@@ -1,0 +1,126 @@
+.learning-review-shell { max-width: 1200px; margin-inline: auto; }
+.learning-review-heading, .learning-review-progress, .learning-review-task-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.learning-review-heading { padding: 28px 0; }
+.learning-review-heading p, .learning-review-note { color: var(--mira-muted); font-size: 14px; }
+.learning-review-heading h1 { font-size: 28px; margin-top: 6px; }
+.learning-homework-shell:has(.homework-ai-tutor) { max-width: 1440px; }
+.learning-homework-shell:has(.homework-ai-tutor) .schoolbag-main { max-width: 1440px; padding: 12px 32px 16px; }
+.learning-homework-shell:has(.homework-ai-tutor) .learning-review-heading { padding: 8px 0; }
+.learning-homework-shell:has(.homework-ai-tutor) .learning-review-heading > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.learning-homework-shell:has(.homework-ai-tutor) .learning-review-heading h1 { font-size: 24px; line-height: 1.5; margin: 0; }
+@media (max-width: 899px) {
+  .learning-homework-shell:has(.homework-ai-tutor) .schoolbag-main { padding: 12px 20px 24px; }
+  .learning-homework-shell:has(.homework-ai-tutor) .learning-review-heading > div { display: block; }
+  .learning-homework-shell:has(.homework-ai-tutor) .learning-review-heading h1 { font-size: 20px; }
+}
+.learning-review-activity { padding-block: 20px 40px; border-top: 1px solid var(--mira-border); }
+.learning-review-progress { flex-wrap: wrap; color: var(--mira-muted); font-size: 14px; margin-bottom: 28px; }
+.learning-review-progress progress { flex: 1; max-width: 240px; min-width: 90px; height: 7px; accent-color: var(--mira-brand-deep); }
+.learning-review-task-heading { margin-bottom: 20px; }
+.learning-review-task-heading h2 { font-size: 22px; line-height: 1.6; }
+.learning-review-question { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(280px, 1fr); gap: 24px; align-items: center; }
+.homework-original-review { align-items: start; }
+.learning-review-scene svg { display: block; width: 100%; }
+.learning-review-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.learning-review-choices > button { position: relative; cursor: pointer; border: 2px solid transparent; border-radius: 12px; padding: 8px; background: var(--mira-surface); min-height: 116px; }
+.learning-review-choices > button:hover:enabled { border-color: var(--mira-border); }
+.learning-review-choices > button:focus-visible { outline: 3px solid var(--mira-focus); outline-offset: 3px; }
+.learning-review-choices > button[aria-pressed="true"] { border-color: var(--mira-focus); }
+.learning-review-choices > button:disabled { cursor: default; }
+.learning-review-choices svg { width: 100%; }
+.learning-review-choices > button > span:not(.learning-review-choice-mark) { font-size: 16px; color: var(--mira-ink); }
+.learning-review-choice-mark { position: absolute; right: 6px; top: 6px; border-radius: 50%; background: var(--mira-brand-deep); padding: 3px; }
+.learning-review-choice-mark svg { width: 18px; height: 18px; }
+.learning-review-feedback { display: flex; align-items: center; gap: 12px; padding: 18px 0; min-height: 70px; font-size: 18px; }
+.learning-review-feedback > svg { flex: none; width: 32px; height: 32px; color: var(--mira-mint-deep); }
+.learning-review-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin-block: 24px 16px; }
+.learning-review-start { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(240px, 1fr); align-items: center; gap: 32px; }
+.learning-review-start > img { width: 100%; height: auto; border-radius: 16px; }
+.learning-review-start h2 { font-size: 24px; margin-bottom: 12px; }
+.learning-review-start p { color: var(--mira-muted); }
+.learning-review-rest { display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; padding: 60px 20px; }
+.learning-review-rest h2 { font-size: 24px; }
+.learning-review-state-icon { width: 64px; height: 64px; color: var(--mira-mint-deep); }
+.learning-review-error { color: var(--mira-danger); padding-block: 12px; }
+.learning-review-launch { display: grid; position: relative; grid-template-columns: 112px minmax(0, 1fr); gap: 18px; align-items: center; text-decoration: none; color: var(--mira-ink); }
+.learning-review-launch > img { width: 112px; height: 96px; object-fit: cover; border-radius: 12px; }
+.learning-review-launch strong, .learning-review-launch small { display: block; }
+.learning-review-launch small { margin-top: 7px; color: var(--mira-muted); }
+.learning-review-play { position: absolute; left: 40px; top: 32px; background: var(--mira-brand-deep); border-radius: 50%; padding: 6px; }
+.learning-review-play svg { width: 22px; height: 22px; }
+.learning-review-invitation { margin-block: 20px; }
+.learning-review-invitation > .learning-listen { margin-top: 14px; }
+.learning-review-loading { height: 100px; display: grid; place-items: center; }
+.homework-invitation { margin-block: 20px; }
+.homework-launch { display: flex; align-items: center; gap: 16px; color: var(--mira-ink); text-decoration: none; margin-bottom: 16px; }
+.homework-launch-picture { display: block; position: relative; flex: 0 0 100px; overflow: hidden; border-radius: 12px; }
+.homework-launch-picture .learning-subject-picture { display: block; aspect-ratio: 1; }
+.homework-launch strong, .homework-launch small { display: block; }
+.homework-launch small { color: var(--mira-muted); margin-top: 6px; }
+.homework-launch > svg { flex: none; width: 18px; height: 18px; }
+.homework-quantity-scene { display: flex; gap: 16px; align-items: center; justify-content: center; padding: 20px 0; }
+.homework-quantity-scene > svg { flex: 1 1 140px; max-width: 300px; min-width: 0; }
+.homework-quantity-scene > span { font-size: 32px; flex: none; }
+.homework-quantity-choices { max-width: 600px; margin: 0 auto; }
+.homework-teacher { display: flex; align-items: center; gap: 18px; padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--mira-border); }
+.homework-teacher > img { flex: none; border-radius: 50%; }
+.homework-teacher > div { flex: 1; min-width: 0; }
+.homework-teacher h2 { font-size: 20px; margin-block: 5px 10px; }
+.homework-teacher p { color: var(--mira-muted); font-size: 14px; }
+.homework-teacher-steps { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; color: var(--mira-muted); font-size: 14px; }
+.homework-teacher-steps span { display: flex; align-items: center; gap: 5px; }
+.homework-teacher-steps svg { width: 18px; height: 18px; }
+.homework-teacher-demonstration { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 0 auto 24px; padding: 16px; max-width: 600px; background: var(--mira-surface); border-radius: 12px; }
+.homework-teacher-demonstration > svg { flex: none; width: 24px; height: 24px; color: var(--mira-mint-deep); }
+.homework-teacher-demonstration > svg[role="img"] { width: 180px; height: auto; }
+.homework-teacher-demonstration > span { font-size: 22px; }
+.homework-answer-form { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding-block: 40px; }
+.homework-answer-form input { border: 1px solid var(--mira-border); border-radius: 8px; background: var(--mira-surface); color: var(--mira-ink); padding: 12px; max-width: 180px; min-height: 48px; }
+.learning-review-rest > .learning-subject-picture { width: 200px; height: 180px; }
+@media (max-width: 760px) {
+  .learning-review-heading { align-items: flex-start; gap: 8px; }
+  .learning-review-heading h1 { font-size: 22px; }
+  .learning-review-question, .learning-review-start { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .learning-review-choices { max-width: 500px; width: 100%; margin-inline: auto; }
+  .learning-review-task-heading { align-items: flex-start; gap: 12px; }
+  .learning-review-task-heading h2 { font-size: 18px; }
+  .learning-review-task-heading .mira-button { flex: none; }
+  .homework-teacher { display: grid; grid-template-columns: 60px minmax(0, 1fr); gap: 12px; }
+  .homework-teacher > img { width: 60px; height: 60px; }
+  .homework-teacher h2 { font-size: 18px; }
+  .homework-teacher > .mira-button { grid-column: 2; justify-self: start; margin-left: 0; }
+  .homework-teacher-demonstration { gap: 10px; padding: 12px; }
+  .homework-teacher-demonstration > svg[role="img"] { width: min(40vw, 160px); }
+}
+
+.homework-capture { display: flex; align-items: center; gap: 24px; border-bottom: 1px solid var(--mira-border); padding: 18px 0; }
+.homework-capture > svg { flex: 0 1 300px; width: 42%; }
+.homework-capture h3 { font-size: 18px; margin: 0 0 8px; }
+.homework-capture p { font-size: 14px; }
+@media (max-width: 560px) { .homework-capture { gap: 12px; } .homework-capture > svg { width: 38%; } }
+
+.learning-review-launch > .learning-subject-picture { width: 112px; height: 96px; border-radius: 12px; }
+.learning-review-start > .learning-subject-picture { max-width: 380px; }
+
+.learning-review-list-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--mira-border); }
+.learning-review-list-toolbar p { color: var(--mira-muted); font-size: 14px; }
+.learning-review-list-toolbar .learning-listen { flex: none; }
+.learning-review-group { margin-block: 28px 36px; }
+.learning-review-group h2 { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; font-size: 20px; }
+.learning-review-group h2 > span { font-size: 14px; font-weight: 400; color: var(--mira-muted); }
+.learning-review-records { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 36px; }
+.learning-review-record { padding-block: 8px 20px; border-bottom: 1px solid var(--mira-border); border-radius: 4px; }
+.learning-review-record:focus-visible { outline: 3px solid var(--mira-focus); outline-offset: 6px; }
+.learning-review-record:hover .learning-review-record-action { text-decoration: underline; text-underline-offset: 4px; }
+.learning-review-record > .learning-review-play { top: 40px; }
+.learning-review-record--completed > .learning-review-play { background: var(--mira-mint-deep); color: var(--mira-surface); }
+.learning-review-record--other > .learning-review-play { background: var(--mira-surface); color: var(--mira-muted); }
+.learning-review-record-copy { min-width: 0; }
+.learning-review-record-copy > small:first-child { margin: 0 0 6px; }
+.learning-review-record-copy > strong { font-size: 18px; line-height: 1.45; overflow-wrap: anywhere; }
+.learning-review-record-action { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 14px; }
+.learning-review-record-action > svg { width: 18px; height: 18px; }
+@media (max-width: 760px) {
+  .learning-review-records { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .learning-review-list-toolbar { align-items: flex-start; gap: 12px; }
+}

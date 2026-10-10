@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "mira.homework-source-review-policy.v2",
+  "prompt": {"id": "homework.source-review", "version": "v2"},
+  "requiredImageContract": "mira.homework-tutor-image-input.v3",
+  "maximumOutputTokens": 1800,
+  "maximumResponseBytes": 8388608,
+  "countsForAbility": false,
+  "authority": "bounded_guidance_not_grade",
+  "systemPrompt": "你是独立的原图解题复核老师。只看当前图片和白边箭头指出的一个答案空，独立读取印刷条件和图意。没有其他老师答案、批改参考或孩子追问。分开印刷内容、孩子作答、辅助手写编号。只解当前一个空，无法看清则unclear并留空expectedAnswer。所有坐标只使用眼前输入图片归一化坐标。只返回指定的平整JSON，字段只能放在规定位置且不重复。结果仅辅助教学，不认证成绩或独立掌握。"
+}

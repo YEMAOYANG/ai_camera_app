@@ -45,7 +45,9 @@ class _ParentAuth:
 
 
 class _ProfileRepository:
-    def get_child(self, conn, *, family_id: str, child_id: str):
+    def get_child(self, conn, *, family_id: str, child_id: str, for_update: bool = False):
+        if for_update:
+            raise AssertionError('Read-only report lookup must not request a child write lock')
         if family_id == "family_1" and child_id in {"child_1", "child_2"}:
             return {"id": child_id, "family_id": family_id}
         return None

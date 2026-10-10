@@ -9,7 +9,7 @@ from unittest.mock import Mock
 
 from integrations.openmaic_formal_media import (
     LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY, INTEGRATED_PROFESSIONAL_POLICY,
-    PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, canonical_sha256, generation_options,
+    PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, canonical_sha256, generation_options,
     professional_policy, validate_media_manifest,
 )
 from integrations.openmaic_formal_video import (
@@ -66,7 +66,7 @@ def _asset():
 
 class OpenMaicFormalVideoTest(unittest.TestCase):
     def test_exact_default_policy_preserves_all_four_historical_options(self):
-        self.assertEqual(OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_CREATION_POLICY, VIDEO_PROFESSIONAL_POLICY)
+        self.assertEqual(OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_CREATION_POLICY, PLAYFUL_PROFESSIONAL_POLICY)
         self.assertEqual(OpenMaicFullRuntimeClient.FORMAL_GENERATION_POLICY["professionalCreation"]["video"], FORMAL_VIDEO_POLICY)
         self.assertIn("scene-actions", OpenMaicFullRuntimeClient.SAMPLE_STRUCTURED_SCENE_POLICY["stages"])
         for policy in (LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY, INTEGRATED_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY):

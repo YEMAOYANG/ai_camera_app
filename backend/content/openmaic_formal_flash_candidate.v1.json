@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "mira.openmaic.flash-candidate-registry.v1",
+  "policyId": "deepseek-v4.1-flash-candidate-v1",
+  "modelPolicy": {
+    "schemaVersion": "mira.openmaic.professional-model-policy.v1",
+    "policyId": "deepseek-v4.1-flash-candidate-v1",
+    "agentDriver": {
+      "providerId": "deepseek",
+      "modelId": "deepseek-flash",
+      "thinking": {
+        "mode": "enabled",
+        "enabled": true,
+        "effort": "high"
+      }
+    },
+    "coursewareCreator": {
+      "providerId": "deepseek",
+      "modelId": "deepseek-flash",
+      "thinking": {
+        "mode": "disabled",
+        "enabled": false
+      }
+    },
+    "coursewareVerifier": {
+      "providerId": "deepseek",
+      "modelId": "deepseek-flash",
+      "thinking": {
+        "mode": "disabled",
+        "enabled": false
+      }
+    },
+    "structuredScene": {
+      "policyId": "deepseek-v4.1-flash-candidate-v1",
+      "providerId": "deepseek",
+      "modelId": "deepseek-flash",
+      "thinking": {
+        "mode": "disabled",
+        "enabled": false
+      }
+    },
+    "fallbackAllowed": false
+  },
+  "sceneLearningPolicy": {
+    "schemaVersion": "mira.learning.scene-contract-policy.v1",
+    "enforced": true,
+    "pictureChoicesForGrades": [
+      "primary_1",
+      "primary_2"
+    ],
+    "noMasteryClaims": true,
+    "scriptSyntaxRequired": true
+  },
+  "activation": "explicit_operator_opt_in_after_acceptance",
+  "legacyModelPolicySha256": "ea231a83dcd2c22d3a29197d2f6edc0a80c1ca58a0d8707fa4d3f4218168daff"
+}

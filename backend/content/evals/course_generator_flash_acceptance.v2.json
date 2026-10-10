@@ -1,0 +1,1074 @@
+{
+  "schemaVersion": "mira.course-generator-flash-acceptance.v2",
+  "id": "deepseek-flash-courseware-acceptance-after-contract-repair-20261008",
+  "status": "specification_frozen_not_executed",
+  "candidateModel": {
+    "providerId": "deepseek",
+    "requestModelId": "deepseek-flash",
+    "family": "DeepSeek V4.1 Flash",
+    "thinking": "disabled_for_core_content_and_actions"
+  },
+  "purpose": "验收修复通用生成/图片题/渲染合同后的Flash课程；把真实教学与互动验收、正式候选合同和正式上线门槛分别记录，只有必需阶段真实通过才切正式模型。",
+  "predecessor": {
+    "specPath": "backend/content/evals/course_generator_comparison.v1.json",
+    "specSha256": "a0209f477a2fa4cc4f904824dae4f868ee82eb6b6074232b8dd9db7995153601",
+    "blindReviewPath": "backend/data/homework/course-evals/20261008-pro-flash-core-v1/blind-review.json",
+    "blindReviewSha256": "2b69121fe2e8d6d4e5bcd55a7cf5d531203266ceb1148c0660c162ab2b3d0504",
+    "firstRoundFindingCount": 30,
+    "conclusion": "Pro和Flash两科均失败；没有Pro教学更好的证据。本轮检验Flash绝对质量，不自动付费重测Pro。"
+  },
+  "authorizationBoundary": {
+    "specDoesNotAuthorizeCalls": true,
+    "specDoesNotAuthorizeDatabaseWrites": true,
+    "specDoesNotAuthorizePublication": true,
+    "specDoesNotChangeProductionConfiguration": true,
+    "noFamilyUploads": true,
+    "ordinaryProductionWorkersRemainDisabledDuringEvaluation": true
+  },
+  "budget": {
+    "currency": "USD",
+    "maximumEstimatedSpend": 8,
+    "maximumTotalNewProviderCalls": 68,
+    "historicalCallsExcluded": true,
+    "initialCoreCandidateCalls": 34,
+    "remainingCallsMaximum": 34,
+    "initialCandidates": 2,
+    "pageRange": [
+      6,
+      8
+    ],
+    "perCoreCandidateMaximum": {
+      "planning": 1,
+      "content": 8,
+      "actions": 8,
+      "total": 17
+    },
+    "remainingUses": [
+      "one documented repair pass per logical course, only if sufficient budget remains",
+      "genuine formal candidate orchestration/review if supported and explicitly reserved",
+      "new required TTS/ASR or media calls, separately itemized, only from remaining total allowance"
+    ],
+    "paidKindsCounted": [
+      "LLM planning/content/actions/Agent/review",
+      "web/search calls if charged",
+      "image/video generation",
+      "TTS",
+      "ASR",
+      "failed or ambiguous dispatched provider calls"
+    ],
+    "stopRules": [
+      "Stop before dispatch if the next bounded call can exceed the 68-call or USD8 cap.",
+      "Do not assume formal Agent/media/audio calls are free or fit in the remaining34.",
+      "Unknown provider outcome is retained; never automatically replay a paid request.",
+      "A documented successful saved response is resumed locally; no extra model call.",
+      "If full formal gates cannot complete under this cap, preserve candidate and mark those required phases not_completed; do not promote or imply completion."
+    ],
+    "tokenLimitsMustBeFrozenBeforeDispatch": true,
+    "pricingMethod": "使用冻结时官方价和实际usage估算，分别列input/output/cache；金额不是账单。"
+  },
+  "scope": {
+    "initialEntryPoint": "native @openmaic/generation outline/content/actions through repaired shared contracts",
+    "output": "actual Stage/Scene saved by native API/store, then rendered by the same classroom renderer used by students",
+    "coreOnlyIsNotFormal": true,
+    "coreExcludedByDefault": [
+      "outer Pro Agent orchestration",
+      "fresh web research",
+      "new media generation",
+      "TTS/ASR",
+      "publication",
+      "real child evidence or family report writes"
+    ],
+    "formalCandidateAttempt": "仅当原生正式隔离job和真实receipt链可用时，在余量内运行；不能给core文件手工补professionalCreation或媒体receipt后称正式。",
+    "formalProgressiveSlot": "必须由当前服务端真实slot/gradeBoundary/锁定assessment冻结并接受；天地人和within5小样不凭空挂progressive lessonId。"
+  },
+  "freezeBeforeDispatch": [
+    "native/core and formal contract versions and source hashes",
+    "managed patch lock and production renderer build identity",
+    "candidate model request IDs and explicit parameters",
+    "full skill files and actually selected/loaded skill receipt provenance",
+    "server assessment IDs, option values, oracle and first-answer semantics",
+    "shared asset bytes and served same-origin URL mapping",
+    "seeded quantity and role-state domains or mathematically proven bounds",
+    "offline source pack evidence and hashes if reused",
+    "budget ledger/reservations and call accounting",
+    "identical per-scene runtime probes and screenshot viewports"
+  ],
+  "sources": {
+    "lowReadingPolicy": {
+      "path": "backend/content/low_reading_policy.v1.json",
+      "sha256": "7796febddf06e9c64cd320ae6665f42d865c0344c059c4c18579848d88997652"
+    },
+    "userRule": "Current AGENTS instructions: grades1-2 must act from meaningful multi-picture scenes and teacher narration without independent reading.",
+    "missingReference": {
+      "path": "docs/learning/low-reading-interaction-rule.md",
+      "state": "missing_in_current_worktree_on_read_20261008",
+      "handling": "Do not claim it was reread. Use verified policy and user-provided AGENTS rule; restore/freeze a durable reference before declaring documentation complete."
+    }
+  },
+  "courses": [
+    {
+      "id": "g1_chinese_tiandiren",
+      "title": "天地人：到公园找一找，换人说一说",
+      "gradeCode": "primary_1",
+      "subject": "chinese",
+      "targetMinutes": [
+        8,
+        10
+      ],
+      "teachingScope": [
+        "天、地、人在生活场景中的含义",
+        "我、你、他随说话人、听话人和谈论对象变化"
+      ],
+      "excludedScope": [
+        "独立朗读和发音评分",
+        "手写和笔画评分",
+        "把看图理解当独立认字",
+        "后续课文或复杂语法"
+      ],
+      "learnerAssumption": "孩子不能独立读懂题干、选项名称和说明，能够听懂短句并点图。",
+      "originalSceneBrief": "公园有天空、地面和三位造型固定的孩子。红衣女孩、蓝衣男孩、黄衣男孩在各页保持造型；用口部、说话气泡、朝向表达正在说、正在听、被谈论。",
+      "requiredMechanisms": [
+        "孩子点天空、地面与人物，目标汉字配合具体场景显示",
+        "把字牌拖到图中位置或以等效点选完成匹配",
+        "孩子主动换说话人；我和你必须随角色交换，不能恒等于某件衣服或某个位置",
+        "错误后以图中关系解释，逐级提示，最后才演示",
+        "独立题改到操场、雨后或不同角色配置，答案不能由旧题图或选项位置记忆推出"
+      ],
+      "oracleProbes": [
+        {
+          "id": "tian_region",
+          "setup": "听到头顶白云所在的地方",
+          "expected": "天空区域",
+          "reject": "靠读题干中的天直接匹配"
+        },
+        {
+          "id": "di_region",
+          "setup": "听到脚下小路所在的地方",
+          "expected": "地面区域",
+          "reject": "图上高亮直接泄露答案"
+        },
+        {
+          "id": "ren_region",
+          "setup": "听到正在散步的小朋友",
+          "expected": "人物区域",
+          "reject": "仅靠人字文字选项回答"
+        },
+        {
+          "id": "red_speaker_me",
+          "setup": "红衣女孩说话、蓝衣男孩听、黄衣男孩被谈论，问我是谁",
+          "expected": "红衣女孩图片"
+        },
+        {
+          "id": "blue_speaker_me",
+          "setup": "切换到蓝衣男孩说话，问我是谁",
+          "expected": "蓝衣男孩图片",
+          "reject": "仍选红衣女孩"
+        },
+        {
+          "id": "listener_you",
+          "setup": "蓝衣男孩对红衣女孩说话，问你是谁",
+          "expected": "红衣女孩图片"
+        },
+        {
+          "id": "third_person_he",
+          "setup": "蓝衣男孩对红衣女孩谈论黄衣男孩，问他是谁",
+          "expected": "黄衣男孩图片"
+        }
+      ],
+      "coverageCaveat": "七项是离线机制探针，不授权增加正式评分题。旧正式合同只有四道锁定题且仅两道独立题，不足以宣称六字分别独立掌握；必须按实际独立题覆盖范围报告。已有原生样板的前测、分流和报告属于框架能力，不能给某个生成模型额外加分。",
+      "lockedAssessmentSuggestion": [
+        {
+          "id": "guided_tian_region",
+          "phase": "guided",
+          "prompt": "点一点，白云在的地方。",
+          "pictureChoices": [
+            "天空区域",
+            "地面区域",
+            "人物区域"
+          ],
+          "correctSemanticChoice": "天空区域"
+        },
+        {
+          "id": "guided_red_me",
+          "phase": "guided",
+          "prompt": "红衣女孩在说话。她说的我是谁？",
+          "setup": "红衣女孩说、蓝衣男孩听、黄衣男孩为第三人",
+          "pictureChoices": [
+            "红衣女孩头像",
+            "蓝衣男孩头像",
+            "黄衣男孩头像"
+          ],
+          "correctSemanticChoice": "红衣女孩头像"
+        },
+        {
+          "id": "independent_ground_after_rain",
+          "phase": "independent",
+          "prompt": "雨停了，点一点脚下小路在的地方。",
+          "pictureChoices": [
+            "天空区域",
+            "地面区域",
+            "人物区域"
+          ],
+          "correctSemanticChoice": "地面区域"
+        },
+        {
+          "id": "independent_blue_me",
+          "phase": "independent",
+          "prompt": "换蓝衣男孩来说话。他说的我是谁？",
+          "setup": "蓝衣男孩说、红衣女孩听、黄衣男孩为第三人",
+          "pictureChoices": [
+            "红衣女孩头像",
+            "蓝衣男孩头像",
+            "黄衣男孩头像"
+          ],
+          "correctSemanticChoice": "蓝衣男孩头像"
+        }
+      ],
+      "observableInteractions": [
+        {
+          "mechanism": "scene_picture_tap",
+          "record": [
+            "chosenRegion",
+            "expectedRegion",
+            "feedbackState"
+          ],
+          "pass": "选区与oracle相同；答错时解释天空/脚下/人物所指，不能只变红"
+        },
+        {
+          "mechanism": "character_to_scene_drag",
+          "record": [
+            "characterTile",
+            "dropRegion",
+            "accepted",
+            "resetState"
+          ],
+          "pass": "落点与字义匹配；错误可撤回并有方向提示；复位恢复原场景"
+        },
+        {
+          "mechanism": "speaker_switch",
+          "record": [
+            "speakerPortraitId",
+            "listenerPortraitId",
+            "thirdPortraitId",
+            "askedPronoun",
+            "selectedPortraitId"
+          ],
+          "pass": "说听角色交换后我/你的正确人物随之改变；旁白、嘴部/气泡/朝向与角色一致"
+        },
+        {
+          "mechanism": "new_scene_task",
+          "record": [
+            "sourceScenario",
+            "transferScenario",
+            "hintUsed",
+            "selectedRegionOrPortrait"
+          ],
+          "pass": "新情境人物关系或物体确实变化，不只换背景；求助后不标独立通过"
+        }
+      ],
+      "brief": "围绕天、地、人、你、我、他的生活含义设计新课，尤其检验角色交换后我你他关系是否真实改变。与既有天地人样板同教学目标，页面布局和机制由模型生成，不复制已有页面。",
+      "requirements": {
+        "requirement": "请用原生课堂生成器创建6至8页、一节8至10分钟的一年级原创课。孩子不能独立读题：场景和多个可区分的图片答案承载意义，目标汉字/数字可显示，其他文字只辅助；每屏一次只做一个任务。操作以点图、拖拽、配对为主，触点至少48px。包含可重玩并改变真实对象或关系的游戏、可观察的错误与正确反馈、三层帮助中最后才演示，以及不同情境的无提示迁移。短句讲解一条一句，与当前图形和聚焦一致。不要emoji、装饰图代替答案，不要在作答前高亮正确选择，不以播放/点击宣称掌握。至少有导入slide、真实interactive和测验任务，控制在8页内；不要预先固定手写页面模板。保留实际四道评测题的身份和原题意，前两道引导、后两道独立，逐题显示，不同时铺满。共用已提供的原创素材，不请求生成图片、TTS、联网或发布。只生成教学页面和actions，不编造孩子成绩、家长报告或已掌握结论。\n课程：天地人：到公园找一找，换人说一说。目标：天、地、人在生活场景中的含义；我、你、他随说话人、听话人和谈论对象变化。场景：公园有天空、地面和三位造型固定的孩子。红衣女孩、蓝衣男孩、黄衣男孩在各页保持造型；用口部、说话气泡、朝向表达正在说、正在听、被谈论。。必须机制：孩子点天空、地面与人物，目标汉字配合具体场景显示；把字牌拖到图中位置或以等效点选完成匹配；孩子主动换说话人；我和你必须随角色交换，不能恒等于某件衣服或某个位置；错误后以图中关系解释，逐级提示，最后才演示；独立题改到操场、雨后或不同角色配置，答案不能由旧题图或选项位置记忆推出。四题：[{\"id\": \"guided_tian_region\", \"phase\": \"guided\", \"prompt\": \"点一点，白云在的地方。\", \"pictureChoices\": [\"天空区域\", \"地面区域\", \"人物区域\"], \"correctSemanticChoice\": \"天空区域\"}, {\"id\": \"guided_red_me\", \"phase\": \"guided\", \"prompt\": \"红衣女孩在说话。她说的我是谁？\", \"setup\": \"红衣女孩说、蓝衣男孩听、黄衣男孩为第三人\", \"pictureChoices\": [\"红衣女孩头像\", \"蓝衣男孩头像\", \"黄衣男孩头像\"], \"correctSemanticChoice\": \"红衣女孩头像\"}, {\"id\": \"independent_ground_after_rain\", \"phase\": \"independent\", \"prompt\": \"雨停了，点一点脚下小路在的地方。\", \"pictureChoices\": [\"天空区域\", \"地面区域\", \"人物区域\"], \"correctSemanticChoice\": \"地面区域\"}, {\"id\": \"independent_blue_me\", \"phase\": \"independent\", \"prompt\": \"换蓝衣男孩来说话。他说的我是谁？\", \"setup\": \"蓝衣男孩说、红衣女孩听、黄衣男孩为第三人\", \"pictureChoices\": [\"红衣女孩头像\", \"蓝衣男孩头像\", \"黄衣男孩头像\"], \"correctSemanticChoice\": \"蓝衣男孩头像\"}]\n素材规则：仅传相同src、准确文字描述与清单，不向模型发送图片字节；不使用家庭作业照片。公园图/老师图URL为已存在的StudentWeb本地服务资源，avatars为Native同源资源。若隔离renderer必须同源，runner负责建立仅这些已核对文件的映射并在manifest记实际servedSrc；禁止虚构Native资源路径。数学数量用可核对的SVG物品、盘子或珠子，禁止emoji。公园人物的唯一说话人必须由叠加标记和actions决定，不推定来自底图。\n修复后验收约束：情境和每个答案必须使用当前实际支持的原生图片合同，不能用“图片A/头像1/三个点心”等文字假装图片；严格保留冻结题ID，answer仅为options.value，绝不能是label。说听人物造型和头像跨页一致。互动状态要实际可操作、可复位，平台state动作必须能改变真实UI；静态页不可命令孩子拖动。旁白不得提前声称孩子已点过、答对、通关或掌握；仅真实用户事件后的反馈可描述当次操作。错误反馈要说明原因并逐步帮助，不能只变红/摇晃。切换说话人不得当答题计分；知识掌握只能依据明确的无提示首次作答，例题/演示/提示/重复点击不可当独立通过。",
+        "userNickname": "测试学生",
+        "userBio": "孩子不能独立读懂题干、选项名称和说明，能够听懂短句并点图。",
+        "webSearch": false,
+        "interactiveMode": true,
+        "taskEngineMode": false
+      },
+      "sharedMediaIds": [
+        "tiandiren_park",
+        "student_portrait_1",
+        "student_portrait_2",
+        "student_portrait_3"
+      ],
+      "learningContract": {
+        "schemaVersion": "mira.learning.scene-contract.v1",
+        "gradeCode": "primary_1",
+        "subject": "chinese",
+        "pictureChoicesRequired": true,
+        "noMasteryClaims": true
+      },
+      "formalSlot": {
+        "status": "not_selected",
+        "registeredSkillCandidate": null,
+        "warning": "This core sample is not a registered formal slot or a published course."
+      },
+      "acceptanceStatus": "not_executed"
+    },
+    {
+      "id": "g1_math_within5_add_subtract",
+      "title": "点心小铺：合起来，拿走后还剩几个",
+      "gradeCode": "primary_1",
+      "subject": "math",
+      "registeredSkillCandidate": "addition_subtraction_20",
+      "targetMinutes": [
+        8,
+        10
+      ],
+      "teachingScope": [
+        "5以内两组物品合并对应加法",
+        "5以内拿走一部分对应减法",
+        "结果是实际物品数量，不由排列长短决定"
+      ],
+      "excludedScope": [
+        "凑十和进退位",
+        "连加连减",
+        "乘除法",
+        "抽象未知数方程",
+        "依赖读文字应用题"
+      ],
+      "learnerAssumption": "孩子能点数5以内物品、听短句，不能独立阅读题目。",
+      "originalSceneBrief": "点心小铺用可数的 SVG 点心表示数量，两个盘子可拖动合并，篮中物品可拖至移走区域；被拿走的物品保留在另外区域，余量清晰可数。",
+      "requiredMechanisms": [
+        "先操作具体物品，再逐步显示运算符号",
+        "合并和拿走必须改变实际可数集合，数字与图形实时一致",
+        "一次只让孩子执行一个动作，数量不靠长段说明传达",
+        "若把拿走数量当余量，指出移走区与剩余区并解释区别",
+        "新情境换成玩具、果子或车站，孩子独立选择对应数量图片"
+      ],
+      "lockedAssessmentSuggestion": [
+        {
+          "id": "guided_combine_2_1",
+          "phase": "guided",
+          "operands": [
+            2,
+            1
+          ],
+          "operation": "add",
+          "correctCount": 3
+        },
+        {
+          "id": "guided_remove_4_1",
+          "phase": "guided",
+          "operands": [
+            4,
+            1
+          ],
+          "operation": "subtract",
+          "correctCount": 3
+        },
+        {
+          "id": "independent_combine_1_3",
+          "phase": "independent",
+          "operands": [
+            1,
+            3
+          ],
+          "operation": "add",
+          "correctCount": 4
+        },
+        {
+          "id": "independent_remove_5_2",
+          "phase": "independent",
+          "operands": [
+            5,
+            2
+          ],
+          "operation": "subtract",
+          "correctCount": 3
+        }
+      ],
+      "oracleProbes": [
+        {
+          "id": "combine_state",
+          "setup": "将2件和1件放到一起",
+          "expectedVisibleCount": 3,
+          "expectedEquation": "2+1=3"
+        },
+        {
+          "id": "remove_state",
+          "setup": "从5件拿走2件",
+          "expectedRemainingCount": 3,
+          "expectedRemovedCount": 2,
+          "expectedEquation": "5-2=3"
+        },
+        {
+          "id": "spacing_invariance",
+          "setup": "只改变3件物品的间距或排列",
+          "expectedVisibleCount": 3,
+          "reject": "排得更长就变多"
+        },
+        {
+          "id": "wrong_removed_as_remaining",
+          "setup": "5件拿走2件后孩子点2件图片",
+          "expected": "解释2是拿走的，指向3件仍在篮中，并给新题验证",
+          "reject": "只显示错了或直接报3"
+        },
+        {
+          "id": "independent_transfer",
+          "setup": "换成独立新题5只小鸟飞走2只，选择余量图片",
+          "expected": "3只图片；提示或演示后不得计为独立通过"
+        }
+      ],
+      "coverageCaveat": "冻结实际正式题目时必须由服务端合同接受题目身份，不能仅以这份建议替代已锁定题。范围是5以内，不从本小样推广到20以内完整课程质量。",
+      "observableInteractions": [
+        {
+          "mechanism": "combine_objects",
+          "record": [
+            "leftCountBefore",
+            "rightCountBefore",
+            "unionObjectIdsAfter",
+            "displayedEquation"
+          ],
+          "pass": "2和1合并后可见且可数3件，数字2+1=3与对象一致"
+        },
+        {
+          "mechanism": "remove_objects",
+          "record": [
+            "initialObjectIds",
+            "removedObjectIds",
+            "remainingObjectIds",
+            "displayedEquation"
+          ],
+          "pass": "5拿走2，移走区2件、余量区3件，数字5-2=3正确；拿走不可只隐藏数字"
+        },
+        {
+          "mechanism": "misconception_probe",
+          "record": [
+            "selectedCount",
+            "feedbackRegion",
+            "reasonText",
+            "hintLevel"
+          ],
+          "pass": "若把拿走2误当还剩2，反馈指向移走区和余量区并解释关系；提示不预先泄露新题答案"
+        },
+        {
+          "mechanism": "layout_change",
+          "record": [
+            "objectIdsBefore",
+            "objectIdsAfter",
+            "positionsBefore",
+            "positionsAfter",
+            "displayedCount"
+          ],
+          "pass": "只改间距或排法时对象总数不变；不能由长度判多少"
+        },
+        {
+          "mechanism": "new_scene_task",
+          "record": [
+            "contextId",
+            "operands",
+            "operation",
+            "selectedCount",
+            "hintUsed"
+          ],
+          "pass": "不同物品/场景的独立合并和拿走题，图示数量与oracle一致；不能照抄例题答案"
+        }
+      ],
+      "brief": "用5以内的具体物品操作解释合起来和拿走后剩余，检验可数对象、数量关系、错误反馈和新情境迁移，而不让孩子读文字应用题。",
+      "requirements": {
+        "requirement": "请用原生课堂生成器创建6至8页、一节8至10分钟的一年级原创课。孩子不能独立读题：场景和多个可区分的图片答案承载意义，目标汉字/数字可显示，其他文字只辅助；每屏一次只做一个任务。操作以点图、拖拽、配对为主，触点至少48px。包含可重玩并改变真实对象或关系的游戏、可观察的错误与正确反馈、三层帮助中最后才演示，以及不同情境的无提示迁移。短句讲解一条一句，与当前图形和聚焦一致。不要emoji、装饰图代替答案，不要在作答前高亮正确选择，不以播放/点击宣称掌握。至少有导入slide、真实interactive和测验任务，控制在8页内；不要预先固定手写页面模板。保留实际四道评测题的身份和原题意，前两道引导、后两道独立，逐题显示，不同时铺满。共用已提供的原创素材，不请求生成图片、TTS、联网或发布。只生成教学页面和actions，不编造孩子成绩、家长报告或已掌握结论。\n课程：点心小铺：合起来，拿走后还剩几个。目标：5以内两组物品合并对应加法；5以内拿走一部分对应减法；结果是实际物品数量，不由排列长短决定。场景：点心小铺用可数的 SVG 点心表示数量，两个盘子可拖动合并，篮中物品可拖至移走区域；被拿走的物品保留在另外区域，余量清晰可数。。必须机制：先操作具体物品，再逐步显示运算符号；合并和拿走必须改变实际可数集合，数字与图形实时一致；一次只让孩子执行一个动作，数量不靠长段说明传达；若把拿走数量当余量，指出移走区与剩余区并解释区别；新情境换成玩具、果子或车站，孩子独立选择对应数量图片。四题：[{\"id\": \"guided_combine_2_1\", \"phase\": \"guided\", \"operands\": [2, 1], \"operation\": \"add\", \"correctCount\": 3}, {\"id\": \"guided_remove_4_1\", \"phase\": \"guided\", \"operands\": [4, 1], \"operation\": \"subtract\", \"correctCount\": 3}, {\"id\": \"independent_combine_1_3\", \"phase\": \"independent\", \"operands\": [1, 3], \"operation\": \"add\", \"correctCount\": 4}, {\"id\": \"independent_remove_5_2\", \"phase\": \"independent\", \"operands\": [5, 2], \"operation\": \"subtract\", \"correctCount\": 3}]\n素材规则：仅传相同src、准确文字描述与清单，不向模型发送图片字节；不使用家庭作业照片。公园图/老师图URL为已存在的StudentWeb本地服务资源，avatars为Native同源资源。若隔离renderer必须同源，runner负责建立仅这些已核对文件的映射并在manifest记实际servedSrc；禁止虚构Native资源路径。数学数量用可核对的SVG物品、盘子或珠子，禁止emoji。公园人物的唯一说话人必须由叠加标记和actions决定，不推定来自底图。\n修复后验收约束：情境和每个答案必须使用当前实际支持的原生图片合同，不能用“图片A/头像1/三个点心”等文字假装图片；严格保留冻结题ID，answer仅为options.value，绝不能是label。说听人物造型和头像跨页一致。互动状态要实际可操作、可复位，平台state动作必须能改变真实UI；静态页不可命令孩子拖动。旁白不得提前声称孩子已点过、答对、通关或掌握；仅真实用户事件后的反馈可描述当次操作。错误反馈要说明原因并逐步帮助，不能只变红/摇晃。切换说话人不得当答题计分；知识掌握只能依据明确的无提示首次作答，例题/演示/提示/重复点击不可当独立通过。所有页面、教程例子、答案图片、游戏关卡、随机状态和旁白中的实际集合数量都必须在0到5之间；加法两组总和最多5；减法初始最多5且拿走不超过初始。严格禁止3+3、4+3、5+5、7−3和随机生成6以上集合。数量用逐个可数的SVG或原生HTML对象，不能用emoji。示例对象只能在操作后真实合并或移走，原始、移走、剩余分区清楚且对象守恒。",
+        "userNickname": "测试学生",
+        "userBio": "孩子能点数5以内物品、听短句，不能独立阅读题目。",
+        "webSearch": false,
+        "interactiveMode": true,
+        "taskEngineMode": false
+      },
+      "sharedMediaIds": [],
+      "quantityVisualRule": "原生SVG或HTML画逐个可数且可拖动物品，固定对象身份与独立数量oracle；禁止emoji、图片模型绘制精确数量和答案照片。",
+      "learningContract": {
+        "schemaVersion": "mira.learning.scene-contract.v1",
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "pictureChoicesRequired": true,
+        "noMasteryClaims": true,
+        "maximumQuantity": 5
+      },
+      "formalSlot": {
+        "status": "not_selected",
+        "registeredSkillCandidate": "addition_subtraction_20",
+        "warning": "This core sample is not a registered formal slot or a published course."
+      },
+      "acceptanceStatus": "not_executed"
+    }
+  ],
+  "sharedMedia": [
+    {
+      "id": "tiandiren_park",
+      "src": "http://localhost:3000/textbooks/navigation-v1/tiandiren-140b4fec01160057.webp",
+      "description": "公园全景：蓝天含白云和飞鸟，下方土路与草地；左侧橙红开衫女孩面向中央蓝绿上衣男孩，右侧黄衫远处男孩挥手。前景两人嘴都微张；原图不能决定唯一说话人。",
+      "localPath": "student-web/public/textbooks/navigation-v1/tiandiren-140b4fec01160057.webp",
+      "sha256": "140b4fec01160057ee24d95845beea3cee391f4c2a94d64d6fd53f1393d2b006",
+      "width": 1600,
+      "height": 800
+    },
+    {
+      "id": "student_portrait_1",
+      "src": "/avatars/student1.svg",
+      "description": "固定可辨识头像1。用于可操作角色及答案，不能仅展示名字或变动造型。",
+      "localPath": "openmaic-runtime/.runtime/OpenMAIC/public/avatars/student1.svg",
+      "sha256": "1938f9e27c5df74fec31611ddd1a247760304e3c2b545c2f5e911af49954a9bb"
+    },
+    {
+      "id": "student_portrait_2",
+      "src": "/avatars/student2.svg",
+      "description": "固定可辨识头像2。与头像1、3不同，在问题、示范及选择中复用同一图。",
+      "localPath": "openmaic-runtime/.runtime/OpenMAIC/public/avatars/student2.svg",
+      "sha256": "9869a75d2c1e7459f12bea11cb23e6d982e412a081c2ae9e35701f93e7a1da38"
+    },
+    {
+      "id": "student_portrait_3",
+      "src": "/avatars/student3.svg",
+      "description": "固定可辨识头像3。角色切换后保留本人造型，只改说听关系。",
+      "localPath": "openmaic-runtime/.runtime/OpenMAIC/public/avatars/student3.svg",
+      "sha256": "de3840c2a5628771108579c601fd673a3741c27a48d54431d91ecb4067e130bf"
+    }
+  ],
+  "teacherAvatar": {
+    "chinese": {
+      "id": "teacher_chinese",
+      "src": "http://localhost:3000/teachers/mi-chinese-v1.png",
+      "description": "现有语文老师形象。",
+      "localPath": "student-web/public/teachers/mi-chinese-v1.png",
+      "sha256": "9be86ad88627fcb65e7df6ca8535b66b209b7c8351907b6fbf235d96a43ffc28"
+    },
+    "math": {
+      "id": "teacher_math",
+      "src": "http://localhost:3000/teachers/ashu-math-v1.png",
+      "description": "现有数学老师形象。",
+      "localPath": "student-web/public/teachers/ashu-math-v1.png",
+      "sha256": "26393424cf51db621aed6a0a56bdc14c87dea7d5e043e3c04d89834a0f48449f"
+    }
+  },
+  "hardGates": [
+    {
+      "id": "content_correct",
+      "check": "所有 oracle、题目答案、图中精确数量与角色指代正确；任一实际错误即失败"
+    },
+    {
+      "id": "no_answer_leak",
+      "check": "作答前图片选项待遇一致，不以位置、色彩、文字复现或预先高亮暴露答案"
+    },
+    {
+      "id": "picture_first",
+      "check": "遮非目标文字探针逐题通过；纯字答案加装饰图或 emoji 判失败"
+    },
+    {
+      "id": "real_mechanism",
+      "check": "至少一个可重玩的实质操作机制，改变对象或关系并给可理解的原因反馈；点一下变颜色、贴纸奖励或翻页不能替代"
+    },
+    {
+      "id": "voice_visual_match",
+      "check": "actions中的讲解对象、数值、说听关系和聚焦目标与实际页面一致，不用浏览器或系统机械语音替代尚未生成的正式音频。实际音色、自动播报与回放验收本轮未测。"
+    },
+    {
+      "id": "independent_evidence",
+      "check": "生成的学习任务区分示例/引导/提示/独立迁移，提示和演示不得在页面中自称独立掌握；真实后端掌握评分本轮不含。"
+    },
+    {
+      "id": "runtime_and_contract",
+      "check": "实际Stage/Scene可被既有classroom renderer加载、完整保存、资源可用、触点至少48px、无遮挡溢出；任务内容和四题身份与冻结输入一致。正式技能/年级/发布回执不在本轮，不能伪造。"
+    },
+    {
+      "id": "no_fake_completion_or_report",
+      "check": "课件不以播放结束、点击或模型主观断言声称孩子已掌握；生成摘要只能表述本次任务范围，不编造真实家长报告或成绩。正式报告接入本轮未测。"
+    }
+  ],
+  "runtimeProbes": [
+    {
+      "id": "all_scenes_render",
+      "courseSubject": "all",
+      "method": "Open every scene at1280x720 and1024x768 through actual classroom renderer; record screenshot, DOM, asset decode/load, console/errors and actual48px targets.",
+      "expected": "Every scene usable, with no clipped meaning/options, missing media, uncaught error or pointer block.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "text_mask_and_replay",
+      "courseSubject": "all",
+      "method": "Hide non-target titles/instructions/labels/letters; inspect scene + picture choices while evaluator follows the generated teacher narration transcript. Test visible replay.",
+      "expected": "Scene and choices still distinguish the task. Core transcript test is script-only; actual prerecorded teacher audio is separately required.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "correct_wrong_every_locked_question",
+      "courseSubject": "all",
+      "method": "For each of4 locked core questions, run expected value and every distractor on isolated fresh state; inspect submission/grading binding and feedback.",
+      "expected": "Each oracle correct is accepted, each distractor rejected; actual pictures remain equal before response; no label/value confusion.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "first_answer_hint_replay",
+      "courseSubject": "all",
+      "method": "Answer wrong once, ask hint1, hint2 and demo3, then answer; repeat/reset; inspect observable local evidence classification.",
+      "expected": "First attempt is retained, assisted answers not independent, replay/points not mastery; help explains a reason.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "no_input_teacher_script",
+      "courseSubject": "all",
+      "method": "Play all actions while never answering or dragging.",
+      "expected": "No narration/score/result claims child completed or learned; visible state and script remain consistent.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "teacher_set_state_real",
+      "courseSubject": "all",
+      "method": "Exercise every generated widget_setState and focus target, inspect before/after DOM/state.",
+      "expected": "Referenced nodes exist and intended changes really occur; no ignored unknown keys or invented targets.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "drag_touch_mouse_reset",
+      "courseSubject": "all",
+      "method": "Use valid/invalid mouse and touch drags, then reset and replay.",
+      "expected": "Real objects/relationships change correctly; wrong drop explains/reverts safely; reset restores original bounded state.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "six_character_concepts",
+      "courseSubject": "chinese",
+      "method": "Point to sky, ground and people; change speaker/listener/third and ask me/you/he with all3 visible; run three speaker rotations and both listening orientations.",
+      "expected": "Each concept matches scene meaning; pronoun answer follows role, not clothing/position; portraits remain consistent.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "pronoun_same_actor_click",
+      "courseSubject": "chinese",
+      "method": "Click the same speaker five times without answering; then switch speaker and answer old actor.",
+      "expected": "No mastery/correct answer is awarded; old speaker choice is now wrong with role explanation.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "park_mouth_ambiguity",
+      "courseSubject": "chinese",
+      "method": "Use supplied park base image with both foreground mouths open; inspect role overlays before answering.",
+      "expected": "Unique speaking/listening relationship is explicit; original base image alone is never claimed as unique speaker evidence.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "math_domain_conservation",
+      "courseSubject": "math",
+      "method": "Enumerate declared level domain and deterministic random bounds; merge2+1, remove4−1 and5−2; compare object IDs and displayed math before/after/reset.",
+      "expected": "All actual collections stay0..5. Merge union is3; removal has2 removed+3 remaining; no duplication/destruction or impossible parent-state gate.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "math_spacing_invariance",
+      "courseSubject": "math",
+      "method": "Spread same3 objects farther apart, compact them, change row layout.",
+      "expected": "Count remains3; longer arrangement is not presented as more.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "removed_as_remaining_repair",
+      "courseSubject": "math",
+      "method": "On5−2 choose picture with2 objects, request progressive help, then new no-hint transfer task.",
+      "expected": "Feedback visibly differentiates removed2 from remaining3; new response cannot inherit assisted independence.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "new_context_transfer",
+      "courseSubject": "all",
+      "method": "Chinese: rain-ground and blue-speaker task; math: toys1+3 and fruit5−2; change picture option order between isolated runs.",
+      "expected": "Each task really changes context/referent and retains oracle; child cannot succeed by old position or announced answer.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    },
+    {
+      "id": "supplementary_narrow_screen",
+      "courseSubject": "all",
+      "method": "Inspect lowest actually supported student classroom viewport, including touch toolbar and help/replay; use896x504 only if supported target.",
+      "expected": "Record viewport/support explicitly; do not claim mobile/portrait support from desktop screenshots.",
+      "status": "not_executed",
+      "evidenceRequired": [
+        "sceneId",
+        "input or interaction trace",
+        "before/after actual state",
+        "screenshot/DOM hash",
+        "pass/fail and reason"
+      ]
+    }
+  ],
+  "regressionCases": [
+    {
+      "id": "text_instead_of_picture_choice",
+      "courseSubject": "all",
+      "fixture": "options=[{value:A,label:图片A：3个点心}] with no supported visual payload",
+      "expected": "reject: picture choices must be real rendered pictures",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "label_answer_key",
+      "courseSubject": "all",
+      "fixture": "options.value=B, label=3个果子; answer=[3个果子]",
+      "expected": "reject: answer must use option.value and match exactly",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "duplicate_or_missing_oracle",
+      "courseSubject": "all",
+      "fixture": "one locked assessment omitted, duplicated, paraphrased or regrouped into a simultaneous multi-task screen",
+      "expected": "reject: locked identity and one-current-task contract",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "undefined_drag_handler",
+      "courseSubject": "all",
+      "fixture": "addEventListener(pointermove,onTilePointerMove) but onTilePointerMove is absent",
+      "expected": "reject: executing init and interaction raises any uncaught error",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "detached_drag_parent",
+      "courseSubject": "math",
+      "fixture": "pointerdown reparents item to body; pointerup requires parent===basket to accept",
+      "expected": "reject: a valid drag never changes removed/remaining counts",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "out_of_scope_quantity",
+      "courseSubject": "math",
+      "fixture": "opening 3+3, game4+3, rule5+5=10, subtraction7−3 or random3..6",
+      "expected": "reject: any actual quantity/operand/result outside frozen within5 domain",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "narration_random_mismatch",
+      "courseSubject": "math",
+      "fixture": "start randomizes3..6 but actions say basket has4 and now remains3",
+      "expected": "reject: narration must agree with actual visible state",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "ignored_teacher_state",
+      "courseSubject": "chinese",
+      "fixture": "teacher sends speaker=girl but code uses c0/c1/c2 and has no state adapter",
+      "expected": "reject: stated teacher change does not reach visible role cues",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "pronoun_click_mastery",
+      "courseSubject": "chinese",
+      "fixture": "five speaker clicks award 我你他全明白 without any pronoun answer",
+      "expected": "reject: operation/replay is not evidence of mastery",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "portrait_reassigned",
+      "courseSubject": "chinese",
+      "fixture": "portrait1 is red girl on slide and blue boy in game; third person omitted",
+      "expected": "reject: consistent recognizable actors and all referenced people visible",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "no_action_false_success",
+      "courseSubject": "all",
+      "fixture": "speech states 你都点到了/你拿对了 before any input or verified event",
+      "expected": "reject: unsolicited completion/mastery claims",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "independent_answer_leak",
+      "courseSubject": "all",
+      "fixture": "toy question asks total then says 点合起来是4个的图, or auto highlights target",
+      "expected": "reject: independent correct choice cannot be announced/styled beforehand",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "emoji_manipulatives",
+      "courseSubject": "math",
+      "fixture": "quantity answer/game consists of repeated cookie emoji rather than frozen SVG/native objects",
+      "expected": "reject: semantic multi-picture/vector quantity contract",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "wrong_feedback_only_red",
+      "courseSubject": "all",
+      "fixture": "wrong choice only shakes/red/beeps with no reason or staged help",
+      "expected": "reject: real misconception repair missing",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "raw_semantic_media_id",
+      "courseSubject": "all",
+      "fixture": "src=tiandiren_park unresolved because harness lacks resolver",
+      "expected": "record assembly fault, repair only whitelisted serving equally; do not score it as model pedagogical failure",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "unsupported_extra_visual_json",
+      "courseSubject": "all",
+      "fixture": "question.scaffold/visual describes picture intent but native renderer ignores it",
+      "expected": "reject: generated payload must render through supported contract",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "native_answer_contract_valid_control",
+      "courseSubject": "all",
+      "fixture": "supported actual picture choices, distinct option.value, matching hidden answer key, equal initial style",
+      "expected": "accept structurally, then require real rendering and teaching review",
+      "isPassingProductionEvidence": false
+    },
+    {
+      "id": "guided_demo_not_independent_control",
+      "courseSubject": "all",
+      "fixture": "explicitly labeled teacher demonstration reveals how to act, recorded guided only",
+      "expected": "allow demonstration but never count independent success",
+      "isPassingProductionEvidence": false
+    }
+  ],
+  "requiredStages": [
+    {
+      "id": "generic_contract_repairs",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "No model calls; shared generation/parser/renderer repairs pass all frozen invalid/valid fixtures.",
+      "evidenceRequired": "source/tests and patch lock, not sample-specific hand edits"
+    },
+    {
+      "id": "native_flash_core_generation",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "Two native-saved first drafts, frozen inputs and max34 initial calls.",
+      "evidenceRequired": "per-call receipt, input/hash, output/raw/classroom hashes, all failed/unknown calls included"
+    },
+    {
+      "id": "rendered_teaching_acceptance",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "All8 hard gates and runtime probes pass per course; independent human review confirms pictures, semantics and feedback.",
+      "evidenceRequired": "per-scene screenshots/DOM/action traces; objective oracle results; full100 score only after rendered review"
+    },
+    {
+      "id": "formal_candidate_identity",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "New versioned candidate model-policy preserves old Pro historical hashes; real formal grade/slot/assessment target accepted by both runtime/backend.",
+      "evidenceRequired": "No invented progressive slot, fake professional receipt, disabled required gate or arbitrary env-only model substitute"
+    },
+    {
+      "id": "formal_native_skill_research",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "Native isolated formal job genuinely selects/loads required skills and binds final scene contexts; research provenance meets the chosen versioned contract.",
+      "evidenceRequired": "Current policy mandates search/fetch. Offline verified source reuse needs an explicitly supported new version/provenance contract; no fake fresh fetch or old-session receipt transplant"
+    },
+    {
+      "id": "formal_final_static_quality",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "Final Stage/Scene passes structural/page/low-reading/grade/oracle/narration checks and independent teaching-quality receipt tied to final snapshot/skills/objectives.",
+      "evidenceRequired": "actual native receipt with final snapshot, scene hashes, renderChecks and independently issued review; not a manually filled JSON pass"
+    },
+    {
+      "id": "formal_final_interaction_quality",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "Actual demonstration→operation→explanatory-feedback→independent-judgment chain and v2 exploration/visual checks pass every locked objective.",
+      "evidenceRequired": "Native interaction plan plus real two-viewport probes/screenshot hashes; no click-only mastery"
+    },
+    {
+      "id": "formal_media_audio",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "Required images/video, teacher roster and all required Qwen teacher TTS/ASR validations pass with final text/media hashes.",
+      "evidenceRequired": "Existing audio reusable only with exact approved voice/text/content identity and supported receipt reuse. New TTS/ASR/media consume explicit remaining calls; absence remains required/not_completed"
+    },
+    {
+      "id": "formal_package_publication_access",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "Server validates generationContract, professional/skill/quality/interaction/media/audio receipts and classroom identity before package/release/student access.",
+      "evidenceRequired": "Real candidate/package/release validators; public/learner release verification needs explicit permitted write and cannot be simulated as published"
+    },
+    {
+      "id": "course_reuse_cache_safety",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "Existing compatible released courses remain playable/reused, new identity reserves at most one generation; rerunning a request or revisiting lesson does not call AI.",
+      "evidenceRequired": "read-only compatible inventory and isolated repository/runtime evidence; no existing database seed/migration or resetting released records"
+    },
+    {
+      "id": "final_model_switch",
+      "requiredForProductionSwitch": true,
+      "status": "not_executed",
+      "criterion": "Only after all required stages and budget checks pass, activate reviewed new default policy for missing/new generation slots; verify managed process model/build identity.",
+      "evidenceRequired": "Exact config/runtime model readiness, historical Pro receipt preservation and same-course reopen with zero extra generation calls"
+    }
+  ],
+  "decision": {
+    "allRequiredStagesMustPass": true,
+    "unknownIsNotPass": true,
+    "noScoreOverridesHardFailure": true,
+    "perSubjectMinimumScore": 85,
+    "scoreScale": {
+      "correctness": 20,
+      "lowReading": 20,
+      "meaningfulInteraction": 20,
+      "misconceptionRepair": 15,
+      "independentTransfer": 15,
+      "narrationAndFocus": 5,
+      "layout": 5
+    },
+    "minimumDimensionLevelOutOf4": {
+      "correctness": 4,
+      "lowReading": 4,
+      "meaningfulInteraction": 3,
+      "misconceptionRepair": 3,
+      "independentTransfer": 3
+    },
+    "corePassEffect": "Eligible for formal candidate validation, never sufficient alone to switch production model.",
+    "formalCandidatePassEffect": "Candidate evidence only; final student/audio/cache/publication readiness and new model-policy identity must also pass.",
+    "scopeOfFinalSwitch": "Validated new generation default only; preserve historical dispatched requests, releases and compatible course reuse.",
+    "coverageLimit": "两门一年级小样不是1至6年级全科教学质量保证，也不证明Flash质量优于Pro。"
+  },
+  "proRetest": {
+    "required": false,
+    "reason": "旧同条件两模型都未通过；本轮目标是Flash达到绝对门槛并完成正式链路，非宣布比较胜负。",
+    "trigger": [
+      "A factual claim that Flash pedagogically outperforms Pro is desired.",
+      "A Pro fallback is being kept for a known unresolved Flash weakness.",
+      "Flash fails a teaching requirement after common contract fixes and a bounded root-cause review suggests a model limitation."
+    ],
+    "fairness": "若触发，使用修复后同版本skills/renderer/media/oracle/参数预算重测Pro；不得对比新Flash与旧Pro失败稿。计入本轮剩余额度或另获明确预算，不自动新增。"
+  },
+  "formalReferences": [
+    {
+      "path": "backend/integrations/openmaic_full_runtime_client.py",
+      "role": "professional model/generation/runtime and audio identity",
+      "sha256AtSpecification": "1407bd590b1542d5f5ecfc633eb60d784c3b0831db47c463c1b853d20f8dfa69"
+    },
+    {
+      "path": "backend/integrations/openmaic_formal_pedagogy.py",
+      "role": "server registered gradeBoundary and teaching brief authority",
+      "sha256AtSpecification": "8f335aa861db14b1549a003e608f51f13cae2abfdb4a3bd3e5b4ebb4c8d50576"
+    },
+    {
+      "path": "backend/integrations/openmaic_formal_skills.py",
+      "role": "native selected skills and scene-context receipt binding",
+      "sha256AtSpecification": "3465bb10f9772c1fece33430a6969d9cd8ed5c18b9d43d46b6e9a49e92b8a0b8"
+    },
+    {
+      "path": "backend/integrations/openmaic_formal_quality.py",
+      "role": "final snapshot+all scenes+two viewports+independent teaching review",
+      "sha256AtSpecification": "1d0230d068812ca644355815e87bd7cd832dddc675a6b0c54074d1c362c2480c"
+    },
+    {
+      "path": "backend/integrations/openmaic_formal_interaction.py",
+      "role": "demonstration-operation-feedback-independent chain and real probes",
+      "sha256AtSpecification": "1af9e1f247062c6d13756e67ac48f9a4d49388668f27f4aa08faf7975fece639"
+    },
+    {
+      "path": "backend/integrations/openmaic_formal_playful.py",
+      "role": "structural playable policy, does not prove actual playability",
+      "sha256AtSpecification": "b532b62b02a92476f1bdddfc11844ab88f4e0dea7a02d327d07b6c63acd8a790"
+    },
+    {
+      "path": "backend/services/openmaic_full_runtime_service.py",
+      "role": "final classroom and professional evidence verification",
+      "sha256AtSpecification": "a5be4c1c3bd9e12345698faf0d69a154f2b51508ef207424f229cc2e4ff85173"
+    },
+    {
+      "path": "backend/services/learning_catalog_release_service.py",
+      "role": "formal package/publication authority",
+      "sha256AtSpecification": "025f6a9dd2e16aeb491e9f7c80003d0145ec50d3ead017103aa946351ddbd97a"
+    },
+    {
+      "path": "backend/repositories/course_supply_inventory.py",
+      "role": "exact compatible published course reuse before generation",
+      "sha256AtSpecification": "88d1d65ee8db2f6f15f5310c8b32fd12ce8e8f1bacb8a8d85921a3d0dd116fea"
+    },
+    {
+      "path": "backend/services/learning_curriculum_preparation_contract.py",
+      "role": "model-policy/target fingerprint and compatibility preserving frozen jobs",
+      "sha256AtSpecification": "1f02ef2930c5e5f728aac326c4358c375bbc5700a335a9fce040d599c2d20851"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+/** Student-facing wording stays separate from provider IDs and grading state. */
+export const homeworkStudentCopy = {
+  title: "老师带我订正",
+  teacherAlt: "老师",
+  teacherQuestionAlt: "陪你讲原题的老师",
+  teacherEssayAlt: "陪你看作文的老师",
+  teacherCorrectionAlt: "陪你订正的老师",
+  teacherPreparingAlt: "老师正在准备",
+  tutorRegion: "老师原题讲解和接着问",
+  teacherQuestionTitle: "老师陪你看原题",
+  teacherEssayTitle: "老师陪你看作文",
+  originalQuestionAction: "请老师看原题",
+  reviewAgainAction: "请老师再看看",
+  originalQuestionLecture: "听原题讲解，接着问老师",
+  correctionRegion: "老师陪你看题、讲解和订正",
+  checkHeader: "作业检查（待老师核对）",
+  checkCorrect: "检查提示：答对",
+  checkIncorrect: "检查提示：再看看",
+  checkReference: "这是作业检查的参考结果，请听老师核对后再试试。",
+  checkNotice: "检查提示帮助找到题目，答案和讲解以老师核对后的结果为准。",
+  checkFilter: "先看提示题",
+} as const;

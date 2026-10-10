@@ -91,11 +91,6 @@ body:has(.schoolbag-shell) { background: #f6f8fa; }
 .schoolbag-auth .space-qr-code { box-shadow: 0 0 0 4px var(--mira-brand-wash); }
 .schoolbag-auth .space-qr[data-qr-state="waiting"] .space-qr-code::after { border-color: var(--mira-brand); animation: none; }
 .schoolbag-auth-art { display: block; width: 240px; height: auto; margin-bottom: 22px; }
-.schoolbag-shell .space-session-state { color: var(--mira-ink); margin: 70px auto; background: var(--mira-surface); border: 1px solid var(--mira-border); box-shadow: none; }
-.schoolbag-shell .space-session-state h1 { text-shadow: none; color: var(--mira-ink); }
-.schoolbag-shell .space-session-message { color: var(--mira-muted); }
-.schoolbag-shell .space-session-skeleton span, .schoolbag-shell .space-session-progress { background: var(--mira-surface-soft); }
-.schoolbag-shell .space-session-progress i { background: var(--mira-brand); }
 
 @media (max-width: 1000px) {
   .schoolbag-header { height: 86px; padding: 0 28px; }

@@ -103,6 +103,34 @@ def rehash_quality(professional):
 
 
 class OpenMaicFormalQualityTest(unittest.TestCase):
+    def test_flash_review_requires_frozen_candidate_generation_identity(self):
+        row, _ = adaptive_quality_fixture()
+        manifest = row['feature_manifest_json']
+        generation = manifest['generationContract']
+        generation['professionalCreationPolicy'] = deepcopy(OpenMaicFullRuntimeClient.FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY)
+        professional = manifest['professionalCreation']
+        professional['teachingQuality']['review']['modelId'] = 'deepseek-flash'
+        professional = rehash_quality(professional)
+        receipt = professional['teachingQuality']
+        from integrations.openmaic_formal_playful import playful_quality_context
+        review_input = {key: receipt[key] for key in ('snapshotSha256', 'gradeBoundarySha256',
+            'selectionPlanSha256', 'teachingBriefSha256', 'renderChecks')}
+        review_input['playfulContextSha256'] = quality_sha(playful_quality_context(generation))
+        receipt['review']['inputSha256'] = quality_sha(review_input)
+        receipt.pop('receiptSha256')
+        receipt['receiptSha256'] = quality_sha(receipt)
+        self.assertEqual(teaching_quality_receipt(receipt, generation_contract=generation), receipt)
+        # A rehashed candidate model name alone cannot rewrite legacy policy.
+        with self.assertRaises(ValueError):
+            teaching_quality_receipt(receipt)
+        legacy_generation = deepcopy(generation)
+        legacy_generation['professionalCreationPolicy'] = deepcopy(PROFESSIONAL_POLICY)
+        with self.assertRaises(ValueError):
+            teaching_quality_receipt(receipt, generation_contract=legacy_generation)
+        generation['professionalCreationPolicy']['sceneLearningPolicy']['enforced'] = False
+        with self.assertRaises(ValueError):
+            teaching_quality_receipt(receipt, generation_contract=generation)
+
     def test_runtime_cross_language_snapshot_text_and_review_hashes_remain_exact(self):
         fixture = json.loads(Path(__file__).with_name("fixtures").joinpath("mira_formal_quality_cross_language.json").read_text())
         snapshot = quality_snapshot(fixture["classroom"])

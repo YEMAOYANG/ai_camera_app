@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "mira.course-generator-selection.v1",
+  "evaluatedAt": "2026-10-08",
+  "activeCourseModel": "deepseek-v4-pro",
+  "recommendedAction": "retain_current_model",
+  "productionModelChanged": false,
+  "models": {
+    "pro": "deepseek-v4-pro",
+    "flash": "deepseek-flash"
+  },
+  "paidCalls": 66,
+  "pages": 31,
+  "performance": {
+    "pro": {
+      "calls": 34,
+      "tokens": {
+        "prompt": 186942,
+        "output": 52336,
+        "cache": 69120
+      },
+      "medianSeconds": 5.151,
+      "peakPriceEstimateUsd": 0.3658
+    },
+    "flash": {
+      "calls": 32,
+      "tokens": {
+        "prompt": 199845,
+        "output": 64213,
+        "cache": 104448
+      },
+      "medianSeconds": 2.109,
+      "peakPriceEstimateUsd": 0.1063
+    }
+  },
+  "acceptance": {
+    "pro": {
+      "chinese": "failed",
+      "math": "failed"
+    },
+    "flash": {
+      "chinese": "failed",
+      "math": "failed"
+    }
+  },
+  "blockingFindings": [
+    "Native quiz options contain descriptions of images instead of actual visual choices.",
+    "Several quiz answer labels do not match option values used by the renderer.",
+    "Pro drag interaction raises an undefined-handler ReferenceError in native classroom.",
+    "Flash mathematics exceeds the fixed within-five boundary."
+  ],
+  "evaluationBoundary": "Native outline/content/action generation and isolated renderer probes. Not full formal Agent research, paid voice, publication or real child learning outcomes.",
+  "harnessLimitations": [
+    "Semantic image IDs did not match native img_N resolver. Deterministic whitelist media resolution was applied equally to independent preview copies; original outputs are unchanged.",
+    "An interactive cross-port park image did not load in a sandboxed preview; no model quality deduction was made for this environment issue."
+  ],
+  "pricingNote": "Costs are estimates from vendor-reported usage at published peak prices, not invoices.",
+  "sourceManifestSha256": "8f5567129816e8056beff397f3ba5ee646ce7fa5bff1810f212f770629a23131"
+}

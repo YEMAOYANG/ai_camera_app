@@ -150,6 +150,24 @@ def _evidence(value: object, scene_ids: set[str]) -> None:
             raise ValueError("invalid formal teaching quality citation")
 
 
+def _quality_verifier_model(generation: Mapping[str, Any] | None) -> str:
+    """Bind new review identities to the frozen generation policy.
+
+    Historical receipts remain on their original alias. A candidate receipt
+    cannot acquire the new identity merely by changing its review.modelId.
+    """
+    if generation is None:
+        return "deepseek-v4-flash"
+    policy = generation.get("professionalCreationPolicy")
+    if not isinstance(policy, Mapping) or "modelPolicyId" not in policy:
+        return "deepseek-v4-flash"
+    from integrations.openmaic_formal_media import professional_policy
+    from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
+    frozen = professional_policy(policy)
+    selected = OpenMaicFullRuntimeClient.selected_professional_model_policy(frozen["modelPolicyId"])
+    return selected["coursewareVerifier"]["modelId"]
+
+
 def teaching_quality_receipt(value: object, *, generation_contract: Mapping[str, Any] | None = None) -> dict[str, Any]:
     raw = _exact(value, {"schemaVersion", "policyId", "status", "sessionId", "stageId", "gradeBoundarySha256",
         "selectionPlanSha256", "teachingBriefSha256", "snapshotSha256", "sceneHashes", "renderChecks", "review", "receiptSha256"})
@@ -188,7 +206,7 @@ def teaching_quality_receipt(value: object, *, generation_contract: Mapping[str,
         if raw["teachingBriefSha256"] != generation_contract.get("teachingBriefSha256"):
             raise ValueError("playful review teaching brief authority drifted")
         expected_input["playfulContextSha256"] = quality_sha(playful_context)
-    if (review["providerId"] != "deepseek" or review["modelId"] != "deepseek-v4-flash"
+    if (review["providerId"] != "deepseek" or review["modelId"] != _quality_verifier_model(generation_contract)
             or not _digest(review["requestIdHash"]) or review["inputSha256"] != quality_sha(expected_input)):
         raise ValueError("formal teaching quality review identity drifted")
     dimensions = review["dimensions"]

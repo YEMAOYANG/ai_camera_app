@@ -18,7 +18,10 @@ GATEWAY_PORT="${MIRA_RUNTIME_PORT:-3101}"
 OPENMAIC_URL="http://127.0.0.1:${OPENMAIC_PORT}"
 GATEWAY_URL="http://127.0.0.1:${GATEWAY_PORT}"
 EXPECTED_OPENMAIC_VERSION="1.0.0"
-OPENMAIC_STRUCTURED_SCENE_POLICY_ID="deepseek-v4-pro-flash-v1"
+# Operator selection is distinct from the child process's reserved variable.
+# Caller-supplied MODEL_ROUTES or MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY cannot
+# bypass the frozen route policy below.
+OPENMAIC_STRUCTURED_SCENE_POLICY_ID=""
 OPENMAIC_RECOVERY_POLICY_VERSION="mira-sample-deterministic-classroom.v1"
 OPENMAIC_RECOVERY_CANONICAL_SPEC_SHA256="879040700d374f045058b09cbf6ed6e956ebf97d8c8d9008477063458c5ef7b6"
 OPENMAIC_TTS_CREDENTIAL_RECOVERY_POLICY_VERSION="mira-sample-tts-credential-recovery.v1"
@@ -81,6 +84,18 @@ provider_env_file() {
 model_provider_env_file() {
   printf '%s' "${RUNTIME_ROOT}/.env"
 }
+
+# Read only the fixed model-owner dotenv, without sourcing it. A process
+# environment selection wins; inherited backend/provider dotenv paths cannot
+# select a model policy. Resolve before any provider/policy validation.
+load_openmaic_model_policy_env() {
+  local selected="${MIRA_OPENMAIC_MODEL_POLICY:-}"
+  if [[ -z "${MIRA_OPENMAIC_MODEL_POLICY+x}" ]]; then
+    selected="$(read_env_value MIRA_OPENMAIC_MODEL_POLICY "$(model_provider_env_file)" || true)"
+  fi
+  OPENMAIC_STRUCTURED_SCENE_POLICY_ID="${selected:-deepseek-v4-pro-flash-v1}"
+}
+load_openmaic_model_policy_env
 
 read_first_env_value() {
   local env_file="$1"
@@ -392,6 +407,11 @@ load_openmaic_model_env() {
   OPENMAIC_DEEPSEEK_MODELS=""
   OPENMAIC_COURSEWARE_VERIFIER_MODEL=""
 
+  case "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" in
+    deepseek-v4-pro-flash-v1|deepseek-v4.1-flash-candidate-v1|deepseek-v4-pro-current-flash-v1) ;;
+    *) echo "Unsupported OpenMAIC structured scene policy." >&2; return 1 ;;
+  esac
+
   local enabled env_file provider model verifier_model api_key base_url configured_models normalized_models service
   env_file="$(model_provider_env_file)"
   enabled="${MIRA_OPENMAIC_ENABLE_MODEL_PROVIDER:-}"
@@ -414,6 +434,21 @@ load_openmaic_model_env() {
       base_url="$(read_env_value DEEPSEEK_BASE_URL "${env_file}" || true)"
       [[ -n "${base_url}" ]] || base_url="https://api.deepseek.com/v1"
       service="$(read_env_value DEEPSEEK_SERVICE "${env_file}" || true)"
+      if [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == "deepseek-v4.1-flash-candidate-v1" ]]; then
+        [[ "${service:-official}" == "official" ]] || {
+          echo "The V4.1 Flash candidate requires the official DeepSeek service." >&2
+          return 1
+        }
+        model="deepseek-flash"
+        verifier_model="deepseek-flash"
+      elif [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == "deepseek-v4-pro-current-flash-v1" ]]; then
+        [[ "${service:-official}" == "official" ]] || {
+          echo "The current Flash verifier requires the official DeepSeek service." >&2
+          return 1
+        }
+        model="deepseek-v4-pro"
+        verifier_model="deepseek-flash"
+      fi
       case "${service:-official}" in
         official) ;;
         bailian)
@@ -442,12 +477,28 @@ load_openmaic_model_env() {
         echo "OpenMAIC DeepSeek mode requires MIRA_OPENMAIC_MODEL, MIRA_OPENMAIC_VERIFIER_MODEL, and DEEPSEEK_API_KEY in ${env_file}." >&2
         return 1
       }
-      [[ "${model}" == "deepseek-v4-pro" ]] || {
-        echo "OpenMAIC professional creation requires deepseek-v4-pro." >&2
+      local expected_model expected_verifier
+      expected_model="deepseek-v4-pro"
+      expected_verifier="deepseek-v4-flash"
+      if [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == "deepseek-v4.1-flash-candidate-v1" ]]; then
+        expected_model="deepseek-flash"
+        expected_verifier="deepseek-flash"
+      elif [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == "deepseek-v4-pro-current-flash-v1" ]]; then
+        expected_verifier="deepseek-flash"
+      fi
+      if [[ "${expected_verifier}" == "deepseek-flash" ]]; then
+        configured_models="${configured_models:+${configured_models},}deepseek-flash"
+        if ! node -e 'const u=new URL(process.argv[1]);process.exit(u.protocol==="https:" && u.hostname==="api.deepseek.com" && !u.port && !u.username && !u.password && !u.search && !u.hash && /^\/(v1\/?)?$/.test(u.pathname)?0:1)' "${base_url}"; then
+          echo "The V4.1 Flash candidate requires the official HTTPS API endpoint." >&2
+          return 1
+        fi
+      fi
+      [[ "${model}" == "${expected_model}" ]] || {
+        echo "OpenMAIC professional creation does not match the selected model policy." >&2
         return 1
       }
-      [[ "${verifier_model}" == "deepseek-v4-flash" ]] || {
-        echo "OpenMAIC independent verification requires deepseek-v4-flash." >&2
+      [[ "${verifier_model}" == "${expected_verifier}" ]] || {
+        echo "OpenMAIC independent verification does not match the selected model policy." >&2
         return 1
       }
       normalized_models="$(printf '%s' "${configured_models}" | tr -d '[:space:]')"
@@ -501,14 +552,14 @@ validate_postgresql_database_url() {
 # Professional generation is a durable, server-owned Agent Runtime. Its
 # connection URL is read without sourcing dotenv, never logged, and crosses
 # only the clean OpenMAIC child-process boundary. The driver route is locked to
-# the reviewed DeepSeek Pro model used for professional courseware creation.
+# the reviewed policy used for professional courseware creation.
 load_openmaic_agent_runtime_env() {
   OPENMAIC_AGENT_RUNTIME_ENABLED="0"
   OPENMAIC_AGENT_DATABASE_URL=""
   OPENMAIC_PERSISTENCE_DEV_TOKEN=""
   OPENMAIC_MODEL_ROUTES=""
 
-  local env_file enabled database_url
+  local env_file enabled database_url expected_model
   env_file="$(provider_env_file)"
   enabled="${MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED:-}"
   [[ -n "${enabled}" ]] || enabled="$(read_env_value MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED "${env_file}" || true)"
@@ -516,8 +567,10 @@ load_openmaic_agent_runtime_env() {
   validate_opt_in MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED "${enabled}" || return 1
   [[ "${enabled}" == "1" ]] || return 0
 
-  [[ "${OPENMAIC_DEFAULT_MODEL}" == "deepseek:deepseek-v4-pro" ]] || {
-    echo "Professional Agent Runtime requires the reviewed deepseek-v4-pro model provider." >&2
+  expected_model="deepseek:deepseek-v4-pro"
+  [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" != "deepseek-v4.1-flash-candidate-v1" ]] || expected_model="deepseek:deepseek-flash"
+  [[ "${OPENMAIC_DEFAULT_MODEL}" == "${expected_model}" ]] || {
+    echo "Professional Agent Runtime does not match the selected model policy." >&2
     return 1
   }
   database_url="${MIRA_OPENMAIC_AGENT_DATABASE_URL:-${DATABASE_URL:-}}"
@@ -536,6 +589,11 @@ load_openmaic_agent_runtime_env() {
   # this token and learner/runtime persistence remains disabled in the browser.
   OPENMAIC_PERSISTENCE_DEV_TOKEN="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')"
   OPENMAIC_MODEL_ROUTES='{"maic-agent-driver":{"model":"deepseek:deepseek-v4-pro","api":"openai-completions","thinking":{"mode":"enabled","enabled":true}},"generate-classroom":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-creator":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-verifier":{"model":"deepseek:deepseek-v4-flash","thinking":{"mode":"disabled","enabled":false}},"web-search-query-rewrite":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}}}'
+  if [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == "deepseek-v4.1-flash-candidate-v1" ]]; then
+    OPENMAIC_MODEL_ROUTES='{"maic-agent-driver":{"model":"deepseek:deepseek-flash","api":"openai-completions","thinking":{"mode":"enabled","enabled":true}},"generate-classroom":{"model":"deepseek:deepseek-flash","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-creator":{"model":"deepseek:deepseek-flash","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-verifier":{"model":"deepseek:deepseek-flash","thinking":{"mode":"disabled","enabled":false}},"web-search-query-rewrite":{"model":"deepseek:deepseek-flash","thinking":{"mode":"disabled","enabled":false}}}'
+  elif [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == "deepseek-v4-pro-current-flash-v1" ]]; then
+    OPENMAIC_MODEL_ROUTES="${OPENMAIC_MODEL_ROUTES//deepseek:deepseek-v4-flash/deepseek:deepseek-flash}"
+  fi
 }
 
 # Search credentials and the selected provider belong to OpenMAIC. The legacy
@@ -792,15 +850,15 @@ show_provider_status() {
     if [[ "${model_service}" == "bailian" ]]; then
       echo "LLM wire models: deepseek-v4-pro-0813,deepseek-v4-flash-0731"
     fi
-    echo "LLM professional creation: DeepSeek V4 Pro"
+    echo "LLM professional creation: ${OPENMAIC_DEFAULT_MODEL}"
     echo "LLM independent verification: ${OPENMAIC_COURSEWARE_VERIFIER_MODEL}"
-    echo "LLM structured scenes: enforced (DeepSeek V4 Pro thinking disabled)"
+    echo "LLM structured scenes: enforced (${OPENMAIC_DEFAULT_MODEL}, thinking disabled)"
   else
     echo "LLM: disabled (set MIRA_OPENMAIC_ENABLE_MODEL_PROVIDER=1 to opt in)"
   fi
   if [[ "${OPENMAIC_AGENT_RUNTIME_ENABLED}" == "1" ]]; then
     echo "Agent Runtime: enabled (PostgreSQL connection configured; URL redacted)"
-    echo "Agent driver: deepseek:deepseek-v4-pro (openai-completions, high thinking)"
+    echo "Agent driver: ${OPENMAIC_DEFAULT_MODEL} (openai-completions, thinking enabled)"
   else
     echo "Agent Runtime: disabled (set MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1 to opt in)"
   fi
@@ -1539,6 +1597,19 @@ validate_health_payload() {
               qwenLanguageType: "Chinese",
               qwenAsrLanguage: "zh",
             },
+            science: {
+              teacherProfileId: "mira_science_inquiry",
+              teacherProfileVersion: 1,
+              teacherProfileSha256: "6bdd6746ed1a6a538751f23ff663a9153e7d1db767f7d9d3b6e5dc00d97d5c6b",
+              teacherName: "小科老师",
+              teacherGender: "female",
+              voiceGender: "female",
+              voiceId: "Serena",
+              languageCode: "zh-CN",
+              instructionLanguageCode: "zh-CN",
+              qwenLanguageType: "Chinese",
+              qwenAsrLanguage: "zh",
+            },
           },
         };
         const expectedFormalProviderReadiness = {
@@ -1593,6 +1664,32 @@ validate_health_payload() {
             },
           },
         };
+        if (process.argv[17] === "deepseek-v4.1-flash-candidate-v1") {
+          expectedStructuredScene.policyId = process.argv[17];
+          expectedStructuredScene.modelId = "deepseek-flash";
+          expectedModelPolicy.policyId = process.argv[17];
+          for (const phase of ["agentDriver", "coursewareCreator", "coursewareVerifier", "structuredScene"])
+            expectedModelPolicy[phase].modelId = "deepseek-flash";
+          expectedModelPolicy.structuredScene.policyId = process.argv[17];
+          expectedFormalGeneration.professionalCreation.modelPolicyId = process.argv[17];
+          expectedFormalGeneration.professionalCreation.sceneLearningPolicy = {
+            schemaVersion: "mira.learning.scene-contract-policy.v1",
+            enforced: true,
+            pictureChoicesForGrades: ["primary_1", "primary_2"],
+            noMasteryClaims: true,
+            scriptSyntaxRequired: true,
+          };
+          expectedFormalProviderReadiness.providers.deepseek.modelId = "deepseek-flash";
+          expectedFormalProviderReadiness.modelPolicyId = process.argv[17];
+        }
+        if (process.argv[17] === "deepseek-v4-pro-current-flash-v1") {
+          expectedStructuredScene.policyId = process.argv[17];
+          expectedModelPolicy.policyId = process.argv[17];
+          expectedModelPolicy.structuredScene.policyId = process.argv[17];
+          expectedModelPolicy.coursewareVerifier.modelId = "deepseek-flash";
+          expectedFormalGeneration.professionalCreation.modelPolicyId = process.argv[17];
+          expectedFormalProviderReadiness.modelPolicyId = process.argv[17];
+        }
         const structuredSceneReady =
           JSON.stringify(body.runtimePolicy?.structuredScene) ===
           JSON.stringify(expectedStructuredScene);
@@ -1672,8 +1769,9 @@ validate_health_payload() {
                 body.status === "ok" &&
                 body.version === "1.0.0" &&
                 body.capabilities?.formalProviderReadiness === true &&
-                JSON.stringify(body.runtimePolicy?.formalProviderReadiness) ===
-                  JSON.stringify(expectedFormalProviderReadiness) &&
+                require("node:util").isDeepStrictEqual(
+                  body.runtimePolicy?.formalProviderReadiness,
+                  expectedFormalProviderReadiness) &&
                 modelPolicyReady
             : body.ok === true && body.service === "mira-openmaic-runtime-gateway" && body.sourceVersion === "openmaic@1.0.0";
         process.exit(ok ? 0 : 1);
@@ -1694,7 +1792,8 @@ validate_health_payload() {
     "${OPENMAIC_FORMAL_CITATION_RECOVERY_ENABLED:-0}" \
     "${OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID:-}" \
     "${OPENMAIC_FORMAL_CITATION_RECOVERY_POLICY_VERSION}" \
-    "${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256:-}" >/dev/null 2>&1
+    "${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256:-}" \
+    "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" >/dev/null 2>&1
 }
 
 probe_health() {
@@ -1845,6 +1944,62 @@ reject_openmaic_build_dotenv_files() {
   done
 }
 
+# Next externalizes this workspace package, so source tests and a Next build
+# alone cannot prove which factory Node imports. Never load Provider env here.
+probe_generation_package() {
+  local node_bin
+  node_bin="$(command -v node)" || return 1
+  (
+    cd "${SOURCE_DIR}" || return 1
+    env -i PATH="${PATH}" HOME="${HOME}" TMPDIR="${TMPDIR:-/tmp}" \
+      LANG="${LANG:-en_US.UTF-8}" NODE_ENV=production \
+      "${node_bin}" --input-type=module < "${SCRIPT_DIR}/probe-generation-package.mjs"
+  )
+}
+
+require_current_generation_package() {
+  if ! probe_generation_package >/dev/null; then
+    echo "OpenMAIC compiled generation package failed its provider-free production export probe. Stop the managed runtime and run $0 build-generation-package before starting." >&2
+    return 1
+  fi
+}
+
+require_generation_build_idle() {
+  local pid="" cwd=""
+  [[ -f "${OPENMAIC_PID_FILE}" ]] || return 0
+  pid="$(tr -d '[:space:]' < "${OPENMAIC_PID_FILE}")"
+  [[ "${pid}" =~ ^[1-9][0-9]*$ ]] || return 0
+  process_is_alive "${pid}" || return 0
+  cwd="$(process_cwd "${pid}" 2>/dev/null)" || {
+    echo "Cannot verify the running OpenMAIC PID before compiling its external package; stop the managed runtime first." >&2
+    return 1
+  }
+  if [[ "${cwd}" == "${SOURCE_DIR}" ]]; then
+    echo "Stop the managed OpenMAIC runtime before compiling its external generation package; a live process caches imported modules." >&2
+    return 1
+  fi
+}
+
+build_generation_package() {
+  reject_openmaic_build_dotenv_files || return 1
+  require_generation_build_idle || return 1
+  local node_bin generation_dir tsc_script
+  node_bin="$(command -v node)" || return 1
+  generation_dir="${SOURCE_DIR}/packages/@openmaic/generation"
+  tsc_script="${SOURCE_DIR}/node_modules/typescript/bin/tsc"
+  [[ -f "${generation_dir}/tsconfig.json" && -f "${tsc_script}" ]] || {
+    echo "OpenMAIC generation package or local TypeScript compiler is missing; install the pinned workspace dependencies first." >&2
+    return 1
+  }
+  (
+    cd "${generation_dir}" || return 1
+    env -i PATH="${PATH}" HOME="${HOME}" TMPDIR="${TMPDIR:-/tmp}" \
+      LANG="${LANG:-en_US.UTF-8}" NODE_ENV=production \
+      "${node_bin}" "${tsc_script}" -p tsconfig.json --incremental false
+  ) || return 1
+  probe_generation_package
+}
+
 # Build in a clean environment so a Provider credential or an unrelated
 # NEXT_PUBLIC value inherited from the operator shell cannot be persisted in
 # .next or exposed by build output. Only validated public origins, fixed public
@@ -1853,6 +2008,7 @@ build_openmaic_production() {
   bootstrap_openmaic_source || return 1
   reject_openmaic_build_dotenv_files || return 1
   require_openmaic_dependencies || return 1
+  build_generation_package || return 1
   load_runtime_origin_env || return 1
 
   local node_bin node_major node_options openmaic_version
@@ -1916,6 +2072,7 @@ run_openmaic_production_foreground() {
   require_openmaic_dependencies || return 1
   reject_openmaic_build_dotenv_files || return 1
   require_openmaic_production_build || return 1
+  require_current_generation_package || return 1
 
   local node_bin node_major node_options openmaic_version
   node_bin="$(command -v node)"
@@ -2124,6 +2281,7 @@ run_gateway_foreground() {
 }
 
 start_openmaic() {
+  require_current_generation_package || return 1
   # Resolve the recovery expectation before accepting an already-running
   # process. A stale process without patch 0007 or with a different source/hash
   # must never be reported as healthy for this opt-in.
@@ -2571,6 +2729,12 @@ main() {
     build-openmaic-production)
       build_openmaic_production
       ;;
+    build-generation-package)
+      build_generation_package
+      ;;
+    probe-generation-package)
+      probe_generation_package
+      ;;
     foreground-openmaic-production)
       run_openmaic_production_foreground
       ;;
@@ -2581,7 +2745,7 @@ main() {
       run_gateway_foreground
       ;;
     *)
-      echo "Usage: $0 [start|stop|restart|status|contract-status|provider-status|build-openmaic-production|foreground-openmaic-production|foreground-openmaic|foreground-gateway]" >&2
+      echo "Usage: $0 [start|stop|restart|status|contract-status|provider-status|build-generation-package|probe-generation-package|build-openmaic-production|foreground-openmaic-production|foreground-openmaic|foreground-gateway]" >&2
       exit 2
       ;;
   esac

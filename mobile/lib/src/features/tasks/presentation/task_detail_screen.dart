@@ -57,6 +57,16 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
         onBack: () => context.go(AppRoute.tasks.path),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 118),
         children: [
+          if (task.type == 'learning')
+            AppListRow(
+              icon: Icons.assignment_outlined,
+              title: '作业检查与复习记录',
+              subtitle: '上传作业、查看薄弱点和周末安排',
+              onTap: () => context.push(
+                '$learningCenterPath?childId=${Uri.encodeQueryComponent(task.childId)}',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+            ),
           _EvidencePanel(
             task: task,
             ref: ref,

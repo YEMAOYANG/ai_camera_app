@@ -1,0 +1,952 @@
+diff --git a/lib/server/model-routes.ts b/lib/server/model-routes.ts
+--- a/lib/server/model-routes.ts
++++ b/lib/server/model-routes.ts
+@@ -81,6 +81,9 @@
+   'mira.openmaic.professional-model-policy.v1' as const;
+ export const MIRA_PROFESSIONAL_MODEL_POLICY_ID = 'deepseek-v4-pro-flash-v1' as const;
+ export const MIRA_STRUCTURED_SCENE_POLICY_ID = MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++export const MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID = 'deepseek-v4.1-flash-candidate-v1' as const;
++export type MiraProfessionalModelPolicyId = typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID | typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
++export const MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID = 'deepseek-flash' as const;
+ 
+ const MIRA_DEEPSEEK_PROVIDER_ID = 'deepseek' as const;
+ const MIRA_DEEPSEEK_PRO_MODEL_ID = 'deepseek-v4-pro' as const;
+@@ -105,9 +108,9 @@
+ 
+ export interface MiraStructuredSceneRuntimePolicy {
+   enforced: true;
+-  policyId: typeof MIRA_STRUCTURED_SCENE_POLICY_ID;
++  policyId: MiraProfessionalModelPolicyId;
+   providerId: typeof MIRA_STRUCTURED_SCENE_PROVIDER_ID;
+-  modelId: typeof MIRA_STRUCTURED_SCENE_MODEL_ID;
++  modelId: typeof MIRA_STRUCTURED_SCENE_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+   stages: readonly (typeof MIRA_STRUCTURED_SCENE_STAGES)[number][];
+   thinking: {
+     mode: 'disabled';
+@@ -117,46 +120,73 @@
+ 
+ export interface MiraProfessionalModelRuntimePolicy {
+   schemaVersion: typeof MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA;
+-  policyId: typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  policyId: MiraProfessionalModelPolicyId;
+   agentDriver: {
+     providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
+-    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+     thinking: { mode: 'enabled'; enabled: true; effort: 'high' };
+   };
+   coursewareCreator: {
+     providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
+-    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+     thinking: { mode: 'disabled'; enabled: false };
+   };
+   coursewareVerifier: {
+     providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
+-    modelId: typeof MIRA_DEEPSEEK_FLASH_MODEL_ID;
++    modelId: typeof MIRA_DEEPSEEK_FLASH_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+     thinking: { mode: 'disabled'; enabled: false };
+   };
+   structuredScene: {
+-    policyId: typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++    policyId: MiraProfessionalModelPolicyId;
+     providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
+-    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+     thinking: { mode: 'disabled'; enabled: false };
+   };
+   fallbackAllowed: false;
+ }
+ 
++/** A server-only opt-in. Missing selection retains all existing route behavior. */
++export function getMiraSelectedModelPolicyId(required = false): MiraProfessionalModelPolicyId | undefined {
++  const policy = process.env[MIRA_STRUCTURED_SCENE_POLICY_ENV]?.trim();
++  if (!policy) {
++    if (required) throw new Error(`${MIRA_STRUCTURED_SCENE_POLICY_ENV} is required.`);
++    return undefined;
++  }
++  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID && policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) {
++    throw new Error(`Unsupported ${MIRA_STRUCTURED_SCENE_POLICY_ENV}; expected a supported frozen policy.`);
++  }
++  return policy;
++}
++
++export function getMiraVerifierModelId(policyId: MiraProfessionalModelPolicyId = MIRA_PROFESSIONAL_MODEL_POLICY_ID): 'deepseek-v4-flash' | 'deepseek-flash' {
++  return policyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : MIRA_DEEPSEEK_FLASH_MODEL_ID;
++}
++
++function structuredModel(policyId: MiraProfessionalModelPolicyId): string {
++  return policyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
++    ? `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID}`
++    : MIRA_STRUCTURED_SCENE_MODEL;
++}
++
+ function getMiraStructuredSceneRoute(stage: string): StageRoute | undefined {
+-  const policy = process.env[MIRA_STRUCTURED_SCENE_POLICY_ENV]?.trim();
++  const policy = getMiraSelectedModelPolicyId();
+   if (!policy) return undefined;
+-  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID) {
+-    throw new Error(
+-      `Unsupported ${MIRA_STRUCTURED_SCENE_POLICY_ENV}; expected ${MIRA_STRUCTURED_SCENE_POLICY_ID}.`,
+-    );
+-  }
+-  if (!MIRA_STRUCTURED_SCENE_STAGE_SET.has(stage)) return undefined;
+-
+-  return {
+-    model: MIRA_STRUCTURED_SCENE_MODEL,
+-    thinking: { mode: 'disabled', enabled: false },
+-    enforced: true,
+-  };
++  if (MIRA_STRUCTURED_SCENE_STAGE_SET.has(stage)) {
++    return { model: structuredModel(policy), thinking: { mode: 'disabled', enabled: false }, enforced: true };
++  }
++  if (policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) return undefined;
++  // The candidate runs on an isolated server instance and cannot inherit an
++  // old MODEL_ROUTES creator, reviewer, planner or Agent through fallback.
++  if (stage === MIRA_AGENT_DRIVER_STAGE) {
++    return { model: structuredModel(policy), api: 'openai-completions',
++      thinking: { mode: 'enabled', enabled: true } };
++  }
++  if ([MIRA_COURSEWARE_CREATOR_STAGE, MIRA_COURSEWARE_VERIFIER_STAGE,
++    MIRA_GENERATE_CLASSROOM_STAGE, MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
++    'scene-outlines-stream', 'agent-profiles'].includes(stage)) {
++    return { model: structuredModel(policy), thinking: { mode: 'disabled', enabled: false } };
++  }
++  return undefined;
+ }
+ 
+ type StageRouteResolver = (stage: string) => StageRoute | undefined;
+@@ -168,7 +198,10 @@
+  */
+ export function validateMiraStructuredSceneRoutes(
+   resolveRoute: StageRouteResolver,
++  policyId: MiraProfessionalModelPolicyId = MIRA_STRUCTURED_SCENE_POLICY_ID,
+ ): MiraStructuredSceneRuntimePolicy {
++  const expectedModel = structuredModel(policyId);
++  const expectedModelId = expectedModel.split(':')[1];
+   let resolvedProviderId: string | undefined;
+   let resolvedModelId: string | undefined;
+ 
+@@ -181,7 +214,7 @@
+     const thinkingKeys = Object.keys(route.thinking).sort();
+     if (
+       route.enforced !== true ||
+-      route.model !== MIRA_STRUCTURED_SCENE_MODEL ||
++      route.model !== expectedModel ||
+       route.thinking.mode !== 'disabled' ||
+       route.thinking.enabled !== false ||
+       routeKeys.join(',') !== 'enforced,model,thinking' ||
+@@ -195,7 +228,7 @@
+     const modelId = separator > 0 ? route.model.slice(separator + 1) : '';
+     if (
+       providerId !== MIRA_STRUCTURED_SCENE_PROVIDER_ID ||
+-      modelId !== MIRA_STRUCTURED_SCENE_MODEL_ID
++      modelId !== expectedModelId
+     ) {
+       throw new Error(`Structured scene model mismatch for ${stage}.`);
+     }
+@@ -209,9 +242,9 @@
+ 
+   return {
+     enforced: true,
+-    policyId: MIRA_STRUCTURED_SCENE_POLICY_ID,
++    policyId,
+     providerId: resolvedProviderId as typeof MIRA_STRUCTURED_SCENE_PROVIDER_ID,
+-    modelId: resolvedModelId as typeof MIRA_STRUCTURED_SCENE_MODEL_ID,
++    modelId: resolvedModelId as MiraStructuredSceneRuntimePolicy['modelId'],
+     stages: [...MIRA_STRUCTURED_SCENE_STAGES],
+     thinking: { mode: 'disabled', enabled: false },
+   };
+@@ -219,16 +252,8 @@
+ 
+ /** Resolve and validate the credential-free structured-scene health contract. */
+ export function getMiraStructuredSceneRuntimePolicy(): MiraStructuredSceneRuntimePolicy {
+-  const policy = process.env[MIRA_STRUCTURED_SCENE_POLICY_ENV]?.trim();
+-  if (!policy) {
+-    throw new Error(`${MIRA_STRUCTURED_SCENE_POLICY_ENV} is required.`);
+-  }
+-  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID) {
+-    throw new Error(
+-      `Unsupported ${MIRA_STRUCTURED_SCENE_POLICY_ENV}; expected ${MIRA_STRUCTURED_SCENE_POLICY_ID}.`,
+-    );
+-  }
+-  return validateMiraStructuredSceneRoutes(getStageRoute);
++  const policyId = getMiraSelectedModelPolicyId(true)!;
++  return validateMiraStructuredSceneRoutes(getStageRoute, policyId);
+ }
+ 
+ function assertExactMiraRoute(
+@@ -259,39 +284,43 @@
+  */
+ export function getMiraProfessionalModelRuntimePolicy(): MiraProfessionalModelRuntimePolicy {
+   const structuredScene = getMiraStructuredSceneRuntimePolicy();
++  const policyId = structuredScene.policyId;
++  const creatorModelId = structuredScene.modelId;
++  const verifierModelId = policyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
++    ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : MIRA_DEEPSEEK_FLASH_MODEL_ID;
+   assertExactMiraRoute(
+     MIRA_AGENT_DRIVER_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_PRO_MODEL_ID}`,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+     { mode: 'enabled', enabled: true },
+     'openai-completions',
+   );
+   assertExactMiraRoute(
+     MIRA_COURSEWARE_CREATOR_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_PRO_MODEL_ID}`,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+     { mode: 'disabled', enabled: false },
+   );
+   assertExactMiraRoute(
+     MIRA_COURSEWARE_VERIFIER_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_FLASH_MODEL_ID}`,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${verifierModelId}`,
+     { mode: 'disabled', enabled: false },
+   );
+   assertExactMiraRoute(
+     MIRA_GENERATE_CLASSROOM_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_PRO_MODEL_ID}`,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+     { mode: 'disabled', enabled: false },
+   );
+   assertExactMiraRoute(
+     MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_PRO_MODEL_ID}`,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+     { mode: 'disabled', enabled: false },
+   );
+ 
+   return {
+     schemaVersion: MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA,
+-    policyId: MIRA_PROFESSIONAL_MODEL_POLICY_ID,
++    policyId,
+     agentDriver: {
+       providerId: MIRA_DEEPSEEK_PROVIDER_ID,
+-      modelId: MIRA_DEEPSEEK_PRO_MODEL_ID,
++      modelId: creatorModelId,
+       // DeepSeek maps enabled reasoning without an explicit route effort to its
+       // reviewed high setting. The pi Agent transport rejects an effort field
+       // when function tools are active, so health exposes the effective value.
+@@ -299,16 +328,16 @@
+     },
+     coursewareCreator: {
+       providerId: MIRA_DEEPSEEK_PROVIDER_ID,
+-      modelId: MIRA_DEEPSEEK_PRO_MODEL_ID,
++      modelId: creatorModelId,
+       thinking: { mode: 'disabled', enabled: false },
+     },
+     coursewareVerifier: {
+       providerId: MIRA_DEEPSEEK_PROVIDER_ID,
+-      modelId: MIRA_DEEPSEEK_FLASH_MODEL_ID,
++      modelId: verifierModelId,
+       thinking: { mode: 'disabled', enabled: false },
+     },
+     structuredScene: {
+-      policyId: MIRA_PROFESSIONAL_MODEL_POLICY_ID,
++      policyId,
+       providerId: structuredScene.providerId,
+       modelId: structuredScene.modelId,
+       thinking: { ...structuredScene.thinking },
+diff --git a/lib/server/mira-courseware-provider.ts b/lib/server/mira-courseware-provider.ts
+--- a/lib/server/mira-courseware-provider.ts
++++ b/lib/server/mira-courseware-provider.ts
+@@ -7,6 +7,7 @@
+ import { isProviderKeyRequired } from '@/lib/ai/providers';
+ import { resolveModel } from '@/lib/server/resolve-model';
+ import { qualitySha } from './mira-formal-quality-contract';
++import { getMiraSelectedModelPolicyId, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID } from './model-routes';
+ 
+ export const MIRA_COURSEWARE_PROVIDER_SCHEMA = 'mira.openmaic.courseware-provider-call.v1' as const;
+ 
+@@ -250,8 +251,10 @@
+   const userPrompt = boundedPrompt(body.userPrompt, 'userPrompt');
+   // A bounded action-only completion repair uses the authorized Flash model;
+   // its explicit phase remains distinct from independent verification.
+-  const coursewareRole = VERIFIER_PHASES.has(phase) || phase === 'learner_discussion_repair'
++  const legacyRole = VERIFIER_PHASES.has(phase) || phase === 'learner_discussion_repair'
+     ? COURSEWARE_VERIFIER : COURSEWARE_CREATOR;
++  const coursewareRole = getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
++    ? { ...legacyRole, modelId: MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID } : legacyRole;
+   const resolved = await resolveModel({ stage: coursewareRole.stage });
+   if (
+     resolved.providerId !== coursewareRole.providerId ||
+diff --git a/lib/server/mira-formal-provider-readiness.ts b/lib/server/mira-formal-provider-readiness.ts
+--- a/lib/server/mira-formal-provider-readiness.ts
++++ b/lib/server/mira-formal-provider-readiness.ts
+@@ -1,4 +1,5 @@
+ import { adaptDeepSeekRequest } from '@/lib/ai/deepseek-service';
++import { getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID } from './model-routes';
+ import { createHash } from 'crypto';
+ import { promises as fs } from 'fs';
+ import path from 'path';
+@@ -113,6 +114,7 @@
+ } as const;
+ 
+ export interface MiraFormalProviderReadinessRequest {
++  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
+   schemaVersion: typeof MIRA_FORMAL_PROVIDER_READINESS_VERSION;
+   requestId: string;
+   buildItemId: string;
+@@ -144,7 +146,7 @@
+   kind: 'deepseek_text' | 'qwen_asr' | 'qwen_tts';
+   subject?: Subject;
+   providerId: 'deepseek' | 'qwen-asr' | 'qwen-tts';
+-  modelId: 'deepseek-v4-pro' | 'qwen3-asr-flash' | 'qwen3-tts-flash';
++  modelId: 'deepseek-v4-pro' | 'deepseek-flash' | 'qwen3-asr-flash' | 'qwen3-tts-flash';
+   voiceId?: 'Serena' | 'Ethan' | 'Jennifer';
+   languageCode?: 'zh-CN' | 'en-US';
+   fallbackUsed: false;
+@@ -168,6 +170,7 @@
+ }
+ 
+ export interface MiraFormalProviderReadinessJob {
++  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
+   schemaVersion: typeof MIRA_FORMAL_PROVIDER_READINESS_JOB_VERSION;
+   requestId: string;
+   requestSha256: string;
+@@ -330,7 +333,10 @@
+   value: unknown,
+ ): MiraFormalProviderReadinessRequest {
+   assertNoForbiddenKeys(value);
+-  const input = exactObject(value, REQUEST_KEYS);
++  const withPolicy = value && typeof value === 'object' && Object.hasOwn(value, 'modelPolicyId');
++  const input = exactObject(value, withPolicy ? [...REQUEST_KEYS, 'modelPolicyId'] : REQUEST_KEYS);
++  if (withPolicy && input.modelPolicyId !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID)
++    throw new MiraFormalProviderReadinessError('invalid_request', 'Invalid readiness model policy');
+   const validation = exactObject(input.validation, VALIDATION_KEYS);
+   const routeSession = exactObject(input.routeSession, ROUTE_KEYS);
+   if (
+@@ -467,6 +473,7 @@
+ 
+ function identityFrom(input: MiraFormalProviderReadinessRequest) {
+   return {
++    ...(input.modelPolicyId ? { modelPolicyId: input.modelPolicyId } : {}),
+     buildItemId: input.buildItemId,
+     releaseId: input.releaseId,
+     gradeCode: input.gradeCode,
+@@ -558,8 +565,9 @@
+   if (
+     !deepseek ||
+     (deepseek.models !== undefined &&
+-      (!deepseek.models.includes('deepseek-v4-pro') ||
+-        !deepseek.models.includes('deepseek-v4-flash'))) ||
++      (getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
++        ? !deepseek.models.includes('deepseek-flash')
++        : (!deepseek.models.includes('deepseek-v4-pro') || !deepseek.models.includes('deepseek-v4-flash')))) ||
+     !resolveApiKey('deepseek') ||
+     !tts ||
+     tts.disabled === true ||
+@@ -577,13 +585,13 @@
+   qwenEndpoint(resolveASRBaseUrl('qwen-asr'));
+ }
+ 
+-function callSpecs(subject: Subject) {
++function callSpecs(subject: Subject, policyId: string = MIRA_PROFESSIONAL_MODEL_POLICY_ID) {
+   return [
+     {
+       callOrdinal: 1,
+       kind: 'deepseek_text' as const,
+       providerId: 'deepseek' as const,
+-      modelId: 'deepseek-v4-pro' as const,
++      modelId: policyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? 'deepseek-flash' as const : 'deepseek-v4-pro' as const,
+     },
+     {
+       callOrdinal: 2,
+@@ -617,7 +625,7 @@
+       endpoint: deepseekEndpoint(resolveBaseUrl('deepseek')),
+       apiKey: resolveApiKey('deepseek'),
+       body: adaptDeepSeekRequest(deepseekEndpoint(resolveBaseUrl('deepseek')), {
+-        model: 'deepseek-v4-pro',
++        model: spec.modelId,
+         messages: [
+           {
+             role: 'user',
+@@ -876,6 +884,9 @@
+ ): Promise<{ record: MiraFormalProviderReadinessJob; created: boolean }> {
+   const input = assertMiraFormalProviderReadinessRequest(value);
+   assertMiraFormalProviderReadinessProviderReady();
++  if ((input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID)
++    !== (getMiraSelectedModelPolicyId() ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID))
++    throw new MiraFormalProviderReadinessError('invalid_request', 'Readiness model policy does not match the isolated server');
+   let asset;
+   try {
+     asset = await readMiraFormalTtsAsset(input.validation.ttsRequestId);
+@@ -908,7 +919,7 @@
+   if (!claimed.created) return claimed;
+   let record = claimed.record;
+   const fetchImpl = dependencies.fetchImpl || fetch;
+-  for (const spec of callSpecs(input.validation.subject)) {
++  for (const spec of callSpecs(input.validation.subject, input.modelPolicyId)) {
+     const providerRequest = requestForCall(spec, input, asset.bytes);
+     record = await recordAttempt(
+       record,
+@@ -988,6 +999,7 @@
+   return assertMiraFormalProviderReadinessRequest({
+     schemaVersion: MIRA_FORMAL_PROVIDER_READINESS_VERSION,
+     requestId: record.requestId,
++    ...(record.modelPolicyId ? { modelPolicyId: record.modelPolicyId } : {}),
+     buildItemId: record.buildItemId,
+     releaseId: record.releaseId,
+     gradeCode: record.gradeCode,
+@@ -1016,7 +1028,7 @@
+   if (!source) {
+     throw new MiraFormalProviderReadinessError('not_found', 'Readiness request not found');
+   }
+-  const specs = callSpecs(source.validation.subject);
++  const specs = callSpecs(source.validation.subject, source.modelPolicyId);
+   const sourceProof = source.providerProof;
+   if (
+     source.state !== 'failed' ||
+@@ -1042,6 +1054,9 @@
+   }
+ 
+   const input = requestFromJob(source);
++  if ((input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID)
++    !== (getMiraSelectedModelPolicyId() ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID))
++    throw new MiraFormalProviderReadinessError('request_conflict', 'Recovery model policy does not match the isolated server');
+   if (digest(input) !== source.requestSha256) {
+     throw new MiraFormalProviderReadinessError(
+       'request_conflict',
+@@ -1159,6 +1174,11 @@
+ }
+ 
+ export function getMiraFormalProviderReadinessPolicy() {
++  if (getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) {
++    return { ...MIRA_FORMAL_PROVIDER_READINESS_POLICY, modelPolicyId: MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID,
++      providers: { ...MIRA_FORMAL_PROVIDER_READINESS_POLICY.providers,
++        deepseek: { providerId: 'deepseek' as const, modelId: 'deepseek-flash' as const, callCount: 1 } } };
++  }
+   return MIRA_FORMAL_PROVIDER_READINESS_POLICY;
+ }
+ 
+diff --git a/lib/ai/deepseek-service.ts b/lib/ai/deepseek-service.ts
+--- a/lib/ai/deepseek-service.ts
++++ b/lib/ai/deepseek-service.ts
+@@ -19,6 +19,17 @@
+   'deepseek-v4-pro': 'deepseek-v4-pro-0813',
+   'deepseek-v4-flash': 'deepseek-v4-flash-0731',
+ };
++
++/** Current-alias requests are confined to the verified official service. */
++export function isOfficialDeepSeekEndpoint(baseUrl: string): boolean {
++  try {
++    const url = new URL(baseUrl);
++    return url.protocol === 'https:' && url.hostname === 'api.deepseek.com'
++      && !url.username && !url.password && !url.search && !url.hash
++      && (!url.port || url.port === '443')
++      && /^\/(?:v1\/?)?(?:chat\/completions\/?)?$/.test(url.pathname);
++  } catch { return false; }
++}
+ 
+ /** Preserve the required output contract when the endpoint uses JSON mode. */
+ export function adaptDeepSeekJsonSchema(body: Record<string, unknown>): Record<string, unknown> {
+@@ -42,6 +53,13 @@
+   endpoint: string,
+   body: Record<string, unknown>,
+ ): Record<string, unknown> {
++  if (body.model === 'deepseek-flash') {
++    if (!isOfficialDeepSeekEndpoint(endpoint)) throw new Error('DeepSeek Flash candidate requires the official service.');
++    const adapted = adaptDeepSeekJsonSchema({ ...body });
++    if ((adapted.thinking as { type?: string } | undefined)?.type === 'disabled') delete adapted.reasoning_effort;
++    if (adapted.stream !== true) delete adapted.stream_options;
++    return adapted;
++  }
+   if (!isBailianDeepSeekEndpoint(endpoint)) return body;
+   const adapted = { ...body };
+   const model = String(body.model || '');
+@@ -65,6 +83,7 @@
+       : {
+           'deepseek-v4-pro': 'deepseek-v4-pro',
+           'deepseek-v4-flash': 'deepseek-v4-flash',
++          'deepseek-flash': 'deepseek-flash',
+         },
+     automaticFallback: false,
+   };
+diff --git a/lib/ai/model-metadata.ts b/lib/ai/model-metadata.ts
+--- a/lib/ai/model-metadata.ts
++++ b/lib/ai/model-metadata.ts
+@@ -363,6 +363,8 @@
+   [getModelMetadataKey('qwen', 'qwen3-max')]: qwenBudgetDisabled,
+   [getModelMetadataKey('qwen', 'qwen3-vl-plus')]: qwenBudgetDisabled,
+ 
++  [getModelMetadataKey('deepseek', 'deepseek-flash')]: deepseekEffort,
++  [getModelMetadataKey('deepseek', 'deepseek-v4-flash-vision-exp')]: deepseekEffort,
+   [getModelMetadataKey('deepseek', 'deepseek-v4-pro')]: deepseekEffort,
+   [getModelMetadataKey('deepseek', 'deepseek-v4-flash')]: deepseekEffort,
+   [getModelMetadataKey('atlascloud', 'deepseek-ai/deepseek-v4-pro')]: deepseekEffort,
+diff --git a/lib/ai/providers.ts b/lib/ai/providers.ts
+--- a/lib/ai/providers.ts
++++ b/lib/ai/providers.ts
+@@ -895,6 +895,16 @@
+     icon: '/logos/deepseek.svg',
+     models: [
+       {
++        id: 'deepseek-flash',
++        name: 'DeepSeek V4.1 Flash',
++        contextWindow: 1048576,
++        outputWindow: 393216,
++        capabilities: {
++          streaming: true, tools: true, vision: true,
++          thinking: { toggleable: true, budgetAdjustable: true, defaultEnabled: true },
++        },
++      },
++      {
+         id: 'deepseek-v4-flash-vision-exp',
+         name: 'DeepSeek V4 Flash Vision (Experimental)',
+         contextWindow: 1048576,
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -7,6 +7,8 @@
+ import { MIRA_TEACHING_QUALITY_POLICY } from './mira-formal-quality-contract';
+ import { MIRA_INTERACTION_DESIGN_POLICY, MIRA_MULTISTATE_INTERACTION_POLICY } from './mira-formal-interaction-design';
+ import { MIRA_FORMAL_PLAYFUL_POLICY, MIRA_FORMAL_PLAYFUL_3D_POLICY } from './mira-formal-playful-policy';
++import { MIRA_FORMAL_SCENE_LEARNING_POLICY } from './mira-formal-learning-contract';
++import { MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PROFESSIONAL_MODEL_POLICY_ID, getMiraSelectedModelPolicyId } from './model-routes';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+   'mira.openmaic.formal-runtime.v4-deepseek-professional' as const;
+@@ -111,8 +113,15 @@
+   playfulLearningPolicy: MIRA_FORMAL_PLAYFUL_3D_POLICY,
+ } as const;
+ 
++export const MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++  modelPolicyId: MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID,
++  sceneLearningPolicy: MIRA_FORMAL_SCENE_LEARNING_POLICY,
++} as const;
++
+ export const MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES = [
+   MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY, MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY,
++  MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY,
+ ] as const;
+ 
+ export type MiraProfessionalCreationPolicy =
+@@ -124,7 +133,8 @@
+   | typeof MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY
+-  | typeof MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY;
++  | typeof MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+@@ -274,6 +284,10 @@
+   if (!isExactMiraProfessionalCreationPolicy(input.professionalCreationPolicy)) {
+     throw new Error('FORMAL_PROFESSIONAL_CREATION_POLICY_INVALID');
+   }
++  const creationModelPolicy = (input.professionalCreationPolicy as { modelPolicyId?: string }).modelPolicyId
++    ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  if (creationModelPolicy !== (getMiraSelectedModelPolicyId() ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID))
++    throw new Error('FORMAL_PROFESSIONAL_MODEL_POLICY_MISMATCH');
+   if (
+     !input.requirement.trim() ||
+     input.pdfContent !== undefined ||
+diff --git a/lib/server/mira-formal-quality-contract.ts b/lib/server/mira-formal-quality-contract.ts
+--- a/lib/server/mira-formal-quality-contract.ts
++++ b/lib/server/mira-formal-quality-contract.ts
+@@ -106,7 +106,7 @@
+   snapshotSha256: string; sceneHashes: Array<{ sceneId: string; sceneSha256: string }>;
+   renderChecks: QualityRenderCheck[];
+   review: {
+-    providerId: 'deepseek'; modelId: 'deepseek-v4-flash'; requestIdHash: string;
++    providerId: 'deepseek'; modelId: 'deepseek-v4-flash' | 'deepseek-flash'; requestIdHash: string;
+     inputSha256: string; dimensions: QualityDimension[]; objectives: QualityObjective[];
+   };
+   receiptSha256: string;
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -28,6 +28,7 @@
+ } from './mira-formal-interaction-design';
+ import type { FormalInteractionProbe, FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
+ import { isPaidBudgetObservationMode } from './mira-paid-budget';
++import { getMiraVerifierModelId, getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, type MiraProfessionalModelPolicyId } from './model-routes';
+ import { assertMiraFormalPlayfulScenes, formalPlayfulReviewInstructions,
+   MIRA_FORMAL_PLAYFUL_REVIEW_VERSION, type MiraFormalPlayfulContext } from './mira-formal-playful-policy';
+ 
+@@ -36,6 +37,7 @@
+   value !== null && typeof value === 'object' && !Array.isArray(value);
+ const SHA = /^[0-9a-f]{64}$/;
+ export interface FormalQualityContext {
++  modelPolicyId?: MiraProfessionalModelPolicyId;
+   gradeBoundary: JsonRecord;
+   selectionPlan: { planSha256: string } & JsonRecord;
+   teachingBrief: JsonRecord;
+@@ -142,12 +144,22 @@
+   return raw as unknown as ReviewReport;
+ }
+ 
++export function formalQualityVerifierModel(input: Pick<FormalQualityContext, 'modelPolicyId'>) {
++  const policyId = input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  if (![MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID].includes(policyId))
++    throw new Error('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
++  const selected = getMiraSelectedModelPolicyId();
++  if (selected && selected !== policyId) throw new Error('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
++  return getMiraVerifierModelId(policyId);
++}
++
+ /** Same pure finalizer for a fresh Provider reply or its explicitly audited saved bytes. */
+ export function finalizeFormalQualityResponse(
+   input: FormalQualityInput,
+   response: Pick<Awaited<ReturnType<typeof executeMiraCoursewareProvider>>, 'content' | 'providerRequestIdHash'>,
+   observations: FormalSceneInspectionResult[], visualReview?: VisualReviewReceipt,
+ ): FormalQualityResult {
++  const reviewModelId = formalQualityVerifierModel(input);
+   const snapshot=qualitySnapshot(input.stage,input.scenes), snapshotSha256=qualitySha(snapshot);
+   const gradeBoundarySha256=qualitySha(input.gradeBoundary),teachingBriefSha256=qualitySha(input.teachingBrief);
+   const selectionPlanSha256=input.selectionPlan.planSha256;
+@@ -182,7 +194,7 @@
+     policyId:MIRA_TEACHING_QUALITY_POLICY.policyId,status:'passed' as const,sessionId:input.sessionId,stageId:input.stage.id,
+     gradeBoundarySha256,selectionPlanSha256,teachingBriefSha256,snapshotSha256,
+     sceneHashes:snapshot.scenes.map(scene=>({sceneId:scene.id,sceneSha256:qualitySha(scene)})),renderChecks,
+-    review:{providerId:'deepseek' as const,modelId:'deepseek-v4-flash' as const,requestIdHash:response.providerRequestIdHash,
++    review:{providerId:'deepseek' as const,modelId:reviewModelId,requestIdHash:response.providerRequestIdHash,
+       inputSha256:qualityReviewIdentity(reviewIdentity),dimensions:report.dimensions,objectives:report.objectives}};
+   const result:FormalQualityResult={status:'passed',snapshotSha256,issues:[],receipt:{...unsigned,receiptSha256:qualitySha(unsigned)}};
+   if(plan)result.interactionDesign=buildInteractionDesignReceipt({...input,plan,quality:result.receipt!,observations,...(visualReview?{visualReview}:{})});
+@@ -246,6 +258,7 @@
+   input: FormalQualityInput, signal?: AbortSignal, deps: QualityReviewDeps = {},
+ ): Promise<FormalQualityResult> {
+   if (signal?.aborted) throw new Error('FORMAL_QUALITY_ABORTED');
++  formalQualityVerifierModel(input);
+   assertMiraFormalPlayfulScenes(input.scenes, input.playfulLearning);
+   const observationMode = await isPaidBudgetObservationMode();
+   const remainingAttempts = (count: number) => observationMode ? null
+@@ -275,6 +288,7 @@
+   const selectionPlanSha256 = input.selectionPlan.planSha256;
+   if (!SHA.test(selectionPlanSha256)) throw new Error('FORMAL_QUALITY_SELECTION_INVALID');
+   const identity = { ownerId: input.ownerId, sessionId: input.sessionId, stageId: input.stage.id,
++    ...(input.modelPolicyId ? { modelPolicyId: input.modelPolicyId } : {}),
+     gradeBoundarySha256, teachingBriefSha256, selectionPlanSha256,
+     ...(input.interactionDesign ? { interactionDesignContextSha256: qualitySha(input.interactionDesign) } : {}),
+     ...(playfulContextSha256 ? { playfulContextSha256 } : {}),
+diff --git a/lib/server/mira-formal-learner-discussion-repair.ts b/lib/server/mira-formal-learner-discussion-repair.ts
+--- a/lib/server/mira-formal-learner-discussion-repair.ts
++++ b/lib/server/mira-formal-learner-discussion-repair.ts
+@@ -7,6 +7,7 @@
+ import { paidBudgetContext } from './mira-paid-budget';
+ import { qualitySha, qualitySnapshot } from './mira-formal-quality-contract';
+ import type { FormalQualityInput, FormalQualityResult } from './mira-formal-teaching-quality';
++import { getMiraVerifierModelId, getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID } from './model-routes';
+ 
+ const SCHEMA = 'mira.openmaic.learner-discussion-repair.v1' as const;
+ const SHA = /^[a-f0-9]{64}$/;
+@@ -33,7 +34,7 @@
+   providerResponseSha256: string;
+   providerRequestIdHash: string;
+   providerId: 'deepseek';
+-  modelId: 'deepseek-v4-flash';
++  modelId: 'deepseek-v4-flash' | 'deepseek-flash';
+   authorizationId: string;
+   namespace: string;
+   repairReference: string;
+@@ -143,6 +144,10 @@
+   signal?: AbortSignal,
+ ): Promise<{ scenes: Scene[]; receipt: LearnerDiscussionRepairReceipt }> {
+   const { snapshot, teacher } = validateInput(input, rejectedReview, context);
++  const policyId = input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  const selected = getMiraSelectedModelPolicyId();
++  if (selected && selected !== policyId) return fail('MODEL_POLICY_MISMATCH');
++  const verifierModelId = getMiraVerifierModelId(policyId);
+   const namespace = `${input.sessionId}:completion`;
+   const paid = paidBudgetContext.getStore();
+   if (paid?.namespace !== namespace || paid.binding.authorizationId !== context.authorizationId || paid.binding.required !== true)
+@@ -151,7 +156,8 @@
+   // Ledger-derived remaining counts are not part of the rejected course. A
+   // later read must not create a second identity for the same failed snapshot.
+   const normalizedRejection = { status: rejectedReview.status, snapshotSha256: rejectedReview.snapshotSha256, issues: rejectedReview.issues };
+-  const frozenContext = { gradeBoundary: input.gradeBoundary, selectionPlan: input.selectionPlan, teachingBrief: input.teachingBrief };
++  const frozenContext = { gradeBoundary: input.gradeBoundary, selectionPlan: input.selectionPlan, teachingBrief: input.teachingBrief,
++    ...(input.modelPolicyId ? { modelPolicyId: input.modelPolicyId } : {}) };
+   const identity = { sessionId: input.sessionId, stageId: input.stage.id, sourceSnapshotSha256: context.sourceSnapshotSha256,
+     inputSnapshotSha256, frozenContextSha256: qualitySha(frozenContext), rejectedReviewSha256: qualitySha(normalizedRejection) };
+   const targets = TARGETS.map(sceneId => ({ sceneId, afterActionCount: input.scenes.find(s => s.id === sceneId)!.actions!.length }));
+@@ -229,7 +235,7 @@
+         || unsigned.schemaVersion !== SCHEMA || unsigned.promptVersion !== LEARNER_DISCUSSION_REPAIR_PROMPT_VERSION
+         || unsigned.authorizationId !== context.authorizationId || unsigned.namespace !== namespace
+         || unsigned.repairReference !== context.repairReference
+-        || unsigned.providerId !== 'deepseek' || unsigned.modelId !== 'deepseek-v4-flash'
++        || unsigned.providerId !== 'deepseek' || unsigned.modelId !== verifierModelId
+         || unsigned.providerRequestIdHash !== raw.providerRequestIdHash) return fail('CACHED_AUDIT_INVALID');
+     const insertions = validateInsertions(JSON.parse(raw.content), input, teacher);
+     const scenes = derive(input, insertions);
+@@ -254,7 +260,7 @@
+     const unsigned = { schemaVersion: SCHEMA, promptVersion: LEARNER_DISCUSSION_REPAIR_PROMPT_VERSION, ...identity,
+       outputSnapshotSha256: qualitySha(qualitySnapshot(input.stage, scenes)), requestSha256: qualitySha(request),
+       providerResponseSha256: qualitySha(response), providerRequestIdHash: response.providerRequestIdHash,
+-      providerId: 'deepseek' as const, modelId: 'deepseek-v4-flash' as const,
++      providerId: 'deepseek' as const, modelId: verifierModelId,
+       authorizationId: context.authorizationId, namespace, repairReference: context.repairReference, insertions } as const;
+     const receipt: LearnerDiscussionRepairReceipt = { ...unsigned, receiptSha256: qualitySha(unsigned) };
+     return { scenes, receipt };
+diff --git a/lib/server/mira-formal-completion-tail-budget.ts b/lib/server/mira-formal-completion-tail-budget.ts
+--- a/lib/server/mira-formal-completion-tail-budget.ts
++++ b/lib/server/mira-formal-completion-tail-budget.ts
+@@ -7,6 +7,12 @@
+ const SHA = /^[a-f0-9]{64}$/;
+ const PRICE_MODELS = {
+   'deepseek-flash-peak': ['deepseek', 'deepseek-v4-flash'],
++  'deepseek-vision-peak': ['deepseek', 'deepseek-v4-flash-vision-exp'],
++  'qwen-tts-beijing': ['qwen-tts', 'qwen3-tts-flash'],
++  'qwen-asr-beijing': ['qwen-asr', 'qwen3-asr-flash'],
++} as const;
++const FLASH_CANDIDATE_PRICE_MODELS = {
++  'deepseek-v4.1-flash-peak': ['deepseek', 'deepseek-flash'],
+   'deepseek-vision-peak': ['deepseek', 'deepseek-v4-flash-vision-exp'],
+   'qwen-tts-beijing': ['qwen-tts', 'qwen3-tts-flash'],
+   'qwen-asr-beijing': ['qwen-asr', 'qwen3-asr-flash'],
+@@ -98,6 +104,8 @@
+     'parentAuthorizationSha256', 'scopeSha256', 'scope', 'startsAt', 'expiresAt', 'priceKeys',
+     'limits', 'transportTerminalPlanSha256'])) return fail('SIDECAR_INVALID');
+   const sidecar = value as unknown as CompletionTailSidecar;
++  const priceModels = Array.isArray(sidecar.priceKeys)
++    && sidecar.priceKeys.includes('deepseek-v4.1-flash-peak') ? FLASH_CANDIDATE_PRICE_MODELS : PRICE_MODELS;
+   const identityKeys = ['parentAuthorizationId', 'buildItemId', 'runtimeId', 'runtimeRequestId', 'jobId',
+     'sourceJobSha256', 'sourceSnapshotSha256', 'repairSnapshotSha256', 'formalInputSha256',
+     'sessionId', 'ownerId', 'stageId', 'speechActionCount', 'sceneIds', 'lockedQuestionIds'];
+@@ -112,7 +120,7 @@
+       || sidecar.scopeSha256 !== qualitySha(sidecar.scope)
+       || !object(sidecar.limits)
+       || !Array.isArray(sidecar.priceKeys)
+-      || sidecar.priceKeys.slice().sort().join(',') !== Object.keys(PRICE_MODELS).sort().join(','))
++      || sidecar.priceKeys.slice().sort().join(',') !== Object.keys(priceModels).sort().join(','))
+     return fail('IDENTITY_MISMATCH');
+   if (sidecar.authorizationId !== qualitySha({ schema: 'mira.learning.saved-stage-tail-authorization.v1', identity: sidecar.identity }))
+     return fail('AUTHORIZATION_ID_MISMATCH');
+@@ -126,8 +134,8 @@
+   if (authority.authorizationId !== binding.authorizationId || authority.purpose !== 'production'
+       || !object(authority.completionTailGrant) || qualitySha(authority.completionTailGrant) !== qualitySha(sidecar)
+       || !object(authority.prices)
+-      || Object.keys(authority.prices).sort().join(',') !== Object.keys(PRICE_MODELS).sort().join(',')
+-      || Object.entries(PRICE_MODELS).some(([key, [provider, model]]) => {
++      || Object.keys(authority.prices).sort().join(',') !== Object.keys(priceModels).sort().join(',')
++      || Object.entries(priceModels).some(([key, [provider, model]]) => {
+         const price = (authority.prices as RecordValue)[key];
+         return !object(price) || price.provider !== provider || price.model !== model;
+       })) return fail('AUTHORITY_MISMATCH');
+diff --git a/tests/server/model-routes.test.ts b/tests/server/model-routes.test.ts
+--- a/tests/server/model-routes.test.ts
++++ b/tests/server/model-routes.test.ts
+@@ -533,4 +533,29 @@
+       ]),
+     );
+   });
++  it('opts in all formal creation and independent review stages to current Flash', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
++    process.env.MODEL_ROUTES = JSON.stringify({ 'mira-courseware-creator': 'attacker:model',
++      'mira-courseware-verifier': 'deepseek:deepseek-v4-flash', 'maic-agent-driver': 'deepseek:deepseek-v4-pro' });
++    const { getStageRoute, getMiraProfessionalModelRuntimePolicy } = await import('@/lib/server/model-routes');
++    for (const stage of ['scene-outlines-stream', 'agent-profiles', 'generate-classroom',
++      'mira-courseware-creator', 'mira-courseware-verifier', 'web-search-query-rewrite']) {
++      expect(getStageRoute(stage)).toEqual({ model: 'deepseek:deepseek-flash', thinking: { mode: 'disabled', enabled: false } });
++    }
++    expect(getStageRoute('scene-content:quiz')).toMatchObject({ model: 'deepseek:deepseek-flash', enforced: true });
++    const policy = getMiraProfessionalModelRuntimePolicy();
++    expect(policy.policyId).toBe('deepseek-v4.1-flash-candidate-v1');
++    for (const role of ['agentDriver', 'coursewareCreator', 'coursewareVerifier', 'structuredScene'] as const) {
++      expect(policy[role].modelId).toBe('deepseek-flash');
++    }
++    expect(policy.fallbackAllowed).toBe(false);
++    expect(getStageRoute('chat-adapter')).toBeUndefined();
++  });
++  it('does not accept a mixed model as evidence of a Flash scene route', async () => {
++    const { validateMiraStructuredSceneRoutes } = await import('@/lib/server/model-routes');
++    expect(() => validateMiraStructuredSceneRoutes(() => ({ model: 'deepseek:deepseek-v4-pro',
++      thinking: { mode: 'disabled', enabled: false }, enforced: true }),
++      'deepseek-v4.1-flash-candidate-v1')).toThrow(/Structured scene route mismatch/);
++  });
++
+ });
+diff --git a/tests/server/mira-courseware-provider.test.ts b/tests/server/mira-courseware-provider.test.ts
+--- a/tests/server/mira-courseware-provider.test.ts
++++ b/tests/server/mira-courseware-provider.test.ts
+@@ -51,6 +51,7 @@
+ 
+ describe('Mira OpenMAIC courseware Provider boundary', () => {
+   beforeEach(() => {
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
+     mocks.resolveModel.mockReset();
+     mocks.callLLM.mockReset();
+     mocks.defaultSettingsMiddleware.mockClear();
+@@ -71,6 +72,7 @@
+ 
+   afterEach(() => {
+     delete process.env.MIRA_INTERNAL_API_TOKEN;
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
+   });
+ 
+   it('owns the DeepSeek Pro creator call and applies the Sidecar JSON schema', async () => {
+@@ -248,4 +250,23 @@
+       'Courseware Provider access is private',
+     );
+   });
++  it.each(['outline', 'independent_verification', 'learner_discussion_repair'])
++    ('uses current Flash for candidate phase %s and retains each separate audit phase', async phase => {
++      process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
++      mocks.resolveModel.mockResolvedValue({ providerId: 'deepseek', modelId: 'deepseek-flash',
++        model: { provider: 'deepseek', modelId: 'deepseek-flash' }, modelInfo: { outputWindow: 393216 }, apiKey: 'test-key' });
++      const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
++      const result = await executeMiraCoursewareProvider(request(phase));
++      expect(result.phase).toBe(phase);
++      expect(mocks.callLLM).toHaveBeenCalledTimes(1);
++      expect(mocks.callLLM).toHaveBeenCalledWith(expect.objectContaining({ maxRetries: 0 }),
++        'mira-courseware-provider', undefined, { mode: 'disabled', enabled: false });
++    });
++  it('rejects a legacy creator resolved in a Flash candidate instance before dispatch', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
++    const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
++    await expect(executeMiraCoursewareProvider(request())).rejects.toMatchObject({ code: 'provider_unavailable' });
++    expect(mocks.callLLM).not.toHaveBeenCalled();
++  });
++
+ });
+diff --git a/tests/server/mira-formal-provider-readiness.test.ts b/tests/server/mira-formal-provider-readiness.test.ts
+--- a/tests/server/mira-formal-provider-readiness.test.ts
++++ b/tests/server/mira-formal-provider-readiness.test.ts
+@@ -17,7 +17,7 @@
+ const asrKey = 'asr-secret-never-persist';
+ 
+ vi.mock('@/lib/server/provider-config', () => ({
+-  getServerProviders: () => ({ deepseek: { models: ['deepseek-v4-pro', 'deepseek-v4-flash'] } }),
++  getServerProviders: () => ({ deepseek: { models: ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-flash'] } }),
+   getServerWebSearchProviders: () => ({}),
+   getServerImageProviders: () => ({}),
+   getServerVideoProviders: () => ({}),
+@@ -182,14 +182,14 @@
+     };
+   }
+ 
+-  function successfulFetch(observedAttempts: number[]) {
++  function successfulFetch(observedAttempts: number[], expectedModel = 'deepseek-v4-pro') {
+     return vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+       const current = await readMiraFormalProviderReadinessJob(requestBase.requestId);
+       observedAttempts.push(current?.providerAttemptedCount || 0);
+       const body = JSON.parse(String(init?.body));
+       if (String(input).includes('deepseek')) {
+         expect(body).toMatchObject({
+-          model: 'deepseek-v4-pro',
++          model: expectedModel,
+           temperature: 0.6,
+           max_tokens: 16,
+           thinking: { type: 'disabled' },
+@@ -472,4 +472,28 @@
+     expect(healthBody.capabilities).toEqual({ formalProviderReadiness: true });
+     expect(healthBody.runtimePolicy.formalProviderReadiness.expectedProviderCallCount).toBe(5);
+   });
++  it('binds current Flash readiness to a distinct request hash without skipping Qwen gates', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
++    const input = request({ modelPolicyId: 'deepseek-v4.1-flash-candidate-v1' });
++    const attempts: number[] = [];
++    const fetchImpl = successfulFetch(attempts, 'deepseek-flash');
++    const result = await executeMiraFormalProviderReadiness(input, { fetchImpl: fetchImpl as typeof fetch });
++    expect(result.record.state).toBe('auto_validated');
++    expect(result.record.modelPolicyId).toBe(input.modelPolicyId);
++    expect(result.record.calls[0].modelId).toBe('deepseek-flash');
++    expect(result.record.providerPassedCount).toBe(5);
++    expect(getMiraFormalProviderReadinessPolicy()).toMatchObject({ modelPolicyId: input.modelPolicyId,
++      expectedProviderCallCount: 5, providers: { deepseek: { modelId: 'deepseek-flash' } } });
++    const duplicate = await executeMiraFormalProviderReadiness(input, { fetchImpl: fetchImpl as typeof fetch });
++    expect(duplicate.created).toBe(false);
++    expect(fetchImpl).toHaveBeenCalledTimes(5);
++  });
++  it('rejects a legacy readiness dispatch in a Flash instance before any provider call', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
++    const fetchImpl = vi.fn();
++    await expect(executeMiraFormalProviderReadiness(request(), { fetchImpl: fetchImpl as typeof fetch }))
++      .rejects.toMatchObject({ code: 'invalid_request' });
++    expect(fetchImpl).not.toHaveBeenCalled();
++  });
++
+ });
+diff --git a/tests/ai/deepseek-service.test.ts b/tests/ai/deepseek-service.test.ts
+--- a/tests/ai/deepseek-service.test.ts
++++ b/tests/ai/deepseek-service.test.ts
+@@ -1,5 +1,5 @@
+ import { describe, expect, it } from 'vitest';
+-import { adaptDeepSeekRequest, adaptDeepSeekJsonSchema, isBailianDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
++import { adaptDeepSeekRequest, adaptDeepSeekJsonSchema, isBailianDeepSeekEndpoint, isOfficialDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
+ 
+ describe('DeepSeek service wire adaptation', () => {
+   it('preserves the schema and original prompt when using JSON-object compatibility', () => {
+@@ -46,4 +46,29 @@
+     expect(isBailianDeepSeekEndpoint(url)).toBe(false);
+     expect(adaptDeepSeekRequest(url, body)).toBe(body);
+   });
++  it('keeps current Flash on the official wire with a preserved JSON contract', () => {
++    const schema = { type: 'object', required: ['answer'] };
++    const original = { model: 'deepseek-flash', thinking: { type: 'disabled' }, reasoning_effort: 'high',
++      stream_options: { include_usage: true }, response_format: { type: 'json_schema', json_schema: { schema } },
++      messages: [{ role: 'system', content: 'Teach honestly.' }] };
++    const result = adaptDeepSeekRequest('https://api.deepseek.com/v1/chat/completions', original);
++    expect(result).toMatchObject({ model: 'deepseek-flash', thinking: { type: 'disabled' }, response_format: { type: 'json_object' } });
++    expect(result).not.toHaveProperty('reasoning_effort');
++    expect(result).not.toHaveProperty('stream_options');
++    expect((result.messages as Array<{ content: string }>)[0].content).toContain(JSON.stringify(schema));
++    expect(original).toHaveProperty('reasoning_effort', 'high');
++  });
++  it('preserves enabled Agent reasoning and streaming usage when allowed', () => {
++    const result = adaptDeepSeekRequest('https://api.deepseek.com/chat/completions', {
++      model: 'deepseek-flash', thinking: { type: 'enabled' }, stream: true, stream_options: { include_usage: true } });
++    expect(result).toMatchObject({ thinking: { type: 'enabled' }, stream_options: { include_usage: true } });
++  });
++  it.each(['https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
++    'https://api.deepseek.com.attacker.test/v1', 'https://user:pass@api.deepseek.com/v1',
++    'http://api.deepseek.com/v1', 'https://api.deepseek.com/v1?token=private', 'https://api.deepseek.com:444/v1'])
++    ('rejects an unverified endpoint for current Flash: %s', endpoint => {
++      expect(isOfficialDeepSeekEndpoint(endpoint)).toBe(false);
++      expect(() => adaptDeepSeekRequest(endpoint, { model: 'deepseek-flash' })).toThrow(/requires the official service/);
++    });
++
+ });
+diff --git a/tests/server/mira-formal-teaching-quality.test.ts b/tests/server/mira-formal-teaching-quality.test.ts
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -13,6 +13,7 @@
+ } from '@/lib/server/mira-formal-quality-contract';
+ import {
+   parseFormalQualityReview,
++  formalQualityVerifierModel,
+   reviewFormalCourse,
+   type FormalQualityInput,
+   type QualityReviewDeps,
+@@ -785,4 +786,38 @@
+   expect(await readFile(join(oldFolder, 'attempts.json'), 'utf8')).toBe(ledger);
+   expect(deps.provider).toHaveBeenCalledTimes(1);
+   expect((await reviewFormalCourse(prior, undefined, { ...deps, cachedOnly: true })).receipt).toEqual(old.receipt);
++
+ });
++
++  it('binds current Flash review to the explicit candidate input identity', async () => {
++    const previous = process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
++    try {
++      const value = { ...input(), modelPolicyId: 'deepseek-v4.1-flash-candidate-v1' as const };
++      expect(formalQualityVerifierModel(value)).toBe('deepseek-flash');
++      const deps = mocks(value);
++      const result = await reviewFormalCourse(value, undefined, deps);
++      expect(result.receipt?.review.modelId).toBe('deepseek-flash');
++      expect(deps.provider).toHaveBeenCalledTimes(1);
++      const repeated = await reviewFormalCourse(value, undefined, deps);
++      expect(repeated.receipt).toEqual(result.receipt);
++      expect(deps.provider).toHaveBeenCalledTimes(1);
++    } finally {
++      if (previous === undefined) delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++      else process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = previous;
++    }
++  });
++  it('rejects a model policy mismatch before rendering or dispatching a reviewer', async () => {
++    const previous = process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
++    try {
++      const value = input(), deps = mocks(value);
++      await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
++      expect(deps.provider).not.toHaveBeenCalled();
++      expect(deps.inspect).not.toHaveBeenCalled();
++    } finally {
++      if (previous === undefined) delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++      else process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = previous;
++    }
++  });
++

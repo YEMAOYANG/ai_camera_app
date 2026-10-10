@@ -1,0 +1,1621 @@
+diff --git a/lib/server/mira-formal-learning-contract.ts b/lib/server/mira-formal-learning-contract.ts
+--- a/lib/server/mira-formal-learning-contract.ts
++++ b/lib/server/mira-formal-learning-contract.ts
+@@ -5,6 +5,7 @@
+ import type { Scene } from '@/lib/types/stage';
+ import type { FormalCoursewareSpec } from './mira-formal-compiled-classroom';
+ import type { MiraProfessionalModelPolicyId } from './model-routes';
++import { assertMiraFormalSelectionInput } from './mira-formal-skill-selection';
+ 
+ /** New requests opt in; persisted creation policies are never rewritten. */
+ export const MIRA_FORMAL_SCENE_LEARNING_POLICY = {
+@@ -25,19 +26,24 @@
+   if (!object(creationPolicy) || !Object.hasOwn(creationPolicy, 'sceneLearningPolicy')) return undefined;
+   if (canonical(creationPolicy.sceneLearningPolicy) !== canonical(MIRA_FORMAL_SCENE_LEARNING_POLICY))
+     throw new Error('FORMAL_LEARNING_SCENE_POLICY_INVALID');
+-  const brief = object(payload.teachingBrief) ? payload.teachingBrief : undefined;
+-  const lesson = brief && object(brief.lesson) ? brief.lesson : undefined;
+-  const constraints = lesson && object(lesson.constraints) ? lesson.constraints : undefined;
+-  const boundary = object(payload.gradeBoundary) ? payload.gradeBoundary : undefined;
+-  const boundaryConstraints = boundary && object(boundary.constraints) ? boundary.constraints : undefined;
+-  const maximum = constraints?.maximumNumber ?? boundaryConstraints?.maximumNumber ?? boundary?.maximumNumber;
++  if (creationPolicy.modelPolicyId !== 'deepseek-v4.1-flash-candidate-v1')
++    throw new Error('FORMAL_LEARNING_SCENE_MODEL_POLICY_INVALID');
++  const boundary = assertMiraFormalSelectionInput({ teachingBrief: payload.teachingBrief,
++    gradeBoundary: payload.gradeBoundary, gradeBoundarySha256: String(payload.gradeBoundarySha256 ?? ''),
++    modelPolicyId: creationPolicy.modelPolicyId });
++  if (boundary.gradeCode !== spec.course.gradeCode || boundary.subject !== spec.course.subject)
++    throw new Error('FORMAL_LEARNING_SCENE_BOUNDARY_MISMATCH');
++  // The structured registry projection is mandatory; text, titles and optional
++  // lesson overrides cannot silently remove or widen this frozen bound.
++  const maximum = boundary.constraints!.maximumNumber;
++  if (maximum !== null && (typeof maximum !== 'number' || !Number.isInteger(maximum)
++    || maximum < 0 || maximum > 100)) throw new Error('FORMAL_LEARNING_SCENE_QUANTITY_BOUND_UNSUPPORTED');
+   const contract: LearningSceneContract = {
+     schemaVersion: 'mira.learning.scene-contract.v1', gradeCode: spec.course.gradeCode,
+     subject: spec.course.subject,
+     pictureChoicesRequired: (MIRA_FORMAL_SCENE_LEARNING_POLICY.pictureChoicesForGrades as readonly string[]).includes(spec.course.gradeCode),
+     noMasteryClaims: true,
+-    ...(typeof maximum === 'number' && Number.isInteger(maximum) && maximum >= 0 && maximum <= 100
+-      ? { maximumQuantity: maximum } : {}),
++    ...(typeof maximum === 'number' ? { maximumQuantity: maximum } : {}),
+   };
+   assertLearningContract(contract);
+   return contract;
+diff --git a/lib/server/mira-formal-skill-selection.ts b/lib/server/mira-formal-skill-selection.ts
+--- a/lib/server/mira-formal-skill-selection.ts
++++ b/lib/server/mira-formal-skill-selection.ts
+@@ -72,11 +72,15 @@
+   prerequisiteSkills: string[];
+   language: 'zh-CN';
+   estimatedMinutes: number;
++  /** Present only in the candidate's exact registered progressive boundary. */
++  constraints?: Record<string, unknown>;
+ }
+ export interface MiraFormalSelectionInput {
+   teachingBrief: unknown;
+   gradeBoundary: unknown;
+   gradeBoundarySha256: string;
++  /** Omitted for historical adaptive requests. */
++  modelPolicyId?: 'deepseek-v4.1-flash-candidate-v1';
+ }
+ export interface MiraFormalSkillDecision {
+   skillId: MiraFormalBuiltinSkillId;
+@@ -112,10 +116,69 @@
+     value.every(text)
+   );
+ }
++
++/** Cross-check the structured boundary against the existing frozen lesson authority.
++ * The Backend separately recomputes both values from its actual curriculum registry.
++ * Human-readable allowedContent is never parsed as authority here. */
++export function assertMiraFormalProgressiveConstraints(
++  boundary: Record<string, unknown>, brief: Record<string, unknown>,
++): Record<string, unknown> {
++  const fail = (): never => { throw new Error('FORMAL_SKILL_REGISTERED_CONSTRAINTS_INVALID'); };
++  const constraints = record(boundary.constraints);
++  const binding = record(brief.progressiveLesson);
++  const difficulty = record(brief.difficultyPolicy);
++  const scope = record(difficulty.lessonScope);
++  const { policySha256, ...unsignedDifficulty } = difficulty;
++  const fields = [
++    'allowedGrammarCodes', 'allowedLetters', 'allowedOperations', 'allowedPinyin',
++    'assessmentEvidenceKinds', 'assessmentEvidenceScope', 'audioInstructionsAllowed',
++    'challengeMayOnlyCombineDeclaredKnowledge', 'excludedGrammarCodes', 'introducedGrammarCodes',
++    'introducedOperations', 'introducedTokens', 'maxCoreNewTargets', 'maximumNumber', 'minimumNumber',
++    'neutralDistractorTokens', 'newVocabularyMustBeIntroducedBeforeUse',
++    'noUnintroducedKnowledgeInInstructions', 'teachBeforeAssessment', 'tokenKind',
++    'writtenNumberRecognitionRequired',
++  ].sort();
++  const listFields = ['allowedGrammarCodes', 'allowedLetters', 'allowedOperations', 'allowedPinyin',
++    'assessmentEvidenceKinds', 'excludedGrammarCodes', 'introducedGrammarCodes', 'introducedOperations',
++    'introducedTokens', 'neutralDistractorTokens'];
++  const trueFields = ['audioInstructionsAllowed', 'challengeMayOnlyCombineDeclaredKnowledge',
++    'newVocabularyMustBeIntroducedBeforeUse', 'noUnintroducedKnowledgeInInstructions', 'teachBeforeAssessment'];
++  const minimum = constraints.minimumNumber, maximum = constraints.maximumNumber;
++  const numericScope = minimum === null && maximum === null
++    || typeof minimum === 'number' && Number.isFinite(minimum)
++      && typeof maximum === 'number' && Number.isFinite(maximum) && minimum <= maximum;
++  if (brief.schemaVersion !== 'mira.learning.formal-runtime-teaching-brief.progressive.v1'
++    || boundary.curriculumVersion !== 'mira.primary.progressive.v1'
++    || JSON.stringify(Object.keys(constraints).sort()) !== JSON.stringify(fields)
++    || !listFields.every(key => textList(constraints[key]))
++    || !trueFields.every(key => constraints[key] === true)
++    || typeof constraints.writtenNumberRecognitionRequired !== 'boolean'
++    || !text(constraints.tokenKind) || !text(constraints.assessmentEvidenceScope)
++    || !Number.isInteger(constraints.maxCoreNewTargets) || Number(constraints.maxCoreNewTargets) < 1
++    || !numericScope
++    || binding.schemaVersion !== 'mira.learning.progressive-binding.v1'
++    || binding.curriculumVersion !== boundary.curriculumVersion || binding.lessonId !== boundary.skillId
++    || !/^[a-f0-9]{64}$/.test(String(binding.lessonSha256))
++    || !/^[a-f0-9]{64}$/.test(String(binding.identitySha256))
++    || boundary.boundaryVersion !== `${String(boundary.curriculumVersion)}:${String(binding.lessonSha256).slice(0, 24)}`
++    || difficulty.schemaVersion !== 'mira.learning.difficulty-policy.v1'
++    || difficulty.policyVersion !== 'mira.learning.progressive-difficulty-policy.v1'
++    || !['gradeCode', 'subject', 'skillId', 'curriculumVersion'].every(key => difficulty[key] === boundary[key])
++    || difficulty.lessonSha256 !== binding.lessonSha256
++    || difficulty.curriculumIdentitySha256 !== binding.identitySha256
++    || difficulty.difficultyCode !== binding.difficultyCode
++    || formalCanonicalSha256(unsignedDifficulty) !== policySha256
++    || formalCanonicalSha256(scope.constraints) !== formalCanonicalSha256(constraints)) fail();
++  return structuredClone(constraints);
++}
++
+ export function assertMiraFormalSelectionInput(
+   input: MiraFormalSelectionInput,
+ ): MiraFormalGradeBoundary {
+   const boundary = record(input.gradeBoundary);
++  if (input.modelPolicyId !== undefined && input.modelPolicyId !== 'deepseek-v4.1-flash-candidate-v1')
++    throw new Error('FORMAL_SKILL_MODEL_POLICY_INVALID');
++  const candidate = input.modelPolicyId === 'deepseek-v4.1-flash-candidate-v1';
+   const expected = [
+     'gradeCode',
+     'subject',
+@@ -129,6 +192,7 @@
+     'prerequisiteSkills',
+     'language',
+     'estimatedMinutes',
++    ...(candidate ? ['constraints'] : []),
+   ].sort();
+   if (
+     JSON.stringify(Object.keys(boundary).sort()) !== JSON.stringify(expected) ||
+@@ -155,6 +219,7 @@
+   const flow = record(lesson.teachingFlow);
+   const teach = record(flow.teach);
+   const progressive = brief.schemaVersion === 'mira.learning.formal-runtime-teaching-brief.progressive.v1';
++  if (candidate) assertMiraFormalProgressiveConstraints(boundary, brief);
+   if (
+     (!progressive && brief.schemaVersion !== 'mira.learning.formal-runtime-teaching-brief.v1') ||
+     !['gradeCode', 'subject', 'skillId'].every((key) => course[key] === boundary[key]) ||
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -391,6 +391,8 @@
+     teachingBrief: contract.teachingBrief,
+     gradeBoundary: contract.gradeBoundary,
+     gradeBoundarySha256: String(contract.gradeBoundarySha256 ?? ''),
++    ...(plainObject(input.professionalCreationPolicy)?.modelPolicyId === 'deepseek-v4.1-flash-candidate-v1'
++      ? { modelPolicyId: 'deepseek-v4.1-flash-candidate-v1' as const } : {}),
+   };
+ }
+ 
+diff --git a/tests/server/mira-formal-learning-contract.test.ts b/tests/server/mira-formal-learning-contract.test.ts
+--- a/tests/server/mira-formal-learning-contract.test.ts
++++ b/tests/server/mira-formal-learning-contract.test.ts
+@@ -1,9 +1,13 @@
+ import { describe, expect, it } from 'vitest';
+ import { assertLearningInteractiveSyntax, formalLearningContract, formalLearningContractFromPrompt,
+-  MIRA_FORMAL_SCENE_LEARNING_POLICY, withFormalLearningContract } from '@/lib/server/mira-formal-learning-contract';
++  assertFormalLearningScenes, MIRA_FORMAL_SCENE_LEARNING_POLICY, withFormalLearningContract } from '@/lib/server/mira-formal-learning-contract';
++import { formalCanonicalSha256 } from '@/lib/server/mira-formal-skill-selection';
++import { formalAdaptiveSkillSelectionInput } from '@/lib/server/mira-formal-professional-classroom';
++import fixtures from '../fixtures/mira-formal-candidate-lesson-boundaries-v1.json';
+ 
+ const spec = { course: { gradeCode: 'primary_1', subject: 'math' as const } } as any;
+-const policy = { sceneLearningPolicy: MIRA_FORMAL_SCENE_LEARNING_POLICY };
++const policy = { modelPolicyId: 'deepseek-v4.1-flash-candidate-v1', sceneLearningPolicy: MIRA_FORMAL_SCENE_LEARNING_POLICY };
++function mathInput() { return structuredClone(fixtures[0].input); }
+ describe('formal scene contract authority and compile-only checks', () => {
+   it('keeps historical policies and prompts unchanged', () => {
+     expect(formalLearningContract({}, spec, {})).toBeUndefined();
+@@ -11,14 +15,61 @@
+     expect(formalLearningContractFromPrompt('historical bytes')).toBeUndefined();
+   });
+   it('derives the exact registered lesson bound, never a title heuristic', () => {
+-    const contract = formalLearningContract(policy, spec, { teachingBrief: { lesson: { constraints: { maximumNumber: 5 } } } })!;
++    const contract = formalLearningContract(policy, spec, mathInput())!;
+     expect(contract.maximumQuantity).toBe(5);
+     expect(contract.pictureChoicesRequired).toBe(true);
+     expect(formalLearningContractFromPrompt(withFormalLearningContract('formal', contract))).toEqual(contract);
+   });
++  it('the actual formal compiler forwards candidate identity to the exact adaptive parser', () => {
++    const payload = mathInput();
++    const selection = formalAdaptiveSkillSelectionInput({
++      professionalCreationPolicy:policy,requirement:JSON.stringify(payload),
++    } as any);
++    expect(selection).toEqual(payload);
++    const old = formalAdaptiveSkillSelectionInput({
++      professionalCreationPolicy:{},requirement:JSON.stringify(payload),
++    } as any);
++    expect(Object.hasOwn(old,'modelPolicyId')).toBe(false);
++  });
++  it('supports a registered nonnumeric lesson without inventing a numeric bound', () => {
++    const payload = structuredClone(fixtures[1].input);
++    const chinese = { course: { gradeCode: 'primary_1', subject: 'chinese' as const } } as any;
++    expect(formalLearningContract(policy, chinese, payload)?.maximumQuantity).toBeUndefined();
++  });
++  it('does not infer a bound from prompt text or an unauthoritative lesson override', () => {
++    const input = mathInput();
++    (input.teachingBrief.lesson as unknown as Record<string, unknown>).constraints = { maximumNumber: 6 };
++    input.gradeBoundary.allowedContent.push('最大数量6，六个苹果，maximumNumber=6');
++    input.gradeBoundarySha256 = formalCanonicalSha256(input.gradeBoundary);
++    expect(formalLearningContract(policy, spec, input)?.maximumQuantity).toBe(5);
++    delete (input.gradeBoundary as Partial<typeof input.gradeBoundary>).constraints;
++    input.gradeBoundarySha256 = formalCanonicalSha256(input.gradeBoundary);
++    expect(() => formalLearningContract(policy, spec, input)).toThrow('GRADE_BOUNDARY_INVALID');
++  });
++  it('rejects forged/removed authority before a generated quantity scene is accepted', () => {
++    const input = mathInput();
++    input.gradeBoundary.constraints.maximumNumber = 6;
++    input.gradeBoundarySha256 = formalCanonicalSha256(input.gradeBoundary);
++    expect(() => formalLearningContract(policy, spec, input)).toThrow('REGISTERED_CONSTRAINTS_INVALID');
++    expect(() => formalLearningContract({sceneLearningPolicy:MIRA_FORMAL_SCENE_LEARNING_POLICY}, spec, mathInput()))
++      .toThrow('MODEL_POLICY_INVALID');
++    expect(() => formalLearningContract(policy, {course:{gradeCode:'primary_2',subject:'math'}} as any, mathInput()))
++      .toThrow('BOUNDARY_MISMATCH');
++  });
++  it('actually rejects six-object pictures under the registered five-object contract', () => {
++    const contract = formalLearningContract(policy, spec, mathInput());
++    const scene = { id:'quantity-test', type:'quiz', content:{type:'quiz',questions:[{
++      id:'q',type:'single',question:'看看这组物体，点同样多的一组。',hasAnswer:false,answer:[],
++      options:[{value:'a',label:'这组'},{value:'b',label:'那组'}],visual:{kind:'quantity',count:5},
++      optionVisuals:{a:{kind:'quantity',count:5},b:{kind:'quantity',count:4}},
++    }]},actions:[] } as any;
++    expect(() => assertFormalLearningScenes([scene], contract)).not.toThrow();
++    scene.content.questions[0].optionVisuals.b.count = 6;
++    expect(() => assertFormalLearningScenes([scene], contract)).toThrow('QUANTITY_OUT_OF_RANGE');
++  });
+   it('rejects unknown policy and tampered duplicated context', () => {
+     expect(() => formalLearningContract({ sceneLearningPolicy: { ...MIRA_FORMAL_SCENE_LEARNING_POLICY, enforced: false } }, spec, {})).toThrow('POLICY_INVALID');
+-    const prompt = withFormalLearningContract('', formalLearningContract(policy, spec, {})!);
++    const prompt = withFormalLearningContract('', formalLearningContract(policy, spec, mathInput())!);
+     expect(() => formalLearningContractFromPrompt(prompt + prompt)).toThrow('CONTEXT_INVALID');
+   });
+   it('compiles scripts without executing them, rejecting truncated JS', () => {
+diff --git a/tests/server/mira-formal-skill-selection.test.ts b/tests/server/mira-formal-skill-selection.test.ts
+--- a/tests/server/mira-formal-skill-selection.test.ts
++++ b/tests/server/mira-formal-skill-selection.test.ts
+@@ -1,5 +1,6 @@
+ import { describe, expect, it } from 'vitest';
+ import fixtures from '../fixtures/mira-formal-skill-selection-v2.json';
++import candidateFixtures from '../fixtures/mira-formal-candidate-lesson-boundaries-v1.json';
+ import {
+   MIRA_ADAPTIVE_SKILL_ORCHESTRATION_POLICY,
+   MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN,
+@@ -46,6 +47,32 @@
+ }
+ 
+ describe('formal server-selected Skills v2', () => {
++  it.each(candidateFixtures)('binds candidate $name to the exact structured lesson projection and cross-language plan', (fixture) => {
++    const value = fixture.input as Parameters<typeof selectMiraFormalSkills>[0];
++    expect(selectMiraFormalSkills(value)).toEqual(fixture.expectedPlan);
++    expect(formalAdaptiveSelectionInputFromPrompt(formalAdaptiveSkillPromptSuffix(value))).toEqual(value);
++  });
++  it('candidate constraints cannot be missing, widened, nullified or detached from frozen difficulty', () => {
++    const mutations = [
++      (value:any) => delete value.gradeBoundary.constraints,
++      (value:any) => value.gradeBoundary.constraints.maximumNumber = 6,
++      (value:any) => value.gradeBoundary.constraints.maximumNumber = null,
++      (value:any) => value.gradeBoundary.constraints.maximumNumber = true,
++      (value:any) => value.gradeBoundary.constraints.unknown = 5,
++      (value:any) => value.teachingBrief.progressiveLesson.lessonSha256 = 'b'.repeat(64),
++      (value:any) => value.teachingBrief.difficultyPolicy.policySha256 = 'a'.repeat(64),
++      (value:any) => value.teachingBrief.difficultyPolicy.lessonScope.constraints.maximumNumber = 6,
++    ];
++    for (const mutate of mutations) {
++      const value = structuredClone(candidateFixtures[0].input) as Parameters<typeof selectMiraFormalSkills>[0];
++      mutate(value);
++      value.gradeBoundarySha256 = formalCanonicalSha256(value.gradeBoundary);
++      expect(() => selectMiraFormalSkills(value)).toThrow();
++    }
++    const noOptIn = structuredClone(candidateFixtures[0].input) as Parameters<typeof selectMiraFormalSkills>[0];
++    delete noOptIn.modelPolicyId;
++    expect(() => selectMiraFormalSkills(noOptIn)).toThrow('GRADE_BOUNDARY_INVALID');
++  });
+   it.each(fixtures)('matches the cross-language golden $name', (fixture) => {
+     const plan = selectMiraFormalSkills(fixture.input);
+     expect(plan).toEqual(fixture.expected);
+diff --git a/tests/fixtures/mira-formal-candidate-lesson-boundaries-v1.json b/tests/fixtures/mira-formal-candidate-lesson-boundaries-v1.json
+new file mode 100644
+--- /dev/null
++++ b/tests/fixtures/mira-formal-candidate-lesson-boundaries-v1.json
+@@ -0,0 +1,1329 @@
++[
++  {
++    "name": "math",
++    "input": {
++      "gradeBoundary": {
++        "allowedContent": [
++          "围绕一年级《逐物数数 1～5》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：逐物对应数数：5",
++          "本课为一年级《逐物数数 1～5》中的入门步骤；难度从本年级起步。",
++          "本课已登记范围：{\"allowedGrammarCodes\": [], \"allowedLetters\": [], \"allowedOperations\": [], \"allowedPinyin\": [], \"assessmentEvidenceKinds\": [\"count_objects\"], \"assessmentEvidenceScope\": \"declared_objective_only\", \"audioInstructionsAllowed\": true, \"challengeMayOnlyCombineDeclaredKnowledge\": true, \"excludedGrammarCodes\": [], \"introducedGrammarCodes\": [], \"introducedOperations\": [], \"introducedTokens\": [\"5\"], \"maxCoreNewTargets\": 1, \"maximumNumber\": 5, \"minimumNumber\": 0, \"neutralDistractorTokens\": [], \"newVocabularyMustBeIntroducedBeforeUse\": true, \"noUnintroducedKnowledgeInInstructions\": true, \"teachBeforeAssessment\": true, \"tokenKind\": \"number\", \"writtenNumberRecognitionRequired\": false}",
++          "本课新增知识：M1A01.05"
++        ],
++        "boundaryVersion": "mira.primary.progressive.v1:be68cb20f4adef9274f9d338",
++        "constraints": {
++          "allowedGrammarCodes": [],
++          "allowedLetters": [],
++          "allowedOperations": [],
++          "allowedPinyin": [],
++          "assessmentEvidenceKinds": [
++            "count_objects"
++          ],
++          "assessmentEvidenceScope": "declared_objective_only",
++          "audioInstructionsAllowed": true,
++          "challengeMayOnlyCombineDeclaredKnowledge": true,
++          "excludedGrammarCodes": [],
++          "introducedGrammarCodes": [],
++          "introducedOperations": [],
++          "introducedTokens": [
++            "5"
++          ],
++          "maxCoreNewTargets": 1,
++          "maximumNumber": 5,
++          "minimumNumber": 0,
++          "neutralDistractorTokens": [],
++          "newVocabularyMustBeIntroducedBeforeUse": true,
++          "noUnintroducedKnowledgeInInstructions": true,
++          "teachBeforeAssessment": true,
++          "tokenKind": "number",
++          "writtenNumberRecognitionRequired": false
++        },
++        "curriculumVersion": "mira.primary.progressive.v1",
++        "estimatedMinutes": 8,
++        "excludedContent": [
++          "不得依赖未登记为先修的后续知识。",
++          "不得把演示、提示或重复作答作为独立掌握证据。",
++          "不得把本年级入门课替换为低年级启蒙；低年级先修只能必要时简短回顾，不能成为主要教学和练习。"
++        ],
++        "gradeCode": "primary_1",
++        "language": "zh-CN",
++        "learningObjectives": [
++          "围绕一年级《逐物数数 1～5》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：逐物对应数数：5"
++        ],
++        "prerequisiteSkills": [
++          "M1A01.04"
++        ],
++        "skillId": "M1A01.05",
++        "skillTitle": "逐物对应数数：5",
++        "subject": "math"
++      },
++      "gradeBoundarySha256": "b53d90bc7de875ee392db129e090e867cacf0c51c4c40c0343cc2b36c7ca6450",
++      "teachingBrief": {
++        "authority": {
++          "answerContractProvided": false,
++          "providerSecretsProvided": false,
++          "scoringRulesProvided": false,
++          "source": "locked_learning_course"
++        },
++        "course": {
++          "difficultyCode": "basic",
++          "gradeCode": "primary_1",
++          "id": "formal_eval_6de310e3f884cced37560307",
++          "objective": "围绕一年级《逐物数数 1～5》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：逐物对应数数：5",
++          "skillId": "M1A01.05",
++          "subject": "math",
++          "title": "逐物对应数数：5",
++          "version": "original-authoring-v1"
++        },
++        "difficultyPolicy": {
++          "assessment": {
++            "autoMasteryEligible": true,
++            "criteria": {
++              "claimScope": "this_lesson_only",
++              "minimumAccuracy": 0.8,
++              "minimumDistinctTasks": 5,
++              "minimumIndependentAttempts": 5,
++              "promptedAnswersCountAsIndependent": false,
++              "requiresObservedConfirmation": false
++            },
++            "evidenceKinds": [
++              "count_objects"
++            ],
++            "manualConfirmationRequired": false,
++            "mode": "objective",
++            "semanticScoringAuthority": "independent_answer_blind_review"
++          },
++          "complexity": {
++            "assessmentOperation": "independent_lesson_tasks",
++            "maxCoreNewTargets": 1,
++            "reasoningScope": "direct_application_of_taught_lesson_objectives",
++            "requirements": [
++              "basic means the entry level of this grade and this lesson, not a restart at grade 1.",
++              "Teach and demonstrate the declared lesson objectives before guided practice and assessment.",
++              "Use prerequisites only to support this lesson; do not replace it with another grade or coarse skill.",
++              "Do not add future lesson skills, harder unit-wide reasoning, vocabulary, grammar or operations outside the locked scope.",
++              "Different assessment set ordinals change task material, never the difficulty or lesson boundary."
++            ],
++            "scope": "current_grade_current_lesson"
++          },
++          "curriculumIdentitySha256": "76c51a42b183102089749c51c3250fd1a3cae887ef207add5c4c7f6f4933dff9",
++          "curriculumVersion": "mira.primary.progressive.v1",
++          "difficultyCode": "basic",
++          "gradeCode": "primary_1",
++          "lessonScope": {
++            "constraints": {
++              "allowedGrammarCodes": [],
++              "allowedLetters": [],
++              "allowedOperations": [],
++              "allowedPinyin": [],
++              "assessmentEvidenceKinds": [
++                "count_objects"
++              ],
++              "assessmentEvidenceScope": "declared_objective_only",
++              "audioInstructionsAllowed": true,
++              "challengeMayOnlyCombineDeclaredKnowledge": true,
++              "excludedGrammarCodes": [],
++              "introducedGrammarCodes": [],
++              "introducedOperations": [],
++              "introducedTokens": [
++                "5"
++              ],
++              "maxCoreNewTargets": 1,
++              "maximumNumber": 5,
++              "minimumNumber": 0,
++              "neutralDistractorTokens": [],
++              "newVocabularyMustBeIntroducedBeforeUse": true,
++              "noUnintroducedKnowledgeInInstructions": true,
++              "teachBeforeAssessment": true,
++              "tokenKind": "number",
++              "writtenNumberRecognitionRequired": false
++            },
++            "introducedKnowledgeIds": [
++              "M1A01.05"
++            ],
++            "learningObjectives": [
++              "围绕一年级《逐物数数 1～5》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：逐物对应数数：5"
++            ],
++            "prerequisiteLessonIds": [
++              "M1A01.04"
++            ],
++            "sourceStepTitle": "一物对应一个数词",
++            "unitId": "M1A01",
++            "unitTitle": "逐物数数 1～5"
++          },
++          "lessonSha256": "be68cb20f4adef9274f9d338a8981830cdcc4278f922c6c48c14c989c7f905ad",
++          "mode": "progressive_objective",
++          "objectiveRuleVersion": "mira.learning.progressive-host-validation.v1",
++          "policySha256": "18c4916dc7601300eedf36f6ed3030017ba963723ebbc46fefb68c02a3e92cf7",
++          "policyVersion": "mira.learning.progressive-difficulty-policy.v1",
++          "schemaVersion": "mira.learning.difficulty-policy.v1",
++          "skillId": "M1A01.05",
++          "subject": "math"
++        },
++        "lesson": {
++          "assessmentMode": "objective",
++          "autoMasteryEligible": true,
++          "estimatedMinutes": 10,
++          "intro": "听老师说，看图动手试一试。",
++          "manualConfirmationRequired": false,
++          "progressiveFlow": [
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "teach",
++              "text": "看这些物体，老师一边点一边数：一、二、三、四、五。每个只点一次，点过留下记号。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "example",
++              "text": "老师演示：从一个物体开始，点一个数一个；点过的留记号，到五时所有物体都数过了。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "guided",
++              "questionId": "math-guided-1",
++              "text": "看红色圆形，跟老师一起点，一个物体只点一次。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "guided",
++              "questionId": "math-guided-2",
++              "text": "看看蓝色方块，这次你来点，点过的留下记号。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "independent",
++              "questionId": "math-independent-1",
++              "text": "看黄色三角形，从一个开始，一个一个点，不重复。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "independent",
++              "questionId": "math-independent-2",
++              "text": "这些物体的形状不同，请你逐个点过，不漏掉。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "independent",
++              "questionId": "math-independent-3",
++              "text": "看看颜色不同的这组物体，每个只点一次。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "independent",
++              "questionId": "math-independent-4",
++              "text": "这一组换了颜色和形状，试着把每个物体都点到。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "independent",
++              "questionId": "math-independent-5",
++              "text": "再换一组物体，请你自己点，一个也不漏，一个也不重复。"
++            },
++            {
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "phase": "recap",
++              "text": "今天先到这里，可以再听老师示范；学习记录只记录刚才的独立尝试。"
++            }
++          ],
++          "questions": [
++            {
++              "id": "math-guided-1",
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "objects": [
++                {
++                  "color": "red",
++                  "id": "math-guided-1-object-1",
++                  "shape": "circle"
++                },
++                {
++                  "color": "red",
++                  "id": "math-guided-1-object-2",
++                  "shape": "circle"
++                },
++                {
++                  "color": "red",
++                  "id": "math-guided-1-object-3",
++                  "shape": "circle"
++                },
++                {
++                  "color": "red",
++                  "id": "math-guided-1-object-4",
++                  "shape": "circle"
++                },
++                {
++                  "color": "red",
++                  "id": "math-guided-1-object-5",
++                  "shape": "circle"
++                }
++              ],
++              "prompt": "看红色圆形，跟老师一起点，一个物体只点一次。",
++              "type": "tap_objects"
++            },
++            {
++              "id": "math-guided-2",
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "objects": [
++                {
++                  "color": "blue",
++                  "id": "math-guided-2-object-1",
++                  "shape": "square"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-guided-2-object-2",
++                  "shape": "square"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-guided-2-object-3",
++                  "shape": "square"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-guided-2-object-4",
++                  "shape": "square"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-guided-2-object-5",
++                  "shape": "square"
++                }
++              ],
++              "prompt": "看看蓝色方块，这次你来点，点过的留下记号。",
++              "type": "tap_objects"
++            },
++            {
++              "id": "math-independent-1",
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "objects": [
++                {
++                  "color": "yellow",
++                  "id": "math-independent-1-object-1",
++                  "shape": "triangle"
++                },
++                {
++                  "color": "yellow",
++                  "id": "math-independent-1-object-2",
++                  "shape": "triangle"
++                },
++                {
++                  "color": "yellow",
++                  "id": "math-independent-1-object-3",
++                  "shape": "triangle"
++                },
++                {
++                  "color": "yellow",
++                  "id": "math-independent-1-object-4",
++                  "shape": "triangle"
++                },
++                {
++                  "color": "yellow",
++                  "id": "math-independent-1-object-5",
++                  "shape": "triangle"
++                }
++              ],
++              "prompt": "看黄色三角形，从一个开始，一个一个点，不重复。",
++              "type": "tap_objects"
++            },
++            {
++              "id": "math-independent-2",
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "objects": [
++                {
++                  "color": "green",
++                  "id": "math-independent-2-object-1",
++                  "shape": "circle"
++                },
++                {
++                  "color": "green",
++                  "id": "math-independent-2-object-2",
++                  "shape": "square"
++                },
++                {
++                  "color": "green",
++                  "id": "math-independent-2-object-3",
++                  "shape": "triangle"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-independent-2-object-4",
++                  "shape": "circle"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-independent-2-object-5",
++                  "shape": "square"
++                }
++              ],
++              "prompt": "这些物体的形状不同，请你逐个点过，不漏掉。",
++              "type": "tap_objects"
++            },
++            {
++              "id": "math-independent-3",
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "objects": [
++                {
++                  "color": "red",
++                  "id": "math-independent-3-object-1",
++                  "shape": "circle"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-independent-3-object-2",
++                  "shape": "circle"
++                },
++                {
++                  "color": "yellow",
++                  "id": "math-independent-3-object-3",
++                  "shape": "circle"
++                },
++                {
++                  "color": "green",
++                  "id": "math-independent-3-object-4",
++                  "shape": "circle"
++                },
++                {
++                  "color": "red",
++                  "id": "math-independent-3-object-5",
++                  "shape": "square"
++                }
++              ],
++              "prompt": "看看颜色不同的这组物体，每个只点一次。",
++              "type": "tap_objects"
++            },
++            {
++              "id": "math-independent-4",
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "objects": [
++                {
++                  "color": "yellow",
++                  "id": "math-independent-4-object-1",
++                  "shape": "square"
++                },
++                {
++                  "color": "green",
++                  "id": "math-independent-4-object-2",
++                  "shape": "square"
++                },
++                {
++                  "color": "red",
++                  "id": "math-independent-4-object-3",
++                  "shape": "triangle"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-independent-4-object-4",
++                  "shape": "triangle"
++                },
++                {
++                  "color": "yellow",
++                  "id": "math-independent-4-object-5",
++                  "shape": "circle"
++                }
++              ],
++              "prompt": "这一组换了颜色和形状，试着把每个物体都点到。",
++              "type": "tap_objects"
++            },
++            {
++              "id": "math-independent-5",
++              "knowledgeIds": [
++                "M1A01.05"
++              ],
++              "objects": [
++                {
++                  "color": "green",
++                  "id": "math-independent-5-object-1",
++                  "shape": "triangle"
++                },
++                {
++                  "color": "blue",
++                  "id": "math-independent-5-object-2",
++                  "shape": "circle"
++                },
++                {
++                  "color": "red",
++                  "id": "math-independent-5-object-3",
++                  "shape": "square"
++                },
++                {
++                  "color": "green",
++                  "id": "math-independent-5-object-4",
++                  "shape": "square"
++                },
++                {
++                  "color": "red",
++                  "id": "math-independent-5-object-5",
++                  "shape": "circle"
++                }
++              ],
++              "prompt": "再换一组物体，请你自己点，一个也不漏，一个也不重复。",
++              "type": "tap_objects"
++            }
++          ],
++          "teachingFlow": {
++            "examples": [
++              {
++                "knowledgeIds": [
++                  "M1A01.05"
++                ],
++                "text": "老师演示：从一个物体开始，点一个数一个；点过的留记号，到五时所有物体都数过了。"
++              }
++            ],
++            "guidedQuestionIds": [
++              "math-guided-1",
++              "math-guided-2"
++            ],
++            "independentQuestionIds": [
++              "math-independent-1",
++              "math-independent-2",
++              "math-independent-3",
++              "math-independent-4",
++              "math-independent-5"
++            ],
++            "observations": [],
++            "recap": {
++              "sayText": "今天先到这里，可以再听老师示范；学习记录只记录刚才的独立尝试。"
++            },
++            "schemaVersion": "mira.learning.progressive-teaching-flow.v1",
++            "teach": {
++              "keyPoints": [
++                "围绕一年级《逐物数数 1～5》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：逐物对应数数：5"
++              ],
++              "sayText": "看这些物体，老师一边点一边数：一、二、三、四、五。每个只点一次，点过留下记号。",
++              "title": "逐物对应数数：5"
++            }
++          }
++        },
++        "progressiveLesson": {
++          "assessmentMode": "objective",
++          "curriculumVersion": "mira.primary.progressive.v1",
++          "difficultyCode": "basic",
++          "identitySha256": "76c51a42b183102089749c51c3250fd1a3cae887ef207add5c4c7f6f4933dff9",
++          "lessonId": "M1A01.05",
++          "lessonSha256": "be68cb20f4adef9274f9d338a8981830cdcc4278f922c6c48c14c989c7f905ad",
++          "schemaVersion": "mira.learning.progressive-binding.v1"
++        },
++        "schemaVersion": "mira.learning.formal-runtime-teaching-brief.progressive.v1",
++        "sourceCourseContentSha256": "3affc089812dd891c6119ad750dd5cd261600c82bb76c73b82de491d3cf3a31b"
++      },
++      "modelPolicyId": "deepseek-v4.1-flash-candidate-v1"
++    },
++    "expectedPlan": {
++      "schemaVersion": "mira.openmaic.skill-selection.v1",
++      "registryId": "openmaic-builtin-skills.v1-23",
++      "inputSha256": "52796c419a834e7ecd6f0ff45138dff06d2b7b5f5a040f978e525873b88c97ee",
++      "gradeBoundarySha256": "b53d90bc7de875ee392db129e090e867cacf0c51c4c40c0343cc2b36c7ca6450",
++      "gradeBand": "lower_primary",
++      "primaryMethod": null,
++      "selectedSkillIds": [
++        "mira-primary-courseware",
++        "stage-design",
++        "k12-core-literacy-planning",
++        "deep-interactive",
++        "slide-craft",
++        "learning-to-learn",
++        "understanding-by-design"
++      ],
++      "decisions": [
++        {
++          "skillId": "mira-primary-courseware",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "stage-design",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "k12-core-literacy-planning",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "deep-interactive",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "slide-craft",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "learning-to-learn",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "understanding-by-design",
++          "status": "selected",
++          "reasonCode": "bounded_goal_and_assessment_backward_design",
++          "evidencePaths": [
++            "/teachingBrief/course/objective",
++            "/teachingBrief/lesson/questions"
++          ]
++        },
++        {
++          "skillId": "feynman-learning",
++          "status": "not_applicable",
++          "reasonCode": "no_supported_explanation_cycle",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "workshop-style",
++          "status": "not_applicable",
++          "reasonCode": "no_supported_practice_sequence",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "social-emotional-learning",
++          "status": "not_applicable",
++          "reasonCode": "no_explicit_social_learning_situation",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "deep-research",
++          "status": "not_applicable",
++          "reasonCode": "stable_subject_formal_source_gate_suffices",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "lecture-style",
++          "status": "not_applicable",
++          "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode"
++          ]
++        },
++        {
++          "skillId": "pro-editing",
++          "status": "deferred",
++          "reasonCode": "only_after_persisted_page_requires_repair",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "stage-dsl",
++          "status": "deferred",
++          "reasonCode": "only_after_persisted_page_requires_repair",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "slide-dsl",
++          "status": "deferred",
++          "reasonCode": "only_after_persisted_page_requires_repair",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "pptx-import",
++          "status": "not_applicable",
++          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "style-clone",
++          "status": "not_applicable",
++          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "page-clone",
++          "status": "not_applicable",
++          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "teacher-style-clone",
++          "status": "not_applicable",
++          "reasonCode": "no_authorized_teacher_material",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "curriculum-planner",
++          "status": "not_applicable",
++          "reasonCode": "single_course_not_series_or_cross_course_memory",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "spiral-curriculum",
++          "status": "not_applicable",
++          "reasonCode": "single_course_not_series_or_cross_course_memory",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "build-personal-skill",
++          "status": "not_applicable",
++          "reasonCode": "no_personal_history_or_skill_creation_request",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "vocational",
++          "status": "not_applicable",
++          "reasonCode": "primary_subject_not_occupational_procedure",
++          "evidencePaths": [
++            "/gradeBoundary/subject"
++          ]
++        }
++      ],
++      "planSha256": "f1fa491899ff3e22bba9f3ce3dccde56b75ce4d45b960d0b4915b24a47f2bf17"
++    },
++    "productionLessonId": "M1A01.05"
++  },
++  {
++    "name": "chinese",
++    "input": {
++      "gradeBoundary": {
++        "allowedContent": [
++          "围绕一年级《基础汉字与书写》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：常用字形辨认",
++          "本课为一年级《基础汉字与书写》中的入门步骤；难度从本年级起步。",
++          "本课已登记范围：{\"allowedGrammarCodes\": [], \"allowedLetters\": [], \"allowedOperations\": [], \"allowedPinyin\": [], \"assessmentEvidenceKinds\": [\"independent_choice\"], \"assessmentEvidenceScope\": \"declared_objective_only\", \"audioInstructionsAllowed\": true, \"challengeMayOnlyCombineDeclaredKnowledge\": true, \"excludedGrammarCodes\": [], \"introducedGrammarCodes\": [], \"introducedOperations\": [], \"introducedTokens\": [], \"maxCoreNewTargets\": 1, \"maximumNumber\": null, \"minimumNumber\": null, \"neutralDistractorTokens\": [], \"newVocabularyMustBeIntroducedBeforeUse\": true, \"noUnintroducedKnowledgeInInstructions\": true, \"teachBeforeAssessment\": true, \"tokenKind\": \"general\", \"writtenNumberRecognitionRequired\": true}",
++          "本课新增知识：ZH1B02.03"
++        ],
++        "boundaryVersion": "mira.primary.progressive.v1:1b33d94878aa282d82753d1a",
++        "constraints": {
++          "allowedGrammarCodes": [],
++          "allowedLetters": [],
++          "allowedOperations": [],
++          "allowedPinyin": [],
++          "assessmentEvidenceKinds": [
++            "independent_choice"
++          ],
++          "assessmentEvidenceScope": "declared_objective_only",
++          "audioInstructionsAllowed": true,
++          "challengeMayOnlyCombineDeclaredKnowledge": true,
++          "excludedGrammarCodes": [],
++          "introducedGrammarCodes": [],
++          "introducedOperations": [],
++          "introducedTokens": [],
++          "maxCoreNewTargets": 1,
++          "maximumNumber": null,
++          "minimumNumber": null,
++          "neutralDistractorTokens": [],
++          "newVocabularyMustBeIntroducedBeforeUse": true,
++          "noUnintroducedKnowledgeInInstructions": true,
++          "teachBeforeAssessment": true,
++          "tokenKind": "general",
++          "writtenNumberRecognitionRequired": true
++        },
++        "curriculumVersion": "mira.primary.progressive.v1",
++        "estimatedMinutes": 8,
++        "excludedContent": [
++          "不得依赖未登记为先修的后续知识。",
++          "不得把演示、提示或重复作答作为独立掌握证据。",
++          "不得把本年级入门课替换为低年级启蒙；低年级先修只能必要时简短回顾，不能成为主要教学和练习。"
++        ],
++        "gradeCode": "primary_1",
++        "language": "zh-CN",
++        "learningObjectives": [
++          "围绕一年级《基础汉字与书写》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：常用字形辨认"
++        ],
++        "prerequisiteSkills": [
++          "ZH1B02.01"
++        ],
++        "skillId": "ZH1B02.03",
++        "skillTitle": "常用字形辨认",
++        "subject": "chinese"
++      },
++      "gradeBoundarySha256": "15d08c806acb48208cc4cdff2c5bd07621225a0945f49c0a5cd22bca124c9f3f",
++      "teachingBrief": {
++        "authority": {
++          "answerContractProvided": false,
++          "providerSecretsProvided": false,
++          "scoringRulesProvided": false,
++          "source": "locked_learning_course"
++        },
++        "course": {
++          "difficultyCode": "basic",
++          "gradeCode": "primary_1",
++          "id": "formal_eval_45c6c737ea4e0891cc36cb7f",
++          "objective": "围绕一年级《基础汉字与书写》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：常用字形辨认",
++          "skillId": "ZH1B02.03",
++          "subject": "chinese",
++          "title": "常用字形辨认",
++          "version": "original-authoring-v1"
++        },
++        "difficultyPolicy": {
++          "assessment": {
++            "autoMasteryEligible": true,
++            "criteria": {
++              "claimScope": "this_lesson_only",
++              "minimumAccuracy": 0.8,
++              "minimumDistinctTasks": 5,
++              "minimumIndependentAttempts": 5,
++              "promptedAnswersCountAsIndependent": false,
++              "requiresObservedConfirmation": false
++            },
++            "evidenceKinds": [
++              "independent_choice"
++            ],
++            "manualConfirmationRequired": false,
++            "mode": "objective",
++            "semanticScoringAuthority": "independent_answer_blind_review"
++          },
++          "complexity": {
++            "assessmentOperation": "independent_lesson_tasks",
++            "maxCoreNewTargets": 1,
++            "reasoningScope": "direct_application_of_taught_lesson_objectives",
++            "requirements": [
++              "basic means the entry level of this grade and this lesson, not a restart at grade 1.",
++              "Teach and demonstrate the declared lesson objectives before guided practice and assessment.",
++              "Use prerequisites only to support this lesson; do not replace it with another grade or coarse skill.",
++              "Do not add future lesson skills, harder unit-wide reasoning, vocabulary, grammar or operations outside the locked scope.",
++              "Different assessment set ordinals change task material, never the difficulty or lesson boundary."
++            ],
++            "scope": "current_grade_current_lesson"
++          },
++          "curriculumIdentitySha256": "76c51a42b183102089749c51c3250fd1a3cae887ef207add5c4c7f6f4933dff9",
++          "curriculumVersion": "mira.primary.progressive.v1",
++          "difficultyCode": "basic",
++          "gradeCode": "primary_1",
++          "lessonScope": {
++            "constraints": {
++              "allowedGrammarCodes": [],
++              "allowedLetters": [],
++              "allowedOperations": [],
++              "allowedPinyin": [],
++              "assessmentEvidenceKinds": [
++                "independent_choice"
++              ],
++              "assessmentEvidenceScope": "declared_objective_only",
++              "audioInstructionsAllowed": true,
++              "challengeMayOnlyCombineDeclaredKnowledge": true,
++              "excludedGrammarCodes": [],
++              "introducedGrammarCodes": [],
++              "introducedOperations": [],
++              "introducedTokens": [],
++              "maxCoreNewTargets": 1,
++              "maximumNumber": null,
++              "minimumNumber": null,
++              "neutralDistractorTokens": [],
++              "newVocabularyMustBeIntroducedBeforeUse": true,
++              "noUnintroducedKnowledgeInInstructions": true,
++              "teachBeforeAssessment": true,
++              "tokenKind": "general",
++              "writtenNumberRecognitionRequired": true
++            },
++            "introducedKnowledgeIds": [
++              "ZH1B02.03"
++            ],
++            "learningObjectives": [
++              "围绕一年级《基础汉字与书写》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：常用字形辨认"
++            ],
++            "prerequisiteLessonIds": [
++              "ZH1B02.01"
++            ],
++            "sourceStepTitle": "常用字形辨认",
++            "unitId": "ZH1B02",
++            "unitTitle": "基础汉字与书写"
++          },
++          "lessonSha256": "1b33d94878aa282d82753d1ae2c2afe2b4beec8d3c29cc1eb92af2764a940c61",
++          "mode": "progressive_objective",
++          "objectiveRuleVersion": "mira.learning.progressive-host-validation.v1",
++          "policySha256": "ce5e8526445700c9558069fdf6ad75bfc176fe5707ba7a713e532d79bcab3ffe",
++          "policyVersion": "mira.learning.progressive-difficulty-policy.v1",
++          "schemaVersion": "mira.learning.difficulty-policy.v1",
++          "skillId": "ZH1B02.03",
++          "subject": "chinese"
++        },
++        "lesson": {
++          "assessmentMode": "objective",
++          "autoMasteryEligible": true,
++          "estimatedMinutes": 10,
++          "intro": "听老师说，看图动手试一试。",
++          "manualConfirmationRequired": false,
++          "progressiveFlow": [
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "teach",
++              "text": "看天空的情境图，听老师说天。再看旁边的大字形：上面两横，下面两笔分开。本课只学天字的字形。"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "example",
++              "text": "老师先在天空图旁指给你看天字，再指上面的两横和下面分开的两笔。看两张字形图片，只找天字。"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "guided",
++              "questionId": "chinese-guided-1",
++              "text": "看两张字形图片，跟老师找一找，哪张和天字一样？"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "guided",
++              "questionId": "chinese-guided-2",
++              "text": "这次指一指两张图片里，和刚才天字相同的字形。"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "independent",
++              "questionId": "chinese-independent-1",
++              "text": "换了两张图片，请你自己找出天字的字形。"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "independent",
++              "questionId": "chinese-independent-2",
++              "text": "再看这一对字形图片，点出和刚才学过的天字一样的。"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "independent",
++              "questionId": "chinese-independent-3",
++              "text": "帮老师从这一对图片中，挑出天字的字形。"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "independent",
++              "questionId": "chinese-independent-4",
++              "text": "图片又换了，看看哪张和天字的形状相同。"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "independent",
++              "questionId": "chinese-independent-5",
++              "text": "最后这一对图片，请你自己点出天字的字形。"
++            },
++            {
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "phase": "recap",
++              "text": "今天先到这里，可以再听老师示范；学习记录只记录刚才的独立尝试。"
++            }
++          ],
++          "questions": [
++            {
++              "choices": [
++                {
++                  "id": "chinese-guided-1-target",
++                  "label": "天"
++                },
++                {
++                  "id": "chinese-guided-1-distractor",
++                  "label": "大"
++                }
++              ],
++              "id": "chinese-guided-1",
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "prompt": "看两张字形图片，跟老师找一找，哪张和天字一样？",
++              "type": "single_choice"
++            },
++            {
++              "choices": [
++                {
++                  "id": "chinese-guided-2-distractor",
++                  "label": "夫"
++                },
++                {
++                  "id": "chinese-guided-2-target",
++                  "label": "天"
++                }
++              ],
++              "id": "chinese-guided-2",
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "prompt": "这次指一指两张图片里，和刚才天字相同的字形。",
++              "type": "single_choice"
++            },
++            {
++              "choices": [
++                {
++                  "id": "chinese-independent-1-target",
++                  "label": "天"
++                },
++                {
++                  "id": "chinese-independent-1-distractor",
++                  "label": "无"
++                }
++              ],
++              "id": "chinese-independent-1",
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "prompt": "换了两张图片，请你自己找出天字的字形。",
++              "type": "single_choice"
++            },
++            {
++              "choices": [
++                {
++                  "id": "chinese-independent-2-distractor",
++                  "label": "夭"
++                },
++                {
++                  "id": "chinese-independent-2-target",
++                  "label": "天"
++                }
++              ],
++              "id": "chinese-independent-2",
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "prompt": "再看这一对字形图片，点出和刚才学过的天字一样的。",
++              "type": "single_choice"
++            },
++            {
++              "choices": [
++                {
++                  "id": "chinese-independent-3-target",
++                  "label": "天"
++                },
++                {
++                  "id": "chinese-independent-3-distractor",
++                  "label": "太"
++                }
++              ],
++              "id": "chinese-independent-3",
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "prompt": "帮老师从这一对图片中，挑出天字的字形。",
++              "type": "single_choice"
++            },
++            {
++              "choices": [
++                {
++                  "id": "chinese-independent-4-distractor",
++                  "label": "犬"
++                },
++                {
++                  "id": "chinese-independent-4-target",
++                  "label": "天"
++                }
++              ],
++              "id": "chinese-independent-4",
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "prompt": "图片又换了，看看哪张和天字的形状相同。",
++              "type": "single_choice"
++            },
++            {
++              "choices": [
++                {
++                  "id": "chinese-independent-5-target",
++                  "label": "天"
++                },
++                {
++                  "id": "chinese-independent-5-distractor",
++                  "label": "木"
++                }
++              ],
++              "id": "chinese-independent-5",
++              "knowledgeIds": [
++                "ZH1B02.03"
++              ],
++              "prompt": "最后这一对图片，请你自己点出天字的字形。",
++              "type": "single_choice"
++            }
++          ],
++          "teachingFlow": {
++            "examples": [
++              {
++                "knowledgeIds": [
++                  "ZH1B02.03"
++                ],
++                "text": "老师先在天空图旁指给你看天字，再指上面的两横和下面分开的两笔。看两张字形图片，只找天字。"
++              }
++            ],
++            "guidedQuestionIds": [
++              "chinese-guided-1",
++              "chinese-guided-2"
++            ],
++            "independentQuestionIds": [
++              "chinese-independent-1",
++              "chinese-independent-2",
++              "chinese-independent-3",
++              "chinese-independent-4",
++              "chinese-independent-5"
++            ],
++            "observations": [],
++            "recap": {
++              "sayText": "今天先到这里，可以再听老师示范；学习记录只记录刚才的独立尝试。"
++            },
++            "schemaVersion": "mira.learning.progressive-teaching-flow.v1",
++            "teach": {
++              "keyPoints": [
++                "围绕一年级《基础汉字与书写》的本课目标，通过独立辨认、匹配、选择、排序或计算验证：常用字形辨认"
++              ],
++              "sayText": "看天空的情境图，听老师说天。再看旁边的大字形：上面两横，下面两笔分开。本课只学天字的字形。",
++              "title": "常用字形辨认"
++            }
++          }
++        },
++        "progressiveLesson": {
++          "assessmentMode": "objective",
++          "curriculumVersion": "mira.primary.progressive.v1",
++          "difficultyCode": "basic",
++          "identitySha256": "76c51a42b183102089749c51c3250fd1a3cae887ef207add5c4c7f6f4933dff9",
++          "lessonId": "ZH1B02.03",
++          "lessonSha256": "1b33d94878aa282d82753d1ae2c2afe2b4beec8d3c29cc1eb92af2764a940c61",
++          "schemaVersion": "mira.learning.progressive-binding.v1"
++        },
++        "schemaVersion": "mira.learning.formal-runtime-teaching-brief.progressive.v1",
++        "sourceCourseContentSha256": "67cb43a7de090d91ce42d603af05ee7bfc7c7335a6b0dcfd42d8e9e0b6bcbde4"
++      },
++      "modelPolicyId": "deepseek-v4.1-flash-candidate-v1"
++    },
++    "expectedPlan": {
++      "schemaVersion": "mira.openmaic.skill-selection.v1",
++      "registryId": "openmaic-builtin-skills.v1-23",
++      "inputSha256": "9fad951e8e49fe3f991a4d69f5a3f8f66aba89aaf78646b631144caad644a3a4",
++      "gradeBoundarySha256": "15d08c806acb48208cc4cdff2c5bd07621225a0945f49c0a5cd22bca124c9f3f",
++      "gradeBand": "lower_primary",
++      "primaryMethod": null,
++      "selectedSkillIds": [
++        "mira-primary-courseware",
++        "stage-design",
++        "k12-core-literacy-planning",
++        "deep-interactive",
++        "slide-craft",
++        "learning-to-learn",
++        "understanding-by-design"
++      ],
++      "decisions": [
++        {
++          "skillId": "mira-primary-courseware",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "stage-design",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "k12-core-literacy-planning",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "deep-interactive",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "slide-craft",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "learning-to-learn",
++          "status": "selected",
++          "reasonCode": "formal_primary_baseline",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode",
++            "/gradeBoundary/subject"
++          ]
++        },
++        {
++          "skillId": "understanding-by-design",
++          "status": "selected",
++          "reasonCode": "bounded_goal_and_assessment_backward_design",
++          "evidencePaths": [
++            "/teachingBrief/course/objective",
++            "/teachingBrief/lesson/questions"
++          ]
++        },
++        {
++          "skillId": "feynman-learning",
++          "status": "not_applicable",
++          "reasonCode": "no_supported_explanation_cycle",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "workshop-style",
++          "status": "not_applicable",
++          "reasonCode": "no_supported_practice_sequence",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "social-emotional-learning",
++          "status": "not_applicable",
++          "reasonCode": "no_explicit_social_learning_situation",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "deep-research",
++          "status": "not_applicable",
++          "reasonCode": "stable_subject_formal_source_gate_suffices",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "lecture-style",
++          "status": "not_applicable",
++          "reasonCode": "dense_masterclass_conflicts_with_primary_contract",
++          "evidencePaths": [
++            "/gradeBoundary/gradeCode"
++          ]
++        },
++        {
++          "skillId": "pro-editing",
++          "status": "deferred",
++          "reasonCode": "only_after_persisted_page_requires_repair",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "stage-dsl",
++          "status": "deferred",
++          "reasonCode": "only_after_persisted_page_requires_repair",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "slide-dsl",
++          "status": "deferred",
++          "reasonCode": "only_after_persisted_page_requires_repair",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "pptx-import",
++          "status": "not_applicable",
++          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "style-clone",
++          "status": "not_applicable",
++          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "page-clone",
++          "status": "not_applicable",
++          "reasonCode": "no_authorized_layout_source_in_generated_single_course",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "teacher-style-clone",
++          "status": "not_applicable",
++          "reasonCode": "no_authorized_teacher_material",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "curriculum-planner",
++          "status": "not_applicable",
++          "reasonCode": "single_course_not_series_or_cross_course_memory",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "spiral-curriculum",
++          "status": "not_applicable",
++          "reasonCode": "single_course_not_series_or_cross_course_memory",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "build-personal-skill",
++          "status": "not_applicable",
++          "reasonCode": "no_personal_history_or_skill_creation_request",
++          "evidencePaths": []
++        },
++        {
++          "skillId": "vocational",
++          "status": "not_applicable",
++          "reasonCode": "primary_subject_not_occupational_procedure",
++          "evidencePaths": [
++            "/gradeBoundary/subject"
++          ]
++        }
++      ],
++      "planSha256": "9d43cb373d7072aaf04adc650dd4086fa3936999c01df8620ad22ea834905fc9"
++    },
++    "productionLessonId": "ZH1B02.03"
++  }
++]

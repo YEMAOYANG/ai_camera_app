@@ -31,3 +31,17 @@ backend/backend-8000.pid
 /deploy/env/*.env
 /deploy/*.local.*
 /deploy/**/__pycache__/
+
+# Family-private homework images and generated narration.
+/backend/data/homework/
+
+# Local Tencent Cloud credential export.
+/docs/腾讯作业批改密钥文件/*.csv
+
+# Disposable local verification output; durable fixtures stay in source control.
+/tmp/
+/temp/
+**/.playwright-cli/
+/student-web/output/
+**/.pytest_cache/
+**/.ruff_cache/

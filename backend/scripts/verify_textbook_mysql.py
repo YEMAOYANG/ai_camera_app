@@ -1,10 +1,12 @@
-"""Check migration 082 and concurrent repository writes on a disposable MySQL.
+"""Check textbook, review, homework migrations and concurrent reservations on isolated MySQL.
 
 Starts its own server with networking disabled and a fresh temporary data dir.
 Never reads AppConfig, .env or an existing database. Requires a local mysqld.
 """
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import argparse
 import json
 from pathlib import Path
@@ -58,6 +60,11 @@ def verify(socket):
     with db.transaction() as conn:
         conn.executescript((ROOT / "migrations/082_fixed_textbook_learning.sql").read_text())
         conn.executescript((ROOT / "migrations/083_textbook_course_previews.sql").read_text())
+        conn.executescript((ROOT / "migrations/087_learning_course_reuse.sql").read_text())
+        conn.executescript((ROOT / "migrations/085_learning_reviews.sql").read_text())
+        conn.executescript((ROOT / "migrations/086_homework_analysis.sql").read_text())
+        conn.executescript((ROOT / "migrations/076_learning_paid_budget.sql").read_text())
+        conn.executescript((ROOT / "migrations/088_homework_paid_budget.sql").read_text())
         conn.execute("CREATE TABLE children (id VARCHAR(128) PRIMARY KEY, family_id VARCHAR(128), grade_code VARCHAR(32), grade_selection_revision INT)")
         conn.execute("INSERT INTO children VALUES ('isolated-child','isolated-family','primary_1',1)")
     m = json.loads((ROOT / "content/textbooks/pep-chinese-g1-upper.preview.v1.json").read_text())
@@ -109,10 +116,49 @@ def verify(socket):
         list(pool.map(lambda _: previews.start(preview_key), range(4)))
     assert runtime.start_generation.call_count == 1
     assert previews.poll(preview_key)["runtimeJobId"] == job.job_id
-    return {"migration": "passed", "concurrentImports": 4, "uniqueImportedRevision": 1,
+    # Exercise the newly added review tables on real InnoDB transactions, with
+    # synthetic content only. No provider, camera or existing data is involved.
+    from services.learning_evidence_service import record_answer, digest
+    from services.learning_review_service import LearningReviewService
+    now = int(datetime(2026, 10, 3, 9, tzinfo=ZoneInfo("Asia/Shanghai")).timestamp() * 1000)
+    question = {"id": "isolated-question", "version": "1", "subject": "math", "gradeCode": "primary_1",
+                "knowledgeId": "isolated:addition", "knowledgeLabel": "Synthetic addition",
+                "courseId": "isolated-course", "courseTitle": "Synthetic course", "courseVersion": "1",
+                "renderer": "picture_choices", "prompt": "Synthetic verification only", "visual": {},
+                "options": [], "correctAnswer": "A", "estimatedSeconds": 60, "private": False,
+                "promptAudioAsset": "fixture.wav", "hintAudioAssets": [], "explanationAudioAsset": "fixture.wav"}
+    question["fingerprint"] = digest(question)
+    def save_answer(_):
+        with db.transaction() as conn:
+            return record_answer(conn, family_id="isolated-family", child_id="isolated-child",
+                                 source_kind="classroom", source_id="isolated-session", event_key="same-answer",
+                                 question=question, answer="B", correct=False, occurred_at=now-1000,
+                                 independent=True, hint_used=False, adult_help=False)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        evidence = list(pool.map(save_answer, range(4)))
+    assert len({row["id"] for row in evidence}) == 1
+    with db.transaction() as conn:
+        assert conn.execute("SELECT COUNT(*) n FROM learning_answer_events").fetchone()["n"] == 1
+        names = "id,family_id,child_id,title,description,type,status,scheduled_date,scheduled_start,scheduled_end,schedule_type,start_at,due_at,priority,reward_points,requires_parent_confirmation,created_by,reminder_minutes_before,reminder_status,timezone,learning_assignment_key,learning_slot,created_at,updated_at,next_reminder_at,started_at,completed_at,ended_at,completion_source,evidence_summary".split(",")
+        conn.execute("CREATE TABLE tasks (" + ",".join(name + (" VARCHAR(255) PRIMARY KEY" if name == "id" else " TEXT") for name in names) + ")")
+    review_service = LearningReviewService(db, auth_service=None, student_auth_service=None,
+                                         question_pool=lambda conn, child: ([dict(question)], []), clock=lambda: now)
+    def prepare_week(_):
+        with db.transaction() as conn:
+            child = review_service.repository.child(conn, "isolated-family", "isolated-child")
+            return review_service.ensure_week(conn, child, now)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        reviews = list(pool.map(prepare_week, range(4)))
+    assert len({row["id"] for row in reviews}) == 1
+    with db.transaction() as conn:
+        assert conn.execute("SELECT COUNT(*) n FROM learning_review_runs").fetchone()["n"] == 1
+        assert conn.execute("SELECT COUNT(*) n FROM tasks").fetchone()["n"] == 1
+    return {"migration": "passed", "migrationFiles": ["076", "082", "083", "085", "086", "087", "088"], "concurrentImports": 4, "uniqueImportedRevision": 1,
             "concurrentPreparations": 4, "uniqueBuild": 1, "concurrentSelections": 4,
             "successfulSelections": 1, "publicationCheckConstraint": "passed", "existingDatabaseTouched": False,
             "concurrentPreviewStarts": 4, "previewDispatches": runtime.start_generation.call_count,
+            "concurrentEvidenceWrites": 4, "uniqueAnswerEvent": 1,
+            "concurrentWeeklySchedules": 4, "uniqueWeeklyReview": 1, "uniqueReviewTask": 1,
             "realProviderDispatched": False}
 
 

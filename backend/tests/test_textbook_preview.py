@@ -32,7 +32,7 @@ def scene_content(kind):
 
 class TextbookPreviewTest(unittest.TestCase):
     def setUp(self):
-        self.db = IsolatedDatabase(("082_fixed_textbook_learning.sql", "083_textbook_course_previews.sql"))
+        self.db = IsolatedDatabase(("082_fixed_textbook_learning.sql", "083_textbook_course_previews.sql", "087_learning_course_reuse.sql"))
         self.addCleanup(self.db.raw.close)
         self.repo = TextbookRepository(self.db)
         self.manifest = json.loads((Path(__file__).parents[1] / "content/textbooks/revisions/pep-chinese-g1-upper.preview.v2.json").read_text())

@@ -1,3 +1,6 @@
+import 'package:warm_sight/src/features/learning_review/application/learning_review_repository.dart';
+import 'package:warm_sight/src/features/homework/application/homework_repository.dart';
+import 'package:warm_sight/src/features/homework/application/homework_photo_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/features/care/application/care_repository.dart';
 import 'package:warm_sight/src/features/care/application/parent_review_realtime.dart';
@@ -46,6 +49,20 @@ void _invalidateAuthenticatedSessionData(dynamic ref) {
   ref.invalidate(dailyReportProvider);
   ref.invalidate(weeklyReportProvider);
   ref.invalidate(growthMomentsProvider);
+
+  ref.invalidate(learningReviewRepositoryProvider);
+  ref.invalidate(reviewListProvider);
+  ref.invalidate(reviewDetailProvider);
+  ref.invalidate(reviewPreferencesProvider);
+  ref.invalidate(learningWeaknessesProvider);
+  ref.invalidate(homeworkRepositoryProvider);
+  ref.invalidate(homeworkListProvider);
+  ref.invalidate(homeworkDetailProvider);
+  ref.invalidate(homeworkImageProvider);
+  ref.invalidate(homeworkPhotoPickerProvider);
+  ref.invalidate(homeworkPhotoRecoveryProvider);
+  ref.invalidate(homeworkCaptureAuthorizationProvider);
+  ref.invalidate(homeworkCaptureRepositoryProvider);
 
   ref.invalidate(todayLearningProvider);
   ref.invalidate(latestLearningReportProvider);

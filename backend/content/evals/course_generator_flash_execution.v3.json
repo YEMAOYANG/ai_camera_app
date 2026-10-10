@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "mira.course-generator-flash-execution.v3",
+  "checkedAt": "2026-10-08",
+  "frozenSpecification": "backend/content/evals/course_generator_flash_acceptance.v3.json",
+  "continuationSpecification": "backend/content/evals/course_generator_flash_continuation.v1.json",
+  "decision": {
+    "acceptance": "not_passed",
+    "globalCourseGenerationPromotion": "defer",
+    "partialCoursesPublished": false,
+    "studentScoresWritten": false,
+    "proQualitySuperiorityEstablished": false,
+    "reason": "The two formal jobs reached their preserved driver limit before final review/audio/runtime acceptance. Actual saved content also contains teaching errors and premature completion claims."
+  },
+  "candidate": {
+    "officialVersionName": "DeepSeek-V4.1-Flash",
+    "provider": "deepseek",
+    "requestModelId": "deepseek-flash",
+    "modelPolicyId": "deepseek-v4.1-flash-candidate-v1",
+    "fallbackAllowed": false
+  },
+  "sampleScope": {
+    "math": "M1A01.05 teaches pointing to five pictured objects. Five is this registered lesson's boundary, not a product-wide mathematics limit.",
+    "chinese": "ZH1B02.03 introduces the glyph 天. This does not assess the entire 天地人 lesson or unsupported independent character reading.",
+    "coverage": "Two original progressive primary-one samples; this is not all-grade, all-subject or textbook-entry acceptance."
+  },
+  "realExecution": {
+    "math": {
+      "jobId": "omformal_b554552142ae78eae086ac08",
+      "stageId": "stage-nBdHrUaZWz",
+      "status": "failed",
+      "error": "FORMAL_PROFESSIONAL_SESSION_FAILED:FORMAL_AGENT_DISPATCH_BUDGET_EXHAUSTED",
+      "driverCalls": 48,
+      "sourceDispatchesPreserved": 25,
+      "continuationDispatches": 23,
+      "cumulativeInputCharacters": 21266025,
+      "savedScenes": 10,
+      "sceneTypes": { "slide": 5, "interactive": 3, "quiz": 2 },
+      "savedSpeechTexts": 51,
+      "guidedQuestions": 2,
+      "independentQuestions": 5,
+      "distinctDiscussionPeers": 2,
+      "questionTeacherAudioBound": false
+    },
+    "chinese": {
+      "jobId": "omformal_eef2fcfd0a6b6534f28b225f",
+      "stageId": "stage-4Kmy8XQNTp",
+      "status": "failed",
+      "error": "FORMAL_PROFESSIONAL_SESSION_FAILED:FORMAL_AGENT_DISPATCH_BUDGET_EXHAUSTED",
+      "driverCalls": 48,
+      "sourceDispatchesPreserved": 26,
+      "continuationDispatches": 22,
+      "cumulativeInputCharacters": 18582308,
+      "savedScenes": 7,
+      "sceneTypes": { "slide": 3, "interactive": 2, "quiz": 2 },
+      "savedSpeechTexts": 37,
+      "guidedQuestions": 2,
+      "independentQuestions": 5,
+      "distinctDiscussionPeers": 1,
+      "questionTeacherAudioBound": false
+    },
+    "nativeSkillPreloadPerCourse": {
+      "localReads": 9,
+      "modelCalls": 0,
+      "countedAsDriverCalls": false
+    },
+    "uncompletedAcceptance": [
+      "Final independent teaching review",
+      "Rendered visual and interaction review",
+      "Qwen teacher and peer TTS with ASR verification",
+      "Saved question narration and served audio byte verification",
+      "Actual final Native classroom browser interaction"
+    ]
+  },
+  "contentFindings": [
+    {
+      "subject": "chinese",
+      "sceneId": "scene-p3",
+      "priority": 1,
+      "kind": "teaching_fact_error",
+      "detail": "The saved 太 card treats both horizontal strokes as correct and says 太 only adds a dot to 天. 太 has one horizontal stroke and a dot; the comparison also requires accounting for 天's other horizontal stroke."
+    },
+    {
+      "subject": "chinese",
+      "sceneId": "scene-p4",
+      "priority": 1,
+      "kind": "teaching_fact_error",
+      "detail": "The narration incorrectly explains stroke connection and describes 木 relative to 天 as just adding a vertical stroke. These comparisons are misleading for beginning readers."
+    },
+    {
+      "subject": "math",
+      "sceneId": "scene-p9",
+      "priority": 1,
+      "kind": "premature_completion_claim",
+      "detail": "A fixed speech action states that all five groups have been completed. The saved action has no response-bound condition; actual runtime playback order and learner-completion evidence have not been verified."
+    },
+    {
+      "subject": "math",
+      "kind": "shared_runtime_evidence_limit",
+      "candidateSpecific": false,
+      "detail": "The tap_objects renderer records a selected ID set. That set alone cannot prove that the child never recounted an object or correctly spoke the number sequence. Report picture-supported operation evidence within this boundary."
+    }
+  ],
+  "repairsValidatedDuringExecution": [
+    "Tencent saved two-page homework recovery is recorded separately in tencent_homework_recovery_acceptance.v2.json",
+    "Current Flash candidate selection, identity and registered lesson boundaries",
+    "Strict DSL patching accepts valid picture-choice fields while rejecting malformed fields",
+    "Candidate-only cumulative input quota preserves mandatory thinking history and every previous driver record",
+    "The same original jobs, sessions and paid ledger were continued after locally verified failures"
+  ],
+  "budget": {
+    "origin": "assistant_operator_evaluation_protection_not_provider_or_user_config",
+    "allReservationsSettled": true,
+    "totalSettledCalls": 140,
+    "callsByPriceKey": { "deepseek-v4.1-flash-peak": 134, "baidu-search": 4, "qwen-image": 2 },
+    "ttsCalls": 0,
+    "asrCalls": 0,
+    "unknownCalls": 0,
+    "estimatedCny": "29.180744",
+    "estimatedUsdAtProtectiveFx8": "3.647593",
+    "estimateIsProviderInvoice": false,
+    "maxAggregateCallsUnchanged": 400,
+    "maxPerCourseCallsUnchanged": 200,
+    "maxEstimatedSpendUsdUnchanged": "7.50",
+    "maxDriverCallsPerOriginalSessionUnchanged": 48,
+    "maxCumulativeInputCharacters": 50331648,
+    "actualLedgerBudgetPolicyId": "mira-formal-agent-budget.v2",
+    "frozenContinuationMetadataTypo": "The frozen continuation specification spells the budget policy ID as mira-formal-flash-agent-budget.v2. The executable constant and preserved ledgers use mira-formal-agent-budget.v2; the frozen record has not been rewritten."
+  },
+  "validation": {
+    "candidateProductionBuildPassed": true,
+    "latestNativePatch": "0144-mira-flash-agent-context-budget.patch",
+    "latestNativePatchSha256": "e57e76a762da7c4fbe9c6ae9d8b0b626b94f8e81c8783aafaa18c0f89d8e876a",
+    "pictureQuizPatchFocusedTests": 85,
+    "contextBudgetPatchFocusedTests": 30,
+    "engineeringChecksAreModelQualityAcceptance": false,
+    "partialCourseBrowserAcceptancePerformed": false,
+    "existingAppBackendHealthHttp": 200,
+    "existingStudentWebHttp": 200
+  },
+  "evidence": {
+    "privateBase": "backend/data/homework/course-evals/20261008-flash-formal-v3",
+    "finalAudit": "independent-final-audit.json",
+    "finalAuditSha256": "1187c1c1b8634fa24f63429ab6cb406a706a7f07dc52f44b78207e46efc0b2a4",
+    "contentAudit": "independent-content-audit.json",
+    "contentAuditSha256": "76eed73d1a2a06e2a29f01825d5fa517928d7770518eb75904fdd147bfd3809f",
+    "terminalBudget": "terminal-budget-report.json",
+    "isolatedPgBackupSha256": "7bf3dfc07bf8fc6c8ba6b0cdca8db986d24cd24d07ccea271468cf010cbf58b1",
+    "isolatedPgBackupListVerified": true,
+    "isolatedPgRestoreExecuted": false
+  },
+  "cleanup": {
+    "onlyOwnedAcceptancePortsStopped": [3210, 8102, 55482],
+    "privateHistoryAndSavedStagesRetained": true,
+    "existingBusinessDatabaseMigrated": false,
+    "existingBusinessServicesStopped": false
+  },
+  "nextAcceptanceRequirements": [
+    "Reduce repeated skill reads, stage inspection and piecemeal patches within a priced, bounded workflow",
+    "Verify character-comparison facts before accepting low-grade teaching content",
+    "Gate completion and mastery claims on real learner evidence",
+    "Finish every mandatory review, audio and renderer check before publishing or promoting course generation",
+    "Evaluate other grade and textbook entry contracts separately before a global switch"
+  ]
+}

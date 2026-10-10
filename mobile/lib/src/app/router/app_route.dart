@@ -24,6 +24,13 @@ const profileFamilyHubPath = '/profile/family';
 const profileDeviceHubPath = '/profile/device-care';
 const profileTaskRewardHubPath = '/profile/task-rewards';
 const profileReportsHubPath = '/profile/reports';
+const learningCenterPath = '/learning-center';
+const reviewPreferencesPath = '/learning-center/preferences';
+const learningReviewDetailPath = '/learning-center/reviews';
+const homeworkCreatePath = '/learning-center/homework/new';
+const homeworkDetailPath = '/learning-center/homework';
+const homeworkCaptureAuthorizationPath =
+    '/learning-center/capture-authorization';
 const profileRulesHubPath = '/profile/rules-reminders';
 const profileAccountPath = '/profile/account';
 const profileSecurityPath = '/profile/security';

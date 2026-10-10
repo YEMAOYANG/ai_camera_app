@@ -184,6 +184,11 @@ class AuthTokenInterceptor extends Interceptor {
     }
 
     try {
+      // Multipart streams have been finalized by the first request. Clone the
+      // body for the single authenticated retry; the upload key stays intact.
+      if (request.data is FormData) {
+        request.data = (request.data as FormData).clone();
+      }
       final retryOptions = request
         ..extra[_retryKey] = true
         ..headers['Authorization'] = 'Bearer ${refreshed.accessToken}';

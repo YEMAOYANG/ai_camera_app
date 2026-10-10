@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "mira.homework-teacher-selection.v1",
+  "evaluatedAt": "2026-10-08",
+  "status": "not_activated",
+  "selection": {
+    "grading": {
+      "provider": "tencent_iem",
+      "service": "QuestionMarkAgent",
+      "integrationStatus": "not_connected"
+    },
+    "teacher": {
+      "provider": "deepseek_official",
+      "model": "deepseek-flash",
+      "versionLabelAtEvaluation": "DeepSeek-V4.1-Flash",
+      "integrationStatus": "quality_gates_required",
+      "singleTeacherModel": true
+    },
+    "speech": {
+      "decision": "retain_existing_separate_tts_and_asr"
+    }
+  },
+  "comparison": {
+    "prompt": "homework.tutor/v3",
+    "promptSha256": "a17fe9ea8af66cfcd05da2a14a5f617128711adf75d00ae398d4d1d7c3fd7c6b",
+    "originalCasesSha256": "90710676ad158cc45033056012d191fb1ad9cfa11fd524e9d5da32f21a3e5771",
+    "realCasesSha256": "848cf14e3e2daad5c74c0ae580765a4970680df9b9a67e98418d93a2c447432c",
+    "originalCases": 8,
+    "realPhotoCases": 2,
+    "totalDispatched": 39,
+    "thinking": false,
+    "temperature": 0.6,
+    "maxOutputTokens": 4000,
+    "deepseek": {
+      "calls": 20,
+      "contractValid": 20,
+      "localSafetyDowngrades": 4,
+      "medianSeconds": 2.409,
+      "realPhotoMedianSeconds": 9.6125
+    },
+    "qwen": {
+      "model": "qwen3.8-max",
+      "calls": 19,
+      "contractValid": 10,
+      "invalidContract": 6,
+      "truncated": 1,
+      "http400": 1,
+      "localReceiptLoss": 1,
+      "medianSeconds": 13.707,
+      "realPhotoMedianSeconds": 22.8345
+    },
+    "limitations": [
+      "Contract validity is not answer accuracy or teaching success.",
+      "Followups use only each model's validated previous reply.",
+      "One local parser exception lost a Qwen receipt; its quality and usage are unknown.",
+      "Latency excludes TTS, ASR and student UI delivery.",
+      "Small sample and non-thinking mode do not establish general model superiority."
+    ]
+  },
+  "requiredBeforeActivation": [
+    "Separate grading provider from teacher provider without changing camera providers.",
+    "Validate that visual quantities and semantic actions agree with narration.",
+    "Do not infer correctness or mastery from a question without a new student answer.",
+    "Keep uncertain source evidence out of definitive mistake and ability reports.",
+    "Verify Tencent output mapping and teacher behavior with real confirmed questions."
+  ],
+  "productionConfigurationChanged": false,
+  "studentRecordsChanged": false,
+  "cameraConfigurationChanged": false,
+  "reportPath": "docs/operations/2026-10-08-homework-teacher-model-comparison.md"
+}

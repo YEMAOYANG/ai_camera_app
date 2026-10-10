@@ -1,0 +1,489 @@
+diff --git a/lib/server/mira-courseware-provider.ts b/lib/server/mira-courseware-provider.ts
+index bd4da9c..9e41b12 100644
+--- a/lib/server/mira-courseware-provider.ts
++++ b/lib/server/mira-courseware-provider.ts
+@@ -7,7 +7,7 @@ import { callLLM } from '@/lib/ai/llm';
+ import { isProviderKeyRequired } from '@/lib/ai/providers';
+ import { resolveModel } from '@/lib/server/resolve-model';
+ import { qualitySha } from './mira-formal-quality-contract';
+-import { getMiraSelectedModelPolicyId, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID } from './model-routes';
++import { getMiraSelectedModelPolicyId, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID } from './model-routes';
+ 
+ export const MIRA_COURSEWARE_PROVIDER_SCHEMA = 'mira.openmaic.courseware-provider-call.v1' as const;
+ 
+@@ -253,7 +253,8 @@ export async function executeMiraCoursewareProvider(
+   // its explicit phase remains distinct from independent verification.
+   const legacyRole = VERIFIER_PHASES.has(phase) || phase === 'learner_discussion_repair'
+     ? COURSEWARE_VERIFIER : COURSEWARE_CREATOR;
+-  const coursewareRole = getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
++  const coursewareRole = (getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
++    || (getMiraSelectedModelPolicyId() === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID && legacyRole === COURSEWARE_VERIFIER))
+     ? { ...legacyRole, modelId: MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID } : legacyRole;
+   const resolved = await resolveModel({ stage: coursewareRole.stage });
+   if (
+diff --git a/lib/server/mira-formal-agent-budget.ts b/lib/server/mira-formal-agent-budget.ts
+index 753e905..0919ad6 100644
+--- a/lib/server/mira-formal-agent-budget.ts
++++ b/lib/server/mira-formal-agent-budget.ts
+@@ -29,7 +29,8 @@ const LEGACY_MODEL_POLICY_ID = 'deepseek-v4-pro-flash-v1' as const;
+ 
+ export function miraFormalAgentBudget(modelPolicyId?: unknown) {
+   if (modelPolicyId === FLASH_MODEL_POLICY_ID) return MIRA_FORMAL_FLASH_AGENT_BUDGET;
+-  if (modelPolicyId === undefined || modelPolicyId === LEGACY_MODEL_POLICY_ID) return MIRA_FORMAL_AGENT_BUDGET;
++  if (modelPolicyId === undefined || modelPolicyId === LEGACY_MODEL_POLICY_ID
++    || modelPolicyId === 'deepseek-v4-pro-current-flash-v1') return MIRA_FORMAL_AGENT_BUDGET;
+   throw new Error('FORMAL_AGENT_MODEL_POLICY_INVALID');
+ }
+ 
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+index 647fde9..08500fc 100644
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -8,7 +8,7 @@ import { MIRA_TEACHING_QUALITY_POLICY } from './mira-formal-quality-contract';
+ import { MIRA_INTERACTION_DESIGN_POLICY, MIRA_MULTISTATE_INTERACTION_POLICY } from './mira-formal-interaction-design';
+ import { MIRA_FORMAL_PLAYFUL_POLICY, MIRA_FORMAL_PLAYFUL_3D_POLICY } from './mira-formal-playful-policy';
+ import { MIRA_FORMAL_SCENE_LEARNING_POLICY } from './mira-formal-learning-contract';
+-import { MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PROFESSIONAL_MODEL_POLICY_ID, getMiraSelectedModelPolicyId } from './model-routes';
++import { MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID, MIRA_PROFESSIONAL_MODEL_POLICY_ID, getMiraSelectedModelPolicyId } from './model-routes';
+ 
+ export const MIRA_FORMAL_RUNTIME_CONTRACT_VERSION =
+   'mira.openmaic.formal-runtime.v4-deepseek-professional' as const;
+@@ -119,9 +119,19 @@ export const MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY = {
+   sceneLearningPolicy: MIRA_FORMAL_SCENE_LEARNING_POLICY,
+ } as const;
+ 
++export const MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++  modelPolicyId: MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID,
++} as const;
++export const MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY,
++  modelPolicyId: MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID,
++} as const;
++
+ export const MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES = [
+   MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY, MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY,
+-  MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY,
++  MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY, MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY,
++  MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY,
+ ] as const;
+ 
+ export type MiraProfessionalCreationPolicy =
+@@ -134,7 +144,9 @@ export type MiraProfessionalCreationPolicy =
+   | typeof MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY
+-  | typeof MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY;
++  | typeof MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+@@ -310,6 +322,10 @@ export function getMiraFormalGenerationRuntimePolicy() {
+     return { ...MIRA_FORMAL_GENERATION_POLICY,
+       professionalCreation: MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY };
+   }
++  if (getMiraSelectedModelPolicyId() === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) {
++    return { ...MIRA_FORMAL_GENERATION_POLICY,
++      professionalCreation: MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY };
++  }
+   return MIRA_FORMAL_GENERATION_POLICY;
+ }
+ 
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+index 35ae6d7..2ae6c65 100644
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -1274,7 +1274,8 @@ function buildProfessionalCreationReceipt(
+     supportingSkillIds: [...MIRA_PROFESSIONAL_CREATION_POLICY.supportingSkillIds],
+     ...(plainObject(input.professionalCreationPolicy)?.modelPolicyId ? {
+       modelPolicyId: plainObject(input.professionalCreationPolicy)!.modelPolicyId as MiraProfessionalModelPolicyId,
+-      sceneLearningPolicy: MIRA_FORMAL_SCENE_LEARNING_POLICY,
++      ...(plainObject(input.professionalCreationPolicy)?.sceneLearningPolicy
++        ? { sceneLearningPolicy: MIRA_FORMAL_SCENE_LEARNING_POLICY } : {}),
+     } : {}),
+     userPromptRequired: false as const,
+     studentToolsEnabled: false as const,
+diff --git a/lib/server/mira-formal-provider-readiness.ts b/lib/server/mira-formal-provider-readiness.ts
+index 061f997..ad5b49e 100644
+--- a/lib/server/mira-formal-provider-readiness.ts
++++ b/lib/server/mira-formal-provider-readiness.ts
+@@ -1,5 +1,5 @@
+ import { adaptDeepSeekRequest } from '@/lib/ai/deepseek-service';
+-import { getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID } from './model-routes';
++import { getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID } from './model-routes';
+ import { createHash } from 'crypto';
+ import { promises as fs } from 'fs';
+ import path from 'path';
+@@ -114,7 +114,7 @@ export const MIRA_FORMAL_PROVIDER_READINESS_POLICY = {
+ } as const;
+ 
+ export interface MiraFormalProviderReadinessRequest {
+-  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
++  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID | typeof MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID;
+   schemaVersion: typeof MIRA_FORMAL_PROVIDER_READINESS_VERSION;
+   requestId: string;
+   buildItemId: string;
+@@ -170,7 +170,7 @@ export interface MiraFormalProviderProof {
+ }
+ 
+ export interface MiraFormalProviderReadinessJob {
+-  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
++  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID | typeof MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID;
+   schemaVersion: typeof MIRA_FORMAL_PROVIDER_READINESS_JOB_VERSION;
+   requestId: string;
+   requestSha256: string;
+@@ -335,7 +335,7 @@ export function assertMiraFormalProviderReadinessRequest(
+   assertNoForbiddenKeys(value);
+   const withPolicy = value && typeof value === 'object' && Object.hasOwn(value, 'modelPolicyId');
+   const input = exactObject(value, withPolicy ? [...REQUEST_KEYS, 'modelPolicyId'] : REQUEST_KEYS);
+-  if (withPolicy && input.modelPolicyId !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID)
++  if (withPolicy && input.modelPolicyId !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID && input.modelPolicyId !== MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID)
+     throw new MiraFormalProviderReadinessError('invalid_request', 'Invalid readiness model policy');
+   const validation = exactObject(input.validation, VALIDATION_KEYS);
+   const routeSession = exactObject(input.routeSession, ROUTE_KEYS);
+@@ -567,7 +567,7 @@ export function assertMiraFormalProviderReadinessProviderReady(): void {
+     (deepseek.models !== undefined &&
+       (getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
+         ? !deepseek.models.includes('deepseek-flash')
+-        : (!deepseek.models.includes('deepseek-v4-pro') || !deepseek.models.includes('deepseek-v4-flash')))) ||
++        : (!deepseek.models.includes('deepseek-v4-pro') || !deepseek.models.includes(getMiraSelectedModelPolicyId() === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID ? 'deepseek-flash' : 'deepseek-v4-flash')))) ||
+     !resolveApiKey('deepseek') ||
+     !tts ||
+     tts.disabled === true ||
+@@ -1179,6 +1179,8 @@ export function getMiraFormalProviderReadinessPolicy() {
+       providers: { ...MIRA_FORMAL_PROVIDER_READINESS_POLICY.providers,
+         deepseek: { providerId: 'deepseek' as const, modelId: 'deepseek-flash' as const, callCount: 1 } } };
+   }
++  if (getMiraSelectedModelPolicyId() === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID)
++    return { ...MIRA_FORMAL_PROVIDER_READINESS_POLICY, modelPolicyId: MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID };
+   return MIRA_FORMAL_PROVIDER_READINESS_POLICY;
+ }
+ 
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+index 2ce1d49..f16b839 100644
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -28,7 +28,7 @@ import {
+ } from './mira-formal-interaction-design';
+ import type { FormalInteractionProbe, FormalSceneInspectionResult } from '@/lib/types/formal-scene-inspection';
+ import { isPaidBudgetObservationMode } from './mira-paid-budget';
+-import { getMiraVerifierModelId, getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, type MiraProfessionalModelPolicyId } from './model-routes';
++import { getMiraVerifierModelId, getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID, type MiraProfessionalModelPolicyId } from './model-routes';
+ import { assertMiraFormalPlayfulScenes, formalPlayfulReviewInstructions,
+   MIRA_FORMAL_PLAYFUL_REVIEW_VERSION, type MiraFormalPlayfulContext } from './mira-formal-playful-policy';
+ 
+@@ -146,7 +146,7 @@ export function parseFormalQualityReview(raw: unknown, input: FormalQualityInput
+ 
+ export function formalQualityVerifierModel(input: Pick<FormalQualityContext, 'modelPolicyId'>) {
+   const policyId = input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
+-  if (![MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID].includes(policyId))
++  if (![MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID].includes(policyId))
+     throw new Error('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
+   const selected = getMiraSelectedModelPolicyId() ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
+   if (selected !== policyId) throw new Error('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
+diff --git a/lib/server/mira-formal-visual-contract.ts b/lib/server/mira-formal-visual-contract.ts
+index 523d457..2da2df4 100644
+--- a/lib/server/mira-formal-visual-contract.ts
++++ b/lib/server/mira-formal-visual-contract.ts
+@@ -1,6 +1,6 @@
+ import { qualitySha } from './mira-formal-quality-contract';
+ import { FORMAL_VISION_MODEL } from './mira-vision-meter';
+-import { getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID, type MiraProfessionalModelPolicyId } from './model-routes';
++import { getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID, type MiraProfessionalModelPolicyId } from './model-routes';
+ 
+ export const VISUAL_RUBRIC_VERSION = 'mira.primary-teaching-visual.v1' as const;
+ export const VISUAL_RUBRIC = {
+@@ -17,7 +17,7 @@ export type VisualInput = {
+     screenshotSha256: string; screenshotPath: string; domSha256: string; title?: string; objective?: string }>;
+ };
+ export type VisualReviewReceipt = {
+-  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
++  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID | typeof MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID;
+   schemaVersion: 'mira.openmaic.visual-review.v1'; reviewerKind: 'vision_model';
+   status: 'passed' | 'needs_revision'; rubricVersion: typeof VISUAL_RUBRIC_VERSION;
+   snapshotSha256: string; teachingQualityContextSha256: string;
+@@ -29,7 +29,7 @@ export type VisualReviewReceipt = {
+  * current server selector when observing a historical visual review. */
+ export function formalVisualModel(input: Pick<VisualInput, 'modelPolicyId'>): string {
+   const policy = input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
+-  if (policy === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) return MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
++  if (policy === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID || policy === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) return MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+   if (policy === MIRA_PROFESSIONAL_MODEL_POLICY_ID) return FORMAL_VISION_MODEL;
+   throw new Error('FORMAL_VISUAL_MODEL_POLICY_MISMATCH');
+ }
+@@ -47,7 +47,7 @@ export function assertVisualReview(value: unknown, input: Pick<VisualInput,'snap
+     ||r.rubricVersion!==VISUAL_RUBRIC_VERSION||r.snapshotSha256!==input.snapshotSha256
+     ||r.teachingQualityContextSha256!==input.teachingQualityContextSha256
+     ||!['passed','needs_revision'].includes(r.status)||r.providerId!=='deepseek'||r.modelId!==formalVisualModel(input)||!sha(r.providerRequestIdHash)
+-    ||(input.modelPolicyId===MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? r.modelPolicyId!==input.modelPolicyId : r.modelPolicyId!==undefined)
++    ||((input.modelPolicyId===MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID || input.modelPolicyId===MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) ? r.modelPolicyId!==input.modelPolicyId : r.modelPolicyId!==undefined)
+     ||(r.providerResponseModelId!==undefined&&(typeof r.providerResponseModelId!=='string'||!r.providerResponseModelId.trim()||r.providerResponseModelId.length>200))
+     ||!Array.isArray(r.sceneReviews)||r.sceneReviews.length!==input.observations.length) throw new Error('FORMAL_VISUAL_RECEIPT_INVALID');
+   const seen=new Set<string>();
+diff --git a/lib/server/mira-formal-visual-review.ts b/lib/server/mira-formal-visual-review.ts
+index ca68059..e0ab070 100644
+--- a/lib/server/mira-formal-visual-review.ts
++++ b/lib/server/mira-formal-visual-review.ts
+@@ -7,7 +7,7 @@ import { isOfficialDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
+ import { resolveModel } from './resolve-model';
+ import { paidBudgetContext } from './mira-paid-budget';
+ import { checkedPngDimensions } from './mira-vision-meter';
+-import { MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID } from './model-routes';
++import { MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID } from './model-routes';
+ import { qualitySha } from './mira-formal-quality-contract';
+ import {
+   assertVisualReview,
+@@ -57,7 +57,7 @@ export async function reviewFormalVisualSnapshot(
+     endpoint.hostname !== 'api.deepseek.com' ||
+     endpoint.username ||
+     endpoint.password ||
+-    (input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID && !isOfficialDeepSeekEndpoint(endpoint.href))
++    ((input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID || input.modelPolicyId === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) && !isOfficialDeepSeekEndpoint(endpoint.href))
+   )
+     throw new Error('FORMAL_VISUAL_PROVIDER_UNAVAILABLE');
+ 
+@@ -69,7 +69,7 @@ export async function reviewFormalVisualSnapshot(
+     type: 'text',
+     text: JSON.stringify({ snapshotSha256: input.snapshotSha256,
+       teachingQualityContextSha256: input.teachingQualityContextSha256,
+-      ...(input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? { modelPolicyId: input.modelPolicyId } : {}),
++      ...((input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID || input.modelPolicyId === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) ? { modelPolicyId: input.modelPolicyId } : {}),
+       rubric: VISUAL_RUBRIC, gradeBoundary: input.gradeBoundary }),
+   });
+   let bytes = 0;
+@@ -135,7 +135,7 @@ export async function reviewFormalVisualSnapshot(
+     schemaVersion: 'mira.openmaic.visual-provider-response.v1',
+     snapshotSha256: input.snapshotSha256,
+     teachingQualityContextSha256: input.teachingQualityContextSha256,
+-    ...(input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? { modelPolicyId: input.modelPolicyId } : {}),
++    ...((input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID || input.modelPolicyId === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) ? { modelPolicyId: input.modelPolicyId } : {}),
+     authorizationId: paidBudgetContext.getStore()!.binding.authorizationId,
+     providerId: resolved.providerId,
+     requestedModelId: resolved.modelId,
+@@ -198,7 +198,7 @@ export async function reviewFormalVisualSnapshot(
+     rubricVersion: VISUAL_RUBRIC_VERSION,
+     snapshotSha256: input.snapshotSha256,
+     teachingQualityContextSha256: input.teachingQualityContextSha256,
+-    ...(input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? { modelPolicyId: input.modelPolicyId } : {}),
++    ...((input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID || input.modelPolicyId === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) ? { modelPolicyId: input.modelPolicyId } : {}),
+     sceneReviews,
+     providerId: resolved.providerId,
+     modelId: resolved.modelId,
+diff --git a/lib/server/mira-vision-meter.ts b/lib/server/mira-vision-meter.ts
+index 722219a..d6f7031 100644
+--- a/lib/server/mira-vision-meter.ts
++++ b/lib/server/mira-vision-meter.ts
+@@ -1,5 +1,5 @@
+ import { createHash } from 'node:crypto';
+-import { getMiraSelectedModelPolicyId, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID } from './model-routes';
++import { getMiraSelectedModelPolicyId, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID } from './model-routes';
+ 
+ export const FORMAL_VISION_MODEL = 'deepseek-v4-flash-vision-exp';
+ // Official documentation: every image is resized by the provider and costs at
+@@ -35,7 +35,7 @@ export function measureModelInput(
+   tools: unknown,
+ ) {
+   let imageCount = 0;
+-  const candidate = getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
++  const candidate = [MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID].includes(getMiraSelectedModelPolicyId() as typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID | typeof MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID);
+   const expectedVisionModel = candidate ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : FORMAL_VISION_MODEL;
+   const imageTokenCeiling = candidate ? DEEPSEEK_CURRENT_FLASH_IMAGE_TOKEN_CEILING : DEEPSEEK_IMAGE_TOKEN_CEILING;
+   const measuredPrompt = prompt.map((message) => ({
+diff --git a/lib/server/model-routes.ts b/lib/server/model-routes.ts
+index d027dda..8906b44 100644
+--- a/lib/server/model-routes.ts
++++ b/lib/server/model-routes.ts
+@@ -82,7 +82,8 @@ export const MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA =
+ export const MIRA_PROFESSIONAL_MODEL_POLICY_ID = 'deepseek-v4-pro-flash-v1' as const;
+ export const MIRA_STRUCTURED_SCENE_POLICY_ID = MIRA_PROFESSIONAL_MODEL_POLICY_ID;
+ export const MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID = 'deepseek-v4.1-flash-candidate-v1' as const;
+-export type MiraProfessionalModelPolicyId = typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID | typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
++export const MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID = 'deepseek-v4-pro-current-flash-v1' as const;
++export type MiraProfessionalModelPolicyId = typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID | typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID | typeof MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID;
+ export const MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID = 'deepseek-flash' as const;
+ 
+ const MIRA_DEEPSEEK_PROVIDER_ID = 'deepseek' as const;
+@@ -152,14 +153,14 @@ export function getMiraSelectedModelPolicyId(required = false): MiraProfessional
+     if (required) throw new Error(`${MIRA_STRUCTURED_SCENE_POLICY_ENV} is required.`);
+     return undefined;
+   }
+-  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID && policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) {
++  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID && policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID && policy !== MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) {
+     throw new Error(`Unsupported ${MIRA_STRUCTURED_SCENE_POLICY_ENV}; expected a supported frozen policy.`);
+   }
+   return policy;
+ }
+ 
+ export function getMiraVerifierModelId(policyId: MiraProfessionalModelPolicyId = MIRA_PROFESSIONAL_MODEL_POLICY_ID): 'deepseek-v4-flash' | 'deepseek-flash' {
+-  return policyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : MIRA_DEEPSEEK_FLASH_MODEL_ID;
++  return policyId !== MIRA_PROFESSIONAL_MODEL_POLICY_ID ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : MIRA_DEEPSEEK_FLASH_MODEL_ID;
+ }
+ 
+ function structuredModel(policyId: MiraProfessionalModelPolicyId): string {
+@@ -174,6 +175,17 @@ function getMiraStructuredSceneRoute(stage: string): StageRoute | undefined {
+   if (MIRA_STRUCTURED_SCENE_STAGE_SET.has(stage)) {
+     return { model: structuredModel(policy), thinking: { mode: 'disabled', enabled: false }, enforced: true };
+   }
++  if (policy === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) {
++    // Only the verifier changes. Protect Pro generation from operator overrides.
++    if (stage === MIRA_COURSEWARE_VERIFIER_STAGE)
++      return { model: `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID}`, thinking: { mode: 'disabled', enabled: false } };
++    if (stage === MIRA_AGENT_DRIVER_STAGE)
++      return { model: MIRA_STRUCTURED_SCENE_MODEL, api: 'openai-completions', thinking: { mode: 'enabled', enabled: true } };
++    if ([MIRA_COURSEWARE_CREATOR_STAGE, MIRA_GENERATE_CLASSROOM_STAGE, MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
++      'scene-outlines-stream', 'agent-profiles'].includes(stage))
++      return { model: MIRA_STRUCTURED_SCENE_MODEL, thinking: { mode: 'disabled', enabled: false } };
++    return undefined;
++  }
+   if (policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) return undefined;
+   // The candidate runs on an isolated server instance and cannot inherit an
+   // old MODEL_ROUTES creator, reviewer, planner or Agent through fallback.
+@@ -286,8 +298,7 @@ export function getMiraProfessionalModelRuntimePolicy(): MiraProfessionalModelRu
+   const structuredScene = getMiraStructuredSceneRuntimePolicy();
+   const policyId = structuredScene.policyId;
+   const creatorModelId = structuredScene.modelId;
+-  const verifierModelId = policyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
+-    ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : MIRA_DEEPSEEK_FLASH_MODEL_ID;
++  const verifierModelId = getMiraVerifierModelId(policyId);
+   assertExactMiraRoute(
+     MIRA_AGENT_DRIVER_STAGE,
+     `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+diff --git a/tests/server/mira-courseware-provider.test.ts b/tests/server/mira-courseware-provider.test.ts
+index 996a512..d37513a 100644
+--- a/tests/server/mira-courseware-provider.test.ts
++++ b/tests/server/mira-courseware-provider.test.ts
+@@ -269,4 +269,24 @@ describe('Mira OpenMAIC courseware Provider boundary', () => {
+     expect(mocks.callLLM).not.toHaveBeenCalled();
+   });
+ 
++  it.each(['outline', 'independent_verification', 'verification_after_repair', 'learner_discussion_repair'])
++    ('keeps creator Pro and upgrades only verifier phase %s', async phase => {
++      process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-current-flash-v1';
++      const modelId=phase==='outline'?'deepseek-v4-pro':'deepseek-flash';
++      mocks.resolveModel.mockResolvedValue({providerId:'deepseek',modelId,model:{provider:'deepseek',modelId},
++        modelInfo:{outputWindow:16000},apiKey:'test-key'});
++      const {executeMiraCoursewareProvider}=await import('@/lib/server/mira-courseware-provider');
++      const result=await executeMiraCoursewareProvider(request(phase));
++      expect(result.phase).toBe(phase);expect(mocks.callLLM).toHaveBeenCalledOnce();
++      expect(mocks.wrapLanguageModel).toHaveBeenCalledWith(expect.objectContaining({model:expect.objectContaining({modelId})}));
++      expect(mocks.resolveModel).toHaveBeenCalledWith({stage:phase==='outline'?'mira-courseware-creator':'mira-courseware-verifier'});
++    });
++  it('rejects the legacy verifier in the new verifier policy before dispatch',async()=>{
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY='deepseek-v4-pro-current-flash-v1';
++    mocks.resolveModel.mockResolvedValue({providerId:'deepseek',modelId:'deepseek-v4-flash',apiKey:'test-key'});
++    const {executeMiraCoursewareProvider}=await import('@/lib/server/mira-courseware-provider');
++    await expect(executeMiraCoursewareProvider(request('independent_verification'))).rejects.toMatchObject({code:'provider_unavailable'});
++    expect(mocks.callLLM).not.toHaveBeenCalled();
++  });
++
+ });
+diff --git a/tests/server/mira-flash-formal-visual.test.ts b/tests/server/mira-flash-formal-visual.test.ts
+index 13d05ad..15b1a48 100644
+--- a/tests/server/mira-flash-formal-visual.test.ts
++++ b/tests/server/mira-flash-formal-visual.test.ts
+@@ -58,7 +58,8 @@ afterEach(async () => {
+ });
+ 
+ describe('current Flash visual review and metering without a paid call', () => {
+-  it('requests current Flash with actual PNG bytes and archives and signs its frozen policy identity', async () => {
++  it.each(['deepseek-v4.1-flash-candidate-v1','deepseek-v4-pro-current-flash-v1'] as const)('requests current Flash with actual PNG and frozen identity %s', async selectedId => {
++    vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY',selectedId); input.modelPolicyId=selectedId;
+     const result = await reviewFormalVisualSnapshot(input);
+     expect(mocks.resolve).toHaveBeenCalledWith({ modelString: 'deepseek:deepseek-flash' });
+     expect(mocks.call).toHaveBeenCalledOnce();
+@@ -67,11 +68,11 @@ describe('current Flash visual review and metering without a paid call', () => {
+     expect(thinking).toEqual({ mode: 'disabled', enabled: false });
+     expect(request.maxRetries).toBe(0);
+     expect(request.messages[1].content.at(-1).image).toEqual(png);
+-    expect(result).toMatchObject({ modelPolicyId: id, modelId: 'deepseek-flash', providerResponseModelId: 'deepseek-flash' });
++    expect(result).toMatchObject({ modelPolicyId: selectedId, modelId: 'deepseek-flash', providerResponseModelId: 'deepseek-flash' });
+     expect(() => assertVisualReview(result, input)).not.toThrow();
+     const archiveFolder = join(resolve('data/formal-visual-provider-responses'), input.snapshotSha256);
+     const archive = JSON.parse(await readFile(join(archiveFolder, (await readdir(archiveFolder))[0]), 'utf8'));
+-    expect(archive).toMatchObject({ modelPolicyId: id, requestedModelId: 'deepseek-flash', responseModelId: 'deepseek-flash' });
++    expect(archive).toMatchObject({ modelPolicyId: selectedId, requestedModelId: 'deepseek-flash', responseModelId: 'deepseek-flash' });
+   });
+   it.each(['missing-server', 'legacy-server', 'missing-input'])('rejects %s before resolving or calling a model', async scenario => {
+     if (scenario === 'missing-server') delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
+@@ -110,4 +111,12 @@ describe('current Flash visual review and metering without a paid call', () => {
+     expect(DEEPSEEK_IMAGE_TOKEN_CEILING).toBe(384);
+     expect(() => measureModelInput('deepseek', 'deepseek-flash', prompt, undefined)).toThrow('VISION_METER_UNAVAILABLE');
+   });
++  it('uses 1024 image tokens for verifier-only upgrade and rejects a legacy vision wire model',()=>{
++    vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY','deepseek-v4-pro-current-flash-v1');
++    const messages=[{role:'user',content:[{type:'file',mediaType:'image/png',data:png}]}];
++    const measured=measureModelInput('deepseek','deepseek-flash',messages,undefined);
++    expect(measured.inputTokens).toBe(Buffer.byteLength(JSON.stringify(measured.request))+4096+1024);
++    expect(()=>measureModelInput('deepseek',FORMAL_VISION_MODEL,messages,undefined)).toThrow('VISION_METER_UNAVAILABLE');
++  });
++
+ });
+diff --git a/tests/server/mira-pro-current-flash-policy.test.ts b/tests/server/mira-pro-current-flash-policy.test.ts
+new file mode 100644
+index 0000000..9f1be7d
+--- /dev/null
++++ b/tests/server/mira-pro-current-flash-policy.test.ts
+@@ -0,0 +1,61 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { getMiraProfessionalModelRuntimePolicy, getMiraVerifierModelId, getStageRoute,
++  MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID as ID } from '@/lib/server/model-routes';
++import { getMiraFormalGenerationRuntimePolicy, MIRA_FORMAL_GENERATION_POLICY,
++  MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY, MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY,
++  isExactMiraProfessionalCreationPolicy } from '@/lib/server/mira-formal-generation-policy';
++import { getMiraFormalProviderReadinessPolicy, MIRA_FORMAL_PROVIDER_READINESS_POLICY } from '@/lib/server/mira-formal-provider-readiness';
++import { formalQualityVerifierModel } from '@/lib/server/mira-formal-teaching-quality';
++import { formalVisualModel, selectedFormalVisualModel } from '@/lib/server/mira-formal-visual-contract';
++import { miraFormalAgentBudget, MIRA_FORMAL_AGENT_BUDGET } from '@/lib/server/mira-formal-agent-budget';
++
++afterEach(() => { vi.unstubAllEnvs(); });
++describe('Pro creation with current Flash verification frozen policy', () => {
++  it('protects Pro Agent, creator and planning but selects current Flash for verification', () => {
++    vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', ID);
++    vi.stubEnv('MODEL_ROUTES', JSON.stringify({'mira-courseware-creator':{model:'deepseek:deepseek-flash'}}));
++    const p=getMiraProfessionalModelRuntimePolicy();
++    expect(p.policyId).toBe(ID);
++    for(const role of ['agentDriver','coursewareCreator','structuredScene'] as const)expect(p[role].modelId).toBe('deepseek-v4-pro');
++    expect(p.coursewareVerifier.modelId).toBe('deepseek-flash');
++    expect(p.fallbackAllowed).toBe(false);
++    for(const stage of ['generate-classroom','scene-content:quiz','scene-actions','agent-profiles','web-search-query-rewrite'])
++      expect(getStageRoute(stage)?.model).toBe('deepseek:deepseek-v4-pro');
++    expect(getStageRoute('mira-courseware-verifier')?.model).toBe('deepseek:deepseek-flash');
++  });
++  it('only adds a model identity to existing creation semantics and keeps default frozen', () => {
++    vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', ID);
++    const generation=getMiraFormalGenerationRuntimePolicy();
++    expect(generation.professionalCreation).toEqual(MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY);
++    const {modelPolicyId,...unchanged}=MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY;
++    expect(modelPolicyId).toBe(ID);expect(unchanged).toEqual(MIRA_FORMAL_GENERATION_POLICY.professionalCreation);
++    expect(generation.professionalCreation).not.toHaveProperty('sceneLearningPolicy');
++    expect(isExactMiraProfessionalCreationPolicy(MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY)).toBe(true);
++    expect(isExactMiraProfessionalCreationPolicy({...generation.professionalCreation,sceneLearningPolicy:{enforced:true}})).toBe(false);
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    expect(getMiraFormalGenerationRuntimePolicy()).toBe(MIRA_FORMAL_GENERATION_POLICY);
++    expect(getMiraVerifierModelId()).toBe('deepseek-v4-flash');
++  });
++  it('binds current text and visual reviewer to the same exact new input/server identity', () => {
++    vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', ID);
++    expect(formalQualityVerifierModel({modelPolicyId:ID})).toBe('deepseek-flash');
++    expect(formalVisualModel({modelPolicyId:ID})).toBe('deepseek-flash');
++    expect(selectedFormalVisualModel({modelPolicyId:ID})).toBe('deepseek-flash');
++    expect(()=>formalQualityVerifierModel({})).toThrow('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
++    expect(()=>selectedFormalVisualModel({})).toThrow('FORMAL_VISUAL_MODEL_POLICY_MISMATCH');
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    expect(()=>formalQualityVerifierModel({modelPolicyId:ID})).toThrow('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
++    expect(()=>selectedFormalVisualModel({modelPolicyId:ID})).toThrow('FORMAL_VISUAL_MODEL_POLICY_MISMATCH');
++    expect(formalVisualModel({})).toBe('deepseek-v4-flash-vision-exp');
++  });
++  it('readiness proves Pro generation and leaves original provider count and Agent caps intact', () => {
++    vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', ID);
++    const ready=getMiraFormalProviderReadinessPolicy();
++    expect(ready).toEqual({...MIRA_FORMAL_PROVIDER_READINESS_POLICY,modelPolicyId:ID});
++    expect(ready.providers.deepseek.modelId).toBe('deepseek-v4-pro');
++    expect(ready.expectedProviderCallCount).toBe(5);
++    expect(miraFormalAgentBudget(ID)).toBe(MIRA_FORMAL_AGENT_BUDGET);
++    expect(miraFormalAgentBudget(ID).maxDispatches).toBe(48);
++    expect(miraFormalAgentBudget(ID).maxCumulativeInputCharacters).toBe(8_000_000);
++  });
++});

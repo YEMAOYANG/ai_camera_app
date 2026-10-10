@@ -1,7 +1,12 @@
 from copy import deepcopy
 import json
 import unittest
+from unittest.mock import patch
 
+from integrations.openmaic_formal_media import (
+    PLAYFUL_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY,
+    PRO_CURRENT_FLASH_PROFESSIONAL_POLICY,
+)
 from integrations.openmaic_formal_quality import quality_sha, quality_snapshot
 from services.learning_saved_stage_reconciliation import validate_learner_discussion_repair
 
@@ -82,6 +87,75 @@ class SavedStageLearnerDiscussionRepairTest(unittest.TestCase):
             'completion': {'scenes': deepcopy(completion['result']['scenes']), 'receipt': deepcopy(receipt)},
             'dispatch.claim': claim}
         return completion, prepared, audit
+
+    def model_audit_fixture(self, policy):
+        """Resign a synthetic Native audit using its real opt-in context shape."""
+        completion, prepared, audit = self.audit_fixture()
+        receipt = completion['learnerDiscussionRepair']
+        context = audit['input']['frozenContext']
+        professional = completion['result']['professionalCreation']
+        for key in ('modelPolicyId', 'sceneLearningPolicy'):
+            if key in policy: professional[key] = deepcopy(policy[key])
+        if 'modelPolicyId' in policy:
+            context['modelPolicyId'] = policy['modelPolicyId']
+            receipt['modelId'] = 'deepseek-flash'
+        professional['teachingQuality']['review'] = {'providerId': 'deepseek', 'modelId': receipt['modelId']}
+        receipt['frozenContextSha256'] = quality_sha(context)
+        identity = {key: receipt[key] for key in ('sessionId', 'stageId', 'sourceSnapshotSha256',
+            'inputSnapshotSha256', 'frozenContextSha256', 'rejectedReviewSha256')}
+        audit['input'].update(identity)
+        request = audit['request']
+        prompt = json.loads(request['userPrompt'])
+        prompt.update(context)
+        request['userPrompt'] = json.dumps(prompt)
+        request['requestId'] = 'learner-repair-' + quality_sha(identity)
+        audit['provider-response']['requestId'] = request['requestId']
+        receipt['requestSha256'] = quality_sha(request)
+        receipt['providerResponseSha256'] = quality_sha(audit['provider-response'])
+        self.resign(completion)
+        audit['dispatch.claim'].update(identity, requestSha256=receipt['requestSha256'])
+        audit['completion']['receipt'] = deepcopy(receipt)
+        return completion, prepared, audit, {'professionalCreationPolicy': deepcopy(policy)}
+
+    def test_saved_stage_review_uses_frozen_legacy_current_or_candidate_identity(self):
+        for policy in (PLAYFUL_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY,
+                       FLASH_CANDIDATE_PROFESSIONAL_POLICY):
+            completion, prepared, audit, generation = self.model_audit_fixture(policy)
+            # The service's current choice may differ from a saved job. It must
+            # never relabel the old dispatch or the old immutable audit.
+            with self.subTest(policy=policy.get('modelPolicyId', 'legacy')), patch.dict('os.environ',
+                {'MIRA_FORMAL_MODEL_POLICY': 'deepseek-v4-pro-current-flash-v1'}):
+                self.assertEqual(validate_learner_discussion_repair(completion, prepared,
+                    repair_audit=audit, generation_contract=generation),
+                    completion['learnerDiscussionRepair']['receiptSha256'])
+
+    def test_new_model_repair_cannot_use_legacy_contract_or_skip_full_contract(self):
+        completion, prepared, audit, generation = self.model_audit_fixture(PRO_CURRENT_FLASH_PROFESSIONAL_POLICY)
+        for contract in (None, {'professionalCreationPolicy': PLAYFUL_PROFESSIONAL_POLICY},
+            {'professionalCreationPolicy': FLASH_CANDIDATE_PROFESSIONAL_POLICY},
+            {'professionalCreationPolicy': {**PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, 'fallbackAllowed': True}}):
+            with self.subTest(contract=contract), self.assertRaises(ValueError):
+                validate_learner_discussion_repair(completion, prepared, repair_audit=audit,
+                    generation_contract=contract)
+        completion['learnerDiscussionRepair']['modelId'] = 'deepseek-v4-flash'
+        self.resign(completion)
+        with self.assertRaises(ValueError):
+            validate_learner_discussion_repair(completion, prepared, generation_contract=generation)
+
+    def test_new_repair_and_final_qa_require_the_exact_model_context(self):
+        for case in ('missing_context_id', 'wrong_context_id', 'wrong_final_reviewer',
+                     'invalid_final_review', 'missing_receipt_id', 'changed_scene_contract'):
+            completion, prepared, audit, generation = self.model_audit_fixture(FLASH_CANDIDATE_PROFESSIONAL_POLICY)
+            professional = completion['result']['professionalCreation']
+            if case == 'missing_context_id': audit['input']['frozenContext'].pop('modelPolicyId')
+            if case == 'wrong_context_id': audit['input']['frozenContext']['modelPolicyId'] = 'deepseek-v4-pro-current-flash-v1'
+            if case == 'wrong_final_reviewer': professional['teachingQuality']['review']['modelId'] = 'deepseek-v4-flash'
+            if case == 'invalid_final_review': professional['teachingQuality']['review'] = ['deepseek-flash']
+            if case == 'missing_receipt_id': professional.pop('modelPolicyId')
+            if case == 'changed_scene_contract': professional['sceneLearningPolicy']['enforced'] = 1
+            with self.subTest(case=case), self.assertRaises(ValueError):
+                validate_learner_discussion_repair(completion, prepared, repair_audit=audit,
+                    generation_contract=generation)
 
     def test_only_two_ai_discussions_and_verified_speech_audio_are_accepted(self):
         completion, prepared = self.fixture()

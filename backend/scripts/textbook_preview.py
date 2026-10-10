@@ -27,7 +27,14 @@ def main():
     parser.add_argument("--revision", default="20260924-preview-2")
     parser.add_argument("--node", default="u1-l1")
     parser.add_argument("--classroom-directory", type=Path)
+    parser.add_argument("--teaching-revision", help="Explicit teaching content version; default reuses the existing version")
+    parser.add_argument("--regeneration-reason")
+    parser.add_argument("--budget-reference")
     args = parser.parse_args()
+    if bool(args.regeneration_reason) != bool(args.budget_reference):
+        parser.error("--regeneration-reason and --budget-reference must be supplied together")
+    if args.action != "prepare" and any((args.teaching_revision, args.regeneration_reason, args.budget_reference)):
+        parser.error("teaching version options apply only to prepare")
     if args.action != "prepare" and not args.key:
         parser.error("start/status require --key")
     if args.action == "narrate" and not args.classroom_directory:
@@ -43,7 +50,10 @@ def main():
         elif args.action == "freeze":
             result = service.freeze(args.key)
         else:
-            result = service.prepare(args.edition, args.revision, args.node) if args.action == "prepare" else (
+            result = service.prepare(args.edition, args.revision, args.node,
+                                     teaching_revision=args.teaching_revision,
+                                     regeneration={"reason": args.regeneration_reason, "budgetReference": args.budget_reference}
+                                     if args.regeneration_reason else None) if args.action == "prepare" else (
                 service.start(args.key) if args.action == "start" else service.poll(args.key))
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0

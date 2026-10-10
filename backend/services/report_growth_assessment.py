@@ -55,7 +55,7 @@ def build_growth_maps(children, tasks, lessons, camera, *, start_date, end_date)
     for row in tasks:
         child = row.get('child_id')
         key = TASK_DIMENSIONS.get(row.get('type'))
-        if child not in evidence or not key or row.get('learning_course_id'):
+        if child not in evidence or not key or row.get('learning_course_id') or row.get('learning_slot') == 'weekend_review':
             continue
         status = row.get('status')
         if status in ('confirmed', 'rejected'):

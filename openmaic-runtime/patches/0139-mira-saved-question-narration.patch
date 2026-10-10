@@ -1,0 +1,530 @@
+diff --git a/components/audio/question-narration.tsx b/components/audio/question-narration.tsx
+--- a/components/audio/question-narration.tsx
++++ b/components/audio/question-narration.tsx
+@@ -20,8 +20,9 @@
+   const [failed, setFailed] = useState(false);
+ 
+   useEffect(() => {
+-    const player = new Audio(src);
++    const player = new Audio();
+     player.preload = 'none';
++    player.src = src;
+     audio.current = player;
+     const stopped = () => setPlaying(false);
+     const error = () => { setPlaying(false); setFailed(true); };
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -74,10 +74,10 @@
+     </span>
+   );
+   if (visual.kind === 'quantity') return (
+-    <svg data-quiz-visual="quantity" data-quantity={visual.count} viewBox="0 0 240 120" role="img"
++    <svg data-quiz-visual="quantity" data-quantity={visual.count} viewBox={`0 0 240 ${Math.max(120, Math.ceil(visual.count / 5) * 22 + 28)}`} role="img"
+       aria-label={visual.alt ?? `${visual.count} 个物体`} className={scene ? 'w-full h-36' : 'w-full h-24'}>
+-      <rect x="6" y="6" width="228" height="108" rx="20" fill="#eef2e8" stroke="#d1dccb" />
+-      {Array.from({ length: Math.min(20, visual.count) }, (_, index) => (
++      <rect x="6" y="6" width="228" height={Math.max(108, Math.ceil(visual.count / 5) * 22 + 16)} rx="20" fill="#eef2e8" stroke="#d1dccb" />
++      {Array.from({ length: visual.count }, (_, index) => (
+         <circle key={index} cx={30 + (index % 5) * 45} cy={29 + Math.floor(index / 5) * 22} r="9" fill="#d9a844" stroke="#9e782e" />
+       ))}
+     </svg>
+@@ -816,7 +816,8 @@
+   const [phase, setPhase] = useState<Phase>(readOnly ? 'answering' : 'not_started');
+   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+   const [pictureQuestionIndex, setPictureQuestionIndex] = useState(0);
+-  const pictureSequence = questions.length > 1 && questions.every(question => !!question.optionVisuals);
++  const pictureSequence = questions.length > 1 && questions.every(question => !!question.optionVisuals || !!tapObjectVisuals(question));
++  useEffect(() => setPictureQuestionIndex(0), [sceneId]);
+   const [results, setResults] = useState<QuestionResult[]>([]);
+   const [runtimeGate, setRuntimeGate] = useState<QuizRuntimeGate>(
+     readOnly ? { status: 'ready', attemptId: 'private-render-preview' } : { status: 'loading' },
+@@ -1117,15 +1118,17 @@
+               <button
+                 type="button"
+                 onClick={() => void handleSubmit()}
++                aria-label={t('quiz.submitAnswers')}
+                 disabled={readOnly || !allAnswered}
+                 className={cn(
+                   'px-4 py-1.5 rounded-lg text-xs font-medium transition-all',
++                  pictureSequence && 'flex min-h-12 min-w-12 items-center justify-center',
+                   allAnswered
+                     ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-sm hover:shadow-md hover:shadow-violet-200/50 dark:hover:shadow-violet-900/50 active:scale-[0.97]'
+                     : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed',
+                 )}
+               >
+-                {t('quiz.submitAnswers')}
++                {pictureSequence ? <Check className="h-6 w-6" /> : t('quiz.submitAnswers')}
+               </button>
+             </div>
+ 
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -28,6 +28,7 @@
+ import { isMediaPlaceholder } from '@/lib/store/media-generation';
+ import type { MiraFormalSceneSkillInput } from '../mira-formal-skill-policy';
+ import { assertLearningInteractiveSyntax } from '../mira-formal-learning-contract';
++import { learningSceneInstructions } from '@openmaic/generation';
+ 
+ const MAX_GENERATE_SCENE_MEDIA = 8;
+ const SUPPORTED_SCENE_TYPES = new Set(['slide', 'quiz', 'interactive', 'pbl']);
+@@ -219,9 +220,10 @@
+     if (context && !deps.onGenerationSkillContext)
+       throw new Error('FORMAL_SKILL_CONTEXT_RECORDER_MISSING');
+     let succeeded = false;
++    const learning = deps.getGenerationLearningContract?.();
+     const call: AICallFn = context
+       ? async (system, user, images) => {
+-          const result = await base(`${system}\n\n${context.text}`, user, images);
++          const result = await base(`${system}\n\n${context.text}${learning ? learningSceneInstructions(learning) : ''}`, user, images);
+           succeeded = true;
+           return result;
+         }
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -114,6 +114,7 @@
+ }
+ 
+ export interface GenerateClassroomResult {
++  narrationAssets?: import('./mira-formal-question-narration').FormalNarrationMaterializationReceipt;
+   id: string;
+   url: string;
+   stage: Stage;
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -53,6 +53,7 @@
+     scenesCount: number;
+     speechActionCount?: number;
+     formalAudio?: MiraFormalAudioLifecycleReceipt;
++    narrationAssets?: import('./mira-formal-question-narration').FormalNarrationMaterializationReceipt;
+     professionalCreation?: MiraFormalProfessionalCreationReceipt;
+     research?: MiraFormalResearchReceipt;
+     media?: MiraFormalMediaReceipt;
+@@ -439,6 +440,7 @@
+         ? { speechActionCount: result.speechActionCount }
+         : {}),
+       ...(result.formalAudio ? { formalAudio: result.formalAudio } : {}),
++      ...(result.narrationAssets ? { narrationAssets: result.narrationAssets } : {}),
+       ...(result.professionalCreation ? { professionalCreation: result.professionalCreation } : {}),
+       ...(result.research ? { research: result.research } : {}),
+       ...(result.media ? { media: result.media } : {}),
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -75,6 +75,8 @@
+   withFormalLearningContract } from './mira-formal-learning-contract';
+ import type { MiraProfessionalModelPolicyId } from './model-routes';
+ import { MIRA_FORMAL_SCENE_LEARNING_POLICY } from './mira-formal-learning-contract';
++import { formalQuestionNarrationContextFromPrompt, materializeFormalNarration,
++  prepareFormalQuestionNarration, withFormalQuestionNarrationContext } from './mira-formal-question-narration';
+ import type { AgentMessage } from '@earendil-works/pi-agent-core';
+ import {
+   isMiraFormalProfessionalSessionIdentity,
+@@ -490,11 +492,13 @@
+         } } : {}) })
+     : prompt;
+   const selectedModelPolicyId = plainObject(input.professionalCreationPolicy)?.modelPolicyId;
+-  const finalPrompt = withFormalLearningContract(withMiraFormalPlayfulInstructions(
++  const sceneLearningContract = formalLearningContract(input.professionalCreationPolicy, spec, contract);
++  const finalPrompt = withFormalQuestionNarrationContext(withFormalLearningContract(withMiraFormalPlayfulInstructions(
+     interactionPrompt,
+     formalPlayfulContext(input.professionalCreationPolicy, spec),
+-  ), formalLearningContract(input.professionalCreationPolicy, spec, contract))
+-    + (selectedModelPolicyId ? `\nMIRA_FORMAL_MODEL_POLICY_ID:${String(selectedModelPolicyId)}\n` : '');
++  ), sceneLearningContract)
++    + (selectedModelPolicyId ? `\nMIRA_FORMAL_MODEL_POLICY_ID:${String(selectedModelPolicyId)}\n` : ''),
++    sceneLearningContract ? { buildItemId: spec.buildItemId, subject: spec.course.subject } : undefined);
+   if (!spec.progressiveLesson) return finalPrompt;
+   return finalPrompt.replace(
+     '- Use between one and four quiz scenes. Distribute the four locked assessment questions across them in original order so every locked question appears exactly once.',
+@@ -910,8 +914,10 @@
+   const ordered = [...input.scenes].sort((a, b) => a.order - b.order);
+   if (ordered.some((scene, index) => scene.order !== index + 1))
+     throw new Error('FORMAL_PROFESSIONAL_SOURCE_SCENE_ORDER_INVALID');
+-  const normalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true, observed,
++  const sourceNormalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true, observed,
+     !!formalLearningContractFromPrompt(session.prompt));
++  const normalized = prepareFormalQuestionNarration(input.stage, sourceNormalized,
++    formalQuestionNarrationContextFromPrompt(session.prompt), formalLearningContractFromPrompt(session.prompt));
+   const playfulLearning = formalPlayfulContextFromPrompt(session.prompt);
+   assertMiraFormalPlayfulScenes(normalized, playfulLearning);
+   assertFormalLearningScenes(normalized, formalLearningContractFromPrompt(session.prompt));
+@@ -1395,7 +1401,9 @@
+     throw new Error('FORMAL_PROFESSIONAL_CITATION_RECOVERY_NO_REPAIR');
+   }
+   const stage = promoted.stage;
+-  let scenes = canonicalized.scenes;
++  const sceneLearningContract = formalLearningContract(input.professionalCreationPolicy, spec, formalContractPayload(input));
++  let scenes = prepareFormalQuestionNarration(stage, canonicalized.scenes,
++    sceneLearningContract ? { buildItemId: spec.buildItemId, subject: spec.course.subject } : undefined, sceneLearningContract);
+   const speechActionCount = assertProfessionalClassroom(
+     stage,
+     scenes,
+@@ -1569,6 +1577,8 @@
+   ) {
+     throw new Error('FORMAL_PROFESSIONAL_AUDIO_COUNT_INVALID');
+   }
++  const narrationAssets = sceneLearningContract
++    ? await materializeFormalNarration(stage, scenes, formalAudio) : undefined;
+   await options.onProgress?.({
+     step: 'persisting',
+     progress: 98,
+@@ -1596,6 +1606,7 @@
+       speechActionCount,
+       createdAt: persisted.createdAt,
+       formalAudio,
++      ...(narrationAssets ? { narrationAssets } : {}),
+       professionalCreation,
+       research,
+       ...(media ? { media } : {}),
+diff --git a/packages/@openmaic/dsl/src/action.ts b/packages/@openmaic/dsl/src/action.ts
+--- a/packages/@openmaic/dsl/src/action.ts
++++ b/packages/@openmaic/dsl/src/action.ts
+@@ -55,6 +55,8 @@
+    * through the app's legacy read fallbacks.
+    */
+   audioId?: AssetRef;
++  /** Host-validated same-classroom saved audio; no synthesis is needed to play it. */
++  audioUrl?: string;
+   /** Prevent legacy derived-id fallback after an edit invalidates old narration. */
+   audioInvalidated?: boolean;
+   voice?: string;
+diff --git a/packages/@openmaic/dsl/src/stage.ts b/packages/@openmaic/dsl/src/stage.ts
+--- a/packages/@openmaic/dsl/src/stage.ts
++++ b/packages/@openmaic/dsl/src/stage.ts
+@@ -207,6 +207,10 @@
+   /** Optional scene illustration and distinct pictures keyed by the locked option value. */
+   visual?: QuizVisual;
+   optionVisuals?: Record<string, QuizVisual>;
++  /** Saved teacher audio, derived from the same scene's exact-question speech. */
++  questionAudioUrl?: string;
++  questionAudioBinding?: { schemaVersion: 'mira.learning.question-narration-binding.v1';
++    sceneId: string; actionId: string; ttsRequestId: string; sourceTextSha256: string };
+   answer?: string[]; // Correct answer values: ["A"], ["A","C"], or undefined for text
+   analysis?: string; // Explanation shown after grading
+   commentPrompt?: string; // Grading guidance for text questions
+diff --git a/packages/@openmaic/generation/src/learning-scene-contract.ts b/packages/@openmaic/generation/src/learning-scene-contract.ts
+--- a/packages/@openmaic/generation/src/learning-scene-contract.ts
++++ b/packages/@openmaic/generation/src/learning-scene-contract.ts
+@@ -27,6 +27,7 @@
+   return [
+     '\nSERVER LEARNING SCENE CONTRACT (authoritative):', JSON.stringify(contract),
+     'Preserve option value keys exactly. answer contains value keys, never option labels. Never invent an answer for a server-locked hasAnswer:false question.',
++    'For quiz action generation, provide one separate teacher speech action for every question. Its text must equal the exact question.question verbatim, with no added greeting, explanation, answer, or option labels. Each question stem appears exactly once among that scene\'s speech actions. The host binds this actual Qwen narration for that specific question; never author audio URLs or pretend audio exists.',
+     ...(contract.pictureChoicesRequired ? [
+       'Children cannot independently read instructions. Each quiz question needs visual plus optionVisuals keyed by every option value. Use meaningful, distinguishable pictures, not emoji or a decorative common background.',
+       'Visual schema: {kind:"image",src:"approved image ID or source",alt:"brief description",cue?:"speaking"|"listening"|"observer"} or {kind:"quantity",count:integer,alt?:string}. Quantity renders that many objects; zero renders an empty tray. The target character may be taught, but other instructions cannot depend on reading.',
+@@ -76,7 +77,7 @@
+       || members.filter(member => member!.cue === 'listening').length !== 1) return undefined;
+     return { kind: 'people', members: members as Extract<QuizVisual, {kind: 'people'}>['members'] };
+   }
+-  if (value.kind === 'quantity' && Number.isInteger(value.count) && Number(value.count) >= 0)
++  if (value.kind === 'quantity' && Number.isInteger(value.count) && Number(value.count) >= 0 && Number(value.count) <= 100)
+     return { kind: 'quantity', count: Number(value.count), ...(typeof value.alt === 'string' ? { alt: value.alt } : {}) };
+   if (value.kind !== 'image' || typeof value.src !== 'string' || typeof value.alt !== 'string' || !value.alt.trim()) return undefined;
+   const src = mapping && Object.hasOwn(mapping, value.src) ? mapping[value.src] : value.src;
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -909,7 +909,7 @@
+       options: normalizedOptions,
+       answer,
+       hasAnswer: !isText && q.hasAnswer !== false,
+-      ...(visual ? { visual } : {}),
++      ...(source.visual !== undefined ? { visual } : {}),
+       ...(optionVisuals ? { optionVisuals: optionVisuals as QuizQuestion['optionVisuals'] } : {}),
+     };
+   });
+diff --git a/lib/server/mira-formal-question-narration.ts b/lib/server/mira-formal-question-narration.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-question-narration.ts
+@@ -0,0 +1,161 @@
++import { createHash } from 'node:crypto';
++import { mkdir, lstat, open, readFile, realpath } from 'node:fs/promises';
++import { join, resolve, sep } from 'node:path';
++import type { Scene, Stage } from '@/lib/types/stage';
++import type { LearningSceneContract } from '@openmaic/generation';
++import { buildLifecycleSegments, miraFormalAudioClassroomContentSha256,
++  type MiraFormalAudioLifecycleReceipt } from './mira-formal-audio-lifecycle';
++import { readMiraFormalTtsAsset } from './mira-formal-audio';
++import { CLASSROOMS_DIR, isValidClassroomId } from './classroom-storage';
++import { qualitySha } from './mira-formal-quality-contract';
++
++const START = '\nMIRA_FORMAL_QUESTION_NARRATION_CONTEXT:\n';
++const END = '\nEND_MIRA_FORMAL_QUESTION_NARRATION_CONTEXT\n';
++const SCHEMA = 'mira.learning.question-narration-binding.v1' as const;
++const sha = (value: string | Uint8Array) => createHash('sha256').update(value).digest('hex');
++const fail = (reason: string): never => { throw new Error(`FORMAL_QUESTION_NARRATION_${reason}`); };
++export interface FormalQuestionNarrationContext { buildItemId: string; subject: 'chinese' | 'math' | 'english' }
++function assertContext(context: FormalQuestionNarrationContext): void {
++  if (!context || Object.keys(context).sort().join(',') !== 'buildItemId,subject'
++    || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(context.buildItemId)
++    || !['chinese', 'math', 'english'].includes(context.subject)) fail('CONTEXT_INVALID');
++}
++export function withFormalQuestionNarrationContext(prompt: string, context: FormalQuestionNarrationContext | undefined): string {
++  if (!context) return prompt;
++  assertContext(context);
++  return prompt + START + JSON.stringify(context) + END;
++}
++export function formalQuestionNarrationContextFromPrompt(prompt: string): FormalQuestionNarrationContext | undefined {
++  const parts = prompt.split(START);
++  if (parts.length === 1) return undefined;
++  if (parts.length !== 2 || parts[1].split(END).length !== 2) fail('CONTEXT_INVALID');
++  let context: FormalQuestionNarrationContext;
++  try { context = JSON.parse(parts[1].split(END)[0]); } catch { fail('CONTEXT_INVALID'); }
++  assertContext(context!);
++  return context!;
++}
++
++/** Before QA and audio hashing: bind stable, deterministic future asset paths.
++ * No audio is claimed available until materializeFormalNarration verifies its
++ * real TTS/ASR receipt and bytes. Text, values and scoring authority stay intact.
++ */
++export function prepareFormalQuestionNarration(stage: Stage, scenes: Scene[],
++  context: FormalQuestionNarrationContext | undefined, contract: LearningSceneContract | undefined): Scene[] {
++  if (!context || !contract) return scenes;
++  assertContext(context);
++  if (!isValidClassroomId(stage.id)) fail('CLASSROOM_INVALID');
++  const { segments } = buildLifecycleSegments({ ...context, stage, scenes });
++  const byAction = new Map(segments.map(segment => [segment.sceneId + '\0' + segment.actionId, segment]));
++  return scenes.map(scene => {
++    const actions = (scene.actions ?? []).map(action => {
++      if (action.type !== 'speech') return action;
++      const segment = byAction.get(scene.id + '\0' + action.id);
++      if (!segment) return fail('SPEECH_SEGMENT_MISSING');
++      const audioUrl = `/api/classroom-media/${stage.id}/audio/${segment.ttsRequestId}.wav`;
++      if ((action.audioUrl && action.audioUrl !== audioUrl)
++        || (action.audioId && action.audioId !== segment.ttsRequestId)) fail('AUTHORED_AUDIO_REFERENCE_FORBIDDEN');
++      return { ...action, audioId: segment.ttsRequestId, audioUrl };
++    });
++    if (scene.content.type !== 'quiz') return { ...scene, actions } as Scene;
++    const questions = scene.content.questions.map(question => {
++      const matches = actions.filter(action => action.type === 'speech' && action.text.trim() === question.question.trim());
++      if (matches.length !== 1) fail(matches.length ? 'QUESTION_SPEECH_AMBIGUOUS' : 'QUESTION_SPEECH_MISSING');
++      const action = matches[0];
++      const segment = byAction.get(scene.id + '\0' + action.id)!;
++      const questionAudioUrl = `/api/classroom-media/${stage.id}/audio/${segment.ttsRequestId}.wav`;
++      const questionAudioBinding = { schemaVersion: SCHEMA, sceneId: scene.id, actionId: action.id,
++        ttsRequestId: segment.ttsRequestId, sourceTextSha256: sha(question.question.trim()) };
++      if (segment.sourceTextSha256 !== questionAudioBinding.sourceTextSha256
++        || (question.questionAudioUrl && question.questionAudioUrl !== questionAudioUrl)
++        || (question.questionAudioBinding && JSON.stringify(question.questionAudioBinding) !== JSON.stringify(questionAudioBinding))) fail('QUESTION_BINDING_MISMATCH');
++      return { ...question, questionAudioUrl, questionAudioBinding };
++    });
++    return { ...scene, actions, content: { ...scene.content, questions } } as Scene;
++  });
++}
++
++export interface FormalNarrationMaterializationReceipt {
++  schemaVersion: 'mira.learning.saved-narration-assets.v1';
++  classroomId: string;
++  classroomContentSha256: string;
++  status: 'verified';
++  questionCount: number;
++  assets: { sceneId: string; actionId: string; ttsRequestId: string; audioUrl: string; audioSha256: string; sizeBytes: number }[];
++  receiptSha256: string;
++}
++async function writeSavedAsset(classroomId: string, filename: string, bytes: Uint8Array): Promise<void> {
++  if (!isValidClassroomId(classroomId) || !/^formal_tts_[a-f0-9]{48}\.wav$/.test(filename)) fail('ASSET_PATH_INVALID');
++  await mkdir(CLASSROOMS_DIR, { recursive: true });
++  const base = await realpath(CLASSROOMS_DIR);
++  const directory = join(base, classroomId, 'audio');
++  await mkdir(directory, { recursive: true, mode: 0o700 });
++  const actual = await realpath(directory);
++  if (actual !== resolve(directory) || !actual.startsWith(base + sep)) fail('ASSET_PATH_INVALID');
++  const path = join(actual, filename);
++  try {
++    const fd = await open(path, 'wx', 0o600);
++    try { await fd.writeFile(bytes); await fd.sync(); } finally { await fd.close(); }
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++    const info = await lstat(path);
++    if (!info.isFile() || info.isSymbolicLink() || sha(await readFile(path)) !== sha(bytes)) fail('EXISTING_ASSET_CONFLICT');
++  }
++}
++
++/** Reuse saved Qwen results only. This function never invokes a provider. */
++export async function materializeFormalNarration(stage: Stage, scenes: Scene[],
++  formalAudio: MiraFormalAudioLifecycleReceipt,
++  deps: { readAsset?: typeof readMiraFormalTtsAsset; writeAsset?: typeof writeSavedAsset } = {},
++): Promise<FormalNarrationMaterializationReceipt> {
++  const expectedHash = miraFormalAudioClassroomContentSha256(stage, scenes);
++  if (formalAudio.status !== 'succeeded' || formalAudio.classroomId !== stage.id
++    || formalAudio.classroomContentSha256 !== expectedHash
++    || formalAudio.expectedSegmentCount !== formalAudio.segments.length
++    || formalAudio.ttsSucceededCount !== formalAudio.segments.length
++    || formalAudio.asrPassedCount !== formalAudio.segments.length) fail('LIFECYCLE_MISMATCH');
++  const assets: FormalNarrationMaterializationReceipt['assets'] = [];
++  const planned = new Map<string, { scene: Scene; action: NonNullable<Scene['actions']>[number] }>();
++  for (const scene of scenes) for (const action of scene.actions ?? []) if (action.type === 'speech') planned.set(scene.id + '\0' + action.id, { scene, action });
++  if (planned.size !== formalAudio.segments.length) fail('SEGMENT_COVERAGE_MISMATCH');
++  const readAsset = deps.readAsset ?? readMiraFormalTtsAsset;
++  const writeAsset = deps.writeAsset ?? writeSavedAsset;
++  for (const segment of formalAudio.segments) {
++    const item = planned.get(segment.sceneId + '\0' + segment.actionId);
++    if (!item) return fail('SEGMENT_MISMATCH');
++    const action = item.action;
++    if (action.type !== 'speech') return fail('SEGMENT_MISMATCH');
++    if (sha(action.text.trim()) !== segment.sourceTextSha256
++      || segment.tts.state !== 'succeeded' || segment.asr.state !== 'succeeded'
++      || segment.tts.providerId !== 'qwen-tts' || segment.tts.modelId !== 'qwen3-tts-flash'
++      || segment.asr.providerId !== 'qwen-asr' || segment.asr.fallbackUsed !== false
++      || segment.asr.similarityBps < 8500 || segment.tts.fallbackUsed !== false) fail('SEGMENT_MISMATCH');
++    planned.delete(segment.sceneId + '\0' + segment.actionId);
++    const audioUrl = `/api/classroom-media/${stage.id}/audio/${segment.tts.requestId}.wav`;
++    if (action.audioUrl !== audioUrl || action.audioId !== segment.tts.requestId) fail('AUDIO_REFERENCE_MISMATCH');
++    const saved = await readAsset(segment.tts.requestId);
++    if (saved.record.state !== 'succeeded' || saved.record.classroomId !== stage.id
++      || saved.record.classroomContentSha256 !== expectedHash || saved.record.sceneId !== segment.sceneId
++      || saved.record.actionId !== segment.actionId || saved.record.requestId !== segment.tts.requestId
++      || saved.record.requestSha256 !== segment.tts.requestSha256
++      || saved.record.textSha256 !== segment.textSha256 || saved.record.voiceId !== segment.tts.voiceId
++      || saved.record.fallbackUsed !== false
++      || saved.record.audioSha256 !== segment.tts.audioSha256 || sha(saved.bytes) !== segment.tts.audioSha256
++      || saved.bytes.byteLength !== segment.tts.sizeBytes || saved.record.sizeBytes !== segment.tts.sizeBytes
++      || saved.record.mimeType !== 'audio/wav') fail('SAVED_ASSET_MISMATCH');
++    await writeAsset(stage.id, `${segment.tts.requestId}.wav`, saved.bytes);
++    assets.push({ sceneId: segment.sceneId, actionId: segment.actionId, ttsRequestId: segment.tts.requestId,
++      audioUrl, audioSha256: segment.tts.audioSha256, sizeBytes: segment.tts.sizeBytes });
++  }
++  let questionCount = 0;
++  for (const scene of scenes) if (scene.content.type === 'quiz') for (const question of scene.content.questions) {
++    const binding = question.questionAudioBinding;
++    const asset = assets.find(row => row.sceneId === scene.id && row.actionId === binding?.actionId);
++    if (!binding || binding.schemaVersion !== SCHEMA || binding.sceneId !== scene.id
++      || binding.sourceTextSha256 !== sha(question.question.trim()) || !asset
++      || binding.ttsRequestId !== asset.ttsRequestId || question.questionAudioUrl !== asset.audioUrl) fail('QUESTION_ASSET_UNVERIFIED');
++    questionCount++;
++  }
++  const receipt = { schemaVersion: 'mira.learning.saved-narration-assets.v1' as const, classroomId: stage.id,
++    classroomContentSha256: expectedHash, status: 'verified' as const, questionCount, assets };
++  return { ...receipt, receiptSha256: qualitySha(receipt) };
++}
+diff --git a/tests/server/mira-formal-question-narration.test.ts b/tests/server/mira-formal-question-narration.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-question-narration.test.ts
+@@ -0,0 +1,119 @@
++import { createHash } from 'node:crypto';
++import type { Scene } from '@/lib/types/stage';
++import { describe, expect, it, vi } from 'vitest';
++import { buildLifecycleSegments, miraFormalAudioClassroomContentSha256 } from '@/lib/server/mira-formal-audio-lifecycle';
++import { qualitySha, qualitySnapshot } from '@/lib/server/mira-formal-quality-contract';
++import { formalQuestionNarrationContextFromPrompt, materializeFormalNarration,
++  prepareFormalQuestionNarration, withFormalQuestionNarrationContext } from '@/lib/server/mira-formal-question-narration';
++
++const context = { buildItemId: 'new-flash-isolated-build', subject: 'math' as const };
++const contract = { schemaVersion: 'mira.learning.scene-contract.v1' as const,
++  gradeCode: 'primary_1', subject: 'math', maximumQuantity: 5, pictureChoicesRequired: true, noMasteryClaims: true };
++const stage = { id: 'new_flash_isolated_class', name: '数一数', createdAt: 'frozen', updatedAt: 'frozen' } as any;
++const sha = (value: Uint8Array | string) => createHash('sha256').update(value).digest('hex');
++function source() {
++  return [{ id: 'scene_1', stageId: stage.id, order: 0, title: '看图选一选', type: 'quiz',
++    content: { type: 'quiz', questions: [
++      { id: 'locked-q1', type: 'single', question: '点一点有三个圆的图片。', hasAnswer: false, answer: [],
++        options: [{ value: 'A', label: '2' }, { value: 'B', label: '3' }],
++        visual: { kind: 'quantity', count: 3 }, optionVisuals: { A: { kind: 'quantity', count: 2 }, B: { kind: 'quantity', count: 3 } } },
++      { id: 'locked-q2', type: 'single', question: '这一次，点有四个圆的图片。', hasAnswer: false, answer: [],
++        options: [{ value: 'C', label: '4' }, { value: 'D', label: '5' }],
++        visual: { kind: 'quantity', count: 4 }, optionVisuals: { C: { kind: 'quantity', count: 4 }, D: { kind: 'quantity', count: 5 } } },
++    ] }, actions: [
++      { id: 'speech_1', type: 'speech', text: '点一点有三个圆的图片。' },
++      { id: 'speech_2', type: 'speech', text: '这一次，点有四个圆的图片。' },
++    ] }] as any;
++}
++function question(scene: Scene, index = 0) {
++  if (scene.content.type !== 'quiz') throw new Error('fixture must be quiz');
++  return scene.content.questions[index];
++}
++function speech(scene: Scene, index = 0) {
++  const action = scene.actions?.[index];
++  if (!action || action.type !== 'speech') throw new Error('fixture must have speech');
++  return action;
++}
++function audioFixture(scenes: any[]) {
++  const segments = buildLifecycleSegments({ ...context, stage, scenes }).segments;
++  const hash = miraFormalAudioClassroomContentSha256(stage, scenes);
++  const saved = new Map();
++  const completed = segments.map((segment, index) => {
++    const bytes = new Uint8Array([82, 73, 70, 70, index, 87, 65, 86, 69]);
++    const audioSha256 = sha(bytes);
++    const tts = { requestId: segment.ttsRequestId, requestSha256: sha('request' + index), state: 'succeeded',
++      providerId: 'qwen-tts', modelId: 'qwen3-tts-flash', voiceId: 'Serena', fallbackUsed: false,
++      audioSha256, sizeBytes: bytes.length };
++    saved.set(tts.requestId, { bytes, record: { ...tts, classroomId: stage.id, classroomContentSha256: hash,
++      sceneId: segment.sceneId, actionId: segment.actionId, textSha256: segment.textSha256, mimeType: 'audio/wav' } });
++    return { ...segment, tts, asr: { requestId: segment.asrRequestId, state: 'succeeded',
++      providerId: 'qwen-asr', modelId: 'qwen3-asr-flash', similarityBps: 10000, fallbackUsed: false } };
++  });
++  const receipt = { status: 'succeeded', classroomId: stage.id, classroomContentSha256: hash,
++    expectedSegmentCount: segments.length, ttsSucceededCount: segments.length, asrPassedCount: segments.length, segments: completed } as any;
++  const readAsset = vi.fn(async (id: string) => saved.get(id));
++  const writeAsset = vi.fn(async (_classroomId: string, _filename: string, _bytes: Uint8Array) => {});
++  return { saved, receipt, readAsset, writeAsset };
++}
++describe('saved per-question Qwen narration', () => {
++  it('leaves historical scenes and prompts byte-identical', () => {
++    const scenes = source();
++    expect(prepareFormalQuestionNarration(stage, scenes, undefined, undefined)).toBe(scenes);
++    expect(withFormalQuestionNarrationContext('old', undefined)).toBe('old');
++    expect(formalQuestionNarrationContextFromPrompt('old')).toBeUndefined();
++  });
++  it('freezes the exact native context and rejects duplicate/tampered context', () => {
++    const prompt = withFormalQuestionNarrationContext('new', context);
++    expect(formalQuestionNarrationContextFromPrompt(prompt)).toEqual(context);
++    expect(() => formalQuestionNarrationContextFromPrompt(prompt + prompt)).toThrow('CONTEXT_INVALID');
++  });
++  it('binds same-scene same-text speech without touching locked questions or answers', () => {
++    const original = source(); const before = JSON.stringify(original);
++    const bound = prepareFormalQuestionNarration(stage, original, context, contract);
++    expect(JSON.stringify(original)).toBe(before);
++    const item = question(bound[0]);
++    expect(item.id).toBe('locked-q1'); expect(item.options).toEqual(original[0].content.questions[0].options);
++    expect(item.answer).toEqual([]); expect(item.hasAnswer).toBe(false);
++    expect(item.questionAudioBinding!.actionId).toBe('speech_1');
++    expect(item.questionAudioBinding!.sourceTextSha256).toBe(sha(item.question));
++    expect(item.questionAudioUrl).toBe(speech(bound[0]).audioUrl);
++    expect(prepareFormalQuestionNarration(stage, bound, context, contract)).toEqual(bound);
++  });
++  it('includes question URLs/binding and all speech URLs in the audio source hash before TTS', () => {
++    const raw = source(), bound = prepareFormalQuestionNarration(stage, raw, context, contract);
++    expect(miraFormalAudioClassroomContentSha256(stage, bound)).not.toBe(miraFormalAudioClassroomContentSha256(stage, raw));
++    const changed = structuredClone(bound); speech(changed[0]).audioUrl += '?changed';
++    expect(miraFormalAudioClassroomContentSha256(stage, changed)).not.toBe(miraFormalAudioClassroomContentSha256(stage, bound));
++    const edited = structuredClone(bound); question(edited[0]).questionAudioUrl += '?changed';
++    expect(qualitySha(qualitySnapshot(stage, edited))).not.toBe(qualitySha(qualitySnapshot(stage, bound)));
++  });
++  it.each(['missing', 'changed-text', 'duplicate', 'foreign-url'])('rejects %s narration before any paid completion call', reason => {
++    const scenes = source();
++    if (reason === 'missing') scenes[0].actions.shift();
++    if (reason === 'changed-text') scenes[0].actions[0].text += '请选择答案B。';
++    if (reason === 'duplicate') scenes[0].actions.push({ ...scenes[0].actions[0], id: 'another_speech' });
++    if (reason === 'foreign-url') scenes[0].actions[0].audioUrl = 'https://example.test/invented.wav';
++    expect(() => prepareFormalQuestionNarration(stage, scenes, context, contract)).toThrow('FORMAL_QUESTION_NARRATION_');
++  });
++  it('copies already-saved validated bytes and keeps source hash stable; no synthesis dependency', async () => {
++    const scenes = prepareFormalQuestionNarration(stage, source(), context, contract);
++    const fixture = audioFixture(scenes), before = miraFormalAudioClassroomContentSha256(stage, scenes);
++    const result = await materializeFormalNarration(stage, scenes, fixture.receipt, fixture as any);
++    expect(result.questionCount).toBe(2); expect(result.status).toBe('verified');
++    expect(fixture.readAsset).toHaveBeenCalledTimes(2); expect(fixture.writeAsset).toHaveBeenCalledTimes(2);
++    expect(result.assets[0].audioUrl).toBe(question(scenes[0]).questionAudioUrl);
++    expect(fixture.writeAsset.mock.calls[0][0]).toBe(stage.id);
++    expect(miraFormalAudioClassroomContentSha256(stage, scenes)).toBe(before);
++  });
++  it.each(['wrong-bytes', 'foreign-classroom', 'bad-asr', 'edited-question', 'missing-segment'])('rejects %s without exposing an unverified audio file', async reason => {
++    const scenes = prepareFormalQuestionNarration(stage, source(), context, contract);
++    const fixture = audioFixture(scenes);
++    if (reason === 'wrong-bytes') fixture.saved.get(fixture.receipt.segments[0].tts.requestId).bytes = new Uint8Array([1, 2]);
++    if (reason === 'foreign-classroom') fixture.saved.get(fixture.receipt.segments[0].tts.requestId).record.classroomId = 'other_class';
++    if (reason === 'bad-asr') fixture.receipt.segments[0].asr.similarityBps = 100;
++    if (reason === 'edited-question') question(scenes[0]).question += '修改了';
++    if (reason === 'missing-segment') fixture.receipt.segments.pop();
++    await expect(materializeFormalNarration(stage, scenes, fixture.receipt, fixture as any)).rejects.toThrow('FORMAL_QUESTION_NARRATION_');
++    expect(fixture.writeAsset).not.toHaveBeenCalled();
++  });
++});

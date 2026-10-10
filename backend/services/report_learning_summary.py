@@ -195,6 +195,42 @@ def learning_for_period(conn, *, family_id, start_date, end_date):
         if identity not in lessons or item['observedAt'] > lessons[identity]['observedAt']:
             lessons[identity] = item
     items = sorted(lessons.values(), key=lambda item: (not item['needsSupport'], -item['observedAt']))
-    return {'schemaVersion': 'mira.report.learning.v1', 'lessonCount': len(items),
+    extra = {}
+    from services.learning_evidence_service import enabled
+    if enabled():
+        extra = review_report_for_period(conn, family_id=family_id, start=start, end=end)
+    from flask import current_app, has_app_context
+    if has_app_context() and current_app.config.get('HOMEWORK_ANALYSIS_ENABLED', False):
+        from services.report_homework_progress import homework_progress_for_period
+        extra['homeworkProgress'] = homework_progress_for_period(
+            conn, family_id=family_id, start=start, end=end)
+    return {**extra, 'schemaVersion': 'mira.report.learning.v1', 'lessonCount': len(items),
             'needsSupportCount': sum(item['needsSupport'] for item in items),
             'reviewCount': len(reviews), 'lessons': items, 'coachingSummary': coaching_summary(coaching_records)}
+
+
+def review_report_for_period(conn, *, family_id, start, end):
+    """Keep non-participation separate from course mastery and care task scores."""
+    from services.learning_evidence_service import weaknesses
+    from services.learning_review_service import LearningReviewService, synthetic_fixture
+    from repositories.learning_review_repository import LearningReviewRepository
+    service = object.__new__(LearningReviewService)
+    service.repository = LearningReviewRepository(None)
+    rows = conn.execute('SELECT * FROM learning_review_runs WHERE family_id=? AND '
+        '((created_at>=? AND created_at<?) OR (completed_at>=? AND completed_at<?)) ORDER BY created_at DESC',
+        (family_id,start,end,start,end)).fetchall()
+    reviews = []
+    for row in rows:
+        if synthetic_fixture(row):
+            continue
+        run = dict(row)
+        report = service._report(run,service.repository.items(conn,run['id']),conn=conn)
+        summary = service._summary(run)
+        if report.get('sourceReviewCount'):
+            summary.update(correctCount=sum(bool(item['correct']) for item in report['items']),
+                independentCorrectCount=report['independentFirstCorrect'])
+        reviews.append({**summary, 'childId':run['child_id'], 'report':report})
+    children = conn.execute('SELECT id FROM children WHERE family_id=?', (family_id,)).fetchall()
+    return {'weekendReviews':reviews, 'weaknesses':[
+        {'childId':child['id'], **item} for child in children
+        for item in weaknesses(conn,family_id=family_id,child_id=child['id'],since=start,until=end)]}

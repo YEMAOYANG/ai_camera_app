@@ -38,8 +38,18 @@ def adaptive_policy(policy: object) -> bool:
     )
 
 
+def structured_lesson_constraints_policy(policy: object) -> bool:
+    """Only the frozen Flash candidate opts in; historical envelopes stay exact."""
+    if not isinstance(policy, Mapping) or not ({"modelPolicyId", "sceneLearningPolicy"} & set(policy)):
+        return False
+    from integrations.openmaic_formal_media import FLASH_CANDIDATE_PROFESSIONAL_POLICY
+    if _sha(policy) != _sha(FLASH_CANDIDATE_PROFESSIONAL_POLICY):
+        raise ValueError("formal structured lesson constraints policy is invalid")
+    return True
+
+
 def registered_grade_boundary(*, grade_code: object, subject: object,
-                              skill_id: object) -> dict[str, Any]:
+                              skill_id: object, structured_constraints: bool = False) -> dict[str, Any]:
     if any(not isinstance(value, str) or not value for value in (grade_code, subject, skill_id)):
         raise ValueError("formal grade boundary identity is missing")
     from content.progressive_curriculum import CURRICULUM_VERSION, lesson_by_id
@@ -50,7 +60,7 @@ def registered_grade_boundary(*, grade_code: object, subject: object,
     if lesson is not None:
         if lesson["gradeCode"] != grade_code or lesson["subject"] != subject:
             raise ValueError("formal progressive lesson grade or subject drifted")
-        return {
+        boundary = {
             "gradeCode": grade_code, "subject": subject,
             "curriculumVersion": CURRICULUM_VERSION,
             "boundaryVersion": CURRICULUM_VERSION + ":" + _sha(lesson)[:24],
@@ -67,6 +77,12 @@ def registered_grade_boundary(*, grade_code: object, subject: object,
             "prerequisiteSkills": deepcopy(lesson["prerequisiteLessonIds"]),
             "language": "zh-CN", "estimatedMinutes": 8,
         }
+        if structured_constraints:
+            # Copy actual registry data, never parse the human-readable allowedContent.
+            boundary["constraints"] = deepcopy(lesson["constraints"])
+        return boundary
+    if structured_constraints:
+        raise ValueError("formal structured lesson constraints require a registered progressive lesson")
     boundary = next((item for item in boundaries_for(grade_code, subject)
                      if item.skill_id == skill_id), None)
     if boundary is None:
@@ -85,7 +101,8 @@ def grade_boundary_fields(course: Mapping[str, Any], policy: Mapping[str, Any]) 
     if _sha(policy.get("teachingQuality")) != _sha(FORMAL_TEACHING_QUALITY_POLICY):
         raise ValueError("formal teaching quality policy is missing")
     boundary = registered_grade_boundary(grade_code=course.get("grade_code"),
-        subject=course.get("subject"), skill_id=course.get("node_code"))
+        subject=course.get("subject"), skill_id=course.get("node_code"),
+        structured_constraints=structured_lesson_constraints_policy(policy))
     if (course.get("boundary_version") != boundary["boundaryVersion"]
             or course.get("curriculum_version") != boundary["curriculumVersion"]):
         raise ValueError("formal course grade boundary version drifted")
@@ -114,13 +131,21 @@ def validate_generation_grade_boundary(generation: Mapping[str, Any],
             or generation.get("teachingBriefSha256") != _sha(brief)):
         raise ValueError("formal grade boundary teaching brief hash drifted")
     expected = registered_grade_boundary(grade_code=identity.get("gradeCode"),
-        subject=identity.get("subject"), skill_id=identity.get("skillId"))
+        subject=identity.get("subject"), skill_id=identity.get("skillId"),
+        structured_constraints=structured_lesson_constraints_policy(policy))
     from content.progressive_curriculum import CURRICULUM_VERSION
     if expected["curriculumVersion"] == CURRICULUM_VERSION:
         from services.progressive_course_generation import lesson_binding
         if (brief.get("schemaVersion") != PROGRESSIVE_BRIEF_SCHEMA
                 or brief.get("progressiveLesson") != lesson_binding(expected["skillId"])):
             raise ValueError("formal progressive lesson binding drifted")
+        if "constraints" in expected:
+            from content.progressive_difficulty_policy import progressive_difficulty_policy
+            difficulty = progressive_difficulty_policy(expected["gradeCode"], expected["subject"],
+                expected["skillId"], identity.get("difficultyCode", "basic"))
+            if (brief.get("difficultyPolicy") != difficulty
+                    or ("difficultyPolicy" in generation and generation["difficultyPolicy"] != difficulty)):
+                raise ValueError("formal structured lesson constraints difficulty authority drifted")
     elif brief.get("schemaVersion") != "mira.learning.formal-runtime-teaching-brief.v1":
         raise ValueError("historical lesson cannot use a progressive teaching brief")
     if course is not None:

@@ -501,8 +501,10 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
 }
 
 async function textbookMediaBytes(media, config) {
+  const newFormats = { 'video/mp4': '.mp4', 'video/webm': '.webm', 'model/gltf-binary': '.glb' };
   if (!/^\/api\/classroom-media\/tbpub_[a-f0-9]{24}\/(audio|media)\/[A-Za-z0-9_.-]+$/.test(media.path)
-      || !['audio/wav', 'audio/mpeg', 'image/webp', 'image/png'].includes(media.mimeType)
+      || !['audio/wav', 'audio/mpeg', 'image/webp', 'image/png', ...Object.keys(newFormats)].includes(media.mimeType)
+      || (newFormats[media.mimeType] && !media.path.toLowerCase().endsWith(newFormats[media.mimeType]))
       || !/^[a-f0-9]{64}$/.test(media.sha256) || !Number.isInteger(media.byteSize)
       || media.byteSize <= 0 || media.byteSize > MAX_RUNTIME_AUDIO_BYTES) return runtimeAudioBindingError();
   const upstream = await fetch(new URL(media.path, config.upstreamUrl), { redirect: 'error', signal: AbortSignal.timeout(config.upstreamTimeoutMs) });

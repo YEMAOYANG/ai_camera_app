@@ -230,6 +230,9 @@ class TaskRuntimeService:
         }
 
     def _advance_task(self, conn, task, *, now: datetime):
+        # Cross-lesson reviews are owned by server answers, never camera/timer verdicts.
+        if task.get('learning_slot') == 'weekend_review':
+            return task, []
         start_at = self._task_datetime(task, "start")
         due_at = self._task_datetime(task, "due")
         if start_at is None and due_at is None:

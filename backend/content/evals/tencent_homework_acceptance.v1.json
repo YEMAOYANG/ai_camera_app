@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "mira.tencent-homework-acceptance.v1",
+  "verifiedAt": "2026-10-08",
+  "runtime": "local_backend_api",
+  "healthOk": true,
+  "providers": {
+    "grading": "tencent",
+    "teacher": "deepseek",
+    "teacherModel": "deepseek-flash",
+    "camera": "moonshot",
+    "cameraModel": "kimi-k2.6"
+  },
+  "providerSmoke": {
+    "submitCalls": 3,
+    "queryCalls": 7,
+    "cases": [
+      "anonymous_printed_arithmetic",
+      "anonymous_printed_chinese_essay",
+      "anonymous_printed_english_essay"
+    ],
+    "allCompleted": true,
+    "handwrittenAccuracyValidated": false
+  },
+  "savedReceiptIntegration": [
+    {
+      "case": "questions",
+      "items": 2,
+      "statuses": [
+        "incorrect",
+        "correct"
+      ],
+      "trusted": true,
+      "pictureCorrection": true,
+      "confidenceInvented": false
+    },
+    {
+      "case": "essay-zh",
+      "pages": 1,
+      "suggestions": 9,
+      "assessment": "guidance_only",
+      "pixelHighlightsAssumed": false
+    },
+    {
+      "case": "essay-en",
+      "pages": 1,
+      "suggestions": 4,
+      "assessment": "guidance_only",
+      "pixelHighlightsAssumed": false
+    }
+  ],
+  "regression": {
+    "homeworkChecksPassed": 463,
+    "relatedReviewChecksPassed": 80,
+    "mobileAnalyze": "passed",
+    "mobileTestsPassed": 435,
+    "mobileTestsSkipped": 1,
+    "studentFullSuiteBeforeFinalEssayPhotoRefinement": 393,
+    "finalEssayPhotoFocusedTestsPassed": 25,
+    "studentProductionBuild": "passed",
+    "physicalAndroidAcceptance": "not_performed"
+  },
+  "courseModel": "deepseek-v4-pro",
+  "courseModelChanged": false,
+  "cameraConfigurationChanged": false,
+  "databaseMigrationPerformed": false,
+  "credentialsTracked": false,
+  "sources": [
+    "https://cloud.tencent.com/document/product/866/128273",
+    "https://cloud.tencent.com/document/product/866/128620"
+  ]
+}

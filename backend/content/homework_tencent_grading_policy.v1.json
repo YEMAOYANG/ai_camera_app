@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "mira.homework-tencent-grading-policy.v1",
+  "maxItemsPerPage": 200,
+  "firstPollMilliseconds": 5000,
+  "maxPollMilliseconds": 60000,
+  "maxQueriesPerPage": 60,
+  "maxPollingMilliseconds": 1200000,
+  "permanentQueryErrorPrefixes": ["AuthFailure", "ResourceNotFound", "InvalidParameter", "UnsupportedOperation", "UnauthorizedOperation", "InvalidAction", "InvalidVersion"],
+  "transientQueryErrorPrefixes": ["RequestLimitExceeded", "InternalError"]
+}

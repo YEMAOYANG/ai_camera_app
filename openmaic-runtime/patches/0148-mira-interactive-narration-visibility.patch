@@ -1,0 +1,171 @@
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -1,6 +1,6 @@
+ 'use client';
+ 
+-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
++import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+ import { createPortal } from 'react-dom';
+ import { toast } from 'sonner';
+ import { useWidgetIframeStore } from '@/lib/store/widget-iframe';
+@@ -291,6 +291,16 @@
+     visibleViewport.height > 0 &&
+     rect.width > 0 &&
+     rect.height > 0;
++  // Keep-alive documents keep running while CSS-hidden. Notify the prerecorded
++  // narration bridge before paint so outgoing audio stops on a scene switch.
++  // Legacy activities simply ignore this additive message. Sandbox null origins
++  // require '*'; the receiver accepts visibility only from its parent window.
++  useLayoutEffect(() => {
++    iframeRef.current?.contentWindow?.postMessage(
++      { type: 'MIRA_NARRATION_VISIBILITY', visible: shown },
++      '*',
++    );
++  }, [shown, entry.srcDoc, entry.src]);
+   const wrapStyle: CSSProperties = {
+     position: 'fixed',
+     left: visibleViewport?.left ?? 0,
+@@ -320,6 +330,12 @@
+         ref={iframeRef}
+         srcDoc={entry.srcDoc}
+         src={entry.srcDoc ? undefined : entry.src}
++        onLoad={() =>
++          iframeRef.current?.contentWindow?.postMessage(
++            { type: 'MIRA_NARRATION_VISIBILITY', visible: shown },
++            '*',
++          )
++        }
+         style={iframeStyle}
+         title={`Interactive Scene ${sceneId}`}
+         sandbox="allow-scripts allow-forms allow-popups"
+diff --git a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+@@ -0,0 +1,125 @@
++// @vitest-environment jsdom
++import { act, createElement } from 'react';
++import { createRoot, type Root } from 'react-dom/client';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { InteractiveIframeHost } from '@/components/scene-renderers/InteractiveIframeHost';
++import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
++
++vi.mock('@/lib/contexts/mira-student-runtime-context', () => ({
++  useMiraStudentRuntimeEvents: () => null,
++}));
++vi.mock('@/lib/mira/student-interaction-bridge', () => ({
++  studentInteractionObjectives: () => [],
++  connectStudentInteractionFrame: vi.fn(),
++}));
++vi.mock('@/lib/hooks/use-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }));
++
++const rect = { left: 10, top: 20, width: 800, height: 450 };
++let root: Root | undefined;
++let messages: WeakMap<HTMLIFrameElement, ReturnType<typeof vi.fn>>;
++
++function frame(sceneId = 'one') {
++  return document.querySelector(
++    `iframe[title="Interactive Scene ${sceneId}"]`,
++  ) as HTMLIFrameElement;
++}
++function visibility(frameElement: HTMLIFrameElement) {
++  return messages
++    .get(frameElement)!
++    .mock.calls.filter(([message]) => message.type === 'MIRA_NARRATION_VISIBILITY');
++}
++function prepare(sceneId: string, measured = true) {
++  const pool = useInteractiveIframePool.getState();
++  pool.mount(sceneId, { srcDoc: '<html><body>legacy or narrated activity</body></html>' });
++  pool.claim(sceneId, `owner-${sceneId}`);
++  if (measured) pool.setRect(sceneId, rect);
++}
++async function mountHost() {
++  const container = document.createElement('div');
++  document.body.append(container);
++  root = createRoot(container);
++  await act(async () => root!.render(createElement(InteractiveIframeHost)));
++}
++
++describe('keep-alive iframe narration visibility', () => {
++  beforeEach(() => {
++    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
++    useInteractiveIframePool.getState().reset();
++    messages = new WeakMap();
++    vi.spyOn(HTMLIFrameElement.prototype, 'contentWindow', 'get').mockImplementation(function (
++      this: HTMLIFrameElement,
++    ) {
++      let post = messages.get(this);
++      if (!post) {
++        post = vi.fn();
++        messages.set(this, post);
++      }
++      return { postMessage: post } as unknown as Window;
++    });
++  });
++  afterEach(async () => {
++    await act(async () => root?.unmount());
++    root = undefined;
++    document.body.replaceChildren();
++    vi.restoreAllMocks();
++    vi.unstubAllGlobals();
++  });
++
++  it('stops the outgoing scene and enables the incoming one while preserving both documents', async () => {
++    prepare('one');
++    prepare('two');
++    useInteractiveIframePool.getState().setActive('one');
++    await mountHost();
++    const first = frame('one');
++    const second = frame('two');
++    expect(visibility(first).at(-1)).toEqual([
++      { type: 'MIRA_NARRATION_VISIBILITY', visible: true },
++      '*',
++    ]);
++    expect(visibility(second).at(-1)).toEqual([
++      { type: 'MIRA_NARRATION_VISIBILITY', visible: false },
++      '*',
++    ]);
++    await act(async () => useInteractiveIframePool.getState().setActive('two'));
++    expect(visibility(first).at(-1)![0].visible).toBe(false);
++    expect(visibility(second).at(-1)![0].visible).toBe(true);
++    expect(frame('one')).toBe(first);
++    expect(frame('two')).toBe(second);
++    expect(first.getAttribute('sandbox')).toBe('allow-scripts allow-forms allow-popups');
++    expect(first.srcdoc).toContain('legacy or narrated activity');
++  });
++
++  it('re-sends the latest hidden state when a background iframe finishes loading', async () => {
++    prepare('one');
++    useInteractiveIframePool.getState().setActive('one');
++    await mountHost();
++    const first = frame();
++    await act(async () => useInteractiveIframePool.getState().release('one', 'owner-one'));
++    messages.get(first)!.mockClear();
++    await act(async () => first.dispatchEvent(new Event('load')));
++    expect(visibility(first)).toEqual([
++      [{ type: 'MIRA_NARRATION_VISIBILITY', visible: false }, '*'],
++    ]);
++    expect(first.parentElement!.style.visibility).toBe('hidden');
++    await act(async () => useInteractiveIframePool.getState().claim('one', 'owner-new'));
++    await act(async () => first.dispatchEvent(new Event('load')));
++    expect(visibility(first).at(-1)![0].visible).toBe(true);
++    expect(frame()).toBe(first);
++  });
++
++  it('keeps an active unmeasured or fully clipped iframe silent, including its initial load', async () => {
++    prepare('one', false);
++    useInteractiveIframePool.getState().setActive('one');
++    await mountHost();
++    const first = frame();
++    await act(async () => first.dispatchEvent(new Event('load')));
++    expect(visibility(first).every(([message]) => message.visible === false)).toBe(true);
++    await act(async () => useInteractiveIframePool.getState().setRect('one', rect));
++    expect(visibility(first).at(-1)![0].visible).toBe(true);
++    await act(async () =>
++      useInteractiveIframePool.getState().setRect('one', rect, { ...rect, width: 0, height: 0 }),
++    );
++    expect(visibility(first).at(-1)![0].visible).toBe(false);
++    expect(first.parentElement!.style.visibility).toBe('hidden');
++  });
++});

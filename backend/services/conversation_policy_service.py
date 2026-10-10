@@ -7,6 +7,7 @@ from core.database import Database
 from core.errors import ApiError
 from repositories.conversation_repository import ConversationRepository
 from repositories.profile_repository import ProfileRepository
+from repositories.task_repository import TaskRepository
 from services.setting_policy import setting_value
 from services.wake_name_constants import DEFAULT_WAKE_NAME, FALLBACK_WAKE_NAME
 from services.wake_name_validator import validate_wake_name
@@ -248,18 +249,7 @@ class ConversationPolicyService:
         }
 
     def _has_active_task(self, conn, family_id: str) -> bool:
-        row = conn.execute(
-            """
-            SELECT id
-            FROM tasks
-            WHERE family_id = ?
-              AND status IN ('in_progress', 'started', 'active')
-            ORDER BY updated_at DESC
-            LIMIT 1
-            """,
-            (family_id,),
-        ).fetchone()
-        return row is not None
+        return TaskRepository.has_active_task(conn, family_id=family_id)
 
     def _is_past_bedtime(self, sleep_time: str, now_ms: int) -> bool:
         value = str(sleep_time or "").strip()

@@ -2522,6 +2522,7 @@ class OpenMaicFullRuntimeTest(unittest.TestCase):
 
         service = object.__new__(OpenMaicFullRuntimeService)
         service.enabled = True
+        service.textbook_library_only = False
         service.client = object()
         service.public_url = "https://classroom.mira.test"
         service.student_auth_service = Auth()
@@ -2564,6 +2565,7 @@ class OpenMaicFullRuntimeTest(unittest.TestCase):
 
         service = object.__new__(OpenMaicFullRuntimeService)
         service.enabled = True
+        service.textbook_library_only = False
         service.client = object()
         service.public_url = "https://classroom.mira.test"
         service.student_auth_service = Auth()
@@ -2657,6 +2659,7 @@ class OpenMaicFullRuntimeTest(unittest.TestCase):
 
         service = object.__new__(OpenMaicFullRuntimeService)
         service.enabled = True
+        service.textbook_library_only = False
         service.client = object()
         service.public_url = "https://classroom.mira.test"
         service.session_ttl_seconds = 3600

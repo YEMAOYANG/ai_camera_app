@@ -1,0 +1,175 @@
+diff --git a/lib/server/agent-runtime/dsl-tools.ts b/lib/server/agent-runtime/dsl-tools.ts
+--- a/lib/server/agent-runtime/dsl-tools.ts
++++ b/lib/server/agent-runtime/dsl-tools.ts
+@@ -1,4 +1,6 @@
+ import { Type, type Static } from 'typebox';
++import { Check } from 'typebox/value';
++import dslSceneSchema from '@openmaic/dsl/schema/scene.schema.json';
+ import type { AgentTool } from '@earendil-works/pi-agent-core';
+ import type { Action } from '@/lib/types/action';
+ import type { Scene, SlideContent } from '@/lib/types/stage';
+@@ -18,6 +20,14 @@
+   omitReadSceneMediaBytes,
+ } from './course-edit/media-byte-omission';
+ import { COURSE_STAGE_ID_DESCRIPTION } from './course-stage';
++
++// Consume the built DSL schema, including nested additionalProperties:false.
++// Keep legacy app extensions separate from the canonical learning fields.
++const QUIZ_LEARNING_FIELDS = ['visual', 'optionVisuals', 'questionAudioUrl', 'questionAudioBinding'] as const;
++const QUIZ_LEARNING_SCHEMAS = Object.fromEntries(QUIZ_LEARNING_FIELDS.map(field => [field, {
++  definitions: dslSceneSchema.definitions,
++  ...dslSceneSchema.definitions.QuizQuestion.properties[field],
++}]));
+ 
+ const READ_PAGE_CHARS = 12_000;
+ const SEARCH_CONTEXT_CHARS = 200;
+@@ -450,6 +460,7 @@
+         'commentPrompt',
+         'hasAnswer',
+         'points',
++        ...QUIZ_LEARNING_FIELDS,
+       ];
+       if (question.sourceType === 'tap_objects') {
+         allowed.push('sourceType', 'objects');
+@@ -475,6 +486,19 @@
+       const unknown = Object.keys(question).filter((key) => !allowed.includes(key));
+       if (unknown.length)
+         return `/content/questions/${index}: unknown field(s) ${unknown.join(', ')}`;
++      for (const field of QUIZ_LEARNING_FIELDS) {
++        if (question[field] !== undefined && !Check(QUIZ_LEARNING_SCHEMAS[field], question[field]))
++          return `/content/questions/${index}/${field}: does not match the strict DSL schema`;
++      }
++      if (question.optionVisuals !== undefined) {
++        const values = Array.isArray(question.options)
++          ? question.options.map(option => option && typeof option === 'object' && !Array.isArray(option)
++            ? (option as { value?: unknown }).value : undefined) : [];
++        if (!values.length || values.some(value => typeof value !== 'string' || !value)
++          || new Set(values).size !== values.length
++          || JSON.stringify(Object.keys(question.optionVisuals as object).sort()) !== JSON.stringify([...values].sort()))
++          return `/content/questions/${index}/optionVisuals: pictures must be keyed by every actual option value exactly once`;
++      }
+       if (!['single', 'multiple', 'short_answer'].includes(String(question.type))) {
+         return `/content/questions/${index}/type: unknown quiz question type`;
+       }
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -707,8 +707,8 @@
+         progress: session.status === 'running' ? 35 : 18,
+         message:
+           session.status === 'running'
+-            ? 'OpenMAIC Pro Agent is researching and creating the classroom'
+-            : 'OpenMAIC Pro Agent session is queued',
++            ? 'OpenMAIC Agent is researching and creating the classroom'
++            : 'OpenMAIC Agent session is queued',
+         scenesGenerated: 0,
+         totalScenes: 0,
+       });
+@@ -1584,7 +1584,7 @@
+   await options.onProgress?.({
+     step: 'persisting',
+     progress: 98,
+-    message: 'Publishing the validated Pro classroom to the student runtime',
++    message: 'Saving the validated classroom to the runtime',
+     scenesGenerated: scenes.length,
+     totalScenes: scenes.length,
+   });
+@@ -1592,7 +1592,7 @@
+   await options.onProgress?.({
+     step: 'completed',
+     progress: 100,
+-    message: 'OpenMAIC Pro courseware workflow completed with web research and citations',
++    message: 'OpenMAIC courseware workflow completed with web research and citations',
+     scenesGenerated: scenes.length,
+     totalScenes: scenes.length,
+   });
+@@ -1780,7 +1780,7 @@
+   await options.onProgress?.({
+     step: 'researching',
+     progress: 10,
+-    message: 'Starting the unattended OpenMAIC Pro courseware workflow with required web research',
++    message: 'Starting the unattended OpenMAIC courseware workflow with required web research',
+     scenesGenerated: 0,
+     totalScenes: 0,
+   });
+diff --git a/tests/agent-runtime/dsl-tools.test.ts b/tests/agent-runtime/dsl-tools.test.ts
+--- a/tests/agent-runtime/dsl-tools.test.ts
++++ b/tests/agent-runtime/dsl-tools.test.ts
+@@ -531,6 +531,77 @@
+     expect(result).toMatchObject({ isError: true });
+     expect(textOf(result)).toContain('/content/questions/0/points: expected number');
+     expect(current.putScene).not.toHaveBeenCalled();
++  });
++
++  it('accepts seven answer-blind picture questions with two guided and five independent tasks', async () => {
++    const current = state();
++    const questions = Array.from({ length: 7 }, (_, index) => ({
++      id: index < 2 ? `guided-${index + 1}` : `independent-${index - 1}`,
++      type: 'single', question: '听老师说，点对应的图片。', hasAnswer: false, answer: [],
++      options: [{ label: '天', value: `target-${index}` }, { label: '字形干扰', value: `other-${index}` }],
++      visual: { kind: 'image', src: '/media/sky.png', alt: '蓝天的情境图' },
++      optionVisuals: {
++        [`target-${index}`]: { kind: 'image', src: '/media/target-glyph.png', alt: '字形图片' },
++        [`other-${index}`]: { kind: 'image', src: '/media/other-glyph.png', alt: '另一张字形图片' },
++      },
++    }));
++    const patch = tool(dslTools(current.store), 'patch_stage');
++    const result = await patch.execute('picture-seven', { target: '/scenes/2', intent: 'Keep locked tasks and add pictures',
++      ops: [{ op: 'set', path: '/content/questions', value: questions }] } as never);
++    expect(result).not.toMatchObject({ isError: true });
++    expect(current.putScene).toHaveBeenCalledOnce();
++    expect((current.get().scenes[1]!.content as QuizContent).questions).toEqual(questions);
++  });
++
++  it.each([
++    ['visual', { kind: 'image', src: '/media/sky.png', alt: '天空', answer: true }],
++    ['visual', { kind: 'image', src: '/media/person.png', alt: '人物', cue: 'answer' }],
++    ['visual', { kind: 'people', members: [{ id: 'child', src: '/media/child.png', alt: '孩子', cue: 'speaking', selected: true }] }],
++    ['optionVisuals', { A: { kind: 'quantity', count: 1 }, B: { kind: 'quantity', count: 2, correct: true } }],
++    ['optionVisuals', { Alpha: { kind: 'quantity', count: 1 }, Beta: { kind: 'quantity', count: 2 } }],
++    ['optionVisuals', { A: { kind: 'quantity', count: 1 } }],
++    ['questionAudioUrl', 42],
++    ['questionAudioBinding', { schemaVersion: 'mira.learning.question-narration-binding.v1', sceneId: 'scene_quiz',
++      actionId: 'speech-1', ttsRequestId: 'request', sourceTextSha256: 'a'.repeat(64), unverified: true }],
++    ['questionAudioBinding', { schemaVersion: 'wrong-version', sceneId: 'scene_quiz', actionId: 'speech-1',
++      ttsRequestId: 'request', sourceTextSha256: 'a'.repeat(64) }],
++    ['questionAudioBinding', { schemaVersion: 'mira.learning.question-narration-binding.v1', sceneId: 'scene_quiz' }],
++    ['inventedVisual', { kind: 'quantity', count: 1 }],
++  ])('rejects malformed or invented learning field %s without persisting', async (field, value) => {
++    const current = state();
++    const before = structuredClone(current.get());
++    const patch = tool(dslTools(current.store), 'patch_stage');
++    const result = await patch.execute('invalid-picture', { target: '/scenes/2', intent: 'Invalid visual field',
++      ops: [{ op: 'set', path: `/content/questions/0/${field}`, value }] } as never);
++    expect(result).toMatchObject({ isError: true });
++    expect(textOf(result)).toContain('structure validation');
++    expect(current.putScene).not.toHaveBeenCalled();
++    expect(current.get()).toEqual(before);
++  });
++
++  it('rejects malformed options paired with pictures without crashing or persisting', async () => {
++    const current = state();
++    const patch = tool(dslTools(current.store), 'patch_stage');
++    const result = await patch.execute('bad-picture-options', { target: '/scenes/2', intent: 'Reject a malformed option',
++      ops: [{ op: 'set', path: '/content/questions/0/options', value: [null, { label: 'B', value: 'B' }] },
++        { op: 'set', path: '/content/questions/0/optionVisuals', value: {
++          A: { kind: 'quantity', count: 1 }, B: { kind: 'quantity', count: 2 } } }] } as never);
++    expect(result).toMatchObject({ isError: true });
++    expect(current.putScene).not.toHaveBeenCalled();
++  });
++
++  it('accepts canonical saved narration fields from the actual DSL schema', async () => {
++    const current = state();
++    const patch = tool(dslTools(current.store), 'patch_stage');
++    const url = '/api/classroom-media/stage-test/audio/formal_tts_' + 'a'.repeat(48) + '.wav';
++    const binding = { schemaVersion: 'mira.learning.question-narration-binding.v1', sceneId: 'scene_quiz',
++      actionId: 'speech-1', ttsRequestId: 'formal_tts_' + 'a'.repeat(48), sourceTextSha256: 'b'.repeat(64) };
++    const result = await patch.execute('saved-audio-fields', { target: '/scenes/2', intent: 'Keep host-owned saved narration binding',
++      ops: [{ op: 'set', path: '/content/questions/0/questionAudioUrl', value: url },
++        { op: 'set', path: '/content/questions/0/questionAudioBinding', value: binding }] } as never);
++    expect(result).not.toMatchObject({ isError: true });
++    expect(current.putScene).toHaveBeenCalledOnce();
++    expect((current.get().scenes[1]!.content as QuizContent).questions[0]).toMatchObject({ questionAudioUrl: url, questionAudioBinding: binding });
+   });
+ 
+   it('keeps add_element/delete_element semantics aligned with edit_slide', async () => {

@@ -296,7 +296,8 @@ class TaskService:
         now = now_ms()
         with self.repository.transaction() as conn:
             self._assert_capability(conn, context, "manage_tasks")
-            self._task_or_error(conn, context["family"]["id"], task_id)
+            task = self._task_or_error(conn, context["family"]["id"], task_id)
+            self._assert_not_weekend_review(task)
             task = self.repository.update_task(
                 conn,
                 family_id=context["family"]["id"],
@@ -320,6 +321,7 @@ class TaskService:
         with self.repository.transaction() as conn:
             self._assert_capability(conn, context, "manage_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
+            self._assert_not_weekend_review(task)
             if task["status"] not in (
                 *TASK_ACTIVE_SCHEDULED_STATUSES,
                 TASK_IN_PROGRESS,
@@ -346,6 +348,7 @@ class TaskService:
         with self.repository.transaction() as conn:
             self._assert_capability(conn, context, "manage_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
+            self._assert_not_weekend_review(task)
             child = self.profile_repository.get_child(
                 conn,
                 family_id=context["family"]["id"],
@@ -423,6 +426,7 @@ class TaskService:
         with self.repository.transaction() as conn:
             self._assert_capability(conn, context, "confirm_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
+            self._assert_not_weekend_review(task)
             evidence_summary = self._optional_text(data, "evidenceSummary")
             evidence = self._json_text(data.get("evidence"))
             ai_summary = self._optional_text(data, "aiObservationSummary") or evidence_summary
@@ -474,6 +478,7 @@ class TaskService:
         with self.repository.transaction() as conn:
             self._assert_capability(conn, context, "confirm_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
+            self._assert_not_weekend_review(task)
             if task["status"] not in (TASK_MISSED, TASK_EXPIRED):
                 raise ApiError("task_not_missed", "这项安排还不能这样处理")
             if not self.repository.has_event(
@@ -499,6 +504,7 @@ class TaskService:
         with self.repository.transaction() as conn:
             self._assert_capability(conn, context, "confirm_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
+            self._assert_not_weekend_review(task)
             if task["status"] not in (TASK_AWAITING_PARENT_CONFIRMATION, TASK_CONFIRMED):
                 raise ApiError("task_not_awaiting_confirmation", "任务还不能确认")
 
@@ -522,6 +528,7 @@ class TaskService:
         with self.repository.transaction() as conn:
             self._assert_capability(conn, context, "confirm_tasks")
             task = self._task_or_error(conn, context["family"]["id"], task_id)
+            self._assert_not_weekend_review(task)
             if task["status"] != TASK_AWAITING_PARENT_CONFIRMATION:
                 raise ApiError("task_not_awaiting_confirmation", "任务还不能驳回")
             task = self.repository.mark_rejected(
@@ -687,6 +694,11 @@ class TaskService:
         if task is None:
             raise ApiError("task_not_found", "任务不存在", 404)
         return task
+
+    @staticmethod
+    def _assert_not_weekend_review(task):
+        if task.get('learning_slot') == 'weekend_review':
+            raise ApiError('review_task_owned', '请在复习安排中改期或暂停；复习完成由实际作答记录确认', 409)
 
     def _ensure_child(self, conn, family_id: str, child_id: str) -> None:
         if not self.repository.child_exists(conn, family_id=family_id, child_id=child_id):

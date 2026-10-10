@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from core.config import LEARNING_CURRICULUM_PREPARATION_MIN_LEASE_SECONDS
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
@@ -17,6 +18,18 @@ from services.learning_curriculum_preparation_contract import (
 
 
 class LearningCurriculumPreparationContractTest(unittest.TestCase):
+    def test_flash_opt_in_binds_creation_and_model_and_leaves_default_exact(self):
+        with patch.dict('os.environ', {'MIRA_FORMAL_MODEL_POLICY': ''}):
+            legacy = build_preparation_target('primary_1')
+        with patch.dict('os.environ', {'MIRA_FORMAL_MODEL_POLICY': 'deepseek-v4.1-flash-candidate-v1'}):
+            candidate = build_preparation_target('primary_1')
+        runtime = candidate['formalRuntimePolicy']
+        self.assertEqual(runtime['professionalModelPolicy'], OpenMaicFullRuntimeClient.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY)
+        self.assertEqual(runtime['professionalCreationPolicy'], OpenMaicFullRuntimeClient.FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY)
+        self.assertNotEqual(preparation_target_fingerprint(candidate), preparation_target_fingerprint(legacy))
+        with patch.dict('os.environ', {'MIRA_FORMAL_MODEL_POLICY': ''}):
+            self.assertEqual(build_preparation_target('primary_1'), legacy)
+
     def test_primary_one_target_has_three_subjects_and_thirty_courses(self):
         target = build_preparation_target("primary_1")
         self.assertEqual(target["schemaVersion"], TARGET_SCHEMA_V2)

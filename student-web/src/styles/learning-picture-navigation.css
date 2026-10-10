@@ -3,6 +3,19 @@
 .schoolbag-subject .learning-subject-picture { display: block; width: 100%; max-width: 120px; margin-bottom: 4px; }
 .schoolbag-subjects { gap: 12px; }
 .schoolbag-book-space > .learning-listen { display: flex; margin: 14px auto; }
+.schoolbag-extra-learning { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; max-width: 380px; text-align: left; }
+.schoolbag-learning-entry { display: flex; align-items: center; gap: 14px; min-height: 72px; color: var(--mira-ink); text-decoration: none; }
+.schoolbag-learning-entry-art { position: relative; flex: none; width: 68px; height: 68px; }
+.schoolbag-learning-entry-art > .learning-subject-picture { height: 100%; border-radius: 12px; }
+.schoolbag-learning-entry-art > span:last-child { position: absolute; right: -3px; bottom: -3px; display: grid; place-items: center; width: 26px; height: 26px; border: 2px solid var(--mira-bg); border-radius: 50%; background: var(--mira-brand-deep); }
+.schoolbag-learning-entry-art > span:last-child svg { width: 12px; height: 12px; }
+.schoolbag-learning-entry > span:not(.schoolbag-learning-entry-art) { flex: 1; min-width: 0; }
+.schoolbag-learning-entry strong, .schoolbag-learning-entry small { display: block; }
+.schoolbag-learning-entry strong { font-size: 18px; font-weight: 600; line-height: 1.5; }
+.schoolbag-learning-entry small { margin-top: 3px; color: var(--mira-muted); font-size: 13px; line-height: 1.5; }
+.schoolbag-learning-entry > svg { flex: none; width: 18px; height: 18px; color: var(--mira-muted); }
+.schoolbag-learning-entry:hover strong { text-decoration: underline; text-underline-offset: 4px; }
+.schoolbag-extra-learning > .learning-listen { align-self: flex-start; }
 .learning-picture-launch:focus-visible { outline: 3px solid var(--mira-ink); outline-offset: 4px; }
 .learning-next-picture { margin-top: 24px; max-width: 440px; }
 .learning-picture-launch { position: relative; display: flex; flex-direction: column; min-width: 0; overflow: hidden; border-radius: 22px; border: 2px solid var(--mira-border); background: var(--mira-surface); text-decoration: none; color: var(--mira-ink); }
@@ -60,6 +73,7 @@
   .picture-lesson-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
+  .schoolbag-extra-learning { width: 100%; margin: 24px auto 0; }
   .learning-next-picture { max-width: 520px; margin: 20px auto 0; text-align: left; }
   .learning-picture-rest { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 16px; padding: 0; min-height: 80px; }
   .learning-picture-rest > svg { grid-row: 1 / 4; }

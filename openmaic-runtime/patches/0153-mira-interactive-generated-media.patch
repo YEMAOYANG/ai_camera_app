@@ -1,0 +1,152 @@
+diff --git a/lib/server/classroom-media-generation.ts b/lib/server/classroom-media-generation.ts
+--- a/lib/server/classroom-media-generation.ts
++++ b/lib/server/classroom-media-generation.ts
+@@ -36,6 +36,7 @@
+ import type { TTSProviderId } from '@/lib/audio/types';
+ import { splitLongSpeechActions } from '@/lib/audio/tts-utils';
+ import { isGeneratedMediaPlaceholder } from '@/lib/media/media-ref';
++import { replaceInteractiveMediaPlaceholders } from '@/lib/server/interactive-media-placeholders';
+ import { VOXCPM_AUTO_VOICE_ID, VOXCPM_TTS_PROVIDER_ID } from '@/lib/audio/voxcpm';
+ import { assertMiraTtsProviderReady, getMiraTtsPolicy } from '@/lib/server/mira-tts-policy';
+ 
+@@ -219,6 +220,12 @@
+   if (Object.keys(mediaMap).length === 0) return;
+ 
+   for (const scene of scenes) {
++    if (scene.type === 'interactive') {
++      const content = scene.content as { html?: string };
++      if (typeof content.html === 'string')
++        content.html = replaceInteractiveMediaPlaceholders(content.html, mediaMap);
++      continue;
++    }
+     if (scene.type !== 'slide') continue;
+     const canvas = (
+       scene.content as {
+diff --git a/lib/server/mira-textbook-batch-generation.ts b/lib/server/mira-textbook-batch-generation.ts
+--- a/lib/server/mira-textbook-batch-generation.ts
++++ b/lib/server/mira-textbook-batch-generation.ts
+@@ -344,11 +344,19 @@
+       );
+     }
+   }
+-  if (final)
++  if (final) {
+     for (const image of document.querySelectorAll('img')) {
+       const src = image.getAttribute('src');
+       check(src && !/^(?:gen_|image_|placeholder)|example\.com/i.test(src), 'media_unresolved');
+     }
++    for (const video of document.querySelectorAll('video')) {
++      const ownSrc = video.getAttribute('src');
++      const sources = ownSrc ? [ownSrc] : Array.from(video.querySelectorAll('source')).map((source) => source.getAttribute('src'));
++      check(sources.length > 0 && sources.every((src) => src && !/^(?:gen_|image_|placeholder)|example\.com/i.test(src)), 'media_unresolved');
++      const poster = video.getAttribute('poster');
++      check(!poster || !/^(?:gen_|image_|placeholder)|example\.com/i.test(poster), 'media_unresolved');
++    }
++  }
+ }
+ 
+ function visualSignature(visual: unknown, final: boolean): string {
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -1257,7 +1257,11 @@
+   }
+ 
+   log.info(`Generating ${widgetType} widget for: ${outline.title}`);
+-  const response = await aiCall(prompts.system + (options.learningContract ? learningSceneInstructions(options.learningContract) : ''), prompts.user);
++  const generatedMedia = outline.mediaGenerations || [];
++  const mediaInstructions = generatedMedia.length
++    ? '\nGenerated media will be resolved after authoring. Use each exact elementId as a literal HTML src attribute on video/source for video or img for image. Never invent a URL or a fake player. Keep native video controls visible and play only on an explicit student action.\n' + JSON.stringify(generatedMedia)
++    : '';
++  const response = await aiCall(prompts.system + (options.learningContract ? learningSceneInstructions(options.learningContract) : ''), prompts.user + mediaInstructions);
+   const rawHtml = extractHtml(response, log);
+   const html = rawHtml ? resolveInteractiveImageIds(rawHtml, options.imageMapping) : rawHtml;
+ 
+diff --git a/lib/server/interactive-media-placeholders.ts b/lib/server/interactive-media-placeholders.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/interactive-media-placeholders.ts
+@@ -0,0 +1,19 @@
++/** Replace only real media attributes, preserving authored scripts and document bytes. */
++export function replaceInteractiveMediaPlaceholders(
++  html: string,
++  mediaMap: Record<string, string>,
++): string {
++  const tokens = /<!--[\s\S]*?-->|<(script|style)\b[\s\S]*?<\/\1\s*>|<(img|video|source)\b(?:[^"'<>]|"[^"]*"|'[^']*')*>/gi;
++  return html.replace(tokens, (tag: string) => {
++    if (!/^<(?:img|video|source)\b/i.test(tag)) return tag;
++    return tag.replace(/(\s(?:src|poster)\s*=\s*)(?:(["'])(.*?)\2|([^\s>]+))/gi,
++      (attribute: string, prefix: string, quote: string, quoted: string, bare: string) => {
++        const key = quote ? quoted : bare;
++        if (!/^gen_(?:img|vid)_[\w-]+$/.test(key) || !Object.hasOwn(mediaMap, key)) return attribute;
++        const url = mediaMap[key];
++        if (typeof url !== 'string' || !/^(?:https?:\/\/|\/api\/classroom-media\/)/i.test(url)) return attribute;
++        const safe = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
++        return prefix + (quote || '"') + safe + (quote || '"');
++      });
++  });
++}
+diff --git a/tests/server/interactive-media-placeholders.test.ts b/tests/server/interactive-media-placeholders.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/interactive-media-placeholders.test.ts
+@@ -0,0 +1,36 @@
++import { describe, expect, it } from 'vitest';
++import { replaceInteractiveMediaPlaceholders } from '@/lib/server/interactive-media-placeholders';
++import { assertTextbookBatchContent } from '@/lib/server/mira-textbook-batch-generation';
++import { textbookContext, textbookInteractive } from '@/tests/fixtures/textbook-batch';
++
++describe('interactive generated media boundary', () => {
++  const map = { gen_vid_intro: '/api/classroom-media/book/media/intro.mp4', gen_img_poster: '/api/classroom-media/book/media/poster.png' };
++  it('resolves both video source forms, images and posters without rewriting script bytes', () => {
++    const script = '<script>const example = `<video src="gen_vid_intro">`;window.miraNarrate("intro");</script>';
++    const html = '<!doctype html><video controls src="gen_vid_intro" poster=gen_img_poster></video><video><source src=gen_vid_intro></video><img src=\'gen_img_poster\'>' + script;
++    const result = replaceInteractiveMediaPlaceholders(html, map);
++    expect(result).toContain('src="' + map.gen_vid_intro + '"');
++    expect(result).toContain('poster="' + map.gen_img_poster + '"');
++    expect(result).toContain('src=\'' + map.gen_img_poster + '\'');
++    expect(result.endsWith(script)).toBe(true);
++    expect(result.startsWith('<!doctype html>')).toBe(true);
++  });
++  it('preserves direct assets, comments, styles, missing entries and unsafe maps', () => {
++    const html = '<!-- <img src="gen_img_poster"> --><style>x{content:"<video src=gen_vid_intro>"}</style><video src="/original.mp4" data-src="gen_vid_intro"></video><img src="gen_img_missing">';
++    expect(replaceInteractiveMediaPlaceholders(html, map)).toBe(html);
++    expect(replaceInteractiveMediaPlaceholders('<video src=gen_vid_intro>', { gen_vid_intro: 'javascript:alert(1)' })).toBe('<video src=gen_vid_intro>');
++  });
++  it.each(['<video src="gen_vid_intro"></video>', '<video><source src="gen_vid_intro"></video>', '<video></video>', '<video src="/real.mp4" poster="gen_img_poster"></video>'])(
++    'rejects unresolved final videos: %s', (video) => {
++      const content = textbookInteractive();
++      content.html += video;
++      expect(() => assertTextbookBatchContent('interactive', content, textbookContext(), true)).toThrow('media_unresolved');
++      expect(() => assertTextbookBatchContent('interactive', content, textbookContext(), false)).not.toThrow();
++    });
++  it('accepts a resolved real video while preserving strict narration validation', () => {
++    const content = textbookInteractive();
++    content.html += '<video controls><source src="gen_vid_intro"></video>';
++    content.html = replaceInteractiveMediaPlaceholders(content.html, map);
++    expect(() => assertTextbookBatchContent('interactive', content, textbookContext(), true)).not.toThrow();
++  });
++});
+diff --git a/tests/server/widget-media-context.test.ts b/tests/server/widget-media-context.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/widget-media-context.test.ts
+@@ -0,0 +1,18 @@
++import { describe, expect, it, vi } from 'vitest';
++import { generateWidgetContent, type SceneOutline } from '@openmaic/generation';
++
++describe('interactive generated media authoring context', () => {
++  it('forwards exact video IDs and topic to the interactive author instead of inventing URLs', async () => {
++    const call = vi.fn(async () => '<html><head></head><body></body></html>');
++    const outline = {
++      id: 'intro', type: 'interactive', title: 'Observe water', description: 'Age-bound observation', order: 1,
++      widgetType: 'game', widgetOutline: { gameType: 'puzzle' },
++      mediaGenerations: [{ type: 'video', elementId: 'gen_vid_water_intro', prompt: 'Observe liquid water poured into two containers, no vapor or particles.' }],
++    } as SceneOutline;
++    await generateWidgetContent(outline, call, '', { textbookPromptProfile: 'textbook-v1' });
++    expect(call).toHaveBeenCalledTimes(1);
++    expect(call.mock.calls[0][1]).toContain('gen_vid_water_intro');
++    expect(call.mock.calls[0][1]).toContain('no vapor or particles');
++    expect(call.mock.calls[0][1]).toContain('literal HTML src attribute');
++  });
++});

@@ -2250,6 +2250,7 @@ def _json_dict(value: object) -> dict:
 
 
 def _report_summary(rows: list[dict], events: list[dict]) -> dict:
+    rows = [row for row in rows if row.get('learning_slot') != 'weekend_review']
     total = len(rows)
     completed = sum(1 for row in rows if row.get("status") in REPORT_DONE_STATUSES)
     pending = sum(1 for row in rows if row.get("status") in REPORT_PENDING_STATUSES)
@@ -2287,6 +2288,7 @@ def _build_report_payload(
     learning: dict | None = None,
     skill_maps: list[dict] | None = None,
 ) -> dict:
+    rows = [row for row in rows if row.get('learning_slot') != 'weekend_review']
     task_total = int(summary["total"])
     task_completed = int(summary["completed"])
     pending_items = int(summary["pending"])
@@ -2417,6 +2419,7 @@ def _positive_task_sentence(row: dict) -> str:
 
 
 def _report_improvements(rows: list[dict], summary: dict, *, is_weekly: bool) -> list[dict]:
+    rows = [row for row in rows if row.get('learning_slot') != 'weekend_review']
     trouble_rows = [
         row
         for row in rows

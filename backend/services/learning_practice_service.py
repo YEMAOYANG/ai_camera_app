@@ -263,6 +263,16 @@ class LearningPracticeService:
             feedback = {'questionId': item['question_id'], 'correct': correct, 'status': evaluated['status'],
                 'message': '答对啦！' if correct else '这次还差一点，回想一下老师的示范。',
                 'explanation': str(question.get('explanation') or ''), 'evaluatorVersion': self.evaluator.version}
+            from services.learning_evidence_service import enabled, record_course_answers
+            if enabled():
+                origin = question.get('practiceSource') or {}
+                source = conn.execute('SELECT * FROM learning_courses WHERE id=? AND version=?',
+                    (origin.get('courseId'), origin.get('courseVersion'))).fetchone()
+                if source:
+                    record_course_answers(conn, session, dict(source), [question],
+                        [{'questionId': question['id'], 'answer': data['response'], 'correct': correct,
+                          'attemptNumber': 1, 'answeredAt': self.clock(), 'hintUsed': False,
+                          'adultHelp': None, 'independent': None}], self.clock(), source_kind='practice')
             self.repository.answer(conn, session=session, item=item, response_sha256=response_hash, feedback=feedback, now=self.clock())
             current = self._session(conn, principal, session_id, grade, revision)
             return {**self._view(conn, current), 'evaluation': feedback}

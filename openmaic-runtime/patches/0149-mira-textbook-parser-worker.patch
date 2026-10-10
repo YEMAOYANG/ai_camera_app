@@ -1,0 +1,91 @@
+diff --git a/lib/server/mira-textbook-batch-generation.ts b/lib/server/mira-textbook-batch-generation.ts
+--- a/lib/server/mira-textbook-batch-generation.ts
++++ b/lib/server/mira-textbook-batch-generation.ts
+@@ -1,4 +1,6 @@
+-import { parseHTML } from 'linkedom';
++// The worker entry is pure JS: the main DOM entry pulls optional native canvas
++// into the Next server bundle even though validation never renders a canvas.
++import { parseHTML } from 'linkedom/worker';
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import { createHash } from 'node:crypto';
+diff --git a/tests/server/textbook-parser-webpack.test.ts b/tests/server/textbook-parser-webpack.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/textbook-parser-webpack.test.ts
+@@ -0,0 +1,75 @@
++import { execFile } from 'node:child_process';
++import { promises as fs } from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { promisify } from 'node:util';
++import { describe, expect, it } from 'vitest';
++
++const execute = promisify(execFile);
++
++describe('textbook HTML parser in the production webpack runtime', () => {
++  it('bundles the worker entry with Next webpack and parses SVG, canvas and cues without native canvas', async () => {
++    const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-parser-webpack-'));
++    try {
++      const entry = path.join(directory, 'entry.mjs');
++      const bundle = path.join(directory, 'bundle.cjs');
++      const script = path.join(directory, 'compile.cjs');
++      const helper = await fs.readFile(
++        path.join(process.cwd(), 'lib/server/mira-textbook-batch-generation.ts'),
++        'utf8',
++      );
++      const parserImport = helper.match(/import \{ parseHTML \} from ['"]([^'"]+)['"]/);
++      expect(parserImport).not.toBeNull();
++      await fs.writeFile(
++        entry,
++        `import { parseHTML } from ${JSON.stringify(parserImport![1])};
++        const { document } = parseHTML('<html><body><canvas id="scene"></canvas><svg><circle r="4"/></svg><script type="application/json" id="mira-narration-cues">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"intro","text":"看一看球。"}]}</script></body></html>');
++        export const result = { canvas: document.querySelectorAll('canvas').length,
++          circles: document.querySelectorAll('svg circle').length,
++          cue: JSON.parse(document.querySelector('#mira-narration-cues').textContent).cues[0].id };`,
++      );
++      await fs.writeFile(
++        script,
++        `const { createRequire } = require('node:module');
++        const requireFromApp = createRequire(${JSON.stringify(path.join(process.cwd(), 'package.json'))});
++        const { webpack } = requireFromApp('next/dist/compiled/webpack/webpack');
++        const compiler = webpack({ mode: 'production', target: 'node', cache: false,
++          entry: ${JSON.stringify(entry)},
++          resolve: { modules: [${JSON.stringify(path.join(process.cwd(), 'node_modules'))}, 'node_modules'] },
++          optimization: { minimize: false },
++          output: { path: ${JSON.stringify(directory)}, filename: 'bundle.cjs', library: { type: 'commonjs2' } } },
++          (error, stats) => {
++            if (error || stats.hasErrors()) {
++              console.error(error || JSON.stringify(stats.toJson({ all: false, errors: true }).errors));
++              process.exitCode = 1;
++              compiler.close(() => {});
++              return;
++            }
++            const names = [];
++            function collect(modules) { for (const item of modules || []) {
++              names.push(item.name || ''); collect(item.modules);
++            } }
++            collect(stats.toJson({ all: false, modules: true, nestedModules: true }).modules);
++            compiler.close(closeError => {
++              if (closeError) throw closeError;
++              console.log(JSON.stringify({ result: require(${JSON.stringify(bundle)}).result,
++                workerBundled: names.some(name => name.includes('linkedom/worker.js')),
++                nativeCanvasBundled: names.some(name => /canvas\\.node|commonjs\\/canvas\\.cjs|node_modules\\/canvas\\//.test(name)) }));
++            });
++          });`,
++      );
++      const { stdout } = await execute(process.execPath, [script], {
++        cwd: process.cwd(),
++        timeout: 30_000,
++        maxBuffer: 256 * 1024,
++      });
++      expect(JSON.parse(stdout)).toEqual({
++        result: { canvas: 1, circles: 1, cue: 'intro' },
++        workerBundled: true,
++        nativeCanvasBundled: false,
++      });
++    } finally {
++      await fs.rm(directory, { recursive: true, force: true });
++    }
++  }, 30_000);
++});

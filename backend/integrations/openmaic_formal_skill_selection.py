@@ -52,11 +52,18 @@ def _matches(nodes: list[tuple[str, str]], expression: str) -> list[str]:
 
 
 def select_formal_skills(*, teaching_brief: object, grade_boundary: object,
-                        grade_boundary_sha256: object) -> dict[str, Any]:
+                        grade_boundary_sha256: object,
+                        model_policy_id: object = None) -> dict[str, Any]:
     boundary = _mapping(grade_boundary)
-    if (set(boundary) != {"gradeCode", "subject", "curriculumVersion", "boundaryVersion", "skillId",
+    if model_policy_id not in (None, "deepseek-v4.1-flash-candidate-v1"):
+        raise ValueError("formal skill model policy is invalid")
+    candidate = model_policy_id == "deepseek-v4.1-flash-candidate-v1"
+    expected_keys = {"gradeCode", "subject", "curriculumVersion", "boundaryVersion", "skillId",
                          "skillTitle", "learningObjectives", "allowedContent", "excludedContent",
                          "prerequisiteSkills", "language", "estimatedMinutes"}
+    if candidate:
+        expected_keys.add("constraints")
+    if (set(boundary) != expected_keys
             or not isinstance(boundary["gradeCode"], str) or not re.fullmatch(r"primary_[1-6]", boundary["gradeCode"])
             or boundary["subject"] not in ("math", "chinese", "english")
             or any(not _text(boundary[key]) for key in ("curriculumVersion", "boundaryVersion", "skillId", "skillTitle"))
@@ -71,6 +78,17 @@ def select_formal_skills(*, teaching_brief: object, grade_boundary: object,
     teach = _mapping(_mapping(lesson.get("teachingFlow")).get("teach"))
     questions = lesson.get("questions")
     progressive = brief.get("schemaVersion") == "mira.learning.formal-runtime-teaching-brief.progressive.v1"
+    if candidate:
+        from integrations.openmaic_formal_pedagogy import registered_grade_boundary
+        from content.progressive_difficulty_policy import progressive_difficulty_policy
+        from services.progressive_course_generation import lesson_binding
+        registered = registered_grade_boundary(grade_code=boundary["gradeCode"], subject=boundary["subject"],
+            skill_id=boundary["skillId"], structured_constraints=True)
+        if (not progressive or dict(boundary) != registered
+                or brief.get("progressiveLesson") != lesson_binding(boundary["skillId"])
+                or brief.get("difficultyPolicy") != progressive_difficulty_policy(boundary["gradeCode"],
+                    boundary["subject"], boundary["skillId"], course.get("difficultyCode", "basic"))):
+            raise ValueError("formal skill structured lesson constraints are invalid")
     question_count_valid = (isinstance(questions, list) and (
         (not questions if lesson.get("assessmentMode") == "observed" else 6 <= len(questions) <= 14)
         if progressive else len(questions) == 5

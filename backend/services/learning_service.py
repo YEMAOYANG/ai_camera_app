@@ -684,6 +684,8 @@ class LearningService:
                 can_retry = False
                 hint_level = 0
 
+            from services.learning_evidence_service import record_course_answers
+            record_course_answers(conn, session, course, questions, answers[-1:], now)
             completed = next_index >= len(questions)
             session = self.repository.update_session(
                 conn,
@@ -828,6 +830,8 @@ class LearningService:
         if correct:
             correct_count += 1
         next_index = index + 1
+        from services.learning_evidence_service import record_course_answers
+        record_course_answers(conn, session, course, questions, answers[-1:], now)
         questions_complete = next_index >= len(questions)
         updated = self.repository.update_session(
             conn,

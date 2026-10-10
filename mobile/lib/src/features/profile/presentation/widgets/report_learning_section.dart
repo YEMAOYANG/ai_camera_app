@@ -1,3 +1,5 @@
+import 'package:go_router/go_router.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
 import 'package:flutter/material.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/profile/domain/report_learning_models.dart';
@@ -19,32 +21,47 @@ class ReportLearningSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.auto_stories_outlined,
-                  color: AppColors.brandDeep,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    '课程学习 · ${learning.lessonCount} 节',
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.ink,
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => context.push(learningCenterPath),
+                child: const Text('薄弱点与复习安排'),
+              ),
+            ),
+            if (learning.homeworkProgress case final progress?
+                when progress.submissionCount > 0) ...[
+              _HomeworkProgress(progress: progress),
+              if (learning.lessons.isNotEmpty)
+                const Divider(height: 24, color: AppColors.border),
+            ],
+            if (learning.lessons.isNotEmpty) ...[
+              Row(
+                children: [
+                  const Icon(
+                    Icons.auto_stories_outlined,
+                    color: AppColors.brandDeep,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      '课程学习 · ${learning.lessonCount} 节',
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              learning.needsSupportCount > 0
-                  ? '${learning.needsSupportCount} 节需要您留意，展开查看具体帮助方式。'
-                  : '先看孩子的独立表现，再决定是否需要辅导。',
-              style: _secondary,
-            ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                learning.needsSupportCount > 0
+                    ? '${learning.needsSupportCount} 节需要您留意，展开查看具体帮助方式。'
+                    : '先看孩子的独立表现，再决定是否需要辅导。',
+                style: _secondary,
+              ),
+            ],
             if (learning.reviewCount > 0)
               Text('本期完成 ${learning.reviewCount} 次间隔复习', style: _secondary),
             if ((learning.coachingSummary['recordedSessions'] as num? ?? 0) >
@@ -71,6 +88,69 @@ class ReportLearningSection extends StatelessWidget {
       ),
     );
   }
+}
+
+class _HomeworkProgress extends StatelessWidget {
+  const _HomeworkProgress({required this.progress});
+  final ReportHomeworkProgress progress;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text(
+        '作业订正 · ${progress.submissionCount} 份',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      const SizedBox(height: 6),
+      const Text('本期关联作业的当前订正进度', style: _secondary),
+      if (progress.total > 0) ...[
+        Text(
+          '需订正 ${progress.total} 题 · 已订正 ${progress.corrected} 题',
+          style: _body,
+        ),
+        if (progress.selfReportedCompleted > 0)
+          Text(
+            '自行完成，未复测 ${progress.selfReportedCompleted} 题',
+            style: _secondary,
+          ),
+        Text(
+          '正在订正 ${progress.inProgress} 题 · 尚未开始 ${progress.notStarted} 题',
+          style: _secondary,
+        ),
+      ] else
+        const Text('暂无已确认需订正的题目，批改结果可在详情查看', style: _body),
+      if (progress.assisted > 0)
+        Text('有 ${progress.assisted} 题已查看提示、解析或老师指导', style: _secondary),
+      if (progress.needsReview > 0)
+        Text('另有 ${progress.needsReview} 题批改待核实，未计为错题', style: _secondary),
+      const SizedBox(height: 6),
+      const Text(
+        '原题订正和查看指导不能证明独立掌握，课程独立表现另外记录。此处显示当前进度，不回填为本期完成成绩。',
+        style: _secondary,
+      ),
+      for (final entry in progress.entries)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            '${entry.childName.isEmpty ? '' : '${entry.childName} · '}${entry.title}',
+          ),
+          subtitle: Text(
+            entry.total > 0
+                ? '已订正 ${entry.corrected}/${entry.total} 题'
+                      '${entry.selfReportedCompleted > 0 ? ' · 自行完成，未复测 ${entry.selfReportedCompleted} 题' : ''}'
+                      '${entry.needsReview > 0 ? ' · 待核实 ${entry.needsReview} 题' : ''}'
+                : entry.needsReview > 0
+                ? '批改待核实 ${entry.needsReview} 题'
+                : '暂无需订正的题目，查看批改结果',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.push(
+            '$homeworkDetailPath/${Uri.encodeComponent(entry.submissionId)}',
+          ),
+        ),
+    ],
+  );
 }
 
 const _secondary = TextStyle(

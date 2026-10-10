@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "mira.learning.review-policy.v1",
+  "targetSeconds": 600,
+  "maximumSeconds": 720,
+  "maximumQuestions": 10,
+  "maximumPerKnowledge": 2,
+  "reminderValiditySeconds": 600,
+  "evidenceWindowDays": 42,
+  "defaults": {
+    "weekday": 6,
+    "time": "10:00",
+    "timezone": "Asia/Shanghai",
+    "enabled": true,
+    "reminderEnabled": true,
+    "dailyReminderLimit": 2,
+    "allowedStart": "09:00",
+    "allowedEnd": "20:00",
+    "pausedUntil": null,
+    "revision": 0
+  }
+}

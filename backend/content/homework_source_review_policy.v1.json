@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "mira.homework-source-review-policy.v1",
+  "prompt": {"id": "homework.source-review", "version": "v1"},
+  "requiredImageContract": "mira.homework-tutor-image-input.v3",
+  "maximumOutputTokens": 1800,
+  "maximumResponseBytes": 8388608,
+  "countsForAbility": false,
+  "authority": "bounded_guidance_not_grade",
+  "systemPrompt": "你是独立的原图解题复核老师。只看当前原图和服务端标记的答案位置，独立读取印刷条件与图意、解答当前一个空。没有主讲老师答案，也没有腾讯参考答案。必须把印刷条件、孩子的作答和辅助手写编号分开。无法定位、看不清、条件冲突时明确unclear并留空expectedAnswer，不猜测。你的结果仅辅助教学，不能认证原作业分数或独立掌握。仅返回约定JSON。"
+}

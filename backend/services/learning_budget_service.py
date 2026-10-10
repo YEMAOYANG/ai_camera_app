@@ -12,7 +12,7 @@ import hashlib
 import json
 import re
 
-from content.learning_budget_policy import LearningBudgetPolicy, PURPOSES, UNITS, canonical, digest, units
+from content.learning_budget_policy import LearningBudgetPolicy, SUPPORTED_PURPOSES, COURSE_BUDGET_SUBJECTS, HOMEWORK_SCOPE_FIELDS, UNITS, canonical, digest, units
 from core.errors import ApiError
 from core.security import now_ms
 from repositories.learning_budget_repository import LearningBudgetRepository
@@ -70,12 +70,20 @@ class LearningBudgetService:
     def validate_scope(scope):
         required = {"purpose", "gradeCode", "subject", "courseId", "courseVersion",
                     "userId", "sessionId", "productionJobId", "approvalReference"}
+        if isinstance(scope, dict) and scope.get("purpose") == "homework":
+            required = HOMEWORK_SCOPE_FIELDS
         if not isinstance(scope, dict) or set(scope) != required:
             _fail("invalid_scope", 400)
-        if scope["purpose"] not in PURPOSES or scope["gradeCode"] not in {
+        if scope["purpose"] not in SUPPORTED_PURPOSES or scope["gradeCode"] not in {
             f"primary_{n}" for n in range(1, 7)
-        } or scope["subject"] not in {"chinese", "math", "english"}:
+        } or scope["subject"] not in ({"chinese", "math", "english", "science", "other"} if scope["purpose"] == "homework" else COURSE_BUDGET_SUBJECTS):
             _fail("invalid_scope", 400)
+        if scope["purpose"] == "homework":
+            for field in ("familyId", "childId", "submissionId", "itemId", "approvalReference"):
+                _identifier(scope[field])
+            if type(scope["itemRevision"]) is not int or scope["itemRevision"] < 1:
+                _fail("invalid_scope", 400)
+            return dict(scope)
         for field in ("courseId", "courseVersion", "approvalReference"):
             _identifier(scope[field])
         if scope["purpose"] == "production":
@@ -88,6 +96,46 @@ class LearningBudgetService:
             if scope["productionJobId"] is not None:
                 _fail("teaching_scope_has_production", 400)
         return dict(scope)
+
+    def _homework_scope(self, conn, submission_id, item_id, revision):
+        """Private, consented content authority; no synthetic course/session ids."""
+        _identifier(submission_id)
+        _identifier(item_id)
+        row = conn.execute("SELECT * FROM homework_submissions WHERE id = ?", (submission_id,)).fetchone()
+        item = conn.execute("SELECT * FROM homework_items WHERE id = ? AND submission_id = ?",
+                            (item_id, submission_id)).fetchone()
+        if (row is None or item is None or row["deleted_at"] is not None
+                or not row["consent_at"] or item["revision"] != revision):
+            _fail("homework_scope_changed", 403)
+        result = json.loads(item["result_json"]) if isinstance(item["result_json"], str) else item["result_json"]
+        legacy_activity = result.get("status") == "incorrect" and bool(result.get("answerMode"))
+        tutor_activity = bool(result.get("prompt")) and row.get("source") in {"parent_app", "document_camera"}
+        if not legacy_activity and not tutor_activity:
+            _fail("homework_item_not_teachable", 403)
+        return self.validate_scope({"purpose": "homework", "gradeCode": row["grade_code"],
+            "subject": row["subject"], "familyId": row["family_id"], "childId": row["child_id"],
+            "submissionId": submission_id, "itemId": item_id, "itemRevision": revision,
+            "approvalReference": "homework-consent:" + str(row["consent_at"])})
+
+    def issue_homework_authorization(self, *, submission_id, item_id, revision):
+        if not self.policy.raw["enabled"] or self.policy.raw["authorizationTemplates"].get("homework") is None:
+            return None
+        with self.repository.database.transaction() as conn:
+            scope = self._homework_scope(conn, submission_id, item_id, revision)
+        template = self.policy.raw["authorizationTemplates"]["homework"]
+        if self.policy.raw.get("version") == "published-classroom-homework-budget.v1":
+            identity = digest({"schema": "mira.homework-paid-budget.v1", "scope": scope})
+        else:
+            identity = digest({"schema": "mira.homework-paid-budget.v2", "scope": scope,
+                "template": template,
+                "prices": {key: self.policy.price(key) for key in sorted(template["priceKeys"])}})
+        return self.issue_course_authorization(authorization_id=identity, scope=scope)
+
+    def _revalidate_homework(self, conn, scope):
+        if scope["purpose"] == "homework":
+            current = self._homework_scope(conn, scope["submissionId"], scope["itemId"], scope["itemRevision"])
+            if current != scope:
+                _fail("homework_scope_changed", 403)
 
     def _catalog_production_scope(self, conn, build_item_id, *, expected_grade=None,
                                   expected_subject=None, expected_skill=None,
@@ -176,7 +224,7 @@ class LearningBudgetService:
     def issue_course_authorization(self, *, authorization_id, scope, existing_only=False):
         """Derive all limits/prices from trusted operational policy, never request JSON."""
         scope = self.validate_scope(scope)
-        template = self.policy.raw["authorizationTemplates"][scope["purpose"]]
+        template = self.policy.raw["authorizationTemplates"].get(scope["purpose"])
         if not self.policy.raw["enabled"] or template is None:
             return None
         now = self.clock()
@@ -215,6 +263,9 @@ class LearningBudgetService:
         self._scope_allowed(scope, now)
         with self.repository.locked() as conn:
             self._enabled(conn)
+            if scope["purpose"] not in self.policy.raw["limits"]["purposes"]:
+                _fail("purpose_not_configured", 403)
+            self._revalidate_homework(conn, scope)
             existing = self.repository.authorization(conn, identity)
             if existing is not None:
                 price_scope_matches = existing["price_keys_json"] == canonical(prices)
@@ -238,7 +289,7 @@ class LearningBudgetService:
             if _existing_only:
                 _fail("authorization_required", 403)
             caps = self.policy.raw["limits"]["authorization"]
-            if maximum["calls"] < 1 or (self.policy.aggregate_limits_enabled
+            if maximum["calls"] < 1 or (self.policy.enforces_limits(scope["purpose"])
                     and any(maximum[k] > caps[k] for k in UNITS)):
                 _fail("authorization_limit")
             if scope["purpose"] == "required_teaching":
@@ -305,6 +356,7 @@ class LearningBudgetService:
         if active:
             scope = json.loads(row["scope_json"])
             self._scope_allowed(scope, now)
+            self._revalidate_homework(conn, scope)
             if scope["purpose"] == "production" and scope["courseId"].startswith("catalog-item:"):
                 current, _required = self._catalog_production_scope(conn, scope["productionJobId"])
                 if current != scope:
@@ -320,8 +372,13 @@ class LearningBudgetService:
 
     def _check_capacity(self, conn, authority, scope, requested, now, *, exclude_id=None, check_inflight=True):
         windows = self._windows(now)
-        user_key = _key(scope["userId"]) if scope["userId"] else ""
-        course_key = digest([scope["gradeCode"], scope["subject"], scope["courseId"], scope["courseVersion"]])
+        if scope["purpose"] == "homework":
+            user_key = digest(["homework", scope["familyId"], scope["childId"]])
+            # Per-submission spending survives item edits and new authorizations.
+            course_key = digest(["homework", scope["familyId"], scope["submissionId"]])
+        else:
+            user_key = _key(scope["userId"]) if scope["userId"] else ""
+            course_key = digest([scope["gradeCode"], scope["subject"], scope["courseId"], scope["courseVersion"]])
         rows = self.repository.ledger(conn, since=windows["month"],
             authorization_id=authority["id"], course_key=course_key)
         rows = [r for r in rows if r["id"] != exclude_id and r["state"] != "released"]
@@ -343,11 +400,14 @@ class LearningBudgetService:
         if check_inflight and (inflight + requested["calls"] > inflight_limit
                 or active + requested["calls"] > limits["global"]["maxInflightCalls"]):
             _fail("inflight_limit", 429)
-        if not self.policy.aggregate_limits_enabled:
+        if not self.policy.enforces_limits(scope["purpose"]):
             # Metering-only policy: preserve prices, identity and durable holds;
             # SDK/model technical limits remain at the actual provider boundary.
             return user_key, course_key
-        for package in self.repository.open_authorizations(conn, now):
+        # Global teaching packages only reserve global money when the global
+        # hard-budget mode is enabled. A purpose opt-in must not inherit them.
+        packages = self.repository.open_authorizations(conn, now) if self.policy.aggregate_limits_enabled else []
+        for package in packages:
             package_scope = json.loads(package["scope_json"])
             if package_scope["purpose"] != "required_teaching" or package["id"] == authority["id"]:
                 continue
@@ -360,22 +420,25 @@ class LearningBudgetService:
                 "course_key": digest([package_scope["gradeCode"], package_scope["subject"],
                     package_scope["courseId"], package_scope["courseVersion"]]),
                 "state": "reserved", "charge_at": package["created_at"], "max_units_json": canonical(remaining)})
+        purpose_limits = limits["purposes"][scope["purpose"]]
+        course_limits = purpose_limits.get("course", limits["course"])
+        user_limits = purpose_limits.get("user", limits["user"])
         checks = [
             ("authorization", json.loads(authority["limits_json"]), lambda r: r["authorization_id"] == authority["id"]),
-            ("course", limits["course"]["lifetime"], lambda r: r["course_key"] == course_key),
+            ("course", course_limits["lifetime"], lambda r: r["course_key"] == course_key),
         ]
         for window, start in windows.items():
             # All unresolved holds survive day/month changes and process restarts.
             def current(r, start=start):
                 return r["state"] in _PENDING or r["charge_at"] >= start
-            checks.extend([
-                ("global_" + window, limits["global"][window], current),
-                ("purpose_" + window, limits["purposes"][scope["purpose"]][window],
-                    lambda r, current=current: current(r) and r["purpose"] == scope["purpose"]),
-            ])
+            if self.policy.aggregate_limits_enabled:
+                checks.append(("global_" + window, limits["global"][window], current))
+            checks.append(("purpose_" + window, purpose_limits[window],
+                lambda r, current=current: current(r) and r["purpose"] == scope["purpose"]))
             if user_key:
-                checks.append(("user_" + window, limits["user"][window],
-                    lambda r, current=current: current(r) and r["user_key"] == user_key))
+                checks.append(("user_" + window, user_limits[window],
+                    lambda r, current=current: current(r) and r["user_key"] == user_key
+                    and (self.policy.aggregate_limits_enabled or r["purpose"] == scope["purpose"])))
         for name, maximum, applies in checks:
             consumed = dict.fromkeys(UNITS, 0)
             for row in rows:
@@ -416,9 +479,9 @@ class LearningBudgetService:
             if active_prices is not None and price_key not in active_prices:
                 _fail("price_not_authorized", 403)
             price = frozen["prices"][price_key]
-            maximum = self.policy.measure(max_units, price, reservation=True,
-                enforce_per_call_limits=self.policy.aggregate_limits_enabled)
             scope = json.loads(authority["scope_json"])
+            maximum = self.policy.measure(max_units, price, reservation=True,
+                enforce_per_call_limits=self.policy.enforces_limits(scope["purpose"]))
             user_key, course_key = self._check_capacity(conn, authority, scope, maximum, now)
             self.repository.insert_reservation(conn, {
                 "id": identity, "authorization_id": authorization_id, "dispatch_id": dispatch_id,
@@ -536,9 +599,10 @@ class LearningBudgetService:
             ledger = self.repository.authorization_ledger(conn, authorization_id)
             from services.learning_saved_stage_tail_authorization import verified_tail_grant
             tail_grant = verified_tail_grant(conn, authority, self.policy)
+            purpose = json.loads(authority["scope_json"])["purpose"]
             return {"authorizationId": authorization_id,
-                    "purpose": json.loads(authority["scope_json"])["purpose"],
-                    "aggregateLimitsEnabled": self.policy.aggregate_limits_enabled,
+                    "purpose": purpose,
+                    "aggregateLimitsEnabled": self.policy.enforces_limits(purpose),
                     "unsettledReservationCount": sum(row["state"] in _PENDING
                         for row in ledger),
                     "latestProviderDispatchAt": max((int(row["dispatched_at"]) for row in ledger

@@ -1,0 +1,1106 @@
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -60,6 +60,16 @@
+   isExactMiraFormalRuntimeContract,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import { generateMiraFormalProfessionalClassroom } from '@/lib/server/mira-formal-professional-classroom';
++import {
++  assertTextbookBatchActions,
++  assertTextbookBatchContent,
++  assertTextbookBatchOutline,
++  bindTextbookTeacher,
++  createTextbookBatchRecorder,
++  resolveTextbookBatchContext,
++  TextbookBatchContractError,
++  withTextbookBatchContext,
++} from '@/lib/server/mira-textbook-batch-generation';
+ import type { MiraFormalAudioLifecycleReceipt } from '@/lib/server/mira-formal-audio-lifecycle';
+ import type { MiraFormalMediaReceipt } from '@/lib/server/mira-formal-media';
+ import type { MiraFormalVideoReceipt } from '@/lib/server/mira-formal-video';
+@@ -224,6 +234,14 @@
+   },
+ ): Promise<GenerateClassroomResult> {
+   const { requirement, pdfContent } = input;
++  const textbookBatch = resolveTextbookBatchContext(requirement);
++  if (textbookBatch && input.enableTTS) {
++    throw new TextbookBatchContractError('persist_before_bound_teacher_audio');
++  }
++  const textbookRunId = textbookBatch ? nanoid(10) : undefined;
++  const textbookDiagnostics = await createTextbookBatchRecorder(textbookBatch, textbookRunId ?? 'unused');
++  const textbookAiCall = (call: AICallFn, phase: string) => withTextbookBatchContext(call, textbookBatch,
++    textbookDiagnostics ? response => textbookDiagnostics.save(phase, { rawResponse: response }) : undefined);
+   const miraFormalRuntime = isExactMiraFormalRuntimeContract(input.formalRuntimeContract);
+ 
+   await options.onProgress?.({
+@@ -572,7 +590,7 @@
+       requirements,
+       pdfText,
+       undefined,
+-      aiCall,
++      textbookAiCall(aiCall, 'outlines-raw'),
+       {
+         imageGenerationEnabled: input.enableImageGeneration,
+         videoGenerationEnabled: input.enableVideoGeneration,
+@@ -587,6 +605,9 @@
+     }
+     ({ languageDirective, courseTitle, outlines } = outlinesResult.data);
+   }
++  await textbookDiagnostics?.save('outlines', { languageDirective, courseTitle, outlines });
++  assertTextbookBatchContent('slide', { title: courseTitle }, textbookBatch);
++  for (const outline of outlines) assertTextbookBatchOutline(outline, textbookBatch);
+   log.info(
+     `Generated ${outlines.length} scene outlines (languageDirective: ${languageDirective}, courseTitle: ${courseTitle ?? 'n/a'})`,
+   );
+@@ -608,7 +629,8 @@
+     log.info('Generating custom agent profiles via LLM...');
+     try {
+       const agentProfilesCall = await getAgentProfilesAiCall();
+-      agents = await generateAgentProfiles(requirement, languageDirective, agentProfilesCall);
++      agents = await generateAgentProfiles(requirement, languageDirective,
++        textbookAiCall(agentProfilesCall, 'agent-profiles-raw'));
+       log.info(`Generated ${agents.length} agent profiles`);
+     } catch (e) {
+       log.warn('Agent profile generation failed, falling back to defaults:', e);
+@@ -617,9 +639,10 @@
+   } else {
+     agents = getDefaultAgents();
+   }
++  agents = bindTextbookTeacher(agents, textbookBatch);
+   const miraTtsPolicy = getMiraTtsPolicy();
+ 
+-  const stageId = nanoid(10);
++  const stageId = textbookRunId ?? nanoid(10);
+   const stage: Stage = {
+     id: stageId,
+     name: courseTitle || outlines[0]?.title || requirement.slice(0, 50),
+@@ -632,19 +655,24 @@
+     // For LLM-generated agents, embed full configs so the client can
+     // hydrate the agent registry without prior IndexedDB data.
+     // For default agents, just record IDs — the client already has them.
+-    ...(miraSampleStructuralPlan || agentMode === 'generate'
++    ...(textbookBatch || miraSampleStructuralPlan || agentMode === 'generate'
+       ? {
+           generatedAgentConfigs: agents.map((a, i) => {
+-            const voiceConfig = getMiraTeacherVoiceConfig(a.role, miraTtsPolicy);
++            const batchTeacher = a.role === 'teacher' ? textbookBatch?.teacher : undefined;
++            const voiceConfig = batchTeacher ? {
++              providerId: batchTeacher.tts.providerId, modelId: batchTeacher.tts.modelId,
++              voiceId: batchTeacher.voiceId,
++            } : getMiraTeacherVoiceConfig(a.role, miraTtsPolicy);
+             return {
+               id: a.id,
+-              name: getMiraTeacherName(a.role, a.name, miraTtsPolicy),
++              name: batchTeacher?.teacherName ?? getMiraTeacherName(a.role, a.name, miraTtsPolicy),
+               role: a.role,
+               persona: a.persona || '',
+-              avatar: AGENT_DEFAULT_AVATARS[i % AGENT_DEFAULT_AVATARS.length],
++              avatar: batchTeacher?.avatarPath ?? AGENT_DEFAULT_AVATARS[i % AGENT_DEFAULT_AVATARS.length],
+               color: AGENT_COLOR_PALETTE[i % AGENT_COLOR_PALETTE.length],
+               priority: a.role === 'teacher' ? 10 : a.role === 'assistant' ? 7 : 5,
+               ...(voiceConfig ? { voiceConfig } : {}),
++              ...(batchTeacher ? { teacherProfile: batchTeacher.teacherProfile } : {}),
+             };
+           }),
+         }
+@@ -698,7 +726,8 @@
+         return await withGenerationRetry(
+           async (attempt) => {
+             contentCall.beginAttempt(attempt);
+-            const result = await generateSceneContent(safeOutline, contentCall.aiCall, {
++            const result = await generateSceneContent(safeOutline,
++              textbookAiCall(contentCall.aiCall, `scene-${index + 1}-content-raw`), {
+               agents,
+               languageDirective,
+               allowProceduralSkill: vocationalActive,
+@@ -718,7 +747,10 @@
+             if (result !== null) return result;
+ 
+             const metadata = contentCall.getLastAttemptMetadata();
+-            if (!isStructuredOutputExhaustedAfterParseFailure(metadata)) return result;
++            if (!isStructuredOutputExhaustedAfterParseFailure(metadata)) {
++              if (textbookBatch) throw new TextbookBatchContractError('scene_content_failed');
++              return result;
++            }
+ 
+             // A conclusively exhausted call may be retried once at the current
+             // scene.  The second exhaustion is terminal, so this never turns
+@@ -741,14 +773,17 @@
+       }
+     })();
+     if (!content) {
++      if (textbookBatch) throw new TextbookBatchContractError('scene_content_failed');
+       log.warn(`Skipping scene "${safeOutline.title}" — content generation failed`);
+       continue;
+     }
++    await textbookDiagnostics?.save(`scene-${index + 1}-content`, { outline: safeOutline, content });
++    assertTextbookBatchContent(safeOutline.type, content, textbookBatch);
+ 
+     const actionsAiCall = await getSceneActionsAiCall();
+     const generatedActions = await withGenerationRetry(
+       () =>
+-        generateSceneActions(safeOutline, content, actionsAiCall, {
++        generateSceneActions(safeOutline, content, textbookAiCall(actionsAiCall, `scene-${index + 1}-actions-raw`), {
+           agents,
+           languageDirective,
+         }),
+@@ -760,10 +795,13 @@
+     const actions = miraSampleStructuralPlan
+       ? ensureMiraSampleSceneActions(safeOutline, content, generatedActions)
+       : generatedActions;
++    await textbookDiagnostics?.save(`scene-${index + 1}-actions`, { outline: safeOutline, actions });
++    assertTextbookBatchActions(actions, textbookBatch);
+     log.info(`Scene "${safeOutline.title}": ${actions.length} actions`);
+ 
+     const sceneId = createSceneWithActions(safeOutline, content, actions, api);
+     if (!sceneId) {
++      if (textbookBatch) throw new TextbookBatchContractError('scene_creation_failed');
+       log.warn(`Skipping scene "${safeOutline.title}" — scene creation failed`);
+       continue;
+     }
+@@ -803,8 +841,15 @@
+       replaceMediaPlaceholders(scenes, mediaMap);
+       log.info(`Media generation complete: ${Object.keys(mediaMap).length} files`);
+     } catch (err) {
++      if (textbookBatch) throw new TextbookBatchContractError('media_generation_failed');
+       log.warn('Media generation phase failed, continuing:', err);
+     }
++  }
++
++  await textbookDiagnostics?.save('classroom-before-final-guard', { stage, scenes });
++  for (const scene of scenes) {
++    assertTextbookBatchContent(scene.type, scene.content, textbookBatch, true);
++    assertTextbookBatchActions(scene.actions, textbookBatch);
+   }
+ 
+   // Phase: TTS generation
+diff --git a/lib/server/mira-textbook-batch-generation.ts b/lib/server/mira-textbook-batch-generation.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-textbook-batch-generation.ts
+@@ -0,0 +1,435 @@
++import { parseHTML } from 'linkedom';
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import { createHash } from 'node:crypto';
++import type { AICallFn, AgentInfo, SceneOutline } from '@openmaic/generation';
++
++export const TEXTBOOK_BATCH_MARKER = 'MIRA_TEXTBOOK_BATCH_V2';
++
++export interface TextbookBatchContext {
++  schemaVersion: 'mira.textbook.batch-context.v2';
++  taskId: string;
++  kind: string;
++  gradeCode: string;
++  subject: string;
++  binding: Record<string, unknown>;
++  directoryComplete: boolean;
++  teacher: {
++    teacherName: string;
++    avatarPath: string;
++    voiceId: string;
++    teacherProfile: { id: string; version: number; contentHash: string };
++    tts: { providerId: string; modelId: string; fallbackAllowed: false };
++  };
++  /** Exact operator-frozen requirement, never an outline-generated summary. */
++  requirement: string;
++}
++
++export class TextbookBatchContractError extends Error {
++  readonly isRetryable = false;
++  constructor(code: string) {
++    super(`MIRA_TEXTBOOK_BATCH_CONTRACT:${code}`);
++    this.name = 'TextbookBatchContractError';
++  }
++}
++
++function check(value: unknown, code: string): asserts value {
++  if (!value) throw new TextbookBatchContractError(code);
++}
++function record(value: unknown): value is Record<string, unknown> {
++  return typeof value === 'object' && value !== null && !Array.isArray(value);
++}
++function nonempty(value: unknown): value is string {
++  return typeof value === 'string' && value.trim().length > 0;
++}
++
++/** An ordinary requirement mentioning the marker in prose does not opt in. */
++export function resolveTextbookBatchContext(requirement: string): TextbookBatchContext | null {
++  const lines = requirement.split(/\r?\n/);
++  const markers = lines.flatMap((line, index) => (line === TEXTBOOK_BATCH_MARKER ? [index] : []));
++  if (!markers.length) return null;
++  check(markers.length === 1 && markers[0] === 0, 'marker_invalid');
++  let context: unknown;
++  try {
++    context = JSON.parse(lines[1]);
++  } catch {
++    throw new TextbookBatchContractError('context_json');
++  }
++  check(
++    record(context) && context.schemaVersion === 'mira.textbook.batch-context.v2',
++    'context_schema',
++  );
++  check(nonempty(context.taskId) && /^[a-f0-9]{64}$/.test(context.taskId), 'task_identity');
++  check(
++    ['book_exploration', 'unit_guide', 'lesson_courseware'].includes(String(context.kind)),
++    'kind',
++  );
++  check(record(context.binding), 'binding');
++  check(
++    nonempty(context.gradeCode) && context.gradeCode === context.binding.gradeCode,
++    'grade_binding',
++  );
++  check(
++    nonempty(context.subject) && context.subject === context.binding.subject,
++    'subject_binding',
++  );
++  for (const field of ['editionId', 'revisionId', 'schoolSystem', 'volume']) {
++    check(nonempty(context.binding[field]), `binding_${field}`);
++  }
++  check(typeof context.directoryComplete === 'boolean', 'directory_complete');
++  const frozenLine = lines.indexOf('冻结任务书：');
++  check(frozenLine >= 2, 'frozen_scope_missing');
++  let frozen: unknown;
++  try {
++    frozen = JSON.parse(lines[frozenLine + 1]);
++  } catch {
++    throw new TextbookBatchContractError('frozen_scope_json');
++  }
++  check(record(frozen) && record(frozen.binding), 'frozen_scope');
++  const binding = context.binding;
++  const frozenBinding = frozen.binding;
++  const bindingKeys = Object.keys(binding).sort();
++  check(
++    bindingKeys.join('|') === Object.keys(frozenBinding).sort().join('|') &&
++      bindingKeys.every((key) => binding[key] === frozenBinding[key]) &&
++      context.kind === frozen.kind &&
++      context.directoryComplete === frozen.directoryComplete,
++    'frozen_binding_mismatch',
++  );
++  const teacher = context.teacher;
++  check(
++    record(teacher) &&
++      nonempty(teacher.teacherName) &&
++      nonempty(teacher.avatarPath) &&
++      nonempty(teacher.voiceId),
++    'teacher',
++  );
++  check(
++    record(teacher.teacherProfile) &&
++      nonempty(teacher.teacherProfile.id) &&
++      Number.isInteger(teacher.teacherProfile.version) &&
++      Number(teacher.teacherProfile.version) > 0 &&
++      typeof teacher.teacherProfile.contentHash === 'string' &&
++      /^[a-f0-9]{64}$/.test(teacher.teacherProfile.contentHash),
++    'teacher_profile',
++  );
++  check(
++    record(teacher.tts) &&
++      teacher.tts.providerId === 'qwen-tts' &&
++      teacher.tts.modelId === 'qwen3-tts-flash' &&
++      teacher.tts.fallbackAllowed === false,
++    'teacher_voice',
++  );
++  return { ...context, requirement } as unknown as TextbookBatchContext;
++}
++
++const STRICT_RULES = `教材批次生成的强制契约（优先于任何通用模板）：
++完整冻结任务书中的学段、年级、科目、学制、册次、版本、修订及真实目录始终适用；不得靠 outline 摘要替代。
++只生成学生可见的教学内容。版权/来源审核、待审核说明、草稿/发布状态、模型或工程质量报告只在后端，不得做课件页或教师台词。
++禁止 speechSynthesis、SpeechSynthesisUtterance、浏览器或系统语音 fallback，禁止 emoji 承载题意/答案。
++互动内所有有限状态指令、提示、反馈必须登记为 <script type="application/json" id="mira-narration-cues">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"intro","text":"老师的完整短句"}]}</script>。
++只通过 window.miraNarrate('固定cue-id') 请求预录老师配音；不定义/覆写/别名 miraNarrate，不临时拼接朗读文本。不自己播放临时TTS。配音由后处理生成，未配音仍是私有草稿。
++一二年级指令和操作不依赖识字：游戏/模拟至少两个 data-mira-picture-choice="稳定ID" 容器，各含可区分的真实 SVG图形/图片/canvas；装饰背景、emoji、图A/B/C文字不算图片。3D探索可用实际canvas/SVG，仍有显式语音cue和大触点。
++低年级 quiz 每题须有有效 visual 及每个选项独立且不同的 optionVisuals；不能保证真多图就用图画互动，不生成quiz。禁止 short_answer。
++互动保留原生 window.addEventListener('message', ...) 协议，读取 event.data.type：SET_WIDGET_STATE 读取顶层 state，HIGHLIGHT_ELEMENT 读取顶层 target；不是 action/payload。有限状态与 cueId 绑定，点击、重置及外部SET_WIDGET_STATE共用更新路径。
++只允许 slide/interactive/quiz 场景；不得用独立 PBL 多轮流程绕过教材约束。`;
++
++export function withTextbookBatchContext(
++  aiCall: AICallFn,
++  context: TextbookBatchContext | null,
++  recordResponse?: (response: string) => Promise<void>,
++): AICallFn {
++  if (!context) return aiCall;
++  return async (system, user, images) => {
++    const response = await aiCall(
++      `${system}\n\n${STRICT_RULES}\n\n<exact-frozen-textbook-requirement>\n${context.requirement}\n</exact-frozen-textbook-requirement>`,
++      user,
++      images,
++    );
++    await recordResponse?.(response);
++    return response;
++  };
++}
++
++/** Private raw results survive parsing/quality rejection; never a classroom URL. */
++export async function createTextbookBatchRecorder(
++  context: TextbookBatchContext | null,
++  runId: string,
++  root = path.join(process.cwd(), 'data', 'textbook-batch-diagnostics'),
++) {
++  if (!context) return null;
++  check(/^[a-zA-Z0-9_-]+$/.test(runId), 'diagnostic_run_identity');
++  const directory = path.join(root, context.taskId, runId);
++  await fs.mkdir(path.dirname(directory), { recursive: true, mode: 0o700 });
++  await fs.mkdir(directory, { mode: 0o700 });
++  let sequence = 0;
++  const save = async (phase: string, value: unknown) => {
++    check(/^[a-zA-Z0-9_-]+$/.test(phase), 'diagnostic_phase');
++    const raw = JSON.stringify(value);
++    const receipt = {
++      schemaVersion: 'mira.textbook.private-generation-diagnostic.v1',
++      phase,
++      taskId: context.taskId,
++      runId,
++      createdAt: new Date().toISOString(),
++      valueSha256: createHash('sha256').update(raw).digest('hex'),
++      value,
++    };
++    const file = path.join(directory, `${String(++sequence).padStart(4, '0')}-${phase}.json`);
++    const handle = await fs.open(file, 'wx', 0o600);
++    try {
++      await handle.writeFile(JSON.stringify(receipt));
++      await handle.sync();
++    } finally {
++      await handle.close();
++    }
++  };
++  await save('input', context);
++  return { save };
++}
++
++export function bindTextbookTeacher(
++  agents: AgentInfo[],
++  context: TextbookBatchContext | null,
++): AgentInfo[] {
++  if (!context) return agents;
++  check(agents.filter((agent) => agent.role === 'teacher').length === 1, 'teacher_roster');
++  return agents.map((agent) => ({
++    ...agent,
++    id: `mira-textbook-${context.taskId.slice(0, 12)}-${agent.id}`,
++    ...(agent.role === 'teacher'
++      ? {
++          name: context.teacher.teacherName,
++          persona: `你是${context.teacher.teacherName}，本课${context.gradeCode}年级${context.subject}老师。遵循冻结教材任务书，用图片和简短口语指导。`,
++        }
++      : {}),
++  }));
++}
++
++function lowReading(context: TextbookBatchContext): boolean {
++  return context.gradeCode === 'primary_1' || context.gradeCode === 'primary_2';
++}
++function decoded(text: string): string {
++  return text
++    .replace(/&#(?:x([a-f\d]+)|(\d+));/gi, (all, hex, decimal) => {
++      const code = Number.parseInt(hex ?? decimal, hex ? 16 : 10);
++      return code <= 0x10ffff ? String.fromCodePoint(code) : all;
++    })
++    .replace(/\\u(?:\{([a-f\d]+)\}|([a-f\d]{4}))|\\x([a-f\d]{2})/gi, (all, long, short, byte) => {
++      const code = Number.parseInt(long ?? short ?? byte, 16);
++      return code <= 0x10ffff ? String.fromCodePoint(code) : all;
++    });
++}
++function assertStudentText(value: unknown): void {
++  if (typeof value === 'string') {
++    const text = decoded(value);
++    check(!/speechSynthesis|SpeechSynthesisUtterance/i.test(text), 'browser_tts');
++    check(!/[\p{Extended_Pictographic}\u{1f1e6}-\u{1f1ff}\u20e3]/u.test(text), 'emoji_picture');
++    check(
++      !/待审核|审核说明|版权状态|生成状态|私有草稿|发布门禁|后续制作|模型输出|质量审查|needs[_ -]?review|private draft|rights review|publicationAllowed|MIRA_TEXTBOOK_BATCH_V2|冻结任务书/i.test(
++        text,
++      ),
++      'student_engineering_copy',
++    );
++  } else if (Array.isArray(value)) value.forEach(assertStudentText);
++  else if (record(value)) Object.values(value).forEach(assertStudentText);
++}
++
++export function assertTextbookBatchOutline(
++  outline: SceneOutline,
++  context: TextbookBatchContext | null,
++): void {
++  if (!context) return;
++  check(['slide', 'interactive', 'quiz'].includes(outline.type), 'unsupported_scene_type');
++  assertStudentText([outline.title, outline.description, outline.keyPoints]);
++}
++
++function graphicSignature(element: Element): string {
++  const images = Array.from(element.querySelectorAll('img'));
++  const svg = Array.from(element.querySelectorAll('svg')).filter((node) =>
++    node.querySelector('path,circle,ellipse,rect,polygon,polyline,line,image,use'),
++  );
++  const canvas = Array.from(element.querySelectorAll('canvas'));
++  return [
++    ...images.map((node) => node.getAttribute('src') || ''),
++    ...svg.map((node) => node.innerHTML),
++    ...canvas.map((node) => node.outerHTML),
++  ]
++    .filter(Boolean)
++    .join('|');
++}
++
++function assertInteractive(
++  html: string,
++  widgetType: unknown,
++  context: TextbookBatchContext,
++  final: boolean,
++): void {
++  const { document } = parseHTML(html);
++  const manifests = document.querySelectorAll('script#mira-narration-cues');
++  check(
++    manifests.length === 1 && manifests[0].getAttribute('type') === 'application/json',
++    'narration_cues_missing',
++  );
++  let manifest: unknown;
++  try {
++    manifest = JSON.parse(manifests[0].textContent || '');
++  } catch {
++    throw new TextbookBatchContractError('narration_cues_json');
++  }
++  check(
++    record(manifest) &&
++      manifest.schemaVersion === 'mira.interactive.narration-cues.v1' &&
++      Array.isArray(manifest.cues) &&
++      manifest.cues.length > 0,
++    'narration_cues_schema',
++  );
++  const ids = new Set<string>();
++  for (const cue of manifest.cues) {
++    check(
++      record(cue) &&
++        nonempty(cue.id) &&
++        /^[a-zA-Z0-9_-]+$/.test(cue.id) &&
++        nonempty(cue.text) &&
++        !ids.has(cue.id),
++      'narration_cue_invalid',
++    );
++    ids.add(cue.id);
++  }
++  const code = [
++    ...Array.from(document.querySelectorAll('script'))
++      .filter((node) => node !== manifests[0])
++      .map((node) => node.textContent || ''),
++    ...Array.from(document.querySelectorAll('*')).flatMap((node) =>
++      Array.from(node.attributes)
++        .filter((attribute) => /^on/i.test(attribute.name))
++        .map((attribute) => attribute.value),
++    ),
++  ].join('\n');
++  const calls = Array.from(
++    code.matchAll(/window\s*\.\s*miraNarrate\s*\(\s*(['"])([a-zA-Z0-9_-]+)\1\s*\)/g),
++  );
++  check(
++    calls.length > 0 &&
++      (code.match(/miraNarrate/g) || []).length === calls.length &&
++      calls.every((call) => ids.has(call[2])),
++    'narration_call_must_be_fixed_cue',
++  );
++  check(
++    /addEventListener\s*\(\s*['"]message['"]/.test(code) &&
++      /SET_WIDGET_STATE/.test(code) &&
++      /HIGHLIGHT_ELEMENT/.test(code) &&
++      /\.data\b/.test(code) &&
++      /\btype\b/.test(code) &&
++      /\bstate\b/.test(code) &&
++      /\btarget\b/.test(code) &&
++      !/\.(?:action|payload)\b|\{[^{}]*(?:\baction\b|\bpayload\b)[^{}]*\}\s*=\s*\w+\.data/.test(
++        code,
++      ),
++    'widget_message_protocol',
++  );
++  if (lowReading(context)) {
++    if (widgetType === 'visualization3d')
++      check(document.querySelector('canvas,svg'), 'meaningful_picture_missing');
++    else {
++      const choices = Array.from(document.querySelectorAll('[data-mira-picture-choice]'));
++      const signatures = choices.map(graphicSignature);
++      check(
++        choices.length >= 2 &&
++          signatures.every(Boolean) &&
++          new Set(signatures).size === signatures.length,
++        'distinct_picture_choices_missing',
++      );
++    }
++  }
++  if (final)
++    for (const image of document.querySelectorAll('img')) {
++      const src = image.getAttribute('src');
++      check(src && !/^(?:gen_|image_|placeholder)|example\.com/i.test(src), 'media_unresolved');
++    }
++}
++
++function visualSignature(visual: unknown, final: boolean): string {
++  if (!record(visual)) return '';
++  if (visual.kind === 'image' && nonempty(visual.src) && nonempty(visual.alt)) {
++    if (final && /^(?:gen_|image_|placeholder)|example\.com/i.test(visual.src)) return '';
++    return visual.src;
++  }
++  if (visual.kind === 'people' && Array.isArray(visual.members) && visual.members.length) {
++    const images = visual.members.map((member) =>
++      visualSignature({ ...member, kind: 'image' }, final),
++    );
++    return images.every(Boolean) ? images.join('|') : '';
++  }
++  if (visual.kind === 'quantity' && Number.isInteger(visual.count) && Number(visual.count) >= 0)
++    return `quantity:${visual.count}`;
++  return '';
++}
++
++/** Structural rejection only: it never certifies semantic/age/engagement QA. */
++export function assertTextbookBatchContent(
++  type: string,
++  content: unknown,
++  context: TextbookBatchContext | null,
++  final = false,
++): void {
++  if (!context) return;
++  check(record(content), 'scene_content_missing');
++  assertStudentText(content);
++  if (type === 'interactive') {
++    check(nonempty(content.html), 'interactive_html_missing');
++    assertInteractive(content.html, content.widgetType, context, final);
++  }
++  if (type === 'quiz' && lowReading(context)) {
++    check(
++      Array.isArray(content.questions) && content.questions.length > 0,
++      'quiz_questions_missing',
++    );
++    for (const question of content.questions) {
++      check(
++        record(question) &&
++          question.type !== 'short_answer' &&
++          visualSignature(question.visual, final) &&
++          Array.isArray(question.options) &&
++          question.options.length >= 2 &&
++          record(question.optionVisuals),
++        'quiz_pictures_missing',
++      );
++      const optionVisuals = question.optionVisuals;
++      const signatures = question.options.map((option) =>
++        record(option) ? visualSignature(optionVisuals[String(option.value)], final) : '',
++      );
++      check(
++        signatures.every(Boolean) && new Set(signatures).size === signatures.length,
++        'quiz_distinct_option_pictures_missing',
++      );
++    }
++  }
++  if (final) {
++    const inspect = (value: unknown): void => {
++      if (Array.isArray(value)) value.forEach(inspect);
++      else if (record(value)) {
++        if (value.type === 'image' || value.type === 'video')
++          check(
++            nonempty(value.src) && !/^(?:gen_|image_|placeholder)|example\.com/i.test(value.src),
++            'media_unresolved',
++          );
++        Object.values(value).forEach(inspect);
++      }
++    };
++    inspect(content);
++  }
++}
++
++export function assertTextbookBatchActions(
++  actions: unknown,
++  context: TextbookBatchContext | null,
++): void {
++  if (!context) return;
++  assertStudentText(actions);
++  check(
++    Array.isArray(actions) &&
++      actions.some((action) => record(action) && action.type === 'speech' && nonempty(action.text)),
++    'teacher_speech_missing',
++  );
++}
+diff --git a/tests/fixtures/textbook-batch.ts b/tests/fixtures/textbook-batch.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/fixtures/textbook-batch.ts
+@@ -0,0 +1,51 @@
++import { resolveTextbookBatchContext } from '@/lib/server/mira-textbook-batch-generation';
++
++export function textbookRequirement(gradeCode = 'primary_1') {
++  const binding = {
++    editionId: 'pep_math_v1',
++    revisionId: 'rev-1',
++    gradeCode,
++    subject: 'math',
++    schoolSystem: 'six_three',
++    volume: 'upper',
++    unitId: null,
++    nodeId: null,
++  };
++  const context = {
++    schemaVersion: 'mira.textbook.batch-context.v2',
++    taskId: 'a'.repeat(64),
++    kind: 'book_exploration',
++    gradeCode,
++    subject: 'math',
++    binding,
++    directoryComplete: true,
++    teacher: {
++      teacherName: '小数老师',
++      avatarPath: '/avatars/teacher-2.png',
++      voiceId: 'Ethan',
++      teacherProfile: { id: 'math-teacher', version: 1, contentHash: 'b'.repeat(64) },
++      tts: { providerId: 'qwen-tts', modelId: 'qwen3-tts-flash', fallbackAllowed: false },
++    },
++  };
++  return `MIRA_TEXTBOOK_BATCH_V2\n${JSON.stringify(context)}\n目录与教材范围原样保留 SENTINEL-NOT-OUTLINE\n冻结任务书：\n${JSON.stringify({ kind: context.kind, binding, directoryComplete: true })}`;
++}
++
++export function textbookContext(gradeCode = 'primary_1') {
++  return resolveTextbookBatchContext(textbookRequirement(gradeCode))!;
++}
++
++export function textbookInteractive() {
++  return {
++    widgetType: 'game',
++    html: `<html><body>
++    <button data-mira-picture-choice="one" onclick="window.miraNarrate('again')"><svg><circle r="12"/></svg></button>
++    <button data-mira-picture-choice="two" onclick="window.miraNarrate('again')"><svg><circle r="12"/><circle r="8"/></svg></button>
++    <script type="application/json" id="mira-narration-cues">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"intro","text":"请点两颗球。"},{"id":"again","text":"再数一数。"}]}</script>
++    <script>window.miraNarrate('intro');
++    window.addEventListener('message', function(event) {
++      const { type, state, target } = event.data;
++      if (type === 'SET_WIDGET_STATE') document.body.dataset.round = state.round;
++      if (type === 'HIGHLIGHT_ELEMENT') document.querySelector(target).focus();
++    });</script></body></html>`,
++  };
++}
+diff --git a/tests/server/mira-textbook-batch-generation.test.ts b/tests/server/mira-textbook-batch-generation.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-textbook-batch-generation.test.ts
+@@ -0,0 +1,232 @@
++import { promises as fs } from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { createHash } from 'node:crypto';
++import { describe, expect, it, vi } from 'vitest';
++import type { AICallFn } from '@openmaic/generation';
++import {
++  assertTextbookBatchActions,
++  assertTextbookBatchContent,
++  assertTextbookBatchOutline,
++  bindTextbookTeacher,
++  createTextbookBatchRecorder,
++  resolveTextbookBatchContext,
++  TextbookBatchContractError,
++  withTextbookBatchContext,
++} from '@/lib/server/mira-textbook-batch-generation';
++import {
++  textbookContext,
++  textbookInteractive,
++  textbookRequirement,
++} from '@/tests/fixtures/textbook-batch';
++
++describe('opt-in textbook batch generation contract', () => {
++  it('keeps ordinary requirements and AI calls unchanged', async () => {
++    expect(resolveTextbookBatchContext('Explain MIRA_TEXTBOOK_BATCH_V2 to adults')).toBeNull();
++    const call = vi.fn(async () => 'ordinary');
++    expect(withTextbookBatchContext(call, null)).toBe(call);
++    expect(() =>
++      assertTextbookBatchContent('interactive', { html: 'speechSynthesis' }, null),
++    ).not.toThrow();
++  });
++
++  it('rejects malformed markers and grade or revision drift before generation', () => {
++    const requirement = textbookRequirement();
++    expect(() => resolveTextbookBatchContext('MIRA_TEXTBOOK_BATCH_V2\n{}')).toThrow(
++      TextbookBatchContractError,
++    );
++    expect(() => resolveTextbookBatchContext(`intro\n${requirement}`)).toThrow('marker_invalid');
++    expect(() =>
++      resolveTextbookBatchContext(
++        requirement.replace('"gradeCode":"primary_1"', '"gradeCode":"primary_2"'),
++      ),
++    ).toThrow();
++    expect(() =>
++      resolveTextbookBatchContext(
++        requirement.replace('"revisionId":"rev-1"', '"revisionId":"other"'),
++      ),
++    ).toThrow('frozen_binding_mismatch');
++  });
++
++  it('forwards the full exact requirement and images while retaining raw output before parsing', async () => {
++    const context = textbookContext();
++    const call = vi.fn<AICallFn>(async () => '{invalid model JSON');
++    const save = vi.fn(async () => {});
++    const images = [{ id: 'scene', src: 'data:image/png;base64,abc' }];
++    expect(
++      await withTextbookBatchContext(call, context, save)('template', 'outline summary', images),
++    ).toBe('{invalid model JSON');
++    expect(call.mock.calls[0][0]).toContain(context.requirement);
++    expect(call.mock.calls[0][0]).toContain('mira-narration-cues');
++    expect(call.mock.calls[0][1]).toBe('outline summary');
++    expect(call.mock.calls[0][2]).toBe(images);
++    expect(save).toHaveBeenCalledWith('{invalid model JSON');
++  });
++
++  it('binds the frozen teacher without reusing or mutating default registry IDs', () => {
++    const agents = [
++      { id: 'default-1', role: 'teacher', name: 'AI老师' },
++      { id: 'default-2', role: 'assistant', name: '助教' },
++    ];
++    const bound = bindTextbookTeacher(agents, textbookContext());
++    expect(bound[0].name).toBe('小数老师');
++    expect(bound.every((agent) => agent.id.startsWith('mira-textbook-'))).toBe(true);
++    expect(agents[0].id).toBe('default-1');
++    expect(agents[0].name).toBe('AI老师');
++  });
++
++  it('accepts actual distinct SVG choices with a fixed prerecorded narration contract', () => {
++    expect(() =>
++      assertTextbookBatchContent('interactive', textbookInteractive(), textbookContext(), true),
++    ).not.toThrow();
++  });
++
++  it.each([
++    'speechSynthesis.speak(new SpeechSynthesisUtterance("好"))',
++    'window["speechSynthesis"]',
++    '\\u0073peechSynthesis',
++  ])('rejects browser speech even when a cue manifest exists: %s', (source) => {
++    const content = textbookInteractive();
++    content.html += `<script>${source}</script>`;
++    expect(() => assertTextbookBatchContent('interactive', content, textbookContext())).toThrow(
++      'browser_tts',
++    );
++  });
++
++  it.each(['🍎', '&#x1F34E;', '\\u{1F34E}'])(
++    'rejects emoji choices, including encoded glyphs: %s',
++    (emoji) => {
++      const content = textbookInteractive();
++      content.html = content.html.replace('<svg><circle r="12"/></svg>', emoji);
++      expect(() => assertTextbookBatchContent('interactive', content, textbookContext())).toThrow(
++        'emoji_picture',
++      );
++    },
++  );
++
++  it.each([
++    ["window.miraNarrate('intro')", "window.miraNarrate('missing')"],
++    ["window.miraNarrate('intro')", "window.miraNarrate('intro' + round)"],
++    ["window.miraNarrate('intro')", 'window.miraNarrate = function() {};'],
++    ['mira-narration-cues', 'other-cues'],
++  ])('rejects missing, dynamic or overridden narration: %s', (from, to) => {
++    const content = textbookInteractive();
++    content.html = content.html.replace(from, to);
++    expect(() => assertTextbookBatchContent('interactive', content, textbookContext())).toThrow(
++      /narration_/,
++    );
++  });
++
++  it('rejects action/payload messages that the real ActionEngine never sends', () => {
++    const content = textbookInteractive();
++    content.html = content.html
++      .replace('type, state, target', 'action, payload')
++      .replace('event.data', 'event.data.payload');
++    expect(() => assertTextbookBatchContent('interactive', content, textbookContext())).toThrow(
++      'widget_message_protocol',
++    );
++  });
++
++  it('rejects text-only choices and duplicate pictures despite an illustrated background', () => {
++    const content = textbookInteractive();
++    content.html = content.html.replace('<svg><circle r="12"/></svg>', '图A');
++    expect(() => assertTextbookBatchContent('interactive', content, textbookContext())).toThrow(
++      'distinct_picture_choices_missing',
++    );
++    content.html = textbookInteractive().html.replace(
++      '<circle r="12"/><circle r="8"/>',
++      '<circle r="12"/>',
++    );
++    expect(() => assertTextbookBatchContent('interactive', content, textbookContext())).toThrow(
++      'distinct_picture_choices_missing',
++    );
++  });
++
++  it('requires real distinct quiz visuals, not 图A/B labels or short answers', () => {
++    const question = {
++      type: 'single',
++      question: '点两颗球',
++      options: [
++        { value: 'A', label: '图A' },
++        { value: 'B', label: '图B' },
++      ],
++      visual: { kind: 'quantity', count: 2 },
++      optionVisuals: { A: { kind: 'quantity', count: 1 }, B: { kind: 'quantity', count: 2 } },
++    };
++    expect(() =>
++      assertTextbookBatchContent('quiz', { questions: [question] }, textbookContext(), true),
++    ).not.toThrow();
++    expect(() =>
++      assertTextbookBatchContent(
++        'quiz',
++        { questions: [{ ...question, optionVisuals: undefined }] },
++        textbookContext(),
++      ),
++    ).toThrow('quiz_pictures_missing');
++    expect(() =>
++      assertTextbookBatchContent(
++        'quiz',
++        { questions: [{ ...question, type: 'short_answer' }] },
++        textbookContext(),
++      ),
++    ).toThrow('quiz_pictures_missing');
++  });
++
++  it('rejects engineering review copy in slides and teacher speech, but preserves ordinary courses', () => {
++    expect(() =>
++      assertTextbookBatchContent(
++        'slide',
++        { elements: [{ content: '待审核说明与后续制作' }] },
++        textbookContext(),
++      ),
++    ).toThrow('student_engineering_copy');
++    expect(() =>
++      assertTextbookBatchActions([{ type: 'speech', text: '版权状态尚未审核' }], textbookContext()),
++    ).toThrow('student_engineering_copy');
++    expect(() => assertTextbookBatchActions([], textbookContext())).toThrow(
++      'teacher_speech_missing',
++    );
++  });
++
++  it('rejects unsupported PBL routes and unresolved final media without retryable errors', () => {
++    expect(() => assertTextbookBatchOutline({ type: 'pbl' } as never, textbookContext())).toThrow(
++      'unsupported_scene_type',
++    );
++    expect(() =>
++      assertTextbookBatchContent(
++        'slide',
++        { elements: [{ type: 'image', src: 'gen_img_1' }] },
++        textbookContext(),
++        true,
++      ),
++    ).toThrow('media_unresolved');
++    expect(new TextbookBatchContractError('invalid').isRetryable).toBe(false);
++  });
++
++  it('durably retains private raw failures with content hashes, outside classroom storage', async () => {
++    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-batch-diagnostic-'));
++    try {
++      const context = textbookContext();
++      const recorder = await createTextbookBatchRecorder(context, 'run-1', root);
++      await recorder!.save('scene-1-content-raw', { rawResponse: '{bad JSON and speechSynthesis' });
++      const dir = path.join(root, context.taskId, 'run-1');
++      const files = await fs.readdir(dir);
++      const raw = JSON.parse(
++        await fs.readFile(
++          path.join(dir, files.find((file) => file.includes('content-raw'))!),
++          'utf8',
++        ),
++      );
++      expect(raw.value.rawResponse).toBe('{bad JSON and speechSynthesis');
++      expect(raw.valueSha256).toBe(
++        createHash('sha256').update(JSON.stringify(raw.value)).digest('hex'),
++      );
++      expect((await fs.stat(path.join(dir, files[0]))).mode & 0o777).toBe(0o600);
++      await expect(createTextbookBatchRecorder(context, 'run-1', root)).rejects.toMatchObject({
++        code: 'EEXIST',
++      });
++    } finally {
++      await fs.rm(root, { recursive: true, force: true });
++    }
++  });
++});
+diff --git a/tests/server/classroom-generation-textbook-batch.test.ts b/tests/server/classroom-generation-textbook-batch.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/classroom-generation-textbook-batch.test.ts
+@@ -0,0 +1,192 @@
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++import { textbookRequirement } from '@/tests/fixtures/textbook-batch';
++
++const mocks = vi.hoisted(() => ({
++  outlines: vi.fn(),
++  content: vi.fn(),
++  actions: vi.fn(),
++  callLLM: vi.fn(),
++  persist: vi.fn(),
++  media: vi.fn(),
++  save: vi.fn(),
++}));
++vi.mock('@/lib/server/resolve-model', () => ({
++  resolveModel: async () => ({
++    model: { id: 'mock-model' },
++    modelInfo: {},
++    modelString: 'test:model',
++    providerId: 'test',
++    apiKey: '',
++  }),
++}));
++vi.mock('@/lib/ai/providers', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@/lib/ai/providers')>()),
++  isProviderKeyRequired: () => false,
++}));
++vi.mock('@/lib/ai/llm', () => ({ callLLM: mocks.callLLM }));
++vi.mock('@openmaic/generation', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@openmaic/generation')>()),
++  generateSceneOutlinesFromRequirements: mocks.outlines,
++  generateSceneContent: mocks.content,
++  generateSceneActions: mocks.actions,
++}));
++vi.mock('@/lib/server/classroom-storage', () => ({ persistClassroom: mocks.persist }));
++vi.mock('@/lib/server/classroom-media-generation', () => ({
++  generateMediaForClassroom: mocks.media,
++  replaceMediaPlaceholders: () => {},
++  generateTTSForClassroom: vi.fn(),
++}));
++vi.mock('@/lib/server/mira-textbook-batch-generation', async (importOriginal) => ({
++  ...(await importOriginal<typeof import('@/lib/server/mira-textbook-batch-generation')>()),
++  createTextbookBatchRecorder: async (context: unknown) => (context ? { save: mocks.save } : null),
++}));
++vi.mock('@/lib/server/mira-formal-professional-classroom', () => ({
++  generateMiraFormalProfessionalClassroom: vi.fn(),
++}));
++
++const outline = {
++  id: 'scene-1',
++  type: 'slide',
++  title: '看一看球',
++  description: '用真实图画认识球',
++  keyPoints: ['观察'],
++  order: 1,
++};
++
++describe('ordinary classroom pipeline with opt-in textbook context', () => {
++  beforeEach(() => {
++    for (const mock of Object.values(mocks)) mock.mockReset();
++    mocks.save.mockResolvedValue(undefined);
++    mocks.callLLM.mockResolvedValue({ text: '{raw-provider-result}', finishReason: 'stop' });
++    mocks.outlines.mockImplementation(async (_requirements, _pdf, _image, call) => {
++      await call('outlines-template', 'outline-user');
++      return {
++        success: true,
++        data: { courseTitle: '观察球', languageDirective: '用简短中文', outlines: [outline] },
++      };
++    });
++    mocks.content.mockImplementation(async (_outline, call) => {
++      await call('content-template', 'content-user');
++      return { elements: [], remark: '观察球' };
++    });
++    mocks.actions.mockImplementation(async (_outline, _content, call, options) => {
++      await call('actions-template', 'actions-user');
++      return [
++        {
++          id: 'speech-1',
++          type: 'speech',
++          text: '看这颗球，摸一摸。',
++          agentId: options.agents.find((agent: { role: string }) => agent.role === 'teacher').id,
++        },
++      ];
++    });
++    mocks.persist.mockImplementation(async ({ id, stage, scenes }) => ({
++      id,
++      stage,
++      scenes,
++      createdAt: '2026-10-09T00:00:00Z',
++      url: `http://localhost/classroom/${id}`,
++    }));
++    mocks.media.mockResolvedValue({});
++  });
++
++  it('passes the full frozen requirement to all three real pipeline AI boundaries and binds the exact teacher', async () => {
++    const { generateClassroom } = await import('@/lib/server/classroom-generation');
++    const requirement = textbookRequirement();
++    const result = await generateClassroom(
++      { requirement, agentMode: 'default', enableTTS: false },
++      { baseUrl: 'http://localhost' },
++    );
++    expect(mocks.callLLM).toHaveBeenCalledTimes(3);
++    for (const [request] of mocks.callLLM.mock.calls) {
++      expect(request.messages[0].content).toContain(requirement);
++      expect(request.messages[0].content).toContain('mira.interactive.narration-cues.v1');
++    }
++    const teacher = result.stage.generatedAgentConfigs!.find((agent) => agent.role === 'teacher')!;
++    expect(teacher.name).toBe('小数老师');
++    expect(teacher.avatar).toBe('/avatars/teacher-2.png');
++    expect(teacher.voiceConfig).toEqual({
++      providerId: 'qwen-tts',
++      modelId: 'qwen3-tts-flash',
++      voiceId: 'Ethan',
++    });
++    expect(teacher.id).toMatch(/^mira-textbook-/);
++    expect(result.scenes[0].actions![0]).toMatchObject({ agentId: teacher.id });
++    expect(mocks.save.mock.calls.filter(([phase]) => phase.endsWith('-raw'))).toHaveLength(3);
++    expect(mocks.persist).toHaveBeenCalledTimes(1);
++  });
++
++  it('retains rejected raw scene content and stops before actions or persistence, without a paid repeat', async () => {
++    mocks.content.mockImplementation(async (_outline, call) => {
++      await call('content-template', 'content-user');
++      return { elements: [{ content: '待审核说明与后续制作' }] };
++    });
++    const { generateClassroom } = await import('@/lib/server/classroom-generation');
++    await expect(
++      generateClassroom({ requirement: textbookRequirement() }, { baseUrl: 'http://localhost' }),
++    ).rejects.toThrow('student_engineering_copy');
++    expect(mocks.content).toHaveBeenCalledTimes(1);
++    expect(mocks.actions).not.toHaveBeenCalled();
++    expect(mocks.persist).not.toHaveBeenCalled();
++    expect(
++      mocks.save.mock.calls.some(
++        ([phase, data]) =>
++          phase === 'scene-1-content' && data.content.elements[0].content.includes('待审核'),
++      ),
++    ).toBe(true);
++    expect(
++      mocks.save.mock.calls.some(
++        ([phase, data]) =>
++          phase === 'scene-1-content-raw' && data.rawResponse === '{raw-provider-result}',
++      ),
++    ).toBe(true);
++  });
++
++  it('does not silently drop a missing strict scene or save a classroom after media failure', async () => {
++    const { generateClassroom } = await import('@/lib/server/classroom-generation');
++    mocks.content.mockResolvedValueOnce(null);
++    await expect(
++      generateClassroom({ requirement: textbookRequirement() }, { baseUrl: 'http://localhost' }),
++    ).rejects.toThrow('scene_content_failed');
++    expect(mocks.content).toHaveBeenCalledTimes(1);
++    expect(mocks.persist).not.toHaveBeenCalled();
++    mocks.media.mockRejectedValueOnce(new Error('mock media failed'));
++    await expect(
++      generateClassroom(
++        { requirement: textbookRequirement(), enableImageGeneration: true },
++        { baseUrl: 'http://localhost' },
++      ),
++    ).rejects.toThrow('media_generation_failed');
++    expect(mocks.persist).not.toHaveBeenCalled();
++  });
++
++  it('keeps old unmarked courses outside strict checking and the bound teacher roster', async () => {
++    mocks.content.mockResolvedValue({
++      elements: [
++        {
++          type: 'text',
++          id: 'text-1',
++          content: '<p>待审核说明</p>',
++          left: 0,
++          top: 0,
++          width: 100,
++          height: 30,
++          rotate: 0,
++          defaultFontName: '',
++          defaultColor: '#000',
++        },
++      ],
++    });
++    const { generateClassroom } = await import('@/lib/server/classroom-generation');
++    const result = await generateClassroom(
++      { requirement: '普通旧课程' },
++      { baseUrl: 'http://localhost' },
++    );
++    expect(result.stage.generatedAgentConfigs).toBeUndefined();
++    expect(result.stage.agentIds).toContain('default-1');
++    expect(mocks.save).not.toHaveBeenCalled();
++    expect(mocks.persist).toHaveBeenCalledTimes(1);
++    for (const [request] of mocks.callLLM.mock.calls)
++      expect(request.messages[0].content).not.toContain('exact-frozen-textbook-requirement');
++  });
++});

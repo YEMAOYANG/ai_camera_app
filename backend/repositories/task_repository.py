@@ -196,7 +196,7 @@ class TaskRepository:
         if status:
             clauses.append("status = ?")
             values.append(status)
-        return list(
+        rows = list(
             conn.execute(
                 f"""
                 SELECT t.*,
@@ -214,6 +214,7 @@ class TaskRepository:
                 values,
             ).fetchall()
         )
+        return self._without_synthetic_reviews(conn, rows)
 
     def list_scheduler_tasks(
         self,
@@ -221,7 +222,7 @@ class TaskRepository:
         *,
         end_date: str,
     ) -> list[DatabaseRow]:
-        return list(
+        rows = list(
             conn.execute(
                 """
                 SELECT task.*,
@@ -249,6 +250,7 @@ class TaskRepository:
                 ),
             ).fetchall()
         )
+        return self._without_synthetic_reviews(conn, rows)
 
     def list_in_progress_tasks(
         self,
@@ -271,7 +273,7 @@ class TaskRepository:
             else:
                 clauses.append("device_id = ?")
                 values.append(device_id)
-        return list(
+        rows = list(
             conn.execute(
                 f"""
                 SELECT * FROM tasks
@@ -281,6 +283,47 @@ class TaskRepository:
                 values,
             ).fetchall()
         )
+        return self._without_synthetic_reviews(conn, rows)
+
+    @staticmethod
+    def _without_synthetic_reviews(
+        conn: DatabaseConnection, rows: list[DatabaseRow]
+    ) -> list[DatabaseRow]:
+        """Demo review tasks belong only to the dedicated review experience.
+
+        Read the server-owned review type, never a title or client-supplied flag.
+        Keep the task rows available to review transactions while excluding them
+        from ordinary task, current-care and automatic-reminder projections.
+        """
+        excluded: set[tuple[str, str, str]] = set()
+        for offset in range(0, len(rows), 200):
+            task_ids = [row["id"] for row in rows[offset:offset + 200]]
+            try:
+                reviews = conn.execute(
+                    "SELECT family_id, child_id, task_id FROM learning_review_runs "
+                    "WHERE task_type = 'synthetic_review' AND task_id IN ("
+                    + ",".join("?" for _ in task_ids) + ")",
+                    task_ids,
+                ).fetchall()
+            except Exception as exc:
+                # The review feature is optional on databases predating 085.
+                # A missing review table cannot contain demo review tasks.
+                message = str(exc).lower()
+                missing_table = (
+                    (getattr(exc, "args", ()) or (None,))[0] == 1146
+                    and "learning_review_runs" in message
+                ) or "no such table: learning_review_runs" in message
+                if missing_table:
+                    return rows
+                raise
+            excluded.update(
+                (review["family_id"], review["child_id"], review["task_id"])
+                for review in reviews
+            )
+        return [
+            row for row in rows
+            if (row["family_id"], row["child_id"], row["id"]) not in excluded
+        ]
 
     def get_task(
         self,
@@ -304,6 +347,16 @@ class TaskRepository:
             """,
             (family_id, task_id),
         ).fetchone()
+
+    @classmethod
+    def has_active_task(cls, conn: DatabaseConnection, *, family_id: str) -> bool:
+        """Conversation focus policy includes real tasks, including legacy states."""
+        rows = list(conn.execute(
+            "SELECT id, family_id, child_id FROM tasks WHERE family_id = ? "
+            "AND status IN ('in_progress', 'started', 'active')",
+            (family_id,),
+        ).fetchall())
+        return bool(cls._without_synthetic_reviews(conn, rows))
 
     def update_task(
         self,

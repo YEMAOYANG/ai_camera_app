@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SpaceNavigationProvider } from "@/components/student/space-navigation";
 import { SchoolbagMotionProvider } from "@/components/schoolbag/schoolbag-motion";
+import "katex/dist/katex.min.css";
 import "./globals.css";
 import "../styles/space.css";
 import "../styles/space-pages.css";
@@ -16,6 +17,8 @@ import "../styles/space-textbooks.css";
 import "../styles/schoolbag.css";
 import "../styles/schoolbag-motion.css";
 import "../styles/learning-picture-navigation.css";
+import "../styles/learning-review.css";
+import "../styles/learning-homework.css";
 import "../styles/student-ui.css";
 import "../styles/storybook.css";
 import "../styles/buttons.css";

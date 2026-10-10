@@ -1350,6 +1350,14 @@ class _ReportsHubPageState extends ConsumerState<ReportsHubPage> {
       title: '看护报告',
       subtitle: '日报和周报',
       children: [
+        AppListRow(
+          icon: Icons.school_outlined,
+          title: '学习与作业',
+          subtitle: '错题、周末复习与具体薄弱点',
+          onTap: () => context.push(learningCenterPath),
+          trailing: const Icon(Icons.chevron_right),
+        ),
+        const SizedBox(height: 12),
         AppSegmentedControl<int>(
           value: _index,
           semanticLabel: '报告类型',
@@ -5923,7 +5931,8 @@ class _ReportPane extends ConsumerWidget {
 List<Widget> _reportSections(ReportData data) {
   final sections = <Widget>[
     _ReportHero(data: data),
-    if (data.learning.lessons.isNotEmpty)
+    if (data.learning.lessons.isNotEmpty ||
+        (data.learning.homeworkProgress?.submissionCount ?? 0) > 0)
       ReportLearningSection(learning: data.learning),
     if (data.skillMaps.isNotEmpty) ReportGrowthSection(maps: data.skillMaps),
     _ReportSectionBlock(

@@ -1,0 +1,192 @@
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -306,6 +306,10 @@
+ }
+ 
+ export function getMiraFormalGenerationRuntimePolicy() {
++  if (getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) {
++    return { ...MIRA_FORMAL_GENERATION_POLICY,
++      professionalCreation: MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY };
++  }
+   return MIRA_FORMAL_GENERATION_POLICY;
+ }
+ 
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -148,8 +148,8 @@
+   const policyId = input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
+   if (![MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID].includes(policyId))
+     throw new Error('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
+-  const selected = getMiraSelectedModelPolicyId();
+-  if (selected && selected !== policyId) throw new Error('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
++  const selected = getMiraSelectedModelPolicyId() ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  if (selected !== policyId) throw new Error('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
+   return getMiraVerifierModelId(policyId);
+ }
+ 
+--- a/lib/server/mira-formal-learner-discussion-repair.ts
++++ b/lib/server/mira-formal-learner-discussion-repair.ts
+@@ -145,8 +145,8 @@
+ ): Promise<{ scenes: Scene[]; receipt: LearnerDiscussionRepairReceipt }> {
+   const { snapshot, teacher } = validateInput(input, rejectedReview, context);
+   const policyId = input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
+-  const selected = getMiraSelectedModelPolicyId();
+-  if (selected && selected !== policyId) return fail('MODEL_POLICY_MISMATCH');
++  const selected = getMiraSelectedModelPolicyId() ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  if (selected !== policyId) return fail('MODEL_POLICY_MISMATCH');
+   const verifierModelId = getMiraVerifierModelId(policyId);
+   const namespace = `${input.sessionId}:completion`;
+   const paid = paidBudgetContext.getStore();
+--- a/tests/server/mira-formal-teaching-quality.test.ts
++++ b/tests/server/mira-formal-teaching-quality.test.ts
+@@ -180,7 +180,7 @@
+ 
+ async function exhaustedGrantFixture(attemptCount = 3) {
+   const value = input(); const deps = { ...mocks(value), cacheRoot };
+-  const valid = await deps.provider();
++  const valid = await deps.provider({});
+   deps.provider.mockClear();
+   deps.provider.mockResolvedValue({ ...valid, content: '{"invalid":true}' });
+   for (let revision = 1; revision <= attemptCount; revision++) {
+@@ -272,11 +272,11 @@
+   it('reviews the same failed snapshot once, retaining all prior evidence and reusing only its valid pass', async () => {
+     const { value, deps, directory, ledger, grant } = await exhaustedGrantFixture();
+     const oldResponse = await readFile(join(directory, `${grant.snapshotSha256}-provider.json`), 'utf8');
+-    const oldRequestId = deps.provider.mock.calls.at(-1)![0].requestId;
++    const oldRequestId = (deps.provider.mock.calls.at(-1)![0] as { requestId: string }).requestId;
+     const result = await reviewFormalCourse(value, undefined, { ...deps, approvedReviewGrant: grant });
+     expect(result.status).toBe('passed'); expect(result.remainingReviewAttempts).toBe(0);
+     expect(deps.provider).toHaveBeenCalledTimes(4);
+-    expect(deps.provider.mock.calls.at(-1)![0].requestId).not.toBe(oldRequestId);
++    expect((deps.provider.mock.calls.at(-1)![0] as { requestId: string }).requestId).not.toBe(oldRequestId);
+     expect(await readFile(join(directory, `${grant.snapshotSha256}-provider.json`), 'utf8')).toBe(oldResponse);
+     const after = JSON.parse(await readFile(join(directory, 'attempts.json'), 'utf8'));
+     expect(after.slice(0, 3)).toEqual(ledger);
+@@ -370,7 +370,7 @@
+ 
+   it('does not re-dispatch a paid invalid response even in operator browser-recheck mode', async () => {
+     const value = input(); const deps = { ...mocks(value), cacheRoot };
+-    deps.provider.mockResolvedValue({ ...await deps.provider(), content: '{"status":"needs_revision"}' });
++    deps.provider.mockResolvedValue({ ...await deps.provider({}), content: '{"status":"needs_revision"}' });
+     deps.provider.mockClear();
+     await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow();
+     await expect(reviewFormalCourse(value, undefined, { ...deps, recheckUnsentBrowserReview: true }))
+@@ -795,7 +795,7 @@
+     try {
+       const value = { ...input(), modelPolicyId: 'deepseek-v4.1-flash-candidate-v1' as const };
+       expect(formalQualityVerifierModel(value)).toBe('deepseek-flash');
+-      const deps = mocks(value);
++      const deps = { ...mocks(value), cacheRoot };
+       const result = await reviewFormalCourse(value, undefined, deps);
+       expect(result.receipt?.review.modelId).toBe('deepseek-flash');
+       expect(deps.provider).toHaveBeenCalledTimes(1);
+@@ -811,7 +811,7 @@
+     const previous = process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
+     try {
+-      const value = input(), deps = mocks(value);
++      const value = input(), deps = { ...mocks(value), cacheRoot };
+       await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
+       expect(deps.provider).not.toHaveBeenCalled();
+       expect(deps.inspect).not.toHaveBeenCalled();
+@@ -821,3 +821,18 @@
+     }
+   });
+ 
++
++it('rejects candidate quality without the server selector before any spend', async () => {
++  const previous = process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++  delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++  try {
++    expect(formalQualityVerifierModel({})).toBe('deepseek-v4-flash');
++    const value = { ...input(), modelPolicyId: 'deepseek-v4.1-flash-candidate-v1' as const }, deps = { ...mocks(value), cacheRoot };
++    await expect(reviewFormalCourse(value, undefined, deps)).rejects.toThrow('FORMAL_QUALITY_MODEL_POLICY_MISMATCH');
++    expect(deps.provider).not.toHaveBeenCalled();
++    expect(deps.inspect).not.toHaveBeenCalled();
++  } finally {
++    if (previous === undefined) delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    else process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = previous;
++  }
++});
+--- a/tests/server/mira-formal-learner-discussion-repair.test.ts
++++ b/tests/server/mira-formal-learner-discussion-repair.test.ts
+@@ -95,6 +95,41 @@
+     await expect(repairFormalLearnerDiscussions(i,rejection(i),context,{provider:p,cacheRoot})).rejects.toThrow('transport timeout');
+     await expect(repairFormalLearnerDiscussions(i,rejection(i),context,{provider:p,cacheRoot})).rejects.toThrow('PRIOR_DISPATCH');expect(p).toHaveBeenCalledTimes(1);
+   });
++  it.each([
++    ['missing', undefined, 'deepseek-v4.1-flash-candidate-v1'],
++    ['legacy-server', 'deepseek-v4-pro-flash-v1', 'deepseek-v4.1-flash-candidate-v1'],
++    ['candidate-server', 'deepseek-v4.1-flash-candidate-v1', undefined],
++  ])('rejects a %s selector mismatch before creating a dispatch claim', async (_case, selected, inputPolicy) => {
++    const previous = process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    try {
++      if (selected === undefined) delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++      else process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = selected;
++      const i = input(), p = provider(i);
++      if (inputPolicy !== undefined) i.modelPolicyId = inputPolicy as FormalQualityInput['modelPolicyId'];
++      await expect(repairFormalLearnerDiscussions(i, rejection(i), context, { provider: p, cacheRoot }))
++        .rejects.toThrow('FORMAL_LEARNER_DISCUSSION_REPAIR_MODEL_POLICY_MISMATCH');
++      expect(p).not.toHaveBeenCalled();
++      expect(await readdir(cacheRoot)).toEqual([]);
++    } finally {
++      if (previous === undefined) delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++      else process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = previous;
++    }
++  });
++  it('binds a selected candidate repair receipt to the current Flash model and frozen input', async () => {
++    const previous = process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    try {
++      process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4.1-flash-candidate-v1';
++      const i = input(); i.modelPolicyId = 'deepseek-v4.1-flash-candidate-v1';
++      const p = provider(i), result = await repairFormalLearnerDiscussions(i, rejection(i), context, { provider: p, cacheRoot });
++      expect(result.receipt.modelId).toBe('deepseek-flash');
++      expect(result.receipt.frozenContextSha256).toBe(qualitySha({ gradeBoundary: i.gradeBoundary,
++        selectionPlan: i.selectionPlan, teachingBrief: i.teachingBrief, modelPolicyId: i.modelPolicyId }));
++      expect(JSON.parse(String((p.mock.calls[0][0] as Record<string, unknown>).userPrompt)).modelPolicyId).toBe(i.modelPolicyId);
++    } finally {
++      if (previous === undefined) delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++      else process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = previous;
++    }
++  });
+   it('allows only one concurrent dispatch',async()=>{
+     const i=input(),p=provider(i);const r=await Promise.allSettled([0,1].map(()=>repairFormalLearnerDiscussions(i,rejection(i),context,{provider:p,cacheRoot})));
+     expect(r.filter(x=>x.status==='fulfilled')).toHaveLength(1);expect(p).toHaveBeenCalledTimes(1);
+--- /dev/null
++++ b/tests/server/mira-flash-formal-health.test.ts
+@@ -0,0 +1,35 @@
++import { afterEach, describe, expect, it } from 'vitest';
++import { getMiraFormalGenerationRuntimePolicy, MIRA_FORMAL_GENERATION_POLICY,
++  MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY } from '@/lib/server/mira-formal-generation-policy';
++import { getMiraFormalProviderReadinessPolicy, MIRA_FORMAL_PROVIDER_READINESS_POLICY } from '@/lib/server/mira-formal-provider-readiness';
++import { getMiraProfessionalModelRuntimePolicy } from '@/lib/server/model-routes';
++
++const id = 'deepseek-v4.1-flash-candidate-v1';
++afterEach(() => { delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY; });
++
++describe('actual exported formal candidate health policies', () => {
++  it('reports the same model and learning policy used by the native generation input', () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = id;
++    const generation = getMiraFormalGenerationRuntimePolicy();
++    expect(generation.professionalCreation).toEqual(MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY);
++    expect(generation.professionalCreation).toMatchObject({ modelPolicyId: id,
++      sceneLearningPolicy: { enforced: true, noMasteryClaims: true,
++        pictureChoicesForGrades: ['primary_1', 'primary_2'], scriptSyntaxRequired: true } });
++    const model = getMiraProfessionalModelRuntimePolicy();
++    expect(model.policyId).toBe(id);
++    expect(model.coursewareVerifier.modelId).toBe('deepseek-flash');
++    expect(getMiraFormalProviderReadinessPolicy()).toMatchObject({ modelPolicyId: id,
++      expectedProviderCallCount: 5, providers: { deepseek: { modelId: 'deepseek-flash' } } });
++  });
++  it('keeps the original default health object and historical policy hash inputs', () => {
++    expect(getMiraFormalGenerationRuntimePolicy()).toBe(MIRA_FORMAL_GENERATION_POLICY);
++    expect(getMiraFormalProviderReadinessPolicy()).toBe(MIRA_FORMAL_PROVIDER_READINESS_POLICY);
++    expect(MIRA_FORMAL_GENERATION_POLICY.professionalCreation).not.toHaveProperty('modelPolicyId');
++    expect(MIRA_FORMAL_PROVIDER_READINESS_POLICY).not.toHaveProperty('modelPolicyId');
++  });
++  it('fails closed for unsupported health model policy selections', () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'unknown-policy';
++    expect(() => getMiraFormalGenerationRuntimePolicy()).toThrow(/Unsupported/);
++    expect(() => getMiraFormalProviderReadinessPolicy()).toThrow(/Unsupported/);
++  });
++});

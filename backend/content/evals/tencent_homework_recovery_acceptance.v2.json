@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "mira.tencent-homework-recovery-acceptance.v2",
+  "checkedAt": "2026-10-08",
+  "status": "saved_two_page_task_recovered",
+  "provider": "tencent",
+  "fixes": [
+    "Receipt idempotency includes the provider call ID as well as its attempt",
+    "Tencent normalization has its own bounded 200-item page capacity",
+    "Raw receipts up to 40MB remain in private durable storage with database summaries",
+    "Local recovery verifies original photo bytes, transformed source bytes, revision, request hash and every original Submit JobId",
+    "A recovered task cannot create any additional Submit reservation"
+  ],
+  "realRecovery": {
+    "source": "parent_app",
+    "revision": 3,
+    "pages": 2,
+    "originalCalls": 2,
+    "originalCallIdentitiesUnchanged": true,
+    "originalPhotoHashesUnchanged": true,
+    "newSubmitCalls": 0,
+    "newQueryCalls": 1,
+    "errorCode": null,
+    "status": "needs_confirmation",
+    "savedAnswerItems": 66,
+    "pendingAnswerItems": 65,
+    "blankAnswerItems": 1,
+    "studentTeacherItems": 66
+  },
+  "validation": {
+    "homeworkRegressionTests": 475,
+    "recoveryOperatorBoundaryTests": 5,
+    "passed": true
+  },
+  "limitations": [
+    "The real photographed paper has grouped answer entries without verified full question alignment; its provisional provider verdicts are not trusted scores or ability evidence",
+    "The saved student DTO offers original-paper AI teacher guidance; no new paid teacher requests were dispatched by this recovery",
+    "An updated Android client was not exercised in this recovery"
+  ]
+}

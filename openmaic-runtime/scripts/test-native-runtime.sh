@@ -56,7 +56,9 @@ MIRA_STUDENT_WEB_PUBLIC_URL=http://192.168.228.95:3000
 EOF
 
 # shellcheck source=native-runtime.sh
+MIRA_OPENMAIC_MODEL_POLICY=deepseek-v4-pro-flash-v1
 source "${RUNTIME_SCRIPT}"
+unset MIRA_OPENMAIC_MODEL_POLICY
 
 # Production pins model credentials to openmaic-runtime/.env. This local unit
 # harness replaces only that path resolver so it never reads an operator key.
@@ -65,6 +67,31 @@ model_provider_env_file() {
 }
 
 MIRA_BACKEND_ENV_FILE="${TMP_ROOT}/backend.env"
+# Policy selection follows only the fixed OpenMAIC owner file, before the
+# existing strict validation. This subshell never modifies a live dotenv.
+(
+  cp "${TMP_ROOT}/openmaic.env" "${TMP_ROOT}/policy.env"
+  model_provider_env_file() { printf '%s' "${TMP_ROOT}/policy.env"; }
+  printf '%s\n' 'MIRA_OPENMAIC_MODEL_POLICY=deepseek-v4-pro-current-flash-v1' >> "${TMP_ROOT}/policy.env"
+  unset MIRA_OPENMAIC_MODEL_POLICY
+  load_openmaic_model_policy_env
+  [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == deepseek-v4-pro-current-flash-v1 ]] || fail 'fixed policy dotenv not loaded'
+  load_openmaic_model_env
+  [[ "${OPENMAIC_DEFAULT_MODEL}" == deepseek:deepseek-v4-pro && "${OPENMAIC_COURSEWARE_VERIFIER_MODEL}" == deepseek-flash ]] || fail 'dotenv policy did not bind actual roles'
+  MIRA_OPENMAIC_MODEL_POLICY=deepseek-v4-pro-flash-v1
+  load_openmaic_model_policy_env
+  [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == deepseek-v4-pro-flash-v1 ]] || fail 'process policy did not override dotenv'
+  MIRA_OPENMAIC_MODEL_POLICY=unsupported-policy
+  load_openmaic_model_policy_env
+  if load_openmaic_model_env 2>/dev/null; then fail 'explicit unsupported policy fell back to dotenv'; fi
+  unset MIRA_OPENMAIC_MODEL_POLICY
+  model_provider_env_file() { printf '%s' "${TMP_ROOT}/missing-policy.env"; }
+  printf '%s\n' 'MIRA_OPENMAIC_MODEL_POLICY=deepseek-v4-pro-current-flash-v1' >> "${TMP_ROOT}/backend.env"
+  load_openmaic_model_policy_env
+  [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == deepseek-v4-pro-flash-v1 ]] || fail 'missing fixed policy inherited backend selection'
+  # Restore the unrelated fake backend fixture for the rest of the suite.
+  sed -i.bak '/^MIRA_OPENMAIC_MODEL_POLICY=/d' "${TMP_ROOT}/backend.env"
+)
 MIRA_STUDENT_WEB_ENV_FILE="${TMP_ROOT}/student-web.env"
 load_runtime_origin_env
 [[ "${MIRA_RUNTIME_PUBLIC_ORIGIN}" == "http://192.168.228.95:3101" ]] || fail "runtime public origin was not loaded"
@@ -139,6 +166,7 @@ EOF
 chmod +x "${FAKE_SOURCE_DIR}/node_modules/next/dist/bin/next"
 touch "${FAKE_SOURCE_DIR}/node_modules/.bin/next"
 chmod +x "${FAKE_SOURCE_DIR}/node_modules/.bin/next"
+node "${SCRIPT_DIR}/test-generation-package.mjs" --write-fixture "${FAKE_SOURCE_DIR}"
 
 ORIGINAL_SOURCE_DIR="${SOURCE_DIR}"
 SOURCE_DIR="${FAKE_SOURCE_DIR}"
@@ -481,6 +509,37 @@ load_openmaic_provider_env
 [[ "${OPENMAIC_DEEPSEEK_BASE_URL}" == "https://api.deepseek.com/v1" ]]
 [[ "${OPENMAIC_DEEPSEEK_MODELS}" == "deepseek-v4-pro,deepseek-v4-flash" ]]
 [[ "${OPENMAIC_COURSEWARE_VERIFIER_MODEL}" == "deepseek-v4-flash" ]]
+# The new operator opt-in selects one current Flash model for every stage,
+# using official credentials without rewriting the legacy dotenv or routes.
+(
+  OPENMAIC_STRUCTURED_SCENE_POLICY_ID=deepseek-v4.1-flash-candidate-v1
+  load_openmaic_model_env
+  [[ "${OPENMAIC_DEFAULT_MODEL}" == deepseek:deepseek-flash ]] || fail 'Flash candidate creator mismatch'
+  [[ "${OPENMAIC_COURSEWARE_VERIFIER_MODEL}" == deepseek-flash ]] || fail 'Flash candidate verifier mismatch'
+  [[ ",${OPENMAIC_DEEPSEEK_MODELS}," == *,deepseek-flash,* ]] || fail 'current Flash missing from candidate catalog'
+  [[ "${OPENMAIC_DEEPSEEK_API_KEY}" == test-deepseek-secret-never-log ]] || fail 'candidate selected a different credential'
+  [[ "$(read_env_value MIRA_OPENMAIC_MODEL "${TMP_ROOT}/openmaic.env")" == deepseek-v4-pro ]] || fail 'candidate rewrote legacy dotenv'
+  MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1
+  MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/private-authoring
+  load_openmaic_agent_runtime_env
+  [[ "${OPENMAIC_MODEL_ROUTES}" == *deepseek:deepseek-flash* ]] || fail 'candidate agent routes absent'
+  [[ "${OPENMAIC_MODEL_ROUTES}" != *deepseek-v4-pro* ]] || fail 'candidate fell back to Pro'
+  OPENMAIC_STRUCTURED_SCENE_POLICY_ID=unsupported-policy
+  if load_openmaic_model_env 2>/dev/null; then fail 'unsupported candidate policy accepted'; fi
+)
+# A verifier-only upgrade preserves all Pro authoring stages and the old env.
+(
+  OPENMAIC_STRUCTURED_SCENE_POLICY_ID=deepseek-v4-pro-current-flash-v1
+  load_openmaic_model_env
+  [[ "${OPENMAIC_DEFAULT_MODEL}" == deepseek:deepseek-v4-pro ]] || fail 'verifier upgrade changed creator'
+  [[ "${OPENMAIC_COURSEWARE_VERIFIER_MODEL}" == deepseek-flash ]] || fail 'current verifier absent'
+  [[ ",${OPENMAIC_DEEPSEEK_MODELS}," == *,deepseek-flash,* ]] || fail 'current verifier catalog absent'
+  [[ "$(read_env_value MIRA_OPENMAIC_VERIFIER_MODEL "${TMP_ROOT}/openmaic.env")" == deepseek-v4-flash ]] || fail 'verifier upgrade rewrote legacy env'
+  MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1
+  MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/private-authoring
+  load_openmaic_agent_runtime_env
+  node -e 'const r=JSON.parse(process.argv[1]);for(const s of ["maic-agent-driver","generate-classroom","mira-courseware-creator","web-search-query-rewrite"])if(r[s].model!=="deepseek:deepseek-v4-pro")process.exit(1);if(r["mira-courseware-verifier"].model!=="deepseek:deepseek-flash")process.exit(1)' "${OPENMAIC_MODEL_ROUTES}" || fail 'verifier upgrade changed Pro routes'
+)
 # Switching services keeps official credentials intact and fails closed when
 # free-tier protection or a trusted Bailian endpoint is missing.
 (
@@ -963,7 +1022,26 @@ fi
 formal_audio_health_payload='{"success":true,"status":"ok","version":"1.0.0","capabilities":{"formalAudio":true,"tts":true,"asr":true},"runtimePolicy":{"formalAudio":{"enforced":true,"schemaVersion":"mira.openmaic.formal-audio.v1","segmentCount":{"mode":"per_speech_action","min":1,"max":240},"requestIdempotency":"requestId+canonicalBodySha256","providerAttemptRecordedBeforeFetch":true,"staleRunningOutcome":"ambiguous","retryAllowed":false,"providerTimeoutMs":120000,"maxAudioBytes":16777216,"audioMimeType":"audio/wav","tts":{"providerId":"qwen-tts","modelId":"qwen3-tts-flash","fallbackAllowed":false},"asr":{"providerId":"qwen-asr","modelId":"qwen3-asr-flash","fallbackAllowed":false,"inputAuthority":"matching-local-tts-wav","transcriptPersisted":false},"subjects":{"chinese":{"teacherProfileId":"mira_chinese_gentle","teacherProfileVersion":2,"teacherProfileSha256":"a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8","teacherName":"小语老师","teacherGender":"female","voiceGender":"female","voiceId":"Serena","languageCode":"zh-CN","qwenLanguageType":"Chinese"},"math":{"teacherProfileId":"mira_math_clear","teacherProfileVersion":2,"teacherProfileSha256":"4f5a986a765f69798c8546d7f9091fe297f2a98c5353fdd01cd1aa06884c98fb","teacherName":"小数老师","teacherGender":"male","voiceGender":"male","voiceId":"Ethan","languageCode":"zh-CN","qwenLanguageType":"Chinese"},"english":{"teacherProfileId":"mira_english_standard","teacherProfileVersion":2,"teacherProfileSha256":"4725f27c5438c0f68fe8923ac977fa1dd01452b990ac58912b880320750ee040","teacherName":"Mia 老师","teacherGender":"female","voiceGender":"female","voiceId":"Jennifer","languageCode":"en-US","qwenLanguageType":"English"}}}}}'
 formal_audio_health_payload="${formal_audio_health_payload//\"languageCode\":\"zh-CN\",\"qwenLanguageType\":\"Chinese\"/\"languageCode\":\"zh-CN\",\"instructionLanguageCode\":\"zh-CN\",\"qwenLanguageType\":\"Chinese\",\"qwenAsrLanguage\":\"zh\"}"
 formal_audio_health_payload="${formal_audio_health_payload/\"languageCode\":\"en-US\",\"qwenLanguageType\":\"English\"/\"languageCode\":\"en-US\",\"instructionLanguageCode\":\"zh-CN\",\"qwenLanguageType\":\"Chinese\",\"qwenAsrLanguage\":\"zh\"}"
+legacy_formal_audio_health_payload="${formal_audio_health_payload}"
+formal_audio_health_payload="$(printf '%s' "${formal_audio_health_payload}" | node -e '
+  let raw="";process.stdin.on("data",c=>raw+=c);process.stdin.on("end",()=>{
+    const body=JSON.parse(raw);
+    body.runtimePolicy.formalAudio.subjects.science={
+      teacherProfileId:"mira_science_inquiry",teacherProfileVersion:1,
+      teacherProfileSha256:"6bdd6746ed1a6a538751f23ff663a9153e7d1db767f7d9d3b6e5dc00d97d5c6b",
+      teacherName:"小科老师",teacherGender:"female",voiceGender:"female",voiceId:"Serena",
+      languageCode:"zh-CN",instructionLanguageCode:"zh-CN",qwenLanguageType:"Chinese",qwenAsrLanguage:"zh"
+    };
+    process.stdout.write(JSON.stringify(body));
+  });
+')"
 validate_health_payload formal-audio "${formal_audio_health_payload}"
+if validate_health_payload formal-audio "${legacy_formal_audio_health_payload}"; then
+  fail "missing science teacher unexpectedly passed formal-audio health"
+fi
+if validate_health_payload formal-audio "${formal_audio_health_payload/6bdd6746ed1a6a538751f23ff663a9153e7d1db767f7d9d3b6e5dc00d97d5c6b/unreviewed-science-profile}"; then
+  fail "wrong science teacher hash unexpectedly passed formal-audio health"
+fi
 if validate_health_payload formal-audio "${formal_audio_health_payload/\"voiceId\":\"Ethan\"/\"voiceId\":\"Serena\"}"; then
   echo "wrong formal math voice unexpectedly passed formal-audio health" >&2
   exit 1
@@ -973,6 +1051,35 @@ formal_provider_readiness_health_payload="${formal_provider_readiness_health_pay
 formal_provider_readiness_health_payload="${formal_provider_readiness_health_payload/\"kimi\":{\"providerId\":\"kimi\",\"modelId\":\"kimi-k2.6\"/\"deepseek\":{\"providerId\":\"deepseek\",\"modelId\":\"deepseek-v4-pro\"}"
 formal_provider_readiness_health_payload="${formal_provider_readiness_health_payload/\"runtimePolicy\":{/\"runtimePolicy\":{${model_policy_json},}"
 validate_health_payload formal-provider-readiness "${formal_provider_readiness_health_payload}"
+# Candidate health must prove the exact current model and learning policy;
+# accepting the old runtime merely because it is alive is not sufficient.
+(
+  candidate_payload="$(printf '%s' "${structured_health_payload}" | node -e '
+    let raw="";process.stdin.on("data",c=>raw+=c);process.stdin.on("end",()=>{
+      const body=JSON.parse(raw),p=body.runtimePolicy,id="deepseek-v4.1-flash-candidate-v1";
+      p.structuredScene.policyId=id;p.structuredScene.modelId="deepseek-flash";
+      p.modelPolicy.policyId=id;
+      for(const phase of ["agentDriver","coursewareCreator","coursewareVerifier","structuredScene"]) p.modelPolicy[phase].modelId="deepseek-flash";
+      p.modelPolicy.structuredScene.policyId=id;
+      p.formalGeneration.professionalCreation.modelPolicyId=id;
+      p.formalGeneration.professionalCreation.sceneLearningPolicy={schemaVersion:"mira.learning.scene-contract-policy.v1",enforced:true,pictureChoicesForGrades:["primary_1","primary_2"],noMasteryClaims:true,scriptSyntaxRequired:true};
+      process.stdout.write(JSON.stringify(body));
+    });' )"
+  if validate_health_payload openmaic "${candidate_payload}"; then fail 'legacy health accepted a Flash candidate'; fi
+  OPENMAIC_STRUCTURED_SCENE_POLICY_ID=deepseek-v4.1-flash-candidate-v1
+  validate_health_payload openmaic "${candidate_payload}" || fail 'exact Flash candidate health rejected'
+  if validate_health_payload openmaic "${structured_health_payload}"; then fail 'candidate health accepted legacy Pro'; fi
+  missing_picture_payload="$(printf '%s' "${candidate_payload}" | node -e 'let raw="";process.stdin.on("data",c=>raw+=c);process.stdin.on("end",()=>{const b=JSON.parse(raw);b.runtimePolicy.formalGeneration.professionalCreation.sceneLearningPolicy.pictureChoicesForGrades=[];process.stdout.write(JSON.stringify(b));});')"
+  if validate_health_payload openmaic "${missing_picture_payload}"; then fail 'candidate health accepted missing picture policy'; fi
+)
+(
+  upgraded_payload="$(printf '%s' "${structured_health_payload}" | node -e 'let raw="";process.stdin.on("data",c=>raw+=c);process.stdin.on("end",()=>{const b=JSON.parse(raw),p=b.runtimePolicy,id="deepseek-v4-pro-current-flash-v1";p.structuredScene.policyId=id;p.modelPolicy.policyId=id;p.modelPolicy.structuredScene.policyId=id;p.modelPolicy.coursewareVerifier.modelId="deepseek-flash";p.formalGeneration.professionalCreation.modelPolicyId=id;process.stdout.write(JSON.stringify(b));});')"
+  OPENMAIC_STRUCTURED_SCENE_POLICY_ID=deepseek-v4-pro-current-flash-v1
+  validate_health_payload openmaic "${upgraded_payload}" || fail 'Pro/current Flash health rejected'
+  if validate_health_payload openmaic "${structured_health_payload}"; then fail 'new verifier health accepted legacy identity'; fi
+  all_flash_payload="$(printf '%s' "${upgraded_payload}" | node -e 'let r="";process.stdin.on("data",c=>r+=c);process.stdin.on("end",()=>{const b=JSON.parse(r);b.runtimePolicy.modelPolicy.coursewareCreator.modelId="deepseek-flash";process.stdout.write(JSON.stringify(b));});')"
+  if validate_health_payload openmaic "${all_flash_payload}"; then fail 'verifier policy allowed all-Flash creator'; fi
+)
 if validate_health_payload formal-provider-readiness "${formal_provider_readiness_health_payload/\"providerCall\":true/\"providerCall\":false}"; then
   echo "providerCall=false unexpectedly passed formal Provider readiness health" >&2
   exit 1

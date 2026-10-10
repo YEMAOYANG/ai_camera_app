@@ -1,0 +1,177 @@
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -69,6 +69,20 @@
+     qwenLanguageType: 'Chinese',
+     qwenAsrLanguage: 'zh',
+   },
++  // Additive science identity; the existing three subject policies stay frozen.
++  science: {
++    teacherProfileId: 'mira_science_inquiry',
++    teacherProfileVersion: 1,
++    teacherProfileSha256: '6bdd6746ed1a6a538751f23ff663a9153e7d1db767f7d9d3b6e5dc00d97d5c6b',
++    teacherName: '小科老师',
++    teacherGender: 'female',
++    voiceGender: 'female',
++    voiceId: 'Serena',
++    languageCode: 'zh-CN',
++    instructionLanguageCode: 'zh-CN',
++    qwenLanguageType: 'Chinese',
++    qwenAsrLanguage: 'zh',
++  },
+ } as const;
+ 
+ export const MIRA_FORMAL_AUDIO_POLICY = {
+diff --git a/tests/server/mira-science-audio.test.ts b/tests/server/mira-science-audio.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-science-audio.test.ts
+@@ -0,0 +1,100 @@
++import { createHash } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import {
++  assertMiraFormalAsrRequest, assertMiraFormalTtsRequest, executeMiraFormalAsr,
++  executeMiraFormalTts, getMiraFormalAudioRuntimePolicy, readMiraFormalTtsJob,
++  type MiraFormalTtsRequest,
++} from '@/lib/server/mira-formal-audio';
++
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerProviders: () => ({}), getServerWebSearchProviders: () => ({}),
++  getServerImageProviders: () => ({}), getServerVideoProviders: () => ({}),
++  getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
++  getServerASRProviders: () => ({ 'qwen-asr': { disabled: false } }),
++  resolveTTSApiKey: () => 'synthetic-science-tts',
++  resolveASRApiKey: () => 'synthetic-science-asr',
++  resolveTTSBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++  resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++}));
++const sha = (text: string) => createHash('sha256').update(text).digest('hex');
++const text = '观察叶子的形状。';
++const request: MiraFormalTtsRequest = {
++  requestId: 'science-tts', classroomId: 'science-classroom', classroomContentSha256: '0'.repeat(64),
++  subject: 'science', teacherProfileId: 'mira_science_inquiry', teacherProfileVersion: 1,
++  teacherProfileSha256: '6bdd6746ed1a6a538751f23ff663a9153e7d1db767f7d9d3b6e5dc00d97d5c6b',
++  teacherGender: 'female', sceneId: 'science-scene', sceneOrder: 0,
++  actionId: 'science-speech', narrationSegmentId: 'science-speech', text, textSha256: sha(text),
++};
++function asrRequest(audioSha256: string) {
++  const identity = Object.fromEntries(Object.entries(request).filter(([key]) => !['text', 'textSha256'].includes(key)));
++  return assertMiraFormalAsrRequest({ ...identity, requestId: 'science-asr', ttsRequestId: request.requestId, audioSha256 });
++}
++function wav(): Buffer {
++  const data = Buffer.alloc(48);
++  data.write('RIFF'); data.writeUInt32LE(40, 4); data.write('WAVE', 8); data.write('fmt ', 12);
++  data.writeUInt32LE(16, 16); data.writeUInt16LE(1, 20); data.writeUInt16LE(1, 22);
++  data.writeUInt32LE(16000, 24); data.writeUInt32LE(32000, 28);
++  data.writeUInt16LE(2, 32); data.writeUInt16LE(16, 34); data.write('data', 36); data.writeUInt32LE(4, 40);
++  data.writeInt16LE(1000, 44); data.writeInt16LE(-1000, 46); return data;
++}
++
++describe('additive science Qwen audio identity', () => {
++  let root: string;
++  beforeEach(async () => { root = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-science-audio-'));
++    vi.stubEnv('MIRA_FORMAL_AUDIO_DATA_DIR', root); });
++  afterEach(async () => { vi.unstubAllEnvs(); await fs.rm(root, { recursive: true, force: true }); });
++
++  it('registers a distinct Mandarin science teacher while preserving historical teacher identities', () => {
++    const policy = getMiraFormalAudioRuntimePolicy();
++    expect(policy.subjects.science).toMatchObject({ teacherProfileId: 'mira_science_inquiry',
++      teacherProfileVersion: 1, teacherName: '小科老师', voiceId: 'Serena', languageCode: 'zh-CN',
++      qwenAsrLanguage: 'zh' });
++    expect(policy.subjects.chinese.teacherProfileSha256).toBe('a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8');
++    expect(policy.subjects.math.voiceId).toBe('Ethan');
++    expect(policy.subjects.english.voiceId).toBe('Jennifer');
++    expect(assertMiraFormalTtsRequest(request)).toEqual(request);
++  });
++
++  it.each([
++    ['teacherProfileId', 'mira_chinese_gentle'], ['teacherProfileVersion', 2],
++    ['teacherProfileSha256', '1'.repeat(64)], ['teacherGender', 'male'], ['subject', 'history'],
++  ])('rejects mismatched science identity field %s before dispatch', (field, value) => {
++    expect(() => assertMiraFormalTtsRequest({ ...request, [field]: value })).toThrow('Invalid formal teacher identity');
++    const asr = asrRequest('2'.repeat(64));
++    expect(() => assertMiraFormalAsrRequest({ ...asr, [field]: value })).toThrow('Invalid formal teacher identity');
++  });
++
++  it('persists and reuses science TTS and ASR with the registered Mandarin voice and language', async () => {
++    const audio = wav();
++    const fetched = vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
++      if (String(input).includes('science.wav')) return new Response(new Uint8Array(audio), {
++        headers: { 'content-type': 'audio/wav', 'content-length': String(audio.length) } });
++      const body = JSON.parse(String(init?.body));
++      if (body.model === 'qwen3-tts-flash') {
++        const saved = await readMiraFormalTtsJob(request.requestId);
++        expect(saved?.state).toBe('running'); expect(saved?.subject).toBe('science');
++        expect(body.input).toEqual({ text, voice: 'Serena', language_type: 'Chinese' });
++        return new Response(JSON.stringify({ output: { audio: {
++          url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/science.wav' } } }),
++          { headers: { 'content-type': 'application/json' } });
++      }
++      expect(body.model).toBe('qwen3-asr-flash');
++      expect(body.parameters.asr_options.language).toBe('zh');
++      return new Response(JSON.stringify({ output: { choices: [{ message: { content: [{ text }] } }] } }),
++        { headers: { 'content-type': 'application/json' } });
++    });
++    const deps = { fetchImpl: fetched as typeof fetch, resolveAddresses: async () => ['8.8.8.8'] };
++    const first = await executeMiraFormalTts(request, deps);
++    expect(first.record.state).toBe('succeeded'); expect(first.record.voiceId).toBe('Serena');
++    const again = await executeMiraFormalTts(request, deps);
++    expect(again.created).toBe(false);
++    const asr = asrRequest(first.record.audioSha256!);
++    const result = await executeMiraFormalAsr(asr, deps);
++    expect(result.record.state).toBe('succeeded'); expect(result.transcript).toBe(text);
++    const replay = await executeMiraFormalAsr(asr, deps);
++    expect(replay.created).toBe(false); expect(fetched).toHaveBeenCalledTimes(3);
++  });
++});
+--- a/lib/server/mira-formal-compiled-classroom.ts
++++ b/lib/server/mira-formal-compiled-classroom.ts
+@@ -27,6 +27,9 @@
+ import type { Scene, Stage } from '@/lib/types/stage';
+ 
+ type JsonObject = Record<string, unknown>;
++// Formal classroom generation retains its registered three-subject contract.
++// Standalone formal audio additionally supports the science teacher.
++type MiraFormalCourseSubject = Exclude<MiraFormalAudioSubject, 'science'>;
+ 
+ export interface FormalQuestion {
+   id: string;
+@@ -46,7 +49,7 @@
+     id: string;
+     version: string;
+     gradeCode: string;
+-    subject: MiraFormalAudioSubject;
++    subject: MiraFormalCourseSubject;
+     skillId: string;
+     title: string;
+     objective: string;
+@@ -267,7 +270,7 @@
+       id: textValue(course.id, 'course.id', 255),
+       version: textValue(course.version, 'course.version', 64),
+       gradeCode: textValue(course.gradeCode, 'course.gradeCode', 64),
+-      subject: subject as MiraFormalAudioSubject,
++      subject: subject as MiraFormalCourseSubject,
+       skillId: textValue(course.skillId, 'course.skillId', 120),
+       title: textValue(course.title, 'course.title', 160),
+       objective: textValue(course.objective, 'course.objective', 600),
+@@ -375,7 +378,7 @@
+   };
+ }
+ 
+-function subjectLabel(subject: MiraFormalAudioSubject): string {
++function subjectLabel(subject: MiraFormalCourseSubject): string {
+   return { chinese: '语文', math: '数学', english: '英语' }[subject];
+ }
+ 
+@@ -864,7 +867,7 @@
+ ): {
+   stage: Stage;
+   scenes: Scene[];
+-  formalAudioContext: { buildItemId: string; subject: MiraFormalAudioSubject };
++  formalAudioContext: { buildItemId: string; subject: MiraFormalCourseSubject };
+ } {
+   const spec = preparedSpec || parseFormalCoursewareSpec(input);
+   if (spec.progressiveLesson) throw new Error('FORMAL_PROGRESSIVE_PROFESSIONAL_CLASSROOM_REQUIRED');

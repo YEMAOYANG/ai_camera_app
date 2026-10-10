@@ -50,7 +50,7 @@ def blueprint_prompt(blueprint):
             '正常一节约 8 至 10 分钟；已会的目标交由课外适配层缩短。不要虚构已记录的成绩、复习结果或家长用时。']}
 
 
-def preview_input(manifest, node_id):
+def preview_input(manifest, node_id, *, teaching_revision="1"):
     manifest = validate_manifest(manifest)
     unit, lesson = lesson_by_id(manifest, node_id)
     legacy_scope = (manifest["editionId"], manifest["revisionId"], node_id) == (
@@ -79,6 +79,9 @@ def preview_input(manifest, node_id):
     }
     if blueprint:
         brief['sourceScope'] = blueprint['sourceScope']
+    # Keep v1 hashes stable; explicit later teaching versions get distinct work.
+    if teaching_revision != "1":
+        brief["teachingRevision"] = teaching_revision
     key = digest(brief)
     requirement = "\n".join(original["instructions"] + prompt["instructions"])
     requirement += "\n年级教学规则：\n" + json.dumps(brief["teachingProfile"], ensure_ascii=False, indent=2)

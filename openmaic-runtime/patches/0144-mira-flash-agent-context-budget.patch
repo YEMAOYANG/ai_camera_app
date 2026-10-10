@@ -1,0 +1,415 @@
+diff --git a/lib/server/mira-formal-agent-budget.ts b/lib/server/mira-formal-agent-budget.ts
+--- a/lib/server/mira-formal-agent-budget.ts
++++ b/lib/server/mira-formal-agent-budget.ts
+@@ -1,4 +1,5 @@
+ import { mkdir, readFile } from 'node:fs/promises';
++import { createHash } from 'node:crypto';
+ import { join, resolve } from 'node:path';
+ import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
+ import { acquireFormalQualityLock, type QualityLockDeps } from './mira-formal-quality-lock';
+@@ -14,15 +15,142 @@
+   maxRetries: 0,
+ } as const;
+ 
++export const MIRA_FORMAL_FLASH_AGENT_BUDGET = {
++  policyId: 'mira-formal-agent-budget.v2',
++  maxDispatches: 48,
++  // Conservative one-character/one-token allowance for each 1M-context turn.
++  // Thinking/tool history remains intact; this does not change the paid ledger.
++  maxCumulativeInputCharacters: 48 * 1_048_576,
++  maxOutputTokensPerDispatch: 16_384,
++  maxRetries: 0,
++} as const;
++const FLASH_MODEL_POLICY_ID = 'deepseek-v4.1-flash-candidate-v1' as const;
++const LEGACY_MODEL_POLICY_ID = 'deepseek-v4-pro-flash-v1' as const;
++
++export function miraFormalAgentBudget(modelPolicyId?: unknown) {
++  if (modelPolicyId === FLASH_MODEL_POLICY_ID) return MIRA_FORMAL_FLASH_AGENT_BUDGET;
++  if (modelPolicyId === undefined || modelPolicyId === LEGACY_MODEL_POLICY_ID) return MIRA_FORMAL_AGENT_BUDGET;
++  throw new Error('FORMAL_AGENT_MODEL_POLICY_INVALID');
++}
++
++interface AgentBudgetUpgradeReceipt {
++  schemaVersion: 'mira.openmaic.formal-agent-budget-upgrade.v1';
++  sessionId: string;
++  modelPolicyId: typeof FLASH_MODEL_POLICY_ID;
++  sourcePolicyId: typeof MIRA_FORMAL_AGENT_BUDGET.policyId;
++  targetPolicyId: typeof MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId;
++  sourceLedgerSha256: string;
++  sourceArchiveFile: string;
++  priorCalls: number;
++  dispatchCount: number;
++  cumulativeInputCharacters: number;
++}
++interface AgentBudgetLedger {
++  policyId: string;
++  modelPolicyId?: string;
++  priorCalls: number;
++  dispatches: Array<{ inputCharacters: number; reservedAt: string }>;
++  cumulativeInputCharacters?: number;
++  upgrade?: AgentBudgetUpgradeReceipt;
++  [key: string]: unknown;
++}
++const object = (value: unknown): value is Record<string, unknown> =>
++  !!value && typeof value === 'object' && !Array.isArray(value);
++function canonicalSha(value: unknown): string {
++  return createHash('sha256').update(JSON.stringify(value, (_, v) => object(v)
++    ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) : v)).digest('hex');
++}
++function ledgerCharacters(ledger: AgentBudgetLedger): number {
++  const total = ledger.dispatches.reduce((sum, row) => sum + row.inputCharacters, 0);
++  if (!Number.isSafeInteger(total)) throw new Error('FORMAL_AGENT_BUDGET_LEDGER_INVALID');
++  return total;
++}
++function validatedLedger(value: unknown): AgentBudgetLedger {
++  if (!object(value) || (value.policyId !== MIRA_FORMAL_AGENT_BUDGET.policyId
++    && value.policyId !== MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId)
++    || !Number.isSafeInteger(value.priorCalls) || Number(value.priorCalls) < 0
++    || !Array.isArray(value.dispatches) || value.dispatches.some(row => !object(row)
++      || !Number.isSafeInteger(row.inputCharacters) || Number(row.inputCharacters) < 1))
++    throw new Error('FORMAL_AGENT_BUDGET_LEDGER_INVALID');
++  const ledger = value as unknown as AgentBudgetLedger;
++  const total = ledgerCharacters(ledger);
++  if (!Number.isSafeInteger(ledger.priorCalls + ledger.dispatches.length)
++    || (ledger.policyId === MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId
++      && (ledger.modelPolicyId !== FLASH_MODEL_POLICY_ID || ledger.cumulativeInputCharacters !== total)))
++    throw new Error('FORMAL_AGENT_BUDGET_LEDGER_INVALID');
++  return ledger;
++}
++
++/** Pure, operator-only conversion. The caller must preserve archive.sourceLedgerJson
++ * at archive.fileName before atomically replacing dispatches.json. No HTTP route,
++ * file write, provider dispatch or counter reset is performed by this helper. */
++export function upgradeMiraFormalCandidateAgentBudget(input: {
++  sessionId: string;
++  modelPolicyId: unknown;
++  sourceLedgerJson: string;
++  expectedSourceSha256: string;
++  trustedOperatorApproved: boolean;
++}) {
++  if (!/^miraformal_[a-f0-9]{64}$/.test(input.sessionId)
++    || input.modelPolicyId !== FLASH_MODEL_POLICY_ID || input.trustedOperatorApproved !== true
++    || typeof input.sourceLedgerJson !== 'string' || !/^[a-f0-9]{64}$/.test(input.expectedSourceSha256))
++    throw new Error('FORMAL_AGENT_BUDGET_UPGRADE_AUTHORITY_INVALID');
++  const sourceSha256 = createHash('sha256').update(input.sourceLedgerJson, 'utf8').digest('hex');
++  if (sourceSha256 !== input.expectedSourceSha256) throw new Error('FORMAL_AGENT_BUDGET_UPGRADE_SOURCE_CHANGED');
++  const source = validatedLedger(JSON.parse(input.sourceLedgerJson));
++  if (source.policyId !== MIRA_FORMAL_AGENT_BUDGET.policyId || source.upgrade !== undefined
++    || (source.modelPolicyId !== undefined && source.modelPolicyId !== FLASH_MODEL_POLICY_ID))
++    throw new Error('FORMAL_AGENT_BUDGET_UPGRADE_SOURCE_INVALID');
++  const characters = ledgerCharacters(source);
++  if (source.cumulativeInputCharacters !== undefined && source.cumulativeInputCharacters !== characters)
++    throw new Error('FORMAL_AGENT_BUDGET_UPGRADE_SOURCE_INVALID');
++  const fileName = `dispatches.v1.${sourceSha256}.json`;
++  const receipt: AgentBudgetUpgradeReceipt = {
++    schemaVersion: 'mira.openmaic.formal-agent-budget-upgrade.v1', sessionId: input.sessionId,
++    modelPolicyId: FLASH_MODEL_POLICY_ID, sourcePolicyId: MIRA_FORMAL_AGENT_BUDGET.policyId,
++    targetPolicyId: MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId, sourceLedgerSha256: sourceSha256,
++    sourceArchiveFile: fileName, priorCalls: source.priorCalls,
++    dispatchCount: source.dispatches.length, cumulativeInputCharacters: characters,
++  };
++  const ledger: AgentBudgetLedger = { ...structuredClone(source),
++    policyId: MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId, modelPolicyId: FLASH_MODEL_POLICY_ID,
++    cumulativeInputCharacters: characters, upgrade: receipt };
++  return { ledger, archive: { fileName, sha256: sourceSha256, sourceLedgerJson: input.sourceLedgerJson }, receipt };
++}
++
++async function verifyUpgradeArchive(folder: string, ledger: AgentBudgetLedger, sessionId: string): Promise<void> {
++  if (ledger.upgrade === undefined) return;
++  const receipt = ledger.upgrade;
++  if (!object(receipt) || receipt.schemaVersion !== 'mira.openmaic.formal-agent-budget-upgrade.v1'
++    || receipt.sessionId !== sessionId || receipt.modelPolicyId !== FLASH_MODEL_POLICY_ID
++    || receipt.sourcePolicyId !== MIRA_FORMAL_AGENT_BUDGET.policyId
++    || receipt.targetPolicyId !== MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId
++    || !/^[a-f0-9]{64}$/.test(receipt.sourceLedgerSha256)
++    || receipt.sourceArchiveFile !== `dispatches.v1.${receipt.sourceLedgerSha256}.json`)
++    throw new Error('FORMAL_AGENT_BUDGET_UPGRADE_RECEIPT_INVALID');
++  let raw: string;
++  try { raw = await readFile(join(folder, receipt.sourceArchiveFile), 'utf8'); }
++  catch { throw new Error('FORMAL_AGENT_BUDGET_UPGRADE_ARCHIVE_MISSING'); }
++  const upgraded = upgradeMiraFormalCandidateAgentBudget({ sessionId, modelPolicyId: FLASH_MODEL_POLICY_ID,
++    sourceLedgerJson: raw, expectedSourceSha256: receipt.sourceLedgerSha256, trustedOperatorApproved: true });
++  if (canonicalSha(upgraded.receipt) !== canonicalSha(receipt)
++    || ledger.priorCalls !== upgraded.ledger.priorCalls
++    || canonicalSha(ledger.dispatches.slice(0, receipt.dispatchCount)) !== canonicalSha(upgraded.ledger.dispatches))
++    throw new Error('FORMAL_AGENT_BUDGET_UPGRADE_RECEIPT_INVALID');
++}
++
+ /** The legacy 16K allowance is a local quota, not the driver's model capacity. */
+ export async function miraFormalAgentOutputOptions(
+   formalProfessionalSession: boolean,
+   wireMaxOutputTokens: number | undefined,
++  modelPolicyId?: unknown,
+ ) {
+-  const limitOutput = formalProfessionalSession && !(await isPaidBudgetObservationMode());
++  const policy = miraFormalAgentBudget(modelPolicyId);
++  const limitOutput = formalProfessionalSession && (!(await isPaidBudgetObservationMode())
++    || policy.policyId === MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId);
+   return {
+     maxOutputTokens: limitOutput
+-      ? Math.min(wireMaxOutputTokens ?? Infinity, MIRA_FORMAL_AGENT_BUDGET.maxOutputTokensPerDispatch)
++      ? Math.min(wireMaxOutputTokens ?? Infinity, policy.maxOutputTokensPerDispatch)
+       : wireMaxOutputTokens,
+     omitMaxOutputTokens: !limitOutput && wireMaxOutputTokens === undefined,
+   };
+@@ -32,9 +160,11 @@
+   input: {
+     sessionId: string;
+     inputCharacters: number;
++    modelPolicyId?: unknown;
+   },
+   deps: { root?: string; priorCalls?: () => Promise<number>; lockDeps?: QualityLockDeps } = {},
+ ) {
++  const policy = miraFormalAgentBudget(input.modelPolicyId);
+   if (
+     !/^miraformal_[a-f0-9]{64}$/.test(input.sessionId) ||
+     !Number.isSafeInteger(input.inputCharacters) ||
+@@ -42,18 +172,15 @@
+   )
+     throw new Error('FORMAL_AGENT_BUDGET_IDENTITY_INVALID');
+   const observationMode = await isPaidBudgetObservationMode();
++  const enforceBudget = !observationMode || policy.policyId === MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId;
+   const folder = join(resolve(deps.root ?? 'data/formal-agent-budgets'), input.sessionId);
+   await mkdir(folder, { recursive: true, mode: 0o700 });
+   const lock = await acquireFormalQualityLock(join(folder, 'budget.lock'), deps.lockDeps);
+   try {
+     const file = join(folder, 'dispatches.json');
+-    let ledger: {
+-      policyId: string;
+-      priorCalls: number;
+-      dispatches: Array<{ inputCharacters: number; reservedAt: string }>;
+-    };
++    let ledger: AgentBudgetLedger;
+     try {
+-      ledger = JSON.parse(await readFile(file, 'utf8'));
++      ledger = validatedLedger(JSON.parse(await readFile(file, 'utf8')));
+     } catch (error) {
+       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+       const priorCalls = deps.priorCalls
+@@ -67,33 +194,32 @@
+             );
+             return Number(result.rows[0].count);
+           })();
+-      ledger = { policyId: MIRA_FORMAL_AGENT_BUDGET.policyId, priorCalls, dispatches: [] };
++      ledger = { policyId: policy.policyId, priorCalls, dispatches: [],
++        ...(policy.policyId === MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId
++          ? { modelPolicyId: FLASH_MODEL_POLICY_ID, cumulativeInputCharacters: 0 } : {}) };
+     }
++    validatedLedger(ledger);
++    if (policy.policyId === MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId && ledger.policyId === MIRA_FORMAL_AGENT_BUDGET.policyId)
++      throw new Error('FORMAL_AGENT_BUDGET_UPGRADE_REQUIRED');
++    if (ledger.policyId !== policy.policyId) throw new Error('FORMAL_AGENT_BUDGET_MODEL_POLICY_MISMATCH');
++    if (policy.policyId === MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId) await verifyUpgradeArchive(folder, ledger, input.sessionId);
+     if (
+-      ledger.policyId !== MIRA_FORMAL_AGENT_BUDGET.policyId ||
+-      !Number.isSafeInteger(ledger.priorCalls) ||
+-      ledger.priorCalls < 0 ||
+-      !Array.isArray(ledger.dispatches) ||
+-      ledger.dispatches.some(
+-        (row) => !Number.isSafeInteger(row.inputCharacters) || row.inputCharacters < 1,
+-      )
+-    )
+-      throw new Error('FORMAL_AGENT_BUDGET_LEDGER_INVALID');
+-    if (
+-      !observationMode &&
+-      ledger.priorCalls + ledger.dispatches.length >= MIRA_FORMAL_AGENT_BUDGET.maxDispatches
++      enforceBudget &&
++      ledger.priorCalls + ledger.dispatches.length >= policy.maxDispatches
+     )
+       throw new Error('FORMAL_AGENT_DISPATCH_BUDGET_EXHAUSTED');
+-    const characters = ledger.dispatches.reduce((sum, row) => sum + row.inputCharacters, 0);
++    const characters = ledgerCharacters(ledger);
+     if (
+-      !observationMode &&
+-      characters + input.inputCharacters > MIRA_FORMAL_AGENT_BUDGET.maxCumulativeInputCharacters
++      enforceBudget &&
++      characters + input.inputCharacters > policy.maxCumulativeInputCharacters
+     )
+       throw new Error('FORMAL_AGENT_CONTEXT_BUDGET_EXHAUSTED');
+     ledger.dispatches.push({
+       inputCharacters: input.inputCharacters,
+       reservedAt: new Date().toISOString(),
+     });
++    if (policy.policyId === MIRA_FORMAL_FLASH_AGENT_BUDGET.policyId)
++      ledger.cumulativeInputCharacters = characters + input.inputCharacters;
+     // Always record before touching the provider, including observation mode.
+     // Aborted/unknown dispatches and old counts survive every process restart.
+     await writeJsonFileAtomic(file, ledger);
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -1401,11 +1401,12 @@
+     const driver = await resolveAgentDriverModel();
+     const streamFn = createCallLlmStreamFn({
+       languageModel: driver.connection.model,
+-      ...(await miraFormalAgentOutputOptions(formalProfessionalSession, driver.wireMaxOutputTokens)),
++      ...(await miraFormalAgentOutputOptions(formalProfessionalSession, driver.wireMaxOutputTokens, formalModelPolicyId)),
+       ...(formalProfessionalSession ? {
+         maxRetries: MIRA_FORMAL_AGENT_BUDGET.maxRetries,
+         beforeDispatch: ({ inputCharacters }: { inputCharacters: number }) =>
+-          reserveMiraFormalAgentDispatch({ sessionId: id, inputCharacters }),
++          reserveMiraFormalAgentDispatch({ sessionId: id, inputCharacters,
++            ...(formalModelPolicyId ? { modelPolicyId: formalModelPolicyId } : {}) }),
+       } : {}),
+       thinkingConfig: driver.connection.thinkingConfig,
+       source: 'agent-runtime',
+diff --git a/tests/server/mira-formal-agent-budget.test.ts b/tests/server/mira-formal-agent-budget.test.ts
+--- a/tests/server/mira-formal-agent-budget.test.ts
++++ b/tests/server/mira-formal-agent-budget.test.ts
+@@ -1,15 +1,21 @@
+ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+ import { tmpdir } from 'node:os';
+ import { join } from 'node:path';
++import { createHash } from 'node:crypto';
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ import {
+   MIRA_FORMAL_AGENT_BUDGET,
++  MIRA_FORMAL_FLASH_AGENT_BUDGET,
++  miraFormalAgentBudget,
++  upgradeMiraFormalCandidateAgentBudget,
+   miraFormalAgentOutputOptions,
+   reserveMiraFormalAgentDispatch,
+ } from '@/lib/server/mira-formal-agent-budget';
+ import { withPaidBudget } from '@/lib/server/mira-paid-budget';
+ let root: string;
+ const sessionId = `miraformal_${'a'.repeat(64)}`;
++const modelPolicyId = 'deepseek-v4.1-flash-candidate-v1' as const;
++const byteSha = (raw: string) => createHash('sha256').update(raw, 'utf8').digest('hex');
+ const lockDeps = {
+   withMutex: async <T>(_key: string, work: () => Promise<T>) => work(),
+   identity: async () => ({ pid: 123, hostname: 'test-host', startIdentity: 'current' }),
+@@ -23,6 +29,123 @@
+   await rm(root, { recursive: true, force: true });
+ });
+ describe('formal Agent provider dispatch allowance', () => {
++  it('keeps the legacy quota exact and selects only the frozen candidate v2', () => {
++    expect(MIRA_FORMAL_AGENT_BUDGET).toEqual({policyId:'mira-formal-agent-budget.v1',maxDispatches:48,
++      maxCumulativeInputCharacters:8_000_000,maxOutputTokensPerDispatch:16_384,maxRetries:0});
++    expect(MIRA_FORMAL_FLASH_AGENT_BUDGET).toEqual({policyId:'mira-formal-agent-budget.v2',maxDispatches:48,
++      maxCumulativeInputCharacters:50_331_648,maxOutputTokensPerDispatch:16_384,maxRetries:0});
++    expect(miraFormalAgentBudget()).toBe(MIRA_FORMAL_AGENT_BUDGET);
++    expect(miraFormalAgentBudget('deepseek-v4-pro-flash-v1')).toBe(MIRA_FORMAL_AGENT_BUDGET);
++    expect(miraFormalAgentBudget(modelPolicyId)).toBe(MIRA_FORMAL_FLASH_AGENT_BUDGET);
++    for (const unknown of ['',null,'deepseek-flash','unknown'])
++      expect(() => miraFormalAgentBudget(unknown)).toThrow('MODEL_POLICY_INVALID');
++  });
++  it('candidate continues past the old cumulative 8M without losing any reservation on restart', async () => {
++    for (let turn=0;turn<9;turn++) await reserveMiraFormalAgentDispatch(
++      {sessionId,inputCharacters:1_000_000,modelPolicyId},{root,lockDeps,priorCalls:async()=>2});
++    const recorded=JSON.parse(await readFile(join(root,sessionId,'dispatches.json'),'utf8'));
++    expect(recorded.policyId).toBe('mira-formal-agent-budget.v2');
++    expect(recorded.modelPolicyId).toBe(modelPolicyId);
++    expect(recorded.priorCalls).toBe(2);
++    expect(recorded.dispatches).toHaveLength(9);
++    expect(recorded.cumulativeInputCharacters).toBe(9_000_000);
++    await expect(reserveMiraFormalAgentDispatch({sessionId,inputCharacters:1}, {root,lockDeps}))
++      .rejects.toThrow('MODEL_POLICY_MISMATCH');
++  });
++  it('candidate keeps both 48 dispatch and its exact cumulative allowance', async () => {
++    await reserveMiraFormalAgentDispatch({sessionId,inputCharacters:1,modelPolicyId},
++      {root,lockDeps,priorCalls:async()=>47});
++    await expect(reserveMiraFormalAgentDispatch({sessionId,inputCharacters:1,modelPolicyId},{root,lockDeps}))
++      .rejects.toThrow('DISPATCH_BUDGET_EXHAUSTED');
++    const other=`miraformal_${'b'.repeat(64)}`;
++    await reserveMiraFormalAgentDispatch({sessionId:other,inputCharacters:50_331_648,modelPolicyId},
++      {root,lockDeps,priorCalls:async()=>0});
++    await expect(reserveMiraFormalAgentDispatch({sessionId:other,inputCharacters:1,modelPolicyId},{root,lockDeps}))
++      .rejects.toThrow('CONTEXT_BUDGET_EXHAUSTED');
++    await expect(reserveMiraFormalAgentDispatch({sessionId:other,inputCharacters:1,modelPolicyId:'unknown'},{root,lockDeps}))
++      .rejects.toThrow('MODEL_POLICY_INVALID');
++  });
++  it('an existing candidate v1 ledger requires an explicit upgrade, with original bytes unchanged', async () => {
++    await mkdir(join(root,sessionId));
++    const file=join(root,sessionId,'dispatches.json');
++    const original=JSON.stringify({policyId:MIRA_FORMAL_AGENT_BUDGET.policyId,priorCalls:3,
++      dispatches:[{inputCharacters:7_950_000,reservedAt:'2026-10-08T00:00:00.000Z'}]},null,2)+'\n';
++    await writeFile(file,original);
++    const priorCalls=vi.fn(async()=>0);
++    await expect(reserveMiraFormalAgentDispatch({sessionId,inputCharacters:400_000,modelPolicyId},{root,lockDeps,priorCalls}))
++      .rejects.toThrow('UPGRADE_REQUIRED');
++    expect(priorCalls).not.toHaveBeenCalled();
++    expect(await readFile(file,'utf8')).toBe(original);
++    const upgraded=upgradeMiraFormalCandidateAgentBudget({sessionId,modelPolicyId,sourceLedgerJson:original,
++      expectedSourceSha256:byteSha(original),trustedOperatorApproved:true});
++    expect(upgraded.archive.sourceLedgerJson).toBe(original);
++    expect(upgraded.archive.sha256).toBe(byteSha(original));
++    expect(upgraded.ledger.priorCalls).toBe(3);
++    expect(upgraded.ledger.dispatches).toEqual(JSON.parse(original).dispatches);
++    expect(upgraded.ledger.cumulativeInputCharacters).toBe(7_950_000);
++    await writeFile(join(root,sessionId,upgraded.archive.fileName),upgraded.archive.sourceLedgerJson);
++    await writeFile(file,JSON.stringify(upgraded.ledger));
++    await reserveMiraFormalAgentDispatch({sessionId,inputCharacters:400_000,modelPolicyId},{root,lockDeps,priorCalls});
++    const saved=JSON.parse(await readFile(file,'utf8'));
++    expect(saved.dispatches).toHaveLength(2);
++    expect(saved.priorCalls).toBe(3);
++    expect(saved.dispatches[0]).toEqual(JSON.parse(original).dispatches[0]);
++    expect(saved.cumulativeInputCharacters).toBe(8_350_000);
++    expect(saved.upgrade).toEqual(upgraded.receipt);
++    expect(await readFile(join(root,sessionId,upgraded.archive.fileName),'utf8')).toBe(original);
++  });
++  it('pure upgrades reject stale bytes, untrusted selectors and reset/double-upgrade inputs', () => {
++    const raw=JSON.stringify({policyId:MIRA_FORMAL_AGENT_BUDGET.policyId,priorCalls:25,
++      dispatches:[{inputCharacters:7_900_000,reservedAt:'2026-10-08T00:00:00Z'}]});
++    const input={sessionId,modelPolicyId,sourceLedgerJson:raw,expectedSourceSha256:byteSha(raw),trustedOperatorApproved:true};
++    for (const change of [{trustedOperatorApproved:false},{modelPolicyId:'unknown'},
++      {expectedSourceSha256:'a'.repeat(64)},{sourceLedgerJson:raw+' '}])
++      expect(()=>upgradeMiraFormalCandidateAgentBudget({...input,...change})).toThrow();
++    const upgraded=upgradeMiraFormalCandidateAgentBudget(input);
++    const next=JSON.stringify(upgraded.ledger);
++    expect(()=>upgradeMiraFormalCandidateAgentBudget({...input,sourceLedgerJson:next,expectedSourceSha256:byteSha(next)}))
++      .toThrow('UPGRADE_SOURCE_INVALID');
++    for (const change of [{priorCalls:-1},{dispatches:[{inputCharacters:-1}]},{cumulativeInputCharacters:0}]) {
++      const altered=JSON.stringify({...JSON.parse(raw),...change});
++      expect(()=>upgradeMiraFormalCandidateAgentBudget({...input,sourceLedgerJson:altered,expectedSourceSha256:byteSha(altered)}))
++        .toThrow();
++    }
++  });
++  it('requires the byte archive and unchanged prior history for an upgraded candidate', async () => {
++    const raw=JSON.stringify({policyId:MIRA_FORMAL_AGENT_BUDGET.policyId,priorCalls:25,
++      dispatches:[{inputCharacters:7_900_000,reservedAt:'2026-10-08T00:00:00Z'}]});
++    const upgraded=upgradeMiraFormalCandidateAgentBudget({sessionId,modelPolicyId,sourceLedgerJson:raw,
++      expectedSourceSha256:byteSha(raw),trustedOperatorApproved:true});
++    await mkdir(join(root,sessionId));
++    const file=join(root,sessionId,'dispatches.json');
++    const reserve=()=>reserveMiraFormalAgentDispatch({sessionId,inputCharacters:400_000,modelPolicyId},{root,lockDeps});
++    await writeFile(file,JSON.stringify(upgraded.ledger));
++    await expect(reserve()).rejects.toThrow('UPGRADE_ARCHIVE_MISSING');
++    await writeFile(join(root,sessionId,upgraded.archive.fileName),raw+' ');
++    await expect(reserve()).rejects.toThrow('UPGRADE_SOURCE_CHANGED');
++    await writeFile(join(root,sessionId,upgraded.archive.fileName),raw);
++    const altered=structuredClone(upgraded.ledger);
++    altered.priorCalls=0;
++    await writeFile(file,JSON.stringify(altered));
++    await expect(reserve()).rejects.toThrow('UPGRADE_RECEIPT_INVALID');
++    await writeFile(file,JSON.stringify({...upgraded.ledger,cumulativeInputCharacters:0}));
++    await expect(reserve()).rejects.toThrow('LEDGER_INVALID');
++    await writeFile(file,JSON.stringify({...upgraded.ledger,dispatches:[],cumulativeInputCharacters:0}));
++    await expect(reserve()).rejects.toThrow('UPGRADE_RECEIPT_INVALID');
++  });
++  it('upgrading the context allowance cannot reopen an exhausted dispatch allowance', async () => {
++    const raw=JSON.stringify({policyId:MIRA_FORMAL_AGENT_BUDGET.policyId,priorCalls:47,
++      dispatches:[{inputCharacters:7_900_000,reservedAt:'2026-10-08T00:00:00Z'}]});
++    const upgraded=upgradeMiraFormalCandidateAgentBudget({sessionId,modelPolicyId,sourceLedgerJson:raw,
++      expectedSourceSha256:byteSha(raw),trustedOperatorApproved:true});
++    await mkdir(join(root,sessionId));
++    await writeFile(join(root,sessionId,upgraded.archive.fileName),raw);
++    const file=join(root,sessionId,'dispatches.json');
++    await writeFile(file,JSON.stringify(upgraded.ledger));
++    await expect(reserveMiraFormalAgentDispatch({sessionId,inputCharacters:400_000,modelPolicyId},{root,lockDeps}))
++      .rejects.toThrow('DISPATCH_BUDGET_EXHAUSTED');
++    expect(JSON.parse(await readFile(file,'utf8'))).toEqual(upgraded.ledger);
++  });
+   it('retains ordinary model windows and the default formal allowance', async () => {
+     const fetch = vi.fn();
+     vi.stubGlobal('fetch', fetch);
+@@ -32,6 +155,10 @@
+         omitMaxOutputTokens: window === undefined,
+       });
+       expect(await miraFormalAgentOutputOptions(true, window)).toEqual({
++        maxOutputTokens: Math.min(window ?? Infinity, 16_384),
++        omitMaxOutputTokens: false,
++      });
++      expect(await miraFormalAgentOutputOptions(true, window, modelPolicyId)).toEqual({
+         maxOutputTokens: Math.min(window ?? Infinity, 16_384),
+         omitMaxOutputTokens: false,
+       });

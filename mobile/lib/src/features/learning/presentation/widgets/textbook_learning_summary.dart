@@ -1,3 +1,6 @@
+import 'package:go_router/go_router.dart';
+import 'package:warm_sight/src/app/router/app_route.dart';
+import 'package:warm_sight/src/shared/widgets/app_list_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/core/theme/app_tokens.dart';
@@ -71,6 +74,15 @@ class TextbookLearningSummary extends ConsumerWidget {
               ),
             ),
           ),
+        AppListRow(
+          icon: Icons.assignment_outlined,
+          title: '作业检查与周末复习',
+          subtitle: '查看具体错题和学习进步',
+          onTap: () => context.push(
+            '$learningCenterPath?childId=${Uri.encodeQueryComponent(childId)}',
+          ),
+          trailing: const Icon(Icons.chevron_right),
+        ),
         catalog.when(
           skipLoadingOnRefresh: false,
           loading: () => const _BooksLoading(),

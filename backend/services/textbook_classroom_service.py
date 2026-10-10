@@ -333,6 +333,8 @@ class TextbookClassroomService:
                             'attemptNumber': 1, 'hintUsed': r['hintUsed'], 'adultHelp': r['adultHelp']} for r in result['results']]),
                          result['totalQuestions'], result['correctCount'], result['totalQuestions'], now_ms(), session['id']))
                     self._report(conn, session, child, course, result)
+                from services.learning_evidence_service import record_textbook_changes
+                record_textbook_changes(conn, session, course, state, previous, release)
                 sync_journey(conn, self.learning, session, child, course, state, previous)
                 if textbook_activity.complete(progress) and result:
                     self._complete(conn, session, child, course, result)

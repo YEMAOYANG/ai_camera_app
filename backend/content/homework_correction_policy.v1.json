@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "mira.homework-correction-policy.v1",
+  "maximumAttempts": 10,
+  "maximumAnswerCharacters": 1000,
+  "voice": {
+    "prompt": "看原题图片，找到圈出的第{ordinal}个空。请自己想一想，再说出答案。",
+    "hint": "先看清题目问的是哪一个空，再看原图里的条件。可以请老师讲一讲。",
+    "explanation": "这道题的参考答案是{answer}。{analysis}",
+    "success": "这次的答案和原题参考一致，订正记录已经保存。之后再独立试一试。",
+    "retry": "这次答案和原题参考还不一样。先看原图，听讲解，再试一试。"
+  }
+}

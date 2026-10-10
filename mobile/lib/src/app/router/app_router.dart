@@ -1,3 +1,9 @@
+import 'package:warm_sight/src/features/homework/presentation/homework_capture_authorization_page.dart';
+import 'package:warm_sight/src/features/learning_review/presentation/learning_center_page.dart';
+import 'package:warm_sight/src/features/learning_review/presentation/review_preferences_page.dart';
+import 'package:warm_sight/src/features/learning_review/presentation/review_detail_page.dart';
+import 'package:warm_sight/src/features/homework/presentation/homework_create_page.dart';
+import 'package:warm_sight/src/features/homework/presentation/homework_detail_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warm_sight/src/features/learning/presentation/school_textbooks_page.dart';
 import 'package:go_router/go_router.dart';
@@ -46,6 +52,48 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(path: '/', builder: (_, _) => const StartupGate()),
+      GoRoute(
+        path: homeworkCaptureAuthorizationPath,
+        name: 'homeworkCaptureAuthorization',
+        builder: (_, state) => HomeworkCaptureAuthorizationPage(
+          childId: state.uri.queryParameters['childId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: learningCenterPath,
+        name: 'learningCenter',
+        builder: (_, state) =>
+            LearningCenterPage(childId: state.uri.queryParameters['childId']),
+      ),
+      GoRoute(
+        path: reviewPreferencesPath,
+        name: 'reviewPreferences',
+        builder: (_, state) => ReviewPreferencesPage(
+          childId: state.uri.queryParameters['childId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: '$learningReviewDetailPath/:reviewId',
+        name: 'learningReviewDetail',
+        builder: (_, state) => ReviewDetailPage(
+          childId: state.uri.queryParameters['childId'] ?? '',
+          reviewId: state.pathParameters['reviewId']!,
+        ),
+      ),
+      GoRoute(
+        path: homeworkCreatePath,
+        name: 'homeworkCreate',
+        builder: (_, state) => HomeworkCreatePage(
+          childId: state.uri.queryParameters['childId'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: '$homeworkDetailPath/:submissionId',
+        name: 'homeworkDetail',
+        builder: (_, state) => HomeworkDetailPage(
+          submissionId: state.pathParameters['submissionId']!,
+        ),
+      ),
       GoRoute(
         path: welcomePath,
         name: 'welcome',

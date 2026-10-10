@@ -32,6 +32,27 @@ def receipt():
 
 
 class FormalMultistateTest(unittest.TestCase):
+    def test_candidate_visual_receipt_binds_the_frozen_model_policy(self):
+        from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
+        policy = OpenMaicFullRuntimeClient.selected_professional_creation_policy("deepseek-v4.1-flash-candidate-v1")
+        generation = {"professionalCreationPolicy": policy}
+        r, q = receipt()
+        candidate = r['visualReview'] | {"modelId": "deepseek-flash", "modelPolicyId": policy["modelPolicyId"]}
+        visual_review_receipt(signed(candidate), q, generation_contract=generation)
+        for changed in (
+            candidate | {"modelId": "deepseek-v4-flash-vision-exp"},
+            candidate | {"modelPolicyId": "other-policy"},
+            {key: value for key, value in candidate.items() if key != "modelPolicyId"},
+        ):
+            with self.assertRaises(ValueError):
+                visual_review_receipt(signed(changed), q, generation_contract=generation)
+        with self.assertRaises(ValueError):
+            visual_review_receipt(signed(candidate), q)
+        changed_policy = deepcopy(policy)
+        changed_policy["sceneLearningPolicy"]["pictureChoicesForGrades"] = []
+        with self.assertRaises(ValueError):
+            visual_review_receipt(signed(candidate), q, generation_contract={"professionalCreationPolicy": changed_policy})
+
     def test_v2_receipt_preserves_plan_and_two_device_proofs(self):
         r,q=receipt()
         interaction_design_receipt(r)

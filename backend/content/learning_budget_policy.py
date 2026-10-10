@@ -11,6 +11,10 @@ from zoneinfo import ZoneInfo
 UNITS = ("calls", "input_tokens", "output_tokens", "characters", "audio_ms",
          "video_ms", "images", "search_requests", "money_micros")
 PURPOSES = ("production", "required_teaching", "optional_interaction")
+SUPPORTED_PURPOSES = (*PURPOSES, "homework")
+COURSE_BUDGET_SUBJECTS = frozenset({"chinese", "math", "english", "science"})
+HOMEWORK_SCOPE_FIELDS = {"purpose", "gradeCode", "subject", "familyId", "childId",
+                         "submissionId", "itemId", "itemRevision", "approvalReference"}
 MAX_UNITS = 10**12
 DEFAULT_POLICY_PATH = Path(__file__).with_name("learning_budget_policy.json")
 
@@ -48,6 +52,8 @@ class LearningBudgetPolicy:
                   "allowUnpriced", "limits", "prices", "authorizationTemplates"}
         if "aggregateLimitsEnabled" in raw:
             fields.add("aggregateLimitsEnabled")
+        if "enforcedPurposes" in raw:
+            fields.add("enforcedPurposes")
         if "renewTeachingAuthorizations" in raw:
             fields.add("renewTeachingAuthorizations")
         if "productionInflightOverride" in raw:
@@ -77,14 +83,35 @@ class LearningBudgetPolicy:
         maximum = limits["global"]["maxInflightCalls"]
         if type(maximum) is not int or not 0 <= maximum <= 10000:
             raise ValueError("invalid global inflight limit")
-        _exact(limits["purposes"], PURPOSES)
+        purpose_keys = set(limits["purposes"]) if isinstance(limits["purposes"], dict) else set()
+        if purpose_keys not in (set(PURPOSES), set(SUPPORTED_PURPOSES)):
+            raise ValueError("invalid budget purpose registry")
+        enforced = raw.get("enforcedPurposes", [])
+        if (not isinstance(enforced, list) or any(not isinstance(p, str) for p in enforced)
+                or len(set(enforced)) != len(enforced) or not set(enforced) <= purpose_keys):
+            raise ValueError("invalid enforced budget purposes")
+        self.enforced_purposes = frozenset(enforced)
         _exact(limits["user"], {"day", "month"})
         _exact(limits["course"], {"lifetime"})
-        for pool in [limits["global"], limits["user"], *limits["purposes"].values()]:
+        for pool in [limits["global"], limits["user"]]:
             if pool is not limits["global"]:
                 _exact(pool, {"day", "month"})
             for window in ("day", "month"):
                 units(pool[window], money=True, complete=True)
+        for pool in limits["purposes"].values():
+            if not isinstance(pool, dict):
+                raise ValueError("invalid purpose budget limits")
+            extra = {key for key in ("user", "course") if key in pool}
+            _exact(pool, {"day", "month"} | extra)
+            for window in ("day", "month"):
+                units(pool[window], money=True, complete=True)
+            if "user" in pool:
+                _exact(pool["user"], {"day", "month"})
+                for window in ("day", "month"):
+                    units(pool["user"][window], money=True, complete=True)
+            if "course" in pool:
+                _exact(pool["course"], {"lifetime"})
+                units(pool["course"]["lifetime"], money=True, complete=True)
         units(limits["course"]["lifetime"], money=True, complete=True)
         units(limits["authorization"], money=True, complete=True)
         if not isinstance(raw["prices"], dict):
@@ -114,13 +141,13 @@ class LearningBudgetPolicy:
                 if not isinstance(rates, dict) or set(rates) != set(allowed):
                     raise ValueError("price must rate all allowed measurements")
                 units(rates)
-        _exact(raw["authorizationTemplates"], PURPOSES)
-        for template in raw["authorizationTemplates"].values():
+        _exact(raw["authorizationTemplates"], purpose_keys)
+        for purpose, template in raw["authorizationTemplates"].items():
             if template is None:
                 continue
             _exact(template, {"maxUnits", "priceKeys", "ttlMs"})
             maximum = units(template["maxUnits"], money=True, complete=True)
-            if self.aggregate_limits_enabled and any(maximum[k] > limits["authorization"][k] for k in UNITS):
+            if self.enforces_limits(purpose) and any(maximum[k] > limits["authorization"][k] for k in UNITS):
                 raise ValueError("authorization template exceeds policy")
             keys = template["priceKeys"]
             if (not isinstance(keys, list) or not keys or any(not isinstance(k, str) for k in keys)
@@ -144,14 +171,14 @@ class LearningBudgetPolicy:
             if not isinstance(scopes, list) or not 1 <= len(scopes) <= 32:
                 raise ValueError("explicit budget scopes are required")
             for scope in scopes:
-                _exact(scope, fields)
-                if scope["purpose"] not in PURPOSES:
+                _exact(scope, HOMEWORK_SCOPE_FIELDS if isinstance(scope, dict) and scope.get("purpose") == "homework" else fields)
+                if scope["purpose"] not in purpose_keys:
                     raise ValueError("invalid fixed budget purpose")
                 if production_only:
                     if (scope["purpose"] != "production" or scope["userId"] is not None
                             or scope["sessionId"] is not None
                             or scope["gradeCode"] not in {f"primary_{grade}" for grade in range(1, 7)}
-                            or scope["subject"] not in {"chinese", "math", "english"}):
+                            or scope["subject"] not in COURSE_BUDGET_SUBJECTS):
                         raise ValueError("production authorization window requires exact production scopes")
                     for key in ("courseId", "courseVersion", "productionJobId", "approvalReference"):
                         if (not isinstance(scope[key], str)
@@ -179,6 +206,9 @@ class LearningBudgetPolicy:
                 raise ValueError("production inflight override permits only one temporary slot above four")
         self.raw = raw
         self.sha256 = digest(raw)
+
+    def enforces_limits(self, purpose):
+        return self.aggregate_limits_enabled or purpose in self.enforced_purposes
 
     def production_inflight_override(self, *, scope, authorization_id, now):
         """A fixed-window admission exception; unresolved accounting stays intact."""

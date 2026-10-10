@@ -12,6 +12,7 @@ from html.parser import HTMLParser
 import json
 import re
 from typing import Any, Callable, Mapping
+from pathlib import Path
 
 from integrations.openmaic_formal_skills import (
     FORMAL_SKILL_ORCHESTRATION_POLICY, ADAPTIVE_SKILL_ORCHESTRATION_POLICY,
@@ -76,6 +77,31 @@ REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY = {
     **deepcopy(MULTISTATE_PROFESSIONAL_POLICY),
     "playfulLearningPolicy": REQUIRED_3D_PLAYFUL_LEARNING_POLICY,
 }
+_FLASH_CANDIDATE_REGISTRY = json.loads((Path(__file__).resolve().parents[1] /
+    "content" / "openmaic_formal_flash_candidate.v1.json").read_text(encoding="utf-8"))
+FLASH_CANDIDATE_MODEL_POLICY = deepcopy(_FLASH_CANDIDATE_REGISTRY["modelPolicy"])
+# A distinct creation identity activates the fixed scene/quiz learning contract.
+# All existing creation policies above remain frozen for persisted requests.
+FLASH_CANDIDATE_PROFESSIONAL_POLICY = {
+    **deepcopy(PLAYFUL_PROFESSIONAL_POLICY),
+    "modelPolicyId": "deepseek-v4.1-flash-candidate-v1",
+    "sceneLearningPolicy": {
+        "schemaVersion": "mira.learning.scene-contract-policy.v1",
+        "enforced": True,
+        "pictureChoicesForGrades": ["primary_1", "primary_2"],
+        "noMasteryClaims": True,
+        "scriptSyntaxRequired": True,
+    },
+}
+_PRO_CURRENT_FLASH_REGISTRY = json.loads((Path(__file__).resolve().parents[1] /
+    "content" / "openmaic_formal_pro_current_flash.v1.json").read_text(encoding="utf-8"))
+PRO_CURRENT_FLASH_MODEL_POLICY = deepcopy(_PRO_CURRENT_FLASH_REGISTRY["modelPolicy"])
+PRO_CURRENT_FLASH_PROFESSIONAL_POLICY = {
+    **deepcopy(PLAYFUL_PROFESSIONAL_POLICY), "modelPolicyId": PRO_CURRENT_FLASH_MODEL_POLICY["policyId"],
+}
+PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY = {
+    **deepcopy(REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY), "modelPolicyId": PRO_CURRENT_FLASH_MODEL_POLICY["policyId"],
+}
 LEGACY_CONTENT_PROVIDER_PROFILE = "mira.learning.question-provider-profile.v105-deepseek-professional"
 VIDEO_CONTENT_PROVIDER_PROFILE = "mira.learning.question-provider-profile.v106-deepseek-professional-video"
 LEGACY_GENERATION_OPTIONS = {
@@ -112,7 +138,9 @@ def professional_policy(value: object) -> dict[str, Any]:
         canonical_sha256(LEGACY_PROFESSIONAL_POLICY), canonical_sha256(IMAGE_PROFESSIONAL_POLICY),
         canonical_sha256(INTEGRATED_PROFESSIONAL_POLICY), canonical_sha256(PROFESSIONAL_POLICY),
         canonical_sha256(VIDEO_PROFESSIONAL_POLICY), canonical_sha256(INTERACTIVE_PROFESSIONAL_POLICY), canonical_sha256(MULTISTATE_PROFESSIONAL_POLICY),
-        canonical_sha256(PLAYFUL_PROFESSIONAL_POLICY), canonical_sha256(REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)
+        canonical_sha256(PLAYFUL_PROFESSIONAL_POLICY), canonical_sha256(REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY),
+        canonical_sha256(FLASH_CANDIDATE_PROFESSIONAL_POLICY),
+        canonical_sha256(PRO_CURRENT_FLASH_PROFESSIONAL_POLICY), canonical_sha256(PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)
     }:
         raise ValueError("unsupported formal professional policy")
     return deepcopy(dict(value))
@@ -135,7 +163,32 @@ def policy_from_target(target: object) -> dict[str, Any]:
 
 def compatible_preparation_targets(current: Mapping[str, Any]) -> tuple[dict[str, Any], ...]:
     """Enumerate frozen contracts; never replace a persisted target in place."""
-    policy_from_target(current)
+    current_policy = policy_from_target(current)
+    runtime = current.get("formalRuntimePolicy")
+    model = runtime.get("professionalModelPolicy") if isinstance(runtime, Mapping) else None
+    if isinstance(model, Mapping) and model.get("policyId") == FLASH_CANDIDATE_PROFESSIONAL_POLICY["modelPolicyId"] and current_policy != FLASH_CANDIDATE_PROFESSIONAL_POLICY:
+        raise ValueError("candidate model cannot use a legacy creation policy")
+    if current_policy == FLASH_CANDIDATE_PROFESSIONAL_POLICY:
+        # Never attach the new model identity to a historical creation policy.
+        # Old published courses keep their original explicit target/hash and
+        # remain usable through their historical playback contracts.
+        if not isinstance(model, Mapping) or canonical_sha256(model) != canonical_sha256(FLASH_CANDIDATE_MODEL_POLICY):
+            raise ValueError("candidate preparation model policy mismatch")
+        return (deepcopy(dict(current)),)
+    if isinstance(model, Mapping) and model.get("policyId") == PRO_CURRENT_FLASH_MODEL_POLICY["policyId"]:
+        if (canonical_sha256(model) != canonical_sha256(PRO_CURRENT_FLASH_MODEL_POLICY)
+                or current_policy not in (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)):
+            raise ValueError("current Flash verifier preparation policy mismatch")
+        # Preserve reuse by enumerating the exact old identity, never assigning
+        # a new reviewer identity to an old receipt or modifying its hash.
+        from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
+        historical = deepcopy(dict(current))
+        historical["formalRuntimePolicy"]["professionalModelPolicy"] = deepcopy(OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_MODEL_POLICY)
+        historical["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(current_policy)
+        historical["formalRuntimePolicy"]["professionalCreationPolicy"].pop("modelPolicyId")
+        return (deepcopy(dict(current)), *compatible_preparation_targets(historical))
+    if current_policy in (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY):
+        raise ValueError("current Flash verifier preparation model policy mismatch")
     if current.get("schemaVersion") == "mira.learning.preparation-target.progressive.v1":
         return (deepcopy(dict(current)),)
     targets = [deepcopy(dict(current))]
@@ -163,6 +216,24 @@ def compatible_preparation_target(persisted: object, current: object) -> bool:
         }
     except (TypeError, ValueError, KeyError):
         return False
+
+
+def professional_scene_learning_fields(receipt: Mapping[str, Any], *,
+                                       generation_contract: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    keys = {"modelPolicyId", "sceneLearningPolicy"}
+    fields = {key: receipt[key] for key in keys if key in receipt}
+    identity = fields.get("modelPolicyId")
+    expected = ({"modelPolicyId": PRO_CURRENT_FLASH_MODEL_POLICY["policyId"]}
+                if identity == PRO_CURRENT_FLASH_MODEL_POLICY["policyId"] else
+                {key: deepcopy(FLASH_CANDIDATE_PROFESSIONAL_POLICY[key]) for key in keys})
+    if fields and canonical_sha256(fields) != canonical_sha256(expected):
+        raise ValueError("invalid versioned professional model receipt")
+    if generation_contract is not None:
+        policy = professional_policy(generation_contract.get("professionalCreationPolicy"))
+        expected_contract = {key: deepcopy(policy[key]) for key in keys if key in policy}
+        if canonical_sha256(fields) != canonical_sha256(expected_contract):
+            raise ValueError("professional model receipt policy mismatch")
+    return fields
 
 
 def professional_image_fields(receipt: Mapping[str, Any]) -> dict[str, Any]:
@@ -383,6 +454,7 @@ def validate_media_manifest(manifest: Mapping[str, Any]) -> dict[str, Any] | Non
     if not all(isinstance(v, Mapping) for v in (generation, professional, evidence)):
         raise ValueError("formal media authority missing")
     policy = professional_policy(generation.get("professionalCreationPolicy"))
+    professional_scene_learning_fields(professional, generation_contract=generation)
     validate_generation_grade_boundary(generation)
     validate_skill_manifest(manifest)
     validate_quality_manifest(manifest)

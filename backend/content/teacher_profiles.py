@@ -8,6 +8,7 @@ from typing import Iterable
 
 LEGACY_TEACHER_REGISTRY_VERSION = "mira.teacher-registry.v1"
 TEACHER_REGISTRY_VERSION = "mira.teacher-registry.v2"
+SCIENCE_TEACHER_REGISTRY_VERSION = "mira.teacher-registry.v3"
 SUPPORTED_TEACHER_SUBJECTS = frozenset({"chinese", "math", "english"})
 SUPPORTED_TTS_PROVIDER_IDS = frozenset({"voxcpm2", "macos-say"})
 OPENMAIC_QWEN3_VOICE_CONTRACT_VERSION = "mira.openmaic.qwen3-voice.v1"
@@ -24,6 +25,7 @@ FORMAL_RUNTIME_TEACHER_AVATARS = {
     "chinese": "/avatars/teacher-2.png",
     "math": "/avatars/teacher.png",
     "english": "/avatars/teacher-2.png",
+    "science": "/avatars/teacher-2.png",
 }
 
 
@@ -371,7 +373,38 @@ TEACHER_PROFILES: tuple[TeacherProfile, ...] = (
     ),
 )
 
-_PROFILE_INDEX = {(profile.profile_id, profile.version): profile for profile in TEACHER_PROFILES}
+# The v1/v2 registry and its completeness invariant remain immutable. Science
+# is an additive textbook teacher with its own registry/versioned identity.
+SCIENCE_TEACHER_PROFILES: tuple[TeacherProfile, ...] = (
+    TeacherProfile(
+        profile_id="mira_science_inquiry",
+        version=1,
+        registry_version=SCIENCE_TEACHER_REGISTRY_VERSION,
+        display_name="小科老师",
+        avatar_path="/teachers/mi-chinese-v1.png",
+        subject="science",
+        language_code="zh-CN",
+        teaching_style="observe_predict_experiment",
+        provider_id="voxcpm2",
+        provider_model="openbmb/VoxCPM2",
+        voice_prompt=(
+            "清晰、温和、充满好奇心的中文小学科学老师声音，普通话标准，"
+            "语速适中，观察与操作步骤之间停顿明确"
+        ),
+        capabilities=(
+            "observe_and_describe",
+            "predict_and_test",
+            "evidence_based_explanation",
+            "standard_mandarin",
+            "safe_experiment_guidance",
+        ),
+    ),
+)
+
+_PROFILE_INDEX = {
+    (profile.profile_id, profile.version): profile
+    for profile in (*TEACHER_PROFILES, *SCIENCE_TEACHER_PROFILES)
+}
 
 # Stage 2 deliberately approves exactly one voice for the single
 # primary_1/math/number_sense_20 full-runtime sample.  This mapping is separate
@@ -428,11 +461,23 @@ _FORMAL_SUBJECT_QWEN_VOICE_IDENTITIES = {
     ),
 }
 
+_SCIENCE_QWEN_VOICE_IDENTITY = FormalSubjectQwenVoiceIdentity(
+    subject="science",
+    teacher_profile_id="mira_science_inquiry",
+    teacher_profile_version=1,
+    teacher_profile_hash="6bdd6746ed1a6a538751f23ff663a9153e7d1db767f7d9d3b6e5dc00d97d5c6b",
+    teacher_name="小科老师",
+    teacher_gender="female",
+    voice_gender="female",
+    voice_id="Serena",
+    language_code="zh-CN",
+)
+
 
 def get_teacher_profile(profile_id: str, version: int | None = None) -> TeacherProfile:
     normalized_id = str(profile_id or "").strip()
     if version is None:
-        candidates = [profile for profile in TEACHER_PROFILES if profile.profile_id == normalized_id]
+        candidates = [profile for profile in _PROFILE_INDEX.values() if profile.profile_id == normalized_id]
         if not candidates:
             raise KeyError(f"unknown teacher profile: {normalized_id}")
         return max(candidates, key=lambda item: item.version)
@@ -464,6 +509,8 @@ def get_formal_subject_qwen_voice_identity(
     subject: str,
 ) -> FormalSubjectQwenVoiceIdentity:
     normalized = str(subject or "").strip().lower()
+    if normalized == "science":
+        return _SCIENCE_QWEN_VOICE_IDENTITY
     try:
         return _FORMAL_SUBJECT_QWEN_VOICE_IDENTITIES[normalized]
     except KeyError as exc:
@@ -518,9 +565,11 @@ def list_teacher_profiles(
 ) -> tuple[TeacherProfile, ...]:
     subject_code = str(subject or "").strip().lower()
     language = str(language_code or "").strip().casefold()
+    # Unfiltered legacy callers keep the original three-subject registry.
+    profiles = SCIENCE_TEACHER_PROFILES if subject_code == "science" else TEACHER_PROFILES
     matches = tuple(
         profile
-        for profile in TEACHER_PROFILES
+        for profile in profiles
         if (not subject_code or profile.subject == subject_code)
         and (not language or profile.language_code.casefold() == language)
     )
@@ -618,6 +667,32 @@ def validate_formal_subject_qwen_voice_registry(
             raise ValueError(f"invalid formal subject voice identity: {subject}")
 
 
+def validate_science_teacher_contract() -> None:
+    """Validate the additive identity without widening the legacy registries."""
+    voice = _SCIENCE_QWEN_VOICE_IDENTITY
+    profile = _PROFILE_INDEX.get((voice.teacher_profile_id, voice.teacher_profile_version))
+    if (
+        len(SCIENCE_TEACHER_PROFILES) != 1
+        or profile != SCIENCE_TEACHER_PROFILES[0]
+        or profile.registry_version != SCIENCE_TEACHER_REGISTRY_VERSION
+        or profile.subject != "science"
+        or profile.content_hash != voice.teacher_profile_hash
+        or profile.display_name != voice.teacher_name
+        or profile.language_code != voice.language_code
+        or profile.voice_mode != "prompt"
+        or profile.clone_allowed
+        or voice.teacher_gender != voice.voice_gender
+        or voice.voice_id != "Serena"
+        or voice.tts_provider_id != FORMAL_QWEN_TTS_PROVIDER_ID
+        or voice.tts_model_id != FORMAL_QWEN_TTS_MODEL_ID
+        or voice.asr_provider_id != FORMAL_QWEN_ASR_PROVIDER_ID
+        or voice.asr_model_id != FORMAL_QWEN_ASR_MODEL_ID
+        or voice.fallback_allowed
+    ):
+        raise ValueError("invalid additive science teacher contract")
+
+
 validate_teacher_registry()
 validate_openmaic_qwen3_voice_registry()
 validate_formal_subject_qwen_voice_registry()
+validate_science_teacher_contract()

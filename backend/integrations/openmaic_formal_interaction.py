@@ -168,7 +168,7 @@ def _bound_interaction(professional: Mapping[str, Any], generation: Mapping[str,
     if receipt["policyId"] != selected["policyId"]:
         raise ValueError("interaction policy and receipt version mismatch")
     if receipt["schemaVersion"].endswith(".v2"):
-        visual_review_receipt(receipt["visualReview"], quality)
+        visual_review_receipt(receipt["visualReview"], quality, generation_contract=generation)
         for item in receipt["objectives"]:
             validate_exploration(item["exploration"], skill_id=generation.get("gradeBoundary", {}).get("skillId"))
     unsigned = dict(professional)

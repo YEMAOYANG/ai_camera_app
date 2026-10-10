@@ -100,3 +100,13 @@ flutter test
 ```
 
 If either command cannot run, report the reason and the remaining risk.
+
+## Repository Hygiene
+
+- Report ordinary changes and verification in chat. Do not create a new Markdown report, dated plan, acceptance note, or screenshot gallery unless the user asks or a necessary workflow explicitly requires it. Update an existing relevant document when lasting guidance changes.
+- Show routine lint, typecheck, test and build results in the terminal. Do not save a separate success log, JSON report, screenshot gallery, or duplicate result for every command. Prefer existing tools or code passed through stdin over creating a new one-time script.
+- When temporary files are necessary, use one private directory per task through `python3 tools/task_tmp.py --name <task> -- <command...>`. The command receives `MIRA_TASK_TMPDIR` and `TMPDIR`; explicitly direct screenshots and other independent tools to that same directory. Do not scatter dated files directly into `/tmp` or `/private/tmp`.
+- Successful foreground checks clean their temporary workspace automatically. A failed check retains nonempty diagnostics and prints their location; `--keep` retains an explicitly needed workspace. Remove retained task output after the issue is resolved. Commit only reusable operator tools and meaningful regression tests, never a script for each fixed job, course, or recovery attempt.
+- Do not use automatic task cleanup for background services, database clusters, paid-call receipts, original private attachments, or recovery backups. These belong in their existing managed locations. Before removing any task directory, account for its running processes and live consumers; never sweep the shared system temporary directory by age or filename alone.
+- Keep test fixtures, golden baselines, prompt Markdown, migrations, private ownership manifests, paid-call receipts, published media, and active runtime dependencies when they have live consumers. File extensions and directory names alone do not establish redundancy.
+- Audit references, runtime ownership, and existing uncommitted work before cleanup. Use a verified recovery copy for unique historical data. Do not delete whole test, output, data, or database-table categories merely because they are large or currently empty.

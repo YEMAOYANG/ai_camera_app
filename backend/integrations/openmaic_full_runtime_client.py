@@ -10,11 +10,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
+from content.teacher_profiles import get_formal_subject_qwen_voice_identity
 
 from integrations.openmaic_formal_media import (
-    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY, FLASH_CANDIDATE_MODEL_POLICY, PRO_CURRENT_FLASH_MODEL_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
     LEGACY_GENERATION_OPTIONS, generation_options, professional_policy,
-    professional_image_fields, media_receipt,
+    professional_image_fields, professional_scene_learning_fields, media_receipt,
 )
 from integrations.openmaic_formal_video import FORMAL_VIDEO_POLICY, professional_video_fields, video_receipt
 from integrations.openmaic_formal_skills import professional_skill_fields
@@ -175,14 +176,38 @@ class OpenMaicFullRuntimeClient:
         },
         "fallbackAllowed": False,
     }
+    FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY = FLASH_CANDIDATE_MODEL_POLICY
+    PRO_CURRENT_FLASH_PROFESSIONAL_MODEL_POLICY = PRO_CURRENT_FLASH_MODEL_POLICY
+    PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY = PRO_CURRENT_FLASH_PROFESSIONAL_POLICY
+
     FORMAL_IMAGE_POLICY = FORMAL_IMAGE_POLICY
     FORMAL_VIDEO_POLICY = FORMAL_VIDEO_POLICY
     LEGACY_FORMAL_PROFESSIONAL_CREATION_POLICY = LEGACY_PROFESSIONAL_POLICY
     FORMAL_PROFESSIONAL_CREATION_POLICY = PLAYFUL_PROFESSIONAL_POLICY
 
+    FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY = FLASH_CANDIDATE_PROFESSIONAL_POLICY
+    FORMAL_MODEL_POLICY_ENV = "MIRA_FORMAL_MODEL_POLICY"
+
     @classmethod
-    def selected_professional_creation_policy(cls) -> dict[str, Any]:
+    def selected_professional_model_policy(cls, policy_id: str | None = None) -> dict[str, Any]:
+        """Opt in explicitly; persisted legacy policy objects remain unchanged."""
+        selected = str(policy_id if policy_id is not None else os.environ.get(cls.FORMAL_MODEL_POLICY_ENV, "")).strip()
+        if not selected or selected == cls.FORMAL_PROFESSIONAL_MODEL_POLICY["policyId"]:
+            return json.loads(json.dumps(cls.FORMAL_PROFESSIONAL_MODEL_POLICY))
+        if selected == cls.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY["policyId"]:
+            return json.loads(json.dumps(cls.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY))
+        if selected == cls.PRO_CURRENT_FLASH_PROFESSIONAL_MODEL_POLICY["policyId"]:
+            return json.loads(json.dumps(cls.PRO_CURRENT_FLASH_PROFESSIONAL_MODEL_POLICY))
+        raise ValueError("unsupported formal model policy")
+
+    @classmethod
+    def selected_professional_creation_policy(cls, policy_id: str | None = None) -> dict[str, Any]:
         """Read the operator opt-in at target construction, never at import time."""
+        if cls.selected_professional_model_policy(policy_id)["policyId"] == cls.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY["policyId"]:
+            return professional_policy(cls.FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY)
+        if cls.selected_professional_model_policy(policy_id)["policyId"] == cls.PRO_CURRENT_FLASH_PROFESSIONAL_MODEL_POLICY["policyId"]:
+            return professional_policy(PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY
+                if os.environ.get("MIRA_FORMAL_PLAYFUL_REQUIRE_3D") == "1" else PRO_CURRENT_FLASH_PROFESSIONAL_POLICY)
         policy = (REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY
                   if os.environ.get("MIRA_FORMAL_PLAYFUL_REQUIRE_3D") == "1"
                   else cls.FORMAL_PROFESSIONAL_CREATION_POLICY)
@@ -460,6 +485,14 @@ class OpenMaicFullRuntimeClient:
             "error": None if ready else "openmaic_sample_generation_not_ready",
         }
 
+    @classmethod
+    def selected_formal_generation_policy(cls, policy_id: str | None = None) -> dict[str, Any]:
+        selected = cls.selected_professional_model_policy(policy_id)
+        policy = json.loads(json.dumps(cls.FORMAL_GENERATION_POLICY))
+        if selected["policyId"] != cls.FORMAL_PROFESSIONAL_MODEL_POLICY["policyId"]:
+            policy["professionalCreation"] = cls.selected_professional_creation_policy(selected["policyId"])
+        return policy
+
     def formal_generation_readiness(self) -> dict[str, Any]:
         """Verify the private Pro Agent, web research and formal policy gate."""
 
@@ -503,7 +536,7 @@ class OpenMaicFullRuntimeClient:
                               if isinstance(runtime_policy, Mapping) else None)
         selected_policy = self.selected_professional_creation_policy()
         required_3d_ready = (
-            selected_policy != REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY
+            selected_policy not in (REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, self.FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)
             or isinstance(supported_policies, list) and any(
                 isinstance(policy, Mapping)
                 and _canonical_sha256(policy) == _canonical_sha256(selected_policy)
@@ -532,12 +565,12 @@ class OpenMaicFullRuntimeClient:
             and required_3d_ready
             and capabilities.get("speechAudioGeneration") is True
             and isinstance(formal_policy, Mapping)
-            and _canonical_sha256(dict(formal_policy)) == _canonical_sha256(self.FORMAL_GENERATION_POLICY)
+            and _canonical_sha256(dict(formal_policy)) == _canonical_sha256(self.selected_formal_generation_policy())
             and isinstance(professional_research, Mapping)
             and dict(professional_research)
             == self.FORMAL_PROFESSIONAL_RESEARCH_POLICY
             and isinstance(model_policy, Mapping)
-            and dict(model_policy) == self.FORMAL_PROFESSIONAL_MODEL_POLICY
+            and dict(model_policy) == self.selected_professional_model_policy()
         )
         return {
             "ready": ready,
@@ -573,17 +606,18 @@ class OpenMaicFullRuntimeClient:
     def formal_generation_provider_canary(self) -> dict[str, Any]:
         """Make one bounded real call to the pinned formal generation model."""
 
+        model_id = self.selected_professional_model_policy()["coursewareCreator"]["modelId"]
         try:
             payload = self._request_json(
                 "POST",
                 "/api/verify-model",
-                {"model": "deepseek:deepseek-v4-pro"},
+                {"model": f"deepseek:{model_id}"},
             )
         except OpenMaicFullRuntimeError as exc:
             return {
                 "ready": False,
                 "providerId": "deepseek",
-                "modelId": "deepseek-v4-pro",
+                "modelId": model_id,
                 "error": exc.code,
             }
         ready = bool(
@@ -594,7 +628,7 @@ class OpenMaicFullRuntimeClient:
         return {
             "ready": ready,
             "providerId": "deepseek",
-            "modelId": "deepseek-v4-pro",
+            "modelId": model_id,
             "error": None if ready else "openmaic_formal_provider_canary_failed",
         }
 
@@ -781,6 +815,9 @@ class OpenMaicFullRuntimeClient:
         """
 
         payload = self._formal_provider_readiness_payload(evidence)
+        selected = self.selected_professional_model_policy()
+        if selected["policyId"] != self.FORMAL_PROFESSIONAL_MODEL_POLICY["policyId"]:
+            payload["modelPolicyId"] = selected["policyId"]
         response = self._request_formal_audio_json(
             "POST", "/api/mira/formal-provider-readiness", payload
         )
@@ -1023,6 +1060,10 @@ class OpenMaicFullRuntimeClient:
                 "invalid_formal_provider_readiness_response",
                 "OpenMAIC Provider 就绪身份无效",
             )
+        policy_id = response.get("modelPolicyId")
+        if policy_id is not None and policy_id not in (cls.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY["policyId"], cls.PRO_CURRENT_FLASH_PROFESSIONAL_MODEL_POLICY["policyId"]):
+            raise OpenMaicFullRuntimeError("invalid_formal_provider_readiness_response", "OpenMAIC Provider 模型策略无效")
+        model_id = cls.selected_professional_model_policy(policy_id or cls.FORMAL_PROFESSIONAL_MODEL_POLICY["policyId"])["coursewareCreator"]["modelId"]
         normalized_validation = cls._validate_formal_readiness_validation(
             validation
         )
@@ -1031,6 +1072,7 @@ class OpenMaicFullRuntimeClient:
         )
         reconstructed_request = {
             "schemaVersion": cls.FORMAL_PROVIDER_READINESS_VERSION,
+            **({"modelPolicyId": policy_id} if policy_id is not None else {}),
             "requestId": request_id,
             **{
                 field: str(response[field])
@@ -1055,6 +1097,7 @@ class OpenMaicFullRuntimeClient:
         normalized_calls = cls._validate_formal_readiness_calls(
             calls,
             subject=normalized_validation["subject"],
+            model_id=model_id,
         )
         actual_passed = sum(
             call["state"] == "passed" for call in normalized_calls
@@ -1072,6 +1115,7 @@ class OpenMaicFullRuntimeClient:
                 calls=normalized_calls,
                 attempted=attempted,
                 passed=passed,
+                model_id=model_id,
             )
         done = response.get("done")
         if (
@@ -1095,6 +1139,7 @@ class OpenMaicFullRuntimeClient:
             )
         return {
             "requestId": request_id,
+            **({"modelPolicyId": policy_id} if policy_id is not None else {}),
             "requestSha256": request_sha256,
             "status": status,
             **{
@@ -1209,7 +1254,10 @@ class OpenMaicFullRuntimeClient:
         values: list[Any],
         *,
         subject: str,
+        model_id: str = "deepseek-v4-pro",
     ) -> list[dict[str, Any]]:
+        if model_id not in {"deepseek-v4-pro", "deepseek-flash"}:
+            raise OpenMaicFullRuntimeError("invalid_formal_provider_readiness_response", "OpenMAIC Provider 模型身份无效")
         language = "en-US" if subject == "english" else "zh-CN"
         expected = [
             (
@@ -1217,7 +1265,7 @@ class OpenMaicFullRuntimeClient:
                 "deepseek_text",
                 None,
                 "deepseek",
-                "deepseek-v4-pro",
+                model_id,
                 None,
                 None,
             ),
@@ -1377,6 +1425,7 @@ class OpenMaicFullRuntimeClient:
         calls: list[dict[str, Any]],
         attempted: int,
         passed: int,
+        model_id: str = "deepseek-v4-pro",
     ) -> str:
         if not isinstance(value, Mapping) or set(value) != {
             "schemaVersion",
@@ -1394,7 +1443,7 @@ class OpenMaicFullRuntimeClient:
         proof_calls = value.get("calls")
         normalized_proof_calls = (
             cls._validate_formal_readiness_calls(
-                proof_calls, subject=(calls[1]["subject"] if len(calls) > 1 else "math")
+                proof_calls, subject=(calls[1]["subject"] if len(calls) > 1 else "math"), model_id=model_id
             )
             if isinstance(proof_calls, list)
             else None
@@ -1457,10 +1506,10 @@ class OpenMaicFullRuntimeClient:
                 "invalid_formal_audio_identity", "正式课堂语音身份无效", status_code=400
             )
         if (
-            str(subject or "") not in {"chinese", "math", "english"}
+            str(subject or "") not in {"chinese", "math", "english", "science"}
             or str(teacher_gender or "") not in {"female", "male"}
             or type(teacher_profile_version) is not int
-            or teacher_profile_version != 2
+            or teacher_profile_version != (1 if subject == "science" else 2)
             or type(scene_order) is not int
             or not 0 <= scene_order <= 239
             or re.fullmatch(r"[0-9a-f]{64}", str(classroom_content_sha256 or "")) is None
@@ -1469,6 +1518,14 @@ class OpenMaicFullRuntimeClient:
             raise OpenMaicFullRuntimeError(
                 "invalid_formal_audio_identity", "正式课堂语音身份无效", status_code=400
             )
+        if subject == "science":
+            voice = get_formal_subject_qwen_voice_identity(subject)
+            if (teacher_profile_id, teacher_profile_sha256, teacher_gender) != (
+                voice.teacher_profile_id, voice.teacher_profile_hash, voice.teacher_gender
+            ):
+                raise OpenMaicFullRuntimeError(
+                    "invalid_formal_audio_identity", "科学教师语音身份不一致", status_code=400
+                )
         return {
             **identities,
             "classroomContentSha256": str(classroom_content_sha256),
@@ -1645,6 +1702,10 @@ class OpenMaicFullRuntimeClient:
                     "invalid_openmaic_professional_creation_policy",
                     "OpenMAIC 专业图片策略无效", status_code=400,
                 ) from exc
+            expected_model_policy_id = selected_policy.get("modelPolicyId", self.FORMAL_PROFESSIONAL_MODEL_POLICY["policyId"])
+            if expected_model_policy_id != self.selected_professional_model_policy()["policyId"]:
+                raise OpenMaicFullRuntimeError("invalid_openmaic_professional_creation_policy",
+                    "正式课程创作策略与隔离运行环境的模型策略不一致", status_code=400)
             if not _formal_runtime_request_identifier(str(runtime_request_id or "")):
                 raise OpenMaicFullRuntimeError(
                     "invalid_openmaic_runtime_request_id",
@@ -2125,6 +2186,7 @@ class OpenMaicFullRuntimeClient:
     ) -> dict[str, Any]:
         code = "invalid_openmaic_professional_creation_receipt"
         try:
+            scene_learning_fields = professional_scene_learning_fields(value, generation_contract=generation_contract) if isinstance(value, Mapping) else {}
             image_fields = professional_image_fields(value) if isinstance(value, Mapping) else {}
             video_fields = professional_video_fields(value) if isinstance(value, Mapping) else {}
             skill_fields = professional_skill_fields(value) if isinstance(value, Mapping) else {}
@@ -2158,6 +2220,7 @@ class OpenMaicFullRuntimeClient:
                 "studentToolsEnabled",
                 "webSearchEnabled",
                 "receiptSha256",
+                *scene_learning_fields,
                 *image_fields,
                 *video_fields,
                 *skill_fields,
@@ -2440,12 +2503,12 @@ class OpenMaicFullRuntimeClient:
             or build_item_id is None
             or observed_classroom_id != classroom_id
             or classroom_content_sha256 is None
-            or subject not in {"chinese", "math", "english"}
+            or subject not in {"chinese", "math", "english", "science"}
             or receipt.get("speechTextPolicyVersion")
             != cls.FORMAL_SPEECH_TEXT_POLICY_VERSION
             or teacher_profile_id is None
             or type(teacher_profile_version) is not int
-            or teacher_profile_version != 2
+            or teacher_profile_version != (1 if subject == "science" else 2)
             or teacher_profile_sha256 is None
             or teacher_gender not in {"female", "male"}
             or type(expected_segment_count) is not int
@@ -2461,6 +2524,14 @@ class OpenMaicFullRuntimeClient:
                 "invalid_openmaic_formal_audio_receipt",
                 "OpenMAIC 正式语音回执无效",
             )
+        if subject == "science":
+            voice = get_formal_subject_qwen_voice_identity(subject)
+            if (teacher_profile_id, teacher_profile_sha256, teacher_gender) != (
+                voice.teacher_profile_id, voice.teacher_profile_hash, voice.teacher_gender
+            ):
+                raise OpenMaicFullRuntimeError(
+                    "invalid_openmaic_formal_audio_receipt", "科学教师语音回执身份不一致"
+                )
         safe_receipt = dict(receipt)
         safe_receipt.pop("receiptSha256")
         if receipt_sha256 != _canonical_sha256(safe_receipt):
@@ -2478,6 +2549,7 @@ class OpenMaicFullRuntimeClient:
             "chinese": "Serena",
             "math": "Ethan",
             "english": "Jennifer",
+            "science": "Serena",
         }
         for expected_order, raw_segment in enumerate(raw_segments):
             segment = _exact_mapping(

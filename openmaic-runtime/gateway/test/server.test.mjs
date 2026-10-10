@@ -130,6 +130,66 @@ test('fixed textbook delivery uses private backend snapshot, verified media and 
   assert.equal(paidCalls, 0);
 });
 
+test('published video and GLB bytes retain exact session, hash, size and format boundaries', async () => {
+  const classroomId = 'tbpub_' + 'd'.repeat(24);
+  const pathFor = name => `/api/classroom-media/${classroomId}/media/${name}`;
+  const mp4 = Buffer.from('000000186674797069736f6d0000020069736f6d6d703432000000086d6f6f760000000c6d64617400000001', 'hex');
+  const webm = Buffer.from('1a45dfa3874282847765626d18538067ffec8100', 'hex');
+  const modelJson = Buffer.from('{"asset":{"version":"2.0"}}  ');
+  const modelHeader = Buffer.alloc(20);
+  modelHeader.write('glTF'); modelHeader.writeUInt32LE(2, 4);
+  modelHeader.writeUInt32LE(20 + modelJson.length, 8);
+  modelHeader.writeUInt32LE(modelJson.length, 12); modelHeader.writeUInt32LE(0x4e4f534a, 16);
+  const glb = Buffer.concat([modelHeader, modelJson]);
+  const assets = [ ['clip.mp4', 'video/mp4', mp4], ['clip.webm', 'video/webm', webm], ['shape.glb', 'model/gltf-binary', glb] ];
+  const metadata = assets.map(([name, mimeType, bytes]) => ({path: pathFor(name), mimeType,
+    sha256: createHash('sha256').update(bytes).digest('hex'), byteSize: bytes.length}));
+  let mode = 'valid', reads = 0;
+  const backend = await listen(http.createServer(async (request, response) => {
+    if (request.url.endsWith('/exchange')) return reply(response, {ok:true,runtimeToken:'tbpr_media-session',classroomId,expiresAt:Date.now()+60000});
+    assert.equal(request.url.endsWith('/validate'), true);
+    let media = metadata;
+    if (mode !== 'valid') {
+      const base = {...metadata[0]};
+      if (mode === 'mime') base.mimeType = 'application/javascript';
+      if (mode === 'extension') base.mimeType = 'model/gltf-binary';
+      if (mode === 'oversize') base.byteSize = 16 * 1024 * 1024 + 1;
+      if (mode === 'hash') base.sha256 = '0'.repeat(64);
+      if (mode === 'size') base.byteSize++;
+      media = [base];
+    }
+    reply(response, {ok:true,purpose:'fixed_textbook',classroomId,runtimeSessionId:'media-session',
+      learningSessionId:'media-session',expiresAt:Date.now()+60000,media});
+  }));
+  const upstream = await listen(http.createServer((request, response) => {
+    reads++;
+    const asset = assets.find(([name]) => pathFor(name) === request.url);
+    if (!asset) return response.writeHead(404).end();
+    response.end(asset[2]);
+  }));
+  const gateway = await listenGateway({backend, upstream});
+  const launch = await fetch(`${gateway}/mira/textbook-launch?ticket=tbpt_media-test`, {redirect:'manual'});
+  const cookie = launch.headers.getSetCookie().map(item => item.split(';')[0]).join('; ');
+  const headers = {cookie,referer:`http://runtime.test/classroom/${classroomId}?mira=1&textbook=1`};
+  for (const [name, mime, bytes] of assets) {
+    const result = await fetch(gateway + pathFor(name), {headers});
+    assert.equal(result.status, 200);
+    assert.equal(result.headers.get('content-type'), mime);
+    assert.equal(result.headers.get('x-content-type-options'), 'nosniff');
+    assert.deepEqual(Buffer.from(await result.arrayBuffer()), bytes);
+  }
+  const goodReads = reads;
+  assert.equal((await fetch(gateway + pathFor('clip.mp4'))).status, 401);
+  assert.equal((await fetch(gateway + pathFor('unpublished.glb'), {headers})).status, 403);
+  assert.equal(reads, goodReads);
+  for (mode of ['mime', 'extension', 'oversize']) {
+    assert.equal((await fetch(gateway + pathFor('clip.mp4'), {headers})).status, 502);
+    assert.equal(reads, goodReads);
+  }
+  for (mode of ['hash', 'size']) assert.equal((await fetch(gateway + pathFor('clip.mp4'), {headers})).status, 502);
+  assert.equal(reads, goodReads + 2);
+});
+
 test('fixed textbook discussions and speech retain native endpoints with session-bound admission', async () => {
   const classroomId = 'tbpub_' + 'b'.repeat(24);
   let admitted = 0;

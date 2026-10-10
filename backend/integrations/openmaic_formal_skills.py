@@ -136,7 +136,8 @@ def _bound_receipt(professional: Mapping[str, Any], generation: Mapping[str, Any
     if adaptive:
         expected_plan = select_formal_skills(teaching_brief=generation.get("teachingBrief"),
             grade_boundary=generation.get("gradeBoundary"),
-            grade_boundary_sha256=generation.get("gradeBoundarySha256"))
+            grade_boundary_sha256=generation.get("gradeBoundarySha256"),
+            model_policy_id=policy.get("modelPolicyId"))
         if _sha(receipt["selectionPlan"]) != _sha(expected_plan):
             raise ValueError("formal skill selection plan differs from locked inputs")
     brief = generation.get("teachingBrief")

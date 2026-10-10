@@ -1,0 +1,449 @@
+{
+  "studentList": {
+    "ok": true,
+    "enabled": true,
+    "submissions": [
+      {
+        "id": "hw_a2528e27b7ef4888972a831b29e3ec49",
+        "childId": "child-a",
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "title": "数学作业",
+        "source": "parent_app",
+        "revision": 2,
+        "status": "ready",
+        "error": null,
+        "pages": [],
+        "items": [
+          {
+            "annotationAmbiguous": false,
+            "answerMode": "picture_choice",
+            "confidence": 0.99,
+            "knowledgeId": "math:primary_1:addition:range20",
+            "knowledgeLabel": "20以内加法",
+            "method": "decimal_arithmetic.v1",
+            "picture": {
+              "choices": [
+                {
+                  "count": 6,
+                  "id": "n6"
+                },
+                {
+                  "count": 5,
+                  "id": "n5"
+                },
+                {
+                  "count": 4,
+                  "id": "n4"
+                }
+              ],
+              "kind": "quantity_arithmetic",
+              "left": 3,
+              "operation": "add",
+              "right": 2
+            },
+            "prompt": "3 + 2 =",
+            "recognitionConfirmed": false,
+            "status": "incorrect",
+            "type": "arithmetic",
+            "id": "hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc",
+            "pageId": "hwp_2665f77271654b4f8e1071066faf53df",
+            "revision": 1,
+            "readyForStudent": true,
+            "correctionStatus": "pending",
+            "hintViewed": false,
+            "explanationViewed": false,
+            "voice": {
+              "explanation": {
+                "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/explanation",
+                "status": "ready",
+                "mimeType": "audio/wav",
+                "providerId": "qwen-tts",
+                "voiceId": "Ethan"
+              },
+              "hint": {
+                "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/hint",
+                "status": "ready",
+                "mimeType": "audio/wav",
+                "providerId": "qwen-tts",
+                "voiceId": "Ethan"
+              },
+              "prompt": {
+                "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/prompt",
+                "status": "ready",
+                "mimeType": "audio/wav",
+                "providerId": "qwen-tts",
+                "voiceId": "Ethan"
+              },
+              "retry": {
+                "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/retry",
+                "status": "ready",
+                "mimeType": "audio/wav",
+                "providerId": "qwen-tts",
+                "voiceId": "Ethan"
+              },
+              "success": {
+                "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/success",
+                "status": "ready",
+                "mimeType": "audio/wav",
+                "providerId": "qwen-tts",
+                "voiceId": "Ethan"
+              }
+            }
+          }
+        ],
+        "summary": {
+          "correct": 0,
+          "incorrect": 1,
+          "blank": 0,
+          "pending": 0,
+          "unsupported": 0,
+          "total": 1,
+          "corrected": 0
+        },
+        "createdAt": 1790730000000,
+        "updatedAt": 1790730000000,
+        "scope": "verified_arithmetic_only",
+        "helpEvidence": "unknown",
+        "readyForStudent": true
+      }
+    ],
+    "captureTasks": [
+      {
+        "taskId": "task-a",
+        "title": "数学作业",
+        "available": false,
+        "unavailableReason": "请使用家长App拍照；设备暂未通过作业拍摄验收"
+      }
+    ]
+  },
+  "studentDetail": {
+    "ok": true,
+    "submission": {
+      "id": "hw_a2528e27b7ef4888972a831b29e3ec49",
+      "childId": "child-a",
+      "gradeCode": "primary_1",
+      "subject": "math",
+      "title": "数学作业",
+      "source": "parent_app",
+      "revision": 2,
+      "status": "ready",
+      "error": null,
+      "pages": [],
+      "items": [
+        {
+          "annotationAmbiguous": false,
+          "answerMode": "picture_choice",
+          "confidence": 0.99,
+          "knowledgeId": "math:primary_1:addition:range20",
+          "knowledgeLabel": "20以内加法",
+          "method": "decimal_arithmetic.v1",
+          "picture": {
+            "choices": [
+              {
+                "count": 6,
+                "id": "n6"
+              },
+              {
+                "count": 5,
+                "id": "n5"
+              },
+              {
+                "count": 4,
+                "id": "n4"
+              }
+            ],
+            "kind": "quantity_arithmetic",
+            "left": 3,
+            "operation": "add",
+            "right": 2
+          },
+          "prompt": "3 + 2 =",
+          "recognitionConfirmed": false,
+          "status": "incorrect",
+          "type": "arithmetic",
+          "id": "hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc",
+          "pageId": "hwp_2665f77271654b4f8e1071066faf53df",
+          "revision": 1,
+          "readyForStudent": true,
+          "correctionStatus": "pending",
+          "hintViewed": false,
+          "explanationViewed": false,
+          "voice": {
+            "explanation": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/explanation",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "hint": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/hint",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "prompt": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/prompt",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "retry": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/retry",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "success": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/success",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            }
+          }
+        }
+      ],
+      "summary": {
+        "correct": 0,
+        "incorrect": 1,
+        "blank": 0,
+        "pending": 0,
+        "unsupported": 0,
+        "total": 1,
+        "corrected": 0
+      },
+      "createdAt": 1790730000000,
+      "updatedAt": 1790730000000,
+      "scope": "verified_arithmetic_only",
+      "helpEvidence": "unknown",
+      "readyForStudent": true
+    }
+  },
+  "studentAction": {
+    "ok": true,
+    "submission": {
+      "id": "hw_a2528e27b7ef4888972a831b29e3ec49",
+      "childId": "child-a",
+      "gradeCode": "primary_1",
+      "subject": "math",
+      "title": "数学作业",
+      "source": "parent_app",
+      "revision": 2,
+      "status": "ready",
+      "error": null,
+      "pages": [],
+      "items": [
+        {
+          "annotationAmbiguous": false,
+          "answerMode": "picture_choice",
+          "confidence": 0.99,
+          "hint": "可以数一数图里的小圆片。把两组放在一起。",
+          "knowledgeId": "math:primary_1:addition:range20",
+          "knowledgeLabel": "20以内加法",
+          "method": "decimal_arithmetic.v1",
+          "picture": {
+            "choices": [
+              {
+                "count": 6,
+                "id": "n6"
+              },
+              {
+                "count": 5,
+                "id": "n5"
+              },
+              {
+                "count": 4,
+                "id": "n4"
+              }
+            ],
+            "kind": "quantity_arithmetic",
+            "left": 3,
+            "operation": "add",
+            "right": 2
+          },
+          "prompt": "3 + 2 =",
+          "recognitionConfirmed": false,
+          "status": "incorrect",
+          "type": "arithmetic",
+          "id": "hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc",
+          "pageId": "hwp_2665f77271654b4f8e1071066faf53df",
+          "revision": 1,
+          "readyForStudent": true,
+          "correctionStatus": "pending",
+          "hintViewed": true,
+          "explanationViewed": false,
+          "voice": {
+            "explanation": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/explanation",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "hint": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/hint",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "prompt": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/prompt",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "retry": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/retry",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "success": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/success",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            }
+          }
+        }
+      ],
+      "summary": {
+        "correct": 0,
+        "incorrect": 1,
+        "blank": 0,
+        "pending": 0,
+        "unsupported": 0,
+        "total": 1,
+        "corrected": 0
+      },
+      "createdAt": 1790730000000,
+      "updatedAt": 1790730000000,
+      "scope": "verified_arithmetic_only",
+      "helpEvidence": "unknown",
+      "readyForStudent": true
+    }
+  },
+  "studentAnswer": {
+    "ok": true,
+    "submission": {
+      "id": "hw_a2528e27b7ef4888972a831b29e3ec49",
+      "childId": "child-a",
+      "gradeCode": "primary_1",
+      "subject": "math",
+      "title": "数学作业",
+      "source": "parent_app",
+      "revision": 2,
+      "status": "ready",
+      "error": null,
+      "pages": [],
+      "items": [
+        {
+          "annotationAmbiguous": false,
+          "answerMode": "picture_choice",
+          "confidence": 0.99,
+          "hint": "可以数一数图里的小圆片。把两组放在一起。",
+          "knowledgeId": "math:primary_1:addition:range20",
+          "knowledgeLabel": "20以内加法",
+          "method": "decimal_arithmetic.v1",
+          "picture": {
+            "choices": [
+              {
+                "count": 6,
+                "id": "n6"
+              },
+              {
+                "count": 5,
+                "id": "n5"
+              },
+              {
+                "count": 4,
+                "id": "n4"
+              }
+            ],
+            "kind": "quantity_arithmetic",
+            "left": 3,
+            "operation": "add",
+            "right": 2
+          },
+          "prompt": "3 + 2 =",
+          "recognitionConfirmed": false,
+          "status": "incorrect",
+          "type": "arithmetic",
+          "id": "hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc",
+          "pageId": "hwp_2665f77271654b4f8e1071066faf53df",
+          "revision": 1,
+          "readyForStudent": true,
+          "correctionStatus": "corrected",
+          "hintViewed": true,
+          "explanationViewed": false,
+          "voice": {
+            "explanation": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/explanation",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "hint": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/hint",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "prompt": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/prompt",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "retry": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/retry",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            },
+            "success": {
+              "assetUrl": "/api/v2/student/learning/homework/hw_a2528e27b7ef4888972a831b29e3ec49/items/hwi_4461a58b77a8ad32a70843d7db248e2679e0c3067ce2f671096e4ebc/audio/success",
+              "status": "ready",
+              "mimeType": "audio/wav",
+              "providerId": "qwen-tts",
+              "voiceId": "Ethan"
+            }
+          }
+        }
+      ],
+      "summary": {
+        "correct": 0,
+        "incorrect": 1,
+        "blank": 0,
+        "pending": 0,
+        "unsupported": 0,
+        "total": 1,
+        "corrected": 1
+      },
+      "createdAt": 1790730000000,
+      "updatedAt": 1790730000000,
+      "scope": "verified_arithmetic_only",
+      "helpEvidence": "unknown",
+      "readyForStudent": true
+    },
+    "feedback": {
+      "correct": true,
+      "attempt": 1,
+      "scope": "same_question_correction",
+      "audioKind": "success"
+    }
+  }
+}

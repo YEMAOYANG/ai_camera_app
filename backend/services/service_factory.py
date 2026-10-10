@@ -1227,7 +1227,7 @@ def build_ai_vision_provider_from_config(config: dict):
     max_bytes = int(config.get("AI_VISION_MAX_BYTES", 524288))
     max_dimension = int(config.get("AI_VISION_MAX_DIMENSION", 1280))
     jpeg_quality = int(config.get("AI_VISION_JPEG_QUALITY", 85))
-    if provider in {"moonshot", "kimi", "openai", "openai_compatible"} and api_key and base_url and model:
+    if provider in {"moonshot", "kimi", "openai", "openai_compatible", "qwen", "dashscope"} and api_key and base_url and model:
         # kimi-k2.6 thinking 会吃掉 max_tokens，导致 content 为空；视觉观察只需 JSON 输出。
         disable_thinking = provider in {"moonshot", "kimi"} or str(model).startswith("kimi-k")
         return OpenAICompatibleVisionProvider(
@@ -1240,6 +1240,7 @@ def build_ai_vision_provider_from_config(config: dict):
             max_image_dimension=max_dimension,
             jpeg_quality=jpeg_quality,
             disable_thinking=disable_thinking,
+            json_output=bool(config.get("AI_VISION_JSON_OUTPUT", False)),
         )
     return UnavailableVisionProvider()
 
@@ -1308,3 +1309,128 @@ def learning_practice_service():
     from services.learning_practice_service import LearningPracticeService
     return LearningPracticeService(repository=LearningPracticeRepository(Database(current_app.config["DATABASE_URL"])),
                                    student_auth_service=student_auth_service())
+
+
+def learning_review_service():
+    from services.learning_review_service import LearningReviewService
+    from services.learning_review_reminder import SafeReviewReminderSender
+    private_homework = homework_service() if current_app.config.get("HOMEWORK_ANALYSIS_ENABLED", False) else None
+    return LearningReviewService(
+        Database(current_app.config["DATABASE_URL"]),
+        auth_service=auth_service(), student_auth_service=student_auth_service(),
+        parent_authorize=task_service()._assert_capability,
+        reminder_sender=SafeReviewReminderSender(device_runtime_resolver()),
+        private_question_pool=private_homework.review_question_pool if private_homework else None,
+        private_audio_file=private_homework.review_audio_file if private_homework else None,
+        private_source_alive=private_homework.review_source_alive if private_homework else None,
+    )
+
+
+def _homework_image_provider(settings):
+    # DeepSeek vision is intentionally scoped to homework. The care factory
+    # remains unchanged and cannot silently route camera images to this model.
+    if str(settings.get("AI_PROVIDER") or "").strip().lower() == "deepseek":
+        model = str(settings.get("AI_VISION_MODEL") or "").strip()
+        key = str(settings.get("AI_API_KEY") or "").strip()
+        base = str(settings.get("AI_BASE_URL") or "").strip()
+        if not settings.get("AI_VISION_ENABLED", True) or model != "deepseek-flash" or not key or not base:
+            return UnavailableVisionProvider()
+        return OpenAICompatibleVisionProvider(
+            provider_name="deepseek", api_key=key, base_url=base, model_name=model,
+            timeout_seconds=settings.get("AI_VISION_TIMEOUT_SECONDS", 120),
+            max_bytes=settings.get("AI_VISION_MAX_BYTES", 8388608),
+            max_image_dimension=settings.get("AI_VISION_MAX_DIMENSION", 3200),
+            jpeg_quality=95, disable_thinking=True, json_output=True,
+            capture_received_response=True,
+        )
+    result = build_ai_vision_provider_from_config(settings)
+    if isinstance(result, OpenAICompatibleVisionProvider):
+        result.capture_received_response = True
+    return result
+
+
+def homework_vision_provider():
+    # Paper needs its own upload quality budget. Never change the shared care
+    # provider's compression, resolution or observation configuration.
+    settings = dict(current_app.config)
+    provider = str(settings.get("HOMEWORK_VISION_PROVIDER") or "").strip().lower()
+    if provider:
+        # A paper-specific provider must not replace the camera/chat provider.
+        settings.update(AI_PROVIDER=provider,
+            AI_API_KEY=settings.get("HOMEWORK_VISION_API_KEY") or "",
+            AI_BASE_URL=settings.get("HOMEWORK_VISION_BASE_URL") or "",
+            AI_VISION_JSON_OUTPUT=provider in {"qwen", "dashscope", "deepseek"})
+    settings.update(
+        AI_VISION_MAX_BYTES=settings.get("HOMEWORK_VISION_MAX_BYTES", 8388608),
+        AI_VISION_MAX_DIMENSION=settings.get("HOMEWORK_VISION_MAX_DIMENSION", 3200),
+        AI_VISION_JPEG_QUALITY=95,
+        AI_VISION_TIMEOUT_SECONDS=settings.get("HOMEWORK_VISION_TIMEOUT_SECONDS", 120),
+        AI_VISION_MODEL=settings.get("HOMEWORK_VISION_MODEL") or settings.get("AI_VISION_MODEL") or settings.get("AI_MODEL"),
+    )
+    return _homework_image_provider(settings)
+
+
+def homework_tutor_provider():
+    provider = str(current_app.config.get("HOMEWORK_TUTOR_PROVIDER") or "").strip().lower()
+    if not provider:
+        # Preserve the legacy paper teacher, including when grading is Tencent.
+        return homework_vision_provider()
+    settings = dict(current_app.config)
+    settings.update(
+        AI_PROVIDER=provider,
+        AI_API_KEY=settings.get("HOMEWORK_TUTOR_API_KEY") or "",
+        AI_BASE_URL=settings.get("HOMEWORK_TUTOR_BASE_URL") or ("https://api.deepseek.com" if provider == "deepseek" else ""),
+        AI_VISION_MODEL=settings.get("HOMEWORK_TUTOR_MODEL") or ("deepseek-flash" if provider == "deepseek" else ""),
+        AI_VISION_JSON_OUTPUT=True,
+        AI_VISION_MAX_BYTES=settings.get("HOMEWORK_VISION_MAX_BYTES", 8388608),
+        AI_VISION_MAX_DIMENSION=settings.get("HOMEWORK_VISION_MAX_DIMENSION", 3200),
+        AI_VISION_JPEG_QUALITY=95,
+        AI_VISION_TIMEOUT_SECONDS=settings.get("HOMEWORK_VISION_TIMEOUT_SECONDS", 120),
+    )
+    return _homework_image_provider(settings)
+
+
+def homework_grading_provider():
+    provider = str(current_app.config.get("HOMEWORK_GRADING_PROVIDER") or "").strip().lower()
+    if provider in {"", "vision"}:
+        return None
+    if provider != "tencent":
+        raise ApiError("homework_provider_unconfigured", "作业批改服务尚未配置", 503)
+    from integrations.ai.tencent_homework_provider import TencentHomeworkProvider, TencentConfigurationError
+    try:
+        # Only the exact configured CSV path may be read. No key, file contents,
+        # or credential-bearing exception is returned to callers or logs.
+        return TencentHomeworkProvider.from_config(current_app.config)
+    except TencentConfigurationError:
+        raise ApiError("homework_provider_unconfigured", "作业批改服务尚未配置", 503) from None
+
+
+def homework_service():
+    from services.homework_assets import HomeworkAssetStore
+    from services.homework_audio_service import HomeworkAudioService
+    from services.homework_service import HomeworkService
+    from services.homework_capture_service import HomeworkCaptureService
+    database = Database(current_app.config["DATABASE_URL"])
+    assets = HomeworkAssetStore(current_app.config.get("HOMEWORK_ASSET_ROOT") or BACKEND_ROOT / "data" / "homework")
+    audio = HomeworkAudioService(
+        database, asset_store=assets,
+        runtime_base_url=current_app.config.get("HOMEWORK_TTS_RUNTIME_URL") or "",
+        paid_budget_service=learning_budget_service(),
+        internal_token=current_app.config.get("INTERNAL_API_TOKEN") or "",
+        enabled=current_app.config.get("HOMEWORK_AUDIO_ENABLED", False),
+        max_calls=current_app.config.get("HOMEWORK_AUDIO_MAX_CALLS_PER_SUBMISSION", 200),
+    )
+    service = HomeworkService(
+        database, profile_service=profile_service(), student_auth=student_auth_service(),
+        asset_store=assets, prompt_registry=prompt_registry(), vision_provider=homework_vision_provider(),
+        grading_provider=homework_grading_provider(), tutor_provider=homework_tutor_provider(),
+        source_review_provider=homework_vision_provider(),
+        audio_service=audio, enabled=current_app.config.get("HOMEWORK_ANALYSIS_ENABLED", False),
+        evidence_enabled=current_app.config.get("LEARNING_REVIEW_ENABLED", False),
+        processing_enabled=current_app.config.get("HOMEWORK_WORKER_ENABLED", False),
+    )
+    service.capture_service = HomeworkCaptureService(
+        service, runtime_resolver=device_runtime_resolver(),
+        approved_evidence_ids=current_app.config.get("HOMEWORK_DOCUMENT_CAPTURE_APPROVED_EVIDENCE_IDS", []),
+    )
+    return service

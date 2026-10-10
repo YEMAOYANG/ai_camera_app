@@ -1,0 +1,734 @@
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -103,6 +103,8 @@
+   interactiveIncludeKatex?: boolean;
+   /** Host-selected exploration: AI chooses a non-quiz game with local, unscored feedback. */
+   explorationGame?: boolean;
++  /** Host-selected textbook game/3D authoring; ordinary templates stay unchanged. */
++  textbookPromptProfile?: 'textbook-v1';
+   /**
+    * Natural-language edit instruction for whole-slide regeneration (MAIC Editor
+    * agent `regenerate_scene`). When set, the slide content prompt switches to
+@@ -278,6 +280,7 @@
+       allowProceduralSkill,
+       includeKatex: options.interactiveIncludeKatex,
+       explorationGame: options.explorationGame,
++      textbookPromptProfile: options.textbookPromptProfile,
+       learningContract: options.learningContract,
+       imageMapping: options.imageMapping,
+       logger: log,
+@@ -1121,6 +1124,7 @@
+     allowProceduralSkill?: boolean;
+     includeKatex?: boolean;
+     explorationGame?: boolean;
++    textbookPromptProfile?: 'textbook-v1';
+     learningContract?: LearningSceneContract;
+     imageMapping?: ImageMapping;
+     logger?: GenerationLogger;
+@@ -1183,24 +1187,33 @@
+       };
+       break;
+ 
+-    case 'game':
+-      promptId = PROMPT_IDS.GAME_CONTENT;
++    case 'game': {
++      const textbookGame = options.textbookPromptProfile === 'textbook-v1';
++      promptId = textbookGame ? PROMPT_IDS.TEXTBOOK_GAME_CONTENT : PROMPT_IDS.GAME_CONTENT;
+       variables = {
+         title: outline.title,
+-        gameType: options.explorationGame
+-          ? 'Choose puzzle, strategy or card to serve this lesson objective; design the rules yourself. Never quiz.'
+-          : widgetOutline.gameType || 'quiz',
++        gameType: textbookGame
++          ? 'Choose puzzle, card or strategy with picture matching, placement, sorting or building for the exact frozen objective. No quiz or assessment.'
++          : options.explorationGame
++            ? 'Choose puzzle, strategy or card to serve this lesson objective; design the rules yourself. Never quiz.'
++            : widgetOutline.gameType || 'quiz',
+         description: outline.description,
+         keyPoints: (outline.keyPoints || []).join('\n'),
+-        scoring: options.explorationGame
+-          ? { correctPoints: 0 }
+-          : { correctPoints: 10, speedBonus: 5 },
++        scoring: textbookGame
++          ? {}
++          : options.explorationGame
++            ? { correctPoints: 0 }
++            : { correctPoints: 10, speedBonus: 5 },
+         languageDirective: languageDirective || '',
+       };
+       break;
++    }
+ 
+     case 'visualization3d':
+-      promptId = PROMPT_IDS.VISUALIZATION3D_CONTENT;
++      promptId =
++        options.textbookPromptProfile === 'textbook-v1'
++          ? PROMPT_IDS.TEXTBOOK_VISUALIZATION3D_CONTENT
++          : PROMPT_IDS.VISUALIZATION3D_CONTENT;
+       variables = {
+         title: outline.title,
+         visualizationType: widgetOutline.visualizationType || 'custom',
+diff --git a/packages/@openmaic/generation/src/prompts/types.ts b/packages/@openmaic/generation/src/prompts/types.ts
+--- a/packages/@openmaic/generation/src/prompts/types.ts
++++ b/packages/@openmaic/generation/src/prompts/types.ts
+@@ -11,6 +11,8 @@
+   | 'diagram-content'
+   | 'code-content'
+   | 'game-content'
++  | 'textbook-game-content'
++  | 'textbook-visualization3d-content'
+   | 'visualization3d-content'
+   | 'procedural-skill-content'
+   | 'slide-actions'
+@@ -26,7 +28,8 @@
+   | 'media-safety-guidelines'
+   | 'slide-image-instructions'
+   | 'slide-generated-image-instructions'
+-  | 'slide-video-instructions';
++  | 'slide-video-instructions'
++  | 'textbook-activity-contract';
+ 
+ /** Loaded prompt template. */
+ export interface LoadedPrompt {
+diff --git a/packages/@openmaic/generation/src/prompts/index.ts b/packages/@openmaic/generation/src/prompts/index.ts
+--- a/packages/@openmaic/generation/src/prompts/index.ts
++++ b/packages/@openmaic/generation/src/prompts/index.ts
+@@ -18,6 +18,8 @@
+   DIAGRAM_CONTENT: 'diagram-content',
+   CODE_CONTENT: 'code-content',
+   GAME_CONTENT: 'game-content',
++  TEXTBOOK_GAME_CONTENT: 'textbook-game-content',
++  TEXTBOOK_VISUALIZATION3D_CONTENT: 'textbook-visualization3d-content',
+   VISUALIZATION3D_CONTENT: 'visualization3d-content',
+   PROCEDURAL_SKILL_CONTENT: 'procedural-skill-content',
+   SLIDE_ACTIONS: 'slide-actions',
+diff --git a/packages/@openmaic/generation/test/assets.test.ts b/packages/@openmaic/generation/test/assets.test.ts
+--- a/packages/@openmaic/generation/test/assets.test.ts
++++ b/packages/@openmaic/generation/test/assets.test.ts
+@@ -20,6 +20,8 @@
+   'diagram-content',
+   'code-content',
+   'game-content',
++  'textbook-game-content',
++  'textbook-visualization3d-content',
+   'visualization3d-content',
+   'procedural-skill-content',
+   'slide-actions',
+@@ -36,6 +38,7 @@
+   'slide-image-instructions',
+   'slide-generated-image-instructions',
+   'slide-video-instructions',
++  'textbook-activity-contract',
+ ] as const satisfies readonly SnippetId[];
+ 
+ const GRANDFATHERED_NON_CAMEL_CASE_PLACEHOLDERS = [
+diff --git a/packages/@openmaic/generation/test/type-surface.test.ts b/packages/@openmaic/generation/test/type-surface.test.ts
+--- a/packages/@openmaic/generation/test/type-surface.test.ts
++++ b/packages/@openmaic/generation/test/type-surface.test.ts
+@@ -27,6 +27,7 @@
+     | 'allowProceduralSkill'
+     | 'interactiveIncludeKatex'
+     | 'explorationGame'
++    | 'textbookPromptProfile'
+     | 'editDirective'
+     | 'baselineContent'
+     | 'pblLoopFallback'
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -731,6 +731,10 @@
+               agents,
+               languageDirective,
+               allowProceduralSkill: vocationalActive,
++              ...(textbookBatch && safeOutline.type === 'interactive' &&
++                ['game', 'visualization3d'].includes(safeOutline.widgetType ?? '')
++                ? { textbookPromptProfile: 'textbook-v1' as const, interactiveIncludeKatex: false }
++                : {}),
+               ...(safeOutline.type === 'pbl'
+                 ? {
+                     pblLoopFallback: (input) =>
+diff --git a/lib/server/mira-textbook-batch-generation.ts b/lib/server/mira-textbook-batch-generation.ts
+--- a/lib/server/mira-textbook-batch-generation.ts
++++ b/lib/server/mira-textbook-batch-generation.ts
+@@ -128,7 +128,7 @@
+ const STRICT_RULES = `教材批次生成的强制契约（优先于任何通用模板）：
+ 完整冻结任务书中的学段、年级、科目、学制、册次、版本、修订及真实目录始终适用；不得靠 outline 摘要替代。
+ 只生成学生可见的教学内容。版权/来源审核、待审核说明、草稿/发布状态、模型或工程质量报告只在后端，不得做课件页或教师台词。
+-禁止 speechSynthesis、SpeechSynthesisUtterance、浏览器或系统语音 fallback，禁止 emoji 承载题意/答案。
++禁止 speechSynthesis、SpeechSynthesisUtterance、浏览器或系统语音 fallback；整个 HTML 源、JS、CSS、注释、JSON及字符串均禁止 emoji（包括转义或实体），图意和图标使用真实图片或原创 SVG。
+ 互动内所有有限状态指令、提示、反馈必须登记为 <script type="application/json" id="mira-narration-cues">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"intro","text":"老师的完整短句"}]}</script>。
+ 只通过 window.miraNarrate('固定cue-id') 请求预录老师配音；不定义/覆写/别名 miraNarrate，不临时拼接朗读文本。不自己播放临时TTS。配音由后处理生成，未配音仍是私有草稿。
+ 一二年级指令和操作不依赖识字：游戏/模拟至少两个 data-mira-picture-choice="稳定ID" 容器，各含可区分的真实 SVG图形/图片/canvas；装饰背景、emoji、图A/B/C文字不算图片。3D探索可用实际canvas/SVG，仍有显式语音cue和大触点。
+diff --git a/tests/server/classroom-generation-textbook-batch.test.ts b/tests/server/classroom-generation-textbook-batch.test.ts
+--- a/tests/server/classroom-generation-textbook-batch.test.ts
++++ b/tests/server/classroom-generation-textbook-batch.test.ts
+@@ -1,5 +1,5 @@
+ import { beforeEach, describe, expect, it, vi } from 'vitest';
+-import { textbookRequirement } from '@/tests/fixtures/textbook-batch';
++import { textbookInteractive, textbookRequirement } from '@/tests/fixtures/textbook-batch';
+ 
+ const mocks = vi.hoisted(() => ({
+   outlines: vi.fn(),
+@@ -142,6 +142,32 @@
+     ).toBe(true);
+   });
+ 
++  it.each(['game', 'visualization3d'])('selects the textbook %s profile only for a parsed textbook task', async (widgetType) => {
++    mocks.outlines.mockResolvedValue({
++      success: true,
++      data: { courseTitle: '观察球', languageDirective: '用简短中文', outlines: [
++        { ...outline, type: 'interactive', widgetType, widgetOutline: {} },
++      ] },
++    });
++    mocks.content.mockImplementation(async (_outline, call) => {
++      await call('content-template', 'content-user');
++      return { ...textbookInteractive(), widgetType, widgetConfig: { type: widgetType } };
++    });
++    const { generateClassroom } = await import('@/lib/server/classroom-generation');
++    await generateClassroom(
++      { requirement: textbookRequirement(), enableTTS: false }, { baseUrl: 'http://localhost' },
++    );
++    expect(mocks.content.mock.calls[0][2]).toMatchObject({
++      textbookPromptProfile: 'textbook-v1', interactiveIncludeKatex: false,
++    });
++    await generateClassroom(
++      { requirement: '普通观察游戏', enableTTS: false }, { baseUrl: 'http://localhost' },
++    );
++    const ordinary = mocks.content.mock.calls[1][2];
++    expect(ordinary).not.toHaveProperty('textbookPromptProfile');
++    expect(ordinary).not.toHaveProperty('interactiveIncludeKatex');
++  });
++
+   it('does not silently drop a missing strict scene or save a classroom after media failure', async () => {
+     const { generateClassroom } = await import('@/lib/server/classroom-generation');
+     mocks.content.mockResolvedValueOnce(null);
+diff --git a/packages/@openmaic/generation/snippets/textbook-activity-contract.md b/packages/@openmaic/generation/snippets/textbook-activity-contract.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/snippets/textbook-activity-contract.md
+@@ -0,0 +1,108 @@
++## Authoritative textbook activity contract v1
++
++The host appends the complete frozen textbook requirement to this system message. Its subject, grade, school system, edition, revision, volume, unit/node, finite design and media identities are authoritative. An outline summary cannot replace them. Do not invent curriculum, directory nodes, assessment permission or learner ability. Return a complete executable activity with original meaningful artwork, all finite feedback branches and real native command handlers, not a skeleton or static mockup.
++
++The task has not authorized independent assessment. Do not output quiz questions, a test, scores, points, high scores, achievements, speed bonuses, accuracy counters, pass/fail grades or mastery claims. Book exploration and unit guidance stay observational. Lesson practice follows its exact objective. Local task progress describes visible actions, not ability; assistance and teacher demonstration never count as independent success. Do not use localStorage to persist learning results.
++
++### Pictures carry meaning
++
++- Grade 1 and 2 learners may not read independently. Narration, a relevant scene and distinguishable pictures must make the action understandable with supplementary text covered.
++- For picture selection, author at least three meaningful choice containers directly in the initial HTML, each with a unique stable `data-mira-picture-choice` value and its actual SVG, image or canvas inside. Do not create all markers only through later JavaScript. A genuine pointing/dragging task may use the permitted smaller set when the frozen design calls for it.
++- Every marked container has nonempty graphics and a pairwise different actual visual signature, not just a different ID, label or color. For repeated matching objects, mark meaningful distinct groups or draw distinguishable real object poses/details rather than marking identical repeated SVG copies as separate choices. Keep these differences pedagogically relevant and neutral with respect to the answer.
++- Draw the actual thing being named: recognizable objects and people, not generic colored boxes, letters or identical repeated icons. A cat needs recognizable ears, face, body and tail; a bowl needs a visible open vessel. If the objective requires a clock, draw its real dial and corresponding hands. Keep people and object identities consistent.
++- Prefer frozen original asset identities. Otherwise author relevant original SVG paths/shapes with clear silhouettes. Do not invent missing-image URLs or placeholders. Choices stay visually neutral until a learner response or explicitly requested demonstration.
++- The entire returned source must contain no emoji: markup, text, JavaScript, CSS, JSON, comments, strings, numeric entities and Unicode escapes are all checked. Draw original SVG teaching pictures and replay/hint/retry icons. Do not implement an emoji lookup or glyph fallback.
++- Keep engineering, review, provenance, model, generation and publication notes out of the classroom and teacher speech.
++
++### Complete finite prerecorded teacher narration
++
++The classroom supplies its registered teacher's Qwen recordings after authoring. Do not synthesize audio, replace the voice, play temporary TTS or invent audio URLs. Browser/system speech, speechSynthesis and SpeechSynthesisUtterance are forbidden.
++
++Include exactly one JSON manifest listing every instruction, observation, error reason, hint, feedback, continuation, reset and load-error sentence used by the activity:
++
++```html
++<script type="application/json" id="mira-narration-cues">
++{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"observe","text":"先看一看，再动手试一试。"},{"id":"retry","text":"再看看它的样子，我们重新试一试。"}]}
++</script>
++```
++
++Those two entries illustrate the format; author the complete task-specific inventory. IDs are unique and use only letters, digits, underscores or hyphens. Spoken text is a complete, natural, short teacher sentence appropriate to the grade, tied to the actual finite state. Never randomize a question, visual or correct object independently of its fixed cue.
++
++Every occurrence of `miraNarrate` in executable source must be a direct call with one declared string literal. Never guard, alias, redefine, bind or inspect this function. Do not pass a variable, concatenation, state property or computed lookup. Use finite branches with literal calls:
++
++```javascript
++function narrateCurrentInstruction() {
++  switch (currentPhase) {
++    case 'observe': window.miraNarrate('observe'); break;
++    case 'retry': window.miraNarrate('retry'); break;
++  }
++}
++```
++
++Expand this pattern for every actual branch and declare every referenced ID. Keep the visual and replay state synchronized. Student actions, reset and teacher state changes use the same real transition functions. Pause feedback until explicit continuation; do not immediately overwrite a success/error cue with the next prompt. Visible instructions remain usable before recordings are attached, with no speech fallback.
++
++Keep continuation/task-changing controls disabled during feedback playback. The prerecorded bridge emits a window `mira-narration-state` event with `detail.cueId` and `detail.status`; unlock only after `status === 'ready'` for the exact current finite cue ID. Ignore the initial stop notification with a null cue ID, and do not treat hidden, missing or error states as completion. A narration call's Promise resolves when playback starts, not when it ends, so awaiting the call is not a playback-completion signal. Replay and the appropriate retry action remain available without skipping feedback into a new task.
++
++### Actual CSS pixels, safe touch and real media
++
++Include these two meta elements directly in the head, with exactly one responsive activity marker:
++
++```html
++<meta name="viewport" content="width=device-width,initial-scale=1">
++<meta name="mira-responsive-activity" content="low-reading-v1">
++```
++
++- The iframe uses its actual available CSS viewport. Do not force 1280 pixels, scale/zoom the entire document, or shrink controls to fit.
++- Every actionable target, including replay, hint, retry, next and alternative model controls, is at least 48 by 48 actual CSS pixels. Use `min-width:48px; min-height:48px; flex-shrink:0`; let labels determine natural larger widths rather than assigning every button an oversized fixed width.
++- Use wrapping tool/collection groups and responsive `minmax(0,1fr)` grids. At narrow widths reflow choices or stack vertically without shrinking targets or losing recognizable pictures. Permit internal vertical scrolling when height is short. Keep one task at a time; never clip actions or cover native classroom chrome.
++- Use plain local CSS, reliable pointer/click handlers, safe pointer cancellation and a tap-select/tap-place alternative to dragging. Provide visible replay and specific retry feedback. Respect reduced motion, avoid flashing/time pressure, and use requestAnimationFrame only for genuine animation.
++- Honor the frozen media plan. A supplied actual media URL may be used in HTML `<video controls>` with pause/replay and a following learner observation action. Do not substitute a play triangle, poster-only frame, text animation or fabricated URL. Do not request a second generated video when the frozen task already provides the real asset.
++- Required 3D uses actual geometry and rendering. Object selection, movement, orientation or comparison changes real model state; camera movement alone and CSS perspective on a flat card are insufficient. Keep visible 48-pixel alternative picture selection and move/rotate controls when projected mesh/handle hit areas are smaller.
++- The iframe has an opaque sandbox origin. Do not access parent DOM, cookies/storage or relax sandbox permissions. Use supplied reachable or self-contained dependencies; same-host ES module URLs also require CORS from an opaque origin. Never assume a relative module import will work. Do not invent missing dependencies/media or silently replace them with placeholders.
++
++### Native ActionEngine protocol: all four commands
++
++Register a real message listener, accept only the parent window, validate the data object and read top-level `type`, `state`, `target` and `content`. Do not introduce an action/payload envelope.
++
++```javascript
++function findTarget(target) {
++  if (typeof target !== 'string' || !target || target.length > 256) return null;
++  const byId = document.getElementById(target);
++  if (byId) return byId;
++  try { return document.querySelector(target); } catch (_) { return null; }
++}
++window.addEventListener('message', function(event) {
++  if (event.source !== window.parent) return;
++  const data = event.data;
++  if (!data || typeof data !== 'object' || Array.isArray(data)) return;
++  const { type, state, target, content } = data;
++  switch (type) {
++    case 'SET_WIDGET_STATE':
++      if (isAllowedTeacherState(state)) {
++        applyActivityTransition(state, { origin: 'teacher_demonstration' });
++      }
++      break;
++    case 'HIGHLIGHT_ELEMENT': {
++      const element = findTarget(target);
++      if (element) showTemporaryHighlight(element);
++      break;
++    }
++    case 'ANNOTATE_ELEMENT': {
++      const element = findTarget(target);
++      if (element && typeof content === 'string') showTeacherAnnotation(element, content);
++      break;
++    }
++    case 'REVEAL_ELEMENT': {
++      const element = findTarget(target);
++      if (element) revealTeacherTarget(element);
++      break;
++    }
++  }
++});
++```
++
++Implement all referenced functions with real behavior, not no-ops or comment-only stubs. Validate the finite keys and values the activity defines; never assign arbitrary external fields or treat an incoming completion flag as a learner response. Stable IDs and widget-config state/control definitions let native commands drive the same transitions as child UI. Unsupported state values and invalid selectors safely do nothing.
++
++Highlight and annotation are temporary teaching support. Use textContent for annotations and do not invoke undeclared narration. Reveal or external state changes record teacher assistance separately, follow the real visual/feedback path and never certify independent success. Retain the native classroom toolbar, teacher and discussion by keeping all activity UI inside its iframe.
++
++Before returning, verify every finite cue, literal call, meaningful picture, retry branch, native command and narrow layout. Preserve exact grade/scope/teacher and genuine media without claiming review, publication or mastery. Return exactly one complete HTML document without Markdown fences, duplicated documents, authoring notes or content after its closing html tag.
+diff --git a/packages/@openmaic/generation/templates/textbook-game-content/system.md b/packages/@openmaic/generation/templates/textbook-game-content/system.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/textbook-game-content/system.md
+@@ -0,0 +1,33 @@
++# Textbook Picture Game Authoring v1
++
++Create an original, playable picture game serving the exact frozen textbook objective. Design a small, coherent experience that a child wants to explore again through meaningful action and specific feedback. Do not copy unrelated game mechanics, advanced physics examples or a generic scored quiz.
++
++{{snippet:textbook-activity-contract}}
++
++## Complete game design
++
++1. Establish a recognizable everyday scene and a visible goal: find a matching object, arrange pieces, return objects to meaningful destinations, sort by an observed feature, or build something within the frozen objective.
++2. Require at least two distinct learner actions, such as choosing a relevant picture and then placing its object. Each action changes a visible, persistent task state; a decorative celebration alone does not count.
++3. Define a finite safe initial state, supported choices, specific mistakes, hints, successful placement, explicit continuation, replay and reset. Wrong moves return or preserve the object and allow retry. Do not make the child fail before interacting.
++4. Use a few carefully authored rounds when appropriate. Keep every prompt, picture set and response branch bound to its declared cue; avoid random question generation and automatic next-round narration.
++5. Give meaningful pictorial feedback and a short teacher explanation for the actual mistake. A child should see what moved or changed without reading a paragraph. Completion describes the observed activity, not independent understanding.
++
++## Artwork and initial HTML
++
++Use original SVG/images that depict the named objects and their relevant relationships. For a picture-choice step, put at least three distinguishable options in the initial HTML with stable unique `data-mira-picture-choice` containers. Mark the container around the actual graphic, not an unrelated text label. Distinct silhouettes and scene details must carry the choice; do not use emoji, letters, generic boxes or correct-answer color coding.
++
++When the exact task is dragging or pointing, keep the scene meaningful, visible destinations large and a tap equivalent available. Collections wrap while retaining each meaningful picture group. Three-column grids switch to a vertical arrangement when the actual width cannot preserve image/target size. Local CSS and inline SVG avoid missing remote icon assets.
++
++## State and native control inventory
++
++Include exactly one JSON widget-config with `type:"game"`, `gameType` chosen from `puzzle`, `card` or `strategy`, exact activity description, original asset IDs, finite phases and allowed teacher-driven state keys/values. Do not include scoring or achievement fields.
++
++Implement state transitions for child actions, retry, reset and external teacher support using shared functions. A target highlight must find a real scene object or control. External selection, placement or reveal records assistance separately and uses the same state/feedback rules; it cannot pretend the learner completed the task independently.
++
++Use real event handlers and stable element IDs. A start button, if needed, works reliably with pointer and keyboard input; do not show a fake play surface or require browser speech permission. Optional animation stops or reduces under reduced motion without blocking interaction.
++
++## Supplied video and geometry
++
++If the frozen plan includes a real provided video URL, embed that playable asset with native controls and a following observation/matching action. Do not draw a pretend video rectangle or generate replacement media. If real 3D belongs in this game, manipulate actual geometry with a task purpose and visible 48-pixel alternative controls; never use a flat card's CSS transform as proof of 3D.
++
++Return a complete, tested-in-thought implementation: all functions referenced by listeners exist, all visuals are present, every finite narration branch is declared and called literally, wrong actions can retry, and the child can complete the goal through meaningful actions without reading supplementary instructions.
+diff --git a/packages/@openmaic/generation/templates/textbook-game-content/user.md b/packages/@openmaic/generation/templates/textbook-game-content/user.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/textbook-game-content/user.md
+@@ -0,0 +1,25 @@
++Create the exact textbook picture activity: {{title}}
++
++## Objective-bound game design
++
++{{gameType}}
++
++## Activity description
++
++{{description}}
++
++## Scope-bound learning points
++
++{{keyPoints}}
++
++## Language and registered teacher
++
++{{languageDirective}}
++
++The complete frozen requirement in the system message controls grade, edition, revision, unit/node, finite cues and supplied media identities. The outline above cannot authorize extra content.
++
++Produce a coherent playable scene with meaningful original pictures, at least two learner actions, visible state changes, specific error feedback, retry, explicit continuation and replay. Put real distinct picture-choice containers in the initial HTML and bind all finite narration to direct declared literal cue calls.
++
++No quiz, scores, points, achievements, high scores, speed bonus, assessment result, mastery claim or emoji anywhere in the source. Draw real SVG illustrations/icons. Preserve all four native parent-validated ActionEngine commands, shared real transitions, 48-pixel responsive controls and separate assistance from learner action.
++
++Use an actual supplied video URL with native controls when the frozen plan requires observation; do not replace it with a poster or play icon. Real 3D, if included, uses manipulable geometry and reachable alternative controls. Return only one complete HTML document, without echoing authoring instructions or engineering notes.
+diff --git a/packages/@openmaic/generation/templates/textbook-visualization3d-content/system.md b/packages/@openmaic/generation/templates/textbook-visualization3d-content/system.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/textbook-visualization3d-content/system.md
+@@ -0,0 +1,55 @@
++# Textbook Manipulable Geometry Authoring v1
++
++Create a complete, original HTML 3D observation activity for the exact frozen textbook objective. Render actual geometry and let the learner make meaningful changes to objects. Keep the conceptual depth, vocabulary and operations within the frozen grade and scope. Do not copy unrelated physics, geometry terminology or measurement formulas into a simple observation task.
++
++{{snippet:textbook-activity-contract}}
++
++## Real geometry and meaningful teaching states
++
++- Use WebGL with real vertex/mesh geometry, camera projection, lighting and material contrast. Three.js is suitable when its actual dependency is available; a custom WebGL implementation is also valid. CSS perspective, flat transformed cards, a prerendered model picture or a canvas that only draws text are not 3D geometry.
++- Define at least three objective-relevant teaching states when the frozen design calls for exploration: observe/select an object, move/orient it toward a meaningful destination, and compare its changed placement or appearance with a reference. Use the design's own states and concepts rather than inventing a different lesson.
++- Model transformations must update real position/orientation and scene rendering. A camera preset alone does not complete an object task. A rotation changes actual geometry orientation and its supported floor placement, not only a label.
++- A wrong object, invalid placement or incomplete manipulation has a specific visible reason and fixed teacher cue, with a safe retry. Never reveal an answer before the learner acts or requests a demonstration. Continue is explicit after feedback.
++- Show recognizable life-object references and distinguishable model choices, with original SVG/image buttons where selection needs them. For younger children, an object name alone is insufficient. Keep actual models visible with contrast against the floor/background and enough light to perceive their form.
++
++## Complete renderer and viewport behavior
++
++Initialize the renderer, scene, camera, real geometries, materials and lights before enabling manipulation. Catch initialization/dependency failures and show a genuine 48-pixel retry button with an original SVG icon and a declared literal error cue. Do not leave a spinning/loading placeholder or silently substitute fake 3D. Success hides the retry/loading UI.
++
++Use a ResizeObserver on the actual canvas/container, not only a window resize listener:
++
++```javascript
++const resizeObserver = new ResizeObserver(function() {
++  const width = canvas.clientWidth;
++  const height = canvas.clientHeight;
++  if (width <= 0 || height <= 0) return;
++  renderer.setSize(width, height, false);
++  camera.aspect = width / height;
++  camera.updateProjectionMatrix();
++});
++resizeObserver.observe(canvas);
++```
++
++For a custom WebGL renderer, implement equivalent canvas buffer/viewport and projection updates. Bound device pixel ratio for performance. Use requestAnimationFrame for actual rendering, and keep task state stable when the viewport reflows or the teacher/chat layout changes.
++
++Raycasting uses the canvas's current getBoundingClientRect and pointer client coordinates. Support touch pointer capture and safe cancellation. Keep models and destinations in view at narrow aspect ratios; adjust camera framing or scene layout without changing the objective or cue binding. Use visible picture buttons for equivalent model selection, and visible 48-pixel move/turn controls for small projected meshes or handles. Do not claim that the entire mesh hit area is 48 pixels when only the equivalent controls meet it.
++
++Use the responsive head marker, local CSS and actual 48-pixel controls from the shared contract. Tool groups wrap and content can scroll vertically. The model canvas must not grow over replay controls or the native classroom toolbar, teacher or discussion. Reduced motion removes nonessential spinning/animation while preserving intentional learner manipulation.
++
++## Opaque-origin dependency safety
++
++Do not assume that a same-host ES module URL is same-origin: this sandbox has an opaque origin. A module/dependency chain must be self-contained or actually CORS-accessible to that origin. Do not include an importmap pointing to unverified dependencies. If the frozen plan supplies a pinned self-contained module or encoded original module bytes, use that exact dependency and preserve the planned identity. Otherwise author complete geometry with dependencies that are actually supported; never invent a module URL or relax the sandbox.
++
++All imports in a dependency chain must resolve. A raw module containing imports cannot be made self-contained just by changing its top-level URL. A loading indicator is temporary; dependency failure presents the real retry path and cannot be reported as successful 3D.
++
++## Native states and teacher feedback
++
++Include one widget-config object with `type:"visualization3d"`, its visualizationType, exact objective, object identities, finite teaching states, allowed selection/transform/camera keys and stable target/control IDs. Implement all four native commands from the shared contract.
++
++SET_WIDGET_STATE validates finite state IDs, known object IDs, bounded finite position vectors and normalized nonzero orientation values. Route accepted transforms through the same object movement/placement/rotation functions used by child controls. Teacher demonstrations remain assisted, cannot bypass a task's feedback, and cannot assert independent completion. Camera changes update the real camera but do not count as object manipulation. Invalid state or target safely does nothing.
++
++Register every finite observe/select/move/turn/compare/mistake/hint/reset/retry/continue sentence in the single cue manifest. In every executable branch call the bridge directly with a declared literal cue ID; never pass state.cueId, a variable or a guarded function reference. Keep the current replay instruction synchronized with actual geometry and task phase.
++
++If the frozen design provides a real video for observation, it may be embedded with native pause/replay and a follow-up manipulation or picture action. Use the actual provided media URL, never a fake video card. Do not generate extra media or assess mastery.
++
++Return exactly one executable HTML document with genuine visible manipulable geometry, complete real handlers, finite teacher cues, responsive touch alternatives and the exact grade-bound content. Do not return an unfinished renderer or claim review/publication.
+diff --git a/packages/@openmaic/generation/templates/textbook-visualization3d-content/user.md b/packages/@openmaic/generation/templates/textbook-visualization3d-content/user.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/textbook-visualization3d-content/user.md
+@@ -0,0 +1,33 @@
++Create the exact textbook 3D activity: {{title}}
++
++## Visualization type
++
++{{visualizationType}}
++
++## Activity description
++
++{{description}}
++
++## Scope-bound learning points
++
++{{keyPoints}}
++
++## Planned objects
++
++{{objects}}
++
++## Planned interactions
++
++{{interactions}}
++
++## Language and registered teacher
++
++{{languageDirective}}
++
++The full frozen textbook requirement controls grade, edition, revision, unit/node, finite teaching/cue states, object identities and real media/dependency assets. Do not expand an outline into unrelated concepts.
++
++Render genuine geometry with visible meaningful selection, movement/orientation and comparison states according to that design. Use actual model transforms, safe touch raycasting and equivalent visible 48-pixel controls, a real ResizeObserver, responsive layout and an explicit dependency/load retry path. Preserve the opaque sandbox and use only complete self-contained or genuinely CORS-accessible dependencies.
++
++Declare every teacher sentence in one finite cue manifest and call each branch with a direct string literal. Keep the native four-command type/state/target/content protocol and real child/teacher transitions, separating assisted demonstration from learner action. No quiz, scores, points, achievements, mastery claims, browser speech or emoji anywhere in the returned source.
++
++Use real provided video media only where the frozen plan asks for observation, with pause/replay and a following action. Do not fake 3D through CSS, camera-only movement or a static image, and do not fabricate asset URLs. Return one complete HTML document without engineering or authoring notes.
+diff --git a/packages/@openmaic/generation/test/textbook-widget-routing.test.ts b/packages/@openmaic/generation/test/textbook-widget-routing.test.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/test/textbook-widget-routing.test.ts
+@@ -0,0 +1,150 @@
++import { describe, expect, it } from 'vitest';
++import {
++  buildPrompt,
++  generateSceneContent,
++  generateWidgetContent,
++  type AICallFn,
++  type SceneContentOptions,
++  type SceneOutline,
++} from '@openmaic/generation';
++
++const title = 'Frozen activity title';
++const description = 'Frozen grade-bound observation';
++const keyPoints = ['Only the frozen concept'];
++const languageDirective = 'Registered teacher and language';
++const types = ['game', 'visualization3d'] as const;
++
++function outline(widgetType: (typeof types)[number]): SceneOutline {
++  return {
++    id: 'routing-fixture',
++    type: 'interactive',
++    title,
++    description,
++    keyPoints,
++    order: 1,
++    widgetType,
++    widgetOutline: {
++      gameType: 'quiz',
++      visualizationType: 'geometry',
++      objects: [],
++      interactions: [],
++    },
++  };
++}
++
++async function capture(widgetType: (typeof types)[number], options: SceneContentOptions = {}) {
++  let captured = { system: '', user: '' };
++  // This minimal response tests prompt routing, not courseware/content approval.
++  const call: AICallFn = async (system, user) => {
++    captured = { system, user };
++    return `<html><head></head><body><script type="application/json" id="widget-config">{"type":"${widgetType}"}</script></body></html>`;
++  };
++  await generateSceneContent(outline(widgetType), call, { languageDirective, ...options });
++  return captured;
++}
++
++describe('host-selected textbook widget prompt profile', () => {
++  it.each(types)(
++    'keeps the ordinary %s system and user prompts exactly unchanged',
++    async (type) => {
++      const variables =
++        type === 'game'
++          ? {
++              title,
++              description,
++              keyPoints: keyPoints.join('\n'),
++              languageDirective,
++              gameType: 'quiz',
++              scoring: { correctPoints: 10, speedBonus: 5 },
++            }
++          : {
++              title,
++              description,
++              keyPoints: keyPoints.join('\n'),
++              languageDirective,
++              visualizationType: 'geometry',
++              objects: [],
++              interactions: [],
++            };
++      expect(await capture(type)).toEqual(
++        buildPrompt(type === 'game' ? 'game-content' : 'visualization3d-content', variables),
++      );
++    },
++  );
++
++  it('does not mistake an ordinary exploration game for a textbook task', async () => {
++    const prompts = await capture('game', { explorationGame: true });
++    expect(prompts.system).toContain('# Educational Game Widget Generator');
++    expect(prompts.user).toContain('Scoring Configuration');
++    expect(prompts.user).toContain('"correctPoints": 0');
++    expect(prompts.system).not.toContain('Authoritative textbook activity contract');
++  });
++
++  it.each(types)(
++    'selects a complete textbook %s template pair with all variables resolved',
++    async (type) => {
++      const prompts = await capture(type, {
++        textbookPromptProfile: 'textbook-v1',
++        interactiveIncludeKatex: false,
++      });
++      expect(prompts.system).toContain(
++        type === 'game'
++          ? '# Textbook Picture Game Authoring v1'
++          : '# Textbook Manipulable Geometry Authoring v1',
++      );
++      expect(prompts.user).toContain(title);
++      expect(prompts.user).toContain(description);
++      expect(prompts.user).toContain(keyPoints[0]);
++      expect(prompts.user).toContain(languageDirective);
++      expect(prompts.system + prompts.user).not.toMatch(/\{\{/);
++      expect(prompts.system + prompts.user).not.toMatch(
++        /[\p{Extended_Pictographic}\u{1f1e6}-\u{1f1ff}\u20e3]/u,
++      );
++      for (const command of [
++        'SET_WIDGET_STATE',
++        'HIGHLIGHT_ELEMENT',
++        'ANNOTATE_ELEMENT',
++        'REVEAL_ELEMENT',
++      ]) {
++        expect(prompts.system).toContain(`case '${command}'`);
++      }
++      expect(prompts.system).toContain('event.source !== window.parent');
++      expect(prompts.system).toContain('const { type, state, target, content } = data');
++      expect(prompts.system).toContain("window.miraNarrate('observe')");
++      expect(prompts.system).toContain('initial HTML');
++      expect(prompts.system).toContain('min-width:48px; min-height:48px; flex-shrink:0');
++    expect(prompts.system).toContain('mira-responsive-activity');
++    expect(prompts.system).toContain('mira-narration-state');
++    expect(prompts.system).toContain('null cue ID');
++      expect(prompts.system).toContain('pairwise different actual visual signature');
++      expect(prompts.user).not.toContain('## Scoring Configuration');
++      expect(prompts.user).not.toContain('"correctPoints"');
++      expect(prompts.system).not.toContain('Achievement popups');
++    },
++  );
++
++  it('passes the explicit profile through the direct widget factory too', async () => {
++    let system = '';
++    await generateWidgetContent(
++      outline('game'),
++      async (prompt) => {
++        system = prompt;
++        return '<html><body></body></html>';
++      },
++      languageDirective,
++      { textbookPromptProfile: 'textbook-v1', includeKatex: false },
++    );
++    expect(system).toContain('# Textbook Picture Game Authoring v1');
++  });
++
++  it('gives textbook 3D real resize, opaque-origin dependency and transform instructions', async () => {
++    const prompts = await capture('visualization3d', { textbookPromptProfile: 'textbook-v1' });
++    expect(prompts.system).toContain('new ResizeObserver');
++    expect(prompts.system).toContain('renderer.setSize(width, height, false)');
++    expect(prompts.system).toContain('camera.aspect = width / height');
++    expect(prompts.system).toContain('same-host ES module URLs also require CORS');
++    expect(prompts.system).toContain('normalized nonzero orientation values');
++    expect(prompts.system).not.toContain('44px');
++    expect(prompts.user).not.toContain('Three.js from CDN');
++  });
++});
+diff --git a/tests/server/textbook-widget-prompt-contract.test.ts b/tests/server/textbook-widget-prompt-contract.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/textbook-widget-prompt-contract.test.ts
+@@ -0,0 +1,90 @@
++import { describe, expect, it, vi } from 'vitest';
++import type { AICallFn } from '@openmaic/generation';
++import { generateSceneContent } from '../../packages/@openmaic/generation/src/scene-generator';
++import {
++  assertTextbookBatchContent,
++  withTextbookBatchContext,
++} from '@/lib/server/mira-textbook-batch-generation';
++import { textbookContext, textbookInteractive } from '@/tests/fixtures/textbook-batch';
++
++const outline = {
++  id: 'picture-game',
++  type: 'interactive' as const,
++  title: '看图观察',
++  description: '先观察图片，再移动物体',
++  keyPoints: ['观察'],
++  order: 1,
++  widgetType: 'game' as const,
++  widgetOutline: { gameType: 'puzzle' as const },
++};
++
++async function draft(html: string) {
++  const context = textbookContext();
++  const call = vi.fn<AICallFn>(async () => html);
++  const retainRaw = vi.fn(async () => {});
++  const content = await generateSceneContent(
++    outline,
++    withTextbookBatchContext(call, context, retainRaw),
++    { textbookPromptProfile: 'textbook-v1', interactiveIncludeKatex: false },
++  );
++  return { context, call, retainRaw, content };
++}
++
++describe('actual textbook widget factory and unchanged strict guard', () => {
++  it('combines the dedicated system/user pair with exact frozen scope, retains raw, and accepts static SVG/literal cues', async () => {
++    const result = await draft(textbookInteractive().html);
++    expect(result.call).toHaveBeenCalledTimes(1);
++    expect(result.call.mock.calls[0][0]).toContain('# Textbook Picture Game Authoring v1');
++    expect(result.call.mock.calls[0][0]).toContain(result.context.requirement);
++    expect(result.call.mock.calls[0][0]).toContain('整个 HTML 源');
++    expect(result.call.mock.calls[0][1]).not.toContain('## Scoring Configuration');
++    expect(result.retainRaw).toHaveBeenCalledWith(textbookInteractive().html);
++    expect(() =>
++      assertTextbookBatchContent('interactive', result.content, result.context),
++    ).not.toThrow();
++  });
++
++  it.each([
++    [
++      'emoji in markup',
++      (html: string) => html.replace('<svg><circle r="12"/></svg>', '&#x1F34E;'),
++      'emoji_picture',
++    ],
++    [
++      'emoji in a source comment',
++      (html: string) => html.replace('</body>', '<!-- \\u{1F34E} --></body>'),
++      'emoji_picture',
++    ],
++    [
++      'guarded bridge reference',
++      (html: string) =>
++        html.replace(
++          "window.miraNarrate('intro')",
++          "window.miraNarrate && window.miraNarrate('intro')",
++        ),
++      'narration_call_must_be_fixed_cue',
++    ],
++    [
++      'computed cue',
++      (html: string) =>
++        html.replace("window.miraNarrate('intro')", 'window.miraNarrate(state.cueId)'),
++      'narration_call_must_be_fixed_cue',
++    ],
++    [
++      'only dynamically added picture markers',
++      (html: string) => html.replaceAll('data-mira-picture-choice=', 'data-example='),
++      'distinct_picture_choices_missing',
++    ],
++  ] as const)(
++    'still rejects %s after one recorded draft without retry or persistence',
++    async (_name, mutate, code) => {
++      const raw = mutate(textbookInteractive().html);
++      const result = await draft(raw);
++      expect(result.call).toHaveBeenCalledTimes(1);
++      expect(result.retainRaw).toHaveBeenCalledWith(raw);
++      expect(() =>
++        assertTextbookBatchContent('interactive', result.content, result.context),
++      ).toThrow(code);
++    },
++  );
++});

@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 
 from content.learning_budget_policy import canonical, digest
+from integrations.openmaic_formal_media import professional_policy, professional_scene_learning_fields
 from integrations.openmaic_formal_playful import playful_generation_kwargs
 from integrations.openmaic_formal_quality import quality_canonical_json, quality_sha, quality_snapshot
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
@@ -55,7 +56,32 @@ def _saved_stage_event_for_runtime(events, *, owner_id, build_item_id, runtime_i
     return matches[0] if matches else None
 
 
-def _validate_learner_discussion_audit(receipt, prepared_snapshot, result, audit):
+def _repair_model_contract(completion, generation_contract):
+    """Read the dispatched identity, never the operator's current environment.
+
+    Legacy checksum-only callers remain valid, but a new receipt cannot acquire
+    the current verifier without its complete frozen creation contract. Normal
+    reconciliation passes the original, SHA-bound formal input below.
+    """
+    result = completion.get('result')
+    professional = result.get('professionalCreation') if isinstance(result, dict) else None
+    if generation_contract is None:
+        if isinstance(professional, dict) and any(key in professional for key in ('modelPolicyId', 'sceneLearningPolicy')):
+            raise ValueError('saved-stage learner discussion repair requires its frozen model contract')
+        return 'deepseek-v4-flash', {}
+    if not isinstance(generation_contract, dict):
+        raise ValueError('saved-stage learner discussion repair model contract is missing')
+    policy = professional_policy(generation_contract.get('professionalCreationPolicy'))
+    model_policy_id = policy.get('modelPolicyId')
+    if not isinstance(professional, dict):
+        raise ValueError('saved-stage learner discussion repair model receipt is missing')
+    professional_scene_learning_fields(professional, generation_contract=generation_contract)
+    selected = OpenMaicFullRuntimeClient.selected_professional_model_policy(
+        model_policy_id or OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_MODEL_POLICY['policyId'])
+    return selected['coursewareVerifier']['modelId'], ({'modelPolicyId': model_policy_id} if model_policy_id else {})
+
+
+def _validate_learner_discussion_audit(receipt, prepared_snapshot, result, audit, *, model_context):
     """Check immutable Native source/request/response artifacts without any Provider call."""
     names = {'input', 'request', 'provider-response', 'rejected-review', 'completion', 'dispatch.claim'}
     if not isinstance(audit, dict) or set(audit) != names or any(not isinstance(audit[key], dict) for key in names):
@@ -67,12 +93,15 @@ def _validate_learner_discussion_audit(receipt, prepared_snapshot, result, audit
     quality = (result.get('professionalCreation') or {}).get('teachingQuality')
     if (set(archived_input) != set(identity) | {'frozenContext', 'snapshot', 'sourceScenes'}
             or any(archived_input[key] != value for key, value in identity.items())
-            or not isinstance(context, dict) or set(context) != {'gradeBoundary', 'selectionPlan', 'teachingBrief'}
+            or not isinstance(context, dict) or set(context) != {'gradeBoundary', 'selectionPlan', 'teachingBrief'} | set(model_context)
+            or any(context.get(key) != value for key, value in model_context.items())
             or quality_sha(context) != receipt['frozenContextSha256']
             or quality_sha(archived_input.get('snapshot')) != quality_sha(prepared_snapshot)
             or quality_sha(quality_snapshot({'stage': result['stage'], 'scenes': archived_input.get('sourceScenes')}))
                != receipt['inputSnapshotSha256']
             or not isinstance(quality, dict) or quality.get('status') != 'passed'
+            or (bool(model_context) and (not isinstance(quality.get('review'), dict)
+                or quality['review'].get('modelId') != receipt['modelId']))
             or quality.get('snapshotSha256') != receipt['outputSnapshotSha256']
             or not isinstance(context['selectionPlan'], dict)
             or not isinstance(context['selectionPlan'].get('planSha256'), str)
@@ -111,12 +140,13 @@ def _validate_learner_discussion_audit(receipt, prepared_snapshot, result, audit
         raise ValueError('saved-stage learner discussion repair Provider payload changed')
 
 
-def validate_learner_discussion_repair(completion, prepared_snapshot, *, repair_audit=None):
+def validate_learner_discussion_repair(completion, prepared_snapshot, *, repair_audit=None, generation_contract=None):
     """Verify the two AI discussion additions against the frozen quality projection."""
     receipt = completion.get('learnerDiscussionRepair')
     if (not isinstance(receipt, dict) or set(receipt) != _DISCUSSION_REPAIR_FIELDS
             or not isinstance(prepared_snapshot, dict)):
         raise ValueError('saved-stage learner discussion repair evidence is incomplete')
+    verifier_model, model_context = _repair_model_contract(completion, generation_contract)
     hashes = ('sourceSnapshotSha256', 'inputSnapshotSha256', 'outputSnapshotSha256',
         'frozenContextSha256', 'rejectedReviewSha256', 'requestSha256', 'providerResponseSha256',
         'providerRequestIdHash', 'authorizationId', 'repairReference', 'receiptSha256')
@@ -125,7 +155,7 @@ def validate_learner_discussion_repair(completion, prepared_snapshot, *, repair_
             for key in hashes)
             or receipt['schemaVersion'] != 'mira.openmaic.learner-discussion-repair.v1'
             or receipt['promptVersion'] != 'mira.formal-learner-discussion-repair.v1'
-            or receipt['providerId'] != 'deepseek' or receipt['modelId'] != 'deepseek-v4-flash'
+            or receipt['providerId'] != 'deepseek' or receipt['modelId'] != verifier_model
             or receipt['sessionId'] != completion['sessionId']
             or receipt['stageId'] != completion['stageId']
             or receipt['sourceSnapshotSha256'] != completion['sourceSnapshotSha256']
@@ -183,7 +213,7 @@ def validate_learner_discussion_repair(completion, prepared_snapshot, *, repair_
     if quality_canonical_json(output) != quality_canonical_json(original):
         raise ValueError('saved-stage learner discussion repair modified frozen classroom content')
     if repair_audit is not None:
-        _validate_learner_discussion_audit(receipt, prepared_snapshot, result, repair_audit)
+        _validate_learner_discussion_audit(receipt, prepared_snapshot, result, repair_audit, model_context=model_context)
     return receipt['receiptSha256']
 
 
@@ -251,7 +281,8 @@ def validate_saved_stage_completion(completion, source_bytes, promoted, *, runti
             or upstream.formal_audio.receipt_sha256 != (result.get('formalAudio') or {}).get('receiptSha256')):
         raise ValueError('saved-stage promoted job or authoritative completion evidence mismatch')
     if 'learnerDiscussionRepair' in completion:
-        validate_learner_discussion_repair(completion, prepared_snapshot, repair_audit=learner_discussion_audit)
+        validate_learner_discussion_repair(completion, prepared_snapshot, repair_audit=learner_discussion_audit,
+            generation_contract={'professionalCreationPolicy': formal_input.get('professionalCreationPolicy')})
     return completion['receiptSha256']
 
 
@@ -303,7 +334,8 @@ def reconcile_saved_stage(*, runtime_service, preparation_repository, identity, 
     learner_discussion_audit = None
     if 'learnerDiscussionRepair' in completion:
         # Validate the identity before using its digest in a fixed Native audit path.
-        validate_learner_discussion_repair(completion, prepared_snapshot)
+        validate_learner_discussion_repair(completion, prepared_snapshot,
+            generation_contract=manifest.get('generationContract'))
         repair_identity = {key: completion['learnerDiscussionRepair'][key] for key in _DISCUSSION_REPAIR_IDENTITY}
         repair_folder = path.parent.parent.parent / 'formal-learner-discussion-repairs' / quality_sha(repair_identity)
         learner_discussion_audit = {name: json.loads((repair_folder / (name if name == 'dispatch.claim' else name + '.json')).read_bytes())

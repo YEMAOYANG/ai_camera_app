@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, BookOpen, Check, RefreshCw, Settings2 } from "lucide-react";
+import { ArrowRight, BookOpen, Check, Play, RefreshCw, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState, type MouseEvent } from "react";
 import { SchoolbagShell } from "@/components/student/schoolbag-shell";
@@ -14,6 +14,7 @@ import { useTextbookCatalog } from "@/features/learning/use-textbook-catalog";
 import type { TextbookCatalog } from "@/lib/contracts/textbooks";
 import type { Student } from "@/lib/contracts/student-session";
 import { getLearningHomeState, LearningListenButton, LearningNextPicture, SubjectPicture, useLearningVoice } from "./learning-picture-navigation";
+import { homeworkStudentCopy } from "./homework-student-copy";
 
 const subjects = [
   { id: "chinese", name: "语文", sound: "yǔ wén" },
@@ -64,6 +65,19 @@ export function LearningSchoolbag({ student }: { student: Student }) {
         <p className="schoolbag-eyebrow">你的学习时光</p>
         <h1 id="schoolbag-title">今天，想学哪一本？</h1>
         <p className="schoolbag-invitation">从书包里，拿出一本好奇。</p>
+        <nav className="schoolbag-extra-learning" aria-label="复习与作业">
+          <Link href="/learning/reviews" prefetch={false} className="schoolbag-learning-entry" aria-label="打开复习与考试">
+            <span className="schoolbag-learning-entry-art"><SubjectPicture subject="chinese" /><span><Play aria-hidden="true" fill="currentColor" /></span></span>
+            <span><strong>复习与考试</strong><small>小测验 · 继续做 · 学习记录</small></span>
+            <ArrowRight aria-hidden="true" />
+          </Link>
+          <Link href="/learning/homework" prefetch={false} className="schoolbag-learning-entry" aria-label="打开作业与试卷">
+            <span className="schoolbag-learning-entry-art"><SubjectPicture subject="math" /><span><Play aria-hidden="true" fill="currentColor" /></span></span>
+            <span><strong>作业与试卷</strong><small>{homeworkStudentCopy.title} · 听讲解再练习</small></span>
+            <ArrowRight aria-hidden="true" />
+          </Link>
+          <LearningListenButton cue="choose" label="听入口说明" />
+        </nav>
         {data && pictureFirst ? <LearningNextPicture catalog={data} /> : journey && <div className="schoolbag-next-lesson">
           <strong>{journey.reviewDue ? '到短复习时间啦' : journey.parentNeeded ? '休息好了，再来试试' : journey.status === 'retained' ? '隔了几天，也记得' : journey.reviewDueAt ? '本节学习已完成' : '继续上次的小任务'}</strong>
           <p>《{journey.title}》{journey.reviewDue ? ' · 换个情境，再认一认' : journey.reviewDueAt ? ` · 下次复习 ${new Date(journey.reviewDueAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Shanghai' })}` : ''}</p>

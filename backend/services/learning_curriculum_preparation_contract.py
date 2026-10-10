@@ -268,7 +268,7 @@ def build_preparation_target(grade_code: str) -> dict[str, object]:
                 ),
                 "professionalModelPolicy": json.loads(
                     json.dumps(
-                        OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_MODEL_POLICY,
+                        OpenMaicFullRuntimeClient.selected_professional_model_policy(),
                         ensure_ascii=False,
                         sort_keys=True,
                         separators=(",", ":"),

@@ -9,9 +9,17 @@ VISUAL_RUBRIC_VERSION = "mira.primary-teaching-visual.v1"
 DIMENSIONS = ("legibility", "layout", "teachingGraphic", "interactionAffordance")
 
 
-def visual_review_receipt(value, quality):
+def visual_review_receipt(value, quality, *, generation_contract=None):
+    policy = generation_contract.get("professionalCreationPolicy") if isinstance(generation_contract, Mapping) else None
+    model_policy_id = policy.get("modelPolicyId") if isinstance(policy, Mapping) else None
+    model_id = "deepseek-v4-flash-vision-exp"
+    if model_policy_id is not None:
+        from integrations.openmaic_formal_quality import _quality_verifier_model
+        model_id = _quality_verifier_model(generation_contract)
     expected = {"schemaVersion", "reviewerKind", "status", "rubricVersion", "snapshotSha256",
         "teachingQualityContextSha256", "sceneReviews", "providerId", "modelId", "providerRequestIdHash", "receiptSha256"}
+    if model_policy_id is not None:
+        expected.add("modelPolicyId")
     if not isinstance(value, Mapping) or set(value) not in (expected, expected | {"providerResponseModelId"}):
         raise ValueError("visual review receipt fields are invalid")
     if "providerResponseModelId" in value and (not isinstance(value["providerResponseModelId"], str) or not value["providerResponseModelId"].strip() or len(value["providerResponseModelId"]) > 200):
@@ -21,7 +29,8 @@ def visual_review_receipt(value, quality):
         or value["status"] != "passed" or value["rubricVersion"] != VISUAL_RUBRIC_VERSION
         or value["snapshotSha256"] != quality["snapshotSha256"]
         or value["teachingQualityContextSha256"] != quality_sha(context)
-        or value["providerId"] != "deepseek" or value["modelId"] != "deepseek-v4-flash-vision-exp"):
+        or value["providerId"] != "deepseek" or value["modelId"] != model_id
+        or (model_policy_id is not None and value["modelPolicyId"] != model_policy_id)):
         raise ValueError("final artifact has not passed the configured visual model")
     reviews = value["sceneReviews"]
     observations = quality["renderChecks"]
@@ -51,4 +60,4 @@ def validate_visual_review(manifest):
     receipt = _bound_interaction(professional, generation)
     if receipt is None or receipt["schemaVersion"] == "mira.openmaic.interaction-design-receipt.v1":
         return None
-    return visual_review_receipt(receipt["visualReview"], professional["teachingQuality"])
+    return visual_review_receipt(receipt["visualReview"], professional["teachingQuality"], generation_contract=generation)

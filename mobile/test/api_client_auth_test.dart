@@ -51,6 +51,96 @@ void main() {
     },
   );
 
+  test(
+    'one token refresh clones a finalized multipart upload and keeps its key',
+    () async {
+      SharedPreferences.setMockInitialValues(const {});
+      final preferences = await SharedPreferences.getInstance();
+      final sessionStore = AuthSessionStore(
+        preferences,
+        secureStorage: FakeAuthSecureSessionStorage(),
+      );
+      final now = DateTime.now();
+      await sessionStore.save(
+        AuthSession(
+          accessToken: 'test-access-before',
+          refreshToken: 'test-refresh',
+          accessTokenExpiresAt: now.add(const Duration(minutes: 30)),
+          refreshTokenExpiresAt: now.add(const Duration(days: 1)),
+          userId: 'test-parent',
+          phone: 'test-phone',
+        ),
+      );
+      final dio = Dio(BaseOptions(baseUrl: 'http://test.local/api'));
+      final refresh = Dio(BaseOptions(baseUrl: 'http://test.local/api'));
+      refresh.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (r, h) => h.resolve(
+            Response(
+              requestOptions: r,
+              data: {
+                'user': {'id': 'test-parent', 'phone': 'test-phone'},
+                'tokens': {
+                  'accessToken': 'test-access-after',
+                  'refreshToken': 'test-refresh-after',
+                  'accessTokenExpiresAt': now
+                      .add(const Duration(minutes: 30))
+                      .millisecondsSinceEpoch,
+                  'refreshTokenExpiresAt': now
+                      .add(const Duration(days: 1))
+                      .millisecondsSinceEpoch,
+                },
+              },
+            ),
+          ),
+        ),
+      );
+      dio.interceptors.add(
+        AuthTokenInterceptor(
+          sessionStore: sessionStore,
+          refreshDio: refresh,
+          dio: dio,
+        ),
+      );
+      var calls = 0;
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (r, h) async {
+            calls++;
+            final body = r.data as FormData;
+            expect(body.isFinalized, isFalse);
+            expect(
+              Map.fromEntries(body.fields)['idempotencyKey'],
+              'stable-upload',
+            );
+            if (calls == 1) {
+              await body.finalize().drain<void>();
+              h.reject(
+                DioException(
+                  requestOptions: r,
+                  response: Response(requestOptions: r, statusCode: 401),
+                ),
+                true,
+              );
+            } else {
+              expect(r.headers['Authorization'], 'Bearer test-access-after');
+              h.resolve(Response(requestOptions: r, data: {'ok': true}));
+            }
+          },
+        ),
+      );
+      final response = await dio.post<dynamic>(
+        '/homework-submissions/test/pages',
+        data: FormData.fromMap({
+          'idempotencyKey': 'stable-upload',
+          'file': MultipartFile.fromBytes([1, 2, 3], filename: 'test.png'),
+        }),
+      );
+      expect(response.data, {'ok': true});
+      expect(calls, 2);
+    },
+  );
+
   test('public documents can load without a session', () async {
     SharedPreferences.setMockInitialValues(const {});
     final preferences = await SharedPreferences.getInstance();

@@ -5,6 +5,7 @@ class ReportLearningSummary {
     this.reviewCount = 0,
     this.lessons = const [],
     this.coachingSummary = const {},
+    this.homeworkProgress,
   });
 
   final int lessonCount;
@@ -12,6 +13,7 @@ class ReportLearningSummary {
   final int reviewCount;
   final List<ReportLearningLesson> lessons;
   final Map<String, dynamic> coachingSummary;
+  final ReportHomeworkProgress? homeworkProgress;
 
   factory ReportLearningSummary.fromJson(Object? value) {
     final json = _map(value);
@@ -20,12 +22,59 @@ class ReportLearningSummary {
       needsSupportCount: _number(json['needsSupportCount']),
       reviewCount: _number(json['reviewCount']),
       coachingSummary: _map(json['coachingSummary']),
+      homeworkProgress: ReportHomeworkProgress.fromJson(
+        json['homeworkProgress'],
+      ),
       lessons: (json['lessons'] is List ? json['lessons'] as List : const [])
           .whereType<Map>()
           .map((item) => ReportLearningLesson.fromJson(_map(item)))
           .toList(),
     );
   }
+}
+
+class ReportHomeworkProgress {
+  ReportHomeworkProgress._(this.data, this.entries);
+  final Map<String, dynamic> data;
+  final List<ReportHomeworkEntry> entries;
+  int get submissionCount => _number(data['submissionCount']);
+  int get total => _number(data['total']);
+  int get corrected => _number(data['corrected']);
+  int get selfReportedCompleted => _number(data['selfReportedCompleted']);
+  int get inProgress => _number(data['inProgress']);
+  int get notStarted => _number(data['notStarted']);
+  int get needsReview => _number(data['needsReview']);
+  int get assisted => _number(data['assisted']);
+
+  static ReportHomeworkProgress? fromJson(Object? value) {
+    final json = _map(value);
+    if (json['schemaVersion'] != 'mira.report.homework-progress.v1' ||
+        json['scope'] != 'current_same_question_correction' ||
+        json['countsForAbility'] != false ||
+        json['independent'] != null) {
+      return null;
+    }
+    return ReportHomeworkProgress._(
+      json,
+      (json['entries'] is List ? json['entries'] as List : const [])
+          .whereType<Map>()
+          .map((item) => ReportHomeworkEntry(_map(item)))
+          .where((item) => item.submissionId.isNotEmpty)
+          .toList(),
+    );
+  }
+}
+
+class ReportHomeworkEntry {
+  const ReportHomeworkEntry(this.data);
+  final Map<String, dynamic> data;
+  String get submissionId => _text(data['submissionId']);
+  String get childName => _text(data['childName']);
+  String get title => _text(data['title']);
+  int get total => _number(data['total']);
+  int get corrected => _number(data['corrected']);
+  int get selfReportedCompleted => _number(data['selfReportedCompleted']);
+  int get needsReview => _number(data['needsReview']);
 }
 
 class ReportLearningLesson {

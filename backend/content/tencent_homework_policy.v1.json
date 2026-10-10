@@ -1,0 +1,46 @@
+{
+  "version": "mira.tencent-homework-policy.v1",
+  "endpoint": "https://ocr.tencentcloudapi.com/",
+  "apiVersion": "2018-11-19",
+  "submitRetryCount": 0,
+  "requiresDurableRawReceiptBeforeParsing": true,
+  "requiresConfirmedSourceForAbilityEvidence": true,
+  "maximumImageBase64Bytes": 10485760,
+  "pdfSinglePageOnly": true,
+  "subjectEvidence": {
+    "math": {"questions": "official_product_support", "essay": "unsupported"},
+    "chinese": {"questions": "official_product_support", "essay": "official_api_support"},
+    "english": {"questions": "official_product_support", "essay": "official_api_support"},
+    "science": {"questions": "requires_subject_and_grade_validation", "essay": "unsupported"},
+    "other": {"questions": "requires_subject_and_grade_validation", "essay": "unsupported"}
+  },
+  "questionConfigMap": {"KnowledgePoints": true, "TrueAnswer": true, "OutputSubQuestionsAndCoords": true},
+  "essayConfigMap": {"StructureAndContent": "1"},
+  "essay": {
+    "countsForObjectiveAccuracy": false,
+    "countsForAbility": false,
+    "scoreAvailable": false,
+    "confidenceAvailable": false,
+    "fullEssayTranscriptAvailable": false,
+    "allReturnedJobIdsMustBeQueried": true,
+    "sentenceSuggestionsAreUntrustedData": true,
+    "unknownSamePageMultipleJobSemantics": true,
+    "printedSmokeDoesNotValidateHandwriting": true
+  },
+  "coordinates": {"unit": "pixels", "corners": 4, "numbersPerPosition": 8, "requiresAngleAndSourceFrameValidation": true},
+  "freeAllowance": {
+    "questionAgent": {"quantity": 1000, "unit": "questions", "grant": "one_time_per_account", "validityYears": 1},
+    "essayAgent": {"quantity": 1000, "unit": "calls", "grant": "one_time_per_account", "validityYears": 1},
+    "requiresActualAccountBalanceCheck": true,
+    "doNotApplyGenericOcrMonthlyAllowance": true
+  },
+  "sources": [
+    "https://cloud.tencent.com/document/product/866/128273",
+    "https://cloud.tencent.cn/document/api/866/128274",
+    "https://cloud.tencent.com/document/product/866/128620",
+    "https://cloud.tencent.com/document/api/866/128621",
+    "https://cloud.tencent.com/document/api/866/33527",
+    "https://cloud.tencent.com/document/product/866/35945",
+    "https://cloud.tencent.com/product/iem"
+  ]
+}

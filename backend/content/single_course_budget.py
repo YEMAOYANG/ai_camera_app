@@ -76,6 +76,13 @@ def build_single_course_policy(*, grade, subject, skill, ordinal, now, ttl_ms=10
     identity = single_slot_identity(grade, subject, skill, ordinal)
     raw = LearningBudgetPolicy.load().raw
     raw.update(enabled=True, version=f"single-course-2026-09-10:{identity['buildItemId']}")
+    from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
+    current_flash = (OpenMaicFullRuntimeClient.selected_professional_model_policy()["policyId"]
+                     == "deepseek-v4-pro-current-flash-v1")
+    if current_flash and vision_provider != "deepseek":
+        raise ValueError("current Flash verification requires the official DeepSeek visual provider")
+    if current_flash:
+        raw["version"] += ":pro-current-flash.v1"
     maximum = {**dict.fromkeys(UNITS, 0), "calls": 256, "input_tokens": 2000000,
                "output_tokens": 400000, "characters": 60000, "audio_ms": 7200000,
                "search_requests": 20, "images": 2, "money_micros": money_micros}
@@ -100,6 +107,16 @@ def build_single_course_policy(*, grade, subject, skill, ordinal, now, ttl_ms=10
         "qwen-asr-beijing": price("qwen-asr", "qwen3-asr-flash", {"audio_ms": 600000}, {"audio_ms": 220000}),
         "qwen-image-beijing": price("qwen-image", "qwen-image-max", {"images": 1}, {"images": 500000000000}),
     }
+    if current_flash:
+        # A provider/model must resolve to exactly one frozen price. Text and
+        # PNG review share the same wire model; visual input is independently
+        # measured at 1024 tokens/image, with no discounted/cache assumption.
+        raw["prices"]["deepseek-current-flash-peak"] = price("deepseek", "deepseek-flash",
+            {"input_tokens": 500000, "output_tokens": 32768},
+            {"input_tokens": 3000000, "output_tokens": 9000000},
+            version="official-2026-10-08-v4.1-flash-peak-uncached-ceiling.v1")
+        raw["prices"].pop("deepseek-flash-peak")
+        raw["prices"].pop("deepseek-vision-peak")
     if search_provider == "brave":
         # Search $5/1000; budget conversion 8 CNY/USD is an explicit ceiling, not live FX.
         raw["prices"]["brave-search-ceiling"] = price("brave", "brave-search",
@@ -136,7 +153,7 @@ def with_single_teaching_scope(policy, *, identity, scope, now):
     raw['limits']['purposes']['required_teaching'] = {'day': maximum, 'month': maximum}
     raw['limits']['user'] = {'day': maximum, 'month': maximum}
     raw['authorizationTemplates']['required_teaching'] = {'maxUnits': maximum,
-        'priceKeys': ['deepseek-pro-peak', 'deepseek-flash-peak', 'qwen-tts-beijing', 'qwen-asr-beijing'],
+        'priceKeys': ['deepseek-pro-peak', 'deepseek-current-flash-peak' if 'deepseek-current-flash-peak' in raw['prices'] else 'deepseek-flash-peak', 'qwen-tts-beijing', 'qwen-asr-beijing'],
         'ttlMs': raw['authorizationTemplates']['production']['ttlMs']}
     raw['authorizationWindow']['scopes'] = [identity['scope'], scope]
     return LearningBudgetPolicy(raw)

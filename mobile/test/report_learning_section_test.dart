@@ -110,11 +110,10 @@ void main() {
     await tester.pumpAndSettle();
     await captureParentTextbookPreview(tester, 'daily-learning-report');
     expect(tester.takeException(), isNull);
-    await tester.scrollUntilVisible(
-      find.text('周报'),
-      -400,
-      scrollable: find.byType(Scrollable).first,
-    );
+    // Return above the fixed header before tapping the report tab.
+    final scroll = tester.state<ScrollableState>(find.byType(Scrollable).first);
+    scroll.position.jumpTo(0);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('周报'));
     await tester.pumpAndSettle();
     expect(weeklyReads, greaterThan(0));

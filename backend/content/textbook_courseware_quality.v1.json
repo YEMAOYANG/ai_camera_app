@@ -1,0 +1,317 @@
+{
+  "schemaVersion": "mira.textbook.courseware-quality-policy.v1",
+  "policyId": "mira-textbook-engaging-grade-aligned-v1",
+  "version": 1,
+  "status": "proposed_not_enforced",
+  "policySha256": "b60c1c2e67a1a9db530bb4268ec50c33439b0f07e435759dc6c6f210ac5e1fbf",
+  "integrity": {
+    "algorithm": "sha256",
+    "canonicalization": "utf8-json-sort-keys-compact-ensure-ascii-false",
+    "excludedTopLevelFields": [
+      "policySha256"
+    ],
+    "consumerMustVerifyHash": true,
+    "consumerMustFreezeFields": [
+      "schemaVersion",
+      "policyId",
+      "version",
+      "policySha256"
+    ],
+    "mutablePromptTextIsPolicyAuthority": false
+  },
+  "applicability": {
+    "artifactTypes": [
+      "book_exploration",
+      "unit_guide",
+      "lesson_courseware"
+    ],
+    "grades": [
+      "primary_1",
+      "primary_2",
+      "primary_3",
+      "primary_4",
+      "primary_5",
+      "primary_6"
+    ],
+    "subjectsSource": "content.textbook_catalog.SUBJECTS",
+    "gradePedagogySource": "content.textbook_pedagogy.teaching_profile",
+    "lowReadingPolicySource": "backend/content/low_reading_policy.v1.json",
+    "teacherRegistrySource": "content.teacher_profiles.get_formal_runtime_teacher_contract",
+    "historicalArtifactsAutomaticallyCertified": false,
+    "historicalArtifactsRequireIndividualReassessment": true,
+    "providerDispatchAuthorizedByThisFile": false,
+    "publicationAuthorizedByThisFile": false
+  },
+  "binding": {
+    "requiredBookFields": [
+      "editionId",
+      "alignmentRevisionId",
+      "alignmentManifestSha256",
+      "gradeCode",
+      "subject",
+      "schoolSystem",
+      "volume"
+    ],
+    "requiredUnitFields": [
+      "unitId"
+    ],
+    "requiredLessonFields": [
+      "nodeId",
+      "partIndex",
+      "teachingRevision",
+      "knowledgeBriefSha256"
+    ],
+    "manifestMustBeVerifiedAndImmutable": true,
+    "directoryMustMatchExactEditionAndRevision": true,
+    "lessonScopeMustBeReviewedBeforeGeneration": true,
+    "requiredScopeFields": [
+      "objectives",
+      "knowledgePoints",
+      "priorKnowledge",
+      "excludedTopics",
+      "assessmentMode"
+    ],
+    "everySceneAndTaskMustMapToObjectiveIds": true,
+    "everyObjectiveMustHaveTeachingAndTransferEvidence": true,
+    "scopeInventionAllowed": false,
+    "missingScopeDisposition": "blocked_scope_review_required",
+    "crossGradeOrCrossEditionRelabelingAllowed": false,
+    "crossEditionReuseRequiresExactScopeAndBindingReview": true,
+    "unreviewedCrossEditionReuseAllowed": false,
+    "visualComplexityMayWidenKnowledgeScope": false
+  },
+  "catalogCompleteness": {
+    "bookExploration": {
+      "requiredPerBook": 1,
+      "mustIntroduceSubjectAndCurrentVolume": true,
+      "mustIncludeMeaningfulLearnerExploration": true,
+      "mustBridgeToRealNodeIdsInBook": true,
+      "mayCountAsLessonAssessment": false
+    },
+    "unitGuide": {
+      "requiredPerUnit": 1,
+      "includeOrientationUnits": true,
+      "mustIntroduceUnitObjectivesAndPriorKnowledge": true,
+      "mustIncludeMeaningfulLearnerExploration": true,
+      "mustBridgeToRealNodeIdsInUnit": true,
+      "mayCountAsLessonAssessment": false
+    },
+    "lessonCourseware": {
+      "requiredForEveryReviewedDirectoryNode": true,
+      "unverifiedDirectoryNodesMayBeInvented": false,
+      "missingArtifactsDisposition": "incomplete_not_released",
+      "catalogMetadataMayCountAsCourseware": false
+    }
+  },
+  "lessonExperience": {
+    "requiredSequence": [
+      "concrete_situation",
+      "teacher_demonstration",
+      "learner_exploration",
+      "guided_practice",
+      "independent_transfer",
+      "brief_reflection"
+    ],
+    "meaningfulPracticeRequired": true,
+    "practiceMustUseCurrentLessonKnowledge": true,
+    "longLectureThenQuizSatisfiesPolicy": false,
+    "replayableGame": {
+      "minimumPerLesson": 1,
+      "visibleGoalRequired": true,
+      "gradeAppropriateRulesRequired": true,
+      "knowledgeDependentSuccessRequired": true,
+      "minimumDistinctLearnerActionKinds": 2,
+      "navigationReplayAndCosmeticClicksCountAsLearningActions": false,
+      "learnerActionsMustChangeTeachingState": true,
+      "resultMustBeComputedFromTeachingState": true,
+      "recoverableUnsuccessfulStateRequired": true,
+      "explanatoryErrorFeedbackRequired": true,
+      "retryRequired": true,
+      "restartAndReplayRequired": true,
+      "quizDisguisedAsGameAllowed": false,
+      "timerCounterOrRewardAnimationAloneSatisfiesPolicy": false,
+      "gameMayAwardOfficialMasteryOrRewards": false
+    },
+    "independentTransfer": {
+      "requiredAfterTeaching": true,
+      "minimumNewContextTasksPerObjective": 1,
+      "mayRepeatPreviouslyExposedAnswers": false,
+      "mustPreserveGradeAndLessonScope": true,
+      "firstIndependentAttemptMustBePreserved": true,
+      "hintAndAdultAssistanceMustBeRecordedSeparately": true,
+      "assistedCorrectMayCountAsIndependentMastery": false,
+      "observedPerformanceRequiresSeparateHumanConfirmation": true,
+      "pictureSupportedComprehensionEqualsIndependentReading": false,
+      "sceneVisitsOrPlaybackCompletionEqualMastery": false
+    }
+  },
+  "unitMediaCoverage": {
+    "coverageMustBePlannedBeforeLessonGeneration": true,
+    "threeD": {
+      "minimumQualifyingActivitiesPerUnit": 1,
+      "mustMapToReviewedUnitObjectiveIds": true,
+      "realGeometryAndCameraProjectionRequired": true,
+      "learnerManipulationOfTeachingStateRequired": true,
+      "minimumMeaningfulVerifiedStates": 3,
+      "stateLinkedInstructionAndFeedbackRequired": true,
+      "resetRequired": true,
+      "cameraOrbitAloneQualifies": false,
+      "cssPerspectiveStaticRenderOrDecorativeSpinQualifies": false,
+      "newPrerequisitesOrAdvancedConceptsAllowed": false,
+      "externalDependenciesMustBePinnedAndAvailable": true
+    },
+    "video": {
+      "minimumQualifyingClipsPerUnit": 1,
+      "mustMapToReviewedUnitObjectiveIds": true,
+      "actualPlayableMediaBytesRequired": true,
+      "verifiedMimeHashDurationAndSourceRequired": true,
+      "gradeAppropriateNarrationRequired": true,
+      "captionsRequired": true,
+      "pauseReplayAndRecoveryRequired": true,
+      "postVideoObservationOrInteractionRequired": true,
+      "passiveWatchingAloneQualifies": false,
+      "placeholderBrokenUrlPosterOrAnimationLabeledVideoQualifies": false,
+      "unknownExternalMediaAllowed": false
+    },
+    "pedagogicalException": {
+      "allowedOnlyFor": [
+        "threeD",
+        "video"
+      ],
+      "allowedOnlyAfterDocumentedHumanPedagogicalReview": true,
+      "requiredFields": [
+        "exceptionId",
+        "policySha256",
+        "binding",
+        "modality",
+        "objectiveIds",
+        "pedagogicalReason",
+        "alternativeActivity",
+        "alternativeEvidence",
+        "reviewer",
+        "reviewedAt",
+        "approvalStatus"
+      ],
+      "requiredApprovalStatus": "approved",
+      "mustBeBoundToExactUnitAndRevision": true,
+      "costFailureOrMissingProviderAloneJustifiesException": false,
+      "generatorMayApproveItsOwnException": false,
+      "silentSkipAllowed": false,
+      "unreviewedExceptionDisposition": "blocked_media_review_required"
+    }
+  },
+  "narration": {
+    "requiredForAllGradesAndSubjects": true,
+    "providerId": "qwen-tts",
+    "modelAndVoiceAuthority": "registered_subject_teacher_contract",
+    "preGeneratedSavedAudioRequired": true,
+    "requiredCoverage": [
+      "instructions",
+      "demonstrations",
+      "question_prompts",
+      "game_goals",
+      "game_rules",
+      "state_changes_requiring_explanation",
+      "hints",
+      "answer_feedback",
+      "video_narration",
+      "reflection"
+    ],
+    "subjectTeacherIdentityMustMatchBinding": true,
+    "languageMustMatchReviewedTeachingIntent": true,
+    "unregisteredSubjectDisposition": "blocked_teacher_contract_required",
+    "silentSubstitutionOfAnotherSubjectTeacherAllowed": false,
+    "browserSpeechSynthesisAllowed": false,
+    "systemSpeechFallbackAllowed": false,
+    "auditedAudioHashAndTextHashRequired": true,
+    "asrAgainstExactNarrationTextRequired": true,
+    "minimumAsrSimilarityBps": 8500,
+    "semanticPronunciationAndLanguageReviewRequired": true,
+    "missingOrAmbiguousAudioDisposition": "blocked_audio_review_required"
+  },
+  "lowReading": {
+    "grades": [
+      "primary_1",
+      "primary_2"
+    ],
+    "independentInstructionReadingAssumed": false,
+    "meaningfulContextSceneRequired": true,
+    "teacherNarrationAndVisibleReplayRequired": true,
+    "maximumTasksPerScreen": 1,
+    "pictureChoice": {
+      "minimumDistinguishablePictorialOptions": 3,
+      "everyOptionMustCarryMeaning": true,
+      "labelsLettersPinyinOrNamesRequiredToDistinguishChoices": false,
+      "correctAnswerStylingBeforeResponseAllowed": false,
+      "peopleMustHaveConsistentPortraitsAndVisibleRoleCues": true
+    },
+    "alternativeModes": [
+      "point",
+      "drag_match"
+    ],
+    "alternativeModesStillRequireMeaningfulSceneAndDistinguishableTargets": true,
+    "alternativeModesMayReplacePicturesWithText": false,
+    "targetCharactersMayBeVisible": true,
+    "nonTargetTextMayCarryRequiredInstructions": false,
+    "decorativeImagesEmojiOrAudioButtonOnTextChoicesQualify": false,
+    "coverNonTargetTextRuntimeReviewRequired": true
+  },
+  "accessibility": {
+    "minimumTouchTargetPx": 48,
+    "keyboardAndFocusSupportRequired": true,
+    "accessibleNamesAndImageAlternativesRequired": true,
+    "colorAloneMayCarryMeaning": false,
+    "readableContrastRequired": true,
+    "reducedMotionRespected": true,
+    "reducedMotionMayRemoveLearningStateOrControls": false,
+    "essentialAnimationRequiresPauseOrEquivalentStaticSequence": true,
+    "mobileTouchAndViewportReviewRequired": true,
+    "audioVideoLoadingFailureAndRecoveryStatesRequired": true,
+    "savedProgressResumeMustBeVerified": true
+  },
+  "publication": {
+    "requiredEvidence": [
+      "exact_binding_and_scope_review",
+      "complete_artifacts_for_exact_reviewed_release_scope",
+      "objective_coverage_semantic_review",
+      "original_expression_and_source_usage_review",
+      "complete_teacher_audio_hash_text_hash_and_asr_review",
+      "per_item_pointer_and_touch_interaction_review",
+      "per_item_3d_meaningful_state_review_or_approved_exception",
+      "per_item_video_play_pause_replay_and_followup_review_or_approved_exception",
+      "low_reading_text_covered_review_when_applicable",
+      "accessibility_reduced_motion_and_resume_review",
+      "immutable_artifact_and_media_hashes",
+      "explicit_publication_review_record"
+    ],
+    "actualRenderedArtifactsRequired": true,
+    "metadataOrWidgetLabelsAloneMayPass": false,
+    "independentReviewerRequired": true,
+    "generatorMayApproveItsOwnOutput": false,
+    "automaticallyFabricatedReviewReceiptsAllowed": false,
+    "automaticApprovalAllowed": false,
+    "existingPublicationGatesMustRemainAuthoritative": true,
+    "newPolicyMayBypassExistingPublicationGates": false,
+    "partialCoverageMayBeReportedAsComplete": false,
+    "failedOrMissingEvidenceDisposition": "needs_review_not_published",
+    "granularity": {
+      "lessonReleaseAllowedBeforeWholeBookComplete": true,
+      "releaseMustNameExactReviewedArtifactScope": true,
+      "unreleasedLessonAndUnitCoverageMustRemainVisible": "pending_or_incomplete",
+      "unitCompleteRequiresAllUnitGuidesLessonsAndMediaEvidence": true,
+      "bookCompleteRequiresExplorationAndAllUnitsComplete": true,
+      "partialBatchMayClaimWholeBookComplete": false
+    }
+  },
+  "generationOperations": {
+    "reuseReviewedExactScopeArtifactsBeforePaidDispatch": true,
+    "durableReservationBeforeProviderDispatchRequired": true,
+    "frozenPolicyScopeAndMediaIdentityRequired": true,
+    "separateContentAudioVideoAndReviewCheckpointsRequired": true,
+    "timeoutOrUnknownOutcomeAllowsAutomaticPaidRetry": false,
+    "ambiguousPaidDispatchDisposition": "reconcile_original_request_before_further_dispatch",
+    "existingPublishedArtifactsMayBeOverwritten": false,
+    "newTeachingVersionRequiresRecordedScopeAndReason": true,
+    "providerReceiptsAndCostAccountingRequired": true
+  }
+}

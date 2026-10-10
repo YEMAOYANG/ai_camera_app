@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 from content.textbook_catalog import canonical, digest, lesson_by_id
 from content.textbook_preview import preview_checks
 from content.textbook_release import INPUT_SCHEMA, RELEASE_SCHEMA, MEDIA, check_questions, fail, validate_release
+from content.textbook_release_media import MAX_MEDIA_BYTES, media_mime_type
 from core.errors import ApiError
 from core.security import now_ms
 
@@ -87,13 +88,13 @@ class TextbookPublicationService:
             source_path = (root / match.group(1) / match.group(2)).resolve()
             if root not in source_path.parents or not source_path.is_file():
                 fail('课件素材丢失')
+            if not 0 < source_path.stat().st_size <= MAX_MEDIA_BYTES:
+                fail('课件素材格式或大小无效')
             raw = source_path.read_bytes()
             sha = hashlib.sha256(raw).hexdigest()
             suffix = source_path.suffix.lower()
-            mimes = {'.wav': 'audio/wav', '.webp': 'image/webp', '.png': 'image/png', '.mp3': 'audio/mpeg'}
-            if suffix not in mimes or not 0 < len(raw) <= 16 * 1024 * 1024:
-                fail('课件素材格式或大小无效')
-            kind = 'audio' if mimes[suffix].startswith('audio/') else 'media'
+            mime_type = media_mime_type(suffix, raw)
+            kind = 'audio' if mime_type.startswith('audio/') else 'media'
             relative = f'{kind}/{sha}{suffix}'
             url = f'/api/classroom-media/{classroom_id}/{relative}'
             target_path = root / classroom_id / relative
@@ -103,7 +104,7 @@ class TextbookPublicationService:
             if not target_path.exists():
                 with target_path.open('xb') as output:
                     output.write(raw)
-            media[url] = {'path': url, 'sha256': sha, 'byteSize': len(raw), 'mimeType': mimes[suffix]}
+            media[url] = {'path': url, 'sha256': sha, 'byteSize': len(raw), 'mimeType': mime_type}
             return url
 
         def convert(value):

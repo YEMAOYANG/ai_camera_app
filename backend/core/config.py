@@ -95,6 +95,32 @@ class AppConfig:
     TASK_REMINDER_LEAD_SECONDS: int
     TASK_SCHEDULER_ENABLED: bool
     TASK_SCHEDULER_INTERVAL_SECONDS: int
+    LEARNING_REVIEW_ENABLED: bool
+    HOMEWORK_ANALYSIS_ENABLED: bool
+    HOMEWORK_WORKER_ENABLED: bool
+    HOMEWORK_WORKER_INTERVAL_SECONDS: int
+    HOMEWORK_ASSET_ROOT: str
+    HOMEWORK_TTS_RUNTIME_URL: str
+    HOMEWORK_AUDIO_ENABLED: bool
+    HOMEWORK_AUDIO_MAX_CALLS_PER_SUBMISSION: int
+    HOMEWORK_VISION_MODEL: str
+    HOMEWORK_VISION_PROVIDER: str
+    HOMEWORK_VISION_API_KEY: str
+    HOMEWORK_VISION_BASE_URL: str
+    HOMEWORK_VISION_MAX_BYTES: int
+    HOMEWORK_VISION_MAX_DIMENSION: int
+    HOMEWORK_VISION_TIMEOUT_SECONDS: float
+    HOMEWORK_GRADING_PROVIDER: str
+    HOMEWORK_TENCENT_SECRET_ID: str
+    HOMEWORK_TENCENT_SECRET_KEY: str
+    HOMEWORK_TENCENT_CREDENTIALS_CSV: str
+    HOMEWORK_TENCENT_REGION: str
+    HOMEWORK_TENCENT_TIMEOUT_SECONDS: float
+    HOMEWORK_TUTOR_PROVIDER: str
+    HOMEWORK_TUTOR_MODEL: str
+    HOMEWORK_TUTOR_API_KEY: str
+    HOMEWORK_TUTOR_BASE_URL: str
+    HOMEWORK_DOCUMENT_CAPTURE_APPROVED_EVIDENCE_IDS: list[str]
     LEARNING_DAILY_PREPARATION_ENABLED: bool
     LEARNING_DAILY_PREPARATION_HOUR: int
     LEARNING_DAILY_PREPARATION_MINUTE: int
@@ -193,6 +219,12 @@ class AppConfig:
         ).strip()
         ai_provider = _env("APP_AI_PROVIDER", _default_ai_provider()).strip().lower()
         ai_model = _env("APP_AI_MODEL", _default_ai_model(ai_provider)).strip()
+        homework_tutor_provider = _env("HOMEWORK_TUTOR_PROVIDER", "").strip().lower()
+        homework_tencent_id = _env("HOMEWORK_TENCENT_SECRET_ID", "").strip()
+        homework_tencent_key = _env("HOMEWORK_TENCENT_SECRET_KEY", "").strip()
+        if not homework_tencent_id and not homework_tencent_key:
+            homework_tencent_id = _env("TENCENTCLOUD_SECRET_ID", "").strip()
+            homework_tencent_key = _env("TENCENTCLOUD_SECRET_KEY", "").strip()
         learning_dynamic_generation_enabled = _bool(
             _env("LEARNING_DYNAMIC_GENERATION_ENABLED", "1")
         )
@@ -342,6 +374,32 @@ class AppConfig:
                 )
             ),
             TASK_SCHEDULER_INTERVAL_SECONDS=int(_env("TASK_SCHEDULER_INTERVAL_SECONDS", "15")),
+            LEARNING_REVIEW_ENABLED=_bool(_env("LEARNING_REVIEW_ENABLED", "false")),
+            HOMEWORK_ANALYSIS_ENABLED=_bool(_env("HOMEWORK_ANALYSIS_ENABLED", "false")),
+            HOMEWORK_WORKER_ENABLED=_bool(_env("HOMEWORK_WORKER_ENABLED", "false")),
+            HOMEWORK_WORKER_INTERVAL_SECONDS=int(_env("HOMEWORK_WORKER_INTERVAL_SECONDS", "10")),
+            HOMEWORK_ASSET_ROOT=_env("HOMEWORK_ASSET_ROOT", str(BACKEND_ROOT / "data" / "homework")),
+            HOMEWORK_TTS_RUNTIME_URL=_env("HOMEWORK_TTS_RUNTIME_URL", "").strip(),
+            HOMEWORK_AUDIO_ENABLED=_bool(_env("HOMEWORK_AUDIO_ENABLED", "false")),
+            HOMEWORK_AUDIO_MAX_CALLS_PER_SUBMISSION=int(_env("HOMEWORK_AUDIO_MAX_CALLS_PER_SUBMISSION", "200")),
+            HOMEWORK_VISION_MODEL=_env("HOMEWORK_VISION_MODEL", ""),
+            HOMEWORK_VISION_PROVIDER=_env("HOMEWORK_VISION_PROVIDER", "").strip().lower(),
+            HOMEWORK_VISION_API_KEY=(_env("HOMEWORK_VISION_API_KEY", "").strip() or _env("DASHSCOPE_API_KEY", "").strip() or _env("QWEN_API_KEY", "").strip() or _env("TTS_QWEN_API_KEY", "").strip()),
+            HOMEWORK_VISION_BASE_URL=_env("HOMEWORK_VISION_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1").strip(),
+            HOMEWORK_VISION_MAX_BYTES=int(_env("HOMEWORK_VISION_MAX_BYTES", "8388608")),
+            HOMEWORK_VISION_MAX_DIMENSION=int(_env("HOMEWORK_VISION_MAX_DIMENSION", "3200")),
+            HOMEWORK_VISION_TIMEOUT_SECONDS=float(_env("HOMEWORK_VISION_TIMEOUT_SECONDS", "120")),
+            HOMEWORK_GRADING_PROVIDER=_env("HOMEWORK_GRADING_PROVIDER", "").strip().lower(),
+            HOMEWORK_TENCENT_SECRET_ID=homework_tencent_id,
+            HOMEWORK_TENCENT_SECRET_KEY=homework_tencent_key,
+            HOMEWORK_TENCENT_CREDENTIALS_CSV=_env("HOMEWORK_TENCENT_CREDENTIALS_CSV", "").strip(),
+            HOMEWORK_TENCENT_REGION=_env("HOMEWORK_TENCENT_REGION", "").strip(),
+            HOMEWORK_TENCENT_TIMEOUT_SECONDS=float(_env("HOMEWORK_TENCENT_TIMEOUT_SECONDS", "30")),
+            HOMEWORK_TUTOR_PROVIDER=homework_tutor_provider,
+            HOMEWORK_TUTOR_MODEL=_env("HOMEWORK_TUTOR_MODEL", "deepseek-flash" if homework_tutor_provider == "deepseek" else "").strip(),
+            HOMEWORK_TUTOR_API_KEY=(_env("HOMEWORK_TUTOR_API_KEY", "").strip() or (_env("DEEPSEEK_API_KEY", "").strip() if homework_tutor_provider == "deepseek" else "")),
+            HOMEWORK_TUTOR_BASE_URL=_env("HOMEWORK_TUTOR_BASE_URL", "https://api.deepseek.com" if homework_tutor_provider == "deepseek" else "").strip(),
+            HOMEWORK_DOCUMENT_CAPTURE_APPROVED_EVIDENCE_IDS=_csv(_env("HOMEWORK_DOCUMENT_CAPTURE_APPROVED_EVIDENCE_IDS", "")),
             LEARNING_DAILY_PREPARATION_ENABLED=_bool(
                 _env("LEARNING_DAILY_PREPARATION_ENABLED", "1")
             ),
@@ -783,6 +841,10 @@ def apply_test_defaults(config: dict) -> dict:
     next_config.setdefault("DEV_ADAPTERS_ENABLED", True)
     next_config.setdefault("SMS_PROVIDER", "development")
     next_config.setdefault("TASK_SCHEDULER_ENABLED", False)
+    next_config.setdefault("LEARNING_REVIEW_ENABLED", False)
+    next_config.setdefault("HOMEWORK_ANALYSIS_ENABLED", False)
+    next_config.setdefault("HOMEWORK_WORKER_ENABLED", False)
+    next_config.setdefault("HOMEWORK_AUDIO_ENABLED", False)
     next_config.setdefault("LEARNING_DAILY_PREPARATION_ENABLED", False)
     next_config.setdefault("LEARNING_DYNAMIC_GENERATION_ENABLED", False)
     next_config.setdefault("LEARNING_STATIC_CATALOG_ENABLED", True)
@@ -879,6 +941,36 @@ def apply_test_defaults(config: dict) -> dict:
 
 
 def validate_flask_config(config: dict) -> None:
+    for flag in ("LEARNING_REVIEW_ENABLED", "HOMEWORK_ANALYSIS_ENABLED", "HOMEWORK_WORKER_ENABLED", "HOMEWORK_AUDIO_ENABLED"):
+        if type(config.get(flag, False)) is not bool:
+            raise ConfigError(f"{flag} must be boolean.")
+    for key, default, lower, upper in (
+        ("HOMEWORK_WORKER_INTERVAL_SECONDS", 10, 5, 3600),
+        ("HOMEWORK_AUDIO_MAX_CALLS_PER_SUBMISSION", 200, 1, 1000),
+        ("HOMEWORK_VISION_MAX_BYTES", 8388608, 524288, 12582912),
+        ("HOMEWORK_VISION_MAX_DIMENSION", 3200, 1280, 6000),
+    ):
+        value = config.get(key, default)
+        if type(value) is not int or not lower <= value <= upper:
+            raise ConfigError(f"{key} must be between {lower} and {upper}.")
+    if config.get("HOMEWORK_WORKER_ENABLED") and not config.get("HOMEWORK_ANALYSIS_ENABLED"):
+        raise ConfigError("HOMEWORK_WORKER_ENABLED requires HOMEWORK_ANALYSIS_ENABLED.")
+    homework_timeout = config.get("HOMEWORK_VISION_TIMEOUT_SECONDS", 120)
+    if type(homework_timeout) not in {int, float} or not 5 <= homework_timeout <= 300:
+        raise ConfigError("HOMEWORK_VISION_TIMEOUT_SECONDS must be between 5 and 300.")
+    tencent_timeout = config.get("HOMEWORK_TENCENT_TIMEOUT_SECONDS", 30)
+    if type(tencent_timeout) not in {int, float} or not 5 <= tencent_timeout <= 120:
+        raise ConfigError("HOMEWORK_TENCENT_TIMEOUT_SECONDS must be between 5 and 120.")
+    if str(config.get("HOMEWORK_GRADING_PROVIDER") or "").strip().lower() not in {"", "vision", "tencent"}:
+        raise ConfigError("HOMEWORK_GRADING_PROVIDER must be empty, vision or tencent.")
+    tutor_provider = str(config.get("HOMEWORK_TUTOR_PROVIDER") or "").strip().lower()
+    if tutor_provider not in {"", "moonshot", "kimi", "openai", "openai_compatible", "qwen", "dashscope", "deepseek"}:
+        raise ConfigError("Unsupported HOMEWORK_TUTOR_PROVIDER.")
+    if tutor_provider == "deepseek" and str(config.get("HOMEWORK_TUTOR_MODEL") or "deepseek-flash").strip() != "deepseek-flash":
+        raise ConfigError("HOMEWORK_TUTOR_MODEL must be image-capable deepseek-flash for DeepSeek homework teaching.")
+    approvals = config.get("HOMEWORK_DOCUMENT_CAPTURE_APPROVED_EVIDENCE_IDS", [])
+    if not isinstance(approvals, list) or any(not isinstance(value, str) or not value or len(value) > 160 for value in approvals):
+        raise ConfigError("HOMEWORK_DOCUMENT_CAPTURE_APPROVED_EVIDENCE_IDS must be a list of validation evidence identifiers.")
     if type(config.get("LEARNING_TEXTBOOK_LIBRARY_ONLY", True)) is not bool:
         raise ConfigError("LEARNING_TEXTBOOK_LIBRARY_ONLY must be boolean.")
     app_env = str(config.get("APP_ENV", "development")).strip().lower()

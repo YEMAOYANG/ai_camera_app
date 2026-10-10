@@ -84,6 +84,18 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(family_bp, url_prefix="/api/family")
     app.register_blueprint(children_bp, url_prefix="/api/children")
     app.register_blueprint(parent_textbooks_bp, url_prefix="/api/children")
+    from routes.api.v1.homework import homework_bp
+    from routes.api.v2.student_homework import student_homework_bp
+    app.register_blueprint(homework_bp, url_prefix="/api")
+    app.register_blueprint(student_homework_bp, url_prefix="/api/v2/student/learning")
+    from routes.api.v2.student_homework_tutor_asr import student_homework_tutor_asr_bp
+    app.register_blueprint(student_homework_tutor_asr_bp, url_prefix="/api/v2/student/learning")
+    from routes.api.v1.learning_reviews import parent_review_preferences_bp, parent_learning_reviews_bp, parent_learning_weaknesses_bp
+    from routes.api.v2.student_reviews import student_reviews_bp
+    app.register_blueprint(parent_review_preferences_bp, url_prefix="/api/children")
+    app.register_blueprint(parent_learning_reviews_bp, url_prefix="/api/learning/reviews")
+    app.register_blueprint(parent_learning_weaknesses_bp, url_prefix="/api/reports/learning")
+    app.register_blueprint(student_reviews_bp, url_prefix="/api/v2/student/learning/reviews")
     app.register_blueprint(student_textbooks_bp, url_prefix="/api/v2/student/learning/textbooks")
     app.register_blueprint(internal_textbooks_bp, url_prefix="/internal/learning/textbooks")
     app.register_blueprint(contacts_bp, url_prefix="/api/contacts")
@@ -175,6 +187,10 @@ def create_app(test_config: dict | None = None) -> Flask:
     if process_role in {"all", "api"}:
         start_task_event_stream(app)
         start_task_scheduler(app)
+        from services.learning_review_scheduler_runner import start_learning_review_scheduler
+        start_learning_review_scheduler(app)
+        from services.homework_worker_runner import start_homework_worker
+        start_homework_worker(app)
     if process_role == "all":
         # The standalone curriculum worker owns the complete formal pipeline.
         # Legacy all-in-one runners must not compete with it in an API process.

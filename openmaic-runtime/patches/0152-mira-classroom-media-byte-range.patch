@@ -1,0 +1,253 @@
+diff --git a/app/api/classroom-media/[classroomId]/[...path]/route.ts b/app/api/classroom-media/[classroomId]/[...path]/route.ts
+--- a/app/api/classroom-media/[classroomId]/[...path]/route.ts
++++ b/app/api/classroom-media/[classroomId]/[...path]/route.ts
+@@ -2,6 +2,7 @@
+ import path from 'path';
+ import { NextRequest, NextResponse } from 'next/server';
+ import { CLASSROOMS_DIR, isValidClassroomId } from '@/lib/server/classroom-storage';
++import { parseClassroomMediaRange } from '@/lib/server/classroom-media-range';
+ import { createLogger } from '@/lib/logger';
+ 
+ const log = createLogger('ClassroomMedia');
+@@ -21,7 +22,7 @@
+ };
+ 
+ export async function GET(
+-  _req: NextRequest,
++  req: NextRequest,
+   { params }: { params: Promise<{ classroomId: string; path: string[] }> },
+ ) {
+   const { classroomId, path: pathSegments } = await params;
+@@ -66,9 +67,33 @@
+ 
+     const ext = path.extname(realPath).toLowerCase();
+     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
++    const range = parseClassroomMediaRange(req.headers.get('range'), stat.size);
++    const headers: Record<string, string> = {
++      'Content-Type': contentType,
++      'Accept-Ranges': 'bytes',
++      'Cache-Control': 'public, max-age=86400, immutable',
++    };
++    if (range.kind === 'unsatisfiable') {
++      return new NextResponse(null, {
++        status: 416,
++        headers: {
++          ...headers,
++          'Content-Range': `bytes */${stat.size}`,
++          'Content-Length': '0',
++        },
++      });
++    }
++    const partial = range.kind === 'partial';
++    headers['Content-Length'] = String(partial ? range.end - range.start + 1 : stat.size);
++    if (partial) {
++      headers['Content-Range'] = `bytes ${range.start}-${range.end}/${stat.size}`;
++    }
+ 
+     // Stream the file to avoid loading large videos into memory
+-    const stream = createReadStream(realPath);
++    const stream = createReadStream(
++      realPath,
++      partial ? { start: range.start, end: range.end } : undefined,
++    );
+     const webStream = new ReadableStream({
+       start(controller) {
+         stream.on('data', (chunk: Buffer | string) => controller.enqueue(chunk));
+@@ -81,12 +106,8 @@
+     });
+ 
+     return new NextResponse(webStream, {
+-      status: 200,
+-      headers: {
+-        'Content-Type': contentType,
+-        'Content-Length': String(stat.size),
+-        'Cache-Control': 'public, max-age=86400, immutable',
+-      },
++      status: partial ? 206 : 200,
++      headers,
+     });
+   } catch (error) {
+     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+diff --git a/lib/server/classroom-media-range.ts b/lib/server/classroom-media-range.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/classroom-media-range.ts
+@@ -0,0 +1,36 @@
++/** One byte range only. Unsupported/malformed ranges fall back to the full representation. */
++export type ClassroomMediaRange =
++  | { kind: 'full' }
++  | { kind: 'partial'; start: number; end: number }
++  | { kind: 'unsatisfiable' };
++
++export function parseClassroomMediaRange(header: string | null, size: number): ClassroomMediaRange {
++  if (!Number.isSafeInteger(size) || size < 0) {
++    throw new RangeError('Invalid media byte size');
++  }
++  if (header === null) return { kind: 'full' };
++  // Multipart responses are deliberately unsupported. HTTP permits ignoring a
++  // malformed or unsupported Range rather than serving an incorrect fragment.
++  const match = /^bytes=(\d*)-(\d*)$/i.exec(header.trim());
++  if (!match || (!match[1] && !match[2])) return { kind: 'full' };
++  if (size === 0) return { kind: 'unsatisfiable' };
++
++  const length = BigInt(size);
++  if (!match[1]) {
++    const suffix = BigInt(match[2]);
++    if (suffix === BigInt(0)) return { kind: 'unsatisfiable' };
++    return {
++      kind: 'partial',
++      start: suffix >= length ? 0 : Number(length - suffix),
++      end: size - 1,
++    };
++  }
++  const start = BigInt(match[1]);
++  const end = match[2] ? BigInt(match[2]) : length - BigInt(1);
++  if (start >= length || end < start) return { kind: 'unsatisfiable' };
++  return {
++    kind: 'partial',
++    start: Number(start),
++    end: Number(end >= length ? length - BigInt(1) : end),
++  };
++}
+diff --git a/tests/server/classroom-media-range.test.ts b/tests/server/classroom-media-range.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/classroom-media-range.test.ts
+@@ -0,0 +1,137 @@
++import { promises as fs } from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
++import { NextRequest } from 'next/server';
++import { parseClassroomMediaRange } from '@/lib/server/classroom-media-range';
++
++const storage = vi.hoisted(() => ({ root: '' }));
++vi.mock('@/lib/server/classroom-storage', () => ({
++  get CLASSROOMS_DIR() {
++    return storage.root;
++  },
++  isValidClassroomId: (id: string) => /^[a-zA-Z0-9_-]+$/.test(id),
++}));
++vi.mock('@/lib/logger', () => ({ createLogger: () => ({ error: vi.fn() }) }));
++import { GET } from '@/app/api/classroom-media/[classroomId]/[...path]/route';
++
++describe('single classroom media byte range', () => {
++  const bytes = Buffer.from('0123456789abcdefghij');
++  let external: string;
++  beforeAll(async () => {
++    storage.root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'mira-media-range-')));
++    await fs.mkdir(path.join(storage.root, 'classroom', 'media'), { recursive: true });
++    await fs.mkdir(path.join(storage.root, 'omclass_private', 'artifact', 'audio'), {
++      recursive: true,
++    });
++    await fs.writeFile(path.join(storage.root, 'classroom', 'media', 'clip.mp4'), bytes);
++    await fs.writeFile(path.join(storage.root, 'classroom', 'media', 'empty.mp4'), '');
++    await fs.writeFile(
++      path.join(storage.root, 'omclass_private', 'artifact', 'audio', 'teacher.wav'),
++      bytes,
++    );
++    external = path.join(path.dirname(storage.root), `${path.basename(storage.root)}-outside`);
++    await fs.writeFile(external, 'private outside bytes');
++    await fs.symlink(external, path.join(storage.root, 'classroom', 'media', 'escape.mp4'));
++  });
++  afterAll(async () => {
++    await fs.rm(storage.root, { recursive: true, force: true });
++    await fs.rm(external, { force: true });
++  });
++
++  const read = (
++    range: string | null,
++    segments = ['media', 'clip.mp4'],
++    classroomId = 'classroom',
++  ) =>
++    GET(
++      new NextRequest('http://runtime.test/api/classroom-media/clip', {
++        headers: range === null ? {} : { Range: range },
++      }),
++      { params: Promise.resolve({ classroomId, path: segments }) },
++    );
++
++  it.each([
++    ['bytes=3-6', 3, 6],
++    ['bytes=14-', 14, 19],
++    ['bytes=-4', 16, 19],
++    ['bytes=18-999', 18, 19],
++    ['bytes=-999', 0, 19],
++    ['bytes=0-0', 0, 0],
++    ['Bytes=0002-0004', 2, 4],
++    ['bytes=1-9999999999999999999999999999999999999999', 1, 19],
++  ])('streams exactly the requested bytes for %s', async (header, start, end) => {
++    const response = await read(header);
++    expect(response.status).toBe(206);
++    expect(response.headers.get('Content-Range')).toBe(`bytes ${start}-${end}/20`);
++    expect(response.headers.get('Content-Length')).toBe(String(Number(end) - Number(start) + 1));
++    expect(response.headers.get('Accept-Ranges')).toBe('bytes');
++    expect(response.headers.get('Content-Type')).toBe('video/mp4');
++    expect(response.headers.get('Cache-Control')).toBe('public, max-age=86400, immutable');
++    expect(Buffer.from(await response.arrayBuffer())).toEqual(
++      bytes.subarray(Number(start), Number(end) + 1),
++    );
++  });
++
++  it.each(['bytes=20-', 'bytes=21-99', 'bytes=8-4', 'bytes=-0', 'bytes=999999999999999999999999-'])(
++    'rejects an unsatisfiable range %s without serving a body',
++    async (header) => {
++      const response = await read(header);
++      expect(response.status).toBe(416);
++      expect(response.headers.get('Content-Range')).toBe('bytes */20');
++      expect(response.headers.get('Content-Length')).toBe('0');
++      expect((await response.arrayBuffer()).byteLength).toBe(0);
++    },
++  );
++
++  it.each([
++    null,
++    '',
++    'bytes=',
++    'bytes=-',
++    'bytes=NaN-4',
++    'bytes=1.5-4',
++    'bytes=+1-4',
++    'bytes=0-2,5-6',
++    'items=0-3',
++    'bytes=0 - 3',
++  ])(
++    'ignores unsupported or malformed %s and preserves the full representation',
++    async (header) => {
++      const response = await read(header);
++      expect(response.status).toBe(200);
++      expect(response.headers.get('Content-Range')).toBeNull();
++      expect(response.headers.get('Content-Length')).toBe('20');
++      expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes);
++    },
++  );
++
++  it('handles an empty representation without a negative stream endpoint', async () => {
++    const full = await read(null, ['media', 'empty.mp4']);
++    expect(full.status).toBe(200);
++    expect((await full.arrayBuffer()).byteLength).toBe(0);
++    const partial = await read('bytes=0-', ['media', 'empty.mp4']);
++    expect(partial.status).toBe(416);
++    expect(partial.headers.get('Content-Range')).toBe('bytes */0');
++  });
++
++  it('preserves recovery artifact isolation and audio MIME while supporting suffix ranges', async () => {
++    const response = await read('bytes=-4', ['audio', 'teacher.wav'], 'omclass_private');
++    expect(response.status).toBe(206);
++    expect(response.headers.get('Content-Type')).toBe('audio/wav');
++    expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes.subarray(-4));
++  });
++
++  it('does not allow a Range header to bypass existing path and realpath boundaries', async () => {
++    expect((await read('bytes=0-1', ['media', '..', 'clip.mp4'])).status).toBe(400);
++    expect((await read('bytes=0-1', ['media', 'escape.mp4'])).status).toBe(404);
++    expect((await read('bytes=0-1', ['other', 'clip.mp4'])).status).toBe(404);
++    expect((await read('bytes=0-1', ['media', 'clip.mp4'], '../foreign')).status).toBe(400);
++    expect((await read('bytes=0-1', ['media', 'missing.mp4'])).status).toBe(404);
++  });
++
++  it('refuses an invalid file size before converting range endpoints', () => {
++    expect(() => parseClassroomMediaRange('bytes=0-', -1)).toThrow(RangeError);
++    expect(() => parseClassroomMediaRange(null, Number.MAX_SAFE_INTEGER + 1)).toThrow(RangeError);
++  });
++});

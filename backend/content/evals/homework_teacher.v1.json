@@ -1,0 +1,2346 @@
+{
+  "schemaVersion": "mira.eval.homework-teacher.v1",
+  "description": "原创小学AI老师双轮对照评测；不包含学生真实资料。groundTruth与rubric只供离线人工审核，不发送给模型。",
+  "createdFor": "DeepSeek与阿里同提示、同图、同参数能力对照；不代表生产验收或能力评分。",
+  "turnsPerCase": 2,
+  "sceneContract": {
+    "size": [
+      1000,
+      700
+    ],
+    "coordinates": "pixels; teacherInput regions use x/width,y/height normalized coordinates",
+    "elementTypes": [
+      "text",
+      "rect",
+      "circle",
+      "star",
+      "line",
+      "polygon"
+    ],
+    "transparentFill": "none",
+    "textPosition": "x/y is top-left; render using CJK font",
+    "pictures": "Rendered source scenes are original illustration evidence, not emoji or decorative substitutes. No generated candidate correctness styling."
+  },
+  "scoring": {
+    "method": "human_review",
+    "maxPoints": 100,
+    "eachCriterion": "0=failed, 0.5=partly satisfied, 1=fully satisfied; multiply by weight",
+    "hardFailures": [
+      "Fabricates original child answer from an empty box.",
+      "Ignores a confirmed source mismatch and marks correct/incorrect.",
+      "Wrong mathematical or visual facts in either turn."
+    ],
+    "limitations": [
+      "8 synthetic cases cannot establish general OCR accuracy or real-child learning effectiveness.",
+      "Teacher output, source fidelity, low-reading picture support, JSON validity and latency must be reported separately.",
+      "The blank and hallucinated-OCR cases must not be included in student wrong-answer statistics."
+    ]
+  },
+  "cases": [
+    {
+      "id": "g1_count_stars",
+      "grade": "primary_1",
+      "subject": "math",
+      "teacherInput": {
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "prompt": "数一数图中的星星，在框里填写数量。",
+        "studentOriginalAnswer": "5",
+        "recognitionConfidence": 0.99,
+        "recognitionNeedsConfirmation": false,
+        "annotationAmbiguous": false,
+        "region": {
+          "x": 0.025,
+          "y": 0.09285714285714286,
+          "width": 0.95,
+          "height": 0.8571428571428571
+        },
+        "assessmentScope": "AI指导，不是独立成绩",
+        "transcriptVersion": "v3",
+        "sourceQuestionLabel": "1",
+        "answerState": "written",
+        "answerRegions": [
+          {
+            "x": 0.405,
+            "y": 0.5642857142857143,
+            "width": 0.15,
+            "height": 0.15
+          }
+        ],
+        "visualEvidence": null,
+        "exactArithmetic": null
+      },
+      "initialStudentMessage": "老师，我哪里数错了？",
+      "followupMessage": "我还是不会数，你能一步一步带我点吗？",
+      "groundTruth": {
+        "visibleFacts": [
+          "同一排恰有4颗完整星星。",
+          "答案框内孩子写了5。"
+        ],
+        "actualStudentAnswer": "5",
+        "expectedAnswer": "4",
+        "expectedSourceCheck": "matched",
+        "allowedAssessmentStatuses": [
+          "incorrect"
+        ],
+        "mustNotClaim": [
+          "有5颗或6颗星星。"
+        ]
+      },
+      "rubric": [
+        {
+          "id": "source_fidelity",
+          "weight": 30,
+          "passCriteria": [
+            "先核对原图及孩子实际作答，不添加原图没有的答案或对象。"
+          ],
+          "failCriteria": [
+            "把参考答案说成孩子原来写的答案。",
+            "原图与OCR冲突时仍沿用OCR判错。"
+          ]
+        },
+        {
+          "id": "factual_correctness",
+          "weight": 25,
+          "passCriteria": [
+            "明确总数4，区别于孩子写的5。"
+          ],
+          "failCriteria": [
+            "给出错误数量、运算结果、人物指代或因果解释。"
+          ]
+        },
+        {
+          "id": "age_appropriate_guidance",
+          "weight": 20,
+          "passCriteria": [
+            "一次引导点一颗或逐个计数，使用4个对象的quantity或原图定位。"
+          ],
+          "failCriteria": [
+            "低年级靠长文字、选项字母或人物姓名才可操作。",
+            "没有循序引导就把全部答案倾倒给孩子。"
+          ]
+        },
+        {
+          "id": "followup_adaptation",
+          "weight": 15,
+          "passCriteria": [
+            "第二轮改为逐个指认、点数，避免只重复“答案是4”。"
+          ],
+          "failCriteria": [
+            "重复第一轮内容，没有回应新的困惑。"
+          ]
+        },
+        {
+          "id": "visual_alignment",
+          "weight": 10,
+          "passCriteria": [
+            "每一步 visual 与语音内容对应，region 在本题范围内。",
+            "图片选项只能来自本题真实候选图，不能用数符或文字伪造图片选项。"
+          ],
+          "failCriteria": [
+            "用错误数量图、错位原图区域或不相关图片解释。"
+          ]
+        }
+      ],
+      "scene": {
+        "width": 1000,
+        "height": 700,
+        "background": "#fffaf0",
+        "coordinateSystem": "pixels",
+        "fontPreference": "Noto Sans CJK SC / PingFang SC",
+        "elements": [
+          {
+            "type": "text",
+            "text": "原创教学评测 · 非正式考试",
+            "x": 38,
+            "y": 25,
+            "size": 18,
+            "color": "#64748b"
+          },
+          {
+            "type": "text",
+            "text": "1",
+            "x": 38,
+            "y": 70,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "数一数星星，填在下面的框里。",
+            "x": 38,
+            "y": 113,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "star",
+            "x": 155,
+            "y": 255,
+            "radius": 38,
+            "fill": "#f6c55b",
+            "outline": "#334155"
+          },
+          {
+            "type": "star",
+            "x": 350,
+            "y": 255,
+            "radius": 38,
+            "fill": "#f6c55b",
+            "outline": "#334155"
+          },
+          {
+            "type": "star",
+            "x": 545,
+            "y": 255,
+            "radius": 38,
+            "fill": "#f6c55b",
+            "outline": "#334155"
+          },
+          {
+            "type": "star",
+            "x": 740,
+            "y": 255,
+            "radius": 38,
+            "fill": "#f6c55b",
+            "outline": "#334155"
+          },
+          {
+            "type": "rect",
+            "x": 410,
+            "y": 400,
+            "width": 140,
+            "height": 95,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "text",
+            "text": "5",
+            "x": 455,
+            "y": 415,
+            "size": 62,
+            "color": "#305b8a"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g1_blank_is_not_wrong",
+      "grade": "primary_1",
+      "subject": "math",
+      "teacherInput": {
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "prompt": "4 − □ = 3，空框还没填写。",
+        "studentOriginalAnswer": "□",
+        "recognitionConfidence": 0.99,
+        "recognitionNeedsConfirmation": false,
+        "annotationAmbiguous": false,
+        "region": {
+          "x": 0.025,
+          "y": 0.09285714285714286,
+          "width": 0.95,
+          "height": 0.8571428571428571
+        },
+        "assessmentScope": "AI指导，不是独立成绩",
+        "transcriptVersion": "v3",
+        "sourceQuestionLabel": "1",
+        "answerState": "blank",
+        "answerRegions": [
+          {
+            "x": 0.425,
+            "y": 0.54,
+            "width": 0.1,
+            "height": 0.12285714285714286
+          }
+        ],
+        "visualEvidence": null,
+        "exactArithmetic": null
+      },
+      "initialStudentMessage": "这个我还没做，老师带我想一想。",
+      "followupMessage": "为什么要拿走一个？我以为要拿走三个。",
+      "groundTruth": {
+        "visibleFacts": [
+          "原图是4 − □ = 3。",
+          "空框没有任何笔迹。",
+          "上方4个圆片是数量支持图。"
+        ],
+        "actualStudentAnswer": "□",
+        "expectedAnswer": "1",
+        "expectedSourceCheck": "matched",
+        "allowedAssessmentStatuses": [
+          "guidance_only"
+        ],
+        "mustNotClaim": [
+          "孩子写了1。",
+          "孩子这题做错了。"
+        ]
+      },
+      "rubric": [
+        {
+          "id": "source_fidelity",
+          "weight": 30,
+          "passCriteria": [
+            "sourceCheck 保留孩子答案为空框。",
+            "参考答案1可以在讲解中出现，但不能记录为孩子原作答。"
+          ],
+          "failCriteria": [
+            "把参考答案说成孩子原来写的答案。",
+            "原图与OCR冲突时仍沿用OCR判错。"
+          ]
+        },
+        {
+          "id": "factual_correctness",
+          "weight": 25,
+          "passCriteria": [
+            "参考解法拿走1个后剩3个。"
+          ],
+          "failCriteria": [
+            "给出错误数量、运算结果、人物指代或因果解释。"
+          ]
+        },
+        {
+          "id": "age_appropriate_guidance",
+          "weight": 20,
+          "passCriteria": [
+            "把未作答说成还没填，使用groups或准确原图数量支持，不标成错题。"
+          ],
+          "failCriteria": [
+            "低年级靠长文字、选项字母或人物姓名才可操作。",
+            "没有循序引导就把全部答案倾倒给孩子。"
+          ]
+        },
+        {
+          "id": "followup_adaptation",
+          "weight": 15,
+          "passCriteria": [
+            "区别“拿走几个”与“剩几个”，用原来的4个物体解释。"
+          ],
+          "failCriteria": [
+            "重复第一轮内容，没有回应新的困惑。"
+          ]
+        },
+        {
+          "id": "visual_alignment",
+          "weight": 10,
+          "passCriteria": [
+            "每一步 visual 与语音内容对应，region 在本题范围内。",
+            "图片选项只能来自本题真实候选图，不能用数符或文字伪造图片选项。"
+          ],
+          "failCriteria": [
+            "用错误数量图、错位原图区域或不相关图片解释。"
+          ]
+        }
+      ],
+      "scene": {
+        "width": 1000,
+        "height": 700,
+        "background": "#fffaf0",
+        "coordinateSystem": "pixels",
+        "fontPreference": "Noto Sans CJK SC / PingFang SC",
+        "elements": [
+          {
+            "type": "text",
+            "text": "原创教学评测 · 非正式考试",
+            "x": 38,
+            "y": 25,
+            "size": 18,
+            "color": "#64748b"
+          },
+          {
+            "type": "text",
+            "text": "1",
+            "x": 38,
+            "y": 70,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "先看小圆片，再想一想：拿走多少个？",
+            "x": 38,
+            "y": 113,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "circle",
+            "x": 210,
+            "y": 235,
+            "radius": 30,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 360,
+            "y": 235,
+            "radius": 30,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 510,
+            "y": 235,
+            "radius": 30,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 660,
+            "y": 235,
+            "radius": 30,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "text",
+            "text": "4 −",
+            "x": 260,
+            "y": 380,
+            "size": 62,
+            "color": "#243b3b"
+          },
+          {
+            "type": "rect",
+            "x": 425,
+            "y": 378,
+            "width": 100,
+            "height": 86,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "text",
+            "text": "= 3",
+            "x": 558,
+            "y": 380,
+            "size": 62,
+            "color": "#243b3b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g1_ocr_invented_answer",
+      "grade": "primary_1",
+      "subject": "math",
+      "teacherInput": {
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "prompt": "5 − 4 = □。",
+        "studentOriginalAnswer": "1",
+        "recognitionConfidence": 0.99,
+        "recognitionNeedsConfirmation": false,
+        "annotationAmbiguous": false,
+        "region": {
+          "x": 0.025,
+          "y": 0.09285714285714286,
+          "width": 0.95,
+          "height": 0.8571428571428571
+        },
+        "assessmentScope": "AI指导，不是独立成绩",
+        "transcriptVersion": "v3",
+        "sourceQuestionLabel": "1",
+        "answerState": "written",
+        "answerRegions": [
+          {
+            "x": 0.58,
+            "y": 0.35714285714285715,
+            "width": 0.12,
+            "height": 0.1357142857142857
+          }
+        ],
+        "visualEvidence": null,
+        "exactArithmetic": null
+      },
+      "initialStudentMessage": "老师，我这题还没写呢。",
+      "followupMessage": "照片里明明是空的，为什么说我写了1？",
+      "groundTruth": {
+        "visibleFacts": [
+          "原图5 − 4 = □，答案框没有笔迹。",
+          "待核对输入误写studentOriginalAnswer=1，answerState=written。"
+        ],
+        "actualStudentAnswer": "□",
+        "expectedAnswer": "1",
+        "expectedSourceCheck": "mismatch",
+        "allowedAssessmentStatuses": [
+          "needs_confirmation"
+        ],
+        "mustNotClaim": [
+          "孩子已经写对1。",
+          "根据OCR确认这题正确或错误。"
+        ]
+      },
+      "rubric": [
+        {
+          "id": "source_fidelity",
+          "weight": 30,
+          "passCriteria": [
+            "sourceCheck 必须 mismatch。",
+            "assessment 必须 needs_confirmation。",
+            "不把算出来的1补记为孩子写过的1。"
+          ],
+          "failCriteria": [
+            "把参考答案说成孩子原来写的答案。",
+            "原图与OCR冲突时仍沿用OCR判错。"
+          ]
+        },
+        {
+          "id": "factual_correctness",
+          "weight": 25,
+          "passCriteria": [
+            "识别空框，与OCR原答案1明确区分。"
+          ],
+          "failCriteria": [
+            "给出错误数量、运算结果、人物指代或因果解释。"
+          ]
+        },
+        {
+          "id": "age_appropriate_guidance",
+          "weight": 20,
+          "passCriteria": [
+            "先核对框内没有笔迹；不要继续拿虚构的原答案给孩子评分。"
+          ],
+          "failCriteria": [
+            "低年级靠长文字、选项字母或人物姓名才可操作。",
+            "没有循序引导就把全部答案倾倒给孩子。"
+          ]
+        },
+        {
+          "id": "followup_adaptation",
+          "weight": 15,
+          "passCriteria": [
+            "回应孩子指出的矛盾，承认需要核对原答案，避免坚持旧结论。"
+          ],
+          "failCriteria": [
+            "重复第一轮内容，没有回应新的困惑。"
+          ]
+        },
+        {
+          "id": "visual_alignment",
+          "weight": 10,
+          "passCriteria": [
+            "每一步 visual 与语音内容对应，region 在本题范围内。",
+            "图片选项只能来自本题真实候选图，不能用数符或文字伪造图片选项。"
+          ],
+          "failCriteria": [
+            "用错误数量图、错位原图区域或不相关图片解释。"
+          ]
+        }
+      ],
+      "scene": {
+        "width": 1000,
+        "height": 700,
+        "background": "#fffaf0",
+        "coordinateSystem": "pixels",
+        "fontPreference": "Noto Sans CJK SC / PingFang SC",
+        "elements": [
+          {
+            "type": "text",
+            "text": "原创教学评测 · 非正式考试",
+            "x": 38,
+            "y": 25,
+            "size": 18,
+            "color": "#64748b"
+          },
+          {
+            "type": "text",
+            "text": "1",
+            "x": 38,
+            "y": 70,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "看看这道题，老师带你试一试。",
+            "x": 38,
+            "y": 113,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "5 − 4 =",
+            "x": 180,
+            "y": 250,
+            "size": 70,
+            "color": "#243b3b"
+          },
+          {
+            "type": "rect",
+            "x": 580,
+            "y": 250,
+            "width": 120,
+            "height": 95,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "g1_subtraction_selected_item",
+      "grade": "primary_1",
+      "subject": "math",
+      "teacherInput": {
+        "gradeCode": "primary_1",
+        "subject": "math",
+        "prompt": "选中的第（2）小题：7 − 3 = □。",
+        "studentOriginalAnswer": "5",
+        "recognitionConfidence": 0.99,
+        "recognitionNeedsConfirmation": false,
+        "annotationAmbiguous": false,
+        "region": {
+          "x": 0.045,
+          "y": 0.42857142857142855,
+          "width": 0.885,
+          "height": 0.35
+        },
+        "assessmentScope": "AI指导，不是独立成绩",
+        "transcriptVersion": "v3",
+        "sourceQuestionLabel": "1（2）",
+        "answerState": "written",
+        "answerRegions": [
+          {
+            "x": 0.54,
+            "y": 0.45714285714285713,
+            "width": 0.085,
+            "height": 0.1
+          }
+        ],
+        "visualEvidence": null,
+        "exactArithmetic": null
+      },
+      "initialStudentMessage": "老师帮我看第二小题。",
+      "followupMessage": "为什么不是5？你换成拿走小圆片讲吧。",
+      "groundTruth": {
+        "visibleFacts": [
+          "第（1）题5 − 2 = 3是相邻题。",
+          "选中第（2）题7 − 3，孩子写5。",
+          "第（2）题下面有7个圆片。"
+        ],
+        "actualStudentAnswer": "5",
+        "expectedAnswer": "4",
+        "expectedSourceCheck": "matched",
+        "allowedAssessmentStatuses": [
+          "incorrect"
+        ],
+        "mustNotClaim": [
+          "把第（1）题当成本轮选中题。"
+        ]
+      },
+      "rubric": [
+        {
+          "id": "source_fidelity",
+          "weight": 30,
+          "passCriteria": [
+            "先核对原图及孩子实际作答，不添加原图没有的答案或对象。"
+          ],
+          "failCriteria": [
+            "把参考答案说成孩子原来写的答案。",
+            "原图与OCR冲突时仍沿用OCR判错。"
+          ]
+        },
+        {
+          "id": "factual_correctness",
+          "weight": 25,
+          "passCriteria": [
+            "只解释7拿走3剩4，孩子原来写5。"
+          ],
+          "failCriteria": [
+            "给出错误数量、运算结果、人物指代或因果解释。"
+          ]
+        },
+        {
+          "id": "age_appropriate_guidance",
+          "weight": 20,
+          "passCriteria": [
+            "用7个圆片拿走3的具体动作引导。"
+          ],
+          "failCriteria": [
+            "低年级靠长文字、选项字母或人物姓名才可操作。",
+            "没有循序引导就把全部答案倾倒给孩子。"
+          ]
+        },
+        {
+          "id": "followup_adaptation",
+          "weight": 15,
+          "passCriteria": [
+            "第二轮用数量分组或准确原图定位回应“换成圆片”。"
+          ],
+          "failCriteria": [
+            "重复第一轮内容，没有回应新的困惑。"
+          ]
+        },
+        {
+          "id": "visual_alignment",
+          "weight": 10,
+          "passCriteria": [
+            "每一步 visual 与语音内容对应，region 在本题范围内。",
+            "图片选项只能来自本题真实候选图，不能用数符或文字伪造图片选项。"
+          ],
+          "failCriteria": [
+            "用错误数量图、错位原图区域或不相关图片解释。"
+          ]
+        }
+      ],
+      "scene": {
+        "width": 1000,
+        "height": 700,
+        "background": "#fffaf0",
+        "coordinateSystem": "pixels",
+        "fontPreference": "Noto Sans CJK SC / PingFang SC",
+        "elements": [
+          {
+            "type": "text",
+            "text": "原创教学评测 · 非正式考试",
+            "x": 38,
+            "y": 25,
+            "size": 18,
+            "color": "#64748b"
+          },
+          {
+            "type": "text",
+            "text": "1（2）",
+            "x": 38,
+            "y": 70,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "这一轮只看蓝框里的小题。",
+            "x": 38,
+            "y": 113,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "（1） 5 − 2 =",
+            "x": 80,
+            "y": 180,
+            "size": 45,
+            "color": "#243b3b"
+          },
+          {
+            "type": "rect",
+            "x": 540,
+            "y": 175,
+            "width": 85,
+            "height": 70,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "text",
+            "text": "3",
+            "x": 566,
+            "y": 179,
+            "size": 44,
+            "color": "#305b8a"
+          },
+          {
+            "type": "rect",
+            "x": 45,
+            "y": 300,
+            "width": 885,
+            "height": 245,
+            "fill": "#f2f7fa",
+            "outline": "#b9cdd9",
+            "outlineWidth": 3
+          },
+          {
+            "type": "text",
+            "text": "（2） 7 − 3 =",
+            "x": 80,
+            "y": 325,
+            "size": 45,
+            "color": "#243b3b"
+          },
+          {
+            "type": "rect",
+            "x": 540,
+            "y": 320,
+            "width": 85,
+            "height": 70,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "text",
+            "text": "5",
+            "x": 566,
+            "y": 324,
+            "size": 44,
+            "color": "#305b8a"
+          },
+          {
+            "type": "circle",
+            "x": 140,
+            "y": 463,
+            "radius": 25,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 235,
+            "y": 463,
+            "radius": 25,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 330,
+            "y": 463,
+            "radius": 25,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 425,
+            "y": 463,
+            "radius": 25,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 520,
+            "y": 463,
+            "radius": 25,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 615,
+            "y": 463,
+            "radius": 25,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 710,
+            "y": 463,
+            "radius": 25,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "g1_pronoun_picture_choice",
+      "grade": "primary_1",
+      "subject": "chinese",
+      "teacherInput": {
+        "gradeCode": "primary_1",
+        "subject": "chinese",
+        "prompt": "穿红衣服的孩子对穿蓝衣服的孩子说“你能把球递给我吗？”；从下方两张同造型人物图中指认“你”。",
+        "studentOriginalAnswer": "圈了红衣孩子图",
+        "recognitionConfidence": 0.99,
+        "recognitionNeedsConfirmation": false,
+        "annotationAmbiguous": false,
+        "region": {
+          "x": 0.025,
+          "y": 0.09285714285714286,
+          "width": 0.95,
+          "height": 0.8571428571428571
+        },
+        "assessmentScope": "AI指导，不是独立成绩",
+        "transcriptVersion": "v3",
+        "sourceQuestionLabel": "1",
+        "answerState": "drawing",
+        "answerRegions": [
+          {
+            "x": 0.105,
+            "y": 0.6714285714285714,
+            "width": 0.2,
+            "height": 0.2857142857142857
+          }
+        ],
+        "visualEvidence": null,
+        "exactArithmetic": null
+      },
+      "initialStudentMessage": "老师，“你”是哪一个？我圈了穿红衣服的。",
+      "followupMessage": "换穿蓝衣服的说这句话，“你”还是穿蓝衣服的吗？",
+      "groundTruth": {
+        "visibleFacts": [
+          "红衣孩子是说话者，蓝衣孩子是听话者。",
+          "下方真实候选图分别是同造型红衣和蓝衣孩子。",
+          "孩子圈的是红衣候选图。"
+        ],
+        "actualStudentAnswer": "圈了红衣孩子图",
+        "expectedAnswer": "第一轮“你”指蓝衣听话者；第二轮蓝衣说话时“你”指红衣听话者。",
+        "expectedSourceCheck": "matched",
+        "allowedAssessmentStatuses": [
+          "incorrect"
+        ],
+        "mustNotClaim": [
+          "“你”永远指固定衣服颜色的人。",
+          "孩子已经独立认读代词。"
+        ]
+      },
+      "rubric": [
+        {
+          "id": "source_fidelity",
+          "weight": 30,
+          "passCriteria": [
+            "先核对原图及孩子实际作答，不添加原图没有的答案或对象。"
+          ],
+          "failCriteria": [
+            "把参考答案说成孩子原来写的答案。",
+            "原图与OCR冲突时仍沿用OCR判错。"
+          ]
+        },
+        {
+          "id": "factual_correctness",
+          "weight": 25,
+          "passCriteria": [
+            "“我”由说话者视角决定，“你”指当前被说话的人。",
+            "换说话者后正确切换指代。"
+          ],
+          "failCriteria": [
+            "给出错误数量、运算结果、人物指代或因果解释。"
+          ]
+        },
+        {
+          "id": "age_appropriate_guidance",
+          "weight": 20,
+          "passCriteria": [
+            "用谁在说话、谁在听和衣服造型指认，而非让孩子读姓名或选项字母。"
+          ],
+          "failCriteria": [
+            "低年级靠长文字、选项字母或人物姓名才可操作。",
+            "没有循序引导就把全部答案倾倒给孩子。"
+          ]
+        },
+        {
+          "id": "followup_adaptation",
+          "weight": 15,
+          "passCriteria": [
+            "第二轮明确换说话者后的角色变化，沿用同造型人物。"
+          ],
+          "failCriteria": [
+            "重复第一轮内容，没有回应新的困惑。"
+          ]
+        },
+        {
+          "id": "visual_alignment",
+          "weight": 10,
+          "passCriteria": [
+            "每一步 visual 与语音内容对应，region 在本题范围内。",
+            "图片选项只能来自本题真实候选图，不能用数符或文字伪造图片选项。"
+          ],
+          "failCriteria": [
+            "用错误数量图、错位原图区域或不相关图片解释。"
+          ]
+        }
+      ],
+      "scene": {
+        "width": 1000,
+        "height": 700,
+        "background": "#fffaf0",
+        "coordinateSystem": "pixels",
+        "fontPreference": "Noto Sans CJK SC / PingFang SC",
+        "elements": [
+          {
+            "type": "text",
+            "text": "原创教学评测 · 非正式考试",
+            "x": 38,
+            "y": 25,
+            "size": 18,
+            "color": "#64748b"
+          },
+          {
+            "type": "text",
+            "text": "1",
+            "x": 38,
+            "y": 70,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "听左边穿红衣服的孩子说话，再指一指“你”。",
+            "x": 38,
+            "y": 113,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "circle",
+            "x": 230,
+            "y": 230,
+            "radius": 33,
+            "fill": "#f1cba9",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 740,
+            "y": 380,
+            "radius": 32,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 195,
+            "y": 268,
+            "width": 70,
+            "height": 92,
+            "fill": "#ce665e",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 212,
+            "y1": 360,
+            "x2": 205,
+            "y2": 415,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 248,
+            "y1": 360,
+            "x2": 255,
+            "y2": 415,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 195,
+            "y1": 285,
+            "x2": 160,
+            "y2": 240,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 265,
+            "y1": 285,
+            "x2": 300,
+            "y2": 340,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "circle",
+            "x": 220,
+            "y": 227,
+            "radius": 3,
+            "fill": "#243b3b",
+            "outline": "#334155",
+            "outlineWidth": 1
+          },
+          {
+            "type": "circle",
+            "x": 240,
+            "y": 227,
+            "radius": 3,
+            "fill": "#243b3b",
+            "outline": "#334155",
+            "outlineWidth": 1
+          },
+          {
+            "type": "line",
+            "x1": 222,
+            "y1": 243,
+            "x2": 238,
+            "y2": 243,
+            "color": "#334155",
+            "width": 2
+          },
+          {
+            "type": "circle",
+            "x": 620,
+            "y": 230,
+            "radius": 33,
+            "fill": "#f1cba9",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 585,
+            "y": 268,
+            "width": 70,
+            "height": 92,
+            "fill": "#527ba5",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 602,
+            "y1": 360,
+            "x2": 595,
+            "y2": 415,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 638,
+            "y1": 360,
+            "x2": 645,
+            "y2": 415,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 585,
+            "y1": 285,
+            "x2": 550,
+            "y2": 340,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 655,
+            "y1": 285,
+            "x2": 708,
+            "y2": 265,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "circle",
+            "x": 610,
+            "y": 227,
+            "radius": 3,
+            "fill": "#243b3b",
+            "outline": "#334155",
+            "outlineWidth": 1
+          },
+          {
+            "type": "circle",
+            "x": 630,
+            "y": 227,
+            "radius": 3,
+            "fill": "#243b3b",
+            "outline": "#334155",
+            "outlineWidth": 1
+          },
+          {
+            "type": "line",
+            "x1": 612,
+            "y1": 243,
+            "x2": 628,
+            "y2": 243,
+            "color": "#334155",
+            "width": 2
+          },
+          {
+            "type": "rect",
+            "x": 75,
+            "y": 155,
+            "width": 400,
+            "height": 45,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 2
+          },
+          {
+            "type": "text",
+            "text": "你能把球递给我吗？",
+            "x": 92,
+            "y": 163,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "line",
+            "x1": 210,
+            "y1": 200,
+            "x2": 220,
+            "y2": 215,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "rect",
+            "x": 105,
+            "y": 470,
+            "width": 200,
+            "height": 200,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 400,
+            "y": 470,
+            "width": 200,
+            "height": 200,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 205,
+            "y": 514,
+            "radius": 33,
+            "fill": "#f1cba9",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 170,
+            "y": 552,
+            "width": 70,
+            "height": 92,
+            "fill": "#ce665e",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 187,
+            "y1": 644,
+            "x2": 180,
+            "y2": 699,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 223,
+            "y1": 644,
+            "x2": 230,
+            "y2": 699,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 170,
+            "y1": 569,
+            "x2": 135,
+            "y2": 624,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 240,
+            "y1": 569,
+            "x2": 275,
+            "y2": 624,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "circle",
+            "x": 195,
+            "y": 511,
+            "radius": 3,
+            "fill": "#243b3b",
+            "outline": "#334155",
+            "outlineWidth": 1
+          },
+          {
+            "type": "circle",
+            "x": 215,
+            "y": 511,
+            "radius": 3,
+            "fill": "#243b3b",
+            "outline": "#334155",
+            "outlineWidth": 1
+          },
+          {
+            "type": "line",
+            "x1": 197,
+            "y1": 527,
+            "x2": 213,
+            "y2": 527,
+            "color": "#334155",
+            "width": 2
+          },
+          {
+            "type": "circle",
+            "x": 500,
+            "y": 514,
+            "radius": 33,
+            "fill": "#f1cba9",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 465,
+            "y": 552,
+            "width": 70,
+            "height": 92,
+            "fill": "#527ba5",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 482,
+            "y1": 644,
+            "x2": 475,
+            "y2": 699,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 518,
+            "y1": 644,
+            "x2": 525,
+            "y2": 699,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 465,
+            "y1": 569,
+            "x2": 430,
+            "y2": 624,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 535,
+            "y1": 569,
+            "x2": 570,
+            "y2": 624,
+            "color": "#334155",
+            "width": 4
+          },
+          {
+            "type": "circle",
+            "x": 490,
+            "y": 511,
+            "radius": 3,
+            "fill": "#243b3b",
+            "outline": "#334155",
+            "outlineWidth": 1
+          },
+          {
+            "type": "circle",
+            "x": 510,
+            "y": 511,
+            "radius": 3,
+            "fill": "#243b3b",
+            "outline": "#334155",
+            "outlineWidth": 1
+          },
+          {
+            "type": "line",
+            "x1": 492,
+            "y1": 527,
+            "x2": 508,
+            "y2": 527,
+            "color": "#334155",
+            "width": 2
+          },
+          {
+            "type": "circle",
+            "x": 205,
+            "y": 570,
+            "radius": 88,
+            "fill": "none",
+            "outline": "#305b8a",
+            "outlineWidth": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "g2_equal_groups_word_problem",
+      "grade": "primary_2",
+      "subject": "math",
+      "teacherInput": {
+        "gradeCode": "primary_2",
+        "subject": "math",
+        "prompt": "3个盘子，每盘4个苹果。一共有几个苹果？",
+        "studentOriginalAnswer": "7",
+        "recognitionConfidence": 0.99,
+        "recognitionNeedsConfirmation": false,
+        "annotationAmbiguous": false,
+        "region": {
+          "x": 0.025,
+          "y": 0.09285714285714286,
+          "width": 0.95,
+          "height": 0.8571428571428571
+        },
+        "assessmentScope": "AI指导，不是独立成绩",
+        "transcriptVersion": "v3",
+        "sourceQuestionLabel": "1",
+        "answerState": "written",
+        "answerRegions": [
+          {
+            "x": 0.44,
+            "y": 0.6642857142857143,
+            "width": 0.1,
+            "height": 0.10714285714285714
+          }
+        ],
+        "visualEvidence": null,
+        "exactArithmetic": null
+      },
+      "initialStudentMessage": "我把3和4加起来了，哪里不对？",
+      "followupMessage": "我还没学会乘法，能不用乘法讲吗？",
+      "groundTruth": {
+        "visibleFacts": [
+          "3个盘子，每盘准确4个苹果。",
+          "答案框孩子写7。"
+        ],
+        "actualStudentAnswer": "7",
+        "expectedAnswer": "12个苹果；4+4+4=12，或3×4=12。",
+        "expectedSourceCheck": "matched",
+        "allowedAssessmentStatuses": [
+          "incorrect"
+        ],
+        "mustNotClaim": [
+          "3个盘子也算3个苹果。"
+        ]
+      },
+      "rubric": [
+        {
+          "id": "source_fidelity",
+          "weight": 30,
+          "passCriteria": [
+            "先核对原图及孩子实际作答，不添加原图没有的答案或对象。"
+          ],
+          "failCriteria": [
+            "把参考答案说成孩子原来写的答案。",
+            "原图与OCR冲突时仍沿用OCR判错。"
+          ]
+        },
+        {
+          "id": "factual_correctness",
+          "weight": 25,
+          "passCriteria": [
+            "区别盘子数和每盘苹果数，单位保留为个苹果。"
+          ],
+          "failCriteria": [
+            "给出错误数量、运算结果、人物指代或因果解释。"
+          ]
+        },
+        {
+          "id": "age_appropriate_guidance",
+          "weight": 20,
+          "passCriteria": [
+            "以三组四个的图解释，groups 可用[4,4,4]，不能只给一个数量图冒充三组。"
+          ],
+          "failCriteria": [
+            "低年级靠长文字、选项字母或人物姓名才可操作。",
+            "没有循序引导就把全部答案倾倒给孩子。"
+          ]
+        },
+        {
+          "id": "followup_adaptation",
+          "weight": 15,
+          "passCriteria": [
+            "第二轮改用4+4+4或按盘逐个数，不坚持孩子必须会乘法。"
+          ],
+          "failCriteria": [
+            "重复第一轮内容，没有回应新的困惑。"
+          ]
+        },
+        {
+          "id": "visual_alignment",
+          "weight": 10,
+          "passCriteria": [
+            "每一步 visual 与语音内容对应，region 在本题范围内。",
+            "图片选项只能来自本题真实候选图，不能用数符或文字伪造图片选项。"
+          ],
+          "failCriteria": [
+            "用错误数量图、错位原图区域或不相关图片解释。"
+          ]
+        }
+      ],
+      "scene": {
+        "width": 1000,
+        "height": 700,
+        "background": "#fffaf0",
+        "coordinateSystem": "pixels",
+        "fontPreference": "Noto Sans CJK SC / PingFang SC",
+        "elements": [
+          {
+            "type": "text",
+            "text": "原创教学评测 · 非正式考试",
+            "x": 38,
+            "y": 25,
+            "size": 18,
+            "color": "#64748b"
+          },
+          {
+            "type": "text",
+            "text": "1",
+            "x": 38,
+            "y": 70,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "3个盘子，每盘4个苹果，一共有几个？",
+            "x": 38,
+            "y": 113,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "circle",
+            "x": 200,
+            "y": 280,
+            "radius": 110,
+            "fill": "#eef1de",
+            "outline": "#789178",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 162,
+            "y": 245,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 162,
+            "y1": 222,
+            "x2": 167,
+            "y2": 211,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 238,
+            "y": 245,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 238,
+            "y1": 222,
+            "x2": 243,
+            "y2": 211,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 162,
+            "y": 315,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 162,
+            "y1": 292,
+            "x2": 167,
+            "y2": 281,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 238,
+            "y": 315,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 238,
+            "y1": 292,
+            "x2": 243,
+            "y2": 281,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 490,
+            "y": 280,
+            "radius": 110,
+            "fill": "#eef1de",
+            "outline": "#789178",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 452,
+            "y": 245,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 452,
+            "y1": 222,
+            "x2": 457,
+            "y2": 211,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 528,
+            "y": 245,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 528,
+            "y1": 222,
+            "x2": 533,
+            "y2": 211,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 452,
+            "y": 315,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 452,
+            "y1": 292,
+            "x2": 457,
+            "y2": 281,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 528,
+            "y": 315,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 528,
+            "y1": 292,
+            "x2": 533,
+            "y2": 281,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 780,
+            "y": 280,
+            "radius": 110,
+            "fill": "#eef1de",
+            "outline": "#789178",
+            "outlineWidth": 3
+          },
+          {
+            "type": "circle",
+            "x": 742,
+            "y": 245,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 742,
+            "y1": 222,
+            "x2": 747,
+            "y2": 211,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 818,
+            "y": 245,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 818,
+            "y1": 222,
+            "x2": 823,
+            "y2": 211,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 742,
+            "y": 315,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 742,
+            "y1": 292,
+            "x2": 747,
+            "y2": 281,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "circle",
+            "x": 818,
+            "y": 315,
+            "radius": 23,
+            "fill": "#d6675f",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 818,
+            "y1": 292,
+            "x2": 823,
+            "y2": 281,
+            "color": "#526a3f",
+            "width": 3
+          },
+          {
+            "type": "text",
+            "text": "一共有",
+            "x": 265,
+            "y": 475,
+            "size": 36,
+            "color": "#243b3b"
+          },
+          {
+            "type": "rect",
+            "x": 440,
+            "y": 465,
+            "width": 100,
+            "height": 75,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "text",
+            "text": "7",
+            "x": 470,
+            "y": 468,
+            "size": 48,
+            "color": "#305b8a"
+          },
+          {
+            "type": "text",
+            "text": "个苹果。",
+            "x": 565,
+            "y": 475,
+            "size": 36,
+            "color": "#243b3b"
+          }
+        ]
+      }
+    },
+    {
+      "id": "g2_science_picture_reasoning",
+      "grade": "primary_2",
+      "subject": "science",
+      "teacherInput": {
+        "gradeCode": "primary_2",
+        "subject": "science",
+        "prompt": "两杯同样大的冰，左杯放在温暖阳光下，右杯放在阴凉处；同样时间后，哪杯更可能融化得快？",
+        "studentOriginalAnswer": "圈了右边阴凉处的杯子",
+        "recognitionConfidence": 0.99,
+        "recognitionNeedsConfirmation": false,
+        "annotationAmbiguous": false,
+        "region": {
+          "x": 0.025,
+          "y": 0.09285714285714286,
+          "width": 0.95,
+          "height": 0.8571428571428571
+        },
+        "assessmentScope": "AI指导，不是独立成绩",
+        "transcriptVersion": "v3",
+        "sourceQuestionLabel": "1",
+        "answerState": "drawing",
+        "answerRegions": [
+          {
+            "x": 0.575,
+            "y": 0.4785714285714286,
+            "width": 0.25,
+            "height": 0.3
+          }
+        ],
+        "visualEvidence": null,
+        "exactArithmetic": null
+      },
+      "initialStudentMessage": "我选了阴凉的杯子，对吗？",
+      "followupMessage": "可是阴凉也会化呀，为什么不是一样快？",
+      "groundTruth": {
+        "visibleFacts": [
+          "左杯有太阳表示温暖阳光环境；右杯有遮阴房屋表示阴凉环境。",
+          "两块冰同样大小，观察时间相同。",
+          "孩子圈右边杯子。"
+        ],
+        "actualStudentAnswer": "圈了右边阴凉处的杯子",
+        "expectedAnswer": "同样其他条件下，温暖阳光处的冰通常更快融化；阴凉处也会融化，但速度通常较慢。",
+        "expectedSourceCheck": "matched",
+        "allowedAssessmentStatuses": [
+          "incorrect"
+        ],
+        "mustNotClaim": [
+          "阴凉处的冰永远不会融化。",
+          "仅凭这题确定学生独立阅读或综合能力分数。"
+        ]
+      },
+      "rubric": [
+        {
+          "id": "source_fidelity",
+          "weight": 30,
+          "passCriteria": [
+            "先核对原图及孩子实际作答，不添加原图没有的答案或对象。"
+          ],
+          "failCriteria": [
+            "把参考答案说成孩子原来写的答案。",
+            "原图与OCR冲突时仍沿用OCR判错。"
+          ]
+        },
+        {
+          "id": "factual_correctness",
+          "weight": 25,
+          "passCriteria": [
+            "区别“是否会融化”与“快慢”，给出有条件的合理解释。"
+          ],
+          "failCriteria": [
+            "给出错误数量、运算结果、人物指代或因果解释。"
+          ]
+        },
+        {
+          "id": "age_appropriate_guidance",
+          "weight": 20,
+          "passCriteria": [
+            "用太阳、阴凉杯的真实图片指认，避免抽象热力学长段讲解。"
+          ],
+          "failCriteria": [
+            "低年级靠长文字、选项字母或人物姓名才可操作。",
+            "没有循序引导就把全部答案倾倒给孩子。"
+          ]
+        },
+        {
+          "id": "followup_adaptation",
+          "weight": 15,
+          "passCriteria": [
+            "第二轮承认阴凉也会融化，解释通常速度不同。"
+          ],
+          "failCriteria": [
+            "重复第一轮内容，没有回应新的困惑。"
+          ]
+        },
+        {
+          "id": "visual_alignment",
+          "weight": 10,
+          "passCriteria": [
+            "每一步 visual 与语音内容对应，region 在本题范围内。",
+            "图片选项只能来自本题真实候选图，不能用数符或文字伪造图片选项。"
+          ],
+          "failCriteria": [
+            "用错误数量图、错位原图区域或不相关图片解释。"
+          ]
+        }
+      ],
+      "scene": {
+        "width": 1000,
+        "height": 700,
+        "background": "#fffaf0",
+        "coordinateSystem": "pixels",
+        "fontPreference": "Noto Sans CJK SC / PingFang SC",
+        "elements": [
+          {
+            "type": "text",
+            "text": "原创教学评测 · 非正式考试",
+            "x": 38,
+            "y": 25,
+            "size": 18,
+            "color": "#64748b"
+          },
+          {
+            "type": "text",
+            "text": "1",
+            "x": 38,
+            "y": 70,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "哪一杯冰会更快融化？听老师说明，再指杯子。",
+            "x": 38,
+            "y": 113,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "circle",
+            "x": 245,
+            "y": 220,
+            "radius": 65,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "line",
+            "x1": 325.0,
+            "y1": 220.0,
+            "x2": 348.0,
+            "y2": 220.0,
+            "color": "#b28a38",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 301.5685424949238,
+            "y1": 276.5685424949238,
+            "x2": 317.8319984622144,
+            "y2": 292.8319984622144,
+            "color": "#b28a38",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 245.0,
+            "y1": 300.0,
+            "x2": 245.0,
+            "y2": 323.0,
+            "color": "#b28a38",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 188.4314575050762,
+            "y1": 276.5685424949238,
+            "x2": 172.1680015377856,
+            "y2": 292.8319984622144,
+            "color": "#b28a38",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 165.0,
+            "y1": 220.0,
+            "x2": 142.0,
+            "y2": 220.0,
+            "color": "#b28a38",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 188.4314575050762,
+            "y1": 163.4314575050762,
+            "x2": 172.16800153778559,
+            "y2": 147.1680015377856,
+            "color": "#b28a38",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 244.99999999999997,
+            "y1": 140.0,
+            "x2": 244.99999999999997,
+            "y2": 117.0,
+            "color": "#b28a38",
+            "width": 4
+          },
+          {
+            "type": "line",
+            "x1": 301.5685424949238,
+            "y1": 163.4314575050762,
+            "x2": 317.83199846221436,
+            "y2": 147.16800153778559,
+            "color": "#b28a38",
+            "width": 4
+          },
+          {
+            "type": "rect",
+            "x": 590,
+            "y": 155,
+            "width": 230,
+            "height": 180,
+            "fill": "#738b9a",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "polygon",
+            "points": [
+              [
+                555,
+                155
+              ],
+              [
+                705,
+                90
+              ],
+              [
+                855,
+                155
+              ]
+            ],
+            "fill": "#607889",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 135,
+            "y": 345,
+            "width": 220,
+            "height": 190,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 4
+          },
+          {
+            "type": "rect",
+            "x": 590,
+            "y": 345,
+            "width": 220,
+            "height": 190,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 4
+          },
+          {
+            "type": "rect",
+            "x": 195,
+            "y": 400,
+            "width": 85,
+            "height": 85,
+            "fill": "#d9edf5",
+            "outline": "#7095a7",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 650,
+            "y": 400,
+            "width": 85,
+            "height": 85,
+            "fill": "#d9edf5",
+            "outline": "#7095a7",
+            "outlineWidth": 3
+          },
+          {
+            "type": "text",
+            "text": "同样大的冰，放同样久",
+            "x": 220,
+            "y": 570,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "circle",
+            "x": 700,
+            "y": 435,
+            "radius": 123,
+            "fill": "none",
+            "outline": "#305b8a",
+            "outlineWidth": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "g5_fraction_denominator_followup",
+      "grade": "primary_5",
+      "subject": "math",
+      "teacherInput": {
+        "gradeCode": "primary_5",
+        "subject": "math",
+        "prompt": "比较1/2与1/3的大小。两条同样长纸带分别平均分成2份和3份，各取一份。",
+        "studentOriginalAnswer": "1/2 < 1/3",
+        "recognitionConfidence": 0.99,
+        "recognitionNeedsConfirmation": false,
+        "annotationAmbiguous": false,
+        "region": {
+          "x": 0.025,
+          "y": 0.09285714285714286,
+          "width": 0.95,
+          "height": 0.8571428571428571
+        },
+        "assessmentScope": "AI指导，不是独立成绩",
+        "transcriptVersion": "v3",
+        "sourceQuestionLabel": "1",
+        "answerState": "written",
+        "answerRegions": [
+          {
+            "x": 0.085,
+            "y": 0.25,
+            "width": 0.6,
+            "height": 0.10714285714285714
+          }
+        ],
+        "visualEvidence": null,
+        "exactArithmetic": null
+      },
+      "initialStudentMessage": "我觉得分母3比2大，所以三分之一更大。",
+      "followupMessage": "那为什么二分之三又比三分之二大？是不是分母越小都越大？",
+      "groundTruth": {
+        "visibleFacts": [
+          "两条纸带总长相同，分别等分2份与3份，均取一份。",
+          "孩子写1/2 < 1/3。"
+        ],
+        "actualStudentAnswer": "1/2 < 1/3",
+        "expectedAnswer": "1/2 > 1/3。第二轮3/2 > 2/3，但分母越小越大只适用于正数分子相同且整体相同的比较，不是任意分数规则。",
+        "expectedSourceCheck": "matched",
+        "allowedAssessmentStatuses": [
+          "incorrect"
+        ],
+        "mustNotClaim": [
+          "对任意两个分数，分母越小一定越大。",
+          "3/2小于1。"
+        ]
+      },
+      "rubric": [
+        {
+          "id": "source_fidelity",
+          "weight": 30,
+          "passCriteria": [
+            "先核对原图及孩子实际作答，不添加原图没有的答案或对象。"
+          ],
+          "failCriteria": [
+            "把参考答案说成孩子原来写的答案。",
+            "原图与OCR冲突时仍沿用OCR判错。"
+          ]
+        },
+        {
+          "id": "factual_correctness",
+          "weight": 25,
+          "passCriteria": [
+            "正确比较1/2与1/3，说明同一整体等分越多，每份越小。",
+            "第二轮指出分子也改变，3/2大于1而2/3小于1。"
+          ],
+          "failCriteria": [
+            "给出错误数量、运算结果、人物指代或因果解释。"
+          ]
+        },
+        {
+          "id": "age_appropriate_guidance",
+          "weight": 20,
+          "passCriteria": [
+            "使用两条同长纸带定位或正确分组，不仅给通分计算。"
+          ],
+          "failCriteria": [
+            "低年级靠长文字、选项字母或人物姓名才可操作。",
+            "没有循序引导就把全部答案倾倒给孩子。"
+          ]
+        },
+        {
+          "id": "followup_adaptation",
+          "weight": 15,
+          "passCriteria": [
+            "回答规则适用条件，不能把第一轮同分子规律套用到不同分子。"
+          ],
+          "failCriteria": [
+            "重复第一轮内容，没有回应新的困惑。"
+          ]
+        },
+        {
+          "id": "visual_alignment",
+          "weight": 10,
+          "passCriteria": [
+            "每一步 visual 与语音内容对应，region 在本题范围内。",
+            "图片选项只能来自本题真实候选图，不能用数符或文字伪造图片选项。"
+          ],
+          "failCriteria": [
+            "用错误数量图、错位原图区域或不相关图片解释。"
+          ]
+        }
+      ],
+      "scene": {
+        "width": 1000,
+        "height": 700,
+        "background": "#fffaf0",
+        "coordinateSystem": "pixels",
+        "fontPreference": "Noto Sans CJK SC / PingFang SC",
+        "elements": [
+          {
+            "type": "text",
+            "text": "原创教学评测 · 非正式考试",
+            "x": 38,
+            "y": 25,
+            "size": 18,
+            "color": "#64748b"
+          },
+          {
+            "type": "text",
+            "text": "1",
+            "x": 38,
+            "y": 70,
+            "size": 27,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "比较：一半和三分之一，哪个更大？",
+            "x": 38,
+            "y": 113,
+            "size": 30,
+            "color": "#243b3b"
+          },
+          {
+            "type": "text",
+            "text": "孩子原作答：1/2 < 1/3",
+            "x": 90,
+            "y": 180,
+            "size": 45,
+            "color": "#305b8a"
+          },
+          {
+            "type": "rect",
+            "x": 160,
+            "y": 340,
+            "width": 600,
+            "height": 100,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 160.0,
+            "y": 340,
+            "width": 300.0,
+            "height": 100,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 2
+          },
+          {
+            "type": "rect",
+            "x": 460.0,
+            "y": 340,
+            "width": 300.0,
+            "height": 100,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 2
+          },
+          {
+            "type": "rect",
+            "x": 160,
+            "y": 490,
+            "width": 600,
+            "height": 100,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 3
+          },
+          {
+            "type": "rect",
+            "x": 160.0,
+            "y": 490,
+            "width": 200.0,
+            "height": 100,
+            "fill": "#f6c55b",
+            "outline": "#334155",
+            "outlineWidth": 2
+          },
+          {
+            "type": "rect",
+            "x": 360.0,
+            "y": 490,
+            "width": 200.0,
+            "height": 100,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 2
+          },
+          {
+            "type": "rect",
+            "x": 560.0,
+            "y": 490,
+            "width": 200.0,
+            "height": 100,
+            "fill": "#ffffff",
+            "outline": "#334155",
+            "outlineWidth": 2
+          },
+          {
+            "type": "text",
+            "text": "两条纸带总长度一样",
+            "x": 190,
+            "y": 615,
+            "size": 32,
+            "color": "#243b3b"
+          }
+        ]
+      }
+    }
+  ]
+}

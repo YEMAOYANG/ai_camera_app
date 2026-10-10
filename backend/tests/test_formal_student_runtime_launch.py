@@ -518,6 +518,7 @@ class FormalStudentRuntimeLaunchTest(unittest.TestCase):
     def _service(self, row: dict) -> OpenMaicFullRuntimeService:
         service = object.__new__(OpenMaicFullRuntimeService)
         service.enabled = True
+        service.textbook_library_only = False
         service.client = object()
         service.public_url = "https://classroom.mira.test"
         service.launch_ttl_seconds = 60

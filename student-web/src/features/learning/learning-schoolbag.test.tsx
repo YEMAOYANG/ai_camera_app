@@ -19,6 +19,28 @@ beforeEach(() => { vi.clearAllMocks(); vi.spyOn(HTMLMediaElement.prototype, "pla
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); vi.restoreAllMocks(); });
 
 describe("shared textbook schoolbag", () => {
+  it("keeps review/exam and worksheet entries visible while books load or fail", async () => {
+    let finish!: (value: Response) => void;
+    const fetch = vi.fn(() => new Promise<Response>(resolve => { finish = resolve; }));
+    vi.stubGlobal("fetch", fetch);
+    render(<LearningSchoolbag student={student} />);
+    expect(screen.getByRole("link", { name: "打开复习与考试" })).toHaveAttribute("href", "/learning/reviews");
+    expect(screen.getByRole("link", { name: "打开作业与试卷" })).toHaveAttribute("href", "/learning/homework");
+    expect(screen.getByRole("link", { name: "打开作业与试卷" })).toHaveTextContent("老师带我订正 · 听讲解再练习");
+    expect(screen.getByRole("navigation", { name: "复习与作业" }).textContent).not.toMatch(/AI老师|腾讯|初判/iu);
+    expect(screen.getByRole("navigation", { name: "复习与作业" }).querySelectorAll("img")).toHaveLength(2);
+    finish(response({ message: "课本服务暂时不可用" }, 503));
+    expect(await screen.findByRole("alert")).toHaveTextContent("课本服务暂时不可用");
+    expect(screen.getByRole("link", { name: "打开复习与考试" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "打开作业与试卷" })).toBeVisible();
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "听入口说明" }));
+    const playback = vi.mocked(HTMLMediaElement.prototype.play);
+    expect(playback).toHaveBeenCalledTimes(1);
+    expect((playback.mock.instances[0] as HTMLAudioElement).getAttribute("src")).toBe(voice.cues.choose.src);
+  });
+
   it.each(["primary_1", "primary_2", "primary_3"])("keeps %s home silent across entry, refresh, focus and return; reads only on request", async gradeCode => {
     const fetch = vi.fn().mockImplementation(() => Promise.resolve(response({ ...catalog, gradeCode, learningJourneys: [savedJourney] })));
     vi.stubGlobal("fetch", fetch);

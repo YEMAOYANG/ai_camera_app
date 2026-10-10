@@ -1,0 +1,1105 @@
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -20,6 +20,7 @@
+ 
+ const log = createLogger('QuizView');
+ import type { QuizQuestion } from '@/lib/types/stage';
++import type { QuizVisual } from '@openmaic/dsl';
+ import { SpeechButton } from '@/components/audio/speech-button';
+ import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { gradeChoiceQuestions, isShortAnswer, type QuestionResult } from '@/lib/quiz/grading';
+@@ -63,6 +64,42 @@
+ const TAP_OBJECT_NAMES = { circle: '圆形', square: '方形', triangle: '三角形' } as const;
+ const TAP_COLOR_NAMES = { red: '红色', blue: '蓝色', yellow: '黄色', green: '绿色' } as const;
+ 
++/** The visual never supplies an answer; its containing button owns the value. */
++function QuizPicture({ visual, scene = false }: { visual: QuizVisual; scene?: boolean }) {
++  if (visual.kind === 'people') return (
++    <span data-quiz-visual="people" className="flex justify-center gap-4 rounded-xl bg-[#eef2e8] p-3">
++      {visual.members.map(member => <span key={member.id} data-person-id={member.id} className="block min-w-0 max-w-36 flex-1">
++        <QuizPicture visual={{ kind: 'image', src: member.src, alt: member.alt, cue: member.cue }} scene={scene} />
++      </span>)}
++    </span>
++  );
++  if (visual.kind === 'quantity') return (
++    <svg data-quiz-visual="quantity" data-quantity={visual.count} viewBox="0 0 240 120" role="img"
++      aria-label={visual.alt ?? `${visual.count} 个物体`} className={scene ? 'w-full h-36' : 'w-full h-24'}>
++      <rect x="6" y="6" width="228" height="108" rx="20" fill="#eef2e8" stroke="#d1dccb" />
++      {Array.from({ length: Math.min(20, visual.count) }, (_, index) => (
++        <circle key={index} cx={30 + (index % 5) * 45} cy={29 + Math.floor(index / 5) * 22} r="9" fill="#d9a844" stroke="#9e782e" />
++      ))}
++    </svg>
++  );
++  return (
++    <span data-quiz-visual="image" className="relative block w-full">
++      {/* Approved local/original assets can cross the classroom origin. */}
++      {/* eslint-disable-next-line @next/next/no-img-element */}
++      <img src={visual.src} alt={visual.alt} className={cn('w-full object-contain rounded-xl', scene ? 'max-h-52' : 'h-28')} />
++      {visual.cue && visual.cue !== 'observer' && (
++        <svg data-person-cue={visual.cue} viewBox="0 0 64 48" aria-label={visual.cue === 'speaking' ? '正在说话' : '正在听'}
++          className="absolute right-1 top-1 w-12 h-10 drop-shadow-sm" role="img">
++          <path d="M8 4h45v30H29L18 44V34H8Z" fill="#fff9e6" stroke="#466a51" strokeWidth="2" />
++          {visual.cue === 'speaking'
++            ? <path d="M19 18v7m8-13v18m8-15v12m8-9v6" stroke="#466a51" strokeWidth="3" strokeLinecap="round" />
++            : <path d="M23 26c-6-11 2-19 10-16 9 3 4 12 0 13-3 1-1 8-5 8m1-12c2-5 7-3 5 1" fill="none" stroke="#466a51" strokeWidth="3" strokeLinecap="round" />}
++        </svg>
++      )}
++    </span>
++  );
++}
++
+ function tapObjectVisuals(question: QuizQuestion): TapObjectVisual[] | null {
+   const source = question as unknown as Record<string, unknown>;
+   if (source.sourceType !== 'tap_objects' || !Array.isArray(source.objects)
+@@ -277,6 +314,7 @@
+     <QuestionCard question={question} index={index} result={result}>
+       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+         {question.options?.map((opt) => {
++          const visual = question.optionVisuals?.[opt.value];
+           const selected = value === opt.value;
+           const isCorrectOpt = isReview && question.answer?.includes(opt.value);
+           const isWrong = isReview && selected && result?.status === 'incorrect';
+@@ -288,7 +326,8 @@
+               disabled={disabled}
+               onClick={() => !disabled && onChange(opt.value)}
+               className={cn(
+-                'flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all text-sm',
++                'flex min-h-12 items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all text-sm',
++                visual && 'flex-col text-center',
+                 // Default state
+                 !isReview &&
+                   !selected &&
+@@ -311,9 +350,11 @@
+                 disabled && !isReview && 'cursor-default',
+               )}
+             >
++              {visual && <QuizPicture visual={visual} />}
+               <span
+                 className={cn(
+                   'w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
++                  visual && 'sr-only',
+                   !isReview &&
+                     !selected &&
+                     'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
+@@ -416,6 +457,7 @@
+       )}
+       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+         {question.options?.map((opt) => {
++          const visual = question.optionVisuals?.[opt.value];
+           const isSelected = selected.includes(opt.value);
+           const isCorrectOpt = isReview && question.answer?.includes(opt.value);
+           const isWrong = isReview && isSelected && !isCorrectOpt;
+@@ -427,7 +469,8 @@
+               disabled={disabled}
+               onClick={() => toggle(opt.value)}
+               className={cn(
+-                'flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all text-sm',
++                'flex min-h-12 items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all text-sm',
++                visual && 'flex-col text-center',
+                 !isReview &&
+                   !isSelected &&
+                   'border-gray-200 dark:border-gray-600 hover:border-violet-200 dark:hover:border-violet-700 hover:bg-violet-50/50 dark:hover:bg-violet-900/30',
+@@ -445,9 +488,11 @@
+                 disabled && !isReview && 'cursor-default',
+               )}
+             >
++              {visual && <QuizPicture visual={visual} />}
+               <span
+                 className={cn(
+                   'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 transition-colors',
++                  visual && 'sr-only',
+                   !isReview &&
+                     !isSelected &&
+                     'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
+@@ -649,6 +694,7 @@
+ 
+       {/* Body */}
+       {narrationSource && <QuestionNarration src={narrationSource} number={index + 1} />}
++      {question.visual && <div className="mb-4" data-quiz-scene-picture><QuizPicture visual={question.visual} scene /></div>}
+       {children}
+ 
+       {/* Analysis (review only) */}
+@@ -769,6 +815,8 @@
+ 
+   const [phase, setPhase] = useState<Phase>(readOnly ? 'answering' : 'not_started');
+   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
++  const [pictureQuestionIndex, setPictureQuestionIndex] = useState(0);
++  const pictureSequence = questions.length > 1 && questions.every(question => !!question.optionVisuals);
+   const [results, setResults] = useState<QuestionResult[]>([]);
+   const [runtimeGate, setRuntimeGate] = useState<QuizRuntimeGate>(
+     readOnly ? { status: 'ready', attemptId: 'private-render-preview' } : { status: 'loading' },
+@@ -1084,6 +1132,7 @@
+             {/* Questions */}
+             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+               {questions.map((q, i) => {
++                if (pictureSequence && i !== pictureQuestionIndex) return null;
+                 if (q.type === 'single') {
+                   return (
+                     <SingleChoiceQuestion
+@@ -1117,6 +1166,23 @@
+                 );
+               })}
+             </div>
++            {pictureSequence && (
++              <div className="flex shrink-0 items-center justify-center gap-4 px-6 pb-4" data-picture-question-navigation>
++                <button type="button" data-picture-question-prev aria-label="上一题" disabled={pictureQuestionIndex === 0}
++                  onClick={() => setPictureQuestionIndex(index => Math.max(0, index - 1))}
++                  className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-300 disabled:opacity-30">
++                  <ChevronRight className="h-6 w-6 rotate-180" />
++                </button>
++                <span className="flex items-center gap-2" aria-label={`${pictureQuestionIndex + 1}/${questions.length}`}>
++                  {questions.map((q, index) => <span key={q.id} className={cn('h-2.5 w-2.5 rounded-full', index === pictureQuestionIndex ? 'bg-[#47684e]' : 'bg-stone-300')} />)}
++                </span>
++                <button type="button" data-picture-question-next aria-label="下一题" disabled={pictureQuestionIndex === questions.length - 1}
++                  onClick={() => setPictureQuestionIndex(index => Math.min(questions.length - 1, index + 1))}
++                  className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-300 disabled:opacity-30">
++                  <ChevronRight className="h-6 w-6" />
++                </button>
++              </div>
++            )}
+           </motion.div>
+         )}
+ 
+diff --git a/lib/server/agent-runtime/course-tools.ts b/lib/server/agent-runtime/course-tools.ts
+--- a/lib/server/agent-runtime/course-tools.ts
++++ b/lib/server/agent-runtime/course-tools.ts
+@@ -30,6 +30,7 @@
+ import type { AgentTool } from '@earendil-works/pi-agent-core';
+ import type { DocumentFolderStore, DocumentStore, MaicDocument } from '@openmaic/storage';
+ import type { Stage } from '@openmaic/dsl';
++import type { LearningSceneContract } from '@openmaic/generation';
+ 
+ import type { Scene } from '@/lib/types/stage';
+ import { STAGE_WRITER_TOOL_NAMES } from '@/lib/agent-runtime/stage-writer-tools';
+@@ -101,6 +102,8 @@
+   getActiveSkill?: () => LoadedSkill | null;
+   /** Server-selected formal profile only; never a model-controlled tool argument. */
+   getGenerationSkillContext?: (input: MiraFormalSceneSkillInput) => MiraFormalSceneSkillContext;
++  /** Frozen formal prompt authority; never accepted from model tool parameters. */
++  getGenerationLearningContract?: () => LearningSceneContract | undefined;
+   /** Required durable evidence after the generated page/action has persisted. */
+   onGenerationSkillContext?: (
+     input: MiraFormalSceneSkillInput,
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -27,6 +27,7 @@
+ import { checkScenesAgainstSkill } from './skills';
+ import { isMediaPlaceholder } from '@/lib/store/media-generation';
+ import type { MiraFormalSceneSkillInput } from '../mira-formal-skill-policy';
++import { assertLearningInteractiveSyntax } from '../mira-formal-learning-contract';
+ 
+ const MAX_GENERATE_SCENE_MEDIA = 8;
+ const SUPPORTED_SCENE_TYPES = new Set(['slide', 'quiz', 'interactive', 'pbl']);
+@@ -383,6 +384,7 @@
+       let content: Awaited<ReturnType<typeof generateSceneContent>>;
+       try {
+         content = await generateSceneContent(outline, contentCall.call, {
++          ...(deps.getGenerationLearningContract?.() ? { learningContract: deps.getGenerationLearningContract() } : {}),
+           agents,
+           languageDirective: doc.stage.languageDirective ?? '',
+           allowProceduralSkill: true,
+@@ -416,6 +418,8 @@
+       if (signal?.aborted) throw new Error('aborted');
+       if (!content) return result('Page content generation failed; nothing was written.', {}, true);
+       const actionsCall = contextualCall('scene-actions', { ...pageInput, phase: 'actions' });
++      if (deps.getGenerationLearningContract?.() && outline.type === 'interactive' && 'html' in content)
++        assertLearningInteractiveSyntax(content.html);
+       const actions = filterKnownActions(
+         await actionGenerator(outline, content, actionsCall.call, {
+           agents,
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -1292,6 +1292,9 @@
+       origin: meta.origin,
+     };
+     const { formalPlayfulContextFromPrompt } = await import('../mira-formal-playful-policy');
++    const { formalLearningContractFromPrompt, formalModelPolicyFromPrompt } = await import('../mira-formal-learning-contract');
++    const generationLearningContract = formalLearningContractFromPrompt(meta.prompt);
++    const formalModelPolicyId = formalModelPolicyFromPrompt(meta.prompt);
+     const formalSkillBundle = isMiraFormalAdaptiveSkillSession(formalSkillIdentity)
+       ? await prepareMiraFormalAdaptiveSkillBundle(
+           installedSkills,
+@@ -1537,6 +1540,7 @@
+         sessionId: id,
+         abortSignal: abort.signal,
+         getActiveSkill: () => activeSkill,
++        ...(generationLearningContract ? { getGenerationLearningContract: () => generationLearningContract } : {}),
+         ...(formalSkillBundle
+           ? {
+               getGenerationSkillContext: (
+@@ -1649,6 +1653,7 @@
+               gradeBoundary: { ...formalSkillBundle.gradeBoundary },
+               selectionPlan: { ...formalSkillBundle.selectionPlan },
+               teachingBrief: formalSkillBundle.teachingBrief,
++              ...(formalModelPolicyId ? { modelPolicyId: formalModelPolicyId } : {}),
+               ...(formalSkillBundle.playfulLearning ? { playfulLearning: formalSkillBundle.playfulLearning } : {}),
+             },
+           })
+diff --git a/lib/server/mira-formal-learning-contract.ts b/lib/server/mira-formal-learning-contract.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-formal-learning-contract.ts
+@@ -0,0 +1,97 @@
++import { Script } from 'node:vm';
++import { assertLearningContract, assertLearningInteractive, assertLearningQuiz,
++  assertNoInventedMastery, interactiveScripts, learningSceneInstructions,
++  type LearningSceneContract } from '@openmaic/generation';
++import type { Scene } from '@/lib/types/stage';
++import type { FormalCoursewareSpec } from './mira-formal-compiled-classroom';
++import type { MiraProfessionalModelPolicyId } from './model-routes';
++
++/** New requests opt in; persisted creation policies are never rewritten. */
++export const MIRA_FORMAL_SCENE_LEARNING_POLICY = {
++  schemaVersion: 'mira.learning.scene-contract-policy.v1',
++  enforced: true,
++  pictureChoicesForGrades: ['primary_1', 'primary_2'],
++  noMasteryClaims: true,
++  scriptSyntaxRequired: true,
++} as const;
++const START = '\nMIRA_FORMAL_LEARNING_SCENE_CONTRACT:\n';
++const END = '\nEND_MIRA_FORMAL_LEARNING_SCENE_CONTRACT\n';
++const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
++const canonical = (value: unknown): string => JSON.stringify(value, (_, v) => object(v)
++  ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a.localeCompare(b))) : v);
++
++export function formalLearningContract(creationPolicy: unknown,
++  spec: Pick<FormalCoursewareSpec, 'course'>, payload: Record<string, unknown>): LearningSceneContract | undefined {
++  if (!object(creationPolicy) || !Object.hasOwn(creationPolicy, 'sceneLearningPolicy')) return undefined;
++  if (canonical(creationPolicy.sceneLearningPolicy) !== canonical(MIRA_FORMAL_SCENE_LEARNING_POLICY))
++    throw new Error('FORMAL_LEARNING_SCENE_POLICY_INVALID');
++  const brief = object(payload.teachingBrief) ? payload.teachingBrief : undefined;
++  const lesson = brief && object(brief.lesson) ? brief.lesson : undefined;
++  const constraints = lesson && object(lesson.constraints) ? lesson.constraints : undefined;
++  const boundary = object(payload.gradeBoundary) ? payload.gradeBoundary : undefined;
++  const boundaryConstraints = boundary && object(boundary.constraints) ? boundary.constraints : undefined;
++  const maximum = constraints?.maximumNumber ?? boundaryConstraints?.maximumNumber ?? boundary?.maximumNumber;
++  const contract: LearningSceneContract = {
++    schemaVersion: 'mira.learning.scene-contract.v1', gradeCode: spec.course.gradeCode,
++    subject: spec.course.subject,
++    pictureChoicesRequired: (MIRA_FORMAL_SCENE_LEARNING_POLICY.pictureChoicesForGrades as readonly string[]).includes(spec.course.gradeCode),
++    noMasteryClaims: true,
++    ...(typeof maximum === 'number' && Number.isInteger(maximum) && maximum >= 0 && maximum <= 100
++      ? { maximumQuantity: maximum } : {}),
++  };
++  assertLearningContract(contract);
++  return contract;
++}
++export function withFormalLearningContract(prompt: string, contract: LearningSceneContract | undefined): string {
++  return contract ? prompt + START + JSON.stringify(contract) + END + learningSceneInstructions(contract) : prompt;
++}
++export function formalModelPolicyFromPrompt(prompt: string): MiraProfessionalModelPolicyId | undefined {
++  const marker = '\nMIRA_FORMAL_MODEL_POLICY_ID:';
++  const parts = prompt.split(marker);
++  if (parts.length === 1) return undefined;
++  const id = parts[1].split('\n')[0].trim();
++  if (parts.length !== 2 || id !== 'deepseek-v4.1-flash-candidate-v1') throw new Error('FORMAL_MODEL_POLICY_CONTEXT_INVALID');
++  return id;
++}
++export function formalLearningContractFromPrompt(prompt: string): LearningSceneContract | undefined {
++  const parts = prompt.split(START);
++  if (parts.length === 1) return undefined;
++  if (parts.length !== 2 || parts[1].split(END).length !== 2) throw new Error('FORMAL_LEARNING_SCENE_CONTEXT_INVALID');
++  let value: unknown;
++  try { value = JSON.parse(parts[1].split(END)[0]); } catch { throw new Error('FORMAL_LEARNING_SCENE_CONTEXT_INVALID'); }
++  assertLearningContract(value);
++  return value;
++}
++
++/** Compile only: generated JavaScript is never evaluated in the backend. */
++export function assertLearningInteractiveSyntax(html: string): void {
++  let index = 0;
++  for (const script of interactiveScripts(html)) {
++    try { new Script(script, { filename: `learning-widget-${index++}.js` }); }
++    catch { throw new Error('LEARNING_SCENE_SCRIPT_SYNTAX_INVALID'); }
++  }
++  for (const match of html.matchAll(/\bon[a-z]+\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {
++    const handler = (match[1] ?? match[2]).replaceAll('&quot;', '"').replaceAll('&#39;', "'").replaceAll('&amp;', '&');
++    try { new Script(`(function(event){${handler}\n})`); }
++    catch { throw new Error('LEARNING_SCENE_HANDLER_SYNTAX_INVALID'); }
++  }
++}
++export function assertFormalLearningScenes(scenes: Scene[], contract: LearningSceneContract | undefined): void {
++  if (!contract) return; // Historical jobs preserve their original contract.
++  assertLearningContract(contract);
++  for (const scene of scenes) {
++    if (scene.content.type === 'quiz') assertLearningQuiz(scene.content.questions, contract);
++    if (scene.content.type === 'interactive') {
++      const content = scene.content;
++      if (!content.html) throw new Error('LEARNING_SCENE_INLINE_HTML_REQUIRED');
++      assertLearningInteractive({ html: content.html, widgetType: content.widgetType,
++        widgetConfig: content.widgetConfig }, contract);
++      assertLearningInteractiveSyntax(content.html);
++    }
++    const rendered = scene.content.type === 'slide' ? JSON.stringify(scene.content.canvas.elements)
++      : scene.content.type === 'interactive' ? (scene.content.html ?? '')
++        : scene.content.type === 'quiz' ? scene.content.questions.map(q => q.question).join('\n') : '';
++    assertNoInventedMastery(rendered, contract);
++    for (const action of scene.actions ?? []) if (action.type === 'speech') assertNoInventedMastery(action.text, contract);
++  }
++}
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -71,6 +71,10 @@
+   withMiraFormalPlayfulInstructions,
+ } from './mira-formal-playful-policy';
+ import { formalInspectionConfiguration } from './mira-formal-scene-inspector';
++import { assertFormalLearningScenes, formalLearningContract, formalLearningContractFromPrompt,
++  withFormalLearningContract } from './mira-formal-learning-contract';
++import type { MiraProfessionalModelPolicyId } from './model-routes';
++import { MIRA_FORMAL_SCENE_LEARNING_POLICY } from './mira-formal-learning-contract';
+ import type { AgentMessage } from '@earendil-works/pi-agent-core';
+ import {
+   isMiraFormalProfessionalSessionIdentity,
+@@ -166,6 +170,8 @@
+   skillOrchestration?: MiraFormalSkillReceipt;
+   teachingQuality?: MiraTeachingQualityReceipt;
+   interactionDesign?: InteractionDesignReceipt;
++  modelPolicyId?: MiraProfessionalModelPolicyId;
++  sceneLearningPolicy?: typeof MIRA_FORMAL_SCENE_LEARNING_POLICY;
+   receiptSha256: string;
+ }
+ 
+@@ -483,10 +489,12 @@
+           schemaVersion: 'mira.learning.observed-assessment.v1', criteria: spec.observations || [],
+         } } : {}) })
+     : prompt;
+-  const finalPrompt = withMiraFormalPlayfulInstructions(
++  const selectedModelPolicyId = plainObject(input.professionalCreationPolicy)?.modelPolicyId;
++  const finalPrompt = withFormalLearningContract(withMiraFormalPlayfulInstructions(
+     interactionPrompt,
+     formalPlayfulContext(input.professionalCreationPolicy, spec),
+-  );
++  ), formalLearningContract(input.professionalCreationPolicy, spec, contract))
++    + (selectedModelPolicyId ? `\nMIRA_FORMAL_MODEL_POLICY_ID:${String(selectedModelPolicyId)}\n` : '');
+   if (!spec.progressiveLesson) return finalPrompt;
+   return finalPrompt.replace(
+     '- Use between one and four quiz scenes. Distribute the four locked assessment questions across them in original order so every locked question appears exactly once.',
+@@ -781,6 +789,7 @@
+   scenes: Scene[],
+   spec: FormalCoursewareSpec,
+   preserveQuestionPlacement = false,
++  preservePictures = false,
+ ): { stage: Stage; scenes: Scene[] } {
+   const ordered = [...scenes].sort((left, right) => left.order - right.order);
+   const planning = MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.scenePlanning;
+@@ -802,7 +811,7 @@
+   const lockedQuestions = [...spec.guided, ...spec.independent].map(lockedRuntimeQuestion);
+   return {
+     stage: promotedStage,
+-    scenes: normalizeProfessionalScenes(ordered, lockedQuestions, preserveQuestionPlacement, spec.assessmentMode === 'observed'),
++    scenes: normalizeProfessionalScenes(ordered, lockedQuestions, preserveQuestionPlacement, spec.assessmentMode === 'observed', preservePictures),
+   };
+ }
+ 
+@@ -811,6 +820,7 @@
+   lockedQuestions: QuizQuestion[],
+   preserveQuestionPlacement: boolean,
+   observedAssessment = false,
++  preservePictures = false,
+ ): Scene[] {
+   const quizSceneCount = ordered.filter((scene) => scene.type === 'quiz').length;
+   if (observedAssessment ? quizSceneCount !== 0 || lockedQuestions.length !== 0
+@@ -848,7 +858,10 @@
+                     canonicalJson(publicFields(question)) !== canonicalJson(publicFields(locked))
+                   )
+                     throw new Error('FORMAL_QUALITY_LOCKED_QUESTION_MISMATCH');
+-                  return locked;
++                  return preservePictures ? { ...locked,
++                    ...(question.visual ? { visual: question.visual } : {}),
++                    ...(question.optionVisuals ? { optionVisuals: question.optionVisuals } : {}),
++                  } : locked;
+                 })
+               : questionsByQuiz[quizIndex++],
+           }
+@@ -897,9 +910,11 @@
+   const ordered = [...input.scenes].sort((a, b) => a.order - b.order);
+   if (ordered.some((scene, index) => scene.order !== index + 1))
+     throw new Error('FORMAL_PROFESSIONAL_SOURCE_SCENE_ORDER_INVALID');
+-  const normalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true, observed);
++  const normalized = normalizeProfessionalScenes(ordered, questions as QuizQuestion[], true, observed,
++    !!formalLearningContractFromPrompt(session.prompt));
+   const playfulLearning = formalPlayfulContextFromPrompt(session.prompt);
+   assertMiraFormalPlayfulScenes(normalized, playfulLearning);
++  assertFormalLearningScenes(normalized, formalLearningContractFromPrompt(session.prompt));
+   return {
+     stage: input.stage,
+     scenes: canonicalizeMiraFormalResearchFooters(normalized, research.fetched).scenes,
+@@ -1249,6 +1264,10 @@
+     workflowVersion: MIRA_PROFESSIONAL_CREATION_POLICY.workflowVersion,
+     skillId: MIRA_PROFESSIONAL_CREATION_POLICY.skillId,
+     supportingSkillIds: [...MIRA_PROFESSIONAL_CREATION_POLICY.supportingSkillIds],
++    ...(plainObject(input.professionalCreationPolicy)?.modelPolicyId ? {
++      modelPolicyId: plainObject(input.professionalCreationPolicy)!.modelPolicyId as MiraProfessionalModelPolicyId,
++      sceneLearningPolicy: MIRA_FORMAL_SCENE_LEARNING_POLICY,
++    } : {}),
+     userPromptRequired: false as const,
+     studentToolsEnabled: false as const,
+     webSearchEnabled: true as const,
+@@ -1355,6 +1374,7 @@
+     options.recoveredScenes ?? (document.scenes as Scene[]),
+     spec,
+     isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy),
++    !!formalLearningContract(input.professionalCreationPolicy, spec, formalContractPayload(input)),
+   );
+   const sourceSpeechActionCount = assertProfessionalClassroom(
+     promoted.stage,
+@@ -1367,6 +1387,8 @@
+     promoted.scenes,
+     formalPlayfulContext(input.professionalCreationPolicy, spec),
+   );
++  assertFormalLearningScenes(promoted.scenes,
++    formalLearningContract(input.professionalCreationPolicy, spec, formalContractPayload(input)));
+   const evidence = await loadResearchEvidence(events, identity.sessionId);
+   const canonicalized = canonicalizeMiraFormalResearchFooters(promoted.scenes, evidence.fetched);
+   if (options.requireCitationRepair && canonicalized.repairedSceneIds.length === 0) {
+@@ -1440,6 +1462,9 @@
+       gradeBoundary: { ...skillBundle.gradeBoundary },
+       selectionPlan: { ...skillBundle.selectionPlan },
+       teachingBrief: skillBundle.teachingBrief,
++      ...(plainObject(input.professionalCreationPolicy)?.modelPolicyId ? {
++        modelPolicyId: plainObject(input.professionalCreationPolicy)!.modelPolicyId as MiraProfessionalModelPolicyId,
++      } : {}),
+       ...(skillBundle.playfulLearning ? { playfulLearning: skillBundle.playfulLearning } : {}),
+       ...(formalDifficultyPolicy(input) ? {difficultyPolicy: formalDifficultyPolicy(input)} : {}),
+       ...(isMiraInteractionCreationPolicy(input.professionalCreationPolicy)
+@@ -1672,7 +1697,8 @@
+     throw new Error('FORMAL_SAVED_STAGE_SOURCE_MISMATCH');
+   const repairedScenes = validateMiraFormalSavedStageSceneRepair(document.scenes, repair.scenes);
+   const promoted = promoteProfessionalDocument(document.stage as Stage, repairedScenes, spec,
+-    isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy));
++    isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy),
++    !!formalLearningContract(input.professionalCreationPolicy, spec, formalContractPayload(input)));
+   assertProfessionalClassroom(promoted.stage, promoted.scenes, spec, identity.sessionId, document.outline);
+   const evidence = await withPaidBudget(input.paidBudget, identity.sessionId + ':saved-stage-preparation',
+     () => loadResearchEvidence(events, identity.sessionId));
+diff --git a/lib/whiteboard/runtime/validate.ts b/lib/whiteboard/runtime/validate.ts
+--- a/lib/whiteboard/runtime/validate.ts
++++ b/lib/whiteboard/runtime/validate.ts
+@@ -53,7 +53,7 @@
+ };
+ 
+ type SchemaDocument = { definitions?: Record<string, JsonSchema> };
+-const schemaDefinitions = (sceneSchemaJson as SchemaDocument).definitions ?? {};
++const schemaDefinitions = (sceneSchemaJson as unknown as SchemaDocument).definitions ?? {};
+ const ELEMENT_SCHEMA_DEFINITION_BY_TYPE = new Map<string, string>([
+   ['text', 'PPTTextElement'],
+   ['image', 'PPTImageElement'],
+diff --git a/packages/@openmaic/dsl/src/stage.ts b/packages/@openmaic/dsl/src/stage.ts
+--- a/packages/@openmaic/dsl/src/stage.ts
++++ b/packages/@openmaic/dsl/src/stage.ts
+@@ -193,11 +193,20 @@
+   value: string; // Selection key: "A", "B", "C", "D"
+ }
+ 
++/** Meaningful visual content. Selection/grading always uses QuizOption.value. */
++export type QuizVisual =
++  | { kind: 'image'; src: string; alt: string; cue?: 'speaking' | 'listening' | 'observer' }
++  | { kind: 'people'; members: { id: string; src: string; alt: string; cue: 'speaking' | 'listening' | 'observer' }[] }
++  | { kind: 'quantity'; count: number; alt?: string };
++
+ export interface QuizQuestion {
+   id: string;
+   type: 'single' | 'multiple' | 'short_answer';
+   question: string;
+   options?: QuizOption[];
++  /** Optional scene illustration and distinct pictures keyed by the locked option value. */
++  visual?: QuizVisual;
++  optionVisuals?: Record<string, QuizVisual>;
+   answer?: string[]; // Correct answer values: ["A"], ["A","C"], or undefined for text
+   analysis?: string; // Explanation shown after grading
+   commentPrompt?: string; // Grading guidance for text questions
+diff --git a/packages/@openmaic/generation/src/index.ts b/packages/@openmaic/generation/src/index.ts
+--- a/packages/@openmaic/generation/src/index.ts
++++ b/packages/@openmaic/generation/src/index.ts
+@@ -16,6 +16,10 @@
+   resolveImageIds,
+ } from './scene-generator.js';
+ export type { SceneActionsOptions, SceneContentOptions } from './scene-generator.js';
++export { assertLearningContract, assertLearningQuiz, assertLearningInteractive,
++  assertNoInventedMastery, interactiveScripts, learningSceneInstructions,
++  normalizeQuizValueAnswers, resolveQuizVisual, resolveInteractiveImageIds } from './learning-scene-contract.js';
++export type { LearningSceneContract } from './learning-scene-contract.js';
+ export { buildCompleteScene } from './scene-builder.js';
+ export type { BuildCompleteSceneOptions } from './scene-builder.js';
+ export {
+diff --git a/packages/@openmaic/generation/src/learning-scene-contract.ts b/packages/@openmaic/generation/src/learning-scene-contract.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/src/learning-scene-contract.ts
+@@ -0,0 +1,224 @@
++import type { QuizQuestion, QuizVisual } from '@openmaic/dsl';
++
++/** Server-selected, versioned authority; never inferred from a child's response. */
++export interface LearningSceneContract {
++  schemaVersion: 'mira.learning.scene-contract.v1';
++  gradeCode: string;
++  subject: string;
++  maximumQuantity?: number;
++  pictureChoicesRequired: boolean;
++  noMasteryClaims: boolean;
++}
++
++const object = (value: unknown): value is Record<string, unknown> =>
++  !!value && typeof value === 'object' && !Array.isArray(value);
++function fail(code: string): never { throw new Error(`LEARNING_SCENE_${code}`); }
++export function assertLearningContract(value: unknown): asserts value is LearningSceneContract {
++  if (!object(value) || value.schemaVersion !== 'mira.learning.scene-contract.v1'
++    || !/^primary_[1-6]$/.test(String(value.gradeCode))
++    || !['chinese', 'math', 'english'].includes(String(value.subject))
++    || typeof value.pictureChoicesRequired !== 'boolean' || typeof value.noMasteryClaims !== 'boolean'
++    || (value.maximumQuantity !== undefined && (!Number.isInteger(value.maximumQuantity)
++      || Number(value.maximumQuantity) < 0 || Number(value.maximumQuantity) > 100))) fail('CONTRACT_INVALID');
++}
++
++export function learningSceneInstructions(contract: LearningSceneContract): string {
++  assertLearningContract(contract);
++  return [
++    '\nSERVER LEARNING SCENE CONTRACT (authoritative):', JSON.stringify(contract),
++    'Preserve option value keys exactly. answer contains value keys, never option labels. Never invent an answer for a server-locked hasAnswer:false question.',
++    ...(contract.pictureChoicesRequired ? [
++      'Children cannot independently read instructions. Each quiz question needs visual plus optionVisuals keyed by every option value. Use meaningful, distinguishable pictures, not emoji or a decorative common background.',
++      'Visual schema: {kind:"image",src:"approved image ID or source",alt:"brief description",cue?:"speaking"|"listening"|"observer"} or {kind:"quantity",count:integer,alt?:string}. Quantity renders that many objects; zero renders an empty tray. The target character may be taught, but other instructions cannot depend on reading.',
++      'For pronouns/people, use visual:{kind:"people",members:[{id,src,alt,cue:"speaking"|"listening"|"observer"}]} with exactly one speaker and one listener. Reuse these exact portraits in optionVisuals. The renderer places the cue on the corresponding person. Never infer a speaker from a shared photo where two mouths are open. Never style the correct choice before the learner responds. Provide teacher narration and replay; one task per screen, minimum 48px touch targets.',
++    ] : []),
++    ...(contract.maximumQuantity !== undefined ? [
++      `All taught quantities, operands, results, distractors and quantity controls stay between 0 and ${contract.maximumQuantity}. CSS coordinates/timers are not learning quantities.`,
++      'Every numeric/range input must have explicit min, max and initial value within that boundary. widget-config must contain learningQuantities:[{selector:"#control",min:0,max:...,initial:...}] for every quantity input; initial state, reset and all operations must obey the same bound. Do not add out-of-range examples.',
++    ] : []),
++    ...(contract.noMasteryClaims ? [
++      'No invented learner history, score, independent reading or mastery claim. Describe only the activity and actual local feedback. Exploration/game scoring.correctPoints must be 0; no rewards, mastery flags or completion/runtime events. Formal locked quiz scoring belongs to the server.',
++    ] : []),
++    'Interactive HTML is self-contained: no external/module scripts, no import/eval/Function; embed exactly one valid application/json widget-config whose type matches the requested widgetType. Inline JavaScript must parse and actual controls must change meaningful visible state. Do not fabricate preview/test receipts.',
++  ].join('\n');
++}
++
++/** Bind legacy label answers only when the label identifies one unique value. */
++export function normalizeQuizValueAnswers(question: Record<string, unknown>, options: QuizQuestion['options']): string[] | undefined {
++  if (question.hasAnswer === false) return undefined;
++  const raw = question.answer ?? question.correctAnswer ?? question.correct_answer;
++  if (raw === undefined || raw === null) return undefined;
++  const answers = Array.isArray(raw) ? raw : [raw];
++  if (!options?.length || new Set(options.map(o => o.value)).size !== options.length) fail('OPTION_VALUES_INVALID');
++  const values = answers.map(answer => {
++    if (typeof answer !== 'string' || !answer.trim()) fail('ANSWER_VALUE_INVALID');
++    if (options.some(o => o.value === answer)) return answer;
++    const matches = options.filter(o => o.label === answer);
++    if (matches.length !== 1) fail('ANSWER_VALUE_UNBOUND');
++    return matches[0].value;
++  });
++  if (!values.length || new Set(values).size !== values.length
++    || (question.type === 'single' && values.length !== 1)) fail('ANSWER_CARDINALITY_INVALID');
++  return values;
++}
++
++export function resolveQuizVisual(value: unknown, mapping?: Record<string, string>): QuizVisual | undefined {
++  if (!object(value)) return undefined;
++  if (value.kind === 'people' && Array.isArray(value.members) && value.members.length >= 2 && value.members.length <= 4) {
++    const members = value.members.map(member => {
++      if (!object(member) || typeof member.id !== 'string' || !member.id.trim() || !['speaking', 'listening', 'observer'].includes(String(member.cue))) return undefined;
++      const portrait = resolveQuizVisual({ ...member, kind: 'image' }, mapping);
++      return portrait?.kind === 'image' ? { id: member.id, src: portrait.src, alt: portrait.alt, cue: member.cue as 'speaking' | 'listening' | 'observer' } : undefined;
++    });
++    if (members.some(member => !member) || new Set(members.map(member => member!.id)).size !== members.length
++      || new Set(members.map(member => member!.src)).size !== members.length
++      || members.filter(member => member!.cue === 'speaking').length !== 1
++      || members.filter(member => member!.cue === 'listening').length !== 1) return undefined;
++    return { kind: 'people', members: members as Extract<QuizVisual, {kind: 'people'}>['members'] };
++  }
++  if (value.kind === 'quantity' && Number.isInteger(value.count) && Number(value.count) >= 0)
++    return { kind: 'quantity', count: Number(value.count), ...(typeof value.alt === 'string' ? { alt: value.alt } : {}) };
++  if (value.kind !== 'image' || typeof value.src !== 'string' || typeof value.alt !== 'string' || !value.alt.trim()) return undefined;
++  const src = mapping && Object.hasOwn(mapping, value.src) ? mapping[value.src] : value.src;
++  if (!/^(?:https?:\/\/|\/|data:image\/(?:png|jpeg|webp|svg\+xml);)/.test(src)) return undefined;
++  if (value.cue !== undefined && !['speaking', 'listening', 'observer'].includes(String(value.cue))) return undefined;
++  return { kind: 'image', src, alt: value.alt, ...(value.cue ? { cue: value.cue as 'speaking' | 'listening' | 'observer' } : {}) };
++}
++
++function assertVisual(visual: unknown, contract: LearningSceneContract): asserts visual is QuizVisual {
++  const resolved = resolveQuizVisual(visual);
++  if (!resolved) fail('PICTURE_INVALID');
++  if (resolved.kind === 'quantity' && resolved.count > (contract.maximumQuantity ?? 20)) fail('QUANTITY_OUT_OF_RANGE');
++}
++function fingerprint(visual: QuizVisual): string {
++  return visual.kind === 'quantity' ? `quantity:${visual.count}` : visual.kind === 'people'
++    ? 'people:' + JSON.stringify(visual.members) : `image:${visual.src}:${visual.cue ?? ''}`;
++}
++function assertArithmetic(text: string, maximum: number): void {
++  // Only arithmetic operands/results, not positions, timings, IDs or page numbers.
++  for (const match of text.matchAll(/(?:^|[^\d.])(\d+)\s*([+＋\-−])\s*(\d+)(?:\s*[=＝]\s*(\d+))?/g)) {
++    const left = Number(match[1]), right = Number(match[3]);
++    const result = match[2] === '+' || match[2] === '＋' ? left + right : left - right;
++    if ([left, right, result, ...(match[4] ? [Number(match[4])] : [])].some(n => n < 0 || n > maximum)) fail('ARITHMETIC_OUT_OF_RANGE');
++    if (match[4] && Number(match[4]) !== result) fail('ARITHMETIC_INCORRECT');
++  }
++}
++export function assertLearningQuiz(questions: QuizQuestion[], contract: LearningSceneContract): void {
++  assertLearningContract(contract);
++  if (!questions.length || new Set(questions.map(q => q.id)).size !== questions.length) fail('QUESTION_IDS_INVALID');
++  for (const question of questions) {
++    if (!['single', 'multiple', 'short_answer'].includes(question.type)
++      || typeof question.question !== 'string' || !question.question.trim()) fail('QUESTION_INVALID');
++    if (contract.pictureChoicesRequired && question.type === 'short_answer') fail('TEXT_INPUT_NOT_PICTURE_CHOICE');
++    const options = question.options;
++    if (question.type !== 'short_answer') {
++      if (!options?.length || options.length < 2 || new Set(options.map(o => o.value)).size !== options.length
++        || options.some(o => !o.value.trim())) fail('OPTION_VALUES_INVALID');
++      if (question.hasAnswer === false) {
++        if (question.answer?.length) fail('LOCKED_ANSWER_LEAK');
++      } else {
++        const answers = question.answer;
++        if (!answers?.length || answers.some(a => !options.some(o => o.value === a))
++          || new Set(answers).size !== answers.length || (question.type === 'single' && answers.length !== 1)) fail('ANSWER_VALUE_UNBOUND');
++      }
++    }
++    if (contract.pictureChoicesRequired) {
++      const source = question as unknown as Record<string, unknown>;
++      // Existing authoritative tap-object questions already render distinct real shapes.
++      const tap = source.sourceType === 'tap_objects' && Array.isArray(source.objects)
++        && source.objects.length === options?.length && source.objects.every(raw => object(raw)
++          && options?.some(o => o.value === raw.id) && ['circle', 'square', 'triangle'].includes(String(raw.shape))
++          && ['red', 'blue', 'yellow', 'green'].includes(String(raw.color)));
++      if (!tap) {
++        assertVisual(question.visual, contract);
++        if (!object(question.optionVisuals) || Object.keys(question.optionVisuals).sort().join('\0') !== options?.map(o => o.value).sort().join('\0')) fail('PICTURE_VALUE_BINDING_INVALID');
++        const pictures = options!.map(option => { const picture = question.optionVisuals![option.value]; assertVisual(picture, contract); return fingerprint(picture); });
++        if (new Set(pictures).size !== pictures.length) fail('PICTURES_NOT_DISTINCT');
++        const sceneVisual = question.visual;
++        if (sceneVisual?.kind === 'people' && options!.some(option => {
++          const portrait = question.optionVisuals![option.value];
++          return portrait.kind !== 'image' || !sceneVisual.members.some(member => member.src === portrait.src);
++        })) fail('PERSON_PORTRAIT_MISMATCH');
++      }
++    }
++    if (contract.maximumQuantity !== undefined) {
++      assertArithmetic(question.question, contract.maximumQuantity);
++      for (const option of options ?? []) {
++        if (/^\s*\d+\s*$/.test(option.label) && Number(option.label) > contract.maximumQuantity) fail('QUANTITY_OUT_OF_RANGE');
++        assertArithmetic(option.label, contract.maximumQuantity);
++      }
++    }
++  }
++}
++
++/** Resolve only caller-owned asset keys; unregistered IDs are never guessed. */
++export function resolveInteractiveImageIds(html: string, mapping?: Record<string, string>): string {
++  if (!mapping) return html;
++  return html.replace(/\bsrc\s*=\s*(["'])([^"']+)\1/gi, (all, quote: string, src: string) => {
++    if (!Object.hasOwn(mapping, src)) return all;
++    const resolved = mapping[src];
++    if (!/^(?:https?:\/\/|\/|data:image\/)/.test(resolved) || /["'<>]/.test(resolved)) fail('ASSET_SOURCE_INVALID');
++    return `src=${quote}${resolved}${quote}`;
++  });
++}
++
++export function interactiveScripts(html: string): string[] {
++  const scripts: string[] = [];
++  for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
++    const attrs = match[1];
++    if (/\bsrc\s*=/i.test(attrs) || /\btype\s*=\s*["']module["']/i.test(attrs)) fail('EXTERNAL_SCRIPT_UNSUPPORTED');
++    const type = attrs.match(/\btype\s*=\s*["']([^"']+)["']/i)?.[1];
++    if (type && !['text/javascript', 'application/javascript'].includes(type.toLowerCase())) continue;
++    if (/\b(?:eval|Function)\s*\(|\bimport\s*(?:\(|\{|["'])/.test(match[2])) fail('DYNAMIC_SCRIPT_UNSUPPORTED');
++    scripts.push(match[2]);
++  }
++  if (!scripts.some(script => script.trim())) fail('SCRIPT_MISSING');
++  return scripts;
++}
++function attr(attrs: string, name: string): string | undefined {
++  return attrs.match(new RegExp(`(?:^|\\s)${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'))?.slice(1).find(v => v !== undefined);
++}
++export function assertLearningInteractive(content: { html: string; widgetType?: string; widgetConfig?: Record<string, unknown> }, contract: LearningSceneContract): void {
++  assertLearningContract(contract);
++  interactiveScripts(content.html);
++  for (const image of content.html.matchAll(/<img\b([^>]*)>/gi)) {
++    const src = attr(image[1], 'src');
++    if (!src || !/^(?:https?:\/\/|\/|data:image\/)/.test(src)) fail('ASSET_SOURCE_INVALID');
++  }
++  if (!object(content.widgetConfig) || content.widgetConfig.type !== content.widgetType) fail('WIDGET_CONFIG_MISMATCH');
++  const embedded = [...content.html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
++    .filter(match => attr(match[1], 'id') === 'widget-config' && attr(match[1], 'type') === 'application/json');
++  if (embedded.length !== 1) fail('WIDGET_CONFIG_MISMATCH');
++  let parsed: unknown;
++  try { parsed = JSON.parse(embedded[0][2]); } catch { fail('WIDGET_CONFIG_INVALID'); }
++  if (!object(parsed) || parsed.type !== content.widgetType) fail('WIDGET_CONFIG_MISMATCH');
++  if (contract.noMasteryClaims) {
++    const scoring = content.widgetConfig.scoring;
++    if (object(scoring) && Object.values(scoring).some(v => typeof v === 'number' && v > 0)) fail('EXPLORATION_SCORE_FORBIDDEN');
++    if (/\b(?:mastered|masteryScore|independentReadingConfirmed)\s*[:=]\s*(?:true|[1-9])|mira:(?:course-completed|mastery)|student-runtime-events/.test(content.html)) fail('MASTERY_EVENT_FORBIDDEN');
++  }
++  if (contract.maximumQuantity !== undefined) {
++    const max = contract.maximumQuantity;
++    assertArithmetic(content.html.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ''), max);
++    const bounds = content.widgetConfig.learningQuantities;
++    for (const input of content.html.matchAll(/<input\b([^>]*)>/gi)) {
++      if (!['number', 'range'].includes(attr(input[1], 'type') ?? '')) continue;
++      const id = attr(input[1], 'id'), min = attr(input[1], 'min'), maximum = attr(input[1], 'max'), initial = attr(input[1], 'value');
++      if (!id || min === undefined || maximum === undefined || initial === undefined
++        || ![min, maximum, initial].every(v => /^\d+$/.test(v)) || Number(min) < 0
++        || Number(maximum) > max || Number(min) > Number(maximum) || Number(initial) < Number(min)
++        || Number(initial) > Number(maximum)) fail('PARAMETER_BOUND_INVALID');
++      if (!Array.isArray(bounds) || !bounds.some(bound => object(bound) && bound.selector === `#${id}`
++        && bound.min === Number(min) && bound.max === Number(maximum) && bound.initial === Number(initial))) fail('PARAMETER_BOUND_UNDECLARED');
++    }
++    if (bounds !== undefined && (!Array.isArray(bounds) || bounds.some(bound => !object(bound)
++      || !Number.isInteger(bound.min) || !Number.isInteger(bound.max) || !Number.isInteger(bound.initial)
++      || Number(bound.min) < 0 || Number(bound.max) > max || Number(bound.initial) < Number(bound.min)
++      || Number(bound.initial) > Number(bound.max)))) fail('PARAMETER_BOUND_INVALID');
++  }
++}
++
++/** This catches unsupported unconditional assertions; actual ability stays server-owned. */
++export function assertNoInventedMastery(text: string, contract: LearningSceneContract): void {
++  if (contract.noMasteryClaims && /(?:你(?:已经|完全)?(?:掌握了|学会了|都会了)|你也会啦|已(?:经)?独立(?:掌握|认字)|you have mastered|you can now independently read)/i.test(text)) fail('MASTERY_CLAIM_FORBIDDEN');
++}
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -34,6 +34,8 @@
+ import { parseActionsFromStructuredOutput } from './action-parser.js';
+ import { formatSlideElementsForPrompt } from './slide-element-inventory.js';
+ import { parseJsonResponse } from './json-repair.js';
++import { assertLearningInteractive, assertLearningQuiz, learningSceneInstructions,
++  normalizeQuizValueAnswers, resolveQuizVisual, resolveInteractiveImageIds, type LearningSceneContract } from './learning-scene-contract.js';
+ import {
+   buildCourseContext,
+   formatAgentsForPrompt,
+@@ -74,6 +76,8 @@
+ // ── Options interfaces for scene generation functions ──
+ 
+ export interface SceneContentOptions {
++  /** Server-owned grade boundary and picture interaction policy, opt-in for new jobs. */
++  learningContract?: LearningSceneContract;
+   assignedImages?: PdfImage[];
+   imageMapping?: ImageMapping;
+   visionEnabled?: boolean;
+@@ -274,6 +278,8 @@
+       allowProceduralSkill,
+       includeKatex: options.interactiveIncludeKatex,
+       explorationGame: options.explorationGame,
++      learningContract: options.learningContract,
++      imageMapping: options.imageMapping,
+       logger: log,
+     });
+   }
+@@ -295,7 +301,7 @@
+         log,
+       );
+     case 'quiz':
+-      return generateQuizContent(outline, aiCall, languageDirective, log);
++      return generateQuizContent(outline, aiCall, languageDirective, log, options);
+     case 'pbl':
+       return generatePBLSceneContent(
+         outline,
+@@ -366,7 +372,7 @@
+         const src = el.src as string;
+ 
+         // If src is an image ID reference, replace with actual URL
+-        if (isImageIdReference(src)) {
++        if (isImageIdReference(src) || (imageMapping && Object.hasOwn(imageMapping, src))) {
+           if (!imageMapping || !imageMapping[src]) {
+             log.warn(`No mapping for image ID: ${src}, removing element`);
+             return null; // Remove invalid image elements
+@@ -851,6 +857,7 @@
+   aiCall: AICallFn,
+   languageDirective?: string,
+   log: GenerationLogger = noopGenerationLogger,
++  options: SceneContentOptions = {},
+ ): Promise<GeneratedQuizContent | null> {
+   const quizConfig = outline.quizConfig || {
+     questionCount: 3,
+@@ -873,7 +880,10 @@
+   }
+ 
+   log.debug(`Generating quiz content for: ${outline.title}`);
+-  const response = await aiCall(prompts.system, prompts.user);
++  const mediaText = (options.assignedImages ?? []).map(image => ({ id: image.id,
++    src: options.imageMapping?.[image.id] ?? image.src, description: image.description }));
++  const response = await aiCall(prompts.system + (options.learningContract ? learningSceneInstructions(options.learningContract) : ''),
++    prompts.user + (mediaText.length ? '\nApproved visual assets (reuse exact IDs/sources):\n' + JSON.stringify(mediaText) : ''));
+   const generatedQuestions = parseJsonResponse<QuizQuestion[]>(response);
+ 
+   if (!generatedQuestions || !Array.isArray(generatedQuestions)) {
+@@ -886,14 +896,25 @@
+   // Ensure each question has an ID and normalize options format
+   const questions: QuizQuestion[] = generatedQuestions.map((q) => {
+     const isText = q.type === 'short_answer';
++    const normalizedOptions = isText ? undefined : normalizeQuizOptions(q.options);
++    const mapping = { ...options.imageMapping, ...options.generatedMediaMapping };
++    const source = q as unknown as Record<string, unknown>;
++    const visual = resolveQuizVisual(source.visual, mapping);
++    const optionVisuals = source.optionVisuals && typeof source.optionVisuals === 'object'
++      ? Object.fromEntries(Object.entries(source.optionVisuals).map(([key, value]) => [key, resolveQuizVisual(value, mapping)])) : undefined;
++    const answer = isText ? undefined : normalizeQuizValueAnswers(source, normalizedOptions);
+     return {
+       ...q,
+       id: q.id || `q_${nanoid(8)}`,
+-      options: isText ? undefined : normalizeQuizOptions(q.options),
+-      answer: isText ? undefined : normalizeQuizAnswer(q as unknown as Record<string, unknown>),
+-      hasAnswer: isText ? false : true,
++      options: normalizedOptions,
++      answer,
++      hasAnswer: !isText && q.hasAnswer !== false,
++      ...(visual ? { visual } : {}),
++      ...(optionVisuals ? { optionVisuals: optionVisuals as QuizQuestion['optionVisuals'] } : {}),
+     };
+   });
++
++  if (options.learningContract) assertLearningQuiz(questions, options.learningContract);
+ 
+   return { questions };
+ }
+@@ -932,20 +953,6 @@
+  * AI may generate correctAnswer as string or string[], under various field names.
+  * This normalizes to string[] format matching option values.
+  */
+-function normalizeQuizAnswer(question: Record<string, unknown>): string[] | undefined {
+-  // AI might use "correctAnswer", "answer", or "correct_answer"
+-  const raw =
+-    question.answer ??
+-    question.correctAnswer ??
+-    (question as Record<string, unknown>).correct_answer;
+-  if (!raw) return undefined;
+-
+-  if (Array.isArray(raw)) {
+-    return raw.map(String);
+-  }
+-  return [String(raw)];
+-}
+-
+ /**
+  * Generate PBL project content.
+  *
+@@ -1114,6 +1121,8 @@
+     allowProceduralSkill?: boolean;
+     includeKatex?: boolean;
+     explorationGame?: boolean;
++    learningContract?: LearningSceneContract;
++    imageMapping?: ImageMapping;
+     logger?: GenerationLogger;
+   } = {},
+ ): Promise<GeneratedInteractiveContent | null> {
+@@ -1235,8 +1244,9 @@
+   }
+ 
+   log.info(`Generating ${widgetType} widget for: ${outline.title}`);
+-  const response = await aiCall(prompts.system, prompts.user);
+-  const html = extractHtml(response, log);
++  const response = await aiCall(prompts.system + (options.learningContract ? learningSceneInstructions(options.learningContract) : ''), prompts.user);
++  const rawHtml = extractHtml(response, log);
++  const html = rawHtml ? resolveInteractiveImageIds(rawHtml, options.imageMapping) : rawHtml;
+ 
+   if (!html) {
+     log.error(`Failed to extract HTML from ${widgetType} response for: ${outline.title}`);
+@@ -1245,6 +1255,7 @@
+ 
+   // Extract widget config from HTML if present
+   const widgetConfig = extractWidgetConfig(html, widgetType);
++  if (options.learningContract) assertLearningInteractive({ html, widgetType, widgetConfig }, options.learningContract);
+ 
+   return {
+     html: postProcessInteractiveHtml(html, { includeKatex: options.includeKatex }),
+@@ -1260,13 +1271,13 @@
+   html: string,
+   widgetType: WidgetType,
+ ): WidgetConfig | undefined {
+-  const match = html.match(
+-    /<script type="application\/json" id="widget-config">([\s\S]*?)<\/script>/,
+-  );
+-  if (!match) return undefined;
++  const matches = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
++    .filter(match => /\bid\s*=\s*["']widget-config["']/i.test(match[1])
++      && /\btype\s*=\s*["']application\/json["']/i.test(match[1]));
++  if (matches.length !== 1) return undefined;
+ 
+   try {
+-    const parsed: unknown = JSON.parse(match[1]);
++    const parsed: unknown = JSON.parse(matches[0][2]);
+     if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) return undefined;
+ 
+     const config = parsed as Record<string, unknown>;
+diff --git a/packages/@openmaic/generation/templates/quiz-content/user.md b/packages/@openmaic/generation/templates/quiz-content/user.md
+--- a/packages/@openmaic/generation/templates/quiz-content/user.md
++++ b/packages/@openmaic/generation/templates/quiz-content/user.md
+@@ -7,4 +7,5 @@
+ {{languageDirective}}
+ 
+ Output JSON array directly (no explanation, no code blocks, no LaTeX):
+-[{"id":"q1","type":"single","question":"Question text","options":["Option A","Option B","Option C","Option D"],"correctAnswer":"Option A"}]
++[{"id":"q1","type":"single","question":"Question text","options":[{"value":"A","label":"Option A"},{"value":"B","label":"Option B"}],"answer":["A"],"analysis":"Explanation after grading","points":1}]
++Use answer value keys exactly. If the server requests picture choices, provide visual and optionVisuals separately, with optionVisuals keys matching every option value.
+diff --git a/packages/@openmaic/generation/test/__snapshots__/scene-prompt-golden.test.ts.snap b/packages/@openmaic/generation/test/__snapshots__/scene-prompt-golden.test.ts.snap
+--- a/packages/@openmaic/generation/test/__snapshots__/scene-prompt-golden.test.ts.snap
++++ b/packages/@openmaic/generation/test/__snapshots__/scene-prompt-golden.test.ts.snap
+@@ -697,7 +697,8 @@
+ Teach in English.
+ 
+ Output JSON array directly (no explanation, no code blocks, no LaTeX):
+-[{"id":"q1","type":"single","question":"Question text","options":["Option A","Option B","Option C","Option D"],"correctAnswer":"Option A"}]",
++[{"id":"q1","type":"single","question":"Question text","options":[{"value":"A","label":"Option A"},{"value":"B","label":"Option B"}],"answer":["A"],"analysis":"Explanation after grading","points":1}]
++Use answer value keys exactly. If the server requests picture choices, provide visual and optionVisuals separately, with optionVisuals keys matching every option value.",
+   },
+   "slide": {
+     "system": "# Slide Content Generator
+diff --git a/packages/@openmaic/generation/test/learning-scene-contract.test.ts b/packages/@openmaic/generation/test/learning-scene-contract.test.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/test/learning-scene-contract.test.ts
+@@ -0,0 +1,100 @@
++import { describe, expect, it } from 'vitest';
++import type { QuizQuestion } from '@openmaic/dsl';
++import { assertLearningInteractive, assertLearningQuiz, assertNoInventedMastery,
++  normalizeQuizValueAnswers, resolveQuizVisual, resolveInteractiveImageIds, type LearningSceneContract } from '../src/learning-scene-contract.js';
++import { extractWidgetConfig, generateSceneContent, resolveImageIds } from '../src/scene-generator.js';
++
++const contract: LearningSceneContract = { schemaVersion: 'mira.learning.scene-contract.v1',
++  gradeCode: 'primary_1', subject: 'math', maximumQuantity: 5, pictureChoicesRequired: true, noMasteryClaims: true };
++function question(): QuizQuestion {
++  return { id: 'q1', type: 'single', question: '2 + 1 = ?', options: [{ value: 'left', label: '2' }, { value: 'right', label: '3' }],
++    answer: ['right'], hasAnswer: true, visual: { kind: 'quantity', count: 3 },
++    optionVisuals: { left: { kind: 'quantity', count: 2 }, right: { kind: 'quantity', count: 3 } } };
++}
++const config = { type: 'simulation', learningQuantities: [{ selector: '#count', min: 0, max: 5, initial: 3 }] };
++function widget(overrides: Record<string, unknown> = {}) {
++  const widgetConfig = { ...config, ...overrides };
++  return { widgetType: 'simulation', widgetConfig,
++    html: '<html><input id="count" type="range" min="0" max="5" value="3"><p id="state"></p>'
++      + `<script id='widget-config' type='application/json'>${JSON.stringify(widgetConfig)}</script>`
++      + '<script>document.querySelector("#count").oninput=e=>document.querySelector("#state").textContent=e.target.value;</script></html>' };
++}
++describe('learning scene contract', () => {
++  it('passes a picture question with authoritative value binding', () => expect(() => assertLearningQuiz([question()], contract)).not.toThrow());
++  it('maps a unique legacy answer label to the actual value', () => expect(normalizeQuizValueAnswers({ type: 'single', correctAnswer: '3' }, question().options)).toEqual(['right']));
++  it('does not reinterpret a value as a label', () => expect(normalizeQuizValueAnswers({ type: 'single', answer: ['right'] }, question().options)).toEqual(['right']));
++  it('rejects ambiguous labels and unknown values', () => {
++    expect(() => normalizeQuizValueAnswers({ type: 'single', answer: 'absent' }, question().options)).toThrow('UNBOUND');
++    expect(() => normalizeQuizValueAnswers({ type: 'single', answer: 'same' }, [{ value: 'a', label: 'same' }, { value: 'b', label: 'same' }])).toThrow('UNBOUND');
++  });
++  it('keeps answer-blind server questions answerless', () => {
++    expect(normalizeQuizValueAnswers({ hasAnswer: false, answer: ['right'] }, question().options)).toBeUndefined();
++    const q = { ...question(), hasAnswer: false, answer: [] };
++    expect(() => assertLearningQuiz([q], contract)).not.toThrow();
++    expect(() => assertLearningQuiz([{ ...q, answer: ['right'] }], contract)).toThrow('LOCKED_ANSWER_LEAK');
++  });
++  it.each(['missing-picture', 'duplicate-picture', 'extra-key', 'unknown-answer', 'duplicate-option', 'out-of-range', 'text-input'])(
++    'rejects %s instead of accepting decorative text choices', reason => {
++      const q = question();
++      if (reason === 'missing-picture') delete q.optionVisuals;
++      if (reason === 'duplicate-picture') q.optionVisuals!.left = q.optionVisuals!.right;
++      if (reason === 'extra-key') q.optionVisuals!.unbound = { kind: 'quantity', count: 1 };
++      if (reason === 'unknown-answer') q.answer = ['absent'];
++      if (reason === 'duplicate-option') q.options![1].value = 'left';
++      if (reason === 'out-of-range') q.optionVisuals!.right = { kind: 'quantity', count: 6 };
++      if (reason === 'text-input') q.type = 'short_answer';
++      expect(() => assertLearningQuiz([q], contract)).toThrow('LEARNING_SCENE_');
++    });
++  it('renders zero as a valid empty quantity', () => expect(resolveQuizVisual({ kind: 'quantity', count: 0 })).toEqual({ kind: 'quantity', count: 0 }));
++  it('rejects outside-bound and incorrect arithmetic', () => {
++    expect(() => assertLearningQuiz([{ ...question(), question: '4 + 2 = 6' }], contract)).toThrow('OUT_OF_RANGE');
++    expect(() => assertLearningQuiz([{ ...question(), question: '2 + 1 = 4' }], contract)).toThrow('ARITHMETIC_INCORRECT');
++  });
++  it('resolves semantic asset IDs without inventing URLs', () => {
++    expect(resolveQuizVisual({ kind: 'image', src: 'portrait_blue', alt: '蓝衣同伴', cue: 'speaking' }, { portrait_blue: '/portraits/blue.png' })).toEqual({ kind: 'image', src: '/portraits/blue.png', alt: '蓝衣同伴', cue: 'speaking' });
++    expect(resolveQuizVisual({ kind: 'image', src: 'invented_name', alt: 'x' })).toBeUndefined();
++    expect(resolveImageIds([{ type: 'image', src: 'park', id: 'park' } as any], { park: '/original-park.png' })[0]).toMatchObject({ src: '/original-park.png' });
++  });
++  it('shows one real speaker/listener and preserves the same people in choices', () => {
++    const q = question(); q.visual = { kind: 'people', members: [
++      { id: 'blue', src: '/blue.png', alt: '蓝衣同伴', cue: 'speaking' },
++      { id: 'red', src: '/red.png', alt: '红衣同伴', cue: 'listening' },
++    ] };
++    q.optionVisuals = { left: { kind: 'image', src: '/blue.png', alt: '蓝衣同伴' }, right: { kind: 'image', src: '/red.png', alt: '红衣同伴' } };
++    expect(() => assertLearningQuiz([q], contract)).not.toThrow();
++    q.optionVisuals.right = { kind: 'image', src: '/another-child.png', alt: '另一位' };
++    expect(() => assertLearningQuiz([q], contract)).toThrow('PORTRAIT_MISMATCH');
++    q.visual.members[1].cue = 'speaking';
++    expect(resolveQuizVisual(q.visual)).toBeUndefined();
++  });
++  it('uses the same known mapping for HTML src, leaving unknown IDs rejected', () => {
++    expect(resolveInteractiveImageIds('<img src="park">', { park: '/original.png' })).toBe('<img src="/original.png">');
++    expect(() => assertLearningInteractive({ ...widget(), html: widget().html + '<img src="unknown">' }, contract)).toThrow('ASSET_SOURCE_INVALID');
++  });
++  it('parses widget JSON with either attribute order and rejects duplicates', () => {
++    const w = widget();
++    expect(extractWidgetConfig(w.html, 'simulation')).toEqual(config);
++    expect(extractWidgetConfig(w.html + `<script type="application/json" id="widget-config">${JSON.stringify(config)}</script>`, 'simulation')).toBeUndefined();
++  });
++  it('validates matching type and every declared numeric parameter', () => {
++    expect(() => assertLearningInteractive(widget(), contract)).not.toThrow();
++    expect(() => assertLearningInteractive(widget({ type: 'game' }), contract)).toThrow('MISMATCH');
++    expect(() => assertLearningInteractive(widget({ learningQuantities: [] }), contract)).toThrow('UNDECLARED');
++    const w = widget(); w.html = w.html.replace('max="5"', 'max="6"');
++    expect(() => assertLearningInteractive(w, contract)).toThrow('BOUND_INVALID');
++  });
++  it('blocks modules/external/dynamic scripts and fabricated mastery', () => {
++    for (const script of ['<script src="https://x/script.js"></script>', '<script type="module">const n=1;</script>', '<script>eval("x")</script>'])
++      expect(() => assertLearningInteractive({ ...widget(), html: widget().html + script }, contract)).toThrow('SCRIPT_UNSUPPORTED');
++    expect(() => assertLearningInteractive(widget({ scoring: { correctPoints: 10 } }), contract)).toThrow('SCORE_FORBIDDEN');
++    expect(() => assertNoInventedMastery('你已经掌握了所有汉字。', contract)).toThrow('MASTERY_CLAIM');
++    expect(() => assertNoInventedMastery('看图试一试，点图片听老师说。', contract)).not.toThrow();
++  });
++  it('real quiz generator preserves pictures and binds label answer', async () => {
++    const q = question();
++    const content = await generateSceneContent({ id: 'outline', type: 'quiz', title: '数量', description: '图片判断', order: 1,
++      quizConfig: { questionCount: 1, difficulty: 'easy', questionTypes: ['single'] } } as any,
++    async system => { expect(system).toContain('SERVER LEARNING SCENE CONTRACT'); return JSON.stringify([{ ...q, answer: undefined, correctAnswer: '3' }]); }, { learningContract: contract });
++    expect(content).toMatchObject({ questions: [{ answer: ['right'], optionVisuals: q.optionVisuals, visual: q.visual }] });
++  });
++});
+diff --git a/packages/@openmaic/generation/test/type-surface.test.ts b/packages/@openmaic/generation/test/type-surface.test.ts
+--- a/packages/@openmaic/generation/test/type-surface.test.ts
++++ b/packages/@openmaic/generation/test/type-surface.test.ts
+@@ -15,6 +15,7 @@
+   Equal<
+     keyof SceneContentOptions,
+     | 'assignedImages'
++    | 'learningContract'
+     | 'imageMapping'
+     | 'visionEnabled'
+     | 'generatedMediaMapping'
+@@ -24,6 +25,8 @@
+     | 'targetLanguage'
+     | 'userRequirements'
+     | 'allowProceduralSkill'
++    | 'interactiveIncludeKatex'
++    | 'explorationGame'
+     | 'editDirective'
+     | 'baselineContent'
+     | 'pblLoopFallback'
+diff --git a/tests/server/mira-formal-learning-contract.test.ts b/tests/server/mira-formal-learning-contract.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-formal-learning-contract.test.ts
+@@ -0,0 +1,29 @@
++import { describe, expect, it } from 'vitest';
++import { assertLearningInteractiveSyntax, formalLearningContract, formalLearningContractFromPrompt,
++  MIRA_FORMAL_SCENE_LEARNING_POLICY, withFormalLearningContract } from '@/lib/server/mira-formal-learning-contract';
++
++const spec = { course: { gradeCode: 'primary_1', subject: 'math' as const } } as any;
++const policy = { sceneLearningPolicy: MIRA_FORMAL_SCENE_LEARNING_POLICY };
++describe('formal scene contract authority and compile-only checks', () => {
++  it('keeps historical policies and prompts unchanged', () => {
++    expect(formalLearningContract({}, spec, {})).toBeUndefined();
++    expect(withFormalLearningContract('historical bytes', undefined)).toBe('historical bytes');
++    expect(formalLearningContractFromPrompt('historical bytes')).toBeUndefined();
++  });
++  it('derives the exact registered lesson bound, never a title heuristic', () => {
++    const contract = formalLearningContract(policy, spec, { teachingBrief: { lesson: { constraints: { maximumNumber: 5 } } } })!;
++    expect(contract.maximumQuantity).toBe(5);
++    expect(contract.pictureChoicesRequired).toBe(true);
++    expect(formalLearningContractFromPrompt(withFormalLearningContract('formal', contract))).toEqual(contract);
++  });
++  it('rejects unknown policy and tampered duplicated context', () => {
++    expect(() => formalLearningContract({ sceneLearningPolicy: { ...MIRA_FORMAL_SCENE_LEARNING_POLICY, enforced: false } }, spec, {})).toThrow('POLICY_INVALID');
++    const prompt = withFormalLearningContract('', formalLearningContract(policy, spec, {})!);
++    expect(() => formalLearningContractFromPrompt(prompt + prompt)).toThrow('CONTEXT_INVALID');
++  });
++  it('compiles scripts without executing them, rejecting truncated JS', () => {
++    expect(() => assertLearningInteractiveSyntax('<script>throw new Error("must never execute");</script>')).not.toThrow();
++    expect(() => assertLearningInteractiveSyntax('<script>const result = ;</script>')).toThrow('SYNTAX_INVALID');
++    expect(() => assertLearningInteractiveSyntax('<button onclick="const x = ;">x</button><script>const x=1;</script>')).toThrow('HANDLER_SYNTAX_INVALID');
++  });
++});

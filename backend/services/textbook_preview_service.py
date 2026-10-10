@@ -10,12 +10,14 @@ from content.textbook_preview import preview_checks, preview_input
 from core.errors import ApiError
 from core.security import now_ms
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
+from services.course_reuse_resolver import CourseReuseResolver
 
 
 class TextbookPreviewService:
     def __init__(self, repository, runtime):
         self.repository = repository
         self.runtime = runtime
+        self.reuse = CourseReuseResolver(repository)
 
     def get(self, key):
         with self.repository.transaction() as conn:
@@ -26,29 +28,60 @@ class TextbookPreviewService:
             raise ApiError("textbook_preview_runtime_changed", "预览所属的 OpenMAIC 地址已变化，请核对原任务", 409)
         return row
 
-    def prepare(self, edition, revision, node):
+    def _manifest(self, conn, edition, revision):
+        source = self.repository.get_revision(conn, edition, revision)
+        if source is None:
+            raise ApiError("textbook_revision_not_found", "请先导入已核对的教材修订", 404)
+        manifest = self.repository.manifest(source)
+        if digest(manifest) != source["manifest_sha256"]:
+            raise ApiError("textbook_integrity_error", "教材资料摘要不一致，请先核对", 409)
+        return manifest
+
+    def _resolved_summary(self, resolved):
+        if 'publication' not in resolved:
+            row = resolved['preview']
+            if row['runtime_origin'] != self.runtime.base_url:
+                raise ApiError('textbook_preview_runtime_changed', '已有课件属于其他运行地址，请核对原任务', 409)
+            return self.summary(row)
+        build, release = resolved['publication'], resolved['release']
+        frozen = self.repository.parse(build['input_json'])
+        return {'status': 'published', 'reused': True, 'reuseSource': 'published',
+                'contentKey': build['content_key'], 'courseId': build['course_id'],
+                'courseVersion': build['course_version'], 'previewKey': frozen.get('previewKey'),
+                'classroomId': release['classroomId'], 'classroomSha256': release['classroomSha256'],
+                'sourceEditionId': build['edition_id'], 'sourceRevisionId': build['revision_id'],
+                'publicationAllowed': False, 'providerDispatched': False}
+
+    def prepare(self, edition, revision, node, *, teaching_revision=None, regeneration=None):
         with self.repository.transaction() as conn:
-            source = self.repository.get_revision(conn, edition, revision)
-            if source is None:
-                raise ApiError("textbook_revision_not_found", "请先导入已核对的教材修订", 404)
-            manifest = self.repository.manifest(source)
-            if digest(manifest) != source["manifest_sha256"]:
-                raise ApiError("textbook_integrity_error", "教材资料摘要不一致，请先核对", 409)
-            frozen = preview_input(manifest, node)
+            manifest = self._manifest(conn, edition, revision)
+            resolved = self.reuse.resolve(conn, manifest, node, teaching_revision=teaching_revision,
+                                         regeneration=regeneration)
+            if resolved['source'] != 'new':
+                return self._resolved_summary(resolved)
+            frozen = preview_input(manifest, node, teaching_revision=resolved['slot']['teaching_revision'])
             now = now_ms()
             conn.execute("INSERT INTO learning_textbook_course_previews "
                          "(preview_key,edition_id,revision_id,node_id,input_json,runtime_origin,status,created_at,updated_at) "
                          "VALUES (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE preview_key=preview_key",
                          (frozen["previewKey"], edition, revision, node, canonical(frozen), self.runtime.base_url, "queued", now, now))
             row = conn.execute("SELECT * FROM learning_textbook_course_previews WHERE preview_key=? FOR UPDATE", (frozen["previewKey"],)).fetchone()
-            if (self.repository.parse(row["input_json"]) != frozen or row["runtime_origin"] != self.runtime.base_url):
+            if self.repository.parse(row["input_json"]) != frozen or row["runtime_origin"] != self.runtime.base_url:
                 raise ApiError("textbook_preview_conflict", "同一预览任务存在输入或运行地址冲突", 409)
+            self.reuse.repository.bind_preview(conn, resolved['slot'], row['preview_key'], now)
         return self.summary(row)
 
     def start(self, key):
         row = self.get(key)
-        frozen = self.repository.parse(row["input_json"])
         with self.repository.transaction() as conn:
+            manifest = self._manifest(conn, row['edition_id'], row['revision_id'])
+            resolved = self.reuse.resolve(conn, manifest, row['node_id'], preferred_key=key)
+            if 'publication' in resolved:
+                return self._resolved_summary(resolved)
+            row = resolved['preview']
+            self._resolved_summary(resolved)  # Check runtime before any dispatch.
+            key = row['preview_key']
+            frozen = self.repository.parse(row['input_json'])
             claimed = conn.execute("UPDATE learning_textbook_course_previews SET status='dispatching',updated_at=? "
                                    "WHERE preview_key=? AND status='queued'", (now_ms(), key)).rowcount == 1
         if not claimed:

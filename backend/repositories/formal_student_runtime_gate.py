@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 
 
@@ -92,6 +93,70 @@ def _formal_video_sql(alias: str) -> str:
     return f"(({absent}) OR ({' AND '.join(checks)}))"
 
 
+def _formal_quality_model_sql(alias: str) -> str:
+    """Bind QA to a complete frozen creation identity, not a model-name allowlist.
+
+    The complete model policy is already locked by the callers' preparation
+    target/fingerprint joins. Runtime receipts carry its versioned creation
+    identity; legacy receipts intentionally have neither new identity field.
+    Their original hashes and old reviewer must remain unchanged.
+    """
+    from integrations.openmaic_formal_media import (
+        PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY,
+        MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+        REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY,
+        PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
+    )
+
+    def raw(path: str) -> str:
+        return f"JSON_EXTRACT({alias}.feature_manifest_json, '$.{path}')"
+
+    def text(path: str) -> str:
+        return f"JSON_UNQUOTE({raw(path)})"
+
+    def frozen(value: object) -> str:
+        # These are registry constants, never user-supplied SQL. JSON equality
+        # compares the entire object (including types/unknown keys), unlike
+        # JSON_CONTAINS or a handful of policy fields.
+        value_json = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        escaped = value_json.replace("\\", "\\\\").replace("'", "''")
+        return f"JSON_EXTRACT('{escaped}', '$')"
+
+    policy = raw("generationContract.professionalCreationPolicy")
+    model_id = text("professionalCreation.modelPolicyId")
+    scene_policy = raw("professionalCreation.sceneLearningPolicy")
+    reviewer = text("professionalCreation.teachingQuality.review.modelId")
+    legacy = (PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY,
+              MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+              REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)
+    legacy_branch = " AND ".join([
+        "(" + " OR ".join(f"{policy} = {frozen(value)}" for value in legacy) + ")",
+        f"{raw('professionalCreation.modelPolicyId')} IS NULL",
+        f"{scene_policy} IS NULL",
+        f"{reviewer} = 'deepseek-v4-flash'",
+    ])
+    current_branch = " AND ".join([
+        "(" + " OR ".join(f"{policy} = {frozen(value)}" for value in
+            (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)) + ")",
+        f"{model_id} = 'deepseek-v4-pro-current-flash-v1'",
+        f"{scene_policy} IS NULL",
+        f"{reviewer} = 'deepseek-flash'",
+    ])
+    candidate_branch = " AND ".join([
+        f"{policy} = {frozen(FLASH_CANDIDATE_PROFESSIONAL_POLICY)}",
+        f"{model_id} = 'deepseek-v4.1-flash-candidate-v1'",
+        f"{scene_policy} = {frozen(FLASH_CANDIDATE_PROFESSIONAL_POLICY['sceneLearningPolicy'])}",
+        f"{reviewer} = 'deepseek-flash'",
+    ])
+    # The audit projection omits modelPolicyId but locks the entire raw parent
+    # receipt by SHA. Do not invent a new historical audit field/hash.
+    return "(" + " AND ".join([
+        f"{text('professionalCreation.receiptSha256')} REGEXP '^[0-9a-f]{{64}}$'",
+        f"{text('professionalCreation.receiptSha256')} = {text('formalEvidence.professionalCreation.receiptSha256')}",
+        f"(({legacy_branch}) OR ({current_branch}) OR ({candidate_branch}))",
+    ]) + ")"
+
+
 def _adaptive_skill_quality_sql(alias: str) -> str:
     """Early fail-closed visibility gate; Python checks exact nested receipts."""
 
@@ -139,7 +204,7 @@ def _adaptive_skill_quality_sql(alias: str) -> str:
         f"{count('formalEvidence.teachingQuality.sceneHashes')} = {scene_count}",
         f"{count(quality + '.renderChecks')} = 2 * {scene_count}",
         f"{text(quality + '.review.providerId')} = 'deepseek'",
-        f"{text(quality + '.review.modelId')} = 'deepseek-v4-flash'",
+        _formal_quality_model_sql(alias),
         f"{text(quality + '.review.inputSha256')} REGEXP '^[0-9a-f]{{64}}$'",
         f"{text(quality + '.review.requestIdHash')} REGEXP '^[0-9a-f]{{64}}$'",
         f"{count(quality + '.review.dimensions')} = 7",

@@ -17,6 +17,24 @@ from services.learning_transport_terminal_reconciliation import receipt, validat
 from tests.test_learning_budget import IsolatedDatabase
 
 
+class FrozenSavedStageTailModelContractTests(unittest.TestCase):
+    def test_fixed_historical_grant_cannot_be_repriced_as_current_flash(self):
+        raw = LearningBudgetPolicy.load(Path(__file__).parents[1] / 'content/learning_classroom_policy.json').raw
+        prices = {key: deepcopy(raw['prices'][key]) for key in tail.PRICE_CALLS if key in raw['prices']}
+        prices['deepseek-vision-peak'] = {**deepcopy(prices['deepseek-flash-peak']),
+            'model': 'deepseek-v4-flash-vision-exp'}
+        policy = Mock(raw={'prices': {}}, measure=Mock())
+        parent = {'price_keys_json': canonical({'prices': prices}), 'limits_json': canonical({'calls': 1})}
+        self.assertEqual(tail._prices_and_limits(parent, policy)[0]['prices'], prices)
+        for key in ('deepseek-flash-peak', 'deepseek-vision-peak'):
+            changed = deepcopy(prices)
+            changed[key]['model'] = 'deepseek-flash'
+            with self.subTest(price=key), self.assertRaises(ValueError):
+                tail._prices_and_limits({**parent, 'price_keys_json': canonical({'prices': changed})}, policy)
+        self.assertEqual(tail.PRICE_MODELS['deepseek-flash-peak'], ('deepseek', 'deepseek-v4-flash'))
+        self.assertEqual(tail.PRICE_MODELS['deepseek-vision-peak'], ('deepseek', 'deepseek-v4-flash-vision-exp'))
+
+
 class SavedStageTailAuthorizationTests(unittest.TestCase):
     def setUp(self):
         self.tmp = TemporaryDirectory()

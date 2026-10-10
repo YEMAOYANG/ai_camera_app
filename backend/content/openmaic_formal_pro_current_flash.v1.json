@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "mira.openmaic.pro-current-flash-registry.v1",
+  "policyId": "deepseek-v4-pro-current-flash-v1",
+  "modelPolicy": {
+    "schemaVersion": "mira.openmaic.professional-model-policy.v1",
+    "policyId": "deepseek-v4-pro-current-flash-v1",
+    "agentDriver": {
+      "providerId": "deepseek",
+      "modelId": "deepseek-v4-pro",
+      "thinking": {
+        "mode": "enabled",
+        "enabled": true,
+        "effort": "high"
+      }
+    },
+    "coursewareCreator": {
+      "providerId": "deepseek",
+      "modelId": "deepseek-v4-pro",
+      "thinking": {
+        "mode": "disabled",
+        "enabled": false
+      }
+    },
+    "coursewareVerifier": {
+      "providerId": "deepseek",
+      "modelId": "deepseek-flash",
+      "thinking": {
+        "mode": "disabled",
+        "enabled": false
+      }
+    },
+    "structuredScene": {
+      "policyId": "deepseek-v4-pro-current-flash-v1",
+      "providerId": "deepseek",
+      "modelId": "deepseek-v4-pro",
+      "thinking": {
+        "mode": "disabled",
+        "enabled": false
+      }
+    },
+    "fallbackAllowed": false
+  },
+  "activation": "explicit_operator_pro_creation_current_flash_verification",
+  "legacyModelPolicySha256": "ea231a83dcd2c22d3a29197d2f6edc0a80c1ca58a0d8707fa4d3f4218168daff",
+  "officialModelIdentity": {
+    "creator": "DeepSeek-V4-Pro-0813",
+    "verifier": "DeepSeek-V4.1-Flash",
+    "verifierWireModel": "deepseek-flash",
+    "legacyVerifierWireModel": "deepseek-v4-flash",
+    "pricingSource": "https://api-docs.deepseek.com/quick_start/pricing/"
+  }
+}

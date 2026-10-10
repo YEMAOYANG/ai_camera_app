@@ -1,0 +1,350 @@
+--- a/lib/server/mira-vision-meter.ts
++++ b/lib/server/mira-vision-meter.ts
+@@ -1,10 +1,15 @@
+ import { createHash } from 'node:crypto';
++import { getMiraSelectedModelPolicyId, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID } from './model-routes';
+ 
+ export const FORMAL_VISION_MODEL = 'deepseek-v4-flash-vision-exp';
+ // Official documentation: every image is resized by the provider and costs at
+ // most 384 tokens. Reserve that upper bound; settle from provider usage later.
+ // https://api-docs.deepseek.com/zh-cn/guides/vision/#token-用量
+ export const DEEPSEEK_IMAGE_TOKEN_CEILING = 384;
++// Frozen legacy accounting above is unchanged. The current Flash vision guide
++// (verified 2026-10-08) specifies 1024 tokens per image, irrespective of size.
++// https://api-docs.deepseek.com/zh-cn/guides/vision/#token-用量
++export const DEEPSEEK_CURRENT_FLASH_IMAGE_TOKEN_CEILING = 1024;
+ 
+ export function checkedPngDimensions(data: Uint8Array) {
+   const bytes = Buffer.from(data);
+@@ -30,6 +35,9 @@
+   tools: unknown,
+ ) {
+   let imageCount = 0;
++  const candidate = getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
++  const expectedVisionModel = candidate ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : FORMAL_VISION_MODEL;
++  const imageTokenCeiling = candidate ? DEEPSEEK_CURRENT_FLASH_IMAGE_TOKEN_CEILING : DEEPSEEK_IMAGE_TOKEN_CEILING;
+   const measuredPrompt = prompt.map((message) => ({
+     ...message,
+     content: Array.isArray(message.content)
+@@ -37,7 +45,7 @@
+           if (part.type !== 'file') return part;
+           if (
+             provider !== 'deepseek' ||
+-            model !== FORMAL_VISION_MODEL ||
++            model !== expectedVisionModel ||
+             message.role !== 'user' ||
+             part.mediaType !== 'image/png' ||
+             !(part.data instanceof Uint8Array)
+@@ -60,6 +68,6 @@
+     inputTokens:
+       Buffer.byteLength(JSON.stringify({ prompt: measuredPrompt, tools })) +
+       4096 +
+-      imageCount * DEEPSEEK_IMAGE_TOKEN_CEILING,
++      imageCount * imageTokenCeiling,
+   };
+ }
+--- a/lib/server/mira-formal-visual-contract.ts
++++ b/lib/server/mira-formal-visual-contract.ts
+@@ -1,4 +1,6 @@
+ import { qualitySha } from './mira-formal-quality-contract';
++import { FORMAL_VISION_MODEL } from './mira-vision-meter';
++import { getMiraSelectedModelPolicyId, MIRA_PROFESSIONAL_MODEL_POLICY_ID, MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID, MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID, type MiraProfessionalModelPolicyId } from './model-routes';
+ 
+ export const VISUAL_RUBRIC_VERSION = 'mira.primary-teaching-visual.v1' as const;
+ export const VISUAL_RUBRIC = {
+@@ -8,12 +10,14 @@
+   interactionAffordance: '操作入口清楚，触屏可点、结果反馈可辨；静态页不伪装交互。',
+ } as const;
+ export type VisualInput = {
++  modelPolicyId?: MiraProfessionalModelPolicyId;
+   snapshotSha256: string; teachingQualityContextSha256: string; gradeBoundary: Record<string, unknown>;
+   scenes: readonly unknown[]; rubricVersion: typeof VISUAL_RUBRIC_VERSION;
+   observations: Array<{ sceneId: string; sceneSha256: string; viewport: {width:number;height:number};
+     screenshotSha256: string; screenshotPath: string; domSha256: string; title?: string; objective?: string }>;
+ };
+ export type VisualReviewReceipt = {
++  modelPolicyId?: typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID;
+   schemaVersion: 'mira.openmaic.visual-review.v1'; reviewerKind: 'vision_model';
+   status: 'passed' | 'needs_revision'; rubricVersion: typeof VISUAL_RUBRIC_VERSION;
+   snapshotSha256: string; teachingQualityContextSha256: string;
+@@ -21,13 +25,29 @@
+     legibility:'passed'|'needs_revision';layout:'passed'|'needs_revision';teachingGraphic:'passed'|'needs_revision';interactionAffordance:'passed'|'needs_revision';notes:string}>;
+   providerId:string;modelId:string;providerResponseModelId?:string;providerRequestIdHash:string;receiptSha256:string;
+ };
+-export function assertVisualReview(value: unknown, input: Pick<VisualInput,'snapshotSha256'|'teachingQualityContextSha256'|'observations'>): asserts value is VisualReviewReceipt {
++/** Receipt identity is derived from frozen input, never reinterpreted from the
++ * current server selector when observing a historical visual review. */
++export function formalVisualModel(input: Pick<VisualInput, 'modelPolicyId'>): string {
++  const policy = input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  if (policy === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) return MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
++  if (policy === MIRA_PROFESSIONAL_MODEL_POLICY_ID) return FORMAL_VISION_MODEL;
++  throw new Error('FORMAL_VISUAL_MODEL_POLICY_MISMATCH');
++}
++/** A new dispatch additionally requires the matching server policy. */
++export function selectedFormalVisualModel(input: Pick<VisualInput, 'modelPolicyId'>): string {
++  const selected = getMiraSelectedModelPolicyId() ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++  if (selected !== (input.modelPolicyId ?? MIRA_PROFESSIONAL_MODEL_POLICY_ID))
++    throw new Error('FORMAL_VISUAL_MODEL_POLICY_MISMATCH');
++  return formalVisualModel(input);
++}
++export function assertVisualReview(value: unknown, input: Pick<VisualInput,'snapshotSha256'|'teachingQualityContextSha256'|'observations'|'modelPolicyId'>): asserts value is VisualReviewReceipt {
+   const r=value as VisualReviewReceipt;
+   const sha=(v:unknown)=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
+   if (!r || r.schemaVersion!=='mira.openmaic.visual-review.v1'||r.reviewerKind!=='vision_model'
+     ||r.rubricVersion!==VISUAL_RUBRIC_VERSION||r.snapshotSha256!==input.snapshotSha256
+     ||r.teachingQualityContextSha256!==input.teachingQualityContextSha256
+-    ||!['passed','needs_revision'].includes(r.status)||r.providerId!=='deepseek'||r.modelId!=='deepseek-v4-flash-vision-exp'||!sha(r.providerRequestIdHash)
++    ||!['passed','needs_revision'].includes(r.status)||r.providerId!=='deepseek'||r.modelId!==formalVisualModel(input)||!sha(r.providerRequestIdHash)
++    ||(input.modelPolicyId===MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? r.modelPolicyId!==input.modelPolicyId : r.modelPolicyId!==undefined)
+     ||(r.providerResponseModelId!==undefined&&(typeof r.providerResponseModelId!=='string'||!r.providerResponseModelId.trim()||r.providerResponseModelId.length>200))
+     ||!Array.isArray(r.sceneReviews)||r.sceneReviews.length!==input.observations.length) throw new Error('FORMAL_VISUAL_RECEIPT_INVALID');
+   const seen=new Set<string>();
+--- a/lib/server/mira-formal-visual-review.ts
++++ b/lib/server/mira-formal-visual-review.ts
+@@ -3,12 +3,15 @@
+ import { isAbsolute, join, relative, resolve } from 'node:path';
+ import { defaultSettingsMiddleware, wrapLanguageModel } from 'ai';
+ import { callLLM } from '@/lib/ai/llm';
++import { isOfficialDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
+ import { resolveModel } from './resolve-model';
+ import { paidBudgetContext } from './mira-paid-budget';
+-import { checkedPngDimensions, FORMAL_VISION_MODEL } from './mira-vision-meter';
++import { checkedPngDimensions } from './mira-vision-meter';
++import { MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID } from './model-routes';
+ import { qualitySha } from './mira-formal-quality-contract';
+ import {
+   assertVisualReview,
++  selectedFormalVisualModel,
+   VISUAL_RUBRIC,
+   VISUAL_RUBRIC_VERSION,
+   type VisualInput,
+@@ -29,6 +32,7 @@
+   input: VisualInput,
+   signal?: AbortSignal,
+ ): Promise<VisualReviewReceipt> {
++  const modelId = selectedFormalVisualModel(input);
+   if (!paidBudgetContext.getStore()) throw new Error('MIRA_PAID_BUDGET_CONTEXT_REQUIRED');
+   if (
+     input.rubricVersion !== VISUAL_RUBRIC_VERSION ||
+@@ -40,19 +44,20 @@
+     !(process.env.DEEPSEEK_MODELS || '')
+       .split(',')
+       .map((s) => s.trim())
+-      .includes(FORMAL_VISION_MODEL)
++      .includes(modelId)
+   )
+     throw new Error('FORMAL_VISUAL_MODEL_NOT_CONFIGURED');
+-  const resolved = await resolveModel({ modelString: `deepseek:${FORMAL_VISION_MODEL}` });
++  const resolved = await resolveModel({ modelString: `deepseek:${modelId}` });
+   const endpoint = new URL(resolved.baseUrl || 'https://api.deepseek.com/v1');
+   if (
+     resolved.providerId !== 'deepseek' ||
+-    resolved.modelId !== FORMAL_VISION_MODEL ||
++    resolved.modelId !== modelId ||
+     !resolved.apiKey ||
+     endpoint.protocol !== 'https:' ||
+     endpoint.hostname !== 'api.deepseek.com' ||
+     endpoint.username ||
+-    endpoint.password
++    endpoint.password ||
++    (input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID && !isOfficialDeepSeekEndpoint(endpoint.href))
+   )
+     throw new Error('FORMAL_VISUAL_PROVIDER_UNAVAILABLE');
+ 
+@@ -64,6 +69,7 @@
+     type: 'text',
+     text: JSON.stringify({ snapshotSha256: input.snapshotSha256,
+       teachingQualityContextSha256: input.teachingQualityContextSha256,
++      ...(input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? { modelPolicyId: input.modelPolicyId } : {}),
+       rubric: VISUAL_RUBRIC, gradeBoundary: input.gradeBoundary }),
+   });
+   let bytes = 0;
+@@ -129,6 +135,7 @@
+     schemaVersion: 'mira.openmaic.visual-provider-response.v1',
+     snapshotSha256: input.snapshotSha256,
+     teachingQualityContextSha256: input.teachingQualityContextSha256,
++    ...(input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? { modelPolicyId: input.modelPolicyId } : {}),
+     authorizationId: paidBudgetContext.getStore()!.binding.authorizationId,
+     providerId: resolved.providerId,
+     requestedModelId: resolved.modelId,
+@@ -191,6 +198,7 @@
+     rubricVersion: VISUAL_RUBRIC_VERSION,
+     snapshotSha256: input.snapshotSha256,
+     teachingQualityContextSha256: input.teachingQualityContextSha256,
++    ...(input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID ? { modelPolicyId: input.modelPolicyId } : {}),
+     sceneReviews,
+     providerId: resolved.providerId,
+     modelId: resolved.modelId,
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -181,6 +181,7 @@
+   if(seen.size!==expected.size)throw new Error('FORMAL_QUALITY_RENDER_IDENTITY_MISMATCH');
+   if(plan?.schemaVersion==='mira.openmaic.interaction-design-plan.v2') {
+     assertVisualReview(visualReview,{snapshotSha256,
++      ...(input.modelPolicyId ? { modelPolicyId: input.modelPolicyId } : {}),
+       teachingQualityContextSha256:qualitySha({snapshotSha256,gradeBoundarySha256,selectionPlanSha256,teachingBriefSha256}),
+       observations:observations.map(o=>({...o,screenshotPath:o.screenshotPath??''}))});
+     if(visualReview.status!=='passed')throw new Error('FORMAL_VISUAL_RECEIPT_INVALID');
+@@ -435,7 +436,8 @@
+       await save(join(folder, `${artifactPrefix}-browser.json`), observations);
+       let visualReview: VisualReviewReceipt | undefined;
+       if (!issues.length && multistate) {
+-        const visualInput = {snapshotSha256, teachingQualityContextSha256:qualitySha({snapshotSha256,gradeBoundarySha256,selectionPlanSha256,teachingBriefSha256}),
++        const visualInput = {snapshotSha256,
++          ...(input.modelPolicyId ? { modelPolicyId: input.modelPolicyId } : {}), teachingQualityContextSha256:qualitySha({snapshotSha256,gradeBoundarySha256,selectionPlanSha256,teachingBriefSha256}),
+           gradeBoundary:input.gradeBoundary, scenes:snapshot.scenes, rubricVersion:VISUAL_RUBRIC_VERSION,
+           observations:observations.map(o=>({...o,screenshotPath:o.screenshotPath ?? '',title:scenes.find(s=>s.id===o.sceneId)?.title,objective:JSON.stringify(input.gradeBoundary.learningObjectives)}))};
+         visualReview = await reviewFormalVisualSnapshot(visualInput, signal);
+--- a/lib/server/mira-formal-completion-tail-budget.ts
++++ b/lib/server/mira-formal-completion-tail-budget.ts
+@@ -13,7 +13,6 @@
+ } as const;
+ const FLASH_CANDIDATE_PRICE_MODELS = {
+   'deepseek-v4.1-flash-peak': ['deepseek', 'deepseek-flash'],
+-  'deepseek-vision-peak': ['deepseek', 'deepseek-v4-flash-vision-exp'],
+   'qwen-tts-beijing': ['qwen-tts', 'qwen3-tts-flash'],
+   'qwen-asr-beijing': ['qwen-asr', 'qwen3-asr-flash'],
+ } as const;
+--- a/tests/server/mira-formal-completion-tail-budget.test.ts
++++ b/tests/server/mira-formal-completion-tail-budget.test.ts
+@@ -154,3 +154,24 @@
+     expect(() => assertCompletionTailRenewal(token, changed)).toThrow('RENEWAL_SCOPE_CHANGED');
+   }
+ });
++
++const candidateModels = {
++  'deepseek-v4.1-flash-peak': { provider: 'deepseek', model: 'deepseek-flash' },
++  'qwen-tts-beijing': models['qwen-tts-beijing'],
++  'qwen-asr-beijing': models['qwen-asr-beijing'],
++};
++it('accepts the exact current Flash completion scope without an obsolete vision model price', async () => {
++  const { sidecar, expected } = fixture(); sidecar.priceKeys = Object.keys(candidateModels).sort();
++  mockAuthority(sidecar, authority => { authority.prices = structuredClone(candidateModels); });
++  const token = await validateCompletionTailBudget(sidecar, expected);
++  expect(completionTailPaidBudget(token)).toEqual(sidecar.paidBudget);
++});
++it.each(['legacy-vision', 'wrong-flash'])('rejects a candidate completion %s price scope', async scenario => {
++  const { sidecar, expected } = fixture(); sidecar.priceKeys = Object.keys(candidateModels).sort();
++  if (scenario === 'legacy-vision') sidecar.priceKeys.push('deepseek-vision-peak');
++  mockAuthority(sidecar, authority => {
++    authority.prices = structuredClone(candidateModels);
++    if (scenario === 'wrong-flash') authority.prices['deepseek-v4.1-flash-peak'].model = 'deepseek-v4-flash';
++  });
++  await expect(validateCompletionTailBudget(sidecar, expected)).rejects.toThrow('SAVED_STAGE_COMPLETION_BUDGET_');
++});
+--- /dev/null
++++ b/tests/server/mira-flash-formal-visual.test.ts
+@@ -0,0 +1,113 @@
++import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
++import { join, resolve } from 'node:path';
++import { createHash, randomUUID } from 'node:crypto';
++import sharp from 'sharp';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { reviewFormalVisualSnapshot } from '@/lib/server/mira-formal-visual-review';
++import { assertVisualReview, formalVisualModel, selectedFormalVisualModel, VISUAL_RUBRIC_VERSION,
++  type VisualInput, type VisualReviewReceipt } from '@/lib/server/mira-formal-visual-contract';
++import { measureModelInput, DEEPSEEK_IMAGE_TOKEN_CEILING, DEEPSEEK_CURRENT_FLASH_IMAGE_TOKEN_CEILING,
++  FORMAL_VISION_MODEL } from '@/lib/server/mira-vision-meter';
++import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
++
++const mocks = vi.hoisted(() => ({ resolve: vi.fn(), call: vi.fn(), paid: vi.fn() }));
++vi.mock('@/lib/server/resolve-model', () => ({ resolveModel: mocks.resolve }));
++vi.mock('@/lib/ai/llm', () => ({ callLLM: mocks.call }));
++vi.mock('@/lib/server/mira-paid-budget', () => ({ paidBudgetContext: { getStore: mocks.paid } }));
++vi.mock('ai', () => ({ wrapLanguageModel: ({ model }: { model: unknown }) => model,
++  defaultSettingsMiddleware: (value: unknown) => value }));
++const id = 'deepseek-v4.1-flash-candidate-v1';
++let folder: string, input: VisualInput, png: Buffer;
++function returnedReview() {
++  return { sceneReviews: [{ observationIndex: 0, legibility: 'passed', layout: 'passed',
++    teachingGraphic: 'passed', interactionAffordance: 'passed', notes: '两组苹果清晰，点按入口和结果区域可见。' }] };
++}
++function resolved(modelId = 'deepseek-flash', baseUrl = 'https://api.deepseek.com/v1') {
++  return { providerId: 'deepseek', modelId, model: { modelId }, apiKey: 'test-only-key', baseUrl };
++}
++function frozenReceipt(modelId: string, modelPolicyId?: typeof id): VisualReviewReceipt {
++  const unsigned = { schemaVersion: 'mira.openmaic.visual-review.v1' as const, reviewerKind: 'vision_model' as const,
++    status: 'passed' as const, rubricVersion: VISUAL_RUBRIC_VERSION, snapshotSha256: input.snapshotSha256,
++    teachingQualityContextSha256: input.teachingQualityContextSha256,
++    ...(modelPolicyId ? { modelPolicyId } : {}), sceneReviews: input.observations.map(o => ({
++      sceneId: o.sceneId, sceneSha256: o.sceneSha256, viewport: o.viewport, screenshotSha256: o.screenshotSha256,
++      legibility: 'passed' as const, layout: 'passed' as const, teachingGraphic: 'passed' as const,
++      interactionAffordance: 'passed' as const, notes: '实际图片清晰可见。' })),
++    providerId: 'deepseek', modelId, providerRequestIdHash: 'a'.repeat(64) };
++  return { ...unsigned, receiptSha256: qualitySha(unsigned) };
++}
++beforeEach(async () => {
++  vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', id);
++  vi.stubEnv('DEEPSEEK_MODELS', 'deepseek-flash');
++  folder = await mkdtemp(join(resolve('data'), 'flash-visual-test-'));
++  png = await sharp({ create: { width: 1280, height: 720, channels: 4, background: '#fff6e0' } }).png().toBuffer();
++  const path = join(folder, 'scene.png'); await writeFile(path, png);
++  input = { modelPolicyId: id, snapshotSha256: qualitySha(randomUUID()), teachingQualityContextSha256: 'b'.repeat(64),
++    gradeBoundary: { gradeCode: 'primary_1' }, scenes: [], rubricVersion: VISUAL_RUBRIC_VERSION,
++    observations: [{ sceneId: 'scene-1', sceneSha256: 'c'.repeat(64), viewport: { width: 1280, height: 720 },
++      screenshotSha256: createHash('sha256').update(png).digest('hex'), screenshotPath: path, domSha256: 'd'.repeat(64) }] };
++  mocks.paid.mockReset().mockReturnValue({ binding: { authorizationId: 'test-visual-authorization' } });
++  mocks.resolve.mockReset().mockResolvedValue(resolved());
++  mocks.call.mockReset().mockResolvedValue({ text: JSON.stringify(returnedReview()),
++    response: { id: 'test-provider-request', modelId: 'deepseek-flash' }, usage: { inputTokens: 2048, outputTokens: 100 } });
++});
++afterEach(async () => {
++  await rm(folder, { recursive: true, force: true });
++  await rm(join(resolve('data/formal-visual-provider-responses'), input.snapshotSha256), { recursive: true, force: true });
++  vi.unstubAllEnvs();
++});
++
++describe('current Flash visual review and metering without a paid call', () => {
++  it('requests current Flash with actual PNG bytes and archives and signs its frozen policy identity', async () => {
++    const result = await reviewFormalVisualSnapshot(input);
++    expect(mocks.resolve).toHaveBeenCalledWith({ modelString: 'deepseek:deepseek-flash' });
++    expect(mocks.call).toHaveBeenCalledOnce();
++    const [request, source, , thinking] = mocks.call.mock.calls[0];
++    expect(source).toBe('mira-formal-visual-review');
++    expect(thinking).toEqual({ mode: 'disabled', enabled: false });
++    expect(request.maxRetries).toBe(0);
++    expect(request.messages[1].content.at(-1).image).toEqual(png);
++    expect(result).toMatchObject({ modelPolicyId: id, modelId: 'deepseek-flash', providerResponseModelId: 'deepseek-flash' });
++    expect(() => assertVisualReview(result, input)).not.toThrow();
++    const archiveFolder = join(resolve('data/formal-visual-provider-responses'), input.snapshotSha256);
++    const archive = JSON.parse(await readFile(join(archiveFolder, (await readdir(archiveFolder))[0]), 'utf8'));
++    expect(archive).toMatchObject({ modelPolicyId: id, requestedModelId: 'deepseek-flash', responseModelId: 'deepseek-flash' });
++  });
++  it.each(['missing-server', 'legacy-server', 'missing-input'])('rejects %s before resolving or calling a model', async scenario => {
++    if (scenario === 'missing-server') delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    if (scenario === 'legacy-server') process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
++    if (scenario === 'missing-input') delete input.modelPolicyId;
++    await expect(reviewFormalVisualSnapshot(input)).rejects.toThrow('FORMAL_VISUAL_MODEL_POLICY_MISMATCH');
++    expect(mocks.resolve).not.toHaveBeenCalled(); expect(mocks.call).not.toHaveBeenCalled();
++  });
++  it.each(['model', 'endpoint', 'catalog'])('refuses a mismatching candidate %s before dispatch', async scenario => {
++    if (scenario === 'model') mocks.resolve.mockResolvedValue(resolved(FORMAL_VISION_MODEL));
++    if (scenario === 'endpoint') mocks.resolve.mockResolvedValue(resolved('deepseek-flash', 'https://api.deepseek.com:8443/v1'));
++    if (scenario === 'catalog') process.env.DEEPSEEK_MODELS = FORMAL_VISION_MODEL;
++    await expect(reviewFormalVisualSnapshot(input)).rejects.toThrow(/FORMAL_VISUAL_(PROVIDER_UNAVAILABLE|MODEL_NOT_CONFIGURED)/);
++    expect(mocks.call).not.toHaveBeenCalled();
++  });
++  it('requires the current model and explicit policy in candidate receipts without reinterpretation from the current environment', () => {
++    const candidate = frozenReceipt('deepseek-flash', id), legacy = frozenReceipt(FORMAL_VISION_MODEL);
++    expect(() => assertVisualReview(candidate, input)).not.toThrow();
++    for (const value of [frozenReceipt('deepseek-flash'), frozenReceipt(FORMAL_VISION_MODEL, id), legacy])
++      expect(() => assertVisualReview(value, input)).toThrow('FORMAL_VISUAL_RECEIPT_INVALID');
++    const oldInput = { ...input }; delete oldInput.modelPolicyId;
++    expect(formalVisualModel(oldInput)).toBe(FORMAL_VISION_MODEL);
++    expect(() => assertVisualReview(legacy, oldInput)).not.toThrow();
++    expect(() => assertVisualReview(candidate, oldInput)).toThrow('FORMAL_VISUAL_RECEIPT_INVALID');
++    expect(() => selectedFormalVisualModel(oldInput)).toThrow('FORMAL_VISUAL_MODEL_POLICY_MISMATCH');
++  });
++  it('meters candidate PNG input with the verified 1024-token image ceiling and binds the actual model', () => {
++    const prompt = [{ role: 'user', content: [{ type: 'file', mediaType: 'image/png', data: png }] }];
++    const candidate = measureModelInput('deepseek', 'deepseek-flash', prompt, undefined);
++    expect(candidate.inputTokens).toBe(Buffer.byteLength(JSON.stringify(candidate.request)) + 4096 + DEEPSEEK_CURRENT_FLASH_IMAGE_TOKEN_CEILING);
++    expect(JSON.stringify(candidate.request)).not.toContain(png.toString('base64'));
++    expect(() => measureModelInput('deepseek', FORMAL_VISION_MODEL, prompt, undefined)).toThrow('VISION_METER_UNAVAILABLE');
++    delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;
++    const legacy = measureModelInput('deepseek', FORMAL_VISION_MODEL, prompt, undefined);
++    expect(legacy.inputTokens).toBe(Buffer.byteLength(JSON.stringify(legacy.request)) + 4096 + DEEPSEEK_IMAGE_TOKEN_CEILING);
++    expect(DEEPSEEK_IMAGE_TOKEN_CEILING).toBe(384);
++    expect(() => measureModelInput('deepseek', 'deepseek-flash', prompt, undefined)).toThrow('VISION_METER_UNAVAILABLE');
++  });
++});
