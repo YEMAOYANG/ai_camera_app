@@ -452,7 +452,10 @@ def learning_curriculum_preparation_checkpoint_adapter() -> CheckpointSharedBuil
     adapter = FormalProductionStageAdapter(
         restricted_catalog_service,
         repository=checkpoint_repository,
-        runtime_candidate_processor=lambda **scope: process_next_formal_runtime_candidate(**scope),
+        runtime_candidate_processor=(
+            (lambda **scope: process_next_formal_runtime_candidate(**scope))
+            if formal_runtime_enabled else None
+        ),
         formal_repository=formal_repository,
         formal_audio_service=formal_audio_service,
         formal_audio_validation_enabled=(

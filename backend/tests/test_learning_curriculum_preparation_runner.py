@@ -4,6 +4,7 @@ import copy
 from contextlib import contextmanager
 import json
 import os
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -52,6 +53,18 @@ def _app(**overrides) -> Flask:
     return app
 
 
+class _RunnerProbeConnection:
+    def execute(self, sql, params=()):
+        if ("SELECT plan.target_spec_json FROM learning_curriculum_preparation_plans AS plan"
+                not in " ".join(sql.split()) or tuple(params) != ("primary_1",)):
+            raise AssertionError("unexpected runner authority probe")
+        return self
+
+    def fetchone(self):
+        # These fixtures resume the existing frozen legacy plan only.
+        return None
+
+
 class _FakeRepository:
     def __init__(self):
         self.plan = {
@@ -92,7 +105,7 @@ class _FakeRepository:
         self.in_transaction = True
         self.transaction_count += 1
         try:
-            yield object()
+            yield _RunnerProbeConnection()
         finally:
             self.in_transaction = False
 
@@ -871,6 +884,46 @@ class LearningCurriculumPreparationRunnerTest(unittest.TestCase):
             "audit_content_host_retry_graph",
         )
 
+    def test_checkpoint_factory_runtime_dispatch_requires_all_enablement_fields(self):
+        from types import SimpleNamespace
+        from services import service_factory
+
+        enabled = {
+            "OPENMAIC_FULL_RUNTIME_ENABLED": True,
+            "OPENMAIC_FULL_RUNTIME_GENERATION_ENABLED": True,
+            "OPENMAIC_FULL_RUNTIME_INTERNAL_URL": "http://127.0.0.1:3100",
+            "INTERNAL_API_TOKEN": "fixture-internal-token",
+        }
+        for missing in (None, *enabled):
+            with self.subTest(missing=missing):
+                config = dict(enabled)
+                if missing is not None:
+                    config[missing] = False if isinstance(config[missing], bool) else ""
+                app = _app(
+                    DATABASE_URL="mysql+pymysql://unused:unused@127.0.0.1/unused",
+                    **config,
+                )
+                with app.app_context(), patch.object(
+                    service_factory, "openmaic_full_runtime_service",
+                    return_value=SimpleNamespace(client=None),
+                ) as runtime_factory, patch.object(
+                    service_factory, "process_next_formal_runtime_candidate",
+                    return_value={"dispatched": True},
+                ) as processor:
+                    adapter = service_factory.learning_curriculum_preparation_checkpoint_adapter()
+                    if missing is None:
+                        plan = {"id": "fixture-authorized-preparation"}
+                        self.assertEqual(
+                            adapter.runtime_candidate_processor(preparation_plan=plan),
+                            {"dispatched": True},
+                        )
+                        runtime_factory.assert_called_once_with()
+                        processor.assert_called_once_with(preparation_plan=plan)
+                    else:
+                        self.assertIsNone(adapter.runtime_candidate_processor)
+                        runtime_factory.assert_not_called()
+                        processor.assert_not_called()
+
     def test_checkpoint_factory_freezes_exact_secret_free_seven_key_profile(self):
         from services import service_factory
 
@@ -1129,7 +1182,14 @@ class LearningCurriculumPreparationRunnerTest(unittest.TestCase):
         adapter.advance = advance
         self.assertFalse(has_app_context())
 
-        runner._run(app, interval=0)
+        timeout = threading.Timer(2, runner._stop.set)
+        timeout.daemon = True
+        timeout.start()
+        try:
+            runner._run(app, interval=0)
+        finally:
+            runner._stop.set()
+            timeout.cancel()
 
         self.assertEqual(observed, [(True, 1_000)])
         self.assertEqual(adapter.calls, ["planning"])

@@ -53,6 +53,24 @@ from tests.test_learning_generated_course_validator import formal_host_fixture
 from tests.test_openmaic_question_phase_adapter import _outline_checkpoint
 
 
+def _resume_legacy_content_build(service, *, request_id, title,
+                                 preparation_target, target_fingerprint):
+    """Restore a pre-progressive batch, then exercise the real resume path."""
+    with service.repository.transaction() as conn:
+        existing = service.repository.get_build_by_request(conn, request_id=request_id)
+        if existing is None:
+            service.repository.create_or_get_content_build(
+                conn, request_id=request_id, title=title,
+                curriculum_version=preparation_target["curriculumVersion"],
+                target_spec=preparation_target, target_fingerprint=target_fingerprint,
+                now=service._content_clock_ms(),
+            )
+    return service.create_preparation_content_build(
+        request_id=request_id, title=title, preparation_target=preparation_target,
+        target_fingerprint=target_fingerprint,
+    )
+
+
 class LearningCatalogContentOnlyContractTest(unittest.TestCase):
     def test_provider_dependency_projection_is_exact_and_rejects_artifact_residue(self):
         service = object.__new__(LearningCatalogReleaseService)
@@ -1188,7 +1206,11 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
             "attempt_count": 1,
             "active_generation_request_id": "request-1",
             "subject": "chinese",
-            "skill_id": "primary_1_chinese_pinyin_initials",
+            "skill_id": "pinyin_initials_syllables",
+            "subject_ordinal": 1,
+            "boundary_ordinal": 1,
+            "boundary_version": "primary_1_chinese_pinyin_initials_syllables.v1",
+            "variant_ordinal": 1,
         }
         dispatches = [
             {
@@ -1245,6 +1267,9 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
         ]
 
         class Repository:
+            def get_build(self, conn, *, build_id):
+                return {"id": build_id, "target_spec_json": json.dumps(build_preparation_target("primary_1"))}
+
             def load_content_proof_inventory(self, conn, *, build_id):
                 self.call = (conn, build_id)
                 return {
@@ -2102,7 +2127,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
             clock_ms=lambda: now,
         )
         target = build_preparation_target("primary_1")
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id="task7-real-canary-provider-phase",
             title="Task 7 Provider 单阶段",
             preparation_target=target,
@@ -2133,7 +2158,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
         self.assertEqual(item["skill_id"], "pinyin_syllables")
         self.assertEqual(item["content_phase"], "raw_candidate")
         self.assertIsNone(item["content_lease_token"])
-        self.assertEqual(item["content_work_unit_deadline_at"], now + 120_000)
+        self.assertEqual(item["content_work_unit_deadline_at"], now + LearningCatalogRepository.FORMAL_CONTENT_WORK_UNIT_MS)
         self.assertEqual(len(dispatches), 1)
         self.assertEqual(dispatches[0]["phase"], "outline")
         self.assertEqual(dispatches[0]["status"], "succeeded")
@@ -2169,7 +2194,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
             clock_ms=lambda: now,
         )
         target = build_preparation_target("primary_1")
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id="task7-real-host-finalize",
             title="Task 7 Host 原子完成",
             preparation_target=target,
@@ -2344,7 +2369,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
             clock_ms=lambda: now,
         )
         target = build_preparation_target("primary_1")
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id="task7-real-attempt-two-authority",
             title="Task 7 唯一内容修复授权",
             preparation_target=target,
@@ -2571,7 +2596,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
             clock_ms=lambda: now,
         )
         target = build_preparation_target("primary_1")
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id="task7-real-attempt-two-overlap",
             title="Task 7 双修复授权",
             preparation_target=target,
@@ -2695,7 +2720,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
             clock_ms=lambda: now,
         )
         target = build_preparation_target("primary_1")
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id="task7-real-overlap",
             title="Task 7 双 claimer",
             preparation_target=target,
@@ -2807,7 +2832,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
 
         for label in ("false", "raise", "cleanup_cas_loss"):
             with self.subTest(binder=label):
-                created = service.create_preparation_content_build(
+                created = _resume_legacy_content_build(service,
                     request_id=f"task8-provider-binder-{label}",
                     title=f"Task 8 Provider binder {label}",
                     preparation_target=target,
@@ -2921,7 +2946,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
             with self.subTest(binder=label), patch.dict(
                 os.environ, {"APP_AI_API_KEY": "test-only"}, clear=False
             ):
-                created = service.create_preparation_content_build(
+                created = _resume_legacy_content_build(service,
                     request_id=f"task8-host-binder-{label}",
                     title=f"Task 8 Host binder {label}",
                     preparation_target=target,

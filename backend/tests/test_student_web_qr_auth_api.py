@@ -158,8 +158,9 @@ class StudentWebQrAuthApiTest(unittest.TestCase):
         self.assertEqual(rejected.status_code, 409, rejected.json)
         self.assertEqual(rejected.json["error"], "student_learning_primary_only")
 
-    def test_qr_approval_rejects_unopened_primary_grade_without_binding(self):
+    def test_qr_approval_rejects_unconfirmed_primary_grade_without_binding(self):
         created = self._create_challenge()
+        # A directly inserted child has no saved grade selection revision.
         primary_two_id = self._insert_child("安安", "primary_2")
 
         rejected = self.client.post(
@@ -169,7 +170,7 @@ class StudentWebQrAuthApiTest(unittest.TestCase):
         )
 
         self.assertEqual(rejected.status_code, 409, rejected.json)
-        self.assertEqual(rejected.json["error"], "student_learning_grade_not_open")
+        self.assertEqual(rejected.json["error"], "student_learning_release_not_ready")
         with self.database.transaction() as conn:
             challenge = conn.execute(
                 "SELECT status, child_id FROM student_pairing_challenges WHERE challenge_hash = ?",

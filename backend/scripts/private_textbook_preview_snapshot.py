@@ -25,7 +25,8 @@ from content.textbook_catalog import digest
 from content.textbook_interactive_narration import AUDIO_BLOCK, interactive_cues, without_audio_helper
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient, OpenMaicFullRuntimeError
 from scripts.narrate_textbook_batch import DEFAULT_CLASSROOM_DIRECTORY, load_candidate
-from services.textbook_batch_audio import build_audio_plan, narration_workload, save_json
+from services.textbook_batch_audio import (audio_language_policy_from_plan, build_audio_plan,
+                                          narration_workload, save_json)
 from services.textbook_preview_audio import core_content
 
 SCHEMA = "mira.textbook.private-preview-snapshot.v1"
@@ -96,6 +97,7 @@ def verify_complete_audio(original, narrated, plan, audit, media_directory):
             or digest(teaching_core(narrated)) != plan.get("coreSha256")):
         raise ValueError("private_preview_narrated_source_mismatch")
     workload = narration_workload(original)
+    auto_language = audio_language_policy_from_plan(plan) is not None
     segments = audit.get("segments", [])
     if (audit.get("schemaVersion") != "mira.textbook.batch-audio-audit.v1"
             or audit.get("publicationAllowed") is not False or audit.get("allSegmentsPassed") is not True
@@ -123,6 +125,9 @@ def verify_complete_audio(original, narrated, plan, audit, media_directory):
                 or not IDENTITY.fullmatch(tts_id) or not HASH.fullmatch(audio_hash)
                 or not isinstance(segment.get("similarityBps"), int) or segment["similarityBps"] < 8500):
             raise ValueError("private_preview_audio_segment_mismatch")
+        if auto_language and (not re.fullmatch(r"tbbtts2_[0-9a-f]{64}", tts_id)
+                or not re.fullmatch(r"(?:tbbasr2|tbbreasr2)_[0-9a-f]{64}", str(segment.get("asrRequestId", "")))):
+            raise ValueError("private_preview_audio_language_namespace_mismatch")
         seen.add(key)
         url = f"/api/classroom-media/{source_id}/audio/{tts_id}.wav"
         if segment.get("audioUrl") != url:
@@ -219,7 +224,8 @@ def prepare_snapshot(candidate_directory, output, *, audio_audit_directory=None,
     if loaded["input"] != frozen or loaded["state"] != state or loaded["classroom"] != original:
         raise ValueError("private_preview_source_changed_during_read")
     plan, audit, narrated = loaded["audioPlan"], loaded["audioAudit"], loaded["narratedClassroom"]
-    if plan != build_audio_plan(original, frozen["binding"], origin):
+    if plan != build_audio_plan(original, frozen["binding"], origin,
+                               audio_language_policy=audio_language_policy_from_plan(plan)):
         raise ValueError("private_preview_audio_plan_mismatch")
     assets = verify_complete_audio(original, narrated, plan, audit, classroom_directory)
     alias, mapping = make_alias(narrated, alias_id or "tbprivate_" + uuid4().hex[:24])

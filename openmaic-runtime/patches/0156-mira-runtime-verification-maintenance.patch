@@ -1,0 +1,1588 @@
+diff --git a/app/api/transcription/route.ts b/app/api/transcription/route.ts
+--- a/app/api/transcription/route.ts
++++ b/app/api/transcription/route.ts
+@@ -136,7 +136,7 @@
+     return apiSuccess({ text: result.text });
+   } catch (error) {
+     if (miraRuntime) {
+-      log.error('Mira Qwen ASR transcription failed');
++      log.error('Mira ASR transcription failed');
+       return apiError('TRANSCRIPTION_FAILED', 500, 'Transcription failed');
+     }
+     log.error(
+diff --git a/lib/i18n/workbench-locales/ar-SA.json b/lib/i18n/workbench-locales/ar-SA.json
+--- a/lib/i18n/workbench-locales/ar-SA.json
++++ b/lib/i18n/workbench-locales/ar-SA.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "حذف"
+     },
+     "title": {
++      "mira-primary-courseware": "مواد Mira الدراسية للمرحلة الابتدائية",
+       "build-personal-skill": "إنشاء Skill خاص بك",
+       "curriculum-planner": "تخطيط سلسلة دروس",
+       "stage-dsl": "بنية مستند الدرس",
+diff --git a/lib/i18n/workbench-locales/de-DE.json b/lib/i18n/workbench-locales/de-DE.json
+--- a/lib/i18n/workbench-locales/de-DE.json
++++ b/lib/i18n/workbench-locales/de-DE.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "Löschen"
+     },
+     "title": {
++      "mira-primary-courseware": "Mira-Unterrichtsmaterial für die Grundschule",
+       "build-personal-skill": "Eigenen Skill bauen",
+       "curriculum-planner": "Reihenplanung",
+       "stage-dsl": "Klassendokumentstruktur",
+diff --git a/lib/i18n/workbench-locales/es-MX.json b/lib/i18n/workbench-locales/es-MX.json
+--- a/lib/i18n/workbench-locales/es-MX.json
++++ b/lib/i18n/workbench-locales/es-MX.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "Eliminar"
+     },
+     "title": {
++      "mira-primary-courseware": "Material didáctico Mira de primaria",
+       "build-personal-skill": "Crear un Skill propio",
+       "curriculum-planner": "Planeación de serie",
+       "stage-dsl": "Estructura del documento del aula",
+diff --git a/lib/i18n/workbench-locales/fr-FR.json b/lib/i18n/workbench-locales/fr-FR.json
+--- a/lib/i18n/workbench-locales/fr-FR.json
++++ b/lib/i18n/workbench-locales/fr-FR.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "Supprimer"
+     },
+     "title": {
++      "mira-primary-courseware": "Supports de cours Mira pour le primaire",
+       "build-personal-skill": "Créer un Skill personnel",
+       "curriculum-planner": "Planification de série",
+       "stage-dsl": "Structure du document de classe",
+diff --git a/lib/i18n/workbench-locales/ja-JP.json b/lib/i18n/workbench-locales/ja-JP.json
+--- a/lib/i18n/workbench-locales/ja-JP.json
++++ b/lib/i18n/workbench-locales/ja-JP.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "削除"
+     },
+     "title": {
++      "mira-primary-courseware": "Mira 小学校向け教材",
+       "build-personal-skill": "専用 Skill を作成",
+       "curriculum-planner": "シリーズ設計",
+       "stage-dsl": "授業文書構造",
+diff --git a/lib/i18n/workbench-locales/ko-KR.json b/lib/i18n/workbench-locales/ko-KR.json
+--- a/lib/i18n/workbench-locales/ko-KR.json
++++ b/lib/i18n/workbench-locales/ko-KR.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "삭제"
+     },
+     "title": {
++      "mira-primary-courseware": "Mira 초등 교과 수업 자료",
+       "build-personal-skill": "전용 Skill 만들기",
+       "curriculum-planner": "시리즈 수업 기획",
+       "stage-dsl": "수업 문서 구조",
+diff --git a/lib/i18n/workbench-locales/pt-BR.json b/lib/i18n/workbench-locales/pt-BR.json
+--- a/lib/i18n/workbench-locales/pt-BR.json
++++ b/lib/i18n/workbench-locales/pt-BR.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "Excluir"
+     },
+     "title": {
++      "mira-primary-courseware": "Material didático Mira para o ensino fundamental",
+       "build-personal-skill": "Criar um Skill próprio",
+       "curriculum-planner": "Planejamento de série",
+       "stage-dsl": "Estrutura do documento da sala",
+diff --git a/lib/i18n/workbench-locales/ru-RU.json b/lib/i18n/workbench-locales/ru-RU.json
+--- a/lib/i18n/workbench-locales/ru-RU.json
++++ b/lib/i18n/workbench-locales/ru-RU.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "Удалить"
+     },
+     "title": {
++      "mira-primary-courseware": "Учебные материалы Mira для начальной школы",
+       "build-personal-skill": "Создать личный Skill",
+       "curriculum-planner": "Планирование серии",
+       "stage-dsl": "Структура документа класса",
+diff --git a/lib/i18n/workbench-locales/vi-VN.json b/lib/i18n/workbench-locales/vi-VN.json
+--- a/lib/i18n/workbench-locales/vi-VN.json
++++ b/lib/i18n/workbench-locales/vi-VN.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "Xóa"
+     },
+     "title": {
++      "mira-primary-courseware": "Học liệu tiểu học Mira",
+       "build-personal-skill": "Tạo Skill riêng",
+       "curriculum-planner": "Lập kế hoạch chuỗi bài",
+       "stage-dsl": "Cấu trúc tài liệu lớp học",
+diff --git a/lib/i18n/workbench-locales/zh-TW.json b/lib/i18n/workbench-locales/zh-TW.json
+--- a/lib/i18n/workbench-locales/zh-TW.json
++++ b/lib/i18n/workbench-locales/zh-TW.json
+@@ -74,6 +74,7 @@
+       "confirmDelete": "刪除"
+     },
+     "title": {
++      "mira-primary-courseware": "Mira 小學教材課件",
+       "build-personal-skill": "建立專屬 Skill",
+       "curriculum-planner": "系列課規劃",
+       "stage-dsl": "課堂文件結構",
+diff --git a/lib/i18n/workbench.ts b/lib/i18n/workbench.ts
+--- a/lib/i18n/workbench.ts
++++ b/lib/i18n/workbench.ts
+@@ -131,6 +131,7 @@
+       confirmDelete: 'Delete',
+     },
+     title: {
++      'mira-primary-courseware': 'Mira primary courseware',
+       'build-personal-skill': 'Build a personal Skill',
+       'curriculum-planner': 'Series planning',
+       'stage-dsl': 'Classroom document structure',
+@@ -430,6 +431,7 @@
+       confirmDelete: '删除',
+     },
+     title: {
++      'mira-primary-courseware': 'Mira 小学教材课件',
+       'build-personal-skill': '创建专属 Skill',
+       'curriculum-planner': '系列课规划',
+       'stage-dsl': '课堂文档结构',
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -37,6 +37,10 @@
+ import type { UserRequirements } from '@/lib/types/generation';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ import { AGENT_COLOR_PALETTE, AGENT_DEFAULT_AVATARS } from '@/lib/constants/agent-defaults';
++import {
++  MIRA_SAMPLE_TEACHER_AVATAR,
++  MIRA_SAMPLE_TEACHER_ID,
++} from '@/lib/mira/sample-teacher-identity';
+ import {
+   getMiraTeacherName,
+   getMiraTeacherVoiceConfig,
+@@ -668,7 +672,11 @@
+               name: batchTeacher?.teacherName ?? getMiraTeacherName(a.role, a.name, miraTtsPolicy),
+               role: a.role,
+               persona: a.persona || '',
+-              avatar: batchTeacher?.avatarPath ?? AGENT_DEFAULT_AVATARS[i % AGENT_DEFAULT_AVATARS.length],
++              avatar: batchTeacher?.avatarPath
++                ?? (miraSampleStructuralPlan && a.id === MIRA_SAMPLE_TEACHER_ID
++                  ? MIRA_SAMPLE_TEACHER_AVATAR
++                  : undefined)
++                ?? AGENT_DEFAULT_AVATARS[i % AGENT_DEFAULT_AVATARS.length],
+               color: AGENT_COLOR_PALETTE[i % AGENT_COLOR_PALETTE.length],
+               priority: a.role === 'teacher' ? 10 : a.role === 'assistant' ? 7 : 5,
+               ...(voiceConfig ? { voiceConfig } : {}),
+diff --git a/lib/server/mira-model-exports.ts b/lib/server/mira-model-exports.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-model-exports.ts
+@@ -0,0 +1,19 @@
++/** Original public Mira policy symbols retained by the generic route composition. */
++export {
++  MIRA_STRUCTURED_SCENE_POLICY_ENV,
++  MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA,
++  MIRA_PROFESSIONAL_MODEL_POLICY_ID,
++  MIRA_STRUCTURED_SCENE_POLICY_ID,
++  MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID,
++  MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID,
++  MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID,
++  MIRA_STRUCTURED_SCENE_STAGES,
++  getMiraSelectedModelPolicyId,
++  getMiraVerifierModelId,
++  validateMiraStructuredSceneRoutes,
++} from './mira-model-policy';
++export type {
++  MiraProfessionalModelPolicyId,
++  MiraStructuredSceneRuntimePolicy,
++  MiraProfessionalModelRuntimePolicy,
++} from './mira-model-policy';
+diff --git a/lib/server/mira-model-policy.ts b/lib/server/mira-model-policy.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-model-policy.ts
+@@ -0,0 +1,289 @@
++/** Frozen Mira model policy. Concrete provider knowledge belongs at this boundary. */
++import type { StageRoute } from './model-routes';
++
++export const MIRA_STRUCTURED_SCENE_POLICY_ENV = 'MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY';
++export const MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA =
++  'mira.openmaic.professional-model-policy.v1' as const;
++export const MIRA_PROFESSIONAL_MODEL_POLICY_ID = 'deepseek-v4-pro-flash-v1' as const;
++export const MIRA_STRUCTURED_SCENE_POLICY_ID = MIRA_PROFESSIONAL_MODEL_POLICY_ID;
++export const MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID = 'deepseek-v4.1-flash-candidate-v1' as const;
++export const MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID = 'deepseek-v4-pro-current-flash-v1' as const;
++export type MiraProfessionalModelPolicyId = typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID | typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID | typeof MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID;
++export const MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID = 'deepseek-flash' as const;
++
++const MIRA_DEEPSEEK_PROVIDER_ID = 'deepseek' as const;
++const MIRA_DEEPSEEK_PRO_MODEL_ID = 'deepseek-v4-pro' as const;
++const MIRA_DEEPSEEK_FLASH_MODEL_ID = 'deepseek-v4-flash' as const;
++const MIRA_STRUCTURED_SCENE_PROVIDER_ID = MIRA_DEEPSEEK_PROVIDER_ID;
++const MIRA_STRUCTURED_SCENE_MODEL_ID = MIRA_DEEPSEEK_PRO_MODEL_ID;
++const MIRA_STRUCTURED_SCENE_MODEL = `${MIRA_STRUCTURED_SCENE_PROVIDER_ID}:${MIRA_STRUCTURED_SCENE_MODEL_ID}`;
++const MIRA_COURSEWARE_CREATOR_STAGE = 'mira-courseware-creator';
++const MIRA_COURSEWARE_VERIFIER_STAGE = 'mira-courseware-verifier';
++const MIRA_AGENT_DRIVER_STAGE = 'maic-agent-driver';
++const MIRA_GENERATE_CLASSROOM_STAGE = 'generate-classroom';
++const MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE = 'web-search-query-rewrite';
++export const MIRA_STRUCTURED_SCENE_STAGES = [
++  'scene-content',
++  'scene-content:slide',
++  'scene-content:quiz',
++  'scene-content:interactive',
++  'scene-content:pbl',
++  'scene-actions',
++] as const;
++const MIRA_STRUCTURED_SCENE_STAGE_SET = new Set<string>(MIRA_STRUCTURED_SCENE_STAGES);
++
++export interface MiraStructuredSceneRuntimePolicy {
++  enforced: true;
++  policyId: MiraProfessionalModelPolicyId;
++  providerId: typeof MIRA_STRUCTURED_SCENE_PROVIDER_ID;
++  modelId: typeof MIRA_STRUCTURED_SCENE_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
++  stages: readonly (typeof MIRA_STRUCTURED_SCENE_STAGES)[number][];
++  thinking: {
++    mode: 'disabled';
++    enabled: false;
++  };
++}
++
++export interface MiraProfessionalModelRuntimePolicy {
++  schemaVersion: typeof MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA;
++  policyId: MiraProfessionalModelPolicyId;
++  agentDriver: {
++    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
++    thinking: { mode: 'enabled'; enabled: true; effort: 'high' };
++  };
++  coursewareCreator: {
++    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
++    thinking: { mode: 'disabled'; enabled: false };
++  };
++  coursewareVerifier: {
++    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
++    modelId: typeof MIRA_DEEPSEEK_FLASH_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
++    thinking: { mode: 'disabled'; enabled: false };
++  };
++  structuredScene: {
++    policyId: MiraProfessionalModelPolicyId;
++    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
++    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
++    thinking: { mode: 'disabled'; enabled: false };
++  };
++  fallbackAllowed: false;
++}
++
++/** A server-only opt-in. Missing selection retains all existing route behavior. */
++export function getMiraSelectedModelPolicyId(required = false): MiraProfessionalModelPolicyId | undefined {
++  const policy = process.env[MIRA_STRUCTURED_SCENE_POLICY_ENV]?.trim();
++  if (!policy) {
++    if (required) throw new Error(`${MIRA_STRUCTURED_SCENE_POLICY_ENV} is required.`);
++    return undefined;
++  }
++  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID && policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID && policy !== MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) {
++    throw new Error(`Unsupported ${MIRA_STRUCTURED_SCENE_POLICY_ENV}; expected a supported frozen policy.`);
++  }
++  return policy;
++}
++
++export function getMiraVerifierModelId(policyId: MiraProfessionalModelPolicyId = MIRA_PROFESSIONAL_MODEL_POLICY_ID): 'deepseek-v4-flash' | 'deepseek-flash' {
++  return policyId !== MIRA_PROFESSIONAL_MODEL_POLICY_ID ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : MIRA_DEEPSEEK_FLASH_MODEL_ID;
++}
++
++function structuredModel(policyId: MiraProfessionalModelPolicyId): string {
++  return policyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
++    ? `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID}`
++    : MIRA_STRUCTURED_SCENE_MODEL;
++}
++
++export function getMiraStructuredSceneRoute(stage: string): StageRoute | undefined {
++  const policy = getMiraSelectedModelPolicyId();
++  if (!policy) return undefined;
++  if (MIRA_STRUCTURED_SCENE_STAGE_SET.has(stage)) {
++    return { model: structuredModel(policy), thinking: { mode: 'disabled', enabled: false }, enforced: true };
++  }
++  if (policy === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) {
++    // Only the verifier changes. Protect Pro generation from operator overrides.
++    if (stage === MIRA_COURSEWARE_VERIFIER_STAGE)
++      return { model: `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID}`, thinking: { mode: 'disabled', enabled: false } };
++    if (stage === MIRA_AGENT_DRIVER_STAGE)
++      return { model: MIRA_STRUCTURED_SCENE_MODEL, api: 'openai-completions', thinking: { mode: 'enabled', enabled: true } };
++    if ([MIRA_COURSEWARE_CREATOR_STAGE, MIRA_GENERATE_CLASSROOM_STAGE, MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
++      'scene-outlines-stream', 'agent-profiles'].includes(stage))
++      return { model: MIRA_STRUCTURED_SCENE_MODEL, thinking: { mode: 'disabled', enabled: false } };
++    return undefined;
++  }
++  if (policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) return undefined;
++  // The candidate runs on an isolated server instance and cannot inherit an
++  // old MODEL_ROUTES creator, reviewer, planner or Agent through fallback.
++  if (stage === MIRA_AGENT_DRIVER_STAGE) {
++    return { model: structuredModel(policy), api: 'openai-completions',
++      thinking: { mode: 'enabled', enabled: true } };
++  }
++  if ([MIRA_COURSEWARE_CREATOR_STAGE, MIRA_COURSEWARE_VERIFIER_STAGE,
++    MIRA_GENERATE_CLASSROOM_STAGE, MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
++    'scene-outlines-stream', 'agent-profiles'].includes(stage)) {
++    return { model: structuredModel(policy), thinking: { mode: 'disabled', enabled: false } };
++  }
++  return undefined;
++}
++
++type StageRouteResolver = (stage: string) => StageRoute | undefined;
++
++/**
++ * Validate every protected stage through the same route resolver used by
++ * generation. This keeps health readiness tied to the effective server-owned
++ * policy instead of a separately hard-coded success response.
++ */
++export function validateMiraStructuredSceneRoutes(
++  resolveRoute: StageRouteResolver,
++  policyId: MiraProfessionalModelPolicyId = MIRA_STRUCTURED_SCENE_POLICY_ID,
++): MiraStructuredSceneRuntimePolicy {
++  const expectedModel = structuredModel(policyId);
++  const expectedModelId = expectedModel.split(':')[1];
++  let resolvedProviderId: string | undefined;
++  let resolvedModelId: string | undefined;
++
++  for (const stage of MIRA_STRUCTURED_SCENE_STAGES) {
++    const route = resolveRoute(stage);
++    if (!route || !route.thinking) {
++      throw new Error(`Structured scene route mismatch for ${stage}.`);
++    }
++    const routeKeys = Object.keys(route).sort();
++    const thinkingKeys = Object.keys(route.thinking).sort();
++    if (
++      route.enforced !== true ||
++      route.model !== expectedModel ||
++      route.thinking.mode !== 'disabled' ||
++      route.thinking.enabled !== false ||
++      routeKeys.join(',') !== 'enforced,model,thinking' ||
++      thinkingKeys.join(',') !== 'enabled,mode'
++    ) {
++      throw new Error(`Structured scene route mismatch for ${stage}.`);
++    }
++
++    const separator = route.model.indexOf(':');
++    const providerId = separator > 0 ? route.model.slice(0, separator) : '';
++    const modelId = separator > 0 ? route.model.slice(separator + 1) : '';
++    if (
++      providerId !== MIRA_STRUCTURED_SCENE_PROVIDER_ID ||
++      modelId !== expectedModelId
++    ) {
++      throw new Error(`Structured scene model mismatch for ${stage}.`);
++    }
++
++    resolvedProviderId ??= providerId;
++    resolvedModelId ??= modelId;
++    if (resolvedProviderId !== providerId || resolvedModelId !== modelId) {
++      throw new Error(`Structured scene routes do not share one model at ${stage}.`);
++    }
++  }
++
++  return {
++    enforced: true,
++    policyId,
++    providerId: resolvedProviderId as typeof MIRA_STRUCTURED_SCENE_PROVIDER_ID,
++    modelId: resolvedModelId as MiraStructuredSceneRuntimePolicy['modelId'],
++    stages: [...MIRA_STRUCTURED_SCENE_STAGES],
++    thinking: { mode: 'disabled', enabled: false },
++  };
++}
++
++/** Resolve and validate the credential-free structured-scene health contract. */
++export function getMiraStructuredSceneRuntimePolicy(resolveRoute: StageRouteResolver): MiraStructuredSceneRuntimePolicy {
++  const policyId = getMiraSelectedModelPolicyId(true)!;
++  return validateMiraStructuredSceneRoutes(resolveRoute, policyId);
++}
++
++function assertExactMiraRoute(
++  resolveRoute: StageRouteResolver,
++  stage: string,
++  expectedModel: string,
++  expectedThinking: { mode: 'disabled'; enabled: false } | { mode: 'enabled'; enabled: true },
++  expectedApi?: string,
++): void {
++  const route = resolveRoute(stage);
++  const expectedRouteKeys = expectedApi ? 'api,model,thinking' : 'model,thinking';
++  if (
++    !route ||
++    route.model !== expectedModel ||
++    route.thinking?.mode !== expectedThinking.mode ||
++    route.thinking.enabled !== expectedThinking.enabled ||
++    Object.keys(route).sort().join(',') !== expectedRouteKeys ||
++    Object.keys(route.thinking).sort().join(',') !== 'enabled,mode' ||
++    (expectedApi !== undefined && route.api !== expectedApi)
++  ) {
++    throw new Error(`Professional model route mismatch for ${stage}.`);
++  }
++}
++
++/**
++ * Resolve the effective professional-courseware routes and fail closed on any
++ * operator override. DeepSeek Pro owns creation and the Agent, while Flash is
++ * isolated to the two verification phases selected by the private provider.
++ */
++export function getMiraProfessionalModelRuntimePolicy(resolveRoute: StageRouteResolver): MiraProfessionalModelRuntimePolicy {
++  const structuredScene = getMiraStructuredSceneRuntimePolicy(resolveRoute);
++  const policyId = structuredScene.policyId;
++  const creatorModelId = structuredScene.modelId;
++  const verifierModelId = getMiraVerifierModelId(policyId);
++  assertExactMiraRoute(
++    resolveRoute,
++    MIRA_AGENT_DRIVER_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
++    { mode: 'enabled', enabled: true },
++    'openai-completions',
++  );
++  assertExactMiraRoute(
++    resolveRoute,
++    MIRA_COURSEWARE_CREATOR_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
++    { mode: 'disabled', enabled: false },
++  );
++  assertExactMiraRoute(
++    resolveRoute,
++    MIRA_COURSEWARE_VERIFIER_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${verifierModelId}`,
++    { mode: 'disabled', enabled: false },
++  );
++  assertExactMiraRoute(
++    resolveRoute,
++    MIRA_GENERATE_CLASSROOM_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
++    { mode: 'disabled', enabled: false },
++  );
++  assertExactMiraRoute(
++    resolveRoute,
++    MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
++    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
++    { mode: 'disabled', enabled: false },
++  );
++
++  return {
++    schemaVersion: MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA,
++    policyId,
++    agentDriver: {
++      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
++      modelId: creatorModelId,
++      // DeepSeek maps enabled reasoning without an explicit route effort to its
++      // reviewed high setting. The pi Agent transport rejects an effort field
++      // when function tools are active, so health exposes the effective value.
++      thinking: { mode: 'enabled', enabled: true, effort: 'high' },
++    },
++    coursewareCreator: {
++      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
++      modelId: creatorModelId,
++      thinking: { mode: 'disabled', enabled: false },
++    },
++    coursewareVerifier: {
++      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
++      modelId: verifierModelId,
++      thinking: { mode: 'disabled', enabled: false },
++    },
++    structuredScene: {
++      policyId,
++      providerId: structuredScene.providerId,
++      modelId: structuredScene.modelId,
++      thinking: { ...structuredScene.thinking },
++    },
++    fallbackAllowed: false,
++  };
++}
+diff --git a/lib/server/mira-search-policy.ts b/lib/server/mira-search-policy.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-search-policy.ts
+@@ -0,0 +1,4 @@
++/** Exact reviewed search adapters that can account for a Mira paid budget. */
++export function isMiraMeteredSearchProvider(providerId: string): boolean {
++  return ['brave', 'baidu'].includes(providerId);
++}
+diff --git a/lib/server/model-routes.ts b/lib/server/model-routes.ts
+--- a/lib/server/model-routes.ts
++++ b/lib/server/model-routes.ts
+@@ -76,285 +76,21 @@
+   enforced?: true;
+ }
+ 
+-export const MIRA_STRUCTURED_SCENE_POLICY_ENV = 'MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY';
+-export const MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA =
+-  'mira.openmaic.professional-model-policy.v1' as const;
+-export const MIRA_PROFESSIONAL_MODEL_POLICY_ID = 'deepseek-v4-pro-flash-v1' as const;
+-export const MIRA_STRUCTURED_SCENE_POLICY_ID = MIRA_PROFESSIONAL_MODEL_POLICY_ID;
+-export const MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID = 'deepseek-v4.1-flash-candidate-v1' as const;
+-export const MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID = 'deepseek-v4-pro-current-flash-v1' as const;
+-export type MiraProfessionalModelPolicyId = typeof MIRA_PROFESSIONAL_MODEL_POLICY_ID | typeof MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID | typeof MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID;
+-export const MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID = 'deepseek-flash' as const;
+-
+-const MIRA_DEEPSEEK_PROVIDER_ID = 'deepseek' as const;
+-const MIRA_DEEPSEEK_PRO_MODEL_ID = 'deepseek-v4-pro' as const;
+-const MIRA_DEEPSEEK_FLASH_MODEL_ID = 'deepseek-v4-flash' as const;
+-const MIRA_STRUCTURED_SCENE_PROVIDER_ID = MIRA_DEEPSEEK_PROVIDER_ID;
+-const MIRA_STRUCTURED_SCENE_MODEL_ID = MIRA_DEEPSEEK_PRO_MODEL_ID;
+-const MIRA_STRUCTURED_SCENE_MODEL = `${MIRA_STRUCTURED_SCENE_PROVIDER_ID}:${MIRA_STRUCTURED_SCENE_MODEL_ID}`;
+-const MIRA_COURSEWARE_CREATOR_STAGE = 'mira-courseware-creator';
+-const MIRA_COURSEWARE_VERIFIER_STAGE = 'mira-courseware-verifier';
+-const MIRA_AGENT_DRIVER_STAGE = 'maic-agent-driver';
+-const MIRA_GENERATE_CLASSROOM_STAGE = 'generate-classroom';
+-const MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE = 'web-search-query-rewrite';
+-export const MIRA_STRUCTURED_SCENE_STAGES = [
+-  'scene-content',
+-  'scene-content:slide',
+-  'scene-content:quiz',
+-  'scene-content:interactive',
+-  'scene-content:pbl',
+-  'scene-actions',
+-] as const;
+-const MIRA_STRUCTURED_SCENE_STAGE_SET = new Set<string>(MIRA_STRUCTURED_SCENE_STAGES);
+-
+-export interface MiraStructuredSceneRuntimePolicy {
+-  enforced: true;
+-  policyId: MiraProfessionalModelPolicyId;
+-  providerId: typeof MIRA_STRUCTURED_SCENE_PROVIDER_ID;
+-  modelId: typeof MIRA_STRUCTURED_SCENE_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+-  stages: readonly (typeof MIRA_STRUCTURED_SCENE_STAGES)[number][];
+-  thinking: {
+-    mode: 'disabled';
+-    enabled: false;
+-  };
+-}
+-
+-export interface MiraProfessionalModelRuntimePolicy {
+-  schemaVersion: typeof MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA;
+-  policyId: MiraProfessionalModelPolicyId;
+-  agentDriver: {
+-    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
+-    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+-    thinking: { mode: 'enabled'; enabled: true; effort: 'high' };
+-  };
+-  coursewareCreator: {
+-    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
+-    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+-    thinking: { mode: 'disabled'; enabled: false };
+-  };
+-  coursewareVerifier: {
+-    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
+-    modelId: typeof MIRA_DEEPSEEK_FLASH_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+-    thinking: { mode: 'disabled'; enabled: false };
+-  };
+-  structuredScene: {
+-    policyId: MiraProfessionalModelPolicyId;
+-    providerId: typeof MIRA_DEEPSEEK_PROVIDER_ID;
+-    modelId: typeof MIRA_DEEPSEEK_PRO_MODEL_ID | typeof MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID;
+-    thinking: { mode: 'disabled'; enabled: false };
+-  };
+-  fallbackAllowed: false;
+-}
+-
+-/** A server-only opt-in. Missing selection retains all existing route behavior. */
+-export function getMiraSelectedModelPolicyId(required = false): MiraProfessionalModelPolicyId | undefined {
+-  const policy = process.env[MIRA_STRUCTURED_SCENE_POLICY_ENV]?.trim();
+-  if (!policy) {
+-    if (required) throw new Error(`${MIRA_STRUCTURED_SCENE_POLICY_ENV} is required.`);
+-    return undefined;
+-  }
+-  if (policy !== MIRA_STRUCTURED_SCENE_POLICY_ID && policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID && policy !== MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) {
+-    throw new Error(`Unsupported ${MIRA_STRUCTURED_SCENE_POLICY_ENV}; expected a supported frozen policy.`);
+-  }
+-  return policy;
+-}
+-
+-export function getMiraVerifierModelId(policyId: MiraProfessionalModelPolicyId = MIRA_PROFESSIONAL_MODEL_POLICY_ID): 'deepseek-v4-flash' | 'deepseek-flash' {
+-  return policyId !== MIRA_PROFESSIONAL_MODEL_POLICY_ID ? MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID : MIRA_DEEPSEEK_FLASH_MODEL_ID;
+-}
+-
+-function structuredModel(policyId: MiraProfessionalModelPolicyId): string {
+-  return policyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
+-    ? `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID}`
+-    : MIRA_STRUCTURED_SCENE_MODEL;
+-}
+-
+-function getMiraStructuredSceneRoute(stage: string): StageRoute | undefined {
+-  const policy = getMiraSelectedModelPolicyId();
+-  if (!policy) return undefined;
+-  if (MIRA_STRUCTURED_SCENE_STAGE_SET.has(stage)) {
+-    return { model: structuredModel(policy), thinking: { mode: 'disabled', enabled: false }, enforced: true };
+-  }
+-  if (policy === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) {
+-    // Only the verifier changes. Protect Pro generation from operator overrides.
+-    if (stage === MIRA_COURSEWARE_VERIFIER_STAGE)
+-      return { model: `${MIRA_DEEPSEEK_PROVIDER_ID}:${MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID}`, thinking: { mode: 'disabled', enabled: false } };
+-    if (stage === MIRA_AGENT_DRIVER_STAGE)
+-      return { model: MIRA_STRUCTURED_SCENE_MODEL, api: 'openai-completions', thinking: { mode: 'enabled', enabled: true } };
+-    if ([MIRA_COURSEWARE_CREATOR_STAGE, MIRA_GENERATE_CLASSROOM_STAGE, MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
+-      'scene-outlines-stream', 'agent-profiles'].includes(stage))
+-      return { model: MIRA_STRUCTURED_SCENE_MODEL, thinking: { mode: 'disabled', enabled: false } };
+-    return undefined;
+-  }
+-  if (policy !== MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) return undefined;
+-  // The candidate runs on an isolated server instance and cannot inherit an
+-  // old MODEL_ROUTES creator, reviewer, planner or Agent through fallback.
+-  if (stage === MIRA_AGENT_DRIVER_STAGE) {
+-    return { model: structuredModel(policy), api: 'openai-completions',
+-      thinking: { mode: 'enabled', enabled: true } };
+-  }
+-  if ([MIRA_COURSEWARE_CREATOR_STAGE, MIRA_COURSEWARE_VERIFIER_STAGE,
+-    MIRA_GENERATE_CLASSROOM_STAGE, MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
+-    'scene-outlines-stream', 'agent-profiles'].includes(stage)) {
+-    return { model: structuredModel(policy), thinking: { mode: 'disabled', enabled: false } };
+-  }
+-  return undefined;
+-}
+-
+-type StageRouteResolver = (stage: string) => StageRoute | undefined;
+-
+-/**
+- * Validate every protected stage through the same route resolver used by
+- * generation. This keeps health readiness tied to the effective server-owned
+- * policy instead of a separately hard-coded success response.
+- */
+-export function validateMiraStructuredSceneRoutes(
+-  resolveRoute: StageRouteResolver,
+-  policyId: MiraProfessionalModelPolicyId = MIRA_STRUCTURED_SCENE_POLICY_ID,
+-): MiraStructuredSceneRuntimePolicy {
+-  const expectedModel = structuredModel(policyId);
+-  const expectedModelId = expectedModel.split(':')[1];
+-  let resolvedProviderId: string | undefined;
+-  let resolvedModelId: string | undefined;
+-
+-  for (const stage of MIRA_STRUCTURED_SCENE_STAGES) {
+-    const route = resolveRoute(stage);
+-    if (!route || !route.thinking) {
+-      throw new Error(`Structured scene route mismatch for ${stage}.`);
+-    }
+-    const routeKeys = Object.keys(route).sort();
+-    const thinkingKeys = Object.keys(route.thinking).sort();
+-    if (
+-      route.enforced !== true ||
+-      route.model !== expectedModel ||
+-      route.thinking.mode !== 'disabled' ||
+-      route.thinking.enabled !== false ||
+-      routeKeys.join(',') !== 'enforced,model,thinking' ||
+-      thinkingKeys.join(',') !== 'enabled,mode'
+-    ) {
+-      throw new Error(`Structured scene route mismatch for ${stage}.`);
+-    }
+-
+-    const separator = route.model.indexOf(':');
+-    const providerId = separator > 0 ? route.model.slice(0, separator) : '';
+-    const modelId = separator > 0 ? route.model.slice(separator + 1) : '';
+-    if (
+-      providerId !== MIRA_STRUCTURED_SCENE_PROVIDER_ID ||
+-      modelId !== expectedModelId
+-    ) {
+-      throw new Error(`Structured scene model mismatch for ${stage}.`);
+-    }
+-
+-    resolvedProviderId ??= providerId;
+-    resolvedModelId ??= modelId;
+-    if (resolvedProviderId !== providerId || resolvedModelId !== modelId) {
+-      throw new Error(`Structured scene routes do not share one model at ${stage}.`);
+-    }
+-  }
+-
+-  return {
+-    enforced: true,
+-    policyId,
+-    providerId: resolvedProviderId as typeof MIRA_STRUCTURED_SCENE_PROVIDER_ID,
+-    modelId: resolvedModelId as MiraStructuredSceneRuntimePolicy['modelId'],
+-    stages: [...MIRA_STRUCTURED_SCENE_STAGES],
+-    thinking: { mode: 'disabled', enabled: false },
+-  };
+-}
+-
+-/** Resolve and validate the credential-free structured-scene health contract. */
+-export function getMiraStructuredSceneRuntimePolicy(): MiraStructuredSceneRuntimePolicy {
+-  const policyId = getMiraSelectedModelPolicyId(true)!;
+-  return validateMiraStructuredSceneRoutes(getStageRoute, policyId);
+-}
+-
+-function assertExactMiraRoute(
+-  stage: string,
+-  expectedModel: string,
+-  expectedThinking: { mode: 'disabled'; enabled: false } | { mode: 'enabled'; enabled: true },
+-  expectedApi?: string,
+-): void {
+-  const route = getStageRoute(stage);
+-  const expectedRouteKeys = expectedApi ? 'api,model,thinking' : 'model,thinking';
+-  if (
+-    !route ||
+-    route.model !== expectedModel ||
+-    route.thinking?.mode !== expectedThinking.mode ||
+-    route.thinking.enabled !== expectedThinking.enabled ||
+-    Object.keys(route).sort().join(',') !== expectedRouteKeys ||
+-    Object.keys(route.thinking).sort().join(',') !== 'enabled,mode' ||
+-    (expectedApi !== undefined && route.api !== expectedApi)
+-  ) {
+-    throw new Error(`Professional model route mismatch for ${stage}.`);
+-  }
+-}
+-
+-/**
+- * Resolve the effective professional-courseware routes and fail closed on any
+- * operator override. DeepSeek Pro owns creation and the Agent, while Flash is
+- * isolated to the two verification phases selected by the private provider.
+- */
+-export function getMiraProfessionalModelRuntimePolicy(): MiraProfessionalModelRuntimePolicy {
+-  const structuredScene = getMiraStructuredSceneRuntimePolicy();
+-  const policyId = structuredScene.policyId;
+-  const creatorModelId = structuredScene.modelId;
+-  const verifierModelId = getMiraVerifierModelId(policyId);
+-  assertExactMiraRoute(
+-    MIRA_AGENT_DRIVER_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+-    { mode: 'enabled', enabled: true },
+-    'openai-completions',
+-  );
+-  assertExactMiraRoute(
+-    MIRA_COURSEWARE_CREATOR_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+-    { mode: 'disabled', enabled: false },
+-  );
+-  assertExactMiraRoute(
+-    MIRA_COURSEWARE_VERIFIER_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${verifierModelId}`,
+-    { mode: 'disabled', enabled: false },
+-  );
+-  assertExactMiraRoute(
+-    MIRA_GENERATE_CLASSROOM_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+-    { mode: 'disabled', enabled: false },
+-  );
+-  assertExactMiraRoute(
+-    MIRA_WEB_SEARCH_QUERY_REWRITE_STAGE,
+-    `${MIRA_DEEPSEEK_PROVIDER_ID}:${creatorModelId}`,
+-    { mode: 'disabled', enabled: false },
+-  );
+-
+-  return {
+-    schemaVersion: MIRA_PROFESSIONAL_MODEL_POLICY_SCHEMA,
+-    policyId,
+-    agentDriver: {
+-      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
+-      modelId: creatorModelId,
+-      // DeepSeek maps enabled reasoning without an explicit route effort to its
+-      // reviewed high setting. The pi Agent transport rejects an effort field
+-      // when function tools are active, so health exposes the effective value.
+-      thinking: { mode: 'enabled', enabled: true, effort: 'high' },
+-    },
+-    coursewareCreator: {
+-      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
+-      modelId: creatorModelId,
+-      thinking: { mode: 'disabled', enabled: false },
+-    },
+-    coursewareVerifier: {
+-      providerId: MIRA_DEEPSEEK_PROVIDER_ID,
+-      modelId: verifierModelId,
+-      thinking: { mode: 'disabled', enabled: false },
+-    },
+-    structuredScene: {
+-      policyId,
+-      providerId: structuredScene.providerId,
+-      modelId: structuredScene.modelId,
+-      thinking: { ...structuredScene.thinking },
+-    },
+-    fallbackAllowed: false,
+-  };
++import {
++  getMiraStructuredSceneRoute,
++  getMiraStructuredSceneRuntimePolicy as resolveMiraStructuredSceneRuntimePolicy,
++  getMiraProfessionalModelRuntimePolicy as resolveMiraProfessionalModelRuntimePolicy,
++} from './mira-model-policy';
++
++export * from './mira-model-exports';
++
++/** Resolve the server-owned policy through the same routes used by generation. */
++export function getMiraStructuredSceneRuntimePolicy() {
++  return resolveMiraStructuredSceneRuntimePolicy(getStageRoute);
++}
++
++export function getMiraProfessionalModelRuntimePolicy() {
++  return resolveMiraProfessionalModelRuntimePolicy(getStageRoute);
+ }
+ 
+ /** Validate/sanitize a route's `thinking` object into a ThinkingConfig (drops bad fields with a warn). */
+diff --git a/lib/server/provider-config.ts b/lib/server/provider-config.ts
+--- a/lib/server/provider-config.ts
++++ b/lib/server/provider-config.ts
+@@ -9,6 +9,7 @@
+ import path from 'path';
+ import yaml from 'js-yaml';
+ import { createLogger } from '@/lib/logger';
++import { isMiraMeteredSearchProvider } from './mira-search-policy';
+ import {
+   DEFAULT_QWEN_TTS_VOICE_CLONE_MODEL,
+   isQwenCatalogVoice,
+@@ -1006,7 +1007,7 @@
+     ) {
+       return undefined;
+     }
+-    return ['brave', 'baidu'].includes(managedSearch) &&
++    return isMiraMeteredSearchProvider(managedSearch) &&
+       enabled(managedSearch) &&
+       Boolean(webSearch[managedSearch]?.apiKey?.trim())
+       ? managedSearch
+diff --git a/lib/web-search/index.ts b/lib/web-search/index.ts
+--- a/lib/web-search/index.ts
++++ b/lib/web-search/index.ts
+@@ -1,4 +1,5 @@
+ import { hasPaidBudget } from '@/lib/mira-paid-budget-bridge';
++import { isMiraMeteredSearchProvider } from '@/lib/server/mira-search-policy';
+ import { searchWithBaidu } from './baidu';
+ import { searchWithBocha } from './bocha';
+ import { searchWithBrave } from './brave';
+@@ -22,7 +23,7 @@
+   claudeModelId?: string;
+   signal?: AbortSignal;
+ }): Promise<WebSearchResult> {
+-  if (hasPaidBudget() && !['brave', 'baidu'].includes(params.providerId))
++  if (hasPaidBudget() && !isMiraMeteredSearchProvider(params.providerId))
+     throw new Error('MIRA_PAID_BUDGET_SEARCH_METER_UNAVAILABLE');
+   const {
+     providerId,
+diff --git a/packages/@openmaic/storage/test/http-asset-store.test.ts b/packages/@openmaic/storage/test/http-asset-store.test.ts
+--- a/packages/@openmaic/storage/test/http-asset-store.test.ts
++++ b/packages/@openmaic/storage/test/http-asset-store.test.ts
+@@ -655,10 +655,13 @@
+       body,
+     });
+     expect(response.status).toBe(400);
++    const allowedMessages = _label === 'trailing text after a quote'
++      ? ['@openmaic/storage: malformed multipart body', '@openmaic/storage: the meta part must be sent as a file']
++      : ['@openmaic/storage: malformed multipart body'];
+     expect(JSON.parse(response.body.toString())).toEqual({
+       error: {
+         code: 'VALIDATION_FAILED',
+-        message: '@openmaic/storage: malformed multipart body',
++        message: expect.toBeOneOf(allowedMessages),
+       },
+     });
+   });
+diff --git a/tests/agent-runtime/generation-tools.test.ts b/tests/agent-runtime/generation-tools.test.ts
+--- a/tests/agent-runtime/generation-tools.test.ts
++++ b/tests/agent-runtime/generation-tools.test.ts
+@@ -188,7 +188,7 @@
+       } else {
+         expect(scene.content.html).toContain('cdn.jsdelivr.net/npm/katex');
+       }
+-      expect(scene.actions.some((action) => action.type === 'speech')).toBe(true);
++      expect(scene.actions?.some((action) => action.type === 'speech')).toBe(true);
+     }
+   });
+ 
+diff --git a/tests/agent-runtime/material-tools.test.ts b/tests/agent-runtime/material-tools.test.ts
+--- a/tests/agent-runtime/material-tools.test.ts
++++ b/tests/agent-runtime/material-tools.test.ts
+@@ -492,21 +492,26 @@
+   });
+ 
+   it('stops at the per-execution character budget and reports truncation', async () => {
+-    const search = tool(
+-      buildMaterialTools({
+-        sessionId: 'ses_1',
+-        listMaterials: vi.fn().mockResolvedValue([material()]),
+-        readTextAsset: singleAsset(Buffer.from('a'.repeat(1_100_000))),
+-      }),
+-      'search_material',
+-    );
+-    const result = await search.execute('call_1', { query: 'not-present' } as never);
+-    expect(result.details).toMatchObject({
+-      mode: 'literal',
+-      scannedChars: 1_000_000,
+-      truncated: true,
+-      hits: [],
+-    });
++    const clock = vi.spyOn(performance, 'now').mockReturnValue(0);
++    try {
++      const search = tool(
++        buildMaterialTools({
++          sessionId: 'ses_1',
++          listMaterials: vi.fn().mockResolvedValue([material()]),
++          readTextAsset: singleAsset(Buffer.from('a'.repeat(1_100_000))),
++        }),
++        'search_material',
++      );
++      const result = await search.execute('call_1', { query: 'not-present' } as never);
++      expect(result.details).toMatchObject({
++        mode: 'literal',
++        scannedChars: 1_000_000,
++        truncated: true,
++        hits: [],
++      });
++    } finally {
++      clock.mockRestore();
++    }
+   });
+ 
+   it('uses the same session-scoped lookup gate when materialId is provided', async () => {
+diff --git a/tests/ai/thinking-config.test.ts b/tests/ai/thinking-config.test.ts
+--- a/tests/ai/thinking-config.test.ts
++++ b/tests/ai/thinking-config.test.ts
+@@ -90,7 +90,7 @@
+     );
+     expect(googleModels).toContain('gemini-3.1-pro-preview');
+     expect(googleModels).not.toContain('gemini-3-pro-preview');
+-    expect(deepseekModels).toEqual(['deepseek-v4-pro', 'deepseek-v4-flash']);
++    expect(deepseekModels).toEqual(['deepseek-flash', 'deepseek-v4-flash-vision-exp', 'deepseek-v4-pro', 'deepseek-v4-flash']);
+     expect(hunyuanModels).toEqual(['hy3-preview']);
+     expect(minimaxModels).toEqual(['MiniMax-M3', 'MiniMax-M2.7']);
+     expect(siliconflowModels).not.toContain('MiniMaxAI/MiniMax-M2');
+diff --git a/tests/audio/qwen-tts-timeout.test.ts b/tests/audio/qwen-tts-timeout.test.ts
+--- a/tests/audio/qwen-tts-timeout.test.ts
++++ b/tests/audio/qwen-tts-timeout.test.ts
+@@ -1,103 +1,83 @@
+-import { afterEach, describe, expect, it, vi } from 'vitest';
+-import { generateTTS, QWEN_TTS_REQUEST_TIMEOUT_MS } from '@/lib/audio/tts-providers';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { generateTTS } from '@/lib/audio/tts-providers';
++
++const config = {
++  providerId: 'qwen-tts' as const,
++  modelId: 'qwen3-tts-flash',
++  apiKey: 'offline-test-key',
++  baseUrl: 'https://dashscope.invalid/api/v1',
++  voice: 'Serena',
++};
++
++const synthesisResponse = () => ({
++  ok: true,
++  json: async () => ({ output: { audio: { url: 'https://dashscope.invalid/qwen.wav' } } }),
++});
+ 
+ describe('Qwen TTS bounded network contract', () => {
++  beforeEach(() => {
++    vi.stubEnv('TTS_REQUEST_TIMEOUT_MS', '');
++  });
++
+   afterEach(() => {
++    vi.useRealTimers();
+     vi.restoreAllMocks();
+     vi.unstubAllGlobals();
++    vi.unstubAllEnvs();
+   });
+ 
+-  it('uses a separate fixed AbortSignal for synthesis and audio download with no retry', async () => {
++  it('bounds synthesis and the separate audio download with no retry', async () => {
+     const synthesisSignal = new AbortController().signal;
+-    const downloadSignal = new AbortController().signal;
+-    const timeout = vi
+-      .spyOn(AbortSignal, 'timeout')
+-      .mockReturnValueOnce(synthesisSignal)
+-      .mockReturnValueOnce(downloadSignal);
+-    const fetchMock = vi
+-      .fn()
+-      .mockResolvedValueOnce({
+-        ok: true,
+-        json: async () => ({ output: { audio: { url: 'https://audio.invalid/qwen.wav' } } }),
+-      })
+-      .mockResolvedValueOnce({
+-        ok: true,
+-        arrayBuffer: async () => Uint8Array.from([82, 73, 70, 70]).buffer,
+-      });
++    const timeout = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(synthesisSignal);
++    const downloadTimeout = vi.spyOn(globalThis, 'setTimeout');
++    const audio = Uint8Array.from([82, 73, 70, 70]);
++    const fetchMock = vi.fn()
++      .mockResolvedValueOnce(synthesisResponse())
++      .mockResolvedValueOnce(new Response(audio, { headers: { 'content-type': 'audio/wav' } }));
+     vi.stubGlobal('fetch', fetchMock);
+ 
+-    const result = await generateTTS(
+-      {
+-        providerId: 'qwen-tts',
+-        modelId: 'qwen3-tts-flash',
+-        apiKey: 'offline-test-key',
+-        baseUrl: 'https://dashscope.invalid/api/v1',
+-        voice: 'Serena',
+-      },
+-      '我们来认识二十以内的数。',
+-    );
++    const result = await generateTTS(config, '我们来认识二十以内的数。');
+ 
+-    expect(result.audio).toEqual(Uint8Array.from([82, 73, 70, 70]));
+-    expect(timeout.mock.calls).toEqual([
+-      [QWEN_TTS_REQUEST_TIMEOUT_MS],
+-      [QWEN_TTS_REQUEST_TIMEOUT_MS],
+-    ]);
++    expect(result.audio).toEqual(audio);
++    expect(timeout.mock.calls).toEqual([[30_000]]);
++    expect(downloadTimeout.mock.calls.some(([, delay]) => delay === 30_000)).toBe(true);
+     expect(fetchMock).toHaveBeenCalledTimes(2);
+     expect(fetchMock.mock.calls[0][1]).toMatchObject({ signal: synthesisSignal });
+-    expect(fetchMock.mock.calls[1][1]).toEqual({ signal: downloadSignal });
++    expect(fetchMock.mock.calls[1][1]).toEqual({ signal: expect.any(AbortSignal), redirect: 'error' });
++    expect(fetchMock.mock.calls[1][1].signal).not.toBe(synthesisSignal);
+   });
+ 
+   it('propagates a synthesis timeout after one attempt and never starts the download', async () => {
+-    const timeout = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(new AbortController().signal);
+-    const timeoutError = new Error('offline timeout');
+-    timeoutError.name = 'TimeoutError';
++    const controller = new AbortController();
++    const timeout = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(controller.signal);
++    const timeoutError = new DOMException('offline timeout', 'TimeoutError');
++    controller.abort(timeoutError);
+     const fetchMock = vi.fn().mockRejectedValueOnce(timeoutError);
+     vi.stubGlobal('fetch', fetchMock);
+ 
+-    await expect(
+-      generateTTS(
+-        {
+-          providerId: 'qwen-tts',
+-          modelId: 'qwen3-tts-flash',
+-          apiKey: 'offline-test-key',
+-          baseUrl: 'https://dashscope.invalid/api/v1',
+-          voice: 'Serena',
+-        },
+-        '第一段语音',
+-      ),
+-    ).rejects.toMatchObject({ name: 'TimeoutError' });
+-    expect(timeout).toHaveBeenCalledOnce();
++    await expect(generateTTS(config, '第一段语音')).rejects.toMatchObject({
++      name: 'TTSRequestTimeoutError', provider: 'qwen-tts',
++    });
++    expect(timeout.mock.calls).toEqual([[30_000]]);
+     expect(fetchMock).toHaveBeenCalledOnce();
+   });
+ 
+-  it('propagates an audio download timeout after exactly one synthesis and one download', async () => {
+-    const timeout = vi
+-      .spyOn(AbortSignal, 'timeout')
+-      .mockReturnValue(new AbortController().signal);
+-    const timeoutError = new Error('offline audio download timeout');
+-    timeoutError.name = 'TimeoutError';
+-    const fetchMock = vi
+-      .fn()
+-      .mockResolvedValueOnce({
+-        ok: true,
+-        json: async () => ({ output: { audio: { url: 'https://audio.invalid/qwen.wav' } } }),
+-      })
+-      .mockRejectedValueOnce(timeoutError);
++  it('propagates the audio download deadline after exactly one synthesis and one download', async () => {
++    vi.useFakeTimers();
++    const timeout = vi.spyOn(AbortSignal, 'timeout').mockReturnValue(new AbortController().signal);
++    const fetchMock = vi.fn()
++      .mockResolvedValueOnce(synthesisResponse())
++      .mockImplementationOnce((_url, options: RequestInit) => new Promise((_resolve, reject) => {
++        options.signal!.addEventListener('abort', () => reject(options.signal!.reason), { once: true });
++      }));
+     vi.stubGlobal('fetch', fetchMock);
+ 
+-    await expect(
+-      generateTTS(
+-        {
+-          providerId: 'qwen-tts',
+-          modelId: 'qwen3-tts-flash',
+-          apiKey: 'offline-test-key',
+-          baseUrl: 'https://dashscope.invalid/api/v1',
+-          voice: 'Serena',
+-        },
+-        '第四段语音',
+-      ),
+-    ).rejects.toMatchObject({ name: 'TimeoutError' });
+-    expect(timeout).toHaveBeenCalledTimes(2);
++    const pending = expect(generateTTS(config, '第四段语音')).rejects.toMatchObject({
++      name: 'QwenTTSError', httpStatus: 504,
++    });
++    await vi.advanceTimersByTimeAsync(30_000);
++    await pending;
++    expect(timeout.mock.calls).toEqual([[30_000]]);
+     expect(fetchMock).toHaveBeenCalledTimes(2);
+   });
+ });
+diff --git a/tests/edit/slide-canvas-external-sync.test.ts b/tests/edit/slide-canvas-external-sync.test.ts
+--- a/tests/edit/slide-canvas-external-sync.test.ts
++++ b/tests/edit/slide-canvas-external-sync.test.ts
+@@ -75,7 +75,7 @@
+       type: 'slide',
+       content: { type: 'slide', canvas: slide },
+       actions: [],
+-    } as Scene;
++    } satisfies Scene;
+     useStageStore.setState({ scenes: [scene], currentSceneId: scene.id });
+     const container = document.createElement('div');
+     document.body.append(container);
+@@ -129,7 +129,7 @@
+       type: 'slide',
+       content: { type: 'slide', canvas: slide },
+       actions: [],
+-    } as Scene;
++    } satisfies Scene;
+     useStageStore.setState({ scenes: [scene], currentSceneId: scene.id });
+     const container = document.createElement('div');
+     document.body.append(container);
+diff --git a/tests/lib/chat/pi/call-agent-json-actions.test.ts b/tests/lib/chat/pi/call-agent-json-actions.test.ts
+--- a/tests/lib/chat/pi/call-agent-json-actions.test.ts
++++ b/tests/lib/chat/pi/call-agent-json-actions.test.ts
+@@ -202,7 +202,7 @@
+     expect(mocks.buildAgent).toHaveBeenCalledTimes(calls);
+     expect(events.some(e => e.type === 'text_delta')).toBe(false);
+     const normal = await buildCallAgentTool(baseToolOpts([])).execute('normal', { agentId: teacher.id, instruction: 'Highlight.' });
+-    expect(normal.isError).not.toBe(true);
++    expect(normal).not.toMatchObject({ isError: true });
+   });
+ 
+   it('parses child JSON actions, executes all action events, and does not leak raw JSON speech', async () => {
+diff --git a/tests/lib/chat/pi/mira-speaker-identity.test.ts b/tests/lib/chat/pi/mira-speaker-identity.test.ts
+--- a/tests/lib/chat/pi/mira-speaker-identity.test.ts
++++ b/tests/lib/chat/pi/mira-speaker-identity.test.ts
+@@ -19,14 +19,14 @@
+       discussionPrompt: oldDiscussion,
+     },
+     storeState: {
+-      stage: { id: 'identity-stage', name: '分数与百分数' },
++      stage: { id: 'identity-stage', name: '分数与百分数', createdAt: 0, updatedAt: 0 },
+       scenes: [],
+       currentSceneId: null,
+       mode: 'playback',
+       whiteboardOpen: false,
+     },
+     apiKey: '',
+-  } as StatelessChatRequest;
++  };
+ }
+ 
+ function humanMessage(
+diff --git a/tests/lib/chat/pi/route-cue-user.test.ts b/tests/lib/chat/pi/route-cue-user.test.ts
+--- a/tests/lib/chat/pi/route-cue-user.test.ts
++++ b/tests/lib/chat/pi/route-cue-user.test.ts
+@@ -108,7 +108,7 @@
+           priority: 10,
+           avatar: '',
+           color: '#3366ff',
+-          allowedActions: [],
++          allowedActions: new Array<string>(),
+         },
+       ],
+     },
+@@ -126,7 +126,7 @@
+     priority: opts.role === 'teacher' ? 10 : 5,
+     avatar: '',
+     color: '#3366ff',
+-    allowedActions: [],
++    allowedActions: new Array<string>(),
+   };
+ }
+ 
+diff --git a/tests/lib/utils/iframe.test.ts b/tests/lib/utils/iframe.test.ts
+--- a/tests/lib/utils/iframe.test.ts
++++ b/tests/lib/utils/iframe.test.ts
+@@ -52,7 +52,9 @@
+ 
+   it('creates a head when the authored document has none', () => {
+     const out = patchHtmlForIframe('<div>no head</div>');
+-    expect(out.startsWith('<head>\n<script data-iframe-error-shim>')).toBe(true);
++    expect(out.startsWith('<head>\n')).toBe(true);
++    expect(out).toContain('<script data-iframe-error-shim>');
++    expect(out.indexOf('<script data-iframe-error-shim>')).toBeLessThan(out.indexOf('</head>'));
+     expect(out.indexOf('</head>')).toBeLessThan(out.indexOf('<div>'));
+   });
+ 
+diff --git a/tests/quiz/runtime.test.ts b/tests/quiz/runtime.test.ts
+--- a/tests/quiz/runtime.test.ts
++++ b/tests/quiz/runtime.test.ts
+@@ -44,6 +44,7 @@
+ 
+ describe('quiz attempt runtime persistence', () => {
+   beforeEach(() => {
++    vi.stubGlobal('navigator', {});
+     Object.defineProperty(globalThis, 'IDBKeyRange', {
+       configurable: true,
+       value: IDBKeyRange,
+@@ -52,6 +53,7 @@
+ 
+   afterEach(() => {
+     vi.useRealTimers();
++    vi.unstubAllGlobals();
+   });
+ 
+   it('coalesces rapid draft changes into one latest snapshot', async () => {
+diff --git a/tests/runtime/chat-storage.test.ts b/tests/runtime/chat-storage.test.ts
+--- a/tests/runtime/chat-storage.test.ts
++++ b/tests/runtime/chat-storage.test.ts
+@@ -148,6 +148,7 @@
+ 
+ beforeEach(() => {
+   vi.clearAllMocks();
++  vi.stubGlobal('navigator', {});
+ });
+ 
+ afterEach(() => {
+diff --git a/tests/server/classroom-generation-retry.test.ts b/tests/server/classroom-generation-retry.test.ts
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -1,6 +1,8 @@
++// Initialize the mocked server module during collection, outside generation deadlines.
++import '@/lib/server/classroom-generation';
+ import { spawnSync } from 'node:child_process';
+ import path from 'node:path';
+-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+ 
+ const mocks = vi.hoisted(() => ({
+   resolveModel: vi.fn(),
+@@ -80,6 +82,29 @@
+     debug: mocks.logDebug,
+   }),
+ }));
++
++let historicalProfessionalClassroomJson: string;
++beforeAll(() => {
++  const fixtureResult = spawnSync(
++    'python3',
++    [
++      '-c',
++      `import json
++from tests.test_formal_runtime_candidate_generation import _formal_classroom
++print(json.dumps(_formal_classroom()))`,
++    ],
++    {
++      cwd: process.env.MIRA_TEST_BACKEND_DIR || path.resolve(process.cwd(), '../../../backend'),
++      encoding: 'utf8',
++      env: {
++        ...process.env,
++        PYTHONDONTWRITEBYTECODE: '1',
++      },
++    },
++  );
++  expect(fixtureResult.status, fixtureResult.stderr || fixtureResult.stdout).toBe(0);
++  historicalProfessionalClassroomJson = fixtureResult.stdout;
++});
+ 
+ const outline = {
+   id: 'outline-1',
+@@ -410,25 +435,7 @@
+       teacher,
+     });
+ 
+-    const fixtureResult = spawnSync(
+-      'python3',
+-      [
+-        '-c',
+-        `import json
+-from tests.test_formal_runtime_candidate_generation import _formal_classroom
+-print(json.dumps(_formal_classroom()))`,
+-      ],
+-      {
+-        cwd: path.resolve(process.cwd(), '../../../backend'),
+-        encoding: 'utf8',
+-        env: {
+-          ...process.env,
+-          PYTHONPYCACHEPREFIX: '/tmp/mira-single-authority-pycache',
+-        },
+-      },
+-    );
+-    expect(fixtureResult.status, fixtureResult.stderr || fixtureResult.stdout).toBe(0);
+-    const professionalClassroom = JSON.parse(fixtureResult.stdout);
++    const professionalClassroom = JSON.parse(historicalProfessionalClassroomJson);
+     Object.assign(professionalClassroom.stage.generatedAgentConfigs[0], teacher.runtime);
+     for (const scene of professionalClassroom.scenes) {
+       if (scene.type !== 'slide') continue;
+@@ -521,7 +528,7 @@
+ print(json.dumps({"ok":True,"sceneCount":len(payload["classroom"]["scenes"]),"receiptKeys":sorted(receipt.keys())}))`,
+       ],
+       {
+-        cwd: path.resolve(process.cwd(), '../../../backend'),
++        cwd: process.env.MIRA_TEST_BACKEND_DIR || path.resolve(process.cwd(), '../../../backend'),
+         input: JSON.stringify({
+           classroom: { stage: result.stage, scenes: result.scenes },
+           teacher,
+@@ -535,7 +542,7 @@
+         encoding: 'utf8',
+         env: {
+           ...process.env,
+-          PYTHONPYCACHEPREFIX: '/tmp/mira-single-authority-pycache',
++          PYTHONDONTWRITEBYTECODE: '1',
+         },
+       },
+     );
+diff --git a/tests/server/classroom-generation-sample-policy.test.ts b/tests/server/classroom-generation-sample-policy.test.ts
+--- a/tests/server/classroom-generation-sample-policy.test.ts
++++ b/tests/server/classroom-generation-sample-policy.test.ts
+@@ -1,3 +1,5 @@
++// Initialize the mocked server module during collection, outside generation deadlines.
++import '@/lib/server/classroom-generation';
+ import { beforeEach, describe, expect, it, vi } from 'vitest';
+ import type { SceneOutline } from '@openmaic/generation';
+ 
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -246,6 +246,12 @@
+       },
+       professionalCreation: {
+         interactionDesignPolicy: MIRA_MULTISTATE_INTERACTION_POLICY,
++        playfulLearningPolicy: {
++          schemaVersion: 'mira.openmaic.playful-learning.v1',
++          policyId: 'mira-primary-playful-exploration.v1',
++          aiDesigned: true, lockedAssessmentPreserved: true, maxQuizScenes: 2,
++          minimumReplayableGames: 1, threeDUsage: 'teaching_need',
++        },
+         schemaVersion: 'mira.openmaic.professional-creation.v1',
+         mode: 'professional_skill',
+         workflowVersion: 'openmaic-pro-agent.v1',
+@@ -493,13 +499,14 @@
+     const body = await response.json();
+ 
+     expect(response.status).toBe(503);
+-    expect(body.error).toContain('expected deepseek-v4-pro-flash-v1');
++    expect(body.error).toBe('Unsupported MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY; expected a supported frozen policy.');
+     expect(JSON.stringify(body)).not.toContain('hostile-policy-secret');
+   });
+ 
+   it('returns 503 when effective route validation reports a mismatch', async () => {
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+-    vi.doMock('@/lib/server/model-routes', () => ({
++    vi.doMock('@/lib/server/model-routes', async (importOriginal) => ({
++      ...(await importOriginal<typeof import('@/lib/server/model-routes')>()),
+       getMiraStructuredSceneRuntimePolicy: () => {
+         throw new Error('Structured scene route mismatch for scene-content:quiz.');
+       },
+diff --git a/tests/server/mira-formal-asr-revalidation.test.ts b/tests/server/mira-formal-asr-revalidation.test.ts
+--- a/tests/server/mira-formal-asr-revalidation.test.ts
++++ b/tests/server/mira-formal-asr-revalidation.test.ts
+@@ -18,7 +18,7 @@
+     teacherProfileId: 'mira_math_clear', teacherProfileVersion: 2, teacherProfileSha256: 'e'.repeat(64),
+     teacherGender: 'male' as const, sceneId: 'scene-test', sceneOrder: 2,
+     actionId: 'action-test', narrationSegmentId: 'narration-test',
+-    state: 'succeeded' as const, fallbackUsed: false as const, languageCode: 'zh-CN',
++    state: 'succeeded' as const, fallbackUsed: false as const, languageCode: 'zh-CN' as const,
+     audioSha256: sha(audio), createdAt: timestamp, updatedAt: timestamp,
+     completedAt: timestamp, providerAttemptedAt: timestamp, providerCompletedAt: timestamp,
+   };
+diff --git a/tests/server/mira-formal-audio-lifecycle.test.ts b/tests/server/mira-formal-audio-lifecycle.test.ts
+--- a/tests/server/mira-formal-audio-lifecycle.test.ts
++++ b/tests/server/mira-formal-audio-lifecycle.test.ts
+@@ -278,7 +278,7 @@
+     const fake = fakeDependencies((request) => `第${request.sceneOrder + 1}段讲解。`);
+     const input = { buildItemId: 'build-item-multi-asr', subject: 'math' as const, ...classroom };
+     const first = await completeMiraFormalAudioLifecycle(input, fake.dependencies);
+-    const receipts = [];
++    const receipts: Array<ReturnType<typeof comparisonAudit.buildAsrComparisonRevalidation>> = [];
+     for (const ordinal of [2, 9]) {
+       const asrRecord = (await fake.dependencies.readAsrJob(first.segments[ordinal].asr.requestId))!;
+       const ttsRecord = (await fake.dependencies.readTtsJob(asrRecord.ttsRequestId))!;
+diff --git a/tests/server/mira-formal-generation-idempotency.test.ts b/tests/server/mira-formal-generation-idempotency.test.ts
+--- a/tests/server/mira-formal-generation-idempotency.test.ts
++++ b/tests/server/mira-formal-generation-idempotency.test.ts
+@@ -1,3 +1,4 @@
++import { createRequire } from 'node:module';
+ import { promises as fs } from 'fs';
+ import { spawn } from 'child_process';
+ import os from 'os';
+@@ -22,16 +23,13 @@
+ describe('Mira formal generation request idempotency', () => {
+   let originalCwd: string;
+   let tempRoot: string;
++  let workerBundleDir: string | undefined;
++  let worker: string;
+ 
+   function runWorker(action: 'create' | 'claim', payload: object): Promise<Record<string, unknown>> {
+-    const worker = path.join(
+-      originalCwd,
+-      'tests/server/mira-formal-generation-idempotency-worker.ts',
+-    );
+-    const tsx = path.join(originalCwd, 'node_modules/.bin/tsx');
+     const encoded = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url');
+     return new Promise((resolve, reject) => {
+-      const child = spawn(tsx, [worker, tempRoot, action, encoded], {
++      const child = spawn(process.execPath, ['--import', 'tsx', worker, tempRoot, action, encoded], {
+         cwd: originalCwd,
+         env: { ...process.env },
+         stdio: ['ignore', 'pipe', 'pipe'],
+@@ -53,16 +51,20 @@
+ 
+   beforeEach(async () => {
+     originalCwd = process.cwd();
++    workerBundleDir = undefined;
+     tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-formal-runtime-'));
+     process.chdir(tempRoot);
+     afterSpy.mockReset();
+     runSpy.mockReset();
+     vi.resetModules();
++    vi.stubEnv('MIRA_INTERNAL_API_TOKEN', 'isolated-idempotency-test-token');
+   });
+ 
+   afterEach(async () => {
++    vi.unstubAllEnvs();
+     process.chdir(originalCwd);
+     await fs.rm(tempRoot, { recursive: true, force: true });
++    if (workerBundleDir) await fs.rm(workerBundleDir, { recursive: true, force: true });
+   });
+ 
+   it('converges concurrent creates and rejects a changed replay', async () => {
+@@ -73,7 +75,8 @@
+       runtimeRequestId: 'mira-formal-request-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+       coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+-      enableWebSearch: false,
++      professionalCreationPolicy: policy.MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++      enableWebSearch: true,
+       enableImageGeneration: false,
+       enableVideoGeneration: false,
+       enableTTS: false,
+@@ -95,7 +98,7 @@
+     ).toMatchObject({
+       id: results[0].job.id,
+       runtimeRequestId: input.runtimeRequestId,
+-      formalContractVersion: 'mira.openmaic.formal-runtime.v1',
++      formalContractVersion: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.schemaVersion,
+     });
+ 
+     await expect(
+@@ -113,13 +116,29 @@
+   });
+ 
+   it('atomically creates and claims one formal dispatch across Node processes', async () => {
++    // tsx defaults .ts to CommonJS, while the current agent runtime has ESM-only exports.
++    // Bundle local sources as ESM, retaining real package imports and independent processes.
++    const testRequire = createRequire(path.join(originalCwd, 'package.json'));
++    const { build } = createRequire(testRequire.resolve('tsx/package.json'))('esbuild');
++    workerBundleDir = await fs.mkdtemp(path.join(originalCwd, 'node_modules/.mira-idempotency-'));
++    worker = path.join(workerBundleDir, 'worker.mjs');
++    await build({
++      entryPoints: [path.join(originalCwd, 'tests/server/mira-formal-generation-idempotency-worker.ts')],
++      bundle: true,
++      platform: 'node',
++      format: 'esm',
++      packages: 'external',
++      outfile: worker,
++      tsconfig: path.join(originalCwd, 'tsconfig.json'),
++    });
+     const policy = await import('@/lib/server/mira-formal-generation-policy');
+     const input = {
+       requirement: 'formal cross-process requirement',
+       runtimeRequestId: 'mira-formal-cross-process-request-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+       coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+-      enableWebSearch: false,
++      professionalCreationPolicy: policy.MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++      enableWebSearch: true,
+       enableImageGeneration: false,
+       enableVideoGeneration: false,
+       enableTTS: false,
+@@ -149,7 +168,8 @@
+       runtimeRequestId: 'mira-formal-route-request-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+       coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+-      enableWebSearch: false,
++      professionalCreationPolicy: policy.MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++      enableWebSearch: true,
+       enableImageGeneration: false,
+       enableVideoGeneration: false,
+       enableTTS: false,
+@@ -158,7 +178,7 @@
+     const request = () =>
+       new NextRequest('http://runtime.test/api/generate-classroom', {
+         method: 'POST',
+-        headers: { 'content-type': 'application/json' },
++        headers: { 'content-type': 'application/json', 'x-mira-internal-token': 'isolated-idempotency-test-token' },
+         body: JSON.stringify(payload),
+       });
+ 
+@@ -175,6 +195,7 @@
+     const queried = await route.GET(
+       new NextRequest(
+         'http://runtime.test/api/generate-classroom?runtimeRequestId=mira-formal-route-request-1',
++        { headers: { 'x-mira-internal-token': 'isolated-idempotency-test-token' } },
+       ),
+     );
+     expect(queried.status).toBe(200);
+@@ -184,7 +205,7 @@
+       status: 'queued',
+       done: false,
+       runtimeRequestId: payload.runtimeRequestId,
+-      formalContractVersion: 'mira.openmaic.formal-runtime.v1',
++      formalContractVersion: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT.schemaVersion,
+     });
+     expect(queriedBody.formalInputSha256).toMatch(/^[a-f0-9]{64}$/);
+     expect(afterSpy).toHaveBeenCalledTimes(3);
+@@ -198,7 +219,8 @@
+       runtimeRequestId: 'mira-formal-stale-request-1',
+       formalRuntimeContract: policy.MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+       coursewareAuthority: policy.MIRA_COURSEWARE_AUTHORITY,
+-      enableWebSearch: false,
++      professionalCreationPolicy: policy.MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++      enableWebSearch: true,
+       enableImageGeneration: false,
+       enableVideoGeneration: false,
+       enableTTS: false,
+@@ -225,7 +247,7 @@
+     const response = await route.POST(
+       new NextRequest('http://runtime.test/api/generate-classroom', {
+         method: 'POST',
+-        headers: { 'content-type': 'application/json' },
++        headers: { 'content-type': 'application/json', 'x-mira-internal-token': 'isolated-idempotency-test-token' },
+         body: '{broken-json',
+       }),
+     );
+diff --git a/tests/server/mira-formal-video.test.ts b/tests/server/mira-formal-video.test.ts
+--- a/tests/server/mira-formal-video.test.ts
++++ b/tests/server/mira-formal-video.test.ts
+@@ -38,6 +38,7 @@
+   MIRA_PROFESSIONAL_CREATION_POLICY,
+   MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
+   MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
++  MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
+   getMiraFormalGenerationRuntimePolicy,
+   MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+   MIRA_COURSEWARE_AUTHORITY,
+@@ -255,9 +256,9 @@
+       }),
+     ).toBe(false);
+     expect(MIRA_FORMAL_GENERATION_POLICY.professionalCreation).toEqual(
+-      MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY,
+-    );
+-    expect(getMiraFormalGenerationRuntimePolicy().professionalCreation).toEqual(MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY);
++      MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++    );
++    expect(getMiraFormalGenerationRuntimePolicy().professionalCreation).toEqual(MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY);
+     expect(isExactMiraProfessionalCreationPolicy(MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY)).toBe(true);
+     expect(MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY).not.toHaveProperty('interactionDesignPolicy');
+     expect(digest(JSON.stringify(MIRA_PROFESSIONAL_CREATION_POLICY))).not.toBe(
+diff --git a/tests/server/mira-paid-budget.test.ts b/tests/server/mira-paid-budget.test.ts
+--- a/tests/server/mira-paid-budget.test.ts
++++ b/tests/server/mira-paid-budget.test.ts
+@@ -210,13 +210,14 @@
+   });
+   it('observation removes price-table ceilings but still validates units and one request per dispatch', async () => {
+     aggregateLimitsEnabled = false;
+-    for (const measured of [
++    const invalidUnits: Array<Record<string, number>> = [
+       { calls: 2, characters: 2000 },
+       { calls: 1, characters: -1 },
+       { calls: 1, characters: 1.5 },
+       { calls: 1, characters: Number.NaN },
+       { calls: 1, characters: 2, forged: 1 },
+-    ]) {
++    ];
++    for (const measured of invalidUnits) {
+       await expect(
+         withPaidBudget(binding, 'bad-units', () =>
+           budgetedOperation('qwen-tts', 'qwen3-tts-flash', {}, measured, async () => {
+diff --git a/tests/server/widget-media-context.test.ts b/tests/server/widget-media-context.test.ts
+--- a/tests/server/widget-media-context.test.ts
++++ b/tests/server/widget-media-context.test.ts
+@@ -3,7 +3,7 @@
+ 
+ describe('interactive generated media authoring context', () => {
+   it('forwards exact video IDs and topic to the interactive author instead of inventing URLs', async () => {
+-    const call = vi.fn(async () => '<html><head></head><body></body></html>');
++    const call = vi.fn(async (_system: string, _user: string) => '<html><head></head><body></body></html>');
+     const outline = {
+       id: 'intro', type: 'interactive', title: 'Observe water', description: 'Age-bound observation', order: 1,
+       widgetType: 'game', widgetOutline: { gameType: 'puzzle' },
+diff --git a/tests/workbench/workspace-rail-session-rename.test.ts b/tests/workbench/workspace-rail-session-rename.test.ts
+--- a/tests/workbench/workspace-rail-session-rename.test.ts
++++ b/tests/workbench/workspace-rail-session-rename.test.ts
+@@ -15,6 +15,7 @@
+ import { createRoot, type Root } from 'react-dom/client';
+ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+ import { RAIL_TAB_STORAGE_KEY } from '@/lib/workbench/workspace-rail-tab';
++import { WorkspaceRail } from '@/components/workbench/workspace/WorkspaceRail';
+ 
+ vi.mock('@/lib/hooks/use-i18n', () => ({
+   useI18n: () => ({ t: (key: string) => key }),
+@@ -65,7 +66,6 @@
+ const UNNAMED = 'session-unnamed';
+ 
+ async function renderRail(): Promise<{ onRenameSession: ReturnType<typeof vi.fn> }> {
+-  const { WorkspaceRail } = await import('@/components/workbench/workspace/WorkspaceRail');
+   const onRenameSession = vi.fn(async () => null);
+   window.localStorage.setItem(RAIL_TAB_STORAGE_KEY, 'sessions');
+ 

@@ -38,6 +38,7 @@ from services.learning_generated_course_validator import (
 )
 from tests.support import fresh_test_config, reset_mysql_test_database
 from tests.test_learning_catalog_content_only import (
+    _resume_legacy_content_build,
     _CompletePinyinCanaryAdapter,
     _OutlineOnlyAdapter,
     _RejectingPinyinCanaryAdapter,
@@ -60,6 +61,19 @@ from tests.test_openmaic_question_phase_adapter import (
     _validation as _branch_validation,
 )
 from tests.test_learning_generated_course_validator import formal_host_fixture
+
+
+def _primary_one_item_authority(skill_id: str, variant: int = 1) -> dict[str, object]:
+    target = build_preparation_target("primary_1")
+    item = next(row for row in target["courseTargets"]
+                if row["skillId"] == skill_id and row["variantOrdinal"] == variant)
+    return {"grade_code": "primary_1", "subject": item["subject"],
+            **{key: item[value] for key, value in (
+                ("subject_ordinal", "subjectOrdinal"),
+                ("skill_id", "skillId"),
+                ("boundary_ordinal", "boundaryOrdinal"),
+                ("boundary_version", "boundaryVersion"),
+                ("variant_ordinal", "variantOrdinal"))}}
 
 
 def _profiles() -> dict[str, dict[str, object]]:
@@ -246,6 +260,15 @@ class _CompletePrimaryOneAdapter(_OutlineOnlyAdapter):
                 },
             },
         }
+        if skill_id == "letters_sounds":
+            checkpoint_by_phase["candidate_repair"]["hostCompilation"] = {
+                "compiler": "host_compiler", "source": "canonical_skill_builder",
+                "version": question_adapter_module.LETTERS_SOUNDS_CANONICAL_BUILDER_VERSION,
+            }
+            checkpoint_by_phase["outline"]["outlinePlan"] = question_adapter_module._canonical_letters_sounds_outline_plan()
+            checkpoint_by_phase["raw_candidate"]["rawCandidate"] = question_adapter_module._canonical_letters_sounds_raw_candidate_seed()
+        elif skill_id == "number_sense_20":
+            checkpoint_by_phase["raw_candidate"]["rawCandidate"] = question_adapter_module._canonical_number_sense_raw_candidate_seed()
         if command.phase == "independent_verification":
             candidate_course = question_adapter_module._build_candidate_course(
                 command, compiled
@@ -324,7 +347,7 @@ class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
             clock_ms=lambda: now,
         )
         target = build_preparation_target("primary_1")
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id=(
                 "task7-fix2-attempt2-reject"
                 if reject_attempt_two
@@ -359,7 +382,7 @@ class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
             clock_ms=lambda: now,
         )
         target = build_preparation_target("primary_1")
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id=request_id,
             title="Task 7 Fix2 attempt1 residue proof",
             preparation_target=target,
@@ -385,7 +408,7 @@ class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
             clock_ms=lambda: now,
         )
         target = build_preparation_target("primary_1")
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id=request_id,
             title="Task 7 Fix3 real authority matrix",
             preparation_target=target,
@@ -1515,8 +1538,15 @@ class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
         )
         selections = []
         boundary_variants: dict[tuple[str, str], list[int]] = {}
+        clock = [700_000]
+        service._content_clock_ms = lambda: clock[0]
+        service.staged_content_candidate_generator._clock_ms = lambda: clock[0]
 
         for expected_count in range(1, 31):
+            # Separate sequential item inventories in time. Freezing all thirty
+            # completed courses into one millisecond makes later variants appear
+            # inside an earlier item's immutable pre-attempt history.
+            clock[0] = 700_000 + (expected_count - 1) * 1_000
             before = adapter.execute_calls
             results = self._advance(service, build_id, 7)
             self.assertEqual(
@@ -2222,7 +2252,7 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
             def load_content_proof_inventory(self, conn, *, build_id):
                 self.loads += 1
                 return {
-                    "build": {"id": build_id, "status": "failed"},
+                    "build": {"id": build_id, "status": "failed", "grade_code": "primary_1"},
                     "items": _summary_rows(),
                 }
 
@@ -2262,6 +2292,7 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
         )
         service.question_phase_provider_profiles = _profiles()
         item = {
+            **_primary_one_item_authority("simple_sentences"),
             "id": "item-simple-sentences",
             "subject": "chinese",
             "skill_id": "simple_sentences",
@@ -2601,6 +2632,7 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
             lambda conn, **kwargs: fenced.append(kwargs["error_code"])
         )
         locked = {
+            **_primary_one_item_authority("number_sense_20"),
             "id": "item-1",
             "build_job_id": "build-1",
             "attempt_count": 1,
@@ -2615,10 +2647,10 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
         persisted = repository._complete_content_provider_phase_locked(
             _RecordingConnection(),
             locked_item=locked,
-            locked_build={"id": "build-1"},
+            locked_build={"id": "build-1", "grade_code": "primary_1"},
             locked_items=[
                 locked,
-                *({"id": f"item-{index}"} for index in range(2, 31)),
+                *({"id": f"item-{index}", "grade_code": "primary_1"} for index in range(2, 31)),
             ],
             persisted_dispatch_id="dispatch-1",
             expected_next_phase="raw_candidate",
@@ -2793,6 +2825,7 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
     def test_terminal_provider_writer_uses_the_locked_item_for_candidate_persistence(self):
         now = 100_000
         locked = {
+            **_primary_one_item_authority("number_sense_20"),
             "id": "item-1",
             "build_job_id": "build-1",
             "attempt_count": 1,
@@ -2834,10 +2867,10 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
         persisted = repository._complete_content_provider_phase_locked(
             _RecordingConnection(),
             locked_item=locked,
-            locked_build={"id": "build-1"},
+            locked_build={"id": "build-1", "grade_code": "primary_1"},
             locked_items=[
                 locked,
-                *({"id": f"item-{index}"} for index in range(2, 31)),
+                *({"id": f"item-{index}", "grade_code": "primary_1"} for index in range(2, 31)),
             ],
             persisted_dispatch_id="dispatch-11",
             expected_next_phase=None,
@@ -2975,6 +3008,7 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
             validation=question_adapter_module._build_validation(
                 course, existing_count=5
             ),
+            existing_fingerprint_count=5,
             independent_solution=solution,
         )
         identity = replace(
@@ -3214,6 +3248,8 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
     def test_prepare_consumes_global_histories_without_late_dispatch_lock(self):
         repository = object.__new__(LearningCatalogRepository)
         proof = {
+            **_primary_one_item_authority("pinyin_syllables"),
+            "content_attempt_started_at": 100_000,
             "id": "proof-item",
             "subject": "chinese",
             "skill_id": "pinyin_syllables",
@@ -3224,6 +3260,8 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
             "generation_request_id": "proof-request",
         }
         inflight = {
+            **_primary_one_item_authority("number_sense_20"),
+            "content_attempt_started_at": 100_000,
             "id": "inflight-item",
             "subject": "math",
             "skill_id": "number_sense_20",
@@ -3271,7 +3309,7 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
         repository.list_content_dispatches = late_dispatch_lock
 
         plan = repository.prepare_content_advance(
-            object(),
+            _SingleRowConnection(None),
             build_id="build-1",
             now=100_000,
             passed_item_ids=frozenset({"proof-item"}),
@@ -3307,6 +3345,9 @@ class LearningCatalogContentReviewFixTwoPureRedTest(unittest.TestCase):
 
 def _proof_row(*, attempt: int) -> dict[str, object]:
     return {
+        **_primary_one_item_authority("pinyin_initials_syllables"),
+        "build_job_id": "build-1",
+        "content_attempt_started_at": 100_000,
         "id": "item-1",
         "status": "course_ready",
         "attempt_count": attempt,
@@ -3354,6 +3395,7 @@ class _HistoryConnection:
                         "build_item_id": item_id,
                         "logical_attempt": attempt,
                         "phase_ordinal": 1,
+                        "attempt_started_at": 100_000,
                     }
                     for attempt in (1, 2)
                 ]
@@ -3440,6 +3482,7 @@ def _summary_rows() -> list[dict[str, object]]:
     target = build_preparation_target("primary_1")["courseTargets"]
     rows = [
         {
+            **_primary_one_item_authority(str(item["skillId"]), int(item["variantOrdinal"])),
             "id": f"item-{index}",
             "subject": item["subject"],
             "skill_id": item["skillId"],
@@ -3516,7 +3559,7 @@ class _PostFenceRereadRepository(_TerminalSummaryRepository):
         failed = copy.deepcopy(self.rows[0])
         return {
             "release": {"id": "release-1", "status": "draft"},
-            "build": {"id": build_id, "status": "failed"},
+            "build": {"id": build_id, "status": "failed", "grade_code": "primary_1"},
             "items": copy.deepcopy(self.rows),
             "evidence": [{"item": failed}],
         }
@@ -3537,6 +3580,7 @@ class _PrepareFenceRereadRepository(_TerminalSummaryRepository):
             "build": {
                 "id": build_id,
                 "status": "running" if self.inventory_loads == 1 else "failed",
+                "grade_code": "primary_1",
             },
             "items": copy.deepcopy(self.rows),
             "evidence": [],
@@ -3567,7 +3611,7 @@ class _InternallyFencedHostRepository(_TerminalSummaryRepository):
 
     def load_content_proof_inventory(self, conn, *, build_id):
         return {
-            "build": {"id": build_id, "status": "failed"},
+            "build": {"id": build_id, "status": "failed", "grade_code": "primary_1"},
             "items": copy.deepcopy(self.rows),
         }
 

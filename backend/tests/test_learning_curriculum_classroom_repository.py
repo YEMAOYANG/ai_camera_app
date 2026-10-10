@@ -3,13 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
+from types import SimpleNamespace
 import unittest
 from unittest import mock
 
 import pymysql
 
 from core.database import Database
-from content.teacher_profiles import get_formal_runtime_teacher_contract
+from content.teacher_profiles import get_formal_runtime_teacher_contract, get_formal_subject_qwen_voice_identity
 from repositories.learning_catalog_repository import (
     LearningCatalogActivationError,
     LearningCatalogRepository,
@@ -465,6 +466,9 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                 runtime_service.video_export_enabled = False
                 runtime_service.repository = self.runtimes
                 runtime_service.client = client
+                runtime_service.paid_budget_service = SimpleNamespace(
+                    issue_catalog_production_authorization=lambda **kwargs: {"fixture": "no-provider-dispatch"}
+                )
 
                 with self.assertRaises(OpenMaicRuntimeServiceError) as raised:
                     runtime_service.issue_candidate_generation(**staged_calls[0])
@@ -1353,6 +1357,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
 
     def test_complete_formal_ready_is_exact_atomic_and_readable(self) -> None:
         fixture = self._seed_formal_ready_plan("complete-ready")
+        self._seed_formal_ready_audio_and_provider_evidence(fixture)
         with self.database.transaction() as conn:
             missing_pointer = self.preparations.complete_formal_ready(
                 conn,
@@ -1795,6 +1800,90 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
             }
         return progress
 
+    def _seed_formal_ready_audio_and_provider_evidence(self, fixture):
+        """Persist the publication gate's FK-bound audio/Provider fixture, without calls."""
+        def insert(conn, table, values):
+            columns = ", ".join(values)
+            placeholders = ", ".join("?" for _ in values)
+            conn.execute(f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", tuple(values.values()))
+
+        digest = hashlib.sha256(str(fixture["plan_id"]).encode()).hexdigest()
+        with self.database.transaction() as conn:
+            rows = conn.execute(
+                "SELECT receipt.*, item.subject, runtime.request_id, runtime.upstream_classroom_id "
+                "FROM learning_curriculum_classroom_item_receipts AS receipt "
+                "JOIN learning_catalog_build_items AS item ON item.id = receipt.build_item_id "
+                "JOIN learning_openmaic_runtime_classrooms AS runtime ON runtime.id = receipt.runtime_classroom_id "
+                "WHERE receipt.release_id = ? ORDER BY item.subject_ordinal, item.boundary_ordinal, item.variant_ordinal, item.id",
+                (fixture["release_id"],),
+            ).fetchall()
+            self.assertEqual(len(rows), 30)
+            for row in rows:
+                voice = get_formal_subject_qwen_voice_identity(row["subject"])
+                insert(conn, "learning_formal_qwen_audio_jobs", dict(
+                    build_item_id=row["build_item_id"], release_id=row["release_id"], grade_code=row["grade_code"],
+                    target_fingerprint=row["target_fingerprint"], course_id=row["course_id"], course_version=row["course_version"],
+                    package_id=row["package_id"], package_version=row["package_version"], runtime_classroom_id=row["runtime_classroom_id"],
+                    runtime_request_id=row["request_id"], upstream_classroom_id=row["upstream_classroom_id"], classroom_content_sha256=digest,
+                    subject=voice.subject, language_code=voice.language_code, teacher_profile_id=voice.teacher_profile_id,
+                    teacher_profile_version=voice.teacher_profile_version, teacher_profile_hash=voice.teacher_profile_hash,
+                    teacher_name=voice.teacher_name, teacher_gender=voice.teacher_gender, voice_gender=voice.voice_gender,
+                    voice_contract_version="mira.openmaic.formal-subject-qwen3-voice.v1", tts_provider_id=voice.tts_provider_id,
+                    tts_model_id=voice.tts_model_id, tts_voice_id=voice.voice_id, asr_provider_id=voice.asr_provider_id, asr_model_id=voice.asr_model_id,
+                    audio_contract_version="mira.learning.formal-qwen-audio.v1", pcm_validation_contract_version="mira.learning.formal-pcm-validation.v1",
+                    asr_roundtrip_contract_version="mira.learning.formal-qwen-asr-roundtrip.v1", speech_manifest_sha256=digest,
+                    expected_segment_count=1, state="auto_validated", tts_attempted_count=1, tts_completed_count=1,
+                    audio_validated_count=1, asr_attempted_count=1, asr_passed_count=1,
+                    terminal_receipt_version="mira.learning.formal-qwen-audio.v1", terminal_receipt_hash=digest,
+                    started_at=7001, terminal_at=7005, created_at=7001, updated_at=7005,
+                ))
+            witness = rows[0]
+            asset_id, probe_id, readiness_id = (f"fixture-{kind}-{digest[:32]}" for kind in ("asset", "probe", "readiness"))
+            tts_request_id = f"fixture-tts-{digest[:32]}"
+            insert(conn, "learning_media_assets", dict(id=asset_id, kind="audio", created_at=7001, updated_at=7005))
+            insert(conn, "learning_formal_qwen_audio_segment_receipts", dict(
+                build_item_id=witness["build_item_id"], scene_order=0, scene_id="fixture-scene", action_id="fixture-speech",
+                narration_segment_id=f"fixture-narration-{digest[:32]}", source_text_sha256=digest,
+                tts_request_id=tts_request_id, tts_request_sha256=digest, asr_request_id=f"fixture-asr-{digest[:32]}", asr_request_sha256=digest,
+                state="auto_validated", tts_attempted_at=7001, tts_completed_at=7002, audio_validated_at=7003,
+                asr_attempted_at=7004, asr_completed_at=7005, asr_similarity_bps=10000,
+                runtime_audio_sha256=digest, download_sha256=digest, streamed_sha256=digest, readback_sha256=digest,
+                asset_id=asset_id, mime_type="audio/wav", byte_size=16044, pcm_format=1, channel_count=1,
+                bits_per_sample=16, sample_rate_hz=16000, block_align=2, byte_rate=32000, frame_count=8000, duration_ms=500,
+                normalized_peak_bps=1000, overall_rms_bps=500, active_window_bps=1000,
+                write_completed_at=7003, readback_completed_at=7003, machine_receipt_version="fixture.pcm.v1",
+                machine_receipt_hash=digest, terminal_at=7005, created_at=7001, updated_at=7005,
+            ))
+            insert(conn, "learning_openmaic_conversation_probes", dict(
+                id=probe_id, ticket_hash=digest, runtime_classroom_id=witness["runtime_classroom_id"],
+                upstream_classroom_id=witness["upstream_classroom_id"], challenge="fixture", expires_at=8000, finalized_at=7006, created_at=7001,
+            ))
+            contract = "mira.openmaic.formal-provider-readiness.v1"
+            insert(conn, "learning_openmaic_provider_readiness_jobs", dict(
+                id=readiness_id, request_id=readiness_id, request_sha256=digest, build_item_id=witness["build_item_id"],
+                release_id=witness["release_id"], grade_code=witness["grade_code"], target_fingerprint=witness["target_fingerprint"],
+                runtime_classroom_id=witness["runtime_classroom_id"], runtime_request_id=witness["request_id"],
+                upstream_classroom_id=witness["upstream_classroom_id"], classroom_content_sha256=digest,
+                audio_job_terminal_receipt_hash=digest, validation_scene_order=0, validation_tts_request_id=tts_request_id,
+                validation_audio_sha256=digest, validation_audio_machine_receipt_hash=digest, conversation_probe_id=probe_id,
+                route_session_contract_version="mira.openmaic.conversation-proof.v1", route_session_receipt_hash=digest,
+                route_session_completed_at=7006, provider_contract_version=contract, expected_provider_call_count=5,
+                provider_attempted_count=5, provider_passed_count=5, provider_receipt_hash=digest, state="auto_validated",
+                started_at=7001, terminal_at=7010, created_at=7001, updated_at=7010,
+            ))
+            calls = [("kimi_text", None, "kimi", "kimi-k2.6", None, None),
+                     ("qwen_asr", "chinese", "qwen-asr", "qwen3-asr-flash", None, "zh-CN"),
+                     ("qwen_tts", "chinese", "qwen-tts", "qwen3-tts-flash", "Serena", "zh-CN"),
+                     ("qwen_tts", "math", "qwen-tts", "qwen3-tts-flash", "Ethan", "zh-CN"),
+                     ("qwen_tts", "english", "qwen-tts", "qwen3-tts-flash", "Jennifer", "en-US")]
+            for ordinal, (kind, subject, provider, model, voice, language) in enumerate(calls, 1):
+                insert(conn, "learning_openmaic_provider_readiness_call_receipts", dict(
+                    readiness_id=readiness_id, provider_contract_version=contract, call_ordinal=ordinal, kind=kind, subject=subject,
+                    provider_id=provider, model_id=model, voice_id=voice, language_code=language,
+                    request_sha256=digest, response_sha256=digest, state="passed", attempted_at=7007, completed_at=7008,
+                    created_at=7007, updated_at=7008,
+                ))
+
     def _seed_formal_ready_plan(self, suffix: str) -> dict[str, object]:
         target = build_preparation_target("primary_1")
         fingerprint = preparation_target_fingerprint(target)
@@ -2093,6 +2182,9 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
             )
             self.runtimes.mark_generating(conn, runtime_id=runtime['id'], upstream_job_id='library-resumed-upstream', now=840010)
         library = CourseLibraryService(self.database_url, clock=lambda: 860000)
+        # Observe the exact persisted historical target; new supply defaults to progressive lessons.
+        library.target = build_preparation_target("primary_1")
+        library.fingerprint = fixture["fingerprint"]
         status = library.status()
         self.assertEqual(status['lastProgressAt'], 840000)
         self.assertEqual(status['items'][0]['runtime_status'], 'generating')

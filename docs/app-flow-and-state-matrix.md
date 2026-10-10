@@ -1,7 +1,7 @@
 # Mira Guardian App Flow and State Matrix v1
 
 更新日期：2026-08-12
-适用范围：Figma 设计范围、页面查缺补漏、组件状态设计、后续 Flutter 页面验收  
+适用范围：Figma 设计范围、页面查缺补漏、组件状态设计、后续 Flutter 页面验收
 来源：`README.md`、`docs/grade_based_kindergarten_primary_learning_plan.md`、`docs/ai_camera_parent_needs_product_tech_plan.md`、`design/mira_guardian_high_fidelity_ui.html` 的业务页面/交互状态
 
 ## 1. 产品信息架构 IA

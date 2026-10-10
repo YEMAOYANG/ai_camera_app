@@ -9,6 +9,7 @@ from services.dynamic_learning_course_generation_service import (
 from tests.support import fresh_test_config
 from tests.test_dynamic_learning_course_generation_service import (
     _FakeQuestionAdapter,
+    _freeze_legacy_job,
 )
 
 
@@ -31,6 +32,7 @@ class DynamicLearningClassroomEnqueueTest(unittest.TestCase):
             classroom_enqueue=enqueue,
         )
         boundary = boundary_for("primary_3", "math")
+        _freeze_legacy_job(service, "dynamic-course-with-classroom-job")
         result = service.generate(
             {
                 "requestId": "dynamic-course-with-classroom-job",
@@ -64,6 +66,7 @@ class DynamicLearningClassroomEnqueueTest(unittest.TestCase):
             classroom_enqueue=enqueue,
         )
         boundary = boundary_for("primary_3", "math")
+        _freeze_legacy_job(service, "dynamic-course-catalog-managed")
         result = service.generate_for_skill(
             grade_code="primary_3",
             subject="math",

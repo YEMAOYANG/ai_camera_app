@@ -83,7 +83,7 @@ def _outline_checkpoint() -> dict[str, object]:
     return {
         "phaseStatus": "accepted",
         "outlinePlan": {
-            "courseTitle": "20以内加减法",
+            "courseTitle": "星星与铅笔的加减法",
             "languageDirective": "使用简体中文教学。",
             "outlines": [
                 {
@@ -99,7 +99,7 @@ def _outline_checkpoint() -> dict[str, object]:
 
 def _compiled_candidate() -> dict[str, object]:
     return {
-        "title": "20以内加减法",
+        "title": "星星与铅笔的加减法",
         "intro": "先理解加减法,再完成练习。",
         "estimatedMinutes": 10,
         "teachingFlow": {
@@ -197,7 +197,7 @@ def _number_sense_candidate() -> dict[str, object]:
         }
 
     return _nfkc_fixture({
-        "title": "20以内数感",
+        "title": "数卡小屋的顺序与组成",
         "intro": "认识数的顺序、大小和组成。",
         "estimatedMinutes": 10,
         "teachingFlow": {
@@ -391,7 +391,7 @@ def _text_boundary(*, english: bool) -> dict[str, object]:
 def _text_candidate(*, answers: list[str], english: bool) -> dict[str, object]:
     skill = "Numbers and colors" if english else "汉字与词语"
     return _nfkc_fixture({
-        "title": skill,
+        "title": "Street-name word practice" if english else "山水字卡认读",
         "intro": "Read, think, and answer." if english else "先认读，再作答。",
         "estimatedMinutes": 10,
         "teachingFlow": {
@@ -669,7 +669,11 @@ def _independent_solution_for(
         "answers": [
             {
                 "questionId": question["id"],
-                "answer": copy.deepcopy(question["answer"]),
+                "answer": copy.deepcopy(
+                    question["answer"][0]
+                    if question["type"] == "accepted_text"
+                    else question["answer"]
+                ),
                 **(
                     {"derivedExpression": question["verificationExpression"]}
                     if question["type"] == "numeric"
@@ -1204,6 +1208,7 @@ class OpenMaicQuestionPhaseAdapterTest(unittest.TestCase):
         accepted = (
             base,
             {**base, "timeoutMs": 180_000},
+            {**base, "timeoutMs": 300_000},
             {**base, "baseUrl": "http://127.0.0.1:3000/v1"},
             {**base, "baseUrl": "http://[::1]:3000/v1"},
             {**base, "baseUrl": "https://例子.测试/v1"},
@@ -1235,7 +1240,7 @@ class OpenMaicQuestionPhaseAdapterTest(unittest.TestCase):
                     )
         rejected = (
             {**base, "name": "n" * 81},
-            {**base, "timeoutMs": 180_001},
+            {**base, "timeoutMs": 300_001},
             {**base, "baseUrl": "https://example.com/" + "😀" * 241},
             {**base, "baseUrl": "http://[::1].evil/v1"},
             {**base, "secret": "must-not-exist"},

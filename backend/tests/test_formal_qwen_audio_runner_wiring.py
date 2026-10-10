@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 import unittest
+from types import SimpleNamespace
 
 from services.learning_curriculum_preparation_contract import (
     build_preparation_target,
@@ -121,6 +122,7 @@ class _App:
 def _plan(stage: str) -> dict:
     return {
         "id": "formal-plan-1",
+        "grade_code": "primary_1",
         "stage": stage,
         "catalog_build_id": "formal-build-1",
         "catalog_release_id": "formal-release-1",
@@ -138,7 +140,7 @@ class FormalQwenAudioRunnerWiringTest(unittest.TestCase):
         adapter = FormalProductionStageAdapter(
             _ProgressivePublicationService(calls),
             repository=object(),
-            runtime_candidate_processor=lambda: calls.append("runtime"),
+            runtime_candidate_processor=lambda **_scope: calls.append("runtime"),
             formal_repository=object(),
             formal_audio_service=_RecordingFormalAudio(calls),
             formal_audio_validation_enabled=True,
@@ -155,6 +157,7 @@ class FormalQwenAudioRunnerWiringTest(unittest.TestCase):
 
         self.assertEqual(calls, ["audio", "publication", "runtime"])
         self.assertEqual(result, {
+            "blockedReason": None,
             "total": 1,
             "ready": 1,
             "failed": 0,
@@ -177,7 +180,7 @@ class FormalQwenAudioRunnerWiringTest(unittest.TestCase):
         adapter = FormalProductionStageAdapter(
             _UnpublishedProgressiveService(calls),
             repository=repository,
-            runtime_candidate_processor=lambda: calls.append("runtime"),
+            runtime_candidate_processor=lambda **_scope: calls.append("runtime"),
             formal_repository=formal_repository,
             formal_audio_service=_RecordingFormalAudio(calls),
             formal_audio_validation_enabled=True,
@@ -218,7 +221,8 @@ class FormalQwenAudioRunnerWiringTest(unittest.TestCase):
         formal_audio = _FormalAudio(formal_repository)
         runtime_calls = []
 
-        def runtime_candidate_processor():
+        def runtime_candidate_processor(*, preparation_plan):
+            self.assertEqual(preparation_plan["id"], "formal-plan-1")
             runtime_calls.append(True)
             counts["classroomReady"] = 30
 
@@ -271,6 +275,9 @@ class FormalQwenAudioRunnerWiringTest(unittest.TestCase):
             @contextmanager
             def transaction(self):
                 yield self
+
+            def execute(self, _sql, _params=()):
+                return SimpleNamespace(fetchone=lambda: None)
 
             def start_next_formal_pipeline(self, _conn, **kwargs):
                 self.started = True

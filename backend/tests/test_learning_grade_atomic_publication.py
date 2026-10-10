@@ -21,7 +21,7 @@ def _plan(stage: str) -> dict[str, object]:
         "id": "plan-1",
         "lease_token": "lease-1",
         "stage": stage,
-        "grade_code": "primary_2",
+        "grade_code": "primary_1",
         "catalog_build_id": "build-1",
         "catalog_release_id": "release-1",
         "target_fingerprint": "a" * 64,
@@ -135,7 +135,7 @@ class LearningGradeAtomicPublicationTest(unittest.TestCase):
         self.assertTrue(result.already_persisted)
         self.assertEqual(len(service.publication_calls), 1)
         call = service.publication_calls[0]
-        self.assertEqual(call["grade_code"], "primary_2")
+        self.assertEqual(call["grade_code"], "primary_1")
         self.assertEqual(call["build_id"], "build-1")
         self.assertEqual(call["target_fingerprint"], "a" * 64)
         self.assertEqual(call["publisher_plan_id"], "plan-1")
@@ -272,15 +272,34 @@ class LearningGradeAtomicPublicationTest(unittest.TestCase):
         self.assertNotEqual(first, second)
 
 
+class _LegacyPublicationConnection:
+    def execute(self, sql, params):
+        if not (
+            sql.startswith("SELECT course.* FROM learning_catalog_release_items AS item ")
+            and "course.curriculum_version = 'mira.primary.progressive.v1'" in sql
+            and params == ("release-1",)
+        ):
+            raise AssertionError((sql, params))
+        return self
+
+    def fetchall(self):
+        # These fixtures publish the historical V2 batch, which has no fine lessons.
+        return []
+
+
 class _AtomicCatalogRepository:
     def __init__(self, *, item_count: int = 30):
-        self.conn = object()
+        self.conn = _LegacyPublicationConnection()
+        self.database = object()
         self.item_count = item_count
         self.calls: list[tuple[str, object]] = []
 
     @contextmanager
     def transaction(self):
         yield self.conn
+
+    def get_build(self, conn, *, build_id):
+        return {"id": build_id, "grade_code": "primary_1"}
 
     def lock_formal_publication_authority(self, conn, **_kwargs):
         self.calls.append(("lock", conn))
@@ -354,13 +373,22 @@ class _ValidationPreparationRepository:
 
 class _ProgressiveCatalogRepository:
     def __init__(self):
-        self.conn = object()
+        self.conn = _LegacyPublicationConnection()
+        self.database = object()
         self.calls: list[tuple[str, object]] = []
         self.publications: list[dict[str, object]] = []
 
     @contextmanager
     def transaction(self):
         yield self.conn
+
+    def get_build(self, conn, *, build_id):
+        from services.learning_curriculum_preparation_contract import build_preparation_target
+        return {
+            "id": build_id,
+            "grade_code": "primary_1",
+            "target_spec_json": build_preparation_target("primary_1"),
+        }
 
     def prepare_formal_validation_step(self, conn, **_kwargs):
         self.calls.append(("prepare", conn))
@@ -529,7 +557,7 @@ class LearningGradePublicationServiceTest(unittest.TestCase):
         service = self._service(repository)
 
         result = service.advance_grade_validation(
-            grade_code="primary_2",
+            grade_code="primary_1",
             build_id="build-1",
             release_id="release-1",
             target_fingerprint="a" * 64,
@@ -610,7 +638,7 @@ class LearningGradePublicationServiceTest(unittest.TestCase):
 
         with self.assertRaises(LearningCatalogActivationError):
             service.activate_grade_release(
-                grade_code="primary_2",
+                grade_code="primary_1",
                 build_id="build-1",
                 target_fingerprint="a" * 64,
                 publication_request_id="formal-publish:one",
@@ -633,7 +661,7 @@ class LearningGradePublicationServiceTest(unittest.TestCase):
         service = self._service(repository)
 
         result = service.activate_grade_release(
-            grade_code="primary_2",
+            grade_code="primary_1",
             build_id="build-1",
             target_fingerprint="a" * 64,
             publication_request_id="formal-publish:one",

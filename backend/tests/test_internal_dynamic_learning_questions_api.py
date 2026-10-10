@@ -10,6 +10,7 @@ from services.dynamic_learning_course_generation_service import (
 from tests.support import fresh_test_config
 from tests.test_dynamic_learning_course_generation_service import (
     _FakeQuestionAdapter,
+    _freeze_legacy_job,
 )
 
 
@@ -49,6 +50,8 @@ class InternalDynamicLearningQuestionsApiTest(unittest.TestCase):
         self.assertTrue(policy["catalogReleaseRequired"])
 
         boundary = boundary_for("primary_3", "math")
+        _freeze_legacy_job(self.app.extensions["mira_dynamic_learning_course_generation_service"],
+            "internal-dynamic-primary-3-math", grade_code="primary_3", subject="math", skill_id=boundary.skill_id)
         generated = self.client.post(
             "/internal/learning/content/questions/generate",
             json={

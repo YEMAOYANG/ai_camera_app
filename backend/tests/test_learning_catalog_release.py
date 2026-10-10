@@ -30,9 +30,41 @@ from services.learning_catalog_validator import LearningCatalogValidator
 from tests.support import fresh_test_config, validated_test_database_url
 from tests.test_dynamic_learning_course_generation_service import (
     _WidgetCompatibleQuestionAdapter,
+    _freeze_legacy_job,
 )
 from tests.test_lesson_package_v2 import _FakeClassroomAdapter
 from tests.support_learning_media import AutoPublishingLessonPackageService
+
+
+def _restore_legacy_build(testcase, service, data):
+    """Restore frozen full-pipeline fixtures, then exercise the real replay API."""
+    grades = data.get("grades", ["primary_1"])
+    subjects = data.get("subjects", ["chinese", "math", "english"])
+    targets = [boundary.to_catalog_payload() for boundary in PRIMARY_SKILL_BOUNDARIES
+               if boundary.grade_code in grades and boundary.subject in subjects]
+    variants = int(data.get("variantsPerBoundary", 1))
+    spec = {"schemaVersion": "mira.learning.catalog-build-target.v1",
+            "curriculumVersion": PRIMARY_CURRICULUM_VERSION, "grades": grades, "subjects": subjects,
+            "variantsPerBoundary": variants, "allowPartial": bool(data.get("allowPartial", False)),
+            "boundaryVersions": [target["boundaryVersion"] for target in targets]}
+    with service.repository.transaction() as conn:
+        build, restored = service.repository.create_or_get_build(
+            conn, request_id=data["requestId"], curriculum_version=PRIMARY_CURRICULUM_VERSION,
+            title="Restored legacy catalog fixture", target_spec=spec, targets=targets,
+            variants_per_boundary=variants, now=1,
+        )
+        items = service.repository.list_build_items(conn, build_id=build["id"])
+    testcase.assertTrue(restored)
+    # An already-frozen retry is part of restored work; new coarse requests
+    # remain forbidden after the progressive curriculum upgrade.
+    if isinstance(service.dynamic_generation_service, DynamicLearningCourseGenerationService):
+        for item in items:
+            _freeze_legacy_job(service.dynamic_generation_service,
+                str(item["generation_request_id"]) + ".retry2", grade_code=str(item["grade_code"]),
+                subject=str(item["subject"]), skill_id=str(item["skill_id"]))
+    replay = service.create(data)
+    testcase.assertEqual(replay["build"]["id"], build["id"])
+    return replay
 
 
 class LearningCatalogReleaseTest(unittest.TestCase):
@@ -57,11 +89,19 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             lesson_package_service=self.lesson,
         )
 
+    def _restore_legacy_build(self, service, data):
+        return _restore_legacy_build(self, service, data)
+
     def tearDown(self):
         self.lesson.close()
 
     def test_new_build_is_not_activatable_before_release_ready_packages(self):
-        created = self.service.create(
+        with self.assertRaises(ApiError) as rejected:
+            self.service.create({"requestId": "new-coarse-catalog-forbidden", "grades": ["primary_3"], "subjects": ["math"]})
+        self.assertEqual(rejected.exception.code, "invalid_progressive_lesson_targets")
+        self.assertEqual(self.question_adapter.generate_calls, [])
+        self.assertEqual(self.classroom_adapter.calls, [])
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-release-readiness-payload",
                 "grades": ["primary_3"],
@@ -88,7 +128,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
                     )
                 self.assertEqual(raised.exception.status_code, 400)
 
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-public-full-pipeline-only",
                 "grades": ["primary_3"],
@@ -320,7 +360,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         self.assertEqual(len(items), len(math_targets))
 
     def test_build_resumes_then_only_active_ready_release_is_recommended(self):
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-release-primary-3-math",
                 "grades": ["primary_3"],
@@ -329,7 +369,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
                 "allowPartial": True,
             }
         )
-        self.assertTrue(created["created"])
+        self.assertNotIn("created", created)  # The real service replays an existing build.
         self.assertEqual(created["build"]["totalItemCount"], 3)
         build_id = created["build"]["id"]
         release_id = created["release"]["id"]
@@ -426,7 +466,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             dynamic_generation_service=self.dynamic,
             lesson_package_service=fail_once,
         )
-        created = service.create(
+        created = self._restore_legacy_build(service,
             {
                 "requestId": "catalog-release-recover-package",
                 "grades": ["primary_3"],
@@ -468,7 +508,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             lesson_package_service=self.lesson,
             catalog_validator=gate,
         )
-        created = service.create(
+        created = self._restore_legacy_build(service,
             {
                 "requestId": "catalog-content-reject-course-retry",
                 "grades": ["primary_3"],
@@ -514,7 +554,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             dynamic_generation_service=self.dynamic,
             lesson_package_service=always_fail,
         )
-        created = service.create(
+        created = self._restore_legacy_build(service,
             {
                 "requestId": "catalog-release-bounded-retry",
                 "grades": ["primary_3"],
@@ -563,7 +603,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         self.assertEqual(always_fail.calls, 6)
 
     def test_concurrent_claim_is_unique_and_stale_retry_replays_same_attempt(self):
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-release-claim-lease",
                 "grades": ["primary_3"],
@@ -670,7 +710,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         )
 
     def test_external_failure_replays_same_attempt_only_when_explicit(self):
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-external-provider-recovery",
                 "grades": ["primary_3"],
@@ -745,7 +785,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         self.assertNotIn("prior_error_code", recovered)
 
     def test_package_claim_is_unique_and_late_attempt_cannot_overwrite_new_lease(self):
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-package-atomic-claim",
                 "grades": ["primary_3"],
@@ -849,7 +889,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         self.assertEqual(late["active_package_request_id"], second_request)
 
     def test_late_stale_course_worker_cannot_downgrade_winner_ready_item(self):
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-course-late-worker-cas",
                 "grades": ["primary_3"],
@@ -954,7 +994,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             dynamic_generation_service=self.dynamic,
             lesson_package_service=pending_once,
         )
-        created = service.create(
+        created = self._restore_legacy_build(service,
             {
                 "requestId": "catalog-release-media-pending",
                 "grades": ["primary_3"],
@@ -982,7 +1022,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         )
 
     def test_activation_rejects_required_media_that_has_not_passed_review(self):
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-release-unreviewed-media",
                 "grades": ["primary_3"],
@@ -1074,7 +1114,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         self.assertEqual(activated["release"]["status"], "active")
 
     def test_stored_auto_validated_course_is_rechecked_before_release_activation(self):
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-release-activation-content-recheck",
                 "grades": ["primary_3"],
@@ -1103,7 +1143,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         self.assertEqual(release["status"], "draft")
 
     def test_activation_rejects_package_compiled_from_another_course_hash(self):
-        created = self.service.create(
+        created = self._restore_legacy_build(self.service,
             {
                 "requestId": "catalog-release-activation-hash-recheck",
                 "grades": ["primary_3"],
@@ -1145,6 +1185,14 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             "X-Mira-Internal-Token": token,
             "X-Mira-Internal-Source": "catalog-release-test",
         }
+        rejected = client.post("/internal/learning/content/catalog/builds",
+            json={"requestId": "new-internal-coarse-forbidden", "grades": ["primary_3"], "subjects": ["math"]}, headers=headers)
+        self.assertEqual(rejected.status_code, 400, rejected.json)
+        self.assertEqual(rejected.json["error"], "invalid_progressive_lesson_targets")
+        self.assertEqual(self.question_adapter.generate_calls, [])
+        self.assertEqual(self.classroom_adapter.calls, [])
+        self._restore_legacy_build(self.service, {"requestId": "catalog-api-primary-3-math",
+            "grades": ["primary_3"], "subjects": ["math"], "allowPartial": True})
         created = client.post(
             "/internal/learning/content/catalog/builds",
             json={
@@ -1155,7 +1203,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             },
             headers=headers,
         )
-        self.assertEqual(created.status_code, 201, created.json)
+        self.assertEqual(created.status_code, 200, created.json)
         build_id = created.json["build"]["id"]
         release_id = created.json["release"]["id"]
         status = client.get(

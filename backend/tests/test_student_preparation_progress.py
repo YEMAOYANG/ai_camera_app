@@ -15,7 +15,11 @@ class StudentPreparationProgressTest(unittest.TestCase):
         ]:
             with self.subTest(plan=plan):
                 conn = Mock()
-                conn.execute.return_value.fetchone.side_effect = [plan, {"value": 0}]
+                conn.execute.return_value.fetchone.side_effect = [
+                    plan, {"id": "child-1", "family_id": "family-1",
+                           "grade_code": "primary_1", "grade_selection_revision": 3},
+                ]
+                conn.execute.return_value.fetchall.return_value = []
                 result = LearningRepository.student_catalog_summary(
                     object.__new__(LearningRepository), conn,
                     family_id="family-1", child_id="child-1", grade_code="primary_1",

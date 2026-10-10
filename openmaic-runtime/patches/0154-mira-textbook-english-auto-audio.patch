@@ -1,0 +1,396 @@
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -10,6 +10,8 @@
+   from './mira-formal-math-pronunciation';
+ import { MIRA_FORMAL_ENGLISH_TTS_PRONUNCIATION_POLICY, prepareMiraEnglishTtsPronunciation }
+   from './mira-formal-english-pronunciation';
++import { textbookAudioLanguageProfile, type MiraTextbookAudioLanguageProfile }
++  from './mira-textbook-audio-language';
+ 
+ import {
+   authorizeMiraInternalLoopbackRequest,
+@@ -193,6 +195,7 @@
+   sizeBytes?: number;
+   audioSha256?: string;
+   providerLanguageRepair?: MiraEnglishRepairAsrDiagnosticProfile & { providerBodySha256: string };
++  providerLanguagePolicy?: MiraTextbookAudioLanguageProfile & { providerBodySha256: string };
+   providerPronunciation?: {
+     policyVersion: typeof MIRA_FORMAL_MATH_TTS_PRONUNCIATION_POLICY |
+       typeof MIRA_FORMAL_ENGLISH_TTS_PRONUNCIATION_POLICY;
+@@ -212,6 +215,7 @@
+   normalizedTranscriptSha256?: string;
+   similarityBps?: number;
+   providerDiagnostic?: MiraEnglishRepairAsrDiagnosticProfile & { providerBodySha256: string };
++  providerLanguagePolicy?: MiraTextbookAudioLanguageProfile & { providerBodySha256: string };
+ }
+ 
+ export const MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY = 'mira.english.repair-asr-auto-language.v1' as const;
+@@ -374,7 +378,9 @@
+   ) {
+     throw new MiraFormalAudioError('invalid_request', 'Invalid formal TTS request');
+   }
+-  return input as unknown as MiraFormalTtsRequest;
++  const request = input as unknown as MiraFormalTtsRequest;
++  assertTextbookLanguageNamespace(request, 'tts');
++  return request;
+ }
+ 
+ export function assertMiraFormalAsrRequest(value: unknown): MiraFormalAsrRequest {
+@@ -387,7 +393,14 @@
+   ) {
+     throw new MiraFormalAudioError('invalid_request', 'Invalid formal ASR request');
+   }
+-  return input as unknown as MiraFormalAsrRequest;
++  const request = input as unknown as MiraFormalAsrRequest;
++  assertTextbookLanguageNamespace(request, 'asr');
++  return request;
++}
++
++function assertTextbookLanguageNamespace(input: MiraFormalTtsRequest | MiraFormalAsrRequest, operation: 'tts' | 'asr') {
++  try { return textbookAudioLanguageProfile(input, operation); }
++  catch { throw new MiraFormalAudioError('invalid_request', 'Invalid textbook audio language namespace'); }
+ }
+ 
+ function dataRoot(): string {
+@@ -516,8 +529,10 @@
+   input: MiraFormalTtsRequest,
+   now: Date,
+   languageRepairProfile?: MiraEnglishRepairAsrDiagnosticProfile,
++  batchLanguageProfile?: MiraTextbookAudioLanguageProfile,
+ ): Promise<{ record: MiraFormalTtsJob; created: boolean }> {
+-  const digest = requestDigest(languageRepairProfile ? {logicalRequest: input, languageRepairProfile} : input);
++  const digest = requestDigest(languageRepairProfile ? {logicalRequest: input, languageRepairProfile}
++    : batchLanguageProfile ? {logicalRequest: input, batchLanguageProfile} : input);
+   const existing = await readMiraFormalTtsJob(input.requestId, now);
+   if (existing) {
+     if (existing.requestSha256 !== digest) {
+@@ -564,6 +579,7 @@
+   tts: MiraFormalTtsJob,
+   now: Date,
+   diagnosticProfile?: MiraEnglishRepairAsrDiagnosticProfile,
++  batchLanguageProfile?: MiraTextbookAudioLanguageProfile,
+ ): Promise<{ record: MiraFormalAsrJob; created: boolean }> {
+   if (
+     tts.state !== 'succeeded' ||
+@@ -573,7 +589,15 @@
+   ) {
+     throw new MiraFormalAudioError('asset_unavailable', 'Matching formal TTS WAV is unavailable');
+   }
+-  const digest = requestDigest(diagnosticProfile ? {logicalRequest: input, diagnosticProfile} : input);
++  if (batchLanguageProfile && (
++    tts.providerLanguagePolicy?.policyVersion !== batchLanguageProfile.policyVersion ||
++    tts.providerLanguagePolicy?.policySha256 !== batchLanguageProfile.policySha256 ||
++    !SHA256.test(tts.providerLanguagePolicy?.providerBodySha256 || '')
++  )) {
++    throw new MiraFormalAudioError('asset_unavailable', 'Matching textbook TTS language policy is unavailable');
++  }
++  const digest = requestDigest(diagnosticProfile ? {logicalRequest: input, diagnosticProfile}
++    : batchLanguageProfile ? {logicalRequest: input, batchLanguageProfile} : input);
+   const existing = await readMiraFormalAsrJob(input.requestId, now);
+   if (existing) {
+     if (existing.requestSha256 !== digest) {
+@@ -939,7 +963,8 @@
+ ): Promise<{ record: MiraFormalTtsJob; created: boolean }> {
+   const input = assertMiraFormalTtsRequest(value);
+   const now = dependencies.now?.() || new Date();
+-  const claim = await claimTts(input, now, languageRepairProfile);
++  const batchLanguageProfile = assertTextbookLanguageNamespace(input, 'tts');
++  const claim = await claimTts(input, now, languageRepairProfile, batchLanguageProfile);
+   if (!claim.created) return claim;
+   let record = claim.record;
+   const fetchImpl = dependencies.fetchImpl || fetch;
+@@ -956,7 +981,7 @@
+       : input.subject === 'english' && providerText !== input.text ? MIRA_FORMAL_ENGLISH_TTS_PRONUNCIATION_POLICY : undefined;
+     const providerRequest = {
+       model: 'qwen3-tts-flash',
+-      input: { text: providerText, voice: policy.voiceId, language_type: languageRepairProfile ? 'Auto' : policy.qwenLanguageType },
++      input: { text: providerText, voice: policy.voiceId, language_type: languageRepairProfile || batchLanguageProfile ? 'Auto' : policy.qwenLanguageType },
+       parameters: { rate: 0 },
+     };
+     const characters = Array.from(providerText).length;
+@@ -974,7 +999,12 @@
+       record = {...record, providerLanguageRepair: {...languageRepairProfile, providerBodySha256: requestDigest(providerRequest)}};
+       await updateTts(record);
+     }
+-    const paidRequest = languageRepairProfile ? {logicalRequest: input, languageRepairProfile, providerRequest} : record.providerPronunciation ? {
++    if (batchLanguageProfile) {
++      record = {...record, providerLanguagePolicy: {...batchLanguageProfile, providerBodySha256: requestDigest(providerRequest)}};
++      await updateTts(record);
++    }
++    const paidRequest = batchLanguageProfile ? {logicalRequest: input, batchLanguageProfile, providerRequest}
++      : languageRepairProfile ? {logicalRequest: input, languageRepairProfile, providerRequest} : record.providerPronunciation ? {
+       logicalRequest: input, providerPronunciation: record.providerPronunciation, providerRequest,
+     } : input;
+     const providerBody = await budgetedOperation('qwen-tts', 'qwen3-tts-flash', paidRequest,
+@@ -1128,7 +1158,8 @@
+   if (!tts)
+     throw new MiraFormalAudioError('asset_unavailable', 'Matching formal TTS WAV is unavailable');
+   const now = dependencies.now?.() || new Date();
+-  const claim = await claimAsr(input, tts, now, diagnosticProfile);
++  const batchLanguageProfile = assertTextbookLanguageNamespace(input, 'asr');
++  const claim = await claimAsr(input, tts, now, diagnosticProfile, batchLanguageProfile);
+   if (!claim.created) return claim;
+   let record = claim.record;
+   const fetchImpl = dependencies.fetchImpl || fetch;
+@@ -1145,13 +1176,18 @@
+       input: { messages: [{ role: 'user', content: [
+         { audio: `data:audio/wav;base64,${Buffer.from(bytes).toString('base64')}` },
+       ] }] },
+-      parameters: { asr_options: diagnosticProfile ? {} : { language: policy.qwenAsrLanguage } },
++      parameters: { asr_options: diagnosticProfile || batchLanguageProfile ? {} : { language: policy.qwenAsrLanguage } },
+     };
+     if (diagnosticProfile) {
+       record = {...record, providerDiagnostic: {...diagnosticProfile, providerBodySha256: requestDigest(providerRequest)}};
+       await updateAsr(record);
+     }
+-    const budgetInput = diagnosticProfile ? {logicalRequest: input, diagnosticProfile, providerRequest} : input;
++    if (batchLanguageProfile) {
++      record = {...record, providerLanguagePolicy: {...batchLanguageProfile, providerBodySha256: requestDigest(providerRequest)}};
++      await updateAsr(record);
++    }
++    const budgetInput = batchLanguageProfile ? {logicalRequest: input, batchLanguageProfile, providerRequest}
++      : diagnosticProfile ? {logicalRequest: input, diagnosticProfile, providerRequest} : input;
+     const providerBody = await budgetedOperation('qwen-asr', 'qwen3-asr-flash', budgetInput,
+       { calls: 1, audio_ms: audioMs }, async () => {
+     const response = await fetchProvider(fetchImpl, endpoint, {
+diff --git a/lib/server/mira-textbook-audio-language.ts b/lib/server/mira-textbook-audio-language.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-textbook-audio-language.ts
+@@ -0,0 +1,39 @@
++/** Explicit batch v2 namespace; legacy formal audio keeps its original policy. */
++import { createHash } from 'crypto';
++
++export const MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY = {
++  policyVersion: 'mira.textbook.english-auto-language.v1',
++  subject: 'english',
++  tts: { providerId: 'qwen-tts', modelId: 'qwen3-tts-flash', languageType: 'Auto' },
++  asr: { providerId: 'qwen-asr', modelId: 'qwen3-asr-flash', automaticLanguage: true },
++} as const;
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') return Object.fromEntries(
++    Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, canonical(v)]));
++  return value;
++}
++
++export const MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY_SHA256 = createHash('sha256')
++  .update(JSON.stringify(canonical(MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY))).digest('hex');
++
++export interface MiraTextbookAudioLanguageProfile {
++  policyVersion: typeof MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY.policyVersion;
++  policySha256: string;
++}
++
++export function textbookAudioLanguageProfile(
++  input: { subject: string; requestId: string; ttsRequestId?: string },
++  operation: 'tts' | 'asr',
++): MiraTextbookAudioLanguageProfile | undefined {
++  const reserved = /^(?:tbbtts2|tbbasr2|tbbreasr2)/;
++  if (!reserved.test(input.requestId) && !(operation === 'asr' && reserved.test(input.ttsRequestId || '')))
++    return undefined;
++  const requestPattern = operation === 'tts' ? /^tbbtts2_[a-f0-9]{64}$/ : /^(?:tbbasr2|tbbreasr2)_[a-f0-9]{64}$/;
++  if (input.subject !== 'english' || !requestPattern.test(input.requestId) ||
++      (operation === 'asr' && !/^tbbtts2_[a-f0-9]{64}$/.test(input.ttsRequestId || '')))
++    throw new Error('Invalid textbook audio language namespace');
++  return { policyVersion: MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY.policyVersion,
++    policySha256: MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY_SHA256 };
++}
+diff --git a/tests/server/mira-textbook-audio-language.test.ts b/tests/server/mira-textbook-audio-language.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-textbook-audio-language.test.ts
+@@ -0,0 +1,191 @@
++import { createHash } from 'crypto';
++import { promises as fs } from 'fs';
++import os from 'os';
++import path from 'path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
++import { MIRA_FORMAL_AUDIO_POLICY, assertMiraFormalAsrRequest, executeMiraFormalAsr,
++  executeMiraFormalTts, readMiraFormalTtsAsset, readMiraFormalTtsJob, readMiraFormalAsrJob,
++  type MiraFormalTtsRequest } from '@/lib/server/mira-formal-audio';
++import { MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY, MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY_SHA256,
++  textbookAudioLanguageProfile } from '@/lib/server/mira-textbook-audio-language';
++
++const budgeted = vi.hoisted(() => vi.fn());
++vi.mock('@/lib/server/mira-paid-budget', () => ({ budgetedOperation: budgeted,
++  paidBudgetContext: { getStore: () => undefined } }));
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }), getServerASRProviders: () => ({ 'qwen-asr': {} }),
++  resolveTTSApiKey: () => 'mock-only', resolveASRApiKey: () => 'mock-only',
++  resolveTTSBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++  resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++}));
++const sha = (value: string | Uint8Array) => createHash('sha256').update(value).digest('hex');
++const policy = { policyVersion: MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY.policyVersion,
++  policySha256: MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY_SHA256 };
++
++function input(text: string, id = 'tbbtts2_' + 'a'.repeat(64)): MiraFormalTtsRequest {
++  return { requestId: id, classroomId: 'private-batch-room', classroomContentSha256: '1'.repeat(64),
++    subject: 'english', teacherProfileId: 'mira_english_standard', teacherProfileVersion: 2,
++    teacherProfileSha256: MIRA_FORMAL_AUDIO_POLICY.subjects.english.teacherProfileSha256,
++    teacherGender: 'female', sceneId: 'scene-one', sceneOrder: 0, actionId: 'cue-one',
++    narrationSegmentId: 'cue-one', text, textSha256: sha(text) };
++}
++function wav() {
++  const b = Buffer.alloc(48); b.write('RIFF'); b.writeUInt32LE(40, 4); b.write('WAVE', 8);
++  b.write('fmt ', 12); b.writeUInt32LE(16, 16); b.writeUInt16LE(1, 20); b.writeUInt16LE(1, 22);
++  b.writeUInt32LE(16000, 24); b.writeUInt32LE(32000, 28); b.writeUInt16LE(2, 32);
++  b.writeUInt16LE(16, 34); b.write('data', 36); b.writeUInt32LE(4, 40); return b;
++}
++function mockTts(audio = wav()) {
++  return vi.fn(async (url: string | URL | Request, _init?: RequestInit) => String(url).includes('multimodal-generation')
++    ? new Response(JSON.stringify({ output: { audio: { url: 'https://mira-test.oss-cn-beijing.aliyuncs.com/mock.wav' } } }),
++      { headers: { 'content-type': 'application/json' } })
++    : new Response(audio.buffer.slice(audio.byteOffset, audio.byteOffset + audio.byteLength) as ArrayBuffer,
++      { headers: { 'content-type': 'audio/wav', 'content-length': String(audio.length) } }));
++}
++const deps = (fetchImpl: ReturnType<typeof mockTts>) => ({ fetchImpl: fetchImpl as typeof fetch,
++  resolveAddresses: async () => ['8.8.8.8'] });
++function asrInput(tts: MiraFormalTtsRequest, audioSha256: string, id = 'tbbasr2_' + 'b'.repeat(64)) {
++  const { text: _text, textSha256: _textHash, ...identity } = tts;
++  return { ...identity, requestId: id, ttsRequestId: tts.requestId, audioSha256 };
++}
++
++describe('explicit textbook English Auto language namespace', () => {
++  let folder: string; let prior: string | undefined;
++  beforeEach(async () => { folder = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-textbook-audio-'));
++    prior = process.env.MIRA_FORMAL_AUDIO_DATA_DIR; process.env.MIRA_FORMAL_AUDIO_DATA_DIR = folder;
++    budgeted.mockClear(); budgeted.mockImplementation(async (...args: unknown[]) =>
++      (args[4] as () => Promise<unknown>)()); });
++  afterEach(async () => { if (prior === undefined) delete process.env.MIRA_FORMAL_AUDIO_DATA_DIR;
++    else process.env.MIRA_FORMAL_AUDIO_DATA_DIR = prior; await fs.rm(folder, { recursive: true, force: true }); });
++
++  it('pins the same canonical provider-language policy as the backend registry', () => {
++    expect(policy.policySha256).toBe('ce157e5f65649259b7e908887dd83f3a1f47685d2a9ac759e244e3f2d4b10beb');
++    expect(policy.policySha256).toBe(qualitySha(MIRA_TEXTBOOK_ENGLISH_AUTO_LANGUAGE_POLICY));
++  });
++
++  it.each(['Do you like bananas? 看清香蕉的样子，可以指一指。', '请看香蕉。', 'Do you like bananas?'])(
++    'uses Auto for each English narration type and persists physical identity before dispatch: %s', async text => {
++      const req = input(text), fetchMock = mockTts();
++      const original = fetchMock.getMockImplementation()!;
++      fetchMock.mockImplementation(async url => {
++        if (String(url).includes('multimodal-generation')) {
++          const stored = await readMiraFormalTtsJob(req.requestId);
++          expect(stored?.providerLanguagePolicy?.policySha256).toBe(policy.policySha256);
++        }
++        return original(url);
++      });
++      const result = await executeMiraFormalTts(req, deps(fetchMock));
++      expect(result.record.state).toBe('succeeded');
++      const paidInput = budgeted.mock.calls[0][2];
++      expect(paidInput.providerRequest.input).toEqual({ text, voice: 'Jennifer', language_type: 'Auto' });
++      expect(paidInput.batchLanguageProfile).toEqual(policy);
++      expect(result.record.requestSha256).toBe(qualitySha({ logicalRequest: req, batchLanguageProfile: policy }));
++      expect(result.record.providerLanguagePolicy).toEqual({ ...policy, providerBodySha256: qualitySha(paidInput.providerRequest) });
++      expect(result.record.languageCode).toBe('en-US');
++      const replayFetch = mockTts();
++      expect((await executeMiraFormalTts(req, deps(replayFetch))).record).toEqual(result.record);
++      expect(replayFetch).not.toHaveBeenCalled();
++    });
++
++  it('omits ASR language, keeps exact WAV/teacher identity and has one idempotent request slot', async () => {
++    const req = input('Do you like bananas? 看清香蕉。');
++    const tts = await executeMiraFormalTts(req, deps(mockTts()));
++    const asr = asrInput(req, tts.record.audioSha256!);
++    const fetchMock = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
++      const body = JSON.parse(String(init?.body));
++      expect(body.parameters.asr_options).toEqual({});
++      expect(body.input.messages[0].content[0].audio).toBe('data:audio/wav;base64,' + wav().toString('base64'));
++      expect((await readMiraFormalAsrJob(asr.requestId))?.providerLanguagePolicy?.policySha256).toBe(policy.policySha256);
++      return new Response(JSON.stringify({ output: { choices: [{ message: { content: [{ text: req.text }] } }] } }),
++        { headers: { 'content-type': 'application/json' } });
++    });
++    const first = await executeMiraFormalAsr(asr, { fetchImpl: fetchMock as typeof fetch });
++    expect(first.record.state).toBe('succeeded'); expect(first.transcript).toBe(req.text);
++    expect(first.record.providerLanguagePolicy).toEqual({ ...policy,
++      providerBodySha256: qualitySha(budgeted.mock.calls[1][2].providerRequest) });
++    expect((await executeMiraFormalAsr(asr, { fetchImpl: fetchMock as typeof fetch })).created).toBe(false);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++  });
++
++  it('keeps ordinary four-subject physical language, legacy request digest and health policies', async () => {
++    const frozen = JSON.stringify(MIRA_FORMAL_AUDIO_POLICY);
++    for (const [subject, teacher] of Object.entries(MIRA_FORMAL_AUDIO_POLICY.subjects)) {
++      const req = { ...input('请看图片。', 'legacy-' + subject), subject,
++        teacherProfileId: teacher.teacherProfileId, teacherProfileVersion: teacher.teacherProfileVersion,
++        teacherProfileSha256: teacher.teacherProfileSha256, teacherGender: teacher.teacherGender } as MiraFormalTtsRequest;
++      const fetchMock = mockTts();
++      const result = await executeMiraFormalTts(req, deps(fetchMock));
++      expect(result.record.requestSha256).toBe(qualitySha(req));
++      expect(result.record.providerLanguagePolicy).toBeUndefined();
++      const paidInput = budgeted.mock.calls.at(-1)?.[2];
++      expect(paidInput.logicalRequest || paidInput).toEqual(req);
++      expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body)).input).toEqual({
++        text: req.text, voice: teacher.voiceId, language_type: 'Chinese' });
++    }
++    expect(JSON.stringify(MIRA_FORMAL_AUDIO_POLICY)).toBe(frozen);
++    expect(MIRA_FORMAL_AUDIO_POLICY.subjects.english.qwenLanguageType).toBe('Chinese');
++    expect(MIRA_FORMAL_AUDIO_POLICY.subjects.english.qwenAsrLanguage).toBe('zh');
++  });
++
++  it('rejects missing or drifted successful TTS policy before creating or replaying an ASR job', async () => {
++    const req = input('Hello. 请看图片。');
++    const tts = await executeMiraFormalTts(req, deps(mockTts()));
++    const asr = asrInput(req, tts.record.audioSha256!);
++    const job = path.join(folder, 'jobs/tts', sha(req.requestId) + '.json');
++    const saved = JSON.parse(await fs.readFile(job, 'utf8'));
++    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ output: {
++      choices: [{ message: { content: [{ text: req.text }] } }],
++    } }), { headers: { 'content-type': 'application/json' } }));
++    const invalidPolicies = [undefined,
++      { ...saved.providerLanguagePolicy, policyVersion: 'unrecognized-policy' },
++      { ...saved.providerLanguagePolicy, policySha256: 'f'.repeat(64) },
++      { ...saved.providerLanguagePolicy, providerBodySha256: 'not-a-sha256' }];
++    for (const providerLanguagePolicy of invalidPolicies) {
++      await fs.writeFile(job, JSON.stringify({ ...saved, providerLanguagePolicy }));
++      await expect(executeMiraFormalAsr(asr, { fetchImpl: fetchMock as typeof fetch }))
++        .rejects.toMatchObject({ code: 'asset_unavailable' });
++      expect(await readMiraFormalAsrJob(asr.requestId)).toBeNull();
++    }
++    expect(fetchMock).not.toHaveBeenCalled();
++    expect(budgeted).toHaveBeenCalledTimes(1);
++    await fs.writeFile(job, JSON.stringify(saved));
++    expect((await executeMiraFormalAsr(asr, { fetchImpl: fetchMock as typeof fetch })).record.state).toBe('succeeded');
++    await fs.writeFile(job, JSON.stringify({ ...saved, providerLanguagePolicy: undefined }));
++    await expect(executeMiraFormalAsr(asr, { fetchImpl: fetchMock as typeof fetch }))
++      .rejects.toMatchObject({ code: 'asset_unavailable' });
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    expect(budgeted).toHaveBeenCalledTimes(2);
++  });
++
++  it('rejects non-English, malformed or mixed namespaces and provider overrides before fetch', async () => {
++    const fetchMock = mockTts();
++    for (const id of ['tbbtts2_bad', 'tbbasr2_' + 'a'.repeat(64)])
++      await expect(executeMiraFormalTts(input('图片', id), deps(fetchMock))).rejects.toMatchObject({ code: 'invalid_request' });
++    expect(() => textbookAudioLanguageProfile({ subject: 'math', requestId: 'tbbtts2_' + 'a'.repeat(64) }, 'tts')).toThrow();
++    const req = input('Hello.');
++    for (const mutation of [{ requestId: 'tbbasr_' + 'b'.repeat(64) }, { ttsRequestId: 'tbbtts_' + 'a'.repeat(64) }])
++      expect(() => assertMiraFormalAsrRequest({ ...asrInput(req, 'c'.repeat(64)), ...mutation })).toThrow();
++    await expect(executeMiraFormalTts({ ...req, languageType: 'English' }, deps(fetchMock))).rejects.toMatchObject({ code: 'invalid_request' });
++    expect(fetchMock).not.toHaveBeenCalled();
++  });
++
++  it('does not overwrite a legacy audio asset and rejects changed text or policy under the same new identity', async () => {
++    const legacy = input('Hello. 看图片。', 'tbbtts_' + 'a'.repeat(64));
++    const old = await executeMiraFormalTts(legacy, deps(mockTts()));
++    const before = await readMiraFormalTtsAsset(legacy.requestId);
++    const req = input(legacy.text);
++    const fresh = await executeMiraFormalTts(req, deps(mockTts()));
++    expect(fresh.record.assetId).not.toBe(old.record.assetId);
++    expect(Buffer.from((await readMiraFormalTtsAsset(legacy.requestId)).bytes)).toEqual(Buffer.from(before.bytes));
++    const fetchMock = mockTts();
++    await expect(executeMiraFormalTts({ ...req, text: 'Changed.', textSha256: sha('Changed.') }, deps(fetchMock)))
++      .rejects.toMatchObject({ code: 'request_conflict' });
++    const job = path.join(folder, 'jobs/tts', sha(req.requestId) + '.json');
++    const saved = JSON.parse(await fs.readFile(job, 'utf8'));
++    await fs.writeFile(job, JSON.stringify({ ...saved, requestSha256: qualitySha({ logicalRequest: req,
++      batchLanguageProfile: { ...policy, policySha256: 'f'.repeat(64) } }) }));
++    await expect(executeMiraFormalTts(req, deps(fetchMock))).rejects.toMatchObject({ code: 'request_conflict' });
++    expect(fetchMock).not.toHaveBeenCalled();
++  });
++});

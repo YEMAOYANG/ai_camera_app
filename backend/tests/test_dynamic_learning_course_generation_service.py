@@ -4,7 +4,8 @@ import copy
 import hashlib
 import unittest
 
-from content.primary_skill_boundaries import boundary_for
+from content.primary_skill_boundaries import boundaries_for, boundary_for
+from core.errors import ApiError
 from integrations.openmaic_question_adapter import (
     IndependentSolutionResult,
     OpenMaicQuestionError,
@@ -22,6 +23,49 @@ from tests.support import fresh_test_config
 from tests.test_learning_generated_course_validator import math_candidate
 from tests.test_learning_generated_course_validator import _formal_course
 from tests.test_learning_catalog_validator import _valid_number_sense_course
+
+
+def _freeze_legacy_job(
+    service,
+    request_id: str,
+    *,
+    grade_code: str = "primary_3",
+    subject: str = "math",
+    skill_id: str = "multi_digit_operations",
+    generation_feedback: dict | None = None,
+) -> None:
+    """Restore an already-frozen coarse request after its worker lease expired."""
+    boundary = next(
+        item for item in boundaries_for(grade_code, subject) if item.skill_id == skill_id
+    )
+    generation_spec = {
+        "gradeCode": grade_code,
+        "subject": subject,
+        "skillBoundary": boundary.to_openmaic_payload(),
+        "curriculumVersion": boundary.curriculum_version,
+        "boundaryVersion": boundary.boundary_version,
+        "questionCount": 5,
+        **({"generationFeedback": generation_feedback} if generation_feedback else {}),
+    }
+    with service.repository.transaction() as conn:
+        job, created = service.repository.create_or_get_job(
+            conn,
+            request_id=request_id,
+            grade_code=grade_code,
+            subject=subject,
+            node_code=skill_id,
+            curriculum_version=boundary.curriculum_version,
+            boundary_version=boundary.boundary_version,
+            generator="openmaic",
+            provider=service.adapter.provider_name,
+            model=service.adapter.model_name,
+            prompt_version=PROMPT_VERSION,
+            requested_candidate_count=1,
+            generation_spec=generation_spec,
+            now=1,
+        )
+        if created:
+            service.repository.mark_job_generating(conn, job_id=str(job["id"]), now=2)
 
 
 class _FakeQuestionAdapter:
@@ -42,6 +86,8 @@ class _FakeQuestionAdapter:
         course = math_candidate()
         course["gradeCode"] = kwargs["grade_code"]
         course["subject"] = kwargs["subject"]
+        if kwargs["grade_code"] == "primary_1":
+            course["content"].pop("difficultyCode", None)
         course["nodeCode"] = boundary["skillId"]
         course["objective"] = "；".join(boundary["learningObjectives"])
         for question in course["content"]["questions"]:
@@ -242,6 +288,7 @@ class DynamicLearningCourseGenerationServiceTest(unittest.TestCase):
 
     def test_grade_subject_and_skill_are_generated_verified_and_staged(self):
         boundary = boundary_for("primary_3", "math")
+        _freeze_legacy_job(self.service, "dynamic-primary-3-math-1")
         result = self.service.generate(
             {
                 "requestId": "dynamic-primary-3-math-1",
@@ -283,6 +330,8 @@ class DynamicLearningCourseGenerationServiceTest(unittest.TestCase):
 
     def test_semantically_duplicate_course_from_another_request_is_rejected(self):
         boundary = boundary_for("primary_3", "math")
+        for request_id in ("dynamic-duplicate-1", "dynamic-duplicate-2"):
+            _freeze_legacy_job(self.service, request_id)
         first = self.service.generate(
             {
                 "requestId": "dynamic-duplicate-1",
@@ -304,18 +353,29 @@ class DynamicLearningCourseGenerationServiceTest(unittest.TestCase):
         self.assertEqual(second.payload["status"], "rejected")
         self.assertEqual(second.payload["error"], "duplicate_generated_course")
 
-    def test_generate_next_uses_declared_progression_not_skill_id_sort(self):
-        result = self.service.generate_next(
-            grade_code="primary_1",
-            subject="chinese",
-        )
+    def test_generate_next_requires_a_fine_lesson_before_dispatch(self):
+        # Coarse ordering is retired; only a frozen request may resume it.
+        with self.assertRaises(ApiError) as rejected:
+            self.service.generate_next(grade_code="primary_1", subject="chinese")
 
-        self.assertTrue(result.payload["ok"], result.payload)
-        self.assertEqual(len(self.adapter.generate_calls), 1)
-        self.assertEqual(
-            self.adapter.generate_calls[0]["skill_boundary"]["skillId"],
-            "pinyin_syllables",
-        )
+        self.assertEqual(rejected.exception.code, "progressive_lesson_required")
+        self.assertEqual(rejected.exception.status_code, 409)
+        self.assertEqual(self.adapter.generate_calls, [])
+        self.assertEqual(self.adapter.verify_calls, [])
+
+    def test_new_coarse_request_is_rejected_before_provider_dispatch(self):
+        with self.assertRaises(ApiError) as rejected:
+            self.service.generate({
+                "requestId": "new-unfrozen-coarse-request",
+                "gradeCode": "primary_3",
+                "subject": "math",
+                "skillId": "multi_digit_operations",
+            })
+
+        self.assertEqual(rejected.exception.code, "progressive_lesson_required")
+        self.assertEqual(rejected.exception.status_code, 409)
+        self.assertEqual(self.adapter.generate_calls, [])
+        self.assertEqual(self.adapter.verify_calls, [])
 
     def test_generate_for_skill_retries_model_contract_failure(self):
         adapter = _RetryOnceQuestionAdapter()
@@ -324,10 +384,17 @@ class DynamicLearningCourseGenerationServiceTest(unittest.TestCase):
             adapter=adapter,
         )
 
+        request_id = "frozen-legacy-retry"
+        for attempt_request_id in (request_id, f"{request_id}.retry2"):
+            _freeze_legacy_job(
+                service, attempt_request_id, grade_code="primary_1",
+                subject="chinese", skill_id="pinyin_syllables",
+            )
         result = service.generate_for_skill(
             grade_code="primary_1",
             subject="chinese",
             skill_id="pinyin_syllables",
+            request_id=request_id,
         )
 
         self.assertTrue(result.payload["ok"], result.payload)
@@ -344,6 +411,7 @@ class DynamicLearningCourseGenerationServiceTest(unittest.TestCase):
             "message": "q4 缺少比较证据",
         }
 
+        _freeze_legacy_job(service, "dynamic-feedback", generation_feedback=feedback)
         result = service.generate_for_skill(
             grade_code="primary_3",
             subject="math",
@@ -369,6 +437,7 @@ class DynamicLearningCourseGenerationServiceTest(unittest.TestCase):
             "skillId": "multi_digit_operations",
         }
 
+        _freeze_legacy_job(service, request["requestId"])
         failed = service.generate(request, enqueue_classroom=False)
         self.assertFalse(failed.payload["ok"])
         self.assertEqual(failed.payload["error"], "generation_failed")
@@ -397,6 +466,7 @@ class DynamicLearningCourseGenerationServiceTest(unittest.TestCase):
             adapter=adapter,
         )
 
+        _freeze_legacy_job(service, "dynamic-consistency-repair")
         result = service.generate(
             {
                 "requestId": "dynamic-consistency-repair",

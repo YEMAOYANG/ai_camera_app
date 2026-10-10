@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from copy import deepcopy
+from functools import partial
 import hashlib
 import json
 from types import SimpleNamespace
@@ -12,12 +13,18 @@ from integrations.openmaic_full_runtime_client import (
     OpenMaicFullRuntimeClient,
     OpenMaicFullRuntimeError,
 )
+from services import openmaic_full_runtime_service as runtime_contract
 from services.openmaic_full_runtime_service import (
     FORMAL_REQUIRED_FEATURES,
     OpenMaicFullRuntimeService,
     OpenMaicRuntimeServiceError,
 )
 from services.lesson_package_validator import formal_runtime_teaching_brief
+from integrations.openmaic_formal_media import generation_options
+from tests.test_formal_student_runtime_launch import (
+    _formal_manifest,
+    _with_receipt_sha256,
+)
 from tests.test_openmaic_full_runtime import (
     _complete_sample_widget_content,
     _generated_agent,
@@ -210,6 +217,15 @@ def _formal_classroom() -> dict:
             if action.get("type") not in {"speech", "discussion"}
         ]
         if scene["type"] == "slide":
+            # This fixture freezes the legacy policy, which did not permit video.
+            scene["content"]["canvas"]["elements"] = [
+                element for element in scene["content"]["canvas"]["elements"]
+                if element.get("type") != "video"
+            ]
+            scene["actions"] = [
+                action for action in scene["actions"]
+                if action.get("type") != "play_video"
+            ]
             for element in scene["content"]["canvas"]["elements"]:
                 if element.get("type") == "text":
                     element.setdefault("text", f"正式课件内容 {index}")
@@ -637,6 +653,7 @@ class _CandidateClient:
                 request_payload
             ),
             dispatch_ambiguous=False,
+            _generation_contract=json.loads(kwargs["requirement"]),
         )
         self.jobs[kwargs["runtime_request_id"]] = job
         if self.lose_response:
@@ -647,7 +664,7 @@ class _CandidateClient:
             )
         return job
 
-    def get_generation_job(self, upstream_job_id):
+    def get_generation_job(self, upstream_job_id, *, formal=False):
         return next(
             job for job in self.jobs.values() if job.job_id == upstream_job_id
         )
@@ -655,6 +672,30 @@ class _CandidateClient:
     def get_classroom(self, classroom_id):
         assert classroom_id == "formal-classroom-1"
         return _formal_classroom()
+
+
+def _add_candidate_completion_receipts(job):
+    """Bind legacy-policy fixture receipts to this exact frozen generation."""
+    contract = job._generation_contract
+    manifest = _formal_manifest()
+    binding = {
+        "runtimeRequestId": contract["runtimeRequestId"],
+        "buildItemId": contract["buildItemId"],
+        "classroomId": job.classroom_id,
+        "sessionId": f"professional-{job.job_id}",
+    }
+    professional = manifest["professionalCreation"]
+    professional.pop("receiptSha256")
+    professional.update(
+        **binding,
+        teachingBriefSha256=contract["teachingBriefSha256"],
+    )
+    job.professional_creation = _with_receipt_sha256(professional)
+    research = manifest["research"]
+    research.pop("receiptSha256")
+    research.update(binding)
+    research["citations"][0]["sceneIds"] = [_formal_classroom()["scenes"][0]["id"]]
+    job.research = _with_receipt_sha256(research)
 
 
 class _CandidateCatalogRepository:
@@ -714,8 +755,35 @@ def _candidate_service(client: _CandidateClient | None = None):
     return service
 
 
+def _validate_legacy_fixture(service, classroom, **kwargs):
+    """Inspect historical widget grammar without changing current playback gates."""
+    evidence = service._validate_formal_classroom_legacy_contract(classroom, **kwargs)
+    for scene in classroom["scenes"]:
+        if scene["type"] != "interactive":
+            continue
+        content = scene["content"]
+        flags = runtime_contract._validate_interactive_content(
+            content,
+            fail=service._fail,
+            config_validator=runtime_contract._valid_formal_widget_config,
+        )
+        if not all(flags):
+            service._fail("openmaic_formal_interactive_invalid", "旧互动样例无效", 502)
+        html = content["html"]
+        for action in scene["actions"]:
+            if action["type"] == "widget_highlight" and (
+                runtime_contract._widget_action_target_identity(action["target"])
+                not in runtime_contract._html_operable_widget_targets(html)
+                or not runtime_contract._productive_widget_action(
+                    "widget_highlight", action, html=html
+                )
+            ):
+                service._fail("openmaic_formal_highlight_invalid", "旧高亮样例无效", 502)
+    return evidence
+
+
 class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
-    def test_provider_circuit_does_not_block_deterministic_classroom_compilation(self):
+    def test_provider_circuit_does_not_override_frozen_runtime_managed_generation(self):
         service = _candidate_service()
         service.repository.provider_circuit = {
             "status": "open",
@@ -739,8 +807,12 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         generation = json.loads(service.client.start_calls[0]["requirement"])[
             "generation"
         ]
-        self.assertEqual(generation["mode"], "deterministic_no_llm")
-        self.assertEqual(generation["providerCalls"], 0)
+        self.assertEqual(
+            generation,
+            generation_options(
+                OpenMaicFullRuntimeClient.LEGACY_FORMAL_PROFESSIONAL_CREATION_POLICY
+            ),
+        )
 
     def test_explicit_provider_canary_closes_the_circuit(self):
         service = _candidate_service()
@@ -986,6 +1058,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         service.client = object()
         service.public_url = "https://classroom.mira.test"
         service.student_auth_service = Auth()
+        service.textbook_library_only = False
         service.repository = Repository()
 
         with self.assertRaises(OpenMaicRuntimeServiceError) as raised:
@@ -1219,6 +1292,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         job.done = True
         job.progress = 100
         job.classroom_id = "formal-classroom-1"
+        _add_candidate_completion_receipts(job)
         service._validate_and_manifest = lambda *_args, **_kwargs: {
             "missing": [],
             "present": list(FORMAL_REQUIRED_FEATURES),
@@ -1253,6 +1327,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         job.done = True
         job.progress = 100
         job.classroom_id = "formal-classroom-1"
+        _add_candidate_completion_receipts(job)
         service.repository.rows[0]["feature_manifest_json"].pop(
             "formalRuntimeContract", None
         )
@@ -1290,6 +1365,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         job.done = True
         job.progress = 100
         job.classroom_id = "formal-classroom-1"
+        _add_candidate_completion_receipts(job)
 
         def drift_after_poll(_classroom_id):
             service.repository.rows[0]["upstream_job_id"] = "drifted-upstream-job"
@@ -1331,6 +1407,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
                 job.done = True
                 job.progress = 100
                 job.classroom_id = "formal-classroom-1"
+                _add_candidate_completion_receipts(job)
                 stale_runtime = deepcopy(service.repository.rows[0])
                 requested_manifest = deepcopy(stale_runtime["feature_manifest_json"])
                 service._validate_and_manifest = lambda *_args, **_kwargs: {
@@ -1371,6 +1448,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         job.done = True
         job.progress = 100
         job.classroom_id = "formal-classroom-1"
+        _add_candidate_completion_receipts(job)
         stale_runtime = deepcopy(service.repository.rows[0])
         requested_manifest = deepcopy(stale_runtime["feature_manifest_json"])
         service._validate_and_manifest = lambda *_args, **_kwargs: {
@@ -1425,6 +1503,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             job.done = True
             job.progress = 100
             job.classroom_id = "formal-classroom-1"
+            _add_candidate_completion_receipts(job)
             service.client.get_classroom = lambda _classroom_id: deepcopy(classroom)
             service._validate_and_manifest = lambda *_args, **_kwargs: {
                 "missing": [],
@@ -1468,6 +1547,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         job.done = True
         job.progress = 100
         job.classroom_id = "formal-classroom-1"
+        _add_candidate_completion_receipts(job)
         classroom = _formal_classroom()
         classroom["stage"]["id"] = "different-classroom"
         for scene in classroom["scenes"]:
@@ -1501,6 +1581,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         job.done = True
         job.progress = 100
         job.classroom_id = "formal-classroom-1"
+        _add_candidate_completion_receipts(job)
         service._validate_and_manifest = lambda *_args, **_kwargs: {
             "missing": [],
             "present": list(FORMAL_REQUIRED_FEATURES),
@@ -1615,7 +1696,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         }
         issued = service.issue_candidate_generation(**kwargs)
 
-        def unknown(_upstream_job_id):
+        def unknown(_upstream_job_id, *, formal=False):
             raise OpenMaicFullRuntimeError(
                 "openmaic_transport_error", "poll response unknown", status_code=503
             )
@@ -1660,7 +1741,8 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         wrong.done = True
         wrong.progress = 100
         wrong.classroom_id = "formal-classroom-1"
-        service.client.get_generation_job = lambda _job_id: wrong
+        _add_candidate_completion_receipts(wrong)
+        service.client.get_generation_job = lambda _job_id, *, formal=False: wrong
         service._validate_and_manifest = lambda *_args, **_kwargs: {
             "missing": [],
             "present": list(FORMAL_REQUIRED_FEATURES),
@@ -1783,14 +1865,53 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         )
         self.assertEqual(len(service.client.start_calls), 1)
 
-    def test_formal_runtime_quizzes_are_exactly_the_locked_scored_questions(self):
+    def test_current_formal_playback_accepts_native_design_and_rejects_broken_bindings(self):
+        service = _candidate_service()
+        teacher = service._formal_teacher_contract("math")
+        classroom = _formal_classroom()
+        classroom["stage"]["generatedAgentConfigs"] = classroom["stage"][
+            "generatedAgentConfigs"
+        ][:1]
+        classroom["scenes"] = classroom["scenes"][:1]
+        classroom["scenes"][0]["actions"] = [
+            action for action in classroom["scenes"][0]["actions"]
+            if action["type"] == "speech"
+        ]
+
+        evidence = service._validate_formal_classroom(classroom, teacher_contract=teacher)
+        self.assertEqual(evidence["speechActionCount"], 1)
+        self.assertEqual(evidence["peerCount"], 0)
+        self.assertEqual(evidence["sceneDistribution"]["slide"], 1)
+        self.assertFalse(evidence["spotlightVerified"])
+        self.assertFalse(evidence["widgetHighlightVerified"])
+
+        for name, mutate, code in (
+            ("stage", lambda value: value["scenes"][0].update(stageId="other-stage"),
+             "openmaic_formal_scene_invalid"),
+            ("order", lambda value: value["scenes"][0].update(order=1),
+             "openmaic_formal_scene_invalid"),
+            ("speech", lambda value: value["scenes"][0]["actions"][0].update(text=""),
+             "openmaic_formal_speech_invalid"),
+            ("teacher", lambda value: value["stage"]["generatedAgentConfigs"][0].update(
+                avatar="/avatars/teacher-2.png"), "openmaic_formal_teacher_identity_mismatch"),
+        ):
+            with self.subTest(binding=name):
+                invalid = deepcopy(classroom)
+                mutate(invalid)
+                with self.assertRaises(OpenMaicRuntimeServiceError) as raised:
+                    service._validate_formal_classroom(invalid, teacher_contract=teacher)
+                self.assertEqual(raised.exception.code, code)
+
+    def test_legacy_formal_runtime_quizzes_are_exactly_the_locked_scored_questions(self):
+        # The former content rubric is retained only for historical fixtures;
+        # current formal playback and OpenMAIC lesson design have separate gates.
         service = _candidate_service()
         assessment = service._formal_runtime_assessment_contract(
             {"teachingBrief": deepcopy(TEACHING_BRIEF)}
         )
         teacher_contract = service._formal_teacher_contract("math")
         classroom = _formal_classroom()
-        evidence = service._validate_formal_classroom(
+        evidence = service._validate_formal_classroom_legacy_contract(
             classroom,
             teacher_contract=teacher_contract,
             assessment_questions=assessment,
@@ -1810,7 +1931,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             invalid = deepcopy(classroom)
             mutate(invalid)
             with self.assertRaises(OpenMaicRuntimeServiceError) as raised:
-                service._validate_formal_classroom(
+                service._validate_formal_classroom_legacy_contract(
                     invalid,
                     teacher_contract=teacher_contract,
                     assessment_questions=assessment,
@@ -1845,7 +1966,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             "answer": None,
             "points": 1,
         }
-        service._validate_formal_classroom(
+        service._validate_formal_classroom_legacy_contract(
             choice_classroom,
             teacher_contract=teacher_contract,
             assessment_questions=choice_assessment,
@@ -1854,7 +1975,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             "label"
         ] = "漂移标签"
         with self.assertRaises(OpenMaicRuntimeServiceError) as choice_drift:
-            service._validate_formal_classroom(
+            service._validate_formal_classroom_legacy_contract(
                 choice_classroom,
                 teacher_contract=teacher_contract,
                 assessment_questions=choice_assessment,
@@ -1864,9 +1985,9 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             "openmaic_formal_assessment_mismatch",
         )
 
-    def test_formal_structure_accepts_adaptive_scene_count_and_widget_set(self):
+    def test_legacy_formal_structure_accepts_adaptive_scene_count_and_widget_set(self):
         service = _candidate_service()
-        validator = service._validate_formal_classroom
+        validator = service._validate_formal_classroom_legacy_contract
         adaptive = _formal_classroom()
         adaptive["scenes"] = [
             scene
@@ -1889,7 +2010,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         self.assertEqual(evidence["speechActionCount"], 8)
         self.assertEqual(evidence["widgetTypes"], ["simulation"])
 
-    def test_formal_slide_allows_multi_speech_and_consecutive_focus_actions(self):
+    def test_legacy_formal_slide_allows_multi_speech_and_consecutive_focus_actions(self):
         service = _candidate_service()
         classroom = _formal_classroom()
         first = classroom["scenes"][0]
@@ -1913,7 +2034,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             discussion,
         ]
 
-        evidence = service._validate_formal_classroom(
+        evidence = service._validate_formal_classroom_legacy_contract(
             classroom,
             teacher_contract=service._formal_teacher_contract("math"),
         )
@@ -1937,6 +2058,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         job.done = True
         job.progress = 100
         job.classroom_id = "formal-classroom-1"
+        _add_candidate_completion_receipts(job)
         job.speech_action_count = 11
         service._validate_and_manifest = lambda *_args, **_kwargs: {
             "missing": [],
@@ -1958,9 +2080,9 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             "openmaic_formal_speech_count_mismatch",
         )
 
-    def test_formal_structure_requires_one_focus_explanation_sequence_per_slide(self):
+    def test_legacy_formal_structure_requires_one_focus_explanation_sequence_per_slide(self):
         service = _candidate_service()
-        validator = service._validate_formal_classroom
+        validator = service._validate_formal_classroom_legacy_contract
         teacher_contract = service._formal_teacher_contract("math")
         valid = _formal_classroom()
         validator(valid, teacher_contract=teacher_contract)
@@ -1997,10 +2119,9 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             "openmaic_formal_slide_focus_sequence_invalid",
         )
 
-    def test_formal_structure_is_adaptive_and_rejects_invalid_evidence(self):
+    def test_legacy_formal_structure_is_adaptive_and_rejects_invalid_evidence(self):
         service = _candidate_service()
-        validator = getattr(service, "_validate_formal_classroom", None)
-        self.assertTrue(callable(validator))
+        validator = partial(_validate_legacy_fixture, service)
         valid = _formal_classroom()
         teacher_contract = service._formal_teacher_contract("math")
         evidence = validator(valid, teacher_contract=teacher_contract)
@@ -2929,12 +3050,12 @@ renderModel();"""
 
         mutations["game_duplicate_target"] = game_duplicate_target
 
-        def game_nested_extra(value):
-            value["scenes"][8]["content"]["widgetConfig"]["scoring"][
+        def game_config_unknown_nested_key(value):
+            value["scenes"][8]["content"]["widgetConfig"]["gameConfig"][
                 "unexpected"
             ] = True
 
-        mutations["game_nested_extra"] = game_nested_extra
+        mutations["game_config_unknown_nested_key"] = game_config_unknown_nested_key
 
         def game_duplicate_control(value):
             controls = value["scenes"][8]["content"]["widgetConfig"][
@@ -2970,7 +3091,7 @@ renderModel();"""
             "simulation_nested_extra",
             "simulation_preset_out_of_range",
             "game_duplicate_target",
-            "game_nested_extra",
+            "game_config_unknown_nested_key",
             "game_duplicate_control",
             "game_duplicate_achievement",
             "visualization_missing_reference",
@@ -3002,11 +3123,8 @@ renderModel();"""
                 with self.assertRaises(OpenMaicRuntimeServiceError):
                     validator(invalid, teacher_contract=teacher_contract)
 
-    def test_formal_widget_reachability_rejects_provably_dead_registration(self):
-        validator = getattr(
-            _candidate_service(), "_validate_formal_classroom", None
-        )
-        self.assertTrue(callable(validator))
+    def test_legacy_formal_widget_reachability_rejects_provably_dead_registration(self):
+        validator = partial(_validate_legacy_fixture, _candidate_service())
 
         listeners = {
             "simulation": (

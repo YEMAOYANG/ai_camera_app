@@ -86,19 +86,41 @@ class ProgressiveIntegrationTest(unittest.TestCase):
     def test_new_catalog_fixes_lesson_order_and_plans_two_basic_sets(self):
         service = object.__new__(LearningCatalogReleaseService)
         repo = service.repository = Mock()
+        conn = Mock()
         @contextmanager
-        def transaction(): yield Mock()
+        def transaction(): yield conn
         repo.transaction = transaction
-        repo.create_or_get_build.return_value = ({"id": "build", "release_id": "release"}, True)
+        repo.create_or_get_content_build.return_value = ({"id": "build", "release_id": "release"}, True)
         service._build_payload = Mock(return_value={"ok": True})
-        result = service.create({"requestId": "progressive-build-test", "curriculumVersion": "mira.primary.progressive.v1",
-                                 "lessonIds": ["M1A01.02", "M1A01.01"]})
+        with patch("repositories.learning_curriculum_preparation_repository.LearningCurriculumPreparationRepository") as preparations:
+            preparations.return_value.reserve_plan.return_value = ({"id": "plan"}, True)
+            result = service.create({"requestId": "progressive-build-test", "curriculumVersion": "mira.primary.progressive.v1",
+                                     "lessonIds": ["M1A01.02", "M1A01.01"]})
         self.assertTrue(result["created"])
-        args = repo.create_or_get_build.call_args.kwargs
-        self.assertEqual([target["skillId"] for target in args["targets"]], ["M1A01.01", "M1A01.02"])
-        self.assertEqual(args["variants_per_boundary"], 2)
-        self.assertTrue(all(target["difficultyCode"] == "basic" for target in args["targets"]))
-        self.assertFalse(repo.sync_boundaries.call_args.kwargs["retire_missing"])
+        self.assertEqual(result["preparationPlanId"], "plan")
+        planned = preparations.return_value.reserve_plan.call_args.kwargs
+        self.assertTrue(planned["library_owned"])
+        self.assertIsNone(planned["family_id"])
+        self.assertIsNone(planned["child_id"])
+        args = repo.create_or_get_content_build.call_args.kwargs
+        target = args["target_spec"]
+        self.assertEqual(target["schemaVersion"], "mira.learning.preparation-target.progressive.v1")
+        self.assertEqual(target["variantsPerBoundary"], 2)
+        self.assertEqual(planned["target"], target)
+        self.assertTrue(all(item["difficultyCode"] == "basic" for item in target["courseTargets"]))
+        boundaries = repo.sync_boundaries.call_args.kwargs
+        self.assertCountEqual([item["skillId"] for item in boundaries["boundaries"]], ["M1A01.01", "M1A01.02"])
+        self.assertEqual(
+            [item["skillId"] for item in target["courseTargets"]
+             if item["skillId"] in {"M1A01.01", "M1A01.02"} and item["variantOrdinal"] == 1],
+            ["M1A01.01", "M1A01.02"],
+        )
+        self.assertFalse(boundaries["retire_missing"])
+        queued = [call.args[1] for call in conn.execute.call_args_list
+                  if "INSERT INTO learning_course_supply_requests" in call.args[0]]
+        self.assertEqual([(row[2], row[3]) for row in queued],
+                         [("M1A01.01", 1), ("M1A01.01", 2), ("M1A01.02", 1), ("M1A01.02", 2)])
+        repo.create_or_get_build.assert_not_called()
 
     def test_new_catalog_cannot_inject_old_publication_authority(self):
         service = object.__new__(LearningCatalogReleaseService)

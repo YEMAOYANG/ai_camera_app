@@ -13,6 +13,7 @@ from content.primary_skill_boundaries import (
 )
 from core.database import Database
 from core.errors import ApiError
+from repositories.dynamic_learning_course_repository import DynamicLearningCourseRepository
 from repositories.learning_catalog_repository import (
     LearningCatalogActivationError,
     LearningCatalogBuildConflict,
@@ -24,6 +25,8 @@ from services.learning_curriculum_preparation_contract import (
     preparation_target_fingerprint,
 )
 from tests.support import fresh_test_config, validated_test_database_url
+from tests.test_learning_catalog_content_only import _resume_legacy_content_build
+from tests.test_learning_catalog_release import _restore_legacy_build
 
 
 class _UnexpectedDynamicGenerationService:
@@ -71,12 +74,64 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
         )
 
     def _create(self, request_id: str = "cp2-content-build") -> dict[str, object]:
-        return self.service.create_preparation_content_build(
+        return _resume_legacy_content_build(self.service,
             request_id=request_id,
             title="Mira 一年级正式内容候选",
             preparation_target=self.target,
             target_fingerprint=self.fingerprint,
         )
+
+    def test_same_timestamp_inventory_excludes_self_but_preserves_other_history(self):
+        cutoff = 100_000
+        expected = set()
+        without_request_id = set()
+        fixtures = (
+            ("own", "own-request", cutoff, False, False),
+            ("retry", "own-request.attempt2", cutoff, False, False),
+            ("other", "other-request", cutoff, True, False),
+            ("legacy", None, cutoff, True, False),
+            ("empty", "", cutoff, True, False),
+            ("orphan-retry", ".attempt2", cutoff, True, False),
+            ("retired", "retired-request", cutoff - 1, True, True),
+            ("future", "future-request", cutoff + 1, False, False),
+        )
+        with self.repository.transaction() as conn:
+            for label, request_id, created_at, include, retired in fixtures:
+                question = {"id": "q1", "type": "exact_text",
+                            "prompt": f"历史题目{label}", "answer": "a"}
+                conn.execute(
+                    """INSERT INTO learning_courses(
+                      id, version, grade_code, subject, node_code, title, objective,
+                      status, content_json, generation_request_id,
+                      generation_content_hash, created_at, updated_at, retired_at
+                    ) VALUES (?, '1.0.0', 'primary_1', 'chinese', 'pinyin_syllables',
+                      '历史库存', '恢复去重', 'unverified', ?, ?, ?, ?, ?, ?)""",
+                    (f"history-{label}", json.dumps({"questions": [question]}),
+                     request_id, hashlib.sha256(label.encode()).hexdigest(),
+                     created_at, created_at, created_at if retired else None),
+                )
+                fingerprint = DynamicLearningCourseRepository.question_fingerprint(
+                    grade_code="primary_1", subject="chinese", node_code="pinyin_syllables",
+                    question=question,
+                )
+                if include:
+                    expected.add(fingerprint)
+                if created_at <= cutoff:
+                    without_request_id.add(fingerprint)
+            actual = self.repository._historical_question_fingerprints(
+                conn, item={"grade_code": "primary_1", "subject": "chinese",
+                            "skill_id": "pinyin_syllables", "generation_request_id": "own-request",
+                            "content_attempt_started_at": cutoff},
+            )
+            legacy_actual = self.repository._historical_question_fingerprints(
+                conn, item={"grade_code": "primary_1", "subject": "chinese",
+                            "skill_id": "pinyin_syllables",
+                            "content_attempt_started_at": cutoff},
+            )
+        self.assertEqual(actual, sorted(expected))
+        self.assertEqual(len(actual), 5)
+        self.assertEqual(legacy_actual, sorted(without_request_id))
+        self.assertEqual(len(legacy_actual), 7)
 
     def _rows(self, build_id: str):
         with self.repository.transaction() as conn:
@@ -692,7 +747,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
             self._create("cp2-replay-extra")
         self.assertEqual(extra_error.exception.status_code, 409)
 
-        rogue = self.service.create(
+        rogue = _restore_legacy_build(self, self.service,
             {
                 "requestId": "cp2-replay-rogue-owner",
                 "grades": ["primary_3"],
@@ -781,9 +836,15 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
             release_id=release_id,
             curriculum_version=str(self.target["curriculumVersion"]),
         )
-        with self.assertRaises(ApiError) as create_error:
+        # Restoring this historical target must fail at the repository boundary
+        # before the service can replay it. New coarse target creation is disabled.
+        with self.assertRaisesRegex(
+            LearningCatalogBuildConflict,
+            "content-only catalog release has invalid published items",
+        ):
             self._create(request_id)
-        self.assertEqual(create_error.exception.status_code, 409)
+        with self.repository.transaction() as conn:
+            self.assertIsNone(self.repository.get_build_by_request(conn, request_id=request_id))
 
         replay = self._create("cp2-polluted-replay")
         replay_build_id = str(replay["build"]["id"])
@@ -939,7 +1000,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
         )
         self.assertEqual(str(replay_build["id"]), build_id)
 
-        legacy = self.service.create(
+        legacy = _restore_legacy_build(self, self.service,
             {
                 "requestId": "cp2-activation-item-locks",
                 "grades": ["primary_1"],
@@ -1048,7 +1109,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
                 str(target["boundaryVersion"]) for target in full_targets
             ],
         }
-        self.service.create(
+        _restore_legacy_build(self, self.service,
             {
                 "requestId": full_request_id,
                 "grades": ["primary_1"],

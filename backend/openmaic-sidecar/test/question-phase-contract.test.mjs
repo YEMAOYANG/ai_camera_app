@@ -364,7 +364,7 @@ function normalizedCandidate() {
     },
   ];
   return {
-    title: '20以内加减法',
+    title: '星星和铅笔的加减练习',
     intro: '先学再练。',
     estimatedMinutes: 10,
     teachingFlow: {
@@ -1344,7 +1344,7 @@ test('V2 phase 11 output recomputes fingerprint, validation, and solution identi
   const request = v2Request({
     phase: 'independent_verification',
     phaseOrdinal: 11,
-    checkpoint: { existingFingerprints: [] },
+    checkpoint: { existingFingerprints: [], candidate: compiledCandidateCheckpoint() },
   });
   const valid = acceptedPhase11Checkpoint(request);
   assert.deepEqual(
@@ -1383,7 +1383,7 @@ test('V2 independent solution keeps accepted_text answers scalar and reuses nume
   const request = v2Request({
     phase: 'independent_verification',
     phaseOrdinal: 11,
-    checkpoint: { existingFingerprints: [] },
+    checkpoint: { existingFingerprints: [], candidate: compiledCandidateCheckpoint() },
   });
   const acceptedTextCourse = candidateCourseCheckpoint();
   acceptedTextCourse.content.questions[0] = {
@@ -3030,10 +3030,24 @@ test('V2 phase 4 accepts one valid complete candidate without phase-3 host metad
   assert.equal(result.outcome, 'succeeded');
   assert.deepEqual(Object.keys(result.checkpoint).sort(), ['candidate', 'phaseStatus']);
   assert.equal(result.checkpoint.phaseStatus, 'accepted');
-  assert.deepEqual(
-    result.checkpoint.candidate,
-    questionContract.applyHostOwnedPracticeHints(v2Request(), candidate),
-  );
+  const expected = questionContract.applyHostOwnedPracticeHints(v2Request(), candidate);
+  expected.title = '小海獭的纸艺工坊·礼物盒20以内加减法任务(晨光篇)';
+  expected.intro = '本节课学习20以内一步加法和非负减法。先理解两种运算,再独立练习。';
+  expected.teachingFlow = {
+    teach: {
+      title: '合起来用加法,去掉用减法',
+      sayText: '加法表示把两部分合起来,例如 2 + 3 = 5。减法表示从原来的一部分中去掉一些,例如 6 - 1 = 5。读题时先判断数量是增加还是减少。 示范题:1 + 1 = ? 1加1等于2。',
+      keyPoints: ['合起来时用加法', '去掉一部分时用减法', '计算后检查结果是否在0到20'],
+    },
+    recap: { sayText: '回顾一下:数量合起来用加法,数量减少用减法,最后再复算一次。' },
+  };
+  expected.questions[3].prompt += ' 请计算 4 + 2。';
+  expected.questions[4].prompt += ' 请计算 7 - 3。';
+  assert.equal(expected.questions.length, 5);
+  assert.deepEqual(result.checkpoint.candidate, expected);
+  assert.equal(result.providerRequestIdHash, null);
+  assert.equal(result.inputTokens, null);
+  assert.equal(result.outputTokens, null);
 });
 
 test('V2 phase 4 host-compiles realistic formatted number-sense repair output', () => {
@@ -3073,7 +3087,7 @@ test('V2 phase 4 host-compiles realistic formatted number-sense repair output', 
   assert.equal(result.checkpoint.candidate.questions[1].choices[2].label, '20');
   assert.equal(
     result.checkpoint.candidate.teachingFlow.teach.keyPoints[0],
-    '十几可以拆成1个十和几个一',
+    '按0到20的顺序数',
   );
 });
 
@@ -3095,10 +3109,21 @@ test('V2 number-sense teaching placeholder allowance never masks a concrete inva
     },
     fakeResponses: [JSON.stringify(invalid)],
   }));
+  // The sealed raw candidate supersedes untrusted Provider teaching copy.
   const result = parseOnlyOutputLine(completed);
-  assert.notEqual(completed.status, 0);
-  assert.equal(result.outcome, 'failed_safe');
-  assert.equal(result.safeErrorCode, 'question_phase_output_rejected');
+  assert.equal(completed.status, 0);
+  assert.equal(result.outcome, 'succeeded');
+  assert.equal(result.checkpoint.candidate.questions.length, 5);
+  assert.doesNotMatch(JSON.stringify(result.checkpoint.candidate), /8个十和1个一/u);
+  const lessonText = lessonTextCheckpoint();
+  lessonText.teachingFlow.teach.sayText = invalid.teachingFlow.teach.sayText;
+  assert.throws(
+    () => questionContract.normalizeQuestionPhaseRequest(v2Request({
+      skillBoundary, phase: 'reconciliation', phaseOrdinal: 6,
+      checkpoint: { questionCount: 5, existingFingerprints: [], candidate, lessonText },
+    })),
+    (error) => error?.code === 'question_phase_preflight_rejected',
+  );
 });
 
 supersededPhase3RawAuthorityTest('V2 phase 3 fallback accepts standalone tens placeholders in child-facing hints', () => {
@@ -3148,9 +3173,18 @@ test('V2 child-facing placeholder allowance never masks an incomplete concrete p
     fakeResponses: [JSON.stringify(invalid)],
   }));
   const result = parseOnlyOutputLine(completed);
-  assert.notEqual(completed.status, 0);
-  assert.equal(result.outcome, 'failed_safe');
-  assert.equal(result.safeErrorCode, 'question_phase_output_rejected');
+  assert.equal(completed.status, 0);
+  assert.equal(result.outcome, 'succeeded');
+  assert.equal(result.checkpoint.candidate.questions.length, 5);
+  assert.doesNotMatch(JSON.stringify(result.checkpoint.candidate), /15有1个十和几个一/u);
+  // Check the same bad hint at the reachable complete-candidate boundary.
+  assert.throws(
+    () => questionContract.buildQuestionCandidates({
+      request: { ...v2Request({ skillBoundary }), questionCount: 5, existingFingerprints: [] },
+      generationPlan: {}, generated: invalid, elapsedMs: 0,
+    }),
+    (error) => error?.code === 'invalid_generation',
+  );
 });
 
 supersededPhase3RawAuthorityTest('V2 phase 3 fallback canonicalizes Chinese numeral unit phrases in learner-facing copy', () => {
@@ -3204,9 +3238,18 @@ test('V2 Chinese numeral unit normalization remains bounded to 20', () => {
     fakeResponses: [JSON.stringify(invalid)],
   }));
   const result = parseOnlyOutputLine(completed);
-  assert.notEqual(completed.status, 0);
-  assert.equal(result.outcome, 'failed_safe');
-  assert.equal(result.safeErrorCode, 'question_phase_output_rejected');
+  assert.equal(completed.status, 0);
+  assert.equal(result.outcome, 'succeeded');
+  assert.equal(result.checkpoint.candidate.questions.length, 5);
+  assert.doesNotMatch(JSON.stringify(result.checkpoint.candidate), /三个十/u);
+  // Check the same bad hint at the reachable complete-candidate boundary.
+  assert.throws(
+    () => questionContract.buildQuestionCandidates({
+      request: { ...v2Request({ skillBoundary }), questionCount: 5, existingFingerprints: [] },
+      generationPlan: {}, generated: invalid, elapsedMs: 0,
+    }),
+    (error) => error?.code === 'invalid_generation',
+  );
 });
 
 supersededPhase3RawAuthorityTest('V2 phase 3 fallback accepts separated generic 几个十 and 几个一 only in teaching language', () => {
@@ -6377,13 +6420,13 @@ test('V2 reverse initial-sound raw remains compatible while canonical Host autho
   const result = parseOnlyOutputLine(completed);
   assert.equal(result.checkpoint.phaseStatus, 'accepted');
   const q3 = result.checkpoint.candidate.questions[2];
-  assert.match(q3.prompt, /字母 M 的首音对应哪个单词\?$/u);
-  assert.deepEqual(q3.choices.map((choice) => choice.label), ['moon', 'nose', 'queen']);
-  assert.equal(q3.answer, 'A');
+  assert.match(q3.prompt, /字母 U 的首音对应哪个单词\?$/u);
+  assert.deepEqual(q3.choices.map((choice) => choice.label), ['van', 'yellow', 'umbrella']);
+  assert.equal(q3.answer, 'C');
   const q5 = result.checkpoint.candidate.questions[4];
-  assert.match(q5.prompt, /字母 F 的首音对应哪个单词\?$/u);
-  assert.deepEqual(q5.choices.map((choice) => choice.label), ['goat', 'jam', 'fish']);
-  assert.equal(q5.answer, 'C');
+  assert.match(q5.prompt, /字母 N 的首音对应哪个单词\?$/u);
+  assert.deepEqual(q5.choices.map((choice) => choice.label), ['orange', 'nose', 'red']);
+  assert.equal(q5.answer, 'B');
 });
 
 test('V65 direct initial-sound synonym remains compatible while the canonical Host builder owns authority', () => {
@@ -6457,13 +6500,19 @@ test('V65 direct initial-sound synonym remains compatible while the canonical Ho
   });
   assert.match(
     result.checkpoint.candidate.questions[2].prompt,
-    /字母 M 的首音对应哪个单词\?$/u,
+    /字母 U 的首音对应哪个单词\?$/u,
   );
   assert.match(
     result.checkpoint.candidate.questions[4].prompt,
-    /字母 F 的首音对应哪个单词\?$/u,
+    /字母 N 的首音对应哪个单词\?$/u,
   );
-  assert.doesNotMatch(result.checkpoint.candidate.questions[3].hint, /K/u);
+  assert.deepEqual(result.checkpoint.candidate.questions[2].choices.map((choice) => choice.label),
+    ['van', 'yellow', 'umbrella']);
+  assert.equal(result.checkpoint.candidate.questions[2].answer, 'C');
+  assert.deepEqual(result.checkpoint.candidate.questions[4].choices.map((choice) => choice.label),
+    ['orange', 'nose', 'red']);
+  assert.equal(result.checkpoint.candidate.questions[4].answer, 'B');
+  assert.doesNotMatch(result.checkpoint.candidate.questions[3].hint, /S/u);
   assert.equal(result.providerRequestIdHash, null);
   assert.equal(result.inputTokens, null);
   assert.equal(result.outputTokens, null);
@@ -6876,20 +6925,20 @@ test('V66 exact letters phase 3 is a zero-Provider Host build with five fixed ro
   const questions = result.checkpoint.candidate.questions;
 
   assert.equal(questions.length, 5);
-  assert.match(questions[0].prompt, /大写字母 D .*小写/u);
-  assert.equal(selectedChoiceLabel(questions[0]), 'd');
-  assert.match(questions[1].prompt, /小写字母 g .*大写/u);
-  assert.equal(selectedChoiceLabel(questions[1]), 'G');
-  assert.match(questions[2].prompt, /字母 M .*首音/u);
-  assert.equal(selectedChoiceLabel(questions[2]), 'moon');
-  assert.match(questions[3].prompt, /小写字母 k .*大写/u);
-  assert.equal(selectedChoiceLabel(questions[3]), 'K');
-  assert.match(questions[4].prompt, /字母 F .*首音/u);
-  assert.equal(selectedChoiceLabel(questions[4]), 'fish');
-  assert.doesNotMatch(questions[1].hint, /G/u);
-  assert.doesNotMatch(questions[2].hint, /moon/u);
-  assert.doesNotMatch(questions[3].hint, /K/u);
-  assert.doesNotMatch(questions[4].hint, /fish/u);
+  assert.match(questions[0].prompt, /大写字母 L .*小写/u);
+  assert.equal(selectedChoiceLabel(questions[0]), 'l');
+  assert.match(questions[1].prompt, /小写字母 o .*大写/u);
+  assert.equal(selectedChoiceLabel(questions[1]), 'O');
+  assert.match(questions[2].prompt, /字母 U .*首音/u);
+  assert.equal(selectedChoiceLabel(questions[2]), 'umbrella');
+  assert.match(questions[3].prompt, /小写字母 s .*大写/u);
+  assert.equal(selectedChoiceLabel(questions[3]), 'S');
+  assert.match(questions[4].prompt, /字母 N .*首音/u);
+  assert.equal(selectedChoiceLabel(questions[4]), 'nose');
+  assert.doesNotMatch(questions[1].hint, /O/u);
+  assert.doesNotMatch(questions[2].hint, /umbrella/u);
+  assert.doesNotMatch(questions[3].hint, /S/u);
+  assert.doesNotMatch(questions[4].hint, /nose/u);
 });
 
 test('V66 canonical letters phase 3 ignores empty, malformed, answer-forged, and instructional raw authority at both Host entries', () => {
@@ -6998,23 +7047,37 @@ test('V66 canonical letters output rejects legacy, number-sense, and forged Host
 });
 
 test('V66 canonical letters builder rotates collision-free variants and fails closed when finite inventory is exhausted', () => {
-  const seen = [];
-  for (let variant = 0; variant < 26; variant += 1) {
+  const blockingFingerprints = [];
+  const allFingerprints = new Set();
+  let variants = 0;
+  let exhausted = false;
+  // One fingerprint blocks its entire variant and keeps the V2 history <= 500.
+  for (; variants < 500; variants += 1) {
     const request = questionContract.normalizeQuestionPhaseRequest(
-      canonicalLettersSoundsPhase3Input({ existingFingerprints: seen }),
+      canonicalLettersSoundsPhase3Input({ existingFingerprints: blockingFingerprints }),
     );
-    const candidate = questionContract.compileCanonicalLettersSoundsCandidateCheckpoint(request);
+    let candidate;
+    try {
+      candidate = questionContract.compileCanonicalLettersSoundsCandidateCheckpoint(request);
+    } catch (error) {
+      assert.equal(error?.code, 'duplicate_candidate');
+      exhausted = true;
+      break;
+    }
     const fingerprints = questionContract.buildQuestionFingerprintCheckpoint(
-      request,
-      candidate.questions,
+      request, candidate.questions,
     ).map((item) => item.fingerprint);
     assert.equal(fingerprints.length, 5);
-    assert.equal(new Set([...seen, ...fingerprints]).size, seen.length + 5);
-    seen.push(...fingerprints);
+    assert.equal(new Set(fingerprints).size, 5);
+    assert.ok(fingerprints.every((fingerprint) => !allFingerprints.has(fingerprint)));
+    fingerprints.forEach((fingerprint) => allFingerprints.add(fingerprint));
+    blockingFingerprints.push(fingerprints[0]);
   }
-  assert.equal(seen.length, 130);
+  assert.ok(variants >= 256, `only ${variants} distinct variants`);
+  assert.equal(allFingerprints.size, variants * 5);
+  assert.equal(exhausted, true, 'the finite inventory must exhaust within the history limit');
   const exhaustedRequest = questionContract.normalizeQuestionPhaseRequest(
-    canonicalLettersSoundsPhase3Input({ existingFingerprints: seen }),
+    canonicalLettersSoundsPhase3Input({ existingFingerprints: blockingFingerprints }),
   );
   assert.throws(
     () => questionContract.compileCanonicalLettersSoundsCandidateCheckpoint(exhaustedRequest),
@@ -7195,7 +7258,7 @@ test('accepted candidate host reconciliation is idempotent and rejects noncanoni
   }
 });
 
-test('V2 CLI valid outline writes one exact normalized result and consumes one fake response', () => {
+test('V2 CLI sealed outline ignores fake advisory and requires no Provider', () => {
   const outlineResponse = {
     courseTitle: '20以内加减法',
     languageDirective: 'Use Simplified Chinese.',
@@ -7224,13 +7287,13 @@ test('V2 CLI valid outline writes one exact normalized result and consumes one f
       phaseStatus: 'accepted',
       outlinePlan: {
         courseTitle: '20以内加减法',
-        languageDirective: 'Use Simplified Chinese.',
+        languageDirective: '使用简体中文讲解固定的一年级课程内容。',
         outlines: [
           {
             order: 1,
-            title: '先理解再练习',
-            description: '固定边界内的一节课',
-            keyPoints: ['理解题意', '独立检查'],
+            title: '20以内加减法',
+            description: '围绕固定技能边界安排讲解、示范、练习和总结。',
+            keyPoints: ['完成20以内一步加减法', '0到20的整数'],
           },
         ],
       },
@@ -7246,6 +7309,16 @@ test('V2 CLI valid outline writes one exact normalized result and consumes one f
   assert.ok(result.elapsedMs >= 0);
   assert.equal(completed.stdout.includes('provider-owned-id'), false);
   assert.equal(completed.stdout.includes('raw-body'), false);
+  const live = runV2Cli(v2Request({
+    mode: 'live', fakeResponses: [],
+    provider: { ...v2Provider(), apiKeyEnv: 'MIRA_SEALED_OUTLINE_PROVIDER_MUST_NOT_BE_CALLED' },
+  }));
+  assert.equal(live.status, 0, live.stderr || live.stdout);
+  const noProvider = parseOnlyOutputLine(live);
+  assert.deepEqual(noProvider.checkpoint, result.checkpoint);
+  assert.equal(noProvider.providerRequestIdHash, null);
+  assert.equal(noProvider.inputTokens, null);
+  assert.equal(noProvider.outputTokens, null);
 });
 
 test('V2 outline Host bounds malformed Provider advisory text to the fixed skill', () => {
@@ -7285,7 +7358,13 @@ test('V2 outline Host bounds malformed Provider advisory text to the fixed skill
   const plan = result.checkpoint.outlinePlan;
   assert.equal(plan.courseTitle, '20以内加减法');
   assert.ok(plan.languageDirective.length <= 500);
-  assert.equal(plan.outlines.length, 4);
+  assert.equal(plan.languageDirective, '使用简体中文讲解固定的一年级课程内容。');
+  assert.equal(plan.outlines.length, 1);
+  assert.deepEqual(plan.outlines[0], {
+    order: 1, title: '20以内加减法',
+    description: '围绕固定技能边界安排讲解、示范、练习和总结。',
+    keyPoints: ['完成20以内一步加减法', '0到20的整数'],
+  });
   assert.ok(plan.outlines.every((outline, index) => (
     outline.order === index + 1
     && outline.title.length > 0
@@ -7691,10 +7770,20 @@ test('V84 phase 11 accepts the formal number-sense request with 170 historical f
   assert.equal(normalized.checkpoint.existingFingerprints.length, 170);
 
   const completed = runV2Cli(request);
-  assert.equal(completed.status, 1, completed.stderr || completed.stdout);
+  assert.equal(completed.status, 0, completed.stderr || completed.stdout);
   const result = parseOnlyOutputLine(completed);
-  assert.equal(result.outcome, 'failed_safe');
-  assert.equal(result.safeErrorCode, 'provider_unavailable');
+  assert.equal(result.outcome, 'succeeded');
+  assert.equal(result.safeErrorCode, null);
+  assert.equal(result.checkpoint.phaseStatus, 'accepted');
+  assert.equal(result.checkpoint.validation.existingFingerprintsChecked, 170);
+  assert.equal(result.checkpoint.questionFingerprints.length, 5);
+  assert.equal(result.checkpoint.independentSolution.solver,
+    'host:primary-one-number-sense-v1:deterministic_public_question_solver');
+  assert.equal(result.checkpoint.independentSolution.answers.length, 5);
+  assert.deepEqual(
+    result.checkpoint.independentSolution.answers.map((answer) => answer.answer),
+    result.checkpoint.candidateCourse.content.questions.map((question) => question.answer),
+  );
   assert.equal(result.providerRequestIdHash, null);
   assert.equal(result.inputTokens, null);
   assert.equal(result.outputTokens, null);

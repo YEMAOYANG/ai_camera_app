@@ -52,6 +52,7 @@ from tests.test_learning_catalog_content_only import (
     _CountingHostValidator,
     _OutlineOnlyAdapter,
     _RejectingPinyinCanaryAdapter,
+    _resume_legacy_content_build,
 )
 from tests.test_learning_catalog_content_review_fix2 import (
     _CompletePrimaryOneAdapter,
@@ -2635,7 +2636,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
                 """,
                 (reserved["id"],),
             )
-        created = catalog.create_preparation_content_build(
+        created = _resume_legacy_content_build(catalog,
             request_id=f"grade-build:{fingerprint}",
             title="Task 8 planning manifest authority",
             preparation_target=target,
@@ -2702,7 +2703,18 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
                 return self.delegate.execute(sql, params)
 
         mutations = {
-            "grade_code": {"grade_code": "primary_2"},
+            # Keep the raced row valid under grade-bound SQL constraints so the
+            # locked authority check, rather than fixture insertion, rejects it.
+            "grade_code": {
+                "grade_code": "primary_2",
+                "total_course_count": 27,
+                "content_target_count": 27,
+                "target_spec_json": json.dumps(build_preparation_target("primary_2")),
+                "stage_progress_json": json.dumps({
+                    **json.loads(original["stage_progress_json"]),
+                    "targetCount": 27,
+                }),
+            },
             "shared_request": {
                 "shared_build_request_id": "grade-build:" + "0" * 64
             },
@@ -3030,7 +3042,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
         self.assertEqual(first_plan["stage"], "retry_wait")
         self.assertEqual(first_plan["resume_stage"], "generating_content")
         self.assertEqual(first_plan["work_unit_kind"], "coordinator")
-        self.assertEqual(first_plan["hard_deadline_at"], 222_000)
+        self.assertEqual(first_plan["hard_deadline_at"], 102_000 + repository.FORMAL_V2_PROVIDER_STAGE_DEADLINE_MS)
         self.assertIsNone(first_plan["bound_catalog_item_id"])
         self.assertEqual(
             first_plan["retry_reason_code"],
@@ -3042,11 +3054,11 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
         with repository.transaction() as conn:
             second_plan = repository.get_plan(conn, str(reserved["id"]))
         self.assertEqual(second["status"], "queued", second)
-        self.assertEqual(second_plan["hard_deadline_at"], 222_000)
+        self.assertEqual(second_plan["hard_deadline_at"], 102_000 + repository.FORMAL_V2_PROVIDER_STAGE_DEADLINE_MS)
         self.assertEqual(second_plan["work_unit_kind"], "coordinator")
         self.assertIsNone(second_plan["bound_catalog_item_id"])
 
-        clock.value = 222_000
+        clock.value = 102_000 + repository.FORMAL_V2_PROVIDER_STAGE_DEADLINE_MS
         terminal = runner.run_once(_runner_app(), now_ms=clock.value)
         with repository.transaction() as conn:
             terminal_plan = repository.get_plan(conn, str(reserved["id"]))
@@ -3072,7 +3084,9 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
         )
         with app.app_context(), patch.dict(
             os.environ, {"APP_AI_API_KEY": ""}, clear=False
-        ):
+        ), patch.object(
+            service_factory, "process_next_formal_runtime_candidate"
+        ) as runtime_processor:
             adapter = (
                 service_factory.learning_curriculum_preparation_checkpoint_adapter()
             )
@@ -3108,6 +3122,8 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
             planning = runner.run_once(app, now_ms=now)
             self.assertEqual(planning["resultCode"], "progressed", planning)
             dependency = runner.run_once(app, now_ms=now + 2_000)
+            self.assertIsNone(adapter.runtime_candidate_processor)
+            runtime_processor.assert_not_called()
 
         self.assertEqual(dependency["status"], "queued", dependency)
         self.assertEqual(dependency["stage"], "retry_wait", dependency)
@@ -3130,7 +3146,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
         self.assertEqual(dispatches, 0)
         self.assertEqual(jobs, 0)
 
-    def test_missing_provider_key_retries_bound_item_without_spend_or_extension(self):
+    def test_missing_provider_key_never_spends_or_extends_outer_attempt_deadline(self):
         clock = _MutableClock(100_000)
         provider = _OutlineOnlyAdapter()
         _catalog, repository, runner = self._runtime(
@@ -3162,7 +3178,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
             self.assertEqual(first_plan["work_unit_kind"], "provider_phase")
             self.assertEqual(first_plan["bound_content_attempt_ordinal"], 1)
             self.assertEqual(first_plan["bound_content_phase"], "outline")
-            self.assertEqual(first_plan["hard_deadline_at"], 222_000)
+            self.assertEqual(first_plan["hard_deadline_at"], 102_000 + runner.STAGE_DEADLINE_MS["generating_content"])
             self.assertEqual(
                 first_item["content_work_unit_deadline_at"],
                 first_plan["hard_deadline_at"],
@@ -3197,7 +3213,29 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
             self.assertEqual(second_dispatches, 0)
             self.assertEqual(provider.execute_calls, 0)
 
-            clock.value = 222_000
+            # A never-dispatched phase may recover queue time, while its paid
+            # attempt's original outer deadline and request identity stay frozen.
+            clock.value = int(first_plan["hard_deadline_at"])
+            renewed = runner.run_once(_runner_app(), now_ms=clock.value)
+            with repository.transaction() as conn:
+                renewed_plan = repository.get_plan(conn, str(reserved["id"]))
+                renewed_item = conn.execute(
+                    "SELECT * FROM learning_catalog_build_items WHERE id = ?",
+                    (first_plan["bound_catalog_item_id"],),
+                ).fetchone()
+            self.assertEqual(renewed["status"], "queued", renewed)
+            self.assertEqual(renewed_plan["stage"], "retry_wait")
+            self.assertEqual(
+                (renewed_plan["bound_catalog_item_id"],
+                 renewed_plan["bound_content_attempt_ordinal"],
+                 renewed_plan["bound_content_phase"]), first_identity[:3],
+            )
+            outer_deadline = int(first_item["content_provider_attempt_hard_deadline_at"])
+            self.assertEqual(renewed_item["content_provider_attempt_hard_deadline_at"], outer_deadline)
+            self.assertGreater(renewed_plan["hard_deadline_at"], first_plan["hard_deadline_at"])
+            self.assertLessEqual(renewed_plan["hard_deadline_at"], outer_deadline)
+            self.assertEqual(provider.execute_calls, 0)
+            clock.value = outer_deadline
             terminal = runner.run_once(_runner_app(), now_ms=clock.value)
 
         with repository.transaction() as conn:
@@ -3761,7 +3799,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
             self.assertEqual(crashed_item["content_phase"], "raw_candidate")
             self.assertEqual(crashed_plan["work_unit_kind"], "provider_phase")
             self.assertEqual(crashed_plan["bound_content_phase"], "outline")
-            self.assertEqual(crashed_plan["hard_deadline_at"], 222_000)
+            self.assertEqual(crashed_plan["hard_deadline_at"], 102_000 + runner.STAGE_DEADLINE_MS["generating_content"])
 
             clock.value = int(crashed_plan["lease_expires_at"])
             recovered = runner.run_once(_runner_app(), now_ms=clock.value)
@@ -4081,7 +4119,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
                 self.assertEqual(plan["content_canary_failed_count"], 0)
                 self.assertEqual(plan["ready_course_count"], 0)
                 self.assertEqual(plan["failed_course_count"], 0)
-                self.assertEqual(plan["progress_percent"], 5 + candidate_count)
+                self.assertEqual(plan["progress_percent"], max(10, 5 + candidate_count))
                 self.assertEqual(
                     json.loads(str(plan["stage_progress_json"])),
                     {
@@ -4141,6 +4179,8 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
         with patch.dict(os.environ, {"APP_AI_API_KEY": "test-only"}, clear=False):
             for target_count, canary_count in ((1, 1), (3, 3), (4, 3), (29, 3), (30, 3)):
                 while completed < target_count:
+                    # Later variants must not enter an earlier item's snapshot.
+                    clock.value += 1_000
                     results = [
                         catalog.advance_content(build_id, heartbeat=lambda: True)
                         for _ in range(7)
@@ -4337,6 +4377,8 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
             self._assert_runner_content_progress(first, candidate_count=1)
 
             for _ in range(27):
+                # Preserve the immutable pre-attempt history for each item.
+                clock.value += 1_000
                 direct_results = [
                     catalog.advance_content(
                         build_id=str(first["catalog_build_id"]),
@@ -4396,7 +4438,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
             plan["content_canary_candidate_count"], min(candidate_count, 3)
         )
         self.assertEqual(plan["content_canary_failed_count"], 0)
-        self.assertEqual(plan["progress_percent"], 5 + candidate_count)
+        self.assertEqual(plan["progress_percent"], max(10, 5 + candidate_count))
         subject_progress = json.loads(str(plan["subject_progress_json"]))
         expected_by_subject = (
             {"chinese": 1, "math": 0, "english": 0}
@@ -4438,19 +4480,27 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
 
         clock = _MutableClock(100_000)
         provider = _BindingObservedPinyinAdapter(self.database)
-        provider.provider_timeout_ms = 60_000
+        provider.provider_name = "openmaic_runtime"
+        provider.model_name = "courseware-v2"
+        provider.base_url = "http://127.0.0.1:3100"
+        provider.api_key_env = "INTERNAL_API_TOKEN"
+        provider.temperature = 0.6
+        provider.provider_timeout_ms = 300_000
         provider.max_tokens = 8_000
-        provider.process_timeout_seconds = 75.0
+        provider.process_timeout_seconds = 305.0
+        provider._formal_evidence.independent_solution["solver"] = (
+            "openmaic_runtime:courseware-v2:fresh_call"
+        )
         host = _BindingObservedHostValidator(self.database)
         factory_profiles = {
             role: {
-                "name": "kimi",
-                "model": "moonshot-v1-8k",
-                "baseUrl": "https://api.moonshot.cn/v1",
-                "apiKeyEnv": "APP_AI_API_KEY",
-                "timeoutMs": 60_000,
+                "name": "openmaic_runtime",
+                "model": "courseware-v2",
+                "baseUrl": "http://127.0.0.1:3100",
+                "apiKeyEnv": "INTERNAL_API_TOKEN",
+                "timeoutMs": 300_000,
                 "maxTokens": 8_000,
-                "temperature": 0.2,
+                "temperature": 0.6,
             }
             for role in ("generator", "verifier")
         }
@@ -4466,7 +4516,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
             runner.run_once(_runner_app(), now_ms=clock.value)["resultCode"],
             "progressed",
         )
-        with patch.dict(os.environ, {"APP_AI_API_KEY": "test-only"}, clear=False):
+        with patch.dict(os.environ, {"INTERNAL_API_TOKEN": "test-only"}, clear=False):
             for _ in range(6):
                 clock.value += 2_000
                 phase_result = runner.run_once(_runner_app(), now_ms=clock.value)
@@ -4540,6 +4590,8 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
             AI_PROVIDER="kimi",
             AI_MODEL="moonshot-v1-8k",
             AI_BASE_URL="https://api.moonshot.cn/v1",
+            OPENMAIC_FULL_RUNTIME_INTERNAL_URL="http://127.0.0.1:3100",
+            INTERNAL_API_TOKEN="test-only",
         )
         app.register_blueprint(learning_bp, url_prefix="/api/learning")
         app.extensions["mira_learning_curriculum_preparation_service"] = (
@@ -4950,6 +5002,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
                     evidence={
                         "item": dict(host_item),
                         "attemptHistories": histories[str(host_item["id"])],
+                        "historicalQuestionFingerprintsByAttempt": {1: [], 2: []},
                     },
                     prior_evidence=(),
                 )

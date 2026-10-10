@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 import pymysql
 
@@ -21,7 +22,7 @@ from services.learning_curriculum_preparation_contract import (
     build_preparation_target,
     preparation_target_fingerprint,
 )
-from tests.support import fresh_test_config
+from tests.support import fresh_test_config, migration_fixture_through
 
 
 MIGRATION_VERSION = "056_learning_curriculum_preparation_content_stage.sql"
@@ -75,6 +76,14 @@ ITEM_COLUMNS = (
 
 class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
     def setUp(self):
+        if self._testMethodName in {
+            "test_056_two_real_replays_have_one_marker_and_exact_schema",
+            "test_marker_rejects_same_name_wrong_dispatch_contract",
+            "test_marker_rejects_weak_task2_checks_and_composite_primary",
+            "test_restart_after_partial_ddl_repairs_half_state_and_partial_table",
+            "test_legacy_054_055_rows_backfill_without_mutating_registered_migrations",
+        }:
+            self.enterContext(migration_fixture_through(MIGRATION_VERSION))
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
         self.assertIn("/ai_camera_app_test", self.database_url)
@@ -252,8 +261,15 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
             migration_error = None
             try:
                 run_migrations(database_url, verbose=False)
-            except pymysql.MySQLError as error:
-                migration_error = int(error.args[0])
+            except RuntimeError as error:
+                self.assertIn(f"Migration {MIGRATION_VERSION} failed", str(error))
+                self.assertIsInstance(error.__cause__, pymysql.MySQLError)
+                self.assertEqual(
+                    error.__cause__.args[1],
+                    "This command is not supported in the prepared statement protocol yet",
+                )
+                migration_error = int(error.__cause__.args[0])
+                self.assertEqual(migration_error, 1295)
             with database.transaction() as conn:
                 marker = int(
                     conn.execute(
@@ -272,6 +288,8 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
     def test_marker_rejects_weak_task2_checks_and_composite_primary(self):
         corruptions = {
             "plan_state_check_wrong_clause": (
+                "ALTER TABLE learning_curriculum_preparation_plans "
+                "DROP CHECK chk_learning_prep_content_state_evidence",
                 "ALTER TABLE learning_curriculum_preparation_plans ADD CONSTRAINT "
                 "chk_learning_prep_content_state_evidence "
                 "CHECK (status IN ('queued', 'running', 'ready', 'failed', "
@@ -340,7 +358,14 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
             migration_error = None
             try:
                 run_migrations(database_url, verbose=False)
-            except pymysql.MySQLError:
+            except RuntimeError as error:
+                self.assertIn(f"Migration {MIGRATION_VERSION} failed", str(error))
+                self.assertIsInstance(error.__cause__, pymysql.MySQLError)
+                self.assertEqual(
+                    error.__cause__.args[1],
+                    "This command is not supported in the prepared statement protocol yet",
+                )
+                self.assertEqual(error.__cause__.args[0], 1295)
                 migration_error = True
             with database.transaction() as conn:
                 marker = int(
@@ -359,33 +384,24 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
 
     def test_restart_after_partial_ddl_repairs_half_state_and_partial_table(self):
         self._require_migration()
-        target = build_preparation_target("primary_2")
-        fingerprint = preparation_target_fingerprint(target)
         with self.database.transaction() as conn:
             self._insert_family_child(conn, "partial-family", "partial-child")
-            plan, _ = self.plan_repository.reserve_plan(
-                conn,
-                family_id="partial-family",
-                child_id="partial-child",
-                grade_code="primary_2",
-                school_year_start_year=2026,
-                grade_selection_revision=1,
-                target=target,
-                target_fingerprint=fingerprint,
-                request_id="partial-plan",
-                shared_build_request_id=f"grade-build:{fingerprint}",
-                now=1000,
+            plan_id = self._insert_legacy_plan(
+                conn, family_id="partial-family", child_id="partial-child",
+                request_id="partial-plan", status="queued", stage="queued",
+                lease_token=None, lease_expires_at=None, heartbeat_at=None,
+                next_run_at=1000, hard_deadline_at=None, resume_stage=None,
             )
             conn.execute(
                 "ALTER TABLE learning_curriculum_preparation_plans "
-                "DROP CHECK chk_learning_prep_formal_state_evidence"
+                "DROP CHECK chk_learning_prep_content_state_evidence"
             )
             conn.execute(
                 "UPDATE learning_curriculum_preparation_plans "
                 "SET status = 'running', stage = 'queued', lease_token = 'legacy', "
                 "lease_expires_at = 2000, heartbeat_at = 1000, "
                 "hard_deadline_at = 3000 WHERE id = ?",
-                (plan["id"],),
+                (plan_id,),
             )
             conn.execute(
                 "ALTER TABLE learning_curriculum_preparation_plans "
@@ -405,7 +421,7 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
         run_migrations(self.database_url, verbose=False)
 
         with self.database.transaction() as conn:
-            repaired = self.plan_repository.get_plan(conn, plan["id"])
+            repaired = self.plan_repository.get_plan(conn, plan_id)
             dispatch_columns = self._column_names(
                 conn, "learning_course_provider_dispatches"
             )
@@ -477,7 +493,8 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
 
     def test_target_v1_v2_and_unknown_plan_shapes_are_explicit(self):
         self._require_migration()
-        v1 = build_preparation_target("primary_2")
+        with patch("services.learning_curriculum_preparation_contract.formal_content_contract", return_value=None):
+            v1 = build_preparation_target("primary_2")
         v2 = build_preparation_target("primary_1")
         self.assertEqual(v1["schemaVersion"], TARGET_SCHEMA_V1)
         self.assertEqual(v2["schemaVersion"], TARGET_SCHEMA_V2)
@@ -949,6 +966,7 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
         self,
         conn,
         *,
+        family_id: str = "legacy-family",
         child_id: str,
         request_id: str,
         status: str,
@@ -960,7 +978,10 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
         hard_deadline_at: int | None,
         resume_stage: str | None,
     ) -> str:
-        target = build_preparation_target("primary_2")
+        # Freeze a v1 target as it existed before the multigrade v2 registry.
+        with patch("services.learning_curriculum_preparation_contract.formal_content_contract", return_value=None):
+            target = build_preparation_target("primary_2")
+        self.assertEqual(target["schemaVersion"], TARGET_SCHEMA_V1)
         fingerprint = preparation_target_fingerprint(target)
         plan_id = f"legacy-plan-{child_id}"
         subject_progress = {
@@ -973,8 +994,20 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
             }
             for subject in ("chinese", "math", "english")
         }
+        # The 054/055 backfill case predates stage_progress_json; the partial
+        # 056 replay case already has it and must supply its required value.
+        has_stage_progress = "stage_progress_json" in self._column_names(
+            conn, "learning_curriculum_preparation_plans"
+        )
+        progress_column = ", stage_progress_json" if has_stage_progress else ""
+        progress_value = ", ?" if has_stage_progress else ""
+        stage_progress = json.dumps({
+            "candidateCount": 0, "canaryCandidateCount": 0,
+            "canaryFailedCount": 0, "canaryTargetCount": 0,
+            "failedCount": 0, "targetCount": 0,
+        })
         conn.execute(
-            """
+            f"""
             INSERT INTO learning_curriculum_preparation_plans(
               id, family_id, child_id, grade_code, school_year_start_year,
               grade_selection_revision, curriculum_version,
@@ -984,11 +1017,13 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
               progress_percent, subject_progress_json, retry_ordinal, resume_stage,
               lease_token, lease_expires_at, heartbeat_at, next_run_at,
               hard_deadline_at, last_progress_at, started_at, created_at, updated_at
-            ) VALUES (?, 'legacy-family', ?, 'primary_2', 2026, 1, ?, ?, ?, ?, ?, ?,
-              ?, ?, 27, 0, 0, 0, ?, 0, ?, ?, ?, ?, ?, ?, 1, 1, 1, 1)
+              {progress_column}
+            ) VALUES (?, ?, ?, 'primary_2', 2026, 1, ?, ?, ?, ?, ?, ?,
+              ?, ?, 27, 0, 0, 0, ?, 0, ?, ?, ?, ?, ?, ?, 1, 1, 1, 1{progress_value})
             """,
             (
                 plan_id,
+                family_id,
                 child_id,
                 target["curriculumVersion"],
                 target["preparationContractVersion"],
@@ -1005,7 +1040,7 @@ class LearningCurriculumPreparationContentStageMigrationTest(unittest.TestCase):
                 heartbeat_at,
                 next_run_at,
                 hard_deadline_at,
-            ),
+            ) + ((stage_progress,) if has_stage_progress else ()),
         )
         return plan_id
 

@@ -79,6 +79,35 @@ the Pro Agent retains its professional reasoning policy. No
 `KIMI_*` value is injected into the courseware process. The existing default-on
 Brave research, source fetch, and citation gates are unchanged.
 
+Patch `0154` adds the explicit private textbook English audio policy
+`mira.textbook.english-auto-language.v1`. Its new `tbbtts2_`, `tbbasr2_` and
+`tbbreasr2_` namespaces use Qwen TTS `language_type: Auto` and omit the ASR
+language parameter, while retaining the registered Mia/Jennifer teacher and
+the original narration text. The server binds the policy and physical request
+hash before dispatch, and the backend requires matching policy receipts.
+Ordinary formal audio, version 1 batch plans, health contracts and existing
+request IDs/WAVs keep their original behavior. This policy does not itself
+certify pronunciation or lower the 8500 ASR acceptance gate.
+
+After the managed runtime has been rebuilt with this patch, an operator can
+explicitly select the new policy with a separate durable output directory:
+
+```bash
+backend/.venv/bin/python backend/scripts/narrate_textbook_batch.py \
+  --candidate-directory /absolute/path/to/unchanged-private-candidate \
+  --audio-language-policy english-auto-v1 \
+  --output /absolute/path/to/unchanged-private-candidate/audio-audit-english-auto-v1
+```
+
+The output must be empty or contain the exact matching v2 plan; a prior v1
+audit cannot be reinterpreted. The preview snapshot tool reads and validates
+the saved plan's explicit policy. It keeps original audio URLs and all source
+hashes, and does not silently upgrade legacy plans. A low or unknown result
+still stops for explicit reconciliation; the existing one-shot formal
+`.language1` repair lane is unchanged.
+
+Patch `0155` gives the renderer and editor Rollup builds an explicit `--forceExit` after successful output generation. Build errors retain their nonzero exit status; source bootstrap and postinstall can now finish on Node 24.
+
 ## OpenMAIC v1 professional workbench and Skills
 
 The pinned v1 source keeps OpenMAIC's professional workbench, editable Stage/Scene
@@ -223,8 +252,10 @@ official credential unchanged. The private `BAILIAN_DEEPSEEK_API_KEY` and
 Pro/Flash to `deepseek-v4-pro-0813` / `deepseek-v4-flash-0731` and converts the
 thinking parameter. Enable free-quota-only for both dated models in the cloud
 console before setting `BAILIAN_DEEPSEEK_FREE_TIER_ONLY_CONFIRMED=1`. There is
-no automatic paid fallback. See [switching runbook](../docs/runbooks/deepseek-bailian-switch.md)
-for the manual official rollback and the native-only scope of this selector.
+no automatic paid fallback. This selector applies to the native runtime;
+the reviewed settings are in [.env.example](.env.example). For a manual rollback,
+set `DEEPSEEK_SERVICE=official` and retain the official credential configuration.
+Inspect active jobs before any coordinated runtime restart.
 
 ### Native production build and foreground start
 
@@ -777,7 +808,7 @@ Patch `0056` treats a draining persistence pool as loss of the formal completion
 
 Patch `0057` preserves the JSON Schema in the system message when the DeepSeek wire adapter falls back to JSON-object mode. This keeps the required review field names available to the model; strict schema, quote/evidence checks and review budgets remain unchanged. Wire-level tests cover the actual provider fetch adapter, as well as the creator/verifier route.
 
-Patch `0083` adds the operator-only `complete-browser-recheck` mode for an unchanged saved snapshot whose original completion stopped at browser checks. It binds the original claim and failure bytes, the three inspector dependency hashes, and the same authorization's authoritative dispatch history. Unresolved or later paid calls block reuse. The old claim and rejection remain in the audit; the normal quality and audio pipeline still determines success. See the [single-course operator guide](../docs/architecture/2026-09-10-single-course-operator.md) for manifest fields and the separate backend reconciliation step.
+Patch `0083` adds the operator-only `complete-browser-recheck` mode for an unchanged saved snapshot whose original completion stopped at browser checks. It binds the original claim and failure bytes, the three inspector dependency hashes, and the same authorization's authoritative dispatch history. Unresolved or later paid calls block reuse. The old claim and rejection remain in the audit; the normal quality and audio pipeline still determines success. The manifest fields and separate backend reconciliation are implemented in [the saved-stage operator](../backend/scripts/generate_one_library_course.py).
 
 Patch `0084` makes the formal math ASR comparison recognize equivalent written and spoken fractions, decimals and percentages, while rejecting changed mathematical values before applying the unchanged 8500-bps similarity threshold. It leaves speech text, audio identities and original ASR records intact.
 
@@ -799,7 +830,7 @@ Patch `0091` requires visible teacher explanation during authenticated required 
 
 Patch `0093` restores the avatar-anchored invitation before required classroom discussions. The learner explicitly joins; required invitations have no countdown or skip control, and neither a stale skip callback nor exhausted narration can satisfy discussion completion. Explicit retries keep the same frozen action. In the student orbital theme, dedicated arrow gutters and avatar padding prevent hover controls from obscuring portraits; an invited companion is scrolled into the avatar strip without moving the classroom page. Optional operator discussions retain their countdown and skip behavior.
 
-Patch `0094` adds an opt-in AI-designed playful learning policy for new formal courses. The Pro Agent chooses the game rules and representation from the frozen lesson brief; no prebuilt game or level template is supplied. New courses require a replayable learning game and group the unchanged four assessment questions into two quiz pages. Appropriate mathematics briefs require a manipulable teaching model in 3D. Existing frozen policies remain valid, and structural checks do not replace semantic, browser, audio or publication review. See [AI playful courseware](../docs/architecture/2026-09-11-ai-playful-courseware.md) for the contract and actual sample status.
+Patch `0094` adds an opt-in AI-designed playful learning policy for new formal courses. The Pro Agent chooses the game rules and representation from the frozen lesson brief; no prebuilt game or level template is supplied. New courses require a replayable learning game and group the unchanged four assessment questions into two quiz pages. Appropriate mathematics briefs require a manipulable teaching model in 3D. Existing frozen policies remain valid, and structural checks do not replace semantic, browser, audio or publication review. The frozen generation contract is defined in [patch 0094](patches/0094-mira-ai-playful-course-generation.patch); sample acceptance still requires its own runtime evidence.
 
 Patch `0095` projects that frozen policy directly into each page's content/actions calls and independent teaching review. New game prompts ask the AI to choose its own non-quiz rules with zero official scoring; actual generated configuration remains AI output. The context binds generation receipts, review input hashes and cache identity. A prior review lacking that context cannot be reused or silently reset. Historical prompts and cache paths remain unchanged.
 
@@ -833,3 +864,5 @@ Patch `0106` scopes the Orbit palette to sidebar conversation bubbles, speaker l
 Patch `0107` distinguishes real learner replies from virtual classmates at the authenticated teaching execution boundary, including saved conversation continuations and both Native and Legacy teacher runtimes. Student discussions offer explicit join/skip choices and no longer redirect navigation to unfinished discussions. Exploration participation accepts actual changed values and visible feedback from declared controls instead of requiring publication sample answers. Independent quizzes remain authoritative. See `../docs/architecture/2026-09-15-classroom-speaker-identity.md`.
 
 Patch `0108` aligns desktop discussion choices, recovery controls, history actions and playback controls to 36 px with 48 px coarse-pointer targets. Semantic avatar, collapsed-message and response-cue hooks remove the remaining purple chrome in student discussion, including user messages. Student primary/secondary/end actions retain distinct colors; dedicated voice controls stay large. Operator styling, model routing, authored courseware and discussion behavior are unchanged.
+
+Patch `0156` keeps Mira provider policy outside the upstream routing module, restores the registered teacher avatar and skill translations, and maintains the existing runtime verification fixtures on Node 24.

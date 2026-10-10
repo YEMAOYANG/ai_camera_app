@@ -424,6 +424,7 @@ def canonical_preparation_target_for(authority: object) -> dict[str, object]:
     if isinstance(value, Mapping):
         nested = value.get("target_spec_json", value.get("targetSpec"))
         if nested is not None:
+            preparation_authority_grade(value)
             return canonical_preparation_target_for(nested)
         if value.get("schemaVersion") == TARGET_SCHEMA_PROGRESSIVE:
             if value.get("curriculumVersion") != "mira.primary.progressive.v1":

@@ -1,0 +1,24 @@
+diff --git a/packages/@openmaic/renderer/package.json b/packages/@openmaic/renderer/package.json
+--- a/packages/@openmaic/renderer/package.json
++++ b/packages/@openmaic/renderer/package.json
+@@ -38,7 +38,7 @@
+     "clean": "rm -rf dist",
+     "genfonts": "node scripts/generate-fonts-css.mjs",
+     "gen-katex-fonts": "node scripts/generate-katex-fonts.mjs",
+-    "build": "node scripts/generate-fonts-css.mjs && node scripts/generate-katex-fonts.mjs && rm -rf dist && rollup -c && tsc --emitDeclarationOnly --declarationDir dist",
++    "build": "node scripts/generate-fonts-css.mjs && node scripts/generate-katex-fonts.mjs && rm -rf dist && rollup -c --forceExit && tsc --emitDeclarationOnly --declarationDir dist",
+     "dev": "rollup -c -w",
+     "typecheck": "tsc --noEmit",
+     "test": "vitest run",
+diff --git a/packages/@openmaic/editor/package.json b/packages/@openmaic/editor/package.json
+--- a/packages/@openmaic/editor/package.json
++++ b/packages/@openmaic/editor/package.json
+@@ -34,7 +34,7 @@
+     "directory": "packages/@openmaic/editor"
+   },
+   "scripts": {
+-    "build": "rm -rf dist && rollup -c && tsc --emitDeclarationOnly --declarationDir dist",
++    "build": "rm -rf dist && rollup -c --forceExit && tsc --emitDeclarationOnly --declarationDir dist",
+     "test": "vitest run",
+     "typecheck": "tsc --noEmit",
+     "prepublishOnly": "pnpm run build"

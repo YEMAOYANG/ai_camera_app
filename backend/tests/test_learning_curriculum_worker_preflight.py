@@ -29,6 +29,7 @@ class LearningCurriculumWorkerPreflightTest(unittest.TestCase):
 
     def test_openmaic_preflight_does_not_require_camera_kimi_configuration(self):
         config = {
+            "LEARNING_TEXTBOOK_LIBRARY_ONLY": False,
             "OPENMAIC_FULL_RUNTIME_ENABLED": True,
             "OPENMAIC_FULL_RUNTIME_GENERATION_ENABLED": True,
             "OPENMAIC_FULL_RUNTIME_AUTORUN_ENABLED": True,
@@ -62,6 +63,7 @@ class LearningCurriculumWorkerPreflightTest(unittest.TestCase):
 
     def test_camera_kimi_cannot_replace_the_openmaic_internal_token(self):
         config = {
+            "LEARNING_TEXTBOOK_LIBRARY_ONLY": False,
             "OPENMAIC_FULL_RUNTIME_ENABLED": True,
             "OPENMAIC_FULL_RUNTIME_GENERATION_ENABLED": True,
             "OPENMAIC_FULL_RUNTIME_AUTORUN_ENABLED": True,

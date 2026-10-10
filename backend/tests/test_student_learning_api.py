@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -269,7 +270,8 @@ class StudentLearningApiTest(unittest.TestCase):
             for item in all_courses.json["items"]
             if item["course"]["nodeCode"] == course["node_code"]
         ]
-        self.assertEqual([item["taskId"] for item in matching], [new_task_id])
+        # The full history keeps both assignments; makeup suppresses the older one.
+        self.assertEqual([item["taskId"] for item in matching], [new_task_id, old_task_id])
 
         makeup = self.client.get(
             "/api/v2/student/learning/library",
@@ -293,7 +295,7 @@ class StudentLearningApiTest(unittest.TestCase):
                 update_conn.execute(
                     """
                     UPDATE children
-                    SET grade_code = 'primary_2', grade_selection_revision =
+                    SET grade_code = 'kindergarten_big', grade_selection_revision =
                       grade_selection_revision + 1
                     WHERE id = ?
                     """,
@@ -312,7 +314,7 @@ class StudentLearningApiTest(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 409, response.json)
-        self.assertEqual(response.json["error"], "student_learning_grade_not_open")
+        self.assertEqual(response.json["error"], "student_learning_primary_only")
         self.assertGreaterEqual(gate_calls, 2)
         self.assertEqual(self._learning_write_counts(), before)
 
@@ -330,7 +332,7 @@ class StudentLearningApiTest(unittest.TestCase):
                 update_conn.execute(
                     """
                     UPDATE children
-                    SET grade_code = 'primary_2', grade_selection_revision =
+                    SET grade_code = 'kindergarten_big', grade_selection_revision =
                       grade_selection_revision + 1
                     WHERE id = ?
                     """,
@@ -349,7 +351,7 @@ class StudentLearningApiTest(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 409, response.json)
-        self.assertEqual(response.json["error"], "student_learning_grade_not_open")
+        self.assertEqual(response.json["error"], "student_learning_primary_only")
         self.assertGreaterEqual(gate_calls, 2)
         self.assertEqual(self._learning_write_counts(), before)
 
@@ -778,7 +780,7 @@ class StudentLearningApiTest(unittest.TestCase):
         self.assertEqual(after_task["status"], task["status"])
         self.assertEqual(started_events, 0)
 
-    def test_start_accepts_task_from_exact_active_formal_release(self):
+    def test_start_resumes_historical_session_from_exact_active_formal_release(self):
         assigned = self.client.post(
             "/api/v2/student/learning/today/assign",
             json={"date": "2026-09-22", "scheduledStart": "18:45"},
@@ -798,8 +800,29 @@ class StudentLearningApiTest(unittest.TestCase):
             course_id=task["learning_course_id"],
             course_version=task["learning_course_version"],
         )
+        self._install_formal_publication_evidence(fixture)
         self._activate_formal_pointer(fixture["release_id"])
         student_service = self.app.extensions["mira_student_learning_service"]
+        student_service.learning_service.static_catalog_enabled = False
+
+        # A published coarse course cannot start new progressive learning.
+        rejected = self.client.post(
+            "/api/v2/student/learning/sessions",
+            json={"taskId": task_id},
+            headers=self._student_headers(),
+        )
+        self.assertEqual(rejected.status_code, 409, rejected.json)
+        self.assertEqual(rejected.json["error"], "learning_prerequisite_not_mastered")
+
+        # Explicit historical fixture: create the preexisting session through
+        # the legacy static entry point, then restore the current formal gate.
+        student_service.learning_service.static_catalog_enabled = True
+        historical = self.client.post(
+            "/api/v2/student/learning/sessions",
+            json={"taskId": task_id},
+            headers=self._student_headers(),
+        )
+        self.assertEqual(historical.status_code, 200, historical.json)
         student_service.learning_service.static_catalog_enabled = False
 
         response = self.client.post(
@@ -809,6 +832,8 @@ class StudentLearningApiTest(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200, response.json)
+        self.assertTrue(response.json["resumed"])
+        self.assertEqual(response.json["session"]["id"], historical.json["session"]["id"])
         self.assertEqual(
             response.json["session"]["courseId"],
             task["learning_course_id"],
@@ -1403,12 +1428,12 @@ class StudentLearningApiTest(unittest.TestCase):
                 INSERT INTO children(
                   id, family_id, name, nickname, gender, age_stage,
                   education_stage, grade, grade_code,
-                  grade_school_year_start, grade_confirmed_at, birthday,
+                  grade_school_year_start, grade_confirmed_at, grade_selection_revision, birthday,
                   sleep_time, created_at, updated_at
                 )
                 SELECT ?, family_id, ?, ?, gender, age_stage,
                   education_stage, grade, grade_code,
-                  grade_school_year_start, grade_confirmed_at, birthday,
+                  grade_school_year_start, grade_confirmed_at, grade_selection_revision, birthday,
                   sleep_time, created_at + 1, updated_at
                 FROM children
                 WHERE id = ?
@@ -1714,6 +1739,113 @@ class StudentLearningApiTest(unittest.TestCase):
             "asset_id": asset_id,
             "runtime_id": runtime_id,
         }
+
+    def _install_formal_publication_evidence(self, fixture: dict[str, str]) -> None:
+        """Synthetic published-history receipts for the real SQL visibility gate.
+
+        Reuse the completed Runtime manifest fixture and bind all identities to
+        this stored course. No generation, Provider, audio or publication call
+        is made; this test exercises reading and resuming published history.
+        """
+        from content.teacher_profiles import get_formal_subject_qwen_voice_identity
+        from repositories.formal_student_runtime_gate import (
+            CURRENT_ARTIFACT_PUBLICATION_CONTRACT_VERSION,
+            CURRENT_RUNTIME_BINDING_CONTRACT_VERSION,
+        )
+        from services.lesson_package_validator import formal_runtime_teaching_brief
+        from tests.test_formal_student_runtime_launch import (
+            _formal_manifest, _with_receipt_sha256,
+        )
+
+        def insert(conn, table, values):
+            columns = ", ".join(values)
+            placeholders = ", ".join("?" for _ in values)
+            conn.execute(f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", tuple(values.values()))
+
+        timestamp = now_ms()
+        build_id = f"build_{fixture['release_id']}"
+        item_id = f"item_{fixture['release_id']}"
+        fingerprint = "a" * 64  # Same historical authority as _activate_formal_pointer.
+        with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
+            runtime = conn.execute("SELECT * FROM learning_openmaic_runtime_classrooms WHERE id = ?", (fixture["runtime_id"],)).fetchone()
+            course = conn.execute("SELECT * FROM learning_courses WHERE id = ? AND version = ?", (runtime["course_id"], runtime["course_version"])).fetchone()
+            content = json.loads(course["content_json"])
+            questions = content["questions"]
+            self.assertEqual(len(questions), 5)
+            content["teachingFlow"] = {
+                "schemaVersion": "mira.learning.teaching-flow.v1",
+                "teach": {"title": course["title"], "sayText": content["intro"], "keyPoints": [course["objective"]]},
+                "demoQuestionId": questions[0]["id"],
+                "guidedQuestionIds": [row["id"] for row in questions[1:3]],
+                "independentQuestionIds": [row["id"] for row in questions[3:]],
+                "recap": {"sayText": course["objective"]},
+            }
+            course["content_json"] = json.dumps(content, ensure_ascii=False, separators=(",", ":"))
+            brief, brief_hash, source_hash = formal_runtime_teaching_brief(course)
+            conn.execute("UPDATE learning_courses SET content_json = ? WHERE id = ? AND version = ?", (course["content_json"], course["id"], course["version"]))
+            conn.execute("UPDATE learning_lesson_packages SET source_course_content_hash = ? WHERE id = ? AND version = ?", (source_hash, runtime["package_id"], runtime["package_version"]))
+
+            manifest = _formal_manifest(subject=course["subject"])
+            identity = {"runtimeRequestId": runtime["request_id"], "buildItemId": item_id, "classroomId": runtime["upstream_classroom_id"]}
+            manifest["generationContract"].update(
+                buildItemId=item_id, targetFingerprint=fingerprint, runtimeRequestId=runtime["request_id"],
+                course={"id": course["id"], "version": course["version"], "packageId": runtime["package_id"], "packageVersion": runtime["package_version"]},
+                teachingBrief=brief, sourceCourseContentSha256=source_hash, teachingBriefSha256=brief_hash,
+            )
+            manifest.update(sourceCourseContentSha256=source_hash, teachingBriefSha256=brief_hash)
+            for key in ("professionalCreation", "research"):
+                receipt = manifest[key]
+                receipt.pop("receiptSha256")
+                receipt.update(identity)
+                if key == "professionalCreation":
+                    receipt["teachingBriefSha256"] = brief_hash
+                manifest[key] = _with_receipt_sha256(receipt)
+                manifest["formalEvidence"][key]["receiptSha256"] = manifest[key]["receiptSha256"]
+            receipt_hash = hashlib.sha256(json.dumps(manifest, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
+            insert(conn, "learning_catalog_build_jobs", dict(
+                id=build_id, request_id=build_id, release_id=fixture["release_id"], curriculum_version=course["curriculum_version"],
+                status="ready", target_spec_json=json.dumps({"fixture": "published-history", "gradeCode": course["grade_code"]}),
+                total_item_count=1, ready_item_count=1, completed_at=timestamp, created_at=timestamp, updated_at=timestamp,
+            ))
+            insert(conn, "learning_catalog_build_items", dict(
+                id=item_id, build_job_id=build_id, release_id=fixture["release_id"], grade_code=course["grade_code"],
+                subject=course["subject"], skill_id=course["node_code"], curriculum_version=course["curriculum_version"],
+                boundary_version=course["boundary_version"], status="ready", generation_request_id=item_id,
+                course_id=course["id"], course_version=course["version"], package_id=runtime["package_id"], package_version=runtime["package_version"],
+                completed_at=timestamp, created_at=timestamp, updated_at=timestamp,
+            ))
+            conn.execute("""UPDATE learning_openmaic_runtime_classrooms SET feature_manifest_json = ?,
+                candidate_build_item_id = ?, candidate_release_id = ?, candidate_grade_code = ?,
+                candidate_target_fingerprint = ?, candidate_binding_contract_version = ?, candidate_bound_at = ?
+                WHERE id = ?""", (json.dumps(manifest, ensure_ascii=False), item_id, fixture["release_id"], course["grade_code"],
+                                  fingerprint, CURRENT_RUNTIME_BINDING_CONTRACT_VERSION, timestamp, runtime["id"]))
+            common = dict(build_item_id=item_id, release_id=fixture["release_id"], grade_code=course["grade_code"],
+                target_fingerprint=fingerprint, runtime_classroom_id=runtime["id"], course_id=course["id"], course_version=course["version"],
+                package_id=runtime["package_id"], package_version=runtime["package_version"], created_at=timestamp, updated_at=timestamp)
+            evidence = dict(common, binding_contract_version=CURRENT_RUNTIME_BINDING_CONTRACT_VERSION,
+                auto_validated=1, auto_validation_contract_version=CURRENT_ARTIFACT_PUBLICATION_CONTRACT_VERSION,
+                auto_validation_receipt_hash=receipt_hash, auto_validated_at=timestamp,
+                publication_status="published", publication_receipt_hash=receipt_hash, published_at=timestamp)
+            for kind in ("classroom", "tts", "asr_roundtrip", "conversation_provider"):
+                evidence.update({f"{kind}_status": "passed", f"{kind}_receipt_hash": receipt_hash, f"{kind}_completed_at": timestamp})
+            insert(conn, "learning_curriculum_classroom_item_receipts", evidence)
+            voice = get_formal_subject_qwen_voice_identity(course["subject"])
+            count = manifest["formalEvidence"]["speechActionCount"]
+            insert(conn, "learning_formal_qwen_audio_jobs", dict(common,
+                runtime_request_id=runtime["request_id"], upstream_classroom_id=runtime["upstream_classroom_id"],
+                classroom_content_sha256=manifest["classroomContentSha256"], subject=voice.subject, language_code=voice.language_code,
+                teacher_profile_id=voice.teacher_profile_id, teacher_profile_version=voice.teacher_profile_version,
+                teacher_profile_hash=voice.teacher_profile_hash, teacher_name=voice.teacher_name, teacher_gender=voice.teacher_gender,
+                voice_gender=voice.voice_gender, voice_contract_version="mira.openmaic.formal-subject-qwen3-voice.v1",
+                tts_provider_id=voice.tts_provider_id, tts_model_id=voice.tts_model_id, tts_voice_id=voice.voice_id,
+                asr_provider_id=voice.asr_provider_id, asr_model_id=voice.asr_model_id,
+                audio_contract_version="mira.learning.formal-qwen-audio.v1", pcm_validation_contract_version="mira.learning.formal-pcm-validation.v1",
+                asr_roundtrip_contract_version="mira.learning.formal-qwen-asr-roundtrip.v1", speech_manifest_sha256=receipt_hash,
+                expected_segment_count=count, state="auto_validated", tts_attempted_count=count, tts_completed_count=count,
+                audio_validated_count=count, asr_attempted_count=count, asr_passed_count=count,
+                terminal_receipt_version="mira.learning.formal-qwen-audio.v1", terminal_receipt_hash=receipt_hash,
+                started_at=timestamp, terminal_at=timestamp,
+            ))
 
     def _activate_formal_pointer(self, release_id: str) -> None:
         timestamp = now_ms()

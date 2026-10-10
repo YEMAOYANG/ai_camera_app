@@ -26,11 +26,6 @@ class FormalLearningHealthTest(unittest.TestCase):
         self.assertEqual(result["gradeAllowlist"], ["primary_1"])
         self.assertEqual(result["contracts"]["runtimeEvent"], FORMAL_EVENT_SCHEMA)
         self.assertEqual(result["runtimePatch"]["latest"], RUNTIME_LATEST_PATCH)
-        self.assertEqual(result["runtimePatch"]["count"], 42)
-        self.assertEqual(
-            result["runtimePatch"]["latest"],
-            "0042-mira-deepseek-courseware-routing.patch",
-        )
         self.assertEqual(
             result["runtimePatch"]["latestSha256"],
             RUNTIME_LATEST_PATCH_SHA256,

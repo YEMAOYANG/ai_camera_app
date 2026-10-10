@@ -50,7 +50,12 @@ class LearningClassroomGenerationRunnerTest(unittest.TestCase):
                 return json.dumps(value, sort_keys=True)
 
             @staticmethod
-            def get_next_formal_candidate_authority(_conn):
+            def decode_json(value):
+                return json.loads(value) if isinstance(value, str) else value
+
+            @staticmethod
+            def get_next_formal_candidate_authority(_conn, *, preparation_plan=None):
+                assert preparation_plan == {"id": "formal-plan-1"}
                 questions = [
                     {
                         "id": f"question-{index}",
@@ -154,7 +159,9 @@ class LearningClassroomGenerationRunnerTest(unittest.TestCase):
         service.media_service = Forbidden()
         service._formal_target_fingerprint = lambda _value: "7" * 64
 
-        generated = service.process_next_formal_candidate(Runtime())
+        generated = service.process_next_formal_candidate(
+            Runtime(), preparation_plan={"id": "formal-plan-1"}
+        )
 
         self.assertEqual(generated.payload["status"], "generating")
         self.assertEqual([name for name, _value in calls], [
@@ -184,7 +191,11 @@ class LearningClassroomGenerationRunnerTest(unittest.TestCase):
                 yield object()
 
             @staticmethod
-            def get_next_formal_candidate_authority(_conn):
+            def decode_json(value):
+                return json.loads(value) if isinstance(value, str) else value
+
+            @staticmethod
+            def get_next_formal_candidate_authority(_conn, *, preparation_plan=None):
                 return {
                     "build_item_id": "formal-item-missing-content",
                     "course_id": "formal-course-missing-content",

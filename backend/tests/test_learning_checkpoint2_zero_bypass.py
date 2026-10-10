@@ -381,6 +381,7 @@ class _MemoryContentRepository:
         self.items = [self.item] + [
             {
                 "id": f"pending-{index}",
+                "grade_code": "primary_1",
                 "subject": "chinese" if index < 11 else "english",
                 "skill_id": f"pending-skill-{index}",
                 "variant_ordinal": 1,

@@ -88,6 +88,8 @@ def main(argv=None):
     parser.add_argument("--candidate-directory", type=Path, required=True)
     parser.add_argument("--classroom-directory", type=Path, default=DEFAULT_CLASSROOM_DIRECTORY)
     parser.add_argument("--output", type=Path, help="Durable audio audit directory; default candidate/audio-audit")
+    parser.add_argument("--audio-language-policy", choices=["english-auto-v1"],
+                        help="Opt in to the versioned English Auto TTS/ASR plan; requires a separate --output")
     parser.add_argument("--asr-reconciliation-file", type=Path,
                         help="Explicit exact manifest for one ASR review of known successful, low-similarity audio")
     parser.add_argument("--audio-inheritance-file", type=Path, action="append",
@@ -95,6 +97,11 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         frozen, state, classroom = load_candidate(args.candidate_directory)
+        if args.audio_language_policy is not None:
+            if (frozen["binding"]["subject"] != "english" or args.output is None
+                    or args.output.resolve() == (args.candidate_directory / "audio-audit").resolve()
+                    or args.output.name == "audio-audit"):
+                raise ValueError("english_auto_language_requires_english_and_distinct_explicit_output")
         # Import configuration only after immutable local artifacts pass checks.
         from core.config import AppConfig
         from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
@@ -118,7 +125,9 @@ def main(argv=None):
 
         result = narrate_candidate(runtime, classroom, frozen["binding"], output,
                                    args.classroom_directory, progress=progress,
-                                   asr_reconciliation=reconciliation, audio_inheritance=inheritance)
+                                   asr_reconciliation=reconciliation, audio_inheritance=inheritance,
+                                   **({"audio_language_policy": args.audio_language_policy}
+                                      if args.audio_language_policy is not None else {}))
         print(json.dumps({"ok": True, "status": "audio_completed_needs_review",
                           "expectedSegments": result["expectedSegments"],
                           "completedSegments": result["completedSegments"],

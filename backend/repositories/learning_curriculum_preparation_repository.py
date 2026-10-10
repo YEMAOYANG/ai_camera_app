@@ -719,7 +719,7 @@ class LearningCurriculumPreparationRepository:
         )
         retry_progress: dict[str, dict[str, int]] = {}
         source_target = json.loads(str(source["target_spec_json"]))
-        is_v2 = str(source_target.get("schemaVersion") or "") == TARGET_SCHEMA_V2
+        is_v2 = is_content_preparation_target(source_target)
         for subject in PREPARATION_SUBJECTS:
             item = source_progress[subject]
             retry_progress[subject] = {
@@ -2155,7 +2155,7 @@ class LearningCurriculumPreparationRepository:
                 ).fetchall()
             )
             if (
-                len(coordinator_items) != formal_target_course_count(plan)
+                len(coordinator_items) != formal_target_course_count(hint)
                 or any(
                     not self._coordinator_dependency_item_is_pristine(item)
                     for item in coordinator_items

@@ -10,7 +10,7 @@ from repositories.course_supply_inventory import inherited_scope_requests, publi
 from repositories.course_supply_repository import requested_supply
 from repositories.lesson_package_repository import LessonPackageRepository
 from services import course_library_service as supply
-from services.learning_curriculum_preparation_contract import build_preparation_target
+from services.learning_curriculum_preparation_contract import build_preparation_target, build_progressive_preparation_target
 
 
 DATABASE = 'mysql+pymysql://unused:unused@127.0.0.1/ai_camera_app_test'
@@ -75,15 +75,15 @@ class CourseSupplyAvailabilityTest(unittest.TestCase):
         status.assert_not_called()
 
     def test_a_target_for_another_grade_is_rejected_before_database_access(self):
-        with patch.object(supply, 'build_preparation_target', return_value=build_preparation_target('primary_1')):
+        with patch.object(supply, 'build_progressive_preparation_target', return_value=build_progressive_preparation_target('primary_1')):
             with self.assertRaises(supply.CourseLibraryNotOpen):
                 supply.CourseLibraryService(DATABASE, grade_code='primary_2')
 
     def test_grade_and_policy_fingerprint_both_partition_cached_status(self):
-        base = build_preparation_target('primary_1')
+        base = build_progressive_preparation_target('primary_1')
         revision = [1]
 
-        def target(grade):
+        def target(grade, *, assessment_batch_ordinal=1):
             result = copy.deepcopy(base)
             result['gradeCode'] = grade
             result['testPolicyRevision'] = revision[0]
@@ -95,7 +95,7 @@ class CourseSupplyAvailabilityTest(unittest.TestCase):
                     'readyCount': ready, 'blocked': False, 'stalled': False,
                     'lastProgressAt': 1000}
 
-        with patch.object(supply, 'build_preparation_target', side_effect=target), \
+        with patch.object(supply, 'build_progressive_preparation_target', side_effect=target), \
                 patch.object(supply.CourseLibraryService, 'status', autospec=True, side_effect=status) as query:
             two = supply.cached_supply_summary(DATABASE, grade_code='primary_2')
             six = supply.cached_supply_summary(DATABASE, grade_code='primary_6')
@@ -225,13 +225,16 @@ class CourseSupplyAvailabilityTest(unittest.TestCase):
     def test_automatic_policy_upgrade_inherits_narrow_or_disabled_scope(self):
         for enabled, expected in ((True, 1), (False, 0)):
             with self.subTest(enabled=enabled):
+                library = supply.CourseLibraryService(DATABASE, clock=lambda: 1000)
+                first = library.target['courseTargets'][0]
+                slot = pending_slot(first['subject'], first['skillId'])
                 conn = RecordedConnection(
+                    [],  # No children: preserve the operator's existing scope.
                     [{'id': 'current-owner'}], [],
-                    [{**pending_slot(), 'source_plan_id': 'latest-scope', 'enabled': enabled},
-                     {**pending_slot(variant=2), 'source_plan_id': 'older-wide', 'enabled': True}],
+                    [{**slot, 'source_plan_id': 'latest-scope', 'enabled': enabled},
+                     {**slot, 'variant_ordinal': 2, 'source_plan_id': 'older-wide', 'enabled': True}],
                     [], [], [],
                 )
-                library = supply.CourseLibraryService(DATABASE, clock=lambda: 1000)
                 library.database = ConnectionDatabase(conn)
                 library.database.database_url = DATABASE
                 with patch.object(library, 'ensure_owner', return_value={'id': 'current-owner'}):
@@ -331,8 +334,10 @@ class PlayfulGenerationSupplyTest(unittest.TestCase):
 
     def test_runtime_claim_uses_each_candidates_frozen_target_not_current_registry(self):
         old = {**pending_slot('math', 'fraction_ratio_percentage'), 'build_item_id': 'old',
-               'target_spec_json': json.dumps(self.legacy_target)}
-        new = {**old, 'build_item_id': 'new', 'target_spec_json': json.dumps(self.target)}
+               'target_spec_json': json.dumps(self.legacy_target),
+               'course_id': 'old-course', 'course_version': '1'}
+        new = {**old, 'build_item_id': 'new', 'course_id': 'new-course',
+               'target_spec_json': json.dumps(self.target)}
         connection = RecordedConnection([old, new])
 
         def inventory(_conn, target, *, for_generation=False):

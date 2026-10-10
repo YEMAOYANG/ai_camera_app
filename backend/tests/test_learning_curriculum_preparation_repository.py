@@ -22,7 +22,7 @@ from services.learning_curriculum_preparation_contract import (
     build_preparation_target,
     preparation_target_fingerprint,
 )
-from tests.support import fresh_test_config
+from tests.support import fresh_test_config, migration_fixture_through
 
 
 MIGRATION_VERSION = "054_learning_curriculum_preparations.sql"
@@ -34,6 +34,16 @@ CONTENT_STAGE_MIGRATION_VERSION = (
 
 class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
     def setUp(self):
+        historical_boundaries = {
+            "test_partial_migration_replay_creates_tables_and_constraints_once": MIGRATION_VERSION,
+            "test_055_replay_accepts_deadline_preserving_retry_and_rejects_null_deadline": CONTENT_STAGE_MIGRATION_VERSION,
+            "test_055_upgrade_normalizes_054_legacy_rows_before_replacing_check": CONTENT_STAGE_MIGRATION_VERSION,
+            "test_055_restart_after_partial_ddl_restores_check_for_legacy_rows": CONTENT_STAGE_MIGRATION_VERSION,
+            "test_checkpoint_schema_verifier_reports_exact_contract_after_two_replays": "057_learning_curriculum_classroom_publication.sql",
+        }
+        boundary = historical_boundaries.get(self._testMethodName)
+        if boundary is not None:
+            self.enterContext(migration_fixture_through(boundary))
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
         self.assertIn("/ai_camera_app_test", self.database_url)
@@ -200,7 +210,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
         ):
             self.assertIsNone(failed[field], field)
 
-    def test_v2_fresh_coordinator_claim_has_exact_two_minute_budget_and_cap(self):
+    def test_v2_fresh_coordinator_claim_has_exact_six_minute_budget_and_cap(self):
         with self.repository.transaction() as conn:
             initial, _ = self._reserve(
                 conn, request_id="v2-exact-coordinator-budget", now=2_000
@@ -208,14 +218,14 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
             claimed = self.repository.claim_next(
                 conn,
                 now=2_000,
-                lease_ms=300_000,
+                lease_ms=900_000,
                 stage_deadline_ms={"planning": 900_000},
             )
 
         self.assertEqual(claimed["id"], initial["id"])
         self.assertEqual(claimed["work_unit_kind"], "coordinator")
-        self.assertEqual(claimed["hard_deadline_at"], 122_000)
-        self.assertEqual(claimed["lease_expires_at"], 122_000)
+        self.assertEqual(claimed["hard_deadline_at"], 362_000)
+        self.assertEqual(claimed["lease_expires_at"], 362_000)
 
     def test_runner_count_and_claim_ignore_older_grade_and_stale_fingerprint(self):
         primary_two_target = build_preparation_target("primary_2")
@@ -463,7 +473,14 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
                 (
                     "0" * 64,
                     json.dumps(
-                        {"schemaVersion": "mira.learning.preparation-target.v2"},
+                        {
+                            # Keep the current database's grade/count envelope,
+                            # while omitting the remaining preparation authority.
+                            "schemaVersion": "mira.learning.preparation-target.v2",
+                            "gradeCode": "primary_1",
+                            "totalCourseCount": 30,
+                            "courseTargets": [{}] * 30,
+                        },
                         separators=(",", ":"),
                     ),
                     "{}",
@@ -755,7 +772,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
             )
         self.assertIsNone(claimed)
 
-    def test_claim_uses_90_second_lease_and_immutable_120_second_planning_deadline(self):
+    def test_claim_uses_90_second_lease_and_immutable_360_second_planning_deadline(self):
         with self.repository.transaction() as conn:
             queued, _ = self._reserve(conn, now=3100)
             self.assertEqual(queued["status"], "queued")
@@ -775,7 +792,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
         self.assertEqual(claimed["next_run_at"], 3100)
         self.assertIsNotNone(claimed["lease_token"])
         self.assertEqual(claimed["lease_expires_at"], 93_100)
-        self.assertEqual(claimed["hard_deadline_at"], 123_100)
+        self.assertEqual(claimed["hard_deadline_at"], 363_100)
 
         with self.repository.transaction() as conn:
             reclaimed = self.repository.claim_next(
@@ -787,7 +804,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
         self.assertEqual(reclaimed["id"], claimed["id"])
         self.assertNotEqual(reclaimed["lease_token"], claimed["lease_token"])
         self.assertEqual(reclaimed["next_run_at"], 3100)
-        self.assertEqual(reclaimed["hard_deadline_at"], 123_100)
+        self.assertEqual(reclaimed["hard_deadline_at"], 363_100)
 
     def test_heartbeat_extends_only_lease_not_hard_deadline(self):
         with self.repository.transaction() as conn:
@@ -859,9 +876,9 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
         self.assertEqual(claimed_again["stage"], "planning")
         self.assertEqual(claimed_again["hard_deadline_at"], deadline)
 
-    def test_retry_wait_reclaims_exact_resume_stage(self):
+    def test_historical_v1_retry_wait_reclaims_exact_resume_stage(self):
         with self.repository.transaction() as conn:
-            plan, _ = self._reserve(
+            plan = self._insert_historical_v1_plan(
                 conn,
                 grade_code="primary_2",
                 request_id="legacy-v1-retry-wait",
@@ -1292,9 +1309,9 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
         self.assertEqual(superseded_older["status"], "superseded")
         self.assertEqual(still_current["status"], "queued")
 
-    def test_full_fake_state_flow_is_monotonic_and_terminal_clears_runtime_fields(self):
+    def test_historical_v1_full_state_flow_is_monotonic_and_terminal_clears_runtime_fields(self):
         with self.repository.transaction() as conn:
-            plan, _ = self._reserve(
+            plan = self._insert_historical_v1_plan(
                 conn,
                 grade_code="primary_2",
                 request_id="legacy-v1-full-state-flow",
@@ -1634,24 +1651,21 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
 
     def test_055_replay_accepts_deadline_preserving_retry_and_rejects_null_deadline(self):
         with self.repository.transaction() as conn:
-            plan, _ = self._reserve(
-                conn,
-                grade_code="primary_2",
-                request_id="migration-055-evidence",
-                now=5350,
+            plan = self._insert_historical_v1_plan(
+                conn, grade_code="primary_2", request_id="migration-055-evidence", now=5350
             )
             target = json.loads(plan["target_spec_json"])
             self.assertEqual(target["schemaVersion"], TARGET_SCHEMA_V1)
-            self.assertEqual(
-                plan["target_fingerprint"],
-                preparation_target_fingerprint(target),
+            self.assertEqual(plan["target_fingerprint"], preparation_target_fingerprint(target))
+            # Construct the historical running lease directly: the current
+            # repository uses columns introduced after this DDL fixture.
+            conn.execute(
+                "UPDATE learning_curriculum_preparation_plans SET status = 'running', "
+                "stage = 'planning', lease_token = 'historical-055-lease', "
+                "lease_expires_at = 95350, heartbeat_at = 5350, hard_deadline_at = 125350 WHERE id = ?",
+                (plan["id"],),
             )
-            claimed = self.repository.claim_next(
-                conn,
-                now=5350,
-                lease_ms=90_000,
-                stage_deadline_ms={"planning": 120_000},
-            )
+            claimed = {"hard_deadline_at": 125350}
             conn.execute(
                 "DELETE FROM schema_migrations WHERE version = ?",
                 (RUNNER_MIGRATION_VERSION,),
@@ -1662,7 +1676,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
             )
             conn.execute(
                 "ALTER TABLE learning_curriculum_preparation_plans "
-                "DROP CHECK chk_learning_prep_formal_state_evidence"
+                "DROP CHECK chk_learning_prep_content_state_evidence"
             )
 
         run_migrations(self.database_url, verbose=False)
@@ -1926,13 +1940,13 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
 
     def _install_legacy_054_rows(self, *, install_old_check: bool):
         with self.repository.transaction() as conn:
-            retry, _ = self._reserve(
+            retry = self._insert_historical_v1_plan(
                 conn,
                 grade_code="primary_2",
                 request_id="legacy-retry-null-deadline",
                 now=5500,
             )
-            running, _ = self._reserve(
+            running = self._insert_historical_v1_plan(
                 conn,
                 family_id="fam_2",
                 child_id="child_2",
@@ -1942,7 +1956,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
             )
             conn.execute(
                 "ALTER TABLE learning_curriculum_preparation_plans "
-                "DROP CHECK chk_learning_prep_formal_state_evidence"
+                "DROP CHECK chk_learning_prep_content_state_evidence"
             )
             conn.execute(
                 """
@@ -2056,6 +2070,47 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
         )
         self.assertEqual(running["status"], "running")
         self.assertEqual(running["stage"], "planning")
+
+    def _insert_historical_v1_plan(
+        self, conn, *, grade_code, request_id, now,
+        family_id="fam_1", child_id="child_1",
+    ):
+        # Reproduce only construction of the old immutable target. Migration
+        # execution and all current repository authority checks stay unpatched.
+        with patch("services.learning_curriculum_preparation_contract.formal_content_contract", return_value=None):
+            target = build_preparation_target(grade_code)
+        self.assertEqual(target["schemaVersion"], TARGET_SCHEMA_V1)
+        fingerprint = preparation_target_fingerprint(target)
+        plan_id = f"historical-v1-{request_id}"
+        subject_progress = {
+            subject: {"totalCourseCount": details["totalCourseCount"],
+                      "readyCourseCount": 0, "failedCourseCount": 0}
+            for subject, details in target["subjectTargets"].items()
+        }
+        conn.execute(
+            """
+            INSERT INTO learning_curriculum_preparation_plans(
+              id, family_id, child_id, grade_code, school_year_start_year,
+              grade_selection_revision, curriculum_version, preparation_contract_version,
+              target_spec_json, target_fingerprint, request_id, shared_build_request_id,
+              status, stage, total_course_count, ready_course_count, failed_course_count,
+              progress_percent, subject_progress_json, retry_ordinal,
+              next_run_at, last_progress_at, created_at, updated_at, stage_progress_json
+            ) VALUES (?, ?, ?, ?, 2026, 1, ?, ?, ?, ?, ?, ?,
+              'queued', 'queued', ?, 0, 0, 0, ?, 0, ?, ?, ?, ?, ?)
+            """,
+            (plan_id, family_id, child_id, grade_code,
+             target["curriculumVersion"], target["preparationContractVersion"],
+             json.dumps(target, ensure_ascii=False, separators=(",", ":")), fingerprint,
+             request_id, f"grade-build:{fingerprint}", target["totalCourseCount"],
+             json.dumps(subject_progress, separators=(",", ":")), now, now, now, now,
+             json.dumps({
+                 "candidateCount": 0, "canaryCandidateCount": 0,
+                 "canaryFailedCount": 0, "canaryTargetCount": 0,
+                 "failedCount": 0, "targetCount": 0,
+             })),
+        )
+        return self.repository.get_plan(conn, plan_id)
 
     def _reserve(
         self,

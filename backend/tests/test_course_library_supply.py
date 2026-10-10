@@ -54,7 +54,12 @@ class CourseLibrarySupplyTest(unittest.TestCase):
         self.assertEqual(result.next_stage, 'generating_content')
         with repo.transaction() as conn:
             count = conn.execute('SELECT COUNT(*) AS n FROM learning_catalog_build_items').fetchone()['n']
-            self.assertEqual(count, 30)
+            self.assertEqual(count, self.library.target['totalCourseCount'])
+            slots = conn.execute('SELECT subject, skill_id, variant_ordinal FROM learning_catalog_build_items').fetchall()
+            self.assertEqual(
+                {(row['subject'], row['skill_id'], row['variant_ordinal']) for row in slots},
+                {(row['subject'], row['skillId'], row['variantOrdinal']) for row in self.library.target['courseTargets']},
+            )
             self.assertEqual(conn.execute('SELECT COUNT(*) AS n FROM learning_course_provider_dispatches').fetchone()['n'], 0)
 
     def test_library_owner_can_plan_a_real_build_without_a_child(self):
@@ -115,11 +120,13 @@ class CourseLibrarySupplyTest(unittest.TestCase):
 
     def test_fast_and_struggling_learners_keep_prerequisites_and_scope(self):
         desired = supply_targets(self.library.target, self.library.policy, 'first_unit')
-        mastered = [dict(child_id='fast', subject='math', node_code='number_sense_20', mastery_level='mastered')]
+        first_math = next(row['skillId'] for row in desired
+                          if row['subject'] == 'math' and row['boundaryOrdinal'] == 1)
+        mastered = [dict(child_id='fast', subject='math', node_code=first_math, mastery_level='mastered')]
         boosted = prioritize_demand(desired, mastered, forward_boundaries=1)
         next_core = next(r for r in boosted if r['subject'] == 'math' and r['boundaryOrdinal'] == 2 and r['variantOrdinal'] == 1)
         self.assertEqual(next_core['priority'], 1)
-        struggling = prioritize_demand(desired, [dict(child_id='slow', subject='math', node_code='number_sense_20', mastery_level='needs_practice')], forward_boundaries=1)
+        struggling = prioritize_demand(desired, [dict(child_id='slow', subject='math', node_code=first_math, mastery_level='needs_practice')], forward_boundaries=1)
         review = next(r for r in struggling if r['subject'] == 'math' and r['boundaryOrdinal'] == 1 and r['variantOrdinal'] == 2)
         self.assertEqual(review['priority'], 1)
         self.assertTrue(all(r['boundaryOrdinal'] <= 2 for r in boosted + struggling))

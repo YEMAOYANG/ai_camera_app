@@ -11,6 +11,8 @@ from urllib.parse import quote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 from content.teacher_profiles import get_formal_subject_qwen_voice_identity
+from content.textbook_audio_language import (ENGLISH_AUTO_LANGUAGE_POLICY,
+                                            ENGLISH_AUTO_LANGUAGE_POLICY_SHA256)
 
 from integrations.openmaic_formal_media import (
     FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY, FLASH_CANDIDATE_MODEL_POLICY, PRO_CURRENT_FLASH_MODEL_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
@@ -676,6 +678,7 @@ class OpenMaicFullRuntimeClient:
                 "invalid_formal_audio_text_hash", "正式课堂讲解文本校验失败", status_code=400
             )
         payload.update({"text": normalized_text, "textSha256": actual_text_sha256})
+        self._validate_textbook_audio_namespace(payload, "tts")
         response = self._request_formal_audio_json(
             "POST", "/api/mira/formal-audio/tts", payload, paid_budget=paid_budget
         )
@@ -790,6 +793,7 @@ class OpenMaicFullRuntimeClient:
                 "invalid_formal_audio_hash", "正式课堂语音校验值无效", status_code=400
             )
         payload["audioSha256"] = str(audio_sha256)
+        self._validate_textbook_audio_namespace(payload, "asr")
         response = self._request_formal_audio_json(
             "POST", "/api/mira/formal-audio/asr", payload, paid_budget=paid_budget
         )
@@ -1537,6 +1541,39 @@ class OpenMaicFullRuntimeClient:
         }
 
     @staticmethod
+    def _validate_textbook_audio_namespace(payload: Mapping[str, Any], operation: str) -> None:
+        request_id = str(payload["requestId"])
+        tts_id = str(payload.get("ttsRequestId", ""))
+        reserved = ("tbbtts2", "tbbasr2", "tbbreasr2")
+        selected = request_id.startswith(reserved)
+        paired = operation == "asr" and tts_id.startswith(reserved)
+        if not selected and not paired:
+            return
+        pattern = r"tbbtts2_[0-9a-f]{64}" if operation == "tts" else r"(?:tbbasr2|tbbreasr2)_[0-9a-f]{64}"
+        if (payload["subject"] != "english" or re.fullmatch(pattern, request_id) is None
+                or (operation == "asr" and re.fullmatch(r"tbbtts2_[0-9a-f]{64}", tts_id) is None)):
+            raise OpenMaicFullRuntimeError(
+                "invalid_textbook_audio_language_namespace", "英语批量语音策略身份不一致", status_code=400
+            )
+
+    @staticmethod
+    def _textbook_audio_response_policy(response: Mapping[str, Any], request_id: str) -> dict[str, Any]:
+        if re.fullmatch(r"(?:tbbtts2|tbbasr2|tbbreasr2)_[0-9a-f]{64}", request_id) is None:
+            return {}
+        profile = response.get("providerLanguagePolicy")
+        if response.get("state") != "succeeded":
+            return {}
+        if (not isinstance(profile, Mapping)
+                or set(profile) != {"policyVersion", "policySha256", "providerBodySha256"}
+                or profile["policyVersion"] != ENGLISH_AUTO_LANGUAGE_POLICY["policyVersion"]
+                or profile["policySha256"] != ENGLISH_AUTO_LANGUAGE_POLICY_SHA256
+                or re.fullmatch(r"[0-9a-f]{64}", str(profile["providerBodySha256"])) is None):
+            raise OpenMaicFullRuntimeError(
+                "textbook_audio_language_policy_not_confirmed", "英语批量语音策略回执不一致", status_code=502
+            )
+        return {"providerLanguagePolicy": dict(profile)}
+
+    @staticmethod
     def _formal_audio_request_id(value: str) -> str:
         normalized = str(value or "").strip()
         if not _safe_identifier(normalized, max_length=128):
@@ -1568,6 +1605,7 @@ class OpenMaicFullRuntimeClient:
             "status": status,
             "audioSha256": digest or None,
             "mimeType": response.get("mimeType") if status == "succeeded" else None,
+            **OpenMaicFullRuntimeClient._textbook_audio_response_policy(response, request_id),
         }
 
     @staticmethod
@@ -1616,6 +1654,7 @@ class OpenMaicFullRuntimeClient:
             "completionUsable": bool(
                 status == "succeeded" and require_ephemeral_transcript
             ),
+            **OpenMaicFullRuntimeClient._textbook_audio_response_policy(response, request_id),
         }
 
     def _formal_audio_headers(self) -> dict[str, str]:

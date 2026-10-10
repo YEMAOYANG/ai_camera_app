@@ -118,6 +118,9 @@ class _UnexpectedLessonService:
 
 
 class _ContentOnlyRepositoryRecorder:
+    def get_build(self, _conn, *, build_id):
+        return {"id": build_id, "execution_mode": "content_only"}
+
     def __init__(self):
         self.calls = []
 

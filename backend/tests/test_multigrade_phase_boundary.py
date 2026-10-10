@@ -20,7 +20,7 @@ class MultigradePhaseBoundaryTest(unittest.TestCase):
             for subject in formal_content_contract(grade)['subjects']:
                 for skill in subject['boundaries']:
                     raw = formal_registered_boundary(grade, subject['subject'], skill['skillId']).to_catalog_payload()
-                    command = _command(grade_code=grade, subject=subject['subject'], target_language_code=subject['targetLanguageCode'],
+                    command = _command(grade_code=grade, subject=subject['subject'], difficulty_code='standard', target_language_code=subject['targetLanguageCode'],
                                        boundary={key: raw[key] for key in _QUESTION_PHASE_SKILL_KEYS})
                     rows.append(adapter.canonicalize_phase(command).request)
         return rows

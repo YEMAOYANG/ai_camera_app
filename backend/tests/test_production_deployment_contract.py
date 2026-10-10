@@ -152,15 +152,14 @@ class ProductionDeploymentContractTest(unittest.TestCase):
     def test_runbook_documents_secure_lan_microphone_requirements(self) -> None:
         runbook = (
             REPOSITORY_ROOT
-            / "docs"
-            / "runbooks"
-            / "production-service-entrypoints.md"
+            / "deploy"
+            / "README.md"
         ).read_text(encoding="utf-8")
         for required in (
-            "npm run build",
-            "npm run start",
-            "docker compose up --build",
-            "backend/scripts/start-prod.sh",
+            "deploy/server.py",
+            "compose.production.yml",
+            "Permissions-Policy",
+            "frame-ancestors",
             "MIRA_STUDENT_WEB_PUBLIC_URL",
             "OPENMAIC_FULL_RUNTIME_PUBLIC_URL",
             "Secure Context",

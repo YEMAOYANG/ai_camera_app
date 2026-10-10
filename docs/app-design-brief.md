@@ -1,6 +1,6 @@
 # Mira Guardian 家长端 App Design Brief v2
 
-更新日期：2026-05-28  
+更新日期：2026-05-28
 当前业务与交互参考：`app-prototype-v4/index.html`；本文保留早期视觉方向说明，供 Figma 设计与 Flutter 页面实现参考。
 当前阶段目标：先验证首页视觉方向。首页方向确认后，再迁移任务首页、实时看护和全量页面状态矩阵。
 
