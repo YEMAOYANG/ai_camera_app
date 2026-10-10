@@ -1,0 +1,14 @@
+{
+  "policyVersion": "mira.textbook.english-auto-language.v1",
+  "subject": "english",
+  "tts": {
+    "providerId": "qwen-tts",
+    "modelId": "qwen3-tts-flash",
+    "languageType": "Auto"
+  },
+  "asr": {
+    "providerId": "qwen-asr",
+    "modelId": "qwen3-asr-flash",
+    "automaticLanguage": true
+  }
+}

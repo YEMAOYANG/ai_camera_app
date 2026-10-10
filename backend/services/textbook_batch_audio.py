@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 import wave
 
 from content.teacher_profiles import get_formal_subject_qwen_voice_identity
+from content.textbook_audio_language import ENGLISH_AUTO_LANGUAGE_OPTION, ENGLISH_AUTO_LANGUAGE_POLICY
 from content.textbook_catalog import digest
 from content.textbook_interactive_narration import (AUDIO_BLOCK, bind_interactive_audio,
                                                    interactive_cues, without_audio_helper)
@@ -27,6 +28,29 @@ ASR_RECONCILIATION_SCHEMA = "mira.textbook.batch-asr-reconciliation.v1"
 ASR_RECONCILIATION_REASON = "known_successful_but_low_similarity"
 AUDIO_INHERITANCE_SCHEMA = "mira.textbook.batch-audio-inheritance.v1"
 AUDIO_INHERITANCE_SET_SCHEMA = "mira.textbook.batch-audio-inheritance-set.v1"
+
+
+def _plan_uses_english_auto(plan):
+    if plan.get("schemaVersion") == "mira.textbook.batch-audio.v1":
+        if "providerLanguagePolicy" in plan or "providerLanguagePolicySha256" in plan:
+            raise ValueError("legacy_audio_plan_cannot_select_language_policy")
+        return False
+    if (plan.get("schemaVersion") != "mira.textbook.batch-audio.v2"
+            or plan.get("binding", {}).get("subject") != "english"
+            or plan.get("providerLanguagePolicy") != ENGLISH_AUTO_LANGUAGE_POLICY
+            or plan.get("providerLanguagePolicySha256") != digest(ENGLISH_AUTO_LANGUAGE_POLICY)):
+        raise ValueError("invalid_textbook_audio_language_policy")
+    return True
+
+
+def _asr_request_id(plan, tts_id, audio_hash):
+    return ("tbbasr2_" if _plan_uses_english_auto(plan) else "tbbasr_") + digest(
+        {"tts": tts_id, "audio": audio_hash})
+
+
+def audio_language_policy_from_plan(plan):
+    """Validate the saved version; never infer or upgrade a legacy plan."""
+    return ENGLISH_AUTO_LANGUAGE_OPTION if _plan_uses_english_auto(plan) else None
 
 
 def validate_asr_reconciliation(value):
@@ -239,7 +263,8 @@ def _audio_bindings(classroom):
 
 
 def _segment_requests(plan, item, teacher):
-    tts_id = "tbbtts_" + digest({"plan": digest(plan), "segment": item})
+    tts_id = ("tbbtts2_" if _plan_uses_english_auto(plan) else "tbbtts_") + digest(
+        {"plan": digest(plan), "segment": item})
     identity = {"classroom_id": plan["classroomId"], "classroom_content_sha256": plan["sourceSha256"],
                 "subject": plan["binding"]["subject"], "teacher_profile_id": teacher.teacher_profile_id,
                 "teacher_profile_version": teacher.teacher_profile_version,
@@ -283,7 +308,7 @@ def _reconciliation_targets(value, plan, output, media, teacher):
         tts = _known_success(output, tts_id, tts_payload)
         if tts.get("audioSha256") != entry["audioSha256"]:
             raise ValueError("asr_reconciliation_audio_mismatch")
-        asr_id = "tbbasr_" + digest({"tts": tts_id, "audio": tts["audioSha256"]})
+        asr_id = _asr_request_id(plan, tts_id, tts["audioSha256"])
         if entry["originalAsrRequestId"] != asr_id:
             raise ValueError("asr_reconciliation_original_request_mismatch")
         asr = _known_success(output, asr_id, {
@@ -301,7 +326,7 @@ def _reconciliation_targets(value, plan, output, media, teacher):
             raise ValueError("asr_reconciliation_original_audio_mismatch")
         # One permanent slot per original ASR. No filename, reason, timestamp,
         # transcript or review score can create another recognition identity.
-        request_id = "tbbreasr_" + digest({"purpose": ASR_RECONCILIATION_SCHEMA,
+        request_id = ("tbbreasr2_" if _plan_uses_english_auto(plan) else "tbbreasr_") + digest({"purpose": ASR_RECONCILIATION_SCHEMA,
             "planSha256": digest(plan), "sourceSha256": plan["sourceSha256"],
             "sceneId": entry["sceneId"], "segmentId": entry["segmentId"],
             "originalAsrRequestId": asr_id, "audioSha256": entry["audioSha256"]})
@@ -311,7 +336,7 @@ def _reconciliation_targets(value, plan, output, media, teacher):
     return targets
 
 
-def build_audio_plan(classroom, binding, runtime_origin):
+def build_audio_plan(classroom, binding, runtime_origin, *, audio_language_policy=None):
     """Provider-free immutable plan used by explicit inheritance operators."""
     from services.textbook_preview_audio import core_content
     value = core_content(classroom)
@@ -321,11 +346,18 @@ def build_audio_plan(classroom, binding, runtime_origin):
         for question in scene.get("content", {}).get("questions", []):
             question.pop("questionAudioUrl", None)
             question.pop("feedbackAudioUrl", None)
-    return {"schemaVersion": "mira.textbook.batch-audio.v1", "binding": binding,
+    plan = {"schemaVersion": "mira.textbook.batch-audio.v1", "binding": binding,
             "classroomId": classroom["id"], "sourceSha256": digest(classroom),
             "coreSha256": digest(value),
             "teacher": get_formal_subject_qwen_voice_identity(binding["subject"]).to_target_payload(),
             "workload": narration_workload(classroom), "runtimeOrigin": runtime_origin, "publicationAllowed": False}
+    if audio_language_policy is not None:
+        if audio_language_policy != ENGLISH_AUTO_LANGUAGE_OPTION or binding["subject"] != "english":
+            raise ValueError("english_auto_language_policy_requires_english_subject")
+        plan.update(schemaVersion="mira.textbook.batch-audio.v2",
+                    providerLanguagePolicy=deepcopy(ENGLISH_AUTO_LANGUAGE_POLICY),
+                    providerLanguagePolicySha256=digest(ENGLISH_AUTO_LANGUAGE_POLICY))
+    return plan
 
 
 def _inheritance_targets(value, plan, output, media, teacher):
@@ -341,11 +373,13 @@ def _inheritance_targets(value, plan, output, media, teacher):
     source_audit = json.loads((source / "audit.json").read_text())
     if (digest(source_plan) != value["sourcePlanSha256"] or digest(source_audit) != value["sourceAuditSha256"]
             or source_plan.get("sourceSha256") != value["sourceSha256"]
-            or source_plan.get("schemaVersion") != "mira.textbook.batch-audio.v1"
+            or source_plan.get("schemaVersion") not in {"mira.textbook.batch-audio.v1", "mira.textbook.batch-audio.v2"}
             or source_audit.get("schemaVersion") != "mira.textbook.batch-audio-audit.v1"
             or source_audit.get("planSha256") != digest(source_plan)
             or source_plan.get("publicationAllowed") is not False or source_audit.get("publicationAllowed") is not False):
         raise ValueError("audio_inheritance_source_evidence_mismatch")
+    if _plan_uses_english_auto(source_plan) != _plan_uses_english_auto(plan):
+        raise ValueError("audio_inheritance_language_policy_mismatch")
     for key in ("binding", "teacher", "classroomId", "runtimeOrigin"):
         if source_plan.get(key) != plan[key]:
             raise ValueError("audio_inheritance_identity_mismatch")
@@ -389,7 +423,7 @@ def _inheritance_targets(value, plan, output, media, teacher):
         if not audio_path.is_file() or hashlib.sha256(audio_path.read_bytes()).hexdigest() != entry["audioSha256"]:
             raise ValueError("audio_inheritance_audio_mismatch")
         target_tts_id, _, _, _ = _segment_requests(plan, item, teacher)
-        target_asr_id = "tbbasr_" + digest({"tts": target_tts_id, "audio": entry["audioSha256"]})
+        target_asr_id = _asr_request_id(plan, target_tts_id, entry["audioSha256"])
         if (output / f"{target_tts_id}.json").exists() or (output / f"{target_asr_id}.json").exists():
             raise ValueError("audio_inheritance_conflicts_with_target_dispatch")
         evidence = {"schemaVersion": AUDIO_INHERITANCE_SCHEMA,
@@ -413,7 +447,7 @@ def _inheritance_set_targets(value, plan, output, media, teacher):
 
 
 def narrate_candidate(runtime, classroom, binding, output, classroom_directory, *, progress=lambda value: None,
-                      asr_reconciliation=None, audio_inheritance=None):
+                      asr_reconciliation=None, audio_inheritance=None, audio_language_policy=None):
     """Return an audited private candidate; never install a student course."""
     required = {"editionId", "revisionId", "gradeCode", "subject", "schoolSystem", "volume"}
     if not required <= set(binding) or binding["subject"] not in {"chinese", "math", "english", "science"}:
@@ -427,6 +461,11 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
     teacher = get_formal_subject_qwen_voice_identity(binding["subject"])
     workload = narration_workload(classroom)
     output, root = Path(output).resolve(), Path(classroom_directory).resolve()
+    if audio_language_policy is not None:
+        if output.name == "audio-audit":
+            raise ValueError("english_auto_language_requires_distinct_audit_directory")
+        if output.exists() and not (output / "plan.json").is_file() and any(output.iterdir()):
+            raise ValueError("english_auto_language_requires_empty_or_matching_audit_directory")
     output.mkdir(parents=True, exist_ok=True)
     original_file = root / f"{classroom_id}.json"
     if not original_file.is_file():
@@ -445,7 +484,7 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
         return value
     if core(json.loads(original_file.read_text())) != core(canonical_source):
         raise RuntimeError("runtime_classroom_changed")
-    plan = build_audio_plan(classroom, binding, runtime.base_url)
+    plan = build_audio_plan(classroom, binding, runtime.base_url, audio_language_policy=audio_language_policy)
     with (output / "operator.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         plan_path = output / "plan.json"
@@ -495,7 +534,7 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
             if inherited:
                 asr_id, asr = inherited["asrId"], inherited["asr"]
             else:
-                asr_id = "tbbasr_" + digest({"tts": tts_id, "audio": tts["audioSha256"]})
+                asr_id = _asr_request_id(plan, tts_id, tts["audioSha256"])
                 asr = _external_once(runtime, output / f"{asr_id}.json", asr_id, "asr",
                                      {**identity, "request_id": asr_id, "tts_request_id": tts_id,
                                       "audio_sha256": tts["audioSha256"]})

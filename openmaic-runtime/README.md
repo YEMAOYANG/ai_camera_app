@@ -79,6 +79,33 @@ the Pro Agent retains its professional reasoning policy. No
 `KIMI_*` value is injected into the courseware process. The existing default-on
 Brave research, source fetch, and citation gates are unchanged.
 
+Patch `0154` adds the explicit private textbook English audio policy
+`mira.textbook.english-auto-language.v1`. Its new `tbbtts2_`, `tbbasr2_` and
+`tbbreasr2_` namespaces use Qwen TTS `language_type: Auto` and omit the ASR
+language parameter, while retaining the registered Mia/Jennifer teacher and
+the original narration text. The server binds the policy and physical request
+hash before dispatch, and the backend requires matching policy receipts.
+Ordinary formal audio, version 1 batch plans, health contracts and existing
+request IDs/WAVs keep their original behavior. This policy does not itself
+certify pronunciation or lower the 8500 ASR acceptance gate.
+
+After the managed runtime has been rebuilt with this patch, an operator can
+explicitly select the new policy with a separate durable output directory:
+
+```bash
+backend/.venv/bin/python backend/scripts/narrate_textbook_batch.py \
+  --candidate-directory /absolute/path/to/unchanged-private-candidate \
+  --audio-language-policy english-auto-v1 \
+  --output /absolute/path/to/unchanged-private-candidate/audio-audit-english-auto-v1
+```
+
+The output must be empty or contain the exact matching v2 plan; a prior v1
+audit cannot be reinterpreted. The preview snapshot tool reads and validates
+the saved plan's explicit policy. It keeps original audio URLs and all source
+hashes, and does not silently upgrade legacy plans. A low or unknown result
+still stops for explicit reconciliation; the existing one-shot formal
+`.language1` repair lane is unchanged.
+
 ## OpenMAIC v1 professional workbench and Skills
 
 The pinned v1 source keeps OpenMAIC's professional workbench, editable Stage/Scene
