@@ -64,6 +64,14 @@ const SECRET_KEYS = new Set([
   "baseurl",
   "ttsbaseurl",
 ]);
+// The native quiz and PBL routes resolve their model, provider type, key and
+// endpoint from these request headers. A student never selects any of them.
+const CLIENT_PROVIDER_HEADERS = new Set([
+  "x-model",
+  "x-api-key",
+  "x-base-url",
+  "x-provider-type",
+]);
 
 export function createGateway(overrides = {}) {
   const config = gatewayConfig(overrides);
@@ -653,7 +661,9 @@ async function proxyToUpstream(request, response, url, runtime, config, decision
   const method = String(request.method || "GET").toUpperCase();
   if (!["GET", "HEAD"].includes(method)) {
     body = await readBody(request, config.maxBodyBytes);
-    if (decision.sanitizeJson && isJsonRequest(request)) {
+    // The native routes parse a JSON body whatever content type was declared,
+    // so scrub by content as well as by the caller's header.
+    if (decision.sanitizeJson && (isJsonRequest(request) || isJsonBody(body))) {
       body = sanitizeRuntimeJson(body, runtime.classroomId, {
         requireRootStageId: decision.kind === "conversation-probe" && url.pathname === "/api/chat",
       });
@@ -1075,6 +1085,7 @@ function filteredRequestHeaders(source) {
     if (
       value == null ||
       normalized.startsWith("x-mira-") ||
+      CLIENT_PROVIDER_HEADERS.has(normalized) ||
       ["host", "cookie", "authorization", "content-length", "connection"].includes(normalized)
     )
       continue;
@@ -1224,6 +1235,14 @@ function isJsonRequest(request) {
   return String(request.headers["content-type"] || "")
     .toLowerCase()
     .includes("application/json");
+}
+
+// A body that opens like a JSON document is handled as JSON. Only the
+// multipart audio upload legitimately starts with anything else.
+function isJsonBody(body) {
+  let index = body[0] === 0xef && body[1] === 0xbb && body[2] === 0xbf ? 3 : 0;
+  while ([0x20, 0x09, 0x0a, 0x0d].includes(body[index])) index += 1;
+  return body[index] === 0x7b || body[index] === 0x5b;
 }
 
 function readCookie(header, name) {

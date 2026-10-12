@@ -1282,6 +1282,74 @@ test("authorized chat SSE is streamed through the gateway", async () => {
   assert.match(await result.text(), /text_delta/);
 });
 
+test("student requests cannot choose a model, provider, key or endpoint", async () => {
+  const backend = await listen(
+    http.createServer(async (request, response) => {
+      const body = await jsonBody(request);
+      if (request.url.endsWith("/validate") && body.runtimeToken === "omr_good") {
+        return reply(response, {
+          ok: true,
+          runtimeSessionId: "rs1",
+          learningSessionId: "ls1",
+          classroomId: "classroom-a",
+          expiresAt: Date.now() + 60_000,
+        });
+      }
+      response.writeHead(401, { "content-type": "application/json" });
+      response.end(JSON.stringify({ ok: false, error: "invalid" }));
+    }),
+  );
+  const seen = [];
+  const upstream = await listen(
+    http.createServer(async (request, response) => {
+      seen.push({ url: request.url, headers: request.headers, body: await jsonBody(request) });
+      reply(response, { success: true });
+    }),
+  );
+  const gateway = await listenGateway({ backend, upstream });
+  const cookie = "mira_openmaic_runtime=omr_good";
+
+  const graded = await fetch(`${gateway}/api/quiz-grade`, {
+    method: "POST",
+    headers: {
+      cookie,
+      "content-type": "application/json",
+      "x-model": "openai:attacker-model",
+      "x-api-key": "attacker-key",
+      "x-base-url": "https://attacker.invalid/v1",
+      "x-provider-type": "openai",
+    },
+    body: JSON.stringify({ question: "1+1", userAnswer: "2", points: 1 }),
+  });
+  assert.equal(graded.status, 200);
+
+  // The native route parses JSON whatever content type the caller declares.
+  const undeclared = { cookie, "content-type": "text/plain" };
+  const chat = await fetch(`${gateway}/api/chat`, {
+    method: "POST",
+    headers: undeclared,
+    body: ` ${JSON.stringify({
+      stageId: "classroom-a",
+      apiKey: "attacker-key",
+      baseUrl: "https://attacker.invalid/v1",
+    })}`,
+  });
+  assert.equal(chat.status, 200);
+  const crossClassroom = await fetch(`${gateway}/api/chat`, {
+    method: "POST",
+    headers: undeclared,
+    body: JSON.stringify({ stageId: "classroom-b" }),
+  });
+  assert.equal(crossClassroom.status, 403);
+
+  assert.deepEqual(seen.map((request) => request.url), ["/api/quiz-grade", "/api/chat"]);
+  for (const header of ["x-model", "x-api-key", "x-base-url", "x-provider-type"]) {
+    assert.equal(seen[0].headers[header], undefined);
+  }
+  assert.deepEqual(seen[0].body, { question: "1+1", userAnswer: "2", points: 1 });
+  assert.deepEqual(seen[1].body, { stageId: "classroom-a" });
+});
+
 test("conversation probe is cookie-authenticated, scope-bound, and streams chat plus multipart ASR", async () => {
   const challenge = "ompc_abcdefghijklmnopqrstuvwxyz012345";
   const backend = await listen(

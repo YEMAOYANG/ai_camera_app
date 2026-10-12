@@ -125,6 +125,22 @@ additively; the legacy three-subject course domain and underlying profile-list
 contract remain unchanged. Apply the locked patch chain and rebuild the native
 runtime and Student Web before checking the portraits in the classroom.
 
+Patches `0160` to `0162` backport upstream dependency security fixes onto the
+pinned 1.0.0 commit as unmodified upstream diffs. `0160` is upstream `6334e9ad`
+(#1357): Next.js 16.2.11, js-yaml 4.3.0, undici 7.29.0, nanoid 5.1.16, lodash
+4.18.1 and sharp 0.35.4. `0161` is upstream `4d0f88b4` (#1503): Next.js 16.3.3.
+`0162` is upstream `7aef1bd4` (#1407), which keeps the libvips libraries of
+sharp 0.35.4 in Docker standalone output. They change `package.json`, the
+lockfiles and `next.config.ts` only, so run `pnpm install --frozen-lockfile`
+before rebuilding.
+
+The pin itself stays at 1.0.0. The student launch gate requires every released
+classroom manifest to carry this exact source version and commit
+(`backend/repositories/formal_student_runtime_gate.py`), so moving the pin
+needs a compatibility decision for released classrooms first. Upstream 1.0.1
+to 1.0.3 fixes that change classroom storage or stored slide HTML, audio
+provider transports, the access code or the render service are not included.
+
 ## OpenMAIC v1 professional workbench and Skills
 
 The pinned v1 source keeps OpenMAIC's professional workbench, editable Stage/Scene
@@ -796,7 +812,9 @@ Blocked from the student gateway:
 - classroom generation
 - editor and arbitrary classroom writes
 - settings and provider configuration
-- client-supplied API keys and base URLs
+- client-supplied API keys and base URLs, in a JSON body under any declared
+  content type and in the native `x-api-key`, `x-base-url`, `x-model` and
+  `x-provider-type` request headers
 - arbitrary media proxying
 - other classroom IDs
 - MP4 render jobs (content-operations only)

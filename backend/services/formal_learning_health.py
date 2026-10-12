@@ -23,10 +23,10 @@ FORMAL_EVENT_RECEIPT_SCHEMA = (
 RUNTIME_UPSTREAM_VERSION = "1.0.0"
 RUNTIME_UPSTREAM_COMMIT = "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5"
 # Deployment pins must match openmaic-runtime/upstream.lock.json.
-RUNTIME_PATCH_COUNT = 159
-RUNTIME_LATEST_PATCH = "0159-mira-completed-lesson-replay.patch"
+RUNTIME_PATCH_COUNT = 162
+RUNTIME_LATEST_PATCH = "0162-mira-upstream-sharp-libvips-tracing.patch"
 RUNTIME_LATEST_PATCH_SHA256 = (
-    "5a33358ef8aa34097968bbe3ea44e4f70f431c8332c972263e1963b89ea4fef2"
+    "544ccf1b91676b2edeed15eac792f71c2f299d3b9073fb88ebd8de85510ef6c1"
 )
 
 

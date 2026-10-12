@@ -134,7 +134,7 @@ cat > "${FAKE_SOURCE_DIR}/package.json" <<'EOF'
 {"name":"fake-openmaic","version":"1.0.0"}
 EOF
 cat > "${FAKE_SOURCE_DIR}/node_modules/next/package.json" <<'EOF'
-{"name":"next","version":"16.1.2"}
+{"name":"next","version":"16.3.3"}
 EOF
 cat > "${FAKE_SOURCE_DIR}/scripts/assert-vendor-maic-importer.mjs" <<'EOF'
 // Intentionally empty: native-runtime.sh must preserve the upstream pre-build check.
@@ -286,7 +286,7 @@ IDENTITY_PORT_FILE="${TMP_ROOT}/identity-port"
   exec "$(command -v node)" -e '
     const fs = require("fs");
     const http = require("http");
-    process.title = "next-server (v16.1.2)";
+    process.title = "next-server (v16.3.3)";
     const server = http.createServer((_req, res) => {
       res.writeHead(200, {"content-type": "application/json"});
       res.end("{\"status\":\"ok\"}");
@@ -312,7 +312,7 @@ OPENMAIC_MODE_FILE="${TMP_ROOT}/identity-openmaic.mode"
 printf '%s\n' "${IDENTITY_TEST_PID}" > "${OPENMAIC_PID_FILE}"
 identity_start_hash="$(process_start_hash "${IDENTITY_TEST_PID}")"
 identity_build_hash="$(openmaic_build_id_hash)"
-write_openmaic_mode "${IDENTITY_TEST_PID}" "${identity_start_hash}" "${identity_build_hash}" "16.1.2"
+write_openmaic_mode "${IDENTITY_TEST_PID}" "${identity_start_hash}" "${identity_build_hash}" "16.3.3"
 openmaic_production_mode_is_current || fail "valid production identity was rejected"
 
 cp "${OPENMAIC_MODE_FILE}" "${OPENMAIC_MODE_FILE}.valid"
@@ -335,7 +335,7 @@ if openmaic_production_mode_is_current; then
   echo "PID reuse simulation unexpectedly passed the production identity gate" >&2
   exit 1
 fi
-write_openmaic_mode "${IDENTITY_TEST_PID}" "${identity_start_hash}" "${identity_build_hash}" "16.1.2"
+write_openmaic_mode "${IDENTITY_TEST_PID}" "${identity_start_hash}" "${identity_build_hash}" "16.3.3"
 
 printf 'different-build\n' > "${SOURCE_DIR}/.next/BUILD_ID"
 openmaic_recorded_process_identity_is_current || fail "build change invalidated process ownership identity"
@@ -344,7 +344,7 @@ if openmaic_production_mode_is_current; then
   exit 1
 fi
 printf 'fake-reviewed-build\n' > "${SOURCE_DIR}/.next/BUILD_ID"
-write_openmaic_mode "${IDENTITY_TEST_PID}" "${identity_start_hash}" "$(openmaic_build_id_hash)" "16.1.2"
+write_openmaic_mode "${IDENTITY_TEST_PID}" "${identity_start_hash}" "$(openmaic_build_id_hash)" "16.3.3"
 openmaic_production_mode_is_current || fail "restored production identity was rejected"
 
 if prepare_openmaic_start 2>/dev/null; then
@@ -354,12 +354,12 @@ fi
 
 (
   cd "${FAKE_SOURCE_DIR}"
-  exec "$(command -v node)" -e 'process.title = "next-server (v16.1.2)"; setInterval(() => {}, 1000)'
+  exec "$(command -v node)" -e 'process.title = "next-server (v16.3.3)"; setInterval(() => {}, 1000)'
 ) &
 IDENTITY_TEST_OTHER_PID="$!"
 other_start_hash="$(process_start_hash "${IDENTITY_TEST_OTHER_PID}")"
 printf '%s\n' "${IDENTITY_TEST_OTHER_PID}" > "${OPENMAIC_PID_FILE}"
-write_openmaic_mode "${IDENTITY_TEST_OTHER_PID}" "${other_start_hash}" "$(openmaic_build_id_hash)" "16.1.2"
+write_openmaic_mode "${IDENTITY_TEST_OTHER_PID}" "${other_start_hash}" "$(openmaic_build_id_hash)" "16.3.3"
 if openmaic_production_mode_is_current; then
   echo "production-looking PID without listener ownership unexpectedly passed" >&2
   exit 1
@@ -453,7 +453,7 @@ IDENTITY_TEST_PID=""
   start_openmaic || fail "mock detached production start failed"
   grep -Fq 'version=2' "${OPENMAIC_MODE_FILE}" || fail "detached start did not write a v2 identity"
   grep -Fq 'mode=production' "${OPENMAIC_MODE_FILE}" || fail "detached start did not finish with a production identity"
-  grep -Fq 'next_version=16.1.2' "${OPENMAIC_MODE_FILE}" || fail "detached start identity has the wrong Next version"
+  grep -Fq 'next_version=16.3.3' "${OPENMAIC_MODE_FILE}" || fail "detached start identity has the wrong Next version"
   expected_start_order="$(printf '%s\n' pending-commit owned-health-complete audio-health-complete provider-health-complete production-commit)"
   actual_start_order="$(cat "${START_ORDER_LOG}")"
   [[ "${actual_start_order}" == "${expected_start_order}" ]] || fail "detached start identity/health order was incorrect: ${actual_start_order}"
@@ -725,7 +725,7 @@ grep -Fq 'version=2' "${RUNTIME_SCRIPT}" || fail "native runtime does not use v2
 grep -Fq 'port_is_owned_by_tree "${OPENMAIC_PORT}"' "${RUNTIME_SCRIPT}" || fail "native runtime does not bind identity to listener ownership"
 production_foreground_source="$(declare -f run_openmaic_production_foreground)"
 [[ "${production_foreground_source}" == *'MIRA_OPENMAIC_NATIVE_BUILD=1'* ]] || fail "production foreground omits the native-build boundary"
-grep -Fq 'OPENMAIC_PRODUCTION_COMMAND_TOKEN="next-server (v16.1.2)"' "${LOCAL_TEST_STACK_SCRIPT}" || fail "local stack does not recognize the production Next process"
+grep -Fq 'OPENMAIC_PRODUCTION_COMMAND_TOKEN="next-server (v16.3.3)"' "${LOCAL_TEST_STACK_SCRIPT}" || fail "local stack does not recognize the production Next process"
 grep -Fq 'OPENMAIC_LEGACY_DEV_COMMAND_TOKEN="next/dist/bin/next dev"' "${LOCAL_TEST_STACK_SCRIPT}" || fail "local stack lacks the legacy dev migration guard"
 provider_readiness_qwen_recovery_patch="${SCRIPT_DIR}/../patches/0027-mira-provider-readiness-qwen-url-recovery.patch"
 provider_readiness_qwen_recovery_patch_sha="$(shasum -a 256 "${provider_readiness_qwen_recovery_patch}" | awk '{print $1}')"
@@ -1226,7 +1226,7 @@ clear_openmaic_recovery_env
   GATEWAY_PID_FILE="${TMP_ROOT}/term-timeout-gateway.pid"
   GATEWAY_IDENTITY_FILE="${TMP_ROOT}/term-timeout-gateway.identity"
   printf '%s\n' "${cleanup_pid}" > "${OPENMAIC_PID_FILE}"
-  write_openmaic_mode "${cleanup_pid}" "${cleanup_start_hash}" "${cleanup_build_hash}" "16.1.2" pending
+  write_openmaic_mode "${cleanup_pid}" "${cleanup_start_hash}" "${cleanup_build_hash}" "16.3.3" pending
   printf '%s\n' "${cleanup_pid}" > "${GATEWAY_PID_FILE}"
   write_gateway_identity "${cleanup_pid}" "${cleanup_start_hash}"
 
@@ -1266,7 +1266,7 @@ clear_openmaic_recovery_env
   GATEWAY_PID_FILE="${TMP_ROOT}/dead-gateway.pid"
   GATEWAY_IDENTITY_FILE="${TMP_ROOT}/dead-gateway.identity"
   printf '%s\n' "${cleanup_pid}" > "${OPENMAIC_PID_FILE}"
-  write_openmaic_mode "${cleanup_pid}" "${cleanup_start_hash}" "${cleanup_build_hash}" "16.1.2" pending
+  write_openmaic_mode "${cleanup_pid}" "${cleanup_start_hash}" "${cleanup_build_hash}" "16.3.3" pending
   printf '%s\n' "${cleanup_pid}" > "${GATEWAY_PID_FILE}"
   write_gateway_identity "${cleanup_pid}" "${cleanup_start_hash}"
 
@@ -1284,7 +1284,7 @@ clear_openmaic_recovery_env
   OPENMAIC_PID_FILE="${TMP_ROOT}/uncertain-openmaic.pid"
   OPENMAIC_MODE_FILE="${TMP_ROOT}/uncertain-openmaic.mode"
   printf '%s\n' "${cleanup_pid}" > "${OPENMAIC_PID_FILE}"
-  write_openmaic_mode "${cleanup_pid}" "${cleanup_start_hash}" "${cleanup_build_hash}" "16.1.2" pending
+  write_openmaic_mode "${cleanup_pid}" "${cleanup_start_hash}" "${cleanup_build_hash}" "16.3.3" pending
   process_is_alive() { return 0; }
   process_start_hash() { return 1; }
   port_is_listening() { return 1; }
