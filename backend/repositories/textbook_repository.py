@@ -145,8 +145,12 @@ class TextbookRepository:
         return json.loads(value) if isinstance(value, str) else value
 
     def builds(self, conn, edition_id, revision_id):
-        return conn.execute("SELECT * FROM learning_textbook_course_builds WHERE edition_id=? AND revision_id=? AND status='published' ORDER BY node_id,part_index,created_at DESC,content_key ASC",
+        # MySQL filesort carries the large classroom JSON and can exhaust its
+        # sort buffer even for one 3D release. Sort this one book's rows without
+        # changing global database settings or the latest-revision ordering.
+        rows = conn.execute("SELECT * FROM learning_textbook_course_builds WHERE edition_id=? AND revision_id=? AND status='published'",
                             (edition_id, revision_id)).fetchall()
+        return sorted(rows, key=lambda row: (row['node_id'], row['part_index'], -int(row['created_at']), row['content_key']))
 
     def get_build(self, conn, content_key, *, lock=False):
         return conn.execute("SELECT * FROM learning_textbook_course_builds WHERE content_key=?" + (" FOR UPDATE" if lock else ""),

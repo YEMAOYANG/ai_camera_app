@@ -36,6 +36,7 @@ from routes.api.v2.parent_student_access import parent_student_access_bp
 from routes.api.v2.student_auth import student_auth_bp
 from routes.api.v2.student_learning import student_learning_bp
 from routes.api.v2.student_textbooks import student_textbooks_bp, parent_textbooks_bp
+from routes.api.v2.student_international_trials import student_international_trials_bp
 from routes.internal.textbooks import internal_textbooks_bp
 from routes.api.v2.student_practice import student_practice_bp
 from routes.api.v2.student_learning_media import student_learning_media_bp
@@ -97,6 +98,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(parent_learning_weaknesses_bp, url_prefix="/api/reports/learning")
     app.register_blueprint(student_reviews_bp, url_prefix="/api/v2/student/learning/reviews")
     app.register_blueprint(student_textbooks_bp, url_prefix="/api/v2/student/learning/textbooks")
+    app.register_blueprint(student_international_trials_bp, url_prefix="/api/v2/student/learning/international-trials")
     app.register_blueprint(internal_textbooks_bp, url_prefix="/internal/learning/textbooks")
     app.register_blueprint(contacts_bp, url_prefix="/api/contacts")
     app.register_blueprint(devices_bp, url_prefix="/api/devices")

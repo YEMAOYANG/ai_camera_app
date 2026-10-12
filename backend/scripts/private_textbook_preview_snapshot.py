@@ -28,6 +28,8 @@ from scripts.narrate_textbook_batch import DEFAULT_CLASSROOM_DIRECTORY, load_can
 from services.textbook_batch_audio import (audio_language_policy_from_plan, build_audio_plan,
                                           narration_workload, save_json)
 from services.textbook_preview_audio import core_content
+from content.textbook_number_spelling import validate_page_number_equivalence
+from services.learning_media_materialization_service import asr_similarity_bps
 
 SCHEMA = "mira.textbook.private-preview-snapshot.v1"
 IDENTITY = re.compile(r"[A-Za-z0-9_-]{1,128}\Z")
@@ -128,6 +130,13 @@ def verify_complete_audio(original, narrated, plan, audit, media_directory):
         if auto_language and (not re.fullmatch(r"tbbtts2_[0-9a-f]{64}", tts_id)
                 or not re.fullmatch(r"(?:tbbasr2|tbbreasr2)_[0-9a-f]{64}", str(segment.get("asrRequestId", "")))):
             raise ValueError("private_preview_audio_language_namespace_mismatch")
+        if 'pageNumberEquivalence' in segment:
+            receipt = validate_page_number_equivalence(item['text'], segment['pageNumberEquivalence'])
+            if (plan.get('binding', {}).get('subject') != 'chinese'
+                    or receipt.get('requestId') != segment.get('asrRequestId')
+                    or segment['similarityBps'] != 10000
+                    or segment.get('literalScoreBps') != asr_similarity_bps(item['text'], receipt['transcript'])):
+                raise ValueError('private_preview_page_number_evidence_mismatch')
         seen.add(key)
         url = f"/api/classroom-media/{source_id}/audio/{tts_id}.wav"
         if segment.get("audioUrl") != url:

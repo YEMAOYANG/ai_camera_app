@@ -10,19 +10,20 @@ import {
   teacherTone,
 } from "@/features/learning/teacher-registry";
 import type {
-  LearningSubject,
+  TeacherSubject,
   LearningTeacherProfile,
   LearningTeachersResponse,
 } from "@/lib/contracts/learning";
 
-const subjectChoices: Array<{ id: LearningSubject; label: string }> = [
+const subjectChoices: Array<{ id: TeacherSubject; label: string }> = [
   { id: "chinese", label: "语文" },
   { id: "math", label: "数学" },
   { id: "english", label: "英语" },
+  { id: "science", label: "科学" },
 ];
 
-export function TeacherPicker({ compact = false, subject }: { compact?: boolean; subject?: LearningSubject }) {
-  const [selectedSubject, setSelectedSubject] = useState<LearningSubject>(subject || "chinese");
+export function TeacherPicker({ compact = false, subject }: { compact?: boolean; subject?: TeacherSubject }) {
+  const [selectedSubject, setSelectedSubject] = useState<TeacherSubject>(subject || "chinese");
   const activeSubject = subject || selectedSubject;
   const [data, setData] = useState<LearningTeachersResponse | null>(null);
   const [savingId, setSavingId] = useState("");

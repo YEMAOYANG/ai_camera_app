@@ -50,7 +50,7 @@ describe("persistent student navigation", () => {
   it("keeps auth, classroom and unrelated routes outside the navigation", () => {
     route.pathname = "/pair";
     const view = render(<SpaceNavigationProvider><ProviderState /></SpaceNavigationProvider>);
-    for (const pathname of ["/learning", "/learning/textbooks", "/learning/reviews", "/learning/reviews/", "/learning/reviews/review-1", "/learning/homework", "/learning/homework/", "/learning/homework/submission-1", "/pair", "/unlock", "/lesson/task-1/classroom", "/lesson/task-1", "/learning-other", "/today/extra", "/learning/textbooks/book/revision/intro/welcome"]) {
+    for (const pathname of ["/learning", "/learning/textbooks", "/learning/reviews", "/learning/reviews/", "/learning/reviews/review-1", "/learning/homework", "/learning/homework/", "/learning/homework/submission-1", "/learning/international", "/learning/international/", "/pair", "/unlock", "/lesson/task-1/classroom", "/lesson/task-1", "/learning-other", "/today/extra", "/learning/textbooks/book/revision/intro/welcome"]) {
       route.pathname = pathname;
       view.rerender(<SpaceNavigationProvider><ProviderState /></SpaceNavigationProvider>);
       expect(screen.queryByRole("navigation", { name: "学生导航" })).not.toBeInTheDocument();

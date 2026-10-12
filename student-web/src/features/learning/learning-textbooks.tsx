@@ -50,11 +50,11 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
   const [chosenUnit, setChosenUnit] = useState<{ book: string; unit: string }>();
   const [view, setView] = useState<"pictures" | "directory">("pictures");
   const [choosingUnit, setChoosingUnit] = useState(false);
-  const books = data?.books.filter(item => item.selected) ?? [];
+  const books = data?.books.filter(item => item.selected || item.accessMode === "published") ?? [];
   const requestedKey = location?.editionId && location?.revisionId ? `${location.editionId}:${location.revisionId}` : "";
   const book = requestedKey ? books.find(item => bookKey(item) === requestedKey) : books[0];
-  // Direct links also pass the server's parent-selection check. Never silently
-  // replace an outdated URL with a different book or a different revision.
+  // Keep exact edition/revision URLs; browsing an available directory does not
+  // replace the parent's confirmed school book.
   const edition = location?.editionId ?? book?.editionId;
   const revision = location?.revisionId ?? book?.revisionId;
   const contentsKey = `${catalogKey}:${edition}:${revision}`;
@@ -64,7 +64,7 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
   useSchoolbagBook(detail?.book.subject);
   const activeUnit = detail?.units.find(unit => unit.unitId === (chosenUnit?.book === `${edition}:${revision}` ? chosenUnit.unit : location?.unitId))
     ?? detail?.units.find(unit => unit.lessons.some(lesson => lesson.nodeId === detail.currentNodeId))
-    ?? (pictureFirst ? detail?.units.find(unit => unit.lessons.some(isPictureLesson)) : undefined)
+    ?? (pictureFirst ? detail?.units.find(unit => unit.guideCourse || unit.lessons.some(isPictureLesson)) : undefined)
     ?? detail?.units[0];
   const showPictures = pictureFirst && view === "pictures";
   function chooseUnit(unit: string) {
@@ -77,7 +77,7 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
     const controller = new AbortController();
     const query = new URLSearchParams({ alignmentRevisionId: revision });
     void load(`/api/learning/textbooks/${encodeURIComponent(edition)}/contents?${query}`, textbookContentsSchema, controller.signal).then(result => {
-      if (!result.selected || result.book.editionId !== edition || result.book.revisionId !== revision || result.book.gradeCode !== student.gradeCode) throw new Error("教材资料已更新，请刷新目录");
+      if ((!result.selected && result.accessMode !== "published") || result.book.editionId !== edition || result.book.revisionId !== revision || result.book.gradeCode !== student.gradeCode) throw new Error("教材资料已更新，请刷新目录");
       if (!controller.signal.aborted) setContents({ key: contentsKey, data: result });
     }).catch((caught: unknown) => {
       if (controller.signal.aborted) return;
@@ -103,11 +103,18 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
           : location?.introductionId ? <div className="textbook-state" role="alert"><h2>这份导学还没有准备好</h2><Button asChild><Link href="/learning/textbooks">回到教材目录</Link></Button></div>
           : <>
             <section className="textbook-welcome" aria-label="走进这门学科">
-              <div><p className="textbook-bookline">我的学校课本</p>
+              <div><p className="textbook-bookline">{detail.selected ? "我的学校课本" : "教材目录"}</p>
                 <h1>{detail.book.title.split(/\s+/).map((part, index) => <span key={`${index}-${part}`}>{index > 0 ? " " : ""}{part}</span>)}</h1>
-                {detail.introduction ? <Link className="textbook-discover-link" href={textbookIntroductionPath(detail.book, detail.introduction.introductionId)}><Compass size={20} aria-hidden="true" />先认识{subjectNames[detail.book.subject]}<ArrowRight size={20} aria-hidden="true" /></Link> : null}
+                {detail.explorationCourse ? <Link prefetch={false} className="textbook-discover-link" href={`/learning/textbooks/courses/${detail.explorationCourse.contentKey}`}><Compass size={20} aria-hidden="true" />先认识{subjectNames[detail.book.subject]}<ArrowRight size={20} aria-hidden="true" /></Link>
+                  : detail.introduction ? <Link className="textbook-discover-link" href={textbookIntroductionPath(detail.book, detail.introduction.introductionId)}><Compass size={20} aria-hidden="true" />先认识{subjectNames[detail.book.subject]}<ArrowRight size={20} aria-hidden="true" /></Link> : null}
               </div>{detail.introduction?.presentation ? <div className="textbook-welcome-art"><TextbookPicture art={detail.introduction.presentation.scenes[0].art} thumbnail /></div> : null}
             </section>
+            {books.filter(item => item.subject === detail.book.subject).length > 1 && <Disclosure className="textbook-book-info" title="查看其他教材版本与册次">
+              <SelectField label="选择教材目录（请家长帮忙）" value={bookKey(detail.book)}
+                onValueChange={value => { const next = books.find(item => bookKey(item) === value); if (next) router.push(`/learning/textbooks?${new URLSearchParams({ editionId: next.editionId, revisionId: next.revisionId })}`); }}
+                options={books.filter(item => item.subject === detail.book.subject).map(item => ({ value: bookKey(item),
+                  label: `${item.selected ? "学校课本 · " : ""}${item.publisher} · ${item.editionLabel} · ${item.volume === "upper" ? "上册" : item.volume === "lower" ? "下册" : "全册"}${item.schoolSystem === "five_four" ? " · 五四制" : ""}` }))} />
+            </Disclosure>}
             {pictureFirst && <div className="textbook-view-switch" role="group" aria-label="课程显示方式">
               <button type="button" aria-pressed={view === "pictures"} onClick={() => { setView("pictures"); setChoosingUnit(false); }}><LayoutGrid size={21} aria-hidden="true" />图片学习</button>
               <button type="button" aria-pressed={view === "directory"} onClick={() => { setView("directory"); setChoosingUnit(false); }}><List size={21} aria-hidden="true" />完整目录</button>
@@ -128,14 +135,17 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
               </aside>
               <section className="textbook-unit-content" key={activeUnit.unitId} aria-label={activeUnit.title}>
                 <header className="textbook-unit-heading"><h3>{activeUnit.title}</h3></header>
-                {activeUnit.introduction ? <div className="textbook-unit-introduction">
+                {activeUnit.guideCourse ? <div className="textbook-unit-introduction">
+                  <div className="textbook-unit-art"><LessonPicture title={activeUnit.guideCourse.title} subject={detail.book.subject} contentKey={activeUnit.guideCourse.contentKey} /></div>
+                  <div className="textbook-unit-invitation"><p>单元导学 · 互动探索</p><h4>{activeUnit.guideCourse.title}</h4><Button asChild><Link prefetch={false} href={`/learning/textbooks/courses/${activeUnit.guideCourse.contentKey}`}>开始探索<ArrowRight size={20} aria-hidden="true" /></Link></Button></div>
+                </div> : activeUnit.introduction ? <div className="textbook-unit-introduction">
                   {activeUnit.introduction.presentation && <div className="textbook-unit-art"><TextbookPicture art={activeUnit.introduction.presentation.scenes[0].art} thumbnail /></div>}
                   <div className="textbook-unit-invitation"><p>单元导学 · 约 {activeUnit.introduction.estimatedMinutes} 分钟</p><h4>{activeUnit.introduction.title}</h4><Button asChild><Link href={textbookIntroductionPath(detail.book, activeUnit.introduction.introductionId)}>开始探索<ArrowRight size={20} aria-hidden="true" /></Link></Button></div>
                 </div> : null}
                 <h4 className="textbook-lessons-heading">课本里的课程</h4>
                 <ol className="textbook-lessons">{activeUnit.lessons.map(lesson => <li key={lesson.nodeId} className="textbook-lesson" aria-current={detail.currentNodeId === lesson.nodeId ? "step" : undefined}>
                   <div>{lesson.sectionTitle ? <p>{lesson.sectionTitle}</p> : null}<h4>{lesson.title}</h4><p>{lesson.printedPage ? `课本第 ${lesson.printedPage} 页` : "对应课本课程"}{detail.currentNodeId === lesson.nodeId ? " · 学校当前进度" : ""}</p></div>
-                  {lesson.status === "ready" && lesson.course && detail.selected ? lesson.course.delivery === "fixed_textbook"
+                  {lesson.status === "ready" && lesson.course && (detail.selected || detail.accessMode === "published") ? lesson.course.delivery === "fixed_textbook"
                     ? <Button asChild><Link prefetch={false} href={`/learning/textbooks/courses/${lesson.course.contentKey}`}>开始上课<ArrowRight size={20} aria-hidden="true" /></Link></Button>
                     : <LearningCourseStartButton courseId={lesson.course.courseId} version={lesson.course.courseVersion} />
                     : <span className="textbook-lesson-status">{lesson.status === "locked" ? lesson.message || "请先完成前面的课程" : "课件待生成"}</span>}
@@ -179,7 +189,7 @@ function PictureLessons({ detail, unit, onChooseUnits }: { detail: TextbookConte
   useEffect(() => { heading.current?.focus({ preventScroll: true }); }, []);
   const lessons = unit.lessons.filter(isPictureLesson);
   const guide = unit.introduction?.presentation ? unit.introduction : undefined;
-  const guideCount = guide ? 1 : 0;
+  const guideCount = unit.guideCourse || guide ? 1 : 0;
   const [chosenPage, setPage] = useState(() => Math.floor(Math.max(0, lessons.findIndex(lesson => lesson.nodeId === detail.currentNodeId) + guideCount) / PICTURE_PAGE_SIZE));
   const count = lessons.length + guideCount;
   const pages = Math.max(1, Math.ceil(count / PICTURE_PAGE_SIZE));
@@ -189,18 +199,23 @@ function PictureLessons({ detail, unit, onChooseUnits }: { detail: TextbookConte
   return <section className="picture-lesson-directory" aria-label="图片选课">
     <header><div><h2 ref={heading} tabIndex={-1}>{unit.title}</h2><p>点图片，开始玩</p></div><div className="picture-lesson-tools"><Button variant="secondary" size="compact" type="button" onClick={onChooseUnits}><LayoutGrid aria-hidden="true" />换个单元</Button><LearningListenButton cue={count ? "choose" : "unavailable"} /></div></header>
     <div className="picture-lesson-choices" data-size={count <= 2 ? "small" : "large"}>
-      {guide?.presentation && page === 0 && <Link className="learning-picture-launch" href={textbookIntroductionPath(detail.book, guide.introductionId)} aria-label={guide.title}>
+      {unit.guideCourse && page === 0 ? <Link className="learning-picture-launch" prefetch={false} href={`/learning/textbooks/courses/${unit.guideCourse.contentKey}`} aria-label={unit.guideCourse.title}>
+        <span className="picture-course-art"><LessonPicture title={unit.guideCourse.title} subject={detail.book.subject} contentKey={unit.guideCourse.contentKey} /><span className="learning-picture-play"><Play size={30} fill="currentColor" aria-hidden="true" /></span></span>
+        <span className="learning-picture-caption"><span>单元探索</span><strong>{unit.guideCourse.title}</strong></span>
+      </Link> : guide?.presentation && page === 0 && <Link className="learning-picture-launch" href={textbookIntroductionPath(detail.book, guide.introductionId)} aria-label={guide.title}>
         <span className="picture-course-art"><TextbookPicture art={guide.presentation.scenes[0].art} thumbnail /><span className="learning-picture-play"><Play size={30} fill="currentColor" aria-hidden="true" /></span></span>
         <span className="learning-picture-caption"><span>单元探索 · 约 {guide.estimatedMinutes} 分钟</span><strong>{guide.title}</strong></span>
       </Link>}
       {lessons.slice(Math.max(0, first - guideCount), last - guideCount).map(lesson => <Link className="learning-picture-launch" prefetch={false} key={lesson.nodeId}
         href={`/learning/textbooks/courses/${lesson.course!.contentKey}`} aria-label={`开始上课，${lesson.title}`}>
-        <span className="picture-course-art"><LessonPicture title={lesson.title} subject={detail.book.subject} /><span className="learning-picture-play"><Play size={30} fill="currentColor" aria-hidden="true" /></span></span>
+        <span className="picture-course-art"><LessonPicture title={lesson.title} subject={detail.book.subject} contentKey={lesson.course!.contentKey} /><span className="learning-picture-play"><Play size={30} fill="currentColor" aria-hidden="true" /></span></span>
         <span className="learning-picture-caption"><span>互动课堂</span><strong>{lesson.title}</strong></span>
       </Link>)}
     </div>
     {pages > 1 && <DirectoryPagination page={page} pages={pages} count={count} label="图片课程翻页" onChange={setPage} />}
-    {!lessons.length && <p className="textbook-notice">本单元课件正在准备{guide ? "，可以先探索图片导学。" : "，可以切换单元看看。"}</p>}
+    {!lessons.length && <p className="textbook-notice">{unit.guideCourse
+      ? "本单元导学已开放，后续课时正在准备。"
+      : `本单元课件正在准备${guideCount ? "，可以先探索图片导学。" : "，可以切换单元看看。"}`}</p>}
   </section>;
 }
 

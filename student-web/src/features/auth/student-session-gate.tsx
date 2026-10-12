@@ -11,6 +11,7 @@ import { LearningTextbookClassroom } from "@/features/learning/learning-textbook
 import { LearningSchoolbag } from "@/features/learning/learning-schoolbag";
 import { LearningReviews } from "@/features/learning/learning-reviews";
 import { LearningHomework } from "@/features/learning/learning-homework";
+import { LearningInternationalTrials } from "@/features/learning/learning-international-trials";
 import { StudentSessionState } from "./student-session-state";
 import type { TextbookLocation } from "@/features/learning/textbook-navigation";
 
@@ -27,7 +28,7 @@ export function StudentSessionGate({
 }: {
   lessonTaskId?: string;
   classroomMode?: "discover" | "openmaic";
-  learningView?: "library" | "course" | "practice" | "path" | "textbooks" | "schoolbag" | "reviews" | "homework";
+  learningView?: "library" | "course" | "practice" | "path" | "textbooks" | "schoolbag" | "reviews" | "homework" | "international";
   courseId?: string;
   courseVersion?: string;
   textbookLocation?: TextbookLocation;
@@ -72,6 +73,7 @@ export function StudentSessionGate({
 
   if (learningView === "reviews") return <LearningReviews student={student} reviewId={reviewId} />;
   if (learningView === "homework") return <LearningHomework student={student} submissionId={submissionId} />;
+  if (learningView === "international") return <LearningInternationalTrials student={student} />;
   if (textbookCourseKey) return <LearningTextbookClassroom key={textbookCourseKey} student={student} contentKey={textbookCourseKey} />;
   if (lessonTaskId) {
     return <ClassroomEntry key={`${classroomMode}:${lessonTaskId}`} student={student} taskId={lessonTaskId} mode={classroomMode} />;

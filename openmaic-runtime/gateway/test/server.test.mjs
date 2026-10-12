@@ -3,11 +3,13 @@ import { createHash } from "node:crypto";
 import http from "node:http";
 import { afterEach, test } from "node:test";
 import { gzipSync } from "node:zlib";
+import vm from "node:vm";
 
 import {
   authorizeRuntimeRequest,
   authorizeTextbookRequest,
   createGateway,
+  embedTextbookSceneMedia,
   injectRuntimeAudioBindings,
   mergeContentSecurityPolicy,
   prepareRuntimeEvent,
@@ -15,6 +17,33 @@ import {
 } from "../src/server.mjs";
 
 const servers = [];
+
+test('large repeated textbook atlases remain single-copy and reconstruct exact approved HTML', async () => {
+  const path = '/api/classroom-media/tbpub_' + 'a'.repeat(24) + '/media/atlas.png';
+  const audioPath = path.replace('media/atlas.png', 'audio/teacher.wav');
+  const atlas = Buffer.alloc(2 * 1024 * 1024, 39);
+  const audio = Buffer.from('reviewed narration bytes');
+  const original = '<!doctype html><html><body>' + `<img src="${path}">`.repeat(200)
+    + `<script>const picture=${JSON.stringify(path)};const audio=${JSON.stringify(audioPath)};</script></body></html>`;
+  const bundled = embedTextbookSceneMedia(original, [
+    {path, mimeType:'image/png', base64:atlas.toString('base64')},
+    {path:audioPath, mimeType:'audio/wav', base64:audio.toString('base64')},
+  ]);
+  assert.ok(Buffer.byteLength(bundled) < 3 * 1024 * 1024);
+  assert.equal((bundled.match(/<script>/g) || []).length, 1);
+  assert.equal((bundled.match(/<\/script>/g) || []).length, 1);
+  let restored = '';
+  const blobs = [];
+  vm.runInNewContext(bundled.split('<script>')[1].split('</script>')[0], {
+    atob, Uint8Array, Blob,
+    URL: {createObjectURL(blob) {blobs.push(blob);return 'blob:verified-' + blobs.length;}},
+    document: {open() {}, write(value) {restored += value;}, close() {}},
+  });
+  assert.equal(restored, original.split(path).join('blob:verified-1').split(audioPath).join('blob:verified-2'));
+  assert.deepEqual(Buffer.from(await blobs[0].arrayBuffer()), atlas);
+  assert.deepEqual(Buffer.from(await blobs[1].arrayBuffer()), audio);
+  assert.deepEqual(blobs.map(blob => blob.type), ['image/png','audio/wav']);
+});
 
 test('fixed textbook permits only its published snapshot and exact archived media', () => {
   const runtime = { purpose: 'fixed_textbook', classroomId: 'tbpub_one',
@@ -984,6 +1013,69 @@ test("student HTTP gateway proxies only classroom avatar assets", async () => {
   const legacy = await fetch(`${gateway}/logo-horizontal.png`, { headers });
   assert.equal(legacy.status, 404);
   assert.deepEqual(upstreamPaths, ["/avatars/teacher-2.png"]);
+});
+
+test("formal teacher portraits allow only four authenticated GET or HEAD asset paths", async () => {
+  const paths = [
+    "/teachers/mi-chinese-v1.png", "/teachers/ashu-math-v1.png",
+    "/teachers/coco-english-v1.png", "/teachers/ke-science-v1.png",
+  ];
+  const runtime = { classroomId: "classroom-a" };
+  const fixed = { ...runtime, purpose: "fixed_textbook" };
+  for (const authorize of [authorizeRuntimeRequest, authorizeTextbookRequest]) {
+    const scope = authorize === authorizeTextbookRequest ? fixed : runtime;
+    for (const path of paths) {
+      for (const method of ["GET", "HEAD"]) {
+        assert.deepEqual(authorize({ method }, new URL(path, "https://runtime.test"), scope),
+          { allowed: true, kind: "asset" });
+      }
+      for (const method of ["POST", "PUT", "PATCH", "DELETE"]) {
+        assert.equal(authorize({ method }, new URL(path, "https://runtime.test"), scope).allowed, false);
+      }
+    }
+    for (const path of ["/teachers/unknown.png", "/teachers/ke-science-v1.png/private", "/teachers/ke-science-v2.png"]) {
+      for (const method of ["GET", "HEAD"])
+        assert.equal(authorize({ method }, new URL(path, "https://runtime.test"), scope).allowed, false);
+    }
+  }
+  // A conversation-only probe never acquires the classroom asset boundary.
+  assert.equal(authorizeRuntimeRequest({ method: "GET" }, new URL(paths[0], "https://runtime.test"),
+    { ...runtime, purpose: "conversation_probe" }).allowed, false);
+  const backend = await listen(http.createServer(async (request, response) => {
+    const body = await jsonBody(request);
+    if (request.url.endsWith("/validate") && body.runtimeToken === "omr_good") {
+      return reply(response, { ok: true, runtimeSessionId: "rs1", learningSessionId: "ls1",
+        classroomId: "classroom-a", expiresAt: Date.now() + 60_000 });
+    }
+    response.writeHead(401); response.end();
+  }));
+  const upstreamRequests = [];
+  const bytes = Buffer.from("pinned-portrait-test-bytes");
+  const upstream = await listen(http.createServer((request, response) => {
+    assert.ok(paths.includes(request.url));
+    assert.ok(["GET", "HEAD"].includes(request.method));
+    upstreamRequests.push([request.method, request.url]);
+    response.writeHead(200, { "content-type": "image/png", "content-length": String(bytes.length) });
+    response.end(request.method === "HEAD" ? undefined : bytes);
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const headers = { cookie: "mira_openmaic_runtime=omr_good" };
+  for (const path of paths) {
+    const get = await fetch(gateway + path, { headers });
+    assert.equal(get.status, 200);
+    assert.equal(get.headers.get("content-type"), "image/png");
+    assert.deepEqual(Buffer.from(await get.arrayBuffer()), bytes);
+    const head = await fetch(gateway + path, { method: "HEAD", headers });
+    assert.equal(head.status, 200);
+    assert.equal((await head.arrayBuffer()).byteLength, 0);
+  }
+  const before = upstreamRequests.length;
+  assert.equal((await fetch(gateway + "/teachers/unknown.png", { headers })).status, 403);
+  assert.equal((await fetch(gateway + paths[0], { method: "POST", headers })).status, 403);
+  for (const method of ["GET", "HEAD"])
+    assert.equal((await fetch(gateway + paths[0], { method })).status, 401);
+  assert.equal(upstreamRequests.length, before);
+  assert.equal(before, 8);
 });
 
 test("student HTTP gateway never caches Next runtime chunks but may cache immutable assets", async () => {

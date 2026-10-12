@@ -32,7 +32,13 @@ class TextbookClassroomService:
                                              signer_kwargs={'digest_method': hashlib.sha256})
         self.public_url = public_url.rstrip('/')
 
-    def _release(self, conn, key, child):
+    def _release(self, conn, key, child, *, access_scope='selected_textbook'):
+        if access_scope == 'published_directory':
+            from services.textbook_directory_access import published_release
+            build, release, course, _ = published_release(self.repository, conn, key, child)
+            return build, release, course
+        if access_scope != 'selected_textbook':
+            fail()
         if not isinstance(key, str) or KEY.fullmatch(key) is None:
             fail()
         build = self.repository.get_build(conn, key)
@@ -58,14 +64,14 @@ class TextbookClassroomService:
             fail()
         return build, release, course
 
-    def launch(self, token, key):
+    def launch(self, token, key, *, access_scope='published_directory'):
         context = self.auth.authenticate(token)
         principal = context['principal']
         with self.repository.transaction() as conn:
             child = self.repository.child(conn, principal['family_id'], principal['child_id'], lock=True)
             if child is None:
                 fail()
-            build, release, course = self._release(conn, key, child)
+            build, release, course = self._release(conn, key, child, access_scope=access_scope)
             task, _ = self.learning.assign_catalog_task(conn, family_id=child['family_id'], child_id=child['id'],
                 course=course, created_by=principal['id'], now=now_ms())
             session, _ = self.learning.create_or_get_session(conn, family_id=child['family_id'], child_id=child['id'],
@@ -73,13 +79,17 @@ class TextbookClassroomService:
             self.learning.mark_task_in_progress(conn, family_id=child['family_id'], task_id=task['id'], now=now_ms())
             authority = {'purpose': 'ticket', 'key': key, 'release': release['sha256'],
                 'studentSession': context['session']['id'], 'learningSession': session['id'],
-                'gradeRevision': int(child['grade_selection_revision'])}
+                'gradeRevision': int(child['grade_selection_revision']), 'accessScope': access_scope}
             directory = self.repository.get_revision(conn, build['edition_id'], build['revision_id'])
-            unit, _ = lesson_by_id(self.repository.manifest(directory), build['node_id'])
+            if release.get('assessmentMode') == 'ungraded':
+                from content.textbook_batch_release import activity_unit
+                unit = activity_unit(self.repository.manifest(directory), self.repository.parse(build['input_json']))
+            else:
+                unit, _ = lesson_by_id(self.repository.manifest(directory), build['node_id'])
         ticket = 'tbpt_' + self.signer.dumps(authority)
         return {'ok': True, 'launchUrl': self.public_url + '/mira/textbook-launch?' + urlencode({'ticket': ticket}),
             'title': course['title'], 'editionId': build['edition_id'], 'revisionId': build['revision_id'],
-            'unitId': unit['unitId'], 'contentKey': key, 'learningSessionId': session['id']}
+            'unitId': unit['unitId'] if unit else None, 'contentKey': key, 'learningSessionId': session['id']}
 
     def _authority(self, token, *, purpose='runtime'):
         prefix, age = ('tbpt_', 90) if purpose == 'ticket' else ('tbpr_', 14400)
@@ -99,7 +109,8 @@ class TextbookClassroomService:
             child = self.repository.child(conn, principal['family_id'], principal['child_id'])
             if child is None or data.get('gradeRevision') != int(child['grade_selection_revision']):
                 fail('年级已变化，请返回书包')
-            build, release, course = self._release(conn, data.get('key'), child)
+            build, release, course = self._release(conn, data.get('key'), child,
+                access_scope=data.get('accessScope', 'selected_textbook'))
             session = self.learning.get_session(conn, family_id=child['family_id'], session_id=data.get('learningSession'))
             if (session is None or session['child_id'] != child['id'] or session['course_id'] != course['id']
                     or session['course_version'] != course['version'] or data.get('release') != release['sha256']):
@@ -223,10 +234,14 @@ class TextbookClassroomService:
         # depend on replaying the legacy HTML introduction to the final action.
         required_audio = [s['id'] for s in scenes if not textbook_activity.supported(release)
                           or s['id'] not in textbook_activity.definition(release=release).plan['sceneIds'].values()]
+        # Ungraded content records viewing only. Visiting a page is never an
+        # independent game result, a quiz grade, or evidence of subject mastery.
+        ungraded_ready = (release.get('assessmentMode') == 'ungraded' and len(visited) == len(scenes)
+                          and all(scene_id in completed_scenes for scene_id in required_audio))
         return {'ok': True, 'schemaVersion': RECEIPT_SCHEMA, 'runtimeSessionId': session['id'],
             'learningSessionId': session['id'], 'classroomId': release['classroomId'], 'releaseId': release['sha256'],
             'lastSequence': state['lastSequence'], 'nextSequence': state['lastSequence'] + 1, 'completed': complete,
-            'completionReady': textbook_activity.complete(state) if (play or {}).get('flowVersion') == 2 else bool(state['quiz'] and len(visited) == len(scenes)
+            'completionReady': ungraded_ready if release.get('assessmentMode') == 'ungraded' else textbook_activity.complete(state) if (play or {}).get('flowVersion') == 2 else bool(state['quiz'] and len(visited) == len(scenes)
                                     and all(scene_id in completed_scenes for scene_id in required_audio)
                                     and (complete or not textbook_activity.supported(release)
                                          or textbook_activity.complete(state))),
@@ -296,6 +311,8 @@ class TextbookClassroomService:
             state = self._state(session)
             if answers is None:
                 return {'ok': True, 'result': state['quiz']}
+            if release.get('assessmentMode') == 'ungraded':
+                raise ApiError('textbook_activity_ungraded', '这份探索不提供评分或掌握度测评', 409)
             if textbook_activity.supported(release):
                 raise ApiError('textbook_play_required', '请刷新课堂，逐题完成互动练习', 409)
             result = grade_answers(release, answers)
@@ -372,4 +389,5 @@ class TextbookClassroomService:
         conn.execute("UPDATE learning_sessions SET status='completed',completed_at=?,classroom_completed_at=?,updated_at=? WHERE id=?",
                      (now_ms(), now_ms(), now_ms(), session['id']))
         self.learning.mark_task_completed(conn, family_id=child['family_id'], task_id=session['task_id'],
-            summary=f'教材课练习答对 {result["correctCount"]}/{result["totalQuestions"]} 题。', now=now_ms())
+            summary=(f'教材课练习答对 {result["correctCount"]}/{result["totalQuestions"]} 题。' if result is not None
+                     else '已浏览本次教学活动；未进行独立能力测评。'), now=now_ms())

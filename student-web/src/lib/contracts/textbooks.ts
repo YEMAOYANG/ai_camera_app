@@ -26,6 +26,11 @@ const bookFields = {
   sourceUrl, unitCount: z.number().int().nonnegative(), lessonCount: z.number().int().nonnegative(),
 };
 export const textbookBookSchema = z.object(bookFields);
+const activityCourseSchema = z.object({
+  courseId: z.string().min(1), courseVersion: z.string().min(1), contentKey: hash,
+  delivery: z.literal("fixed_textbook"), title: z.string().min(1), nodeId: textbookIdSchema,
+  kind: z.enum(["book_exploration", "unit_guide"]), assessmentMode: z.literal("ungraded"),
+});
 const discoveryItem = z.object({ label: z.string().min(1).max(40), response: z.string().min(1).max(180) });
 const stepFields = { title: z.string().min(1).max(80), body: z.string().min(1).max(220) };
 const pictureSegmentSchema = z.object({
@@ -73,16 +78,19 @@ export const textbookCatalogSchema = z.object({
     title: z.string(), subject: textbookSubjectSchema, editionId: textbookIdSchema,
     revisionId: textbookIdSchema, nodeId: textbookIdSchema, current: z.boolean(),
     delivery: z.literal("fixed_textbook").optional() }).nullable().optional(),
-  books: z.array(z.object({ ...bookFields, selected: z.boolean(), selectionRevision: z.number().int().nonnegative(), currentNodeId: textbookIdSchema.nullable(), learningStatus: z.object({status: z.enum(["ready", "unpublished", "locked"]), availableLessonCount: z.number().int().nonnegative(), completedLessonCount: z.number().int().nonnegative()}).optional() })),
+  books: z.array(z.object({ ...bookFields, selected: z.boolean(), accessMode: z.literal("published").optional(), selectionRevision: z.number().int().nonnegative(), currentNodeId: textbookIdSchema.nullable(), learningStatus: z.object({status: z.enum(["ready", "unpublished", "locked"]), availableLessonCount: z.number().int().nonnegative(), availableActivityCount: z.number().int().nonnegative().optional(), completedLessonCount: z.number().int().nonnegative()}).optional() })),
 });
 export const textbookContentsSchema = z.object({
   ok: z.literal(true), schemaVersion: z.literal("mira.learning.textbooks.v1"), book: textbookBookSchema,
   selected: z.boolean(), selectionRevision: z.number().int().nonnegative(), currentNodeId: textbookIdSchema.nullable(),
+  accessMode: z.literal("published").optional(),
   introduction: textbookIntroductionSchema.nullable().optional(),
+  explorationCourse: activityCourseSchema.refine(course => course.kind === "book_exploration").nullable().optional(),
   units: z.array(z.object({
     unitId: textbookIdSchema, title: z.string(), sequence: z.number().int().positive(),
     kind: z.enum(["unit", "orientation"]).default("unit"),
     introduction: textbookIntroductionSchema.nullable().optional(),
+    guideCourse: activityCourseSchema.refine(course => course.kind === "unit_guide").nullable().optional(),
     lessons: z.array(z.object({
       nodeId: textbookIdSchema, title: z.string(), sequence: z.number().int().positive(),
       sectionTitle: z.string().min(1).max(500).optional(),
@@ -92,7 +100,7 @@ export const textbookContentsSchema = z.object({
         delivery: z.literal("fixed_textbook").optional() }).nullable(),
     }).refine(node => (node.status === "ready") === (node.course !== null))),
   })),
-}).refine(data => data.selected || data.units.every(unit => unit.lessons.every(lesson => lesson.course === null)))
+}).refine(data => data.selected || data.accessMode === "published" || (!data.explorationCourse && data.units.every(unit => !unit.guideCourse && unit.lessons.every(lesson => lesson.course === null))))
   .refine(data => {
     const guides = [data.introduction, ...data.units.map(unit => unit.introduction)].filter(Boolean);
     const nodes = new Set(data.units.flatMap(unit => unit.lessons.map(lesson => lesson.nodeId)));
@@ -110,5 +118,5 @@ export type PictureGuideSegment = z.infer<typeof pictureSegmentSchema>;
 export const textbookLaunchSchema = z.object({
   ok: z.literal(true), contentKey: hash, title: z.string().min(1),
   editionId: textbookIdSchema, revisionId: textbookIdSchema,
-  unitId: textbookIdSchema, learningSessionId: z.string().min(1), launchUrl: z.string().url(),
+  unitId: textbookIdSchema.nullable(), learningSessionId: z.string().min(1), launchUrl: z.string().url(),
 });

@@ -13,7 +13,44 @@ from content.textbook_catalog import canonical, digest
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from services.textbook_batch_audio import _external_once, build_audio_plan
 from services.textbook_batch_generation_service import atomic_json
-from services.textbook_batch_queue_audio_service import TextbookBatchQueueAudioService, structural_review
+from services.textbook_batch_queue_audio_service import TextbookBatchQueueAudioService, structural_review, _Markup
+
+
+class PictureStructureTest(unittest.TestCase):
+    def signature(self, content):
+        markup = _Markup('<button data-mira-picture-choice="picture">' + content + '</button>')
+        self.assertEqual(len(markup.choices), 1)
+        return digest(markup.choices[0])
+
+    def test_actual_svg_ancestor_positions_are_part_of_picture_identity(self):
+        def birds(chick, duck):
+            return ('<svg viewBox="0 0 640 400"><g transform="translate'+chick+'">'
+                    '<circle r="20" fill="yellow"/></g><g transform="translate'+duck+'">'
+                    '<ellipse rx="30" ry="15" fill="white"/></g></svg>')
+        ahead = self.signature(birds('(390 230)', '(220 230)'))
+        behind = self.signature(birds('(220 230)', '(390 230)'))
+        beside = self.signature(birds('(315 150)', '(315 310)'))
+        self.assertEqual(len({ahead, behind, beside}), 3)
+
+    def test_equivalent_transforms_and_labels_cannot_fake_distinct_graphics(self):
+        plain = '<svg><rect width="20" height="10"/></svg>'
+        decorated = '<svg><g id="different" aria-label="another picture" transform="translate(0,0) rotate(360)"><rect width="20" height="10"/></g><g transform="translate(99 99)"></g></svg>'
+        self.assertEqual(self.signature(plain), self.signature(decorated))
+        positioned = '<svg><g transform="translate(10 20)"><rect width="20" height="10"/></g></svg>'
+        equivalent = '<svg><g transform="translate(5,10)"><g transform="scale(1) matrix(1 0 0 1 5 10)"><rect width="20" height="10"/></g></g></svg>'
+        self.assertEqual(self.signature(positioned), self.signature(equivalent))
+        self.assertNotEqual(self.signature(plain), self.signature(positioned))
+
+    def test_group_scope_ends_before_sibling_and_empty_groups_are_not_shapes(self):
+        grouped = '<svg><g transform="translate(10 20)"><circle r="10"/></g><rect width="20" height="10"/></svg>'
+        markup = _Markup('<button data-mira-picture-choice="a">'+grouped+'</button>')
+        shapes = dict((tag, attrs) for tag, attrs in markup.choices[0])
+        self.assertIn('svgAncestorTransform', shapes['circle'])
+        self.assertNotIn('svgAncestorTransform', shapes['rect'])
+        empty = _Markup('<button data-mira-picture-choice="a"><svg><g transform="translate(5 8)"></g></svg></button>')
+        self.assertFalse(any(tag in {'path', 'rect', 'circle', 'ellipse', 'img'} for tag, _ in empty.choices[0]))
+        with self.assertRaisesRegex(ValueError, 'picture_svg_transform_invalid'):
+            self.signature('<svg><g transform="translate(1 nope)"><circle r="10"/></g></svg>')
 
 
 class QueueAudioTest(unittest.TestCase):
@@ -125,6 +162,20 @@ function finish(){window.miraNarrate('done');}"""
         self.assertIn("emoji_in_scene_source", review["issues"])
         self.assertIn("pictures:distinct_meaningful_picture_container_structure_missing", review["issues"])
         self.runtime.start_formal_audio_tts.assert_not_called()
+
+    def test_group_position_pictures_pass_without_lowering_picture_count_or_duplicate_guard(self):
+        source = self.classroom["scenes"][0]["content"]["html"]
+        source = source.replace('<svg><rect width="20" height="10"/></svg>',
+            '<svg><g transform="translate(15 0)"><rect width="20" height="10"/></g></svg>')
+        source = source.replace('<svg><circle r="10"/></svg>',
+            '<svg><g transform="translate(0 15)"><rect width="20" height="10"/></g></svg>')
+        self.classroom["scenes"][0]["content"]["html"] = source
+        self.save_classroom()
+        self.assertEqual(structural_review(self.folder, self.media_root)['issues'], [])
+        self.classroom["scenes"][0]["content"]["html"] = source.replace('translate(0 15)', 'translate(15 0)')
+        self.save_classroom()
+        self.assertIn('pictures:distinct_meaningful_picture_container_structure_missing',
+                      structural_review(self.folder, self.media_root)['issues'])
 
     def test_canvas_label_without_renderer_is_rejected_before_audio(self):
         self.classroom["scenes"][1]["content"]["html"] = self.classroom["scenes"][1]["content"]["html"].replace(

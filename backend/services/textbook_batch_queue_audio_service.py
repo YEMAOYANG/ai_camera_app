@@ -9,6 +9,7 @@ import fcntl
 import hashlib
 from html.parser import HTMLParser
 import json
+import math
 from pathlib import Path
 import re
 import shutil
@@ -28,6 +29,56 @@ from services.textbook_batch_queue_service import TextbookBatchQueueService, doc
 
 SCHEMA = "mira.textbook.queue-audio-state.v1"
 LITERAL_CALL = re.compile(r"window\s*\.\s*miraNarrate\s*\(\s*(['\"])([A-Za-z0-9_-]+)\1\s*\)")
+_IDENTITY = (1., 0., 0., 1., 0., 0.)
+_SVG_NUMBER = r"[-+]?(?:\d*\.\d+|\d+\.?\d*)(?:[eE][-+]?\d+)?"
+
+
+def _affine_product(left, right):
+    a, b, c, d, e, f = left
+    g, h, i, j, k, l = right
+    return (a*g+c*h, b*g+d*h, a*i+c*j, b*i+d*j, a*k+c*l+e, b*k+d*l+f)
+
+
+def _svg_transform(source):
+    """Canonical SVG group placement; labels and empty groups add no identity.
+
+    Only transforms attached to real SVG shape ancestry enter the signature.
+    Equivalent identity/translate/matrix spellings therefore cannot manufacture
+    distinct picture choices, while actual relative positions remain visible.
+    This remains structural evidence, never a picture-meaning approval.
+    """
+    matrix, cursor = _IDENTITY, 0
+    for match in re.finditer(r"([A-Za-z]+)\s*\(([^()]*)\)", source or ""):
+        if (source[cursor:match.start()].strip(" ,\t\r\n") or
+                re.sub(_SVG_NUMBER, "", match[2]).strip(" ,\t\r\n")):
+            raise ValueError("picture_svg_transform_invalid")
+        values = [float(number) for number in re.findall(_SVG_NUMBER, match[2])]
+        if not all(math.isfinite(value) for value in values):
+            raise ValueError("picture_svg_transform_invalid")
+        name = match[1]
+        if name == "matrix" and len(values) == 6:
+            current = tuple(values)
+        elif name == "translate" and len(values) in {1, 2}:
+            current = (1, 0, 0, 1, values[0], values[1] if len(values) == 2 else 0)
+        elif name == "scale" and len(values) in {1, 2}:
+            current = (values[0], 0, 0, values[-1], 0, 0)
+        elif name == "rotate" and len(values) in {1, 3}:
+            angle = math.radians(values[0])
+            current = (math.cos(angle), math.sin(angle), -math.sin(angle), math.cos(angle), 0, 0)
+            if len(values) == 3:
+                x, y = values[1:]
+                current = _affine_product((1, 0, 0, 1, x, y),
+                    _affine_product(current, (1, 0, 0, 1, -x, -y)))
+        elif name in {"skewX", "skewY"} and len(values) == 1:
+            tangent = math.tan(math.radians(values[0]))
+            current = (1, 0, tangent, 1, 0, 0) if name == "skewX" else (1, tangent, 0, 1, 0, 0)
+        else:
+            raise ValueError("picture_svg_transform_invalid")
+        matrix = _affine_product(matrix, current)
+        cursor = match.end()
+    if (source or "")[cursor:].strip(" ,\t\r\n") or not all(math.isfinite(value) for value in matrix):
+        raise ValueError("picture_svg_transform_invalid")
+    return tuple(round(value, 12) + 0. for value in matrix)
 
 
 class _Markup(HTMLParser):
@@ -35,6 +86,7 @@ class _Markup(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.tags, self.scripts, self.choices = [], [], []
         self._script, self._choice, self._depth = None, None, 0
+        self._svg_stack = []
         self.feed(source)
 
     def handle_starttag(self, tag, attrs):
@@ -42,14 +94,21 @@ class _Markup(HTMLParser):
         self.tags.append((tag, attrs))
         if self._choice is not None:
             if tag in {"svg", "path", "rect", "circle", "ellipse", "polygon", "polyline", "line", "img"}:
-                self._choice.append((tag, {key: value for key, value in attrs.items()
-                                          if key not in {"id", "aria-label", "title"}}))
+                graphic = {key: value for key, value in attrs.items()
+                           if key not in {"id", "aria-label", "title"}}
+                if self._svg_stack and self._svg_stack[-1][1] != _IDENTITY:
+                    graphic["svgAncestorTransform"] = self._svg_stack[-1][1]
+                self._choice.append((tag, graphic))
+            if tag == "svg" or (tag == "g" and self._svg_stack):
+                parent = self._svg_stack[-1][1] if self._svg_stack else _IDENTITY
+                matrix = _affine_product(parent, _svg_transform(attrs.get("transform", "")))
+                self._svg_stack.append((tag, tuple(round(value, 12) + 0. for value in matrix)))
             if tag not in {"img", "input", "meta", "br", "hr", "source", "link"}:
                 self._depth += 1
         if "data-mira-picture-choice" in attrs:
             if self._choice is not None:
                 raise ValueError("nested_picture_choice_ambiguous")
-            self._choice, self._depth = [], 1
+            self._choice, self._depth, self._svg_stack = [], 1, []
         if tag == "script":
             self._script = {"attrs": attrs, "code": ""}
             self.scripts.append(self._script)
@@ -63,6 +122,10 @@ class _Markup(HTMLParser):
         if tag == "script":
             self._script = None
         if self._choice is not None:
+            if tag in {"g", "svg"} and self._svg_stack:
+                if self._svg_stack[-1][0] != tag:
+                    raise ValueError("picture_svg_group_nesting_invalid")
+                self._svg_stack.pop()
             self._depth -= 1
             if self._depth == 0:
                 self.choices.append(self._choice)
@@ -71,6 +134,94 @@ class _Markup(HTMLParser):
     def handle_data(self, text):
         if self._script is not None:
             self._script["code"] += text
+
+
+def _reviewed_word_observation(frozen, scene, source):
+    """Allow shared context pictures in exact sequential word observations only.
+
+    Answer choices still require distinct pictures. The bounded observation
+    renderer shows one reviewed target character at a time, each with narration.
+    """
+    design = frozen.get("activityDesign", {})
+    scope = frozen.get("reviewedLessonScope") or {}
+    planned = next((s for s in design.get("scenes", []) if s.get("sceneId") == scene.get("id")), {})
+    cards = planned.get("cards", [])
+    if (design.get("lessonFamily") not in {"chinese_word_contexts_v1", "chinese_integrated_review_v1"}
+            or frozen.get("binding", {}).get("subject") != "chinese"
+            or len(cards) < 3 or len({c.get("character") for c in cards}) != len(cards)
+            or {c.get("character") for c in cards} != set(scope.get("recognizedCharacters", []))):
+        return False
+    from content.chinese_word_activity import cards_scene
+    assets = {a["assetId"]: a["svgMarkup"] for a in design.get("assetPlan", [])}
+    if any(c.get("assetId") not in assets for c in cards):
+        return False
+    # Require real picture geometry independently of the target text.
+    graphics = []
+    for card in cards:
+        markup = _Markup('<div data-mira-picture-choice="picture">'+assets[card["assetId"]]+'</div>')
+        if not markup.choices or not any(tag in {"path", "rect", "circle", "ellipse", "polygon", "polyline", "line", "img"}
+                                         for tag, _ in markup.choices[0]):
+            return False
+        graphics.append(digest(markup.choices[0]))
+    return len(set(graphics)) >= 2 and source == cards_scene(planned, assets)
+
+
+def _reviewed_dictionary_practice(frozen, scene, source):
+    """Allow target glyph choices only in the exact narrated lookup renderer."""
+    design = frozen.get("activityDesign", {})
+    scope = frozen.get("reviewedLessonScope") or {}
+    planned = next((s for s in design.get("scenes", []) if s.get("sceneId") == scene.get("id")), {})
+    if (design.get("lessonFamily") != "chinese_integrated_review_v1"
+            or frozen.get("binding", {}).get("subject") != "chinese"
+            or planned.get("renderer") != "dictionary_lookup"):
+        return False
+    from content.chinese_dictionary_activity import dictionary_scene, validate_scene
+    assets = {a["assetId"]: a["svgMarkup"] for a in design.get("assetPlan", [])}
+    try:
+        validate_scene(planned, assets, scope)
+        graphics = []
+        for entry in planned["entries"]:
+            markup = _Markup('<div data-mira-picture-choice="picture">'+assets[entry['sourceAssetId']]+'</div>')
+            if not markup.choices or not any(tag in {"path", "circle", "ellipse", "polygon", "polyline", "img"}
+                                              for tag, _ in markup.choices[0]):
+                return False
+            graphics.append(digest(markup.choices[0]))
+        return bool(graphics) and source == dictionary_scene(planned, assets)
+    except (ValueError, KeyError, TypeError):
+        return False
+
+
+def _reviewed_deepseek_picture_pages(frozen, scene, source):
+    """Permit repeated illustrations across separate exact-template pages.
+
+    Distinct choices are still required within every question. A narration or
+    oral-expression page may show one relevant scene; this never approves its
+    meaning or its instructional depth.
+    """
+    design = frozen.get("activityDesign", {})
+    if design.get("lessonFamily") != "deepseek_picture_book_v1":
+        return False
+    planned = next((s for s in design.get("scenes", []) if s.get("sceneId") == scene.get("id")), {})
+    if planned.get("renderer") != "deepseek_picture_pages":
+        return False
+    assets = design.get("compiledImageAssets", {})
+    pages = planned.get("pages", [])
+    if not pages:
+        return False
+    for page in pages:
+        if page.get("assetKey") not in assets or page.get("kind") not in {"observe", "oral_response", "choose_picture"}:
+            return False
+        choices = page.get("choices", [])
+        if page["kind"] == "choose_picture":
+            if len(choices) < 2 or any(c.get("assetKey") not in assets for c in choices):
+                return False
+            signatures = [digest({k: assets[c["assetKey"]].get(k) for k in ("sha256", "crop")}) for c in choices]
+            if len(set(signatures)) != len(signatures):
+                return False
+        elif choices:
+            return False
+    from content.textbook_deepseek_activity import pages_scene
+    return source == pages_scene(planned, assets)
 
 
 def structural_review(folder, classroom_directory=DEFAULT_CLASSROOM_DIRECTORY):
@@ -150,7 +301,11 @@ def structural_review(folder, classroom_directory=DEFAULT_CLASSROOM_DIRECTORY):
         graphics = [digest(graphic) for graphic in markup.choices if any(
             tag in {"path", "rect", "circle", "ellipse", "polygon", "polyline", "line", "img"}
             for tag, _ in graphic)]
-        if low and widget != "visualization3d" and (len(graphics) < 2 or len(set(graphics)) != len(graphics)):
+        word_observation = _reviewed_word_observation(frozen, scene, source)
+        dictionary_practice = _reviewed_dictionary_practice(frozen, scene, source)
+        deepseek_picture_pages = _reviewed_deepseek_picture_pages(frozen, scene, source)
+        if (low and widget != "visualization3d" and not word_observation and not dictionary_practice and not deepseek_picture_pages
+                and (len(graphics) < 2 or len(set(graphics)) != len(graphics))):
             issues.append(prefix + "distinct_meaningful_picture_container_structure_missing")
         if low and len([attrs for tag, attrs in markup.tags if tag == "meta"
                 and attrs.get("name") == "mira-responsive-activity"
@@ -204,6 +359,9 @@ def structural_review(folder, classroom_directory=DEFAULT_CLASSROOM_DIRECTORY):
             "finiteCueCount": len(cue_map), "literalCallCount": len(calls),
             "cueIds": sorted(cue_map),
             "pictureGraphicCount": len(graphics), "videoCount": video_count,
+            "reviewedSequentialWordObservation": word_observation,
+            "reviewedDictionaryTargetGlyphPractice": dictionary_practice,
+            "reviewedDeepSeekPicturePages": deepseek_picture_pages,
             "videoSources": video_sources,
             "rendererStructure": ("three_scene_graph" if three_renderer else "native_webgl_mesh" if native_renderer
                                   else "unverified") if widget == "visualization3d" else None,

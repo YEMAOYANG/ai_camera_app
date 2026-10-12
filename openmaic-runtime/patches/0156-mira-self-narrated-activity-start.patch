@@ -1,0 +1,63 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -1510,6 +1510,12 @@
+           : 'fresh';
+     const showStudentStartGate = shouldShowMiraStudentStartGate({
+       nativeActivity: Boolean(currentScene?.miraActivity),
++      selfNarratedActivity: Boolean(
++        (stage as { fixedTextbook?: boolean; miraUngradedActivity?: boolean } | null)?.fixedTextbook &&
++        (stage as { miraUngradedActivity?: boolean } | null)?.miraUngradedActivity &&
++        currentScene?.type === 'interactive' &&
++        currentScene.actions?.length === 0,
++      ),
+       studentMode,
+       lectureStarted: studentAutoPlayRuntime?.audioStartAccepted ?? false,
+       resumeStatus: studentResumeStatus,
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -103,20 +103,22 @@
+ /** Browsers require a direct user gesture before a classroom can reliably play audio. */
+ export function shouldShowMiraStudentStartGate({
+   nativeActivity = false,
++  selfNarratedActivity = false,
+   studentMode,
+   lectureStarted,
+   resumeStatus,
+   hasScene,
+ }: {
+   nativeActivity?: boolean;
++  selfNarratedActivity?: boolean;
+   readonly studentMode: boolean;
+   readonly lectureStarted: boolean;
+   readonly resumeStatus: 'checking' | 'fresh' | 'resumed';
+   readonly hasScene: boolean;
+ }): boolean {
+-  // Native activities have their own direct-gesture audio controls and no
++  // Native and released self-narrated activities have direct-gesture controls and no
+   // lecture engine; a lecture-start overlay would permanently block them.
+-  return !nativeActivity && studentMode && hasScene && resumeStatus === 'fresh' && !lectureStarted;
++  return !nativeActivity && !selfNarratedActivity && studentMode && hasScene && resumeStatus === 'fresh' && !lectureStarted;
+ }
+ 
+ export function getMiraEffectiveAsrEnabled({
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -135,6 +135,15 @@
+         lectureStarted: false,
+         resumeStatus: 'fresh',
+         hasScene: true,
++        selfNarratedActivity: true,
++      }),
++    ).toBe(false);
++    expect(
++      shouldShowMiraStudentStartGate({
++        studentMode: true,
++        lectureStarted: false,
++        resumeStatus: 'fresh',
++        hasScene: true,
+         nativeActivity: true,
+       }),
+     ).toBe(false);

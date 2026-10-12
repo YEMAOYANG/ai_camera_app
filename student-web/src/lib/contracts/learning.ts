@@ -169,6 +169,8 @@ export const learningLibraryBucketSchema = z.enum(["continue", "makeup", "all", 
 export const learningLibrarySourceSchema = z.literal("backend");
 
 export const learningSubjectSchema = z.enum(["chinese", "math", "english"]);
+// Teacher availability is separate from the legacy course/practice domain.
+export const teacherSubjectSchema = z.enum(["chinese", "math", "english", "science"]);
 
 export const learningProgressionSchema = z.object({
   schemaVersion: z.literal("mira.learning.progression.v1"),
@@ -296,7 +298,7 @@ export const learningTeacherProfileSchema = z.object({
   version: z.number().int().positive(),
   displayName: z.string().trim().min(1).max(80),
   avatarPath: z.string().startsWith("/teachers/").max(200),
-  subject: learningSubjectSchema,
+  subject: teacherSubjectSchema,
   languageCode: z.string().trim().min(2).max(24),
   teachingStyle: z.string().trim().min(1).max(80),
   capabilities: z.array(z.string().trim().min(1).max(80)).min(1).max(32),
@@ -312,13 +314,14 @@ export const learningTeachersResponseSchema = z.object({
   registryVersion: z.enum([
     "mira.teacher-registry.v1",
     "mira.teacher-registry.v2",
+    "mira.teacher-registry.v3",
   ]),
   items: z.array(learningTeacherProfileSchema),
   selected: learningTeacherSelectionSchema.nullable(),
 }).strict();
 
 export const learningTeacherPreferenceRequestSchema = z.object({
-  subject: learningSubjectSchema,
+  subject: teacherSubjectSchema,
   teacherProfileId: z.string().trim().min(1).max(80),
   teacherProfileVersion: z.number().int().positive(),
 }).strict();
@@ -326,7 +329,7 @@ export const learningTeacherPreferenceRequestSchema = z.object({
 export const learningTeacherPreferenceResponseSchema = z.object({
   ok: z.literal(true),
   childId: z.string().trim().min(1).max(160),
-  subject: learningSubjectSchema,
+  subject: teacherSubjectSchema,
   teacher: learningTeacherProfileSchema,
   updatedAt: z.number().int().nonnegative(),
 }).strict();
@@ -404,6 +407,7 @@ export type LearningTodayItem = z.infer<typeof learningTodayItemSchema>;
 export type LearningTodayResponse = z.infer<typeof learningTodayResponseSchema>;
 export type LearningLibraryBucket = z.infer<typeof learningLibraryBucketSchema>;
 export type LearningSubject = z.infer<typeof learningSubjectSchema>;
+export type TeacherSubject = z.infer<typeof teacherSubjectSchema>;
 export type LearningProgression = z.infer<typeof learningProgressionSchema>;
 export type LearningLibraryItem = z.infer<typeof learningLibraryItemSchema>;
 export type LearningLibraryResponse = z.infer<typeof learningLibraryResponseSchema>;

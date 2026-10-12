@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LearningTextbooks } from "@/features/learning/learning-textbooks";
 import { textbookContentsSchema } from "@/lib/contracts/textbooks";
 
-const { router, startLearningCourse } = vi.hoisted(() => ({ router: { replace: vi.fn() }, startLearningCourse: vi.fn() }));
+const { router, startLearningCourse } = vi.hoisted(() => ({ router: { replace: vi.fn(), push: vi.fn() }, startLearningCourse: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("@/features/learning/learning-client", async importOriginal => ({ ...await importOriginal<typeof import("@/features/learning/learning-client")>(), startLearningCourse }));
 vi.mock("@/components/student/space-shell", () => ({
@@ -21,6 +21,39 @@ const reply = (value: unknown, status = 200) => new Response(JSON.stringify(valu
 describe("school textbooks", () => {
   beforeEach(() => vi.clearAllMocks());
   afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+
+  it("opens an available edition through its original directory without changing the parent's school book", async () => {
+    const other = { ...book, editionId: "other-chinese-g1", revisionId: "published-v1", volume: "lower" };
+    const guide = { courseId: "guide", courseVersion: "1", contentKey: "a".repeat(64), delivery: "fixed_textbook", title: "看图找春天", nodeId: "guide-u1", kind: "unit_guide", assessmentMode: "ungraded" };
+    const contents = { ...detail(false), book: other, accessMode: "published", units: [{ ...detail().units[0], guideCourse: guide }] };
+    const fetch = vi.fn().mockResolvedValueOnce(reply({ ...catalog(), books: [...catalog().books, { ...other, selected: false, accessMode: "published", selectionRevision: 0, currentNodeId: null }] }))
+      .mockResolvedValueOnce(reply(contents));
+    vi.stubGlobal("fetch", fetch);
+    render(<LearningTextbooks student={student} location={{ editionId: other.editionId, revisionId: other.revisionId }} />);
+    expect(await screen.findByRole("link", { name: "看图找春天" })).toHaveAttribute("href", `/learning/textbooks/courses/${guide.contentKey}`);
+    expect(textbookContentsSchema.safeParse(contents).success).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "查看其他教材版本与册次" }));
+    expect(screen.getByRole("combobox", { name: "选择教材目录（请家长帮忙）" })).toBeVisible();
+    expect(screen.queryByText("家长已确认")).not.toBeInTheDocument();
+    expect(fetch.mock.calls.every(([, options]) => !options?.method || options.method === "GET")).toBe(true);
+    expect(startLearningCourse).not.toHaveBeenCalled();
+  });
+
+  it("opens released exploration and unit guide from the selected book without treating them as lesson mastery", async () => {
+    const guide = { courseId: "guide", courseVersion: "1", contentKey: "a".repeat(64), delivery: "fixed_textbook", title: "看图找朋友", nodeId: "guide-u1", kind: "unit_guide", assessmentMode: "ungraded" };
+    const exploration = { ...guide, contentKey: "b".repeat(64), nodeId: "explore-book", kind: "book_exploration" };
+    const response = { ...detail(), explorationCourse: exploration, units: [{ ...detail().units[0], guideCourse: guide }] };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(reply(catalog())).mockResolvedValueOnce(reply(response)));
+    render(<LearningTextbooks student={student} />);
+    expect(await screen.findByRole("link", { name: "看图找朋友" })).toHaveAttribute("href", `/learning/textbooks/courses/${guide.contentKey}`);
+    expect(screen.getByRole("link", { name: "先认识语文" })).toHaveAttribute("href", `/learning/textbooks/courses/${exploration.contentKey}`);
+    fireEvent.click(screen.getByRole("button", { name: "完整目录" }));
+    expect(screen.getByRole("link", { name: "开始探索" })).toHaveAttribute("href", `/learning/textbooks/courses/${guide.contentKey}`);
+    expect(screen.queryByRole("link", { name: "开始上课" })).not.toBeInTheDocument();
+    expect(startLearningCourse).not.toHaveBeenCalled();
+    expect(textbookContentsSchema.safeParse({ ...response, selected: false }).success).toBe(false);
+    expect(textbookContentsSchema.safeParse({ ...response, explorationCourse: guide }).success).toBe(false);
+  });
 
   it("shows verified order/page and partial coverage without creating a course or choosing for parents", async () => {
     const fetch = vi.fn().mockResolvedValueOnce(reply(catalog())).mockResolvedValueOnce(reply(detail()));

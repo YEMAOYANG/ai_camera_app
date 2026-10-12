@@ -106,6 +106,23 @@ hashes, and does not silently upgrade legacy plans. A low or unknown result
 still stops for explicit reconciliation; the existing one-shot formal
 `.language1` repair lane is unchanged.
 
+Patch `0155` adds a display-only teacher presentation registry, shared byte for
+byte with `backend/content/teacher_presentations.v1.json`. The four entries bind
+the exact formal profile ID, version and content hash to pinned portrait bytes
+under `/teachers/`: the existing Chinese, mathematics and English portraits,
+and the independent science portrait. The patch contains all four PNG assets
+as Git binary patches, so a clean bootstrap preserves the same hashes as
+`student-web/public/teachers/`.
+
+The presentation resolver changes only the in-memory generated-agent registry
+and stage-bound teacher-message display. It does not rewrite a saved classroom,
+teacher profile, voice configuration, audio plan, or narration asset. Unknown
+or mismatched identities retain their original avatar. The public teacher
+library uses `mira.teacher-registry.v3` and includes the existing science profile
+additively; the legacy three-subject course domain and underlying profile-list
+contract remain unchanged. Apply the locked patch chain and rebuild the native
+runtime and Student Web before checking the portraits in the classroom.
+
 ## OpenMAIC v1 professional workbench and Skills
 
 The pinned v1 source keeps OpenMAIC's professional workbench, editable Stage/Scene
@@ -281,6 +298,11 @@ loads project dotenv files, the command also fails closed if `.env`,
 `.env.local`, `.env.production`, or `.env.production.local` exists inside the
 pinned OpenMAIC source tree; server credentials stay in the separate
 `openmaic-runtime/.env` read only by the production start command.
+
+Patch `0156` lets released, ungraded interactive activities with no timeline
+actions use their own prerecorded narration buttons. Their student start gate
+does not wait for a lecture engine that does not exist. Timeline lessons keep
+the explicit audio-start gate, and all classroom controls remain available.
 
 `foreground-openmaic-production` fails closed unless `.next/BUILD_ID` is
 present and non-empty. It executes `next start` with `NODE_ENV=production` and

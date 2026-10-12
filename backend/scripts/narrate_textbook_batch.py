@@ -88,6 +88,8 @@ def main(argv=None):
     parser.add_argument("--candidate-directory", type=Path, required=True)
     parser.add_argument("--classroom-directory", type=Path, default=DEFAULT_CLASSROOM_DIRECTORY)
     parser.add_argument("--output", type=Path, help="Durable audio audit directory; default candidate/audio-audit")
+    parser.add_argument('--allow-page-number-equivalence', action='store_true',
+                        help='Exact Chinese/Arabic page-number spelling only; requires separate audit output')
     parser.add_argument("--audio-language-policy", choices=["english-auto-v1"],
                         help="Opt in to the versioned English Auto TTS/ASR plan; requires a separate --output")
     parser.add_argument("--asr-reconciliation-file", type=Path,
@@ -117,6 +119,10 @@ def main(argv=None):
         if state.get("runtimeOrigin") != runtime.base_url:
             raise ValueError("candidate_belongs_to_different_runtime")
         output = args.output or args.candidate_directory / "audio-audit"
+        if args.allow_page_number_equivalence and (args.output is None
+                or output.name != 'audio-audit-page-numbers-v1'
+                or not output.resolve().is_relative_to(args.candidate_directory.resolve())):
+            raise ValueError('page_number_review_requires_distinct_owned_audit')
 
         def progress(value):
             print(json.dumps({"status": "narrating", "completedSegments": value["completed"],
@@ -126,6 +132,8 @@ def main(argv=None):
         result = narrate_candidate(runtime, classroom, frozen["binding"], output,
                                    args.classroom_directory, progress=progress,
                                    asr_reconciliation=reconciliation, audio_inheritance=inheritance,
+                                   **({'allow_page_number_equivalence': True}
+                                      if args.allow_page_number_equivalence else {}),
                                    **({"audio_language_policy": args.audio_language_policy}
                                       if args.audio_language_policy is not None else {}))
         print(json.dumps({"ok": True, "status": "audio_completed_needs_review",

@@ -9,11 +9,11 @@ import {
 import {
   learningTeacherPreferenceRequestSchema,
   learningTeacherPreferenceResponseSchema,
-  learningSubjectSchema,
+  teacherSubjectSchema,
   learningTeachersResponseSchema,
 } from "@/lib/contracts/learning";
 
-const querySchema = z.object({ subject: learningSubjectSchema.optional() }).strict();
+const querySchema = z.object({ subject: teacherSubjectSchema.optional() }).strict();
 
 export async function GET(request: NextRequest) {
   const query = querySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams));

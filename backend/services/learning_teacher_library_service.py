@@ -3,11 +3,15 @@ from __future__ import annotations
 from typing import Any, Protocol
 
 from content.teacher_profiles import (
-    SUPPORTED_TEACHER_SUBJECTS,
+    SCIENCE_TEACHER_PROFILES,
     TEACHER_PROFILES,
-    TEACHER_REGISTRY_VERSION,
     get_teacher_profile,
     list_teacher_profiles,
+)
+from content.teacher_presentations import (
+    TEACHER_LIBRARY_SUBJECTS,
+    TEACHER_PRESENTATION_REGISTRY_VERSION,
+    public_teacher_payload,
 )
 from core.security import now_ms
 from repositories.learning_teacher_media_repository import (
@@ -50,7 +54,7 @@ class LearningTeacherLibraryService:
     def sync_teacher_registry(self) -> None:
         timestamp = now_ms()
         with self.repository.transaction() as conn:
-            for profile in TEACHER_PROFILES:
+            for profile in (*TEACHER_PROFILES, *SCIENCE_TEACHER_PROFILES):
                 self.repository.sync_teacher_profile(conn, profile=profile, now=timestamp)
 
     def list_teachers(
@@ -61,8 +65,8 @@ class LearningTeacherLibraryService:
         child_id: str | None = None,
     ) -> dict[str, Any]:
         subject_code = str(subject or "").strip().lower()
-        if subject_code and subject_code not in SUPPORTED_TEACHER_SUBJECTS:
-            self._fail("invalid_subject", "subject must be chinese, math, or english")
+        if subject_code and subject_code not in TEACHER_LIBRARY_SUBJECTS:
+            self._fail("invalid_subject", "subject must be chinese, math, english, or science")
         self.sync_teacher_registry()
         selected: dict[str, Any] | None = None
         if child_id or family_id:
@@ -90,9 +94,11 @@ class LearningTeacherLibraryService:
                     "version": int(preference["teacher_profile_version"]),
                 }
         profiles = list_teacher_profiles(subject=subject_code or None)
+        if not subject_code:
+            profiles = (*profiles, *list_teacher_profiles(subject="science"))
         return {
-            "registryVersion": TEACHER_REGISTRY_VERSION,
-            "items": [profile.to_public_payload() for profile in profiles],
+            "registryVersion": TEACHER_PRESENTATION_REGISTRY_VERSION,
+            "items": [public_teacher_payload(profile) for profile in profiles],
             "selected": selected,
         }
 
@@ -143,7 +149,7 @@ class LearningTeacherLibraryService:
         return {
             "childId": str(preference["child_id"]),
             "subject": str(preference["subject"]),
-            "teacher": profile.to_public_payload(),
+            "teacher": public_teacher_payload(profile),
             "updatedAt": int(preference["updated_at"]),
         }
 

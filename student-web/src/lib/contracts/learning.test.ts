@@ -7,10 +7,25 @@ import {
   learningStartResponseSchema,
   learningTeacherPreferenceResponseSchema,
   learningTeachersResponseSchema,
+  learningSubjectSchema,
+  teacherSubjectSchema,
+  learningTeacherPreferenceRequestSchema,
 } from "@/lib/contracts/learning";
 import { lessonFixture, sessionFixture } from "@/test/fixtures/learning";
 
 describe("student learning product contracts", () => {
+  it("adds science only to teacher contracts and keeps the legacy learning scope unchanged", () => {
+    expect(teacherSubjectSchema.parse("science")).toBe("science");
+    expect(learningSubjectSchema.safeParse("science").success).toBe(false);
+    const teacher = { id: "mira_science_inquiry", version: 1, displayName: "小科老师",
+      avatarPath: "/teachers/ke-science-v1.png", subject: "science", languageCode: "zh-CN",
+      teachingStyle: "observe_predict_experiment", capabilities: ["observe_and_describe"] };
+    expect(learningTeachersResponseSchema.parse({ ok: true, registryVersion: "mira.teacher-registry.v3",
+      items: [teacher], selected: null }).items[0]).toEqual(teacher);
+    expect(learningTeacherPreferenceRequestSchema.parse({ subject: "science", teacherProfileId: teacher.id,
+      teacherProfileVersion: 1 }).subject).toBe("science");
+    expect(teacherSubjectSchema.safeParse("history").success).toBe(false);
+  });
   it("retains prerequisite gates and accepts zero only as an unnumbered skill boundary", () => {
     const progression = {
       schemaVersion: "mira.learning.progression.v1",

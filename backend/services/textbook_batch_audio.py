@@ -20,13 +20,17 @@ from content.textbook_audio_language import ENGLISH_AUTO_LANGUAGE_OPTION, ENGLIS
 from content.textbook_catalog import digest
 from content.textbook_interactive_narration import (AUDIO_BLOCK, bind_interactive_audio,
                                                    interactive_cues, without_audio_helper)
-from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
+from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient, OpenMaicFullRuntimeError
 from services.learning_media_materialization_service import asr_similarity_bps
+from content.textbook_number_spelling import page_number_equivalence, validate_page_number_equivalence
 
 
 ASR_RECONCILIATION_SCHEMA = "mira.textbook.batch-asr-reconciliation.v1"
 ASR_RECONCILIATION_REASON = "known_successful_but_low_similarity"
 AUDIO_INHERITANCE_SCHEMA = "mira.textbook.batch-audio-inheritance.v1"
+AUDIO_CLONE_INHERITANCE_SCHEMA = "mira.textbook.batch-audio-inheritance.v2"
+AUDIO_INSERTION_CLONE_SCHEMA = "mira.textbook.batch-audio-inheritance.v3"
+AUDIO_SCENE_INSERTION_CLONE_SCHEMA = "mira.textbook.batch-audio-inheritance.v4"
 AUDIO_INHERITANCE_SET_SCHEMA = "mira.textbook.batch-audio-inheritance-set.v1"
 
 
@@ -90,15 +94,27 @@ def load_asr_reconciliation_file(path):
 
 
 def validate_audio_inheritance(value):
-    if (not isinstance(value, dict) or set(value) != {"schemaVersion", "sourceAudioAuditDirectory",
+    clone = isinstance(value, dict) and value.get("schemaVersion") in {
+        AUDIO_CLONE_INHERITANCE_SCHEMA, AUDIO_INSERTION_CLONE_SCHEMA, AUDIO_SCENE_INSERTION_CLONE_SCHEMA}
+    keys = {"schemaVersion", "sourceAudioAuditDirectory",
             "sourcePlanSha256", "sourceAuditSha256", "sourceSha256", "targetPlanSha256",
             "targetSourceSha256", "segments"}
-            or value.get("schemaVersion") != AUDIO_INHERITANCE_SCHEMA
+    if clone:
+        keys |= {"taskId", "sourceCandidateDirectory", "targetCandidateDirectory"}
+    if (not isinstance(value, dict) or set(value) != keys
+            or value.get("schemaVersion") not in {AUDIO_INHERITANCE_SCHEMA, AUDIO_CLONE_INHERITANCE_SCHEMA, AUDIO_INSERTION_CLONE_SCHEMA, AUDIO_SCENE_INSERTION_CLONE_SCHEMA}
             or not isinstance(value.get("sourceAudioAuditDirectory"), str)
             or not Path(value["sourceAudioAuditDirectory"]).is_absolute()
             or str(Path(value["sourceAudioAuditDirectory"]).resolve()) != value["sourceAudioAuditDirectory"]
             or not isinstance(value.get("segments"), list) or not 1 <= len(value["segments"]) <= 240):
         raise ValueError("invalid_audio_inheritance_manifest")
+    if clone:
+        if not isinstance(value["taskId"], str) or not re.fullmatch(r"[0-9a-f]{64}", value["taskId"]):
+            raise ValueError("invalid_audio_clone_task_identity")
+        for key in ("sourceCandidateDirectory", "targetCandidateDirectory"):
+            if (not isinstance(value[key], str) or not Path(value[key]).is_absolute()
+                    or str(Path(value[key]).resolve()) != value[key]):
+                raise ValueError("invalid_audio_clone_candidate_path")
     for key in ("sourcePlanSha256", "sourceAuditSha256", "sourceSha256", "targetPlanSha256", "targetSourceSha256"):
         if not isinstance(value[key], str) or not re.fullmatch(r"[0-9a-f]{64}", value[key]):
             raise ValueError("invalid_audio_inheritance_manifest")
@@ -360,6 +376,38 @@ def build_audio_plan(classroom, binding, runtime_origin, *, audio_language_polic
     return plan
 
 
+def _verify_clone_lineage(value, source_plan, plan, output):
+    """Verify frozen task identity without inventing new paid-call receipts."""
+    source = Path(value["sourceCandidateDirectory"])
+    target = Path(value["targetCandidateDirectory"])
+    if (source == target or source.is_relative_to(target) or target.is_relative_to(source)
+            or not Path(value["sourceAudioAuditDirectory"]).is_relative_to(source)
+            or not output.resolve().is_relative_to(target)
+            or source_plan["classroomId"] == plan["classroomId"]):
+        raise ValueError("audio_clone_requires_distinct_candidates_and_classrooms")
+    for directory, expected in ((source, source_plan), (target, plan)):
+        if directory.is_symlink():
+            raise ValueError("audio_clone_candidate_symlink")
+        paths = [directory / name for name in ("input.json", "classroom.json")]
+        if any(path.is_symlink() or not path.is_file() for path in paths):
+            raise ValueError("audio_clone_frozen_candidate_required")
+        frozen, room = [json.loads(path.read_text()) for path in paths]
+        if (frozen.get("taskId") != value["taskId"] or frozen.get("binding") != expected["binding"]
+                or frozen.get("inputSha256") != digest({k: v for k, v in frozen.items() if k != "inputSha256"})
+                or room.get("id") != expected["classroomId"] or digest(room) != expected["sourceSha256"]
+                or build_audio_plan(room, frozen["binding"], expected["runtimeOrigin"],
+                    audio_language_policy=audio_language_policy_from_plan(expected)) != expected):
+            raise ValueError("audio_clone_frozen_lineage_mismatch")
+
+
+def same_inherited_teaching_cue(old, new, *, allow_inserted_scenes=False):
+    """Only v4 may shift a scene's index; all other cue fields stay exact."""
+    if not allow_inserted_scenes:
+        return old == new
+    return ({k: v for k, v in old.items() if k != 'sceneOrder'}
+            == {k: v for k, v in new.items() if k != 'sceneOrder'})
+
+
 def _inheritance_targets(value, plan, output, media, teacher):
     if value is None:
         return {}
@@ -380,61 +428,122 @@ def _inheritance_targets(value, plan, output, media, teacher):
         raise ValueError("audio_inheritance_source_evidence_mismatch")
     if _plan_uses_english_auto(source_plan) != _plan_uses_english_auto(plan):
         raise ValueError("audio_inheritance_language_policy_mismatch")
-    for key in ("binding", "teacher", "classroomId", "runtimeOrigin"):
+    inserted_scenes = value["schemaVersion"] == AUDIO_SCENE_INSERTION_CLONE_SCHEMA
+    inserted_cues = value["schemaVersion"] in {AUDIO_INSERTION_CLONE_SCHEMA, AUDIO_SCENE_INSERTION_CLONE_SCHEMA}
+    clone = value["schemaVersion"] in {AUDIO_CLONE_INHERITANCE_SCHEMA, AUDIO_INSERTION_CLONE_SCHEMA, AUDIO_SCENE_INSERTION_CLONE_SCHEMA}
+    identity_keys = ("binding", "teacher", "runtimeOrigin") if clone else ("binding", "teacher", "classroomId", "runtimeOrigin")
+    for key in identity_keys:
         if source_plan.get(key) != plan[key]:
             raise ValueError("audio_inheritance_identity_mismatch")
+    if clone:
+        _verify_clone_lineage(value, source_plan, plan, output)
+    source_media = media
+    if clone:
+        source_id = source_plan["classroomId"]
+        if not isinstance(source_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", source_id):
+            raise ValueError("audio_clone_source_identity_invalid")
+        source_media = media.parent.parent / source_id / "audio"
+        if (source_media.parent.is_symlink() or source_media.is_symlink()
+                or not source_media.resolve().is_relative_to(media.parent.parent.resolve())):
+            raise ValueError("audio_clone_source_media_path_invalid")
     old_workload = {(item["sceneId"], item["id"]): item for item in source_plan["workload"]}
     new_workload = {(item["sceneId"], item["id"]): item for item in plan["workload"]}
     old_segments = {(item["sceneId"], item["segmentId"]): item for item in source_audit["segments"]}
-    if len(old_workload) != len(source_plan["workload"]) or len(old_segments) != len(source_audit["segments"]):
+    if (len(old_workload) != len(source_plan["workload"])
+            or len(new_workload) != len(plan["workload"])
+            or len(old_segments) != len(source_audit["segments"])):
         raise ValueError("audio_inheritance_duplicate_source_identity")
     old_order = {key: index for index, key in enumerate(old_workload)}
     new_order = {key: index for index, key in enumerate(new_workload)}
+    # v3 permits new cues between existing cues, never moving an existing cue.
+    # The exact per-cue payload below still includes scene order, text and kind;
+    # global workload offsets are not part of the original provider identity.
+    if inserted_cues and ([key for key in old_workload if key in new_workload]
+                          != [key for key in new_workload if key in old_workload]):
+        raise ValueError("audio_inheritance_teaching_segment_changed")
+    if inserted_scenes:
+        old_scenes = list(dict.fromkeys(item['sceneId'] for item in source_plan['workload']))
+        new_scenes = list(dict.fromkeys(item['sceneId'] for item in plan['workload']))
+        if old_scenes != [scene for scene in new_scenes if scene in old_scenes]:
+            raise ValueError('audio_inheritance_source_scene_removed_or_reordered')
     targets = {}
     for entry in value["segments"]:
         key = entry["sceneId"], entry["segmentId"]
-        if (key not in old_workload or key not in new_workload or old_workload[key] != new_workload[key]
-                or old_order[key] != new_order[key]):
+        if (key not in old_workload or key not in new_workload
+                or not same_inherited_teaching_cue(old_workload[key], new_workload[key],
+                                                   allow_inserted_scenes=inserted_scenes)
+                or not inserted_cues and old_order[key] != new_order[key]):
             raise ValueError("audio_inheritance_teaching_segment_changed")
         item = new_workload[key]
         source_segment = old_segments.get(key, {})
+        page_proof = source_segment.get("pageNumberEquivalence")
+        page_receipt = None
+        if page_proof is not None:
+            if (source_plan["binding"]["subject"] != "chinese"
+                    or output.name != "audio-audit-page-numbers-v1"):
+                raise ValueError("audio_inheritance_page_number_policy_required")
+            page_receipt = validate_page_number_equivalence(item["text"], page_proof)
         if (source_segment.get("similarityBps") != entry["similarityBps"]
-                or source_segment.get("literalScoreBps", source_segment.get("similarityBps", 0)) < 8500
+                or (page_receipt is None and
+                    source_segment.get("literalScoreBps", source_segment.get("similarityBps", 0)) < 8500)
                 or source_segment.get("inheritedFrom") is not None
                 or any(source_segment.get(field) != entry[field] for field in
                        ("ttsRequestId", "asrRequestId", "audioSha256", "textSha256"))):
             raise ValueError("audio_inheritance_requires_original_passed_segment")
-        tts_id, old_identity, text_hash, tts_payload = _segment_requests(source_plan, item, teacher)
+        # A paid source request includes its ORIGINAL scene_order. Never
+        # reconstruct that receipt with a shifted target scene index.
+        tts_id, old_identity, text_hash, tts_payload = _segment_requests(source_plan, old_workload[key], teacher)
         if tts_id != entry["ttsRequestId"] or text_hash != entry["textSha256"]:
             raise ValueError("audio_inheritance_request_identity_mismatch")
         tts = _known_success(source, tts_id, tts_payload)
         asr_id = entry["asrRequestId"]
         asr = _known_success(source, asr_id, {**old_identity, "request_id": asr_id,
             "tts_request_id": tts_id, "audio_sha256": entry["audioSha256"]})
+        if clone and _plan_uses_english_auto(source_plan):
+            # A v2 plan or request prefix alone is not evidence that the
+            # original paid calls used Auto. Reuse the native client's exact
+            # policy validation without constructing a client or making a GET.
+            for operation, request_id, receipt in (("tts", tts_id, tts), ("asr", asr_id, asr)):
+                OpenMaicFullRuntimeClient._validate_textbook_audio_namespace({
+                    "subject": source_plan["binding"]["subject"], "requestId": request_id,
+                    **({"ttsRequestId": tts_id} if operation == "asr" else {}),
+                }, operation)
+                OpenMaicFullRuntimeClient._textbook_audio_response_policy(
+                    {**receipt, "state": receipt["status"]}, request_id)
         if (digest(tts) != entry["ttsReceiptSha256"] or digest(asr) != entry["asrReceiptSha256"]
                 or tts.get("audioSha256") != entry["audioSha256"]):
             raise ValueError("audio_inheritance_receipt_mismatch")
         transcript = asr.get("transcript")
+        literal_score = asr_similarity_bps(item["text"], transcript) if isinstance(transcript, str) else None
+        if page_receipt is not None and (page_receipt != asr
+                or source_segment.get("literalScoreBps") != literal_score
+                or entry["similarityBps"] != 10000):
+            raise ValueError("audio_inheritance_page_number_receipt_mismatch")
         if (not isinstance(transcript, str) or not transcript.strip()
                 or asr.get("transcriptSha256") != hashlib.sha256(transcript.encode()).hexdigest()
-                or asr_similarity_bps(item["text"], transcript) != entry["similarityBps"]):
+                or (10000 if page_receipt is not None else literal_score) != entry["similarityBps"]):
             raise ValueError("audio_inheritance_transcript_mismatch")
-        audio_path = media / f"{tts_id}.wav"
-        if not audio_path.is_file() or hashlib.sha256(audio_path.read_bytes()).hexdigest() != entry["audioSha256"]:
+        audio_path = source_media / f"{tts_id}.wav"
+        if audio_path.is_symlink() or not audio_path.is_file() or hashlib.sha256(audio_path.read_bytes()).hexdigest() != entry["audioSha256"]:
             raise ValueError("audio_inheritance_audio_mismatch")
         target_tts_id, _, _, _ = _segment_requests(plan, item, teacher)
         target_asr_id = _asr_request_id(plan, target_tts_id, entry["audioSha256"])
         if (output / f"{target_tts_id}.json").exists() or (output / f"{target_asr_id}.json").exists():
             raise ValueError("audio_inheritance_conflicts_with_target_dispatch")
-        evidence = {"schemaVersion": AUDIO_INHERITANCE_SCHEMA,
+        evidence = {"schemaVersion": value["schemaVersion"],
                 "sourceAudioAuditDirectory": str(source), "sourcePlanSha256": digest(source_plan),
                 "sourceAuditSha256": digest(source_audit), "sourceSha256": source_plan["sourceSha256"],
                 "targetPlanSha256": digest(plan), "targetSourceSha256": plan["sourceSha256"],
                 "segment": deepcopy(entry)}
+        if clone:
+            evidence.update({key: value[key] for key in
+                ("taskId", "sourceCandidateDirectory", "targetCandidateDirectory")})
         checkpoint = output / f"{tts_id}.inheritance.json"
         if checkpoint.exists() and json.loads(checkpoint.read_text()) != evidence:
             raise RuntimeError("frozen_audio_inheritance_segment_changed")
-        targets[key] = {"ttsId": tts_id, "tts": tts, "asrId": asr_id, "asr": asr, "evidence": evidence}
+        targets[key] = {"ttsId": tts_id, "tts": tts, "asrId": asr_id, "asr": asr,
+                        "sourceAudioPath": audio_path, "evidence": evidence,
+                        "pageNumberEquivalence": page_proof}
     return targets
 
 
@@ -447,7 +556,8 @@ def _inheritance_set_targets(value, plan, output, media, teacher):
 
 
 def narrate_candidate(runtime, classroom, binding, output, classroom_directory, *, progress=lambda value: None,
-                      asr_reconciliation=None, audio_inheritance=None, audio_language_policy=None):
+                      asr_reconciliation=None, audio_inheritance=None, audio_language_policy=None,
+                      allow_page_number_equivalence=False):
     """Return an audited private candidate; never install a student course."""
     required = {"editionId", "revisionId", "gradeCode", "subject", "schoolSystem", "volume"}
     if not required <= set(binding) or binding["subject"] not in {"chinese", "math", "english", "science"}:
@@ -461,6 +571,9 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
     teacher = get_formal_subject_qwen_voice_identity(binding["subject"])
     workload = narration_workload(classroom)
     output, root = Path(output).resolve(), Path(classroom_directory).resolve()
+    if allow_page_number_equivalence and (binding['subject'] != 'chinese'
+            or output.name != 'audio-audit-page-numbers-v1' or asr_reconciliation is not None):
+        raise ValueError('page_number_review_requires_separate_chinese_audit')
     if audio_language_policy is not None:
         if output.name == "audio-audit":
             raise ValueError("english_auto_language_requires_distinct_audit_directory")
@@ -492,6 +605,14 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
             raise RuntimeError("frozen_audio_plan_changed")
         if not plan_path.exists():
             save_json(plan_path, plan)
+        spelling_path = output / 'page-number-policy.json'
+        spelling_policy = {'schemaVersion': 'mira.textbook.page-number-policy.v1',
+                           'planSha256': digest(plan), 'allowed': True}
+        if spelling_path.exists() and (not allow_page_number_equivalence
+                or json.loads(spelling_path.read_text()) != spelling_policy):
+            raise ValueError('page_number_review_policy_changed')
+        if allow_page_number_equivalence and not spelling_path.exists():
+            save_json(spelling_path, spelling_policy)
         narrated, segments, interactive_urls = deepcopy(classroom), [], {}
         media = root / classroom_id / "audio"
         media.mkdir(parents=True, exist_ok=True)
@@ -502,6 +623,9 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
             raise RuntimeError("frozen_audio_inheritance_manifest_required")
         inheritance_set, inheritance_targets = _inheritance_set_targets(
             inheritance_set, plan, output, media, teacher)
+        if not allow_page_number_equivalence and any(
+                target.get("pageNumberEquivalence") is not None for target in inheritance_targets.values()):
+            raise ValueError("audio_inheritance_page_number_policy_required")
         reconciliation_targets = _reconciliation_targets(asr_reconciliation, plan, output, media, teacher)
         if inheritance_targets.keys() & reconciliation_targets.keys():
             raise ValueError("audio_inheritance_reconciliation_overlap")
@@ -520,8 +644,9 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
             else:
                 tts = _external_once(runtime, output / f"{tts_id}.json", tts_id, "tts", tts_payload)
             audio_path = media / f"{tts_id}.wav"
-            audio = audio_path.read_bytes() if audio_path.exists() else runtime.download_formal_audio_tts(
-                tts_id, expected_sha256=tts["audioSha256"])
+            audio = (audio_path.read_bytes() if audio_path.exists() else
+                     inherited["sourceAudioPath"].read_bytes() if inherited else
+                     runtime.download_formal_audio_tts(tts_id, expected_sha256=tts["audioSha256"]))
             if hashlib.sha256(audio).hexdigest() != tts["audioSha256"]:
                 raise RuntimeError("narration_audio_hash_changed")
             with wave.open(io.BytesIO(audio)) as wav:
@@ -542,6 +667,10 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
                 raise RuntimeError("asr_transcript_recovery_required_no_retry")
             similarity = asr_similarity_bps(item["text"], asr["transcript"])
             literal_score = similarity
+            spelling_proof = (page_number_equivalence(item['text'], asr)
+                              if allow_page_number_equivalence and literal_score < 10000 else None)
+            if spelling_proof is not None:
+                similarity = 10000
             reconciliation = None
             target = reconciliation_targets.get((item["sceneId"], item["id"]))
             if target:
@@ -584,6 +713,8 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
                              "literalScoreBps": literal_score, "similarityBps": similarity, "audioUrl": url}
             if reconciliation:
                 segment["asrReconciliation"] = reconciliation
+            if spelling_proof is not None:
+                segment['pageNumberEquivalence'] = spelling_proof
             if inherited:
                 segment["inheritedFrom"] = inherited["evidence"]
             segments.append(segment)

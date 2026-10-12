@@ -42,7 +42,7 @@ export function LearningTextbookClassroom({ student, contentKey }: { student: St
     window.addEventListener('message', receive);
     return () => window.removeEventListener('message', receive);
   }, [entry, router]);
-  const back = entry ? `/learning/textbooks?${new URLSearchParams({ editionId: entry.editionId, revisionId: entry.revisionId, unitId: entry.unitId })}` : "/learning";
+  const back = entry ? `/learning/textbooks?${new URLSearchParams({ editionId: entry.editionId, revisionId: entry.revisionId, ...(entry.unitId ? { unitId: entry.unitId } : {}) })}` : "/learning";
   return <SchoolbagShell student={student} className="textbook-classroom"
     navigation={<Link href={back}><Backpack size={32} aria-hidden="true" /><span>回到课本</span></Link>}>
     {error ? <div className="textbook-state" role="alert"><h1>暂时没有打开课堂</h1><p>{error}</p>

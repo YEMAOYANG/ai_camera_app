@@ -24,6 +24,7 @@ from services.textbook_batch_audio import (ASR_RECONCILIATION_REASON, ASR_RECONC
     normalize_audio_inheritance)
 from tests.test_textbook_batch import manifest
 from tests.test_textbook_interactive_narration import activity
+from content.textbook_number_spelling import page_number_equivalence, validate_page_number_equivalence
 
 
 def missing():
@@ -47,6 +48,110 @@ def wav_bytes():
 
 
 class TextbookBatchAudioTest(unittest.TestCase):
+    def test_page_number_equivalence_is_exact_and_rejects_wrong_numbers_or_words(self):
+        def receipt(text):
+            return {'requestId':'asr-test','status':'succeeded','transcript':text,
+                    'transcriptSha256':hashlib.sha256(text.encode()).hexdigest(),'completionUsable':True}
+        expected='音节旁边标着演示页码12。接着翻到这个练习的第12页。'
+        proof=page_number_equivalence(expected,receipt('音节旁边标着演示页码十二，接着翻到这个练习的第十二页。'))
+        self.assertIsNotNone(proof);self.assertEqual(proof['pageNumberOccurrences'],2)
+        validate_page_number_equivalence(expected,proof)
+        for actual in ['音节旁边标着演示页码二十，接着翻到这个练习的第十二页。',
+                       '音节旁边标着演示页码十二，接着翻到那个练习的第十二页。']:
+            self.assertIsNone(page_number_equivalence(expected,receipt(actual)))
+        for text,actual in [('页码12.5','页码十二点五'),('页码012','页码十二'),
+                            ('页码1200','页码一千二百'),('电话12','电话十二'),
+                            ('页码12万','页码十二万'),('第12年','第十二年')]:
+            self.assertIsNone(page_number_equivalence(text,receipt(actual)))
+        for text,actual in [('第101页','第一百零一页'),('第110页','第一百一十页'),('页码999','页码九百九十九')]:
+            self.assertIsNotNone(page_number_equivalence(text,receipt(actual)))
+        changed=deepcopy(proof);changed['asrReceipt']['transcript']='第十一页'
+        with self.assertRaisesRegex(ValueError,'evidence_changed'):validate_page_number_equivalence(expected,changed)
+
+    def test_page_number_review_reuses_successful_paid_receipts_in_separate_audit(self):
+        text='音节旁边标着演示页码12。接着翻到这个练习的第12页。'
+        transcript='音节旁边标着演示页码十二，接着翻到这个练习的第十二页。'
+        self.room['scenes'][0]['actions'][0]['text']=text
+        self.local_file.write_text(json.dumps(self.room));runtime=self.runtime()
+        runtime.start_formal_audio_asr.side_effect=lambda **p:{'requestId':p['request_id'],
+            'status':'succeeded','transcript':transcript,'transcriptSha256':hashlib.sha256(transcript.encode()).hexdigest(),
+            'completionUsable':True}
+        with self.assertRaisesRegex(RuntimeError,'semantic_review_required'):self.narrate(runtime)
+        original=(self.output/'audit.json').read_bytes();reviewed=self.root/'audio-audit-page-numbers-v1';reviewed.mkdir()
+        for p in [self.output/'plan.json',*self.output.glob('tbb*.json')]:
+            (reviewed/p.name).write_bytes(p.read_bytes())
+        runtime.reset_mock()
+        result=narrate_candidate(runtime,self.room,self.binding,reviewed,self.store,allow_page_number_equivalence=True)
+        runtime.start_formal_audio_tts.assert_not_called();runtime.start_formal_audio_asr.assert_not_called()
+        runtime.download_formal_audio_tts.assert_not_called()
+        self.assertEqual((self.output/'audit.json').read_bytes(),original)
+        self.assertLess(result['segments'][0]['literalScoreBps'],8500)
+        self.assertEqual(result['segments'][0]['similarityBps'],10000)
+        from scripts.private_textbook_preview_snapshot import verify_complete_audio
+        plan=json.loads((reviewed/'plan.json').read_text());narrated=json.loads((reviewed/'narrated-classroom.json').read_text())
+        verify_complete_audio(self.room,narrated,plan,result,self.store)
+        result['segments'][0]['pageNumberEquivalence']['normalizedTextSha256']='0'*64
+        result['sha256']=digest({k:v for k,v in result.items() if k!='sha256'})
+        with self.assertRaisesRegex(ValueError,'evidence_changed'):verify_complete_audio(self.room,narrated,plan,result,self.store)
+
+    def test_page_number_inheritance_binds_actual_receipt_and_never_repays(self):
+        text = '请翻到第12页。'
+        transcript = '请翻到第十二页。'
+        self.room['scenes'][0]['actions'][0]['text'] = text
+        self.local_file.write_text(json.dumps(self.room))
+        runtime = self.runtime()
+        runtime.start_formal_audio_asr.side_effect = lambda **p: {
+            'requestId': p['request_id'], 'status': 'succeeded', 'transcript': transcript,
+            'transcriptSha256': hashlib.sha256(transcript.encode()).hexdigest(), 'completionUsable': True}
+        source = (self.root / 'source' / 'audio-audit-page-numbers-v1').resolve()
+        old_audit = narrate_candidate(runtime, self.room, self.binding, source, self.store,
+                                      allow_page_number_equivalence=True)
+        old_plan = json.loads((source / 'plan.json').read_text())
+        segment = old_audit['segments'][0]
+        self.assertLess(segment['literalScoreBps'], 8500)
+        entry = {k: segment[k] for k in ('sceneId', 'segmentId', 'textSha256',
+            'ttsRequestId', 'asrRequestId', 'audioSha256', 'similarityBps')}
+        for kind in ('tts', 'asr'):
+            receipt = json.loads((source / (entry[kind+'RequestId']+'.json')).read_text())['receipt']
+            entry[kind+'ReceiptSha256'] = digest(receipt)
+        self.room['stage']['name'] = 'New reviewed private version'
+        self.local_file.write_text(json.dumps(self.room))
+        runtime.saved = deepcopy(self.room)
+        target = self.root / 'target' / 'audio-audit-page-numbers-v1'
+        new_plan = build_audio_plan(self.room, self.binding, runtime.base_url)
+        manifest = {'schemaVersion': AUDIO_INHERITANCE_SCHEMA, 'sourceAudioAuditDirectory': str(source),
+            'sourcePlanSha256': digest(old_plan), 'sourceAuditSha256': digest(old_audit),
+            'sourceSha256': old_plan['sourceSha256'], 'targetPlanSha256': digest(new_plan),
+            'targetSourceSha256': new_plan['sourceSha256'], 'segments': [entry]}
+        runtime.reset_mock()
+        with self.assertRaisesRegex(ValueError, 'page_number_policy_required'):
+            narrate_candidate(runtime, self.room, self.binding, target, self.store, audio_inheritance=manifest)
+        original_audit = (source / 'audit.json').read_bytes()
+        for changed_receipt in (False, True):
+            altered = deepcopy(old_audit)
+            proof = altered['segments'][0]['pageNumberEquivalence']
+            if changed_receipt:
+                foreign = {**proof['asrReceipt'], 'requestId': 'unrelated-asr'}
+                altered['segments'][0]['pageNumberEquivalence'] = page_number_equivalence(text, foreign)
+            else:
+                proof['normalizedTextSha256'] = '0' * 64
+            altered['sha256'] = digest({k: v for k, v in altered.items() if k != 'sha256'})
+            (source / 'audit.json').write_text(json.dumps(altered))
+            invalid = {**manifest, 'sourceAuditSha256': digest(altered)}
+            with self.assertRaisesRegex(ValueError, 'evidence_changed|page_number_receipt_mismatch'):
+                narrate_candidate(runtime, self.room, self.binding, target, self.store,
+                                  audio_inheritance=invalid, allow_page_number_equivalence=True)
+        (source / 'audit.json').write_bytes(original_audit)
+        result = narrate_candidate(runtime, self.room, self.binding, target, self.store,
+                                  audio_inheritance=manifest, allow_page_number_equivalence=True)
+        self.assertEqual(result['segments'][0]['similarityBps'], 10000)
+        self.assertEqual(result['segments'][0]['ttsRequestId'], segment['ttsRequestId'])
+        self.assertEqual(result['segments'][0]['pageNumberEquivalence'], segment['pageNumberEquivalence'])
+        runtime.start_formal_audio_tts.assert_not_called()
+        runtime.start_formal_audio_asr.assert_not_called()
+        runtime.download_formal_audio_tts.assert_not_called()
+        self.assertEqual((source / 'audit.json').read_bytes(), original_audit)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

@@ -45,6 +45,9 @@ def validate_release(build, manifest, course=None):
     from repositories.textbook_repository import TextbookRepository
     parse = TextbookRepository.parse
     frozen, review = parse(build['input_json']), parse(build['review_json'])
+    from content.textbook_batch_release import INPUT_SCHEMA as ACTIVITY_INPUT, validate_activity_release
+    if isinstance(frozen, dict) and frozen.get('schemaVersion') == ACTIVITY_INPUT:
+        return validate_activity_release(build, manifest, course)
     if not isinstance(frozen, dict) or frozen.get('schemaVersion') != INPUT_SCHEMA:
         return None
     release = (review or {}).get('release')
@@ -84,6 +87,8 @@ def public_classroom(release):
     allowed_stage = {'id', 'name', 'style', 'createdAt', 'updatedAt', 'agentIds'}
     content['stage'] = {k: v for k, v in content['stage'].items() if k in allowed_stage}
     content['stage']['fixedTextbook'] = True
+    if release.get('assessmentMode') == 'ungraded':
+        content['stage']['miraUngradedActivity'] = True
     for scene in content['scenes']:
         if scene['type'] == 'quiz':
             scene['content']['questions'] = [{k: v for k, v in q.items()

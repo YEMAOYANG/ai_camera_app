@@ -1,14 +1,14 @@
-import type { LearningSubject, LearningTeacherProfile } from "@/lib/contracts/learning";
+import type { TeacherSubject, LearningTeacherProfile } from "@/lib/contracts/learning";
 
 /**
- * A build-time mirror of the public v1 registry. It gives the classroom a
+ * A build-time mirror of the four formal teachers in the public v3 library. It gives the classroom a
  * stable visual while the authenticated preference request is loading. The
  * server response remains authoritative for the selected profile.
  */
 export const learningTeacherProfiles: LearningTeacherProfile[] = [
   {
     id: "mira_chinese_gentle",
-    version: 1,
+    version: 2,
     displayName: "小语老师",
     avatarPath: "/teachers/mi-chinese-v1.png",
     subject: "chinese",
@@ -18,7 +18,7 @@ export const learningTeacherProfiles: LearningTeacherProfile[] = [
   },
   {
     id: "mira_math_clear",
-    version: 1,
+    version: 2,
     displayName: "小数老师",
     avatarPath: "/teachers/ashu-math-v1.png",
     subject: "math",
@@ -28,13 +28,23 @@ export const learningTeacherProfiles: LearningTeacherProfile[] = [
   },
   {
     id: "mira_english_standard",
-    version: 1,
+    version: 2,
     displayName: "Mia 老师",
     avatarPath: "/teachers/coco-english-v1.png",
     subject: "english",
     languageCode: "en-US",
     teachingStyle: "standard_pronunciation",
     capabilities: ["listen_and_repeat", "phonics", "standard_english_pronunciation", "pronunciation_review_gated"],
+  },
+  {
+    id: "mira_science_inquiry",
+    version: 1,
+    displayName: "小科老师",
+    avatarPath: "/teachers/ke-science-v1.png",
+    subject: "science",
+    languageCode: "zh-CN",
+    teachingStyle: "observe_predict_experiment",
+    capabilities: ["observe_and_describe", "predict_and_test", "evidence_based_explanation", "standard_mandarin", "safe_experiment_guidance"],
   },
 ];
 
@@ -72,10 +82,11 @@ export function browserVoiceForTeacher(teacher?: LearningTeacherProfile): Learni
 }
 
 export function teacherStyleDescription(profile: LearningTeacherProfile) {
-  const descriptions: Record<LearningSubject, string> = {
+  const descriptions: Record<TeacherSubject, string> = {
     chinese: "耐心带读、先讲再练，陪你把语文学明白。",
     math: "把步骤拆清楚，用例子陪你理解数学。",
     english: "标准发音、多听多说，陪你大胆开口。",
+    science: "一起观察、动手探索，寻找现象背后的线索。",
   };
   return descriptions[profile.subject];
 }

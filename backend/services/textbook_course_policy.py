@@ -18,7 +18,14 @@ def assert_textbook_course(conn, *, child, course, required=False):
     if row is None:
         raise ApiError("textbook_course_unavailable", "这版教材已停止提供新课", 409)
     manifest = repo.manifest(row)
-    brief = validate_frozen_brief(manifest, repo.parse(build["input_json"]))
+    from content.textbook_release import INPUT_SCHEMA, validate_release
+    from content.textbook_batch_release import INPUT_SCHEMA as ACTIVITY_INPUT
+    frozen = repo.parse(build['input_json'])
+    if frozen.get('schemaVersion') in {INPUT_SCHEMA, ACTIVITY_INPUT}:
+        validate_release(build, manifest, course)
+        brief = frozen
+    else:
+        brief = validate_frozen_brief(manifest, frozen)
     if (digest(manifest) != row["manifest_sha256"] or content["textbookBinding"] != brief["textbookBinding"]
             or brief["contentKey"] != build["content_key"] or digest(content) != build["course_content_sha256"]
             or brief["textbookBinding"]["nodeId"] != build["node_id"] or brief["textbookBinding"]["partIndex"] != build["part_index"]

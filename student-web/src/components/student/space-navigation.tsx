@@ -17,7 +17,7 @@ const destinations = [
 
 export function SpaceNavigationProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const schoolbag = pathname === "/learning" || ["/learning/textbooks", "/learning/reviews", "/learning/homework"]
+  const schoolbag = pathname === "/learning" || ["/learning/textbooks", "/learning/reviews", "/learning/homework", "/learning/international"]
     .some(section => pathname === section || pathname?.startsWith(`${section}/`));
   const pictureGuide = /^\/learning\/textbooks\/[^/]+\/[^/]+\/intro\/[^/]+\/?$/.test(pathname ?? "");
   const active: SpaceNavigationActive | null = pictureGuide ? null : pathname === "/today" ? "today"

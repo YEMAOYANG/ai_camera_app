@@ -58,6 +58,7 @@ export function LearningSchoolbag({ student }: { student: Student }) {
       <p>在家长 App「孩子资料 → 教材与课程」确认版本与学期。</p>
       {data && <p>{data.schoolYearStartYear}—{data.schoolYearStartYear + 1} 学年 · {data.semester === "upper" ? "上学期" : "下学期"}</p>}
       <div className="schoolbag-preferences"><SwitchField label="拿书动效" checked={!reduced} onCheckedChange={toggle} /><Button variant="quiet" size="compact" onClick={() => { setNotice(null); refresh(); }}><RefreshCw aria-hidden="true" />刷新书包</Button></div>
+      <Button asChild variant="quiet" size="compact"><Link href="/learning/international" prefetch={false}>国际教材测试<ArrowRight aria-hidden="true" /></Link></Button>
     </Disclosure>
   }>
     <section className="schoolbag-hero" aria-labelledby="schoolbag-title">

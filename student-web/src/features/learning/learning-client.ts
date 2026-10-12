@@ -12,6 +12,7 @@ import {
   type LearningAnswerResponse,
   type LearningLibraryBucket,
   type LearningSubject,
+  type TeacherSubject,
   type LearningTodayResponse,
 } from "@/lib/contracts/learning";
 import {
@@ -93,13 +94,13 @@ export async function startLearningCourse(courseId: string, version: string) {
   return result.data;
 }
 
-export async function getLearningTeachers(subject?: LearningSubject) {
+export async function getLearningTeachers(subject?: TeacherSubject) {
   const search = subject ? `?subject=${encodeURIComponent(subject)}` : "";
   return learningTeachersResponseSchema.parse(await requestJson(`/api/learning/teachers${search}`));
 }
 
 export async function setLearningTeacher(
-  subject: LearningSubject,
+  subject: TeacherSubject,
   teacherProfileId: string,
   teacherProfileVersion: number,
 ) {

@@ -32,6 +32,12 @@ const PUBLIC_ASSET_PREFIXES = [
   "/logos/",
   "/images/",
 ];
+const FORMAL_TEACHER_ASSET_PATHS = new Set([
+  "/teachers/mi-chinese-v1.png",
+  "/teachers/ashu-math-v1.png",
+  "/teachers/coco-english-v1.png",
+  "/teachers/ke-science-v1.png",
+]);
 const BLOCKED_LEGACY_BRAND_ASSET_PATHS = new Set([
   "/logo-horizontal.png",
   "/openmaic-mark.png",
@@ -427,7 +433,8 @@ export function authorizeTextbookRequest(request, url, runtime) {
     return { allowed: method === 'GET' && !url.search, kind: 'textbook-activity-audio' };
   if (TEXTBOOK_INTERACTION_PATHS.has(url.pathname))
     return { allowed: method === 'POST' && !url.search, kind: 'runtime-api', sanitizeJson: true };
-  if (method !== 'GET') return { allowed: false };
+  if (method !== 'GET') return method === 'HEAD' && FORMAL_TEACHER_ASSET_PATHS.has(url.pathname)
+    ? authorizeRuntimeRequest(request, url, runtime) : { allowed: false };
   if (url.pathname === '/api/server-providers') return { allowed: true, kind: 'json' };
   if (url.pathname === '/api/classroom')
     return { allowed: url.searchParams.getAll('id').length === 1 && url.searchParams.get('id') === runtime.classroomId,
@@ -464,12 +471,16 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
     // requests cannot carry the classroom's SameSite cookie. Deliver only
     // these exact reviewed bytes inside the authenticated snapshot instead
     // of relaxing iframe isolation or exposing a public media route.
+    const verifiedAssets = new Map();
     for (const scene of result.classroom?.scenes || []) {
       if (scene.miraActivity || scene.type !== 'interactive' || typeof scene.content?.html !== 'string') continue;
       const embedded = runtime.media.filter(media => scene.content.html.includes(media.path));
-      const assets = await Promise.all(embedded.map(async media => [media.path,
-        `data:${media.mimeType};base64,${(await textbookMediaBytes(media, config)).toString('base64')}`]));
-      for (const [path, data] of assets) scene.content.html = scene.content.html.split(path).join(data);
+      const assets = await Promise.all(embedded.map(async media => {
+        if (!verifiedAssets.has(media.path)) verifiedAssets.set(media.path, textbookMediaBytes(media, config));
+        return { path: media.path, mimeType: media.mimeType,
+          base64: (await verifiedAssets.get(media.path)).toString('base64') };
+      }));
+      scene.content.html = embedTextbookSceneMedia(scene.content.html, assets);
     }
     return json(response, 200, result);
   }
@@ -498,6 +509,25 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
   }
   if (decision.kind === 'student-video-export-capability') return json(response, 200, { enabled: false });
   return proxyToUpstream(request, response, url, runtime, config, decision, runtimeToken);
+}
+
+export function embedTextbookSceneMedia(html, assets) {
+  const expandedSize = assets.reduce((size, asset) => size
+    + (html.split(asset.path).length - 1) * (asset.base64.length + asset.mimeType.length + 13), html.length);
+  if (expandedSize <= 2 * 1024 * 1024) {
+    for (const asset of assets) html = html.split(asset.path).join(`data:${asset.mimeType};base64,${asset.base64}`);
+    return html;
+  }
+  // Repeated atlas crops must not duplicate megabytes at every picture URL.
+  // Build local object URLs inside the same opaque iframe; no credentials,
+  // public media endpoints or additional sandbox permissions are introduced.
+  const scriptJson = value => JSON.stringify(value).replace(/</g, '\\u003c');
+  return '<!doctype html><html><head><meta charset="utf-8"></head><body><script>'
+    + '(function(){const assets=' + scriptJson(assets) + ';let page=' + scriptJson(html) + ';'
+    + 'for(const asset of assets){const binary=atob(asset.base64);const bytes=new Uint8Array(binary.length);'
+    + 'for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);'
+    + 'const url=URL.createObjectURL(new Blob([bytes],{type:asset.mimeType}));page=page.split(asset.path).join(url);}'
+    + 'document.open();document.write(page);document.close();})();</script></body></html>';
 }
 
 async function textbookMediaBytes(media, config) {
@@ -533,6 +563,10 @@ export function authorizeRuntimeRequest(request, url, runtime) {
       status: 403,
       error: "openmaic_probe_route_not_allowed",
     };
+  }
+
+  if (["GET", "HEAD"].includes(method) && FORMAL_TEACHER_ASSET_PATHS.has(pathname)) {
+    return { allowed: true, kind: "asset" };
   }
 
   if (method === "GET" && pathname === `/classroom/${classroomId}`) {
