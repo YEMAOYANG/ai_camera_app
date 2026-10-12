@@ -1,0 +1,57 @@
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -255,7 +255,13 @@ export function createMiraStudentRuntimeEventClient(
+     if (state.emittedKeys.includes(eventKey)) return;
+     await flushPending();
+     if (state.emittedKeys.includes(eventKey)) return;
+-    if (state.completed) throw new Error('Mira Runtime event stream is already completed');
++    if (state.completed) {
++      // A finished lesson can be replayed on another device, or after its
++      // pages were reordered. Its page markers are already final, so replay
++      // stays quiet; answers and other new evidence are still refused.
++      if (type === 'scene_entered' || type === 'action_completed') return;
++      throw new Error('Mira Runtime event stream is already completed');
++    }
+     const event = {
+       schemaVersion: EVENT_SCHEMA,
+       sequence: state.nextSequence,
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+--- a/tests/runtime/mira-student-runtime-events.test.ts
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -641,3 +641,35 @@ it('reads accepted progress without flushing the rejected teaching completion, t
+   expect(posted[1]).toBe(posted[0]);
+   expect(client.hasCompletedScene('scene-p2')).toBe(true);
+ });
++
++it('replays a finished lesson quietly on a device that never emitted its page markers', async () => {
++  const posted: unknown[] = [];
++  const client = createMiraStudentRuntimeEventClient({
++    classroomId: 'classroom-a',
++    storage: memoryStorage(),
++    fetcher: vi.fn(async (_input, init) => {
++      if ((init?.method ?? 'GET') === 'GET') return response({ ...status(17), completed: true });
++      posted.push(JSON.parse(String(init?.body)));
++      return response({ ok: false, error: 'unexpected_post' }, 500);
++    }),
++  });
++
++  // The page moved from index 2 to 3 after the lesson was finished, so neither
++  // marker matches anything this browser has stored.
++  await expect(
++    client.sceneEntered({ sceneIndex: 3, sceneId: 'scene-earth' }),
++  ).resolves.toBeUndefined();
++  await expect(
++    client.actionCompleted({ sceneIndex: 3, sceneId: 'scene-earth', actionId: 'action-earth' }),
++  ).resolves.toBeUndefined();
++  // Replay never manufactures new evidence for a closed stream.
++  await expect(
++    client.answerSubmitted({
++      sceneIndex: 3,
++      sceneId: 'scene-earth',
++      questionId: 'question-1',
++      response: 'A',
++    }),
++  ).rejects.toThrow('Mira Runtime event stream is already completed');
++  expect(posted).toEqual([]);
++});

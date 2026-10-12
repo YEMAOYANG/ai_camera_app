@@ -308,6 +308,13 @@ actions use their own prerecorded narration buttons. Their student start gate
 does not wait for a lecture engine that does not exist. Timeline lessons keep
 the explicit audio-start gate, and all classroom controls remain available.
 
+Patch `0159` lets a finished lesson be replayed quietly. Once the student
+event stream is completed, the page-entry and page-narration markers return
+without a request instead of raising `Mira Runtime event stream is already
+completed`. This covers replay on another device and lessons whose pages were
+reordered after completion. Answers, speech turns and interactions keep their
+closed-stream behavior, so replay never adds new evidence.
+
 `foreground-openmaic-production` fails closed unless `.next/BUILD_ID` is
 present and non-empty. It executes `next start` with `NODE_ENV=production` and
 reuses the same strict DeepSeek V4 Pro/V4 Flash model policy, Qwen TTS, Qwen
