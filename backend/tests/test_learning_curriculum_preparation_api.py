@@ -14,6 +14,7 @@ from core.database import Database, DatabaseConnection
 from core.errors import ApiError
 from repositories.learning_curriculum_preparation_repository import (
     ParentRetryAuthoritySnapshot,
+    LearningCurriculumPreparationRepository,
 )
 from services import learning_curriculum_preparation_service as preparation_module
 from services.learning_curriculum_preparation_contract import (
@@ -139,6 +140,12 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                 (self.plan_id,),
             ).fetchone()
         self.assertIsNotNone(plan)
+        self.target = json.loads(plan["target_spec_json"])
+        self.target_course_count = len(self.target["courseTargets"])
+        self.subject_target_counts = {
+            subject: item["totalCourseCount"]
+            for subject, item in self.target["subjectTargets"].items()
+        }
         self.plan_last_progress_at = int(plan["last_progress_at"])
         self.clock = _Clock(self.plan_last_progress_at)
         clock_patch = patch(
@@ -170,25 +177,25 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                     "label": "语文",
                     "readyCourseCount": 0,
                     "failedCourseCount": 0,
-                    "totalCourseCount": 12,
+                    "totalCourseCount": self.subject_target_counts["chinese"],
                 },
                 {
                     "code": "math",
                     "label": "数学",
                     "readyCourseCount": 0,
                     "failedCourseCount": 0,
-                    "totalCourseCount": 9,
+                    "totalCourseCount": self.subject_target_counts["math"],
                 },
                 {
                     "code": "english",
                     "label": "英语",
                     "readyCourseCount": 0,
                     "failedCourseCount": 0,
-                    "totalCourseCount": 9,
+                    "totalCourseCount": self.subject_target_counts["english"],
                 },
             ],
         )
-        self.assertEqual(preparation["totalCourseCount"], 30)
+        self.assertEqual(preparation["totalCourseCount"], self.target_course_count)
         self.assertEqual(preparation["retryAfterMs"], 2_500)
         self.assertEqual(
             preparation["message"],
@@ -198,7 +205,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         self.assertEqual(before["last_progress_at"], after["last_progress_at"])
         self.assertEqual(before["updated_at"], after["updated_at"])
 
-    def test_availability_exposes_active_release_while_preparation_is_not_ready(self):
+    def test_availability_active_release_does_not_open_without_personal_next_lesson(self):
         latest_plan = self._plan_row(self.plan_id)
         self.assertNotEqual(latest_plan["status"], "ready")
 
@@ -222,7 +229,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                     "gradeCode": "primary_1",
                     "hasActiveRelease": True,
                     "availableCourseCount": 0,
-                    "canLearnNow": True,
+                    "canLearnNow": False,
                 },
             },
         )
@@ -233,13 +240,9 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             "formal_student_release_available",
             return_value=False,
         ), patch(
-            "repositories.learning_repository.LearningRepository.student_catalog_summary",
-            return_value={
-                "catalogStatus": "preparing",
-                "availableCourseCount": 1,
-                "targetCourseCount": 30,
-            },
-        ):
+            "services.progressive_learning_availability.progressive_personal_learning_state",
+            return_value={"availableCourseCount": 1},
+        ) as personal_state:
             response = self.client.get(
                 "/api/learning/availability",
                 query_string={"childId": self.child_id},
@@ -247,6 +250,8 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             )
 
         self.assertEqual(response.status_code, 200, response.json)
+        self.assertTrue(personal_state.call_args.kwargs["grade_open"])
+        self.assertEqual(personal_state.call_args.kwargs["child"]["id"], self.child_id)
         self.assertEqual(
             response.json["availability"],
             {
@@ -261,7 +266,10 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         for grade_code, revision, expected_access in (
             ("primary_1", 1, True),
             ("primary_1", 0, False),
-            ("primary_2", 1, False),
+            *((f"primary_{grade}", 1, True) for grade in range(2, 7)),
+            ("primary_2", 0, False),
+            ("primary_7", 1, False),
+            ("unknown", 1, False),
             ("kindergarten_middle", 1, False),
         ):
             with self.subTest(grade_code=grade_code, revision=revision):
@@ -272,15 +280,17 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                     )
                 with patch.object(
                     preparation_module, "formal_student_release_available", return_value=False,
-                ), patch(
-                    "repositories.learning_repository.LearningRepository.student_catalog_summary",
-                    return_value={"availableCourseCount": 0},
                 ):
                     response = self.client.get(
                         "/api/learning/availability",
                         query_string={"childId": self.child_id, "includeWorkspaceAccess": "true"},
                         headers=self._auth_headers(),
                     )
+                if grade_code in {"primary_7", "unknown"}:
+                    self.assertEqual(response.status_code, 400, response.json)
+                    self.assertEqual(response.json["error"], "progressive_grade_invalid")
+                    self.assertNotIn("availability", response.json)
+                    continue
                 self.assertEqual(response.status_code, 200, response.json)
                 availability = response.json["availability"]
                 self.assertEqual(availability["canAccessWorkspace"], expected_access)
@@ -510,7 +520,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                             "canaryFailedCount": 0,
                             "canaryTargetCount": 3,
                             "failedCount": 0,
-                            "targetCount": 30,
+                            "targetCount": self.target_course_count,
                         }
                     )
                 },
@@ -548,7 +558,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                     "learning_preparation_state_invalid",
                 )
 
-    def test_v2_30_of_30_handoff_and_partial_content_stage_are_frozen(self):
+    def test_v2_complete_registered_target_handoff_and_partial_content_stage_are_frozen(self):
         row = dict(self._plan_row(self.plan_id))
         with self.app.app_context():
             service = learning_curriculum_preparation_service()
@@ -559,7 +569,10 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             **row,
             "status": "running",
             "stage": "generating_content",
-            "progress_percent": 6,
+            "progress_percent": max(
+                LearningCurriculumPreparationRepository.STAGE_FLOORS["generating_content"],
+                5 + 30 // self.target_course_count,
+            ),
             "content_candidate_count": 1,
             "content_canary_candidate_count": 1,
             "stage_progress_json": json.dumps(
@@ -569,7 +582,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                     "canaryFailedCount": 0,
                     "canaryTargetCount": 3,
                     "failedCount": 0,
-                    "targetCount": 30,
+                    "targetCount": self.target_course_count,
                 }
             ),
             "subject_progress_json": json.dumps(partial_subjects),
@@ -581,7 +594,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         )
         with self.assertRaises(ApiError):
             service.preparation_payload(
-                {**partial, "progress_percent": 5},
+                {**partial, "progress_percent": partial["progress_percent"] + 1},
                 now_ms=self.clock.now_ms,
                 schema_version=PREPARATION_SCHEMA_V2,
             )
@@ -594,22 +607,28 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             "status": "running",
             "stage": "building_classrooms",
             "progress_percent": 35,
-            "content_candidate_count": 30,
+            "content_candidate_count": self.target_course_count,
             "content_canary_candidate_count": 3,
             "content_canary_passed_at": self.clock.now_ms,
             "content_generation_completed_at": self.clock.now_ms,
             "stage_progress_json": json.dumps(
                 {
-                    "candidateCount": 30,
+                    "candidateCount": self.target_course_count,
                     "canaryCandidateCount": 3,
                     "canaryFailedCount": 0,
                     "canaryTargetCount": 3,
                     "failedCount": 0,
-                    "targetCount": 30,
+                    "targetCount": self.target_course_count,
                 }
             ),
             "subject_progress_json": json.dumps(handoff_subjects),
             "next_run_at": None,
+            "work_unit_kind": None,
+            "bound_catalog_item_id": None,
+            "bound_content_attempt_ordinal": None,
+            "bound_content_phase": None,
+            "retry_reason_code": None,
+            "retry_message_safe": None,
             "completed_at": None,
             "error_code": None,
             "error_message_safe": None,
@@ -651,10 +670,10 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             "status": "ready",
             "stage": "completed",
             "progress_percent": 100,
-            "ready_course_count": 30,
+            "ready_course_count": self.target_course_count,
             "failed_course_count": 0,
-            "content_target_count": 30,
-            "content_candidate_count": 30,
+            "content_target_count": self.target_course_count,
+            "content_candidate_count": self.target_course_count,
             "content_failed_count": 0,
             "content_canary_target_count": 3,
             "content_canary_candidate_count": 3,
@@ -663,19 +682,19 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             "content_generation_completed_at": content_completed_at,
             "stage_progress_json": json.dumps(
                 {
-                    "candidateCount": 30,
+                    "candidateCount": self.target_course_count,
                     "canaryCandidateCount": 3,
                     "canaryFailedCount": 0,
                     "canaryTargetCount": 3,
                     "failedCount": 0,
-                    "targetCount": 30,
+                    "targetCount": self.target_course_count,
                 }
             ),
             "subject_progress_json": json.dumps(subject_progress),
-            "classroom_ready_count": 30,
-            "speech_ready_count": 30,
-            "validation_ready_count": 30,
-            "published_course_count": 30,
+            "classroom_ready_count": self.target_course_count,
+            "speech_ready_count": self.target_course_count,
+            "validation_ready_count": self.target_course_count,
+            "published_course_count": self.target_course_count,
             "catalog_build_id": "catalog-build-ready",
             "catalog_release_id": "catalog-release-ready",
             "formal_contract_version": "mira.learning.formal-publication.v1",
@@ -711,15 +730,15 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         self.assertEqual(payload["status"], "ready")
         self.assertEqual(payload["stage"], "completed")
         self.assertEqual(payload["progressPercent"], 100)
-        self.assertEqual(payload["readyCourseCount"], 30)
+        self.assertEqual(payload["readyCourseCount"], self.target_course_count)
 
         for label, mutation in (
             ("progress", {"progress_percent": 99}),
-            ("ready count", {"ready_course_count": 29}),
+            ("ready count", {"ready_course_count": self.target_course_count - 1}),
             ("completion time", {"completed_at": None}),
             ("publication receipt", {"formal_publication_receipt_hash": "bad"}),
             ("active lease", {"lease_token": "unexpected-owner"}),
-            ("published count", {"published_course_count": 29}),
+            ("published count", {"published_course_count": self.target_course_count - 1}),
         ):
             with self.subTest(label=label):
                 with self.assertRaises(ApiError) as caught:
@@ -737,10 +756,10 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         first_subject = next(iter(partial_subject_progress.values()))
         first_subject["contentCandidateCount"] -= 1
         partial_stage_progress = json.loads(ready["stage_progress_json"])
-        partial_stage_progress["candidateCount"] = 29
+        partial_stage_progress["candidateCount"] = self.target_course_count - 1
         internally_consistent_partial_ready = {
             **ready,
-            "content_candidate_count": 29,
+            "content_candidate_count": self.target_course_count - 1,
             "stage_progress_json": json.dumps(partial_stage_progress),
             "subject_progress_json": json.dumps(partial_subject_progress),
         }
@@ -926,7 +945,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         self.assertEqual(non_primary.status_code, 200, non_primary.json)
         self.assertEqual(non_primary.json, {"ok": True, "preparation": None})
 
-    def test_unopened_primary_grade_returns_exact_unavailable_envelope(self):
+    def test_opened_primary_grade_without_matching_plan_returns_null(self):
         with self.database.transaction() as conn:
             conn.execute(
                 "UPDATE children SET grade_code = 'primary_2' WHERE id = ?",
@@ -945,11 +964,6 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             {
                 "ok": True,
                 "preparation": None,
-                "learningPreparationAvailability": {
-                    "status": "unavailable",
-                    "gradeCode": "primary_2",
-                    "message": "该年级正式课程尚未开放",
-                },
             },
         )
 
@@ -1153,7 +1167,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             set(preparation["contentProgress"]["canary"]),
             {"candidateCount", "failedCount", "targetCount", "passed"},
         )
-        self.assertEqual(preparation["contentProgress"]["targetCount"], 30)
+        self.assertEqual(preparation["contentProgress"]["targetCount"], self.target_course_count)
         for subject in preparation["subjects"]:
             self.assertEqual(
                 set(subject),
@@ -1203,7 +1217,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         no_longer_current = self._retry(self.plan_id, "parent-retry-old-grade")
         self.assertEqual(no_longer_current.status_code, 409, no_longer_current.json)
 
-    def test_retry_rejects_a_legacy_failed_plan_for_an_unopened_primary_grade(self):
+    def test_retry_rejects_a_legacy_failed_plan_without_frozen_target_authority(self):
         target = build_preparation_target("primary_2")
         fingerprint = preparation_target_fingerprint(target)
 
@@ -1251,7 +1265,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
 
             def get_current_for_child(inner_self, *args, **kwargs):
                 raise AssertionError(
-                    "unopened grade reached retry successor resolution"
+                    "missing frozen target reached retry successor resolution"
                 )
 
         class AuthService:
@@ -1271,7 +1285,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                 service.retry(
                     "access-token",
                     source["id"],
-                    lambda: {"requestId": "parent-retry-unopened-grade"},
+                    lambda: {"requestId": "parent-retry-missing-target"},
                 )
 
         self.assertEqual(caught.exception.code, "learning_preparation_not_retryable")
@@ -1530,27 +1544,14 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         build_id = str(catalog_payload["build"]["id"])
         release_id = str(catalog_payload["release"]["id"])
         progress = {
-            "chinese": {
-                "totalCourseCount": 12,
+            subject: {
+                "totalCourseCount": target["subjectTargets"][subject]["totalCourseCount"],
                 "readyCourseCount": 0,
-                "failedCourseCount": 12,
+                "failedCourseCount": target["subjectTargets"][subject]["totalCourseCount"],
                 "contentCandidateCount": 0,
                 "contentFailedCount": 0,
-            },
-            "math": {
-                "totalCourseCount": 9,
-                "readyCourseCount": 0,
-                "failedCourseCount": 9,
-                "contentCandidateCount": 0,
-                "contentFailedCount": 0,
-            },
-            "english": {
-                "totalCourseCount": 9,
-                "readyCourseCount": 0,
-                "failedCourseCount": 9,
-                "contentCandidateCount": 0,
-                "contentFailedCount": 0,
-            },
+            }
+            for subject in target["subjects"]
         }
         with self.database.transaction() as conn:
             conn.execute(
@@ -1562,6 +1563,9 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
                   subject_progress_json = ?, next_run_at = NULL,
                   lease_token = NULL, lease_expires_at = NULL, heartbeat_at = NULL,
                   hard_deadline_at = NULL, resume_stage = NULL,
+                  work_unit_kind = NULL, bound_catalog_item_id = NULL,
+                  bound_content_attempt_ordinal = NULL, bound_content_phase = NULL,
+                  retry_reason_code = NULL, retry_message_safe = NULL,
                   error_code = ?, error_message_safe = ?, completed_at = ?,
                   updated_at = ?
                 WHERE id = ?

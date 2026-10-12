@@ -14,8 +14,8 @@
   减少透明度、高对比和减少动态效果使用实底降级。
 
 Flutter SDK 至少需要 3.44.9，Dart 至少需要 3.12.2。升级 SDK 后运行
-`flutter pub get`，提交更新后的 `pubspec.lock`。玻璃组件的选型和验收范围见
-[液态玻璃接入记录](../docs/design/2026-09-29-parent-liquid-glass.md)。
+`flutter pub get`，提交更新后的 `pubspec.lock`。玻璃表面的现有实现见
+[AppGlassSurface](lib/src/shared/widgets/app_glass_surface.dart)，界面规范见 [AGENTS.md](AGENTS.md)。
 
 ## 目录
 

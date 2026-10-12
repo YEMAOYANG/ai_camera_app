@@ -489,7 +489,7 @@ class OpenMaicTtsCredentialRecoveryFactoryTest(unittest.TestCase):
     def test_factory_pins_child_patch_and_wires_both_clients(self):
         app = Flask(__name__)
         app.config.update(
-            DATABASE_URL="sqlite:///:memory:",
+            DATABASE_URL="mysql+pymysql://unused:unused@127.0.0.1/unused",
             OPENMAIC_FULL_RUNTIME_ENABLED=True,
             OPENMAIC_FULL_RUNTIME_GENERATION_ENABLED=False,
             OPENMAIC_FULL_RUNTIME_INTERNAL_URL="http://127.0.0.1:3100",

@@ -100,6 +100,7 @@ def math_candidate() -> dict:
         "objective": "准确完成三位数加减与基础乘除计算。",
         "status": "unverified",
         "content": {
+            "difficultyCode": "standard",
             "schemaVersion": "mira.learning.course.v1",
             "sessionKind": "lesson",
             "outcomeMode": "scored_deterministic",
@@ -338,10 +339,10 @@ def _formal_rows(skill_id: str) -> tuple[list[dict], str, str]:
         ],
         "shapes_position": [
             _choice("有三个角的图形叫什么？", "三角形", ("圆形", "正方形")),
-            _choice("小猫在小狗左边，小狗在小猫哪一边？", "右", ("左", "上")),
-            _choice("球在盒子上方，盒子在球的哪一边？", "下", ("上", "左")),
+            _choice("小猫在小狗的左边，小狗在小猫的哪一边？", "右", ("左", "上")),
+            _choice("球在盒子的上方，盒子在球的哪一边？", "下", ("上", "左")),
             _choice("有四个直角而且四条边相等的是什么图形？", "正方形", ("圆形", "三角形")),
-            _choice("小鸟在树的左边，树在小鸟哪一边？", "右", ("左", "下")),
+            _choice("小鸟在树的左边，树在小鸟的哪一边？", "右", ("左", "下")),
         ],
         "letters_sounds": [
             _choice("大写字母 A 对应哪个小写字母？", "a", ("b", "e")),
@@ -451,7 +452,8 @@ def _formal_course(
         question["skill"] = boundary["skillTitle"]
         delimiter = (
             "。"
-            if skill_id == "number_sense_20" and "组成" in question["prompt"]
+            if (skill_id == "number_sense_20" and "组成" in question["prompt"])
+            or skill_id == "shapes_position"
             else "："
         )
         question["prompt"] = f"练习{marker}{delimiter}{question['prompt']}"
@@ -1310,7 +1312,7 @@ class LearningGeneratedCourseValidatorTest(unittest.TestCase):
         ).exists(),
         "OpenMAIC sidecar dependencies are not installed",
     )
-    def test_real_sidecar_fake_mode_generation_and_second_solve_pass_validator(self):
+    def test_legacy_sidecar_candidate_and_second_solve_remain_nonpublishable(self):
         sidecar = Path(__file__).resolve().parents[1] / "openmaic-sidecar"
         cli = sidecar / "src" / "cli.mjs"
         boundary = {
@@ -1480,11 +1482,24 @@ class LearningGeneratedCourseValidatorTest(unittest.TestCase):
             skill_boundary=generation_output["skillBoundary"],
             independent_solution=verification_output["solution"],
         )
-        self.assertTrue(result.publishable, result.report)
         self.assertEqual(
-            result.course["objective"],
+            generation_output["schemaVersion"], "mira.openmaic.question_candidates.v1",
+        )
+        self.assertEqual(
+            candidate["objective"],
             "正确完成三位数加减法;会用乘除法解决一步问题",
         )
+        self.assertEqual(
+            verification_output["solution"]["publicQuestionHash"],
+            self.validator.public_question_hash(candidate),
+        )
+        self.assertEqual(len(verification_output["solution"]["answers"]), 5)
+        # V1 has no frozen formal objective policy; V2 supplies that authority.
+        self.assertNotIn("difficultyCode", candidate["content"])
+        self.assertFalse(result.publishable, result.report)
+        issue = result.report["issues"][0]
+        self.assertEqual(issue["code"], "invalid_generated_course_schema")
+        self.assertEqual(issue["details"]["missingFields"], ["difficultyCode"])
 
     @staticmethod
     def _run_sidecar(cli: Path, cwd: Path, payload: dict) -> dict:

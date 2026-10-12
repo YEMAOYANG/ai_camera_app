@@ -36,6 +36,11 @@ def historical_question_fingerprints(
         raise ValueError(
             "historical question fingerprint authority is incomplete"
         )
+    # A course written by this item is not part of its pre-attempt inventory,
+    # even when a fast execution or frozen clock gives it the cutoff timestamp.
+    # A rejected first attempt is verified and added separately as required
+    # retry evidence by _attempt_question_fingerprint_authority.
+    request_id = str(item.get("generation_request_id") or "")
     rows = conn.execute(
         """
         SELECT content_json
@@ -43,9 +48,11 @@ def historical_question_fingerprints(
         WHERE grade_code = ? AND subject = ? AND node_code = ?
           AND generation_content_hash IS NOT NULL
           AND created_at <= ?
+          AND (? = '' OR generation_request_id IS NULL
+               OR generation_request_id NOT IN (?, ?))
         ORDER BY created_at, id, version
         """,
-        (grade_code, subject, node_code, cutoff),
+        (grade_code, subject, node_code, cutoff, request_id, request_id, request_id + ".attempt2"),
     ).fetchall()
     fingerprints: set[str] = set()
     for course in rows:

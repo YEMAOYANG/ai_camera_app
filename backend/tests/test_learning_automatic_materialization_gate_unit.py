@@ -4,6 +4,7 @@ import unittest
 from contextlib import contextmanager
 
 from services.learning_service import LearningService
+from services.formal_student_learning_access import assert_formal_student_release_ready
 
 
 def _child(grade_code: str) -> dict[str, object]:
@@ -94,7 +95,7 @@ def _service(child: dict[str, object], release_row):
     service = object.__new__(LearningService)
     service.repository = _Repository(child, release_row)
     service.profile_repository = _ProfileRepository(service.repository)
-    service.formal_learning_access_checker = None
+    service.formal_learning_access_checker = assert_formal_student_release_ready
     service._ensure_catalog = lambda: None
     service._learning_date = lambda value: value or "2026-09-10"
     service.dynamic_calls = []
@@ -113,8 +114,8 @@ def _service(child: dict[str, object], release_row):
 
 
 class LearningAutomaticMaterializationGateUnitTest(unittest.TestCase):
-    def test_unopened_grade_is_skipped_before_provider_or_materialization(self):
-        service = _service(_child("primary_2"), _formal_ready_plan())
+    def test_non_primary_grade_is_skipped_before_provider_or_materialization(self):
+        service = _service(_child("kindergarten_middle"), _formal_ready_plan())
 
         result = service.ensure_today_for_all_primary_children(
             learning_date="2026-09-10"
@@ -127,7 +128,7 @@ class LearningAutomaticMaterializationGateUnitTest(unittest.TestCase):
         self.assertEqual(result["failures"], [])
         self.assertEqual(
             (result.get("skipped") or [{}])[0].get("code"),
-            "student_learning_grade_not_open",
+            "student_learning_primary_only",
         )
         self.assertEqual(service.dynamic_calls, [])
         self.assertEqual(service.materialization_calls, [])
@@ -194,7 +195,7 @@ class LearningAutomaticMaterializationGateUnitTest(unittest.TestCase):
         self.assertEqual(result["createdCount"], 0)
         self.assertEqual(result["childrenEnsured"], 0)
         self.assertEqual(result["childrenSkipped"], 1)
-        self.assertEqual(result["skipped"][0]["code"], "student_learning_grade_not_open")
+        self.assertEqual(result["skipped"][0]["code"], "student_learning_release_not_ready")
         self.assertEqual(
             service.dynamic_calls,
             [("child-primary_1", "2026-09-11")],

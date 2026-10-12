@@ -22,6 +22,26 @@
 
 服务器只公开 Caddy 的 80/443 端口；SSH 按运维需要限制访问。不要把 MySQL、PostgreSQL、8000、8001、3000 或 3101 直接开放到公网。TLS 签发还要求域名解析正确且证书验证流量能到达 Caddy。受限 preview 使用直接 DNS，不在前面套 CDN 或未配置受信客户端 IP 的代理，以免白名单识别成代理地址。
 
+### 局域网麦克风验收
+
+手机或平板通过 `http://192.168.x.x` 访问不属于浏览器的 Secure Context，无法作为正式麦克风链路；`localhost` 例外只适用于运行服务的同一台设备。Student 顶层页面和 Classroom iframe 都必须使用 HTTPS，两个证书都必须在终端上受信。Student 的 Permissions-Policy 要精确包含 Classroom origin，Gateway 的 CSP `frame-ancestors` 要精确包含 Student origin。
+
+本地受管学习栈可使用 `deploy/Caddyfile.lan` 的 `tls internal`，配置本地 DNS 后，校验三个入口：
+
+```sh
+export MIRA_STUDENT_ORIGIN=https://learn.mira.test
+export MIRA_CLASSROOM_ORIGIN=https://classroom.mira.test
+export MIRA_API_ORIGIN=https://api.mira.test
+export MIRA_STUDENT_WEB_ORIGIN=https://learn.mira.test
+export MIRA_RUNTIME_PUBLIC_ORIGIN=https://classroom.mira.test
+python3 deploy/validate_production_origins.py
+caddy validate --config deploy/Caddyfile.lan
+```
+
+本地 Student 的 `MIRA_STUDENT_WEB_PUBLIC_URL`、后端的 `OPENMAIC_FULL_RUNTIME_PUBLIC_URL` 与这些公开入口保持一致；修改域名后重新构建相关前端。必须在每台验收设备安装 Caddy 根证书，并在系统证书设置中启用完整信任，不能只跳过浏览器证书警告。Caddy 仅代理 Student 3000、Gateway 3101 和 API 8000；本地 OpenMAIC 管理入口 `127.0.0.1:3100` 仅供内部访问。
+
+这段配置用于本地三服务入口验收；服务器的五域名部署继续使用下文的 `deploy/server.py` 和 Compose 配置。
+
 ## 2. 放置代码，生成服务器配置
 
 将经过确认的项目版本放到服务器，例如 `/srv/mira/app`。不要上传电脑里的 `.env`、`node_modules` 或整个本地工作目录作为服务器配置；密钥和待迁移数据分别处理。
@@ -67,7 +87,7 @@ python3 deploy/server.py --env /etc/mira/compose.env check
 - OpenMAIC：`127.0.0.1:3000`。
 - 后端：`0.0.0.0:8000`，实时消息为8001。
 - 网关：`0.0.0.0:3101`，内部访问 `127.0.0.1:3000`。
-- Student Web 在独立容器，通过私有别名 `backend:8000` 访问后端。
+- Student Web 在独立容器，通过私有地址 `http://backend:8000` 访问后端。
 
 内部配置使用容器之间的地址，公开配置使用 HTTPS 域名。不要将公网课堂域名替换为 `http://openmaic:3000`，也不要把所有内部地址机械地改成服务器公网 IP。OpenMAIC 的 `MIRA_BACKEND_INTERNAL_URL` 和后端的 `LEARNING_BUDGET_INTERNAL_URL` 在此拓扑下均为 `http://127.0.0.1:8000`。
 

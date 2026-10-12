@@ -8,7 +8,7 @@ from repositories.learning_repository import LearningRepository
 from services.learning_difficulty import available_skill_order, preferred_difficulty, selection_payload
 from services.learning_service import LearningService
 from services.learning_practice_service import canonical, digest
-from tests.test_learning_practice import PracticeTest, source
+from tests import test_learning_practice as practice_fixture
 
 
 class DifficultySelectionTest(unittest.TestCase):
@@ -90,12 +90,12 @@ class DifficultySelectionTest(unittest.TestCase):
         self.assertIn("difficulty_review.status = 'completed'", sql)
         self.assertEqual(params[:8], ['f', 'c', 'primary_6', 'math', 'skill', 'basic', 'f', 'c'])
 
-    def test_practice_missing_tier_preserves_pool_and_returns_review_path(self):
-        fixture = PracticeTest()
+    def test_legacy_practice_source_stays_closed_despite_old_skill_mastery(self):
+        fixture = practice_fixture.PracticeTest()
         fixture.setUp()
         fixture.repo.child.update(grade_code='primary_6')
         skill = boundaries_for('primary_6', 'math')[0].skill_id
-        row = source()
+        row = practice_fixture.source()
         content = json.loads(row['content_json'])
         content['difficultyCode'] = 'standard'
         row.update(grade_code='primary_6', node_code=skill, content_json=canonical(content),
@@ -105,7 +105,8 @@ class DifficultySelectionTest(unittest.TestCase):
         response = fixture.start()
         self.assertIsNone(response['session'])
         self.assertEqual(response['fallbackPath'], '/learning')
-        self.assertIn('当前难度', response['message'])
+        self.assertIn('学习路线', response['message'])
         self.assertFalse(fixture.repo.questions)
         fixture.repo.difficulty_mastery = lambda conn, **scope: {skill: {'mastery_level': 'mastered'}}
-        self.assertEqual(fixture.start()['session']['totalQuestions'], 2)
+        self.assertIsNone(fixture.start()['session'])
+        self.assertFalse(fixture.repo.questions)

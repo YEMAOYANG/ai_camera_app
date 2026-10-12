@@ -25,6 +25,7 @@ from services.learning_daily_preparation_runner import LearningDailyPreparationR
 from services.service_factory import learning_service
 from tests.fixtures.primary_subject_catalog import PRIMARY_COURSE_CATALOG
 from tests.support import fresh_test_config, request_debug_code
+from tests.test_learning_catalog_content_only import _resume_legacy_content_build
 
 
 SIDE_EFFECT_CATEGORIES = (
@@ -628,7 +629,7 @@ class LearningCheckpointRequestPathZeroCallsTest(unittest.TestCase):
             dynamic_generation_service=None,
             lesson_package_service=None,
         )
-        created = service.create_preparation_content_build(
+        created = _resume_legacy_content_build(service,
             request_id="task11-content-only-internal-bypass",
             title="Task 11 内容候选隔离",
             preparation_target=target,
@@ -1045,6 +1046,12 @@ class LearningCheckpointRequestPathZeroCallsTest(unittest.TestCase):
                 "primary_1",
             )
             plan_id = profile_saved.json["learningPreparation"]["id"]
+            with self.database.transaction() as conn:
+                frozen_plan = conn.execute(
+                    "SELECT target_spec_json FROM learning_curriculum_preparation_plans WHERE id = ?",
+                    (plan_id,),
+                ).fetchone()
+            target_count = json.loads(frozen_plan["target_spec_json"])["totalCourseCount"]
 
             current = record(
                 "preparation_current_v2_get",
@@ -1073,7 +1080,7 @@ class LearningCheckpointRequestPathZeroCallsTest(unittest.TestCase):
                 {
                     "candidateCount": 0,
                     "failedCount": 0,
-                    "targetCount": 30,
+                    "targetCount": target_count,
                     "canary": {
                         "targetCount": 3,
                         "candidateCount": 0,
@@ -1114,7 +1121,7 @@ class LearningCheckpointRequestPathZeroCallsTest(unittest.TestCase):
                 {
                     "candidateCount": 0,
                     "failedCount": 0,
-                    "targetCount": 30,
+                    "targetCount": target_count,
                     "canary": {
                         "targetCount": 3,
                         "candidateCount": 0,
@@ -1172,27 +1179,14 @@ class LearningCheckpointRequestPathZeroCallsTest(unittest.TestCase):
         build_id = str(catalog_payload["build"]["id"])
         release_id = str(catalog_payload["release"]["id"])
         subject_progress = {
-            "chinese": {
-                "totalCourseCount": 12,
+            subject: {
+                "totalCourseCount": target["subjectTargets"][subject]["totalCourseCount"],
                 "readyCourseCount": 0,
-                "failedCourseCount": 12,
+                "failedCourseCount": target["subjectTargets"][subject]["totalCourseCount"],
                 "contentCandidateCount": 0,
                 "contentFailedCount": 0,
-            },
-            "math": {
-                "totalCourseCount": 9,
-                "readyCourseCount": 0,
-                "failedCourseCount": 9,
-                "contentCandidateCount": 0,
-                "contentFailedCount": 0,
-            },
-            "english": {
-                "totalCourseCount": 9,
-                "readyCourseCount": 0,
-                "failedCourseCount": 9,
-                "contentCandidateCount": 0,
-                "contentFailedCount": 0,
-            },
+            }
+            for subject in target["subjects"]
         }
         with self.database.transaction() as conn:
             conn.execute(
@@ -1206,6 +1200,9 @@ class LearningCheckpointRequestPathZeroCallsTest(unittest.TestCase):
                   error_message_safe = '课程准备未完成，请重试',
                   lease_token = NULL, lease_expires_at = NULL, heartbeat_at = NULL,
                   next_run_at = NULL, hard_deadline_at = NULL, resume_stage = NULL,
+                  work_unit_kind = NULL, bound_catalog_item_id = NULL,
+                  bound_content_attempt_ordinal = NULL, bound_content_phase = NULL,
+                  retry_reason_code = NULL, retry_message_safe = NULL,
                   completed_at = ?, updated_at = ?
                 WHERE id = ?
                 """,

@@ -210,7 +210,8 @@ class StudentWebAuthApiTest(unittest.TestCase):
         self.assertEqual(response.status_code, 409, response.json)
         self.assertEqual(response.json["error"], "student_learning_primary_only")
 
-    def test_pairing_code_creation_rejects_unopened_primary_grade(self):
+    def test_pairing_code_creation_rejects_unconfirmed_primary_grade(self):
+        # A directly inserted child has no saved grade selection revision.
         primary_two_id = self._insert_child("安安", "primary_2")
 
         response = self.client.post(
@@ -220,7 +221,7 @@ class StudentWebAuthApiTest(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 409, response.json)
-        self.assertEqual(response.json["error"], "student_learning_grade_not_open")
+        self.assertEqual(response.json["error"], "student_learning_release_not_ready")
         with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
             count = conn.execute(
                 "SELECT COUNT(*) AS count FROM student_pairing_codes WHERE child_id = ?",
@@ -310,13 +311,30 @@ class StudentWebAuthApiTest(unittest.TestCase):
                 (self.child_id,),
             )
 
+        still_open = self.client.get(
+            "/api/v2/student/me",
+            headers=self._student_headers(access_token),
+        )
+        self.assertEqual(still_open.status_code, 200, still_open.json)
+        self.assertEqual(still_open.json["student"]["gradeCode"], "primary_2")
+
+        with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
+            conn.execute(
+                """
+                UPDATE children
+                SET grade_code = 'unknown', grade = '',
+                  education_stage = '', age_stage = ''
+                WHERE id = ?
+                """,
+                (self.child_id,),
+            )
         response = self.client.get(
             "/api/v2/student/me",
             headers=self._student_headers(access_token),
         )
 
         self.assertEqual(response.status_code, 409, response.json)
-        self.assertEqual(response.json["error"], "student_learning_grade_not_open")
+        self.assertEqual(response.json["error"], "student_learning_primary_only")
 
     def test_orphan_family_cleanup_removes_student_identity_and_sessions(self):
         paired = self._pair(self._create_pairing_code("2468").json["pairingCode"])

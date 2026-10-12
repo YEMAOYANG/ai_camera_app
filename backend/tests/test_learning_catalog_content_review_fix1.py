@@ -47,7 +47,7 @@ def _canonical_json(value: object) -> str:
 
 
 class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
-    def test_v71_attempt_claim_persists_a_240_second_provider_work_unit(self):
+    def test_attempt_claim_persists_the_registered_600_second_provider_work_unit(self):
         class Connection:
             def __init__(self):
                 self.executions = []
@@ -70,12 +70,15 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
         )
 
         self.assertEqual(claimed, {"id": "item-1"})
-        params = connection.executions[0][1]
-        self.assertEqual(params[4], 241_000)
-        self.assertEqual(params[8], 241_000)
+        params = next(
+            params for sql, params in connection.executions
+            if "UPDATE learning_catalog_build_items" in sql
+        )
+        self.assertEqual(params[4], 601_000)
+        self.assertEqual(params[8], 601_000)
         self.assertEqual(params[7], 1_801_000)
 
-    def test_v71_public_initial_claim_uses_the_same_240_second_budget(self):
+    def test_public_initial_claim_uses_the_same_600_second_budget(self):
         class Connection:
             def __init__(self):
                 self.executions = []
@@ -136,14 +139,17 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
             connection,
             build_id=build["id"],
             now=1_000,
-            lease_ms=240_000,
+            lease_ms=600_000,
         )
 
         self.assertIsNotNone(claimed)
-        params = connection.executions[0][1]
-        self.assertEqual(params[1], 241_000)
+        params = next(
+            params for sql, params in connection.executions
+            if "UPDATE learning_catalog_build_items" in sql
+        )
+        self.assertEqual(params[1], 601_000)
         self.assertEqual(params[4], 1_801_000)
-        self.assertEqual(params[5], 241_000)
+        self.assertEqual(params[5], 601_000)
 
     def test_stale_item_contract_and_wrong_pointer_cannot_be_a_passed_proof(self):
         service = object.__new__(LearningCatalogReleaseService)
@@ -284,9 +290,9 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
             "active_generation_request_id": "request-1",
             "content_phase": "outline",
             "content_lease_token": "original-live-lease",
-            "content_lease_expires_at": now + 120_000,
+            "content_lease_expires_at": now + LearningCatalogRepository.FORMAL_CONTENT_WORK_UNIT_MS,
             "content_provider_attempt_hard_deadline_at": now + 1_800_000,
-            "content_work_unit_deadline_at": now + 120_000,
+            "content_work_unit_deadline_at": now + LearningCatalogRepository.FORMAL_CONTENT_WORK_UNIT_MS,
         }
         connection = _EvidenceConnection(dispatches=[])
         repository.get_item = lambda conn, *, item_id: copy.deepcopy(row)
@@ -432,8 +438,8 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
             "content_phase": "host_gate_running",
             "content_gate_attempt_count": 1,
             "content_lease_token": "host-lease-1",
-            "content_lease_expires_at": now + 120_000,
-            "content_work_unit_deadline_at": now + 120_000,
+            "content_lease_expires_at": now + LearningCatalogRepository.FORMAL_CONTENT_WORK_UNIT_MS,
+            "content_work_unit_deadline_at": now + LearningCatalogRepository.FORMAL_CONTENT_WORK_UNIT_MS,
         }
         repository.lock_build_authority = lambda conn, *, build_id: (
             {"id": "release-1", "status": "draft"},
@@ -533,6 +539,8 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
         service._content_host_evidence = host_evidence
         item = {
             "id": "item-1",
+            "grade_code": "primary_1",
+            "subject": "math",
             "skill_id": "number_sense_20",
             "attempt_count": 1,
             "active_generation_request_id": "request-1",
@@ -620,13 +628,15 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
         service._content_clock_ms = lambda: 100_000
         service._content_host_evidence = lambda **kwargs: (
             object(),
-            object(),
+            SimpleNamespace(grade_code="primary_1"),
             object(),
             (),
         )
         summary = service._empty_content_summary()
         item = {
             "id": "item-1",
+            "grade_code": "primary_1",
+            "subject": "math",
             "skill_id": "number_sense_20",
             "generation_request_id": "request-1",
             "course_id": "course-1",
@@ -818,11 +828,11 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
         self.assertEqual(service._content_profile_payload("generator"), valid)
         service.question_phase_provider_profiles["generator"] = {
             **valid,
-            "timeoutMs": 180_000,
+            "timeoutMs": 300_000,
         }
         self.assertEqual(
             service._content_profile_payload("generator")["timeoutMs"],
-            180_000,
+            300_000,
         )
         service.question_phase_provider_profiles["generator"] = valid
 
@@ -837,7 +847,7 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
             {**valid, "baseUrl": "https://example.com/" + "x" * 490},
             {**valid, "timeoutMs": True},
             {**valid, "timeoutMs": 999},
-            {**valid, "timeoutMs": 180_001},
+            {**valid, "timeoutMs": 300_001},
             {**valid, "maxTokens": True},
             {**valid, "maxTokens": 511},
             {**valid, "maxTokens": 32_001},
@@ -1398,6 +1408,7 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
         rows = [
             {
                 "id": f"summary-{index}",
+                "grade_code": "primary_1",
                 "subject": item["subject"],
                 "skill_id": item["skillId"],
                 "variant_ordinal": item["variantOrdinal"],
@@ -1425,6 +1436,7 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
         items = [
             {
                 "id": f"item-{index}",
+                "grade_code": "primary_1",
                 "subject": target["subject"],
                 "skill_id": target["skillId"],
                 "variant_ordinal": target["variantOrdinal"],
@@ -1620,6 +1632,10 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
                 now = 300_001
                 expired = {
                     "id": "item-1",
+                    "grade_code": "primary_1",
+                    "subject": "math",
+                    "skill_id": "number_sense_20",
+                    "content_attempt_started_at": 1_000,
                     "attempt_count": 1,
                     "content_phase": "host_gate_running",
                     "content_gate_status": "pending",
@@ -1640,8 +1656,8 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
                     "content_phase": "host_gate_running",
                     "content_gate_attempt_count": expected,
                     "content_lease_token": "fresh-lease",
-                    "content_lease_expires_at": now + 120_000,
-                    "content_work_unit_deadline_at": now + 120_000,
+                    "content_lease_expires_at": now + LearningCatalogRepository.FORMAL_CONTENT_WORK_UNIT_MS,
+                    "content_work_unit_deadline_at": now + LearningCatalogRepository.FORMAL_CONTENT_WORK_UNIT_MS,
                 }
                 get_calls = 0
 
@@ -1853,11 +1869,11 @@ class _MutatingLockedAuditRepository:
         yield object()
 
     def prepare_content_advance(self, conn, *, build_id, now):
-        item = {"id": "item-1"}
+        item = {"id": "item-1", "grade_code": "primary_1"}
         return {"action": self.action, "item": item, "items": [item]}
 
     def load_content_proof_inventory(self, conn, *, build_id):
-        return {"items": [{"id": "mutated-item"}]}
+        return {"items": [{"id": "mutated-item", "grade_code": "primary_1"}]}
 
     def claim_content_attempt_two(self, *args, **kwargs):
         self.claim_attempt_two_calls += 1

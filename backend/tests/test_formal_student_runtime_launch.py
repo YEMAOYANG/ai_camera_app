@@ -1050,6 +1050,7 @@ class FormalStudentRuntimeLaunchTest(unittest.TestCase):
                 None,
                 {"grade_code": "primary_1", "grade_selection_revision": 2},
                 None,
+                None,  # No progressive session before the active pointer lookup.
                 active_authority,
                 {"learning_session_id": "session-1"},
             ]

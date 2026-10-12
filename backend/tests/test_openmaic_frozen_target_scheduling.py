@@ -30,7 +30,7 @@ class MemoryConnection:
             id TEXT, grade_code TEXT, target_spec_json TEXT, target_fingerprint TEXT,
             status TEXT, stage TEXT, resume_stage TEXT, next_run_at INT, created_at INT,
             lease_token TEXT, lease_expires_at INT, progress_percent INT, hard_deadline_at INT,
-            work_unit_kind TEXT, superseded_at INT)''')
+            work_unit_kind TEXT, superseded_at INT, library_target_fingerprint TEXT)''')
 
     def add(self, target, *, id="plan", fingerprint=None, **values):
         row = dict(id=id, grade_code=target["gradeCode"], target_spec_json=encoded(target),
@@ -52,7 +52,7 @@ class CaptureConnection:
 
     def execute(self, sql, params=()):
         self.calls.append((sql, tuple(params)))
-        return SimpleNamespace(fetchone=lambda: None)
+        return SimpleNamespace(fetchone=lambda: None, fetchall=lambda: [])
 
 
 class OpenMaicFrozenTargetSchedulingTest(unittest.TestCase):
@@ -63,18 +63,22 @@ class OpenMaicFrozenTargetSchedulingTest(unittest.TestCase):
         self.fingerprint = preparation_target_fingerprint(self.current)
         self.repository = LearningCurriculumPreparationRepository(None)
 
-    def test_five_exact_contracts_have_independent_copies_and_original_hashes(self):
-        self.assertEqual(len(self.targets), 5)
-        self.assertEqual(len({preparation_target_fingerprint(t) for t in self.targets}), 5)
+    def test_nine_exact_contracts_have_independent_copies_and_original_hashes(self):
+        self.assertEqual(len(self.targets), 9)
+        self.assertEqual(len({preparation_target_fingerprint(t) for t in self.targets}), 9)
         self.assertEqual([preparation_target_fingerprint(t) for t in self.targets[1:]], [
             "174a787e2ddbb8dd9c50e859a829bd2fe08fec71838448a8c5e5b0d2246766f1",
             "48cceefd0543abe9e3bfcf2f8d640ef21b8e03503cfa3dc6ef89a0428bcef2df",
             "7d4c0980789621cffb338e14b39c7dbc7b0d34c40013be0725c0076dad3b90a3",
             "c8fb538cb53fe365f86d0fd62bb9f270c9a2c17a39d5b0b8ce425cf7e0051f4a",
+            "e7f3d4be11e40d516d68b793682c67afe6e515b9e18bab1cd12d6649435cc0cc",
+            "d526af0146e824185c7eedf0e0b0eba3c195d0f17247c7297525205b3428d0d3",
+            "1299abda01538caae337d229bb3d1f2a22c00d85cf689bf2ead7271ccd674f0a",
+            "4cf3a0a992f84605b005a67bd7fba0d69dd58e32e388aa912f2adf9673d01c7f",
         ])
         self.targets[1]["formalRuntimePolicy"]["professionalCreationPolicy"]["mode"] = "changed"
         self.assertEqual(self.current["formalRuntimePolicy"]["professionalCreationPolicy"]["mode"], "professional_skill")
-        self.assertEqual(len(compatible_preparation_targets(self.current)), 5)
+        self.assertEqual(len(compatible_preparation_targets(self.current)), 9)
 
     def claim_selection(self, conn, *, fingerprint=None):
         with self.assertRaises(Selected) as selected:
@@ -157,9 +161,10 @@ class OpenMaicFrozenTargetSchedulingTest(unittest.TestCase):
         self.assertIsNone(LessonPackageRepository(None).get_next_formal_candidate_authority(conn))
         sql, params = conn.calls[0]
         self.assertEqual(sql.count("?"), len(params))
-        self.assertEqual(len(params), 6)
-        self.assertEqual(tuple(params[::2]), tuple(encoded(t) for t in self.automatic_targets))
-        self.assertEqual(tuple(params[1::2]), tuple(preparation_target_fingerprint(t) for t in self.automatic_targets))
+        self.assertEqual(len(params), 7)
+        self.assertEqual(params[0], "primary_1")
+        self.assertEqual(tuple(params[1::2]), tuple(encoded(t) for t in self.automatic_targets))
+        self.assertEqual(tuple(params[2::2]), tuple(preparation_target_fingerprint(t) for t in self.automatic_targets))
         for gate in ("plan.status = 'running'", "plan.superseded_at IS NULL", "plan.completed_at IS NULL",
                      "blocked.quality_status = 'quarantined'", "blocked.error_code LIKE '%%ambiguous%%'",
                      "recovery.status IN ('reserving', 'running', 'succeeded')", "ORDER BY plan.created_at, plan.id"):
@@ -199,7 +204,9 @@ class OpenMaicFrozenTargetSchedulingTest(unittest.TestCase):
             target_fingerprint=self.fingerprint, now=100, required_budget_ms=1000))
         sql, params = conn.calls[0]
         self.assertEqual(sql.count("?"), len(params))
-        self.assertEqual(len(params), 8)
+        self.assertEqual(len(params), 11)
+        self.assertEqual(params[-4:-1], (self.fingerprint, self.fingerprint, "primary_1"))
+        self.assertIn("current_library_owner.library_target_fingerprint = ?", sql)
         for gate in ("status = 'queued'", "stage = 'retry_wait'", "work_unit_kind = 'provider_phase'",
                      "lease_token IS NULL", "superseded_at IS NULL"):
             self.assertIn(gate, sql)

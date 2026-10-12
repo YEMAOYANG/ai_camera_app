@@ -51,16 +51,44 @@ class FormalMultigradeRepositoryTest(unittest.TestCase):
                     build = self.catalog.get_build(conn, build_id=owner['catalog_build_id'])
                     release = self.catalog.get_release(conn, release_id=build['release_id'])
                     rows = conn.execute('SELECT * FROM learning_catalog_build_items WHERE build_job_id = ?', (build['id'],)).fetchall()
-                    self.assertEqual(build['total_item_count'], 30 if number == 1 else 27)
-                    self.assertEqual(release['required_boundary_count'], 10 if number == 1 else 9)
+                    self.assertEqual(build['total_item_count'], library.target['totalCourseCount'])
+                    self.assertEqual(release['required_boundary_count'], library.target['boundaryCount'])
                     self.assertEqual(len(rows), build['total_item_count'])
+                    self.assertEqual(
+                        {(row['subject'], row['skill_id'], row['variant_ordinal']) for row in rows},
+                        {(row['subject'], row['skillId'], row['variantOrdinal']) for row in library.target['courseTargets']},
+                    )
                     self.assertEqual({r['grade_code'] for r in rows}, {grade})
                     self.assertTrue(item_ids.isdisjoint({r['id'] for r in rows}))
                     item_ids.update(r['id'] for r in rows)
                     self.assertEqual(json.loads(build['target_spec_json']), library.target)
-                    claim = self.catalog.claim_next_content_item(conn, build_id=build['id'], now=2000, lease_ms=60000)
-                    self.assertEqual(claim['grade_code'], grade)
-                    self.assertEqual(claim['skill_id'], library.target['canaryManifest']['targets'][0]['skillId'])
+                # Progressive work uses its own durable claim phase, never the
+                # frozen legacy outline scaffold. Stop at the generator boundary.
+                dispatched = []
+                class StopBeforeProvider:
+                    def generate(self, payload, *, enqueue_classroom):
+                        dispatched.append((payload, enqueue_classroom))
+                        raise RuntimeError("fixture stopped before Provider dispatch")
+                self.release.dynamic_generation_service = StopBeforeProvider()
+                with library.preparations.transaction() as conn:
+                    content_plan = library.preparations.claim_next(
+                        conn, now=2000, lease_ms=360000, grade_code=grade,
+                        target_fingerprint=library.fingerprint,
+                    )
+                self.assertIsNotNone(content_plan)
+                with self.assertRaisesRegex(RuntimeError, "fixture stopped before Provider dispatch"):
+                    CheckpointSharedBuildAdapter(self.release, repository=library.preparations,
+                        clock=lambda: 2000).advance(content_plan, now_ms=2000, heartbeat=lambda: True)
+                self.assertEqual(len(dispatched), 1)
+                self.assertEqual(dispatched[0][0]['gradeCode'], grade)
+                self.assertEqual(dispatched[0][0]['lessonId'], library.target['canaryManifest']['targets'][0]['skillId'])
+                self.assertFalse(dispatched[0][1])
+                with self.catalog.transaction() as conn:
+                    claimed = conn.execute("SELECT * FROM learning_catalog_build_items WHERE build_job_id = ? "
+                        "AND status = 'processing' AND content_phase = 'progressive_generation'", (build['id'],)).fetchall()
+                self.assertEqual(len(claimed), 1)
+                self.assertEqual(claimed[0]['grade_code'], grade)
+                self.assertEqual(claimed[0]['skill_id'], dispatched[0][0]['lessonId'])
                 status = library.status()
                 self.assertEqual(status['requestedCount'], 3)
                 self.assertEqual(status['readyCount'], 0)
@@ -113,10 +141,10 @@ class FormalMultigradeRepositoryTest(unittest.TestCase):
                         conn.execute('UPDATE learning_curriculum_preparation_plans SET '+assignments+' WHERE id = ?', (*params, plan['id']))
 
     def test_current_owner_does_not_reopen_older_compatible_production_scope(self):
-        from services.learning_curriculum_preparation_contract import preparation_target_fingerprint
+        from services.learning_curriculum_preparation_contract import build_preparation_target, preparation_target_fingerprint
         from integrations.openmaic_formal_media import compatible_preparation_targets, PROFESSIONAL_POLICY
         old = CourseLibraryService(self.url, grade_code='primary_1', clock=lambda: 1000)
-        old.target = next(target for target in compatible_preparation_targets(old.target)
+        old.target = next(target for target in compatible_preparation_targets(build_preparation_target('primary_1'))
                           if target['formalRuntimePolicy']['professionalCreationPolicy'] == PROFESSIONAL_POLICY)
         old.fingerprint = preparation_target_fingerprint(old.target)
         old.request_scope('first_unit')

@@ -6,6 +6,7 @@ from pathlib import Path
 import unittest
 
 from content.primary_skill_boundaries import PRIMARY_SKILL_BOUNDARIES
+from core.errors import ApiError
 from integrations.openmaic_formal_media import (
     LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY, INTEGRATED_PROFESSIONAL_POLICY,
     PROFESSIONAL_POLICY, canonical_sha256, compatible_preparation_target, generation_options,
@@ -118,9 +119,27 @@ class OpenMaicFormalPedagogyTest(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 skill_selection_plan(bad)
 
-    def test_grade_projection_does_not_open_additional_student_grades(self):
-        from services.formal_student_learning_access import FORMAL_STUDENT_GRADE_CODES
-        self.assertEqual(FORMAL_STUDENT_GRADE_CODES, frozenset({"primary_1"}))
+    def test_registered_primary_grades_keep_workspace_and_nonprimary_gates(self):
+        from services.formal_student_learning_access import (
+            FORMAL_STUDENT_GRADE_CODES,
+            assert_formal_student_grade_open,
+            assert_formal_student_workspace_open,
+        )
+        self.assertEqual(
+            FORMAL_STUDENT_GRADE_CODES,
+            frozenset(f"primary_{number}" for number in range(1, 7)),
+        )
+        for grade_code in sorted(FORMAL_STUDENT_GRADE_CODES):
+            with self.subTest(grade=grade_code):
+                child = {"grade_code": grade_code, "grade_selection_revision": 0}
+                self.assertEqual(assert_formal_student_grade_open(child), grade_code)
+                with self.assertRaises(ApiError) as denied:
+                    assert_formal_student_workspace_open(child)
+                self.assertEqual(denied.exception.code, "student_learning_release_not_ready")
+        for grade_code in ("kindergarten_small", "primary_7", "unknown"):
+            with self.subTest(unsupported=grade_code), self.assertRaises(ApiError) as denied:
+                assert_formal_student_grade_open({"grade_code": grade_code})
+            self.assertEqual(denied.exception.code, "student_learning_primary_only")
 
 
 if __name__ == "__main__":

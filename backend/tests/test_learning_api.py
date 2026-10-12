@@ -381,7 +381,7 @@ class LearningApiTest(unittest.TestCase):
             ).fetchone()
         self.assertIsNotNone(event)
 
-    def test_background_ensure_skips_unopened_grade_without_learning_writes(self):
+    def test_background_ensure_skips_unready_release_without_learning_writes(self):
         with self.app.app_context():
             result = learning_service().ensure_today_for_all_primary_children(
                 learning_date="2026-09-03"
@@ -395,7 +395,7 @@ class LearningApiTest(unittest.TestCase):
         self.assertEqual(result["failures"], [])
         self.assertEqual(
             result["skipped"][0]["code"],
-            "student_learning_grade_not_open",
+            "student_learning_release_not_ready",
         )
         with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
             task_count = conn.execute(

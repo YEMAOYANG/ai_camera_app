@@ -1037,7 +1037,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         for subject in preparation["subjects"]:
             self.assertEqual(set(subject), V1_SUBJECT_KEYS)
         self.assertEqual(preparation["status"], "queued")
-        self.assertEqual(preparation["totalCourseCount"], 30)
+        self._assert_preparation_matches_frozen_target(preparation, "primary_1")
         self.assertEqual(preparation["gradeLabel"], "一年级")
         self.assertEqual(
             selected.json["learningPreparationAvailability"],
@@ -1103,7 +1103,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
             [(1, "superseded")],
         )
 
-    def test_primary_two_grade_is_saved_without_reserving_a_formal_plan(self):
+    def test_primary_two_grade_reserves_current_progressive_plan(self):
         current_year = datetime.now().year
 
         selected = self.client.patch(
@@ -1117,13 +1117,15 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
 
         self.assertEqual(selected.status_code, 200, selected.json)
         self.assertEqual(selected.json["child"]["gradeCode"], "primary_2")
-        self.assertNotIn("learningPreparation", selected.json)
+        self._assert_preparation_matches_frozen_target(
+            selected.json["learningPreparation"], "primary_2"
+        )
         self.assertEqual(
             selected.json["learningPreparationAvailability"],
             {
-                "status": "unavailable",
+                "status": "preparing",
                 "gradeCode": "primary_2",
-                "message": "该年级正式课程尚未开放",
+                "message": "已开始准备",
             },
         )
         with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
@@ -1135,7 +1137,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
                 """,
                 (self.child_id,),
             ).fetchone()["count"]
-        self.assertEqual(int(count), 0)
+        self.assertEqual(int(count), 1)
 
     def test_concurrent_profile_grade_changes_serialize_to_one_current_plan(self):
         barrier = Barrier(3)
@@ -1220,15 +1222,13 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
                 (self.child_id,),
             ).fetchone()["count"]
         self.assertEqual(child["grade_selection_revision"], 2)
-        self.assertEqual(len(plans), 1)
-        self.assertEqual(plans[0]["grade_code"], "primary_1")
-        if child["grade_code"] == "primary_1":
-            self.assertEqual(plans[0]["grade_selection_revision"], 2)
-            self.assertEqual(plans[0]["status"], "queued")
-        else:
-            self.assertEqual(child["grade_code"], "primary_2")
-            self.assertEqual(plans[0]["grade_selection_revision"], 1)
-            self.assertEqual(plans[0]["status"], "superseded")
+        self.assertEqual(len(plans), 2)
+        self.assertEqual({row["grade_code"] for row in plans}, {"primary_1", "primary_2"})
+        self.assertEqual(
+            [(row["grade_selection_revision"], row["status"]) for row in plans],
+            [(1, "superseded"), (2, "queued")],
+        )
+        self.assertEqual(plans[1]["grade_code"], child["grade_code"])
         # Task 3's reservation contract records supersession on the plan row;
         # append-only worker events begin only when a stated transition API uses them.
         self.assertEqual(event_count, 0)
@@ -1886,6 +1886,29 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         )
         self.assertEqual(deleted.status_code, 200)
         self.assertEqual(deleted.json["item"]["status"], "archived")
+
+    def _assert_preparation_matches_frozen_target(self, preparation, grade_code):
+        with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
+            plan = conn.execute(
+                "SELECT grade_code, target_spec_json FROM learning_curriculum_preparation_plans "
+                "WHERE id = ? AND child_id = ?",
+                (preparation["id"], self.child_id),
+            ).fetchone()
+        self.assertIsNotNone(plan)
+        self.assertEqual(plan["grade_code"], grade_code)
+        target = json.loads(plan["target_spec_json"])
+        self.assertEqual(target["schemaVersion"], "mira.learning.preparation-target.progressive.v1")
+        self.assertEqual(target["gradeCode"], grade_code)
+        self.assertEqual(target["totalCourseCount"], len(target["courseTargets"]))
+        self.assertEqual(preparation["totalCourseCount"], target["totalCourseCount"])
+        self.assertEqual(
+            {item["code"]: item["totalCourseCount"] for item in preparation["subjects"]},
+            {subject: item["totalCourseCount"] for subject, item in target["subjectTargets"].items()},
+        )
+        self.assertEqual(
+            sum(item["totalCourseCount"] for item in preparation["subjects"]),
+            preparation["totalCourseCount"],
+        )
 
     def _login(self, phone: str) -> str:
         code = request_debug_code(self.client, phone)

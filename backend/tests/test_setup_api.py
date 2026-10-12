@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -258,7 +259,20 @@ class SetupApiTest(unittest.TestCase):
         for subject in preparation["subjects"]:
             self.assertEqual(set(subject), V1_SUBJECT_KEYS)
         self.assertEqual(preparation["status"], "queued")
-        self.assertEqual(preparation["totalCourseCount"], 30)
+        with Database(self.app.config["DATABASE_URL"]).transaction() as conn:
+            frozen = conn.execute(
+                "SELECT target_spec_json FROM learning_curriculum_preparation_plans WHERE id = ?",
+                (preparation["id"],),
+            ).fetchone()
+        target = json.loads(frozen["target_spec_json"])
+        self.assertEqual(target["schemaVersion"], "mira.learning.preparation-target.progressive.v1")
+        self.assertEqual(preparation["totalCourseCount"], target["totalCourseCount"])
+        self.assertEqual(
+            {item["code"]: item["totalCourseCount"] for item in preparation["subjects"]},
+            {subject: item["totalCourseCount"] for subject, item in target["subjectTargets"].items()},
+        )
+        self.assertEqual(sum(item["totalCourseCount"] for item in preparation["subjects"]),
+                         len(target["courseTargets"]))
         self.assertEqual(preparation["gradeLabel"], "一年级")
         self.assertEqual(
             saved.json["learningPreparationAvailability"],
@@ -320,13 +334,14 @@ class SetupApiTest(unittest.TestCase):
             headers=self._auth_headers(access_token),
         )
         self.assertEqual(changed.status_code, 200, changed.json)
-        self.assertNotIn("learningPreparation", changed.json)
+        self.assertEqual(changed.json["learningPreparation"]["gradeCode"], "primary_2")
+        self.assertEqual(changed.json["learningPreparation"]["status"], "queued")
         self.assertEqual(
             changed.json["learningPreparationAvailability"],
             {
-                "status": "unavailable",
+                "status": "preparing",
                 "gradeCode": "primary_2",
-                "message": "该年级正式课程尚未开放",
+                "message": "已开始准备",
             },
         )
 
@@ -365,6 +380,7 @@ class SetupApiTest(unittest.TestCase):
             ],
             [
                 ("primary_1", 1, "superseded"),
+                ("primary_2", 2, "superseded"),
                 ("primary_1", 3, "queued"),
             ],
         )

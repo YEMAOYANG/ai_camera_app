@@ -22,10 +22,11 @@ FORMAL_EVENT_RECEIPT_SCHEMA = (
 )
 RUNTIME_UPSTREAM_VERSION = "1.0.0"
 RUNTIME_UPSTREAM_COMMIT = "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5"
-RUNTIME_PATCH_COUNT = 42
-RUNTIME_LATEST_PATCH = "0042-mira-deepseek-courseware-routing.patch"
+# Deployment pins must match openmaic-runtime/upstream.lock.json.
+RUNTIME_PATCH_COUNT = 158
+RUNTIME_LATEST_PATCH = "0158-mira-self-narrated-activity-start.patch"
 RUNTIME_LATEST_PATCH_SHA256 = (
-    "7cd7e4fb972fcac740c0380826a92bd3b8cbfce68565a37749408e2ea6df5487"
+    "c09c4ddc80da67fcc0a9afb6de0a86d19fae50232204fb137a616c5643ed0ac3"
 )
 
 

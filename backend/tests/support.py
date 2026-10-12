@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import os
+import shutil
+from contextlib import contextmanager
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any
+from unittest.mock import patch
 from urllib.parse import unquote, urlparse
 
 from core.database import Database
@@ -36,6 +40,26 @@ def validated_test_database_url(database_url: str | None = None) -> str:
     if (parsed.hostname or "").lower() not in {"127.0.0.1", "localhost", "::1"}:
         raise RuntimeError("APP_TEST_DATABASE_URL must use a safe local test boundary")
     return resolved
+
+
+@contextmanager
+def migration_fixture_through(version: str):
+    """Run real migrations at one historical boundary, without editing their SQL."""
+    migration = BACKEND_ROOT / "migrations" / version
+    if Path(version).name != version or not migration.is_file():
+        raise ValueError("historical migration fixture version must exist")
+    with TemporaryDirectory(
+        prefix="mira-migration-fixture-",
+        dir=os.getenv("MIRA_TASK_TMPDIR") or os.getenv("TMPDIR"),
+    ) as temporary:
+        fixture_root = Path(temporary)
+        fixture_migrations = fixture_root / "migrations"
+        fixture_migrations.mkdir()
+        for source in sorted((BACKEND_ROOT / "migrations").glob("*.sql")):
+            if source.name <= version:
+                shutil.copyfile(source, fixture_migrations / source.name)
+        with patch("scripts.migrate.ROOT", fixture_root):
+            yield
 
 
 def fresh_test_config(**overrides: Any) -> dict:

@@ -153,7 +153,12 @@ class ProgressiveGenerationTest(unittest.TestCase):
         repo.transaction.side_effect = transaction
         repo.create_or_get_job.return_value = ({"id": "job"}, True)
         repo.create_or_get_candidate.return_value = ({"id": "candidate"}, True)
-        expected_course, report = validate_progressive_course(candidate, brief=brief, verification=verification, request_id="progressive-test")
+        from content.progressive_runtime_authoring_scope import CONTENT_FIELD, issue_runtime_authoring_scope
+        expected_candidate = deepcopy(candidate)
+        expected_candidate['content'][CONTENT_FIELD] = issue_runtime_authoring_scope(
+            lesson_id='ZH1A01.01', binding=brief['binding'], request_id='progressive-test',
+            provider_content=candidate['content'])
+        expected_course, report = validate_progressive_course(expected_candidate, brief=brief, verification=verification, request_id="progressive-test")
         repo.stage_candidate.return_value = (stored_fixture(expected_course, report), True)
         owner.repository = repo
         owner.classroom_enqueue = Mock()

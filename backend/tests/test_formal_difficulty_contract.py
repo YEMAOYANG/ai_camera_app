@@ -160,7 +160,7 @@ class FormalDifficultyContractTest(unittest.TestCase):
         from services.lesson_package_validator import formal_runtime_teaching_brief
         course,target,boundary,evidence,identity=grade_host_fixture('primary_6')
         command=QuestionPhaseCommand('item',1,'outline',1,identity.generation_request_id,'primary_6','math','zh-CN','zh-CN',boundary,{'questionCount':5,'existingFingerprints':[],'generationFeedback':None},'standard')
-        request=OpenMaicQuestionPhaseAdapter().canonicalize_phase(command).request
+        request=OpenMaicQuestionPhaseAdapter(provider_name='kimi', model_name='test-model', base_url='https://provider.invalid/v1').canonicalize_phase(command).request
         projection=_nfkc_fixture(_candidate_projection_from_course(course))
         built=_build_candidate_course(command,projection)
         self.assertEqual(_normalize_candidate_course(built,command,existing_fingerprints=[]),built)
@@ -179,7 +179,7 @@ class FormalDifficultyContractTest(unittest.TestCase):
         from content.formal_curriculum_registry import formal_registered_boundary
         boundary=formal_registered_boundary('primary_6','math','fraction_ratio_percentage')
         command=QuestionPhaseCommand('item',1,'outline',1,'difficulty-reservation-fixture','primary_6','math','zh-CN','zh-CN',boundary.to_openmaic_payload(),{'questionCount':5,'existingFingerprints':[],'generationFeedback':None},'standard')
-        prepared=OpenMaicQuestionPhaseAdapter().canonicalize_phase(command)
+        prepared=OpenMaicQuestionPhaseAdapter(provider_name='kimi', model_name='test-model', base_url='https://provider.invalid/v1').canonicalize_phase(command)
         def validate(request):
             encoded=json.dumps(request,ensure_ascii=False,sort_keys=True,separators=(',',':'))
             _validate_strict_reservation_request(phase=command.phase,phase_ordinal=command.phase_ordinal,generation_request_id=command.generation_request_id,provider=prepared.provider['name'],model=prepared.provider['model'],profile=prepared.profile_sha256,input_sha256=hashlib.sha256(encoded.encode()).hexdigest(),command_checkpoint=prepared.request['checkpoint'],prepared_request=request)
@@ -223,7 +223,7 @@ class FormalDifficultyContractTest(unittest.TestCase):
         valid=_nfkc_fixture(_candidate_projection_from_course(course))
         invalid=copy.deepcopy(valid)
         invalid['questions'][0]['prompt']='把分数3/5化成百分数是多少?'
-        adapter=OpenMaicQuestionPhaseAdapter()
+        adapter=OpenMaicQuestionPhaseAdapter(provider_name='kimi', model_name='test-model', base_url='https://provider.invalid/v1')
         env={**os.environ,'OPENMAIC_FAKE_MODE':'1','OPENMAIC_HOST_VALIDATOR_PYTHON':sys.executable,'PYTHONDONTWRITEBYTECODE':'1'}
         for raw,reply,expected_status,expected_source in (
             (invalid,valid,'accepted','candidate_repair_output'),
@@ -242,7 +242,7 @@ class FormalDifficultyContractTest(unittest.TestCase):
             self.assertEqual(normalized.checkpoint.get('hostCompilation',{}).get('source'),expected_source)
 
     def test_python_sidecar_all_bands_share_canonical_policy_hash(self):
-        requests=[];adapter=OpenMaicQuestionPhaseAdapter()
+        requests=[];adapter=OpenMaicQuestionPhaseAdapter(provider_name='kimi', model_name='test-model', base_url='https://provider.invalid/v1')
         for boundary in PRIMARY_SKILL_BOUNDARIES:
             if boundary.grade_code=='primary_1':continue
             for band in DIFFICULTY_CODES:

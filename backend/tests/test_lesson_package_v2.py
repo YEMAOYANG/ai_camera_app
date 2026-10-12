@@ -701,12 +701,12 @@ class LessonPackageV2ApiTest(unittest.TestCase):
                 INSERT INTO children(
                   id, family_id, name, nickname, gender, age_stage,
                   education_stage, grade, grade_code,
-                  grade_school_year_start, grade_confirmed_at, birthday,
+                  grade_school_year_start, grade_selection_revision, grade_confirmed_at, birthday,
                   sleep_time, created_at, updated_at
                 )
                 SELECT ?, family_id, ?, ?, gender, age_stage,
                   education_stage, grade, grade_code,
-                  grade_school_year_start, grade_confirmed_at, birthday,
+                  grade_school_year_start, grade_selection_revision, grade_confirmed_at, birthday,
                   sleep_time, created_at + 1, updated_at
                 FROM children WHERE id = ?
                 """,

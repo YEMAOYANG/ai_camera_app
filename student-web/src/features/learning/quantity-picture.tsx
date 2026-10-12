@@ -10,4 +10,3 @@ export function QuantityPicture({ count, removed = 0 }: { count: number; removed
     {!count && <ellipse cx="110" cy="92" rx="62" ry="38" fill="none" stroke="#ad9d74" strokeWidth="3" strokeDasharray="5 7" />}
   </svg>;
 }
-

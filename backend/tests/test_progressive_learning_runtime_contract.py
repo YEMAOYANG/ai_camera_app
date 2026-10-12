@@ -45,6 +45,7 @@ def classroom_for(expected):
 class ProgressiveRuntimeContractTest(unittest.TestCase):
     def setUp(self):
         self.service = object.__new__(OpenMaicFullRuntimeService)
+        self.service.textbook_library_only = False
 
     def test_actual_new_candidate_projects_six_exact_answer_blind_questions(self):
         row, generation = generation_fixture()
@@ -134,24 +135,38 @@ class ProgressiveRuntimeContractTest(unittest.TestCase):
         generation["teachingBriefSha256"] = canonical_sha256(generation["teachingBrief"])
         with self.assertRaises(ValueError): validate_generation_grade_boundary(generation)
 
-    def test_lower_grade_launch_requires_exact_visible_fine_prerequisite(self):
-        authority = {"course_id": "progressive_first", "course_version": "v1", "course_grade_code": "primary_1",
-            "child_grade_code": "primary_6", "child_grade_selection_revision": 3,
-            "course_curriculum_version": CURRICULUM_VERSION, "course_subject": "math", "course_node_code": "M1A01.01"}
+    def test_lower_grade_launch_requires_exact_in_progress_binding_and_visibility(self):
+        from tests.test_formal_student_runtime_launch import _formal_row, _Repository
+        authority = _formal_row()
+        authority.update(course_id="progressive_first", course_version="v1",
+            course_grade_code="primary_1", candidate_grade_code="primary_1",
+            child_grade_code="primary_6", child_grade_selection_revision=3,
+            course_curriculum_version=CURRICULUM_VERSION, course_node_code="M1A01.01")
         self.service.repository = SimpleNamespace(database=object())
         conn = object()
         with patch("repositories.learning_repository.LearningRepository.get_student_visible_course", return_value={"id": "progressive_first"}) as visible:
-            self.service._require_student_course_grade(conn, authority, family_id="f", child_id="c")
-            self.assertEqual(visible.call_args.kwargs, {"family_id": "f", "child_id": "c", "grade_code": "primary_6",
+            with self.assertRaises(OpenMaicRuntimeServiceError):
+                self.service._require_student_course_grade(conn, authority, family_id="family-1", child_id="child-1")
+            visible.assert_not_called()
+            _Repository(authority).bind_formal_session_to_active_release(None)
+            authority.update(session_status="in_progress", formal_binding_authority_kind="progressive_course",
+                formal_binding_pointer_history_id=None, formal_binding_pointer_revision=0,
+                formal_binding_grade_selection_revision=3)
+            self.assertEqual(self.service._formal_session_binding_state(authority), (True, True))
+            self.service._require_student_course_grade(conn, authority, family_id="family-1", child_id="child-1")
+            self.assertEqual(visible.call_args.kwargs, {"family_id": "family-1", "child_id": "child-1", "grade_code": "primary_6",
                 "grade_selection_revision": 3, "course_id": "progressive_first", "course_version": "v1"})
-            for mutation in ({"course_curriculum_version": "old"}, {"course_subject": "english"},
-                             {"child_grade_code": "primary_1", "course_grade_code": "primary_6"}):
+            for mutation in ({"course_curriculum_version": "old"},
+                             {"child_grade_code": "primary_1", "course_grade_code": "primary_6"},
+                             {"formal_binding_course_version": "wrong"}, {"session_status": "completed"}):
                 with self.subTest(mutation=mutation), self.assertRaises(OpenMaicRuntimeServiceError):
-                    self.service._require_student_course_grade(conn, {**authority, **mutation}, family_id="f", child_id="c")
+                    self.service._require_student_course_grade(conn, {**authority, **mutation}, family_id="family-1", child_id="child-1")
             self.assertEqual(visible.call_count, 1)
+            # Subject/lesson identity is checked by the complete immutable binding contract.
+            self.assertEqual(self.service._formal_session_binding_state({**authority, "course_subject": "english"}), (True, False))
             visible.return_value = None
             with self.assertRaises(OpenMaicRuntimeServiceError):
-                self.service._require_student_course_grade(conn, authority, family_id="f", child_id="c")
+                self.service._require_student_course_grade(conn, authority, family_id="family-1", child_id="child-1")
 
     def test_pinned_lower_grade_binding_keeps_exact_child_and_course_identity(self):
         from tests.test_formal_student_runtime_launch import _formal_row, _Repository
@@ -159,6 +174,10 @@ class ProgressiveRuntimeContractTest(unittest.TestCase):
         row.update(course_grade_code="primary_1", candidate_grade_code="primary_1", child_grade_code="primary_6",
                    course_curriculum_version=CURRICULUM_VERSION, course_node_code="M1A01.01")
         _Repository(row).bind_formal_session_to_active_release(None)
+        row.update(session_status="in_progress", child_grade_selection_revision=3,
+                   formal_binding_authority_kind="progressive_course",
+                   formal_binding_pointer_history_id=None, formal_binding_pointer_revision=0,
+                   formal_binding_grade_selection_revision=3)
         self.assertEqual(self.service._formal_session_binding_state(row), (True, True))
         for mutation in ({"formal_binding_course_version": "wrong"}, {"formal_binding_child_id": "other"},
                          {"course_curriculum_version": "old"}, {"course_subject": "english"}):

@@ -18,16 +18,16 @@ class OnvifBootstrapConfigTest(unittest.TestCase):
         self.assertFalse(config["LEARNING_CURRICULUM_PREPARATION_RUNNER_ENABLED"])
         self.assertEqual(
             config["LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS"],
-            240,
+            360,
         )
 
-    def test_curriculum_preparation_environment_default_has_v71_lease_budget(self):
+    def test_curriculum_preparation_environment_default_has_v94_lease_budget(self):
         with patch.dict(os.environ, {"APP_ENV": "test"}, clear=True):
             config = AppConfig.from_env()
 
         self.assertEqual(
             config.LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS,
-            240,
+            360,
         )
 
     def test_curriculum_preparation_runner_interval_and_lease_are_bounded(self):
@@ -50,14 +50,14 @@ class OnvifBootstrapConfigTest(unittest.TestCase):
                 {
                     **base,
                     "LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS": 5,
-                    "LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS": 239,
+                    "LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS": 359,
                 }
             )
         validate_flask_config(
             {
                 **base,
                 "LEARNING_CURRICULUM_PREPARATION_INTERVAL_SECONDS": 5,
-                "LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS": 240,
+                "LEARNING_CURRICULUM_PREPARATION_LEASE_SECONDS": 360,
             }
         )
     def test_app_config_requires_explicit_engineering_switch(self):

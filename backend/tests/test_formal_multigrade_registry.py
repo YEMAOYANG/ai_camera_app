@@ -134,7 +134,7 @@ class FormalMultigradeRegistryTest(unittest.TestCase):
         class Repository:
             def __init__(self):self.grades=[]
             @contextmanager
-            def transaction(self):yield object()
+            def transaction(self):yield RecordedConnection([])
             def start_next_formal_pipeline(self,*args,**kw):pass
             def claim_next(self,*args,**kw):self.grades.append(kw['grade_code']);return None
         repo=Repository();runner=LearningCurriculumPreparationRunner(repository=repo,adapter=SimpleNamespace(supported_stages=frozenset({'planning'})),clock=lambda:1000)

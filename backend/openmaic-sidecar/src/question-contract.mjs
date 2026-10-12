@@ -6314,7 +6314,10 @@ function normalizeConcreteCourseTitle(value, request, field, code = 'invalid_gen
 export const FORMAL_OBJECTIVE_PROMPT_VERSION = 'mira.learning.objective-prompt.v2-consumption-fix1';
 
 function productionQuestionBlueprintForRequest(request) {
-  if (/^primary_[2-6]$/.test(request.gradeCode)) {
+  // The legacy v1 schema has no objectivePolicy field. V2 projections deliberately
+  // omit that schema marker and must retain their frozen formal policy.
+  if (request.schemaVersion !== QUESTION_GENERATION_INPUT_SCHEMA
+    && /^primary_[2-6]$/.test(request.gradeCode)) {
     const policy = request.objectivePolicy;
     if (!policy || !['basic', 'standard', 'challenge'].includes(policy.difficultyCode)) {
       throw phaseContractError('formal question blueprint requires the frozen objective policy');

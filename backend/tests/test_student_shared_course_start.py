@@ -97,6 +97,7 @@ class SharedCourseStartTest(unittest.TestCase):
         self.conn.raw.execute('CREATE TABLE learning_catalog_build_jobs (id, release_id, target_spec_json)')
         self.conn.raw.execute('CREATE TABLE learning_catalog_build_items (id, build_job_id, release_id, grade_code)')
         self.conn.raw.execute('CREATE TABLE learning_courses (' + ','.join(self.course) + ')')
+        self.conn.raw.execute('CREATE TABLE learning_progressive_course_bindings (course_id, course_version, retired_at)')
         self.conn.raw.execute('CREATE TABLE student_learning_course_favorites (family_id,child_id,course_id,course_version)')
         self.conn.raw.execute('CREATE TABLE learning_mastery_states (family_id,child_id,grade_code,subject,node_code,mastery_level)')
         self.insert('children', self.child)
@@ -136,6 +137,7 @@ class SharedCourseStartTest(unittest.TestCase):
         service.repository = self.repo
         learning = LearningService.__new__(LearningService)
         learning.repository = self.repo
+        learning.static_catalog_enabled = False
         learning.profile_repository = ProfileRepository(self.db)
         learning.formal_learning_access_checker = None
         service.learning_service = learning
@@ -409,6 +411,7 @@ class SharedCourseStartTest(unittest.TestCase):
     def test_route_preserves_identity_response_and_safe_errors(self):
         from routes.api.v2.student_learning import student_learning_bp
         app = Flask(__name__)
+        app.config["LEARNING_TEXTBOOK_LIBRARY_ONLY"] = False
         app.register_blueprint(student_learning_bp, url_prefix='/api/v2/student/learning')
         client = app.test_client()
         response = {'ok': True, 'taskId': 'task-new', 'created': False,

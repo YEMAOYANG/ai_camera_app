@@ -5,6 +5,7 @@ import unittest
 from datetime import datetime
 
 from app import create_app
+from content.progressive_curriculum import lessons_for
 from core.database import Database
 from services.dynamic_learning_course_generation_service import (
     DynamicLearningCourseGenerationService,
@@ -84,9 +85,13 @@ class DynamicLearningSchedulingTest(unittest.TestCase):
                 "mira_learning_catalog_release_service"
             ] = self.catalog_service
         self.access_token = self._login("13800002131")
-        self.child_id = self._create_child("primary_3")
+        self.child_id = self._create_child(
+            "primary_1"
+            if self._testMethodName == "test_legacy_pinyin_mastery_cannot_skip_the_first_fine_lesson"
+            else "primary_3"
+        )
         if self._testMethodName not in {
-            "test_primary_one_chinese_starts_with_aoe_then_unlocks_later_pinyin",
+            "test_legacy_pinyin_mastery_cannot_skip_the_first_fine_lesson",
             "test_unstarted_legacy_later_skill_is_repaired_to_pinyin",
         }:
             variants = (
@@ -306,23 +311,21 @@ class DynamicLearningSchedulingTest(unittest.TestCase):
         self.assertEqual(item["session"]["id"], session["id"])
         self.assertEqual(len(self.adapter.generate_calls), generate_count)
 
-    def test_primary_one_chinese_starts_with_aoe_then_unlocks_later_pinyin(self):
-        self._set_grade("primary_1")
+    def test_legacy_pinyin_mastery_cannot_skip_the_first_fine_lesson(self):
+        # Fine-lesson mastery cannot be inferred from the retired coarse skill.
+        route = lessons_for("primary_1", "chinese")
+        query = {"childId": self.child_id, "subject": "chinese"}
         first = self.client.get(
-            "/api/learning/today",
-            query_string={"childId": self.child_id, "date": "2026-09-01"},
-            headers=self._headers(),
+            "/api/learning/path", query_string=query, headers=self._headers(),
         )
         self.assertEqual(first.status_code, 200, first.json)
-        chinese = next(item for item in first.json["items"] if item["subject"] == "chinese")
-        self.assertEqual(chinese["recommendation"]["nodeCode"], "pinyin_syllables")
+        self.assertEqual(first.json["nextLesson"]["lessonId"], route[0]["lessonId"])
+        self.assertEqual(first.json["lessons"][1]["status"], "locked")
 
-        database = Database(self.app.config["DATABASE_URL"])
-        repository = LearningRepository(database)
+        repository = LearningRepository(Database(self.app.config["DATABASE_URL"]))
         with repository.transaction() as conn:
             child = conn.execute(
-                "SELECT * FROM children WHERE id = ?",
-                (self.child_id,),
+                "SELECT * FROM children WHERE id = ?", (self.child_id,),
             ).fetchone()
             repository.upsert_mastery_state(
                 conn,
@@ -339,24 +342,20 @@ class DynamicLearningSchedulingTest(unittest.TestCase):
                 mastery_level="mastered",
                 last_practiced_at=now_ms(),
                 next_review_date="2026-09-08",
-                course_id=chinese["recommendation"]["courseId"],
-                course_version=chinese["recommendation"]["courseVersion"],
+                course_id="legacy_primary_1_chinese_pinyin",
+                course_version="legacy",
                 now=now_ms(),
             )
 
-        next_chinese_day = self.client.get(
-            "/api/learning/today",
-            query_string={"childId": self.child_id, "date": "2026-09-03"},
-            headers=self._headers(),
+        unchanged = self.client.get(
+            "/api/learning/path", query_string=query, headers=self._headers(),
         )
-        self.assertEqual(next_chinese_day.status_code, 200, next_chinese_day.json)
-        chinese = next(
-            item for item in next_chinese_day.json["items"] if item["subject"] == "chinese"
-        )
-        self.assertEqual(
-            chinese["recommendation"]["nodeCode"],
-            "pinyin_initials_syllables",
-        )
+        self.assertEqual(unchanged.status_code, 200, unchanged.json)
+        self.assertEqual(unchanged.json["nextLesson"]["lessonId"], route[0]["lessonId"])
+        self.assertEqual(unchanged.json["lessons"][1]["status"], "locked")
+        self.assertFalse(unchanged.json["lessons"][1]["canStart"])
+        self.assertEqual(self.adapter.generate_calls, [])
+        self.assertEqual(self.adapter.verify_calls, [])
 
     @unittest.skip(FORMAL_STUDENT_MUTATION_NOT_OPEN_FOR_GRADE)
     def test_unstarted_legacy_later_skill_is_repaired_to_pinyin(self):
