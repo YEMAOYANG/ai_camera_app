@@ -325,8 +325,9 @@ class ProfileRepository:
         )
         return self.get_family_member(conn, family_id=family_id, member_id=member_id)
 
-    def find_sms_code(self, conn: DatabaseConnection, phone: str) -> DatabaseRow | None:
-        return conn.execute("SELECT * FROM sms_codes WHERE phone = ?", (phone,)).fetchone()
+    def find_sms_code(self, conn: DatabaseConnection, phone: str, *, for_update: bool = False) -> DatabaseRow | None:
+        return conn.execute("SELECT * FROM sms_codes WHERE phone = ?" + (" FOR UPDATE" if for_update else ""),
+                            (phone,)).fetchone()
 
     def increment_sms_attempts(self, conn: DatabaseConnection, phone: str) -> None:
         conn.execute(

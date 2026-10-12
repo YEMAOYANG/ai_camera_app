@@ -70,65 +70,70 @@ class AuthService:
 
         now = now_ms()
         with self.repository.transaction() as conn:
-            sms = self.repository.find_sms_code(conn, normalized)
+            sms = self.repository.find_sms_code(conn, normalized, for_update=True)
             if not sms or sms["expires_at"] < now:
                 raise AuthError("invalid_code", "验证码不正确，请重新输入")
             if sms["attempt_count"] >= self.sms_max_attempts:
                 raise AuthError("sms_attempts_exceeded", "验证码错误次数过多，请重新获取验证码", 429)
             if sms["code_hash"] != hash_value(code):
                 self.repository.increment_sms_attempts(conn, normalized)
-                raise AuthError("invalid_code", "验证码不正确，请重新输入")
+            else:
+                return self._login_verified_sms(conn, normalized, now, client_device)
+        # A rejected attempt is durable even though the request returns an error.
+        # Raising inside the transaction would roll the counter back to zero.
+        raise AuthError("invalid_code", "验证码不正确，请重新输入")
 
-            user = self.repository.find_user_by_phone(conn, normalized)
-            if user is None:
-                user = self.repository.create_parent_user(conn, phone=normalized, now=now)
-            elif user.get("account_status") != "active":
-                raise AuthError("account_inactive", "账号已提交注销申请，无法继续登录", 403)
+    def _login_verified_sms(self, conn, normalized: str, now: int, client_device: dict | None) -> dict:
+        user = self.repository.find_user_by_phone(conn, normalized)
+        if user is None:
+            user = self.repository.create_parent_user(conn, phone=normalized, now=now)
+        elif user.get("account_status") != "active":
+            raise AuthError("account_inactive", "账号已提交注销申请，无法继续登录", 403)
 
-            self.repository.delete_sms_code(conn, normalized)
-            session = self._new_session(now)
-            device = self._client_device(client_device)
-            self.repository.revoke_matching_device_sessions(
-                conn,
-                user_id=user["id"],
-                device_label=device["label"],
-                device_type=device["type"],
-                device_model=device["model"],
-                device_hardware=device["hardware"],
-                platform=device["platform"],
-                os_version=device["osVersion"],
-                app_version=device["appVersion"],
-                revoked_at=now,
-            )
-            self.repository.create_session(
-                conn,
-                user_id=user["id"],
-                device_label=device["label"],
-                device_type=device["type"],
-                device_model=device["model"],
-                device_hardware=device["hardware"],
-                platform=device["platform"],
-                os_version=device["osVersion"],
-                app_version=device["appVersion"],
-                access_hash=hash_value(session.access_token),
-                refresh_hash=hash_value(session.refresh_token),
-                access_expires_at=session.access_expires_at,
-                refresh_expires_at=session.refresh_expires_at,
-                created_at=now,
-            )
-            return self._session_payload(
-                conn,
-                user["id"],
-                session,
-                pending_joins=[
-                    pending_join_payload(row)
-                    for row in self.repository.list_pending_family_invitations_by_phone(
-                        conn,
-                        normalized,
-                        now=now,
-                    )
-                ],
-            )
+        self.repository.delete_sms_code(conn, normalized)
+        session = self._new_session(now)
+        device = self._client_device(client_device)
+        self.repository.revoke_matching_device_sessions(
+            conn,
+            user_id=user["id"],
+            device_label=device["label"],
+            device_type=device["type"],
+            device_model=device["model"],
+            device_hardware=device["hardware"],
+            platform=device["platform"],
+            os_version=device["osVersion"],
+            app_version=device["appVersion"],
+            revoked_at=now,
+        )
+        self.repository.create_session(
+            conn,
+            user_id=user["id"],
+            device_label=device["label"],
+            device_type=device["type"],
+            device_model=device["model"],
+            device_hardware=device["hardware"],
+            platform=device["platform"],
+            os_version=device["osVersion"],
+            app_version=device["appVersion"],
+            access_hash=hash_value(session.access_token),
+            refresh_hash=hash_value(session.refresh_token),
+            access_expires_at=session.access_expires_at,
+            refresh_expires_at=session.refresh_expires_at,
+            created_at=now,
+        )
+        return self._session_payload(
+            conn,
+            user["id"],
+            session,
+            pending_joins=[
+                pending_join_payload(row)
+                for row in self.repository.list_pending_family_invitations_by_phone(
+                    conn,
+                    normalized,
+                    now=now,
+                )
+            ],
+        )
 
     def refresh(self, refresh_token: str, client_device: dict | None = None) -> dict:
         refresh_token = (refresh_token or "").strip()
@@ -137,13 +142,14 @@ class AuthService:
 
         now = now_ms()
         with self.repository.transaction() as conn:
-            row = self.repository.find_session_by_refresh_hash(conn, hash_value(refresh_token))
+            refresh_hash = hash_value(refresh_token)
+            row = self.repository.find_session_by_refresh_hash(conn, refresh_hash, for_update=True)
             if row is None or row["refresh_expires_at"] < now:
                 raise AuthError("refresh_expired", "登录状态已过期，请重新登录", 401)
 
             session = self._new_session(now)
             device = self._client_device(client_device, fallback=row)
-            self.repository.rotate_session(
+            rotated = self.repository.rotate_session(
                 conn,
                 session_id=row["id"],
                 device_label=device["label"],
@@ -158,7 +164,10 @@ class AuthService:
                 access_expires_at=session.access_expires_at,
                 refresh_expires_at=session.refresh_expires_at,
                 rotated_at=now,
+                expected_refresh_hash=refresh_hash,
             )
+            if not rotated:
+                raise AuthError("refresh_expired", "登录状态已过期，请重新登录", 401)
             return self._session_payload(conn, row["user_id"], session)
 
     def authenticate(self, access_token: str) -> dict:

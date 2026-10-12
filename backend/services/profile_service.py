@@ -1195,42 +1195,46 @@ class ProfileService:
             if existing is not None and existing["id"] != user["id"]:
                 raise ApiError("phone_in_use", "该手机号已被其他账号使用")
 
-            sms = self.repository.find_sms_code(conn, phone)
+            sms = self.repository.find_sms_code(conn, phone, for_update=True)
             if not sms or sms["expires_at"] < now:
                 raise ApiError("invalid_code", "验证码不正确，请重新输入")
             if sms["attempt_count"] >= self.auth_service.sms_max_attempts:
                 raise ApiError("sms_attempts_exceeded", "验证码错误次数过多，请重新获取验证码", 429)
             if sms["code_hash"] != hash_value(code):
                 self.repository.increment_sms_attempts(conn, phone)
-                raise ApiError("invalid_code", "验证码不正确，请重新输入")
+            else:
+                return self._change_verified_phone(conn, user, family, phone, now)
+        # Keep failed verification attempts committed before reporting rejection.
+        raise ApiError("invalid_code", "验证码不正确，请重新输入")
 
-            self.repository.delete_sms_code(conn, phone)
-            user = self.repository.update_user_phone(conn, user_id=user["id"], phone=phone)
-            parent_identity = self.repository.get_parent_identity(conn, family_id=family["id"])
-            member, relationship, relationship_key = self._current_member_identity(
-                conn,
-                family_id=family["id"],
-                user=user,
-                parent_identity=parent_identity,
-                now=now,
-            )
-            sessions = self.repository.list_sessions(conn, user_id=user["id"])
-            return {
-                "ok": True,
-                "message": "手机号已更新",
-                "profile": account_profile_payload(
-                    user,
-                    family,
-                    parent_identity,
-                    role=member["role"],
-                    role_label=self._family_role_label(conn, member["role"]),
-                    capabilities=self._capabilities_for_role(conn, member["role"]),
-                    display_name=relationship or member["name"],
-                    relationship=relationship,
-                    relationship_key=relationship_key,
-                ),
-                "security": account_security_payload(user, sessions),
-            }
+    def _change_verified_phone(self, conn, user, family, phone: str, now: int) -> dict:
+        self.repository.delete_sms_code(conn, phone)
+        user = self.repository.update_user_phone(conn, user_id=user["id"], phone=phone)
+        parent_identity = self.repository.get_parent_identity(conn, family_id=family["id"])
+        member, relationship, relationship_key = self._current_member_identity(
+            conn,
+            family_id=family["id"],
+            user=user,
+            parent_identity=parent_identity,
+            now=now,
+        )
+        sessions = self.repository.list_sessions(conn, user_id=user["id"])
+        return {
+            "ok": True,
+            "message": "手机号已更新",
+            "profile": account_profile_payload(
+                user,
+                family,
+                parent_identity,
+                role=member["role"],
+                role_label=self._family_role_label(conn, member["role"]),
+                capabilities=self._capabilities_for_role(conn, member["role"]),
+                display_name=relationship or member["name"],
+                relationship=relationship,
+                relationship_key=relationship_key,
+            ),
+            "security": account_security_payload(user, sessions),
+        }
 
     def subscription_status(self, access_token: str) -> dict:
         self._auth_context(access_token)

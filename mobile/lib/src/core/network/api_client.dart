@@ -131,9 +131,8 @@ class AuthTokenInterceptor extends Interceptor {
   final AuthSessionStore _sessionStore;
   final Dio _refreshDio;
   final Dio _dio;
-  Future<AuthSession?>? _refreshing;
-
   static const _retryKey = 'authRetry';
+  static const _generationKey = 'authSessionGeneration';
 
   @override
   void onRequest(
@@ -150,8 +149,15 @@ class AuthTokenInterceptor extends Interceptor {
         return;
       }
 
+      final generation = _sessionStore.generation;
+      final requestGeneration = options.extra[_generationKey];
+      if (requestGeneration != null && requestGeneration != generation) {
+        _rejectMissingSession(options, handler);
+        return;
+      }
+      options.extra[_generationKey] = generation;
       final session = await _sessionForRequest();
-      if (session == null) {
+      if (session == null || !_sessionStore.isCurrent(session, generation)) {
         _rejectMissingSession(options, handler);
         return;
       }
@@ -159,8 +165,10 @@ class AuthTokenInterceptor extends Interceptor {
         options.headers['Authorization'] = 'Bearer ${session.accessToken}';
       }
       handler.next(options);
-    } catch (_) {
-      _rejectMissingSession(options, handler);
+    } on DioException catch (error) {
+      handler.reject(error.copyWith(requestOptions: options));
+    } catch (error, stackTrace) {
+      handler.reject(_sessionFailure(options, error, stackTrace));
     }
   }
 
@@ -170,6 +178,7 @@ class AuthTokenInterceptor extends Interceptor {
     final shouldRetry =
         err.response?.statusCode == 401 &&
         request.extra[_retryKey] != true &&
+        request.extra[_generationKey] == _sessionStore.generation &&
         !_isAuthPath(request.path);
 
     if (!shouldRetry) {
@@ -177,8 +186,25 @@ class AuthTokenInterceptor extends Interceptor {
       return;
     }
 
-    final refreshed = await _refreshSession();
-    if (refreshed == null) {
+    final generation = _sessionStore.generation;
+    final current = _sessionStore.currentSession;
+    final AuthSession? refreshed;
+    try {
+      refreshed =
+          current != null &&
+              current.hasAccessToken &&
+              request.headers['Authorization'] !=
+                  'Bearer ${current.accessToken}'
+          ? current
+          : await _refreshSession();
+    } on DioException catch (error) {
+      handler.next(error.copyWith(requestOptions: request));
+      return;
+    } catch (error, stackTrace) {
+      handler.next(_sessionFailure(request, error, stackTrace));
+      return;
+    }
+    if (refreshed == null || !_sessionStore.isCurrent(refreshed, generation)) {
       handler.next(err);
       return;
     }
@@ -193,8 +219,10 @@ class AuthTokenInterceptor extends Interceptor {
         ..extra[_retryKey] = true
         ..headers['Authorization'] = 'Bearer ${refreshed.accessToken}';
       handler.resolve(await _dio.fetch<dynamic>(retryOptions));
-    } catch (_) {
-      handler.next(err);
+    } on DioException catch (error) {
+      handler.next(error);
+    } catch (error, stackTrace) {
+      handler.next(_sessionFailure(request, error, stackTrace));
     }
   }
 
@@ -203,39 +231,39 @@ class AuthTokenInterceptor extends Interceptor {
     if (session == null) return null;
     if (session.hasAccessToken) return session;
     if (!session.canRefresh) {
-      await _sessionStore.clear();
+      await _sessionStore.clearIfCurrent(session, _sessionStore.generation);
       return null;
     }
     return _refreshSession();
   }
 
-  Future<AuthSession?> _refreshSession() {
-    final active = _refreshing;
-    if (active != null) return active;
-
-    final future = _doRefreshSession();
-    _refreshing = future;
-    return future.whenComplete(() => _refreshing = null);
-  }
-
-  Future<AuthSession?> _doRefreshSession() async {
+  Future<AuthSession?> _refreshSession() async {
     final session = _sessionStore.currentSession;
-    if (session == null || !session.canRefresh) {
-      await _sessionStore.clear();
+    if (session == null) return null;
+    final generation = _sessionStore.generation;
+    if (!session.canRefresh) {
+      await _sessionStore.clearIfCurrent(session, generation);
       return null;
     }
 
     try {
-      final response = await _refreshDio.post<dynamic>(
-        '/auth/token/refresh',
-        data: {'refreshToken': session.refreshToken},
+      return await _sessionStore.refreshSession(
+        load: (session) async {
+          final response = await _refreshDio.post<dynamic>(
+            '/auth/token/refresh',
+            data: {'refreshToken': session.refreshToken},
+          );
+          return _parseRemoteSession(response.data);
+        },
+        discard: (session) => revokeRemoteAuthSession(_refreshDio, session),
       );
-      final refreshed = _parseRemoteSession(response.data);
-      await _sessionStore.save(refreshed);
-      return refreshed;
-    } on DioException {
-      await _sessionStore.clear();
-      return null;
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 401 ||
+          error.response?.statusCode == 403) {
+        await _sessionStore.clearIfCurrent(session, generation);
+        return null;
+      }
+      rethrow;
     }
   }
 
@@ -263,6 +291,18 @@ class AuthTokenInterceptor extends Interceptor {
     return path.startsWith('/legal/') || path.startsWith('/app/about');
   }
 
+  DioException _sessionFailure(
+    RequestOptions request,
+    Object error,
+    StackTrace stackTrace,
+  ) => DioException(
+    requestOptions: request,
+    type: DioExceptionType.unknown,
+    error: error,
+    stackTrace: stackTrace,
+    message: '登录状态暂时无法更新，请稍后重试。',
+  );
+
   void _rejectMissingSession(
     RequestOptions options,
     RequestInterceptorHandler handler,
@@ -278,6 +318,20 @@ class AuthTokenInterceptor extends Interceptor {
         type: DioExceptionType.badResponse,
       ),
     );
+  }
+}
+
+Future<void> revokeRemoteAuthSession(Dio dio, AuthSession session) async {
+  try {
+    await dio.post<dynamic>(
+      '/auth/logout',
+      data: {'refreshToken': session.refreshToken},
+      options: Options(
+        headers: {'Authorization': 'Bearer ${session.accessToken}'},
+      ),
+    );
+  } on DioException {
+    // Local logout must still complete when the server is unreachable.
   }
 }
 

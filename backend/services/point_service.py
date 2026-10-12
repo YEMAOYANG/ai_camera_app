@@ -145,6 +145,7 @@ class PointService:
         note = self._optional_text(data, "note")
         now = now_ms()
         with self.repository.transaction() as conn:
+            self._assert_capability(conn, context, "manage_rewards")
             self._ensure_child(conn, context["family"]["id"], child_id)
             ledger = self.repository.adjust_points(
                 conn,

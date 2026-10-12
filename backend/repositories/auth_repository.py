@@ -102,8 +102,9 @@ class AuthRepository:
             (phone, code_hash, expires_at, created_at, created_at),
         )
 
-    def find_sms_code(self, conn: DatabaseConnection, phone: str) -> DatabaseRow | None:
-        return conn.execute("SELECT * FROM sms_codes WHERE phone = ?", (phone,)).fetchone()
+    def find_sms_code(self, conn: DatabaseConnection, phone: str, *, for_update: bool = False) -> DatabaseRow | None:
+        return conn.execute("SELECT * FROM sms_codes WHERE phone = ?" + (" FOR UPDATE" if for_update else ""),
+                            (phone,)).fetchone()
 
     def delete_sms_code(self, conn: DatabaseConnection, phone: str) -> None:
         conn.execute("DELETE FROM sms_codes WHERE phone = ?", (phone,))
@@ -275,12 +276,14 @@ class AuthRepository:
         self,
         conn: DatabaseConnection,
         refresh_hash: str,
+        *,
+        for_update: bool = False,
     ) -> DatabaseRow | None:
         return conn.execute(
             """
             SELECT * FROM sessions
             WHERE refresh_hash = ? AND revoked_at IS NULL
-            """,
+            """ + (" FOR UPDATE" if for_update else ""),
             (refresh_hash,),
         ).fetchone()
 
@@ -314,8 +317,9 @@ class AuthRepository:
         access_expires_at: int,
         refresh_expires_at: int,
         rotated_at: int,
-    ) -> None:
-        conn.execute(
+        expected_refresh_hash: str,
+    ) -> bool:
+        cursor = conn.execute(
             """
             UPDATE sessions SET
               device_label = ?,
@@ -331,7 +335,7 @@ class AuthRepository:
               access_expires_at = ?,
               refresh_expires_at = ?,
               rotated_at = ?
-            WHERE id = ?
+            WHERE id = ? AND refresh_hash = ? AND revoked_at IS NULL
             """,
             (
                 device_label,
@@ -348,8 +352,10 @@ class AuthRepository:
                 refresh_expires_at,
                 rotated_at,
                 session_id,
+                expected_refresh_hash,
             ),
         )
+        return cursor.rowcount == 1
 
     def touch_session(
         self,

@@ -2309,10 +2309,10 @@ Future<void> _confirmSetupLogout(BuildContext context, WidgetRef ref) async {
     confirmLabel: '退出登录',
     danger: true,
   );
-  if (!confirmed) return;
-  await ref.read(authRepositoryProvider).logout();
-  await ref.read(setupStoreProvider).clearPendingChildProfile();
+  if (!confirmed || !context.mounted) return;
+  final auth = ref.read(authRepositoryProvider);
   invalidateAuthenticatedSessionData(ref);
+  await auth.logout(clearSetupDraft: true);
   if (context.mounted) context.go(loginPath);
 }
 

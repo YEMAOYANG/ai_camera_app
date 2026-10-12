@@ -151,9 +151,10 @@ Future<void> _confirmProfileLogout(BuildContext context, WidgetRef ref) async {
     confirmLabel: '退出',
     danger: true,
   );
-  if (!confirmed) return;
-  await ref.read(authRepositoryProvider).logout();
+  if (!confirmed || !context.mounted) return;
+  final auth = ref.read(authRepositoryProvider);
   invalidateAuthenticatedSessionData(ref);
+  await auth.logout();
   if (context.mounted) context.go(loginPath);
 }
 

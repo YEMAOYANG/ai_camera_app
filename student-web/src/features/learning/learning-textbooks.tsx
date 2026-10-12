@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Backpack, BookOpen, Check, ChevronLeft, ChevronRight, Compass, LayoutGrid, List, Play, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Backpack, BookOpen, Check, ChevronLeft, ChevronRight, Compass, LayoutGrid, List, Play, RefreshCw, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -15,7 +15,7 @@ import { LearningClientError } from "@/features/learning/learning-client";
 import { LearningCourseStartButton } from "@/features/learning/learning-course-start-button";
 import { LearningTextbookIntroduction } from "@/features/learning/learning-textbook-introduction";
 import { TextbookPicture } from "@/features/learning/textbook-picture";
-import { textbookIntroductionPath, type TextbookLocation } from "@/features/learning/textbook-navigation";
+import { textbookContentsPath, textbookIntroductionPath, type TextbookLocation } from "@/features/learning/textbook-navigation";
 import { useTextbookCatalog } from "@/features/learning/use-textbook-catalog";
 import { textbookContentsSchema, type TextbookContents } from "@/lib/contracts/textbooks";
 import type { Student } from "@/lib/contracts/student-session";
@@ -50,9 +50,9 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
   const [chosenUnit, setChosenUnit] = useState<{ book: string; unit: string }>();
   const [view, setView] = useState<"pictures" | "directory">("pictures");
   const [choosingUnit, setChoosingUnit] = useState(false);
-  const books = data?.books.filter(item => item.selected || item.accessMode === "published") ?? [];
+  const books = data?.books.filter(item => (item.selected || item.accessMode === "published") && (!location?.subject || item.subject === location.subject)) ?? [];
   const requestedKey = location?.editionId && location?.revisionId ? `${location.editionId}:${location.revisionId}` : "";
-  const book = requestedKey ? books.find(item => bookKey(item) === requestedKey) : books[0];
+  const book = requestedKey ? books.find(item => bookKey(item) === requestedKey) : books.length === 1 ? books[0] : undefined;
   // Keep exact edition/revision URLs; browsing an available directory does not
   // replace the parent's confirmed school book.
   const edition = location?.editionId ?? book?.editionId;
@@ -61,7 +61,7 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
   const detail = contents.key === contentsKey ? contents.data : undefined;
   const detailError = contents.key === contentsKey ? contents.error : undefined;
   const pictureFirst = ["primary_1", "primary_2"].includes(student.gradeCode ?? "");
-  useSchoolbagBook(detail?.book.subject);
+  useSchoolbagBook(detail?.book.subject ?? location?.subject);
   const activeUnit = detail?.units.find(unit => unit.unitId === (chosenUnit?.book === `${edition}:${revision}` ? chosenUnit.unit : location?.unitId))
     ?? detail?.units.find(unit => unit.lessons.some(lesson => lesson.nodeId === detail.currentNodeId))
     ?? (pictureFirst ? detail?.units.find(unit => unit.guideCourse || unit.lessons.some(isPictureLesson)) : undefined)
@@ -93,10 +93,19 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
 
   return <SchoolbagShell student={student} className="space-textbooks storybook-directory textbook-browser"
     navigation={<Link href="/learning" onClick={goHome}><Backpack size={32} aria-hidden="true" /><span>回到书包</span></Link>}>
-    {(!detail || error || detailError) && <header className="textbook-empty-heading"><h1>{book ? `我的${subjectNames[book.subject]}课本` : "我的课本"}</h1><Button variant="quiet" size="compact" onClick={refresh}><RefreshCw aria-hidden="true" />刷新教材</Button></header>}
+    {(!detail || error || detailError) && <header className="textbook-empty-heading"><h1>{book ? `我的${subjectNames[book.subject]}课本` : location?.subject ? `${subjectNames[location.subject]}教材目录` : "我的课本"}</h1><Button variant="quiet" size="compact" onClick={refresh}><RefreshCw aria-hidden="true" />刷新教材</Button></header>}
     {error ? <div className="textbook-state" role="alert"><p>{error}</p><Button onClick={refresh}>再试一次</Button></div>
       : !data ? <TextbookLoading label="正在打开教材目录" />
       : !books.length && !edition ? <div className="textbook-state"><BookOpen size={32} aria-hidden="true" /><h2>请家长帮你放入课本</h2><p>在家长 App 的“学校教材”中确认用书，再回到书包刷新。</p><Button asChild><Link href="/learning">回到书包</Link></Button></div>
+      : !edition ? <section className="textbook-state" aria-label="可浏览的教材目录">
+        <UsersRound size={56} role="img" aria-label="请家长一起看课本" />
+        <LearningListenButton cue="selection" label="听老师说，请家长帮忙" />
+        <p>请家长帮你认一认教材版本。这里可以浏览目录；学校用书仍由家长在 App 中确认。</p>
+        <ul className="textbook-edition-list">{books.map(item => <li key={bookKey(item)}>
+          <div><h2>{item.title}</h2><p>{item.publisher} · {item.editionLabel} · {item.volume === "upper" ? "上册" : item.volume === "lower" ? "下册" : "全册"}{item.selected ? " · 学校课本" : ""}</p></div>
+          <Button asChild><Link prefetch={false} href={textbookContentsPath(item)} aria-label={`浏览${item.title}，${item.publisher}，${item.editionLabel}目录`}>浏览目录<ArrowRight aria-hidden="true" /></Link></Button>
+        </li>)}</ul>
+      </section>
       : <>
         {detailError ? <div className="textbook-state" role="alert"><p>{detailError}</p><Button onClick={refresh}>重试目录</Button><Button asChild variant="quiet"><Link href="/learning">回到书包</Link></Button></div>
           : !detail ? <TextbookLoading label="正在读取单元" />

@@ -54,6 +54,12 @@ release 构建默认读取 `.env.product`。如果需要显式覆盖，也可以
 flutter run --dart-define-from-file=.env.development
 ```
 
+显式配置会覆盖打包的环境文件；自定义开发或 staging 文件需要同时提供
+`APP_FLAVOR`、`API_BASE_URL`、`TASK_WS_BASE_URL` 和 `STUDENT_WEB_BASE_URL`。
+Debug/Profile 默认防止 Xcode 残留的 `APP_FLAVOR=production` 将调试 App 指向生产，
+此时会提示并读取 `.env.development`。确实需要在 Debug/Profile 连接生产时，必须
+额外传入 `--dart-define=APP_ALLOW_PRODUCTION_IN_DEBUG=true`；release 不需要此开关。
+
 ```sh
 flutter build apk --dart-define-from-file=.env.product
 ```

@@ -1,11 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  BLOCKED_PERMISSIONS_POLICY,
+  STUDENT_PERMISSIONS_POLICY,
   buildStudentSecurityHeaderRules,
   isTrustedOpenMaicLaunchUrl,
-  OPENMAIC_RUNTIME_HEADER_SOURCE,
-  TEXTBOOK_RUNTIME_HEADER_SOURCE,
   openMaicLaunchUrlForRequest,
   resolveOpenMaicRuntimeOrigin,
 } from "@/lib/security/openmaic-runtime-policy";
@@ -14,54 +12,43 @@ function permissionsPolicy(rule: ReturnType<typeof buildStudentSecurityHeaderRul
   return rule.headers.find((header) => header.key === "Permissions-Policy")?.value;
 }
 
-describe("OpenMAIC classroom Permissions-Policy", () => {
-  it("keeps other pages blocked and delegates microphone only to the two classroom routes", () => {
+describe("Student document Permissions-Policy", () => {
+  it("keeps a route-independent policy for SPA recording and the exact classroom origin", () => {
     const rules = buildStudentSecurityHeaderRules({
       runtimePublicUrl: "https://classroom.mira.test/runtime/path",
       environment: "production",
     });
-
-    expect(rules).toHaveLength(3);
+    expect(rules).toHaveLength(1);
     expect(rules[0].source).toBe("/(.*)");
-    expect(permissionsPolicy(rules[0])).toBe(BLOCKED_PERMISSIONS_POLICY);
-    expect(OPENMAIC_RUNTIME_HEADER_SOURCE).toBe("/lesson/:taskId/classroom");
-    expect(rules[1].source).toBe(OPENMAIC_RUNTIME_HEADER_SOURCE);
-    expect(permissionsPolicy(rules[1])).toBe(
+    expect(permissionsPolicy(rules[0])).toBe(
       'camera=(), microphone=(self "https://classroom.mira.test"), geolocation=()',
     );
-    expect(permissionsPolicy(rules[1])).not.toContain("*");
-    expect(rules[2].source).toBe(TEXTBOOK_RUNTIME_HEADER_SOURCE);
-    expect(TEXTBOOK_RUNTIME_HEADER_SOURCE).toBe("/learning/textbooks/courses/:contentKey");
-    expect(permissionsPolicy(rules[2])).toBe(permissionsPolicy(rules[1]));
+    expect(permissionsPolicy(rules[0])).not.toContain("*");
+    expect(rules[0].headers).toContainEqual({ key: "X-Frame-Options", value: "DENY" });
   });
 
-  it("fails closed in production when the configured runtime origin is missing or insecure", () => {
-    expect(resolveOpenMaicRuntimeOrigin("", "production")).toBeNull();
-    expect(resolveOpenMaicRuntimeOrigin("http://classroom.mira.test", "production")).toBeNull();
-    expect(resolveOpenMaicRuntimeOrigin("not a URL", "production")).toBeNull();
-    const rules = buildStudentSecurityHeaderRules({ environment: "production" });
-    expect(permissionsPolicy(rules[1])).toBe(BLOCKED_PERMISSIONS_POLICY);
-    expect(permissionsPolicy(rules[2])).toBe(BLOCKED_PERMISSIONS_POLICY);
+  it("keeps same-origin recording while refusing missing, insecure or invalid runtime delegation", () => {
+    for (const runtimePublicUrl of ["", "http://classroom.mira.test", "not a URL", "https://user:password@classroom.mira.test"]) {
+      expect(resolveOpenMaicRuntimeOrigin(runtimePublicUrl, "production")).toBeNull();
+      const rules = buildStudentSecurityHeaderRules({ runtimePublicUrl, environment: "production" });
+      expect(permissionsPolicy(rules[0])).toBe(STUDENT_PERMISSIONS_POLICY);
+      expect(permissionsPolicy(rules[0])).toBe("camera=(), microphone=(self), geolocation=()");
+    }
   });
 
-  it("allows HTTP microphone access only for explicit private-LAN production mode", () => {
+  it("delegates private-LAN HTTP classroom origins only with explicit local production mode", () => {
     expect(resolveOpenMaicRuntimeOrigin(
-      "http://192.168.228.95:3101",
-      "production",
-      "1",
+      "http://192.168.228.95:3101", "production", "1",
     )).toBe("http://192.168.228.95:3101");
     expect(resolveOpenMaicRuntimeOrigin(
-      "http://classroom.example:3101",
-      "production",
-      "1",
+      "http://classroom.example:3101", "production", "1",
     )).toBeNull();
-
     const rules = buildStudentSecurityHeaderRules({
       runtimePublicUrl: "http://192.168.228.95:3101",
       environment: "production",
       localLanProductionMode: "1",
     });
-    expect(permissionsPolicy(rules[1])).toBe(
+    expect(permissionsPolicy(rules[0])).toBe(
       'camera=(), microphone=(self "http://192.168.228.95:3101" "http://localhost:3101" "http://127.0.0.1:3101"), geolocation=()',
     );
   });

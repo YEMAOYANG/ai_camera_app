@@ -47,6 +47,7 @@ class AuthRepository {
     required String phone,
     required String code,
   }) async {
+    final generation = _sessionStore.generation;
     try {
       final response = await _dio.post<dynamic>(
         '/auth/sms/login',
@@ -55,8 +56,24 @@ class AuthRepository {
       final session = _parseSession(response.data);
       // Claim before exposing the new session to router listeners, so another
       // account can never render the previous account's unfinished child data.
-      await _setupStore.claimPendingOwner(session.userId);
-      await _sessionStore.save(session);
+      final bool saved;
+      try {
+        saved = await _sessionStore.save(
+          session,
+          expectedGeneration: generation,
+          beforeSave: () => _setupStore.claimPendingOwner(session.userId),
+        );
+      } catch (_) {
+        await revokeRemoteAuthSession(_dio, session);
+        throw const AuthException(
+          '登录状态暂时无法保存，请稍后重试。',
+          code: 'auth_storage_unavailable',
+        );
+      }
+      if (!saved) {
+        await revokeRemoteAuthSession(_dio, session);
+        throw const AuthException('登录状态已变化，请重新登录。', code: 'session_changed');
+      }
       return AuthLoginResult(
         session: session,
         pendingJoins: _parsePendingJoins(response.data),
@@ -68,42 +85,48 @@ class AuthRepository {
 
   Future<AuthSession?> refreshSession() async {
     final session = _sessionStore.currentSession;
-    if (session == null || !session.canRefresh) {
-      await _sessionStore.clear();
+    if (session == null) return null;
+    final generation = _sessionStore.generation;
+    if (!session.canRefresh) {
+      await _sessionStore.clearIfCurrent(session, generation);
       return null;
     }
 
     try {
-      final response = await _dio.post<dynamic>(
-        '/auth/token/refresh',
-        data: {'refreshToken': session.refreshToken},
+      return await _sessionStore.refreshSession(
+        load: (session) async {
+          final response = await _dio.post<dynamic>(
+            '/auth/token/refresh',
+            data: {'refreshToken': session.refreshToken},
+          );
+          return _parseSession(response.data);
+        },
+        discard: (session) => revokeRemoteAuthSession(_dio, session),
       );
-      final refreshed = _parseSession(response.data);
-      await _setupStore.claimPendingOwner(refreshed.userId);
-      await _sessionStore.save(refreshed);
-      return refreshed;
-    } on DioException {
-      await _sessionStore.clear();
-      return null;
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 401 ||
+          error.response?.statusCode == 403) {
+        await _sessionStore.clearIfCurrent(session, generation);
+        return null;
+      }
+      throw _fromDio(error);
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout({bool clearSetupDraft = false}) async {
     final session = _sessionStore.currentSession;
-    if (session != null) {
-      try {
-        await _dio.post<dynamic>(
-          '/auth/logout',
-          data: {'refreshToken': session.refreshToken},
-          options: Options(
-            headers: {'Authorization': 'Bearer ${session.accessToken}'},
-          ),
-        );
-      } on DioException {
-        // Local logout should still complete even if the backend is unreachable.
-      }
-    }
-    await _sessionStore.clear();
+    final pendingRefresh = _sessionStore.pendingRefresh;
+    final clearing = _sessionStore.clear(
+      clearAccountDraft: clearSetupDraft
+          ? _setupStore.clearPendingChildProfile
+          : null,
+    );
+    await Future.wait<void>([
+      clearing,
+      if (session != null) revokeRemoteAuthSession(_dio, session),
+      if (pendingRefresh != null)
+        pendingRefresh.then<void>((_) {}, onError: (Object _, StackTrace _) {}),
+    ]);
   }
 
   AuthSession _parseSession(dynamic data) {

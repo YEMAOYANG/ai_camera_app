@@ -5,11 +5,32 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test(
-    'loads development environment from bundled env file by default',
+    'bootstrap honors explicit development and staging URLs and guards production debug',
     () async {
       final environment = await AppEnvironment.load();
-
-      expect(environment.flavor, AppFlavor.development);
+      const definedFlavor = String.fromEnvironment('APP_FLAVOR');
+      const definedApiUrl = String.fromEnvironment('API_BASE_URL');
+      const definedWsUrl = String.fromEnvironment('TASK_WS_BASE_URL');
+      const definedStudentUrl = String.fromEnvironment('STUDENT_WEB_BASE_URL');
+      const allowProduction = bool.fromEnvironment(
+        'APP_ALLOW_PRODUCTION_IN_DEBUG',
+      );
+      final ignoredProduction =
+          definedFlavor == 'production' && !allowProduction;
+      if (definedApiUrl.isNotEmpty && !ignoredProduction) {
+        expect(environment.apiBaseUrl, definedApiUrl);
+        expect(environment.taskWebSocketBaseUrl, definedWsUrl);
+        expect(environment.studentWebBaseUrl, definedStudentUrl);
+        expect(
+          environment.flavor.name,
+          definedFlavor.isEmpty ? 'development' : definedFlavor,
+        );
+      } else {
+        expect(environment.flavor, AppFlavor.development);
+        if (ignoredProduction) {
+          expect(environment.apiBaseUrl, isNot(definedApiUrl));
+        }
+      }
       expect(environment.apiBaseUrl, startsWith('http'));
       expect(environment.taskWebSocketBaseUrl, startsWith('ws'));
       expect(environment.studentWebBaseUrl, startsWith('http'));

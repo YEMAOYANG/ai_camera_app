@@ -1,16 +1,66 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:warm_sight/src/core/network/api_client.dart';
 import 'package:warm_sight/src/features/auth/application/session_data_invalidation.dart';
 import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
 import 'package:warm_sight/src/features/learning/domain/learning_preparation_models.dart';
+import 'package:warm_sight/src/features/points/application/point_settings.dart';
 
 final _invalidateSessionProvider = Provider<void Function()>((ref) {
   return () => invalidateAuthenticatedSessionDataFromRef(ref);
 });
 
 void main() {
+  for (final delayedFirstRead in [false, true]) {
+    test(
+      'account switch reloads point settings ${delayedFirstRead ? 'and drops the old in-flight result' : 'instead of retaining another family cache'}',
+      () async {
+        final repository = _PointSettingsRepository(delayed: delayedFirstRead);
+        final container = ProviderContainer(
+          overrides: [
+            pointRewardSettingsRepositoryProvider.overrideWithValue(repository),
+          ],
+        );
+        addTearDown(container.dispose);
+        final subscription = container.listen(
+          pointRewardSettingsProvider,
+          (_, _) {},
+        );
+        addTearDown(subscription.close);
+        final firstRead = container.read(pointRewardSettingsProvider.future);
+        if (!delayedFirstRead) expect((await firstRead).stageThreshold, 7);
+        repository.threshold = 99;
+        container.read(_invalidateSessionProvider)();
+        expect(
+          (await container.read(
+            pointRewardSettingsProvider.future,
+          )).stageThreshold,
+          99,
+        );
+        if (delayedFirstRead) {
+          repository.first.complete(_pointSettings(7));
+          await firstRead;
+          await container.pump();
+        }
+        expect(
+          container
+              .read(pointRewardSettingsProvider)
+              .requireValue
+              .stageThreshold,
+          99,
+        );
+        expect(
+          container.read(pointRewardSettingsProvider).requireValue.unitKey,
+          'star',
+        );
+        expect(repository.calls, 2);
+      },
+    );
+  }
+
   test(
     'session invalidation replaces retained preparation family state and drops stale in-flight data',
     () async {
@@ -64,6 +114,37 @@ void main() {
       expect(householdA.requestedChildIds, ['same-child-id']);
       expect(householdB.requestedChildIds, ['same-child-id']);
     },
+  );
+}
+
+class _PointSettingsRepository extends PointRewardSettingsRepository {
+  _PointSettingsRepository({required this.delayed})
+    : super(apiClient: ApiClient(Dio()));
+  final bool delayed;
+  final first = Completer<PointRewardSettings>();
+  int threshold = 7;
+  int calls = 0;
+
+  @override
+  Future<PointRewardSettings> fetch() async {
+    calls++;
+    if (calls == 1 && delayed) return first.future;
+    return _pointSettings(threshold);
+  }
+}
+
+PointRewardSettings _pointSettings(int threshold) {
+  const star = PointRewardUnitOption(
+    key: 'star',
+    label: '星星',
+    suffix: '颗星星',
+    description: '',
+    imageAsset: '',
+  );
+  return PointRewardSettings(
+    stageThreshold: threshold,
+    unit: threshold == 7 ? PointRewardUnitOption.fallback : star,
+    unitOptions: [PointRewardUnitOption.fallback, star],
   );
 }
 

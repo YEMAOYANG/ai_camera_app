@@ -19,7 +19,8 @@ from tests import test_textbook_learning as existing
 def fixture(manifest=None, kind='unit_guide', teaching_revision='test-v1'):
     manifest = deepcopy(manifest or existing.sample())
     unit = manifest['units'][0]
-    scope = {'kind': kind, 'unitId': None if kind == 'book_exploration' else unit['unitId'], 'nodeId': None}
+    scope = {'kind': kind, 'unitId': None if kind == 'book_exploration' else unit['unitId'],
+             'nodeId': unit['lessons'][0]['nodeId'] if kind == 'lesson_courseware' else None}
     review = {'schemaVersion': REVIEW_SCHEMA, **{k: True for k in REVIEW_FLAGS},
               'reviewer': 'Synthetic test fixture', 'reviewedAt': 1, 'basis': 'Synthetic original activity',
               'evidence': ['Synthetic isolated fixture; no production review'],
@@ -30,7 +31,7 @@ def fixture(manifest=None, kind='unit_guide', teaching_revision='test-v1'):
         'teacher': get_formal_subject_qwen_voice_identity(manifest['subject']).to_target_payload(),
         'knowledgeBrief': {'objectives': ['看图观察'], 'priorKnowledge': [], 'excludedTopics': []}, 'activityScope': scope,
         'textbookBinding': {'editionId': manifest['editionId'], 'alignmentRevisionId': manifest['revisionId'],
-            'alignmentManifestSha256': digest(manifest), 'nodeId': node_key(kind, scope['unitId']),
+            'alignmentManifestSha256': digest(manifest), 'nodeId': node_key(kind, scope['unitId'], scope['nodeId']),
             'partIndex': 1, 'teachingRevision': teaching_revision}}
     key = digest(frozen); frozen['contentKey'] = key
     classroom_id = 'tbpub_' + key[:24]

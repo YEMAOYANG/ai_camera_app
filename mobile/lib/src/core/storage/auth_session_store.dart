@@ -92,23 +92,39 @@ class AuthSessionStore extends ChangeNotifier {
   final AuthSecureSessionStorage secureStorage;
   AuthSession? _currentSession;
   Future<void>? _initialization;
+  Future<void> _persistence = Future<void>.value();
+  Future<AuthSession?>? _refreshing;
+  int? _refreshGeneration;
+  int? _pendingSessionGeneration;
+  int _generation = 0;
 
-  AuthSession? get currentSession => _currentSession;
+  AuthSession? get currentSession =>
+      _pendingSessionGeneration == _generation ? null : _currentSession;
+  int get generation => _generation;
+  Future<AuthSession?>? get pendingRefresh => _refreshing;
 
-  bool get hasUsableSession => _currentSession?.canRefresh ?? false;
+  bool isCurrent(AuthSession session, int generation) =>
+      generation == _generation && identical(session, currentSession);
+
+  bool get hasUsableSession => currentSession?.canRefresh ?? false;
 
   Future<void> initialize() {
-    return _initialization ??= _initialize();
+    final generation = _generation;
+    return _initialization ??= _serialize(() => _initialize(generation));
   }
 
-  Future<void> _initialize() async {
+  Future<void> _initialize(int generation) async {
+    if (generation != _generation) return;
     String? secureEnvelope;
     try {
       secureEnvelope = await secureStorage.read();
     } catch (_) {
-      _currentSession = _readCompleteLegacySession();
+      if (generation == _generation) {
+        _currentSession = _readCompleteLegacySession();
+      }
       return;
     }
+    if (generation != _generation) return;
 
     if (secureEnvelope != null) {
       final secureSession = _decodeEnvelope(secureEnvelope);
@@ -119,7 +135,7 @@ class AuthSessionStore extends ChangeNotifier {
         return;
       }
       _currentSession = secureSession;
-      await _removeLegacySession();
+      await _removeLegacySessionAfterCommit();
       return;
     }
 
@@ -138,39 +154,131 @@ class AuthSessionStore extends ChangeNotifier {
     } catch (_) {
       return;
     }
-    await _removeLegacySession();
+    await _removeLegacySessionAfterCommit();
   }
 
-  Future<void> save(AuthSession session) async {
+  Future<bool> save(
+    AuthSession session, {
+    int? expectedGeneration,
+    Future<void> Function()? beforeSave,
+  }) {
     final envelope = _encodeEnvelope(session);
-    await secureStorage.write(envelope);
-
-    // Publish only after the single atomic secure write has succeeded.
-    _currentSession = session;
-    try {
-      await _removeLegacySession();
-    } finally {
-      notifyListeners();
+    if (expectedGeneration != null && expectedGeneration != _generation) {
+      return Future<bool>.value(false);
     }
+    final generation = ++_generation;
+    _pendingSessionGeneration = generation;
+    return _serialize(() async {
+      try {
+        if (generation != _generation) return false;
+        await beforeSave?.call();
+        if (generation != _generation) return false;
+        await secureStorage.write(envelope);
+        // A later clear/save is queued behind this write. Never publish its
+        // superseded account, even while that next disk operation is pending.
+        if (generation == _generation) {
+          _currentSession = session;
+          _pendingSessionGeneration = null;
+          notifyListeners();
+        }
+        await _removeLegacySessionAfterCommit();
+        return isCurrent(session, generation);
+      } finally {
+        if (_pendingSessionGeneration == generation) {
+          _pendingSessionGeneration = null;
+          if (generation == _generation) notifyListeners();
+        }
+      }
+    });
   }
 
-  Future<void> clear() async {
-    Object? secureStorageError;
-    StackTrace? secureStorageStackTrace;
-    try {
-      await secureStorage.delete();
-    } catch (error, stackTrace) {
-      secureStorageError = error;
-      secureStorageStackTrace = stackTrace;
-    }
-
-    await _removeLegacySession();
+  Future<void> clear({Future<void> Function()? clearAccountDraft}) {
+    // Stop authenticated work immediately; slow Keychain/Keystore operations
+    // must not leave the old account available to requests or refresh replies.
+    _generation++;
+    _pendingSessionGeneration = null;
     _currentSession = null;
     notifyListeners();
+    return _serialize(() async {
+      try {
+        await secureStorage.delete();
+      } finally {
+        try {
+          await _removeLegacySession();
+        } finally {
+          await clearAccountDraft?.call();
+        }
+      }
+    });
+  }
 
-    if (secureStorageError != null) {
-      Error.throwWithStackTrace(secureStorageError, secureStorageStackTrace!);
-    }
+  Future<void> clearIfCurrent(AuthSession session, int generation) {
+    return isCurrent(session, generation) ? clear() : Future<void>.value();
+  }
+
+  /// All refresh entry points share one request per signed-in generation.
+  /// Discarded credentials still need remote revocation: the server may have
+  /// already rotated the session before logout reached it with the old token.
+  Future<AuthSession?> refreshSession({
+    required Future<AuthSession> Function(AuthSession session) load,
+    required Future<void> Function(AuthSession session) discard,
+  }) {
+    final session = currentSession;
+    if (session == null) return Future<AuthSession?>.value();
+    final generation = _generation;
+    final pending = _refreshing;
+    if (pending != null && _refreshGeneration == generation) return pending;
+
+    late final Future<AuthSession?> future;
+    future =
+        () async {
+          final refreshed = await load(session);
+          final bool saved;
+          try {
+            saved = await _serialize(() async {
+              if (!isCurrent(session, generation)) return false;
+              await secureStorage.write(_encodeEnvelope(refreshed));
+              if (!isCurrent(session, generation)) return false;
+              _currentSession = refreshed;
+              notifyListeners();
+              await _removeLegacySessionAfterCommit();
+              return isCurrent(refreshed, generation);
+            });
+          } catch (_) {
+            await discard(refreshed);
+            rethrow;
+          }
+          if (!saved) {
+            await discard(refreshed);
+            return null;
+          }
+          return refreshed;
+        }().whenComplete(() {
+          if (identical(_refreshing, future)) {
+            _refreshing = null;
+            _refreshGeneration = null;
+          }
+        });
+    _refreshGeneration = generation;
+    _refreshing = future;
+    return future;
+  }
+
+  Future<T> _serialize<T>(Future<T> Function() operation) {
+    final result = _persistence.then((_) => operation());
+    // Keep the queue usable after a failed platform storage operation while
+    // preserving that error for the caller that owns the failed operation.
+    _persistence = result.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return result;
+  }
+
+  @override
+  void dispose() {
+    _generation++;
+    super.dispose();
   }
 
   AuthSession? _readCompleteLegacySession() {
@@ -298,6 +406,16 @@ class AuthSessionStore extends ChangeNotifier {
   Future<void> _removeLegacySession() async {
     for (final key in _legacySessionKeys) {
       await _preferences.remove(key);
+    }
+  }
+
+  Future<void> _removeLegacySessionAfterCommit() async {
+    try {
+      await _removeLegacySession();
+    } catch (_) {
+      // The secure envelope is already authoritative. Failing to remove old
+      // preferences must not roll back or revoke that committed session.
+      debugPrint('Legacy session metadata cleanup is pending.');
     }
   }
 

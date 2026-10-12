@@ -12,6 +12,7 @@ import 'package:warm_sight/src/features/learning/application/learning_availabili
 import 'package:warm_sight/src/features/learning/application/learning_preparation_repository.dart';
 import 'package:warm_sight/src/features/learning/application/learning_repository.dart';
 import 'package:warm_sight/src/features/points/application/point_repository.dart';
+import 'package:warm_sight/src/features/points/application/point_settings.dart';
 import 'package:warm_sight/src/features/profile/application/profile_repository.dart';
 import 'package:warm_sight/src/features/rewards/application/reward_repository.dart';
 import 'package:warm_sight/src/features/setup/application/setup_draft.dart';
@@ -79,6 +80,7 @@ void _invalidateAuthenticatedSessionData(dynamic ref) {
   ref.invalidate(taskTemplatesProvider);
 
   ref.invalidate(pointsSummaryProvider);
+  ref.invalidate(pointRewardSettingsProvider);
   ref.invalidate(rewardItemsProvider);
   ref.invalidate(rewardRedemptionsProvider);
   ref.invalidate(rewardsSummaryProvider);

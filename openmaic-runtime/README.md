@@ -665,6 +665,7 @@ environment rather than committed to this directory:
 
 ```bash
 cd openmaic-runtime/gateway
+npm ci --ignore-scripts --no-audit --no-fund
 PORT=3101 \
 OPENMAIC_UPSTREAM_URL=http://127.0.0.1:3100 \
 MIRA_BACKEND_INTERNAL_URL=http://127.0.0.1:8000 \
@@ -816,7 +817,16 @@ cd openmaic-runtime
 cd openmaic-runtime/gateway
 npm test
 npm run check
+# Node 24, after bootstrapping the locked native source:
+npm run test:native-viewport
 ```
+
+The gateway pins its HTML parser in `package-lock.json` and requires Node
+20.19 or newer. Both managed and foreground native launches check that dependency
+before reading credentials or starting a process; install it with `npm ci` when
+the check reports missing or outdated dependencies. Large classroom media keeps
+the native renderer's explicit responsive head marker, so bundling repeated
+assets does not shrink low-reading touch targets back into a fixed canvas.
 
 `native-runtime.sh status` and `healthcheck.sh` return non-zero unless both the
 OpenMAIC `1.0.0` health payload on `127.0.0.1:3100` (including the exact

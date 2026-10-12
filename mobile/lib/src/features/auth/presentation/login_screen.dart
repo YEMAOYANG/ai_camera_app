@@ -299,8 +299,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       final joinAction = await _showPendingJoins(loginResult.pendingJoins);
       if (!mounted) return;
       if (joinAction == _PendingJoinAction.deferred) {
-        await ref.read(authRepositoryProvider).logout();
+        final auth = ref.read(authRepositoryProvider);
         invalidateAuthenticatedSessionData(ref);
+        await auth.logout();
         if (!mounted) return;
         setState(() {
           _loading = false;

@@ -22,6 +22,31 @@ describe("school textbooks", () => {
   beforeEach(() => vi.clearAllMocks());
   afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
+  it("offers every published edition in a subject before reading the chosen directory", async () => {
+    const books = [
+      { ...catalog(false).books[0], accessMode: "published" },
+      { ...catalog(false).books[0], editionId: "other-chinese", publisher: "另一出版社", accessMode: "published" },
+      { ...catalog(false).books[0], editionId: "math-book", subject: "math", title: "数学", accessMode: "published" },
+    ];
+    const fetch = vi.fn().mockResolvedValueOnce(reply({ ...catalog(false), books })).mockResolvedValueOnce(reply({ ...detail(false), book: books[1], accessMode: "published" }));
+    vi.stubGlobal("fetch", fetch);
+    const rendered = render(<LearningTextbooks student={student} location={{ subject: "chinese" }} />);
+    const choices = await screen.findByRole("region", { name: "可浏览的教材目录" });
+    expect(within(choices).getByRole("img", { name: "请家长一起看课本" })).toBeVisible();
+    expect(within(choices).getByRole("button", { name: "听老师说，请家长帮忙" })).toBeVisible();
+    expect(within(choices).getAllByRole("link")).toHaveLength(2);
+    expect(within(choices).queryByText("数学")).not.toBeInTheDocument();
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const link = within(choices).getByRole("link", { name: /另一出版社/ });
+    expect(link).toHaveAttribute("href", "/learning/textbooks?editionId=other-chinese&revisionId=review-1");
+    rendered.rerender(<LearningTextbooks student={student} location={{ editionId: "other-chinese", revisionId: "review-1" }} />);
+    expect(await screen.findByRole("region", { name: "走进这门学科" })).toBeVisible();
+    expect(fetch.mock.calls[1][0]).toBe("/api/learning/textbooks/other-chinese/contents?alignmentRevisionId=review-1");
+    expect(screen.queryByText("家长已确认")).not.toBeInTheDocument();
+    expect(fetch.mock.calls.every(([, options]) => !options.method)).toBe(true);
+    expect(books.every(item => !item.selected)).toBe(true);
+  });
+
   it("opens an available edition through its original directory without changing the parent's school book", async () => {
     const other = { ...book, editionId: "other-chinese-g1", revisionId: "published-v1", volume: "lower" };
     const guide = { courseId: "guide", courseVersion: "1", contentKey: "a".repeat(64), delivery: "fixed_textbook", title: "看图找春天", nodeId: "guide-u1", kind: "unit_guide", assessmentMode: "ungraded" };

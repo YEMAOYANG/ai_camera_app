@@ -29,29 +29,42 @@ def published_release(repo, conn, key, child):
 def published_books(service, child):
     """Only add book revisions that actually contain a valid published release."""
     result = {}
-    counted_nodes = set()
     with service.repository.transaction() as conn:
-        rows = conn.execute("SELECT b.content_key FROM learning_textbook_course_builds b "
+        rows = conn.execute("SELECT DISTINCT b.edition_id,b.revision_id FROM learning_textbook_course_builds b "
             "JOIN learning_textbook_revisions r ON r.edition_id=b.edition_id AND r.revision_id=b.revision_id "
-            "WHERE b.status='published' AND r.retired_at IS NULL AND r.grade_code=? ORDER BY b.content_key",
+            "WHERE b.status='published' AND r.retired_at IS NULL AND r.grade_code=? ORDER BY b.edition_id,b.revision_id",
             (child['grade_code'],)).fetchall()
         for row in rows:
-            try:
-                build, _, _, manifest = published_release(service.repository, conn, row['content_key'], child)
-            except ApiError:
-                continue
-            identity = (manifest['editionId'], manifest['revisionId'])
-            if identity not in result:
-                result[identity] = {**service._book(manifest), 'selected': False, 'selectionRevision': 0,
-                    'currentNodeId': None, 'accessMode': 'published', 'learningStatus': {'status': 'ready',
-                    'availableLessonCount': 0, 'availableActivityCount': 0, 'completedLessonCount': 0}}
-            kind = service.repository.parse(build['input_json']).get('activityScope', {}).get('kind', 'lesson_courseware')
-            # A new teaching revision preserves its older release, but the
-            # directory still exposes one entry for this node and part.
-            slot = (*identity, build['node_id'], build['part_index'], kind)
-            if slot in counted_nodes:
-                continue
-            counted_nodes.add(slot)
-            counter = 'availableLessonCount' if kind == 'lesson_courseware' else 'availableActivityCount'
-            result[identity]['learningStatus'][counter] += 1
+            builds = service.repository.builds(conn, row['edition_id'], row['revision_id'])
+            releases = published_node_releases(service.repository, conn, child, builds)
+            for build, _, _, manifest in releases.values():
+                identity = (manifest['editionId'], manifest['revisionId'])
+                if identity not in result:
+                    result[identity] = {**service._book(manifest), 'selected': False, 'selectionRevision': 0,
+                        'currentNodeId': None, 'accessMode': 'published', 'learningStatus': {'status': 'ready',
+                        'availableLessonCount': 0, 'availableActivityCount': 0, 'completedLessonCount': 0}}
+                kind = service.repository.parse(build['input_json']).get('activityScope', {}).get('kind', 'lesson_courseware')
+                counter = 'availableLessonCount' if kind == 'lesson_courseware' else 'availableActivityCount'
+                result[identity]['learningStatus'][counter] += 1
+    return result
+
+
+def published_node_releases(repo, conn, child, builds):
+    """One latest valid release per directory node, shared by every student.
+
+    Only publication integrity determines a fallback. Personal progress and
+    selected books must never select different teaching revisions for a node.
+    The directory contract exposes part one; other parts are not counted here.
+    """
+    result = {}
+    for build in sorted(builds, key=lambda row: (-int(row['created_at']), row['content_key'])):
+        if build['part_index'] != 1 or build['node_id'] in result:
+            continue
+        try:
+            release = published_release(repo, conn, build['content_key'], child)
+        except (ApiError, ValueError, TypeError, KeyError, AttributeError):
+            # A withdrawn or damaged latest artifact must not hide an older
+            # reviewed release or break the whole catalogue response.
+            continue
+        result[build['node_id']] = release
     return result

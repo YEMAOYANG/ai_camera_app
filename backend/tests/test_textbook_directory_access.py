@@ -1,5 +1,6 @@
 """Released courses open from exact directories without changing school choices."""
 import json
+from copy import deepcopy
 import unittest
 from unittest.mock import Mock
 from urllib.parse import parse_qs, urlparse
@@ -52,6 +53,87 @@ class TextbookDirectoryAccessTest(unittest.TestCase):
         self.assertFalse(contents['selected'])
         self.assertEqual(contents['accessMode'], 'published')
         self.assertEqual(self.db.execute('SELECT * FROM learning_textbook_selections').fetchall(), [])
+
+    @staticmethod
+    def course_in_contents(contents, kind):
+        if kind == 'book_exploration':
+            return contents['explorationCourse']
+        if kind == 'unit_guide':
+            return contents['units'][0]['guideCourse']
+        return contents['units'][0]['lessons'][0]['course']
+
+    def assert_latest_valid_fallback(self, kind):
+        old_key, old_course, _ = self.publish(kind=kind)
+        new_key, new_course, _ = self.publish(kind=kind, teaching_revision='test-v2', created_at=2)
+        new_build = self.repo.get_build(self.db, new_key)
+        self.db.execute("INSERT INTO learning_sessions VALUES ('done','family-a','child-a',?,?,'completed')",
+                        (old_course['id'], old_course['version']))
+        query = {'alignmentRevisionId': self.manifest['revisionId']}
+        failures = (
+            ('learning_courses', 'retired_at', 2, None, new_course['id'], 'id'),
+            ('learning_courses', 'status', 'unverified', 'published', new_course['id'], 'id'),
+            ('learning_textbook_course_builds', 'status', 'retired', 'published', new_key, 'content_key'),
+            ('learning_textbook_course_builds', 'review_json', '{}', new_build['review_json'], new_key, 'content_key'),
+            ('learning_textbook_course_builds', 'review_json', '["damaged"]', new_build['review_json'], new_key, 'content_key'),
+            ('learning_textbook_course_builds', 'input_json', '{broken', new_build['input_json'], new_key, 'content_key'),
+        )
+        for table, column, invalid, restored, identity, key in failures:
+            with self.subTest(kind=kind, column=column, value=invalid):
+                self.db.execute(f'UPDATE {table} SET {column}=? WHERE {key}=?', (invalid, identity))
+                for token in ('student-a', 'student-b'):
+                    status = self.service.student_catalog(token, {})['books'][0]['learningStatus']
+                    self.assertEqual(status['status'], 'ready')
+                    self.assertEqual(status['availableLessonCount'], int(kind == 'lesson_courseware'))
+                    self.assertEqual(status['availableActivityCount'], int(kind != 'lesson_courseware'))
+                    contents = self.service.student_contents(token, self.manifest['editionId'], query)
+                    self.assertEqual(self.course_in_contents(contents, kind)['contentKey'], old_key)
+                    self.assertFalse(contents['selected'])
+                self.assertIsNotNone(published_release(self.repo, self.db, old_key, self.child))
+                self.db.execute(f'UPDATE {table} SET {column}=? WHERE {key}=?', (restored, identity))
+                contents = self.service.student_contents('student-a', self.manifest['editionId'], query)
+                self.assertEqual(self.course_in_contents(contents, kind)['contentKey'], new_key)
+        self.assertEqual(self.db.execute('SELECT * FROM learning_textbook_selections').fetchall(), [])
+
+    def test_lesson_falls_back_to_same_valid_revision_for_all_students(self):
+        self.assert_latest_valid_fallback('lesson_courseware')
+
+    def test_unit_guide_falls_back_to_same_valid_revision_for_all_students(self):
+        self.assert_latest_valid_fallback('unit_guide')
+
+    def test_book_exploration_falls_back_to_same_valid_revision_for_all_students(self):
+        self.assert_latest_valid_fallback('book_exploration')
+
+    def test_no_valid_release_never_advertises_a_ready_book_or_entry(self):
+        for kind in ('lesson_courseware', 'unit_guide', 'book_exploration'):
+            self.publish(kind=kind)
+            self.publish(kind=kind, teaching_revision='test-v2', created_at=2)
+        self.db.execute('UPDATE learning_courses SET retired_at=2')
+        self.assertEqual(self.service.student_catalog('student-a', {})['books'], [])
+        query = {'alignmentRevisionId': self.manifest['revisionId']}
+        with self.assertRaises(ApiError):
+            self.service.student_contents('student-a', self.manifest['editionId'], query)
+        existing.TextbookLearningTest.choose(self)
+        catalog = self.service.student_catalog('student-a', {})
+        self.assertEqual(catalog['books'][0]['learningStatus']['status'], 'unpublished')
+        self.assertEqual(catalog['books'][0]['learningStatus']['availableLessonCount'], 0)
+        self.assertIsNone(catalog['startHere'])
+        contents = self.service.student_contents('student-a', self.manifest['editionId'], query)
+        for kind in ('lesson_courseware', 'unit_guide', 'book_exploration'):
+            self.assertIsNone(self.course_in_contents(contents, kind))
+
+    def test_fallback_never_substitutes_another_directory_revision(self):
+        old_key, _, _ = self.publish()
+        other = deepcopy(self.manifest)
+        other['revisionId'] = 'other-directory'
+        self.service.import_manifest(other)
+        _, other_course, _ = self.publish(other, created_at=2)
+        self.db.execute('UPDATE learning_courses SET retired_at=2 WHERE id=?', (other_course['id'],))
+        catalog = self.service.student_catalog('student-a', {})
+        self.assertEqual([book['revisionId'] for book in catalog['books']], [self.manifest['revisionId']])
+        with self.assertRaises(ApiError):
+            self.service.student_contents('student-a', other['editionId'], {'alignmentRevisionId': other['revisionId']})
+        contents = self.service.student_contents('student-a', self.manifest['editionId'], {'alignmentRevisionId': self.manifest['revisionId']})
+        self.assertEqual(contents['units'][0]['guideCourse']['contentKey'], old_key)
 
     def test_wrong_grade_retired_and_withdrawn_courses_never_appear(self):
         key, course, _ = self.publish()

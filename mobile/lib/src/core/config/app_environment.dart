@@ -40,17 +40,27 @@ class AppEnvironment {
   });
 
   static Future<AppEnvironment> load() async {
-    // Debug/Profile builds should read the bundled env file. Xcode runs do not
-    // pass --dart-define-from-file, but ios/Flutter/Generated.xcconfig can keep
-    // stale release DART_DEFINES and point the app at production URLs.
-    if (!kReleaseMode) {
-      return _loadFromBundledAsset(_flavorFromDartDefineOrBuildMode());
+    final flavor = _flavorFromDartDefineOrBuildMode();
+    const allowProductionInDebug = bool.fromEnvironment(
+      'APP_ALLOW_PRODUCTION_IN_DEBUG',
+    );
+    // Xcode can retain production DART_DEFINES from a previous release build.
+    // Explicit development/staging URLs still work normally; intentionally
+    // using production from Debug/Profile requires a separate opt-in.
+    if (!kReleaseMode &&
+        flavor == AppFlavor.production &&
+        !allowProductionInDebug) {
+      debugPrint(
+        'Production configuration ignored in Debug/Profile. Set '
+        'APP_ALLOW_PRODUCTION_IN_DEBUG=true to opt in.',
+      );
+      return _loadFromBundledAsset(AppFlavor.development);
     }
 
     final fromDefines = _fromOptionalDartDefines();
     if (fromDefines != null) return fromDefines;
 
-    return _loadFromBundledAsset(AppFlavor.production);
+    return _loadFromBundledAsset(flavor);
   }
 
   static Future<AppEnvironment> _loadFromBundledAsset(

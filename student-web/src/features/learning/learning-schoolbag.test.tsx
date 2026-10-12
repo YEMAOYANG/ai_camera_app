@@ -19,6 +19,31 @@ beforeEach(() => { vi.clearAllMocks(); vi.spyOn(HTMLMediaElement.prototype, "pla
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); vi.restoreAllMocks(); });
 
 describe("shared textbook schoolbag", () => {
+  it.each([1, 2])("browses %i published unselected editions without confirming a school book", async count => {
+    const books = Array.from({ length: count }, (_, index) => ({ ...book, editionId: `published-${index}`, selected: false, accessMode: "published", selectionRevision: 0 }));
+    const fetch = vi.fn().mockResolvedValue(response({ ...catalog, books, subjects: [{ subject: "chinese", status: "selection_required" }] }));
+    vi.stubGlobal("fetch", fetch);
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    render(<LearningSchoolbag student={student} />);
+    const link = await screen.findByRole("link", { name: "浏览语文教材" });
+    const path = count === 1 ? "/learning/textbooks?editionId=published-0&revisionId=review-1" : "/learning/textbooks?subject=chinese";
+    expect(link).toHaveAttribute("href", path);
+    fireEvent.click(link);
+    expect(router.push).toHaveBeenCalledWith(path);
+    expect(screen.getByRole("region", { name: "看看教材目录" })).toBeVisible();
+    expect(screen.queryByText("请家长在 App 中确认学校课本，再开始学习。")).not.toBeInTheDocument();
+    expect(books.every(item => !item.selected)).toBe(true);
+    expect(fetch.mock.calls.every(([, options]) => !options.method)).toBe(true);
+  });
+
+  it("prioritizes the confirmed school book over other published editions", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response({ ...catalog, books: [{ ...book, editionId: "other", selected: false, accessMode: "published" }, book] })));
+    render(<LearningSchoolbag student={student} />);
+    expect(await screen.findByRole("link", { name: "拿出语文课本" })).toHaveAttribute("href", "/learning/textbooks?editionId=pep-chinese-g1&revisionId=review-1");
+    fireEvent.click(screen.getByRole("button", { name: "家长与设置" }));
+    expect(screen.getByRole("link", { name: "浏览教材目录" })).toHaveAttribute("href", "/learning/textbooks");
+  });
+
   it("keeps review/exam and worksheet entries visible while books load or fail", async () => {
     let finish!: (value: Response) => void;
     const fetch = vi.fn(() => new Promise<Response>(resolve => { finish = resolve; }));

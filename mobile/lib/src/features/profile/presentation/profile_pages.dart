@@ -696,9 +696,10 @@ class _AccountSecurityPageState extends ConsumerState<AccountSecurityPage> {
     if (!confirmed || !mounted) return;
     setState(() => _deletingAccount = true);
     try {
+      final auth = ref.read(authRepositoryProvider);
       await ref.read(profileRepositoryProvider).requestAccountDeletion();
-      await ref.read(authRepositoryProvider).logout();
-      invalidateAuthenticatedSessionData(ref);
+      if (mounted) invalidateAuthenticatedSessionData(ref);
+      await auth.logout();
       if (mounted) context.go(loginPath);
     } on ProfileException catch (error) {
       if (mounted) {

@@ -2,6 +2,7 @@ import http from "node:http";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { Readable } from "node:stream";
 import { URL } from "node:url";
+import { parse } from "parse5";
 
 const DEFAULT_MAX_BODY_BYTES = 25 * 1024 * 1024;
 const MAX_RUNTIME_AUDIO_BYTES = 16 * 1024 * 1024;
@@ -522,7 +523,19 @@ export function embedTextbookSceneMedia(html, assets) {
   // Build local object URLs inside the same opaque iframe; no credentials,
   // public media endpoints or additional sandbox permissions are introduced.
   const scriptJson = value => JSON.stringify(value).replace(/</g, '\\u003c');
-  return '<!doctype html><html><head><meta charset="utf-8"></head><body><script>'
+  // The native host selects its viewport before executing the embedded page.
+  // Preserve only an unambiguous head marker; script strings, templates and
+  // body markup cannot opt a legacy activity into the responsive profile.
+  const document = parse(html, { scriptingEnabled: true });
+  const head = document.childNodes.find(node => node.tagName === 'html')?.childNodes
+    .find(node => node.tagName === 'head');
+  const markers = head?.childNodes.filter(node => node.tagName === 'meta'
+    && node.attrs.some(attr => attr.name === 'name' && attr.value.trim().toLowerCase() === 'mira-responsive-activity'));
+  const responsive = markers?.length === 1
+    && markers[0].attrs.find(attr => attr.name === 'content')?.value.trim() === 'low-reading-v1';
+  return '<!doctype html><html><head><meta charset="utf-8">'
+    + (responsive ? '<meta name="mira-responsive-activity" content="low-reading-v1">' : '')
+    + '</head><body><script>'
     + '(function(){const assets=' + scriptJson(assets) + ';let page=' + scriptJson(html) + ';'
     + 'for(const asset of assets){const binary=atob(asset.base64);const bytes=new Uint8Array(binary.length);'
     + 'for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);'

@@ -60,6 +60,32 @@ MIRA_OPENMAIC_MODEL_POLICY=deepseek-v4-pro-flash-v1
 source "${RUNTIME_SCRIPT}"
 unset MIRA_OPENMAIC_MODEL_POLICY
 
+# Dependency checks run before credentials, process ownership or launch work.
+# These fixtures never contact npm or the live Gateway.
+(
+  GATEWAY_DIR="${TMP_ROOT}/gateway-dependencies"
+  mkdir -p "${GATEWAY_DIR}"
+  printf '%s\n' '{"dependencies":{"parse5":"8.0.1"}}' > "${GATEWAY_DIR}/package.json"
+  if require_gateway_dependencies 2>"${TMP_ROOT}/gateway-dependency-error"; then
+    fail 'Gateway started without its HTML parser dependency'
+  fi
+  grep -q 'npm ci' "${TMP_ROOT}/gateway-dependency-error" || fail 'Gateway dependency guidance is missing'
+  mkdir -p "${GATEWAY_DIR}/node_modules/parse5"
+  printf '%s\n' '{"version":"8.0.1","type":"module","exports":"./index.js"}' > "${GATEWAY_DIR}/node_modules/parse5/package.json"
+  printf '%s\n' 'export function parse() {}' > "${GATEWAY_DIR}/node_modules/parse5/index.js"
+  require_gateway_dependencies || fail 'Gateway rejected its installed parser fixture'
+  printf '%s\n' '{"version":"7.0.0","type":"module","exports":"./index.js"}' > "${GATEWAY_DIR}/node_modules/parse5/package.json"
+  if require_gateway_dependencies 2>/dev/null; then fail 'Gateway accepted a stale parser dependency'; fi
+)
+(
+  require_gateway_dependencies() { return 1; }
+  load_runtime_origin_env() { fail 'Gateway read credentials before dependency validation'; }
+  prepare_gateway_start() { fail 'Gateway changed process records before dependency validation'; }
+  gateway_runtime_is_current() { return 1; }
+  if run_gateway_foreground; then fail 'Foreground Gateway bypassed its dependency gate'; fi
+  if start_gateway; then fail 'Managed Gateway bypassed its dependency gate'; fi
+)
+
 # Production pins model credentials to openmaic-runtime/.env. This local unit
 # harness replaces only that path resolver so it never reads an operator key.
 model_provider_env_file() {
@@ -210,6 +236,7 @@ mkdir -p "${SOURCE_DIR}/.next"
 printf 'fake-reviewed-build\n' > "${SOURCE_DIR}/.next/BUILD_ID"
 require_openmaic_production_build
 production_output="$(
+  MIRA_OPENMAIC_MODEL_POLICY=deepseek-v4-pro-flash-v1 \
   OPENMAIC_SOURCE_DIR="${FAKE_SOURCE_DIR}" \
   MIRA_BACKEND_ENV_FILE="${TMP_ROOT}/backend.env" \
   MIRA_STUDENT_WEB_ENV_FILE="${TMP_ROOT}/student-web.env" \

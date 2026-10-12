@@ -4,6 +4,7 @@ import http from "node:http";
 import { afterEach, test } from "node:test";
 import { gzipSync } from "node:zlib";
 import vm from "node:vm";
+import { parse } from "parse5";
 
 import {
   authorizeRuntimeRequest,
@@ -17,6 +18,31 @@ import {
 } from "../src/server.mjs";
 
 const servers = [];
+
+test('large media preserves only a real unambiguous responsive head marker', () => {
+  const marker = '<meta name="mira-responsive-activity" content="low-reading-v1">';
+  const path = '/api/classroom-media/tbpub_' + 'a'.repeat(24) + '/media/atlas.png';
+  const asset = { path, mimeType: 'image/png', base64: Buffer.alloc(1024 * 1024).toString('base64') };
+  for (const [head, body, expected] of [
+    [marker, '', 1],
+    ["<META CONTENT=' low-reading-v1 ' NAME=' MIRA-RESPONSIVE-ACTIVITY '>", '', 1],
+    ['', '', 0],
+    ['', marker, 0],
+    ['<template>' + marker + '</template>', '', 0],
+    ['<!--' + marker + '-->', '', 0],
+    ['<script>const marker=' + JSON.stringify(marker) + ';</script>', '', 0],
+    [marker + marker, '', 0],
+    [marker.replace('low-reading-v1', 'unreviewed-profile'), '', 0],
+  ]) {
+    const bundled = embedTextbookSceneMedia('<!doctype html><html><head>' + head + '</head><body>'
+      + body + `<img src="${path}">`.repeat(2) + '</body></html>', [asset]);
+    const outerHead = parse(bundled).childNodes.find(node => node.tagName === 'html').childNodes
+      .find(node => node.tagName === 'head');
+    const responsiveMarkers = outerHead.childNodes.filter(node => node.tagName === 'meta'
+      && node.attrs.some(attr => attr.name === 'name' && attr.value === 'mira-responsive-activity'));
+    assert.equal(responsiveMarkers.length, expected, `head=${head}, body=${body}`);
+  }
+});
 
 test('large repeated textbook atlases remain single-copy and reconstruct exact approved HTML', async () => {
   const path = '/api/classroom-media/tbpub_' + 'a'.repeat(24) + '/media/atlas.png';

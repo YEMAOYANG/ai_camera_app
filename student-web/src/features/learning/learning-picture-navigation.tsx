@@ -72,7 +72,7 @@ export function getLearningHomeState(catalog: TextbookCatalog) {
     ?? catalog.learningJourneys?.find(item => item.parentNeeded || ["learning", "checking", "reviewing"].includes(item.status));
   const start = catalog.startHere;
   const last = catalog.learningJourneys?.[0];
-  const cue: LearningCue = journey ? journey.reviewDue ? "review" : "continue" : start ? "start" : last ? "welcome" : catalog.books.some(book => book.selected) ? "unavailable" : "selection";
+  const cue: LearningCue = journey ? journey.reviewDue ? "review" : "continue" : start ? "start" : last ? "welcome" : catalog.books.some(book => book.accessMode === "published") ? "choose" : catalog.books.some(book => book.selected) ? "unavailable" : "selection";
   return { journey, start, last, cue };
 }
 
@@ -80,7 +80,7 @@ export function LearningNextPicture({ catalog }: { catalog: TextbookCatalog }) {
   const { journey, start, last, cue } = getLearningHomeState(catalog);
   const title = journey?.title ?? start?.title ?? last?.title;
   const contentKey = journey?.contentKey ?? start?.contentKey;
-  const heading = cue === "review" ? "再来试一试" : cue === "continue" ? "接着玩" : cue === "start" ? "开始小任务" : cue === "welcome" ? "上次的学习已保存" : cue === "unavailable" ? "课件正在准备" : "等家长放入课本";
+  const heading = cue === "review" ? "再来试一试" : cue === "continue" ? "接着玩" : cue === "start" ? "开始小任务" : cue === "welcome" ? "上次的学习已保存" : cue === "choose" ? "看看教材目录" : cue === "unavailable" ? "课件正在准备" : "等家长放入课本";
   return <section className="learning-next-picture" aria-label={heading}>
     {contentKey && title ? <Link prefetch={false} href={`/learning/textbooks/courses/${contentKey}`} className="learning-picture-launch" aria-label={`${heading}，${title}`}>
       <LessonPicture title={title} subject={start?.subject} contentKey={contentKey} /><span className="learning-picture-play"><Play size={36} fill="currentColor" aria-hidden="true" /></span>

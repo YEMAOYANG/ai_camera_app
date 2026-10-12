@@ -133,9 +133,11 @@ class TextbookLearningService:
                     continue
                 manifest = self._revision(conn, child, book["editionId"], book["revisionId"])
                 builds = self.repository.builds(conn, book["editionId"], book["revisionId"])
+                from services.textbook_directory_access import published_node_releases
+                releases = published_node_releases(self.repository, conn, child, builds)
                 available, locked = [], 0
-                guides = [self._available_activity(conn, child, manifest, builds, 'book_exploration')]
-                guides.extend(self._available_activity(conn, child, manifest, builds, 'unit_guide', unit['unitId'])
+                guides = [self._available_activity(conn, child, manifest, builds, 'book_exploration', releases=releases)]
+                guides.extend(self._available_activity(conn, child, manifest, builds, 'unit_guide', unit['unitId'], releases=releases)
                               for unit in manifest['units'])
                 guides = [guide for guide in guides if guide]
                 for guide in guides:
@@ -143,7 +145,7 @@ class TextbookLearningService:
                         'revisionId': book['revisionId'], 'current': False})
                 for unit in manifest["units"]:
                     for node in unit["lessons"]:
-                        course, blocked = self._available_course(conn, child, manifest, node, builds)
+                        course, blocked = self._available_course(conn, child, manifest, node, builds, releases=releases)
                         if course:
                             available.append((course["courseId"], course["courseVersion"]))
                             suggestions.append({**course, 'title': node['title'], 'subject': book['subject'],
@@ -206,16 +208,10 @@ class TextbookLearningService:
             manifest = self._revision(conn, child, edition_id, revision_id)
             choices = self.repository.selections(conn, child, year, semester)
             selection = next((r for r in choices if r["edition_id"] == edition_id and r["revision_id"] == revision_id), None)
-            from services.textbook_directory_access import published_release
+            from services.textbook_directory_access import published_node_releases
             builds = self.repository.builds(conn, edition_id, revision_id)
-            released_directory = False
-            for build in builds:
-                try:
-                    published_release(self.repository, conn, build['content_key'], child)
-                    released_directory = True
-                    break
-                except ApiError:
-                    continue
+            releases = published_node_releases(self.repository, conn, child, builds)
+            released_directory = bool(releases)
             if selection is None and not released_directory:
                 raise ApiError("textbook_selection_required", "请家长在 App 的“学校教材”中确认这学期的课本，再回到书包刷新。", 409)
             units = []
@@ -224,7 +220,7 @@ class TextbookLearningService:
                 for node in unit["lessons"]:
                     # A published binding is never sufficient on its own. Existing
                     # student visibility/media/identity gates remain authoritative.
-                    course, blocked = self._available_course(conn, child, manifest, node, builds)
+                    course, blocked = self._available_course(conn, child, manifest, node, builds, releases=releases)
                     if selection is None and course and course.get('delivery') != 'fixed_textbook':
                         course, blocked = None, None
                     reviewed = manifest["rightsReview"]["status"] == "cleared" and node["brief"]["status"] == "approved"
@@ -235,9 +231,9 @@ class TextbookLearningService:
                                     "objectives": node["brief"]["objectives"], "status": status, "message": blocked, "course": course})
                 units.append({"unitId": unit["unitId"], "title": unit["title"], "sequence": unit["sequence"],
                               "kind": unit.get("kind", "unit"),
-                              "guideCourse": self._available_activity(conn, child, manifest, builds, 'unit_guide', unit['unitId']),
+                              "guideCourse": self._available_activity(conn, child, manifest, builds, 'unit_guide', unit['unitId'], releases=releases),
                               "introduction": public_introduction(unit.get("introduction"), manifest=manifest), "lessons": lessons})
-            exploration = self._available_activity(conn, child, manifest, builds, 'book_exploration')
+            exploration = self._available_activity(conn, child, manifest, builds, 'book_exploration', releases=releases)
         return {"ok": True, "schemaVersion": RESPONSE_SCHEMA, "book": self._book(manifest),
                 **({'accessMode': 'published'} if released_directory else {}),
                 "selected": selection is not None, "selectionRevision": int(selection["selection_revision"]) if selection else 0,
@@ -245,44 +241,44 @@ class TextbookLearningService:
                 "introduction": public_introduction(manifest.get("introduction"), manifest=manifest),
                 "explorationCourse": exploration, "units": units}
 
-    def _available_activity(self, conn, child, manifest, builds, kind, unit_id=None):
+    def _available_activity(self, conn, child, manifest, builds, kind, unit_id=None, *, releases=None):
         from content.textbook_batch_release import INPUT_SCHEMA, node_key
-        from content.textbook_release import validate_release
+        from services.textbook_directory_access import published_node_releases
         node_id = node_key(kind, unit_id)
-        candidate = next((b for b in builds if b['node_id'] == node_id and b['part_index'] == 1), None)
-        if candidate is None:
+        if releases is None:
+            releases = published_node_releases(self.repository, conn, child, builds)
+        released = releases.get(node_id)
+        if released is None:
             return None
+        candidate, _, course, _ = released
         frozen = self.repository.parse(candidate['input_json'])
         if frozen.get('schemaVersion') != INPUT_SCHEMA or child['grade_code'] != manifest['gradeCode']:
             return None
-        course = conn.execute('SELECT * FROM learning_courses WHERE id=? AND version=?',
-                             (candidate['course_id'], candidate['course_version'])).fetchone()
-        try:
-            if course is not None and validate_release(candidate, manifest, course):
-                return {'courseId': course['id'], 'courseVersion': course['version'], 'contentKey': candidate['content_key'],
-                        'delivery': 'fixed_textbook', 'kind': kind, 'title': course['title'], 'nodeId': node_id,
-                        'assessmentMode': 'ungraded'}
-        except ApiError:
-            pass
-        return None
+        return {'courseId': course['id'], 'courseVersion': course['version'], 'contentKey': candidate['content_key'],
+                'delivery': 'fixed_textbook', 'kind': kind, 'title': course['title'], 'nodeId': node_id,
+                'assessmentMode': 'ungraded'}
 
-    def _available_course(self, conn, child, manifest, node, builds):
+    def _available_course(self, conn, child, manifest, node, builds, *, releases=None):
         # Saved-artifact releases have a per-lesson review and immutable media
         # audit. They do not upgrade the pending review of the entire book.
-        from content.textbook_release import INPUT_SCHEMA, validate_release
+        from content.textbook_release import INPUT_SCHEMA
         from content.textbook_batch_release import INPUT_SCHEMA as ACTIVITY_INPUT
+        from services.textbook_directory_access import published_node_releases
+        if releases is None:
+            releases = published_node_releases(self.repository, conn, child, builds)
+        released = releases.get(node['nodeId'])
+        if released is not None:
+            build, _, course, _ = released
+            return {'courseId': course['id'], 'courseVersion': course['version'],
+                    'contentKey': build['content_key'], 'delivery': 'fixed_textbook'}, None
         candidates = [b for b in builds if b['node_id'] == node['nodeId'] and b['part_index'] == 1]
         if candidates:
             build = candidates[0]
-            if self.repository.parse(build['input_json']).get('schemaVersion') in {INPUT_SCHEMA, ACTIVITY_INPUT}:
-                course = conn.execute('SELECT * FROM learning_courses WHERE id=? AND version=?',
-                                      (build['course_id'], build['course_version'])).fetchone()
-                try:
-                    if course is not None and validate_release(build, manifest, course):
-                        return {'courseId': course['id'], 'courseVersion': course['version'],
-                                'contentKey': build['content_key'], 'delivery': 'fixed_textbook'}, None
-                except ApiError:
-                    pass
+            try:
+                schema = (self.repository.parse(build['input_json']) or {}).get('schemaVersion')
+            except (ValueError, TypeError, AttributeError):
+                return None, None
+            if schema in {INPUT_SCHEMA, ACTIVITY_INPUT}:
                 return None, None
         if manifest["rightsReview"]["status"] != "cleared" or node["brief"]["status"] != "approved" or self.student_learning_service is None:
             return None, None

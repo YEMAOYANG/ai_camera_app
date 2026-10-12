@@ -2,9 +2,7 @@ import { allowsLocalLanProductionHttp, isLocalLanHttpOrigin } from "./local-lan-
 
 const DEVELOPMENT_RUNTIME_ORIGIN = "http://127.0.0.1:3101";
 
-export const OPENMAIC_RUNTIME_HEADER_SOURCE = "/lesson/:taskId/classroom";
-export const TEXTBOOK_RUNTIME_HEADER_SOURCE = "/learning/textbooks/courses/:contentKey";
-export const BLOCKED_PERMISSIONS_POLICY = "camera=(), microphone=(), geolocation=()";
+export const STUDENT_PERMISSIONS_POLICY = "camera=(), microphone=(self), geolocation=()";
 
 type RuntimeEnvironment = "development" | "test" | "production" | string | undefined;
 
@@ -62,7 +60,7 @@ export function openMaicRuntimePermissionsPolicy(
   runtimeOrigin: string | null,
   localLanProductionMode = process.env.MIRA_LOCAL_LAN_PRODUCTION_MODE,
 ) {
-  if (!runtimeOrigin) return BLOCKED_PERMISSIONS_POLICY;
+  if (!runtimeOrigin) return STUDENT_PERMISSIONS_POLICY;
   const origins = runtimeBrowserOrigins(runtimeOrigin, localLanProductionMode);
   return `camera=(), microphone=(self ${origins.map((origin) => `"${origin}"`).join(" ")}), geolocation=()`;
 }
@@ -114,19 +112,12 @@ export function buildStudentSecurityHeaderRules(options: {
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-        { key: "Permissions-Policy", value: BLOCKED_PERMISSIONS_POLICY },
+        // Permissions-Policy belongs to the document. Next client navigation
+        // cannot replace it on a later recording/classroom route. Keep one
+        // document policy; getUserMedia still requires an explicit recording
+        // gesture and only classroom iframes receive an allow attribute.
+        { key: "Permissions-Policy", value: openMaicRuntimePermissionsPolicy(runtimeOrigin, options.localLanProductionMode) },
       ],
     },
-    ...[OPENMAIC_RUNTIME_HEADER_SOURCE, TEXTBOOK_RUNTIME_HEADER_SOURCE].map((source) => ({
-      // This rule must remain after the global rule. Next applies the last
-      // matching value when two header rules set the same header.
-      source,
-      headers: [
-        {
-          key: "Permissions-Policy",
-          value: openMaicRuntimePermissionsPolicy(runtimeOrigin, options.localLanProductionMode),
-        },
-      ],
-    })),
   ];
 }

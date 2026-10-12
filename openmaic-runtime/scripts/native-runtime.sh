@@ -2254,8 +2254,22 @@ run_openmaic_foreground() {
       --hostname 127.0.0.1 --port "${OPENMAIC_PORT}"
 }
 
+require_gateway_dependencies() {
+  if ! (cd "${GATEWAY_DIR}" && node --input-type=module -e '
+    import { readFileSync } from "node:fs";
+    import { parse } from "parse5";
+    const expected = JSON.parse(readFileSync("package.json", "utf8")).dependencies.parse5;
+    const installed = JSON.parse(readFileSync("node_modules/parse5/package.json", "utf8")).version;
+    if (installed !== expected || typeof parse !== "function") process.exit(1);
+  ') >/dev/null 2>&1; then
+    echo "Gateway dependencies are missing or outdated. Run npm ci --ignore-scripts --no-audit --no-fund in ${GATEWAY_DIR}." >&2
+    return 1
+  fi
+}
+
 run_gateway_foreground() {
   local internal_token node_bin
+  require_gateway_dependencies || return 1
   load_runtime_origin_env
   internal_token="$(read_backend_internal_token)" || {
     echo "MIRA_INTERNAL_API_TOKEN is required (or provide backend/.env with INTERNAL_API_TOKEN)." >&2
@@ -2465,6 +2479,7 @@ start_gateway() {
     return 0
   fi
 
+  require_gateway_dependencies || return 1
   prepare_gateway_start || return 1
 
   local internal_token node_bin python_bin started_pid started_start_hash
