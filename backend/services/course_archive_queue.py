@@ -682,6 +682,71 @@ class CourseArchiveProcessor:
             raise ArchiveQueueError(invalid) from error
 
     @staticmethod
+    def _inherited_audio_alias_coverage(uncovered, new_files, manifest):
+        """Cover only a producer-proven alias of the exact same Native WAV member."""
+        aliases = manifest.get("recoveredAliases", [])
+        if not isinstance(aliases, list):
+            return []
+        prefix = "openmaic-runtime/.runtime/OpenMAIC/data/classrooms/"
+        result = []
+        for old in uncovered:
+            match = re.fullmatch(r"媒体/(" + re.escape(prefix)
+                + r"([A-Za-z0-9_-]{1,255})/audio/(tbprev_[a-f0-9]{64})\.wav)", old["archivePath"])
+            new = new_files.get(old["archivePath"])
+            if (not match or not new or old.get("original") is not True or old.get("sourceKind") != "referenced_media"
+                    or new.get("sourceKind") != "referenced_media" or new.get("original") is not True
+                    or old.get("mimeType") != "audio/wav"
+                    or any(new.get(k) != old.get(k) for k in ("sha256", "byteSize", "mimeType"))):
+                continue
+            physical, stage, request = match.groups()
+            uri = "/api/classroom-media/" + physical.removeprefix(prefix)
+            named = re.fullmatch(re.escape("/api/classroom-media/" + stage + "/audio/")
+                + r"(cue-(?:me|you|he)|speaker-(?:teal|coral))\.wav", str(new.get("sourceIdentity", "")))
+            if old["sourceIdentity"] not in {physical, uri} or not named:
+                continue
+            matches = [entry for entry in aliases if isinstance(entry, dict)
+                and entry.get("archivePath") == old["archivePath"]
+                and entry.get("originalReference") == new["sourceIdentity"]]
+            if len(matches) != 1:
+                continue
+            alias = matches[0]
+            if (alias.get("recoveryReason") != "historical_audio_alias_from_verified_inherited_receipt"
+                    or alias.get("ttsRequestId") != request or alias.get("actionId") != "review_" + named[1]
+                    or not isinstance(alias.get("sceneId"), str) or not ID.fullmatch(alias["sceneId"])
+                    or type(alias.get("byteSize")) is not int
+                    or any(alias.get(k) != old.get(k) for k in ("sha256", "byteSize", "mimeType"))):
+                continue
+            evidence, hashes = alias.get("evidence"), alias.get("evidenceSha256")
+            if (not isinstance(evidence, list) or not evidence or not all(isinstance(p, str) for p in evidence)
+                    or len(set(evidence)) != len(evidence) or not isinstance(hashes, dict)
+                    or set(hashes) != set(evidence)):
+                continue
+            base = prefix + stage + "/textbook-preview-audio/operator-parent/"
+            audio = base + "audio/" + request + ".wav"
+            paid_job = "openmaic-runtime/.runtime/OpenMAIC/data/formal-audio/jobs/tts/" + _sha(request.encode()) + ".json"
+            if not {base + "source-receipts.json", audio, paid_job}.issubset(evidence):
+                continue
+            valid = True
+            for source in evidence:
+                entry = new_files.get("原稿/" + source)
+                if (source.startswith("/") or "\\" in source
+                        or any(unicodedata.category(c) in {"Cc", "Cf", "Cs"} for c in source)
+                        or any(part in {"", ".", ".."} for part in source.split("/"))
+                        or not entry or entry.get("original") is not True
+                        or entry.get("sourceKind") != "owned_original_file" or entry.get("sourceIdentity") != source
+                        or not SHA.fullmatch(str(hashes[source])) or entry["sha256"] != hashes[source]):
+                    valid = False
+                    break
+            original_audio = new_files.get("原稿/" + audio, {})
+            if (not valid or original_audio.get("mimeType") not in ("audio/wav", "audio/x-wav")
+                    or any(original_audio.get(k) != old[k] for k in ("sha256", "byteSize"))):
+                continue
+            result.append({"archivePath": old["archivePath"], "oldIdentity": old["sourceIdentity"],
+                "newIdentity": new["sourceIdentity"], "sha256": old["sha256"], "byteSize": old["byteSize"],
+                "mimeType": old["mimeType"], "alias": deepcopy(alias)})
+        return sorted(result, key=lambda entry: entry["archivePath"])
+
+    @staticmethod
     def _private_recovery_omissions(uncovered, manifest):
         def normalized_parts(value):
             if (not isinstance(value, str) or not value or value.startswith("/") or "\\" in value
@@ -851,6 +916,9 @@ class CourseArchiveProcessor:
         uncovered = [entry for entry in originals if original(entry) not in covered]
         if not originals:
             raise ArchiveQueueError("archive_incomplete_cleanup_original_not_covered")
+        audio_alias_coverage = self._inherited_audio_alias_coverage(uncovered, new_files, replacement_manifest)
+        aliased_paths = {entry["archivePath"] for entry in audio_alias_coverage}
+        uncovered = [entry for entry in uncovered if entry["archivePath"] not in aliased_paths]
         private_omissions = self._private_recovery_omissions(uncovered, replacement_manifest)
         zip_path = Path(index.get("zip", {}).get("path", ""))
         if zip_path.parent != stage or zip_path.suffix != ".zip":
@@ -861,6 +929,8 @@ class CourseArchiveProcessor:
             "replacementIndexSha256": job["export"]["indexSha256"], "receiptSha256": job["receiptSha256"]}
         previous = json.loads(_read(marker)) if marker.exists() else None
         if previous and any(previous.get(k) != v for k, v in binding.items()):
+            raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
+        if previous and previous.get("audioAliasCoverage", []) != audio_alias_coverage:
             raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
         private_recovery_proof = None
         if uncovered:
@@ -927,6 +997,7 @@ class CourseArchiveProcessor:
                 raise ArchiveQueueError("archive_incomplete_cleanup_private_recovery_invalid")
         return {**binding, **({"zipOnlyProof": zip_only_proof} if zip_only_proof else {}),
                 **({"privateRecoveryProof": private_recovery_proof} if private_recovery_proof else {}),
+                **({"audioAliasCoverage": audio_alias_coverage} if audio_alias_coverage else {}),
                 "originalFilesCovered": len(originals), "files": files,
                 "directories": [str(p.relative_to(stage)) for p in directories],
                 "bytes": sum(item["byteSize"] for item in files), "stage": str(stage),

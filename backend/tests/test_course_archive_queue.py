@@ -637,7 +637,8 @@ class CourseArchiveQueueTest(unittest.TestCase):
         self.assertTrue(Path(job["retainedManifestPath"]).is_file())
         self.assertFalse(path.exists())
 
-    def completed_with_incomplete_capture(self, *, unique_old_original=False, private_old_originals=False):
+    def completed_with_incomplete_capture(self, *, unique_old_original=False, private_old_originals=False,
+                                          inherited_audio_alias=False):
         from services.course_archive_exporter import CourseArchiveExporter
 
         private_sources = []
@@ -649,12 +650,41 @@ class CourseArchiveQueueTest(unittest.TestCase):
                 source.parent.mkdir(parents=True, exist_ok=True)
                 source.write_bytes(("/* retained private runtime " + source.name + " */").encode())
                 private_sources.append(source)
+        audio_sources, media, alias = [], None, None
+        if inherited_audio_alias:
+            prefix = "openmaic-runtime/.runtime/OpenMAIC/data/classrooms/"
+            stage, request = "tbrev_" + "8" * 24, "tbprev_" + "a" * 64
+            physical = prefix + stage + "/audio/" + request + ".wav"
+            base = prefix + stage + "/textbook-preview-audio/operator-parent/"
+            paid = "openmaic-runtime/.runtime/OpenMAIC/data/formal-audio/jobs/tts/" + digest(request.encode()) + ".json"
+            evidence = [base + "source-receipts.json", base + "audio/" + request + ".wav", paid]
+            raw = b"RIFF\x24\x00\x00\x00WAVEfmt retained fixture audio"
+            for relative in [physical, *evidence]:
+                path = self.root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(raw if path.suffix == ".wav" else encoded({"requestId": request, "status": "succeeded"}))
+                audio_sources.append(path)
+            media = {"path": "/api/classroom-media/" + stage + "/audio/" + request + ".wav",
+                "sourcePath": physical, "archiveSourcePath": physical, "sha256": digest(raw),
+                "byteSize": len(raw), "mimeType": "audio/wav"}
+            alias = {"originalReference": "/api/classroom-media/" + stage + "/audio/cue-you.wav",
+                "archivePath": "媒体/" + physical, "sha256": digest(raw), "byteSize": len(raw),
+                "mimeType": "audio/wav", "sceneId": "page-one", "actionId": "review_cue-you",
+                "ttsRequestId": request, "recoveryReason": "historical_audio_alias_from_verified_inherited_receipt",
+                "evidence": evidence, "evidenceSha256": {p: digest((self.root / p).read_bytes()) for p in evidence}}
+            self.audio_alias_fixture = {"physicalPath": self.root / physical, "originalBytes": raw,
+                                        "oldIdentity": media["path"], "alias": alias}
 
         class RecoverableExporter(CourseArchiveExporter):
             incomplete = True
 
             def export_snapshot(inner, snapshot, **options):
                 snapshot.source_roots.extend(source.parent.parent for source in private_sources)
+                snapshot.source_files.extend(audio_sources)
+                if media:
+                    snapshot.media.append({**media, "path": media["path"] if inner.incomplete else alias["originalReference"]})
+                    if not inner.incomplete:
+                        snapshot.recovered_aliases.append(alias)
                 if inner.incomplete:
                     snapshot.missing_sources.append({"kind": "media", "sourceIdentity": "needed.wav"})
                     if unique_old_original:
@@ -665,7 +695,7 @@ class CourseArchiveQueueTest(unittest.TestCase):
                             return super().export_snapshot(snapshot, **options)
                 return super().export_snapshot(snapshot, **options)
 
-        exporter = RecoverableExporter(project_root=self.root, media_store=Mock(),
+        exporter = RecoverableExporter(project_root=self.root, media_store=Mock(read=Mock(return_value=None)),
             native_document_loader=lambda _: None,
             standard_asset_resolver=lambda *args, **kwargs: {"entries": [], "unresolved": []})
         self.processor.exporter = exporter
@@ -1072,6 +1102,120 @@ class CourseArchiveQueueTest(unittest.TestCase):
         second = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
         self.assertEqual(second["eligibleCaptures"], 1, second)
         self.assertEqual({p.name for p in stage.iterdir()}, {"index.json", "manifest.json", "incomplete-prune.json"})
+
+    def test_inherited_audio_alias_covers_same_member_and_records_proof_without_touching_native_source(self):
+        job, stage, _ = self.completed_with_incomplete_capture(inherited_audio_alias=True)
+        before = self.audio_alias_fixture["physicalPath"].read_bytes()
+        calls = (self.exporter.calls, self.client.uploads)
+        dry = self.processor.prune_incomplete_captures(job["key"])
+        self.assertEqual(dry["eligibleCaptures"], 1, dry)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+        result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(result["eligibleCaptures"], 1, result)
+        marker = json.loads((stage / "incomplete-prune.json").read_bytes())
+        coverage = marker["audioAliasCoverage"]
+        self.assertEqual(len(coverage), 1)
+        self.assertEqual(coverage[0]["oldIdentity"], self.audio_alias_fixture["oldIdentity"])
+        self.assertEqual(coverage[0]["newIdentity"], self.audio_alias_fixture["alias"]["originalReference"])
+        self.assertEqual(coverage[0]["alias"], self.audio_alias_fixture["alias"])
+        self.assertNotIn("privateRecoveryProof", marker)
+        self.assertEqual(self.audio_alias_fixture["physicalPath"].read_bytes(), before)
+        self.assertEqual(calls, (self.exporter.calls, self.client.uploads))
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"], dry_run=False)["removedBytes"], 0)
+
+    def test_inherited_audio_alias_rejects_missing_ambiguous_foreign_or_changed_mapping_and_evidence(self):
+        job, stage, _ = self.completed_with_incomplete_capture(inherited_audio_alias=True)
+        replacement = self.processor._index(job)
+        manifest = json.loads(Path(job["retainedManifestPath"]).read_bytes())
+        target = self.audio_alias_fixture["alias"]["archivePath"]
+
+        def media(value):
+            return next(entry for entry in value["files"] if entry["archivePath"] == target)
+
+        def foreign(value):
+            value["recoveredAliases"][0]["originalReference"] = value["recoveredAliases"][0]["originalReference"].replace("tbrev_", "foreign_")
+            media(value)["sourceIdentity"] = value["recoveredAliases"][0]["originalReference"]
+
+        def remove_paid_proof(value):
+            alias = value["recoveredAliases"][0]
+            paid = next(source for source in alias["evidence"] if "/formal-audio/jobs/tts/" in source)
+            alias["evidence"].remove(paid)
+            alias["evidenceSha256"].pop(paid)
+
+        evidence = self.audio_alias_fixture["alias"]["evidence"][0]
+        audio_evidence = next(source for source in self.audio_alias_fixture["alias"]["evidence"] if source.endswith(".wav"))
+        mutations = [
+            ("missing alias", lambda m: m.update(recoveredAliases=[])),
+            ("duplicate alias", lambda m: m["recoveredAliases"].append(deepcopy(m["recoveredAliases"][0]))),
+            ("different archive member", lambda m: m["recoveredAliases"][0].update(archivePath=target.replace("tbrev_", "foreign_"))),
+            ("different stage URI", foreign),
+            ("different SHA", lambda m: m["recoveredAliases"][0].update(sha256="f" * 64)),
+            ("different size", lambda m: m["recoveredAliases"][0].update(byteSize=1)),
+            ("different MIME", lambda m: m["recoveredAliases"][0].update(mimeType="audio/ogg")),
+            ("wrong reason", lambda m: m["recoveredAliases"][0].update(recoveryReason="same_hash_nearby_stage")),
+            ("wrong request", lambda m: m["recoveredAliases"][0].update(ttsRequestId="tbprev_" + "f" * 64)),
+            ("new media is derived", lambda m: media(m).update(original=False)),
+            ("new media changed", lambda m: media(m).update(sha256="f" * 64)),
+            ("missing evidence hash", lambda m: m["recoveredAliases"][0]["evidenceSha256"].pop(evidence)),
+            ("missing evidence member", lambda m: m.update(files=[e for e in m["files"] if e["archivePath"] != "原稿/" + evidence])),
+            ("paid proof omitted", remove_paid_proof),
+            ("evidence not original", lambda m: next(e for e in m["files"] if e["archivePath"] == "原稿/" + evidence).update(original=False)),
+            ("evidence wrong source", lambda m: next(e for e in m["files"] if e["archivePath"] == "原稿/" + evidence).update(sourceIdentity="unrelated.json")),
+            ("evidence invalid MIME", lambda m: next(e for e in m["files"] if e["archivePath"] == "原稿/" + audio_evidence).update(mimeType={"invalid": True})),
+        ]
+        before = {p.relative_to(stage): p.read_bytes() for p in stage.rglob("*") if p.is_file()}
+        for name, mutate in mutations:
+            with self.subTest(name=name):
+                changed = deepcopy(manifest)
+                mutate(changed)
+                with self.assertRaisesRegex(ArchiveQueueError, "original_not_covered"):
+                    self.processor._incomplete_cleanup_plan(job, job["incompleteExports"][0], replacement, changed)
+                self.assertFalse((stage / "incomplete-prune.json").exists())
+                self.assertEqual(before, {p.relative_to(stage): p.read_bytes() for p in stage.rglob("*") if p.is_file()})
+
+    def test_inherited_audio_alias_requires_exact_old_native_identity_and_original_member(self):
+        job, stage, _ = self.completed_with_incomplete_capture(inherited_audio_alias=True)
+        manifest = json.loads(Path(job["retainedManifestPath"]).read_bytes())
+        files = self.processor._cleanup_manifest_files(manifest)
+        old_manifest = json.loads((stage / "课程资料/manifest.json").read_bytes())
+        old = next(entry for entry in old_manifest["files"] if entry["sourceIdentity"] == self.audio_alias_fixture["oldIdentity"])
+        physical = old["archivePath"].removeprefix("媒体/")
+        self.assertEqual(len(self.processor._inherited_audio_alias_coverage([{**old, "sourceIdentity": physical}], files, manifest)), 1)
+        for change in ({"sourceIdentity": old["sourceIdentity"].replace("tbrev_", "foreign_")},
+                       {"sourceIdentity": physical.replace("/audio/", "/audio/../audio/")},
+                       {"archivePath": old["archivePath"].replace("tbrev_", "foreign_")},
+                       {"sourceIdentity": "https://example.test" + old["sourceIdentity"]},
+                       {"original": False}, {"mimeType": "audio/ogg"}):
+            with self.subTest(change=change):
+                self.assertEqual(self.processor._inherited_audio_alias_coverage([{**old, **change}], files, manifest), [])
+
+    def test_inherited_audio_alias_cleanup_resumes_only_with_same_persisted_mapping(self):
+        job, stage, _ = self.completed_with_incomplete_capture(inherited_audio_alias=True)
+        unlink = Path.unlink
+        interrupted = False
+
+        def interrupted_unlink(path, *args, **kwargs):
+            nonlocal interrupted
+            result = unlink(path, *args, **kwargs)
+            if path.is_relative_to(stage / "课程资料") and not interrupted:
+                interrupted = True
+                raise OSError("interrupted after persisted alias coverage intent")
+            return result
+
+        with patch.object(Path, "unlink", interrupted_unlink):
+            first = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(first["eligibleCaptures"], 0)
+        marker = stage / "incomplete-prune.json"
+        raw = marker.read_bytes()
+        changed = json.loads(raw)
+        changed["audioAliasCoverage"][0]["oldIdentity"] = "wrong-old-identity"
+        marker.write_bytes(encoded(changed))
+        result = self.processor.prune_incomplete_captures(job["key"])
+        self.assertEqual(result["captures"][0]["reason"], "archive_incomplete_cleanup_plan_changed")
+        marker.write_bytes(raw)
+        second = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(second["eligibleCaptures"], 1, second)
+        self.assertEqual(self.audio_alias_fixture["physicalPath"].read_bytes(), self.audio_alias_fixture["originalBytes"])
 
     def test_incomplete_capture_unique_original_is_retained_without_touching_any_derivative(self):
         job, stage, _ = self.completed_with_incomplete_capture(unique_old_original=True)
