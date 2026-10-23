@@ -8,7 +8,7 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {EventEmitter} from 'node:events';
 import {Readable} from 'node:stream';
-import {canonical,enumerateSnapshotAssets,resolveArchiveAssets,createKatexArchiveResolver,downloadKatexBytes,createThreeArchiveResolver,downloadThreeBytes,publicCdnAddress} from './course-archive-assets.mjs';
+import {canonical,enumerateSnapshotAssets,resolveArchiveAssets,createKatexArchiveResolver,downloadKatexBytes,createThreeArchiveResolver,downloadThreeBytes,publicCdnAddress,assertAssetWriteBudget,saveBytes} from './course-archive-assets.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const require=createRequire(path.join(root,'openmaic-runtime/.runtime/OpenMAIC/packages/@openmaic/storage/package.json'));
@@ -345,4 +345,18 @@ test('Three document fields cannot override production file pins',async t=>{
  const result=await resolveArchiveAssets({...f.input,pins:{'build/three.module.js':[fake.length,digest(fake)]}},
   {...f.dependencies,downloadThreeBytes:async()=>fake});
  assert(result.unresolved.some(e=>e.ref===threeBase+'build/three.module.js'));assert.equal(f.calls.length,0);
+});
+test('new asset copies retain one GiB and existing verified caches remain readable without extra reserve',async t=>{
+ const f=await threeFixture(t),bytes=Buffer.from('protected asset'),hash=digest(bytes),reserve=1024**3;
+ let checks=0;
+ await assert.rejects(saveBytes(f.root,hash,'.bin',bytes,{statfs:async()=>{checks++;return{bavail:reserve+bytes.length-1,bsize:1};}}),/disk_space_insufficient/);
+ assert.deepEqual(await fs.readdir(f.root),[]);assert.equal(checks,1);
+ const saved=await saveBytes(f.root,hash,'.bin',bytes,{statfs:async()=>{checks++;return{bavail:BigInt(reserve+bytes.length),bsize:1n};}});
+ assert.equal(digest(await fs.readFile(saved)),hash);assert.equal((await fs.stat(saved)).mode&0o777,0o600);assert.equal(checks,2);
+ assert.equal(await saveBytes(f.root,hash,'.bin',bytes,{statfs:()=>{throw Error('cache hit must not reserve new space');}}),saved);
+ await fs.writeFile(saved,'changed');
+ await assert.rejects(saveBytes(f.root,hash,'.bin',bytes,{statfs:()=>{throw Error('must reject stale bytes first');}}),/staging_conflict/);
+ await fs.unlink(saved);const elsewhere=path.join(f.directory,'elsewhere');await fs.writeFile(elsewhere,bytes);await fs.symlink(elsewhere,saved);
+ await assert.rejects(saveBytes(f.root,hash,'.bin',bytes,{statfs:()=>{throw Error('must reject symlink first');}}),/staging_conflict/);
+ for(const stat of [{bavail:-1,bsize:4096},{bavail:NaN,bsize:4096},{bavail:100,bsize:0}])assert.throws(()=>assertAssetWriteBudget(stat,1),/space_unavailable/);
 });

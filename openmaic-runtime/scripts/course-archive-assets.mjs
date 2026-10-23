@@ -331,10 +331,25 @@ function extension(mime,kind){
  const family=kind==='audio'?'audio/':kind==='video'?'video/':'image/';
  return typeof mime==='string'&&(kind==='dependency'||mime.startsWith(family))?allowed[mime]:undefined;
 }
-async function saveBytes(root,digest,ext,bytes){
+export function assertAssetWriteBudget(stat,byteSize){
+ const integer=value=>typeof value==='bigint'?value:Number.isSafeInteger(value)?BigInt(value):-1n;
+ const blocks=integer(stat.bavail),blockSize=integer(stat.bsize);
+ if(blocks<0n||blockSize<=0n||!Number.isSafeInteger(byteSize)||byteSize<0)throw Error('archive_asset_disk_space_unavailable');
+ if(blocks*blockSize<BigInt(byteSize)+1024n**3n)throw Error('archive_asset_disk_space_insufficient');
+}
+export async function saveBytes(root,digest,ext,bytes,{statfs=fs.statfs}={}){
  const filename=path.join(root,digest+ext);
+ const existing=async()=>{
+  const stat=await fs.lstat(filename);
+  if(stat.isSymbolicLink()||!stat.isFile()||stat.size!==bytes.length||sha(await fs.readFile(filename))!==digest)throw Error('archive_asset_staging_conflict');
+  return filename;
+ };
+ try{return await existing();}catch(error){if(error.code!=='ENOENT')throw error;}
+ // Reserve space only for a genuinely new copy. Verified cache hits remain
+ // readable when free disk has fallen below the one-GiB write reserve.
+ assertAssetWriteBudget(await statfs(root),bytes.length);
  try{const handle=await fs.open(filename,'wx',0o600);try{await handle.writeFile(bytes);await handle.sync();}finally{await handle.close();}}
- catch(error){if(error.code!=='EEXIST')throw error;const stat=await fs.lstat(filename);if(stat.isSymbolicLink()||!stat.isFile()||sha(await fs.readFile(filename))!==digest)throw Error('archive_asset_staging_conflict');}
+ catch(error){if(error.code!=='EEXIST')throw error;await existing();}
  return filename;
 }
 async function publicBytes(ref,nativeRoot){
