@@ -5,6 +5,7 @@ import hashlib
 import os
 import re
 from dataclasses import dataclass
+from contextvars import ContextVar
 from typing import Any, Mapping
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urljoin, urlparse
@@ -27,6 +28,17 @@ from integrations.openmaic_formal_skills import professional_skill_fields
 from integrations.openmaic_formal_quality import professional_quality_fields
 from integrations.openmaic_formal_interaction import professional_interaction_fields
 from integrations.openmaic_asr_revalidation import validate_asr_comparison_revalidation
+
+
+_CLASSROOM_VERSIONS = ContextVar('openmaic_classroom_read_versions', default=None)
+
+
+def reset_classroom_read_versions():
+    _CLASSROOM_VERSIONS.set(None)
+
+
+class _RuntimePayload(dict):
+    """Transport metadata must never become part of a frozen course JSON."""
 
 
 class OpenMaicFullRuntimeError(RuntimeError):
@@ -2008,9 +2020,16 @@ class OpenMaicFullRuntimeClient:
         if (not _safe_identifier(classroom_id, max_length=255)
                 or classroom.get("stage", {}).get("id") != classroom_id):
             raise OpenMaicFullRuntimeError("invalid_preview_classroom", "预览课堂编号无效", status_code=400)
-        payload = self._request_json("POST", "/api/classroom", {"stage": classroom["stage"], "scenes": classroom["scenes"]})
+        version = (_CLASSROOM_VERSIONS.get() or {}).get((id(self), classroom_id))
+        options = {'extra_headers': {'If-Match': version}} if version else {}
+        payload = self._request_json("POST", "/api/classroom", {"stage": classroom["stage"], "scenes": classroom["scenes"]}, **options)
         if payload.get("id") != classroom_id:
             raise OpenMaicFullRuntimeError("preview_classroom_save_mismatch", "预览课堂保存编号不一致")
+        saved_version = getattr(payload, 'course_file_sha256', None)
+        if saved_version:
+            versions = dict(_CLASSROOM_VERSIONS.get() or {})
+            versions[(id(self), classroom_id)] = saved_version
+            _CLASSROOM_VERSIONS.set(versions)
 
     def get_classroom(self, classroom_id: str) -> dict[str, Any]:
         if not _safe_identifier(classroom_id, max_length=255):
@@ -2030,6 +2049,14 @@ class OpenMaicFullRuntimeClient:
                 "invalid_openmaic_classroom",
                 "OpenMAIC 返回的课堂内容不完整",
             )
+        version = getattr(payload, 'course_file_sha256', None)
+        versions = dict(_CLASSROOM_VERSIONS.get() or {})
+        versions.pop((id(self), classroom_id), None)
+        if version:
+            versions[(id(self), classroom_id)] = version
+        while len(versions) > 512:
+            versions.pop(next(iter(versions)))
+        _CLASSROOM_VERSIONS.set(versions)
         return classroom
 
     def read_teaching_conversation(self, *, learning_session_id: str, classroom_id: str,
@@ -2895,6 +2922,7 @@ class OpenMaicFullRuntimeClient:
                         "OpenMAIC 返回了不安全的跳转",
                     )
                 raw = response.read(self.MAX_JSON_BYTES + 1)
+                version = (getattr(response, 'headers', {}) or {}).get('X-Mira-File-Sha256')
         except HTTPError as exc:
             safe_status = int(getattr(exc, "code", 502) or 502)
             raise OpenMaicFullRuntimeError(
@@ -2928,6 +2956,11 @@ class OpenMaicFullRuntimeClient:
                 "OpenMAIC 未能处理这次课堂请求",
                 status_code=422,
             )
+        if version is not None:
+            if not isinstance(version, str) or re.fullmatch(r'[a-f0-9]{64}', version) is None:
+                raise OpenMaicFullRuntimeError('invalid_openmaic_file_version', '课件版本响应无效')
+            payload = _RuntimePayload(payload)
+            payload.course_file_sha256 = version
         return payload
 
 

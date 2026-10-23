@@ -15,6 +15,7 @@ import re
 from content.textbook_catalog import canonical, digest
 from content.textbook_interaction_policy import freeze_interaction_policy
 from content.textbook_scene_contract import scene_canonical, scene_digest
+from services.course_file_store import course_bytes, course_glob, course_is_dir
 
 
 SCHEMA = "mira.textbook.complete-scene-review-followup.v1"
@@ -62,7 +63,7 @@ def _read(path, root):
                 break
             if item.is_symlink():
                 raise ValueError("revision evidence cannot use symbolic links")
-        raw = path.read_bytes()
+        raw = course_bytes(path)
         value = json.loads(raw, object_pairs_hook=_unique_pairs,
                            parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
         if not isinstance(value, dict):
@@ -152,7 +153,7 @@ def _complete_scene_ids(entry, root, stage_id, contract_sha256):
 
 
 def _revision_entry(folder, stage_root, session_id, stage_id, contract_sha256):
-    if folder.is_symlink() or not folder.is_dir() or not _is_sha(folder.name):
+    if folder.is_symlink() or not course_is_dir(folder) or not _is_sha(folder.name):
         raise ValueError("revision archive directory is invalid")
     plan, _ = _read(folder / "intent.json", stage_root)
     receipt, _ = _read(folder / "receipt.json", stage_root)
@@ -266,11 +267,11 @@ def discover_complete_scene_review_followup(classroom, classroom_directory, *, s
 
     evidence_root = directory.parent / "textbook-current-review-revisions"
     stage_root = evidence_root / hashlib.sha256(session_id.encode()).hexdigest() / stage_id
-    if not stage_root.exists():
+    if not stage_root.exists() and not course_is_dir(stage_root):
         return None
-    if stage_root.is_symlink() or not stage_root.is_dir():
+    if stage_root.is_symlink() or not course_is_dir(stage_root):
         raise ValueError("revision archive stage directory is invalid")
-    folders = sorted(stage_root.iterdir())
+    folders = sorted(course_glob(stage_root))
     entries = [_revision_entry(folder, stage_root, session_id, stage_id, contract["sha256"])
                for folder in folders]
     current_file_sha = hashlib.sha256(candidate_raw).hexdigest()

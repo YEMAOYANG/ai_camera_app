@@ -22,6 +22,7 @@ import zipfile
 
 from scripts import course_storage_releases as releases
 from services.course_media_object_store import CourseMediaObjectStore
+from services.course_file_store import (CourseFileStore, course_bytes, course_exists, course_is_dir, course_glob, course_stat)
 from core.course_storage_config import CourseStorageConfig
 
 
@@ -83,6 +84,9 @@ def _sha(raw):
 
 
 def _hash_file(path):
+    entry = CourseFileStore().read_bytes(path)
+    if entry is not None:
+        return _sha(entry)
     checksum = hashlib.sha256()
     with path.open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
@@ -309,9 +313,9 @@ class CourseArchiveExporter:
         if source.suffix.lower() != ".bin":
             return None
         metadata = self._source_path(source.parent / "metadata.json")
-        _require(metadata.is_file() and metadata.stat().st_size <= 64 * 1024,
+        _require(course_exists(metadata) and course_stat(metadata).st_size <= 64 * 1024,
                  "original_response_evidence_missing")
-        records = json.loads(metadata.read_bytes())
+        records = json.loads(course_bytes(metadata))
         _check_public(records)
         _require(isinstance(records, list), "original_response_evidence_invalid")
         matches = [item for item in records if isinstance(item, dict) and isinstance(item.get("scheme"), str)
@@ -319,11 +323,11 @@ class CourseArchiveExporter:
         _require(len(matches) == 1, "original_response_evidence_invalid")
         record = matches[0]
         _require(record.get("contentType") == "application/pdf" and record.get("startsPDF") is True
-            and record.get("bytes") == source.stat().st_size and record.get("sha256") == _hash_file(source),
+            and record.get("bytes") == course_stat(source).st_size and record.get("sha256") == _hash_file(source),
             "original_response_integrity_mismatch")
-        with source.open("rb") as stream:
+        with BytesIO(course_bytes(source)) as stream:
             header = stream.read(16)
-            stream.seek(max(0, source.stat().st_size - 4096))
+            stream.seek(max(0, course_stat(source).st_size - 4096))
             tail = stream.read()
         _require(header.startswith(b"%PDF-") and b"%%EOF" in tail, "original_response_format_invalid")
         return "application/pdf"
@@ -331,12 +335,41 @@ class CourseArchiveExporter:
     def _standard_assets(self, document, *, staging_root):
         """Use the Native DSL's pure enumeration and exact authority resolver."""
         helper = self.root / "openmaic-runtime/scripts/course-archive-assets.mjs"
-        if not helper.is_file():
+        if not course_exists(helper):
             return {"entries": [], "unresolved": [{"ref": "native-standard-assets",
                 "reason": "standard_asset_resolver_unavailable"}]}
+        request = {"snapshot": document, "stageId": document["stage"]["id"], "stagingRoot": str(staging_root)}
+        config = self.media_store.config or CourseStorageConfig.from_env()
+        if config.mode == "registry":
+            from repositories.course_storage_repository import storage_id_for
+            store = CourseFileStore(config=config, project_root=self.root)
+            storage_id = storage_id_for(config.endpoint, config.bucket, config.region)
+            files = []
+            stages = set(re.findall(r"/api/classroom-media/([A-Za-z0-9_-]+)/media/", json.dumps(document)))
+            for stage in sorted(stages):
+                prefix = ("openmaic-runtime/.runtime/OpenMAIC/data/classrooms/" + stage
+                          + ("/artifact" if stage.startswith("omclass_") else "") + "/media")
+                paths = set(store.repository.paths_under(prefix, storage_id))
+                # A newly generated stage has not been archived yet. Include
+                # only its exact owned directory; registered paths still take
+                # their remote version and never a stale local shadow.
+                for source in course_glob(self.root / prefix):
+                    source = self._source_path(source)
+                    if course_exists(source):
+                        paths.add(source.relative_to(self.root).as_posix())
+                _require(len(paths) <= 512, "registered_media_directory_limit")
+                for path in sorted(paths):
+                    entry = store.repository.resolve(path, storage_id)
+                    if entry is not None:
+                        files.append({"path": path, **{k: entry[k] for k in ("sha256", "byteSize", "mimeType")}})
+                    else:
+                        source = self._source_path(self.root / path)
+                        files.append({"path": path, "sha256": _hash_file(source),
+                            "byteSize": course_stat(source).st_size, "mimeType": _media_mime(source.name)})
+            _require(len(files) <= 512, "registered_media_directory_limit")
+            request["registryFiles"] = files
         result = subprocess.run(["node", str(helper)],
-            input=json.dumps({"snapshot": document, "stageId": document["stage"]["id"],
-                              "stagingRoot": str(staging_root)}, ensure_ascii=False),
+            input=json.dumps(request, ensure_ascii=False),
             text=True, capture_output=True, timeout=90)
         if result.returncode:
             return {"entries": [], "unresolved": [{"ref": "native-standard-assets",
@@ -363,18 +396,18 @@ class CourseArchiveExporter:
                     continue
                 job = root / "authoring-job"
                 frozen_path, draft = self._source_path(job / "frozen.json"), self._source_path(job / "draft.json")
-                frozen = json.loads(frozen_path.read_bytes())
+                frozen = json.loads(course_bytes(frozen_path))
                 binding = frozen.get("binding", {})
                 _require(binding.get("editionId") == edition and binding.get("nodeId") == root.parent.name
                     and root.name == "teaching-" + str(frozen.get("teachingRevision"))
                     and _hash_file(draft) == frozen.get("draftSha256"), "review_asset_course_unbound")
-                for receipt in root.rglob("*.json"):
+                for receipt in course_glob(root, "*.json", recursive=True):
                     if not {"asset-receipts", "asset-source-receipts"}.intersection(receipt.parts):
                         continue
                     try:
                         receipt = self._source_path(receipt)
-                        _require(receipt.stat().st_size <= 1024 * 1024, "review_asset_receipt_invalid")
-                        receipt_raw = receipt.read_bytes(); value = json.loads(receipt_raw)
+                        _require(course_stat(receipt).st_size <= 1024 * 1024, "review_asset_receipt_invalid")
+                        receipt_raw = course_bytes(receipt); value = json.loads(receipt_raw)
                         if value.get("schemaVersion") != "mira.textbook.review-asset-source-receipt.v1":
                             continue
                         ref, checksum = value.get("reviewUrl"), value.get("sourceFileSha256")
@@ -384,9 +417,9 @@ class CourseArchiveExporter:
                         source = self._source_path(value["sourceFilePath"])
                         _require(source.is_relative_to(review_root) and source.suffix.lower() == ".png"
                             and ref == "/review-assets/" + source.relative_to(review_root).as_posix()
-                            and source.is_file() and 0 < source.stat().st_size <= 32 * 1024 * 1024,
+                            and course_exists(source) and 0 < course_stat(source).st_size <= 32 * 1024 * 1024,
                             "review_asset_source_unbound")
-                        raw = source.read_bytes()
+                        raw = course_bytes(source)
                         _require(_sha(raw) == checksum, "review_asset_source_hash_mismatch")
                         with Image.open(BytesIO(raw)) as image:
                             _require(image.format == "PNG", "review_asset_not_png")
@@ -420,7 +453,7 @@ class CourseArchiveExporter:
                 if not path.exists():
                     _require(not path.is_symlink(), "review_asset_private_copy_invalid")
                     self._write_private(path, item["raw"])
-                _require(not path.is_symlink() and path.stat().st_size == item["byteSize"]
+                _require(not path.is_symlink() and course_stat(path).st_size == item["byteSize"]
                     and _hash_file(path) == item["sha256"], "review_asset_private_copy_invalid")
                 entry = {**entry, "status": "resolved", "sourcePath": str(path),
                     **{k: item[k] for k in ("sha256", "byteSize", "mimeType", "sourceReceipt")}}
@@ -531,7 +564,7 @@ class CourseArchiveExporter:
         files = set(snapshot.source_files)
         for root in snapshot.source_roots:
             root = self._source_path(root)
-            _require(root.is_dir(), "owned_source_root_missing")
+            _require(course_is_dir(root), "owned_source_root_missing")
             for parent, directories, names in os.walk(root, followlinks=False):
                 for name in directories[:]:
                     candidate = Path(parent) / name
@@ -541,6 +574,15 @@ class CourseArchiveExporter:
                         continue
                     _require(not candidate.is_symlink(), "source_symlink_rejected")
                 files.update(Path(parent) / name for name in names)
+            # A published parent may have no remaining local directory. Its
+            # exact registered original paths still belong to this scope.
+            for path in course_glob(root, "*", recursive=True):
+                excluded = next((parent for parent in reversed((path, *path.parents))
+                    if parent.is_relative_to(root) and _private_runtime_exclusion(parent)), None)
+                if excluded is not None:
+                    files.add(excluded)
+                elif course_exists(path):
+                    files.add(path)
         return files
 
     def preflight_course(self, conn, *, course_id, course_version, content_key=None, file_cache=None):
@@ -575,15 +617,15 @@ class CourseArchiveExporter:
             if not _supported_source_file(source):
                 failures.append({"sourceIdentity": relative, "reason": "original_requires_safe_format_adapter"})
                 continue
-            info = source.stat()
+            info = course_stat(source)
             total += info.st_size
-            _require(source.is_file() and info.st_size <= MAX_FILE_BYTES, "source_file_unavailable_or_oversized")
+            _require(course_exists(source) and info.st_size <= MAX_FILE_BYTES, "source_file_unavailable_or_oversized")
             identity = (str(source), info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
             if identity not in file_cache:
                 try:
                     self._binary_original_mime(source)
                     if _original_suffix(source) == ".json" or _source_text_file(source):
-                        _inspect_original(source.read_bytes(), source)
+                        _inspect_original(course_bytes(source), source)
                     file_cache[identity] = None
                 except (CourseArchiveError, UnicodeDecodeError, json.JSONDecodeError) as error:
                     file_cache[identity] = str(error) if isinstance(error, CourseArchiveError) else "invalid_original_text_or_json"
@@ -650,8 +692,8 @@ class CourseArchiveExporter:
         path = (directory / classroom_id / "artifact/classroom.json" if classroom_id.startswith("omclass_")
                 else directory / (classroom_id + ".json"))
         path = self._source_path(path)
-        _require(path.is_file() and path.stat().st_size <= MAX_FILE_BYTES, "legacy_classroom_source_missing")
-        raw = path.read_bytes()
+        _require(course_exists(path) and course_stat(path).st_size <= MAX_FILE_BYTES, "legacy_classroom_source_missing")
+        raw = course_bytes(path)
         room = json.loads(raw)
         _require(isinstance(room, dict) and room.get("stage", {}).get("id") == classroom_id
                  and isinstance(room.get("scenes"), list) and room["scenes"], "legacy_classroom_identity_mismatch")
@@ -671,7 +713,7 @@ class CourseArchiveExporter:
             "classroomId": classroom_id, "releaseSha256": None}, metadata=metadata,
             classroom=room, documents={"原始课堂.json": raw.decode("utf8")},
             source_files=[path], status="generated_saved")
-        if (directory / classroom_id).is_dir():
+        if course_is_dir(directory / classroom_id):
             snapshot.source_roots.append(directory / classroom_id)
         self._collect_snapshot_media(snapshot)
         return self.export_snapshot(snapshot, staging_root=staging_root,
@@ -688,13 +730,13 @@ class CourseArchiveExporter:
             relative = "openmaic-runtime/.runtime/OpenMAIC/data/classrooms/" + match[1] + (
                 "/artifact/" if match[1].startswith("omclass_") else "/") + match[2] + "/" + match[3]
             path = self._source_path(relative)
-            if path.is_file():
-                entry = {"sha256": _hash_file(path), "byteSize": path.stat().st_size,
+            if course_exists(path):
+                entry = {"sha256": _hash_file(path), "byteSize": course_stat(path).st_size,
                     "mimeType": _media_mime(path.name)}
             else:
                 if manifest is None:
                     config = self.media_store.config or CourseStorageConfig.from_env()
-                    manifest = {} if config.mode == "local" else self.media_store._manifest(config)
+                    manifest = {} if config.mode in {"local", "registry"} else self.media_store._manifest(config)
                 entry = manifest.get(relative)
                 if entry is None and match[2] == "media":
                     recovered = self._retained_material_alias(bound, match)
@@ -744,12 +786,12 @@ class CourseArchiveExporter:
                 continue
             job = root / "authoring-job"
             attachments = job / "page-assets-v1"
-            if not (attachments / "manifest.json").is_file():
+            if not course_exists(attachments / "manifest.json"):
                 continue
             try:
                 paths = [self._source_path(p) for p in (job / "frozen.json", job / "draft.json", job / "state.json", attachments / "manifest.json")]
-                _require(all(p.is_file() and p.stat().st_size <= 4 * 1024 * 1024 for p in paths), "material_alias_evidence_invalid")
-                frozen, draft, state, manifest = [json.loads(p.read_bytes()) for p in paths]
+                _require(all(course_exists(p) and course_stat(p).st_size <= 4 * 1024 * 1024 for p in paths), "material_alias_evidence_invalid")
+                frozen, draft, state, manifest = [json.loads(course_bytes(p)) for p in paths]
                 binding = frozen.get("binding", {})
                 _require(all(binding.get(k) for k in ("editionId", "nodeId"))
                     and root.name == "teaching-" + str(frozen.get("teachingRevision"))
@@ -761,16 +803,16 @@ class CourseArchiveExporter:
                     and manifest.get("basePayloadSha256") == frozen.get("payloadSha256")
                     and manifest.get("sha256") == _sha(releases.canonical({k: v for k, v in manifest.items() if k != "sha256"}).encode()),
                     "material_alias_manifest_invalid")
-                for receipt_path in attachments.glob("*-receipt.json"):
+                for receipt_path in course_glob(attachments, "*-receipt.json"):
                     receipt_path = self._source_path(receipt_path)
-                    _require(receipt_path.stat().st_size <= 64 * 1024, "material_alias_evidence_invalid")
-                    receipt = json.loads(receipt_path.read_bytes())
+                    _require(course_stat(receipt_path).st_size <= 64 * 1024, "material_alias_evidence_invalid")
+                    receipt = json.loads(course_bytes(receipt_path))
                     material = receipt.get("response", {}).get("material", {})
                     if material.get("materialId") != material_id:
                         continue
                     intent_path = self._source_path(receipt_path.with_name(receipt_path.name.removesuffix("-receipt.json") + "-intent.json"))
-                    _require(intent_path.is_file() and intent_path.stat().st_size <= 64 * 1024, "material_alias_evidence_invalid")
-                    intent_raw = intent_path.read_bytes()
+                    _require(course_exists(intent_path) and course_stat(intent_path).st_size <= 64 * 1024, "material_alias_evidence_invalid")
+                    intent_raw = course_bytes(intent_path)
                     intent = json.loads(intent_raw)
                     checksum, size = intent.get("sourceSha256"), intent.get("byteSize")
                     _require(receipt.get("intentSha256") == _sha(intent_raw)
@@ -784,9 +826,9 @@ class CourseArchiveExporter:
                         and records[0].get("bytes") == size and records[0].get("mimeType") == "image/png",
                         "material_alias_asset_invalid")
                     source = self._source_path(records[0]["sourcePath"])
-                    _require(source.is_relative_to(root) and source.is_file() and source.stat().st_size == size
+                    _require(source.is_relative_to(root) and course_exists(source) and course_stat(source).st_size == size
                         and _hash_file(source) == checksum, "material_alias_source_invalid")
-                    with source.open("rb") as stream:
+                    with BytesIO(course_bytes(source)) as stream:
                         _require(stream.read(8) == b"\x89PNG\r\n\x1a\n", "material_alias_source_invalid")
                     correct = "openmaic-runtime/.runtime/OpenMAIC/data/classrooms/" + match[1] + "/media/material-" + material_id + "-" + checksum + ".png"
                     evidence = [paths[0], paths[3], intent_path, receipt_path]
@@ -832,24 +874,24 @@ class CourseArchiveExporter:
                 # Preflight every path before the read-only producer validator
                 # opens it; its generic loader otherwise resolves symlinks.
                 prepared_path = self._source_path(archive / "prepared.json")
-                _require(prepared_path.is_file() and prepared_path.stat().st_size <= 4 * 1024**2,
+                _require(course_exists(prepared_path) and course_stat(prepared_path).st_size <= 4 * 1024**2,
                     "audio_alias_preparation_invalid")
-                prepared = json.loads(prepared_path.read_bytes())
+                prepared = json.loads(course_bytes(prepared_path))
                 prepared_files = prepared.get("files")
                 _require(isinstance(prepared_files, dict) and 0 < len(prepared_files) <= 2048,
                     "audio_alias_preparation_invalid")
                 for name, checksum in prepared_files.items():
                     _safe_relative(name)
                     source = self._source_path(archive / name)
-                    _require(source.is_relative_to(archive) and source.is_file()
-                        and source.stat().st_size <= MAX_FILE_BYTES
+                    _require(source.is_relative_to(archive) and course_exists(source)
+                        and course_stat(source).st_size <= MAX_FILE_BYTES
                         and re.fullmatch(r"[a-f0-9]{64}", str(checksum)), "audio_alias_preparation_invalid")
                     if not name.startswith(("audio/", "images/")):
                         _require(_hash_file(source) == checksum, "audio_alias_preparation_changed")
                 plan_path, proof_path = [self._source_path(p) for p in (folder / "plan.json", archive / "provenance.json")]
-                _require(all(p.is_file() and p.stat().st_size <= 4 * 1024**2 for p in (plan_path, proof_path))
-                    and not (folder / "parent-audio-restorations").exists(), "audio_alias_proof_invalid")
-                plan = json.loads(plan_path.read_bytes())
+                _require(all(course_exists(p) and course_stat(p).st_size <= 4 * 1024**2 for p in (plan_path, proof_path))
+                    and not course_is_dir(folder / "parent-audio-restorations"), "audio_alias_proof_invalid")
+                plan = json.loads(course_bytes(plan_path))
                 context = load_inheritance(folder, plan, frozen=frozen)
                 _require(context and context["archive"] == archive
                     and context["provenance"].get("targetClassroomId") == match[1]
@@ -892,8 +934,8 @@ class CourseArchiveExporter:
                         and r.get("mimeType") == "audio/wav" for r in (*receipts, *target_receipts)),
                     "audio_alias_receipt_invalid")
                 job_path = self._source_path(self.native_root / "data/formal-audio/jobs/tts" / (_sha(request.encode()) + ".json"))
-                _require(job_path.is_file() and job_path.stat().st_size <= 1024**2, "audio_alias_job_missing")
-                job = json.loads(job_path.read_bytes())
+                _require(course_exists(job_path) and course_stat(job_path).st_size <= 1024**2, "audio_alias_job_missing")
+                job = json.loads(course_bytes(job_path))
                 size = job.get("sizeBytes")
                 _require(job.get("requestId") == request and job.get("classroomId") == parent["preview"]["classroom_id"]
                     and job.get("state") == "succeeded" and job.get("kind") == "tts"
@@ -901,7 +943,7 @@ class CourseArchiveExporter:
                     and type(size) is int and 0 < size <= 32 * 1024**2, "audio_alias_job_invalid")
                 source = self._source_path(archive / "audio" / (request + ".wav"))
                 _require(prepared_files.get("audio/" + request + ".wav") == checksum
-                    and source.stat().st_size == size and _hash_file(source) == checksum, "audio_alias_bytes_changed")
+                    and course_stat(source).st_size == size and _hash_file(source) == checksum, "audio_alias_bytes_changed")
                 names = ("prepared.json", "parent.json", "candidate.json", "input.json", "source.json",
                     "source-plan.json", "source-receipts.json", "source-audit.json", "provenance.json",
                     "audio/" + request + ".wav", "asr/" + segment["asrRequestId"] + ".json")
@@ -932,10 +974,10 @@ class CourseArchiveExporter:
             return None
         audio_root = self.native_root / "data/formal-audio"
         job_path = audio_root / "jobs/tts" / (_sha(request_id.encode("utf8")) + ".json")
-        if not job_path.is_file():
+        if not course_exists(job_path):
             return None
         job_path = self._source_path(job_path)
-        job = json.loads(job_path.read_bytes())
+        job = json.loads(course_bytes(job_path))
         if not (job.get("requestId") == request_id and job.get("classroomId") == match[1]
                 and job.get("state") == "succeeded" and job.get("kind") == "tts"
                 and re.fullmatch(r"[a-f0-9]{64}", str(job.get("audioSha256", "")))
@@ -951,7 +993,7 @@ class CourseArchiveExporter:
                     and receipts[0].get("mimeType") == "audio/wav"):
                 return None
         asset = self._source_path(audio_root / "assets" / job["assetFileName"])
-        if not (asset.is_file() and asset.stat().st_size == job["sizeBytes"]
+        if not (course_exists(asset) and course_stat(asset).st_size == job["sizeBytes"]
                 and _hash_file(asset) == job["audioSha256"]):
             return None
         return {"sha256": job["audioSha256"], "byteSize": job["sizeBytes"], "mimeType": "audio/wav"}, job_path, asset
@@ -1003,17 +1045,35 @@ class CourseArchiveExporter:
     def _dated_release(self, identity):
         """Reuse an existing frozen name; verified new releases derive a name."""
         config = self.media_store.config or CourseStorageConfig.from_env()
+        if config.mode == "registry":
+            from repositories.course_storage_repository import storage_id_for
+            store = CourseFileStore(config=config, project_root=self.root)
+            storage_id = storage_id_for(config.endpoint, config.bucket, config.region)
+            scopes = store.repository.find_scopes(storage_id=storage_id,
+                course_id=identity["courseId"], course_version=identity["courseVersion"])
+            if not scopes:
+                return None
+            matching = [s for s in scopes if s["metadata"].get("sourceDigest") == identity.get("releaseSha256")]
+            _require(bool(matching), "published_storage_directory_not_bound")
+            directories = set()
+            for scope in matching:
+                directory = scope["metadata"].get("storageDirectory")
+                if directory is not None:
+                    _safe_relative(directory)
+                    directories.add(directory)
+            _require(len(directories) == 1, "published_storage_directory_not_bound")
+            return {**identity, "storageDirectory": directories.pop()}
         source = Path(config.manifest_path) if config.manifest_path else self.root / "backend/data/course-storage/active-manifest.json"
-        if not source.is_file():
+        if not course_exists(source):
             _require(config.mode == "local", "published_storage_directory_manifest_missing")
             return None
-        _require(not source.is_symlink() and source.stat().st_size <= 64 * 1024 * 1024,
+        _require(not source.is_symlink() and course_stat(source).st_size <= 64 * 1024 * 1024,
                  "published_storage_directory_manifest_invalid")
         try:
             # A new course may be absent; an invalid active manifest may not be
             # mistaken for that case. Reuse the media adapter's validation.
             CourseMediaObjectStore._manifest(replace(config, manifest_path=str(source)))
-            manifest = json.loads(source.read_bytes())
+            manifest = json.loads(course_bytes(source))
         except (OSError, ValueError, TypeError):
             raise CourseArchiveError("published_storage_directory_manifest_invalid") from None
         entries = manifest.get("releases", [])
@@ -1081,10 +1141,10 @@ class CourseArchiveExporter:
             task_id = frozen.get("taskId")
             candidates = []
             if isinstance(task_id, str) and re.fullmatch(r"[a-f0-9]{64}", task_id):
-                for path in (self.root / "output").glob("**/" + task_id + "/input.json"):
+                for path in course_glob(self.root / "output", "**/" + task_id + "/input.json"):
                     if path.is_symlink():
                         continue
-                    original = json.loads(path.read_bytes())
+                    original = json.loads(course_bytes(path))
                     if (original.get("taskId") == task_id and original.get("inputSha256") == frozen.get("sourceInputSha256")):
                         candidates.append(path.parent)
             if candidates:
@@ -1097,20 +1157,28 @@ class CourseArchiveExporter:
 
     def _textbook_sources(self, snapshot, original_input, frozen):
         binding = frozen["textbookBinding"]
+        authoring = original_input.get("authoring", {})
+        session, stage = authoring.get("sessionId"), authoring.get("stageId")
+        if isinstance(session, str) and isinstance(stage, str) and _ID.fullmatch(stage):
+            # Complete-scene review is immutable evidence owned by this frozen
+            # authoring session and stage, separate from exported classroom data.
+            review_root = self.native_root / "data/textbook-current-review-revisions" / _sha(session.encode()) / stage
+            if course_is_dir(review_root):
+                snapshot.source_roots.append(review_root)
         review_path = original_input.get("sourceScope", {}).get("localReviewPath")
         if review_path:
             path = self._source_path(review_path)
             # This exact stored source-review reference owns its sources dir;
             # the adjacent job needs an independent frozen binding check.
-            if path.is_file():
+            if course_exists(path):
                 snapshot.source_roots.append(path.parent)
             else:
                 snapshot.missing_sources.append({"kind": "source_review", "reason": "bound_source_review_missing"})
             teaching = path.parent.parent
             job = teaching / "authoring-job"
             job_frozen = job / "frozen.json"
-            if job_frozen.is_file():
-                value = json.loads(job_frozen.read_bytes())
+            if course_exists(job_frozen):
+                value = json.loads(course_bytes(job_frozen))
                 b = value.get("binding", {})
                 _require(b.get("editionId") == binding["editionId"]
                          and b.get("nodeId") == binding["nodeId"]
@@ -1142,17 +1210,17 @@ class CourseArchiveExporter:
             self._workbench_index = None
         if self._workbench_index is None:
             self._workbench_index = []
-            for path in (self.root / "output").glob("**/authoring-job/frozen.json"):
+            for path in course_glob(self.root / "output", "**/authoring-job/frozen.json"):
                 path = self._source_path(path)
-                value = json.loads(path.read_bytes())
+                value = json.loads(course_bytes(path))
                 draft = path.parent / "draft.json"
                 state = path.parent / "state.json"
-                if not state.is_file():
+                if not course_exists(state):
                     continue
-                state_value = json.loads(self._source_path(state).read_bytes())
-                valid = draft.is_file()
+                state_value = json.loads(course_bytes(self._source_path(state)))
+                valid = course_exists(draft)
                 if valid:
-                    raw = self._source_path(draft).read_bytes()
+                    raw = course_bytes(self._source_path(draft))
                     draft_value = json.loads(raw)
                     valid = (_sha(raw) == value.get("draftSha256")
                         and path.parent.parent.name == "teaching-" + str(value.get("teachingRevision"))
@@ -1207,16 +1275,16 @@ class CourseArchiveExporter:
         expected = tuple(binding[k] for k in keys)
         root = self.root / "backend/content/textbooks"
         matches = []
-        for candidate in root.rglob("*.json"):
+        for candidate in course_glob(root, "*.json", recursive=True):
             try:
                 path = self._source_path(candidate)
-                info = path.stat()
-                if not path.is_file() or info.st_size > 4 * 1024 * 1024:
+                info = course_stat(path)
+                if not course_exists(path) or info.st_size > 4 * 1024 * 1024:
                     continue
                 identity = (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
                 cached = self._catalog_file_cache.get(path)
                 if cached is None or cached[0] != identity:
-                    value = json.loads(path.read_bytes())
+                    value = json.loads(course_bytes(path))
                     record = None
                     if isinstance(value, dict) and value.get("schemaVersion") == "mira.learning.textbook-manifest.v1":
                         record = (_sha(releases.canonical(value).encode()), tuple(value.get(k) for k in keys))
@@ -1226,7 +1294,7 @@ class CourseArchiveExporter:
                 if record == (checksum, expected):
                     # Re-read the matching original, rather than retaining all
                     # catalog JSON bodies in a long-running worker's memory.
-                    value = json.loads(path.read_bytes())
+                    value = json.loads(course_bytes(path))
                     if (_sha(releases.canonical(value).encode()) == checksum
                             and tuple(value.get(k) for k in keys) == expected):
                         matches.append((path, value))
@@ -1246,20 +1314,20 @@ class CourseArchiveExporter:
         if stage_id and stage_id != snapshot.identity["classroomId"]:
             directory = self.native_root / "data/classrooms"
             _require(_ID.fullmatch(stage_id), "native_stage_identity_invalid")
-            if (directory / (stage_id + ".json")).is_file():
+            if course_exists(directory / (stage_id + ".json")):
                 snapshot.source_files.append(directory / (stage_id + ".json"))
-            if (directory / stage_id).is_dir():
+            if course_is_dir(directory / stage_id):
                 snapshot.source_roots.append(directory / stage_id)
 
     def _add_native_sources(self, snapshot, stage_id):
         _require(isinstance(stage_id, str) and _ID.fullmatch(stage_id), "native_stage_identity_invalid")
         directory = self.native_root / "data/classrooms"
         path = directory / (stage_id + ".json")
-        if path.is_file():
+        if course_exists(path):
             snapshot.source_files.append(path)
         # Audio plans/audits and source receipts are scoped to exactly this
         # stage. Media absent after migration are supplied from the release.
-        if (directory / stage_id).is_dir():
+        if course_is_dir(directory / stage_id):
             snapshot.source_roots.append(directory / stage_id)
         document = self.native_document_loader(stage_id)
         if document is not None:
@@ -1281,7 +1349,7 @@ class CourseArchiveExporter:
         directory = self.native_root / "data/classrooms"
         path = (directory / classroom_id / "artifact/classroom.json" if classroom_id.startswith("omclass_")
                 else directory / (classroom_id + ".json"))
-        raw = path.read_bytes()
+        raw = course_bytes(path)
         snapshot = ArchiveSnapshot(identity={k: release[k] for k in
             ("courseId", "courseVersion", "contentKey", "classroomId", "releaseSha256")},
             metadata={"title": course["title"], **releases.release_metadata(course)},
@@ -1313,8 +1381,8 @@ class CourseArchiveExporter:
             job_id = runtime.get("upstream_job_id")
             if job_id and _ID.fullmatch(job_id):
                 job = self.native_root / "data/classroom-jobs" / (job_id + ".json")
-                if job.is_file():
-                    value = json.loads(job.read_bytes())
+                if course_exists(job):
+                    value = json.loads(course_bytes(job))
                     _require(value.get("classroomId", value.get("result", {}).get("classroomId")) in
                              (None, classroom_id), "formal_job_identity_mismatch")
                     snapshot.source_files.append(job)
@@ -1430,8 +1498,8 @@ class CourseArchiveExporter:
                     continue
                 path = Path(entry["sourcePath"])
                 _require(not path.is_symlink() and path.resolve() == path
-                         and path.is_relative_to(asset_root.resolve()) and path.is_file()
-                         and path.stat().st_size == entry["byteSize"] <= MAX_FILE_BYTES
+                         and path.is_relative_to(asset_root.resolve()) and course_exists(path)
+                         and course_stat(path).st_size == entry["byteSize"] <= MAX_FILE_BYTES
                          and _hash_file(path) == entry["sha256"], "standard_asset_bytes_mismatch")
                 previous = resolved_assets.get(entry["ref"])
                 _require(previous is None or previous == entry["sha256"], "standard_asset_identity_conflict")
@@ -1440,7 +1508,7 @@ class CourseArchiveExporter:
                 resolved_assets[entry["ref"]] = entry["sha256"]
                 extension = mimetypes.guess_extension(entry["mimeType"]) or ".bin"
                 kind = {"image": "图片", "background": "背景", "poster": "封面", "audio": "音频", "video": "视频"}.get(entry.get("kind"), "素材")
-                raw = path.read_bytes()
+                raw = course_bytes(path)
                 _require(len(raw) == entry["byteSize"] and _sha(raw) == entry["sha256"],
                          "standard_asset_bytes_changed")
                 add(f"Native素材/{kind}-{len(resolved_assets):03d}{extension}", raw=raw,
@@ -1468,6 +1536,12 @@ class CourseArchiveExporter:
             extra = ArchiveSnapshot(identity=snapshot.identity, metadata=snapshot.metadata, classroom=scan_document,
                 source_roots=list(snapshot.source_roots), documents=snapshot.documents)
             self._collect_snapshot_media(extra)
+            for proof in result.get("entries", []):
+                if proof.get("status") != "already_collected" or "registrySourcePath" not in proof:
+                    continue
+                matched = [item for item in extra.media if item.get("sourcePath") == proof["registrySourcePath"]]
+                _require(len(matched) == 1 and all(matched[0].get(k) == proof.get(k)
+                    for k in ("sha256", "byteSize", "mimeType")), "registered_media_directory_changed")
             missing.extend(extra.missing_sources)
             queued_sources.update(extra.source_files)
             for alias in extra.recovered_aliases:
@@ -1488,10 +1562,10 @@ class CourseArchiveExporter:
             _require(len(files) < MAX_FILES, "archive_file_count_exceeded")
             if source is not None:
                 source = self._source_path(source)
-                _require(source.is_file() and source.stat().st_size <= MAX_FILE_BYTES, "source_file_unavailable_or_oversized")
-                before = source.stat()
-                raw = source.read_bytes()
-                after = source.stat()
+                _require(course_exists(source) and course_stat(source).st_size <= MAX_FILE_BYTES, "source_file_unavailable_or_oversized")
+                before = course_stat(source)
+                raw = course_bytes(source)
+                after = course_stat(source)
                 _require(len(raw) == before.st_size and all(getattr(before, key) == getattr(after, key)
                     for key in ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns")), "source_file_changed")
             _require(isinstance(raw, bytes) and len(raw) <= MAX_FILE_BYTES, "archive_file_oversized")
@@ -1588,8 +1662,8 @@ class CourseArchiveExporter:
                 source_path = self._source_path(source)
                 raw = self.media_store.read(source_path, expected_sha256=item["sha256"], expected_bytes=item["byteSize"])
                 if raw is None:
-                    _require(source_path.is_file(), "published_media_source_missing")
-                    raw = source_path.read_bytes()
+                    _require(course_exists(source_path), "published_media_source_missing")
+                    raw = course_bytes(source_path)
                 _require(len(raw) == item["byteSize"] and _sha(raw) == item["sha256"], "published_media_hash_mismatch")
                 # Retain logical source paths inside ZIP so restored original
                 # classroom links have an explicit path-to-file mapping.
@@ -1624,12 +1698,12 @@ class CourseArchiveExporter:
             self._write_private(manifest_path, _json(manifest))
             title = _safe_name(snapshot.metadata["title"])
             zip_path = target / (title + "-完整课程资料包.zip")
-            zip_inputs = [p for p in sorted(payload.rglob("*")) if p.is_file()]
+            zip_inputs = [p for p in sorted(course_glob(payload, "*", recursive=True)) if course_exists(p)]
             # zlib compressBound plus local/central ZIP headers, UTF-8 names,
             # ZIP64 extras and end records. Incompressible media still fits.
             zip_upper_bound = 98
             for path in zip_inputs:
-                size = path.stat().st_size
+                size = course_stat(path).st_size
                 zip_upper_bound += size + (size >> 12) + (size >> 14) + (size >> 25) + 13
                 zip_upper_bound += 128 + 2 * len(path.relative_to(payload).as_posix().encode("utf8"))
             _require_private_space(target, zip_upper_bound, phase="zip")
@@ -1647,7 +1721,7 @@ class CourseArchiveExporter:
                     extension = Path(suffix).suffix
                     named = title + "-" + suffix.removesuffix(extension) + "-" + archive_version + extension
                     public.append({"localPath": str(path), "relativePath": object_directory + "/" + named,
-                        "sha256": _hash_file(path), "byteSize": path.stat().st_size,
+                        "sha256": _hash_file(path), "byteSize": course_stat(path).st_size,
                         "mimeType": "application/zip" if path == zip_path else "application/json"})
             result = {"schemaVersion": SCHEMA, **snapshot.identity, "archiveId": archive_id,
                 "status": snapshot.status, "complete": complete, "missingSources": missing,
@@ -1655,7 +1729,7 @@ class CourseArchiveExporter:
                 "indexPath": str(target / "index.json"), "objectDirectory": object_directory,
                 "archiveVersion": archive_version, "exportedAt": exported_at,
                 **({"sourceKind": source_kind, "sourceDigest": source_digest} if source_kind else {}),
-                "zip": {"path": str(zip_path), "sha256": _hash_file(zip_path), "byteSize": zip_path.stat().st_size},
+                "zip": {"path": str(zip_path), "sha256": _hash_file(zip_path), "byteSize": course_stat(zip_path).st_size},
                 "totals": manifest["totals"], "generatedPublicFiles": public}
             self._write_private(Path(result["indexPath"]), _json(result))
             return result

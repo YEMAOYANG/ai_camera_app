@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from dataclasses import asdict, is_dataclass
 import fcntl
 import hashlib
+import io
 import json
 from pathlib import Path
 import shutil
@@ -16,6 +17,7 @@ import time
 from content.textbook_batch_generation import HASH, KINDS, PROMPT_PATH, QUALITY_PATH, freeze_input
 from content.textbook_catalog import canonical, digest
 from services.textbook_batch_generation_service import TextbookBatchGenerationService, atomic_json
+from services.course_file_store import course_bytes, course_text, course_exists, course_is_dir
 
 SCHEMA = "mira.textbook.private-authoring-queue.v1"
 INDEX_SCHEMA = "mira.textbook.batch-authoring-index.v1"
@@ -24,15 +26,11 @@ UNCERTAIN = {"dispatching", "dispatch_unknown"}
 
 
 def file_sha(path):
-    result = hashlib.sha256()
-    with Path(path).open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            result.update(chunk)
-    return result.hexdigest()
+    return hashlib.sha256(course_bytes(path)).hexdigest()
 
 
 def document(path):
-    value = json.loads(Path(path).read_text(encoding="utf-8"))
+    value = json.loads(course_text(path))
     if not isinstance(value, dict):
         raise ValueError("queue_document_object_required")
     return value
@@ -63,7 +61,7 @@ class _ReceiptRuntime:
         if job.status in {"failed", "ambiguous", "succeeded"}:
             payload = asdict(job) if is_dataclass(job) else vars(job)
             self._save("upstream-terminal-response-" + digest(payload) + ".json", job, immutable=True)
-            if not (self.folder / "upstream-terminal-response.json").exists():
+            if not course_exists(self.folder / "upstream-terminal-response.json"):
                 self._save("upstream-terminal-response.json", job, immutable=True)
         return job
 
@@ -81,8 +79,9 @@ class TextbookBatchQueueService:
     def _lock(self, create=False):
         if create:
             self.directory.mkdir(parents=True, exist_ok=True)
-        if not self.directory.is_dir():
+        if not course_is_dir(self.directory):
             raise ValueError("queue_init_required")
+        self.directory.mkdir(parents=True, exist_ok=True)
         with (self.directory / "queue.lock").open("a") as handle:
             try:
                 fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -109,12 +108,11 @@ class TextbookBatchQueueService:
         return value
 
     def _inventory(self):
-        with (self.directory / "inventory.jsonl").open(encoding="utf-8") as stream:
-            for line in stream:
-                yield json.loads(line)
+        for line in course_text(self.directory / "inventory.jsonl").splitlines():
+            yield json.loads(line)
 
     def _task(self, row, manifest):
-        with Path(manifest["tasksPath"]).open("rb") as stream:
+        with io.BytesIO(course_bytes(Path(manifest["tasksPath"]))) as stream:
             stream.seek(row["offset"])
             task = json.loads(stream.readline())
         if task.get("taskId") != row["taskId"] or digest(task) != row["taskSha256"]:
@@ -124,7 +122,7 @@ class TextbookBatchQueueService:
     def initialize(self, tasks_path, *, enrich_existing=False, navigation_drafts=False):
         tasks_path = Path(tasks_path).resolve()
         with self._lock(create=True):
-            if (self.directory / "queue.json").exists():
+            if course_exists(self.directory / "queue.json"):
                 manifest = self._manifest()
                 if (manifest["tasksPath"] != str(tasks_path)
                         or manifest["enrichExisting"] != enrich_existing
@@ -134,7 +132,7 @@ class TextbookBatchQueueService:
                 atomic_json(self.directory / "latest-summary.json", summary)
                 return summary
             rows, seen = [], set()
-            with tasks_path.open("rb") as stream:
+            with io.BytesIO(course_bytes(tasks_path)) as stream:
                 while True:
                     offset, line = stream.tell(), stream.readline()
                     if not line:
@@ -166,9 +164,9 @@ class TextbookBatchQueueService:
                 raise ValueError("queue_empty_inventory")
             content = "".join(canonical(row) + "\n" for row in rows)
             inventory = self.directory / "inventory.jsonl"
-            if inventory.exists() and inventory.read_text(encoding="utf-8") != content:
+            if course_exists(inventory) and course_text(inventory) != content:
                 raise ValueError("queue_interrupted_inventory_differs")
-            if not inventory.exists():
+            if not course_exists(inventory):
                 # File is never replaced once admitted, including interrupted init.
                 with inventory.open("x", encoding="utf-8") as output:
                     output.write(content)
@@ -190,7 +188,7 @@ class TextbookBatchQueueService:
 
     def _admission(self, identity):
         path = self.directory / "authoring" / identity / "admission.json"
-        if not path.exists():
+        if not course_exists(path):
             return None
         value = document(path)
         if (value.get("taskId") != identity
@@ -280,10 +278,10 @@ class TextbookBatchQueueService:
 
     def _state(self, row, manifest):
         folder = self.drafts / row["taskId"]
-        if (folder / "state.json").exists():
+        if course_exists(folder / "state.json"):
             return TextbookBatchGenerationService(self.drafts).get(row["taskId"])
         path = self.directory / "task-states" / (row["taskId"] + ".json")
-        if path.exists():
+        if course_exists(path):
             return document(path)
         reasons = self._eligibility(row, manifest)
         status = ("design_pending" if reasons == ["specific_activity_design_pending"] else
@@ -298,7 +296,7 @@ class TextbookBatchQueueService:
 
     def _operator_hold(self, row, manifest):
         path = self.directory / "operator-holds" / (row["taskId"] + ".json")
-        if not path.exists():
+        if not course_exists(path):
             return None
         value = document(path)
         expected = {"schemaVersion", "queueSha256", "taskId", "taskSha256", "admissionSha256",
@@ -314,7 +312,7 @@ class TextbookBatchQueueService:
                 or value.get("publicationAllowed") is not False):
             raise ValueError("queue_operator_hold_integrity_failed")
         path = self.drafts / row["taskId"] / "input.json"
-        if path.exists() and document(path).get("inputSha256") != value["inputSha256"]:
+        if course_exists(path) and document(path).get("inputSha256") != value["inputSha256"]:
             raise ValueError("queue_operator_hold_prepared_input_changed")
         return value
 
@@ -406,7 +404,7 @@ class TextbookBatchQueueService:
         """Only GET an identity actually returned before a local state crash."""
         folder = self.drafts / row["taskId"]
         path = folder / "upstream-dispatch-response.json"
-        if not path.exists():
+        if not course_exists(path):
             return state
         frozen, receipt = document(folder / "input.json"), document(path)
         if (receipt.get("schemaVersion") != "mira.textbook.queue-upstream-receipt.v1"
@@ -493,7 +491,7 @@ class TextbookBatchQueueService:
                 blockers[reason] = blockers.get(reason, 0) + 1
             if status == "generated_needs_review":
                 audio_path = self.drafts / row["taskId"] / "audio-state.json"
-                if audio_path.exists():
+                if course_exists(audio_path):
                     audio = document(audio_path)
                     binding = audio.get("bound", {})
                     audio_status = audio.get("status", "audio_integrity_blocked")
@@ -504,7 +502,7 @@ class TextbookBatchQueueService:
                         audio_status = "audio_integrity_blocked"
                     if audio_status == "audio_completed_needs_review":
                         audit_path = audio_path.parent / "audio-audit" / "audit.json"
-                        if not audit_path.is_file():
+                        if not course_exists(audit_path):
                             audio_status = "audio_integrity_blocked"
                         else:
                             audit = document(audit_path)

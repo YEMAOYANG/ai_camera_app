@@ -1176,6 +1176,15 @@ class CourseArchiveProcessor:
                 job["receiptSha256"] = self._receipt(job, index, returned)
                 job["status"] = "uploaded"
                 self.queue.save(job)
+            from core.course_storage_config import CourseStorageConfig
+            if CourseStorageConfig.from_env().mode == "registry":
+                # A save is not durable until both object bytes and their DB
+                # locator exist. Never acknowledge/prune ahead of registration.
+                if self.database is None:
+                    raise ArchiveQueueError("archive_registry_database_required")
+                from repositories.course_storage_repository import CourseStorageRepository
+                from services.course_storage_registration import register_archive
+                register_archive(self.queue, job, CourseStorageRepository(self.database))
             self._acknowledge(event or job["event"])
             job.update(status="complete", completedAt=self.queue.clock(), nextAttemptAt=0, lastError=None)
             self.queue.save(job)

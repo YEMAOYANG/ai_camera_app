@@ -15,7 +15,7 @@ from urllib.parse import urlsplit
 
 @dataclass(frozen=True)
 class CourseStorageConfig:
-    mode: Literal["local", "manifest", "remote"] = "local"
+    mode: Literal["local", "manifest", "remote", "registry"] = "local"
     endpoint: str = ""
     bucket: str = ""
     prefix: str = "mira-courseware/v1"
@@ -33,13 +33,13 @@ class CourseStorageConfig:
         def value(key: str, default: str = "") -> str:
             return str(env.get(f"COURSE_STORAGE_{key}", default)).strip()
         mode = value("MODE", "local") or "local"
-        if mode not in {"local", "manifest", "remote"}:
+        if mode not in {"local", "manifest", "remote", "registry"}:
             raise ValueError("Invalid course storage mode")
         archive_enabled = value("ARCHIVE_ENABLED", "0").lower()
         if archive_enabled not in {"0", "1", "false", "true"}:
             raise ValueError("Invalid course archive flag")
         config = cls(
-            mode=cast(Literal["local", "manifest", "remote"], mode),
+            mode=cast(Literal["local", "manifest", "remote", "registry"], mode),
             endpoint=value("ENDPOINT"), bucket=value("BUCKET"),
             prefix=value("PREFIX", "mira-courseware/v1") or "mira-courseware/v1",
             region=value("REGION", "us-east-1") or "us-east-1",
@@ -65,7 +65,7 @@ class CourseStorageConfig:
             or ".." in config.bucket
             or not re.fullmatch(r"[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*", config.prefix)
             or not re.fullmatch(r"[A-Za-z0-9_-]+", config.region)
-            or not Path(config.manifest_path).is_absolute()
+            or (config.mode in {"manifest", "remote"} and not Path(config.manifest_path).is_absolute())
         ):
             raise ValueError("Invalid course storage configuration")
         return config

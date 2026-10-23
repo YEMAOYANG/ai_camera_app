@@ -261,6 +261,7 @@ class ReleaseTests(unittest.TestCase):
         service.repository = Mock()
         service.repository.parse.side_effect = __import__('json').loads
         service._authority = Mock(return_value=(None, {'name': '小朋友', 'nickname': '小芽'}, build, release, None, None))
+        service._playback_release = Mock(side_effect=deepcopy)
         for subject, teacher_name in [('chinese', '小语老师'), ('math', '小数老师'), ('english', 'Mia 老师')]:
             frozen = __import__('json').loads(build['input_json'])
             build['input_json'] = canonical({**frozen, 'subject': subject})

@@ -9,14 +9,18 @@ import time
 
 from content.textbook_catalog import canonical, digest
 from content.textbook_batch_generation import HASH, INPUT_SCHEMA, inspect_draft
+from services.course_file_store import (course_bytes, course_text, course_exists,
+    course_is_dir, course_write_bytes)
 
 
 def atomic_json(path, value, *, immutable=False):
     path = Path(path)
     content = canonical(value) + "\n"
-    if path.exists() and immutable:
-        if path.read_text(encoding="utf-8") != content:
+    if course_exists(path) and immutable:
+        if course_text(path) != content:
             raise ValueError("Existing immutable draft artifact differs")
+        return
+    if not immutable and course_write_bytes(path, content.encode('utf-8')):
         return
     handle, temporary = tempfile.mkstemp(prefix=".batch-", suffix=".tmp", dir=path.parent)
     try:
@@ -50,8 +54,9 @@ class TextbookBatchGenerationService:
         folder = self._folder(task_id)
         if create:
             folder.mkdir(parents=True, exist_ok=True)
-        if not folder.is_dir():
+        if not course_is_dir(folder):
             raise ValueError("Prepare this exact task before starting it")
+        folder.mkdir(parents=True, exist_ok=True)
         with (folder / "operator.lock").open("a") as lock:
             try:
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -61,7 +66,7 @@ class TextbookBatchGenerationService:
 
     @staticmethod
     def _read(folder, name):
-        return json.loads((folder / name).read_text(encoding="utf-8"))
+        return json.loads(course_text(folder / name))
 
     def _input(self, folder):
         frozen = self._read(folder, "input.json")
@@ -80,7 +85,7 @@ class TextbookBatchGenerationService:
         with self._lock(frozen["taskId"], create=True) as folder:
             atomic_json(folder / "input.json", frozen, immutable=True)
             verified = self._input(folder)
-            if not (folder / "state.json").exists():
+            if not course_exists(folder / "state.json"):
                 atomic_json(folder / "state.json", {"schemaVersion": "mira.textbook.private-batch-generation-state.v1",
                     "taskId": frozen["taskId"], "inputSha256": frozen["inputSha256"], "status": "prepared",
                     "runtimeOrigin": None, "runtimeJobId": None, "providerDispatched": False,
@@ -99,14 +104,14 @@ class TextbookBatchGenerationService:
     def has_exact_reservation(self, frozen):
         """Read-only queue admission; changed frozen input is never skipped."""
         folder = self._folder(frozen["taskId"])
-        if not (folder / "input.json").exists():
+        if not course_exists(folder / "input.json"):
             return False
         existing = self._input(folder)
         if existing != frozen:
             raise ValueError("Existing immutable draft input differs; reconcile original reservation")
         # Recover a prepare interrupted between input and state on the next
         # prepare. No dispatch is possible until the state exists.
-        if not (folder / "state.json").exists():
+        if not course_exists(folder / "state.json"):
             return False
         state = self._read(folder, "state.json")
         self._validate_state(state, existing)

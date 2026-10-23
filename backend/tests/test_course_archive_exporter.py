@@ -54,6 +54,33 @@ class CourseArchiveExporterTest(unittest.TestCase):
         return self.exporter.export_snapshot(snapshot or self.snapshot,
             staging_root=self.staging / "exports", release=self.release, **kwargs)
 
+    def test_registry_directory_scan_captures_new_owned_media_before_its_first_archive(self):
+        helper = self.root / 'openmaic-runtime/scripts/course-archive-assets.mjs'
+        helper.parent.mkdir(parents=True)
+        helper.write_text('// fixture transport')
+        prefix = 'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/omclass_new/artifact/media'
+        image = self.root / prefix / 'lesson-picture.png'
+        image.parent.mkdir(parents=True)
+        image.write_bytes(b'new lesson image')
+        self.store.config = CourseStorageConfig(mode='registry', endpoint='http://storage.invalid', bucket='study')
+        registry_store = Mock()
+        registry_store.repository.paths_under.return_value = []
+        registry_store.repository.resolve.return_value = None
+        registry_store.read_bytes.return_value = None
+        result = Mock(returncode=0, stdout=json.dumps({'schemaVersion':'mira.course-archive.assets.v1',
+            'entries': [], 'unresolved': []}))
+        document = {'stage':{'id':'omclass_new'}, 'scenes':[{'content':{
+            'html':'<img src="/api/classroom-media/omclass_new/media/">'}}]}
+        with patch('services.course_archive_exporter.CourseFileStore', return_value=registry_store), \
+                patch('services.course_archive_exporter.subprocess.run', return_value=result) as run:
+            self.exporter._standard_assets(document, staging_root=self.staging)
+        sent = json.loads(run.call_args.kwargs['input'])
+        self.assertEqual(sent['registryFiles'], [{'path': prefix+'/lesson-picture.png',
+            'sha256': hashlib.sha256(image.read_bytes()).hexdigest(), 'byteSize': image.stat().st_size,
+            'mimeType':'image/png'}])
+        registry_store.repository.paths_under.assert_called_once()
+        self.assertEqual(registry_store.repository.paths_under.call_args.args[0], prefix)
+
     def retained_review_fixture(self):
         from PIL import Image
         edition = self.root / "output/textbook-operator-lessons/book"

@@ -8,6 +8,7 @@ from pathlib import Path
 import hashlib
 import json
 import re
+from services.course_file_store import course_bytes, course_exists, course_stat
 
 from content.textbook_release_media import media_mime_type, MAX_MEDIA_BYTES
 
@@ -30,9 +31,9 @@ def _file(path, expected, allowed_root):
         candidate = ROOT / candidate
     resolved = candidate.resolve()
     _require(not candidate.is_symlink() and resolved.is_relative_to(allowed_root.resolve())
-             and resolved.is_file(), "file_outside_owned_store")
-    _require(resolved.stat().st_size <= MAX_MEDIA_BYTES, "file_too_large")
-    raw = resolved.read_bytes()
+             and course_exists(resolved), "file_outside_owned_store")
+    _require(course_stat(resolved).st_size <= MAX_MEDIA_BYTES, "file_too_large")
+    raw = course_bytes(resolved, max_bytes=MAX_MEDIA_BYTES)
     _require(hashlib.sha256(raw).hexdigest() == expected, "file_hash_changed")
     return raw
 

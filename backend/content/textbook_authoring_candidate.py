@@ -21,6 +21,7 @@ from content.textbook_preview import responsive_activity_marker
 from content.textbook_review_followup import discover_complete_scene_review_followup
 from content.textbook_scene_contract import scene_canonical
 from core.errors import ApiError
+from services.course_file_store import course_bytes, course_exists, course_glob, course_text
 from services.course_reuse_resolver import lesson_scope
 
 JOB_SCHEMA = 'mira.operator.workbench-authoring.v3'
@@ -53,9 +54,9 @@ def _loads(text):
 
 def _read_json(path):
     try:
-        if path.is_symlink() or not path.is_file():
+        if path.is_symlink() or not course_exists(path):
             raise ValueError()
-        value = _loads(path.read_text(encoding='utf-8'))
+        value = _loads(course_text(path))
         if not isinstance(value, dict):
             raise ValueError()
         return value
@@ -89,9 +90,9 @@ def _find_job(output_root, edition, revision, node, session_id, stage_id, has_le
     lesson = _safe_child(root, root / edition / node)
     jobs, v3_present = [], False
     v3_stage_owners = set()
-    for job in sorted(lesson.glob('teaching-*/authoring-job')):
+    for job in sorted(course_glob(lesson, 'teaching-*/authoring-job')):
         _safe_child(root, job)
-        if not (job / 'frozen.json').exists():
+        if not course_exists(job / 'frozen.json'):
             continue
         frozen = _read_json(job / 'frozen.json')
         schema = frozen.get('schemaVersion')
@@ -131,7 +132,7 @@ def _contract(job, frozen, manifest, node):
     from content.textbook_scene_contract import validate_scene_contract
     draft = _read_json(job / 'draft.json')
     try:
-        raw = (job / 'draft.json').read_bytes()
+        raw = course_bytes(job / 'draft.json')
         if (hashlib.sha256(raw).hexdigest() != frozen.get('draftSha256')
                 or digest(draft) != frozen.get('draftCanonicalSha256')
                 or hashlib.sha256(draft['request'].encode()).hexdigest() != frozen.get('requestSha256')
@@ -170,7 +171,7 @@ def _asset(asset, directory, stage_id):
         reject('候选图片必须属于本次原生课堂，跨课堂素材需要明确复制和重新绑定')
     path = _safe_child(directory, directory / owner / 'media' / name)
     try:
-        raw = path.read_bytes()
+        raw = course_bytes(path)
         if hashlib.sha256(raw).hexdigest() != asset['sha256']:
             raise ValueError()
         with Image.open(io.BytesIO(raw)) as image:
@@ -431,7 +432,7 @@ def validate_authoring_candidate(classroom, classroom_directory, authoring, mani
     path = _safe_child(directory, directory / stage_id / CANDIDATE_FILE)
     session_id = authoring.get('sessionId') if isinstance(authoring, dict) else None
     found = _find_job(output_root, manifest['editionId'], manifest['revisionId'], node, session_id, stage_id,
-                      path.exists() or path.is_symlink())
+                      course_exists(path) or path.is_symlink())
     if found is None:
         return None
     job, frozen, state = found

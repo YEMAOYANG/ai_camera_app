@@ -15,6 +15,7 @@ from core.errors import ApiError
 from integrations.openmaic_full_runtime_client import (
     OpenMaicFullRuntimeClient,
     OpenMaicFullRuntimeError,
+    reset_classroom_read_versions,
 )
 from services.openmaic_full_runtime_service import (
     SAMPLE_GENERATION_STALE_AFTER_MS,
@@ -858,6 +859,56 @@ def _retry_service_with_failed_attempt_two():
         }
     )
     return service, repository, client, attempt_two
+
+
+class ClassroomFileVersionTest(unittest.TestCase):
+    def setUp(self):
+        reset_classroom_read_versions()
+        self.client = OpenMaicFullRuntimeClient('http://127.0.0.1:3100')
+        self.classroom = {'id': 'draft-version-fixture', 'stage': {'id': 'draft-version-fixture'}, 'scenes': []}
+
+    def test_edit_forwards_the_original_get_version_without_fetching_a_fresh_head(self):
+        requests = []
+        old, new = 'a' * 64, 'b' * 64
+        def transport(request, timeout):
+            requests.append(request)
+            if request.method == 'GET':
+                return _HttpResponse({'classroom': self.classroom}, request.full_url,
+                    headers={'X-Mira-File-Sha256': old})
+            return _HttpResponse({'id': self.classroom['id']}, request.full_url,
+                headers={'X-Mira-File-Sha256': new})
+        with patch('integrations.openmaic_full_runtime_client.urlopen', side_effect=transport):
+            loaded = self.client.get_classroom(self.classroom['id'])
+            loaded['stage']['name'] = '修改的草稿'
+            self.client.save_preview_classroom(loaded)
+            self.client.save_preview_classroom(loaded)
+        self.assertEqual([r.method for r in requests], ['GET', 'POST', 'POST'])
+        self.assertEqual(requests[1].get_header('If-match'), old)
+        self.assertEqual(requests[2].get_header('If-match'), new)
+        self.assertNotIn('course_file_sha256', loaded)
+        self.assertNotIn('course_file_sha256', json.loads(requests[1].data))
+
+    def test_request_reset_and_different_classroom_do_not_reuse_a_version(self):
+        requests = []
+        def transport(request, timeout):
+            requests.append(request)
+            return _HttpResponse({'classroom': self.classroom} if request.method == 'GET'
+                else {'id': json.loads(request.data)['stage']['id']}, request.full_url,
+                headers={'X-Mira-File-Sha256': 'a' * 64} if request.method == 'GET' else {})
+        with patch('integrations.openmaic_full_runtime_client.urlopen', side_effect=transport):
+            self.client.get_classroom(self.classroom['id'])
+            self.client.save_preview_classroom({'id': 'new-fork', 'stage': {'id': 'new-fork'}, 'scenes': []})
+            reset_classroom_read_versions()
+            self.client.save_preview_classroom(self.classroom)
+        self.assertIsNone(requests[1].get_header('If-match'))
+        self.assertIsNone(requests[2].get_header('If-match'))
+
+    def test_invalid_transport_version_is_not_accepted_as_a_read(self):
+        response = _HttpResponse({'classroom': self.classroom}, self.client.base_url + '/api/classroom',
+                                 headers={'X-Mira-File-Sha256': 'invalid'})
+        with patch('integrations.openmaic_full_runtime_client.urlopen', return_value=response), \
+                self.assertRaisesRegex(OpenMaicFullRuntimeError, '版本响应'):
+            self.client.get_classroom(self.classroom['id'])
 
 
 class OpenMaicFullRuntimeTest(unittest.TestCase):

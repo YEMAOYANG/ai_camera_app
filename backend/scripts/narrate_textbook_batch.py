@@ -22,7 +22,8 @@ DEFAULT_CLASSROOM_DIRECTORY = ROOT.parent / "openmaic-runtime/.runtime/OpenMAIC/
 def load_candidate(directory):
     """Cross-check frozen input, generation receipt, classroom and exact scope."""
     directory = Path(directory).resolve()
-    frozen, state, classroom = [json.loads((directory / name).read_text(encoding="utf-8"))
+    from services.course_file_store import course_text
+    frozen, state, classroom = [json.loads(course_text(directory / name))
                                 for name in ("input.json", "state.json", "classroom.json")]
     if not all(isinstance(value, dict) for value in (frozen, state, classroom)):
         raise ValueError("candidate_artifact_shape_invalid")

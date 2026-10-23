@@ -1,0 +1,550 @@
+diff --git a/lib/server/course-storage-registry.ts b/lib/server/course-storage-registry.ts
+--- a/lib/server/course-storage-registry.ts
++++ b/lib/server/course-storage-registry.ts
+@@ -14,6 +14,25 @@
+     super('Course storage unavailable');
+     this.name = 'CourseStorageRegistryError';
+   }
++}
++
++export class CourseStorageWriteConflict extends CourseStorageRegistryError {
++  readonly status = 409;
++}
++
++export interface CourseStorageVersion { readonly sourcePath: string; readonly sha256: string }
++// Provenance belongs to this exact read object and never enters JSON or a shared path cache.
++const versions = new WeakMap<object, CourseStorageVersion>();
++export function courseStorageVersion(value: unknown): CourseStorageVersion | undefined {
++  return value !== null && typeof value === 'object' ? versions.get(value) : undefined;
++}
++export function bindCourseStorageVersion<T>(value: T, version: CourseStorageVersion | undefined): T {
++  if (version && value !== null && typeof value === 'object')
++    versions.set(value, Object.freeze({ sourcePath: version.sourcePath, sha256: version.sha256 }));
++  return value;
++}
++export function inheritCourseStorageVersion<T>(value: T, source: unknown): T {
++  return bindCourseStorageVersion(value, courseStorageVersion(source));
+ }
+ 
+ function fail(): never { throw new CourseStorageRegistryError(); }
+@@ -103,7 +122,12 @@
+     if (response.status === 404 && result?.ok === false &&
+         result?.error?.code === 'course_storage_asset_not_found') return undefined;
+     if (!response.ok || result?.ok !== true) fail();
+-    const asset = result.asset as CourseStorageAsset;
++    return validateAsset(result.asset, sourcePath, expectedSha256);
++  } catch { return fail(); }
++}
++
++function validateAsset(value: unknown, sourcePath: string, expectedSha256?: string): CourseStorageAsset {
++    const asset = value as CourseStorageAsset;
+     const locator = asset?.locator;
+     if (!asset || asset.sourcePath !== sourcePath || typeof asset.path !== 'string' ||
+         !SHA.test(asset.sha256) || (expectedSha256 && asset.sha256 !== expectedSha256) ||
+@@ -118,7 +142,6 @@
+         (locator.kind === 'zip_member' && (!SHA.test(locator.archiveSha256 ?? '') ||
+           !Number.isSafeInteger(locator.archiveByteSize) || locator.archiveByteSize! < 0 || !safePath(locator.memberPath)))) fail();
+     return asset;
+-  } catch { return fail(); }
+ }
+ 
+ export async function readCourseStorageAsset(asset: CourseStorageAsset): Promise<Buffer> {
+@@ -152,7 +175,47 @@
+ export async function readCourseStorageFile(filePath: string, encoding?: BufferEncoding): Promise<Buffer | string> {
+   const asset = await registeredCourseStorageFile(filePath);
+   const bytes = asset ? await readCourseStorageAsset(asset) : await fs.readFile(filePath);
++  if (asset) bindCourseStorageVersion(bytes, asset);
+   return encoding ? bytes.toString(encoding) : bytes;
++}
++
++export function parseCourseStorageJson<T = unknown>(bytes: Buffer): T {
++  return inheritCourseStorageVersion(JSON.parse(bytes.toString('utf8')) as T, bytes);
++}
++
++export async function readCourseStorageJson<T = unknown>(filePath: string): Promise<T> {
++  return parseCourseStorageJson<T>(await readCourseStorageFile(filePath));
++}
++
++/** A registered update is a new immutable version, with the original read as CAS token. */
++export async function writeCourseStorageJsonIfRegistered(filePath: string, data: unknown,
++  version = courseStorageVersion(data)): Promise<boolean> {
++  const asset = await registeredCourseStorageFile(filePath);
++  if (!asset) return false;
++  if (!version || version.sourcePath !== asset.sourcePath || !SHA.test(version.sha256))
++    throw new CourseStorageWriteConflict();
++  try {
++    const bytes = Buffer.from(JSON.stringify(data, null, 2), 'utf8');
++    if (!bytes.length || bytes.length > MAX_FILE_BYTES || asset.mimeType !== 'application/json') fail();
++    const expected = createHash('sha256').update(bytes).digest('hex');
++    const { url, init } = internalRequest('file', asset.sourcePath);
++    const response = await fetch(url, { ...init, method: 'PUT',
++      signal: AbortSignal.timeout(120_000),
++      headers: { ...init.headers, 'Content-Type': 'application/json', 'If-Match': version.sha256 }, body: bytes });
++    if (response.status === 409 || response.status === 412) {
++      await response.body?.cancel().catch(() => {}); throw new CourseStorageWriteConflict();
++    }
++    const result = JSON.parse((await boundedBytes(response, 64 * 1024)).toString('utf8'));
++    if (!response.ok || result?.ok !== true) fail();
++    const saved = validateAsset(result.asset, asset.sourcePath, expected);
++    if (saved.byteSize !== bytes.length || saved.mimeType !== 'application/json' ||
++        (['endpoint', 'bucket', 'region'] as const).some(key => saved.storage[key] !== asset.storage[key])) fail();
++    bindCourseStorageVersion(data, saved);
++    return true;
++  } catch (error) {
++    if (error instanceof CourseStorageWriteConflict) throw error;
++    return fail();
++  }
+ }
+ 
+ export async function accessCourseStorageFile(filePath: string): Promise<void> {
+diff --git a/lib/server/classroom-storage.ts b/lib/server/classroom-storage.ts
+--- a/lib/server/classroom-storage.ts
++++ b/lib/server/classroom-storage.ts
+@@ -3,7 +3,9 @@
+ import type { NextRequest } from 'next/server';
+ import type { Scene, Stage } from '@/lib/types/stage';
+ import { enqueueLegacyClassroomArchive } from './course-archive-events';
+-import { readCourseStorageFile, assertCourseStorageFileWritable, registeredCourseStorageFile, readCourseStorageAsset } from './course-storage-registry';
++import { registeredCourseStorageFile, readCourseStorageAsset,
++  bindCourseStorageVersion, readCourseStorageJson, writeCourseStorageJsonIfRegistered,
++  inheritCourseStorageVersion, type CourseStorageVersion } from './course-storage-registry';
+ 
+ export const CLASSROOMS_DIR = path.join(process.cwd(), 'data', 'classrooms');
+ export const CLASSROOM_JOBS_DIR = path.join(process.cwd(), 'data', 'classroom-jobs');
+@@ -20,8 +22,8 @@
+   await ensureDir(CLASSROOM_JOBS_DIR);
+ }
+ 
+-export async function writeJsonFileAtomic(filePath: string, data: unknown) {
+-  await assertCourseStorageFileWritable(filePath);
++export async function writeJsonFileAtomic(filePath: string, data: unknown, version?: CourseStorageVersion) {
++  if (await writeCourseStorageJsonIfRegistered(filePath, data, version)) return;
+   const dir = path.dirname(filePath);
+   await ensureDir(dir);
+ 
+@@ -56,12 +58,11 @@
+   // Check every known spelling before considering an unregistered local draft.
+   for (const filePath of candidates) {
+     const asset = await registeredCourseStorageFile(filePath);
+-    if (asset) return JSON.parse((await readCourseStorageAsset(asset)).toString('utf8')) as PersistedClassroomData;
++    if (asset) return bindCourseStorageVersion(JSON.parse((await readCourseStorageAsset(asset)).toString('utf8')) as PersistedClassroomData, asset);
+   }
+   for (const filePath of candidates) {
+     try {
+-      const content = await readCourseStorageFile(filePath, 'utf-8');
+-      return JSON.parse(content) as PersistedClassroomData;
++      return await readCourseStorageJson<PersistedClassroomData>(filePath);
+     } catch (error) {
+       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+     }
+@@ -76,6 +77,7 @@
+     scenes: Scene[];
+   },
+   baseUrl: string,
++  expectedSha256?: string,
+ ): Promise<PersistedClassroomData & { url: string }> {
+   const classroomData: PersistedClassroomData = {
+     id: data.id,
+@@ -84,9 +86,20 @@
+     createdAt: new Date().toISOString(),
+   };
+ 
+-  await ensureClassroomsDir();
+-  const filePath = path.join(CLASSROOMS_DIR, `${data.id}.json`);
+-  await writeJsonFileAtomic(filePath, classroomData);
++  const candidates = data.id.startsWith('omclass_')
++    ? [path.join(CLASSROOMS_DIR, data.id, 'artifact', 'classroom.json')]
++    : [path.join(CLASSROOMS_DIR, `${data.id}.json`), path.join(CLASSROOMS_DIR, data.id, 'classroom.json')];
++  let filePath = path.join(CLASSROOMS_DIR, `${data.id}.json`);
++  let version: CourseStorageVersion | undefined;
++  for (const candidate of candidates) {
++    const registered = await registeredCourseStorageFile(candidate);
++    if (registered) {
++      filePath = candidate;
++      if (expectedSha256) version = { sourcePath: registered.sourcePath, sha256: expectedSha256 };
++      break;
++    }
++  }
++  await writeJsonFileAtomic(filePath, classroomData, version);
+   try {
+     await enqueueLegacyClassroomArchive(classroomData);
+   } catch {
+@@ -97,8 +110,8 @@
+     );
+   }
+ 
+-  return {
++  return inheritCourseStorageVersion({
+     ...classroomData,
+     url: `${baseUrl}/classroom/${data.id}`,
+-  };
++  }, classroomData);
+ }
+diff --git a/lib/server/classroom-job-store.ts b/lib/server/classroom-job-store.ts
+--- a/lib/server/classroom-job-store.ts
++++ b/lib/server/classroom-job-store.ts
+@@ -1,4 +1,5 @@
+-import { readCourseStorageFile, assertCourseStorageFileWritable, accessCourseStorageFile } from './course-storage-registry';
++import { readCourseStorageFile, assertCourseStorageFileWritable, accessCourseStorageFile,
++  readCourseStorageJson, parseCourseStorageJson, inheritCourseStorageVersion } from './course-storage-registry';
+ import { promises as fs } from 'fs';
+ import { createHash } from 'crypto';
+ import path from 'path';
+@@ -356,8 +357,7 @@
+   jobId: string,
+ ): Promise<ClassroomGenerationJob | null> {
+   try {
+-    const content = await readCourseStorageFile(jobFilePath(jobId), 'utf-8');
+-    return JSON.parse(content) as ClassroomGenerationJob;
++    return await readCourseStorageJson<ClassroomGenerationJob>(jobFilePath(jobId));
+   } catch (error) {
+     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+       return null;
+@@ -382,6 +382,7 @@
+       updatedAt: new Date().toISOString(),
+     };
+ 
++    inheritCourseStorageVersion(updated, existing);
+     await writeJsonFileAtomic(jobFilePath(jobId), updated);
+     return updated;
+   });
+@@ -404,6 +405,7 @@
+       updatedAt: new Date().toISOString(),
+     };
+ 
++    inheritCourseStorageVersion(updated, existing);
+     await writeJsonFileAtomic(jobFilePath(jobId), updated);
+     return updated;
+   });
+@@ -496,7 +498,7 @@
+   }
+   return withJobLock(input.jobId, async () => {
+     const raw = await readCourseStorageFile(jobFilePath(input.jobId));
+-    const existing = JSON.parse(raw.toString('utf8')) as ClassroomGenerationJob;
++    const existing = parseCourseStorageJson<ClassroomGenerationJob>(raw);
+     const audit = existing.formalCitationRecovery;
+     if (existing.status === 'succeeded') {
+       if (
+@@ -545,6 +547,7 @@
+       },
+       error: undefined,
+     };
++    inheritCourseStorageVersion(updated, existing);
+     await writeJsonFileAtomic(jobFilePath(input.jobId), updated);
+     return { job: updated, applied: true };
+   });
+diff --git a/app/api/classroom/route.ts b/app/api/classroom/route.ts
+--- a/app/api/classroom/route.ts
++++ b/app/api/classroom/route.ts
+@@ -9,6 +9,7 @@
+ } from '@/lib/server/classroom-storage';
+ import { createLogger } from '@/lib/logger';
+ import { readFrozenPreview } from '@/lib/server/mira-textbook-preview-quiz';
++import { courseStorageVersion, CourseStorageWriteConflict } from '@/lib/server/course-storage-registry';
+ 
+ const log = createLogger('Classroom API');
+ 
+@@ -32,10 +33,18 @@
+     const id = stage.id || randomUUID();
+     const baseUrl = buildRequestOrigin(request);
+ 
+-    const persisted = await persistClassroom({ id, stage: { ...stage, id }, scenes }, baseUrl);
++    const match = request.headers.get('if-match') ?? undefined;
++    if (match !== undefined && !/^[a-f0-9]{64}$/.test(match))
++      return apiError(API_ERROR_CODES.INVALID_REQUEST, 409, 'Classroom version is required');
++    const persisted = await persistClassroom({ id, stage: { ...stage, id }, scenes }, baseUrl, match);
+ 
+-    return apiSuccess({ id: persisted.id, url: persisted.url }, 201);
++    const response = apiSuccess({ id: persisted.id, url: persisted.url }, 201);
++    const version = courseStorageVersion(persisted);
++    if (version) response.headers.set('X-Mira-File-Sha256', version.sha256);
++    return response;
+   } catch (error) {
++    if (error instanceof CourseStorageWriteConflict)
++      return apiError(API_ERROR_CODES.INVALID_REQUEST, 409, 'Classroom changed; read the current version before editing');
+     log.error(
+       `Classroom storage failed [stageId=${stageId ?? 'unknown'}, scenes=${sceneCount ?? 0}]:`,
+       error,
+@@ -77,7 +86,10 @@
+       return apiSuccess({ classroom: { ...verified.room, stage: { ...verified.room.stage,
+         miraTextbookPreviewNarration: true, miraTextbookPreviewQuiz: true } } });
+     }
+-    return apiSuccess({ classroom });
++    const response = apiSuccess({ classroom });
++    const version = courseStorageVersion(classroom);
++    if (version) response.headers.set('X-Mira-File-Sha256', version.sha256);
++    return response;
+   } catch (error) {
+     log.error(
+       `Classroom retrieval failed [id=${request.nextUrl.searchParams.get('id') ?? 'unknown'}]:`,
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -1,4 +1,5 @@
+-import { readCourseStorageFile, assertCourseStorageFileWritable } from './course-storage-registry';
++import { readCourseStorageFile, assertCourseStorageFileWritable, readCourseStorageJson,
++  writeCourseStorageJsonIfRegistered, inheritCourseStorageVersion } from './course-storage-registry';
+ import { pcmWavDurationMs } from '@/lib/mira-paid-budget-bridge';
+ import { budgetedOperation, paidBudgetContext } from './mira-paid-budget';
+ import { createHash } from 'crypto';
+@@ -499,7 +500,7 @@
+ }
+ 
+ async function writeAtomic(filePath: string, value: unknown): Promise<void> {
+-  await assertCourseStorageFileWritable(filePath);
++  if (await writeCourseStorageJsonIfRegistered(filePath, value)) return;
+   await fs.mkdir(path.dirname(filePath), { recursive: true });
+   const tempPath = `${filePath}.${process.pid}.${Date.now()}.${Math.random()
+     .toString(16)
+@@ -519,7 +520,7 @@
+     throw new MiraFormalAudioError('invalid_request', 'Invalid formal audio request id');
+   }
+   try {
+-    return JSON.parse(await readCourseStorageFile(jobPath(kind, requestId), 'utf8')) as T;
++    return await readCourseStorageJson<T>(jobPath(kind, requestId));
+   } catch (error) {
+     if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
+     throw error;
+@@ -546,6 +547,7 @@
+     updatedAt: now.toISOString(),
+     completedAt: now.toISOString(),
+   };
++  inheritCourseStorageVersion(observed, record);
+   await writeAtomic(jobPath(kind, record.requestId), observed);
+   return observed;
+ }
+@@ -1020,6 +1022,7 @@
+     updatedAt: now.toISOString(),
+     completedAt: now.toISOString(),
+   };
++  inheritCourseStorageVersion(terminal, record);
+   await updateTts(terminal);
+   return terminal;
+ }
+@@ -1036,6 +1039,7 @@
+     updatedAt: now.toISOString(),
+     completedAt: now.toISOString(),
+   };
++  inheritCourseStorageVersion(terminal, record);
+   await updateAsr(terminal);
+   return terminal;
+ }
+diff --git a/lib/server/mira-formal-teaching-quality.ts b/lib/server/mira-formal-teaching-quality.ts
+--- a/lib/server/mira-formal-teaching-quality.ts
++++ b/lib/server/mira-formal-teaching-quality.ts
+@@ -1,4 +1,5 @@
+-import { readCourseStorageFile as readFile, assertCourseStorageFileWritable } from './course-storage-registry';
++import { assertCourseStorageFileWritable,
++  readCourseStorageJson, writeCourseStorageJsonIfRegistered } from './course-storage-registry';
+ import { visualPredispatchRecovery } from './mira-formal-visual-predispatch';
+ import { reviewFormalVisualSnapshot } from './mira-formal-visual-review';
+ import { VISUAL_RUBRIC_VERSION, assertVisualReview, type VisualReviewReceipt } from './mira-formal-visual-contract';
+@@ -204,7 +205,7 @@
+ }
+ 
+ async function save(path: string, value: unknown) {
+-  await assertCourseStorageFileWritable(path);
++  if (await writeCourseStorageJsonIfRegistered(path, value)) return;
+   const temporary = `${path}.${process.pid}.tmp`;
+   const file = await open(temporary, 'w', 0o600);
+   try { await file.writeFile(JSON.stringify(value, null, 2)); await file.sync(); }
+@@ -213,7 +214,7 @@
+ }
+ 
+ async function readJson(path: string): Promise<unknown | undefined> {
+-  try { return JSON.parse(await readFile(path, 'utf8')); }
++  try { return await readCourseStorageJson(path); }
+   catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') return undefined; throw error; }
+ }
+ 
+diff --git a/tests/server/course-storage-registry.test.ts b/tests/server/course-storage-registry.test.ts
+--- a/tests/server/course-storage-registry.test.ts
++++ b/tests/server/course-storage-registry.test.ts
+@@ -7,9 +7,13 @@
+   courseStorageAsset, readCourseStorageAsset, readCourseStorageFile,
+   assertCourseStorageFileWritable, accessCourseStorageFile,
+   withLocalCourseStorageFile,
++  readCourseStorageJson, courseStorageVersion, inheritCourseStorageVersion,
++  writeCourseStorageJsonIfRegistered, CourseStorageWriteConflict,
+ } from '@/lib/server/course-storage-registry';
+-import { readClassroom, writeJsonFileAtomic } from '@/lib/server/classroom-storage';
+-import { assertMiraFormalTtsRequest, executeMiraFormalTts } from '@/lib/server/mira-formal-audio';
++import { readClassroom, writeJsonFileAtomic, persistClassroom } from '@/lib/server/classroom-storage';
++import { GET, POST } from '@/app/api/classroom/route';
++import { NextRequest } from 'next/server';
++import { assertMiraFormalTtsRequest, executeMiraFormalTts, readMiraFormalTtsJob } from '@/lib/server/mira-formal-audio';
+ import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
+ 
+ const room = { id: 'registry_room', stage: { id: 'registry_room' }, scenes: [], createdAt: 'frozen' };
+@@ -173,3 +177,171 @@
+   })).rejects.toThrow('validator rejected');
+   await expect(fs.access(temporary)).rejects.toMatchObject({ code: 'ENOENT' });
+ });
++
++function successfulPut(url: URL, init?: RequestInit) {
++  if (init?.method !== 'PUT') return url.pathname.endsWith('/asset') ? Response.json({ ok: true, asset }) : file();
++  const body = Buffer.from(init.body as Uint8Array);
++  return Response.json({ ok: true, asset: { ...asset,
++    sha256: createHash('sha256').update(body).digest('hex'), byteSize: body.length,
++    locator: { kind: 'object', objectKey: '语文/统编版/一年级上册/2026-10-23/天地人/工作记录.json', etag: '"new"' },
++  } });
++}
++
++it('keeps exact read provenance private, carries it explicitly through copies and updates it only after success', async () => {
++  fetchMock.mockImplementation(successfulPut);
++  const original = await readCourseStorageJson<Record<string, unknown>>(localPath);
++  expect(courseStorageVersion(original)).toEqual({ sourcePath, sha256 });
++  expect(Object.keys(original)).toEqual(Object.keys(room));
++  expect(JSON.stringify(original)).toBe(JSON.stringify(room));
++  const changed = inheritCourseStorageVersion({ ...original, changed: true }, original);
++  const disk = vi.spyOn(fs, 'writeFile');
++  await writeJsonFileAtomic(localPath, changed);
++  const call = fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT')!;
++  expect(call[1].headers).toMatchObject({ 'If-Match': sha256, 'Content-Type': 'application/json' });
++  expect(call[0].searchParams.has('sha256')).toBe(false);
++  expect(courseStorageVersion(changed)?.sha256).toBe(createHash('sha256').update(call[1].body).digest('hex'));
++  expect(disk).not.toHaveBeenCalled();
++});
++
++it('never refreshes an old read token from a newer head and never writes local shadows on conflict', async () => {
++  const original = await readCourseStorageJson<Record<string, unknown>>(localPath);
++  const changed = inheritCourseStorageVersion({ ...original, changed: true }, original);
++  fetchMock.mockImplementation(async (url: URL, init?: RequestInit) => init?.method === 'PUT'
++    ? Response.json({ ok: false }, { status: 409 })
++    : Response.json({ ok: true, asset: { ...asset, sha256: 'b'.repeat(64) } }));
++  const disk = vi.spyOn(fs, 'writeFile');
++  await expect(writeJsonFileAtomic(localPath, changed)).rejects.toBeInstanceOf(CourseStorageWriteConflict);
++  expect(fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT')![1].headers['If-Match']).toBe(sha256);
++  expect(courseStorageVersion(changed)?.sha256).toBe(sha256);
++  expect(disk).not.toHaveBeenCalled();
++});
++
++it('requires provenance for registered values and binds it to the original exact source path', async () => {
++  const original = await readCourseStorageJson(localPath);
++  const changed = { ...room, changed: true };
++  await expect(writeJsonFileAtomic(localPath, changed)).rejects.toBeInstanceOf(CourseStorageWriteConflict);
++  const otherPath = path.join(process.cwd(), 'data/classrooms/other.json');
++  fetchMock.mockImplementation(async (url: URL) => Response.json({ ok: true, asset: {
++    ...asset, sourcePath: url.searchParams.get('path'), path: url.searchParams.get('path'),
++  } }));
++  await expect(writeJsonFileAtomic(otherPath, inheritCourseStorageVersion(changed, original)))
++    .rejects.toBeInstanceOf(CourseStorageWriteConflict);
++  expect(fetchMock.mock.calls.filter(([, init]) => init?.method === 'PUT')).toHaveLength(0);
++});
++
++it.each([403, 500])('rejects backend lifecycle or transfer failure %s without falling back', async status => {
++  const original = await readCourseStorageJson(localPath);
++  fetchMock.mockImplementation(async (url: URL, init?: RequestInit) => init?.method === 'PUT'
++    ? Response.json({ error: 'private failure' }, { status }) : Response.json({ ok: true, asset }));
++  const disk = vi.spyOn(fs, 'writeFile');
++  await expect(writeJsonFileAtomic(localPath, original)).rejects.toThrow('Course storage unavailable');
++  expect(disk).not.toHaveBeenCalled();
++});
++
++it.each(['hash', 'size', 'storage'])('refuses an unbound PUT success descriptor: %s', async kind => {
++  const original = await readCourseStorageJson(localPath);
++  fetchMock.mockImplementation(async (url: URL, init?: RequestInit) => {
++    const response = successfulPut(url, init);
++    if (init?.method !== 'PUT') return response;
++    const payload = await response.json();
++    if (kind === 'hash') payload.asset.sha256 = 'f'.repeat(64);
++    if (kind === 'size') payload.asset.byteSize += 1;
++    if (kind === 'storage') payload.asset.storage.bucket = 'other-study';
++    return Response.json(payload);
++  });
++  await expect(writeCourseStorageJsonIfRegistered(localPath, original)).rejects.toThrow('Course storage unavailable');
++  expect(courseStorageVersion(original)?.sha256).toBe(sha256);
++});
++
++it('GET exposes read SHA only as a header and POST carries caller If-Match through to registered update', async () => {
++  fetchMock.mockImplementation(successfulPut);
++  const read = await GET(new NextRequest('http://localhost/api/classroom?id=registry_room'));
++  expect(read.headers.get('x-mira-file-sha256')).toBe(sha256);
++  const body = await read.json();
++  expect(body.classroom).toEqual(room);
++  expect(JSON.stringify(body)).not.toContain('sourcePath');
++  const post = await POST(new NextRequest('http://localhost/api/classroom', { method: 'POST',
++    headers: { 'Content-Type': 'application/json', 'If-Match': sha256 },
++    body: JSON.stringify({ stage: room.stage, scenes: room.scenes }) }));
++  expect(post.status).toBe(201);
++  expect(post.headers.get('x-mira-file-sha256')).toMatch(/^[a-f0-9]{64}$/);
++  const put = fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT')!;
++  expect(put[1].headers['If-Match']).toBe(sha256);
++});
++
++it('POST registered classroom without original version returns 409 before PUT or local write', async () => {
++  const disk = vi.spyOn(fs, 'writeFile');
++  const response = await POST(new NextRequest('http://localhost/api/classroom', { method: 'POST',
++    body: JSON.stringify({ stage: room.stage, scenes: room.scenes }) }));
++  expect(response.status).toBe(409);
++  expect(fetchMock.mock.calls.filter(([, init]) => init?.method === 'PUT')).toHaveLength(0);
++  expect(disk).not.toHaveBeenCalled();
++});
++
++it('updates a registered artifact classroom at its original spelling rather than a flat local shadow', async () => {
++  const id = 'omclass_registry_fixture', relative = `openmaic-runtime/.runtime/OpenMAIC/data/classrooms/${id}/artifact/classroom.json`;
++  fetchMock.mockImplementation(async (url: URL, init?: RequestInit) => {
++    const result = await successfulPut(url, init).json();
++    result.asset.sourcePath = result.asset.path = relative;
++    return Response.json(result);
++  });
++  const disk = vi.spyOn(fs, 'writeFile');
++  await persistClassroom({ id, stage: { ...room.stage, id } as never, scenes: [] }, 'http://localhost', sha256);
++  expect(fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT')![0].searchParams.get('path')).toBe(relative);
++  expect(disk).not.toHaveBeenCalled();
++});
++
++it('retains local atomic persistence for a genuinely unregistered new draft', async () => {
++  fetchMock.mockImplementation(async () => absent());
++  vi.spyOn(fs, 'mkdir').mockResolvedValue(undefined);
++  const write = vi.spyOn(fs, 'writeFile').mockResolvedValue(undefined);
++  const rename = vi.spyOn(fs, 'rename').mockResolvedValue(undefined);
++  await writeJsonFileAtomic(localPath, { draft: true });
++  expect(write).toHaveBeenCalledOnce();
++  expect(rename).toHaveBeenCalledOnce();
++  expect(fetchMock.mock.calls.filter(([, init]) => init?.method === 'PUT')).toHaveLength(0);
++});
++
++it('successive changes of the same read ledger use each verified prior saved SHA, without JSON fields', async () => {
++  const ledger = [{ status: 'failed' }], payload = Buffer.from(JSON.stringify(ledger));
++  const oldSha = createHash('sha256').update(payload).digest('hex');
++  fetchMock.mockImplementation(async (url: URL, init?: RequestInit) => {
++    if (init?.method === 'PUT') return successfulPut(url, init);
++    return url.pathname.endsWith('/asset') ? Response.json({ ok: true, asset: { ...asset, sha256: oldSha, byteSize: payload.length } })
++      : new Response(payload, { headers: { 'X-Mira-File-Source': 'remote', 'X-Mira-File-Sha256': oldSha } });
++  });
++  const read = await readCourseStorageJson<Array<{ status: string }>>(localPath);
++  read.push({ status: 'started' });
++  await writeJsonFileAtomic(localPath, read);
++  const afterFirst = courseStorageVersion(read)!.sha256;
++  read[1].status = 'needs_revision';
++  await writeJsonFileAtomic(localPath, read);
++  const puts = fetchMock.mock.calls.filter(([, init]) => init?.method === 'PUT');
++  expect(puts[0][1].headers['If-Match']).toBe(oldSha);
++  expect(puts[1][1].headers['If-Match']).toBe(afterFirst);
++  expect(JSON.stringify(read)).toBe('[{"status":"failed"},{"status":"needs_revision"}]');
++});
++
++it('terminalizes a stale remote running audio job with its exact read SHA and no new provider claim', async () => {
++  const requestId = 'registry-stale-tts';
++  const record = { requestId, state: 'running', providerAttemptedAt: '2020-01-01T00:00:00Z' };
++  const payload = Buffer.from(JSON.stringify(record)), oldSha = createHash('sha256').update(payload).digest('hex');
++  fetchMock.mockImplementation(async (url: URL, init?: RequestInit) => {
++    const source = url.searchParams.get('path');
++    if (init?.method === 'PUT') {
++      const result = await successfulPut(url, init).json();
++      result.asset.sourcePath = result.asset.path = source;
++      return Response.json(result);
++    }
++    return url.pathname.endsWith('/asset') ? Response.json({ ok: true, asset: { ...asset,
++      sourcePath: source, path: source, sha256: oldSha, byteSize: payload.length,
++    } }) : new Response(payload, { headers: { 'X-Mira-File-Source': 'remote', 'X-Mira-File-Sha256': oldSha } });
++  });
++  const disk = vi.spyOn(fs, 'open');
++  const observed = await readMiraFormalTtsJob(requestId, new Date('2026-10-23T12:00:00Z'));
++  expect(observed?.state).toBe('ambiguous');
++  const put = fetchMock.mock.calls.find(([, init]) => init?.method === 'PUT')!;
++  expect(put[1].headers['If-Match']).toBe(oldSha);
++  expect(fetchMock.mock.calls.every(([url]) => url.origin === 'http://backend.test:8000')).toBe(true);
++  expect(disk).not.toHaveBeenCalled();
++});

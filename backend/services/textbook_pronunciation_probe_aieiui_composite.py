@@ -14,6 +14,7 @@ from types import MappingProxyType
 from content import textbook_pinyin_pronunciation as pronunciation
 from content.textbook_catalog import canonical, digest
 from core.errors import ApiError
+from services.course_file_store import course_bytes
 
 
 PLAN_SCHEMA = 'mira.operator.phonetic-composite-probe.v1'
@@ -154,7 +155,7 @@ def read_files(review_path):
     for name, source in sources.items():
         if source.is_symlink() or source.resolve() != source:
             fail('ɑi ei ui 组合小样文件不能通过链接跨目录')
-        files[name] = source.read_bytes()
+        files[name] = course_bytes(source)
     return files
 
 

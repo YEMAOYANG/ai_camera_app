@@ -12,6 +12,7 @@ from types import MappingProxyType
 from content import textbook_pinyin_pronunciation as pronunciation
 from content.textbook_catalog import canonical, digest
 from core.errors import ApiError
+from services.course_file_store import course_bytes
 
 PLAN_SCHEMA = 'mira.operator.phonetic-composite-probe.v1'
 REVIEW_SCHEMA = 'mira.textbook.pinyin-initialization-operator-review.v2-composite'
@@ -67,7 +68,7 @@ def read_files(review_path):
         source = path if name == 'evidence/operator-probe-review.json' else path.parent / name.removeprefix('evidence/')
         if source.is_symlink() or source.resolve() != source:
             fail('组合小样文件不能通过链接跨目录')
-        files[name] = source.read_bytes()
+        files[name] = course_bytes(source)
     return files
 
 

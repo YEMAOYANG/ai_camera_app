@@ -36,6 +36,9 @@ def local_origin(value):
 def private_write(path, data):
     """Atomic replace, fsync, and private permissions for requests and receipts."""
     path = Path(path)
+    from services.course_file_store import course_write_bytes
+    if course_write_bytes(path, data):
+        return
     fd, temporary = tempfile.mkstemp(prefix='.authoring-', dir=path.parent)
     try:
         with os.fdopen(fd, 'wb') as stream:

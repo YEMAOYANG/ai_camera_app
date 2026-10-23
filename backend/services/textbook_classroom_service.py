@@ -1,8 +1,12 @@
 """Student access, playback progress and deterministic grading for fixed releases."""
 from datetime import datetime
+from collections import OrderedDict
 from copy import deepcopy
 import hashlib
 import json
+from pathlib import Path
+import re
+from threading import Lock
 from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
@@ -17,13 +21,19 @@ from core.errors import ApiError
 from core.security import now_ms
 from repositories.learning_repository import LearningRepository
 from repositories.textbook_repository import TextbookRepository
+from repositories.course_storage_repository import CourseStorageRepository
+from services.course_file_store import CourseFileStore, CourseFileStorageError
 
 
 RECEIPT_SCHEMA = 'mira.openmaic.student-runtime-event-receipt.v1'
+_CLASSROOM_SOURCE = Path('openmaic-runtime/.runtime/OpenMAIC/data/classrooms')
+_CLASSROOM_CACHE_BYTES = 64 * 1024 * 1024
+_CLASSROOM_CACHE_ENTRIES = 64
 
 
 class TextbookClassroomService:
-    def __init__(self, repository, *, student_auth, signing_key, public_url, budget_service=None):
+    def __init__(self, repository, *, student_auth, signing_key, public_url, budget_service=None,
+                 course_file_store=None):
         self.repository = repository
         self.learning = LearningRepository(repository.database)
         self.auth = student_auth
@@ -31,6 +41,70 @@ class TextbookClassroomService:
         self.signer = URLSafeTimedSerializer(signing_key, salt='mira-fixed-textbook-runtime-v1',
                                              signer_kwargs={'digest_method': hashlib.sha256})
         self.public_url = public_url.rstrip('/')
+        self.course_files = course_file_store or CourseFileStore(
+            repository=CourseStorageRepository(repository.database))
+        self._classroom_cache = OrderedDict()
+        self._classroom_cache_lock = Lock()
+
+    def _playback_release(self, release):
+        """Supply only verified MinIO bytes; the DB release is a frozen comparator.
+
+        Current published aliases retain the complete Native document, including
+        id/createdAt. Never trim an arbitrary document into a matching shape.
+        The bounded cache holds only remotely verified immutable versions.
+        """
+        try:
+            cid = release['classroomId']
+            expected = release['classroomSha256']
+            if (not isinstance(cid, str) or re.fullmatch(r'tbpub_[a-f0-9]{24}', cid) is None
+                    or not isinstance(expected, str) or KEY.fullmatch(expected) is None
+                    or self.course_files.config.mode != 'registry'):
+                raise ValueError('published classroom registry identity missing')
+            source = self.course_files.project_root / _CLASSROOM_SOURCE / (cid + '.json')
+            entry = self.course_files.resolve(source)
+            if entry is None or entry['mimeType'] != 'application/json':
+                raise ValueError('published classroom is not registered')
+            key = (str(source), entry['sha256'], entry['byteSize'], canonical(entry['locator']), expected)
+            with self._classroom_cache_lock:
+                cached = self._classroom_cache.get(key)
+                if cached is not None:
+                    self._classroom_cache.move_to_end(key)
+                    return {**release, 'classroom': deepcopy(cached['classroom'])}
+            raw = self.course_files.read_bytes(source, expected_sha256=entry['sha256'],
+                                               expected_bytes=entry['byteSize'])
+            if not isinstance(raw, bytes) or len(raw) != entry['byteSize']:
+                raise ValueError('published classroom bytes unavailable')
+
+            def unique_pairs(pairs):
+                value = {}
+                for name, item in pairs:
+                    if name in value:
+                        raise ValueError('duplicate published classroom JSON member')
+                    value[name] = item
+                return value
+
+            classroom = json.loads(raw, object_pairs_hook=unique_pairs,
+                parse_constant=lambda _: (_ for _ in ()).throw(ValueError('invalid JSON number')))
+            if (not isinstance(classroom, dict) or set(classroom) != {'id', 'stage', 'scenes', 'createdAt'}
+                    or classroom['id'] != cid or not isinstance(classroom['stage'], dict)
+                    or classroom['stage'].get('id') != cid or not isinstance(classroom['scenes'], list)
+                    or not classroom['scenes'] or type(classroom['createdAt']) not in {str, int}
+                    or digest(classroom) != expected or classroom != release['classroom']):
+                raise ValueError('published classroom differs from frozen release')
+            # CourseFileStore proves the raw SHA. Keep this explicit assertion
+            # at the student delivery boundary as well as its canonical seal.
+            if hashlib.sha256(raw).hexdigest() != entry['sha256']:
+                raise ValueError('published classroom raw hash differs')
+            if len(raw) <= _CLASSROOM_CACHE_BYTES:
+                with self._classroom_cache_lock:
+                    self._classroom_cache[key] = {'classroom': deepcopy(classroom), 'size': len(raw)}
+                    self._classroom_cache.move_to_end(key)
+                    while (len(self._classroom_cache) > _CLASSROOM_CACHE_ENTRIES
+                           or sum(value['size'] for value in self._classroom_cache.values()) > _CLASSROOM_CACHE_BYTES):
+                        self._classroom_cache.popitem(last=False)
+            return {**release, 'classroom': classroom}
+        except (CourseFileStorageError, ValueError, TypeError, KeyError, OSError):
+            raise ApiError('textbook_content_unavailable', '课堂内容暂时不可用，请稍后重新进入', 503) from None
 
     def _release(self, conn, key, child, *, access_scope='selected_textbook'):
         if access_scope == 'published_directory':
@@ -133,6 +207,7 @@ class TextbookClassroomService:
 
     def classroom(self, token):
         _, child, build, release, _, _ = self._authority(token)
+        release = self._playback_release(release)
         content = public_classroom(release)
         textbook_activity.attach(content, release)
         # Bind the published subject, never the operator's default roster.
@@ -159,6 +234,7 @@ class TextbookClassroomService:
         frozen = self.repository.parse(build['input_json'])
         canonical_request = None
         if data['path'] in {'/api/chat', '/api/chat/pi'}:
+            release = self._playback_release(release)
             canonical_request = discussion_request(frozen, release, data['request'])
         from services.learning_paid_authority import scope_digest
         scope = {'purpose': 'required_teaching', 'gradeCode': frozen['gradeCode'], 'subject': frozen['subject'],
@@ -343,6 +419,7 @@ class TextbookClassroomService:
 
     def play(self, token, data=None):
         _, child, _, release, course, initial_session = self._authority(token)
+        release = self._playback_release(release)
         if not textbook_activity.supported(release):
             raise ApiError('textbook_play_unavailable', '这节课没有配置该互动', 404)
         with self.repository.transaction() as conn:
@@ -375,7 +452,7 @@ class TextbookClassroomService:
         _, _, _, release, _, _ = self._authority(token)
         if not textbook_activity.supported(release):
             fail()
-        return textbook_activity.audio_file(asset)
+        return textbook_activity.audio_file(asset, release=release)
 
     def _report(self, conn, session, child, course, result):
         wrong = [r for r in result['results'] if not r['correct']]

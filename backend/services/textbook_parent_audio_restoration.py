@@ -9,19 +9,20 @@ from content.textbook_operator_revision import fail, parse, speech_index
 from core.security import now_ms
 from services.textbook_preview_audio import atomic_json
 from services.textbook_preview_visual_revision import immutable, json_bytes, persisted, verify_audio
+from services.course_file_store import course_exists, course_glob, course_is_dir, course_text
 
 
 def load_restorations(folder, context, plan):
     base = Path(folder) / 'parent-audio-restorations'
-    if not base.exists():
+    if not course_is_dir(base):
         return context
     from content.textbook_parent_audio_restoration import EVIDENCE_FILES, validate_restoration_evidence
     items = []
-    for archive in sorted(base.iterdir()):
-        if not archive.is_dir() or not (archive / 'amendment.json').exists():
+    for archive in sorted(course_glob(base)):
+        if not course_is_dir(archive) or not course_exists(archive / 'amendment.json'):
             continue
         items.append({'revisionId': archive.name, 'documents': {
-            name: json.loads((archive / name).read_text()) for name in EVIDENCE_FILES}})
+            name: json.loads(course_text(archive / name)) for name in EVIDENCE_FILES}})
     return validate_restoration_evidence(context, plan, items)
 
 
@@ -34,7 +35,7 @@ def restore_parent_audio(service, key, classroom_directory, patch):
             or not cid.startswith('tbrev_')):
         fail('只能恢复本机独立修订预览的原父录音')
     folder = root / cid / 'textbook-preview-audio'
-    plan = json.loads((folder / 'plan.json').read_text())
+    plan = json.loads(course_text(folder / 'plan.json'))
     revision = digest({'previewKey': key, 'patch': patch})
     archive = folder / 'parent-audio-restorations' / revision
     with locked(folder / 'operator.lock'), service.repository.transaction() as conn:
@@ -66,7 +67,7 @@ def restore_parent_audio(service, key, classroom_directory, patch):
         if digest(source) != patch.get('expectedSourceSha256') or digest(source) != row['classroom_sha256']:
             fail('恢复来源摘要已变化')
         current = service.runtime.get_classroom(cid)
-        if digest(json.loads((root / (cid + '.json')).read_text())) != digest(current):
+        if digest(json.loads(course_text(root / (cid + '.json')))) != digest(current):
             fail('本机课件与实际运行快照不同')
         target, segments = restoration_candidate(context, source, patch, plan)
         if digest(current) != digest(source) and persisted(current) != persisted(target):
@@ -84,7 +85,7 @@ def restore_parent_audio(service, key, classroom_directory, patch):
             raw = checked_bytes(context['archive'] / 'audio' / (request + '.wav'), segment['audioSha256'])
             immutable(root / cid / 'audio' / (request + '.wav'), raw)
             cached = checked_bytes(context['archive'] / 'asr' / (segment['asrRequestId'] + '.json'),
-                json.loads((context['archive'] / 'prepared.json').read_text())['files']['asr/' + segment['asrRequestId'] + '.json'])
+                json.loads(course_text(context['archive'] / 'prepared.json'))['files']['asr/' + segment['asrRequestId'] + '.json'])
             immutable(archive / (segment['asrRequestId'] + '.json'), cached)
             original = parent_receipts[request]
             if digest(original) != segment['ttsReceiptSha256']:
@@ -95,12 +96,12 @@ def restore_parent_audio(service, key, classroom_directory, patch):
             if existing is None:
                 receipts.append(original)
         if digest(current) == digest(source):
-            if (archive / 'save-attempt.json').exists():
+            if course_exists(archive / 'save-attempt.json'):
                 fail('上次恢复保存结果不明，不能重复发送')
             immutable(archive / 'save-attempt.json', json_bytes({'revisionId': revision, 'attemptedAt': now_ms()}))
             service.runtime.save_preview_classroom(target)
             current = service.runtime.get_classroom(cid)
-        if persisted(current) != persisted(target) or digest(json.loads((root / (cid + '.json')).read_text())) != digest(current):
+        if persisted(current) != persisted(target) or digest(json.loads(course_text(root / (cid + '.json')))) != digest(current):
             fail('原音频恢复保存未确认')
         immutable(archive / 'saved.json', json_bytes(current))
         receipt = restoration_receipt(context, source, current, patch, plan, segments)

@@ -26,6 +26,7 @@ from content.textbook_scene_contract import (PROMPT_END, PROMPT_START, SNAPSHOT_
 from integrations.openmaic_workbench_client import (OpenMaicWorkbenchClient, WorkbenchError,
                                                    local_origin, private_write)
 from services.course_reuse_resolver import lesson_scope
+from services.course_file_store import course_bytes, course_exists, course_glob, course_is_dir, course_text
 
 
 # The workbench generate_scene API accepts these five values. DSL-only widget
@@ -105,7 +106,7 @@ def material_json(path):
     try:
         if path.is_symlink():
             raise ValueError()
-        result = json.loads(path.read_text())
+        result = json.loads(course_text(path))
         if not isinstance(result, dict):
             raise ValueError()
         return result
@@ -120,8 +121,8 @@ def json_bytes(value):
 def immutable_write(path, raw):
     if path.is_symlink():
         fail('amendment_integrity_error', '修订归档不能是符号链接')
-    if path.exists():
-        if not path.is_file() or path.read_bytes() != raw:
+    if course_exists(path):
+        if course_bytes(path) != raw:
             fail('amendment_integrity_error', '既有修订归档发生变化，禁止覆盖')
     else:
         private_write(path, raw)
@@ -277,17 +278,17 @@ class TextbookWorkbenchAuthoring:
 
     def _other_artifacts(self, job):
         records = []
-        for directory in job.parent.parent.glob('teaching-*'):
+        for directory in course_glob(job.parent.parent, 'teaching-*'):
             authoring = directory / 'authoring.json'
-            if authoring.exists():
+            if course_exists(authoring):
                 try:
-                    data = json.loads(authoring.read_text())
+                    data = json.loads(course_text(authoring))
                 except (ValueError, OSError):
                     fail('existing_authoring_unreadable', '已有制作记录无法读取，须核对后复用')
                 if any(data.get(k) for k in ('sessionId', 'stageId', 'classroomId')):
                     records.append({'kind': 'authoring', 'path': str(authoring), 'status': 'review_for_reuse'})
             other = directory / 'authoring-job'
-            if other != job and (other / 'frozen.json').exists():
+            if other != job and course_exists(other / 'frozen.json'):
                 records.append({'kind': 'operator_job', 'path': str(other), 'status': 'review_for_reuse'})
         receipt = self._widget_successor_receipt(job)
         if receipt:
@@ -299,13 +300,13 @@ class TextbookWorkbenchAuthoring:
     def _empty_terminal_source(self, source, frozen, draft, state, classroom_directory):
         """Read-only, fail-closed proof for the no-assets successor route."""
         marker = source / 'dispatch.json'
-        if not marker.is_file() or not state.get('sessionId'):
+        if not course_exists(marker) or not state.get('sessionId'):
             fail('successor_parent_invalid', '父任务必须有可核验的原始派发与会话')
-        if (source / 'material-attachments').exists():
+        if (source / 'material-attachments').exists() or course_is_dir(source / 'material-attachments'):
             fail('successor_parent_has_artifacts', '父任务已有操作员附件，不能丢弃后走无素材继任')
         client = self.client_factory(self.origin, source / 'owner.cookies')
         payload, identity = self._material_payload(source, frozen, draft)
-        dispatch = json.loads(marker.read_text())
+        dispatch = json.loads(course_text(marker))
         session = client.session(state['sessionId'])
         if (dispatch.get('requestSha256') != identity['requestSha256']
                 or dispatch.get('payloadSha256') != identity['payloadSha256']
@@ -321,7 +322,7 @@ class TextbookWorkbenchAuthoring:
         if any(material.get('kind') not in {'web', 'text'} for material in materials):
             fail('successor_parent_has_artifacts', '父任务已有非文字素材，须走素材继承审核')
         root = Path(classroom_directory).resolve()
-        if not root.is_dir():
+        if not course_is_dir(root):
             fail('successor_parent_invalid', '需要真实本机课堂媒体目录以核验原素材')
         stage_id = session.get('stageId')
         if not identifier(stage_id):
@@ -335,11 +336,12 @@ class TextbookWorkbenchAuthoring:
         # A saved stage, even empty, may contain assets or a candidate receipt.
         # This narrow route never silently discards one.
         folder, exported = root / stage_id, root / (stage_id + '.json')
-        if (document is not None or exported.exists() or exported.is_symlink()
+        if (document is not None or course_exists(exported) or exported.is_symlink()
                 or folder.is_symlink()
-                or (folder.exists() and (not folder.is_dir() or any(folder.rglob('*'))))):
+                or (folder.exists() and not folder.is_dir())
+                or any(course_glob(folder, '*', recursive=True))):
             fail('successor_parent_has_artifacts', '父任务已有 stage、候选或媒体文件，不能走无素材继任')
-        if state.get('savedStages') or list(source.glob('saved-*.json')):
+        if state.get('savedStages') or list(course_glob(source, 'saved-*.json')):
             fail('successor_parent_has_artifacts', '父任务已有保存成果，不能走无素材继任')
         return {'session': session, 'materials': materials, 'events': events,
                 'classroomDirectory': str(root), 'stageId': stage_id,
@@ -347,12 +349,12 @@ class TextbookWorkbenchAuthoring:
 
     def _widget_successor_receipt(self, job, *, live=False):
         path = job / 'widget-successor.json'
-        if not path.exists():
+        if not course_exists(path):
             return None
         try:
             if path.is_symlink():
                 raise ValueError()
-            receipt = json.loads(path.read_text())
+            receipt = json.loads(course_text(path))
             body = {k: v for k, v in receipt.items() if k != 'sha256'}
             source = Path(receipt['sourceJob']).resolve()
             if (receipt.get('schemaVersion') != 'mira.operator.empty-widget-successor.v1'
@@ -360,26 +362,26 @@ class TextbookWorkbenchAuthoring:
                     or source.parent.parent != job.parent.parent or source == job
                     or source.name != 'authoring-job'
                     or not source.is_relative_to(self.output_root)
-                    or (source / 'widget-successor.json').exists()
+                    or course_exists(source / 'widget-successor.json')
                     or set(receipt['sourceFileSha256']) != {'draft.json', 'frozen.json', 'dispatch.json'}):
                 raise ValueError()
             for name, expected in receipt['sourceFileSha256'].items():
                 if name not in {'draft.json', 'frozen.json', 'dispatch.json'}:
                     raise ValueError()
                 original, archived = source / name, job / 'predecessor' / name
-                if (original.is_symlink() or archived.is_symlink() or sha(original.read_bytes()) != expected
-                        or archived.read_bytes() != original.read_bytes()):
+                if (original.is_symlink() or archived.is_symlink() or sha(course_bytes(original)) != expected
+                        or course_bytes(archived) != course_bytes(original)):
                     raise ValueError()
             source_frozen, source_draft, source_state = self._load(source)
-            target = json.loads((job / 'draft.json').read_text())
-            if (sha((job / 'draft.json').read_bytes()) != receipt['targetDraftSha256']
-                    or sha((job / 'frozen.json').read_bytes()) != receipt['targetFrozenSha256']
+            target = json.loads(course_text(job / 'draft.json'))
+            if (sha(course_bytes(job / 'draft.json')) != receipt['targetDraftSha256']
+                    or sha(course_bytes(job / 'frozen.json')) != receipt['targetFrozenSha256']
                     or widget_successor_diff(source_draft, target) != receipt['change']):
                 raise ValueError()
-            pointer = json.loads((source / 'widget-successor-intent.json').read_text())
+            pointer = json.loads(course_text(source / 'widget-successor-intent.json'))
             if pointer != receipt['intent'] or pointer['targetJob'] != str(job):
                 raise ValueError()
-            evidence_raw = (job / 'predecessor/terminal-empty-source.json').read_bytes()
+            evidence_raw = course_bytes(job / 'predecessor/terminal-empty-source.json')
             if sha(evidence_raw) != receipt['sourceEvidenceSha256']:
                 raise ValueError()
             evidence = json.loads(evidence_raw)
@@ -402,9 +404,9 @@ class TextbookWorkbenchAuthoring:
             frozen, original, state = self._load(source)
             if (frozen['schemaVersion'] != 'mira.operator.workbench-authoring.v3'
                     or frozen['draftSha256'] != expected_source_draft_sha256
-                    or (source / 'widget-successor.json').exists()):
+                    or course_exists(source / 'widget-successor.json')):
                 fail('successor_parent_invalid', '只允许原始 v3 父任务及准确草稿摘要')
-            raw = Path(draft_path).read_bytes()
+            raw = course_bytes(Path(draft_path))
             corrected = json.loads(raw)
             change = widget_successor_diff(original, corrected)
             job = self._path(corrected['binding'], teaching_revision)
@@ -417,7 +419,7 @@ class TextbookWorkbenchAuthoring:
             evidence = self._empty_terminal_source(source, frozen, original, state, classroom_directory)
             intent = {'sourceJob': str(source), 'targetJob': str(job),
                       'sourceDraftSha256': expected_source_draft_sha256,
-                      'sourceFileSha256': {name: sha((source / name).read_bytes())
+                      'sourceFileSha256': {name: sha(course_bytes(source / name))
                                           for name in ('draft.json', 'frozen.json', 'dispatch.json')},
                       'targetDraftSha256': sha(raw), 'reviewer': reviewer, 'basis': basis, 'change': change}
             immutable_write(source / 'widget-successor-intent.json', json_bytes(intent))
@@ -432,7 +434,7 @@ class TextbookWorkbenchAuthoring:
             archive.mkdir(mode=0o700, exist_ok=True)
             source_hashes = {}
             for name in ('draft.json', 'frozen.json', 'dispatch.json'):
-                data = (source / name).read_bytes()
+                data = course_bytes(source / name)
                 if sha(data) != intent['sourceFileSha256'][name]:
                     fail('successor_parent_changed', '父冻结文件在审核后改变，停止继任准备')
                 immutable_write(archive / name, data)
@@ -441,12 +443,12 @@ class TextbookWorkbenchAuthoring:
             immutable_write(archive / 'terminal-empty-source.json', evidence_bytes)
             body = {'schemaVersion': 'mira.operator.empty-widget-successor.v1', **intent,
                     'sourceFileSha256': source_hashes, 'sourceEvidenceSha256': sha(evidence_bytes),
-                    'targetFrozenSha256': sha((job / 'frozen.json').read_bytes()),
+                    'targetFrozenSha256': sha(course_bytes(job / 'frozen.json')),
                     'intent': intent}
             immutable_write(job / 'widget-successor.json', json_bytes({**body, 'sha256': digest(body)}))
             self._widget_successor_receipt(job, live=True)
             target_frozen, _, target_state = self._load(job)
-            if (job / 'dispatch.json').exists():
+            if course_exists(job / 'dispatch.json'):
                 return self._summary(job, target_frozen, target_state)
             target_state.update(status='prepared', existingArtifacts=[],
                                 message='无素材父任务已终止并归档；仅修正一处渲染枚举，继任尚未派发')
@@ -454,7 +456,7 @@ class TextbookWorkbenchAuthoring:
             return self._summary(job, target_frozen, target_state)
 
     def prepare(self, draft_path, *, teaching_revision='1'):
-        raw = Path(draft_path).read_bytes()
+        raw = course_bytes(Path(draft_path))
         try:
             draft = json.loads(raw)
         except (ValueError, UnicodeError):
@@ -464,7 +466,7 @@ class TextbookWorkbenchAuthoring:
         if binding.get('teachingRevision', str(teaching_revision)) != str(teaching_revision):
             fail('teaching_revision_mismatch', '草案与指定教学版本不一致')
         with self._locked(self._path(binding, teaching_revision)) as job:
-            if (job / 'frozen.json').exists():
+            if course_exists(job / 'frozen.json'):
                 frozen, _, state = self._load(job)
                 if frozen['draftSha256'] != sha(raw) or frozen['origin'] != self.origin:
                     fail('draft_already_frozen', '本教学版本已有不同的冻结请求；禁止覆盖或另派发')
@@ -500,31 +502,31 @@ class TextbookWorkbenchAuthoring:
     def _amendment_records(self, job, *, ignore=None):
         """Any incomplete archive is a dispatch fence, even before live writes."""
         folder = job / 'amendments'
-        if folder.is_symlink():
+        if folder.is_symlink() or (folder.exists() and not folder.is_dir()):
             fail('amendment_integrity_error', '修订归档目录不能是符号链接')
         records = {}
-        if not folder.exists():
+        if not course_is_dir(folder):
             return records
-        for archive in folder.iterdir():
+        for archive in course_glob(folder):
             if archive.name == ignore:
                 continue
-            if archive.is_symlink() or not archive.is_dir() or not re.fullmatch('[0-9a-f]{64}', archive.name):
+            if archive.is_symlink() or not course_is_dir(archive) or not re.fullmatch('[0-9a-f]{64}', archive.name):
                 fail('amendment_integrity_error', '修订归档目录无效')
             intent = self._amendment_intent(archive)
             if intent['sourceEvidence'] != self._source_evidence(job,
                     draft=json.loads(intent['files']['source-draft.json']),
                     frozen=json.loads(intent['files']['source-frozen.json'])):
                 fail('amendment_integrity_error', '修订保留的官方来源材料发生变化，禁止派发')
-            if not (archive / 'receipt.json').exists():
+            if not course_exists(archive / 'receipt.json'):
                 fail('amendment_pending', '草稿修订未完成；只能用同一 amend 请求恢复，禁止派发')
             try:
-                receipt = json.loads((archive / 'receipt.json').read_text())
+                receipt = json.loads(course_text(archive / 'receipt.json'))
                 if (archive.joinpath('receipt.json').is_symlink()
                         or receipt != self._amendment_receipt(intent, receipt['completedAt'])):
                     raise ValueError()
                 for name, raw in intent['files'].items():
                     file = archive / name
-                    if file.is_symlink() or file.read_bytes() != raw.encode():
+                    if file.is_symlink() or course_bytes(file) != raw.encode():
                         raise ValueError()
             except (OSError, ValueError, KeyError, TypeError):
                 fail('amendment_integrity_error', '修订归档或完成收据不一致，禁止派发')
@@ -535,9 +537,9 @@ class TextbookWorkbenchAuthoring:
     def _amendment_intent(archive):
         try:
             path = archive / 'intent.json'
-            if not path.exists():
+            if not course_exists(path):
                 fail('amendment_pending', '草稿修订尚未完成，禁止派发')
-            intent = json.loads(path.read_text())
+            intent = json.loads(course_text(path))
             identity = intent['identity']
             if (path.is_symlink() or digest(identity) != archive.name
                     or intent['sha256'] != digest({k: v for k, v in intent.items() if k != 'sha256'})
@@ -569,10 +571,10 @@ class TextbookWorkbenchAuthoring:
     def _load(self, job, *, ignore_amendment=None):
         amendments = self._amendment_records(job, ignore=ignore_amendment)
         try:
-            frozen = json.loads((job / 'frozen.json').read_text())
-            raw = (job / 'draft.json').read_bytes()
+            frozen = json.loads(course_text(job / 'frozen.json'))
+            raw = course_bytes(job / 'draft.json')
             draft = json.loads(raw)
-            state = json.loads((job / 'state.json').read_text()) if (job / 'state.json').exists() else {'status': 'dispatch_unknown'}
+            state = json.loads(course_text(job / 'state.json')) if course_exists(job / 'state.json') else {'status': 'dispatch_unknown'}
         except (OSError, ValueError, UnicodeError):
             fail('job_invalid', '冻结记录不可读，禁止重新派发')
         schema = frozen.get('schemaVersion')
@@ -596,7 +598,7 @@ class TextbookWorkbenchAuthoring:
         heads = set(amendments) - parents
         if amendments:
             head = frozen.get('draftAmendmentId')
-            if heads != {head} or amendments[head]['files']['target-frozen.json'].encode() != (job / 'frozen.json').read_bytes():
+            if heads != {head} or amendments[head]['files']['target-frozen.json'].encode() != course_bytes(job / 'frozen.json'):
                 fail('amendment_integrity_error', '当前冻结草稿不是修订链的最后版本')
             for intent in amendments.values():
                 parent = json.loads(intent['files']['source-frozen.json']).get('draftAmendmentId')
@@ -627,20 +629,20 @@ class TextbookWorkbenchAuthoring:
         """Only exact bound source review and the original draft may be siblings."""
         records, allowed = [], set()
         sources = job.parent / 'sources'
-        if sources.exists() or sources.is_symlink():
+        if sources.exists() or course_is_dir(sources) or sources.is_symlink():
             reference = draft.get('sourceReview')
             if not isinstance(reference, str) or not reference or '..' in Path(reference).parts:
                 fail('amendment_existing_artifact', '同课来源须由原冻结草稿精确绑定')
             source = Path(reference)
             if not source.is_absolute():
                 source = Path(__file__).resolve().parents[2] / source
-            if (sources.is_symlink() or not sources.is_dir() or source.is_symlink()
-                    or source.parent != sources or not source.is_file() or source.suffix != '.json'
+            if (sources.is_symlink() or not course_is_dir(sources) or source.is_symlink()
+                    or source.parent != sources or not course_exists(source) or source.suffix != '.json'
                     or source.name.startswith('.') or re.search(
                         r'(dispatch|owner|cookie|session|stage|classroom|receipt|audio|generated)', source.name, re.I)
-                    or any(path != source or path.is_symlink() for path in sources.iterdir())):
+                    or any(path != source or path.is_symlink() for path in course_glob(sources))):
                 fail('amendment_existing_artifact', '同课来源目录只能包含绑定的普通审查文件')
-            raw = source.read_bytes()
+            raw = course_bytes(source)
             try:
                 review = json.loads(raw)
             except (ValueError, UnicodeError):
@@ -651,10 +653,10 @@ class TextbookWorkbenchAuthoring:
             allowed.add(sources)
             records.append({'path': '../sources/' + source.name, 'sha256': sha(raw), 'bytes': len(raw)})
         original = job.parent / 'preauthoring-candidate.json'
-        if original.exists() or original.is_symlink():
-            if original.is_symlink() or not original.is_file():
+        if course_exists(original) or original.is_symlink():
+            if original.is_symlink() or not course_exists(original):
                 fail('amendment_existing_artifact', '原始草稿副本必须是普通文件')
-            raw = original.read_bytes()
+            raw = course_bytes(original)
             if sha(raw) != self._initial_draft_sha(job, frozen):
                 fail('amendment_existing_artifact', '同课原始草稿不是冻结链中的原字节')
             allowed.add(original)
@@ -667,15 +669,15 @@ class TextbookWorkbenchAuthoring:
         if folder.is_symlink() or (folder.exists() and not folder.is_dir()):
             fail('amendment_existing_artifact', '来源材料目录必须是本地普通目录')
         records = []
-        for path in sorted(folder.rglob('*')) if folder.exists() else []:
+        for path in sorted(course_glob(folder, '*', recursive=True)) if course_is_dir(folder) else []:
             if (path.is_symlink() or path.name.startswith('.') or re.search(
                     r'(dispatch|owner|cookie|session|stage|classroom|receipt|audio|generated)', path.name, re.I)):
                 fail('amendment_existing_artifact', '来源材料不能包含链接、运行身份、派发记录或生成成果')
-            if path.is_dir():
+            if course_is_dir(path):
                 continue
-            if not path.is_file() or path.suffix.lower() not in {'.json', '.txt', '.html', '.pdf', '.png', '.jpg', '.jpeg', '.webp'}:
+            if not course_exists(path) or path.suffix.lower() not in {'.json', '.txt', '.html', '.pdf', '.png', '.jpg', '.jpeg', '.webp'}:
                 fail('amendment_existing_artifact', '来源材料包含未知文件类型')
-            raw = path.read_bytes()
+            raw = course_bytes(path)
             records.append({'path': path.relative_to(job).as_posix(), 'sha256': sha(raw), 'bytes': len(raw)})
         if draft is not None and frozen is not None:
             sibling_records, _ = self._lesson_source_evidence(job, draft, frozen)
@@ -695,8 +697,8 @@ class TextbookWorkbenchAuthoring:
                                   candidate_path.name, re.I)):
             allowed.add(candidate_path.name)
         _, sibling_sources = self._lesson_source_evidence(job, draft, frozen)
-        if (any(path.name not in allowed or path.is_symlink() for path in job.iterdir())
-                or any(path not in {job, *sibling_sources} for path in job.parent.iterdir())):
+        if (any(path.name not in allowed or path.is_symlink() for path in course_glob(job))
+                or any(path not in {job, *sibling_sources} for path in course_glob(job.parent))):
             fail('amendment_existing_artifact', '已有派发/owner/保存成果或未知工作文件，禁止修订冻结草稿')
         return self._source_evidence(job, draft=draft, frozen=frozen)
 
@@ -706,7 +708,7 @@ class TextbookWorkbenchAuthoring:
                 or any(not isinstance(v, str) or not v.strip() for v in (reviewer, basis))):
             fail('amendment_invalid', '需要原草稿 SHA256、审核人和具体修订依据')
         candidate_path = Path(draft_path).resolve()
-        raw = candidate_path.read_bytes()
+        raw = course_bytes(candidate_path)
         try:
             new = json.loads(raw)
         except (ValueError, UnicodeError):
@@ -721,16 +723,16 @@ class TextbookWorkbenchAuthoring:
             archive = job / 'amendments' / revision
             if archive.is_symlink() or (job / 'amendments').is_symlink():
                 fail('amendment_integrity_error', '修订归档目录不能是符号链接')
-            if (archive / 'intent.json').exists():
+            if course_exists(archive / 'intent.json'):
                 intent = self._amendment_intent(archive)
                 if intent['identity'] != identity or intent['files']['target-draft.json'].encode() != raw:
                     fail('amendment_conflict', '修订恢复参数与原意图不同')
                 frozen = json.loads(intent['files']['source-frozen.json'])
                 old = json.loads(intent['files']['source-draft.json'])
-                state = json.loads((job / 'state.json').read_text())
+                state = json.loads(course_text(job / 'state.json'))
                 self._amendment_records(job, ignore=revision)
                 for name in ('draft', 'frozen', 'state'):
-                    current = (job / f'{name}.json').read_bytes()
+                    current = course_bytes(job / f'{name}.json')
                     if current not in {intent['files'][f'{side}-{name}.json'].encode() for side in ('source', 'target')}:
                         fail('amendment_conflict', '当前文件已偏离归档中的原稿/新稿，禁止覆盖')
             else:
@@ -762,7 +764,7 @@ class TextbookWorkbenchAuthoring:
                 self._base_dispatch_payload(revised, new)
                 revised_state = {**state, 'draftAmendmentId': revision, 'updatedAt': timestamp(),
                                  'message': '冻结草稿修订完成，尚未派发'}
-                files = {f'source-{name}.json': (job / f'{name}.json').read_bytes().decode()
+                files = {f'source-{name}.json': course_bytes(job / f'{name}.json').decode()
                          for name in ('draft', 'frozen', 'state')}
                 files.update({'target-draft.json': raw.decode(), 'target-frozen.json': json_bytes(revised).decode(),
                               'target-state.json': json_bytes(revised_state).decode()})
@@ -780,10 +782,10 @@ class TextbookWorkbenchAuthoring:
                 immutable_write(archive / 'intent.json', json_bytes(intent))
             for name, content in intent['files'].items():
                 immutable_write(archive / name, content.encode())
-            if (archive / 'receipt.json').exists():
+            if course_exists(archive / 'receipt.json'):
                 current_frozen, _, current_state = self._load(job)
                 return {**self._summary(job, current_frozen, current_state),
-                        'amendment': json.loads((archive / 'receipt.json').read_text())}
+                        'amendment': json.loads(course_text(archive / 'receipt.json'))}
             for name in ('draft', 'frozen', 'state'):
                 private_write(job / f'{name}.json', intent['files'][f'target-{name}.json'].encode())
             receipt = self._amendment_receipt(intent, timestamp())
@@ -794,7 +796,7 @@ class TextbookWorkbenchAuthoring:
     @staticmethod
     def _material_manifest(path, frozen):
         path = Path(path).resolve()
-        raw = path.read_bytes()
+        raw = course_bytes(path)
         data = material_json(path)
         assets = data.get('assets')
         if (data.get('schemaVersion') != 'mira.operator.material-attachments.v1'
@@ -816,10 +818,10 @@ class TextbookWorkbenchAuthoring:
                 fail('material_manifest_invalid', '附件需要唯一 assetKey、路径、SHA256、合法 MIME；PNG 需要真实尺寸')
             seen.add(key)
             source = path.parent / asset['path']
-            if source.is_symlink() or not source.is_file():
+            if source.is_symlink() or not course_exists(source):
                 fail('material_source_invalid', '附件来源必须是本地普通文件')
             source = source.resolve()
-            body = source.read_bytes()
+            body = course_bytes(source)
             if (not body or len(body) > 50 * 1024 * 1024 or sha(body) != asset['sha256']
                     or ('byteSize' in asset and (type(asset['byteSize']) is not int or asset['byteSize'] != len(body)))):
                 fail('material_source_changed', '附件原字节、摘要或长度与审核清单不符')
@@ -851,7 +853,7 @@ class TextbookWorkbenchAuthoring:
         folder = job / 'material-attachments'
         if folder.is_symlink() or (folder.exists() and not folder.is_dir()):
             fail('material_integrity_error', '附件归档目录无效')
-        if not folder.exists():
+        if not course_is_dir(folder):
             return None
         manifest = material_json(folder / 'manifest.json')
         if (manifest.get('sha256') != digest({k: v for k, v in manifest.items() if k != 'sha256'})
@@ -904,7 +906,7 @@ class TextbookWorkbenchAuthoring:
         if manifest is None:
             return payload, dispatch_frozen
         folder = job / 'material-attachments'
-        if not (folder / 'ready.json').exists():
+        if not course_exists(folder / 'ready.json'):
             fail('material_attachments_not_ready', '首轮附件尚未全部上传并核验，禁止派发')
         ready = material_json(folder / 'ready.json')
         owner = material_json(folder / 'owner.json')
@@ -913,7 +915,7 @@ class TextbookWorkbenchAuthoring:
         receipts, material_ids, titles, bindings = {}, [], {}, []
         for asset in manifest['assets']:
             snapshot = folder / asset['file']
-            if snapshot.is_symlink() or not snapshot.is_file() or sha(snapshot.read_bytes()) != asset['sha256']:
+            if snapshot.is_symlink() or not course_exists(snapshot) or sha(course_bytes(snapshot)) != asset['sha256']:
                 fail('material_source_changed', '冻结附件字节已改变，禁止派发')
             intent = material_json(folder / (asset['assetKey'] + '-intent.json'))
             receipt = material_json(folder / (asset['assetKey'] + '-receipt.json'))
@@ -962,7 +964,7 @@ class TextbookWorkbenchAuthoring:
             payload = self._base_dispatch_payload(frozen, draft)
             dispatch_frozen = {**frozen, 'requestSha256': sha(payload['prompt'].encode()),
                                'payloadSha256': digest(payload)}
-            if ((job / 'dispatch.json').exists() or state.get('sessionId')
+            if (course_exists(job / 'dispatch.json') or state.get('sessionId')
                     or state.get('status') != 'prepared' or state.get('existingArtifacts')):
                 fail('materials_not_prepared', '只有尚未派发的 prepared 草稿可绑定首轮附件')
             proposed = self._material_manifest(manifest_path, frozen)
@@ -981,8 +983,8 @@ class TextbookWorkbenchAuthoring:
             folder.mkdir(mode=0o700, exist_ok=True)
             immutable_write(folder / 'manifest.json', json_bytes(proposed))
             for asset in proposed['assets']:
-                immutable_write(folder / asset['file'], Path(asset['sourcePath']).read_bytes())
-                if sha((folder / asset['file']).read_bytes()) != asset['sha256']:
+                immutable_write(folder / asset['file'], course_bytes(Path(asset['sourcePath'])))
+                if sha(course_bytes(folder / asset['file'])) != asset['sha256']:
                     fail('material_source_changed', '复制时附件来源改变，停止上传')
             owner_path = folder / 'owner.json'
             client = self.client_factory(self.origin, job / 'owner.cookies')
@@ -1004,17 +1006,17 @@ class TextbookWorkbenchAuthoring:
                 intent = self._upload_intent(proposed, owner, asset)
                 intent_path = folder / (asset['assetKey'] + '-intent.json')
                 receipt_path = folder / (asset['assetKey'] + '-receipt.json')
-                if receipt_path.exists():
+                if course_exists(receipt_path):
                     receipt = material_json(receipt_path)
                     if (material_json(intent_path) != intent or receipt.get('intentSha256') != digest(intent)
                             or not self._valid_upload(receipt.get('response'), asset, intent['requestId'])):
                         fail('material_integrity_error', '已有附件回执不一致，禁止重传')
                     continue
-                if intent_path.exists():
+                if course_exists(intent_path):
                     state.update(materialsStatus='upload_unknown', message='存在无回执的上传意图，禁止重复上传或派发')
                     self._save_state(job, state)
                     fail('material_upload_unknown', '素材上传结果未知；服务端暂无 owner 素材摘要查询，保留意图，禁止重传')
-                raw = (folder / asset['file']).read_bytes()
+                raw = course_bytes(folder / asset['file'])
                 if len(raw) != asset['bytes'] or sha(raw) != asset['sha256']:
                     fail('material_source_changed', '上传前冻结附件字节已改变，停止上传')
                 immutable_write(intent_path, json_bytes(intent))
@@ -1135,7 +1137,13 @@ class TextbookWorkbenchAuthoring:
             if not document['scenes']:
                 continue  # A session's empty placeholder is not an authored lesson.
             path = job / ('saved-' + stage_id + '.json')
-            write_json(path, document)
+            if course_exists(path):
+                # Capture the CAS version before a running session advances.
+                # Published/terminal snapshots are protected by the writer.
+                if json.loads(course_text(path)) != document:
+                    write_json(path, document)
+            else:
+                write_json(path, document)
             stages.append({'stageId': stage_id, 'sceneCount': len(document['scenes']), 'sha256': digest(document),
                            'path': str(path), 'provenance': provenance, 'url': self.origin + '/classroom/' + stage_id})
         state['savedStages'] = stages
@@ -1147,9 +1155,9 @@ class TextbookWorkbenchAuthoring:
         with self._locked(job_path) as job:
             frozen, draft, state = self._load(job)
             marker_path = job / 'dispatch.json'
-            if state['status'] == 'reuse_review_required' and not marker_path.exists():
+            if state['status'] == 'reuse_review_required' and not course_exists(marker_path):
                 return self._summary(job, frozen, state)
-            if not start and not marker_path.exists() and not state.get('sessionId'):
+            if not start and not course_exists(marker_path) and not state.get('sessionId'):
                 return self._summary(job, frozen, state)
             payload, dispatch_frozen = self._material_payload(job, frozen, draft)
             client = self.client_factory(self.origin, job / 'owner.cookies')
@@ -1159,8 +1167,8 @@ class TextbookWorkbenchAuthoring:
                 if (dispatch_frozen.get('materialsOwnerFingerprint') is not None
                         and dispatch_frozen['materialsOwnerFingerprint'] != client.owner_fingerprint()):
                     fail('material_owner_changed', '附件原 owner 不匹配，禁止派发或恢复')
-                if marker_path.exists():
-                    marker = json.loads(marker_path.read_text())
+                if course_exists(marker_path):
+                    marker = json.loads(course_text(marker_path))
                     if (marker.get('requestSha256') != dispatch_frozen['requestSha256']
                             or marker.get('ownerFingerprint') != client.owner_fingerprint()
                             or marker.get('payloadSha256') != dispatch_frozen['payloadSha256']
@@ -1210,7 +1218,7 @@ class TextbookWorkbenchAuthoring:
                 state.update(error=exc.code, message=str(exc))
                 if exc.http_status is not None:
                     state['httpStatus'] = exc.http_status
-                if marker_path.exists() and not state.get('sessionId'):
+                if course_exists(marker_path) and not state.get('sessionId'):
                     state['status'] = 'dispatch_unknown'
             self._save_state(job, state)
             return self._summary(job, frozen, state)

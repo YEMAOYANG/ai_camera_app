@@ -19,17 +19,18 @@ from content.textbook_asr_source_reuse import (
 from content.textbook_preview_audio_contract import asr_request_id, compare_transcript
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from core.security import now_ms
+from services.course_file_store import course_bytes, course_exists, course_glob, course_is_dir, course_text
 
 
 def read(path):
-    return json.loads(Path(path).read_text())
+    return json.loads(course_text(Path(path)))
 
 
 def immutable(path, value):
     path = Path(path); path.parent.mkdir(parents=True, exist_ok=True)
     raw = canonical(value).encode()
-    if path.exists():
-        if path.read_bytes() != raw: raise RuntimeError('Immutable ASR origin evidence conflict')
+    if course_exists(path):
+        if course_bytes(path) != raw: raise RuntimeError('Immutable ASR origin evidence conflict')
         return
     with path.open('xb') as out:
         out.write(raw); out.flush(); os.fsync(out.fileno())
@@ -45,14 +46,14 @@ def inventory_attempts(native_root, probe_roots, facts):
     successful reuse still requires the separate portable validator.
     """
     native_root = Path(native_root).resolve(); attempts = {}
-    if not (native_root / 'jobs/asr').is_dir() or not (native_root / 'jobs/tts').is_dir():
+    if not course_is_dir(native_root / 'jobs/asr') or not course_is_dir(native_root / 'jobs/tts'):
         raise RuntimeError('Actual managed Native job history is required')
-    for path in (native_root / 'jobs/asr').glob('*.json'):
+    for path in course_glob(native_root / 'jobs/asr', '*.json'):
         job = read(path)
         tts_id = job.get('ttsRequestId')
         if not isinstance(tts_id, str): continue
         tts_path = native_root / 'jobs/tts' / (sha(tts_id.encode()) + '.json')
-        if not tts_path.is_file():
+        if not course_exists(tts_path):
             if job.get('audioSha256') == sha(facts['audio']): raise RuntimeError('Matching historical ASR has no TTS identity')
             continue
         tts = read(tts_path)
@@ -63,12 +64,12 @@ def inventory_attempts(native_root, probe_roots, facts):
         attempts[rid] = {'kind': 'native-durable-job', 'job': job, 'tts': tts}
     for root in probe_roots:
         root = Path(root).resolve()
-        if not root.is_dir(): raise RuntimeError('Declared probe history root is missing')
-        for path in root.rglob('intent.json'):
+        if not course_is_dir(root): raise RuntimeError('Declared probe history root is missing')
+        for path in course_glob(root, 'intent.json', recursive=True):
             intent = read(path)
             if intent.get('schemaVersion') != 'mira.operator.probe-asr-intent.v1': continue
             req_path = path.parent / 'request.json'
-            if not req_path.is_file(): raise RuntimeError('Original ASR intent has no immutable request')
+            if not course_exists(req_path): raise RuntimeError('Original ASR intent has no immutable request')
             request = read(req_path)
             try:
                 encoded = request['input']['messages'][0]['content'][0]['audio']
@@ -78,8 +79,8 @@ def inventory_attempts(native_root, probe_roots, facts):
             if len(audio) < 44 or sha(audio[44:]) != facts['receipt']['pcmSha256']: continue
             rid = intent.get('requestId')
             if not isinstance(rid, str) or not rid: raise RuntimeError('Historical probe claim missing ID')
-            evidence = {'kind': 'probe-dispatch-intent', 'intent': intent, 'requestSha256': sha(req_path.read_bytes())}
-            if (path.parent / 'receipt.json').is_file(): evidence['receipt'] = read(path.parent / 'receipt.json')
+            evidence = {'kind': 'probe-dispatch-intent', 'intent': intent, 'requestSha256': sha(course_bytes(req_path))}
+            if course_exists(path.parent / 'receipt.json'): evidence['receipt'] = read(path.parent / 'receipt.json')
             if rid in attempts and attempts[rid] != evidence: raise RuntimeError('Conflicting original ASR identities')
             attempts[rid] = evidence
     return attempts
@@ -99,9 +100,9 @@ class PcmLedger:
         rid = failed['failedRequestId']
         job = self.native_root / 'jobs/asr' / (sha(rid.encode()) + '.json')
         cache = self.routine_cache_directory / (rid + '.json') if self.routine_cache_directory is not None else None
-        if (job.is_symlink() or not job.is_file() or job.read_bytes() != failed['failedJobRaw']
-                or cache is None or cache.is_symlink() or not cache.is_file()
-                or cache.read_bytes() != failed['failedCacheRaw']):
+        if (job.is_symlink() or not course_exists(job) or course_bytes(job) != failed['failedJobRaw']
+                or cache is None or cache.is_symlink() or not course_exists(cache)
+                or course_bytes(cache) != failed['failedCacheRaw']):
             raise RuntimeError('Original failed ASR job/cache bytes changed or are not retained')
         return {rid}
 
@@ -113,7 +114,7 @@ class PcmLedger:
             immutable(group / 'identity.json', {'schemaVersion':'mira.textbook.asr-pcm-identity.v1',
                 'pcmKey':facts['pcmKey'],'audioSha256':sha(facts['audio']), 'text':facts['text'],'providerBody':facts['body']})
             history = inventory_attempts(self.native_root, self.probe_roots, facts)
-            for path in (group/'claims').glob('*/intent.json') if (group/'claims').exists() else ():
+            for path in course_glob(group/'claims', '*/intent.json') if course_is_dir(group/'claims') else ():
                 item=read(path);history.setdefault(item['requestId'], {'kind':'operator-claim','intent':item})
             immutable(group/'history'/(digest(history)+'.json'),history)
             retained = {x['requestId'] for x in facts['attempts']} | self._recovery_history(facts)
@@ -172,7 +173,7 @@ class PcmLedger:
                     'receipt': old['receipt']})
             # Immutable import snapshots retain even historical third attempts.
             immutable(group / 'history' / (digest(history) + '.json'), history)
-            for path in (group / 'claims').glob('*/intent.json') if (group / 'claims').exists() else ():
+            for path in course_glob(group / 'claims', '*/intent.json') if course_is_dir(group / 'claims') else ():
                 item = read(path); history.setdefault(item['requestId'], {'kind': 'operator-claim', 'intent': item})
             count = len(facts['attempts'])
             if count > 1: raise RuntimeError('One routine and one recheck already retained; no further call')
@@ -187,12 +188,12 @@ class PcmLedger:
             request = formal_request(source, plan, classroom_id, rid)
             # Policy version selects the response validator, not an HTTP field.
             # Native derives the actual pronunciation from the original TTS job.
-            prior = read(claim / 'intent.json') if (claim / 'intent.json').exists() else None
+            prior = read(claim / 'intent.json') if course_exists(claim / 'intent.json') else None
             if prior is not None and (prior['request'] != request or prior['originSha256'] != digest(origin)):
                 raise RuntimeError('Prior shared claim has a different original request')
             response = None
             version = own['policy']['policyVersion']
-            if (claim / 'response.json').exists():
+            if course_exists(claim / 'response.json'):
                 response = read(claim / 'response.json')
             else:
                 found = None
@@ -222,7 +223,7 @@ class PcmLedger:
                     immutable(claim / 'intent.json', intent)
                     response = client._request_formal_audio_json('POST', '/api/mira/formal-audio/asr', request)
                 immutable(claim / 'response.json', response)
-            if (claim / 'recovery.json').exists():
+            if course_exists(claim / 'recovery.json'):
                 recovered = read(claim / 'recovery.json')
                 expected = {**recovered['durableGet'], 'transcript': recovered['transcriptArchive']['transcript'],
                             'completionUsable': True}

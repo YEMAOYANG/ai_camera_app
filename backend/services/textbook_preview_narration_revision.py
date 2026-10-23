@@ -27,11 +27,13 @@ from content.textbook_pinyin_pronunciation import (PLAN_SCHEMA as PINYIN_SCHEMA,
 from content.textbook_interactive_narration import interactive_cues, without_audio_helper
 from content.textbook_preview import cue_speech, preview_checks
 from core.errors import ApiError
+from services.textbook_preview_revision_transaction import PreviewRevisionTransaction
 from core.security import now_ms
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from services.learning_media_materialization_service import asr_similarity_bps
 from services.textbook_preview_audio import atomic_json, bind_cue_audio, core_content
 from services.textbook_preview_visual_revision import immutable, json_bytes, persisted, sha_bytes, verify_audio
+from services.course_file_store import course_bytes, course_exists, course_text
 
 SCHEMA = 'mira.textbook.preview-narration-revision.v1'
 SCHEMA_V2 = 'mira.textbook.preview-narration-revision.v2'
@@ -133,7 +135,7 @@ def preserve_source_preview_freeze(service, root, archive, row, source_row, orig
         return snapshot_id if value == row['classroom_id'] else value
 
     snapshot = service.runtime.get_classroom(snapshot_id)
-    local = json.loads((root / (snapshot_id + '.json')).read_text())
+    local = json.loads(course_text(root / (snapshot_id + '.json')))
     if (digest(snapshot) != descriptor['snapshotSha256'] or snapshot != local
             or persisted(snapshot) != persisted(replace_identity(original))):
         fail('验收预览快照未精确对应原课件，不能恢复旁白修订')
@@ -375,7 +377,7 @@ def _check_archive(archive, intent):
     if intent.get('sha256') != digest({k: v for k, v in intent.items() if k != 'sha256'}):
         fail('修订意图摘要已变化')
     for name, sha in intent['files'].items():
-        if sha_bytes((archive / name).read_bytes()) != sha:
+        if sha_bytes(course_bytes(archive / name)) != sha:
             fail('已归档的原文、配音记录或失败审核已变化')
 
 
@@ -389,17 +391,18 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
         fail('只能修订本机未发布课件的配音')
     root = Path(classroom_directory).resolve()
     folder = root / cid / 'textbook-preview-audio'
-    if not (folder / 'plan.json').is_file():
+    if not course_exists(folder / 'plan.json'):
         fail('原始配音计划不存在')
-    audit_raw = Path(failed_audit_path).read_bytes()
+    audit_raw = course_bytes(Path(failed_audit_path))
     revision_id = digest({'previewKey': key, 'patch': patch, 'failedAuditSha256': sha_bytes(audit_raw)})
     archive = folder / 'narration-revisions' / revision_id
+    folder.mkdir(parents=True, exist_ok=True)
     with (folder / 'operator.lock').open('a') as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             fail('课件正在配音或修订，请等待已有任务结束')
-        with service.repository.transaction() as conn:
+        with PreviewRevisionTransaction(service.repository, key, fail, root / (cid + '.json')) as conn:
             row = conn.execute('SELECT * FROM learning_textbook_course_previews WHERE preview_key=? FOR UPDATE', (key,)).fetchone()
             if row['status'] != 'preview_ready' or row['runtime_origin'] != service.runtime.base_url:
                 fail('请先完成原课件全部配音和结构检查')
@@ -407,14 +410,15 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                                      (row['edition_id'], row['node_id'])).fetchall()
             if any(service.repository.parse(b['input_json']).get('previewKey') == key for b in published):
                 fail('已发布课件不能原地替换旁白')
+            conn.release(row)
             intent_path = archive / 'intent.json'
-            if not intent_path.exists():
+            if not course_exists(intent_path):
                 source = service.repository.parse(row['classroom_json'])
                 result = service.repository.parse(row['result_json'])
                 if digest(source) != row['classroom_sha256'] or row['classroom_sha256'] != patch['expectedSourceSha256']:
                     fail('课件已变化，请针对当前版本重新准备修订')
                 if (digest(service.runtime.get_classroom(cid)) != digest(source)
-                        or digest(json.loads((root / (cid + '.json')).read_text())) != digest(source)):
+                        or digest(json.loads(course_text(root / (cid + '.json')))) != digest(source)):
                     fail('运行课件、本机文件与数据库快照不一致')
                 verify_audio(source, result, root, cid)
                 audit = json.loads(audit_raw)
@@ -428,8 +432,8 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                         s.get('target', {}).get('ttsReceipt') != by_request.get(s.get('ttsRequestId'))
                         for s in audit.get('segments', [])):
                     fail('原始来源审核的完整 TTS 收据与当前课件不一致')
-                original_plan = (folder / 'plan.json').read_bytes()
-                original_receipts = (folder / 'receipts.json').read_bytes()
+                original_plan = course_bytes(folder / 'plan.json')
+                original_receipts = course_bytes(folder / 'receipts.json')
                 if json.loads(original_receipts) != result['audioReceipts']:
                     fail('原始音频收据与数据库不一致')
                 previous_plan = json.loads(original_plan)
@@ -452,19 +456,19 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                           'files': {name: sha_bytes(raw) for name, raw in files.items()}}
                 intent['sha256'] = digest(intent)
                 immutable(intent_path, json_bytes(intent))
-            intent = json.loads(intent_path.read_text())
+            intent = json.loads(course_text(intent_path))
             _check_archive(archive, intent)
             if (intent.get('revisionId') != revision_id or intent.get('patch') != patch
                     or intent.get('previewKey') != key or intent.get('classroomId') != cid
-                    or (archive / 'failed-audit.json').read_bytes() != audit_raw):
+                    or course_bytes(archive / 'failed-audit.json') != audit_raw):
                 fail('修订意图与本次请求不一致')
-            original = json.loads((archive / 'source.json').read_text())
-            source_row = json.loads((archive / 'source-row.json').read_text())
-            plan = json.loads((archive / 'plan.json').read_text())
+            original = json.loads(course_text(archive / 'source.json'))
+            source_row = json.loads(course_text(archive / 'source-row.json'))
+            plan = json.loads(course_text(archive / 'plan.json'))
             resolve_audio_contract(plan, json.loads(source_row['input_json']))
             teacher = plan['teacher']
-            target = json.loads((archive / 'target-text.json').read_text())
-            base_plan = json.loads((archive / 'original-plan.json').read_text())
+            target = json.loads(course_text(archive / 'target-text.json'))
+            base_plan = json.loads(course_text(archive / 'original-plan.json'))
             rebuilt = text_candidate(original, patch, json.loads(audit_raw), base_plan)
             if target != rebuilt or plan != revision_audio_plan(base_plan, revision_id=revision_id,
                     classroom_sha256=digest(rebuilt), core_sha256=digest(core_content(rebuilt)),
@@ -472,10 +476,10 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                 fail('归档目标或子计划不再对应严格修订合同')
             result = json.loads(source_row['result_json'])
             verify_audio(original, result, root, cid)
-            if (folder / 'plan.json').read_bytes() != (archive / 'original-plan.json').read_bytes():
+            if course_bytes(folder / 'plan.json') != course_bytes(archive / 'original-plan.json'):
                 fail('原始配音计划已变化')
             current = service.runtime.get_classroom(cid)
-            if digest(json.loads((root / (cid + '.json')).read_text())) != digest(current):
+            if digest(json.loads(course_text(root / (cid + '.json')))) != digest(current):
                 fail('本机文件与运行课件不一致')
             committed = [r for r in service.repository.parse(row['result_json']).get('narrationRevisions', [])
                          if r.get('revisionId') == revision_id]
@@ -484,7 +488,7 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                 if (receipt.get('sha256') != digest({k: v for k, v in receipt.items() if k != 'sha256'})
                         or receipt.get('intentSha256') != intent['sha256']
                         or receipt['targetSha256'] != row['classroom_sha256'] or digest(current) != row['classroom_sha256']
-                        or json.loads((folder / 'receipts.json').read_text()) != service.repository.parse(row['result_json'])['audioReceipts']):
+                        or json.loads(course_text(folder / 'receipts.json')) != service.repository.parse(row['result_json'])['audioReceipts']):
                     fail('已完成修订的课件或收据又发生变化')
                 immutable(archive / 'amendment.json', json_bytes(receipt))
                 return receipt
@@ -497,10 +501,10 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                         'failedAudit': str(archive / 'failed-audit.json'),
                         'segments': len(patch['changes']), 'ttsDispatched': False, 'publicationAllowed': False}
             saved_target_path = archive / 'target.json'
-            if not saved_target_path.exists() and digest(current) != digest(original):
+            if not course_exists(saved_target_path) and digest(current) != digest(original):
                 fail('课件已变化，停止派发新的配音')
             new_receipts_path = archive / 'new-receipts.json'
-            new_receipts = json.loads(new_receipts_path.read_text()) if new_receipts_path.exists() else []
+            new_receipts = json.loads(course_text(new_receipts_path)) if course_exists(new_receipts_path) else []
             target_actions = speeches(target)
             for index, change in enumerate(patch['changes'], 1):
                 scene, action = target_actions[(change['sceneId'], change['actionId'])]
@@ -513,7 +517,7 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                     except OpenMaicFullRuntimeError as exc:
                         if exc.status_code != 404:
                             raise
-                        if marker.exists():
+                        if course_exists(marker):
                             fail('已有派发结果不明且未查到收据，不能自动重发')
                         immutable(marker, json_bytes({'requestId': request, 'attemptedAt': now_ms()}))
                         dispatched = True
@@ -547,8 +551,8 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                         fail('新配音尚未成功；已保存收据，不会自动重发。仅明确记录的失败可用重试参数另建身份')
                     attempt += 1
                 audio_path = root / cid / 'audio' / (request + '.wav')
-                if audio_path.exists():
-                    audio = audio_path.read_bytes()
+                if course_exists(audio_path):
+                    audio = course_bytes(audio_path)
                     if sha_bytes(audio) != audio_receipt['audioSha256']:
                         fail('已有新配音文件摘要改变，不能覆盖')
                 else:
@@ -590,12 +594,12 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
             current = service.runtime.get_classroom(cid)
             if digest(current) == digest(original):
                 marker = archive / 'save-attempt.json'
-                if marker.exists():
+                if course_exists(marker):
                     fail('上次保存结果不明且未发现目标快照，不能自动重发')
                 immutable(marker, json_bytes({'intentSha256': intent['sha256'], 'attemptedAt': now_ms()}))
                 service.runtime.save_preview_classroom(target)
                 current = service.runtime.get_classroom(cid)
-            if persisted(current) != persisted(target) or digest(json.loads((root / (cid + '.json')).read_text())) != digest(current):
+            if persisted(current) != persisted(target) or digest(json.loads(course_text(root / (cid + '.json')))) != digest(current):
                 fail('保存结果不符，原始课件和全部配音已保留')
             immutable(archive / 'saved.json', json_bytes(current))
             old_actions = speeches(original)
@@ -629,10 +633,15 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
             used = {a['audioId'] for _, a in speeches(current).values()}
             updated.update(audioTotal=len(used), audioCompleted=len(used), audioPartial=False)
             updated['audioSeconds'] = round(sum(r.get('durationSeconds', 0) for r in combined if r['requestId'] in used), 3)
-            active_receipts = (folder / 'receipts.json').read_bytes()
-            if active_receipts not in {(archive / 'original-receipts.json').read_bytes(), json_bytes(combined)}:
+            active_receipts = course_bytes(folder / 'receipts.json')
+            if active_receipts not in {course_bytes(archive / 'original-receipts.json'), json_bytes(combined)}:
                 fail('活动收据清单被其他任务改变')
             atomic_json(folder / 'receipts.json', combined)
+            conn.commit_phase()
+            if (json.loads(course_text(root / (cid + '.json'))) != current
+                    or course_bytes(folder / 'plan.json') != course_bytes(archive / 'original-plan.json')
+                    or course_bytes(folder / 'receipts.json') != json_bytes(combined)):
+                fail('提交前运行原稿或配音证据已变化，保留修订断点')
             changed = conn.execute('UPDATE learning_textbook_course_previews SET classroom_json=?,classroom_sha256=?,result_json=?,updated_at=? WHERE preview_key=? AND classroom_sha256=?',
                                    (canonical(current), digest(current), canonical(updated), now_ms(), key, digest(original))).rowcount
             if changed != 1:

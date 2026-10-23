@@ -27,6 +27,7 @@ from core.security import now_ms
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from services.textbook_preview_audio import core_content
 from services.textbook_preview_visual_revision import immutable, json_bytes, persisted, sha_bytes
+from services.course_file_store import course_bytes, course_exists, course_is_dir, course_text
 
 SCHEMA = 'mira.textbook.operator-revision-prepared.v1'
 ARCHIVE = 'operator-parent'
@@ -35,6 +36,9 @@ COMPLETE_SCHEMAS = {COMPLETE_PATCH_SCHEMA, PREVIEW_PATCH_SCHEMA, LEGACY_COMPLETE
 
 @contextmanager
 def locked(path):
+    # Source evidence may be remote; the serialization lock remains local.
+    if course_is_dir(path.parent):
+        path.parent.mkdir(parents=True, exist_ok=True)
     with path.open('a') as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -48,13 +52,13 @@ def media_path(root, reference):
     if not match:
         fail('来源素材路径无效')
     path = (root / match[1] / match[2]).resolve()
-    if root not in path.parents or not path.is_file():
+    if root not in path.parents or not course_exists(path):
         fail('原始素材文件不存在')
     return path
 
 
 def checked_bytes(path, sha):
-    raw = path.read_bytes()
+    raw = course_bytes(path)
     if sha_bytes(raw) != sha:
         fail('来源文件摘要变化：' + path.name)
     return raw
@@ -178,10 +182,10 @@ def read_parent(service, content_key, audit_path, root, conn, *, allow_saved_pre
     if not re.fullmatch(r'[A-Za-z0-9_-]+', cid or '') or preview['runtime_origin'] != service.runtime.base_url:
         fail('父来源不属于当前本机运行环境')
     folder = root / cid / 'textbook-preview-audio'
-    raw = {'source.json': (root / (cid + '.json')).read_bytes(),
-           'source-plan.json': (folder / 'plan.json').read_bytes(),
-           'source-receipts.json': (folder / 'receipts.json').read_bytes(),
-           'source-audit.json': Path(audit_path).read_bytes()}
+    raw = {'source.json': course_bytes(root / (cid + '.json')),
+           'source-plan.json': course_bytes(folder / 'plan.json'),
+           'source-receipts.json': course_bytes(folder / 'receipts.json'),
+           'source-audit.json': course_bytes(Path(audit_path))}
     parent = {'build': build, 'manifest': manifest, 'preview': preview,
               'plan': json.loads(raw['source-plan.json']), 'receipts': json.loads(raw['source-receipts.json']),
               'audit': json.loads(raw['source-audit.json'])}
@@ -196,7 +200,7 @@ def read_parent(service, content_key, audit_path, root, conn, *, allow_saved_pre
             files = {}
             for name in sorted(EVIDENCE_FILES):
                 archived = 'source-narration-revisions/' + revision + '/' + name
-                raw[archived] = (folder / 'narration-revisions' / revision / name).read_bytes()
+                raw[archived] = course_bytes(folder / 'narration-revisions' / revision / name)
                 files[name] = raw[archived].decode('utf-8')
             parent['sourceNarrationRevisions'].append({'revisionId': revision, 'files': files})
     source_input = parse(preview['input_json'])
@@ -217,7 +221,7 @@ def read_parent(service, content_key, audit_path, root, conn, *, allow_saved_pre
         if any(not re.fullmatch(r'[a-f0-9]{64}', revision) for revision in revisions):
             fail('原拼音旁白修订编号无效')
         if revisions:
-            parent['sourceRequestPlans'] = [json.loads((folder / 'narration-revisions' / revision / 'plan.json').read_text())
+            parent['sourceRequestPlans'] = [json.loads(course_text(folder / 'narration-revisions' / revision / 'plan.json'))
                                             for revision in revisions]
     if json.loads(raw['source.json']) != parse(preview['classroom_json']):
         fail('父本机文件与冻结预览不同')
@@ -227,9 +231,9 @@ def read_parent(service, content_key, audit_path, root, conn, *, allow_saved_pre
             fail('父继承发布缺少原归档')
         parent['sourceInheritance'] = {k: context[k] for k in ('parent', 'candidate', 'provenance')}
         parent['sourceInheritance']['input'] = source_input
-        ancestor_intent = json.loads((context['archive'] / 'prepared.json').read_text())
+        ancestor_intent = json.loads(course_text(context['archive'] / 'prepared.json'))
         for name in (*ancestor_intent['files'], 'prepared.json', 'provenance.json'):
-            raw['source-inheritance/' + name] = (context['archive'] / name).read_bytes()
+            raw['source-inheritance/' + name] = course_bytes(context['archive'] / name)
         if context.get('restorations'):
             from content.textbook_parent_audio_restoration import EVIDENCE_FILES
             parent['sourceAudioRestorations'] = []
@@ -237,7 +241,7 @@ def read_parent(service, content_key, audit_path, root, conn, *, allow_saved_pre
                 revision, docs = receipt['revisionId'], {}
                 for name in sorted(EVIDENCE_FILES):
                     archived = 'source-audio-restorations/' + revision + '/' + name
-                    raw[archived] = (folder / 'parent-audio-restorations' / revision / name).read_bytes()
+                    raw[archived] = course_bytes(folder / 'parent-audio-restorations' / revision / name)
                     docs[name] = json.loads(raw[archived])
                 parent['sourceAudioRestorations'].append({'revisionId': revision, 'documents': docs})
     origin = validate_parent(parent, allow_saved_preview=allow_saved_preview, allow_visual_ancestry=allow_visual_ancestry,
@@ -249,7 +253,7 @@ def read_parent(service, content_key, audit_path, root, conn, *, allow_saved_pre
     if parent['plan'].get('schemaVersion') == PINYIN_SCHEMA:
         for request_plan in parent.get('sourceRequestPlans', release['audioAudit'].get('pronunciationReview', {}).get('requestPlans', [])):
             name = 'narration-revisions/' + request_plan['revisionId'] + '/plan.json'
-            raw['source-request-plans/' + request_plan['revisionId'] + '.json'] = (folder / name).read_bytes()
+            raw['source-request-plans/' + request_plan['revisionId'] + '.json'] = course_bytes(folder / name)
             if json.loads(raw['source-request-plans/' + request_plan['revisionId'] + '.json']) != request_plan:
                 fail('拼音原旁白请求计划与发布审核不同')
     for segment in origin['segments']:
@@ -260,9 +264,9 @@ def read_parent(service, content_key, audit_path, root, conn, *, allow_saved_pre
             validate_receipt_wav(receipt, raw['audio/' + request + '.wav'])
         name = segment['asrRequestId'] + '.json'
         cache = Path(audit_path).parent / name
-        if not cache.exists() and 'sourceInheritance' in parent:
+        if not course_exists(cache) and 'sourceInheritance' in parent:
             cache = folder / ARCHIVE / 'asr' / name
-        raw['asr/' + name] = cache.read_bytes()
+        raw['asr/' + name] = course_bytes(cache)
         entry = json.loads(raw['asr/' + name])
         saved = next(e for e in parent['audit']['segments'] if e['ttsRequestId'] == request)
         entry = normalized_parent_cache(parent, entry)
@@ -294,9 +298,9 @@ def read_preview_parent(service, preview_key, audit_path, root, conn):
         fail('原预览课堂身份无效')
     folder = root / cid / 'textbook-preview-audio'
     raw = {'source.json': json_bytes(parse(preview['classroom_json'])),
-           'source-plan.json': (folder / 'plan.json').read_bytes(),
-           'source-receipts.json': (folder / 'receipts.json').read_bytes(),
-           'source-audit.json': Path(audit_path).read_bytes()}
+           'source-plan.json': course_bytes(folder / 'plan.json'),
+           'source-receipts.json': course_bytes(folder / 'receipts.json'),
+           'source-audit.json': course_bytes(Path(audit_path))}
     parent = {'manifest': manifest, 'preview': preview, 'plan': json.loads(raw['source-plan.json']),
               'receipts': json.loads(raw['source-receipts.json']), 'audit': json.loads(raw['source-audit.json'])}
     origin = validate_preview_parent(parent)
@@ -306,7 +310,7 @@ def read_preview_parent(service, preview_key, audit_path, root, conn):
         request = entry['ttsRequestId']
         wav = checked_bytes(root / cid / 'audio' / (request + '.wav'), entry['audioSha256'])
         name = entry['asr']['requestId'] + '.json'
-        cache = (Path(audit_path).parent / name).read_bytes()
+        cache = course_bytes(Path(audit_path).parent / name)
         if normalized_parent_cache(parent, json.loads(cache)) != entry:
             fail('原预览 ASR 缓存与完整审核不同')
         raw['audio/' + request + '.wav'] = wav
@@ -319,7 +323,7 @@ def read_preview_parent(service, preview_key, audit_path, root, conn):
 
 def load_prepared(directory, *, verify_assets=False):
     directory = Path(directory)
-    intent = json.loads((directory / 'prepared.json').read_text())
+    intent = json.loads(course_text(directory / 'prepared.json'))
     if (intent.get('schemaVersion') != SCHEMA or intent.get('sha256') != digest({
             k: v for k, v in intent.items() if k != 'sha256'})):
         fail('修订准备记录无效')
@@ -334,19 +338,19 @@ def load_prepared(directory, *, verify_assets=False):
             fail('修订归档路径无效')
         if verify_assets or not name.startswith(('audio/', 'images/')):
             checked_bytes(path, sha)
-    parent = json.loads((directory / 'parent.json').read_text())
-    candidate = json.loads((directory / 'candidate.json').read_text())
-    frozen = json.loads((directory / 'input.json').read_text())
+    parent = json.loads(course_text(directory / 'parent.json'))
+    candidate = json.loads(course_text(directory / 'candidate.json'))
+    frozen = json.loads(course_text(directory / 'input.json'))
     derived, derivative_files = derive_quiz_assets(parent, candidate['patch'], lambda d:
         checked_bytes(directory / 'images' / (d['sourceSha256'] + Path(urlparse(d['sourcePath']).path).suffix), d['sourceSha256']))
     evidence = candidate.get('completeSceneEvidence')
     rebuilt = revision_candidate(parent, candidate['patch'], candidate.get('visualPatch'), derived_assets=derived,
                                  complete_scene_evidence=evidence)
     if (candidate != rebuilt or frozen != target_input(parent, candidate)
-            or json.loads((directory / 'source.json').read_text()) != parse(parent['preview']['classroom_json'])
-            or json.loads((directory / 'source-plan.json').read_text()) != parent['plan']
-            or json.loads((directory / 'source-receipts.json').read_text()) != parent['receipts']
-            or json.loads((directory / 'source-audit.json').read_text()) != parent['audit']
+            or json.loads(course_text(directory / 'source.json')) != parse(parent['preview']['classroom_json'])
+            or json.loads(course_text(directory / 'source-plan.json')) != parent['plan']
+            or json.loads(course_text(directory / 'source-receipts.json')) != parent['receipts']
+            or json.loads(course_text(directory / 'source-audit.json')) != parent['audit']
             or intent['revisionId'] != candidate['revisionId'] or intent['previewKey'] != frozen['previewKey']):
         fail('归档与父来源或修订白名单不一致')
     expected = required | {'audio/' + s['ttsRequestId'] + '.wav' for s in candidate['parent']['segments']} | {
@@ -360,7 +364,7 @@ def load_prepared(directory, *, verify_assets=False):
     expected |= set(derivative_files)
     if evidence is not None:
         expected.add('complete-scene-evidence.json')
-        if json.loads((directory / 'complete-scene-evidence.json').read_text()) != evidence:
+        if json.loads(course_text(directory / 'complete-scene-evidence.json')) != evidence:
             fail('完整场景原始证据与候选不同')
         expected |= {'complete-scene-media/' + a['sha256'] + Path(urlparse(a['mediaPath']).path).suffix
                      for a in evidence['media']['assets']}
@@ -371,24 +375,24 @@ def load_prepared(directory, *, verify_assets=False):
         for name, raw in evidence['files'].items():
             archived = 'source-narration-revisions/' + evidence['revisionId'] + '/' + name
             expected.add(archived)
-            if (directory / archived).read_text() != raw:
+            if course_text(directory / archived) != raw:
                 fail('普通旧旁白归档字节与父证据不一致')
     for evidence in parent.get('sourceAudioRestorations', []):
         for name, document in evidence['documents'].items():
             archived = 'source-audio-restorations/' + evidence['revisionId'] + '/' + name
             expected.add(archived)
-            if json.loads((directory / archived).read_text()) != document:
+            if json.loads(course_text(directory / archived)) != document:
                 fail('原音频恢复归档与父证据不一致')
     release = parse(parent['build']['review_json'])['release'] if 'build' in parent else {}
     for request_plan in parent.get('sourceRequestPlans', release.get('audioAudit', {}).get('pronunciationReview', {}).get('requestPlans', [])):
         name = 'source-request-plans/' + request_plan['revisionId'] + '.json'
         expected.add(name)
-        if json.loads((directory / name).read_text()) != request_plan:
+        if json.loads(course_text(directory / name)) != request_plan:
             fail('归档拼音请求计划与已批准记录不同')
     if 'sourceInheritance' in parent:
         ancestor = directory / 'source-inheritance'
         prior_parent, prior_candidate, prior_input, prior_intent = load_prepared(ancestor, verify_assets=verify_assets)
-        prior_proof = json.loads((ancestor / 'provenance.json').read_text())
+        prior_proof = json.loads(course_text(ancestor / 'provenance.json'))
         if parent['sourceInheritance'] != {'parent': prior_parent, 'candidate': prior_candidate,
                                          'input': prior_input, 'provenance': prior_proof}:
             fail('继承链原始文件与父证据不一致')
@@ -396,11 +400,11 @@ def load_prepared(directory, *, verify_assets=False):
     if set(files) != expected:
         fail('原始收据或媒体归档清单不完整')
     for name, expected_bytes in derivative_files.items():
-        if (directory / name).read_bytes() != expected_bytes:
+        if course_bytes(directory / name) != expected_bytes:
             fail('派生图片不是冻结原图的准确裁切')
     source_entries = {e['asr']['requestId']: e for e in parent['audit']['segments']}
     for request, saved in source_entries.items():
-        entry = json.loads((directory / 'asr' / (request + '.json')).read_text())
+        entry = json.loads(course_text(directory / 'asr' / (request + '.json')))
         entry = normalized_parent_cache(parent, entry)
         if entry != saved:
             fail('原始 ASR 缓存与冻结父证据不一致')
@@ -479,7 +483,7 @@ def prepare_revision(service, content_key, classroom_directory, patch, source_au
         intent['sha256'] = digest(intent)
         output.mkdir(parents=True, exist_ok=True)
         with locked(output / 'prepare.lock'):
-            if (output / 'prepared.json').exists() and json.loads((output / 'prepared.json').read_text()) != intent:
+            if course_exists(output / 'prepared.json') and json.loads(course_text(output / 'prepared.json')) != intent:
                 fail('候选目录已用于其他修订，不能覆盖')
             for name, raw in files.items():
                 path = output / name
@@ -516,9 +520,9 @@ def register_revision(service, prepared_directory, classroom_directory, *, budge
                 regeneration={'reason': candidate['patch']['basis'], 'budgetReference': budget_reference})
             _same_parent(service, parent, conn)
             for name, archived in [('plan.json', 'source-plan.json'), ('receipts.json', 'source-receipts.json')]:
-                if (source_folder / name).read_bytes() != (directory / archived).read_bytes():
+                if course_bytes(source_folder / name) != course_bytes(directory / archived):
                     fail('准备后父配音计划或收据发生变化')
-            if 'build' in parent and (root / (parent['preview']['classroom_id'] + '.json')).read_bytes() != (directory / 'source.json').read_bytes():
+            if 'build' in parent and course_bytes(root / (parent['preview']['classroom_id'] + '.json')) != course_bytes(directory / 'source.json'):
                 fail('准备后父课件文件发生变化')
             for name, sha in intent['files'].items():
                 if name.startswith('source-narration-revisions/'):
@@ -547,14 +551,14 @@ def register_revision(service, prepared_directory, classroom_directory, *, budge
                 if (existing is None or existing['preview_key'] != key or parse(existing['input_json']) != frozen
                         or existing['classroom_id'] != cid):
                     fail('新教学版本已被其他任务占用')
-                load_inheritance(folder, json.loads((folder / 'plan.json').read_text()), frozen=frozen)
+                load_inheritance(folder, json.loads(course_text(folder / 'plan.json')), frozen=frozen)
                 return service.summary(existing)
             archive = folder / ARCHIVE
             archive.mkdir(exist_ok=True)
             for name in (*intent['files'], 'prepared.json'):
                 target = archive / name
                 target.parent.mkdir(parents=True, exist_ok=True)
-                immutable(target, (directory / name).read_bytes())
+                immutable(target, course_bytes(directory / name))
             for asset in candidate.get('derivedImages', []):
                 target = root / cid / 'media' / (asset['sha256'] + '.png')
                 target.parent.mkdir(exist_ok=True)
@@ -565,14 +569,14 @@ def register_revision(service, prepared_directory, classroom_directory, *, budge
                 if exc.status_code != 404:
                     raise
                 marker = directory / 'save-attempt.json'
-                if marker.exists():
+                if course_exists(marker):
                     fail('上次保存结果不明且未发现候选，不能重发')
                 immutable(marker, json_bytes({'previewKey': key, 'candidateSha256': digest(candidate)}))
                 service.runtime.save_preview_classroom(candidate['classroom'])
                 saved = service.runtime.get_classroom(cid)
             if persisted(saved) != persisted(candidate['classroom']):
                 fail('新课堂编号已存在不同内容，不能覆盖')
-            if json.loads((root / (cid + '.json')).read_text()) != saved:
+            if json.loads(course_text(root / (cid + '.json'))) != saved:
                 fail('保存的本机课堂与运行快照不一致')
             if candidate['patch']['schemaVersion'] == VISUAL_PATCH_SCHEMA and parent['plan'].get('schemaVersion') == PINYIN_SCHEMA:
                 plan = {**deepcopy(parent['plan']), 'previewKey': key, 'classroomSha256': digest(saved),
@@ -615,12 +619,12 @@ def register_revision(service, prepared_directory, classroom_directory, *, budge
 def load_inheritance(folder, plan, *, frozen=None):
     """Missing provenance for an explicitly inherited preview fails closed."""
     archive = Path(folder) / ARCHIVE
-    if not archive.exists():
+    if not course_is_dir(archive):
         if frozen and frozen.get('operatorRevision'):
             fail('修订预览缺少父来源归档')
         return None
     parent, candidate, saved_input, _ = load_prepared(archive)
-    provenance = json.loads((archive / 'provenance.json').read_text())
+    provenance = json.loads(course_text(archive / 'provenance.json'))
     if ((frozen is not None and frozen != saved_input) or plan['previewKey'] != saved_input['previewKey']
             or inheritance_provenance(candidate, plan) != provenance):
         fail('父来源归档未绑定新预览与新配音合同')

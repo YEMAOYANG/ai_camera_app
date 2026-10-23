@@ -475,7 +475,7 @@ async function configuration(){
  const value=key=>process.env[key] ?? file[key];
  // The launcher maps this backend-owned key to Native's DATABASE_URL. Never
  // infer the URL from a second dotenv or initialize application/schema writers.
- return {url:value('MIRA_OPENMAIC_AGENT_DATABASE_URL'),manifestPath:value('COURSE_STORAGE_MANIFEST_PATH'),bucket:value('ASSET_S3_BUCKET'),region:value('AWS_REGION')||value('AWS_DEFAULT_REGION'),
+ return {mode:value('COURSE_STORAGE_MODE')||'local',url:value('MIRA_OPENMAIC_AGENT_DATABASE_URL'),manifestPath:value('COURSE_STORAGE_MANIFEST_PATH'),bucket:value('ASSET_S3_BUCKET'),region:value('AWS_REGION')||value('AWS_DEFAULT_REGION'),
   endpoint:value('AWS_ENDPOINT_URL_S3')||value('AWS_ENDPOINT_URL'),accessKeyId:value('AWS_ACCESS_KEY_ID'),secretAccessKey:value('AWS_SECRET_ACCESS_KEY'),sessionToken:value('AWS_SESSION_TOKEN')};
 }
 async function directory(target,roots){
@@ -587,6 +587,27 @@ async function directoryChildren(ref,config,dependencies){
  const parts=ref.split('/'),stageId=parts[3],nativeRoot=dependencies.nativeRoot||NATIVE;
  const sourcePrefix='openmaic-runtime/.runtime/OpenMAIC/data/classrooms/'+stageId+'/media/';
  const filenames=new Set(),safeImage=name=>/^[A-Za-z0-9_.-]+\.(?:png|jpg|jpeg|webp|gif|avif|svg)$/i.test(name)&&!name.includes('..');
+ if(config.mode==='registry'){
+  const records=dependencies.registryFiles;
+  if(!Array.isArray(records)||records.length>512)throw Error('archive_media_registry_invalid');
+  const prefix='openmaic-runtime/.runtime/OpenMAIC/data/classrooms/'+stageId+(stageId.startsWith('omclass_')?'/artifact':'')+'/media/';
+  const mime={'.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.avif':'image/avif','.svg':'image/svg+xml'};
+  const paths=new Set(),images=[];
+  for(const file of records){
+   if(!file||typeof file!=='object'||Array.isArray(file)||typeof file.path!=='string'||Buffer.byteLength(file.path)>4096||!/^openmaic-runtime\/\.runtime\/OpenMAIC\/data\/classrooms\/[A-Za-z0-9_-]{1,255}\//.test(file.path)
+    ||file.path.includes('\\')||/[\u0000-\u001f\u007f-\u009f]/.test(file.path)||file.path.split('/').some(p=>!p||p==='.'||p==='..')
+    ||paths.has(file.path)||typeof file.sha256!=='string'||!/^[a-f0-9]{64}$/.test(file.sha256)||!Number.isSafeInteger(file.byteSize)||file.byteSize<1||file.byteSize>MAX_BYTES
+    ||typeof file.mimeType!=='string'||!/^[a-z0-9.+-]+\/[a-z0-9.+-]+$/.test(file.mimeType))throw Error('archive_media_registry_invalid');
+   paths.add(file.path);
+   if(!file.path.startsWith(prefix))continue;
+   const name=file.path.slice(prefix.length),type=mime[path.posix.extname(name).toLowerCase()];
+   if(!type)continue;
+   if(!safeImage(name)||file.mimeType!==type)throw Error('archive_media_registry_image_invalid');
+   images.push({ref:ref+name,kind:'image',status:'already_collected',sha256:file.sha256,byteSize:file.byteSize,mimeType:file.mimeType,registrySourcePath:file.path});
+  }
+  if(!images.length)throw Error('archive_media_directory_unavailable_or_oversized');
+  return images.sort((a,b)=>a.ref<b.ref?-1:a.ref>b.ref?1:0);
+ }
  const directory=path.join(nativeRoot,'data/classrooms',stageId,'media');
  try{
   if(await fs.realpath(directory)!==directory)throw Error('archive_media_directory_symlink');
@@ -876,7 +897,7 @@ export async function resolveArchiveAssets(input,dependencies={}){
     Object.assign(entry,{status:'resolved',sourcePath:await saveBytes(target,digest,ext,bytes),sha256:digest,byteSize:bytes.length,mimeType});delete entry.reason;
    }catch{entry.reason='controlled_public_asset_missing_or_invalid';}
   }else if(classroomDirectory(entry.ref)){
-   try{entries.push(...await directoryChildren(entry.ref,config,dependencies));entry.status='already_collected';entry.expandedDirectory=true;delete entry.reason;}
+   try{entries.push(...await directoryChildren(entry.ref,config,{...dependencies,registryFiles:input.registryFiles}));entry.status='already_collected';entry.expandedDirectory=true;delete entry.reason;}
    catch{entry.reason='controlled_classroom_media_directory_unavailable';}
   }
  }

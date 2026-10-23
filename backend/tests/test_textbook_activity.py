@@ -197,6 +197,7 @@ class NativeActivityTests(unittest.TestCase):
         service.learning = Mock()
         service.learning.get_session.side_effect = lambda *args, **kwargs: dict(conn.execute('SELECT * FROM learning_sessions').fetchone())
         service._authority = Mock(return_value=(None, {'family_id': 'family'}, {}, self.release, {}, {'id': 'session'}))
+        service._playback_release = Mock(side_effect=deepcopy)
         service.play('authorized', {'section': 'games', 'version': 0, 'action': 'hint'})
         restored = service.play('authorized')
         self.assertTrue(restored['games']['hintUsed'])

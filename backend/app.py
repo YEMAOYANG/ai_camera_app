@@ -47,6 +47,7 @@ from routes.internal.learning_curriculum_preparations import (
     internal_learning_curriculum_preparations_bp,
 )
 from routes.internal.learning_media import internal_learning_media_bp
+from routes.internal.course_storage import internal_course_storage_bp
 from routes.internal.learning_budget import internal_learning_budget_bp
 from routes.internal.openmaic_runtime import internal_openmaic_runtime_bp
 from routes.internal.voice import internal_voice_bp
@@ -78,6 +79,13 @@ def create_app(test_config: dict | None = None) -> Flask:
     validate_flask_config(app.config)
     CORS(app, origins=app.config["CORS_ORIGINS"])
 
+    @app.before_request
+    def reset_course_file_versions():
+        from services.course_file_store import reset_course_read_versions
+        from integrations.openmaic_full_runtime_client import reset_classroom_read_versions
+        reset_course_read_versions()
+        reset_classroom_read_versions()
+
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(setup_bp, url_prefix="/api/setup")
     app.register_blueprint(profile_bp, url_prefix="/api/profile")
@@ -100,6 +108,7 @@ def create_app(test_config: dict | None = None) -> Flask:
     app.register_blueprint(student_textbooks_bp, url_prefix="/api/v2/student/learning/textbooks")
     app.register_blueprint(student_international_trials_bp, url_prefix="/api/v2/student/learning/international-trials")
     app.register_blueprint(internal_textbooks_bp, url_prefix="/internal/learning/textbooks")
+    app.register_blueprint(internal_course_storage_bp, url_prefix="/internal/learning/course-storage")
     app.register_blueprint(contacts_bp, url_prefix="/api/contacts")
     app.register_blueprint(devices_bp, url_prefix="/api/devices")
     app.register_blueprint(tasks_bp, url_prefix="/api/tasks")

@@ -10,6 +10,7 @@ from content.textbook_catalog import digest
 from content.textbook_operator_revision import fail
 from content.textbook_preview import operator_media
 from content.textbook_review_followup import _revision_entry
+from services.course_file_store import course_bytes, course_text, course_glob
 
 
 def read_complete_scene_evidence(parent, root, authoring, output_root, runtime_origin):
@@ -25,7 +26,7 @@ def read_complete_scene_evidence(parent, root, authoring, output_root, runtime_o
     job, frozen, _ = found
     stage_root = root.parent / 'textbook-current-review-revisions' / hashlib.sha256(session.encode()).hexdigest() / stage
     matches = []
-    for folder in sorted(stage_root.iterdir()):
+    for folder in course_glob(stage_root):
         entry = _revision_entry(folder, stage_root, session, stage, frozen['sceneContract']['sha256'])
         if entry['plan']['afterCandidateSha256'] == ledger['sha256']:
             matches.append((folder, entry))
@@ -40,13 +41,13 @@ def read_complete_scene_evidence(parent, root, authoring, output_root, runtime_o
     if not summary or not summary.get('completeSceneReviewFollowup'):
         fail('完整场景需要通过原生候选及当前规则追踪核验')
     revision_files = {}
-    for path in sorted(folder.glob('*.json')):
+    for path in course_glob(folder, '*.json'):
         _safe_child(stage_root, path)
-        revision_files[path.name] = path.read_text()
+        revision_files[path.name] = course_text(path)
     media = operator_media(classroom, root, authoring['imageProvenance'])
     evidence = {'authoring': deepcopy(authoring), 'summary': summary,
-        'draftJson': (job / 'draft.json').read_text(), 'frozenJson': (job / 'frozen.json').read_text(),
-        'stateJson': (job / 'state.json').read_text(), 'ledgerJson': ledger_path.read_text(),
+        'draftJson': course_text(job / 'draft.json'), 'frozenJson': course_text(job / 'frozen.json'),
+        'stateJson': course_text(job / 'state.json'), 'ledgerJson': course_text(ledger_path),
         'revisionFiles': revision_files, 'media': media}
     from content.textbook_complete_scene_revision import validate_evidence
     rebuilt, _ = validate_evidence(parent, evidence, unpublished='build' not in parent)
@@ -56,7 +57,7 @@ def read_complete_scene_evidence(parent, root, authoring, output_root, runtime_o
     for asset in media['assets']:
         path = root / '/'.join(asset['mediaPath'].split('/')[3:])
         _safe_child(root, path)
-        raw = path.read_bytes()
+        raw = course_bytes(path)
         if hashlib.sha256(raw).hexdigest() != asset['sha256']:
             fail('完整场景图片原字节变化')
         files['complete-scene-media/' + asset['sha256'] + path.suffix] = raw

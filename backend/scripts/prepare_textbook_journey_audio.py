@@ -23,14 +23,16 @@ from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient,
 WORK = Path(__file__).resolve().parents[2] / 'output/textbook-journey-audio-20260929'
 
 
-def texts():
+def texts(*, plan=None, flow=None):
+    plan = journey.PLAN if plan is None else plan
+    flow = journey.FLOW if flow is None else flow
     values = set()
-    for bank in list(journey.FLOW['bank'].values()) + [[p] for p in journey.FLOW['probes'].values()]:
+    for bank in list(flow['bank'].values()) + [[p] for p in flow['probes'].values()]:
         for q in bank:
             values.add(q['prompt'] + ''.join(o['value'] + '，' + o['label'] + '。' for o in q['options']))
             values.update(q['hints'])
             values.add(q['explanation'])
-    for skill, value in journey.PLAN['skills'].items():
+    for skill, value in plan['skills'].items():
         prompt = f'把“{value["word"]}”送到图里。'
         if skill in ('me', 'you', 'he'):
             for lead in ('蓝衣男孩在说话，红衣女孩在听。', '红衣女孩在说话，蓝衣男孩在听。'):

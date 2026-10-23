@@ -10,13 +10,14 @@ from content.textbook_interaction_policy import freeze_interaction_policy
 from content.textbook_legacy_complete_scene_revision import (
     document_references, legacy_metadata, mapped_body, validate_legacy_evidence)
 from content.textbook_operator_revision import fail, sha_text
+from services.course_file_store import course_bytes, course_exists
 
 
 def _read(path, expected=None):
     path = Path(path)
-    if not path.is_absolute() or path.is_symlink() or not path.is_file():
+    if not path.is_absolute() or path.is_symlink() or not course_exists(path):
         fail('旧版来源必须是明确的本机原始文件')
-    raw = path.read_bytes()
+    raw = course_bytes(path)
     if expected is not None and hashlib.sha256(raw).hexdigest() != expected:
         fail('旧版来源文件原字节摘要变化：' + path.name)
     return raw

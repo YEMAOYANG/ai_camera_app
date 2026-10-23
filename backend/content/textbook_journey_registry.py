@@ -6,7 +6,6 @@ run through the existing publication pipeline.
 """
 from dataclasses import dataclass
 from functools import lru_cache
-import hashlib
 import json
 from pathlib import Path
 import re
@@ -14,6 +13,20 @@ import re
 from core.errors import ApiError
 
 ROOT = Path(__file__).parent / 'textbooks/activities'
+
+
+def course_json(path, *, expected_sha256=None, source_root=None):
+    """Load lazily, after the backend-owned environment, without starting an app.
+
+    Imports of teaching modules must not read a local shadow before dotenv is
+    loaded. Registered originals are always read and hashed by CourseFileStore.
+    """
+    from core import config as _backend_environment  # noqa: F401; existing dotenv owner
+    from services.course_file_store import CourseFileStore, course_bytes
+    if source_root is not None and CourseFileStore().resolve(path, expected_sha256=expected_sha256) is None:
+        if not Path(path).resolve().is_relative_to(Path(source_root).resolve()):
+            raise ValueError('Teaching definition escaped its registry')
+    return json.loads(course_bytes(path, expected_sha256=expected_sha256, max_bytes=4 * 1024 * 1024))
 
 
 @dataclass(frozen=True)
@@ -70,18 +83,17 @@ def validate_definition(plan, flow, *, renderer, audio_pack):
 
 @lru_cache(maxsize=1)
 def definitions():
-    registry = json.loads((ROOT / 'registry.v1.json').read_text())
+    registry = course_json(ROOT / 'registry.v1.json', source_root=ROOT)
     result = []
     for row in registry['definitions']:
         docs = []
         for field in ('plan', 'flow'):
-            path = (ROOT / row[field]['file']).resolve()
-            if not path.is_relative_to(ROOT.resolve()):
+            relative = row[field]['file']
+            if (not isinstance(relative, str) or '\\' in relative or relative.startswith('/')
+                    or any(p in {'', '.', '..'} for p in relative.split('/'))):
                 raise ValueError('Teaching definition escaped its registry')
-            data = path.read_bytes()
-            if hashlib.sha256(data).hexdigest() != row[field]['sha256']:
-                raise ValueError('Teaching definition changed without a registry version update')
-            docs.append(json.loads(data))
+            path = ROOT / relative
+            docs.append(course_json(path, expected_sha256=row[field]['sha256'], source_root=ROOT))
         result.append(validate_definition(*docs, renderer=row['renderer'], audio_pack=row['audioPack']))
     if len({d.plan['id'] for d in result}) != len(result) or len({d.plan['releaseSha256'] for d in result}) != len(result):
         raise ValueError('Ambiguous activity or release identity')

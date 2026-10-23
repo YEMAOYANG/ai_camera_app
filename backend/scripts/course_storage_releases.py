@@ -210,8 +210,16 @@ def _formal_audio_rows(conn, build_item_id):
         WHERE segment.build_item_id=? ORDER BY segment.scene_order,variant.variant_key""", (build_item_id,)).fetchall()
 
 
+def _registered_source_bytes(path, *, expected_sha256=None, expected_bytes=None):
+    # No application factory, generation worker or Provider is constructed.
+    # The shared reader returns None only for an unregistered new local source.
+    from services.course_file_store import CourseFileStore
+    return CourseFileStore(project_root=ROOT).read_bytes(
+        path, expected_sha256=expected_sha256, expected_bytes=expected_bytes)
+
+
 def _verify_local_media(item):
-    """Hash only the controlled published source; never fetch remote bytes."""
+    """Verify the exact reviewed source, using its registry bytes when bound."""
     source = item.get('sourcePath')
     if source is None:
         match = MEDIA_PATH.fullmatch(item['path'])
@@ -222,6 +230,11 @@ def _verify_local_media(item):
         'backend/data/learning-media/narration/')) and '\\' not in source
         and not {'', '.', '..'}.intersection(source.split('/')), 'local_media_source_invalid')
     path = ROOT / source
+    remote = _registered_source_bytes(path, expected_sha256=item['sha256'], expected_bytes=item['byteSize'])
+    if remote is not None:
+        _require(len(remote) == item['byteSize'], 'local_media_bytes_mismatch')
+        _require(hashlib.sha256(remote).hexdigest() == item['sha256'], 'local_media_hash_mismatch')
+        return
     _require(path.is_file() and path.resolve() == path and path.stat().st_size == item['byteSize'],
              'local_media_bytes_mismatch')
     digest = hashlib.sha256()
@@ -248,12 +261,17 @@ def _formal_release(conn, course, media_root, *, verify_source_bytes=False):
              and all(authority[field] == expected for field in ('tts_attempted_count',
                  'tts_completed_count', 'audio_validated_count', 'asr_attempted_count', 'asr_passed_count')),
              'formal_audio_terminal_incomplete')
-    native_root = NATIVE_ROOT.resolve()
-    room_file = (native_root / classroom / 'artifact/classroom.json' if classroom.startswith('omclass_')
-                 else native_root / (classroom + '.json'))
-    _require(room_file.is_file() and room_file.resolve() == room_file,
-             'formal_classroom_source_missing_or_linked')
-    room = json.loads(room_file.read_text())
+    relative = (Path(classroom) / 'artifact/classroom.json' if classroom.startswith('omclass_')
+                else Path(classroom + '.json'))
+    # Registry identity uses the original repository spelling, independent of
+    # local presence. Retain the original canonical-root gate for new local work.
+    raw = _registered_source_bytes(NATIVE_ROOT / relative)
+    if raw is None:
+        room_file = NATIVE_ROOT.resolve() / relative
+        _require(room_file.is_file() and room_file.resolve() == room_file,
+                 'formal_classroom_source_missing_or_linked')
+        raw = room_file.read_bytes()
+    room = json.loads(raw)
     manifest = parsed(authority['feature_manifest_json'])
     room_hash = hashlib.sha256(canonical({'stage': room.get('stage'), 'scenes': room.get('scenes')}).encode()).hexdigest()
     _require(room.get('stage', {}).get('id') == classroom

@@ -35,7 +35,8 @@ PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts/textbook-course.v2.
 def superseded_resources():
     """A reviewed inventory changes picker availability, never saved choices."""
     inventory = Path(__file__).parent / "textbooks/sources/smartedu-current-primary-20260928.json"
-    return frozenset(json.loads(inventory.read_text())["supersededResourceIds"])
+    from content.textbook_journey_registry import course_json
+    return frozenset(course_json(inventory, source_root=inventory.parent)["supersededResourceIds"])
 
 
 def authoring_prompt():
@@ -102,7 +103,9 @@ def validate_manifest(value):
         invalid("教材来源链接无效")
     if source.get("kind") == "official_catalog":
         # Exact verified records, not a wildcard trust of arbitrary government URLs.
-        records = json.loads((Path(__file__).parent / "textbooks/sources/official-low-grade-english-20260928.json").read_text())["records"]
+        from content.textbook_journey_registry import course_json
+        sources = Path(__file__).parent / 'textbooks/sources'
+        records = course_json(sources / 'official-low-grade-english-20260928.json', source_root=sources)['records']
         record = next((r for r in records if r["recordId"] == source["resourceId"]), None)
         if (record is None or source["url"] != record["url"]
                 or any(value[k] != record[k] for k in ("editionId", "publisher", "editionLabel", "gradeCode", "subject", "volume", "schoolSystem"))):
@@ -114,8 +117,10 @@ def validate_manifest(value):
         # Starting grade/editor are part of the record, not publisher aliases.
         inventories = ("smartedu-sync-english-20260928.json", "smartedu-sync-fltrp-primary-20260928.json",
                        "smartedu-sync-fltrp-three-year-20260928.json")
-        records = [record for name in inventories for record in json.loads(
-            (Path(__file__).parent / "textbooks/sources" / name).read_text())["records"]]
+        from content.textbook_journey_registry import course_json
+        sources = Path(__file__).parent / 'textbooks/sources'
+        records = [record for name in inventories for record in
+                   course_json(sources / name, source_root=sources)['records']]
         record = next((r for r in records if r["resourceId"] == source["resourceId"]), None)
         if (record is None or source["url"] != record["url"]
                 or any(value[k] != record[k] for k in ("editionId", "publisher", "gradeCode", "subject", "volume", "schoolSystem"))

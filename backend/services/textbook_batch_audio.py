@@ -23,6 +23,7 @@ from content.textbook_interactive_narration import (AUDIO_BLOCK, bind_interactiv
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient, OpenMaicFullRuntimeError
 from services.learning_media_materialization_service import asr_similarity_bps
 from content.textbook_number_spelling import page_number_equivalence, validate_page_number_equivalence
+from services.course_file_store import course_bytes, course_exists, course_text, course_is_dir, course_glob
 
 
 ASR_RECONCILIATION_SCHEMA = "mira.textbook.batch-asr-reconciliation.v1"
@@ -90,7 +91,7 @@ def validate_asr_reconciliation(value):
 
 
 def load_asr_reconciliation_file(path):
-    return validate_asr_reconciliation(json.loads(Path(path).read_text(encoding="utf-8")))
+    return validate_asr_reconciliation(json.loads(course_text(Path(path))))
 
 
 def validate_audio_inheritance(value):
@@ -139,7 +140,7 @@ def validate_audio_inheritance(value):
 
 
 def load_audio_inheritance_file(path):
-    return validate_audio_inheritance(json.loads(Path(path).read_text(encoding="utf-8")))
+    return validate_audio_inheritance(json.loads(course_text(Path(path))))
 
 
 def normalize_audio_inheritance(value):
@@ -173,6 +174,10 @@ def normalize_audio_inheritance(value):
 
 def save_json(path, value):
     path = Path(path)
+    from services.course_file_store import course_write_bytes
+    raw = (json.dumps(value, ensure_ascii=False, indent=2) + '\n').encode('utf-8')
+    if course_write_bytes(path, raw):
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(prefix=".audio-", dir=path.parent)
     try:
@@ -232,7 +237,7 @@ def narration_workload(classroom):
 
 
 def _external_once(runtime, checkpoint, request_id, operation, payload):
-    previous = json.loads(checkpoint.read_text()) if checkpoint.exists() else None
+    previous = json.loads(course_text(checkpoint)) if course_exists(checkpoint) else None
     if previous and (previous.get("requestId") != request_id
                      or previous.get("requestPayloadSha256") != digest(payload)):
         raise RuntimeError("audio_request_identity_conflict")
@@ -295,9 +300,9 @@ def _segment_requests(plan, item, teacher):
 
 def _known_success(output, request_id, payload):
     path = output / f"{request_id}.json"
-    if not path.is_file():
+    if not course_exists(path):
         raise ValueError("asr_reconciliation_requires_known_success")
-    previous = json.loads(path.read_text())
+    previous = json.loads(course_text(path))
     receipt = previous.get("receipt", {})
     if (previous.get("requestId") != request_id or previous.get("requestPayloadSha256") != digest(payload)
             or previous.get("state") != "succeeded" or receipt.get("status") != "succeeded"
@@ -338,7 +343,7 @@ def _reconciliation_targets(value, plan, output, media, teacher):
         if score >= 8500 or score != entry["originalSimilarityBps"]:
             raise ValueError("asr_reconciliation_requires_low_similarity")
         audio_path = media / f"{tts_id}.wav"
-        if not audio_path.is_file() or hashlib.sha256(audio_path.read_bytes()).hexdigest() != entry["audioSha256"]:
+        if not course_exists(audio_path) or hashlib.sha256(course_bytes(audio_path)).hexdigest() != entry["audioSha256"]:
             raise ValueError("asr_reconciliation_original_audio_mismatch")
         # One permanent slot per original ASR. No filename, reason, timestamp,
         # transcript or review score can create another recognition identity.
@@ -389,9 +394,9 @@ def _verify_clone_lineage(value, source_plan, plan, output):
         if directory.is_symlink():
             raise ValueError("audio_clone_candidate_symlink")
         paths = [directory / name for name in ("input.json", "classroom.json")]
-        if any(path.is_symlink() or not path.is_file() for path in paths):
+        if any(path.is_symlink() or not course_exists(path) for path in paths):
             raise ValueError("audio_clone_frozen_candidate_required")
-        frozen, room = [json.loads(path.read_text()) for path in paths]
+        frozen, room = [json.loads(course_text(path)) for path in paths]
         if (frozen.get("taskId") != value["taskId"] or frozen.get("binding") != expected["binding"]
                 or frozen.get("inputSha256") != digest({k: v for k, v in frozen.items() if k != "inputSha256"})
                 or room.get("id") != expected["classroomId"] or digest(room) != expected["sourceSha256"]
@@ -417,8 +422,8 @@ def _inheritance_targets(value, plan, output, media, teacher):
         raise ValueError("audio_inheritance_requires_distinct_source")
     if value["targetPlanSha256"] != digest(plan) or value["targetSourceSha256"] != plan["sourceSha256"]:
         raise ValueError("audio_inheritance_target_mismatch")
-    source_plan = json.loads((source / "plan.json").read_text())
-    source_audit = json.loads((source / "audit.json").read_text())
+    source_plan = json.loads(course_text(source / "plan.json"))
+    source_audit = json.loads(course_text(source / "audit.json"))
     if (digest(source_plan) != value["sourcePlanSha256"] or digest(source_audit) != value["sourceAuditSha256"]
             or source_plan.get("sourceSha256") != value["sourceSha256"]
             or source_plan.get("schemaVersion") not in {"mira.textbook.batch-audio.v1", "mira.textbook.batch-audio.v2"}
@@ -524,11 +529,11 @@ def _inheritance_targets(value, plan, output, media, teacher):
                 or (10000 if page_receipt is not None else literal_score) != entry["similarityBps"]):
             raise ValueError("audio_inheritance_transcript_mismatch")
         audio_path = source_media / f"{tts_id}.wav"
-        if audio_path.is_symlink() or not audio_path.is_file() or hashlib.sha256(audio_path.read_bytes()).hexdigest() != entry["audioSha256"]:
+        if audio_path.is_symlink() or not course_exists(audio_path) or hashlib.sha256(course_bytes(audio_path)).hexdigest() != entry["audioSha256"]:
             raise ValueError("audio_inheritance_audio_mismatch")
         target_tts_id, _, _, _ = _segment_requests(plan, item, teacher)
         target_asr_id = _asr_request_id(plan, target_tts_id, entry["audioSha256"])
-        if (output / f"{target_tts_id}.json").exists() or (output / f"{target_asr_id}.json").exists():
+        if course_exists(output / f"{target_tts_id}.json") or course_exists(output / f"{target_asr_id}.json"):
             raise ValueError("audio_inheritance_conflicts_with_target_dispatch")
         evidence = {"schemaVersion": value["schemaVersion"],
                 "sourceAudioAuditDirectory": str(source), "sourcePlanSha256": digest(source_plan),
@@ -539,7 +544,7 @@ def _inheritance_targets(value, plan, output, media, teacher):
             evidence.update({key: value[key] for key in
                 ("taskId", "sourceCandidateDirectory", "targetCandidateDirectory")})
         checkpoint = output / f"{tts_id}.inheritance.json"
-        if checkpoint.exists() and json.loads(checkpoint.read_text()) != evidence:
+        if course_exists(checkpoint) and json.loads(course_text(checkpoint)) != evidence:
             raise RuntimeError("frozen_audio_inheritance_segment_changed")
         targets[key] = {"ttsId": tts_id, "tts": tts, "asrId": asr_id, "asr": asr,
                         "sourceAudioPath": audio_path, "evidence": evidence,
@@ -577,11 +582,11 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
     if audio_language_policy is not None:
         if output.name == "audio-audit":
             raise ValueError("english_auto_language_requires_distinct_audit_directory")
-        if output.exists() and not (output / "plan.json").is_file() and any(output.iterdir()):
+        if course_is_dir(output) and not course_exists(output / "plan.json") and next(course_glob(output), None) is not None:
             raise ValueError("english_auto_language_requires_empty_or_matching_audit_directory")
     output.mkdir(parents=True, exist_ok=True)
     original_file = root / f"{classroom_id}.json"
-    if not original_file.is_file():
+    if not course_exists(original_file):
         raise RuntimeError("original_runtime_classroom_missing")
     # Files are private generated content, not a license to replace editor work.
     from services.textbook_preview_audio import core_content
@@ -595,31 +600,31 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
                 q.pop("questionAudioUrl", None)
                 q.pop("feedbackAudioUrl", None)
         return value
-    if core(json.loads(original_file.read_text())) != core(canonical_source):
+    if core(json.loads(course_text(original_file))) != core(canonical_source):
         raise RuntimeError("runtime_classroom_changed")
     plan = build_audio_plan(classroom, binding, runtime.base_url, audio_language_policy=audio_language_policy)
     with (output / "operator.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         plan_path = output / "plan.json"
-        if plan_path.exists() and json.loads(plan_path.read_text()) != plan:
+        if course_exists(plan_path) and json.loads(course_text(plan_path)) != plan:
             raise RuntimeError("frozen_audio_plan_changed")
-        if not plan_path.exists():
+        if not course_exists(plan_path):
             save_json(plan_path, plan)
         spelling_path = output / 'page-number-policy.json'
         spelling_policy = {'schemaVersion': 'mira.textbook.page-number-policy.v1',
                            'planSha256': digest(plan), 'allowed': True}
-        if spelling_path.exists() and (not allow_page_number_equivalence
-                or json.loads(spelling_path.read_text()) != spelling_policy):
+        if course_exists(spelling_path) and (not allow_page_number_equivalence
+                or json.loads(course_text(spelling_path)) != spelling_policy):
             raise ValueError('page_number_review_policy_changed')
-        if allow_page_number_equivalence and not spelling_path.exists():
+        if allow_page_number_equivalence and not course_exists(spelling_path):
             save_json(spelling_path, spelling_policy)
         narrated, segments, interactive_urls = deepcopy(classroom), [], {}
         media = root / classroom_id / "audio"
         media.mkdir(parents=True, exist_ok=True)
         inheritance_path = output / "inheritance-manifest.json"
         inheritance_set = normalize_audio_inheritance(audio_inheritance)
-        if inheritance_path.exists() and (inheritance_set is None
-                or normalize_audio_inheritance(json.loads(inheritance_path.read_text())) != inheritance_set):
+        if course_exists(inheritance_path) and (inheritance_set is None
+                or normalize_audio_inheritance(json.loads(course_text(inheritance_path))) != inheritance_set):
             raise RuntimeError("frozen_audio_inheritance_manifest_required")
         inheritance_set, inheritance_targets = _inheritance_set_targets(
             inheritance_set, plan, output, media, teacher)
@@ -629,7 +634,7 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
         reconciliation_targets = _reconciliation_targets(asr_reconciliation, plan, output, media, teacher)
         if inheritance_targets.keys() & reconciliation_targets.keys():
             raise ValueError("audio_inheritance_reconciliation_overlap")
-        if inheritance_set is not None and not inheritance_path.exists():
+        if inheritance_set is not None and not course_exists(inheritance_path):
             save_json(inheritance_path, inheritance_set)
         for i, item in enumerate(workload, 1):
             tts_id, identity, text_hash, tts_payload = _segment_requests(plan, item, teacher)
@@ -637,15 +642,15 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
             if inherited:
                 tts_id, tts = inherited["ttsId"], inherited["tts"]
                 checkpoint = output / f"{tts_id}.inheritance.json"
-                if checkpoint.exists() and json.loads(checkpoint.read_text()) != inherited["evidence"]:
+                if course_exists(checkpoint) and json.loads(course_text(checkpoint)) != inherited["evidence"]:
                     raise RuntimeError("frozen_audio_inheritance_segment_changed")
-                if not checkpoint.exists():
+                if not course_exists(checkpoint):
                     save_json(checkpoint, inherited["evidence"])
             else:
                 tts = _external_once(runtime, output / f"{tts_id}.json", tts_id, "tts", tts_payload)
             audio_path = media / f"{tts_id}.wav"
-            audio = (audio_path.read_bytes() if audio_path.exists() else
-                     inherited["sourceAudioPath"].read_bytes() if inherited else
+            audio = (course_bytes(audio_path) if course_exists(audio_path) else
+                     course_bytes(inherited["sourceAudioPath"]) if inherited else
                      runtime.download_formal_audio_tts(tts_id, expected_sha256=tts["audioSha256"]))
             if hashlib.sha256(audio).hexdigest() != tts["audioSha256"]:
                 raise RuntimeError("narration_audio_hash_changed")
@@ -653,7 +658,7 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
                 duration = wav.getnframes() / wav.getframerate()
                 if not 0 < duration <= 240 or wav.getnchannels() != 1 or wav.getsampwidth() != 2:
                     raise ValueError("invalid_narration_wav")
-            if not audio_path.exists():
+            if not course_exists(audio_path):
                 with audio_path.open("xb") as stream:
                     stream.write(audio)
             if inherited:
@@ -679,8 +684,8 @@ def narrate_candidate(runtime, classroom, binding, output, classroom_directory, 
                         or digest(asr) != entry["originalAsrReceiptSha256"]):
                     raise RuntimeError("asr_reconciliation_original_receipt_changed")
                 authorization_path = output / f"{target['requestId']}.authorization.json"
-                if authorization_path.exists():
-                    if json.loads(authorization_path.read_text()) != target["authorization"]:
+                if course_exists(authorization_path):
+                    if json.loads(course_text(authorization_path)) != target["authorization"]:
                         raise RuntimeError("frozen_asr_reconciliation_changed")
                 else:
                     save_json(authorization_path, target["authorization"])

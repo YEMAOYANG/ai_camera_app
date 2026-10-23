@@ -26,6 +26,10 @@ PUBLIC = ROOT / 'student-web/public/textbooks/navigation-v1'
 TARGET = ROOT / 'backend/content/textbooks/activities/navigation-audio-v1'
 
 
+def texts(source):
+    return set(source['cues'].values())
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--synthesize', action='store_true')
@@ -33,7 +37,7 @@ def main():
     source = json.loads(SOURCE.read_text())
     teacher = get_formal_subject_qwen_voice_identity('chinese')
     frozen = {'schemaVersion': source['schemaVersion'], 'teacher': teacher.to_target_payload(),
-              'texts': sorted(set(source['cues'].values()))}
+              'texts': sorted(texts(source))}
     WORK.mkdir(parents=True, exist_ok=True)
     with (WORK / 'operator.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)

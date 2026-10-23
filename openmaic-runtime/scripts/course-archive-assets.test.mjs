@@ -97,6 +97,52 @@ test('a BASE literal expands only bounded safe stage images, including restored 
  const empty=await resolveArchiveAssets({...f.input,stagingRoot:path.join(f.directory,'empty','asset-sources')},f.dependencies);
  assert.equal(empty.unresolved.length,1);
 });
+const registeredImage=(name='picture.png',changes={})=>({path:'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/stage-one/media/'+name,sha256:'a'.repeat(64),byteSize:123,mimeType:'image/png',...changes});
+test('registry BASE enumeration uses only exact bounded records and never reads local media or manifests',async t=>{
+ const snapshot=room([]);snapshot.scenes[0].content={type:'interactive',html:"<script>const BASE='/api/classroom-media/stage-one/media/';throw Error('not executable');</script>"};
+ const f=await fixture(t,snapshot),directory=path.join(f.dependencies.nativeRoot,'data/classrooms/stage-one/media');
+ await fs.mkdir(directory,{recursive:true});await fs.writeFile(path.join(directory,'local-shadow.png'),'unregistered shadow');
+ const manifestPath=path.join(f.directory,'invalid-manifest.json');await fs.writeFile(manifestPath,'not valid JSON');
+ const records=[registeredImage('z.png'),registeredImage('a.webp',{mimeType:'image/webp',sha256:'b'.repeat(64)}),
+  registeredImage('private.json',{mimeType:'application/json'}),registeredImage('other.png',{path:'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/other-stage/media/other.png'}),
+  registeredImage('teacher.wav',{path:'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/stage-one/audio/teacher.wav',mimeType:'audio/wav'})];
+ const result=await resolveArchiveAssets({...f.input,registryFiles:records},{...f.dependencies,config:{mode:'registry',manifestPath}});
+ assert.equal(result.unresolved.length,0);assert.deepEqual(result.entries.filter(e=>e.registrySourcePath).map(e=>e.ref),['/api/classroom-media/stage-one/media/a.webp','/api/classroom-media/stage-one/media/z.png']);
+ const selected=result.entries.find(e=>e.ref.endsWith('/a.webp'));
+ assert.deepEqual({sha256:selected.sha256,byteSize:selected.byteSize,mimeType:selected.mimeType,sourcePath:selected.registrySourcePath},
+  {sha256:'b'.repeat(64),byteSize:123,mimeType:'image/webp',sourcePath:records[1].path});
+ assert(!result.entries.some(e=>e.ref.includes('local-shadow')||e.ref.endsWith('private.json')||e.ref.includes('other-stage')||e.ref.endsWith('teacher.wav')));
+ assert.equal(f.calls.length,0);
+ const local=await resolveArchiveAssets({...f.input,registryFiles:[registeredImage('remote-only.png')]},f.dependencies);
+ assert(local.entries.some(e=>e.ref.endsWith('/local-shadow.png')));assert(!local.entries.some(e=>e.ref.endsWith('/remote-only.png')));
+});
+test('registry BASE rejects absent, ambiguous, unsafe, stale-shape and over-budget records without fallback',async t=>{
+ const snapshot=room([]);snapshot.scenes[0].content={type:'interactive',html:"<script>const BASE='/api/classroom-media/stage-one/media/';</script>"};
+ const f=await fixture(t,snapshot),directory=path.join(f.dependencies.nativeRoot,'data/classrooms/stage-one/media');await fs.mkdir(directory,{recursive:true});await fs.writeFile(path.join(directory,'local.png'),'local');
+ const cases={absent:undefined,empty:[],object:{},not_record:[null],duplicate:[registeredImage(),registeredImage()],
+  bad_sha:[registeredImage('a.png',{sha256:'invalid'})],sha_type:[registeredImage('a.png',{sha256:['a'.repeat(64)]})],bad_size:[registeredImage('a.png',{byteSize:0})],oversize:[registeredImage('a.png',{byteSize:769*1024**2})],
+  fractional:[registeredImage('a.png',{byteSize:1.5})],bad_mime:[registeredImage('a.png',{mimeType:'text/plain'})],
+  traversal:[registeredImage('a.png',{path:'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/stage-one/media/../a.png'})],
+  absolute:[registeredImage('a.png',{path:'/private/a.png'})],backslash:[registeredImage('a.png',{path:'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/stage-one/media/a\\b.png'})],
+  nested:[registeredImage('nested/a.png')],wrong_stage:[registeredImage('a.png',{path:'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/other/media/a.png'})],
+  too_many:Array.from({length:513},(_,i)=>registeredImage('image-'+i+'.png'))};
+ for(const [label,registryFiles]of Object.entries(cases))await t.test(label,async()=>{
+  const result=await resolveArchiveAssets({...f.input,registryFiles},{...f.dependencies,config:{mode:'registry'}});
+  assert.equal(result.unresolved.length,1);assert.equal(result.unresolved[0].reason,'controlled_classroom_media_directory_unavailable');assert(!result.entries.some(e=>e.expandedDirectory||e.registrySourcePath));
+ });
+ // Document content cannot smuggle caller-owned registry authority.
+ const result=await resolveArchiveAssets({...f.input,snapshot:{...snapshot,registryFiles:[registeredImage()]}},{...f.dependencies,config:{mode:'registry'}});
+ assert.equal(result.unresolved.length,1);assert.equal(f.calls.length,0);
+});
+test('registry preserves complete refs and uses the reserved artifact root for recovered classroom directories',async t=>{
+ const complete=await fixture(t,room(['/api/classroom-media/stage-one/media/direct.png']));
+ const direct=await resolveArchiveAssets({...complete.input,registryFiles:'invalid'},{...complete.dependencies,config:{mode:'registry'}});
+ assert.deepEqual(direct.entries,[{ref:'/api/classroom-media/stage-one/media/direct.png',kind:'image',status:'already_collected'}]);
+ const snapshot=room([]);snapshot.scenes[0].content={type:'interactive',html:"<script>const BASE='/api/classroom-media/omclass_recovered/media/';</script>"};
+ const f=await fixture(t,snapshot),entry=registeredImage('a.png',{path:'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/omclass_recovered/artifact/media/a.png'});
+ const result=await resolveArchiveAssets({...f.input,registryFiles:[entry]},{...f.dependencies,config:{mode:'registry'}});
+ assert.equal(result.unresolved.length,0);assert.equal(result.entries.find(e=>e.registrySourcePath)?.ref,'/api/classroom-media/omclass_recovered/media/a.png');
+});
 test('owner-bound and source-referenced shared bytes are read under a read-only transaction and SHA checked',async t=>{
  const f=await fixture(t,room(['ast_owned','ast_shared']));
  await f.asset('ast_owned','owner-one');await f.asset('ast_shared','shared',Buffer.from('other image bytes'));

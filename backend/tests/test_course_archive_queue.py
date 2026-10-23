@@ -124,6 +124,21 @@ class Client:
 
 
 class CourseArchiveQueueTest(unittest.TestCase):
+    def test_registry_failure_keeps_verified_payload_and_event_for_safe_retry(self):
+        event = filesystem_event(self.fs())
+        job = self.queue.enqueue(event)
+        self.processor.database = object()
+        with patch("core.course_storage_config.CourseStorageConfig.from_env", return_value=Mock(mode="registry")), \
+                patch("repositories.course_storage_repository.CourseStorageRepository"), \
+                patch("services.course_storage_registration.register_archive", side_effect=RuntimeError("fixture unavailable")) as register:
+            self.assertFalse(self.processor.process(job))
+        register.assert_called_once()
+        self.assertTrue(Path(event["eventPath"]).exists())
+        self.assertEqual(self.client.acks, [])
+        self.assertEqual(self.client.uploads, 1)
+        self.assertTrue(Path(job["export"]["indexPath"]).parent.joinpath("完整课件.zip").exists())
+        self.assertNotEqual(job.get("stagingPruned"), True)
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("MIRA_TASK_TMPDIR"))
         self.addCleanup(self.tmp.cleanup)

@@ -47,6 +47,7 @@ class JourneyPersistenceTests(unittest.TestCase):
         self.service.repository = SimpleNamespace(transaction=self.db.transaction)
         self.service.learning = LearningRepository(self.db)
         self.service._authority = Mock(return_value=({}, self.child, {}, self.release, self.course, {'id':'session'}))
+        self.service._playback_release = Mock(side_effect=lambda value: value)
         self.time = 1800000000000
         self.stack = ExitStack()
         for name in ('content.textbook_journey.now_ms', 'services.textbook_classroom_service.now_ms', 'services.textbook_journey_service.now_ms'):

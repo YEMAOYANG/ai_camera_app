@@ -23,6 +23,7 @@ from content import textbook_pinyin_pronunciation as pronunciation_registry
 from core.errors import ApiError
 from core.security import now_ms
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
+from services.course_file_store import course_bytes, course_exists, course_is_dir, course_text
 
 
 def core_content(classroom):
@@ -126,6 +127,9 @@ def bind_cue_audio(classroom, classroom_id):
 
 
 def atomic_json(path, value):
+    from services.course_file_store import course_write_bytes
+    if course_write_bytes(path, canonical(value).encode('utf-8')):
+        return
     temporary = path.with_suffix(".tmp")
     temporary.write_text(canonical(value), encoding="utf-8")
     temporary.replace(path)
@@ -133,7 +137,7 @@ def atomic_json(path, value):
 
 def assert_no_pending_pronunciation_revision(folder):
     """A profile switch must finish reconciliation before narration can resume."""
-    if (folder / 'pronunciation-revision-pending.json').exists():
+    if course_exists(folder / 'pronunciation-revision-pending.json'):
         raise ApiError('textbook_preview_audio_conflict',
                        '拼音配音版本切换尚未完成，请先恢复已有修订，不能开始配音', 409)
 
@@ -186,13 +190,13 @@ def validate_recorded_failure_retry(*, enabled, attempt, fences, selected, selec
                    for field in RETRY_FENCE_FIELDS)):
         raise ApiError('textbook_preview_audio_retry_invalid',
                        '失败配音重试必须选择唯一旁白、指定连续的下一次尝试并提供四项摘要', 409)
-    if plan is None or not plan_path.is_file() or not receipts_path.is_file():
+    if plan is None or not course_exists(plan_path) or not course_exists(receipts_path):
         raise ApiError('textbook_preview_audio_retry_invalid', '失败配音重试缺少原配音计划或回执', 409)
     actual = {
-        'planSha256': hashlib.sha256(plan_path.read_bytes()).hexdigest(),
+        'planSha256': hashlib.sha256(course_bytes(plan_path)).hexdigest(),
         'coreSha256': digest(core_content(original)),
         'classroomSha256': row['classroom_sha256'],
-        'receiptsSha256': hashlib.sha256(receipts_path.read_bytes()).hexdigest(),
+        'receiptsSha256': hashlib.sha256(course_bytes(receipts_path)).hexdigest(),
     }
     if (actual != fences or selection.get('coreSha256') != fences['coreSha256']
             or plan.get('coreSha256') != fences['coreSha256'] or digest(plan) != fences['planSha256']):
@@ -201,7 +205,7 @@ def validate_recorded_failure_retry(*, enabled, attempt, fences, selected, selec
     scene_id, action_id = next(iter(selected))
     action = next(a for s in original['scenes'] if s['id'] == scene_id
                   for a in s.get('actions', []) if a['id'] == action_id)
-    historical = json.loads(receipts_path.read_text())
+    historical = json.loads(course_text(receipts_path))
     by_id = {r['requestId']: r for r in historical}
     # A later explicit authorization must not skip a missing, in-flight or
     # successful attempt. Every earlier attempt remains in the receipt chain.
@@ -264,7 +268,7 @@ def segment_request_plan(plan, receipt, folder, *, text):
         return plan
     if not isinstance(revision, str) or not re.fullmatch(r'[a-f0-9]{64}', revision):
         raise ApiError('textbook_preview_audio_conflict', '旁白修订编号无效', 409)
-    child = json.loads((Path(folder) / 'narration-revisions' / revision / 'plan.json').read_text())
+    child = json.loads(course_text(Path(folder) / 'narration-revisions' / revision / 'plan.json'))
     validate_child_request_plan(plan, child, text=text.strip())
     if child['revisionId'] != revision:
         raise ApiError('textbook_preview_audio_conflict', '旁白修订计划编号不符', 409)
@@ -340,18 +344,23 @@ def recover_completed_audio_save(service, row, root, original):
     assert_no_pending_pronunciation_revision(folder)
     def fail():
         raise ApiError('textbook_preview_storage_mismatch', '课堂不等于已验证音频断点的唯一绑定结果，请先核对原记录', 409)
-    if not folder.is_dir():
+    if not course_is_dir(folder):
         fail()
+    folder.mkdir(parents=True, exist_ok=True)
     with (folder / 'operator.lock').open('a') as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             raise ApiError('textbook_preview_audio_running', '这节课正在配音，请读取已有任务', 409)
         assert_no_pending_pronunciation_revision(folder)
+        # A registered checkpoint is a working version. Capture its current
+        # bytes before the first progress write, while holding the operator lock.
+        if course_exists(folder / 'checkpoint.json'):
+            course_bytes(folder / 'checkpoint.json')
         try:
-            plan = json.loads((folder / 'plan.json').read_text())
-            target = json.loads((folder / 'checkpoint.json').read_text())
-            checkpoint_receipts = json.loads((folder / 'receipts.json').read_text())
+            plan = json.loads(course_text(folder / 'plan.json'))
+            target = json.loads(course_text(folder / 'checkpoint.json'))
+            checkpoint_receipts = json.loads(course_text(folder / 'receipts.json'))
         except (OSError, ValueError):
             fail()
         frozen = service.repository.parse(row['input_json'])
@@ -376,17 +385,17 @@ def recover_completed_audio_save(service, row, root, original):
             request = receipt['requestId']
             asset = root / classroom_id / 'audio' / (request + '.wav')
             if (action.get('audioUrl') != f'{runtime.base_url}/api/classroom-media/{classroom_id}/audio/{request}.wav'
-                    or not asset.is_file() or hashlib.sha256(asset.read_bytes()).hexdigest() != receipt.get('audioSha256')):
+                    or not course_exists(asset) or hashlib.sha256(course_bytes(asset)).hexdigest() != receipt.get('audioSha256')):
                 fail()
             if plan.get('schemaVersion') == PINYIN_SCHEMA:
-                validate_receipt_wav(receipt, asset.read_bytes())
+                validate_receipt_wav(receipt, course_bytes(asset))
         bind_question_audio(target)
         bind_cue_audio(target, classroom_id)
         # createdAt is assigned by the runtime on save; every other field,
         # including actions and audio bindings, must equal the reconstruction.
         def saved_content(value):
             return {k: v for k, v in value.items() if k != 'createdAt'}
-        disk = json.loads((root / (classroom_id + '.json')).read_text())
+        disk = json.loads(course_text(root / (classroom_id + '.json')))
         if saved_content(disk) != saved_content(target):
             fail()
         actual = runtime.get_classroom(classroom_id)
@@ -409,7 +418,7 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
     # The operator must point at the actual classroom store, not an arbitrary
     # destination. Confirm content identity before creating any files or calls.
     source_file = root / f"{classroom_id}.json"
-    if not source_file.is_file():
+    if not course_exists(source_file):
         raise ApiError("textbook_preview_storage_mismatch", "没有找到对应的本机课件文件", 409)
     folder = root / classroom_id / "textbook-preview-audio"
     assert_no_pending_pronunciation_revision(folder)
@@ -424,12 +433,12 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
     frozen = service.repository.parse(row["input_json"])
     plan_path = folder / "plan.json"
     receipts_path = folder / 'receipts.json'
-    plan = json.loads(plan_path.read_text()) if plan_path.exists() else None
+    plan = json.loads(course_text(plan_path)) if course_exists(plan_path) else None
     assert_required_pronunciation_plan(frozen, plan)
     retry = validate_recorded_failure_retry(enabled=retry_recorded_failure, attempt=retry_attempt,
         fences=retry_fences, selected=selected, selection=speech_selection, row=row, plan=plan,
         plan_path=plan_path, receipts_path=receipts_path, original=original)
-    if core_content(json.loads(source_file.read_text())) != core_content(original):
+    if core_content(json.loads(course_text(source_file))) != core_content(original):
         if selected is None:
             return recover_completed_audio_save(service, row, root, original)
         raise ApiError("textbook_preview_storage_mismatch", "本机课件内容与数据库快照不一致", 409)
@@ -459,10 +468,10 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
                 if by_id[request_id]['status'] != 'succeeded':
                     raise ApiError("textbook_preview_audio_invalid", "当前语音未成功", 409)
                 asset = root / classroom_id / "audio" / (request_id + ".wav")
-                if not asset.is_file() or hashlib.sha256(asset.read_bytes()).hexdigest() != by_id[request_id]["audioSha256"]:
+                if not course_exists(asset) or hashlib.sha256(course_bytes(asset)).hexdigest() != by_id[request_id]["audioSha256"]:
                     raise ApiError("textbook_preview_audio_asset_missing", "已完成的配音文件缺失或变化，请从原音频记录恢复", 409)
                 if plan.get('schemaVersion') == PINYIN_SCHEMA:
-                    validate_receipt_wav(by_id[request_id], asset.read_bytes())
+                    validate_receipt_wav(by_id[request_id], course_bytes(asset))
             for scene in original['scenes']:
                 for action in scene.get('actions', []):
                     if action.get('type') == 'speech':
@@ -479,7 +488,7 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
             current_row = service.get(key)
             current_original = service.repository.parse(current_row['classroom_json'])
             validate_recorded_failure_retry(enabled=True, attempt=retry['attempt'], fences=retry['fences'],
-                selected=selected, selection=speech_selection, row=current_row, plan=json.loads(plan_path.read_text()),
+                selected=selected, selection=speech_selection, row=current_row, plan=json.loads(course_text(plan_path)),
                 plan_path=plan_path, receipts_path=receipts_path, original=current_original)
             if (current_row['status'] != row['status'] or current_row['input_json'] != row['input_json']
                     or current_original != original):
@@ -492,8 +501,8 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
         # A page whose cues cannot be bound must stop before any paid speech.
         for scene in cue_pages(classroom):
             cue_speech(scene)
-        if plan_path.exists():
-            plan = json.loads(plan_path.read_text())
+        if course_exists(plan_path):
+            plan = json.loads(course_text(plan_path))
             assert_required_pronunciation_plan(frozen, plan)
             resolve_audio_contract(plan, frozen)
             if plan["previewKey"] != key or plan["coreSha256"] != digest(core_content(classroom)):
@@ -515,7 +524,7 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
             for _, action in workload:
                 pronunciation_identity(action['text'].strip(), policy_version=policy_for_plan(plan)['policyVersion'])
         try:
-            checkpoint_receipts = json.loads(receipts_path.read_text()) if receipts_path.exists() else []
+            checkpoint_receipts = json.loads(course_text(receipts_path)) if course_exists(receipts_path) else []
         except (OSError, ValueError) as exc:
             raise ApiError('textbook_preview_audio_conflict', '无法读取已有配音收据，请先恢复原记录', 409) from exc
         receipt_index = preserved_receipts(plan, receipts, checkpoint_receipts,
@@ -566,7 +575,7 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
                                '目标尝试在运行端已经存在，只能先核对，不能再次派发', 409)
             claim_dir = folder / 'retry-claims'
             claim_path = claim_dir / (request_id + '.json')
-            if claim_path.exists() or request_id in receipt_index:
+            if course_exists(claim_path) or request_id in receipt_index:
                 raise ApiError('textbook_preview_audio_retry_invalid', '目标尝试已经声明，不能再次派发', 409)
             identity = {'planSha256': digest(plan), 'attempt': retry['attempt']}
             remember({'requestId': request_id, 'status': 'unknown', 'audioSha256': None,
@@ -623,10 +632,10 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
                     receipt = next(r for r in inheritance['parent']['receipts'] if r['requestId'] == saved['ttsRequestId'])
                     verify_segment_receipt(plan, receipt, scene, action, folder, inheritance=inheritance)
                     asset = audio_dir / (saved['ttsRequestId'] + '.wav')
-                    if not asset.is_file() or hashlib.sha256(asset.read_bytes()).hexdigest() != saved['audioSha256']:
+                    if not course_exists(asset) or hashlib.sha256(course_bytes(asset)).hexdigest() != saved['audioSha256']:
                         raise ApiError('textbook_preview_audio_asset_missing', '继承的原音频副本缺失或变化', 409)
                     if plan.get('schemaVersion') == PINYIN_SCHEMA:
-                        validate_receipt_wav(receipt, asset.read_bytes())
+                        validate_receipt_wav(receipt, course_bytes(asset))
                     # Keep the original receipt byte-equivalent. The separate
                     # provenance binds it; no provider call or relabelled id.
                     remember(receipt)
@@ -676,8 +685,8 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
                 remember(receipt)
                 filename = request_id + ".wav"
                 target = audio_dir / filename
-                if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest() == receipt["audioSha256"]:
-                    audio = target.read_bytes()
+                if course_exists(target) and hashlib.sha256(course_bytes(target)).hexdigest() == receipt["audioSha256"]:
+                    audio = course_bytes(target)
                 else:
                     audio = runtime.download_formal_audio_tts(request_id, expected_sha256=receipt["audioSha256"])
                 if plan.get('schemaVersion') == PINYIN_SCHEMA:

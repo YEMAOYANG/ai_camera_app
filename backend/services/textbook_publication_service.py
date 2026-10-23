@@ -7,6 +7,7 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
+import re
 from urllib.parse import urlparse
 
 from content.textbook_catalog import canonical, digest, lesson_by_id
@@ -24,15 +25,72 @@ from core.errors import ApiError
 from core.security import now_ms
 from services.textbook_preview_audio import verify_segment_receipt
 from services.course_media_object_store import CourseMediaObjectStore, CourseMediaStorageError
+from services.course_file_store import (MAX_FILE_BYTES, CourseFileStore, CourseFileStorageError,
+    course_bytes, course_exists, course_text)
 
 
 class TextbookPublicationService:
-    def __init__(self, preview_service, delivery_copy=None, *, course_media_store=None):
+    def __init__(self, preview_service, delivery_copy=None, *, course_media_store=None, course_file_store=None):
         self.preview = preview_service
         self.repository = preview_service.repository
         # Optional smaller copy of a reviewed picture or narration file.
         self.delivery_copy = delivery_copy
         self.course_media_store = course_media_store or CourseMediaObjectStore()
+        self._course_file_store = course_file_store
+
+    def _verify_publication_source(self, current, frozen, prepared):
+        """Read the committed head while holding only the preview business lock.
+
+        CourseFileStore uses fresh, ordinary registry SELECTs on its own read
+        transactions. Taking a head lock here would reverse the writer's
+        head -> preview lock order; resolving a historical SHA would hide a
+        remote update whose SQL preview snapshot has not caught up yet.
+        """
+        store = self._course_file_store or CourseFileStore()
+        classroom_id = current.get('classroom_id')
+        if not isinstance(classroom_id, str) or re.fullmatch(r'[A-Za-z0-9_-]+', classroom_id) is None:
+            fail('课件来源身份无效，请重新审核')
+        root = store.project_root / 'openmaic-runtime/.runtime/OpenMAIC/data/classrooms'
+        paths = ([root / classroom_id / 'artifact/classroom.json'] if classroom_id.startswith('omclass_') else
+                 [root / (classroom_id + '.json'), root / classroom_id / 'classroom.json'])
+        # prepare supports an explicit local classroom directory. Keep this
+        # operator path outside the frozen/public release identities, and still
+        # check the standard registered paths first so it cannot hide a head.
+        source_path = prepared.get('sourceClassroomPath')
+        if source_path is not None:
+            path = Path(source_path)
+            if not path.is_absolute() or path.name != classroom_id + '.json':
+                fail('课件来源路径无效，请重新审核')
+            if path not in paths:
+                paths.append(path)
+        try:
+            selected = None
+            # Native checks all registered spellings before any local draft,
+            # then selects only the first registered spelling. A secondary
+            # historical alias must not veto the actual current classroom.
+            for path in paths:
+                entry = store.resolve(path)  # Current head; intentionally no expected/historical SHA.
+                if entry is not None:
+                    raw = store.read_bytes(path, expected_sha256=entry['sha256'], expected_bytes=entry['byteSize'])
+                    if raw is None:
+                        raise CourseFileStorageError('Registered publication source unavailable')
+                    selected = raw
+                    break
+            if selected is None:
+                for path in paths:
+                    if not path.exists():
+                        continue
+                    if not path.is_file() or path.stat().st_size > MAX_FILE_BYTES:
+                        raise CourseFileStorageError('Local publication source invalid')
+                    selected = path.read_bytes()
+                    break
+            if selected is None:
+                raise CourseFileStorageError('Publication source unavailable')
+            checksum = digest(json.loads(selected))
+            if checksum != frozen['sourceSha256'] or checksum != current['classroom_sha256']:
+                fail('课件来源版本已被编辑，请重新审核')
+        except (CourseFileStorageError, OSError, ValueError, KeyError, TypeError):
+            fail('课件来源校验失败，请稍后重试')
 
     def prepare(self, *, key, edition, revision, node, teaching_revision, review, audio_audit, classroom_directory,
                 asr_reconciliation=None, pronunciation_review=None):
@@ -54,7 +112,7 @@ class TextbookPublicationService:
         _, lesson = lesson_by_id(manifest, node)
         original_input = self.repository.parse(row['input_json'])
         root = Path(classroom_directory).resolve()
-        plan = json.loads((root / row['classroom_id'] / 'textbook-preview-audio/plan.json').read_text())
+        plan = json.loads(course_text(root / row['classroom_id'] / 'textbook-preview-audio/plan.json'))
         contract = resolve_audio_contract(plan, original_input)
         from services.textbook_operator_revision_service import _same_parent, checked_bytes, load_inheritance, media_path
         inheritance = load_inheritance(root / row['classroom_id'] / 'textbook-preview-audio', plan, frozen=original_input)
@@ -135,7 +193,7 @@ class TextbookPublicationService:
                     fail('自动审核中的正式 TTS 回执不是当前实际回执')
             for request_plan in pronunciation_review['requestPlans']:
                 path = root / row['classroom_id'] / 'textbook-preview-audio' / 'narration-revisions' / request_plan['revisionId'] / 'plan.json'
-                if not path.is_file() or json.loads(path.read_text()) != request_plan:
+                if not course_exists(path) or json.loads(course_text(path)) != request_plan:
                     fail('自动审核中的旁白修订计划没有对应实际归档')
         elif plan.get('schemaVersion') == PINYIN_SCHEMA and visual_acceptance is None:
             listening = audio_audit.get('listeningReview')
@@ -174,9 +232,9 @@ class TextbookPublicationService:
                 root / row['classroom_id'] / 'textbook-preview-audio', inheritance=inheritance)
             if plan.get('schemaVersion') == PINYIN_SCHEMA:
                 asset = root / row['classroom_id'] / 'audio' / (a['audioId'] + '.wav')
-                if not asset.is_file():
+                if not course_exists(asset):
                     fail('正式拼音 WAV 缺失')
-                validate_receipt_wav(tts, asset.read_bytes())
+                validate_receipt_wav(tts, course_bytes(asset))
             if inherited is not None and audit != inherited:
                 fail('继承段落的审核必须可逐项重建自原始 ASR 收据')
             if inherited is None and 'operatorParent' in audit:
@@ -306,7 +364,7 @@ class TextbookPublicationService:
         if urlparse(self.preview.runtime.base_url).hostname not in {'localhost', '127.0.0.1', '::1'}:
             fail('本机发布工具不能写入其他运行环境')
         original_file = root / (row['classroom_id'] + '.json')
-        if not original_file.is_file() or digest(json.loads(original_file.read_text())) != digest(source):
+        if not course_exists(original_file) or digest(json.loads(course_text(original_file))) != digest(source):
             fail('本机保存的课件与审核快照不一致')
         media, delivered = {}, {}
 
@@ -315,13 +373,13 @@ class TextbookPublicationService:
             if old.startswith('http') and urlparse(old).netloc != urlparse(self.preview.runtime.base_url).netloc:
                 fail('存在未审核的外部素材')
             source_path = (root / match.group(1) / match.group(2)).resolve()
-            if root not in source_path.parents or not source_path.is_file():
+            if root not in source_path.parents or not course_exists(source_path):
                 fail('课件素材丢失')
-            if not 0 < source_path.stat().st_size <= MAX_MEDIA_BYTES:
-                fail('课件素材格式或大小无效')
             if source_path in delivered:
                 return delivered[source_path]
-            raw = source_path.read_bytes()
+            raw = course_bytes(source_path, max_bytes=MAX_MEDIA_BYTES)
+            if not raw:
+                fail('课件素材格式或大小无效')
             suffix = source_path.suffix.lower()
             media_mime_type(suffix, raw)
             reviewed_sha = hashlib.sha256(raw).hexdigest()
@@ -416,14 +474,16 @@ class TextbookPublicationService:
             'course': {'id': course_id, 'version': teaching_revision, 'grade_code': manifest['gradeCode'],
                 'subject': manifest['subject'], 'node_code': f'textbook:{edition}:{node}',
                 'title': classroom['stage']['name'], 'objective': '；'.join(course_content['objectives']),
-                'content_json': canonical(course_content)}, 'manifest': manifest}
+                'content_json': canonical(course_content)}, 'manifest': manifest,
+            'sourceClassroomPath': str(original_file)}
 
     def publish(self, prepared):
         frozen, course, review = prepared['frozen'], prepared['course'], prepared['review']
         with self.repository.transaction() as conn:
             current = conn.execute('SELECT * FROM learning_textbook_course_previews WHERE preview_key=? FOR UPDATE', (frozen['previewKey'],)).fetchone()
-            if current['classroom_sha256'] != frozen['sourceSha256'] or current['status'] != 'preview_ready':
+            if current is None or current['classroom_sha256'] != frozen['sourceSha256'] or current['status'] != 'preview_ready':
                 fail('预览已被编辑，请重新审核')
+            self._verify_publication_source(current, frozen, prepared)
             binding = frozen['textbookBinding']
             directory = self.repository.get_revision(conn, binding['editionId'], binding['alignmentRevisionId'])
             if directory is None or directory['manifest_sha256'] != binding['alignmentManifestSha256']:

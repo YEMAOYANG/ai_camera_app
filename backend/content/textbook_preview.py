@@ -13,6 +13,7 @@ from content.textbook_catalog import authoring_prompt, digest, lesson_by_id, val
 from content.textbook_interactive_narration import bind_interactive_audio, interactive_cues
 from content.textbook_pedagogy import teaching_profile
 from core.errors import ApiError
+from services.course_file_store import course_bytes, course_text, course_exists, course_glob
 
 PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompts/textbook-preview.v3.json"
 MEDIA_PATH = Path(__file__).resolve().parent / "textbooks/lesson-media-v1/tiandiren.json"
@@ -84,20 +85,20 @@ def _has_external_html_resource(html):
 
 def preview_media(media_path=MEDIA_PATH):
     """Freeze verified original bytes along with the lesson, not a mutable URL."""
-    if not media_path.is_file():
+    if not course_exists(media_path):
         raise ApiError("textbook_preview_media_required", "本课教学范围已登记，原创教学插画尚未完成，不能开始生成", 409)
-    manifest = json.loads(media_path.read_text(encoding="utf-8"))
+    manifest = json.loads(course_text(media_path))
     for asset in manifest["assets"]:
         path = media_path.parent / asset["file"]
-        if path.parent != media_path.parent or hashlib.sha256(path.read_bytes()).hexdigest() != asset["sha256"]:
+        if path.parent != media_path.parent or hashlib.sha256(course_bytes(path)).hexdigest() != asset["sha256"]:
             raise ApiError("textbook_preview_media_changed", "课件插画摘要不一致，请先核对素材", 409)
     return manifest
 
 
 def lesson_blueprint(manifest, node_id, units_path=UNITS_PATH):
     """The verified plan of one lesson, from whichever unit file of its edition holds it."""
-    for path in sorted(units_path.glob('*.json')):
-        unit = json.loads(path.read_text(encoding='utf-8'))
+    for path in course_glob(units_path, '*.json'):
+        unit = json.loads(course_text(path))
         if (manifest['editionId'], manifest['revisionId']) != (unit['editionId'], unit['revisionId']):
             continue
         lesson = next((v for v in unit['lessons'] if v['nodeId'] == node_id), None)
@@ -284,9 +285,9 @@ def operator_media(classroom, classroom_directory, provenance):
     assets = []
     for owner, name in sorted(set(OPERATOR_IMAGE.findall(json.dumps(classroom, ensure_ascii=False)))):
         path = (root / owner / "media" / name).resolve()
-        if root not in path.parents or not path.is_file():
+        if root not in path.parents or not course_exists(path):
             raise ApiError("textbook_preview_media_changed", "课件插画文件缺失，请先核对素材", 409)
-        assets.append({"id": Path(name).stem, "file": name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        assets.append({"id": Path(name).stem, "file": name, "sha256": hashlib.sha256(course_bytes(path)).hexdigest(),
                        "mediaPath": f"/api/classroom-media/{owner}/media/{name}", "provenance": provenance})
     if not assets:
         raise ApiError("textbook_preview_media_required", "本课没有可核验的原创教学插画，不能接收", 409)

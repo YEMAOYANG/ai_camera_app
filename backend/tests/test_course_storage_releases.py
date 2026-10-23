@@ -224,6 +224,92 @@ class PublishedMediaInventoryTest(unittest.TestCase):
                 with self.assertRaisesRegex(storage.InventoryError, 'formal_classroom_hash_mismatch'):
                     storage._formal_release(None, course, audio_fixture.root)
 
+    def test_registered_formal_classroom_cold_read_keeps_semantic_and_authority_hashes(self):
+        from tests.test_openmaic_runtime_audio_service import OpenMaicRuntimeAudioServiceTest
+        from services.course_file_store import CourseFileStorageError
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            audio_fixture = OpenMaicRuntimeAudioServiceTest()
+            audio_fixture.root = root / 'audio'
+            rows = audio_fixture._rows(count=1)
+            rows[0]['scene_order'] = 0
+            for classroom in ('stage-formal', 'omclass_formal'):
+                with self.subTest(classroom=classroom):
+                    room = {'stage': {'id': classroom}, 'scenes': []}
+                    room_hash = digest(room)
+                    authority = {'upstream_classroom_id': classroom, 'build_item_id': 'build',
+                        'publication_receipt_hash': 'a' * 64, 'classroom_content_sha256': room_hash,
+                        'terminal_receipt_hash': 'b' * 64, 'expected_segment_count': 1,
+                        'tts_attempted_count': 1, 'tts_completed_count': 1, 'audio_validated_count': 1,
+                        'asr_attempted_count': 1, 'asr_passed_count': 1,
+                        'feature_manifest_json': canonical({'classroomContentSha256': room_hash})}
+                    expected_path = (root / classroom / 'artifact/classroom.json' if classroom.startswith('omclass_')
+                                     else root / (classroom + '.json'))
+                    course = {'courseId': 'formal', 'courseVersion': '1', 'title': '正式课'}
+                    with patch.object(storage, 'NATIVE_ROOT', root), \
+                         patch.object(storage, '_formal_authorities', return_value=[authority]), \
+                         patch.object(storage, '_formal_audio_rows', return_value=rows), \
+                         patch.object(storage, '_registered_source_bytes', return_value=canonical(room).encode()) as reader:
+                        self.assertFalse(expected_path.exists())
+                        result = storage._formal_release(None, course, audio_fixture.root)
+                        self.assertEqual(result['releaseSha256'], authority['publication_receipt_hash'])
+                        reader.assert_called_once_with(expected_path)
+                        for changed in ({**room, 'scenes': [{'tampered': True}]},
+                                        {**room, 'stage': {'id': 'other-stage'}}):
+                            reader.return_value = canonical(changed).encode()
+                            with self.assertRaisesRegex(storage.InventoryError, 'formal_classroom_hash_mismatch'):
+                                storage._formal_release(None, course, audio_fixture.root)
+                        expected_path.parent.mkdir(parents=True, exist_ok=True)
+                        expected_path.write_text(canonical(room))
+                        reader.side_effect = CourseFileStorageError('Course file integrity failed')
+                        with self.assertRaises(CourseFileStorageError):
+                            storage._formal_release(None, course, audio_fixture.root)
+
+    def test_registered_media_passes_exact_sha_and_size_and_never_uses_local_shadow(self):
+        from services.course_file_store import CourseFileStorageError
+        data = b'original-audio'
+        item = {'path': '/mira/runtime-audio/asset',
+                'sourcePath': 'backend/data/learning-media/narration/current.wav',
+                'sha256': hashlib.sha256(data).hexdigest(), 'byteSize': len(data), 'mimeType': 'audio/wav'}
+        with tempfile.TemporaryDirectory() as temporary, patch.object(storage, 'ROOT', Path(temporary).resolve()):
+            path = Path(temporary).resolve() / item['sourcePath']
+            with patch.object(storage, '_registered_source_bytes', return_value=data) as reader:
+                storage._verify_local_media(item)
+                reader.assert_called_once_with(path, expected_sha256=item['sha256'], expected_bytes=len(data))
+                for wrong, reason in ((data + b'changed', 'local_media_bytes_mismatch'),
+                                      (b'x' * len(data), 'local_media_hash_mismatch')):
+                    reader.return_value = wrong
+                    with self.assertRaisesRegex(storage.InventoryError, reason):
+                        storage._verify_local_media(item)
+                path.parent.mkdir(parents=True)
+                path.write_bytes(data)
+                reader.side_effect = CourseFileStorageError('Course file object changed')
+                with self.assertRaises(CourseFileStorageError):
+                    storage._verify_local_media(item)
+                reader.side_effect = None
+                reader.return_value = None
+                storage._verify_local_media(item)  # Explicitly unregistered new local media.
+                path.unlink()
+                other = path.parent / 'other.wav'
+                other.write_bytes(data)
+                path.symlink_to(other)
+                with self.assertRaisesRegex(storage.InventoryError, 'local_media_bytes_mismatch'):
+                    storage._verify_local_media(item)
+                reader.reset_mock()
+                with self.assertRaisesRegex(storage.InventoryError, 'local_media_source_invalid'):
+                    storage._verify_local_media({**item, 'sourcePath': 'backend/data/learning-media/../secret'})
+                reader.assert_not_called()
+
+    def test_registered_source_adapter_forwards_integrity_without_constructing_app(self):
+        with patch('services.course_file_store.CourseFileStore') as store:
+            store.return_value.read_bytes.return_value = b'verified'
+            path = storage.ROOT / 'output/source.json'
+            self.assertEqual(storage._registered_source_bytes(path, expected_sha256='a' * 64,
+                                                               expected_bytes=8), b'verified')
+            store.assert_called_once_with(project_root=storage.ROOT)
+            store.return_value.read_bytes.assert_called_once_with(
+                path, expected_sha256='a' * 64, expected_bytes=8)
+
     def test_read_only_transaction_always_rolls_back_and_closes(self):
         connection = Mock()
         database = Mock(connect=Mock(return_value=connection))

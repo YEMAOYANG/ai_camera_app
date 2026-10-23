@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request, send_file
 from core.errors import ApiError, error_response
 from schemas.auth import json_body
 from services.service_factory import internal_request_guard, textbook_learning_service, textbook_classroom_service
+from content.textbook_journey import VerifiedActivityAudio
 
 internal_textbooks_bp = Blueprint("internal_textbooks", __name__)
 
@@ -113,7 +114,8 @@ def play_audio(asset):
     try:
         authorize()
         path = textbook_classroom_service().activity_audio(request.headers.get('X-Mira-Textbook-Token'), asset)
-        response = send_file(path, mimetype='audio/wav', conditional=False)
+        response = send_file(path, mimetype='audio/wav', conditional=True,
+            **({'download_name': path.name, 'etag': path.sha256} if isinstance(path, VerifiedActivityAudio) else {}))
         response.headers['Cache-Control'] = 'private, no-store'
         return response
     except ApiError as exc:

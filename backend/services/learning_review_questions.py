@@ -1,6 +1,5 @@
 """Project immutable, published lesson activities; never generate on a student request."""
 from copy import deepcopy
-import json
 
 from content import textbook_journey as journey
 from content.textbook_picture_questions import presentation
@@ -14,19 +13,21 @@ def knowledge_id(course, skill, activity=None):
     return ':'.join((course['subject'], course['grade_code'], activity or str(course.get('node_code') or course['id']), skill))
 
 
-def authored_question(spec, course, skill, original, *, verify_audio=True):
+def authored_question(spec, course, skill, original, *, verify_audio=True, release=None):
     value = {**deepcopy(original), 'skill': skill}
     pictures = presentation(value, 'transfer') if spec.renderer == 'tiandiren' else {
         'visual': value['visual'], 'options': value['options']}
     narration = value['prompt'] + ''.join(o['value'] + '，' + o['label'] + '。' for o in value['options'])
     assets = [journey.audio_id(text) + '.wav' for text in [narration, *value['hints'], value['explanation']]]
     if verify_audio:
-        manifest = json.loads((journey.ROOT / spec.audio_pack / 'manifest.json').read_text())
+        manifest = journey.course_json(journey.ROOT / spec.audio_pack / 'manifest.json', source_root=journey.ROOT)
         for asset in assets:
             entry = manifest.get(asset, {})
             if entry.get('providerId') != 'qwen-tts' or entry.get('fallbackUsed') is not False:
                 raise ValueError('Review narration has no verified teacher recording')
-            journey.audio_file(asset)
+            audio = journey.audio_file(asset, release=release)
+            if isinstance(audio, journey.VerifiedActivityAudio):
+                audio.close()
     question = {'id': value['id'], 'version': spec.plan['releaseSha256'], 'renderer': spec.renderer,
         'subject': course['subject'], 'gradeCode': course['grade_code'],
         'knowledgeId': knowledge_id(course, skill, spec.plan['id']),
@@ -65,7 +66,7 @@ def published_question_pool(conn, child):
             spec = journey.definition(release=release)
             for skill in spec.skills:
                 for original in spec.flow['bank'][skill]:
-                    result.append(authored_question(spec, course, skill, original))
+                    result.append(authored_question(spec, course, skill, original, release=release))
         except (ApiError, KeyError, ValueError, OSError):
             gaps.append(course['title'])
     return result, sorted(set(gaps))

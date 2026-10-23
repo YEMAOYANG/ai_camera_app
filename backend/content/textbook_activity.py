@@ -5,21 +5,35 @@ release's reviewed illustration/audio, and stores evidence in learning_sessions.
 Practice retries never replace the first independent assessment.
 """
 from copy import deepcopy
-import json
 from pathlib import Path
 
 from content.textbook_release import grade_answers, questions
 from core.errors import ApiError
+from content.textbook_journey_registry import course_json
 
-PLAN = json.loads((Path(__file__).parent / 'textbooks/activities/tiandiren.v1.json').read_text())
+ROOT = Path(__file__).parent / 'textbooks/activities'
+
+
+def _plan():
+    return course_json(ROOT / 'tiandiren.v1.json', source_root=ROOT)
+
+
+def __getattr__(name):
+    if name == 'PLAN':
+        return _plan()
+    raise AttributeError(name)
+
+
 ZONES = ['sky', 'earth', 'coral', 'teal', 'yellow']
 
 
 def supported(release):
+    PLAN = _plan()
     return release.get('sha256') == PLAN['releaseSha256']
 
 
 def attach(classroom, release):
+    PLAN = _plan()
     if supported(release):
         for scene in classroom['scenes']:
             for section, scene_id in PLAN['sceneIds'].items():
@@ -35,6 +49,7 @@ def attach(classroom, release):
 
 
 def initial(progress, release):
+    PLAN = _plan()
     stored = progress.get('textbookPlay')
     if stored:
         if stored.get('id') != PLAN['id']:
@@ -61,6 +76,7 @@ def repair_skills(section):
 
 
 def item(section, release):
+    PLAN = _plan()
     phase, index = section['phase'], section['index']
     if phase == 'done':
         return None
@@ -164,6 +180,7 @@ def complete(progress):
 
 
 def public_view(state, release):
+    PLAN = _plan()
     allowed = {m['path'] for m in release['media']}
     audio = {a['id']: a.get('audioUrl') for s in release['classroom']['scenes']
              for a in s.get('actions', []) if a.get('audioUrl') in allowed}

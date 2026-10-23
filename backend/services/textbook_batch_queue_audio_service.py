@@ -26,6 +26,7 @@ from services.textbook_batch_audio import (build_audio_plan, narrate_candidate,
                                          normalize_audio_inheritance)
 from services.textbook_batch_generation_service import atomic_json
 from services.textbook_batch_queue_service import TextbookBatchQueueService, document, file_sha
+from services.course_file_store import course_bytes, course_exists, course_stat, course_is_dir, course_glob
 
 SCHEMA = "mira.textbook.queue-audio-state.v1"
 LITERAL_CALL = re.compile(r"window\s*\.\s*miraNarrate\s*\(\s*(['\"])([A-Za-z0-9_-]+)\1\s*\)")
@@ -350,11 +351,11 @@ def structural_review(folder, classroom_directory=DEFAULT_CLASSROOM_DIRECTORY):
                     root = Path(classroom_directory).resolve() / classroom["id"]
                     original_path = root / match[2]
                     media = original_path.resolve()
-                    if (not media.is_relative_to(root) or not media.is_file() or original_path.is_symlink()
-                            or media.stat().st_size > MAX_MEDIA_BYTES):
+                    if (not media.is_relative_to(root) or not course_exists(media) or original_path.is_symlink()
+                            or course_stat(media).st_size > MAX_MEDIA_BYTES):
                         issues.append(prefix + "actual_video_bytes_missing_or_unsafe")
                     else:
-                        media_mime_type(media.suffix, media.read_bytes())
+                        media_mime_type(media.suffix, course_bytes(media, max_bytes=MAX_MEDIA_BYTES))
         scene_reports.append({"sceneId": scene["id"], "type": scene["type"], "widgetType": widget,
             "finiteCueCount": len(cue_map), "literalCallCount": len(calls),
             "cueIds": sorted(cue_map),
@@ -450,7 +451,7 @@ class _GetOnlyAudioRuntime:
             return forbidden
         if name in {"get_formal_audio_tts", "get_formal_audio_asr"}:
             def existing_only(identity):
-                if not (self.output / (identity + ".json")).is_file():
+                if not course_exists(self.output / (identity + ".json")):
                     raise RuntimeError("audio_get_only_reconciled_explicit_continue_required")
                 return original(identity)
             return existing_only
@@ -486,7 +487,7 @@ class TextbookBatchQueueAudioService:
                     continue
                 folder = self.queue.drafts / row["taskId"]
                 path, output = folder / "audio-state.json", folder / "audio-audit"
-                previous = document(path) if path.exists() else None
+                previous = document(path) if course_exists(path) else None
                 if previous and previous.get("status") in {"audio_blocked", "audio_completed_needs_review"}:
                     continue
                 if previous and previous.get("status") == "audio_waiting_explicit_continue" and not continue_audio:
@@ -515,7 +516,7 @@ class TextbookBatchQueueAudioService:
                     continue
                 plan = build_audio_plan(classroom, frozen["binding"], self.queue.runtime.base_url)
                 inheritance_path = output / "inheritance-manifest.json"
-                inheritance = normalize_audio_inheritance(document(inheritance_path)) if inheritance_path.exists() else None
+                inheritance = normalize_audio_inheritance(document(inheritance_path)) if course_exists(inheritance_path) else None
                 bound = {"taskId": row["taskId"], "inputSha256": frozen["inputSha256"],
                     "classroomSha256": digest(classroom), "planSha256": digest(plan),
                     "structuralReviewSha256": digest(review), "runtimeOrigin": self.queue.runtime.base_url,
@@ -536,7 +537,7 @@ class TextbookBatchQueueAudioService:
                     # A crash without an audio-state update is also fenced by
                     # the existing per-request durable audio checkpoints.
                     getter_only = previous is not None and not continue_audio
-                    if previous is None and output.exists() and any(output.glob("tbb*.json")):
+                    if previous is None and course_is_dir(output) and next(course_glob(output, "tbb*.json"), None) is not None:
                         getter_only = True
                     state["resumeMode"] = "get_only" if getter_only else "existing_workload_authorized"
                     atomic_json(path, state)
@@ -550,7 +551,7 @@ class TextbookBatchQueueAudioService:
                                 or len(audit.get("segments", [])) != len(plan["workload"])
                                 or audit.get("planSha256") != digest(plan)
                                 or audit.get("sha256") != digest({key: value for key, value in audit.items() if key != "sha256"})
-                                or not (output / "audit.json").is_file()
+                                or not course_exists(output / "audit.json")
                                 or document(output / "audit.json") != audit
                                 or any(segment.get("similarityBps", 0) < 8500 for segment in audit.get("segments", []))):
                             raise ValueError("queue_audio_completed_audit_mismatch")
@@ -566,7 +567,7 @@ class TextbookBatchQueueAudioService:
                         state.update(status=status, safeErrorCode="audio_stopped_without_retry",
                                      errorType=type(exc).__name__)
                         audit_path = output / "audit.json"
-                        if audit_path.exists():
+                        if course_exists(audit_path):
                             audit = document(audit_path)
                             state.update(completedSegments=audit.get("completedSegments", 0),
                                          expectedSegments=audit.get("expectedSegments", len(plan["workload"])))

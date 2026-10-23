@@ -19,6 +19,7 @@ from content.textbook_interactive_narration import without_audio_helper
 from content.textbook_pinyin_operator_review import validate_operator_authorization
 from content.textbook_preview_audio_contract import new_audio_plan, new_pinyin_audio_plan, resolve_audio_contract
 from core.errors import ApiError
+from services.course_file_store import course_bytes, course_exists, course_glob
 from core.security import now_ms
 from services.textbook_preview_audio import bind_question_audio, core_content
 from services.textbook_preview_visual_revision import immutable, json_bytes, sha_bytes
@@ -581,17 +582,17 @@ def _evidence_files(patch, policy):
         return composite.read_files(patch['verifiedProbeEvidence']['path'])
     probes, _ = _probe_contract(policy)
     path = Path(patch[_evidence_key(patch)]['path']).resolve()
-    review_raw = path.read_bytes()
+    review_raw = course_bytes(path)
     if _json(review_raw).get('schemaVersion') == aieiui_composite.REVIEW_SCHEMA:
         fail('ɑi ei ui 复合人听证据必须使用显式复合初始化版本')
     files = {_review_file(patch['schemaVersion'] == OPERATOR_SCHEMA): review_raw,
-             'evidence/plan.json': (path.parent / 'plan.json').read_bytes()}
+             'evidence/plan.json': course_bytes(path.parent / 'plan.json')}
     for label in probes:
         for name in PROBE_FILES:
             source = path.parent / label / name
             if source.resolve().parent != path.parent / label:
                 fail('小样文件不能跨越固定证据目录')
-            files[f'evidence/{label}/{name}'] = source.read_bytes()
+            files[f'evidence/{label}/{name}'] = course_bytes(source)
     return files
 
 
@@ -635,8 +636,8 @@ def _zero_audio(source, result, folder, root, cid, *, installation_bytes=None):
                    for s in source['scenes'] for a in s.get('actions', []) if a.get('type') == 'speech')
             or any(result.get(k) for k in ('audioReceipts', 'audioPartial', 'audioStopCode', 'audioCompleted',
                        'audioAudit', 'audioReview', 'frozenPreview', 'narrationRevisions', 'pronunciationRevisions'))
-            or any((root / cid / 'audio').glob('*'))
-            or any(p.name not in allowed for p in folder.iterdir())):
+            or any(course_glob(root / cid / 'audio', '*'))
+            or any(p.name not in allowed for p in course_glob(folder))):
         fail('首次拼音配置仅接受零音频新课；已有调用、回执或绑定必须保留并单独处理')
 
 
@@ -681,10 +682,10 @@ def initialize_preview_pronunciation(service, key, classroom_directory, patch, *
             if (digest(source) != row['classroom_sha256'] or source.get('id') != cid
                     or source.get('stage', {}).get('id') != cid
                     or service.runtime.get_classroom(cid) != source
-                    or _json((root / (cid + '.json')).read_bytes()) != source):
+                    or _json(course_bytes(root / (cid + '.json'))) != source):
                 fail('数据库、运行课件及本地文件必须完全一致')
             intent_path, active = archive / 'intent.json', folder / 'plan.json'
-            if not intent_path.exists():
+            if not course_exists(intent_path):
                 _zero_audio(source, service.repository.parse(row['result_json']) or {}, folder, root, cid)
                 if (row['status'] != 'review_required' or digest(source) != patch['expectedSourceSha256']
                         or digest(core_content(source)) != patch['expectedCoreSha256']):
@@ -715,14 +716,14 @@ def initialize_preview_pronunciation(service, key, classroom_directory, patch, *
                           'classroomId': cid, 'patch': patch, 'files': {k: sha_bytes(v) for k, v in files.items()}}
                 intent['sha256'] = digest(intent)
                 immutable(intent_path, json_bytes(intent))
-            intent = _json(intent_path.read_bytes())
+            intent = _json(course_bytes(intent_path))
             if (intent.get('sha256') != digest({k: v for k, v in intent.items() if k != 'sha256'})
                     or intent.get('schemaVersion') != patch['schemaVersion'] or intent.get('patch') != patch
                     or intent.get('previewKey') != key or intent.get('classroomId') != cid
                     or intent.get('initializationId') != initialization_id
                     or set(intent.get('files', {})) != archive_files):
                 fail('首次配置归档身份无效')
-            files = {name: (archive / name).read_bytes() for name in archive_files}
+            files = {name: course_bytes(archive / name) for name in archive_files}
             if any(sha_bytes(raw) != intent['files'][name] for name, raw in files.items()):
                 fail('首次配置归档字节已变化')
             plan, base = _json(files['plan.json']), _json(files['base-plan.json'])
@@ -735,8 +736,8 @@ def initialize_preview_pronunciation(service, key, classroom_directory, patch, *
                     or digest(_without_audio(source)) != plan['coreSha256']):
                 fail('首次配置来源、冻结内容或当前课件已变化')
             _verify_evidence(files, patch, key, frozen, pronunciation.policy_for_plan(plan))
-            if active.exists():
-                if active.read_bytes() != files['plan.json']:
+            if course_exists(active):
+                if course_bytes(active) != files['plan.json']:
                     fail('已有其他活动配音计划，不能覆盖')
             else:
                 if row != _json(files['row.json']):
@@ -766,4 +767,4 @@ def initialize_preview_pronunciation(service, key, classroom_directory, patch, *
             if execute:
                 immutable(archive / 'initialization.json', json_bytes(result))
                 return result
-            return {**result, 'prepared': True, 'initialized': active.exists(), 'archive': str(archive)}
+            return {**result, 'prepared': True, 'initialized': course_exists(active), 'archive': str(archive)}

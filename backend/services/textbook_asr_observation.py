@@ -14,12 +14,13 @@ from content.textbook_asr_observation import (
 )
 from content.textbook_asr_source_reuse import ORIGIN_SCHEMA, formal_request, pcm_key, sha, verify_origin
 from services.textbook_preview_audio import verify_segment_receipt, segment_request_plan
+from services.course_file_store import course_bytes, course_exists, course_glob, course_is_dir
 
 
 def checked_bytes(path):
     path = Path(path)
-    if path.is_symlink() or not path.is_file(): fail('Original observation file is missing or symlinked')
-    return path.read_bytes()
+    if path.is_symlink() or not course_exists(path): fail('Original observation file is missing or symlinked')
+    return course_bytes(path)
 
 
 def package_observation(*, origin, native_audio_directory, receipt_path, receipt_container):
@@ -75,7 +76,7 @@ def package_cached_routines(*, plan, classroom, audio_directory, routine_cache_d
     targets = target_evidence_from_files(plan=plan, classroom=classroom, audio_directory=audio_directory)
     by_key = {(t['sceneId'], t['action']['id']): t for t in targets}
     observations, unsuccessful = [], []
-    for path in sorted(Path(routine_cache_directory).glob('tbpasr1_*.json')):
+    for path in sorted(course_glob(Path(routine_cache_directory), 'tbpasr1_*.json')):
         entry = json.loads(checked_bytes(path)); source = by_key.get((entry.get('sceneId'), entry.get('actionId')))
         if source is None: fail('Original routine cache does not belong to this current lesson')
         response = entry.get('asr', {}); rid = response.get('requestId')
@@ -118,7 +119,7 @@ release identity; they never need the live Native or make network calls.
     validate_observation_audit(audit, plan=plan, classroom=classroom,
         expected_source_sha256=expected_source_sha256)
     root = Path(native_audio_directory)
-    if not (root / 'jobs/asr').is_dir() or not (root / 'jobs/tts').is_dir():
+    if not course_is_dir(root / 'jobs/asr') or not course_is_dir(root / 'jobs/tts'):
         fail('Managed Native ASR/TTS history is required')
     facts = [verify_observation(o) for o in audit['observations']]
     pcm_shas = {f['receipt']['pcmSha256'] for f in facts}
@@ -134,12 +135,12 @@ release identity; they never need the live Native or make network calls.
         recovery = fact.get('failureRecovery')
         if recovery is not None and checked_bytes(root / 'jobs/asr' / (sha(recovery['failedRequestId'].encode()) + '.json')) != recovery['failedJobRaw']:
             fail('Original failed routine bytes changed')
-    for path in (root / 'jobs/asr').glob('*.json'):
+    for path in course_glob(root / 'jobs/asr', '*.json'):
         job = json.loads(checked_bytes(path)); tts_id = job.get('ttsRequestId')
         if not isinstance(tts_id, str): continue
         if tts_id not in tts_cache:
             tts_path = root / 'jobs/tts' / (sha(tts_id.encode()) + '.json')
-            tts_cache[tts_id] = json.loads(checked_bytes(tts_path)) if tts_path.is_file() else None
+            tts_cache[tts_id] = json.loads(checked_bytes(tts_path)) if course_exists(tts_path) else None
         tts = tts_cache[tts_id]
         if tts is None:
             if job.get('audioSha256') in audio_shas:
@@ -162,7 +163,7 @@ release identity; they never need the live Native or make network calls.
             known_requests[recovery['failedRequestId']] = formal_request(f['origin']['source'],
                 f['origin']['plan'], f['origin']['classroomId'], recovery['failedRequestId'])
     for key in current:
-        for path in (claims_root / key / 'claims').glob('*/intent.json'):
+        for path in course_glob(claims_root / key / 'claims', '*/intent.json'):
             claim = json.loads(checked_bytes(path)); rid = claim.get('requestId')
             claim_fields = {'schemaVersion', 'pcmKey', 'requestId', 'request', 'originSha256',
                 'historySha256', 'createdAt', 'maximumPostAttempts', 'maximumAttemptsPerPcm',
@@ -185,8 +186,8 @@ release identity; they never need the live Native or make network calls.
     # Manual probe claims also consume history; no expected-text/body alias can hide one.
     for probe_root in probe_history_roots:
         probe_root = Path(probe_root)
-        if not probe_root.is_dir(): fail('Declared probe history root is missing')
-        for path in probe_root.rglob('intent.json'):
+        if not course_is_dir(probe_root): fail('Declared probe history root is missing')
+        for path in course_glob(probe_root, 'intent.json', recursive=True):
             intent = json.loads(checked_bytes(path))
             if intent.get('schemaVersion') != 'mira.operator.probe-asr-intent.v1': continue
             request = json.loads(checked_bytes(path.parent / 'request.json'))

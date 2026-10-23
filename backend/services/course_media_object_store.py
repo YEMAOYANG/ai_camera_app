@@ -82,6 +82,14 @@ class CourseMediaObjectStore:
             config = self.config or CourseStorageConfig.from_env()
             if config.mode == "local":
                 return None
+            if config.mode == "registry":
+                from services.course_file_store import CourseFileStore, CourseFileStorageError
+                try:
+                    return CourseFileStore(config=config, project_root=self.project_root).read_bytes(
+                        source, expected_sha256=expected_sha256, expected_bytes=expected_bytes,
+                        max_bytes=min(max_bytes, _MAX_MEDIA_BYTES))
+                except CourseFileStorageError:
+                    raise CourseMediaStorageError("Course media storage unavailable") from None
             try:
                 relative = source.resolve().relative_to(self.project_root).as_posix()
             except ValueError:

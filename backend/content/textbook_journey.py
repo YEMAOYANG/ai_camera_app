@@ -5,22 +5,34 @@ are inferred from scene visits. A completed sitting is not durable mastery.
 """
 from copy import deepcopy
 import hashlib
+from io import BytesIO
 import json
 from pathlib import Path
+import re
 
 from content import textbook_activity as legacy
 from content.textbook_picture_questions import presentation
-from content.textbook_journey_registry import definition, definitions, skills_for, supported
+from content.textbook_journey_registry import course_json, definition, definitions, skills_for, supported
 from core.errors import ApiError
 from core.security import now_ms
 
-PLAN = legacy.PLAN
 ROOT = Path(__file__).parent / 'textbooks/activities'
-FLOW = json.loads((ROOT / 'tiandiren.journey.v2.json').read_text())
-SUPPORT = json.loads((ROOT.parent.parent / 'learning_parent_support.v1.json').read_text())
-NAVIGATION = json.loads((ROOT.parent.parent / 'learning_navigation.v1.json').read_text())['cues']
-SKILLS = FLOW['skills']
 DAY = 86400000
+MAX_AUDIO_BYTES = 64 * 1024 * 1024
+
+
+def __getattr__(name):
+    # Preserve callers of the historical constants, without import-time I/O.
+    if name == 'PLAN':
+        return legacy.PLAN
+    if name in {'FLOW', 'SKILLS'}:
+        flow = course_json(ROOT / 'tiandiren.journey.v2.json', source_root=ROOT)
+        return flow if name == 'FLOW' else flow['skills']
+    if name == 'SUPPORT':
+        return course_json(ROOT.parent.parent / 'learning_parent_support.v1.json')
+    if name == 'NAVIGATION':
+        return course_json(ROOT.parent.parent / 'learning_navigation.v1.json')['cues']
+    raise AttributeError(name)
 
 
 def attach(classroom, release):
@@ -344,6 +356,7 @@ def parent_support(state):
     PLAN, FLOW, SKILLS = spec.plan, spec.flow, spec.skills
     if not state.get('parentNeeded'):
         return None
+    SUPPORT = __getattr__('SUPPORT')
     missing = next((s for s in SKILLS if s not in state.get('verified', [])), None)
     advice = PLAN.get('parentSupport', {}).get(missing) or SUPPORT.get(state['id'], {}).get(missing)
     return ({**advice, 'handBack': SUPPORT['handBack'], 'expectedSeconds': SUPPORT['expectedSeconds']}
@@ -399,7 +412,7 @@ def public_view(state, release):
                    'reviewReady' if section['phase'] == 'done' and state.get('reviewDueAt') and state['reviewDueAt'] <= now_ms() else
                    'lessonDone' if section['phase'] == 'done' else
                    'restBreak' if section['phase'] == 'break' else 'locked')
-            view['audio'] = [audio_url(NAVIGATION[cue])]
+            view['audio'] = [audio_url(__getattr__('NAVIGATION')[cue])]
         views[name] = view
     evidence = {'total': len(SKILLS), 'answered': len(state['baseline']), 'independent': sum(independent(r) for r in state['baseline']),
         'hints': sum(r['hintUsed'] for r in state['baseline']), 'adultHelp': sum(r['adultHelp'] for r in state['baseline']),
@@ -418,19 +431,69 @@ def ordered_scenes(release):
     return scenes
 
 
-def audio_file(asset):
-    entry = None
-    for pack in dict.fromkeys([d.audio_pack for d in definitions()] + ['navigation-audio-v1']):
-        folder = ROOT / pack
-        manifest = json.loads((folder / 'manifest.json').read_text())
-        entry = manifest.get(asset)
-        if entry:
-            break
-    if not entry:
+class VerifiedActivityAudio(BytesIO):
+    def __init__(self, raw, *, name, sha256):
+        super().__init__(raw)
+        self.name, self.sha256 = name, sha256
+
+
+def audio_file(asset, *, release=None):
+    """A published runtime binds its exact teaching pack; registered bytes never fall back."""
+    if not isinstance(asset, str) or re.fullmatch(r'[a-f0-9]{24}\.wav', asset) is None:
         raise ApiError('textbook_audio_missing', '没有找到这段声音', 404)
-    path = (folder / entry.get('file', asset)).resolve()
-    if not path.is_relative_to(folder.resolve()):
-        raise ApiError('textbook_audio_invalid', '声音暂时不可用，请稍后再试', 503)
-    if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != entry['sha256']:
-        raise ApiError('textbook_audio_invalid', '声音暂时不可用，请稍后再试', 503)
-    return path
+    from core import config as _backend_environment  # noqa: F401; existing dotenv owner
+    from services.course_file_store import CourseFileStore, CourseFileStorageError
+    store = CourseFileStore()
+    strict = release is not None and store.config.mode == 'registry'
+    packs = ([definition(release=release).audio_pack] if release is not None else [d.audio_pack for d in definitions()])
+    try:
+        for pack in dict.fromkeys(packs + ['navigation-audio-v1']):
+            folder = ROOT / pack
+            manifest_path = folder / 'manifest.json'
+            registered = store.resolve(manifest_path)
+            if strict and registered is None:
+                raise CourseFileStorageError('Published activity manifest is not registered')
+            manifest_raw = store.read_bytes(manifest_path, expected_sha256=registered['sha256'] if registered else None,
+                expected_bytes=registered['byteSize'] if registered else None, max_bytes=4 * 1024 * 1024)
+            if manifest_raw is None:
+                if registered is not None:
+                    raise CourseFileStorageError('Registered activity manifest unavailable')
+                if not manifest_path.resolve().is_relative_to(folder.resolve()):
+                    raise CourseFileStorageError('Activity manifest escaped its pack')
+                manifest_raw = manifest_path.read_bytes()
+                if len(manifest_raw) > 4 * 1024 * 1024:
+                    raise CourseFileStorageError('Activity manifest too large')
+            if registered is not None and registered['mimeType'] != 'application/json':
+                raise CourseFileStorageError('Registered activity manifest type invalid')
+            manifest = json.loads(manifest_raw)
+            entry = manifest.get(asset)
+            if entry is None:
+                continue
+            relative = entry.get('file', asset)
+            if (not isinstance(relative, str) or '\\' in relative or relative.startswith('/')
+                    or any(p in {'', '.', '..'} for p in relative.split('/')) or not relative.endswith('.wav')
+                    or not isinstance(entry.get('sha256'), str) or re.fullmatch(r'[a-f0-9]{64}', entry['sha256']) is None
+                    or type(entry.get('bytes')) is not int or not 0 < entry['bytes'] <= MAX_AUDIO_BYTES):
+                raise CourseFileStorageError('Activity audio identity invalid')
+            path = folder / relative  # Resolve ownership lexically before consulting local links.
+            record = store.resolve(path, expected_sha256=entry['sha256'])
+            if strict and record is None:
+                raise CourseFileStorageError('Published activity audio is not registered')
+            raw = store.read_bytes(path, expected_sha256=entry['sha256'], expected_bytes=entry['bytes'], max_bytes=MAX_AUDIO_BYTES)
+            if record is not None:
+                if raw is None or record['mimeType'] not in {'audio/wav', 'audio/x-wav'}:
+                    raise CourseFileStorageError('Registered activity audio unavailable')
+            else:
+                canonical = path.resolve()
+                if (not canonical.is_relative_to(folder.resolve()) or not canonical.is_file()
+                        or canonical.stat().st_size != entry['bytes']):
+                    raise CourseFileStorageError('Activity audio escaped its pack')
+                raw = canonical.read_bytes()
+            if len(raw) != entry['bytes'] or hashlib.sha256(raw).hexdigest() != entry['sha256']:
+                raise CourseFileStorageError('Activity audio integrity invalid')
+            if record is not None:
+                return VerifiedActivityAudio(raw, name=asset, sha256=entry['sha256'])
+            return canonical
+    except (CourseFileStorageError, OSError, ValueError, KeyError, TypeError, AttributeError):
+        raise ApiError('textbook_audio_invalid', '声音暂时不可用，请稍后再试', 503) from None
+    raise ApiError('textbook_audio_missing', '没有找到这段声音', 404)

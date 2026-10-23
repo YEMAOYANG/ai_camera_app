@@ -1,14 +1,21 @@
 """Answer-blind picture presentation for the existing six-skill lesson."""
 from copy import deepcopy
-import json
 from pathlib import Path
+from content.textbook_journey_registry import course_json
 
-VISUALS = json.loads((Path(__file__).parent / 'textbooks/activities/tiandiren.visuals.v1.json').read_text())
+ROOT = Path(__file__).parent / 'textbooks/activities'
+
+
+def __getattr__(name):
+    if name == 'VISUALS':
+        return course_json(ROOT / 'tiandiren.visuals.v1.json', source_root=ROOT)
+    raise AttributeError(name)
 
 
 def presentation(current, phase):
     if not current.get('options'):
         return {}
+    VISUALS = __getattr__('VISUALS')
     key = f'{phase}-{current["skill"]}' if phase in ('diagnostic', 'probe') else current['id']
     scene = deepcopy(VISUALS['scenes'][key])
     pictures = {'天': 'sky', '地': 'earth', '人': 'people', '头顶': 'above', '脚下': 'below',

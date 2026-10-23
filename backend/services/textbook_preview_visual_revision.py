@@ -23,8 +23,10 @@ from content.textbook_interactive_narration import AUDIO_BLOCK, interactive_cues
 from content.textbook_preview import THREE_MODULE_PATH, cue_speech, preview_checks, self_contained_classroom
 from content.textbook_release import MEDIA
 from core.errors import ApiError
+from services.textbook_preview_revision_transaction import PreviewRevisionTransaction
 from core.security import now_ms
 from services.textbook_preview_audio import verify_segment_receipt
+from services.course_file_store import course_bytes, course_exists, course_text
 
 SCHEMA = 'mira.textbook.preview-visual-patch.v1'
 CANVAS_SCHEMA = 'mira.textbook.preview-visual-patch.v2'
@@ -55,8 +57,8 @@ def persisted(value):
 
 
 def immutable(path, raw):
-    if path.exists():
-        if path.read_bytes() != raw:
+    if course_exists(path):
+        if course_bytes(path) != raw:
             fail('修订归档已存在不同内容，不能覆盖')
         return
     # The shared operator lock serializes writers; publish complete files only.
@@ -255,8 +257,8 @@ def frozen_image(owner, name, root, original_references, original_images):
     if ((owner, name) not in original_references or not name.startswith('media/')
             or path.suffix.lower() not in {'.png', '.webp', '.jpg', '.jpeg'}
             or not SHA.fullmatch(str(asset.get('sha256', '')))
-            or root not in path.parents or not path.is_file()
-            or sha_bytes(path.read_bytes()) != asset['sha256']):
+            or root not in path.parents or not course_exists(path)
+            or sha_bytes(course_bytes(path)) != asset['sha256']):
         fail('图片必须是本课已使用、已冻结且文件摘要一致的原图')
 
 
@@ -285,9 +287,9 @@ def quantity_assets(source, patch, root, frozen):
                 fail('派生来源和原数量图必须同时属于冻结的本课图片')
             frozen_image(*match.groups(), root, references, originals)
         owner, name = MEDIA.fullmatch(definition['sourcePath']).groups()
-        raw = (root / owner / name).read_bytes()
+        raw = course_bytes(root / owner / name)
         old_owner, old_name = MEDIA.fullmatch(definition['replacesPath']).groups()
-        original_png = (root / old_owner / old_name).read_bytes()
+        original_png = course_bytes(root / old_owner / old_name)
         try:
             old = quantity_png(raw, source_size=definition['sourceSize'], count=definition['count'], layout=definition['originalLayout'])
             new = quantity_png(raw, source_size=definition['sourceSize'], count=definition['count'], layout=definition['layout'])
@@ -300,7 +302,7 @@ def quantity_assets(source, patch, root, frozen):
             fail('新数量图必须与确定性派生摘要一致且有实际变化')
         path = f"/api/classroom-media/{source['id']}/media/{definition['sha256']}.png"
         file = root / source['id'] / 'media' / (definition['sha256'] + '.png')
-        if file.exists() and file.read_bytes() != new:
+        if course_exists(file) and course_bytes(file) != new:
             fail('派生资源的内容地址已存在不同字节，不能覆盖')
         assets.append({'definition': deepcopy(definition), 'sha256': definition['sha256'], 'mediaPath': path, 'byteSize': len(new),
                        'originalRgbSha256': sha_bytes(old_pixels[1]), 'derivedRgbSha256': sha_bytes(new_pixels[1])})
@@ -523,7 +525,7 @@ def candidate(source, patch, root, frozen):
 
 
 def verify_audio(source, result, root, classroom_id):
-    plan = json.loads((root / classroom_id / 'textbook-preview-audio/plan.json').read_text())
+    plan = json.loads(course_text(root / classroom_id / 'textbook-preview-audio/plan.json'))
     resolve_audio_contract(plan)
     receipts = result.get('audioReceipts', [])
     by_id = {r['requestId']: r for r in receipts}
@@ -540,7 +542,7 @@ def verify_audio(source, result, root, classroom_id):
             fail('每段讲解都必须有成功的原始配音收据')
         path = root / classroom_id / 'audio' / (request + '.wav')
         if (urlparse(action.get('audioUrl', '')).path != f'/api/classroom-media/{classroom_id}/audio/{request}.wav'
-                or not path.is_file() or sha_bytes(path.read_bytes()) != receipt['audioSha256']):
+                or not course_exists(path) or sha_bytes(course_bytes(path)) != receipt['audioSha256']):
             fail('已完成配音文件缺失、变化或绑定不一致')
     for scene in source['scenes']:
         for action in scene.get('actions', []):
@@ -559,14 +561,15 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
         fail('只能修订本机已保存的课件')
     root = Path(classroom_directory).resolve()
     audio_folder = root / classroom_id / 'textbook-preview-audio'
-    if not (audio_folder / 'plan.json').is_file():
+    if not course_exists(audio_folder / 'plan.json'):
         fail('原始配音计划不存在')
+    audio_folder.mkdir(parents=True, exist_ok=True)
     with (audio_folder / 'operator.lock').open('a') as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             fail('课件正在配音或修订，请等待已有任务结束')
-        with service.repository.transaction() as conn:
+        with PreviewRevisionTransaction(service.repository, key, fail, root / (classroom_id + '.json')) as conn:
             row = conn.execute('SELECT * FROM learning_textbook_course_previews WHERE preview_key=? FOR UPDATE', (key,)).fetchone()
             if row['status'] != 'preview_ready' or row['runtime_origin'] != service.runtime.base_url:
                 fail('请先完成全课配音和结构检查')
@@ -574,24 +577,25 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
                                      (row['edition_id'], row['node_id'])).fetchall()
             if any(service.repository.parse(b['input_json']).get('previewKey') == key for b in published):
                 fail('已发布的课件不能原地修改')
+            conn.release(row)
             revision_id = digest({'previewKey': key, 'patch': patch})
             archive = audio_folder / 'visual-revisions' / revision_id
             intent_path = archive / 'intent.json'
-            if not intent_path.exists():
+            if not course_exists(intent_path):
                 source = service.repository.parse(row['classroom_json'])
                 result = service.repository.parse(row['result_json'])
                 if digest(source) != row['classroom_sha256'] or row['classroom_sha256'] != patch['expectedSourceSha256']:
                     fail('课件摘要已变化，必须针对当前版本重新准备补丁')
                 current = service.runtime.get_classroom(classroom_id)
-                local = json.loads((root / (classroom_id + '.json')).read_text())
+                local = json.loads(course_text(root / (classroom_id + '.json')))
                 if digest(current) != digest(source) or digest(local) != digest(source):
                     fail('数据库、本机文件和运行课件快照不一致')
                 verify_audio(source, result, root, classroom_id)
-                plan_bytes = (audio_folder / 'plan.json').read_bytes()
+                plan_bytes = course_bytes(audio_folder / 'plan.json')
                 plan = json.loads(plan_bytes)
                 if plan.get('previewKey') != key or not SHA.fullmatch(str(plan.get('classroomSha256'))):
                     fail('原配音计划身份不一致')
-                receipt_bytes = (audio_folder / 'receipts.json').read_bytes()
+                receipt_bytes = course_bytes(audio_folder / 'receipts.json')
                 if json.loads(receipt_bytes) != result['audioReceipts']:
                     fail('原配音收据与数据库不一致')
                 frozen = service.repository.parse(row['input_json'])
@@ -620,7 +624,7 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
                           'files': {name: sha_bytes(raw) for name, raw in files.items()}}
                 intent['sha256'] = digest(intent)
                 immutable(intent_path, json_bytes(intent))
-            intent = json.loads(intent_path.read_text())
+            intent = json.loads(course_text(intent_path))
             expected_files = {'source.json', 'source-row.json', 'target.json', 'plan.json', 'receipts.json'}
             if patch['schemaVersion'] == QUANTITY_VISUAL_SCHEMA:
                 expected_files.add('derived-images.json')
@@ -631,32 +635,32 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
                     or set(intent.get('files', {})) != expected_files):
                 fail('修订意图记录被改变')
             for name, sha in intent['files'].items():
-                if sha_bytes((archive / name).read_bytes()) != sha:
+                if sha_bytes(course_bytes(archive / name)) != sha:
                     fail('原始快照或修订目标被改变')
             for name in ('plan.json', 'receipts.json'):
-                if (audio_folder / name).read_bytes() != (archive / name).read_bytes():
+                if course_bytes(audio_folder / name) != course_bytes(archive / name):
                     fail('修订期间原配音计划或收据已改变')
-            source = json.loads((archive / 'source.json').read_text())
-            source_row = json.loads((archive / 'source-row.json').read_text())
-            target = json.loads((archive / 'target.json').read_text())
+            source = json.loads(course_text(archive / 'source.json'))
+            source_row = json.loads(course_text(archive / 'source-row.json'))
+            target = json.loads(course_text(archive / 'target.json'))
             if row['input_json'] != source_row['input_json']:
                 fail('视觉修订不能改变原始冻结输入')
             if candidate(source, patch, root, service.repository.parse(source_row['input_json'])) != target:
                 fail('修订目标与原始补丁不一致')
             derived, derivative_files = quantity_assets(source, patch, root, service.repository.parse(source_row['input_json']))
-            if derived and json.loads((archive / 'derived-images.json').read_text()) != derived:
+            if derived and json.loads(course_text(archive / 'derived-images.json')) != derived:
                 fail('派生图归档与确定性定义不一致')
             result = service.repository.parse(source_row['result_json'])
             verify_audio(source, result, root, classroom_id)
             current = service.runtime.get_classroom(classroom_id)
             local_path = root / (classroom_id + '.json')
-            if digest(json.loads(local_path.read_text())) != digest(current):
+            if digest(json.loads(course_text(local_path))) != digest(current):
                 fail('本机文件与运行课件不一致')
             receipt_path = archive / 'amendment.json'
             committed = service.repository.parse(row['result_json']).get('visualRevisions', [])[-1:]
             committed = committed[0] if committed and committed[0].get('revisionId') == revision_id else None
-            if receipt_path.exists() or committed is not None:
-                receipt = json.loads(receipt_path.read_text()) if receipt_path.exists() else committed
+            if course_exists(receipt_path) or committed is not None:
+                receipt = json.loads(course_text(receipt_path)) if course_exists(receipt_path) else committed
                 if (receipt.get('sha256') != digest({k: v for k, v in receipt.items() if k != 'sha256'})
                         or receipt.get('intentSha256') != intent['sha256']):
                     fail('修订回执被改变')
@@ -665,7 +669,7 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
                         and service.repository.parse(row['result_json']).get('visualRevisions', [])[-1:] == [receipt]):
                     for name, raw in derivative_files.items():
                         asset = root / classroom_id / 'media' / name
-                        if not asset.is_file() or asset.read_bytes() != raw:
+                        if not course_exists(asset) or course_bytes(asset) != raw:
                             fail('已完成修订的派生图缺失或变化')
                     immutable(receipt_path, json_bytes(receipt))
                     return receipt
@@ -676,10 +680,10 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
                 fail('数据库快照已变化，不能覆盖')
             if digest(current) == digest(source):
                 marker = archive / 'save-attempt.json'
-                if marker.exists():
+                if course_exists(marker):
                     fail('上次保存结果不明且未发现目标快照，不能自动重发')
-                # The runtime API has no CAS. Recheck immediately before its
-                # POST, keep the row/operator locks, and reconcile exact output.
+                # Recheck under operator.lock, with no database row lock;
+                # the runtime also forwards this read version to remote CAS.
                 if digest(service.runtime.get_classroom(classroom_id)) != digest(source):
                     fail('保存前课件已被其他编辑者修改')
                 for name, raw in derivative_files.items():
@@ -687,11 +691,11 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
                 immutable(marker, json_bytes({'intentSha256': intent['sha256'], 'attemptedAt': now_ms()}))
                 service.runtime.save_preview_classroom(target)
                 current = service.runtime.get_classroom(classroom_id)
-            if persisted(current) != persisted(target) or digest(json.loads(local_path.read_text())) != digest(current):
+            if persisted(current) != persisted(target) or digest(json.loads(course_text(local_path))) != digest(current):
                 fail('保存结果不符，原始课件与目标已保留供核对')
             for name, raw in derivative_files.items():
                 asset = root / classroom_id / 'media' / name
-                if not asset.is_file() or asset.read_bytes() != raw:
+                if not course_exists(asset) or course_bytes(asset) != raw:
                     fail('派生图未完整保存或字节已变化')
             immutable(archive / 'saved.json', json_bytes(current))
             receipt = {'schemaVersion': 'mira.textbook.preview-visual-amendment.v1', 'revisionId': revision_id,
@@ -711,6 +715,11 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
             updated = {**result, **intent['checks']}
             updated.pop('frozenPreview', None)
             updated['visualRevisions'] = [*result.get('visualRevisions', []), receipt]
+            conn.commit_phase()
+            if (json.loads(course_text(local_path)) != current
+                    or any(course_bytes(audio_folder / name) != course_bytes(archive / name)
+                           for name in ('plan.json', 'receipts.json'))):
+                fail('提交前运行原稿或配音证据已变化，保留修订断点')
             changed = conn.execute("UPDATE learning_textbook_course_previews SET classroom_json=?,classroom_sha256=?,result_json=?,updated_at=? WHERE preview_key=? AND classroom_sha256=? AND status='preview_ready'",
                                    (canonical(current), digest(current), canonical(updated), now_ms(), key, digest(source))).rowcount
             if changed != 1:
@@ -741,7 +750,7 @@ def verify_quantity_visual_revisions(row, classroom_directory):
             if not SHA.fullmatch(str(revision_id)):
                 fail('视觉修订归档编号无效')
             archive = audio / 'visual-revisions' / revision_id
-            intent = json.loads((archive / 'intent.json').read_text())
+            intent = json.loads(course_text(archive / 'intent.json'))
             patch = intent['patch']
             validate_patch(patch)
             if (receipt.get('sha256') != digest({k: v for k, v in receipt.items() if k != 'sha256'})
@@ -749,7 +758,7 @@ def verify_quantity_visual_revisions(row, classroom_directory):
                     or receipt.get('intentSha256') != intent['sha256']
                     or digest({'previewKey': row['preview_key'], 'patch': patch}) != revision_id
                     or intent.get('previewKey') != row['preview_key'] or intent.get('classroomId') != row['classroom_id']
-                    or json.loads((archive / 'amendment.json').read_text()) != receipt):
+                    or json.loads(course_text(archive / 'amendment.json')) != receipt):
                 fail('视觉修订回执或归档绑定已变化')
             expected = {'source.json', 'source-row.json', 'target.json', 'plan.json', 'receipts.json'}
             if patch['schemaVersion'] == QUANTITY_VISUAL_SCHEMA:
@@ -757,15 +766,15 @@ def verify_quantity_visual_revisions(row, classroom_directory):
             if set(intent.get('files', {})) != expected:
                 fail('视觉修订归档文件清单不一致')
             for name, sha in intent['files'].items():
-                if sha_bytes((archive / name).read_bytes()) != sha:
+                if sha_bytes(course_bytes(archive / name)) != sha:
                     fail('视觉修订归档字节已变化')
             for name in ('plan.json', 'receipts.json'):
-                if (archive / name).read_bytes() != (audio / name).read_bytes():
+                if course_bytes(archive / name) != course_bytes(audio / name):
                     fail('数量图修订不能改变原配音计划或收据')
-            source = json.loads((archive / 'source.json').read_text())
-            source_row = json.loads((archive / 'source-row.json').read_text())
-            target = json.loads((archive / 'target.json').read_text())
-            saved = json.loads((archive / 'saved.json').read_text())
+            source = json.loads(course_text(archive / 'source.json'))
+            source_row = json.loads(course_text(archive / 'source-row.json'))
+            target = json.loads(course_text(archive / 'target.json'))
+            saved = json.loads(course_text(archive / 'saved.json'))
             if (source_row['input_json'] != row['input_json'] or digest(source) != patch['expectedSourceSha256']
                     or digest(source) != receipt['sourceSha256']
                     or previous is not None and previous != receipt['sourceSha256']
@@ -774,12 +783,12 @@ def verify_quantity_visual_revisions(row, classroom_directory):
                 fail('视觉修订链与冻结输入或原课件不一致')
             derived, files = quantity_assets(source, patch, root, json.loads(row['input_json']))
             if derived:
-                if (json.loads((archive / 'derived-images.json').read_text()) != derived
+                if (json.loads(course_text(archive / 'derived-images.json')) != derived
                         or receipt.get('patchSchemaVersion') != QUANTITY_VISUAL_SCHEMA
                         or receipt.get('derivedImagesSha256') != intent['files']['derived-images.json']):
                     fail('数量图派生证据与回执不一致')
                 for name, raw in files.items():
-                    if (root / row['classroom_id'] / 'media' / name).read_bytes() != raw:
+                    if course_bytes(root / row['classroom_id'] / 'media' / name) != raw:
                         fail('数量图派生资源已变化')
             previous = receipt['targetSha256']
         if previous != row['classroom_sha256'] or digest(json.loads(row['classroom_json'])) != previous:
