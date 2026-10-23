@@ -276,8 +276,8 @@ export async function run(options,dependencies={}) {
       if(!original || ['courseId','courseVersion','releaseSha256'].some(k=>original[k]!==release[k]) || !release.subjectName || !release.gradeLabel || !release.title)throw Error('Publication metadata differs from verified source');
       const subject=displayName(release.subjectName),title=displayName(release.title);
       if(keyLayout && release.contentKey && !release.editionLabel)throw Error('Reviewed textbook edition metadata required');
-      const edition=displayName([release.editionLabel || '非教材课程',release.volumeLabel].filter(Boolean).join('-'));
-      const parent=keyLayout?[subject,edition,displayName(release.gradeLabel),c.prefix]:[c.prefix,subject];
+      const edition=displayName(release.storageEditionLabel || [release.editionLabel || '非教材课程',release.volumeLabel].filter(Boolean).join('-'));
+      const parent=keyLayout?[subject,edition,displayName(release.storageGradeLabel || release.gradeLabel),c.prefix]:[c.prefix,subject];
       const folderBase=keyLayout?title:displayName([release.gradeLabel,release.volumeLabel,release.title].filter(Boolean).join('-'));
       let folder=folderBase,version=1;
       while(folders.has([...parent,folder].join('/')))folder=folderBase+'（版本'+(++version)+'）';

@@ -6,7 +6,9 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
-import {canonical,enumerateSnapshotAssets,resolveArchiveAssets} from './course-archive-assets.mjs';
+import {EventEmitter} from 'node:events';
+import {Readable} from 'node:stream';
+import {canonical,enumerateSnapshotAssets,resolveArchiveAssets,createKatexArchiveResolver,downloadKatexBytes,publicCdnAddress} from './course-archive-assets.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const require=createRequire(path.join(root,'openmaic-runtime/.runtime/OpenMAIC/packages/@openmaic/storage/package.json'));
@@ -132,4 +134,110 @@ test('exact hash selects the configured byte layer and remote bytes must still m
  assert.equal(calls,1);assert.equal(result.entries[0].status,'resolved');
  const bad=await resolveArchiveAssets({...f.input,stagingRoot:path.join(f.directory,'other','asset-sources')},{...f.dependencies,readBytes:async()=>Buffer.from('wrong')});
  assert.equal(bad.unresolved.length,1);
+});
+
+const katexBase='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/';
+async function katexFixture(t,{fontFailure=false,limits={}}={}){
+ const directory=await fs.realpath(await fs.mkdtemp(path.join(process.env.MIRA_TASK_TMPDIR||os.tmpdir(),'archive-katex-')));
+ t.after(()=>fs.rm(directory,{recursive:true,force:true}));
+ const root=path.join(directory,'assets'),cacheRoot=path.join(directory,'cache');
+ await fs.mkdir(root);await fs.mkdir(cacheRoot);
+ const sources={
+  'katex.min.css':Buffer.from('@font-face{src:url(fonts/KaTeX_Main-Regular.woff2)}'),
+  'katex.min.js':Buffer.from('throw Error("archived but never executed");'),
+  'contrib/auto-render.min.js':Buffer.from('throw Error("also never executed");'),
+  'fonts/KaTeX_Main-Regular.woff2':Buffer.from('exact fixture font bytes'),
+ };
+ const pins=Object.fromEntries(Object.entries(sources).map(([name,bytes])=>[name,[bytes.length,digest(bytes)]])),calls=[];
+ const fetchBytes=async(url,options)=>{
+  calls.push(url);const name=url.slice(katexBase.length);
+  assert.equal(options.maxBytes,sources[name].length);
+  if(fontFailure&&name.startsWith('fonts/'))throw Error('fixture unavailable');
+  return sources[name];
+ };
+ return {directory,root,cacheRoot,pins,sources,calls,fetchBytes,
+  resolver:createKatexArchiveResolver({root,cacheRoot,pins,fetchBytes,limits})};
+}
+test('only the exact pinned KaTeX version is eligible; unrelated hosts, paths and credentials never fetch',async t=>{
+ const f=await katexFixture(t);
+ const forbidden=[
+  katexBase.replace('0.16.9','0.16.10')+'katex.min.js',
+  katexBase+'katex.min.js?token=private',katexBase+'katex.min.js#fragment',
+  katexBase+'../package.json',katexBase+'%6batex.min.js',
+  'https://user:password@cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js',
+  katexBase.replace('cdn.jsdelivr.net','127.0.0.1')+'katex.min.js',
+  katexBase.replace('https:','http:')+'katex.min.js','https://example.invalid/katex.min.js',
+ ];
+ for(const ref of forbidden)await assert.rejects(f.resolver(ref),/url_rejected/);
+ assert.equal(f.calls.length,0);
+ for(const address of ['127.0.0.1','10.1.2.3','169.254.169.254','192.168.1.1','172.20.0.1','::1','::ffff:127.0.0.1','fd00::1','fe80::1','2001:db8::1'])assert.equal(publicCdnAddress(address),false);
+ assert.equal(publicCdnAddress('104.16.175.226'),true);assert.equal(publicCdnAddress('2606:4700::6810:afe2'),true);
+});
+test('CSS is complete only with every font and preserves URL-to-SHA records without executing scripts',async t=>{
+ const f=await katexFixture(t),entries=await f.resolver(katexBase+'katex.min.css');
+ assert.equal(entries.length,2);assert(entries.every(entry=>entry.status==='resolved'));
+ assert.equal(entries[0].mimeType,'text/css');assert.equal(entries[1].mimeType,'font/woff2');
+ assert.equal(entries[1].originalURL,katexBase+'fonts/KaTeX_Main-Regular.woff2');
+ assert.equal(entries[1].dependencyOf,katexBase+'katex.min.css');assert.equal(entries[1].relativeRef,'fonts/KaTeX_Main-Regular.woff2');
+ for(const entry of entries){assert.equal(digest(await fs.readFile(entry.sourcePath)),entry.sha256);assert.equal((await fs.stat(entry.sourcePath)).mode&0o777,0o600);}
+ assert.equal((await f.resolver(katexBase+'katex.min.js'))[0].status,'resolved');
+ assert.equal((await f.resolver(katexBase+'contrib/auto-render.min.js'))[0].status,'resolved');
+ const other=path.join(f.directory,'another-document');await fs.mkdir(other);
+ const cached=createKatexArchiveResolver({root:other,cacheRoot:f.cacheRoot,pins:f.pins,fetchBytes:()=>{throw Error('cache must avoid network');}});
+ assert((await cached(katexBase+'katex.min.css')).every(entry=>entry.status==='resolved'));
+ assert.equal(f.calls.length,4);
+});
+test('missing fonts, corrupt bytes and budgets keep the dependency unresolved',async t=>{
+ const unavailable=await katexFixture(t,{fontFailure:true});
+ const failed=await unavailable.resolver(katexBase+'katex.min.css');
+ assert.equal(failed[0].status,'unresolved');assert.equal(failed[0].reason,'versioned_public_dependency_incomplete');
+ assert.equal(failed[1].status,'unresolved');
+ const limited=await katexFixture(t,{limits:{requests:1}});
+ assert.equal((await limited.resolver(katexBase+'katex.min.css'))[0].status,'unresolved');assert.equal(limited.calls.length,1);
+ const bad=await katexFixture(t);
+ const corrupt=createKatexArchiveResolver({...bad,fetchBytes:async()=>Buffer.from('invalid CDN response')});
+ assert.equal((await corrupt(katexBase+'katex.min.js'))[0].status,'unresolved');
+ assert.deepEqual(await fs.readdir(bad.root),[]);
+});
+test('local bytes qualify only for the exact package version and expected file SHA',async t=>{
+ const f=await katexFixture(t),localRoot=path.join(f.directory,'installed-katex');
+ await fs.mkdir(path.join(localRoot,'dist'),{recursive:true});
+ await fs.writeFile(path.join(localRoot,'package.json'),JSON.stringify({name:'katex',version:'0.16.9'}));
+ await fs.writeFile(path.join(localRoot,'dist/katex.min.js'),f.sources['katex.min.js']);
+ const local=createKatexArchiveResolver({...f,localRoot,fetchBytes:()=>{throw Error('same-version local bytes must avoid network');}});
+ assert.equal((await local(katexBase+'katex.min.js'))[0].status,'resolved');
+ const cacheRoot=path.join(f.directory,'other-cache');await fs.mkdir(cacheRoot);
+ await fs.writeFile(path.join(localRoot,'package.json'),JSON.stringify({name:'katex',version:'0.16.38'}));
+ let attempts=0;
+ const other=createKatexArchiveResolver({...f,cacheRoot,localRoot,fetchBytes:()=>{attempts++;throw Error('network unavailable');}});
+ assert.equal((await other(katexBase+'katex.min.js'))[0].status,'unresolved');assert.equal(attempts,1);
+});
+test('document input cannot replace the production release pins or qualify invented CDN bytes',async t=>{
+ const snapshot=room([]);snapshot.scenes[0].content={type:'interactive',html:`<script src="${katexBase}contrib/auto-render.min.js"></script>`};
+ const f=await fixture(t,snapshot),bytes=Buffer.from('invented code');let calls=0;
+ const result=await resolveArchiveAssets({...f.input,pins:{'contrib/auto-render.min.js':[bytes.length,digest(bytes)]}},
+  {...f.dependencies,downloadKatexBytes:async()=>{calls++;return bytes;}});
+ assert.equal(result.unresolved.length,1);assert.equal(calls,1);assert.equal(f.calls.length,0);
+ assert.equal(result.entries[0].sourcePath,undefined);
+});
+test('untrusted CSS URLs and symlink cache entries never escape the pinned font scope',async t=>{
+ const f=await katexFixture(t),css=Buffer.from('@font-face{src:url(https://127.0.0.1/private)}');
+ const resolver=createKatexArchiveResolver({...f,pins:{...f.pins,'katex.min.css':[css.length,digest(css)]},fetchBytes:async()=>css});
+ assert.equal((await resolver(katexBase+'katex.min.css'))[0].status,'unresolved');
+ const outside=path.join(f.directory,'outside.js');await fs.writeFile(outside,f.sources['katex.min.js']);
+ await fs.symlink(outside,path.join(f.cacheRoot,f.pins['katex.min.js'][1]+'.js'));
+ assert.equal((await f.resolver(katexBase+'katex.min.js'))[0].status,'unresolved');assert.equal(f.calls.length,0);
+});
+test('HTTPS redirects, oversized bodies and non-exact lengths are rejected without following Location',async()=>{
+ for(const [statusCode,body,headers]of [[302,'',{location:'https://127.0.0.1/private'}],[200,'too long',{}],[200,'ok',{'content-length':'99'}]]){
+  let calls=0;
+  const request=(url,options,callback)=>{
+   calls++;assert.equal(url,katexBase+'katex.min.js');assert.equal(options.headers['Accept-Encoding'],'identity');
+   const req=new EventEmitter();req.destroy=()=>{};
+   queueMicrotask(()=>{const response=Readable.from([Buffer.from(body)]);response.statusCode=statusCode;response.headers=headers;callback(response);});
+   return req;
+  };
+  await assert.rejects(downloadKatexBytes(katexBase+'katex.min.js',{maxBytes:2,request}));
+  assert.equal(calls,1);
+ }
 });

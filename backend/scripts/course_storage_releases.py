@@ -91,7 +91,7 @@ def _validated_release(conn, key):
 
 def release_metadata(course, manifest=None):
     """Project public display metadata without changing any release digest."""
-    from content.textbook_metadata import reviewed_edition_label
+    from content.textbook_metadata import course_storage_labels, reviewed_edition_label
     from schemas.education import GRADE_BY_CODE
 
     subject = course.get('subject', course.get('subjectCode'))
@@ -108,6 +108,7 @@ def release_metadata(course, manifest=None):
         'editionId': book.get('editionId'),
         'editionLabel': reviewed_edition_label(book) if book.get('editionLabel') else None,
         'publisher': book.get('publisher'), 'textbookTitle': book.get('title'),
+        'schoolSystem': book.get('schoolSystem'), **course_storage_labels(course, manifest),
         'publishedAt': course.get('published_at', course.get('publishedAt')),
     }
 

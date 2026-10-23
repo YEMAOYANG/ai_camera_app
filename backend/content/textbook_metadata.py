@@ -37,3 +37,33 @@ def matches_source_label(manifest, source_label):
     record = review_for(manifest)
     return bool(record and source_label in record["previousLabels"]
                 and manifest["editionLabel"] == record["editionLabel"])
+
+
+def course_storage_labels(course, manifest=None):
+    """Project readable storage names without rewriting frozen book metadata.
+
+    Edition descriptions and volume are separate identities. The first saved
+    grade-one preview omitted the explicit unified-edition prefix; its exact
+    reviewed book/resource identity is the only implicit-label correction.
+    """
+    from schemas.education import GRADE_BY_CODE
+
+    grade = course.get("grade_code", course.get("gradeCode"))
+    definition = GRADE_BY_CODE.get(grade)
+    grade_label = definition.label if definition else "未标注年级"
+    if manifest is None:
+        return {"storageEditionLabel": "未绑定教材（历史课件）", "storageGradeLabel": grade_label}
+    label = reviewed_edition_label(manifest) if manifest.get("editionLabel") else "未标注教材版本"
+    initial_unified_book = (
+        manifest.get("editionId"), manifest.get("publisher"), manifest.get("subject"),
+        manifest.get("gradeCode"), manifest.get("volume"), manifest.get("schoolSystem"),
+        manifest.get("source", {}).get("resourceId"),
+    ) == ("pep-chinese-g1-upper-2022-standard", "人民教育出版社", "chinese", "primary_1", "upper",
+          "six_year", "1c73b348-e8b6-47d6-84b0-6dbacbe28268")
+    if manifest.get("subject") == "chinese" and (label.startswith("统编版") or initial_unified_book):
+        label = "统编版"
+    volume = {"upper": "上册", "lower": "下册", "full": "全册"}.get(manifest.get("volume"), "")
+    grade_label += volume
+    if manifest.get("schoolSystem") == "five_four":
+        grade_label += "（五四制）"
+    return {"storageEditionLabel": label, "storageGradeLabel": grade_label}

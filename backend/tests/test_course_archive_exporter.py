@@ -84,6 +84,70 @@ class CourseArchiveExporterTest(unittest.TestCase):
         self.assertNotIn("localPath", public_json)
         self.assertEqual(stat.S_IMODE(Path(result["stagingDirectory"]).stat().st_mode), 0o700)
 
+    def test_storage_labels_are_separate_from_exact_metadata_and_never_override_frozen_directory(self):
+        self.snapshot.metadata.update(editionLabel="人教版 · 根据2022年版课程标准修订", volumeLabel="上册",
+            gradeLabel="一年级", editionId="pep-chinese", schoolSystem="six_year",
+            storageEditionLabel="统编版", storageGradeLabel="一年级上册")
+        self.release = {**self.identity, "uploadDate": "2026-10-23"}
+        result = self.export()
+        self.assertEqual(result["objectDirectory"], "科学/统编版/一年级上册/2026-10-23/怎样学科学")
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            metadata = json.loads(archive.read("metadata.json"))
+            self.assertEqual(metadata["editionLabel"], self.snapshot.metadata["editionLabel"])
+            self.assertEqual(metadata["editionId"], "pep-chinese")
+            self.assertEqual(metadata["schoolSystem"], "six_year")
+        self.release["storageDirectory"] = "科学/已冻结版本/已冻结年级/2026-10-23/原目录"
+        self.assertEqual(self.export()["objectDirectory"], self.release["storageDirectory"])
+
+    def active_release_manifest(self, entries):
+        path = self.root / "backend/data/course-storage/active-manifest.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"schemaVersion": "mira.course-storage.manifest.v2", "snapshotId": "verified-active",
+            "files": [], "releases": entries}))
+        self.store.config = CourseStorageConfig(mode="manifest", manifest_path=str(path))
+        return path
+
+    def test_verified_future_publication_missing_from_media_index_uses_central_labels(self):
+        self.active_release_manifest([{**self.release, "courseId": "previous-course"}])
+        self.snapshot.metadata.update(subjectName="语文", storageEditionLabel="统编版", storageGradeLabel="一年级上册")
+        conn = Mock()
+        with patch.object(self.exporter, "_published_snapshot", return_value=self.snapshot) as authority:
+            result = self.exporter.export_course(conn, course_id="course", course_version="1", staging_root=self.staging / "future")
+        authority.assert_called_once_with(conn, "course", "1", None)
+        self.assertTrue(result["complete"])
+        self.assertTrue(result["objectDirectory"].startswith("语文/统编版/一年级上册/"))
+        self.assertTrue(result["objectDirectory"].endswith("/怎样学科学"))
+        with patch.object(self.exporter, "_published_snapshot", side_effect=CourseArchiveError("published_release_invalid")), \
+                patch.object(self.exporter, "_dated_release") as directory_lookup:
+            with self.assertRaisesRegex(CourseArchiveError, "published_release_invalid"):
+                self.exporter.export_course(conn, course_id="course", course_version="1", staging_root=self.staging / "future")
+            directory_lookup.assert_not_called()
+
+    def test_dated_release_retains_one_frozen_path_and_rejects_duplicates_or_identity_conflicts(self):
+        self.active_release_manifest([self.release])
+        self.assertEqual(self.exporter._dated_release(self.identity)["storageDirectory"], self.release["storageDirectory"])
+        cases = ([self.release, self.release],
+                 [{**self.release, "releaseSha256": "c" * 64}],
+                 [{**self.release, "classroomId": "another-classroom"}],
+                 [{**self.release, "storageDirectory": ""}])
+        for entries in cases:
+            with self.subTest(entries=entries):
+                self.active_release_manifest(entries)
+                with self.assertRaisesRegex(CourseArchiveError, "published_storage_directory_not_bound"):
+                    self.exporter._dated_release(self.identity)
+
+    def test_future_release_cannot_treat_invalid_active_manifest_as_an_empty_index(self):
+        path = self.active_release_manifest([])
+        self.assertIsNone(self.exporter._dated_release(self.identity))
+        media_only = json.loads(path.read_text());media_only.pop("releases")
+        path.write_text(json.dumps(media_only))
+        self.assertIsNone(self.exporter._dated_release(self.identity))
+        for invalid in ({"releases": []}, {"schemaVersion": "mira.course-storage.manifest.v2", "snapshotId": "bad", "files": [], "releases": ["bad"]}):
+            with self.subTest(invalid=invalid):
+                path.write_text(json.dumps(invalid))
+                with self.assertRaisesRegex(CourseArchiveError, "published_storage_directory_manifest_invalid"):
+                    self.exporter._dated_release(self.identity)
+
     def test_owned_source_excludes_credentials_without_following_unrelated_json_links(self):
         source = self.root / "output/one-bound-job"
         source.mkdir(parents=True)
@@ -398,12 +462,96 @@ class CourseArchiveExporterTest(unittest.TestCase):
         self.assertEqual(result["status"], "generated_saved")
         self.assertIsNone(result["releaseSha256"])
         self.assertEqual(result["sourceDigest"], hashlib.sha256(raw.encode()).hexdigest())
-        self.assertTrue(result["objectDirectory"].startswith("课程/未绑定教材/未标注年级/"))
+        self.assertTrue(result["objectDirectory"].startswith("课程/未绑定教材（历史课件）/未标注年级/"))
         with zipfile.ZipFile(result["zip"]["path"]) as archive:
             self.assertEqual(archive.read("Native终态快照.json"), raw.encode())
         with self.assertRaisesRegex(CourseArchiveError, "source_digest_mismatch"):
             self.exporter.export_native_snapshot(snapshot, source_kind="native_pg_stage", source_digest="a" * 64,
                 staging_root=self.staging / "saved", meta=meta)
+
+    def test_native_unknown_binding_does_not_infer_unified_textbook_edition(self):
+        room = {"stage": {"id": "stage_new"}, "scenes": [{"id": "scene1", "type": "slide"}]}
+        meta = {"courseId": "native-new", "courseVersion": "saved-1", "title": "历史课件", "subject": "chinese",
+            "generatedAt": "2026-10-23T09:10:11Z", "editionLabel": "统编版", "storageEditionLabel": "统编版",
+            "gradeLabel": "一年级", "storageGradeLabel": "一年级上册", "schoolSystem": "six_year"}
+        result = self.exporter.export_native_snapshot(room, source_kind="native_pg_stage",
+            source_digest=self.exporter._native_digest(room), staging_root=self.staging / "native", meta=meta)
+        self.assertIn("/未绑定教材（历史课件）/", result["objectDirectory"])
+        meta["editionId"] = "pep-chinese-g1-upper-2022-standard"
+        bound = self.exporter.export_native_snapshot(room, source_kind="native_pg_stage",
+            source_digest=self.exporter._native_digest(room), staging_root=self.staging / "native", meta=meta)
+        self.assertIn("/未绑定教材（历史课件）/", bound["objectDirectory"])
+        with zipfile.ZipFile(bound["zip"]["path"]) as archive:
+            self.assertEqual(json.loads(archive.read("metadata.json"))["editionId"], meta["editionId"])
+
+    def native_catalog_fixture(self):
+        room = {"stage": {"id": "stage_new"}, "scenes": [{"id": "scene1", "type": "slide"}]}
+        teaching = self.root / "output/book/node/teaching-1"
+        job = teaching / "authoring-job"
+        job.mkdir(parents=True)
+        draft = b'{"request":"Retained lesson"}'
+        (job / "draft.json").write_bytes(draft)
+        (job / "state.json").write_text(json.dumps({"sessionId": "private-author", "savedStages": []}))
+        manifest = {"schemaVersion": "mira.learning.textbook-manifest.v1", "editionId": "pep-chinese-g1-upper-2022-standard",
+            "revisionId": "directory-original", "gradeCode": "primary_1", "subject": "chinese", "volume": "upper",
+            "schoolSystem": "six_year", "title": "语文", "publisher": "人民教育出版社",
+            "editionLabel": "根据2022年版课程标准修订；出版版次待核验",
+            "source": {"resourceId": "1c73b348-e8b6-47d6-84b0-6dbacbe28268"}}
+        path = self.root / "backend/content/textbooks/revisions/original.json"
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
+        checksum = hashlib.sha256(json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        frozen = {"teachingRevision": 1, "draftSha256": hashlib.sha256(draft).hexdigest(),
+            "binding": {k:manifest[k] for k in ("editionId", "revisionId", "gradeCode", "subject", "volume", "schoolSystem")},
+            "catalogCheck": {"manifestSha256": checksum}}
+        frozen_path = job / "frozen.json"
+        frozen_path.write_text(json.dumps(frozen))
+        meta = {"courseId": "native-saved:stage_new", "courseVersion": "saved-original", "title": "新课",
+            "subject": "course", "generatedAt": "2026-10-23T09:10:11Z"}
+        return room, manifest, path, frozen, frozen_path, meta
+
+    def test_native_frozen_catalog_proof_sets_labels_without_changing_saved_capture(self):
+        room, manifest, path, frozen, _, meta = self.native_catalog_fixture()
+        original = deepcopy(room)
+        digest = self.exporter._native_digest(room)
+        result = self.exporter.export_native_snapshot(room, source_kind="native_pg_stage", source_digest=digest,
+            staging_root=self.staging / "native", meta=meta, authoring_binding={"sessionId": "private-author"})
+        self.assertTrue(result["complete"])
+        self.assertEqual(room, original)
+        self.assertEqual(result["sourceDigest"], digest)
+        self.assertEqual(result["status"], "generated_saved")
+        self.assertIsNone(result["contentKey"])
+        self.assertIn("语文/统编版/一年级上册/", result["objectDirectory"])
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            metadata = json.loads(archive.read("metadata.json"))
+            for key in ("editionId", "schoolSystem", "revisionId", "gradeCode", "subjectCode", "volumeCode"):
+                expected = manifest.get({"subjectCode":"subject", "volumeCode":"volume"}.get(key,key))
+                self.assertEqual(metadata[key], expected)
+            self.assertEqual(metadata["textbookManifestSha256"], frozen["catalogCheck"]["manifestSha256"])
+            self.assertEqual(archive.read("原稿/backend/content/textbooks/revisions/original.json"), path.read_bytes())
+
+    def test_native_catalog_proof_rejects_wrong_digest_identity_and_missing_proof(self):
+        room, manifest, path, frozen, frozen_path, meta = self.native_catalog_fixture()
+        for case in ("sha", "editionId", "revisionId", "gradeCode", "subject", "volume", "schoolSystem", "no-proof"):
+            with self.subTest(case=case):
+                changed, capture = deepcopy(manifest), deepcopy(frozen)
+                if case == "sha":
+                    capture["catalogCheck"]["manifestSha256"] = "f" * 64
+                elif case == "no-proof":
+                    capture.pop("catalogCheck")
+                else:
+                    changed[case] = "other-identity"
+                    capture["catalogCheck"]["manifestSha256"] = hashlib.sha256(json.dumps(changed,
+                        ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+                path.write_text(json.dumps(changed))
+                frozen_path.write_text(json.dumps(capture))
+                result = self.exporter.export_native_snapshot(room, source_kind="native_pg_stage",
+                    source_digest=self.exporter._native_digest(room), staging_root=self.staging / "native", meta=meta,
+                    authoring_binding={"sessionId": "private-author"})
+                self.assertTrue(result["complete"])
+                self.assertIn("/未绑定教材（历史课件）/", result["objectDirectory"])
+                with zipfile.ZipFile(result["zip"]["path"]) as archive:
+                    self.assertNotIn("原稿/backend/content/textbooks/revisions/original.json", archive.namelist())
 
     def test_native_js_digest_covers_javascript_number_and_unicode_serialization(self):
         snapshot = {"stage": {"id": "stage_new", "x": 1.0, "y": 0.0000001},
@@ -438,7 +586,8 @@ class CourseArchiveExporterTest(unittest.TestCase):
                "classroom_sha256": digest(self.snapshot.classroom), "classroom_id": "tbpub_test",
                "input_json": json.dumps(plan, ensure_ascii=False), "result_json": '{"review":"needs audio"}',
                "edition_id": "book", "revision_id": "directory", "node_id": "node"}
-        manifest = {"subject": "science", "gradeCode": "primary_1", "editionId": "book", "title": "科学"}
+        manifest = {"subject": "science", "gradeCode": "primary_1", "editionId": "book", "title": "科学",
+                    "editionLabel": "审定教材", "schoolSystem": "six_year", "volume": "upper"}
         revision = {"manifest_json": json.dumps(manifest, ensure_ascii=False), "manifest_sha256": digest(manifest)}
         conn = Mock()
         conn.execute.return_value.fetchone.side_effect = [row, revision]
@@ -562,6 +711,100 @@ class CourseArchiveExporterTest(unittest.TestCase):
         self.assertEqual(a["sourceDigest"], b["sourceDigest"])
         self.assertEqual(a["sourceDigest"], "b" * 64)
         self.assertNotEqual(a["archiveSourceRevision"], b["archiveSourceRevision"])
+
+    def material_alias_fixture(self):
+        stage, material = "stage_history", "mat_original"
+        teaching = self.root / "output/book/node/teaching-1"
+        job, attachments = teaching / "authoring-job", teaching / "authoring-job/page-assets-v1"
+        attachments.mkdir(parents=True, exist_ok=True)
+        image = teaching / "derived/image.png"
+        image.parent.mkdir(exist_ok=True)
+        data = b'\x89PNG\r\n\x1a\nexact retained material bytes'
+        image.write_bytes(data)
+        checksum = hashlib.sha256(data).hexdigest()
+        good = f"/api/classroom-media/{stage}/media/material-{material}-{checksum}.png"
+        bad = f"/api/classroom-media/{stage}/media/material-{material}-{'b' * 64}.png"
+        live = self.root / ("openmaic-runtime/.runtime/OpenMAIC/data/classrooms/" + good.removeprefix("/api/classroom-media/"))
+        live.parent.mkdir(parents=True, exist_ok=True)
+        live.write_bytes(data)
+        draft = b'{"request":"Retained lesson"}'
+        (job / "draft.json").write_bytes(draft)
+        frozen = {"binding": {"editionId": "book", "nodeId": "node"}, "teachingRevision": 1,
+            "draftSha256": hashlib.sha256(draft).hexdigest(), "payloadSha256": "a" * 64}
+        state = {"sessionId": "private-author", "savedStages": [{"stageId": stage}]}
+        intent = {"assetKey": "portrait", "sessionId": "private-author", "sourceSha256": checksum, "byteSize": len(data)}
+        intent_raw = json.dumps(intent).encode()
+        receipt = {"intentSha256": hashlib.sha256(intent_raw).hexdigest(), "response": {"material": {
+            "materialId": material, "bytes": len(data), "mime": "image/png"}}}
+        manifest = {"schemaVersion": "mira.operator.frozen-material-attachments.v1",
+            "baseDraftSha256": frozen["draftSha256"], "basePayloadSha256": frozen["payloadSha256"],
+            "assets": [{"assetKey": "portrait", "sourcePath": str(image), "mimeType": "image/png", "sha256": checksum, "bytes": len(data)}]}
+        manifest["sha256"] = hashlib.sha256(json.dumps(manifest, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        files = {job / "frozen.json": frozen, job / "state.json": state,
+            attachments / "portrait-intent.json": intent, attachments / "portrait-receipt.json": receipt,
+            attachments / "manifest.json": manifest}
+        for path, value in files.items():
+            path.write_text(json.dumps(value))
+        room = {"stage": {"id": stage}, "scenes": [{"id": "old", "content": {"html": f'<img src="{good}"><img src="{bad}">'}}]}
+        self.snapshot.documents["历史原稿.json"] = json.dumps(room)
+        self.snapshot.source_roots = [teaching]
+        self.store.config = CourseStorageConfig(mode="local")
+        self.store.read.side_effect = lambda path, **kwargs: None if path.suffix == ".png" else self.media
+        return {"files": files, "image": image, "data": data, "good": good, "bad": bad, "teaching": teaching,
+            "frozen": job / "frozen.json", "state": job / "state.json", "intent": attachments / "portrait-intent.json",
+            "receipt": attachments / "portrait-receipt.json", "manifest": attachments / "manifest.json"}
+
+    def test_retained_material_alias_keeps_wrong_original_ref_and_verifies_bytes_without_live_repair(self):
+        fixture = self.material_alias_fixture()
+        original = deepcopy(self.snapshot.documents)
+        result = self.export()
+        self.assertTrue(result["complete"])
+        self.assertEqual(self.snapshot.documents, original)
+        bad_path = self.root / ("openmaic-runtime/.runtime/OpenMAIC/data/classrooms/" + fixture["bad"].removeprefix("/api/classroom-media/"))
+        self.assertFalse(bad_path.exists())
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            manifest = json.loads(archive.read("manifest.json"))
+            alias = manifest["recoveredAliases"][0]
+            self.assertEqual(alias["originalReference"], fixture["bad"])
+            self.assertEqual(alias["sha256"], hashlib.sha256(fixture["data"]).hexdigest())
+            self.assertEqual(alias["recoveryReason"], "historical_material_alias_from_verified_upload_receipt")
+            self.assertEqual(archive.read(alias["archivePath"]), fixture["data"])
+            self.assertEqual(archive.namelist().count(alias["archivePath"]), 1)
+            self.assertIn(fixture["bad"], archive.read("历史原稿.json").decode())
+            self.assertEqual(len(alias["evidence"]), 4)
+
+    def test_material_alias_rejects_unbound_stage_owner_material_and_changed_proofs(self):
+        fixture = self.material_alias_fixture()
+        cases = ("material", "intent_hash", "manifest_hash", "bytes", "stage", "owner", "frozen", "unowned_source")
+        for case in cases:
+            with self.subTest(case=case):
+                for path, value in fixture["files"].items():
+                    path.write_text(json.dumps(value))
+                self.snapshot.source_roots = [fixture["teaching"]]
+                fixture["image"].write_bytes(fixture["data"])
+                if case == "material":
+                    value = deepcopy(fixture["files"][fixture["receipt"]]);value["response"]["material"]["materialId"] = "mat_other"
+                    fixture["receipt"].write_text(json.dumps(value))
+                elif case == "intent_hash":
+                    fixture["intent"].write_text(json.dumps(fixture["files"][fixture["intent"]]) + ' ')
+                elif case == "manifest_hash":
+                    value = deepcopy(fixture["files"][fixture["manifest"]]);value["assets"][0]["bytes"] += 1
+                    fixture["manifest"].write_text(json.dumps(value))
+                elif case == "bytes":
+                    fixture["image"].write_bytes(fixture["data"] + b'changed')
+                elif case in {"stage", "owner"}:
+                    value = deepcopy(fixture["files"][fixture["state"]])
+                    if case == "stage":value["savedStages"] = [{"stageId": "stage_other"}]
+                    else:value["sessionId"] = "other-owner-session"
+                    fixture["state"].write_text(json.dumps(value))
+                elif case == "frozen":
+                    value = deepcopy(fixture["files"][fixture["frozen"]]);value.pop("binding")
+                    fixture["frozen"].write_text(json.dumps(value))
+                else:self.snapshot.source_roots = []
+                result = self.export()
+                self.assertFalse(result["complete"])
+                with zipfile.ZipFile(result["zip"]["path"]) as archive:
+                    self.assertEqual(json.loads(archive.read("manifest.json"))["recoveredAliases"], [])
 
     def test_unresolved_standard_asset_blocks_complete_and_public_upload(self):
         self.snapshot.classroom["scenes"][0]["content"] = {"type": "slide", "canvas": {

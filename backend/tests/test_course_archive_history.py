@@ -69,7 +69,7 @@ class CourseArchiveHistoryTest(unittest.TestCase):
         result = export_authoring_history(self.exporter, event, staging_root=self.root / "archives")
         self.assertTrue(result["complete"], result["missingSources"])
         self.assertEqual(result["sourceKind"], "native_authoring_file")
-        self.assertIn("/未绑定教材/未标注年级/", result["objectDirectory"])
+        self.assertIn("/未绑定教材（历史课件）/未标注年级/", result["objectDirectory"])
         manifest = json.loads(Path(result["manifestPath"]).read_bytes())
         record = next(f for f in manifest["files"] if f["sourceIdentity"] == self.source.relative_to(self.root).as_posix())
         self.assertEqual(record["sha256"], hashlib.sha256(self.raw).hexdigest())

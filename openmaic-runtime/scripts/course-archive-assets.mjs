@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 /** Read only the assets referenced by one authoritative Native course capture. */
 import fs from 'node:fs/promises';
+import {constants as fsConstants} from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import https from 'node:https';
+import {lookup as dnsLookup} from 'node:dns';
+import {isIP} from 'node:net';
 import {createRequire} from 'node:module';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 
@@ -16,6 +20,76 @@ const parseCssValue=require('postcss-value-parser');
 const ts=require('typescript');
 const MAX_BYTES=768*1024**2,MAX_TOTAL=4*1024**3,MAX_INPUT=128*1024**2;
 const sha=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
+const KATEX_BASE='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/';
+const KATEX_ENTRIES=new Set(['katex.min.css','katex.min.js','contrib/auto-render.min.js']);
+// Official npm katex@0.16.9 tarball, verified before deriving these file pins:
+// https://registry.npmjs.org/katex/-/katex-0.16.9.tgz
+// sha512-fsSYjWS0EEOwvy81j3vRA8TEAhQhKiqO+FQaKWp0m39qwOzHVBgAUBIXWj1pB+O2W3fIpNa6Y9KSKCVbfPhyAQ==
+const KATEX_FILES={
+ "contrib/auto-render.min.js":[3478,"9cb8dacfc086c2966c9ec4ba54f4a2dc43b7cbe2b33cec1a2743d886c7fb47a7"],
+ "fonts/KaTeX_AMS-Regular.ttf":[63632,"68534840bcfdd2bffb6f0e8deb48684dd01e7f04ea2813267577afb906de1d13"],
+ "fonts/KaTeX_AMS-Regular.woff":[33516,"30da91e84c893f875e252689faebdc590b2871145e8adc7f9a9d4dbd8ce0b251"],
+ "fonts/KaTeX_AMS-Regular.woff2":[28076,"0cdd387c9590a1a9f9794560022dbb59654a7d86f187aa0c81495ad42d3a7308"],
+ "fonts/KaTeX_Caligraphic-Bold.ttf":[12368,"07d8e303ce4fc12b4bb54f1004170dd190a1f3db45d400fe68060df3e0897268"],
+ "fonts/KaTeX_Caligraphic-Bold.woff":[7716,"1ae6bd7475590e97e7f145a89e09ccde322f7a6bc0b91607b1c8b8ee28290fed"],
+ "fonts/KaTeX_Caligraphic-Bold.woff2":[6912,"de7701e42cf1f4cf0b766c03fb27977207eee2f4fd5d76fa82188406da43ea4c"],
+ "fonts/KaTeX_Caligraphic-Regular.ttf":[12344,"ed0b74372feefcbb9c0666b2e210da37b7e49fa7fbbf3eeb11db5f693dacfbb7"],
+ "fonts/KaTeX_Caligraphic-Regular.woff":[7656,"3398dd02302557a793f2863f88e02d96ce10df2abffa07c8e9fa90775116e65c"],
+ "fonts/KaTeX_Caligraphic-Regular.woff2":[6908,"5d53e70ad607c2352162dec9e0923fb54ecdafaccbf604cd8dcf7d00facb989b"],
+ "fonts/KaTeX_Fraktur-Bold.ttf":[19584,"9163df9c7122432e6495b4229fa9071cf9ae86a758ae5efc4924ec2e1a6dbce1"],
+ "fonts/KaTeX_Fraktur-Bold.woff":[13296,"9be7ceb88004ab8ad124082246fbfcca4091e36385d4ec6ed1df67375dad50fb"],
+ "fonts/KaTeX_Fraktur-Bold.woff2":[11348,"74444efd593c005e3f4573b44524704c0af0a937fe911cca9e94068d0d140d3f"],
+ "fonts/KaTeX_Fraktur-Regular.ttf":[19572,"1e6f9579e90e2cac37f8f60a597c436e075c114385652b7cbeb0dec0421291b3"],
+ "fonts/KaTeX_Fraktur-Regular.woff":[13208,"5e28753be717dac97f559f49bc10be9cf3c124ddcabda6659d11cb68febc6463"],
+ "fonts/KaTeX_Fraktur-Regular.woff2":[11316,"51814d270d06ff0255dba0799994fa4d8c84d11f09951d47595f4abb1f3602dc"],
+ "fonts/KaTeX_Main-Bold.ttf":[51336,"138ac28d1663b3037e9c5f52371fa5c63d8324f4a38d22cd573e6ea3a3fd0cf8"],
+ "fonts/KaTeX_Main-Bold.woff":[29912,"c76c5d696297d51b9cb1639c7da4334f0e7dec81b42b11213b5e25ef671bb822"],
+ "fonts/KaTeX_Main-Bold.woff2":[25324,"0f60d1b897938ec918c8ce073092411baf9438f6739465693ff18b0f9d20b021"],
+ "fonts/KaTeX_Main-BoldItalic.ttf":[32968,"70ee1f64a20f2048c21940ef46d0144fd215baa953ca69afd1e31e98544f708f"],
+ "fonts/KaTeX_Main-BoldItalic.woff":[19412,"a6f7ec0d846ac7ad975adb8959c37ed49b94acbc4ae436db9ce9e20287e4a64c"],
+ "fonts/KaTeX_Main-BoldItalic.woff2":[16780,"99cd42a3c072d918f2f44984a807cf7aa16e13545fd0875fc07c6c65f99e715b"],
+ "fonts/KaTeX_Main-Italic.ttf":[33580,"0d85ae7cc30f23790a7f1a58c4a112fdca8aae769b6ba11429af1d98b1b6cb3a"],
+ "fonts/KaTeX_Main-Italic.woff":[19676,"f1d6ef86f3b11a528bd5185199bd2443ecb2b0dead96d88674b5a2c12be24bdf"],
+ "fonts/KaTeX_Main-Italic.woff2":[16988,"97479ca6cce906abc961ecac96faa5f9ca2e61b8e7670d475826bcdee9a7c267"],
+ "fonts/KaTeX_Main-Regular.ttf":[53580,"d0332f52868370fd83ae7fa46470f90c8f2eab2fcf12bc4f88080b340c95a830"],
+ "fonts/KaTeX_Main-Regular.woff":[30772,"c6368d87e8a1a3a5d337623d83d8dc4b868f242a9ad476237d6f8d1e0f168cdc"],
+ "fonts/KaTeX_Main-Regular.woff2":[26272,"c2342cd8b869e01752a9321dc17213fc40d4d04c79688c1d43f2cf316abd7866"],
+ "fonts/KaTeX_Math-BoldItalic.ttf":[31196,"f9377ab0271cda59af24bcffbd46a4d0c8a3572ffafdbb38de2ad5ea7b0d5ee5"],
+ "fonts/KaTeX_Math-BoldItalic.woff":[18668,"850c0af5c2238497febaf5e461d880bf458c341f42f4f330f1b1ab5698b1998e"],
+ "fonts/KaTeX_Math-BoldItalic.woff2":[16400,"dc47344dbb6cb5b655c8460d561f4df5f501b90c804ad3c6cec65fe322351ab1"],
+ "fonts/KaTeX_Math-Italic.ttf":[31308,"08ce98e51b04d58945a301e639e02b6998af29fdfd61a7b8afdd07bbfc479d4a"],
+ "fonts/KaTeX_Math-Italic.woff":[18748,"8a8d244581371912b8f3f5a23e2437cb2a59cd9bcaebb0346e722c05737a2571"],
+ "fonts/KaTeX_Math-Italic.woff2":[16440,"7af58c5ec8f132a2ddde9027c6d7814decce4d3b822a11192a42a20e2e973264"],
+ "fonts/KaTeX_SansSerif-Bold.ttf":[24504,"1ece03f79f95277d57dc7f6b435a74e1379b0d46104a8530286b60ff49369ea0"],
+ "fonts/KaTeX_SansSerif-Bold.woff":[14408,"ece03cfd83e22c212cdef66feb8442d25a083beb988db3f1883f3f9738d750ba"],
+ "fonts/KaTeX_SansSerif-Bold.woff2":[12216,"e99ae51144bf1232efcc1bfe5add36262c6866b0faab24fa75740e1b98577a62"],
+ "fonts/KaTeX_SansSerif-Italic.ttf":[22364,"3931dd81faed86ba021bb2bbdc36f5bed9a38d6b4f4077aca59b265aa1b02083"],
+ "fonts/KaTeX_SansSerif-Italic.woff":[14112,"91ee67500cc0129aa0ace3ac5c61ff1692102f0f31d02b69347fba35dcb75bf2"],
+ "fonts/KaTeX_SansSerif-Italic.woff2":[12028,"00b26ac825e2095056396e0553b8ac26d3f8ad158c3826e28b4c45b385c4714a"],
+ "fonts/KaTeX_SansSerif-Regular.ttf":[19436,"f36ea897e19f4a2e571d1e900e4e3710e438deb05a842486045ba0a3e616a4ad"],
+ "fonts/KaTeX_SansSerif-Regular.woff":[12316,"11e4dc8a6471ff6d6ee561d53d10fde8f7489e798257ff449c5d37c197435605"],
+ "fonts/KaTeX_SansSerif-Regular.woff2":[10344,"68e8c73ef42afd3ccec58bf0fba302cce448938e7fc020a5e31f8a952eee1342"],
+ "fonts/KaTeX_Script-Regular.ttf":[16648,"1c67f068fea8bb09bf099c088b1cf64bd27516a6e07f4684344873564bb66a67"],
+ "fonts/KaTeX_Script-Regular.woff":[10588,"d96cdf2b3bdd4d64a8fd5f74a4c467f123a8a73931cd435889f08ffaf9bf947a"],
+ "fonts/KaTeX_Script-Regular.woff2":[9644,"036d4e95149b69ff9bcc0cd55771efeb25ffa3947293e69acd78d5ac328c684b"],
+ "fonts/KaTeX_Size1-Regular.ttf":[12228,"95b6d2f1a50173bfedb8c63e1d1c99b10427d0a4df4201cb44513b226951a22b"],
+ "fonts/KaTeX_Size1-Regular.woff":[6496,"c943cc986384f59e86bea5fd7dc50a9c4dfe567a7c05eb40d6790720dead97c9"],
+ "fonts/KaTeX_Size1-Regular.woff2":[5468,"6b47c40166b6dbe21a5dfca7718413f2147fd2399be1ba605d8ad39cedf25dfe"],
+ "fonts/KaTeX_Size2-Regular.ttf":[11508,"a6b2099fb555c60e3a0db3a08842ebf1d732c6eb4e4bf44913613bed4fc4e39b"],
+ "fonts/KaTeX_Size2-Regular.woff":[6188,"2014c523c3210bcc166648c4d4cc57f05b747df07a24277bf71c51e67dc79e3d"],
+ "fonts/KaTeX_Size2-Regular.woff2":[5208,"d04c54219f9eaec6d4d4fd42dfb28785975a4794d6b2fc71e566b9cd6db842dd"],
+ "fonts/KaTeX_Size3-Regular.ttf":[7588,"500e04d54f0d51666332c9d2089aa803be22aa878eca539e59fa53c6e522b082"],
+ "fonts/KaTeX_Size3-Regular.woff":[4420,"6ab6b62e9b62dae2c00dd90f791bd10950be0ecc3490d7d6045f51c2e8fe0949"],
+ "fonts/KaTeX_Size3-Regular.woff2":[3624,"73d591271b1604960cb10bb90fee021670af7297017e0e98480b332d11f51995"],
+ "fonts/KaTeX_Size4-Regular.ttf":[10364,"c647367d1dd4e162468717d020e1fc0f1dc5c26ebfdffbe55261713bf88c5877"],
+ "fonts/KaTeX_Size4-Regular.woff":[5980,"99f9c6750b489c9462bf04900bd3f939df9b829339daaaaa99ef5495cdddea58"],
+ "fonts/KaTeX_Size4-Regular.woff2":[4928,"a4af7d414440a1c1790825cfb700cf9cf43b0f2c4b04f0ebc523011ad9853ec0"],
+ "fonts/KaTeX_Typewriter-Regular.ttf":[27556,"f01f3e87d9c6a61c0c081ceb577abd864eb00a612f7ac1620dd6915fad2ef5aa"],
+ "fonts/KaTeX_Typewriter-Regular.woff":[16028,"e14fed02b1aba7ce9f5afd5844b5d0321b22351febc720e0de8b8723527609f7"],
+ "fonts/KaTeX_Typewriter-Regular.woff2":[13568,"71d517d67827787cfabdf186914cc3358eda539e37931941f2b2fd4a21f68c0b"],
+ "katex.min.css":[23196,"505d5f829022bb7b4f24dfee0aa1141cd7bba67afe411d1240335f820960b5c3"],
+ "katex.min.js":[277038,"dc84b296ec3e884de093158f760fd9d45b6c7abe58b5381557f4e138f46a58ae"],
+};
 export function canonical(value){
  const sorted=x=>Array.isArray(x)?x.map(sorted):x&&typeof x==='object'?Object.fromEntries(Object.entries(x).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>[k,sorted(v)])):x;
  return JSON.stringify(sorted(value));
@@ -235,6 +309,132 @@ async function directoryChildren(ref,config,dependencies){
  return [...filenames].sort().map(name=>({ref:ref+name,kind:'image',status:'already_collected'}));
 }
 
+function katexName(ref,fonts=false){
+ if(typeof ref!=='string'||!ref.startsWith(KATEX_BASE))return;
+ const name=ref.slice(KATEX_BASE.length);
+ if(Object.hasOwn(KATEX_FILES,name)&&(KATEX_ENTRIES.has(name)||(fonts&&name.startsWith('fonts/'))))return name;
+}
+export function publicCdnAddress(address){
+ if(isIP(address)===4){
+  const [a,b,c]=address.split('.').map(Number);
+  return a>0&&a<224&&a!==10&&a!==127&&!(a===100&&b>=64&&b<=127)&&!(a===169&&b===254)
+   &&!(a===172&&b>=16&&b<=31)&&!(a===192&&(b===0||b===168||b===88))
+   &&!(a===198&&(b===18||b===19||(b===51&&c===100)))&&!(a===203&&b===0&&c===113);
+ }
+ return isIP(address)===6&&/^[23][0-9a-f]{3}:/i.test(address)
+  &&!/^2001:(?:db8:|0:|:|10:|20:)/i.test(address)&&!/^2002:|^3fff:/i.test(address);
+}
+function publicCdnLookup(hostname,options,callback){
+ if(hostname!=='cdn.jsdelivr.net'){callback(Error('archive_cdn_host_rejected'));return;}
+ dnsLookup(hostname,{all:true,verbatim:true},(error,addresses)=>{
+  if(error){callback(error);return;}
+  if(!addresses.length||addresses.some(item=>!publicCdnAddress(item.address))){callback(Error('archive_cdn_private_address'));return;}
+  const selected=addresses.filter(item=>!options.family||item.family===options.family);
+  if(!selected.length){callback(Error('archive_cdn_address_unavailable'));return;}
+  if(options.all)callback(null,selected);else callback(null,selected[0].address,selected[0].family);
+ });
+}
+export function downloadKatexBytes(url,{maxBytes,timeoutMs=10000,request=https.get}={}){
+ if(!katexName(url,true)||!Number.isSafeInteger(maxBytes)||maxBytes<1||maxBytes>512*1024)throw Error('archive_cdn_request_rejected');
+ return new Promise((resolve,reject)=>{
+  let req,timer,settled=false;
+  const finish=(error,bytes)=>{if(settled)return;settled=true;clearTimeout(timer);error?reject(error):resolve(bytes);};
+  req=request(url,{agent:false,lookup:publicCdnLookup,maxHeaderSize:16384,
+   headers:{'Accept-Encoding':'identity','User-Agent':'Mira-course-archive/1'}},response=>{
+   response.on('error',error=>finish(error));
+   const fail=()=>{response.destroy();req?.destroy();finish(Error('archive_cdn_response_rejected'));};
+   // Redirect budget is zero: never follow a Location to another origin or IP.
+   if(response.statusCode!==200||(response.headers['content-encoding']&&response.headers['content-encoding']!=='identity')){fail();return;}
+   const length=response.headers['content-length'];
+   if(length!==undefined&&(!/^\d+$/.test(length)||Number(length)!==maxBytes)){fail();return;}
+   const chunks=[];let size=0;
+   response.on('data',chunk=>{size+=chunk.length;if(size>maxBytes){fail();return;}chunks.push(chunk);});
+   response.on('end',()=>size===maxBytes?finish(null,Buffer.concat(chunks)):finish(Error('archive_cdn_size_mismatch')));
+  });
+  req.on('error',error=>finish(error));
+  timer=setTimeout(()=>{req.destroy();finish(Error('archive_cdn_timeout'));},Math.max(1,Math.min(timeoutMs,10000)));
+ });
+}
+async function pinnedFile(root,name,pin){
+ const filename=path.join(root,name);
+ if(await fs.realpath(filename)!==filename)throw Error('archive_cdn_source_linked');
+ const handle=await fs.open(filename,fsConstants.O_RDONLY|fsConstants.O_NOFOLLOW);
+ try{
+  const before=await handle.stat();if(!before.isFile()||before.size!==pin[0])throw Error('archive_cdn_source_size');
+  const buffer=Buffer.alloc(pin[0]+1);let size=0;
+  while(size<buffer.length){const {bytesRead}=await handle.read(buffer,size,buffer.length-size,null);if(!bytesRead)break;size+=bytesRead;}
+  const bytes=buffer.subarray(0,size),after=await handle.stat(),current=await fs.lstat(filename);
+  if(bytes.length!==pin[0]||sha(bytes)!==pin[1]||['dev','ino','size','mtimeMs','ctimeMs'].some(k=>before[k]!==after[k]||before[k]!==current[k]))throw Error('archive_cdn_source_changed');
+  return bytes;
+ }finally{await handle.close();}
+}
+/** The optional pin/transport seams are for offline tests, never document input. */
+export function createKatexArchiveResolver({root,cacheRoot=root,localRoot,pins=KATEX_FILES,fetchBytes=downloadKatexBytes,limits={}}){
+ const maxRequests=Math.min(limits.requests??64,64),maxTotal=Math.min(limits.totalBytes??2*1024**2,2*1024**2);
+ const deadline=Date.now()+Math.min(limits.timeoutMs??60000,60000);
+ const records=new Map();let requests=0,total=0;
+ const local=async(name,pin)=>{
+  if(!localRoot)return;
+  try{
+   const directory=await fs.realpath(localRoot),info=await readJson(path.join(directory,'package.json'));
+   if(info.name!=='katex'||info.version!=='0.16.9')return;
+   return await pinnedFile(path.join(directory,'dist'),name,pin);
+  }catch{return;}
+ };
+ const load=name=>{
+  if(records.has(name))return records.get(name);
+  const promise=(async()=>{
+   const ref=KATEX_BASE+name,entry={ref,originalURL:ref,kind:'dependency',status:'unresolved',reason:'versioned_public_dependency_unavailable'};
+   try{
+    const pin=pins[name];
+    if(!Object.hasOwn(KATEX_FILES,name)||!Array.isArray(pin)||!Number.isSafeInteger(pin[0])||pin[0]<1||pin[0]>512*1024||!/^[a-f0-9]{64}$/.test(pin[1]))throw Error('archive_cdn_pin_invalid');
+    if(Date.now()>deadline)throw Error('archive_cdn_deadline');
+    const ext=path.extname(name),cached=pin[1]+ext;
+    let bytes;
+    try{bytes=await pinnedFile(cacheRoot,cached,pin);}catch(error){if(error.code!=='ENOENT')throw error;}
+    if(!bytes)bytes=await local(name,pin);
+    if(!bytes){
+     if(++requests>maxRequests||(total+=pin[0])>maxTotal)throw Error('archive_cdn_budget');
+     bytes=await fetchBytes(ref,{maxBytes:pin[0],timeoutMs:Math.max(1,Math.min(10000,deadline-Date.now()))});
+    }
+    if(!(bytes instanceof Uint8Array)||bytes.length!==pin[0]||sha(bytes)!==pin[1])throw Error('archive_cdn_integrity');
+    bytes=Buffer.from(bytes);
+    await saveBytes(cacheRoot,pin[1],ext,bytes);
+    const mimeType={'.css':'text/css','.js':'application/javascript','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf'}[ext];
+    Object.assign(entry,{status:'resolved',sourcePath:await saveBytes(root,pin[1],ext,bytes),sha256:pin[1],byteSize:bytes.length,mimeType,
+     packageName:'katex',packageVersion:'0.16.9'});delete entry.reason;
+    return {entry,bytes};
+   }catch{return {entry};}
+  })();records.set(name,promise);return promise;
+ };
+ return async ref=>{
+  const name=katexName(ref);if(!name)throw Error('archive_cdn_url_rejected');
+  const {entry,bytes}=await load(name);
+  if(name!=='katex.min.css'||entry.status!=='resolved')return [entry];
+  const children=[];
+  try{
+   const css=bytes.toString('utf8');if(/@import\b/i.test(css))throw Error('archive_cdn_css_import_rejected');
+   parseCssValue(css).walk(value=>{
+    if(value.type!=='function'||value.value.toLowerCase()!=='url')return;
+    const relative=parseCssValue.stringify(value.nodes).trim().replace(/^(['"])(.*)\1$/s,'$2');
+    const url=new URL(relative,ref).href,child=katexName(url,true);
+    if(!child?.startsWith('fonts/'))throw Error('archive_cdn_css_reference_rejected');
+    if(!children.some(item=>item.ref===url))children.push({ref:url,name:child,relativeRef:relative});return false;
+   });
+   if(!children.length||children.length>60)throw Error('archive_cdn_font_limit');
+   const dependencies=[];
+   for(let i=0;i<children.length;i+=4){
+    const chunk=await Promise.all(children.slice(i,i+4).map(async child=>({...(await load(child.name)).entry,
+     relativeRef:child.relativeRef,dependencyOf:ref})));
+    dependencies.push(...chunk);
+   }
+   if(dependencies.some(child=>child.status!=='resolved')){entry.status='unresolved';entry.reason='versioned_public_dependency_incomplete';}
+   entry.dependencyRefs=children.map(child=>child.ref);
+   return [entry,...dependencies];
+  }catch{entry.status='unresolved';entry.reason='versioned_public_dependency_incomplete';return [entry];}
+ };
+}
+
 export async function resolveArchiveAssets(input,dependencies={}){
  const {snapshot,stageId,stagingRoot}=input;
  if(typeof stageId!=='string'||!/^[A-Za-z0-9_-]{1,255}$/.test(stageId)||snapshot?.stage?.id!==stageId)throw Error('archive_asset_stage_identity_invalid');
@@ -244,9 +444,22 @@ export async function resolveArchiveAssets(input,dependencies={}){
  const roots=dependencies.allowedRoots||[path.join(ROOT,'backend/data/course-storage/archives'),...(process.env.MIRA_TASK_TMPDIR?[await fs.realpath(process.env.MIRA_TASK_TMPDIR)]:[])];
  const target=await directory(stagingRoot,roots);
  const config=dependencies.config||await configuration();
+ let katex;
  for(const entry of [...entries]){
   if(entry.status!=='unresolved')continue;
-  if(staticPublic(entry.ref)){
+  if(katexName(entry.ref)){
+   try{
+    if(!katex){
+     const state=dependencies.stateRoot||path.join(ROOT,'backend/data/course-storage');
+     const cache=await directory(path.join(state,'public-dependency-cache/katex-0.16.9'),dependencies.allowedRoots||[state,...roots]);
+     let localRoot;try{localRoot=path.dirname(require.resolve('katex/package.json'));}catch{}
+     katex=createKatexArchiveResolver({root:target,cacheRoot:cache,localRoot,fetchBytes:dependencies.downloadKatexBytes||downloadKatexBytes});
+    }
+    const [resolved,...children]=await katex(entry.ref);Object.assign(entry,resolved);
+    if(entry.status==='resolved')delete entry.reason;
+    for(const child of children)if(!entries.some(existing=>existing.ref===child.ref))entries.push(child);
+   }catch{entry.reason='versioned_public_dependency_unavailable';}
+  }else if(staticPublic(entry.ref)){
    try{
     const bytes=await publicBytes(entry.ref,dependencies.nativeRoot||NATIVE),digest=sha(bytes),ext=path.extname(entry.ref).toLowerCase();
     const mimeType={'.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp'}[ext];

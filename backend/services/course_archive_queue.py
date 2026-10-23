@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from copy import deepcopy
 from datetime import datetime, timezone
 import fcntl
 import hashlib
@@ -306,11 +307,12 @@ class CourseArchiveQueue:
             raise ArchiveQueueError("archive_job_identity_invalid")
         _write(self.items / (job["key"] + ".json"), job)
 
-    def due(self, limit):
+    def due(self, limit, max_priority=None):
         jobs = []
         for path in self.items.glob("*.json"):
             job = json.loads(_read(path))
             if (job.get("identity", {}).get("storage") != self.storage
+                    or max_priority is not None and job.get("priority", 0) > max_priority
                     or job.get("status") == "complete" and job.get("stagingPruned") is True):
                 continue
             if job.get("nextAttemptAt", 0) <= self.clock():
@@ -425,7 +427,8 @@ class CourseArchiveProcessor:
                 "title": stage.get("name") or stage.get("title") or "已保存课件",
                 "subject": stage.get("subject") or stage.get("subjectCode") or "course",
                 "generatedAt": event["createdAt"], **{k: stage[k] for k in
-                    ("gradeCode", "gradeLabel", "editionLabel", "volumeCode", "volumeLabel") if stage.get(k)}}
+                    ("gradeCode", "gradeLabel", "editionId", "editionLabel", "schoolSystem",
+                     "volumeCode", "volumeLabel", "storageEditionLabel", "storageGradeLabel") if stage.get(k)}}
             if event.get("sourceRaw"):
                 meta["sourceRaw"] = event["sourceRaw"]
             extra = {"authoring_binding": event["authoringBinding"]} if event.get("authoringBinding") else {}
@@ -848,11 +851,83 @@ class CourseArchiveProcessor:
         self.queue.save(job)
         return self.process(job)
 
+    def relocate_verified(self, job_key, index_path, *, dry_run=True):
+        """Bind verified identical remote bytes at a new readable directory.
+
+        An immutable previous index and receipt remain in the layout history.
+        This never uploads, deletes, generates or acknowledges an event.
+        """
+        if not SHA.fullmatch(str(job_key)) or type(dry_run) is not bool:
+            raise ArchiveQueueError("archive_layout_job_invalid")
+        with self.queue.lock():
+            job = json.loads(_read(self.queue.items / (job_key + ".json")))
+            if (job.get("schemaVersion") != SCHEMA or job.get("key") != job_key
+                    or _sha(_json(job.get("identity"))) != job_key
+                    or job.get("status") != "complete" or job.get("stagingPruned") is not True
+                    or not job.get("completedAt") or job.get("identity") != self.queue.identity(job["event"])):
+                raise ArchiveQueueError("archive_layout_source_not_complete")
+            old = self._index(job)
+            self._receipt(job, old)
+            path = Path(index_path).absolute()
+            if (path.parent.parent != self.queue.root / "archives"
+                    or not re.fullmatch(re.escape(old["archiveId"]) + r"-[a-f0-9]{8}", path.parent.name)
+                    or path.name != "index.json"):
+                raise ArchiveQueueError("archive_layout_index_outside_staging")
+            raw = _read(path)
+            new = json.loads(raw)
+            if job["export"]["indexPath"] == str(path) and job["export"]["indexSha256"] == _sha(raw):
+                return {"dryRun": dry_run, "jobKey": job_key, "alreadyCurrent": True}
+
+            def content_contract(value):
+                result = deepcopy(value)
+                for key in ("indexPath", "stagingDirectory", "manifestPath", "objectDirectory"):
+                    result.pop(key, None)
+                result.get("zip", {}).pop("path", None)
+                for entry in result.get("generatedPublicFiles", []):
+                    entry.pop("localPath", None)
+                    entry["relativePath"] = entry["relativePath"].rsplit("/", 1)[-1]
+                return result
+
+            if content_contract(old) != content_contract(new):
+                raise ArchiveQueueError("archive_layout_content_changed")
+            directory = new.get("objectDirectory", "")
+            parts = directory.split("/")
+            if (len(parts) != 5 or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", parts[3])
+                    or any(not p.strip() or p in {".", ".."} or re.search(r"[\\\x00-\x1f\x7f-\x9f]", p)
+                           or len(p.encode()) > 255 for p in parts)
+                    or any(e["relativePath"].rsplit("/", 1)[0] != directory for e in new["generatedPublicFiles"])
+                    or new.get("stagingDirectory") != str(path.parent)
+                    or new.get("indexPath") != str(path)
+                    or new.get("manifestPath") != str(path.parent / "课程资料/manifest.json")
+                    or Path(new.get("zip", {}).get("path", "")).parent != path.parent):
+                raise ArchiveQueueError("archive_layout_directory_invalid")
+            if Path(job.get("retainedManifestPath", "")) != Path(job["export"]["indexPath"]).parent / "manifest.json":
+                raise ArchiveQueueError("archive_layout_source_manifest_invalid")
+            old_manifest = _read(Path(job["retainedManifestPath"]))
+            if _read(path.parent / "manifest.json") != old_manifest:
+                raise ArchiveQueueError("archive_layout_manifest_changed")
+            candidate = deepcopy(job)
+            history = {key: job[key] for key in
+                ("export", "receiptPath", "receiptSha256", "retainedManifestPath", "completedAt")}
+            candidate.setdefault("archiveLayoutHistory", []).append(history)
+            candidate["export"] = {"indexPath": str(path), "indexSha256": _sha(raw), "archiveId": new["archiveId"]}
+            candidate.pop("receiptPath", None)
+            candidate.pop("receiptSha256", None)
+            self._index(candidate)
+            candidate["receiptSha256"] = self._receipt(candidate, new)
+            candidate["retainedManifestPath"] = str(path.parent / "manifest.json")
+            candidate["layoutChangedAt"] = self.queue.clock()
+            if not dry_run:
+                self.queue.save(candidate)
+            return {"dryRun": dry_run, "jobKey": job_key, "fromDirectory": old["objectDirectory"],
+                    "toDirectory": directory, "verifiedFiles": len(new["generatedPublicFiles"])}
+
 
 class CourseArchiveWorker:
-    def __init__(self, queue, processor, *, database=None, scan_catalog=True):
+    def __init__(self, queue, processor, *, database=None, scan_catalog=True, scan_history=True):
         self.queue, self.processor, self.database = queue, processor, database
         self.scan_catalog = scan_catalog
+        self.scan_history = scan_history
 
     def seed_native_snapshot(self, snapshot, *, source_kind, source_digest, created_at,
                              revision="0", source_raw=None):
@@ -980,12 +1055,13 @@ class CourseArchiveWorker:
                         summary["discoveryErrors"] += 1
             except Exception:
                 summary["discoveryErrors"] += 1
-        for reconcile in (self._reconcile_legacy, self._reconcile_postgres):
-            try:
-                summary["discovered"] += reconcile()
-            except Exception:
-                summary["discoveryErrors"] += 1
-        ready = self.queue.due(limit)
+        if self.scan_history:
+            for reconcile in (self._reconcile_legacy, self._reconcile_postgres):
+                try:
+                    summary["discovered"] += reconcile()
+                except Exception:
+                    summary["discoveryErrors"] += 1
+        ready = self.queue.due(limit, max_priority=None if self.scan_history else 1)
         # Completed content can have another producer event. Acknowledge it
         # against its durable verification without exporting/uploading again.
         for key, events in deliveries.items():

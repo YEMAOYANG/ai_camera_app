@@ -23,6 +23,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--once", action="store_true", help="Process one bounded batch and exit")
     parser.add_argument("--limit", type=int, default=10, help="Maximum course deliveries per batch (1-1000)")
+    parser.add_argument("--include-history", action="store_true",
+                        help="Also scan and deliver historical PG/legacy backfill (priority 2)")
     args = parser.parse_args(argv)
     if not 1 <= args.limit <= 1000:
         parser.error("--limit must be between 1 and 1000")
@@ -49,7 +51,7 @@ def main(argv=None):
     database = Database(config.DATABASE_URL)
     client = NodeArchiveClient(project_root=ROOT, node=node)
     processor = CourseArchiveProcessor(queue, CourseArchiveExporter(project_root=ROOT), client, database=database)
-    worker = CourseArchiveWorker(queue, processor, database=database)
+    worker = CourseArchiveWorker(queue, processor, database=database, scan_history=args.include_history)
     stopped = threading.Event()
 
     def stop(_signum, _frame):

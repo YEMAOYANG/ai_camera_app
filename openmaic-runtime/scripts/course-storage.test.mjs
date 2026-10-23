@@ -227,6 +227,20 @@ test('subject edition grade date course layout freezes exact textbook metadata a
   await run({command:'relocate',manifest,...sourceOptions},dependencies);await run({command:'verify',manifest},dependencies);
 });
 
+test('canonical edition and grade-volume names are projected while original book labels remain frozen',async t=>{
+  const f=await fixture(t);await f.verify();
+  const index=JSON.parse(await fs.readFile(f.releaseIndex));
+  Object.assign(index.releases[0],{editionLabel:'根据2022年版课程标准修订;出版版次待核验',storageEditionLabel:'统编版',storageGradeLabel:'一年级上册'});
+  await fs.writeFile(f.releaseIndex,JSON.stringify(index));
+  const config={...f.config,prefix:'2026-10-23'},manifest=path.join(f.root,'canonical-manifest.json');
+  await run({command:'layout',manifest,'release-index':f.releaseIndex,date:config.prefix,'key-layout':'subject-edition-grade-date-course-v1',
+    'source-manifest':f.manifest,'source-prefix':f.config.prefix},{...f.dependencies,config});
+  const m=JSON.parse(await fs.readFile(manifest));
+  assert.equal(m.files[0].objectKey,'语文/统编版/一年级上册/2026-10-23/金木水火土/金木水火土-音频-001.mp3');
+  assert.equal(m.releases[0].editionLabel,index.releases[0].editionLabel);
+  assert.equal(m.files[0].sha256,f.checksum);assert.equal(m.files[0].byteSize,f.bytes.length);
+});
+
 test('named relocation and verification cover every key even when SHA is shared',async t=>{
   const f=await namedFixture(t);await run({command:'relocate',manifest:f.namedManifest,...f.sourceOptions},f.dependencies);
   const m=JSON.parse(await fs.readFile(f.namedManifest));

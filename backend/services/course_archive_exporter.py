@@ -6,7 +6,7 @@ directory. Uploading, deleting, generation and publication are separate jobs.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -260,6 +260,7 @@ class ArchiveSnapshot:
     source_files: list[Path] = field(default_factory=list)
     private_source_files: list[Path] = field(default_factory=list)
     media: list[dict] = field(default_factory=list)
+    recovered_aliases: list[dict] = field(default_factory=list)
     missing_sources: list[dict] = field(default_factory=list)
     status: str = "published"
 
@@ -272,6 +273,7 @@ class CourseArchiveExporter:
         self.media_store = media_store or CourseMediaObjectStore(project_root=self.root)
         self.native_document_loader = native_document_loader or self._native_document
         self._workbench_index = None
+        self._catalog_file_cache = {}
         self.standard_asset_resolver = standard_asset_resolver or self._standard_assets
 
     def _binary_original_mime(self, source):
@@ -510,10 +512,14 @@ class CourseArchiveExporter:
         identity = {"courseId": meta["courseId"], "courseVersion": meta["courseVersion"],
                     "contentKey": None, "classroomId": stage_id, "releaseSha256": None}
         subject = meta["subject"]
-        metadata = {k: meta[k] for k in ("title", "gradeCode", "gradeLabel", "volumeCode", "volumeLabel", "editionLabel") if k in meta}
+        metadata = {k: meta[k] for k in ("title", "gradeCode", "gradeLabel", "volumeCode", "volumeLabel", "editionLabel",
+            "editionId", "schoolSystem", "storageEditionLabel", "storageGradeLabel") if k in meta}
         metadata.update(subjectCode=subject, subjectName=releases.SUBJECT_NAMES.get(subject, "课程" if subject == "course" else subject),
                         generatedAt=meta["generatedAt"])
         metadata["sourceSerialization"] = "exact-capture" if meta.get("sourceRaw") is not None else "producer-canonical-json-verified"
+        # Caller/stage labels alone do not establish a textbook binding. Only
+        # the matched frozen job and exact local catalog proof below may do so.
+        metadata["storageEditionLabel"] = "未绑定教材（历史课件）"
         bound = ArchiveSnapshot(identity=identity, metadata=metadata, classroom=snapshot,
             documents={"Native终态快照.json": raw}, status="generated_saved")
         self._native_authoring_sources(bound, authoring_binding)
@@ -544,7 +550,10 @@ class CourseArchiveExporter:
         _check_public(meta)
         title = room["stage"].get("name") or classroom_id
         subject = meta.get("subject") or room["stage"].get("subject") or "course"
-        metadata = {k: meta[k] for k in ("gradeCode", "gradeLabel", "editionLabel", "volumeLabel", "lifecycleStatus", "retired") if k in meta}
+        metadata = {k: meta[k] for k in ("gradeCode", "gradeLabel", "editionLabel", "volumeLabel", "lifecycleStatus", "retired",
+            "editionId", "schoolSystem", "storageEditionLabel", "storageGradeLabel") if k in meta}
+        if not metadata.get("editionId"):
+            metadata["storageEditionLabel"] = "未绑定教材（历史课件）"
         metadata.update(title=title, subjectCode=subject,
                         subjectName=releases.SUBJECT_NAMES.get(subject, "课程" if subject == "course" else subject))
         snapshot = ArchiveSnapshot(identity={"courseId": "native-legacy:" + classroom_id,
@@ -577,6 +586,14 @@ class CourseArchiveExporter:
                     config = self.media_store.config or CourseStorageConfig.from_env()
                     manifest = {} if config.mode == "local" else self.media_store._manifest(config)
                 entry = manifest.get(relative)
+                if entry is None and match[2] == "media":
+                    recovered = self._retained_material_alias(bound, match)
+                    if recovered is not None:
+                        media, alias, evidence = recovered
+                        bound.media.append(media)
+                        bound.recovered_aliases.append(alias)
+                        bound.source_files.extend(evidence)
+                        continue
                 if entry is None and match[2] == "audio" and match[3].endswith(".wav"):
                     recovered = self._native_audio_original(match, audio_receipts=audio_receipts)
                     if recovered is not None:
@@ -592,6 +609,80 @@ class CourseArchiveExporter:
                     continue
             bound.media.append({"path": match[0], "sourcePath": relative,
                                 **{k: entry[k] for k in ("sha256", "byteSize", "mimeType")}})
+
+    def _retained_material_alias(self, bound, match):
+        """Recover an owned historical typo only from its exact upload proof.
+
+        Filename hash resemblance never authorizes bytes. A frozen job, saved
+        stage, upload intent/receipt and material manifest must agree before a
+        derived archive sidecar can map the unchanged original reference.
+        """
+        named = re.fullmatch(r"material-(mat_[A-Za-z0-9_-]+)-([a-f0-9]{64})\.png", match[3])
+        if not named or bound.classroom.get("stage", {}).get("id") != match[1]:
+            return None
+        material_id = named[1]
+        candidates = []
+        for root in set(bound.source_roots):
+            if not root.name.startswith("teaching-"):
+                continue
+            job = root / "authoring-job"
+            attachments = job / "page-assets-v1"
+            if not (attachments / "manifest.json").is_file():
+                continue
+            try:
+                paths = [self._source_path(p) for p in (job / "frozen.json", job / "draft.json", job / "state.json", attachments / "manifest.json")]
+                _require(all(p.is_file() and p.stat().st_size <= 4 * 1024 * 1024 for p in paths), "material_alias_evidence_invalid")
+                frozen, draft, state, manifest = [json.loads(p.read_bytes()) for p in paths]
+                binding = frozen.get("binding", {})
+                _require(all(binding.get(k) for k in ("editionId", "nodeId"))
+                    and root.name == "teaching-" + str(frozen.get("teachingRevision"))
+                    and _hash_file(paths[1]) == frozen.get("draftSha256")
+                    and any(item.get("stageId") == match[1] for item in state.get("savedStages", []) if isinstance(item, dict)),
+                    "material_alias_stage_unbound")
+                _require(manifest.get("schemaVersion") == "mira.operator.frozen-material-attachments.v1"
+                    and manifest.get("baseDraftSha256") == frozen["draftSha256"]
+                    and manifest.get("basePayloadSha256") == frozen.get("payloadSha256")
+                    and manifest.get("sha256") == _sha(releases.canonical({k: v for k, v in manifest.items() if k != "sha256"}).encode()),
+                    "material_alias_manifest_invalid")
+                for receipt_path in attachments.glob("*-receipt.json"):
+                    receipt_path = self._source_path(receipt_path)
+                    _require(receipt_path.stat().st_size <= 64 * 1024, "material_alias_evidence_invalid")
+                    receipt = json.loads(receipt_path.read_bytes())
+                    material = receipt.get("response", {}).get("material", {})
+                    if material.get("materialId") != material_id:
+                        continue
+                    intent_path = self._source_path(receipt_path.with_name(receipt_path.name.removesuffix("-receipt.json") + "-intent.json"))
+                    _require(intent_path.is_file() and intent_path.stat().st_size <= 64 * 1024, "material_alias_evidence_invalid")
+                    intent_raw = intent_path.read_bytes()
+                    intent = json.loads(intent_raw)
+                    checksum, size = intent.get("sourceSha256"), intent.get("byteSize")
+                    _require(receipt.get("intentSha256") == _sha(intent_raw)
+                        and intent.get("sessionId") and intent["sessionId"] == state.get("sessionId")
+                        and re.fullmatch(r"[a-f0-9]{64}", str(checksum))
+                        and type(size) is int and 0 < size <= 32 * 1024 * 1024
+                        and material.get("bytes") == size and material.get("mime") == "image/png",
+                        "material_alias_intent_invalid")
+                    records = [item for item in manifest.get("assets", []) if isinstance(item, dict) and item.get("assetKey") == intent.get("assetKey")]
+                    _require(len(records) == 1 and records[0].get("sha256") == checksum
+                        and records[0].get("bytes") == size and records[0].get("mimeType") == "image/png",
+                        "material_alias_asset_invalid")
+                    source = self._source_path(records[0]["sourcePath"])
+                    _require(source.is_relative_to(root) and source.is_file() and source.stat().st_size == size
+                        and _hash_file(source) == checksum, "material_alias_source_invalid")
+                    with source.open("rb") as stream:
+                        _require(stream.read(8) == b"\x89PNG\r\n\x1a\n", "material_alias_source_invalid")
+                    correct = "openmaic-runtime/.runtime/OpenMAIC/data/classrooms/" + match[1] + "/media/material-" + material_id + "-" + checksum + ".png"
+                    evidence = [paths[0], paths[3], intent_path, receipt_path]
+                    alias = {"originalReference": match[0], "materialId": material_id,
+                        "archivePath": "媒体/" + correct, "sha256": checksum, "byteSize": size, "mimeType": "image/png",
+                        "recoveryReason": "historical_material_alias_from_verified_upload_receipt",
+                        "evidence": [p.relative_to(self.root).as_posix() for p in evidence]}
+                    media = {"path": match[0], "sourcePath": source.relative_to(self.root).as_posix(),
+                        "archiveSourcePath": correct, "sha256": checksum, "byteSize": size, "mimeType": "image/png"}
+                    candidates.append((media, alias, evidence))
+            except (CourseArchiveError, OSError, ValueError, KeyError, TypeError, AttributeError):
+                continue
+        return candidates[0] if len(candidates) == 1 else None
 
     def _native_audio_original(self, match, *, audio_receipts=None):
         """Recover an exact old alias from its retained, successful paid receipt.
@@ -674,7 +765,7 @@ class CourseArchiveExporter:
         return self.export_snapshot(snapshot, staging_root=staging_root, release=release, **source)
 
     def _dated_release(self, identity):
-        """Reuse the active, frozen named directory, including collision suffixes."""
+        """Reuse an existing frozen name; verified new releases derive a name."""
         config = self.media_store.config or CourseStorageConfig.from_env()
         source = Path(config.manifest_path) if config.manifest_path else self.root / "backend/data/course-storage/active-manifest.json"
         if not source.is_file():
@@ -682,11 +773,26 @@ class CourseArchiveExporter:
             return None
         _require(not source.is_symlink() and source.stat().st_size <= 64 * 1024 * 1024,
                  "published_storage_directory_manifest_invalid")
-        manifest = json.loads(source.read_bytes())
+        try:
+            # A new course may be absent; an invalid active manifest may not be
+            # mistaken for that case. Reuse the media adapter's validation.
+            CourseMediaObjectStore._manifest(replace(config, manifest_path=str(source)))
+            manifest = json.loads(source.read_bytes())
+        except (OSError, ValueError, TypeError):
+            raise CourseArchiveError("published_storage_directory_manifest_invalid") from None
         entries = manifest.get("releases", [])
-        matching = [r for r in entries if all(r.get(k) == identity.get(k)
-                    for k in ("courseId", "courseVersion", "releaseSha256"))]
-        _require(len(matching) == 1 and isinstance(matching[0].get("storageDirectory"), str),
+        _require(isinstance(entries, list) and all(isinstance(r, dict)
+            and all(isinstance(r.get(k), str) and r[k] for k in ("courseId", "courseVersion", "releaseSha256"))
+            and re.fullmatch(r"[a-f0-9]{64}", r["releaseSha256"])
+            for r in entries), "published_storage_directory_manifest_invalid")
+        matching = [r for r in entries if all(r.get(k) == identity.get(k) for k in ("courseId", "courseVersion"))]
+        if not matching:
+            # export_course reaches this only after its published source adapter
+            # has verified the release. No publication gate is bypassed here.
+            return None
+        _require(len(matching) == 1 and matching[0]["releaseSha256"] == identity.get("releaseSha256")
+                 and all(k not in matching[0] or matching[0][k] == identity.get(k) for k in ("classroomId", "contentKey"))
+                 and isinstance(matching[0].get("storageDirectory"), str) and matching[0]["storageDirectory"].strip(),
                  "published_storage_directory_not_bound")
         return matching[0]
 
@@ -846,11 +952,58 @@ class CourseArchiveExporter:
             return
         _require(len({_sha(_json(frozen)) for _, frozen, _ in owned}) == 1,
                  "native_authoring_binding_ambiguous")
-        for job, _, _ in owned:
+        for job, frozen, _ in owned:
             snapshot.source_roots.append(job.parent)
             # Mutable authoring-session control is not the frozen lesson. Keep
             # it local and explain its omission without publishing its values.
             snapshot.private_source_files.append(job / "state.json")
+            self._native_textbook_metadata(snapshot, frozen)
+
+    def _native_textbook_metadata(self, snapshot, frozen):
+        """Project names only from the exact catalog frozen for this job."""
+        binding = frozen.get("binding", {})
+        keys = ("editionId", "revisionId", "gradeCode", "subject", "volume", "schoolSystem")
+        catalog_check = frozen.get("catalogCheck")
+        checksum = catalog_check.get("manifestSha256") if isinstance(catalog_check, dict) else None
+        if (not isinstance(binding, dict) or not all(isinstance(binding.get(k), str) and binding[k] for k in keys)
+                or not re.fullmatch(r"[a-f0-9]{64}", str(checksum))):
+            return
+        expected = tuple(binding[k] for k in keys)
+        root = self.root / "backend/content/textbooks"
+        matches = []
+        for candidate in root.rglob("*.json"):
+            try:
+                path = self._source_path(candidate)
+                info = path.stat()
+                if not path.is_file() or info.st_size > 4 * 1024 * 1024:
+                    continue
+                identity = (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+                cached = self._catalog_file_cache.get(path)
+                if cached is None or cached[0] != identity:
+                    value = json.loads(path.read_bytes())
+                    record = None
+                    if isinstance(value, dict) and value.get("schemaVersion") == "mira.learning.textbook-manifest.v1":
+                        record = (_sha(releases.canonical(value).encode()), tuple(value.get(k) for k in keys))
+                    self._catalog_file_cache[path] = (identity, record)
+                else:
+                    record = cached[1]
+                if record == (checksum, expected):
+                    # Re-read the matching original, rather than retaining all
+                    # catalog JSON bodies in a long-running worker's memory.
+                    value = json.loads(path.read_bytes())
+                    if (_sha(releases.canonical(value).encode()) == checksum
+                            and tuple(value.get(k) for k in keys) == expected):
+                        matches.append((path, value))
+            except (CourseArchiveError, OSError, ValueError, TypeError):
+                continue
+        if not matches:
+            return
+        # Equivalent local copies are the same frozen manifest. Prefer its
+        # revisions location, while never substituting a newer revision.
+        path, manifest = min(matches, key=lambda item: (not item[0].is_relative_to(root / "revisions"), str(item[0])))
+        metadata = releases.release_metadata({"subject": binding["subject"], "grade_code": binding["gradeCode"]}, manifest)
+        snapshot.metadata.update(metadata, revisionId=binding["revisionId"], textbookManifestSha256=checksum)
+        snapshot.source_files.append(path)
 
     def _add_authoring_stage(self, snapshot, original_input):
         stage_id = original_input.get("authoring", {}).get("stageId")
@@ -978,13 +1131,14 @@ class CourseArchiveExporter:
         if not object_directory:
             date = release.get("uploadDate") or datetime.now(timezone.utc).strftime("%Y-%m-%d")
             _require(re.fullmatch(r"\d{4}-\d{2}-\d{2}", date), "upload_date_invalid")
-            edition = snapshot.metadata.get("editionLabel") or (
-                "非教材课程" if snapshot.status == "published" and snapshot.identity.get("contentKey") is None else "未绑定教材")
+            storage_edition = snapshot.metadata.get("storageEditionLabel")
+            edition = storage_edition or snapshot.metadata.get("editionLabel") or (
+                "非教材课程" if snapshot.status == "published" and snapshot.identity.get("contentKey") is None else "未绑定教材（历史课件）")
             volume = snapshot.metadata.get("volumeLabel")
-            if volume and volume not in edition:
+            if not storage_edition and volume and volume not in edition:
                 edition += "-" + volume
             object_directory = "/".join((_safe_name(snapshot.metadata.get("subjectName") or "课程"),
-                _safe_name(edition), _safe_name(snapshot.metadata.get("gradeLabel") or "未标注年级"),
+                _safe_name(edition), _safe_name(snapshot.metadata.get("storageGradeLabel") or snapshot.metadata.get("gradeLabel") or "未标注年级"),
                 date, _safe_name(snapshot.metadata["title"])))
         _safe_relative(object_directory)
         _require(len(object_directory.split("/")) == 5
@@ -1005,6 +1159,7 @@ class CourseArchiveExporter:
         all_media = {item["path"]: item for item in snapshot.media}
         queued_sources = set(snapshot.source_files)
         document_assets, resolved_assets = set(), {}
+        recovered_aliases = {item["originalReference"]: item for item in snapshot.recovered_aliases}
 
         def ensure_document_assets(value):
             if not (isinstance(value, dict) and isinstance(value.get("stage"), dict)
@@ -1067,10 +1222,15 @@ class CourseArchiveExporter:
             # directory into exact full references. This derived scan input is
             # never written back into the frozen/original classroom document.
             scan_document = {**value, "_miraArchiveReferencedMedia": collected_refs}
-            extra = ArchiveSnapshot(identity=snapshot.identity, metadata=snapshot.metadata, classroom=scan_document)
+            extra = ArchiveSnapshot(identity=snapshot.identity, metadata=snapshot.metadata, classroom=scan_document,
+                source_roots=list(snapshot.source_roots))
             self._collect_snapshot_media(extra)
             missing.extend(extra.missing_sources)
             queued_sources.update(extra.source_files)
+            for alias in extra.recovered_aliases:
+                old = recovered_aliases.get(alias["originalReference"])
+                _require(old is None or old == alias, "material_alias_identity_conflict")
+                recovered_aliases[alias["originalReference"]] = alias
             for item in extra.media:
                 old = all_media.get(item["path"])
                 _require(old is None or all(old[k] == item[k] for k in ("sha256", "byteSize", "mimeType")),
@@ -1170,7 +1330,14 @@ class CourseArchiveExporter:
                         raise
                     missing.append({"kind": "unsafe_original", "sourceIdentity": relative.as_posix(),
                                     "reason": "credential_or_student_data_in_artifact"})
+            archived_media = {}
             for item in all_media.values():
+                archive_path = "媒体/" + _safe_relative(item.get("archiveSourcePath", item.get("sourcePath") or "openmaic-runtime/.runtime/OpenMAIC/data/classrooms/" + item["path"].removeprefix("/api/classroom-media/")))
+                media_identity = tuple(item[k] for k in ("sha256", "byteSize", "mimeType"))
+                if archive_path in archived_media:
+                    _require(archived_media[archive_path] == media_identity, "recovered_media_archive_conflict")
+                    continue
+                archived_media[archive_path] = media_identity
                 source = item.get("sourcePath") or "openmaic-runtime/.runtime/OpenMAIC/data/classrooms/" + item["path"].removeprefix("/api/classroom-media/")
                 source_path = self._source_path(source)
                 raw = self.media_store.read(source_path, expected_sha256=item["sha256"], expected_bytes=item["byteSize"])
@@ -1180,7 +1347,7 @@ class CourseArchiveExporter:
                 _require(len(raw) == item["byteSize"] and _sha(raw) == item["sha256"], "published_media_hash_mismatch")
                 # Retain logical source paths inside ZIP so restored original
                 # classroom links have an explicit path-to-file mapping.
-                add("媒体/" + _safe_relative(item.get("archiveSourcePath", source)), raw=raw, kind="referenced_media",
+                add(archive_path, raw=raw, kind="referenced_media",
                     identity=item["path"], mime=item["mimeType"])
             metadata = {"schemaVersion": SCHEMA, **snapshot.identity, **snapshot.metadata,
                 "status": snapshot.status, "archiveFormat": "mira-course-archive-zip-v1",
@@ -1192,6 +1359,7 @@ class CourseArchiveExporter:
             manifest = {"schemaVersion": SCHEMA, "archiveId": archive_id,
                 "identity": snapshot.identity, "status": snapshot.status, "complete": complete,
                 "missingSources": missing, "excludedFiles": omissions, "files": files,
+                "recoveredAliases": list(recovered_aliases.values()),
                 "totals": {"fileCount": len(files), "byteSize": total}}
             manifest_path = payload / "manifest.json"
             self._write_private(manifest_path, _json(manifest))

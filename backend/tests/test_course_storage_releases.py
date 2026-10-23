@@ -36,6 +36,28 @@ class ReadConnection:
 
 
 class PublishedMediaInventoryTest(unittest.TestCase):
+    def test_storage_names_unify_the_verified_chinese_family_and_keep_volume_and_school_system(self):
+        from content.textbook_metadata import course_storage_labels
+
+        course = {"subject": "chinese", "grade_code": "primary_1"}
+        book = {"editionId": "pep-chinese-g1-upper-2022-standard", "publisher": "人民教育出版社",
+            "subject": "chinese", "gradeCode": "primary_1", "volume": "upper", "schoolSystem": "six_year",
+            "editionLabel": "根据2022年版课程标准修订；出版版次待核验",
+            "source": {"resourceId": "1c73b348-e8b6-47d6-84b0-6dbacbe28268"}}
+        original = deepcopy(book)
+        self.assertEqual(course_storage_labels(course, book),
+            {"storageEditionLabel": "统编版", "storageGradeLabel": "一年级上册"})
+        lower = {**book, "editionId": "pep-chinese-g1-lower-2022-standard", "volume": "lower",
+                 "editionLabel": "统编版 · 根据2022年版课程标准修订；出版版次待核验"}
+        self.assertEqual(course_storage_labels(course, lower),
+            {"storageEditionLabel": "统编版", "storageGradeLabel": "一年级下册"})
+        self.assertEqual(course_storage_labels(course, {**lower, "schoolSystem": "five_four"})["storageGradeLabel"],
+                         "一年级下册（五四制）")
+        unknown = {**book, "source": {"resourceId": "unverified-book"}}
+        self.assertEqual(course_storage_labels(course, unknown)["storageEditionLabel"], book["editionLabel"])
+        self.assertEqual(course_storage_labels(course)["storageEditionLabel"], "未绑定教材（历史课件）")
+        self.assertEqual(book, original)
+
     def setUp(self):
         self.raw = sqlite3.connect(':memory:')
         self.raw.row_factory = sqlite3.Row
@@ -84,7 +106,8 @@ class PublishedMediaInventoryTest(unittest.TestCase):
         self.assertEqual(set(result['releases'][0]), {'contentKey', 'releaseSha256', 'classroomId',
             'courseId', 'courseVersion', 'title', 'media', 'subjectCode', 'subjectName',
             'gradeCode', 'gradeLabel', 'volumeCode', 'volumeLabel', 'editionId', 'editionLabel',
-            'publisher', 'textbookTitle', 'publishedAt'})
+            'publisher', 'textbookTitle', 'publishedAt', 'schoolSystem',
+            'storageEditionLabel', 'storageGradeLabel'})
         self.assertEqual(result['releases'][0]['subjectName'], '语文')
         self.assertEqual(result['releases'][0]['gradeLabel'], '一年级')
         self.assertEqual(result['releases'][0]['publishedAt'], 1234567890000)

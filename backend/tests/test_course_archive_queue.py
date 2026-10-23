@@ -65,6 +65,7 @@ class Exporter:
             "complete": not self.incomplete,
             "missingSources": [{"kind": "native_media", "sourceIdentity": "needed.wav"}] if self.incomplete else [],
             "stagingDirectory": str(root), "manifestPath": str(payload / "manifest.json"),
+            "objectDirectory": "科学/教材/一年级/2026-10-23/观察",
             "zip": {"path": str(root / "完整课件.zip")},
             "generatedPublicFiles": [] if self.incomplete else public, "indexPath": str(root / "index.json")}
         Path(value["indexPath"]).write_bytes(encoded(value))
@@ -375,6 +376,81 @@ class CourseArchiveQueueTest(unittest.TestCase):
         self.assertIn("2", self.client.acks)
         self.assertEqual(self.client.cursors, [0, 1])
 
+    def test_live_only_worker_preserves_private_history_and_delivers_real_pg_and_fs_outboxes(self):
+        historical = deepcopy(self.pg())
+        historical.update(origin="reconcile", priority=2)
+        historical["snapshot"]["stage"]["name"] = "previous historical bytes"
+        historical["sourceDigest"] = digest(encoded(historical["snapshot"]))
+        job = self.queue.enqueue(historical)
+        path = self.queue.items / (job["key"] + ".json")
+        before = path.read_bytes()
+        # An exact old capture newly emitted by the real outbox is live work;
+        # its delivery must be promoted while unrelated private history stays.
+        promoted = self.queue.enqueue({**self.pg(), "origin": "reconcile", "priority": 2})
+        self.client.rows = [{"id": "99", "source_kind": "native_pg_stage", "stage_id": "stage-one",
+            "stage_revision": "8", "source_digest": digest(encoded(self.snapshot)),
+            "snapshot_json": self.snapshot, "created_at": "2026-10-23T01:00:00.000Z"}]
+        event_path = self.fs()
+        worker = CourseArchiveWorker(self.queue, self.processor, scan_catalog=False, scan_history=False)
+        with patch.object(worker, "_reconcile_legacy") as legacy, \
+                patch.object(worker, "_reconcile_postgres") as postgres:
+            result = worker.run_once(limit=10)
+        legacy.assert_not_called()
+        postgres.assert_not_called()
+        self.assertEqual((result["completed"], result["failed"], result["discoveryErrors"]), (2, 0, 0))
+        self.assertEqual(self.client.acks, ["99"])
+        self.assertFalse(event_path.exists())
+        self.assertEqual(path.read_bytes(), before)
+        self.assertEqual(json.loads((self.queue.items / (promoted["key"] + ".json")).read_bytes())["status"], "complete")
+        self.assertEqual(self.queue.due(10, max_priority=1), [])
+        self.assertEqual([j["key"] for j in self.queue.due(10)], [job["key"]])
+
+    def test_cli_requires_include_history_for_discovery_and_existing_priority_two_delivery(self):
+        from workers import course_archive_worker as cli
+
+        event = self.pg()
+        event.update(origin="reconcile", priority=2)
+        job = self.queue.enqueue(event)
+        path = self.queue.items / (job["key"] + ".json")
+        before = path.read_bytes()
+        self.client.stages = [{"stage_id": "stage-one", "stage_revision": "7",
+            "source_digest": event["sourceDigest"], "snapshot_json": self.snapshot,
+            "created_at": "2026-10-23T01:00:00.000Z"}]
+        instances = []
+
+        def worker_factory(*args, **kwargs):
+            worker = CourseArchiveWorker(*args, **kwargs)
+            worker._reconcile_legacy = Mock(wraps=worker._reconcile_legacy)
+            worker._reconcile_postgres = Mock(wraps=worker._reconcile_postgres)
+            instances.append(worker)
+            return worker
+
+        with patch.dict(os.environ, {"COURSE_STORAGE_ARCHIVE_ENABLED": "true",
+                "COURSE_STORAGE_ENDPOINT": self.storage["endpoint"], "COURSE_STORAGE_BUCKET": "study"}), \
+                patch("core.config.AppConfig.from_env", return_value=Mock(DATABASE_URL="unused-test-database")), \
+                patch("core.database.Database", return_value=Mock()), \
+                patch("services.course_archive_exporter.CourseArchiveExporter", return_value=self.exporter), \
+                patch.object(cli, "CourseArchiveQueue", return_value=self.queue), \
+                patch.object(cli, "CourseArchiveProcessor", return_value=self.processor), \
+                patch.object(cli, "NodeArchiveClient", return_value=self.client), \
+                patch.object(cli, "CourseArchiveWorker", side_effect=worker_factory), \
+                patch.object(cli.shutil, "which", return_value="/fixture/node24"), \
+                patch.object(cli.subprocess, "run", return_value=Mock(returncode=0, stdout="v24.21.0\n")), \
+                patch.object(cli.signal, "signal"):
+            self.assertEqual(cli.main(["--once"]), 0)
+            self.assertFalse(instances[0].scan_history)
+            instances[0]._reconcile_legacy.assert_not_called()
+            instances[0]._reconcile_postgres.assert_not_called()
+            self.assertEqual(path.read_bytes(), before)
+            self.assertEqual((self.exporter.calls, self.client.uploads), (0, 0))
+            self.assertEqual(cli.main(["--once", "--include-history"]), 0)
+        self.assertTrue(instances[1].scan_history)
+        instances[1]._reconcile_legacy.assert_called_once()
+        instances[1]._reconcile_postgres.assert_called_once()
+        self.assertEqual(self.client.stage_cursors, [""])
+        self.assertEqual((self.exporter.calls, self.client.uploads), (1, 1))
+        self.assertEqual(json.loads(path.read_bytes())["status"], "complete")
+
     def test_catalog_scans_saved_and_published_but_unchanged_courses_are_not_exported(self):
         self.exporter.catalog = [{"courseId": "published", "courseVersion": "1", "sourceKind": "textbook_release",
                 "sourceDigest": "a" * 64, "status": "published"},
@@ -497,6 +573,55 @@ class CourseArchiveQueueTest(unittest.TestCase):
         self.client.upload(job["export"]["indexPath"])
         self.assertTrue(self.processor.adopt_verified(event, job["export"]["indexPath"]))
         self.assertEqual((self.exporter.calls, self.client.uploads), (1, 1))
+
+    def layout_replacement(self, job):
+        value = json.loads(Path(job["export"]["indexPath"]).read_bytes())
+        stage = self.queue.root / "archives" / (value["archiveId"] + "-123abc00")
+        stage.mkdir()
+        value.update(objectDirectory="科学/教材/一年级上册/2026-10-23/观察", stagingDirectory=str(stage),
+                     manifestPath=str(stage / "课程资料/manifest.json"), indexPath=str(stage / "index.json"))
+        value["zip"]["path"] = str(stage / "完整课件.zip")
+        for entry in value["generatedPublicFiles"]:
+            filename = entry["relativePath"].rsplit("/", 1)[-1]
+            entry["relativePath"] = value["objectDirectory"] + "/" + filename
+            entry["localPath"] = str((stage if entry["mimeType"] == "application/zip" else stage / "课程资料") / filename)
+        (stage / "manifest.json").write_bytes(Path(job["retainedManifestPath"]).read_bytes())
+        Path(value["indexPath"]).write_bytes(encoded(value))
+        self.client.upload(value["indexPath"])
+        return value
+
+    def test_verified_layout_rebinding_is_explicit_idempotent_and_keeps_previous_delivery_proof(self):
+        job = self.queue.enqueue(self.pg())
+        self.assertTrue(self.processor.process(job))
+        old = deepcopy(job)
+        new = self.layout_replacement(job)
+        calls = (self.exporter.calls, self.client.uploads, list(self.client.acks))
+        self.assertTrue(self.processor.relocate_verified(job["key"], new["indexPath"])["dryRun"])
+        self.assertEqual(json.loads((self.queue.items / (job["key"] + ".json")).read_bytes())["export"], old["export"])
+        self.processor.relocate_verified(job["key"], new["indexPath"], dry_run=False)
+        saved = json.loads((self.queue.items / (job["key"] + ".json")).read_bytes())
+        self.assertEqual(saved["export"]["indexPath"], new["indexPath"])
+        self.assertEqual(saved["archiveLayoutHistory"][0]["export"], old["export"])
+        self.assertEqual((self.exporter.calls, self.client.uploads, self.client.acks), calls)
+        self.assertTrue(self.processor.relocate_verified(job["key"], new["indexPath"], dry_run=False)["alreadyCurrent"])
+
+    def test_layout_rebinding_rejects_content_changes_and_wrong_remote_receipts_without_mutating_job(self):
+        job = self.queue.enqueue(self.pg())
+        self.assertTrue(self.processor.process(job))
+        old = deepcopy(job["export"])
+        new = self.layout_replacement(job)
+        changed = deepcopy(new)
+        changed["generatedPublicFiles"][0]["sha256"] = "c" * 64
+        Path(new["indexPath"]).write_bytes(encoded(changed))
+        with self.assertRaisesRegex(ArchiveQueueError, "content_changed"):
+            self.processor.relocate_verified(job["key"], new["indexPath"], dry_run=False)
+        Path(new["indexPath"]).write_bytes(encoded(new))
+        self.client.mutate = lambda value: {**value, "storage": {**value["storage"], "bucket": "other"}}
+        self.client.upload(new["indexPath"])
+        with self.assertRaisesRegex(ArchiveQueueError, "verification_not_bound"):
+            self.processor.relocate_verified(job["key"], new["indexPath"], dry_run=False)
+        saved = json.loads((self.queue.items / (job["key"] + ".json")).read_bytes())
+        self.assertEqual(saved["export"], old)
 
     def test_real_native_exporter_contract_delivers_and_cleans_only_derived_staging(self):
         from services.course_archive_exporter import CourseArchiveExporter
