@@ -178,7 +178,7 @@ function finiteClassroomAudio(source){
  scan(source);
  const entries=[],provenLiterals=new Set();
  const unresolved=()=>({entries:[{ref:'mira:classroom-audio-analysis-unresolved',kind:'audio'}],provenLiterals:new Set()});
- if(source.parseDiagnostics.length&&(prefixes.size||source.text.includes('/api/classroom-media/')))return unresolved();
+ if(source.parseDiagnostics.length&&(prefixes.size||/\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/(?=['"`\s]|$)/.test(source.text)))return unresolved();
  if(!prefixes.size)return{entries,provenLiterals};
  const unsafePattern=nodes.some(node=>ts.isWithStatement(node)||ts.isForOfStatement(node)||ts.isForInStatement(node)
   ||((ts.isVariableDeclaration(node)||ts.isParameter(node))&&!ts.isIdentifier(node.name))
@@ -422,7 +422,8 @@ function htmlReferences(html){
   // Parse JavaScript literals without evaluating it. A regexp over quoted
   // source accidentally retained the backslash in nested escaped SVG markup.
   const source=ts.createSourceFile('course.js',script.textContent,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
-  const audio=finiteClassroomAudio(source);result.push(...audio.entries);
+  const inertJson=(script.getAttribute('type')||'').trim().toLowerCase().split(';')[0]==='application/json';
+  const audio=inertJson?{entries:[],provenLiterals:new Set()}:finiteClassroomAudio(source);result.push(...audio.entries);
   const visit=node=>{
    if(ts.isStringLiteral(node)||ts.isNoSubstitutionTemplateLiteral(node)||ts.isTemplateHead(node)){
     const value=node.text;

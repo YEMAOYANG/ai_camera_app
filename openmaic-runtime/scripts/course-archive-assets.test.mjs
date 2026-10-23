@@ -454,3 +454,22 @@ test('audio scripts with parse errors, destructuring, loop writes or dynamic-cod
   assert(!entries.some(e=>e.status==='already_collected'),unsafe);
  }
 });
+test('inert JSON keeps literal media dependencies without treating data as an audio program',()=>{
+ const snapshot=room([]),picture='/api/classroom-media/stage-one/media/picture.png',audio='/api/classroom-media/stage-one/audio/voice.wav';
+ snapshot.scenes[0].content={type:'interactive',html:'<script type="application/json">'+JSON.stringify({picture,audio})+'</script>'};
+ const entries=enumerateSnapshotAssets(snapshot);
+ assert(entries.some(e=>e.ref===picture&&e.status==='already_collected'));assert(entries.some(e=>e.ref===audio&&e.status==='already_collected'));
+ assert(!entries.some(e=>e.ref.startsWith('mira:classroom-audio')));
+ snapshot.scenes[0].content.html='<script type="application/json">'+JSON.stringify({prefix:'/api/classroom-media/stage-one/audio/'})+'</script>';
+ const directory=enumerateSnapshotAssets(snapshot);
+ assert(!directory.some(e=>e.ref.startsWith('mira:classroom-audio')));assert(directory.some(e=>e.ref.endsWith('/audio/')&&e.status==='unresolved'));
+});
+test('audio syntax failure fallback requires an exact directory prefix and still rejects broken audio programs',()=>{
+ const snapshot=room([]);
+ snapshot.scenes[0].content={type:'interactive',html:'<script>const broken=;const picture="/api/classroom-media/stage-one/media/picture.png";</script>'};
+ assert(!enumerateSnapshotAssets(snapshot).some(e=>e.ref.startsWith('mira:classroom-audio')));
+ snapshot.scenes[0].content.html='<script>const broken=; /api/classroom-media/stage-one/audio/ </script>';
+ assert(enumerateSnapshotAssets(snapshot).some(e=>e.ref==='mira:classroom-audio-analysis-unresolved'&&e.status==='unresolved'));
+ snapshot.scenes[0].content.html='<script>const BASE="/api/classroom-media/stage-one/audio/";const broken=;</script>';
+ assert(enumerateSnapshotAssets(snapshot).some(e=>e.ref==='mira:classroom-audio-analysis-unresolved'&&e.status==='unresolved'));
+});
