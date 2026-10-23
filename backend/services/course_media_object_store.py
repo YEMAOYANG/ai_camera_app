@@ -38,20 +38,25 @@ _NAMED_MEDIA_MIME = {
 }
 
 
-def _valid_object_key(entry: dict, prefix: str, schema: str) -> bool:
+def _valid_object_key(entry: dict, prefix: str, schema: str, key_layout=None) -> bool:
     if schema == "mira.course-storage.manifest.v1":
         return entry.get("objectKey") == f"{prefix}/blobs/sha256/{entry['sha256']}"
     key = entry.get("objectKey")
-    if not isinstance(key, str) or not key.startswith(prefix + "/"):
+    subject_layout = key_layout == "subject-edition-grade-date-course-v1"
+    if key_layout and not subject_layout:
         return False
-    parts = key[len(prefix) + 1:].split("/")
-    if len(parts) != 3 or any(
+    if not isinstance(key, str) or (not subject_layout and not key.startswith(prefix + "/")):
+        return False
+    parts = key.split("/") if subject_layout else key[len(prefix) + 1:].split("/")
+    if subject_layout and (not re.fullmatch(r"\d{4}-\d{2}-\d{2}", prefix) or len(parts) < 4 or parts[3] != prefix):
+        return False
+    if len(parts) != (6 if subject_layout else 3) or any(
         not part.strip() or part in {".", ".."} or "\\" in part
         or re.search(r"[\x00-\x1f\x7f-\x9f]", part) or len(part.encode("utf8")) > 255
         for part in parts
     ):
         return False
-    return entry.get("mimeType") in _NAMED_MEDIA_MIME.get(Path(parts[2]).suffix.lower(), set())
+    return entry.get("mimeType") in _NAMED_MEDIA_MIME.get(Path(parts[-1]).suffix.lower(), set())
 
 
 class CourseMediaStorageError(ValueError):
@@ -136,7 +141,7 @@ class CourseMediaObjectStore:
                     or any(part in {"", ".", ".."} for part in relative.split("/"))
                     or not isinstance(entry.get("sha256"), str)
                     or not re.fullmatch(r"[a-f0-9]{64}", entry["sha256"])
-                    or not _valid_object_key(entry, config.prefix, manifest["schemaVersion"])
+                    or not _valid_object_key(entry, config.prefix, manifest["schemaVersion"], manifest.get("keyLayout"))
                     or type(entry.get("byteSize")) is not int or entry["byteSize"] < 0
                     or not isinstance(entry.get("mimeType"), str)
                     or not re.fullmatch(r"[a-z0-9.+-]+/[a-z0-9.+-]+", entry["mimeType"])

@@ -250,6 +250,39 @@ done
   [[ "${actual}" == "${expected}" ]] || fail "legacy migration order was ${actual}"
 )
 
+# Archive uploads are independent of generation and cannot duplicate or stop
+# an unowned process, including when the configuration has been disabled.
+(
+  ARCHIVE_WORKER_PID_FILE="${TMP_ROOT}/archive.identity"
+  printf 'recorded\n' > "${ARCHIVE_WORKER_PID_FILE}"
+  archive_worker_enabled() { return 0; }
+  identity_matches_process() { return 1; }
+  read_identity_record() { RECORD_PID=43210; return 0; }
+  process_is_alive() { return 0; }
+  if start_archive_worker >/dev/null 2>&1; then
+    fail "archive worker duplicated an unowned live process"
+  fi
+  if stop_archive_worker >/dev/null 2>&1; then
+    fail "archive worker stopped a process with mismatched identity"
+  fi
+  [[ -f "${ARCHIVE_WORKER_PID_FILE}" ]] || fail "archive identity was removed on mismatch"
+)
+(
+  ARCHIVE_WORKER_PID_FILE="${TMP_ROOT}/archive-disabled.identity"
+  marker="${TMP_ROOT}/archive-disabled-order"
+  archive_worker_enabled() { return 3; }
+  stop_archive_worker() { printf 'stopped\n' > "${marker}"; }
+  archive_worker_status() { [[ -f "${marker}" ]]; }
+  start_archive_worker || fail "disabled archive worker was started or not stopped"
+)
+(
+  archive_worker_enabled() { return 2; }
+  stop_archive_worker() { fail "invalid configuration stopped a live archive worker"; }
+  if start_archive_worker >/dev/null 2>&1; then
+    fail "invalid archive configuration was treated as disabled"
+  fi
+)
+
 grep -Fq 'node_modules/next/dist/bin/next start' "${STACK_SCRIPT}" || fail "Student Web does not use next start"
 if grep -Eq 'node_modules/next/dist/bin/next dev.*--hostname.*STUDENT_WEB_PORT' "${STACK_SCRIPT}"; then
   fail "normal Student Web launch still uses next dev"

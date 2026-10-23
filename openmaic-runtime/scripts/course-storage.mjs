@@ -158,16 +158,20 @@ async function loadManifest(filename,c) {
   for (const e of m.files) {
     safePath(e.path);
     const named = m.schemaVersion==='mira.course-storage.manifest.v2';
-    if (!allowedSource(e.path) || seen.has(e.path) || !/^[a-f0-9]{64}$/.test(e.sha256) || !Number.isSafeInteger(e.byteSize) || e.byteSize <= 0 || !validIdentity(e.sourceIdentity) || e.sourceIdentity.size!==e.byteSize || e.mimeType!==MIME[path.extname(e.path).toLowerCase()] || (named ? !validNamedKey(e.objectKey,c.prefix,e.mimeType) || keys.has(e.objectKey) : e.objectKey !== `${c.prefix}/blobs/sha256/${e.sha256}`)) throw Error('Invalid manifest entry');
+    if (!allowedSource(e.path) || seen.has(e.path) || !/^[a-f0-9]{64}$/.test(e.sha256) || !Number.isSafeInteger(e.byteSize) || e.byteSize <= 0 || !validIdentity(e.sourceIdentity) || e.sourceIdentity.size!==e.byteSize || e.mimeType!==MIME[path.extname(e.path).toLowerCase()] || (named ? !validNamedKey(e.objectKey,c.prefix,e.mimeType,m.keyLayout) || keys.has(e.objectKey) : e.objectKey !== `${c.prefix}/blobs/sha256/${e.sha256}`)) throw Error('Invalid manifest entry');
     seen.add(e.path);
     keys.add(e.objectKey);
   }
   return {m,manifestSha256:digest(raw)};
 }
-export function validNamedKey(key,prefix,mime) {
-  if(typeof key!=='string' || !key.startsWith(prefix+'/'))return false;
-  const parts=key.slice(prefix.length+1).split('/');
-  return parts.length===3 && parts.every(p=>p.trim() && p!=='.' && p!=='..' && !/[\\\x00-\x1f\x7f-\x9f]/.test(p) && Buffer.byteLength(p)<=255) && MIME[path.extname(parts[2]).toLowerCase()]===mime && /^(audio|image|video)\//.test(mime);
+export function validNamedKey(key,prefix,mime,keyLayout) {
+  if(typeof key!=='string')return false;
+  const subjectLayout=keyLayout==='subject-edition-grade-date-course-v1';
+  if(keyLayout && !subjectLayout)return false;
+  if(!subjectLayout && !key.startsWith(prefix+'/'))return false;
+  const parts=subjectLayout?key.split('/'):key.slice(prefix.length+1).split('/');
+  if(subjectLayout && (!/^\d{4}-\d{2}-\d{2}$/.test(prefix) || parts[3]!==prefix))return false;
+  return parts.length===(subjectLayout?6:3) && parts.every(p=>p.trim() && p!=='.' && p!=='..' && !/[\\\x00-\x1f\x7f-\x9f]/.test(p) && Buffer.byteLength(p)<=255) && MIME[path.extname(parts.at(-1)).toLowerCase()]===mime && /^(audio|image|video)\//.test(mime);
 }
 export function displayName(value) {
   const normalized=String(value || '').normalize('NFKC').replace(/[\\/:*?"<>|#%\x00-\x1f\x7f]/g,'-').replace(/\s+/g,' ').replace(/^[. -]+|[. -]+$/g,'');
@@ -261,6 +265,8 @@ export async function run(options,dependencies={}) {
     if(!/^\d{4}-\d{2}-\d{2}$/.test(options.date || '') || new Date(options.date).toISOString().slice(0,10)!==options.date || c.prefix!==options.date)throw Error('The target prefix must equal the upload date YYYY-MM-DD');
     if(!options.manifest || !options['release-index'])throw Error('A private release index and target manifest are required');
     if(fs.existsSync(options.manifest))throw Error('Never overwrite a frozen layout manifest');
+    const keyLayout=options['key-layout'];
+    if(keyLayout && keyLayout!=='subject-edition-grade-date-course-v1')throw Error('Unknown course key layout');
     const source=await sourceContext();const index=JSON.parse(await fsp.readFile(options['release-index'],'utf8'));
     if(index.schemaVersion!=='mira.course-storage.releases.v1' || index.ok!==true || index.allPublishedCourseMediaCovered!==true)throw Error('Validated complete publication metadata required');
     const sourceReleases=new Map(source.m.releases.map(r=>[r.classroomId,r]));
@@ -269,10 +275,13 @@ export async function run(options,dependencies={}) {
       const original=sourceReleases.get(release.classroomId);
       if(!original || ['courseId','courseVersion','releaseSha256'].some(k=>original[k]!==release[k]) || !release.subjectName || !release.gradeLabel || !release.title)throw Error('Publication metadata differs from verified source');
       const subject=displayName(release.subjectName),title=displayName(release.title);
-      const folderBase=displayName([release.gradeLabel,release.volumeLabel,release.title].filter(Boolean).join('-'));
+      if(keyLayout && release.contentKey && !release.editionLabel)throw Error('Reviewed textbook edition metadata required');
+      const edition=displayName([release.editionLabel || '非教材课程',release.volumeLabel].filter(Boolean).join('-'));
+      const parent=keyLayout?[subject,edition,displayName(release.gradeLabel),c.prefix]:[c.prefix,subject];
+      const folderBase=keyLayout?title:displayName([release.gradeLabel,release.volumeLabel,release.title].filter(Boolean).join('-'));
       let folder=folderBase,version=1;
-      while(folders.has(subject+'/'+folder))folder=folderBase+'（版本'+(++version)+'）';
-      folders.add(subject+'/'+folder);const counters={};
+      while(folders.has([...parent,folder].join('/')))folder=folderBase+'（版本'+(++version)+'）';
+      folders.add([...parent,folder].join('/'));const counters={};
       for(const media of release.media){
         const relative=media.sourcePath || NATIVE+'classrooms/'+media.path.slice('/api/classroom-media/'.length);
         const e=sourceFiles.get(relative);
@@ -280,14 +289,14 @@ export async function run(options,dependencies={}) {
         seen.add(relative);const kind=media.mimeType.startsWith('audio/')?'音频':media.mimeType.startsWith('image/')?'图片':'视频';
         counters[kind]=(counters[kind] || 0)+1;
         const filename=title+'-'+kind+'-'+String(counters[kind]).padStart(3,'0')+path.extname(relative).toLowerCase();
-        const objectKey=[c.prefix,subject,folder,filename].join('/');
-        if(!validNamedKey(objectKey,c.prefix,e.mimeType))throw Error('Invalid readable media name');
+        const objectKey=[...parent,folder,filename].join('/');
+        if(!validNamedKey(objectKey,c.prefix,e.mimeType,keyLayout))throw Error('Invalid readable media name');
         files.push({...e,objectKey});
       }
-      const {media,...metadata}=release;releases.push({...metadata,storageDirectory:[c.prefix,subject,folder].join('/')});
+      const {media,...metadata}=release;releases.push({...metadata,storageDirectory:[...parent,folder].join('/')});
     }
     if(seen.size!==sourceFiles.size || releases.length!==sourceReleases.size)throw Error('Named layout cannot omit any verified published media');
-    const m={schemaVersion:'mira.course-storage.manifest.v2',snapshotId:options.snapshot || 'named-'+Date.now(),createdAt:new Date().toISOString(),uploadDate:options.date,sourceManifestSha256:source.manifestSha256,sourceVerificationSha256:digest(source.raw),sourceStorage:storageIdentity(source.config),releases,files,skipped:[]};
+    const m={schemaVersion:'mira.course-storage.manifest.v2',...(keyLayout?{keyLayout}:{}),snapshotId:options.snapshot || 'named-'+Date.now(),createdAt:new Date().toISOString(),uploadDate:options.date,sourceManifestSha256:source.manifestSha256,sourceVerificationSha256:digest(source.raw),sourceStorage:storageIdentity(source.config),releases,files,skipped:[]};
     await atomicJson(options.manifest,m);console.log(JSON.stringify({manifest:options.manifest,courses:releases.length,files:files.length,objects:unique(m).length,bytes:files.reduce((s,e)=>s+e.byteSize,0)}));return;
   }
   if(options.command==='probe') {
@@ -392,7 +401,7 @@ export async function run(options,dependencies={}) {
     if(options.resume && fs.existsSync(path.join(dir,'verified.jsonl'))){
       for(const line of (await fsp.readFile(path.join(dir,'verified.jsonl'),'utf8')).split('\n')){
         if(!line)continue;let record;try{record=JSON.parse(line);}catch{continue;}
-        if(sameStorage(record.storage,storage) && /^[a-f0-9]{64}$/.test(record.sha256 || '') && typeof record.objectKey==='string' && record.objectKey.startsWith(c.prefix+'/') && typeof record.etag==='string' && record.etag)previous.set(record.objectKey,record);
+        if(sameStorage(record.storage,storage) && /^[a-f0-9]{64}$/.test(record.sha256 || '') && typeof record.objectKey==='string' && (m.keyLayout==='subject-edition-grade-date-course-v1' ? validNamedKey(record.objectKey,c.prefix,MIME[path.extname(record.objectKey).toLowerCase()],m.keyLayout) : record.objectKey.startsWith(c.prefix+'/')) && typeof record.etag==='string' && record.etag)previous.set(record.objectKey,record);
       }
     }
     const result=await parallel(unique(m),concurrency,async e=>{

@@ -27,6 +27,9 @@ BACKEND_PID_FILE="${STATE_DIR}/backend.pid"
 CURRICULUM_WORKER_PID_FILE="${STATE_DIR}/curriculum-worker.pid"
 CURRICULUM_WORKER_LOG="${STATE_DIR}/curriculum-worker.log"
 CURRICULUM_WORKER_COMMAND_TOKEN="workers.learning_curriculum_preparation_worker"
+ARCHIVE_WORKER_PID_FILE="${STATE_DIR}/course-archive-worker.pid"
+ARCHIVE_WORKER_LOG="${STATE_DIR}/course-archive-worker.log"
+ARCHIVE_WORKER_COMMAND_TOKEN="workers.course_archive_worker"
 REPAIR_MODE="${MIRA_LOCAL_TEST_REPAIR_MODE:-0}"
 CURRICULUM_WORKER_ENABLED="${MIRA_LOCAL_TEST_CURRICULUM_WORKER_ENABLED:-0}"
 STUDENT_WEB_PID_FILE="${STATE_DIR}/student-web.pid"
@@ -67,7 +70,7 @@ LEGACY_STUDENT_RECORD_START_HASH=""
 
 usage() {
   cat <<'EOF'
-Usage: local-test-stack.sh [start|stop|restart|status|start-curriculum-worker|stop-curriculum-worker|build-student-web-production]
+Usage: local-test-stack.sh [start|stop|restart|status|start-curriculum-worker|stop-curriculum-worker|start-archive-worker|stop-archive-worker|build-student-web-production]
 
   start    Start backend:8000, student-web:3000, OpenMAIC:3100 and gateway:3101.
   stop     Stop only processes whose strict PID identity belongs to this script.
@@ -75,6 +78,8 @@ Usage: local-test-stack.sh [start|stop|restart|status|start-curriculum-worker|st
   status   Report ownership and HTTP readiness without printing environments.
   start-curriculum-worker / stop-curriculum-worker
             Manage generation independently of the API and student classroom.
+  start-archive-worker / stop-archive-worker
+            Manage full-course uploads; enabled by backend COURSE_STORAGE_ARCHIVE_ENABLED.
   build-student-web-production
             Build Student Web only when its source/config fingerprint is stale.
 
@@ -1225,6 +1230,131 @@ start_curriculum_worker() {
   return 1
 }
 
+archive_worker_enabled() {
+  [[ "${REPAIR_MODE}" != "1" ]] || return 3
+  local python_bin
+  python_bin="$(resolve_python_bin)" || return 1
+  (cd "${BACKEND_DIR}" && "${python_bin}" -c '
+import core.config
+from core.course_storage_config import CourseStorageConfig
+try:
+    enabled = CourseStorageConfig.from_env().archive_enabled
+except ValueError:
+    raise SystemExit(2)
+raise SystemExit(0 if enabled else 3)')
+}
+
+archive_worker_status() {
+  local candidate_pid enabled_status=0
+  archive_worker_enabled || enabled_status=$?
+  if [[ "${enabled_status}" != "0" && "${enabled_status}" != "3" ]]; then
+    echo "Course archive worker: invalid backend configuration." >&2
+    return 1
+  fi
+  if identity_matches_process "${ARCHIVE_WORKER_PID_FILE}" course-archive-worker \
+    "${BACKEND_DIR}" "${ARCHIVE_WORKER_COMMAND_TOKEN}"; then
+    echo "Course archive worker: running (PID ${RECORD_PID}, log: ${ARCHIVE_WORKER_LOG})"
+    return 0
+  fi
+  if [[ ! -e "${ARCHIVE_WORKER_PID_FILE}" && "${enabled_status}" == "3" ]]; then
+    for candidate_pid in $(pgrep -f "[w]orkers[.]course_archive_worker" || true); do
+      if [[ "$(process_cwd "${candidate_pid}")" == "${BACKEND_DIR}" ]]; then
+        echo "Course archive worker: unmanaged process exists; ownership must be resolved." >&2
+        return 1
+      fi
+    done
+    echo "Course archive worker: disabled by backend configuration or repair mode"
+    return 0
+  fi
+  echo "Course archive worker: stopped or identity invalid" >&2
+  return 1
+}
+
+start_archive_worker() {
+  local python_bin pid candidate_pid i enabled_status=0
+  archive_worker_enabled || enabled_status=$?
+  if [[ "${enabled_status}" != "0" && "${enabled_status}" != "3" ]]; then
+    echo "Course archive worker: invalid backend configuration; process left untouched." >&2
+    return 1
+  fi
+  if [[ "${enabled_status}" == "3" ]]; then
+    stop_archive_worker || return 1
+    archive_worker_status
+    return
+  fi
+  if identity_matches_process "${ARCHIVE_WORKER_PID_FILE}" course-archive-worker \
+    "${BACKEND_DIR}" "${ARCHIVE_WORKER_COMMAND_TOKEN}"; then
+    archive_worker_status
+    return
+  fi
+  if [[ -e "${ARCHIVE_WORKER_PID_FILE}" ]]; then
+    if ! read_identity_record "${ARCHIVE_WORKER_PID_FILE}" course-archive-worker || process_is_alive "${RECORD_PID}"; then
+      echo "Course archive worker: invalid live identity; refusing to start a duplicate." >&2
+      return 1
+    fi
+    rm -f "${ARCHIVE_WORKER_PID_FILE}"
+  fi
+  for candidate_pid in $(pgrep -f "[w]orkers[.]course_archive_worker" || true); do
+    if [[ "$(process_cwd "${candidate_pid}")" == "${BACKEND_DIR}" ]]; then
+      echo "Course archive worker: unmanaged process exists; refusing to start a duplicate." >&2
+      return 1
+    fi
+  done
+  python_bin="$(resolve_python_bin)" || return 1
+  (
+    cd "${BACKEND_DIR}" || exit 1
+    umask 077
+    nohup env -i PATH="${PATH}" HOME="${HOME}" TMPDIR="${TMPDIR:-/tmp}" \
+      LANG="${LANG:-en_US.UTF-8}" PYTHONUNBUFFERED=1 APP_DEBUG=0 \
+      "${python_bin}" -c 'import os, sys; os.setsid(); os.execv(sys.executable, [sys.executable, "-m", "workers.course_archive_worker"])' \
+      > "${ARCHIVE_WORKER_LOG}" 2>&1 < /dev/null &
+    pid="$!"
+    write_identity_record "${ARCHIVE_WORKER_PID_FILE}" course-archive-worker "${pid}" || {
+      kill "${pid}" 2>/dev/null || true
+      exit 1
+    }
+  ) || return 1
+  for ((i = 0; i < 20; i += 1)); do
+    if ! identity_matches_process "${ARCHIVE_WORKER_PID_FILE}" course-archive-worker \
+      "${BACKEND_DIR}" "${ARCHIVE_WORKER_COMMAND_TOKEN}"; then
+      echo "Course archive worker: startup failed; inspect ${ARCHIVE_WORKER_LOG}." >&2
+      return 1
+    fi
+    if grep -q 'course archive worker ready' "${ARCHIVE_WORKER_LOG}"; then
+      archive_worker_status
+      return
+    fi
+    sleep 1
+  done
+  echo "Course archive worker: preflight pending; process and identity preserved." >&2
+  return 1
+}
+
+stop_archive_worker() {
+  local pid i
+  [[ -e "${ARCHIVE_WORKER_PID_FILE}" ]] || return 0
+  read_identity_record "${ARCHIVE_WORKER_PID_FILE}" course-archive-worker || {
+    echo "Course archive worker: malformed identity; refusing to stop it." >&2; return 1;
+  }
+  pid="${RECORD_PID}"
+  if ! process_is_alive "${pid}"; then rm -f "${ARCHIVE_WORKER_PID_FILE}"; return; fi
+  identity_matches_process "${ARCHIVE_WORKER_PID_FILE}" course-archive-worker \
+    "${BACKEND_DIR}" "${ARCHIVE_WORKER_COMMAND_TOKEN}" || {
+    echo "Course archive worker: identity mismatch; process left untouched." >&2; return 1;
+  }
+  kill -TERM "${pid}" || return 1
+  for ((i = 0; i < 40; i += 1)); do
+    if ! process_is_alive "${pid}"; then
+      rm -f "${ARCHIVE_WORKER_PID_FILE}"
+      echo "Course archive worker: stopped after persisting its current transfer"
+      return
+    fi
+    sleep 1
+  done
+  echo "Course archive worker: finishing its transfer; process and identity preserved." >&2
+  return 1
+}
+
 stop_curriculum_worker() {
   local pid i
   [[ -e "${CURRICULUM_WORKER_PID_FILE}" ]] || return 0
@@ -1610,6 +1740,7 @@ show_status() {
   service_status Backend backend "${BACKEND_PORT}" "${BACKEND_HEALTH_URL}" \
     "${BACKEND_PID_FILE}" "${BACKEND_DIR}" "app.py" || failed=1
   curriculum_worker_status || failed=1
+  archive_worker_status || failed=1
   student_web_status || failed=1
   native_service_status OpenMAIC openmaic "${OPENMAIC_PORT}" "${OPENMAIC_HEALTH_URL}" \
     "${OPENMAIC_NATIVE_PID_FILE}" "${OPENMAIC_IDENTITY_FILE}" \
@@ -1627,6 +1758,7 @@ start_stack() {
   start_native_stack
   start_student_web
   start_curriculum_worker
+  start_archive_worker
   show_status
 }
 
@@ -1634,6 +1766,7 @@ stop_stack() {
   local failed=0
   # Keep dependencies alive until the paid work unit reaches a persisted result.
   stop_curriculum_worker || return 1
+  stop_archive_worker || return 1
   stop_student_web || failed=1
   stop_native_stack || failed=1
   stop_managed_service Backend backend "${BACKEND_PORT}" \
@@ -1669,6 +1802,14 @@ main() {
     stop-curriculum-worker)
       [[ $# -eq 1 ]] || { usage >&2; return 2; }
       stop_curriculum_worker
+      ;;
+    start-archive-worker)
+      [[ $# -eq 1 ]] || { usage >&2; return 2; }
+      start_archive_worker
+      ;;
+    stop-archive-worker)
+      [[ $# -eq 1 ]] || { usage >&2; return 2; }
+      stop_archive_worker
       ;;
     build-student-web-production)
       [[ $# -eq 1 ]] || { usage >&2; return 2; }

@@ -211,6 +211,22 @@ test('named layout freezes readable collision-free keys without local sources',a
   await assert.rejects(run({command:'layout',manifest:f.namedManifest,'release-index':f.releaseIndex,date:f.config.prefix,...f.sourceOptions},f.dependencies),/overwrite/);
 });
 
+test('subject edition grade date course layout freezes exact textbook metadata and relocates verified bytes',async t=>{
+  const f=await fixture(t);await f.verify();
+  const index=JSON.parse(await fs.readFile(f.releaseIndex));index.releases[0].editionLabel='统编版 · 2022课标';
+  await fs.writeFile(f.releaseIndex,JSON.stringify(index));await fs.unlink(f.source);
+  const config={...f.config,prefix:'2026-10-23'},client=new NamedBucket(f),dependencies={...f.dependencies,config,client};
+  const manifest=path.join(f.root,'subject-manifest.json'),keyLayout='subject-edition-grade-date-course-v1';
+  const sourceOptions={'source-manifest':f.manifest,'source-prefix':f.config.prefix};
+  await run({command:'layout',manifest,'release-index':f.releaseIndex,date:config.prefix,'key-layout':keyLayout,snapshot:'subject',...sourceOptions},dependencies);
+  const m=JSON.parse(await fs.readFile(manifest));assert.equal(m.keyLayout,keyLayout);
+  const key=m.files[0].objectKey;assert.equal(key,'语文/统编版 · 2022课标-上册/一年级/2026-10-23/金木水火土/金木水火土-音频-001.mp3');
+  assert(validNamedKey(key,config.prefix,'audio/mpeg',keyLayout));
+  for(const bad of [key.replace('/一年级/','/../'),key.replace('2026-10-23','2026-10-22'),key+'/extra'])assert(!validNamedKey(bad,config.prefix,'audio/mpeg',keyLayout));
+  assert(!validNamedKey(key,config.prefix,'audio/mpeg'));
+  await run({command:'relocate',manifest,...sourceOptions},dependencies);await run({command:'verify',manifest},dependencies);
+});
+
 test('named relocation and verification cover every key even when SHA is shared',async t=>{
   const f=await namedFixture(t);await run({command:'relocate',manifest:f.namedManifest,...f.sourceOptions},f.dependencies);
   const m=JSON.parse(await fs.readFile(f.namedManifest));

@@ -1,0 +1,723 @@
+diff --git a/packages/@openmaic/storage/src/agent-session/types.ts b/packages/@openmaic/storage/src/agent-session/types.ts
+--- a/packages/@openmaic/storage/src/agent-session/types.ts
++++ b/packages/@openmaic/storage/src/agent-session/types.ts
+@@ -542,6 +542,16 @@
+     event: PersistedOwnerSessionEvent,
+   ) => Promise<void> | void;
+   /**
++   * Runs for a successfully settled session in finishSession's main
++   * transaction, before its optional owner projection. A failure rolls back
++   * settlement and the hook's writes together; this is a durable outbox
++   * boundary, not a lossy notification. No hook runs after a stale lease.
++   */
++  onSessionFinished?: (
++    transaction: AgentSessionTransaction,
++    session: Pick<AgentSessionMeta, 'id' | 'ownerId' | 'stageId' | 'existingCourse' | 'status'>,
++  ) => Promise<void>;
++  /**
+    * Runs inside the cancel transaction after the session row update and its
+    * owner projection, before COMMIT. The reference sends the same
+    * `{kind:'session'}` wakeup from `requestCancel` so a running session's
+diff --git a/packages/@openmaic/storage/src/agent-session/pg.ts b/packages/@openmaic/storage/src/agent-session/pg.ts
+--- a/packages/@openmaic/storage/src/agent-session/pg.ts
++++ b/packages/@openmaic/storage/src/agent-session/pg.ts
+@@ -341,6 +341,7 @@
+   private readonly messageHook?: AgentSessionHooks['onUserMessagePosted'];
+   private readonly sessionEventHook?: AgentSessionHooks['onSessionEventAppended'];
+   private readonly ownerEventHook?: AgentSessionHooks['onOwnerEventAppended'];
++  private readonly finishedHook?: AgentSessionHooks['onSessionFinished'];
+   private readonly cancelHook?: AgentSessionHooks['onCancelRequested'];
+ 
+   constructor(queryable: Queryable, options: PgAgentSessionStoreOptions) {
+@@ -365,6 +366,7 @@
+     this.messageHook = options.onUserMessagePosted;
+     this.sessionEventHook = options.onSessionEventAppended;
+     this.ownerEventHook = options.onOwnerEventAppended;
++    this.finishedHook = options.onSessionFinished;
+     this.cancelHook = options.onCancelRequested;
+   }
+ 
+@@ -655,7 +657,7 @@
+   ): Promise<boolean> {
+     const release = patch.releaseLease !== false;
+     return this.transaction(async (tx) => {
+-      const result = await tx.query<{ attempt: number }>(
++      const result = await tx.query<SessionRow>(
+         `UPDATE ${this.table('sessions')}
+          SET status = $3, error = CASE WHEN $4::boolean THEN $5 ELSE error END,
+              lease_worker_id = CASE WHEN $6::boolean THEN NULL ELSE lease_worker_id END,
+@@ -670,7 +672,7 @@
+          WHERE id = $1 AND lease_worker_id = $2 AND deleted_at IS NULL
+            AND ($8::bigint IS NULL OR cancel_requested_at = $8)
+            AND ($9::integer IS NULL OR attempt = $9)
+-         RETURNING attempt`,
++         RETURNING ${SESSION_COLUMNS}`,
+         [
+           sessionId,
+           workerId,
+@@ -685,6 +687,7 @@
+       );
+       const row = result.rows[0];
+       if (!row) return false;
++      if (patch.status === 'succeeded') await this.finishedHook?.(tx, sessionMeta(row));
+       await this.appendProjection(
+         {
+           type: 'session_status',
+diff --git a/lib/server/agent-runtime/store.ts b/lib/server/agent-runtime/store.ts
+--- a/lib/server/agent-runtime/store.ts
++++ b/lib/server/agent-runtime/store.ts
+@@ -9,6 +9,12 @@
+ 
+ import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
+ import { notifyDurableAgentEvent } from './event-notify-bus';
++import {
++  archiveEventsEnabled,
++  ensureCourseArchiveEventSchema,
++  enqueueSucceededStageArchives,
++  CourseArchiveSettlementPendingError,
++} from '../course-archive-events';
+ 
+ interface AgentSessionStoreState {
+   connectionString?: string;
+@@ -45,6 +51,7 @@
+ async function createAgentSessionStore(connectionString: string): Promise<PgAgentSessionStore> {
+   const { pool } = await getServerPersistenceProvider(connectionString);
+   await ensureAgentSessionSchema(pool);
++  if (archiveEventsEnabled()) await ensureCourseArchiveEventSchema(pool);
+   // URL observations from user-authored prompt/message text are registered
+   // inside the same business transaction that creates the session / posts the
+   // message (reference session-store semantics), so they commit atomically and
+@@ -79,6 +86,15 @@
+       notifyDurableAgentEvent(transaction, { kind: 'owner', ownerId: event.ownerId }),
+     onCancelRequested: (transaction, sessionId): Promise<void> =>
+       notifyDurableAgentEvent(transaction, { kind: 'session', sessionId }),
++    onSessionFinished: async (transaction, session): Promise<void> => {
++      if (archiveEventsEnabled()) {
++        try {
++          await enqueueSucceededStageArchives(transaction, session);
++        } catch {
++          throw new CourseArchiveSettlementPendingError();
++        }
++      }
++    },
+   });
+   return store;
+ }
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -7,6 +7,7 @@
+  * recovery. A client connection is never part of the execution lifetime.
+  */
+ import { randomUUID } from 'node:crypto';
++import { parkCourseArchiveSettlement } from '../course-archive-events';
+ import { textbookContractFromPrompt, createTextbookAuthoringGuard } from '@/lib/server/mira-textbook-scene-contract';
+ import { Session, type AgentEvent, type AgentMessage } from '@earendil-works/pi-agent-core';
+ import {
+@@ -2040,6 +2041,10 @@
+       }
+       log.info(`session ${id} -> ${status} (attempt ${attempt}, ${toolCalls} tool calls)`);
+     } catch (error) {
++      if (await parkCourseArchiveSettlement(error, () => store.releaseLease(id, WORKER_ID))) {
++        log.warn(`session ${id} retains completed generation while archive settlement is pending`);
++        return;
++      }
+       queueInterruptedToolResults();
+       if (isLeaseLostError(error)) markLeaseLost();
+       const message = error instanceof Error ? error.message : String(error);
+@@ -2073,6 +2078,10 @@
+       clearInterval(messagePoll);
+     }
+   } catch (error) {
++    if (await parkCourseArchiveSettlement(error, () => store.releaseLease(id, WORKER_ID))) {
++      log.warn(`session ${id} will retry only completed archive settlement`);
++      return;
++    }
+     if (isLeaseLostError(error)) markLeaseLost();
+     const message = error instanceof Error ? error.message : String(error);
+     if (ctx.shuttingDown || leaseLost || tripwireViolated) {
+diff --git a/lib/server/classroom-storage.ts b/lib/server/classroom-storage.ts
+--- a/lib/server/classroom-storage.ts
++++ b/lib/server/classroom-storage.ts
+@@ -2,6 +2,7 @@
+ import path from 'path';
+ import type { NextRequest } from 'next/server';
+ import type { Scene, Stage } from '@/lib/types/stage';
++import { enqueueLegacyClassroomArchive } from './course-archive-events';
+ 
+ export const CLASSROOMS_DIR = path.join(process.cwd(), 'data', 'classrooms');
+ export const CLASSROOM_JOBS_DIR = path.join(process.cwd(), 'data', 'classroom-jobs');
+@@ -48,10 +49,7 @@
+ export async function readClassroom(id: string): Promise<PersistedClassroomData | null> {
+   const candidates = id.startsWith('omclass_')
+     ? [path.join(CLASSROOMS_DIR, id, 'artifact', 'classroom.json')]
+-    : [
+-        path.join(CLASSROOMS_DIR, `${id}.json`),
+-        path.join(CLASSROOMS_DIR, id, 'classroom.json'),
+-      ];
++    : [path.join(CLASSROOMS_DIR, `${id}.json`), path.join(CLASSROOMS_DIR, id, 'classroom.json')];
+   for (const filePath of candidates) {
+     try {
+       const content = await fs.readFile(filePath, 'utf-8');
+@@ -81,6 +79,15 @@
+   await ensureClassroomsDir();
+   const filePath = path.join(CLASSROOMS_DIR, `${data.id}.json`);
+   await writeJsonFileAtomic(filePath, classroomData);
++  try {
++    await enqueueLegacyClassroomArchive(classroomData);
++  } catch {
++    // The saved result remains authoritative and discoverable by the archive
++    // worker's source scan. A local journal failure never regenerates it.
++    console.error(
++      '[course-archive] legacy enqueue failed; saved source retained for reconciliation',
++    );
++  }
+ 
+   return {
+     ...classroomData,
+diff --git a/lib/server/course-archive-events.ts b/lib/server/course-archive-events.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/course-archive-events.ts
+@@ -0,0 +1,203 @@
++/** Durable local course snapshots; this producer never calls a Provider or S3. */
++import { createHash, randomUUID } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import type { Queryable } from '@openmaic/storage/agent-session/pg';
++
++export const COURSE_ARCHIVE_EVENT_SCHEMA = 'mira.course-archive.event.v1';
++
++export class CourseArchiveSettlementPendingError extends Error {
++  override readonly name = 'CourseArchiveSettlementPendingError';
++  constructor() {
++    super('Local course archive settlement is pending');
++  }
++}
++
++/** Retry durable settlement without converting completed generation to failure. */
++export async function parkCourseArchiveSettlement(
++  error: unknown,
++  releaseLease: () => Promise<void>,
++): Promise<boolean> {
++  if (!(error instanceof CourseArchiveSettlementPendingError)) return false;
++  await releaseLease();
++  return true;
++}
++
++export function archiveEventsEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
++  return ['1', 'true'].includes(env.COURSE_STORAGE_ARCHIVE_ENABLED?.trim().toLowerCase() ?? '');
++}
++
++export function archiveCanonical(value: unknown): string {
++  const sorted = (item: unknown): unknown => {
++    if (Array.isArray(item)) return item.map(sorted);
++    if (item && typeof item === 'object') {
++      return Object.fromEntries(
++        Object.entries(item)
++          .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
++          .map(([key, child]) => [key, sorted(child)]),
++      );
++    }
++    return item;
++  };
++  return JSON.stringify(sorted(value));
++}
++
++export function archiveDigest(value: unknown): string {
++  return createHash('sha256').update(archiveCanonical(value)).digest('hex');
++}
++
++export async function ensureCourseArchiveEventSchema(database: Queryable): Promise<void> {
++  await database.query(`CREATE TABLE IF NOT EXISTS mira_course_archive_events (
++    id BIGSERIAL PRIMARY KEY,
++    source_kind TEXT NOT NULL DEFAULT 'native_pg_stage',
++    session_id TEXT NOT NULL,
++    stage_id TEXT NOT NULL,
++    stage_revision BIGINT NOT NULL,
++    source_digest CHAR(64) NOT NULL,
++    snapshot_json JSONB NOT NULL,
++    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
++    acknowledged_at TIMESTAMPTZ,
++    UNIQUE(session_id, stage_id, stage_revision, source_digest),
++    CHECK (source_kind = 'native_pg_stage'),
++    CHECK (stage_revision >= 0),
++    CHECK (source_digest ~ '^[a-f0-9]{64}$')
++  )`);
++  await database.query(`CREATE INDEX IF NOT EXISTS mira_course_archive_events_pending
++    ON mira_course_archive_events(id) WHERE acknowledged_at IS NULL`);
++}
++
++interface FinishedSession {
++  id: string;
++  ownerId: string;
++  stageId: string;
++  existingCourse: boolean;
++  status: string;
++}
++
++interface SnapshotRow extends Record<string, unknown> {
++  id: string;
++  data: Record<string, unknown>;
++  scenes: Record<string, unknown>[];
++  outline: unknown;
++  revision: string | number;
++}
++
++export async function enqueueSucceededStageArchives(
++  transaction: Queryable,
++  session: FinishedSession,
++): Promise<void> {
++  if (session.status !== 'succeeded') return;
++  // A new Pi session's stage_id can be a placeholder. Discover all actual
++  // create_stage receipts, plus the persisted producerRef when the UI receipt
++  // was interrupted. Existing-course editing may use its owned stage target.
++  // One SELECT snapshots rows/revisions under one PostgreSQL statement view.
++  const result = await transaction.query<SnapshotRow>(
++    `WITH candidates AS (
++    SELECT data->>'stageId' AS id FROM agent_session_events
++      WHERE session_id=$1 AND type='library_changed' AND data->>'change'='stage_created'
++    UNION SELECT stage_id FROM document_outlines WHERE data->>'producerRef'=$1
++    UNION SELECT stage_id FROM agent_sessions WHERE id=$1 AND existing_course=true
++    UNION SELECT active_stage_id FROM agent_sessions WHERE id=$1 AND existing_course=true
++  ) SELECT stage.id,stage.data,revision.rev AS revision,outline.data AS outline,
++      COALESCE((SELECT jsonb_agg(scene.data ORDER BY scene.scene_order,scene.id)
++        FROM document_scenes scene WHERE scene.stage_id=stage.id),'[]'::jsonb) AS scenes
++    FROM document_stages stage
++    JOIN candidates ON candidates.id=stage.id
++    JOIN document_stage_revision revision ON revision.stage_id=stage.id
++    LEFT JOIN document_outlines outline ON outline.stage_id=stage.id
++    WHERE stage.owner_id=$2 AND stage.data->>'id'=stage.id ORDER BY stage.id`,
++    [session.id, session.ownerId],
++  );
++  for (const row of result.rows) {
++    if (!Array.isArray(row.scenes) || row.scenes.length === 0) continue;
++    if (row.scenes.some((scene) => scene.stageId !== row.id))
++      throw new Error('Archive scene identity mismatch');
++    const { dslVersion, ...stage } = row.data;
++    const outline =
++      row.outline && typeof row.outline === 'object' && !Array.isArray(row.outline)
++        ? Object.fromEntries(Object.entries(row.outline).filter(([key]) => key !== 'producerRef'))
++        : row.outline;
++    const snapshot = {
++      id: row.id,
++      stage,
++      scenes: row.scenes,
++      ...(dslVersion === undefined ? {} : { dslVersion }),
++      ...(outline == null ? {} : { outline }),
++    };
++    // Session prompts, owner columns, cookies and credentials are deliberately
++    // absent: only document content enters the archive payload.
++    await transaction.query(
++      `INSERT INTO mira_course_archive_events
++      (source_kind,session_id,stage_id,stage_revision,source_digest,snapshot_json)
++      VALUES ('native_pg_stage',$1,$2,$3,$4,$5::jsonb)
++      ON CONFLICT (session_id,stage_id,stage_revision,source_digest) DO NOTHING`,
++      [
++        session.id,
++        row.id,
++        String(row.revision),
++        archiveDigest(snapshot),
++        archiveCanonical(snapshot),
++      ],
++    );
++  }
++}
++
++export async function enqueueLegacyClassroomArchive(
++  snapshot: { id: string; stage: unknown; scenes: unknown[] },
++  env: NodeJS.ProcessEnv = process.env,
++): Promise<string | undefined> {
++  if (!archiveEventsEnabled(env)) return undefined;
++  const manifest = env.COURSE_STORAGE_MANIFEST_PATH?.trim();
++  if (!manifest || !path.isAbsolute(manifest))
++    throw new Error('Archive state requires an absolute manifest path');
++  if (!/^[A-Za-z0-9_-]+$/.test(snapshot.id) || snapshot.scenes.length === 0) return undefined;
++  const sourceDigest = archiveDigest(snapshot);
++  const eventKey =
++    'legacy-' +
++    createHash('sha256')
++      .update(snapshot.id + ':' + sourceDigest)
++      .digest('hex');
++  const stateRoot = path.dirname(manifest),
++    directory = path.join(stateRoot, 'archive-events');
++  await fs.mkdir(stateRoot, { recursive: true, mode: 0o700 });
++  if ((await fs.lstat(stateRoot)).isSymbolicLink())
++    throw new Error('Archive state root must not be a symlink');
++  await fs.mkdir(directory, { mode: 0o700 }).catch((error) => {
++    if (error.code !== 'EEXIST') throw error;
++  });
++  if ((await fs.lstat(directory)).isSymbolicLink())
++    throw new Error('Archive event directory must not be a symlink');
++  const filename = path.join(directory, eventKey + '.json');
++  const temporary = path.join(directory, '.' + eventKey + '-' + randomUUID() + '.tmp');
++  const event = {
++    schemaVersion: COURSE_ARCHIVE_EVENT_SCHEMA,
++    sourceKind: 'legacy_classroom',
++    stageId: snapshot.id,
++    sourceDigest,
++    snapshot,
++    createdAt: new Date().toISOString(),
++  };
++  const handle = await fs.open(temporary, 'wx', 0o600);
++  try {
++    await handle.writeFile(archiveCanonical(event) + '\n');
++    await handle.sync();
++  } finally {
++    await handle.close();
++  }
++  try {
++    await fs.link(temporary, filename);
++  } catch (error) {
++    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++    const existing = JSON.parse(await fs.readFile(filename, 'utf8'));
++    if (
++      existing.sourceDigest !== sourceDigest ||
++      existing.stageId !== snapshot.id ||
++      existing.schemaVersion !== COURSE_ARCHIVE_EVENT_SCHEMA ||
++      archiveDigest(existing.snapshot) !== sourceDigest
++    )
++      throw new Error('Archive event identity conflict');
++  } finally {
++    await fs.unlink(temporary);
++  }
++  return filename;
++}
+diff --git a/tests/course-archive-events.test.ts b/tests/course-archive-events.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/course-archive-events.test.ts
+@@ -0,0 +1,230 @@
++import { PGlite } from '@electric-sql/pglite';
++import { afterEach, beforeEach, describe, expect, test } from 'vitest';
++import { promises as fs } from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import {
++  PgAgentSessionStore,
++  ensureAgentSessionSchema,
++  type Queryable,
++} from '../packages/@openmaic/storage/src/agent-session/pg';
++import {
++  archiveDigest,
++  archiveEventsEnabled,
++  ensureCourseArchiveEventSchema,
++  enqueueSucceededStageArchives,
++  enqueueLegacyClassroomArchive,
++  CourseArchiveSettlementPendingError,
++  parkCourseArchiveSettlement,
++} from '@/lib/server/course-archive-events';
++import { planResume } from '@/lib/server/agent-runtime/resume';
++
++describe('durable native course archive producer', () => {
++  let db: PGlite;
++  let store: PgAgentSessionStore;
++  beforeEach(async () => {
++    db = new PGlite();
++    await db.waitReady;
++    await ensureAgentSessionSchema(db);
++    await ensureCourseArchiveEventSchema(db);
++    await db.exec(`CREATE TABLE document_stages(id TEXT PRIMARY KEY,owner_id TEXT,data JSONB);
++      CREATE TABLE document_scenes(stage_id TEXT,id TEXT,scene_order INTEGER,data JSONB);
++      CREATE TABLE document_outlines(stage_id TEXT,data JSONB);
++      CREATE TABLE document_stage_revision(stage_id TEXT,rev BIGINT);`);
++    store = new PgAgentSessionStore(db, {
++      withTransaction: (body) => db.transaction((tx) => body(tx as Queryable)),
++      onSessionFinished: enqueueSucceededStageArchives,
++    });
++    await store.createSession({
++      id: 'session-private',
++      ownerId: 'owner-private',
++      prompt: 'private prompt never archived',
++      stageId: 'placeholder',
++    });
++    await store.claimNextSession('worker', 1, { leaseTtlMs: 10_000, maxAttempts: 3 });
++    for (const [id, owner] of [
++      ['actual-stage', 'owner-private'],
++      ['foreign-stage', 'different-owner'],
++      ['empty-stage', 'owner-private'],
++    ]) {
++      await db.query('INSERT INTO document_stages VALUES ($1,$2,$3::jsonb)', [
++        id,
++        owner,
++        JSON.stringify({ id, name: '完整课件', dslVersion: '1.0', createdAt: 1, updatedAt: 1 }),
++      ]);
++      await db.query('INSERT INTO document_stage_revision VALUES ($1,1)', [id]);
++      await db.query('INSERT INTO document_outlines VALUES ($1,$2::jsonb)', [
++        id,
++        JSON.stringify({
++          producer: 'server-job',
++          producerRef: 'session-private',
++          requirement: '教学目标',
++        }),
++      ]);
++      if (id !== 'empty-stage')
++        await db.query('INSERT INTO document_scenes VALUES ($1,$2,1,$3::jsonb)', [
++          id,
++          'scene-1',
++          JSON.stringify({
++            id: 'scene-1',
++            stageId: id,
++            type: 'slide',
++            order: 1,
++            content: { title: '第一版' },
++          }),
++        ]);
++      await store.appendControlEvent('session-private', {
++        ts: 1,
++        type: 'library_changed',
++        data: { change: 'stage_created', stageId: id },
++      });
++    }
++  });
++  afterEach(async () => {
++    await db.close();
++  });
++
++  test('successful settlement freezes only complete owned event-discovered stages atomically', async () => {
++    expect(await store.finishSession('session-private', 'worker', { status: 'succeeded' })).toBe(
++      true,
++    );
++    const result = await db.query<{
++      stage_id: string;
++      source_digest: string;
++      snapshot_json: unknown;
++      acknowledged_at: unknown;
++    }>('SELECT * FROM mira_course_archive_events');
++    expect(result.rows).toHaveLength(1);
++    const event = result.rows[0]!;
++    expect(event.stage_id).toBe('actual-stage');
++    expect(event.source_digest).toBe(archiveDigest(event.snapshot_json));
++    expect(event.acknowledged_at).toBeNull();
++    const json = JSON.stringify(event.snapshot_json);
++    expect(json).toContain('教学目标');
++    expect(json).not.toContain('owner-private');
++    expect(json).not.toContain('session-private');
++    expect(json).not.toContain('private prompt');
++    expect((await store.getSession('session-private'))?.status).toBe('succeeded');
++  });
++
++  test('outbox failure rolls back settlement and retries without changing saved documents', async () => {
++    const failing = new PgAgentSessionStore(db, {
++      withTransaction: (body) => db.transaction((tx) => body(tx as Queryable)),
++      onSessionFinished: async (tx, session) => {
++        await enqueueSucceededStageArchives(tx, session);
++        throw new Error('outbox unavailable');
++      },
++    });
++    await expect(
++      failing.finishSession('session-private', 'worker', { status: 'succeeded' }),
++    ).rejects.toThrow('outbox unavailable');
++    expect((await store.getSession('session-private'))?.status).toBe('running');
++    expect((await db.query('SELECT * FROM mira_course_archive_events')).rows).toHaveLength(0);
++    expect((await db.query('SELECT * FROM document_scenes')).rows).toHaveLength(2);
++    await store.finishSession('session-private', 'worker', { status: 'succeeded' });
++    expect((await db.query('SELECT * FROM mira_course_archive_events')).rows).toHaveLength(1);
++  });
++
++  test('stale or failed settlements do not archive partial work', async () => {
++    expect(
++      await store.finishSession('session-private', 'stale-worker', { status: 'succeeded' }),
++    ).toBe(false);
++    expect(await store.finishSession('session-private', 'worker', { status: 'failed' })).toBe(true);
++    expect((await db.query('SELECT * FROM mira_course_archive_events')).rows).toHaveLength(0);
++  });
++
++  test('pending archival parks the lease and completed history retries settlement without model work', async () => {
++    const pending = new CourseArchiveSettlementPendingError();
++    const failing = new PgAgentSessionStore(db, {
++      withTransaction: (body) => db.transaction((tx) => body(tx as Queryable)),
++      onSessionFinished: async () => {
++        throw pending;
++      },
++    });
++    await expect(
++      failing.finishSession('session-private', 'worker', { status: 'succeeded' }),
++    ).rejects.toBe(pending);
++    expect(
++      await parkCourseArchiveSettlement(pending, () =>
++        store.releaseLease('session-private', 'worker'),
++      ),
++    ).toBe(true);
++    const before = await store.getSession('session-private');
++    expect(before?.status).toBe('running');
++    expect(before?.lease).toBeUndefined();
++    const claimed = await store.claimNextSession('worker', 1, {
++      leaseTtlMs: 10_000,
++      maxAttempts: 3,
++    });
++    expect(claimed?.attempt).toBe(before?.attempt);
++    const completed = [
++      {
++        role: 'assistant',
++        content: [{ type: 'text', text: '已保存完整课件' }],
++        stopReason: 'stop',
++      },
++    ];
++    expect(planResume(completed as Parameters<typeof planResume>[0]).kind).toBe('already-complete');
++    await store.finishSession('session-private', 'worker', { status: 'succeeded' });
++    expect((await db.query('SELECT * FROM mira_course_archive_events')).rows).toHaveLength(1);
++    let released = false;
++    expect(
++      await parkCourseArchiveSettlement(new Error('unrelated'), async () => {
++        released = true;
++      }),
++    ).toBe(false);
++    expect(released).toBe(false);
++  });
++
++  test('reconciliation deduplicates a revision and a later complete version preserves the first snapshot', async () => {
++    await store.finishSession('session-private', 'worker', { status: 'succeeded' });
++    const session = {
++      id: 'session-private',
++      ownerId: 'owner-private',
++      stageId: 'placeholder',
++      existingCourse: false,
++      status: 'succeeded',
++    };
++    await db.transaction((tx) => enqueueSucceededStageArchives(tx as Queryable, session));
++    expect((await db.query('SELECT * FROM mira_course_archive_events')).rows).toHaveLength(1);
++    await db.query(
++      "UPDATE document_scenes SET data=jsonb_set(data,'{content,title}','\"第二版\"') WHERE stage_id='actual-stage'",
++    );
++    await db.query("UPDATE document_stage_revision SET rev=2 WHERE stage_id='actual-stage'");
++    await db.transaction((tx) => enqueueSucceededStageArchives(tx as Queryable, session));
++    const snapshots = await db.query<{ snapshot_json: unknown }>(
++      'SELECT snapshot_json FROM mira_course_archive_events ORDER BY id',
++    );
++    expect(snapshots.rows).toHaveLength(2);
++    expect(JSON.stringify(snapshots.rows[0]!.snapshot_json)).toContain('第一版');
++    expect(JSON.stringify(snapshots.rows[1]!.snapshot_json)).toContain('第二版');
++  });
++});
++
++test('legacy file events default off, are private and idempotent, and require no network', async () => {
++  const root = await fs.mkdtemp(
++    path.join(process.env.MIRA_TASK_TMPDIR || os.tmpdir(), 'archive-events-'),
++  );
++  try {
++    const snapshot = {
++      id: 'stage-legacy',
++      stage: { id: 'stage-legacy', name: '课件' },
++      scenes: [{ id: 'scene' }],
++    };
++    const env = { COURSE_STORAGE_MANIFEST_PATH: path.join(root, 'active-manifest.json') };
++    expect(archiveEventsEnabled({})).toBe(false);
++    expect(await enqueueLegacyClassroomArchive(snapshot, env)).toBeUndefined();
++    const enabled = { ...env, COURSE_STORAGE_ARCHIVE_ENABLED: 'true' };
++    const filename = await enqueueLegacyClassroomArchive(snapshot, enabled);
++    expect(filename).toBeDefined();
++    const contents = await fs.readFile(filename!, 'utf8');
++    expect(await enqueueLegacyClassroomArchive(snapshot, enabled)).toBe(filename);
++    expect(await fs.readFile(filename!, 'utf8')).toBe(contents);
++    expect((await fs.stat(filename!)).mode & 0o777).toBe(0o600);
++    expect((await fs.stat(path.dirname(filename!))).mode & 0o777).toBe(0o700);
++    expect(JSON.parse(contents).sourceDigest).toBe(archiveDigest(snapshot));
++    expect(JSON.parse(contents).snapshot).toEqual(snapshot);
++  } finally {
++    await fs.rm(root, { recursive: true, force: true });
++  }
++});
+diff --git a/lib/server/classroom-media-object-store.ts b/lib/server/classroom-media-object-store.ts
+--- a/lib/server/classroom-media-object-store.ts
++++ b/lib/server/classroom-media-object-store.ts
+@@ -100,14 +100,26 @@
+   };
+ }
+ 
+-function validObjectKey(item: ManifestFile, prefix: string, schema: string): boolean {
++function validObjectKey(
++  item: ManifestFile,
++  prefix: string,
++  schema: string,
++  keyLayout?: unknown,
++): boolean {
+   if (schema === 'mira.course-storage.manifest.v1') {
+     return item.objectKey === `${prefix}/blobs/sha256/${item.sha256}`;
+   }
+-  if (typeof item.objectKey !== 'string' || !item.objectKey.startsWith(`${prefix}/`)) return false;
+-  const parts = item.objectKey.slice(prefix.length + 1).split('/');
++  if (typeof item.objectKey !== 'string') return false;
++  const classified = keyLayout === 'subject-edition-grade-date-course-v1';
++  if (keyLayout !== undefined && !classified) return false;
++  if (!classified && !item.objectKey.startsWith(`${prefix}/`)) return false;
++  const parts = classified
++    ? item.objectKey.split('/')
++    : item.objectKey.slice(prefix.length + 1).split('/');
+   if (
+-    parts.length !== 3 ||
++    (classified
++      ? parts.length !== 6 || parts[3] !== prefix || !/^\d{4}-\d{2}-\d{2}$/.test(parts[3])
++      : parts.length !== 3) ||
+     parts.some(
+       (part) =>
+         !part.trim() ||
+@@ -121,7 +133,8 @@
+   )
+     return false;
+   return (
+-    NAMED_MEDIA_MIME[path.posix.extname(parts[2]).toLowerCase()]?.includes(item.mimeType) ?? false
++    NAMED_MEDIA_MIME[path.posix.extname(parts.at(-1)!).toLowerCase()]?.includes(item.mimeType) ??
++    false
+   );
+ }
+ 
+@@ -164,7 +177,7 @@
+         .some((segment: string) => !segment || segment === '.' || segment === '..') ||
+       typeof item.sha256 !== 'string' ||
+       !/^[a-f0-9]{64}$/.test(item.sha256) ||
+-      !validObjectKey(item, config.prefix, manifest.schemaVersion) ||
++      !validObjectKey(item, config.prefix, manifest.schemaVersion, manifest.keyLayout) ||
+       !Number.isSafeInteger(item.byteSize) ||
+       item.byteSize < 0 ||
+       typeof item.mimeType !== 'string' ||
+diff --git a/tests/server/classroom-media-object-store.test.ts b/tests/server/classroom-media-object-store.test.ts
+--- a/tests/server/classroom-media-object-store.test.ts
++++ b/tests/server/classroom-media-object-store.test.ts
+@@ -38,11 +38,12 @@
+ let cancelled = false;
+ let entry: { path: string; objectKey: string; sha256: string; byteSize: number; mimeType: string };
+ 
+-const manifest = (schemaVersion = 'mira.course-storage.manifest.v1') =>
++const manifest = (schemaVersion = 'mira.course-storage.manifest.v1', keyLayout?: string) =>
+   fs.writeFile(
+     manifestPath,
+     JSON.stringify({
+       schemaVersion,
++      ...(keyLayout === undefined ? {} : { keyLayout }),
+       snapshotId: 'fixture',
+       files: [entry],
+     }),
+@@ -290,6 +291,32 @@
+ const namedPrefix = '2026-10-23';
+ const namedVoice = `${namedPrefix}/语文/一年级上册-金木水火土/金木水火土-老师讲解-001.wav`;
+ 
++it('reads classified subject/edition/grade/date/course media while preserving frozen classroom URLs', async () => {
++  vi.stubEnv('COURSE_STORAGE_PREFIX', namedPrefix);
++  entry.objectKey = `语文/统编版/一年级/${namedPrefix}/金木水火土/金木水火土-音频-001.wav`;
++  await manifest('mira.course-storage.manifest.v2', 'subject-edition-grade-date-course-v1');
++  await fs.rm(storage.root, { recursive: true });
++  const response = await read();
++  expect(response.status).toBe(200);
++  expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes);
++  expect(aws.send.mock.calls[0][0].input.Key).toBe(entry.objectKey);
++});
++
++it.each([
++  `语文/统编版/一年级/2026-10-24/课件/音频.wav`,
++  `语文/../一年级/${namedPrefix}/课件/音频.wav`,
++  `语文/统编版/一年级/${namedPrefix}/课件/原稿.json`,
++  `语文/统编版/一年级/${namedPrefix}/课件/音频\u0085.wav`,
++  `语文/统编版/${namedPrefix}/课件/音频.wav`,
++  `语文/统编版/一年级/${namedPrefix}/课件/多余目录/音频.wav`,
++])('rejects unsafe or misbound classified media keys: %s', async (objectKey) => {
++  vi.stubEnv('COURSE_STORAGE_PREFIX', namedPrefix);
++  entry.objectKey = objectKey;
++  await manifest('mira.course-storage.manifest.v2', 'subject-edition-grade-date-course-v1');
++  expect((await read()).status).toBe(502);
++  expect(aws.send).not.toHaveBeenCalled();
++});
++
+ it('reads a v2 Chinese object key through the original classroom URL after the local copy is absent', async () => {
+   vi.stubEnv('COURSE_STORAGE_PREFIX', namedPrefix);
+   entry.objectKey = namedVoice;

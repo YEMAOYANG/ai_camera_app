@@ -1,0 +1,1008 @@
+"""Durable, private archive delivery; no generation, provider calls or app import."""
+from __future__ import annotations
+
+from contextlib import contextmanager
+from datetime import datetime, timezone
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import stat
+import subprocess
+import tempfile
+import time
+from urllib.parse import urlsplit
+import zipfile
+
+
+SCHEMA = "mira.course-archive.queue.v1"
+SHA = re.compile(r"[a-f0-9]{64}\Z")
+ID = re.compile(r"[A-Za-z0-9_-]{1,255}\Z")
+MAX_JSON_BYTES = 128 * 1024 * 1024
+ADAPTER_SOURCES = (
+    "backend/services/course_archive_exporter.py",
+    "backend/services/course_archive_history.py",
+    "backend/services/course_media_object_store.py",
+    "openmaic-runtime/scripts/course-archive-assets.mjs",
+    "openmaic-runtime/.runtime/OpenMAIC/packages/@openmaic/dsl/dist/index.js",
+)
+
+
+class ArchiveQueueError(RuntimeError):
+    pass
+
+
+def _safe_error_code(error):
+    known_type = (type(error).__module__, type(error).__name__) in {
+        ("services.course_archive_exporter", "CourseArchiveError"),
+        ("scripts.course_storage_releases", "InventoryError"),
+    }
+    if not isinstance(error, ArchiveQueueError) and not known_type:
+        return None
+    code = str(error)
+    return code if re.fullmatch(r"[a-z0-9_]+", code) else None
+
+
+def _json(value):
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+
+
+def _sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def storage_identity(endpoint, bucket, region="us-east-1"):
+    parsed = urlsplit(endpoint)
+    if (parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username
+            or parsed.password or parsed.path not in {"", "/"} or parsed.query or parsed.fragment
+            or not re.fullmatch(r"[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]", bucket)
+            or not re.fullmatch(r"[A-Za-z0-9_-]+", region)):
+        raise ArchiveQueueError("archive_storage_invalid")
+    host = parsed.hostname.lower()
+    if ":" in host:
+        host = "[" + host + "]"
+    port = parsed.port
+    if port and port != (443 if parsed.scheme == "https" else 80):
+        host += ":" + str(port)
+    return {"endpoint": parsed.scheme + "://" + host, "bucket": bucket, "region": region}
+
+
+def _directory(path):
+    """Reject links, including existing ancestors, before creating private state."""
+    path = Path(path).absolute()
+    missing = []
+    current = path
+    while not current.exists() and not current.is_symlink():
+        missing.append(current)
+        current = current.parent
+    for ancestor in (current, *current.parents):
+        info = ancestor.lstat()
+        if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+            raise ArchiveQueueError("archive_state_symlink_or_non_directory")
+    for directory in reversed(missing):
+        directory.mkdir(mode=0o700, exist_ok=True)
+        if directory.is_symlink() or not directory.is_dir():
+            raise ArchiveQueueError("archive_state_symlink_or_non_directory")
+    return path
+
+
+def _read(path):
+    path = Path(path)
+    _directory(path.parent)
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    with os.fdopen(descriptor, "rb") as stream:
+        before = os.fstat(stream.fileno())
+        if not stat.S_ISREG(before.st_mode) or before.st_size > MAX_JSON_BYTES:
+            raise ArchiveQueueError("archive_json_not_regular_or_oversized")
+        raw = stream.read(MAX_JSON_BYTES + 1)
+        after = os.fstat(stream.fileno())
+    current = path.lstat()
+    fields = ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns")
+    if len(raw) > MAX_JSON_BYTES or any(getattr(before, k) != getattr(after, k)
+            or getattr(before, k) != getattr(current, k) for k in fields):
+        raise ArchiveQueueError("archive_json_changed")
+    return raw
+
+
+def _sync_directory(path):
+    descriptor = os.open(path, os.O_RDONLY)
+    try:
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _write(path, value):
+    parent = _directory(path.parent)
+    descriptor, temporary = tempfile.mkstemp(prefix=".queue-", dir=parent)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            os.fchmod(stream.fileno(), 0o600)
+            stream.write(_json(value) + b"\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        if path.is_symlink():
+            raise ArchiveQueueError("archive_state_symlink")
+        os.replace(temporary, path)
+        _sync_directory(parent)
+    finally:
+        Path(temporary).unlink(missing_ok=True)
+
+
+def _snapshot_raw(raw):
+    """Extract the producer's exact JSON value; Python and JS numbers differ."""
+    text = raw.decode("utf8")
+    decoder = json.JSONDecoder()
+    position = len(text) - len(text.lstrip())
+    if text[position:position + 1] != "{":
+        raise ArchiveQueueError("archive_event_invalid")
+    position += 1
+    while True:
+        while position < len(text) and text[position].isspace():
+            position += 1
+        key, position = decoder.raw_decode(text, position)
+        while text[position].isspace():
+            position += 1
+        if text[position] != ":":
+            raise ArchiveQueueError("archive_event_invalid")
+        position += 1
+        while text[position].isspace():
+            position += 1
+        start = position
+        _, position = decoder.raw_decode(text, position)
+        if key == "snapshot":
+            return text[start:position]
+        while text[position].isspace():
+            position += 1
+        if text[position] != ",":
+            raise ArchiveQueueError("archive_event_snapshot_missing")
+        position += 1
+
+
+def _native_event(kind, digest, stage_id, snapshot, created_at, **extra):
+    if (kind not in {"native_pg_stage", "legacy_classroom"} or not SHA.fullmatch(str(digest))
+            or not isinstance(stage_id, str) or not ID.fullmatch(stage_id)
+            or not isinstance(snapshot, dict) or not isinstance(snapshot.get("stage"), dict)
+            or snapshot["stage"].get("id") != stage_id or snapshot.get("id", stage_id) != stage_id
+            or not isinstance(snapshot.get("scenes"), list) or not snapshot["scenes"]):
+        raise ArchiveQueueError("archive_event_identity_invalid")
+    return {"sourceKind": kind, "sourceDigest": digest, "stageId": stage_id,
+            "snapshot": snapshot, "createdAt": created_at, **extra}
+
+
+def filesystem_event(path):
+    raw = _read(path)
+    event = json.loads(raw)
+    if event.get("schemaVersion") != "mira.course-archive.event.v1":
+        raise ArchiveQueueError("archive_event_schema_invalid")
+    snapshot_raw = _snapshot_raw(raw)
+    digest = event.get("sourceDigest")
+    if _sha(snapshot_raw.encode()) != digest:
+        raise ArchiveQueueError("archive_event_digest_mismatch")
+    result = _native_event(event.get("sourceKind"), digest, event.get("stageId"),
+        event.get("snapshot"), event.get("createdAt"), sourceRaw=snapshot_raw,
+        origin="filesystem", eventPath=str(Path(path).absolute()), eventRawSha256=_sha(raw))
+    expected = "legacy-" + _sha((result["stageId"] + ":" + digest).encode()) + ".json"
+    if result["sourceKind"] != "legacy_classroom" or Path(path).name != expected:
+        raise ArchiveQueueError("archive_event_filename_invalid")
+    return result
+
+
+def postgres_event(row):
+    event_id = str(row.get("id", ""))
+    revision = str(row.get("stage_revision", ""))
+    if not re.fullmatch(r"[1-9][0-9]*", event_id) or not revision.isdigit():
+        raise ArchiveQueueError("archive_pg_event_invalid")
+    snapshot = row.get("snapshot_json")
+    if isinstance(snapshot, str):
+        snapshot = json.loads(snapshot)
+    binding = {}
+    if row.get("session_id") is not None:
+        if not isinstance(row["session_id"], str) or not ID.fullmatch(row["session_id"]):
+            raise ArchiveQueueError("archive_pg_authoring_binding_invalid")
+        binding["authoringBinding"] = {"sessionId": row["session_id"]}
+    return _native_event(row.get("source_kind"), row.get("source_digest"), row.get("stage_id"),
+        snapshot, row.get("created_at"), origin="postgres", eventId=event_id, revision=revision, **binding)
+
+
+class NodeArchiveClient:
+    """Only archive transport and outbox operations are available to this worker."""
+    def __init__(self, *, project_root, node="node", timeout=3600):
+        self.root, self.node, self.timeout = Path(project_root), node, timeout
+        self.script = self.root / "openmaic-runtime/scripts/course-archive.mjs"
+
+    def _run(self, command, **options):
+        args = [self.node, str(self.script), command]
+        for key, value in options.items():
+            args.extend(["--" + key.replace("_", "-"), str(value)])
+        try:
+            result = subprocess.run(args, cwd=self.root, text=True, capture_output=True,
+                                    timeout=self.timeout if command == "upload" else 45)
+            value = json.loads(result.stdout) if result.returncode == 0 else None
+        except (OSError, subprocess.SubprocessError, ValueError) as error:
+            raise ArchiveQueueError("archive_" + command + "_failed") from error
+        if not isinstance(value, dict):
+            # Provider responses, environment and untrusted stderr never enter logs.
+            raise ArchiveQueueError("archive_" + command + "_failed")
+        return value
+
+    def events(self, *, after_id=0, limit=100):
+        result = self._run("events", after_id=after_id, limit=limit)
+        if not isinstance(result.get("events"), list):
+            raise ArchiveQueueError("archive_events_invalid")
+        return result["events"]
+
+    def saved_stages(self, *, after_stage_id="", limit=100):
+        options = {"limit": limit}
+        if after_stage_id:
+            options["after_stage_id"] = after_stage_id
+        result = self._run("saved-stages", **options)
+        if not isinstance(result.get("stages"), list):
+            raise ArchiveQueueError("archive_saved_stages_invalid")
+        return result["stages"]
+
+    def upload(self, index):
+        return self._run("upload", index=index)
+
+    def acknowledge(self, event_id, digest):
+        if self._run("ack", id=event_id, digest=digest).get("acknowledged") is not True:
+            raise ArchiveQueueError("archive_ack_not_confirmed")
+
+
+class CourseArchiveQueue:
+    def __init__(self, state_root, storage, *, clock=time.time):
+        self.root = _directory(Path(state_root).absolute())
+        self.directory = _directory(self.root / "archive-queue")
+        self.items = _directory(self.directory / "items")
+        self.storage = storage_identity(storage["endpoint"], storage["bucket"], storage.get("region", "us-east-1"))
+        self.clock = clock
+
+    @contextmanager
+    def lock(self):
+        descriptor = os.open(self.directory / "worker.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        try:
+            try:
+                fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as error:
+                raise ArchiveQueueError("archive_worker_already_running") from error
+            yield
+        finally:
+            os.close(descriptor)
+
+    def identity(self, event):
+        return {"sourceKind": event["sourceKind"], "sourceDigest": event["sourceDigest"],
+                **({"courseId": event["course"]["courseId"], "courseVersion": event["course"]["courseVersion"]}
+                   if event.get("course") else {}),
+                **({"archiveSourceRevision": event.get("archiveSourceRevision") or event.get("course", {}).get("archiveSourceRevision")}
+                   if event.get("archiveSourceRevision") or event.get("course", {}).get("archiveSourceRevision") else {}),
+                "storage": self.storage}
+
+    def enqueue(self, event):
+        identity = self.identity(event)
+        if not SHA.fullmatch(identity["sourceDigest"]):
+            raise ArchiveQueueError("archive_source_digest_invalid")
+        key = _sha(_json(identity))
+        path = self.items / (key + ".json")
+        if path.exists() or path.is_symlink():
+            job = json.loads(_read(path))
+            if job.get("schemaVersion") != SCHEMA or job.get("identity") != identity:
+                raise ArchiveQueueError("archive_queue_identity_conflict")
+            if event.get("snapshot") != job["event"].get("snapshot"):
+                raise ArchiveQueueError("archive_queue_snapshot_conflict")
+            if event.get("priority", 0) < job.get("priority", 0):
+                job["priority"] = event.get("priority", 0)
+                self.save(job)
+        else:
+            job = {"schemaVersion": SCHEMA, "key": key, "identity": identity,
+                   "event": event, "status": "pending", "attempts": 0, "nextAttemptAt": 0,
+                   "createdAt": self.clock(), "priority": event.get("priority", 0)}
+            _write(path, job)
+        return job
+
+    def save(self, job):
+        if not SHA.fullmatch(job.get("key", "")) or job["identity"]["storage"] != self.storage:
+            raise ArchiveQueueError("archive_job_identity_invalid")
+        _write(self.items / (job["key"] + ".json"), job)
+
+    def due(self, limit):
+        jobs = []
+        for path in self.items.glob("*.json"):
+            job = json.loads(_read(path))
+            if (job.get("identity", {}).get("storage") != self.storage
+                    or job.get("status") == "complete" and job.get("stagingPruned") is True):
+                continue
+            if job.get("nextAttemptAt", 0) <= self.clock():
+                jobs.append(job)
+        return sorted(jobs, key=lambda j: (j.get("priority", 0), j.get("nextAttemptAt", 0), j["createdAt"], j["key"]))[:limit]
+
+
+class CourseArchiveProcessor:
+    def __init__(self, queue, exporter, client, *, database=None):
+        self.queue, self.exporter, self.client, self.database = queue, exporter, client, database
+
+    def _index(self, job):
+        reference = job["export"]
+        path = Path(reference["indexPath"])
+        if not path.is_absolute() or not path.is_relative_to(self.queue.root / "archives"):
+            raise ArchiveQueueError("archive_index_outside_staging")
+        raw = _read(path)
+        if _sha(raw) != reference["indexSha256"]:
+            raise ArchiveQueueError("archive_frozen_index_changed")
+        index = json.loads(raw)
+        event = job["event"]
+        if (index.get("complete") is not True or index.get("missingSources")
+                or index.get("archiveId") != reference["archiveId"]
+                or not isinstance(index.get("generatedPublicFiles"), list) or not index["generatedPublicFiles"]):
+            raise ArchiveQueueError("archive_export_incomplete")
+        if event.get("course"):
+            course = event["course"]
+            if any(index.get(k) != course[k] for k in ("courseId", "courseVersion")):
+                raise ArchiveQueueError("archive_export_course_mismatch")
+            actual = index.get("sourceDigest") or index.get("releaseSha256")
+            if actual != event["sourceDigest"]:
+                raise ArchiveQueueError("archive_export_digest_mismatch")
+        elif index.get("sourceKind") != event["sourceKind"] or index.get("sourceDigest") != event["sourceDigest"]:
+            raise ArchiveQueueError("archive_export_digest_mismatch")
+        return index
+
+    def _missing_dependencies(self, missing):
+        """Retry a partial capture only when a missing dependency changes.
+
+        A new catalog authority revision is a new job. Safety adapter repairs
+        must also unblock a frozen capture without changing its source digest.
+        Unchanged missing sources and unchanged adapters never re-pack a ZIP.
+        """
+        root = Path(getattr(self.exporter, "root", self.queue.root.parent)).resolve()
+        evidence = []
+        for item in missing:
+            identity = item.get("sourceIdentity") if isinstance(item, dict) else None
+            row = {"missing": item}
+            if isinstance(identity, str) and identity:
+                source = Path(identity)
+                source = source if source.is_absolute() else root / source
+                if source.is_relative_to(root) and ".." not in source.parts:
+                    for path in (source, source.parent):
+                        try:
+                            info = path.lstat()
+                            row[str(path.relative_to(root))] = [info.st_dev, info.st_ino, info.st_size,
+                                info.st_mtime_ns, info.st_ctime_ns, stat.S_ISLNK(info.st_mode)]
+                        except FileNotFoundError:
+                            row[str(path.relative_to(root))] = None
+            evidence.append(row)
+        # A newly migrated remote source also resolves a missing local alias.
+        manifest = self.queue.root / "active-manifest.json"
+        try:
+            info = manifest.lstat()
+            evidence.append({"activeManifest": [info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns]})
+        except FileNotFoundError:
+            pass
+        adapters = []
+        for relative in ADAPTER_SOURCES:
+            path = root / relative
+            try:
+                info = path.lstat()
+                raw = _read(path)
+                adapters.append({"path": relative, "sha256": _sha(raw),
+                    "stat": [info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns]})
+            except FileNotFoundError:
+                adapters.append({"path": relative, "missing": True})
+        evidence.append({"adapters": adapters})
+        return _sha(_json(evidence))
+
+    def _export(self, job):
+        event = job["event"]
+        # Never consume the last free disk space on a repeated incomplete
+        # capture. Retained failed captures need an operator, not a paid retry.
+        space = os.statvfs(self.queue.root)
+        previous = job.get("incompleteExports", [])
+        if previous and previous[-1].get("dependencySignature") == self._missing_dependencies(
+                previous[-1].get("missingSources", [])):
+            raise ArchiveQueueError("archive_missing_dependencies_unchanged")
+        estimate = max((item.get("stagingBytes", 0) for item in previous), default=0)
+        if space.f_bavail * space.f_frsize < max(512 * 1024**2, estimate + 256 * 1024**2):
+            raise ArchiveQueueError("archive_staging_space_unavailable")
+        if event.get("course"):
+            from scripts.course_storage_releases import read_only_connection
+            course = event["course"]
+            with read_only_connection(self.database) as conn:
+                result = self.exporter.export_course(conn, course_id=course["courseId"],
+                    course_version=course["courseVersion"], content_key=course.get("contentKey"),
+                    staging_root=self.queue.root / "archives")
+        elif event["origin"] == "authoring-history":
+            from services.course_archive_history import export_authoring_history
+            result = export_authoring_history(self.exporter, event,
+                staging_root=self.queue.root / "archives")
+        elif (event["origin"] == "legacy-reconcile" and Path(event["legacyPath"]).exists()
+              and _sha(_read(Path(event["legacyPath"]))) == event["sourceDigest"]):
+            result = self.exporter.export_legacy_classroom(event["stageId"],
+                staging_root=self.queue.root / "archives")
+        else:
+            stage = event["snapshot"]["stage"]
+            meta = {"courseId": "native-" + event["stageId"],
+                "courseVersion": "saved-" + event["sourceDigest"],
+                "title": stage.get("name") or stage.get("title") or "已保存课件",
+                "subject": stage.get("subject") or stage.get("subjectCode") or "course",
+                "generatedAt": event["createdAt"], **{k: stage[k] for k in
+                    ("gradeCode", "gradeLabel", "editionLabel", "volumeCode", "volumeLabel") if stage.get(k)}}
+            if event.get("sourceRaw"):
+                meta["sourceRaw"] = event["sourceRaw"]
+            extra = {"authoring_binding": event["authoringBinding"]} if event.get("authoringBinding") else {}
+            result = self.exporter.export_native_snapshot(event["snapshot"],
+                source_kind=event["sourceKind"], source_digest=event["sourceDigest"],
+                staging_root=self.queue.root / "archives", meta=meta, **extra)
+        path = Path(result["indexPath"])
+        if not path.is_absolute() or not path.is_relative_to(self.queue.root / "archives"):
+            raise ArchiveQueueError("archive_index_outside_staging")
+        raw = _read(path)
+        reference = {"indexPath": str(path), "indexSha256": _sha(raw), "archiveId": result["archiveId"]}
+        if result.get("complete") is not True or result.get("missingSources"):
+            # Keep the diagnostic capture, but allow the exact source event to
+            # be retried when its missing media becomes available. Never call
+            # generation/TTS to repair it, or send a partial ZIP to transport.
+            reference["stagingBytes"] = sum(p.stat().st_size for p in path.parent.rglob("*")
+                if p.is_file() and not p.is_symlink())
+            reference["missingSources"] = result.get("missingSources", [])
+            reference["dependencySignature"] = self._missing_dependencies(reference["missingSources"])
+            job.setdefault("incompleteExports", []).append(reference)
+            self.queue.save(job)
+            raise ArchiveQueueError("archive_export_incomplete")
+        job["export"] = reference
+        # A complete export is frozen before any network operation. Upload
+        # and acknowledgement retries must reuse the same index and ZIP.
+        self.queue.save(job)
+
+    def _receipt(self, job, index, returned=None):
+        base = self.queue.root / "archive-transfers" / index["archiveId"]
+        candidates = [base / "verifications" / _sha(_json(self.queue.storage)) /
+            (job["export"]["indexSha256"] + ".json"),
+            base / "verifications" / (job["export"]["indexSha256"] + ".json"),
+            base / "verified-complete.json"]
+        path = Path(job["receiptPath"]) if job.get("receiptPath") else next(
+            (candidate for candidate in candidates if candidate.exists()), candidates[0])
+        if not path.is_relative_to(base):
+            raise ArchiveQueueError("archive_receipt_outside_state")
+        raw = _read(path)
+        receipt = json.loads(raw)
+        expected = {e["relativePath"]: (e["sha256"], e["byteSize"]) for e in index["generatedPublicFiles"]}
+        objects = receipt.get("objects")
+        if (receipt.get("schemaVersion") != "mira.course-archive.verification.v1"
+                or receipt.get("complete") is not True or receipt.get("storage") != self.queue.storage
+                or receipt.get("archiveId") != index["archiveId"]
+                or receipt.get("indexSha256") != job["export"]["indexSha256"]
+                or receipt.get("sourceDigest") != index.get("sourceDigest")
+                or any(receipt.get(k) != index.get(k) for k in ("courseId", "courseVersion"))
+                or not isinstance(objects, list) or len(objects) != len(expected)
+                or len(expected) != len(index["generatedPublicFiles"])
+                or receipt.get("byteSize") != sum(size for _, size in expected.values())
+                or returned is not None and returned != receipt):
+            raise ArchiveQueueError("archive_verification_not_bound")
+        seen = set()
+        for obj in objects:
+            key = obj.get("objectKey")
+            if (key in seen or key not in expected or (obj.get("sha256"), obj.get("byteSize")) != expected[key]
+                    or not isinstance(obj.get("etag"), str) or not obj["etag"]
+                    or "versionId" in obj and (not isinstance(obj["versionId"], str) or not obj["versionId"])):
+                raise ArchiveQueueError("archive_object_verification_incomplete")
+            seen.add(key)
+        if job.get("receiptSha256") and job["receiptSha256"] != _sha(raw):
+            raise ArchiveQueueError("archive_receipt_changed")
+        job["receiptPath"] = str(path)
+        return _sha(raw)
+
+    def _prune_staging(self, job, index):
+        """Discard only this exporter-owned derived tree after upload AND ack."""
+        if job.get("stagingPruned") is True:
+            return
+        stage = Path(job["export"]["indexPath"]).parent
+        if (stage.parent != self.queue.root / "archives"
+                or not re.fullmatch(re.escape(index["archiveId"]) + r"-[a-f0-9]{8}", stage.name)
+                or index.get("stagingDirectory") != str(stage)):
+            raise ArchiveQueueError("archive_cleanup_ownership_invalid")
+        _directory(stage)
+        payload = stage / "课程资料"
+        original_manifest = Path(index.get("manifestPath", ""))
+        if original_manifest != payload / "manifest.json":
+            raise ArchiveQueueError("archive_cleanup_manifest_invalid")
+        retained = stage / "manifest.json"
+        manifest_entry = next((entry for entry in index["generatedPublicFiles"]
+            if entry.get("localPath") == str(original_manifest)), None)
+        if not manifest_entry:
+            raise ArchiveQueueError("archive_cleanup_manifest_not_verified")
+        raw = _read(retained if retained.exists() else original_manifest)
+        if _sha(raw) != manifest_entry["sha256"] or len(raw) != manifest_entry["byteSize"]:
+            raise ArchiveQueueError("archive_cleanup_manifest_changed")
+        if not retained.exists():
+            descriptor = os.open(retained, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+            with os.fdopen(descriptor, "wb") as stream:
+                stream.write(raw)
+                stream.flush()
+                os.fsync(stream.fileno())
+            _sync_directory(stage)
+        zip_path = Path(index.get("zip", {}).get("path", ""))
+        if zip_path.parent != stage or zip_path.suffix != ".zip":
+            raise ArchiveQueueError("archive_cleanup_zip_invalid")
+        allowed = {"index.json", "manifest.json", "课程资料", "asset-sources", zip_path.name}
+        if any(p.name not in allowed for p in stage.iterdir()):
+            raise ArchiveQueueError("archive_cleanup_unexpected_file")
+        removable = ([zip_path] if zip_path.exists() or zip_path.is_symlink() else [])
+        for derived in (payload, stage / "asset-sources"):
+            if derived.exists() or derived.is_symlink():
+                if derived.is_symlink() or not derived.is_dir():
+                    raise ArchiveQueueError("archive_cleanup_symlink")
+                removable.extend(derived.rglob("*"))
+                removable.append(derived)
+        identities = {}
+        for path in removable:
+            _directory(path.parent)
+            info = path.lstat()
+            if stat.S_ISLNK(info.st_mode) or not (stat.S_ISREG(info.st_mode) or stat.S_ISDIR(info.st_mode)):
+                raise ArchiveQueueError("archive_cleanup_symlink_or_special_file")
+            identities[path] = (info.st_dev, info.st_ino, info.st_mode)
+        # Record the recovery manifest location before deleting any derivative.
+        job["retainedManifestPath"] = str(retained)
+        self.queue.save(job)
+        for path in sorted(removable, key=lambda p: len(p.parts), reverse=True):
+            _directory(path.parent)
+            info = path.lstat()
+            if (info.st_dev, info.st_ino, info.st_mode) != identities[path]:
+                raise ArchiveQueueError("archive_cleanup_source_changed")
+            path.rmdir() if stat.S_ISDIR(info.st_mode) else path.unlink()
+        _sync_directory(stage)
+        job["stagingPruned"] = True
+        self.queue.save(job)
+
+    @staticmethod
+    def _cleanup_file(path):
+        """Hash an owned regular file and detect replacement during the read."""
+        _directory(path.parent)
+        if not stat.S_ISREG(path.lstat().st_mode):
+            raise ArchiveQueueError("archive_incomplete_cleanup_special_file")
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        with os.fdopen(descriptor, "rb") as stream:
+            before = os.fstat(stream.fileno())
+            if not stat.S_ISREG(before.st_mode):
+                raise ArchiveQueueError("archive_incomplete_cleanup_special_file")
+            digest, size = hashlib.sha256(), 0
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+                size += len(chunk)
+            after = os.fstat(stream.fileno())
+        current = path.lstat()
+        fields = ("st_dev", "st_ino", "st_mode", "st_size", "st_mtime_ns", "st_ctime_ns")
+        if any(getattr(before, k) != getattr(after, k) or getattr(before, k) != getattr(current, k)
+               for k in fields):
+            raise ArchiveQueueError("archive_incomplete_cleanup_file_changed")
+        return {"sha256": digest.hexdigest(), "byteSize": size,
+                "identity": [getattr(before, k) for k in fields]}
+
+    @staticmethod
+    def _cleanup_manifest_files(manifest):
+        result = {}
+        if not isinstance(manifest.get("files"), list):
+            raise ArchiveQueueError("archive_incomplete_cleanup_manifest_invalid")
+        for entry in manifest["files"]:
+            name = entry.get("archivePath")
+            if (not isinstance(name, str) or not name or "\\" in name or "\x00" in name
+                    or name.startswith("/") or any(p in {"", ".", ".."} for p in name.split("/"))
+                    or name in result or type(entry.get("original")) is not bool
+                    or not isinstance(entry.get("sourceIdentity"), str) or not entry["sourceIdentity"]
+                    or not SHA.fullmatch(str(entry.get("sha256", "")))
+                    or type(entry.get("byteSize")) is not int or entry["byteSize"] < 0):
+                raise ArchiveQueueError("archive_incomplete_cleanup_manifest_invalid")
+            result[name] = entry
+        return result
+
+    def _incomplete_cleanup_plan(self, job, reference, replacement, replacement_manifest):
+        path = Path(reference.get("indexPath", ""))
+        stage = path.parent
+        if (not path.is_absolute() or path.name != "index.json"
+                or stage.parent != self.queue.root / "archives" or path == Path(job["export"]["indexPath"])):
+            raise ArchiveQueueError("archive_incomplete_cleanup_ownership_invalid")
+        raw = _read(path)
+        if _sha(raw) != reference.get("indexSha256"):
+            raise ArchiveQueueError("archive_incomplete_cleanup_index_changed")
+        index = json.loads(raw)
+        if (index.get("archiveId") != reference.get("archiveId")
+                or not re.fullmatch(re.escape(index.get("archiveId", "")) + r"-[a-f0-9]{8}", stage.name)
+                or index.get("stagingDirectory") != str(stage)
+                or index.get("complete") is not False or not index.get("missingSources")
+                or index.get("generatedPublicFiles") != []
+                or index.get("sourceKind") != job["event"]["sourceKind"]
+                or (index.get("sourceDigest") or index.get("releaseSha256")) != job["event"]["sourceDigest"]
+                or any(index.get(k) != replacement.get(k) for k in
+                       ("courseId", "courseVersion", "contentKey", "classroomId", "releaseSha256"))):
+            raise ArchiveQueueError("archive_incomplete_cleanup_source_mismatch")
+        # Another queue identity must not be using this capture, even when an
+        # operator accidentally attached the same index to multiple jobs.
+        for other_path in self.queue.items.glob("*.json"):
+            if other_path.name == job["key"] + ".json":
+                continue
+            other = json.loads(_read(other_path))
+            refs = [other.get("export", {}), *other.get("incompleteExports", [])]
+            if any(item.get("indexPath") == str(path) for item in refs):
+                raise ArchiveQueueError("archive_incomplete_cleanup_other_consumer")
+        payload, retained = stage / "课程资料", stage / "manifest.json"
+        manifest_path = Path(index.get("manifestPath", ""))
+        if manifest_path != payload / "manifest.json":
+            raise ArchiveQueueError("archive_incomplete_cleanup_manifest_invalid")
+        manifest_raw = _read(retained if retained.exists() else manifest_path)
+        manifest = json.loads(manifest_raw)
+        if (manifest.get("schemaVersion") != index.get("schemaVersion")
+                or manifest.get("archiveId") != index["archiveId"] or manifest.get("complete") is not False
+                or any(manifest.get("identity", {}).get(k) != index.get(k) for k in
+                       ("courseId", "courseVersion", "contentKey", "classroomId", "releaseSha256"))):
+            raise ArchiveQueueError("archive_incomplete_cleanup_manifest_invalid")
+        old_files = self._cleanup_manifest_files(manifest)
+        new_files = self._cleanup_manifest_files(replacement_manifest)
+        original = lambda entry: (entry["sourceIdentity"], entry["sha256"], entry["byteSize"])
+        covered = {original(entry) for entry in new_files.values() if entry["original"]}
+        originals = [entry for entry in old_files.values() if entry["original"]]
+        if not originals or any(original(entry) not in covered for entry in originals):
+            raise ArchiveQueueError("archive_incomplete_cleanup_original_not_covered")
+        zip_path = Path(index.get("zip", {}).get("path", ""))
+        if zip_path.parent != stage or zip_path.suffix != ".zip":
+            raise ArchiveQueueError("archive_incomplete_cleanup_zip_invalid")
+        marker = stage / "incomplete-prune.json"
+        binding = {"schemaVersion": "mira.course-archive.incomplete-prune.v1", "jobKey": job["key"],
+            "oldIndexSha256": reference["indexSha256"], "oldManifestSha256": _sha(manifest_raw),
+            "replacementIndexSha256": job["export"]["indexSha256"], "receiptSha256": job["receiptSha256"]}
+        previous = json.loads(_read(marker)) if marker.exists() else None
+        if previous and any(previous.get(k) != v for k, v in binding.items()):
+            raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
+        if not previous:
+            evidence = self._cleanup_file(zip_path)
+            if (evidence["sha256"] != index["zip"].get("sha256")
+                    or evidence["byteSize"] != index["zip"].get("byteSize")):
+                raise ArchiveQueueError("archive_incomplete_cleanup_zip_changed")
+            with zipfile.ZipFile(zip_path) as archive:
+                if (len(archive.namelist()) != len(old_files) + 1
+                        or set(archive.namelist()) != set(old_files) | {"manifest.json"}
+                        or archive.read("manifest.json") != manifest_raw):
+                    raise ArchiveQueueError("archive_incomplete_cleanup_zip_manifest_mismatch")
+        allowed = {"index.json", "manifest.json", "incomplete-prune.json", "课程资料", "asset-sources", zip_path.name}
+        if any(item.name not in allowed for item in stage.iterdir()):
+            raise ArchiveQueueError("archive_incomplete_cleanup_unexpected_file")
+        files, directories = [], []
+        candidates = [zip_path] if zip_path.exists() or zip_path.is_symlink() else []
+        for directory in (payload, stage / "asset-sources"):
+            if directory.exists() or directory.is_symlink():
+                _directory(directory)
+                for parent, children, names in os.walk(directory, followlinks=False):
+                    directories.append(Path(parent))
+                    for child in children:
+                        if (Path(parent) / child).is_symlink():
+                            raise ArchiveQueueError("archive_incomplete_cleanup_symlink")
+                    candidates.extend(Path(parent) / name for name in names)
+        old_bytes = {(entry["sha256"], entry["byteSize"]) for entry in old_files.values() if entry["original"]}
+        old_plan = {item["path"]: item for item in previous.get("files", [])} if previous else {}
+        expected_payload = {payload / name: entry for name, entry in old_files.items()}
+        expected_payload[manifest_path] = {"sha256": _sha(manifest_raw), "byteSize": len(manifest_raw)}
+        expected_directories = {payload, stage / "asset-sources"}
+        for filename in expected_payload:
+            expected_directories.update(p for p in filename.parents if p.is_relative_to(payload))
+        if any(directory not in expected_directories for directory in directories):
+            raise ArchiveQueueError("archive_incomplete_cleanup_unexpected_directory")
+        for filename in candidates:
+            evidence = self._cleanup_file(filename)
+            expected = (index["zip"] if filename == zip_path else expected_payload.get(filename))
+            if expected is None and filename.parent == stage / "asset-sources":
+                if (not re.fullmatch(r"[a-f0-9]{64}\.[A-Za-z0-9]+", filename.name)
+                        or filename.stem != evidence["sha256"]
+                        or (evidence["sha256"], evidence["byteSize"]) not in old_bytes):
+                    raise ArchiveQueueError("archive_incomplete_cleanup_unowned_asset")
+                expected = evidence
+            if expected is None or any(evidence[k] != expected.get(k) for k in ("sha256", "byteSize")):
+                raise ArchiveQueueError("archive_incomplete_cleanup_derivative_changed")
+            relative = filename.relative_to(stage).as_posix()
+            if previous and (relative not in old_plan or any(old_plan[relative].get(k) != evidence[k]
+                                                             for k in ("sha256", "byteSize"))):
+                raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
+            files.append({"path": relative, **evidence})
+        return {**binding, "originalFilesCovered": len(originals), "files": files,
+                "directories": [str(p.relative_to(stage)) for p in directories],
+                "bytes": sum(item["byteSize"] for item in files), "stage": str(stage),
+                "manifestRaw": manifest_raw}
+
+    def prune_incomplete_captures(self, job_key, *, dry_run=True):
+        """Explicit, locked cleanup of superseded captures; never dispatch work.
+
+        The worker does not call this method. A completed replacement, exact
+        durable receipt and original-file coverage are required on every run.
+        Index, manifest and cleanup diagnostics remain recoverable in place.
+        """
+        if not isinstance(job_key, str) or not SHA.fullmatch(job_key) or type(dry_run) is not bool:
+            raise ArchiveQueueError("archive_incomplete_cleanup_job_invalid")
+        with self.queue.lock():
+            job = json.loads(_read(self.queue.items / (job_key + ".json")))
+            if (job.get("schemaVersion") != SCHEMA or job.get("key") != job_key
+                    or job.get("identity") != self.queue.identity(job["event"])
+                    or _sha(_json(job["identity"])) != job_key or job.get("status") != "complete"
+                    or "completedAt" not in job or job.get("stagingPruned") is not True
+                    or not SHA.fullmatch(str(job.get("receiptSha256", "")))):
+                raise ArchiveQueueError("archive_incomplete_cleanup_replacement_not_complete")
+            replacement = self._index(job)
+            if self._receipt(job, replacement) != job["receiptSha256"]:
+                raise ArchiveQueueError("archive_incomplete_cleanup_receipt_changed")
+            manifest_path = Path(job.get("retainedManifestPath", ""))
+            if manifest_path != Path(job["export"]["indexPath"]).parent / "manifest.json":
+                raise ArchiveQueueError("archive_incomplete_cleanup_replacement_manifest_invalid")
+            manifest_raw = _read(manifest_path)
+            public = next((entry for entry in replacement["generatedPublicFiles"]
+                           if entry.get("localPath") == replacement.get("manifestPath")), None)
+            manifest = json.loads(manifest_raw)
+            if (not public or _sha(manifest_raw) != public["sha256"] or len(manifest_raw) != public["byteSize"]
+                    or manifest.get("complete") is not True or manifest.get("missingSources")
+                    or manifest.get("archiveId") != replacement["archiveId"]
+                    or any(manifest.get("identity", {}).get(k) != replacement.get(k) for k in
+                           ("courseId", "courseVersion", "contentKey", "classroomId", "releaseSha256"))):
+                raise ArchiveQueueError("archive_incomplete_cleanup_replacement_manifest_changed")
+            result = {"dryRun": dry_run, "jobKey": job_key, "eligibleCaptures": 0,
+                      "removedBytes": 0, "eligibleBytes": 0, "captures": []}
+            for reference in job.get("incompleteExports", []):
+                try:
+                    plan = self._incomplete_cleanup_plan(job, reference, replacement, manifest)
+                    row = {"indexPath": reference["indexPath"], "eligible": True, "bytes": plan["bytes"]}
+                    if not dry_run:
+                        stage = Path(plan["stage"])
+                        if not (stage / "manifest.json").exists():
+                            descriptor = os.open(stage / "manifest.json", os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+                            with os.fdopen(descriptor, "wb") as stream:
+                                stream.write(plan["manifestRaw"])
+                                stream.flush()
+                                os.fsync(stream.fileno())
+                        stored = {k: v for k, v in plan.items() if k != "manifestRaw"}
+                        marker = stage / "incomplete-prune.json"
+                        # A previous interrupted plan covers files now absent.
+                        if not marker.exists():
+                            _write(marker, stored)
+                        _sync_directory(stage)
+                        for entry in plan["files"]:
+                            filename = stage / entry["path"]
+                            info = filename.lstat()
+                            fields = ("st_dev", "st_ino", "st_mode", "st_size", "st_mtime_ns", "st_ctime_ns")
+                            if [getattr(info, k) for k in fields] != entry["identity"]:
+                                raise ArchiveQueueError("archive_incomplete_cleanup_file_changed")
+                            filename.unlink()
+                        for name in sorted(plan["directories"], key=lambda value: len(Path(value).parts), reverse=True):
+                            directory = stage / name
+                            _directory(directory)
+                            directory.rmdir()
+                        _sync_directory(stage)
+                        reference.update(stagingPruned=True, retainedManifestPath=str(stage / "manifest.json"),
+                            pruneReceiptPath=str(marker), prunedAt=self.queue.clock())
+                        self.queue.save(job)
+                        result["removedBytes"] += plan["bytes"]
+                    result["eligibleCaptures"] += 1
+                    result["eligibleBytes"] += plan["bytes"]
+                    result["captures"].append(row)
+                except (ArchiveQueueError, OSError, ValueError, zipfile.BadZipFile) as error:
+                    result["captures"].append({"indexPath": reference.get("indexPath"), "eligible": False,
+                                                "reason": _safe_error_code(error)})
+            return result
+
+    def _acknowledge(self, event):
+        if event["origin"] == "postgres":
+            self.client.acknowledge(event["eventId"], event["sourceDigest"])
+        elif event["origin"] == "filesystem":
+            path = Path(event["eventPath"])
+            if path.parent != self.queue.root / "archive-events":
+                raise ArchiveQueueError("archive_event_outside_outbox")
+            if not path.exists():
+                return  # A previous acknowledged move is safe to replay.
+            raw = _read(path)
+            if _sha(raw) != event["eventRawSha256"]:
+                raise ArchiveQueueError("archive_event_changed_before_ack")
+            processed = _directory(path.parent / "processed")
+            target = processed / (path.stem + "-" + _sha(raw) + ".json")
+            try:
+                os.link(path, target, follow_symlinks=False)
+            except FileExistsError:
+                pass
+            if _read(target) != raw or _read(path) != raw:
+                raise ArchiveQueueError("archive_processed_event_conflict")
+            path.unlink()
+            _sync_directory(processed)
+            _sync_directory(path.parent)
+
+    def process(self, job, *, event=None):
+        try:
+            if "export" not in job:
+                self._export(job)
+            index = self._index(job)
+            if job.get("receiptSha256"):
+                self._receipt(job, index)
+            else:
+                returned = self.client.upload(job["export"]["indexPath"])
+                job["receiptSha256"] = self._receipt(job, index, returned)
+                job["status"] = "uploaded"
+                self.queue.save(job)
+            self._acknowledge(event or job["event"])
+            job.update(status="complete", completedAt=self.queue.clock(), nextAttemptAt=0, lastError=None)
+            self.queue.save(job)
+            self._prune_staging(job, index)
+            return True
+        except Exception as error:
+            # Only known, strictly formatted error codes are safe to persist;
+            # filesystem/provider messages may contain private source data.
+            attempts = job.get("attempts", 0) + 1
+            job.update(status="failed", attempts=attempts, lastError=type(error).__name__,
+                lastErrorCode=_safe_error_code(error),
+                nextAttemptAt=self.queue.clock() + min(3600, 15 * 2 ** min(attempts - 1, 8)))
+            self.queue.save(job)
+            return False
+
+    def adopt_verified(self, event, index_path):
+        """Import an operator's exact verified index; never re-export or upload."""
+        job = self.queue.enqueue(event)
+        path = Path(index_path).absolute()
+        if not path.is_relative_to(self.queue.root / "archives"):
+            raise ArchiveQueueError("archive_index_outside_staging")
+        raw = _read(path)
+        value = json.loads(raw)
+        job["export"] = {"indexPath": str(path), "indexSha256": _sha(raw), "archiveId": value["archiveId"]}
+        index = self._index(job)
+        job["receiptSha256"] = self._receipt(job, index)
+        job["status"] = "uploaded"
+        self.queue.save(job)
+        return self.process(job)
+
+
+class CourseArchiveWorker:
+    def __init__(self, queue, processor, *, database=None, scan_catalog=True):
+        self.queue, self.processor, self.database = queue, processor, database
+        self.scan_catalog = scan_catalog
+
+    def seed_native_snapshot(self, snapshot, *, source_kind, source_digest, created_at,
+                             revision="0", source_raw=None):
+        if source_kind not in {"native_pg_stage", "legacy_classroom", "native_legacy_file"}:
+            raise ArchiveQueueError("archive_source_kind_invalid")
+        stage_id = snapshot.get("stage", {}).get("id")
+        event = _native_event("native_pg_stage" if source_kind == "native_pg_stage" else "legacy_classroom",
+            source_digest, stage_id, snapshot, created_at, origin="reconcile", priority=2, revision=str(revision))
+        event["sourceKind"] = source_kind
+        if source_raw is not None:
+            if _sha(source_raw.encode()) != source_digest or json.loads(source_raw) != snapshot:
+                raise ArchiveQueueError("archive_seed_digest_mismatch")
+            event["sourceRaw"] = source_raw
+        return self.queue.enqueue(event)
+
+    def _reconcile_legacy(self, *, limit=100):
+        native = getattr(self.processor.exporter, "native_root", None)
+        if native is None:
+            return 0
+        directory = Path(native) / "data/classrooms"
+        if not directory.exists():
+            return 0
+        _directory(directory)
+        cache_path = self.queue.directory / "legacy-cursor.json"
+        cache = json.loads(_read(cache_path)) if cache_path.exists() else {"after": "", "files": {}}
+        candidates = []
+        for path in directory.iterdir():
+            if path.suffix == ".json" and ID.fullmatch(path.stem):
+                candidates.append((path.name, path, path.stem))
+            elif path.name.startswith("omclass_") and ID.fullmatch(path.name) and not path.is_symlink():
+                artifact = path / "artifact/classroom.json"
+                if artifact.exists():
+                    candidates.append((path.name + "/artifact/classroom.json", artifact, path.name))
+        selected = [row for row in sorted(candidates) if row[0] > cache.get("after", "")][:limit]
+        discovered = 0
+        for name, path, stage_id in selected:
+            info = path.lstat()
+            fingerprint = [info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns,
+                           _sha(_json(self.queue.storage))]
+            revision = []
+            for folder in (directory / stage_id, directory / stage_id / "audio", directory / stage_id / "media"):
+                try:
+                    entry = folder.lstat()
+                    revision.append([entry.st_ino, entry.st_size, entry.st_mtime_ns, entry.st_ctime_ns])
+                except FileNotFoundError:
+                    revision.append(None)
+            fingerprint.append(revision)
+            if cache["files"].get(name) == fingerprint:
+                continue
+            raw = _read(path)
+            snapshot = json.loads(raw)
+            if not isinstance(snapshot, dict) or not isinstance(snapshot.get("stage"), dict) or not snapshot.get("scenes"):
+                # An empty saved shell is not a completed course.
+                cache["files"][name] = fingerprint
+                continue
+            event = _native_event("legacy_classroom", _sha(raw), stage_id, snapshot,
+                datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat(),
+                origin="legacy-reconcile", sourceRaw=raw.decode(), legacyPath=str(path), priority=2,
+                archiveSourceRevision=_sha(_json(revision)))
+            event["sourceKind"] = "native_legacy_file"
+            self.queue.enqueue(event)
+            cache["files"][name] = fingerprint
+            discovered += 1
+        cache["after"] = selected[-1][0] if selected else ""
+        _write(cache_path, cache)
+        return discovered
+
+    def _reconcile_postgres(self):
+        if not hasattr(self.processor.client, "saved_stages"):
+            return 0
+        path = self.queue.directory / "stages-cursor.json"
+        cursor = json.loads(_read(path)).get("after", "") if path.exists() else ""
+        rows = self.processor.client.saved_stages(after_stage_id=cursor, limit=100)
+        for row in rows:
+            self.seed_native_snapshot(row["snapshot_json"], source_kind="native_pg_stage",
+                source_digest=row["source_digest"], revision=row["stage_revision"], created_at=row["created_at"])
+        _write(path, {"after": rows[-1]["stage_id"] if rows else ""})
+        return len(rows)
+
+    def run_once(self, *, limit=10, stop_requested=lambda: False):
+        if type(limit) is not int or not 1 <= limit <= 1000:
+            raise ArchiveQueueError("archive_limit_invalid")
+        summary = {"discovered": 0, "completed": 0, "failed": 0, "discoveryErrors": 0}
+        deliveries = {}
+        events_root = _directory(self.queue.root / "archive-events")
+        for path in sorted(events_root.glob("*.json")):
+            try:
+                event = filesystem_event(path)
+                job = self.queue.enqueue(event)
+                deliveries.setdefault(job["key"], []).append(event)
+                summary["discovered"] += 1
+            except Exception:
+                summary["discoveryErrors"] += 1
+        cursor_path = self.queue.directory / "postgres-cursor.json"
+        cursor = json.loads(_read(cursor_path)).get("afterId", 0) if cursor_path.exists() else 0
+        try:
+            rows = self.processor.client.events(after_id=cursor, limit=100)
+            for row in rows:
+                try:
+                    event = postgres_event(row)
+                    job = self.queue.enqueue(event)
+                    deliveries.setdefault(job["key"], []).append(event)
+                    summary["discovered"] += 1
+                except Exception:
+                    summary["discoveryErrors"] += 1
+            _write(cursor_path, {"afterId": int(rows[-1]["id"]) if rows else 0})
+        except Exception:
+            summary["discoveryErrors"] += 1
+        if self.scan_catalog and self.database is not None:
+            try:
+                from scripts.course_storage_releases import read_only_connection
+                with read_only_connection(self.database) as conn:
+                    courses = self.processor.exporter.list_courses(conn, include_saved=True)
+                for course in courses:
+                    try:
+                        digest = course.get("sourceDigest") or course.get("releaseSha256")
+                        if not isinstance(digest, str) or not SHA.fullmatch(digest):
+                            raise ArchiveQueueError("archive_catalog_digest_missing")
+                        event = {"origin": "catalog", "sourceKind": course["sourceKind"],
+                            "sourceDigest": digest, "course": course,
+                            "createdAt": datetime.now(timezone.utc).isoformat(), "priority": 1}
+                        self.queue.enqueue(event)
+                        summary["discovered"] += 1
+                    except Exception:
+                        summary["discoveryErrors"] += 1
+            except Exception:
+                summary["discoveryErrors"] += 1
+        for reconcile in (self._reconcile_legacy, self._reconcile_postgres):
+            try:
+                summary["discovered"] += reconcile()
+            except Exception:
+                summary["discoveryErrors"] += 1
+        ready = self.queue.due(limit)
+        # Completed content can have another producer event. Acknowledge it
+        # against its durable verification without exporting/uploading again.
+        for key, events in deliveries.items():
+            if len(ready) >= limit:
+                break
+            job = json.loads(_read(self.queue.items / (key + ".json")))
+            if job["status"] == "complete":
+                ready.append(job)
+        for job in ready:
+            if stop_requested():
+                break
+            if self.processor.process(job):
+                summary["completed"] += 1
+                for event in deliveries.get(job["key"], []):
+                    if event != job["event"]:
+                        if not self.processor.process(job, event=event):
+                            summary["failed"] += 1
+            else:
+                summary["failed"] += 1
+        return summary

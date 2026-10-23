@@ -147,6 +147,34 @@ class CourseMediaObjectStoreTest(unittest.TestCase):
                     store.read(self.source)
         self.opener.open.assert_not_called()
 
+    def test_subject_edition_grade_date_course_layout_requires_explicit_flag_and_matching_date(self):
+        key = "语文/统编版-上册/一年级/2026-10-23/金木水火土/金木水火土-音频-001.wav"
+        self.entry["objectKey"] = key
+        store = CourseMediaObjectStore(config=replace(self.config, prefix="2026-10-23"), project_root=self.root)
+        def write(layout="subject-edition-grade-date-course-v1"):
+            self.manifest_path.write_text(json.dumps({"schemaVersion": "mira.course-storage.manifest.v2",
+                "snapshotId": "subject", "keyLayout": layout, "files": [self.entry]}))
+        write()
+        self.assertEqual(store.read(self.source), self.data)
+        for invalid in [key.replace("2026-10-23", "2026-10-22"), key.replace("/一年级/", "/../"), key + "/x"]:
+            self.entry["objectKey"] = invalid
+            write()
+            with self.assertRaises(CourseMediaStorageError):
+                store.read(self.source)
+        self.entry["objectKey"] = key
+        for layout in [None, "unknown-layout"]:
+            write(layout)
+            with self.assertRaises(CourseMediaStorageError):
+                store.read(self.source)
+
+    def test_archive_configuration_is_explicit_and_validates_storage_even_for_local_delivery(self):
+        self.assertFalse(CourseStorageConfig.from_env({}).archive_enabled)
+        for flag in ["yes", "mistyped"]:
+            with self.assertRaises(ValueError):
+                CourseStorageConfig.from_env({"COURSE_STORAGE_ARCHIVE_ENABLED": flag})
+        with self.assertRaises(ValueError):
+            CourseStorageConfig.from_env({"COURSE_STORAGE_ARCHIVE_ENABLED": "1"})
+
     def test_v1_does_not_accept_named_keys_and_v2_keeps_distinct_keys_for_equal_hashes(self):
         self.entry["objectKey"] = "2026-10-23/语文/课件一/课件一-老师讲解-001.wav"
         self._manifest()

@@ -72,21 +72,26 @@ COURSE_STORAGE_ACCESS_KEY='$(exit 99)'
 COURSE_STORAGE_SECRET_KEY=fixture-course-secret
 COURSE_STORAGE_MANIFEST_PATH=/private/course-storage/active-manifest.json
 COURSE_STORAGE_MODE=manifest
+COURSE_STORAGE_ARCHIVE_ENABLED=true
 AWS_SECRET_ACCESS_KEY=must-not-forward
 UNRELATED_VALUE=must-not-forward
 EOF
   MIRA_BACKEND_ENV_FILE="${TMP_ROOT}/course-storage.env"
   COURSE_STORAGE_SECRET_KEY=inherited-wrong-owner
   load_course_storage_env
-  [[ "${#OPENMAIC_COURSE_STORAGE_ENV[@]}" == 8 ]] || fail 'Course storage allowlist changed'
+  [[ "${#OPENMAIC_COURSE_STORAGE_ENV[@]}" == 9 ]] || fail 'Course storage allowlist changed'
   env -i "${OPENMAIC_COURSE_STORAGE_ENV[@]}" "$(command -v node)" -e '
     const assert = require("node:assert/strict");
     assert.equal(process.env.COURSE_STORAGE_MODE, "manifest");
+    assert.equal(process.env.COURSE_STORAGE_ARCHIVE_ENABLED, "true");
     assert.equal(process.env.COURSE_STORAGE_SECRET_KEY, "fixture-course-secret");
     assert.equal(process.env.COURSE_STORAGE_ACCESS_KEY, "$(exit 99)");
     assert.equal(process.env.AWS_SECRET_ACCESS_KEY, undefined);
     assert.equal(process.env.UNRELATED_VALUE, undefined);
   '
+  MIRA_BACKEND_ENV_FILE="${TMP_ROOT}/backend.env"
+  load_course_storage_env
+  [[ " ${OPENMAIC_COURSE_STORAGE_ENV[*]} " == *" COURSE_STORAGE_ARCHIVE_ENABLED=false "* ]] || fail 'Archive must default off'
 )
 
 # Dependency checks run before credentials, process ownership or launch work.

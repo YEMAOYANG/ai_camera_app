@@ -218,8 +218,9 @@ load_course_storage_env() {
   env_file="${MIRA_BACKEND_ENV_FILE:-${REPO_ROOT}/backend/.env}"
   for key in COURSE_STORAGE_ENDPOINT COURSE_STORAGE_BUCKET COURSE_STORAGE_PREFIX \
     COURSE_STORAGE_REGION COURSE_STORAGE_ACCESS_KEY COURSE_STORAGE_SECRET_KEY \
-    COURSE_STORAGE_MANIFEST_PATH COURSE_STORAGE_MODE; do
+    COURSE_STORAGE_MANIFEST_PATH COURSE_STORAGE_MODE COURSE_STORAGE_ARCHIVE_ENABLED; do
     value="$(read_env_value "${key}" "${env_file}" || true)"
+    if [[ "${key}" == COURSE_STORAGE_ARCHIVE_ENABLED && -z "${value}" ]]; then value=false; fi
     OPENMAIC_COURSE_STORAGE_ENV+=("${key}=${value}")
   done
 }

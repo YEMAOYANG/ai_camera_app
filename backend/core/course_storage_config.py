@@ -23,6 +23,7 @@ class CourseStorageConfig:
     access_key: str = field(default="", repr=False)
     secret_key: str = field(default="", repr=False)
     manifest_path: str = ""
+    archive_enabled: bool = False
 
     @classmethod
     def from_env(cls, environment: Mapping[str, str] | None = None) -> CourseStorageConfig:
@@ -34,6 +35,9 @@ class CourseStorageConfig:
         mode = value("MODE", "local") or "local"
         if mode not in {"local", "manifest", "remote"}:
             raise ValueError("Invalid course storage mode")
+        archive_enabled = value("ARCHIVE_ENABLED", "0").lower()
+        if archive_enabled not in {"0", "1", "false", "true"}:
+            raise ValueError("Invalid course archive flag")
         config = cls(
             mode=cast(Literal["local", "manifest", "remote"], mode),
             endpoint=value("ENDPOINT"), bucket=value("BUCKET"),
@@ -41,8 +45,9 @@ class CourseStorageConfig:
             region=value("REGION", "us-east-1") or "us-east-1",
             access_key=value("ACCESS_KEY"), secret_key=value("SECRET_KEY"),
             manifest_path=value("MANIFEST_PATH"),
+            archive_enabled=archive_enabled in {"1", "true"},
         )
-        if config.mode == "local":
+        if config.mode == "local" and not config.archive_enabled:
             return config
         try:
             endpoint = urlsplit(config.endpoint)
