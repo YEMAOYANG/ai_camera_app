@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
 import { Readable } from 'node:stream';
-import { allowedSource, safePath, ROOT, run, storageIdentity } from './course-storage.mjs';
+import { allowedSource, safePath, ROOT, run, storageIdentity, validNamedKey, displayName } from './course-storage.mjs';
 
 const sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 const classroom='tbpub_b8818f097ddcce4fe6bbd43b';
@@ -53,7 +53,7 @@ async function fixture(t,{backend=false}={}){
   const config={endpoint:'https://media.example.test',bucket:'study',prefix:'mira-courseware/v1',region:'us-east-1'};
   const state=path.join(root,'state');const manifest=path.join(root,'manifest.json');const releaseIndex=path.join(root,'releases.json');
   const media=backend ? {path:'/mira/runtime-audio/formal_narration_fixture',sourcePath:relative,sha256:checksum,byteSize:bytes.length,mimeType:'audio/wav'} : {path:'/api/classroom-media/'+classroom+'/audio/'+checksum+'.mp3',sha256:checksum,byteSize:bytes.length,mimeType:'audio/mpeg'};
-  await fs.writeFile(releaseIndex,JSON.stringify({schemaVersion:'mira.course-storage.releases.v1',releases:[{classroomId:backend?'stage-test_1':classroom,contentKey:backend?null:'b'.repeat(64),releaseSha256:'a'.repeat(64),media:[media]}]}));
+  await fs.writeFile(releaseIndex,JSON.stringify({schemaVersion:'mira.course-storage.releases.v1',ok:true,allPublishedCourseMediaCovered:true,releases:[{classroomId:backend?'stage-test_1':classroom,courseId:'course-test',courseVersion:'1',title:'金木水火土',subjectName:'语文',gradeLabel:'一年级',volumeLabel:'上册',contentKey:backend?null:'b'.repeat(64),releaseSha256:'a'.repeat(64),media:[media]}]}));
   const client=new MemoryS3(config.prefix+'/blobs/sha256/'+checksum,bytes);client.expectedSha=checksum;
   const dependencies={root,state,config,client};await run({command:'inventory',manifest,'release-index':releaseIndex,snapshot:'fixture'},dependencies);
   const dir=path.join(state,'transfers/fixture');const fx={root,bytes,checksum,relative,source,config,state,manifest,releaseIndex,client,dependencies,dir};
@@ -150,4 +150,142 @@ test('verification resumes only unchanged objects from the same storage identity
   const config={...f.config,endpoint:'https://different-storage.example.test'};
   await run({command:'verify',manifest:f.manifest,resume:true},{...f.dependencies,config});
   assert.equal(gets(),2);
+});
+
+class NamedBucket {
+  constructor(f){this.key=f.client.key;this.etag=f.client.etag;this.objects=new Map([[f.client.key,{bytes:f.bytes,etag:f.client.etag,versionId:f.client.versionId}]]);this.calls=[];}
+  async send(command){
+    const kind=command.constructor.name,input=command.input;this.calls.push({kind,input});const object=this.objects.get(input.Key);
+    if(kind==='HeadObjectCommand'){
+      if(!object)throw Object.assign(Error('NotFound'),{$metadata:{httpStatusCode:404}});
+      return {ContentLength:object.bytes.length,ETag:object.etag,VersionId:object.versionId};
+    }
+    if(kind==='GetObjectCommand'){
+      if(!object)throw Error('NoSuchKey');
+      if((input.IfMatch && input.IfMatch!==object.etag) || (input.VersionId && input.VersionId!==object.versionId))throw Error('PreconditionFailed');
+      return {Body:Readable.from([object.bytes]),ETag:object.etag,VersionId:object.versionId};
+    }
+    if(kind==='PutObjectCommand'){
+      assert.equal(input.IfNoneMatch,'*');if(object)throw Error('PreconditionFailed');
+      const bytes=Buffer.from(input.Body);assert.equal(sha(bytes),input.Metadata.sha256);
+      this.objects.set(input.Key,{bytes,etag:'"named-'+this.objects.size+'"'});return {ETag:this.objects.get(input.Key).etag};
+    }
+    if(kind==='DeleteObjectCommand'){
+      if(object && input.IfMatch!==object.etag)throw Error('PreconditionFailed');
+      this.objects.delete(input.Key);return {};
+    }
+    throw Error('Unexpected request '+kind);
+  }
+}
+
+async function namedFixture(t){
+  const f=await fixture(t);const index=JSON.parse(await fs.readFile(f.releaseIndex));
+  const second=structuredClone(index.releases[0]);second.classroomId='tbpub_'+'c'.repeat(24);second.courseId='course-test-2';
+  second.media[0].path=second.media[0].path.replace(classroom,second.classroomId);index.releases.push(second);
+  await fs.writeFile(f.releaseIndex,JSON.stringify(index));
+  const secondRelative=f.relative.replace(classroom,second.classroomId);const secondSource=path.join(f.root,secondRelative);
+  await fs.mkdir(path.dirname(secondSource),{recursive:true});await fs.writeFile(secondSource,f.bytes);
+  await run({command:'inventory',manifest:f.manifest,'release-index':f.releaseIndex,snapshot:'fixture'},f.dependencies);await f.verify();
+  // Existing verified remote objects remain usable after local copy pruning.
+  await fs.unlink(f.source);await fs.unlink(secondSource);
+  const config={...f.config,prefix:'2026-10-23'},client=new NamedBucket(f),dependencies={...f.dependencies,config,client};
+  const manifest=path.join(f.root,'named-manifest.json');
+  const sourceOptions={'source-manifest':f.manifest,'source-prefix':f.config.prefix};
+  await run({command:'layout',manifest,'release-index':f.releaseIndex,date:config.prefix,snapshot:'named',...sourceOptions},dependencies);
+  return {...f,config,client,dependencies,namedManifest:manifest,sourceOptions};
+}
+
+test('readable names reject unsafe layout keys and normalize titles',()=>{
+  const key='2026-10-23/语文/一年级上册-金木水火土/金木水火土-音频-001.mp3';
+  assert.equal(validNamedKey(key,'2026-10-23','audio/mpeg'),true);
+  for(const bad of [key.replace('语文/','../'),key+'/x',key.replace('语文/',' /'),key.replace('语文/','语\\文/'),key.replace('.mp3','.json'),key.replace('语文/','语\u0085文/')])assert.equal(validNamedKey(bad,'2026-10-23','audio/mpeg'),false,bad);
+  assert.equal(displayName(' ../金木:水火土? '),'金木-水火土');
+});
+
+test('named layout freezes readable collision-free keys without local sources',async t=>{
+  const f=await namedFixture(t),m=JSON.parse(await fs.readFile(f.namedManifest));
+  assert.equal(m.schemaVersion,'mira.course-storage.manifest.v2');assert.equal(m.files.length,2);
+  assert.equal(new Set(m.files.map(e=>e.objectKey)).size,2);assert.equal(new Set(m.files.map(e=>e.sha256)).size,1);
+  assert(m.files.every(e=>e.objectKey.startsWith('2026-10-23/语文/一年级-上册-金木水火土')));
+  assert(m.files.every(e=>!e.objectKey.includes(e.sha256)));assert(m.files[1].objectKey.includes('版本2'));
+  await assert.rejects(run({command:'layout',manifest:f.namedManifest,'release-index':f.releaseIndex,date:f.config.prefix,...f.sourceOptions},f.dependencies),/overwrite/);
+});
+
+test('named relocation and verification cover every key even when SHA is shared',async t=>{
+  const f=await namedFixture(t);await run({command:'relocate',manifest:f.namedManifest,...f.sourceOptions},f.dependencies);
+  const m=JSON.parse(await fs.readFile(f.namedManifest));
+  assert.equal(f.client.calls.filter(c=>c.kind==='PutObjectCommand').length,2);
+  await run({command:'verify',manifest:f.namedManifest},f.dependencies);
+  const v=JSON.parse(await fs.readFile(path.join(f.state,'transfers/named/verified-complete.json')));
+  assert.equal(v.schemaVersion,'mira.course-storage.verification.v3');assert.equal(v.objects,2);
+  assert.deepEqual(Object.keys(v.blobs).sort(),m.files.map(e=>e.objectKey).sort());
+  const gets=f.client.calls.filter(c=>c.kind==='GetObjectCommand').length;
+  await run({command:'verify',manifest:f.namedManifest,resume:true},f.dependencies);
+  assert.equal(f.client.calls.filter(c=>c.kind==='GetObjectCommand').length,gets);
+  const destination=path.join(f.root,'restored-named');await run({command:'restore',manifest:f.namedManifest,path:base,destination},f.dependencies);
+  for(const e of m.files)assert.deepEqual(await fs.readFile(path.join(destination,e.path)),f.bytes);
+  f.client.objects.get(m.files[1].objectKey).bytes=Buffer.alloc(f.bytes.length,85);
+  await assert.rejects(run({command:'verify',manifest:f.namedManifest},f.dependencies),/checksum/);
+});
+
+test('named relocation refuses corrupt existing targets without overwriting them',async t=>{
+  const f=await namedFixture(t);const m=JSON.parse(await fs.readFile(f.namedManifest));
+  const bytes=Buffer.from('retain unknown existing object');f.client.objects.set(m.files[0].objectKey,{bytes,etag:'"unknown"'});
+  await assert.rejects(run({command:'relocate',manifest:f.namedManifest,...f.sourceOptions},f.dependencies),/checksum/);
+  assert.deepEqual(f.client.objects.get(m.files[0].objectKey).bytes,bytes);
+});
+
+test('old objects retire only after complete active named-layout acceptance',async t=>{
+  const f=await namedFixture(t);await run({command:'relocate',manifest:f.namedManifest,...f.sourceOptions},f.dependencies);
+  await run({command:'verify',manifest:f.namedManifest},f.dependencies);
+  const m=JSON.parse(await fs.readFile(f.namedManifest));const verified=await fs.readFile(path.join(f.state,'transfers/named/verified-complete.json'));
+  const acceptance=path.join(f.root,'retire-acceptance.json'),record={manifestSha256:sha(await fs.readFile(f.namedManifest)),verificationSha256:sha(verified),storage:storageIdentity(f.config),remoteReadPassed:true,restorePassed:true,studentPlaybackPassed:true,oldSourceConsumersDetached:true,retireSourceManifestSha256:m.sourceManifestSha256};
+  const retire=()=>run({command:'retire-source',manifest:f.namedManifest,acceptance,...f.sourceOptions},f.dependencies);
+  await fs.writeFile(acceptance,JSON.stringify(record));await assert.rejects(retire(),/ENOENT/);
+  await run({command:'activate',manifest:f.namedManifest},f.dependencies);
+  await fs.writeFile(acceptance,JSON.stringify({...record,oldSourceConsumersDetached:false}));await assert.rejects(retire(),/acceptance/);
+  await fs.writeFile(acceptance,JSON.stringify(record));
+  f.client.objects.set('unlisted/private.json',{bytes:Buffer.from('keep'),etag:'"private"'});
+  const target=f.client.objects.get(m.files[0].objectKey),bytes=target.bytes;target.bytes=Buffer.alloc(bytes.length,90);
+  await assert.rejects(retire(),/checksum/);assert(f.client.objects.has(f.client.key));
+  target.bytes=bytes;await retire();assert(!f.client.objects.has(f.client.key));
+  assert(f.client.objects.has('unlisted/private.json'));for(const e of m.files)assert(f.client.objects.has(e.objectKey));
+  const deletes=f.client.calls.filter(c=>c.kind==='DeleteObjectCommand');assert.equal(deletes.length,1);assert.equal(deletes[0].input.IfMatch,f.client.etag);
+  await retire();assert.equal(f.client.calls.filter(c=>c.kind==='DeleteObjectCommand').length,1);
+});
+
+test('local pruning refuses unexplained missing files',async t=>{
+  const f=await fixture(t);await f.verify();await fs.unlink(f.source);
+  await assert.rejects(f.prune(),/no matching pruning receipt/);
+});
+
+test('parallel pruning stops further deletions on a changed source',async t=>{
+  const f=await fixture(t),index=JSON.parse(await fs.readFile(f.releaseIndex));
+  const relatives=[];
+  for(let i=0;i<8;i++){
+    const relative=path.dirname(f.relative)+'/extra-'+i+'.mp3';relatives.push(relative);
+    await fs.writeFile(path.join(f.root,relative),f.bytes);
+    index.releases[0].media.push({...index.releases[0].media[0],path:'/api/classroom-media/'+classroom+'/audio/extra-'+i+'.mp3'});
+  }
+  await fs.writeFile(f.releaseIndex,JSON.stringify(index));
+  await run({command:'inventory',manifest:f.manifest,'release-index':f.releaseIndex,snapshot:'fixture'},f.dependencies);await f.verify();
+  await fs.writeFile(f.source,'retain changed source');
+  // Other workers may reach GET while the first worker discovers the change.
+  // Their completed downloads must not advance into quarantine/deletion.
+  f.client.onGet=()=>new Promise(resolve=>setTimeout(resolve,20));
+  await assert.rejects(f.prune({path:base,concurrency:4,acceptance:await f.accept({allowedPrefixes:[base]})}),/Changed source/);
+  assert.equal(await fs.readFile(f.source,'utf8'),'retain changed source');
+  for(const relative of relatives)assert.deepEqual(await fs.readFile(path.join(f.root,relative)),f.bytes);
+  await assert.rejects(fs.stat(path.join(f.dir,'pruned.jsonl')),{code:'ENOENT'});
+});
+
+test('previous pruning receipts are exact, hash-bound and needed for missing sources',async t=>{
+  const f=await fixture(t);await f.verify();const previous=path.join(f.state,'previous-pruned.jsonl');
+  const record={status:'pruned',path:f.relative,sha256:f.checksum,byteSize:f.bytes.length};
+  await fs.writeFile(previous,JSON.stringify(record)+'\n');const priorSha=sha(await fs.readFile(previous));await fs.unlink(f.source);
+  const acceptance=await f.accept({previousPruneReceipt:previous,previousPruneReceiptSha256:priorSha});
+  await f.prune({acceptance});
+  await fs.writeFile(previous,JSON.stringify({...record,sha256:'0'.repeat(64)})+'\n');
+  await assert.rejects(f.prune({acceptance}),/receipt changed/);
+  await assert.rejects(f.prune({acceptance:await f.accept({previousPruneReceipt:previous,previousPruneReceiptSha256:sha(await fs.readFile(previous))})}),/no matching pruning receipt/);
 });

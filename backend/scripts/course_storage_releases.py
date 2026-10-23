@@ -27,6 +27,10 @@ MEDIA_PATH = re.compile(r'/api/classroom-media/(tbpub_[a-f0-9]{24})/(audio|media
 MEDIA_TYPES = frozenset({'audio/wav', 'audio/mpeg', 'image/webp', 'image/png',
                          'image/jpeg', 'video/mp4', 'video/webm', 'model/gltf-binary'})
 MAX_MEDIA_BYTES = 16 * 1024 * 1024
+# Display translations mirror the Student Web textbook picker; identity comes
+# from stored subject/volume codes, never inference from a title or course ID.
+SUBJECT_NAMES = {'chinese': '语文', 'math': '数学', 'english': '英语', 'science': '科学'}
+VOLUME_NAMES = {'upper': '上册', 'lower': '下册', 'full': '全册'}
 
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
@@ -82,7 +86,30 @@ def _validated_release(conn, key):
     _require(digest(manifest) == revision['manifest_sha256'], 'manifest_hash_mismatch')
     release = validate_release(build, manifest, course)
     _require(isinstance(release, dict), 'release_contract_not_supported')
-    return build, course, release
+    return build, course, release, manifest
+
+
+def release_metadata(course, manifest=None):
+    """Project public display metadata without changing any release digest."""
+    from content.textbook_metadata import reviewed_edition_label
+    from schemas.education import GRADE_BY_CODE
+
+    subject = course.get('subject', course.get('subjectCode'))
+    grade = course.get('grade_code', course.get('gradeCode'))
+    if manifest is not None:
+        _require(manifest.get('subject', subject) == subject
+                 and manifest.get('gradeCode', grade) == grade, 'release_display_identity_mismatch')
+    definition = GRADE_BY_CODE.get(grade)
+    book = manifest or {}
+    return {
+        'subjectCode': subject, 'subjectName': SUBJECT_NAMES.get(subject),
+        'gradeCode': grade, 'gradeLabel': definition.label if definition else None,
+        'volumeCode': book.get('volume'), 'volumeLabel': VOLUME_NAMES.get(book.get('volume')),
+        'editionId': book.get('editionId'),
+        'editionLabel': reviewed_edition_label(book) if book.get('editionLabel') else None,
+        'publisher': book.get('publisher'), 'textbookTitle': book.get('title'),
+        'publishedAt': course.get('published_at', course.get('publishedAt')),
+    }
 
 
 def delivery_media(release):
@@ -113,7 +140,8 @@ def _other_published_courses(conn):
     # Non-textbook courses need their own durable formal publication evidence;
     # a course's published flag alone never authorizes its raw/runtime assets.
     return [dict(row) for row in conn.execute("""SELECT c.id AS courseId,c.version AS courseVersion,
-        c.title,c.content_origin AS contentOrigin FROM learning_courses c
+        c.title,c.content_origin AS contentOrigin,c.subject AS subjectCode,
+        c.grade_code AS gradeCode,c.published_at AS publishedAt FROM learning_courses c
         WHERE c.status='published' AND c.quality_status='released' AND c.retired_at IS NULL
         AND NOT EXISTS (SELECT 1 FROM learning_textbook_course_builds b
             JOIN learning_textbook_revisions r ON r.edition_id=b.edition_id AND r.revision_id=b.revision_id
@@ -278,7 +306,8 @@ def _formal_release(conn, course, media_root, *, verify_source_bytes=False):
             _verify_local_media(item)
     return {'contentKey': None, 'releaseSha256': authority['publication_receipt_hash'],
         'classroomId': classroom, 'courseId': course['courseId'], 'courseVersion': course['courseVersion'],
-        'title': course['title'], 'media': sorted(media, key=lambda item: item['path'])}
+        'title': course['title'], 'media': sorted(media, key=lambda item: item['path']),
+        **release_metadata(course)}
 
 
 def inventory(conn, *, content_key=None, media_root=None, verify_source_bytes=False):
@@ -286,7 +315,7 @@ def inventory(conn, *, content_key=None, media_root=None, verify_source_bytes=Fa
     keys = _current_keys(conn, content_key)
     for key in keys:
         try:
-            build, course, release = _validated_release(conn, key)
+            build, course, release, manifest = _validated_release(conn, key)
             media = delivery_media(release)
             if verify_source_bytes:
                 for item in media:
@@ -308,6 +337,7 @@ def inventory(conn, *, content_key=None, media_root=None, verify_source_bytes=Fa
                 'contentKey': key, 'releaseSha256': release['sha256'],
                 'classroomId': release['classroomId'], 'courseId': course['id'],
                 'courseVersion': course['version'], 'title': course['title'], 'media': media,
+                **release_metadata(course, manifest),
             })
         except Exception as exc:
             # Error text/tracebacks can contain private source material. Emit
@@ -355,8 +385,10 @@ def inventory(conn, *, content_key=None, media_root=None, verify_source_bytes=Fa
         },
         'mediaInventorySha256': hashlib.sha256(canonical(metadata).encode()).hexdigest(),
         'validationFailures': failures,
-        'nonTextbookPublishedCourses': other,
-        'uncoveredPublishedCourses': uncovered,
+        'nonTextbookPublishedCourses': [{k: c[k] for k in
+            ('courseId', 'courseVersion', 'title', 'contentOrigin')} for c in other],
+        'uncoveredPublishedCourses': [{k: c[k] for k in
+            ('courseId', 'courseVersion', 'title', 'contentOrigin')} for c in uncovered],
         'allPublishedCourseMediaCovered': content_key is None and not failures and not uncovered,
     }
 

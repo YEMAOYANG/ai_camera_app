@@ -46,7 +46,8 @@ class PublishedMediaInventoryTest(unittest.TestCase):
                 edition_id TEXT,revision_id TEXT,node_id TEXT,part_index INTEGER,
                 teaching_revision TEXT,course_id TEXT,course_version TEXT,course_content_sha256 TEXT);
             CREATE TABLE learning_courses (id TEXT,version TEXT,title TEXT,status TEXT,
-                quality_status TEXT,retired_at INTEGER,content_json TEXT,content_origin TEXT);
+                quality_status TEXT,retired_at INTEGER,content_json TEXT,content_origin TEXT,
+                subject TEXT,grade_code TEXT,published_at INTEGER);
             CREATE TABLE learning_textbook_revisions (edition_id TEXT,revision_id TEXT,
                 retired_at INTEGER,manifest_json TEXT,manifest_sha256 TEXT);
             CREATE TABLE student_sessions (private_token TEXT);
@@ -65,9 +66,10 @@ class PublishedMediaInventoryTest(unittest.TestCase):
         build.update(edition_id='book', revision_id='directory', review_json=canonical(review))
         names = ','.join(build)
         self.raw.execute(f'INSERT INTO learning_textbook_course_builds ({names}) VALUES ({",".join("?" for _ in build)})', tuple(build.values()))
-        self.raw.execute('INSERT INTO learning_courses VALUES (?,?,?,?,?,?,?,?)',
+        self.raw.execute('INSERT INTO learning_courses VALUES (?,?,?,?,?,?,?,?,?,?,?)',
                          ('course', '1', '天地人', 'published', 'released', None,
-                          canonical({'title': '天地人'}), 'openmaic_generated'))
+                          canonical({'title': '天地人'}), 'openmaic_generated',
+                          'chinese', 'primary_1', 1234567890000))
         self.raw.execute('INSERT INTO learning_textbook_revisions VALUES (?,?,?,?,?)',
                          ('book', 'directory', None, canonical(manifest), digest(manifest)))
         self.raw.commit()
@@ -80,7 +82,12 @@ class PublishedMediaInventoryTest(unittest.TestCase):
         self.assertEqual(result['schemaVersion'], storage.SCHEMA)
         self.assertEqual(result['totals']['totalByteSize'], 12)
         self.assertEqual(set(result['releases'][0]), {'contentKey', 'releaseSha256', 'classroomId',
-            'courseId', 'courseVersion', 'title', 'media'})
+            'courseId', 'courseVersion', 'title', 'media', 'subjectCode', 'subjectName',
+            'gradeCode', 'gradeLabel', 'volumeCode', 'volumeLabel', 'editionId', 'editionLabel',
+            'publisher', 'textbookTitle', 'publishedAt'})
+        self.assertEqual(result['releases'][0]['subjectName'], '语文')
+        self.assertEqual(result['releases'][0]['gradeLabel'], '一年级')
+        self.assertEqual(result['releases'][0]['publishedAt'], 1234567890000)
         self.assertEqual(set(result['releases'][0]['media'][0]), {'path', 'sha256', 'byteSize', 'mimeType'})
         text = canonical(result)
         for forbidden in ('must-not-export', 'classroomSha256', 'sourceSha256', 'input_json',
@@ -98,8 +105,9 @@ class PublishedMediaInventoryTest(unittest.TestCase):
 
     def test_lists_non_textbook_courses_as_an_explicit_coverage_gap(self):
         self.raw.execute('PRAGMA query_only=OFF')
-        self.raw.execute('INSERT INTO learning_courses VALUES (?,?,?,?,?,?,?,?)',
-                         ('formal', '2', '另一份正式课', 'published', 'released', None, '{}', 'formal'))
+        self.raw.execute('INSERT INTO learning_courses VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+                         ('formal', '2', '另一份正式课', 'published', 'released', None, '{}', 'formal',
+                          'math', 'primary_1', 1234567890001))
         self.raw.execute('PRAGMA query_only=ON')
         result = storage.inventory(self.conn)
         self.assertFalse(result['ok'])
@@ -205,6 +213,31 @@ class PublishedMediaInventoryTest(unittest.TestCase):
                          ('START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY',))
         connection.rollback.assert_called_once()
         connection.close.assert_called_once()
+
+    def test_display_metadata_uses_stored_codes_and_does_not_change_media_digest(self):
+        course = {'subject': 'science', 'grade_code': 'primary_1', 'published_at': 1234,
+                  'title': '英语不能用于猜科目'}
+        manifest = {'subject': 'science', 'gradeCode': 'primary_1', 'volume': 'upper',
+                    'editionId': 'verified-book', 'editionLabel': '已核验版本',
+                    'publisher': '已核验出版社', 'title': '科学一年级上册'}
+        original = deepcopy(manifest)
+        metadata = storage.release_metadata(course, manifest)
+        self.assertEqual(metadata['subjectCode'], 'science')
+        self.assertEqual(metadata['subjectName'], '科学')
+        self.assertEqual(metadata['volumeLabel'], '上册')
+        self.assertEqual(metadata['editionLabel'], '已核验版本')
+        self.assertEqual(manifest, original)
+        with self.assertRaisesRegex(storage.InventoryError, 'release_display_identity_mismatch'):
+            storage.release_metadata({**course, 'subject': 'english'}, manifest)
+        unknown = storage.release_metadata({'subjectCode': 'unregistered', 'gradeCode': 'unregistered'})
+        self.assertEqual(unknown['subjectCode'], 'unregistered')
+        for field in ('subjectName', 'gradeLabel', 'volumeLabel', 'editionLabel', 'publisher'):
+            self.assertIsNone(unknown[field])
+        result = storage.inventory(self.conn, content_key=self.key)
+        release = result['releases'][0]
+        before = [{'contentKey': release['contentKey'], 'courseId': release['courseId'],
+                   'releaseSha256': release['releaseSha256'], 'media': release['media']}]
+        self.assertEqual(result['mediaInventorySha256'], digest(before))
 
     def test_explicit_local_verification_never_fetches_remote_and_rejects_tampering(self):
         with tempfile.TemporaryDirectory() as temporary, patch.object(storage, 'ROOT', Path(temporary).resolve()):

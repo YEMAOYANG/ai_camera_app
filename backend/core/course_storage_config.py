@@ -1,4 +1,8 @@
-"""Typed server configuration for the existing COURSE_STORAGE_* namespace."""
+"""Typed server configuration for COURSE_STORAGE_* and private v1/v2 manifests.
+
+PREFIX is unchanged for legacy v1 hash objects; a v2 readable layout typically
+uses a date such as 2026-10-23, followed by subject/course/media-name segments.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field

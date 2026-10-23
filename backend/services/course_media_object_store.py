@@ -2,7 +2,7 @@
 
 This byte adapter grants no student or course access. Callers must authorize
 their DB/session binding before consulting it. Unlisted paths remain local;
-listed paths are immutable hash objects and can never fall back to disk.
+listed paths use verified immutable media bytes and can never fall back to disk.
 """
 from __future__ import annotations
 
@@ -26,6 +26,32 @@ _MAX_MEDIA_BYTES = 32 * 1024 * 1024
 _READ_SLOTS = threading.BoundedSemaphore(4)
 _MANIFEST_LOCK = threading.Lock()
 _MANIFEST_CACHE: tuple[tuple, dict[str, dict]] | None = None
+
+
+# v2 uses readable names only for public audio/image/video objects. v1 hash
+# objects keep their original key validation semantics.
+_NAMED_MEDIA_MIME = {
+    ".wav": {"audio/wav"}, ".mp3": {"audio/mpeg"}, ".ogg": {"audio/ogg"},
+    ".aac": {"audio/aac"}, ".flac": {"audio/flac"}, ".webm": {"audio/webm", "video/webm"},
+    ".mp4": {"video/mp4"}, ".png": {"image/png"}, ".webp": {"image/webp"},
+    ".jpg": {"image/jpeg"}, ".jpeg": {"image/jpeg"}, ".gif": {"image/gif"},
+}
+
+
+def _valid_object_key(entry: dict, prefix: str, schema: str) -> bool:
+    if schema == "mira.course-storage.manifest.v1":
+        return entry.get("objectKey") == f"{prefix}/blobs/sha256/{entry['sha256']}"
+    key = entry.get("objectKey")
+    if not isinstance(key, str) or not key.startswith(prefix + "/"):
+        return False
+    parts = key[len(prefix) + 1:].split("/")
+    if len(parts) != 3 or any(
+        not part.strip() or part in {".", ".."} or "\\" in part
+        or re.search(r"[\x00-\x1f\x7f-\x9f]", part) or len(part.encode("utf8")) > 255
+        for part in parts
+    ):
+        return False
+    return entry.get("mimeType") in _NAMED_MEDIA_MIME.get(Path(parts[2]).suffix.lower(), set())
 
 
 class CourseMediaStorageError(ValueError):
@@ -95,7 +121,7 @@ class CourseMediaObjectStore:
             manifest = json.loads(raw)
             if (
                 not isinstance(manifest, dict)
-                or manifest.get("schemaVersion") != "mira.course-storage.manifest.v1"
+                or manifest.get("schemaVersion") not in {"mira.course-storage.manifest.v1", "mira.course-storage.manifest.v2"}
                 or not isinstance(manifest.get("snapshotId"), str)
                 or not manifest["snapshotId"].strip()
                 or not isinstance(manifest.get("files"), list)
@@ -110,7 +136,7 @@ class CourseMediaObjectStore:
                     or any(part in {"", ".", ".."} for part in relative.split("/"))
                     or not isinstance(entry.get("sha256"), str)
                     or not re.fullmatch(r"[a-f0-9]{64}", entry["sha256"])
-                    or entry.get("objectKey") != f"{config.prefix}/blobs/sha256/{entry['sha256']}"
+                    or not _valid_object_key(entry, config.prefix, manifest["schemaVersion"])
                     or type(entry.get("byteSize")) is not int or entry["byteSize"] < 0
                     or not isinstance(entry.get("mimeType"), str)
                     or not re.fullmatch(r"[a-z0-9.+-]+/[a-z0-9.+-]+", entry["mimeType"])
@@ -123,7 +149,8 @@ class CourseMediaObjectStore:
 
     @staticmethod
     def _download(config: CourseStorageConfig, entry: dict, limit: int) -> bytes:
-        url = f"{config.endpoint.rstrip('/')}/{quote(config.bucket, safe='')}/{quote(entry['objectKey'], safe='/')}"
+        encoded_key = "/".join(quote(segment, safe="") for segment in entry["objectKey"].split("/"))
+        url = f"{config.endpoint.rstrip('/')}/{quote(config.bucket, safe='')}/{encoded_key}"
         # Public read is intentional. No credentials, cookies, generic proxy
         # configuration or redirects may participate in byte delivery.
         opener = build_opener(ProxyHandler({}), _NoRedirect())

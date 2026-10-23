@@ -1,0 +1,218 @@
+diff --git a/lib/server/classroom-media-object-store.ts b/lib/server/classroom-media-object-store.ts
+index 75f39d1..7533f34 100644
+--- a/lib/server/classroom-media-object-store.ts
++++ b/lib/server/classroom-media-object-store.ts
+@@ -8,6 +8,23 @@ const NATIVE_MEDIA_ROOT = 'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/';
+ const MAX_MANIFEST_BYTES = 64 * 1024 * 1024;
+ const REQUEST_TIMEOUT_MS = 30_000;
+ 
++// v2 names are presentation-only object locations; the manifest SHA remains
++// the byte identity. v1 keeps its original hash-object contract unchanged.
++const NAMED_MEDIA_MIME: Record<string, readonly string[]> = {
++  '.wav': ['audio/wav'],
++  '.mp3': ['audio/mpeg'],
++  '.ogg': ['audio/ogg'],
++  '.aac': ['audio/aac'],
++  '.flac': ['audio/flac'],
++  '.webm': ['video/webm', 'audio/webm'],
++  '.mp4': ['video/mp4'],
++  '.png': ['image/png'],
++  '.webp': ['image/webp'],
++  '.jpg': ['image/jpeg'],
++  '.jpeg': ['image/jpeg'],
++  '.gif': ['image/gif'],
++};
++
+ interface StorageConfig {
+   mode: 'manifest' | 'remote';
+   endpoint: string;
+@@ -83,6 +100,31 @@ function storageConfig(): StorageConfig | undefined {
+   };
+ }
+ 
++function validObjectKey(item: ManifestFile, prefix: string, schema: string): boolean {
++  if (schema === 'mira.course-storage.manifest.v1') {
++    return item.objectKey === `${prefix}/blobs/sha256/${item.sha256}`;
++  }
++  if (typeof item.objectKey !== 'string' || !item.objectKey.startsWith(`${prefix}/`)) return false;
++  const parts = item.objectKey.slice(prefix.length + 1).split('/');
++  if (
++    parts.length !== 3 ||
++    parts.some(
++      (part) =>
++        !part.trim() ||
++        part === '.' ||
++        part === '..' ||
++        part.includes('\\') ||
++        /[\u0000-\u001f\u007f-\u009f]/.test(part) ||
++        Buffer.byteLength(part, 'utf8') > 255 ||
++        Buffer.from(part, 'utf8').toString('utf8') !== part,
++    )
++  )
++    return false;
++  return (
++    NAMED_MEDIA_MIME[path.posix.extname(parts[2]).toLowerCase()]?.includes(item.mimeType) ?? false
++  );
++}
++
+ let manifestCache: { identity: string; files: Map<string, ManifestFile> } | undefined;
+ 
+ async function manifestFiles(config: StorageConfig): Promise<Map<string, ManifestFile>> {
+@@ -101,7 +143,9 @@ async function manifestFiles(config: StorageConfig): Promise<Map<string, Manifes
+   if (manifestCache?.identity === identity) return manifestCache.files;
+   const manifest = JSON.parse(await fs.readFile(config.manifestPath, 'utf8'));
+   if (
+-    manifest?.schemaVersion !== 'mira.course-storage.manifest.v1' ||
++    !['mira.course-storage.manifest.v1', 'mira.course-storage.manifest.v2'].includes(
++      manifest?.schemaVersion,
++    ) ||
+     typeof manifest.snapshotId !== 'string' ||
+     !manifest.snapshotId.trim() ||
+     !Array.isArray(manifest.files)
+@@ -120,7 +164,7 @@ async function manifestFiles(config: StorageConfig): Promise<Map<string, Manifes
+         .some((segment: string) => !segment || segment === '.' || segment === '..') ||
+       typeof item.sha256 !== 'string' ||
+       !/^[a-f0-9]{64}$/.test(item.sha256) ||
+-      item.objectKey !== `${config.prefix}/blobs/sha256/${item.sha256}` ||
++      !validObjectKey(item, config.prefix, manifest.schemaVersion) ||
+       !Number.isSafeInteger(item.byteSize) ||
+       item.byteSize < 0 ||
+       typeof item.mimeType !== 'string' ||
+diff --git a/tests/server/classroom-media-object-store.test.ts b/tests/server/classroom-media-object-store.test.ts
+index 1316161..625295e 100644
+--- a/tests/server/classroom-media-object-store.test.ts
++++ b/tests/server/classroom-media-object-store.test.ts
+@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
+ import { createHash } from 'node:crypto';
+ import os from 'node:os';
+ import path from 'node:path';
++import { Readable } from 'node:stream';
+ import { NextRequest } from 'next/server';
+ import { HeadObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+@@ -37,11 +38,11 @@ let manifestPath = '';
+ let cancelled = false;
+ let entry: { path: string; objectKey: string; sha256: string; byteSize: number; mimeType: string };
+ 
+-const manifest = () =>
++const manifest = (schemaVersion = 'mira.course-storage.manifest.v1') =>
+   fs.writeFile(
+     manifestPath,
+     JSON.stringify({
+-      schemaVersion: 'mira.course-storage.manifest.v1',
++      schemaVersion,
+       snapshotId: 'fixture',
+       files: [entry],
+     }),
+@@ -285,3 +286,111 @@ it('forwards cancellation to the S3 response stream', async () => {
+   await response.body?.cancel();
+   expect(cancelled).toBe(true);
+ });
++
++const namedPrefix = '2026-10-23';
++const namedVoice = `${namedPrefix}/语文/一年级上册-金木水火土/金木水火土-老师讲解-001.wav`;
++
++it('reads a v2 Chinese object key through the original classroom URL after the local copy is absent', async () => {
++  vi.stubEnv('COURSE_STORAGE_PREFIX', namedPrefix);
++  entry.objectKey = namedVoice;
++  await manifest('mira.course-storage.manifest.v2');
++  await fs.rm(storage.root, { recursive: true });
++  const response = await read('bytes=1-4');
++  expect(response.status).toBe(206);
++  expect(response.headers.get('x-mira-media-source')).toBe('remote');
++  expect(response.headers.get('content-type')).toBe('audio/wav');
++  expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes.subarray(1, 5));
++  expect(aws.send.mock.calls[0][0].input.Key).toBe(namedVoice);
++  expect(aws.send.mock.calls[1][0].input.Key).toBe(namedVoice);
++});
++
++it('uses each complete v2 object key when two courses share identical media bytes', async () => {
++  vi.stubEnv('COURSE_STORAGE_PREFIX', namedPrefix);
++  entry.objectKey = namedVoice;
++  const otherId = 'tbpub_aaaaaaaaaaaaaaaaaaaaaaaa';
++  const otherKey = `${namedPrefix}/语文/一年级上册-天地人/天地人-老师讲解-001.wav`;
++  await fs.writeFile(
++    manifestPath,
++    JSON.stringify({
++      schemaVersion: 'mira.course-storage.manifest.v2',
++      snapshotId: 'named-two-courses',
++      files: [
++        entry,
++        { ...entry, path: entry.path.replace(classroomId, otherId), objectKey: otherKey },
++      ],
++    }),
++  );
++  for (const id of [classroomId, otherId]) {
++    expect(Buffer.from(await (await read(null, 'teacher.wav', id)).arrayBuffer())).toEqual(bytes);
++  }
++  expect(
++    aws.send.mock.calls
++      .filter(([command]) => command instanceof HeadObjectCommand)
++      .map(([command]) => command.input.Key),
++  ).toEqual([namedVoice, otherKey]);
++});
++
++it.each([
++  ['wrong prefix', namedVoice.replace(namedPrefix, '2026-10-230')],
++  ['missing segment', `${namedPrefix}/语文/讲解.wav`],
++  ['extra segment', `${namedPrefix}/语文/一年级/课件/讲解.wav`],
++  ['blank segment', `${namedPrefix}/ /课件/讲解.wav`],
++  ['dot segment', `${namedPrefix}/./课件/讲解.wav`],
++  ['parent segment', `${namedPrefix}/语文/../讲解.wav`],
++  ['backslash', `${namedPrefix}/语文/课件/讲\\解.wav`],
++  ['control character', `${namedPrefix}/语文/课件/讲\u0000解.wav`],
++  ['DEL', `${namedPrefix}/语文/课件/讲\u007f解.wav`],
++  ['C1 control', `${namedPrefix}/语文/课件/讲\u0085解.wav`],
++  ['UTF8 segment over 255 bytes', `${namedPrefix}/语文/${'课'.repeat(86)}/讲解.wav`],
++  ['wrong MIME', `${namedPrefix}/语文/课件/图片.png`],
++  ['HTML', `${namedPrefix}/语文/课件/课件.html`],
++  ['JSON', `${namedPrefix}/语文/课件/索引.json`],
++  ['GLB outside public media scope', `${namedPrefix}/语文/课件/模型.glb`],
++])('rejects a v2 %s before contacting object storage', async (_name, key) => {
++  vi.stubEnv('COURSE_STORAGE_PREFIX', namedPrefix);
++  entry.objectKey = key;
++  await manifest('mira.course-storage.manifest.v2');
++  expect((await read()).status).toBe(502);
++  expect(aws.send).not.toHaveBeenCalled();
++});
++
++it('keeps the v1 hash-key contract strict instead of treating old manifests as v2', async () => {
++  vi.stubEnv('COURSE_STORAGE_PREFIX', namedPrefix);
++  entry.objectKey = namedVoice;
++  await manifest();
++  expect((await read()).status).toBe(502);
++  expect(aws.send).not.toHaveBeenCalled();
++});
++
++it('lets the installed AWS SDK encode Chinese and reserved characters as literal path segments', async () => {
++  const actual = await vi.importActual<typeof import('@aws-sdk/client-s3')>('@aws-sdk/client-s3');
++  const key = `${namedPrefix}/语文/一年级上册-问?题#百分%/老师讲解-%2F-001.wav`;
++  const paths: string[] = [];
++  const client = new actual.S3Client({
++    endpoint: 'http://storage.invalid:9000',
++    region: 'us-east-1',
++    credentials: { accessKeyId: 'fixture', secretAccessKey: 'fixture' },
++    forcePathStyle: true,
++    requestHandler: {
++      handle: async (request) => {
++        paths.push(request.path);
++        return {
++          response: {
++            statusCode: 200,
++            headers: { 'content-length': '0' },
++            body: Readable.from([]),
++          },
++        };
++      },
++    },
++  });
++  try {
++    await client.send(new actual.HeadObjectCommand({ Bucket: 'study', Key: key }));
++    expect(paths).toEqual([`/study/${key.split('/').map(encodeURIComponent).join('/')}`]);
++    expect(paths[0]).not.toContain('?');
++    expect(paths[0]).not.toContain('#');
++    expect(paths[0]).toContain('%252F');
++  } finally {
++    client.destroy();
++  }
++});

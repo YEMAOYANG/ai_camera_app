@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const require = createRequire(path.join(ROOT, 'openmaic-runtime/.runtime/OpenMAIC/package.json'));
 const { S3Client, HeadBucketCommand, ListObjectsV2Command, GetBucketPolicyCommand,
-  HeadObjectCommand, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+  HeadObjectCommand, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const NATIVE = 'openmaic-runtime/.runtime/OpenMAIC/data/';
 const MIME = { '.mp3':'audio/mpeg','.wav':'audio/wav','.ogg':'audio/ogg','.aac':'audio/aac',
   '.flac':'audio/flac','.mp4':'video/mp4','.webm':'video/webm','.webp':'image/webp',
@@ -152,14 +152,28 @@ async function stableRead(filename,root) {
 }
 async function loadManifest(filename,c) {
   const raw = await fsp.readFile(filename); const m = JSON.parse(raw);
-  if (m.schemaVersion !== 'mira.course-storage.manifest.v1' || !/^[A-Za-z0-9_-]+$/.test(m.snapshotId) || !Array.isArray(m.files) || !m.files.length) throw Error('Invalid manifest');
+  if (!['mira.course-storage.manifest.v1','mira.course-storage.manifest.v2'].includes(m.schemaVersion) || !/^[A-Za-z0-9_-]+$/.test(m.snapshotId) || !Array.isArray(m.files) || !m.files.length) throw Error('Invalid manifest');
   const seen = new Set();
+  const keys = new Set();
   for (const e of m.files) {
     safePath(e.path);
-    if (!allowedSource(e.path) || seen.has(e.path) || !/^[a-f0-9]{64}$/.test(e.sha256) || !Number.isSafeInteger(e.byteSize) || e.byteSize <= 0 || !validIdentity(e.sourceIdentity) || e.sourceIdentity.size!==e.byteSize || e.mimeType!==MIME[path.extname(e.path).toLowerCase()] || e.objectKey !== `${c.prefix}/blobs/sha256/${e.sha256}`) throw Error('Invalid manifest entry');
+    const named = m.schemaVersion==='mira.course-storage.manifest.v2';
+    if (!allowedSource(e.path) || seen.has(e.path) || !/^[a-f0-9]{64}$/.test(e.sha256) || !Number.isSafeInteger(e.byteSize) || e.byteSize <= 0 || !validIdentity(e.sourceIdentity) || e.sourceIdentity.size!==e.byteSize || e.mimeType!==MIME[path.extname(e.path).toLowerCase()] || (named ? !validNamedKey(e.objectKey,c.prefix,e.mimeType) || keys.has(e.objectKey) : e.objectKey !== `${c.prefix}/blobs/sha256/${e.sha256}`)) throw Error('Invalid manifest entry');
     seen.add(e.path);
+    keys.add(e.objectKey);
   }
   return {m,manifestSha256:digest(raw)};
+}
+export function validNamedKey(key,prefix,mime) {
+  if(typeof key!=='string' || !key.startsWith(prefix+'/'))return false;
+  const parts=key.slice(prefix.length+1).split('/');
+  return parts.length===3 && parts.every(p=>p.trim() && p!=='.' && p!=='..' && !/[\\\x00-\x1f\x7f-\x9f]/.test(p) && Buffer.byteLength(p)<=255) && MIME[path.extname(parts[2]).toLowerCase()]===mime && /^(audio|image|video)\//.test(mime);
+}
+export function displayName(value) {
+  const normalized=String(value || '').normalize('NFKC').replace(/[\\/:*?"<>|#%\x00-\x1f\x7f]/g,'-').replace(/\s+/g,' ').replace(/^[. -]+|[. -]+$/g,'');
+  let result='';for(const char of normalized){if(Buffer.byteLength(result+char)>120)break;result+=char;}
+  if(!result || result==='.' || result==='..')throw Error('A readable course name is required');
+  return result;
 }
 async function parallel(items, limit, fn) {
   let next=0,done=0,bytes=0;const errors=[];const started=Date.now();let last=started;
@@ -171,10 +185,22 @@ async function parallel(items, limit, fn) {
       if(Date.now()-last>10000){last=Date.now();process.stdout.write(JSON.stringify({done,total:items.length,bytes,errors:errors.length,seconds:Math.round((last-started)/1000)})+'\n');}
     }
   }));
-  if(errors.length) { process.stderr.write(JSON.stringify({errors:errors.slice(0,20),errorCount:errors.length})+'\n'); throw Error('Operation incomplete; sources retained'); }
+  if(errors.length) { process.stderr.write(JSON.stringify({errors:errors.slice(0,20),errorCount:errors.length})+'\n'); throw Error('Operation incomplete; sources retained: '+errors[0].message); }
   return {objects:done,bytes,elapsedSeconds:Math.round((Date.now()-started)/1000)};
 }
-function unique(m) { return [...new Map(m.files.map(e=>[e.sha256,e])).values()]; }
+function unique(m) { return [...new Map(m.files.map(e=>[e.objectKey,e])).values()]; }
+const blobIdentity = (m,e) => m.schemaVersion==='mira.course-storage.manifest.v2' ? e.objectKey : e.sha256;
+const verificationVersion = m => m.schemaVersion==='mira.course-storage.manifest.v2' ? 'mira.course-storage.verification.v3' : 'mira.course-storage.verification.v2';
+async function loadVerification(manifest,state,c) {
+  const dir=path.join(state,'transfers',manifest.m.snapshotId);
+  const raw=await fsp.readFile(path.join(dir,'verified-complete.json'));const verified=JSON.parse(raw);
+  if(verified.schemaVersion!==verificationVersion(manifest.m) || verified.manifestSha256!==manifest.manifestSha256 || verified.objects!==unique(manifest.m).length || !sameStorage(verified.storage,storageIdentity(c)))throw Error('Complete remote verification for this endpoint, bucket and prefix is required');
+  for(const e of unique(manifest.m)){
+    const b=verified.blobs?.[blobIdentity(manifest.m,e)];
+    if(!b || b.sha256!==e.sha256 || b.byteSize!==e.byteSize || b.objectKey!==e.objectKey || typeof b.etag!=='string' || !b.etag)throw Error('Verified immutable blob identity required');
+  }
+  return {dir,verified,raw};
+}
 async function remoteHash(client,c,e,expected) {
   const response=await client.send(new GetObjectCommand({Bucket:c.bucket,Key:e.objectKey,
     ...(expected ? {IfMatch:expected.etag,...(expected.versionId ? {VersionId:expected.versionId} : {})} : {})}));
@@ -225,6 +251,45 @@ export async function run(options,dependencies={}) {
   const c=dependencies.config || readConfig(options.config);const client=dependencies.client || clientFor(c);
   const storage=storageIdentity(c);
   await safeDirectory(root,state);
+  const sourceContext=async()=>{
+    if(!options['source-manifest'] || !options['source-prefix'])throw Error('Exact --source-manifest and --source-prefix required');
+    const sourceConfig={...c,prefix:options['source-prefix']};
+    const source=await loadManifest(options['source-manifest'],sourceConfig);
+    return {...source,...await loadVerification(source,state,sourceConfig),config:sourceConfig};
+  };
+  if(options.command==='layout') {
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(options.date || '') || new Date(options.date).toISOString().slice(0,10)!==options.date || c.prefix!==options.date)throw Error('The target prefix must equal the upload date YYYY-MM-DD');
+    if(!options.manifest || !options['release-index'])throw Error('A private release index and target manifest are required');
+    if(fs.existsSync(options.manifest))throw Error('Never overwrite a frozen layout manifest');
+    const source=await sourceContext();const index=JSON.parse(await fsp.readFile(options['release-index'],'utf8'));
+    if(index.schemaVersion!=='mira.course-storage.releases.v1' || index.ok!==true || index.allPublishedCourseMediaCovered!==true)throw Error('Validated complete publication metadata required');
+    const sourceReleases=new Map(source.m.releases.map(r=>[r.classroomId,r]));
+    const sourceFiles=new Map(source.m.files.map(e=>[e.path,e]));const files=[],releases=[],seen=new Set(),folders=new Set();
+    for(const release of [...index.releases].sort((a,b)=>a.classroomId.localeCompare(b.classroomId))){
+      const original=sourceReleases.get(release.classroomId);
+      if(!original || ['courseId','courseVersion','releaseSha256'].some(k=>original[k]!==release[k]) || !release.subjectName || !release.gradeLabel || !release.title)throw Error('Publication metadata differs from verified source');
+      const subject=displayName(release.subjectName),title=displayName(release.title);
+      const folderBase=displayName([release.gradeLabel,release.volumeLabel,release.title].filter(Boolean).join('-'));
+      let folder=folderBase,version=1;
+      while(folders.has(subject+'/'+folder))folder=folderBase+'（版本'+(++version)+'）';
+      folders.add(subject+'/'+folder);const counters={};
+      for(const media of release.media){
+        const relative=media.sourcePath || NATIVE+'classrooms/'+media.path.slice('/api/classroom-media/'.length);
+        const e=sourceFiles.get(relative);
+        if(!e || seen.has(relative) || e.sha256!==media.sha256 || e.byteSize!==media.byteSize || e.mimeType!==media.mimeType)throw Error('Named layout must cover each exact verified media path once');
+        seen.add(relative);const kind=media.mimeType.startsWith('audio/')?'音频':media.mimeType.startsWith('image/')?'图片':'视频';
+        counters[kind]=(counters[kind] || 0)+1;
+        const filename=title+'-'+kind+'-'+String(counters[kind]).padStart(3,'0')+path.extname(relative).toLowerCase();
+        const objectKey=[c.prefix,subject,folder,filename].join('/');
+        if(!validNamedKey(objectKey,c.prefix,e.mimeType))throw Error('Invalid readable media name');
+        files.push({...e,objectKey});
+      }
+      const {media,...metadata}=release;releases.push({...metadata,storageDirectory:[c.prefix,subject,folder].join('/')});
+    }
+    if(seen.size!==sourceFiles.size || releases.length!==sourceReleases.size)throw Error('Named layout cannot omit any verified published media');
+    const m={schemaVersion:'mira.course-storage.manifest.v2',snapshotId:options.snapshot || 'named-'+Date.now(),createdAt:new Date().toISOString(),uploadDate:options.date,sourceManifestSha256:source.manifestSha256,sourceVerificationSha256:digest(source.raw),sourceStorage:storageIdentity(source.config),releases,files,skipped:[]};
+    await atomicJson(options.manifest,m);console.log(JSON.stringify({manifest:options.manifest,courses:releases.length,files:files.length,objects:unique(m).length,bytes:files.reduce((s,e)=>s+e.byteSize,0)}));return;
+  }
   if(options.command==='probe') {
     await client.send(new HeadBucketCommand({Bucket:c.bucket}));
     const listed=await client.send(new ListObjectsV2Command({Bucket:c.bucket,MaxKeys:1}));
@@ -281,6 +346,29 @@ export async function run(options,dependencies={}) {
   const {m,manifestSha256}=await loadManifest(options.manifest,c);const dir=path.join(state,'transfers',m.snapshotId);
   await safeDirectory(root,dir);const concurrency=Number(options.concurrency || 12);
   if(!Number.isInteger(concurrency)||concurrency<1||concurrency>32)throw Error('Invalid concurrency');
+  if(options.command==='relocate') {
+    const source=await sourceContext();
+    if(m.schemaVersion!=='mira.course-storage.manifest.v2' || m.sourceManifestSha256!==source.manifestSha256 || m.sourceVerificationSha256!==digest(source.raw) || !sameStorage(m.sourceStorage,storageIdentity(source.config)))throw Error('Named layout requires its exact verified original manifest');
+    const originals=new Map(source.m.files.map(e=>[e.path,e]));
+    if(originals.size!==m.files.length || m.files.some(e=>{const old=originals.get(e.path);return !old || old.sha256!==e.sha256 || old.byteSize!==e.byteSize || old.mimeType!==e.mimeType;}))throw Error('Named copy must preserve the complete frozen media inventory');
+    const selected=unique(m).filter(e=>!options.path || e.path===options.path || e.path.startsWith(options.path.replace(/\/$/,'')+'/'));
+    if(!selected.length)throw Error('No media selected for named relocation');
+    const result=await parallel(selected,concurrency,async e=>{
+      let head;try{head=await client.send(new HeadObjectCommand({Bucket:c.bucket,Key:e.objectKey}));}catch(error){if(error.$metadata?.httpStatusCode!==404)throw error;}
+      if(head){await remoteHash(client,c,e);return;}
+      const old=originals.get(e.path),expected=source.verified.blobs[blobIdentity(source.m,old)];
+      const response=await client.send(new GetObjectCommand({Bucket:c.bucket,Key:old.objectKey,IfMatch:expected.etag,...(expected.versionId?{VersionId:expected.versionId}:{})}));
+      const chunks=[];let size=0;
+      if(e.byteSize>64*1024*1024)throw Error('Named copy exceeds bounded media size');
+      for await(const chunk of response.Body){size+=chunk.length;if(size>e.byteSize)throw Error('Source media length changed');chunks.push(chunk);}
+      const bytes=Buffer.concat(chunks);
+      if(size!==e.byteSize || digest(bytes)!==e.sha256 || response.ETag!==expected.etag || (expected.versionId && response.VersionId!==expected.versionId))throw Error('Verified source media changed');
+      const put=await client.send(new PutObjectCommand({Bucket:c.bucket,Key:e.objectKey,Body:bytes,ContentLength:e.byteSize,ContentType:e.mimeType,Metadata:{sha256:e.sha256},ChecksumSHA256:Buffer.from(e.sha256,'hex').toString('base64'),IfNoneMatch:'*'}));
+      await appendReceipt(path.join(dir,'upload.jsonl'),{objectKey:e.objectKey,sha256:e.sha256,byteSize:e.byteSize,etag:put.ETag,storage,at:new Date().toISOString()});
+    });
+    if(!options.path)await atomicJson(path.join(dir,'upload-complete.json'),{manifestSha256,...result});
+    console.log(JSON.stringify({relocated:true,...(options.path?{scope:options.path}:{}),...result}));return;
+  }
   if(options.command==='upload') {
     const result=await parallel(unique(m),concurrency,async e=>{
       let existing;
@@ -304,29 +392,61 @@ export async function run(options,dependencies={}) {
     if(options.resume && fs.existsSync(path.join(dir,'verified.jsonl'))){
       for(const line of (await fsp.readFile(path.join(dir,'verified.jsonl'),'utf8')).split('\n')){
         if(!line)continue;let record;try{record=JSON.parse(line);}catch{continue;}
-        if(sameStorage(record.storage,storage) && /^[a-f0-9]{64}$/.test(record.sha256 || '') && record.objectKey===`${c.prefix}/blobs/sha256/${record.sha256}` && typeof record.etag==='string' && record.etag)previous.set(record.sha256,record);
+        if(sameStorage(record.storage,storage) && /^[a-f0-9]{64}$/.test(record.sha256 || '') && typeof record.objectKey==='string' && record.objectKey.startsWith(c.prefix+'/') && typeof record.etag==='string' && record.etag)previous.set(record.objectKey,record);
       }
     }
     const result=await parallel(unique(m),concurrency,async e=>{
-      const prior=previous.get(e.sha256);
-      if(prior && prior.byteSize===e.byteSize){
+      const prior=previous.get(e.objectKey),identity=blobIdentity(m,e);
+      if(prior && prior.byteSize===e.byteSize && prior.sha256===e.sha256){
         const head=await client.send(new HeadObjectCommand({Bucket:c.bucket,Key:e.objectKey,...(prior.versionId?{VersionId:prior.versionId}:{})}));
         if(head.ContentLength===e.byteSize && head.ETag===prior.etag && (!prior.versionId || head.VersionId===prior.versionId)){
-          blobs[e.sha256]={objectKey:e.objectKey,sha256:e.sha256,byteSize:e.byteSize,etag:prior.etag,...(prior.versionId?{versionId:prior.versionId}:{})};resumedObjects++;return;
+          blobs[identity]={objectKey:e.objectKey,sha256:e.sha256,byteSize:e.byteSize,etag:prior.etag,...(prior.versionId?{versionId:prior.versionId}:{})};resumedObjects++;return;
         }
       }
-      const blob=await remoteHash(client,c,e);blobs[e.sha256]=blob;await appendReceipt(path.join(dir,'verified.jsonl'),{...blob,storage,at:new Date().toISOString()});
+      const blob=await remoteHash(client,c,e);blobs[identity]=blob;await appendReceipt(path.join(dir,'verified.jsonl'),{...blob,storage,at:new Date().toISOString()});
     });
-    const verification={schemaVersion:'mira.course-storage.verification.v2',manifestSha256,storage,blobs,verifiedAt:new Date().toISOString(),resumedObjects,...result};
+    const verification={schemaVersion:verificationVersion(m),manifestSha256,storage,blobs,verifiedAt:new Date().toISOString(),resumedObjects,...result};
     await atomicJson(path.join(dir,'verified-complete.json'),verification);
     // Migration and course metadata remain private on this machine. Only media blobs are uploaded.
     console.log(JSON.stringify({verified:true,files:m.files.length,resumedObjects,...result}));return;
   }
-  const verifiedRaw=await fsp.readFile(path.join(dir,'verified-complete.json'));const verified=JSON.parse(verifiedRaw);
-  if(verified.schemaVersion!=='mira.course-storage.verification.v2' || verified.manifestSha256!==manifestSha256 || verified.objects!==unique(m).length || !sameStorage(verified.storage,storage))throw Error('Complete remote verification for this endpoint, bucket and prefix is required');
-  for(const e of unique(m)){
-    const b=verified.blobs?.[e.sha256];
-    if(!b || b.sha256!==e.sha256 || b.byteSize!==e.byteSize || b.objectKey!==e.objectKey || typeof b.etag!=='string' || !b.etag)throw Error('Verified immutable blob identity required');
+  const {raw:verifiedRaw,verified}=await loadVerification({m,manifestSha256},state,c);
+  if(options.command==='retire-source') {
+    if(!options.acceptance || m.schemaVersion!=='mira.course-storage.manifest.v2')throw Error('Named migration acceptance is required to retire old objects');
+    const acceptance=JSON.parse(await fsp.readFile(options.acceptance,'utf8')),source=await sourceContext();
+    if(acceptance.manifestSha256!==manifestSha256 || acceptance.verificationSha256!==digest(verifiedRaw) || !sameStorage(acceptance.storage,storage) || acceptance.remoteReadPassed!==true || acceptance.restorePassed!==true || acceptance.studentPlaybackPassed!==true || acceptance.oldSourceConsumersDetached!==true || acceptance.retireSourceManifestSha256!==source.manifestSha256 || m.sourceManifestSha256!==source.manifestSha256 || m.sourceVerificationSha256!==digest(source.raw) || !sameStorage(m.sourceStorage,storageIdentity(source.config)))throw Error('Exact active layout, restore, playback and detached-source acceptance required');
+    if(digest(await fsp.readFile(path.join(state,'active-manifest.json')))!==manifestSha256)throw Error('Old objects cannot be retired before the named layout is active');
+    const targets=new Map(m.files.map(e=>[e.path,e]));
+    if(targets.size!==source.m.files.length || source.m.files.some(e=>{const target=targets.get(e.path);return !target || target.objectKey===e.objectKey || target.sha256!==e.sha256 || target.byteSize!==e.byteSize || target.mimeType!==e.mimeType;}))throw Error('Every original object needs an exact replacement in the active named layout');
+    // A shared SHA can have several readable course keys. Every replacement
+    // must pass a fresh full-byte check before any original is retired.
+    await parallel(unique(m),concurrency,e=>remoteHash(client,c,e,verified.blobs[blobIdentity(m,e)]));
+    const replacements=new Map();
+    for(const e of m.files){const list=replacements.get(e.sha256) || [];list.push(e);replacements.set(e.sha256,list);}
+    const receipt=path.join(dir,'retired-source.jsonl'),retired=new Map();
+    if(fs.existsSync(receipt))for(const line of (await fsp.readFile(receipt,'utf8')).split('\n')){if(line){const r=JSON.parse(line);if(r.status==='retired' && sameStorage(r.storage,storageIdentity(source.config)))retired.set(r.objectKey,r);}}
+    let removed=0,aborted=false;
+    const result=await parallel(unique(source.m),Math.min(concurrency,8),async old=>{
+      if(aborted)return;
+      try{
+      let head;try{head=await client.send(new HeadObjectCommand({Bucket:c.bucket,Key:old.objectKey}));}catch(error){
+        const r=retired.get(old.objectKey);
+        if(error.$metadata?.httpStatusCode===404 && r?.sha256===old.sha256 && r?.byteSize===old.byteSize)return;
+        throw error;
+      }
+      const expected=source.verified.blobs[blobIdentity(source.m,old)];
+      if(head.ContentLength!==old.byteSize || head.ETag!==expected.etag || (expected.versionId && head.VersionId!==expected.versionId))throw Error('Old object changed; it is retained');
+      for(const replacement of replacements.get(old.sha256)){
+        const current=await client.send(new HeadObjectCommand({Bucket:c.bucket,Key:replacement.objectKey}));
+        const identity=verified.blobs[blobIdentity(m,replacement)];
+        if(current.ContentLength!==replacement.byteSize || current.ETag!==identity.etag || (identity.versionId && current.VersionId!==identity.versionId))throw Error('Named replacement changed; old object retained');
+      }
+      if(aborted)return;
+      await client.send(new DeleteObjectCommand({Bucket:c.bucket,Key:old.objectKey,IfMatch:expected.etag,...(expected.versionId?{VersionId:expected.versionId}:{})}));
+      await appendReceipt(receipt,{status:'retired',objectKey:old.objectKey,sha256:old.sha256,byteSize:old.byteSize,storage:storageIdentity(source.config),replacementKeys:replacements.get(old.sha256).map(e=>e.objectKey),at:new Date().toISOString()});removed++;
+      }catch(error){aborted=true;throw error;}
+    });
+    console.log(JSON.stringify({retired:true,removedObjects:removed,...result}));return;
   }
   if(options.command==='activate') {
     await atomicJson(path.join(state,'active-manifest.json'),m);
@@ -345,7 +465,7 @@ export async function run(options,dependencies={}) {
       await safeDirectory(restoreRoot,path.dirname(dest));
       const tmp=dest+'.mira-restore-'+process.pid;const handle=await fsp.open(tmp,'wx',0o600);
       try{
-        const b=verified.blobs[e.sha256];const r=await client.send(new GetObjectCommand({Bucket:c.bucket,Key:e.objectKey,IfMatch:b.etag,...(b.versionId?{VersionId:b.versionId}:{})}));const hash=crypto.createHash('sha256');let size=0;
+        const b=verified.blobs[blobIdentity(m,e)];const r=await client.send(new GetObjectCommand({Bucket:c.bucket,Key:e.objectKey,IfMatch:b.etag,...(b.versionId?{VersionId:b.versionId}:{})}));const hash=crypto.createHash('sha256');let size=0;
         for await(const chunk of r.Body){let offset=0;while(offset<chunk.length){const written=await handle.write(chunk,offset,chunk.length-offset);if(!written.bytesWritten)throw Error('Restore write made no progress');offset+=written.bytesWritten;}hash.update(chunk);size+=chunk.length;}
         if(size!==e.byteSize || hash.digest('hex')!==e.sha256 || r.ETag!==b.etag || (b.versionId && r.VersionId!==b.versionId))throw Error('Restore checksum or immutable identity mismatch');
         await handle.sync();await handle.close();
@@ -368,15 +488,31 @@ export async function run(options,dependencies={}) {
     if([...retained].some(p=>!m.files.some(e=>e.path===p)))throw Error('Retained paths must be exact manifest files');
     const selected=m.files.filter(e=>(e.path===options.path || e.path.startsWith(options.path.replace(/\/$/,'')+'/')) && !retained.has(e.path));
     if(!selected.length)throw Error('No files selected');
-    let removed=0,bytes=0;
-    for(const e of selected){
-      const source=sourcePath(e.path,root);await noSymlinkPath(root,source,true);if(!fs.existsSync(source))continue;
+    const receipt=path.join(dir,'pruned.jsonl');const alreadyPruned=new Map();
+    for(const filename of [receipt,...(acceptance.previousPruneReceipt ? [acceptance.previousPruneReceipt] : [])]){
+      if(!fs.existsSync(filename))continue;
+      await noSymlinkPath(state,path.resolve(filename));const raw=await fsp.readFile(filename);
+      if(filename!==receipt && digest(raw)!==acceptance.previousPruneReceiptSha256)throw Error('Previous pruning receipt changed');
+      for(const line of raw.toString().split('\n')){if(!line)continue;const r=JSON.parse(line);if(r.status==='pruned')alreadyPruned.set(r.path,r);}
+    }
+    let removed=0,bytes=0,aborted=false;
+    await parallel(selected,Math.min(concurrency,4),async e=>{
+      if(aborted)return;
+      try{
+      const source=sourcePath(e.path,root);await noSymlinkPath(root,source,true);
+      if(!fs.existsSync(source)){
+        const prior=alreadyPruned.get(e.path);
+        if(!prior || prior.sha256!==e.sha256 || prior.byteSize!==e.byteSize)throw Error('Missing source has no matching pruning receipt');
+        return;
+      }
       const read=await stableRead(source,root);
       try{if(!sameIdentity(e.sourceIdentity,read.sourceIdentity) || read.sha256!==e.sha256)throw Error('Changed source retained: '+e.path);}finally{await read.handle.close();}
-      await remoteHash(client,c,e,verified.blobs[e.sha256]);
-      await quarantineAndPrune({source,entry:e,root,quarantineRoot:path.join(dir,'quarantine'),receipt:path.join(dir,'pruned.jsonl')},dependencies.quarantineOperations || fsp);
+      await remoteHash(client,c,e,verified.blobs[blobIdentity(m,e)]);
+      if(aborted)return;
+      await quarantineAndPrune({source,entry:e,root,quarantineRoot:path.join(dir,'quarantine'),receipt},dependencies.quarantineOperations || fsp);
       removed++;bytes+=e.byteSize;
-    }
+      }catch(error){aborted=true;throw error;}
+    });
     console.log(JSON.stringify({pruned:true,files:removed,bytes}));return;
   }
   throw Error('Unknown command');

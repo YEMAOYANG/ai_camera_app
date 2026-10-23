@@ -8,6 +8,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
+from urllib.parse import quote, unquote, urlsplit
 
 from core.course_storage_config import CourseStorageConfig
 from services.course_media_object_store import CourseMediaObjectStore, CourseMediaStorageError, _NoRedirect
@@ -48,8 +49,8 @@ class CourseMediaObjectStoreTest(unittest.TestCase):
         opener_patch.start()
         self.addCleanup(opener_patch.stop)
 
-    def _manifest(self):
-        self.manifest_path.write_text(json.dumps({"schemaVersion": "mira.course-storage.manifest.v1",
+    def _manifest(self, schema="mira.course-storage.manifest.v1"):
+        self.manifest_path.write_text(json.dumps({"schemaVersion": schema,
                                                  "snapshotId": "fixture", "files": [self.entry]}))
 
     def test_public_get_validates_real_bytes_without_a_local_copy_or_any_credentials(self):
@@ -110,6 +111,57 @@ class CourseMediaObjectStoreTest(unittest.TestCase):
                "COURSE_STORAGE_BUCKET": "study", "COURSE_STORAGE_MANIFEST_PATH": str(self.manifest_path)}
         with self.assertRaises(ValueError):
             CourseStorageConfig.from_env(env)
+
+    def test_v2_names_and_reserved_characters_are_encoded_without_changing_byte_identity(self):
+        key = "2026-10-23/语文/一年级上册-金木水火土?问#号%/金木水火土-老师讲解-%2F-001.wav"
+        self.entry["objectKey"] = key
+        self._manifest("mira.course-storage.manifest.v2")
+        store = CourseMediaObjectStore(config=replace(self.config, prefix="2026-10-23"), project_root=self.root)
+        self.assertEqual(store.read(self.source, expected_sha256=self.sha, expected_bytes=len(self.data)), self.data)
+        req = self.opener.open.call_args.args[0]
+        self.assertEqual(req.full_url, "http://storage.invalid:9000/study/" +
+                         "/".join(quote(segment, safe="") for segment in key.split("/")))
+        parts = urlsplit(req.full_url)
+        self.assertEqual(parts.query, "")
+        self.assertEqual(parts.fragment, "")
+        self.assertEqual(unquote(parts.path), "/study/" + key)
+        self.assertIn("%252F", parts.path)
+        self.assertFalse(self.source.exists())
+
+    def test_v2_rejects_unsafe_names_mime_mismatches_and_non_media_before_network(self):
+        prefix = "2026-10-23"
+        store = CourseMediaObjectStore(config=replace(self.config, prefix=prefix), project_root=self.root)
+        keys = [
+            "2026-10-230/语文/课件/讲解.wav", f"{prefix}/语文/讲解.wav", f"{prefix}/语文/一年级/课件/讲解.wav",
+            f"{prefix}/ /课件/讲解.wav", f"{prefix}/./课件/讲解.wav", f"{prefix}/语文/../讲解.wav",
+            f"{prefix}/语文/课件/讲\\解.wav", f"{prefix}/语文/课件/讲\x00解.wav",
+            f"{prefix}/语文/课件/讲\x7f解.wav", f"{prefix}/语文/课件/讲\x85解.wav",
+            f"{prefix}/语文/{'课' * 86}/讲解.wav", f"{prefix}/语文/课件/图片.png",
+            f"{prefix}/语文/课件/课件.html", f"{prefix}/语文/课件/索引.json", f"{prefix}/语文/课件/模型.glb",
+        ]
+        for key in keys:
+            with self.subTest(key=repr(key)):
+                self.entry["objectKey"] = key
+                self._manifest("mira.course-storage.manifest.v2")
+                with self.assertRaises(CourseMediaStorageError):
+                    store.read(self.source)
+        self.opener.open.assert_not_called()
+
+    def test_v1_does_not_accept_named_keys_and_v2_keeps_distinct_keys_for_equal_hashes(self):
+        self.entry["objectKey"] = "2026-10-23/语文/课件一/课件一-老师讲解-001.wav"
+        self._manifest()
+        store = CourseMediaObjectStore(config=replace(self.config, prefix="2026-10-23"), project_root=self.root)
+        with self.assertRaises(CourseMediaStorageError):
+            store.read(self.source)
+        other = self.source.with_name("second.wav")
+        other_entry = {**self.entry, "path": other.relative_to(self.root).as_posix(),
+                       "objectKey": "2026-10-23/语文/课件二/课件二-老师讲解-001.wav"}
+        self.manifest_path.write_text(json.dumps({"schemaVersion": "mira.course-storage.manifest.v2",
+                                                 "snapshotId": "two-courses", "files": [self.entry, other_entry]}))
+        self.assertEqual(store.read(self.source), self.data)
+        self.assertEqual(store.read(other), self.data)
+        urls = [call.args[0].full_url for call in self.opener.open.call_args_list]
+        self.assertEqual(len(set(urls)), 2)
 
     def test_asset_store_readback_uses_migrated_bytes_but_new_writes_stay_local(self):
         local_root = self.root / "backend/data/learning-media"
