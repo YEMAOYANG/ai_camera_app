@@ -360,3 +360,97 @@ test('new asset copies retain one GiB and existing verified caches remain readab
  await assert.rejects(saveBytes(f.root,hash,'.bin',bytes,{statfs:()=>{throw Error('must reject symlink first');}}),/staging_conflict/);
  for(const stat of [{bavail:-1,bsize:4096},{bavail:NaN,bsize:4096},{bavail:100,bsize:0}])assert.throws(()=>assertAssetWriteBudget(stat,1),/space_unavailable/);
 });
+
+function finiteAudioRoom(stage='stage-one',{extra='',expression='BASE+file+".wav"',variables=''}={}){
+ const snapshot=room([]);snapshot.stage.id=stage;
+ const base='/api/classroom-media/'+stage+'/audio/';
+ snapshot.scenes[0].content={type:'interactive',html:`<script>
+ const BASE=${JSON.stringify(base)};const roles=['me','you','he'];let speaker='teal',index=0;
+ const player={};let queue=[];${variables}
+ function play(files){queue=files.slice();playNext();player.play();}
+ function playNext(){if(!queue.length)return;${expression.includes("queue.shift()")?"":"const file=queue.shift();"}player.src=${expression};}
+ function listen(){play(['speaker-'+speaker,'cue-'+roles[index]])}
+ speaker=speaker==='teal'?'coral':'teal';index=(index+1)%3;${extra}
+ throw Error('must never execute course source');</script>`};
+ return snapshot;
+}
+function derivedAudio(snapshot){return enumerateSnapshotAssets(snapshot).filter(e=>e.ref.startsWith('mira:classroom-audio')||e.ref.includes('/audio/'));}
+test('finite audio flow derives five names per stage through parameters, copy, queue and scoped assignments',()=>{
+ const all=[];
+ for(const stage of ['stage-one','stage-two'])for(const expression of ['BASE+file+".wav"','BASE+queue.shift()+".wav"','`${BASE}${file}.wav`']){
+  const snapshot=finiteAudioRoom(stage,{expression,variables:'const files=unknownValue;function unrelated(){let queue=["outside"];opaque(queue);}' }),original=JSON.stringify(snapshot),entries=derivedAudio(snapshot);
+  const expected=['speaker-teal','speaker-coral','cue-me','cue-you','cue-he'].map(stem=>'/api/classroom-media/'+stage+'/audio/'+stem+'.wav').sort();
+  assert.deepEqual(entries.map(e=>e.ref).sort(),expected);assert(entries.every(e=>e.kind==='audio'&&e.status==='already_collected'));
+  assert.equal(JSON.stringify(snapshot),original);all.push(...entries.map(e=>e.ref));
+ }
+ assert.equal(new Set(all).size,10);
+});
+test('unknown audio assignments, external arrays, alias mutation and function escape remain unresolved',()=>{
+ const cases=[
+  'queue=unknownFiles;',
+  'speaker=readExternalSpeaker();',
+  'roles.push("other");',
+  'roles["push"]("other");',
+  'roles[readExternalMethod()]("other");',
+  'const alias=roles;alias.push("other");',
+  'opaque(roles);',
+  'const alias=roles;opaque(alias);',
+  'const alias=play;alias(["cue-me"]);',
+  'function leak(){return roles;}',
+  'roles[index]="other";',
+  'index=readExternalIndex();',
+  'index=99;',
+  'index=(index+1)%4;',
+  'opaque(BASE);',
+ ];
+ for(const extra of cases){const entries=derivedAudio(finiteAudioRoom('stage-one',{extra}));assert(entries.some(e=>e.status==='unresolved'),extra);assert(entries.some(e=>e.ref==='/api/classroom-media/stage-one/audio/'||e.ref.startsWith('mira:classroom-audio')),extra);}
+ const dynamic=derivedAudio(finiteAudioRoom('stage-one',{expression:'BASE+readExternalName()+".wav"'}));
+ assert(dynamic.some(e=>e.status==='unresolved'));
+});
+test('unbounded filename sets, template expressions and unsupported escaping paths never disappear',()=>{
+ const template=finiteAudioRoom('stage-one',{expression:'`/api/classroom-media/stage-one/audio/${readExternalName()}.wav`'});
+ assert(derivedAudio(template).some(e=>e.status==='unresolved'));
+ const dynamicStage=finiteAudioRoom('stage-one',{expression:'`/api/classroom-media/${readExternalStage()}/audio/${file}.wav`'});
+ assert(enumerateSnapshotAssets(dynamicStage).some(e=>e.ref==='/api/classroom-media/'&&e.status==='unresolved'));
+ const overflow=finiteAudioRoom();overflow.scenes[0].content.html=overflow.scenes[0].content.html.replace("['me','you','he']",JSON.stringify(Array.from({length:129},(_,i)=>'name'+i)));
+ assert(derivedAudio(overflow).some(e=>e.status==='unresolved'));
+ const bounded=finiteAudioRoom('stage-one',{variables:Array.from({length:520},(_,i)=>'const local'+i+'=0;').join('')});
+ assert(derivedAudio(bounded).some(e=>e.ref==='mira:classroom-audio-analysis-limit'&&e.status==='unresolved'));
+});
+function audioScript(script){const snapshot=room([]);snapshot.scenes[0].content={type:'interactive',html:'<script>'+script+'</script>'};return derivedAudio(snapshot);}
+test('queue consumption requires a dominating nonempty guard and one unique take site',()=>{
+ const base='const BASE="/api/classroom-media/stage-one/audio/";const player={};';
+ const good=audioScript(base+'const q=["cue-me"];function next(){if(!q.length){return;}player.src=BASE+q.shift()+".wav";}');
+ assert(good.some(e=>e.ref.endsWith('/cue-me.wav')&&e.status==='already_collected'));assert(!good.some(e=>e.status==='unresolved'));
+ const bad=[
+  'const q=["cue-me"];function next(){player.src=BASE+q.shift()+".wav";}',
+  'const q=["cue-me"];new Audio(BASE+q.shift()+".wav");new Audio(BASE+q.shift()+".wav");',
+  'const q=["cue-me"];function next(){if(!q.length)return;const first=q.shift();player.src=BASE+q.shift()+".wav";}',
+  'const q=[];function next(){if(!q.length)return;player.src=BASE+q.shift()+".wav";}',
+  'let q=["cue-me"];function next(){if(!q.length)return;q=[];player.src=BASE+q.shift()+".wav";}',
+  'const q=["cue-me"];function next(){if(!q.length)return;opaque();player.src=BASE+q.shift()+".wav";}',
+  'const q=["cue-me"];function next(){if(!q.length)return;while(again){player.src=BASE+q.shift()+".wav";}}',
+  'const q=["cue-me"];const alias=q;function next(){if(!q.length)return;player.src=BASE+alias.shift()+".wav";}',
+  'const q=["cue-me"];function next(){if(!q.length)return;player.src=BASE+q.shift()+".wav";}function other(){q.pop();}',
+ ];
+ for(const script of bad){const entries=audioScript(base+script);assert(entries.some(e=>e.status==='unresolved'),script);assert(!entries.some(e=>e.ref.endsWith('/cue-me.wav')&&e.status==='already_collected'),script);}
+});
+test('audio scripts with parse errors, destructuring, loop writes or dynamic-code constructs fail closed',()=>{
+ const base='const BASE="/api/classroom-media/stage-one/audio/";let name="cue-me";const player={};';
+ for(const unsafe of [
+  'let broken=;',
+  'function shadow(){const {BASE}=external;player.src=BASE+name+".wav";}',
+  '[name]=external;',
+  'for(name of external){}',
+  'for(name in external){}',
+  'with(external){name="changed";}',
+  'eval("name=external");',
+  'new Function("name=external")();',
+  'globalThis["eval"]("name=external");',
+  'const run=globalThis["Function"];run("name=external")();',
+ ]){
+  const entries=audioScript(base+unsafe+'player.src=BASE+name+".wav";');
+  assert(entries.some(e=>e.ref==='mira:classroom-audio-analysis-unresolved'&&e.status==='unresolved'),unsafe);
+  assert(!entries.some(e=>e.status==='already_collected'),unsafe);
+ }
+});

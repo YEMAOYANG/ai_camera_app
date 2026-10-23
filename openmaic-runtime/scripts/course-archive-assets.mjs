@@ -168,6 +168,227 @@ function threeHtmlModules(document){
  return {scripts,refs};
 }
 
+
+// A bounded abstract value analysis, not a JavaScript interpreter. Only finite
+// literal audio names may replace a directory literal; every unknown stays loud.
+function finiteClassroomAudio(source){
+ const prefix=/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/$/;
+ const prefixes=new Set(),nodes=[];
+ const scan=node=>{nodes.push(node);if((ts.isStringLiteral(node)||ts.isNoSubstitutionTemplateLiteral(node)||ts.isTemplateHead(node))&&prefix.test(node.text))prefixes.add(node);ts.forEachChild(node,scan);};
+ scan(source);
+ const entries=[],provenLiterals=new Set();
+ const unresolved=()=>({entries:[{ref:'mira:classroom-audio-analysis-unresolved',kind:'audio'}],provenLiterals:new Set()});
+ if(source.parseDiagnostics.length&&(prefixes.size||source.text.includes('/api/classroom-media/')))return unresolved();
+ if(!prefixes.size)return{entries,provenLiterals};
+ const unsafePattern=nodes.some(node=>ts.isWithStatement(node)||ts.isForOfStatement(node)||ts.isForInStatement(node)
+  ||((ts.isVariableDeclaration(node)||ts.isParameter(node))&&!ts.isIdentifier(node.name))
+  ||(ts.isBinaryExpression(node)&&node.operatorToken.kind===ts.SyntaxKind.EqualsToken&&(ts.isArrayLiteralExpression(node.left)||ts.isObjectLiteralExpression(node.left)))
+  ||(ts.isIdentifier(node)&&['eval','Function'].includes(node.text))
+  ||(ts.isElementAccessExpression(node)&&['eval','Function'].includes(node.argumentExpression?.text)));
+ if(unsafePattern)return unresolved();
+ const limited=()=>({entries:[{ref:'mira:classroom-audio-analysis-limit',kind:'audio'}],provenLiterals:new Set()});
+ if(nodes.length>20000)return limited();
+ const scopes=new WeakMap(),decls=new WeakMap(),bindings=[],functions=[];let operations=0;
+ const scope=(parent,fn=false)=>({parent,fn,bindings:new Map()});
+ const outer=scope(null,true);
+ const declare=(where,name,node)=>{
+  if(!ts.isIdentifier(name))return;
+  let binding=where.bindings.get(name.text);
+  if(!binding){binding={name:name.text,defs:[],unsafe:false,escaped:false,value:null};where.bindings.set(name.text,binding);bindings.push(binding);}
+  else binding.unsafe=true;
+  decls.set(node,binding);return binding;
+ };
+ const bind=(node,current)=>{
+  let here=current;
+  if(ts.isFunctionLike(node)){
+   let named;
+   if(ts.isFunctionDeclaration(node)&&node.name)named=declare(current,node.name,node);
+   here=scope(current,true);
+   const fn={node,params:[],escaped:false,calls:0};functions.push(fn);
+   if(named)named.fn=fn;
+   for(const parameter of node.parameters||[]){const b=declare(here,parameter.name,parameter);if(b){if(parameter.initializer||parameter.dotDotDotToken)b.unsafe=true;fn.params.push(b);}else fn.escaped=true;}
+  }else if(ts.isBlock(node)&&!ts.isFunctionLike(node.parent))here=scope(current);
+  scopes.set(node,here);
+  if(ts.isVariableDeclaration(node)){
+   let owner=here;if(!(node.parent.flags&ts.NodeFlags.BlockScoped))while(owner.parent&&!owner.fn)owner=owner.parent;
+   const b=declare(owner,node.name,node);if(b&&node.initializer)b.defs.push(node.initializer);
+  }
+  ts.forEachChild(node,child=>bind(child,here));
+ };
+ bind(source,outer);if(bindings.length>512)return limited();
+ const lookup=node=>{if((ts.isPropertyAccessExpression(node.parent)||ts.isPropertyAssignment(node.parent))&&node.parent.name===node)return;let current=scopes.get(node);while(current){if(current.bindings.has(node.text))return current.bindings.get(node.text);current=current.parent;}};
+ const escape=node=>{
+  if(ts.isFunctionLike(node)||ts.isElementAccessExpression(node)||ts.isPropertyAccessExpression(node))return;
+  if(ts.isIdentifier(node)){const b=lookup(node);if(b&&!b.fn)b.escaped=true;}
+  ts.forEachChild(node,escape);
+ };
+ const candidates=[];
+ for(const node of nodes){
+  if(ts.isVariableDeclaration(node)&&node.initializer)candidates.push(node.initializer);
+  if(ts.isReturnStatement(node)&&node.expression){candidates.push(node.expression);escape(node.expression);}
+  if(ts.isBinaryExpression(node)&&node.operatorToken.kind>=ts.SyntaxKind.FirstAssignment&&node.operatorToken.kind<=ts.SyntaxKind.LastAssignment){
+   candidates.push(node.right);
+   if(ts.isIdentifier(node.left)){const b=lookup(node.left);if(b){if(node.operatorToken.kind===ts.SyntaxKind.EqualsToken)b.defs.push(node.right);else b.unsafe=true;}}
+   else if((ts.isPropertyAccessExpression(node.left)||ts.isElementAccessExpression(node.left))&&ts.isIdentifier(node.left.expression)){
+    const b=lookup(node.left.expression);if(b)b.unsafe=true;
+    if(!ts.isPropertyAccessExpression(node.left)||!['src','href'].includes(node.left.name.text))escape(node.right);
+   }
+  }
+  if((ts.isPrefixUnaryExpression(node)||ts.isPostfixUnaryExpression(node))&&[ts.SyntaxKind.PlusPlusToken,ts.SyntaxKind.MinusMinusToken].includes(node.operator)&&ts.isIdentifier(node.operand)){const b=lookup(node.operand);if(b)b.unsafe=true;}
+  if(ts.isCallExpression(node)){
+   const fn=ts.isIdentifier(node.expression)?lookup(node.expression)?.fn:undefined;
+   if(fn){
+    fn.calls++;
+    for(const [i,b]of fn.params.entries()){if(!node.arguments[i]||node.arguments.some(ts.isSpreadElement))b.unsafe=true;else b.defs.push(node.arguments[i]);}
+   }else{
+    for(const argument of node.arguments)escape(argument);
+    if((ts.isPropertyAccessExpression(node.expression)||ts.isElementAccessExpression(node.expression))&&ts.isIdentifier(node.expression.expression)){
+     const method=ts.isPropertyAccessExpression(node.expression)?node.expression.name.text:node.expression.argumentExpression?.text;
+     if(!['slice','shift','pop'].includes(method)){const b=lookup(node.expression.expression);if(b)b.unsafe=true;}
+    }
+   }
+  }
+  if(ts.isNewExpression(node))for(const argument of node.arguments||[])candidates.push(argument);
+  if(ts.isIdentifier(node)){
+   const fn=lookup(node)?.fn;
+   if(fn&&!(ts.isFunctionDeclaration(node.parent)&&node.parent.name===node)&&!(ts.isCallExpression(node.parent)&&node.parent.expression===node))fn.escaped=true;
+  }
+ }
+ for(const fn of functions)if(fn.escaped||!fn.calls)for(const b of fn.params)b.unsafe=true;
+
+ const takeProof=new WeakMap();
+ const guardedTake=node=>{
+  if(takeProof.has(node))return takeProof.get(node);
+  const prove=()=>{
+   const receiver=node.expression.expression;if(!ts.isIdentifier(receiver))return false;
+   const owner=lookup(receiver);if(!owner)return false;
+   const group=new Set([owner]);let expanded=true;
+   while(expanded){expanded=false;for(const [a,b]of aliases)if((group.has(a)||group.has(b))&&(!group.has(a)||!group.has(b))){group.add(a);group.add(b);expanded=true;}}
+   const takes=nodes.filter(item=>ts.isCallExpression(item)&&ts.isPropertyAccessExpression(item.expression)&&['shift','pop'].includes(item.expression.name.text)&&ts.isIdentifier(item.expression.expression)&&group.has(lookup(item.expression.expression)));
+   if(takes.length!==1)return false;
+   let fn=node.parent;while(fn&&!ts.isFunctionLike(fn))fn=fn.parent;
+   if(!fn||!fn.body||!ts.isBlock(fn.body))return false;
+   const body=fn.body;let statement=node;
+   while(statement.parent&&statement.parent!==body)statement=statement.parent;
+   if(statement.parent!==body||(!ts.isVariableStatement(statement)&&!ts.isExpressionStatement(statement)))return false;
+   const exits=then=>ts.isReturnStatement(then)||(ts.isBlock(then)&&then.statements.length&&ts.isReturnStatement(then.statements.at(-1)));
+   for(const guard of body.statements){
+    if(guard===statement)break;
+    if(!ts.isIfStatement(guard)||guard.elseStatement||!exits(guard.thenStatement))continue;
+    let condition=guard.expression;while(ts.isParenthesizedExpression(condition))condition=condition.expression;
+    if(!ts.isPrefixUnaryExpression(condition)||condition.operator!==ts.SyntaxKind.ExclamationToken)continue;
+    const length=condition.operand;
+    if(!ts.isPropertyAccessExpression(length)||length.name.text!=='length'||!ts.isIdentifier(length.expression)||lookup(length.expression)!==owner)continue;
+    const critical=nodes.filter(item=>item.pos>=guard.end&&item.end<=statement.end);
+    const changes=critical.some(item=>{
+     if(item===node)return false;
+     if(ts.isCallExpression(item)||ts.isNewExpression(item)||ts.isAwaitExpression(item)||ts.isYieldExpression(item)||ts.isFunctionLike(item))return true;
+     if(ts.isVariableDeclaration(item)&&group.has(decls.get(item)))return true;
+     if(ts.isBinaryExpression(item)&&item.operatorToken.kind>=ts.SyntaxKind.FirstAssignment&&item.operatorToken.kind<=ts.SyntaxKind.LastAssignment){
+      const left=item.left;
+      if(ts.isIdentifier(left)&&group.has(lookup(left)))return true;
+      if((ts.isPropertyAccessExpression(left)||ts.isElementAccessExpression(left))&&ts.isIdentifier(left.expression)&&group.has(lookup(left.expression)))return true;
+     }
+     return false;
+    });
+    if(!changes)return true;
+   }
+   return false;
+  };
+  const result=prove();takeProof.set(node,result);return result;
+ };
+
+ const value=(type='bottom',values=[],origins=[],lengths=[])=>({type,values:new Set(values),origins:new Set(origins),lengths:new Set(lengths)});
+ const merge=(a,b)=>{
+  if(!a)return b;if(!b)return a;
+  const origins=new Set([...a.origins,...b.origins]);
+  if(a.type==='bottom')return{...b,origins};if(b.type==='bottom')return{...a,origins};
+  const type=a.type===b.type?a.type:'unknown',values=new Set([...a.values,...b.values]),lengths=new Set([...a.lengths,...b.lengths]);
+  return values.size>128||type==='unknown'?value('unknown',[],origins):value(type,values,origins,lengths);
+ };
+ const unknown=(...items)=>value('unknown',[],items.flatMap(item=>[...(item?.origins||[])]));
+ const join=(a,b,operator)=>{
+  if(a.type==='bottom'||b.type==='bottom')return value('bottom',[],[...a.origins,...b.origins]);
+  const strings=operator===ts.SyntaxKind.PlusToken&&[a.type,b.type].includes('string');
+  if(!['string','number'].includes(a.type)||!['string','number'].includes(b.type)||(!strings&&(a.type!=='number'||b.type!=='number')))return unknown(a,b);
+  const result=value(strings?'string':'number',[],[...a.origins,...b.origins]);
+  for(const x of a.values)for(const y of b.values){
+   const next=strings?String(x)+String(y):operator===ts.SyntaxKind.PlusToken?x+y:operator===ts.SyntaxKind.PercentToken&&y>0?x%y:NaN;
+   if((typeof next==='number'&&!Number.isSafeInteger(next))||(typeof next==='string'&&next.length>4096))return unknown(a,b);
+   result.values.add(next);if(result.values.size>128)return unknown(a,b);
+  }
+  return result;
+ };
+ let evaluationDepth=0;
+ const evaluate=node=>{
+  if(++evaluationDepth>64){evaluationDepth--;return value('unknown',[],prefixes);}
+  try{return evaluateNode(node);}finally{evaluationDepth--;}
+ };
+ const evaluateNode=node=>{
+  if(!node||++operations>200000)return value('unknown');
+  if(ts.isParenthesizedExpression(node))return evaluate(node.expression);
+  if(ts.isStringLiteral(node)||ts.isNoSubstitutionTemplateLiteral(node))return value('string',[node.text],prefixes.has(node)?[node]:[]);
+  if(ts.isNumericLiteral(node))return value('number',[Number(node.text)]);
+  if(ts.isIdentifier(node)){const b=lookup(node);return b?.value||value(b?'bottom':'unknown');}
+  if(ts.isConditionalExpression(node))return merge(evaluate(node.whenTrue),evaluate(node.whenFalse));
+  if(ts.isBinaryExpression(node)&&[ts.SyntaxKind.PlusToken,ts.SyntaxKind.PercentToken].includes(node.operatorToken.kind))return join(evaluate(node.left),evaluate(node.right),node.operatorToken.kind);
+  if(ts.isTemplateExpression(node)){
+   let result=value('string',[node.head.text],prefixes.has(node.head)?[node.head]:[]);
+   for(const span of node.templateSpans)result=join(join(result,evaluate(span.expression),ts.SyntaxKind.PlusToken),value('string',[span.literal.text]),ts.SyntaxKind.PlusToken);
+   return result;
+  }
+  if(ts.isArrayLiteralExpression(node)){
+   let result=value('array',[],[],[node.elements.length]);
+   for(const element of node.elements){const part=evaluate(element);if(!['string','number','bottom'].includes(part.type))return unknown(result,part);result=merge(result,value('array',part.values,part.origins,[node.elements.length]));}
+   return result;
+  }
+  if(ts.isElementAccessExpression(node)){
+   const array=evaluate(node.expression),index=evaluate(node.argumentExpression);
+   if(array.type==='bottom'||index.type==='bottom')return value('bottom',[],[...array.origins,...index.origins]);
+   if(array.type!=='array'||index.type!=='number'||!index.values.size||!array.lengths.size||[...index.values].some(i=>!Number.isSafeInteger(i)||i<0||[...array.lengths].some(n=>i>=n)))return unknown(array,index);
+   const types=new Set([...array.values].map(item=>typeof item));return types.size===1?value([...types][0],array.values,[...array.origins,...index.origins]):unknown(array,index);
+  }
+  if(ts.isPropertyAccessExpression(node)){
+   const owner=evaluate(node.expression);return node.name.text==='length'&&owner.type==='array'?value('number',owner.lengths,owner.origins):unknown(owner);
+  }
+  if(ts.isCallExpression(node)&&ts.isPropertyAccessExpression(node.expression)){
+   const owner=evaluate(node.expression.expression),name=node.expression.name.text;
+   if(owner.type==='bottom')return owner;
+   if(owner.type==='array'&&!node.arguments.length&&name==='slice')return owner;
+   if(owner.type==='array'&&!node.arguments.length&&['shift','pop'].includes(name)&&guardedTake(node)){
+    const types=new Set([...owner.values].map(item=>typeof item));return !types.size?value('bottom',[],owner.origins):types.size===1?value([...types][0],owner.values,owner.origins):unknown(owner);
+   }
+   return unknown(owner,...node.arguments.map(evaluate));
+  }
+  if(ts.isCallExpression(node)||ts.isNewExpression(node))return unknown(...(node.arguments||[]).map(evaluate));
+  return value('unknown',[],[...prefixes].filter(prefix=>prefix.pos>=node.pos&&prefix.end<=node.end));
+ };
+ const aliases=bindings.flatMap(b=>b.defs.filter(ts.isIdentifier).map(node=>[b,lookup(node)]).filter(([,other])=>other));
+ const signature=item=>JSON.stringify([item.type,[...item.values].sort(),[...item.lengths].sort(),[...item.origins].map(node=>node.pos).sort()]);
+ for(let pass=0;pass<32;pass++){
+  let changed=false;
+  for(const b of bindings){
+   let next=b.defs.reduce((result,expr)=>merge(result,evaluate(expr)),value());
+   if(next.type==='array')b.arrayLike=true;
+   if(b.unsafe||(b.escaped&&(next.type==='array'||next.origins.size))||!b.defs.length)next=unknown(next);
+   next=merge(b.value,next);
+   if(!b.value||signature(next)!==signature(b.value)){b.value=next;changed=true;}
+  }
+  for(const [a,b]of aliases)if((a.arrayLike||b.arrayLike)&&(a.unsafe||b.unsafe||a.escaped||b.escaped)&&(!a.unsafe||!b.unsafe)){a.unsafe=b.unsafe=true;changed=true;}
+  if(!changed)break;
+  if(pass===31||operations>200000)return limited();
+ }
+ for(const expression of candidates){
+  const result=evaluate(expression);if(operations>200000)return limited();if(!result.origins.size)continue;
+  if(result.type==='string'&&[...result.values].every(ref=>prefix.test(ref)))continue;
+  if(result.type==='string'&&result.values.size&&[...result.values].every(ref=>classroom(ref)&&/\/audio\/[^/]+\.wav$/.test(ref))){
+   for(const ref of result.values)entries.push({ref,kind:'audio'});
+   for(const node of result.origins)provenLiterals.add(node);
+  }else entries.push({ref:'mira:classroom-audio-expression-unresolved:'+expression.pos,kind:'audio'});
+ }
+ return{entries,provenLiterals};
+}
+
 function htmlReferences(html){
  const result=[];
  if(typeof html!=='string'||!html)return result;
@@ -201,10 +422,11 @@ function htmlReferences(html){
   // Parse JavaScript literals without evaluating it. A regexp over quoted
   // source accidentally retained the backslash in nested escaped SVG markup.
   const source=ts.createSourceFile('course.js',script.textContent,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+  const audio=finiteClassroomAudio(source);result.push(...audio.entries);
   const visit=node=>{
-   if(ts.isStringLiteral(node)||ts.isNoSubstitutionTemplateLiteral(node)){
+   if(ts.isStringLiteral(node)||ts.isNoSubstitutionTemplateLiteral(node)||ts.isTemplateHead(node)){
     const value=node.text;
-    if(!NAMESPACES.has(value)&&/^(?:ast_|https?:\/\/|\/\/|blob:|file:|\/api\/classroom-media\/|\/review-assets\/|\/avatars\/)/.test(value))add(value,'dependency');
+    if(!audio.provenLiterals.has(node)&&!NAMESPACES.has(value)&&/^(?:ast_|https?:\/\/|\/\/|blob:|file:|\/api\/classroom-media\/|\/review-assets\/|\/avatars\/)/.test(value))add(value,'dependency');
     if(value.includes('<')&&value.includes('>'))result.push(...htmlReferences(value));
    }
    ts.forEachChild(node,visit);
