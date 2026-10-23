@@ -254,6 +254,61 @@ test('old objects retire only after complete active named-layout acceptance',asy
   await retire();assert.equal(f.client.calls.filter(c=>c.kind==='DeleteObjectCommand').length,1);
 });
 
+test('retirement aborts pending workers after the first old-object deletion fails',{timeout:5000},async t=>{
+  const f=await fixture(t),index=JSON.parse(await fs.readFile(f.releaseIndex)),client=new NamedBucket(f);
+  for(let i=1;i<=2;i++){
+    const bytes=Buffer.from('distinct published narration '+i),checksum=sha(bytes);
+    const relative=path.dirname(f.relative)+'/'+checksum+'.mp3';
+    await fs.writeFile(path.join(f.root,relative),bytes);
+    index.releases[0].media.push({path:'/api/classroom-media/'+classroom+'/audio/'+checksum+'.mp3',
+      sha256:checksum,byteSize:bytes.length,mimeType:'audio/mpeg'});
+    client.objects.set(f.config.prefix+'/blobs/sha256/'+checksum,{bytes,etag:'"old-'+i+'"'});
+  }
+  await fs.writeFile(f.releaseIndex,JSON.stringify(index));
+  const oldDependencies={...f.dependencies,client};
+  await run({command:'inventory',manifest:f.manifest,'release-index':f.releaseIndex,snapshot:'fixture'},oldDependencies);
+  await run({command:'verify',manifest:f.manifest},oldDependencies);
+  const old=JSON.parse(await fs.readFile(f.manifest)),oldKeys=old.files.map(e=>e.objectKey);
+  assert.equal(new Set(old.files.map(e=>e.sha256)).size,3);
+  for(const entry of old.files)await fs.unlink(path.join(f.root,entry.path));
+  const config={...f.config,prefix:'2026-10-23'},dependencies={...oldDependencies,config};
+  const manifest=path.join(f.root,'named-abort-manifest.json'),sourceOptions={'source-manifest':f.manifest,'source-prefix':f.config.prefix};
+  await run({command:'layout',manifest,'release-index':f.releaseIndex,date:config.prefix,snapshot:'named-abort',...sourceOptions},dependencies);
+  await run({command:'relocate',manifest,...sourceOptions},dependencies);
+  await run({command:'verify',manifest},dependencies);
+  await run({command:'activate',manifest},dependencies);
+  const named=JSON.parse(await fs.readFile(manifest)),dir=path.join(f.state,'transfers/named-abort');
+  const verification=await fs.readFile(path.join(dir,'verified-complete.json')),acceptance=path.join(f.root,'abort-acceptance.json');
+  await fs.writeFile(acceptance,JSON.stringify({manifestSha256:sha(await fs.readFile(manifest)),
+    verificationSha256:sha(verification),storage:storageIdentity(config),remoteReadPassed:true,
+    restorePassed:true,studentPlaybackPassed:true,oldSourceConsumersDetached:true,
+    retireSourceManifestSha256:named.sourceManifestSha256}));
+  let releaseSecondHead,secondHeadStarted=false;
+  const secondHead=new Promise(resolve=>{releaseSecondHead=resolve;}),send=client.send.bind(client);
+  client.calls=[];
+  client.send=async command=>{
+    const kind=command.constructor.name,input=command.input;
+    if(kind==='HeadObjectCommand' && input.Key===oldKeys[1]){
+      secondHeadStarted=true;await secondHead;
+    }
+    if(kind==='DeleteObjectCommand' && input.Key===oldKeys[0]){
+      client.calls.push({kind,input});
+      // Resume the in-flight second worker only after the first rejection's
+      // catch has set the abort flag. The third object has not started yet.
+      setImmediate(releaseSecondHead);
+      throw Error('simulated first old-object delete failure');
+    }
+    return send(command);
+  };
+  await assert.rejects(run({command:'retire-source',manifest,acceptance,concurrency:2,...sourceOptions},dependencies),
+    /simulated first old-object delete failure/);
+  assert.equal(secondHeadStarted,true);
+  assert.deepEqual(client.calls.filter(c=>c.kind==='DeleteObjectCommand').map(c=>c.input.Key),[oldKeys[0]]);
+  assert(!client.calls.some(c=>c.kind==='HeadObjectCommand' && c.input.Key===oldKeys[2]));
+  for(const key of [...oldKeys,...named.files.map(e=>e.objectKey)])assert(client.objects.has(key),key);
+  await assert.rejects(fs.stat(path.join(dir,'retired-source.jsonl')),{code:'ENOENT'});
+});
+
 test('local pruning refuses unexplained missing files',async t=>{
   const f=await fixture(t);await f.verify();await fs.unlink(f.source);
   await assert.rejects(f.prune(),/no matching pruning receipt/);
