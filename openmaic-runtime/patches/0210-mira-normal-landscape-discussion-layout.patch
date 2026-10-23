@@ -1,0 +1,254 @@
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -1,6 +1,6 @@
+ 'use client';
+ 
+-import { useState, useRef, useCallback, useEffect, type CSSProperties } from 'react';
++import { useState, useRef, useCallback, useEffect, useId, type CSSProperties } from 'react';
+ import { usePresentationToolbarHeight } from './use-presentation-toolbar-height';
+ import { motion, AnimatePresence } from 'motion/react';
+ import {
+@@ -12,6 +12,8 @@
+   Play,
+   ChevronLeft,
+   ChevronRight,
++  ChevronUp,
++  ChevronDown,
+   Repeat,
+   BookOpen,
+   Loader2,
+@@ -238,6 +240,9 @@
+   const playbackSpeed = useSettingsStore((s) => s.playbackSpeed);
+   const setPlaybackSpeed = useSettingsStore((s) => s.setPlaybackSpeed);
+   const [isInputOpen, setIsInputOpen] = useState(false);
++  const [compactDiscussionExpanded, setCompactDiscussionExpanded] = useState(false);
++  const compactDiscussionId = useId();
++  useEffect(() => setCompactDiscussionExpanded(false), [activitySceneId, isPresenting]);
+   const [isVoiceOpen, setIsVoiceOpen] = useState(false);
+   const [inputValue, setInputValue] = useState('');
+   const [userMessage, setUserMessage] = useState<string | null>(null);
+@@ -1210,6 +1215,7 @@
+     <div
+       data-mira-fixed-textbook={fixedTextbook ? '' : undefined}
+       data-mira-roundtable-layout="standard"
++      data-mira-discussion-expanded={compactDiscussionExpanded}
+       style={fixedTextbook ? { height: 216 } : undefined}
+       className={cn(
+         'h-[192px] w-full flex flex-col relative z-10 transition-all duration-300',
+@@ -1228,6 +1234,17 @@
+         {toolbar}
+       </div>
+       {/* ── Interaction area — three-column layout ── */}
++      <button
++        type="button"
++        data-mira-compact-discussion-toggle
++        aria-label={`${t(compactDiscussionExpanded ? 'edit.nav.collapse' : 'edit.nav.expand')} ${teacherName}`}
++        aria-controls={compactDiscussionId}
++        aria-expanded={compactDiscussionExpanded}
++        onClick={() => setCompactDiscussionExpanded(value => !value)}
++      >
++        <img src={teacherAvatar} alt="" />
++        {compactDiscussionExpanded ? <ChevronDown aria-hidden="true" /> : <ChevronUp aria-hidden="true" />}
++      </button>
+       <div data-mira-interaction-row className="flex-1 flex items-stretch min-h-0">
+         {/* Left: Teacher identity */}
+         <div
+@@ -1368,7 +1385,7 @@
+         </div>
+ 
+         {/* Center: Interaction stage */}
+-        <div data-mira-speech-stage className="flex-1 relative mx-3 mb-2">
++        <div id={compactDiscussionId} data-mira-speech-stage className="flex-1 relative mx-3 mb-2">
+           {/* End flash banner (Issue 3) */}
+           <AnimatePresence>
+             {endFlashVisible && (
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1716,3 +1716,85 @@
+   }
+   [data-mira-presentation-chrome] [data-mira-chrome="playback-controls"] [data-mira-indicator="toolbar-divider"] { display: none; }
+ }
++
++/* A browser window in landscape needs the same reachable lesson as fullscreen.
++ * Keep a stable navigation row and a compact conversation row. Expanding speech
++ * is an explicit overlay; typing and recording never resize the activity. */
++[data-mira-compact-discussion-toggle] { display: none; }
++@media (min-width: 641px) and (max-height: 500px) {
++  [data-mira-classroom-root]:not(:fullscreen) [data-mira-chrome='header'] {
++    height: 48px; min-height: 48px; padding: 0 8px; gap: 8px; flex-shrink: 0;
++  }
++  [data-mira-classroom-root]:not(:fullscreen) [data-mira-chrome='header'] button {
++    min-width: 48px; min-height: 48px;
++  }
++  [data-mira-classroom-root]:not(:fullscreen) [data-mira-chrome='header'] h1 { font-size: 16px; }
++  [data-mira-classroom-root]:not(:fullscreen) [data-testid='header-controls'] { gap: 8px; height: 48px; }
++  [data-mira-classroom-root]:not(:fullscreen) [data-testid='header-controls'] > div { padding-block: 0; border-block: 0; }
++  [data-mira-classroom-root]:not(:fullscreen) [data-mira-chrome='header'] h1 + span,
++  [data-mira-classroom-root]:not(:fullscreen) [data-mira-chrome='header'] span.text-\[10px\] { display: none; }
++  [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] {
++    height: 105px !important; min-height: 105px; flex-shrink: 0; transition: none;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] > div:first-child {
++    border: 0; height: 48px; min-height: 48px; flex: 0 0 48px;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-chrome='playback-controls'] {
++    display: flex !important; flex-wrap: nowrap; height: 48px; min-height: 48px; padding: 0 4px; gap: 0;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-chrome='playback-controls'] button {
++    box-sizing: border-box; min-width: 48px; min-height: 48px; height: 48px; flex-shrink: 0;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-indicator='toolbar-divider'],
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-rail-decoration],
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-avatar-label] { display: none; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-interaction-row] {
++    display: flex !important; height: 56px; min-height: 56px; flex: 0 0 56px; align-items: center;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-discussion-rail='teacher'] {
++    width: 56px !important; height: 56px; flex: 0 0 56px;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-discussion-rail='teacher'] > div { visibility: hidden; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-compact-discussion-toggle] {
++    display: flex; align-items: center; justify-content: center; position: absolute;
++    bottom: 4px; left: 4px; width: 48px; height: 48px; z-index: 40;
++    background: white; border: 1px solid #cbd5e1; border-radius: 12px;
++  }
++  [data-mira-compact-discussion-toggle] img { width: 36px; height: 36px; border-radius: 50%; }
++  [data-mira-compact-discussion-toggle] svg { position: absolute; right: 0; bottom: 0; width: 18px; height: 18px; background: white; border-radius: 50%; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-speech-stage] { min-width: 0; height: 56px; margin: 0 4px; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-testid='roundtable-non-presentation-card'] {
++    padding: 0 4px; border-radius: 12px; overflow: visible;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-speech-card] {
++    width: 100%; max-width: 100%; max-height: 52px; min-height: 48px; padding: 2px 32px 2px 4px;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'][data-mira-discussion-expanded='true'] [data-mira-speech-stage] {
++    position: absolute; left: 4px; right: 4px; bottom: 105px;
++    height: min(220px, calc(100dvh - 160px)); margin: 0; z-index: 30;
++    background: white; border: 1px solid #cbd5e1; border-radius: 12px;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'][data-mira-discussion-expanded='true'] [data-mira-speech-card] { max-height: 100%; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-discussion-rail='participants'] {
++    display: flex; flex-direction: row; align-items: center; width: 300px !important;
++    min-width: 0; height: 56px; padding: 0; gap: 4px; flex-shrink: 0;
++  }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-participant-carousel] { flex: 1; min-width: 0; height: 56px; padding: 0; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-participant-viewport] { margin: 0 48px; padding: 0; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-participant-track] { gap: 4px; padding: 4px 0; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-participant-scroll] { width: 48px; min-width: 48px; min-height: 48px; opacity: 1; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-participant-avatar] { width: 48px; height: 48px; transform: none !important; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-participant-input] { flex: 0 0 auto; padding: 0; gap: 4px; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-input-modes] { flex-direction: row; gap: 4px; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-input-mode] { width: 48px; height: 48px; min-width: 48px; min-height: 48px; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-user-avatar],
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-user-avatar] > div:first-child { width: 48px; height: 48px; transform: none !important; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-user-avatar] > div:first-child > div:not([data-mira-avatar-ring]) { max-width: 44px; max-height: 44px; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-user-name] { display: none; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-testid='roundtable-non-presentation-input-stage'] { inset: 0; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-composer] { width: 100%; min-width: 0; max-width: 100%; height: 56px; padding: 2px; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-composer] > div { padding: 0; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-composer] textarea { min-height: 48px; max-height: 48px; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-send] { min-width: 48px; min-height: 48px; padding: 0; margin: 0; }
++  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-recording-disc] { width: 48px; height: 48px; }
++}
+--- a/tests/roundtable/fullscreen-touch-layout.browser.test.ts
++++ b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+@@ -42,7 +42,7 @@
+ const html=${JSON.stringify(html)};
+ function App(){const [root,setRoot]=useState(null);const [full,setFull]=useState(false);const [playing,setPlaying]=useState(false);const [chat,setChat]=useState(true);const [sidebar,setSidebar]=useState(true);const [visible,setVisible]=useState(true);window.setControlsVisible=setVisible;const [speech,setSpeech]=useState(false);window.setSpeech=setSpeech;window.unmount=()=>createRootInstance.unmount();
+ useEffect(()=>{const fn=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',fn);return()=>document.removeEventListener('fullscreenchange',fn)},[]);
+-return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white','--mira-presentation-content-inset':'7px'}}><div data-mira-canvas-area style={{height:'100%',boxSizing:'border-box'}}><div style={{height:'100%',padding:8,boxSizing:'border-box'}}><InteractiveRenderer content={{type:'interactive',html,url:''}} sceneId='one'/></div></div><div style={{position:'absolute',bottom:0,width:'100%'}}> <Roundtable playbackView={speech?{phase:'lecturePaused',bubbleRole:'teacher',sourceText:'Recorded teacher instruction',buttonState:'play',isInLiveFlow:false}:undefined} initialParticipants={[]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={playing?'playing':'idle'} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};const createRootInstance=createRoot(document.querySelector('#app'));createRootInstance.render(<App/>);`,
++return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white',display:'flex',flexDirection:'column','--mira-presentation-content-inset':'7px'}}>{!full&&<header data-mira-chrome='header' className='h-20' style={{flexShrink:0}}><button>Back</button><h1>Lesson</h1></header>}<div data-mira-canvas-area style={{height:full?'100%':undefined,flex:1,minHeight:0,boxSizing:'border-box'}}><div style={{height:'100%',padding:8,boxSizing:'border-box'}}><InteractiveRenderer content={{type:'interactive',html,url:''}} sceneId='one'/></div></div><div data-mira-chrome='discussion' style={full?{position:'absolute',bottom:0,width:'100%'}:{flexShrink:0}}> <Roundtable playbackView={speech?{phase:'lecturePaused',bubbleRole:'teacher',sourceText:'Recorded teacher instruction',buttonState:'play',isInLiveFlow:false}:undefined} initialParticipants={[{id:'teacher',name:'Teacher',role:'teacher',avatar:''},{id:'alex',name:'Alex',role:'student',avatar:''},{id:'lily',name:'Lily',role:'student',avatar:''},{id:'ben',name:'Ben',role:'student',avatar:''}]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={playing?'playing':'idle'} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};const createRootInstance=createRoot(document.querySelector('#app'));createRootInstance.render(<App/>);`,
+         },
+         bundle: true,
+         write: false,
+@@ -73,6 +73,7 @@
+       );
+       const source = [
+         "components/roundtable/index.tsx",
++        "components/header.tsx",
+         "components/canvas/canvas-toolbar.tsx",
+         "components/roundtable/presentation-speech-overlay.tsx",
+       ]
+@@ -156,6 +157,48 @@
+               window as any
+             ).originalFrame.contentWindow;
+           });
++          // Real normal-flow parents: header, flexible canvas, then fixed chrome.
++          // The earlier fullscreen fixture alone could not detect the 192px
++          // normal Roundtable consuming most of a short landscape viewport.
++          for (const [width, height] of [[844, 390], [667, 375]]) {
++            await page.setViewportSize({ width, height });
++            await page.evaluate(() => (window as any).setSpeech(true));
++            const toggle = page.locator('[data-mira-compact-discussion-toggle]');
++            await toggle.waitFor({ state: 'visible' });
++            await page.waitForFunction(w=>Math.abs(document.querySelector('iframe')!.getBoundingClientRect().width-(w-16))<1,width);
++            const canvasBefore = await iframe.boundingBox();
++            expect(canvasBefore!.height).toBeGreaterThanOrEqual(height - 48 - 105 - 20);
++            expect((await page.locator('[data-mira-chrome="header"]').boundingBox())!.height).toBe(48);
++            expect((await page.locator('[data-mira-roundtable-layout="standard"]').boundingBox())!.height).toBe(105);
++            const touch = await page.locator('[data-mira-roundtable-layout="standard"] button, [data-mira-user-avatar]').evaluateAll(elements => elements.filter(el => {
++              const s=getComputedStyle(el),r=el.getBoundingClientRect();
++              return s.display!=='none' && s.visibility!=='hidden' && r.width>0 && r.height>0 && !el.closest('[data-mira-speech-stage]') && !el.hasAttribute('data-mira-participant-avatar');
++            }).map(el => {
++              const r=el.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
++              return {label:el.getAttribute('aria-label')||el.textContent,rect:{x:r.x,y:r.y,right:r.right,bottom:r.bottom},width:r.width,height:r.height,inViewport:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight,hit:!!hit&&(el.contains(hit)||hit.contains(el))};
++            }));
++            for (const item of touch) {
++              expect(item.width, item.label||'control').toBeGreaterThanOrEqual(48);
++              expect(item.height, item.label||'control').toBeGreaterThanOrEqual(48);
++              expect(item.inViewport, JSON.stringify(item)).toBe(true);
++              expect(item.hit, JSON.stringify(item)).toBe(true);
++            }
++            await toggle.click();
++            await page.waitForFunction(()=>document.querySelector('[data-mira-compact-discussion-toggle]')?.getAttribute('aria-expanded')==='true');
++            expect((await page.locator('[data-mira-speech-stage]').boundingBox())!.height).toBeGreaterThan(100);
++            expect(await iframe.boundingBox()).toEqual(canvasBefore);
++            await toggle.click();
++            await page.waitForFunction(()=>document.querySelector('[data-mira-compact-discussion-toggle]')?.getAttribute('aria-expanded')==='false');
++            const textInput=page.locator('[data-mira-input-mode="text"]');
++            await textInput.click();
++            await page.locator('textarea').fill('A question to keep');
++            expect(await iframe.boundingBox()).toEqual(canvasBefore);
++            await textInput.click();
++            await page.locator('textarea').waitFor({state:'detached'});
++            await child!.getByRole('button',{name:'Save plant',exact:true}).click();
++            expect(await child!.evaluate(()=>(window as any).documentToken)).toBe(token);
++          }
++          await page.evaluate(() => (window as any).setSpeech(false));
+           let completedBottomActions = 0;
+           for (const width of [390, 360]) {
+             await page.setViewportSize({ width, height: 844 });
+@@ -360,14 +403,20 @@
+             ).toEqual({ frame: true, win: true, observers: 0 });
+             expect(await page.locator('[data-mira-classroom-root]').evaluate(e=> (e as HTMLElement).style.getPropertyValue('--mira-presentation-content-inset'))).toBe('7px');
+             expect(await page.locator('[data-mira-canvas-area]').evaluate(e=>getComputedStyle(e).paddingBottom)).toBe('0px');
+-            expect((await iframe.boundingBox())!.height).toBe(828);
++            await page.waitForFunction(() => {
++              const root=document.querySelector('[data-mira-classroom-root]')!.getBoundingClientRect();
++              const header=document.querySelector('[data-mira-chrome="header"]')!.getBoundingClientRect();
++              const row=document.querySelector('[data-mira-roundtable-layout="standard"]')!.getBoundingClientRect();
++              const frame=document.querySelector('iframe')!.getBoundingClientRect();
++              return row.height>=200 && Math.abs(frame.height-(root.height-header.height-row.height-16))<1;
++            });
+             expect(
+               await child!.evaluate(() => ({
+                 token: (window as any).documentToken,
+                 cards: (window as any).cards,
+                 cue: (window as any).recordedCueState,
+               })),
+-            ).toEqual({ token, cards: 1, cue: "ready" });
++            ).toEqual({ token, cards: 3, cue: "ready" });
+           }
+           // Real teacher controls yield a safe row to the live iframe.
+           for (const viewport of [{width:844,height:390},{width:667,height:375}]) {
+@@ -391,8 +440,8 @@
+             expect(box.height).toBeGreaterThanOrEqual(48);
+             const hit=await control.evaluate(b => {const r=b.getBoundingClientRect(),e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return {ok:b.contains(e),rect:r.toJSON(),hit:e?.outerHTML.slice(0,500),ancestor:b.parentElement?.parentElement?.outerHTML.slice(0,400)};}); expect(hit.ok,JSON.stringify(hit)).toBe(true);
+           }
+-          await pill.getByRole('button', {name:'edit.nav.expand roundtable.teacher'}).click();
+-          const collapse = page.getByRole('button', {name:'edit.nav.collapse roundtable.teacher'});
++          await pill.getByRole('button', {name:'edit.nav.expand Teacher'}).click();
++          const collapse = page.getByRole('button', {name:'edit.nav.collapse Teacher'});
+           await collapse.waitFor();
+           await page.waitForFunction(()=>document.querySelector('[data-mira-collapse-speech]')!.getBoundingClientRect().height>=48);
+           expect((await collapse.boundingBox())!.height).toBeGreaterThanOrEqual(48);

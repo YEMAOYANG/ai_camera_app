@@ -9,6 +9,7 @@ import { parse } from "parse5";
 import {
   authorizeRuntimeRequest,
   authorizeTextbookRequest,
+  bindTextbookPageNarration,
   createGateway,
   embedTextbookSceneMedia,
   injectRuntimeAudioBindings,
@@ -18,6 +19,74 @@ import {
 } from "../src/server.mjs";
 
 const servers = [];
+
+function narrationFixture() {
+  const classroomId = 'tbpub_' + 'a'.repeat(24);
+  const audioPath = `/api/classroom-media/${classroomId}/audio/correct.mp3`;
+  const bytes = Buffer.from('reviewed prerecorded response');
+  const cues = [{ id: 'correct', text: '你找到了。' }];
+  const html = '<script type="application/json" id="mira-narration-cues">'
+    + JSON.stringify({ schemaVersion: 'mira.interactive.narration-cues.v1', cues }) + '</script>'
+    + '<script id="mira-pre-recorded-audio">(()=>{const clips='
+    + JSON.stringify({ correct: audioPath }) + ';let active=null;})();</script>';
+  const scene = { id: 'scene', stageId: classroomId, type: 'interactive', content: { type: 'interactive', html },
+    actions: [{ id: 'speech-correct', type: 'speech', text: cues[0].text, audioUrl: audioPath }] };
+  const runtime = { purpose: 'fixed_textbook', classroomId, media: [{ path: audioPath,
+    mimeType: 'audio/mpeg', byteSize: bytes.length, sha256: createHash('sha256').update(bytes).digest('hex') }] };
+  return { scene, runtime, bytes, audioPath };
+}
+
+test('gateway derives page speech ownership before data URI and blob embedding', () => {
+  for (const large of [false, true]) {
+    const {scene, runtime, bytes, audioPath} = narrationFixture();
+    const assets = [{path: audioPath, mimeType:'audio/mpeg', base64:bytes.toString('base64')}];
+    if (large) {
+      const path = `/api/classroom-media/${runtime.classroomId}/media/atlas.png`;
+      scene.content.html += `<img src="${path}">`.repeat(3);
+      assets.push({path, mimeType:'image/png', base64:Buffer.alloc(1024*1024).toString('base64')});
+    }
+    scene.miraPageNarration = {bindings:[{speechId:'forged'}]};
+    bindTextbookPageNarration(scene, runtime, new Set(assets.map(asset => asset.path)));
+    assert.deepEqual(scene.miraPageNarration, { schemaVersion:'mira.textbook.page-narration.v1',
+      classroomId:runtime.classroomId,sceneId:scene.id,
+      bindings:[{speechId:'speech-correct',cueId:'correct',text:'你找到了。',audioPath}] });
+    scene.content.html = embedTextbookSceneMedia(scene.content.html,assets);
+    assert.equal(scene.content.html.includes('document.write(page)'),large);
+    assert.equal(scene.miraPageNarration.bindings[0].audioPath,audioPath);
+  }
+});
+
+test('gateway clears authored claims and rejects invalid cue, action and media bindings', () => {
+  const cases = {
+    ordinary: (s,r) => { r.purpose='learning'; },
+    quiz: s => { s.type='quiz'; },
+    otherClassroom: s => { s.stageId='tbpub_'+'b'.repeat(24); },
+    missingClip: s => { s.content.html=s.content.html.replace('"correct":"/api/', '"missing":"/api/'); },
+    duplicateManifest: s => { s.content.html+=s.content.html; },
+    inertTemplate: s => { s.content.html='<template>'+s.content.html+'</template>'; },
+    attributeCollision: s => { s.content.html=s.content.html.replace('id="mira-narration-cues"','id="mira-narration-cues" id="other"'); },
+    changedText: s => { s.actions[0].text='不是这句话。'; },
+    changedPath: s => { s.actions[0].audioUrl=s.actions[0].audioUrl.replace('correct','other'); },
+    duplicateAction: s => { s.actions.push({...s.actions[0]}); },
+    missingMedia: (_s,r) => {r.media=[];},
+    wrongMime: (_s,r) => {r.media[0].mimeType='text/plain';},
+    wrongDigest: (_s,r) => {r.media[0].sha256='invalid';},
+  };
+  for(const [name, change] of Object.entries(cases)) {
+    const {scene,runtime}=narrationFixture();
+    scene.miraPageNarration={schemaVersion:'mira.textbook.page-narration.v1',bindings:[{speechId:'forged'}]};
+    change(scene,runtime);bindTextbookPageNarration(scene,runtime,new Set(runtime.media.map(m=>m.path)));
+    assert.equal(Object.hasOwn(scene,'miraPageNarration'),false,name);
+  }
+});
+
+test('escaped or unverified media cannot acquire gateway narration ownership', () => {
+  const {scene,runtime,audioPath}=narrationFixture();
+  scene.content.html=scene.content.html.split(audioPath).join(audioPath.replaceAll('/', '\\/'));
+  assert.equal(scene.content.html.includes(audioPath),false);
+  bindTextbookPageNarration(scene,runtime,new Set());
+  assert.equal(Object.hasOwn(scene,'miraPageNarration'),false);
+});
 
 test('large media preserves only a real unambiguous responsive head marker', () => {
   const marker = '<meta name="mira-responsive-activity" content="low-reading-v1">';
@@ -127,8 +196,15 @@ test('fixed textbook delivery uses private backend snapshot, verified media and 
           byteSize: frozenBytes.length, mimeType: 'audio/wav' }] });
     }
     assert.equal(request.headers['x-mira-textbook-token'], 'tbpr_student-session');
-    if (request.url.endsWith('/classroom')) return reply(response, { success: true, classroom: { id: classroomId,
-      scenes: [{ type: 'interactive', content: { html: `<audio src="${mediaPath}"></audio>` } }] } });
+    if (request.url.endsWith('/classroom')) {
+      const {scene}=narrationFixture();
+      scene.content.html=scene.content.html.replaceAll('/audio/correct.mp3','/audio/frozen.wav');
+      scene.actions[0].audioUrl=mediaPath;
+      scene.miraPageNarration={bindings:[{speechId:'forged'}]};
+      return reply(response, { success: true, classroom: { id: classroomId,
+        scenes: [{ type: 'interactive', content: { html: `<audio src="${mediaPath}"></audio>` } },scene,
+          {type:'quiz',miraPageNarration:{bindings:[{speechId:'forged'}]}}] } });
+    }
     if (request.url.endsWith('/quiz')) {
       submitted = await jsonBody(request);
       return reply(response, { ok: true, result: { score: 5 } });
@@ -159,6 +235,9 @@ test('fixed textbook delivery uses private backend snapshot, verified media and 
   const classroom = (await snapshot.json()).classroom;
   assert.equal(classroom.id, classroomId);
   assert.equal(classroom.scenes[0].content.html, `<audio src="data:audio/wav;base64,${frozenBytes.toString('base64')}"></audio>`);
+  assert.deepEqual(classroom.scenes[1].miraPageNarration.bindings,
+    [{speechId:'speech-correct',cueId:'correct',text:'你找到了。',audioPath:mediaPath}]);
+  assert.equal(Object.hasOwn(classroom.scenes[2],'miraPageNarration'),false);
   assert.deepEqual(Buffer.from(await (await fetch(gateway + mediaPath, { headers })).arrayBuffer()), frozenBytes);
   const quiz = await fetch(`${gateway}/mira/textbook-quiz`, { method: 'POST', headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify({ answers: { q1: 'A' } }) });
   assert.equal(quiz.status, 200);
@@ -182,6 +261,7 @@ test('fixed textbook delivery uses private backend snapshot, verified media and 
   assert.equal((await fetch(gateway + mediaPath)).status, 401);
   corrupt = true;
   assert.equal((await fetch(gateway + mediaPath, { headers })).status, 502);
+  assert.equal((await fetch(`${gateway}/api/classroom?id=${classroomId}`, {headers})).status,502);
   assert.equal(paidCalls, 0);
 });
 
@@ -1280,6 +1360,168 @@ test("authorized chat SSE is streamed through the gateway", async () => {
   });
   assert.equal(result.status, 200);
   assert.match(await result.text(), /text_delta/);
+});
+
+test("upstream body timeout closes only the failed stream and keeps gateway serving", { timeout: 5_000 }, async () => {
+  const backend = await listen(http.createServer(async (request, response) => {
+    const body = await jsonBody(request);
+    assert.ok(request.url.endsWith("/validate"));
+    assert.equal(body.runtimeToken, "omr_stream_test");
+    reply(response, { ok: true, runtimeSessionId: "rs-stream", learningSessionId: "ls-stream",
+      classroomId: "classroom-a", expiresAt: Date.now() + 60_000 });
+  }));
+  let resolveUpstreamClose;
+  const upstreamClosed = new Promise((resolve) => { resolveUpstreamClose = resolve; });
+  let interrupted = false;
+  const upstreamPaths = [];
+  const upstream = await listen(http.createServer((request, response) => {
+    upstreamPaths.push(request.url);
+    response.writeHead(200, { "content-type": "application/octet-stream" });
+    if (request.url === "/images/stalled.bin") {
+      response.on("close", () => {
+        interrupted = !response.writableEnded;
+        resolveUpstreamClose();
+      });
+      response.write("first-chunk");
+      // Send real headers/body, then leave the body open until the gateway's
+      // existing upstream timeout aborts it. No provider or real runtime used.
+      return;
+    }
+    assert.equal(request.url, "/images/healthy.bin");
+    response.end("complete-asset");
+  }));
+  const gateway = await listenGateway({ backend, upstream, upstreamTimeoutMs: 250 });
+  const headers = { cookie: "mira_openmaic_runtime=omr_stream_test" };
+  const response = await fetch(`${gateway}/images/stalled.bin`, {
+    headers, signal: AbortSignal.timeout(3_000),
+  });
+  assert.equal(response.status, 200);
+  const reader = response.body.getReader();
+  const first = await reader.read();
+  assert.equal(first.done, false);
+  assert.equal(Buffer.from(first.value).toString(), "first-chunk");
+  await assert.rejects(reader.read(), /terminated|other side closed/i);
+  await upstreamClosed;
+  assert.equal(interrupted, true);
+  const health = await fetch(`${gateway}/health`);
+  assert.equal(health.status, 200);
+  assert.equal((await health.json()).ok, true);
+  const next = await fetch(`${gateway}/images/healthy.bin`, { headers });
+  assert.equal(next.status, 200);
+  assert.equal(await next.text(), "complete-asset");
+  assert.deepEqual(upstreamPaths, ["/images/stalled.bin", "/images/healthy.bin"]);
+});
+
+test("upstream socket truncation rejects its body without terminating the gateway", { timeout: 5_000 }, async () => {
+  const backend = await listen(http.createServer(async (request, response) => {
+    await jsonBody(request);
+    reply(response, formalRuntime());
+  }));
+  let truncate;
+  const firstChunk = Buffer.alloc(320_853, 42);
+  const upstream = await listen(http.createServer((_request, response) => {
+    response.writeHead(200, { "content-type": "application/octet-stream" });
+    response.write(firstChunk);
+    truncate = () => response.destroy();
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const response = await fetch(`${gateway}/images/truncated.bin`, {
+    headers: { cookie: "mira_openmaic_runtime=omr_good" },
+    signal: AbortSignal.timeout(3_000),
+  });
+  assert.equal(response.status, 200);
+  const reader = response.body.getReader();
+  let bytes = 0;
+  while (bytes < firstChunk.length) {
+    const part = await reader.read();
+    assert.equal(part.done, false);
+    bytes += part.value.length;
+  }
+  truncate();
+  await assert.rejects(reader.read(), /terminated|other side closed/i);
+  assert.equal(bytes, firstChunk.length);
+  const health = await fetch(`${gateway}/health`);
+  assert.equal(health.status, 200);
+  assert.equal((await health.json()).ok, true);
+});
+
+test("client disconnect cancels the upstream body and leaves the gateway healthy", { timeout: 5_000 }, async () => {
+  const backend = await listen(http.createServer(async (request, response) => {
+    await jsonBody(request);
+    reply(response, formalRuntime());
+  }));
+  let upstreamCancelled;
+  const closed = new Promise(resolve => { upstreamCancelled = resolve; });
+  const upstream = await listen(http.createServer((_request, response) => {
+    response.writeHead(200, { "content-type": "application/octet-stream" });
+    response.write("first");
+    const timer = setInterval(() => response.write(Buffer.alloc(65_536, 42)), 10);
+    response.on("close", () => {
+      clearInterval(timer);
+      upstreamCancelled(!response.writableEnded);
+    });
+  }));
+  const gateway = await listenGateway({ backend, upstream, upstreamTimeoutMs: 20_000 });
+  await new Promise((resolve, reject) => {
+    const request = http.get(`${gateway}/images/client-cancel.bin`, {
+      headers: { cookie: "mira_openmaic_runtime=omr_good" },
+    }, response => {
+      assert.equal(response.statusCode, 200);
+      response.once("data", () => { response.destroy(); resolve(); });
+      response.on("error", reject);
+    });
+    request.on("error", reject);
+  });
+  assert.equal(await closed, true);
+  const health = await fetch(`${gateway}/health`);
+  assert.equal(health.status, 200);
+  assert.equal((await health.json()).ok, true);
+});
+
+test("buffered classroom truncation fails closed and does not leave a Readable error", { timeout: 5_000 }, async () => {
+  let manifestCalls = 0;
+  const backend = await listen(http.createServer(async (request, response) => {
+    await jsonBody(request);
+    if (request.url.endsWith("/audio-manifest")) manifestCalls += 1;
+    reply(response, formalRuntime());
+  }));
+  const upstream = await listen(http.createServer((_request, response) => {
+    response.writeHead(200, { "content-type": "application/json" });
+    response.write('{"success":true,"classroom":');
+    setTimeout(() => response.destroy(), 30);
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const response = await fetch(`${gateway}/api/classroom?id=classroom-a`, {
+    headers: { cookie: "mira_openmaic_runtime=omr_good" },
+    signal: AbortSignal.timeout(3_000),
+  });
+  assert.equal(response.status, 502);
+  assert.equal((await response.json()).error, "runtime_gateway_failed");
+  assert.equal(manifestCalls, 0);
+  assert.equal((await fetch(`${gateway}/health`)).status, 200);
+});
+
+test("buffered classroom size rejection cancels its unfinished upstream", { timeout: 5_000 }, async () => {
+  const backend = await listen(http.createServer(async (request, response) => {
+    await jsonBody(request);
+    reply(response, formalRuntime());
+  }));
+  let upstreamCancelled;
+  const closed = new Promise(resolve => { upstreamCancelled = resolve; });
+  const upstream = await listen(http.createServer((_request, response) => {
+    response.writeHead(200, { "content-type": "application/json" });
+    response.write(" ".repeat(2048));
+    response.on("close", () => upstreamCancelled(!response.writableEnded));
+  }));
+  const gateway = await listenGateway({ backend, upstream, maxBodyBytes: 1024 });
+  const response = await fetch(`${gateway}/api/classroom?id=classroom-a`, {
+    headers: { cookie: "mira_openmaic_runtime=omr_good" },
+    signal: AbortSignal.timeout(3_000),
+  });
+  assert.equal(response.status, 502);
+  assert.equal((await response.json()).error, "openmaic_runtime_audio_binding_invalid");
+  assert.equal(await closed, true);
+  assert.equal((await fetch(`${gateway}/health`)).status, 200);
 });
 
 test("student requests cannot choose a model, provider, key or endpoint", async () => {

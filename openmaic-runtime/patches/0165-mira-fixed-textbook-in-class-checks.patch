@@ -1,0 +1,155 @@
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -9,20 +9,29 @@ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime
+ import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { QuizPicture } from './quiz-picture';
+ 
+-type Result = {
+-  score: number; maxScore: number; correctCount: number; totalQuestions: number;
+-  results: { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string }[];
+-};
++type Graded = { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string };
++type Result = { score: number; maxScore: number; correctCount: number; totalQuestions: number; results: Graded[] };
++type Saved = { result?: Result | null; partial?: { results: Graded[] } | null };
++
++/** The questions of one in-class check that the server has already graded. */
++export function gradedOnThisPage(saved: Saved, questionIds: string[]): Graded[] {
++  const graded = (saved.result ?? saved.partial)?.results ?? [];
++  return questionIds.flatMap(id => graded.filter(item => item.questionId === id));
++}
+ 
+ /** A picture answer needs no reading; its label stays available to assistive technology. */
+ export function FixedTextbookOptionFace({ visual, label }: { visual?: QuizVisual; label: string }) {
+   return visual ? <><QuizPicture visual={visual} /><span className="sr-only">{label}</span></> : <>{label}</>;
+ }
+ 
+-/** Fixed releases have private server answers and student-scoped persistence. */
++/**
++ * Fixed releases have private server answers and student-scoped persistence.
++ * A lesson may hold several of these pages; each hands in only its own
++ * questions and the server adds them up to one lesson result.
++ */
+ export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] }) {
+   const [answers, setAnswers] = useState<Record<string, string>>({});
+-  const [result, setResult] = useState<Result | null>(null);
++  const [graded, setGraded] = useState<Graded[]>([]);
+   const [loading, setLoading] = useState(true);
+   const [sending, setSending] = useState(false);
+   const [error, setError] = useState('');
+@@ -38,13 +47,14 @@ export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] })
+     const response = await fetch('/mira/textbook-quiz', { cache: 'no-store', signal });
+     const payload = await response.json();
+     if (!response.ok || !payload.ok) throw new Error(payload.message || '练习暂时没有加载成功');
+-    if (payload.result) {
+-      setResult(payload.result);
+-      setAnswers(Object.fromEntries(payload.result.results.map((r: Result['results'][number]) => [r.questionId, r.response])));
++    const saved = gradedOnThisPage(payload, questions.map(q => q.id));
++    if (saved.length) {
++      setGraded(saved);
++      setAnswers(Object.fromEntries(saved.map(r => [r.questionId, r.response])));
+     }
+     setLoading(false);
+     setError('');
+-  }, []);
++  }, [questions]);
+ 
+   useEffect(() => {
+     const controller = new AbortController();
+@@ -54,16 +64,18 @@ export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] })
+     return () => controller.abort();
+   }, [read]);
+ 
++  const done = questions.length > 0 && graded.length === questions.length;
++
+   async function submit() {
+-    if (sending || result) return;
++    if (sending || done) return;
+     setSending(true); setError('');
+     try {
+       const response = await fetch('/mira/textbook-quiz', { method: 'POST',
+         headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers }) });
+       const payload = await response.json();
+       if (!response.ok || !payload.ok) throw new Error(payload.message || '回答暂时没有保存，请重试');
+-      setResult(payload.result);
+-      await complete();
++      setGraded(gradedOnThisPage(payload, questions.map(q => q.id)));
++      if (payload.result) await complete();
+     } catch (caught) { setError(caught instanceof Error ? caught.message : '回答暂时没有保存，请重试'); }
+     finally { setSending(false); }
+   }
+@@ -71,14 +83,13 @@ export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] })
+   return <section className="h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]" aria-label="课堂练习">
+     <div className="mx-auto max-w-5xl p-5 sm:p-8">
+       <header className="mb-7 flex items-end justify-between gap-4">
+-        <div><p className="mb-2 text-sm text-[#697a6c]">小小识字家</p>
+-          <h2 className="text-2xl font-semibold sm:text-3xl">{result ? `答对 ${result.correctCount} / ${result.totalQuestions} 题` : '听一听，选一选'}</h2></div>
+-        {result && <span className="text-xl font-semibold">{result.score} / {result.maxScore}</span>}
++        <div><p className="mb-2 text-sm text-[#697a6c]">随堂小测</p>
++          <h2 className="text-2xl font-semibold sm:text-3xl">{done ? `答对 ${graded.filter(r => r.correct).length} / ${graded.length} 题` : '听一听，选一选'}</h2></div>
+       </header>
+       {loading ? <p role="status">正在打开练习…</p> : <div className="grid gap-5 sm:grid-cols-2">
+         {questions.map((q, index) => {
+           const audio = questionNarrationSource(q);
+-          const feedback = result?.results.find(r => r.questionId === q.id);
++          const feedback = graded.find(r => r.questionId === q.id);
+           return <fieldset key={q.id} className="rounded-2xl border border-[#e9dfcd] bg-white/80 p-5">
+             <legend className="px-2 text-sm text-[#788275]">第 {index + 1} 题</legend>
+             {q.visual && <div className="mb-4" data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
+@@ -86,7 +97,7 @@ export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] })
+             {audio && <QuestionNarration src={audio} number={index + 1} />}
+             <div className="flex gap-3" role="radiogroup" aria-label={q.question}>
+               {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+-                aria-label={option.label} key={option.value} disabled={Boolean(result) || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
++                aria-label={option.label} key={option.value} disabled={done || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+                 className={`min-h-16 flex-1 rounded-xl border text-3xl transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
+                 <FixedTextbookOptionFace visual={q.optionVisuals?.[option.value]} label={option.label} />
+               </button>)}
+@@ -99,12 +110,12 @@ export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] })
+       </div>}
+       {error && <p role="alert" className="mt-5 text-[#9b503b]">{error}</p>}
+       <footer className="mt-7 flex justify-end">
+-        {!result && !loading && <button type="button" onClick={() => void submit()}
++        {!done && !loading && <button type="button" onClick={() => void submit()}
+           disabled={sending || questions.some(q => !answers[q.id])}
+           className="inline-flex min-h-12 items-center gap-3 rounded-full bg-[#466a53] px-7 text-lg text-white disabled:opacity-40">
+           {sending ? <><Loader2 className="animate-spin" size={20} aria-hidden />正在保存</> : <>完成练习<ArrowRight size={20} aria-hidden /></>}
+         </button>}
+-        {result && <p className="text-base text-[#68766b]">练习已保存，可以返回教材目录。</p>}
++        {done && <p className="text-base text-[#68766b]">答案已保存，继续往下学吧。</p>}
+       </footer>
+     </div>
+   </section>;
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts b/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
+--- a/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
++++ b/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
+@@ -1,7 +1,7 @@
+ import { createElement } from 'react';
+ import { renderToStaticMarkup } from 'react-dom/server';
+ import { describe, expect, it } from 'vitest';
+-import { FixedTextbookOptionFace } from '@/components/scene-renderers/fixed-textbook-quiz';
++import { FixedTextbookOptionFace, gradedOnThisPage } from '@/components/scene-renderers/fixed-textbook-quiz';
+ 
+ describe('published textbook quiz options', () => {
+   it('shows the reviewed picture and keeps the label for assistive technology only', () => {
+@@ -17,3 +17,20 @@ describe('published textbook quiz options', () => {
+     expect(renderToStaticMarkup(createElement(FixedTextbookOptionFace, { label: '天' }))).toBe('天');
+   });
+ });
++
++describe('in-class checks spread over several pages', () => {
++  const graded = (questionId: string, correct: boolean) =>
++    ({ questionId, response: 'A', correct, explanation: '', correctAnswer: 'A' });
++
++  it('shows a page only its own graded questions, in page order', () => {
++    const partial = { results: [graded('q3', true), graded('q1', false)] };
++    expect(gradedOnThisPage({ result: null, partial }, ['q1', 'q2']).map(item => item.questionId)).toEqual(['q1']);
++    expect(gradedOnThisPage({ result: null, partial }, ['q4'])).toEqual([]);
++  });
++
++  it('prefers the finished lesson result over partial answers', () => {
++    const result = { score: 1, maxScore: 2, correctCount: 1, totalQuestions: 2, results: [graded('q1', true), graded('q2', false)] };
++    expect(gradedOnThisPage({ result, partial: null }, ['q2', 'q1']).map(item => item.correct)).toEqual([false, true]);
++    expect(gradedOnThisPage({}, ['q1'])).toEqual([]);
++  });
++});

@@ -6,7 +6,7 @@ import type { SchoolSubject } from "./motion-timeline";
 
 const state = vi.hoisted(() => ({
   path: "/unlock", fail: () => {},
-  router: { push: vi.fn(), replace: vi.fn(), refresh: vi.fn() },
+  router: { push: vi.fn(), replace: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() },
   engine: { setPose: vi.fn(), frame: vi.fn(), hover: vi.fn(), pick: vi.fn(), dispose: vi.fn() },
   create: vi.fn(),
 }));
@@ -123,6 +123,7 @@ describe("schoolbag navigation choreography", () => {
   it("finishes a skipped extraction once and keeps the exact confirmed directory URL", async () => {
     state.path = "/learning"; await boot(true);
     fireEvent.click(screen.getByText("取出语文")); fireEvent.click(screen.getByText("取出语文"));
+    expect(state.router.prefetch).toHaveBeenCalledExactlyOnceWith("/learning/textbooks?editionId=confirmed&revisionId=immutable");
     act(() => vi.advanceTimersByTime(350));
     expect(state.router.push).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: /跳过动画/ }));

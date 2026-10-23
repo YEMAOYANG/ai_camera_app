@@ -1,0 +1,456 @@
+diff --git a/components/stage.tsx b/components/stage.tsx
+--- a/components/stage.tsx
++++ b/components/stage.tsx
+@@ -68,6 +68,7 @@
+ }) {
+   const { mode, setMode, scenes, currentSceneId, generatingOutlines, stage } = useStageStore();
+   const router = useRouter();
++  const [activityContainer, setActivityContainer] = useState<HTMLDivElement | null>(null);
+   const enteringWorkbench = useRef(false);
+   const proWorkbenchFlag = isProWorkbenchEnabled();
+   const editorEnabled = isMaicEditorEnabled();
+@@ -387,7 +388,7 @@
+   );
+ 
+   return (
+-    <div className="relative flex flex-1 overflow-hidden">
++    <div ref={setActivityContainer} data-mira-classroom-root className="relative flex flex-1 overflow-hidden">
+       {/* The edit-mode guard has been removed (#1961 decision change 2026-08-23): a
+           new agent version directly replaces the canvas; the user's typed data is
+           protected by the write-path veto/retry channel (see lib/store/stage.ts),
+@@ -402,7 +403,7 @@
+       {/* Keep-alive host for interactive scene iframes (#619). Lives here, above
+           the mode-swap subtree, so its iframes survive Pro mode toggles and
+           scene switches instead of reloading on every remount. */}
+-      <InteractiveIframeHost />
++      <InteractiveIframeHost container={activityContainer} />
+     </div>
+   );
+ }
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -57,6 +57,7 @@
+ import { useMiraStudentParentOrigins } from '@/lib/contexts/mira-student-runtime-context';
+ import { fixedQuizQuestionNarrationText } from '@/lib/mira/fixed-quiz-narration';
+ import { fixedPageManagedSpeechIds } from '@/lib/mira/page-managed-narration';
++import { classroomFullscreenRoot } from '@/lib/interactive/classroom-fullscreen-root';
+ import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import {
+   AlertDialog,
+@@ -700,9 +701,10 @@
+     const togglePresentation = useCallback(async () => {
+       const stageElement = stageRef.current;
+       if (!stageElement) return;
++      const fullscreenRoot = classroomFullscreenRoot(stageElement);
+ 
+       try {
+-        if (document.fullscreenElement === stageElement) {
++        if (document.fullscreenElement === fullscreenRoot) {
+           // Unlock Escape key before exiting fullscreen
+           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           (navigator as any).keyboard?.unlock?.();
+@@ -711,7 +713,7 @@
+         }
+ 
+         setControlsVisible(true);
+-        await stageElement.requestFullscreen();
++        await fullscreenRoot.requestFullscreen();
+         // Lock Escape key so it doesn't auto-exit fullscreen (#255)
+         // Escape is handled manually in our keydown handler instead
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+@@ -726,7 +728,8 @@
+ 
+     useEffect(() => {
+       const onFullscreenChange = () => {
+-        const active = document.fullscreenElement === stageRef.current;
++        const active = stageRef.current !== null
++          && document.fullscreenElement === classroomFullscreenRoot(stageRef.current);
+         setIsPresenting(active);
+ 
+         if (!active) {
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -90,32 +90,25 @@
+  * the on-screen rect; the actual iframes live here, portaled into a stable host
+  * node and positioned over each scene's rect via `position: fixed`.
+  *
+- * Portal target follows `document.fullscreenElement` so the iframe stays inside
+- * the fullscreen subtree during presentation mode (which calls requestFullscreen
+- * on the playback stage, not on body); otherwise it lives on `document.body`.
+- * A low z-index keeps it under Radix dialogs (e.g. the scene-switch confirm)
+- * while still covering the canvas box during interactive playback AND Pro-mode
+- * editing — the editor agent fixes interactive HTML, so the teacher must see the
+- * live page while editing. Visibility is driven by the placeholder's ownership
+- * (gone → hidden, never unmounted), so the document is preserved for a
+- * zero-reload return.
++ * The stable Stage container is also the presentation fullscreen target. The
++ * portal never moves: changing a React portal target remounts its children,
++ * while DOM reparenting can reload an iframe even if its element is retained.
++ * Visibility changes still cancel hidden narration without dropping game state.
+  */
+-export function InteractiveIframeHost() {
++export function InteractiveIframeHost({ container }: { container?: HTMLElement | null } = {}) {
+   const entries = useInteractiveIframePool((s) => s.entries);
+   const activeSceneId = useInteractiveIframePool((s) => s.activeSceneId);
+   const reset = useInteractiveIframePool((s) => s.reset);
+   const setActiveScene = useWidgetIframeStore((s) => s.setActiveScene);
+ 
+-  // Portal into the fullscreen element when one is active (presentation mode
+-  // fullscreens the stage, and a body-portaled iframe would not be part of that
+-  // subtree, so it would vanish). Falls back to body otherwise.
+-  const [portalTarget, setPortalTarget] = useState<Element | null>(null);
+-  useEffect(() => {
+-    const sync = () => setPortalTarget(document.fullscreenElement ?? document.body);
+-    sync();
+-    document.addEventListener('fullscreenchange', sync);
+-    return () => document.removeEventListener('fullscreenchange', sync);
+-  }, []);
++  // Standalone test/legacy mounts keep a fixed body fallback. Stage passes its
++  // stable container (initially null until the DOM ref attaches); fullscreen
++  // changes never replace this target or move the opaque-origin iframe.
++  const [fallbackTarget, setFallbackTarget] = useState<Element | null>(null);
++  useEffect(() => {
++    if (container === undefined) setFallbackTarget(document.body);
++  }, [container]);
++  const portalTarget = container === undefined ? fallbackTarget : container;
+ 
+   // Keep the messaging store's active scene in lock-step (its legacy fallback
+   // path resolves the current widget by active scene when no id is passed).
+diff --git a/lib/interactive/classroom-fullscreen-root.ts b/lib/interactive/classroom-fullscreen-root.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/interactive/classroom-fullscreen-root.ts
+@@ -0,0 +1,13 @@
++/** Fullscreen the stable ancestor shared by playback and pooled activities.
++ * Requesting fullscreen on the inner playback shell would force the iframe
++ * portal to move and recreate the child document, losing its learning state.
++ * An isolated legacy playback shell retains its original fullscreen target.
++ */
++export function classroomFullscreenRoot(
++  playbackShell: HTMLElement,
++): HTMLElement {
++  return (
++    playbackShell.closest<HTMLElement>("[data-mira-classroom-root]") ??
++    playbackShell
++  );
++}
+diff --git a/tests/scene-renderers/interactive-fullscreen-preservation.test.ts b/tests/scene-renderers/interactive-fullscreen-preservation.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/interactive-fullscreen-preservation.test.ts
+@@ -0,0 +1,144 @@
++// @vitest-environment jsdom
++import { act, createElement } from "react";
++import { createRoot, type Root } from "react-dom/client";
++import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
++import { InteractiveIframeHost } from "@/components/scene-renderers/InteractiveIframeHost";
++import { classroomFullscreenRoot } from "@/lib/interactive/classroom-fullscreen-root";
++import { useInteractiveIframePool } from "@/lib/store/interactive-iframe-pool";
++import {
++  pausePageNarration,
++  releasePageNarrationPause,
++} from "@/lib/mira/page-narration";
++
++vi.mock("@/lib/contexts/mira-student-runtime-context", () => ({
++  useMiraStudentRuntimeEvents: () => null,
++}));
++vi.mock("@/lib/mira/student-interaction-bridge", () => ({
++  studentInteractionObjectives: () => [],
++  connectStudentInteractionFrame: vi.fn(),
++}));
++vi.mock("@/lib/hooks/use-i18n", () => ({
++  useI18n: () => ({ t: (key: string) => key }),
++}));
++let root: Root | undefined;
++let container: HTMLDivElement;
++let messages: WeakMap<HTMLIFrameElement, ReturnType<typeof vi.fn>>;
++let windows: WeakMap<HTMLIFrameElement, Window>;
++const frame = () => document.querySelector("iframe") as HTMLIFrameElement;
++
++beforeEach(() => {
++  vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
++  useInteractiveIframePool.getState().reset();
++  releasePageNarrationPause();
++  messages = new WeakMap();
++  windows = new WeakMap();
++  vi.spyOn(
++    HTMLIFrameElement.prototype,
++    "contentWindow",
++    "get",
++  ).mockImplementation(function (this: HTMLIFrameElement) {
++    if (!windows.has(this)) {
++      const postMessage = vi.fn();
++      messages.set(this, postMessage);
++      windows.set(this, { postMessage } as unknown as Window);
++    }
++    return windows.get(this)!;
++  });
++  container = document.createElement("div");
++  container.dataset.miraClassroomRoot = "";
++  const mount = document.createElement("div");
++  container.append(mount);
++  document.body.append(container);
++  root = createRoot(mount);
++  const pool = useInteractiveIframePool.getState();
++  pool.mount("one", {
++    srcDoc: "<html><body>an authored activity</body></html>",
++  });
++  pool.claim("one", "owner");
++  pool.setActive("one");
++  pool.setRect("one", { left: 0, top: 0, width: 640, height: 360 });
++});
++afterEach(async () => {
++  await act(async () => root?.unmount());
++  root = undefined;
++  document.body.replaceChildren();
++  vi.restoreAllMocks();
++  vi.unstubAllGlobals();
++});
++
++describe("stable classroom fullscreen boundary", () => {
++  it("uses the nearest stable classroom ancestor, with a legacy standalone fallback", () => {
++    const shell = document.createElement("div");
++    container.append(shell);
++    expect(classroomFullscreenRoot(shell)).toBe(container);
++    const nested = document.createElement("div");
++    nested.dataset.miraClassroomRoot = "";
++    container.append(nested);
++    nested.append(shell);
++    expect(classroomFullscreenRoot(shell)).toBe(nested);
++    nested.removeAttribute("data-mira-classroom-root");
++    container.removeAttribute("data-mira-classroom-root");
++    expect(classroomFullscreenRoot(shell)).toBe(shell);
++  });
++  it("does not briefly mount into body while the Stage DOM ref is still null", async () => {
++    await act(async () =>
++      root!.render(createElement(InteractiveIframeHost, { container: null })),
++    );
++    expect(frame()).toBeNull();
++    await act(async () =>
++      root!.render(createElement(InteractiveIframeHost, { container })),
++    );
++    expect(container.contains(frame())).toBe(true);
++  });
++  it("preserves iframe identity and its registered window on enter, exit and repeated fullscreen", async () => {
++    await act(async () =>
++      root!.render(createElement(InteractiveIframeHost, { container })),
++    );
++    const initial = frame(),
++      windowRef = initial.contentWindow;
++    for (const fullscreen of [container, null, container, null]) {
++      Object.defineProperty(document, "fullscreenElement", {
++        configurable: true,
++        value: fullscreen,
++      });
++      await act(async () => {
++        document.dispatchEvent(new Event("fullscreenchange"));
++        root!.render(createElement(InteractiveIframeHost, { container }));
++      });
++      expect(frame()).toBe(initial);
++      expect(frame().contentWindow).toBe(windowRef);
++      expect(container.contains(frame())).toBe(true);
++    }
++    expect(frame().getAttribute("sandbox")).toBe(
++      "allow-scripts allow-forms allow-popups",
++    );
++  });
++  it("retains cancellation and explicit resume while the same fullscreen document stays mounted", async () => {
++    await act(async () =>
++      root!.render(createElement(InteractiveIframeHost, { container })),
++    );
++    const initial = frame();
++    Object.defineProperty(document, "fullscreenElement", {
++      configurable: true,
++      value: container,
++    });
++    await act(async () =>
++      document.dispatchEvent(new Event("fullscreenchange")),
++    );
++    await act(async () => pausePageNarration());
++    expect(
++      messages
++        .get(initial)!
++        .mock.calls.filter(([m]) => m.type === "MIRA_NARRATION_VISIBILITY")
++        .at(-1)?.[0].visible,
++    ).toBe(false);
++    await act(async () => releasePageNarrationPause());
++    expect(
++      messages
++        .get(initial)!
++        .mock.calls.filter(([m]) => m.type === "MIRA_NARRATION_VISIBILITY")
++        .at(-1)?.[0].visible,
++    ).toBe(true);
++    expect(frame()).toBe(initial);
++  });
++});
+diff --git a/tests/scene-renderers/interactive-fullscreen.browser.test.ts b/tests/scene-renderers/interactive-fullscreen.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/interactive-fullscreen.browser.test.ts
+@@ -0,0 +1,164 @@
++import { describe, expect, it } from "vitest";
++import { chromium } from "playwright-core";
++import { createRequire } from "node:module";
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== "1")(
++  "real browser pooled-iframe fullscreen",
++  () => {
++    it("keeps the child document and work through enter/exit, pauses, page return and real content replacement", async () => {
++      const require = createRequire(import.meta.url);
++      const { build } = createRequire(require.resolve("tsx"))("esbuild");
++      // Only unrelated app integrations are mocked. Host, pool, React portal,
++      // fullscreen target resolution, narration visibility and iframe are real.
++      const mocks: Record<string, string> = {
++        "@/lib/contexts/mira-student-runtime-context":
++          "export const useMiraStudentRuntimeEvents=()=>null;",
++        "@/lib/mira/student-interaction-bridge":
++          "export const studentInteractionObjectives=()=>[];export const connectStudentInteractionFrame=()=>()=>{};",
++        "@/lib/hooks/use-i18n": "export const useI18n=()=>({t:k=>k});",
++        "@/lib/store/stage":
++          "const scenes=[];export const useStageStore=selector=>selector({scenes});useStageStore.getState=()=>({scenes});",
++        "@/lib/store/canvas":
++          "const s={pickTarget:null,setPickTarget(){}};export const useCanvasStore={use:{pickTarget:()=>null},getState:()=>s};",
++        "@/lib/store/element-refs":
++          "const refs=[];export const useElementRefsStore={use:{refs:()=>refs},getState:()=>({refs})};",
++      };
++      const html = `<!doctype html><html><head><meta name="mira-responsive-activity" content="low-reading-v1"></head><body>
++<button id="make">Make observation card</button><output id="album">0</output><output id="visibility">waiting</output>
++<script>window.documentToken=Math.random().toString(36);window.cards=0;window.cancels=0;window.pending=false;make.onclick=()=>{album.textContent=String(++cards);pending=true};addEventListener('message',e=>{if(e.source===parent&&e.data?.type==='MIRA_NARRATION_VISIBILITY'){visibility.textContent=String(e.data.visible);if(!e.data.visible&&pending){pending=false;cancels++}}});</script></body></html>`;
++      const bundle = await build({
++        stdin: {
++          resolveDir: process.cwd(),
++          loader: "tsx",
++          contents: `
++import React,{useState} from 'react';import {createRoot} from 'react-dom/client';
++import {InteractiveIframeHost} from './components/scene-renderers/InteractiveIframeHost';
++import {classroomFullscreenRoot} from './lib/interactive/classroom-fullscreen-root';
++import {useInteractiveIframePool} from './lib/store/interactive-iframe-pool';
++import {pausePageNarration,releasePageNarrationPause} from './lib/mira/page-narration';
++const initial=${JSON.stringify(html)};const pool=useInteractiveIframePool.getState();
++for(const id of ['one','two']){pool.mount(id,{srcDoc:initial});pool.claim(id,id);pool.setRect(id,{left:20,top:100,width:600,height:300});}pool.setActive('one');
++function App(){const [container,setContainer]=useState(null);return <div data-mira-classroom-root ref={setContainer} style={{width:'100vw',height:'100vh',background:'white'}}><div id="shell"><button id="fullscreen" onClick={()=>classroomFullscreenRoot(document.querySelector('#shell')).requestFullscreen()}>Fullscreen</button><button id="exit" onClick={()=>document.exitFullscreen()}>Exit</button><button id="pause" onClick={()=>pausePageNarration()}>Pause</button><button id="resume" onClick={()=>releasePageNarrationPause()}>Resume</button><button id="other" onClick={()=>pool.setActive('two')}>Other scene</button><button id="back" onClick={()=>pool.setActive('one')}>Return</button><button id="replace" onClick={()=>pool.mount('one',{srcDoc:initial.replace('window.cards=0','window.cards=40')})}>Replace authored HTML</button></div><InteractiveIframeHost container={container}/></div>};createRoot(document.querySelector('#app')).render(<App/>);`,
++        },
++        bundle: true,
++        write: false,
++        format: "iife",
++        platform: "browser",
++        logLevel: "silent",
++        define: { "process.env.NODE_ENV": '"test"' },
++        plugins: [
++          {
++            name: "isolated-app-integrations",
++            setup(b: any) {
++              b.onResolve({ filter: /^@\// }, (args: any) =>
++                mocks[args.path]
++                  ? { path: args.path, namespace: "test-mock" }
++                  : undefined,
++              );
++              b.onLoad(
++                { filter: /.*/, namespace: "test-mock" },
++                (args: any) => ({ contents: mocks[args.path], loader: "js" }),
++              );
++            },
++          },
++        ],
++      });
++      const browser = await chromium.launch({
++        executablePath:
++          process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
++        headless: true,
++      });
++      try {
++        const page = await browser.newPage({
++          viewport: { width: 800, height: 600 },
++        });
++        await page.route("**/*", (route) => route.abort());
++        await page.setContent('<div id="app"></div>');
++        await page.addScriptTag({ content: bundle.outputFiles[0].text });
++        const iframe = page.locator('iframe[title="Interactive Scene one"]');
++        const child = await (await iframe.elementHandle())!.contentFrame();
++        await child!
++          .getByRole("button", { name: "Make observation card" })
++          .click();
++        const token = await child!.evaluate(
++          () => (window as any).documentToken,
++        );
++        await page.evaluate(() => {
++          (window as any).originalFrame = document.querySelector(
++            'iframe[title="Interactive Scene one"]',
++          );
++          (window as any).originalWindow = (
++            window as any
++          ).originalFrame.contentWindow;
++        });
++        for (let n = 0; n < 2; n++) {
++          await page
++            .getByRole("button", { name: "Fullscreen", exact: true })
++            .click();
++          await page.waitForFunction(() =>
++            document.fullscreenElement?.hasAttribute(
++              "data-mira-classroom-root",
++            ),
++          );
++          expect(
++            await page.evaluate(
++              () =>
++                document.querySelector(
++                  'iframe[title="Interactive Scene one"]',
++                ) === (window as any).originalFrame &&
++                (window as any).originalFrame.contentWindow ===
++                  (window as any).originalWindow,
++            ),
++          ).toBe(true);
++          expect(
++            await child!.evaluate(() => ({
++              token: (window as any).documentToken,
++              cards: (window as any).cards,
++            })),
++          ).toEqual({ token, cards: 1 });
++          await page.getByRole("button", { name: "Exit", exact: true }).click();
++          await page.waitForFunction(() => !document.fullscreenElement);
++          expect(
++            await child!.evaluate(() => (window as any).documentToken),
++          ).toBe(token);
++        }
++        await page.getByRole("button", { name: "Pause", exact: true }).click();
++        await child!.waitForFunction(
++          () => document.querySelector("#visibility")?.textContent === "false",
++        );
++        expect(
++          await child!.evaluate(() => ({
++            cards: (window as any).cards,
++            cancels: (window as any).cancels,
++            pending: (window as any).pending,
++          })),
++        ).toEqual({ cards: 1, cancels: 1, pending: false });
++        await page.getByRole("button", { name: "Resume", exact: true }).click();
++        await child!.waitForFunction(
++          () => document.querySelector("#visibility")?.textContent === "true",
++        );
++        await page
++          .getByRole("button", { name: "Other scene", exact: true })
++          .click();
++        await child!.waitForFunction(
++          () => document.querySelector("#visibility")?.textContent === "false",
++        );
++        await page.getByRole("button", { name: "Return", exact: true }).click();
++        await child!.waitForFunction(
++          () => document.querySelector("#visibility")?.textContent === "true",
++        );
++        expect(await child!.evaluate(() => (window as any).cards)).toBe(1);
++        await page
++          .getByRole("button", { name: "Replace authored HTML", exact: true })
++          .click();
++        await child!.waitForFunction(() => (window as any).cards === 40);
++        expect(
++          await child!.evaluate(() => (window as any).documentToken),
++        ).not.toBe(token);
++      } finally {
++        await browser.close();
++      }
++    }, 30000);
++  },
++);

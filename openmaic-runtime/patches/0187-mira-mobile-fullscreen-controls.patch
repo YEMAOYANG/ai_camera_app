@@ -1,0 +1,565 @@
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -1,6 +1,7 @@
+ 'use client';
+ 
+-import { useState, useRef, useCallback, useEffect } from 'react';
++import { useState, useRef, useCallback, useEffect, type CSSProperties } from 'react';
++import { usePresentationToolbarHeight } from './use-presentation-toolbar-height';
+ import { motion, AnimatePresence } from 'motion/react';
+ import {
+   Mic,
+@@ -700,6 +701,11 @@
+     isVoiceOpen ||
+     isRecording ||
+     isProcessing;
++  const { toolbarRef, toolbarHeight, dockHeight } = usePresentationToolbarHeight(
++    !!isPresenting,
++    presentationActionAnchorRef,
++    showPresentationDock,
++  );
+   const toolbar = (
+     <CanvasToolbar
+       className="shrink-0 h-8 px-3 border-b border-gray-100/40 dark:border-gray-700/30"
+@@ -752,6 +758,11 @@
+     return (
+       <div
+         data-mira-fixed-textbook={fixedTextbook ? '' : undefined}
++        data-mira-presentation-chrome
++        style={{
++          '--mira-presentation-toolbar-height': `${toolbarHeight}px`,
++          '--mira-presentation-dock-height': `${dockHeight}px`,
++        } as CSSProperties}
+         className="h-0 w-full relative z-10 overflow-visible"
+       >
+         {/* Speech overlay — fills the full stage area via absolute positioning */}
+@@ -770,6 +781,7 @@
+         {/* Click-outside backdrop to dismiss input/voice */}
+         {(isInputOpen || isVoiceOpen) && (
+           <div
++            data-mira-presentation-backdrop
+             className="fixed top-0 left-0 right-0 bottom-14 z-[45] pointer-events-auto"
+             onClick={() => {
+               setIsInputOpen(false);
+@@ -781,6 +793,8 @@
+ 
+         {/* ── Toolbar — pinned to bottom of screen ── */}
+         <div
++          ref={toolbarRef}
++          data-mira-presentation-toolbar
+           className={cn(
+             'fixed bottom-0 left-0 z-[40] pointer-events-none flex items-center justify-center transition-all duration-300',
+             controlsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2',
+@@ -807,6 +821,7 @@
+                 times: [0, 0.15, 0.7, 1],
+                 ease: 'easeOut',
+               }}
++              data-mira-presentation-end-flash
+               className="fixed bottom-20 -translate-x-1/2 z-[50] bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-md text-gray-700 dark:text-white px-3.5 py-1.5 rounded-full text-xs font-medium pointer-events-none"
+               style={{
+                 left: `calc((100vw - ${chatCollapsed === false ? (chatAreaWidth ?? 320) : 0}px) / 2)`,
+@@ -822,6 +837,7 @@
+ 
+         {/* ── Center stack: input / voice / thinking — anchored above toolbar ── */}
+         <div
++          data-mira-presentation-input
+           className="fixed bottom-14 left-0 z-[50] flex flex-col items-center justify-center gap-3 pointer-events-none transition-[right] duration-300"
+           style={{ right: chatCollapsed === false ? (chatAreaWidth ?? 320) : 0 }}
+         >
+@@ -979,6 +995,7 @@
+ 
+         {/* ── Right-side stack: bubble + dock — flex column, no hardcoded px ── */}
+         <div
++          data-mira-presentation-dock
+           className="fixed bottom-5 z-[48] flex flex-col items-end gap-3 pointer-events-none transition-[right] duration-300"
+           style={{ right: chatCollapsed ? 20 : 20 + (chatAreaWidth ?? 320) }}
+         >
+diff --git a/components/roundtable/use-presentation-toolbar-height.ts b/components/roundtable/use-presentation-toolbar-height.ts
+new file mode 100644
+--- /dev/null
++++ b/components/roundtable/use-presentation-toolbar-height.ts
+@@ -0,0 +1,40 @@
++"use client";
++
++import { useEffect, useRef, useState, type RefObject } from "react";
++
++/** Keep fullscreen discussion controls above the toolbar, including wrapped rows. */
++export function usePresentationToolbarHeight(
++  isPresenting: boolean,
++  dockRef: RefObject<HTMLDivElement | null>,
++  dockVisible: boolean,
++) {
++  const toolbarRef = useRef<HTMLDivElement>(null);
++  const [toolbarHeight, setToolbarHeight] = useState(176);
++
++  const [dockHeight, setDockHeight] = useState(76);
++
++  useEffect(() => {
++    if (!isPresenting) return;
++    const toolbar = toolbarRef.current;
++    if (!toolbar) return;
++    const dock = dockVisible ? dockRef.current : null;
++    const measure = () => {
++      setToolbarHeight(toolbar.offsetHeight);
++      setDockHeight(dock ? dock.offsetHeight : 0);
++    };
++    measure();
++    const observer =
++      typeof ResizeObserver === "undefined"
++        ? null
++        : new ResizeObserver(measure);
++    observer?.observe(toolbar);
++    if (dock) observer?.observe(dock);
++    window.addEventListener("resize", measure);
++    return () => {
++      observer?.disconnect();
++      window.removeEventListener("resize", measure);
++    };
++  }, [isPresenting, dockRef, dockVisible]);
++
++  return { toolbarRef, toolbarHeight, dockHeight };
++}
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1587,3 +1587,85 @@
+     max-width: 100%;
+   }
+ }
++
++/* Fullscreen previews and student classrooms share touch-safe navigation.
++ * The dock/input follow the measured toolbar height, including wrapped rows. */
++@media (max-width: 640px) {
++  [data-mira-presentation-chrome] [data-mira-presentation-toolbar] {
++    right: 0 !important;
++    padding-inline: 4px;
++  }
++  [data-mira-presentation-chrome] [data-mira-presentation-toolbar] > div {
++    box-sizing: border-box;
++    width: 100%;
++    padding: 4px;
++    border-radius: 20px;
++  }
++  [data-mira-presentation-chrome] [data-mira-chrome="playback-controls"] {
++    display: grid;
++    grid-template-columns: minmax(0, 1fr) auto;
++    gap: 2px 0;
++    height: auto;
++    width: 100%;
++    padding: 0;
++  }
++  [data-mira-presentation-chrome]
++    [data-mira-chrome="playback-controls"]
++    > .flex-1 {
++    grid-column: 1 / -1;
++    grid-row: 2;
++    min-width: 0;
++  }
++  [data-mira-presentation-chrome]
++    [data-mira-chrome="playback-controls"]
++    > div:last-child {
++    grid-column: 2;
++    grid-row: 1;
++    margin: 0;
++    padding: 0;
++  }
++  [data-mira-presentation-chrome]
++    [data-mira-chrome="playback-controls"]
++    > .flex-1
++    > div {
++    display: flex;
++    flex-wrap: wrap;
++    justify-content: center;
++    gap: 0;
++    height: auto;
++    width: 100%;
++    padding: 0;
++  }
++  [data-mira-presentation-chrome]
++    [data-mira-chrome="playback-controls"]
++    button {
++    box-sizing: border-box;
++    flex-shrink: 0;
++    min-width: max(48px, var(--mira-orbit-control-height, 48px));
++    min-height: max(48px, var(--mira-orbit-control-height, 48px));
++    height: auto;
++  }
++  [data-mira-presentation-chrome]
++    [data-mira-chrome="playback-controls"]
++    [data-mira-indicator="toolbar-divider"] {
++    display: none;
++  }
++  [data-mira-presentation-chrome] [data-mira-presentation-dock],
++  [data-mira-presentation-chrome] [data-mira-presentation-end-flash] {
++    bottom: calc(var(--mira-presentation-toolbar-height, 176px) + 12px);
++  }
++  [data-mira-presentation-chrome] [data-mira-presentation-backdrop] {
++    bottom: var(--mira-presentation-toolbar-height, 176px);
++  }
++  [data-mira-presentation-chrome] [data-mira-presentation-dock] {
++    right: 12px !important;
++    max-width: calc(100vw - 24px);
++  }
++  [data-mira-presentation-chrome] [data-mira-presentation-input] {
++    bottom: calc(
++      var(--mira-presentation-toolbar-height, 176px) +
++        var(--mira-presentation-dock-height, 76px) + 24px
++    );
++    right: 0 !important;
++  }
++}
+diff --git a/tests/roundtable/fullscreen-touch-layout.browser.test.ts b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+@@ -0,0 +1,349 @@
++import { describe, expect, it } from "vitest";
++import { chromium } from "playwright-core";
++import { createRequire } from "node:module";
++import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
++import { dirname, join } from "node:path";
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== "1")(
++  "fullscreen touch layout",
++  () => {
++    it("keeps every control reachable and preserves the real iframe through repeated fullscreen and resize", async () => {
++      const require = createRequire(import.meta.url);
++      const { build } = createRequire(require.resolve("tsx"))("esbuild");
++      // Unrelated network, ASR and roster integrations are isolated. Roundtable,
++      // CanvasToolbar, layout measurement, fullscreen and pooled iframe are real.
++      const mocks: Record<string, string> = {
++        "@/lib/hooks/use-i18n": `export const useI18n=()=>({t:k=>k});`,
++        "@/lib/store": `export const useStageStore=f=>f({stage:{fixedTextbook:true},scenes:[]});`,
++        "@/lib/store/stage": `const s={scenes:[]};export const useStageStore=f=>f(s);useStageStore.getState=()=>s;`,
++        "@/lib/store/settings": `const s={ttsMuted:false,ttsEnabled:true,asrEnabled:false,ttsVolume:1,chatAreaWidth:320,playbackSpeed:1,setTTSMuted(){},setTTSVolume(){},setPlaybackSpeed(){}};export const useSettingsStore=f=>f(s);export const PLAYBACK_SPEEDS=[1,1.5,2];`,
++        "@/lib/hooks/use-audio-recorder": `export const useAudioRecorder=()=>({isRecording:false,isProcessing:false,startRecording(){},stopRecording(){},cancelRecording(){}});`,
++        "@/lib/contexts/mira-student-runtime-context": `export const useMiraStudentRuntime=()=>false;export const useMiraStudentRuntimeEvents=()=>null;`,
++        "@/lib/mira/student-interaction-bridge": `export const studentInteractionObjectives=()=>[];export const connectStudentInteractionFrame=()=>()=>{};`,
++        "@/lib/mira/student-runtime": `export const getMiraEffectiveAsrEnabled=()=>false;`,
++        "@/lib/orchestration/registry/store": `export const useAgentRegistry={getState:()=>({getAgent:()=>undefined})};`,
++        "@/components/roundtable/presentation-speech-overlay": `export const PresentationSpeechOverlay=()=>null;`,
++        "@/components/chat/proactive-card": `export const ProactiveCard=()=>null;`,
++        "@/components/ui/avatar-display": `import React from 'react';export const AvatarDisplay=({alt})=><span>{alt}</span>;`,
++        "@/lib/store/canvas": `const s={pickTarget:null,setPickTarget(){}};export const useCanvasStore={use:{pickTarget:()=>null},getState:()=>s};`,
++        "@/lib/store/element-refs": `const refs=[];export const useElementRefsStore={use:{refs:()=>refs},getState:()=>({refs})};`,
++      };
++      const html =
++        '<!doctype html><meta name="mira-responsive-activity" content="low-reading-v1"><button id="make">Save plant</button><output id="album">0</output><script>window.documentToken=Math.random().toString(36);window.cards=0;window.recordedCueState="ready";make.onclick=()=>{album.textContent=String(++cards)};</script>';
++      const bundle = await build({
++        stdin: {
++          resolveDir: process.cwd(),
++          loader: "tsx",
++          contents: `
++import React,{useState,useEffect} from 'react';import {createRoot} from 'react-dom/client';
++import {Roundtable} from './components/roundtable';
++import {InteractiveIframeHost} from './components/scene-renderers/InteractiveIframeHost';
++import {useInteractiveIframePool} from './lib/store/interactive-iframe-pool';
++const pool=useInteractiveIframePool.getState();pool.mount('one',{srcDoc:${JSON.stringify(html)}});pool.claim('one','one');pool.setRect('one',{left:10,top:40,width:300,height:240});pool.setActive('one');
++function App(){const [root,setRoot]=useState(null);const [full,setFull]=useState(false);const [playing,setPlaying]=useState(false);const [chat,setChat]=useState(true);const [sidebar,setSidebar]=useState(true);const [visible,setVisible]=useState(true);window.setControlsVisible=setVisible;
++useEffect(()=>{const fn=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',fn);return()=>document.removeEventListener('fullscreenchange',fn)},[]);
++return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white'}}><div style={{position:'absolute',bottom:0,width:'100%'}}><Roundtable initialParticipants={[]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={playing?'playing':'idle'} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};createRoot(document.querySelector('#app')).render(<App/>);`,
++        },
++        bundle: true,
++        write: false,
++        format: "iife",
++        platform: "browser",
++        logLevel: "silent",
++        define: { "process.env.NODE_ENV": '"test"' },
++        plugins: [
++          {
++            name: "unrelated-integrations",
++            setup(b: any) {
++              b.onResolve({ filter: /^@\// }, (a: any) =>
++                mocks[a.path] ? { path: a.path, namespace: "mock" } : undefined,
++              );
++              b.onLoad({ filter: /.*/, namespace: "mock" }, (a: any) => ({
++                contents: mocks[a.path],
++                loader: "tsx",
++                resolveDir: process.cwd(),
++              }));
++            },
++          },
++        ],
++      });
++      const tw = require("tailwindcss");
++      const twDir = dirname(require.resolve("tailwindcss/package.json"));
++      const compiled = await tw.compile(
++        readFileSync(join(twDir, "index.css"), "utf8"),
++      );
++      const source = [
++        "components/roundtable/index.tsx",
++        "components/canvas/canvas-toolbar.tsx",
++      ]
++        .map((p) => readFileSync(p, "utf8"))
++        .join("\n");
++      const tokens = Array.from(new Set(source.split(/[\s'"`{}(),]+/)));
++      const css =
++        compiled.build(tokens) +
++        "\n" +
++        readFileSync("app/mira-student-orbit.css", "utf8");
++      if (process.env.MIRA_FORMAL_QA_EXPORT_DIR) {
++        mkdirSync(process.env.MIRA_FORMAL_QA_EXPORT_DIR, { recursive: true });
++        writeFileSync(
++          join(
++            process.env.MIRA_FORMAL_QA_EXPORT_DIR,
++            "fullscreen-touch-host.html",
++          ),
++          '<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>' +
++            css +
++            '</style></head><body><div id="app"></div><script>' +
++            bundle.outputFiles[0].text.replaceAll("</script", "<\\/script") +
++            "</script></body></html>",
++        );
++      }
++      const browser = await chromium.launch({
++        executablePath:
++          process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
++        headless: true,
++      });
++      try {
++        for (const theme of ["", "storybook"]) {
++          const page = await browser.newPage({
++            viewport: { width: 390, height: 844 },
++          });
++          page.setDefaultTimeout(10000);
++          page.on("pageerror", (e) => console.error(e.message));
++          await page.route("**/*", (r) => r.abort());
++          await page.setContent(
++            `<html ${theme ? 'data-mira-student-theme="storybook"' : ""}><head></head><body><div id="app"></div></body></html>`,
++          );
++          await page.addStyleTag({ content: css });
++          await page.evaluate(() => {
++            const Original = ResizeObserver;
++            const state = { active: 0, disconnected: 0 };
++            (window as any).toolbarObservers = state;
++            window.ResizeObserver = class extends Original {
++              tracked = false;
++              observe(e: Element, o?: ResizeObserverOptions) {
++                if (e.hasAttribute("data-mira-presentation-toolbar")) {
++                  this.tracked = true;
++                  state.active++;
++                }
++                super.observe(e, o);
++              }
++              disconnect() {
++                if (this.tracked) {
++                  state.active--;
++                  state.disconnected++;
++                  this.tracked = false;
++                }
++                super.disconnect();
++              }
++            };
++          });
++          await page.addScriptTag({ content: bundle.outputFiles[0].text });
++          const iframe = page.locator('iframe[title="Interactive Scene one"]');
++          await iframe.waitFor();
++          const child = await (await iframe.elementHandle())!.contentFrame();
++          await child!.getByRole("button", { name: "Save plant" }).click();
++          const token = await child!.evaluate(
++            () => (window as any).documentToken,
++          );
++          await page.evaluate(() => {
++            (window as any).originalFrame = document.querySelector("iframe");
++            (window as any).originalWindow = (
++              window as any
++            ).originalFrame.contentWindow;
++          });
++          for (const width of [390, 360]) {
++            await page.setViewportSize({ width, height: 844 });
++            await page
++              .getByRole("button", { name: "stage.fullscreen", exact: true })
++              .click();
++            await page.waitForFunction(() => !!document.fullscreenElement);
++            const exit = page.getByRole("button", {
++              name: "stage.exitFullscreen",
++              exact: true,
++            });
++            await exit.waitFor();
++            if (await page.locator("[data-mira-composer]").count())
++              await page
++                .locator("[data-mira-presentation-backdrop]")
++                .click({ position: { x: 3, y: 3 } });
++            await page.evaluate(() =>
++              (window as any).setControlsVisible(false),
++            );
++            await page
++              .locator('[data-mira-discussion-rail="dock"]')
++              .waitFor({ state: "detached" });
++            await page.evaluate(() => (window as any).setControlsVisible(true));
++            await page.locator('[data-mira-discussion-rail="dock"]').waitFor();
++
++            await page.waitForFunction(() => {
++              const a = document
++                .querySelector("[data-mira-presentation-toolbar]")!
++                .getBoundingClientRect();
++              const d = document
++                .querySelector("[data-mira-presentation-dock]")!
++                .getBoundingClientRect();
++              return d.bottom + 8 <= a.top;
++            });
++            const measured = await page.evaluate(() => {
++              const toolbar = document.querySelector(
++                "[data-mira-presentation-toolbar]",
++              )!;
++              const dock = document.querySelector(
++                "[data-mira-presentation-dock]",
++              )!;
++              const controls = Array.from(
++                toolbar.querySelectorAll("button"),
++              ).map((b) => {
++                const r = b.getBoundingClientRect();
++                return {
++                  name: b.getAttribute("aria-label") || b.title,
++                  rect: r.toJSON(),
++                  hit: b.contains(
++                    document.elementFromPoint(
++                      r.x + r.width / 2,
++                      r.y + r.height / 2,
++                    ),
++                  ),
++                };
++              });
++              return {
++                controls,
++                toolbar: toolbar.getBoundingClientRect().toJSON(),
++                dock: dock.getBoundingClientRect().toJSON(),
++                viewport: document.documentElement.clientWidth,
++              };
++            });
++            for (const name of [
++              "Toggle sidebar",
++              "Mute",
++              "Playback speed",
++              "Previous scene",
++              "Play",
++              "Next scene",
++              "Auto-play",
++              "stage.exitFullscreen",
++              "Toggle chat",
++            ])
++              expect(
++                measured.controls.some((c) => c.name === name),
++                name,
++              ).toBe(true);
++            for (const c of measured.controls) {
++              expect(c.rect.width, c.name).toBeGreaterThanOrEqual(48);
++              expect(c.rect.height, c.name).toBeGreaterThanOrEqual(48);
++              expect(c.rect.x, c.name).toBeGreaterThanOrEqual(0);
++              expect(c.rect.right, c.name).toBeLessThanOrEqual(
++                measured.viewport + 1,
++              );
++              expect(c.hit, c.name).toBe(true);
++            }
++            for (let i = 0; i < measured.controls.length; i++)
++              for (let j = i + 1; j < measured.controls.length; j++) {
++                const a = measured.controls[i].rect,
++                  b = measured.controls[j].rect;
++                expect(
++                  a.right <= b.left + 0.5 ||
++                    b.right <= a.left + 0.5 ||
++                    a.bottom <= b.top + 0.5 ||
++                    b.bottom <= a.top + 0.5,
++                  "touch targets overlap",
++                ).toBe(true);
++              }
++            await page
++              .getByRole("button", { name: "Toggle chat", exact: true })
++              .click();
++            await page
++              .getByRole("button", { name: "Toggle chat", exact: true })
++              .click();
++            const textToggle = page.getByRole("button", {
++              name: "roundtable.textInput",
++              exact: true,
++            });
++            if ((await textToggle.getAttribute("data-active")) === "true")
++              await textToggle.click();
++            await textToggle.click();
++            await page.locator("[data-mira-composer]").waitFor();
++            await page.waitForFunction(
++              () =>
++                document
++                  .querySelector("[data-mira-composer]")!
++                  .getBoundingClientRect().bottom <
++                document
++                  .querySelector("[data-mira-presentation-toolbar]")!
++                  .getBoundingClientRect().top,
++            );
++            // The outside-click backdrop must not cover enlarged toolbar rows.
++            expect(
++              await exit.evaluate((b) => {
++                const r = b.getBoundingClientRect();
++                return b.contains(
++                  document.elementFromPoint(
++                    r.x + r.width / 2,
++                    r.y + r.height / 2,
++                  ),
++                );
++              }),
++            ).toBe(true);
++            const box = (await exit.boundingBox())!;
++            await page.mouse.move(
++              box.x + box.width / 2,
++              box.y + box.height / 2,
++            );
++            await page.mouse.click(
++              box.x + box.width / 2,
++              box.y + box.height / 2,
++            );
++            await page.waitForFunction(
++              () =>
++                !document.fullscreenElement &&
++                (window as any).toolbarObservers.active === 0,
++            );
++            expect(
++              await page.evaluate(() => ({
++                frame:
++                  document.querySelector("iframe") ===
++                  (window as any).originalFrame,
++                win:
++                  (document.querySelector("iframe") as HTMLIFrameElement)
++                    .contentWindow === (window as any).originalWindow,
++                observers: (window as any).toolbarObservers.active,
++              })),
++            ).toEqual({ frame: true, win: true, observers: 0 });
++            expect(
++              await child!.evaluate(() => ({
++                token: (window as any).documentToken,
++                cards: (window as any).cards,
++                cue: (window as any).recordedCueState,
++              })),
++            ).toEqual({ token, cards: 1, cue: "ready" });
++          }
++          // Outside the mobile breakpoint, original toolbar geometry is restored.
++          await page.setViewportSize({ width: 1280, height: 900 });
++          await page
++            .getByRole("button", { name: "stage.fullscreen", exact: true })
++            .click();
++          await page.waitForFunction(() => !!document.fullscreenElement);
++          expect(
++            await page
++              .locator("[data-mira-presentation-toolbar]")
++              .evaluate((e) => getComputedStyle(e).paddingLeft),
++          ).toBe("0px");
++          await page
++            .getByRole("button", { name: "stage.exitFullscreen", exact: true })
++            .click();
++          await page.waitForFunction(
++            () =>
++              !document.fullscreenElement &&
++              (window as any).toolbarObservers.active === 0,
++          );
++          expect(
++            await page.evaluate(() => (window as any).toolbarObservers),
++          ).toMatchObject({ active: 0 });
++          await page.close();
++        }
++      } finally {
++        await browser.close();
++      }
++    }, 60000);
++  },
++);

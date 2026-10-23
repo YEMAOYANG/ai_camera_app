@@ -1,0 +1,162 @@
+--- a/components/canvas/canvas-toolbar.tsx
++++ b/components/canvas/canvas-toolbar.tsx
+@@ -13,6 +13,7 @@
+   Volume2,
+   VolumeX,
+   Repeat,
++  Square,
+   Maximize2,
+   Minimize2,
+ } from 'lucide-react';
+@@ -309,8 +310,10 @@
+ 
+           {/* Play / Pause / Stop Discussion */}
+           {showStopDiscussion && onStopDiscussion ? (
+-            <div className="flex items-center gap-1.5">
++            <div data-mira-live-controls className="flex items-center gap-1.5">
+               <button
++                data-mira-live-control="stop"
++                aria-label={t('roundtable.stopDiscussion')}
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   onStopDiscussion();
+@@ -323,11 +326,16 @@
+                 )}
+                 title={t('roundtable.stopDiscussion')}
+               >
+-                <span className="inline-flex rounded-full h-1.5 w-1.5 bg-red-500" />
+-                {t('roundtable.stopDiscussion')}
++                <Square data-mira-live-control-icon aria-hidden="true" className="hidden w-5 h-5 fill-current" />
++                <span data-mira-live-control-label className="flex items-center gap-1.5">
++                  <span className="inline-flex rounded-full h-1.5 w-1.5 bg-red-500" />
++                  {t('roundtable.stopDiscussion')}
++                </span>
+               </button>
+               {isSoftClosing && onContinueDiscussion && (
+                 <button
++                  data-mira-live-control="continue"
++                  aria-label={t('roundtable.softClosing')}
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     onContinueDiscussion();
+@@ -335,12 +343,15 @@
+                   className="flex items-center gap-1.5 h-6 px-2.5 rounded-md border border-purple-200 dark:border-purple-700 bg-white/70 dark:bg-gray-800/70 text-purple-600 dark:text-purple-300 text-[11px] font-semibold whitespace-nowrap hover:bg-purple-50 dark:hover:bg-purple-900/20 active:scale-95 transition-all cursor-pointer"
+                   title={t('roundtable.softClosing')}
+                 >
+-                  {t('roundtable.softClosing')}
+-                  {remainingSoftCloseSeconds !== undefined && (
+-                    <span className="text-[9px] font-medium tabular-nums text-gray-400 dark:text-gray-500">
+-                      {remainingSoftCloseSeconds}s
+-                    </span>
+-                  )}
++                  <Play data-mira-live-control-icon aria-hidden="true" className="hidden w-5 h-5" />
++                  <span data-mira-live-control-label className="flex items-center gap-1.5">
++                    {t('roundtable.softClosing')}
++                    {remainingSoftCloseSeconds !== undefined && (
++                      <span className="text-[9px] font-medium tabular-nums text-gray-400 dark:text-gray-500">
++                        {remainingSoftCloseSeconds}s
++                      </span>
++                    )}
++                  </span>
+                 </button>
+               )}
+             </div>
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1864,3 +1864,19 @@
+   }
+   [data-mira-classroom-root]:not(:fullscreen) [data-testid='header-controls'] > label > span { display: none; }
+ }
++
++/* Live discussion uses the same stable phone rows as recorded lessons. The
++ * complete action names remain accessible while compact controls use icons. */
++@media (max-width: 640px), (min-width: 641px) and (max-height: 500px) {
++  [data-mira-classroom-root] [data-mira-chrome='playback-controls'] [data-mira-live-controls] { gap: 0; }
++  [data-mira-classroom-root] [data-mira-chrome='playback-controls'] [data-mira-live-control] {
++    width: 48px; height: 48px; min-width: 48px; min-height: 48px; padding: 0; gap: 0; justify-content: center;
++  }
++  [data-mira-classroom-root] [data-mira-live-control-label] { display: none; }
++  [data-mira-classroom-root] [data-mira-live-control-icon] { display: block; }
++}
++@media (max-width: 640px) {
++  [data-mira-classroom-root] [data-mira-chrome='playback-controls'] [data-mira-live-control='continue'] {
++    position: absolute; top: 0; right: 144px;
++  }
++}
+--- a/tests/roundtable/fullscreen-touch-layout.browser.test.ts
++++ b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+@@ -39,10 +39,10 @@
+ import {InteractiveIframeHost} from './components/scene-renderers/InteractiveIframeHost';
+ import {InteractiveRenderer} from './components/scene-renderers/interactive-renderer';
+ import {useInteractiveIframePool} from './lib/store/interactive-iframe-pool';
+-const html=${JSON.stringify(html)};
+-function App(){const [root,setRoot]=useState(null);const [full,setFull]=useState(false);const [playing,setPlaying]=useState(false);const [chat,setChat]=useState(true);const [sidebar,setSidebar]=useState(true);const [visible,setVisible]=useState(true);window.setControlsVisible=setVisible;const [speech,setSpeech]=useState(false);window.setSpeech=setSpeech;window.unmount=()=>createRootInstance.unmount();
++const html=${JSON.stringify(html)};window.stopCalls=0;window.continueCalls=0;
++function App(){const [live,setLive]=useState(false);const [soft,setSoft]=useState(false);window.setLive=setLive;window.setSoft=setSoft;const [root,setRoot]=useState(null);const [full,setFull]=useState(false);const [playing,setPlaying]=useState(false);const [chat,setChat]=useState(true);const [sidebar,setSidebar]=useState(true);const [visible,setVisible]=useState(true);window.setControlsVisible=setVisible;const [speech,setSpeech]=useState(false);window.setSpeech=setSpeech;window.unmount=()=>createRootInstance.unmount();
+ useEffect(()=>{const fn=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',fn);return()=>document.removeEventListener('fullscreenchange',fn)},[]);
+-return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white',display:'flex',flexDirection:'column','--mira-presentation-content-inset':'7px'}}>{!full&&<header data-mira-chrome='header' className='h-20 px-8 flex items-center justify-between gap-4' style={{flexShrink:0}}><div className='flex items-center gap-3 min-w-0 flex-1'><button aria-label='Back' className='shrink-0 p-2'><span style={{display:'block',width:20,height:20}}/></button><div className='flex flex-col min-w-0'><h1 className='truncate'>Lesson</h1></div></div><div data-testid='header-controls' className='flex items-center gap-4'><div className='shrink-0 flex items-center gap-1 px-2 py-1.5'><button>CN</button><button aria-label='Theme'><span style={{display:'block',width:16,height:16}}/></button><button aria-label='Settings'><span style={{display:'block',width:16,height:16}}/></button></div><label className='shrink-0 inline-flex items-center gap-2.5 h-9 px-3'><span>Pro mode</span><button role='switch' aria-checked='false' aria-label='Edit course'>Edit</button></label><button aria-label='Export' className='shrink-0'><span style={{display:'block',width:16,height:16}}/></button></div></header>}<div data-mira-canvas-area style={{height:full?'100%':undefined,flex:1,minHeight:0,boxSizing:'border-box'}}><div style={{height:'100%',padding:8,boxSizing:'border-box'}}><InteractiveRenderer content={{type:'interactive',html,url:''}} sceneId='one'/></div></div><div data-mira-chrome='discussion' style={full?{position:'absolute',bottom:0,width:'100%'}:{flexShrink:0}}> <Roundtable idleText="Verified first teacher instruction" playbackView={speech?{phase:'lecturePaused',bubbleRole:'teacher',sourceText:'Recorded teacher instruction',buttonState:'play',isInLiveFlow:false}:undefined} initialParticipants={[{id:'teacher',name:'Teacher',role:'teacher',avatar:''},{id:'alex',name:'Alex',role:'student',avatar:''},{id:'lily',name:'Lily',role:'student',avatar:''},{id:'ben',name:'Ben',role:'student',avatar:''}]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={playing?'playing':'idle'} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};const createRootInstance=createRoot(document.querySelector('#app'));createRootInstance.render(<App/>);`,
++return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white',display:'flex',flexDirection:'column','--mira-presentation-content-inset':'7px'}}>{!full&&<header data-mira-chrome='header' className='h-20 px-8 flex items-center justify-between gap-4' style={{flexShrink:0}}><div className='flex items-center gap-3 min-w-0 flex-1'><button aria-label='Back' className='shrink-0 p-2'><span style={{display:'block',width:20,height:20}}/></button><div className='flex flex-col min-w-0'><h1 className='truncate'>Lesson</h1></div></div><div data-testid='header-controls' className='flex items-center gap-4'><div className='shrink-0 flex items-center gap-1 px-2 py-1.5'><button>CN</button><button aria-label='Theme'><span style={{display:'block',width:16,height:16}}/></button><button aria-label='Settings'><span style={{display:'block',width:16,height:16}}/></button></div><label className='shrink-0 inline-flex items-center gap-2.5 h-9 px-3'><span>Pro mode</span><button role='switch' aria-checked='false' aria-label='Edit course'>Edit</button></label><button aria-label='Export' className='shrink-0'><span style={{display:'block',width:16,height:16}}/></button></div></header>}<div data-mira-canvas-area style={{height:full?'100%':undefined,flex:1,minHeight:0,boxSizing:'border-box'}}><div style={{height:'100%',padding:8,boxSizing:'border-box'}}><InteractiveRenderer content={{type:'interactive',html,url:''}} sceneId='one'/></div></div><div data-mira-chrome='discussion' style={full?{position:'absolute',bottom:0,width:'100%'}:{flexShrink:0}}> <Roundtable idleText="Verified first teacher instruction" playbackView={live?{phase:'discussionActive',bubbleRole:'teacher',sourceText:'Live discussion',buttonState:'none',isInLiveFlow:true}:speech?{phase:'lecturePaused',bubbleRole:'teacher',sourceText:'Recorded teacher instruction',buttonState:'play',isInLiveFlow:false}:undefined} initialParticipants={[{id:'teacher',name:'Teacher',role:'teacher',avatar:''},{id:'alex',name:'Alex',role:'student',avatar:''},{id:'lily',name:'Lily',role:'student',avatar:''},{id:'ben',name:'Ben',role:'student',avatar:''}]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={live?'live':playing?'playing':'idle'} isSoftClosing={soft} onContinueDiscussion={()=>window.continueCalls++} onStopDiscussion={()=>{window.stopCalls++;setLive(false);setSoft(false)}} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};const createRootInstance=createRoot(document.querySelector('#app'));createRootInstance.render(<App/>);`,
+         },
+         bundle: true,
+         write: false,
+@@ -488,8 +488,52 @@
+             await page.waitForFunction(() => !document.fullscreenElement);
+           }
+           await page.evaluate(() => (window as any).setSpeech(false));
++          // Live and soft-closing discussions retain all navigation at the same
++          // dimensions. Their real callbacks run locally, without a live model.
++          for (const viewport of [{width:320,height:568},{width:390,height:844},{width:667,height:375}]) {
++            await page.setViewportSize(viewport);
++            for (const full of [false,true]) {
++              if ((await page.evaluate(()=>!!document.fullscreenElement))!==full) {
++                await page.getByRole('button',{name:full?'stage.fullscreen':'stage.exitFullscreen',exact:true}).click();
++                await page.waitForFunction(f=>!!document.fullscreenElement===f,full);
++              }
++              await page.evaluate(()=>{(window as any).setControlsVisible(true);(window as any).setSoft(false);(window as any).setLive(true)});
++              const stop=page.getByRole('button',{name:'roundtable.stopDiscussion',exact:true});
++              await stop.waitFor();
++              const before=await iframe.boundingBox();
++              for (const soft of [false,true]) {
++                await page.evaluate(s=>(window as any).setSoft(s),soft);
++                const continuation=page.getByRole('button',{name:'roundtable.softClosing',exact:true});
++                await continuation.waitFor({state:soft?'visible':'detached'});
++                const controls=await page.locator('[data-mira-chrome="playback-controls"] button').evaluateAll(bs=>bs.map(b=>{
++                  const r=b.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
++                  return {name:b.getAttribute('aria-label')||b.getAttribute('title'),x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height,hit:b.contains(hit)};
++                }));
++                for(const c of controls){expect(c.width+0.001,JSON.stringify({viewport,full,soft,c})).toBeGreaterThanOrEqual(48);expect(c.height+0.001).toBeGreaterThanOrEqual(48);expect(c.x).toBeGreaterThanOrEqual(0);expect(c.right).toBeLessThanOrEqual(viewport.width);expect(c.hit,JSON.stringify({viewport,full,soft,c})).toBe(true);}
++                for(let i=0;i<controls.length;i++)for(let j=i+1;j<controls.length;j++){const a=controls[i],b=controls[j];expect(a.right<=b.x+0.5||b.right<=a.x+0.5||a.bottom<=b.y+0.5||b.bottom<=a.y+0.5,JSON.stringify({viewport,full,soft,a,b})).toBe(true);}
++              }
++              const counts=await page.evaluate(()=>[(window as any).continueCalls,(window as any).stopCalls]);
++              await page.getByRole('button',{name:'roundtable.softClosing',exact:true}).click();
++              await page.locator('textarea').waitFor({state:'visible'});
++              expect(await page.evaluate(()=>(window as any).continueCalls)).toBe(counts[0]+1);
++              expect(await iframe.boundingBox()).toEqual(before);
++              await page.keyboard.press('Escape');
++              await page.locator('textarea').waitFor({state:'detached'});
++              await stop.click();
++              expect(await page.evaluate(()=>(window as any).stopCalls)).toBe(counts[1]+1);
++              await stop.waitFor({state:'detached'});
++              expect(await iframe.boundingBox()).toEqual(before);
++            }
++            await page.getByRole('button',{name:'stage.exitFullscreen',exact:true}).click();
++            await page.waitForFunction(()=>!document.fullscreenElement);
++          }
+           // Outside the mobile breakpoint, original toolbar geometry is restored.
+           await page.setViewportSize({ width: 1280, height: 900 });
++          await page.evaluate(()=>{(window as any).setLive(true);(window as any).setSoft(true)});
++          await page.getByRole('button',{name:'roundtable.softClosing',exact:true}).waitFor();
++          for(const label of await page.locator('[data-mira-live-control-label]').all()) expect(await label.isVisible()).toBe(true);
++          for(const icon of await page.locator('[data-mira-live-control-icon]').all()) expect(await icon.isVisible()).toBe(false);
++          await page.getByRole('button',{name:'roundtable.stopDiscussion',exact:true}).click();
+           await page
+             .getByRole("button", { name: "stage.fullscreen", exact: true })
+             .click();
+@@ -537,6 +581,6 @@
+       } finally {
+         await browser.close();
+       }
+-    }, 90000);
++    }, 120000);
+   },
+ );

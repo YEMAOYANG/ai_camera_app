@@ -1,0 +1,181 @@
+{
+  "schemaVersion": "mira.textbook.preview-audio-policy.v2",
+  "subjects": {
+    "chinese": {
+      "teacher": {
+        "schemaVersion": "mira.openmaic.formal-subject-qwen3-voice.v1",
+        "teacherProfile": {
+          "id": "mira_chinese_gentle",
+          "version": 2,
+          "contentHash": "a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8"
+        },
+        "teacherName": "小语老师",
+        "teacherGender": "female",
+        "voiceGender": "female",
+        "voiceId": "Serena",
+        "languageCode": "zh-CN",
+        "tts": {
+          "providerId": "qwen-tts",
+          "modelId": "qwen3-tts-flash",
+          "fallbackAllowed": false
+        },
+        "asr": {
+          "providerId": "qwen-asr",
+          "modelId": "qwen3-asr-flash",
+          "fallbackAllowed": false
+        }
+      },
+      "comparison": "literal-v1",
+      "ttsPrefix": "tbprev_",
+      "asrPrefix": "tbasr_"
+    },
+    "math": {
+      "teacher": {
+        "schemaVersion": "mira.openmaic.formal-subject-qwen3-voice.v1",
+        "teacherProfile": {
+          "id": "mira_math_clear",
+          "version": 2,
+          "contentHash": "4f5a986a765f69798c8546d7f9091fe297f2a98c5353fdd01cd1aa06884c98fb"
+        },
+        "teacherName": "小数老师",
+        "teacherGender": "male",
+        "voiceGender": "male",
+        "voiceId": "Ethan",
+        "languageCode": "zh-CN",
+        "tts": {
+          "providerId": "qwen-tts",
+          "modelId": "qwen3-tts-flash",
+          "fallbackAllowed": false
+        },
+        "asr": {
+          "providerId": "qwen-asr",
+          "modelId": "qwen3-asr-flash",
+          "fallbackAllowed": false
+        }
+      },
+      "comparison": "math-spoken-v1",
+      "ttsPrefix": "tbprev_",
+      "asrPrefix": "tbasr_"
+    },
+    "english": {
+      "teacher": {
+        "schemaVersion": "mira.openmaic.formal-subject-qwen3-voice.v1",
+        "teacherProfile": {
+          "id": "mira_english_standard",
+          "version": 2,
+          "contentHash": "4725f27c5438c0f68fe8923ac977fa1dd01452b990ac58912b880320750ee040"
+        },
+        "teacherName": "Mia 老师",
+        "teacherGender": "female",
+        "voiceGender": "female",
+        "voiceId": "Jennifer",
+        "languageCode": "en-US",
+        "tts": {
+          "providerId": "qwen-tts",
+          "modelId": "qwen3-tts-flash",
+          "fallbackAllowed": false
+        },
+        "asr": {
+          "providerId": "qwen-asr",
+          "modelId": "qwen3-asr-flash",
+          "fallbackAllowed": false
+        }
+      },
+      "comparison": "english-words-v1",
+      "ttsPrefix": "tbbtts2_",
+      "asrPrefix": "tbbasr2_"
+    },
+    "science": {
+      "teacher": {
+        "schemaVersion": "mira.openmaic.formal-subject-qwen3-voice.v1",
+        "teacherProfile": {
+          "id": "mira_science_inquiry",
+          "version": 1,
+          "contentHash": "6bdd6746ed1a6a538751f23ff663a9153e7d1db767f7d9d3b6e5dc00d97d5c6b"
+        },
+        "teacherName": "小科老师",
+        "teacherGender": "female",
+        "voiceGender": "female",
+        "voiceId": "Serena",
+        "languageCode": "zh-CN",
+        "tts": {
+          "providerId": "qwen-tts",
+          "modelId": "qwen3-tts-flash",
+          "fallbackAllowed": false
+        },
+        "asr": {
+          "providerId": "qwen-asr",
+          "modelId": "qwen3-asr-flash",
+          "fallbackAllowed": false
+        }
+      },
+      "comparison": "literal-v1",
+      "ttsPrefix": "tbprev_",
+      "asrPrefix": "tbasr_"
+    }
+  },
+  "comparisons": {
+    "literal-v1": {
+      "version": "literal-v1",
+      "minimumSimilarityBps": 8500,
+      "normalization": "NFKC_casefold_letters_numbers_levenshtein"
+    },
+    "math-spoken-v1": {
+      "version": "math-spoken-v1",
+      "minimumSimilarityBps": 8500,
+      "normalization": "integer_and_basic_operator_spelling_v1",
+      "requireSameNumberSequence": true,
+      "requireSameOrdinalRoles": true,
+      "requireSameOperatorSequence": true,
+      "unsupportedNumericForms": "reject_decimals_fractions_percentages",
+      "nonNumericPhrases": [
+        "数一数",
+        "看一看",
+        "点一点",
+        "找一找",
+        "比一比",
+        "摆一摆",
+        "想一想",
+        "听一听",
+        "读一读",
+        "说一说",
+        "一起来",
+        "一共",
+        "一起",
+        "一样",
+        "一些",
+        "一下",
+        "一定",
+        "一边",
+        "一会儿",
+        "加油"
+      ]
+    },
+    "english-words-v1": {
+      "version": "english-words-v1",
+      "minimumSimilarityBps": 8500,
+      "normalization": "NFKC_casefold_letters_numbers_levenshtein",
+      "requireSameLatinWordSequence": true,
+      "equivalentEnglishSpelling": "case_and_apostrophe_style_only"
+    }
+  },
+  "mandarinLanguagePolicy": {
+    "policyVersion": "mira.textbook.preview-mandarin-language.v1",
+    "tts": {
+      "providerId": "qwen-tts",
+      "modelId": "qwen3-tts-flash",
+      "languageType": "Chinese"
+    },
+    "asr": {
+      "providerId": "qwen-asr",
+      "modelId": "qwen3-asr-flash",
+      "language": "zh"
+    }
+  },
+  "legacy": {
+    "subject": "chinese",
+    "ttsPrefix": "tbprev_",
+    "asrPrefix": "tbasr_",
+    "comparison": "literal-v1"
+  }
+}

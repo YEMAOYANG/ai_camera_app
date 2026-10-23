@@ -1,0 +1,416 @@
+diff --git a/packages/@openmaic/dsl/src/stage.ts b/packages/@openmaic/dsl/src/stage.ts
+--- a/packages/@openmaic/dsl/src/stage.ts
++++ b/packages/@openmaic/dsl/src/stage.ts
+@@ -193,11 +193,33 @@
+   value: string; // Selection key: "A", "B", "C", "D"
+ }
+ 
++export type QuizRelationshipKind =
++  | 'speaks-to'
++  | 'voice-match'
++  | 'mismatch'
++  | 'corrects-name'
++  | 'farewell';
++
+ /** Meaningful visual content. Selection/grading always uses QuizOption.value. */
+ export type QuizVisual =
+   | { kind: 'image'; src: string; alt: string; cue?: 'speaking' | 'listening' | 'observer' }
+   | { kind: 'people'; members: { id: string; src: string; alt: string; cue: 'speaking' | 'listening' | 'observer' }[] }
++  | {
++      kind: 'relationship';
++      alt: string;
++      actors: { id: string; src: string; alt: string; cue: 'speaking' | 'listening' | 'observer' }[];
++      links: { fromId: string; toId: string; kind: QuizRelationshipKind }[];
++    }
+   | { kind: 'quantity'; count: number; alt?: string };
++
++/** Feedback released only after grading the selected option. */
++export interface QuizOptionFeedback {
++  text: string;
++  visual: QuizVisual;
++  audioUrl?: string;
++  audioBinding?: { schemaVersion: 'mira.learning.quiz-feedback-audio-binding.v1';
++    sceneId: string; questionId: string; optionValue: string; ttsRequestId: string; sourceTextSha256: string };
++}
+ 
+ export interface QuizQuestion {
+   id: string;
+@@ -207,6 +229,8 @@
+   /** Optional scene illustration and distinct pictures keyed by the locked option value. */
+   visual?: QuizVisual;
+   optionVisuals?: Record<string, QuizVisual>;
++  /** Per-option feedback kept private until the server grades that option. */
++  optionFeedback?: Record<string, QuizOptionFeedback>;
+   /** Saved teacher audio, derived from the same scene's exact-question speech. */
+   questionAudioUrl?: string;
+   questionAudioBinding?: { schemaVersion: 'mira.learning.question-narration-binding.v1';
+diff --git a/components/audio/question-narration.tsx b/components/audio/question-narration.tsx
+--- a/components/audio/question-narration.tsx
++++ b/components/audio/question-narration.tsx
+@@ -8,17 +8,20 @@
+ import referencePictureStyles from '@/components/scene-renderers/quiz-reference-picture.module.css';
+ 
+ /** Only already-authored, same-origin classroom audio; never calls a TTS API. */
+-export function questionNarrationSource(question: unknown): string | null {
+-  if (!question || typeof question !== 'object') return null;
+-  const value = (question as Record<string, unknown>).questionAudioUrl;
++export function classroomNarrationSource(value: unknown): string | null {
+   return typeof value === 'string'
+     && /^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(?:wav|mp3|ogg)$/.test(value)
+     ? value : null;
+ }
+ 
++export function questionNarrationSource(question: unknown): string | null {
++  return question && typeof question === 'object'
++    ? classroomNarrationSource((question as Record<string, unknown>).questionAudioUrl) : null;
++}
++
+ let activeAudio: HTMLAudioElement | null = null;
+ 
+-export function QuestionNarration({ src, number, autoPlay = false, sceneId, questionId, controlSlot }: { src: string; number: number; autoPlay?: boolean; sceneId?: string; questionId?: string; controlSlot?: ReactNode }) {
++export function QuestionNarration({ src, number, autoPlay = false, sceneId, questionId, controlSlot, label }: { src: string; number: number; autoPlay?: boolean; sceneId?: string; questionId?: string; controlSlot?: ReactNode; label?: string }) {
+   const audio = useRef<HTMLAudioElement | null>(null);
+   const play = useRef<(() => Promise<void>) | null>(null);
+   const [playing, setPlaying] = useState(false);
+@@ -122,10 +125,10 @@
+ 
+   return <div className={`mb-3${controlSlot ? ` ${referencePictureStyles.controls}` : ''}`}
+     data-question-narration-controls={controlSlot ? '' : undefined}>
+-    <button type="button" onClick={toggle} aria-label={`${playing ? '暂停' : '听'}第 ${number} 题`}
++    <button type="button" onClick={toggle} aria-label={label ? `${playing ? '暂停' : '听'}${label}` : `${playing ? '暂停' : '听'}第 ${number} 题`}
+       className="inline-flex min-h-14 items-center gap-2 rounded-full bg-amber-100 px-5 text-base font-medium text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
+       {playing ? <Pause size={20} aria-hidden /> : <Volume2 size={20} aria-hidden />}
+-      {controlSlot ? <span className="sr-only">{playing ? '暂停' : '听题目'}</span> : playing ? '暂停' : '听题目'}
++      {controlSlot ? <span className="sr-only">{playing ? '暂停' : label ? `听${label}` : '听题目'}</span> : playing ? '暂停' : label ? `听${label}` : '听题目'}
+     </button>
+     {controlSlot}
+     {failed && <p role="status" className="mt-2 text-sm text-amber-800">声音暂时没放出来，请再试一次。</p>}
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -3,17 +3,17 @@
+ import { useCallback, useEffect, useRef, useState } from 'react';
+ import { Check, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+ import type { QuizQuestion } from '@/lib/types/stage';
+-import type { QuizVisual } from '@openmaic/dsl';
++import type { QuizOptionFeedback, QuizVisual } from '@openmaic/dsl';
+ import { useStageStore } from '@/lib/store';
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+-import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
++import { classroomNarrationSource, QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { QuizPicture } from './quiz-picture';
+ import { QuizReferencePicture } from './quiz-reference-picture';
+ import referencePictureStyles from './quiz-reference-picture.module.css';
+ import pictureOptionStyles from './quiz-picture-options.module.css';
+ import compactPictureStyles from './fixed-textbook-picture-layout.module.css';
+ 
+-type Graded = { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string };
++type Graded = { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string; feedback?: QuizOptionFeedback };
+ type Result = { score: number; maxScore: number; correctCount: number; totalQuestions: number; results: Graded[] };
+ type Saved = { result?: Result | null; partial?: { results: Graded[] } | null };
+ 
+@@ -41,6 +41,7 @@
+   const [sending, setSending] = useState(false);
+   const [error, setError] = useState('');
+   const [questionIndex, setQuestionIndex] = useState(0);
++  const [freshFeedbackQuestionId, setFreshFeedbackQuestionId] = useState<string | null>(null);
+   const submission = useRef<AbortController | null>(null);
+   const events = useMiraStudentRuntimeEvents();
+ 
+@@ -57,6 +58,7 @@
+     if (!response.ok || !payload.ok) throw new Error(payload.message || '练习暂时没有加载成功');
+     const saved = gradedOnThisPage(payload, questions.map(q => q.id));
+     if (saved.length) {
++      setFreshFeedbackQuestionId(null);
+       setGraded(saved);
+       setAnswers(Object.fromEntries(saved.map(r => [r.questionId, r.response])));
+       const firstUnanswered = questions.findIndex(q => !saved.some(r => r.questionId === q.id));
+@@ -88,6 +90,7 @@
+       if (controller.signal.aborted) return;
+       if (!response.ok || !payload.ok) throw new Error(payload.message || '回答暂时没有保存，请重试');
+       setGraded(gradedOnThisPage(payload, questions.map(q => q.id)));
++      setFreshFeedbackQuestionId(questions[questionIndex]?.id ?? null);
+       if (payload.result) await complete();
+     } catch (caught) { if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : '回答暂时没有保存，请重试'); }
+     finally { if (!controller.signal.aborted) setSending(false); submission.current = null; }
+@@ -95,6 +98,8 @@
+ 
+   const q = questions[questionIndex];
+   const feedback = q && graded.find(r => r.questionId === q.id);
++  const selectedFeedback = feedback?.feedback;
++  const feedbackAudio = classroomNarrationSource(selectedFeedback?.audioUrl);
+   const audio = q && questionNarrationSource(q);
+   const compactImages = [2, 3].includes(q?.options?.length ?? 0) && !!q?.options && q.options.every(
+     option => q.optionVisuals?.[option.value]?.kind === 'image',
+@@ -122,9 +127,13 @@
+                 <FixedTextbookOptionFace visual={q.optionVisuals?.[option.value]} label={option.label} />
+               </button>)}
+             </div>
+-            {feedback && <p className={`mt-3 flex items-start gap-2 text-base ${feedback.correct ? 'text-[#377254]' : 'text-[#996238]'}`}>
+-              {feedback.correct && <Check size={20} className="mt-0.5 shrink-0" aria-hidden />}{feedback.explanation}
+-            </p>}
++            {feedback && <div className={`mt-3 rounded-2xl border p-3 ${feedback.correct ? 'border-[#b9d8c5] bg-[#edf7f0] text-[#285d43]' : 'border-[#ead0a9] bg-[#fff8e8] text-[#805328]'}`}
++              data-quiz-selected-feedback={feedback.response} role="status">
++              {selectedFeedback?.visual && <div className="mb-2 [&_img]:max-h-40 [&_svg]:max-h-40" data-quiz-feedback-picture><QuizPicture visual={selectedFeedback.visual} scene /></div>}
++              <p className="flex items-start gap-2 text-base">{feedback.correct && <Check size={20} className="mt-0.5 shrink-0" aria-hidden />}{selectedFeedback?.text ?? feedback.explanation}</p>
++              {feedbackAudio && <QuestionNarration src={feedbackAudio} number={questionIndex + 1} sceneId={sceneId}
++                questionId={`${q.id}:feedback:${feedback.response}`} autoPlay={freshFeedbackQuestionId === q.id} label="这次反馈" />}
++            </div>}
+             </div>
+           </div>
+         </fieldset>}
+diff --git a/components/scene-renderers/quiz-picture.tsx b/components/scene-renderers/quiz-picture.tsx
+--- a/components/scene-renderers/quiz-picture.tsx
++++ b/components/scene-renderers/quiz-picture.tsx
+@@ -5,6 +5,43 @@
+ 
+ /** The visual never supplies an answer; its containing button owns the value. */
+ export function QuizPicture({ visual, scene = false }: { visual: QuizVisual; scene?: boolean }) {
++  if (visual.kind === 'relationship') {
++    const count = visual.actors.length;
++    const centers = Object.fromEntries(visual.actors.map((actor, index) => [actor.id, ((index + 0.5) / count) * 100]));
++    const color = (kind: string) => kind === 'mismatch' ? '#b94f43' : kind === 'corrects-name' ? '#b37623' : kind === 'farewell' ? '#547ca5' : '#3f7657';
++    return (
++      <span data-quiz-visual="relationship" role="img" aria-label={visual.alt}
++        className={cn('relative block overflow-hidden rounded-xl border border-[#d1dccb] bg-[#eef2e8] px-2 pb-2 pt-3', scene ? 'min-h-52' : 'min-h-32')}>
++        <span className="relative z-10 grid items-start gap-2" style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}>
++          {visual.actors.map(actor => (
++            <span key={actor.id} data-person-id={actor.id} data-person-cue={actor.cue} className="block min-w-0 justify-self-center">
++              <QuizPicture visual={{ kind: 'image', src: actor.src, alt: actor.alt, cue: actor.cue }} scene={scene} />
++            </span>
++          ))}
++        </span>
++        <svg viewBox="0 0 100 58" preserveAspectRatio="none" aria-hidden className="pointer-events-none absolute inset-x-2 bottom-1 z-20 h-[56%] w-[calc(100%-1rem)] overflow-visible">
++          <defs>
++            {visual.links.map((link, index) => <marker key={index} id={`quiz-rel-arrow-${index}`} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
++              <path d="M0,0 L7,3.5 L0,7 Z" fill={color(link.kind)} />
++            </marker>)}
++          </defs>
++          {visual.links.map((link, index) => {
++            const start = centers[link.fromId];
++            const end = centers[link.toId];
++            const self = start === end;
++            const path = self
++              ? `M ${start - 7} 38 C ${start - 20} 18, ${start + 20} 18, ${start + 7} 38`
++              : `M ${start + (start < end ? 9 : -9)} 40 C ${(start + end) / 2} 23, ${(start + end) / 2} 23, ${end + (start < end ? -9 : 9)} 40`;
++            return <g key={`${link.fromId}-${link.toId}-${index}`} data-relationship-kind={link.kind}>
++              <path d={path} fill="none" stroke={color(link.kind)} strokeWidth="2.5" strokeDasharray={link.kind === 'mismatch' ? '5 4' : undefined}
++                markerEnd={`url(#quiz-rel-arrow-${index})`} vectorEffect="non-scaling-stroke" />
++              {link.kind === 'mismatch' && <path d={`M ${(start + end) / 2 - 3} 25 l6 6 m0 -6 l-6 6`} stroke={color(link.kind)} strokeWidth="2.5" vectorEffect="non-scaling-stroke" />}
++            </g>;
++          })}
++        </svg>
++      </span>
++    );
++  }
+   if (visual.kind === 'people') return (
+     <span data-quiz-visual="people" className="flex justify-center gap-4 rounded-xl bg-[#eef2e8] p-3">
+       {visual.members.map(member => <span key={member.id} data-person-id={member.id} className="block min-w-0 max-w-36 flex-1">
+diff --git a/lib/server/mira-textbook-scene-contract.ts b/lib/server/mira-textbook-scene-contract.ts
+--- a/lib/server/mira-textbook-scene-contract.ts
++++ b/lib/server/mira-textbook-scene-contract.ts
+@@ -388,11 +388,15 @@
+     if (v?.kind === 'people')
+       for (const member of v.members ?? [])
+         if (typeof member.src === 'string') refs.add(member.src);
++    if (v?.kind === 'relationship')
++      for (const actor of v.actors ?? [])
++        if (typeof actor.src === 'string') refs.add(actor.src);
+   };
+   if (scene.content.type === 'quiz')
+     for (const q of scene.content.questions) {
+       add(q.visual);
+       for (const v of Object.values(q.optionVisuals ?? {})) add(v);
++      for (const feedback of Object.values(q.optionFeedback ?? {})) add(feedback?.visual);
+     }
+   return [...refs];
+ }
+@@ -507,6 +511,39 @@
+           return b.sha256;
+         });
+         if (low && new Set(hashes).size !== hashes.length) fail('QUIZ_PICTURES_NOT_DISTINCT');
++      }
++      if (q.optionFeedback !== undefined) {
++        const values = lock.choices.map((choice: Json) => choice.value).sort();
++        if (!object(q.optionFeedback) || Object.keys(q.optionFeedback).sort().join('\0') !== values.join('\0'))
++          fail('QUIZ_OPTION_FEEDBACK_INCOMPLETE');
++        for (const value of values) {
++          const feedback = q.optionFeedback[value];
++          if (!object(feedback) || typeof feedback.text !== 'string' || !feedback.text.trim()
++              || !object(feedback.visual) || !nonempty(feedback.visual.alt))
++            fail('QUIZ_OPTION_FEEDBACK_INVALID');
++          if (feedback.visual.kind === 'image') {
++            if (typeof feedback.visual.src !== 'string'
++                || !bindings.some((binding) => binding.src === feedback.visual.src))
++              fail('QUIZ_OPTION_FEEDBACK_INVALID');
++          } else if (feedback.visual.kind === 'relationship') {
++            const actors = feedback.visual.actors;
++            const links = feedback.visual.links;
++            const allowed = new Set(['speaks-to', 'voice-match', 'mismatch', 'corrects-name', 'farewell']);
++            if (!Array.isArray(actors) || actors.length < 1 || actors.length > 3
++                || actors.some((actor: Json) => !object(actor) || !CATALOG_ID.test(actor.id)
++                  || !nonempty(actor.src) || !nonempty(actor.alt)
++                  || !['speaking', 'listening', 'observer'].includes(actor.cue)
++                  || !bindings.some((binding) => binding.src === actor.src))
++                || new Set(actors.map((actor: Json) => actor.id)).size !== actors.length
++                || !Array.isArray(links) || links.length < 1 || links.length > 3
++                || links.some((link: Json) => !object(link) || !allowed.has(link.kind)
++                  || !actors.some((actor: Json) => actor.id === link.fromId)
++                  || !actors.some((actor: Json) => actor.id === link.toId)))
++              fail('QUIZ_OPTION_FEEDBACK_INVALID');
++          } else fail('QUIZ_OPTION_FEEDBACK_INVALID');
++          if (feedback.audioUrl !== undefined && (typeof feedback.audioUrl !== 'string' || !feedback.audioUrl.trim()))
++            fail('QUIZ_OPTION_FEEDBACK_AUDIO_INVALID');
++        }
+       }
+     }
+   }
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts b/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
+--- a/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
++++ b/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
+@@ -16,7 +16,11 @@
+ vi.mock('@/lib/hooks/use-i18n', () => ({ useI18n: () => ({ t: (key: string) => key, locale: 'zh-CN' }) }));
+ vi.mock('@/components/audio/question-narration', () => ({
+   questionNarrationSource: (q: QuizQuestion) => q.questionAudioUrl,
+-  QuestionNarration: ({ autoPlay, sceneId, questionId }: { autoPlay?: boolean; sceneId?: string; questionId?: string }) => createElement('span', { 'data-narration-autoplay': String(autoPlay), 'data-narration-scene': sceneId, 'data-narration-question': questionId }),
++  classroomNarrationSource: (value: unknown) => typeof value === 'string' ? value : null,
++  QuestionNarration: ({ autoPlay, sceneId, questionId, label, src }: { autoPlay?: boolean; sceneId?: string; questionId?: string; label?: string; src?: string }) => createElement('span', {
++    'data-narration-autoplay': String(autoPlay), 'data-narration-scene': sceneId,
++    'data-narration-question': questionId, 'data-narration-label': label, 'data-narration-src': src,
++  }),
+ }));
+ import { FixedTextbookQuiz } from '@/components/scene-renderers/fixed-textbook-quiz';
+ import { QuizView, SingleChoiceQuestion } from '@/components/scene-renderers/quiz-view';
+@@ -87,6 +91,29 @@
+     await click(host, '[aria-label="下一题"]');
+     expect(host.querySelectorAll('[data-fixed-question]')).toHaveLength(1);
+     expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('false');
++  });
++
++  it('renders only the selected option feedback and keeps reopened feedback quiet', async () => {
++    const q: QuizQuestion = { ...question('feedback'), optionFeedback: {
++      A: { text: 'A 的具体反馈', visual: { kind: 'image', src: '/api/classroom-media/lesson/media/feedback-a.png', alt: 'A 的结果' } },
++      B: { text: 'B 的具体反馈', visual: { kind: 'image', src: '/api/classroom-media/lesson/media/feedback-b.png', alt: 'B 的结果' }, audioUrl: '/api/classroom-media/lesson/audio/feedback-b.wav' },
++      C: { text: 'C 的具体反馈', visual: { kind: 'image', src: '/api/classroom-media/lesson/media/feedback-c.png', alt: 'C 的结果' } },
++    }};
++    const selected = { ...graded(q.id), response: 'B', feedback: q.optionFeedback!.B };
++    vi.stubGlobal('fetch', vi.fn(async (_url: string, init?: RequestInit) => ({ ok: true, json: async () => init?.method === 'POST'
++      ? { ok: true, result: { results: [selected] } } : { ok: true } })));
++    const host = await mount([q]);
++    await click(host, '[role=radio][aria-label="梨子"]');
++    await act(async () => ([...host.querySelectorAll('button')].find(button => button.textContent?.includes('完成练习')) as HTMLButtonElement).click());
++    const panel = host.querySelector('[data-quiz-selected-feedback="B"]')!;
++    expect(panel.textContent).toContain('B 的具体反馈');
++    expect(panel.textContent).not.toContain('A 的具体反馈');
++    expect(panel.querySelector('img')?.getAttribute('src')).toBe('/api/classroom-media/lesson/media/feedback-b.png');
++    expect(panel.querySelector('[data-narration-label="这次反馈"]')?.getAttribute('data-narration-autoplay')).toBe('true');
++    act(() => root?.unmount()); root = undefined; document.body.replaceChildren();
++    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ ok: true, partial: { results: [selected] } }) })));
++    const reopened = await mount([q]);
++    expect(reopened.querySelector('[data-narration-label="这次反馈"]')?.getAttribute('data-narration-autoplay')).toBe('false');
+   });
+ 
+   it('starts a different quiz from its own first question and only submits that page', async () => {
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts b/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
+--- a/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
++++ b/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
+@@ -15,6 +15,26 @@
+ 
+   it('keeps a text answer unchanged when a question has no pictures', () => {
+     expect(renderToStaticMarkup(createElement(FixedTextbookOptionFace, { label: '天' }))).toBe('天');
++  });
++
++  it('renders a selected feedback relationship on the actual people', () => {
++    const markup = renderToStaticMarkup(createElement(FixedTextbookOptionFace, {
++      label: 'Alex 问候 Lily',
++      visual: {
++        kind: 'relationship',
++        alt: 'Alex 的问候线落到 Lily 身上',
++        actors: [
++          { id: 'alex', src: '/api/classroom-media/lesson/media/alex.png', alt: 'Alex 正在说话', cue: 'speaking' },
++          { id: 'lily', src: '/api/classroom-media/lesson/media/lily.png', alt: 'Lily 正在听', cue: 'listening' },
++        ],
++        links: [{ fromId: 'alex', toId: 'lily', kind: 'speaks-to' }],
++      },
++    }));
++    expect(markup).toContain('data-quiz-visual="relationship"');
++    expect(markup).toContain('data-relationship-kind="speaks-to"');
++    expect(markup).toContain('data-person-id="alex"');
++    expect(markup).toContain('data-person-id="lily"');
++    expect(markup).toContain('<span class="sr-only">Alex 问候 Lily</span>');
+   });
+ });
+ 
+diff --git a/tests/quiz/question-narration.test.ts b/tests/quiz/question-narration.test.ts
+--- a/tests/quiz/question-narration.test.ts
++++ b/tests/quiz/question-narration.test.ts
+@@ -1,5 +1,8 @@
+ import { describe, expect, it } from 'vitest';
+-import { questionNarrationSource } from '@/components/audio/question-narration';
++import {
++  classroomNarrationSource,
++  questionNarrationSource,
++} from '@/components/audio/question-narration';
+ 
+ describe('pre-generated quiz narration', () => {
+   it('accepts a saved same-origin classroom recording', () => {
+@@ -12,10 +15,16 @@
+     '/api/generate/tts',
+     '/api/classroom-media/a/audio/../../private.wav',
+     '/api/classroom-media/a/audio/x.wav?token=anything',
+-  ])('does not use dynamic or unrelated media: %s', value => {
++  ])('does not use dynamic or unrelated media: %s', (value) => {
+     expect(questionNarrationSource({ questionAudioUrl: value })).toBeNull();
+   });
+   it('leaves historical questions without narration unchanged', () => {
+     expect(questionNarrationSource({ question: '天' })).toBeNull();
+   });
++  it('accepts the same saved-media contract for selected feedback audio', () => {
++    expect(classroomNarrationSource('/api/classroom-media/lesson_123/audio/feedback-A.mp3')).toBe(
++      '/api/classroom-media/lesson_123/audio/feedback-A.mp3',
++    );
++    expect(classroomNarrationSource('https://untrusted.example/feedback.mp3')).toBeNull();
++  });
+ });
+diff --git a/tests/agent-runtime/textbook-scene-contract.test.ts b/tests/agent-runtime/textbook-scene-contract.test.ts
+--- a/tests/agent-runtime/textbook-scene-contract.test.ts
++++ b/tests/agent-runtime/textbook-scene-contract.test.ts
+@@ -498,6 +498,38 @@
+     await expect(s.store.putScene(stageId, speech)).rejects.toThrow('CUE_SPEECH_MISMATCH');
+     expect(s.base.putScene).not.toHaveBeenCalled();
+   });
++  it('binds complete selected-option feedback without changing the locked assessment', async () => {
++    const s = setup();
++    await bind(s);
++    const scene = quiz();
++    (scene.content as any).questions[0].optionFeedback = {
++      A: { text: '这次选到了离开的朋友，再听听见面时的声音。',
++        visual: { kind: 'image', src: source('leaving'), alt: '离开的朋友和回到见面场景的提示' } },
++      B: { text: '两位朋友走近并挥手，和听到的问候一致。',
++        visual: { kind: 'image', src: source('meeting'), alt: '两位朋友见面并互相挥手' } },
++    };
++    await expect(s.store.putScene(stageId, scene)).resolves.toBeUndefined();
++    const incomplete = structuredClone(scene);
++    delete (incomplete.content as any).questions[0].optionFeedback.A;
++    await expect(s.store.putScene(stageId, incomplete)).rejects.toThrow('QUIZ_OPTION_FEEDBACK_INCOMPLETE');
++    const unbound = structuredClone(scene);
++    (unbound.content as any).questions[0].optionFeedback.A.visual.src = source('missing');
++    await expect(s.store.putScene(stageId, unbound)).rejects.toThrow('QUIZ_OPTION_FEEDBACK_INVALID');
++
++    const relationship = structuredClone(scene);
++    (relationship.content as any).questions[0].optionFeedback.B.visual = {
++      kind: 'relationship',
++      alt: '见面问候线从说话者连到倾听者',
++      actors: [
++        { id: 'speaker', src: source('meeting'), alt: '说话的朋友', cue: 'speaking' },
++        { id: 'listener', src: source('leaving'), alt: '倾听的朋友', cue: 'listening' },
++      ],
++      links: [{ fromId: 'speaker', toId: 'listener', kind: 'speaks-to' }],
++    };
++    await expect(s.store.putScene(stageId, relationship)).resolves.toBeUndefined();
++    (relationship.content as any).questions[0].optionFeedback.B.visual.links[0].toId = 'missing';
++    await expect(s.store.putScene(stageId, relationship)).rejects.toThrow('QUIZ_OPTION_FEEDBACK_INVALID');
++  });
+   it('validates actual bytes, not just distinct paths or model-declared alt text', async () => {
+     await fs.copyFile(
+       path.join(root, stageId, 'media', 'meeting.png'),

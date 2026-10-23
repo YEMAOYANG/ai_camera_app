@@ -1,0 +1,94 @@
+{
+  "policyVersion": "mira.textbook.pinyin-aoe-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "symbols": {
+    "ɑ": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "a": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "o": {
+      "ph": "o1",
+      "carrier": "哦"
+    },
+    "e": {
+      "ph": "e1",
+      "carrier": "鹅"
+    },
+    "ā": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "á": {
+      "ph": "a2",
+      "carrier": "啊"
+    },
+    "ǎ": {
+      "ph": "a3",
+      "carrier": "啊"
+    },
+    "à": {
+      "ph": "a4",
+      "carrier": "啊"
+    },
+    "ō": {
+      "ph": "o1",
+      "carrier": "哦"
+    },
+    "ó": {
+      "ph": "o2",
+      "carrier": "哦"
+    },
+    "ǒ": {
+      "ph": "o3",
+      "carrier": "哦"
+    },
+    "ò": {
+      "ph": "o4",
+      "carrier": "哦"
+    },
+    "ē": {
+      "ph": "e1",
+      "carrier": "鹅"
+    },
+    "é": {
+      "ph": "e2",
+      "carrier": "鹅"
+    },
+    "ě": {
+      "ph": "e3",
+      "carrier": "鹅"
+    },
+    "è": {
+      "ph": "e4",
+      "carrier": "鹅"
+    }
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak"
+  },
+  "listeningRequired": true
+}

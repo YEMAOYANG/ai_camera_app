@@ -1,0 +1,239 @@
+diff --git a/skills/agent-runtime/deep-interactive/outline-constraints.json b/skills/agent-runtime/deep-interactive/outline-constraints.json
+--- a/skills/agent-runtime/deep-interactive/outline-constraints.json
++++ b/skills/agent-runtime/deep-interactive/outline-constraints.json
+@@ -1,9 +1,20 @@
+ {
+-  "$comment": "Structural constraints for the deep-interactive skill. Rendered into the outline prompt AND checked against the model's output; violations come back to the agent as a tool-result diagnostic so it can re-plan. See lib/server/agent-runtime/skills.ts.",
+-  "allowedTypes": ["slide", "quiz", "interactive"],
++  "$comment": "Native schema and opening compatibility only. Teaching mechanisms, page mix and justified repetition are reviewed from the learning goal, not counted or rotated.",
++  "allowedTypes": [
++    "slide",
++    "quiz",
++    "interactive",
++    "pbl"
++  ],
+   "firstSceneType": "slide",
+-  "typeMix": [{ "type": "interactive", "minRatio": 0.6 }],
+-  "allowedWidgetTypes": ["simulation", "diagram", "code", "game", "visualization3d"],
+-  "requiredWidgetOutlineFields": ["concept"],
+-  "noConsecutiveSameWidgetType": true
++  "allowedWidgetTypes": [
++    "simulation",
++    "diagram",
++    "code",
++    "game",
++    "visualization3d"
++  ],
++  "requiredWidgetOutlineFields": [
++    "concept"
++  ]
+ }
+diff --git a/skills/agent-runtime/mira-primary-courseware/references/meaningful-interactivity.v1.json b/skills/agent-runtime/mira-primary-courseware/references/meaningful-interactivity.v1.json
+new file mode 100644
+--- /dev/null
++++ b/skills/agent-runtime/mira-primary-courseware/references/meaningful-interactivity.v1.json
+@@ -0,0 +1,91 @@
++{
++  "schemaVersion": "mira.textbook.interaction-policy.v1",
++  "policyId": "mira-textbook-meaningful-interactivity",
++  "version": 1,
++  "title": "教材约束下的多样化互动与游戏规则",
++  "appliesTo": ["chinese", "math", "english", "science"],
++  "executionBoundary": {
++    "automatic": "新工作台任务冻结完整策略及摘要，并注入实际派发请求；只证明规则已交给作者。",
++    "requiresReview": "教材准确性、机制真实性、多样性、低阅读理解与实玩质量须逐课审查，不能由策略摘要、页面类型数或生成成功自动判定。",
++    "historicalJobs": "旧冻结、排队、运行及发布课程保留原合同。升级须新修订及实际验收，不覆盖原请求、不重派已有任务。"
++  },
++  "precedence": [
++    "精确教材版次、册次、节点、已核来源与目标、锁定测评身份及顺序、教师合同、安全、音频与发布权限始终保留。本策略不能扩大教学范围或改动这些合同。",
++    "对新任务的互动教学设计，本策略覆盖旧通用默认中正文必须全互动、互动占比至少60%、相邻页必须不同widgetType、固定页数/模板顺序等配额；不得覆盖本次用户明确指定或已批准的逐页计划，遇到冲突须报告并通过修订流程解决。",
++    "textbook_courseware_quality.v1.json 的 proposed_not_enforced 旧提案不作为新任务的配额依据：不继承每课游戏数量、每游戏动作种类数、每单元3D/视频数量、3D状态数量或低阅读选项数量配额。旧冻结合同及既有发布校验不被改写或绕过；出现不可兼容的合同冲突须明确报告。",
++    "低阅读策略中的点图、拖配、模仿等输入列表是示例，不是玩法或输入白名单。遵守可理解、可操作、可替代输入的原则，允许其他适龄操作。"
++  ],
++  "activityContract": {
++    "location": "写入已有pagePlan或教学设计；原生场景只能使用其合法字段，必要时将机制说明放入keyPoints，不给原生工具增加未支持的字段。",
++    "requiredFields": {
++      "role": "practice、exploration、game、creation、assessment等真实教学角色；观察、描写、配对不必虚称游戏。",
++      "targetIds": "引用已核教材目标的ID或完整名称，不凭玩法新增目标。",
++      "learningMechanism": {
++        "family": "可扩展的机制名称，不能用tap/drag/game/diagram代替机制说明。",
++        "childDecision": "儿童实际决定什么；与所学知识有什么关系。",
++        "domainState": "与学科任务相关的状态，如已计数对象、结构、路线、实验条件、情景选择或作品内容；纯分数和按钮颜色不算。",
++        "stateTransition": "合法操作如何改变领域状态，结果如何根据真实状态计算。",
++        "observableOutcome": "儿童可看见或听见的后果及其教学含义。",
++        "revisionOpportunity": "如何撤销、比较、改条件、重试、重玩或改进作品；不适用时说明理由。"
++      },
++      "inputModes": "实际输入方式及低年级等价易操作路径，与玩法分类分开。",
++      "widgetType": "仅互动页按真实渲染能力选择原生类型；slide/quiz不适用，不为填字段或凑多样性改标签。",
++      "evidenceClaim": "分别写observed、supports、doesNotSupport：记录到什么、能支持何种判断、不能推出何种能力。",
++      "repetitionRationale": "重复主要机制时说明具体巩固目标、难度/情境变化及如何迁移；非重复时可为空。"
++    }
++  },
++  "rules": [
++    {
++      "id": "goal_before_mechanic",
++      "requirement": "先确定已核教材目标，再选择儿童的决策与反馈机制。学习性游戏须有可理解的任务目标、规则、知识相关的决策、由操作产生的状态/后果和可恢复尝试。拖拽只是输入；三选一加分、倒计时、奖励或过关动画仍是选择练习，不能冒充构建、探索或策略游戏。"
++    },
++    {
++      "id": "diversity_is_semantic",
++      "requirement": "按childDecision、domainState、stateTransition、observableOutcome和学习证据比较主要活动。换图、字卡、台词、背景、分数或widgetType不构成新机制；同widgetType可以承载不同机制。每课选择目标确实需要的组合，不设最低游戏种数；不能整课重复听音选卡/拖到唯一答案而宣称多样。窄目标的必要重复须说明教学理由并另做迁移检查，审查者判断是否充分，理由文字本身不算通过。"
++    },
++    {
++      "id": "real_exploration_and_creation",
++      "requirement": "适合的目标提供探索、构建试验、调整条件、空间路线、声音比较/记忆、角色轮流、情景分支或表达创作。构建须保留孩子作品并按结构检验；路线须按当前位置移动；实验须由条件驱动结果。禁止选中预定答案后自动完成全部操作。允许多条有效路径和多个合理作品；开放表达不得伪造唯一正确答案。"
++    },
++    {
++      "id": "purposeful_lesson_structure",
++      "requirement": "按需要组合情境、观察、教师示范、尝试、解释、巩固、迁移与回顾，允许必要短讲解，不把讲解硬套互动外壳。页数取完成教学所需的规模，遵守现有技术上限，不能凑固定页数或类型顺序。一屏一事可以通过多阶段状态推进；较长任务分段并可恢复。保留本课已有锁定题数量与顺序，不把某课四题推广为所有课程硬配额。"
++    },
++    {
++      "id": "feedback_and_revision",
++      "requirement": "反馈解释可观察原因并指向下一次尝试，不只报对错或播放庆祝。可撤销、重置、重试或比较前后结果，提示逐级按需提供。首答前不高亮答案；记录独立尝试与获助/演示后的完成。失败不惩罚孩子，不因拖拽精度或操作速度低而判学科不会。"
++    },
++    {
++      "id": "low_reading_and_accessibility",
++      "requirement": "一二年级遮住非目标文字仍能听懂当前任务、识别有意义且可区分的图片、操作、理解反馈并继续。目标字形可见但指令不可依赖识字；人物造型和说听关系一致。装饰图、emoji、拼音和给纯文字选项加喇叭不达标。触控目标至少48px，窄屏可玩；精细拖动/轨迹提供容错及等价点选操作，手部精度与学科证据分开。不能机械强制所有活动有三个选项。"
++    },
++    {
++      "id": "teacher_and_audio_pacing",
++      "requirement": "使用本学科冻结教师及预录音频。先说清当前任务，再让儿童尝试；只在有教学意义的状态变化讲解，重播定位当前状态。正式音频完成、失败重试、页面隐藏取消、恢复不重答等可靠性要求保留，但不计为新玩法。不得用浏览器/系统合成音替代；不把中文录音字数经验无区别用于英语短词、音素或数词，按实际音频合同核验。"
++    },
++    {
++      "id": "media_with_learning_value",
++      "requirement": "3D用于空间关系或观察视角，视频用于必须观察的真实变化，编程用于真实顺序/规则目标；选择时说明儿童能做/看到什么和教学收益。无关技术、计时和敏捷操作不能充数；有更清楚的2D方案时可采用。数目、字形、发音、科学因果必须准确，不能让生成图片或随机特效决定正确答案。"
++    },
++    {
++      "id": "bounded_learning_evidence",
++      "requirement": "探索、练习、独立检测与迁移分开。完成动画、看过区域、点击配对或听过声音不能证明已经认字、说过/读过、发音正确或掌握现实行为。新情境检测同一目标，避免超纲；不得将原题、原布局或固定答案位置的重放当作独立迁移，窄目标允许正确答案值重复。作品和观察记录只支持实际记录的能力；涉及口语必须有相应真实证据。课堂分数不能冒充正式积分账本或奖励发放。"
++    },
++    {
++      "id": "review_actual_play",
++      "requirement": "逐课实际操作并记录儿童做了什么、改变什么、从结果能判断什么。对游戏至少核验有效路径、错误/替代路径、撤销或重试以及恢复；开放创作核验多种产物可保留修改。对照代码确认改变决策确实改变领域状态/结果。教材范围、图片理解、教师音频、玩法真实性与多样性、触控恢复分别验收，不能总分抵消硬失败。设计稿、已生成、实玩通过、正式音频、审查、发布回执和学生入口验收分别报告。"
++    }
++  ],
++  "subjectExamples": {
++    "chinese": "依本课目标选择声音比较、规范书写轨迹、词句情境表达或角色回应；听音选卡只能声称相应识别练习，不能证明独立发音。",
++    "math": "一一对应、可撤销点数、轮廓试装、相邻位置路线、改变摆放后比较；按真实对象身份、数量和几何结果计算。",
++    "english": "教材内情境轮流沟通、听辨比较、语义分支或角色回应；区分听懂、模仿与实际口语证据。",
++    "science": "放大观察、选取并标记证据、比较特征、改变条件或制作观察记录；视觉记忆不等于科学概念掌握。"
++  },
++  "officialComparisons": [
++    {"url": "https://open.maic.chat/classroom/U96_9bhRtme4owN8NK3Cs", "lesson": "分数", "observed": "分切和交付、分数搭桥、调整切线检验等分", "principle": "规则与结果由同一知识模型驱动，而非选择后自动过关"},
++    {"url": "https://open.maic.chat/classroom/mWaTO92icaXwC4eZgv1Jb", "lesson": "电子电路", "observed": "线路构建、调整信号参数", "principle": "保留中间状态，允许试验和修订；不照搬低年级不适合的知识难度"},
++    {"url": "https://open.maic.chat/classroom/adSd7bead8SsLX2FNjWng", "lesson": "Photoshop", "observed": "讲解与实验穿插，蒙版自由涂抹和调整", "principle": "必要讲解与真实创造并存，不要求每步唯一答案"},
++    {"url": "https://open.maic.chat/classroom/W7OH7Ba7_L4r7wlz0g6mh", "lesson": "Python", "observed": "编辑、运行、结果界面及分级提示", "principle": "尝试—检查—解释—修改；仅参考机制，不为低年级强加编程"}
++  ]
++}
+diff --git a/tests/server/mira-meaningful-interaction-policy.test.ts b/tests/server/mira-meaningful-interaction-policy.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-meaningful-interaction-policy.test.ts
+@@ -0,0 +1,108 @@
++import { createHash } from 'node:crypto';
++import { readFile } from 'node:fs/promises';
++import { resolve } from 'node:path';
++import { describe, expect, it } from 'vitest';
++import {
++  checkOutlineAgainstSkill,
++  createNativeSkillReadTool,
++  findSkill,
++  listSkills,
++} from '@/lib/server/agent-runtime/skills';
++import {
++  composeMiraFormalSceneSkillContext,
++  formalSkillReferencePaths,
++  prepareMiraFormalSkillBundle,
++} from '@/lib/server/mira-formal-skill-policy';
++
++const policyReference =
++  'mira-primary-courseware/references/meaningful-interactivity.v1.json';
++
++describe('meaningful textbook interaction source and context', () => {
++  it('permits consecutive renderers and explanatory pages without relaxing native schema checks', async () => {
++    const deep = (await findSkill('deep-interactive'))!;
++    const outlines = [
++      { order: 0, type: 'slide', title: 'Notice the problem' },
++      {
++        order: 1,
++        type: 'interactive',
++        title: 'Arrange and count',
++        widgetType: 'simulation',
++        widgetOutline: { concept: 'one-to-one counting' },
++      },
++      {
++        order: 2,
++        type: 'interactive',
++        title: 'Rearrange and compare',
++        widgetType: 'simulation',
++        widgetOutline: { concept: 'count is independent of arrangement' },
++      },
++      { order: 3, type: 'slide', title: 'Explain the evidence' },
++      { order: 4, type: 'slide', title: 'Model checking' },
++      { order: 5, type: 'pbl', title: 'Use the same idea in a new situation' },
++    ];
++    expect(checkOutlineAgainstSkill(outlines, deep.constraints)).toEqual([]);
++    expect(
++      checkOutlineAgainstSkill(
++        outlines.map((scene, index) =>
++          index === 1 ? { ...scene, widgetType: 'invented-renderer' } : scene,
++        ),
++        deep.constraints,
++      ),
++    ).toContain('widget types not allowed by the skill: invented-renderer');
++    expect(
++      checkOutlineAgainstSkill(
++        outlines.map((scene, index) =>
++          index === 1 ? { ...scene, widgetOutline: {} } : scene,
++        ),
++        deep.constraints,
++      ),
++    ).toContain('`widgetOutline.concept` missing on scene(s) 1');
++  });
++
++  it('makes the complete policy readable without silently upgrading historical formal contexts', async () => {
++    const installed = await listSkills();
++    const primary = installed.find(
++      (skill) => skill.id === 'mira-primary-courseware',
++    )!;
++    const path = resolve(
++      primary.filePath,
++      '..',
++      'references/meaningful-interactivity.v1.json',
++    );
++    const text = await readFile(path, 'utf8');
++    const policy = JSON.parse(text);
++    expect(policy.schemaVersion).toBe('mira.textbook.interaction-policy.v1');
++    expect(policy.policyId).toBe('mira-textbook-meaningful-interactivity');
++    expect(policy.appliesTo).toEqual(['chinese', 'math', 'english', 'science']);
++
++    const read = createNativeSkillReadTool(installed, () => undefined);
++    const result = await read.execute('read-meaningful-interaction-policy', {
++      path,
++      offset: 1,
++      limit: text.split(/\r?\n/).length,
++    });
++    expect(result.isError).not.toBe(true);
++    expect(result.content).toEqual([{ type: 'text', text }]);
++    expect(result.details).toMatchObject({
++      path,
++      offset: 1,
++      sourceHash: createHash('sha256').update(text).digest('hex').slice(0, 16),
++    });
++
++    // The new workbench freezes and dispatches the full policy explicitly.
++    // Adding a reference must not rewrite older formal bundle/receipt identities.
++    expect(formalSkillReferencePaths('math')).not.toContain(policyReference);
++    const legacy = await prepareMiraFormalSkillBundle(installed, 'math');
++    expect(
++      legacy.resources.some(
++        (resource) => resource.resourcePath === policyReference,
++      ),
++    ).toBe(false);
++    expect(
++      composeMiraFormalSceneSkillContext(legacy, {
++        sceneType: 'interactive',
++        phase: 'content',
++      }).contextSha256,
++    ).toBe('6d428dfbdef4bb7e4f229952d932bae48fba5bf487aa4f133c5527a0a60c68d6');
++  });
++});

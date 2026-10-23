@@ -132,9 +132,9 @@ class TextbookLearningService:
                 if not book["selected"]:
                     continue
                 manifest = self._revision(conn, child, book["editionId"], book["revisionId"])
-                builds = self.repository.builds(conn, book["editionId"], book["revisionId"])
-                from services.textbook_directory_access import published_node_releases
-                releases = published_node_releases(self.repository, conn, child, builds)
+                builds = self.repository.directory_builds(conn, book["editionId"], book["revisionId"])
+                from services.textbook_directory_access import published_node_directory_entries
+                releases = published_node_directory_entries(self.repository, child, builds, manifest)
                 available, locked = [], 0
                 guides = [self._available_activity(conn, child, manifest, builds, 'book_exploration', releases=releases)]
                 guides.extend(self._available_activity(conn, child, manifest, builds, 'unit_guide', unit['unitId'], releases=releases)
@@ -208,9 +208,9 @@ class TextbookLearningService:
             manifest = self._revision(conn, child, edition_id, revision_id)
             choices = self.repository.selections(conn, child, year, semester)
             selection = next((r for r in choices if r["edition_id"] == edition_id and r["revision_id"] == revision_id), None)
-            from services.textbook_directory_access import published_node_releases
-            builds = self.repository.builds(conn, edition_id, revision_id)
-            releases = published_node_releases(self.repository, conn, child, builds)
+            from services.textbook_directory_access import published_node_directory_entries
+            builds = self.repository.directory_builds(conn, edition_id, revision_id)
+            releases = published_node_directory_entries(self.repository, child, builds, manifest)
             released_directory = bool(releases)
             if selection is None and not released_directory:
                 raise ApiError("textbook_selection_required", "请家长在 App 的“学校教材”中确认这学期的课本，再回到书包刷新。", 409)
@@ -243,10 +243,11 @@ class TextbookLearningService:
 
     def _available_activity(self, conn, child, manifest, builds, kind, unit_id=None, *, releases=None):
         from content.textbook_batch_release import INPUT_SCHEMA, node_key
-        from services.textbook_directory_access import published_node_releases
+        from services.textbook_directory_access import published_node_directory_entries
         node_id = node_key(kind, unit_id)
         if releases is None:
-            releases = published_node_releases(self.repository, conn, child, builds)
+            builds = self.repository.directory_builds(conn, manifest['editionId'], manifest['revisionId'])
+            releases = published_node_directory_entries(self.repository, child, builds, manifest)
         released = releases.get(node_id)
         if released is None:
             return None
@@ -263,9 +264,10 @@ class TextbookLearningService:
         # audit. They do not upgrade the pending review of the entire book.
         from content.textbook_release import INPUT_SCHEMA
         from content.textbook_batch_release import INPUT_SCHEMA as ACTIVITY_INPUT
-        from services.textbook_directory_access import published_node_releases
+        from services.textbook_directory_access import published_node_directory_entries
         if releases is None:
-            releases = published_node_releases(self.repository, conn, child, builds)
+            builds = self.repository.directory_builds(conn, manifest['editionId'], manifest['revisionId'])
+            releases = published_node_directory_entries(self.repository, child, builds, manifest)
         released = releases.get(node['nodeId'])
         if released is not None:
             build, _, course, _ = released

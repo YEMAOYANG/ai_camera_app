@@ -1,0 +1,297 @@
+{
+  "policyVersion": "mira.textbook.pinyin-bpmf-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "symbols": {
+    "b": {
+      "ph": "bo1",
+      "carrier": "波"
+    },
+    "p": {
+      "ph": "po1",
+      "carrier": "坡"
+    },
+    "m": {
+      "ph": "mo1",
+      "carrier": "摸"
+    },
+    "f": {
+      "ph": "fo1",
+      "carrier": "佛"
+    },
+    "ɑ": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "ba": {
+      "ph": "ba1",
+      "carrier": "八"
+    },
+    "bā": {
+      "ph": "ba1",
+      "carrier": "八"
+    },
+    "bá": {
+      "ph": "ba2",
+      "carrier": "拔"
+    },
+    "bǎ": {
+      "ph": "ba3",
+      "carrier": "把"
+    },
+    "bà": {
+      "ph": "ba4",
+      "carrier": "坝"
+    },
+    "bō": {
+      "ph": "bo1",
+      "carrier": "波"
+    },
+    "bí": {
+      "ph": "bi2",
+      "carrier": "鼻"
+    },
+    "bù": {
+      "ph": "bu4",
+      "carrier": "布"
+    },
+    "pá": {
+      "ph": "pa2",
+      "carrier": "爬"
+    },
+    "pò": {
+      "ph": "po4",
+      "carrier": "破"
+    },
+    "pī": {
+      "ph": "pi1",
+      "carrier": "批"
+    },
+    "pǔ": {
+      "ph": "pu3",
+      "carrier": "普"
+    },
+    "mǎ": {
+      "ph": "ma3",
+      "carrier": "马"
+    },
+    "mō": {
+      "ph": "mo1",
+      "carrier": "摸"
+    },
+    "mǐ": {
+      "ph": "mi3",
+      "carrier": "米"
+    },
+    "mù": {
+      "ph": "mu4",
+      "carrier": "木"
+    },
+    "fā": {
+      "ph": "fa1",
+      "carrier": "发"
+    },
+    "fó": {
+      "ph": "fo2",
+      "carrier": "佛"
+    },
+    "fǔ": {
+      "ph": "fu3",
+      "carrier": "斧"
+    }
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "words": {
+    "爸爸": {
+      "ph": "ba4 ba5",
+      "carrier": "爸爸"
+    },
+    "妈妈": {
+      "ph": "ma1 ma5",
+      "carrier": "妈妈"
+    }
+  },
+  "approvalBoundary": {
+    "recipeStatus": "candidate-pending-exact-formal-whole-sentence-listening",
+    "approvedProbeScope": "four-base-call-names-only",
+    "shortConsonantAccepted": false,
+    "formalListeningScope": "every-segment-containing-a-registered-latin-token-or-chinese-word"
+  }
+}

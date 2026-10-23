@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "mira.learning.unit-blueprints.v1",
+  "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+  "revisionId": "20260928-metadata-1",
+  "unitId": "dbfdd12d-fdf5-3b62-95ae-90300fc4ee7b",
+  "source": {
+    "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）一年级上册.pdf",
+    "kind": "public_github_mirror_page_review",
+    "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+    "sha256": "7b1eb1b3069a7b453b4db2f13821c1bea8b09b8b27670298be9b76c2c23aa67d",
+    "verifiedAt": "2026-10-20",
+    "printedPages": [
+      5,
+      6,
+      7
+    ],
+    "pdfPages": [
+      10,
+      11,
+      12
+    ],
+    "reviewerKind": "ai",
+    "humanReviewed": false,
+    "localReviewPath": "output/textbook-operator-lessons/smartedu-english-six-year-g1-upper-sync-af05bc77/bc822143-75b7-33cb-a639-cbf6b5deb0ec/teaching-1/sources/source-review.json",
+    "method": "逐页目视核对印刷5–7页；与同版官方同步目录绑定，并目视下一PDF13/印刷8确认已进入Module2，不夹入本课。",
+    "usageBoundary": "镜像非官方教材下载、缺版权页，不确认ISBN，不外推整册可靠性，不交付原页/插画/歌谱/音频，不修改目录rightsReview或家长选书。"
+  },
+  "lessons": [
+    {
+      "nodeId": "bc822143-75b7-33cb-a639-cbf6b5deb0ec",
+      "title": "Unit 2 How are you?",
+      "status": "scope_verified_preview_only",
+      "scopePages": [
+        5,
+        6,
+        7
+      ],
+      "targets": [
+        "在图片和教师录音支持下理解How are you?并辨认I’m fine.或I’m fine, thank you.作为本课虚构朋友的回应。",
+        "辨认正在说话和被问候的人，听完再轮流回应，能把问候传给另一位朋友。",
+        "在已认识人物的情境中理解叫错名字后的No, I’m…及Sorry的修正作用，并能修改图语音对话顺序。"
+      ],
+      "mediaManifest": "english-how-are-you.original-v1.json",
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "在图片和教师录音支持下理解How are you?并辨认I’m fine.或I’m fine, thank you.作为本课虚构朋友的回应。",
+          "辨认正在说话和被问候的人，听完再轮流回应，能把问候传给另一位朋友。",
+          "在已认识人物的情境中理解叫错名字后的No, I’m…及Sorry的修正作用，并能修改图语音对话顺序。"
+        ],
+        "knowledgePoints": [
+          "How are you? / I’m fine. / I’m fine, thank you.作为完整语块，不讲语法。",
+          "两种回应均有效；先回应再询问对方；不强制现实孩子声称感觉很好。",
+          "No, I’m + 名字与Sorry仅用于本课称呼修正；人名沿用原创Alex、Lily、Ben。",
+          "点击录音不等于儿童说过；记录只支持图语音辅助理解、人物识别与轮次顺序。"
+        ],
+        "priorKnowledge": [
+          "上一课Hello/Hi、I’m加名字及Bye/Goodbye可用中文口头提醒复习。",
+          "Alex蓝衣、Lily红衣双马尾、Ben绿衣肖像沿用上课；新孩子可重听认识。"
+        ],
+        "excludedTopics": [
+          "Module 2 What’s your name?新课目标",
+          "sad/happy/tired及I’m not fine等未核新表达",
+          "字母拼读、语法术语、独立识读或口语评分",
+          "复制课本原题、歌谱、歌词、插画、角色造型或音频"
+        ],
+        "assessmentMode": "objective",
+        "reviewNote": "2026-10-20 AI逐页目视核镜像PDF10–12/印刷5–7；保持20260928-metadata-1。镜像异常限制保留。仅原创候选制作，不含发布或掌握结论。"
+      },
+      "assessmentMapping": [
+        {
+          "targetIndex": 0,
+          "questionId": "howareyou-response-01",
+          "page": 3,
+          "evidence": "听一听，I’m fine, thank you. 请找到小朋友回答问候的那幅图。",
+          "correctAnswer": "A"
+        },
+        {
+          "targetIndex": 1,
+          "questionId": "howareyou-listener-02",
+          "page": 6,
+          "evidence": "听一听，How are you, Ben? 请找到这句话正在问候的小朋友。",
+          "correctAnswer": "C"
+        },
+        {
+          "targetIndex": 2,
+          "questionId": "howareyou-repair-03",
+          "page": 7,
+          "evidence": "听一听，No, I’m Lily. 请找到正在纠正自己名字的小朋友。",
+          "correctAnswer": "B"
+        }
+      ],
+      "game": "问候说话权的角色轮次交接；保留和运行图语音作品、按语义状态定位和修复称呼与问答断点，可撤销修改，多条有效对话。",
+      "transfer": "换起点、座位和问候路径；新情境图片辨认fine回应；肖像顺序改变后辨认被问候者与纠正称呼者，不把选择/播放算为开口。",
+      "parentSupport": "可以和孩子自愿试一句How are you?并轮流回应；不要求抄写、发音打分或违背真实感受强说fine。",
+      "generationReady": false,
+      "missing": [
+        "真实原创素材及实际互动逐页验收",
+        "英语教师正式录音和语义核验",
+        "教学来源终审、发布授权和学生入口验收"
+      ]
+    }
+  ]
+}

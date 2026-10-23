@@ -1,0 +1,184 @@
+diff --git a/lib/server/agent-runtime/config.ts b/lib/server/agent-runtime/config.ts
+--- a/lib/server/agent-runtime/config.ts
++++ b/lib/server/agent-runtime/config.ts
+@@ -1,8 +1,14 @@
+ /** Server-only agent runtime configuration. */
++import { parseAgentDriverOutputCap } from './driver-output-cap';
++
+ const numberFromEnv = (value: string | undefined, fallback: number) =>
+   value ? Number(value) : fallback;
+ 
+ export const agentRuntimeConfig = {
++  /** Optional parent-only output cap; absent preserves catalog/formal behavior. */
++  driverMaxOutputTokens: parseAgentDriverOutputCap(
++    process.env.OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS,
++  ),
+   /** How often the runner scans for claimable sessions. */
+   scanIntervalMs: numberFromEnv(process.env.OPENMAIC_AGENT_RUNTIME_SCAN_INTERVAL_MS, 1000),
+   /** How often a running session's lease heartbeat is refreshed. */
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -56,6 +56,7 @@
+ import { resolveAgentDriverModel } from './agent-driver-model';
+ import { buildAskUserTool } from './ask-user';
+ import { agentRuntimeConfig as config } from './config';
++import { capAgentDriverOutput } from './driver-output-cap';
+ import { buildCreateSkillTool } from './create-skill';
+ import {
+   buildDslCourseToolset,
+@@ -1407,7 +1408,10 @@
+     const driver = await resolveAgentDriverModel();
+     const streamFn = createCallLlmStreamFn({
+       languageModel: driver.connection.model,
+-      ...(await miraFormalAgentOutputOptions(formalProfessionalSession, driver.wireMaxOutputTokens, formalModelPolicyId)),
++      ...capAgentDriverOutput(
++        await miraFormalAgentOutputOptions(formalProfessionalSession, driver.wireMaxOutputTokens, formalModelPolicyId),
++        config.driverMaxOutputTokens,
++      ),
+       ...(formalProfessionalSession ? {
+         maxRetries: MIRA_FORMAL_AGENT_BUDGET.maxRetries,
+         beforeDispatch: ({ inputCharacters }: { inputCharacters: number }) =>
+diff --git a/lib/server/agent-runtime/driver-output-cap.ts b/lib/server/agent-runtime/driver-output-cap.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/agent-runtime/driver-output-cap.ts
+@@ -0,0 +1,29 @@
++/** Optional operator cap for the parent driver only, not a model capacity. */
++export const AGENT_DRIVER_OUTPUT_CAP_MAX = 2_147_483_647;
++
++export function parseAgentDriverOutputCap(value: string | undefined): number | undefined {
++  if (value === undefined || value === '') return undefined;
++  const parsed = Number(value);
++  if (!/^[1-9][0-9]{0,9}$/.test(value)
++    || !Number.isSafeInteger(parsed)
++    || parsed > AGENT_DRIVER_OUTPUT_CAP_MAX) {
++    throw new Error(
++      'OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS must be empty or an integer from 1 through 2147483647.',
++    );
++  }
++  return parsed;
++}
++
++/** Apply after existing formal allowances so an operator can only lower them. */
++export function capAgentDriverOutput<T extends {
++  maxOutputTokens?: number;
++  omitMaxOutputTokens?: boolean;
++}>(options: T, configuredCap: number | undefined): T {
++  if (configuredCap === undefined) return options;
++  return {
++    ...options,
++    maxOutputTokens: Math.min(options.maxOutputTokens ?? configuredCap, configuredCap),
++    // An unknown catalog limit still permits an explicit operator wire cap.
++    omitMaxOutputTokens: false,
++  };
++}
+diff --git a/tests/agent-runtime/driver-output-cap.test.ts b/tests/agent-runtime/driver-output-cap.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/agent-runtime/driver-output-cap.test.ts
+@@ -0,0 +1,104 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import {
++  capAgentDriverOutput,
++  parseAgentDriverOutputCap,
++} from '@/lib/server/agent-runtime/driver-output-cap';
++import { miraFormalAgentOutputOptions } from '@/lib/server/mira-formal-agent-budget';
++import { createCallLlmStreamFn } from '@/lib/agent/runtime/stream-fn';
++
++const mocks = vi.hoisted(() => ({ observation: false, streamLLM: vi.fn() }));
++vi.mock('@/lib/server/mira-paid-budget', () => ({
++  isPaidBudgetObservationMode: async () => mocks.observation,
++}));
++vi.mock('@/lib/ai/llm', () => ({ streamLLM: mocks.streamLLM }));
++
++beforeEach(() => {
++  mocks.observation = false;
++  mocks.streamLLM.mockReset();
++  mocks.streamLLM.mockReturnValue({
++    fullStream: (async function* () {
++      yield {
++        type: 'finish', finishReason: 'stop',
++        totalUsage: { inputTokens: 0, outputTokens: 0,
++          inputTokenDetails: { cacheReadTokens: 0, cacheWriteTokens: 0 } },
++      };
++    })(),
++    usage: Promise.resolve({ inputTokens: 0, outputTokens: 0 }),
++  });
++});
++afterEach(() => vi.unstubAllEnvs());
++
++describe('parent driver output cap configuration', () => {
++  it.each([undefined, ''])('leaves %s unset', (value) => {
++    expect(parseAgentDriverOutputCap(value)).toBeUndefined();
++  });
++  it.each(['1', '65536', '2147483647'])('accepts canonical integer %s', (value) => {
++    expect(parseAgentDriverOutputCap(value)).toBe(Number(value));
++  });
++  it.each(['0', '-1', '1.5', '1e5', '+65536', '065536', ' 65536', '65536 ',
++    'NaN', 'Infinity', '2147483648', '999999999999999999999999', '\n'])(
++    'rejects invalid configured cap %s before dispatch', (value) => {
++      expect(() => parseAgentDriverOutputCap(value)).toThrow('OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS');
++      expect(mocks.streamLLM).not.toHaveBeenCalled();
++    },
++  );
++  it('loads only the server parent cap from runtime configuration', async () => {
++    vi.stubEnv('OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS', '65536');
++    vi.resetModules();
++    const { agentRuntimeConfig } = await import('@/lib/server/agent-runtime/config');
++    expect(agentRuntimeConfig.driverMaxOutputTokens).toBe(65_536);
++  });
++  it('fails runtime configuration closed for a malformed explicit value', async () => {
++    vi.stubEnv('OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS', '0');
++    vi.resetModules();
++    await expect(import('@/lib/server/agent-runtime/config')).rejects.toThrow(
++      'OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS',
++    );
++    expect(mocks.streamLLM).not.toHaveBeenCalled();
++  });
++});
++
++describe('parent cap composes with existing formal allowances', () => {
++  it.each([undefined, 8_192, 393_216])('preserves the original options with no cap (%s)', async (wire) => {
++    const original = await miraFormalAgentOutputOptions(false, wire);
++    expect(capAgentDriverOutput(original, undefined)).toBe(original);
++  });
++  it.each([
++    { wire: 393_216, cap: 65_536, expected: 65_536 },
++    { wire: 8_192, cap: 65_536, expected: 8_192 },
++    { wire: undefined, cap: 65_536, expected: 65_536 },
++  ])('bounds ordinary or unknown catalog output: $wire', async ({ wire, cap, expected }) => {
++    const original = await miraFormalAgentOutputOptions(false, wire);
++    const before = { ...original };
++    expect(capAgentDriverOutput(original, cap)).toEqual({
++      maxOutputTokens: expected, omitMaxOutputTokens: false,
++    });
++    expect(original).toEqual(before);
++  });
++  it.each([false, true])('never raises formal budgets in observation=%s', async (observation) => {
++    mocks.observation = observation;
++    for (const policy of [undefined, 'deepseek-v4.1-flash-candidate-v1']) {
++      const original = await miraFormalAgentOutputOptions(true, 393_216, policy);
++      for (const cap of [4_096, 65_536]) {
++        expect(capAgentDriverOutput(original, cap).maxOutputTokens)
++          .toBe(Math.min(original.maxOutputTokens!, cap));
++      }
++    }
++  });
++  it.each([
++    { wire: 393_216, cap: 65_536, perCall: 393_216, expected: 65_536 },
++    { wire: 393_216, cap: 65_536, perCall: 1_024, expected: 1_024 },
++    { wire: undefined, cap: 65_536, perCall: undefined, expected: 65_536 },
++    { wire: undefined, cap: undefined, perCall: 8_192, expected: undefined },
++  ])('passes the bounded parent request through the actual stream adapter: $expected',
++    async ({ wire, cap, perCall, expected }) => {
++      const options = capAgentDriverOutput(await miraFormalAgentOutputOptions(false, wire), cap);
++      const stream = createCallLlmStreamFn({ languageModel: {} as never, ...options });
++      for await (const _ of await stream(
++        {} as never, { systemPrompt: 'system', messages: [], tools: [] },
++        perCall === undefined ? undefined : { maxTokens: perCall },
++      )) { /* Consume the real adapter, with only the provider transport mocked. */ }
++      expect(mocks.streamLLM).toHaveBeenCalledOnce();
++      expect(mocks.streamLLM.mock.calls[0][0].maxOutputTokens).toBe(expected);
++    });
++});

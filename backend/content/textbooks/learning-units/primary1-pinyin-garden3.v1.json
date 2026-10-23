@@ -1,0 +1,337 @@
+{
+  "schemaVersion": "mira.learning.unit-blueprints.v1",
+  "editionId": "pep-chinese-g1-upper-2022-standard",
+  "revisionId": "20260924-directory-3",
+  "unitId": "unit-3-pinyin",
+  "source": {
+    "url": "https://r2-ndr.ykt.cbern.com.cn/edu_product/esp/assets/1c73b348-e8b6-47d6-84b0-6dbacbe28268.pkg/%E4%B9%89%E5%8A%A1%E6%95%99%E8%82%B2%E6%95%99%E7%A7%91%E4%B9%A6%20%E8%AF%AD%E6%96%87%20%E4%B8%80%E5%B9%B4%E7%BA%A7%20%E4%B8%8A%E5%86%8C_1725097498841.pdf",
+    "verifiedAt": "2026-10-19T13:27:58.543194+00:00",
+    "method": "实际查看官方缓存PDF47/48/49页，核课程表示例、8识字/2写字、字母造型/3组平翘词组/6动作、7图词及6成语、民间歌谣谁会飞边界；复核星期三第六节劳动。未听来源录音或观察动态书写轨迹。",
+    "printedStartPage": 42,
+    "pdfStartPage": 47,
+    "textbookBodyRead": true,
+    "bodyPagesRead": [
+      42,
+      43,
+      44
+    ],
+    "sourcePeriods": null,
+    "sourcePeriodBoundary": "未读取官方课时安排；分段学习仅为产品建议。",
+    "textbookFilePath": "/var/folders/lq/3xj2bqbj4vd0xkysnv2vlz780000gn/T/mira-task-grade1-continuation-m9rj2ew6/u2-l3-public-textbook-2024.pdf",
+    "textbookFileSha256": "cc43f42bd4271a6d57811922816aa8abafec31cd2c0e97423ac272676df7fd58",
+    "scope": {
+      "literacyStation": {
+        "context": "课程表",
+        "recognitionCharacters": [
+          "午",
+          "星",
+          "期",
+          "语",
+          "文",
+          "数",
+          "写",
+          "会"
+        ],
+        "pronunciation": [
+          "wǔ",
+          "xīng",
+          "qī",
+          "yǔ",
+          "wén",
+          "shù",
+          "xiě",
+          "huì"
+        ],
+        "writingCharacters": [
+          {
+            "character": "午",
+            "strokeCount": 4,
+            "staticOrder": "撇、横、横、竖"
+          },
+          {
+            "character": "下",
+            "strokeCount": 3,
+            "staticOrder": "横、竖、点"
+          }
+        ],
+        "writingEvidence": "Textbook static stroke sequence and field position were viewed; no official dynamic trajectory observed or original paths created.",
+        "sourceWednesdayExample": [
+          "数学",
+          "语文",
+          "体育与健康",
+          "语文",
+          "道德与法治",
+          "劳动"
+        ],
+        "boundary": "A textbook example timetable, never the actual child school timetable. Do not add every course-name character to the recognition targets.",
+        "readingNotes": [
+          "期读qī，数在数学中读shù；模在一模一样中读mú。",
+          "课程表以教材示例为依据，不写入或冒充当前儿童的真实课表。"
+        ]
+      },
+      "pinyinUse": {
+        "shapeConstructionExamples": [
+          "c",
+          "s",
+          "x"
+        ],
+        "shapeConstructionBoundary": "Use already learned letters for the open construction prompt; accurate geometry/letter identity must remain separate from teaching-flow diagrams.",
+        "initialPairs": [
+          [
+            "z",
+            "zh"
+          ],
+          [
+            "c",
+            "ch"
+          ],
+          [
+            "s",
+            "sh"
+          ]
+        ],
+        "comparisonExpressions": [
+          [
+            "zì mǔ",
+            "zhī zhū"
+          ],
+          [
+            "cā bō li",
+            "hē chá"
+          ],
+          [
+            "sù shè",
+            "shū jià"
+          ]
+        ],
+        "actionExpressions": [
+          "shuā yá",
+          "qí mǎ",
+          "chī xī guā",
+          "tuō dì",
+          "lǐ fà",
+          "bá luó bo"
+        ],
+        "boundary": "These are whole words/phrases for comparison or action. Preserve neutral-tone li/bo and do not split audio into letter phonemes or automatically expand all annotations into new sound/recognition targets.",
+        "readingNotes": [
+          "玻璃的li、萝卜的bo为教材无调轻声；西瓜guā在本页明确第一声。",
+          "z/zh、c/ch、s/sh作为声母名称/呼读对照；不声称长呼读音就是独立轻短本音。",
+          "短语必须按完整音节/完整词组录制，不能把字母声音拼接成词。"
+        ]
+      },
+      "wordSentenceUse": {
+        "targets": [
+          "鸡",
+          "鱼",
+          "河",
+          "一座山",
+          "一棵树",
+          "四只鸽子",
+          "七朵花"
+        ],
+        "boundary": "Locate corresponding original scene objects/groups; fixed group counts must be deterministic, not inferred from random AI image detail. Do not generalize to arbitrary measure-word or arithmetic curriculum."
+      },
+      "accumulation": {
+        "expressions": [
+          "一模一样",
+          "一心一意",
+          "独一无二",
+          "三头六臂",
+          "五颜六色",
+          "十全十美"
+        ],
+        "boundary": "Short narrated picture-supported meanings and examples; figurative 三头六臂 is not literal biology. Do not turn 十全十美 into perfection pressure, points or behavioral judgment."
+      },
+      "sharedReading": {
+        "title": "谁会飞",
+        "sourceFootnote": "本文是民间歌谣，选作课文时有改动。",
+        "characters": [
+          "鸟",
+          "马",
+          "鱼"
+        ],
+        "actions": [
+          "飞",
+          "跑",
+          "游"
+        ],
+        "fullTextCopiedIntoProposal": false,
+        "approach": "Original picture observation and voluntary action/description; read original wording in own textbook with adult. Do not export textbook art or copy full adapted text into course."
+      },
+      "excluded": [
+        "不扩新增声韵母或全套音节表",
+        "8识字之外的课名/成语字不列新增独立识字目标",
+        "不把形状搭建/描线/听图对应当独立读音与纸笔能力",
+        "不复制教材课程表版式、插图或改编歌谣全文",
+        "不据ASR文字转写确认声调听辨，正式音频需独立证据"
+      ]
+    },
+    "sourceAudioListened": false,
+    "dynamicStrokeObserved": false,
+    "evidenceFiles": [
+      {
+        "path": "/var/folders/lq/3xj2bqbj4vd0xkysnv2vlz780000gn/T/mira-task-grade1-continuation-m9rj2ew6/u3-next-planning/registration-0202/authoring-draft.input.json",
+        "byteSha256": "b40891f9d609a1629ce913213bf73d2075c52ac35fb24f03e60d35bb5f2b4bd5"
+      },
+      {
+        "path": "/var/folders/lq/3xj2bqbj4vd0xkysnv2vlz780000gn/T/mira-task-grade1-continuation-m9rj2ew6/u3-next-planning/textbook-047.png",
+        "byteSha256": "6109ece65cff3605f63c37919aece75ccace1ca1cd97efb72ee570cb55fb30ba"
+      },
+      {
+        "path": "/var/folders/lq/3xj2bqbj4vd0xkysnv2vlz780000gn/T/mira-task-grade1-continuation-m9rj2ew6/u3-next-planning/textbook-048.png",
+        "byteSha256": "fdd9d3907a282ee598a9b14f26457653f2414d3e7cebc7c0b4d42fb63bb1e1e9"
+      },
+      {
+        "path": "/var/folders/lq/3xj2bqbj4vd0xkysnv2vlz780000gn/T/mira-task-grade1-continuation-m9rj2ew6/u3-next-planning/textbook-049.png",
+        "byteSha256": "5f46887c83e4f97e609ef1632e89f7c5556d882517a15da028fdedd97f38af54"
+      }
+    ],
+    "registrationBasis": {
+      "authoringDraftSha256": "b40891f9d609a1629ce913213bf73d2075c52ac35fb24f03e60d35bb5f2b4bd5",
+      "formalAudioApproved": false,
+      "published": false,
+      "directoryUnchanged": true,
+      "rootFinalIntegrationReview": "registration-authorized-static-scope-reviewed-technical-readiness-pending"
+    }
+  },
+  "lessons": [
+    {
+      "nodeId": "u3-l6",
+      "title": "语文园地三",
+      "status": "scope_verified_preview_only",
+      "targets": [
+        "在示例星期三课表中按节次查课；联系午星期语文数写会8字，并按静态笔序描午、下。",
+        "用已学字母作可修改造型；比较3组声母及6词组，理解6动作并编排图画顺序。",
+        "听读鸡鱼河与4个量词短语，在原创建构图景中定位正确对象及确切组。",
+        "用原创图景理解和积累6个成语，比较相同/不同并创作可修改颜色图案。",
+        "用原创鸟马鱼画面支持自有书谁会飞共读和自愿表达，不采集或推断实际朗读成绩。"
+      ],
+      "scopePages": [
+        42,
+        43,
+        44
+      ],
+      "mediaManifest": "u3-l6.original-v1.json",
+      "mediaManifestStatus": "not-created",
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "在示例星期三课表中按节次查课；联系午星期语文数写会8字，并按静态笔序描午、下。",
+          "用已学字母作可修改造型；比较3组声母及6词组，理解6动作并编排图画顺序。",
+          "听读鸡鱼河与4个量词短语，在原创建构图景中定位正确对象及确切组。",
+          "用原创图景理解和积累6个成语，比较相同/不同并创作可修改颜色图案。",
+          "用原创鸟马鱼画面支持自有书谁会飞共读和自愿表达，不采集或推断实际朗读成绩。"
+        ],
+        "knowledgePoints": [
+          "示例星期三共六节，第三节体育与健康、第六节劳动；不是当前儿童的真实课程表。识字目标午星期语文数写会。",
+          "午四笔撇横横竖，下三笔横竖点。48px引导点描与连续描线分开记录，均不推断独立纸笔能力；未观察官方动态轨迹。",
+          "已学字母c/s/x造型，z/zh、c/ch、s/sh呼读对照；六组词与六个动作按完整音节/词组示范，不拼接孤立录音。",
+          "玻璃li、萝卜bo为轻声；一模一样的模读mú，汉字保持自然中文，不设置全局词语强制覆盖。",
+          "鸡鱼河及一座山、一棵树、四只鸽子、七朵花做有图语支架的定位或建构；确定性数量不当算术扩课。",
+          "六个成语用原创图景和作品支持理解；三头六臂为比喻，十全十美不变成完美压力。",
+          "民间歌谣谁会飞仅原创鸟马鱼导读、自有教材共读和自愿表达，不复制改编全文或推断实际朗读成绩。"
+        ],
+        "priorKnowledge": [
+          "已学教材内声母、单韵母、四声和两拼三拼；不要求独立读操作说明。"
+        ],
+        "excludedTopics": [
+          "不扩新增声韵母或全套音节表",
+          "8识字之外的课名/成语字不列新增独立识字目标",
+          "不把形状搭建/描线/听图对应当独立读音与纸笔能力",
+          "不复制教材课程表版式、插图或改编歌谣全文",
+          "不据ASR文字转写确认声调听辨，正式音频需独立证据"
+        ],
+        "assessmentMode": "objective",
+        "review": {
+          "status": "reviewed",
+          "scope": "static-textbook-and-original-implementation-plan-only",
+          "reviewer": "root",
+          "recordedAt": "2026-10-19T21:09:12Z",
+          "basis": "Root已审20页教材范围与BAC三题，授权本次固定配音注册。仅登记静态范围和原创实施计划；尚未冻结教案、作者派发、素材实玩、探针及正式音频核验。",
+          "dynamicOfficialStrokeObserved": false,
+          "formalAudioApproved": false
+        }
+      },
+      "assessmentMapping": [
+        {
+          "targetIndex": 0,
+          "targetId": "garden3-timetable-literacy-writing",
+          "questionId": "u3-l6-q1",
+          "page": 6,
+          "question": "看这张示例星期三课表。从上往下，第三节是什么课？请找出对应的图片。",
+          "answer": "B",
+          "points": 10,
+          "evidenceLimit": "仅当前图语支架下的单点取样；不代表独立识字、发音、纸笔或整目标掌握。",
+          "questionLockSha256": "8d5574d4e7964f3d9adf135e4d197858ad4790df1e50a628e5eb3dc789c6ee31",
+          "optionAssetKeys": {
+            "A": "subject-chinese",
+            "B": "subject-pe",
+            "C": "subject-math"
+          },
+          "visualAssetKey": "quiz-wednesday-column"
+        },
+        {
+          "targetIndex": 1,
+          "targetId": "garden3-pinyin-meaning-construction",
+          "questionId": "u3-l6-q2",
+          "page": 10,
+          "question": "听老师读这个词语：hē chá。请找出意思相同的图片。",
+          "answer": "A",
+          "points": 10,
+          "evidenceLimit": "仅当前图语支架下的单点取样；不代表独立识字、发音、纸笔或整目标掌握。",
+          "questionLockSha256": "167666afcffc759b40de91751003efea7ea3a291db755dfd5b9418ce4fe0d105",
+          "optionAssetKeys": {
+            "A": "word-tea",
+            "B": "word-wipe-window",
+            "C": "word-bookshelf"
+          }
+        },
+        {
+          "targetIndex": 2,
+          "targetId": "garden3-picture-words-groups",
+          "questionId": "u3-l6-q3",
+          "page": 15,
+          "question": "听老师读：四只鸽子。哪张图是四只鸽子？",
+          "answer": "C",
+          "points": 10,
+          "evidenceLimit": "仅当前图语支架下的单点取样；不代表独立识字、发音、纸笔或整目标掌握。",
+          "questionLockSha256": "07216316595950eea229cecbf4bbae6bae28601be0dd932f30b3df98ad40bbfa",
+          "optionAssetKeys": {
+            "A": "quiz-pigeons3",
+            "B": "quiz-pigeons5",
+            "C": "quiz-pigeons4"
+          }
+        }
+      ],
+      "game": "示例查表、图字对应、午下分模式描写、字母造型、词对排序、动作编排、图景建构和成语作品。",
+      "transfer": "允许自主修改作品、次序和图案；三道测评只取样前三目标，不推断五目标全掌握。",
+      "parentSupport": "共读自有语文书，按孩子节奏观察鸟马鱼；不采集或自动评判儿童朗读。",
+      "authoringPlan": {
+        "pageCount": 20,
+        "speechCount": 150,
+        "interactiveCueCount": 114,
+        "sceneTypes": {
+          "slide": 6,
+          "interactive": 11,
+          "quiz": 3
+        },
+        "quizPages": [
+          6,
+          10,
+          15
+        ],
+        "draftPath": "/var/folders/lq/3xj2bqbj4vd0xkysnv2vlz780000gn/T/mira-task-grade1-continuation-m9rj2ew6/u3-next-planning/registration-0202/authoring-draft.input.json",
+        "draftSha256": "b40891f9d609a1629ce913213bf73d2075c52ac35fb24f03e60d35bb5f2b4bd5",
+        "assessmentLockSha256": "8930973c01a16577a7f6fd780fee4888881ab2ab05710dc8d3559ee1b9863ccd",
+        "status": "scope-reviewed-candidate-undispatched"
+      },
+      "generationReady": false,
+      "missing": [
+        "实际语义图片、原创轨迹及图语交互尚待完成与验收",
+        "作者同会话研究、课堂生成及最终素材绑定未开始",
+        "七组初始化探针、自然中文诊断、正式150句音频审核、浏览器验收及发布均未完成"
+      ],
+      "readinessBoundary": "注册不等于初始化、派发、感知声调准确或发布。引导点描和连续描线分别记录，均不冒称独立写字。"
+    }
+  ]
+}

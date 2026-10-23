@@ -1,0 +1,339 @@
+diff --git a/lib/server/mira-textbook-rejected-scene-repair.ts b/lib/server/mira-textbook-rejected-scene-repair.ts
+--- a/lib/server/mira-textbook-rejected-scene-repair.ts
++++ b/lib/server/mira-textbook-rejected-scene-repair.ts
+@@ -383,21 +383,83 @@
+   revisedHtmlPath: string;
+   revisedHtmlSha256: string;
+ }
+-async function savedInputs(input: SavedSceneRepairInput, env: RepairEnvironment) {
+-  check(Object.keys(input).sort().join(',') === 'jobDir,originalSceneFileSha256,originalScenePath,originalSceneSha256,revisedHtmlPath,revisedHtmlSha256,sceneId,stageId', 'SAVED_INPUT_SHAPE');
++/** Existing saved slide only. Bindings contain no caller-supplied action payload. */
++export interface SavedSlideSpotlightRepairInput {
++  jobDir: string;
++  stageId: string;
++  sceneId: string;
++  originalScenePath: string;
++  originalSceneFileSha256: string;
++  originalSceneSha256: string;
++  spotlightBindingsPath: string;
++  spotlightBindingsSha256: string;
++}
++type SavedRepairInput = SavedSceneRepairInput | SavedSlideSpotlightRepairInput;
++type SavedRepairMode = 'html' | 'slide-spotlight';
++const savedContract = (mode: SavedRepairMode) => mode === 'html'
++  ? { plan: 'mira.textbook.saved-scene-html-repair-plan.v1', receipt: 'mira.textbook.saved-scene-html-repair-receipt.v1', directory: 'textbook-saved-scene-repairs' }
++  : { plan: 'mira.textbook.saved-slide-spotlight-repair-plan.v1', receipt: 'mira.textbook.saved-slide-spotlight-repair-receipt.v1', directory: 'textbook-saved-slide-spotlight-repairs' };
++async function revisedSavedSlideSpotlights(scene: Json, input: SavedSlideSpotlightRepairInput) {
++  check(scene.type === 'slide' && scene.content?.type === 'slide' && jsonObject(scene.content.canvas) && Array.isArray(scene.content.canvas.elements), 'SAVED_SLIDE_ONLY');
++  const canvas = scene.content.canvas, elements = canvas.elements as Json[];
++  const width = canvas.viewportSize, height = width * canvas.viewportRatio;
++  check(Number.isFinite(width) && width > 0 && Number.isFinite(height) && height > 0 && (!canvas.animations || (Array.isArray(canvas.animations) && canvas.animations.length === 0)), 'SAVED_SLIDE_CANVAS');
++  check(elements.every(e => jsonObject(e) && safeId(e.id)) && new Set(elements.map(e => e.id)).size === elements.length, 'SAVED_SLIDE_ELEMENT_IDS');
++  const bytes = await privateRead(input.spotlightBindingsPath);
++  check(digestBytes(bytes) === input.spotlightBindingsSha256 && bytes.length > 0 && bytes.length <= 1024 * 1024, 'SAVED_SPOTLIGHT_BINDINGS_SHA');
++  let parsed: unknown;
++  try { parsed = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)); }
++  catch { fail('SAVED_SPOTLIGHT_BINDINGS_JSON'); }
++  check(Array.isArray(parsed) && parsed.length > 0 && parsed.length <= 128, 'SAVED_SPOTLIGHT_BINDINGS');
++  const bindings = parsed as Json[], actions = scene.actions;
++  check(Array.isArray(actions) && actions.every(a => jsonObject(a) && safeId(a.id)) && new Set(actions.map(a => a.id)).size === actions.length, 'SAVED_SLIDE_ACTION_IDS');
++  const actionIds = new Set(actions.map((a: Json) => a.id)), before = new Map<string, Json>(), targets = new Set<string>();
++  for (const b of bindings) {
++    check(jsonObject(b) && Object.keys(b).sort().join(',') === 'elementId,speechId' && safeId(b.speechId) && safeId(b.elementId) && !before.has(b.speechId) && !targets.has(b.elementId), 'SAVED_SPOTLIGHT_BINDING');
++    check(actions.some((a: Json) => a.id === b.speechId && a.type === 'speech'), 'SAVED_SPOTLIGHT_SPEECH');
++    const index = elements.findIndex(e => e.id === b.elementId), target = elements[index];
++    check(target?.type === 'image', 'SAVED_SPOTLIGHT_IMAGE');
++    // Limit this mode to plain, visible existing PNGs. No new render attributes,
++    // clipping, filters, overlays or animated visibility are introduced/accepted.
++    check(Object.keys(target).every(k => ['id', 'type', 'left', 'top', 'width', 'height', 'rotate', 'fixedRatio', 'src', 'name', 'lock', 'imageType'].includes(k)), 'SAVED_SPOTLIGHT_IMAGE_FIELDS');
++    check(['left', 'top', 'width', 'height', 'rotate'].every(k => Number.isFinite(target[k])) && target.rotate === 0 && target.left >= 0 && target.top >= 0 && target.width >= 48 && target.height >= 48 && target.left + target.width <= width && target.top + target.height <= height, 'SAVED_SPOTLIGHT_BOUNDS');
++    check(typeof target.src === 'string' && target.src.startsWith(`/api/classroom-media/${scene.stageId}/media/`) && /^\/api\/classroom-media\/[A-Za-z0-9_-]+\/media\/[A-Za-z0-9_.-]+\.png$/.test(target.src), 'SAVED_SPOTLIGHT_IMAGE_SOURCE');
++    // Later canvas elements paint above this image. Conservatively reject any
++    // intersection; this narrow repair does not attempt to interpret text/CSS.
++    check(elements.slice(index + 1).every(e => ['left', 'top', 'width', 'height', 'rotate'].every(k => Number.isFinite(e[k])) && e.rotate === 0 && (e.left + e.width <= target.left || e.left >= target.left + target.width || e.top + e.height <= target.top || e.top >= target.top + target.height)), 'SAVED_SPOTLIGHT_OCCLUDED');
++    check(!actions.some((a: Json) => a.type === 'spotlight' && a.elementId === b.elementId), 'SAVED_SPOTLIGHT_ALREADY_PRESENT');
++    const id = `saved-slide-spotlight-${textbookDigest({ sceneId: scene.id, speechId: b.speechId, elementId: b.elementId }).slice(0, 32)}`;
++    check(!actionIds.has(id), 'SAVED_SLIDE_ACTION_IDS'); actionIds.add(id); targets.add(b.elementId);
++    before.set(b.speechId, { id, type: 'spotlight', elementId: b.elementId });
++  }
++  const revised = structuredClone(scene);
++  revised.actions = actions.flatMap((a: Json) => before.has(a.id) ? [before.get(a.id), a] : [a]);
++  return revised;
++}
++async function savedInputs(input: SavedRepairInput, env: RepairEnvironment, mode: SavedRepairMode = 'html') {
++  const fields = mode === 'html'
++    ? 'jobDir,originalSceneFileSha256,originalScenePath,originalSceneSha256,revisedHtmlPath,revisedHtmlSha256,sceneId,stageId'
++    : 'jobDir,originalSceneFileSha256,originalScenePath,originalSceneSha256,sceneId,spotlightBindingsPath,spotlightBindingsSha256,stageId';
++  check(Object.keys(input).sort().join(',') === fields, 'SAVED_INPUT_SHAPE');
+   check(/^[A-Za-z0-9_-]{1,160}$/.test(input.stageId) && typeof input.sceneId === 'string' && input.sceneId.length > 0 && input.sceneId.length <= 160, 'SAVED_ID');
+   const dataDir = await fs.realpath(env.dataDir);
+   const originalBytes = await privateRead(input.originalScenePath);
+   check(digestBytes(originalBytes) === input.originalSceneFileSha256, 'SAVED_SOURCE_FILE_SHA');
+   const scene = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(originalBytes));
+   check(textbookDigest(scene) === input.originalSceneSha256 && scene.id === input.sceneId && scene.stageId === input.stageId, 'SAVED_SOURCE_SCENE_SHA');
+-  check(scene.type === 'interactive' && scene.content?.type === 'interactive' && typeof scene.content.html === 'string', 'HTML_ONLY');
+-  check(scene.content.widgetConfig?.html === undefined && (scene.content.url === undefined || scene.content.url === ''), 'DUPLICATE_HTML_UNSUPPORTED');
+-  const html = await privateRead(input.revisedHtmlPath);
+-  check(digestBytes(html) === input.revisedHtmlSha256 && html.length > 0 && html.length <= 4 * 1024 * 1024, 'HTML_SHA');
+-  const revised = structuredClone(scene);
+-  revised.content.html = new TextDecoder('utf-8', { fatal: true }).decode(html);
+-  check(revised.content.html !== scene.content.html, 'NO_CHANGE');
++  let revised: Json;
++  if (mode === 'slide-spotlight') {
++    revised = await revisedSavedSlideSpotlights(scene, input as SavedSlideSpotlightRepairInput);
++  } else {
++    const htmlInput = input as SavedSceneRepairInput;
++    check(scene.type === 'interactive' && scene.content?.type === 'interactive' && typeof scene.content.html === 'string', 'HTML_ONLY');
++    check(scene.content.widgetConfig?.html === undefined && (scene.content.url === undefined || scene.content.url === ''), 'DUPLICATE_HTML_UNSUPPORTED');
++    const html = await privateRead(htmlInput.revisedHtmlPath);
++    check(digestBytes(html) === htmlInput.revisedHtmlSha256 && html.length > 0 && html.length <= 4 * 1024 * 1024, 'HTML_SHA');
++    revised = structuredClone(scene);
++    revised.content.html = new TextDecoder('utf-8', { fatal: true }).decode(html);
++    check(revised.content.html !== scene.content.html, 'NO_CHANGE');
++  }
+   check(validateScene(scene).valid && validateScene(revised).valid, 'STRICT_DSL');
+   const job = path.resolve(input.jobDir);
+   const cookies = (await privateRead(path.join(job, 'owner.cookies'))).toString();
+@@ -413,7 +475,7 @@
+   const frozenFile = JSON.parse((await privateRead(path.join(job, 'frozen.json'))).toString());
+   check(dispatch.ownerFingerprint === ownerFingerprint && frozenFile.sceneContract?.sha256, 'JOB_BINDING');
+   const ledgerPath = path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json');
+-  return { sessionId: jobState.sessionId as string, stageId: input.stageId, scene, revised, ownerId, ownerFingerprint, frozenFile, ledgerPath, dataDir };
++  return { sessionId: jobState.sessionId as string, stageId: input.stageId, scene, revised: revised as Scene, ownerId, ownerFingerprint, frozenFile, ledgerPath, dataDir };
+ }
+ type SavedState = Awaited<ReturnType<typeof savedInputs>>;
+ async function savedLedger(state: SavedState): Promise<Json> {
+@@ -432,14 +494,14 @@
+   check(document && (document.outline as Json)?.producerRef === state.sessionId, 'DOCUMENT_SESSION_MISMATCH');
+   return { frozen: frozen!, document: document! };
+ }
+-function savedDescribe(input: SavedSceneRepairInput, state: SavedState, document: CourseDocument, ledger: Json, frozen: NonNullable<ReturnType<typeof textbookContractFromPrompt>>) {
++function savedDescribe(input: SavedRepairInput, state: SavedState, document: CourseDocument, ledger: Json, frozen: NonNullable<ReturnType<typeof textbookContractFromPrompt>>, mode: SavedRepairMode = 'html') {
+   const matches = document.scenes.filter(s => s.id === state.scene.id || s.order === state.scene.order);
+   check(matches.length === 1 && matches[0].id === state.scene.id && textbookDigest(matches[0]) === input.originalSceneSha256, 'SAVED_SCENE_CHANGED_OR_MISSING');
+   check(ledger.sessionId === state.sessionId && ledger.stageId === state.stageId && textbookDigest(ledger.frozenContract) === textbookDigest(frozen), 'LEDGER_BINDING');
+   check(Array.isArray(ledger.scenes) && ledger.scenes.length === document.scenes.length && document.scenes.every(s => ledger.scenes.some((e: Json) => e.sceneId === s.id && e.order === s.order && e.sha256 === textbookDigest(s) && e.canonicalJson === textbookCanonical(s) && e.contractSha256 === frozen.sha256)), 'LEDGER_DOCUMENT');
+   const after = { ...document, scenes: document.scenes.map(s => s.id === state.scene.id ? state.revised : s).sort((a, b) => a.order - b.order) };
+   const afterLedger = { ...unseal(ledger), scenes: after.scenes.map(s => ({ sceneId: s.id, order: s.order, sha256: textbookDigest(s), canonicalJson: textbookCanonical(s), contractSha256: frozen.sha256 })) };
+-  return seal({ schemaVersion: 'mira.textbook.saved-scene-html-repair-plan.v1', verification: 'static_only_not_play_audio_or_publication', input, sessionId: state.sessionId, stageId: state.stageId, sceneId: state.scene.id, order: state.scene.order, ownerFingerprint: state.ownerFingerprint, contractSha256: frozen.sha256, originalSceneSha256: textbookDigest(state.scene), revisedSceneSha256: textbookDigest(state.revised), beforeDocumentSha256: textbookDigest(document), afterDocumentSha256: textbookDigest(after), beforeCandidateSha256: ledger.sha256, afterCandidateSha256: textbookDigest(afterLedger) });
++  return seal({ schemaVersion: savedContract(mode).plan, verification: 'static_only_not_play_audio_or_publication', input, sessionId: state.sessionId, stageId: state.stageId, sceneId: state.scene.id, order: state.scene.order, ownerFingerprint: state.ownerFingerprint, contractSha256: frozen.sha256, originalSceneSha256: textbookDigest(state.scene), revisedSceneSha256: textbookDigest(state.revised), beforeDocumentSha256: textbookDigest(document), afterDocumentSha256: textbookDigest(after), beforeCandidateSha256: ledger.sha256, afterCandidateSha256: textbookDigest(afterLedger) });
+ }
+ async function savedDryGuard(state: SavedState, frozen: NonNullable<ReturnType<typeof textbookContractFromPrompt>>, document: CourseDocument) {
+   const validated = new Error('SAVED_REPAIR_DRY_RUN_VALIDATED');
+@@ -450,23 +512,23 @@
+   fail('DRY_RUN_UNEXPECTED');
+ }
+ /** Read-only plan for one existing scene. Its original is evidence, not a rejected generation. */
+-export async function prepareSavedSceneRepair(input: SavedSceneRepairInput, env: RepairEnvironment): Promise<Json> {
+-  const state = await savedInputs(input, env);
++async function prepareSavedRepair(input: SavedRepairInput, env: RepairEnvironment, mode: SavedRepairMode): Promise<Json> {
++  const state = await savedInputs(input, env, mode);
+   return transaction(env, true, async q => {
+     const { frozen, document } = await savedAuthority(q, state, false);
+     const ledger = await savedLedger(state);
+-    const plan = savedDescribe(input, state, document, ledger, frozen);
++    const plan = savedDescribe(input, state, document, ledger, frozen, mode);
+     await savedDryGuard(state, frozen, document);
+     check((await savedLedger(state)).sha256 === ledger.sha256, 'ATOMIC_LEDGER_FENCE');
+     return plan;
+   });
+ }
+-/** Explicit replacement; only the saved HTML leaf may change. No paid call or automatic retry. */
+-export async function runSavedSceneRepair(plan: Json, approvedPlanSha256: string, env: RepairEnvironment): Promise<Json> {
++/** Explicit mode-bound replacement. No paid call or automatic retry. */
++async function runSavedRepair(plan: Json, approvedPlanSha256: string, env: RepairEnvironment, mode: SavedRepairMode): Promise<Json> {
+   unseal(plan);
+-  check(plan.schemaVersion === 'mira.textbook.saved-scene-html-repair-plan.v1' && plan.sha256 === approvedPlanSha256, 'PLAN_APPROVAL_SHA');
+-  const state = await savedInputs(plan.input, env);
+-  const directory = path.join(state.dataDir, 'textbook-saved-scene-repairs', digestBytes(state.sessionId), state.stageId, plan.sha256);
++  check(plan.schemaVersion === savedContract(mode).plan && plan.sha256 === approvedPlanSha256, 'PLAN_APPROVAL_SHA');
++  const state = await savedInputs(plan.input, env, mode);
++  const directory = path.join(state.dataDir, savedContract(mode).directory, digestBytes(state.sessionId), state.stageId, plan.sha256);
+   const intentPath = path.join(directory, 'intent.json');
+   const originalPath = path.join(directory, 'original-scene.json');
+   const receiptPath = path.join(directory, 'receipt.json');
+@@ -493,7 +555,7 @@
+       check(body.scenes.filter((s: Json) => s.sceneId === state.scene.id).length === 1, 'RECOVERY_LEDGER');
+       beforeLedger = seal({ ...body, scenes: body.scenes.map((s: Json) => s.sceneId === state.scene.id ? { sceneId: state.scene.id, order: state.scene.order, sha256: textbookDigest(state.scene), canonicalJson: textbookCanonical(state.scene), contractSha256: frozen.sha256 } : s) });
+     }
+-    check(textbookCanonical(savedDescribe(plan.input, state, before, beforeLedger, frozen)) === textbookCanonical(plan), 'PLAN_STALE');
++    check(textbookCanonical(savedDescribe(plan.input, state, before, beforeLedger, frozen, mode)) === textbookCanonical(plan), 'PLAN_STALE');
+     check(actualSha === plan.beforeDocumentSha256 || (priorIntent && actualSha === plan.afterDocumentSha256), 'DOCUMENT_CHANGED');
+     await savedDryGuard(state, frozen, before);
+     check((await savedLedger(state)).sha256 === ledger.sha256, 'ATOMIC_LEDGER_FENCE');
+@@ -515,8 +577,13 @@
+     const final = await savedAuthority(q, state, true);
+     check(textbookDigest(final.document) === plan.afterDocumentSha256, 'AFTER_DOCUMENT');
+     check((await savedLedger(state)).sha256 === plan.afterCandidateSha256, 'AFTER_LEDGER');
+-    return seal({ schemaVersion: 'mira.textbook.saved-scene-html-repair-receipt.v1', status: 'static_candidate_accepted', verification: 'static_only_not_play_audio_or_publication', planSha256: plan.sha256, originalSceneFileSha256: plan.input.originalSceneFileSha256, originalSceneSha256: plan.originalSceneSha256, sessionId: plan.sessionId, stageId: plan.stageId, sceneId: plan.sceneId, sceneSha256: plan.revisedSceneSha256, documentSha256: plan.afterDocumentSha256, candidateSha256: plan.afterCandidateSha256, providerCalls: 0 });
++    return seal({ schemaVersion: savedContract(mode).receipt, status: 'static_candidate_accepted', verification: 'static_only_not_play_audio_or_publication', planSha256: plan.sha256, originalSceneFileSha256: plan.input.originalSceneFileSha256, originalSceneSha256: plan.originalSceneSha256, sessionId: plan.sessionId, stageId: plan.stageId, sceneId: plan.sceneId, sceneSha256: plan.revisedSceneSha256, documentSha256: plan.afterDocumentSha256, candidateSha256: plan.afterCandidateSha256, providerCalls: 0 });
+   });
+   await immutable(receiptPath, result);
+   return result;
+ }
++
++export const prepareSavedSceneRepair = (input: SavedSceneRepairInput, env: RepairEnvironment) => prepareSavedRepair(input, env, 'html');
++export const runSavedSceneRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runSavedRepair(plan, approvedPlanSha256, env, 'html');
++export const prepareSavedSlideSpotlightRepair = (input: SavedSlideSpotlightRepairInput, env: RepairEnvironment) => prepareSavedRepair(input, env, 'slide-spotlight');
++export const runSavedSlideSpotlightRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runSavedRepair(plan, approvedPlanSha256, env, 'slide-spotlight');
+diff --git a/scripts/repair-textbook-rejected-scene.ts b/scripts/repair-textbook-rejected-scene.ts
+--- a/scripts/repair-textbook-rejected-scene.ts
++++ b/scripts/repair-textbook-rejected-scene.ts
+@@ -2,11 +2,11 @@
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import { Pool } from 'pg';
+-import { prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair } from '../lib/server/mira-textbook-rejected-scene-repair';
++import { prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair } from '../lib/server/mira-textbook-rejected-scene-repair';
+ 
+ async function main() {
+   const mode = process.argv[2];
+-  if (!['prepare', 'run', 'prepare-saved', 'run-saved', 'prepare-quiz', 'run-quiz', 'prepare-slide', 'run-slide'].includes(mode)) throw new Error('Usage: repair-textbook-rejected-scene.ts prepare|run|prepare-saved|run-saved|prepare-quiz|run-quiz|prepare-slide|run-slide < request.json');
++  if (!['prepare', 'run', 'prepare-saved', 'run-saved', 'prepare-quiz', 'run-quiz', 'prepare-slide', 'run-slide', 'prepare-saved-slide', 'run-saved-slide'].includes(mode)) throw new Error('Usage: repair-textbook-rejected-scene.ts prepare|run|prepare-saved|run-saved|prepare-quiz|run-quiz|prepare-slide|run-slide|prepare-saved-slide|run-saved-slide < request.json');
+   let body = '';
+   for await (const chunk of process.stdin) { body += chunk; if (body.length > 1024 * 1024) throw new Error('INPUT_TOO_LARGE'); }
+   const request = JSON.parse(body);
+@@ -17,6 +17,10 @@
+     const env = { pool, dataDir: path.resolve('data') };
+     const result = mode === 'prepare'
+       ? await prepareRejectedSceneRepair(request, env)
++      : mode === 'prepare-saved-slide'
++        ? await prepareSavedSlideSpotlightRepair(request, env)
++        : mode === 'run-saved-slide'
++          ? await runSavedSlideSpotlightRepair(JSON.parse(await fs.readFile(request.planPath, 'utf8')), request.approvedPlanSha256, env)
+       : mode === 'prepare-slide'
+         ? await prepareRejectedSlideRepair(request, env)
+         : mode === 'run-slide'
+diff --git a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+--- a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
++++ b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+@@ -12,7 +12,7 @@
+ import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
+ import { archiveRejectedTextbookScene } from '@/lib/server/mira-textbook-rejected-scene';
+ import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest, type FrozenTextbookContract } from '@/lib/server/mira-textbook-scene-contract';
+-import { prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, type SlideRepairInput, type QuizRepairInput, type RepairInput, type SavedSceneRepairInput } from '@/lib/server/mira-textbook-rejected-scene-repair';
++import { prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair, type SavedSlideSpotlightRepairInput, type SlideRepairInput, type QuizRepairInput, type RepairInput, type SavedSceneRepairInput } from '@/lib/server/mira-textbook-rejected-scene-repair';
+ import type { CourseStore } from '@/lib/server/agent-runtime/course-tools';
+ import frozenFixture from '../fixtures/textbook-scene-contract.v1.json';
+ 
+@@ -660,3 +660,120 @@
+     expect(await fs.readFile(quizInput.archivePath)).toEqual(originalBytes);
+   });
+ });
++
++
++describe('saved slide spotlight-only repair', () => {
++  let spotlightInput: SavedSlideSpotlightRepairInput, savedSlide: any, prior: any;
++  const bindings = () => [{ speechId: 'slide-wipe', elementId: 'image-wipe' }, { speechId: 'slide-read', elementId: 'image-read' }];
++  const repairDir = (plan: any) => path.join(root, 'textbook-saved-slide-spotlight-repairs', hash(sessionId), stageId, plan.sha256);
++  const writeBindings = async (value: unknown) => { const bytes = JSON.stringify(value); await fs.writeFile(spotlightInput.spotlightBindingsPath, bytes); spotlightInput.spotlightBindingsSha256 = hash(bytes); };
++  const writeOriginal = async (value: unknown) => { const bytes = JSON.stringify(value); await fs.writeFile(spotlightInput.originalScenePath, bytes); spotlightInput.originalSceneFileSha256 = hash(bytes); spotlightInput.originalSceneSha256 = textbookDigest(value); };
++  beforeEach(async () => {
++    frozen.contract.pagePlan.push({ page: 2, title: '看图听词', type: 'slide', move: '听词并观察对应图片' }); frozen.sha256 = textbookDigest(frozen.contract);
++    await sql('UPDATE agent_sessions SET prompt=$1', [prompt()]); await fs.writeFile(path.join(input.jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen })); await fs.rm(ledgerFile());
++    const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') }), src = '/api/classroom-media/' + stageId + '/media/picture.png';
++    const guarded = guard.wrapStore(store as unknown as CourseStore);
++    await guard.context({ stageId, order: 1, type: 'interactive', title: '观察', widgetType: 'simulation', media: [{ src, assetKey: 'picture' }] });
++    prior = { ...scene, content: { ...scene.content, html: await fs.readFile(input.revisedHtmlPath, 'utf8') } }; await guarded.putScene(stageId, prior);
++    await guard.context({ stageId, order: 2, type: 'slide', title: '看图听词', media: [{ src, assetKey: 'picture' }] });
++    savedSlide = { id: 'scene-p2', stageId, order: 2, title: '看图听词', type: 'slide', createdAt: 12, updatedAt: 19,
++      content: { type: 'slide', canvas: { id: 'canvas-two', viewportSize: 1000, viewportRatio: 0.5625,
++        theme: { backgroundColor: '#ffffff', themeColors: ['#153f50'], fontColor: '#153f50', fontName: 'sans-serif' },
++        elements: ['wipe', 'read'].map((name, i) => ({ id: 'image-' + name, type: 'image', left: 100 + i * 400, top: 180, width: 200, height: 200, rotate: 0, fixedRatio: true, src })) } },
++      actions: [{ id: 'slide-start', type: 'speech', text: '先观察两幅图。' }, { id: 'slide-wipe', type: 'speech', text: '这个小朋友在擦桌子。' }, { id: 'slide-read', type: 'speech', text: '这个小朋友在读书。' }] };
++    await guarded.putScene(stageId, savedSlide); await fs.rm(path.join(root, 'textbook-rejected-scenes'), { recursive: true });
++    spotlightInput = { jobDir: input.jobDir, stageId, sceneId: savedSlide.id, originalScenePath: path.join(root, 'saved-slide.json'), originalSceneFileSha256: '', originalSceneSha256: '', spotlightBindingsPath: path.join(root, 'spotlight-bindings.json'), spotlightBindingsSha256: '' };
++    await writeOriginal(savedSlide); await writeBindings(bindings()); ledger = await readLedger();
++  });
++  it('prepares read-only and inserts only stable spotlights immediately before the named original speech', async () => {
++    const before = (await document())!, ledgerBytes = await fs.readFile(ledgerFile()), original = await fs.readFile(spotlightInput.originalScenePath);
++    const plan = await prepareSavedSlideSpotlightRepair(spotlightInput, env);
++    expect(plan.schemaVersion).toBe('mira.textbook.saved-slide-spotlight-repair-plan.v1'); expect(await document()).toEqual(before); expect(await fs.readFile(ledgerFile())).toEqual(ledgerBytes);
++    await expect(fs.stat(repairDir(plan))).rejects.toMatchObject({ code: 'ENOENT' });
++    const receipt = await runSavedSlideSpotlightRepair(plan, plan.sha256, env), after = (await document())!, revised = after.scenes[1] as any;
++    expect(receipt.schemaVersion).toBe('mira.textbook.saved-slide-spotlight-repair-receipt.v1'); expect(receipt.providerCalls).toBe(0); expect(receipt.verification).toBe('static_only_not_play_audio_or_publication');
++    expect(revised.actions).toHaveLength(5); expect(revised.actions[0]).toEqual(savedSlide.actions[0]);
++    for (const [i, b] of bindings().entries()) {
++      const id = 'saved-slide-spotlight-' + textbookDigest({ sceneId: savedSlide.id, ...b }).slice(0, 32);
++      expect(revised.actions[i * 2 + 1]).toEqual({ id, type: 'spotlight', elementId: b.elementId }); expect(revised.actions[i * 2 + 2]).toEqual(savedSlide.actions[i + 1]);
++    }
++    expect({ ...revised, actions: revised.actions.filter((a: any) => a.type !== 'spotlight') }).toEqual(savedSlide);
++    expect(after.scenes[0]).toEqual(prior); expect(after.stage).toEqual(before.stage); expect(after.outline).toEqual(before.outline);
++    expect(await fs.readFile(spotlightInput.originalScenePath)).toEqual(original); expect((await readLedger()).assetBindings).toEqual(ledger.assetBindings);
++    expect(await runSavedSlideSpotlightRepair(plan, plan.sha256, env)).toEqual(receipt);
++    await expect(fs.stat(path.join(root, 'textbook-rejected-scenes'))).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++  it.each(['empty', 'object', 'unknown-key', 'unknown-speech', 'non-speech', 'duplicate-speech', 'duplicate-target', 'missing-image'])('rejects bindings without a unique existing speech/image relation: %s', async kind => {
++    const value: any = bindings();
++    if (kind === 'unknown-key') value[0].type = 'script';
++    if (kind === 'unknown-speech') value[0].speechId = 'missing';
++    if (kind === 'non-speech') value[0].speechId = 'image-wipe';
++    if (kind === 'duplicate-speech') value[1].speechId = value[0].speechId;
++    if (kind === 'duplicate-target') value[1].elementId = value[0].elementId;
++    if (kind === 'missing-image') value[0].elementId = 'missing';
++    await writeBindings(kind === 'empty' ? [] : kind === 'object' ? { bindings: value } : value);
++    await expect(prepareSavedSlideSpotlightRepair(spotlightInput, env)).rejects.toThrow('TEXTBOOK_REPAIR_SAVED_SPOTLIGHT_'); expect((await document())!.scenes).toEqual([prior, savedSlide]);
++  });
++  it.each(['shape', 'tiny', 'outside', 'rotated', 'filters', 'clip', 'flip', 'mask', 'animated', 'overlay', 'foreign', 'remote', 'duplicate-existing-spotlight'])('refuses non-plain or obscured target: %s', async kind => {
++    const changed = structuredClone(savedSlide), target = changed.content.canvas.elements[0];
++    if (kind === 'shape') target.type = 'shape';
++    if (kind === 'tiny') target.width = 47;
++    if (kind === 'outside') target.left = 990;
++    if (kind === 'rotated') target.rotate = 90;
++    if (kind === 'filters') target.filters = { opacity: '0%' };
++    if (kind === 'clip') target.clip = { range: [[0, 0], [1, 1]], shape: 'rect' };
++    if (kind === 'flip') target.flipH = true;
++    if (kind === 'mask') target.colorMask = '#ffffff';
++    if (kind === 'animated') changed.content.canvas.animations = [{}];
++    if (kind === 'overlay') changed.content.canvas.elements.push({ ...target, id: 'overlay' });
++    if (kind === 'foreign') target.src = '/api/classroom-media/foreign/media/picture.png';
++    if (kind === 'remote') target.src = 'https://example.com/picture.png';
++    if (kind === 'duplicate-existing-spotlight') changed.actions.unshift({ id: 'existing-highlight', type: 'spotlight', elementId: target.id });
++    await writeOriginal(changed); await expect(prepareSavedSlideSpotlightRepair(spotlightInput, env)).rejects.toThrow('TEXTBOOK_REPAIR_SAVED_'); expect((await document())!.scenes).toEqual([prior, savedSlide]);
++  });
++  it('keeps old modes and new mode mutually exclusive, and rejects caller action or canvas overrides', async () => {
++    const plan = await prepareSavedSlideSpotlightRepair(spotlightInput, env);
++    await expect(runSavedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('PLAN_APPROVAL_SHA'); await expect(runRejectedSlideRepair(plan, plan.sha256, env)).rejects.toThrow('PLAN_APPROVAL_SHA');
++    await expect(prepareSavedSceneRepair(spotlightInput as unknown as SavedSceneRepairInput, env)).rejects.toThrow('SAVED_INPUT_SHAPE');
++    await expect(prepareSavedSlideSpotlightRepair({ ...spotlightInput, actions: [] } as SavedSlideSpotlightRepairInput, env)).rejects.toThrow('SAVED_INPUT_SHAPE');
++    const htmlInput = { ...spotlightInput, revisedHtmlPath: input.revisedHtmlPath, revisedHtmlSha256: input.revisedHtmlSha256 } as any; delete htmlInput.spotlightBindingsPath; delete htmlInput.spotlightBindingsSha256;
++    await expect(prepareSavedSceneRepair(htmlInput, env)).rejects.toThrow('HTML_ONLY');
++    await writeOriginal(prior); spotlightInput.sceneId = prior.id; await expect(prepareSavedSlideSpotlightRepair(spotlightInput, env)).rejects.toThrow('SAVED_SLIDE_ONLY');
++  });
++  it.each(['owner', 'session-owner', 'running', 'queued', 'lease', 'frozen', 'document', 'ledger'])('retains the complete saved-mode fence after prepare: %s', async kind => {
++    const plan = await prepareSavedSlideSpotlightRepair(spotlightInput, env), before = (await document())!;
++    if (kind === 'owner') await sql("UPDATE stage_meta SET owner_id='foreign'");
++    if (kind === 'session-owner') await sql("UPDATE agent_sessions SET owner_id='foreign'");
++    if (kind === 'running' || kind === 'queued') await sql('UPDATE agent_sessions SET status=$1', [kind]);
++    if (kind === 'lease') await sql("UPDATE agent_sessions SET lease_worker_id='worker'");
++    if (kind === 'frozen') await sql("UPDATE agent_sessions SET prompt='changed'");
++    if (kind === 'document') await store.saveDocument({ ...before, stage: { ...before.stage, name: 'changed' } });
++    if (kind === 'ledger') { const { sha256: _, ...body } = await readLedger(); body.operatorNote = 'drift'; await fs.writeFile(ledgerFile(), JSON.stringify({ ...body, sha256: textbookDigest(body) })); }
++    await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow();
++    expect((await sql('SELECT data FROM document_scenes WHERE id=$1', [savedSlide.id])).rows[0]).toEqual({ data: savedSlide }); await expect(fs.stat(repairDir(plan))).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++  it('checks the exact original/bindings bytes and current bound image bytes at run', async () => {
++    const plan = await prepareSavedSlideSpotlightRepair(spotlightInput, env);
++    await fs.appendFile(spotlightInput.spotlightBindingsPath, ' '); await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow('SAVED_SPOTLIGHT_BINDINGS_SHA'); await writeBindings(bindings());
++    await fs.appendFile(spotlightInput.originalScenePath, ' '); await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow('SAVED_SOURCE_FILE_SHA'); await writeOriginal(savedSlide);
++    await sharp({ create: { width: 64, height: 64, channels: 3, background: '#00ff00' } }).png().toFile(path.join(root, 'classrooms', stageId, 'media', 'picture.png'));
++    await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow('IMAGE_BYTES_CHANGED'); expect((await document())!.scenes).toEqual([prior, savedSlide]);
++  });
++  it('restores the saved original entry after DB-before/ledger-after without deleting any scene', async () => {
++    const plan = await prepareSavedSlideSpotlightRepair(spotlightInput, env), before = await document(), query = pool.query; let failed = false;
++    pool.query = async (text, args) => { if (text === 'COMMIT' && !failed) { failed = true; throw new Error('spotlight commit interrupted'); } return query(text, args); };
++    await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow('spotlight commit interrupted'); pool.query = query;
++    expect(await document()).toEqual(before); expect((await readLedger()).sha256).toBe(plan.afterCandidateSha256);
++    expect((await runSavedSlideSpotlightRepair(plan, plan.sha256, env)).documentSha256).toBe(plan.afterDocumentSha256); expect((await document())!.scenes).toHaveLength(2);
++  });
++  it('recovers DB-after/missing-receipt without another write and requires exact intent plus original snapshot', async () => {
++    const plan = await prepareSavedSlideSpotlightRepair(spotlightInput, env), open = fs.open.bind(fs); let failed = false;
++    vi.spyOn(fs, 'open').mockImplementation(async (...args: Parameters<typeof fs.open>) => { if (String(args[0]).endsWith('/receipt.json') && !failed) { failed = true; throw new Error('spotlight receipt interrupted'); } return open(...args); });
++    await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow('spotlight receipt interrupted');
++    expect(textbookDigest(await document())).toBe(plan.afterDocumentSha256);
++    const queries: string[] = [], query = pool.query; pool.query = async (text, args) => { queries.push(text); return query(text, args); };
++    await runSavedSlideSpotlightRepair(plan, plan.sha256, env); expect(queries.some(q => q.includes('INSERT INTO document_scenes'))).toBe(false);
++    expect(await fs.readFile(path.join(repairDir(plan), 'original-scene.json'), 'utf8')).toBe(textbookCanonical(savedSlide) + '\n');
++    await fs.writeFile(path.join(repairDir(plan), 'intent.json'), JSON.stringify({ ...plan, unrelated: true })); await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow('INTENT_COLLISION');
++  });
++});

@@ -1,0 +1,38 @@
+diff --git a/app/api/classroom-media/[classroomId]/[...path]/route.ts b/app/api/classroom-media/[classroomId]/[...path]/route.ts
+--- a/app/api/classroom-media/[classroomId]/[...path]/route.ts
++++ b/app/api/classroom-media/[classroomId]/[...path]/route.ts
+@@ -70,6 +70,7 @@ export async function GET(
+     const headers: Record<string, string> = {
+       'Content-Type': contentType,
+       'Accept-Ranges': 'bytes',
++      'Access-Control-Allow-Origin': '*',
+       'Cache-Control': 'public, max-age=86400, immutable',
+     };
+     if (range.kind === 'unsatisfiable') {
+diff --git a/tests/server/classroom-media-range.test.ts b/tests/server/classroom-media-range.test.ts
+--- a/tests/server/classroom-media-range.test.ts
++++ b/tests/server/classroom-media-range.test.ts
+@@ -66,6 +66,7 @@ describe('single classroom media byte range', () => {
+     expect(response.headers.get('Content-Range')).toBe(`bytes ${start}-${end}/20`);
+     expect(response.headers.get('Content-Length')).toBe(String(Number(end) - Number(start) + 1));
+     expect(response.headers.get('Accept-Ranges')).toBe('bytes');
++    expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
+     expect(response.headers.get('Content-Type')).toBe('video/mp4');
+     expect(response.headers.get('Cache-Control')).toBe('public, max-age=86400, immutable');
+     expect(Buffer.from(await response.arrayBuffer())).toEqual(
+@@ -80,6 +81,7 @@ describe('single classroom media byte range', () => {
+       expect(response.status).toBe(416);
+       expect(response.headers.get('Content-Range')).toBe('bytes */20');
+       expect(response.headers.get('Content-Length')).toBe('0');
++      expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
+       expect((await response.arrayBuffer()).byteLength).toBe(0);
+     },
+   );
+@@ -102,6 +104,7 @@ describe('single classroom media byte range', () => {
+       expect(response.status).toBe(200);
+       expect(response.headers.get('Content-Range')).toBeNull();
+       expect(response.headers.get('Content-Length')).toBe('20');
++      expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
+       expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes);
+     },
+   );

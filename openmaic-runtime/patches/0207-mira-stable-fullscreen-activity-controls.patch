@@ -1,0 +1,442 @@
+diff --git a/components/roundtable/presentation-speech-overlay.tsx b/components/roundtable/presentation-speech-overlay.tsx
+--- a/components/roundtable/presentation-speech-overlay.tsx
++++ b/components/roundtable/presentation-speech-overlay.tsx
+@@ -1,6 +1,6 @@
+ 'use client';
+ 
+-import { useState } from 'react';
++import { useEffect, useState } from 'react';
+ import { AnimatePresence, motion } from 'motion/react';
+ import { Play, Pause, Repeat, Loader2, Volume2, ChevronDown, ChevronUp } from 'lucide-react';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+@@ -25,6 +25,8 @@
+   readonly audioIndicatorState?: AudioIndicatorState;
+   readonly buttonState?: 'play' | 'bars' | 'restart' | 'none';
+   readonly isPaused?: boolean;
++  /** Only duplicate lecture captions yield to hands-on scene content. */
++  readonly activitySceneId?: string;
+ }
+ 
+ export interface PresentationBubbleModel {
+@@ -130,12 +132,17 @@
+   readonly onPlayPause?: () => void;
+   readonly isPaused?: boolean;
+ }) {
++  const { t } = useI18n();
+   return (
+-    <div className="flex items-center gap-2" onClick={onExpand}>
+-      <div
++    <div data-mira-collapsed-speech className="flex items-center gap-2">
++      <button
++        type="button"
++        aria-label={`${t('edit.nav.expand')} ${bubble.name}`}
++        aria-expanded={false}
++        onClick={onExpand}
+         data-mira-speech-card={bubble.role}
+         className={cn(
+-          'flex items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-xl shadow-md cursor-pointer transition-all duration-200',
++          'flex min-h-12 min-w-12 items-center gap-2 px-3 py-1.5 rounded-full border backdrop-blur-xl shadow-md cursor-pointer transition-all duration-200',
+           'hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]',
+           bubble.role === 'user'
+             ? 'bg-violet-50/80 dark:bg-violet-950/70 border-violet-200/70 dark:border-violet-800/60'
+@@ -157,20 +164,22 @@
+         >
+           <AvatarDisplay src={bubble.avatar} alt={bubble.name} />
+         </div>
+-        <span className="text-xs font-medium text-gray-700 dark:text-gray-200 truncate max-w-[120px]">
++        <span className="text-xs font-medium text-gray-700 dark:text-gray-200 truncate max-w-[88px]">
+           {bubble.name}
+         </span>
+         <ChevronUp className="w-3 h-3 text-gray-400 dark:text-gray-500 shrink-0" />
+-      </div>
++      </button>
+       {onPlayPause && (
+-        <div
++        <button
++          type="button"
++          aria-label={`${t(isPaused ? 'proactiveCard.resume' : 'proactiveCard.pause')} ${bubble.name}`}
+           data-mira-bubble-control={isPaused ? 'play' : 'pause'}
+           onClick={(e) => {
+             e.stopPropagation();
+             onPlayPause();
+           }}
+           className={cn(
+-            'p-2 rounded-full border backdrop-blur-xl shadow-md cursor-pointer transition-all duration-200',
++            'flex min-h-12 min-w-12 items-center justify-center p-2 rounded-full border backdrop-blur-xl shadow-md cursor-pointer transition-all duration-200',
+             'hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]',
+             bubble.role === 'user'
+               ? 'bg-violet-50/80 dark:bg-violet-950/70 border-violet-200/70 dark:border-violet-800/60 hover:bg-violet-100 dark:hover:bg-violet-900/70'
+@@ -184,7 +193,7 @@
+           ) : (
+             <Pause className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+           )}
+-        </div>
++        </button>
+       )}
+     </div>
+   );
+@@ -266,15 +275,19 @@
+           </div>
+         </div>
+         {onCollapse && (
+-          <div
++          <button
++            type="button"
++            aria-label={`${t('edit.nav.collapse')} ${bubble.name}`}
++            aria-expanded={true}
++            data-mira-collapse-speech
+             onClick={(e) => {
+               e.stopPropagation();
+               onCollapse();
+             }}
+-            className="absolute top-2 right-2 p-1.5 rounded-full text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-colors duration-200 cursor-pointer z-10"
++            className="absolute top-1 right-1 flex min-h-12 min-w-12 items-center justify-center p-1.5 rounded-full text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-colors duration-200 cursor-pointer z-10"
+           >
+-            <ChevronDown className="w-4 h-4" />
+-          </div>
++            <ChevronDown className="w-5 h-5" aria-hidden />
++          </button>
+         )}
+       </div>
+ 
+@@ -407,6 +420,7 @@
+   audioIndicatorState,
+   buttonState,
+   isPaused,
++  activitySceneId,
+ }: PresentationSpeechOverlayProps) {
+   const { t } = useI18n();
+ 
+@@ -425,12 +439,24 @@
+   // Left/right sides are separate component instances so they track independently.
+   // Right-side agents share a single instance, so all agents share the same collapse state.
+   const [isCollapsed, setIsCollapsed] = useState(false);
++  const [shortLandscape, setShortLandscape] = useState(false);
++  const [expandedActivityId, setExpandedActivityId] = useState<string | null>(null);
++  useEffect(() => {
++    const media = window.matchMedia('(min-width: 641px) and (max-height: 500px)');
++    const update = () => setShortLandscape(media.matches);
++    update();
++    media.addEventListener('change', update);
++    return () => media.removeEventListener('change', update);
++  }, []);
++  const activityLecture = shortLandscape && !!activitySceneId && bubble?.role === 'teacher'
++    && (playbackView.phase === 'lecturePlaying' || playbackView.phase === 'lecturePaused');
++  const collapsed = isCollapsed || (activityLecture && expandedActivityId !== activitySceneId);
+ 
+   const matchesSide = !!(bubble && bubble.side === side);
+ 
+   const renderContent = (b: PresentationBubbleModel) => (
+     <AnimatePresence mode="wait" initial={false}>
+-      {isCollapsed ? (
++      {collapsed ? (
+         <motion.div
+           key="collapsed"
+           initial={{ opacity: 0, scale: 0.9 }}
+@@ -440,7 +466,10 @@
+         >
+           <CollapsedBubblePill
+             bubble={b}
+-            onExpand={() => setIsCollapsed(false)}
++            onExpand={() => {
++              setIsCollapsed(false);
++              setExpandedActivityId(activitySceneId ?? null);
++            }}
+             onPlayPause={onBubbleClick}
+             isPaused={isPaused}
+           />
+@@ -457,7 +486,10 @@
+           <PresentationBubbleCard
+             bubble={b}
+             onClick={onBubbleClick}
+-            onCollapse={() => setIsCollapsed(true)}
++            onCollapse={() => {
++              setIsCollapsed(true);
++              setExpandedActivityId(null);
++            }}
+             audioIndicatorState={audioIndicatorState}
+             buttonState={buttonState}
+             isPaused={isPaused}
+@@ -479,6 +511,8 @@
+               animate={{ opacity: 1, x: 0, y: 0 }}
+               exit={{ opacity: 0, y: 8 }}
+               transition={{ duration: 0.22, ease: [0.21, 1, 0.36, 1] }}
++              data-mira-left-speech
++              data-mira-speech-collapsed={collapsed ? 'true' : 'false'}
+               className="absolute bottom-6 left-6 z-30 pointer-events-auto"
+             >
+               {renderContent(bubble)}
+diff --git a/components/roundtable/index.tsx b/components/roundtable/index.tsx
+--- a/components/roundtable/index.tsx
++++ b/components/roundtable/index.tsx
+@@ -222,6 +222,13 @@
+   const fixedTextbook = useStageStore(
+     (state) => (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true,
+   );
++  const activitySceneId = useStageStore((state) => {
++    const scene = state.scenes.find(item => item.id === state.currentSceneId);
++    if (!scene) return undefined;
++    if (scene.content.type === 'interactive') return scene.id;
++    if (scene.content.type === 'quiz' && scene.content.questions.some(question => !!question.optionVisuals)) return scene.id;
++    return undefined;
++  });
+   const asrEnabled = getMiraEffectiveAsrEnabled({ studentMode, operatorAsrEnabled });
+   const chatAreaWidth = useSettingsStore((s) => s.chatAreaWidth);
+   const operatorTTSVolume = useSettingsStore((s) => s.ttsVolume);
+@@ -772,6 +779,7 @@
+           speakingAgentId={speakingAgentId ?? null}
+           isTopicPending={!!isTopicPending}
+           side="left"
++          activitySceneId={activitySceneId}
+           onBubbleClick={handlePresentationBubbleClick}
+           audioIndicatorState={audioIndicatorState ?? 'idle'}
+           buttonState={enrichedPlaybackView?.buttonState}
+diff --git a/components/roundtable/use-presentation-toolbar-height.ts b/components/roundtable/use-presentation-toolbar-height.ts
+--- a/components/roundtable/use-presentation-toolbar-height.ts
++++ b/components/roundtable/use-presentation-toolbar-height.ts
+@@ -6,7 +6,8 @@
+ export function usePresentationToolbarHeight(
+   isPresenting: boolean,
+   dockRef: RefObject<HTMLDivElement | null>,
+-  dockVisible: boolean,
++  // Visibility only changes opacity/presence, never the reserved content slot.
++  _dockVisible: boolean,
+ ) {
+   const toolbarRef = useRef<HTMLDivElement>(null);
+   const [toolbarHeight, setToolbarHeight] = useState(176);
+@@ -17,7 +18,7 @@
+     if (!isPresenting) return;
+     const toolbar = toolbarRef.current;
+     if (!toolbar) return;
+-    const dock = dockVisible ? dockRef.current : null;
++    const dock = dockRef.current;
+     // The canvas and the stable iframe portal are siblings of Roundtable. Put
+     // this inset on their classroom ancestor, never on documentElement. Padding
+     // the real canvas shrinks the measured slot and the child scroll viewport;
+@@ -30,7 +31,9 @@
+     let ownsInset = true;
+     const measure = () => {
+       const toolbarSize = toolbar.offsetHeight;
+-      const dockSize = dock ? dock.offsetHeight : 0;
++      // Reserve the dock even when auto-hidden. Otherwise a pointerdown that
++      // reveals controls moves the content before pointerup and loses the tap.
++      const dockSize = Math.max(76, dockRef.current?.offsetHeight ?? 0);
+       setToolbarHeight(toolbarSize);
+       setDockHeight(dockSize);
+       // Match the dock's 12px gap above the toolbar, plus a 12px content gap.
+@@ -59,7 +62,7 @@
+         else root.style.removeProperty(property);
+       }
+     };
+-  }, [isPresenting, dockRef, dockVisible]);
++  }, [isPresenting, dockRef]);
+ 
+   return { toolbarRef, toolbarHeight, dockHeight };
+ }
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1687,3 +1687,32 @@
+     padding-bottom: var(--mira-presentation-content-inset, 276px);
+   }
+ }
++
++/* Short landscape reserves two stable rows: narration/discussion above the
++ * navigation row. Showing chrome never moves a pressed activity control. */
++@media (min-width: 641px) and (max-height: 500px) {
++  [data-mira-classroom-root]:fullscreen [data-mira-canvas-area] {
++    box-sizing: border-box;
++    padding-bottom: var(--mira-presentation-content-inset, 176px);
++  }
++  [data-mira-presentation-chrome] [data-mira-left-speech] {
++    position: fixed;
++    left: 8px;
++    bottom: calc(var(--mira-presentation-toolbar-height, 76px) + 12px);
++  }
++  [data-mira-presentation-chrome] [data-mira-presentation-dock] {
++    bottom: calc(var(--mira-presentation-toolbar-height, 76px) + 12px);
++    right: 8px !important;
++  }
++  [data-mira-presentation-chrome] [data-mira-presentation-toolbar] {
++    right: 0 !important;
++    padding-inline: 4px;
++  }
++  [data-mira-presentation-chrome] [data-mira-presentation-toolbar] > div { max-width: 100%; padding: 4px; }
++  [data-mira-presentation-chrome] [data-mira-chrome="playback-controls"] { height: auto; padding: 0; gap: 0; }
++  [data-mira-presentation-chrome] [data-mira-chrome="playback-controls"] button,
++  [data-mira-presentation-chrome] [data-mira-discussion-rail="dock"] > button {
++    box-sizing: border-box; min-width: 48px; min-height: 48px; height: 48px; flex-shrink: 0;
++  }
++  [data-mira-presentation-chrome] [data-mira-chrome="playback-controls"] [data-mira-indicator="toolbar-divider"] { display: none; }
++}
+diff --git a/components/scene-renderers/picture-quiz-layout.module.css b/components/scene-renderers/picture-quiz-layout.module.css
+--- a/components/scene-renderers/picture-quiz-layout.module.css
++++ b/components/scene-renderers/picture-quiz-layout.module.css
+@@ -63,3 +63,14 @@
+   }
+   .root [data-quiz-option-group] { grid-column: 2; grid-row: 3; }
+ }
++
++/* Both chrome rows remain visible on a phone in landscape. The spoken prompt
++ * and scene sit beside the picture answers in the remaining short slot. */
++@container picture-quiz (min-width: 561px) and (max-height: 260px) {
++  .root[data-quiz-phase="answering"] [data-quiz-picture-card] { grid-template-columns: minmax(0, .85fr) minmax(0, 1.5fr); }
++  .root [data-quiz-question-heading] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
++  .root [data-quiz-scene-picture] { grid-column: 1; grid-row: 1; height: 80px; margin: 0; }
++  .root [data-quiz-picture-card] > div:has(> button) { grid-column: 1; grid-row: 2; margin: 0; }
++  .root [data-quiz-option-group] { grid-column: 2; grid-row: 1 / 3; align-self: center; }
++  .root [data-quiz-option-group] button { height: clamp(100px, calc(100cqh - 86px), 140px); }
++}
+diff --git a/components/scene-renderers/fixed-textbook-picture-layout.module.css b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+--- a/components/scene-renderers/fixed-textbook-picture-layout.module.css
++++ b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+@@ -161,3 +161,15 @@
+   .scenePicture { height: 100%; max-height: 180px; }
+   .question { height: 100%; }
+ }
++
++@container fixed-picture-quiz (min-width: 561px) and (max-height: 260px) {
++  .shell { padding: 4px; gap: 2px; }
++  .header { min-height: 0; height: 0; overflow: hidden; }
++  .fieldset { padding: 4px 6px; }
++  .task { grid-template-columns: minmax(0, .85fr) minmax(0, 1.5fr); grid-template-rows: minmax(80px, 1fr) 48px; gap: 4px 10px; }
++  .question { display: contents; }
++  .question > p { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
++  .scenePicture { grid-column: 1; grid-row: 1; height: 100%; min-height: 80px; }
++  .question > div:not([role="radiogroup"]) { grid-column: 1; grid-row: 2; }
++  .question .options { grid-column: 2; grid-row: 1 / 3; height: 100%; min-height: 100px; }
++}
+diff --git a/tests/roundtable/fullscreen-touch-layout.browser.test.ts b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+--- a/tests/roundtable/fullscreen-touch-layout.browser.test.ts
++++ b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+@@ -14,7 +14,7 @@
+       // CanvasToolbar, layout measurement, fullscreen and pooled iframe are real.
+       const mocks: Record<string, string> = {
+         "@/lib/hooks/use-i18n": `export const useI18n=()=>({t:k=>k});`,
+-        "@/lib/store": `export const useStageStore=f=>f({stage:{fixedTextbook:true},scenes:[]});`,
++        "@/lib/store": `export const useStageStore=f=>f({stage:{fixedTextbook:true},currentSceneId:"one",scenes:[{id:"one",content:{type:"interactive"}}]});`,
+         "@/lib/store/stage": `const s={scenes:[]};export const useStageStore=f=>f(s);useStageStore.getState=()=>s;`,
+         "@/lib/store/settings": `const s={ttsMuted:false,ttsEnabled:true,asrEnabled:false,ttsVolume:1,chatAreaWidth:320,playbackSpeed:1,setTTSMuted(){},setTTSVolume(){},setPlaybackSpeed(){}};export const useSettingsStore=f=>f(s);export const PLAYBACK_SPEEDS=[1,1.5,2];`,
+         "@/lib/hooks/use-audio-recorder": `export const useAudioRecorder=()=>({isRecording:false,isProcessing:false,startRecording(){},stopRecording(){},cancelRecording(){}});`,
+@@ -22,14 +22,13 @@
+         "@/lib/mira/student-interaction-bridge": `export const studentInteractionObjectives=()=>[];export const connectStudentInteractionFrame=()=>()=>{};export const STUDENT_INTERACTION_OBSERVER='';`,
+         "@/lib/mira/student-runtime": `export const getMiraEffectiveAsrEnabled=()=>false;`,
+         "@/lib/orchestration/registry/store": `export const useAgentRegistry={getState:()=>({getAgent:()=>undefined})};`,
+-        "@/components/roundtable/presentation-speech-overlay": `export const PresentationSpeechOverlay=()=>null;`,
+         "@/components/chat/proactive-card": `export const ProactiveCard=()=>null;`,
+         "@/components/ui/avatar-display": `import React from 'react';export const AvatarDisplay=({alt})=><span>{alt}</span>;`,
+         "@/lib/store/canvas": `const s={pickTarget:null,setPickTarget(){}};export const useCanvasStore={use:{pickTarget:()=>null},getState:()=>s};`,
+         "@/lib/store/element-refs": `const refs=[];export const useElementRefsStore={use:{refs:()=>refs},getState:()=>({refs})};`,
+       };
+       const html =
+-        '<!doctype html><meta name="mira-responsive-activity" content="low-reading-v1"><style>html,body{height:100%;margin:0;overflow:auto}body{box-sizing:border-box;padding:8px}button{min-width:90px;min-height:56px}footer{display:flex;gap:12px}</style><button id="make">Save plant</button><output id="album">0</output><div style="height:1100px"></div><footer><button id="bottomSave">Save bottom</button><button id="bottomReplay">Replay bottom</button></footer><script>window.documentToken=Math.random().toString(36);window.cards=0;window.bottomSaves=0;window.bottomReplays=0;window.recordedCueState="ready";make.onclick=()=>{album.textContent=String(++cards)};bottomSave.onclick=()=>++window.bottomSaves;bottomReplay.onclick=()=>++window.bottomReplays;</script>';
++        '<!doctype html><meta name="mira-responsive-activity" content="low-reading-v1"><style>html,body{height:100%;margin:0;overflow:auto}body{box-sizing:border-box;padding:8px}button{min-width:90px;min-height:56px}footer{display:flex;gap:12px}</style><button id="make">Save plant</button><output id="album">0</output><button id="start" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%)">Start activity</button><div style="height:1100px"></div><footer><button id="bottomSave">Save bottom</button><button id="bottomReplay">Replay bottom</button></footer><script>window.documentToken=Math.random().toString(36);window.cards=0;window.starts=0;start.onclick=()=>++window.starts;window.bottomSaves=0;window.bottomReplays=0;window.recordedCueState="ready";make.onclick=()=>{album.textContent=String(++cards)};bottomSave.onclick=()=>++window.bottomSaves;bottomReplay.onclick=()=>++window.bottomReplays;</script>';
+       const bundle = await build({
+         stdin: {
+           resolveDir: process.cwd(),
+@@ -41,9 +40,9 @@
+ import {InteractiveRenderer} from './components/scene-renderers/interactive-renderer';
+ import {useInteractiveIframePool} from './lib/store/interactive-iframe-pool';
+ const html=${JSON.stringify(html)};
+-function App(){const [root,setRoot]=useState(null);const [full,setFull]=useState(false);const [playing,setPlaying]=useState(false);const [chat,setChat]=useState(true);const [sidebar,setSidebar]=useState(true);const [visible,setVisible]=useState(true);window.setControlsVisible=setVisible;window.unmount=()=>createRootInstance.unmount();
++function App(){const [root,setRoot]=useState(null);const [full,setFull]=useState(false);const [playing,setPlaying]=useState(false);const [chat,setChat]=useState(true);const [sidebar,setSidebar]=useState(true);const [visible,setVisible]=useState(true);window.setControlsVisible=setVisible;const [speech,setSpeech]=useState(false);window.setSpeech=setSpeech;window.unmount=()=>createRootInstance.unmount();
+ useEffect(()=>{const fn=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',fn);return()=>document.removeEventListener('fullscreenchange',fn)},[]);
+-return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white','--mira-presentation-content-inset':'7px'}}><div data-mira-canvas-area style={{height:'100%',boxSizing:'border-box'}}><div style={{height:'100%',padding:8,boxSizing:'border-box'}}><InteractiveRenderer content={{type:'interactive',html,url:''}} sceneId='one'/></div></div><div style={{position:'absolute',bottom:0,width:'100%'}}> <Roundtable initialParticipants={[]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={playing?'playing':'idle'} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};const createRootInstance=createRoot(document.querySelector('#app'));createRootInstance.render(<App/>);`,
++return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white','--mira-presentation-content-inset':'7px'}}><div data-mira-canvas-area style={{height:'100%',boxSizing:'border-box'}}><div style={{height:'100%',padding:8,boxSizing:'border-box'}}><InteractiveRenderer content={{type:'interactive',html,url:''}} sceneId='one'/></div></div><div style={{position:'absolute',bottom:0,width:'100%'}}> <Roundtable playbackView={speech?{phase:'lecturePaused',bubbleRole:'teacher',sourceText:'Recorded teacher instruction',buttonState:'play',isInLiveFlow:false}:undefined} initialParticipants={[]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={playing?'playing':'idle'} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};const createRootInstance=createRoot(document.querySelector('#app'));createRootInstance.render(<App/>);`,
+         },
+         bundle: true,
+         write: false,
+@@ -75,6 +74,7 @@
+       const source = [
+         "components/roundtable/index.tsx",
+         "components/canvas/canvas-toolbar.tsx",
++        "components/roundtable/presentation-speech-overlay.tsx",
+       ]
+         .map((p) => readFileSync(p, "utf8"))
+         .join("\n");
+@@ -369,6 +369,65 @@
+               })),
+             ).toEqual({ token, cards: 1, cue: "ready" });
+           }
++          // Real teacher controls yield a safe row to the live iframe.
++          for (const viewport of [{width:844,height:390},{width:667,height:375}]) {
++          await page.setViewportSize(viewport);
++          await page.evaluate(() => (window as any).setSpeech(true));
++          await page.getByRole('button', { name: 'stage.fullscreen', exact: true }).click();
++          await page.waitForFunction(() => !!document.fullscreenElement);
++          if (await page.locator('[data-mira-composer]').count()) await page.locator('[data-mira-presentation-backdrop]').click({position:{x:3,y:3}});
++          await page.locator('[data-mira-composer]').waitFor({state:'detached'});
++          const pill = page.locator('[data-mira-collapsed-speech]');
++          await pill.waitFor();
++          await page.waitForFunction(() => {
++            const p = document.querySelector('[data-mira-collapsed-speech]')?.getBoundingClientRect();
++            const f = document.querySelector('iframe')?.getBoundingClientRect();
++            return p && f && f.bottom + 4 <= p.top;
++          });
++          await page.waitForFunction(() => Array.from(document.querySelectorAll('[data-mira-collapsed-speech] button')).every(b => b.getBoundingClientRect().height >= 48));
++          for (const control of await pill.locator('button').all()) {
++            const box = (await control.boundingBox())!;
++            expect(box.width).toBeGreaterThanOrEqual(48);
++            expect(box.height).toBeGreaterThanOrEqual(48);
++            const hit=await control.evaluate(b => {const r=b.getBoundingClientRect(),e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return {ok:b.contains(e),rect:r.toJSON(),hit:e?.outerHTML.slice(0,500),ancestor:b.parentElement?.parentElement?.outerHTML.slice(0,400)};}); expect(hit.ok,JSON.stringify(hit)).toBe(true);
++          }
++          await pill.getByRole('button', {name:'edit.nav.expand roundtable.teacher'}).click();
++          const collapse = page.getByRole('button', {name:'edit.nav.collapse roundtable.teacher'});
++          await collapse.waitFor();
++          await page.waitForFunction(()=>document.querySelector('[data-mira-collapse-speech]')!.getBoundingClientRect().height>=48);
++          expect((await collapse.boundingBox())!.height).toBeGreaterThanOrEqual(48);
++          await collapse.focus();
++          await page.keyboard.press('Space');
++          await pill.waitFor();
++          const navigation = await page.locator('[data-mira-presentation-toolbar] button').evaluateAll(bs=>bs.map(b=>{const r=b.getBoundingClientRect();return {name:b.getAttribute('aria-label')||b.getAttribute('title'),width:r.width,height:r.height,x:r.x,right:r.right,hit:b.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))};}));
++          for(const control of navigation){expect(control.width,JSON.stringify({viewport,control})).toBeGreaterThanOrEqual(48);expect(control.height).toBeGreaterThanOrEqual(48);expect(control.x).toBeGreaterThanOrEqual(0);expect(control.right).toBeLessThanOrEqual(viewport.width);expect(control.hit,JSON.stringify({viewport,control})).toBe(true);}
++          await page.getByRole('button', {name:'stage.exitFullscreen',exact:true}).click();
++          await page.waitForFunction(() => !document.fullscreenElement);
++          }
++          await child!.locator('#start').evaluate(e=>(e as HTMLElement).style.display='block');
++          // Revealing chrome between real pointerdown/up cannot move the target.
++          for (const viewport of [{width:390,height:844},{width:320,height:568}]) {
++            await page.setViewportSize(viewport);
++            await page.getByRole('button', {name:'stage.fullscreen',exact:true}).click();
++            await page.waitForFunction(() => !!document.fullscreenElement);
++            await page.evaluate(() => (window as any).setControlsVisible(false));
++            await page.locator('[data-mira-discussion-rail="dock"]').waitFor({state:'detached'});
++            await page.waitForFunction(() => {const inset=parseFloat(document.querySelector<HTMLElement>('[data-mira-classroom-root]')!.style.getPropertyValue('--mira-presentation-content-inset'));return inset>100 && document.querySelector('iframe')!.getBoundingClientRect().bottom <= innerHeight-inset-7;});
++            const start = child!.getByRole('button',{name:'Start activity'});
++            const before=(await start.boundingBox())!;
++            const count=await child!.evaluate(()=>(window as any).starts);
++            await page.mouse.move(before.x+before.width/2,before.y+before.height/2);
++            await page.mouse.down();
++            await page.evaluate(() => (window as any).setControlsVisible(true));
++            await page.locator('[data-mira-discussion-rail="dock"]').waitFor();
++            const after=(await start.boundingBox())!;
++            expect(after.y, JSON.stringify({viewport,before,after})).toBe(before.y);
++            await page.mouse.up();
++            expect(await child!.evaluate(()=>(window as any).starts)).toBe(count+1);
++            await page.getByRole('button',{name:'stage.exitFullscreen',exact:true}).click();
++            await page.waitForFunction(() => !document.fullscreenElement);
++          }
++          await page.evaluate(() => (window as any).setSpeech(false));
+           // Outside the mobile breakpoint, original toolbar geometry is restored.
+           await page.setViewportSize({ width: 1280, height: 900 });
+           await page
+@@ -418,6 +477,6 @@
+       } finally {
+         await browser.close();
+       }
+-    }, 60000);
++    }, 90000);
+   },
+ );
+diff --git a/tests/scene-renderers/picture-quiz-layout.browser.test.ts b/tests/scene-renderers/picture-quiz-layout.browser.test.ts
+--- a/tests/scene-renderers/picture-quiz-layout.browser.test.ts
++++ b/tests/scene-renderers/picture-quiz-layout.browser.test.ts
+@@ -118,6 +118,8 @@
+               { width: 320, height: 390 },
+               { width: 390, height: 564 },
+               { width: 844, height: 300 },
++              { width: 844, height: 220 },
++              { width: 667, height: 205 },
+             ]) {
+               await page.setViewportSize(viewport);
+               await page.evaluate(

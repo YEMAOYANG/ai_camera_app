@@ -22,18 +22,41 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from content.textbook_catalog import digest
-from content.textbook_interactive_narration import AUDIO_BLOCK, interactive_cues, without_audio_helper
+from content.textbook_interactive_narration import (AUDIO_BLOCK, bind_interactive_audio,
+                                                     interactive_cues, without_audio_helper)
+from content.textbook_asr_source_reuse import decoded as origin_bytes, validate_audit as validate_origin_audit
+from content.textbook_pinyin_pronunciation import (PLAN_SCHEMA as PINYIN_PLAN_SCHEMA,
+                                                   policy_for_plan, validate_receipt_wav)
+from content.textbook_preview_audio_contract import validate_child_request_plan
+from core.errors import ApiError
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient, OpenMaicFullRuntimeError
 from scripts.narrate_textbook_batch import DEFAULT_CLASSROOM_DIRECTORY, load_candidate
 from services.textbook_batch_audio import (audio_language_policy_from_plan, build_audio_plan,
                                           narration_workload, save_json)
-from services.textbook_preview_audio import core_content
+from services.textbook_preview_audio import core_content, segment_request_plan, verify_segment_receipt
 from content.textbook_number_spelling import validate_page_number_equivalence
 from services.learning_media_materialization_service import asr_similarity_bps
 
 SCHEMA = "mira.textbook.private-preview-snapshot.v1"
+PINYIN_ORIGIN_SCHEMA = "mira.textbook.private-preview-snapshot.v2-pinyin-origin"
+PINYIN_ORIGIN_SOURCE_CONTRACT = {
+    "schemaVersion": "mira.textbook.private-preview-pinyin-origin-source.v1",
+    "audioPlanSchemaVersion": PINYIN_PLAN_SCHEMA,
+    "audioAuditSchemaVersion": "mira.textbook.audio-audit.v3-asr-origin",
+    "completeSpeechReceiptAndWavCoverage": True,
+    "interactiveHelperAndQuestionAudioBound": True,
+}
+LEGACY_FIXED_PLAYBACK_CONTRACT = {"schemaVersion": "mira.textbook.private-preview-playback.v1", "fixedTextbook": True}
+PLAYBACK_CONTRACT = {"schemaVersion": "mira.textbook.private-preview-playback.v2",
+                     "pageManagedNarration": True, "studentGrading": False}
 IDENTITY = re.compile(r"[A-Za-z0-9_-]{1,128}\Z")
 HASH = re.compile(r"[a-f0-9]{64}\Z")
+
+
+def _save_contract():
+    return {"api": "existing local GET/POST /api/classroom", "explicitSaveRequired": True,
+        "unknownAliasContent": "stop", "ambiguousPriorSaveAndAliasMissing": "stop_without_repost",
+        "existingExactAlias": "read_only_reconcile", "atomicCompareAndSwapAvailable": False}
 
 
 def file_hash(path):
@@ -73,11 +96,11 @@ def local_origin(value):
     return value.rstrip("/")
 
 
-def document(path, role):
+def document(path, role, *, container=dict):
     path = Path(path).resolve()
     raw = path.read_bytes()
     value = json.loads(raw)
-    if not isinstance(value, dict):
+    if not isinstance(value, container):
         raise ValueError("private_preview_document_invalid")
     return value, {"role": role, "path": str(path), "byteSha256": hashlib.sha256(raw).hexdigest(),
                    "canonicalSha256": digest(value)}
@@ -181,11 +204,326 @@ def verify_complete_audio(original, narrated, plan, audit, media_directory):
     return assets
 
 
-def make_alias(narrated, alias_id):
+def _media_path(value, runtime_origin, expected):
+    """Accept only this local runtime's exact media path."""
+    if not isinstance(value, str) or not value:
+        raise ValueError("private_preview_pinyin_audio_url_invalid")
+    parsed, runtime = urlparse(value), urlparse(runtime_origin)
+    if parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.params:
+        raise ValueError("private_preview_pinyin_audio_url_invalid")
+    if parsed.scheme or parsed.netloc:
+        if ((parsed.scheme, parsed.hostname, parsed.port) != (runtime.scheme, runtime.hostname, runtime.port)
+                or parsed.path != expected):
+            raise ValueError("private_preview_pinyin_audio_url_invalid")
+    elif value != expected or parsed.path != expected:
+        raise ValueError("private_preview_pinyin_audio_url_invalid")
+    return expected
+
+
+def verify_pinyin_playback_bindings(classroom, audio_ids, runtime_origin):
+    """Verify finite interactive and quiz playback against formal speech."""
+    if (not isinstance(classroom, dict) or not IDENTITY.fullmatch(str(classroom.get("id", "")))
+            or not isinstance(classroom.get("stage"), dict)
+            or classroom["stage"].get("id") != classroom["id"]
+            or "fixedTextbook" in classroom["stage"]
+            or "miraTextbookPreviewNarration" in classroom["stage"]
+            or not isinstance(classroom.get("scenes"), list)):
+        raise ValueError("private_preview_pinyin_source_classroom_invalid")
+    source_id = classroom["id"]
+    question_ids = set()
+    for scene in classroom["scenes"]:
+        actions = [item for item in scene.get("actions", [])
+                   if isinstance(item, dict) and item.get("type") == "speech"]
+        by_text = {}
+        for action in actions:
+            text = str(action.get("text") or "").strip()
+            request_id = action.get("audioId")
+            if not text or request_id not in audio_ids:
+                raise ValueError("private_preview_pinyin_speech_binding_mismatch")
+            path = f"/api/classroom-media/{source_id}/audio/{request_id}.wav"
+            _media_path(action.get("audioUrl"), runtime_origin, path)
+            by_text.setdefault(text, []).append(action)
+        if scene.get("type") == "interactive":
+            html = scene.get("content", {}).get("html")
+            if not isinstance(html, str):
+                raise ValueError("private_preview_pinyin_interactive_helper_invalid")
+            cues = interactive_cues(html)
+            without_audio_helper(html)
+            if not cues:
+                if AUDIO_BLOCK.findall(html):
+                    raise ValueError("private_preview_pinyin_interactive_helper_invalid")
+            else:
+                clips = {}
+                for cue in cues:
+                    matches = by_text.get(cue["text"], [])
+                    if len(matches) != 1:
+                        raise ValueError("private_preview_pinyin_interactive_helper_invalid")
+                    clips[cue["id"]] = _media_path(matches[0]["audioUrl"], runtime_origin,
+                        f"/api/classroom-media/{source_id}/audio/{matches[0]['audioId']}.wav")
+                if html != bind_interactive_audio(html, clips, source_id):
+                    raise ValueError("private_preview_pinyin_interactive_helper_invalid")
+        if scene.get("type") == "quiz":
+            questions = scene.get("content", {}).get("questions")
+            if not isinstance(questions, list) or not questions:
+                raise ValueError("private_preview_pinyin_question_audio_invalid")
+            for question in questions:
+                if (not isinstance(question, dict) or not IDENTITY.fullmatch(str(question.get("id", "")))
+                        or question["id"] in question_ids):
+                    raise ValueError("private_preview_pinyin_question_audio_invalid")
+                question_ids.add(question["id"])
+                matches = by_text.get(str(question.get("question") or "").strip(), [])
+                if len(matches) != 1:
+                    raise ValueError("private_preview_pinyin_question_audio_invalid")
+                action = matches[0]
+                expected = f"/api/classroom-media/{source_id}/audio/{action['audioId']}.wav"
+                _media_path(question.get("questionAudioUrl"), runtime_origin, expected)
+    return {"interactiveScenes": sum(s.get("type") == "interactive" for s in classroom["scenes"]),
+            "quizQuestions": len(question_ids)}
+
+
+def _archive_json(path, container=dict):
+    try:
+        value = json.loads(Path(path).read_text())
+    except (OSError, ValueError, TypeError):
+        raise ValueError("private_preview_pinyin_revision_archive_invalid")
+    if not isinstance(value, container):
+        raise ValueError("private_preview_pinyin_revision_archive_invalid")
+    return value
+
+
+def _receipt_ids(receipts):
+    if not isinstance(receipts, list):
+        raise ValueError("private_preview_pinyin_receipts_invalid")
+    ids = [item.get("requestId") for item in receipts if isinstance(item, dict)]
+    if len(ids) != len(receipts) or any(not IDENTITY.fullmatch(str(item or "")) for item in ids) \
+            or len(set(ids)) != len(ids):
+        raise ValueError("private_preview_pinyin_receipts_invalid")
+    return ids
+
+
+def verify_pinyin_revision_lineage(classroom, plan, receipts, folder, *,
+                                    expected_source_sha256, expected_core_sha256):
+    """Verify every committed narration amendment from its original source to final save."""
+    revision_root = Path(folder) / "narration-revisions"
+    if revision_root.is_symlink():
+        raise ValueError("private_preview_pinyin_revision_archive_invalid")
+    directories = ([item for item in revision_root.iterdir() if item.is_dir()]
+                   if revision_root.is_dir() else [])
+    if not directories:
+        if plan.get("coreSha256") != expected_core_sha256:
+            raise ValueError("private_preview_pinyin_final_revision_missing")
+        return {"revisionCount": 0, "activeRevisionCount": 0}, set()
+    if any(item.is_symlink() or not HASH.fullmatch(item.name) for item in directories):
+        raise ValueError("private_preview_pinyin_revision_archive_invalid")
+
+    original_plan_sha256 = digest(plan)
+    records = {}
+    for archive in directories:
+        revision = archive.name
+        required = ("source.json", "target-text.json", "target.json", "saved.json", "original-plan.json",
+                    "original-receipts.json", "new-receipts.json", "receipts.json", "plan.json",
+                    "intent.json", "amendment.json")
+        if any((archive / name).is_symlink() or not (archive / name).is_file() for name in required):
+            raise ValueError("private_preview_pinyin_revision_archive_invalid")
+        source = _archive_json(archive / "source.json")
+        target_text = _archive_json(archive / "target-text.json")
+        target = _archive_json(archive / "target.json")
+        saved = _archive_json(archive / "saved.json")
+        archived_parent = _archive_json(archive / "original-plan.json")
+        child = _archive_json(archive / "plan.json")
+        original_receipts = _archive_json(archive / "original-receipts.json", list)
+        new_receipts = _archive_json(archive / "new-receipts.json", list)
+        combined_receipts = _archive_json(archive / "receipts.json", list)
+        intent = _archive_json(archive / "intent.json")
+        amendment = _archive_json(archive / "amendment.json")
+        _receipt_ids(original_receipts)
+        _receipt_ids(new_receipts)
+        _receipt_ids(combined_receipts)
+
+        files = intent.get("files")
+        if (intent.get("revisionId") != revision or not isinstance(files, dict)
+                or intent.get("sha256") != digest({k: v for k, v in intent.items() if k != "sha256"})
+                or not {"source.json", "target-text.json", "original-plan.json", "original-receipts.json",
+                        "plan.json"}.issubset(files)):
+            raise ValueError("private_preview_pinyin_revision_archive_invalid")
+        for name, sha256 in files.items():
+            path = archive / name
+            if (Path(name).name != name or not HASH.fullmatch(str(sha256)) or path.is_symlink() or not path.is_file()
+                    or file_hash(path) != sha256):
+                raise ValueError("private_preview_pinyin_revision_archive_invalid")
+        if archived_parent != plan:
+            raise ValueError("private_preview_pinyin_revision_parent_mismatch")
+        try:
+            validate_child_request_plan(plan, child)
+        except (ApiError, ValueError, KeyError, TypeError):
+            raise ValueError("private_preview_pinyin_revision_parent_mismatch")
+        if (child.get("revisionId") != revision or child.get("parentPlanSha256") != original_plan_sha256
+                or child.get("classroomSha256") != digest(target_text)
+                or child.get("coreSha256") != digest(core_content(target_text))):
+            raise ValueError("private_preview_pinyin_revision_target_mismatch")
+        if (digest(teaching_core(target_text)) != digest(teaching_core(target))
+                or digest(teaching_core(target)) != digest(teaching_core(saved))
+                or persisted_content(target) != persisted_content(saved)):
+            raise ValueError("private_preview_pinyin_revision_target_mismatch")
+        source_sha256, saved_sha256 = digest(source), digest(saved)
+        if (amendment.get("revisionId") != revision
+                or amendment.get("intentSha256") != intent["sha256"]
+                or amendment.get("sourceSha256") != source_sha256
+                or amendment.get("targetSha256") != saved_sha256
+                or amendment.get("audioPlanSha256") != digest(child)
+                or amendment.get("sha256") != digest({k: v for k, v in amendment.items() if k != "sha256"})):
+            raise ValueError("private_preview_pinyin_revision_hash_mismatch")
+        if (len(combined_receipts) < len(original_receipts)
+                or combined_receipts[:len(original_receipts)] != original_receipts
+                or combined_receipts[len(original_receipts):] != new_receipts
+                or not new_receipts
+                or any(item.get("narrationRevisionId") != revision for item in new_receipts)):
+            raise ValueError("private_preview_pinyin_revision_receipts_invalid")
+        new_ids = amendment.get("newTtsRequestIds")
+        if (not isinstance(new_ids, list) or not new_ids or len(set(new_ids)) != len(new_ids)
+                or not set(new_ids).issubset(set(_receipt_ids(new_receipts)))):
+            raise ValueError("private_preview_pinyin_revision_receipts_invalid")
+        records[revision] = {"source": source, "sourceSha256": source_sha256,
+            "saved": saved, "savedSha256": saved_sha256, "plan": child,
+            "originalReceipts": original_receipts, "receipts": combined_receipts,
+            "newTtsRequestIds": set(new_ids)}
+
+    by_source = {record["sourceSha256"]: record for record in records.values()}
+    if len(by_source) != len(records):
+        raise ValueError("private_preview_pinyin_revision_chain_invalid")
+    saved_hashes = [record["savedSha256"] for record in records.values()]
+    if len(set(saved_hashes)) != len(saved_hashes):
+        raise ValueError("private_preview_pinyin_revision_chain_invalid")
+    roots = [record for record in records.values() if record["sourceSha256"] not in set(saved_hashes)]
+    if len(roots) != 1 or digest(teaching_core(roots[0]["source"])) != plan.get("coreSha256"):
+        raise ValueError("private_preview_pinyin_revision_chain_invalid")
+    ordered, current, seen = [], roots[0], set()
+    while current is not None:
+        revision = current["plan"]["revisionId"]
+        if revision in seen:
+            raise ValueError("private_preview_pinyin_revision_chain_invalid")
+        seen.add(revision)
+        ordered.append(current)
+        current = by_source.get(current["savedSha256"])
+    if (len(ordered) != len(records) or ordered[-1]["saved"] != classroom
+            or ordered[-1]["savedSha256"] != expected_source_sha256
+            or digest(teaching_core(ordered[-1]["saved"])) != expected_core_sha256):
+        raise ValueError("private_preview_pinyin_final_revision_missing")
+    previous = ordered[0]["originalReceipts"]
+    for record in ordered:
+        if record["originalReceipts"] != previous:
+            raise ValueError("private_preview_pinyin_revision_chain_invalid")
+        previous = record["receipts"]
+    if previous != receipts:
+        raise ValueError("private_preview_pinyin_revision_chain_invalid")
+    active_ids = {action.get("audioId") for scene in classroom.get("scenes", [])
+                  for action in scene.get("actions", []) if action.get("type") == "speech"}
+    active_revisions = {item.get("narrationRevisionId") for item in receipts
+                        if item.get("requestId") in active_ids and item.get("narrationRevisionId") is not None}
+    if (not active_revisions.issubset(records)
+            or not (ordered[-1]["newTtsRequestIds"] & active_ids)):
+        raise ValueError("private_preview_pinyin_final_revision_missing")
+    return {"revisionCount": len(ordered), "activeRevisionCount": len(active_revisions)}, set(records)
+
+
+def verify_pinyin_origin_complete(classroom, plan, receipts, audit, audio_directory, *,
+                                  runtime_origin, expected_source_sha256,
+                                  expected_core_sha256, expected_plan_sha256,
+                                  expected_speech_count):
+    """Rebuild every pinyin TTS/WAV/playback/origin-audit binding locally."""
+    if (not all(HASH.fullmatch(str(item)) for item in
+                (expected_source_sha256, expected_core_sha256, expected_plan_sha256))
+            or type(expected_speech_count) is not int or not 1 <= expected_speech_count <= 240):
+        raise ValueError("private_preview_pinyin_expected_identity_invalid")
+    if digest(classroom) != expected_source_sha256:
+        raise ValueError("private_preview_pinyin_source_sha256_mismatch")
+    if digest(teaching_core(classroom)) != expected_core_sha256:
+        raise ValueError("private_preview_pinyin_core_sha256_mismatch")
+    if (not isinstance(plan, dict) or plan.get("schemaVersion") != PINYIN_PLAN_SCHEMA
+            or digest(plan) != expected_plan_sha256):
+        raise ValueError("private_preview_pinyin_plan_sha256_mismatch")
+    policy_for_plan(plan)
+    runtime_origin = local_origin(runtime_origin)
+    audio_directory = Path(audio_directory).resolve()
+    if audio_directory.name != classroom.get("id"):
+        raise ValueError("private_preview_pinyin_audio_directory_invalid")
+    folder = audio_directory / "textbook-preview-audio"
+    audio_root = (audio_directory / "audio").resolve()
+    if not folder.is_dir() or not audio_root.is_dir():
+        raise ValueError("private_preview_pinyin_audio_directory_invalid")
+    scenes = classroom.get("scenes")
+    if not isinstance(scenes, list) or len({s.get("id") for s in scenes if isinstance(s, dict)}) != len(scenes):
+        raise ValueError("private_preview_pinyin_scene_identity_invalid")
+    speeches = [(scene, action) for scene in scenes for action in scene.get("actions", [])
+                if isinstance(action, dict) and action.get("type") == "speech"]
+    action_ids = [action.get("id") for _, action in speeches]
+    if (len(speeches) != expected_speech_count or len(set(action_ids)) != len(action_ids)
+            or any(not IDENTITY.fullmatch(str(item or "")) for item in action_ids)):
+        raise ValueError("private_preview_pinyin_speech_count_or_identity_mismatch")
+    receipt_ids = _receipt_ids(receipts)
+    by_id = {item["requestId"]: item for item in receipts}
+    audio_ids = [action.get("audioId") for _, action in speeches]
+    if (len(set(audio_ids)) != len(audio_ids) or not set(audio_ids).issubset(by_id)):
+        raise ValueError("private_preview_pinyin_receipt_coverage_mismatch")
+    lineage, revision_ids = verify_pinyin_revision_lineage(classroom, plan, receipts, folder,
+        expected_source_sha256=expected_source_sha256, expected_core_sha256=expected_core_sha256)
+    if not revision_ids and set(receipt_ids) != set(audio_ids):
+        raise ValueError("private_preview_pinyin_receipt_coverage_mismatch")
+    successful_wavs = {}
+    for receipt in receipts:
+        path = audio_root / f"{receipt['requestId']}.wav"
+        if receipt.get("status") == "succeeded" and receipt.get("completionUsable") is not False:
+            if path.is_symlink() or not path.is_file() or audio_root not in path.resolve().parents:
+                raise ValueError("private_preview_pinyin_wav_missing")
+            audio = path.read_bytes()
+            validate_receipt_wav(receipt, audio)
+            successful_wavs[receipt["requestId"]] = (path.resolve(), audio)
+        elif path.exists():
+            raise ValueError("private_preview_pinyin_wav_coverage_mismatch")
+    actual_wavs = {path.resolve() for path in audio_root.glob("*.wav") if path.is_file()}
+    if actual_wavs != {item[0] for item in successful_wavs.values()}:
+        raise ValueError("private_preview_pinyin_wav_coverage_mismatch")
+    assets, wavs, children = [], {}, {}
+    for scene, action in speeches:
+        receipt = by_id[action["audioId"]]
+        if receipt.get("status") != "succeeded" or receipt.get("completionUsable") is False:
+            raise ValueError("private_preview_pinyin_receipt_not_succeeded")
+        verify_segment_receipt(plan, receipt, scene, action, folder)
+        request_plan = segment_request_plan(plan, receipt, folder, text=action["text"])
+        children[(scene["id"], action["id"])] = (None if request_plan == plan else request_plan)
+        expected_url = f"/api/classroom-media/{classroom['id']}/audio/{action['audioId']}.wav"
+        _media_path(action.get("audioUrl"), runtime_origin, expected_url)
+        path, audio = successful_wavs[action["audioId"]]
+        wavs[(scene["id"], action["id"])] = audio
+        assets.append({"sceneId": scene["id"], "actionId": action["id"],
+            "textSha256": hashlib.sha256(action["text"].strip().encode()).hexdigest(),
+            "ttsRequestId": action["audioId"], "ttsReceiptSha256": digest(receipt),
+            "audioSha256": receipt["audioSha256"], "pcmSha256": receipt["pcmSha256"],
+            "audioUrl": action["audioUrl"], "path": str(path), "byteLength": len(audio)})
+    playback = verify_pinyin_playback_bindings(classroom, set(audio_ids), runtime_origin)
+    checked = validate_origin_audit(audit, plan=plan, classroom=classroom,
+        expected_source_sha256=expected_source_sha256)
+    if set(checked) != set(wavs):
+        raise ValueError("private_preview_pinyin_origin_audit_coverage_mismatch")
+    for key, (entry, _origin) in checked.items():
+        target = entry.get("target", {})
+        if (target.get("ttsReceipt") != by_id[entry["ttsRequestId"]]
+                or target.get("requestPlan") != children[key]
+                or origin_bytes(target.get("audioBase64")) != wavs[key]):
+            raise ValueError("private_preview_pinyin_origin_audit_source_mismatch")
+    return assets, {"speechCount": len(speeches), "wavCount": len(wavs),
+                    "receiptCount": len(audio_ids), "storedReceiptCount": len(receipts),
+                    "storedWavCount": len(actual_wavs), "originAuditSegmentCount": len(checked),
+                    **lineage, **playback}
+
+
+def make_alias(narrated, alias_id, *, fixed_textbook=False, narration_preview=False):
     if (not IDENTITY.fullmatch(alias_id) or len(alias_id) > 104 or not alias_id.startswith("tbprivate_")
             or alias_id == narrated.get("id") or narrated.get("stage", {}).get("id") != narrated.get("id")
             or set(narrated) - {"id", "createdAt", "stage", "scenes"}):
         raise ValueError("private_preview_alias_identity_invalid")
+    if narration_preview and (fixed_textbook or narrated["stage"].get("fixedTextbook") is True):
+        raise ValueError("private_preview_playback_contract_invalid")
     alias = deepcopy(narrated)
     source_id = narrated["id"]
     mapping = {scene["id"]: f"{alias_id}_s{index:03d}" for index, scene in enumerate(narrated["scenes"], 1)}
@@ -210,6 +548,13 @@ def make_alias(narrated, alias_id):
 
     alias = rewrite(alias)
     alias["id"], alias["stage"]["id"] = alias_id, alias_id
+    if fixed_textbook:
+        # Retain the exact behavior of earlier, explicitly recorded snapshots.
+        alias["stage"]["fixedTextbook"] = True
+    if narration_preview:
+        # Cue ownership is shared with delivery, but private quizzes retain
+        # their existing operator route rather than the student grading API.
+        alias["stage"]["miraTextbookPreviewNarration"] = True
     for scene in alias["scenes"]:
         old = scene["id"]
         scene["id"], scene["stageId"] = mapping[old], alias_id
@@ -237,7 +582,7 @@ def prepare_snapshot(candidate_directory, output, *, audio_audit_directory=None,
                                audio_language_policy=audio_language_policy_from_plan(plan)):
         raise ValueError("private_preview_audio_plan_mismatch")
     assets = verify_complete_audio(original, narrated, plan, audit, classroom_directory)
-    alias, mapping = make_alias(narrated, alias_id or "tbprivate_" + uuid4().hex[:24])
+    alias, mapping = make_alias(narrated, alias_id or "tbprivate_" + uuid4().hex[:24], narration_preview=True)
     manifest = {"schemaVersion": SCHEMA, "purpose": "private_operator_acceptance_preview_alias",
         "createdAt": datetime.now(timezone.utc).isoformat(), "publicationAllowed": False,
         "studentDeliveryAllowed": False, "runtimeOrigin": origin, "sourceClassroomId": original["id"],
@@ -248,12 +593,11 @@ def prepare_snapshot(candidate_directory, output, *, audio_audit_directory=None,
         "expectedRuntimeNarratedSha256": digest(persisted_content(narrated)),
         "aliasClassroomSha256": digest(alias), "aliasPersistedSha256": digest(persisted_content(alias)),
         "sceneIdMapping": mapping, "audioUrlsRewritten": False, "mediaUrlsRewritten": False,
+        "playbackContract": deepcopy(PLAYBACK_CONTRACT),
         "htmlRewritten": False, "sourceCandidateModified": False, "providerCalls": 0,
         "semanticPronunciationReview": audit.get("semanticPronunciationReview", "pending"),
         "interactiveStateNarrationReview": audit.get("interactiveStateNarrationReview", "pending"),
-        "saveContract": {"api": "existing local GET/POST /api/classroom", "explicitSaveRequired": True,
-            "unknownAliasContent": "stop", "ambiguousPriorSaveAndAliasMissing": "stop_without_repost",
-            "existingExactAlias": "read_only_reconcile", "atomicCompareAndSwapAvailable": False}}
+        "saveContract": _save_contract()}
     verify_sources(manifest)
     manifest["snapshotSha256"] = digest(manifest)
     output.mkdir(parents=True)
@@ -263,12 +607,101 @@ def prepare_snapshot(candidate_directory, output, *, audio_audit_directory=None,
     return manifest
 
 
+def prepare_pinyin_snapshot(classroom_path, audio_directory, audio_audit_path, output, *,
+                            expected_source_sha256, expected_core_sha256,
+                            expected_plan_sha256, expected_speech_count,
+                            runtime_origin="http://127.0.0.1:3100", alias_id=None):
+    """Prepare a v3-pinyin/origin-audit alias without network or runtime writes."""
+    classroom_path, audio_directory = Path(classroom_path).resolve(), Path(audio_directory).resolve()
+    audio_audit_path, output = Path(audio_audit_path).resolve(), Path(output).resolve()
+    if (output.exists() or output == audio_directory or audio_directory in output.parents
+            or output == classroom_path.parent or output == audio_audit_path.parent):
+        raise ValueError("private_preview_requires_new_separate_output_directory")
+    origin = local_origin(runtime_origin)
+    roles = [("classroom", classroom_path, dict),
+        ("audioPlan", audio_directory / "textbook-preview-audio" / "plan.json", dict),
+        ("audioReceipts", audio_directory / "textbook-preview-audio" / "receipts.json", list),
+        ("audioAudit", audio_audit_path, dict)]
+    loaded, evidence = {}, []
+    for role, path, container in roles:
+        loaded[role], source = document(path, role, container=container)
+        evidence.append(source)
+    classroom, plan = loaded["classroom"], loaded["audioPlan"]
+    receipts, audit = loaded["audioReceipts"], loaded["audioAudit"]
+    assets, verification = verify_pinyin_origin_complete(classroom, plan, receipts, audit, audio_directory,
+        runtime_origin=origin, expected_source_sha256=expected_source_sha256,
+        expected_core_sha256=expected_core_sha256, expected_plan_sha256=expected_plan_sha256,
+        expected_speech_count=expected_speech_count)
+    alias, mapping = make_alias(classroom, alias_id or "tbprivate_" + uuid4().hex[:24], narration_preview=True)
+    source_contract = {**deepcopy(PINYIN_ORIGIN_SOURCE_CONTRACT),
+        "expectedSpeechCount": expected_speech_count, "sourceAudioDirectory": str(audio_directory),
+        "sourceSha256": expected_source_sha256, "coreSha256": expected_core_sha256,
+        "planSha256": expected_plan_sha256, "receiptsSha256": digest(receipts),
+        "audioAuditSha256": digest(audit)}
+    manifest = {"schemaVersion": PINYIN_ORIGIN_SCHEMA,
+        "purpose": "private_operator_acceptance_preview_alias", "createdAt": datetime.now(timezone.utc).isoformat(),
+        "publicationAllowed": False, "studentDeliveryAllowed": False, "runtimeOrigin": origin,
+        "sourceClassroomId": classroom["id"], "aliasClassroomId": alias["id"],
+        "taskId": plan["previewKey"], "binding": plan["binding"], "teacher": plan["teacher"],
+        "sourceDocuments": evidence, "audioAssets": assets, "sourceSha256": expected_source_sha256,
+        "audioPlanSha256": expected_plan_sha256, "audioReceiptsSha256": digest(receipts),
+        "audioAuditSha256": digest(audit), "narratedClassroomSha256": digest(classroom),
+        "expectedRuntimeCoreSha256": expected_core_sha256,
+        "expectedRuntimeNarratedSha256": digest(persisted_content(classroom)),
+        "aliasClassroomSha256": digest(alias), "aliasPersistedSha256": digest(persisted_content(alias)),
+        "sceneIdMapping": mapping, "audioUrlsRewritten": False, "mediaUrlsRewritten": False,
+        "playbackContract": deepcopy(PLAYBACK_CONTRACT), "pinyinOriginSourceContract": source_contract,
+        "verification": verification, "htmlRewritten": False, "sourceCandidateModified": False,
+        "providerCalls": 0, "saveContract": _save_contract()}
+    verify_sources(manifest)
+    manifest["snapshotSha256"] = digest(manifest)
+    output.mkdir(parents=True)
+    save_json(output / "source-narrated-classroom.json", classroom)
+    save_json(output / "classroom.json", alias)
+    save_json(output / "snapshot.json", manifest)
+    return manifest
+
+
+def _verify_pinyin_snapshot_sources(manifest, narrated):
+    contract = manifest.get("pinyinOriginSourceContract")
+    if (not isinstance(contract, dict)
+            or {k: contract.get(k) for k in PINYIN_ORIGIN_SOURCE_CONTRACT} != PINYIN_ORIGIN_SOURCE_CONTRACT
+            or set(contract) != set(PINYIN_ORIGIN_SOURCE_CONTRACT) | {"expectedSpeechCount", "sourceAudioDirectory",
+                "sourceSha256", "coreSha256", "planSha256", "receiptsSha256", "audioAuditSha256"}):
+        raise ValueError("private_preview_pinyin_source_contract_invalid")
+    sources = manifest.get("sourceDocuments")
+    if not isinstance(sources, list) or {item.get("role") for item in sources if isinstance(item, dict)} != {
+            "classroom", "audioPlan", "audioReceipts", "audioAudit"} or len(sources) != 4:
+        raise ValueError("private_preview_pinyin_source_contract_invalid")
+    loaded = {}
+    for source in sources:
+        container = list if source["role"] == "audioReceipts" else dict
+        value, actual = document(source["path"], source["role"], container=container)
+        if actual != source:
+            raise ValueError("private_preview_source_document_changed")
+        loaded[source["role"]] = value
+    if (loaded["classroom"] != narrated or manifest.get("sourceSha256") != contract["sourceSha256"]
+            or manifest.get("audioPlanSha256") != contract["planSha256"]
+            or manifest.get("audioReceiptsSha256") != contract["receiptsSha256"]
+            or manifest.get("audioAuditSha256") != contract["audioAuditSha256"]
+            or manifest.get("expectedRuntimeCoreSha256") != contract["coreSha256"]):
+        raise ValueError("private_preview_pinyin_source_contract_invalid")
+    assets, verification = verify_pinyin_origin_complete(loaded["classroom"], loaded["audioPlan"],
+        loaded["audioReceipts"], loaded["audioAudit"], contract["sourceAudioDirectory"],
+        runtime_origin=manifest["runtimeOrigin"], expected_source_sha256=contract["sourceSha256"],
+        expected_core_sha256=contract["coreSha256"], expected_plan_sha256=contract["planSha256"],
+        expected_speech_count=contract["expectedSpeechCount"])
+    if assets != manifest.get("audioAssets") or verification != manifest.get("verification"):
+        raise ValueError("private_preview_pinyin_source_contract_invalid")
+
+
 def load_snapshot(directory):
     directory = Path(directory).resolve()
     manifest = json.loads((directory / "snapshot.json").read_text())
     alias = json.loads((directory / "classroom.json").read_text())
     narrated = json.loads((directory / "source-narrated-classroom.json").read_text())
-    if (manifest.get("schemaVersion") != SCHEMA or manifest.get("publicationAllowed") is not False
+    if (manifest.get("schemaVersion") not in {SCHEMA, PINYIN_ORIGIN_SCHEMA}
+            or manifest.get("publicationAllowed") is not False
             or manifest.get("studentDeliveryAllowed") is not False
             or manifest.get("snapshotSha256") != digest({k: v for k, v in manifest.items() if k != "snapshotSha256"})
             or manifest.get("aliasClassroomSha256") != digest(alias)
@@ -277,11 +710,22 @@ def load_snapshot(directory):
             or manifest.get("expectedRuntimeNarratedSha256") != digest(persisted_content(narrated))
             or manifest.get("expectedRuntimeCoreSha256") != digest(teaching_core(narrated))):
         raise ValueError("private_preview_snapshot_integrity_failed")
-    expected, mapping = make_alias(narrated, manifest["aliasClassroomId"])
+    # Old saved previews retain their exact identity and original behavior.
+    # New previews explicitly record the metadata change in their hashed receipt.
+    playback = manifest.get("playbackContract")
+    if "playbackContract" in manifest and playback not in (PLAYBACK_CONTRACT, LEGACY_FIXED_PLAYBACK_CONTRACT):
+        raise ValueError("private_preview_playback_contract_invalid")
+    expected, mapping = make_alias(narrated, manifest["aliasClassroomId"],
+        fixed_textbook=playback == LEGACY_FIXED_PLAYBACK_CONTRACT, narration_preview=playback == PLAYBACK_CONTRACT)
     if expected != alias or mapping != manifest.get("sceneIdMapping"):
         raise ValueError("private_preview_alias_content_changed")
     local_origin(manifest["runtimeOrigin"])
     verify_sources(manifest)
+    if manifest["schemaVersion"] == PINYIN_ORIGIN_SCHEMA:
+        if (playback != PLAYBACK_CONTRACT or alias.get("stage", {}).get("miraTextbookPreviewNarration") is not True
+                or "fixedTextbook" in alias.get("stage", {})):
+            raise ValueError("private_preview_playback_contract_invalid")
+        _verify_pinyin_snapshot_sources(manifest, narrated)
     return directory, manifest, alias
 
 
@@ -367,6 +811,18 @@ def main(argv=None):
     prepare.add_argument("--classroom-directory", type=Path, default=DEFAULT_CLASSROOM_DIRECTORY)
     prepare.add_argument("--output", type=Path, required=True)
     prepare.add_argument("--alias-id")
+    pinyin = commands.add_parser("prepare-pinyin-origin",
+        help="Pure local v3-pinyin/origin-audit preparation; no API or provider calls")
+    pinyin.add_argument("--classroom", type=Path, required=True)
+    pinyin.add_argument("--audio-directory", type=Path, required=True)
+    pinyin.add_argument("--audio-audit", type=Path, required=True)
+    pinyin.add_argument("--source-sha256", required=True)
+    pinyin.add_argument("--core-sha256", required=True)
+    pinyin.add_argument("--plan-sha256", required=True)
+    pinyin.add_argument("--expected-speech-count", type=int, required=True)
+    pinyin.add_argument("--runtime-origin", default="http://127.0.0.1:3100")
+    pinyin.add_argument("--output", type=Path, required=True)
+    pinyin.add_argument("--alias-id")
     save = commands.add_parser("save", help="Explicitly save the prepared alias over the existing local API")
     save.add_argument("--snapshot-directory", type=Path, required=True)
     save.add_argument("--expected-runtime-core-sha256")
@@ -376,6 +832,12 @@ def main(argv=None):
             result = prepare_snapshot(args.candidate_directory, args.output,
                 audio_audit_directory=args.audio_audit_directory, classroom_directory=args.classroom_directory,
                 alias_id=args.alias_id)
+            status = "prepared_private_preview_not_saved"
+        elif args.command == "prepare-pinyin-origin":
+            result = prepare_pinyin_snapshot(args.classroom, args.audio_directory, args.audio_audit, args.output,
+                expected_source_sha256=args.source_sha256, expected_core_sha256=args.core_sha256,
+                expected_plan_sha256=args.plan_sha256, expected_speech_count=args.expected_speech_count,
+                runtime_origin=args.runtime_origin, alias_id=args.alias_id)
             status = "prepared_private_preview_not_saved"
         else:
             _, manifest, _ = load_snapshot(args.snapshot_directory)

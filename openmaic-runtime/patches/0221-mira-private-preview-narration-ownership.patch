@@ -1,0 +1,150 @@
+diff --git a/lib/mira/page-managed-narration.ts b/lib/mira/page-managed-narration.ts
+--- a/lib/mira/page-managed-narration.ts
++++ b/lib/mira/page-managed-narration.ts
+@@ -1,5 +1,21 @@
+ import type { Scene } from '@/lib/types/stage';
+ import { fixedQuizManagedSpeechIds } from './fixed-quiz-narration';
++
++/** Private operator playback shares cue ownership, never student grading. */
++export function usesTextbookPageNarration(stage: unknown): boolean {
++  if (!stage || typeof stage !== 'object') return false;
++  const value = stage as { fixedTextbook?: unknown; miraTextbookPreviewNarration?: unknown };
++  return value.fixedTextbook === true || value.miraTextbookPreviewNarration === true;
++}
++
++/** Skipping page-owned speech emits no lecture audio. Do not briefly hide the
++ * active game's narration merely because the cursor traverses those actions. */
++export function lectureModeOwnsAudio(mode: string, scene: Scene, managed: ReadonlySet<string>): boolean {
++  if (mode === 'live') return true;
++  if (mode !== 'playing') return false;
++  const actions = scene.actions ?? [];
++  return !(actions.length > 0 && actions.every(action => action.type === 'speech' && managed.has(action.id)));
++}
+ 
+ function recordedPath(value: unknown): string | null {
+   if (typeof value !== 'string') return null;
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -56,7 +56,7 @@
+ import { isStudentParentPause } from '@/lib/mira/student-parent-pause';
+ import { useMiraStudentParentOrigins } from '@/lib/contexts/mira-student-runtime-context';
+ import { fixedQuizQuestionNarrationText } from '@/lib/mira/fixed-quiz-narration';
+-import { fixedPageManagedSpeechIds } from '@/lib/mira/page-managed-narration';
++import { fixedPageManagedSpeechIds, lectureModeOwnsAudio, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
+ import { classroomFullscreenRoot } from '@/lib/interactive/classroom-fullscreen-root';
+ import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import {
+@@ -349,7 +349,7 @@
+     const parentOrigins = useMiraStudentParentOrigins();
+     const engineRef = useRef<PlaybackEngine | null>(null);
+     useLayoutEffect(() => {
+-      const fixed = (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true;
++      const fixed = usesTextbookPageNarration(stage);
+       releasePageNarrationPause();
+       beginQuestionNarrationScene(fixed && currentScene?.type === 'quiz' ? currentScene.id : null);
+       return () => beginQuestionNarrationScene(null);
+@@ -370,7 +370,7 @@
+       const unsubscribeQuestion = subscribeQuestionNarration((sceneId, questionId) => {
+         const state = useStageStore.getState();
+         const text = fixedQuizQuestionNarrationText(state.getCurrentScene(),
+-          (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true, sceneId, questionId);
++          usesTextbookPageNarration(state.stage), sceneId, questionId);
+         if (text === null) return;
+         setLectureSpeech(text);
+         setLiveSpeech(null);
+@@ -784,7 +784,7 @@
+       let cancelled = false;
+       const initializeScene = async () => {
+         const managedPageSpeech = currentScene ? fixedPageManagedSpeechIds(
+-          currentScene, (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true,
++          currentScene, usesTextbookPageNarration(stage),
+         ) : new Set<string>();
+         const previousSceneId = activeSceneIdRef.current;
+         if (previousSceneId && previousSceneId !== currentScene?.id) {
+@@ -915,7 +915,7 @@
+           onModeChange: (mode) => {
+             setEngineMode(mode);
+             // Interactive pages keep their own teacher lines quiet meanwhile.
+-            setLectureSpeaking(mode === 'playing' || mode === 'live');
++            setLectureSpeaking(lectureModeOwnsAudio(mode, currentScene, managedPageSpeech));
+             if (mode === 'idle' && engine.isExhausted()) releaseQuestionNarrationScene(currentScene.id);
+           },
+           onProgress: (snapshot) => {
+diff --git a/tests/playback/page-managed-narration.test.ts b/tests/playback/page-managed-narration.test.ts
+--- a/tests/playback/page-managed-narration.test.ts
++++ b/tests/playback/page-managed-narration.test.ts
+@@ -1,5 +1,5 @@
+ import { afterEach, describe, expect, it, vi } from 'vitest';
+-import { fixedPageManagedSpeechIds } from '@/lib/mira/page-managed-narration';
++import { fixedPageManagedSpeechIds, lectureModeOwnsAudio, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
+ import { PlaybackEngine } from '@/lib/playback/engine';
+ import type { Scene } from '@/lib/types/stage';
+ import type { SpeechAction } from '@/lib/types/action';
+@@ -71,6 +71,26 @@
+ afterEach(() => vi.restoreAllMocks());
+ 
+ describe('fixed interactive recorded cue ownership', () => {
++  it('enables private cue arbitration without enabling the fixed student grading flag', () => {
++    const stage = { id: 'private-review', miraTextbookPreviewNarration: true };
++    expect(usesTextbookPageNarration(stage)).toBe(true);
++    expect('fixedTextbook' in stage).toBe(false);
++    expect(usesTextbookPageNarration({ fixedTextbook: true })).toBe(true);
++    for (const invalid of [null, {}, { miraTextbookPreviewNarration: 'true' }, { fixedTextbook: 1 }])
++      expect(usesTextbookPageNarration(invalid)).toBe(false);
++    expect(fixedPageManagedSpeechIds(activity(), usesTextbookPageNarration(stage)).size).toBe(cues.length);
++  });
++  it('does not claim lecture audio for skipped page cues, while preserving openings, actions and live discussions', () => {
++    const scene = activity(), managed = fixedPageManagedSpeechIds(scene, true);
++    expect(lectureModeOwnsAudio('playing', scene, managed)).toBe(false);
++    expect(lectureModeOwnsAudio('live', scene, managed)).toBe(true);
++    expect(lectureModeOwnsAudio('paused', scene, managed)).toBe(false);
++    expect(lectureModeOwnsAudio('playing', scene, new Set())).toBe(true);
++    const opening = { ...scene, actions: [{ id: 'opening', type: 'speech', text: '先观察。' }, ...scene.actions!] } as Scene;
++    expect(lectureModeOwnsAudio('playing', opening, managed)).toBe(true);
++    const effects = { ...scene, actions: [...scene.actions!, { id: 'focus', type: 'spotlight', elementId: 'target' }] } as Scene;
++    expect(lectureModeOwnsAudio('playing', effects, managed)).toBe(true);
++  });
+   it.each([false, true])('keeps feedback out of the real engine after gateway embedding (blob=%s)', async large => {
+     const scene=deliveredActivity(large);
+     if(scene.content.type!=='interactive') throw new Error();
+diff --git a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+--- a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
++++ b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+@@ -2,7 +2,12 @@
+ import { act, createElement } from 'react';
+ import { createRoot, type Root } from 'react-dom/client';
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+-import { ACTIVITY_AUDIO_EVENT } from '@/lib/mira/lecture-audio';
++import { ACTIVITY_AUDIO_EVENT, setLectureSpeaking } from '@/lib/mira/lecture-audio';
++import { lectureModeOwnsAudio } from '@/lib/mira/page-managed-narration';
++import { PlaybackEngine } from '@/lib/playback/engine';
++import type { Scene } from '@/lib/types/stage';
++import type { ActionEngine } from '@/lib/action/engine';
++import type { AudioPlayer } from '@/lib/utils/audio-player';
+ import { pausePageNarration, releasePageNarrationPause } from '@/lib/mira/page-narration';
+ import { InteractiveIframeHost } from '@/components/scene-renderers/InteractiveIframeHost';
+ import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
+@@ -168,4 +173,22 @@
+     act(() => releasePageNarrationPause());
+     expect(visibility(frame()).at(-1)![0].visible).toBe(true);
+   });
++  it('global Play traversing only page-owned cues never hides or cancels the active game', async () => {
++    prepare('one'); useInteractiveIframePool.getState().setActive('one');
++    await mountHost();
++    const first = frame(); messages.get(first)!.mockClear();
++    const scene = { id: 'one', stageId: 'room', order: 1, type: 'interactive', content: { type: 'interactive', html: '<main>game</main>' },
++      actions: [{ id: 'intro', type: 'speech', text: '请三位伙伴站进队圈。' }, { id: 'result', type: 'speech', text: '正好三位。' }] } as Scene;
++    const managed = new Set(['intro', 'result']);
++    const audio = { play: vi.fn(), stop: vi.fn(), pause: vi.fn(), onEnded: vi.fn() };
++    const engine = new PlaybackEngine([scene], { clearEffects: vi.fn(), resetPlaybackVisualState: vi.fn() } as unknown as ActionEngine,
++      audio as unknown as AudioPlayer, { isSpeechManagedByPage: id => managed.has(id),
++        onModeChange: mode => setLectureSpeaking(lectureModeOwnsAudio(mode, scene, managed)) });
++    await act(async () => { engine.start(); for (let i = 0; i < 8; i++) await Promise.resolve(); });
++    expect(engine.isExhausted()).toBe(true);
++    expect(audio.play).not.toHaveBeenCalled();
++    expect(visibility(first).some(([message]) => message.visible === false)).toBe(false);
++    expect(first.parentElement!.style.visibility).toBe('visible'); expect(frame()).toBe(first);
++    engine.stop();
++  });
+ });

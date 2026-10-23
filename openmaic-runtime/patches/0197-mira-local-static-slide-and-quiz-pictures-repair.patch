@@ -1,0 +1,644 @@
+diff --git a/lib/server/mira-textbook-rejected-scene-repair.ts b/lib/server/mira-textbook-rejected-scene-repair.ts
+--- a/lib/server/mira-textbook-rejected-scene-repair.ts
++++ b/lib/server/mira-textbook-rejected-scene-repair.ts
+@@ -3,6 +3,7 @@
+ import { constants, promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import { SVGPathData } from 'svg-pathdata';
++import { parseFragment } from 'parse5';
+ import { validateScene } from '@openmaic/dsl';
+ import { PgDocumentStore, type Queryable } from '@openmaic/storage/document/pg';
+ import { validateAppStage } from '@/lib/document-store/validators';
+@@ -67,6 +68,15 @@
+   revisedOptionVisualsPath: string;
+   revisedOptionVisualsSha256: string;
+ }
++/** Missing rejected quiz only: restore one frozen question's target and option pictures. */
++export interface QuizPicturesRepairInput {
++  jobDir: string;
++  archivePath: string;
++  archiveSha256: string;
++  questionId: string;
++  picturesPath: string;
++  picturesSha256: string;
++}
+ /** Missing rejected slide only: append pure shapes/images and optional speech-bound spotlights. */
+ export interface SlideRepairInput {
+   jobDir: string;
+@@ -75,12 +85,14 @@
+   appendElementsPath: string;
+   appendElementsSha256: string;
+ }
+-type RejectedRepairInput = RepairInput | QuizRepairInput | SlideRepairInput;
+-type RejectedRepairMode = 'html' | 'quiz' | 'slide';
++type RejectedRepairInput = RepairInput | QuizRepairInput | QuizPicturesRepairInput | SlideRepairInput;
++type RejectedRepairMode = 'html' | 'quiz' | 'quiz-pictures' | 'slide';
+ const rejectedContract = (mode: RejectedRepairMode) => mode === 'html'
+   ? { plan: 'mira.textbook.rejected-scene-repair-plan.v1', receipt: 'mira.textbook.rejected-scene-repair-receipt.v1', directory: 'textbook-rejected-scene-repairs' }
+   : mode === 'quiz'
+     ? { plan: 'mira.textbook.rejected-quiz-visual-repair-plan.v1', receipt: 'mira.textbook.rejected-quiz-visual-repair-receipt.v1', directory: 'textbook-rejected-quiz-visual-repairs' }
++    : mode === 'quiz-pictures'
++      ? { plan: 'mira.textbook.rejected-quiz-pictures-repair-plan.v1', receipt: 'mira.textbook.rejected-quiz-pictures-repair-receipt.v1', directory: 'textbook-rejected-quiz-pictures-repairs' }
+     : { plan: 'mira.textbook.rejected-slide-additions-repair-plan.v1', receipt: 'mira.textbook.rejected-slide-additions-repair-receipt.v1', directory: 'textbook-rejected-slide-additions-repairs' };
+ const jsonObject = (value: unknown): value is Json => !!value && typeof value === 'object' && !Array.isArray(value);
+ const solidColor = (v: unknown): v is string => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);
+@@ -169,8 +181,34 @@
+   check(textbookDigest(revised) !== textbookDigest(scene), 'NO_CHANGE');
+   return revised;
+ }
++async function revisedQuizPictures(scene: Json, input: QuizPicturesRepairInput) {
++  check(scene.type === 'quiz' && scene.content?.type === 'quiz' && Array.isArray(scene.content.questions) && scene.content.questions.length > 0, 'QUIZ_ONLY');
++  const questions = scene.content.questions as Json[];
++  check(questions.every(q => jsonObject(q) && typeof q.id === 'string' && q.id.length > 0) && new Set(questions.map(q => q.id)).size === questions.length, 'QUIZ_QUESTION_IDS');
++  check(typeof input.questionId === 'string' && questions.some(q => q.id === input.questionId), 'QUIZ_PICTURES_QUESTION');
++  const bytes = await privateRead(input.picturesPath);
++  check(digestBytes(bytes) === input.picturesSha256 && bytes.length > 0 && bytes.length <= 1024 * 1024, 'QUIZ_PICTURES_SHA');
++  let parsed: unknown;
++  try { parsed = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)); }
++  catch { fail('QUIZ_PICTURES_JSON'); }
++  check(jsonObject(parsed) && Object.keys(parsed).sort().join(',') === 'optionVisuals,visual', 'QUIZ_PICTURES_SHAPE');
++  const pictures = parsed as Json, question = questions.find(q => q.id === input.questionId)!;
++  check(jsonObject(pictures.optionVisuals) && Array.isArray(question.options) && question.options.length > 0 && Object.keys(pictures.optionVisuals).sort().join('\0') === question.options.map((o: Json) => o.value).sort().join('\0'), 'QUIZ_PICTURES_OPTIONS');
++  for (const visual of [pictures.visual, ...Object.values(pictures.optionVisuals)]) {
++    check(jsonObject(visual) && Object.keys(visual).sort().join(',') === 'alt,kind,src' && visual.kind === 'image' && typeof visual.src === 'string' && typeof visual.alt === 'string' && visual.alt.trim().length > 0, 'QUIZ_PICTURES_IMAGE');
++    check(visual.src.startsWith(`/api/classroom-media/${scene.stageId}/media/`) && /^\/api\/classroom-media\/[A-Za-z0-9_-]+\/media\/[A-Za-z0-9_.-]+\.png$/.test(visual.src), 'QUIZ_PICTURES_SOURCE');
++  }
++  const revised = structuredClone(scene), target = revised.content.questions.find((q: Json) => q.id === input.questionId);
++  // Only these two leaves change; the original question, answers, actions and
++  // every other question stay exact. The real guard proves frozen asset keys
++  // and physical file hashes again in both prepare and transactional run.
++  target.visual = structuredClone(pictures.visual);
++  target.optionVisuals = structuredClone(pictures.optionVisuals);
++  check(textbookDigest(revised) !== textbookDigest(scene), 'NO_CHANGE');
++  return revised;
++}
+ async function inputs(input: RejectedRepairInput, env: RepairEnvironment, mode: RejectedRepairMode = 'html') {
+-  const fields = mode === 'html' ? 'archivePath,archiveSha256,jobDir,revisedHtmlPath,revisedHtmlSha256' : mode === 'quiz' ? 'archivePath,archiveSha256,jobDir,revisedOptionVisualsPath,revisedOptionVisualsSha256' : 'appendElementsPath,appendElementsSha256,archivePath,archiveSha256,jobDir';
++  const fields = mode === 'html' ? 'archivePath,archiveSha256,jobDir,revisedHtmlPath,revisedHtmlSha256' : mode === 'quiz' ? 'archivePath,archiveSha256,jobDir,revisedOptionVisualsPath,revisedOptionVisualsSha256' : mode === 'quiz-pictures' ? 'archivePath,archiveSha256,jobDir,picturesPath,picturesSha256,questionId' : 'appendElementsPath,appendElementsSha256,archivePath,archiveSha256,jobDir';
+   check(Object.keys(input).sort().join(',') === fields, 'INPUT_SHAPE');
+   const dataDir = await fs.realpath(env.dataDir);
+   const archiveBytes = await privateRead(input.archivePath);
+@@ -182,7 +220,9 @@
+   const scene = JSON.parse(archive.sceneCanonicalJson);
+   check(textbookCanonical(scene) === archive.sceneCanonicalJson && textbookDigest(scene) === archive.sceneSha256 && scene.stageId === archive.stageId, 'ARCHIVE_SCENE_SHA');
+   let revised: Json;
+-  if (mode === 'slide') {
++  if (mode === 'quiz-pictures') {
++    revised = await revisedQuizPictures(scene, input as QuizPicturesRepairInput);
++  } else if (mode === 'slide') {
+     revised = await revisedSlide(scene, input as SlideRepairInput);
+   } else if (mode === 'quiz') {
+     revised = await revisedQuiz(scene, input as QuizRepairInput);
+@@ -212,6 +252,13 @@
+   const dispatch = JSON.parse((await privateRead(path.join(job, 'dispatch.json'))).toString());
+   const frozenFile = JSON.parse((await privateRead(path.join(job, 'frozen.json'))).toString());
+   check(dispatch.ownerFingerprint === ownerFingerprint && frozenFile.sceneContract?.sha256 === archive.contractSha256, 'JOB_BINDING');
++  if (mode === 'quiz-pictures') {
++    const locks = frozenFile.sceneContract?.contract?.lockedAssessments;
++    const lock = Array.isArray(locks) ? locks.find((q: Json) => q.id === (input as QuizPicturesRepairInput).questionId && q.page === scene.order) : undefined;
++    // This mode restores a required frozen target picture, never introduces one
++    // merely because the general quiz DSL permits an optional visual.
++    check(lock && typeof lock.visualAsset === 'string' && lock.visualAsset.trim().length > 0, 'QUIZ_PICTURES_FROZEN_TARGET');
++  }
+   const ledgerPath = path.join(dataDir, 'classrooms', archive.stageId, 'textbook-authoring-candidate.json');
+   const ledger = JSON.parse((await privateRead(ledgerPath)).toString());
+   unseal(ledger);
+@@ -368,6 +415,8 @@
+ export const runRejectedSceneRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runRejectedRepair(plan, approvedPlanSha256, env, 'html');
+ export const prepareRejectedQuizRepair = (input: QuizRepairInput, env: RepairEnvironment) => prepareRejectedRepair(input, env, 'quiz');
+ export const runRejectedQuizRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runRejectedRepair(plan, approvedPlanSha256, env, 'quiz');
++export const prepareRejectedQuizPicturesRepair = (input: QuizPicturesRepairInput, env: RepairEnvironment) => prepareRejectedRepair(input, env, 'quiz-pictures');
++export const runRejectedQuizPicturesRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runRejectedRepair(plan, approvedPlanSha256, env, 'quiz-pictures');
+ export const prepareRejectedSlideRepair = (input: SlideRepairInput, env: RepairEnvironment) => prepareRejectedRepair(input, env, 'slide');
+ export const runRejectedSlideRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runRejectedRepair(plan, approvedPlanSha256, env, 'slide');
+ 
+@@ -394,10 +443,23 @@
+   spotlightBindingsPath: string;
+   spotlightBindingsSha256: string;
+ }
+-type SavedRepairInput = SavedSceneRepairInput | SavedSlideSpotlightRepairInput;
+-type SavedRepairMode = 'html' | 'slide-spotlight';
++/** Narrow static edits to one saved slide; caller markup/actions are never accepted. */
++export interface SavedSlideStaticRepairInput {
++  jobDir: string;
++  stageId: string;
++  sceneId: string;
++  originalScenePath: string;
++  originalSceneFileSha256: string;
++  originalSceneSha256: string;
++  staticEditsPath: string;
++  staticEditsSha256: string;
++}
++type SavedRepairInput = SavedSceneRepairInput | SavedSlideSpotlightRepairInput | SavedSlideStaticRepairInput;
++type SavedRepairMode = 'html' | 'slide-spotlight' | 'slide-static';
+ const savedContract = (mode: SavedRepairMode) => mode === 'html'
+   ? { plan: 'mira.textbook.saved-scene-html-repair-plan.v1', receipt: 'mira.textbook.saved-scene-html-repair-receipt.v1', directory: 'textbook-saved-scene-repairs' }
++  : mode === 'slide-static'
++    ? { plan: 'mira.textbook.saved-slide-static-repair-plan.v1', receipt: 'mira.textbook.saved-slide-static-repair-receipt.v1', directory: 'textbook-saved-slide-static-repairs' }
+   : { plan: 'mira.textbook.saved-slide-spotlight-repair-plan.v1', receipt: 'mira.textbook.saved-slide-spotlight-repair-receipt.v1', directory: 'textbook-saved-slide-spotlight-repairs' };
+ async function revisedSavedSlideSpotlights(scene: Json, input: SavedSlideSpotlightRepairInput) {
+   check(scene.type === 'slide' && scene.content?.type === 'slide' && jsonObject(scene.content.canvas) && Array.isArray(scene.content.canvas.elements), 'SAVED_SLIDE_ONLY');
+@@ -436,9 +498,139 @@
+   revised.actions = actions.flatMap((a: Json) => before.has(a.id) ? [before.get(a.id), a] : [a]);
+   return revised;
+ }
++const staticKeys = (v: unknown, keys: string[]) => jsonObject(v) && Object.keys(v).sort().join(',') === [...keys].sort().join(',');
++const staticEscape = (v: string) => v.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
++const staticPlain = (v: unknown, max = 2048): v is string => typeof v === 'string' && v.trim().length > 0 && v.length <= max && !/[<>\u0000-\u0008\u000b-\u001f\u007f\u202a-\u202e\u2066-\u2069]/.test(v);
++const staticRect = (e: Json, width: number, height: number) => ['left', 'top', 'width', 'height'].every(k => typeof e[k] === 'number' && Number.isFinite(e[k])) && e.left >= 0 && e.top >= 0 && e.width >= 48 && e.height >= 48 && e.left + e.width <= width && e.top + e.height <= height;
++const staticOverlap = (a: Json, b: Json) => !(b.left + b.width <= a.left || b.left >= a.left + a.width || b.top + b.height <= a.top || b.top >= a.top + a.height);
++const staticImageFields = ['id', 'type', 'left', 'top', 'width', 'height', 'rotate', 'fixedRatio', 'src', 'name', 'lock', 'imageType'];
++const staticTextFields = ['id', 'type', 'left', 'top', 'width', 'height', 'rotate', 'content', 'defaultColor', 'defaultFontName', 'name', 'lock'];
++function staticTextTree(element: Json, sourceNote = false) {
++  check(element.type === 'text' && Object.keys(element).every(k => staticTextFields.includes(k)) && element.rotate === 0 && solidColor(element.defaultColor) && typeof element.defaultFontName === 'string' && /^[A-Za-z0-9\u4e00-\u9fff ,_-]{1,100}$/.test(element.defaultFontName) && typeof element.content === 'string' && element.content.length <= 50000, 'STATIC_TEXT_FIELDS');
++  const fragment = parseFragment(element.content), tags: string[] = [];
++  const walk = (node: any): void => {
++    if (node.nodeName === '#text') return;
++    if (node.nodeName === '#document-fragment') { node.childNodes.forEach(walk); return; }
++    check(typeof node.tagName === 'string' && ['p', 'span', 'strong', 'b', 'em', 'i', 'br', ...(sourceNote ? ['details', 'summary'] : [])].includes(node.tagName) && node.namespaceURI === 'http://www.w3.org/1999/xhtml', 'STATIC_TEXT_MARKUP');
++    tags.push(node.tagName);
++    for (const attr of node.attrs) {
++      check(attr.name === 'style', 'STATIC_TEXT_ATTRIBUTE');
++      for (const declaration of attr.value.split(';').map((v: string) => v.trim()).filter(Boolean)) {
++        const parts = declaration.split(':').map((v: string) => v.trim());
++        check(parts.length === 2, 'STATIC_TEXT_STYLE');
++        const [key, value] = parts;
++        const ok = key === 'font-size' ? /^(?:1[2-9]|[2-8][0-9]|9[0-6])px$/.test(value)
++          : key === 'font-weight' ? /^(?:normal|bold|[4-9]00)$/.test(value)
++          : key === 'text-align' ? /^(?:left|center|right)$/.test(value)
++          : key === 'color' ? solidColor(value)
++          : key === 'line-height' ? /^(?:1(?:\.[0-9]{1,2})?|2)$/.test(value)
++          : sourceNote && key === 'pointer-events' && value === 'auto';
++        check(ok, 'STATIC_TEXT_STYLE');
++      }
++    }
++    node.childNodes.forEach(walk);
++  };
++  walk(fragment);
++  if (sourceNote) check(tags.filter(t => t === 'details').length === 1 && tags.filter(t => t === 'summary').length === 1, 'STATIC_SOURCE_ORIGINAL');
++  else check(tags.length > 0 && element.content.replace(/<[^>]*>/g, '').trim().length > 0, 'STATIC_TEXT_EMPTY');
++  return fragment;
++}
++async function staticImageSize(element: Json, scene: Json, dataDir: string) {
++  check(element.type === 'image' && Object.keys(element).every(k => staticImageFields.includes(k)) && element.rotate === 0, 'STATIC_IMAGE_FIELDS');
++  check(typeof element.src === 'string' && element.src.startsWith(`/api/classroom-media/${scene.stageId}/media/`) && /^\/api\/classroom-media\/[A-Za-z0-9_-]+\/media\/[A-Za-z0-9_.-]+\.png$/.test(element.src), 'STATIC_IMAGE_SOURCE');
++  const bytes = await privateRead(path.join(dataDir, 'classrooms', scene.stageId, 'media', path.basename(element.src)));
++  check(bytes.length >= 24 && bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10])) && bytes.toString('ascii', 12, 16) === 'IHDR', 'STATIC_IMAGE_PNG');
++  const width = bytes.readUInt32BE(16), height = bytes.readUInt32BE(20);
++  check(width > 0 && height > 0, 'STATIC_IMAGE_PNG');
++  // The unchanged save guard also checks this file against the current media ledger.
++  return { width, height };
++}
++function staticSourceContent(note: Json) {
++  check(staticPlain(note.summary, 100) && Array.isArray(note.paragraphs) && note.paragraphs.length > 0 && note.paragraphs.length <= 16 && note.paragraphs.every((v: unknown) => staticPlain(v, 4000)) && Array.isArray(note.sources) && note.sources.length > 0 && note.sources.length <= 16, 'STATIC_SOURCE_CONTENT');
++  const sources = note.sources.map((source: unknown) => {
++    check(staticKeys(source, ['url', 'readAt']), 'STATIC_SOURCE_ENTRY');
++    const value = source as Json;
++    check(staticPlain(value.url, 2048) && !/\s/.test(value.url) && typeof value.readAt === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:\d{2})$/.test(value.readAt) && Number.isFinite(Date.parse(value.readAt)), 'STATIC_SOURCE_ENTRY');
++    let url: URL; try { url = new URL(value.url); } catch { fail('STATIC_SOURCE_URL'); }
++    check(['http:', 'https:'].includes(url!.protocol) && !url!.username && !url!.password && url!.hostname, 'STATIC_SOURCE_URL');
++    return `<p>${staticEscape(value.url)}</p><p>本地材料核对时间：${staticEscape(value.readAt)}</p>`;
++  });
++  // Fixed collapsed note: the adult-only reading panel opens upward within the slide.
++  // URLs are visible text, never links; callers cannot supply markup, CSS or events.
++  return `<details style="pointer-events:auto;position:relative;color:#333;"><summary style="pointer-events:auto;box-sizing:border-box;min-height:140px;padding:40px 16px;font-size:40px;line-height:54px;cursor:pointer;">${staticEscape(note.summary)}</summary><div tabindex="0" style="pointer-events:auto;position:absolute;bottom:140px;left:0;width:100%;height:360px;overflow:auto;box-sizing:border-box;background:#fff;border:2px solid #c9b990;padding:20px;font-size:40px;line-height:1.35;overflow-wrap:anywhere;word-break:break-all;z-index:10;">${note.paragraphs.map((v: string) => `<p>${staticEscape(v)}</p>`).join('')}${sources.join('')}</div></details>`;
++}
++async function revisedSavedSlideStatic(scene: Json, input: SavedSlideStaticRepairInput, dataDir: string) {
++  check(scene.type === 'slide' && scene.content?.type === 'slide' && jsonObject(scene.content.canvas) && Array.isArray(scene.content.canvas.elements), 'SAVED_SLIDE_ONLY');
++  const canvas = scene.content.canvas, width = canvas.viewportSize, height = width * canvas.viewportRatio;
++  check(Number.isFinite(width) && width > 0 && Number.isFinite(height) && height > 0 && (!canvas.animations || (Array.isArray(canvas.animations) && canvas.animations.length === 0)), 'SAVED_SLIDE_CANVAS');
++  const original = canvas.elements as Json[], actions = scene.actions;
++  check(original.every(e => jsonObject(e) && safeId(e.id)) && new Set(original.map(e => e.id)).size === original.length && Array.isArray(actions) && actions.every(a => jsonObject(a) && safeId(a.id)) && new Set(actions.map((a: Json) => a.id)).size === actions.length, 'SAVED_SLIDE_ELEMENT_IDS');
++  const bytes = await privateRead(input.staticEditsPath);
++  check(digestBytes(bytes) === input.staticEditsSha256 && bytes.length > 0 && bytes.length <= 1024 * 1024, 'STATIC_EDITS_SHA');
++  let edits: Json; try { edits = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)); } catch { fail('STATIC_EDITS_JSON'); }
++  const names = ['sourceNotes', 'geometryEdits', 'plainTextReplacements', 'appendPlainTexts', 'spotlightBindings'];
++  check(jsonObject(edits!) && Object.keys(edits!).length > 0 && Object.keys(edits!).every(k => names.includes(k)) && Object.values(edits!).every(v => Array.isArray(v) && v.length <= 128) && Object.values(edits!).some(v => v.length > 0), 'STATIC_EDITS_SHAPE');
++  const revised = structuredClone(scene), elements = revised.content.canvas.elements as Json[], fields = new Set<string>(), notes = new Set<string>(), appended = new Map<string, string>();
++  const existing = (edit: Json, changed: string[]) => {
++    check(safeId(edit.elementId), 'STATIC_ELEMENT_ID');
++    const index = original.findIndex(e => e.id === edit.elementId), old = original[index];
++    check(old && edit.beforeElementSha256 === textbookDigest(old), 'STATIC_ELEMENT_SHA');
++    for (const field of changed) { const key = edit.elementId + ':' + field; check(!fields.has(key), 'STATIC_DUPLICATE_EDIT'); fields.add(key); }
++    return { old, target: elements[index] };
++  };
++  for (const edit of edits!.geometryEdits ?? []) {
++    check(staticKeys(edit, ['elementId', 'beforeElementSha256', 'left', 'top', 'width', 'height']), 'STATIC_GEOMETRY_SHAPE');
++    const { old, target } = existing(edit, ['geometry']);
++    if (old.type === 'image') { const size = await staticImageSize(old, scene, dataDir); check(Math.abs(edit.width * size.height - edit.height * size.width) <= 0.000001 * size.width * size.height, 'STATIC_IMAGE_RATIO'); }
++    else staticTextTree(old);
++    check(staticRect(edit, width, height), 'STATIC_BOUNDS');
++    for (const key of ['left', 'top', 'width', 'height']) target[key] = edit[key];
++  }
++  for (const edit of edits!.plainTextReplacements ?? []) {
++    check(staticKeys(edit, ['elementId', 'beforeElementSha256', 'text']), 'STATIC_REPLACEMENT_SHAPE');
++    const { old, target } = existing(edit, ['content']), tree = staticTextTree(old);
++    check(staticPlain(edit.text, 300) && actions.some((a: Json) => a.type === 'speech' && typeof a.text === 'string' && a.text.includes(edit.text)), 'STATIC_TEXT_NOT_IN_SPEECH');
++    const first = (tree as any).childNodes.find((n: any) => n.tagName === 'p');
++    const style = first?.attrs.find((a: any) => a.name === 'style')?.value;
++    target.content = `<p${style ? ` style="${staticEscape(style)}"` : ''}>${staticEscape(edit.text)}</p>`;
++  }
++  for (const edit of edits!.sourceNotes ?? []) {
++    check(staticKeys(edit, ['elementId', 'beforeElementSha256', 'left', 'top', 'width', 'height', 'summary', 'paragraphs', 'sources']), 'STATIC_SOURCE_SHAPE');
++    const { old, target } = existing(edit, ['content', 'geometry']); staticTextTree(old, true);
++    check(staticRect(edit, width, height) && edit.top >= 360 && edit.height >= 160 && edit.width >= 300 && staticPlain(edit.summary, 100) && edit.width >= Array.from(edit.summary).length * 40 + 52, 'STATIC_SOURCE_BOUNDS');
++    for (const key of ['left', 'top', 'width', 'height']) target[key] = edit[key];
++    target.content = staticSourceContent(edit); notes.add(target.id);
++  }
++  for (const edit of edits!.appendPlainTexts ?? []) {
++    check(staticKeys(edit, ['id', 'left', 'top', 'width', 'height', 'text', 'fontSize']) && safeId(edit.id) && !elements.some(e => e.id === edit.id), 'STATIC_APPEND_SHAPE');
++    check(staticPlain(edit.text, 32) && [32,40,48,56,64,72,76,80,96].includes(edit.fontSize) && staticRect(edit, width, height) && edit.height >= edit.fontSize * 1.35 + 20 && edit.width >= Array.from(edit.text).length * edit.fontSize + 20, 'STATIC_APPEND_BOUNDS');
++    elements.push({ id: edit.id, type: 'text', left: edit.left, top: edit.top, width: edit.width, height: edit.height, rotate: 0, content: `<p style="font-size:${edit.fontSize}px;text-align:center;line-height:1.35">${staticEscape(edit.text)}</p>`, defaultColor: '#333333', defaultFontName: 'Microsoft YaHei' });
++    appended.set(edit.id, edit.text);
++  }
++  const before = new Map<string, Json>(), targetIds = new Set<string>(), actionIds = new Set(actions.map((a: Json) => a.id));
++  for (const b of edits!.spotlightBindings ?? []) {
++    check(staticKeys(b, ['speechId', 'elementId']) && safeId(b.speechId) && safeId(b.elementId) && !before.has(b.speechId) && !targetIds.has(b.elementId), 'STATIC_SPOTLIGHT_BINDING');
++    const speech = actions.find((a: Json) => a.id === b.speechId && a.type === 'speech'), index = elements.findIndex(e => e.id === b.elementId), target = elements[index];
++    check(speech && target && !notes.has(target.id), 'STATIC_SPOTLIGHT_TARGET');
++    if (target.type === 'image') await staticImageSize(target, scene, dataDir); else staticTextTree(target);
++    check(target.rotate === 0 && staticRect(target, width, height), 'STATIC_SPOTLIGHT_BOUNDS');
++    check(elements.slice(index + 1).every(e => ['left', 'top', 'width', 'height', 'rotate'].every(k => Number.isFinite(e[k])) && e.rotate === 0 && !staticOverlap(target, e)), 'STATIC_SPOTLIGHT_OCCLUDED');
++    check(!actions.some((a: Json) => a.type === 'spotlight' && a.elementId === target.id), 'STATIC_SPOTLIGHT_ALREADY_PRESENT');
++    if (appended.has(target.id)) check(typeof speech.text === 'string' && speech.text.includes(appended.get(target.id)!), 'STATIC_TEXT_NOT_IN_SPEECH');
++    const id = `saved-slide-static-spotlight-${textbookDigest({ sceneId: scene.id, speechId: b.speechId, elementId: b.elementId }).slice(0, 32)}`;
++    check(!actionIds.has(id), 'SAVED_SLIDE_ACTION_IDS'); actionIds.add(id); targetIds.add(target.id);
++    before.set(b.speechId, { id, type: 'spotlight', elementId: target.id });
++  }
++  check([...appended.keys()].every(id => targetIds.has(id)), 'STATIC_APPEND_WITHOUT_SPEECH');
++  revised.actions = actions.flatMap((a: Json) => before.has(a.id) ? [before.get(a.id), a] : [a]);
++  check(textbookDigest(revised) !== textbookDigest(scene), 'NO_CHANGE');
++  return revised;
++}
+ async function savedInputs(input: SavedRepairInput, env: RepairEnvironment, mode: SavedRepairMode = 'html') {
+   const fields = mode === 'html'
+     ? 'jobDir,originalSceneFileSha256,originalScenePath,originalSceneSha256,revisedHtmlPath,revisedHtmlSha256,sceneId,stageId'
++    : mode === 'slide-static'
++      ? 'jobDir,originalSceneFileSha256,originalScenePath,originalSceneSha256,sceneId,stageId,staticEditsPath,staticEditsSha256'
+     : 'jobDir,originalSceneFileSha256,originalScenePath,originalSceneSha256,sceneId,spotlightBindingsPath,spotlightBindingsSha256,stageId';
+   check(Object.keys(input).sort().join(',') === fields, 'SAVED_INPUT_SHAPE');
+   check(/^[A-Za-z0-9_-]{1,160}$/.test(input.stageId) && typeof input.sceneId === 'string' && input.sceneId.length > 0 && input.sceneId.length <= 160, 'SAVED_ID');
+@@ -448,7 +640,9 @@
+   const scene = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(originalBytes));
+   check(textbookDigest(scene) === input.originalSceneSha256 && scene.id === input.sceneId && scene.stageId === input.stageId, 'SAVED_SOURCE_SCENE_SHA');
+   let revised: Json;
+-  if (mode === 'slide-spotlight') {
++  if (mode === 'slide-static') {
++    revised = await revisedSavedSlideStatic(scene, input as SavedSlideStaticRepairInput, dataDir);
++  } else if (mode === 'slide-spotlight') {
+     revised = await revisedSavedSlideSpotlights(scene, input as SavedSlideSpotlightRepairInput);
+   } else {
+     const htmlInput = input as SavedSceneRepairInput;
+@@ -587,3 +781,6 @@
+ export const runSavedSceneRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runSavedRepair(plan, approvedPlanSha256, env, 'html');
+ export const prepareSavedSlideSpotlightRepair = (input: SavedSlideSpotlightRepairInput, env: RepairEnvironment) => prepareSavedRepair(input, env, 'slide-spotlight');
+ export const runSavedSlideSpotlightRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runSavedRepair(plan, approvedPlanSha256, env, 'slide-spotlight');
++
++export const prepareSavedSlideStaticRepair = (input: SavedSlideStaticRepairInput, env: RepairEnvironment) => prepareSavedRepair(input, env, 'slide-static');
++export const runSavedSlideStaticRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runSavedRepair(plan, approvedPlanSha256, env, 'slide-static');
+diff --git a/scripts/repair-textbook-rejected-scene.ts b/scripts/repair-textbook-rejected-scene.ts
+--- a/scripts/repair-textbook-rejected-scene.ts
++++ b/scripts/repair-textbook-rejected-scene.ts
+@@ -2,11 +2,11 @@
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import { Pool } from 'pg';
+-import { prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair } from '../lib/server/mira-textbook-rejected-scene-repair';
++import { prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair, prepareSavedSlideStaticRepair, runSavedSlideStaticRepair, prepareRejectedQuizPicturesRepair, runRejectedQuizPicturesRepair } from '../lib/server/mira-textbook-rejected-scene-repair';
+ 
+ async function main() {
+   const mode = process.argv[2];
+-  if (!['prepare', 'run', 'prepare-saved', 'run-saved', 'prepare-quiz', 'run-quiz', 'prepare-slide', 'run-slide', 'prepare-saved-slide', 'run-saved-slide'].includes(mode)) throw new Error('Usage: repair-textbook-rejected-scene.ts prepare|run|prepare-saved|run-saved|prepare-quiz|run-quiz|prepare-slide|run-slide|prepare-saved-slide|run-saved-slide < request.json');
++  if (!['prepare', 'run', 'prepare-saved', 'run-saved', 'prepare-quiz', 'run-quiz', 'prepare-quiz-pictures', 'run-quiz-pictures', 'prepare-slide', 'run-slide', 'prepare-saved-slide', 'run-saved-slide', 'prepare-saved-static', 'run-saved-static'].includes(mode)) throw new Error('Usage: repair-textbook-rejected-scene.ts prepare|run|prepare-saved|run-saved|prepare-quiz|run-quiz|prepare-quiz-pictures|run-quiz-pictures|prepare-slide|run-slide|prepare-saved-slide|run-saved-slide|prepare-saved-static|run-saved-static < request.json');
+   let body = '';
+   for await (const chunk of process.stdin) { body += chunk; if (body.length > 1024 * 1024) throw new Error('INPUT_TOO_LARGE'); }
+   const request = JSON.parse(body);
+@@ -17,6 +17,10 @@
+     const env = { pool, dataDir: path.resolve('data') };
+     const result = mode === 'prepare'
+       ? await prepareRejectedSceneRepair(request, env)
++      : mode === 'prepare-saved-static'
++        ? await prepareSavedSlideStaticRepair(request, env)
++        : mode === 'run-saved-static'
++          ? await runSavedSlideStaticRepair(JSON.parse(await fs.readFile(request.planPath, 'utf8')), request.approvedPlanSha256, env)
+       : mode === 'prepare-saved-slide'
+         ? await prepareSavedSlideSpotlightRepair(request, env)
+         : mode === 'run-saved-slide'
+@@ -25,6 +29,10 @@
+         ? await prepareRejectedSlideRepair(request, env)
+         : mode === 'run-slide'
+           ? await runRejectedSlideRepair(JSON.parse(await fs.readFile(request.planPath, 'utf8')), request.approvedPlanSha256, env)
++      : mode === 'prepare-quiz-pictures'
++        ? await prepareRejectedQuizPicturesRepair(request, env)
++        : mode === 'run-quiz-pictures'
++          ? await runRejectedQuizPicturesRepair(JSON.parse(await fs.readFile(request.planPath, 'utf8')), request.approvedPlanSha256, env)
+       : mode === 'prepare-quiz'
+         ? await prepareRejectedQuizRepair(request, env)
+         : mode === 'run-quiz'
+diff --git a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+--- a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
++++ b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+@@ -12,7 +12,7 @@
+ import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
+ import { archiveRejectedTextbookScene } from '@/lib/server/mira-textbook-rejected-scene';
+ import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest, type FrozenTextbookContract } from '@/lib/server/mira-textbook-scene-contract';
+-import { prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair, type SavedSlideSpotlightRepairInput, type SlideRepairInput, type QuizRepairInput, type RepairInput, type SavedSceneRepairInput } from '@/lib/server/mira-textbook-rejected-scene-repair';
++import { prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair, prepareSavedSlideStaticRepair, runSavedSlideStaticRepair, type SavedSlideStaticRepairInput, type SavedSlideSpotlightRepairInput, type SlideRepairInput, type QuizRepairInput, type RepairInput, type SavedSceneRepairInput, prepareRejectedQuizPicturesRepair, runRejectedQuizPicturesRepair, type QuizPicturesRepairInput } from '@/lib/server/mira-textbook-rejected-scene-repair';
+ import type { CourseStore } from '@/lib/server/agent-runtime/course-tools';
+ import frozenFixture from '../fixtures/textbook-scene-contract.v1.json';
+ 
+@@ -777,3 +777,294 @@
+     await fs.writeFile(path.join(repairDir(plan), 'intent.json'), JSON.stringify({ ...plan, unrelated: true })); await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow('INTENT_COLLISION');
+   });
+ });
++
++
++describe('saved slide static text/geometry/source repair', () => {
++  let staticInput: SavedSlideStaticRepairInput, savedSlide: any, prior: any;
++  const repairDir = (plan: any) => path.join(root, 'textbook-saved-slide-static-repairs', hash(sessionId), stageId, plan.sha256);
++  const writeEdits = async (value: unknown) => { const bytes = JSON.stringify(value); await fs.writeFile(staticInput.staticEditsPath, bytes); staticInput.staticEditsSha256 = hash(bytes); };
++  const writeOriginal = async (value: unknown) => { const bytes = JSON.stringify(value); await fs.writeFile(staticInput.originalScenePath, bytes); staticInput.originalSceneFileSha256 = hash(bytes); staticInput.originalSceneSha256 = textbookDigest(value); };
++  const target = (id: string) => savedSlide.content.canvas.elements.find((e: any) => e.id === id);
++  const note = () => ({ elementId: 'source', beforeElementSha256: textbookDigest(target('source')), left: 50, top: 400, width: 900, height: 162.5, summary: '来源与使用范围', paragraphs: ['使用自己的课本，不记录朗读完成。'], sources: [{ url: 'https://example.com/textbook?a=1&b=2', readAt: '2026-10-20T00:00:00Z' }] });
++  const edits = () => ({ sourceNotes: [note()], geometryEdits: [{ elementId: 'picture', beforeElementSha256: textbookDigest(target('picture')), left: 60, top: 170, width: 200, height: 200 }], plainTextReplacements: [{ elementId: 'subtitle', beforeElementSha256: textbookDigest(target('subtitle')), text: '先慢慢听，不比速度' }], appendPlainTexts: ['四','十','十四','四十'].map((text, i) => ({ id: 'word-' + i, left: 300 + i * 170, top: 220, width: 160, height: 120, text, fontSize: 64 })), spotlightBindings: ['four','ten','fourteen','forty'].map((name, i) => ({ speechId: 'speech-' + name, elementId: 'word-' + i })) });
++  beforeEach(async () => {
++    frozen.contract.pagePlan.push({ page: 2, title: '慢慢听', type: 'slide', move: '听词并比较顺序' }); frozen.sha256 = textbookDigest(frozen.contract);
++    await sql('UPDATE agent_sessions SET prompt=$1', [prompt()]); await fs.writeFile(path.join(input.jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen })); await fs.rm(ledgerFile());
++    const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') }), src = '/api/classroom-media/' + stageId + '/media/picture.png', guarded = guard.wrapStore(store as unknown as CourseStore);
++    await guard.context({ stageId, order: 1, type: 'interactive', title: '观察', widgetType: 'simulation', media: [{ src, assetKey: 'picture' }] });
++    prior = { ...scene, content: { ...scene.content, html: await fs.readFile(input.revisedHtmlPath, 'utf8') } }; await guarded.putScene(stageId, prior);
++    await guard.context({ stageId, order: 2, type: 'slide', title: '慢慢听', media: [{ src, assetKey: 'picture' }] });
++    const text = (id: string, top: number, content: string) => ({ id, type: 'text', left: 60, top, width: 880, height: 49, rotate: 0, content, defaultColor: '#333333', defaultFontName: 'Microsoft YaHei' });
++    savedSlide = { id: 'scene-static', stageId, order: 2, title: '慢慢听', type: 'slide', createdAt: 12, updatedAt: 19, content: { type: 'slide', canvas: { id: 'canvas-static', viewportSize: 1000, viewportRatio: 0.5625, theme: { backgroundColor: '#ffffff', themeColors: ['#153f50'], fontColor: '#153f50', fontName: 'sans-serif' }, elements: [text('subtitle', 50, '<p style="font-size:18px;text-align:center">实现说明</p>'), { id: 'picture', type: 'image', left: 60, top: 170, width: 300, height: 300, rotate: 0, fixedRatio: true, src }, text('source', 510, '<p><details style="pointer-events:auto"><summary>来源</summary>原教材</details></p>')] } }, actions: [{ id: 'speech-start', type: 'speech', text: '我们先慢慢听，不比速度。' }, ...['四','十','十四','四十'].map((text, i) => ({ id: 'speech-' + ['four','ten','fourteen','forty'][i], type: 'speech', text: '先听这个词，老师读' + text + '。' }))] };
++    await guarded.putScene(stageId, savedSlide); await fs.rm(path.join(root, 'textbook-rejected-scenes'), { recursive: true });
++    staticInput = { jobDir: input.jobDir, stageId, sceneId: savedSlide.id, originalScenePath: path.join(root, 'saved-static.json'), originalSceneFileSha256: '', originalSceneSha256: '', staticEditsPath: path.join(root, 'static-edits.json'), staticEditsSha256: '' };
++    await writeOriginal(savedSlide); await writeEdits(edits()); ledger = await readLedger();
++  });
++  it('prepares read-only; edits only declared leaves, inserts stable focus, preserves original speech and all other scenes', async () => {
++    const before = (await document())!, bytes = await fs.readFile(ledgerFile()), original = await fs.readFile(staticInput.originalScenePath);
++    const plan = await prepareSavedSlideStaticRepair(staticInput, env);
++    expect(plan.schemaVersion).toBe('mira.textbook.saved-slide-static-repair-plan.v1'); expect(await document()).toEqual(before); expect(await fs.readFile(ledgerFile())).toEqual(bytes); await expect(fs.stat(repairDir(plan))).rejects.toMatchObject({ code: 'ENOENT' });
++    const receipt = await runSavedSlideStaticRepair(plan, plan.sha256, env), after = (await document())!, revised: any = after.scenes[1], elements = revised.content.canvas.elements;
++    expect(receipt.schemaVersion).toBe('mira.textbook.saved-slide-static-repair-receipt.v1'); expect(receipt.providerCalls).toBe(0);
++    expect(after.scenes[0]).toEqual(prior); expect({ ...revised, actions: savedSlide.actions, content: savedSlide.content }).toEqual(savedSlide);
++    expect(revised.actions.filter((a: any) => a.type !== 'spotlight')).toEqual(savedSlide.actions); expect(revised.actions).toHaveLength(9);
++    for (const b of edits().spotlightBindings) { const index = revised.actions.findIndex((a: any) => a.id === b.speechId); expect(revised.actions[index - 1]).toEqual({ id: 'saved-slide-static-spotlight-' + textbookDigest({ sceneId: savedSlide.id, ...b }).slice(0,32), type: 'spotlight', elementId: b.elementId }); }
++    const source = elements.find((e: any) => e.id === 'source'); expect(source.content).toContain('<details '); expect(source.content).not.toContain(' open'); expect(source.content).toContain('height:140px'); expect(source.content).toContain('bottom:140px'); expect(source.content).toContain('height:360px'); expect(source.content).toContain('https://example.com/textbook?a=1&amp;b=2'); expect(source.content).not.toMatch(/<a[ >]|href=|onclick=|<script/);
++    expect(elements[0]).toEqual({ ...target('subtitle'), content: '<p style="font-size:18px;text-align:center">先慢慢听，不比速度</p>' }); expect(elements[1]).toEqual({ ...target('picture'), width: 200, height: 200 });
++    expect(await fs.readFile(staticInput.originalScenePath)).toEqual(original); expect((await readLedger()).assetBindings).toEqual(ledger.assetBindings); expect(await runSavedSlideStaticRepair(plan, plan.sha256, env)).toEqual(receipt);
++  });
++  it('accepts focus on existing safe text without changing its content or any canvas field', async () => {
++    await writeEdits({ spotlightBindings: [{ speechId: 'speech-start', elementId: 'subtitle' }] }); const plan = await prepareSavedSlideStaticRepair(staticInput, env); await runSavedSlideStaticRepair(plan, plan.sha256, env);
++    expect(((await document())!.scenes[1] as any).content).toEqual(savedSlide.content);
++  });
++  it.each(['unknown', 'html', 'url', 'time', 'too-high', 'too-small', 'duplicate', 'hash', 'script', 'control'])('rejects unsafe or unbound source-note edit: %s', async kind => {
++    const value: any = { sourceNotes: [note()] }, n = value.sourceNotes[0];
++    if (kind === 'unknown') n.onclick = 'evil()'; if (kind === 'html') n.paragraphs = ['<img src=x onerror=evil()>']; if (kind === 'url') n.sources[0].url = 'javascript:evil()'; if (kind === 'time') n.sources[0].readAt = 'not-observed'; if (kind === 'too-high') n.top = 359; if (kind === 'too-small') n.height = 159; if (kind === 'duplicate') value.sourceNotes.push(n); if (kind === 'hash') n.beforeElementSha256 = '0'.repeat(64); if (kind === 'script') n.summary = '<script>x</script>'; if (kind === 'control') n.summary = 'source\u202e';
++    await writeEdits(value); await expect(prepareSavedSlideStaticRepair(staticInput, env)).rejects.toThrow('TEXTBOOK_REPAIR_STATIC_'); expect((await document())!.scenes).toEqual([prior, savedSlide]);
++  });
++  it.each(['ratio', 'outside', 'attributes', 'unknown', 'duplicate'])('refuses image geometry changes beyond four bounded aspect-correct numbers: %s', async kind => {
++    const value: any = { geometryEdits: edits().geometryEdits };
++    if (kind === 'ratio') value.geometryEdits[0].height = 100; if (kind === 'outside') value.geometryEdits[0].left = 999; if (kind === 'attributes') value.geometryEdits[0].src = 'https://example.com/image.png'; if (kind === 'unknown') value.geometryEdits[0].elementId = 'no-image'; if (kind === 'duplicate') value.geometryEdits.push(value.geometryEdits[0]);
++    await writeEdits(value); await expect(prepareSavedSlideStaticRepair(staticInput, env)).rejects.toThrow('TEXTBOOK_REPAIR_STATIC_');
++  });
++  it.each(['caller-html', 'unknown-text', 'not-in-speech', 'font', 'small', 'duplicate-id', 'unbound', 'wrong-speech', 'action-override'])('refuses unrestricted new or replacement text: %s', async kind => {
++    const value: any = edits();
++    if (kind === 'caller-html') value.plainTextReplacements[0].text = '<b>四</b>'; if (kind === 'unknown-text') value.plainTextReplacements[0].content = '<p>四</p>'; if (kind === 'not-in-speech') value.plainTextReplacements[0].text = '新知识'; if (kind === 'font') value.appendPlainTexts[0].fontSize = 999; if (kind === 'small') value.appendPlainTexts[0].height = 48; if (kind === 'duplicate-id') value.appendPlainTexts[0].id = 'subtitle'; if (kind === 'unbound') value.spotlightBindings = []; if (kind === 'wrong-speech') value.spotlightBindings[0].speechId = 'speech-ten'; if (kind === 'action-override') value.spotlightBindings[0].type = 'script';
++    await writeEdits(value); await expect(prepareSavedSlideStaticRepair(staticInput, env)).rejects.toThrow('TEXTBOOK_REPAIR_STATIC_');
++  });
++  it.each(['script', 'iframe', 'href', 'onload', 'hide', 'opacity', 'transform', 'url-style', 'foreign-svg', 'clip', 'rotation', 'covered'])('rejects unsafe or obscured existing text targets: %s', async kind => {
++    const changed = structuredClone(savedSlide), t = changed.content.canvas.elements[0];
++    if (kind === 'script') t.content = '<script>evil()</script>'; if (kind === 'iframe') t.content = '<iframe src="https://example.com"></iframe>'; if (kind === 'href') t.content = '<a href="https://example.com">四</a>'; if (kind === 'onload') t.content = '<p onload="evil()">四</p>'; if (kind === 'hide') t.content = '<p style="display:none">四</p>'; if (kind === 'opacity') t.content = '<p style="opacity:0">四</p>'; if (kind === 'transform') t.content = '<p style="transform:scale(0)">四</p>'; if (kind === 'url-style') t.content = '<p style="background:url(https://example.com)">四</p>'; if (kind === 'foreign-svg') t.content = '<svg><text>四</text></svg>'; if (kind === 'clip') t.clip = {}; if (kind === 'rotation') t.rotate = 90; if (kind === 'covered') changed.content.canvas.elements.push({ ...t, id: 'cover' });
++    await writeOriginal(changed); await writeEdits({ spotlightBindings: [{ speechId: 'speech-start', elementId: 'subtitle' }] }); await expect(prepareSavedSlideStaticRepair(staticInput, env)).rejects.toThrow('TEXTBOOK_REPAIR_STATIC_');
++  });
++  it('rejects already-focused targets and modes cannot consume each other plans or input shapes', async () => {
++    const plan = await prepareSavedSlideStaticRepair(staticInput, env); await expect(runSavedSlideSpotlightRepair(plan, plan.sha256, env)).rejects.toThrow('PLAN_APPROVAL_SHA'); await expect(runSavedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('PLAN_APPROVAL_SHA'); await expect(runRejectedSlideRepair(plan, plan.sha256, env)).rejects.toThrow('PLAN_APPROVAL_SHA'); await expect(prepareSavedSlideSpotlightRepair(staticInput as any, env)).rejects.toThrow('SAVED_INPUT_SHAPE');
++    const changed = structuredClone(savedSlide); changed.actions.unshift({ id: 'old-focus', type: 'spotlight', elementId: 'subtitle' }); await writeOriginal(changed); await writeEdits({ spotlightBindings: [{ speechId: 'speech-start', elementId: 'subtitle' }] }); await expect(prepareSavedSlideStaticRepair(staticInput, env)).rejects.toThrow('STATIC_SPOTLIGHT_ALREADY_PRESENT');
++  });
++  it.each(['stage-owner','owner','running','queued','lease','frozen','document','ledger'])('retains saved authority/full-document/full-ledger fences: %s', async kind => {
++    const plan = await prepareSavedSlideStaticRepair(staticInput, env), before = (await document())!;
++    if (kind === 'stage-owner') await sql("UPDATE stage_meta SET owner_id='foreign'"); if (kind === 'owner') await sql("UPDATE agent_sessions SET owner_id='foreign'"); if (kind === 'running' || kind === 'queued') await sql('UPDATE agent_sessions SET status=$1',[kind]); if (kind === 'lease') await sql("UPDATE agent_sessions SET lease_worker_id='worker'"); if (kind === 'frozen') await sql("UPDATE agent_sessions SET prompt='changed'"); if (kind === 'document') await store.saveDocument({ ...before, stage: { ...before.stage, name: 'changed' } }); if (kind === 'ledger') { const { sha256: _, ...body } = await readLedger(); body.extra = 'changed'; await fs.writeFile(ledgerFile(), JSON.stringify({ ...body, sha256: textbookDigest(body) })); }
++    await expect(runSavedSlideStaticRepair(plan, plan.sha256, env)).rejects.toThrow(); expect((await sql('SELECT data FROM document_scenes WHERE id=$1',[savedSlide.id])).rows[0]).toEqual({ data: savedSlide }); await expect(fs.stat(repairDir(plan))).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++  it('rechecks exact input/original bytes and current bound PNG bytes at run', async () => {
++    const plan = await prepareSavedSlideStaticRepair(staticInput, env); await fs.appendFile(staticInput.staticEditsPath, ' '); await expect(runSavedSlideStaticRepair(plan, plan.sha256, env)).rejects.toThrow('STATIC_EDITS_SHA'); await writeEdits(edits()); await fs.appendFile(staticInput.originalScenePath,' '); await expect(runSavedSlideStaticRepair(plan, plan.sha256, env)).rejects.toThrow('SAVED_SOURCE_FILE_SHA'); await writeOriginal(savedSlide);
++    await sharp({ create: { width: 64,height:64,channels:3,background:'#00ff00' } }).png().toFile(path.join(root,'classrooms',stageId,'media','picture.png')); await expect(runSavedSlideStaticRepair(plan, plan.sha256, env)).rejects.toThrow('IMAGE_BYTES_CHANGED');
++  });
++  it('recovers DB-before/ledger-after by restoring the original saved scene, not deletion', async () => {
++    const plan = await prepareSavedSlideStaticRepair(staticInput, env), before = await document(), query = pool.query; let failed = false;
++    pool.query = async (text,args) => { if(text === 'COMMIT' && !failed) { failed = true; throw new Error('static commit interrupted'); } return query(text,args); };
++    await expect(runSavedSlideStaticRepair(plan,plan.sha256,env)).rejects.toThrow('static commit interrupted'); pool.query = query; expect(await document()).toEqual(before); expect((await readLedger()).sha256).toBe(plan.afterCandidateSha256); await runSavedSlideStaticRepair(plan,plan.sha256,env); expect((await document())!.scenes).toHaveLength(2);
++  });
++  it('recovers DB-after/missing-receipt with exact intent and no repeated store write', async () => {
++    const plan = await prepareSavedSlideStaticRepair(staticInput, env), open = fs.open.bind(fs); let failed = false;
++    vi.spyOn(fs,'open').mockImplementation(async (...args:Parameters<typeof fs.open>) => { if(String(args[0]).endsWith('/receipt.json') && !failed) { failed=true; throw new Error('static receipt interrupted'); } return open(...args); });
++    await expect(runSavedSlideStaticRepair(plan,plan.sha256,env)).rejects.toThrow('static receipt interrupted'); expect(textbookDigest(await document())).toBe(plan.afterDocumentSha256);
++    const queries:string[] = [],query=pool.query; pool.query=async(text,args)=>{queries.push(text);return query(text,args);}; await runSavedSlideStaticRepair(plan,plan.sha256,env); expect(queries.some(q=>q.includes('INSERT INTO document_scenes'))).toBe(false);
++    await fs.writeFile(path.join(repairDir(plan),'original-scene.json'),'{}'); await expect(runSavedSlideStaticRepair(plan,plan.sha256,env)).rejects.toThrow('SAVED_SNAPSHOT_COLLISION');
++  });
++});
++
++
++
++describe('separate rejected quiz frozen target and option pictures repair', () => {
++  let quizInput: QuizPicturesRepairInput, quiz: any, priorScene: any, visuals: any, pictures: any;
++  const repairDir = (plan: any) => path.join(root, 'textbook-rejected-quiz-pictures-repairs', hash(sessionId), stageId, plan.sha256);
++  const replacePictures = async (value: unknown) => {
++    const bytes = Buffer.from(JSON.stringify(value));
++    await fs.writeFile(quizInput.picturesPath, bytes); quizInput.picturesSha256 = hash(bytes);
++  };
++  const buildFixture = async (withTarget = true) => {
++    const current = (await document())!;
++    await store.saveDocument({ ...current, scenes: [] });
++    frozen.contract.pagePlan = frozen.contract.pagePlan.filter(p => p.page === 1);
++    frozen.contract.pagePlan.push({ page: 2, title: '找整卡', type: 'quiz', move: '听音选图', questionIds: ['q-one'], narrationGuidance: ['听完再选一张图。'] });
++    frozen.contract.lockedAssessments = [{ id: 'q-one', page: 2, type: 'single', question: '听老师读声母：sh。请找出对应的整张卡。', choices: [
++      { label: '第一张图', value: 'A', asset: 'glyph-ch' }, { label: '第二张图', value: 'B', asset: 'glyph-sh' }, { label: '第三张图', value: 'C', asset: 'glyph-zh' },
++    ], answer: 'B', points: 10, analysis: '对应整卡是sh。', ...(withTarget ? { visualAsset: 'picture' } : {}) }];
++    frozen.sha256 = textbookDigest(frozen.contract);
++    await sql('UPDATE agent_sessions SET prompt=$1', [prompt()]);
++    await fs.writeFile(path.join(input.jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen }));
++    await fs.rm(ledgerFile());
++    const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms'), rejectedScenesDir: path.join(root, 'textbook-rejected-scenes'), ownsStage: async () => true });
++    const guarded = guard.wrapStore(store as unknown as CourseStore);
++    await guard.context({ stageId, order: 1, type: 'interactive', title: '观察', widgetType: 'simulation', media: [{ src: `/api/classroom-media/${stageId}/media/picture.png`, assetKey: 'picture' }] });
++    priorScene = { ...scene, content: { ...scene.content, html: await fs.readFile(input.revisedHtmlPath, 'utf8') } };
++    await guarded.putScene(stageId, priorScene);
++    const media = [];
++    visuals = {};
++    for (const [i, key] of ['glyph-ch', 'glyph-sh', 'glyph-zh'].entries()) {
++      const file = `${key}.png`, src = `/api/classroom-media/${stageId}/media/${file}`;
++      await sharp({ create: { width: 64, height: 64, channels: 3, background: ['#ff0000', '#00ff00', '#0000ff'][i] } }).png().toFile(path.join(root, 'classrooms', stageId, 'media', file));
++      media.push({ src, assetKey: key });
++      visuals[['A', 'B', 'C'][i]] = { kind: 'image', src, alt: ['第一张图', '第二张图', '第三张图'][i] };
++    }
++    await guard.context({ stageId, order: 2, type: 'quiz', title: '找整卡', media });
++    quiz = { id: 'scene-p2', stageId, order: 2, title: '找整卡', type: 'quiz', createdAt: 12, updatedAt: 19,
++      content: { type: 'quiz', questions: [{ id: 'q-one', type: 'single', question: frozen.contract.lockedAssessments[0].question, options: [{ label: '第一张图', value: 'A' }, { label: '第二张图', value: 'B' }, { label: '第三张图', value: 'C' }], optionVisuals: {}, answer: ['B'], analysis: '对应整卡是sh。', points: 10, hasAnswer: true }] },
++      actions: [{ id: 'speech-guide', type: 'speech', text: '听完再选一张图。' }, { id: 'speech-question', type: 'speech', text: frozen.contract.lockedAssessments[0].question }] };
++    let rejection: any;
++    try { await guarded.putScene(stageId, quiz); } catch (error: any) { rejection = error.rejection; }
++    expect(rejection?.status).toBe('rejected');
++    const mapPath = path.join(root, 'pictures.json');
++    pictures = { visual: { kind: 'image', src: `/api/classroom-media/${stageId}/media/picture.png`, alt: '待辨认的目标图' }, optionVisuals: visuals };
++    const bytes = JSON.stringify(pictures, null, 2) + '\n'; await fs.writeFile(mapPath, bytes);
++    quizInput = { jobDir: input.jobDir, archivePath: path.join(root, 'textbook-rejected-scenes', rejection.archiveId), archiveSha256: rejection.archiveSha256, questionId: 'q-one', picturesPath: mapPath, picturesSha256: hash(bytes) };
++    originalBytes = await fs.readFile(quizInput.archivePath); ledger = await readLedger();
++  };
++  beforeEach(async () => { await buildFixture(); });
++
++  it('prepares read-only and restores only two frozen picture fields; retains the prior page and immutable evidence', async () => {
++    const before = (await document())!, ledgerBytes = await fs.readFile(ledgerFile());
++    const plan = await prepareRejectedQuizPicturesRepair(quizInput, env);
++    expect(plan.schemaVersion).toBe('mira.textbook.rejected-quiz-pictures-repair-plan.v1');
++    expect(plan.input).toEqual(quizInput);
++    expect(await document()).toEqual(before); expect(await fs.readFile(ledgerFile())).toEqual(ledgerBytes);
++    await expect(fs.stat(repairDir(plan))).rejects.toMatchObject({ code: 'ENOENT' });
++    const receipt = await runRejectedQuizPicturesRepair(plan, plan.sha256, env);
++    const after = (await document())!, added = after.scenes.find(s => s.id === quiz.id) as any;
++    expect(after.scenes).toHaveLength(2); expect(after.scenes[0]).toEqual(priorScene);
++    expect(added.content.questions[0].visual).toEqual(pictures.visual);
++    expect(added.content.questions[0].optionVisuals).toEqual(visuals);
++    const restored = structuredClone(added); delete restored.content.questions[0].visual; restored.content.questions[0].optionVisuals = {};
++    expect(restored).toEqual(quiz); expect(after.stage).toEqual(before.stage); expect(after.outline).toEqual(before.outline);
++    expect(receipt.schemaVersion).toBe('mira.textbook.rejected-quiz-pictures-repair-receipt.v1');
++    expect(receipt.providerCalls).toBe(0); expect(receipt.verification).toBe('static_only_not_play_audio_or_publication');
++    expect(JSON.parse(await fs.readFile(path.join(repairDir(plan), 'intent.json'), 'utf8'))).toEqual(plan);
++    expect(JSON.parse(await fs.readFile(path.join(repairDir(plan), 'receipt.json'), 'utf8'))).toEqual(receipt);
++    expect(await runRejectedQuizPicturesRepair(plan, plan.sha256, env)).toEqual(receipt);
++    expect(await fs.readFile(quizInput.archivePath)).toEqual(originalBytes);
++    expect((await readLedger()).scenes.map((s: any) => s.sha256)).toEqual(after.scenes.map(s => textbookDigest(s)));
++  });
++  it('requires an actual frozen target visual rather than the general DSL optional image allowance', async () => {
++    await buildFixture(false);
++    await expect(prepareRejectedQuizPicturesRepair(quizInput, env)).rejects.toThrow('QUIZ_PICTURES_FROZEN_TARGET');
++    expect((await document())!.scenes).toEqual([priorScene]); expect(await readLedger()).toEqual(ledger);
++  });
++  it('does not accept unknown questions, non-quiz archives or caller-supplied extra fields', async () => {
++    await expect(prepareRejectedQuizPicturesRepair({ ...quizInput, questionId: 'unknown' }, env)).rejects.toThrow('QUIZ_PICTURES_QUESTION');
++    await expect(prepareRejectedQuizPicturesRepair({ ...quizInput, actions: [] } as QuizPicturesRepairInput, env)).rejects.toThrow('INPUT_SHAPE');
++    await expect(prepareRejectedQuizPicturesRepair({ ...quizInput, archivePath: input.archivePath, archiveSha256: input.archiveSha256 }, env)).rejects.toThrow('QUIZ_ONLY');
++  });
++  it('keeps the old options-only input and plan schemas separate in both directions', async () => {
++    const plan = await prepareRejectedQuizPicturesRepair(quizInput, env);
++    await expect(prepareRejectedQuizRepair(quizInput as unknown as QuizRepairInput, env)).rejects.toThrow('INPUT_SHAPE');
++    await expect(runRejectedQuizRepair(plan, plan.sha256, env)).rejects.toThrow('PLAN_APPROVAL_SHA');
++    await expect(runRejectedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('PLAN_APPROVAL_SHA');
++    const oldInput = { jobDir: quizInput.jobDir, archivePath: quizInput.archivePath, archiveSha256: quizInput.archiveSha256, revisedOptionVisualsPath: quizInput.picturesPath, revisedOptionVisualsSha256: quizInput.picturesSha256 };
++    await expect(prepareRejectedQuizPicturesRepair(oldInput as unknown as QuizPicturesRepairInput, env)).rejects.toThrow('INPUT_SHAPE');
++    const { sha256: _sha, ...body } = plan;
++    const oldBody = { ...body, schemaVersion: 'mira.textbook.rejected-quiz-visual-repair-plan.v1' };
++    const oldPlan = { ...oldBody, sha256: textbookDigest(oldBody) };
++    await expect(runRejectedQuizPicturesRepair(oldPlan, oldPlan.sha256, env)).rejects.toThrow('PLAN_APPROVAL_SHA');
++  });
++  it.each(['missing-target', 'missing-options', 'empty-target', 'empty-options', 'array', 'extra-field', 'question-map', 'answer-override', 'missing-choice', 'extra-choice', 'target-extra', 'option-extra', 'target-kind', 'target-alt', 'option-alt'])('refuses malformed pictures %s without changes', async kind => {
++    let v: any = structuredClone(pictures);
++    if (kind === 'missing-target') delete v.visual;
++    if (kind === 'missing-options') delete v.optionVisuals;
++    if (kind === 'empty-target') v.visual = {};
++    if (kind === 'empty-options') v.optionVisuals = {};
++    if (kind === 'array') v = [];
++    if (kind === 'extra-field') v.question = 'changed';
++    if (kind === 'question-map') v = { 'q-one': v };
++    if (kind === 'answer-override') v.answer = ['A'];
++    if (kind === 'missing-choice') delete v.optionVisuals.C;
++    if (kind === 'extra-choice') v.optionVisuals.D = v.optionVisuals.A;
++    if (kind === 'target-extra') v.visual.width = 100;
++    if (kind === 'option-extra') v.optionVisuals.A.onClick = 'changed';
++    if (kind === 'target-kind') v.visual.kind = 'text';
++    if (kind === 'target-alt') v.visual.alt = ' ';
++    if (kind === 'option-alt') delete v.optionVisuals.A.alt;
++    await replacePictures(v);
++    await expect(prepareRejectedQuizPicturesRepair(quizInput, env)).rejects.toThrow('TEXTBOOK_REPAIR_QUIZ_PICTURES_');
++    expect((await document())!.scenes).toEqual([priorScene]); expect(await readLedger()).toEqual(ledger);
++    expect(await fs.readFile(quizInput.archivePath)).toEqual(originalBytes);
++  });
++  it.each(['external', 'data-svg', 'foreign-stage', 'query', 'unbound-target', 'wrong-target', 'swapped-options'])('refuses %s source or binding', async kind => {
++    const v = structuredClone(pictures);
++    if (kind === 'external') v.visual.src = 'https://example.com/picture.png';
++    if (kind === 'data-svg') v.visual.src = 'data:image/svg+xml,<svg/>';
++    if (kind === 'foreign-stage') v.visual.src = '/api/classroom-media/foreign-stage/media/picture.png';
++    if (kind === 'query') v.visual.src += '?new=true';
++    if (kind === 'unbound-target') v.visual.src = `/api/classroom-media/${stageId}/media/new-picture.png`;
++    if (kind === 'wrong-target') v.visual.src = visuals.B.src;
++    if (kind === 'swapped-options') { v.optionVisuals.A = visuals.B; v.optionVisuals.B = visuals.A; }
++    await replacePictures(v);
++    await expect(prepareRejectedQuizPicturesRepair(quizInput, env)).rejects.toThrow(/QUIZ_PICTURES_SOURCE|QUIZ_ASSET_BINDING_MISSING|IMAGE_BINDING_MISSING/);
++    expect((await document())!.scenes).toEqual([priorScene]); expect(await readLedger()).toEqual(ledger);
++  });
++  it('binds immutable request/archive bytes and refuses malformed UTF8 and symlinks', async () => {
++    const plan = await prepareRejectedQuizPicturesRepair(quizInput, env);
++    await expect(runRejectedQuizPicturesRepair(plan, '0'.repeat(64), env)).rejects.toThrow('PLAN_APPROVAL_SHA');
++    const link = path.join(root, 'pictures-link.json'); await fs.symlink(quizInput.picturesPath, link);
++    await expect(prepareRejectedQuizPicturesRepair({ ...quizInput, picturesPath: link }, env)).rejects.toThrow('SYMLINK_REFUSED');
++    await fs.appendFile(quizInput.picturesPath, ' ');
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow('QUIZ_PICTURES_SHA');
++    for (const bytes of [Buffer.from('{ invalid }'), Buffer.from([0xff, 0xfe])]) {
++      await fs.writeFile(quizInput.picturesPath, bytes); quizInput.picturesSha256 = hash(bytes);
++      await expect(prepareRejectedQuizPicturesRepair(quizInput, env)).rejects.toThrow('QUIZ_PICTURES_JSON');
++    }
++    await fs.appendFile(quizInput.archivePath, ' ');
++    await expect(prepareRejectedQuizPicturesRepair(quizInput, env)).rejects.toThrow('ARCHIVE_SHA');
++  });
++  it.each(['picture.png', 'glyph-sh.png'])('checks actual %s bytes again after preparation', async file => {
++    const plan = await prepareRejectedQuizPicturesRepair(quizInput, env);
++    await sharp({ create: { width: 64, height: 64, channels: 3, background: '#ffff00' } }).png().toFile(path.join(root, 'classrooms', stageId, 'media', file));
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow('IMAGE_BYTES_CHANGED');
++    expect((await document())!.scenes).toEqual([priorScene]); expect(await readLedger()).toEqual(ledger);
++  });
++  it.each(['owner', 'session-owner', 'running', 'queued', 'lease', 'deleted', 'frozen'])('preserves authority fence after %s changes', async kind => {
++    const plan = await prepareRejectedQuizPicturesRepair(quizInput, env);
++    if (kind === 'owner') await sql("UPDATE stage_meta SET owner_id='foreign'");
++    if (kind === 'session-owner') await sql("UPDATE agent_sessions SET owner_id='foreign'");
++    if (kind === 'running') await sql("UPDATE agent_sessions SET status='running'");
++    if (kind === 'queued') await sql("UPDATE agent_sessions SET status='queued'");
++    if (kind === 'lease') await sql("UPDATE agent_sessions SET lease_worker_id='worker'");
++    if (kind === 'deleted') await sql('UPDATE stage_meta SET deleted_at=now()');
++    if (kind === 'frozen') await sql("UPDATE agent_sessions SET prompt='changed'");
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow();
++    expect((await sql('SELECT id FROM document_scenes')).rows).toEqual([{ id: priorScene.id }]);
++    expect(await readLedger()).toEqual(ledger);
++  });
++  it('requires the exact full before document/ledger and refuses recovery without matching intent', async () => {
++    const plan = await prepareRejectedQuizPicturesRepair(quizInput, env), before = (await document())!;
++    await store.saveDocument({ ...before, stage: { ...before.stage, name: 'Changed' } });
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow('STALE_BEFORE');
++    await store.saveDocument(before);
++    const { sha256: _seal, ...body } = ledger, changed = { ...body, operatorNote: 'changed' };
++    await fs.writeFile(ledgerFile(), JSON.stringify({ ...changed, sha256: textbookDigest(changed) }));
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow('STALE_BEFORE');
++    await fs.writeFile(ledgerFile(), JSON.stringify(ledger));
++    await store.putScene(stageId, { ...quiz, content: { ...quiz.content, questions: [{ ...quiz.content.questions[0], ...pictures }] } });
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow('PAGE_EXISTS');
++  });
++  it('retains transaction locks and recovers DB-before/ledger-after without changing prior pages', async () => {
++    const plan = await prepareRejectedQuizPicturesRepair(quizInput, env), before = (await document())!;
++    const query = pool.query, queries: string[] = []; let failed = false;
++    pool.query = async (text, args) => { queries.push(text); if (text === 'COMMIT' && !failed) { failed = true; throw new Error('pictures commit interrupted'); } return query(text, args); };
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow('pictures commit interrupted');
++    pool.query = query;
++    expect(queries.some(q => q.includes('agent_sessions') && q.includes('FOR UPDATE'))).toBe(true);
++    expect(queries.some(q => q.includes('stage_meta') && q.includes('FOR UPDATE'))).toBe(true);
++    expect(queries.some(q => q.startsWith('SAVEPOINT'))).toBe(true);
++    expect(await document()).toEqual(before); expect((await readLedger()).sha256).toBe(plan.afterCandidateSha256);
++    const receipt = await runRejectedQuizPicturesRepair(plan, plan.sha256, env);
++    expect(receipt.documentSha256).toBe(plan.afterDocumentSha256); expect((await document())!.scenes[0]).toEqual(priorScene);
++  });
++  it('recovers DB-after/ledger-after with missing receipt without another scene write', async () => {
++    const plan = await prepareRejectedQuizPicturesRepair(quizInput, env), open = fs.open.bind(fs); let failed = false;
++    vi.spyOn(fs, 'open').mockImplementation(async (...args: Parameters<typeof fs.open>) => {
++      if (String(args[0]).endsWith('/receipt.json') && !failed) { failed = true; throw new Error('pictures receipt interrupted'); }
++      return open(...args);
++    });
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow('pictures receipt interrupted');
++    expect(textbookDigest(await document())).toBe(plan.afterDocumentSha256);
++    const queries: string[] = [], query = pool.query;
++    pool.query = async (text, args) => { queries.push(text); return query(text, args); };
++    const receipt = await runRejectedQuizPicturesRepair(plan, plan.sha256, env);
++    expect(queries.some(q => q.includes('INSERT INTO document_scenes'))).toBe(false);
++    expect(receipt.providerCalls).toBe(0); expect((await document())!.scenes).toHaveLength(2);
++    expect(await fs.readFile(quizInput.archivePath)).toEqual(originalBytes);
++    await fs.writeFile(path.join(repairDir(plan), 'intent.json'), '{}');
++    await expect(runRejectedQuizPicturesRepair(plan, plan.sha256, env)).rejects.toThrow('INTENT_COLLISION');
++  });
++});

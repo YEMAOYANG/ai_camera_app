@@ -1,0 +1,456 @@
+diff --git a/lib/server/mira-textbook-pinyin-pronunciation.ts b/lib/server/mira-textbook-pinyin-pronunciation.ts
+--- a/lib/server/mira-textbook-pinyin-pronunciation.ts
++++ b/lib/server/mira-textbook-pinyin-pronunciation.ts
+@@ -123,6 +123,305 @@
+   "listeningRequired": true
+ } as const;
+ 
++/** Whole-token BPMF candidate recipe. Call-name probes do not approve short consonants. */
++export const MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY = {
++  "policyVersion": "mira.textbook.pinyin-bpmf-ssml.v1",
++  "subject": "chinese",
++  "providerId": "aliyun-cosyvoice",
++  "modelId": "cosyvoice-v3-flash",
++  "voiceId": "longanwen_v3",
++  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
++  "inputParameters": {
++    "voice": "longanwen_v3",
++    "format": "wav",
++    "sample_rate": 24000,
++    "enable_ssml": true,
++    "rate": 1,
++    "pitch": 1,
++    "seed": 0,
++    "language_hints": [
++      "zh"
++    ]
++  },
++  "symbols": {
++    "b": {
++      "ph": "bo1",
++      "carrier": "波"
++    },
++    "p": {
++      "ph": "po1",
++      "carrier": "坡"
++    },
++    "m": {
++      "ph": "mo1",
++      "carrier": "摸"
++    },
++    "f": {
++      "ph": "fo1",
++      "carrier": "佛"
++    },
++    "ɑ": {
++      "ph": "a1",
++      "carrier": "啊"
++    },
++    "ba": {
++      "ph": "ba1",
++      "carrier": "八"
++    },
++    "bā": {
++      "ph": "ba1",
++      "carrier": "八"
++    },
++    "bá": {
++      "ph": "ba2",
++      "carrier": "拔"
++    },
++    "bǎ": {
++      "ph": "ba3",
++      "carrier": "把"
++    },
++    "bà": {
++      "ph": "ba4",
++      "carrier": "坝"
++    },
++    "bō": {
++      "ph": "bo1",
++      "carrier": "波"
++    },
++    "bí": {
++      "ph": "bi2",
++      "carrier": "鼻"
++    },
++    "bù": {
++      "ph": "bu4",
++      "carrier": "布"
++    },
++    "pá": {
++      "ph": "pa2",
++      "carrier": "爬"
++    },
++    "pò": {
++      "ph": "po4",
++      "carrier": "破"
++    },
++    "pī": {
++      "ph": "pi1",
++      "carrier": "批"
++    },
++    "pǔ": {
++      "ph": "pu3",
++      "carrier": "普"
++    },
++    "mǎ": {
++      "ph": "ma3",
++      "carrier": "马"
++    },
++    "mō": {
++      "ph": "mo1",
++      "carrier": "摸"
++    },
++    "mǐ": {
++      "ph": "mi3",
++      "carrier": "米"
++    },
++    "mù": {
++      "ph": "mu4",
++      "carrier": "木"
++    },
++    "fā": {
++      "ph": "fa1",
++      "carrier": "发"
++    },
++    "fó": {
++      "ph": "fo2",
++      "carrier": "佛"
++    },
++    "fǔ": {
++      "ph": "fu3",
++      "carrier": "斧"
++    }
++  },
++  "textHandling": {
++    "normalization": "none",
++    "xmlEscape": "amp_lt_gt_quot_apos",
++    "unsupportedLatin": "reject",
++    "combiningMarks": "reject",
++    "wrapper": "speak",
++    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
++    "latinRunRanges": [
++      [
++        48,
++        57
++      ],
++      [
++        65,
++        90
++      ],
++      [
++        97,
++        122
++      ],
++      [
++        170,
++        170
++      ],
++      [
++        186,
++        186
++      ],
++      [
++        192,
++        214
++      ],
++      [
++        216,
++        246
++      ],
++      [
++        248,
++        696
++      ],
++      [
++        736,
++        740
++      ],
++      [
++        7424,
++        7461
++      ],
++      [
++        7468,
++        7516
++      ],
++      [
++        7522,
++        7525
++      ],
++      [
++        7531,
++        7543
++      ],
++      [
++        7545,
++        7614
++      ],
++      [
++        7680,
++        7935
++      ],
++      [
++        8305,
++        8305
++      ],
++      [
++        8319,
++        8319
++      ],
++      [
++        8336,
++        8348
++      ],
++      [
++        8490,
++        8491
++      ],
++      [
++        8498,
++        8498
++      ],
++      [
++        8526,
++        8526
++      ],
++      [
++        8544,
++        8584
++      ],
++      [
++        11360,
++        11391
++      ],
++      [
++        42786,
++        42887
++      ],
++      [
++        42891,
++        42972
++      ],
++      [
++        42993,
++        43007
++      ],
++      [
++        43824,
++        43866
++      ],
++      [
++        43868,
++        43876
++      ],
++      [
++        43878,
++        43881
++      ],
++      [
++        64256,
++        64262
++      ],
++      [
++        65313,
++        65338
++      ],
++      [
++        65345,
++        65370
++      ],
++      [
++        67456,
++        67461
++      ],
++      [
++        67463,
++        67504
++      ],
++      [
++        67506,
++        67514
++      ],
++      [
++        119808,
++        120831
++      ],
++      [
++        122624,
++        122654
++      ],
++      [
++        122661,
++        122666
++      ]
++    ]
++  },
++  "listeningRequired": true,
++  "words": {
++    "爸爸": {
++      "ph": "ba4 ba5",
++      "carrier": "爸爸"
++    },
++    "妈妈": {
++      "ph": "ma1 ma5",
++      "carrier": "妈妈"
++    }
++  },
++  "approvalBoundary": {
++    "recipeStatus": "candidate-pending-exact-formal-whole-sentence-listening",
++    "approvedProbeScope": "four-base-call-names-only",
++    "shortConsonantAccepted": false,
++    "formalListeningScope": "every-segment-containing-a-registered-latin-token-or-chinese-word"
++  }
++} as const;
++
+ function canonical(value: unknown): unknown {
+   if (Array.isArray(value)) return value.map(canonical);
+   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value)
+@@ -137,7 +436,8 @@
+ export const MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY));
+ 
+ export const MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY));
+-type RegisteredPolicy = typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY;
++export const MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY));
++type RegisteredPolicy = typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY;
+ 
+ // Only server-owned recipes can enter this registry. A caller supplies an
+ // identity, never provider settings, an SSML template, or a symbol table.
+@@ -150,6 +450,10 @@
+     policy: MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY,
+     sha256: MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY_SHA256,
+   }],
++  [MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY.policyVersion, {
++    policy: MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY,
++    sha256: MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY_SHA256,
++  }],
+ ]);
+ 
+ function registeredPolicy(version: unknown) {
+@@ -175,6 +479,44 @@
+ const XML_ENTITIES: Record<string, string> = {
+   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
+ };
++
++/** Code-point cursor, shared fixed Latin ranges, and longest whole Chinese words.
++ * Unknown runs cannot fall back to individually supported consonants/vowels. */
++function bpmfParts(text: string, policy: typeof MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY): string[] {
++  const characters = Array.from(text);
++  const latin = (character: string) => policy.textHandling.latinRunRanges.some(
++    ([start, end]) => character.codePointAt(0)! >= start && character.codePointAt(0)! <= end,
++  );
++  const symbols: Record<string, { ph: string; carrier: string }> = policy.symbols;
++  const words: Record<string, { ph: string; carrier: string }> = policy.words;
++  const wordKeys = Object.keys(words).sort((a, b) => Array.from(b).length - Array.from(a).length || (a < b ? -1 : a > b ? 1 : 0));
++  const parts: string[] = [];
++  for (let index = 0; index < characters.length;) {
++    const character = characters[index];
++    if (/\p{Mark}/u.test(character) || (/\p{Cc}/u.test(character) && !/[\n\r\t]/u.test(character)))
++      throw new Error('Invalid textbook pinyin mark or control character');
++    let token: string | undefined;
++    let entry: { ph: string; carrier: string };
++    if (latin(character)) {
++      let end = index + 1;
++      while (end < characters.length && latin(characters[end])) end += 1;
++      token = characters.slice(index, end).join('');
++      if (!Object.hasOwn(symbols, token)) throw new Error('Unsupported complete textbook pinyin token');
++      entry = symbols[token];
++    } else {
++      token = wordKeys.find(word => characters.slice(index, index + Array.from(word).length).join('') === word);
++      if (token === undefined) {
++        parts.push(XML_ENTITIES[character] ?? character);
++        index += 1;
++        continue;
++      }
++      entry = words[token];
++    }
++    parts.push(`<phoneme alphabet="py" ph="${entry.ph}">${entry.carrier}</phoneme>`);
++    index += Array.from(token).length;
++  }
++  return parts;
++}
+ 
+ export function prepareMiraTextbookPinyinPronunciation(
+   text: string, policyVersion: unknown = MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.policyVersion,
+@@ -183,7 +525,8 @@
+     throw new Error('Invalid textbook pinyin text');
+   const { policy, sha256: policySha256 } = registeredPolicy(policyVersion);
+   const symbols: Record<string, { ph: string; carrier: string }> = policy.symbols;
+-  const parts = Array.from(text).map(character => {
++  const parts = policy.policyVersion === MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY.policyVersion
++    ? bpmfParts(text, policy) : Array.from(text).map(character => {
+     const symbol = symbols[character];
+     if (symbol) return `<phoneme alphabet="py" ph="${symbol.ph}">${symbol.carrier}</phoneme>`;
+     // Do not normalize: a visually equivalent spelling would otherwise have a different source identity.
+diff --git a/tests/server/mira-textbook-pinyin-pronunciation.test.ts b/tests/server/mira-textbook-pinyin-pronunciation.test.ts
+--- a/tests/server/mira-textbook-pinyin-pronunciation.test.ts
++++ b/tests/server/mira-textbook-pinyin-pronunciation.test.ts
+@@ -7,6 +7,8 @@
+   MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256,
+   MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY,
+   MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY_SHA256,
++  MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY,
++  MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY_SHA256,
+   isMiraTextbookPinyinProviderPronunciation,
+   prepareMiraTextbookPinyinPronunciation,
+ } from '@/lib/server/mira-textbook-pinyin-pronunciation';
+@@ -60,6 +62,58 @@
+     ('rejects unsupported Latin or combining marks before dispatch: %s', text => {
+       expect(() => prepareMiraTextbookPinyinPronunciation(text)).toThrow();
+     });
++});
++
++describe('lesson-bound BPMF whole-token recipe', () => {
++  const version = 'mira.textbook.pinyin-bpmf-ssml.v1';
++
++  it('matches backend JSON and Python physical-body identity without changing provider parameters', () => {
++    expect(MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY_SHA256)
++      .toBe('0db25c66499d66ddf8569e6c621d74fc63e344ff3436cfd7908e78e5509a84de');
++    const source = path.resolve(process.cwd(), '../../../backend/content/textbook_pinyin_pronunciation_bpmf.v1.json');
++    if (existsSync(source)) expect(MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY)
++      .toEqual(JSON.parse(readFileSync(source, 'utf8')));
++    expect(MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY.inputParameters)
++      .toEqual(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.inputParameters);
++    expect(MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY.listeningRequired).toBe(true);
++    expect(MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY.approvalBoundary.shortConsonantAccepted).toBe(false);
++    const prepared = prepareMiraTextbookPinyinPronunciation('请听b p m f，ɑ ba bā bá bǎ bà，爸爸、妈妈。', version);
++    expect(prepared.profile.ssmlSha256).toBe('8343595c46dbef24126d661bb5360bd9f31a88c2b01e1963e9a888f8df7a2701');
++    expect(prepared.providerPronunciation.providerBodySha256)
++      .toBe('c829841fca7dfa555c8d704612e60994774954387509c075ec1bbae2cf4d36ab');
++    expect(isMiraTextbookPinyinProviderPronunciation(prepared.providerPronunciation,
++      prepared.providerPronunciation.sourceTextSha256)).toBe(true);
++    expect(isMiraTextbookPinyinProviderPronunciation({ ...prepared.providerPronunciation,
++      policyVersion: 'mira.textbook.pinyin-iuu-ssml.v1' }, prepared.providerPronunciation.sourceTextSha256)).toBe(false);
++  });
++
++  it('emits exactly one phoneme for each entire supported syllable or call-name', () => {
++    const cases = [
++      ['b', 'bo1', '波'], ['p', 'po1', '坡'], ['m', 'mo1', '摸'], ['f', 'fo1', '佛'],
++      ['ɑ', 'a1', '啊'], ['ba', 'ba1', '八'], ['bā', 'ba1', '八'], ['bá', 'ba2', '拔'],
++      ['bǎ', 'ba3', '把'], ['bà', 'ba4', '坝'], ['bō', 'bo1', '波'], ['bí', 'bi2', '鼻'],
++      ['bù', 'bu4', '布'], ['pá', 'pa2', '爬'], ['pò', 'po4', '破'], ['pī', 'pi1', '批'],
++      ['pǔ', 'pu3', '普'], ['mǎ', 'ma3', '马'], ['mō', 'mo1', '摸'], ['mǐ', 'mi3', '米'],
++      ['mù', 'mu4', '木'], ['fā', 'fa1', '发'], ['fó', 'fo2', '佛'], ['fǔ', 'fu3', '斧'],
++    ];
++    expect(Object.keys(MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY.symbols).sort()).toEqual(cases.map(c => c[0]).sort());
++    for (const [token, ph, carrier] of cases) expect(prepareMiraTextbookPinyinPronunciation(`请听：${token}。`, version).ssml)
++      .toBe(`<speak>请听：<phoneme alphabet="py" ph="${ph}">${carrier}</phoneme>。</speak>`);
++  });
++
++  it.each(['bai', 'e', 'baaa', 'bābá', 'bɑ', 'bǎng', 'B', 'pǐ', 'ba1',
++    'bā\u0301', 'b\u0304a', 'bK', 'Ⅳ', '𝒃', 'hello', 'constructor', '\x85'])
++    ('rejects unknown complete spelling without splitting: %s', text => {
++      expect(() => prepareMiraTextbookPinyinPronunciation(`请听${text}。`, version)).toThrow();
++    });
++
++  it('keeps whole Chinese words and codepoint boundaries after an astral character', () => {
++    expect(prepareMiraTextbookPinyinPronunciation('爸爸和妈妈。', version).ssml)
++      .toBe('<speak><phoneme alphabet="py" ph="ba4 ba5">爸爸</phoneme>和<phoneme alphabet="py" ph="ma1 ma5">妈妈</phoneme>。</speak>');
++    expect(prepareMiraTextbookPinyinPronunciation('😀<&>"\'爸爸，bā。', version).ssml)
++      .toBe('<speak>😀&lt;&amp;&gt;&quot;&apos;<phoneme alphabet="py" ph="ba4 ba5">爸爸</phoneme>，<phoneme alphabet="py" ph="ba1">八</phoneme>。</speak>');
++    expect(prepareMiraTextbookPinyinPronunciation('爸、妈、八。', version).ssml).toBe('<speak>爸、妈、八。</speak>');
++  });
+ });
+ 
+ describe('server-registered textbook IUU recipe', () => {

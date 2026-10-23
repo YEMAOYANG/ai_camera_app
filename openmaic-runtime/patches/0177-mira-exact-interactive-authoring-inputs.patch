@@ -1,0 +1,535 @@
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -1,5 +1,7 @@
+ import { createHash } from 'node:crypto';
+ import { Type } from 'typebox';
++import { Check } from 'typebox/value';
++import dslSceneSchema from '@openmaic/dsl/schema/scene.schema.json';
+ import type { AgentTool } from '@earendil-works/pi-agent-core';
+ import { isActionType } from '@openmaic/dsl';
+ import {
+@@ -32,6 +34,30 @@
+ 
+ const MAX_GENERATE_SCENE_MEDIA = 8;
+ const SUPPORTED_SCENE_TYPES = new Set(['slide', 'quiz', 'interactive', 'pbl']);
++const EXACT_ACTION_SCHEMA = { definitions: dslSceneSchema.definitions, ...dslSceneSchema.definitions.Action };
++
++// Preserve caller-owned geometry and task extensions while checking every field
++// the generation package consumes structurally before any provider call.
++const WidgetOutlineParams = Type.Object({
++  concept: Type.Optional(Type.String()),
++  keyVariables: Type.Optional(Type.Array(Type.Union([Type.String(), Type.Record(Type.String(), Type.Unknown())]))),
++  diagramType: Type.Optional(Type.Union(['flowchart', 'mindmap', 'hierarchy', 'system', 'interactive-visual-structure'].map(value => Type.Literal(value)))),
++  notTeachingFlowchart: Type.Optional(Type.Boolean()),
++  nodeCount: Type.Optional(Type.Integer({ minimum: 0 })),
++  nodes: Type.Optional(Type.Array(Type.Object({
++    id: Type.String(), label: Type.String(), parentId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
++    icon: Type.Optional(Type.String()), details: Type.Optional(Type.String()),
++  }, { additionalProperties: true }))),
++  language: Type.Optional(Type.Union(['python', 'javascript', 'typescript', 'java', 'cpp'].map(value => Type.Literal(value)))),
++  gameType: Type.Optional(Type.String({ minLength: 1, maxLength: 128 })),
++  visualizationType: Type.Optional(Type.Union(['molecular', 'solar', 'anatomy', 'geometry', 'physics', 'custom'].map(value => Type.Literal(value)))),
++  procedureType: Type.Optional(Type.Union(['repair', 'assembly', 'inspection', 'operation', 'custom'].map(value => Type.Literal(value)))),
++  objects: Type.Optional(Type.Array(Type.String())), interactions: Type.Optional(Type.Array(Type.String())),
++  task: Type.Optional(Type.String()), tools: Type.Optional(Type.Array(Type.String())),
++  steps: Type.Optional(Type.Array(Type.String())), successCriteria: Type.Optional(Type.Array(Type.String())),
++  errorConsequences: Type.Optional(Type.Array(Type.String())), challenge: Type.Optional(Type.String()),
++  playerControls: Type.Optional(Type.Array(Type.String())), challengeType: Type.Optional(Type.String()),
++}, { additionalProperties: true, description: 'Complete approved widget design, including exact geometry and interaction extensions. Preserve the supplied object; notTeachingFlowchart opts diagram pages into picture-led structure authoring.' });
+ 
+ const SceneParams = Type.Object({
+   stageId: Type.String({ description: COURSE_STAGE_ID_DESCRIPTION }),
+@@ -53,6 +79,10 @@
+     ]),
+   ),
+   brief: Type.String({ minLength: 1 }),
++  widgetOutline: Type.Optional(WidgetOutlineParams),
++  actions: Type.Optional(Type.Array(Type.Unknown(), {
++    description: 'Exact complete DSL actions with stable unique IDs. Validated and persisted unchanged; skips the action generator.',
++  })),
+   instruction: Type.Optional(Type.String()),
+   materialFacts: Type.Optional(Type.Array(Type.String())),
+   media: Type.Optional(
+@@ -243,7 +273,7 @@
+     name: 'generate_scene',
+     label: 'Generate page',
+     description:
+-      'Generate and durably persist one page from an explicit title, type, and brief. Reusing an order replaces that page.',
++      'Generate and durably persist one page from an explicit title, type, and brief. Pass the full approved widgetOutline, real media, instruction, and exact actions when supplied; exact actions skip narration rewriting. Reusing an order replaces that page.',
+     parameters: SceneParams,
+     async execute(_callId, params, signal) {
+       if (!Number.isInteger(params.order) || params.order < 1) {
+@@ -297,6 +327,22 @@
+           true,
+         );
+       }
++      if (params.widgetOutline !== undefined &&
++          (params.type !== 'interactive' || !params.widgetType || !Check(WidgetOutlineParams, params.widgetOutline))) {
++        return result('widgetOutline needs an interactive widgetType and valid structured fields.', { error: 'invalid-widget-outline' }, true);
++      }
++      let exactActions: Action[] | undefined;
++      if (params.actions !== undefined) {
++        const ids = new Set<string>();
++        if (!Array.isArray(params.actions) || params.actions.some(action => {
++          if (!Check(EXACT_ACTION_SCHEMA, action)) return true;
++          const id = (action as Action).id;
++          if (!id.trim() || ids.has(id)) return true;
++          ids.add(id);
++          return false;
++        })) return result('actions must satisfy the strict DSL with nonempty unique IDs; nothing was generated.', { error: 'invalid-exact-actions' }, true);
++        exactActions = structuredClone(params.actions) as Action[];
++      }
+       const requestedMedia = params.media ?? [];
+       if (requestedMedia.length > MAX_GENERATE_SCENE_MEDIA) {
+         return result(
+@@ -315,7 +361,7 @@
+         ...(params.type === 'interactive' && params.widgetType
+           ? {
+               widgetType: params.widgetType,
+-              widgetOutline: { concept: brief },
++              widgetOutline: params.widgetOutline ? structuredClone(params.widgetOutline) as SceneOutline['widgetOutline'] : { concept: brief },
+             }
+           : {}),
+         ...(params.type === 'pbl'
+@@ -398,6 +444,8 @@
+             : {}),
+           ...(assignedImages.length ? { assignedImages, imageMapping } : {}),
+           ...(params.instruction ? { editDirective: params.instruction } : {}),
++          ...(params.widgetOutline !== undefined ? { includeWidgetOutline: true } : {}),
++          ...(exactActions !== undefined ? { exactActions } : {}),
+           ...(baseline ? { baselineContent: baseline } : {}),
+         });
+       } catch (error) {
+@@ -419,11 +467,11 @@
+       }
+       if (signal?.aborted) throw new Error('aborted');
+       if (!content) return result('Page content generation failed; nothing was written.', {}, true);
+-      const actionsCall = contextualCall('scene-actions', { ...pageInput, phase: 'actions' });
++      const actionsCall = exactActions === undefined ? contextualCall('scene-actions', { ...pageInput, phase: 'actions' }) : undefined;
+       if (deps.getGenerationLearningContract?.() && outline.type === 'interactive' && 'html' in content)
+         assertLearningInteractiveSyntax(content.html);
+-      const actions = filterKnownActions(
+-        await actionGenerator(outline, content, actionsCall.call, {
++      const actions = exactActions ?? filterKnownActions(
++        await actionGenerator(outline, content, actionsCall!.call, {
+           agents,
+           languageDirective: doc.stage.languageDirective ?? '',
+         }),
+@@ -435,7 +483,7 @@
+       const scene = built as Scene;
+       await runStageMutation(signal, () => deps.store.putScene(params.stageId, scene));
+       await contentCall.record();
+-      await actionsCall.record();
++      await actionsCall?.record();
+       const skill = deps.getActiveSkill?.() ?? null;
+       const afterWrite = await deps.store.loadDocument(params.stageId);
+       const skillViolations =
+diff --git a/lib/types/generation.ts b/lib/types/generation.ts
+--- a/lib/types/generation.ts
++++ b/lib/types/generation.ts
+@@ -118,10 +118,12 @@
+   concept?: string;
+ 
+   // Type-specific fields
+-  keyVariables?: string[]; // simulation
+-  diagramType?: 'flowchart' | 'mindmap' | 'hierarchy' | 'system'; // diagram
++  keyVariables?: Array<string | Record<string, unknown>>; // simulation
++  diagramType?: 'flowchart' | 'mindmap' | 'hierarchy' | 'system' | 'interactive-visual-structure'; // diagram
++  /** Explicit picture-led task opt-in; ordinary diagrams retain their template. */
++  notTeachingFlowchart?: boolean;
+   language?: 'python' | 'javascript' | 'typescript' | 'java' | 'cpp'; // code
+-  gameType?: 'quiz' | 'puzzle' | 'strategy' | 'card' | 'action'; // game
++  gameType?: string; // game - named mechanism, including caller-defined textbook tasks
+   visualizationType?: 'molecular' | 'solar' | 'anatomy' | 'geometry' | 'physics' | 'custom'; // visualization3d
+   objects?: string[]; // visualization3d
+   interactions?: string[]; // visualization3d
+@@ -137,7 +139,7 @@
+   nodes?: Array<{
+     id: string;
+     label: string;
+-    parentId?: string;
++    parentId?: string | null;
+     icon?: string;
+     details?: string;
+   }>; // diagram - prescribed nodes and optional hierarchy
+diff --git a/packages/@openmaic/generation/src/outline-types.ts b/packages/@openmaic/generation/src/outline-types.ts
+--- a/packages/@openmaic/generation/src/outline-types.ts
++++ b/packages/@openmaic/generation/src/outline-types.ts
+@@ -32,10 +32,12 @@
+ 
+ export interface WidgetOutline {
+   concept?: string;
+-  keyVariables?: string[];
+-  diagramType?: 'flowchart' | 'mindmap' | 'hierarchy' | 'system';
++  keyVariables?: Array<string | Record<string, unknown>>;
++  diagramType?: 'flowchart' | 'mindmap' | 'hierarchy' | 'system' | 'interactive-visual-structure';
++  /** Explicit picture-led task opt-in; ordinary diagrams retain their template. */
++  notTeachingFlowchart?: boolean;
+   language?: 'python' | 'javascript' | 'typescript' | 'java' | 'cpp';
+-  gameType?: 'quiz' | 'puzzle' | 'strategy' | 'card' | 'action';
++  gameType?: string;
+   visualizationType?: 'molecular' | 'solar' | 'anatomy' | 'geometry' | 'physics' | 'custom';
+   objects?: string[];
+   interactions?: string[];
+@@ -51,7 +53,7 @@
+   nodes?: Array<{
+     id: string;
+     label: string;
+-    parentId?: string;
++    parentId?: string | null;
+     icon?: string;
+     details?: string;
+   }>;
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -108,9 +108,13 @@
+   /**
+    * Natural-language edit instruction for whole-slide regeneration (MAIC Editor
+    * agent `regenerate_scene`). When set, the slide content prompt switches to
+-   * EDIT MODE. slide-only; ignored by other scene types.
++   * EDIT MODE. Interactive widgets also receive this explicit instruction.
+    */
+   editDirective?: string;
++  /** Validated by the host; widgets must keep supplied narration text/IDs exact. */
++  exactActions?: Action[];
++  /** Explicit caller structure must reach the model intact, including extensions. */
++  includeWidgetOutline?: boolean;
+   /**
+    * The current slide content, fed as the edit baseline so content-specific
+    * instructions operate on the real slide rather than re-rolling from outline.
+@@ -283,6 +287,10 @@
+       textbookPromptProfile: options.textbookPromptProfile,
+       learningContract: options.learningContract,
+       imageMapping: options.imageMapping,
++      assignedImages,
++      editDirective,
++      exactActions: options.exactActions,
++      includeWidgetOutline: options.includeWidgetOutline,
+       logger: log,
+     });
+   }
+@@ -1127,6 +1135,10 @@
+     textbookPromptProfile?: 'textbook-v1';
+     learningContract?: LearningSceneContract;
+     imageMapping?: ImageMapping;
++    assignedImages?: PdfImage[];
++    editDirective?: string;
++    exactActions?: Action[];
++    includeWidgetOutline?: boolean;
+     logger?: GenerationLogger;
+   } = {},
+ ): Promise<GeneratedInteractiveContent | null> {
+@@ -1150,7 +1162,7 @@
+         conceptName: widgetOutline.concept || outline.title,
+         conceptOverview: outline.description,
+         keyPoints: (outline.keyPoints || []).join('\n'),
+-        variables: widgetOutline.keyVariables?.join(', ') || '',
++        variables: widgetOutline.keyVariables?.map(value => typeof value === 'string' ? value : JSON.stringify(value)).join(', ') || '',
+         designIdea: '',
+         languageDirective: languageDirective || '',
+       };
+@@ -1158,7 +1170,8 @@
+ 
+     case 'diagram': {
+       const prescribedNodes = widgetOutline.nodes ?? [];
+-      promptId = PROMPT_IDS.DIAGRAM_CONTENT;
++      promptId = widgetOutline.notTeachingFlowchart === true
++        ? PROMPT_IDS.PICTURE_STRUCTURE_CONTENT : PROMPT_IDS.DIAGRAM_CONTENT;
+       variables = {
+         title: outline.title,
+         diagramType: widgetOutline.diagramType || 'flowchart',
+@@ -1169,6 +1182,7 @@
+         hasNodeCount: typeof widgetOutline.nodeCount === 'number' && widgetOutline.nodeCount > 0,
+         hasPrescribedNodes: prescribedNodes.length > 0,
+         languageDirective: languageDirective || '',
++        widgetOutline,
+       };
+       break;
+     }
+@@ -1261,7 +1275,23 @@
+   const mediaInstructions = generatedMedia.length
+     ? '\nGenerated media will be resolved after authoring. Use each exact elementId as a literal HTML src attribute on video/source for video or img for image. Never invent a URL or a fake player. Keep native video controls visible and play only on an explicit student action.\n' + JSON.stringify(generatedMedia)
+     : '';
+-  const response = await aiCall(prompts.system + (options.learningContract ? learningSceneInstructions(options.learningContract) : ''), prompts.user + mediaInstructions);
++  const suppliedMedia = (options.assignedImages ?? []).map(image => ({
++    id: image.id, src: options.imageMapping?.[image.id] ?? image.src,
++    description: image.description ?? '',
++    ...(image.width !== undefined ? { width: image.width } : {}),
++    ...(image.height !== undefined ? { height: image.height } : {}),
++  }));
++  const explicitInput = options.includeWidgetOutline === true || suppliedMedia.length > 0 || options.editDirective !== undefined || options.exactActions !== undefined || widgetOutline.notTeachingFlowchart === true;
++  // No additions for legacy callers: ordinary diagram prompt bytes stay stable.
++  const inputContract = explicitInput ? '\n\n## Exact supplied page inputs\n'
++    + 'Implement this structured widget outline as the actual child-operable task, not a summary of teaching steps. Preserve exact geometry and source paths; do not invent glyphs, media URLs, or sound callbacks.\n'
++    + JSON.stringify({ widgetOutline, media: suppliedMedia,
++      ...(options.editDirective !== undefined ? { instruction: options.editDirective } : {}),
++      ...(options.exactActions !== undefined ? { actions: options.exactActions } : {}),
++    })
++    + '\nUse supplied images as real teaching content with these exact src values. Supplied actions are immutable; do not paraphrase, omit, add, or limit them to 3–8 items. Keep each required cue ID and text as specified in the page contract.\n'
++    : '';
++  const response = await aiCall(prompts.system + (options.learningContract ? learningSceneInstructions(options.learningContract) : ''), prompts.user + mediaInstructions + inputContract);
+   const rawHtml = extractHtml(response, log);
+   const html = rawHtml ? resolveInteractiveImageIds(rawHtml, options.imageMapping) : rawHtml;
+ 
+@@ -1275,7 +1305,9 @@
+   if (options.learningContract) assertLearningInteractive({ html, widgetType, widgetConfig }, options.learningContract);
+ 
+   return {
+-    html: postProcessInteractiveHtml(html, { includeKatex: options.includeKatex }),
++    html: postProcessInteractiveHtml(html, {
++      includeKatex: widgetOutline.notTeachingFlowchart === true ? false : options.includeKatex,
++    }),
+     widgetType,
+     widgetConfig,
+   };
+diff --git a/packages/@openmaic/generation/src/prompts/index.ts b/packages/@openmaic/generation/src/prompts/index.ts
+--- a/packages/@openmaic/generation/src/prompts/index.ts
++++ b/packages/@openmaic/generation/src/prompts/index.ts
+@@ -16,6 +16,7 @@
+   QUIZ_CONTENT: 'quiz-content',
+   SIMULATION_CONTENT: 'simulation-content',
+   DIAGRAM_CONTENT: 'diagram-content',
++  PICTURE_STRUCTURE_CONTENT: 'picture-structure-content',
+   CODE_CONTENT: 'code-content',
+   GAME_CONTENT: 'game-content',
+   TEXTBOOK_GAME_CONTENT: 'textbook-game-content',
+diff --git a/packages/@openmaic/generation/src/prompts/types.ts b/packages/@openmaic/generation/src/prompts/types.ts
+--- a/packages/@openmaic/generation/src/prompts/types.ts
++++ b/packages/@openmaic/generation/src/prompts/types.ts
+@@ -9,6 +9,7 @@
+   | 'quiz-content'
+   | 'simulation-content'
+   | 'diagram-content'
++  | 'picture-structure-content'
+   | 'code-content'
+   | 'game-content'
+   | 'textbook-game-content'
+diff --git a/tests/agent-runtime/generation-tools.test.ts b/tests/agent-runtime/generation-tools.test.ts
+--- a/tests/agent-runtime/generation-tools.test.ts
++++ b/tests/agent-runtime/generation-tools.test.ts
+@@ -103,6 +103,107 @@
+ }
+ 
+ describe('generation and deck tools', () => {
++  it.each(['diagram', 'simulation'] as const)('preserves structured %s inputs and exact long actions through the real content pipeline', async widgetType => {
++    const current = state(document([]));
++    const html = `<html><head></head><body><img src="img_1"><script type="application/json" id="widget-config">{"type":"${widgetType}"}</script></body></html>`;
++    const aiCall = vi.fn(async (_system: string, _user: string) => html);
++    const generateActions = vi.fn(async () => []);
++    const contextReceipt = vi.fn(async () => {});
++    const tool = find(buildGenerationTools(deps(current.store, {
++      aiCall, generateActions,
++      getGenerationSkillContext: () => ({ text: 'approved rules', contextSha256: 'a'.repeat(64) }),
++      onGenerationSkillContext: contextReceipt,
++    })), 'generate_scene');
++    const actions = Array.from({ length: 10 }, (_, index) => ({
++      id: `speech-p2-${index}`, type: 'speech', text: `逐字保留第${index}句。`,
++    }));
++    const widgetOutline = { concept: '精确字形', notTeachingFlowchart: true,
++      diagramType: 'interactive-visual-structure', keyVariables: ['selectedCard'],
++      nodes: [{ id: 'letter-z', label: 'glyph-z', parentId: null }],
++      preciseGeometry: { path: 'M10,10 L100,10 L10,100 L100,100', sha256: 'a'.repeat(64) },
++    };
++    const media = [{ src: '/api/classroom-media/stage-test/media/z.png', description: '已核规范小写z，不能用大写Z', width: 1024, height: 768 }];
++    const result = await tool.execute('exact-inputs', { stageId: 'stage-test', order: 1,
++      title: '看图找字', type: 'interactive', widgetType, brief: '真实图片和规范字形点选',
++      widgetOutline, actions, media, instruction: '保留开口；错误选择不推进。',
++    } as never);
++    expect(result).not.toMatchObject({ isError: true });
++    expect(aiCall).toHaveBeenCalledTimes(1);
++    expect(generateActions).not.toHaveBeenCalled();
++    expect(contextReceipt).toHaveBeenCalledTimes(1); // no invented actions-model receipt
++    const [system, user] = aiCall.mock.calls[0]!;
++    if (widgetType === 'diagram') {
++      expect(system).toContain('Picture-led Interactive Structure Authoring v1');
++      expect(user).not.toContain('Step-by-step reveal');
++    }
++    expect(user).toContain(JSON.stringify(widgetOutline));
++    expect(user).toContain(JSON.stringify(actions));
++    expect(user).toContain(media[0].src);
++    expect(user).toContain(media[0].description);
++    expect(user).toContain('"width":1024,"height":768');
++    expect(user).toContain('保留开口；错误选择不推进。');
++    expect(current.get()?.scenes[0].actions).toEqual(actions);
++    expect(current.get()?.scenes[0].id).toBe('scene-p1');
++    expect((current.get()?.scenes[0].content as { html: string }).html).toContain(media[0].src);
++  });
++
++  it.each([
++    [{ id: 'a', type: 'speech' }],
++    [{ id: 'a', type: 'speech', text: '原句', speed: 'fast' }],
++    [{ id: 'a', type: 'speech', text: '原句', fabricated: true }],
++    [{ id: 'a', type: 'invented', text: '原句' }],
++    [{ id: '', type: 'speech', text: '原句' }],
++    [{ id: 'a', type: 'speech', text: '原句' }, { id: 'a', type: 'speech', text: '重复ID' }],
++  ])('rejects malformed exact actions before a paid call or mutation: %j', async (...actions) => {
++    const current = state(document([]));
++    const aiCall = vi.fn();
++    const generateActions = vi.fn();
++    const tool = find(buildGenerationTools(deps(current.store, { aiCall, generateActions })), 'generate_scene');
++    const result = await tool.execute('bad-exact', { stageId: 'stage-test', order: 1,
++      title: 'Practice', type: 'interactive', widgetType: 'simulation', brief: 'Keep it exact', actions,
++    } as never);
++    expect(result).toMatchObject({ isError: true });
++    expect(result.details).toMatchObject({ error: 'invalid-exact-actions' });
++    expect(aiCall).not.toHaveBeenCalled();
++    expect(generateActions).not.toHaveBeenCalled();
++    expect(current.store.putScene).not.toHaveBeenCalled();
++  });
++
++  it('rejects invalid widget structure before content generation', async () => {
++    const current = state(document([]));
++    const aiCall = vi.fn();
++    const tool = find(buildGenerationTools(deps(current.store, { aiCall })), 'generate_scene');
++    const result = await tool.execute('bad-outline', { stageId: 'stage-test', order: 1,
++      title: 'Practice', type: 'interactive', widgetType: 'simulation', brief: 'Exact',
++      widgetOutline: { keyVariables: 'not an array' },
++    } as never);
++    expect(result).toMatchObject({ isError: true });
++    expect(aiCall).not.toHaveBeenCalled();
++    expect(current.store.putScene).not.toHaveBeenCalled();
++  });
++
++  it.each([
++    { widgetType: 'simulation', widgetOutline: { concept: '声母c与规范字形联系；刺猬是记忆情境',
++      keyVariables: [{ name: 'activeTask', input: '真实图卡或轨迹操作' }, { name: 'demonstration', input: '请求示范/复听' }],
++      interaction: '先真实声音后准入、反馈结束才完成、隐藏取消、重听恢复。', notTeachingFlowchart: true } },
++    { widgetType: 'game', widgetOutline: { gameType: 'spoken-picture-or-glyph-match',
++      challenge: '听示范后从s/z两图找目标', playerControls: ['重听', '帮助', '重来'],
++      interaction: '两张同待遇字形卡真实选择判定，错误保持任务。', notTeachingFlowchart: true } },
++    { widgetType: 'diagram', widgetOutline: { concept: 'ordinary visual structure',
++      exactGeometry: { path: 'M0,0 L2,1' } } },
++  ])('preserves structured textbook mechanisms without coercing them to legacy enums: $widgetType', async ({ widgetType, widgetOutline }) => {
++    const current = state(document([]));
++    const aiCall = vi.fn(async (_system: string, _user: string) => '<html><head></head><body></body></html>');
++    const tool = find(buildGenerationTools(deps(current.store, { aiCall, generateActions: async () => [] })), 'generate_scene');
++    const result = await tool.execute('structured-mechanism', { stageId: 'stage-test', order: 3,
++      title: '本课任务', type: 'interactive', widgetType, widgetOutline, brief: '遵守已冻结任务',
++    } as never);
++    expect(result).not.toMatchObject({ isError: true });
++    expect(aiCall.mock.calls[0]![1]).toContain(JSON.stringify(widgetOutline));
++    expect(aiCall.mock.calls[0]![1]).not.toContain('[object Object]');
++    expect(current.get()?.scenes).toHaveLength(1);
++  });
++
+   it('lets AI choose an unscored game only for server-owned playful context', async () => {
+     for (const playful of [false, true]) {
+       const current = state(document([]));
+diff --git a/packages/@openmaic/generation/test/assets.test.ts b/packages/@openmaic/generation/test/assets.test.ts
+--- a/packages/@openmaic/generation/test/assets.test.ts
++++ b/packages/@openmaic/generation/test/assets.test.ts
+@@ -18,6 +18,7 @@
+   'quiz-content',
+   'simulation-content',
+   'diagram-content',
++  'picture-structure-content',
+   'code-content',
+   'game-content',
+   'textbook-game-content',
+diff --git a/packages/@openmaic/generation/templates/picture-structure-content/system.md b/packages/@openmaic/generation/templates/picture-structure-content/system.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/picture-structure-content/system.md
+@@ -0,0 +1,39 @@
++# Picture-led Interactive Structure Authoring v1
++
++Produce one complete self-contained HTML document implementing the supplied learner task. The host selected this profile because `notTeachingFlowchart` is true. `diagram` identifies an inspectable visual structure; it does not require a teaching flowchart.
++
++## Teaching content
++
++- Use the supplied real pictures, exact glyph paths, and source URLs as the actual objects to inspect, select, place, or compare. Do not replace them with text boxes, emoji, uppercase substitutes, guessed geometry, or decorative symbols.
++- Preserve every supplied exact path, dot, tone mark and stroke sequence. Do not reconstruct a character from a font or a different letter. Material keys are references, not student labels.
++- Show the meaningful scene and the current task together. Node definitions describe the visual objects, not a mandatory sequence of connected steps. Do not invent arrows, process boxes, or an information sidebar describing how to learn.
++- Implement the requested controls and state changes, including incorrect attempts and replay. Do not substitute generic matching if the specified task is exploration, construction, tracing, turn-taking, or another mechanism.
++- Children must be able to act from pictures and recorded teacher speech without reading instructions. Use supplementary short text only, large actual target glyphs, visible pictorial feedback, and equally styled unanswered choices. Never reveal the answer through option styling before a response or requested help.
++- Keep controls at least 56 CSS pixels. Reflow at 360×360 and 1000×563; drag sources and targets must remain in the same usable view. Do not shrink touch targets with transforms.
++
++## Narration and state
++
++- The host owns audio. Never define or replace `window.miraNarrate`, synthesize browser speech, fabricate playing/ready events, or use timers as successful audio completion.
++- Keep the supplied controller byte-for-byte when one is provided. For any cue, only a matching real `playing` followed by `ready` allows progression. Null-ready is initialization; hidden, errors, rejected playback, and cancellation do not complete an attempt. Keep the same task retryable.
++- Preserve all supplied narration text and action IDs exactly. Use the specified cue IDs, and put the static cue inventory in `script#mira-narration-cues` with JSON `{ "schemaVersion":"mira.interactive.narration-cues.v1", "cues":[{"id":"specified-cue-id","text":"exact supplied text"}] }`. Do not invent IDs if they were provided in the contract.
++- Completed activities may replay a selected demonstration without changing accepted progress. Help followed by replay must not loop help indefinitely.
++- Use actual pointer events and the supplied continuous trajectory validator for tracing. Track one primary pointer, reject shortcuts and wrong targets, clear capture on cancel/lost capture/hidden, and retain the current round after failure.
++
++## Host interface
++
++Embed `script#widget-config[type="application/json"]` with `{"type":"diagram"}` plus any necessary real visual state. Register the host messages below against the real HTML elements; never emit a fake narration event:
++
++```javascript
++window.addEventListener('message', event => {
++  if (event.source !== window.parent || !event.data || typeof event.data !== 'object') return;
++  const { type, state, target, content } = event.data;
++  switch (type) {
++    case 'SET_WIDGET_STATE': /* update the actual visual state */ break;
++    case 'HIGHLIGHT_ELEMENT': /* highlight the actual matching element */ break;
++    case 'ANNOTATE_ELEMENT': /* annotate the actual matching element */ break;
++    case 'REVEAL_ELEMENT': /* reveal the actual matching element */ break;
++  }
++});
++```
++
++No external scripts, styles, fonts or CDN dependencies. Return exactly one HTML document, no Markdown fences. Required source attribution may be available through an unobtrusive expandable source control; it must not replace the child's task.
+diff --git a/packages/@openmaic/generation/templates/picture-structure-content/user.md b/packages/@openmaic/generation/templates/picture-structure-content/user.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/picture-structure-content/user.md
+@@ -0,0 +1,15 @@
++Implement this picture-led interactive task: {{title}}
++
++## Exact task brief
++{{description}}
++
++## Teaching facts
++{{keyPoints}}
++
++## Complete caller-supplied visual structure
++{{widgetOutline}}
++
++## Language
++{{languageDirective}}
++
++Use the exact supplied page inputs below, including media, geometry, instruction and narration. The final HTML must implement the learner's actual operation, not a diagram of teaching stages. Preserve `widgetType: diagram` and `widgetConfig.type: diagram` as host metadata.
+diff --git a/packages/@openmaic/generation/test/picture-structure-inputs.test.ts b/packages/@openmaic/generation/test/picture-structure-inputs.test.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/test/picture-structure-inputs.test.ts
+@@ -0,0 +1,36 @@
++import { describe, expect, it } from 'vitest';
++import { buildPrompt, generateSceneContent, type SceneOutline } from '@openmaic/generation';
++
++describe('explicit picture-led diagram routing', () => {
++  const outline: SceneOutline = { id: 'p2', order: 2, title: '看图找字', type: 'interactive',
++    description: '看实物图片和规范字形', keyPoints: ['不把教学步骤画成流程'], widgetType: 'diagram',
++    widgetOutline: { concept: 'shape' },
++  };
++  it.each([undefined, false])('retains ordinary diagram prompt bytes with flag %s', async flag => {
++    let captured: unknown;
++    await generateSceneContent({ ...outline, widgetOutline: { concept: 'shape', ...(flag !== undefined ? { notTeachingFlowchart: flag } : {}) } }, async (system, user) => {
++      captured = { system, user }; return '<html><body></body></html>';
++    });
++    expect(captured).toEqual(buildPrompt('diagram-content', {
++      title: outline.title, diagramType: 'flowchart', description: outline.description,
++      keyPoints: outline.keyPoints.join('\n'), nodeCount: 0, prescribedNodes: [],
++      hasNodeCount: false, hasPrescribedNodes: false, languageDirective: '',
++    }));
++  });
++  it('uses both dedicated templates without unresolved placeholders or mandatory workflow nodes', async () => {
++    let captured = { system: '', user: '' };
++    const result = await generateSceneContent({ ...outline, widgetOutline: { notTeachingFlowchart: true,
++      diagramType: 'interactive-visual-structure', nodes: [{ id: 'letter-z', label: 'glyph-z', parentId: null }],
++    } }, async (system, user) => {
++      captured = { system, user }; return '<html><body></body></html>';
++    });
++    expect(captured.system).toContain('Picture-led Interactive Structure Authoring v1');
++    expect(captured.user).toContain('"id": "letter-z"');
++    expect(captured.system + captured.user).not.toContain('{{');
++    expect(captured.system + captured.user).not.toMatch(/[\p{Extended_Pictographic}\u{1f1e6}-\u{1f1ff}\u20e3]/u);
++    expect(captured.system + captured.user).not.toContain('All nodes connected');
++    expect(captured.system).toContain('Null-ready is initialization');
++    expect(captured.system).toContain('56 CSS pixels');
++    expect(result && 'html' in result && result.html).not.toContain('cdn.jsdelivr.net');
++  });
++});

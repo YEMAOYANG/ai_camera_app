@@ -153,6 +153,7 @@ export function SchoolbagMotionProvider({ children }: { children: ReactNode }) {
 
   const start = useCallback((action: BagAction, href: string, subject?: SchoolSubject) => {
     if (journey.current) return;
+    if (action === "open") router.prefetch(href);
     if (reducedSnapshot() || !engine.current || (!stage.current && action !== "return") || !ready) {
       if (action === "pack") { router.replace(href); router.refresh(); } else router.push(href);
       return;

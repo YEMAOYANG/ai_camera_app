@@ -1,0 +1,281 @@
+{
+  "policyVersion": "mira.textbook.pinyin-garden2-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "symbols": {
+    "dǎ": {
+      "ph": "da3",
+      "carrier": "打"
+    },
+    "dà": {
+      "ph": "da4",
+      "carrier": "大"
+    },
+    "mō": {
+      "ph": "mo1",
+      "carrier": "摸"
+    },
+    "mó": {
+      "ph": "mo2",
+      "carrier": "磨"
+    },
+    "bí": {
+      "ph": "bi2",
+      "carrier": "鼻"
+    },
+    "bǐ": {
+      "ph": "bi3",
+      "carrier": "笔"
+    },
+    "pú": {
+      "ph": "pu2",
+      "carrier": "葡"
+    },
+    "pù": {
+      "ph": "pu4",
+      "carrier": "铺"
+    },
+    "là": {
+      "ph": "la4",
+      "carrier": "蜡"
+    },
+    "mǐ": {
+      "ph": "mi3",
+      "carrier": "米"
+    },
+    "fú": {
+      "ph": "fu2",
+      "carrier": "扶"
+    },
+    "tī": {
+      "ph": "ti1",
+      "carrier": "梯"
+    },
+    "dì": {
+      "ph": "di4",
+      "carrier": "地"
+    },
+    "tú": {
+      "ph": "tu2",
+      "carrier": "图"
+    },
+    "b": {
+      "ph": "bo1",
+      "carrier": "波"
+    },
+    "d": {
+      "ph": "de1",
+      "carrier": "的"
+    },
+    "f": {
+      "ph": "fo1",
+      "carrier": "佛"
+    },
+    "t": {
+      "ph": "te1",
+      "carrier": "特"
+    },
+    "ɑ": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "i": {
+      "ph": "yi1",
+      "carrier": "衣"
+    },
+    "u": {
+      "ph": "wu1",
+      "carrier": "乌"
+    }
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "words": {},
+  "approvalBoundary": {
+    "recipeStatus": "candidate-pending-nine-new-whole-syllable-probes-and-exact-formal-sentence-listening",
+    "approvedProbeScope": "none-for-u2-l5-pending-human-review",
+    "shortConsonantAccepted": false,
+    "formalListeningScope": "every-formal-segment-containing-a-registered-latin-token-including-question-feedback-and-repetition",
+    "humanReview": "pending",
+    "pronunciationApproved": false,
+    "formalUseAllowed": false,
+    "probeScope": "nine-new-whole-syllables-only; twelve unchanged prior symbol mappings do not need duplicate base probes",
+    "probeSuccessDoesNotProve": "formal-context tone accuracy, light-short consonant delivery, complete-sentence fidelity, or publication readiness"
+  }
+}

@@ -1,0 +1,174 @@
+diff --git a/lib/server/mira-textbook-asset-revision.ts b/lib/server/mira-textbook-asset-revision.ts
+--- a/lib/server/mira-textbook-asset-revision.ts
++++ b/lib/server/mira-textbook-asset-revision.ts
+@@ -3,6 +3,7 @@
+ import { constants, promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import sharp from 'sharp';
++import { parse, type DefaultTreeAdapterMap } from 'parse5';
+ import { validateScene } from '@openmaic/dsl';
+ import { PgDocumentStore, type Queryable } from '@openmaic/storage/document/pg';
+ import { validateAppStage } from '@/lib/document-store/validators';
+@@ -171,10 +172,44 @@
+     check(textbookDigest(ledger.scenes[i]) === textbookDigest({ sceneId: scene.id, order: scene.order, sha256: textbookDigest(scene), canonicalJson: textbookCanonical(scene), contractSha256: s.frozen.sha256 }), 'SCENE_LEDGER');
+   }
+ }
++/** Preserve source bytes: only quoted, literal HTML img[src] values are mutable. */
++function patchHtmlImageSources(html: string, from: string, to: string) {
++  const spans: { start: number; end: number }[] = [], errors: string[] = [];
++  const tree = parse(html, { sourceCodeLocationInfo: true, onParseError: e => errors.push(e.code) });
++  check(!errors.includes('duplicate-attribute'), 'UNSUPPORTED_DEPENDENCY');
++  const visit = (node: DefaultTreeAdapterMap['node']) => {
++    if ('tagName' in node) {
++      if (node.tagName === 'template') return;
++      const source = node.attrs.find(a => a.name === 'src');
++      if (node.tagName === 'img' && node.namespaceURI === 'http://www.w3.org/1999/xhtml' && source?.value === from) {
++        const loc = node.sourceCodeLocation?.attrs?.src;
++        check(loc, 'UNSUPPORTED_DEPENDENCY');
++        const raw = html.slice(loc!.startOffset, loc!.endOffset), match = /^src\s*=\s*(['"])([\s\S]*)\1$/i.exec(raw);
++        check(match && match[2] === from, 'UNSUPPORTED_DEPENDENCY');
++        const start = loc!.startOffset + raw.indexOf(match![1]) + 1;
++        spans.push({ start, end: start + from.length });
++      }
++    }
++    if ('childNodes' in node) node.childNodes.forEach(visit);
++  };
++  visit(tree); spans.sort((a, b) => a.start - b.start);
++  // Every occurrence must be one of those exact attributes, never script,
++  // style, comment, template, another attribute or a longer URL.
++  let cursor = 0;
++  for (const span of spans) {
++    check(span.start >= cursor && !html.slice(cursor, span.start).includes(from), 'UNSUPPORTED_DEPENDENCY');
++    cursor = span.end;
++  }
++  check(spans.length > 0 && !html.slice(cursor).includes(from), 'UNSUPPORTED_DEPENDENCY');
++  let revised = html;
++  for (const span of [...spans].reverse()) revised = revised.slice(0, span.start) + to + revised.slice(span.end);
++  return { revised, spans };
++}
+ function patchDocument(doc: CourseDocument, before: Json, changes: Json[]) {
+-  const after = structuredClone(doc), dependencies: Json[] = [], allowed = new Set<string>();
++  const after = structuredClone(doc), dependencies: Json[] = [], allowed = new Set<string>(), htmlPaths = new Set<string>();
+   for (const [i, scene] of doc.scenes.entries()) {
+     const c = scene.content as Json, root = ['scenes', String(i), 'content'];
++    if (scene.type === 'interactive' && typeof c.html === 'string') htmlPaths.add(textbookCanonical([...root, 'html']));
+     if (scene.type === 'slide') c.canvas.elements.forEach((e: Json, j: number) => { if (e.type === 'image') allowed.add(textbookCanonical([...root, 'canvas', 'elements', String(j), 'src'])); });
+     if (scene.type === 'quiz') c.questions.forEach((q: Json, j: number) => {
+       if (q.visual?.kind === 'image') allowed.add(textbookCanonical([...root, 'questions', String(j), 'visual', 'src']));
+@@ -186,10 +221,21 @@
+     let count = 0;
+     function walk(v: any, parts: string[]) {
+       if (typeof v === 'string' && v.includes(change.from.src)) {
+-        check(v === change.from.src && allowed.has(textbookCanonical(parts)), 'UNSUPPORTED_DEPENDENCY');
+-        let target: any = after; for (const part of parts.slice(0, -1)) target = target[part]; target[parts.at(-1)!] = change.to.src;
++        const location = textbookCanonical(parts), isHtml = htmlPaths.has(location);
++        check(isHtml || (v === change.from.src && allowed.has(location)), 'UNSUPPORTED_DEPENDENCY');
++        let target: any = after; for (const part of parts.slice(0, -1)) target = target[part];
+         const scene = doc.scenes[Number(parts[1])];
+-        dependencies.push({ assetKey: change.assetKey, sceneId: scene.id, order: scene.order, path: '/' + parts.map(p => p.replace(/~/g, '~0').replace(/\//g, '~1')).join('/'), beforeSceneSha256: textbookDigest(scene) }); count++;
++        const dependency: Json = { assetKey: change.assetKey, sceneId: scene.id, order: scene.order, path: '/' + parts.map(p => p.replace(/~/g, '~0').replace(/\//g, '~1')).join('/'), beforeSceneSha256: textbookDigest(scene) };
++        if (isHtml) {
++          // Earlier assets may already have been revised in this same HTML.
++          const current = target[parts.at(-1)!];
++          const { revised, spans } = patchHtmlImageSources(current, change.from.src, change.to.src);
++          target[parts.at(-1)!] = revised;
++          Object.assign(dependency, { kind: 'html-img-src', sourceOffsetUnit: 'utf16', sourceSpans: spans, beforeHtmlSha256: hash(current), afterHtmlSha256: hash(revised) });
++        } else {
++          target[parts.at(-1)!] = change.to.src;
++        }
++        dependencies.push(dependency); count++;
+       } else if (Array.isArray(v)) v.forEach((value, i) => walk(value, [...parts, String(i)]));
+       else if (object(v)) for (const [key, value] of Object.entries(v)) walk(value, [...parts, key]);
+     }
+diff --git a/tests/agent-runtime/textbook-asset-revision.test.ts b/tests/agent-runtime/textbook-asset-revision.test.ts
+--- a/tests/agent-runtime/textbook-asset-revision.test.ts
++++ b/tests/agent-runtime/textbook-asset-revision.test.ts
+@@ -13,6 +13,7 @@
+ import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest } from '@/lib/server/mira-textbook-scene-contract';
+ import { prepareTextbookAssetRevision, runTextbookAssetRevision, type AssetRevisionInput } from '@/lib/server/mira-textbook-asset-revision';
+ import type { CourseStore } from '@/lib/server/agent-runtime/course-tools';
++import type { InteractiveContent, Scene } from '@/lib/types/stage';
+ import fixture from '../fixtures/textbook-scene-contract.v1.json';
+ 
+ const hash = (v: string | Buffer) => createHash('sha256').update(v).digest('hex');
+@@ -44,6 +45,18 @@
+   const current = await ledger(); delete current.sha256;
+   current.scenes = value.scenes.map((s: any) => ({ sceneId: s.id, order: s.order, sha256: textbookDigest(s), canonicalJson: textbookCanonical(s), contractSha256: frozen.sha256 }));
+   await fs.writeFile(ledgerPath(), JSON.stringify({ ...current, sha256: textbookDigest(current) })); await refreshInput();
++}
++async function seedInteractive(extra = '', imageMarkup = `<img SRC = '${src('smell')}' alt="闻"><img src="${src('smell')}" id="result-image"><img src="${src('cactus')}" alt="带刺的植物">`) {
++  frozen.contract.pagePlan[0] = { page: 1, title: '观察方法', type: 'interactive', widgetType: 'simulation', move: '看图观察' };
++  frozen.sha256 = textbookDigest(frozen.contract);
++  await db.query('UPDATE agent_sessions SET prompt=$1', [prompt()]);
++  await fs.writeFile(path.join(input.jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen }));
++  const current = await ledger(); delete current.sha256; current.frozenContract = frozen;
++  await fs.writeFile(ledgerPath(), JSON.stringify({ ...current, sha256: textbookDigest(current) }));
++  const value = (await doc())!, scenes = value.scenes as Scene[];
++  const html = `<!doctype html><html><head><meta name="mira-responsive-activity" content="low-reading-v1"><style>button { min-height: 48px; }</style></head><body><!-- keep byte spacing -->\n${imageMarkup}<img src="${src('eyes')}" alt="看"><script id="mira-narration-cues" type="application/json">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"intro","text":"站远一点，轻轻闻。"}]}</script><script type="application/json" id="widget-config">{"type":"simulation"}</script><script>let sequence=[];document.querySelector('img').onclick=()=>{sequence.push('child-choice');window.miraNarrate('intro');};</script>${extra}</body></html>`;
++  scenes[0] = { ...scenes[0], type: 'interactive', content: { type: 'interactive', html, widgetType: 'simulation', widgetConfig: { type: 'simulation', concept: '观察', description: '看图观察', variables: [] } } };
++  await seedDocument(value); return html;
+ }
+ beforeEach(async () => {
+   root = await fs.realpath(await fs.mkdtemp(path.join(tmpdir(), 'asset-revision-')));
+@@ -87,6 +100,61 @@
+ afterEach(async () => { vi.restoreAllMocks(); await db.close(); await fs.rm(root, { recursive: true, force: true }); });
+ 
+ describe('explicit local asset revision', () => {
++  it('revises only source-bounded static img attributes, including repeated images and multiple assets in one HTML', async () => {
++    const html = await seedInteractive(), original = (await doc())!, candidateBytes = await fs.readFile(ledgerPath());
++    const plan = await prepareTextbookAssetRevision(input, env);
++    expect(await doc()).toEqual(original); expect(await fs.readFile(ledgerPath())).toEqual(candidateBytes);
++    const htmlDependencies = (plan.dependencies as { kind?: string; assetKey: string; sourceSpans: { start: number; end: number }[]; beforeHtmlSha256: string; afterHtmlSha256: string }[]).filter(d => d.kind === 'html-img-src');
++    const changes = plan.changes as { assetKey: string; from: { src: string }; to: { src: string } }[];
++    expect(htmlDependencies.map(d => d.sourceSpans.length)).toEqual([2, 1]);
++    let expected = html;
++    for (const dependency of htmlDependencies) {
++      const change = changes.find(c => c.assetKey === dependency.assetKey)!;
++      expect(dependency.beforeHtmlSha256).toBe(hash(expected));
++      for (const span of [...dependency.sourceSpans].reverse()) {
++        expect(expected.slice(span.start, span.end)).toBe(change.from.src);
++        expected = expected.slice(0, span.start) + change.to.src + expected.slice(span.end);
++      }
++      expect(dependency.afterHtmlSha256).toBe(hash(expected));
++    }
++    const receipt = await runTextbookAssetRevision(plan, plan.sha256, env), after = (await doc())!;
++    const afterScene = after.scenes[0] as Scene, beforeScene = original.scenes[0] as Scene;
++    const afterContent = afterScene.content as InteractiveContent;
++    expect(afterContent.html).toBe(expected);
++    let restored = afterContent.html!;
++    for (const change of changes) restored = restored.split(change.to.src).join(change.from.src);
++    expect(restored).toBe(html); expect(afterScene.actions).toEqual(beforeScene.actions);
++    expect(afterContent.widgetConfig).toEqual((beforeScene.content as InteractiveContent).widgetConfig);
++    expect((await ledger()).bindingHistory).toHaveLength(2);
++    expect(await fs.readFile(path.join(revisionDir(plan), 'original-candidate.json'))).toEqual(candidateBytes);
++    expect(JSON.parse(await fs.readFile(path.join(revisionDir(plan), 'original-document.json'), 'utf8'))).toEqual(original);
++    expect(await runTextbookAssetRevision(plan, plan.sha256, env)).toEqual(receipt);
++    expect(receipt.providerCalls).toBe(0);
++  });
++  it.each(['script', 'style', 'comment', 'text', 'attribute', 'template', 'longer-url'])('rejects an additional HTML %s reference without modifying any source', async kind => {
++    const extra: Record<string, string> = {
++      script: `<script>const source='${src('smell')}';</script>`,
++      style: `<style>.item { background-image:url('${src('smell')}'); }</style>`,
++      comment: `<!-- ${src('smell')} -->`, text: `<p>${src('smell')}</p>`,
++      attribute: `<div data-source="${src('smell')}"></div>`,
++      template: `<template><img src="${src('smell')}"></template>`,
++      'longer-url': `<img src="${src('smell')}?variant=2">`,
++    };
++    await seedInteractive(extra[kind]); const before = await doc(), bytes = await fs.readFile(ledgerPath());
++    await expect(prepareTextbookAssetRevision(input, env)).rejects.toThrow(kind === 'longer-url' ? 'TEXTBOOK_SCENE_IMAGE_BINDING_MISSING' : 'TEXTBOOK_ASSET_REVISION_UNSUPPORTED_DEPENDENCY');
++    expect(await doc()).toEqual(before); expect(await fs.readFile(ledgerPath())).toEqual(bytes);
++  });
++  it.each(['duplicate', 'encoded', 'unquoted'])('rejects ambiguous or nonliteral %s image attributes', async kind => {
++    const images: Record<string, string> = {
++      duplicate: `<img src="${src('smell')}" src="${src('eyes')}">`,
++      encoded: `<img src="${src('smell').replace('/api/', '&#47;api/')}">`,
++      unquoted: `<img src=${src('smell')}>`,
++    };
++    // A second literal occurrence makes the bounded HTML path inspect the
++    // entire document even when the first src uses an entity.
++    await seedInteractive('', images[kind] + `<img src="${src('smell')}"><img src="${src('cactus')}">`);
++    await expect(prepareTextbookAssetRevision(input, env)).rejects.toThrow('TEXTBOOK_ASSET_REVISION_UNSUPPORTED_DEPENDENCY');
++  });
+   it('read-only prepare; changes precisely three src leaves, preserves originals and frozen identities, uses standard history', async () => {
+     const original = (await doc())!, originalBytes = await fs.readFile(ledgerPath());
+     const plan = await prepareTextbookAssetRevision(input, env);

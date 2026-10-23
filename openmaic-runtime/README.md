@@ -134,6 +134,36 @@ sharp 0.35.4 in Docker standalone output. They change `package.json`, the
 lockfiles and `next.config.ts` only, so run `pnpm install --frozen-lockfile`
 before rebuilding.
 
+Patch `0163` backports upstream `cfae106b` (#1499): every PostgreSQL JSONB write
+replaces U+0000 and lone UTF-16 surrogates with U+FFFD before the statement
+is sent. Without it, a tool result that cuts an emoji in half fails the Agent
+session with `invalid input syntax for type json`. The storage package version
+stays at the pinned workspace value. It changes `packages/@openmaic/storage`,
+whose `dist` is rebuilt by `pnpm install --frozen-lockfile`.
+
+Patch `0164` lets the published textbook quiz show the reviewed pictures of a
+question (`visual`) and of its options (`optionVisuals`). Until then a released
+lesson showed text-only answers, which a child who cannot read cannot tell
+apart.
+
+Patch `0165` lets a released lesson place its questions on one to four
+in-class check pages. Each page hands in only its own questions through
+`/mira/textbook-quiz` and shows their feedback at once; the backend keeps the
+answers given so far (`partial`) and produces the lesson result and the parent
+report when the last question is answered. An answered question cannot be
+changed, and question ids stay unique across the lesson. The page heading no
+longer names one subject.
+
+Patch `0166` keeps an interactive page's own teacher lines quiet while the
+lecture or a discussion is speaking: the page is told it may not speak
+(`MIRA_NARRATION_VISIBILITY` is false) until the lecture pauses or ends. A tap
+inside the page moves focus into its frame, and the player then pauses the
+lecture through the event native activities already use
+(`mira:textbook-play-audio`), so the child hears the answer to what they did;
+the play control resumes the lecture and quiets the page again. Pages narrated
+after this change keep the line a child asked for while the lecture spoke and
+play it as soon as the page may speak (within 4 seconds).
+
 The pin itself stays at 1.0.0. The student launch gate requires every released
 classroom manifest to carry this exact source version and commit
 (`backend/repositories/formal_student_runtime_gate.py`), so moving the pin
@@ -161,6 +191,132 @@ least one result to be fetched into the same durable Agent session, prefers
 primary educational sources, and requires a visible source title or domain in
 the pages that use researched facts. Missing search, fetch, or citation evidence
 fails the job closed instead of publishing an offline or invented result.
+
+The managed authoring runner defaults to two concurrent sessions. Set
+`MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT=4` in `backend/.env` to allow Chinese,
+mathematics, English and science authoring to run together. The wrapper accepts
+integers from 1 through 4 and passes the limit only to the server process. Load a
+changed limit during an idle managed restart; do not interrupt paid calls or
+start a second unmanaged runner. Saved sessions retain their identities and
+PostgreSQL leases prevent duplicate claims.
+
+Optional `MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=65536` in `backend/.env` caps only the parent authoring model through all three managed Native launch paths; empty/unset preserves existing limits, canonical integers 1–2147483647 are accepted, and catalog/formal limits still take precedence when lower. An explicit empty process override clears the dotenv cap; `provider-status` reports the configured cap. Load changes only through a coordinated managed restart, leaving child generation, narration and saved history unchanged.
+
+### Comparing another model
+
+The frozen policy keeps courseware on DeepSeek. To see how another model builds
+the same lesson, start a second, isolated workbench: its own port, its own Agent
+database, the model named by an OpenRouter id, and `OPENROUTER_API_KEY` in
+`openmaic-runtime/.env`. The script refuses the student port and the main Agent
+database. Such an instance carries no frozen policy, so `/api/health` reports
+the policy as missing and it must not serve students or formal generation;
+pictures, speech and search keep their usual providers.
+
+```sh
+OPENMAIC_ADMIN_PORT=3200 MIRA_OPENMAIC_LOG_DIR=/tmp/mira-model-trial/sonnet \
+MIRA_OPENMAIC_ENABLE_MODEL_PROVIDER=1 MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1 \
+MIRA_OPENMAIC_OPERATOR_MODEL_TRIAL=1 \
+MIRA_OPENMAIC_OPERATOR_TRIAL_MODEL=anthropic/claude-sonnet-5.5 \
+MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://<user>@127.0.0.1:5432/openmaic_trial_sonnet \
+scripts/native-runtime.sh foreground-openmaic-production
+```
+
+Open `http://localhost:3200/workspace` (not `127.0.0.1`, so the two workbenches
+keep separate owner cookies) and send the same request. The saved classroom
+lands in the shared file store, so the usual export and adoption steps apply.
+Every stage of a trial lesson runs on the trial model, and the session can cost
+far more than a DeepSeek build; check the spend before starting a second one.
+
+### Publishing a workbench lesson to the textbook library
+
+A lesson authored in a workbench Agent session reaches students only through
+`backend/scripts/textbook_preview.py adopt`, then `narrate`,
+`audit_textbook_audio.py` and `publish_textbook_preview.py`. `adopt` refuses a
+classroom the released player cannot run, so state these rules in the request
+to the Agent instead of repairing pages afterwards:
+
+- Teach the textbook lesson itself. Look up that edition's lesson first (its
+  text, the characters to recognise and write, its tasks) and give those facts
+  in the request. A lesson that only shared the target characters and used an
+  unrelated scenario was rejected by the product owner. A traditional
+  public-domain text may be shown in full; textbook pictures, layout and
+  exercises are not used.
+- One to four in-class check pages, placed after the section they test, with
+  lesson-wide unique question ids. Each page is graded when it is handed in and
+  the pages add up to one lesson result. Picture answers use `visual` and
+  `optionVisuals`.
+- Shape of a lesson, taken from the examples on `open.maic.chat`: three or four
+  sections, each one explain, then try, then check; ten to eighteen pages; the
+  kind of interaction follows the subject (a simulation to operate in science,
+  movable counters and shapes in mathematics, listen-and-say in English,
+  characters and reading aloud in Chinese). Grades one and two stay
+  picture-first with short spoken lines; grades three to six get more
+  explanation and may read.
+- Publish with `--compact-media` (`backend/scripts/publish_textbook_preview.py`)
+  to deliver WebP pictures and MP3 narration encoded from the reviewed PNG and
+  WAV files. Each such item keeps `sourceSha256`, and the audio audit is checked
+  against it. One lesson went from 35 MB to about 4 MB. It needs `ffmpeg` for
+  narration; without it the reviewed files are delivered unchanged.
+- Interactive pages run in an opaque sandbox: no `speechSynthesis`, no
+  `localStorage` or other browser storage, no host other than the classroom.
+  Adoption checks the words themselves, so a page must not mention them even
+  in code that only disables them.
+- A page speaks only through `window.miraNarrate('<cue id>')`. It lists its
+  cues in one `<script id="mira-narration-cues" type="application/json">`
+  block, and every cue text is also a speech line of the same page, word for
+  word. Narration binds each cue to that line's audited recording. A line
+  being spoken is not cut off: a request for another line waits until it ends
+  (only the newest waiting request is kept), and asking for the same line again
+  restarts it. Lessons narrated before this rule keep the earlier helper,
+  which stopped the current line at once.
+- Keep every spoken line at seven characters or more. The audit needs 85%
+  similarity per line, so one misheard character fails a five-character line.
+  When a line names a character that sounds like another (目 and 木, 足 and 竹),
+  add its meaning, as in “目，眼睛的目”: speech recognition cannot tell
+  homophones apart, and the child benefits from the same hint.
+- Pages must fit 1000 by 563 without scrolling, and must not show an answer
+  count or character on an option before the child answers. Ask for a natural
+  height of at most 555 pixels; a taller page is shrunk to fit and its targets
+  become too small to tap.
+- Every interactive page shows at least one of the lesson's own illustrations
+  through its original media address, including the small pictures on cards
+  and options; adoption rejects a page that only draws icons
+  (`interactive_teaching_image_missing`).
+- The Agent cannot see where things are in a picture it generated. Touch
+  zones and drop targets placed on an illustration land in the wrong places
+  unless their positions are measured on the actual picture (as percentages
+  of its width and height) and given to the Agent.
+- The Agent also draws handwriting characters badly: in 《日月山川》 its
+  tracing 日 sat in one half of the grid and 禾 and 火 lost strokes. For a
+  tracing or stroke-order page, give every stroke as an SVG path in a
+  300 by 300 grid, in standard stroke order, and check the paths against a
+  printed character first (the request for 《语文园地一》 has six examples).
+- A drag-to-assemble page needs a faint outline of each piece in its slot,
+  and identical pieces must fit any matching slot; otherwise a child can only
+  guess.
+- Slide elements are drawn in list order. Generated slides have put background
+  blocks and dimming overlays last, hiding the characters and pictures under
+  them; ask for them to come first.
+- Generated drag code has measured the card after snapping it back, so no drop
+  ever counted. Ask for the drop to be judged by the pointer position at
+  release, and try every drag before narration.
+- Narration: a line whose speech call stalls or is refused by the provider
+  (receipt `ambiguous` or `failed`, seen on about one line in fifty on
+  2026-10-15) gets one second attempt under a new, recorded request id; a
+  second failure stops the run. The first attempt's receipt stays in the
+  preview's records.
+
+Play each interactive page before narration. `backend/scripts/textbook_page_harness.py`
+builds a local page from a saved classroom: `?auto=1` opens every interactive
+page, reports its natural size, script errors and the cue each click asks for,
+and `?page=N` shows one page in the student sandbox
+(`sandbox="allow-scripts allow-forms allow-popups"`, 1000 by 563, media inlined).
+The operator classroom view scales the frame, which blocks automated clicks,
+and it does not embed media the way the student gateway does. A reworked
+export of the same session is adopted as a new teaching revision. If the
+workbench loses its owner cookie, open `/classroom/<saved classroom id>` to
+copy that classroom into the current owner's courses, then start a new
+session with it referenced ("引用课堂") to continue fixing it.
 
 ```bash
 cd openmaic-runtime
@@ -923,3 +1079,5 @@ Patch `0107` distinguishes real learner replies from virtual classmates at the a
 Patch `0108` aligns desktop discussion choices, recovery controls, history actions and playback controls to 36 px with 48 px coarse-pointer targets. Semantic avatar, collapsed-message and response-cue hooks remove the remaining purple chrome in student discussion, including user messages. Student primary/secondary/end actions retain distinct colors; dedicated voice controls stay large. Operator styling, model routing, authored courseware and discussion behavior are unchanged.
 
 Patch `0156` keeps Mira provider policy outside the upstream routing module, restores the registered teacher avatar and skill translations, and maintains the existing runtime verification fixtures on Node 24.
+
+Patch `0248` preserves the current approved teacher sentence when a textbook quiz takes the sound channel. After a question or selected-feedback clip actually starts, its caption resolves from the active scene's saved speech and exact local audio path. Unknown options, other scenes, unrelated clips and iframe text cannot supply captions; grading, frozen questions and recorded audio stay unchanged.

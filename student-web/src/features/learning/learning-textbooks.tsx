@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, Backpack, BookOpen, Check, ChevronLeft, ChevronR
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { z } from "zod";
 
 import { SchoolbagShell } from "@/components/student/schoolbag-shell";
 import { useSchoolbagMotion, useSchoolbagBook } from "@/components/schoolbag/schoolbag-motion";
@@ -16,8 +15,9 @@ import { LearningCourseStartButton } from "@/features/learning/learning-course-s
 import { LearningTextbookIntroduction } from "@/features/learning/learning-textbook-introduction";
 import { TextbookPicture } from "@/features/learning/textbook-picture";
 import { textbookContentsPath, textbookIntroductionPath, type TextbookLocation } from "@/features/learning/textbook-navigation";
+import { loadTextbookContents } from "@/features/learning/textbook-contents-client";
 import { useTextbookCatalog } from "@/features/learning/use-textbook-catalog";
-import { textbookContentsSchema, type TextbookContents } from "@/lib/contracts/textbooks";
+import type { TextbookContents } from "@/lib/contracts/textbooks";
 import type { Student } from "@/lib/contracts/student-session";
 import { LearningListenButton, LessonPicture } from "./learning-picture-navigation";
 
@@ -28,16 +28,6 @@ type TextbookUnit = TextbookContents["units"][number];
 const PICTURE_PAGE_SIZE = 6;
 const isPictureLesson = (lesson: TextbookUnit["lessons"][number]) => lesson.status === "ready" && lesson.course?.delivery === "fixed_textbook";
 
-async function load<T>(path: string, schema: z.ZodType<T>, signal: AbortSignal) {
-  const response = await fetch(path, { cache: "no-store", signal });
-  const payload: unknown = await response.json();
-  if (!response.ok) {
-    const detail = payload as { error?: string; message?: string };
-    throw new LearningClientError(response.status, detail.error || "textbook_unavailable", detail.message || "教材暂时没有加载成功");
-  }
-  return schema.parse(payload);
-}
-
 export function LearningTextbooks({ student, location }: { student: Student; location?: TextbookLocation }) {
   const router = useRouter();
   const { returnHome, busy } = useSchoolbagMotion();
@@ -45,8 +35,9 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault(); if (!busy) returnHome();
   }
-  const { key: catalogKey, data, error, refresh } = useTextbookCatalog(student);
+  const { key: catalogKey, revalidationRevision, data, error, refresh } = useTextbookCatalog(student);
   const [contents, setContents] = useState<State<TextbookContents>>({ key: "" });
+  const [contentsRevision, refreshContents] = useState(0);
   const [chosenUnit, setChosenUnit] = useState<{ book: string; unit: string }>();
   const [view, setView] = useState<"pictures" | "directory">("pictures");
   const [choosingUnit, setChoosingUnit] = useState(false);
@@ -71,12 +62,15 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
     setChosenUnit({ book: `${edition}:${revision}`, unit });
     setChoosingUnit(false);
   }
+  function refreshAll() {
+    refresh();
+    refreshContents(value => value + 1);
+  }
 
   useEffect(() => {
-    if (!data || !edition || !revision) return;
+    if (!edition || !revision) return;
     const controller = new AbortController();
-    const query = new URLSearchParams({ alignmentRevisionId: revision });
-    void load(`/api/learning/textbooks/${encodeURIComponent(edition)}/contents?${query}`, textbookContentsSchema, controller.signal).then(result => {
+    void loadTextbookContents({ id: student.id, gradeCode: student.gradeCode }, { editionId: edition, revisionId: revision }, controller.signal).then(result => {
       if ((!result.selected && result.accessMode !== "published") || result.book.editionId !== edition || result.book.revisionId !== revision || result.book.gradeCode !== student.gradeCode) throw new Error("教材资料已更新，请刷新目录");
       if (!controller.signal.aborted) setContents({ key: contentsKey, data: result });
     }).catch((caught: unknown) => {
@@ -85,7 +79,7 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
       setContents({ key: contentsKey, error: caught instanceof Error ? caught.message : "目录暂时没有加载成功" });
     });
     return () => controller.abort();
-  }, [contentsKey, data, edition, revision, router, student.gradeCode]);
+  }, [contentsKey, contentsRevision, edition, revision, revalidationRevision, router, student.gradeCode, student.id]);
 
   const introUnit = detail?.units.find(unit => unit.introduction?.introductionId === location?.introductionId);
   const introduction = location?.introductionId ? (detail?.introduction?.introductionId === location.introductionId ? detail.introduction : introUnit?.introduction) : null;
@@ -93,9 +87,9 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
 
   return <SchoolbagShell student={student} className="space-textbooks storybook-directory textbook-browser"
     navigation={<Link href="/learning" onClick={goHome}><Backpack size={32} aria-hidden="true" /><span>回到书包</span></Link>}>
-    {(!detail || error || detailError) && <header className="textbook-empty-heading"><h1>{book ? `我的${subjectNames[book.subject]}课本` : location?.subject ? `${subjectNames[location.subject]}教材目录` : "我的课本"}</h1><Button variant="quiet" size="compact" onClick={refresh}><RefreshCw aria-hidden="true" />刷新教材</Button></header>}
-    {error ? <div className="textbook-state" role="alert"><p>{error}</p><Button onClick={refresh}>再试一次</Button></div>
-      : !data ? <TextbookLoading label="正在打开教材目录" />
+    {!detail && <header className="textbook-empty-heading"><h1>{book ? `我的${subjectNames[book.subject]}课本` : location?.subject ? `${subjectNames[location.subject]}教材目录` : "我的课本"}</h1><Button variant="quiet" size="compact" onClick={refreshAll}><RefreshCw aria-hidden="true" />刷新教材</Button></header>}
+    {error && !detail ? <div className="textbook-state" role="alert"><p>{error}</p><Button onClick={refreshAll}>再试一次</Button></div>
+      : !data && !detail ? <TextbookLoading label="正在打开教材目录" />
       : !books.length && !edition ? <div className="textbook-state"><BookOpen size={32} aria-hidden="true" /><h2>请家长帮你放入课本</h2><p>在家长 App 的“学校教材”中确认用书，再回到书包刷新。</p><Button asChild><Link href="/learning">回到书包</Link></Button></div>
       : !edition ? <section className="textbook-state" aria-label="可浏览的教材目录">
         <UsersRound size={56} role="img" aria-label="请家长一起看课本" />
@@ -107,7 +101,7 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
         </li>)}</ul>
       </section>
       : <>
-        {detailError ? <div className="textbook-state" role="alert"><p>{detailError}</p><Button onClick={refresh}>重试目录</Button><Button asChild variant="quiet"><Link href="/learning">回到书包</Link></Button></div>
+        {detailError && !detail ? <div className="textbook-state" role="alert"><p>{detailError}</p><Button onClick={refreshAll}>重试目录</Button><Button asChild variant="quiet"><Link href="/learning">回到书包</Link></Button></div>
           : !detail ? <TextbookLoading label="正在读取单元" />
           : location?.introductionId ? <div className="textbook-state" role="alert"><h2>这份导学还没有准备好</h2><Button asChild><Link href="/learning/textbooks">回到教材目录</Link></Button></div>
           : <>
@@ -165,7 +159,7 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
             <Disclosure className="textbook-book-info" title="教材信息与学习说明">
               <p>{detail.book.publisher} · {detail.selected ? <span className="textbook-confirmed"><Check size={16} aria-hidden="true" />家长已确认</span> : "教材同步"}</p>
               <p>{detail.book.editionLabel}</p><p>{detail.book.coverage.note}</p><p>目录按教材编排，课件完成后开放。导学是原创的课前探索，学习进度单独记录。</p>
-              <div className="textbook-info-actions"><a className="focus-ring textbook-source" href={detail.book.sourceUrl} target="_blank" rel="noopener noreferrer">查看官方教材信息<span className="sr-only">（在新窗口打开）</span></a><Button variant="quiet" size="compact" onClick={refresh}><RefreshCw aria-hidden="true" />刷新教材</Button></div>
+              <div className="textbook-info-actions"><a className="focus-ring textbook-source" href={detail.book.sourceUrl} target="_blank" rel="noopener noreferrer">查看官方教材信息<span className="sr-only">（在新窗口打开）</span></a><Button variant="quiet" size="compact" onClick={refreshAll}><RefreshCw aria-hidden="true" />刷新教材</Button></div>
             </Disclosure>
             </>}
           </>}

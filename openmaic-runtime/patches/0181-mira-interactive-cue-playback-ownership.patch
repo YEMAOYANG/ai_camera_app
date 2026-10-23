@@ -1,0 +1,212 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -55,7 +55,8 @@
+ import { getPageNarration, subscribePageNarration, setPageAudioPreferences, pausePageNarration, releasePageNarrationPause, togglePageNarration } from '@/lib/mira/page-narration';
+ import { isStudentParentPause } from '@/lib/mira/student-parent-pause';
+ import { useMiraStudentParentOrigins } from '@/lib/contexts/mira-student-runtime-context';
+-import { fixedQuizManagedSpeechIds, fixedQuizQuestionNarrationText } from '@/lib/mira/fixed-quiz-narration';
++import { fixedQuizQuestionNarrationText } from '@/lib/mira/fixed-quiz-narration';
++import { fixedPageManagedSpeechIds } from '@/lib/mira/page-managed-narration';
+ import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import {
+   AlertDialog,
+@@ -779,7 +780,7 @@
+     useEffect(() => {
+       let cancelled = false;
+       const initializeScene = async () => {
+-        const managedQuizSpeech = currentScene ? fixedQuizManagedSpeechIds(
++        const managedPageSpeech = currentScene ? fixedPageManagedSpeechIds(
+           currentScene, (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true,
+         ) : new Set<string>();
+         const previousSceneId = activeSceneIdRef.current;
+@@ -859,7 +860,7 @@
+         resetSceneState({
+           actionIndex: savedResumeActionIndex,
+           lectureSpeech:
+-            savedResumeAction?.type === 'speech' && !managedQuizSpeech.has(savedResumeAction.id)
++            savedResumeAction?.type === 'speech' && !managedPageSpeech.has(savedResumeAction.id)
+               ? (savedResumeAction as SpeechAction).text : null,
+         });
+ 
+@@ -907,7 +908,7 @@
+         // Create new PlaybackEngine
+         const engine = new PlaybackEngine([currentScene], actionEngine, audioPlayerRef.current, {
+           requireScriptedDiscussions: studentMode,
+-          isSpeechManagedByPage: actionId => managedQuizSpeech.has(actionId),
++          isSpeechManagedByPage: actionId => managedPageSpeech.has(actionId),
+           onModeChange: (mode) => {
+             setEngineMode(mode);
+             // Interactive pages keep their own teacher lines quiet meanwhile.
+@@ -1210,7 +1211,7 @@
+                 if (!restored || engineRef.current !== engine) return;
+                 updateCurrentPlaybackActionIndex(savedResumeActionIndex);
+                 const action = currentScene.actions?.[savedResumeActionIndex];
+-                if (action?.type === 'speech' && !managedQuizSpeech.has(action.id)) {
++                if (action?.type === 'speech' && !managedPageSpeech.has(action.id)) {
+                   setLectureSpeech(action.text);
+                 }
+               });
+diff --git a/lib/mira/page-managed-narration.ts b/lib/mira/page-managed-narration.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/page-managed-narration.ts
+@@ -0,0 +1,62 @@
++import type { Scene } from '@/lib/types/stage';
++import { fixedQuizManagedSpeechIds } from './fixed-quiz-narration';
++
++function recordedPath(value: unknown): string | null {
++  if (typeof value !== 'string') return null;
++  try {
++    const url = new URL(value, 'http://classroom.local');
++    return !url.search && !url.hash && /^\/api\/classroom-media\/[\w-]+\/audio\/[\w-]+\.(?:wav|mp3)$/.test(url.pathname)
++      ? url.pathname : null;
++  } catch { return null; }
++}
++
++/** Read inert, authored manifests only. Never run an activity's JavaScript. */
++function script(html: string, id: string, type?: string): string | null {
++  const matches = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)].filter(match => {
++    const attributes = [...match[1].matchAll(/([\w-]+)\s*=\s*(["'])(.*?)\2/g)];
++    return attributes.filter(a => a[1].toLowerCase() === 'id').length === 1
++      && attributes.some(a => a[1].toLowerCase() === 'id' && a[3] === id)
++      && (!type || attributes.some(a => a[1].toLowerCase() === 'type' && a[3] === type));
++  });
++  return matches.length === 1 ? matches[0][2] : null;
++}
++
++/** The activity owns its recorded instructions and conditional feedback.
++ * Only exact text AND recorded-media matches transfer out of the lecture queue.
++ * Other opening lines, legacy activities and non-textbook classrooms keep their
++ * original playback; action indices and saved cursors never change.
++ */
++export function fixedPageManagedSpeechIds(scene: Scene, fixedTextbook: boolean): Set<string> {
++  if (scene.type === 'quiz') return fixedQuizManagedSpeechIds(scene, fixedTextbook);
++  const managed = new Set<string>();
++  if (!fixedTextbook || scene.type !== 'interactive' || scene.content.type !== 'interactive'
++      || typeof scene.content.html !== 'string') return managed;
++  try {
++    const manifest = script(scene.content.html, 'mira-narration-cues', 'application/json');
++    const helper = script(scene.content.html, 'mira-pre-recorded-audio');
++    if (!manifest || !helper) return managed;
++    const payload = JSON.parse(manifest);
++    const clipsSource = helper.match(/\bconst clips=(\{[^\n]*?\});let active=null;/);
++    if (!clipsSource || payload?.schemaVersion !== 'mira.interactive.narration-cues.v1'
++        || !Array.isArray(payload.cues) || payload.cues.length < 1 || payload.cues.length > 120) return managed;
++    const clips = JSON.parse(clipsSource[1]);
++    const ids = new Set<string>();
++    const bindings = new Map<string, Set<string>>();
++    for (const cue of payload.cues) {
++      if (!cue || typeof cue.id !== 'string' || !/^[\w-]{1,128}$/.test(cue.id) || ids.has(cue.id)
++          || typeof cue.text !== 'string' || !cue.text.trim() || cue.text.trim().length > 1000) return managed;
++      ids.add(cue.id);
++      const path = recordedPath(clips?.[cue.id]);
++      if (!path) return managed;
++      const texts = bindings.get(path) ?? new Set<string>();
++      texts.add(cue.text.trim()); bindings.set(path, texts);
++    }
++    if (!clips || typeof clips !== 'object' || Array.isArray(clips) || Object.keys(clips).length !== ids.size) return managed;
++    for (const action of scene.actions ?? []) {
++      if (action.type !== 'speech') continue;
++      const path = recordedPath(action.audioUrl);
++      if (path && bindings.get(path)?.has(action.text.trim())) managed.add(action.id);
++    }
++  } catch { return new Set<string>(); }
++  return managed;
++}
+diff --git a/tests/playback/page-managed-narration.test.ts b/tests/playback/page-managed-narration.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/playback/page-managed-narration.test.ts
+@@ -0,0 +1,91 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { fixedPageManagedSpeechIds } from '@/lib/mira/page-managed-narration';
++import { PlaybackEngine } from '@/lib/playback/engine';
++import type { Scene } from '@/lib/types/stage';
++import type { SpeechAction } from '@/lib/types/action';
++import type { ActionEngine } from '@/lib/action/engine';
++import type { AudioPlayer } from '@/lib/utils/audio-player';
++
++const cues = [
++  { id: 'start', text: '先听老师，再找一张图。' },
++  { id: 'correct', text: '你找到了。' },
++  { id: 'retry', text: '再听一遍。' },
++  { id: 'help', text: '看老师示范。' },
++  { id: 'done', text: '这一轮完成了。' },
++];
++function activity(extension = 'wav'): Scene {
++  const clips = Object.fromEntries(cues.map(c => [c.id, `/api/classroom-media/lesson/audio/${c.id}.${extension}`]));
++  return {
++    id: 'activity', type: 'interactive', stageId: 'lesson', order: 2,
++    content: { type: 'interactive', html: `<script type="application/json" id="mira-narration-cues">${JSON.stringify({ schemaVersion: 'mira.interactive.narration-cues.v1', cues })}</script><script id="mira-pre-recorded-audio">(()=>{const clips=${JSON.stringify(clips)};let active=null;})();</script>` },
++    actions: cues.map(c => ({ id: `speech-${c.id}`, type: 'speech', text: c.text,
++      audioId: c.id, audioUrl: `http://127.0.0.1:3100${clips[c.id]}` })),
++  } as Scene;
++}
++function playback(scene: Scene) {
++  let end = () => {};
++  const audio = { play: vi.fn(async () => true), pause: vi.fn(), stop: vi.fn(),
++    onEnded: vi.fn((next: () => void) => { end = next; }), hasActiveAudio: () => false, isPlaying: () => true };
++  const transcript = vi.fn(), complete = vi.fn();
++  const managed = fixedPageManagedSpeechIds(scene, true);
++  const engine = new PlaybackEngine([scene], {
++    clearEffects: vi.fn(), resetPlaybackVisualState: vi.fn(), execute: vi.fn(),
++  } as unknown as ActionEngine, audio as unknown as AudioPlayer, {
++    isSpeechManagedByPage: id => managed.has(id), onSpeechStart: transcript, onComplete: complete,
++  });
++  return { engine, audio, transcript, complete, ended: () => end() };
++}
++async function flush() { for (let i = 0; i < 30; i++) await Promise.resolve(); }
++afterEach(() => vi.restoreAllMocks());
++
++describe('fixed interactive recorded cue ownership', () => {
++  it.each(['wav', 'mp3'])('keeps %s feedback and opening cues out of top-level playback without mutating actions', async extension => {
++    const scene = activity(extension), original = JSON.stringify(scene);
++    const p = playback(scene); p.engine.start(); await flush();
++    expect(p.audio.play).not.toHaveBeenCalled();
++    expect(p.transcript).not.toHaveBeenCalled();
++    expect(p.complete).toHaveBeenCalledOnce();
++    expect(p.engine.isExhausted()).toBe(true);
++    expect(JSON.stringify(scene)).toBe(original);
++    p.engine.stop();
++  });
++  it('plays a separate lecture opening, then waits for activity-owned feedback', async () => {
++    const scene = activity();
++    scene.actions!.unshift({ id: 'opening', type: 'speech', text: '我们来做一个小游戏。', audioId: 'opening',
++      audioUrl: '/api/classroom-media/lesson/audio/opening.wav' });
++    const p = playback(scene); p.engine.start(); await flush();
++    expect(p.audio.play).toHaveBeenCalledTimes(1);
++    p.ended(); await flush();
++    expect(p.audio.play).toHaveBeenCalledTimes(1);
++    expect(p.transcript.mock.calls).toEqual([['我们来做一个小游戏。']]);
++    expect(p.complete).toHaveBeenCalledOnce(); p.engine.stop();
++  });
++  it('does not replay an owned answer when restoring its original action index', async () => {
++    const scene = activity(), p = playback(scene);
++    expect(await p.engine.jumpToAction(1, { autoplay: false })).toBe(true);
++    p.engine.continuePlayback(); await flush();
++    expect(p.audio.play).not.toHaveBeenCalled(); expect(p.transcript).not.toHaveBeenCalled();
++    expect(scene.actions![1].id).toBe('speech-correct'); p.engine.stop();
++  });
++  it('requires both exact spoken text and recorded path', () => {
++    const scene = activity();
++    scene.actions![0] = { ...scene.actions![0], text: '不同的讲解。' } as SpeechAction;
++    scene.actions![1] = { ...scene.actions![1], audioUrl: '/api/classroom-media/lesson/audio/different.wav' } as SpeechAction;
++    expect([...fixedPageManagedSpeechIds(scene, true)]).toEqual(['speech-retry', 'speech-help', 'speech-done']);
++  });
++  it.each(['missing-helper', 'duplicate-cues', 'bad-cue', 'bad-path', 'missing-clip'])('leaves invalid or legacy manifests alone: %s', mode => {
++    const scene = activity(); if (scene.content.type !== 'interactive') throw new Error();
++    if (mode === 'missing-helper') scene.content.html = '<button>开始</button>';
++    if (mode === 'duplicate-cues') scene.content.html = (scene.content.html ?? '') + (scene.content.html ?? '');
++    if (mode === 'bad-cue') scene.content.html = scene.content.html!.replace('"id":"start"', '"id":"bad id"');
++    if (mode === 'missing-clip') scene.content.html = scene.content.html!.replace('"done":"/api/classroom-media/lesson/audio/done.wav"', '"other":"/api/classroom-media/lesson/audio/done.wav"');
++    if (mode === 'bad-path') scene.content.html = scene.content.html!.replace('/lesson/audio/start.wav', '/lesson/audio/../secret.wav');
++    expect(fixedPageManagedSpeechIds(scene, true).size).toBe(0);
++  });
++  it('preserves non-textbook and quiz behavior', () => {
++    expect(fixedPageManagedSpeechIds(activity(), false).size).toBe(0);
++    const scene = activity(); scene.type = 'quiz';
++    scene.content = { type: 'quiz', questions: [{ id: 'q', question: cues[0].text }] } as Scene['content'];
++    expect([...fixedPageManagedSpeechIds(scene, true)]).toEqual(cues.map(c => `speech-${c.id}`));
++  });
++});

@@ -1,0 +1,292 @@
+{
+  "policyVersion": "mira.textbook.pinyin-gkh-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "symbols": {
+    "g": {
+      "ph": "ge1",
+      "carrier": "哥"
+    },
+    "k": {
+      "ph": "ke1",
+      "carrier": "科"
+    },
+    "h": {
+      "ph": "he1",
+      "carrier": "喝"
+    },
+    "gā": {
+      "ph": "ga1",
+      "carrier": "嘎"
+    },
+    "gè": {
+      "ph": "ge4",
+      "carrier": "个"
+    },
+    "gù": {
+      "ph": "gu4",
+      "carrier": "固"
+    },
+    "kǎ": {
+      "ph": "ka3",
+      "carrier": "卡"
+    },
+    "kē": {
+      "ph": "ke1",
+      "carrier": "科"
+    },
+    "kǔ": {
+      "ph": "ku3",
+      "carrier": "苦"
+    },
+    "hā": {
+      "ph": "ha1",
+      "carrier": "哈"
+    },
+    "hē": {
+      "ph": "he1",
+      "carrier": "喝"
+    },
+    "hǔ": {
+      "ph": "hu3",
+      "carrier": "虎"
+    },
+    "guā": {
+      "ph": "gua1",
+      "carrier": "瓜"
+    },
+    "guà": {
+      "ph": "gua4",
+      "carrier": "挂"
+    },
+    "kuā": {
+      "ph": "kua1",
+      "carrier": "夸"
+    },
+    "huá": {
+      "ph": "hua2",
+      "carrier": "滑"
+    },
+    "guō": {
+      "ph": "guo1",
+      "carrier": "锅"
+    },
+    "kuò": {
+      "ph": "kuo4",
+      "carrier": "阔"
+    },
+    "huǒ": {
+      "ph": "huo3",
+      "carrier": "火"
+    },
+    "u": {
+      "ph": "wu1",
+      "carrier": "乌"
+    },
+    "ā": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "ò": {
+      "ph": "o4",
+      "carrier": "哦"
+    },
+    "ǒ": {
+      "ph": "o3",
+      "carrier": "哦"
+    }
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "words": {},
+  "approvalBoundary": {
+    "recipeStatus": "candidate-pending-six-gkh-probes-and-exact-formal-sentence-listening",
+    "approvedProbeScope": "none-for-u3-l1-pending-human-review",
+    "shortConsonantAccepted": false,
+    "formalListeningScope": "every-formal-segment-containing-a-registered-latin-token-including-question-feedback-and-repetition",
+    "humanReview": "pending",
+    "pronunciationApproved": false,
+    "formalUseAllowed": false,
+    "probeScope": "three-call-name-plus-explicit-light-short-context-files-and-three-component-to-whole-syllable-files",
+    "probeSuccessDoesNotProve": "all sixteen textbook syllables, formal-context tone accuracy, light-short consonant delivery in other sentences, complete-sentence fidelity, or publication readiness",
+    "consonantRecipeBoundary": "g/k/h map to ge1/ke1/he1 call-name syllables. The second occurrence in each first probe only adds explicit light-short spoken context and uses the same phoneme recipe; isolated-consonant production or shortening is not encoded or guaranteed.",
+    "wholeSyllableBoundary": "The final guā/kuò/huǒ result uses one complete py phoneme each, not concatenated or split letter audio.",
+    "naturalChineseWords": "哥哥、弟弟、画画、荷花 remain natural Chinese text; no additional Chinese word mapping or teaching-character targets."
+  }
+}

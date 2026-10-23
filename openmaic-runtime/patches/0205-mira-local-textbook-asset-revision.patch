@@ -1,0 +1,544 @@
+diff --git a/lib/server/mira-textbook-asset-revision.ts b/lib/server/mira-textbook-asset-revision.ts
+new file mode 100644
+index 0000000..42a401c
+--- /dev/null
++++ b/lib/server/mira-textbook-asset-revision.ts
+@@ -0,0 +1,295 @@
++/** Explicit local image revision. No HTTP entry point, provider, audio or publication. */
++import { createHash, randomUUID } from 'node:crypto';
++import { constants, promises as fs } from 'node:fs';
++import path from 'node:path';
++import sharp from 'sharp';
++import { validateScene } from '@openmaic/dsl';
++import { PgDocumentStore, type Queryable } from '@openmaic/storage/document/pg';
++import { validateAppStage } from '@/lib/document-store/validators';
++import { createOwnerBoundDocumentStore, type TransactionSource } from '@/lib/persistence/owner-bound-document-store';
++import { resolveRequestOwnerId } from './agent-runtime/owner';
++import type { CourseDocument, CourseStore } from './agent-runtime/course-tools';
++import { assertTextbookContract, assertTextbookScene, textbookCanonical, textbookDigest, textbookContractFromPrompt } from './mira-textbook-scene-contract';
++
++type Json = Record<string, any>;
++const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
++const check = (value: unknown, code: string): void => { if (!value) throw new Error(`TEXTBOOK_ASSET_REVISION_${code}`); };
++const hex = (v: unknown): v is string => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v);
++const object = (v: unknown): v is Json => !!v && typeof v === 'object' && !Array.isArray(v);
++const keys = (v: unknown, fields: string[]) => object(v) && Object.keys(v).sort().join(',') === [...fields].sort().join(',');
++const seal = (v: Json): Json => ({ ...v, sha256: textbookDigest(v) });
++function unseal(v: Json): Json { const { sha256, ...body } = v; check(hex(sha256) && textbookDigest(body) === sha256, 'SEAL'); return body; }
++const encoded = (v: unknown) => Buffer.from(textbookCanonical(v) + '\n');
++const PLAN = 'mira.textbook.asset-revision-plan.v1';
++const VERIFY = 'static_only_not_play_audio_or_publication';
++
++export interface AssetRevisionInput {
++  jobDir: string;
++  stageId: string;
++  expectedDocumentSha256: string;
++  expectedCandidateSha256: string;
++  changes: Array<{
++    assetKey: string;
++    expectedOldBindingSha256: string;
++    expectedOldBytesSha256: string;
++    newFilePath: string;
++    newBytesSha256: string;
++    reviewBasis: string;
++  }>;
++}
++export interface AssetRevisionEnvironment { pool: TransactionSource; dataDir: string }
++
++async function read(file: string): Promise<Buffer> {
++  check(typeof file === 'string' && path.isAbsolute(file), 'ABSOLUTE_PATH');
++  const exact = path.resolve(file);
++  check(await fs.realpath(exact) === exact, 'SYMLINK');
++  const handle = await fs.open(exact, constants.O_RDONLY | constants.O_NOFOLLOW);
++  try {
++    const stat = await handle.stat();
++    check(stat.isFile() && stat.size <= 64 * 1024 * 1024, 'FILE_SIZE');
++    return await handle.readFile();
++  } finally { await handle.close(); }
++}
++async function directory(dir: string) {
++  let current = path.parse(dir).root;
++  for (const part of dir.slice(current.length).split(path.sep)) {
++    current = path.join(current, part);
++    try { await fs.mkdir(current, { mode: 0o700 }); } catch (e: any) { if (e.code !== 'EEXIST') throw e; }
++    const s = await fs.lstat(current); check(s.isDirectory() && !s.isSymbolicLink(), 'DIRECTORY');
++  }
++}
++async function immutable(file: string, bytes: Buffer) {
++  await directory(path.dirname(file));
++  try {
++    const fd = await fs.open(file, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
++    try { await fd.writeFile(bytes); await fd.sync(); } finally { await fd.close(); }
++  } catch (e: any) { if (e.code !== 'EEXIST') throw e; check((await read(file)).equals(bytes), 'IMMUTABLE_COLLISION'); }
++}
++async function image(bytes: Buffer) {
++  check(bytes.length > 0 && bytes.length <= 32 * 1024 * 1024, 'IMAGE_SIZE');
++  const decoded = sharp(bytes, { limitInputPixels: 40_000_000 });
++  const meta = await decoded.metadata();
++  check(['png', 'jpeg', 'webp'].includes(meta.format ?? '') && meta.width && meta.height && (!meta.pages || meta.pages === 1), 'IMAGE_FORMAT');
++  await decoded.stats(); // Decode, rather than accepting a truncated image header.
++  return { sha256: hash(bytes), width: meta.width!, height: meta.height!, extension: meta.format === 'jpeg' ? 'jpg' : meta.format! };
++}
++function mediaFile(dataDir: string, stageId: string, src: string) {
++  const prefix = `/api/classroom-media/${stageId}/media/`;
++  check(typeof src === 'string' && src.startsWith(prefix) && /^[A-Za-z0-9_.-]+\.(?:png|jpg|jpeg|webp)$/.test(src.slice(prefix.length)), 'MEDIA_SOURCE');
++  return path.join(dataDir, 'classrooms', stageId, 'media', src.slice(prefix.length));
++}
++async function inputs(input: AssetRevisionInput, env: AssetRevisionEnvironment) {
++  check(keys(input, ['jobDir', 'stageId', 'expectedDocumentSha256', 'expectedCandidateSha256', 'changes']), 'INPUT');
++  check(typeof input.stageId === 'string' && /^[A-Za-z0-9_-]{1,160}$/.test(input.stageId) && hex(input.expectedDocumentSha256) && hex(input.expectedCandidateSha256), 'INPUT_ID');
++  check(typeof input.jobDir === 'string' && path.isAbsolute(input.jobDir) && Array.isArray(input.changes) && input.changes.length > 0 && input.changes.length <= 8, 'INPUT_CHANGES');
++  check(new Set(input.changes.map(c => c.assetKey)).size === input.changes.length, 'DUPLICATE_KEY');
++  const dataDir = await fs.realpath(env.dataDir), job = path.resolve(input.jobDir);
++  const cookies = (await read(path.join(job, 'owner.cookies'))).toString();
++  const owners = cookies.split(/\r?\n/).map(l => l.replace(/^#HttpOnly_/, '')).filter(l => l && !l.startsWith('#')).map(l => l.split('\t')).filter(p => p.length === 7 && p[5] === 'anonymous_id').map(p => p[6]);
++  check(owners.length === 1 && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(owners[0]), 'OWNER_COOKIE');
++  const headers = new Headers(), ownerId = resolveRequestOwnerId({ headers: new Headers({ cookie: `anonymous_id=${owners[0]}` }) }, headers);
++  check(!headers.has('set-cookie'), 'OWNER_COOKIE');
++  const ownerFingerprint = hash(owners[0]);
++  const state = JSON.parse((await read(path.join(job, 'state.json'))).toString());
++  const dispatch = JSON.parse((await read(path.join(job, 'dispatch.json'))).toString());
++  const frozenFile = JSON.parse((await read(path.join(job, 'frozen.json'))).toString());
++  check(typeof state.sessionId === 'string' && state.sessionId.length > 0 && dispatch.ownerFingerprint === ownerFingerprint, 'JOB_BINDING');
++  assertTextbookContract(frozenFile.sceneContract);
++  const replacements = [];
++  for (const c of input.changes) {
++    check(keys(c, ['assetKey', 'expectedOldBindingSha256', 'expectedOldBytesSha256', 'newFilePath', 'newBytesSha256', 'reviewBasis']) && typeof c.assetKey === 'string' && /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/.test(c.assetKey) && [c.expectedOldBindingSha256, c.expectedOldBytesSha256, c.newBytesSha256].every(hex) && typeof c.reviewBasis === 'string' && c.reviewBasis.trim().length > 0 && c.reviewBasis.length <= 4000, 'CHANGE');
++    const bytes = await read(c.newFilePath), meta = await image(bytes);
++    check(meta.sha256 === c.newBytesSha256 && meta.sha256 !== c.expectedOldBytesSha256, 'NEW_BYTES');
++    const src = `/api/classroom-media/${input.stageId}/media/revised-${meta.sha256}.${meta.extension}`;
++    replacements.push({ input: c, bytes, meta, src });
++  }
++  return { dataDir, ownerId, ownerFingerprint, sessionId: state.sessionId as string, stageId: input.stageId, frozen: frozenFile.sceneContract, replacements, candidatePath: path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json') };
++}
++type State = Awaited<ReturnType<typeof inputs>>;
++async function transaction<T>(env: AssetRevisionEnvironment, readOnly: boolean, body: (q: Queryable, pool: TransactionSource) => Promise<T>): Promise<T> {
++  const client = await env.pool.connect();
++  const q: Queryable = { query: async <R extends Record<string, unknown>>(sql: string, args?: unknown[]) => {
++    if (readOnly) { check(/^\s*SELECT\b/i.test(sql), 'READ_ONLY'); sql = sql.replace(/\s+FOR SHARE\s*$/i, ''); }
++    return { rows: (await client.query(sql, args)).rows as R[] };
++  } };
++  let serial = 0;
++  const nested: TransactionSource = { connect: async () => {
++    let savepoint: string | undefined;
++    return { release() {}, query: async (sql, args) => {
++      if (sql.startsWith('BEGIN')) { check(!savepoint, 'TRANSACTION'); savepoint = `asset_revision_${++serial}`; return client.query(`SAVEPOINT ${savepoint}`); }
++      if (sql === 'COMMIT' || sql === 'ROLLBACK') { check(savepoint, 'TRANSACTION'); if (sql === 'ROLLBACK') await client.query(`ROLLBACK TO SAVEPOINT ${savepoint}`); const r = await client.query(`RELEASE SAVEPOINT ${savepoint}`); savepoint = undefined; return r; }
++      return client.query(sql, args);
++    } };
++  } };
++  try {
++    await client.query(readOnly ? 'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY' : 'BEGIN');
++    const result = await body(q, nested); await client.query('COMMIT'); return result;
++  } catch (e) { await client.query('ROLLBACK'); throw e; }
++  finally { client.release(); }
++}
++async function authority(q: Queryable, s: State, lock: boolean) {
++  const row = (await q.query('SELECT owner_id,prompt,status,deleted_at,lease_worker_id FROM agent_sessions WHERE id=$1' + (lock ? ' FOR UPDATE' : ''), [s.sessionId])).rows[0];
++  check(row && row.owner_id === s.ownerId && row.deleted_at === null && ['succeeded', 'failed', 'cancelled'].includes(String(row.status)) && row.lease_worker_id === null, 'SESSION_NOT_TERMINAL_OWNED');
++  const meta = (await q.query('SELECT owner_id,deleted_at FROM stage_meta WHERE stage_id=$1' + (lock ? ' FOR UPDATE' : ''), [s.stageId])).rows[0];
++  check(meta && meta.owner_id === s.ownerId && meta.deleted_at === null, 'STAGE_NOT_OWNED');
++  const active = await q.query("SELECT id FROM agent_sessions WHERE (stage_id=$1 OR active_stage_id=$1) AND deleted_at IS NULL AND (status IN ('queued','running') OR lease_worker_id IS NOT NULL)", [s.stageId]);
++  check(active.rows.length === 0, 'STAGE_ACTIVE');
++  const frozen = textbookContractFromPrompt(String(row.prompt));
++  check(frozen && textbookDigest(frozen) === textbookDigest(s.frozen), 'FROZEN_CHANGED');
++  const doc = await new PgDocumentStore(q, { withTransaction: async fn => fn(q) }).loadDocument(s.stageId) as CourseDocument | null;
++  check(doc && doc.stage.id === s.stageId && (doc.outline as Json)?.producerRef === s.sessionId, 'DOCUMENT_SESSION');
++  return doc!;
++}
++async function candidate(s: State) { const bytes = await read(s.candidatePath), value = JSON.parse(bytes.toString()); unseal(value); return { bytes, value }; }
++async function validateAssets(s: State, ledger: Json, proposed = false) {
++  check(Array.isArray(ledger.assetBindings) && Array.isArray(ledger.bindingHistory), 'BINDINGS');
++  const cache = new Map<string, Json>(), supplied = new Map(proposed ? s.replacements.map(r => [r.src, r]) : []);
++  const asset = async (b: Json) => {
++    check(keys(b, ['assetKey', 'src', 'sha256', 'width', 'height', 'bindingVersion', 'status']) && typeof b.assetKey === 'string' && /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/.test(b.assetKey) && b.status === 'author_candidate' && hex(b.sha256) && [b.width, b.height, b.bindingVersion].every(n => Number.isSafeInteger(n) && n > 0), 'BINDING');
++    const file = mediaFile(s.dataDir, s.stageId, b.src);
++    let actual = cache.get(b.src);
++    if (!actual) { actual = supplied.get(b.src)?.meta ?? await image(await read(file)); cache.set(b.src, actual); }
++    check(actual.sha256 === b.sha256 && actual.width === b.width && actual.height === b.height, 'IMAGE_BYTES_CHANGED');
++  };
++  const current = new Map<string, Json>();
++  for (const b of ledger.assetBindings) { await asset(b); check(!current.has(b.assetKey), 'DUPLICATE_BINDING'); current.set(b.assetKey, b); }
++  const chains = new Map<string, Json>();
++  for (const h of ledger.bindingHistory) {
++    check(keys(h, ['assetKey', 'from', 'to']), 'HISTORY'); await asset(h.from); await asset(h.to);
++    check(current.has(h.assetKey) && h.from.assetKey === h.assetKey && h.to.assetKey === h.assetKey && h.to.bindingVersion === h.from.bindingVersion + 1 && (chains.has(h.assetKey) ? textbookDigest(chains.get(h.assetKey)) === textbookDigest(h.from) : h.from.bindingVersion === 1), 'HISTORY_CHAIN');
++    chains.set(h.assetKey, h.to);
++  }
++  for (const [key, b] of current) check(chains.has(key) ? textbookDigest(chains.get(key)) === textbookDigest(b) : b.bindingVersion === 1, 'HISTORY_CURRENT');
++}
++function validateDocument(s: State, doc: CourseDocument, ledger: Json) {
++  check(keys(ledger, ['schemaVersion', 'sessionId', 'stageId', 'frozenContract', 'status', 'verification', 'assetBindings', 'bindingHistory', 'scenes', 'sha256']) && ledger.schemaVersion === 'mira.textbook.authoring-candidate.v1' && ledger.sessionId === s.sessionId && ledger.stageId === s.stageId && textbookDigest(ledger.frozenContract) === textbookDigest(s.frozen) && ledger.status === 'author_candidate' && ledger.verification === 'static_contract_only_not_play_or_semantic_review', 'CANDIDATE_IDENTITY');
++  unseal(ledger);
++  check(doc.scenes.length === s.frozen.contract.pagePlan.length && Array.isArray(ledger.scenes) && doc.scenes.length === ledger.scenes.length && new Set(doc.scenes.map(p => p.id)).size === doc.scenes.length, 'COMPLETE_DOCUMENT');
++  for (const [i, scene] of doc.scenes.entries()) {
++    check(scene.order === i + 1 && scene.stageId === s.stageId && validateScene(scene).valid, 'SCENE_DSL');
++    assertTextbookScene(scene, s.frozen, ledger.assetBindings);
++    check(textbookDigest(ledger.scenes[i]) === textbookDigest({ sceneId: scene.id, order: scene.order, sha256: textbookDigest(scene), canonicalJson: textbookCanonical(scene), contractSha256: s.frozen.sha256 }), 'SCENE_LEDGER');
++  }
++}
++function patchDocument(doc: CourseDocument, before: Json, changes: Json[]) {
++  const after = structuredClone(doc), dependencies: Json[] = [], allowed = new Set<string>();
++  for (const [i, scene] of doc.scenes.entries()) {
++    const c = scene.content as Json, root = ['scenes', String(i), 'content'];
++    if (scene.type === 'slide') c.canvas.elements.forEach((e: Json, j: number) => { if (e.type === 'image') allowed.add(textbookCanonical([...root, 'canvas', 'elements', String(j), 'src'])); });
++    if (scene.type === 'quiz') c.questions.forEach((q: Json, j: number) => {
++      if (q.visual?.kind === 'image') allowed.add(textbookCanonical([...root, 'questions', String(j), 'visual', 'src']));
++      for (const [key, v] of Object.entries(q.optionVisuals ?? {}) as [string, Json][]) if (v.kind === 'image') allowed.add(textbookCanonical([...root, 'questions', String(j), 'optionVisuals', key, 'src']));
++    });
++  }
++  for (const change of changes) {
++    check(before.assetBindings.filter((b: Json) => b.src === change.from.src).length === 1, 'AMBIGUOUS_SOURCE');
++    let count = 0;
++    function walk(v: any, parts: string[]) {
++      if (typeof v === 'string' && v.includes(change.from.src)) {
++        check(v === change.from.src && allowed.has(textbookCanonical(parts)), 'UNSUPPORTED_DEPENDENCY');
++        let target: any = after; for (const part of parts.slice(0, -1)) target = target[part]; target[parts.at(-1)!] = change.to.src;
++        const scene = doc.scenes[Number(parts[1])];
++        dependencies.push({ assetKey: change.assetKey, sceneId: scene.id, order: scene.order, path: '/' + parts.map(p => p.replace(/~/g, '~0').replace(/\//g, '~1')).join('/'), beforeSceneSha256: textbookDigest(scene) }); count++;
++      } else if (Array.isArray(v)) v.forEach((value, i) => walk(value, [...parts, String(i)]));
++      else if (object(v)) for (const [key, value] of Object.entries(v)) walk(value, [...parts, key]);
++    }
++    walk(doc, []); check(count > 0, 'UNUSED_ASSET');
++  }
++  for (const d of dependencies) d.afterSceneSha256 = textbookDigest(after.scenes.find(p => p.id === d.sceneId));
++  return { after, dependencies };
++}
++async function describe(input: AssetRevisionInput, s: State, doc: CourseDocument, ledgerBytes: Buffer) {
++  const ledger = JSON.parse(ledgerBytes.toString());
++  check(textbookDigest(doc) === input.expectedDocumentSha256 && ledger.sha256 === input.expectedCandidateSha256, 'STALE_BEFORE');
++  validateDocument(s, doc, ledger); await validateAssets(s, ledger);
++  const changes = s.replacements.map(r => {
++    const from = ledger.assetBindings.find((b: Json) => b.assetKey === r.input.assetKey);
++    check(from && textbookDigest(from) === r.input.expectedOldBindingSha256 && from.sha256 === r.input.expectedOldBytesSha256, 'OLD_BINDING');
++    check(!ledger.assetBindings.some((b: Json) => b.src === r.src), 'NEW_SOURCE_ALREADY_BOUND');
++    return { assetKey: from.assetKey, from, to: { ...from, src: r.src, sha256: r.meta.sha256, width: r.meta.width, height: r.meta.height, bindingVersion: from.bindingVersion + 1 } };
++  });
++  check(new Set(changes.map(c => c.to.src)).size === changes.length, 'DUPLICATE_NEW_SOURCE');
++  const { after, dependencies } = patchDocument(doc, ledger, changes);
++  const body = unseal(ledger);
++  const afterCandidate = seal({ ...body, assetBindings: body.assetBindings.map((b: Json) => changes.find(c => c.assetKey === b.assetKey)?.to ?? b), bindingHistory: [...body.bindingHistory, ...changes], scenes: after.scenes.map(scene => ({ sceneId: scene.id, order: scene.order, sha256: textbookDigest(scene), canonicalJson: textbookCanonical(scene), contractSha256: s.frozen.sha256 })) });
++  validateDocument(s, after, afterCandidate); await validateAssets(s, afterCandidate, true);
++  const plan = seal({ schemaVersion: PLAN, verification: VERIFY, input, dataDir: s.dataDir, sessionId: s.sessionId, stageId: s.stageId, ownerFingerprint: s.ownerFingerprint, contractSha256: s.frozen.sha256, beforeDocumentSha256: textbookDigest(doc), afterDocumentSha256: textbookDigest(after), beforeCandidateSha256: ledger.sha256, beforeCandidateFileSha256: hash(ledgerBytes), afterCandidateSha256: afterCandidate.sha256, afterCandidateFileSha256: hash(encoded(afterCandidate)), changes, dependencies });
++  return { plan, after, afterCandidate, beforeCandidate: ledger };
++}
++export async function prepareTextbookAssetRevision(input: AssetRevisionInput, env: AssetRevisionEnvironment): Promise<Json> {
++  const s = await inputs(input, env);
++  return transaction(env, true, async q => {
++    const doc = await authority(q, s, false), ledger = await candidate(s);
++    const result = await describe(input, s, doc, ledger.bytes);
++    check(hash((await candidate(s)).bytes) === hash(ledger.bytes), 'CANDIDATE_FENCE');
++    return result.plan;
++  });
++}
++/** Candidate rename and SQL commit are recoverable, not a cross-system atomic commit. */
++export async function runTextbookAssetRevision(plan: Json, approvedPlanSha256: string, env: AssetRevisionEnvironment): Promise<Json> {
++  unseal(plan); check(plan.schemaVersion === PLAN && plan.sha256 === approvedPlanSha256, 'PLAN_APPROVAL');
++  const s = await inputs(plan.input, env);
++  const dir = path.join(s.dataDir, 'textbook-asset-revisions', hash(s.sessionId), s.stageId, plan.sha256);
++  const intent = path.join(dir, 'intent.json'), originalCandidate = path.join(dir, 'original-candidate.json'), originalDoc = path.join(dir, 'original-document.json');
++  let prior = false;
++  try { check((await read(intent)).equals(encoded(plan)), 'INTENT_COLLISION'); prior = true; } catch (e: any) { if (e.code !== 'ENOENT') throw e; }
++  const receipt = await transaction(env, false, async (q, pool) => {
++    const actualDoc = await authority(q, s, true), actual = await candidate(s);
++    check([plan.beforeDocumentSha256, ...(prior ? [plan.afterDocumentSha256] : [])].includes(textbookDigest(actualDoc)), 'DOCUMENT_CHANGED');
++    check([plan.beforeCandidateFileSha256, ...(prior ? [plan.afterCandidateFileSha256] : [])].includes(hash(actual.bytes)), 'CANDIDATE_CHANGED');
++    const beforeDoc = prior ? JSON.parse((await read(originalDoc)).toString()) : actualDoc;
++    const beforeBytes = prior ? await read(originalCandidate) : actual.bytes;
++    check(hash(beforeBytes) === plan.beforeCandidateFileSha256 && textbookDigest(beforeDoc) === plan.beforeDocumentSha256, 'ORIGINAL_CHANGED');
++    const next = await describe(plan.input, s, beforeDoc, beforeBytes);
++    check(textbookCanonical(next.plan) === textbookCanonical(plan), 'PLAN_STALE');
++    // Both sides are checked as complete objects; no reconstruction from a partial ledger.
++    if (textbookDigest(actualDoc) === plan.afterDocumentSha256) check(textbookCanonical(actualDoc) === textbookCanonical(next.after), 'AFTER_DOCUMENT');
++    if (hash(actual.bytes) === plan.afterCandidateFileSha256) check(actual.bytes.equals(encoded(next.afterCandidate)), 'AFTER_CANDIDATE');
++    if (prior) {
++      check((await read(originalDoc)).equals(encoded(beforeDoc)), 'ORIGINAL_CHANGED');
++      for (const scene of beforeDoc.scenes) if (plan.dependencies.some((d: Json) => d.sceneId === scene.id)) check((await read(path.join(dir, `original-scene-${hash(scene.id)}.json`))).equals(encoded(scene)), 'ORIGINAL_CHANGED');
++      for (const c of plan.changes) {
++        check(hash(await read(path.join(dir, `original-image-${c.from.sha256}`))) === c.from.sha256, 'ORIGINAL_CHANGED');
++        check(hash(await read(path.join(dir, `replacement-image-${c.to.sha256}`))) === c.to.sha256, 'ORIGINAL_CHANGED');
++      }
++    }
++    await immutable(originalCandidate, beforeBytes); await immutable(originalDoc, encoded(beforeDoc));
++    for (const scene of beforeDoc.scenes) if (plan.dependencies.some((d: Json) => d.sceneId === scene.id)) await immutable(path.join(dir, `original-scene-${hash(scene.id)}.json`), encoded(scene));
++    for (const c of plan.changes) {
++      await immutable(path.join(dir, `original-image-${c.from.sha256}`), await read(mediaFile(s.dataDir, s.stageId, c.from.src)));
++      const replacement = s.replacements.find(r => r.input.assetKey === c.assetKey)!;
++      await immutable(path.join(dir, `replacement-image-${c.to.sha256}`), replacement.bytes);
++    }
++    // Intent is committed before the first public media/SQL/candidate write.
++    await immutable(intent, encoded(plan));
++    for (const r of s.replacements) await immutable(mediaFile(s.dataDir, s.stageId, r.src), r.bytes);
++    await validateAssets(s, next.afterCandidate);
++    let current = actualDoc;
++    if (textbookDigest(current) === plan.beforeDocumentSha256) {
++      for (const revised of next.after.scenes.filter(scene => plan.dependencies.some((d: Json) => d.sceneId === scene.id))) {
++        const intermediate = { ...current, scenes: current.scenes.map(scene => scene.id === revised.id ? revised : scene) };
++        const fences = [textbookDigest(current), textbookDigest(intermediate)]; let index = 0;
++        const store = createOwnerBoundDocumentStore({ pool, ownerId: s.ownerId, validateScene, validateStage: validateAppStage, mutationFence: async tx => {
++          check(textbookDigest(await authority(tx, s, true)) === fences[index++], 'DOCUMENT_FENCE');
++          check(hash((await candidate(s)).bytes) === hash(actual.bytes), 'CANDIDATE_FENCE');
++        } }) as unknown as CourseStore;
++        await store.putScene(s.stageId, revised); check(index === 2, 'FENCE_COUNT'); current = intermediate;
++      }
++    }
++    const finalDoc = await authority(q, s, true);
++    check(textbookDigest(finalDoc) === plan.afterDocumentSha256, 'AFTER_DOCUMENT');
++    validateDocument(s, finalDoc, next.afterCandidate); await validateAssets(s, next.afterCandidate);
++    check(hash((await candidate(s)).bytes) === hash(actual.bytes), 'CANDIDATE_FENCE');
++    if (hash(actual.bytes) !== plan.afterCandidateFileSha256) {
++      const temporary = `${s.candidatePath}.${randomUUID()}.tmp`;
++      await immutable(temporary, encoded(next.afterCandidate));
++      try { check(hash((await candidate(s)).bytes) === hash(actual.bytes), 'CANDIDATE_FENCE'); await fs.rename(temporary, s.candidatePath); }
++      finally { try { await fs.unlink(temporary); } catch (e: any) { if (e.code !== 'ENOENT') throw e; } }
++      const parent = await fs.open(path.dirname(s.candidatePath), constants.O_RDONLY); try { await parent.sync(); } finally { await parent.close(); }
++    }
++    check(hash((await candidate(s)).bytes) === plan.afterCandidateFileSha256, 'AFTER_CANDIDATE');
++    return seal({ schemaVersion: 'mira.textbook.asset-revision-receipt.v1', revisionId: plan.sha256, status: 'static_candidate_accepted', verification: VERIFY, sessionId: s.sessionId, stageId: s.stageId, planSha256: plan.sha256, documentSha256: plan.afterDocumentSha256, candidateSha256: plan.afterCandidateSha256, changes: plan.changes, dependencies: plan.dependencies, providerCalls: 0 });
++  });
++  await immutable(path.join(dir, 'receipt.json'), encoded(receipt));
++  return receipt;
++}
+diff --git a/scripts/revise-textbook-assets.ts b/scripts/revise-textbook-assets.ts
+new file mode 100644
+index 0000000..930f069
+--- /dev/null
++++ b/scripts/revise-textbook-assets.ts
+@@ -0,0 +1,25 @@
++/** Local operator only. Explicit prepare/run JSON stdin; existing ownership is mandatory. */
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import { Pool } from 'pg';
++import { prepareTextbookAssetRevision, runTextbookAssetRevision } from '../lib/server/mira-textbook-asset-revision';
++
++async function main() {
++  const mode = process.argv[2];
++  if (!['prepare', 'run'].includes(mode)) throw new Error('USAGE');
++  let body = ''; for await (const chunk of process.stdin) { body += chunk; if (body.length > 1024 * 1024) throw new Error('INPUT_TOO_LARGE'); }
++  const input = JSON.parse(body), connectionString = process.env.MIRA_OPENMAIC_AGENT_DATABASE_URL ?? process.env.DATABASE_URL;
++  if (!connectionString) throw new Error('DATABASE_CONFIGURATION');
++  const pool = new Pool({ connectionString, max: 1 });
++  try {
++    const env = { pool, dataDir: path.resolve('data') };
++    if (mode === 'run' && Object.keys(input).sort().join(',') !== 'approvedPlanSha256,planPath') throw new Error('RUN_INPUT');
++    const result = mode === 'prepare' ? await prepareTextbookAssetRevision(input, env) : await runTextbookAssetRevision(JSON.parse(await fs.readFile(input.planPath, 'utf8')), input.approvedPlanSha256, env);
++    process.stdout.write(JSON.stringify(result, null, 2) + '\n');
++  } finally { await pool.end(); }
++}
++main().catch(error => {
++  const message = String(error?.message ?? '');
++  process.stderr.write(JSON.stringify({ error: /^(TEXTBOOK_ASSET_REVISION_|TEXTBOOK_SCENE_)[A-Z0-9_]+$/.test(message) ? message : 'LOCAL_ASSET_REVISION_FAILED_NO_AUTOMATIC_RETRY' }) + '\n');
++  process.exitCode = 1;
++});
+diff --git a/tests/agent-runtime/textbook-asset-revision.test.ts b/tests/agent-runtime/textbook-asset-revision.test.ts
+new file mode 100644
+index 0000000..4061090
+--- /dev/null
++++ b/tests/agent-runtime/textbook-asset-revision.test.ts
+@@ -0,0 +1,206 @@
++import { createHash } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import { tmpdir } from 'node:os';
++import path from 'node:path';
++import sharp from 'sharp';
++import { PGlite } from '@electric-sql/pglite';
++import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
++import { ensureDocumentSchema, type Queryable } from '@openmaic/storage/document/pg';
++import { ensureAgentSessionSchema } from '@openmaic/storage/agent-session/pg';
++import { ensureStageMetaSchema } from '@/lib/persistence/stage-meta';
++import { createOwnerBoundDocumentStore } from '@/lib/persistence/owner-bound-document-store';
++import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
++import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest } from '@/lib/server/mira-textbook-scene-contract';
++import { prepareTextbookAssetRevision, runTextbookAssetRevision, type AssetRevisionInput } from '@/lib/server/mira-textbook-asset-revision';
++import type { CourseStore } from '@/lib/server/agent-runtime/course-tools';
++import fixture from '../fixtures/textbook-scene-contract.v1.json';
++
++const hash = (v: string | Buffer) => createHash('sha256').update(v).digest('hex');
++const cookie = '11111111-1111-4111-8111-111111111111', owner = `anon:${cookie}`, stageId = 'stage-assets', sessionId = 'session-assets';
++let db: PGlite, root: string, frozen: any, store: ReturnType<typeof createOwnerBoundDocumentStore>, input: AssetRevisionInput, sourceBytes: Map<string, Buffer>;
++class Pool {
++  failCommit = false;
++  failAfterCommit = false;
++  failScene = false;
++  async query(sql: string, args?: unknown[]) {
++    if (sql === 'COMMIT' && this.failCommit) { this.failCommit = false; throw new Error('injected-before-commit'); }
++    if (this.failScene && /INSERT INTO document_scenes/.test(sql)) { this.failScene = false; throw new Error('injected-scene-write'); }
++    const result = await db.query(sql, args);
++    if (sql === 'COMMIT' && this.failAfterCommit) { this.failAfterCommit = false; throw new Error('injected-after-commit'); }
++    return result;
++  }
++  connect = async () => ({ query: this.query.bind(this), release() {} });
++}
++let pool: Pool, env: { pool: Pool; dataDir: string };
++const ledgerPath = () => path.join(root, 'classrooms', stageId, 'textbook-authoring-candidate.json');
++const ledger = async () => JSON.parse(await fs.readFile(ledgerPath(), 'utf8'));
++const doc = () => store.loadDocument(stageId);
++const src = (key: string) => `/api/classroom-media/${stageId}/media/${key}.png`;
++const revisionDir = (plan: any) => path.join(root, 'textbook-asset-revisions', hash(sessionId), stageId, plan.sha256);
++const prompt = () => '\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n' + JSON.stringify(frozen) + '\nEND_MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT\n';
++async function refreshInput() { input.expectedDocumentSha256 = textbookDigest(await doc()); input.expectedCandidateSha256 = (await ledger()).sha256; }
++async function seedDocument(value: any) {
++  for (const scene of value.scenes) await store.putScene(stageId, scene);
++  const current = await ledger(); delete current.sha256;
++  current.scenes = value.scenes.map((s: any) => ({ sceneId: s.id, order: s.order, sha256: textbookDigest(s), canonicalJson: textbookCanonical(s), contractSha256: frozen.sha256 }));
++  await fs.writeFile(ledgerPath(), JSON.stringify({ ...current, sha256: textbookDigest(current) })); await refreshInput();
++}
++beforeEach(async () => {
++  root = await fs.realpath(await fs.mkdtemp(path.join(tmpdir(), 'asset-revision-')));
++  db = new PGlite(); await db.waitReady; pool = new Pool(); env = { pool, dataDir: root };
++  const query: Queryable = { query: <R extends Record<string, unknown>>(sql: string, args?: unknown[]) => db.query<R>(sql, args) };
++  await ensureDocumentSchema(query); await ensureAgentSessionSchema(query); await ensureStageMetaSchema(query);
++  frozen = structuredClone(fixture);
++  frozen.contract.pagePlan = [{ page: 1, title: '观察方法', type: 'slide', move: '看图观察' }, { page: 2, title: '选择方法', type: 'quiz', questionIds: ['method'], move: '辨认观察方法' }, { page: 3, title: '安全观察', type: 'quiz', questionIds: ['safety'], move: '选择安全观察方法' }];
++  frozen.contract.lockedAssessments = [
++    { id: 'method', page: 2, type: 'single', question: '看图，选择一种方法。', choices: [{ value: 'A', label: '看', asset: 'eyes' }, { value: 'B', label: '闻', asset: 'smell' }], answer: 'A', points: 10, analysis: '用眼睛看。' },
++    { id: 'safety', page: 3, type: 'single', question: '有刺的植物怎样观察？', choices: [{ value: 'A', label: '看', asset: 'eyes' }, { value: 'B', label: '摸', asset: 'touch' }], answer: 'A', points: 10, analysis: '站在旁边看。', visualAsset: 'cactus' },
++  ]; frozen.sha256 = textbookDigest(frozen.contract);
++  await db.query('INSERT INTO agent_sessions(id,owner_id,prompt,stage_id,status) VALUES($1,$2,$3,$4,$5)', [sessionId, owner, prompt(), stageId, 'succeeded']);
++  store = createOwnerBoundDocumentStore({ pool, ownerId: owner, validateScene: validateAppScene, validateStage: validateAppStage });
++  await store.saveDocument({ stage: { id: stageId, name: '观察植物', createdAt: 1, updatedAt: 1 }, scenes: [], outline: { producerRef: sessionId, outlines: [] } } as never);
++  const media = path.join(root, 'classrooms', stageId, 'media'); await fs.mkdir(media, { recursive: true }); sourceBytes = new Map();
++  for (const [key, color] of [['eyes', '#ff0000'], ['touch', '#0000ff'], ['smell', '#00ff00'], ['cactus', '#ff00ff']]) {
++    const bytes = await sharp({ create: { width: 64, height: 64, channels: 3, background: color } }).png().toBuffer(); sourceBytes.set(key, bytes); await fs.writeFile(path.join(media, `${key}.png`), bytes);
++  }
++  const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') }), guarded = guard.wrapStore(store as unknown as CourseStore);
++  await guard.context({ stageId, order: 1, title: '观察方法', type: 'slide', media: [...sourceBytes.keys()].map(key => ({ assetKey: key, src: src(key) })) });
++  await guarded.putScene(stageId, { id: 'scene-p1', stageId, order: 1, title: '观察方法', type: 'slide', content: { type: 'slide', canvas: { id: 'canvas1', viewportSize: 1000, viewportRatio: 0.5625, theme: { backgroundColor: '#ffffff', themeColors: ['#153f50'], fontColor: '#153f50', fontName: 'sans-serif' }, background: { type: 'solid', color: '#ffffff' }, elements: [{ id: 'image-smell', type: 'image', left: 0, top: 0, width: 500, height: 500, rotate: 0, fixedRatio: true, src: src('smell') }] } }, actions: [{ id: 'speech-1', type: 'speech', text: '站远一点，轻轻闻。' }] } as never);
++  for (const [i, lock] of frozen.contract.lockedAssessments.entries()) {
++    const q: any = { id: lock.id, type: 'single', question: lock.question, points: lock.points, options: lock.choices.map((c: any) => ({ value: c.value, label: c.label })), answer: [lock.answer], analysis: lock.analysis, optionVisuals: Object.fromEntries(lock.choices.map((c: any) => [c.value, { kind: 'image', src: src(c.asset), alt: c.label }])) };
++    if (lock.visualAsset) q.visual = { kind: 'image', src: src(lock.visualAsset), alt: '带刺的植物' };
++    await guarded.putScene(stageId, { id: `scene-p${i + 2}`, stageId, order: i + 2, title: frozen.contract.pagePlan[i + 1].title, type: 'quiz', content: { type: 'quiz', questions: [q] }, actions: [{ id: `speech-${i + 2}`, type: 'speech', text: lock.question }] } as never);
++  }
++  const jobDir = path.join(root, 'job'); await fs.mkdir(jobDir);
++  await fs.writeFile(path.join(jobDir, 'owner.cookies'), `# Netscape HTTP Cookie File\nlocalhost\tFALSE\t/\tTRUE\t0\tanonymous_id\t${cookie}\n`);
++  await fs.writeFile(path.join(jobDir, 'state.json'), JSON.stringify({ sessionId }));
++  await fs.writeFile(path.join(jobDir, 'dispatch.json'), JSON.stringify({ ownerFingerprint: hash(cookie) }));
++  await fs.writeFile(path.join(jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen }));
++  input = { jobDir, stageId, expectedDocumentSha256: '', expectedCandidateSha256: '', changes: [] };
++  for (const [key, color] of [['smell', '#999999'], ['cactus', '#444444']]) {
++    const bytes = await sharp({ create: { width: 128, height: 128, channels: 3, background: color } }).png().toBuffer(), newFilePath = path.join(root, `${key}-new.png`);
++    await fs.writeFile(newFilePath, bytes); const binding = (await ledger()).assetBindings.find((b: any) => b.assetKey === key);
++    input.changes.push({ assetKey: key, expectedOldBindingSha256: textbookDigest(binding), expectedOldBytesSha256: binding.sha256, newFilePath, newBytesSha256: hash(bytes), reviewBasis: '已人工复核新图表达的观察方法与安全距离。' });
++  }
++  await refreshInput();
++});
++afterEach(async () => { vi.restoreAllMocks(); await db.close(); await fs.rm(root, { recursive: true, force: true }); });
++
++describe('explicit local asset revision', () => {
++  it('read-only prepare; changes precisely three src leaves, preserves originals and frozen identities, uses standard history', async () => {
++    const original = (await doc())!, originalBytes = await fs.readFile(ledgerPath());
++    const plan = await prepareTextbookAssetRevision(input, env);
++    expect(plan.dependencies).toHaveLength(3); expect(await doc()).toEqual(original); expect(await fs.readFile(ledgerPath())).toEqual(originalBytes);
++    await expect(fs.stat(revisionDir(plan))).rejects.toMatchObject({ code: 'ENOENT' });
++    const receipt = await runTextbookAssetRevision(plan, plan.sha256, env), after = (await doc())!, result = await ledger();
++    expect(receipt.providerCalls).toBe(0); expect(receipt.verification).toBe('static_only_not_play_audio_or_publication');
++    expect(result.bindingHistory).toHaveLength(2); expect(Object.keys(result).sort()).toEqual(Object.keys(JSON.parse(originalBytes.toString())).sort());
++    const restored = structuredClone(after) as any;
++    for (const d of plan.dependencies) { const parts = d.path.slice(1).split('/'); let target = restored; for (const p of parts.slice(0, -1)) target = target[p]; target[parts.at(-1)!] = plan.changes.find((c: any) => c.assetKey === d.assetKey).from.src; }
++    expect(restored).toEqual(original); expect(result.frozenContract).toEqual(frozen);
++    expect(await fs.readFile(path.join(revisionDir(plan), 'original-candidate.json'))).toEqual(originalBytes);
++    expect(JSON.parse(await fs.readFile(path.join(revisionDir(plan), 'original-document.json'), 'utf8'))).toEqual(original);
++    for (const c of plan.changes) {
++      expect(c.to.bindingVersion).toBe(2);
++      expect(await fs.readFile(path.join(root, 'classrooms', stageId, 'media', `${c.assetKey}.png`))).toEqual(sourceBytes.get(c.assetKey));
++      expect(await fs.readFile(path.join(revisionDir(plan), `original-image-${c.from.sha256}`))).toEqual(sourceBytes.get(c.assetKey));
++    }
++    expect(await runTextbookAssetRevision(plan, plan.sha256, env)).toEqual(receipt);
++    expect((await ledger()).bindingHistory).toHaveLength(2);
++    // The ordinary generator still cannot rebind a saved asset.
++    const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') }); guard.wrapStore(store as unknown as CourseStore);
++    await expect(guard.context({ stageId, order: 1, title: '观察方法', type: 'slide', media: [{ assetKey: 'smell', src: src('smell') }] })).rejects.toThrow('ASSET_REBIND_REQUIRES_REVISION');
++  });
++  it.each(['running', 'queued', 'lease', 'foreign-owner', 'stage-owner', 'deleted', 'frozen', 'other-stage-active'])('rejects authority changes: %s', async kind => {
++    const plan = await prepareTextbookAssetRevision(input, env), original = await doc(), bytes = await fs.readFile(ledgerPath());
++    if (['running', 'queued'].includes(kind)) await db.query('UPDATE agent_sessions SET status=$1', [kind]);
++    if (kind === 'lease') await db.query("UPDATE agent_sessions SET lease_worker_id='worker'");
++    if (kind === 'foreign-owner') await db.query("UPDATE agent_sessions SET owner_id='foreign'");
++    if (kind === 'stage-owner') await db.query("UPDATE stage_meta SET owner_id='foreign'");
++    if (kind === 'deleted') await db.query('UPDATE agent_sessions SET deleted_at=now()');
++    if (kind === 'frozen') await db.query("UPDATE agent_sessions SET prompt='changed'");
++    if (kind === 'other-stage-active') await db.query("INSERT INTO agent_sessions(id,owner_id,prompt,stage_id,active_stage_id,status) VALUES('other',$1,'other','placeholder',$2,'running')", [owner, stageId]);
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('TEXTBOOK_ASSET_REVISION_');
++    expect(await doc()).toEqual(original); expect(await fs.readFile(ledgerPath())).toEqual(bytes);
++    await expect(fs.stat(revisionDir(plan))).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++  it('does not block unrelated subject sessions', async () => {
++    await db.query("INSERT INTO agent_sessions(id,owner_id,prompt,stage_id,status,lease_worker_id) VALUES('other',$1,'other','another-stage','running','worker')", [owner]);
++    const plan = await prepareTextbookAssetRevision(input, env); await runTextbookAssetRevision(plan, plan.sha256, env);
++    expect((await db.query("SELECT status,lease_worker_id FROM agent_sessions WHERE id='other'")).rows[0]).toEqual({ status: 'running', lease_worker_id: 'worker' });
++  });
++  it.each(['source-bytes', 'old-bytes', 'symlink', 'old-binding', 'extra-field', 'approval'])('rejects tampering: %s', async kind => {
++    const plan = await prepareTextbookAssetRevision(input, env);
++    if (kind === 'source-bytes') await fs.writeFile(input.changes[0].newFilePath, sourceBytes.get('eyes')!);
++    if (kind === 'old-bytes') await fs.writeFile(path.join(root, 'classrooms', stageId, 'media', 'smell.png'), sourceBytes.get('eyes')!);
++    if (kind === 'symlink') { await fs.rename(input.changes[0].newFilePath, input.changes[0].newFilePath + '.real'); await fs.symlink(input.changes[0].newFilePath + '.real', input.changes[0].newFilePath); }
++    if (kind === 'old-binding') plan.input.changes[0].expectedOldBindingSha256 = '0'.repeat(64);
++    if (kind === 'extra-field') plan.input.additionalMutation = 'forbidden';
++    await expect(runTextbookAssetRevision(plan, kind === 'approval' ? '0'.repeat(64) : plan.sha256, env)).rejects.toThrow('TEXTBOOK_ASSET_REVISION_');
++  });
++  it('rejects stale document and candidate byte identities separately', async () => {
++    const plan = await prepareTextbookAssetRevision(input, env);
++    const original = await fs.readFile(ledgerPath()); await fs.appendFile(ledgerPath(), ' ');
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('CANDIDATE_CHANGED');
++    await fs.writeFile(ledgerPath(), original); const changed: any = (await doc())!; changed.scenes[0].title = 'changed'; await store.putScene(stageId, changed.scenes[0]);
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('DOCUMENT_CHANGED');
++  });
++  it('checks locked quiz and every retained scene against the frozen contract', async () => {
++    const changed: any = await doc(); changed.scenes[1].content.questions[0].answer = ['B']; await seedDocument(changed);
++    await expect(prepareTextbookAssetRevision(input, env)).rejects.toThrow('LOCKED_QUESTION_CHANGED');
++  });
++  it('rejects hidden string references and aliased old image sources', async () => {
++    const original: any = await doc(), hidden = structuredClone(original);
++    hidden.scenes[0].content.canvas.elements.push({ id: 'hidden', type: 'text', left: 0, top: 0, width: 400, height: 80, rotate: 0, content: `<p>${src('smell')}</p>`, defaultColor: '#333333', defaultFontName: 'sans-serif' });
++    await seedDocument(hidden); await expect(prepareTextbookAssetRevision(input, env)).rejects.toThrow('UNSUPPORTED_DEPENDENCY');
++    await seedDocument(original);
++    const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') }); guard.wrapStore(store as unknown as CourseStore);
++    await guard.context({ stageId, order: 1, type: 'slide', title: '观察方法', media: [{ assetKey: 'smell-alias', src: src('smell') }] }); await refreshInput();
++    await expect(prepareTextbookAssetRevision(input, env)).rejects.toThrow('AMBIGUOUS_SOURCE');
++  });
++  it.each(['before-before', 'before-after', 'after-before', 'after-after'])('recovers exact persistent state %s without extra binding versions', async state => {
++    const plan = await prepareTextbookAssetRevision(input, env), beforeDoc = await doc(), beforeBytes = await fs.readFile(ledgerPath());
++    if (state === 'before-before') { pool.failScene = true; await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('injected-scene-write'); }
++    if (state === 'before-after') { pool.failCommit = true; await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('injected-before-commit'); }
++    if (state.startsWith('after')) {
++      await runTextbookAssetRevision(plan, plan.sha256, env); await fs.unlink(path.join(revisionDir(plan), 'receipt.json'));
++      if (state === 'after-before') await fs.writeFile(ledgerPath(), beforeBytes);
++    }
++    expect(textbookDigest(await doc())).toBe(state.startsWith('before') ? textbookDigest(beforeDoc) : plan.afterDocumentSha256);
++    expect((await ledger()).sha256).toBe(state.endsWith('before') ? plan.beforeCandidateSha256 : plan.afterCandidateSha256);
++    const receipt = await runTextbookAssetRevision(plan, plan.sha256, env);
++    expect(textbookDigest(await doc())).toBe(plan.afterDocumentSha256); expect((await ledger()).sha256).toBe(plan.afterCandidateSha256);
++    expect((await ledger()).bindingHistory).toHaveLength(2); expect(await runTextbookAssetRevision(plan, plan.sha256, env)).toEqual(receipt);
++  });
++  it('refuses altered original backups during recovery', async () => {
++    const plan = await prepareTextbookAssetRevision(input, env); pool.failCommit = true;
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('injected-before-commit');
++    await fs.appendFile(path.join(revisionDir(plan), 'original-candidate.json'), ' ');
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('ORIGINAL_CHANGED');
++  });
++  it('recovers a successful COMMIT whose acknowledgement was lost, without another SQL scene write', async () => {
++    const plan = await prepareTextbookAssetRevision(input, env); pool.failAfterCommit = true;
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('injected-after-commit');
++    expect(textbookDigest(await doc())).toBe(plan.afterDocumentSha256);
++    await expect(fs.stat(path.join(revisionDir(plan), 'receipt.json'))).rejects.toMatchObject({ code: 'ENOENT' });
++    pool.failScene = true;
++    const receipt = await runTextbookAssetRevision(plan, plan.sha256, env);
++    expect(receipt.candidateSha256).toBe(plan.afterCandidateSha256); expect(pool.failScene).toBe(true);
++  });
++  it('requires every archived original image during recovery', async () => {
++    const plan = await prepareTextbookAssetRevision(input, env); pool.failScene = true;
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('injected-scene-write');
++    await fs.unlink(path.join(revisionDir(plan), `original-image-${plan.changes[0].from.sha256}`));
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++  it('rejects a concurrent candidate write at the owner-store fence and rolls back SQL', async () => {
++    const plan = await prepareTextbookAssetRevision(input, env), before = await doc();
++    const originalQuery = pool.query.bind(pool); let injected = false;
++    pool.query = async (sql, args) => {
++      const result = await originalQuery(sql, args);
++      if (!injected && /INSERT INTO document_scenes/.test(sql)) { injected = true; await fs.appendFile(ledgerPath(), ' '); }
++      return result;
++    };
++    await expect(runTextbookAssetRevision(plan, plan.sha256, env)).rejects.toThrow('CANDIDATE_FENCE'); expect(await doc()).toEqual(before);
++  });
++});

@@ -2,11 +2,12 @@
 import json
 from copy import deepcopy
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from urllib.parse import parse_qs, urlparse
 
 from core.errors import ApiError
 from core.security import now_ms
+from services import textbook_directory_access as directory
 from services.textbook_classroom_service import TextbookClassroomService
 from services.textbook_directory_access import published_release
 from tests.test_textbook_activity_release import fixture
@@ -54,6 +55,82 @@ class TextbookDirectoryAccessTest(unittest.TestCase):
         self.assertEqual(contents['accessMode'], 'published')
         self.assertEqual(self.db.execute('SELECT * FROM learning_textbook_selections').fetchall(), [])
 
+    def test_directory_projection_never_returns_full_review_or_runs_full_validator(self):
+        key, _, _ = self.publish()
+        full = self.repo.get_build(self.db, key)
+        projected = self.repo.directory_builds(
+            self.db, self.manifest['editionId'], self.manifest['revisionId'])[0]
+        self.assertNotIn('review_json', projected)
+        self.assertIn('directory_review_evidence_json', projected)
+        self.assertIn('directory_release_summary_json', projected)
+        self.assertIsInstance(
+            json.loads(projected['directory_release_summary_json'])['activityScope'], dict)
+        self.assertLess(
+            len(projected['directory_review_evidence_json'])
+            + len(projected['directory_release_summary_json']),
+            len(full['review_json']),
+        )
+        with patch.object(directory, 'validate_release',
+                          side_effect=AssertionError('directory read used full release validator')):
+            self.assertEqual(self.service.student_catalog('student-a', {})['books'][0]
+                             ['learningStatus']['availableActivityCount'], 1)
+            contents = self.service.student_contents('student-a', self.manifest['editionId'], {
+                'alignmentRevisionId': self.manifest['revisionId']})
+        self.assertEqual(contents['units'][0]['guideCourse']['contentKey'], key)
+
+    def test_top_level_damage_falls_back_but_deep_damage_is_rejected_at_launch(self):
+        old_key, _, _ = self.publish()
+        new_key, _, _ = self.publish(teaching_revision='test-v2', created_at=2)
+        stored = self.repo.get_build(self.db, new_key)['review_json']
+
+        def visible_key():
+            contents = self.service.student_contents('student-a', self.manifest['editionId'], {
+                'alignmentRevisionId': self.manifest['revisionId']})
+            return contents['units'][0]['guideCourse']['contentKey']
+
+        for mutation in ('review_authority', 'review_authority_integer', 'release_identity',
+                         'audio_boolean_type', 'unexpected_review_payload'):
+            review = json.loads(stored)
+            if mutation == 'review_authority':
+                review['publicationAuthorized'] = False
+            elif mutation == 'review_authority_integer':
+                review['publicationAuthorized'] = 1
+            elif mutation == 'release_identity':
+                review['release']['sha256'] = '0' * 64
+            elif mutation == 'audio_boolean_type':
+                review['release']['audioAudit']['passed'] = 1
+            else:
+                review['unrelatedLargePayload'] = 'x' * 1100000
+            with self.subTest(mutation=mutation):
+                self.db.execute('UPDATE learning_textbook_course_builds SET review_json=? WHERE content_key=?',
+                                (json.dumps(review), new_key))
+                self.db.raw.commit()
+                self.assertEqual(visible_key(), old_key)
+            self.db.execute('UPDATE learning_textbook_course_builds SET review_json=? WHERE content_key=?',
+                            (stored, new_key))
+            self.db.raw.commit()
+
+        # A directory projection is an availability hint. It deliberately does
+        # not transfer the classroom body, so a deep-only mutation remains
+        # visible until the strict launch boundary rejects its broken hash.
+        review = json.loads(stored)
+        review['release']['classroom']['directoryTestTamper'] = True
+        self.db.execute('UPDATE learning_textbook_course_builds SET review_json=? WHERE content_key=?',
+                        (json.dumps(review), new_key))
+        self.db.raw.commit()
+        self.assertEqual(visible_key(), new_key)
+        auth = Mock()
+        auth.authenticate.return_value = {'principal': {'id': 'principal', 'family_id': 'family-a',
+                                                        'child_id': 'child-a'},
+                                          'session': {'id': 'login'}}
+        classroom = TextbookClassroomService(self.repo, student_auth=auth,
+            signing_key='isolated-directory-boundary', public_url='http://runtime')
+        with patch.object(directory, 'validate_release', wraps=directory.validate_release) as strict_validator:
+            with self.assertRaises(ApiError) as caught:
+                classroom.launch('student-a', new_key)
+        self.assertEqual(strict_validator.call_count, 1)
+        self.assertEqual(caught.exception.code, 'textbook_release_unavailable')
+
     @staticmethod
     def course_in_contents(contents, kind):
         if kind == 'book_exploration':
@@ -75,6 +152,7 @@ class TextbookDirectoryAccessTest(unittest.TestCase):
             ('learning_textbook_course_builds', 'status', 'retired', 'published', new_key, 'content_key'),
             ('learning_textbook_course_builds', 'review_json', '{}', new_build['review_json'], new_key, 'content_key'),
             ('learning_textbook_course_builds', 'review_json', '["damaged"]', new_build['review_json'], new_key, 'content_key'),
+            ('learning_textbook_course_builds', 'review_json', '{broken', new_build['review_json'], new_key, 'content_key'),
             ('learning_textbook_course_builds', 'input_json', '{broken', new_build['input_json'], new_key, 'content_key'),
         )
         for table, column, invalid, restored, identity, key in failures:

@@ -33,15 +33,22 @@ class CourseReuseRepository:
             raise
 
     @staticmethod
-    def previews(conn, edition, node):
-        return conn.execute('SELECT * FROM learning_textbook_course_previews WHERE edition_id=? AND node_id=? '
-                            'ORDER BY created_at DESC,preview_key DESC FOR UPDATE', (edition, node)).fetchall()
+    def _newest(rows, key):
+        # A saved classroom can be megabytes of JSON; ordering such rows in SQL
+        # exhausts MySQL's sort buffer, so the few rows of one lesson sort here.
+        return sorted(rows, key=lambda row: (row['created_at'], row[key]), reverse=True)
 
-    @staticmethod
-    def publications(conn, edition, node):
-        return conn.execute("SELECT * FROM learning_textbook_course_builds WHERE edition_id=? AND node_id=? "
-                            "AND part_index=1 AND status='published' ORDER BY created_at DESC,content_key DESC FOR UPDATE",
-                            (edition, node)).fetchall()
+    @classmethod
+    def previews(cls, conn, edition, node):
+        return cls._newest(conn.execute(
+            'SELECT * FROM learning_textbook_course_previews WHERE edition_id=? AND node_id=? FOR UPDATE',
+            (edition, node)).fetchall(), 'preview_key')
+
+    @classmethod
+    def publications(cls, conn, edition, node):
+        return cls._newest(conn.execute(
+            "SELECT * FROM learning_textbook_course_builds WHERE edition_id=? AND node_id=? "
+            "AND part_index=1 AND status='published' FOR UPDATE", (edition, node)).fetchall(), 'content_key')
 
     @staticmethod
     def reserve(conn, identity, scope_hash, now, *, preview_key=None, publication_key=None, regeneration=None):

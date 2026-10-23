@@ -1,0 +1,258 @@
+diff --git a/components/roundtable/use-presentation-toolbar-height.ts b/components/roundtable/use-presentation-toolbar-height.ts
+--- a/components/roundtable/use-presentation-toolbar-height.ts
++++ b/components/roundtable/use-presentation-toolbar-height.ts
+@@ -2,7 +2,7 @@
+ 
+ import { useEffect, useRef, useState, type RefObject } from "react";
+ 
+-/** Keep fullscreen discussion controls above the toolbar, including wrapped rows. */
++/** Measure fullscreen chrome and reserve its occupied space inside this classroom. */
+ export function usePresentationToolbarHeight(
+   isPresenting: boolean,
+   dockRef: RefObject<HTMLDivElement | null>,
+@@ -18,9 +18,28 @@
+     const toolbar = toolbarRef.current;
+     if (!toolbar) return;
+     const dock = dockVisible ? dockRef.current : null;
++    // The canvas and the stable iframe portal are siblings of Roundtable. Put
++    // this inset on their classroom ancestor, never on documentElement. Padding
++    // the real canvas shrinks the measured slot and the child scroll viewport;
++    // clipping an unchanged full-height iframe would leave its last controls hidden.
++    const root = toolbar.closest<HTMLElement>("[data-mira-classroom-root]");
++    const property = "--mira-presentation-content-inset";
++    const previousValue = root?.style.getPropertyValue(property) ?? "";
++    const previousPriority = root?.style.getPropertyPriority(property) ?? "";
++    let appliedValue = "";
++    let ownsInset = true;
+     const measure = () => {
+-      setToolbarHeight(toolbar.offsetHeight);
+-      setDockHeight(dock ? dock.offsetHeight : 0);
++      const toolbarSize = toolbar.offsetHeight;
++      const dockSize = dock ? dock.offsetHeight : 0;
++      setToolbarHeight(toolbarSize);
++      setDockHeight(dockSize);
++      // Match the dock's 12px gap above the toolbar, plus a 12px content gap.
++      if (appliedValue && (root?.style.getPropertyValue(property) !== appliedValue
++          || root.style.getPropertyPriority(property) !== "")) ownsInset = false;
++      if (ownsInset) {
++        appliedValue = `${toolbarSize + dockSize + 24}px`;
++        root?.style.setProperty(property, appliedValue);
++      }
+     };
+     measure();
+     const observer =
+@@ -33,6 +52,12 @@
+     return () => {
+       observer?.disconnect();
+       window.removeEventListener("resize", measure);
++      // Restore a pre-existing owner value and do not erase a later owner write.
++      if (ownsInset && root?.style.getPropertyValue(property) === appliedValue
++          && root.style.getPropertyPriority(property) === "") {
++        if (previousValue) root.style.setProperty(property, previousValue, previousPriority);
++        else root.style.removeProperty(property);
++      }
+     };
+   }, [isPresenting, dockRef, dockVisible]);
+ 
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1669,3 +1669,21 @@
+     right: 0 !important;
+   }
+ }
++
++/* Reserve actual fullscreen chrome space in the content viewport. The pooled
++ * iframe follows this slot without reparenting or replacing its document. */
++@media (max-width: 640px) {
++  [data-mira-classroom-root]:fullscreen
++    [data-mira-presentation-dock] [data-mira-discussion-rail="dock"] > button {
++    display: flex;
++    align-items: center;
++    justify-content: center;
++    flex-shrink: 0;
++    min-width: 48px;
++    min-height: 48px;
++  }
++  [data-mira-classroom-root]:fullscreen [data-mira-canvas-area] {
++    box-sizing: border-box;
++    padding-bottom: var(--mira-presentation-content-inset, 276px);
++  }
++}
+diff --git a/tests/roundtable/fullscreen-touch-layout.browser.test.ts b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+--- a/tests/roundtable/fullscreen-touch-layout.browser.test.ts
++++ b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+@@ -7,7 +7,7 @@
+ describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== "1")(
+   "fullscreen touch layout",
+   () => {
+-    it("keeps every control reachable and preserves the real iframe through repeated fullscreen and resize", async () => {
++    it("keeps chrome and bottom activity buttons reachable without replacing the real iframe", async () => {
+       const require = createRequire(import.meta.url);
+       const { build } = createRequire(require.resolve("tsx"))("esbuild");
+       // Unrelated network, ASR and roster integrations are isolated. Roundtable,
+@@ -19,7 +19,7 @@
+         "@/lib/store/settings": `const s={ttsMuted:false,ttsEnabled:true,asrEnabled:false,ttsVolume:1,chatAreaWidth:320,playbackSpeed:1,setTTSMuted(){},setTTSVolume(){},setPlaybackSpeed(){}};export const useSettingsStore=f=>f(s);export const PLAYBACK_SPEEDS=[1,1.5,2];`,
+         "@/lib/hooks/use-audio-recorder": `export const useAudioRecorder=()=>({isRecording:false,isProcessing:false,startRecording(){},stopRecording(){},cancelRecording(){}});`,
+         "@/lib/contexts/mira-student-runtime-context": `export const useMiraStudentRuntime=()=>false;export const useMiraStudentRuntimeEvents=()=>null;`,
+-        "@/lib/mira/student-interaction-bridge": `export const studentInteractionObjectives=()=>[];export const connectStudentInteractionFrame=()=>()=>{};`,
++        "@/lib/mira/student-interaction-bridge": `export const studentInteractionObjectives=()=>[];export const connectStudentInteractionFrame=()=>()=>{};export const STUDENT_INTERACTION_OBSERVER='';`,
+         "@/lib/mira/student-runtime": `export const getMiraEffectiveAsrEnabled=()=>false;`,
+         "@/lib/orchestration/registry/store": `export const useAgentRegistry={getState:()=>({getAgent:()=>undefined})};`,
+         "@/components/roundtable/presentation-speech-overlay": `export const PresentationSpeechOverlay=()=>null;`,
+@@ -29,7 +29,7 @@
+         "@/lib/store/element-refs": `const refs=[];export const useElementRefsStore={use:{refs:()=>refs},getState:()=>({refs})};`,
+       };
+       const html =
+-        '<!doctype html><meta name="mira-responsive-activity" content="low-reading-v1"><button id="make">Save plant</button><output id="album">0</output><script>window.documentToken=Math.random().toString(36);window.cards=0;window.recordedCueState="ready";make.onclick=()=>{album.textContent=String(++cards)};</script>';
++        '<!doctype html><meta name="mira-responsive-activity" content="low-reading-v1"><style>html,body{height:100%;margin:0;overflow:auto}body{box-sizing:border-box;padding:8px}button{min-width:90px;min-height:56px}footer{display:flex;gap:12px}</style><button id="make">Save plant</button><output id="album">0</output><div style="height:1100px"></div><footer><button id="bottomSave">Save bottom</button><button id="bottomReplay">Replay bottom</button></footer><script>window.documentToken=Math.random().toString(36);window.cards=0;window.bottomSaves=0;window.bottomReplays=0;window.recordedCueState="ready";make.onclick=()=>{album.textContent=String(++cards)};bottomSave.onclick=()=>++window.bottomSaves;bottomReplay.onclick=()=>++window.bottomReplays;</script>';
+       const bundle = await build({
+         stdin: {
+           resolveDir: process.cwd(),
+@@ -38,11 +38,12 @@
+ import React,{useState,useEffect} from 'react';import {createRoot} from 'react-dom/client';
+ import {Roundtable} from './components/roundtable';
+ import {InteractiveIframeHost} from './components/scene-renderers/InteractiveIframeHost';
++import {InteractiveRenderer} from './components/scene-renderers/interactive-renderer';
+ import {useInteractiveIframePool} from './lib/store/interactive-iframe-pool';
+-const pool=useInteractiveIframePool.getState();pool.mount('one',{srcDoc:${JSON.stringify(html)}});pool.claim('one','one');pool.setRect('one',{left:10,top:40,width:300,height:240});pool.setActive('one');
+-function App(){const [root,setRoot]=useState(null);const [full,setFull]=useState(false);const [playing,setPlaying]=useState(false);const [chat,setChat]=useState(true);const [sidebar,setSidebar]=useState(true);const [visible,setVisible]=useState(true);window.setControlsVisible=setVisible;
++const html=${JSON.stringify(html)};
++function App(){const [root,setRoot]=useState(null);const [full,setFull]=useState(false);const [playing,setPlaying]=useState(false);const [chat,setChat]=useState(true);const [sidebar,setSidebar]=useState(true);const [visible,setVisible]=useState(true);window.setControlsVisible=setVisible;window.unmount=()=>createRootInstance.unmount();
+ useEffect(()=>{const fn=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',fn);return()=>document.removeEventListener('fullscreenchange',fn)},[]);
+-return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white'}}><div style={{position:'absolute',bottom:0,width:'100%'}}><Roundtable initialParticipants={[]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={playing?'playing':'idle'} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};createRoot(document.querySelector('#app')).render(<App/>);`,
++return <div data-mira-classroom-root ref={setRoot} style={{width:'100vw',height:'100vh',background:'white','--mira-presentation-content-inset':'7px'}}><div data-mira-canvas-area style={{height:'100%',boxSizing:'border-box'}}><div style={{height:'100%',padding:8,boxSizing:'border-box'}}><InteractiveRenderer content={{type:'interactive',html,url:''}} sceneId='one'/></div></div><div style={{position:'absolute',bottom:0,width:'100%'}}> <Roundtable initialParticipants={[]} currentSceneIndex={1} scenesCount={14} isPresenting={full} controlsVisible={visible} autoPlayLecture={false} onAutoPlayLectureChange={()=>{}} engineMode={playing?'playing':'idle'} onPlayPause={()=>setPlaying(!playing)} onTogglePresentation={()=>full?document.exitFullscreen():root.requestFullscreen()} chatCollapsed={chat} onToggleChat={()=>setChat(!chat)} sidebarCollapsed={sidebar} onToggleSidebar={()=>setSidebar(!sidebar)} onWhiteboardClose={()=>{}} onPrevSlide={()=>{}} onNextSlide={()=>{}}/></div><InteractiveIframeHost container={root}/></div>};const createRootInstance=createRoot(document.querySelector('#app'));createRootInstance.render(<App/>);`,
+         },
+         bundle: true,
+         write: false,
+@@ -80,7 +81,10 @@
+       const tokens = Array.from(new Set(source.split(/[\s'"`{}(),]+/)));
+       const css =
+         compiled.build(tokens) +
+-        "\n" +
++        // Match the real application viewport ancestors. Fullscreen removes
++        // the root from normal flow; a zero-height test body would falsely
++        // clip its pooled iframe through the storybook overflow boundary.
++        "\nhtml,body,#app{width:100%;height:100%;margin:0}body{overflow:hidden}\n" +
+         readFileSync("app/mira-student-orbit.css", "utf8");
+       if (process.env.MIRA_FORMAL_QA_EXPORT_DIR) {
+         mkdirSync(process.env.MIRA_FORMAL_QA_EXPORT_DIR, { recursive: true });
+@@ -106,6 +110,7 @@
+         for (const theme of ["", "storybook"]) {
+           const page = await browser.newPage({
+             viewport: { width: 390, height: 844 },
++            hasTouch: true,
+           });
+           page.setDefaultTimeout(10000);
+           page.on("pageerror", (e) => console.error(e.message));
+@@ -151,6 +156,7 @@
+               window as any
+             ).originalFrame.contentWindow;
+           });
++          let completedBottomActions = 0;
+           for (const width of [390, 360]) {
+             await page.setViewportSize({ width, height: 844 });
+             await page
+@@ -166,6 +172,7 @@
+               await page
+                 .locator("[data-mira-presentation-backdrop]")
+                 .click({ position: { x: 3, y: 3 } });
++            await page.locator("[data-mira-composer]").waitFor({state:"detached"});
+             await page.evaluate(() =>
+               (window as any).setControlsVisible(false),
+             );
+@@ -184,6 +191,48 @@
+                 .getBoundingClientRect();
+               return d.bottom + 8 <= a.top;
+             });
++            await page.waitForFunction(() => {
++              const rail=document.querySelector('[data-mira-discussion-rail="dock"]');
++              return rail && getComputedStyle(rail.parentElement!).transform==='none';
++            });
++            // The real placeholder must shrink the iframe's CSS viewport, not
++            // merely clip an unchanged full-height document behind fixed chrome.
++            await page.waitForFunction(() => {
++              const frame = document.querySelector("iframe")!.getBoundingClientRect();
++              const dock = document.querySelector("[data-mira-presentation-dock]")!.getBoundingClientRect();
++              return frame.bottom + 8 <= dock.top;
++            });
++            const frameBox = (await iframe.boundingBox())!;
++            await page.mouse.move(frameBox.x + frameBox.width / 2, frameBox.y + frameBox.height / 2);
++            await page.mouse.wheel(0, 4000);
++            await child!.waitForFunction(() => {
++              const s = document.body;
++              return s.scrollHeight > s.clientHeight && s.scrollTop >= s.scrollHeight - s.clientHeight - 1;
++            });
++            // Check the entire 56px button, including every edge, against host
++            // overlays as well as the child's hit testing, then perform real taps.
++            for (const id of ["bottomSave", "bottomReplay"]) {
++              const button = child!.locator(`#${id}`);
++              const box = (await button.boundingBox())!;
++              expect(box.height).toBeGreaterThanOrEqual(48);
++              expect(box.width).toBeGreaterThanOrEqual(48);
++              const points = [[box.x+1,box.y+1],[box.x+box.width-1,box.y+1],[box.x+1,box.y+box.height-1],[box.x+box.width-1,box.y+box.height-1],[box.x+box.width/2,box.y+box.height/2]];
++              const hits=await page.evaluate(points => points.map(([x,y]) => ({point:[x,y],hit:document.elementFromPoint(x,y) === document.querySelector("iframe"),elements:document.elementsFromPoint(x,y).slice(0,3).map(e=>({tag:e.tagName,cls:e.className}))})), points);
++              expect(hits.every(h=>h.hit),JSON.stringify({theme,width,id,box,hits})).toBe(true);
++              expect(await button.evaluate(b => {
++                const r=b.getBoundingClientRect();
++                return [[1,1],[r.width-1,1],[1,r.height-1],[r.width-1,r.height-1],[r.width/2,r.height/2]].every(([x,y]) => b.contains(document.elementFromPoint(r.x+x,r.y+y)));
++              })).toBe(true);
++              await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2);
++            }
++            completedBottomActions++;
++            expect(await child!.evaluate(() => [(window as any).bottomSaves,(window as any).bottomReplays])).toEqual([completedBottomActions,completedBottomActions]);
++            await page.waitForFunction(() => Array.from(document.querySelectorAll('[data-mira-discussion-rail="dock"] > button')).every(b => {const r=b.getBoundingClientRect();return r.width>=48&&r.height>=48;}));
++            const dockButtons = await page.locator('[data-mira-discussion-rail="dock"] > button').evaluateAll(buttons => buttons.map(b => {
++              const r=b.getBoundingClientRect();return {width:r.width,height:r.height,hit:b.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))};
++            }));
++            expect(dockButtons.length).toBe(3);
++            for(const b of dockButtons){expect(b.width).toBeGreaterThanOrEqual(48);expect(b.height).toBeGreaterThanOrEqual(48);expect(b.hit).toBe(true);}
+             const measured = await page.evaluate(() => {
+               const toolbar = document.querySelector(
+                 "[data-mira-presentation-toolbar]",
+@@ -309,6 +358,9 @@
+                 observers: (window as any).toolbarObservers.active,
+               })),
+             ).toEqual({ frame: true, win: true, observers: 0 });
++            expect(await page.locator('[data-mira-classroom-root]').evaluate(e=> (e as HTMLElement).style.getPropertyValue('--mira-presentation-content-inset'))).toBe('7px');
++            expect(await page.locator('[data-mira-canvas-area]').evaluate(e=>getComputedStyle(e).paddingBottom)).toBe('0px');
++            expect((await iframe.boundingBox())!.height).toBe(828);
+             expect(
+               await child!.evaluate(() => ({
+                 token: (window as any).documentToken,
+@@ -328,6 +380,8 @@
+               .locator("[data-mira-presentation-toolbar]")
+               .evaluate((e) => getComputedStyle(e).paddingLeft),
+           ).toBe("0px");
++          expect(await page.locator('[data-mira-canvas-area]').evaluate(e=>getComputedStyle(e).paddingBottom)).toBe('0px');
++          expect((await iframe.boundingBox())!.height).toBe(884);
+           await page
+             .getByRole("button", { name: "stage.exitFullscreen", exact: true })
+             .click();
+@@ -339,6 +393,26 @@
+           expect(
+             await page.evaluate(() => (window as any).toolbarObservers),
+           ).toMatchObject({ active: 0 });
++          // A later owner priority change must survive our effect cleanup even
++          // when it writes the same pixel value.
++          await page.getByRole("button", {name:"stage.fullscreen",exact:true}).click();
++          await page.waitForFunction(()=>document.querySelector<HTMLElement>('[data-mira-classroom-root]')!.style.getPropertyValue('--mira-presentation-content-inset')!=='7px');
++          const laterValue=await page.locator('[data-mira-classroom-root]').evaluate(e=>{const s=(e as HTMLElement).style;const v=s.getPropertyValue('--mira-presentation-content-inset');s.setProperty('--mira-presentation-content-inset',v,'important');return v;});
++          await page.evaluate(()=>window.dispatchEvent(new Event('resize')));
++          expect(await page.locator('[data-mira-classroom-root]').evaluate(e=>(e as HTMLElement).style.getPropertyPriority('--mira-presentation-content-inset'))).toBe('important');
++          await page.getByRole("button", {name:"stage.exitFullscreen",exact:true}).click();
++          await page.waitForFunction(()=>!document.fullscreenElement&&(window as any).toolbarObservers.active===0);
++          expect(await page.locator('[data-mira-classroom-root]').evaluate(e=>[(e as HTMLElement).style.getPropertyValue('--mira-presentation-content-inset'),(e as HTMLElement).style.getPropertyPriority('--mira-presentation-content-inset')])).toEqual([laterValue,'important']);
++          await page.locator('[data-mira-classroom-root]').evaluate(e=>(e as HTMLElement).style.setProperty('--mira-presentation-content-inset','7px'));
++          // Unmounting an active presentation must restore the classroom-owned
++          // inline value and leave no observation or document-wide inset behind.
++          await page.getByRole("button", {name:"stage.fullscreen",exact:true}).click();
++          await page.waitForFunction(()=>!!document.fullscreenElement);
++          await page.waitForFunction(()=>document.querySelector<HTMLElement>('[data-mira-classroom-root]')!.style.getPropertyValue('--mira-presentation-content-inset')!=='7px');
++          const rootHandle=await page.locator('[data-mira-classroom-root]').elementHandle();
++          await page.evaluate(()=>(window as any).unmount());
++          expect(await rootHandle!.evaluate(e=>(e as HTMLElement).style.getPropertyValue('--mira-presentation-content-inset'))).toBe('7px');
++          expect(await page.evaluate(()=>document.documentElement.style.getPropertyValue('--mira-presentation-content-inset'))).toBe('');
+           await page.close();
+         }
+       } finally {

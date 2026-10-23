@@ -11,8 +11,11 @@ from urllib.parse import quote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 from content.teacher_profiles import get_formal_subject_qwen_voice_identity
+from content.textbook_pinyin_pronunciation import (AOE_POLICY_VERSION, registered_policy,
+    pronunciation_identity, validate_formal_receipt)
 from content.textbook_audio_language import (ENGLISH_AUTO_LANGUAGE_POLICY,
                                             ENGLISH_AUTO_LANGUAGE_POLICY_SHA256)
+from core.errors import ApiError
 
 from integrations.openmaic_formal_media import (
     FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY, FLASH_CANDIDATE_MODEL_POLICY, PRO_CURRENT_FLASH_MODEL_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
@@ -652,6 +655,7 @@ class OpenMaicFullRuntimeClient:
         text: str,
         text_sha256: str,
         paid_budget: Mapping[str, Any] | None = None,
+        pronunciation_policy_version: str | None = None,
     ) -> dict[str, Any]:
         payload = self._formal_audio_identity_payload(
             request_id=request_id,
@@ -678,18 +682,30 @@ class OpenMaicFullRuntimeClient:
                 "invalid_formal_audio_text_hash", "正式课堂讲解文本校验失败", status_code=400
             )
         payload.update({"text": normalized_text, "textSha256": actual_text_sha256})
-        self._validate_textbook_audio_namespace(payload, "tts")
+        policy_version = self._formal_pronunciation_version(request_id, pronunciation_policy_version)
+        if str(request_id).startswith('tbptts1_'):
+            payload['pronunciationProfile'] = pronunciation_identity(normalized_text, policy_version=policy_version)
+        self._validate_textbook_audio_namespace(payload, "tts", pronunciation_policy_version=policy_version)
         response = self._request_formal_audio_json(
             "POST", "/api/mira/formal-audio/tts", payload, paid_budget=paid_budget
         )
-        return self._validate_formal_tts_response(response, request_id=request_id)
+        result = self._validate_formal_tts_response(response, request_id=request_id,
+                                                   pronunciation_policy_version=policy_version)
+        if str(request_id).startswith('tbptts1_') and result['status'] == 'succeeded':
+            try:
+                validate_formal_receipt(result, normalized_text, policy_version=policy_version)
+            except ApiError as exc:
+                raise OpenMaicFullRuntimeError('invalid_pinyin_audio_response', '拼音音频回执不匹配原文', status_code=502) from exc
+        return result
 
-    def get_formal_audio_tts(self, request_id: str) -> dict[str, Any]:
+    def get_formal_audio_tts(self, request_id: str, *, pronunciation_policy_version: str | None = None) -> dict[str, Any]:
         normalized = self._formal_audio_request_id(request_id)
+        policy_version = self._formal_pronunciation_version(normalized, pronunciation_policy_version)
         response = self._request_formal_audio_json(
             "GET", f"/api/mira/formal-audio/tts?requestId={quote(normalized)}"
         )
-        return self._validate_formal_tts_response(response, request_id=normalized)
+        return self._validate_formal_tts_response(response, request_id=normalized,
+                                                 pronunciation_policy_version=policy_version)
 
     def download_formal_audio_tts(
         self, request_id: str, *, expected_sha256: str
@@ -772,6 +788,7 @@ class OpenMaicFullRuntimeClient:
         narration_segment_id: str,
         audio_sha256: str,
         paid_budget: Mapping[str, Any] | None = None,
+        pronunciation_policy_version: str | None = None,
     ) -> dict[str, Any]:
         payload = self._formal_audio_identity_payload(
             request_id=request_id,
@@ -793,21 +810,25 @@ class OpenMaicFullRuntimeClient:
                 "invalid_formal_audio_hash", "正式课堂语音校验值无效", status_code=400
             )
         payload["audioSha256"] = str(audio_sha256)
-        self._validate_textbook_audio_namespace(payload, "asr")
+        policy_version = self._formal_pronunciation_version(request_id, pronunciation_policy_version)
+        self._validate_textbook_audio_namespace(payload, "asr", pronunciation_policy_version=policy_version)
         response = self._request_formal_audio_json(
             "POST", "/api/mira/formal-audio/asr", payload, paid_budget=paid_budget
         )
         return self._validate_formal_asr_response(
-            response, request_id=request_id, require_ephemeral_transcript=True
+            response, request_id=request_id, require_ephemeral_transcript=True,
+            pronunciation_policy_version=policy_version,
         )
 
-    def get_formal_audio_asr(self, request_id: str) -> dict[str, Any]:
+    def get_formal_audio_asr(self, request_id: str, *, pronunciation_policy_version: str | None = None) -> dict[str, Any]:
         normalized = self._formal_audio_request_id(request_id)
+        policy_version = self._formal_pronunciation_version(normalized, pronunciation_policy_version)
         response = self._request_formal_audio_json(
             "GET", f"/api/mira/formal-audio/asr?requestId={quote(normalized)}"
         )
         return self._validate_formal_asr_response(
-            response, request_id=normalized, require_ephemeral_transcript=False
+            response, request_id=normalized, require_ephemeral_transcript=False,
+            pronunciation_policy_version=policy_version,
         )
 
     def start_formal_provider_readiness(self, **evidence: Any) -> dict[str, Any]:
@@ -1541,9 +1562,45 @@ class OpenMaicFullRuntimeClient:
         }
 
     @staticmethod
-    def _validate_textbook_audio_namespace(payload: Mapping[str, Any], operation: str) -> None:
+    def _formal_pronunciation_version(request_id: str, version: str | None) -> str | None:
+        if str(request_id).startswith(('tbptts1', 'tbpasr1')):
+            try:
+                # Only direct legacy callers may omit the internal selector.
+                # Plan-backed operators always pass their validated version.
+                return registered_policy(AOE_POLICY_VERSION if version is None else version)['policyVersion']
+            except ApiError as exc:
+                raise OpenMaicFullRuntimeError('invalid_pinyin_audio_namespace', '拼音政策版本未注册', status_code=400) from exc
+        if version is not None:
+            raise OpenMaicFullRuntimeError('invalid_pinyin_audio_namespace', '普通音频不能选择拼音政策', status_code=400)
+        return None
+
+    @staticmethod
+    def _validate_textbook_audio_namespace(payload: Mapping[str, Any], operation: str,
+                                         *, pronunciation_policy_version: str | None = None) -> None:
         request_id = str(payload["requestId"])
+        policy_version = OpenMaicFullRuntimeClient._formal_pronunciation_version(request_id, pronunciation_policy_version)
         tts_id = str(payload.get("ttsRequestId", ""))
+        pinyin = request_id.startswith(('tbptts1', 'tbpasr1')) or tts_id.startswith(('tbptts1', 'tbpasr1'))
+        if pinyin:
+            pattern = r'tbptts1_[0-9a-f]{64}' if operation == 'tts' else r'tbpasr1_[0-9a-f]{64}'
+            voice = get_formal_subject_qwen_voice_identity('chinese')
+            expected_teacher = {'subject': 'chinese', 'teacherProfileId': voice.teacher_profile_id,
+                                'teacherProfileVersion': voice.teacher_profile_version,
+                                'teacherProfileSha256': voice.teacher_profile_hash, 'teacherGender': voice.teacher_gender}
+            valid = (all(payload.get(k) == v for k, v in expected_teacher.items())
+                     and re.fullmatch(pattern, request_id) is not None)
+            if operation == 'tts':
+                valid = valid and payload.get('pronunciationProfile') == pronunciation_identity(
+                    payload['text'], policy_version=policy_version)
+            else:
+                valid = (valid and re.fullmatch(r'tbptts1_[0-9a-f]{64}', tts_id) is not None
+                         and request_id == 'tbpasr1_' + _canonical_sha256({'tts': tts_id, 'audio': payload['audioSha256']})
+                         and 'pronunciationProfile' not in payload)
+            if not valid:
+                raise OpenMaicFullRuntimeError('invalid_pinyin_audio_namespace', '拼音音频请求身份不一致', status_code=400)
+            return
+        if 'pronunciationProfile' in payload:
+            raise OpenMaicFullRuntimeError('invalid_pinyin_audio_namespace', '普通音频不能携带拼音合同', status_code=400)
         reserved = ("tbbtts2", "tbbasr2", "tbbreasr2")
         selected = request_id.startswith(reserved)
         paired = operation == "asr" and tts_id.startswith(reserved)
@@ -1557,7 +1614,36 @@ class OpenMaicFullRuntimeClient:
             )
 
     @staticmethod
-    def _textbook_audio_response_policy(response: Mapping[str, Any], request_id: str) -> dict[str, Any]:
+    def _textbook_audio_response_policy(response: Mapping[str, Any], request_id: str,
+                                       *, pronunciation_policy_version: str | None = None) -> dict[str, Any]:
+        policy_version = OpenMaicFullRuntimeClient._formal_pronunciation_version(request_id, pronunciation_policy_version)
+        if re.fullmatch(r'(?:tbptts1|tbpasr1)_[0-9a-f]{64}', request_id):
+            if response.get('state') != 'succeeded':
+                return {}
+            # Exact values and body/SSML hashes are checked again against the
+            # original text by the caller before any audio can be bound.
+            try:
+                value = validate_formal_receipt(response, policy_version=policy_version)
+            except ApiError as exc:
+                raise OpenMaicFullRuntimeError('invalid_pinyin_audio_response', '拼音音频回执无效', status_code=502) from exc
+            extra = {k: response[k] for k in ('providerId', 'modelId', 'voiceId', 'providerAudioSha256', 'pcmSha256', 'audioNormalization',
+                                             'providerAsrBodySha256', 'providerRequestId', 'providerUsage',
+                                             'budgetMeasurement') if k in response}
+            if ('providerRequestId' in extra and (not isinstance(extra['providerRequestId'], str)
+                    or not extra['providerRequestId'].strip() or len(extra['providerRequestId']) > 512)):
+                raise OpenMaicFullRuntimeError('invalid_pinyin_audio_response', '配音服务请求编号无效', status_code=502)
+            if 'providerUsage' in extra:
+                usage = extra['providerUsage']
+                if (not isinstance(usage, dict) or set(usage) != {'characters'}
+                        or type(usage['characters']) is not int or usage['characters'] < 0):
+                    raise OpenMaicFullRuntimeError('invalid_pinyin_audio_response', '配音实际计量无效', status_code=502)
+            if 'budgetMeasurement' in extra:
+                measurement = extra['budgetMeasurement']
+                if (not isinstance(measurement, dict) or set(measurement) != {'kind', 'characters', 'estimated'}
+                        or measurement['kind'] != 'ssml-codepoint-upper-bound' or measurement['estimated'] is not True
+                        or type(measurement['characters']) is not int or measurement['characters'] <= 0):
+                    raise OpenMaicFullRuntimeError('invalid_pinyin_audio_response', '配音估算计量无效', status_code=502)
+            return {'providerPronunciation': value, **extra}
         if re.fullmatch(r"(?:tbbtts2|tbbasr2|tbbreasr2)_[0-9a-f]{64}", request_id) is None:
             return {}
         profile = response.get("providerLanguagePolicy")
@@ -1576,7 +1662,9 @@ class OpenMaicFullRuntimeClient:
     @staticmethod
     def _formal_audio_request_id(value: str) -> str:
         normalized = str(value or "").strip()
-        if not _safe_identifier(normalized, max_length=128):
+        if (not _safe_identifier(normalized, max_length=128)
+                or (normalized.startswith(('tbptts1', 'tbpasr1'))
+                    and re.fullmatch(r'(?:tbptts1|tbpasr1)_[a-f0-9]{64}', normalized) is None)):
             raise OpenMaicFullRuntimeError(
                 "invalid_formal_audio_request_id", "正式课堂语音请求编号无效", status_code=400
             )
@@ -1584,7 +1672,7 @@ class OpenMaicFullRuntimeClient:
 
     @staticmethod
     def _validate_formal_tts_response(
-        response: Mapping[str, Any], *, request_id: str
+        response: Mapping[str, Any], *, request_id: str, pronunciation_policy_version: str | None = None
     ) -> dict[str, Any]:
         status = str(response.get("state") or "")
         digest = str(response.get("audioSha256") or "")
@@ -1605,13 +1693,15 @@ class OpenMaicFullRuntimeClient:
             "status": status,
             "audioSha256": digest or None,
             "mimeType": response.get("mimeType") if status == "succeeded" else None,
-            **OpenMaicFullRuntimeClient._textbook_audio_response_policy(response, request_id),
+            **OpenMaicFullRuntimeClient._textbook_audio_response_policy(response, request_id,
+                pronunciation_policy_version=pronunciation_policy_version),
         }
 
     @staticmethod
     def _validate_formal_asr_response(
         response: Mapping[str, Any], *, request_id: str,
         require_ephemeral_transcript: bool,
+        pronunciation_policy_version: str | None = None,
     ) -> dict[str, Any]:
         status = str(response.get("state") or "")
         transcript = response.get("transcript")
@@ -1654,7 +1744,8 @@ class OpenMaicFullRuntimeClient:
             "completionUsable": bool(
                 status == "succeeded" and require_ephemeral_transcript
             ),
-            **OpenMaicFullRuntimeClient._textbook_audio_response_policy(response, request_id),
+            **OpenMaicFullRuntimeClient._textbook_audio_response_policy(response, request_id,
+                pronunciation_policy_version=pronunciation_policy_version),
         }
 
     def _formal_audio_headers(self) -> dict[str, str]:

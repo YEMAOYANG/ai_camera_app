@@ -1,0 +1,704 @@
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -30,6 +30,7 @@
+ import { isMediaPlaceholder } from '@/lib/store/media-generation';
+ import type { MiraFormalSceneSkillInput } from '../mira-formal-skill-policy';
+ import { assertLearningInteractiveSyntax } from '../mira-formal-learning-contract';
++import { TextbookSceneValidationError } from '../mira-textbook-rejected-scene';
+ import { learningSceneInstructions } from '@openmaic/generation';
+ 
+ const MAX_GENERATE_SCENE_MEDIA = 8;
+@@ -442,6 +443,7 @@
+       try {
+         content = await generateSceneContent(outline, contentCall.call, {
+           ...(deps.getGenerationLearningContract?.() ? { learningContract: deps.getGenerationLearningContract() } : {}),
++          ...(textbookContext ? { textbookPromptProfile: 'frozen-textbook-v1' as const } : {}),
+           agents,
+           languageDirective: doc.stage.languageDirective ?? '',
+           allowProceduralSkill: true,
+@@ -490,7 +492,18 @@
+       });
+       if (!built) return result('Page assembly failed; nothing was written.', {}, true);
+       const scene = built as Scene;
+-      await runStageMutation(signal, () => deps.store.putScene(params.stageId, scene));
++      try {
++        await runStageMutation(signal, () => deps.store.putScene(params.stageId, scene));
++      } catch (error) {
++        if (error instanceof TextbookSceneValidationError && error.rejection) {
++          return result(error.message + ' Nothing was saved as an accepted scene. Do not regenerate automatically. ' + (error.rejection.archivalStatus === 'saved' ? 'Inspect the private rejection evidence first.' : 'Private archival failed; operator review is required.'), {
++            error: error.message, order: params.order, sceneId: scene.id,
++            diagnostics: error.diagnostics, rejection: error.rejection,
++            retryable: false, saved: false,
++          }, true);
++        }
++        throw error;
++      }
+       await contentCall.record();
+       await actionsCall?.record();
+       const skill = deps.getActiveSkill?.() ?? null;
+diff --git a/lib/server/mira-textbook-scene-contract.ts b/lib/server/mira-textbook-scene-contract.ts
+--- a/lib/server/mira-textbook-scene-contract.ts
++++ b/lib/server/mira-textbook-scene-contract.ts
+@@ -7,6 +7,7 @@
+ import type { CourseStore, CourseDocument } from './agent-runtime/course-tools';
+ import { CLASSROOMS_DIR } from './classroom-storage';
+ import { assertLearningInteractiveSyntax } from './mira-formal-learning-contract';
++import { archiveRejectedTextbookScene, TextbookSceneValidationError } from './mira-textbook-rejected-scene';
+ import { formalSceneImageReferences } from './mira-formal-media';
+ 
+ const START = '\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n';
+@@ -18,8 +19,8 @@
+ type Json = Record<string, any>;
+ const nonempty = (v: unknown): v is string => typeof v === 'string' && !!v.trim();
+ const object = (v: unknown): v is Json => !!v && typeof v === 'object' && !Array.isArray(v);
+-function fail(code: string): never {
+-  throw new Error(`TEXTBOOK_SCENE_${code}`);
++function fail(code: string, diagnostics: Json = {}): never {
++  throw new TextbookSceneValidationError(code, diagnostics);
+ }
+ function compareCodePoints(a: string, b: string): number {
+   const left = Array.from(a, (c) => c.codePointAt(0)!);
+@@ -279,6 +280,7 @@
+   cues: Json[];
+   images: string[];
+   marker: boolean;
++  markerCount: number;
+ } {
+   const document = parse(html);
+   let markerCount = 0;
+@@ -292,13 +294,13 @@
+         attrs.name === 'mira-responsive-activity' &&
+         parent === 'head'
+       ) {
+-        if (attrs.content !== 'low-reading-v1') fail('RESPONSIVE_MARKER_INVALID');
++        if (attrs.content !== 'low-reading-v1') fail('RESPONSIVE_MARKER_INVALID', { requiredContent: 'low-reading-v1' });
+         markerCount++;
+       }
+       if (node.tagName === 'script') {
+-        if (attrs.src || attrs.type === 'module') fail('EXTERNAL_RESOURCE');
++        if (attrs.src || attrs.type === 'module') fail('EXTERNAL_RESOURCE', { category: 'script-source-or-module', tag: node.tagName });
+         if (attrs.id === 'mira-narration-cues') {
+-          if (attrs.type !== 'application/json') fail('CUES_INVALID');
++          if (attrs.type !== 'application/json') fail('CUES_INVALID', { category: 'cue-container-type', expected: 'application/json' });
+           blocks.push(node.childNodes.map((n) => ('value' in n ? n.value : '')).join(''));
+         }
+       }
+@@ -306,9 +308,9 @@
+         ['iframe', 'object', 'embed', 'audio', 'video', 'source'].includes(node.tagName) ||
+         (node.tagName === 'link' && attrs.href)
+       )
+-        fail('EXTERNAL_RESOURCE');
++        fail('EXTERNAL_RESOURCE', { category: 'unsupported-element', tag: node.tagName });
+       if (node.tagName === 'img') {
+-        if (!attrs.src || attrs.srcset) fail('IMAGE_BINDING_MISSING');
++        if (!attrs.src || attrs.srcset) fail('IMAGE_BINDING_MISSING', { category: !attrs.src ? 'img-src-missing' : 'img-srcset-unsupported' });
+         images.push(attrs.src);
+       }
+       // Templates are inert and cannot provide the required marker/cues/pictures.
+@@ -318,29 +320,41 @@
+       for (const child of node.childNodes) visit(child, 'tagName' in node ? node.tagName : parent);
+   };
+   visit(document);
+-  if (
+-    /speechSynthesis|SpeechSynthesisUtterance|\bnew\s+Audio\s*\(|\b(?:localStorage|sessionStorage|indexedDB)\b|document\s*\.\s*cookie|\b(?:fetch|XMLHttpRequest|WebSocket|EventSource)\b/.test(
+-      html,
+-    ) ||
+-    /(?:window\s*\.\s*miraNarrate\s*=(?!=)|function\s+miraNarrate\b)/.test(html)
+-  )
+-    fail('UNSAFE_AUDIO_OR_STORAGE');
+-  if (/@import\b|url\(\s*["']?(?:https?:|\/\/|data:)/i.test(html)) fail('EXTERNAL_RESOURCE');
++  // Keep the same forbidden language and whole-document scan, but identify the
++  // actual match so an operator can repair the saved rejection without guessing.
++  const forbidden: [string, RegExp][] = [
++    ['browser-speech', /speechSynthesis|SpeechSynthesisUtterance/],
++    ['audio-constructor', /\bnew\s+Audio\s*\(/],
++    ['browser-storage', /\b(?:localStorage|sessionStorage|indexedDB)\b/],
++    ['cookie-access', /document\s*\.\s*cookie/],
++    ['network-api', /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource)\b/],
++    ['narration-helper-override', /(?:window\s*\.\s*miraNarrate\s*=(?!=)|function\s+miraNarrate\b)/],
++  ];
++  for (const [category, pattern] of forbidden) {
++    const match = pattern.exec(html);
++    if (match) fail('UNSAFE_AUDIO_OR_STORAGE', {
++      category, token: match[0], offset: match.index,
++      line: html.slice(0, match.index).split('\n').length,
++      scan: 'complete-html-including-comments',
++    });
++  }
++  const external = /@import\b|url\(\s*["']?(?:https?:|\/\/|data:)/i.exec(html);
++  if (external) fail('EXTERNAL_RESOURCE', { category: 'css-import-or-url', token: external[0], offset: external.index });
+   assertLearningInteractiveSyntax(html);
+   let cues: Json[] = [];
+   if (blocks.length) {
+-    if (blocks.length !== 1) fail('CUES_INVALID');
++    if (blocks.length !== 1) fail('CUES_INVALID', { category: 'cue-container-count', actual: blocks.length, expected: 1 });
+     let payload: Json;
+     try {
+       payload = JSON.parse(blocks[0]);
+     } catch {
+-      fail('CUES_INVALID');
++      fail('CUES_INVALID', { category: 'cue-json-invalid' });
+     }
+     if (
+       payload!.schemaVersion !== 'mira.interactive.narration-cues.v1' ||
+       !Array.isArray(payload!.cues)
+     )
+-      fail('CUES_INVALID');
++      fail('CUES_INVALID', { category: 'cue-schema-invalid', expected: 'mira.interactive.narration-cues.v1' });
+     cues = payload!.cues;
+     if (
+       !cues.length ||
+@@ -356,9 +370,9 @@
+       ) ||
+       new Set(cues.map((c) => c.id)).size !== cues.length
+     )
+-      fail('CUES_INVALID');
+-  }
+-  return { cues, images, marker: markerCount === 1 };
++      fail('CUES_INVALID', { category: 'cue-items-invalid', count: cues.length });
++  }
++  return { cues, images, marker: markerCount === 1, markerCount };
+ }
+ 
+ function sceneImages(scene: Scene): string[] {
+@@ -406,14 +420,21 @@
+     if (typeof scene.content.html !== 'string') fail('INLINE_HTML_REQUIRED');
+     const h = htmlDetails(scene.content.html);
+     if (low && (!h.marker || !h.images.length || !h.cues.length))
+-      fail('LOW_READING_INTERACTIVE_INCOMPLETE');
++      fail('LOW_READING_INTERACTIVE_INCOMPLETE', {
++        missing: [!h.marker && 'one-head-responsive-meta', !h.images.length && 'real-img', !h.cues.length && 'static-narration-cues'].filter(Boolean),
++        counts: { headResponsiveMarkers: h.markerCount, images: h.images.length, cues: h.cues.length },
++      });
+     if (
+       h.cues.length &&
+       (h.cues.length !== speech.length ||
+         new Set(h.cues.map((c) => c.text)).size !== h.cues.length ||
+         h.cues.some((c) => speech.filter((a) => a.text === c.text).length !== 1))
+     )
+-      fail('CUE_SPEECH_MISMATCH');
++      fail('CUE_SPEECH_MISMATCH', {
++        cueCount: h.cues.length, speechCount: speech.length,
++        unmatchedCueIds: h.cues.filter((c) => speech.filter((a) => a.text === c.text).length !== 1).map((c) => c.id),
++        unmatchedSpeechIds: speech.filter((a) => h.cues.filter((c) => c.text === a.text).length !== 1).map((a) => a.id),
++      });
+   }
+   if (scene.content.type === 'quiz') {
+     const qs = scene.content.questions;
+@@ -493,11 +514,16 @@
+   sessionId: string,
+   options: {
+     classroomsDir?: string;
++    rejectedScenesDir?: string;
++    ownsStage?: (stageId: string) => Promise<boolean>;
+     onCandidate?: (candidate: Json) => Promise<void>;
+   } = {},
+ ) {
+   assertTextbookContract(frozen);
+   const root = path.resolve(options.classroomsDir ?? CLASSROOMS_DIR);
++  const rejectedRoot = options.rejectedScenesDir ?? (options.classroomsDir
++    ? path.join(root, '.private-rejected-scenes')
++    : path.join(path.dirname(root), 'textbook-rejected-scenes'));
+   const inMemory = new Map<string, Candidate>();
+   const writes = new Map<string, Promise<unknown>>();
+   const serial = <T>(id: string, task: () => Promise<T>): Promise<T> => {
+@@ -706,7 +732,7 @@
+             'Use the exact question IDs, stems, option values/labels, answers, points and analysis. Convert choices to options; keep asset keys in this contract, not unsupported quiz fields. Every optionVisuals key must match its locked choice asset binding. No answer hints before response.',
+             'Generate finite prerecorded narration: interactive HTML must have exactly one application/json script id=mira-narration-cues with {schemaVersion:"mira.interactive.narration-cues.v1",cues:[{id,text}]}. Generate exactly one same-page speech action for every cue, with identical text, no extra speech. Never call browser speech synthesis, invent audio URLs, override miraNarrate, or use a timer as audio completion. The server binds real audio later.',
+             'For each quiz generate each exact question stem once as its speech action. Extra neutral guidance is OPTIONAL and must match a frozen pagePlan.narrationGuidance line verbatim, at most once; never invent extra guidance. Analysis stays only in the question and is shown after response. For interactive actions, read the full generated cue JSON and preserve every text verbatim.',
+-            'Only primary_1/primary_2 require picture-led choices, real img elements, one task, responsive head meta name="mira-responsive-activity" content="low-reading-v1", and 56 CSS px touch targets. Preserve actual state and child decisions; ready must follow that cue playing, with cancellation on hide/error. Self-contained HTML only: no CDN, external scripts/styles, storage or network calls.',
++            'Only primary_1/primary_2 require picture-led choices, real img elements, one task, responsive head meta name="mira-responsive-activity" content="low-reading-v1", and the touch-target dimensions specified by this frozen page/interaction policy (do not substitute a historical default). Preserve actual state and child decisions; ready must follow that cue playing, with cancellation on hide/error. Self-contained HTML only: no CDN, external scripts/styles, storage or network calls.',
+             'These constraints are structural authoring gates; never claim real play, picture meaning, narration audit, publication or mastery has passed.',
+           ].join('\n'),
+         };
+@@ -762,7 +788,37 @@
+                   ...doc!,
+                   scenes: [...doc!.scenes.filter((s) => s.id !== scene.id), scene],
+                 };
+-                const candidate = await guarded(next);
++                // Establish ownership and prior ledger integrity before retaining
++                // anything. A foreign stage never gets a private archive here.
++                if (doc!.stage.id !== id || (doc!.outline as any)?.producerRef !== sessionId || scene.stageId !== id)
++                  fail('STAGE_SESSION_MISMATCH');
++                const prior = await read(id);
++                let candidate: Candidate;
++                try {
++                  candidate = await guarded(next);
++                } catch (error) {
++                  const rejection = error instanceof TextbookSceneValidationError ? error
++                    : new TextbookSceneValidationError('VALIDATION_FAILED', { category: 'scene-validation' }, error instanceof Error ? error.message : String(error));
++                  const sceneCanonicalJson = textbookCanonical(scene);
++                  try {
++                    // loadDocument is capability-readable; producerRef alone is
++                    // not ownership. Recheck the live, server-owned owner probe.
++                    if (!options.ownsStage || !(await options.ownsStage(id)))
++                      throw new Error('REJECTED_SCENE_OWNER_UNVERIFIED');
++                    rejection.rejection = await archiveRejectedTextbookScene({
++                      root: rejectedRoot, sessionId, stageId: id, sceneCanonicalJson,
++                      contractSha256: frozen.sha256, beforeDocumentSha256: textbookDigest(doc),
++                      beforeCandidateSha256: textbookDigest(prior), code: rejection.message,
++                      diagnostics: rejection.diagnostics,
++                    });
++                  } catch {
++                    // An archival failure cannot imply success or authorize a
++                    // repeat paid call. Preserve the original rejection code.
++                    rejection.rejection = { status: 'rejected', archivalStatus: 'failed',
++                      sceneSha256: textbookDigest(scene) };
++                  }
++                  throw rejection;
++                }
+                 const result = await target.putScene(id, scene);
+                 await record(candidate);
+                 return result;
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -104,7 +104,7 @@
+   /** Host-selected exploration: AI chooses a non-quiz game with local, unscored feedback. */
+   explorationGame?: boolean;
+   /** Host-selected textbook game/3D authoring; ordinary templates stay unchanged. */
+-  textbookPromptProfile?: 'textbook-v1';
++  textbookPromptProfile?: 'textbook-v1' | 'frozen-textbook-v1';
+   /**
+    * Natural-language edit instruction for whole-slide regeneration (MAIC Editor
+    * agent `regenerate_scene`). When set, the slide content prompt switches to
+@@ -1132,7 +1132,7 @@
+     allowProceduralSkill?: boolean;
+     includeKatex?: boolean;
+     explorationGame?: boolean;
+-    textbookPromptProfile?: 'textbook-v1';
++    textbookPromptProfile?: 'textbook-v1' | 'frozen-textbook-v1';
+     learningContract?: LearningSceneContract;
+     imageMapping?: ImageMapping;
+     assignedImages?: PdfImage[];
+@@ -1155,7 +1155,15 @@
+   let promptId: PromptId;
+   let variables: Record<string, unknown>;
+ 
+-  switch (widgetType) {
++  if (options.textbookPromptProfile === 'frozen-textbook-v1') {
++    if (widgetType === 'procedural-skill' && !options.allowProceduralSkill) return null;
++    promptId = PROMPT_IDS.FROZEN_TEXTBOOK_INTERACTIVE_CONTENT;
++    variables = {
++      title: outline.title, description: outline.description,
++      keyPoints: (outline.keyPoints || []).join('\n'), widgetType, widgetOutline,
++      languageDirective: languageDirective || '',
++    };
++  } else switch (widgetType) {
+     case 'simulation':
+       promptId = PROMPT_IDS.SIMULATION_CONTENT;
+       variables = {
+@@ -1274,7 +1282,9 @@
+ 
+   log.info(`Generating ${widgetType} widget for: ${outline.title}`);
+   const generatedMedia = outline.mediaGenerations || [];
+-  const mediaInstructions = generatedMedia.length
++  const mediaInstructions = options.textbookPromptProfile === 'frozen-textbook-v1'
++    ? '' // Frozen pages may use only the server's already verified media bindings.
++    : generatedMedia.length
+     ? '\nGenerated media will be resolved after authoring. Use each exact elementId as a literal HTML src attribute on video/source for video or img for image. Never invent a URL or a fake player. Keep native video controls visible and play only on an explicit student action.\n' + JSON.stringify(generatedMedia)
+     : '';
+   const suppliedMedia = (options.assignedImages ?? []).map(image => ({
+diff --git a/packages/@openmaic/generation/src/prompts/index.ts b/packages/@openmaic/generation/src/prompts/index.ts
+--- a/packages/@openmaic/generation/src/prompts/index.ts
++++ b/packages/@openmaic/generation/src/prompts/index.ts
+@@ -19,6 +19,7 @@
+   PICTURE_STRUCTURE_CONTENT: 'picture-structure-content',
+   CODE_CONTENT: 'code-content',
+   GAME_CONTENT: 'game-content',
++  FROZEN_TEXTBOOK_INTERACTIVE_CONTENT: 'frozen-textbook-interactive-content',
+   TEXTBOOK_GAME_CONTENT: 'textbook-game-content',
+   TEXTBOOK_VISUALIZATION3D_CONTENT: 'textbook-visualization3d-content',
+   VISUALIZATION3D_CONTENT: 'visualization3d-content',
+diff --git a/packages/@openmaic/generation/src/prompts/types.ts b/packages/@openmaic/generation/src/prompts/types.ts
+--- a/packages/@openmaic/generation/src/prompts/types.ts
++++ b/packages/@openmaic/generation/src/prompts/types.ts
+@@ -12,6 +12,7 @@
+   | 'picture-structure-content'
+   | 'code-content'
+   | 'game-content'
++  | 'frozen-textbook-interactive-content'
+   | 'textbook-game-content'
+   | 'textbook-visualization3d-content'
+   | 'visualization3d-content'
+diff --git a/tests/agent-runtime/textbook-scene-contract.test.ts b/tests/agent-runtime/textbook-scene-contract.test.ts
+--- a/tests/agent-runtime/textbook-scene-contract.test.ts
++++ b/tests/agent-runtime/textbook-scene-contract.test.ts
+@@ -1,3 +1,5 @@
++import { createHash } from 'node:crypto';
++import { TextbookSceneValidationError } from '@/lib/server/mira-textbook-rejected-scene';
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ import { promises as fs } from 'node:fs';
+ import { tmpdir } from 'node:os';
+@@ -181,8 +183,10 @@
+     }),
+   } as unknown as CourseStore;
+   const trace = vi.fn();
++  const ownership = vi.fn(async () => true);
+   const guard = createTextbookAuthoringGuard(f, sessionId, {
+     classroomsDir: root,
++    ownsStage: ownership,
+     onCandidate: trace,
+   });
+   const store = guard.wrapStore(base);
+@@ -195,6 +199,7 @@
+     f,
+     base,
+     trace,
++    ownership,
+     guard,
+     store,
+     media,
+@@ -281,13 +286,7 @@
+     expect(aiCall).toHaveBeenCalledTimes(1);
+     expect(aiCall.mock.calls[0]![1]).toContain(JSON.stringify(widgetOutline));
+     expect(aiCall.mock.calls[0]![1]).not.toContain('[object Object]');
+-    if ('keyVariables' in widgetOutline) {
+-      const variables = widgetOutline.keyVariables;
+-      const expected = Array.isArray(variables)
+-        ? variables.map(value => typeof value === 'string' ? value : JSON.stringify(value)).join(', ')
+-        : JSON.stringify(variables);
+-      expect(aiCall.mock.calls[0]![1]).toContain(expected);
+-    }
++    expect(aiCall.mock.calls[0]![0]).toContain('# Frozen Textbook Interactive Authoring v1');
+     expect(generateActions).not.toHaveBeenCalled();
+     expect(s.base.putScene).toHaveBeenCalledOnce();
+     expect(s.doc().scenes[0].actions).toEqual(activity().actions);
+@@ -764,3 +763,145 @@
+     expect(s.doc().scenes[0].actions).toEqual(activity().actions);
+   });
+ });
++
++
++describe('private rejected textbook scenes', () => {
++  const archiveRoot = () => path.join(root, '.private-rejected-scenes');
++  async function rejectionFor(s: ReturnType<typeof setup>, scene: Scene) {
++    try { await s.store.putScene(stageId, scene); throw new Error('unexpected acceptance'); }
++    catch (error) {
++      expect(error).toBeInstanceOf(TextbookSceneValidationError);
++      return error as TextbookSceneValidationError;
++    }
++  }
++  it('archives exact rejected scene bytes and owner/source/contract identity without accepted writes', async () => {
++    const s = setup(); await bind(s);
++    const ledgerPath = path.join(root, stageId, 'textbook-authoring-candidate.json');
++    const ledgerBefore = await fs.readFile(ledgerPath, 'utf8');
++    const before = textbookDigest(s.doc());
++    const scene = activity();
++    (scene.content as any).html = '<html><head></head><body><script>let state=0;</script></body></html>';
++    const error = await rejectionFor(s, scene);
++    expect(error.message).toBe('TEXTBOOK_SCENE_LOW_READING_INTERACTIVE_INCOMPLETE');
++    expect(error.diagnostics).toEqual({ missing: ['one-head-responsive-meta', 'real-img', 'static-narration-cues'], counts: { headResponsiveMarkers: 0, images: 0, cues: 0 } });
++    expect(error.rejection).toMatchObject({ archivalStatus: 'saved', status: 'rejected', sceneSha256: textbookDigest(scene) });
++    const file = path.join(archiveRoot(), error.rejection!.archiveId!);
++    const bytes = await fs.readFile(file);
++    expect(createHash('sha256').update(bytes).digest('hex')).toBe(error.rejection!.archiveSha256);
++    const archived = JSON.parse(bytes.toString());
++    expect(archived).toMatchObject({ sessionId, stageId, beforeDocumentSha256: before,
++      contractSha256: s.f.sha256, status: 'rejected', verification: 'rejected_not_saved_not_reviewed' });
++    expect(JSON.parse(archived.sceneCanonicalJson)).toEqual(scene);
++    const {sha256: _seal, ...prior} = JSON.parse(ledgerBefore);
++    expect(archived.beforeCandidateSha256).toBe(textbookDigest(prior));
++    expect((await fs.stat(file)).mode & 0o777).toBe(0o600);
++    expect((await fs.stat(path.dirname(file))).mode & 0o777).toBe(0o700);
++    expect(error.rejection!.archiveId).not.toContain('/api/');
++    expect(await fs.readFile(ledgerPath, 'utf8')).toBe(ledgerBefore);
++    expect(s.base.putScene).not.toHaveBeenCalled(); expect(s.trace).not.toHaveBeenCalled();
++    expect(textbookDigest(s.doc())).toBe(before);
++    // Repeating the same rejected write reuses identical immutable evidence.
++    const again = await rejectionFor(s, scene);
++    expect(again.rejection).toEqual(error.rejection);
++    expect(await fs.readdir(path.dirname(file))).toEqual([path.basename(file)]);
++  });
++  it.each([
++    ['localStorage.setItem("x","y")', 'browser-storage', 'localStorage'],
++    ['window.miraNarrate=()=>true', 'narration-helper-override', 'window.miraNarrate='],
++    ['fetch("/x")', 'network-api', 'fetch'],
++  ])('keeps original unsafe error and pinpoints %s, including comments', async (code, category, token) => {
++    const s = setup(); await bind(s); const scene = activity();
++    (scene.content as any).html = html().replace('</body>', `<!--${code}--></body>`);
++    const error = await rejectionFor(s, scene);
++    expect(error.message).toBe('TEXTBOOK_SCENE_UNSAFE_AUDIO_OR_STORAGE');
++    expect(error.diagnostics).toMatchObject({ category, token, scan: 'complete-html-including-comments' });
++    const offset = (scene.content as any).html.indexOf(token);
++    expect(error.diagnostics.offset).toBe(offset);
++    expect(error.rejection!.archivalStatus).toBe('saved');
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it('reports malformed cues and exact unmatched cue/action IDs', async () => {
++    const s = setup(); await bind(s); const scene = activity();
++    (scene.content as any).html = html().replace('mira.interactive.narration-cues.v1', 'wrong');
++    expect((await rejectionFor(s, scene)).diagnostics).toMatchObject({ category: 'cue-schema-invalid' });
++    scene.content = activity().content; (scene.actions![0] as any).text = 'different';
++    const mismatch = await rejectionFor(s, scene);
++    expect(mismatch.message).toBe('TEXTBOOK_SCENE_CUE_SPEECH_MISMATCH');
++    expect(mismatch.diagnostics).toMatchObject({ unmatchedCueIds: ['intro'], unmatchedSpeechIds: ['speech-2'] });
++  });
++  it('does not archive stages with a different producer', async () => {
++    const s = setup(); await bind(s); (s.doc().outline as any).producerRef = 'another-session';
++    await expect(s.store.putScene(stageId, activity())).rejects.toThrow('STAGE_SESSION_MISMATCH');
++    await expect(fs.stat(archiveRoot())).rejects.toMatchObject({ code: 'ENOENT' });
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it.each([false, 'unknown'])('does not archive a capability-readable same-producer stage when live owner probe is %s', async status => {
++    const s = setup(); await bind(s);
++    // The readable document retains this session producerRef; the live metadata
++    // probe, not that copied field, determines the real owner/tombstone status.
++    expect((s.doc().outline as any).producerRef).toBe(sessionId);
++    if (status === false) s.ownership.mockResolvedValue(false);
++    else s.ownership.mockRejectedValue(new Error('owner metadata unavailable'));
++    const scene = activity(); (scene.content as any).html = html().replace('</body>', '<!--localStorage--></body>');
++    const rejected = await rejectionFor(s, scene);
++    expect(rejected.message).toBe('TEXTBOOK_SCENE_UNSAFE_AUDIO_OR_STORAGE');
++    expect(rejected.rejection).toMatchObject({ archivalStatus: 'failed', status: 'rejected' });
++    expect(s.ownership).toHaveBeenCalledExactlyOnceWith(stageId);
++    await expect(fs.stat(archiveRoot())).rejects.toMatchObject({ code: 'ENOENT' });
++    expect(s.base.putScene).not.toHaveBeenCalled(); expect(s.trace).not.toHaveBeenCalled();
++  });
++  it('refuses a symlink archive and preserves original rejection without a retryable success', async () => {
++    const s = setup(); await bind(s);
++    const destination = path.join(root, 'not-archive'); await fs.mkdir(destination);
++    await fs.symlink(destination, archiveRoot());
++    const scene = activity(); (scene.content as any).html = '<html><script>let state=0;</script></html>';
++    const error = await rejectionFor(s, scene);
++    expect(error.message).toBe('TEXTBOOK_SCENE_LOW_READING_INTERACTIVE_INCOMPLETE');
++    expect(error.rejection).toMatchObject({ archivalStatus: 'failed', status: 'rejected' });
++    expect(await fs.readdir(destination)).toEqual([]); expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it('returns private diagnostic receipt from actual generation without retry, accepted scene or checkpoint', async () => {
++    const s = setup(withWidgetOutline('game', structuredGame));
++    const aiCall = vi.fn(async (system: string, user: string) => {
++      expect(system).toContain('# Frozen Textbook Interactive Authoring v1');
++      expect(user).toContain(JSON.stringify(structuredGame));
++      return html().replace('"type":"simulation"', '"type":"game"').replace('</body>', '<script>localStorage.setItem("x","y")</script></body>');
++    });
++    const tool = find(buildGenerationTools({ ...s.deps, aiCall } as any), 'generate_scene');
++    const result = await tool.execute('reject-once', { stageId, order: 2, title: '改变情境', type: 'interactive',
++      widgetType: 'game', brief: 'exact', actions: activity().actions, media: s.media });
++    expect(result).toMatchObject({ isError: true, details: { error: 'TEXTBOOK_SCENE_UNSAFE_AUDIO_OR_STORAGE',
++      saved: false, retryable: false, rejection: { archivalStatus: 'saved', status: 'rejected' } } });
++    expect(aiCall).toHaveBeenCalledOnce(); expect(s.base.putScene).not.toHaveBeenCalled();
++    expect(s.deps.onCheckpoint).not.toHaveBeenCalled();
++    expect(JSON.stringify(result)).not.toContain('<html');
++    expect(JSON.stringify(result.details.rejection)).not.toContain('/api/');
++  });
++  it('never overwrites tampered immutable evidence or treats archival failure as acceptance', async () => {
++    const s = setup(); await bind(s); const scene = activity();
++    (scene.content as any).html = html().replace('</body>', '<!--localStorage--></body>');
++    const original = await rejectionFor(s, scene);
++    const file = path.join(archiveRoot(), original.rejection!.archiveId!);
++    await fs.writeFile(file, 'tampered');
++    const rejected = await rejectionFor(s, scene);
++    expect(rejected.message).toBe('TEXTBOOK_SCENE_UNSAFE_AUDIO_OR_STORAGE');
++    expect(rejected.rejection).toMatchObject({ archivalStatus: 'failed' });
++    expect(await fs.readFile(file, 'utf8')).toBe('tampered');
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it('keeps non-textbook syntax error text and archives the invalid source without evaluating it', async () => {
++    const s = setup(); await bind(s); const scene = activity();
++    (scene.content as any).html = html().replace("document.querySelector('img').onclick=()=>window.miraNarrate('intro');", 'const value = ;');
++    const rejected = await rejectionFor(s, scene);
++    expect(rejected.message).toBe('LEARNING_SCENE_SCRIPT_SYNTAX_INVALID');
++    expect(rejected.rejection!.archivalStatus).toBe('saved');
++    const data = JSON.parse(await fs.readFile(path.join(archiveRoot(), rejected.rejection!.archiveId!), 'utf8'));
++    expect(JSON.parse(data.sceneCanonicalJson).content.html).toBe((scene.content as any).html);
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it('does not hard-code a new touch quota over frozen dimensions', async () => {
++    const s = setup(); const context = await s.guard.context({ stageId, order: 2, title: '改变情境', type: 'interactive', widgetType: 'simulation', media: s.media });
++    expect(context.text).toContain('touch-target dimensions specified by this frozen');
++    expect(context.text).not.toContain('56 CSS px');
++  });
++});
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -1297,6 +1297,7 @@
+     const generationLearningContract = formalLearningContractFromPrompt(meta.prompt);
+     const textbookContract = textbookContractFromPrompt(meta.prompt);
+     const textbookGuard = textbookContract ? createTextbookAuthoringGuard(textbookContract, id, {
++      ownsStage: async (stageId) => (await probeStageAccess(meta.ownerId, stageId)).kind === 'owned',
+       onCandidate: candidate => appendRequiredRunEvent('mira_textbook_authoring_candidate', candidate, Date.now()),
+     }) : undefined;
+     const formalModelPolicyId = formalModelPolicyFromPrompt(meta.prompt);
+diff --git a/lib/server/mira-textbook-rejected-scene.ts b/lib/server/mira-textbook-rejected-scene.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-textbook-rejected-scene.ts
+@@ -0,0 +1,77 @@
++import { createHash } from 'node:crypto';
++import { constants, promises as fs } from 'node:fs';
++import path from 'node:path';
++
++export interface RejectedSceneReceipt {
++  status: 'rejected';
++  archiveId?: string;
++  archiveSha256?: string;
++  sceneSha256: string;
++  archivalStatus: 'saved' | 'failed';
++}
++
++/** Preserve existing TEXTBOOK_SCENE_* messages; details do not weaken the gate. */
++export class TextbookSceneValidationError extends Error {
++  rejection?: RejectedSceneReceipt;
++  constructor(readonly code: string, readonly diagnostics: Record<string, unknown> = {}, originalMessage?: string) {
++    super(originalMessage ?? `TEXTBOOK_SCENE_${code}`);
++    this.name = 'TextbookSceneValidationError';
++  }
++}
++
++const sha = (value: string) => createHash('sha256').update(value).digest('hex');
++
++/** Private, content-addressed evidence only. Never a classroom or success ledger. */
++export async function archiveRejectedTextbookScene(input: {
++  root: string;
++  sessionId: string;
++  stageId: string;
++  sceneCanonicalJson: string;
++  contractSha256: string;
++  beforeDocumentSha256: string;
++  beforeCandidateSha256: string;
++  code: string;
++  diagnostics: Record<string, unknown>;
++}): Promise<RejectedSceneReceipt> {
++  if (!/^[A-Za-z0-9_-]{1,160}$/.test(input.stageId) || !input.sessionId)
++    throw new Error('REJECTED_SCENE_IDENTITY_INVALID');
++  for (const value of [input.contractSha256, input.beforeDocumentSha256, input.beforeCandidateSha256])
++    if (!/^[a-f0-9]{64}$/.test(value)) throw new Error('REJECTED_SCENE_HASH_INVALID');
++  const sceneSha256 = sha(input.sceneCanonicalJson);
++  const body = JSON.stringify({
++    schemaVersion: 'mira.textbook.rejected-scene.v1', status: 'rejected',
++    verification: 'rejected_not_saved_not_reviewed', sessionId: input.sessionId,
++    stageId: input.stageId, contractSha256: input.contractSha256,
++    beforeDocumentSha256: input.beforeDocumentSha256,
++    beforeCandidateSha256: input.beforeCandidateSha256,
++    sceneSha256, sceneCanonicalJson: input.sceneCanonicalJson,
++    error: { code: input.code, diagnostics: input.diagnostics },
++  }) + '\n';
++  const archiveSha256 = sha(body);
++  // No raw owner/session identity or user-controlled path component is exposed.
++  const parts = [sha(input.sessionId), input.stageId];
++  let directory = path.resolve(input.root);
++  for (const part of [null, ...parts]) {
++    if (part) directory = path.join(directory, part);
++    await fs.mkdir(directory, { recursive: true, mode: 0o700 });
++    const stat = await fs.lstat(directory);
++    if (!part && !stat.isSymbolicLink()) directory = await fs.realpath(directory);
++    if (stat.isSymbolicLink() || !stat.isDirectory() || await fs.realpath(directory) !== directory)
++      throw new Error('REJECTED_SCENE_PRIVATE_PATH_INVALID');
++    await fs.chmod(directory, 0o700);
++  }
++  const file = path.join(directory, `${archiveSha256}.json`);
++  try {
++    const handle = await fs.open(file, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
++    try { await handle.writeFile(body); await handle.sync(); } finally { await handle.close(); }
++  } catch (error: any) {
++    if (error.code !== 'EEXIST') throw error;
++    const handle = await fs.open(file, constants.O_RDONLY | constants.O_NOFOLLOW);
++    try {
++      if (!(await handle.stat()).isFile() || await handle.readFile('utf8') !== body)
++        throw new Error('REJECTED_SCENE_ARCHIVE_COLLISION');
++    } finally { await handle.close(); }
++  }
++  return { status: 'rejected', archivalStatus: 'saved', sceneSha256, archiveSha256,
++    archiveId: [...parts, `${archiveSha256}.json`].join('/') };
++}
+diff --git a/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/system.md b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/system.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/system.md
+@@ -0,0 +1,19 @@
++# Frozen Textbook Interactive Authoring v1
++
++Implement the server's exact frozen page plan, not a generic widget demo. Its textbook scope, meaningful mechanism, widgetType, full widgetOutline, gameType, playerControls, teacher, narration, images and geometry are authoritative. Do not turn a child's task into a teaching-steps flowchart. Do not impose counts of actions, choices, rounds, tools, sliders or game types. Preserve ordinary observation, construction, revision and open expression where the plan calls for them. Never infer mastery from listening, clicking, teacher help or an external completion flag.
++
++Do not assume that a referenced controller, geometry file or attachment was supplied to this child call. If required source bytes or exact implementation details are absent, identify the missing inputs for the director instead of inventing a controller, glyph path, URL or passing placeholder.
++
++Return one complete self-contained HTML document, without Markdown fences. Include exactly one `<meta name="mira-responsive-activity" content="low-reading-v1">` in its head. Include a static `application/json` script with id `mira-narration-cues` and shape `{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"exact-cue-id","text":"exact speech text"}]}`. The finite cue set and same-page speech actions must correspond one-to-one, with identical text. Preserve every frozen cue/action; do not invent, paraphrase, truncate or duplicate them. Include an `application/json` script id `widget-config` whose `type` equals the frozen widgetType.
++
++For primary_1/primary_2, at least one real `<img src="...">` from the page's server-verified bindings must carry teaching meaning. Use distinguishable task pictures, exact supplied character paths and pictorial controls. SVG and canvas may implement geometry but do not replace the required real img. Do not invent a media URL, placeholder, emoji, font approximation of a supplied precision glyph, or an answer-revealing option style. Cover non-target text: the child must still be able to act from the pictures and teacher audio. Use one task per screen with responsive reflow; keep drag source and destination in the same usable viewport. Follow the frozen page/interaction-policy touch dimensions; do not substitute a different historical pixel minimum.
++
++Reuse the supplied narration controller and its page hooks unchanged. Request a supplied cue through the existing host helper. Keep controller type checks and variable cue IDs when prescribed. Only that cue's real playing event may start its demonstration; only ready after matching playing may admit action or advance. Initial null-ready is not completion; hidden, cancellation, failure and rejected playback do not succeed. Preserve the current round for explicit retry; help must not trap replay in a help loop; completion replay must not count again. Do not redefine or simulate the host helper, synthesize speech, create audio players, use duration timers as sound completion, or fabricate success events. Real audio is bound later by the server.
++
++Keep state only in memory. Do not use browser persistence, cookies, network requests, external script/style/module imports, CDN dependencies, iframe, object, embed, audio, video, source or stylesheet link elements. Do not echo forbidden API names into HTML comments or explanatory text: the save guard scans the complete document. Use only supplied local img URLs and inline safe SVG/CSS/JS. This frozen profile has no generic storage, score/speed/achievement or video requirement.
++
++Preserve the renderer's four parent commands SET_WIDGET_STATE, HIGHLIGHT_ELEMENT, ANNOTATE_ELEMENT and REVEAL_ELEMENT where applicable. Accept messages only from window.parent; validate their shapes and targets. These commands can demonstrate or reveal but cannot certify a child's completion. The frozen domain state and actual operations determine consequences. Do not let external completedSteps or a start click bypass required actions/audio.
++
++This is authored candidate content. Do not claim audio audit, real browser play, image semantics, publication or independent mastery has passed.
++
++{{languageDirective}}
+diff --git a/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/user.md b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/user.md
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/user.md
+@@ -0,0 +1,14 @@
++Implement this exact frozen activity as working HTML.
++
++Title: {{title}}
++Widget type: {{widgetType}}
++Teaching task: {{description}}
++Scope:
++{{keyPoints}}
++
++Complete prescribed widget outline (preserve all fields and their shapes):
++{{widgetOutline}}
++
++The server context and exact supplied page inputs below contain the frozen narration, real image bindings and source geometry. Follow that mechanism rather than generic widget conventions. A simulation must use its prescribed domain state; a diagram must expose its actual picture/structure task; a game must retain its frozen rules and controls; a procedural activity must use the assigned local teaching images and actual steps. Do not add quotas or reinterpret the task as a quiz, flowchart, timer or storage-backed achievement game.
++
++{{languageDirective}}
+diff --git a/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts b/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts
+@@ -0,0 +1,50 @@
++import { describe, expect, it } from 'vitest';
++import { buildPrompt, generateSceneContent, generateWidgetContent, type SceneOutline } from '@openmaic/generation';
++
++const kinds = ['simulation', 'diagram', 'game', 'visualization3d', 'procedural-skill'] as const;
++const precise = { concept: 'frozen goal', gameType: 'memory-with-revision',
++  keyVariables: { domain: 'positions' }, playerControls: 'listen then move; may revise',
++  notTeachingFlowchart: true, geometry: { stroke: 'M0 0 L30 10', sourceSha256: 'a'.repeat(64) } };
++const outline = (widgetType: (typeof kinds)[number]): SceneOutline => ({
++  id: 'frozen-page', order: 2, title: 'Prescribed task', description: 'change domain state',
++  type: 'interactive', widgetType, widgetOutline: precise, keyPoints: ['scope only'],
++});
++const response = '<html><head></head><body><script id="widget-config" type="application/json">{"type":"game"}</script></body></html>';
++
++describe('server-only frozen-textbook-v1 routing', () => {
++  it.each(kinds)('routes %s through the new contract without generic contradictory instructions', async kind => {
++    let captured = { system: '', user: '' };
++    await generateSceneContent(outline(kind), async (system, user) => { captured = { system, user }; return response; }, {
++      textbookPromptProfile: 'frozen-textbook-v1', allowProceduralSkill: true,
++      interactiveIncludeKatex: false, includeWidgetOutline: true, editDirective: 'exact source controller here',
++      exactActions: [{ id: 'speech-intro', type: 'speech', text: 'exact words' }],
++      assignedImages: [{ id: 'real', pageNumber: 1, src: '/api/classroom-media/stage-fixture/media/real.png', description: 'real teaching picture' }],
++    });
++    expect(captured.system).toContain('# Frozen Textbook Interactive Authoring v1');
++    expect(captured.system).toContain('exactly one `<meta name="mira-responsive-activity"');
++    expect(captured.system).toContain('mira.interactive.narration-cues.v1');
++    expect(captured.system).toContain('only ready after matching playing');
++    expect(captured.system).toContain('If required source bytes or exact implementation details are absent');
++    expect(captured.user).toContain(JSON.stringify(precise));
++    expect(captured.user).toContain('exact source controller here');
++    expect(captured.user).toContain('speech-intro');
++    expect(captured.user).toContain('/api/classroom-media/stage-fixture/media/real.png');
++    expect(captured.system + captured.user).not.toMatch(/localStorage|sessionStorage|indexedDB|speedBonus|correctPoints|56 CSS|44px|Do not use external media assets|\{\{/);
++    expect(captured.user).toContain('memory-with-revision');
++    expect(captured.system).toContain('touch dimensions');
++  });
++  it('does not enable procedural widgets when the existing capability is absent', async () => {
++    let calls = 0;
++    expect(await generateWidgetContent(outline('procedural-skill'), async () => { calls++; return response; }, '', { textbookPromptProfile: 'frozen-textbook-v1' })).toBeNull();
++    expect(calls).toBe(0);
++  });
++  it.each(['game', 'visualization3d'] as const)('keeps historical textbook-v1 %s system and user bytes exact', async kind => {
++    let captured: unknown;
++    const o = { ...outline(kind), widgetOutline: { gameType: 'quiz', visualizationType: 'geometry' as const, objects: [], interactions: [] } };
++    await generateSceneContent(o, async (system, user) => { captured = { system, user }; return response; }, { textbookPromptProfile: 'textbook-v1' });
++    const variables = { title: o.title, description: o.description, keyPoints: o.keyPoints.join('\n'), languageDirective: '',
++      ...(kind === 'game' ? { gameType: 'Choose puzzle, card or strategy with picture matching, placement, sorting or building for the exact frozen objective. No quiz or assessment.', scoring: {} }
++        : { visualizationType: 'geometry', objects: [], interactions: [] }) };
++    expect(captured).toEqual(buildPrompt(kind === 'game' ? 'textbook-game-content' : 'textbook-visualization3d-content', variables));
++  });
++});

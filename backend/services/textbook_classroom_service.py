@@ -34,8 +34,8 @@ class TextbookClassroomService:
 
     def _release(self, conn, key, child, *, access_scope='selected_textbook'):
         if access_scope == 'published_directory':
-            from services.textbook_directory_access import published_release
-            build, release, course, _ = published_release(self.repository, conn, key, child)
+            from services.textbook_runtime_release_cache import published_runtime_release
+            build, release, course, _ = published_runtime_release(self.repository, conn, key, child)
             return build, release, course
         if access_scope != 'selected_textbook':
             fail()
@@ -245,7 +245,7 @@ class TextbookClassroomService:
                                     and all(scene_id in completed_scenes for scene_id in required_audio)
                                     and (complete or not textbook_activity.supported(release)
                                          or textbook_activity.complete(state))),
-            'answeredQuestionIds': [r['questionId'] for r in (state['quiz'] or {}).get('results', [])],
+            'answeredQuestionIds': [r['questionId'] for r in (state['quiz'] or state.get('quizPartial') or {}).get('results', [])],
             'completedInteractionObjectiveIndexes': [], 'completedActionSceneIds': completed_scenes,
             'resumeScene': {'sceneIndex': resume, 'sceneId': scenes[resume]['id']} if resume >= 0 else None}
 
@@ -309,25 +309,37 @@ class TextbookClassroomService:
         with self.repository.transaction() as conn:
             session = self.learning.get_session(conn, family_id=child['family_id'], session_id=initial_session['id'], for_update=True)
             state = self._state(session)
+            # A lesson may spread its questions over several in-class checks.
+            # Each check is graded when it is handed in; the lesson result and
+            # the parent report exist only once every question is answered.
+            saved = {r['questionId']: r for r in (state['quiz'] or state.get('quizPartial') or {}).get('results', [])}
             if answers is None:
-                return {'ok': True, 'result': state['quiz']}
+                return {'ok': True, 'result': state['quiz'], 'partial': state.get('quizPartial')}
             if release.get('assessmentMode') == 'ungraded':
                 raise ApiError('textbook_activity_ungraded', '这份探索不提供评分或掌握度测评', 409)
             if textbook_activity.supported(release):
                 raise ApiError('textbook_play_required', '请刷新课堂，逐题完成互动练习', 409)
-            result = grade_answers(release, answers)
+            graded = grade_answers(release, answers, partial=True)
+            if any(q in saved and saved[q]['response'] != answer for q, answer in answers.items()):
+                raise ApiError('textbook_answers_already_submitted', '这次练习已经提交，请查看已保存的结果', 409)
             if state['quiz']:
-                if {r['questionId']: r['response'] for r in state['quiz']['results']} != answers:
-                    raise ApiError('textbook_answers_already_submitted', '这次练习已经提交，请查看已保存的结果', 409)
-                return {'ok': True, 'result': state['quiz']}
+                return {'ok': True, 'result': state['quiz'], 'partial': None}
+            merged = {**saved, **{r['questionId']: r for r in graded['results']}}
+            if len(merged) < len(questions(release['classroom'])):
+                state['quizPartial'] = {'results': list(merged.values())}
+                conn.execute('UPDATE learning_sessions SET runtime_state_json=?,updated_at=? WHERE id=?',
+                              (canonical(state), now_ms(), session['id']))
+                return {'ok': True, 'result': None, 'partial': state['quizPartial']}
+            result = grade_answers(release, {q: r['response'] for q, r in merged.items()})
             state['quiz'] = result
+            state.pop('quizPartial', None)
             conn.execute('UPDATE learning_sessions SET runtime_state_json=?,answers_json=?,attempted_count=?,correct_count=?,current_question_index=?,updated_at=? WHERE id=?',
                 (canonical(state), canonical([{'questionId': r['questionId'], 'answer': r['response'], 'correct': r['correct'],
                     'attemptNumber': 1, 'hintUsed': False} for r in result['results']]), result['totalQuestions'],
                  result['correctCount'], result['totalQuestions'], now_ms(), session['id']))
             # The report describes the exercise; it does not claim oral-reading mastery.
             self._report(conn, session, child, course, result)
-            return {'ok': True, 'result': result}
+            return {'ok': True, 'result': result, 'partial': None}
 
     def play(self, token, data=None):
         _, child, _, release, course, initial_session = self._authority(token)

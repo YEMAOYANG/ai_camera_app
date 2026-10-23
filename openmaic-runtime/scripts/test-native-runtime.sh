@@ -153,6 +153,8 @@ const state = {
   nodeEnv: process.env.NODE_ENV,
   nativeBuild: process.env.MIRA_OPENMAIC_NATIVE_BUILD,
   allowedFrameAncestors: process.env.ALLOWED_FRAME_ANCESTORS,
+  runtimePublicOrigin: process.env.MIRA_RUNTIME_PUBLIC_ORIGIN,
+  localLanMode: process.env.MIRA_LOCAL_LAN_PRODUCTION_MODE,
   editor: process.env.NEXT_PUBLIC_MAIC_EDITOR_ENABLED,
   editorRenderer: process.env.NEXT_PUBLIC_MAIC_EDITOR_RENDERER_ENABLED,
   workbench: process.env.NEXT_PUBLIC_PRO_WORKBENCH_ENABLED,
@@ -184,6 +186,8 @@ const state = {
   formalCitationRecoverySourceJobId: process.env.MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID,
   formalCitationRecoveryPatchSha256: process.env.MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256,
   privatePort: process.env.MIRA_OPENMAIC_PRIVATE_PORT,
+  agentMaxConcurrent: process.env.OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT,
+  agentDriverOutputCap: process.env.OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS,
   qualityBase: process.env.MIRA_FORMAL_QA_BASE_URL,
   qualityBrowser: process.env.MIRA_FORMAL_QA_BROWSER_PATH,
 };
@@ -206,11 +210,14 @@ if reject_openmaic_build_dotenv_files 2>/dev/null; then
 fi
 rm -f "${SOURCE_DIR}/.env.production.local"
 reject_openmaic_build_dotenv_files
+MIRA_LOCAL_LAN_PRODUCTION_MODE=1
 build_output="$(build_openmaic_production)"
 [[ "${build_output}" == *'"argv":["build","--webpack"]'* ]] || fail "production build did not invoke the reviewed Next webpack build"
 [[ "${build_output}" == *'"nodeEnv":"production"'* ]] || fail "production build did not set NODE_ENV=production"
 [[ "${build_output}" == *'"nativeBuild":"1"'* ]] || fail "production build did not set native-build boundary"
 [[ "${build_output}" == *'"allowedFrameAncestors":"http://192.168.228.95:3000"'* ]] || fail "production build did not constrain frame ancestors"
+[[ "${build_output}" == *'"runtimePublicOrigin":"http://192.168.228.95:3101"'* ]] || fail "production build did not pass the reviewed runtime origin"
+[[ "${build_output}" == *'"localLanMode":"1"'* ]] || fail "production build did not pass the local LAN origin policy"
 [[ "${build_output}" == *'"editor":"true"'* ]] || fail "production build did not enable the private editor"
 [[ "${build_output}" == *'"editorRenderer":"true"'* ]] || fail "production build did not enable the official editor renderer"
 [[ "${build_output}" == *'"workbench":"true"'* ]] || fail "production build did not enable the Pro workbench"
@@ -245,6 +252,8 @@ production_output="$(
   MIRA_OPENMAIC_ENABLE_QWEN_ASR=1 \
   MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1 \
   MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/private-authoring \
+  MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT=4 \
+  MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=65536 \
   MODEL_ROUTES='{"scene-content":"attacker:model"}' \
   OPENMAIC_MODEL_ROUTES='{"scene-content":"attacker:model"}' \
   MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY=attacker-controlled \
@@ -252,6 +261,8 @@ production_output="$(
 )"
 [[ "${production_output}" == *'"argv":["start","--hostname","127.0.0.1","--port","3100"]'* ]] || fail "production foreground did not invoke Next start on 3100"
 [[ "${production_output}" == *'"nodeEnv":"production"'* ]] || fail "production foreground did not set NODE_ENV=production"
+[[ "${production_output}" == *'"agentMaxConcurrent":"4"'* ]] || fail "production foreground dropped the four-session authoring limit"
+[[ "${production_output}" == *'"agentDriverOutputCap":"65536"'* ]] || fail "production foreground dropped the parent output cap"
 [[ "${production_output}" == *'"serverPersistenceTokenPresent":true'* ]] || fail "production foreground omitted the private document route prerequisite"
 [[ "${production_output}" == *'"persistenceTokenPresent":false'* ]] || fail "production foreground exposed a public persistence token"
 [[ "${production_output}" != *'"globalPersistence":'* ]] || fail "production foreground enabled learner HTTP persistence"
@@ -275,6 +286,24 @@ production_output="$(
 [[ "${production_output}" == *'"qualityBrowser":"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"'* ]] || fail "quality browser path missing"
 [[ "${production_output}" != *'secret-never-log'* ]] || fail "production foreground output leaked a provider secret"
 [[ "${production_output}" != *'internal-token-never-log'* ]] || fail "production foreground output leaked the internal token"
+
+# Exercise the same clean-environment handoff on the development path without
+# invoking a real bootstrap, model, listener or Next.js process.
+development_output="$(
+  MIRA_OPENMAIC_MODEL_POLICY=deepseek-v4-pro-flash-v1 \
+  OPENMAIC_SOURCE_DIR="${FAKE_SOURCE_DIR}" \
+  MIRA_BACKEND_ENV_FILE="${TMP_ROOT}/backend.env" \
+  MIRA_STUDENT_WEB_ENV_FILE="${TMP_ROOT}/student-web.env" \
+  MIRA_OPENMAIC_ENABLE_MODEL_PROVIDER=1 \
+  MIRA_OPENMAIC_ENABLE_QWEN_TTS=1 \
+  MIRA_OPENMAIC_ENABLE_QWEN_ASR=1 \
+  MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1 \
+  MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/private-authoring \
+  MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=65536 \
+  bash -c 'source "$1"; MIRA_TEST_OPENMAIC_ENV="$2"; model_provider_env_file() { printf "%s" "${MIRA_TEST_OPENMAIC_ENV}"; }; bootstrap_openmaic_source() { :; }; run_openmaic_foreground' _ "${RUNTIME_SCRIPT}" "${TMP_ROOT}/openmaic.env"
+)"
+[[ "${development_output}" == *'"argv":["dev"'* ]] || fail "development fixture did not use the intended entry point"
+[[ "${development_output}" == *'"agentDriverOutputCap":"65536"'* ]] || fail "development foreground dropped the parent output cap"
 
 # A healthy HTTP listener is never enough to claim production ownership. The
 # v2 record binds the exact process start, cwd, Next production command, build,
@@ -392,6 +421,7 @@ IDENTITY_TEST_PID=""
   MIRA_OPENMAIC_ENABLE_QWEN_ASR=1
   MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1
   MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/private-authoring
+  MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=65536
   export MODEL_ROUTES='{"scene-content":"attacker:model"}'
   export OPENMAIC_MODEL_ROUTES='{"scene-content":"attacker:model"}'
   export MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY=attacker-controlled
@@ -462,6 +492,7 @@ IDENTITY_TEST_PID=""
     sleep 0.05
   done
   grep -Fq '"reviewedModelRoutes":true' "${OPENMAIC_LOG}" || fail "detached start did not replace caller routes with the exact reviewed model routes"
+  grep -Fq '"agentDriverOutputCap":"65536"' "${OPENMAIC_LOG}" || fail "detached start dropped the parent output cap"
   grep -Fq '"detachedProcessGroup":true' "${OPENMAIC_LOG}" || fail "detached start still belongs to the invoking terminal process group"
   grep -Fq '"structuredScenePolicy":"deepseek-v4-pro-flash-v1"' "${OPENMAIC_LOG}" || fail "detached start accepted a caller structured scene policy"
 )
@@ -597,6 +628,64 @@ EOF
 [[ "${OPENMAIC_ASR_QWEN_API_KEY}" == "test-qwen-asr-secret-never-log" ]]
 [[ "${OPENMAIC_ASR_QWEN_MODELS}" == "qwen3-asr-flash" ]]
 [[ "${OPENMAIC_REQUIRE_QWEN_ASR}" == "1" ]]
+
+# Concurrency crosses only the clean server boundary; malformed or excessive
+# values cannot silently become an unbounded or stalled paid-call queue.
+(
+  MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1
+  MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/private-authoring
+  unset MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT
+  load_openmaic_agent_runtime_env
+  [[ "${OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT}" == 2 ]] || fail 'default authoring concurrency changed'
+  cp "${TMP_ROOT}/backend.env" "${TMP_ROOT}/concurrency.env"
+  printf '%s\n' 'MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT=4' >> "${TMP_ROOT}/concurrency.env"
+  MIRA_OPENMAIC_PROVIDER_ENV_FILE="${TMP_ROOT}/concurrency.env"
+  load_openmaic_agent_runtime_env
+  [[ "${OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT}" == 4 ]] || fail 'dotenv concurrency was ignored'
+  MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT=1
+  load_openmaic_agent_runtime_env
+  [[ "${OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT}" == 1 ]] || fail 'explicit concurrency override was ignored'
+  for bad_limit in 0 5 -1 2.5 NaN Infinity 04; do
+    MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT="${bad_limit}"
+    if load_openmaic_agent_runtime_env 2>/dev/null; then fail "invalid concurrency accepted: ${bad_limit}"; fi
+  done
+  clear_openmaic_provider_env
+  [[ "${OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT}" == 2 ]] || fail 'concurrency survived provider cleanup'
+)
+
+# Parent output is optional and separate from catalog/child output capacity.
+(
+  MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1
+  MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/private-authoring
+  unset MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS
+  load_openmaic_agent_runtime_env
+  [[ -z "${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}" ]] || fail 'parent output default changed'
+  cp "${TMP_ROOT}/backend.env" "${TMP_ROOT}/driver-output.env"
+  printf '%s\n' 'MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=65536' >> "${TMP_ROOT}/driver-output.env"
+  MIRA_OPENMAIC_PROVIDER_ENV_FILE="${TMP_ROOT}/driver-output.env"
+  load_openmaic_agent_runtime_env
+  [[ "${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}" == 65536 ]] || fail 'dotenv parent cap ignored'
+  cap_status="$(show_provider_status)"
+  [[ "${cap_status}" == *'Agent driver output cap: 65536'* ]] || fail 'parent cap status missing'
+  MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=""
+  load_openmaic_agent_runtime_env
+  [[ -z "${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}" ]] || fail 'explicit empty cap did not clear dotenv'
+  cap_status="$(show_provider_status)"
+  [[ "${cap_status}" == *'Agent driver output cap: unset (catalog/formal limits unchanged)'* ]] || fail 'unset parent cap status missing'
+  for good_cap in 1 65536 2147483647; do
+    MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS="${good_cap}"
+    load_openmaic_agent_runtime_env
+    [[ "${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}" == "${good_cap}" ]] || fail 'explicit parent cap ignored'
+  done
+  for bad_cap in 0 -1 1.5 1e5 +65536 065536 ' 65536' '65536 ' NaN Infinity 2147483648 999999999999999999999999; do
+    MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS="${bad_cap}"
+    if load_openmaic_agent_runtime_env 2>/dev/null; then fail "invalid parent cap accepted: ${bad_cap}"; fi
+  done
+  MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=65536
+  load_openmaic_agent_runtime_env
+  clear_openmaic_provider_env
+  [[ -z "${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}" ]] || fail 'parent cap survived provider cleanup'
+)
 
 # Authoring documents retain the existing server route guard. Its private token
 # is process-local and distinct from the internal bridge and browser identity.
@@ -1002,6 +1091,7 @@ structured_health_payload="$(printf '%s' "${structured_health_payload}" | node -
   process.stdin.on("data", chunk => { raw += chunk; });
   process.stdin.on("end", () => {
     const body = JSON.parse(raw);
+    body.runtimePolicy.authoringModelService = { scope: "courseware-authoring", service: "inherit", automaticFallback: false };
     const { image, ...legacy } = body.runtimePolicy.formalGeneration.professionalCreation;
     body.runtimePolicy.formalGeneration.professionalCreation = { ...legacy, image,
       skillOrchestration: {
@@ -1077,6 +1167,8 @@ formal_provider_readiness_health_payload='{"success":true,"status":"ok","version
 formal_provider_readiness_health_payload="${formal_provider_readiness_health_payload//mira.openmaic.formal-provider-readiness.v1/mira.openmaic.formal-provider-readiness.v2}"
 formal_provider_readiness_health_payload="${formal_provider_readiness_health_payload/\"kimi\":{\"providerId\":\"kimi\",\"modelId\":\"kimi-k2.6\"/\"deepseek\":{\"providerId\":\"deepseek\",\"modelId\":\"deepseek-v4-pro\"}"
 formal_provider_readiness_health_payload="${formal_provider_readiness_health_payload/\"runtimePolicy\":{/\"runtimePolicy\":{${model_policy_json},}"
+authoring_service_json='"authoringModelService":{"scope":"courseware-authoring","service":"inherit","automaticFallback":false}'
+formal_provider_readiness_health_payload="${formal_provider_readiness_health_payload/\"runtimePolicy\":{/\"runtimePolicy\":{${authoring_service_json},}"
 validate_health_payload formal-provider-readiness "${formal_provider_readiness_health_payload}"
 # Candidate health must prove the exact current model and learning policy;
 # accepting the old runtime merely because it is alive is not sufficient.
@@ -1103,6 +1195,30 @@ validate_health_payload formal-provider-readiness "${formal_provider_readiness_h
   upgraded_payload="$(printf '%s' "${structured_health_payload}" | node -e 'let raw="";process.stdin.on("data",c=>raw+=c);process.stdin.on("end",()=>{const b=JSON.parse(raw),p=b.runtimePolicy,id="deepseek-v4-pro-current-flash-v1";p.structuredScene.policyId=id;p.modelPolicy.policyId=id;p.modelPolicy.structuredScene.policyId=id;p.modelPolicy.coursewareVerifier.modelId="deepseek-flash";p.formalGeneration.professionalCreation.modelPolicyId=id;process.stdout.write(JSON.stringify(b));});')"
   OPENMAIC_STRUCTURED_SCENE_POLICY_ID=deepseek-v4-pro-current-flash-v1
   validate_health_payload openmaic "${upgraded_payload}" || fail 'Pro/current Flash health rejected'
+  # Exercise the production launch order: load, clear all provider variables,
+  # then attest the child from the fixed owner file, not stale shell state.
+  cp "${TMP_ROOT}/openmaic.env" "${TMP_ROOT}/authoring-health.env"
+  model_provider_env_file() { printf '%s' "${TMP_ROOT}/authoring-health.env"; }
+  cat >> "${TMP_ROOT}/authoring-health.env" <<'EOF'
+MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE=autorouter
+AUTOROUTER_DEEPSEEK_API_KEY=test-authoring-key-never-log
+AUTOROUTER_DEEPSEEK_BASE_URL=https://api.autorouter.top/v1
+EOF
+  OPENMAIC_DEFAULT_MODEL=deepseek:deepseek-v4-pro
+  load_openmaic_authoring_model_env
+  [[ "${OPENMAIC_AUTHORING_DEEPSEEK_SERVICE}" == autorouter ]] || fail 'authoring service fixture was not loaded'
+  clear_openmaic_provider_env
+  [[ -z "${OPENMAIC_AUTHORING_DEEPSEEK_SERVICE}" && -z "${OPENMAIC_AUTHORING_DEEPSEEK_API_KEY}" ]] || fail 'provider variables were not cleared'
+  autorouter_payload="$(printf '%s' "${upgraded_payload}" | node -e 'let r="";process.stdin.on("data",c=>r+=c);process.stdin.on("end",()=>{const b=JSON.parse(r);b.runtimePolicy.authoringModelService={scope:"courseware-authoring",service:"autorouter",host:"api.autorouter.top",wireModels:{"deepseek-v4-pro":"deepseek-v4-pro","deepseek-flash":"deepseek-v4.1-flash"},automaticFallback:false};process.stdout.write(JSON.stringify(b));});')"
+  validate_health_payload openmaic "${autorouter_payload}" || fail 'cleared launch variables rejected the configured authoring service'
+  if validate_health_payload openmaic "${upgraded_payload}"; then fail 'authoring opt-in accepted an old inherit process'; fi
+  printf '%s\n' 'MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE=inherit' > "${TMP_ROOT}/authoring-health.env"
+  if validate_health_payload openmaic "${autorouter_payload}"; then fail 'changed authoring flag accepted the old autorouter process'; fi
+  validate_health_payload openmaic "${upgraded_payload}" || fail 'explicit inherit service was rejected'
+  printf '%s\n' 'MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE=unknown' > "${TMP_ROOT}/authoring-health.env"
+  if validate_health_payload openmaic "${upgraded_payload}" 2>/dev/null; then fail 'unknown authoring service silently fell back to inherit'; fi
+  : > "${TMP_ROOT}/authoring-health.env"
+  validate_health_payload openmaic "${upgraded_payload}" || fail 'unset authoring service did not default to inherit'
   if validate_health_payload openmaic "${structured_health_payload}"; then fail 'new verifier health accepted legacy identity'; fi
   all_flash_payload="$(printf '%s' "${upgraded_payload}" | node -e 'let r="";process.stdin.on("data",c=>r+=c);process.stdin.on("end",()=>{const b=JSON.parse(r);b.runtimePolicy.modelPolicy.coursewareCreator.modelId="deepseek-flash";process.stdout.write(JSON.stringify(b));});')"
   if validate_health_payload openmaic "${all_flash_payload}"; then fail 'verifier policy allowed all-Flash creator'; fi

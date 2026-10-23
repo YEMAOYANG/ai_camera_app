@@ -1,0 +1,434 @@
+{
+  "policyVersion": "mira.textbook.pinyin-aouiu-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "symbols": {
+    "ɑo": {
+      "ph": "ao1",
+      "carrier": "凹"
+    },
+    "āo": {
+      "ph": "ao1",
+      "carrier": "凹"
+    },
+    "áo": {
+      "ph": "ao2",
+      "carrier": "熬"
+    },
+    "ǎo": {
+      "ph": "ao3",
+      "carrier": "袄"
+    },
+    "ào": {
+      "ph": "ao4",
+      "carrier": "奥"
+    },
+    "ou": {
+      "ph": "ou1",
+      "carrier": "欧"
+    },
+    "ōu": {
+      "ph": "ou1",
+      "carrier": "欧"
+    },
+    "óu": {
+      "ph": "ou2",
+      "carrier": "呕"
+    },
+    "ǒu": {
+      "ph": "ou3",
+      "carrier": "藕"
+    },
+    "òu": {
+      "ph": "ou4",
+      "carrier": "怄"
+    },
+    "iu": {
+      "ph": "you1",
+      "carrier": "优"
+    },
+    "iū": {
+      "ph": "you1",
+      "carrier": "优"
+    },
+    "iú": {
+      "ph": "you2",
+      "carrier": "游"
+    },
+    "iǔ": {
+      "ph": "you3",
+      "carrier": "有"
+    },
+    "iù": {
+      "ph": "you4",
+      "carrier": "又"
+    },
+    "niǎo": {
+      "ph": "niao3",
+      "carrier": "鸟"
+    },
+    "shǎo": {
+      "ph": "shao3",
+      "carrier": "少"
+    },
+    "yào": {
+      "ph": "yao4",
+      "carrier": "要"
+    },
+    "rào": {
+      "ph": "rao4",
+      "carrier": "绕"
+    },
+    "zǎo": {
+      "ph": "zao3",
+      "carrier": "早"
+    },
+    "tiào": {
+      "ph": "tiao4",
+      "carrier": "跳"
+    },
+    "ròu": {
+      "ph": "rou4",
+      "carrier": "肉"
+    },
+    "tóu": {
+      "ph": "tou2",
+      "carrier": "头"
+    },
+    "lóu": {
+      "ph": "lou2",
+      "carrier": "楼"
+    },
+    "yóu": {
+      "ph": "you2",
+      "carrier": "游"
+    },
+    "zǒu": {
+      "ph": "zou3",
+      "carrier": "走"
+    },
+    "shōu": {
+      "ph": "shou1",
+      "carrier": "收"
+    },
+    "kǒu": {
+      "ph": "kou3",
+      "carrier": "口"
+    },
+    "qiú": {
+      "ph": "qiu2",
+      "carrier": "球"
+    },
+    "diū": {
+      "ph": "diu1",
+      "carrier": "丢"
+    },
+    "liù": {
+      "ph": "liu4",
+      "carrier": "六"
+    },
+    "niú": {
+      "ph": "niu2",
+      "carrier": "牛"
+    },
+    "xiū": {
+      "ph": "xiu1",
+      "carrier": "修"
+    },
+    "jiù": {
+      "ph": "jiu4",
+      "carrier": "旧"
+    },
+    "xiǎo": {
+      "ph": "xiao3",
+      "carrier": "小"
+    },
+    "qiáo": {
+      "ph": "qiao2",
+      "carrier": "桥"
+    },
+    "liú": {
+      "ph": "liu2",
+      "carrier": "流"
+    },
+    "shuǐ": {
+      "ph": "shui3",
+      "carrier": "水"
+    },
+    "chuí": {
+      "ph": "chui2",
+      "carrier": "垂"
+    },
+    "liǔ": {
+      "ph": "liu3",
+      "carrier": "柳"
+    },
+    "táo": {
+      "ph": "tao2",
+      "carrier": "桃"
+    },
+    "huā": {
+      "ph": "hua1",
+      "carrier": "花"
+    },
+    "ɑ": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "o": {
+      "ph": "o1",
+      "carrier": "哦"
+    },
+    "i": {
+      "ph": "yi1",
+      "carrier": "衣"
+    },
+    "u": {
+      "ph": "wu1",
+      "carrier": "乌"
+    },
+    "n": {
+      "ph": "ne1",
+      "carrier": "呢"
+    },
+    "sh": {
+      "ph": "shi1",
+      "carrier": "诗"
+    },
+    "y": {
+      "ph": "yi1",
+      "carrier": "衣"
+    },
+    "r": {
+      "ph": "ri1",
+      "carrier": "日"
+    },
+    "z": {
+      "ph": "zi1",
+      "carrier": "资"
+    },
+    "t": {
+      "ph": "te1",
+      "carrier": "特"
+    },
+    "l": {
+      "ph": "le1",
+      "carrier": "勒"
+    },
+    "q": {
+      "ph": "qi1",
+      "carrier": "七"
+    },
+    "d": {
+      "ph": "de1",
+      "carrier": "的"
+    },
+    "x": {
+      "ph": "xi1",
+      "carrier": "西"
+    },
+    "j": {
+      "ph": "ji1",
+      "carrier": "鸡"
+    },
+    "k": {
+      "ph": "ke1",
+      "carrier": "科"
+    }
+  },
+  "words": {},
+  "approvalBoundary": {
+    "recipeStatus": "registered-textbook-scoped-ssml-recipe-for-existing-operator-verification",
+    "sourceScope": "pep-chinese-g1-upper-2022-standard / 20260924-directory-3 / u4-l2; verified printed pages 47 and 48; 19 whole syllables, xiǎo niú writing, four pictured word pairs.",
+    "providerReuse": "The previously user-confirmed Aliyun CosyVoice-v3-flash longanwen_v3 SSML provider, input parameters, whole-token validation and unchanged-WAV/PCM verification are reused. New lesson files are not claimed to have been individually heard.",
+    "formalListeningScope": "No new per-sentence human confirmation requirement. Existing user-authorized automatic initialization, complete-sentence ASR, exact receipt identity and real-browser review remain required; automatic checks do not establish perceptual pronunciation or tone accuracy.",
+    "humanReview": "not-performed-for-this-lesson",
+    "humanListeningVerified": false,
+    "perceptualToneVerified": false,
+    "pronunciationApproved": false,
+    "formalUseAllowed": false,
+    "probeScope": "Three exact fixed requests: ɑo and its four tones; ou and its four tones; iu and its four tones. Probe bytes are evidence only and never imported as formal narration.",
+    "wholeTokenBoundary": "Every Latin run is one complete registered token. No Unicode normalization, alpha-a/ASCII-a equivalence, numeric tone spelling, combining tone mark, per-letter fallback or concatenated phoneme recipe is allowed.",
+    "iuToneBoundary": "Unmarked iu uses you1 as its carrier recipe; the marked forms iū/iú/iǔ/iù use you1..4. īu/íu/ǐu/ìu and numeric tone spellings are rejected. These SSML recipes are not a claim that new audio has passed listening.",
+    "formalScopeBoundary": "Ordinary Chinese narration remains natural Chinese. Every formal Latin token must be in this exact lesson policy. No aieiui exact-text override or unresolved-ASR publication exception is inherited.",
+    "publicationBoundary": "No probe or policy registration alone authorizes publication. Preserve original ASR results and use the existing strict operator review; unresolved differences are not silently accepted."
+  }
+}

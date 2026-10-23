@@ -1,0 +1,827 @@
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -12,6 +12,12 @@
+   from './mira-formal-english-pronunciation';
+ import { textbookAudioLanguageProfile, type MiraTextbookAudioLanguageProfile }
+   from './mira-textbook-audio-language';
++import {
++  assertMiraTextbookPinyinProfile, isMiraTextbookPinyinProviderPronunciation,
++  MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY, prepareMiraTextbookPinyinPronunciation,
++  textbookPinyinNamespace, type MiraTextbookPinyinPrepared,
++  type MiraTextbookPinyinPronunciationProfile, type MiraTextbookPinyinProviderPronunciation,
++} from './mira-textbook-pinyin-pronunciation';
+ 
+ import {
+   authorizeMiraInternalLoopbackRequest,
+@@ -133,6 +139,8 @@
+   narrationSegmentId: string;
+   text: string;
+   textSha256: string;
++  /** Accepted only in the additive tbptts1 namespace; never on legacy requests. */
++  pronunciationProfile?: MiraTextbookPinyinPronunciationProfile;
+ }
+ 
+ export interface MiraFormalAsrRequest {
+@@ -171,8 +179,8 @@
+   requestId: string;
+   requestSha256: string;
+   state: JobState;
+-  providerId: 'qwen-tts' | 'qwen-asr';
+-  modelId: 'qwen3-tts-flash' | 'qwen3-asr-flash';
++  providerId: 'qwen-tts' | 'qwen-asr' | 'aliyun-cosyvoice';
++  modelId: 'qwen3-tts-flash' | 'qwen3-asr-flash' | 'cosyvoice-v3-flash';
+   fallbackUsed: false;
+   providerAttemptedAt: string;
+   providerCompletedAt?: string;
+@@ -185,7 +193,7 @@
+ export interface MiraFormalTtsJob extends BaseJobRecord {
+   kind: 'tts';
+   textSha256: string;
+-  voiceId: 'Serena' | 'Ethan' | 'Jennifer';
++  voiceId: 'Serena' | 'Ethan' | 'Jennifer' | 'longanwen_v3';
+   voiceGender: Gender;
+   languageCode: 'zh-CN' | 'en-US';
+   downloadAttemptedAt?: string;
+@@ -194,9 +202,15 @@
+   mimeType?: 'audio/wav';
+   sizeBytes?: number;
+   audioSha256?: string;
++  providerAudioSha256?: string;
++  pcmSha256?: string;
++  audioNormalization?: MiraPinyinWavNormalization;
++  providerRequestId?: string;
++  providerUsage?: { characters: number };
++  budgetMeasurement?: { kind: 'ssml-codepoint-upper-bound'; characters: number; estimated: true };
+   providerLanguageRepair?: MiraEnglishRepairAsrDiagnosticProfile & { providerBodySha256: string };
+   providerLanguagePolicy?: MiraTextbookAudioLanguageProfile & { providerBodySha256: string };
+-  providerPronunciation?: {
++  providerPronunciation?: (MiraTextbookPinyinProviderPronunciation & { textSha256?: never; characters?: never }) | {
+     policyVersion: typeof MIRA_FORMAL_MATH_TTS_PRONUNCIATION_POLICY |
+       typeof MIRA_FORMAL_ENGLISH_TTS_PRONUNCIATION_POLICY;
+     sourceTextSha256: string;
+@@ -216,6 +230,22 @@
+   similarityBps?: number;
+   providerDiagnostic?: MiraEnglishRepairAsrDiagnosticProfile & { providerBodySha256: string };
+   providerLanguagePolicy?: MiraTextbookAudioLanguageProfile & { providerBodySha256: string };
++  /** The exact matched TTS pronunciation identity, not an ASR pronunciation verdict. */
++  providerPronunciation?: MiraTextbookPinyinProviderPronunciation;
++  providerAsrBodySha256?: string;
++}
++
++export interface MiraPinyinWavNormalization {
++  policyVersion: 'mira.wav.streaming-pcm-lengths.v1';
++  applied: boolean;
++  providerRiffSize: number;
++  providerDataSize: number;
++  riffSize: number;
++  dataSize: number;
++  pcmByteLength: number;
++  sampleRate: 24000;
++  channels: 1;
++  bitsPerSample: 16;
+ }
+ 
+ export const MIRA_ENGLISH_REPAIR_ASR_DIAGNOSTIC_POLICY = 'mira.english.repair-asr-auto-language.v1' as const;
+@@ -363,7 +393,12 @@
+ }
+ 
+ export function assertMiraFormalTtsRequest(value: unknown): MiraFormalTtsRequest {
+-  const input = assertExactObject(value, TTS_KEYS);
++  let pinyin = false;
++  try {
++    if (value && typeof value === 'object' && !Array.isArray(value))
++      pinyin = textbookPinyinNamespace(value as Record<string, unknown>, 'tts');
++  } catch { throw new MiraFormalAudioError('invalid_request', 'Invalid textbook pinyin namespace'); }
++  const input = assertExactObject(value, pinyin ? [...TTS_KEYS, 'pronunciationProfile'] : TTS_KEYS);
+   assertIdentity(input);
+   const text = input.text;
+   if (
+@@ -380,6 +415,7 @@
+   }
+   const request = input as unknown as MiraFormalTtsRequest;
+   assertTextbookLanguageNamespace(request, 'tts');
++  if (pinyin) preparePinyinRequest(request);
+   return request;
+ }
+ 
+@@ -395,7 +431,21 @@
+   }
+   const request = input as unknown as MiraFormalAsrRequest;
+   assertTextbookLanguageNamespace(request, 'asr');
++  assertPinyinNamespace(request, 'asr');
+   return request;
++}
++
++function assertPinyinNamespace(input: MiraFormalTtsRequest | MiraFormalAsrRequest, operation: 'tts' | 'asr') {
++  try { return textbookPinyinNamespace(input, operation); }
++  catch { throw new MiraFormalAudioError('invalid_request', 'Invalid textbook pinyin namespace'); }
++}
++
++function preparePinyinRequest(input: MiraFormalTtsRequest): MiraTextbookPinyinPrepared {
++  try {
++    const prepared = prepareMiraTextbookPinyinPronunciation(input.text);
++    assertMiraTextbookPinyinProfile(input.pronunciationProfile, prepared.profile);
++    return prepared;
++  } catch { throw new MiraFormalAudioError('invalid_request', 'Invalid textbook pinyin pronunciation profile'); }
+ }
+ 
+ function assertTextbookLanguageNamespace(input: MiraFormalTtsRequest | MiraFormalAsrRequest, operation: 'tts' | 'asr') {
+@@ -530,8 +580,10 @@
+   now: Date,
+   languageRepairProfile?: MiraEnglishRepairAsrDiagnosticProfile,
+   batchLanguageProfile?: MiraTextbookAudioLanguageProfile,
++  pinyin?: MiraTextbookPinyinPrepared,
+ ): Promise<{ record: MiraFormalTtsJob; created: boolean }> {
+-  const digest = requestDigest(languageRepairProfile ? {logicalRequest: input, languageRepairProfile}
++  const digest = requestDigest(pinyin ? {logicalRequest: input, providerPronunciation: pinyin.providerPronunciation}
++    : languageRepairProfile ? {logicalRequest: input, languageRepairProfile}
+     : batchLanguageProfile ? {logicalRequest: input, batchLanguageProfile} : input);
+   const existing = await readMiraFormalTtsJob(input.requestId, now);
+   if (existing) {
+@@ -550,15 +602,20 @@
+     ...identityOf(input),
+     textSha256: input.textSha256,
+     state: 'running',
+-    providerId: 'qwen-tts',
+-    modelId: 'qwen3-tts-flash',
+-    voiceId: policy.voiceId,
++    providerId: pinyin ? 'aliyun-cosyvoice' : 'qwen-tts',
++    modelId: pinyin ? 'cosyvoice-v3-flash' : 'qwen3-tts-flash',
++    voiceId: pinyin ? 'longanwen_v3' : policy.voiceId,
+     voiceGender: policy.voiceGender,
+     languageCode: policy.languageCode,
+     fallbackUsed: false,
+     providerAttemptedAt: timestamp,
+     createdAt: timestamp,
+     updatedAt: timestamp,
++    ...(pinyin ? {
++      providerPronunciation: pinyin.providerPronunciation,
++      budgetMeasurement: { kind: 'ssml-codepoint-upper-bound' as const,
++        characters: Array.from(pinyin.ssml).length, estimated: true as const },
++    } : {}),
+   };
+   if (await writeExclusiveAtomic(jobPath('tts', input.requestId), record)) {
+     return { record, created: true };
+@@ -580,6 +637,7 @@
+   now: Date,
+   diagnosticProfile?: MiraEnglishRepairAsrDiagnosticProfile,
+   batchLanguageProfile?: MiraTextbookAudioLanguageProfile,
++  pinyin = false,
+ ): Promise<{ record: MiraFormalAsrJob; created: boolean }> {
+   if (
+     tts.state !== 'succeeded' ||
+@@ -596,7 +654,13 @@
+   )) {
+     throw new MiraFormalAudioError('asset_unavailable', 'Matching textbook TTS language policy is unavailable');
+   }
+-  const digest = requestDigest(diagnosticProfile ? {logicalRequest: input, diagnosticProfile}
++  if (pinyin && (!isMiraTextbookPinyinProviderPronunciation(tts.providerPronunciation, tts.textSha256)
++      || tts.providerId !== 'aliyun-cosyvoice' || tts.modelId !== 'cosyvoice-v3-flash' || tts.voiceId !== 'longanwen_v3')) {
++    throw new MiraFormalAudioError('asset_unavailable', 'Matching textbook pinyin TTS policy is unavailable');
++  }
++  const providerPronunciation = pinyin ? tts.providerPronunciation as MiraTextbookPinyinProviderPronunciation : undefined;
++  const digest = requestDigest(pinyin ? {logicalRequest: input, providerPronunciation}
++    : diagnosticProfile ? {logicalRequest: input, diagnosticProfile}
+     : batchLanguageProfile ? {logicalRequest: input, batchLanguageProfile} : input);
+   const existing = await readMiraFormalAsrJob(input.requestId, now);
+   if (existing) {
+@@ -623,6 +687,7 @@
+     providerAttemptedAt: timestamp,
+     createdAt: timestamp,
+     updatedAt: timestamp,
++    ...(providerPronunciation ? { providerPronunciation } : {}),
+   };
+   if (await writeExclusiveAtomic(jobPath('asr', input.requestId), record)) {
+     return { record, created: true };
+@@ -634,7 +699,7 @@
+   return { record: winner, created: false };
+ }
+ 
+-function providerEndpoint(baseUrl: string | undefined): string {
++function providerEndpoint(baseUrl: string | undefined, pinyin = false): string {
+   const effectiveBaseUrl = baseUrl || 'https://dashscope.aliyuncs.com/api/v1';
+   let parsed: URL;
+   try {
+@@ -652,7 +717,8 @@
+   ) {
+     throw new MiraFormalAudioError('provider_unavailable', 'Formal audio provider is unavailable');
+   }
+-  return `${parsed.toString().replace(/\/$/u, '')}/services/aigc/multimodal-generation/generation`;
++  return `${parsed.toString().replace(/\/$/u, '')}${pinyin ? MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.endpointPath
++    : '/services/aigc/multimodal-generation/generation'}`;
+ }
+ 
+ function timeoutSignal(): AbortSignal {
+@@ -769,12 +835,17 @@
+ async function validateMediaUrl(
+   rawUrl: string,
+   resolveAddresses: (hostname: string) => Promise<string[]>,
++  pinyin = false,
+ ): Promise<URL> {
+   let url: URL;
+   try {
+     url = new URL(rawUrl);
+   } catch {
+     throw new OperationalFailure('failed', 'media_url_invalid');
++  }
++  if (pinyin && (url.hostname !== 'dashscope-result-bj.oss-cn-beijing.aliyuncs.com'
++      || !/^\/prod\/cosyvoice-v3-flash\/\d{8}\/\d+\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\.wav$/.test(url.pathname))) {
++    throw new OperationalFailure('failed', 'media_url_rejected');
+   }
+   const allowedHostname = isAllowedMediaHostname(url.hostname);
+   // DashScope currently returns a time-limited OSS URL with an http scheme.
+@@ -816,9 +887,12 @@
+   initialUrl: string,
+   fetchImpl: typeof fetch,
+   resolveAddresses: (hostname: string) => Promise<string[]>,
+-): Promise<Uint8Array> {
++  pinyin = false,
++): Promise<{ bytes: Uint8Array; provenance?: {
++  providerAudioSha256: string; pcmSha256: string; audioNormalization: MiraPinyinWavNormalization;
++} }> {
+   const signal = timeoutSignal();
+-  let current = await validateMediaUrl(initialUrl, resolveAddresses);
++  let current = await validateMediaUrl(initialUrl, resolveAddresses, pinyin);
+   for (let redirectCount = 0; redirectCount <= 2; redirectCount += 1) {
+     let response: Response;
+     try {
+@@ -831,7 +905,7 @@
+       if (!location || redirectCount === 2) {
+         throw new OperationalFailure('failed', 'media_redirect_rejected');
+       }
+-      current = await validateMediaUrl(new URL(location, current).toString(), resolveAddresses);
++      current = await validateMediaUrl(new URL(location, current).toString(), resolveAddresses, pinyin);
+       continue;
+     }
+     if (!response.ok) throw new OperationalFailure('failed', 'media_download_failed');
+@@ -856,6 +930,14 @@
+     const actualDataSize = fixedPcmHeader ? bytes.byteLength - 44 : -1;
+     const declaredRiffSize = header.readUInt32LE(4);
+     const declaredDataSize = fixedPcmHeader ? header.readUInt32LE(40) : -1;
++    if (pinyin && (!fixedPcmHeader || header.readUInt16LE(20) !== 1
++        || header.readUInt16LE(22) !== 1 || header.readUInt32LE(24) !== 24000
++        || header.readUInt32LE(28) !== 48000 || header.readUInt16LE(32) !== 2
++        || header.readUInt16LE(34) !== 16 || actualDataSize <= 0 || actualDataSize % 2 !== 0
++        || ((declaredRiffSize !== actualRiffSize || declaredDataSize !== actualDataSize)
++          && !(declaredRiffSize === 0x7fffffbf && declaredDataSize === 0x7fffff9b)))) {
++      throw new OperationalFailure('failed', 'media_wav_pcm_invalid');
++    }
+     if (
+       fixedPcmHeader &&
+       declaredRiffSize >= 0x7fff0000 &&
+@@ -872,7 +954,16 @@
+     ) {
+       throw new OperationalFailure('failed', 'media_wav_size_invalid');
+     }
+-    return bytes;
++    return { bytes, ...(pinyin ? { provenance: {
++      providerAudioSha256: sha256(header), pcmSha256: sha256(header.subarray(44)),
++      audioNormalization: {
++        policyVersion: 'mira.wav.streaming-pcm-lengths.v1' as const,
++        applied: declaredRiffSize !== actualRiffSize || declaredDataSize !== actualDataSize,
++        providerRiffSize: declaredRiffSize, providerDataSize: declaredDataSize,
++        riffSize: actualRiffSize, dataSize: actualDataSize, pcmByteLength: actualDataSize,
++        sampleRate: 24000 as const, channels: 1 as const, bitsPerSample: 16 as const,
++      },
++    } } : {}) };
+   }
+   throw new OperationalFailure('failed', 'media_redirect_rejected');
+ }
+@@ -964,7 +1055,8 @@
+   const input = assertMiraFormalTtsRequest(value);
+   const now = dependencies.now?.() || new Date();
+   const batchLanguageProfile = assertTextbookLanguageNamespace(input, 'tts');
+-  const claim = await claimTts(input, now, languageRepairProfile, batchLanguageProfile);
++  const pinyin = assertPinyinNamespace(input, 'tts') ? preparePinyinRequest(input) : undefined;
++  const claim = await claimTts(input, now, languageRepairProfile, batchLanguageProfile, pinyin);
+   if (!claim.created) return claim;
+   let record = claim.record;
+   const fetchImpl = dependencies.fetchImpl || fetch;
+@@ -973,13 +1065,13 @@
+     const apiKey = resolveTTSApiKey('qwen-tts');
+     if (!apiKey)
+       throw new MiraFormalAudioError('provider_unavailable', 'Formal TTS is unavailable');
+-    const endpoint = providerEndpoint(resolveTTSBaseUrl('qwen-tts'));
++    const endpoint = providerEndpoint(resolveTTSBaseUrl('qwen-tts'), Boolean(pinyin));
+     const policy = SUBJECT_POLICIES[input.subject];
+-    const providerText = input.subject === 'math' ? prepareMiraMathTtsPronunciation(input.text)
++    const providerText = pinyin ? pinyin.ssml : input.subject === 'math' ? prepareMiraMathTtsPronunciation(input.text)
+       : input.subject === 'english' ? prepareMiraEnglishTtsPronunciation(input.text) : input.text;
+     const pronunciationPolicy = input.subject === 'math' ? MIRA_FORMAL_MATH_TTS_PRONUNCIATION_POLICY
+       : input.subject === 'english' && providerText !== input.text ? MIRA_FORMAL_ENGLISH_TTS_PRONUNCIATION_POLICY : undefined;
+-    const providerRequest = {
++    const providerRequest = pinyin ? pinyin.providerRequest : {
+       model: 'qwen3-tts-flash',
+       input: { text: providerText, voice: policy.voiceId, language_type: languageRepairProfile || batchLanguageProfile ? 'Auto' : policy.qwenLanguageType },
+       parameters: { rate: 0 },
+@@ -1007,7 +1099,8 @@
+       : languageRepairProfile ? {logicalRequest: input, languageRepairProfile, providerRequest} : record.providerPronunciation ? {
+       logicalRequest: input, providerPronunciation: record.providerPronunciation, providerRequest,
+     } : input;
+-    const providerBody = await budgetedOperation('qwen-tts', 'qwen3-tts-flash', paidRequest,
++    const providerBody = await budgetedOperation(pinyin ? 'aliyun-cosyvoice' : 'qwen-tts',
++      pinyin ? 'cosyvoice-v3-flash' : 'qwen3-tts-flash', paidRequest,
+       { calls: 1, characters }, async () => {
+     const response = await fetchProvider(fetchImpl, endpoint, {
+       method: 'POST',
+@@ -1015,11 +1108,21 @@
+         Authorization: `Bearer ${apiKey}`,
+         'Content-Type': 'application/json; charset=utf-8',
+       },
+-      body: JSON.stringify(providerRequest),
++      body: pinyin ? pinyin.providerBody : JSON.stringify(providerRequest),
+     });
+     if (!response.ok) throw new OperationalFailure('failed', 'provider_rejected');
+     return readProviderJson(response);
+     });
++    if (pinyin) {
++      const usage = providerBody.usage as Record<string, unknown> | undefined;
++      if (typeof providerBody.request_id !== 'string' || !IDENTIFIER.test(providerBody.request_id)
++          || !usage || !Number.isSafeInteger(usage.characters) || Number(usage.characters) < 0) {
++        throw new OperationalFailure('failed', 'provider_usage_identity_invalid');
++      }
++      record = { ...record, providerRequestId: providerBody.request_id,
++        providerUsage: { characters: Number(usage.characters) } };
++      await updateTts(record);
++    }
+     const output = providerBody.output as Record<string, unknown> | undefined;
+     const audio = output?.audio as Record<string, unknown> | undefined;
+     if (!audio || typeof audio.url !== 'string') {
+@@ -1033,7 +1136,11 @@
+       updatedAt: providerCompletedAt,
+     };
+     await updateTts(record);
+-    const bytes = await downloadWav(audio.url, fetchImpl, resolveAddresses);
++    const { bytes, provenance } = await downloadWav(audio.url, fetchImpl, resolveAddresses, Boolean(pinyin));
++    if (provenance) {
++      record = { ...record, ...provenance };
++      await updateTts(record);
++    }
+     const audioSha256 = sha256(bytes);
+     const assetId = `mirawav_${sha256(input.requestId).slice(0, 24)}`;
+     const assetFileName = await writeAssetExclusive(assetId, bytes);
+@@ -1159,7 +1266,8 @@
+     throw new MiraFormalAudioError('asset_unavailable', 'Matching formal TTS WAV is unavailable');
+   const now = dependencies.now?.() || new Date();
+   const batchLanguageProfile = assertTextbookLanguageNamespace(input, 'asr');
+-  const claim = await claimAsr(input, tts, now, diagnosticProfile, batchLanguageProfile);
++  const pinyin = assertPinyinNamespace(input, 'asr');
++  const claim = await claimAsr(input, tts, now, diagnosticProfile, batchLanguageProfile, pinyin);
+   if (!claim.created) return claim;
+   let record = claim.record;
+   const fetchImpl = dependencies.fetchImpl || fetch;
+@@ -1178,6 +1286,10 @@
+       ] }] },
+       parameters: { asr_options: diagnosticProfile || batchLanguageProfile ? {} : { language: policy.qwenAsrLanguage } },
+     };
++    if (pinyin) {
++      record = { ...record, providerAsrBodySha256: sha256(JSON.stringify(providerRequest)) };
++      await updateAsr(record);
++    }
+     if (diagnosticProfile) {
+       record = {...record, providerDiagnostic: {...diagnosticProfile, providerBodySha256: requestDigest(providerRequest)}};
+       await updateAsr(record);
+@@ -1186,7 +1298,8 @@
+       record = {...record, providerLanguagePolicy: {...batchLanguageProfile, providerBodySha256: requestDigest(providerRequest)}};
+       await updateAsr(record);
+     }
+-    const budgetInput = batchLanguageProfile ? {logicalRequest: input, batchLanguageProfile, providerRequest}
++    const budgetInput = pinyin ? {logicalRequest: input, providerPronunciation: record.providerPronunciation, providerRequest}
++      : batchLanguageProfile ? {logicalRequest: input, batchLanguageProfile, providerRequest}
+       : diagnosticProfile ? {logicalRequest: input, diagnosticProfile, providerRequest} : input;
+     const providerBody = await budgetedOperation('qwen-asr', 'qwen3-asr-flash', budgetInput,
+       { calls: 1, audio_ms: audioMs }, async () => {
+diff --git a/lib/server/mira-formal-audio-lifecycle.ts b/lib/server/mira-formal-audio-lifecycle.ts
+--- a/lib/server/mira-formal-audio-lifecycle.ts
++++ b/lib/server/mira-formal-audio-lifecycle.ts
+@@ -422,6 +422,11 @@
+   audioSha256: string;
+   mimeType: 'audio/wav';
+   sizeBytes: number;
++  // These are checked below. The legacy lifecycle cannot adopt an operator-only
++  // CosyVoice record merely because the shared durable job type supports it.
++  providerId: 'qwen-tts';
++  modelId: 'qwen3-tts-flash';
++  voiceId: FormalAudioLifecycleTtsReceipt['voiceId'];
+ } {
+   if (
+     record.requestSha256 !== canonicalSha256(request) ||
+diff --git a/tests/server/mira-formal-audio-lifecycle.test.ts b/tests/server/mira-formal-audio-lifecycle.test.ts
+--- a/tests/server/mira-formal-audio-lifecycle.test.ts
++++ b/tests/server/mira-formal-audio-lifecycle.test.ts
+@@ -208,6 +208,21 @@
+ }
+ 
+ describe('Mira formal audio lifecycle v2', () => {
++  it('rejects operator-only CosyVoice records without relabelling them as legacy Qwen audio', async () => {
++    const classroom = formalClassroom(1, 1);
++    const fake = fakeDependencies(() => '不会调用识别');
++    const originalExecute = fake.dependencies.executeTts;
++    fake.dependencies.executeTts = async request => {
++      const result = await originalExecute(request);
++      return { ...result, record: { ...result.record, providerId: 'aliyun-cosyvoice',
++        modelId: 'cosyvoice-v3-flash', voiceId: 'longanwen_v3' } };
++    };
++    await expect(completeMiraFormalAudioLifecycle(
++      { buildItemId: 'build-item-wrong-lane', subject: 'math', ...classroom }, fake.dependencies,
++    )).rejects.toThrow('FORMAL_AUDIO_TTS_INCOMPLETE:0:succeeded');
++    expect(fake.executeAsr).not.toHaveBeenCalled();
++  });
++
+   it('flattens speech by scene/action order for TTS, ASR, progress and the receipt', async () => {
+     const classroom = formalClassroom(3, 2);
+     const fake = fakeDependencies((request) => `第${request.sceneOrder + 1}段讲解。`);
+diff --git a/lib/server/mira-textbook-pinyin-pronunciation.ts b/lib/server/mira-textbook-pinyin-pronunciation.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-textbook-pinyin-pronunciation.ts
+@@ -0,0 +1,125 @@
++import { createHash } from 'crypto';
++
++/** Additive operator policy; this is a pronunciation recipe, not a listening verdict.
++ * Its canonical digest must match backend/content/textbook_pinyin_pronunciation.v1.json.
++ * Keep the original teacher identity and legacy Qwen requests unchanged. */
++export const MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY = {
++  policyVersion: 'mira.textbook.pinyin-aoe-ssml.v1',
++  subject: 'chinese',
++  providerId: 'aliyun-cosyvoice',
++  modelId: 'cosyvoice-v3-flash',
++  voiceId: 'longanwen_v3',
++  endpointPath: '/services/audio/tts/SpeechSynthesizer',
++  inputParameters: {
++    voice: 'longanwen_v3', format: 'wav', sample_rate: 24000,
++    enable_ssml: true, rate: 1, pitch: 1, seed: 0, language_hints: ['zh'],
++  },
++  symbols: {
++    'ɑ': { ph: 'a1', carrier: '啊' }, a: { ph: 'a1', carrier: '啊' },
++    o: { ph: 'o1', carrier: '哦' }, e: { ph: 'e1', carrier: '鹅' },
++    'ā': { ph: 'a1', carrier: '啊' }, 'á': { ph: 'a2', carrier: '啊' },
++    'ǎ': { ph: 'a3', carrier: '啊' }, 'à': { ph: 'a4', carrier: '啊' },
++    'ō': { ph: 'o1', carrier: '哦' }, 'ó': { ph: 'o2', carrier: '哦' },
++    'ǒ': { ph: 'o3', carrier: '哦' }, 'ò': { ph: 'o4', carrier: '哦' },
++    'ē': { ph: 'e1', carrier: '鹅' }, 'é': { ph: 'e2', carrier: '鹅' },
++    'ě': { ph: 'e3', carrier: '鹅' }, 'è': { ph: 'e4', carrier: '鹅' },
++  },
++  textHandling: {
++    normalization: 'none', xmlEscape: 'amp_lt_gt_quot_apos',
++    unsupportedLatin: 'reject', combiningMarks: 'reject', wrapper: 'speak',
++  },
++  listeningRequired: true,
++} as const;
++
++function canonical(value: unknown): unknown {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value)
++    // Python sort_keys follows code points; every policy key is in the BMP.
++    // localeCompare would sort accented symbols differently and corrupt the cross-language identity.
++    .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([k, v]) => [k, canonical(v)]));
++  return value;
++}
++const sha = (value: string) => createHash('sha256').update(value).digest('hex');
++const canonicalJson = (value: unknown) => JSON.stringify(canonical(value));
++
++export const MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY));
++
++export interface MiraTextbookPinyinPronunciationProfile {
++  policyVersion: typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.policyVersion;
++  policySha256: string;
++  ssmlSha256: string;
++}
++export interface MiraTextbookPinyinProviderPronunciation extends MiraTextbookPinyinPronunciationProfile {
++  sourceTextSha256: string;
++  providerBodySha256: string;
++  providerId: typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.providerId;
++  modelId: typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.modelId;
++  voiceId: typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.voiceId;
++}
++
++const XML_ENTITIES: Record<string, string> = {
++  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
++};
++
++export function prepareMiraTextbookPinyinPronunciation(text: string) {
++  if (!text || text !== text.trim() || text.length > 8000 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(text))
++    throw new Error('Invalid textbook pinyin text');
++  const policy = MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY;
++  const symbols: Record<string, { ph: string; carrier: string }> = policy.symbols;
++  const parts = Array.from(text).map(character => {
++    const symbol = symbols[character];
++    if (symbol) return `<phoneme alphabet="py" ph="${symbol.ph}">${symbol.carrier}</phoneme>`;
++    // Do not normalize: a visually equivalent spelling would otherwise have a different source identity.
++    if (/[\p{Script=Latin}\p{Mark}]/u.test(character)) throw new Error('Unsupported textbook pinyin symbol');
++    return XML_ENTITIES[character] ?? character;
++  });
++  const ssml = `<speak>${parts.join('')}</speak>`;
++  const profile: MiraTextbookPinyinPronunciationProfile = {
++    policyVersion: policy.policyVersion,
++    policySha256: MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256,
++    ssmlSha256: sha(ssml),
++  };
++  const providerRequest = { model: policy.modelId, input: { ...policy.inputParameters, text: ssml } };
++  const providerBody = canonicalJson(providerRequest);
++  const providerPronunciation: MiraTextbookPinyinProviderPronunciation = {
++    ...profile, sourceTextSha256: sha(text), providerBodySha256: sha(providerBody),
++    providerId: policy.providerId, modelId: policy.modelId, voiceId: policy.voiceId,
++  };
++  return { ssml, profile, providerRequest, providerBody, providerPronunciation };
++}
++
++export type MiraTextbookPinyinPrepared = ReturnType<typeof prepareMiraTextbookPinyinPronunciation>;
++
++/** Reserve even malformed spellings so an invalid pinyin request cannot fall through to Qwen. */
++export function textbookPinyinNamespace(
++  input: { subject?: unknown; requestId?: unknown; ttsRequestId?: unknown }, operation: 'tts' | 'asr',
++): boolean {
++  const reserved = /^(?:tbptts|tbpasr)/;
++  const requestId = String(input.requestId || '');
++  const ttsRequestId = String(input.ttsRequestId || '');
++  if (!reserved.test(requestId) && !(operation === 'asr' && reserved.test(ttsRequestId))) return false;
++  if (input.subject !== 'chinese' || !(operation === 'tts' ? /^tbptts1_[a-f0-9]{64}$/ : /^tbpasr1_[a-f0-9]{64}$/).test(requestId)
++      || (operation === 'asr' && !/^tbptts1_[a-f0-9]{64}$/.test(ttsRequestId)))
++    throw new Error('Invalid textbook pinyin namespace');
++  return true;
++}
++
++export function assertMiraTextbookPinyinProfile(profile: unknown, expected: MiraTextbookPinyinPronunciationProfile): void {
++  if (!profile || typeof profile !== 'object' || Array.isArray(profile)
++      || canonicalJson(profile) !== canonicalJson(expected)) throw new Error('Invalid textbook pinyin pronunciation profile');
++}
++
++export function isMiraTextbookPinyinProviderPronunciation(
++  value: unknown, sourceTextSha256: string,
++): value is MiraTextbookPinyinProviderPronunciation {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
++  const profile = value as Record<string, unknown>;
++  const policy = MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY;
++  return Object.keys(profile).sort().join(',') === [
++    'policyVersion', 'policySha256', 'ssmlSha256', 'sourceTextSha256', 'providerBodySha256', 'providerId', 'modelId', 'voiceId',
++  ].sort().join(',') && profile.policyVersion === policy.policyVersion
++    && profile.policySha256 === MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256
++    && profile.sourceTextSha256 === sourceTextSha256
++    && profile.providerId === policy.providerId && profile.modelId === policy.modelId && profile.voiceId === policy.voiceId
++    && ['ssmlSha256', 'providerBodySha256', 'sourceTextSha256'].every(key => /^[a-f0-9]{64}$/.test(String(profile[key] || '')));
++}
+diff --git a/tests/server/mira-textbook-pinyin-pronunciation.test.ts b/tests/server/mira-textbook-pinyin-pronunciation.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-textbook-pinyin-pronunciation.test.ts
+@@ -0,0 +1,60 @@
++import { createHash } from 'crypto';
++import { existsSync, readFileSync } from 'fs';
++import path from 'path';
++import { describe, expect, it } from 'vitest';
++import {
++  MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY,
++  MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256,
++  prepareMiraTextbookPinyinPronunciation,
++} from '@/lib/server/mira-textbook-pinyin-pronunciation';
++
++const sha = (text: string) => createHash('sha256').update(text).digest('hex');
++
++describe('fixed textbook aoe SSML policy', () => {
++  it('matches the separately frozen Python policy digest', () => {
++    expect(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256)
++      .toBe('e325a2ef4706cb6e5cf6b11691d05ee0b30e59ce37d8a06c1528d8c6adf578c7');
++    expect(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.listeningRequired).toBe(true);
++    // In the integrated repository compare actual JSON, not just the agreed digest.
++    // The native package can also run standalone after applying its durable patch series.
++    const source = path.resolve(process.cwd(), '../../../backend/content/textbook_pinyin_pronunciation.v1.json');
++    if (existsSync(source)) expect(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY)
++      .toEqual(JSON.parse(readFileSync(source, 'utf8')));
++  });
++
++  it('matches independent Python SSML and physical-body vectors', () => {
++    const prepared = prepareMiraTextbookPinyinPronunciation('e，ɑ o e，āáǎà。');
++    expect(prepared.profile.ssmlSha256).toBe('18ca0381d4d11ce74efe08ac76111aaabc4f16d97ce0cb789e4421032140c737');
++    expect(prepared.providerPronunciation.providerBodySha256)
++      .toBe('d66a1a16ca8b98f99e8eba7c320a4e12f8d66ba1e57aa2280334b24913d6aca3');
++  });
++
++  it('maps only the reviewed aoe symbol inventory without changing logical identity', () => {
++    const text = '请听ɑaāáǎàoōóǒòeēéěè。';
++    const prepared = prepareMiraTextbookPinyinPronunciation(text);
++    const phonemes = [...prepared.ssml.matchAll(/ph="([aoe][1-4])"/g)].map(item => item[1]);
++    expect(phonemes).toEqual(['a1', 'a1', 'a1', 'a2', 'a3', 'a4',
++      'o1', 'o1', 'o2', 'o3', 'o4', 'e1', 'e1', 'e2', 'e3', 'e4']);
++    expect(prepared.providerPronunciation.sourceTextSha256).toBe(sha(text));
++    expect(prepared.profile.ssmlSha256).toBe(sha(prepared.ssml));
++    expect(prepared.providerPronunciation.providerBodySha256).toBe(sha(prepared.providerBody));
++    expect(JSON.parse(prepared.providerBody)).toEqual({
++      model: 'cosyvoice-v3-flash', input: {
++        text: prepared.ssml, voice: 'longanwen_v3', format: 'wav', sample_rate: 24000,
++        rate: 1, pitch: 1, enable_ssml: true, seed: 0, language_hints: ['zh'],
++      },
++    });
++  });
++
++  it('escapes ordinary text instead of allowing caller supplied SSML', () => {
++    expect(prepareMiraTextbookPinyinPronunciation('请听：<&>"\'，é。').ssml)
++      .toBe('<speak>请听：&lt;&amp;&gt;&quot;&apos;，<phoneme alphabet="py" ph="e2">鹅</phoneme>。</speak>');
++    expect(prepareMiraTextbookPinyinPronunciation('请看这幅图。').ssml)
++      .toBe('<speak>请看这幅图。</speak>');
++  });
++
++  it.each(['hello', 'A', 'ü', 'bɑ', 'ɑ\u0304', 'e\u0301', '<break time="1s"/>', 'éclair'])
++    ('rejects unsupported Latin or combining marks before dispatch: %s', text => {
++      expect(() => prepareMiraTextbookPinyinPronunciation(text)).toThrow();
++    });
++});
+diff --git a/tests/server/mira-textbook-pinyin-audio.test.ts b/tests/server/mira-textbook-pinyin-audio.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-textbook-pinyin-audio.test.ts
+@@ -0,0 +1,193 @@
++import { createHash } from 'crypto';
++import { promises as fs } from 'fs';
++import os from 'os';
++import path from 'path';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import * as paidBudget from '@/lib/server/mira-paid-budget';
++import {
++  assertMiraFormalAsrRequest, assertMiraFormalTtsRequest, executeMiraFormalAsr,
++  executeMiraFormalTts, readMiraFormalTtsAsset, readMiraFormalTtsJob,
++} from '@/lib/server/mira-formal-audio';
++import { prepareMiraTextbookPinyinPronunciation } from '@/lib/server/mira-textbook-pinyin-pronunciation';
++
++vi.mock('@/lib/server/provider-config', () => ({
++  getServerProviders: () => ({}), getServerWebSearchProviders: () => ({}),
++  getServerImageProviders: () => ({}), getServerVideoProviders: () => ({}),
++  getServerTTSProviders: () => ({ 'qwen-tts': { disabled: false } }),
++  getServerASRProviders: () => ({ 'qwen-asr': {} }),
++  resolveTTSApiKey: () => 'secret-not-a-receipt',
++  resolveTTSBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++  resolveASRApiKey: () => 'asr-secret-not-a-receipt',
++  resolveASRBaseUrl: () => 'https://dashscope.aliyuncs.com/api/v1',
++}));
++
++const sha = (value: string | Uint8Array) => createHash('sha256').update(value).digest('hex');
++const text = '听第二声，é。';
++const ttsInput = () => ({
++  requestId: `tbptts1_${'a'.repeat(64)}`, classroomId: 'pinyin-classroom',
++  classroomContentSha256: 'b'.repeat(64), subject: 'chinese',
++  teacherProfileId: 'mira_chinese_gentle', teacherProfileVersion: 2,
++  teacherProfileSha256: 'a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8',
++  teacherGender: 'female', sceneId: 'scene-p8', sceneOrder: 8,
++  actionId: 'speech-e-second', narrationSegmentId: 'segment-e-second',
++  text, textSha256: sha(text), pronunciationProfile: prepareMiraTextbookPinyinPronunciation(text).profile,
++});
++const asrInput = (audioSha256: string) => {
++  const { text: _text, textSha256: _textSha, pronunciationProfile: _profile, ...identity } = ttsInput();
++  return { ...identity, requestId: `tbpasr1_${'c'.repeat(64)}`,
++    ttsRequestId: identity.requestId, audioSha256 };
++};
++
++function wav(streaming = true) {
++  const bytes = Buffer.alloc(48);
++  bytes.write('RIFF', 0); bytes.writeUInt32LE(streaming ? 0x7fffffbf : 40, 4);
++  bytes.write('WAVEfmt ', 8); bytes.writeUInt32LE(16, 16); bytes.writeUInt16LE(1, 20);
++  bytes.writeUInt16LE(1, 22); bytes.writeUInt32LE(24_000, 24); bytes.writeUInt32LE(48_000, 28);
++  bytes.writeUInt16LE(2, 32); bytes.writeUInt16LE(16, 34); bytes.write('data', 36);
++  bytes.writeUInt32LE(streaming ? 0x7fffff9b : 4, 40);
++  bytes.writeInt16LE(1234, 44); bytes.writeInt16LE(-2345, 46);
++  return bytes;
++}
++const mediaUrl = 'http://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/cosyvoice-v3-flash/20261016/12345/9bd16738-3506-9b8d-939d-52280b8dde40.wav?signature=private';
++const json = (value: unknown) => new Response(JSON.stringify({ request_id: 'provider-request-123',
++  usage: { characters: 12 }, ...(value as object) }), { headers: { 'content-type': 'application/json' } });
++
++describe('isolated formal textbook pinyin audio', () => {
++  let tempRoot: string;
++  beforeEach(async () => {
++    tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'mira-pinyin-audio-'));
++    process.env.MIRA_FORMAL_AUDIO_DATA_DIR = tempRoot;
++  });
++  afterEach(async () => {
++    delete process.env.MIRA_FORMAL_AUDIO_DATA_DIR;
++    await fs.rm(tempRoot, { recursive: true, force: true });
++    vi.restoreAllMocks();
++  });
++
++  it('requires exact explicit profile only for the new namespace', () => {
++    const input = ttsInput();
++    expect(assertMiraFormalTtsRequest(input)).toEqual(input);
++    const { pronunciationProfile: _profile, ...noProfile } = input;
++    for (const bad of [noProfile, { ...input, requestId: 'old-tts' },
++      { ...input, requestId: 'tbptts1_bad' }, { ...input, requestId: `tbpasr1_${'a'.repeat(64)}` },
++      { ...input, pronunciationProfile: { ...input.pronunciationProfile, ssmlSha256: '0'.repeat(64) } },
++      { ...input, pronunciationProfile: { ...input.pronunciationProfile, extra: true } },
++      { ...input, text: 'hello', textSha256: sha('hello') },
++      { ...input, subject: 'science', teacherProfileId: 'mira_science_inquiry', teacherProfileVersion: 1,
++        teacherProfileSha256: '6bdd6746ed1a6a538751f23ff663a9153e7d1db767f7d9d3b6e5dc00d97d5c6b' },
++    ]) expect(() => assertMiraFormalTtsRequest(bad)).toThrow();
++    expect(assertMiraFormalTtsRequest({ ...noProfile, requestId: 'old-tts' })).toBeDefined();
++    const asr = asrInput('d'.repeat(64));
++    expect(assertMiraFormalAsrRequest(asr)).toEqual(asr);
++    for (const bad of [{ ...asr, requestId: 'old-asr' }, { ...asr, ttsRequestId: 'old-tts' },
++      { ...asr, ttsRequestId: `tbbtts2_${'a'.repeat(64)}` },
++      { ...asr, pronunciationProfile: input.pronunciationProfile },
++    ]) expect(() => assertMiraFormalAsrRequest(bad)).toThrow();
++  });
++
++  it('persists and meters actual provider/body, repairs only length bytes, and replays without POST', async () => {
++    const source = wav(); const prepared = prepareMiraTextbookPinyinPronunciation(text);
++    const budget = vi.spyOn(paidBudget, 'budgetedOperation').mockImplementation(
++      async (_provider, _model, _request, _units, work) => work());
++    const fetchMock = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
++      if (init?.method === 'POST') {
++        expect(String(url)).toBe('https://dashscope.aliyuncs.com/api/v1/services/audio/tts/SpeechSynthesizer');
++        expect(init.body).toBe(prepared.providerBody);
++        const pending = await readMiraFormalTtsJob(ttsInput().requestId);
++        expect(pending).toMatchObject({ state: 'running', providerId: 'aliyun-cosyvoice',
++          modelId: 'cosyvoice-v3-flash', voiceId: 'longanwen_v3',
++          providerPronunciation: prepared.providerPronunciation });
++        return json({ output: { audio: { url: mediaUrl } } });
++      }
++      expect(String(url)).toBe(mediaUrl.replace('http:', 'https:'));
++      expect(init?.headers).toBeUndefined();
++      return new Response(source, { headers: { 'content-type': 'audio/wav' } });
++    });
++    const dependencies = { fetchImpl: fetchMock as typeof fetch, resolveAddresses: async () => ['8.8.8.8'] };
++    const first = await executeMiraFormalTts(ttsInput(), dependencies);
++    expect(first.record).toMatchObject({ state: 'succeeded', providerAudioSha256: sha(source),
++      providerRequestId: 'provider-request-123', providerUsage: { characters: 12 },
++      budgetMeasurement: { kind: 'ssml-codepoint-upper-bound', characters: Array.from(prepared.ssml).length, estimated: true },
++      pcmSha256: sha(source.subarray(44)), audioNormalization: {
++        policyVersion: 'mira.wav.streaming-pcm-lengths.v1', applied: true,
++        providerRiffSize: 0x7fffffbf, providerDataSize: 0x7fffff9b,
++        riffSize: 40, dataSize: 4, pcmByteLength: 4, sampleRate: 24000, channels: 1, bitsPerSample: 16,
++      } });
++    const { bytes } = await readMiraFormalTtsAsset(ttsInput().requestId);
++    expect(Buffer.from(bytes)).toEqual(wav(false));
++    expect(first.record.audioSha256).toBe(sha(wav(false)));
++    const replay = await executeMiraFormalTts(ttsInput(), dependencies);
++    expect(replay).toEqual({ record: first.record, created: false });
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++    expect(budget).toHaveBeenCalledWith('aliyun-cosyvoice', 'cosyvoice-v3-flash', expect.objectContaining({
++      logicalRequest: ttsInput(), providerRequest: JSON.parse(prepared.providerBody),
++    }), { calls: 1, characters: Array.from(prepared.ssml).length }, expect.any(Function));
++    const receipt = JSON.stringify(first.record);
++    expect(receipt).not.toContain('secret-not-a-receipt');
++    expect(receipt).not.toContain('signature=private');
++  });
++
++  it('keeps unknown provider outcomes immutable without another POST', async () => {
++    const fetchMock = vi.fn(async () => { throw new Error('network uncertainty'); });
++    const first = await executeMiraFormalTts(ttsInput(), { fetchImpl: fetchMock });
++    expect(first.record.state).toBe('ambiguous');
++    expect((await executeMiraFormalTts(ttsInput(), { fetchImpl: fetchMock })).created).toBe(false);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++  });
++
++  it.each([
++    'http://other.oss-cn-beijing.aliyuncs.com/prod/cosyvoice-v3-flash/20261016/123/x.wav',
++    mediaUrl.replace('/cosyvoice-v3-flash/', '/qwen3-tts-flash/'),
++  ])('rejects unreviewed provider media destinations: %s', async url => {
++    const fetchMock = vi.fn(async () => json({ output: { audio: { url } } }));
++    const result = await executeMiraFormalTts(ttsInput(), { fetchImpl: fetchMock,
++      resolveAddresses: async () => ['8.8.8.8'] });
++    expect(result.record.state).toBe('failed');
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++  });
++
++  it.each(['sample-rate', 'invented-sentinel', 'truncated-data'])('does not normalize an unverified WAV: %s', async defect => {
++    const source = wav();
++    if (defect === 'sample-rate') source.writeUInt32LE(16000, 24);
++    if (defect === 'invented-sentinel') {
++      source.writeUInt32LE(0xffffffff, 4); source.writeUInt32LE(0xffffffdb, 40);
++    }
++    const malformed = defect === 'truncated-data' ? source.subarray(0, 47) : source;
++    const fetchMock = vi.fn(async (_url: unknown, init?: RequestInit) => init?.method === 'POST'
++      ? json({ output: { audio: { url: mediaUrl } } })
++      : new Response(malformed, { headers: { 'content-type': 'audio/wav' } }));
++    const deps = { fetchImpl: fetchMock as typeof fetch, resolveAddresses: async () => ['8.8.8.8'] };
++    const first = await executeMiraFormalTts(ttsInput(), deps);
++    expect(first.record.state).toBe('failed');
++    expect(first.record.safeErrorCode).toBe('media_wav_pcm_invalid');
++    expect((await executeMiraFormalTts(ttsInput(), deps)).created).toBe(false);
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++  });
++
++  it('ASR binds the same TTS pronunciation receipt and exact audio instead of mixing lanes', async () => {
++    const fetchTts = vi.fn(async (_url: unknown, init?: RequestInit) => init?.method === 'POST'
++      ? json({ output: { audio: { url: mediaUrl } } })
++      : new Response(wav(false), { headers: { 'content-type': 'audio/wav' } }));
++    const tts = await executeMiraFormalTts(ttsInput(), { fetchImpl: fetchTts as typeof fetch,
++      resolveAddresses: async () => ['8.8.8.8'] });
++    const fetchAsr = vi.fn(async (_url: unknown, init?: RequestInit) => {
++      const body = JSON.parse(String(init?.body));
++      expect(body.model).toBe('qwen3-asr-flash');
++      expect(body.parameters.asr_options).toEqual({ language: 'zh' });
++      return json({ output: { choices: [{ message: { content: [{ text: '听第二声鹅' }] } }] } });
++    });
++    const result = await executeMiraFormalAsr(asrInput(tts.record.audioSha256!), { fetchImpl: fetchAsr as typeof fetch });
++    expect(result.record).toMatchObject({ state: 'succeeded', providerId: 'qwen-asr', modelId: 'qwen3-asr-flash',
++      providerPronunciation: tts.record.providerPronunciation, providerAsrBodySha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
++    expect((await executeMiraFormalAsr(asrInput(tts.record.audioSha256!), { fetchImpl: fetchAsr as typeof fetch })).created).toBe(false);
++    expect(fetchAsr).toHaveBeenCalledTimes(1);
++    await expect(executeMiraFormalAsr({ ...asrInput(tts.record.audioSha256!), actionId: 'wrong-action' },
++      { fetchImpl: fetchAsr as typeof fetch })).rejects.toThrow();
++    const recordPath = path.join(tempRoot, 'jobs', 'tts', `${sha(ttsInput().requestId)}.json`);
++    const corrupted = JSON.parse(await fs.readFile(recordPath, 'utf8'));
++    corrupted.providerPronunciation.policySha256 = '0'.repeat(64);
++    await fs.writeFile(recordPath, JSON.stringify(corrupted));
++    await expect(executeMiraFormalAsr(asrInput(tts.record.audioSha256!), { fetchImpl: fetchAsr as typeof fetch })).rejects.toThrow();
++    expect(fetchAsr).toHaveBeenCalledTimes(1);
++  });
++});

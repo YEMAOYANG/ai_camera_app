@@ -1,0 +1,692 @@
+diff --git a/app/api/health/route.ts b/app/api/health/route.ts
+--- a/app/api/health/route.ts
++++ b/app/api/health/route.ts
+@@ -1,3 +1,4 @@
++import { getMiraAuthoringModelService } from '@/lib/server/mira-authoring-provider';
+ import { describeDeepSeekService } from '@/lib/ai/deepseek-service';
+ import { apiError, apiSuccess } from '@/lib/server/api-response';
+ import type { NextRequest } from 'next/server';
+@@ -57,7 +58,8 @@
+         runtimePolicy: {
+           formalProviderReadiness: getMiraFormalProviderReadinessPolicy(),
+           modelPolicy,
+-          modelService: describeDeepSeekService(
++          authoringModelService: getMiraAuthoringModelService(),
++      modelService: describeDeepSeekService(
+             resolveBaseUrl('deepseek') || 'https://api.deepseek.com/v1',
+           ),
+         },
+@@ -189,6 +191,7 @@
+       instrumentationBoundary: instrumentationBoundaryPolicy,
+       professionalResearch: getMiraProfessionalResearchPolicy(),
+       modelPolicy,
++      authoringModelService: getMiraAuthoringModelService(),
+       modelService: describeDeepSeekService(
+         resolveBaseUrl('deepseek') || 'https://api.deepseek.com/v1',
+       ),
+diff --git a/lib/ai/deepseek-service.ts b/lib/ai/deepseek-service.ts
+--- a/lib/ai/deepseek-service.ts
++++ b/lib/ai/deepseek-service.ts
+@@ -19,6 +19,20 @@
+   'deepseek-v4-pro': 'deepseek-v4-pro-0813',
+   'deepseek-v4-flash': 'deepseek-v4-flash-0731',
+ };
++
++/** Reviewed authoring service: logical current Flash is never the older 0731 model. */
++export const AUTOROUTER_DEEPSEEK_MODELS: Record<string, string> = {
++  'deepseek-v4-pro': 'deepseek-v4-pro',
++  'deepseek-flash': 'deepseek-v4.1-flash',
++};
++export function isAutoRouterDeepSeekEndpoint(baseUrl: string): boolean {
++  try {
++    const url = new URL(baseUrl);
++    return url.protocol === 'https:' && url.hostname === 'api.autorouter.top'
++      && !url.username && !url.password && !url.port && !url.search && !url.hash
++      && /^\/v1(?:\/chat\/completions)?\/?$/.test(url.pathname);
++  } catch { return false; }
++}
+ 
+ /** Current-alias requests are confined to the verified official service. */
+ export function isOfficialDeepSeekEndpoint(baseUrl: string): boolean {
+@@ -53,6 +67,15 @@
+   endpoint: string,
+   body: Record<string, unknown>,
+ ): Record<string, unknown> {
++  if (isAutoRouterDeepSeekEndpoint(endpoint)) {
++    const model = String(body.model || '');
++    if (!Object.prototype.hasOwnProperty.call(AUTOROUTER_DEEPSEEK_MODELS, model))
++      throw new Error('AutoRouter authoring model is not registered.');
++    const adapted = adaptDeepSeekJsonSchema({ ...body, model: AUTOROUTER_DEEPSEEK_MODELS[model] });
++    if ((adapted.thinking as { type?: string } | undefined)?.type === 'disabled') delete adapted.reasoning_effort;
++    if (adapted.stream !== true) delete adapted.stream_options;
++    return adapted;
++  }
+   if (body.model === 'deepseek-flash') {
+     if (!isOfficialDeepSeekEndpoint(endpoint)) throw new Error('DeepSeek Flash candidate requires the official service.');
+     const adapted = adaptDeepSeekJsonSchema({ ...body });
+@@ -75,6 +98,9 @@
+ }
+ 
+ export function describeDeepSeekService(endpoint: string) {
++  if (isAutoRouterDeepSeekEndpoint(endpoint)) return {
++    service: 'autorouter', wireModels: AUTOROUTER_DEEPSEEK_MODELS, automaticFallback: false,
++  };
+   const bailian = isBailianDeepSeekEndpoint(endpoint);
+   return {
+     service: bailian ? 'bailian' : 'official-or-custom',
+diff --git a/lib/ai/llm.ts b/lib/ai/llm.ts
+--- a/lib/ai/llm.ts
++++ b/lib/ai/llm.ts
+@@ -1,3 +1,4 @@
++import { getModelTransportIdentity, type ModelTransportIdentity } from './model-transport-identity';
+ import { budgetedModel, paidBudgetContext } from '@/lib/server/mira-paid-budget';
+ /**
+  * Unified LLM Call Layer
+@@ -289,13 +290,13 @@
+   const rawModelId = getModelId(params);
+   const providerId = getModelProviderId(params) ?? 'unknown';
+   const modelId = getCanonicalModelId(providerId, rawModelId);
+-  return { source, providerId, modelId, modelString: `${providerId}:${modelId}` };
++  return { source, providerId, modelId, modelString: `${providerId}:${modelId}`, ...getModelTransportIdentity(params.model) };
+ }
+ 
+ /** Record one call's usage. Never throws. */
+ function recordUsageSafe(
+   rawUsage: unknown,
+-  meta: { source: string; providerId: string; modelId: string; modelString: string },
++  meta: { source: string; providerId: string; modelId: string; modelString: string } & Partial<ModelTransportIdentity>,
+ ): void {
+   void (async () => {
+     try {
+@@ -307,6 +308,7 @@
+         providerId: meta.providerId,
+         modelId: meta.modelId,
+         modelString: meta.modelString,
++        ...(meta.providerService ? { providerService: meta.providerService, providerHost: meta.providerHost, wireModelId: meta.wireModelId } : {}),
+         usage: normalizeUsage(rawUsage as never),
+       });
+     } catch (err) {
+diff --git a/lib/ai/model-transport-identity.ts b/lib/ai/model-transport-identity.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/ai/model-transport-identity.ts
+@@ -0,0 +1,17 @@
++/** Non-secret connection provenance carried through model wrappers into usage rows. */
++export interface ModelTransportIdentity {
++  providerService: string;
++  providerHost: string;
++  wireModelId: string;
++}
++const identities = new WeakMap<object, ModelTransportIdentity>();
++export function setModelTransportIdentity(model: unknown, identity: ModelTransportIdentity): void {
++  if (model && typeof model === 'object') identities.set(model, { ...identity });
++}
++export function getModelTransportIdentity(model: unknown): ModelTransportIdentity | undefined {
++  return model && typeof model === 'object' ? identities.get(model) : undefined;
++}
++export function copyModelTransportIdentity(source: unknown, target: unknown): void {
++  const identity = getModelTransportIdentity(source);
++  if (identity) setModelTransportIdentity(target, identity);
++}
+diff --git a/lib/server/agent-runtime/agent-driver-model.ts b/lib/server/agent-runtime/agent-driver-model.ts
+--- a/lib/server/agent-runtime/agent-driver-model.ts
++++ b/lib/server/agent-runtime/agent-driver-model.ts
+@@ -79,7 +79,7 @@
+         `${modelId} cannot combine reasoning_effort with function tools on this transport.`,
+     );
+   }
+-  const connection = await resolveModel({ stage: AGENT_DRIVER_STAGE });
++  const connection = await resolveModel({ stage: AGENT_DRIVER_STAGE, scope: 'courseware-authoring' });
+   const wireMaxOutputTokens = connection.modelInfo?.outputWindow;
+   return {
+     connection,
+diff --git a/lib/server/agent-runtime/generation-ai-call.ts b/lib/server/agent-runtime/generation-ai-call.ts
+--- a/lib/server/agent-runtime/generation-ai-call.ts
++++ b/lib/server/agent-runtime/generation-ai-call.ts
+@@ -28,7 +28,7 @@
+     if (cached) return cached;
+     let resolved: Awaited<ReturnType<typeof resolveModel>> | undefined;
+     const call: AICallFn = async (systemPrompt, userPrompt) => {
+-      resolved ??= await resolveModel({ stage });
++      resolved ??= await resolveModel({ stage, scope: 'courseware-authoring' });
+       const modelOutputWindow = resolved.modelInfo?.outputWindow;
+       const formalTask = getStageRoute(stage)?.enforced === true;
+       const maxOutputTokens = formalTask
+diff --git a/lib/server/classroom-generation.ts b/lib/server/classroom-generation.ts
+--- a/lib/server/classroom-generation.ts
++++ b/lib/server/classroom-generation.ts
+@@ -270,7 +270,7 @@
+     providerId,
+     apiKey,
+     thinkingConfig: classroomThinking,
+-  } = await resolveModel({ stage: 'generate-classroom' });
++  } = await resolveModel({ scope: 'courseware-authoring', stage: 'generate-classroom' });
+   log.info(`Using server-configured model: ${modelString}`);
+ 
+   // Fail fast if the resolved provider has no API key configured
+@@ -355,7 +355,7 @@
+     }
+ 
+     try {
+-      const resolved = await resolveModel({ stage });
++      const resolved = await resolveModel({ stage, scope: 'courseware-authoring' });
+       const entry = {
+         model: resolved.model,
+         modelString: resolved.modelString,
+@@ -536,7 +536,7 @@
+       const rewriteRoute = getStageModel('web-search-query-rewrite');
+       if (rewriteRoute) {
+         try {
+-          const rewriteResolved = await resolveModel({ stage: 'web-search-query-rewrite' });
++          const rewriteResolved = await resolveModel({ scope: 'courseware-authoring', stage: 'web-search-query-rewrite' });
+           searchQueryModel = rewriteResolved.model;
+           searchQueryThinking = rewriteResolved.thinkingConfig;
+         } catch (err) {
+diff --git a/lib/server/mira-authoring-provider.ts b/lib/server/mira-authoring-provider.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-authoring-provider.ts
+@@ -0,0 +1,25 @@
++/** Server-owned courseware connection override; never selected by request headers. */
++import { isAutoRouterDeepSeekEndpoint, AUTOROUTER_DEEPSEEK_MODELS } from '@/lib/ai/deepseek-service';
++
++export function resolveMiraAuthoringConnection(providerId: string, modelId: string) {
++  if (providerId !== 'deepseek') return undefined;
++  const service = process.env.MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE?.trim();
++  if (!service || service === 'inherit') return undefined;
++  if (service !== 'autorouter') throw new Error('MIRA_AUTHORING_SERVICE_INVALID');
++  const apiKey = process.env.AUTOROUTER_DEEPSEEK_API_KEY?.trim();
++  const baseUrl = process.env.AUTOROUTER_DEEPSEEK_BASE_URL?.trim();
++  if (!apiKey || !baseUrl || !isAutoRouterDeepSeekEndpoint(baseUrl)
++    || !/^\/v1\/?$/.test(new URL(baseUrl).pathname))
++    throw new Error('MIRA_AUTHORING_SERVICE_UNAVAILABLE');
++  if (!Object.prototype.hasOwnProperty.call(AUTOROUTER_DEEPSEEK_MODELS, modelId))
++    throw new Error('MIRA_AUTHORING_MODEL_UNSUPPORTED');
++  return { apiKey, baseUrl };
++}
++
++export function getMiraAuthoringModelService() {
++  const connection = resolveMiraAuthoringConnection('deepseek', 'deepseek-v4-pro');
++  return connection
++    ? { scope: 'courseware-authoring', service: 'autorouter', host: 'api.autorouter.top',
++        wireModels: AUTOROUTER_DEEPSEEK_MODELS, automaticFallback: false }
++    : { scope: 'courseware-authoring', service: 'inherit', automaticFallback: false };
++}
+diff --git a/lib/server/mira-courseware-provider.ts b/lib/server/mira-courseware-provider.ts
+--- a/lib/server/mira-courseware-provider.ts
++++ b/lib/server/mira-courseware-provider.ts
+@@ -1,3 +1,4 @@
++import { copyModelTransportIdentity, getModelTransportIdentity } from '@/lib/ai/model-transport-identity';
+ import { createHash, timingSafeEqual } from 'node:crypto';
+ import { mkdir, open } from 'node:fs/promises';
+ import { join, resolve } from 'node:path';
+@@ -256,7 +257,7 @@
+   const coursewareRole = (getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID
+     || (getMiraSelectedModelPolicyId() === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID && legacyRole === COURSEWARE_VERIFIER))
+     ? { ...legacyRole, modelId: MIRA_DEEPSEEK_CURRENT_FLASH_MODEL_ID } : legacyRole;
+-  const resolved = await resolveModel({ stage: coursewareRole.stage });
++  const resolved = await resolveModel({ stage: coursewareRole.stage, scope: 'courseware-authoring' });
+   if (
+     resolved.providerId !== coursewareRole.providerId ||
+     resolved.modelId !== coursewareRole.modelId ||
+@@ -279,6 +280,7 @@
+     model: resolved.model as Parameters<typeof wrapLanguageModel>[0]['model'],
+     middleware: defaultSettingsMiddleware({ settings: { responseFormat } }),
+   });
++  copyModelTransportIdentity(resolved.model, coursewareModel);
+   const timeoutSignal = AbortSignal.timeout(COURSEWARE_CALL_TIMEOUT_MS);
+   const abortSignal = callerSignal ? AbortSignal.any([callerSignal, timeoutSignal]) : timeoutSignal;
+   abortSignal.throwIfAborted();
+@@ -307,6 +309,7 @@
+         schemaVersion: 'mira.openmaic.courseware-provider-response.v1',
+         requestId, phase, inputSha256: qualitySha(body),
+         providerId: resolved.providerId, requestedModelId: resolved.modelId,
++        ...getModelTransportIdentity(resolved.model),
+         responseId: result.response?.id ?? null,
+         responseModelId: result.response?.modelId ?? null,
+         content: result.text, usage: result.totalUsage ?? result.usage,
+diff --git a/lib/server/mira-formal-visual-review.ts b/lib/server/mira-formal-visual-review.ts
+--- a/lib/server/mira-formal-visual-review.ts
++++ b/lib/server/mira-formal-visual-review.ts
+@@ -1,9 +1,10 @@
++import { copyModelTransportIdentity, getModelTransportIdentity } from '@/lib/ai/model-transport-identity';
+ import { createHash } from 'node:crypto';
+ import { mkdir, open, readFile, realpath } from 'node:fs/promises';
+ import { isAbsolute, join, relative, resolve } from 'node:path';
+ import { defaultSettingsMiddleware, wrapLanguageModel } from 'ai';
+ import { callLLM } from '@/lib/ai/llm';
+-import { isOfficialDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
++import { isOfficialDeepSeekEndpoint, isAutoRouterDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
+ import { resolveModel } from './resolve-model';
+ import { paidBudgetContext } from './mira-paid-budget';
+ import { checkedPngDimensions } from './mira-vision-meter';
+@@ -47,17 +48,17 @@
+       .includes(modelId)
+   )
+     throw new Error('FORMAL_VISUAL_MODEL_NOT_CONFIGURED');
+-  const resolved = await resolveModel({ modelString: `deepseek:${modelId}` });
++  const resolved = await resolveModel({ modelString: `deepseek:${modelId}`, scope: 'courseware-authoring' });
+   const endpoint = new URL(resolved.baseUrl || 'https://api.deepseek.com/v1');
+   if (
+     resolved.providerId !== 'deepseek' ||
+     resolved.modelId !== modelId ||
+     !resolved.apiKey ||
+     endpoint.protocol !== 'https:' ||
+-    endpoint.hostname !== 'api.deepseek.com' ||
++    (endpoint.hostname !== 'api.deepseek.com' && !(modelId === 'deepseek-flash' && isAutoRouterDeepSeekEndpoint(endpoint.href))) ||
+     endpoint.username ||
+     endpoint.password ||
+-    ((input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID || input.modelPolicyId === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) && !isOfficialDeepSeekEndpoint(endpoint.href))
++    ((input.modelPolicyId === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID || input.modelPolicyId === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) && !isOfficialDeepSeekEndpoint(endpoint.href) && !isAutoRouterDeepSeekEndpoint(endpoint.href))
+   )
+     throw new Error('FORMAL_VISUAL_PROVIDER_UNAVAILABLE');
+ 
+@@ -110,6 +111,7 @@
+     model: resolved.model as Parameters<typeof wrapLanguageModel>[0]['model'],
+     middleware: defaultSettingsMiddleware({ settings: { responseFormat: { type: 'json' } } }),
+   });
++  copyModelTransportIdentity(resolved.model, model);
+   const timeout = AbortSignal.timeout(180_000);
+   const result = await callLLM(
+     {
+@@ -139,6 +141,7 @@
+     authorizationId: paidBudgetContext.getStore()!.binding.authorizationId,
+     providerId: resolved.providerId,
+     requestedModelId: resolved.modelId,
++        ...getModelTransportIdentity(resolved.model),
+     responseId: result.response?.id ?? null,
+     responseModelId: result.response?.modelId ?? null,
+     content: result.text,
+diff --git a/lib/server/resolve-model.ts b/lib/server/resolve-model.ts
+--- a/lib/server/resolve-model.ts
++++ b/lib/server/resolve-model.ts
+@@ -16,6 +16,9 @@
+ } from '@/lib/server/provider-config';
+ import { validateUrlForSSRF } from '@/lib/server/ssrf-guard';
+ import { getStageRoute, type LlmStage } from '@/lib/server/model-routes';
++import { resolveMiraAuthoringConnection } from './mira-authoring-provider';
++import { describeDeepSeekService } from '@/lib/ai/deepseek-service';
++import { setModelTransportIdentity } from '@/lib/ai/model-transport-identity';
+ 
+ export interface ResolvedModel extends ModelWithInfo {
+   /** Original model string (e.g. "openai/gpt-4o-mini") */
+@@ -38,6 +41,8 @@
+  * Use this when model config comes from the request body.
+  */
+ export async function resolveModel(params: {
++  /** Internal call-site marker. HTTP headers/body never populate this field. */
++  scope?: 'courseware-authoring';
+   modelString?: string;
+   /**
+    * Optional generation stage (a `callLLM` source label, e.g. 'scene-content').
+@@ -108,8 +113,12 @@
+     }
+   }
+ 
+-  const apiKey = resolveApiKey(providerId, clientApiKey || '');
+-  const baseUrl = resolveBaseUrl(providerId, clientBaseUrl);
++  const configuredApiKey = resolveApiKey(providerId, clientApiKey || '');
++  const configuredBaseUrl = resolveBaseUrl(providerId, clientBaseUrl);
++  const authoring = params.scope === 'courseware-authoring'
++    ? resolveMiraAuthoringConnection(providerId, modelId) : undefined;
++  const apiKey = authoring?.apiKey ?? configuredApiKey;
++  const baseUrl = authoring?.baseUrl ?? configuredBaseUrl;
+   const proxy = resolveProxy(providerId);
+   const { model, modelInfo } = getModel({
+     providerId,
+@@ -119,6 +128,12 @@
+     proxy,
+     providerType: clientProviderType as ProviderType | undefined,
+   });
++  if (providerId === 'deepseek') {
++    const endpoint = baseUrl || getProvider(providerId)?.defaultBaseUrl || 'https://api.deepseek.com/v1';
++    const service = describeDeepSeekService(endpoint);
++    setModelTransportIdentity(model, { providerService: service.service,
++      providerHost: new URL(endpoint).hostname, wireModelId: service.wireModels[modelId] || modelId });
++  }
+ 
+   // Thinking arbitration mirrors model routing — the route carries a full
+   // ThinkingConfig (mode/effort/level/enabled/budgetTokens/…) which callLLM
+diff --git a/lib/server/usage-storage.ts b/lib/server/usage-storage.ts
+--- a/lib/server/usage-storage.ts
++++ b/lib/server/usage-storage.ts
+@@ -1,3 +1,4 @@
++import type { ModelTransportIdentity } from '@/lib/ai/model-transport-identity';
+ import { promises as fs } from 'fs';
+ import path from 'path';
+ import { createLogger } from '@/lib/logger';
+@@ -23,7 +24,7 @@
+ export type UsageUnit = 'token' | 'image' | 'second' | 'character';
+ 
+ /** Input to record one generation's usage. */
+-export interface UsageRecordInput {
++export interface UsageRecordInput extends Partial<ModelTransportIdentity> {
+   /** Modality. Defaults to 'llm'. */
+   kind?: UsageKind;
+   source: string;
+@@ -39,7 +40,7 @@
+ }
+ 
+ /** A persisted usage row — pure usage, no cost. */
+-export interface UsageRecord {
++export interface UsageRecord extends Partial<ModelTransportIdentity> {
+   id: string;
+   createdAt: number;
+   kind: UsageKind;
+@@ -118,6 +119,7 @@
+       providerId: input.providerId,
+       modelId: input.modelId,
+       modelString: input.modelString,
++      ...(input.providerService ? { providerService: input.providerService, providerHost: input.providerHost, wireModelId: input.wireModelId } : {}),
+       inputTokens: usage.inputTokens,
+       outputTokens: usage.outputTokens,
+       cacheReadTokens: usage.cacheReadTokens,
+diff --git a/tests/agent-runtime/agent-driver-model.test.ts b/tests/agent-runtime/agent-driver-model.test.ts
+--- a/tests/agent-runtime/agent-driver-model.test.ts
++++ b/tests/agent-runtime/agent-driver-model.test.ts
+@@ -90,7 +90,7 @@
+         await import('@/lib/server/agent-runtime/agent-driver-model');
+       const resolved = await resolveAgentDriverModel();
+ 
+-      expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'maic-agent-driver' });
++      expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'maic-agent-driver', scope: 'courseware-authoring' });
+       expect(resolved.piModel).toMatchObject({
+         id: modelId,
+         provider: 'openai',
+diff --git a/tests/server/classroom-generation-retry.test.ts b/tests/server/classroom-generation-retry.test.ts
+--- a/tests/server/classroom-generation-retry.test.ts
++++ b/tests/server/classroom-generation-retry.test.ts
+@@ -256,7 +256,7 @@
+ 
+     await generateWithProgress();
+ 
+-    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'scene-content:slide' });
++    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'scene-content:slide', scope: 'courseware-authoring' });
+     expect(mocks.callLLM).toHaveBeenCalledWith(
+       expect.objectContaining({
+         model: { id: 'structured-scene-model' },
+diff --git a/tests/server/classroom-generation-sample-policy.test.ts b/tests/server/classroom-generation-sample-policy.test.ts
+--- a/tests/server/classroom-generation-sample-policy.test.ts
++++ b/tests/server/classroom-generation-sample-policy.test.ts
+@@ -146,7 +146,7 @@
+     );
+ 
+     expect(mocks.generateSceneOutlinesFromRequirements).not.toHaveBeenCalled();
+-    expect(mocks.resolveModel).not.toHaveBeenCalledWith({ stage: 'agent-profiles' });
++    expect(mocks.resolveModel).not.toHaveBeenCalledWith({ stage: 'agent-profiles', scope: 'courseware-authoring' });
+     expect(mocks.generateSceneContent).toHaveBeenCalledTimes(10);
+     expect(mocks.generateSceneActions).toHaveBeenCalledTimes(10);
+     expect(result.scenes).toHaveLength(10);
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -125,6 +125,27 @@
+     delete process.env.MIRA_OPENMAIC_TTS_CREDENTIAL_RECOVERY_PATCH_SHA256;
+   });
+ 
++  it('reports authoring supply separately from unchanged student supply without credentials', async () => {
++    process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-current-flash-v1';
++    process.env.DEEPSEEK_API_KEY = 'original-test-only';
++    process.env.DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1';
++    vi.stubEnv('MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE', 'autorouter');
++    vi.stubEnv('AUTOROUTER_DEEPSEEK_API_KEY', 'author-test-secret-must-not-leak');
++    vi.stubEnv('AUTOROUTER_DEEPSEEK_BASE_URL', 'https://api.autorouter.top/v1');
++    try {
++      const { GET } = await import('@/app/api/health/route');
++      const response = await GET(healthRequest()); const body = await response.json();
++      expect(response.status).toBe(200);
++      expect(body.runtimePolicy.authoringModelService).toEqual({ scope: 'courseware-authoring', service: 'autorouter',
++        host: 'api.autorouter.top', wireModels: { 'deepseek-v4-pro': 'deepseek-v4-pro', 'deepseek-flash': 'deepseek-v4.1-flash' }, automaticFallback: false });
++      expect(body.runtimePolicy.modelService).toMatchObject({ service: 'official-or-custom', wireModels: { 'deepseek-flash': 'deepseek-flash' } });
++      expect(body.runtimePolicy.tts).toMatchObject({ providerId: 'qwen-tts', voiceId: 'Serena' });
++      expect(body.runtimePolicy.asr).toMatchObject({ providerId: 'qwen-asr' });
++      expect(JSON.stringify(body)).not.toContain('author-test-secret');
++      expect(JSON.stringify(body)).not.toContain('original-test-only');
++    } finally { vi.unstubAllEnvs(); }
++  });
++
+   it('returns the exact policy resolved from the effective server-owned routes', async () => {
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY = 'deepseek-v4-pro-flash-v1';
+     process.env.MODEL_ROUTES = JSON.stringify({
+diff --git a/tests/server/mira-authoring-provider.test.ts b/tests/server/mira-authoring-provider.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-authoring-provider.test.ts
+@@ -0,0 +1,168 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { generateText } from 'ai';
++import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join, resolve } from 'node:path';
++import { spawnSync } from 'node:child_process';
++import { NextRequest } from 'next/server';
++import { resolveModel, resolveModelFromRequest } from '@/lib/server/resolve-model';
++import { getMiraAuthoringModelService } from '@/lib/server/mira-authoring-provider';
++import { getModelTransportIdentity, copyModelTransportIdentity } from '@/lib/ai/model-transport-identity';
++import { recordUsage, readUsageRecords } from '@/lib/server/usage-storage';
++import { adaptDeepSeekRequest, isAutoRouterDeepSeekEndpoint } from '@/lib/ai/deepseek-service';
++
++vi.mock('@/lib/server/provider-config', () => ({
++  isServerConfiguredProvider: () => true,
++  resolveApiKey: () => 'official-test-only',
++  resolveBaseUrl: () => 'https://api.deepseek.com/v1',
++  resolveProxy: () => undefined,
++}));
++
++beforeEach(() => {
++  vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY', 'deepseek-v4-pro-current-flash-v1');
++  vi.stubEnv('MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE', 'autorouter');
++  vi.stubEnv('AUTOROUTER_DEEPSEEK_API_KEY', 'autorouter-test-only');
++  vi.stubEnv('AUTOROUTER_DEEPSEEK_BASE_URL', 'https://api.autorouter.top/v1');
++});
++afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
++
++describe('server-only authoring supply', () => {
++  it('changes only an explicit internal scope, including when the stage name is identical', async () => {
++    const author = await resolveModel({ stage: 'scene-content', scope: 'courseware-authoring' });
++    const unscoped = await resolveModel({ stage: 'scene-content' });
++    expect(author).toMatchObject({ providerId: 'deepseek', modelId: 'deepseek-v4-pro',
++      apiKey: 'autorouter-test-only', baseUrl: 'https://api.autorouter.top/v1' });
++    expect(unscoped).toMatchObject({ apiKey: 'official-test-only', baseUrl: 'https://api.deepseek.com/v1' });
++    expect(getModelTransportIdentity(author.model)).toEqual({ providerService: 'autorouter',
++      providerHost: 'api.autorouter.top', wireModelId: 'deepseek-v4-pro' });
++  });
++  it.each(['chat-adapter', 'pbl-chat', 'pbl-v2-runtime', 'quiz-grade'] as const)
++    ('keeps student %s on the original connection despite forged scope fields', async stage => {
++      const request = new NextRequest('http://localhost/api/student', { headers: {
++        'x-model': 'deepseek:deepseek-v4-pro', 'x-mira-scope': 'courseware-authoring',
++        'x-base-url': 'https://api.autorouter.top/v1', 'x-api-key': 'attacker',
++      } });
++      const model = await resolveModelFromRequest(request, { scope: 'courseware-authoring' }, stage);
++      expect(model).toMatchObject({ apiKey: 'official-test-only', baseUrl: 'https://api.deepseek.com/v1' });
++      expect(getModelTransportIdentity(model.model)?.providerHost).toBe('api.deepseek.com');
++    });
++  it.each(['', 'inherit'])('does not use the extra key without explicit opt-in: %s', async service => {
++    vi.stubEnv('MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE', service);
++    expect(await resolveModel({ stage: 'maic-agent-driver', scope: 'courseware-authoring' }))
++      .toMatchObject({ apiKey: 'official-test-only', baseUrl: 'https://api.deepseek.com/v1' });
++    expect(getMiraAuthoringModelService().service).toBe('inherit');
++  });
++  it.each(['unknown-service', 'missing-key', 'wrong-endpoint', 'old-model'])('fails closed: %s', async scenario => {
++    if (scenario === 'unknown-service') vi.stubEnv('MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE', 'other');
++    if (scenario === 'missing-key') vi.stubEnv('AUTOROUTER_DEEPSEEK_API_KEY', '');
++    if (scenario === 'wrong-endpoint') vi.stubEnv('AUTOROUTER_DEEPSEEK_BASE_URL', 'https://api.autorouter.top.attacker.test/v1');
++    const promise = resolveModel({ modelString: scenario === 'old-model' ? 'deepseek:deepseek-v4-flash' : 'deepseek:deepseek-flash', scope: 'courseware-authoring' });
++    await expect(promise).rejects.toThrow(/MIRA_AUTHORING_/);
++  });
++  it('publishes only service/host/wire identity and leaves non-DeepSeek models alone', async () => {
++    expect(getMiraAuthoringModelService()).toEqual({ scope: 'courseware-authoring', service: 'autorouter',
++      host: 'api.autorouter.top', wireModels: { 'deepseek-v4-pro': 'deepseek-v4-pro', 'deepseek-flash': 'deepseek-v4.1-flash' }, automaticFallback: false });
++    const other = await resolveModel({ modelString: 'openai:gpt-5.4', scope: 'courseware-authoring' });
++    expect(other.apiKey).toBe('official-test-only');
++    expect(getModelTransportIdentity(other.model)).toBeUndefined();
++  });
++  it.each(['deepseek-v4-pro', 'deepseek-flash'])('uses the actual AI SDK request path for %s without network I/O', async modelId => {
++    const calls: Array<{ url: string; key: string | null; body: any }> = [];
++    vi.stubGlobal('fetch', vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
++      const body = JSON.parse(String(init?.body));
++      calls.push({ url: String(url), key: new Headers(init?.headers).get('authorization'), body });
++      return new Response(JSON.stringify({ id: 'test-response', object: 'chat.completion', created: 1,
++        model: body.model, choices: [{ index: 0, message: { role: 'assistant', content: 'ok' }, finish_reason: 'stop' }],
++        usage: { prompt_tokens: 12, completion_tokens: 3, total_tokens: 15, prompt_tokens_details: { cached_tokens: 4 } } }),
++      { headers: { 'Content-Type': 'application/json' } });
++    }));
++    const connection = await resolveModel({ modelString: `deepseek:${modelId}`, scope: 'courseware-authoring' });
++    const result = await generateText({ model: connection.model, prompt: 'fixture', maxRetries: 0 });
++    expect(result.text).toBe('ok'); expect(calls).toHaveLength(1);
++    expect(calls[0]).toMatchObject({ url: 'https://api.autorouter.top/v1/chat/completions', key: 'Bearer autorouter-test-only',
++      body: { model: modelId === 'deepseek-flash' ? 'deepseek-v4.1-flash' : modelId } });
++    expect(result.response.modelId).toBe(calls[0].body.model);
++  });
++  it('retains actual supply identity across wrappers and persistent usage rows', async () => {
++    const connection = await resolveModel({ modelString: 'deepseek:deepseek-flash', scope: 'courseware-authoring' });
++    const wrapper = {}; copyModelTransportIdentity(connection.model, wrapper);
++    const identity = getModelTransportIdentity(wrapper)!;
++    const folder = mkdtempSync(join(tmpdir(), 'authoring-usage-'));
++    try {
++      await recordUsage({ kind: 'llm', source: 'scene-actions', providerId: 'deepseek', modelId: 'deepseek-flash',
++        modelString: 'deepseek:deepseek-flash', ...identity,
++        usage: { inputTokens: 12, outputTokens: 3, cacheReadTokens: 4, cacheCreationTokens: 0, reasoningTokens: 1 } }, { baseDir: folder });
++      expect(await readUsageRecords({ baseDir: folder })).toEqual([expect.objectContaining({
++        ...identity, modelId: 'deepseek-flash', inputTokens: 12, outputTokens: 3, cacheReadTokens: 4 })]);
++    } finally { rmSync(folder, { recursive: true, force: true }); }
++  });
++});
++
++describe('AutoRouter DeepSeek wire boundary', () => {
++  it('keeps tool calls, thinking and streaming usage with the exact current Flash wire name', () => {
++    const body = { model: 'deepseek-flash', thinking: { type: 'enabled' }, stream: true,
++      stream_options: { include_usage: true }, tools: [{ type: 'function', function: { name: 'generate_scene' } }],
++      messages: [{ role: 'assistant', reasoning_content: 'prior', tool_calls: [{ id: 'tool-1' }] }] };
++    expect(adaptDeepSeekRequest('https://api.autorouter.top/v1/chat/completions', body))
++      .toEqual({ ...body, model: 'deepseek-v4.1-flash' });
++    expect(body.model).toBe('deepseek-flash');
++  });
++  it('preserves JSON schema and disables verifier reasoning without changing the official request', () => {
++    const body = { model: 'deepseek-flash', thinking: { type: 'disabled' }, reasoning_effort: 'high',
++      stream_options: { include_usage: true }, messages: [{ role: 'user', content: 'review' }],
++      response_format: { type: 'json_schema', json_schema: { schema: { type: 'object', required: ['status'] } } } };
++    const result = adaptDeepSeekRequest('https://api.autorouter.top/v1/chat/completions', body);
++    expect(result).toMatchObject({ model: 'deepseek-v4.1-flash', response_format: { type: 'json_object' } });
++    expect(result).not.toHaveProperty('reasoning_effort'); expect(result).not.toHaveProperty('stream_options');
++    expect(JSON.stringify(result.messages)).toContain('status');
++    expect(adaptDeepSeekRequest('https://api.deepseek.com/v1/chat/completions', body).model).toBe('deepseek-flash');
++  });
++  it.each(['http://api.autorouter.top/v1', 'https://api.autorouter.top.attacker.test/v1',
++    'https://user:pass@api.autorouter.top/v1', 'https://api.autorouter.top:444/v1',
++    'https://api.autorouter.top/v1?key=private', 'https://api.autorouter.top/v1#private',
++    'https://api.autorouter.top/other', 'https://api.autorouter.top/v1/responses'])('rejects %s', endpoint => {
++      expect(isAutoRouterDeepSeekEndpoint(endpoint)).toBe(false);
++      expect(() => adaptDeepSeekRequest(endpoint, { model: 'deepseek-flash' })).toThrow();
++    });
++  it.each(['deepseek-v4-flash', 'deepseek-v4-flash-0731', 'deepseek-v4.1-flash', 'other'])
++    ('does not silently substitute or accept an unregistered logical model: %s', model => {
++      expect(() => adaptDeepSeekRequest('https://api.autorouter.top/v1/chat/completions', { model })).toThrow(/not registered/);
++    });
++});
++
++describe('managed launcher authoring configuration', () => {
++  const source = readFileSync(resolve('../../scripts/native-runtime.sh'), 'utf8');
++  const loader = source.match(/load_openmaic_authoring_model_env\(\) \{[\s\S]*?\n\}/)![0];
++  const expectedService = source.match(/expected_openmaic_authoring_service\(\) \{[\s\S]*?\n\}/)![0];
++  function launch(overrides: Record<string, string | undefined> = {}) {
++    const script = `model_provider_env_file() { printf fixture; }
++read_env_value() { case "$1" in
++MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE) printf '%s' "$FIXTURE_SERVICE";;
++AUTOROUTER_DEEPSEEK_API_KEY) printf '%s' "$FIXTURE_KEY";;
++AUTOROUTER_DEEPSEEK_BASE_URL) printf '%s' "$FIXTURE_URL";; esac; }
++OPENMAIC_DEFAULT_MODEL=deepseek:deepseek-v4-pro
++OPENMAIC_DEEPSEEK_API_KEY=original-test-only
++OPENMAIC_TTS_QWEN_API_KEY=tts-test-only
++${expectedService}
++${loader}
++load_openmaic_authoring_model_env || exit $?
++printf '%s|%s|%s|%s' "$OPENMAIC_DEEPSEEK_API_KEY" "$OPENMAIC_TTS_QWEN_API_KEY" "$OPENMAIC_AUTHORING_DEEPSEEK_SERVICE" "$OPENMAIC_AUTHORING_DEEPSEEK_API_KEY"`;
++    return spawnSync('bash', ['-c', script], { encoding: 'utf8', env: { NODE_ENV: 'test', PATH: process.env.PATH,
++      FIXTURE_SERVICE: 'autorouter', FIXTURE_KEY: 'author-test-only', FIXTURE_URL: 'https://api.autorouter.top/v1',
++      OPENMAIC_STRUCTURED_SCENE_POLICY_ID: 'deepseek-v4-pro-current-flash-v1', ...overrides } });
++  }
++  it('uses the separate pair without changing student or TTS credentials', () => {
++    const result = launch(); expect(result.status, result.stderr).toBe(0);
++    expect(result.stdout).toBe('original-test-only|tts-test-only|autorouter|author-test-only');
++  });
++  it.each([{ FIXTURE_KEY: '' }, { FIXTURE_URL: 'https://api.deepseek.com/v1' },
++    { FIXTURE_SERVICE: 'other' }, { OPENMAIC_STRUCTURED_SCENE_POLICY_ID: 'deepseek-v4-pro-flash-v1' }])
++    ('rejects an incomplete or inconsistent authoring configuration: %j', overrides => {
++      const result = launch(overrides); expect(result.status).not.toBe(0);
++      expect(result.stdout).toBe(''); expect(result.stderr).not.toContain('author-test-only');
++    });
++  it('leaves override empty when the operator has not selected it', () => {
++    const result = launch({ FIXTURE_SERVICE: 'inherit', FIXTURE_KEY: '' });
++    expect(result.status).toBe(0); expect(result.stdout).toBe('original-test-only|tts-test-only||');
++  });
++});
+diff --git a/tests/server/mira-courseware-provider.test.ts b/tests/server/mira-courseware-provider.test.ts
+--- a/tests/server/mira-courseware-provider.test.ts
++++ b/tests/server/mira-courseware-provider.test.ts
+@@ -80,7 +80,7 @@
+     const result = await executeMiraCoursewareProvider(request());
+ 
+     expect(mocks.resolveModel).toHaveBeenCalledTimes(1);
+-    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'mira-courseware-creator' });
++    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'mira-courseware-creator', scope: 'courseware-authoring' });
+     expect(mocks.wrapLanguageModel).toHaveBeenCalledTimes(1);
+     expect(mocks.defaultSettingsMiddleware).toHaveBeenCalledWith({
+       settings: {
+@@ -128,7 +128,7 @@
+ 
+       await executeMiraCoursewareProvider(request(phase));
+ 
+-      expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'mira-courseware-verifier' });
++      expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'mira-courseware-verifier', scope: 'courseware-authoring' });
+       expect(mocks.callLLM).toHaveBeenCalledWith(
+         expect.objectContaining({ temperature: 0.1, maxRetries: 0 }),
+         'mira-courseware-provider',
+@@ -158,7 +158,7 @@
+       model: { provider: 'deepseek', modelId: 'deepseek-v4-flash' }, modelInfo: { outputWindow: 16000 }, apiKey: 'runtime-owned-key' });
+     const { executeMiraCoursewareProvider } = await import('@/lib/server/mira-courseware-provider');
+     const result = await executeMiraCoursewareProvider(request('learner_discussion_repair'));
+-    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'mira-courseware-verifier' });
++    expect(mocks.resolveModel).toHaveBeenCalledWith({ stage: 'mira-courseware-verifier', scope: 'courseware-authoring' });
+     expect(result.phase).toBe('learner_discussion_repair');
+     expect(mocks.callLLM).toHaveBeenCalledTimes(1);
+   });
+@@ -279,7 +279,7 @@
+       const result=await executeMiraCoursewareProvider(request(phase));
+       expect(result.phase).toBe(phase);expect(mocks.callLLM).toHaveBeenCalledOnce();
+       expect(mocks.wrapLanguageModel).toHaveBeenCalledWith(expect.objectContaining({model:expect.objectContaining({modelId})}));
+-      expect(mocks.resolveModel).toHaveBeenCalledWith({stage:phase==='outline'?'mira-courseware-creator':'mira-courseware-verifier'});
++      expect(mocks.resolveModel).toHaveBeenCalledWith({stage:phase==='outline'?'mira-courseware-creator':'mira-courseware-verifier',scope:'courseware-authoring'});
+     });
+   it('rejects the legacy verifier in the new verifier policy before dispatch',async()=>{
+     process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY='deepseek-v4-pro-current-flash-v1';
+diff --git a/tests/server/mira-flash-formal-visual.test.ts b/tests/server/mira-flash-formal-visual.test.ts
+--- a/tests/server/mira-flash-formal-visual.test.ts
++++ b/tests/server/mira-flash-formal-visual.test.ts
+@@ -61,7 +61,7 @@
+   it.each(['deepseek-v4.1-flash-candidate-v1','deepseek-v4-pro-current-flash-v1'] as const)('requests current Flash with actual PNG and frozen identity %s', async selectedId => {
+     vi.stubEnv('MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY',selectedId); input.modelPolicyId=selectedId;
+     const result = await reviewFormalVisualSnapshot(input);
+-    expect(mocks.resolve).toHaveBeenCalledWith({ modelString: 'deepseek:deepseek-flash' });
++    expect(mocks.resolve).toHaveBeenCalledWith({ modelString: 'deepseek:deepseek-flash', scope: 'courseware-authoring' });
+     expect(mocks.call).toHaveBeenCalledOnce();
+     const [request, source, , thinking] = mocks.call.mock.calls[0];
+     expect(source).toBe('mira-formal-visual-review');
+@@ -73,6 +73,17 @@
+     const archiveFolder = join(resolve('data/formal-visual-provider-responses'), input.snapshotSha256);
+     const archive = JSON.parse(await readFile(join(archiveFolder, (await readdir(archiveFolder))[0]), 'utf8'));
+     expect(archive).toMatchObject({ modelPolicyId: selectedId, requestedModelId: 'deepseek-flash', responseModelId: 'deepseek-flash' });
++  });
++  it('accepts only the reviewed AutoRouter current-Flash endpoint while keeping logical policy identity', async () => {
++    mocks.resolve.mockResolvedValue(resolved('deepseek-flash', 'https://api.autorouter.top/v1'));
++    mocks.call.mockResolvedValue({ text: JSON.stringify(returnedReview()), response: { id: 'fixture-auto', modelId: 'deepseek-v4.1-flash' }, usage: { inputTokens: 20, outputTokens: 10 } });
++    const result = await reviewFormalVisualSnapshot(input);
++    expect(result).toMatchObject({ modelId: 'deepseek-flash', providerResponseModelId: 'deepseek-v4.1-flash' });
++    expect(() => assertVisualReview(result, input)).not.toThrow();
++    mocks.call.mockClear();
++    mocks.resolve.mockResolvedValue(resolved('deepseek-flash', 'https://api.autorouter.top.attacker.test/v1'));
++    await expect(reviewFormalVisualSnapshot(input)).rejects.toThrow('FORMAL_VISUAL_PROVIDER_UNAVAILABLE');
++    expect(mocks.call).not.toHaveBeenCalled();
+   });
+   it.each(['missing-server', 'legacy-server', 'missing-input'])('rejects %s before resolving or calling a model', async scenario => {
+     if (scenario === 'missing-server') delete process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY;

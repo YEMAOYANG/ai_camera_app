@@ -300,5 +300,16 @@ html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
 }
 /* The saved OpenMAIC lesson owns its playback layout below the pinned header. */
 .textbook-classroom .schoolbag-main { max-width: none; padding: 0; }
+.textbook-classroom .textbook-classroom-state {
+  min-height: calc(100dvh - 64px);
+  align-content: center;
+  justify-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+  text-align: center;
+}
+.textbook-classroom-state-icon { width: 64px; height: 64px; color: var(--mira-ai); stroke-width: 1.5; }
+.textbook-classroom-state h1 { font-size: clamp(24px, 4vw, 32px); font-weight: 750; line-height: 1.4; }
+.textbook-classroom-state p { max-width: 32em; color: var(--mira-muted); overflow-wrap: anywhere; }
 .textbook-classroom-frame { display: block; width: 100%; height: calc(100dvh - 64px); min-height: 0; border: 0; background: #fbf7ec; }
 @media (max-width: 640px) { .textbook-classroom-frame { height: calc(100dvh - 60px); min-height: 0; } }

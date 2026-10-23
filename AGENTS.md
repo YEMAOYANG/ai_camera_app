@@ -86,6 +86,15 @@ For **all grade 1–2 student games, courseware, questions, answer choices and l
 - Validate by covering the non-target text: can a child follow the spoken instruction, distinguish the pictures, answer and continue? Report picture-supported comprehension separately from unsupported character-reading ability.
 - Read `docs/learning/low-reading-interaction-rule.md` before changing low-grade learning content. The generation policy is `backend/content/low_reading_policy.v1.json`; native activities must follow it too.
 
+## Textbook Authoring and Review Rules
+
+For Chinese, mathematics, English and science textbook authoring or review, read `backend/content/textbook_interaction_policy.v1.json` together with `docs/learning/low-reading-interaction-rule.md`. `CLAUDE.md` imports these same sources for Claude; do not maintain a separate conflicting game rule set.
+
+- The accepted 《金木水火土》 v7 is a quality reference, not a fixed page count, type order or activity template. Choose the teaching sequence and mechanisms from the verified lesson goals. Pointing, tapping, dragging and matching are input examples, not a closed list of games.
+- Record the child's decision, domain state, state transition, computed outcome, feedback/revision opportunity and bounded learning evidence in the existing teaching plan. Different pictures, scores or renderer labels do not establish different mechanics. Explain deliberate repetition and test transfer within the same scope.
+- New workbench jobs freeze and dispatch the complete interaction policy. Verify the actual frozen snapshot and request before claiming it was applied; a rule file or generated page is not play acceptance. Existing frozen jobs retain their original identities. Explicitly authorized repairs need a preserved original and a traceable revision or follow-up, not silent replacement of the frozen request.
+- Keep textbook accuracy, picture-supported comprehension, teacher audio, real play, recovery, review, publication receipt and student-entry acceptance separate. Do not turn an observation or supported selection into a claim of independent reading, speaking or mastery.
+
 ## Flutter Work
 
 Flutter code lives in `mobile/`. Follow `mobile/AGENTS.md` for all Flutter changes.

@@ -1,0 +1,124 @@
+--- a/lib/server/mira-textbook-asset-revision.ts
++++ b/lib/server/mira-textbook-asset-revision.ts
+@@ -217,7 +217,7 @@
+   return { revised, spans };
+ }
+ function patchDocument(doc: CourseDocument, before: Json, frozen: Json, changes: Json[]) {
+-  const after = structuredClone(doc), dependencies: Json[] = [], allowed = new Set<string>(), htmlPaths = new Set<string>();
++  const after = structuredClone(doc), dependencies: Json[] = [], allowed = new Set<string>(), htmlPaths = new Set<string>(), exactFeedbackPaths = new Set<string>();
+   for (const [i, scene] of doc.scenes.entries()) {
+     const c = scene.content as Json, root = ['scenes', String(i), 'content'];
+     if (scene.type === 'interactive' && typeof c.html === 'string') htmlPaths.add(textbookCanonical([...root, 'html']));
+@@ -225,6 +225,11 @@
+     if (scene.type === 'quiz') c.questions.forEach((q: Json, j: number) => {
+       if (q.visual?.kind === 'image') allowed.add(textbookCanonical([...root, 'questions', String(j), 'visual', 'src']));
+       for (const [key, v] of Object.entries(q.optionVisuals ?? {}) as [string, Json][]) if (v.kind === 'image') allowed.add(textbookCanonical([...root, 'questions', String(j), 'optionVisuals', key, 'src']));
++      for (const [key, feedback] of Object.entries(q.optionFeedback ?? {}) as [string, Json][]) {
++        const visual = q.optionVisuals?.[key];
++        if (visual?.kind === 'image' && textbookCanonical(feedback.visual) === textbookCanonical(visual))
++          exactFeedbackPaths.add(textbookCanonical([...root, 'questions', String(j), 'optionFeedback', key, 'visual', 'src']));
++      }
+     });
+   }
+   for (const change of changes) {
+@@ -248,37 +253,48 @@
+       const targetParts = ['scenes', String(sceneIndex), 'content', 'questions', String(questionIndex), 'optionVisuals', leaf.optionValue, 'src'];
+       const targetPath = textbookCanonical(targetParts);
+       check(allowed.has(targetPath) && sourceBindings.some((binding: Json) => binding.assetKey === leaf.assetKey), 'LOCKED_LEAF_SOURCE');
++      const targets = [{ parts: targetParts, kind: 'locked-quiz-option-image-src' }];
++      const feedback = question.optionFeedback?.[leaf.optionValue];
++      if (feedback !== undefined) {
++        check(object(feedback) && textbookCanonical(feedback.visual) === textbookCanonical(visual), 'LOCKED_LEAF_FEEDBACK_MISMATCH');
++        const parts = ['scenes', String(sceneIndex), 'content', 'questions', String(questionIndex), 'optionFeedback', leaf.optionValue, 'visual', 'src'];
++        check(exactFeedbackPaths.has(textbookCanonical(parts)), 'LOCKED_LEAF_FEEDBACK_MISMATCH');
++        targets.push({ parts, kind: 'locked-quiz-option-feedback-image-src' });
++      }
++      const targetPaths = new Set(targets.map(target => textbookCanonical(target.parts)));
+ 
+       const retainedReferences: Json[] = [];
+       function inspect(v: any, parts: string[]) {
+         if (typeof v === 'string' && v.includes(change.from.src)) {
+           const location = textbookCanonical(parts);
+-          if (location === targetPath) return;
++          if (targetPaths.has(location)) return;
+           if (htmlPaths.has(location)) {
+             const parsed = patchHtmlImageSources(v, change.from.src, change.from.src);
+             retainedReferences.push({ path: '/' + parts.map(p => p.replace(/~/g, '~0').replace(/\//g, '~1')).join('/'), kind: 'html-img-src', occurrences: parsed.spans.length, valueSha256: hash(v) });
+           } else {
+-            check(v === change.from.src && allowed.has(location), 'LOCKED_LEAF_UNSUPPORTED_REFERENCE');
++            check(v === change.from.src && (allowed.has(location) || exactFeedbackPaths.has(location)), 'LOCKED_LEAF_UNSUPPORTED_REFERENCE');
+             retainedReferences.push({ path: '/' + parts.map(p => p.replace(/~/g, '~0').replace(/\//g, '~1')).join('/'), kind: 'image-src', occurrences: 1, valueSha256: hash(v) });
+           }
+         } else if (Array.isArray(v)) v.forEach((value, i) => inspect(value, [...parts, String(i)]));
+         else if (object(v)) for (const [key, value] of Object.entries(v)) inspect(value, [...parts, key]);
+       }
+       inspect(doc, []);
+-      let target: any = after;
+-      for (const part of targetParts.slice(0, -1)) target = target[part];
+-      check(target[targetParts.at(-1)!] === change.from.src, 'LOCKED_LEAF_SOURCE');
+-      target[targetParts.at(-1)!] = change.to.src;
++      for (const entry of targets) {
++        let target: any = after;
++        for (const part of entry.parts.slice(0, -1)) target = target[part];
++        check(target[entry.parts.at(-1)!] === change.from.src, 'LOCKED_LEAF_SOURCE');
++        target[entry.parts.at(-1)!] = change.to.src;
++      }
+       function atPath(root: any, pointer: string) {
+         return pointer.slice(1).split('/').map(p => p.replace(/~1/g, '/').replace(/~0/g, '~')).reduce((value, part) => value[part], root);
+       }
+       for (const reference of retainedReferences) check(hash(atPath(after, reference.path)) === reference.valueSha256, 'LOCKED_LEAF_RETENTION');
+-      dependencies.push({
++      for (const entry of targets) dependencies.push({
+         assetKey: change.assetKey,
+         sceneId: scene.id,
+         order: scene.order,
+-        path: '/' + targetParts.map(p => p.replace(/~/g, '~0').replace(/\//g, '~1')).join('/'),
+-        kind: 'locked-quiz-option-image-src',
++        path: '/' + entry.parts.map(p => p.replace(/~/g, '~0').replace(/\//g, '~1')).join('/'),
++        kind: entry.kind,
+         questionId: leaf.questionId,
+         optionValue: leaf.optionValue,
+         frozenChoiceAsset: choices[0].asset,
+--- a/tests/agent-runtime/textbook-asset-revision.test.ts
++++ b/tests/agent-runtime/textbook-asset-revision.test.ts
+@@ -250,8 +250,40 @@
+     expect(afterLedger.assetBindings.find((binding: any) => binding.assetKey === 'smell').src).toBe(newSrc);
+     expect(afterLedger.assetBindings.find((binding: any) => binding.assetKey === 'image-smell-alias').src).toBe(oldSrc);
+     expect(afterLedger.bindingHistory).toHaveLength(beforeLedger.bindingHistory.length + 1);
++    expect(receipt.providerCalls).toBe(0);
++  });
++  it('rebinds an exact same-option feedback image and archives both dependencies without changing the question or feedback', async () => {
++    const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') }); guard.wrapStore(store as unknown as CourseStore);
++    await guard.context({ stageId, order: 1, type: 'slide', title: '观察方法', media: [{ assetKey: 'image-smell-alias', src: src('smell') }] });
++    const value: any = await doc(), question = value.scenes[1].content.questions[0];
++    question.optionFeedback = Object.fromEntries(Object.entries(question.optionVisuals).map(([key, visual]) => [key, { text: `feedback-${key}`, visual: structuredClone(visual) }]));
++    await seedDocument(value);
++    input.changes = [input.changes.find(change => change.assetKey === 'smell')!];
++    input.changes[0].lockedQuizOptionLeaf = { sceneId: 'scene-p2', questionId: 'method', optionValue: 'B', assetKey: 'smell' };
++    const original = structuredClone(value), beforeLedger = await ledger(), plan = await prepareTextbookAssetRevision(input, env);
++    expect(await doc()).toEqual(original);
++    expect(plan.dependencies.map((d: any) => d.kind)).toEqual(['locked-quiz-option-image-src', 'locked-quiz-option-feedback-image-src']);
++    const receipt = await runTextbookAssetRevision(plan, plan.sha256, env), after: any = await doc();
++    expect(after.scenes[1].content.questions[0].optionFeedback.B.visual).toEqual(after.scenes[1].content.questions[0].optionVisuals.B);
++    expect(after.scenes[1].content.questions[0].optionFeedback.A).toEqual(question.optionFeedback.A);
++    after.scenes[1].content.questions[0].optionVisuals.B.src = question.optionVisuals.B.src;
++    after.scenes[1].content.questions[0].optionFeedback.B.visual.src = question.optionFeedback.B.visual.src;
++    expect(after).toEqual(original);
++    expect((await ledger()).bindingHistory).toHaveLength(beforeLedger.bindingHistory.length + 1);
+     expect(receipt.providerCalls).toBe(0);
++    expect(JSON.parse(await fs.readFile(path.join(revisionDir(plan), 'original-document.json'), 'utf8'))).toEqual(original);
+   });
++  it.each(['src', 'alt'])('rejects a same-option feedback image with a different %s', async field => {
++    const value: any = await doc(), question = value.scenes[1].content.questions[0];
++    question.optionFeedback = Object.fromEntries(Object.entries(question.optionVisuals).map(([key, visual]) => [key, { text: `feedback-${key}`, visual: structuredClone(visual) }]));
++    question.optionFeedback.B.visual[field] = field === 'src' ? src('eyes') : 'different feedback depiction';
++    await seedDocument(value);
++    input.changes = [input.changes.find(change => change.assetKey === 'smell')!];
++    input.changes[0].lockedQuizOptionLeaf = { sceneId: 'scene-p2', questionId: 'method', optionValue: 'B', assetKey: 'smell' };
++    const beforeBytes = await fs.readFile(ledgerPath());
++    await expect(prepareTextbookAssetRevision(input, env)).rejects.toThrow('LOCKED_LEAF_FEEDBACK_MISMATCH');
++    expect(await doc()).toEqual(value); expect(await fs.readFile(ledgerPath())).toEqual(beforeBytes);
++  });
+   it.each([
+     ['scene', { sceneId: 'scene-p1', questionId: 'method', optionValue: 'B', assetKey: 'smell' }, 'LOCKED_LEAF_SCENE'],
+     ['question', { sceneId: 'scene-p2', questionId: 'missing', optionValue: 'B', assetKey: 'smell' }, 'LOCKED_LEAF_QUESTION'],

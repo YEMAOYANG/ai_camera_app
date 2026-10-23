@@ -4,9 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LearningSchoolbag } from "./learning-schoolbag";
 import voice from "./navigation-audio.json";
 
-const { router } = vi.hoisted(() => ({ router: { push: vi.fn(), replace: vi.fn() } }));
+const { router, preloadTextbookContents } = vi.hoisted(() => ({ router: { push: vi.fn(), replace: vi.fn() }, preloadTextbookContents: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("@/components/student/schoolbag-shell", () => ({ SchoolbagShell: ({ children, tools }: { children: ReactNode; tools?: ReactNode }) => <><header>{tools}</header><main>{children}</main></> }));
+vi.mock("@/features/learning/textbook-contents-client", () => ({ preloadTextbookContents }));
 const student = { id: "student-a", childId: "child-a", displayName: "小读者", gradeCode: "primary_1" };
 const book = { editionId: "pep-chinese-g1", revisionId: "review-1", title: "语文 一年级上册", publisher: "人民教育出版社", editionLabel: "测试目录", gradeCode: "primary_1", subject: "chinese", volume: "upper", schoolSystem: "six_year", coverage: { status: "complete", note: "" }, sourceUrl: "https://basic.smartedu.cn/tchMaterial/detail?contentId=test", unitCount: 1, lessonCount: 1, selected: true, selectionRevision: 1, currentNodeId: null };
 const catalog = { ok: true, schemaVersion: "mira.learning.textbooks.v1", gradeCode: "primary_1", schoolYearStartYear: 2026, semester: "upper", books: [book], subjects: [{ subject: "chinese", status: "confirmed" }, { subject: "math", status: "unavailable" }, { subject: "english", status: "unavailable" }] };
@@ -82,7 +83,7 @@ describe("shared textbook schoolbag", () => {
     expect(await screen.findByText(heading)).toBeInTheDocument();
     fireEvent(window, new Event("focus"));
     expect(await screen.findByText(heading)).toBeInTheDocument();
-    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(fetch).toHaveBeenCalledTimes(2);
     expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
 
     firstVisit.unmount();
@@ -96,12 +97,18 @@ describe("shared textbook schoolbag", () => {
   });
 
   it("updates a due review after focus without announcing a new completion", async () => {
+    let now = 1_000_000;
+    let finish!: (value: Response) => void;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
     vi.stubGlobal("fetch", vi.fn()
       .mockResolvedValueOnce(response({ ...catalog, learningJourneys: [savedJourney] }))
-      .mockResolvedValueOnce(response({ ...catalog, learningJourneys: [{ ...savedJourney, reviewDue: true }] })));
+      .mockImplementationOnce(() => new Promise<Response>(resolve => { finish = resolve; })));
     render(<LearningSchoolbag student={student} />);
     expect(await screen.findByText("上次的学习已保存")).toBeInTheDocument();
+    now += 30_001;
     fireEvent(window, new Event("focus"));
+    expect(screen.getByText("上次的学习已保存")).toBeInTheDocument();
+    finish(response({ ...catalog, learningJourneys: [{ ...savedJourney, reviewDue: true }] }));
     expect(await screen.findByRole("link", { name: "再来试一试，天地人" })).toBeInTheDocument();
     expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "听老师说" }));
@@ -147,6 +154,7 @@ describe("shared textbook schoolbag", () => {
     fireEvent.click(link);
     expect(router.push).toHaveBeenCalledTimes(1);
     expect(router.push).toHaveBeenCalledWith(link.getAttribute("href"));
+    expect(preloadTextbookContents).toHaveBeenCalledExactlyOnceWith(student, expect.objectContaining({ editionId: "pep-chinese-g1", revisionId: "review-1" }));
     expect(fetch.mock.calls.every(([, options]) => !options.method)).toBe(true);
   });
 
@@ -174,11 +182,14 @@ describe("shared textbook schoolbag", () => {
   });
 
   it("uses the parent's semester after focus and keeps first-grade English selectable", async () => {
+    let now = 1_000_000;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
     const english = { ...book, editionId: "beijing-english-g1-upper-2022", title: "英语 一年级上册", publisher: "北京出版社", editionLabel: "北京版 · 一年级起点（2022 目录）", subject: "english", sourceUrl: "https://bph.com.cn/news/detail/2726.html", coverage: { status: "index_only", note: "目录核验" }, lessonCount: 0, unitCount: 0 };
     const fetch = vi.fn().mockResolvedValueOnce(response({ ...catalog, books: [english], subjects: [{ subject: "english", status: "confirmed" }] })).mockResolvedValueOnce(response({ ...catalog, semester: "lower", termSource: "parent", books: [], subjects: [{ subject: "english", status: "selection_required" }] }));
     vi.stubGlobal("fetch", fetch);
     render(<LearningSchoolbag student={student} />);
     expect(await screen.findByRole("link", { name: "拿出英语课本" })).toBeInTheDocument();
+    now += 30_001;
     fireEvent(window, new Event("focus"));
     expect(await screen.findByRole("button", { name: "英语，等家长选书" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "拿出英语课本" })).not.toBeInTheDocument();

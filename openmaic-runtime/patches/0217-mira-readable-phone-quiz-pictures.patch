@@ -1,0 +1,130 @@
+diff --git a/components/scene-renderers/picture-quiz-layout.module.css b/components/scene-renderers/picture-quiz-layout.module.css
+--- a/components/scene-renderers/picture-quiz-layout.module.css
++++ b/components/scene-renderers/picture-quiz-layout.module.css
+@@ -17,7 +17,7 @@
+   .root [data-quiz-picture-card] > div:has(> button) { margin-bottom: 4px; }
+   .root [data-quiz-picture-card] > div > button[aria-label] { min-height: 48px; }
+   .root [data-quiz-scene-picture] {
+-    height: clamp(56px, 16cqh, 120px);
++    height: clamp(96px, 24cqh, 168px);
+     margin-bottom: 6px;
+   }
+   .root [data-quiz-scene-picture] [data-quiz-visual],
+@@ -49,17 +49,22 @@
+   }
+ }
+ 
+-@container picture-quiz (max-width: 560px) and (max-height: 340px) {
++@container picture-quiz (max-width: 560px) and (max-height: 440px) {
+   .root[data-quiz-phase="answering"] [data-quiz-picture-card] {
+-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
++    display: grid; grid-template-columns: minmax(0, 1fr) 100px;
+     gap: 4px 6px; padding: 6px;
+   }
+   .root [data-quiz-question-heading] {
+     position: absolute; width: 1px; height: 1px;
+     overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap;
+   }
+-  .root [data-quiz-scene-picture] { grid-column: 1; grid-row: 1; height: 80px; margin: 0; align-self: center; }
++  .root [data-quiz-scene-picture] { grid-column: 1; grid-row: 1; height: clamp(96px, calc(100cqh - 210px), 156px); margin: 0; align-self: center; }
+   .root [data-quiz-picture-card] > div:has(> button) { grid-column: 2; grid-row: 1; margin: 0; align-self: center; }
++  /* Reserve room for both the scene and the visible narration retry message. */
++  .root [data-quiz-picture-card] > div:has(> button) > button {
++    width: 100px; height: 48px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center;
++  }
++  .root [data-quiz-picture-card] > div:has(> button) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .root [data-quiz-option-group] { grid-column: 1 / 3; grid-row: 2; }
+ }
+ 
+@@ -81,10 +86,12 @@
+ /* Both chrome rows remain visible on a phone in landscape. The spoken prompt
+  * and scene sit beside the picture answers in the remaining short slot. */
+ @container picture-quiz (min-width: 561px) and (max-height: 260px) {
+-  .root[data-quiz-phase="answering"] [data-quiz-picture-card] { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.8fr); padding: 6px; }
++  .root[data-quiz-phase="answering"] [data-quiz-picture-card] { grid-template-columns: minmax(144px, 1fr) 100px minmax(0, 1.8fr); padding: 6px; }
+   .root [data-quiz-question-heading] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+   .root [data-quiz-scene-picture] { grid-column: 1; grid-row: 1; height: clamp(96px, calc(100cqh - 86px), 160px); margin: 0; }
+   .root [data-quiz-picture-card] > div:has(> button) { grid-column: 2; grid-row: 1; margin: 0; align-self: center; }
++  .root [data-quiz-picture-card] > div:has(> button) > button { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
++  .root [data-quiz-picture-card] > div:has(> button) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .root [data-quiz-option-group] { grid-column: 3; grid-row: 1; align-self: center; }
+   .root [data-quiz-option-group] button { height: clamp(96px, calc(100cqh - 86px), 160px); }
+   .root [data-quiz-picture-card]:not(:has([data-quiz-scene-picture])) { grid-template-columns: auto minmax(0, 1fr); }
+diff --git a/components/scene-renderers/fixed-textbook-picture-layout.module.css b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+--- a/components/scene-renderers/fixed-textbook-picture-layout.module.css
++++ b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+@@ -47,9 +47,9 @@
+   }
+ 
+   .scenePicture {
+-    flex: 0 0 clamp(48px, 18cqh, 88px);
+-    height: clamp(48px, 18cqh, 88px);
+-    min-height: 48px;
++    flex: 0 0 clamp(96px, 24cqh, 168px);
++    height: clamp(96px, 24cqh, 168px);
++    min-height: 96px;
+   }
+ 
+   .scenePicture > [data-quiz-visual],
+@@ -165,14 +165,16 @@
+   .question { height: 100%; }
+ }
+ 
+-@container fixed-picture-quiz (max-width: 560px) and (max-height: 340px) {
++@container fixed-picture-quiz (max-width: 560px) and (max-height: 440px) {
+   .header { min-height: 0; height: 0; overflow: hidden; }
+   .shell { padding: 4px; gap: 2px; }
+   .fieldset { padding: 4px 6px; }
+-  .task { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(80px, 1fr); gap: 4px 6px; }
++  .task { display: grid; grid-template-columns: minmax(0, 1fr) 100px; grid-template-rows: auto minmax(80px, 1fr); gap: 4px 6px; }
+   .question { display: contents; }
+-  .scenePicture { grid-column: 1; grid-row: 1; height: 80px; min-height: 80px; align-self: center; }
++  .scenePicture { grid-column: 1; grid-row: 1; height: clamp(96px, calc(100cqh - 170px), 156px); min-height: 96px; align-self: center; }
+   .question > div:not([role="radiogroup"]) { grid-column: 2; grid-row: 1; align-self: center; }
++  .question > div:not([role="radiogroup"]) > button { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
++  .question > div:not([role="radiogroup"]) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .question .options { grid-column: 1 / 3; grid-row: 2; }
+ }
+ 
+@@ -180,11 +182,13 @@
+   .shell { padding: 4px; gap: 2px; }
+   .header { min-height: 0; height: 0; overflow: hidden; }
+   .fieldset { padding: 4px 6px; }
+-  .task { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.8fr); grid-template-rows: minmax(96px, 1fr); gap: 4px 10px; }
++  .task { grid-template-columns: minmax(144px, 1fr) 100px minmax(0, 1.8fr); grid-template-rows: minmax(96px, 1fr); gap: 4px 10px; }
+   .question { display: contents; }
+   .question > p { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+   .scenePicture { grid-column: 1; grid-row: 1; height: 100%; min-height: 96px; }
+   .question > div:not([role="radiogroup"]) { grid-column: 2; grid-row: 1; align-self: center; }
++  .question > div:not([role="radiogroup"]) > button { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
++  .question > div:not([role="radiogroup"]) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .question .options { grid-column: 3; grid-row: 1; height: 100%; min-height: 100px; }
+   .task:not(:has(.scenePicture)) { grid-template-columns: auto minmax(0, 1fr); }
+   .task:not(:has(.scenePicture)) .question > div:not([role="radiogroup"]) { grid-column: 1; }
+diff --git a/tests/scene-renderers/picture-quiz-layout.browser.test.ts b/tests/scene-renderers/picture-quiz-layout.browser.test.ts
+--- a/tests/scene-renderers/picture-quiz-layout.browser.test.ts
++++ b/tests/scene-renderers/picture-quiz-layout.browser.test.ts
+@@ -125,6 +125,8 @@
+             for (const hasScene of [true, false])
+               for (const viewport of [
+                 { width: 320, height: 390 },
++                { width: 305, height: 367 },
++                { width: 320, height: 351 },
+                 { width: 320, height: 283 },
+                 { width: 390, height: 564 },
+                 { width: 844, height: 300 },
+@@ -164,11 +166,12 @@
+                   .first()
+                   .boundingBox();
+                 expect(canvas?.width).toBe(viewport.width - 16);
+-                if (hasScene && viewport.width >= 561 && viewport.height <= 260) {
++                if (hasScene) {
+                   const scene = await page
+                     .getByRole('img', { name: 'scene', exact: true })
+                     .boundingBox();
+-                  expect(scene!.height).toBeGreaterThanOrEqual(96);
++                  expect(scene!.height, JSON.stringify({ fixed, count, viewport, scene })).toBeGreaterThanOrEqual(96);
++                  expect(scene!.width, JSON.stringify({ fixed, count, viewport, scene })).toBeGreaterThanOrEqual(96);
+                 }
+                 const boxes = await options.evaluateAll((elements) =>
+                   elements.map((el) => {

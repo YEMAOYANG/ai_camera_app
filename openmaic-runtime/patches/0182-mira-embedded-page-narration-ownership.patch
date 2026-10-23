@@ -1,0 +1,170 @@
+diff --git a/lib/types/stage.ts b/lib/types/stage.ts
+--- a/lib/types/stage.ts
++++ b/lib/types/stage.ts
+@@ -97,6 +97,15 @@
+  * all four kinds).
+  */
+ export type AppScene = DslScene<Action, SceneContent> & {
++  /** Gateway-only delivery metadata, derived before sandbox media embedding.
++   * Not an authored/persisted DSL field or permission to skip arbitrary speech.
++   */
++  miraPageNarration?: {
++    schemaVersion: 'mira.textbook.page-narration.v1';
++    classroomId: string;
++    sceneId: string;
++    bindings: { speechId: string; cueId: string; text: string; audioPath: string }[];
++  };
+   /** Server-bound native activities for reviewed Mira textbook releases. */
+   miraActivity?: { id: string; section: 'games' | 'challenge' };
+   /**
+diff --git a/lib/mira/page-managed-narration.ts b/lib/mira/page-managed-narration.ts
+--- a/lib/mira/page-managed-narration.ts
++++ b/lib/mira/page-managed-narration.ts
+@@ -21,6 +21,44 @@
+   return matches.length === 1 ? matches[0][2] : null;
+ }
+ 
++function exactKeys(value: unknown, keys: readonly string[]): value is Record<string, unknown> {
++  return !!value && typeof value === 'object' && !Array.isArray(value)
++    && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
++}
++
++/** The authenticated gateway derives this before replacing media with data/blob
++ * URLs. Recheck every action binding; never infer ownership by evaluating HTML.
++ */
++function gatewayManagedSpeechIds(scene: Scene): Set<string> {
++  const none = new Set<string>();
++  const value: unknown = scene.miraPageNarration;
++  if (!exactKeys(value, ['schemaVersion', 'classroomId', 'sceneId', 'bindings'])
++      || value.schemaVersion !== 'mira.textbook.page-narration.v1'
++      || typeof value.classroomId !== 'string' || !/^tbpub_[a-f0-9]{24}$/.test(value.classroomId)
++      || value.classroomId !== scene.stageId || value.sceneId !== scene.id
++      || !Array.isArray(value.bindings) || value.bindings.length < 1 || value.bindings.length > 120) return none;
++  if (!Array.isArray(scene.actions) || scene.actions.some(action => !action || typeof action.id !== 'string')) return none;
++  const actions = new Map(scene.actions.map(action => [action.id, action]));
++  if (actions.size !== scene.actions.length) return none;
++  const ids = new Set<string>();
++  const cueIds = new Set<string>();
++  for (const binding of value.bindings) {
++    if (!exactKeys(binding, ['speechId', 'cueId', 'text', 'audioPath'])
++        || typeof binding.speechId !== 'string' || !/^[\w-]{1,128}$/.test(binding.speechId) || ids.has(binding.speechId)
++        || typeof binding.cueId !== 'string' || !/^[\w-]{1,128}$/.test(binding.cueId) || cueIds.has(binding.cueId)
++        || typeof binding.text !== 'string' || !binding.text.trim() || binding.text.length > 1000
++        || typeof binding.audioPath !== 'string'
++        || recordedPath(binding.audioPath) !== binding.audioPath
++        || !binding.audioPath.startsWith(`/api/classroom-media/${value.classroomId}/audio/`)) return none;
++    const action = actions.get(binding.speechId);
++    if (!action || action.type !== 'speech' || action.text !== binding.text
++        || recordedPath(action.audioUrl) !== binding.audioPath) return none;
++    ids.add(binding.speechId);
++    cueIds.add(binding.cueId);
++  }
++  return ids;
++}
++
+ /** The activity owns its recorded instructions and conditional feedback.
+  * Only exact text AND recorded-media matches transfer out of the lecture queue.
+  * Other opening lines, legacy activities and non-textbook classrooms keep their
+@@ -31,6 +69,9 @@
+   const managed = new Set<string>();
+   if (!fixedTextbook || scene.type !== 'interactive' || scene.content.type !== 'interactive'
+       || typeof scene.content.html !== 'string') return managed;
++  // Invalid delivery metadata fails closed instead of falling back to a possibly
++  // rewritten manifest. Legacy author previews still use the original path below.
++  if (scene.miraPageNarration !== undefined) return gatewayManagedSpeechIds(scene);
+   try {
+     const manifest = script(scene.content.html, 'mira-narration-cues', 'application/json');
+     const helper = script(scene.content.html, 'mira-pre-recorded-audio');
+diff --git a/tests/playback/page-managed-narration.test.ts b/tests/playback/page-managed-narration.test.ts
+--- a/tests/playback/page-managed-narration.test.ts
++++ b/tests/playback/page-managed-narration.test.ts
+@@ -5,6 +5,13 @@
+ import type { SpeechAction } from '@/lib/types/action';
+ import type { ActionEngine } from '@/lib/action/engine';
+ import type { AudioPlayer } from '@/lib/utils/audio-player';
++import { createHash } from 'node:crypto';
++import { createRequire } from 'node:module';
++
++// Exercise the actual sandbox-delivery transformation, not a parallel mock of it.
++const { bindTextbookPageNarration, embedTextbookSceneMedia } = createRequire(import.meta.url)(
++  '../../../../gateway/src/server.mjs',
++);
+ 
+ const cues = [
+   { id: 'start', text: '先听老师，再找一张图。' },
+@@ -36,9 +43,75 @@
+   return { engine, audio, transcript, complete, ended: () => end() };
+ }
+ async function flush() { for (let i = 0; i < 30; i++) await Promise.resolve(); }
++
++function deliveredActivity(large = false, separateOpening = false): Scene {
++  const scene = activity('mp3');
++  const classroomId = 'tbpub_' + 'a'.repeat(24);
++  scene.stageId = classroomId;
++  if (scene.content.type !== 'interactive') throw new Error();
++  scene.content.html = scene.content.html!.replaceAll('/lesson/', `/${classroomId}/`);
++  for (const action of scene.actions ?? []) {
++    if (action.type === 'speech') action.audioUrl = action.audioUrl!.replace('http://127.0.0.1:3100', '').replace('/lesson/', `/${classroomId}/`);
++  }
++  const bytes = Buffer.from('verified mp3 fixture bytes');
++  const media = cues.map(c => ({ path: `/api/classroom-media/${classroomId}/audio/${c.id}.mp3`,
++    mimeType:'audio/mpeg',byteSize:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex') }));
++  const assets = media.map(m => ({path:m.path,mimeType:m.mimeType,base64:bytes.toString('base64')}));
++  if (large) {
++    const imagePath=`/api/classroom-media/${classroomId}/media/atlas.png`;
++    scene.content.html+=`<img src="${imagePath}">`.repeat(3);
++    assets.push({path:imagePath,mimeType:'image/png',base64:Buffer.alloc(1024*1024).toString('base64')});
++  }
++  if (separateOpening) scene.actions!.unshift({id:'opening',type:'speech',text:'我们来做一个小游戏。',audioId:'opening',
++    audioUrl:`/api/classroom-media/${classroomId}/audio/opening.mp3`});
++  bindTextbookPageNarration(scene,{purpose:'fixed_textbook',classroomId,media},new Set(assets.map(asset=>asset.path)));
++  scene.content.html=embedTextbookSceneMedia(scene.content.html,assets);
++  return scene;
++}
+ afterEach(() => vi.restoreAllMocks());
+ 
+ describe('fixed interactive recorded cue ownership', () => {
++  it.each([false, true])('keeps feedback out of the real engine after gateway embedding (blob=%s)', async large => {
++    const scene=deliveredActivity(large);
++    if(scene.content.type!=='interactive') throw new Error();
++    expect(scene.content.html!.includes('document.write(page)')).toBe(large);
++    expect([...fixedPageManagedSpeechIds(scene,true)]).toEqual(cues.map(c=>`speech-${c.id}`));
++    const withoutMetadata=structuredClone(scene);delete withoutMetadata.miraPageNarration;
++    expect(fixedPageManagedSpeechIds(withoutMetadata,true).size).toBe(0); // Original production regression.
++    const p=playback(scene);p.engine.start();await flush();
++    expect(p.audio.play).not.toHaveBeenCalled();expect(p.transcript).not.toHaveBeenCalled();
++    expect(p.complete).toHaveBeenCalledOnce();p.engine.stop();
++  });
++  it('preserves a non-cue opening after authenticated sandbox delivery', async () => {
++    const scene=deliveredActivity(false,true),p=playback(scene);p.engine.start();await flush();
++    expect(p.audio.play).toHaveBeenCalledTimes(1);p.ended();await flush();
++    expect(p.audio.play).toHaveBeenCalledTimes(1);
++    expect(p.transcript.mock.calls).toEqual([['我们来做一个小游戏。']]);p.engine.stop();
++  });
++  it('does not use gateway metadata outside fixed interactive scenes', () => {
++    const scene=deliveredActivity();expect(fixedPageManagedSpeechIds(scene,false).size).toBe(0);
++    scene.type='quiz';scene.content={type:'quiz',questions:[{id:'q',question:cues[0].text}]} as Scene['content'];
++    expect([...fixedPageManagedSpeechIds(scene,true)]).toEqual(cues.map(c=>`speech-${c.id}`));
++  });
++  it.each(['classroom','scene','speech','cue','text','audio','duplicate','duplicate-cue','extra-key','empty','changed-action','duplicate-action','null-action','non-array-actions'])
++    ('rejects an invalid delivery binding without trusting rewritten HTML: %s', mode => {
++      const scene=deliveredActivity(),value=scene.miraPageNarration!;
++      if(mode==='classroom')value.classroomId='tbpub_'+'b'.repeat(24);
++      if(mode==='scene')value.sceneId='other';
++      if(mode==='speech')value.bindings[0].speechId='missing';
++      if(mode==='cue')value.bindings[0].cueId='bad id';
++      if(mode==='text')value.bindings[0].text='另一句话。';
++      if(mode==='audio')value.bindings[0].audioPath=value.bindings[0].audioPath.replace('start.mp3','correct.mp3');
++      if(mode==='duplicate')value.bindings.push({...value.bindings[0]});
++      if(mode==='duplicate-cue')value.bindings[1].cueId=value.bindings[0].cueId;
++      if(mode==='extra-key')Object.assign(value,{untrusted:true});
++      if(mode==='empty')value.bindings=[];
++      if(mode==='changed-action')scene.actions![0]={...scene.actions![0],text:'另一句话。'} as SpeechAction;
++      if(mode==='duplicate-action')scene.actions!.push({...scene.actions![0]});
++      if(mode==='null-action')Object.assign(scene,{actions:[null]});
++      if(mode==='non-array-actions')Object.assign(scene,{actions:{}});
++      expect(fixedPageManagedSpeechIds(scene,true).size).toBe(0);
++    });
+   it.each(['wav', 'mp3'])('keeps %s feedback and opening cues out of top-level playback without mutating actions', async extension => {
+     const scene = activity(extension), original = JSON.stringify(scene);
+     const p = playback(scene); p.engine.start(); await flush();

@@ -1,0 +1,369 @@
+{
+  "policyVersion": "mira.textbook.pinyin-zhchshr-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "symbols": {
+    "zh": {
+      "ph": "zhi1",
+      "carrier": "知"
+    },
+    "ch": {
+      "ph": "chi1",
+      "carrier": "吃"
+    },
+    "sh": {
+      "ph": "shi1",
+      "carrier": "诗"
+    },
+    "r": {
+      "ph": "ri1",
+      "carrier": "日"
+    },
+    "zhi": {
+      "ph": "zhi1",
+      "carrier": "知"
+    },
+    "chi": {
+      "ph": "chi1",
+      "carrier": "吃"
+    },
+    "shi": {
+      "ph": "shi1",
+      "carrier": "诗"
+    },
+    "ri": {
+      "ph": "ri1",
+      "carrier": "日"
+    },
+    "zhí": {
+      "ph": "zhi2",
+      "carrier": "直"
+    },
+    "chī": {
+      "ph": "chi1",
+      "carrier": "吃"
+    },
+    "shī": {
+      "ph": "shi1",
+      "carrier": "诗"
+    },
+    "rì": {
+      "ph": "ri4",
+      "carrier": "日"
+    },
+    "zhā": {
+      "ph": "zha1",
+      "carrier": "扎"
+    },
+    "zhè": {
+      "ph": "zhe4",
+      "carrier": "这"
+    },
+    "zhù": {
+      "ph": "zhu4",
+      "carrier": "住"
+    },
+    "zhuǎ": {
+      "ph": "zhua3",
+      "carrier": "爪"
+    },
+    "zhuō": {
+      "ph": "zhuo1",
+      "carrier": "桌"
+    },
+    "chá": {
+      "ph": "cha2",
+      "carrier": "茶"
+    },
+    "chē": {
+      "ph": "che1",
+      "carrier": "车"
+    },
+    "chū": {
+      "ph": "chu1",
+      "carrier": "出"
+    },
+    "chuō": {
+      "ph": "chuo1",
+      "carrier": "戳"
+    },
+    "shà": {
+      "ph": "sha4",
+      "carrier": "煞"
+    },
+    "shé": {
+      "ph": "she2",
+      "carrier": "蛇"
+    },
+    "shǔ": {
+      "ph": "shu3",
+      "carrier": "鼠"
+    },
+    "shuā": {
+      "ph": "shua1",
+      "carrier": "刷"
+    },
+    "shuō": {
+      "ph": "shuo1",
+      "carrier": "说"
+    },
+    "rè": {
+      "ph": "re4",
+      "carrier": "热"
+    },
+    "rǔ": {
+      "ph": "ru3",
+      "carrier": "乳"
+    },
+    "ruò": {
+      "ph": "ruo4",
+      "carrier": "若"
+    },
+    "u": {
+      "ph": "wu1",
+      "carrier": "乌"
+    },
+    "à": {
+      "ph": "a4",
+      "carrier": "啊"
+    },
+    "á": {
+      "ph": "a2",
+      "carrier": "啊"
+    },
+    "è": {
+      "ph": "e4",
+      "carrier": "鹅"
+    },
+    "é": {
+      "ph": "e2",
+      "carrier": "鹅"
+    },
+    "ò": {
+      "ph": "o4",
+      "carrier": "哦"
+    },
+    "ù": {
+      "ph": "wu4",
+      "carrier": "乌"
+    },
+    "ā": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "ē": {
+      "ph": "e1",
+      "carrier": "鹅"
+    },
+    "ō": {
+      "ph": "o1",
+      "carrier": "哦"
+    },
+    "ū": {
+      "ph": "wu1",
+      "carrier": "乌"
+    },
+    "ǎ": {
+      "ph": "a3",
+      "carrier": "啊"
+    },
+    "ǔ": {
+      "ph": "wu3",
+      "carrier": "乌"
+    }
+  },
+  "words": {},
+  "approvalBoundary": {
+    "recipeStatus": "registered-recipe-pending-eight-probe-protocol-verification-and-separate-formal-operator-review",
+    "approvedProbeScope": "none",
+    "shortConsonantAccepted": false,
+    "formalListeningScope": "All sentences containing these exact 42 Latin tokens; separately inventory natural Chinese target words and the complete original sentences.",
+    "humanReview": "not-requested-under-user-authorized-automated-workflow",
+    "humanListeningVerified": false,
+    "perceptualToneVerified": false,
+    "pronunciationApproved": false,
+    "formalUseAllowed": false,
+    "consonantRecipeBoundary": "zh/ch/sh/r map to zhi1/chi1/shi1/ri1 as call-name syllable candidates. Light-short is a spoken blending-method instruction only, not a promise that the same SSML realizes an isolated consonant or shorter waveform. Use complete synthesized syllables as actual blending demonstrations.",
+    "wholeSyllableBoundary": "zhi/chi/shi/ri are complete py syllables; never split the i as yi1, use English r/CMU, or concatenate independently synthesized pieces. r and ri both use ri1 but have different pedagogical labels, not a guaranteed acoustic contrast.",
+    "neutralToneBoundary": "words is empty. Preserve natural Chinese including 桌子/擦桌子/折纸/读书/四/十/十四/四十. The textbook neutral zi in 桌子 remains a review target; no global 子 mapping and no unneeded whole-Chinese-word phoneme override.",
+    "scopeBoundary": "Exact reviewed 157-speech lesson scope and its 42 listed Latin tokens only. Unknown Latin tokens and combining marks fail closed; no automatic extension or Chinese word override. Registration is a protocol recipe, not perceptual pronunciation, tone or formal-audio approval."
+  }
+}

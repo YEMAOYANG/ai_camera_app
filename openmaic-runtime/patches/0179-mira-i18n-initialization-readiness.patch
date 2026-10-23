@@ -1,0 +1,236 @@
+diff --git a/lib/hooks/use-i18n.tsx b/lib/hooks/use-i18n.tsx
+--- a/lib/hooks/use-i18n.tsx
++++ b/lib/hooks/use-i18n.tsx
+@@ -1,6 +1,6 @@
+ 'use client';
+ 
+-import { createContext, useContext, useEffect, ReactNode } from 'react';
++import { createContext, useContext, useEffect, useRef, ReactNode } from 'react';
+ import { useTranslation } from 'react-i18next';
+ import { type Locale, defaultLocale, supportedLocales } from '@/lib/i18n';
+ import '@/lib/i18n/config';
+@@ -28,7 +28,10 @@
+ const I18nContext = createContext<I18nContextType | undefined>(undefined);
+ 
+ export function I18nProvider({ children }: { children: ReactNode }) {
+-  const { t, i18n } = useTranslation();
++  // Commit once while the asynchronous resource loader initializes. Suspending
++  // this root provider can repeatedly register namespace waits before init.
++  const { t, i18n, ready } = useTranslation(undefined, { useSuspense: false });
++  const preferenceApplied = useRef(false);
+ 
+   const locale = (i18n.language || defaultLocale) as Locale;
+ 
+@@ -36,6 +39,11 @@
+   // i18next handles fallback automatically: if the detected language
+   // has no matching JSON file, it falls back to fallbackLng.
+   useEffect(() => {
++    // The previous Suspense path reached this effect only after readiness.
++    // Keep that ordering, and never reapply a stored preference on a later
++    // classroom-only locale override or namespace reload.
++    if (!ready || preferenceApplied.current) return;
++    preferenceApplied.current = true;
+     try {
+       const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
+       const raw = stored || navigator.language || defaultLocale;
+@@ -44,7 +52,7 @@
+     } catch {
+       // localStorage unavailable, keep default
+     }
+-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
++  }, [ready, i18n]);
+ 
+   const setLocale = (newLocale: Locale) => {
+     i18n.changeLanguage(newLocale);
+@@ -61,6 +69,21 @@
+     i18n.changeLanguage(newLocale);
+   };
+ 
++  if (!ready) {
++    return (
++      <div
++        role="status"
++        aria-label="Loading"
++        className="flex min-h-screen items-center justify-center"
++      >
++        <span
++          aria-hidden="true"
++          className="h-8 w-8 animate-spin rounded-full border-2 border-current border-t-transparent"
++        />
++      </div>
++    );
++  }
++
+   return (
+     <I18nContext.Provider value={{ locale, setLocale, setRuntimeLocale, t }}>
+       {children}
+diff --git a/tests/i18n/provider-delayed-init.test.ts b/tests/i18n/provider-delayed-init.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/i18n/provider-delayed-init.test.ts
+@@ -0,0 +1,165 @@
++import { act, createElement, Profiler } from 'react';
++import { createRoot, type Root } from 'react-dom/client';
++import { createInstance, type i18n as I18n } from 'i18next';
++import { initReactI18next } from 'react-i18next';
++import { parseHTML } from 'linkedom';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++vi.mock('@/lib/i18n/config', () => ({}));
++vi.mock('@/lib/i18n', () => ({
++  defaultLocale: 'zh-CN',
++  supportedLocales: [{ code: 'zh-CN' }, { code: 'en-US' }],
++}));
++import { I18nProvider, useI18n } from '@/lib/hooks/use-i18n';
++
++// Exercise the installed React/i18next integration, including its real backend
++// wait and readiness logic. Only DOM/storage and the static locale registry are fixtures.
++describe('root i18n provider during delayed initialization', () => {
++  let root: Root;
++  let container: HTMLDivElement;
++  let instance: I18n;
++  let pending: Map<string, (error: Error | null, data: Record<string, string>) => void>;
++  let initPromise: Promise<unknown>;
++  let reads: number;
++
++  beforeEach(() => {
++    const { window } = parseHTML('<!doctype html><html><body></body></html>');
++    for (const key of ['window', 'document', 'HTMLElement', 'Node'] as const) {
++      vi.stubGlobal(key, key === 'window' ? window : window[key]);
++    }
++    vi.stubGlobal('navigator', { language: 'zh-CN' });
++    const storage = new Map<string, string>();
++    vi.stubGlobal('localStorage', {
++      getItem: (key: string) => storage.get(key) ?? null,
++      setItem: (key: string, value: string) => storage.set(key, String(value)),
++    });
++    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
++    container = document.createElement('div');
++    document.body.append(container);
++    root = createRoot(container);
++    pending = new Map();
++    reads = 0;
++    instance = createInstance();
++    instance.use(initReactI18next).use({
++      type: 'backend' as const,
++      init() {},
++      read(
++        language: string,
++        _namespace: string,
++        callback: (error: Error | null, data: Record<string, string>) => void,
++      ) {
++        reads += 1;
++        pending.set(language, callback);
++      },
++    });
++    initPromise = instance.init({
++      lng: 'zh-CN',
++      fallbackLng: 'zh-CN',
++      supportedLngs: ['zh-CN', 'en-US'],
++      initAsync: false,
++      interpolation: { escapeValue: false },
++    });
++  });
++
++  afterEach(async () => {
++    await act(async () => root.unmount());
++    for (const callback of pending.values()) callback(null, { hello: 'Loaded' });
++    pending.clear();
++    await initPromise;
++    vi.unstubAllGlobals();
++  });
++
++  async function release(language: string, hello: string) {
++    const callback = pending.get(language);
++    expect(callback).toBeTypeOf('function');
++    pending.delete(language);
++    await act(async () => {
++      callback!(null, { hello });
++      await Promise.resolve();
++    });
++  }
++
++  it('commits loading with bounded namespace waits, then renders actual translations', async () => {
++    const namespaces = vi.spyOn(instance, 'loadNamespaces');
++    const commits = vi.fn();
++    const child = vi.fn(() => createElement('p', null, useI18n().t('hello')));
++    await act(async () =>
++      root.render(
++        createElement(
++          Profiler,
++          { id: 'i18n', onRender: commits },
++          createElement(I18nProvider, null, createElement(child)),
++        ),
++      ),
++    );
++    expect(container.querySelector('[role="status"]')).not.toBeNull();
++    expect(child).not.toHaveBeenCalled();
++    expect(reads).toBe(1);
++    const before = commits.mock.calls.length;
++    await act(async () => {
++      await new Promise((resolve) => setTimeout(resolve, 60));
++    });
++    expect(commits.mock.calls.length).toBe(before);
++    expect(namespaces.mock.calls.length).toBeLessThanOrEqual(2);
++    expect(instance.isInitialized).toBeFalsy();
++    await release('zh-CN', '你好');
++    expect(instance.isInitialized).toBe(true);
++    expect(container.textContent).toBe('你好');
++    expect(container.querySelector('[role="status"]')).toBeNull();
++    expect(commits.mock.calls.length).toBeLessThanOrEqual(4);
++  });
++
++  it('applies stored preference only after initialization and preserves runtime-only locale changes', async () => {
++    localStorage.setItem('locale', 'en-US');
++    const change = vi.spyOn(instance, 'changeLanguage');
++    let runtimeLocale: ((locale: 'zh-CN' | 'en-US') => void) | undefined;
++    function Child() {
++      const current = useI18n();
++      runtimeLocale = current.setRuntimeLocale;
++      return createElement('p', null, current.t('hello'));
++    }
++    await act(async () => root.render(createElement(I18nProvider, null, createElement(Child))));
++    expect(change).not.toHaveBeenCalled();
++    await release('zh-CN', '你好');
++    expect(change.mock.calls.filter(([locale]) => locale === 'en-US')).toHaveLength(1);
++    await release('en-US', 'Hello');
++    expect(container.textContent).toBe('Hello');
++    await act(async () => {
++      runtimeLocale!('zh-CN');
++      await Promise.resolve();
++    });
++    expect(container.textContent).toBe('你好');
++    expect(localStorage.getItem('locale')).toBe('en-US');
++    expect(change.mock.calls.filter(([locale]) => locale === 'en-US')).toHaveLength(1);
++  });
++
++  it('still persists an explicit locale choice after readiness', async () => {
++    let setLocale: ((locale: 'zh-CN' | 'en-US') => void) | undefined;
++    function Child() {
++      const current = useI18n();
++      setLocale = current.setLocale;
++      return createElement('p', null, current.t('hello'));
++    }
++    await act(async () => root.render(createElement(I18nProvider, null, createElement(Child))));
++    await release('zh-CN', '你好');
++    await act(async () => {
++      setLocale!('en-US');
++      await Promise.resolve();
++    });
++    await release('en-US', 'Hello');
++    expect(container.textContent).toBe('Hello');
++    expect(localStorage.getItem('locale')).toBe('en-US');
++  });
++
++  it('can unmount before the backend resolves without rendering children or applying preferences', async () => {
++    localStorage.setItem('locale', 'en-US');
++    const change = vi.spyOn(instance, 'changeLanguage');
++    const child = vi.fn(() => createElement('p', null, 'child'));
++    await act(async () => root.render(createElement(I18nProvider, null, createElement(child))));
++    await act(async () => root.render(null));
++    await release('zh-CN', '你好');
++    expect(child).not.toHaveBeenCalled();
++    expect(change).not.toHaveBeenCalled();
++    expect(container.textContent).toBe('');
++  });
++});

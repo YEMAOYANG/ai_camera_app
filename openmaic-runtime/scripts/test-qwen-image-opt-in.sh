@@ -43,14 +43,14 @@ load_openmaic_provider_env
 [[ "${OPENMAIC_DEFAULT_IMAGE_PROVIDER}" == "qwen-image" ]] || fail "Qwen Image was not selected"
 [[ "${OPENMAIC_IMAGE_QWEN_IMAGE_API_KEY}" == "test-dedicated-image-secret-never-log" ]] || fail "dedicated Qwen Image key was not preferred"
 [[ "${OPENMAIC_IMAGE_QWEN_IMAGE_BASE_URL}" == "https://dashscope.aliyuncs.com" ]] || fail "Qwen Image root URL is not pinned"
-[[ "${OPENMAIC_IMAGE_QWEN_IMAGE_MODELS}" == "qwen-image-max" ]] || fail "Qwen Image model is not pinned"
+[[ "${OPENMAIC_IMAGE_QWEN_IMAGE_MODELS}" == "qwen-image-3.0" ]] || fail "Qwen Image model is not pinned"
 
 MIRA_OPENMAIC_PROVIDER_ENV_FILE="${TMP_ROOT}/fallback.env"
 load_openmaic_provider_env
 [[ "${OPENMAIC_IMAGE_QWEN_IMAGE_API_KEY}" == "test-shared-image-secret-never-log" ]] || fail "DashScope fallback was not loaded"
 
 provider_status="$(show_provider_status)"
-[[ "${provider_status}" == *'Image: enabled (qwen-image, qwen-image-max)'* ]] || fail "provider status omitted Qwen Image"
+[[ "${provider_status}" == *'Image: enabled (qwen-image, qwen-image-3.0)'* ]] || fail "provider status omitted Qwen Image"
 [[ "${provider_status}" != *'secret-never-log'* ]] || fail "provider status leaked the image key"
 
 printf '\n' > "${TMP_ROOT}/missing-key.env"

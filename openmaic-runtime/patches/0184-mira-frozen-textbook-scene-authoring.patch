@@ -1,0 +1,2033 @@
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -7,6 +7,7 @@
+  * recovery. A client connection is never part of the execution lifetime.
+  */
+ import { randomUUID } from 'node:crypto';
++import { textbookContractFromPrompt, createTextbookAuthoringGuard } from '@/lib/server/mira-textbook-scene-contract';
+ import { Session, type AgentEvent, type AgentMessage } from '@earendil-works/pi-agent-core';
+ import {
+   AgentSessionLeaseLostError,
+@@ -1294,6 +1295,10 @@
+     const { formalPlayfulContextFromPrompt } = await import('../mira-formal-playful-policy');
+     const { formalLearningContractFromPrompt, formalModelPolicyFromPrompt } = await import('../mira-formal-learning-contract');
+     const generationLearningContract = formalLearningContractFromPrompt(meta.prompt);
++    const textbookContract = textbookContractFromPrompt(meta.prompt);
++    const textbookGuard = textbookContract ? createTextbookAuthoringGuard(textbookContract, id, {
++      onCandidate: candidate => appendRequiredRunEvent('mira_textbook_authoring_candidate', candidate, Date.now()),
++    }) : undefined;
+     const formalModelPolicyId = formalModelPolicyFromPrompt(meta.prompt);
+     const formalSkillBundle = isMiraFormalAdaptiveSkillSession(formalSkillIdentity)
+       ? await prepareMiraFormalAdaptiveSkillBundle(
+@@ -1480,7 +1485,7 @@
+     // that carries them never persists a JSON-null key (reference semantics).
+     // `getAgentSessionStore` above already guards on DATABASE_URL, so the
+     // provider can only be reached with a configured connection string.
+-    const ownerScopedStore = (await getOwnerScopedDocumentStore(
++    const baseOwnerScopedStore = (await getOwnerScopedDocumentStore(
+       meta.ownerId,
+       async (transaction) => {
+         assertCurrentStageMutationActive();
+@@ -1488,6 +1493,7 @@
+         assertCurrentStageMutationActive();
+       },
+     )) as CourseStore;
++    const ownerScopedStore = textbookGuard ? textbookGuard.wrapStore(baseOwnerScopedStore) : baseOwnerScopedStore;
+     const resolveFollowUpElementContext = async (
+       message: FollowUpMessage,
+     ): Promise<FollowUpMessage> => {
+@@ -1541,6 +1547,7 @@
+         sessionId: id,
+         abortSignal: abort.signal,
+         getActiveSkill: () => activeSkill,
++        ...(textbookGuard ? { getTextbookPageContext: textbookGuard.context } : {}),
+         ...(generationLearningContract ? { getGenerationLearningContract: () => generationLearningContract } : {}),
+         ...(formalSkillBundle
+           ? {
+diff --git a/lib/server/agent-runtime/course-tools.ts b/lib/server/agent-runtime/course-tools.ts
+--- a/lib/server/agent-runtime/course-tools.ts
++++ b/lib/server/agent-runtime/course-tools.ts
+@@ -104,6 +104,8 @@
+   getGenerationSkillContext?: (input: MiraFormalSceneSkillInput) => MiraFormalSceneSkillContext;
+   /** Frozen formal prompt authority; never accepted from model tool parameters. */
+   getGenerationLearningContract?: () => LearningSceneContract | undefined;
++  /** Frozen textbook authority from the immutable opening request; never a tool flag. */
++  getTextbookPageContext?: (input: import('../mira-textbook-scene-contract').TextbookPageInput) => Promise<import('../mira-textbook-scene-contract').TextbookPageContext>;
+   /** Required durable evidence after the generated page/action has persisted. */
+   onGenerationSkillContext?: (
+     input: MiraFormalSceneSkillInput,
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -89,6 +89,7 @@
+     Type.Array(
+       Type.Object({
+         src: Type.String({ minLength: 1 }),
++        assetKey: Type.Optional(Type.String({ minLength: 1, description: "Frozen textbook semantic asset key; required for locked picture choices." })),
+         description: Type.String({ minLength: 1 }),
+         width: Type.Optional(Type.Number({ minimum: 1 })),
+         height: Type.Optional(Type.Number({ minimum: 1 })),
+@@ -244,6 +245,7 @@
+   const contextualCall = (
+     stage: Parameters<typeof routed>[0],
+     input: MiraFormalSceneSkillInput,
++    textbookText?: string,
+   ) => {
+     const base = aiCallFor(stage);
+     const context = deps.getGenerationSkillContext?.(input);
+@@ -251,9 +253,9 @@
+       throw new Error('FORMAL_SKILL_CONTEXT_RECORDER_MISSING');
+     let succeeded = false;
+     const learning = deps.getGenerationLearningContract?.();
+-    const call: AICallFn = context
++    const call: AICallFn = context || textbookText
+       ? async (system, user, images) => {
+-          const result = await base(`${system}\n\n${context.text}${learning ? learningSceneInstructions(learning) : ''}`, user, images);
++          const result = await base(`${system}\n\n${context?.text ?? ''}${learning ? learningSceneInstructions(learning) : ''}${textbookText ?? ''}`, user, images);
+           succeeded = true;
+           return result;
+         }
+@@ -287,6 +289,8 @@
+       }
+       const doc = await deps.store.loadDocument(params.stageId);
+       if (!doc) return result('No course document yet. Call create_stage first.', {}, true);
++      const textbookContext = await deps.getTextbookPageContext?.(params);
++      const suppliedWidgetOutline = textbookContext?.widgetOutline ?? params.widgetOutline;
+       const existing = doc.scenes.find((scene) => scene.order === params.order);
+       const title = params.title.trim();
+       const brief = params.brief.trim();
+@@ -327,8 +331,8 @@
+           true,
+         );
+       }
+-      if (params.widgetOutline !== undefined &&
+-          (params.type !== 'interactive' || !params.widgetType || !Check(WidgetOutlineParams, params.widgetOutline))) {
++      if (suppliedWidgetOutline !== undefined &&
++          (params.type !== 'interactive' || !params.widgetType || !Check(WidgetOutlineParams, suppliedWidgetOutline))) {
+         return result('widgetOutline needs an interactive widgetType and valid structured fields.', { error: 'invalid-widget-outline' }, true);
+       }
+       let exactActions: Action[] | undefined;
+@@ -356,12 +360,12 @@
+         order: params.order,
+         title,
+         type: params.type,
+-        description: brief,
++        description: textbookContext?.brief ?? brief,
+         keyPoints: params.materialFacts ?? [],
+         ...(params.type === 'interactive' && params.widgetType
+           ? {
+               widgetType: params.widgetType,
+-              widgetOutline: params.widgetOutline ? structuredClone(params.widgetOutline) as SceneOutline['widgetOutline'] : { concept: brief },
++              widgetOutline: suppliedWidgetOutline ? structuredClone(suppliedWidgetOutline) as SceneOutline['widgetOutline'] : { concept: brief },
+             }
+           : {}),
+         ...(params.type === 'pbl'
+@@ -428,7 +432,7 @@
+       const contentCall = contextualCall(sceneContentStage(params.type), {
+         ...pageInput,
+         phase: 'content',
+-      });
++      }, textbookContext?.text);
+       let content: Awaited<ReturnType<typeof generateSceneContent>>;
+       try {
+         content = await generateSceneContent(outline, contentCall.call, {
+@@ -438,13 +442,13 @@
+           allowProceduralSkill: true,
+           // Formal context comes only from the server-owned Skill bundle. The
+           // post-processor must not add CDN dependencies to self-contained pages.
+-          ...(deps.getGenerationSkillContext ? { interactiveIncludeKatex: false } : {}),
++          ...(deps.getGenerationSkillContext || textbookContext ? { interactiveIncludeKatex: false } : {}),
+           ...(params.widgetType === 'game' && contentCall.context?.playfulLearning
+             ? { explorationGame: true }
+             : {}),
+           ...(assignedImages.length ? { assignedImages, imageMapping } : {}),
+           ...(params.instruction ? { editDirective: params.instruction } : {}),
+-          ...(params.widgetOutline !== undefined ? { includeWidgetOutline: true } : {}),
++          ...(suppliedWidgetOutline !== undefined ? { includeWidgetOutline: true } : {}),
+           ...(exactActions !== undefined ? { exactActions } : {}),
+           ...(baseline ? { baselineContent: baseline } : {}),
+         });
+@@ -467,7 +471,7 @@
+       }
+       if (signal?.aborted) throw new Error('aborted');
+       if (!content) return result('Page content generation failed; nothing was written.', {}, true);
+-      const actionsCall = exactActions === undefined ? contextualCall('scene-actions', { ...pageInput, phase: 'actions' }) : undefined;
++      const actionsCall = exactActions === undefined ? contextualCall('scene-actions', { ...pageInput, phase: 'actions' }, textbookContext ? textbookContext.text + '\nACTUAL GENERATED PAGE CONTENT (copy each finite cue verbatim into speech actions):\n' + JSON.stringify(content) : undefined) : undefined;
+       if (deps.getGenerationLearningContract?.() && outline.type === 'interactive' && 'html' in content)
+         assertLearningInteractiveSyntax(content.html);
+       const actions = exactActions ?? filterKnownActions(
+@@ -550,13 +554,19 @@
+         ? doc?.scenes.find((item) => item.id === params.sceneId)
+         : doc?.scenes.find((item) => item.order === params.order);
+       if (!doc || !scene) return result('Page not found. Call list_scenes.', {}, true);
++      const textbookContext = await deps.getTextbookPageContext?.({
++        stageId: params.stageId, order: scene.order, title: scene.title, type: scene.type,
++        widgetType: scene.content.type === 'interactive' ? scene.content.widgetType : undefined,
++      });
++      if (textbookContext && params.synthesizeAudio === true)
++        return result('Frozen textbook authoring generates speech text only. Use the backend formal teacher narration workflow for audio.', { error: 'textbook-formal-audio-required' }, true);
+       const outline = outlineFromScene(scene, doc.outline);
+       const actionsCall = contextualCall('scene-actions', {
+         stageId: params.stageId,
+         sceneId: scene.id,
+         sceneType: scene.type,
+         phase: 'actions',
+-      });
++      }, textbookContext ? textbookContext.text + '\nACTUAL SAVED PAGE CONTENT (copy each finite cue verbatim into speech actions):\n' + JSON.stringify(scene.content) : undefined);
+       const actions = filterKnownActions(
+         await actionGenerator(outline, toGenerationContent(scene.content), actionsCall.call, {
+           ctx: actionContext(doc.scenes, scene),
+@@ -577,8 +587,8 @@
+         order: scene.order,
+         detail: `${actions.length} actions persisted`,
+       });
+-      let audio;
+-      if (params.synthesizeAudio !== false) {
++      let audio: Awaited<ReturnType<typeof synthesizeSceneNarration>> | { deferred: true; reason: string } | undefined = textbookContext ? { deferred: true, reason: 'textbook-formal-teacher-audio-required' } : undefined;
++      if (!textbookContext && params.synthesizeAudio !== false) {
+         audio = await (deps.synthesizeTts ?? synthesizeSceneNarration)({
+           scene: next,
+           force: false,
+diff --git a/app/api/agent/sessions/route.ts b/app/api/agent/sessions/route.ts
+--- a/app/api/agent/sessions/route.ts
++++ b/app/api/agent/sessions/route.ts
+@@ -191,6 +191,7 @@
+   return withRequestOwnerId(req, async (ownerId, responseHeaders) => {
+     const store = await getAgentSessionStore();
+     const sessions = await store.listSessionsByOwner(ownerId);
++    responseHeaders.set('x-mira-textbook-scene-contract', 'mira.frozen-textbook-scene-authoring.v1');
+     return NextResponse.json(sessions, { headers: responseHeaders });
+   });
+ }
+diff --git a/tests/agent-runtime/sessions-route.test.ts b/tests/agent-runtime/sessions-route.test.ts
+--- a/tests/agent-runtime/sessions-route.test.ts
++++ b/tests/agent-runtime/sessions-route.test.ts
+@@ -256,6 +256,7 @@
+   it('lists only sessions for the resolved owner', async () => {
+     mocks.listSessionsByOwner.mockResolvedValue([{ id: 'session-1', status: 'running' }]);
+     const response = await GET(new NextRequest('http://localhost/api/agent/sessions'));
++    expect(response.headers.get('x-mira-textbook-scene-contract')).toBe('mira.frozen-textbook-scene-authoring.v1');
+ 
+     expect(response.status).toBe(200);
+     expect(mocks.listSessionsByOwner).toHaveBeenCalledWith('anon:test');
+diff --git a/lib/server/mira-textbook-scene-contract.ts b/lib/server/mira-textbook-scene-contract.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-textbook-scene-contract.ts
+@@ -0,0 +1,801 @@
++import { createHash, randomUUID } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import sharp from 'sharp';
++import { parse, type DefaultTreeAdapterTypes as Tree } from 'parse5';
++import type { Scene } from '@/lib/types/stage';
++import type { CourseStore, CourseDocument } from './agent-runtime/course-tools';
++import { CLASSROOMS_DIR } from './classroom-storage';
++import { assertLearningInteractiveSyntax } from './mira-formal-learning-contract';
++import { formalSceneImageReferences } from './mira-formal-media';
++
++const START = '\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n';
++const END = '\nEND_MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT\n';
++const HEX = /^[a-f0-9]{64}$/;
++const CATALOG_ID = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/;
++const STAGE_ID = /^[A-Za-z0-9_-]{1,160}$/;
++const CUE_ID = /^[A-Za-z0-9_-]{1,128}$/;
++type Json = Record<string, any>;
++const nonempty = (v: unknown): v is string => typeof v === 'string' && !!v.trim();
++const object = (v: unknown): v is Json => !!v && typeof v === 'object' && !Array.isArray(v);
++function fail(code: string): never {
++  throw new Error(`TEXTBOOK_SCENE_${code}`);
++}
++function compareCodePoints(a: string, b: string): number {
++  const left = Array.from(a, (c) => c.codePointAt(0)!);
++  const right = Array.from(b, (c) => c.codePointAt(0)!);
++  for (let i = 0; i < Math.min(left.length, right.length); i++)
++    if (left[i] !== right[i]) return left[i] - right[i];
++  return left.length - right.length;
++}
++/** Match Python sort_keys even for numeric-looking and non-BMP object keys. */
++export function textbookCanonical(v: any): string {
++  if (Array.isArray(v))
++    return '[' + v.map((item) => textbookCanonical(item ?? null)).join(',') + ']';
++  if (object(v))
++    return (
++      '{' +
++      Object.keys(v)
++        .filter((k) => v[k] !== undefined)
++        .sort(compareCodePoints)
++        .map((k) => JSON.stringify(k) + ':' + textbookCanonical(v[k]))
++        .join(',') +
++      '}'
++    );
++  return JSON.stringify(v);
++}
++export const textbookDigest = (v: unknown): string =>
++  createHash('sha256').update(textbookCanonical(v)).digest('hex');
++function safeContractJson(v: unknown): void {
++  if (typeof v === 'number' && !Number.isSafeInteger(v)) fail('CONTRACT_NUMBER_UNSUPPORTED');
++  if (Array.isArray(v)) for (const item of v) safeContractJson(item);
++  else if (object(v)) for (const item of Object.values(v)) safeContractJson(item);
++}
++
++export interface FrozenTextbookContract {
++  schemaVersion: 'mira.frozen-textbook-scene-authoring.v1';
++  contract: {
++    schemaVersion: 'mira.textbook.scene-authoring-contract.v1';
++    binding: Json;
++    catalogEvidence: Json;
++    teacherContract: Json;
++    interactionPolicy: Json;
++    qualityRules: string[];
++    scopeReview: Json;
++    pagePlan: Json[];
++    lockedAssessments: Json[];
++  };
++  sha256: string;
++}
++export interface TextbookPageInput {
++  stageId: string;
++  order: number;
++  type: string;
++  title: string;
++  widgetType?: string;
++  widgetOutline?: Json;
++  media?: { src: string; assetKey?: string; description?: string }[];
++}
++export interface TextbookPageContext {
++  text: string;
++  brief: string;
++  widgetOutline?: Json;
++}
++interface AssetBinding {
++  assetKey: string;
++  src: string;
++  sha256: string;
++  width: number;
++  height: number;
++  bindingVersion: number;
++  status: 'author_candidate';
++}
++interface Candidate extends Json {
++  schemaVersion: 'mira.textbook.authoring-candidate.v1';
++  sessionId: string;
++  stageId: string;
++  frozenContract: FrozenTextbookContract;
++  assetBindings: AssetBinding[];
++  bindingHistory: { assetKey: string; from: AssetBinding; to: AssetBinding }[];
++  scenes: {
++    sceneId: string;
++    order: number;
++    sha256: string;
++    canonicalJson: string;
++    contractSha256: string;
++  }[];
++}
++
++export function assertTextbookContract(raw: unknown): asserts raw is FrozenTextbookContract {
++  safeContractJson(raw);
++  if (
++    !object(raw) ||
++    Object.keys(raw).sort().join(',') !== 'contract,schemaVersion,sha256' ||
++    raw.schemaVersion !== 'mira.frozen-textbook-scene-authoring.v1' ||
++    !object(raw.contract) ||
++    raw.sha256 !== textbookDigest(raw.contract)
++  )
++    fail('CONTRACT_INTEGRITY');
++  const c = raw.contract;
++  if (
++    Object.keys(c).sort().join(',') !==
++      'binding,catalogEvidence,interactionPolicy,lockedAssessments,pagePlan,qualityRules,schemaVersion,scopeReview,teacherContract' ||
++    c.schemaVersion !== 'mira.textbook.scene-authoring-contract.v1' ||
++    !object(c.binding) ||
++    !/^primary_[1-6]$/.test(c.binding.gradeCode) ||
++    !['chinese', 'math', 'english', 'science'].includes(c.binding.subject) ||
++    ['editionId', 'revisionId', 'nodeId', 'unitId'].some((k) => !CATALOG_ID.test(c.binding[k])) ||
++    !['upper', 'lower', 'full'].includes(c.binding.volume) ||
++    !['six_year', 'five_four'].includes(c.binding.schoolSystem) ||
++    (c.binding.schoolSystem === 'five_four' && c.binding.gradeCode === 'primary_6') ||
++    !nonempty(c.binding.unitTitle) ||
++    !nonempty(c.binding.lessonTitle) ||
++    !object(c.catalogEvidence) ||
++    !HEX.test(c.catalogEvidence.manifestSha256) ||
++    !HEX.test(c.catalogEvidence.lessonScopeSha256) ||
++    !object(c.teacherContract) ||
++    c.teacherContract.subject !== c.binding.subject ||
++    ['teacherProfileId', 'teacherProfileHash', 'teacherName', 'voiceId', 'languageCode'].some(
++      (k) => !nonempty(c.teacherContract[k]),
++    ) ||
++    !Number.isSafeInteger(c.teacherContract.teacherProfileVersion) ||
++    c.teacherContract.teacherProfileVersion < 1 ||
++    !object(c.scopeReview) ||
++    !Object.keys(c.scopeReview).length ||
++    !Array.isArray(c.qualityRules) ||
++    !c.qualityRules.length ||
++    c.qualityRules.some((x: unknown) => typeof x !== 'string' || !x.trim()) ||
++    !object(c.interactionPolicy) ||
++    c.interactionPolicy.schemaVersion !== 'mira.frozen-interaction-policy.v1' ||
++    !object(c.interactionPolicy.policy) ||
++    c.interactionPolicy.sha256 !== textbookDigest(c.interactionPolicy.policy) ||
++    !Array.isArray(c.pagePlan) ||
++    !c.pagePlan.length ||
++    !Array.isArray(c.lockedAssessments)
++  )
++    fail('CONTRACT_INVALID');
++  const seen = new Set<string>();
++  for (const [index, p] of c.pagePlan.entries()) {
++    if (
++      !object(p) ||
++      p.page !== index + 1 ||
++      !['slide', 'interactive', 'quiz'].includes(p.type) ||
++      typeof p.title !== 'string' ||
++      !p.title.trim() ||
++      !nonempty(p.move)
++    )
++      fail('PAGE_PLAN_INVALID');
++    if (
++      p.narrationGuidance !== undefined &&
++      (!Array.isArray(p.narrationGuidance) ||
++        (p.narrationGuidance.length && p.type !== 'quiz') ||
++        p.narrationGuidance.some((x: unknown) => typeof x !== 'string' || !x.trim()) ||
++        new Set(p.narrationGuidance).size !== p.narrationGuidance.length)
++    )
++      fail('QUIZ_GUIDANCE_INVALID');
++    const ids = p.questionIds ?? [];
++    if (
++      !Array.isArray(ids) ||
++      ids.some((id) => !CATALOG_ID.test(id)) ||
++      new Set(ids).size !== ids.length ||
++      (p.type === 'quiz' &&
++        (!ids.length ||
++          (['primary_1', 'primary_2'].includes(c.binding.gradeCode) && ids.length !== 1))) ||
++      (p.type !== 'quiz' && ids.length)
++    )
++      fail('LOCKED_QUESTION_SCOPE');
++  }
++  for (const q of c.lockedAssessments) {
++    if (
++      !object(q) ||
++      !CATALOG_ID.test(q.id) ||
++      seen.has(q.id) ||
++      typeof q.question !== 'string' ||
++      !q.question.trim() ||
++      q.type !== 'single' ||
++      !Number.isSafeInteger(q.page) ||
++      !Number.isInteger(q.points) ||
++      q.points <= 0 ||
++      !nonempty(q.analysis) ||
++      (q.visualAsset !== undefined && !CATALOG_ID.test(q.visualAsset)) ||
++      !Array.isArray(q.choices) ||
++      q.choices.length < 2 ||
++      q.choices.length > 6 ||
++      q.choices.some(
++        (o: Json) =>
++          !object(o) ||
++          !nonempty(o.value) ||
++          !nonempty(o.label) ||
++          (['primary_1', 'primary_2'].includes(c.binding.gradeCode) && !CATALOG_ID.test(o.asset)) ||
++          (o.asset !== undefined && !CATALOG_ID.test(o.asset)),
++      ) ||
++      new Set(q.choices.map((o: Json) => o.value)).size !== q.choices.length
++    )
++      fail('LOCKED_QUESTION_INVALID');
++    const page = c.pagePlan[q.page - 1];
++    if (!page || page.type !== 'quiz' || !page.questionIds.includes(q.id))
++      fail('LOCKED_QUESTION_SCOPE');
++    const answers = Array.isArray(q.answer) ? q.answer : [q.answer];
++    if (
++      typeof q.answer !== 'string' ||
++      !answers.length ||
++      answers.some((a: string) => !q.choices.some((o: Json) => o.value === a))
++    )
++      fail('LOCKED_ANSWER_INVALID');
++    if (
++      (page.narrationGuidance ?? []).some(
++        (line: string) => line === q.question || line === q.analysis,
++      )
++    )
++      fail('QUIZ_GUIDANCE_INVALID');
++    seen.add(q.id);
++  }
++  const planned = c.pagePlan.flatMap((p: Json) => (p.type === 'quiz' ? p.questionIds : []));
++  if (
++    planned.length !== seen.size ||
++    new Set(planned).size !== seen.size ||
++    planned.some((id: string) => !seen.has(id))
++  )
++    fail('LOCKED_QUESTION_SCOPE');
++}
++
++/** Only the immutable opening request is authority; follow-ups/tool booleans cannot downgrade it. */
++export function textbookContractFromPrompt(prompt: string): FrozenTextbookContract | undefined {
++  if (!prompt.includes('MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT')) return undefined;
++  const parts = prompt.split(START);
++  if (parts.length !== 2 || parts[1].split(END).length !== 2) fail('CONTRACT_ENVELOPE_INVALID');
++  let raw: unknown;
++  try {
++    raw = JSON.parse(parts[1].split(END)[0]);
++  } catch {
++    fail('CONTRACT_ENVELOPE_INVALID');
++  }
++  assertTextbookContract(raw);
++  return raw;
++}
++
++function pageFor(
++  frozen: FrozenTextbookContract,
++  input: Pick<TextbookPageInput, 'order' | 'type' | 'title' | 'widgetType' | 'widgetOutline'>,
++): Json {
++  const p = frozen.contract.pagePlan[input.order - 1];
++  if (
++    !p ||
++    p.page !== input.order ||
++    p.type !== input.type ||
++    p.title !== input.title ||
++    (p.widgetType && p.widgetType !== input.widgetType)
++  )
++    fail('PAGE_SCOPE_MISMATCH');
++  if (
++    p.widgetOutline &&
++    input.widgetOutline &&
++    textbookDigest(p.widgetOutline) !== textbookDigest(input.widgetOutline)
++  )
++    fail('PAGE_SCOPE_MISMATCH');
++  return p;
++}
++function htmlDetails(html: string): {
++  cues: Json[];
++  images: string[];
++  marker: boolean;
++} {
++  const document = parse(html);
++  let markerCount = 0;
++  const blocks: string[] = [];
++  const images: string[] = [];
++  const visit = (node: Tree.Node, parent?: string) => {
++    if ('tagName' in node) {
++      const attrs = Object.fromEntries(node.attrs.map((a) => [a.name, a.value]));
++      if (
++        node.tagName === 'meta' &&
++        attrs.name === 'mira-responsive-activity' &&
++        parent === 'head'
++      ) {
++        if (attrs.content !== 'low-reading-v1') fail('RESPONSIVE_MARKER_INVALID');
++        markerCount++;
++      }
++      if (node.tagName === 'script') {
++        if (attrs.src || attrs.type === 'module') fail('EXTERNAL_RESOURCE');
++        if (attrs.id === 'mira-narration-cues') {
++          if (attrs.type !== 'application/json') fail('CUES_INVALID');
++          blocks.push(node.childNodes.map((n) => ('value' in n ? n.value : '')).join(''));
++        }
++      }
++      if (
++        ['iframe', 'object', 'embed', 'audio', 'video', 'source'].includes(node.tagName) ||
++        (node.tagName === 'link' && attrs.href)
++      )
++        fail('EXTERNAL_RESOURCE');
++      if (node.tagName === 'img') {
++        if (!attrs.src || attrs.srcset) fail('IMAGE_BINDING_MISSING');
++        images.push(attrs.src);
++      }
++      // Templates are inert and cannot provide the required marker/cues/pictures.
++      if (node.tagName === 'template') return;
++    }
++    if ('childNodes' in node)
++      for (const child of node.childNodes) visit(child, 'tagName' in node ? node.tagName : parent);
++  };
++  visit(document);
++  if (
++    /speechSynthesis|SpeechSynthesisUtterance|\bnew\s+Audio\s*\(|\b(?:localStorage|sessionStorage|indexedDB)\b|document\s*\.\s*cookie|\b(?:fetch|XMLHttpRequest|WebSocket|EventSource)\b/.test(
++      html,
++    ) ||
++    /(?:window\s*\.\s*miraNarrate\s*=(?!=)|function\s+miraNarrate\b)/.test(html)
++  )
++    fail('UNSAFE_AUDIO_OR_STORAGE');
++  if (/@import\b|url\(\s*["']?(?:https?:|\/\/|data:)/i.test(html)) fail('EXTERNAL_RESOURCE');
++  assertLearningInteractiveSyntax(html);
++  let cues: Json[] = [];
++  if (blocks.length) {
++    if (blocks.length !== 1) fail('CUES_INVALID');
++    let payload: Json;
++    try {
++      payload = JSON.parse(blocks[0]);
++    } catch {
++      fail('CUES_INVALID');
++    }
++    if (
++      payload!.schemaVersion !== 'mira.interactive.narration-cues.v1' ||
++      !Array.isArray(payload!.cues)
++    )
++      fail('CUES_INVALID');
++    cues = payload!.cues;
++    if (
++      !cues.length ||
++      cues.length > 120 ||
++      cues.some(
++        (c) =>
++          !object(c) ||
++          !CUE_ID.test(c.id) ||
++          typeof c.text !== 'string' ||
++          !c.text.trim() ||
++          c.text !== c.text.trim() ||
++          Array.from(c.text).length > 1000,
++      ) ||
++      new Set(cues.map((c) => c.id)).size !== cues.length
++    )
++      fail('CUES_INVALID');
++  }
++  return { cues, images, marker: markerCount === 1 };
++}
++
++function sceneImages(scene: Scene): string[] {
++  const refs = new Set(formalSceneImageReferences(scene));
++  const add = (v: any) => {
++    if (v?.kind === 'image' && typeof v.src === 'string') refs.add(v.src);
++    if (v?.kind === 'people')
++      for (const member of v.members ?? [])
++        if (typeof member.src === 'string') refs.add(member.src);
++  };
++  if (scene.content.type === 'quiz')
++    for (const q of scene.content.questions) {
++      add(q.visual);
++      for (const v of Object.values(q.optionVisuals ?? {})) add(v);
++    }
++  return [...refs];
++}
++
++/** Static contract checks, never a claim that a game or pictured meaning was play-tested. */
++export function assertTextbookScene(
++  scene: Scene,
++  frozen: FrozenTextbookContract,
++  bindings: AssetBinding[],
++): void {
++  if (scene.content.type !== scene.type) fail('PAGE_SCOPE_MISMATCH');
++  const p = pageFor(frozen, {
++    order: scene.order,
++    type: scene.type,
++    title: scene.title,
++    widgetType: (scene.content as any).widgetType,
++  });
++  const low = ['primary_1', 'primary_2'].includes(frozen.contract.binding.gradeCode);
++  const speech = (scene.actions ?? []).filter((a) => a.type === 'speech') as {
++    id: string;
++    text: string;
++  }[];
++  if (
++    !speech.length ||
++    speech.some((a) => !a.id || !a.text?.trim()) ||
++    new Set(speech.map((a) => a.id)).size !== speech.length
++  )
++    fail('SPEECH_MISSING');
++  const byKey = new Map(bindings.map((b) => [b.assetKey, b]));
++  if (scene.content.type === 'interactive') {
++    if (typeof scene.content.html !== 'string') fail('INLINE_HTML_REQUIRED');
++    const h = htmlDetails(scene.content.html);
++    if (low && (!h.marker || !h.images.length || !h.cues.length))
++      fail('LOW_READING_INTERACTIVE_INCOMPLETE');
++    if (
++      h.cues.length &&
++      (h.cues.length !== speech.length ||
++        new Set(h.cues.map((c) => c.text)).size !== h.cues.length ||
++        h.cues.some((c) => speech.filter((a) => a.text === c.text).length !== 1))
++    )
++      fail('CUE_SPEECH_MISMATCH');
++  }
++  if (scene.content.type === 'quiz') {
++    const qs = scene.content.questions;
++    if (textbookDigest(qs.map((q) => q.id)) !== textbookDigest(p.questionIds))
++      fail('LOCKED_QUESTION_SCOPE');
++    for (const q of qs) {
++      const lock = frozen.contract.lockedAssessments.find((a) => a.id === q.id)!;
++      const expected = {
++        id: lock.id,
++        type: lock.type,
++        question: lock.question,
++        points: lock.points,
++        options: lock.choices.map((c: Json) => ({
++          value: c.value,
++          label: c.label,
++        })),
++        answer: Array.isArray(lock.answer) ? lock.answer : [lock.answer],
++        analysis: lock.analysis,
++      };
++      const actual = Object.fromEntries(Object.keys(expected).map((k) => [k, (q as any)[k]]));
++      if (q.hasAnswer === false || textbookDigest(expected) !== textbookDigest(actual))
++        fail('LOCKED_QUESTION_CHANGED');
++      if (
++        speech.filter((a) => a.text === q.question).length !== 1 ||
++        speech.some(
++          (a) =>
++            !qs.some((t) => t.question === a.text) && !(p.narrationGuidance ?? []).includes(a.text),
++        ) ||
++        new Set(speech.map((a) => a.text)).size !== speech.length
++      )
++        fail('QUIZ_SPEECH_MISMATCH');
++      if (lock.visualAsset) {
++        const expectedVisual = byKey.get(lock.visualAsset);
++        if (!expectedVisual || q.visual?.kind !== 'image' || q.visual.src !== expectedVisual.src)
++          fail('QUIZ_ASSET_BINDING_MISSING');
++      } else if (
++        q.visual !== undefined &&
++        (!object(q.visual) ||
++          q.visual.kind !== 'image' ||
++          !bindings.some((b) => b.src === (q.visual as { src: string }).src))
++      )
++        fail('QUIZ_ASSET_BINDING_MISSING');
++      if (low || lock.choices.some((choice: Json) => choice.asset)) {
++        if (
++          !object(q.optionVisuals) ||
++          Object.keys(q.optionVisuals).sort().join('\0') !==
++            lock.choices
++              .map((c: Json) => c.value)
++              .sort()
++              .join('\0')
++        )
++          fail('QUIZ_PICTURES_MISSING');
++        const hashes = lock.choices.map((choice: Json) => {
++          const b = byKey.get(choice.asset);
++          const visual = q.optionVisuals![choice.value];
++          if (
++            !b ||
++            !visual ||
++            visual.kind !== 'image' ||
++            visual.src !== b.src ||
++            !visual.alt?.trim()
++          )
++            fail('QUIZ_ASSET_BINDING_MISSING');
++          return b.sha256;
++        });
++        if (low && new Set(hashes).size !== hashes.length) fail('QUIZ_PICTURES_NOT_DISTINCT');
++      }
++    }
++  }
++  const refs = sceneImages(scene);
++  if (low && !refs.length) fail('TEACHING_IMAGE_MISSING');
++  if (refs.some((src) => !bindings.some((b) => b.src === src))) fail('IMAGE_BINDING_MISSING');
++}
++
++export function createTextbookAuthoringGuard(
++  frozen: FrozenTextbookContract,
++  sessionId: string,
++  options: {
++    classroomsDir?: string;
++    onCandidate?: (candidate: Json) => Promise<void>;
++  } = {},
++) {
++  assertTextbookContract(frozen);
++  const root = path.resolve(options.classroomsDir ?? CLASSROOMS_DIR);
++  const inMemory = new Map<string, Candidate>();
++  const writes = new Map<string, Promise<unknown>>();
++  const serial = <T>(id: string, task: () => Promise<T>): Promise<T> => {
++    const running = (writes.get(id) ?? Promise.resolve()).catch(() => undefined).then(task);
++    writes.set(id, running);
++    void running
++      .finally(() => {
++        if (writes.get(id) === running) writes.delete(id);
++      })
++      .catch(() => undefined);
++    return running;
++  };
++  let ownerStore: CourseStore | undefined;
++  const fileFor = (id: string) => {
++    if (!STAGE_ID.test(id)) fail('STAGE_INVALID');
++    return path.join(root, id, 'textbook-authoring-candidate.json');
++  };
++  async function read(id: string): Promise<Candidate> {
++    if (inMemory.has(id)) return inMemory.get(id)!;
++    let candidate: Candidate;
++    try {
++      const { sha256, ...saved } = JSON.parse(await fs.readFile(fileFor(id), 'utf8'));
++      if (
++        sha256 !== textbookDigest(saved) ||
++        saved.schemaVersion !== 'mira.textbook.authoring-candidate.v1' ||
++        saved.sessionId !== sessionId ||
++        saved.stageId !== id ||
++        !object(saved.frozenContract) ||
++        textbookDigest(saved.frozenContract) !== textbookDigest(frozen) ||
++        saved.status !== 'author_candidate' ||
++        saved.verification !== 'static_contract_only_not_play_or_semantic_review' ||
++        !Array.isArray(saved.assetBindings) ||
++        !Array.isArray(saved.bindingHistory) ||
++        !Array.isArray(saved.scenes)
++      )
++        fail('CANDIDATE_INTEGRITY');
++      candidate = saved as Candidate;
++    } catch (e: any) {
++      if (e.code !== 'ENOENT') throw e;
++      candidate = {
++        schemaVersion: 'mira.textbook.authoring-candidate.v1',
++        sessionId,
++        stageId: id,
++        frozenContract: frozen,
++        status: 'author_candidate',
++        verification: 'static_contract_only_not_play_or_semantic_review',
++        assetBindings: [],
++        bindingHistory: [],
++        scenes: [],
++      };
++    }
++    inMemory.set(id, candidate);
++    return candidate;
++  }
++  async function image(src: string, stageId: string) {
++    const prefix = `/api/classroom-media/${stageId}/media/`;
++    if (
++      !src.startsWith(prefix) ||
++      !/^[A-Za-z0-9_.-]+\.(?:png|jpg|jpeg|webp)$/.test(src.slice(prefix.length))
++    )
++      fail('IMAGE_NOT_STAGE_OWNED');
++    const file = path.join(await fs.realpath(root), stageId, 'media', src.slice(prefix.length));
++    let bytes: Buffer;
++    try {
++      if ((await fs.realpath(file)) !== file || (await fs.stat(file)).size > 32 * 1024 * 1024)
++        fail('IMAGE_BYTES_INVALID');
++      bytes = await fs.readFile(file);
++    } catch (e: any) {
++      if (e.message?.startsWith('TEXTBOOK_SCENE_')) throw e;
++      fail('IMAGE_FILE_MISSING');
++    }
++    let meta;
++    try {
++      meta = await sharp(bytes!, { limitInputPixels: 40_000_000 }).metadata();
++    } catch {
++      fail('IMAGE_BYTES_INVALID');
++    }
++    if (!['png', 'jpeg', 'webp'].includes(meta!.format ?? '') || !meta!.width || !meta!.height)
++      fail('IMAGE_BYTES_INVALID');
++    return {
++      src,
++      sha256: createHash('sha256').update(bytes!).digest('hex'),
++      width: meta!.width!,
++      height: meta!.height!,
++    };
++  }
++  async function persist(candidate: Candidate) {
++    const file = fileFor(candidate.stageId);
++    const pending = file + '.' + randomUUID() + '.tmp';
++    await fs.mkdir(path.dirname(file), { recursive: true });
++    await fs.writeFile(
++      pending,
++      JSON.stringify({ ...candidate, sha256: textbookDigest(candidate) }),
++      { mode: 0o600 },
++    );
++    await fs.rename(pending, file);
++  }
++  async function verifyBytes(candidate: Candidate, scenes: Scene[]) {
++    const refs = new Set(scenes.flatMap(sceneImages));
++    for (const src of refs) {
++      const actual = await image(src, candidate.stageId);
++      if (!candidate.assetBindings.some((b) => b.src === src && b.sha256 === actual.sha256))
++        fail('IMAGE_BYTES_CHANGED');
++    }
++  }
++  return {
++    context(input: TextbookPageInput): Promise<TextbookPageContext> {
++      return serial(input.stageId, async () => {
++        const page = pageFor(frozen, input);
++        const document = await ownerStore?.loadDocument(input.stageId);
++        if ((document?.outline as any)?.producerRef !== sessionId) fail('STAGE_SESSION_MISMATCH');
++        const candidate = await read(input.stageId);
++        if (
++          document!.scenes.length !== candidate.scenes.length ||
++          document!.scenes.some(
++            (scene) =>
++              !candidate.scenes.some(
++                (saved) => saved.sceneId === scene.id && saved.sha256 === textbookDigest(scene),
++              ),
++          )
++        ) {
++          fail('SAVED_CANDIDATE_REVIEW_REQUIRED');
++        }
++        const next = structuredClone(candidate);
++        const seen = new Set<string>();
++        for (const media of input.media ?? []) {
++          // Unlabelled non-assessment images still get a stable byte-derived key.
++          const actual = await image(media.src, input.stageId);
++          const key = media.assetKey ?? `image-${actual.sha256}`;
++          if (!CATALOG_ID.test(key) || seen.has(key)) fail('ASSET_KEY_INVALID');
++          seen.add(key);
++          const previous = next.assetBindings.find((b) => b.assetKey === key);
++          if (!previous || previous.src !== actual.src || previous.sha256 !== actual.sha256) {
++            const binding: AssetBinding = {
++              ...actual,
++              assetKey: key,
++              bindingVersion: (previous?.bindingVersion ?? 0) + 1,
++              status: 'author_candidate',
++            };
++            if (previous)
++              next.bindingHistory.push({
++                assetKey: key,
++                from: previous,
++                to: binding,
++              });
++            next.assetBindings = [...next.assetBindings.filter((b) => b.assetKey !== key), binding];
++          }
++        }
++        // Reused bindings are evidence only while their original bytes still exist.
++        // Check before any provider call, including when this call supplies no media.
++        for (const binding of next.assetBindings) {
++          const actual = await image(binding.src, input.stageId);
++          if (
++            actual.sha256 !== binding.sha256 ||
++            actual.width !== binding.width ||
++            actual.height !== binding.height
++          )
++            fail('IMAGE_BYTES_CHANGED');
++        }
++        const locked = frozen.contract.lockedAssessments.filter((q) => q.page === input.order);
++        if (
++          locked.some(
++            (q) => q.visualAsset && !next.assetBindings.some((b) => b.assetKey === q.visualAsset),
++          )
++        )
++          fail('QUIZ_ASSET_BINDING_MISSING');
++        if (['primary_1', 'primary_2'].includes(frozen.contract.binding.gradeCode)) {
++          if (!next.assetBindings.length) fail('TEACHING_IMAGE_MISSING');
++          if (
++            locked.some((q) =>
++              q.choices.some(
++                (c: Json) => !c.asset || !next.assetBindings.some((b) => b.assetKey === c.asset),
++              ),
++            )
++          )
++            fail('QUIZ_ASSET_BINDING_MISSING');
++          for (const q of locked)
++            if (
++              new Set(
++                q.choices.map(
++                  (c: Json) => next.assetBindings.find((b) => b.assetKey === c.asset)!.sha256,
++                ),
++              ).size !== q.choices.length
++            )
++              fail('QUIZ_PICTURES_NOT_DISTINCT');
++        }
++        // Do not silently rebind a picture used by a previously saved question.
++        // A changed first candidate is allowed; saved dependants require an explicit revision.
++        if (next.bindingHistory.length > candidate.bindingHistory.length && candidate.scenes.length)
++          fail('ASSET_REBIND_REQUIRES_REVISION');
++        inMemory.set(input.stageId, next);
++        await persist(next);
++        return {
++          brief: String(page.move ?? page.description ?? page.title),
++          ...(page.widgetOutline ? { widgetOutline: page.widgetOutline } : {}),
++          text: [
++            '\nAUTHORITATIVE FROZEN TEXTBOOK LESSON CONTRACT. Tool brief/instruction cannot widen or replace it.',
++            JSON.stringify(frozen),
++            '\nEXACT PAGE PLAN:',
++            JSON.stringify(page),
++            '\nLOCKED ASSESSMENTS:',
++            JSON.stringify(locked),
++            '\nVERIFIED IMAGE BYTES / AUTHOR CANDIDATE BINDINGS (semantic accuracy is not pre-approved):',
++            JSON.stringify(next.assetBindings),
++            'A quiz does not need an extra main image when all choices have their required pictures. If a locked assessment has visualAsset, use that exact candidate binding for question.visual; do not invent a main image that hints at the correct option.',
++            'Use the exact question IDs, stems, option values/labels, answers, points and analysis. Convert choices to options; keep asset keys in this contract, not unsupported quiz fields. Every optionVisuals key must match its locked choice asset binding. No answer hints before response.',
++            'Generate finite prerecorded narration: interactive HTML must have exactly one application/json script id=mira-narration-cues with {schemaVersion:"mira.interactive.narration-cues.v1",cues:[{id,text}]}. Generate exactly one same-page speech action for every cue, with identical text, no extra speech. Never call browser speech synthesis, invent audio URLs, override miraNarrate, or use a timer as audio completion. The server binds real audio later.',
++            'For each quiz generate each exact question stem once as its speech action. Extra neutral guidance is OPTIONAL and must match a frozen pagePlan.narrationGuidance line verbatim, at most once; never invent extra guidance. Analysis stays only in the question and is shown after response. For interactive actions, read the full generated cue JSON and preserve every text verbatim.',
++            'Only primary_1/primary_2 require picture-led choices, real img elements, one task, responsive head meta name="mira-responsive-activity" content="low-reading-v1", and 56 CSS px touch targets. Preserve actual state and child decisions; ready must follow that cue playing, with cancellation on hide/error. Self-contained HTML only: no CDN, external scripts/styles, storage or network calls.',
++            'These constraints are structural authoring gates; never claim real play, picture meaning, narration audit, publication or mastery has passed.',
++          ].join('\n'),
++        };
++      });
++    },
++    wrapStore(store: CourseStore): CourseStore {
++      ownerStore = store;
++      const guarded = async (doc: CourseDocument) => {
++        const producer = (doc.outline as any)?.producerRef;
++        if (producer !== sessionId) fail('STAGE_SESSION_MISMATCH');
++        const candidate = await read(doc.stage.id);
++        if (new Set(doc.scenes.map((s) => s.order)).size !== doc.scenes.length)
++          fail('PAGE_SCOPE_MISMATCH');
++        for (const scene of doc.scenes) {
++          if (scene.stageId !== doc.stage.id) fail('STAGE_SESSION_MISMATCH');
++          assertTextbookScene(scene, frozen, candidate.assetBindings);
++        }
++        await verifyBytes(candidate, doc.scenes);
++        return {
++          ...candidate,
++          scenes: [...doc.scenes]
++            .sort((a, b) => a.order - b.order)
++            .map((s) => ({
++              sceneId: s.id,
++              order: s.order,
++              sha256: textbookDigest(s),
++              canonicalJson: textbookCanonical(s),
++              contractSha256: frozen.sha256,
++            })),
++        };
++      };
++      const record = async (candidate: Candidate) => {
++        inMemory.set(candidate.stageId, candidate);
++        await persist(candidate);
++        await options.onCandidate?.({
++          schemaVersion: candidate.schemaVersion,
++          stageId: candidate.stageId,
++          sessionId,
++          contractSha256: frozen.sha256,
++          candidateSha256: textbookDigest(candidate),
++          scenes: candidate.scenes.map(({ canonicalJson: _canonicalJson, ...summary }) => summary),
++          verification: 'static_contract_only_not_play_or_semantic_review',
++        });
++      };
++      return new Proxy(store, {
++        get(target, property) {
++          if (property === 'putScene')
++            return (id: string, scene: Scene) =>
++              serial(id, async () => {
++                const doc = await target.loadDocument(id);
++                if (!doc) fail('STAGE_MISSING');
++                const next = {
++                  ...doc!,
++                  scenes: [...doc!.scenes.filter((s) => s.id !== scene.id), scene],
++                };
++                const candidate = await guarded(next);
++                const result = await target.putScene(id, scene);
++                await record(candidate);
++                return result;
++              });
++          if (property === 'saveDocument')
++            return (doc: CourseDocument) =>
++              serial(doc.stage.id, async () => {
++                const candidate = await guarded(doc);
++                const result = await target.saveDocument(doc);
++                await record(candidate);
++                return result;
++              });
++          if (property === 'deleteDocument')
++            return async () => {
++              fail('DOCUMENT_REMOVAL_REQUIRES_REVIEW');
++            };
++          if (property === 'deleteScene')
++            return (id: string, sceneId: string) =>
++              serial(id, async () => {
++                const doc = await target.loadDocument(id);
++                if (!doc) fail('STAGE_MISSING');
++                const candidate = await guarded({
++                  ...doc!,
++                  scenes: doc!.scenes.filter((s) => s.id !== sceneId),
++                });
++                const result = await target.deleteScene(id, sceneId);
++                await record(candidate);
++                return result;
++              });
++          const value = Reflect.get(target, property);
++          return typeof value === 'function' ? value.bind(target) : value;
++        },
++      });
++    },
++  };
++}
+diff --git a/tests/agent-runtime/textbook-scene-contract.test.ts b/tests/agent-runtime/textbook-scene-contract.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/agent-runtime/textbook-scene-contract.test.ts
+@@ -0,0 +1,643 @@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { promises as fs } from 'node:fs';
++import { tmpdir } from 'node:os';
++import path from 'node:path';
++import sharp from 'sharp';
++import realSnapshot from '../fixtures/textbook-scene-contract.v1.json';
++import type { Scene } from '@/lib/types/stage';
++import type { CourseDocument, CourseStore } from '@/lib/server/agent-runtime/course-tools';
++import { buildGenerationTools } from '@/lib/server/agent-runtime/generation-tools';
++import { buildDslCourseTools } from '@/lib/server/agent-runtime/dsl-tools';
++import {
++  assertTextbookContract,
++  assertTextbookScene,
++  createTextbookAuthoringGuard,
++  textbookContractFromPrompt,
++  textbookDigest,
++  textbookCanonical,
++  type FrozenTextbookContract,
++} from '@/lib/server/mira-textbook-scene-contract';
++
++vi.mock('@openmaic/generation', async () => import('@/packages/@openmaic/generation/src/index'));
++const stageId = 'stage-contract',
++  sessionId = 'session-contract';
++const stem = '听一听，请找到正在见面打招呼的那幅图。';
++const cue = '请听老师说，再让两位朋友走近。';
++const q = () => ({
++  id: 'hello-01',
++  page: 3,
++  type: 'single',
++  points: 10,
++  question: stem,
++  choices: [
++    { value: 'A', label: '第一张图', asset: 'leaving' },
++    { value: 'B', label: '第二张图', asset: 'meeting' },
++  ],
++  answer: 'B',
++  analysis: '两位朋友刚刚见面。',
++});
++const frozen = (grade = 'primary_1', subject = 'english'): FrozenTextbookContract => {
++  const policy = {
++    schemaVersion: 'mira.textbook.interaction-policy.v1',
++    policyId: 'meaningful',
++    version: 1,
++  };
++  const contract = {
++    schemaVersion: 'mira.textbook.scene-authoring-contract.v1' as const,
++    binding: {
++      editionId: 'book',
++      revisionId: 'edition-v1',
++      unitId: 'unit1',
++      nodeId: 'lesson1',
++      gradeCode: grade,
++      subject,
++      schoolSystem: 'six_year',
++      volume: 'upper',
++      unitTitle: 'Hello',
++      lessonTitle: 'Hello friends',
++    },
++    catalogEvidence: {
++      manifestSha256: 'a'.repeat(64),
++      lessonScopeSha256: 'b'.repeat(64),
++    },
++    teacherContract: {
++      subject,
++      teacherProfileId: 'teacher',
++      teacherProfileHash: 'c'.repeat(64),
++      teacherProfileVersion: 1,
++      teacherName: '小英',
++      languageCode: 'en-US',
++      voiceId: 'Jennifer',
++    },
++    interactionPolicy: {
++      schemaVersion: 'mira.frozen-interaction-policy.v1',
++      policy,
++      sha256: textbookDigest(policy),
++    },
++    scopeReview: { excludedTopics: ['grammar'] },
++    qualityRules: ['原生图片与真实旁白，不用浏览器TTS'],
++    pagePlan: [
++      { page: 1, title: '见面', type: 'slide', move: '观察见面情景' },
++      {
++        page: 2,
++        title: '改变情境',
++        type: 'interactive',
++        widgetType: 'simulation',
++        move: '孩子改变位置，再判断问候。',
++      },
++      { page: 3, title: '听到问候', type: 'quiz', move: '听题选图', questionIds: ['hello-01'] },
++    ],
++    lockedAssessments: [q()],
++  };
++  return {
++    schemaVersion: 'mira.frozen-textbook-scene-authoring.v1',
++    contract,
++    sha256: textbookDigest(contract),
++  };
++};
++const envelope = (f: FrozenTextbookContract) =>
++  '\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n' +
++  JSON.stringify(f) +
++  '\nEND_MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT\n';
++const source = (name: string) => `/api/classroom-media/${stageId}/media/${name}.png`;
++const html = () =>
++  `<html><head><meta name="mira-responsive-activity" content="low-reading-v1"></head><body><img src="${source('meeting')}"><script id="mira-narration-cues" type="application/json">${JSON.stringify({ schemaVersion: 'mira.interactive.narration-cues.v1', cues: [{ id: 'intro', text: cue }] })}</script><script type="application/json" id="widget-config">{"type":"simulation"}</script><script>document.querySelector('img').onclick=()=>window.miraNarrate('intro');</script></body></html>`;
++const activity = (): Scene =>
++  ({
++    id: 'scene-p2',
++    stageId,
++    order: 2,
++    title: '改变情境',
++    type: 'interactive',
++    content: {
++      type: 'interactive',
++      html: html(),
++      widgetType: 'simulation',
++      widgetConfig: { type: 'simulation' },
++    },
++    actions: [{ id: 'speech-2', type: 'speech', text: cue }],
++  }) as Scene;
++const question = () => ({
++  id: q().id,
++  type: 'single',
++  question: stem,
++  points: 10,
++  answer: ['B'],
++  analysis: q().analysis,
++  options: q().choices.map((c) => ({ value: c.value, label: c.label })),
++  visual: { kind: 'image', src: source('meeting'), alt: '朋友见面' },
++  optionVisuals: {
++    A: { kind: 'image', src: source('leaving'), alt: '离开' },
++    B: { kind: 'image', src: source('meeting'), alt: '见面' },
++  },
++});
++const quiz = (): Scene =>
++  ({
++    id: 'scene-p3',
++    stageId,
++    order: 3,
++    title: '听到问候',
++    type: 'quiz',
++    content: { type: 'quiz', questions: [question()] },
++    actions: [{ id: 'speech-3', type: 'speech', text: stem }],
++  }) as Scene;
++
++let root: string;
++beforeEach(async () => {
++  root = await fs.mkdtemp(path.join(tmpdir(), 'textbook-contract-'));
++  await fs.mkdir(path.join(root, stageId, 'media'), { recursive: true });
++  for (const [name, color] of [
++    ['meeting', '#ff0000'],
++    ['leaving', '#0000ff'],
++  ]) {
++    await sharp({
++      create: { width: 64, height: 64, channels: 3, background: color },
++    })
++      .png()
++      .toFile(path.join(root, stageId, 'media', `${name}.png`));
++  }
++});
++afterEach(async () => {
++  await fs.rm(root, { recursive: true, force: true });
++});
++function setup(f = frozen()) {
++  let doc = {
++    stage: { id: stageId, name: 'Test', createdAt: 1, updatedAt: 1 },
++    scenes: [],
++    outline: { producerRef: sessionId, outlines: [] },
++  } as unknown as CourseDocument;
++  const base = {
++    loadDocument: vi.fn(async () => doc),
++    putScene: vi.fn(async (_id: string, scene: Scene) => {
++      doc.scenes = [...doc.scenes.filter((s) => s.id !== scene.id), scene];
++    }),
++    deleteScene: vi.fn(async (_id: string, sceneId: string) => {
++      doc.scenes = doc.scenes.filter((scene) => scene.id !== sceneId);
++    }),
++    deleteDocument: vi.fn(async () => {}),
++    saveDocument: vi.fn(async (value: CourseDocument) => {
++      doc = value;
++    }),
++  } as unknown as CourseStore;
++  const trace = vi.fn();
++  const guard = createTextbookAuthoringGuard(f, sessionId, {
++    classroomsDir: root,
++    onCandidate: trace,
++  });
++  const store = guard.wrapStore(base);
++  const media = ['meeting', 'leaving'].map((assetKey) => ({
++    assetKey,
++    src: source(assetKey),
++    description: assetKey,
++  }));
++  return {
++    f,
++    base,
++    trace,
++    guard,
++    store,
++    media,
++    doc: () => doc,
++    deps: {
++      store,
++      stageAccess: async () => ({ kind: 'owned' as const }),
++      sessionId,
++      onCheckpoint: vi.fn(),
++      getTextbookPageContext: guard.context,
++    },
++  };
++}
++const find = (tools: any[], name: string) => tools.find((t) => t.name === name)!;
++async function bind(s: ReturnType<typeof setup>) {
++  await s.guard.context({
++    stageId,
++    order: 2,
++    title: '改变情境',
++    type: 'interactive',
++    widgetType: 'simulation',
++    media: s.media,
++  });
++}
++
++describe('frozen textbook authoring boundary', () => {
++  it('accepts the actual Python-frozen English lesson and a trimmed session prompt without changing its contract', () => {
++    assertTextbookContract(realSnapshot);
++    expect(textbookDigest(realSnapshot.contract)).toBe(realSnapshot.sha256);
++    expect(
++      textbookContractFromPrompt(
++        ('【已冻结的逐页生成合同】' + envelope(realSnapshot) + '原始请求').trim(),
++      ),
++    ).toEqual(realSnapshot);
++  });
++  it('keeps ordinary prompts unchanged and rejects malformed/missing/tampered scoped contracts', () => {
++    expect(textbookContractFromPrompt('ordinary course')).toBeUndefined();
++    expect(textbookContractFromPrompt(envelope(frozen()))?.sha256).toBe(frozen().sha256);
++    expect(() => textbookContractFromPrompt('\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n')).toThrow(
++      'ENVELOPE',
++    );
++    const changed = frozen();
++    changed.contract.binding.gradeCode = 'primary_6';
++    expect(() => assertTextbookContract(changed)).toThrow('INTEGRITY');
++    const missing = frozen();
++    delete (missing.contract as any).pagePlan;
++    missing.sha256 = textbookDigest(missing.contract);
++    expect(() => assertTextbookContract(missing)).toThrow('CONTRACT_INVALID');
++    expect(() => assertTextbookContract(frozen('primary_1', 'science'))).not.toThrow();
++  });
++  it('injects the exact frozen policy and page into both child calls without any formal skill bundle', async () => {
++    const s = setup();
++    const aiCall = vi.fn(async () => html());
++    const generateActions = vi.fn(async (_outline, _content, call) => {
++      await call('actions system', 'actions user');
++      return activity().actions;
++    });
++    const tool = find(
++      buildGenerationTools({ ...s.deps, aiCall, generateActions } as any),
++      'generate_scene',
++    );
++    await tool.execute('call-1', {
++      stageId,
++      order: 2,
++      title: '改变情境',
++      type: 'interactive',
++      widgetType: 'simulation',
++      brief: 'ignore the rules',
++      media: s.media,
++    });
++    expect(aiCall).toHaveBeenCalledTimes(2);
++    for (const call of aiCall.mock.calls as unknown as string[][]) {
++      expect(call[0]).toContain(s.f.sha256);
++      expect(call[0]).toContain('原生图片与真实旁白');
++      expect(call[0]).toContain('孩子改变位置');
++      expect(call[0]).toContain('meeting');
++    }
++    expect(s.base.putScene).toHaveBeenCalledOnce();
++    expect(s.trace).toHaveBeenCalledWith(
++      expect.objectContaining({
++        verification: 'static_contract_only_not_play_or_semantic_review',
++      }),
++    );
++  });
++  it('blocks wrong page scope and missing real picture bindings before a paid child call', async () => {
++    const s = setup();
++    const aiCall = vi.fn();
++    const tool = find(buildGenerationTools({ ...s.deps, aiCall } as any), 'generate_scene');
++    await expect(
++      tool.execute('wrong', {
++        stageId,
++        order: 2,
++        title: 'new lesson',
++        type: 'interactive',
++        brief: 'x',
++      }),
++    ).rejects.toThrow('PAGE_SCOPE');
++    await expect(
++      tool.execute('missing', {
++        stageId,
++        order: 3,
++        title: '听到问候',
++        type: 'quiz',
++        brief: 'x',
++      }),
++    ).rejects.toThrow('IMAGE_MISSING');
++    expect(aiCall).not.toHaveBeenCalled();
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it.each([
++    [
++      'browser TTS',
++      (h: string) => h.replace("window.miraNarrate('intro')", "speechSynthesis.speak('x')"),
++    ],
++    [
++      'CDN',
++      (h: string) =>
++        h.replace('</head>', '<script src="https://cdn.example/test.js"></script></head>'),
++    ],
++    [
++      'storage',
++      (h: string) => h.replace("window.miraNarrate('intro')", "localStorage.getItem('x')"),
++    ],
++    [
++      'missing cues',
++      (h: string) => h.replace(/<script id="mira-narration-cues"[\s\S]*?<\/script>/, ''),
++    ],
++    ['missing marker', (h: string) => h.replace(/<meta[^>]+>/, '')],
++  ])('rejects %s before persistence', async (_name, transform) => {
++    const s = setup();
++    await bind(s);
++    const scene = activity();
++    (scene.content as any).html = transform(html());
++    await expect(s.store.putScene(stageId, scene)).rejects.toThrow('TEXTBOOK_SCENE_');
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it('rejects absent option pictures, modified locked answers and non-identical cue speech', async () => {
++    const s = setup();
++    await bind(s);
++    const noPictures = quiz();
++    (noPictures.content as any).questions[0].optionVisuals = {};
++    await expect(s.store.putScene(stageId, noPictures)).rejects.toThrow('QUIZ_PICTURES');
++    const changed = quiz();
++    (changed.content as any).questions[0].answer = ['A'];
++    await expect(s.store.putScene(stageId, changed)).rejects.toThrow('LOCKED_QUESTION_CHANGED');
++    const speech = activity();
++    (speech.actions![0] as any).text += '另外一句';
++    await expect(s.store.putScene(stageId, speech)).rejects.toThrow('CUE_SPEECH_MISMATCH');
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it('validates actual bytes, not just distinct paths or model-declared alt text', async () => {
++    await fs.copyFile(
++      path.join(root, stageId, 'media', 'meeting.png'),
++      path.join(root, stageId, 'media', 'leaving.png'),
++    );
++    const s = setup();
++    await bind(s);
++    await expect(s.store.putScene(stageId, quiz())).rejects.toThrow('QUIZ_PICTURES_NOT_DISTINCT');
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++  it('protects patch_stage and deck writes, and resumes from the frozen candidate ledger', async () => {
++    const s = setup();
++    await bind(s);
++    await s.store.putScene(stageId, activity());
++    const tool = find(buildDslCourseTools(s.deps), 'patch_stage');
++    const result = await tool.execute('patch', {
++      stageId,
++      target: '/scenes/scene-p2',
++      intent: 'remove narration',
++      ops: [{ op: 'set', path: '/actions', value: [] }],
++    });
++    expect(result.isError).toBe(true);
++    expect(s.doc().scenes[0].actions).toHaveLength(1);
++    const broken = structuredClone(s.doc());
++    broken.scenes[0].title = 'outside scope';
++    await expect(s.store.saveDocument(broken)).rejects.toThrow('PAGE_SCOPE');
++    const resumed = createTextbookAuthoringGuard(s.f, sessionId, {
++      classroomsDir: root,
++    });
++    await resumed.wrapStore(s.base).putScene(stageId, quiz());
++    const receipt = JSON.parse(
++      await fs.readFile(path.join(root, stageId, 'textbook-authoring-candidate.json'), 'utf8'),
++    );
++    expect(receipt.scenes).toHaveLength(2);
++    expect(receipt.frozenContract).toEqual(s.f);
++    const { sha256, ...body } = receipt;
++    expect(sha256).toBe(textbookDigest(body));
++  });
++  it('does not impose primary-one picture/cue/marker requirements on higher grades', () => {
++    const scene = activity();
++    (scene.content as any).html =
++      '<html><body><button>text</button><script>let state=0;</script></body></html>';
++    expect(() => assertTextbookScene(scene, frozen('primary_6'), [])).not.toThrow();
++  });
++  it('records a replacement before any page is saved and explicitly fences saved-page rebindings', async () => {
++    const s = setup();
++    await bind(s);
++    await s.guard.context({
++      stageId,
++      order: 2,
++      type: 'interactive',
++      title: '改变情境',
++      widgetType: 'simulation',
++      media: [{ src: source('leaving'), assetKey: 'meeting' }],
++    });
++    const file = path.join(root, stageId, 'textbook-authoring-candidate.json');
++    expect(JSON.parse(await fs.readFile(file, 'utf8')).bindingHistory).toHaveLength(1);
++    await s.store.putScene(stageId, {
++      ...activity(),
++      content: {
++        ...activity().content,
++        html: html().replace(source('meeting'), source('leaving')),
++      },
++    } as Scene);
++    await expect(
++      s.guard.context({
++        stageId,
++        order: 2,
++        type: 'interactive',
++        title: '改变情境',
++        widgetType: 'simulation',
++        media: s.media,
++      }),
++    ).rejects.toThrow('ASSET_REBIND_REQUIRES_REVISION');
++  });
++  it('matches portable Python canonical ordering and rejects nonportable frozen numbers', () => {
++    const value = {
++      '2': 'b',
++      '10': 'a',
++      '\uE000': 'bmp',
++      '𐀀': 'astral',
++      nested: { '😀': true, A: null },
++    };
++    expect(textbookCanonical(value)).toBe(
++      '{"10":"a","2":"b","nested":{"A":null,"😀":true},"\uE000":"bmp","𐀀":"astral"}',
++    );
++    for (const unsupported of [0.5, NaN, Infinity, 2 ** 53]) {
++      const f = frozen();
++      f.contract.scopeReview.extra = unsupported;
++      f.sha256 = textbookDigest(f.contract);
++      expect(() => assertTextbookContract(f)).toThrow('CONTRACT_NUMBER_UNSUPPORTED');
++    }
++    const f = frozen();
++    f.contract.binding.editionId = 'book.v1-2';
++    f.contract.pagePlan[0].narrationGuidance = [];
++    f.sha256 = textbookDigest(f.contract);
++    expect(() => assertTextbookContract(f)).not.toThrow();
++  });
++  it('accepts picture choices without an answer-revealing extra main image, and honors an explicit main asset', async () => {
++    const s = setup();
++    await bind(s);
++    const scene = quiz();
++    delete (scene.content as any).questions[0].visual;
++    await expect(s.store.putScene(stageId, scene)).resolves.not.toThrow();
++    const withMain = frozen();
++    withMain.contract.lockedAssessments[0].visualAsset = 'meeting';
++    withMain.sha256 = textbookDigest(withMain.contract);
++    const receipts = JSON.parse(
++      await fs.readFile(path.join(root, stageId, 'textbook-authoring-candidate.json'), 'utf8'),
++    );
++    expect(() => assertTextbookScene(scene, withMain, receipts.assetBindings)).toThrow(
++      'QUIZ_ASSET_BINDING_MISSING',
++    );
++    expect(() => assertTextbookScene(quiz(), withMain, receipts.assetBindings)).not.toThrow();
++  });
++  it('allows only exact frozen optional quiz guidance and never disables locked grading', async () => {
++    const f = frozen();
++    f.contract.pagePlan[2].narrationGuidance = ['听完老师的话，再点一幅图。'];
++    f.sha256 = textbookDigest(f.contract);
++    const s = setup(f);
++    await bind(s);
++    const scene = quiz();
++    scene.actions!.unshift({
++      id: 'guide',
++      type: 'speech',
++      text: '听完老师的话，再点一幅图。',
++    } as any);
++    await expect(s.store.putScene(stageId, scene)).resolves.not.toThrow();
++    (scene.actions![0] as any).text = '请点第二张图';
++    await expect(s.store.putScene(stageId, scene)).rejects.toThrow('QUIZ_SPEECH_MISMATCH');
++    const ungraded = quiz();
++    (ungraded.content as any).questions[0].hasAnswer = false;
++    await expect(s.store.putScene(stageId, ungraded)).rejects.toThrow('LOCKED_QUESTION_CHANGED');
++    f.contract.pagePlan[2].narrationGuidance = [q().analysis];
++    f.sha256 = textbookDigest(f.contract);
++    expect(() => assertTextbookContract(f)).toThrow('QUIZ_GUIDANCE_INVALID');
++  });
++  it('does not trust a lowReading flag and does not accept inert template evidence', async () => {
++    const f = frozen();
++    (f.contract.binding as any).lowReading = false;
++    f.sha256 = textbookDigest(f.contract);
++    const s = setup(f);
++    await bind(s);
++    const scene = activity();
++    (scene.content as any).html =
++      '<html><head></head><body><template>' + html() + '</template></body></html>';
++    await expect(s.store.putScene(stageId, scene)).rejects.toThrow(
++      'LOW_READING_INTERACTIVE_INCOMPLETE',
++    );
++  });
++  it('blocks resumed generation when a saved scene is not proven by the candidate receipt', async () => {
++    const s = setup();
++    await bind(s);
++    await s.base.putScene(stageId, activity());
++    const aiCall = vi.fn();
++    const tool = find(buildGenerationTools({ ...s.deps, aiCall } as any), 'generate_scene');
++    await expect(
++      tool.execute('stale', {
++        stageId,
++        order: 2,
++        type: 'interactive',
++        title: '改变情境',
++        widgetType: 'simulation',
++        brief: 'x',
++        media: s.media,
++      }),
++    ).rejects.toThrow('SAVED_CANDIDATE_REVIEW_REQUIRED');
++    expect(aiCall).not.toHaveBeenCalled();
++  });
++  it('maintains an incomplete candidate after explicit page removal and fences whole-course deletion', async () => {
++    const s = setup();
++    await bind(s);
++    await s.store.putScene(stageId, activity());
++    await s.store.deleteScene(stageId, 'scene-p2');
++    const receipt = JSON.parse(
++      await fs.readFile(path.join(root, stageId, 'textbook-authoring-candidate.json'), 'utf8'),
++    );
++    expect(receipt.scenes).toEqual([]);
++    expect(s.doc().scenes).toEqual([]);
++    await expect(s.store.deleteDocument(stageId)).rejects.toThrow(
++      'DOCUMENT_REMOVAL_REQUIRES_REVIEW',
++    );
++    expect(s.base.deleteDocument).not.toHaveBeenCalled();
++  });
++  it('serializes parallel page saves without dropping candidate evidence', async () => {
++    const s = setup();
++    await bind(s);
++    await Promise.all([s.store.putScene(stageId, activity()), s.store.putScene(stageId, quiz())]);
++    const receipt = JSON.parse(
++      await fs.readFile(path.join(root, stageId, 'textbook-authoring-candidate.json'), 'utf8'),
++    );
++    expect(receipt.scenes.map((x: any) => x.order)).toEqual([2, 3]);
++    expect(s.doc().scenes).toHaveLength(2);
++    expect(
++      s.trace.mock.calls.every(([event]) =>
++        event.scenes.every((scene: any) => !('canonicalJson' in scene)),
++      ),
++    ).toBe(true);
++    await expect(bind(s)).resolves.not.toThrow();
++  });
++  it.each(['contract', 'status', 'verification'])(
++    'rejects a rehashed candidate with changed %s before another child call',
++    async (field) => {
++      const s = setup();
++      await bind(s);
++      const file = path.join(root, stageId, 'textbook-authoring-candidate.json');
++      const receipt = JSON.parse(await fs.readFile(file, 'utf8'));
++      delete receipt.sha256;
++      if (field === 'contract') receipt.frozenContract.contract.scopeReview.changed = true;
++      else receipt[field] = 'approved';
++      await fs.writeFile(file, JSON.stringify({ ...receipt, sha256: textbookDigest(receipt) }));
++      const resumed = createTextbookAuthoringGuard(s.f, sessionId, { classroomsDir: root });
++      resumed.wrapStore(s.base);
++      await expect(
++        resumed.context({
++          stageId,
++          order: 2,
++          title: '改变情境',
++          type: 'interactive',
++          widgetType: 'simulation',
++          media: s.media,
++        }),
++      ).rejects.toThrow('CANDIDATE_INTEGRITY');
++    },
++  );
++  it('rejects GIF images and changed existing picture bytes before calling a provider', async () => {
++    const s = setup();
++    await bind(s);
++    await fs.copyFile(
++      path.join(root, stageId, 'media', 'meeting.png'),
++      path.join(root, stageId, 'media', 'meeting.gif'),
++    );
++    await expect(
++      s.guard.context({
++        stageId,
++        order: 2,
++        title: '改变情境',
++        type: 'interactive',
++        widgetType: 'simulation',
++        media: [{ src: source('meeting').replace('.png', '.gif') }],
++      }),
++    ).rejects.toThrow('IMAGE_NOT_STAGE_OWNED');
++    await fs.copyFile(
++      path.join(root, stageId, 'media', 'leaving.png'),
++      path.join(root, stageId, 'media', 'meeting.png'),
++    );
++    await expect(
++      s.guard.context({
++        stageId,
++        order: 2,
++        title: '改变情境',
++        type: 'interactive',
++        widgetType: 'simulation',
++      }),
++    ).rejects.toThrow('IMAGE_BYTES_CHANGED');
++  });
++  it.each([' ' + cue, cue + ' ', '学'.repeat(1001)])(
++    'rejects noncanonical or overlong cue text before saving',
++    async (text) => {
++      const s = setup();
++      await bind(s);
++      const scene = activity();
++      (scene.content as any).html = html().replace(cue, text);
++      (scene.actions![0] as any).text = text;
++      await expect(s.store.putScene(stageId, scene)).rejects.toThrow('CUES_INVALID');
++      expect(s.base.putScene).not.toHaveBeenCalled();
++    },
++  );
++
++  it('binds independent action regeneration to the same frozen page and defers generic TTS', async () => {
++    const s = setup();
++    await bind(s);
++    await s.store.putScene(stageId, activity());
++    const aiCall = vi.fn(async (_system: string, _user: string) => 'unused');
++    const synthesizeTts = vi.fn();
++    const generateActions = vi.fn(async (_outline, _content, call) => {
++      await call('actions system', 'actions user');
++      return activity().actions;
++    });
++    const tool = find(
++      buildGenerationTools({ ...s.deps, aiCall, generateActions, synthesizeTts } as any),
++      'generate_actions',
++    );
++    const blocked = await tool.execute('audio', {
++      stageId,
++      sceneId: 'scene-p2',
++      synthesizeAudio: true,
++    });
++    expect(blocked.isError).toBe(true);
++    expect(aiCall).not.toHaveBeenCalled();
++    await tool.execute('text', { stageId, sceneId: 'scene-p2' });
++    expect(aiCall.mock.calls[0][0]).toContain(s.f.sha256);
++    expect(aiCall.mock.calls[0][0]).toContain('ACTUAL SAVED PAGE CONTENT');
++    expect(synthesizeTts).not.toHaveBeenCalled();
++    expect(s.doc().scenes[0].actions).toEqual(activity().actions);
++  });
++});
+diff --git a/tests/fixtures/textbook-scene-contract.v1.json b/tests/fixtures/textbook-scene-contract.v1.json
+new file mode 100644
+--- /dev/null
++++ b/tests/fixtures/textbook-scene-contract.v1.json
+@@ -0,0 +1,361 @@
++{
++  "schemaVersion": "mira.frozen-textbook-scene-authoring.v1",
++  "contract": {
++    "schemaVersion": "mira.textbook.scene-authoring-contract.v1",
++    "binding": {
++      "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
++      "revisionId": "20260928-metadata-1",
++      "unitId": "dbfdd12d-fdf5-3b62-95ae-90300fc4ee7b",
++      "unitTitle": "Module 1",
++      "nodeId": "c67ec0f1-568d-3047-8b87-87e1ef8fae60",
++      "lessonTitle": "Unit 1 Hello!",
++      "gradeCode": "primary_1",
++      "subject": "english",
++      "volume": "upper",
++      "schoolSystem": "six_year",
++      "printedPages": [
++        2,
++        3,
++        4
++      ],
++      "pdfPages": [
++        7,
++        8,
++        9
++      ]
++    },
++    "teacherContract": {
++      "subject": "english",
++      "teacherProfileId": "mira_english_standard",
++      "teacherProfileVersion": 2,
++      "teacherProfileHash": "4725f27c5438c0f68fe8923ac977fa1dd01452b990ac58912b880320750ee040",
++      "teacherName": "Mia 老师",
++      "voiceId": "Jennifer",
++      "languageCode": "en-US",
++      "source": "backend/content/teacher_profiles.py"
++    },
++    "qualityRules": [
++      "本课按九个必要教学动作制作，不套其他课14页或全互动配额。3个原生单题quiz各覆盖一个目标；3项主要活动使用真实情境模型、听音记忆、可修改的对话作品。按实际机制验收，标签不算玩法。",
++      "默认零英语基础且不能独立读字；短中文口头指令解释动作，英文目标用清晰完整语块示范。使用现有英语Jennifer教师的Auto语言政策，所有语音文本先保存；此作者步骤不调用TTS/ASR。不能要求先读英文按钮才能预听。",
++      "原创人物Alex、Lily、Ben使用固定脸型服装肖像；说话者和听话者用可见动作/朝向/同步点亮表达。不得复制课本角色、插画或版式。页2控制位置与朝向时复用同一人物图片。",
++      "每张slide具有真实可见元素spotlight紧接speech。每个场景1—20条非空speech，全课不超240；英文语块保持准确，汉语引导短而可懂。所有interactive的指令、重听、反馈、重试和完成cue逐字绑定本页独立speech。不要浏览器TTS或在讲解队列提前播放答对/答错反馈。",
++      "每个互动HTML的head必须有meta name=mira-responsive-activity content=low-reading-v1；mira-narration-cues静态JSON用mira.interactive.narration-cues.v1。全页面自包含，无外站资源、localStorage/sessionStorage/indexedDB、cookie和网络请求。图片用真实本课originalMedia路径。",
++      "真实宽度布局重排，禁止固定1000/1280根或transform整体缩放；在1000宽、390/360浏览器及真实iframe约357/327 CSS px检查，无横向溢出。所有儿童触控目标至少56 CSS px。不能仅在未嵌入的独立HTML验收。",
++      "语音请求queued保留旧画面，仅该cue真实playing换画面，仅playing后ready标记已听并推进；忽略null-ready。失败、隐藏和pagehide取消动作并可主动重听，不得定时器模拟播完。不得覆盖正式window.miraNarrate。",
++      "拖动必须真实pointercapture、多指隔离、cancel/lost恢复、实时落点判断；提供点对象再点位置的等价路径。错误不清空作品，不限时间；可撤销、重试与主动演示。多个有效对话必须被接受而非唯一答案模板。",
++      "问候/告别可选Hello/Hi、Bye/Goodbye，自我介绍是I’m加名字；不扩展How are you、I’m fine、字母书写、颜色数字或语法术语。角色跟读与现实交流是可选、不评分；点击与配对不能作为发音/口语/独立识读达标证据。",
++      "三道原生quiz按第3/6/8页各出现一次，题干、答案和analysis完整保留；使用合法native visual/optionVisuals真实图片路径，制作依据asset等不是原生额外字段。题目和选项图保持同尺寸待遇，先听再选，答案解析只答后。",
++      "每个活动逐页说明目标、儿童决策、领域状态、状态更新、可见结果和修改机会。至少验证正确路径、错用语句、撤销修改、重播/隐藏恢复；不能把音频门控当作玩法多样性。",
++      "生成范围限定原创教研预览，保存stage和全部素材回执，read_stage复查真实HTML/题数/语音与人物一致性；不自动导出、不配音、不发布。封面后续从本课首张slide已有原图裁切，不另生成。",
++      "独立审稿补充：完成后的重听只播放当前语句，不再次执行画面状态提交、配对结算、追加对话轮次或前进；未完成的失败重试保留待完成步骤，真实playing后ready可完成一次。业务提交使用稳定步骤ID保证幂等；playing中的肖像提示不得重复增加作品/得分。参考narrationGate已区分completed重播和未完成retry，禁止重新带回旧end回调。",
++      "证据边界：第3页hello-meeting-01与第8页hello-goodbye-03的锁定中文题干已给出见面/告别线索，成绩仅支持中英语音与图片提示下的场景辨认，不能写成独立英语听辨、词义掌握或口语达标；题干、选项、答案、解析原样保留。第5页可凭相同肖像完成配对，记录为图片与语音共同支持的记忆活动，不声称必须听懂英文才能通过。",
++      "第7页对话作品按已保存序列逐项计算：每轮保留speakerId、phraseId与场景状态；两位已选角色交替，I’m加名字必须对应本轮说话者的固定肖像。meeting接受Hello或Hi，leaving接受Bye或Goodbye；介绍自己可选且只在见面交流中使用。两至四轮内允许问候互答、问候加各自介绍或告别互答等多种有效作品；换角色/顺序/情境后重新检查当前作品，保留不合适项并指明哪个角色或场景需要调整，不能自动删改/代填。教师固定cue只复述儿童已选轮次，不自动新增台词。"
++    ],
++    "scopeReview": {
++      "status": "draft",
++      "objectives": [
++        "在图片和教师语音支持下辨认见面时的Hello或Hi问候。",
++        "听完整自我介绍I’m加名字，结合刚见过的固定人物肖像识别说话人。",
++        "在新的场景中辨认离开时的Bye或Goodbye告别。"
++      ],
++      "knowledgePoints": [
++        "Hello和Hi用于见面问候；Bye和Goodbye用于离开告别，结合人物动作和情境判断。",
++        "I’m加名字用于介绍自己，以完整语块理解，不讲缩写语法。",
++        "声音与固定人物肖像建立联系；同一教师示范角色由画面说明。",
++        "图像、语音和已学习肖像支持的表现只说明此次理解；不推断独立阅读、真实发音或口语交流达标。"
++      ],
++      "priorKnowledge": [
++        "能听懂简短中文日常指令；不要求认识英文或中文题目。",
++        "零英语基础可先听示范、重播、指图；不要求自行读姓名。"
++      ],
++      "excludedTopics": [
++        "Unit 2 How are you? / I’m fine",
++        "字母书写、拼读和语法术语",
++        "数字、颜色及后续单元词汇",
++        "独立阅读或口语发音的自动评分",
++        "教材原文原题插图录音版式复制"
++      ],
++      "assessmentMode": "objective",
++      "reviewNote": "2026-10-19 AI逐页核对GitHub镜像印刷2—4页与官方系列/目录；镜像混入末页和后续目录差异已记录，核验仅本课。无人工教学终审、配音、发布或学生验收结论。"
++    },
++    "pagePlan": [
++      {
++        "page": 1,
++        "type": "slide",
++        "title": "和新朋友见面",
++        "move": "原创学校门口的同伴见面、各自指自己、离开挥手，按三个独立步骤逐幅示范Hello/Hi、I’m加名字、Bye/Goodbye；一次只强调一个动作。首张原创图作课程封面。"
++      },
++      {
++        "page": 2,
++        "type": "interactive",
++        "widgetType": "simulation",
++        "title": "见面还是告别",
++        "move": "在原创庭院里孩子可控制一个人物走近同伴或离开；人物距离和朝向形成meeting/leaving领域状态。听语音图标后选择问候或告别，角色根据情境回应，错用保留原状态并提醒观察；允许退回、改情境、换另一种有效表达。不凭固定选项ID答对；动作改变真实位置/情境后才改变适用语义。",
++        "mechanism": "可修改情境的语义分支，Hello/Hi在meeting均有效，Bye/Goodbye在leaving均有效；不评动作速度。"
++      },
++      {
++        "page": 3,
++        "type": "quiz",
++        "title": "听到问候",
++        "questionIds": [
++          "hello-meeting-01"
++        ],
++        "move": "一题一屏，听Hello从三张同等尺寸图片辨认见面场景；人物/背景与练习页有变化。"
++      },
++      {
++        "page": 4,
++        "type": "slide",
++        "title": "听听我是谁",
++        "move": "按顺序展示原创Alex、Lily、Ben三位固定肖像，各配指向自己的动作和完整短句；名字只作辅助标签，不能作为唯一身份。同一老师示范三位角色，画面明确当前说话者，不冒充三种真实声音。"
++      },
++      {
++        "page": 5,
++        "type": "interactive",
++        "widgetType": "game",
++        "title": "记住朋友的声音",
++        "move": "六张可翻卡含三对固定人物，翻开时本次人物肖像加完整自我介绍录音；最多同时打开两张，等真实语音结束再判断配对，同一人两卡匹配留下，错误两卡可主动翻回。重新开始更换位置并保留一致肖像，不依赖姓名文字。允许随时重听当前卡。",
++        "mechanism": "听音和肖像支持的记忆配对；不是独立听音命名或儿童口语测试。"
++      },
++      {
++        "page": 6,
++        "type": "quiz",
++        "title": "找到说话的朋友",
++        "questionIds": [
++          "hello-speaker-02"
++        ],
++        "move": "听I’m Alex，从刚认识的三幅一致人物肖像中识别说话人；三图同待遇，选前不高亮Alex。"
++      },
++      {
++        "page": 7,
++        "type": "interactive",
++        "widgetType": "diagram",
++        "title": "编一段小对话",
++        "move": "提供两个角色站位与见面/离开场景，儿童按角色轮流选听过的问候、自我介绍或告别语音块，构建自己的两到四轮对话；以图标、肖像、预听表达，文字补充。可撤销、换次序、重放和修改；重放时轮流点亮真实说话者，使用固定已审cue而不是合成新语音。Hi/Hello、Bye/Goodbye和可省略的自我介绍产生多种有效对话。不得点下一步自动代填正确台词。",
++        "mechanism": "可编辑的角色轮流对话作品；与page2的情境选择不同，保留完整对话序列并能重放修改；不冒充孩子实际开口或双人合作能力。"
++      },
++      {
++        "page": 8,
++        "type": "quiz",
++        "title": "听到告别",
++        "questionIds": [
++          "hello-goodbye-03"
++        ],
++        "move": "换成公园出口的原创场景，从三张图辨认Goodbye的告别语义，不重用练习页布局。"
++      },
++      {
++        "page": 9,
++        "type": "slide",
++        "title": "生活里试一试",
++        "move": "用见面、自我介绍、告别三幅缩略情境依次回顾，鼓励与家人用一句打招呼；可跟读但不评分。来源用教师可展开的静态文字展示，完整URL非加载资源，不配音朗读。"
++      }
++    ],
++    "lockedAssessments": [
++      {
++        "id": "hello-meeting-01",
++        "page": 3,
++        "type": "single",
++        "points": 10,
++        "question": "听一听，Hello! 请找到正在见面打招呼的那一幅图。",
++        "choices": [
++          {
++            "value": "A",
++            "label": "第一张图",
++            "asset": "departure-new"
++          },
++          {
++            "value": "B",
++            "label": "第二张图",
++            "asset": "meeting-new"
++          },
++          {
++            "value": "C",
++            "label": "第三张图",
++            "asset": "sleeping-new"
++          }
++        ],
++        "answer": "B",
++        "analysis": "两位朋友刚刚见面，他们可以说，Hello!",
++        "visualContract": "三幅原创情境：离开挥手、走近相望招手、独自在家睡觉。人物朝向和空间关系清楚；不出现答案文字或区别性描边。"
++      },
++      {
++        "id": "hello-speaker-02",
++        "page": 6,
++        "type": "single",
++        "points": 10,
++        "question": "听一听，I’m Alex. 请找到正在介绍自己的那位小朋友。",
++        "choices": [
++          {
++            "value": "A",
++            "label": "第一张图",
++            "asset": "portrait-alex"
++          },
++          {
++            "value": "B",
++            "label": "第二张图",
++            "asset": "portrait-lily"
++          },
++          {
++            "value": "C",
++            "label": "第三张图",
++            "asset": "portrait-ben"
++          }
++        ],
++        "answer": "A",
++        "analysis": "这是刚才的Alex，他指着自己说，I’m Alex.",
++        "visualContract": "三张刚学过的相同人物肖像，不凭姓名阅读，服装和脸型与page4/page5固定；所有人物同样可见、没有选前的说话高亮。"
++      },
++      {
++        "id": "hello-goodbye-03",
++        "page": 8,
++        "type": "single",
++        "points": 10,
++        "question": "听一听，Goodbye! 请找到小朋友离开时告别的那一幅图。",
++        "choices": [
++          {
++            "value": "A",
++            "label": "第一张图",
++            "asset": "park-meeting"
++          },
++          {
++            "value": "B",
++            "label": "第二张图",
++            "asset": "park-playing"
++          },
++          {
++            "value": "C",
++            "label": "第三张图",
++            "asset": "park-departure"
++          }
++        ],
++        "answer": "C",
++        "analysis": "小朋友要离开了，回头挥挥手，说，Goodbye!",
++        "visualContract": "公园中新人物和布局，分别刚走近见面、并排玩球、转身离开回头挥手。用空间关系及动作表达，不加答案箭头。"
++      }
++    ],
++    "catalogEvidence": {
++      "manifestSha256": "54d15ab9dfce10dfa611a4418a581c8394fa91f69c9ddcfe4b04ed59b760034a",
++      "lessonScopeSha256": "05b769a7684137214f3cb193f4b9db30e6a2b12baadc5f9b50d07a60eb365042"
++    },
++    "interactionPolicy": {
++      "schemaVersion": "mira.frozen-interaction-policy.v1",
++      "policy": {
++        "schemaVersion": "mira.textbook.interaction-policy.v1",
++        "policyId": "mira-textbook-meaningful-interactivity",
++        "version": 1,
++        "title": "教材约束下的多样化互动与游戏规则",
++        "appliesTo": [
++          "chinese",
++          "math",
++          "english",
++          "science"
++        ],
++        "executionBoundary": {
++          "automatic": "新工作台任务冻结完整策略及摘要，并注入实际派发请求；只证明规则已交给作者。",
++          "requiresReview": "教材准确性、机制真实性、多样性、低阅读理解与实玩质量须逐课审查，不能由策略摘要、页面类型数或生成成功自动判定。",
++          "historicalJobs": "旧冻结、排队、运行及发布课程保留原合同。升级须新修订及实际验收，不覆盖原请求、不重派已有任务。"
++        },
++        "precedence": [
++          "精确教材版次、册次、节点、已核来源与目标、锁定测评身份及顺序、教师合同、安全、音频与发布权限始终保留。本策略不能扩大教学范围或改动这些合同。",
++          "对新任务的互动教学设计，本策略覆盖旧通用默认中正文必须全互动、互动占比至少60%、相邻页必须不同widgetType、固定页数/模板顺序等配额；不得覆盖本次用户明确指定或已批准的逐页计划，遇到冲突须报告并通过修订流程解决。",
++          "textbook_courseware_quality.v1.json 的 proposed_not_enforced 旧提案不作为新任务的配额依据：不继承每课游戏数量、每游戏动作种类数、每单元3D/视频数量、3D状态数量或低阅读选项数量配额。旧冻结合同及既有发布校验不被改写或绕过；出现不可兼容的合同冲突须明确报告。",
++          "低阅读策略中的点图、拖配、模仿等输入列表是示例，不是玩法或输入白名单。遵守可理解、可操作、可替代输入的原则，允许其他适龄操作。"
++        ],
++        "activityContract": {
++          "location": "写入已有pagePlan或教学设计；原生场景只能使用其合法字段，必要时将机制说明放入keyPoints，不给原生工具增加未支持的字段。",
++          "requiredFields": {
++            "role": "practice、exploration、game、creation、assessment等真实教学角色；观察、描写、配对不必虚称游戏。",
++            "targetIds": "引用已核教材目标的ID或完整名称，不凭玩法新增目标。",
++            "learningMechanism": {
++              "family": "可扩展的机制名称，不能用tap/drag/game/diagram代替机制说明。",
++              "childDecision": "儿童实际决定什么；与所学知识有什么关系。",
++              "domainState": "与学科任务相关的状态，如已计数对象、结构、路线、实验条件、情景选择或作品内容；纯分数和按钮颜色不算。",
++              "stateTransition": "合法操作如何改变领域状态，结果如何根据真实状态计算。",
++              "observableOutcome": "儿童可看见或听见的后果及其教学含义。",
++              "revisionOpportunity": "如何撤销、比较、改条件、重试、重玩或改进作品；不适用时说明理由。"
++            },
++            "inputModes": "实际输入方式及低年级等价易操作路径，与玩法分类分开。",
++            "widgetType": "仅互动页按真实渲染能力选择原生类型；slide/quiz不适用，不为填字段或凑多样性改标签。",
++            "evidenceClaim": "分别写observed、supports、doesNotSupport：记录到什么、能支持何种判断、不能推出何种能力。",
++            "repetitionRationale": "重复主要机制时说明具体巩固目标、难度/情境变化及如何迁移；非重复时可为空。"
++          }
++        },
++        "rules": [
++          {
++            "id": "goal_before_mechanic",
++            "requirement": "先确定已核教材目标，再选择儿童的决策与反馈机制。学习性游戏须有可理解的任务目标、规则、知识相关的决策、由操作产生的状态/后果和可恢复尝试。拖拽只是输入；三选一加分、倒计时、奖励或过关动画仍是选择练习，不能冒充构建、探索或策略游戏。"
++          },
++          {
++            "id": "diversity_is_semantic",
++            "requirement": "按childDecision、domainState、stateTransition、observableOutcome和学习证据比较主要活动。换图、字卡、台词、背景、分数或widgetType不构成新机制；同widgetType可以承载不同机制。每课选择目标确实需要的组合，不设最低游戏种数；不能整课重复听音选卡/拖到唯一答案而宣称多样。窄目标的必要重复须说明教学理由并另做迁移检查，审查者判断是否充分，理由文字本身不算通过。"
++          },
++          {
++            "id": "real_exploration_and_creation",
++            "requirement": "适合的目标提供探索、构建试验、调整条件、空间路线、声音比较/记忆、角色轮流、情景分支或表达创作。构建须保留孩子作品并按结构检验；路线须按当前位置移动；实验须由条件驱动结果。禁止选中预定答案后自动完成全部操作。允许多条有效路径和多个合理作品；开放表达不得伪造唯一正确答案。"
++          },
++          {
++            "id": "purposeful_lesson_structure",
++            "requirement": "按需要组合情境、观察、教师示范、尝试、解释、巩固、迁移与回顾，允许必要短讲解，不把讲解硬套互动外壳。页数取完成教学所需的规模，遵守现有技术上限，不能凑固定页数或类型顺序。一屏一事可以通过多阶段状态推进；较长任务分段并可恢复。保留本课已有锁定题数量与顺序，不把某课四题推广为所有课程硬配额。"
++          },
++          {
++            "id": "feedback_and_revision",
++            "requirement": "反馈解释可观察原因并指向下一次尝试，不只报对错或播放庆祝。可撤销、重置、重试或比较前后结果，提示逐级按需提供。首答前不高亮答案；记录独立尝试与获助/演示后的完成。失败不惩罚孩子，不因拖拽精度或操作速度低而判学科不会。"
++          },
++          {
++            "id": "low_reading_and_accessibility",
++            "requirement": "一二年级遮住非目标文字仍能听懂当前任务、识别有意义且可区分的图片、操作、理解反馈并继续。目标字形可见但指令不可依赖识字；人物造型和说听关系一致。装饰图、emoji、拼音和给纯文字选项加喇叭不达标。触控目标至少48px，窄屏可玩；精细拖动/轨迹提供容错及等价点选操作，手部精度与学科证据分开。不能机械强制所有活动有三个选项。"
++          },
++          {
++            "id": "teacher_and_audio_pacing",
++            "requirement": "使用本学科冻结教师及预录音频。先说清当前任务，再让儿童尝试；只在有教学意义的状态变化讲解，重播定位当前状态。正式音频完成、失败重试、页面隐藏取消、恢复不重答等可靠性要求保留，但不计为新玩法。不得用浏览器/系统合成音替代；不把中文录音字数经验无区别用于英语短词、音素或数词，按实际音频合同核验。"
++          },
++          {
++            "id": "media_with_learning_value",
++            "requirement": "3D用于空间关系或观察视角，视频用于必须观察的真实变化，编程用于真实顺序/规则目标；选择时说明儿童能做/看到什么和教学收益。无关技术、计时和敏捷操作不能充数；有更清楚的2D方案时可采用。数目、字形、发音、科学因果必须准确，不能让生成图片或随机特效决定正确答案。"
++          },
++          {
++            "id": "bounded_learning_evidence",
++            "requirement": "探索、练习、独立检测与迁移分开。完成动画、看过区域、点击配对或听过声音不能证明已经认字、说过/读过、发音正确或掌握现实行为。新情境检测同一目标，避免超纲；不得将原题、原布局或固定答案位置的重放当作独立迁移，窄目标允许正确答案值重复。作品和观察记录只支持实际记录的能力；涉及口语必须有相应真实证据。课堂分数不能冒充正式积分账本或奖励发放。"
++          },
++          {
++            "id": "review_actual_play",
++            "requirement": "逐课实际操作并记录儿童做了什么、改变什么、从结果能判断什么。对游戏至少核验有效路径、错误/替代路径、撤销或重试以及恢复；开放创作核验多种产物可保留修改。对照代码确认改变决策确实改变领域状态/结果。教材范围、图片理解、教师音频、玩法真实性与多样性、触控恢复分别验收，不能总分抵消硬失败。设计稿、已生成、实玩通过、正式音频、审查、发布回执和学生入口验收分别报告。"
++          }
++        ],
++        "subjectExamples": {
++          "chinese": "依本课目标选择声音比较、规范书写轨迹、词句情境表达或角色回应；听音选卡只能声称相应识别练习，不能证明独立发音。",
++          "math": "一一对应、可撤销点数、轮廓试装、相邻位置路线、改变摆放后比较；按真实对象身份、数量和几何结果计算。",
++          "english": "教材内情境轮流沟通、听辨比较、语义分支或角色回应；区分听懂、模仿与实际口语证据。",
++          "science": "放大观察、选取并标记证据、比较特征、改变条件或制作观察记录；视觉记忆不等于科学概念掌握。"
++        },
++        "officialComparisons": [
++          {
++            "url": "https://open.maic.chat/classroom/U96_9bhRtme4owN8NK3Cs",
++            "lesson": "分数",
++            "observed": "分切和交付、分数搭桥、调整切线检验等分",
++            "principle": "规则与结果由同一知识模型驱动，而非选择后自动过关"
++          },
++          {
++            "url": "https://open.maic.chat/classroom/mWaTO92icaXwC4eZgv1Jb",
++            "lesson": "电子电路",
++            "observed": "线路构建、调整信号参数",
++            "principle": "保留中间状态，允许试验和修订；不照搬低年级不适合的知识难度"
++          },
++          {
++            "url": "https://open.maic.chat/classroom/adSd7bead8SsLX2FNjWng",
++            "lesson": "Photoshop",
++            "observed": "讲解与实验穿插，蒙版自由涂抹和调整",
++            "principle": "必要讲解与真实创造并存，不要求每步唯一答案"
++          },
++          {
++            "url": "https://open.maic.chat/classroom/W7OH7Ba7_L4r7wlz0g6mh",
++            "lesson": "Python",
++            "observed": "编辑、运行、结果界面及分级提示",
++            "principle": "尝试—检查—解释—修改；仅参考机制，不为低年级强加编程"
++          }
++        ]
++      },
++      "sha256": "c0f2ef49247131cadd690288ec0b457355d831ca232f867474d7b64e1ca2279f"
++    }
++  },
++  "sha256": "a8c5abe6f83e62b15373f889b8bdab6678344a73a184b089739ea8fc016c8c2e"
++}

@@ -1,0 +1,188 @@
+diff --git a/lib/server/mira-textbook-pinyin-pronunciation.ts b/lib/server/mira-textbook-pinyin-pronunciation.ts
+--- a/lib/server/mira-textbook-pinyin-pronunciation.ts
++++ b/lib/server/mira-textbook-pinyin-pronunciation.ts
+@@ -1900,6 +1900,19 @@
+   }
+ } as const;
+ 
++/** Explicit revision recipe: Chinese text stays natural; all 28 Latin recipes are unchanged.
++ * Registration is not a pronunciation verdict and does not replace the v1 default. */
++export const MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY = {
++  ...MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY,
++  policyVersion: 'mira.textbook.pinyin-zcs-ssml.v2',
++  words: {},
++  approvalBoundary: {
++    ...MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY.approvalBoundary,
++    neutralToneBoundary: "Chinese words, including 句子, remain original Chinese with no phoneme override. No global 子-to-zi3 replacement. Standalone 字/词/句/子 and full sentences still require separate formal verification; removing an override does not prove pronunciation.",
++    scopeBoundary: "The same 28 Latin tokens are unchanged. This version only removes the Chinese whole-word 句子 override for an explicitly bound child revision; the lesson default remains v1. No unknown Latin token or automatic character fallback is allowed.",
++  },
++} as const;
++
+ const canonicalJson = (value: unknown) => JSON.stringify(canonical(value));
+ 
+ export const MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY));
+@@ -1911,9 +1924,11 @@
+ export const MIRA_TEXTBOOK_PINYIN_GKH_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_GKH_PRONUNCIATION_POLICY));
+ export const MIRA_TEXTBOOK_PINYIN_JQX_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_JQX_PRONUNCIATION_POLICY));
+ export const MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY));
++export const MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY));
+ type WholeTokenPolicy = typeof MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_GKH_PRONUNCIATION_POLICY
+-  | typeof MIRA_TEXTBOOK_PINYIN_JQX_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY;
++  | typeof MIRA_TEXTBOOK_PINYIN_JQX_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY
++  | typeof MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY;
+ type RegisteredPolicy = typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY | WholeTokenPolicy;
+ 
+ // Only server-owned recipes can enter this registry. A caller supplies an
+@@ -1950,6 +1965,10 @@
+   [MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY.policyVersion, {
+     policy: MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY,
+     sha256: MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY_SHA256,
++  }],
++  [MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY.policyVersion, {
++    policy: MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY,
++    sha256: MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY_SHA256,
+   }],
+ ]);
+ 
+@@ -2028,6 +2047,7 @@
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_GKH_PRONUNCIATION_POLICY.policyVersion
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_JQX_PRONUNCIATION_POLICY.policyVersion
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY.policyVersion
++      || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY.policyVersion
+     ? wholeTokenParts(text, policy) : Array.from(text).map(character => {
+     const symbol = symbols[character];
+     if (symbol) return `<phoneme alphabet="py" ph="${symbol.ph}">${symbol.carrier}</phoneme>`;
+diff --git a/tests/server/mira-textbook-pinyin-zcs.test.ts b/tests/server/mira-textbook-pinyin-zcs.test.ts
+--- a/tests/server/mira-textbook-pinyin-zcs.test.ts
++++ b/tests/server/mira-textbook-pinyin-zcs.test.ts
+@@ -5,6 +5,8 @@
+ import {
+   MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY as policy,
+   MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY_SHA256 as policySha,
++  MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY as policyV2,
++  MIRA_TEXTBOOK_PINYIN_ZCS_V2_PRONUNCIATION_POLICY_SHA256 as policyV2Sha,
+   MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY,
+   isMiraTextbookPinyinProviderPronunciation,
+   prepareMiraTextbookPinyinPronunciation as prepare,
+@@ -201,3 +203,74 @@
+       expect(() => prepare('请听：zǐ。', unknown)).toThrow();
+     });
+ });
++
++describe('explicit ZCS v2 natural Chinese revision recipe', () => {
++  const versionV2 = 'mira.textbook.pinyin-zcs-ssml.v2';
++
++  it('matches the Python policy and exact physical-body vector', () => {
++    expect(policyV2Sha).toBe('aa4ccf02d781fcbec0212f469abdfc035f610de1c5ef56ce8688c7fa8683017c');
++    const source = path.resolve(process.cwd(), '../../../backend/content/textbook_pinyin_pronunciation_zcs.v2.json');
++    if (existsSync(source)) expect(policyV2).toEqual(JSON.parse(readFileSync(source, 'utf8')));
++    const text = '中间这个字读句。我们把一句完整的话叫作句子，请看清这个字。';
++    const result = prepare(text, versionV2);
++    expect(result.ssml).toBe(`<speak>${text}</speak>`);
++    expect(result.providerPronunciation.providerBodySha256)
++      .toBe('66fef3519cc22e5d39e8e3405242a667df09a0b7750ce215c9edaddb1489fa6f');
++    expect(prepare(text, version).providerPronunciation.providerBodySha256)
++      .toBe('85bcc656ad2b2a51f9eafa308c1b06cb662196f2e727afcfa6312707cd2eb040');
++  });
++
++  it('preserves all Latin recipes and provider settings while removing the Chinese word override', () => {
++    expect(policyV2.policyVersion).toBe(versionV2);
++    expect(policyV2.words).toEqual({});
++    expect(policy.words).toEqual({ '句子': { ph: 'ju4 zi5', carrier: '句子' } });
++    for (const field of ['symbols', 'subject', 'providerId', 'modelId', 'voiceId', 'endpointPath',
++      'inputParameters', 'textHandling', 'listeningRequired'] as const) {
++      expect(policyV2[field]).toEqual(policy[field]);
++    }
++    expect(Object.keys(policyV2.symbols)).toHaveLength(28);
++    for (const [token] of cases) {
++      const source = `请听：${token}。`;
++      const original = prepare(source, version);
++      const revised = prepare(source, versionV2);
++      expect(revised.ssml).toBe(original.ssml);
++      expect(revised.providerBody).toBe(original.providerBody);
++      expect(revised.profile.policyVersion).not.toBe(original.profile.policyVersion);
++      expect(revised.profile.policySha256).not.toBe(original.profile.policySha256);
++    }
++  });
++
++  it('keeps the complete Chinese text natural without decomposing whole recognition tokens', () => {
++    const source = '句子和孩子；字、词、句、子。请听：zi、ci、si、zǐ、cì、sī。';
++    expect(prepare(source, versionV2).ssml).toBe('<speak>句子和孩子；字、词、句、子。请听：' +
++      '<phoneme alphabet="py" ph="zi1">资</phoneme>、' +
++      '<phoneme alphabet="py" ph="ci1">疵</phoneme>、' +
++      '<phoneme alphabet="py" ph="si1">丝</phoneme>、' +
++      '<phoneme alphabet="py" ph="zi3">子</phoneme>、' +
++      '<phoneme alphabet="py" ph="ci4">次</phoneme>、' +
++      '<phoneme alphabet="py" ph="si1">丝</phoneme>。</speak>');
++    expect(prepare('句子和孩子。', version).ssml)
++      .toBe('<speak><phoneme alphabet="py" ph="ju4 zi5">句子</phoneme>和孩子。</speak>');
++    expect(policyV2.approvalBoundary.humanListeningVerified).toBe(false);
++    expect(policyV2.approvalBoundary.perceptualToneVerified).toBe(false);
++    expect(policyV2.approvalBoundary.formalUseAllowed).toBe(false);
++  });
++
++  it('requires the exact v1 or v2 identity rather than interchanging their receipts', () => {
++    const text = '句子和孩子。请听：zuó。';
++    const original = prepare(text, version);
++    const revised = prepare(text, versionV2);
++    expect(isMiraTextbookPinyinProviderPronunciation(original.providerPronunciation, sha(text))).toBe(true);
++    expect(isMiraTextbookPinyinProviderPronunciation(revised.providerPronunciation, sha(text))).toBe(true);
++    for (const [record, other] of [[original.providerPronunciation, revised.providerPronunciation],
++      [revised.providerPronunciation, original.providerPronunciation]]) {
++      expect(isMiraTextbookPinyinProviderPronunciation({ ...record, policyVersion: other.policyVersion }, sha(text))).toBe(false);
++      expect(isMiraTextbookPinyinProviderPronunciation({ ...record, policySha256: other.policySha256 }, sha(text))).toBe(false);
++    }
++  });
++
++  it.each(['zci', 'zi3', 'zh', 'zhi', 'zǐci', 'zī', 'i', 'Z', 'ｚ', '𝒛', 'constructor', 'zi\u030c', 'z\x00'])(
++    'keeps v2 whole-token rejection for %s', token => {
++      expect(() => prepare(`请听：${token}。`, versionV2)).toThrow();
++    });
++});
+diff --git a/tests/server/mira-textbook-pinyin-audio.test.ts b/tests/server/mira-textbook-pinyin-audio.test.ts
+--- a/tests/server/mira-textbook-pinyin-audio.test.ts
++++ b/tests/server/mira-textbook-pinyin-audio.test.ts
+@@ -200,6 +200,8 @@
+     ['mira.textbook.pinyin-garden2-ssml.v1', '听老师把两个音节连起来读，再联系图片：là bǐ，蜡笔。'],
+     ['mira.textbook.pinyin-gkh-ssml.v1', '先听：g、u、ā。连起来听：guā。再看哥哥。'],
+     ['mira.textbook.pinyin-jqx-ssml.v1', '先听：j、ü。再听完整音节：jū、qū、xū。再看下棋。'],
++    ['mira.textbook.pinyin-zcs-ssml.v1', '请听完整音节：zi、cì、sī。再看句子。'],
++    ['mira.textbook.pinyin-zcs-ssml.v2', '请听完整音节：zi、cì、sī。再看句子。'],
+   ])('sends exact registered %s SSML once and preserves its version through TTS replay and ASR', async (version, sourceText) => {
+     const input = ttsInput(sourceText, version);
+     const prepared = prepareMiraTextbookPinyinPronunciation(input.text, version);
+@@ -234,7 +236,32 @@
+     expect(fetchAsr).toHaveBeenCalledTimes(1);
+   });
+ 
+-  it.each(['mira.textbook.pinyin-iuu-ssml.v1', 'mira.textbook.pinyin-dtnl-ssml.v1', 'mira.textbook.pinyin-garden2-ssml.v1', 'mira.textbook.pinyin-gkh-ssml.v1', 'mira.textbook.pinyin-jqx-ssml.v1'])(
++  it('does not repurpose an existing ZCS v1 request or ASR receipt for v2', async () => {
++    const source = '请听：zi。再看句子。';
++    const original = ttsInput(source, 'mira.textbook.pinyin-zcs-ssml.v1');
++    const revised = ttsInput(source, 'mira.textbook.pinyin-zcs-ssml.v2');
++    const fetchTts = vi.fn(async (_url: unknown, init?: RequestInit) => init?.method === 'POST'
++      ? json({ output: { audio: { url: mediaUrl } } })
++      : new Response(wav(false), { headers: { 'content-type': 'audio/wav' } }));
++    const dependencies = { fetchImpl: fetchTts as typeof fetch, resolveAddresses: async () => ['8.8.8.8'] };
++    const tts = await executeMiraFormalTts(original, dependencies);
++    await expect(executeMiraFormalTts(revised, dependencies)).rejects.toThrow();
++    expect(fetchTts).toHaveBeenCalledTimes(2);
++    expect((await readMiraFormalTtsJob(original.requestId))?.providerPronunciation?.policyVersion)
++      .toBe('mira.textbook.pinyin-zcs-ssml.v1');
++    const fetchAsr = vi.fn(async () => json({ output: { choices: [{ message: { content: [{ text: '请听资再看句子' }] } }] } }));
++    const input = asrInput(tts.record.audioSha256!, original);
++    const asr = await executeMiraFormalAsr(input, { fetchImpl: fetchAsr as typeof fetch });
++    expect(asr.record.providerPronunciation).toEqual(tts.record.providerPronunciation);
++    const recordPath = path.join(tempRoot, 'jobs', 'tts', `${sha(original.requestId)}.json`);
++    const corrupted = JSON.parse(await fs.readFile(recordPath, 'utf8'));
++    corrupted.providerPronunciation.policyVersion = 'mira.textbook.pinyin-zcs-ssml.v2';
++    await fs.writeFile(recordPath, JSON.stringify(corrupted));
++    await expect(executeMiraFormalAsr(input, { fetchImpl: fetchAsr as typeof fetch })).rejects.toThrow();
++    expect(fetchAsr).toHaveBeenCalledTimes(1);
++  });
++
++  it.each(['mira.textbook.pinyin-iuu-ssml.v1', 'mira.textbook.pinyin-dtnl-ssml.v1', 'mira.textbook.pinyin-garden2-ssml.v1', 'mira.textbook.pinyin-gkh-ssml.v1', 'mira.textbook.pinyin-jqx-ssml.v1', 'mira.textbook.pinyin-zcs-ssml.v1', 'mira.textbook.pinyin-zcs-ssml.v2'])(
+     'rejects unknown, missing, swapped or caller-expanded %s profiles before any claim, budget or POST', async version => {
+     const input = ttsInput('请听。', version);
+     const fetchMock = vi.fn();

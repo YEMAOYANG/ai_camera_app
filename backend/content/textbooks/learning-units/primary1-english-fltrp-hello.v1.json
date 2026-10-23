@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "mira.learning.unit-blueprints.v1",
+  "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+  "revisionId": "20260928-metadata-1",
+  "unitId": "dbfdd12d-fdf5-3b62-95ae-90300fc4ee7b",
+  "source": {
+    "url": "https://github.com/TapXWorld/ChinaTextbook/blob/5a80345f2043ba6f8db8d7be9cf3db82725ff1f7/小学/英语/外研社版（一年级起点）（主编：陈琳）/义务教育教科书·英语（一年级起点）一年级上册.pdf",
+    "kind": "public_github_mirror_page_review",
+    "commit": "5a80345f2043ba6f8db8d7be9cf3db82725ff1f7",
+    "sha256": "7b1eb1b3069a7b453b4db2f13821c1bea8b09b8b27670298be9b76c2c23aa67d",
+    "verifiedAt": "2026-10-19",
+    "printedPages": [
+      2,
+      3,
+      4
+    ],
+    "pdfPages": [
+      7,
+      8,
+      9
+    ],
+    "reviewerKind": "ai",
+    "humanReviewed": false,
+    "localReviewPath": "output/textbook-operator-lessons/smartedu-english-six-year-g1-upper-sync-af05bc77/c67ec0f1-568d-3047-8b87-87e1ef8fae60/teaching-1/sources/source-review.json",
+    "method": "对原页视觉核对本课目标与边界，并与官方一年级起点系列及本地官方同步目录交叉确认；仅用于原创教学范围。",
+    "usageBoundary": "镜像不是官方教材下载；不确认ISBN，不外推整册可靠性，不交付原页或插画，不修改目录rightsReview或家长选书。"
+  },
+  "lessons": [
+    {
+      "nodeId": "c67ec0f1-568d-3047-8b87-87e1ef8fae60",
+      "title": "Unit 1 Hello!",
+      "status": "scope_verified_preview_only",
+      "scopePages": [
+        2,
+        3,
+        4
+      ],
+      "targets": [
+        "在图片和教师语音支持下辨认见面时的Hello或Hi问候。",
+        "听完整自我介绍I’m加名字，结合刚见过的固定人物肖像识别说话人。",
+        "在新的场景中辨认离开时的Bye或Goodbye告别。"
+      ],
+      "mediaManifest": "english-hello.original-v1.json",
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "在图片和教师语音支持下辨认见面时的Hello或Hi问候。",
+          "听完整自我介绍I’m加名字，结合刚见过的固定人物肖像识别说话人。",
+          "在新的场景中辨认离开时的Bye或Goodbye告别。"
+        ],
+        "knowledgePoints": [
+          "Hello和Hi用于见面问候；Bye和Goodbye用于离开告别，结合人物动作和情境判断。",
+          "I’m加名字用于介绍自己，以完整语块理解，不讲缩写语法。",
+          "声音与固定人物肖像建立联系；同一教师示范角色由画面说明。",
+          "图像、语音和已学习肖像支持的表现只说明此次理解；不推断独立阅读、真实发音或口语交流达标。"
+        ],
+        "priorKnowledge": [
+          "能听懂简短中文日常指令；不要求认识英文或中文题目。",
+          "零英语基础可先听示范、重播、指图；不要求自行读姓名。"
+        ],
+        "excludedTopics": [
+          "Unit 2 How are you? / I’m fine",
+          "字母书写、拼读和语法术语",
+          "数字、颜色及后续单元词汇",
+          "独立阅读或口语发音的自动评分",
+          "教材原文原题插图录音版式复制"
+        ],
+        "assessmentMode": "objective",
+        "reviewNote": "2026-10-19 AI逐页核对GitHub镜像印刷2—4页与官方系列/目录；镜像混入末页和后续目录差异已记录，核验仅本课。无人工教学终审、配音、发布或学生验收结论。"
+      },
+      "assessmentMapping": [
+        {
+          "targetIndex": 0,
+          "questionId": "hello-meeting-01",
+          "page": 3,
+          "evidence": "听一听，Hello! 请找到正在见面打招呼的那一幅图。",
+          "correctAnswer": "B"
+        },
+        {
+          "targetIndex": 1,
+          "questionId": "hello-speaker-02",
+          "page": 6,
+          "evidence": "听一听，I’m Alex. 请找到正在介绍自己的那位小朋友。",
+          "correctAnswer": "A"
+        },
+        {
+          "targetIndex": 2,
+          "questionId": "hello-goodbye-03",
+          "page": 8,
+          "evidence": "听一听，Goodbye! 请找到小朋友离开时告别的那一幅图。",
+          "correctAnswer": "C"
+        }
+      ],
+      "game": "可修改走近/离开的情境并选择合适语句；听音与肖像记忆配对；按角色编排、重放、撤销和修改多种有效小对话。",
+      "transfer": "新地点和新人物布局辨认相同问候/告别用途；可自选角色编排对话，不将自选播放算为开口。",
+      "parentSupport": "和孩子在见面、介绍自己和离开时尝试一句英语，愿意说即可；不要求抄写或发音打分。",
+      "generationReady": false,
+      "missing": [
+        "真实原创素材及实际互动逐页验收",
+        "英语教师配音与逐段语义核验",
+        "教学和来源终审、发布收据与真实学生入口验收"
+      ]
+    }
+  ]
+}

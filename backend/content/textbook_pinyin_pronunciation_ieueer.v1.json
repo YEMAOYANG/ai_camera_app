@@ -1,0 +1,350 @@
+{
+  "policyVersion": "mira.textbook.pinyin-ieueer-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "symbols": {
+    "ie": {
+      "ph": "ye1",
+      "carrier": "椰"
+    },
+    "üe": {
+      "ph": "yue1",
+      "carrier": "约"
+    },
+    "er": {
+      "ph": "er1",
+      "carrier": "儿"
+    },
+    "ye": {
+      "ph": "ye1",
+      "carrier": "椰"
+    },
+    "yue": {
+      "ph": "yue1",
+      "carrier": "约"
+    },
+    "piě": {
+      "ph": "pie3",
+      "carrier": "撇"
+    },
+    "dié": {
+      "ph": "die2",
+      "carrier": "蝶"
+    },
+    "bié": {
+      "ph": "bie2",
+      "carrier": "别"
+    },
+    "xié": {
+      "ph": "xie2",
+      "carrier": "鞋"
+    },
+    "qiē": {
+      "ph": "qie1",
+      "carrier": "切"
+    },
+    "jiě": {
+      "ph": "jie3",
+      "carrier": "姐"
+    },
+    "lüè": {
+      "ph": "lve4",
+      "carrier": "略"
+    },
+    "nüè": {
+      "ph": "nve4",
+      "carrier": "虐"
+    },
+    "jué": {
+      "ph": "jue2",
+      "carrier": "觉"
+    },
+    "quē": {
+      "ph": "que1",
+      "carrier": "缺"
+    },
+    "xué": {
+      "ph": "xue2",
+      "carrier": "学"
+    },
+    "xiě": {
+      "ph": "xie3",
+      "carrier": "写"
+    },
+    "zuò": {
+      "ph": "zuo4",
+      "carrier": "作"
+    },
+    "yè": {
+      "ph": "ye4",
+      "carrier": "夜"
+    },
+    "méi": {
+      "ph": "mei2",
+      "carrier": "梅"
+    },
+    "xuě": {
+      "ph": "xue3",
+      "carrier": "雪"
+    },
+    "piāo": {
+      "ph": "piao1",
+      "carrier": "飘"
+    },
+    "měi": {
+      "ph": "mei3",
+      "carrier": "美"
+    },
+    "yuè": {
+      "ph": "yue4",
+      "carrier": "月"
+    },
+    "ér": {
+      "ph": "er2",
+      "carrier": "儿"
+    },
+    "huā": {
+      "ph": "hua1",
+      "carrier": "花"
+    },
+    "kāi": {
+      "ph": "kai1",
+      "carrier": "开"
+    },
+    "sè": {
+      "ph": "se4",
+      "carrier": "色"
+    },
+    "p": {
+      "ph": "po1",
+      "carrier": "坡"
+    },
+    "b": {
+      "ph": "bo1",
+      "carrier": "波"
+    },
+    "d": {
+      "ph": "de1",
+      "carrier": "的"
+    },
+    "l": {
+      "ph": "le1",
+      "carrier": "勒"
+    },
+    "n": {
+      "ph": "ne1",
+      "carrier": "呢"
+    },
+    "x": {
+      "ph": "xi1",
+      "carrier": "西"
+    },
+    "q": {
+      "ph": "qi1",
+      "carrier": "七"
+    },
+    "j": {
+      "ph": "ji1",
+      "carrier": "鸡"
+    },
+    "y": {
+      "ph": "yi1",
+      "carrier": "衣"
+    }
+  },
+  "words": {},
+  "approvalBoundary": {
+    "recipeStatus": "registered-textbook-scoped-ssml-recipe-for-existing-operator-verification",
+    "sourceScope": "pep-chinese-g1-upper-2022-standard / 20260924-directory-3 / u4-l3; printed49-50; five base/whole forms, eleven printed whole syllables, xiě zuò yè, three picture phrases, yuè and ér.",
+    "providerReuse": "Unchanged Aliyun CosyVoice-v3-flash longanwen_v3 parameters, py SSML and strict whole-token recipe; existing approved recipe is not a human verdict on new files.",
+    "humanReview": "not-performed-for-this-lesson",
+    "humanListeningVerified": false,
+    "perceptualToneVerified": false,
+    "pronunciationApproved": false,
+    "formalUseAllowed": false,
+    "wholeTokenBoundary": "Every Latin run is one complete registered token; no normalization, numeric-tone spellings, combining marks, per-letter fallback, unknown syllables or synthesized wrong combinations.",
+    "componentBoundary": "p/b/d/l/n/x/q/j are support call names for visible P5-P7 components; y is only for P8/P9 static-form description. They do not authorize initial-plus-final audio assembly or claim short-consonant performance. Written iě/ié/iē/üè/ué/uē remain visual components, not independent audio targets.",
+    "toneBoundary": "ie and ye use ye1; üe and yue use yue1; er uses er1 as explicitly requested base demonstration. Only printed actual syllable tones are added, never full four-tone rows. 儿 is an inert carrier for er1; its lexical er2 reading is separately encoded for ér.",
+    "umlautBoundary": "lüè/nüè propose lve4/nve4, extending the same v spelling convention as registered nv3/lv2; provider acceptance and audible results for these new strings have not been observed. jué/quē/xué use complete jue2/que1/xue2, never jv/qv/xv fallback.",
+    "naturalChineseWords": "Ordinary Chinese remains natural speech; 梅花开/雪花飘/夜色美 are not whole-word overrides. Their printed pinyin tokens are separately whitelisted. No unknown Chinese-word phoneme override is guessed.",
+    "publicationBoundary": "No prior lesson ASR exception, real audio receipt, human acceptance or published status is inherited. Initialize through the existing v2 operator evidence contract, then verify actual formal audio and browser play separately."
+  }
+}

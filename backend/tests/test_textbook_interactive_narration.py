@@ -3,8 +3,8 @@ import shutil
 import subprocess
 import unittest
 
-from content.textbook_interactive_narration import (bind_interactive_audio, interactive_cues,
-                                                   without_audio_helper)
+from content.textbook_interactive_narration import (_INTERRUPTING_AUDIO_CODE, _QUEUE_AUDIO_CODE, _WAITING_AUDIO_CODE, _helper, bind_interactive_audio,
+                                                   interactive_cues, without_audio_helper)
 
 
 def activity(cues=None):
@@ -45,24 +45,76 @@ pause(){this.paused=true;}};
 """
         checks = """
 (async()=>{
+const flush=()=>new Promise(resolve=>setTimeout(resolve,0));
+const realNow=Date.now;let clock=0;Date.now=()=>realNow()+clock;
 assert.equal(await window.miraNarrate('find-cat'),false);assert.equal(clips.length,0);
-listeners.message({source:parent,data:{type:'MIRA_NARRATION_VISIBILITY',visible:true}});
-const a=window.miraNarrate('find-cat'),first=clips[0],oldEnded=first.onended;
-const b=window.miraNarrate('try-again'),second=clips[1];second.resolve();await b;
-assert.deepEqual(events.at(-1),{cueId:'try-again',status:'playing'});
-first.resolve();await a;oldEnded();assert.deepEqual(events.at(-1),{cueId:'try-again',status:'playing'});
+// A line asked for long before the page may speak is not played late.
+clock=5000;listeners.message({source:parent,data:{type:'MIRA_NARRATION_VISIBILITY',visible:true}});
+assert.equal(clips.length,0);
+const a=window.miraNarrate('find-cat'),first=clips[0];
+// A second line waits for the one being spoken instead of cutting it off.
+assert.equal(await window.miraNarrate('try-again'),true);assert.equal(clips.length,1);
+assert.deepEqual(events.at(-1),{cueId:'try-again',status:'queued'});
+first.resolve();assert.equal(await a,true);assert.equal(first.paused,false);
+assert.deepEqual(events.at(-1),{cueId:'find-cat',status:'playing'});
+first.onended();assert.deepEqual(events.at(-1),{cueId:'find-cat',status:'ready'});
+const second=clips[1];assert.equal(second.url,'/api/classroom-media/room-1/audio/b.wav');
+second.resolve();await flush();assert.deepEqual(events.at(-1),{cueId:'try-again',status:'playing'});
+first.onended();assert.deepEqual(events.at(-1),{cueId:'try-again',status:'playing'});
+// Asking for the line that is playing restarts it.
+const again=window.miraNarrate('try-again');assert.equal(second.paused,true);
+const third=clips[2];third.resolve();assert.equal(await again,true);
 listeners.message({source:{},data:{type:'MIRA_NARRATION_VISIBILITY',visible:false}});
-assert.equal(second.paused,false);
+assert.equal(third.paused,false);
+window.miraNarrate('find-cat');assert.equal(clips.length,3);
 listeners.message({source:parent,data:{type:'MIRA_NARRATION_VISIBILITY',visible:false}});
-assert.equal(second.paused,true);assert.equal(events.at(-1).status,'hidden');
-assert.equal(await window.miraNarrate('find-cat'),false);assert.equal(clips.length,2);
+assert.equal(third.paused,true);assert.equal(events.at(-1).status,'hidden');
+assert.equal(third.onended,null);assert.equal(clips.length,3);assert.equal(events.at(-1).status,'hidden');
+// A line tapped while the lecture speaks plays as soon as the page may speak.
+assert.equal(await window.miraNarrate('find-cat'),false);assert.equal(clips.length,3);
+clock+=1500;listeners.message({source:parent,data:{type:'MIRA_NARRATION_VISIBILITY',visible:true}});
+assert.equal(clips.length,4);assert.equal(clips[3].url,'/api/classroom-media/room-1/audio/a.wav');
+clips[3].resolve();await flush();assert.deepEqual(events.at(-1),{cueId:'find-cat',status:'playing'});
+clips[3].onended();assert.deepEqual(events.at(-1),{cueId:'find-cat',status:'ready'});
+// Task changes stop sound and its queued successor, including a late play()
+// completion. Neither callback may make the cancelled cue ready/playing.
+const cancelled=window.miraNarrate('find-cat'),fourth=clips[4];
+const lateEnded=fourth.onended;
+await window.miraNarrate('try-again');
+window.miraCancelNarration();assert.equal(fourth.paused,true);
+assert.equal(fourth.onended,null);assert.equal(fourth.onerror,null);
+fourth.resolve();assert.equal(await cancelled,false);lateEnded();await flush();
+assert.equal(clips.length,5);assert.deepEqual(events.at(-1),{cueId:null,status:'ready'});
+// A hidden request must not be resurrected after its task was cancelled.
+listeners.message({source:parent,data:{type:'MIRA_NARRATION_VISIBILITY',visible:false}});
+assert.equal(await window.miraNarrate('try-again'),false);
+window.miraCancelNarration();
 listeners.message({source:parent,data:{type:'MIRA_NARRATION_VISIBILITY',visible:true}});
-const c=window.miraNarrate('find-cat');clips[2].resolve();await c;clips[2].onended();
-assert.deepEqual(events.at(-1),{cueId:'find-cat',status:'ready'});
+assert.equal(clips.length,5);
+// It plays once: becoming visible again does not repeat it.
+listeners.message({source:parent,data:{type:'MIRA_NARRATION_VISIBILITY',visible:false}});
+listeners.message({source:parent,data:{type:'MIRA_NARRATION_VISIBILITY',visible:true}});
+assert.equal(clips.length,5);
 })().catch(error=>{console.error(error);process.exitCode=1;});
 """
         result = subprocess.run([shutil.which("node"), "-e", setup + code + checks], text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_lessons_narrated_with_the_earlier_helper_can_be_narrated_again(self):
+        urls = {"find-cat": "/api/classroom-media/room-1/audio/a.wav", "try-again": "/api/classroom-media/room-1/audio/b.wav"}
+        earlier = activity().replace("<head>", "<head>" + _helper(urls, _INTERRUPTING_AUDIO_CODE), 1)
+        queued = activity().replace("<head>", "<head>" + _helper(urls, _QUEUE_AUDIO_CODE), 1)
+        waiting = activity().replace("<head>", "<head>" + _helper(urls, _WAITING_AUDIO_CODE), 1)
+        self.assertEqual(without_audio_helper(waiting), activity())
+        self.assertEqual(without_audio_helper(queued), activity())
+        self.assertEqual(without_audio_helper(earlier), activity())
+        for existing in (waiting, queued, earlier):
+            self.assertEqual(bind_interactive_audio(existing, urls, "room-1"), existing)
+        rebound = bind_interactive_audio(earlier, urls, "room-1")
+        self.assertEqual(rebound, earlier)
+        self.assertNotIn("pending=cueId", earlier)
+        with self.assertRaises(ValueError):
+            without_audio_helper(earlier.replace("previous.pause();", "", 1))
 
     def test_missing_extra_or_external_audio_is_rejected(self):
         for urls in ({}, {"unknown": "/api/classroom-media/room-1/audio/x.wav"},
@@ -77,6 +129,10 @@ assert.deepEqual(events.at(-1),{cueId:'find-cat',status:'ready'});
         urls = {cue["id"]: f"/api/classroom-media/room-1/audio/{cue['id']}.wav" for cue in interactive_cues(activity())}
         with self.assertRaisesRegex(ValueError, "override"):
             bind_interactive_audio(activity() + '<script>window.miraNarrate=()=>{};</script>', urls, "room-1")
+        with self.assertRaisesRegex(ValueError, "override"):
+            bind_interactive_audio(activity() + '<script>window.miraCancelNarration=()=>{};</script>', urls, "room-1")
+        guarded = activity() + "<script>if (typeof window.miraNarrate === 'function') window.miraNarrate('find-cat');</script>"
+        self.assertIn('id="mira-pre-recorded-audio"', bind_interactive_audio(guarded, urls, "room-1"))
 
     def test_ambiguous_duplicate_invalid_inventory_is_rejected(self):
         invalid = [activity() + activity(), activity([{"id": "same", "text": "一"}, {"id": "same", "text": "二"}]),

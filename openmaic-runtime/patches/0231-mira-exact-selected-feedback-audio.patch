@@ -1,0 +1,76 @@
+diff --git a/lib/server/mira-textbook-scene-contract.ts b/lib/server/mira-textbook-scene-contract.ts
+--- a/lib/server/mira-textbook-scene-contract.ts
++++ b/lib/server/mira-textbook-scene-contract.ts
+@@ -450,6 +450,22 @@
+     const qs = scene.content.questions;
+     if (textbookDigest(qs.map((q) => q.id)) !== textbookDigest(p.questionIds))
+       fail('LOCKED_QUESTION_SCOPE');
++    // Only the selected-option renderer releases these exact lines after an
++    // answer. They are not a general extension of the frozen narration scope.
++    const feedbackLines = qs.flatMap((q) =>
++      object(q.optionFeedback)
++        ? Object.values(q.optionFeedback).flatMap((feedback) =>
++            object(feedback) && nonempty(feedback.text) ? [{ question: q, text: feedback.text }] : [],
++          )
++        : [],
++    );
++    const isExactSelectedFeedback = (action: { id: string; text: string }) => {
++      const matches = feedbackLines.filter((line) => line.text === action.text);
++      if (matches.length !== 1 || qs.some((q) => q.question === action.text)
++          || (p.narrationGuidance ?? []).includes(action.text)) return false;
++      const stemIndex = speech.findIndex((a) => a.text === matches[0].question.question);
++      return stemIndex >= 0 && speech.indexOf(action) > stemIndex;
++    };
+     for (const q of qs) {
+       const lock = frozen.contract.lockedAssessments.find((a) => a.id === q.id)!;
+       const expected = {
+@@ -471,7 +487,8 @@
+         speech.filter((a) => a.text === q.question).length !== 1 ||
+         speech.some(
+           (a) =>
+-            !qs.some((t) => t.question === a.text) && !(p.narrationGuidance ?? []).includes(a.text),
++            !qs.some((t) => t.question === a.text) && !(p.narrationGuidance ?? []).includes(a.text)
++            && !isExactSelectedFeedback(a),
+         ) ||
+         new Set(speech.map((a) => a.text)).size !== speech.length
+       )
+diff --git a/tests/agent-runtime/textbook-scene-contract.test.ts b/tests/agent-runtime/textbook-scene-contract.test.ts
+--- a/tests/agent-runtime/textbook-scene-contract.test.ts
++++ b/tests/agent-runtime/textbook-scene-contract.test.ts
+@@ -530,6 +530,36 @@
+     (relationship.content as any).questions[0].optionFeedback.B.visual.links[0].toId = 'missing';
+     await expect(s.store.putScene(stageId, relationship)).rejects.toThrow('QUIZ_OPTION_FEEDBACK_INVALID');
+   });
++  it('allows only unique exact selected-feedback speeches after their locked stem', async () => {
++    const s = setup();
++    await bind(s);
++    const scene = quiz();
++    (scene.content as any).questions[0].optionFeedback = {
++      A: { text: '这是离开的朋友，请再听一次。',
++        visual: { kind: 'image', src: source('leaving'), alt: '离开的朋友' } },
++      B: { text: '朋友面对面挥手，和问候一致。',
++        visual: { kind: 'image', src: source('meeting'), alt: '见面的朋友' } },
++    };
++    scene.actions!.push(
++      { id: 'feedback-a', type: 'speech', text: '这是离开的朋友，请再听一次。' },
++      { id: 'feedback-b', type: 'speech', text: '朋友面对面挥手，和问候一致。' },
++    );
++    await expect(s.store.putScene(stageId, scene)).resolves.toBeUndefined();
++    const arbitrary = structuredClone(scene);
++    (arbitrary.actions![1] as any).text += '额外的题外讲解';
++    await expect(s.store.putScene(stageId, arbitrary)).rejects.toThrow('QUIZ_SPEECH_MISMATCH');
++    const early = structuredClone(scene);
++    early.actions!.unshift(early.actions!.splice(1, 1)[0]);
++    await expect(s.store.putScene(stageId, early)).rejects.toThrow('QUIZ_SPEECH_MISMATCH');
++    const ambiguous = structuredClone(scene);
++    (ambiguous.content as any).questions[0].optionFeedback.B.text =
++      (ambiguous.content as any).questions[0].optionFeedback.A.text;
++    ambiguous.actions!.pop();
++    await expect(s.store.putScene(stageId, ambiguous)).rejects.toThrow('QUIZ_SPEECH_MISMATCH');
++    const answerChanged = structuredClone(scene);
++    (answerChanged.content as any).questions[0].answer = ['A'];
++    await expect(s.store.putScene(stageId, answerChanged)).rejects.toThrow('LOCKED_QUESTION_CHANGED');
++  });
+   it('validates actual bytes, not just distinct paths or model-declared alt text', async () => {
+     await fs.copyFile(
+       path.join(root, stageId, 'media', 'meeting.png'),

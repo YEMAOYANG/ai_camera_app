@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Disclosure } from "@/components/ui/disclosure";
 import { SwitchField } from "@/components/ui/switch";
 import { textbookSubjectPath } from "@/features/learning/textbook-navigation";
+import { preloadTextbookContents } from "@/features/learning/textbook-contents-client";
 import { useTextbookCatalog } from "@/features/learning/use-textbook-catalog";
 import type { Student } from "@/lib/contracts/student-session";
 import { getLearningHomeState, LearningListenButton, LearningNextPicture, SubjectPicture, useLearningVoice } from "./learning-picture-navigation";
@@ -37,7 +38,14 @@ export function LearningSchoolbag({ student }: { student: Student }) {
   function openBook(event: MouseEvent<HTMLAnchorElement>, subject: SchoolSubject, path: string) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault();
-    if (!motion.busy) motion.openBook(subject, path);
+    if (!motion.busy) warmAndOpenBook(subject, path);
+  }
+  function warmAndOpenBook(subject: SchoolSubject, path: string) {
+    const selected = books.find(book => book.subject === subject && book.selected);
+    const published = books.filter(book => book.subject === subject && book.accessMode === "published");
+    const directBook = selected ?? (published.length === 1 ? published[0] : undefined);
+    if (directBook) preloadTextbookContents(student, directBook);
+    motion.openBook(subject, path);
   }
   function showNotice(subject: SchoolSubject) {
     setNotice(subject);
@@ -47,7 +55,7 @@ export function LearningSchoolbag({ student }: { student: Student }) {
   function selectSubject(subject: SchoolSubject) {
     if (!data || motion.busy) return;
     const path = textbookSubjectPath(books, subject);
-    if (path) motion.openBook(subject, path); else showNotice(subject);
+    if (path) warmAndOpenBook(subject, path); else showNotice(subject);
   }
   const noticeName = subjects.find(subject => subject.id === notice)?.name;
   const needsSelection = data?.subjects?.find(subject => subject.subject === notice)?.status === "selection_required";

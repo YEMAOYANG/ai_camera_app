@@ -1,0 +1,1647 @@
+diff --git a/components/audio/question-narration.tsx b/components/audio/question-narration.tsx
+--- a/components/audio/question-narration.tsx
++++ b/components/audio/question-narration.tsx
+@@ -2,6 +2,9 @@
+ 
+ import { useEffect, useRef, useState } from 'react';
+ import { Pause, Volume2 } from 'lucide-react';
++import { ACTIVITY_AUDIO_EVENT, isLectureSpeaking, isQuestionNarrationReady, LECTURE_AUDIO_EVENT, notifyQuestionNarration } from '@/lib/mira/lecture-audio';
++
++import { getPageNarration, registerPageNarration, releasePageNarrationPause, subscribePageNarration } from '@/lib/mira/page-narration';
+ 
+ /** Only already-authored, same-origin classroom audio; never calls a TTS API. */
+ export function questionNarrationSource(question: unknown): string | null {
+@@ -14,8 +17,9 @@
+ 
+ let activeAudio: HTMLAudioElement | null = null;
+ 
+-export function QuestionNarration({ src, number }: { src: string; number: number }) {
++export function QuestionNarration({ src, number, autoPlay = false, sceneId, questionId }: { src: string; number: number; autoPlay?: boolean; sceneId?: string; questionId?: string }) {
+   const audio = useRef<HTMLAudioElement | null>(null);
++  const play = useRef<(() => Promise<void>) | null>(null);
+   const [playing, setPlaying] = useState(false);
+   const [failed, setFailed] = useState(false);
+ 
+@@ -24,40 +28,100 @@
+     player.preload = 'none';
+     player.src = src;
+     audio.current = player;
+-    const stopped = () => setPlaying(false);
+-    const error = () => { setPlaying(false); setFailed(true); };
+-    const hidden = () => { if (document.hidden) player.pause(); };
++    let disposed = false;
++    let pendingAutomatic = autoPlay;
++    let timer: ReturnType<typeof setTimeout> | undefined;
++    setPlaying(false);
++    setFailed(false);
++    let request = 0;
++    let playIntent = false;
++    const blocked = () => getPageNarration().paused || document.hidden || isLectureSpeaking();
++    const start = async (restart = true) => {
++      if (disposed || blocked()) return;
++      pendingAutomatic = false;
++      activeAudio?.pause();
++      activeAudio = player;
++      if (restart || player.ended) player.currentTime = 0;
++      setFailed(false);
++      playIntent = true;
++      const attempt = ++request;
++      registration.phase('pending');
++      try {
++        await player.play();
++        if (disposed || !playIntent || blocked()) { player.pause(); return; }
++        if (attempt !== request) return;
++        setPlaying(!player.paused);
++        registration.phase(player.paused ? 'paused' : 'playing');
++        if (!player.paused && sceneId && questionId) notifyQuestionNarration(sceneId, questionId);
++      } catch {
++        if (!disposed && attempt === request) {
++          setPlaying(false); setFailed(true); registration.phase('paused');
++        }
++      }
++    };
++    const pause = () => {
++      playIntent = false; ++request; pendingAutomatic = false;
++      clearTimeout(timer); player.pause(); registration.phase('paused');
++    };
++    const registration = registerPageNarration({
++      ready: () => !isLectureSpeaking() && (!sceneId || isQuestionNarrationReady(sceneId)),
++      play: () => { void start(false); }, pause,
++    });
++    play.current = () => start(true);
++    const stopped = () => { setPlaying(false); registration.phase('paused'); };
++    const ended = () => { setPlaying(false); registration.phase('ended'); };
++    const error = () => { setPlaying(false); setFailed(true); registration.phase('paused'); };
++    const schedule = () => {
++      clearTimeout(timer);
++      const settings = getPageNarration();
++      player.muted = settings.muted; player.volume = settings.volume; player.playbackRate = settings.rate;
++      if (blocked() || sceneId && !isQuestionNarrationReady(sceneId)) {
++        playIntent = false; ++request; player.pause(); return;
++      }
++      if (pendingAutomatic) timer = setTimeout(() => {
++        if (!disposed && pendingAutomatic && !blocked()
++            && (!sceneId || isQuestionNarrationReady(sceneId))) void start();
++      }, 120);
++    };
++    const unsubscribe = subscribePageNarration(schedule);
++    const hidden = () => schedule();
+     player.addEventListener('pause', stopped);
+-    player.addEventListener('ended', stopped);
++    player.addEventListener('ended', ended);
+     player.addEventListener('error', error);
+     document.addEventListener('visibilitychange', hidden);
++    window.addEventListener(LECTURE_AUDIO_EVENT, schedule);
++    schedule();
+     return () => {
++      disposed = true;
++      playIntent = false; ++request;
++      unsubscribe(); registration.dispose();
++      clearTimeout(timer);
+       player.pause();
+       if (activeAudio === player) activeAudio = null;
+       player.removeEventListener('pause', stopped);
+-      player.removeEventListener('ended', stopped);
++      player.removeEventListener('ended', ended);
+       player.removeEventListener('error', error);
+       document.removeEventListener('visibilitychange', hidden);
++      window.removeEventListener(LECTURE_AUDIO_EVENT, schedule);
+       player.removeAttribute('src');
+       audio.current = null;
++      play.current = null;
+     };
+-  }, [src]);
++  }, [src, autoPlay, sceneId, questionId]);
+ 
+   async function toggle() {
+     const player = audio.current;
+     if (!player) return;
+     if (!player.paused) { player.pause(); return; }
+-    activeAudio?.pause();
+-    activeAudio = player;
+-    player.currentTime = 0;
+-    setFailed(false);
+-    try { await player.play(); if (audio.current === player) setPlaying(true); }
+-    catch { if (audio.current === player) { setPlaying(false); setFailed(true); } }
++    // An explicit replay takes the classroom sound channel from the lecture.
++    window.dispatchEvent(new Event(ACTIVITY_AUDIO_EVENT));
++    releasePageNarrationPause();
++    await play.current?.();
+   }
+ 
+   return <div className="mb-3">
+     <button type="button" onClick={toggle} aria-label={`${playing ? '暂停' : '听'}第 ${number} 题`}
+-      className="inline-flex min-h-12 items-center gap-2 rounded-full bg-amber-100 px-5 text-base font-medium text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
++      className="inline-flex min-h-14 items-center gap-2 rounded-full bg-amber-100 px-5 text-base font-medium text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
+       {playing ? <Pause size={20} aria-hidden /> : <Volume2 size={20} aria-hidden />}
+       {playing ? '暂停' : '听题目'}
+     </button>
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -1,7 +1,7 @@
+ 'use client';
+ 
+-import { useCallback, useEffect, useState } from 'react';
+-import { Check, ArrowRight, Loader2 } from 'lucide-react';
++import { useCallback, useEffect, useRef, useState } from 'react';
++import { Check, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+ import type { QuizQuestion } from '@/lib/types/stage';
+ import type { QuizVisual } from '@openmaic/dsl';
+ import { useStageStore } from '@/lib/store';
+@@ -30,11 +30,14 @@
+  * questions and the server adds them up to one lesson result.
+  */
+ export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] }) {
++  const sceneId = useStageStore(state => state.currentSceneId) ?? undefined;
+   const [answers, setAnswers] = useState<Record<string, string>>({});
+   const [graded, setGraded] = useState<Graded[]>([]);
+   const [loading, setLoading] = useState(true);
+   const [sending, setSending] = useState(false);
+   const [error, setError] = useState('');
++  const [questionIndex, setQuestionIndex] = useState(0);
++  const submission = useRef<AbortController | null>(null);
+   const events = useMiraStudentRuntimeEvents();
+ 
+   const complete = useCallback(async () => {
+@@ -46,11 +49,14 @@
+   const read = useCallback(async (signal?: AbortSignal) => {
+     const response = await fetch('/mira/textbook-quiz', { cache: 'no-store', signal });
+     const payload = await response.json();
++    if (signal?.aborted) return;
+     if (!response.ok || !payload.ok) throw new Error(payload.message || '练习暂时没有加载成功');
+     const saved = gradedOnThisPage(payload, questions.map(q => q.id));
+     if (saved.length) {
+       setGraded(saved);
+       setAnswers(Object.fromEntries(saved.map(r => [r.questionId, r.response])));
++      const firstUnanswered = questions.findIndex(q => !saved.some(r => r.questionId === q.id));
++      setQuestionIndex(Math.max(0, firstUnanswered));
+     }
+     setLoading(false);
+     setError('');
+@@ -61,61 +67,71 @@
+     void read(controller.signal).catch((caught: unknown) => {
+       if (!controller.signal.aborted) { setLoading(false); setError(caught instanceof Error ? caught.message : '请重新进入练习'); }
+     });
+-    return () => controller.abort();
++    return () => { controller.abort(); submission.current?.abort(); };
+   }, [read]);
+ 
+   const done = questions.length > 0 && graded.length === questions.length;
+ 
+   async function submit() {
+-    if (sending || done) return;
++    if (submission.current || done || questions.some(q => !answers[q.id])) return;
++    const controller = new AbortController();
++    submission.current = controller;
+     setSending(true); setError('');
+     try {
+-      const response = await fetch('/mira/textbook-quiz', { method: 'POST',
++      const response = await fetch('/mira/textbook-quiz', { method: 'POST', signal: controller.signal,
+         headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers }) });
+       const payload = await response.json();
++      if (controller.signal.aborted) return;
+       if (!response.ok || !payload.ok) throw new Error(payload.message || '回答暂时没有保存，请重试');
+       setGraded(gradedOnThisPage(payload, questions.map(q => q.id)));
+       if (payload.result) await complete();
+-    } catch (caught) { setError(caught instanceof Error ? caught.message : '回答暂时没有保存，请重试'); }
+-    finally { setSending(false); }
++    } catch (caught) { if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : '回答暂时没有保存，请重试'); }
++    finally { if (!controller.signal.aborted) setSending(false); submission.current = null; }
+   }
+ 
++  const q = questions[questionIndex];
++  const feedback = q && graded.find(r => r.questionId === q.id);
++  const audio = q && questionNarrationSource(q);
+   return <section className="h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]" aria-label="课堂练习">
+-    <div className="mx-auto max-w-5xl p-5 sm:p-8">
+-      <header className="mb-7 flex items-end justify-between gap-4">
+-        <div><p className="mb-2 text-sm text-[#697a6c]">随堂小测</p>
+-          <h2 className="text-2xl font-semibold sm:text-3xl">{done ? `答对 ${graded.filter(r => r.correct).length} / ${graded.length} 题` : '听一听，选一选'}</h2></div>
++    <div className="mx-auto flex min-h-full max-w-5xl flex-col p-3 sm:p-5">
++      <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
++        <h2 className="text-lg font-semibold sm:text-2xl">{done ? `答对 ${graded.filter(r => r.correct).length} / ${graded.length} 题` : '听一听，选一选'}</h2>
++        <span className="text-sm text-[#697a6c]" aria-label="题目进度">{questionIndex + 1} / {questions.length}</span>
+       </header>
+-      {loading ? <p role="status">正在打开练习…</p> : <div className="grid gap-5 sm:grid-cols-2">
+-        {questions.map((q, index) => {
+-          const audio = questionNarrationSource(q);
+-          const feedback = graded.find(r => r.questionId === q.id);
+-          return <fieldset key={q.id} className="rounded-2xl border border-[#e9dfcd] bg-white/80 p-5">
+-            <legend className="px-2 text-sm text-[#788275]">第 {index + 1} 题</legend>
+-            {q.visual && <div className="mb-4" data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
+-            <p className="mb-4 text-lg leading-relaxed">{q.question}</p>
+-            {audio && <QuestionNarration src={audio} number={index + 1} />}
+-            <div className="flex gap-3" role="radiogroup" aria-label={q.question}>
++      {loading ? <p role="status">正在打开练习…</p> : q &&
++        <fieldset key={q.id} data-fixed-question={q.id} className="min-w-0 rounded-2xl border border-[#e9dfcd] bg-white/80 p-3 sm:p-4">
++          <legend className="px-2 text-sm text-[#788275]">第 {questionIndex + 1} 题</legend>
++          <div className={`grid min-w-0 items-center gap-3 ${q.visual ? 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]' : ''}`}>
++            {q.visual && <div className="min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44" data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
++            <div className="min-w-0">
++            <p className="mb-2 text-base leading-relaxed sm:text-lg">{q.question}</p>
++            {audio && <QuestionNarration key={q.id} src={audio} number={questionIndex + 1} sceneId={sceneId} questionId={q.id} autoPlay={!done && !feedback && !sending} />}
++            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'}`} role="radiogroup" aria-label={q.question}>
+               {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+                 aria-label={option.label} key={option.value} disabled={done || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+-                className={`min-h-16 flex-1 rounded-xl border text-3xl transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
++                className={`min-h-14 min-w-14 rounded-xl border p-1 text-2xl transition-colors [&_img]:h-24 [&_svg]:max-h-24 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
+                 <FixedTextbookOptionFace visual={q.optionVisuals?.[option.value]} label={option.label} />
+               </button>)}
+             </div>
+-            {feedback && <p className={`mt-4 flex items-start gap-2 text-base ${feedback.correct ? 'text-[#377254]' : 'text-[#996238]'}`}>
++            {feedback && <p className={`mt-3 flex items-start gap-2 text-base ${feedback.correct ? 'text-[#377254]' : 'text-[#996238]'}`}>
+               {feedback.correct && <Check size={20} className="mt-0.5 shrink-0" aria-hidden />}{feedback.explanation}
+             </p>}
+-          </fieldset>;
+-        })}
+-      </div>}
++            </div>
++          </div>
++        </fieldset>}
+       {error && <p role="alert" className="mt-5 text-[#9b503b]">{error}</p>}
+-      <footer className="mt-7 flex justify-end">
+-        {!done && !loading && <button type="button" onClick={() => void submit()}
++      <footer className="mt-auto flex shrink-0 items-center justify-between gap-3 pt-3">
++        {!loading && q && <button type="button" aria-label="上一题" onClick={() => setQuestionIndex(index => index - 1)} disabled={sending || questionIndex === 0}
++          className="inline-flex min-h-14 min-w-14 items-center justify-center rounded-full border border-[#c7d1c5] px-3 disabled:opacity-30"><ArrowLeft size={18} aria-hidden /></button>}
++        {!loading && q && questionIndex < questions.length - 1 && <button type="button" aria-label="下一题"
++          disabled={sending || (!done && !answers[q.id])} onClick={() => setQuestionIndex(index => index + 1)}
++          className="inline-flex min-h-14 items-center gap-2 rounded-full bg-[#466a53] px-5 text-base text-white disabled:opacity-40">下一题<ArrowRight size={18} aria-hidden /></button>}
++        {!done && !loading && questionIndex === questions.length - 1 && <button type="button" onClick={() => void submit()}
+           disabled={sending || questions.some(q => !answers[q.id])}
+-          className="inline-flex min-h-12 items-center gap-3 rounded-full bg-[#466a53] px-7 text-lg text-white disabled:opacity-40">
++          className="inline-flex min-h-14 items-center gap-3 rounded-full bg-[#466a53] px-7 text-lg text-white disabled:opacity-40">
+           {sending ? <><Loader2 className="animate-spin" size={20} aria-hidden />正在保存</> : <>完成练习<ArrowRight size={20} aria-hidden /></>}
+         </button>}
+-        {done && <p className="text-base text-[#68766b]">答案已保存，继续往下学吧。</p>}
++        {done && questionIndex === questions.length - 1 && <p className="text-sm text-[#68766b]">答案已保存，继续往下学吧。</p>}
+       </footer>
+     </div>
+   </section>;
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -257,13 +257,14 @@
+   );
+ }
+ 
+-function SingleChoiceQuestion({
++export function SingleChoiceQuestion({
+   question,
+   index,
+   value,
+   onChange,
+   disabled,
+   result,
++  autoNarrate = false,
+ }: {
+   question: QuizQuestion;
+   index: number;
+@@ -271,12 +272,14 @@
+   onChange: (value: string) => void;
+   disabled?: boolean;
+   result?: QuestionResult;
++  autoNarrate?: boolean;
+ }) {
+   const isReview = !!result;
++  const threePictures = question.options?.length === 3 && question.options.every(option => !!question.optionVisuals?.[option.value]);
+ 
+   return (
+-    <QuestionCard question={question} index={index} result={result}>
+-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
++    <QuestionCard question={question} index={index} result={result} autoNarrate={autoNarrate}>
++      <div className={cn('grid min-w-0 gap-2', threePictures ? 'grid-cols-3' : 'grid-cols-1 sm:grid-cols-2')}>
+         {question.options?.map((opt) => {
+           const visual = question.optionVisuals?.[opt.value];
+           const selected = value === opt.value;
+@@ -292,6 +295,7 @@
+               className={cn(
+                 'flex min-h-12 items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all text-sm',
+                 visual && 'flex-col text-center',
++                threePictures && 'min-h-14 min-w-14 gap-2 px-2',
+                 // Default state
+                 !isReview &&
+                   !selected &&
+@@ -578,11 +582,13 @@
+   index,
+   result,
+   children,
++  autoNarrate = false,
+ }: {
+   question: QuizQuestion;
+   index: number;
+   result?: QuestionResult;
+   children: React.ReactNode;
++  autoNarrate?: boolean;
+ }) {
+   const { t } = useI18n();
+   const isReview = !!result;
+@@ -657,7 +663,7 @@
+       </div>
+ 
+       {/* Body */}
+-      {narrationSource && <QuestionNarration src={narrationSource} number={index + 1} />}
++      {narrationSource && <QuestionNarration src={narrationSource} number={index + 1} autoPlay={autoNarrate && !isReview} />}
+       {question.visual && <div className="mb-4" data-quiz-scene-picture><QuizPicture visual={question.visual} scene /></div>}
+       {children}
+ 
+@@ -770,7 +776,8 @@
+ 
+ export function QuizView(props: QuizViewProps) {
+   const fixed = useStageStore(state => (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true);
+-  return fixed && !props.readOnly ? <FixedTextbookQuiz questions={props.questions} /> : <StandardQuizView {...props} />;
++  const fixedPageKey = JSON.stringify([props.sceneId, props.questions.map(question => question.id)]);
++  return fixed && !props.readOnly ? <FixedTextbookQuiz key={fixedPageKey} questions={props.questions} /> : <StandardQuizView {...props} />;
+ }
+ 
+ function StandardQuizView({ questions, sceneId, stageId, readOnly = false }: QuizViewProps) {
+@@ -1108,6 +1115,7 @@
+                       index={i}
+                       value={answers[q.id] as string | undefined}
+                       onChange={(v) => handleSetAnswer(q.id, v)}
++                      autoNarrate={pictureSequence || questions.length === 1}
+                     />
+                   );
+                 }
+diff --git a/tests/quiz/question-narration-lifecycle.test.ts b/tests/quiz/question-narration-lifecycle.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/quiz/question-narration-lifecycle.test.ts
+@@ -0,0 +1,359 @@
++// @vitest-environment jsdom
++import { act, createElement } from 'react';
++import { createRoot, type Root } from 'react-dom/client';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { QuestionNarration } from '@/components/audio/question-narration';
++import { ACTIVITY_AUDIO_EVENT, beginQuestionNarrationScene, releaseQuestionNarrationScene, setLectureSpeaking, subscribeQuestionNarration, notifyQuestionNarration } from '@/lib/mira/lecture-audio';
++import { PlaybackEngine } from '@/lib/playback/engine';
++import { fixedQuizManagedSpeechIds, fixedQuizQuestionNarrationText } from '@/lib/mira/fixed-quiz-narration';
++import type { Scene } from '@/lib/types/stage';
++import type { ActionEngine } from '@/lib/action/engine';
++import type { AudioPlayer } from '@/lib/utils/audio-player';
++import { getPageNarration, pausePageNarration, releasePageNarrationPause, setPageAudioPreferences, togglePageNarration } from '@/lib/mira/page-narration';
++import { computePlaybackView, type PlaybackRawState } from '@/lib/playback/derived-state';
++
++vi.mock('@/lib/store/settings', () => ({ useSettingsStore: { getState: () => ({ ttsProvidersConfig: {} }) } }));
++
++const players: FakeAudio[] = [];
++class FakeAudio extends EventTarget {
++  src = '';
++  preload = '';
++  paused = true;
++  currentTime = 0;
++  muted = false;
++  volume = 1;
++  playbackRate = 1;
++  ended = false;
++  play = vi.fn(async () => { this.paused = false; });
++  pause = vi.fn(() => { this.paused = true; this.dispatchEvent(new Event('pause')); });
++  removeAttribute(name: string) { if (name === 'src') this.src = ''; }
++  constructor() { super(); players.push(this); }
++}
++let root: Root | undefined;
++let host: HTMLDivElement;
++(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
++beforeEach(() => {
++  vi.useFakeTimers();
++  releasePageNarrationPause();
++  setPageAudioPreferences({ muted: false, volume: 1, rate: 1 });
++  vi.stubGlobal('Audio', FakeAudio);
++  host = document.createElement('div');
++  document.body.append(host);
++  root = createRoot(host);
++});
++afterEach(() => {
++  act(() => root?.unmount());
++  root = undefined;
++  setLectureSpeaking(false);
++  beginQuestionNarrationScene(null);
++  players.splice(0);
++  document.body.replaceChildren();
++  vi.unstubAllGlobals();
++  vi.useRealTimers();
++});
++const src = '/api/classroom-media/lesson/audio/question.wav';
++async function render(autoPlay: boolean, source = src, sceneId?: string, questionId?: string) {
++  await act(async () => root!.render(createElement(QuestionNarration, { src: source, number: 1, autoPlay, sceneId, questionId })));
++}
++async function tick() { await act(async () => { await vi.advanceTimersByTimeAsync(150); }); }
++
++describe('recorded question audio lifecycle', () => {
++  it('waits for the lecture, reads once, and pauses if the lecture resumes', async () => {
++    setLectureSpeaking(true);
++    await render(true);
++    await tick();
++    expect(players[0].play).not.toHaveBeenCalled();
++    act(() => setLectureSpeaking(false));
++    await tick();
++    expect(players[0].play).toHaveBeenCalledTimes(1);
++    act(() => setLectureSpeaking(true));
++    expect(players[0].paused).toBe(true);
++    act(() => setLectureSpeaking(false));
++    await tick();
++    expect(players[0].play).toHaveBeenCalledTimes(1);
++  });
++
++  it('keeps reopened results quiet and requests the sound channel only on replay', async () => {
++    await render(false);
++    await tick();
++    expect(players[0].play).not.toHaveBeenCalled();
++    const activity = vi.fn(() => setLectureSpeaking(false));
++    window.addEventListener(ACTIVITY_AUDIO_EVENT, activity);
++    setLectureSpeaking(true);
++    await act(async () => host.querySelector('button')!.click());
++    expect(activity).toHaveBeenCalledTimes(1);
++    expect(players[0].play).toHaveBeenCalledTimes(1);
++    window.removeEventListener(ACTIVITY_AUDIO_EVENT, activity);
++  });
++
++  it('cancels a waiting question on a scene change and releases its media', async () => {
++    setLectureSpeaking(true);
++    await render(true);
++    const previous = players[0];
++    await render(true, '/api/classroom-media/lesson/audio/next.wav');
++    expect(previous.src).toBe('');
++    act(() => root!.unmount());
++    root = undefined;
++    setLectureSpeaking(false);
++    await tick();
++    expect(players.every(player => player.paused && player.src === '')).toBe(true);
++    expect(players.every(player => player.play.mock.calls.length === 0)).toBe(true);
++  });
++});
++
++function fixedQuiz(count = 5): Scene {
++  const questions = Array.from({ length: count }, (_, index) => ({
++    id: `q${index + 1}`, type: 'single', points: 1,
++    question: `请你数一数，找到有${['六', '七', '八', '九', '十'][index]}个圆点的卡片。`,
++    questionAudioUrl: `/api/classroom-media/lesson/audio/q${index + 1}.wav`,
++    options: [{ value: 'A', label: '第一张图' }, { value: 'B', label: '第二张图' }],
++  }));
++  const actions = [{ id: 'opening', type: 'speech', text: '我们一起数一数，找到正确的卡片。',
++    audioId: 'opening', audioUrl: '/api/classroom-media/lesson/audio/opening.wav' },
++  ...questions.map(q => ({ id: `speech-${q.id}`, type: 'speech', text: q.question,
++    audioId: q.id, audioUrl: `http://127.0.0.1:3100${q.questionAudioUrl}` }))];
++  return { id: 'fixed-quiz', type: 'quiz', stageId: 'lesson', order: 4,
++    content: { type: 'quiz', questions }, actions } as Scene;
++}
++
++function lecture(scene: Scene) {
++  let ended = () => {};
++  const audio = { play: vi.fn(async () => true), pause: vi.fn(), stop: vi.fn(),
++    onEnded: vi.fn((callback: () => void) => { ended = callback; }), hasActiveAudio: () => false, isPlaying: () => true };
++  const transcript = vi.fn();
++  const managed = fixedQuizManagedSpeechIds(scene, true);
++  const engine = new PlaybackEngine([scene], {
++    clearEffects: vi.fn(), resetPlaybackVisualState: vi.fn(), execute: vi.fn(),
++  } as unknown as ActionEngine, audio as unknown as AudioPlayer, {
++    isSpeechManagedByPage: id => managed.has(id), onSpeechStart: transcript,
++    onModeChange: mode => {
++      setLectureSpeaking(mode === 'playing');
++      if (mode === 'idle' && engine.isExhausted()) releaseQuestionNarrationScene(scene.id);
++    },
++  });
++  return { engine, audio, transcript, finishOpening: () => ended() };
++}
++
++describe('fixed quiz lecture-to-current-question handoff', () => {
++  it.each([2, 3, 5])('plays only the opening then the visible question from a %i-question authored speech sequence', async count => {
++    const scene = fixedQuiz(count);
++    const saved = JSON.stringify(scene);
++    const playback = lecture(scene);
++    beginQuestionNarrationScene(scene.id);
++    await render(true, '/api/classroom-media/lesson/audio/q1.wav', scene.id);
++    // Slow progress/cursor initialization is silent; a timer is not readiness.
++    await act(async () => { await vi.advanceTimersByTimeAsync(2000); });
++    expect(players[0].play).not.toHaveBeenCalled();
++    act(() => playback.engine.start());
++    await tick();
++    expect(players[0].play).not.toHaveBeenCalled();
++    act(() => playback.finishOpening());
++    await tick();
++    expect(playback.audio.play).toHaveBeenCalledTimes(1);
++    expect(playback.transcript.mock.calls).toEqual([['我们一起数一数，找到正确的卡片。']]);
++    expect(players[0].play).toHaveBeenCalledTimes(1);
++    expect(players[0].src).toContain('/q1.wav');
++    await tick();
++    expect(players).toHaveLength(1); // No future question was scheduled.
++    await render(true, '/api/classroom-media/lesson/audio/q2.wav', scene.id);
++    await tick();
++    expect(players[0].src).toBe('');
++    expect(players[1].src).toContain('/q2.wav');
++    expect(players[1].play).toHaveBeenCalledTimes(1);
++    expect(playback.audio.play).toHaveBeenCalledTimes(1);
++    expect(JSON.stringify(scene)).toBe(saved); // Original audio identities/actions are untouched.
++    playback.engine.stop();
++  });
++
++  it('restores an old middle action cursor without reading that future question', async () => {
++    const scene = fixedQuiz();
++    const playback = lecture(scene);
++    beginQuestionNarrationScene(scene.id);
++    await render(true, '/api/classroom-media/lesson/audio/q1.wav', scene.id);
++    await playback.engine.jumpToAction(4, { autoplay: false });
++    act(() => playback.engine.continuePlayback());
++    await tick();
++    expect(playback.audio.play).not.toHaveBeenCalled();
++    expect(playback.transcript).not.toHaveBeenCalled();
++    expect(players[0].src).toContain('/q1.wav');
++    expect(players[0].play).toHaveBeenCalledTimes(1);
++    playback.engine.stop();
++  });
++
++  it('manual current-question replay pauses the opening and never restarts it', async () => {
++    const scene = fixedQuiz();
++    const playback = lecture(scene);
++    beginQuestionNarrationScene(scene.id);
++    const handoff = () => { playback.engine.pause(); releaseQuestionNarrationScene(scene.id); };
++    window.addEventListener(ACTIVITY_AUDIO_EVENT, handoff);
++    try {
++      act(() => playback.engine.start());
++      await render(true, '/api/classroom-media/lesson/audio/q1.wav', scene.id);
++      await act(async () => host.querySelector('button')!.click());
++      expect(playback.audio.pause).toHaveBeenCalledTimes(1);
++      expect(players[0].play).toHaveBeenCalledTimes(1);
++      act(() => playback.finishOpening());
++      await tick();
++      expect(playback.audio.play).toHaveBeenCalledTimes(1);
++      expect(players[0].play).toHaveBeenCalledTimes(1);
++      await render(true, '/api/classroom-media/lesson/audio/q2.wav', scene.id);
++      await tick();
++      expect(players[1].play).toHaveBeenCalledTimes(1);
++    } finally {
++      window.removeEventListener(ACTIVITY_AUDIO_EVENT, handoff);
++      playback.engine.stop();
++    }
++  });
++
++  it('does not change ordinary lecture ownership and rejects stale scene handoff', async () => {
++    expect(fixedQuizManagedSpeechIds(fixedQuiz(), false).size).toBe(0);
++    beginQuestionNarrationScene('new-scene');
++    await render(true, src, 'new-scene');
++    releaseQuestionNarrationScene('old-scene');
++    await tick();
++    expect(players[0].play).not.toHaveBeenCalled();
++  });
++});
++
++
++describe('native question teacher bubble', () => {
++  const raw = (): PlaybackRawState => ({
++    engineMode: 'paused', lectureSpeech: '答对了！这是家里的书架。', liveSpeech: '旧聊天内容',
++    speakingAgentId: null, thinkingState: null, isCueUser: false, isTopicPending: false,
++    chatIsStreaming: false, discussionTrigger: null, playbackCompleted: false,
++    idleText: '一起找一找在哪里读书。', speakingStudent: false, sessionType: null,
++  });
++
++  it('updates from the current question identity only after its audio starts', async () => {
++    const scene = fixedQuiz();
++    const bubble = raw();
++    const spoken: string[] = [];
++    const unsubscribe = subscribeQuestionNarration((sceneId, questionId) => {
++      const text = fixedQuizQuestionNarrationText(scene, true, sceneId, questionId);
++      if (text === null) return;
++      bubble.lectureSpeech = text; bubble.liveSpeech = null; bubble.suppressIdleSpeech = true;
++      spoken.push(computePlaybackView(bubble).sourceText);
++    });
++    try {
++      beginQuestionNarrationScene(scene.id);
++      await render(true, '/api/classroom-media/lesson/audio/q1.wav', scene.id, 'q1');
++      await tick();
++      expect(spoken).toEqual([]); // Opening has not handed off yet.
++      act(() => releaseQuestionNarrationScene(scene.id));
++      await tick();
++      expect(spoken).toEqual(['请你数一数，找到有六个圆点的卡片。']);
++      await render(true, '/api/classroom-media/lesson/audio/q2.wav', scene.id, 'q2');
++      await tick();
++      expect(spoken).toEqual(['请你数一数，找到有六个圆点的卡片。', '请你数一数，找到有七个圆点的卡片。']);
++      expect(computePlaybackView(bubble).sourceText).not.toContain('书架');
++      notifyQuestionNarration('old-scene', 'q1');
++      notifyQuestionNarration(scene.id, 'missing-question');
++      window.dispatchEvent(new MessageEvent('message', { data: { sceneId: scene.id, questionId: 'q5', text: 'iframe text' } }));
++      expect(spoken).toHaveLength(2);
++      expect(fixedQuizQuestionNarrationText(scene, false, scene.id, 'q1')).toBeNull();
++    } finally { unsubscribe(); }
++  });
++
++  it('does not announce failed audio or a pending old question after a page change', async () => {
++    const spoken = vi.fn();
++    const unsubscribe = subscribeQuestionNarration(spoken);
++    try {
++      beginQuestionNarrationScene('fixed-quiz');
++      releaseQuestionNarrationScene('fixed-quiz');
++      await render(true, src, 'fixed-quiz', 'q1');
++      players[0].play.mockRejectedValueOnce(new Error('blocked'));
++      await tick();
++      expect(spoken).not.toHaveBeenCalled();
++      let finish!: () => void;
++      players[0].play.mockImplementationOnce(() => new Promise<void>(resolve => { finish = resolve; }));
++      act(() => host.querySelector('button')!.click());
++      await render(false, '/api/classroom-media/lesson/audio/q2.wav', 'fixed-quiz', 'q2');
++      await act(async () => finish());
++      expect(spoken).not.toHaveBeenCalled();
++    } finally { unsubscribe(); }
++  });
++
++  it('keeps an activity handoff blank despite an available old opening, then permits a new scene or live reply', () => {
++    const bubble = raw();
++    expect(computePlaybackView(bubble).sourceText).toBe('旧聊天内容');
++    // PlaybackChromeRoot clears both speech sources when the activity takes ownership.
++    bubble.liveSpeech = null; bubble.lectureSpeech = null; bubble.suppressIdleSpeech = true;
++    expect(computePlaybackView(bubble)).toMatchObject({ sourceText: '', bubbleRole: null, activeRole: null });
++    bubble.liveSpeech = '新的老师回答'; bubble.sessionType = 'qa';
++    expect(computePlaybackView(bubble).sourceText).toBe('新的老师回答');
++    bubble.liveSpeech = null; bubble.sessionType = null; bubble.suppressIdleSpeech = false;
++    expect(computePlaybackView(bubble).sourceText).toBe('一起找一找在哪里读书。');
++  });
++});
++
++
++describe('classroom controls own the current question audio', () => {
++  it('pauses and resumes the question at its position without restarting the opening', async () => {
++    const scene = fixedQuiz();
++    const playback = lecture(scene);
++    beginQuestionNarrationScene(scene.id);
++    await render(true, src, scene.id, 'q1');
++    act(() => playback.engine.start());
++    act(() => playback.finishOpening());
++    await tick();
++    players[0].currentTime = 3.5;
++    expect(getPageNarration().phase).toBe('playing');
++    act(() => { expect(togglePageNarration()).toBe(true); });
++    expect(players[0].paused).toBe(true);
++    expect(getPageNarration().phase).toBe('paused');
++    await tick();
++    expect(players[0].play).toHaveBeenCalledTimes(1);
++    await act(async () => { expect(togglePageNarration()).toBe(true); });
++    expect(players[0].currentTime).toBe(3.5);
++    expect(getPageNarration().phase).toBe('playing');
++    expect(playback.audio.play).toHaveBeenCalledTimes(1);
++    playback.engine.stop();
++  });
++
++  it('applies effective classroom mute, volume and speed to active and later questions', async () => {
++    await render(true);
++    await tick();
++    act(() => setPageAudioPreferences({ muted: true, volume: 0.3, rate: 1.5 }));
++    expect(players[0]).toMatchObject({ muted: true, volume: 0.3, playbackRate: 1.5 });
++    expect(players[0].play).toHaveBeenCalledTimes(1);
++    await render(true, '/api/classroom-media/lesson/audio/q2.wav');
++    await tick();
++    expect(players[1]).toMatchObject({ muted: true, volume: 0.3, playbackRate: 1.5 });
++    act(() => setPageAudioPreferences({ muted: false, volume: 0.6, rate: 0.75 }));
++    expect(players[1]).toMatchObject({ muted: false, volume: 0.6, playbackRate: 0.75 });
++  });
++
++  it('does not resume after pause arrives while play is pending, and releases ownership on unmount', async () => {
++    await render(true);
++    let finish!: () => void;
++    players[0].play.mockImplementationOnce(() => new Promise<void>(resolve => { finish = resolve; }));
++    await tick();
++    expect(getPageNarration().phase).toBe('pending');
++    act(() => pausePageNarration());
++    await act(async () => { players[0].paused = false; finish(); });
++    expect(players[0].paused).toBe(true);
++    expect(getPageNarration().phase).toBe('paused');
++    await render(true, '/api/classroom-media/lesson/audio/q2.wav');
++    await tick();
++    expect(players[1].play).not.toHaveBeenCalled();
++    act(() => root!.unmount()); root = undefined;
++    expect(getPageNarration().registered).toBe(false);
++    expect(togglePageNarration()).toBe(false);
++  });
++
++  it('pauses when hidden and never lets a late play completion speak in the background', async () => {
++    await render(true);
++    let finish!: () => void;
++    players[0].play.mockImplementationOnce(() => new Promise<void>(resolve => { finish = resolve; }));
++    await tick();
++    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
++    act(() => document.dispatchEvent(new Event('visibilitychange')));
++    await act(async () => { players[0].paused = false; finish(); });
++    expect(players[0].paused).toBe(true);
++    hidden.mockReturnValue(false);
++    act(() => document.dispatchEvent(new Event('visibilitychange')));
++    await tick();
++    expect(players[0].play).toHaveBeenCalledTimes(1);
++    hidden.mockRestore();
++  });
++});
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts b/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
+@@ -0,0 +1,144 @@
++// @vitest-environment jsdom
++import { act, createElement } from 'react';
++import { createRoot, type Root } from 'react-dom/client';
++import { renderToStaticMarkup } from 'react-dom/server';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import type { QuizQuestion } from '@/lib/types/stage';
++
++const complete = vi.hoisted(() => vi.fn(async () => {}));
++vi.mock('@/lib/contexts/mira-student-runtime-context', () => ({
++  useMiraStudentRuntimeEvents: () => ({ completeWhenReady: complete }),
++}));
++vi.mock('@/lib/store', () => {
++  const state = { stage: { fixedTextbook: true }, currentSceneId: 'quiz-scene', scenes: [{ id: 'last', order: 3 }] };
++  return { useStageStore: Object.assign((select: (value: typeof state) => unknown) => select(state), { getState: () => state }) };
++});
++vi.mock('@/lib/hooks/use-i18n', () => ({ useI18n: () => ({ t: (key: string) => key, locale: 'zh-CN' }) }));
++vi.mock('@/components/audio/question-narration', () => ({
++  questionNarrationSource: (q: QuizQuestion) => q.questionAudioUrl,
++  QuestionNarration: ({ autoPlay, sceneId, questionId }: { autoPlay?: boolean; sceneId?: string; questionId?: string }) => createElement('span', { 'data-narration-autoplay': String(autoPlay), 'data-narration-scene': sceneId, 'data-narration-question': questionId }),
++}));
++import { FixedTextbookQuiz } from '@/components/scene-renderers/fixed-textbook-quiz';
++import { QuizView, SingleChoiceQuestion } from '@/components/scene-renderers/quiz-view';
++
++let root: Root | undefined;
++(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
++afterEach(() => {
++  act(() => root?.unmount());
++  root = undefined;
++  document.body.replaceChildren();
++  complete.mockClear();
++  vi.unstubAllGlobals();
++});
++const question = (id: string): QuizQuestion => ({ id, type: 'single', question: `请听第${id}题。`,
++  options: [{ value: 'A', label: '苹果' }, { value: 'B', label: '梨子' }, { value: 'C', label: '桃子' }],
++  optionVisuals: Object.fromEntries(['A', 'B', 'C'].map((value, index) => [value, { kind: 'quantity', count: index + 1 }])),
++  questionAudioUrl: '/api/classroom-media/lesson/audio/question.wav', points: 1,
++});
++const questions = [question('q1'), question('q2')];
++const graded = (id: string) => ({ questionId: id, response: 'B', correct: true, explanation: '选对了。', correctAnswer: 'B' });
++async function mount() {
++  const host = document.createElement('div');
++  document.body.append(host);
++  root = createRoot(host);
++  await act(async () => root!.render(createElement(FixedTextbookQuiz, { questions })));
++  return host;
++}
++async function click(host: HTMLElement, selector: string) {
++  await act(async () => (host.querySelector(selector) as HTMLButtonElement).click());
++}
++
++describe('one task per fixed textbook question', () => {
++  it('keeps page answers while navigating and submits them together exactly once', async () => {
++    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => ({ ok: true, json: async () => init?.method === 'POST'
++      ? { ok: true, result: { results: questions.map(q => graded(q.id)) } } : { ok: true } }));
++    vi.stubGlobal('fetch', fetchMock);
++    const host = await mount();
++    expect(host.querySelectorAll('[data-fixed-question]')).toHaveLength(1);
++    expect(host.querySelector('[data-fixed-question]')!.getAttribute('data-fixed-question')).toBe('q1');
++    expect(host.querySelector('[data-narration-question]')!.getAttribute('data-narration-question')).toBe('q1');
++    expect(host.querySelector('[data-narration-scene]')!.getAttribute('data-narration-scene')).toBe('quiz-scene');
++    expect(host.querySelectorAll('[role=radio]')).toHaveLength(3);
++    expect(host.querySelector('[role=radiogroup]')!.className).toContain('grid-cols-3');
++    expect(host.querySelector('[aria-label="下一题"]')).toHaveProperty('disabled', true);
++    expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('true');
++    await click(host, '[role=radio][aria-label="梨子"]');
++    await click(host, '[aria-label="下一题"]');
++    expect(host.querySelector('[data-fixed-question]')!.getAttribute('data-fixed-question')).toBe('q2');
++    expect(host.querySelector('[data-narration-question]')!.getAttribute('data-narration-question')).toBe('q2');
++    await click(host, '[role=radio][aria-label="苹果"]');
++    await click(host, '[aria-label="上一题"]');
++    expect(host.querySelector('[role=radio][aria-label="梨子"]')!.getAttribute('aria-checked')).toBe('true');
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    await click(host, '[aria-label="下一题"]');
++    const submit = [...host.querySelectorAll('button')].find(button => button.textContent?.includes('完成练习'))!;
++    await act(async () => { submit.click(); submit.click(); });
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++    expect(JSON.parse(fetchMock.mock.calls[1][1]!.body as string)).toEqual({ answers: { q1: 'B', q2: 'A' } });
++    expect(complete).toHaveBeenCalledTimes(1);
++    expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('false');
++  });
++
++  it('reopens server results without auto-reading or announcing completion', async () => {
++    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ ok: true, partial: { results: questions.map(q => graded(q.id)) } }) })));
++    const host = await mount();
++    expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('false');
++    expect(complete).not.toHaveBeenCalled();
++    await click(host, '[aria-label="下一题"]');
++    expect(host.querySelectorAll('[data-fixed-question]')).toHaveLength(1);
++    expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('false');
++  });
++
++  it('starts a different quiz from its own first question and only submits that page', async () => {
++    const first = Array.from({ length: 5 }, (_, index) => question(`first-${index}`));
++    const second = Array.from({ length: 3 }, (_, index) => question(`second-${index}`));
++    let saved: { results: ReturnType<typeof graded>[] } | undefined;
++    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
++      if (init?.method === 'POST') saved = { results: [...first, ...second].map(q => graded(q.id)) };
++      return { ok: true, json: async () => ({ ok: true, partial: saved }) };
++    });
++    vi.stubGlobal('fetch', fetchMock);
++    const host = document.createElement('div');
++    document.body.append(host);
++    root = createRoot(host);
++    const render = async (page: QuizQuestion[], sceneId = 'same-scene') => {
++      await act(async () => root!.render(createElement(QuizView, { questions: page, sceneId, stageId: 'stage' })));
++    };
++    await render(first);
++    for (let index = 0; index < first.length; index++) {
++      await click(host, '[role=radio][aria-label="苹果"]');
++      if (index < first.length - 1) await click(host, '[aria-label="下一题"]');
++    }
++    expect(host.querySelector('[data-fixed-question]')!.getAttribute('data-fixed-question')).toBe('first-4');
++    await render(second);
++    expect(host.querySelector('[data-fixed-question]')!.getAttribute('data-fixed-question')).toBe('second-0');
++    expect(host.querySelectorAll('[aria-checked=true]')).toHaveLength(0);
++    expect(host.querySelector('[aria-label="下一题"]')).toHaveProperty('disabled', true);
++    for (let index = 0; index < second.length; index++) {
++      await click(host, '[role=radio][aria-label="梨子"]');
++      if (index < second.length - 1) await click(host, '[aria-label="下一题"]');
++    }
++    const submit = [...host.querySelectorAll('button')].find(button => button.textContent?.includes('完成练习'))!;
++    await act(async () => submit.click());
++    const posts = fetchMock.mock.calls.filter(([, init]) => init?.method === 'POST');
++    expect(posts).toHaveLength(1);
++    expect(JSON.parse(posts[0][1]!.body as string)).toEqual({ answers: { 'second-0': 'B', 'second-1': 'B', 'second-2': 'B' } });
++    await render(first);
++    await render(second);
++    expect(host.querySelector('[data-fixed-question]')!.getAttribute('data-fixed-question')).toBe('second-0');
++    expect(host.querySelector('[role=radio][aria-label="梨子"]')!.getAttribute('aria-checked')).toBe('true');
++    expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('false');
++    expect(host.textContent).toContain('答对 3 / 3 题');
++    expect(complete).not.toHaveBeenCalled();
++  });
++
++  it('uses three columns for three picture options while text options keep their layout', () => {
++    const markup = renderToStaticMarkup(createElement(SingleChoiceQuestion, { question: questions[0], index: 0, onChange: () => {} }));
++    expect(markup).toContain('grid-cols-3');
++    expect(markup.match(/data-quiz-option=/g)).toHaveLength(3);
++    expect(markup).toContain('min-h-14 min-w-14');
++    const text = renderToStaticMarkup(createElement(SingleChoiceQuestion, { question: { ...questions[0], optionVisuals: undefined }, index: 0, onChange: () => {} }));
++    expect(text).toContain('grid-cols-1 sm:grid-cols-2');
++    expect(text).not.toContain('grid-cols-3');
++  });
++});
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -5,9 +5,11 @@
+   useCallback,
+   useEffect,
+   useImperativeHandle,
++  useLayoutEffect,
+   useMemo,
+   useRef,
+   useState,
++  useSyncExternalStore,
+   type ReactNode,
+ } from 'react';
+ import { useStageStore } from '@/lib/store';
+@@ -49,7 +51,11 @@
+ import { ChatArea, type ChatAreaRef } from '@/components/chat/chat-area';
+ import type { SessionCleanupPayload } from '@/components/chat/use-chat-sessions';
+ import { agentsToParticipants, useAgentRegistry } from '@/lib/orchestration/registry/store';
+-import { ACTIVITY_AUDIO_EVENT, setLectureSpeaking } from '@/lib/mira/lecture-audio';
++import { ACTIVITY_AUDIO_EVENT, beginQuestionNarrationScene, releaseQuestionNarrationScene, setLectureSpeaking, subscribeQuestionNarration } from '@/lib/mira/lecture-audio';
++import { getPageNarration, subscribePageNarration, setPageAudioPreferences, pausePageNarration, releasePageNarrationPause, togglePageNarration } from '@/lib/mira/page-narration';
++import { isStudentParentPause } from '@/lib/mira/student-parent-pause';
++import { useMiraStudentParentOrigins } from '@/lib/contexts/mira-student-runtime-context';
++import { fixedQuizManagedSpeechIds, fixedQuizQuestionNarrationText } from '@/lib/mira/fixed-quiz-narration';
+ import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import {
+   AlertDialog,
+@@ -220,7 +226,8 @@
+     // PlaybackEngine state
+     const [engineMode, setEngineMode] = useState<EngineMode>('idle');
+     const [playbackCompleted, setPlaybackCompleted] = useState(false); // Distinguishes "never played" idle from "finished" idle
+-    const [lectureSpeech, setLectureSpeech] = useState<string | null>(null); // From PlaybackEngine (lecture)
++    const [lectureSpeech, setLectureSpeech] = useState<string | null>(null); // From PlaybackEngine or native current question
++    const [suppressIdleSpeech, setSuppressIdleSpeech] = useState(false);
+     const [currentPlaybackActionIndex, setCurrentPlaybackActionIndex] = useState<number | null>(0);
+     const [studentPlaybackRestore, setStudentPlaybackRestore] = useState<{
+       sceneId: string;
+@@ -336,20 +343,58 @@
+       return agents[0]?.id || 'default-1';
+     }, [selectedAgentIds]);
+ 
++    const pageNarration = useSyncExternalStore(subscribePageNarration, getPageNarration, getPageNarration);
++    const parentOrigins = useMiraStudentParentOrigins();
+     const engineRef = useRef<PlaybackEngine | null>(null);
++    useLayoutEffect(() => {
++      const fixed = (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true;
++      releasePageNarrationPause();
++      beginQuestionNarrationScene(fixed && currentScene?.type === 'quiz' ? currentScene.id : null);
++      return () => beginQuestionNarrationScene(null);
++    }, [currentScene, stage?.id]);
+     useEffect(() => {
+       // Native textbook cues share the classroom sound channel with the lecture.
+       // Pause narration on an explicit listen gesture; discussion remains available.
+-      const pauseForActivity = () => engineRef.current?.pause();
++      const pauseForActivity = () => {
++        releasePageNarrationPause();
++        engineRef.current?.pause();
++        setLectureSpeech(null);
++        setLiveSpeech(null);
++        setSuppressIdleSpeech(true);
++        const sceneId = useStageStore.getState().currentSceneId;
++        if (sceneId) releaseQuestionNarrationScene(sceneId);
++      };
+       window.addEventListener(ACTIVITY_AUDIO_EVENT, pauseForActivity);
++      const unsubscribeQuestion = subscribeQuestionNarration((sceneId, questionId) => {
++        const state = useStageStore.getState();
++        const text = fixedQuizQuestionNarrationText(state.getCurrentScene(),
++          (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true, sceneId, questionId);
++        if (text === null) return;
++        setLectureSpeech(text);
++        setLiveSpeech(null);
++        setSuppressIdleSpeech(true);
++      });
+       return () => {
+         window.removeEventListener(ACTIVITY_AUDIO_EVENT, pauseForActivity);
++        unsubscribeQuestion();
+         setLectureSpeaking(false);
+       };
+     }, []);
+     const audioPlayerRef = useRef(createAudioPlayer());
+     const chatAreaRef = useRef<ChatAreaRef>(null);
+     const lectureSessionIdRef = useRef<string | null>(null);
++    useEffect(() => {
++      if (!studentMode) return;
++      const rest = (event: MessageEvent) => {
++        if (!isStudentParentPause(event, window.parent, window, parentOrigins)) return;
++        pausePageNarration();
++        engineRef.current?.pause();
++        discussionTTS.pause();
++        if (lectureSessionIdRef.current) chatAreaRef.current?.pauseBuffer(lectureSessionIdRef.current);
++      };
++      window.addEventListener('message', rest);
++      return () => window.removeEventListener('message', rest);
++    }, [parentOrigins, studentMode, discussionTTS]);
+     const lectureActionCounterRef = useRef(0);
+     const currentPlaybackActionIndexRef = useRef<number | null>(currentPlaybackActionIndex);
+     const activeSceneIdRef = useRef<string | null>(currentSceneId);
+@@ -483,6 +528,7 @@
+         resetLiveState();
+         setPlaybackCompleted(false);
+         setLectureSpeech(initial?.lectureSpeech ?? null);
++        setSuppressIdleSpeech(false);
+         updateCurrentPlaybackActionIndex(initial?.actionIndex ?? 0);
+         setSpeechProgress(null);
+         setShowEndFlash(false);
+@@ -733,6 +779,9 @@
+     useEffect(() => {
+       let cancelled = false;
+       const initializeScene = async () => {
++        const managedQuizSpeech = currentScene ? fixedQuizManagedSpeechIds(
++          currentScene, (stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true,
++        ) : new Set<string>();
+         const previousSceneId = activeSceneIdRef.current;
+         if (previousSceneId && previousSceneId !== currentScene?.id) {
+           saveSceneResumePosition(previousSceneId, currentPlaybackActionIndexRef.current);
+@@ -810,7 +859,8 @@
+         resetSceneState({
+           actionIndex: savedResumeActionIndex,
+           lectureSpeech:
+-            savedResumeAction?.type === 'speech' ? (savedResumeAction as SpeechAction).text : null,
++            savedResumeAction?.type === 'speech' && !managedQuizSpeech.has(savedResumeAction.id)
++              ? (savedResumeAction as SpeechAction).text : null,
+         });
+ 
+         // A slide scene with no actions is still playable: the engine dwells on it
+@@ -827,6 +877,7 @@
+           engineRef.current = null;
+           setEngineMode('idle');
+           activeSceneIdRef.current = currentSceneId;
++          if (currentScene) releaseQuestionNarrationScene(currentScene.id);
+ 
+           return;
+         }
+@@ -856,10 +907,12 @@
+         // Create new PlaybackEngine
+         const engine = new PlaybackEngine([currentScene], actionEngine, audioPlayerRef.current, {
+           requireScriptedDiscussions: studentMode,
++          isSpeechManagedByPage: actionId => managedQuizSpeech.has(actionId),
+           onModeChange: (mode) => {
+             setEngineMode(mode);
+             // Interactive pages keep their own teacher lines quiet meanwhile.
+             setLectureSpeaking(mode === 'playing' || mode === 'live');
++            if (mode === 'idle' && engine.isExhausted()) releaseQuestionNarrationScene(currentScene.id);
+           },
+           onProgress: (snapshot) => {
+             // Identity guard: a superseded engine (scene switch during an
+@@ -881,6 +934,7 @@
+           },
+           onSpeechStart: (text) => {
+             setLectureSpeech(text);
++            setSuppressIdleSpeech(false);
+             // Add to lecture session with incrementing index for dedup
+             // Chat area pacing is handled by the StreamBuffer (onTextReveal)
+             if (lectureSessionIdRef.current) {
+@@ -1156,7 +1210,7 @@
+                 if (!restored || engineRef.current !== engine) return;
+                 updateCurrentPlaybackActionIndex(savedResumeActionIndex);
+                 const action = currentScene.actions?.[savedResumeActionIndex];
+-                if (action?.type === 'speech') {
++                if (action?.type === 'speech' && !managedQuizSpeech.has(action.id)) {
+                   setLectureSpeech(action.text);
+                 }
+               });
+@@ -1213,6 +1267,9 @@
+     useEffect(() => {
+       audioPlayerRef.current.setPlaybackRate(playbackSpeed);
+     }, [playbackSpeed]);
++    useEffect(() => {
++      setPageAudioPreferences({ muted: ttsMuted, volume: ttsVolume, rate: playbackSpeed });
++    }, [ttsMuted, ttsVolume, playbackSpeed]);
+ 
+     /**
+      * Handle discussion SSE — POST /api/chat and push events to engine
+@@ -1278,11 +1335,16 @@
+       return agent?.role !== 'teacher';
+     }, [speakingAgentId]);
+ 
++    const pageOwnsPlayback = pageNarration.registered && pageNarration.phase !== 'idle'
++      && engineMode !== 'playing' && engineMode !== 'live';
++    const displayEngineMode = pageOwnsPlayback
++      ? (pageNarration.phase === 'playing' || pageNarration.phase === 'pending' ? 'playing' : 'paused')
++      : engineMode;
+     // Centralised derived playback view
+     const playbackView = useMemo(
+       () =>
+         computePlaybackView({
+-          engineMode,
++          engineMode: displayEngineMode,
+           lectureSpeech,
+           liveSpeech,
+           speakingAgentId,
+@@ -1291,13 +1353,15 @@
+           isTopicPending,
+           chatIsStreaming,
+           discussionTrigger,
+-          playbackCompleted,
++          playbackCompleted: pageOwnsPlayback ? false : playbackCompleted,
+           idleText: firstSpeechText,
++          suppressIdleSpeech,
+           speakingStudent: speakingStudentFlag,
+           sessionType: chatSessionType,
+         }),
+       [
+-        engineMode,
++        displayEngineMode,
++        pageOwnsPlayback,
+         lectureSpeech,
+         liveSpeech,
+         speakingAgentId,
+@@ -1308,6 +1372,7 @@
+         discussionTrigger,
+         playbackCompleted,
+         firstSpeechText,
++        suppressIdleSpeech,
+         speakingStudentFlag,
+         chatSessionType,
+       ],
+@@ -1452,6 +1517,8 @@
+ 
+     // play/pause toggle
+     const handlePlayPause = useCallback(() => {
++      if (togglePageNarration()) return;
++      releasePageNarrationPause();
+       const engine = engineRef.current;
+       if (!engine) return;
+ 
+@@ -1735,7 +1802,7 @@
+ 
+     // Map engine mode to the CanvasArea's expected engine state
+     const canvasEngineState = (() => {
+-      switch (engineMode) {
++      switch (displayEngineMode) {
+         case 'playing':
+         case 'live':
+           return 'playing';
+@@ -1948,10 +2015,10 @@
+                 playbackView={playbackView}
+                 currentSpeech={liveSpeech}
+                 lectureSpeech={lectureSpeech}
+-                idleText={firstSpeechText}
++                idleText={suppressIdleSpeech ? null : firstSpeechText}
+                 playbackCompleted={playbackCompleted}
+                 discussionRequest={discussionRequest}
+-                engineMode={engineMode}
++                engineMode={displayEngineMode}
+                 isStreaming={chatIsStreaming}
+                 audioIndicatorState={audioIndicatorState}
+                 audioAgentId={audioAgentId}
+diff --git a/lib/playback/engine.ts b/lib/playback/engine.ts
+--- a/lib/playback/engine.ts
++++ b/lib/playback/engine.ts
+@@ -693,6 +693,14 @@
+     switch (action.type) {
+       case 'speech': {
+         const speechAction = action as SpeechAction;
++        if (this.callbacks.isSpeechManagedByPage?.(speechAction.id)) {
++          // Preserve authored indices for saved cursors, without scheduling audio,
++          // reading timers or transcript lines for a future quiz question.
++          queueMicrotask(() => {
++            if (this.isCurrentGeneration(generation)) this.processNext(generation);
++          });
++          return;
++        }
+         this.callbacks.onSpeechStart?.(speechAction.text);
+ 
+         // onEnded → processNext; if paused, resume() will call processNext
+diff --git a/lib/playback/types.ts b/lib/playback/types.ts
+--- a/lib/playback/types.ts
++++ b/lib/playback/types.ts
+@@ -36,6 +36,8 @@
+ 
+ /** Playback engine callbacks */
+ export interface PlaybackEngineCallbacks {
++  /** A page owns this recorded speech; retain its cursor but do not speak it. */
++  isSpeechManagedByPage?: (actionId: string) => boolean;
+   onModeChange?: (mode: EngineMode) => void;
+   onSceneChange?: (sceneId: string) => void;
+   onSpeechStart?: (text: string) => void;
+diff --git a/lib/mira/lecture-audio.ts b/lib/mira/lecture-audio.ts
+--- a/lib/mira/lecture-audio.ts
++++ b/lib/mira/lecture-audio.ts
+@@ -9,6 +9,23 @@
+ export const ACTIVITY_AUDIO_EVENT = 'mira:textbook-play-audio';
+ 
+ let speaking = false;
++let questionScene: { id: string; ready: boolean } | null = null;
++
++/** The opening may still be initializing asynchronously while lecture is quiet. */
++export function beginQuestionNarrationScene(sceneId: string | null): void {
++  questionScene = sceneId ? { id: sceneId, ready: false } : null;
++  window.dispatchEvent(new Event(LECTURE_AUDIO_EVENT));
++}
++
++export function releaseQuestionNarrationScene(sceneId: string): void {
++  if (questionScene?.id !== sceneId || questionScene.ready) return;
++  questionScene.ready = true;
++  window.dispatchEvent(new Event(LECTURE_AUDIO_EVENT));
++}
++
++export function isQuestionNarrationReady(sceneId: string): boolean {
++  return questionScene?.id === sceneId && questionScene.ready;
++}
+ 
+ export function isLectureSpeaking(): boolean {
+   return speaking;
+@@ -24,3 +41,17 @@
+ export function pageNarrationAllowed(shown: boolean, lectureSpeaking: boolean): boolean {
+   return shown && !lectureSpeaking;
+ }
++
++// Native quiz identity only: iframe postMessage/CustomEvent payloads are not text sources.
++type QuestionNarrationListener = (sceneId: string, questionId: string) => void;
++const questionListeners = new Set<QuestionNarrationListener>();
++
++export function subscribeQuestionNarration(listener: QuestionNarrationListener): () => void {
++  questionListeners.add(listener);
++  return () => { questionListeners.delete(listener); };
++}
++
++export function notifyQuestionNarration(sceneId: string, questionId: string): void {
++  if (!isQuestionNarrationReady(sceneId)) return;
++  questionListeners.forEach(listener => listener(sceneId, questionId));
++}
+diff --git a/lib/mira/fixed-quiz-narration.ts b/lib/mira/fixed-quiz-narration.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/fixed-quiz-narration.ts
+@@ -0,0 +1,37 @@
++import type { Scene } from '@/lib/types/stage';
++
++function audioPath(value: unknown): string | null {
++  if (typeof value !== 'string' || !value) return null;
++  try { return new URL(value, 'http://classroom.local').pathname; } catch { return null; }
++}
++
++/** Keep the original action indices/audio intact; only transfer playback ownership.
++ * Fixed quiz pages may contain an opening followed by every question/answer.
++ * Once the first question begins, the visible-question UI owns that narration.
++ */
++export function fixedQuizManagedSpeechIds(scene: Scene, fixedTextbook: boolean): Set<string> {
++  const managed = new Set<string>();
++  if (!fixedTextbook || scene.type !== 'quiz' || scene.content.type !== 'quiz') return managed;
++  const questions = scene.content.questions;
++  const texts = new Set(questions.map(question => question.question.trim()));
++  const paths = new Set(questions.map(question => audioPath(
++    (question as unknown as Record<string, unknown>).questionAudioUrl,
++  )).filter((path): path is string => path !== null));
++  let questionStarted = false;
++  for (const action of scene.actions ?? []) {
++    if (action.type !== 'speech') continue;
++    const source = audioPath(action.audioUrl);
++    if (texts.has(action.text.trim()) || source !== null && paths.has(source)) questionStarted = true;
++    // Explanations and closing answer lines after a question must not leak early.
++    if (questionStarted) managed.add(action.id);
++  }
++  return managed;
++}
++
++/** Resolve native narration identity against this scene; never accept message text. */
++export function fixedQuizQuestionNarrationText(
++  scene: Scene | null | undefined, fixedTextbook: boolean, sceneId: string, questionId: string,
++): string | null {
++  if (!fixedTextbook || scene?.id !== sceneId || scene.type !== 'quiz' || scene.content.type !== 'quiz') return null;
++  return scene.content.questions.find(question => question.id === questionId)?.question ?? null;
++}
+diff --git a/lib/playback/derived-state.ts b/lib/playback/derived-state.ts
+--- a/lib/playback/derived-state.ts
++++ b/lib/playback/derived-state.ts
+@@ -25,6 +25,8 @@
+   discussionTrigger: TriggerEvent | null;
+   playbackCompleted: boolean;
+   idleText: string | null;
++  /** A page has taken over narration; do not redisplay the lecture opening. */
++  suppressIdleSpeech?: boolean;
+   /** Whether the speaking agent is a student (not teacher). Provided by caller. */
+   speakingStudent: boolean;
+   /** Active session type — stays set between agent-loop turns (cleared only by doSessionCleanup). */
+@@ -86,10 +88,13 @@
+     chatIsStreaming,
+     discussionTrigger,
+     playbackCompleted,
+-    idleText,
++    idleText: openingText,
++    suppressIdleSpeech,
+     speakingStudent,
+     sessionType,
+   } = raw;
++
++  const idleText = suppressIdleSpeech ? null : openingText;
+ 
+   // ---- isInLiveFlow ----
+   // True when there's any live SSE activity (agent speaking, thinking, or streaming).
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -1,6 +1,6 @@
+ 'use client';
+ 
+-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
++import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
+ import { createPortal } from 'react-dom';
+ import { toast } from 'sonner';
+ import { useWidgetIframeStore } from '@/lib/store/widget-iframe';
+@@ -21,6 +21,7 @@
+   isLectureSpeaking,
+   pageNarrationAllowed,
+ } from '@/lib/mira/lecture-audio';
++import { getPageNarration, subscribePageNarration } from '@/lib/mira/page-narration';
+ import { intersectClientBoxes } from '@/lib/edit/visible-client-rect';
+ import { useCanvasStore } from '@/lib/store/canvas';
+ import { useElementRefsStore } from '@/lib/store/element-refs';
+@@ -306,19 +307,30 @@
+     window.addEventListener(LECTURE_AUDIO_EVENT, onLecture);
+     return () => window.removeEventListener(LECTURE_AUDIO_EVENT, onLecture);
+   }, []);
+-  const narrationAllowed = pageNarrationAllowed(shown, lectureSpeaking);
++  const pageNarration = useSyncExternalStore(subscribePageNarration, getPageNarration, getPageNarration);
++  const narrationAllowed = pageNarrationAllowed(shown, lectureSpeaking) && !pageNarration.paused;
++  useEffect(() => {
++    const interact = (event: MessageEvent) => {
++      if (!shown || event.source !== iframeRef.current?.contentWindow
++          || !event.data || Object.keys(event.data).length !== 1
++          || event.data.type !== 'MIRA_ACTIVITY_INTERACTION') return;
++      window.dispatchEvent(new Event(ACTIVITY_AUDIO_EVENT));
++    };
++    window.addEventListener('message', interact);
++    return () => window.removeEventListener('message', interact);
++  }, [shown]);
+   // A tap inside the page moves focus into the frame: pause the lecture so the
+   // child hears the answer to what they did. The play control resumes it.
+   useEffect(() => {
+     const onBlur = () =>
+       setTimeout(() => {
+-        if (document.activeElement === iframeRef.current) {
++        if (shown && document.hasFocus() && document.activeElement === iframeRef.current) {
+           window.dispatchEvent(new Event(ACTIVITY_AUDIO_EVENT));
+         }
+       }, 0);
+     window.addEventListener('blur', onBlur);
+     return () => window.removeEventListener('blur', onBlur);
+-  }, []);
++  }, [shown]);
+   // Keep-alive documents keep running while CSS-hidden. Notify the prerecorded
+   // narration bridge before paint so outgoing audio stops on a scene switch.
+   // Legacy activities simply ignore this additive message. Sandbox null origins
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -101,6 +101,20 @@
+ })();
+ </script>`;
+ 
++/** Only interaction intent leaves the sandbox; no authored teacher text is accepted. */
++const ACTIVITY_INTENT_SHIM = `<script data-mira-activity-intent>
++(function () {
++  if (window.__miraActivityIntent) return;
++  window.__miraActivityIntent = true;
++  function notify(event) {
++    if (!event.isTrusted || (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ')) return;
++    window.parent.postMessage({ type: 'MIRA_ACTIVITY_INTERACTION' }, '*');
++  }
++  document.addEventListener('pointerdown', notify, true);
++  document.addEventListener('keydown', notify, true);
++})();
++</script>`;
++
+ /** Dormant-by-default picker installed into generated interactive documents. */
+ const ELEMENT_PICKER_SHIM = `<script data-iframe-element-picker-shim>
+ (function () {
+@@ -302,7 +316,7 @@
+ </style>`;
+ 
+   const injection =
+-    '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss;
++    '\n' + ACTIVITY_INTENT_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss;
+ 
+   return injectIntoDocumentHead(html, injection);
+ }
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+--- a/lib/contexts/mira-student-runtime-context.tsx
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -27,6 +27,8 @@
+ } from '@/lib/mira/student-runtime-events';
+ 
+ const MiraStudentRuntimeContext = createContext(false);
++const MiraStudentParentOriginsContext = createContext<readonly string[]>([]);
++export const useMiraStudentParentOrigins = () => useContext(MiraStudentParentOriginsContext);
+ const MiraStudentRuntimeEventContext = createContext<MiraStudentRuntimeEventClient | null>(null);
+ 
+ export interface MiraStudentAutoPlayRuntime {
+@@ -160,12 +162,14 @@
+ }
+ 
+ export function MiraStudentRuntimeProvider({
++  parentOrigins = [],
+   studentMode,
+   classroomId,
+   children,
+ }: {
+   readonly studentMode: boolean;
+   readonly classroomId: string;
++  readonly parentOrigins?: readonly string[];
+   readonly children: ReactNode;
+ }) {
+   const [preferencesReady, setPreferencesReady] = useState(!studentMode);
+@@ -186,6 +190,7 @@
+   }, [runtimeEvents]);
+ 
+   return (
++    <MiraStudentParentOriginsContext.Provider value={parentOrigins}>
+     <MiraStudentRuntimeContext.Provider value={studentMode}>
+       <MiraStudentRuntimeEventContext.Provider value={runtimeEvents}>
+         <MiraStudentAutoPlaySession
+@@ -209,6 +214,7 @@
+         </MiraStudentAutoPlaySession>
+       </MiraStudentRuntimeEventContext.Provider>
+     </MiraStudentRuntimeContext.Provider>
++    </MiraStudentParentOriginsContext.Provider>
+   );
+ }
+ 
+diff --git a/app/classroom/[id]/page.tsx b/app/classroom/[id]/page.tsx
+--- a/app/classroom/[id]/page.tsx
++++ b/app/classroom/[id]/page.tsx
+@@ -1,3 +1,4 @@
++import { studentParentOrigins } from '@/lib/mira/student-parent-pause';
+ import type { Metadata } from 'next';
+ import { ClassroomSurface } from '@/components/classroom/ClassroomSurface';
+ import { MiraStudentRuntimeProvider } from '@/lib/contexts/mira-student-runtime-context';
+@@ -23,7 +24,8 @@
+   const studentMode = isMiraStudentRuntimeParam(query.mira);
+ 
+   return (
+-    <MiraStudentRuntimeProvider studentMode={studentMode} classroomId={id}>
++    <MiraStudentRuntimeProvider studentMode={studentMode} classroomId={id}
++      parentOrigins={studentParentOrigins(process.env.ALLOWED_FRAME_ANCESTORS ?? '', process.env.MIRA_LOCAL_LAN_PRODUCTION_MODE === '1', process.env.MIRA_RUNTIME_PUBLIC_ORIGIN ?? '')}>
+       <ClassroomSurface classroomId={id} variant="page" />
+     </MiraStudentRuntimeProvider>
+   );
+diff --git a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+--- a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
++++ b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+@@ -2,6 +2,8 @@
+ import { act, createElement } from 'react';
+ import { createRoot, type Root } from 'react-dom/client';
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { ACTIVITY_AUDIO_EVENT } from '@/lib/mira/lecture-audio';
++import { pausePageNarration, releasePageNarrationPause } from '@/lib/mira/page-narration';
+ import { InteractiveIframeHost } from '@/components/scene-renderers/InteractiveIframeHost';
+ import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
+ 
+@@ -17,6 +19,7 @@
+ const rect = { left: 10, top: 20, width: 800, height: 450 };
+ let root: Root | undefined;
+ let messages: WeakMap<HTMLIFrameElement, ReturnType<typeof vi.fn>>;
++let windows: WeakMap<HTMLIFrameElement, Window>;
+ 
+ function frame(sceneId = 'one') {
+   return document.querySelector(
+@@ -45,7 +48,8 @@
+   beforeEach(() => {
+     vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+     useInteractiveIframePool.getState().reset();
+-    messages = new WeakMap();
++    releasePageNarrationPause();
++    messages = new WeakMap(); windows = new WeakMap();
+     vi.spyOn(HTMLIFrameElement.prototype, 'contentWindow', 'get').mockImplementation(function (
+       this: HTMLIFrameElement,
+     ) {
+@@ -54,7 +58,8 @@
+         post = vi.fn();
+         messages.set(this, post);
+       }
+-      return { postMessage: post } as unknown as Window;
++      if (!windows.has(this)) windows.set(this, { postMessage: post } as unknown as Window);
++      return windows.get(this)!;
+     });
+   });
+   afterEach(async () => {
+@@ -123,3 +128,44 @@
+     expect(first.parentElement!.style.visibility).toBe('hidden');
+   });
+ });
++
++
++describe('interactive takeover and immediate classroom pause', () => {
++  beforeEach(() => {
++    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
++    useInteractiveIframePool.getState().reset(); releasePageNarrationPause();
++    messages = new WeakMap(); windows = new WeakMap();
++    vi.spyOn(HTMLIFrameElement.prototype, 'contentWindow', 'get').mockImplementation(function (this: HTMLIFrameElement) {
++      if (!messages.has(this)) messages.set(this, vi.fn());
++      if (!windows.has(this)) windows.set(this, { postMessage: messages.get(this)! } as unknown as Window);
++      return windows.get(this)!;
++    });
++  });
++  afterEach(async () => {
++    await act(async () => root?.unmount()); root = undefined;
++    document.body.replaceChildren(); vi.restoreAllMocks(); vi.unstubAllGlobals(); releasePageNarrationPause();
++  });
++  it('takes over on every current-frame gesture but rejects other windows, hidden frames and text payloads', async () => {
++    prepare('one'); prepare('two'); useInteractiveIframePool.getState().setActive('one');
++    await mountHost();
++    const activity = vi.fn(); window.addEventListener(ACTIVITY_AUDIO_EVENT, activity);
++    const send = (source: Window, data = { type: 'MIRA_ACTIVITY_INTERACTION' }) =>
++      window.dispatchEvent(new MessageEvent('message', { source, data }));
++    act(() => { send(frame().contentWindow!); send(frame().contentWindow!); });
++    expect(activity).toHaveBeenCalledTimes(2);
++    act(() => { send(window); send(frame('two').contentWindow!); send(frame().contentWindow!, { type: 'MIRA_ACTIVITY_INTERACTION', text: 'fake teacher' } as { type: string }); });
++    expect(activity).toHaveBeenCalledTimes(2);
++    vi.spyOn(document, 'activeElement', 'get').mockReturnValue(frame());
++    vi.spyOn(document, 'hasFocus').mockReturnValue(false);
++    await act(async () => {
++      pausePageNarration();
++      window.dispatchEvent(new Event('blur'));
++      await new Promise(resolve => setTimeout(resolve, 0));
++    });
++    expect(activity).toHaveBeenCalledTimes(2); // Parent rest/focus loss cannot reclaim the sound channel.
++    window.removeEventListener(ACTIVITY_AUDIO_EVENT, activity);
++    expect(visibility(frame()).at(-1)![0].visible).toBe(false);
++    act(() => releasePageNarrationPause());
++    expect(visibility(frame()).at(-1)![0].visible).toBe(true);
++  });
++});
+diff --git a/lib/mira/page-narration.ts b/lib/mira/page-narration.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/page-narration.ts
+@@ -0,0 +1,50 @@
++/** Native page audio shares the classroom controls without moving the lecture cursor. */
++export type PageNarrationPhase = 'idle' | 'pending' | 'playing' | 'paused' | 'ended';
++export type PageAudioPreferences = { muted: boolean; volume: number; rate: number };
++type Controller = { ready: () => boolean; play: () => void; pause: () => void };
++type Snapshot = PageAudioPreferences & { phase: PageNarrationPhase; registered: boolean; paused: boolean };
++let snapshot: Snapshot = { muted: false, volume: 1, rate: 1, phase: 'idle', registered: false, paused: false };
++let controller: Controller | null = null;
++const listeners = new Set<() => void>();
++const publish = (patch: Partial<Snapshot>) => {
++  if (Object.entries(patch).every(([key, value]) => snapshot[key as keyof Snapshot] === value)) return;
++  snapshot = { ...snapshot, ...patch };
++  listeners.forEach(listener => listener());
++};
++export const getPageNarration = () => snapshot;
++export function subscribePageNarration(listener: () => void) {
++  listeners.add(listener);
++  return () => { listeners.delete(listener); };
++}
++export function setPageAudioPreferences(preferences: PageAudioPreferences) {
++  publish({ muted: preferences.muted, volume: Math.max(0, Math.min(1, preferences.volume)), rate: preferences.rate });
++}
++export function registerPageNarration(next: Controller) {
++  controller?.pause();
++  controller = next;
++  publish({ registered: true, phase: 'idle' });
++  return {
++    phase: (phase: PageNarrationPhase) => { if (controller === next) publish({ phase }); },
++    dispose: () => {
++      if (controller !== next) return;
++      controller = null;
++      publish({ registered: false, phase: 'idle' });
++    },
++  };
++}
++export function pausePageNarration() {
++  publish({ paused: true });
++  controller?.pause();
++}
++export function releasePageNarrationPause() { publish({ paused: false }); }
++
++/** True means the current page owns the click; do not restart the lecture opening. */
++export function togglePageNarration(): boolean {
++  if (!controller?.ready()) return false;
++  if (snapshot.phase === 'playing' || snapshot.phase === 'pending') pausePageNarration();
++  else {
++    releasePageNarrationPause();
++    controller.play();
++  }
++  return true;
++}
+diff --git a/lib/mira/student-parent-pause.ts b/lib/mira/student-parent-pause.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/student-parent-pause.ts
+@@ -0,0 +1,31 @@
++/** Same configured Student Web origin and fixed loopback aliases as the gateway CSP. */
++function privateHttpOrigin(url: URL): boolean {
++  if (url.protocol !== 'http:' || url.username || url.password) return false;
++  const hostname = url.hostname.toLowerCase();
++  if (hostname === 'localhost' || hostname === '[::1]') return true;
++  if (hostname.startsWith('[fc') || hostname.startsWith('[fd')) return true;
++  const octets = hostname.split('.').map(Number);
++  if (octets.length !== 4 || octets.some(part => !Number.isInteger(part) || part < 0 || part > 255)) return false;
++  return octets[0] === 10 || octets[0] === 127 || octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31
++    || octets[0] === 192 && octets[1] === 168;
++}
++
++export function studentParentOrigins(configured: string, localLan: boolean, runtimeOrigin = configured): string[] {
++  try {
++    const url = new URL(configured);
++    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return [];
++    const origins = new Set([url.origin]);
++    if (localLan && privateHttpOrigin(url) && privateHttpOrigin(new URL(runtimeOrigin))) {
++      for (const hostname of ['localhost', '127.0.0.1']) {
++        const alias = new URL(url); alias.hostname = hostname; origins.add(alias.origin);
++      }
++    }
++    return [...origins];
++  } catch { return []; }
++}
++
++export function isStudentParentPause(event: MessageEvent, parent: Window, self: Window, origins: readonly string[]): boolean {
++  return parent !== self && event.source === parent && origins.includes(event.origin)
++    && event.data !== null && typeof event.data === 'object'
++    && Object.keys(event.data).length === 1 && event.data.type === 'mira.textbook.pause';
++}
+diff --git a/tests/runtime/student-parent-pause.test.ts b/tests/runtime/student-parent-pause.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/student-parent-pause.test.ts
+@@ -0,0 +1,47 @@
++// @vitest-environment jsdom
++import { describe, expect, it, vi } from 'vitest';
++import { isStudentParentPause, studentParentOrigins } from '@/lib/mira/student-parent-pause';
++import { patchHtmlForIframe } from '@/lib/utils/iframe';
++
++describe('bounded Student Web pause channel', () => {
++  it('requires exact configured origin and immediate parent even without ancestorOrigins', () => {
++    const parent = {} as Window;
++    const origins = studentParentOrigins('https://student.example', false);
++    const event = (origin: string, source: Window = parent, data: unknown = { type: 'mira.textbook.pause' }) =>
++      ({ origin, source, data }) as MessageEvent;
++    expect(isStudentParentPause(event('https://student.example'), parent, window, origins)).toBe(true);
++    for (const origin of ['null', 'https://student.example.evil.test', 'http://student.example', 'https://other.example'])
++      expect(isStudentParentPause(event(origin), parent, window, origins)).toBe(false);
++    expect(isStudentParentPause(event('https://student.example', window), parent, window, origins)).toBe(false);
++    expect(isStudentParentPause(event('https://student.example', parent, { type: 'mira.textbook.pause', text: 'unsafe' }), parent, window, origins)).toBe(false);
++    expect(isStudentParentPause(event('https://student.example'), parent, parent, origins)).toBe(false);
++    expect(isStudentParentPause(event('https://student.example'), parent, window, [])).toBe(false);
++    expect(studentParentOrigins('http://127.0.0.1:3000', true)).toEqual(['http://127.0.0.1:3000', 'http://localhost:3000']);
++    expect(studentParentOrigins('http://127.0.0.1:3000', false)).toEqual(['http://127.0.0.1:3000']);
++    expect(studentParentOrigins('invalid', true)).toEqual([]);
++    expect(studentParentOrigins('http://192.168.228.95:3000', true, 'http://192.168.228.95:3101'))
++      .toEqual(['http://192.168.228.95:3000', 'http://localhost:3000', 'http://127.0.0.1:3000']);
++    expect(studentParentOrigins('http://192.168.228.95:3000', false, 'http://192.168.228.95:3101'))
++      .toEqual(['http://192.168.228.95:3000']);
++    expect(studentParentOrigins('https://student.example', true, 'http://127.0.0.1:3101')).toEqual(['https://student.example']);
++    expect(studentParentOrigins('http://192.168.228.95:3000', true, 'https://runtime.example')).toEqual(['http://192.168.228.95:3000']);
++  });
++
++  it('sends only a gesture intent from trusted pointer or activation keys, including repeated clicks', () => {
++    const html = patchHtmlForIframe('<html><head></head><body><button>开始</button></body></html>');
++    const shim = html.match(/<script data-mira-activity-intent>([\s\S]*?)<\/script>/)?.[1];
++    expect(shim).toBeTruthy();
++    const listeners = new Map<string, (event: unknown) => void>();
++    const postMessage = vi.fn();
++    new Function('window', 'document', shim!)(
++      { parent: { postMessage } }, { addEventListener: (type: string, callback: (event: unknown) => void) => listeners.set(type, callback) },
++    );
++    listeners.get('pointerdown')!({ type: 'pointerdown', isTrusted: false });
++    listeners.get('keydown')!({ type: 'keydown', isTrusted: true, key: 'a' });
++    expect(postMessage).not.toHaveBeenCalled();
++    listeners.get('pointerdown')!({ type: 'pointerdown', isTrusted: true });
++    listeners.get('pointerdown')!({ type: 'pointerdown', isTrusted: true });
++    listeners.get('keydown')!({ type: 'keydown', isTrusted: true, key: 'Enter' });
++    expect(postMessage.mock.calls).toEqual(Array(3).fill([{ type: 'MIRA_ACTIVITY_INTERACTION' }, '*']));
++  });
++});

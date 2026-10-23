@@ -1,0 +1,544 @@
+diff --git a/lib/server/mira-textbook-current-review-revision.ts b/lib/server/mira-textbook-current-review-revision.ts
+--- a/lib/server/mira-textbook-current-review-revision.ts
++++ b/lib/server/mira-textbook-current-review-revision.ts
+@@ -3,13 +3,17 @@
+  *
+  * This operator has no HTTP entry point and never calls a model, TTS, ASR,
+  * publication, or runtime restart.  It changes only explicitly fenced speech
+- * text, tail-appended feedback speech, one complete interactive HTML field, or
+- * allowlisted slide geometry leaves.  The original candidate, document,
+- * affected scenes, and HTML are archived before the first public write.
++ * text, tail-appended feedback speech, one complete interactive HTML field,
++ * allowlisted slide geometry leaves, or an exact complete-scene replacement.
++ * Complete-scene replacement is separately fenced by the frozen contract,
++ * original scene, current scene, replacement bytes, and exact scene id.  The
++ * original candidate, document, affected scenes, HTML, and newly bound image
++ * bytes are archived before the first public write.
+  */
+ import { createHash, randomUUID } from 'node:crypto';
+ import { constants, promises as fs } from 'node:fs';
+ import path from 'node:path';
++import sharp from 'sharp';
+ import { validateScene } from '@openmaic/dsl';
+ import { PgDocumentStore, type Queryable } from '@openmaic/storage/document/pg';
+ import { validateAppStage } from '@/lib/document-store/validators';
+@@ -83,6 +87,26 @@
+   element: Json;
+   reason: string;
+ }
++export interface ReviewCompleteSceneAssetAddition {
++  assetKey: string;
++  sourceFilePath: string;
++  sourceFileSha256: string;
++  sourceReceiptPath: string;
++  sourceReceiptFileSha256: string;
++}
++export interface ReviewCompleteSceneReplacement {
++  exactSceneId: string;
++  expectedFrozenContractSha256: string;
++  originalScenePath: string;
++  originalSceneFileSha256: string;
++  expectedOriginalSceneSha256: string;
++  expectedCurrentSceneSha256: string;
++  replacementScenePath: string;
++  replacementSceneFileSha256: string;
++  expectedReplacementSceneSha256: string;
++  assetAdditions: ReviewCompleteSceneAssetAddition[];
++  reason: string;
++}
+ export interface ReviewSceneRevision {
+   sceneId: string;
+   expectedSceneSha256: string;
+@@ -94,6 +118,7 @@
+   canvasImageReplacements: ReviewCanvasImageReplacement[];
+   canvasTextReplacements: ReviewCanvasTextReplacement[];
+   canvasElementAppends: ReviewCanvasElementAppend[];
++  completeSceneReplacement?: ReviewCompleteSceneReplacement | null;
+ }
+ export interface CurrentReviewRevisionInput {
+   jobDir: string;
+@@ -121,6 +146,19 @@
+   } finally {
+     await handle.close();
+   }
++}
++async function image(bytes: Buffer) {
++  check(bytes.length > 0 && bytes.length <= 32 * 1024 * 1024, 'IMAGE_SIZE');
++  const decoded = sharp(bytes, { limitInputPixels: 40_000_000 });
++  const meta = await decoded.metadata();
++  check(['png', 'jpeg', 'webp'].includes(meta.format ?? '') && meta.width && meta.height && (!meta.pages || meta.pages === 1), 'IMAGE_FORMAT');
++  await decoded.stats();
++  return { sha256: hash(bytes), width: meta.width!, height: meta.height!, extension: meta.format === 'jpeg' ? 'jpg' : meta.format! };
++}
++function mediaFile(dataDir: string, stageId: string, src: string) {
++  const prefix = `/api/classroom-media/${stageId}/media/`;
++  check(typeof src === 'string' && src.startsWith(prefix) && /^[A-Za-z0-9_.-]+\.(?:png|jpg|jpeg|webp)$/.test(src.slice(prefix.length)), 'MEDIA_SOURCE');
++  return path.join(dataDir, 'classrooms', stageId, 'media', src.slice(prefix.length));
+ }
+ async function directory(dir: string) {
+   let current = path.parse(dir).root;
+@@ -222,6 +260,44 @@
+   };
+ }
+ 
++/** Parsed-scene fences complement the raw byte fences checked below. */
++export function inspectCompleteSceneReplacement(current: Json, original: Json, replacement: Json, revisionSceneId: string, spec: ReviewCompleteSceneReplacement, frozenContractSha256: string) {
++  check(revisionSceneId === spec.exactSceneId, 'COMPLETE_SCENE_ID');
++  check(current.id === spec.exactSceneId && original.id === spec.exactSceneId && replacement.id === spec.exactSceneId, 'COMPLETE_SCENE_ID');
++  check(frozenContractSha256 === spec.expectedFrozenContractSha256, 'COMPLETE_SCENE_CONTRACT');
++  check(textbookDigest(original) === spec.expectedOriginalSceneSha256, 'COMPLETE_SCENE_ORIGINAL');
++  check(textbookDigest(current) === spec.expectedCurrentSceneSha256, 'COMPLETE_SCENE_CURRENT');
++  check(textbookDigest(replacement) === spec.expectedReplacementSceneSha256, 'COMPLETE_SCENE_REPLACEMENT');
++  for (const field of ['stageId', 'order', 'type', 'title', 'outlineId', 'createdAt']) check(original[field] === current[field] && replacement[field] === current[field], 'COMPLETE_SCENE_IDENTITY');
++  check(validateScene(original).valid && validateScene(current).valid && validateScene(replacement).valid, 'COMPLETE_SCENE_DSL');
++  check(Array.isArray(replacement.actions) && new Set(replacement.actions.map((action: Json) => action.id)).size === replacement.actions.length, 'COMPLETE_SCENE_ACTIONS');
++  check(textbookDigest(replacement) !== textbookDigest(current) && spec.reason.trim().length > 0, 'COMPLETE_SCENE_NO_CHANGE');
++  return {
++    exactSceneId: spec.exactSceneId,
++    frozenContractSha256,
++    originalSceneSha256: textbookDigest(original),
++    currentSceneSha256: textbookDigest(current),
++    replacementSceneSha256: textbookDigest(replacement),
++    preservedIdentity: { stageId: current.stageId, order: current.order, type: current.type, title: current.title, outlineId: current.outlineId, createdAt: current.createdAt },
++    reason: spec.reason,
++  };
++}
++
++export function inspectCompleteSceneReplacementBytes(originalBytes: Buffer, replacementBytes: Buffer, spec: ReviewCompleteSceneReplacement) {
++  check(hash(originalBytes) === spec.originalSceneFileSha256 && hash(replacementBytes) === spec.replacementSceneFileSha256, 'COMPLETE_SCENE_BYTES');
++  let original: unknown, replacement: unknown;
++  try {
++    original = JSON.parse(originalBytes.toString('utf8'));
++    replacement = JSON.parse(replacementBytes.toString('utf8'));
++  } catch {
++    check(false, 'COMPLETE_SCENE_JSON');
++  }
++  check(object(original) && object(replacement), 'COMPLETE_SCENE_JSON');
++  check(textbookDigest(original) === spec.expectedOriginalSceneSha256 && textbookDigest(replacement) === spec.expectedReplacementSceneSha256, 'COMPLETE_SCENE_DIGEST');
++  check(original.id === spec.exactSceneId && replacement.id === spec.exactSceneId, 'COMPLETE_SCENE_ID');
++  return { original, replacement };
++}
++
+ function validateSpeechReplacement(value: unknown): asserts value is ReviewSpeechReplacement {
+   check(keys(value, ['actionId', 'expectedOldText', 'replacementText', 'reason']), 'SPEECH_REPLACEMENT');
+   const item = value as ReviewSpeechReplacement;
+@@ -259,8 +335,11 @@
+   check(Array.isArray(input.stateTransitionNotes) && input.stateTransitionNotes.every(note => typeof note === 'string' && note.trim().length > 0 && note.length <= 4000), 'STATE_NOTES');
+   check(Array.isArray(input.revisions) && input.revisions.length > 0 && input.revisions.length <= 11 && new Set(input.revisions.map(revision => revision.sceneId)).size === input.revisions.length, 'REVISIONS');
+   const html = new Map<string, string>();
++  const completeScenes = new Map<string, { original: Json; replacement: Json; originalBytes: Buffer; replacementBytes: Buffer }>();
++  const assetAdditions = new Map<string, { input: ReviewCompleteSceneAssetAddition; bytes: Buffer; receiptBytes: Buffer; meta: Awaited<ReturnType<typeof image>>; src: string; binding: Json }>();
++  const legacyRevisionFields = ['sceneId', 'expectedSceneSha256', 'reviewBasis', 'speechTextReplacements', 'appendedSpeechActions', 'htmlReplacement', 'canvasGeometryChanges', 'canvasImageReplacements', 'canvasTextReplacements', 'canvasElementAppends'];
+   for (const revision of input.revisions) {
+-    check(keys(revision, ['sceneId', 'expectedSceneSha256', 'reviewBasis', 'speechTextReplacements', 'appendedSpeechActions', 'htmlReplacement', 'canvasGeometryChanges', 'canvasImageReplacements', 'canvasTextReplacements', 'canvasElementAppends']), 'REVISION');
++    check(keys(revision, legacyRevisionFields) || keys(revision, [...legacyRevisionFields, 'completeSceneReplacement']), 'REVISION');
+     check(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(revision.sceneId) && hex(revision.expectedSceneSha256) && revision.reviewBasis.trim().length > 0, 'REVISION');
+     check(Array.isArray(revision.speechTextReplacements) && Array.isArray(revision.appendedSpeechActions) && Array.isArray(revision.canvasGeometryChanges) && Array.isArray(revision.canvasImageReplacements) && Array.isArray(revision.canvasTextReplacements) && Array.isArray(revision.canvasElementAppends), 'REVISION');
+     revision.speechTextReplacements.forEach(validateSpeechReplacement);
+@@ -273,12 +352,34 @@
+     check(new Set(revision.appendedSpeechActions.map(item => item.id)).size === revision.appendedSpeechActions.length, 'DUPLICATE_ACTION');
+     check(new Set(revision.canvasGeometryChanges.map(item => `${item.elementId}:${item.field}`)).size === revision.canvasGeometryChanges.length, 'DUPLICATE_GEOMETRY');
+     check(new Set(revision.canvasImageReplacements.map(item => item.elementId)).size === revision.canvasImageReplacements.length && new Set(revision.canvasTextReplacements.map(item => item.elementId)).size === revision.canvasTextReplacements.length && new Set(revision.canvasElementAppends.map(item => item.element.id)).size === revision.canvasElementAppends.length, 'DUPLICATE_CANVAS');
+-    check(revision.speechTextReplacements.length + revision.appendedSpeechActions.length + revision.canvasGeometryChanges.length + revision.canvasImageReplacements.length + revision.canvasTextReplacements.length + revision.canvasElementAppends.length + Number(!!revision.htmlReplacement) > 0, 'EMPTY_REVISION');
++    const granularCount = revision.speechTextReplacements.length + revision.appendedSpeechActions.length + revision.canvasGeometryChanges.length + revision.canvasImageReplacements.length + revision.canvasTextReplacements.length + revision.canvasElementAppends.length + Number(!!revision.htmlReplacement);
++    const complete = revision.completeSceneReplacement ?? null;
++    check((complete ? Number(granularCount === 0) : granularCount) > 0, complete ? 'COMPLETE_SCENE_MIXED' : 'EMPTY_REVISION');
+     if (revision.htmlReplacement) {
+       check(keys(revision.htmlReplacement, ['expectedOldHtmlSha256', 'newHtmlPath', 'newHtmlSha256', 'visibleDomChange', 'reason']) && hex(revision.htmlReplacement.expectedOldHtmlSha256) && hex(revision.htmlReplacement.newHtmlSha256) && path.isAbsolute(revision.htmlReplacement.newHtmlPath) && ['none', 'add-explicit-check-button-v1'].includes(revision.htmlReplacement.visibleDomChange) && revision.htmlReplacement.reason.trim().length > 0, 'HTML_REPLACEMENT');
+       const bytes = await read(revision.htmlReplacement.newHtmlPath);
+       check(hash(bytes) === revision.htmlReplacement.newHtmlSha256, 'HTML_BYTES');
+       html.set(revision.sceneId, bytes.toString('utf8'));
++    }
++    if (complete) {
++      check(keys(complete, ['exactSceneId', 'expectedFrozenContractSha256', 'originalScenePath', 'originalSceneFileSha256', 'expectedOriginalSceneSha256', 'expectedCurrentSceneSha256', 'replacementScenePath', 'replacementSceneFileSha256', 'expectedReplacementSceneSha256', 'assetAdditions', 'reason']), 'COMPLETE_SCENE');
++      check(complete.exactSceneId === revision.sceneId && complete.expectedCurrentSceneSha256 === revision.expectedSceneSha256 && [complete.expectedFrozenContractSha256, complete.originalSceneFileSha256, complete.expectedOriginalSceneSha256, complete.expectedCurrentSceneSha256, complete.replacementSceneFileSha256, complete.expectedReplacementSceneSha256].every(hex), 'COMPLETE_SCENE_FENCE');
++      check(path.isAbsolute(complete.originalScenePath) && path.isAbsolute(complete.replacementScenePath) && Array.isArray(complete.assetAdditions) && complete.assetAdditions.length <= 8 && complete.reason.trim().length > 0 && complete.reason.length <= 4000, 'COMPLETE_SCENE');
++      const originalBytes = await read(complete.originalScenePath), replacementBytes = await read(complete.replacementScenePath);
++      const { original, replacement } = inspectCompleteSceneReplacementBytes(originalBytes, replacementBytes, complete);
++      check(original.id === complete.exactSceneId && replacement.id === complete.exactSceneId && original.stageId === input.stageId && replacement.stageId === input.stageId, 'COMPLETE_SCENE_ID');
++      completeScenes.set(revision.sceneId, { original, replacement, originalBytes, replacementBytes });
++      check(new Set(complete.assetAdditions.map(item => item.assetKey)).size === complete.assetAdditions.length, 'COMPLETE_SCENE_ASSET_DUPLICATE');
++      for (const addition of complete.assetAdditions) {
++        check(keys(addition, ['assetKey', 'sourceFilePath', 'sourceFileSha256', 'sourceReceiptPath', 'sourceReceiptFileSha256']) && /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/.test(addition.assetKey) && path.isAbsolute(addition.sourceFilePath) && path.isAbsolute(addition.sourceReceiptPath) && hex(addition.sourceFileSha256) && hex(addition.sourceReceiptFileSha256), 'COMPLETE_SCENE_ASSET');
++        const bytes = await read(addition.sourceFilePath), receiptBytes = await read(addition.sourceReceiptPath), meta = await image(bytes);
++        check(meta.sha256 === addition.sourceFileSha256 && hash(receiptBytes) === addition.sourceReceiptFileSha256, 'COMPLETE_SCENE_ASSET_BYTES');
++        const src = `/api/classroom-media/${input.stageId}/media/review-${meta.sha256}.${meta.extension}`;
++        const binding = { assetKey: addition.assetKey, src, sha256: meta.sha256, width: meta.width, height: meta.height, bindingVersion: 1, status: 'author_candidate' };
++        const prior = assetAdditions.get(addition.assetKey);
++        if (prior) check(textbookCanonical(prior.binding) === textbookCanonical(binding) && prior.input.sourceReceiptFileSha256 === addition.sourceReceiptFileSha256, 'COMPLETE_SCENE_ASSET_COLLISION');
++        else assetAdditions.set(addition.assetKey, { input: addition, bytes, receiptBytes, meta, src, binding });
++      }
+     }
+   }
+   const dataDir = await fs.realpath(env.dataDir);
+@@ -295,6 +396,7 @@
+   const frozenFile = JSON.parse((await read(path.join(jobDir, 'frozen.json'))).toString());
+   check(typeof state.sessionId === 'string' && state.sessionId.length > 0 && dispatch.ownerFingerprint === ownerFingerprint, 'JOB_BINDING');
+   assertTextbookContract(frozenFile.sceneContract);
++  for (const revision of input.revisions) if (revision.completeSceneReplacement) check(revision.completeSceneReplacement.expectedFrozenContractSha256 === frozenFile.sceneContract.sha256, 'COMPLETE_SCENE_CONTRACT');
+   return {
+     dataDir,
+     ownerId,
+@@ -303,6 +405,8 @@
+     stageId: input.stageId,
+     frozen: frozenFile.sceneContract,
+     html,
++    completeScenes,
++    assetAdditions,
+     candidatePath: path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json'),
+   };
+ }
+@@ -368,14 +472,19 @@
+   unseal(value);
+   return { bytes, value };
+ }
+-async function validateAssets(state: State, ledger: Json) {
++async function validateAssets(state: State, ledger: Json, proposed = false) {
+   check(Array.isArray(ledger.assetBindings) && Array.isArray(ledger.bindingHistory), 'BINDINGS');
++  const supplied = new Map(proposed ? [...state.assetAdditions.values()].map(addition => [addition.src, addition]) : []);
++  const keysSeen = new Set<string>();
+   for (const binding of ledger.assetBindings) {
+     check(keys(binding, ['assetKey', 'src', 'sha256', 'width', 'height', 'bindingVersion', 'status']) && binding.status === 'author_candidate' && hex(binding.sha256), 'BINDING');
++    check(typeof binding.assetKey === 'string' && !keysSeen.has(binding.assetKey), 'DUPLICATE_BINDING');
++    keysSeen.add(binding.assetKey);
+     const prefix = `/api/classroom-media/${state.stageId}/media/`;
+     check(typeof binding.src === 'string' && binding.src.startsWith(prefix) && /^[A-Za-z0-9_.-]+\.(?:png|jpe?g|webp)$/.test(binding.src.slice(prefix.length)), 'BINDING_SOURCE');
+-    const bytes = await read(path.join(state.dataDir, 'classrooms', state.stageId, 'media', binding.src.slice(prefix.length)));
+-    check(hash(bytes) === binding.sha256, 'IMAGE_BYTES_CHANGED');
++    const addition = supplied.get(binding.src);
++    if (addition) check(addition.meta.sha256 === binding.sha256 && addition.meta.width === binding.width && addition.meta.height === binding.height, 'IMAGE_BYTES_CHANGED');
++    else check(hash(await read(mediaFile(state.dataDir, state.stageId, binding.src))) === binding.sha256, 'IMAGE_BYTES_CHANGED');
+   }
+ }
+ function validateDocument(state: State, doc: CourseDocument, ledger: Json) {
+@@ -389,9 +498,30 @@
+   }
+ }
+ 
+-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+-function applySceneRevision(scene: any, revision: ReviewSceneRevision, replacementHtml: string | undefined, boundSources: Set<string>) {
++function applySceneRevision(scene: Json, revision: ReviewSceneRevision, replacementHtml: string | undefined, completeFiles: { original: Json; replacement: Json; originalBytes: Buffer; replacementBytes: Buffer } | undefined, frozenContractSha256: string, boundSources: Set<string>) {
+   check(textbookDigest(scene) === revision.expectedSceneSha256, 'SCENE_CHANGED');
++  const complete = revision.completeSceneReplacement ?? null;
++  if (complete) {
++    check(completeFiles, 'COMPLETE_SCENE_FILES');
++    const completeSceneEvidence = inspectCompleteSceneReplacement(scene, completeFiles!.original, completeFiles!.replacement, revision.sceneId, complete, frozenContractSha256);
++    return {
++      next: structuredClone(completeFiles!.replacement),
++      evidence: {
++        sceneId: scene.id,
++        beforeSceneSha256: textbookDigest(scene),
++        afterSceneSha256: textbookDigest(completeFiles!.replacement),
++        completeSceneEvidence: {
++          ...completeSceneEvidence,
++          originalSceneFileSha256: hash(completeFiles!.originalBytes),
++          replacementSceneFileSha256: hash(completeFiles!.replacementBytes),
++          assetAdditions: complete.assetAdditions.map(addition => ({ assetKey: addition.assetKey, sourceFileSha256: addition.sourceFileSha256, sourceReceiptFileSha256: addition.sourceReceiptFileSha256 })),
++        },
++        fieldDiffs: [{ path: '/', kind: 'exact-complete-scene-replacement', beforeSha256: textbookDigest(scene), afterSha256: textbookDigest(completeFiles!.replacement), reason: complete.reason }],
++        htmlEvidence: null,
++        reviewBasis: revision.reviewBasis,
++      },
++    };
++  }
+   const next = structuredClone(scene);
+   const originalActions = structuredClone(scene.actions ?? []);
+   check(Array.isArray(next.actions) && new Set(next.actions.map((action: Json) => action.id)).size === next.actions.length, 'ACTIONS');
+@@ -481,19 +611,25 @@
+   await validateAssets(state, ledger);
+   const after = structuredClone(doc);
+   const revisions: Json[] = [];
+-  const boundSources = new Set<string>(ledger.assetBindings.map((binding: Json) => binding.src));
++  for (const addition of state.assetAdditions.values()) check(!ledger.assetBindings.some((binding: Json) => binding.assetKey === addition.binding.assetKey || binding.src === addition.binding.src), 'COMPLETE_SCENE_ASSET_ALREADY_BOUND');
++  const boundSources = new Set<string>([...ledger.assetBindings.map((binding: Json) => binding.src), ...[...state.assetAdditions.values()].map(addition => addition.src)]);
+   for (const revision of input.revisions) {
+     const index = after.scenes.findIndex(scene => scene.id === revision.sceneId);
+     check(index >= 0, 'SCENE_MISSING');
+-    const result = applySceneRevision(doc.scenes[index], revision, state.html.get(revision.sceneId), boundSources);
++    const result = applySceneRevision(doc.scenes[index], revision, state.html.get(revision.sceneId), state.completeScenes.get(revision.sceneId), state.frozen.sha256, boundSources);
+     after.scenes[index] = result.next;
+     revisions.push(result.evidence);
+   }
++  for (const addition of state.assetAdditions.values()) {
++    const used = after.scenes.some(scene => scene.type === 'interactive' && typeof (scene.content as Json)?.html === 'string' && mediaSources((scene.content as Json).html).includes(addition.src) || textbookCanonical(scene).includes(JSON.stringify(addition.src)));
++    check(used, 'COMPLETE_SCENE_ASSET_UNUSED');
++  }
+   const body = unseal(ledger);
+-  const afterCandidate = seal({ ...body, scenes: after.scenes.map(scene => ({ sceneId: scene.id, order: scene.order, sha256: textbookDigest(scene), canonicalJson: textbookCanonical(scene), contractSha256: state.frozen.sha256 })) });
++  const addedBindings = [...state.assetAdditions.values()].map(addition => addition.binding);
++  const afterCandidate = seal({ ...body, assetBindings: [...body.assetBindings, ...addedBindings], scenes: after.scenes.map(scene => ({ sceneId: scene.id, order: scene.order, sha256: textbookDigest(scene), canonicalJson: textbookCanonical(scene), contractSha256: state.frozen.sha256 })) });
+   validateDocument(state, after, afterCandidate);
+-  await validateAssets(state, afterCandidate);
+-  check(textbookCanonical(afterCandidate.assetBindings) === textbookCanonical(ledger.assetBindings) && textbookCanonical(afterCandidate.bindingHistory) === textbookCanonical(ledger.bindingHistory), 'ASSET_LEDGER_CHANGED');
++  await validateAssets(state, afterCandidate, true);
++  check(textbookCanonical(afterCandidate.assetBindings.slice(0, ledger.assetBindings.length)) === textbookCanonical(ledger.assetBindings) && textbookCanonical(afterCandidate.assetBindings.slice(ledger.assetBindings.length)) === textbookCanonical(addedBindings) && textbookCanonical(afterCandidate.bindingHistory) === textbookCanonical(ledger.bindingHistory), 'ASSET_LEDGER_CHANGED');
+   const plan = seal({
+     schemaVersion: PLAN,
+     verification: VERIFY,
+@@ -509,6 +645,7 @@
+     beforeCandidateFileSha256: hash(ledgerBytes),
+     afterCandidateSha256: afterCandidate.sha256,
+     afterCandidateFileSha256: hash(encoded(afterCandidate)),
++    assetAdditions: addedBindings,
+     stateTransitionNotes: input.stateTransitionNotes,
+     revisions,
+   });
+@@ -559,10 +696,20 @@
+       for (const revision of plan.revisions) {
+         const scene = beforeDoc.scenes.find((value: Json) => value.id === revision.sceneId);
+         check(scene && (await read(path.join(dir, `original-scene-${hash(scene.id)}.json`))).equals(encoded(scene)), 'ORIGINAL_CHANGED');
++        if (revision.completeSceneEvidence) {
++          const files = state.completeScenes.get(scene.id);
++          check(files, 'COMPLETE_SCENE_FILES');
++          check((await read(path.join(dir, `declared-original-scene-${hash(scene.id)}.json`))).equals(files!.originalBytes), 'ORIGINAL_CHANGED');
++          check((await read(path.join(dir, `replacement-scene-${hash(scene.id)}.json`))).equals(files!.replacementBytes), 'ORIGINAL_CHANGED');
++        }
+         if (revision.htmlEvidence) {
+           check(hash(await read(path.join(dir, `original-html-${hash(scene.id)}.html`))) === revision.htmlEvidence.beforeHtmlSha256, 'ORIGINAL_CHANGED');
+           check(hash(await read(path.join(dir, `revised-html-${hash(scene.id)}.html`))) === revision.htmlEvidence.afterHtmlSha256, 'ORIGINAL_CHANGED');
+         }
++      }
++      for (const addition of state.assetAdditions.values()) {
++        check((await read(path.join(dir, `source-image-${addition.meta.sha256}.${addition.meta.extension}`))).equals(addition.bytes), 'ORIGINAL_CHANGED');
++        check((await read(path.join(dir, `source-receipt-${addition.input.sourceReceiptFileSha256}.json`))).equals(addition.receiptBytes), 'ORIGINAL_CHANGED');
+       }
+     }
+     await immutable(originalCandidate, beforeBytes);
+@@ -571,13 +718,24 @@
+       const scene = beforeDoc.scenes.find((value: Json) => value.id === revision.sceneId);
+       check(scene, 'SCENE_MISSING');
+       await immutable(path.join(dir, `original-scene-${hash(scene.id)}.json`), encoded(scene));
++      if (revision.completeSceneEvidence) {
++        const files = state.completeScenes.get(scene.id);
++        check(files, 'COMPLETE_SCENE_FILES');
++        await immutable(path.join(dir, `declared-original-scene-${hash(scene.id)}.json`), files!.originalBytes);
++        await immutable(path.join(dir, `replacement-scene-${hash(scene.id)}.json`), files!.replacementBytes);
++      }
+       if (revision.htmlEvidence) {
+         await immutable(path.join(dir, `original-html-${hash(scene.id)}.html`), Buffer.from(scene.content.html));
+         const revised = next.after.scenes.find((value: Json) => value.id === revision.sceneId)! as Json;
+         await immutable(path.join(dir, `revised-html-${hash(scene.id)}.html`), Buffer.from(revised.content.html));
+       }
+     }
++    for (const addition of state.assetAdditions.values()) {
++      await immutable(path.join(dir, `source-image-${addition.meta.sha256}.${addition.meta.extension}`), addition.bytes);
++      await immutable(path.join(dir, `source-receipt-${addition.input.sourceReceiptFileSha256}.json`), addition.receiptBytes);
++    }
+     await immutable(intent, encoded(plan));
++    for (const addition of state.assetAdditions.values()) await immutable(mediaFile(state.dataDir, state.stageId, addition.src), addition.bytes);
+     let current = actualDoc;
+     if (textbookDigest(current) === plan.beforeDocumentSha256) {
+       for (const revised of next.after.scenes.filter(scene => plan.revisions.some((revision: Json) => revision.sceneId === scene.id))) {
+@@ -638,6 +796,7 @@
+       candidateFileSha256: plan.afterCandidateFileSha256,
+       stateTransitionNotes: plan.stateTransitionNotes,
+       revisions: plan.revisions,
++      assetAdditions: plan.assetAdditions,
+       providerCalls: 0,
+     });
+   });
+diff --git a/tests/agent-runtime/textbook-current-review-revision.test.ts b/tests/agent-runtime/textbook-current-review-revision.test.ts
+--- a/tests/agent-runtime/textbook-current-review-revision.test.ts
++++ b/tests/agent-runtime/textbook-current-review-revision.test.ts
+@@ -1,9 +1,24 @@
+-import { describe, expect, it } from 'vitest';
+-import { inspectReviewHtml } from '@/lib/server/mira-textbook-current-review-revision';
++import { createHash } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import { tmpdir } from 'node:os';
++import path from 'node:path';
++import sharp from 'sharp';
++import { PGlite } from '@electric-sql/pglite';
++import { afterEach, beforeEach, describe, expect, it } from 'vitest';
++import { ensureDocumentSchema, type Queryable } from '@openmaic/storage/document/pg';
++import { ensureAgentSessionSchema } from '@openmaic/storage/agent-session/pg';
++import { ensureStageMetaSchema } from '@/lib/persistence/stage-meta';
++import { createOwnerBoundDocumentStore } from '@/lib/persistence/owner-bound-document-store';
++import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
++import { inspectCompleteSceneReplacement, inspectCompleteSceneReplacementBytes, inspectReviewHtml, prepareCurrentReviewRevision, runCurrentReviewRevision, type CurrentReviewRevisionInput, type ReviewCompleteSceneReplacement } from '@/lib/server/mira-textbook-current-review-revision';
++import { createTextbookAuthoringGuard, textbookDigest } from '@/lib/server/mira-textbook-scene-contract';
++import type { CourseStore } from '@/lib/server/agent-runtime/course-tools';
++import frozenFixture from '../fixtures/textbook-scene-contract.v1.json';
+ 
+ const media = '/api/classroom-media/stage-review/media/scene.png';
+ const checkButton = '<button class="check-btn" id="checkSeatBtn" type="button" aria-label="检查当前座位">✓ 检查</button>';
+ const speech = ['听完以后再操作。'];
++const sha = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
+ 
+ function page(options: {
+   code?: string;
+@@ -85,3 +100,174 @@
+       if (typeof window.miraCancelNarration === 'function') window.miraCancelNarration();
+     });`;
+ }
++
++function slideScene(label: string, updatedAt: number) {
++  return {
++    id: 'scene-p2', stageId: 'stage-review', order: 2, title: '问一问，认识朋友', type: 'slide', outlineId: 'p2', createdAt: 1, updatedAt,
++    content: { type: 'slide', canvas: {
++      id: 'canvas-p2', viewportSize: 1000, viewportRatio: 0.5625,
++      theme: { backgroundColor: '#ffffff', themeColors: ['#153f50'], fontColor: '#153f50', fontName: 'sans-serif' },
++      background: { type: 'solid', color: '#ffffff' },
++      elements: [{ id: 'story-state', type: 'text', left: 80, top: 80, width: 840, height: 120, rotate: 0, content: `<p>${label}</p>`, defaultColor: '#153f50', defaultFontName: 'sans-serif' }],
++    } },
++    actions: [{ id: 'speech-p2', type: 'speech', text: '听一听，再决定。' }],
++  };
++}
++
++function completeSpec(original: ReturnType<typeof slideScene>, current: ReturnType<typeof slideScene>, replacement: ReturnType<typeof slideScene>) {
++  const originalBytes = Buffer.from(JSON.stringify(original)), replacementBytes = Buffer.from(JSON.stringify(replacement));
++  const spec: ReviewCompleteSceneReplacement = {
++    exactSceneId: 'scene-p2', expectedFrozenContractSha256: 'a'.repeat(64),
++    originalScenePath: '/review/original-scene-p2.json', originalSceneFileSha256: sha(originalBytes), expectedOriginalSceneSha256: textbookDigest(original),
++    expectedCurrentSceneSha256: textbookDigest(current), replacementScenePath: '/review/replacement-scene-p2.json', replacementSceneFileSha256: sha(replacementBytes),
++    expectedReplacementSceneSha256: textbookDigest(replacement), assetAdditions: [], reason: '把卡片拼页改为连续校园世界。',
++  };
++  return { spec, originalBytes, replacementBytes };
++}
++
++describe('exact complete-scene review revision fences', () => {
++  it('accepts independently fenced original/current/replacement identities and raw replacement bytes', () => {
++    const original = slideScene('original-world', 1), current = slideScene('current-reviewed-world', 2), replacement = slideScene('continuous-campus-world', 3);
++    const { spec, originalBytes, replacementBytes } = completeSpec(original, current, replacement);
++    expect(inspectCompleteSceneReplacementBytes(originalBytes, replacementBytes, spec)).toEqual({ original, replacement });
++    expect(inspectCompleteSceneReplacement(current, original, replacement, 'scene-p2', spec, 'a'.repeat(64))).toMatchObject({
++      exactSceneId: 'scene-p2', originalSceneSha256: textbookDigest(original), currentSceneSha256: textbookDigest(current), replacementSceneSha256: textbookDigest(replacement),
++      preservedIdentity: { stageId: 'stage-review', order: 2, type: 'slide', title: '问一问，认识朋友' },
++    });
++  });
++
++  it('rejects changed bytes even when parsed JSON would be semantically equivalent', () => {
++    const original = slideScene('original-world', 1), current = slideScene('current-reviewed-world', 2), replacement = slideScene('continuous-campus-world', 3);
++    const { spec, originalBytes, replacementBytes } = completeSpec(original, current, replacement);
++    expect(() => inspectCompleteSceneReplacementBytes(originalBytes, Buffer.concat([replacementBytes, Buffer.from(' ')]), spec)).toThrow('TEXTBOOK_CURRENT_REVIEW_REVISION_COMPLETE_SCENE_BYTES');
++  });
++
++  it.each([
++    ['revision id', (spec: ReviewCompleteSceneReplacement) => ({ revisionId: 'scene-p3', spec }), 'COMPLETE_SCENE_ID'],
++    ['frozen contract', (spec: ReviewCompleteSceneReplacement) => ({ revisionId: 'scene-p2', spec: { ...spec, expectedFrozenContractSha256: 'b'.repeat(64) } }), 'COMPLETE_SCENE_CONTRACT'],
++    ['original scene', (spec: ReviewCompleteSceneReplacement) => ({ revisionId: 'scene-p2', spec: { ...spec, expectedOriginalSceneSha256: 'b'.repeat(64) } }), 'COMPLETE_SCENE_ORIGINAL'],
++    ['current scene', (spec: ReviewCompleteSceneReplacement) => ({ revisionId: 'scene-p2', spec: { ...spec, expectedCurrentSceneSha256: 'b'.repeat(64) } }), 'COMPLETE_SCENE_CURRENT'],
++    ['replacement scene', (spec: ReviewCompleteSceneReplacement) => ({ revisionId: 'scene-p2', spec: { ...spec, expectedReplacementSceneSha256: 'b'.repeat(64) } }), 'COMPLETE_SCENE_REPLACEMENT'],
++  ])('rejects a mismatched %s fence', (_name, mutate, code) => {
++    const original = slideScene('original-world', 1), current = slideScene('current-reviewed-world', 2), replacement = slideScene('continuous-campus-world', 3);
++    const changed = mutate(completeSpec(original, current, replacement).spec);
++    expect(() => inspectCompleteSceneReplacement(current, original, replacement, changed.revisionId, changed.spec, 'a'.repeat(64))).toThrow(`TEXTBOOK_CURRENT_REVIEW_REVISION_${code}`);
++  });
++
++  it('rejects identity drift even when the replacement canonical hash matches it', () => {
++    const original = slideScene('original-world', 1), current = slideScene('current-reviewed-world', 2), replacement = { ...slideScene('continuous-campus-world', 3), order: 3 };
++    const { spec } = completeSpec(original, current, replacement as ReturnType<typeof slideScene>);
++    expect(() => inspectCompleteSceneReplacement(current, original, replacement, 'scene-p2', spec, 'a'.repeat(64))).toThrow('TEXTBOOK_CURRENT_REVIEW_REVISION_COMPLETE_SCENE_IDENTITY');
++  });
++});
++
++describe('complete-scene path through prepare, apply, candidate ledger, and immutable archive', () => {
++  const cookie = '11111111-1111-4111-8111-111111111111', owner = `anon:${cookie}`, stageId = 'stage-complete-review', sessionId = 'session-complete-review';
++  let db: PGlite, root: string, pool: Pool, store: ReturnType<typeof createOwnerBoundDocumentStore>, input: CurrentReviewRevisionInput;
++  let oldScene: ReturnType<typeof scene>, original: ReturnType<typeof scene>, replacement: ReturnType<typeof scene>, originalBytes: Buffer, replacementBytes: Buffer, newBytes: Buffer, receiptBytes: Buffer, newSrc: string, frozen: typeof frozenFixture;
++  class Pool {
++    async query(sql: string, args?: unknown[]) { return db.query(sql, args); }
++    connect = async () => ({ query: this.query.bind(this), release() {} });
++  }
++  const prompt = () => '\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n' + JSON.stringify(frozen) + '\nEND_MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT\n';
++  const ledgerPath = () => path.join(root, 'classrooms', stageId, 'textbook-authoring-candidate.json');
++  const mediaPath = () => path.join(root, 'classrooms', stageId, 'media', newSrc.split('/').at(-1)!);
++  const revisionDir = (plan: { sha256: string }) => path.join(root, 'textbook-current-review-revisions', sha(sessionId), stageId, plan.sha256);
++  function scene(src: string, updatedAt: number, label: string) {
++    return {
++      id: 'scene-p1', stageId, order: 1, title: '连续校园', type: 'slide', outlineId: 'p1', createdAt: 1, updatedAt,
++      content: { type: 'slide', canvas: {
++        id: 'canvas-p1', viewportSize: 1000, viewportRatio: 0.5625,
++        theme: { backgroundColor: '#ffffff', themeColors: ['#153f50'], fontColor: '#153f50', fontName: 'sans-serif' },
++        background: { type: 'solid', color: '#ffffff' },
++        elements: [{ id: 'world', type: 'image', left: 0, top: 0, width: 1000, height: 562, rotate: 0, fixedRatio: true, src }, { id: 'state', type: 'text', left: 40, top: 440, width: 920, height: 80, rotate: 0, content: `<p>${label}</p>`, defaultColor: '#153f50', defaultFontName: 'sans-serif' }],
++      } },
++      actions: [{ id: 'speech-p1', type: 'speech', text: '看一看校园里的朋友。' }],
++    };
++  }
++  beforeEach(async () => {
++    root = await fs.realpath(await fs.mkdtemp(path.join(tmpdir(), 'complete-scene-review-')));
++    db = new PGlite(); await db.waitReady; pool = new Pool();
++    const query: Queryable = { query: <R extends Record<string, unknown>>(sql: string, args?: unknown[]) => db.query<R>(sql, args) };
++    await ensureDocumentSchema(query); await ensureAgentSessionSchema(query); await ensureStageMetaSchema(query);
++    frozen = structuredClone(frozenFixture);
++    frozen.contract.pagePlan = [{ page: 1, title: '连续校园', type: 'slide', move: '看图听校园故事' }];
++    frozen.contract.lockedAssessments = [];
++    frozen.sha256 = textbookDigest(frozen.contract);
++    await db.query('INSERT INTO agent_sessions(id,owner_id,prompt,stage_id,status) VALUES($1,$2,$3,$4,$5)', [sessionId, owner, prompt(), stageId, 'succeeded']);
++    store = createOwnerBoundDocumentStore({ pool, ownerId: owner, validateScene: validateAppScene, validateStage: validateAppStage });
++    await store.saveDocument({ stage: { id: stageId, name: '连续校园', createdAt: 1, updatedAt: 1 }, scenes: [], outline: { producerRef: sessionId, outlines: [] } } as never);
++    const mediaDir = path.join(root, 'classrooms', stageId, 'media'); await fs.mkdir(mediaDir, { recursive: true });
++    const oldBytes = await sharp({ create: { width: 64, height: 64, channels: 3, background: '#ff0000' } }).png().toBuffer();
++    newBytes = await sharp({ create: { width: 96, height: 54, channels: 3, background: '#00ff00' } }).png().toBuffer();
++    const oldSrc = `/api/classroom-media/${stageId}/media/old-world.png`;
++    newSrc = `/api/classroom-media/${stageId}/media/review-${sha(newBytes)}.png`;
++    await fs.writeFile(path.join(mediaDir, 'old-world.png'), oldBytes);
++    const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') }), guarded = guard.wrapStore(store as unknown as CourseStore);
++    await guard.context({ stageId, order: 1, title: '连续校园', type: 'slide', media: [{ assetKey: 'old-world', src: oldSrc }] });
++    oldScene = scene(oldSrc, 2, 'current'); await guarded.putScene(stageId, oldScene as never);
++    original = scene(oldSrc, 1, 'preserved original'); replacement = scene(newSrc, 3, 'continuous replacement');
++    originalBytes = Buffer.from(JSON.stringify(original)); replacementBytes = Buffer.from(JSON.stringify(replacement));
++    const jobDir = path.join(root, 'job'); await fs.mkdir(jobDir);
++    await fs.writeFile(path.join(jobDir, 'owner.cookies'), `# Netscape HTTP Cookie File\nlocalhost\tFALSE\t/\tTRUE\t0\tanonymous_id\t${cookie}\n`);
++    await fs.writeFile(path.join(jobDir, 'state.json'), JSON.stringify({ sessionId }));
++    await fs.writeFile(path.join(jobDir, 'dispatch.json'), JSON.stringify({ ownerFingerprint: sha(cookie) }));
++    await fs.writeFile(path.join(jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen }));
++    const originalPath = path.join(root, 'original.json'), replacementPath = path.join(root, 'replacement.json'), sourcePath = path.join(root, 'new-world.png'), receiptPath = path.join(root, 'asset-manifest.json');
++    receiptBytes = Buffer.from(JSON.stringify({ status: 'draft_not_bound', sha256: sha(newBytes) }));
++    await fs.writeFile(originalPath, originalBytes); await fs.writeFile(replacementPath, replacementBytes); await fs.writeFile(sourcePath, newBytes); await fs.writeFile(receiptPath, receiptBytes);
++    const ledgerBytes = await fs.readFile(ledgerPath()), ledger = JSON.parse(ledgerBytes.toString()), doc = await store.loadDocument(stageId);
++    input = {
++      jobDir, stageId, expectedDocumentSha256: textbookDigest(doc), expectedCandidateSha256: ledger.sha256, expectedCandidateFileSha256: sha(ledgerBytes), stateTransitionNotes: ['完整校园场景只进入可追溯候选修订。'],
++      revisions: [{
++        sceneId: oldScene.id, expectedSceneSha256: textbookDigest(oldScene), reviewBasis: '连续世界质量审查已拒绝卡片拼页。',
++        speechTextReplacements: [], appendedSpeechActions: [], htmlReplacement: null, canvasGeometryChanges: [], canvasImageReplacements: [], canvasTextReplacements: [], canvasElementAppends: [],
++        completeSceneReplacement: {
++          exactSceneId: oldScene.id, expectedFrozenContractSha256: frozen.sha256,
++          originalScenePath: originalPath, originalSceneFileSha256: sha(originalBytes), expectedOriginalSceneSha256: textbookDigest(original), expectedCurrentSceneSha256: textbookDigest(oldScene),
++          replacementScenePath: replacementPath, replacementSceneFileSha256: sha(replacementBytes), expectedReplacementSceneSha256: textbookDigest(replacement),
++          assetAdditions: [{ assetKey: 'continuous-world', sourceFilePath: sourcePath, sourceFileSha256: sha(newBytes), sourceReceiptPath: receiptPath, sourceReceiptFileSha256: sha(receiptBytes) }],
++          reason: '用占满主要视区的连续校园世界替换卡片拼页。',
++        },
++      }],
++    };
++  });
++  afterEach(async () => { await db.close(); await fs.rm(root, { recursive: true, force: true }); });
++
++  it('keeps prepare read-only, applies one exact scene, extends only the candidate asset ledger, and archives all fenced inputs immutably', async () => {
++    const beforeDoc = await store.loadDocument(stageId), beforeCandidate = await fs.readFile(ledgerPath());
++    const plan = await prepareCurrentReviewRevision(input, { pool, dataDir: root });
++    expect(plan.schemaVersion).toBe('mira.textbook.current-review-revision-plan.v1');
++    expect(plan.revisions[0].completeSceneEvidence).toMatchObject({ exactSceneId: oldScene.id, originalSceneSha256: textbookDigest(original), currentSceneSha256: textbookDigest(oldScene), replacementSceneSha256: textbookDigest(replacement) });
++    expect(await store.loadDocument(stageId)).toEqual(beforeDoc); expect(await fs.readFile(ledgerPath())).toEqual(beforeCandidate); await expect(fs.stat(mediaPath())).rejects.toMatchObject({ code: 'ENOENT' });
++    const receipt = await runCurrentReviewRevision(plan, plan.sha256, { pool, dataDir: root }), after = (await store.loadDocument(stageId))!, ledger = JSON.parse(await fs.readFile(ledgerPath(), 'utf8'));
++    expect(after.scenes).toEqual([replacement]); expect(receipt.providerCalls).toBe(0); expect(receipt.assetAdditions).toEqual(plan.assetAdditions);
++    expect(ledger.assetBindings.slice(0, -1)).toEqual(JSON.parse(beforeCandidate.toString()).assetBindings);
++    expect(ledger.assetBindings.at(-1)).toMatchObject({ assetKey: 'continuous-world', src: newSrc, sha256: sha(newBytes), bindingVersion: 1, status: 'author_candidate' });
++    expect(await fs.readFile(mediaPath())).toEqual(newBytes);
++    const dir = revisionDir(plan), token = sha(oldScene.id);
++    expect(await fs.readFile(path.join(dir, `declared-original-scene-${token}.json`))).toEqual(originalBytes);
++    expect(await fs.readFile(path.join(dir, `replacement-scene-${token}.json`))).toEqual(replacementBytes);
++    expect(await fs.readFile(path.join(dir, `source-image-${sha(newBytes)}.png`))).toEqual(newBytes);
++    expect(await fs.readFile(path.join(dir, `source-receipt-${sha(receiptBytes)}.json`))).toEqual(receiptBytes);
++    expect(await runCurrentReviewRevision(plan, plan.sha256, { pool, dataDir: root })).toEqual(receipt);
++  });
++
++  it('rejects complete-scene and leaf edits in the same revision', async () => {
++    input.revisions[0].speechTextReplacements = [{ actionId: 'speech-p1', expectedOldText: '看一看校园里的朋友。', replacementText: '另一句。', reason: 'invalid mixed mode' }];
++    await expect(prepareCurrentReviewRevision(input, { pool, dataDir: root })).rejects.toThrow('TEXTBOOK_CURRENT_REVIEW_REVISION_COMPLETE_SCENE_MIXED');
++  });
++
++  it('rejects asset bytes changed after the review plan was authored', async () => {
++    const source = input.revisions[0].completeSceneReplacement!.assetAdditions[0].sourceFilePath;
++    await fs.writeFile(source, Buffer.concat([newBytes, Buffer.from('changed')]));
++    await expect(prepareCurrentReviewRevision(input, { pool, dataDir: root })).rejects.toThrow('TEXTBOOK_CURRENT_REVIEW_REVISION_COMPLETE_SCENE_ASSET_BYTES');
++  });
++
++  it('rejects a stale document before any public media write', async () => {
++    const plan = await prepareCurrentReviewRevision(input, { pool, dataDir: root });
++    await store.putScene(stageId, { ...oldScene, updatedAt: 99 } as never);
++    await expect(runCurrentReviewRevision(plan, plan.sha256, { pool, dataDir: root })).rejects.toThrow('TEXTBOOK_CURRENT_REVIEW_REVISION_DOCUMENT_CHANGED');
++    await expect(fs.stat(mediaPath())).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++});

@@ -1,0 +1,418 @@
+{
+  "policyVersion": "mira.textbook.pinyin-aieiui-ssml.v4",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "symbols": {
+    "ɑi": {
+      "ph": "ai1",
+      "carrier": "哀"
+    },
+    "āi": {
+      "ph": "ai1",
+      "carrier": "哀"
+    },
+    "ái": {
+      "ph": "ai2",
+      "carrier": "挨"
+    },
+    "ǎi": {
+      "ph": "ai3",
+      "carrier": "矮"
+    },
+    "ài": {
+      "ph": "ai4",
+      "carrier": "爱"
+    },
+    "ei": {
+      "ph": "ei1",
+      "carrier": "诶"
+    },
+    "ēi": {
+      "ph": "ei1",
+      "carrier": "诶"
+    },
+    "éi": {
+      "ph": "ei2",
+      "carrier": "诶"
+    },
+    "ěi": {
+      "ph": "ei3",
+      "carrier": "诶"
+    },
+    "èi": {
+      "ph": "ei4",
+      "carrier": "诶"
+    },
+    "ui": {
+      "ph": "wei1",
+      "carrier": "威"
+    },
+    "uī": {
+      "ph": "wei1",
+      "carrier": "威"
+    },
+    "uí": {
+      "ph": "wei2",
+      "carrier": "围"
+    },
+    "uǐ": {
+      "ph": "wei3",
+      "carrier": "伟"
+    },
+    "uì": {
+      "ph": "wei4",
+      "carrier": "味"
+    },
+    "g": {
+      "ph": "ge1",
+      "carrier": "哥"
+    },
+    "u": {
+      "ph": "wu1",
+      "carrier": "乌"
+    },
+    "l": {
+      "ph": "le1",
+      "carrier": "勒"
+    },
+    "t": {
+      "ph": "te1",
+      "carrier": "特"
+    },
+    "gāi": {
+      "ph": "gai1",
+      "carrier": "该"
+    },
+    "guāi": {
+      "ph": "guai1",
+      "carrier": "乖"
+    },
+    "tái": {
+      "ph": "tai2",
+      "carrier": "台"
+    },
+    "kāi": {
+      "ph": "kai1",
+      "carrier": "开"
+    },
+    "cāi": {
+      "ph": "cai1",
+      "carrier": "猜"
+    },
+    "huài": {
+      "ph": "huai4",
+      "carrier": "坏"
+    },
+    "kuài": {
+      "ph": "kuai4",
+      "carrier": "快"
+    },
+    "lèi": {
+      "ph": "lei4",
+      "carrier": "泪"
+    },
+    "bēi": {
+      "ph": "bei1",
+      "carrier": "杯"
+    },
+    "péi": {
+      "ph": "pei2",
+      "carrier": "陪"
+    },
+    "fēi": {
+      "ph": "fei1",
+      "carrier": "飞"
+    },
+    "gěi": {
+      "ph": "gei3",
+      "carrier": "给"
+    },
+    "wéi": {
+      "ph": "wei2",
+      "carrier": "围"
+    },
+    "hēi": {
+      "ph": "hei1",
+      "carrier": "黑"
+    },
+    "tuǐ": {
+      "ph": "tui3",
+      "carrier": "腿"
+    },
+    "huì": {
+      "ph": "hui4",
+      "carrier": "会"
+    },
+    "duī": {
+      "ph": "dui1",
+      "carrier": "堆"
+    },
+    "chuī": {
+      "ph": "chui1",
+      "carrier": "吹"
+    },
+    "zuǐ": {
+      "ph": "zui3",
+      "carrier": "嘴"
+    },
+    "suì": {
+      "ph": "sui4",
+      "carrier": "岁"
+    },
+    "ruì": {
+      "ph": "rui4",
+      "carrier": "瑞"
+    },
+    "pái": {
+      "ph": "pai2",
+      "carrier": "排"
+    },
+    "duì": {
+      "ph": "dui4",
+      "carrier": "队"
+    },
+    "luó": {
+      "ph": "luo2",
+      "carrier": "萝"
+    },
+    "bo": {
+      "ph": "bo5",
+      "carrier": "卜"
+    },
+    "bái": {
+      "ph": "bai2",
+      "carrier": "白"
+    },
+    "cài": {
+      "ph": "cai4",
+      "carrier": "菜"
+    },
+    "yā": {
+      "ph": "ya1",
+      "carrier": "鸭"
+    },
+    "lí": {
+      "ph": "li2",
+      "carrier": "梨"
+    },
+    "xī": {
+      "ph": "xi1",
+      "carrier": "西"
+    },
+    "guā": {
+      "ph": "gua1",
+      "carrier": "瓜"
+    },
+    "shū": {
+      "ph": "shu1",
+      "carrier": "蔬"
+    },
+    "shuǐ": {
+      "ph": "shui3",
+      "carrier": "水"
+    },
+    "guǒ": {
+      "ph": "guo3",
+      "carrier": "果"
+    }
+  },
+  "words": {},
+  "approvalBoundary": {
+    "recipeStatus": "registered-exact-sub-alias-candidate-pending-six-fixed-probes-and-exact-formal-sentence-listening",
+    "approvedProbeScope": "none-for-u4-l1-pending-human-review",
+    "formalListeningScope": "Every formal segment containing a registered Latin token, including all final, tone, spelling, picture-word, question, feedback and repetition segments.",
+    "humanReview": "pending",
+    "humanListeningVerified": false,
+    "perceptualToneVerified": false,
+    "pronunciationApproved": false,
+    "formalUseAllowed": false,
+    "probeScope": "six fixed files: ai base and four tones; ei base and four tones; ui base and four tones; four textbook spelling demonstrations; pai-dui; luo-bo with neutral bo.",
+    "wholeTokenBoundary": "Every Latin run is one complete registered token. No Unicode normalization, alpha-a/ASCII-a equivalence, numeric tone spelling, combining tone mark, per-letter fallback or concatenated phoneme recipe is allowed.",
+    "uiToneBoundary": "ui uses wei1 only as the unmarked final carrier recipe. Correct marked forms are uī/uí/uǐ/uì and map to wei1..4; ūi/úi/ǔi/ùi are rejected.",
+    "neutralToneBoundary": "bo maps only to bo5 in the fixed luó bo probe. The exact full source luó bo uses the Garden3 request representation sub alias 萝卜 followed by one Chinese full stop; all other source text keeps the v1 request. This is only a provider request representation and does not establish the second tone or neutral tone. Both must be verified by user listening before formal use.",
+    "pictureWordBoundary": "Registered picture/category tokens cover luó bo, bái cài, yā lí, xī guā, shū cài and shuǐ guǒ. Chinese words remain natural Chinese unless the frozen narration uses these exact pinyin tokens.",
+    "probeSuccessDoesNotProve": "all 21 textbook whole syllables, unprobed picture-word tokens, complete formal sentence fidelity, or publication readiness; every formal Latin-bearing segment still requires full human listening and ASR cannot establish tone or neutral-tone accuracy.",
+    "scopeBoundary": "Version 4 changes only the exact full-source luó bo provider request from the version 3 multi-character phoneme form to the Garden3 sub alias representation. Versions 1 through 3 remain registered for recovery, and no other request, token recipe or approval state changes."
+  },
+  "exactTextSsml": {
+    "luó bo": "<speak><sub alias=\"萝卜\">luó bo</sub>。</speak>"
+  }
+}

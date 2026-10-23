@@ -1,0 +1,165 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -49,6 +49,7 @@ import { cn } from '@/lib/utils';
+ import { ChatArea, type ChatAreaRef } from '@/components/chat/chat-area';
+ import type { SessionCleanupPayload } from '@/components/chat/use-chat-sessions';
+ import { agentsToParticipants, useAgentRegistry } from '@/lib/orchestration/registry/store';
++import { ACTIVITY_AUDIO_EVENT, setLectureSpeaking } from '@/lib/mira/lecture-audio';
+ import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import {
+   AlertDialog,
+@@ -340,8 +341,11 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+       // Native textbook cues share the classroom sound channel with the lecture.
+       // Pause narration on an explicit listen gesture; discussion remains available.
+       const pauseForActivity = () => engineRef.current?.pause();
+-      window.addEventListener('mira:textbook-play-audio', pauseForActivity);
+-      return () => window.removeEventListener('mira:textbook-play-audio', pauseForActivity);
++      window.addEventListener(ACTIVITY_AUDIO_EVENT, pauseForActivity);
++      return () => {
++        window.removeEventListener(ACTIVITY_AUDIO_EVENT, pauseForActivity);
++        setLectureSpeaking(false);
++      };
+     }, []);
+     const audioPlayerRef = useRef(createAudioPlayer());
+     const chatAreaRef = useRef<ChatAreaRef>(null);
+@@ -854,6 +858,8 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+           requireScriptedDiscussions: studentMode,
+           onModeChange: (mode) => {
+             setEngineMode(mode);
++            // Interactive pages keep their own teacher lines quiet meanwhile.
++            setLectureSpeaking(mode === 'playing' || mode === 'live');
+           },
+           onProgress: (snapshot) => {
+             // Identity guard: a superseded engine (scene switch during an
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -15,6 +15,12 @@ import {
+   fitGenUiViewport,
+ } from '@/lib/interactive/logical-viewport';
+ import { activityViewportMode } from '@/lib/interactive/activity-viewport';
++import {
++  ACTIVITY_AUDIO_EVENT,
++  LECTURE_AUDIO_EVENT,
++  isLectureSpeaking,
++  pageNarrationAllowed,
++} from '@/lib/mira/lecture-audio';
+ import { intersectClientBoxes } from '@/lib/edit/visible-client-rect';
+ import { useCanvasStore } from '@/lib/store/canvas';
+ import { useElementRefsStore } from '@/lib/store/element-refs';
+@@ -293,16 +299,36 @@ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+     visibleViewport.height > 0 &&
+     rect.width > 0 &&
+     rect.height > 0;
++  // The page's own teacher lines wait while the lecture or a discussion speaks.
++  const [lectureSpeaking, setLectureSpeaking] = useState(isLectureSpeaking);
++  useEffect(() => {
++    const onLecture = () => setLectureSpeaking(isLectureSpeaking());
++    window.addEventListener(LECTURE_AUDIO_EVENT, onLecture);
++    return () => window.removeEventListener(LECTURE_AUDIO_EVENT, onLecture);
++  }, []);
++  const narrationAllowed = pageNarrationAllowed(shown, lectureSpeaking);
++  // A tap inside the page moves focus into the frame: pause the lecture so the
++  // child hears the answer to what they did. The play control resumes it.
++  useEffect(() => {
++    const onBlur = () =>
++      setTimeout(() => {
++        if (document.activeElement === iframeRef.current) {
++          window.dispatchEvent(new Event(ACTIVITY_AUDIO_EVENT));
++        }
++      }, 0);
++    window.addEventListener('blur', onBlur);
++    return () => window.removeEventListener('blur', onBlur);
++  }, []);
+   // Keep-alive documents keep running while CSS-hidden. Notify the prerecorded
+   // narration bridge before paint so outgoing audio stops on a scene switch.
+   // Legacy activities simply ignore this additive message. Sandbox null origins
+   // require '*'; the receiver accepts visibility only from its parent window.
+   useLayoutEffect(() => {
+     iframeRef.current?.contentWindow?.postMessage(
+-      { type: 'MIRA_NARRATION_VISIBILITY', visible: shown },
++      { type: 'MIRA_NARRATION_VISIBILITY', visible: narrationAllowed },
+       '*',
+     );
+-  }, [shown, entry.srcDoc, entry.src]);
++  }, [narrationAllowed, entry.srcDoc, entry.src]);
+   const wrapStyle: CSSProperties = {
+     position: 'fixed',
+     left: visibleViewport?.left ?? 0,
+@@ -334,7 +360,7 @@ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+         src={entry.srcDoc ? undefined : entry.src}
+         onLoad={() =>
+           iframeRef.current?.contentWindow?.postMessage(
+-            { type: 'MIRA_NARRATION_VISIBILITY', visible: shown },
++            { type: 'MIRA_NARRATION_VISIBILITY', visible: narrationAllowed },
+             '*',
+           )
+         }
+diff --git a/lib/mira/lecture-audio.ts b/lib/mira/lecture-audio.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/lecture-audio.ts
+@@ -0,0 +1,26 @@
++/**
++ * Whether the classroom lecture (or a discussion) is speaking. Interactive
++ * pages carry their own recorded teacher lines; they stay quiet while the
++ * lecture speaks, and a tap inside a page pauses the lecture so the child
++ * hears the answer to what they did.
++ */
++export const LECTURE_AUDIO_EVENT = 'mira:lecture-audio';
++/** Existing pause request shared with native textbook activities. */
++export const ACTIVITY_AUDIO_EVENT = 'mira:textbook-play-audio';
++
++let speaking = false;
++
++export function isLectureSpeaking(): boolean {
++  return speaking;
++}
++
++export function setLectureSpeaking(value: boolean): void {
++  if (speaking === value) return;
++  speaking = value;
++  window.dispatchEvent(new CustomEvent(LECTURE_AUDIO_EVENT, { detail: { speaking } }));
++}
++
++/** A page may speak only while it is on screen and the lecture is silent. */
++export function pageNarrationAllowed(shown: boolean, lectureSpeaking: boolean): boolean {
++  return shown && !lectureSpeaking;
++}
+diff --git a/tests/scene-renderers/interactive-lecture-audio.test.ts b/tests/scene-renderers/interactive-lecture-audio.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/interactive-lecture-audio.test.ts
+@@ -0,0 +1,31 @@
++// @vitest-environment jsdom
++import { afterEach, describe, expect, it } from 'vitest';
++import {
++  LECTURE_AUDIO_EVENT,
++  isLectureSpeaking,
++  pageNarrationAllowed,
++  setLectureSpeaking,
++} from '@/lib/mira/lecture-audio';
++
++describe('interactive page lines and the lecture', () => {
++  afterEach(() => setLectureSpeaking(false));
++
++  it('lets a page speak only while it is shown and the lecture is silent', () => {
++    expect(pageNarrationAllowed(true, false)).toBe(true);
++    expect(pageNarrationAllowed(true, true)).toBe(false);
++    expect(pageNarrationAllowed(false, false)).toBe(false);
++  });
++
++  it('announces each change of the lecture once', () => {
++    const seen: boolean[] = [];
++    const listener = (event: Event) =>
++      seen.push((event as CustomEvent<{ speaking: boolean }>).detail.speaking);
++    window.addEventListener(LECTURE_AUDIO_EVENT, listener);
++    setLectureSpeaking(true);
++    setLectureSpeaking(true);
++    setLectureSpeaking(false);
++    window.removeEventListener(LECTURE_AUDIO_EVENT, listener);
++    expect(seen).toEqual([true, false]);
++    expect(isLectureSpeaking()).toBe(false);
++  });
++});

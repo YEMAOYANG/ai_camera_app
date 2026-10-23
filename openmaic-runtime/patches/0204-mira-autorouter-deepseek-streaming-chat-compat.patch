@@ -1,0 +1,614 @@
+diff --git a/lib/ai/providers.ts b/lib/ai/providers.ts
+--- a/lib/ai/providers.ts
++++ b/lib/ai/providers.ts
+@@ -26,7 +26,11 @@
+  * - https://platform.xiaomimimo.com/static/docs/tokenplan/quick-access.md
+  */
+ 
+-import { adaptDeepSeekRequest, adaptDeepSeekJsonSchema } from './deepseek-service';
++import {
++  adaptDeepSeekRequest,
++  adaptDeepSeekJsonSchema,
++  isAutoRouterDeepSeekEndpoint,
++} from './deepseek-service';
+ import { createOpenAI } from '@ai-sdk/openai';
+ import { createAzure } from '@ai-sdk/azure';
+ import { createAnthropic } from '@ai-sdk/anthropic';
+@@ -1886,9 +1890,10 @@
+ 
+ function shouldUseOpenAIStreamingChatCompat(providerId: ProviderId, baseUrl?: string): boolean {
+   return (
+-    providerId === 'openai' &&
+-    usesCustomOpenAIBaseUrl(baseUrl) &&
+-    process.env.OPENAI_COMPAT_USE_STREAMING_CHAT === 'true'
++    (providerId === 'deepseek' && !!baseUrl && isAutoRouterDeepSeekEndpoint(baseUrl)) ||
++    (providerId === 'openai' &&
++      usesCustomOpenAIBaseUrl(baseUrl) &&
++      process.env.OPENAI_COMPAT_USE_STREAMING_CHAT === 'true')
+   );
+ }
+ 
+@@ -1929,9 +1934,52 @@
+   return Number.isInteger(status) && status >= 400 && status <= 599 ? status : 500;
+ }
+ 
++/** Keep cancellation attached while a non-streaming SDK call consumes an SSE body. */
++async function readAutoRouterChatStream(response: Response, signal?: AbortSignal | null): Promise<string> {
++  signal?.throwIfAborted();
++  if (!response.body) throw new Error('AUTOROUTER_SSE_INCOMPLETE: missing response body');
++  const reader = response.body.getReader();
++  const decoder = new TextDecoder('utf-8', { fatal: true });
++  let text = '';
++  let ended = false;
++  const cancel = () => { void reader.cancel(signal?.reason).catch(() => undefined); };
++  signal?.addEventListener('abort', cancel, { once: true });
++  try {
++    signal?.throwIfAborted();
++    while (true) {
++      const chunk = await reader.read();
++      signal?.throwIfAborted();
++      if (chunk.done) { ended = true; break; }
++      text += decoder.decode(chunk.value, { stream: true });
++    }
++    return text + decoder.decode();
++  } finally {
++    signal?.removeEventListener('abort', cancel);
++    if (!ended) cancel();
++    reader.releaseLock();
++  }
++}
++
++function autoRouterChatEvents(raw: string): string[] {
++  const events: string[] = [];
++  let data: string[] = [];
++  for (const line of raw.split(/\r\n|\r|\n/)) {
++    if (line === '') {
++      if (data.length) events.push(data.join('\n'));
++      data = [];
++    } else if (line === 'data' || line.startsWith('data:')) {
++      data.push(line === 'data' ? '' : line.slice(5).replace(/^ /, ''));
++    }
++  }
++  // A final event without its blank separator still has to pass the full terminal checks.
++  if (data.length) events.push(data.join('\n'));
++  return events;
++}
++
+ async function fetchCustomOpenAIChat(
+   input: RequestInfo | URL,
+   init?: RequestInit,
++  strictAutoRouter = false,
+ ): Promise<Response> {
+   const requestUrl = requestUrlString(input);
+   if (!requestUrl.includes('/chat/completions') || !init?.body || typeof init.body !== 'string') {
+@@ -1964,9 +2012,13 @@
+   });
+   if (!response.ok) return response;
+ 
+-  const rawStream = await response.text();
++  const rawStream = strictAutoRouter
++    ? await readAutoRouterChatStream(response, init?.signal)
++    : await response.text();
+   const streamLines = rawStream.split(/\r?\n/);
+-  if (!streamLines.some((line) => line.startsWith('data:'))) {
++  const strictEvents = strictAutoRouter ? autoRouterChatEvents(rawStream) : undefined;
++  if (strictEvents ? !strictEvents.length : !streamLines.some((line) => line.startsWith('data:'))) {
++    if (strictAutoRouter) throw new Error('AUTOROUTER_SSE_INCOMPLETE: missing data events');
+     const headers = new Headers(response.headers);
+     headers.delete('content-length');
+     headers.delete('content-encoding');
+@@ -1981,20 +2033,31 @@
+   let created = 0;
+   let model = typeof requestBody.model === 'string' ? requestBody.model : '';
+   let content = '';
++  let reasoningContent = '';
+   let finishReason: unknown = null;
++  let sawDone = false;
++  let sawChoice = false;
+   let usage: unknown;
+   const toolCalls = new Map<
+     number,
+     { id: string; type: string; function: { name: string; arguments: string } }
+   >();
+ 
+-  for (const line of streamLines) {
++  const eventLines = strictAutoRouter
++    ? strictEvents!.map((data) => `data:${data}`)
++    : streamLines;
++  for (const line of eventLines) {
+     if (!line.startsWith('data:')) continue;
+     const data = line.slice(5).trim();
+-    if (!data || data === '[DONE]') continue;
++    if (!data) continue;
++    if (strictAutoRouter && sawDone) throw new Error('AUTOROUTER_SSE_INVALID: data after terminal event');
++    if (data === '[DONE]') { sawDone = true; continue; }
+ 
+     try {
+       const chunk = JSON.parse(data) as Record<string, unknown>;
++      if (strictAutoRouter && (!chunk || typeof chunk !== 'object' || Array.isArray(chunk))) {
++        throw new Error('AUTOROUTER_SSE_INVALID: expected a chunk object');
++      }
+       const error =
+         chunk.error && typeof chunk.error === 'object' && !Array.isArray(chunk.error)
+           ? (chunk.error as Record<string, unknown>)
+@@ -2005,6 +2068,9 @@
+           headers: openAIJsonResponseHeaders(response),
+         });
+       }
++      if (strictAutoRouter && chunk.error != null) {
++        throw new Error('AUTOROUTER_SSE_INVALID: upstream error event');
++      }
+ 
+       if (typeof chunk.id === 'string') id = chunk.id;
+       if (typeof chunk.created === 'number') created = chunk.created;
+@@ -2016,10 +2082,12 @@
+         if (!rawChoice || typeof rawChoice !== 'object') continue;
+         const choice = rawChoice as Record<string, unknown>;
+         if (typeof choice.index === 'number' && choice.index !== 0) continue;
++        sawChoice = true;
+         if (choice.finish_reason) finishReason = choice.finish_reason;
+         if (!choice.delta || typeof choice.delta !== 'object') continue;
+         const delta = choice.delta as Record<string, unknown>;
+         content += appendChatDelta(delta.content);
++        if (strictAutoRouter) reasoningContent += appendChatDelta(delta.reasoning_content);
+ 
+         if (!Array.isArray(delta.tool_calls)) continue;
+         for (const rawToolCall of delta.tool_calls) {
+@@ -2041,12 +2109,19 @@
+           toolCalls.set(index, current);
+         }
+       }
+-    } catch {
++    } catch (error) {
++      if (strictAutoRouter) {
++        throw new Error('AUTOROUTER_SSE_INVALID: malformed data event', { cause: error });
++      }
+       // Ignore non-JSON SSE lines and continue collecting valid chunks.
+     }
+   }
+ 
++  if (strictAutoRouter && (!sawDone || !sawChoice || typeof finishReason !== 'string' || !finishReason)) {
++    throw new Error('AUTOROUTER_SSE_INCOMPLETE: missing choice, finish reason or terminal event');
++  }
+   const message: Record<string, unknown> = { role: 'assistant', content };
++  if (strictAutoRouter && reasoningContent) message.reasoning_content = reasoningContent;
+   if (toolCalls.size > 0) {
+     message.tool_calls = [...toolCalls.entries()]
+       .sort(([a], [b]) => a - b)
+@@ -2130,6 +2205,10 @@
+         config.providerId,
+         effectiveBaseUrl,
+       );
++      const strictAutoRouterStreamingChatCompat =
++        config.providerId === 'deepseek' &&
++        !!effectiveBaseUrl &&
++        isAutoRouterDeepSeekEndpoint(effectiveBaseUrl);
+       const openaiOptions: Parameters<typeof createOpenAI>[0] = {
+         apiKey: effectiveApiKey,
+         baseURL: effectiveBaseUrl,
+@@ -2208,7 +2287,7 @@
+             };
+           }
+           const response = useStreamingChatCompat
+-            ? await fetchCustomOpenAIChat(url, init)
++            ? await fetchCustomOpenAIChat(url, init, strictAutoRouterStreamingChatCompat)
+             : await globalThis.fetch(url, init);
+ 
+           // Recover reasoning that @ai-sdk/openai's chat schema drops: rewrite
+@@ -2225,7 +2304,8 @@
+           }
+           const normalizedReasoningResponse = streaming
+             ? wrapResponseWithReasoning(response)
+-            : providerId === 'kimi' && config.modelId === 'kimi-k3'
++            : strictAutoRouterStreamingChatCompat ||
++                (providerId === 'kimi' && config.modelId === 'kimi-k3')
+               ? await wrapJsonResponseWithReasoning(response)
+               : response;
+ 
+diff --git a/tests/ai/openai-sdk-integration.test.ts b/tests/ai/openai-sdk-integration.test.ts
+--- a/tests/ai/openai-sdk-integration.test.ts
++++ b/tests/ai/openai-sdk-integration.test.ts
+@@ -1,6 +1,6 @@
+ import { createOpenAI } from '@ai-sdk/openai';
+ import { generateText, stepCountIs, streamText, tool } from 'ai';
+-import { describe, expect, it, vi } from 'vitest';
++import { afterEach, describe, expect, it, vi } from 'vitest';
+ import { z } from 'zod';
+ 
+ import { resolveThinkingProviderOptions, streamLLM } from '@/lib/ai/llm';
+@@ -308,3 +308,312 @@
+     }
+   });
+ });
++
++describe('AutoRouter DeepSeek non-streaming SSE compatibility', () => {
++  afterEach(() => {
++    vi.unstubAllGlobals();
++    vi.unstubAllEnvs();
++  });
++
++  const endpoint = 'https://api.autorouter.top/v1';
++  const chunk = (delta: Record<string, unknown>, finish: string | null = null) => ({
++    id: 'chatcmpl-router',
++    object: 'chat.completion.chunk',
++    created: 123,
++    model: 'deepseek-v4.1-flash',
++    choices: [{ index: 0, delta, finish_reason: finish }],
++  });
++  const frame = (value: unknown) => `data: ${JSON.stringify(value)}\n\n`;
++  const sse = (body: string) =>
++    new Response(body, { headers: { 'content-type': 'text/event-stream' } });
++  const modelAt = (baseUrl = endpoint) =>
++    getModel({
++      providerId: 'deepseek',
++      modelId: 'deepseek-flash',
++      apiKey: 'sk-test',
++      baseUrl,
++    }).model;
++
++  it('returns complete SDK text, reasoning, usage and actual response identity without the OpenAI toggle', async () => {
++    vi.stubEnv('OPENAI_COMPAT_USE_STREAMING_CHAT', 'false');
++    const fetchMock = vi.fn(async (_url: RequestInfo | URL, _init?: RequestInit) =>
++      sse(
++        frame(chunk({ reasoning_content: 'Inspect ' })) +
++          frame(chunk({ reasoning_content: 'the picture.' })) +
++          frame(chunk({ content: 'Complete answer.' })) +
++          frame(chunk({}, 'stop')) +
++          frame({
++            choices: [],
++            usage: {
++              prompt_tokens: 11,
++              completion_tokens: 7,
++              total_tokens: 18,
++              completion_tokens_details: { reasoning_tokens: 4 },
++            },
++          }) +
++          'data: [DONE]\n\n',
++      ),
++    );
++    vi.stubGlobal('fetch', fetchMock);
++    const result = await generateText({ model: modelAt(), prompt: 'Inspect', maxRetries: 0 });
++    expect(result.text).toBe('Complete answer.');
++    expect(result.reasoningText).toBe('Inspect the picture.');
++    expect(result.usage).toMatchObject({ inputTokens: 11, outputTokens: 7, totalTokens: 18 });
++    expect(result.response).toMatchObject({
++      id: 'chatcmpl-router',
++      modelId: 'deepseek-v4.1-flash',
++    });
++    expect(result.response.timestamp.getTime()).toBe(123000);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toMatchObject({
++      model: 'deepseek-v4.1-flash',
++      stream: true,
++      stream_options: { include_usage: true },
++    });
++  });
++
++  it('preserves split tool calls and reasoning for the SDK automatic continuation', async () => {
++    const bodies: Array<Record<string, unknown>> = [];
++    const fetchMock = vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
++      bodies.push(JSON.parse(String(init?.body)));
++      if (bodies.length === 1)
++        return sse(
++          frame(chunk({ reasoning_content: 'Use the lookup.' })) +
++            frame(
++              chunk({
++                tool_calls: [
++                  {
++                    index: 0,
++                    id: 'lookup-1',
++                    type: 'function',
++                    function: { name: 'lookup', arguments: '{"value":' },
++                  },
++                ],
++              }),
++            ) +
++            frame(
++              chunk({ tool_calls: [{ index: 0, function: { arguments: '4}' } }] }, 'tool_calls'),
++            ) +
++            'data: [DONE]\n\n',
++        );
++      return sse(frame(chunk({ content: 'Four.' }, 'stop')) + 'data: [DONE]\n\n');
++    });
++    vi.stubGlobal('fetch', fetchMock);
++    const execute = vi.fn(async ({ value }: { value: number }) => ({ value }));
++    const result = await generateText({
++      model: modelAt(),
++      prompt: 'Look up four',
++      maxRetries: 0,
++      stopWhen: stepCountIs(2),
++      tools: { lookup: tool({ inputSchema: z.object({ value: z.number() }), execute }) },
++    });
++    expect(result.text).toBe('Four.');
++    expect(result.steps[0].toolCalls[0]).toMatchObject({
++      toolCallId: 'lookup-1',
++      toolName: 'lookup',
++      input: { value: 4 },
++    });
++    expect(execute).toHaveBeenCalledTimes(1);
++    expect(fetchMock).toHaveBeenCalledTimes(2);
++    expect(bodies[1].messages).toContainEqual(
++      expect.objectContaining({
++        role: 'assistant',
++        reasoning_content: 'Use the lookup.',
++        tool_calls: [
++          expect.objectContaining({
++            id: 'lookup-1',
++            function: { name: 'lookup', arguments: '{"value":4}' },
++          }),
++        ],
++      }),
++    );
++  });
++
++  it('keeps a parent streaming call live instead of collecting it to JSON', async () => {
++    let wire: RequestInit | undefined;
++    let streamController: ReadableStreamDefaultController<Uint8Array> | undefined;
++    vi.stubGlobal(
++      'fetch',
++      vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
++        wire = init;
++        return new Response(
++          new ReadableStream<Uint8Array>({
++            start(controller) {
++              streamController = controller;
++              controller.enqueue(
++                new TextEncoder().encode(frame(chunk({ content: 'First fragment' }))),
++              );
++            },
++          }),
++          { headers: { 'content-type': 'text/event-stream' } },
++        );
++      }),
++    );
++    const result = streamText({ model: modelAt(), prompt: 'Inspect', maxRetries: 0 });
++    const iterator = result.textStream[Symbol.asyncIterator]();
++    expect(await iterator.next()).toEqual({ value: 'First fragment', done: false });
++    expect(JSON.parse(String(wire?.body)).stream).toBe(true);
++    streamController!.enqueue(
++      new TextEncoder().encode(frame(chunk({}, 'stop')) + 'data: [DONE]\n\n'),
++    );
++    streamController!.close();
++    expect((await iterator.next()).done).toBe(true);
++  });
++
++  it('leaves official DeepSeek non-streaming requests unchanged', async () => {
++    let body: Record<string, unknown> | undefined;
++    vi.stubGlobal(
++      'fetch',
++      vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
++        body = JSON.parse(String(init?.body));
++        return new Response(
++          JSON.stringify({
++            id: 'official',
++            object: 'chat.completion',
++            created: 1,
++            model: 'deepseek-flash',
++            choices: [
++              {
++                index: 0,
++                message: { role: 'assistant', content: 'Original.' },
++                finish_reason: 'stop',
++              },
++            ],
++            usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
++          }),
++          { headers: { 'content-type': 'application/json' } },
++        );
++      }),
++    );
++    expect(
++      (
++        await generateText({
++          model: modelAt('https://api.deepseek.com/v1'),
++          prompt: 'Hi',
++          maxRetries: 0,
++        })
++      ).text,
++    ).toBe('Original.');
++    expect(body?.stream).not.toBe(true);
++  });
++
++  it('does not tighten the existing opt-in OpenAI collector', async () => {
++    vi.stubEnv('OPENAI_COMPAT_USE_STREAMING_CHAT', 'true');
++    const fetchMock = vi.fn(async () => sse(frame(chunk({ content: 'Legacy.' }))));
++    vi.stubGlobal('fetch', fetchMock);
++    const { model } = getModel({
++      providerId: 'openai',
++      modelId: 'gpt-5.6-sol',
++      apiKey: 'sk-test',
++      baseUrl: 'https://relay.example/v1',
++    });
++    expect((await generateText({ model, prompt: 'Hi', maxRetries: 0 })).text).toBe('Legacy.');
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++  });
++
++  it.each([
++    ['missing terminal event', frame(chunk({ content: 'Partial.' }, 'stop'))],
++    ['missing finish reason', frame(chunk({ content: 'Partial.' })) + 'data: [DONE]\n\n'],
++    [
++      'malformed JSON',
++      frame(chunk({ content: 'Partial.' }, 'stop')) + 'data: {"broken":\n\ndata: [DONE]\n\n',
++    ],
++    ['no choice', frame({ usage: { total_tokens: 1 } }) + 'data: [DONE]\n\n'],
++    [
++      'data after terminal',
++      frame(chunk({ content: 'Partial.' }, 'stop')) +
++        'data: [DONE]\n\n' +
++        frame(chunk({ content: 'extra' })),
++    ],
++    ['non SSE body', '{"partial":true}'],
++  ])('rejects %s without returning partial output or retrying', async (_name, body) => {
++    const fetchMock = vi.fn(async () => sse(body));
++    vi.stubGlobal('fetch', fetchMock);
++    await expect(generateText({ model: modelAt(), prompt: 'Hi', maxRetries: 0 })).rejects.toThrow(
++      /AUTOROUTER_SSE_/,
++    );
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++  });
++
++  it('propagates an SSE error after partial content without retry or partial success', async () => {
++    const fetchMock = vi.fn(async () =>
++      sse(
++        frame(chunk({ content: 'Partial.' })) +
++          frame({ error: { code: 429, message: 'quota unavailable' } }) +
++          'data: [DONE]\n\n',
++      ),
++    );
++    vi.stubGlobal('fetch', fetchMock);
++    await expect(
++      generateText({ model: modelAt(), prompt: 'Hi', maxRetries: 0 }),
++    ).rejects.toMatchObject({
++      name: 'AI_APICallError',
++      statusCode: 429,
++      message: 'quota unavailable',
++    });
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++  });
++
++  it.each([{}, { code: 500 }, 'provider failed'])(
++    'rejects a non-null error field without a message: %j',
++    async (error) => {
++      const fetchMock = vi.fn(async () =>
++        sse(frame({ ...chunk({ content: 'Partial.' }, 'stop'), error }) + 'data: [DONE]\n\n'),
++      );
++      vi.stubGlobal('fetch', fetchMock);
++      await expect(generateText({ model: modelAt(), prompt: 'Hi', maxRetries: 0 })).rejects.toThrow(
++        /AUTOROUTER_SSE_INVALID/,
++      );
++      expect(fetchMock).toHaveBeenCalledTimes(1);
++    },
++  );
++
++  it('cancels the response body after headers when the original signal aborts', async () => {
++    const abort = new AbortController();
++    let signal: AbortSignal | null | undefined;
++    let headersReady!: () => void;
++    const ready = new Promise<void>((resolve) => {
++      headersReady = resolve;
++    });
++    const cancelled = vi.fn();
++    const fetchMock = vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
++      signal = init?.signal;
++      const response = new Response(
++        new ReadableStream<Uint8Array>({
++          start(controller) {
++            controller.enqueue(new TextEncoder().encode(frame(chunk({ content: 'Partial.' }))));
++          },
++          cancel: cancelled,
++        }),
++        { headers: { 'content-type': 'text/event-stream' } },
++      );
++      headersReady();
++      return response;
++    });
++    vi.stubGlobal('fetch', fetchMock);
++    const pending = generateText({
++      model: modelAt(),
++      prompt: 'Hi',
++      maxRetries: 0,
++      abortSignal: abort.signal,
++    });
++    const rejected = expect(pending).rejects.toMatchObject({ name: 'AbortError' });
++    await ready;
++    await new Promise((resolve) => setTimeout(resolve, 0));
++    abort.abort();
++    await rejected;
++    expect(signal?.aborted).toBe(true);
++    expect(cancelled).toHaveBeenCalledTimes(1);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++  });
++
++  it('preserves length termination for the existing formal truncation archive', async () => {
++    vi.stubGlobal(
++      'fetch',
++      vi.fn(async () => sse(frame(chunk({ content: 'Limited' }, 'length')) + 'data: [DONE]\n\n')),
++    );
++    const result = await generateText({ model: modelAt(), prompt: 'Hi', maxRetries: 0 });
++    expect(result.finishReason).toBe('length');
++    expect(result.text).toBe('Limited');
++  });
++});
+diff --git a/tests/server/mira-authoring-provider.test.ts b/tests/server/mira-authoring-provider.test.ts
+--- a/tests/server/mira-authoring-provider.test.ts
++++ b/tests/server/mira-authoring-provider.test.ts
+@@ -66,23 +66,62 @@
+     expect(other.apiKey).toBe('official-test-only');
+     expect(getModelTransportIdentity(other.model)).toBeUndefined();
+   });
+-  it.each(['deepseek-v4-pro', 'deepseek-flash'])('uses the actual AI SDK request path for %s without network I/O', async modelId => {
+-    const calls: Array<{ url: string; key: string | null; body: any }> = [];
+-    vi.stubGlobal('fetch', vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
+-      const body = JSON.parse(String(init?.body));
+-      calls.push({ url: String(url), key: new Headers(init?.headers).get('authorization'), body });
+-      return new Response(JSON.stringify({ id: 'test-response', object: 'chat.completion', created: 1,
+-        model: body.model, choices: [{ index: 0, message: { role: 'assistant', content: 'ok' }, finish_reason: 'stop' }],
+-        usage: { prompt_tokens: 12, completion_tokens: 3, total_tokens: 15, prompt_tokens_details: { cached_tokens: 4 } } }),
+-      { headers: { 'Content-Type': 'application/json' } });
+-    }));
+-    const connection = await resolveModel({ modelString: `deepseek:${modelId}`, scope: 'courseware-authoring' });
+-    const result = await generateText({ model: connection.model, prompt: 'fixture', maxRetries: 0 });
+-    expect(result.text).toBe('ok'); expect(calls).toHaveLength(1);
+-    expect(calls[0]).toMatchObject({ url: 'https://api.autorouter.top/v1/chat/completions', key: 'Bearer autorouter-test-only',
+-      body: { model: modelId === 'deepseek-flash' ? 'deepseek-v4.1-flash' : modelId } });
+-    expect(result.response.modelId).toBe(calls[0].body.model);
+-  });
++  it.each(['deepseek-v4-pro', 'deepseek-flash'])(
++    'uses the actual AI SDK request path for %s without network I/O',
++    async (modelId) => {
++      const calls: Array<{ url: string; key: string | null; body: any }> = [];
++      vi.stubGlobal(
++        'fetch',
++        vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
++          const body = JSON.parse(String(init?.body));
++          calls.push({
++            url: String(url),
++            key: new Headers(init?.headers).get('authorization'),
++            body,
++          });
++          return new Response(
++            `data: ${JSON.stringify({
++              id: 'test-response',
++              object: 'chat.completion.chunk',
++              created: 1,
++              model: body.model,
++              choices: [
++                { index: 0, delta: { role: 'assistant', content: 'ok' }, finish_reason: 'stop' },
++              ],
++              usage: {
++                prompt_tokens: 12,
++                completion_tokens: 3,
++                total_tokens: 15,
++                prompt_tokens_details: { cached_tokens: 4 },
++              },
++            })}\n\ndata: [DONE]\n\n`,
++            { headers: { 'Content-Type': 'text/event-stream' } },
++          );
++        }),
++      );
++      const connection = await resolveModel({
++        modelString: `deepseek:${modelId}`,
++        scope: 'courseware-authoring',
++      });
++      const result = await generateText({
++        model: connection.model,
++        prompt: 'fixture',
++        maxRetries: 0,
++      });
++      expect(result.text).toBe('ok');
++      expect(calls).toHaveLength(1);
++      expect(calls[0]).toMatchObject({
++        url: 'https://api.autorouter.top/v1/chat/completions',
++        key: 'Bearer autorouter-test-only',
++        body: {
++          model: modelId === 'deepseek-flash' ? 'deepseek-v4.1-flash' : modelId,
++          stream: true,
++          stream_options: { include_usage: true },
++        },
++      });
++      expect(result.response.modelId).toBe(calls[0].body.model);
++    },
++  );
+   it('retains actual supply identity across wrappers and persistent usage rows', async () => {
+     const connection = await resolveModel({ modelString: 'deepseek:deepseek-flash', scope: 'courseware-authoring' });
+     const wrapper = {}; copyModelTransportIdentity(connection.model, wrapper);

@@ -1,0 +1,786 @@
+diff --git a/lib/server/mira-textbook-current-review-revision.ts b/lib/server/mira-textbook-current-review-revision.ts
+new file mode 100644
+index 0000000..08c53b0
+--- /dev/null
++++ b/lib/server/mira-textbook-current-review-revision.ts
+@@ -0,0 +1,646 @@
++/**
++ * Explicit, bounded review revision for an already-complete textbook candidate.
++ *
++ * This operator has no HTTP entry point and never calls a model, TTS, ASR,
++ * publication, or runtime restart.  It changes only explicitly fenced speech
++ * text, tail-appended feedback speech, one complete interactive HTML field, or
++ * allowlisted slide geometry leaves.  The original candidate, document,
++ * affected scenes, and HTML are archived before the first public write.
++ */
++import { createHash, randomUUID } from 'node:crypto';
++import { constants, promises as fs } from 'node:fs';
++import path from 'node:path';
++import { validateScene } from '@openmaic/dsl';
++import { PgDocumentStore, type Queryable } from '@openmaic/storage/document/pg';
++import { validateAppStage } from '@/lib/document-store/validators';
++import { createOwnerBoundDocumentStore, type TransactionSource } from '@/lib/persistence/owner-bound-document-store';
++import { resolveRequestOwnerId } from './agent-runtime/owner';
++import type { CourseDocument, CourseStore } from './agent-runtime/course-tools';
++import { assertTextbookContract, assertTextbookScene, textbookCanonical, textbookDigest, textbookContractFromPrompt } from './mira-textbook-scene-contract';
++
++// The operator validates every externally supplied object before use. Dynamic
++// scene leaves stay intentionally JSON-shaped because the DSL is a tagged
++// union with element-specific fields.
++// eslint-disable-next-line @typescript-eslint/no-explicit-any
++type Json = Record<string, any>;
++const PLAN = 'mira.textbook.current-review-revision-plan.v1';
++const RECEIPT = 'mira.textbook.current-review-revision-receipt.v1';
++const VERIFY = 'static_review_only_not_play_audio_or_publication';
++const hash = (value: string | Buffer) => createHash('sha256').update(value).digest('hex');
++const check: (value: unknown, code: string) => asserts value = (value, code) => {
++  if (!value) throw new Error(`TEXTBOOK_CURRENT_REVIEW_REVISION_${code}`);
++};
++const object = (value: unknown): value is Json => !!value && typeof value === 'object' && !Array.isArray(value);
++const hex = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
++const keys = (value: unknown, fields: string[]) => object(value) && Object.keys(value).sort().join(',') === [...fields].sort().join(',');
++const encoded = (value: unknown) => Buffer.from(textbookCanonical(value) + '\n');
++const seal = (value: Json): Json => ({ ...value, sha256: textbookDigest(value) });
++function unseal(value: Json): Json {
++  const { sha256, ...body } = value;
++  check(hex(sha256) && textbookDigest(body) === sha256, 'SEAL');
++  return body;
++}
++
++export interface ReviewSpeechReplacement {
++  actionId: string;
++  expectedOldText: string;
++  replacementText: string;
++  reason: string;
++}
++export interface ReviewAppendedSpeechAction {
++  id: string;
++  type: 'speech';
++  text: string;
++  reason: string;
++}
++export interface ReviewHtmlReplacement {
++  expectedOldHtmlSha256: string;
++  newHtmlPath: string;
++  newHtmlSha256: string;
++  visibleDomChange: 'none' | 'add-explicit-check-button-v1';
++  reason: string;
++}
++export interface ReviewCanvasGeometryChange {
++  elementId: string;
++  field: 'left' | 'top' | 'width' | 'height';
++  expectedOldValue: number;
++  replacementValue: number;
++  reason: string;
++}
++export interface ReviewCanvasImageReplacement {
++  elementId: string;
++  expectedOldSrc: string;
++  replacementSrc: string;
++  reason: string;
++}
++export interface ReviewCanvasTextReplacement {
++  elementId: string;
++  expectedOldContent: string;
++  replacementContent: string;
++  reason: string;
++}
++export interface ReviewCanvasElementAppend {
++  element: Json;
++  reason: string;
++}
++export interface ReviewSceneRevision {
++  sceneId: string;
++  expectedSceneSha256: string;
++  reviewBasis: string;
++  speechTextReplacements: ReviewSpeechReplacement[];
++  appendedSpeechActions: ReviewAppendedSpeechAction[];
++  htmlReplacement: ReviewHtmlReplacement | null;
++  canvasGeometryChanges: ReviewCanvasGeometryChange[];
++  canvasImageReplacements: ReviewCanvasImageReplacement[];
++  canvasTextReplacements: ReviewCanvasTextReplacement[];
++  canvasElementAppends: ReviewCanvasElementAppend[];
++}
++export interface CurrentReviewRevisionInput {
++  jobDir: string;
++  stageId: string;
++  expectedDocumentSha256: string;
++  expectedCandidateSha256: string;
++  expectedCandidateFileSha256: string;
++  stateTransitionNotes: string[];
++  revisions: ReviewSceneRevision[];
++}
++export interface CurrentReviewRevisionEnvironment {
++  pool: TransactionSource;
++  dataDir: string;
++}
++
++async function read(file: string): Promise<Buffer> {
++  check(typeof file === 'string' && path.isAbsolute(file), 'ABSOLUTE_PATH');
++  const exact = path.resolve(file);
++  check(await fs.realpath(exact) === exact, 'SYMLINK');
++  const handle = await fs.open(exact, constants.O_RDONLY | constants.O_NOFOLLOW);
++  try {
++    const stat = await handle.stat();
++    check(stat.isFile() && stat.size <= 64 * 1024 * 1024, 'FILE_SIZE');
++    return await handle.readFile();
++  } finally {
++    await handle.close();
++  }
++}
++async function directory(dir: string) {
++  let current = path.parse(dir).root;
++  for (const part of dir.slice(current.length).split(path.sep)) {
++    current = path.join(current, part);
++    try {
++      await fs.mkdir(current, { mode: 0o700 });
++    } catch (error: unknown) {
++      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++    }
++    const stat = await fs.lstat(current);
++    check(stat.isDirectory() && !stat.isSymbolicLink(), 'DIRECTORY');
++  }
++}
++async function immutable(file: string, bytes: Buffer) {
++  await directory(path.dirname(file));
++  try {
++    const handle = await fs.open(file, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
++    try {
++      await handle.writeFile(bytes);
++      await handle.sync();
++    } finally {
++      await handle.close();
++    }
++  } catch (error: unknown) {
++    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
++    check((await read(file)).equals(bytes), 'IMMUTABLE_COLLISION');
++  }
++}
++
++const scriptBodyPattern = /(<script\b[^>]*>)[\s\S]*?(<\/script\s*>)/gi;
++const styleBodyPattern = /(<style\b[^>]*>)[\s\S]*?(<\/style\s*>)/gi;
++const mediaPattern = /\/api\/classroom-media\/[A-Za-z0-9_-]+\/media\/[A-Za-z0-9_.-]+\.(?:png|jpe?g|webp)/g;
++const jsonScript = (html: string, id: string): Json => {
++  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
++  const patterns = [
++    new RegExp(`<script\\b(?=[^>]*\\bid=["']${escaped}["'])[^>]*>([\\s\\S]*?)<\\/script\\s*>`, 'i'),
++    new RegExp(`<script\\b(?=[^>]*\\bid=${escaped}(?:\\s|>))[^>]*>([\\s\\S]*?)<\\/script\\s*>`, 'i'),
++  ];
++  const match = patterns.map(pattern => pattern.exec(html)).find(Boolean);
++  check(match, 'HTML_JSON_SCRIPT');
++  let parsed: unknown;
++  try {
++    parsed = JSON.parse(match![1]);
++  } catch {
++    check(false, 'HTML_JSON_SCRIPT');
++  }
++  check(object(parsed), 'HTML_JSON_SCRIPT');
++  return parsed;
++};
++const mediaSources = (html: string) => [...html.matchAll(mediaPattern)].map(match => match[0]).sort();
++const visibleSkeleton = (html: string) => html
++  .replace(styleBodyPattern, '$1$2')
++  .replace(scriptBodyPattern, '$1$2');
++const executableScripts = (html: string) => [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
++  .filter(match => !/\btype\s*=\s*["']application\/json["']/i.test(match[1]))
++  .map(match => match[2]).join('\n');
++
++export function inspectReviewHtml(before: string, after: string, speechTexts: string[], visibleDomChange: ReviewHtmlReplacement['visibleDomChange'] = 'none') {
++  check(before !== after, 'HTML_UNCHANGED');
++  check(textbookCanonical(mediaSources(after)) === textbookCanonical(mediaSources(before)), 'HTML_MEDIA_CHANGED');
++  const expectedCheckButton = '<button class="check-btn" id="checkSeatBtn" type="button" aria-label="检查当前座位">✓ 检查</button>';
++  if (visibleDomChange === 'none') check(visibleSkeleton(after) === visibleSkeleton(before), 'HTML_VISIBLE_DOM_CHANGED');
++  else {
++    check(visibleDomChange === 'add-explicit-check-button-v1' && visibleSkeleton(after).split(expectedCheckButton).length === 2, 'HTML_VISIBLE_DOM_CHANGED');
++    check(visibleSkeleton(after).replace(expectedCheckButton, '') === visibleSkeleton(before), 'HTML_VISIBLE_DOM_CHANGED');
++  }
++  const beforeWidget = jsonScript(before, 'widget-config');
++  const afterWidget = jsonScript(after, 'widget-config');
++  check(textbookCanonical(afterWidget) === textbookCanonical(beforeWidget), 'HTML_WIDGET_CHANGED');
++  const cueManifest = jsonScript(after, 'mira-narration-cues');
++  check(keys(cueManifest, ['schemaVersion', 'cues']) && cueManifest.schemaVersion === 'mira.interactive.narration-cues.v1' && Array.isArray(cueManifest.cues), 'HTML_CUES');
++  const cues = cueManifest.cues as Json[];
++  check(cues.every(cue => keys(cue, ['id', 'text']) && typeof cue.id === 'string' && cue.id.length > 0 && typeof cue.text === 'string' && cue.text.trim().length > 0), 'HTML_CUES');
++  check(new Set(cues.map(cue => cue.id)).size === cues.length && new Set(cues.map(cue => cue.text)).size === cues.length, 'HTML_CUE_DUPLICATE');
++  check(textbookCanonical([...new Set(cues.map(cue => cue.text))].sort()) === textbookCanonical([...new Set(speechTexts)].sort()), 'HTML_CUE_ACTION_MISMATCH');
++  const code = executableScripts(after);
++  check(!/(?:setTimeout\s*\(|speechSynthesis|new\s+Audio\s*\(|fetch\s*\(|XMLHttpRequest|WebSocket\s*\()/i.test(code), 'HTML_FORBIDDEN_RUNTIME');
++  check(/addEventListener\s*\(\s*['"]mira-narration-state['"]/.test(code), 'HTML_EVENT_GATE');
++  check(/(?:status|detail\.status)[\s\S]{0,80}(?:===|==)\s*['"]playing['"]/.test(code), 'HTML_PLAYING_GATE');
++  check(/(?:status|detail\.status)[\s\S]{0,80}(?:===|==)\s*['"]ready['"]/.test(code), 'HTML_READY_GATE');
++  check(/(?:cueId|detail\.cueId)/.test(code), 'HTML_CUE_ID_GATE');
++  check(/addEventListener\s*\(\s*['"]visibilitychange['"]/.test(code) && /addEventListener\s*\(\s*['"]pagehide['"]/.test(code), 'HTML_HIDDEN_RECOVERY');
++  check(/miraCancelNarration/.test(code) && /document\.hidden/.test(code), 'HTML_HIDDEN_RECOVERY');
++  check(/48px/.test(after), 'HTML_TOUCH_TARGET');
++  return {
++    beforeHtmlSha256: hash(before),
++    afterHtmlSha256: hash(after),
++    mediaSourcesSha256: textbookDigest(mediaSources(after)),
++    visibleSkeletonSha256: hash(visibleSkeleton(after)),
++    visibleDomChange,
++    widgetConfigSha256: textbookDigest(afterWidget),
++    cueManifestSha256: textbookDigest(cueManifest),
++    cueCount: cues.length,
++    uniqueSpeechCount: new Set(speechTexts).size,
++    narrationGate: 'matching_cue_playing_then_ready',
++    hiddenRecovery: 'visibilitychange_and_pagehide_cancel_then_explicit_replay',
++    minimumTouchTargetPx: 48,
++  };
++}
++
++function validateSpeechReplacement(value: unknown): asserts value is ReviewSpeechReplacement {
++  check(keys(value, ['actionId', 'expectedOldText', 'replacementText', 'reason']), 'SPEECH_REPLACEMENT');
++  const item = value as ReviewSpeechReplacement;
++  check(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(item.actionId) && item.expectedOldText.length > 0 && item.replacementText.length > 0 && item.expectedOldText !== item.replacementText && item.reason.trim().length > 0, 'SPEECH_REPLACEMENT');
++}
++function validateAppendedSpeech(value: unknown): asserts value is ReviewAppendedSpeechAction {
++  check(keys(value, ['id', 'type', 'text', 'reason']), 'APPENDED_SPEECH');
++  const item = value as ReviewAppendedSpeechAction;
++  check(item.type === 'speech' && /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(item.id) && item.text.trim().length > 0 && item.reason.trim().length > 0, 'APPENDED_SPEECH');
++}
++function validateGeometry(value: unknown): asserts value is ReviewCanvasGeometryChange {
++  check(keys(value, ['elementId', 'field', 'expectedOldValue', 'replacementValue', 'reason']), 'GEOMETRY');
++  const item = value as ReviewCanvasGeometryChange;
++  check(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(item.elementId) && ['left', 'top', 'width', 'height'].includes(item.field) && Number.isFinite(item.expectedOldValue) && Number.isFinite(item.replacementValue) && item.expectedOldValue !== item.replacementValue && item.replacementValue >= 0 && item.reason.trim().length > 0, 'GEOMETRY');
++}
++function validateImageReplacement(value: unknown): asserts value is ReviewCanvasImageReplacement {
++  check(keys(value, ['elementId', 'expectedOldSrc', 'replacementSrc', 'reason']), 'IMAGE_REPLACEMENT');
++  const item = value as ReviewCanvasImageReplacement;
++  check(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(item.elementId) && item.expectedOldSrc !== item.replacementSrc && item.expectedOldSrc.startsWith('/api/classroom-media/') && item.replacementSrc.startsWith('/api/classroom-media/') && item.reason.trim().length > 0, 'IMAGE_REPLACEMENT');
++}
++function validateTextReplacement(value: unknown): asserts value is ReviewCanvasTextReplacement {
++  check(keys(value, ['elementId', 'expectedOldContent', 'replacementContent', 'reason']), 'TEXT_REPLACEMENT');
++  const item = value as ReviewCanvasTextReplacement;
++  check(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(item.elementId) && item.expectedOldContent.length > 0 && item.replacementContent.length > 0 && item.expectedOldContent !== item.replacementContent && item.reason.trim().length > 0, 'TEXT_REPLACEMENT');
++}
++function validateElementAppend(value: unknown): asserts value is ReviewCanvasElementAppend {
++  check(keys(value, ['element', 'reason']) && object((value as ReviewCanvasElementAppend).element) && (value as ReviewCanvasElementAppend).reason.trim().length > 0, 'ELEMENT_APPEND');
++  const element = (value as ReviewCanvasElementAppend).element;
++  check(typeof element.id === 'string' && /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(element.id) && element.type === 'image' && typeof element.src === 'string' && element.src.startsWith('/api/classroom-media/'), 'ELEMENT_APPEND');
++}
++
++async function inputs(input: CurrentReviewRevisionInput, env: CurrentReviewRevisionEnvironment) {
++  check(keys(input, ['jobDir', 'stageId', 'expectedDocumentSha256', 'expectedCandidateSha256', 'expectedCandidateFileSha256', 'stateTransitionNotes', 'revisions']), 'INPUT');
++  check(path.isAbsolute(input.jobDir) && /^[A-Za-z0-9_-]{1,160}$/.test(input.stageId) && [input.expectedDocumentSha256, input.expectedCandidateSha256, input.expectedCandidateFileSha256].every(hex), 'INPUT_ID');
++  check(Array.isArray(input.stateTransitionNotes) && input.stateTransitionNotes.every(note => typeof note === 'string' && note.trim().length > 0 && note.length <= 4000), 'STATE_NOTES');
++  check(Array.isArray(input.revisions) && input.revisions.length > 0 && input.revisions.length <= 11 && new Set(input.revisions.map(revision => revision.sceneId)).size === input.revisions.length, 'REVISIONS');
++  const html = new Map<string, string>();
++  for (const revision of input.revisions) {
++    check(keys(revision, ['sceneId', 'expectedSceneSha256', 'reviewBasis', 'speechTextReplacements', 'appendedSpeechActions', 'htmlReplacement', 'canvasGeometryChanges', 'canvasImageReplacements', 'canvasTextReplacements', 'canvasElementAppends']), 'REVISION');
++    check(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(revision.sceneId) && hex(revision.expectedSceneSha256) && revision.reviewBasis.trim().length > 0, 'REVISION');
++    check(Array.isArray(revision.speechTextReplacements) && Array.isArray(revision.appendedSpeechActions) && Array.isArray(revision.canvasGeometryChanges) && Array.isArray(revision.canvasImageReplacements) && Array.isArray(revision.canvasTextReplacements) && Array.isArray(revision.canvasElementAppends), 'REVISION');
++    revision.speechTextReplacements.forEach(validateSpeechReplacement);
++    revision.appendedSpeechActions.forEach(validateAppendedSpeech);
++    revision.canvasGeometryChanges.forEach(validateGeometry);
++    revision.canvasImageReplacements.forEach(validateImageReplacement);
++    revision.canvasTextReplacements.forEach(validateTextReplacement);
++    revision.canvasElementAppends.forEach(validateElementAppend);
++    check(new Set(revision.speechTextReplacements.map(item => item.actionId)).size === revision.speechTextReplacements.length, 'DUPLICATE_ACTION');
++    check(new Set(revision.appendedSpeechActions.map(item => item.id)).size === revision.appendedSpeechActions.length, 'DUPLICATE_ACTION');
++    check(new Set(revision.canvasGeometryChanges.map(item => `${item.elementId}:${item.field}`)).size === revision.canvasGeometryChanges.length, 'DUPLICATE_GEOMETRY');
++    check(new Set(revision.canvasImageReplacements.map(item => item.elementId)).size === revision.canvasImageReplacements.length && new Set(revision.canvasTextReplacements.map(item => item.elementId)).size === revision.canvasTextReplacements.length && new Set(revision.canvasElementAppends.map(item => item.element.id)).size === revision.canvasElementAppends.length, 'DUPLICATE_CANVAS');
++    check(revision.speechTextReplacements.length + revision.appendedSpeechActions.length + revision.canvasGeometryChanges.length + revision.canvasImageReplacements.length + revision.canvasTextReplacements.length + revision.canvasElementAppends.length + Number(!!revision.htmlReplacement) > 0, 'EMPTY_REVISION');
++    if (revision.htmlReplacement) {
++      check(keys(revision.htmlReplacement, ['expectedOldHtmlSha256', 'newHtmlPath', 'newHtmlSha256', 'visibleDomChange', 'reason']) && hex(revision.htmlReplacement.expectedOldHtmlSha256) && hex(revision.htmlReplacement.newHtmlSha256) && path.isAbsolute(revision.htmlReplacement.newHtmlPath) && ['none', 'add-explicit-check-button-v1'].includes(revision.htmlReplacement.visibleDomChange) && revision.htmlReplacement.reason.trim().length > 0, 'HTML_REPLACEMENT');
++      const bytes = await read(revision.htmlReplacement.newHtmlPath);
++      check(hash(bytes) === revision.htmlReplacement.newHtmlSha256, 'HTML_BYTES');
++      html.set(revision.sceneId, bytes.toString('utf8'));
++    }
++  }
++  const dataDir = await fs.realpath(env.dataDir);
++  const jobDir = path.resolve(input.jobDir);
++  const cookies = (await read(path.join(jobDir, 'owner.cookies'))).toString();
++  const owners = cookies.split(/\r?\n/).map(line => line.replace(/^#HttpOnly_/, '')).filter(line => line && !line.startsWith('#')).map(line => line.split('\t')).filter(parts => parts.length === 7 && parts[5] === 'anonymous_id').map(parts => parts[6]);
++  check(owners.length === 1 && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(owners[0]), 'OWNER_COOKIE');
++  const headers = new Headers();
++  const ownerId = resolveRequestOwnerId({ headers: new Headers({ cookie: `anonymous_id=${owners[0]}` }) }, headers);
++  check(!headers.has('set-cookie'), 'OWNER_COOKIE');
++  const ownerFingerprint = hash(owners[0]);
++  const state = JSON.parse((await read(path.join(jobDir, 'state.json'))).toString());
++  const dispatch = JSON.parse((await read(path.join(jobDir, 'dispatch.json'))).toString());
++  const frozenFile = JSON.parse((await read(path.join(jobDir, 'frozen.json'))).toString());
++  check(typeof state.sessionId === 'string' && state.sessionId.length > 0 && dispatch.ownerFingerprint === ownerFingerprint, 'JOB_BINDING');
++  assertTextbookContract(frozenFile.sceneContract);
++  return {
++    dataDir,
++    ownerId,
++    ownerFingerprint,
++    sessionId: state.sessionId as string,
++    stageId: input.stageId,
++    frozen: frozenFile.sceneContract,
++    html,
++    candidatePath: path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json'),
++  };
++}
++type State = Awaited<ReturnType<typeof inputs>>;
++
++async function transaction<T>(env: CurrentReviewRevisionEnvironment, readOnly: boolean, body: (query: Queryable, pool: TransactionSource) => Promise<T>): Promise<T> {
++  const client = await env.pool.connect();
++  const query: Queryable = { query: async <R extends Record<string, unknown>>(sql: string, args?: unknown[]) => {
++    if (readOnly) {
++      check(/^\s*SELECT\b/i.test(sql), 'READ_ONLY');
++      sql = sql.replace(/\s+FOR SHARE\s*$/i, '');
++    }
++    return { rows: (await client.query(sql, args)).rows as R[] };
++  } };
++  let serial = 0;
++  const nested: TransactionSource = { connect: async () => {
++    let savepoint: string | undefined;
++    return { release() {}, query: async (sql, args) => {
++      if (sql.startsWith('BEGIN')) {
++        check(!savepoint, 'TRANSACTION');
++        savepoint = `current_review_revision_${++serial}`;
++        return client.query(`SAVEPOINT ${savepoint}`);
++      }
++      if (sql === 'COMMIT' || sql === 'ROLLBACK') {
++        check(savepoint, 'TRANSACTION');
++        if (sql === 'ROLLBACK') await client.query(`ROLLBACK TO SAVEPOINT ${savepoint}`);
++        const result = await client.query(`RELEASE SAVEPOINT ${savepoint}`);
++        savepoint = undefined;
++        return result;
++      }
++      return client.query(sql, args);
++    } };
++  } };
++  try {
++    await client.query(readOnly ? 'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY' : 'BEGIN');
++    const result = await body(query, nested);
++    await client.query('COMMIT');
++    return result;
++  } catch (error) {
++    await client.query('ROLLBACK');
++    throw error;
++  } finally {
++    client.release();
++  }
++}
++
++async function authority(query: Queryable, state: State, lock: boolean) {
++  const row = (await query.query('SELECT owner_id,prompt,status,deleted_at,lease_worker_id FROM agent_sessions WHERE id=$1' + (lock ? ' FOR UPDATE' : ''), [state.sessionId])).rows[0];
++  check(row && row.owner_id === state.ownerId && row.deleted_at === null && ['succeeded', 'failed', 'cancelled'].includes(String(row.status)) && row.lease_worker_id === null, 'SESSION_NOT_TERMINAL_OWNED');
++  const meta = (await query.query('SELECT owner_id,deleted_at FROM stage_meta WHERE stage_id=$1' + (lock ? ' FOR UPDATE' : ''), [state.stageId])).rows[0];
++  check(meta && meta.owner_id === state.ownerId && meta.deleted_at === null, 'STAGE_NOT_OWNED');
++  const active = await query.query("SELECT id FROM agent_sessions WHERE (stage_id=$1 OR active_stage_id=$1) AND deleted_at IS NULL AND (status IN ('queued','running') OR lease_worker_id IS NOT NULL)", [state.stageId]);
++  check(active.rows.length === 0, 'STAGE_ACTIVE');
++  const frozen = textbookContractFromPrompt(String(row.prompt));
++  check(frozen && textbookDigest(frozen) === textbookDigest(state.frozen), 'FROZEN_CHANGED');
++  const doc = await new PgDocumentStore(query, { withTransaction: async fn => fn(query) }).loadDocument(state.stageId) as CourseDocument | null;
++  check(doc && doc.stage.id === state.stageId && (doc.outline as Json)?.producerRef === state.sessionId, 'DOCUMENT_SESSION');
++  return doc!;
++}
++async function candidate(state: State) {
++  const bytes = await read(state.candidatePath);
++  const value = JSON.parse(bytes.toString());
++  unseal(value);
++  return { bytes, value };
++}
++async function validateAssets(state: State, ledger: Json) {
++  check(Array.isArray(ledger.assetBindings) && Array.isArray(ledger.bindingHistory), 'BINDINGS');
++  for (const binding of ledger.assetBindings) {
++    check(keys(binding, ['assetKey', 'src', 'sha256', 'width', 'height', 'bindingVersion', 'status']) && binding.status === 'author_candidate' && hex(binding.sha256), 'BINDING');
++    const prefix = `/api/classroom-media/${state.stageId}/media/`;
++    check(typeof binding.src === 'string' && binding.src.startsWith(prefix) && /^[A-Za-z0-9_.-]+\.(?:png|jpe?g|webp)$/.test(binding.src.slice(prefix.length)), 'BINDING_SOURCE');
++    const bytes = await read(path.join(state.dataDir, 'classrooms', state.stageId, 'media', binding.src.slice(prefix.length)));
++    check(hash(bytes) === binding.sha256, 'IMAGE_BYTES_CHANGED');
++  }
++}
++function validateDocument(state: State, doc: CourseDocument, ledger: Json) {
++  check(keys(ledger, ['schemaVersion', 'sessionId', 'stageId', 'frozenContract', 'status', 'verification', 'assetBindings', 'bindingHistory', 'scenes', 'sha256']) && ledger.schemaVersion === 'mira.textbook.authoring-candidate.v1' && ledger.sessionId === state.sessionId && ledger.stageId === state.stageId && textbookDigest(ledger.frozenContract) === textbookDigest(state.frozen) && ledger.status === 'author_candidate' && ledger.verification === 'static_contract_only_not_play_or_semantic_review', 'CANDIDATE_IDENTITY');
++  unseal(ledger);
++  check(doc.scenes.length === state.frozen.contract.pagePlan.length && Array.isArray(ledger.scenes) && doc.scenes.length === ledger.scenes.length && new Set(doc.scenes.map(scene => scene.id)).size === doc.scenes.length, 'COMPLETE_DOCUMENT');
++  for (const [index, scene] of doc.scenes.entries()) {
++    check(scene.order === index + 1 && scene.stageId === state.stageId && validateScene(scene).valid, 'SCENE_DSL');
++    assertTextbookScene(scene, state.frozen, ledger.assetBindings);
++    check(textbookDigest(ledger.scenes[index]) === textbookDigest({ sceneId: scene.id, order: scene.order, sha256: textbookDigest(scene), canonicalJson: textbookCanonical(scene), contractSha256: state.frozen.sha256 }), 'SCENE_LEDGER');
++  }
++}
++
++// eslint-disable-next-line @typescript-eslint/no-explicit-any
++function applySceneRevision(scene: any, revision: ReviewSceneRevision, replacementHtml: string | undefined, boundSources: Set<string>) {
++  check(textbookDigest(scene) === revision.expectedSceneSha256, 'SCENE_CHANGED');
++  const next = structuredClone(scene);
++  const originalActions = structuredClone(scene.actions ?? []);
++  check(Array.isArray(next.actions) && new Set(next.actions.map((action: Json) => action.id)).size === next.actions.length, 'ACTIONS');
++  const fieldDiffs: Json[] = [];
++  for (const replacement of revision.speechTextReplacements) {
++    const index = next.actions.findIndex((action: Json) => action.id === replacement.actionId);
++    check(index >= 0 && next.actions[index].type === 'speech' && next.actions[index].text === replacement.expectedOldText, 'SPEECH_CHANGED');
++    next.actions[index].text = replacement.replacementText;
++    fieldDiffs.push({ path: `/actions/${index}/text`, kind: 'speech-text', before: replacement.expectedOldText, after: replacement.replacementText, reason: replacement.reason });
++  }
++  const existingIds = new Set(next.actions.map((action: Json) => action.id));
++  const existingSpeech = new Set(next.actions.filter((action: Json) => action.type === 'speech').map((action: Json) => action.text));
++  for (const appended of revision.appendedSpeechActions) {
++    check(!existingIds.has(appended.id) && !existingSpeech.has(appended.text), 'APPENDED_SPEECH_COLLISION');
++    const action = { id: appended.id, type: 'speech', text: appended.text };
++    fieldDiffs.push({ path: `/actions/${next.actions.length}`, kind: 'authorized-feedback-speech-append', before: null, after: action, reason: appended.reason });
++    next.actions.push(action);
++    existingIds.add(appended.id);
++    existingSpeech.add(appended.text);
++  }
++  check(next.actions.length === originalActions.length + revision.appendedSpeechActions.length, 'ACTION_LENGTH');
++  for (let index = 0; index < originalActions.length; index++) {
++    const allowed = revision.speechTextReplacements.find(item => item.actionId === originalActions[index].id);
++    const expected = allowed ? { ...originalActions[index], text: allowed.replacementText } : originalActions[index];
++    check(textbookCanonical(next.actions[index]) === textbookCanonical(expected), 'ACTION_PREFIX_CHANGED');
++  }
++  let htmlEvidence: Json | null = null;
++  if (revision.htmlReplacement) {
++    check(next.type === 'interactive' && typeof next.content?.html === 'string' && replacementHtml !== undefined, 'HTML_SCENE');
++    check(hash(next.content.html) === revision.htmlReplacement.expectedOldHtmlSha256 && hash(replacementHtml) === revision.htmlReplacement.newHtmlSha256, 'HTML_CHANGED');
++    const beforeHtml = next.content.html;
++    next.content.html = replacementHtml;
++    htmlEvidence = inspectReviewHtml(beforeHtml, replacementHtml, next.actions.filter((action: Json) => action.type === 'speech').map((action: Json) => action.text), revision.htmlReplacement.visibleDomChange);
++    fieldDiffs.push({ path: '/content/html', kind: 'complete-interactive-html', beforeSha256: hash(beforeHtml), afterSha256: hash(replacementHtml), beforeBytes: Buffer.byteLength(beforeHtml), afterBytes: Buffer.byteLength(replacementHtml), reason: revision.htmlReplacement.reason });
++  }
++  for (const geometry of revision.canvasGeometryChanges) {
++    check(next.type === 'slide' && Array.isArray(next.content?.canvas?.elements), 'GEOMETRY_SCENE');
++    const index = next.content.canvas.elements.findIndex((element: Json) => element.id === geometry.elementId);
++    check(index >= 0 && next.content.canvas.elements[index][geometry.field] === geometry.expectedOldValue, 'GEOMETRY_CHANGED');
++    next.content.canvas.elements[index][geometry.field] = geometry.replacementValue;
++    fieldDiffs.push({ path: `/content/canvas/elements/${index}/${geometry.field}`, kind: 'canvas-geometry', before: geometry.expectedOldValue, after: geometry.replacementValue, reason: geometry.reason });
++  }
++  for (const image of revision.canvasImageReplacements) {
++    check(next.type === 'slide' && Array.isArray(next.content?.canvas?.elements) && boundSources.has(image.replacementSrc), 'IMAGE_SCENE');
++    const index = next.content.canvas.elements.findIndex((element: Json) => element.id === image.elementId);
++    check(index >= 0 && next.content.canvas.elements[index].type === 'image' && next.content.canvas.elements[index].src === image.expectedOldSrc, 'IMAGE_CHANGED');
++    next.content.canvas.elements[index].src = image.replacementSrc;
++    fieldDiffs.push({ path: `/content/canvas/elements/${index}/src`, kind: 'bound-canvas-image', before: image.expectedOldSrc, after: image.replacementSrc, reason: image.reason });
++  }
++  for (const text of revision.canvasTextReplacements) {
++    check(next.type === 'slide' && Array.isArray(next.content?.canvas?.elements), 'TEXT_SCENE');
++    const index = next.content.canvas.elements.findIndex((element: Json) => element.id === text.elementId);
++    check(index >= 0 && next.content.canvas.elements[index].type === 'text' && next.content.canvas.elements[index].content === text.expectedOldContent, 'TEXT_CHANGED');
++    next.content.canvas.elements[index].content = text.replacementContent;
++    fieldDiffs.push({ path: `/content/canvas/elements/${index}/content`, kind: 'canvas-text', before: text.expectedOldContent, after: text.replacementContent, reason: text.reason });
++  }
++  for (const append of revision.canvasElementAppends) {
++    check(next.type === 'slide' && Array.isArray(next.content?.canvas?.elements) && boundSources.has(append.element.src) && !next.content.canvas.elements.some((element: Json) => element.id === append.element.id), 'ELEMENT_APPEND');
++    const index = next.content.canvas.elements.length;
++    next.content.canvas.elements.push(structuredClone(append.element));
++    fieldDiffs.push({ path: `/content/canvas/elements/${index}`, kind: 'bound-canvas-image-append', before: null, after: append.element, reason: append.reason });
++  }
++  check(textbookDigest(next) !== textbookDigest(scene), 'NO_CHANGE');
++  return {
++    next,
++    evidence: {
++      sceneId: scene.id,
++      beforeSceneSha256: textbookDigest(scene),
++      afterSceneSha256: textbookDigest(next),
++      originalActionsSha256: textbookDigest(originalActions),
++      revisedActionsSha256: textbookDigest(next.actions),
++      originalActionCount: originalActions.length,
++      revisedActionCount: next.actions.length,
++      originalActionPrefixPolicy: 'byte-equivalent-except-allowlisted-speech-text',
++      appendedSpeechPolicy: 'authorized-tail-only',
++      fieldDiffs,
++      htmlEvidence,
++      reviewBasis: revision.reviewBasis,
++    },
++  };
++}
++
++async function describe(input: CurrentReviewRevisionInput, state: State, doc: CourseDocument, ledgerBytes: Buffer) {
++  const ledger = JSON.parse(ledgerBytes.toString());
++  check(textbookDigest(doc) === input.expectedDocumentSha256 && ledger.sha256 === input.expectedCandidateSha256 && hash(ledgerBytes) === input.expectedCandidateFileSha256, 'STALE_BEFORE');
++  validateDocument(state, doc, ledger);
++  await validateAssets(state, ledger);
++  const after = structuredClone(doc);
++  const revisions: Json[] = [];
++  const boundSources = new Set<string>(ledger.assetBindings.map((binding: Json) => binding.src));
++  for (const revision of input.revisions) {
++    const index = after.scenes.findIndex(scene => scene.id === revision.sceneId);
++    check(index >= 0, 'SCENE_MISSING');
++    const result = applySceneRevision(doc.scenes[index], revision, state.html.get(revision.sceneId), boundSources);
++    after.scenes[index] = result.next;
++    revisions.push(result.evidence);
++  }
++  const body = unseal(ledger);
++  const afterCandidate = seal({ ...body, scenes: after.scenes.map(scene => ({ sceneId: scene.id, order: scene.order, sha256: textbookDigest(scene), canonicalJson: textbookCanonical(scene), contractSha256: state.frozen.sha256 })) });
++  validateDocument(state, after, afterCandidate);
++  await validateAssets(state, afterCandidate);
++  check(textbookCanonical(afterCandidate.assetBindings) === textbookCanonical(ledger.assetBindings) && textbookCanonical(afterCandidate.bindingHistory) === textbookCanonical(ledger.bindingHistory), 'ASSET_LEDGER_CHANGED');
++  const plan = seal({
++    schemaVersion: PLAN,
++    verification: VERIFY,
++    input,
++    dataDir: state.dataDir,
++    sessionId: state.sessionId,
++    stageId: state.stageId,
++    ownerFingerprint: state.ownerFingerprint,
++    contractSha256: state.frozen.sha256,
++    beforeDocumentSha256: textbookDigest(doc),
++    afterDocumentSha256: textbookDigest(after),
++    beforeCandidateSha256: ledger.sha256,
++    beforeCandidateFileSha256: hash(ledgerBytes),
++    afterCandidateSha256: afterCandidate.sha256,
++    afterCandidateFileSha256: hash(encoded(afterCandidate)),
++    stateTransitionNotes: input.stateTransitionNotes,
++    revisions,
++  });
++  return { plan, after, afterCandidate, beforeCandidate: ledger };
++}
++
++export async function prepareCurrentReviewRevision(input: CurrentReviewRevisionInput, env: CurrentReviewRevisionEnvironment): Promise<Json> {
++  const state = await inputs(input, env);
++  return transaction(env, true, async query => {
++    const doc = await authority(query, state, false);
++    const ledger = await candidate(state);
++    const result = await describe(input, state, doc, ledger.bytes);
++    check(hash((await candidate(state)).bytes) === hash(ledger.bytes), 'CANDIDATE_FENCE');
++    return result.plan;
++  });
++}
++
++/** Candidate rename and SQL commit are recoverable, not a cross-system atomic commit. */
++export async function runCurrentReviewRevision(plan: Json, approvedPlanSha256: string, env: CurrentReviewRevisionEnvironment): Promise<Json> {
++  unseal(plan);
++  check(plan.schemaVersion === PLAN && plan.sha256 === approvedPlanSha256, 'PLAN_APPROVAL');
++  const state = await inputs(plan.input, env);
++  const dir = path.join(state.dataDir, 'textbook-current-review-revisions', hash(state.sessionId), state.stageId, plan.sha256);
++  const intent = path.join(dir, 'intent.json');
++  const originalCandidate = path.join(dir, 'original-candidate.json');
++  const originalDocument = path.join(dir, 'original-document.json');
++  let prior = false;
++  try {
++    check((await read(intent)).equals(encoded(plan)), 'INTENT_COLLISION');
++    prior = true;
++  } catch (error: unknown) {
++    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
++  }
++  const receipt = await transaction(env, false, async (query, pool) => {
++    const actualDoc = await authority(query, state, true);
++    const actual = await candidate(state);
++    check([plan.beforeDocumentSha256, ...(prior ? [plan.afterDocumentSha256] : [])].includes(textbookDigest(actualDoc)), 'DOCUMENT_CHANGED');
++    check([plan.beforeCandidateFileSha256, ...(prior ? [plan.afterCandidateFileSha256] : [])].includes(hash(actual.bytes)), 'CANDIDATE_CHANGED');
++    const beforeDoc = prior ? JSON.parse((await read(originalDocument)).toString()) : actualDoc;
++    const beforeBytes = prior ? await read(originalCandidate) : actual.bytes;
++    check(hash(beforeBytes) === plan.beforeCandidateFileSha256 && textbookDigest(beforeDoc) === plan.beforeDocumentSha256, 'ORIGINAL_CHANGED');
++    const next = await describe(plan.input, state, beforeDoc, beforeBytes);
++    check(textbookCanonical(next.plan) === textbookCanonical(plan), 'PLAN_STALE');
++    if (textbookDigest(actualDoc) === plan.afterDocumentSha256) check(textbookCanonical(actualDoc) === textbookCanonical(next.after), 'AFTER_DOCUMENT');
++    if (hash(actual.bytes) === plan.afterCandidateFileSha256) check(actual.bytes.equals(encoded(next.afterCandidate)), 'AFTER_CANDIDATE');
++    if (prior) {
++      check((await read(originalDocument)).equals(encoded(beforeDoc)) && (await read(originalCandidate)).equals(beforeBytes), 'ORIGINAL_CHANGED');
++      for (const revision of plan.revisions) {
++        const scene = beforeDoc.scenes.find((value: Json) => value.id === revision.sceneId);
++        check(scene && (await read(path.join(dir, `original-scene-${hash(scene.id)}.json`))).equals(encoded(scene)), 'ORIGINAL_CHANGED');
++        if (revision.htmlEvidence) {
++          check(hash(await read(path.join(dir, `original-html-${hash(scene.id)}.html`))) === revision.htmlEvidence.beforeHtmlSha256, 'ORIGINAL_CHANGED');
++          check(hash(await read(path.join(dir, `revised-html-${hash(scene.id)}.html`))) === revision.htmlEvidence.afterHtmlSha256, 'ORIGINAL_CHANGED');
++        }
++      }
++    }
++    await immutable(originalCandidate, beforeBytes);
++    await immutable(originalDocument, encoded(beforeDoc));
++    for (const revision of plan.revisions) {
++      const scene = beforeDoc.scenes.find((value: Json) => value.id === revision.sceneId);
++      check(scene, 'SCENE_MISSING');
++      await immutable(path.join(dir, `original-scene-${hash(scene.id)}.json`), encoded(scene));
++      if (revision.htmlEvidence) {
++        await immutable(path.join(dir, `original-html-${hash(scene.id)}.html`), Buffer.from(scene.content.html));
++        const revised = next.after.scenes.find((value: Json) => value.id === revision.sceneId)! as Json;
++        await immutable(path.join(dir, `revised-html-${hash(scene.id)}.html`), Buffer.from(revised.content.html));
++      }
++    }
++    await immutable(intent, encoded(plan));
++    let current = actualDoc;
++    if (textbookDigest(current) === plan.beforeDocumentSha256) {
++      for (const revised of next.after.scenes.filter(scene => plan.revisions.some((revision: Json) => revision.sceneId === scene.id))) {
++        const intermediate = { ...current, scenes: current.scenes.map(scene => scene.id === revised.id ? revised : scene) };
++        const fences = [textbookDigest(current), textbookDigest(intermediate)];
++        let index = 0;
++        const store = createOwnerBoundDocumentStore({
++          pool,
++          ownerId: state.ownerId,
++          validateScene,
++          validateStage: validateAppStage,
++          mutationFence: async transactionQuery => {
++            check(textbookDigest(await authority(transactionQuery, state, true)) === fences[index++], 'DOCUMENT_FENCE');
++            check(hash((await candidate(state)).bytes) === hash(actual.bytes), 'CANDIDATE_FENCE');
++          },
++        }) as unknown as CourseStore;
++        await store.putScene(state.stageId, revised);
++        check(index === 2, 'FENCE_COUNT');
++        current = intermediate;
++      }
++    }
++    const finalDoc = await authority(query, state, true);
++    check(textbookDigest(finalDoc) === plan.afterDocumentSha256, 'AFTER_DOCUMENT');
++    validateDocument(state, finalDoc, next.afterCandidate);
++    await validateAssets(state, next.afterCandidate);
++    check(hash((await candidate(state)).bytes) === hash(actual.bytes), 'CANDIDATE_FENCE');
++    if (hash(actual.bytes) !== plan.afterCandidateFileSha256) {
++      const temporary = `${state.candidatePath}.${randomUUID()}.tmp`;
++      await immutable(temporary, encoded(next.afterCandidate));
++      try {
++        check(hash((await candidate(state)).bytes) === hash(actual.bytes), 'CANDIDATE_FENCE');
++        await fs.rename(temporary, state.candidatePath);
++      } finally {
++        try {
++          await fs.unlink(temporary);
++        } catch (error: unknown) {
++          if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
++        }
++      }
++      const parent = await fs.open(path.dirname(state.candidatePath), constants.O_RDONLY);
++      try {
++        await parent.sync();
++      } finally {
++        await parent.close();
++      }
++    }
++    check(hash((await candidate(state)).bytes) === plan.afterCandidateFileSha256, 'AFTER_CANDIDATE');
++    return seal({
++      schemaVersion: RECEIPT,
++      revisionId: plan.sha256,
++      status: 'static_candidate_review_revised',
++      verification: VERIFY,
++      sessionId: state.sessionId,
++      stageId: state.stageId,
++      planSha256: plan.sha256,
++      documentSha256: plan.afterDocumentSha256,
++      candidateSha256: plan.afterCandidateSha256,
++      candidateFileSha256: plan.afterCandidateFileSha256,
++      stateTransitionNotes: plan.stateTransitionNotes,
++      revisions: plan.revisions,
++      providerCalls: 0,
++    });
++  });
++  await immutable(path.join(dir, 'receipt.json'), encoded(receipt));
++  return receipt;
++}
+diff --git a/scripts/revise-textbook-current-review.ts b/scripts/revise-textbook-current-review.ts
+new file mode 100644
+index 0000000..83a8ee6
+--- /dev/null
++++ b/scripts/revise-textbook-current-review.ts
+@@ -0,0 +1,35 @@
++/** Local operator only. Explicit prepare/run JSON stdin; existing ownership is mandatory. */
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import { Pool } from 'pg';
++import { prepareCurrentReviewRevision, runCurrentReviewRevision } from '../lib/server/mira-textbook-current-review-revision';
++
++async function main() {
++  const mode = process.argv[2];
++  if (!['prepare', 'run'].includes(mode)) throw new Error('USAGE');
++  let body = '';
++  for await (const chunk of process.stdin) {
++    body += chunk;
++    if (body.length > 4 * 1024 * 1024) throw new Error('INPUT_TOO_LARGE');
++  }
++  const input = JSON.parse(body);
++  const connectionString = process.env.MIRA_OPENMAIC_AGENT_DATABASE_URL ?? process.env.DATABASE_URL;
++  if (!connectionString) throw new Error('DATABASE_CONFIGURATION');
++  const pool = new Pool({ connectionString, max: 1 });
++  try {
++    const env = { pool, dataDir: path.resolve('data') };
++    if (mode === 'run' && Object.keys(input).sort().join(',') !== 'approvedPlanSha256,planPath') throw new Error('RUN_INPUT');
++    const result = mode === 'prepare'
++      ? await prepareCurrentReviewRevision(input, env)
++      : await runCurrentReviewRevision(JSON.parse(await fs.readFile(input.planPath, 'utf8')), input.approvedPlanSha256, env);
++    process.stdout.write(JSON.stringify(result, null, 2) + '\n');
++  } finally {
++    await pool.end();
++  }
++}
++
++main().catch(error => {
++  const message = String(error?.message ?? '');
++  process.stderr.write(JSON.stringify({ error: /^TEXTBOOK_CURRENT_REVIEW_REVISION_[A-Z0-9_]+$/.test(message) ? message : 'LOCAL_CURRENT_REVIEW_REVISION_FAILED_NO_AUTOMATIC_RETRY' }) + '\n');
++  process.exitCode = 1;
++});
+diff --git a/tests/agent-runtime/textbook-current-review-revision.test.ts b/tests/agent-runtime/textbook-current-review-revision.test.ts
+new file mode 100644
+index 0000000..7b5bf76
+--- /dev/null
++++ b/tests/agent-runtime/textbook-current-review-revision.test.ts
+@@ -0,0 +1,87 @@
++import { describe, expect, it } from 'vitest';
++import { inspectReviewHtml } from '@/lib/server/mira-textbook-current-review-revision';
++
++const media = '/api/classroom-media/stage-review/media/scene.png';
++const checkButton = '<button class="check-btn" id="checkSeatBtn" type="button" aria-label="检查当前座位">✓ 检查</button>';
++const speech = ['听完以后再操作。'];
++
++function page(options: {
++  code?: string;
++  cueText?: string;
++  image?: string;
++  widget?: string;
++  extraBody?: string;
++  style?: string;
++} = {}) {
++  const code = options.code ?? `
++    let played = false;
++    window.addEventListener('mira-narration-state', event => {
++      const detail = event.detail || {};
++      if (detail.status === 'playing' && detail.cueId === 'cue') played = true;
++      if (detail.status === 'ready' && detail.cueId === 'cue' && played) played = false;
++    });
++    document.addEventListener('visibilitychange', () => {
++      if (document.hidden && typeof window.miraCancelNarration === 'function') window.miraCancelNarration();
++    });
++    window.addEventListener('pagehide', () => {
++      if (typeof window.miraCancelNarration === 'function') window.miraCancelNarration();
++    });`;
++  return `<!doctype html><html><head><style>${options.style ?? 'button { min-height: 48px; min-width: 48px; }'}</style></head><body><main><img src="${options.image ?? media}"></main>${options.extraBody ?? ''}<script type="application/json" id="mira-narration-cues">${JSON.stringify({ schemaVersion: 'mira.interactive.narration-cues.v1', cues: [{ id: 'cue', text: options.cueText ?? speech[0] }] })}</script><script type="application/json" id="widget-config">${options.widget ?? '{"type":"simulation"}'}</script><script>${code}</script></body></html>`;
++}
++
++describe('bounded current review HTML revision', () => {
++  it('accepts behavior-only replacement with identical visible DOM, media, widget config, and matching cue speech', () => {
++    const before = page({ code: 'const oldBehavior = true;' });
++    const after = page();
++    const evidence = inspectReviewHtml(before, after, speech);
++    expect(evidence).toMatchObject({
++      cueCount: 1,
++      uniqueSpeechCount: 1,
++      visibleDomChange: 'none',
++      narrationGate: 'matching_cue_playing_then_ready',
++      hiddenRecovery: 'visibilitychange_and_pagehide_cancel_then_explicit_replay',
++      minimumTouchTargetPx: 48,
++    });
++  });
++
++  it('accepts only the exact explicit-check button as a visible DOM addition', () => {
++    const before = page({ code: 'const oldBehavior = true;' });
++    const after = page({ extraBody: checkButton });
++    expect(inspectReviewHtml(before, after, speech, 'add-explicit-check-button-v1').visibleDomChange).toBe('add-explicit-check-button-v1');
++  });
++
++  it.each([
++    ['media', () => page({ image: media.replace('scene.png', 'other.png') }), 'HTML_MEDIA_CHANGED'],
++    ['widget', () => page({ widget: '{"type":"matching"}' }), 'HTML_WIDGET_CHANGED'],
++    ['cue', () => page({ cueText: '另一句话。' }), 'HTML_CUE_ACTION_MISMATCH'],
++    ['timer', () => page({ code: `${pageCode()}\nsetTimeout(() => {}, 1);` }), 'HTML_FORBIDDEN_RUNTIME'],
++    ['no-playing', () => page({ code: pageCode().replace("detail.status === 'playing'", "detail.status === 'buffering'") }), 'HTML_PLAYING_GATE'],
++    ['no-ready', () => page({ code: pageCode().replace("detail.status === 'ready'", "detail.status === 'ended'") }), 'HTML_READY_GATE'],
++    ['visible-dom', () => page({ extraBody: '<p>extra</p>' }), 'HTML_VISIBLE_DOM_CHANGED'],
++  ])('rejects %s drift', (_name, changed, code) => {
++    const before = page({ code: 'const oldBehavior = true;' });
++    expect(() => inspectReviewHtml(before, changed(), speech)).toThrow(`TEXTBOOK_CURRENT_REVIEW_REVISION_${code}`);
++  });
++
++  it('rejects a lookalike or duplicate check control', () => {
++    const before = page({ code: 'const oldBehavior = true;' });
++    expect(() => inspectReviewHtml(before, page({ extraBody: checkButton.replace('✓ 检查', '检查') }), speech, 'add-explicit-check-button-v1')).toThrow('TEXTBOOK_CURRENT_REVIEW_REVISION_HTML_VISIBLE_DOM_CHANGED');
++    expect(() => inspectReviewHtml(before, page({ extraBody: checkButton + checkButton }), speech, 'add-explicit-check-button-v1')).toThrow('TEXTBOOK_CURRENT_REVIEW_REVISION_HTML_VISIBLE_DOM_CHANGED');
++  });
++});
++
++function pageCode() {
++  return `
++    let played = false;
++    window.addEventListener('mira-narration-state', event => {
++      const detail = event.detail || {};
++      if (detail.status === 'playing' && detail.cueId === 'cue') played = true;
++      if (detail.status === 'ready' && detail.cueId === 'cue' && played) played = false;
++    });
++    document.addEventListener('visibilitychange', () => {
++      if (document.hidden && typeof window.miraCancelNarration === 'function') window.miraCancelNarration();
++    });
++    window.addEventListener('pagehide', () => {
++      if (typeof window.miraCancelNarration === 'function') window.miraCancelNarration();
++    });`;
++}

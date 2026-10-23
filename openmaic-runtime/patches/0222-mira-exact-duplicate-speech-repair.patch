@@ -1,0 +1,148 @@
+diff --git a/lib/server/mira-textbook-derived-speech-repair.ts b/lib/server/mira-textbook-derived-speech-repair.ts
+--- a/lib/server/mira-textbook-derived-speech-repair.ts
++++ b/lib/server/mira-textbook-derived-speech-repair.ts
+@@ -68,7 +68,21 @@
+   const actions: Json[] = scene.actions;
+   check(Array.isArray(actions) && actions.every(a => object(a) && safeId(a.id)) && new Set(actions.map(a => a.id)).size === actions.length, 'ACTION_IDS');
+   const speech = actions.filter(a => a.type === 'speech');
+-  check(speech.length > 0 && speech.every(a => validText(a.text)) && new Set(speech.map(a => a.text)).size === speech.length, 'SOURCE_SPEECH');
++  check(speech.length > 0 && speech.every(a => validText(a.text)), 'SOURCE_SPEECH');
++  const firstSpeech = new Map<string, Json>();
++  const mergedSpeech: { text: string; retainedActionId: string; retainedActionSha256: string; removedActions: { actionId: string; originalIndex: number; actionSha256: string }[] }[] = [];
++  for (const [originalIndex, action] of actions.entries()) {
++    if (action.type !== 'speech') continue;
++    const prior = firstSpeech.get(action.text);
++    if (!prior) { firstSpeech.set(action.text, action); continue; }
++    const { id: priorId, ...priorBody } = prior, { id: actionId, ...body } = action;
++    // Matching words alone cannot merge a different speaker, timing, or any
++    // other semantic field. The immutable rejection retains both full actions.
++    check(canonical(priorBody) === canonical(body), 'SOURCE_SPEECH_DUPLICATE_CONFLICT');
++    let group = mergedSpeech.find(m => m.retainedActionId === priorId);
++    if (!group) { group = { text: action.text, retainedActionId: priorId, retainedActionSha256: hash(canonical(prior)), removedActions: [] }; mergedSpeech.push(group); }
++    group.removedActions.push({ actionId, originalIndex, actionSha256: hash(canonical(action)) });
++  }
+   const union = new Map<string, { cueIds: string[]; actionIds: string[] }>();
+   for (const cue of originalCues) {
+     if (!union.has(cue.text)) union.set(cue.text, { cueIds: [], actionIds: [] });
+@@ -82,7 +96,7 @@
+   const expectedCues = [...union].map(([text, origins]) => ({ id: origins.cueIds[0] ?? derivedSpeechCueId(sceneSha256, text), text }));
+   check(new Set(expectedCues.map(c => c.id)).size === expectedCues.length, 'CUE_ID_COLLISION');
+   const addedSpeech = [...union].filter(([, origins]) => !origins.actionIds.length).map(([text]) => ({ id: derivedSpeechActionId(sceneSha256, text), type: 'speech' as const, text }));
+-  check(addedSpeech.length > 0 && addedSpeech.every(a => !actions.some(prior => prior.id === a.id)) && new Set(addedSpeech.map(a => a.id)).size === addedSpeech.length, 'ACTION_ID_COLLISION');
++  check((addedSpeech.length > 0 || mergedSpeech.length > 0) && addedSpeech.every(a => !actions.some(prior => prior.id === a.id)) && new Set(addedSpeech.map(a => a.id)).size === addedSpeech.length, 'ACTION_ID_COLLISION');
+   return {
+     originalCueCount: originalCues.length,
+     originalSpeechCount: speech.length,
+@@ -91,6 +105,8 @@
+     addedSpeech,
+     textOrigins: [...union].map(([text, origins]) => ({ text, ...origins })),
+     mergedCues: [...union].filter(([, origins]) => origins.cueIds.length > 1).map(([text, origins]) => ({ text, retainedCueId: origins.cueIds[0], removedCueIds: origins.cueIds.slice(1) })),
++    // Preserve the exact existing manifest shape for non-deduplication plans.
++    ...(mergedSpeech.length ? { mergedSpeech } : {}),
+   };
+ }
+ 
+@@ -102,7 +118,9 @@
+   noRecordedAudio(revised);
+   const cues = staticCues(revised.content?.html);
+   check(cues.length === manifest.expectedCues.length && new Set(cues.map(c => c.text)).size === cues.length && cues.every(c => manifest.expectedCues.some(expected => expected.text === c.text && expected.id === c.id)), 'REVISED_CUE_UNION');
+-  // Clone the original actions, never accept an action override from the operator's HTML input.
+-  revised.actions = [...structuredClone(scene.actions), ...manifest.addedSpeech];
++  // Never accept an action override from the operator's HTML input. Only the
++  // source-derived manifest may remove exact redundant speech actions.
++  const removed = new Set(manifest.mergedSpeech?.flatMap(m => m.removedActions.map(a => a.actionId)) ?? []);
++  revised.actions = [...structuredClone(scene.actions.filter((a: Json) => !removed.has(a.id))), ...manifest.addedSpeech];
+   return manifest;
+ }
+diff --git a/tests/agent-runtime/textbook-derived-speech-repair.test.ts b/tests/agent-runtime/textbook-derived-speech-repair.test.ts
+--- a/tests/agent-runtime/textbook-derived-speech-repair.test.ts
++++ b/tests/agent-runtime/textbook-derived-speech-repair.test.ts
+@@ -1,4 +1,5 @@
+ import { describe, expect, it } from 'vitest';
++import { createHash } from 'node:crypto';
+ import { deriveRejectedSpeechManifest, derivedSpeechCueId, restoreDerivedSpeech } from '@/lib/server/mira-textbook-derived-speech-repair';
+ 
+ const sha = 'a'.repeat(64);
+@@ -13,6 +14,7 @@
+     expect(manifest.expectedCues).toEqual([...cues.slice(0, 2), { id: derivedSpeechCueId(sha, '再想一想。'), text: '再想一想。' }]);
+     expect(manifest.mergedCues).toEqual([{ text: 'Hello.', retainedCueId: 'hello', removedCueIds: ['hello-reply'] }]);
+     expect(manifest.addedSpeech).toHaveLength(1);
++    expect(manifest).not.toHaveProperty('mergedSpeech');
+     const revised = structuredClone(scene); revised.content.html = html(manifest.expectedCues);
+     expect(restoreDerivedSpeech(scene, revised, frozen, sha)).toEqual(manifest);
+     expect(JSON.stringify(revised.actions.slice(0, scene.actions.length))).toBe(JSON.stringify(scene.actions));
+@@ -33,10 +35,10 @@
+     revised.content.html = html(values);
+     expect(() => restoreDerivedSpeech(scene, revised, frozen, sha)).toThrow('TEXTBOOK_REPAIR_DERIVED_SPEECH_');
+   });
+-  it.each(['duplicate-action-id', 'duplicate-speech', 'audio-action', 'audio-node', 'audio-helper', 'audio-constructor', 'audio-in-template', 'two-cue-blocks', 'dynamic-only-cues'])('refuses ambiguous or recorded source: %s', kind => {
++  it.each(['duplicate-action-id', 'conflicting-duplicate-speech', 'audio-action', 'audio-node', 'audio-helper', 'audio-constructor', 'audio-in-template', 'two-cue-blocks', 'dynamic-only-cues'])('refuses ambiguous or recorded source: %s', kind => {
+     const scene: any = fixture();
+     if (kind === 'duplicate-action-id') scene.actions[1].id = scene.actions[0].id;
+-    if (kind === 'duplicate-speech') scene.actions[2].text = scene.actions[0].text;
++    if (kind === 'conflicting-duplicate-speech') { scene.actions[2].text = scene.actions[0].text; scene.actions[2].speakerId = 'other'; }
+     if (kind === 'audio-action') scene.actions[0].audioUrl = 'saved.wav';
+     if (kind === 'audio-node') scene.content.html += '<audio src="saved.wav"></audio>';
+     if (kind === 'audio-helper') scene.content.html += '<script id="mira-pre-recorded-audio"></script>';
+@@ -46,6 +48,31 @@
+     if (kind === 'dynamic-only-cues') scene.content.html = '<script>window.cues=[]</script>';
+     expect(() => deriveRejectedSpeechManifest(scene, sha)).toThrow('TEXTBOOK_REPAIR_DERIVED_SPEECH_');
+   });
++  it('deduplicates only complete identical speech bodies, retains order, and records every original identity and hash', () => {
++    const scene = fixture();
++    scene.actions.push({ id: 'hello-first', type: 'speech', text: 'Hello.' }, { id: 'second-highlight', type: 'widget_highlight', target: '#friend' }, { id: 'hello-repeat', type: 'speech', text: 'Hello.' });
++    const before = JSON.stringify(scene), manifest = deriveRejectedSpeechManifest(scene, sha);
++    const hashAction = (a: object) => createHash('sha256').update(JSON.stringify(a, Object.keys(a).sort())).digest('hex');
++    expect(manifest.addedSpeech).toEqual([]);
++    expect(manifest.mergedSpeech).toEqual([{ text: 'Hello.', retainedActionId: 'hello-first', retainedActionSha256: hashAction(scene.actions[3]), removedActions: [{ actionId: 'hello-repeat', originalIndex: 5, actionSha256: hashAction(scene.actions[5]) }] }]);
++    const revised = structuredClone(scene); revised.content.html = html(manifest.expectedCues);
++    revised.actions = []; // Operator input cannot decide which actions survive.
++    restoreDerivedSpeech(scene, revised, frozen, sha);
++    expect(revised.actions).toEqual(scene.actions.slice(0, -1));
++    expect(JSON.stringify(scene)).toBe(before);
++    expect(deriveRejectedSpeechManifest(scene, sha)).toEqual(manifest);
++  });
++  it.each(['speaker', 'extra-field', 'metadata'])('rejects identical words with different %s semantics', kind => {
++    const scene = fixture(); scene.actions.push({ id: 'first', type: 'speech', text: 'Hello.' }, { id: 'repeat', type: 'speech', text: 'Hello.' });
++    if (kind === 'speaker') { Object.assign(scene.actions[3], { speakerId: 'alex' }); Object.assign(scene.actions[4], { speakerId: 'lily' }); }
++    if (kind === 'extra-field') Object.assign(scene.actions[4], { duration: 2 });
++    if (kind === 'metadata') { Object.assign(scene.actions[3], { metadata: { voice: 'a' } }); Object.assign(scene.actions[4], { metadata: { voice: 'b' } }); }
++    expect(() => deriveRejectedSpeechManifest(scene, sha)).toThrow('SOURCE_SPEECH_DUPLICATE_CONFLICT');
++  });
++  it('does not permit a no-addition plan without any actual duplicate to remove', () => {
++    const scene = fixture(); scene.actions.push({ id: 'first', type: 'speech', text: 'Hello.' });
++    expect(() => deriveRejectedSpeechManifest(scene, sha)).toThrow('ACTION_ID_COLLISION');
++  });
+   it('cannot bypass an existing frozen speech plan or a different page identity', () => {
+     const scene = fixture(), revised = structuredClone(scene); revised.content.html = html(deriveRejectedSpeechManifest(scene, sha).expectedCues);
+     for (const page of [{ page: 1, title: '朋友', type: 'interactive', speechPlan: [] }, { page: 1, title: '朋友', type: 'interactive', cueSpeechMap: [] }, { page: 2, title: '朋友', type: 'interactive' }, { page: 1, title: '其他课', type: 'interactive' }]) {
+diff --git a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+--- a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
++++ b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+@@ -1396,6 +1396,26 @@
+     await fs.writeFile(input.revisedHtmlPath, revisedHtml);
+     derivedInput = { ...input, archivePath: path.join(root, 'textbook-rejected-scenes', a.archiveId!), archiveSha256: a.archiveSha256!, revisedHtmlSha256: hash(revisedHtml), expectedCurrentDocumentSha256: textbookDigest(await document()), expectedCurrentCandidateSha256: (await readLedger()).sha256 };
+   });
++  it('preserves the full duplicate-action rejection, checks CAS, and saves one exact deduplicated scene idempotently', async () => {
++    rejected.actions.push({ id: 'hello-first', type: 'speech', text: 'Hello.' }, { id: 'hello-repeat', type: 'speech', text: 'Hello.' });
++    const archived = await archiveRejectedTextbookScene({ root: path.join(root, 'textbook-rejected-scenes'), sessionId, stageId, sceneCanonicalJson: textbookCanonical(rejected), contractSha256: frozen.sha256, beforeDocumentSha256: textbookDigest(await document()), beforeCandidateSha256: (await readLedger()).sha256, code: 'TEXTBOOK_SCENE_CUE_SPEECH_MISMATCH', diagnostics: { fixture: 'identical-speech-only' } });
++    manifest = deriveRejectedSpeechManifest(rejected, textbookDigest(rejected));
++    expect(manifest.addedSpeech).toHaveLength(0); expect(manifest.mergedSpeech).toHaveLength(1);
++    derivedInput.archivePath = path.join(root, 'textbook-rejected-scenes', archived.archiveId!); derivedInput.archiveSha256 = archived.archiveSha256!;
++    await writeHtml(replaceCues(revisedHtml, manifest.expectedCues));
++    const bytes = await fs.readFile(derivedInput.archivePath), before = await document(), ledgerBytes = await fs.readFile(ledgerFile());
++    await expect(prepareRejectedDerivedSpeechRepair({ ...derivedInput, expectedCurrentDocumentSha256: '0'.repeat(64) }, env)).rejects.toThrow();
++    await expect(prepareRejectedDerivedSpeechRepair({ ...derivedInput, expectedCurrentCandidateSha256: '0'.repeat(64) }, env)).rejects.toThrow();
++    const plan = await prepareRejectedDerivedSpeechRepair(derivedInput, env);
++    expect(plan.derivedSpeech).toEqual(manifest); expect(await document()).toEqual(before); expect(await fs.readFile(ledgerFile())).toEqual(ledgerBytes);
++    await fs.appendFile(derivedInput.archivePath, ' ');
++    await expect(runRejectedDerivedSpeechRepair(plan, plan.sha256, env)).rejects.toThrow();
++    expect(await document()).toEqual(before); await fs.writeFile(derivedInput.archivePath, bytes);
++    const receipt = await runRejectedDerivedSpeechRepair(plan, plan.sha256, env), saved = (await document())!.scenes[0] as typeof rejected;
++    expect(saved.actions).toEqual(rejected.actions.filter((a: { id: string }) => a.id !== 'hello-repeat'));
++    expect(receipt.providerCalls).toBe(0); expect(await runRejectedDerivedSpeechRepair(plan, plan.sha256, env)).toEqual(receipt);
++    expect(await fs.readFile(derivedInput.archivePath)).toEqual(bytes); expect((await document())!.scenes).toHaveLength(1);
++  });
+   it('prepares read-only, appends only original cue text, preserves all identities/actions/assets, and replays the same receipt', async () => {
+     const before = await document(), archiveBytes = await fs.readFile(derivedInput.archivePath), ledgerBytes = await fs.readFile(ledgerFile());
+     const plan = await prepareRejectedDerivedSpeechRepair(derivedInput, env);

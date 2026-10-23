@@ -1,6 +1,6 @@
 import http from "node:http";
 import { createHash, timingSafeEqual } from "node:crypto";
-import { Readable } from "node:stream";
+import { Writable } from "node:stream";
 import { URL } from "node:url";
 import { parse } from "parse5";
 
@@ -77,8 +77,9 @@ export function createGateway(overrides = {}) {
   const config = gatewayConfig(overrides);
   return http.createServer((request, response) => {
     void handleRequest(request, response, config).catch((error) => {
+      if (response.destroyed || response.writableEnded) return;
       if (response.headersSent) {
-        response.destroy(error);
+        response.destroy();
         return;
       }
       const status = Number(error?.statusCode || 502);
@@ -482,6 +483,8 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
     // of relaxing iframe isolation or exposing a public media route.
     const verifiedAssets = new Map();
     for (const scene of result.classroom?.scenes || []) {
+      // This is delivery metadata, never an authored assertion of ownership.
+      delete scene.miraPageNarration;
       if (scene.miraActivity || scene.type !== 'interactive' || typeof scene.content?.html !== 'string') continue;
       const embedded = runtime.media.filter(media => scene.content.html.includes(media.path));
       const assets = await Promise.all(embedded.map(async media => {
@@ -489,6 +492,10 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
         return { path: media.path, mimeType: media.mimeType,
           base64: (await verifiedAssets.get(media.path)).toString('base64') };
       }));
+      // The exact archived bytes above have passed textbookMediaBytes. Resolve
+      // ownership while the inert manifests still contain their audited paths;
+      // embedding below replaces those paths with data/blob URLs.
+      bindTextbookPageNarration(scene, runtime, new Set(assets.map(asset => asset.path)));
       scene.content.html = embedTextbookSceneMedia(scene.content.html, assets);
     }
     return json(response, 200, result);
@@ -518,6 +525,83 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
   }
   if (decision.kind === 'student-video-export-capability') return json(response, 200, { enabled: false });
   return proxyToUpstream(request, response, url, runtime, config, decision, runtimeToken);
+}
+
+/** Bind only the authenticated release's exact cue/text/media relationship.
+ * Called after archived media verification, before sandbox delivery rewriting.
+ * Never execute authored JavaScript or recover metadata from an embedding shell.
+ */
+export function bindTextbookPageNarration(scene, runtime, verifiedMediaPaths = new Set()) {
+  delete scene.miraPageNarration;
+  if (runtime?.purpose !== 'fixed_textbook' || !/^tbpub_[a-f0-9]{24}$/.test(runtime.classroomId)
+      || scene.stageId !== runtime.classroomId || !/^[\w-]{1,128}$/.test(scene.id)
+      || scene.miraActivity || scene.type !== 'interactive' || scene.content?.type !== 'interactive'
+      || typeof scene.content.html !== 'string' || !Array.isArray(scene.actions)) return;
+  try {
+    let duplicateAttribute = false;
+    const document = parse(scene.content.html, { scriptingEnabled: true,
+      onParseError(error) { if (error.code === 'duplicate-attribute') duplicateAttribute = true; } });
+    const scripts = [];
+    const visit = node => {
+      if (node.tagName === 'script') scripts.push(node);
+      // Template contents are inert and are deliberately not traversed.
+      for (const child of node.childNodes || []) visit(child);
+    };
+    visit(document);
+    if (duplicateAttribute) return;
+    const script = (id, type) => {
+      const matches = scripts.filter(node => node.attrs.some(a => a.name === 'id' && a.value === id));
+      if (matches.length !== 1 || (type && !matches[0].attrs.some(a => a.name === 'type' && a.value === type))) return null;
+      return matches[0].childNodes.map(node => node.value || '').join('');
+    };
+    const source = script('mira-narration-cues', 'application/json');
+    const helper = script('mira-pre-recorded-audio');
+    if (!source || !helper) return;
+    const payload = JSON.parse(source);
+    const matches = [...helper.matchAll(/\bconst clips=(\{[^\n]*?\});let active=null;/g)];
+    if (matches.length !== 1 || payload?.schemaVersion !== 'mira.interactive.narration-cues.v1'
+        || !Array.isArray(payload.cues) || payload.cues.length < 1 || payload.cues.length > 120) return;
+    const clips = JSON.parse(matches[0][1]);
+    if (!clips || typeof clips !== 'object' || Array.isArray(clips)
+        || Object.keys(clips).length !== payload.cues.length || !Array.isArray(runtime.media)) return;
+    const media = new Map(runtime.media.map(item => [item.path, item]));
+    if (media.size !== runtime.media.length) return;
+    const ids = new Set();
+    for (const cue of payload.cues) {
+      if (!cue || typeof cue.id !== 'string' || !/^[\w-]{1,128}$/.test(cue.id) || ids.has(cue.id)
+          || typeof cue.text !== 'string' || !cue.text.trim() || cue.text.length > 1000
+          || !Object.hasOwn(clips, cue.id)) return;
+      ids.add(cue.id);
+      const audioPath = clips[cue.id];
+      const prefix = `/api/classroom-media/${runtime.classroomId}/audio/`;
+      if (typeof audioPath !== 'string' || !audioPath.startsWith(prefix)
+          || !/^[\w-]+\.(wav|mp3)$/.test(audioPath.slice(prefix.length))) return;
+      const asset = media.get(audioPath);
+      if (!verifiedMediaPaths.has(audioPath) || !asset || !/^[a-f0-9]{64}$/.test(asset.sha256) || !Number.isInteger(asset.byteSize)
+          || asset.byteSize < 1 || asset.byteSize > MAX_RUNTIME_AUDIO_BYTES
+          || asset.mimeType !== (audioPath.endsWith('.mp3') ? 'audio/mpeg' : 'audio/wav')) return;
+    }
+    const actionIds = new Set();
+    const boundCues = new Set();
+    const bindings = [];
+    for (const action of scene.actions) {
+      if (!action || typeof action.id !== 'string' || !/^[\w-]{1,128}$/.test(action.id) || actionIds.has(action.id)) return;
+      actionIds.add(action.id);
+      if (action.type !== 'speech') continue;
+      const cues = payload.cues.filter(cue => cue.text === action.text && clips[cue.id] === action.audioUrl);
+      if (cues.length > 1) return; // Ambiguous ownership must not suppress a lecture line.
+      if (cues.length === 1) {
+        if (boundCues.has(cues[0].id)) return;
+        boundCues.add(cues[0].id);
+        bindings.push({ speechId: action.id, cueId: cues[0].id,
+          text: action.text, audioPath: action.audioUrl });
+      }
+    }
+    if (bindings.length) scene.miraPageNarration = {
+      schemaVersion: 'mira.textbook.page-narration.v1', classroomId: runtime.classroomId,
+      sceneId: scene.id, bindings,
+    };
+  } catch { /* Malformed legacy manifests keep their original lecture behavior. */ }
 }
 
 export function embedTextbookSceneMedia(html, assets) {
@@ -758,7 +842,11 @@ async function proxyToUpstream(request, response, url, runtime, config, decision
   response.statusCode = upstream.status;
   copyResponseHeaders(upstream.headers, response, config, decision, url.pathname);
   if (!upstream.body) return response.end();
-  Readable.fromWeb(upstream.body).pipe(response);
+  // Consume the fetch Web stream directly. Readable.fromWeb adds a second
+  // emitter whose late socket-abort error can escape after cancellation.
+  // pipeTo owns upstream errors and cancels its reader when the client closes;
+  // its rejection stays in this request's async error path.
+  await upstream.body.pipeTo(Writable.toWeb(response));
 }
 
 export function injectRuntimeAudioBindings(raw, runtime, manifest) {
@@ -1223,7 +1311,9 @@ async function readFetchBody(body, maxBytes, fail = runtimeAudioDeliveryError) {
   if (!body) return fail();
   const chunks = [];
   let length = 0;
-  for await (const chunk of Readable.fromWeb(body)) {
+  // The Web iterator cancels on an early size-limit failure and reports read
+  // errors through this promise, without creating an unowned Node Readable.
+  for await (const chunk of body) {
     length += chunk.length;
     if (length > maxBytes) return fail();
     chunks.push(chunk);

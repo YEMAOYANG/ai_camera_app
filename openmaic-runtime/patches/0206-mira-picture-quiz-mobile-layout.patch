@@ -1,0 +1,556 @@
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -12,6 +12,7 @@
+   BookOpenText,
+   Loader2,
+   Sparkles,
++  Play,
+ } from 'lucide-react';
+ import { cn } from '@/lib/utils';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+@@ -47,8 +48,14 @@
+ import { FixedTextbookQuiz } from './fixed-textbook-quiz';
+ import { QuizPicture } from './quiz-picture';
+ import pictureOptionStyles from './quiz-picture-options.module.css';
++import pictureQuizStyles from './picture-quiz-layout.module.css';
+ 
+ // ─── Types ──────────────────────────────────────────────────────────────────
++
++function compactImageQuestion(question: QuizQuestion): boolean {
++  return question.type === 'single' && [2, 3].includes(question.options?.length ?? 0)
++    && question.options!.every(option => question.optionVisuals?.[option.value]?.kind === 'image');
++}
+ 
+ type Phase = 'not_started' | 'answering' | 'submitting' | 'grading' | 'reviewing';
+ 
+@@ -182,10 +189,12 @@
+   questionCount,
+   totalPoints,
+   onStart,
++  pictureQuestion = false,
+ }: {
+   questionCount: number;
+   totalPoints: number;
+   onStart: () => void;
++  pictureQuestion?: boolean;
+ }) {
+   const { t } = useI18n();
+ 
+@@ -249,8 +258,9 @@
+         whileHover={{ scale: 1.05 }}
+         whileTap={{ scale: 0.95 }}
+         onClick={onStart}
+-        className="mt-1 px-8 py-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full font-medium shadow-lg shadow-violet-200/50 dark:shadow-violet-900/50 hover:shadow-violet-300/50 transition-shadow z-10 flex items-center gap-2"
++        className="mt-1 min-h-12 min-w-12 px-8 py-2.5 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full font-medium shadow-lg shadow-violet-200/50 dark:shadow-violet-900/50 hover:shadow-violet-300/50 transition-shadow z-10 flex items-center gap-2"
+       >
++        {pictureQuestion && <Play className="h-6 w-6" aria-hidden />}
+         {t('quiz.startQuiz')}
+         <ChevronRight className="w-4 h-4" />
+       </motion.button>
+@@ -283,7 +293,7 @@
+ 
+   return (
+     <QuestionCard question={question} index={index} result={result} autoNarrate={autoNarrate}>
+-      <div className={threeImages ? pictureOptionStyles.container : undefined}>
++      <div data-quiz-option-group={compactImageQuestion(question) ? String(question.options!.length) : undefined} className={threeImages ? pictureOptionStyles.container : undefined}>
+       <div className={cn('grid min-w-0 gap-2', threePictures ? 'grid-cols-3' : 'grid-cols-1 sm:grid-cols-2', threeImages && pictureOptionStyles.options)}>
+         {question.options?.map((opt) => {
+           const visual = question.optionVisuals?.[opt.value];
+@@ -606,6 +616,7 @@
+       initial={{ opacity: 0, y: 12 }}
+       animate={{ opacity: 1, y: 0 }}
+       transition={{ delay: index * 0.05 }}
++      data-quiz-picture-card={compactImageQuestion(question) ? 'true' : undefined}
+       className={cn(
+         'bg-white dark:bg-gray-800 rounded-2xl border p-5 relative overflow-hidden',
+         !isReview && 'border-gray-150 dark:border-gray-700 shadow-sm',
+@@ -628,7 +639,7 @@
+       />
+ 
+       {/* Header */}
+-      <div className="flex items-start justify-between mb-3">
++      <div data-quiz-question-heading className="flex items-start justify-between mb-3">
+         <div className="flex items-start gap-3">
+           <span
+             className={cn(
+@@ -794,6 +805,7 @@
+   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+   const [pictureQuestionIndex, setPictureQuestionIndex] = useState(0);
+   const pictureSequence = questions.length > 1 && questions.every(question => !!question.optionVisuals || !!tapObjectVisuals(question));
++  const compactPictures = questions.length > 0 && questions.every(compactImageQuestion);
+   useEffect(() => setPictureQuestionIndex(0), [sceneId]);
+   const [results, setResults] = useState<QuestionResult[]>([]);
+   const [runtimeGate, setRuntimeGate] = useState<QuizRuntimeGate>(
+@@ -1048,7 +1060,7 @@
+   }
+ 
+   return (
+-    <div className="w-full h-full bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-900 overflow-hidden flex flex-col">
++    <div data-quiz-phase={phase} className={cn(compactPictures && pictureQuizStyles.root, "w-full h-full bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-900 overflow-hidden flex flex-col")}>
+       <AnimatePresence mode="wait">
+         {phase === 'not_started' && (
+           <motion.div
+@@ -1059,6 +1071,7 @@
+             className="flex-1"
+           >
+             <QuizCover
++              pictureQuestion={compactPictures}
+               questionCount={questions.length}
+               totalPoints={totalPoints}
+               onStart={() => setPhase('answering')}
+@@ -1075,7 +1088,7 @@
+             className="flex-1 flex flex-col min-h-0"
+           >
+             {/* Header bar */}
+-            <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur shrink-0">
++            <div data-quiz-answer-header className="flex items-center justify-between px-6 py-3 border-b border-gray-100 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur shrink-0">
+               <div className="flex items-center gap-2">
+                 <PieChart className="w-4 h-4 text-violet-500" />
+                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+@@ -1099,18 +1112,18 @@
+                 disabled={readOnly || !allAnswered}
+                 className={cn(
+                   'px-4 py-1.5 rounded-lg text-xs font-medium transition-all',
+-                  pictureSequence && 'flex min-h-12 min-w-12 items-center justify-center',
++                  (pictureSequence || compactPictures) && 'flex min-h-12 min-w-12 items-center justify-center',
+                   allAnswered
+                     ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-sm hover:shadow-md hover:shadow-violet-200/50 dark:hover:shadow-violet-900/50 active:scale-[0.97]'
+                     : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed',
+                 )}
+               >
+-                {pictureSequence ? <Check className="h-6 w-6" /> : t('quiz.submitAnswers')}
++                {pictureSequence || compactPictures ? <Check className="h-6 w-6" aria-hidden /> : t('quiz.submitAnswers')}
+               </button>
+             </div>
+ 
+             {/* Questions */}
+-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
++            <div data-quiz-question-scroll className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+               {questions.map((q, i) => {
+                 if (pictureSequence && i !== pictureQuestionIndex) return null;
+                 if (q.type === 'single') {
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -94,24 +94,24 @@
+   const q = questions[questionIndex];
+   const feedback = q && graded.find(r => r.questionId === q.id);
+   const audio = q && questionNarrationSource(q);
+-  const threeImages = q?.options?.length === 3 && q.options.every(
++  const compactImages = [2, 3].includes(q?.options?.length ?? 0) && !!q?.options && q.options.every(
+     option => q.optionVisuals?.[option.value]?.kind === 'image',
+   );
+-  return <section data-picture-layout={threeImages ? 'three-images' : undefined} className={`${threeImages ? compactPictureStyles.root : ''} h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]`} aria-label="课堂练习">
+-    <div className={`${threeImages ? compactPictureStyles.shell : ''} mx-auto flex min-h-full max-w-5xl flex-col p-3 sm:p-5`}>
+-      <header className={`${threeImages ? compactPictureStyles.header : ''} mb-3 flex shrink-0 items-center justify-between gap-3`}>
++  return <section data-picture-layout={compactImages ? (q.options!.length === 3 ? 'three-images' : 'two-images') : undefined} className={`${compactImages ? compactPictureStyles.root : ''} h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]`} aria-label="课堂练习">
++    <div className={`${compactImages ? compactPictureStyles.shell : ''} mx-auto flex min-h-full max-w-5xl flex-col p-3 sm:p-5`}>
++      <header className={`${compactImages ? compactPictureStyles.header : ''} mb-3 flex shrink-0 items-center justify-between gap-3`}>
+         <h2 className="text-lg font-semibold sm:text-2xl">{done ? `答对 ${graded.filter(r => r.correct).length} / ${graded.length} 题` : '听一听，选一选'}</h2>
+         <span className="text-sm text-[#697a6c]" aria-label="题目进度">{questionIndex + 1} / {questions.length}</span>
+       </header>
+       {loading ? <p role="status">正在打开练习…</p> : q &&
+-        <fieldset key={q.id} data-fixed-question={q.id} className={`${threeImages ? compactPictureStyles.fieldset : ''} min-w-0 rounded-2xl border border-[#e9dfcd] bg-white/80 p-3 sm:p-4`}>
++        <fieldset key={q.id} data-fixed-question={q.id} className={`${compactImages ? compactPictureStyles.fieldset : ''} min-w-0 rounded-2xl border border-[#e9dfcd] bg-white/80 p-3 sm:p-4`}>
+           <legend className="px-2 text-sm text-[#788275]">第 {questionIndex + 1} 题</legend>
+-          <div className={`${threeImages ? compactPictureStyles.task : ''} grid min-w-0 items-center gap-3 ${q.visual ? 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]' : ''}`}>
+-            {q.visual && <div className={`${threeImages ? compactPictureStyles.scenePicture : ''} min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44`} data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
+-            <div className={`${threeImages ? compactPictureStyles.question : ''} min-w-0 ${threeImages ? pictureOptionStyles.container : ''}`}>
++          <div className={`${compactImages ? compactPictureStyles.task : ''} grid min-w-0 items-center gap-3 ${q.visual ? 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]' : ''}`}>
++            {q.visual && <div className={`${compactImages ? compactPictureStyles.scenePicture : ''} min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44`} data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
++            <div className={`${compactImages ? compactPictureStyles.question : ''} min-w-0 ${compactImages ? pictureOptionStyles.container : ''}`}>
+             <p className="mb-2 text-base leading-relaxed sm:text-lg">{q.question}</p>
+             {audio && <QuestionNarration key={q.id} src={audio} number={questionIndex + 1} sceneId={sceneId} questionId={q.id} autoPlay={!done && !feedback && !sending} />}
+-            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${threeImages ? pictureOptionStyles.options + ' ' + compactPictureStyles.options : ''}`} role="radiogroup" aria-label={q.question}>
++            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${compactImages ? pictureOptionStyles.options + ' ' + compactPictureStyles.options : ''}`} role="radiogroup" aria-label={q.question}>
+               {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+                 aria-label={option.label} key={option.value} disabled={done || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+                 className={`min-h-14 min-w-14 rounded-xl border p-1 text-2xl transition-colors [&_img]:h-24 [&_svg]:max-h-24 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
+@@ -125,7 +125,7 @@
+           </div>
+         </fieldset>}
+       {error && <p role="alert" className="mt-5 text-[#9b503b]">{error}</p>}
+-      <footer className={`${threeImages ? compactPictureStyles.footer : ''} mt-auto flex shrink-0 items-center justify-between gap-3 pt-3`}>
++      <footer className={`${compactImages ? compactPictureStyles.footer : ''} mt-auto flex shrink-0 items-center justify-between gap-3 pt-3`}>
+         {!loading && q && <button type="button" aria-label="上一题" onClick={() => setQuestionIndex(index => index - 1)} disabled={sending || questionIndex === 0}
+           className="inline-flex min-h-14 min-w-14 items-center justify-center rounded-full border border-[#c7d1c5] px-3 disabled:opacity-30"><ArrowLeft size={18} aria-hidden /></button>}
+         {!loading && q && questionIndex < questions.length - 1 && <button type="button" aria-label="下一题"
+diff --git a/components/scene-renderers/fixed-textbook-picture-layout.module.css b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+--- a/components/scene-renderers/fixed-textbook-picture-layout.module.css
++++ b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+@@ -1,10 +1,10 @@
+-/* Only the fixed student three-image question opts into this size container.
++/* Only fixed student two/three-image questions opts into this size container.
+    Ordinary QuizView, text answers and other option counts keep their layout. */
+ .root {
+   container: fixed-picture-quiz / size;
+ }
+ 
+-@container fixed-picture-quiz (max-width: 560px) {
++@container fixed-picture-quiz (max-width: 560px) or (max-height: 400px) {
+   .shell {
+     height: 100%;
+     min-height: 0;
+@@ -145,3 +145,19 @@
+ 
+   .footer > button > svg { width: 18px; height: 18px; }
+ }
++
++@container fixed-picture-quiz (max-width: 560px) or (max-height: 400px) {
++  .root[data-picture-layout="two-images"] .question .options {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++  }
++}
++
++@container fixed-picture-quiz (min-width: 561px) and (max-height: 400px) {
++  .task {
++    display: grid;
++    grid-template-columns: minmax(0, .8fr) minmax(0, 1.5fr);
++    gap: 10px;
++  }
++  .scenePicture { height: 100%; max-height: 180px; }
++  .question { height: 100%; }
++}
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts b/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
+--- a/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
++++ b/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
+@@ -152,23 +152,23 @@
+     visual: { kind: 'image', src: '/api/classroom-media/lesson/media/stem.png', alt: '情境图' },
+   });
+ 
+-  it('keeps the stem, three equal initial choices, original narration and exact answer submission', async () => {
+-    const q = pictured();
++  it.each([2, 3])('keeps the stem, %i equal initial choices, original narration and exact answer submission', async count => {
++    const q = pictured(count);
+     const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => ({ ok: true, json: async () => init?.method === 'POST'
+       ? { ok: true, result: { results: [graded(q.id)] } } : { ok: true } }));
+     vi.stubGlobal('fetch', fetchMock);
+     const host = await mount([q]);
+-    expect(host.querySelector('[data-picture-layout="three-images"]')).not.toBeNull();
++    expect(host.querySelector(`[data-picture-layout="${count === 3 ? 'three' : 'two'}-images"]`)).not.toBeNull();
+     expect([...host.querySelectorAll('img')].map(img => img.getAttribute('src'))).toEqual([
+       '/api/classroom-media/lesson/media/stem.png',
+-      '/api/classroom-media/lesson/media/0.png', '/api/classroom-media/lesson/media/1.png', '/api/classroom-media/lesson/media/2.png',
++      ...Array.from({ length: count }, (_, index) => `/api/classroom-media/lesson/media/${index}.png`),
+     ]);
+     const buttons = [...host.querySelectorAll<HTMLButtonElement>('[role=radio]')];
+     expect(new Set(buttons.map(button => button.className)).size).toBe(1);
+-    expect(buttons.map(button => button.getAttribute('aria-checked'))).toEqual(['false', 'false', 'false']);
++    expect(buttons.map(button => button.getAttribute('aria-checked'))).toEqual(Array(count).fill('false'));
+     expect(host.querySelector('[data-narration-question]')!.getAttribute('data-narration-question')).toBe(q.id);
+     expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('true');
+-    await click(host, '[role=radio][aria-label="图3"]');
++    await click(host, '[role=radio][aria-label="图1"]');
+     await click(host, '[role=radio][aria-label="图2"]');
+     const submit = [...host.querySelectorAll('footer button')].find(button => button.textContent?.includes('完成练习')) as HTMLButtonElement;
+     expect(submit.disabled).toBe(false);
+diff --git a/components/scene-renderers/picture-quiz-layout.module.css b/components/scene-renderers/picture-quiz-layout.module.css
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/picture-quiz-layout.module.css
+@@ -0,0 +1,65 @@
++/* The real QuizView keeps its narration, attempt persistence and grading.
++   Only two/three-image single-choice tasks opt into this measured viewport. */
++.root { container: picture-quiz / size; }
++
++@container picture-quiz (max-width: 560px) or (max-height: 400px) {
++  .root[data-quiz-phase="answering"] [data-quiz-answer-header] {
++    min-height: 56px;
++    padding: 4px 12px;
++  }
++  .root[data-quiz-phase="answering"] [data-quiz-question-scroll] {
++    padding: 6px;
++    min-height: 0;
++  }
++  .root [data-quiz-picture-card] { padding: 8px; }
++  .root [data-quiz-question-heading] { margin-bottom: 4px; }
++  .root [data-quiz-question-heading] p { display: none; }
++  .root [data-quiz-picture-card] > div:has(> button) { margin-bottom: 4px; }
++  .root [data-quiz-picture-card] > div > button[aria-label] { min-height: 48px; }
++  .root [data-quiz-scene-picture] {
++    height: clamp(56px, 17cqh, 120px);
++    margin-bottom: 6px;
++  }
++  .root [data-quiz-scene-picture] [data-quiz-visual],
++  .root [data-quiz-scene-picture] img {
++    height: 100%; width: 100%; max-height: 100%; object-fit: contain;
++  }
++  .root [data-quiz-option-group] > div {
++    display: grid;
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++    gap: 6px;
++  }
++  .root [data-quiz-option-group="2"] > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
++  .root [data-quiz-option-group] button {
++    display: flex; flex-direction: column; justify-content: center;
++    width: 100%; min-width: 48px; min-height: 80px;
++    height: clamp(80px, 25cqh, 160px);
++    padding: 4px; gap: 0;
++  }
++  .root [data-quiz-option-group] button > [data-quiz-visual] {
++    flex: 1 1 0%; width: 100%; height: 100%; min-height: 0;
++  }
++  .root [data-quiz-option-group] img {
++    width: 100%; height: 100%; max-height: 100%; object-fit: contain;
++  }
++  /* Labels remain accessible but pictures carry the choice. */
++  .root [data-quiz-option-group] button > span:not([data-quiz-visual]) {
++    position: absolute; width: 1px; height: 1px; padding: 0;
++    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap;
++  }
++}
++
++@container picture-quiz (min-width: 561px) and (max-height: 400px) {
++  .root[data-quiz-phase="answering"] [data-quiz-picture-card] {
++    display: grid;
++    grid-template-columns: minmax(0, .85fr) minmax(0, 1.5fr);
++    column-gap: 12px;
++  }
++  .root [data-quiz-question-heading] { grid-column: 2; grid-row: 1; }
++  .root [data-quiz-picture-card] > div:has(> button) { grid-column: 2; grid-row: 2; }
++  .root [data-quiz-scene-picture] {
++    grid-column: 1; grid-row: 1 / 4;
++    align-self: center; height: clamp(80px, 55cqh, 200px);
++  }
++  .root [data-quiz-option-group] { grid-column: 2; grid-row: 3; }
++}
+diff --git a/tests/scene-renderers/picture-quiz-layout.browser.test.ts b/tests/scene-renderers/picture-quiz-layout.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/picture-quiz-layout.browser.test.ts
+@@ -0,0 +1,234 @@
++import { describe, expect, it } from 'vitest';
++import { chromium } from 'playwright-core';
++import { createRequire } from 'node:module';
++import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
++import { dirname, join } from 'node:path';
++
++type FixtureWindow = Window & {
++  mountQuiz: (fixed: boolean, count: number) => void;
++  posts: Array<{ answers: Record<string, string> }>;
++};
++type BundleFile = { path: string; text: string };
++type BuildHooks = {
++  onResolve: (
++    options: { filter: RegExp },
++    callback: (args: { path: string }) => { path: string; namespace: string } | undefined,
++  ) => void;
++  onLoad: (
++    options: { filter: RegExp; namespace: string },
++    callback: (args: { path: string }) => { contents: string; loader: string },
++  ) => void;
++};
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')(
++  'picture question mobile layout',
++  () => {
++    it('keeps all choices visible, equal before answering, and preserves exact submitted answers', async () => {
++      const require = createRequire(import.meta.url);
++      const { build } = createRequire(require.resolve('tsx'))('esbuild');
++      const mocks: Record<string, string> = {
++        '@/lib/hooks/use-i18n': `export const useI18n=()=>({t:k=>k,locale:'zh-CN'});`,
++        '@/lib/store': `const state={stage:{fixedTextbook:true},currentSceneId:'quiz',scenes:[]};export const useStageStore=f=>f(state);useStageStore.getState=()=>state;`,
++        '@/lib/contexts/mira-student-runtime-context': `export const useMiraStudentRuntimeEvents=()=>null;`,
++        '@/lib/quiz/runtime': `export const createQuizAttemptWriter=()=>({});export const loadQuizAttemptState=async()=>({attemptId:'test'});export class QuizRetryProgressedError extends Error {}`,
++        '@/lib/quiz/view-state': `export const createQuizViewLifetime=()=>({});export const isQuizRuntimeReady=()=>true;export const persistQuizReview=async()=>{};export const persistQuizRetry=async()=>{};export const persistQuizSubmission=async()=>{};export const quizViewStateFromAttempt=()=>({});export const runQuizPersistenceTransition=async()=>{};`,
++        '@/lib/utils/model-config': `export const getCurrentModelConfig=()=>({});`,
++        '@/components/audio/speech-button': `export const SpeechButton=()=>null;`,
++      };
++      const bundle = await build({
++        stdin: {
++          resolveDir: process.cwd(),
++          loader: 'tsx',
++          contents: `
++import React from 'react';import {createRoot} from 'react-dom/client';
++import {FixedTextbookQuiz} from './components/scene-renderers/fixed-textbook-quiz';
++import {SingleChoiceQuestion} from './components/scene-renderers/quiz-view';
++import styles from './components/scene-renderers/picture-quiz-layout.module.css';
++const picture=(color)=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="'+color+'"/><circle cx="200" cy="150" r="70" fill="white"/></svg>');
++let generation=0;window.mountQuiz=(fixed,count)=>{generation++;const q={id:'q',type:'single',question:'下一步用哪个动作？请听老师说，再看图选择。',questionAudioUrl:'/api/classroom-media/test/audio/question.wav',options:Array.from({length:count},(_,i)=>({value:String(i),label:'图'+i})),optionVisuals:Object.fromEntries(Array.from({length:count},(_,i)=>[String(i),{kind:'image',src:picture(['#428c72','#df8a50','#6983b4'][i]),alt:'picture'+i}])),visual:{kind:'image',src:picture('#e2e9cd'),alt:'scene'}};window.posts=[];window.fetch=async(_url,init)=>{if(init?.method==='POST')window.posts.push(JSON.parse(init.body));return{ok:true,json:async()=>init?.method==='POST'?{ok:true,partial:{results:[{questionId:'q',response:'1',correct:true,explanation:'选对了',correctAnswer:'1'}]}}:{ok:true}}};root.render(fixed?<FixedTextbookQuiz key={'fixed'+count+':'+generation} questions={[q]}/>:<div className={styles.root} data-quiz-phase='answering' style={{height:'100%',display:'flex',flexDirection:'column'}}><div data-quiz-answer-header style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>答题中<button style={{minHeight:48,minWidth:48}}>✓</button></div><div data-quiz-question-scroll style={{flex:1,overflowY:'auto'}}><SingleChoiceQuestion question={q} index={0} onChange={()=>{}}/></div></div>);};const root=createRoot(document.querySelector('#app'));window.mountQuiz(true,3);`,
++        },
++        bundle: true,
++        write: false,
++        outfile: 'quiz-test.js',
++        format: 'iife',
++        platform: 'browser',
++        logLevel: 'silent',
++        define: { 'process.env.NODE_ENV': '"test"' },
++        plugins: [
++          {
++            name: 'app-integrations',
++            setup(b: BuildHooks) {
++              b.onResolve({ filter: /^@\// }, (a: { path: string }) =>
++                mocks[a.path] ? { path: a.path, namespace: 'mock' } : undefined,
++              );
++              b.onLoad({ filter: /.*/, namespace: 'mock' }, (a: { path: string }) => ({
++                contents: mocks[a.path],
++                loader: 'js',
++              }));
++            },
++          },
++        ],
++      });
++      const tw = require('tailwindcss');
++      const compiled = await tw.compile(
++        readFileSync(
++          join(dirname(require.resolve('tailwindcss/package.json')), 'index.css'),
++          'utf8',
++        ),
++      );
++      const files = ['fixed-textbook-quiz.tsx', 'quiz-view.tsx', 'quiz-picture.tsx']
++        .map((f) => `components/scene-renderers/${f}`)
++        .concat('components/audio/question-narration.tsx');
++      const source = files.map((f) => readFileSync(f, 'utf8')).join('\n');
++      const css =
++        compiled.build([
++          ...new Set(source.split(/[\s'"`{}(),]+/)),
++          'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]',
++        ]) +
++        '\n' +
++        bundle.outputFiles.find((f: BundleFile) => f.path.endsWith('.css')).text +
++        '\nhtml,body,#app{height:100%;width:100%;margin:0}';
++      const js = bundle.outputFiles.find((f: BundleFile) => f.path.endsWith('.js')).text;
++      if (process.env.MIRA_FORMAL_QA_EXPORT_DIR) {
++        mkdirSync(process.env.MIRA_FORMAL_QA_EXPORT_DIR, { recursive: true });
++        writeFileSync(
++          join(process.env.MIRA_FORMAL_QA_EXPORT_DIR, 'picture-quiz.html'),
++          `<html><head><style>${css}</style></head><body><div id="app"></div><script>${js.replaceAll('</script', '<\\/script')}</script></body></html>`,
++        );
++      }
++      const browser = await chromium.launch({
++        executablePath:
++          process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++        headless: true,
++      });
++      try {
++        const page = await browser.newPage({
++          viewport: { width: 390, height: 564 },
++          hasTouch: true,
++        });
++        await page.route('**/*', (r) => r.abort());
++        await page.setContent('<html><body><div id="app"></div></body></html>');
++        await page.addStyleTag({ content: css });
++        await page.addScriptTag({ content: js });
++        // Heights cover the lesson viewport after chrome, plus a short landscape.
++        for (const fixed of [false, true])
++          for (const count of [2, 3])
++            for (const viewport of [
++              { width: 320, height: 390 },
++              { width: 390, height: 564 },
++              { width: 844, height: 300 },
++            ]) {
++              await page.setViewportSize(viewport);
++              await page.evaluate(
++                ({ fixed, count }) => (window as unknown as FixtureWindow).mountQuiz(fixed, count),
++                { fixed, count },
++              );
++              const options = page.locator(fixed ? '[role=radio]' : '[data-quiz-option]');
++              await options.last().waitFor();
++              await page.waitForFunction(
++                (count) =>
++                  document.querySelectorAll('[role=radio],[data-quiz-option]').length === count &&
++                  !document.querySelector('[role=radio]:disabled'),
++                count,
++              );
++              const boxes = await options.evaluateAll((elements) =>
++                elements.map((el) => {
++                  const r = el.getBoundingClientRect();
++                  let top = 0,
++                    left = 0,
++                    right = innerWidth,
++                    bottom = innerHeight;
++                  for (let parent = el.parentElement; parent; parent = parent.parentElement) {
++                    const style = getComputedStyle(parent),
++                      box = parent.getBoundingClientRect();
++                    if (/auto|scroll|hidden|clip/.test(style.overflowY)) {
++                      top = Math.max(top, box.top + parent.clientTop);
++                      bottom = Math.min(bottom, box.top + parent.clientTop + parent.clientHeight);
++                    }
++                    if (/auto|scroll|hidden|clip/.test(style.overflowX)) {
++                      left = Math.max(left, box.left + parent.clientLeft);
++                      right = Math.min(right, box.left + parent.clientLeft + parent.clientWidth);
++                    }
++                  }
++                  const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
++                  const image = el.querySelector('img');
++                  const imageBox = image?.getBoundingClientRect();
++                  let unclipped = true;
++                  for (
++                    let parent = image?.parentElement;
++                    parent && parent !== el;
++                    parent = parent.parentElement
++                  ) {
++                    if (getComputedStyle(parent).clip !== 'auto') unclipped = false;
++                  }
++                  const imageVisible =
++                    !!image?.complete &&
++                    image.naturalWidth > 0 &&
++                    !!imageBox &&
++                    imageBox.width >= 48 &&
++                    imageBox.height >= 48 &&
++                    unclipped &&
++                    imageBox.x >= r.x &&
++                    imageBox.y >= r.y &&
++                    imageBox.right <= r.right + 1 &&
++                    imageBox.bottom <= r.bottom + 1;
++                  return {
++                    x: r.x,
++                    y: r.y,
++                    width: r.width,
++                    height: r.height,
++                    bottom: r.bottom,
++                    right: r.right,
++                    fullyVisible:
++                      r.top >= top &&
++                      r.left >= left &&
++                      r.bottom <= bottom + 1 &&
++                      r.right <= right + 1,
++                    receivesPointer: !!hit && el.contains(hit),
++                    imageVisible,
++                  };
++                }),
++              );
++              for (const box of boxes) {
++                expect(box.fullyVisible, JSON.stringify({ fixed, count, viewport, boxes })).toBe(
++                  true,
++                );
++                expect(box.receivesPointer).toBe(true);
++                expect(box.imageVisible, JSON.stringify({ fixed, count, viewport, boxes })).toBe(
++                  true,
++                );
++                expect(
++                  box.width,
++                  JSON.stringify({ fixed, count, viewport, boxes }),
++                ).toBeGreaterThanOrEqual(48);
++                expect(box.height).toBeGreaterThanOrEqual(48);
++                expect(box.y).toBeGreaterThanOrEqual(0);
++                expect(box.x).toBeGreaterThanOrEqual(0);
++                expect(
++                  box.bottom,
++                  JSON.stringify({ fixed, count, viewport, boxes }),
++                ).toBeLessThanOrEqual(viewport.height);
++                expect(box.right).toBeLessThanOrEqual(viewport.width);
++              }
++              expect(
++                Math.max(...boxes.map((b) => b.width)) - Math.min(...boxes.map((b) => b.width)),
++              ).toBeLessThan(1);
++              if (fixed) {
++                await options.nth(0).click();
++                await options.nth(1).click();
++                await page.getByRole('button', { name: '完成练习' }).click();
++                await page.waitForFunction(
++                  () => (window as unknown as FixtureWindow).posts.length === 1,
++                );
++                expect(
++                  await page.evaluate(() => (window as unknown as FixtureWindow).posts),
++                ).toEqual([{ answers: { q: '1' } }]);
++              }
++            }
++      } finally {
++        await browser.close();
++      }
++    }, 60000);
++  },
++);

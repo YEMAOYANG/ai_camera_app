@@ -1,0 +1,171 @@
+diff --git a/components/audio/question-narration.tsx b/components/audio/question-narration.tsx
+--- a/components/audio/question-narration.tsx
++++ b/components/audio/question-narration.tsx
+@@ -56,7 +56,7 @@
+         if (attempt !== request) return;
+         setPlaying(!player.paused);
+         registration.phase(player.paused ? 'paused' : 'playing');
+-        if (!player.paused && sceneId && questionId) notifyQuestionNarration(sceneId, questionId);
++        if (!player.paused && sceneId && questionId) notifyQuestionNarration(sceneId, questionId, src);
+       } catch {
+         if (!disposed && attempt === request) {
+           setPlaying(false); setFailed(true); registration.phase('paused');
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -360,17 +360,20 @@
+       const pauseForActivity = () => {
+         releasePageNarrationPause();
+         engineRef.current?.pause();
+-        setLectureSpeech(previous => speechAfterActivityGesture(useStageStore.getState().getCurrentScene(), previous));
++        setLectureSpeech(previous => {
++          const state = useStageStore.getState();
++          return speechAfterActivityGesture(state.getCurrentScene(), previous, usesTextbookPageNarration(state.stage));
++        });
+         setLiveSpeech(null);
+         setSuppressIdleSpeech(true);
+         const sceneId = useStageStore.getState().currentSceneId;
+         if (sceneId) releaseQuestionNarrationScene(sceneId);
+       };
+       window.addEventListener(ACTIVITY_AUDIO_EVENT, pauseForActivity);
+-      const unsubscribeQuestion = subscribeQuestionNarration((sceneId, questionId) => {
++      const unsubscribeQuestion = subscribeQuestionNarration((sceneId, questionId, audioSource) => {
+         const state = useStageStore.getState();
+         const text = fixedQuizQuestionNarrationText(state.getCurrentScene(),
+-          usesTextbookPageNarration(state.stage), sceneId, questionId);
++          usesTextbookPageNarration(state.stage), sceneId, questionId, audioSource);
+         if (text === null) return;
+         setLectureSpeech(text);
+         setLiveSpeech(null);
+diff --git a/lib/mira/fixed-quiz-narration.ts b/lib/mira/fixed-quiz-narration.ts
+--- a/lib/mira/fixed-quiz-narration.ts
++++ b/lib/mira/fixed-quiz-narration.ts
+@@ -31,7 +31,25 @@
+ /** Resolve native narration identity against this scene; never accept message text. */
+ export function fixedQuizQuestionNarrationText(
+   scene: Scene | null | undefined, fixedTextbook: boolean, sceneId: string, questionId: string,
++  audioSource?: string,
+ ): string | null {
+   if (!fixedTextbook || scene?.id !== sceneId || scene.type !== 'quiz' || scene.content.type !== 'quiz') return null;
+-  return scene.content.questions.find(question => question.id === questionId)?.question ?? null;
++  const question = scene.content.questions.find(question => question.id === questionId);
++  if (question) return question.question;
++  // The public student question omits answers and optionFeedback. Resolve the
++  // selected server feedback through its recorded clip and this scene's saved
++  // speech actions, never from an iframe/event-supplied caption string.
++  const feedbackQuestion = scene.content.questions.find(question => question.options?.some(
++    option => `${question.id}:feedback:${option.value}` === questionId,
++  ));
++  if (!feedbackQuestion || !audioSource ||
++      !/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/audio\/[A-Za-z0-9_-]+\.(?:wav|mp3|ogg)$/.test(audioSource)) return null;
++  let questionStarted = false;
++  const stems = new Set(scene.content.questions.map(question => question.question.trim()));
++  for (const action of scene.actions ?? []) {
++    if (action.type !== 'speech') continue;
++    if (stems.has(action.text.trim())) questionStarted = action.text.trim() === feedbackQuestion.question.trim();
++    else if (questionStarted && audioPath(action.audioUrl) === audioSource) return action.text;
++  }
++  return null;
+ }
+diff --git a/lib/mira/lecture-audio.ts b/lib/mira/lecture-audio.ts
+--- a/lib/mira/lecture-audio.ts
++++ b/lib/mira/lecture-audio.ts
+@@ -43,7 +43,7 @@
+ }
+ 
+ // Native quiz identity only: iframe postMessage/CustomEvent payloads are not text sources.
+-type QuestionNarrationListener = (sceneId: string, questionId: string) => void;
++type QuestionNarrationListener = (sceneId: string, questionId: string, audioSource?: string) => void;
+ const questionListeners = new Set<QuestionNarrationListener>();
+ 
+ export function subscribeQuestionNarration(listener: QuestionNarrationListener): () => void {
+@@ -51,9 +51,9 @@
+   return () => { questionListeners.delete(listener); };
+ }
+ 
+-export function notifyQuestionNarration(sceneId: string, questionId: string): void {
++export function notifyQuestionNarration(sceneId: string, questionId: string, audioSource?: string): void {
+   if (!isQuestionNarrationReady(sceneId)) return;
+-  questionListeners.forEach(listener => listener(sceneId, questionId));
++  questionListeners.forEach(listener => listener(sceneId, questionId, audioSource));
+ }
+ 
+ // Interactive captions use fixed cue identities; authored iframe text is never accepted.
+diff --git a/lib/mira/page-managed-narration.ts b/lib/mira/page-managed-narration.ts
+--- a/lib/mira/page-managed-narration.ts
++++ b/lib/mira/page-managed-narration.ts
+@@ -145,7 +145,13 @@
+ }
+ 
+ /** A gesture takes the sound channel, not the already visible teacher sentence. */
+-export function speechAfterActivityGesture(scene: Scene | null | undefined, previous: string | null): string | null {
++export function speechAfterActivityGesture(scene: Scene | null | undefined, previous: string | null, pageManagedQuiz = false): string | null {
++  if (pageManagedQuiz && scene?.type === 'quiz' && scene.content.type === 'quiz') {
++    const speeches = (scene.actions ?? []).filter(action => action.type === 'speech');
++    if (previous && (speeches.some(action => action.text === previous)
++        || scene.content.questions.some(question => question.question === previous))) return previous;
++    return speeches[0]?.text ?? scene.content.questions[0]?.question ?? null;
++  }
+   if (scene?.type !== 'interactive') return null;
+   return previous ?? scene.actions?.find(action => action.type === 'speech')?.text ?? null;
+ }
+diff --git a/tests/playback/page-managed-narration.test.ts b/tests/playback/page-managed-narration.test.ts
+--- a/tests/playback/page-managed-narration.test.ts
++++ b/tests/playback/page-managed-narration.test.ts
+@@ -204,4 +204,14 @@
+     expect(speechAfterActivityGesture({ ...scene, type: 'quiz' } as Scene, text)).toBeNull();
+     expect(speechAfterActivityGesture(null, text)).toBeNull();
+   });
++  it('preserves only current-scene teacher text while a fixed quiz takes the sound channel', () => {
++    const scene = { id: 'quiz', type: 'quiz', content: { type: 'quiz', questions: [
++      { id: 'q', question: '听一听，选一选。' },
++    ] }, actions: [{ id: 'feedback', type: 'speech', text: '先对齐尺子零点，再比较。' }] } as Scene;
++    expect(speechAfterActivityGesture(scene, '先对齐尺子零点，再比较。', true)).toBe('先对齐尺子零点，再比较。');
++    expect(speechAfterActivityGesture(scene, '听一听，选一选。', true)).toBe('听一听，选一选。');
++    expect(speechAfterActivityGesture(scene, '旧场景的回答', true)).not.toBe('旧场景的回答');
++    expect(speechAfterActivityGesture(scene, null, true)).not.toBeNull();
++    expect(speechAfterActivityGesture(scene, '先对齐尺子零点，再比较。', false)).toBeNull();
++  });
+ });
+diff --git a/tests/quiz/question-narration-lifecycle.test.ts b/tests/quiz/question-narration-lifecycle.test.ts
+--- a/tests/quiz/question-narration-lifecycle.test.ts
++++ b/tests/quiz/question-narration-lifecycle.test.ts
+@@ -224,6 +224,38 @@
+     idleText: '一起找一找在哪里读书。', speakingStudent: false, sessionType: null,
+   });
+ 
++  it('announces selected feedback only after its recorded clip starts, using saved scene speech', async () => {
++    const scene = fixedQuiz(2);
++    const feedbackSrc = '/api/classroom-media/lesson/audio/feedback-A.mp3';
++    const feedbackText = '这里有五个圆点，再逐个数一遍。';
++    scene.actions!.splice(2, 0, { id: 'feedback-q1-A', type: 'speech', text: feedbackText,
++      audioId: 'feedback-A', audioUrl: `http://127.0.0.1:3100${feedbackSrc}` });
++    const spoken: string[] = [];
++    const unsubscribe = subscribeQuestionNarration((sceneId, questionId, source) => {
++      const text = fixedQuizQuestionNarrationText(scene, true, sceneId, questionId, source);
++      if (text !== null) spoken.push(text);
++    });
++    try {
++      beginQuestionNarrationScene(scene.id);
++      releaseQuestionNarrationScene(scene.id);
++      await render(false, feedbackSrc, scene.id, 'q1:feedback:A');
++      expect(spoken).toEqual([]); // Reopening results must stay quiet.
++      act(() => host.querySelector('button')!.click());
++      await tick();
++      expect(spoken).toEqual([feedbackText]);
++      expect(fixedQuizQuestionNarrationText(scene, true, scene.id, 'q1:feedback:A')).toBeNull();
++      expect(fixedQuizQuestionNarrationText(scene, true, 'other', 'q1:feedback:A', feedbackSrc)).toBeNull();
++      expect(fixedQuizQuestionNarrationText(scene, true, scene.id, 'q1:feedback:unknown', feedbackSrc)).toBeNull();
++      expect(fixedQuizQuestionNarrationText(scene, true, scene.id, 'q2:feedback:A', feedbackSrc)).toBeNull();
++      expect(fixedQuizQuestionNarrationText(scene, true, scene.id, 'q1:feedback:A', '/api/classroom-media/lesson/audio/q1.wav')).toBeNull();
++      expect(fixedQuizQuestionNarrationText(scene, true, scene.id, 'q1:feedback:A', `https://untrusted.example${feedbackSrc}`)).toBeNull();
++      window.dispatchEvent(new MessageEvent('message', { data: {
++        sceneId: scene.id, questionId: 'q1:feedback:A', text: 'arbitrary iframe text', audioSource: feedbackSrc,
++      } }));
++      expect(spoken).toEqual([feedbackText]);
++    } finally { unsubscribe(); }
++  });
++
+   it('updates from the current question identity only after its audio starts', async () => {
+     const scene = fixedQuiz();
+     const bubble = raw();

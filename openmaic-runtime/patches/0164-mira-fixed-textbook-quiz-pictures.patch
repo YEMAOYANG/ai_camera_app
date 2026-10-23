@@ -1,0 +1,181 @@
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -3,14 +3,21 @@
+ import { useCallback, useEffect, useState } from 'react';
+ import { Check, ArrowRight, Loader2 } from 'lucide-react';
+ import type { QuizQuestion } from '@/lib/types/stage';
++import type { QuizVisual } from '@openmaic/dsl';
+ import { useStageStore } from '@/lib/store';
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
++import { QuizPicture } from './quiz-picture';
+ 
+ type Result = {
+   score: number; maxScore: number; correctCount: number; totalQuestions: number;
+   results: { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string }[];
+ };
++
++/** A picture answer needs no reading; its label stays available to assistive technology. */
++export function FixedTextbookOptionFace({ visual, label }: { visual?: QuizVisual; label: string }) {
++  return visual ? <><QuizPicture visual={visual} /><span className="sr-only">{label}</span></> : <>{label}</>;
++}
+ 
+ /** Fixed releases have private server answers and student-scoped persistence. */
+ export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] }) {
+@@ -61,7 +68,7 @@
+     finally { setSending(false); }
+   }
+ 
+-  return <section className="h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]" aria-label="天地人练习">
++  return <section className="h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]" aria-label="课堂练习">
+     <div className="mx-auto max-w-5xl p-5 sm:p-8">
+       <header className="mb-7 flex items-end justify-between gap-4">
+         <div><p className="mb-2 text-sm text-[#697a6c]">小小识字家</p>
+@@ -74,13 +81,14 @@
+           const feedback = result?.results.find(r => r.questionId === q.id);
+           return <fieldset key={q.id} className="rounded-2xl border border-[#e9dfcd] bg-white/80 p-5">
+             <legend className="px-2 text-sm text-[#788275]">第 {index + 1} 题</legend>
++            {q.visual && <div className="mb-4" data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
+             <p className="mb-4 text-lg leading-relaxed">{q.question}</p>
+             {audio && <QuestionNarration src={audio} number={index + 1} />}
+             <div className="flex gap-3" role="radiogroup" aria-label={q.question}>
+               {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+                 aria-label={option.label} key={option.value} disabled={Boolean(result) || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+                 className={`min-h-16 flex-1 rounded-xl border text-3xl transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
+-                {option.label}
++                <FixedTextbookOptionFace visual={q.optionVisuals?.[option.value]} label={option.label} />
+               </button>)}
+             </div>
+             {feedback && <p className={`mt-4 flex items-start gap-2 text-base ${feedback.correct ? 'text-[#377254]' : 'text-[#996238]'}`}>
+diff --git a/components/scene-renderers/quiz-picture.tsx b/components/scene-renderers/quiz-picture.tsx
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/quiz-picture.tsx
+@@ -0,0 +1,40 @@
++'use client';
++
++import { cn } from '@/lib/utils';
++import type { QuizVisual } from '@openmaic/dsl';
++
++/** The visual never supplies an answer; its containing button owns the value. */
++export function QuizPicture({ visual, scene = false }: { visual: QuizVisual; scene?: boolean }) {
++  if (visual.kind === 'people') return (
++    <span data-quiz-visual="people" className="flex justify-center gap-4 rounded-xl bg-[#eef2e8] p-3">
++      {visual.members.map(member => <span key={member.id} data-person-id={member.id} className="block min-w-0 max-w-36 flex-1">
++        <QuizPicture visual={{ kind: 'image', src: member.src, alt: member.alt, cue: member.cue }} scene={scene} />
++      </span>)}
++    </span>
++  );
++  if (visual.kind === 'quantity') return (
++    <svg data-quiz-visual="quantity" data-quantity={visual.count} viewBox={`0 0 240 ${Math.max(120, Math.ceil(visual.count / 5) * 22 + 28)}`} role="img"
++      aria-label={visual.alt ?? `${visual.count} 个物体`} className={scene ? 'w-full h-36' : 'w-full h-24'}>
++      <rect x="6" y="6" width="228" height={Math.max(108, Math.ceil(visual.count / 5) * 22 + 16)} rx="20" fill="#eef2e8" stroke="#d1dccb" />
++      {Array.from({ length: visual.count }, (_, index) => (
++        <circle key={index} cx={30 + (index % 5) * 45} cy={29 + Math.floor(index / 5) * 22} r="9" fill="#d9a844" stroke="#9e782e" />
++      ))}
++    </svg>
++  );
++  return (
++    <span data-quiz-visual="image" className="relative block w-full">
++      {/* Approved local/original assets can cross the classroom origin. */}
++      {/* eslint-disable-next-line @next/next/no-img-element */}
++      <img src={visual.src} alt={visual.alt} className={cn('w-full object-contain rounded-xl', scene ? 'max-h-52' : 'h-28')} />
++      {visual.cue && visual.cue !== 'observer' && (
++        <svg data-person-cue={visual.cue} viewBox="0 0 64 48" aria-label={visual.cue === 'speaking' ? '正在说话' : '正在听'}
++          className="absolute right-1 top-1 w-12 h-10 drop-shadow-sm" role="img">
++          <path d="M8 4h45v30H29L18 44V34H8Z" fill="#fff9e6" stroke="#466a51" strokeWidth="2" />
++          {visual.cue === 'speaking'
++            ? <path d="M19 18v7m8-13v18m8-15v12m8-9v6" stroke="#466a51" strokeWidth="3" strokeLinecap="round" />
++            : <path d="M23 26c-6-11 2-19 10-16 9 3 4 12 0 13-3 1-1 8-5 8m1-12c2-5 7-3 5 1" fill="none" stroke="#466a51" strokeWidth="3" strokeLinecap="round" />}
++        </svg>
++      )}
++    </span>
++  );
++}
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -20,7 +20,6 @@
+ 
+ const log = createLogger('QuizView');
+ import type { QuizQuestion } from '@/lib/types/stage';
+-import type { QuizVisual } from '@openmaic/dsl';
+ import { SpeechButton } from '@/components/audio/speech-button';
+ import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { gradeChoiceQuestions, isShortAnswer, type QuestionResult } from '@/lib/quiz/grading';
+@@ -46,6 +45,7 @@
+ import { useStageStore } from '@/lib/store';
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import { FixedTextbookQuiz } from './fixed-textbook-quiz';
++import { QuizPicture } from './quiz-picture';
+ 
+ // ─── Types ──────────────────────────────────────────────────────────────────
+ 
+@@ -63,42 +63,6 @@
+ const TAP_OBJECT_COLORS = { red: '#dc4c40', blue: '#2879c6', yellow: '#e8b72d', green: '#348d57' } as const;
+ const TAP_OBJECT_NAMES = { circle: '圆形', square: '方形', triangle: '三角形' } as const;
+ const TAP_COLOR_NAMES = { red: '红色', blue: '蓝色', yellow: '黄色', green: '绿色' } as const;
+-
+-/** The visual never supplies an answer; its containing button owns the value. */
+-function QuizPicture({ visual, scene = false }: { visual: QuizVisual; scene?: boolean }) {
+-  if (visual.kind === 'people') return (
+-    <span data-quiz-visual="people" className="flex justify-center gap-4 rounded-xl bg-[#eef2e8] p-3">
+-      {visual.members.map(member => <span key={member.id} data-person-id={member.id} className="block min-w-0 max-w-36 flex-1">
+-        <QuizPicture visual={{ kind: 'image', src: member.src, alt: member.alt, cue: member.cue }} scene={scene} />
+-      </span>)}
+-    </span>
+-  );
+-  if (visual.kind === 'quantity') return (
+-    <svg data-quiz-visual="quantity" data-quantity={visual.count} viewBox={`0 0 240 ${Math.max(120, Math.ceil(visual.count / 5) * 22 + 28)}`} role="img"
+-      aria-label={visual.alt ?? `${visual.count} 个物体`} className={scene ? 'w-full h-36' : 'w-full h-24'}>
+-      <rect x="6" y="6" width="228" height={Math.max(108, Math.ceil(visual.count / 5) * 22 + 16)} rx="20" fill="#eef2e8" stroke="#d1dccb" />
+-      {Array.from({ length: visual.count }, (_, index) => (
+-        <circle key={index} cx={30 + (index % 5) * 45} cy={29 + Math.floor(index / 5) * 22} r="9" fill="#d9a844" stroke="#9e782e" />
+-      ))}
+-    </svg>
+-  );
+-  return (
+-    <span data-quiz-visual="image" className="relative block w-full">
+-      {/* Approved local/original assets can cross the classroom origin. */}
+-      {/* eslint-disable-next-line @next/next/no-img-element */}
+-      <img src={visual.src} alt={visual.alt} className={cn('w-full object-contain rounded-xl', scene ? 'max-h-52' : 'h-28')} />
+-      {visual.cue && visual.cue !== 'observer' && (
+-        <svg data-person-cue={visual.cue} viewBox="0 0 64 48" aria-label={visual.cue === 'speaking' ? '正在说话' : '正在听'}
+-          className="absolute right-1 top-1 w-12 h-10 drop-shadow-sm" role="img">
+-          <path d="M8 4h45v30H29L18 44V34H8Z" fill="#fff9e6" stroke="#466a51" strokeWidth="2" />
+-          {visual.cue === 'speaking'
+-            ? <path d="M19 18v7m8-13v18m8-15v12m8-9v6" stroke="#466a51" strokeWidth="3" strokeLinecap="round" />
+-            : <path d="M23 26c-6-11 2-19 10-16 9 3 4 12 0 13-3 1-1 8-5 8m1-12c2-5 7-3 5 1" fill="none" stroke="#466a51" strokeWidth="3" strokeLinecap="round" />}
+-        </svg>
+-      )}
+-    </span>
+-  );
+-}
+ 
+ function tapObjectVisuals(question: QuizQuestion): TapObjectVisual[] | null {
+   const source = question as unknown as Record<string, unknown>;
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts b/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
+@@ -0,0 +1,19 @@
++import { createElement } from 'react';
++import { renderToStaticMarkup } from 'react-dom/server';
++import { describe, expect, it } from 'vitest';
++import { FixedTextbookOptionFace } from '@/components/scene-renderers/fixed-textbook-quiz';
++
++describe('published textbook quiz options', () => {
++  it('shows the reviewed picture and keeps the label for assistive technology only', () => {
++    const markup = renderToStaticMarkup(
++      createElement(FixedTextbookOptionFace, { visual: { kind: 'quantity', count: 3, alt: '3个' }, label: '三个' }),
++    );
++    expect(markup).toContain('data-quiz-visual="quantity"');
++    expect(markup).toContain('data-quantity="3"');
++    expect(markup).toContain('<span class="sr-only">三个</span>');
++  });
++
++  it('keeps a text answer unchanged when a question has no pictures', () => {
++    expect(renderToStaticMarkup(createElement(FixedTextbookOptionFace, { label: '天' }))).toBe('天');
++  });
++});

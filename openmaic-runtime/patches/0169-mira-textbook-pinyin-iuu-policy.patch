@@ -1,0 +1,371 @@
+diff --git a/lib/server/mira-textbook-pinyin-pronunciation.ts b/lib/server/mira-textbook-pinyin-pronunciation.ts
+--- a/lib/server/mira-textbook-pinyin-pronunciation.ts
++++ b/lib/server/mira-textbook-pinyin-pronunciation.ts
+@@ -31,6 +31,98 @@
+   listeningRequired: true,
+ } as const;
+ 
++/** Versioned IUU recipe; each formal segment still requires listening review. */
++export const MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY = {
++  "policyVersion": "mira.textbook.pinyin-iuu-ssml.v1",
++  "subject": "chinese",
++  "providerId": "aliyun-cosyvoice",
++  "modelId": "cosyvoice-v3-flash",
++  "voiceId": "longanwen_v3",
++  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
++  "inputParameters": {
++    "voice": "longanwen_v3",
++    "format": "wav",
++    "sample_rate": 24000,
++    "enable_ssml": true,
++    "rate": 1,
++    "pitch": 1,
++    "seed": 0,
++    "language_hints": [
++      "zh"
++    ]
++  },
++  "symbols": {
++    "i": {
++      "ph": "yi1",
++      "carrier": "衣"
++    },
++    "ī": {
++      "ph": "yi1",
++      "carrier": "衣"
++    },
++    "í": {
++      "ph": "yi2",
++      "carrier": "衣"
++    },
++    "ǐ": {
++      "ph": "yi3",
++      "carrier": "衣"
++    },
++    "ì": {
++      "ph": "yi4",
++      "carrier": "衣"
++    },
++    "u": {
++      "ph": "wu1",
++      "carrier": "乌"
++    },
++    "ū": {
++      "ph": "wu1",
++      "carrier": "乌"
++    },
++    "ú": {
++      "ph": "wu2",
++      "carrier": "乌"
++    },
++    "ǔ": {
++      "ph": "wu3",
++      "carrier": "乌"
++    },
++    "ù": {
++      "ph": "wu4",
++      "carrier": "乌"
++    },
++    "ü": {
++      "ph": "yu1",
++      "carrier": "迂"
++    },
++    "ǖ": {
++      "ph": "yu1",
++      "carrier": "迂"
++    },
++    "ǘ": {
++      "ph": "yu2",
++      "carrier": "迂"
++    },
++    "ǚ": {
++      "ph": "yu3",
++      "carrier": "迂"
++    },
++    "ǜ": {
++      "ph": "yu4",
++      "carrier": "迂"
++    }
++  },
++  "textHandling": {
++    "normalization": "none",
++    "xmlEscape": "amp_lt_gt_quot_apos",
++    "unsupportedLatin": "reject",
++    "combiningMarks": "reject",
++    "wrapper": "speak"
++  },
++  "listeningRequired": true
++} as const;
++
+ function canonical(value: unknown): unknown {
+   if (Array.isArray(value)) return value.map(canonical);
+   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value)
+@@ -44,8 +136,31 @@
+ 
+ export const MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY));
+ 
++export const MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY));
++type RegisteredPolicy = typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY;
++
++// Only server-owned recipes can enter this registry. A caller supplies an
++// identity, never provider settings, an SSML template, or a symbol table.
++const REGISTERED_POLICIES = new Map<string, { policy: RegisteredPolicy; sha256: string }>([
++  [MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.policyVersion, {
++    policy: MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY,
++    sha256: MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256,
++  }],
++  [MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY.policyVersion, {
++    policy: MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY,
++    sha256: MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY_SHA256,
++  }],
++]);
++
++function registeredPolicy(version: unknown) {
++  if (typeof version !== 'string') throw new Error('Missing textbook pinyin policy version');
++  const registered = REGISTERED_POLICIES.get(version);
++  if (!registered) throw new Error('Unknown textbook pinyin policy version');
++  return registered;
++}
++
+ export interface MiraTextbookPinyinPronunciationProfile {
+-  policyVersion: typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.policyVersion;
++  policyVersion: RegisteredPolicy['policyVersion'];
+   policySha256: string;
+   ssmlSha256: string;
+ }
+@@ -61,10 +176,12 @@
+   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
+ };
+ 
+-export function prepareMiraTextbookPinyinPronunciation(text: string) {
++export function prepareMiraTextbookPinyinPronunciation(
++  text: string, policyVersion: unknown = MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.policyVersion,
++) {
+   if (!text || text !== text.trim() || text.length > 8000 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(text))
+     throw new Error('Invalid textbook pinyin text');
+-  const policy = MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY;
++  const { policy, sha256: policySha256 } = registeredPolicy(policyVersion);
+   const symbols: Record<string, { ph: string; carrier: string }> = policy.symbols;
+   const parts = Array.from(text).map(character => {
+     const symbol = symbols[character];
+@@ -76,7 +193,7 @@
+   const ssml = `<speak>${parts.join('')}</speak>`;
+   const profile: MiraTextbookPinyinPronunciationProfile = {
+     policyVersion: policy.policyVersion,
+-    policySha256: MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256,
++    policySha256,
+     ssmlSha256: sha(ssml),
+   };
+   const providerRequest = { model: policy.modelId, input: { ...policy.inputParameters, text: ssml } };
+@@ -114,11 +231,13 @@
+ ): value is MiraTextbookPinyinProviderPronunciation {
+   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+   const profile = value as Record<string, unknown>;
+-  const policy = MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY;
++  let registered: ReturnType<typeof registeredPolicy>;
++  try { registered = registeredPolicy(profile.policyVersion); } catch { return false; }
++  const { policy, sha256: policySha256 } = registered;
+   return Object.keys(profile).sort().join(',') === [
+     'policyVersion', 'policySha256', 'ssmlSha256', 'sourceTextSha256', 'providerBodySha256', 'providerId', 'modelId', 'voiceId',
+   ].sort().join(',') && profile.policyVersion === policy.policyVersion
+-    && profile.policySha256 === MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256
++    && profile.policySha256 === policySha256
+     && profile.sourceTextSha256 === sourceTextSha256
+     && profile.providerId === policy.providerId && profile.modelId === policy.modelId && profile.voiceId === policy.voiceId
+     && ['ssmlSha256', 'providerBodySha256', 'sourceTextSha256'].every(key => /^[a-f0-9]{64}$/.test(String(profile[key] || '')));
+diff --git a/lib/server/mira-formal-audio.ts b/lib/server/mira-formal-audio.ts
+--- a/lib/server/mira-formal-audio.ts
++++ b/lib/server/mira-formal-audio.ts
+@@ -442,7 +442,11 @@
+ 
+ function preparePinyinRequest(input: MiraFormalTtsRequest): MiraTextbookPinyinPrepared {
+   try {
+-    const prepared = prepareMiraTextbookPinyinPronunciation(input.text);
++    // Formal requests must select a registered recipe explicitly. The helper's
++    // legacy AOE default is only for existing internal callers, never this API.
++    const version = input.pronunciationProfile?.policyVersion;
++    if (typeof version !== 'string') throw new Error('Missing pinyin policy version');
++    const prepared = prepareMiraTextbookPinyinPronunciation(input.text, version);
+     assertMiraTextbookPinyinProfile(input.pronunciationProfile, prepared.profile);
+     return prepared;
+   } catch { throw new MiraFormalAudioError('invalid_request', 'Invalid textbook pinyin pronunciation profile'); }
+diff --git a/tests/server/mira-textbook-pinyin-pronunciation.test.ts b/tests/server/mira-textbook-pinyin-pronunciation.test.ts
+--- a/tests/server/mira-textbook-pinyin-pronunciation.test.ts
++++ b/tests/server/mira-textbook-pinyin-pronunciation.test.ts
+@@ -5,6 +5,9 @@
+ import {
+   MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY,
+   MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY_SHA256,
++  MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY,
++  MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY_SHA256,
++  isMiraTextbookPinyinProviderPronunciation,
+   prepareMiraTextbookPinyinPronunciation,
+ } from '@/lib/server/mira-textbook-pinyin-pronunciation';
+ 
+@@ -58,3 +61,59 @@
+       expect(() => prepareMiraTextbookPinyinPronunciation(text)).toThrow();
+     });
+ });
++
++describe('server-registered textbook IUU recipe', () => {
++  const version = 'mira.textbook.pinyin-iuu-ssml.v1';
++
++  it('matches the exact backend policy and independent Python physical-body vector', () => {
++    expect(MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY_SHA256)
++      .toBe('09776788ae5c1dfbbf137179be923550e5838256f5abd30ae8b78b5493f2f8fb');
++    const source = path.resolve(process.cwd(), '../../../backend/content/textbook_pinyin_pronunciation_iuu.v1.json');
++    if (existsSync(source)) expect(MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY)
++      .toEqual(JSON.parse(readFileSync(source, 'utf8')));
++    expect(MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY.inputParameters)
++      .toEqual(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.inputParameters);
++    expect(MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY.listeningRequired).toBe(true);
++    const prepared = prepareMiraTextbookPinyinPronunciation('请听i u ü，īíǐì，ūúǔù，ǖǘǚǜ。', version);
++    expect(prepared.profile.ssmlSha256).toBe('964a9a10c25aa8d18dc20bdbd4f4d60443801715c546922f36ab35fca53dde17');
++    expect(prepared.providerPronunciation.providerBodySha256)
++      .toBe('c69c181546708796450e8cf441754dedd9fec457e540c5dca97d3026670b0dc6');
++  });
++
++  it('maps three bases and all twelve written tones without granting listening approval', () => {
++    const prepared = prepareMiraTextbookPinyinPronunciation('iīíǐìuūúǔùüǖǘǚǜ', version);
++    expect([...prepared.ssml.matchAll(/ph="([a-z]+[1-4])">([^<]+)</g)].map(m => [m[1], m[2]]))
++      .toEqual([
++        ['yi1', '衣'], ['yi1', '衣'], ['yi2', '衣'], ['yi3', '衣'], ['yi4', '衣'],
++        ['wu1', '乌'], ['wu1', '乌'], ['wu2', '乌'], ['wu3', '乌'], ['wu4', '乌'],
++        ['yu1', '迂'], ['yu1', '迂'], ['yu2', '迂'], ['yu3', '迂'], ['yu4', '迂'],
++      ]);
++    expect(Object.keys(prepared.profile).sort()).toEqual(['policySha256', 'policyVersion', 'ssmlSha256']);
++    expect(prepareMiraTextbookPinyinPronunciation('请听<&>"\'。', version).ssml)
++      .toBe('<speak>请听&lt;&amp;&gt;&quot;&apos;。</speak>');
++  });
++
++  it.each(['ɑ', 'e', 'é', 'I', 'ı', 'u\u0308', 'i\u0304', '你好hello'])
++    ('does not expand this lesson policy to unregistered spelling: %s', text => {
++      expect(() => prepareMiraTextbookPinyinPronunciation(text, version)).toThrow();
++    });
++
++  it.each([null, '', 'unknown', '__proto__', 'constructor', { policyVersion: version }])
++    ('rejects unknown policy selectors without an AOE fallback: %j', selector => {
++      expect(() => prepareMiraTextbookPinyinPronunciation('请听。', selector)).toThrow();
++    });
++
++  it('validates receipt version and digest as one registered identity', () => {
++    for (const selected of [version, MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.policyVersion]) {
++      const receipt = prepareMiraTextbookPinyinPronunciation('请听。', selected).providerPronunciation;
++      expect(isMiraTextbookPinyinProviderPronunciation(receipt, receipt.sourceTextSha256)).toBe(true);
++      const other = selected === version ? MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.policyVersion : version;
++      for (const bad of [
++        { ...receipt, policyVersion: other }, { ...receipt, policyVersion: 'unknown' },
++        { ...receipt, policyVersion: undefined }, { ...receipt, policySha256: '0'.repeat(64) },
++        { ...receipt, providerId: 'other-provider' }, { ...receipt, voiceId: 'Serena' },
++        { ...receipt, inputParameters: { rate: 2 } },
++      ]) expect(isMiraTextbookPinyinProviderPronunciation(bad, receipt.sourceTextSha256)).toBe(false);
++    }
++  });
++});
+diff --git a/tests/server/mira-textbook-pinyin-audio.test.ts b/tests/server/mira-textbook-pinyin-audio.test.ts
+--- a/tests/server/mira-textbook-pinyin-audio.test.ts
++++ b/tests/server/mira-textbook-pinyin-audio.test.ts
+@@ -23,17 +23,17 @@
+ 
+ const sha = (value: string | Uint8Array) => createHash('sha256').update(value).digest('hex');
+ const text = '听第二声，é。';
+-const ttsInput = () => ({
++const ttsInput = (source = text, policyVersion?: string) => ({
+   requestId: `tbptts1_${'a'.repeat(64)}`, classroomId: 'pinyin-classroom',
+   classroomContentSha256: 'b'.repeat(64), subject: 'chinese',
+   teacherProfileId: 'mira_chinese_gentle', teacherProfileVersion: 2,
+   teacherProfileSha256: 'a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8',
+   teacherGender: 'female', sceneId: 'scene-p8', sceneOrder: 8,
+   actionId: 'speech-e-second', narrationSegmentId: 'segment-e-second',
+-  text, textSha256: sha(text), pronunciationProfile: prepareMiraTextbookPinyinPronunciation(text).profile,
++  text: source, textSha256: sha(source), pronunciationProfile: prepareMiraTextbookPinyinPronunciation(source, policyVersion).profile,
+ });
+-const asrInput = (audioSha256: string) => {
+-  const { text: _text, textSha256: _textSha, pronunciationProfile: _profile, ...identity } = ttsInput();
++const asrInput = (audioSha256: string, input = ttsInput()) => {
++  const { text: _text, textSha256: _textSha, pronunciationProfile: _profile, ...identity } = input;
+   return { ...identity, requestId: `tbpasr1_${'c'.repeat(64)}`,
+     ttsRequestId: identity.requestId, audioSha256 };
+ };
+@@ -105,6 +105,9 @@
+     });
+     const dependencies = { fetchImpl: fetchMock as typeof fetch, resolveAddresses: async () => ['8.8.8.8'] };
+     const first = await executeMiraFormalTts(ttsInput(), dependencies);
++    // Frozen 0168 logical+physical request identity; registering IUU must not
++    // turn already-paid AOE requests into different jobs.
++    expect(first.record.requestSha256).toBe('896984ba4c7d3a84378db408038a13736f22e9fb7585e56d95e7437e8de3b48a');
+     expect(first.record).toMatchObject({ state: 'succeeded', providerAudioSha256: sha(source),
+       providerRequestId: 'provider-request-123', providerUsage: { characters: 12 },
+       budgetMeasurement: { kind: 'ssml-codepoint-upper-bound', characters: Array.from(prepared.ssml).length, estimated: true },
+@@ -190,4 +193,71 @@
+     await expect(executeMiraFormalAsr(asrInput(tts.record.audioSha256!), { fetchImpl: fetchAsr as typeof fetch })).rejects.toThrow();
+     expect(fetchAsr).toHaveBeenCalledTimes(1);
+   });
++
++  it('sends exact registered IUU SSML once and preserves its version through TTS replay and ASR', async () => {
++    const version = 'mira.textbook.pinyin-iuu-ssml.v1';
++    const input = ttsInput('听第二声，í ú ǘ。', version);
++    const prepared = prepareMiraTextbookPinyinPronunciation(input.text, version);
++    const budget = vi.spyOn(paidBudget, 'budgetedOperation').mockImplementation(
++      async (_provider, _model, _request, _units, work) => work());
++    const fetchTts = vi.fn(async (url: unknown, init?: RequestInit) => {
++      if (init?.method === 'POST') {
++        expect(String(url)).toBe('https://dashscope.aliyuncs.com/api/v1/services/audio/tts/SpeechSynthesizer');
++        expect(init.body).toBe(prepared.providerBody);
++        expect(await readMiraFormalTtsJob(input.requestId)).toMatchObject({
++          state: 'running', providerPronunciation: prepared.providerPronunciation,
++        });
++        return json({ output: { audio: { url: mediaUrl } } });
++      }
++      return new Response(wav(false), { headers: { 'content-type': 'audio/wav' } });
++    });
++    const dependencies = { fetchImpl: fetchTts as typeof fetch, resolveAddresses: async () => ['8.8.8.8'] };
++    const first = await executeMiraFormalTts(input, dependencies);
++    expect(first.record).toMatchObject({ state: 'succeeded', providerId: 'aliyun-cosyvoice',
++      modelId: 'cosyvoice-v3-flash', voiceId: 'longanwen_v3', providerPronunciation: prepared.providerPronunciation });
++    expect(await executeMiraFormalTts(input, dependencies)).toEqual({ record: first.record, created: false });
++    expect(fetchTts).toHaveBeenCalledTimes(2);
++    expect(budget).toHaveBeenCalledTimes(1);
++    expect(budget).toHaveBeenCalledWith('aliyun-cosyvoice', 'cosyvoice-v3-flash', expect.objectContaining({
++      logicalRequest: input, providerRequest: prepared.providerRequest,
++    }), { calls: 1, characters: Array.from(prepared.ssml).length }, expect.any(Function));
++    const fetchAsr = vi.fn(async () => json({ output: { choices: [{ message: { content: [{ text: '听第二声衣乌迂' }] } }] } }));
++    const asr = await executeMiraFormalAsr(asrInput(first.record.audioSha256!, input), { fetchImpl: fetchAsr as typeof fetch });
++    expect(asr.record.providerPronunciation).toEqual(prepared.providerPronunciation);
++    expect((await executeMiraFormalAsr(asrInput(first.record.audioSha256!, input),
++      { fetchImpl: fetchAsr as typeof fetch })).created).toBe(false);
++    expect(fetchAsr).toHaveBeenCalledTimes(1);
++  });
++
++  it('rejects unknown, missing, swapped or caller-expanded IUU profiles before any claim, budget or POST', async () => {
++    const input = ttsInput('请听。', 'mira.textbook.pinyin-iuu-ssml.v1');
++    const fetchMock = vi.fn();
++    const budget = vi.spyOn(paidBudget, 'budgetedOperation');
++    const badProfiles = [undefined, {},
++      { ...input.pronunciationProfile, policyVersion: 'unknown' },
++      { ...input.pronunciationProfile, policyVersion: '__proto__' },
++      { ...input.pronunciationProfile, policyVersion: 'mira.textbook.pinyin-aoe-ssml.v1' },
++      { ...input.pronunciationProfile, policySha256: '0'.repeat(64) },
++      { ...input.pronunciationProfile, ssmlSha256: '0'.repeat(64) },
++      { ...input.pronunciationProfile, providerId: 'other-provider' },
++    ];
++    for (const pronunciationProfile of badProfiles) {
++      await expect(executeMiraFormalTts({ ...input, pronunciationProfile }, { fetchImpl: fetchMock }))
++        .rejects.toThrow();
++    }
++    expect(await readMiraFormalTtsJob(input.requestId)).toBeNull();
++    expect(budget).not.toHaveBeenCalled();
++    expect(fetchMock).not.toHaveBeenCalled();
++  });
++
++  it('does not reuse or resend a request ID across policies even when ordinary text yields identical provider bytes', async () => {
++    const input = ttsInput('请听。', 'mira.textbook.pinyin-iuu-ssml.v1');
++    const fetchMock = vi.fn(async () => { throw new Error('unknown provider outcome'); });
++    const first = await executeMiraFormalTts(input, { fetchImpl: fetchMock });
++    expect(first.record.state).toBe('ambiguous');
++    await expect(executeMiraFormalTts(ttsInput(input.text), { fetchImpl: fetchMock })).rejects.toThrow('conflict');
++    expect((await executeMiraFormalTts(input, { fetchImpl: fetchMock })).created).toBe(false);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    expect(await readMiraFormalTtsJob(input.requestId)).toEqual(first.record);
++  });
+ });

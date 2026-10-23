@@ -1,0 +1,356 @@
+diff --git a/lib/store/interactive-iframe-pool.ts b/lib/store/interactive-iframe-pool.ts
+--- a/lib/store/interactive-iframe-pool.ts
++++ b/lib/store/interactive-iframe-pool.ts
+@@ -12,8 +12,9 @@
+  * rect to position the iframe over, and whether it should currently be visible.
+  *
+  * Entries are keyed by sceneId and persist across scene/mode changes — a scene's
+- * iframe is only rebuilt when its content actually changes. A small LRU cap
+- * bounds how many documents stay resident in memory.
++ * iframe is only rebuilt when its content actually changes. The current
++ * classroom's low-reading responsive activities retain their work; a small LRU
++ * cap bounds all other documents. Leaving the classroom drops both groups.
+  */
+ 
+ import { create } from 'zustand';
+@@ -58,6 +59,12 @@
+ interface InteractiveIframePoolState {
+   entries: Record<string, IframePoolEntry>;
+   activeSceneId: string | null;
++  classroomId: string | null;
++  /** Changes only when one known classroom is replaced by another. */
++  classroomGeneration: number;
++  retainedSceneIds: readonly string[];
++  /** Only the host configures these IDs from the current classroom's scenes. */
++  configureClassroom: (classroomId: string, retainedSceneIds: readonly string[]) => void;
+   /** Monotonic counter; each mount/touch takes the next value. */
+   tick: number;
+   mount: (sceneId: string, input: MountInput) => void;
+@@ -79,8 +86,10 @@
+ function evictLru(
+   entries: Record<string, IframePoolEntry>,
+   activeSceneId: string | null,
++  retainedSceneIds: readonly string[] = [],
+ ): Record<string, IframePoolEntry> {
+-  const ids = Object.keys(entries);
++  const retained = new Set(retainedSceneIds);
++  const ids = Object.keys(entries).filter((id) => !retained.has(id));
+   if (ids.length <= IFRAME_POOL_CAP) return entries;
+   const evictable = ids
+     .filter((id) => id !== activeSceneId)
+@@ -98,7 +107,31 @@
+ export const useInteractiveIframePool = create<InteractiveIframePoolState>((set) => ({
+   entries: {},
+   activeSceneId: null,
++  classroomId: null,
++  classroomGeneration: 0,
++  retainedSceneIds: [],
+   tick: 0,
++
++  configureClassroom: (classroomId, sceneIds) =>
++    set((state) => {
++      const retainedSceneIds = [...new Set(sceneIds)].sort();
++      if (state.classroomId !== null && state.classroomId !== classroomId) {
++        return {
++          classroomId, classroomGeneration: state.classroomGeneration + 1,
++          retainedSceneIds, entries: {}, activeSceneId: null, tick: 0,
++        };
++      }
++      if (
++        state.classroomId === classroomId &&
++        retainedSceneIds.length === state.retainedSceneIds.length &&
++        retainedSceneIds.every((id, index) => id === state.retainedSceneIds[index])
++      ) return {};
++      return {
++        classroomId,
++        retainedSceneIds,
++        entries: evictLru(state.entries, state.activeSceneId, retainedSceneIds),
++      };
++    }),
+ 
+   mount: (sceneId, input) =>
+     set((state) => {
+@@ -122,7 +155,9 @@
+         owner: existing?.owner ?? null,
+         tick,
+       };
+-      const entries = evictLru({ ...state.entries, [sceneId]: entry }, state.activeSceneId);
++      const entries = evictLru(
++        { ...state.entries, [sceneId]: entry }, state.activeSceneId, state.retainedSceneIds,
++      );
+       return { entries, tick };
+     }),
+ 
+@@ -177,5 +212,8 @@
+       return { entries, activeSceneId };
+     }),
+ 
+-  reset: () => set({ entries: {}, activeSceneId: null, tick: 0 }),
++  reset: () => set({
++    entries: {}, activeSceneId: null, classroomId: null, classroomGeneration: 0,
++    retainedSceneIds: [], tick: 0,
++  }),
+ }));
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -98,8 +98,26 @@
+ export function InteractiveIframeHost({ container }: { container?: HTMLElement | null } = {}) {
+   const entries = useInteractiveIframePool((s) => s.entries);
+   const activeSceneId = useInteractiveIframePool((s) => s.activeSceneId);
++  const classroomGeneration = useInteractiveIframePool((s) => s.classroomGeneration);
+   const reset = useInteractiveIframePool((s) => s.reset);
++  const configureClassroom = useInteractiveIframePool((s) => s.configureClassroom);
++  const classroomId = useStageStore((s) => s.stage?.id);
++  const classroomScenes = useStageStore((s) => s.scenes);
++  const retainedSceneIds = useMemo(
++    () => classroomScenes.filter((scene) =>
++      scene.type === 'interactive' && scene.content.type === 'interactive' &&
++      activityViewportMode(scene.content.html) === 'responsive',
++    ).map((scene) => scene.id),
++    [classroomScenes],
++  );
+   const setActiveScene = useWidgetIframeStore((s) => s.setActiveScene);
++
++  // Configure before InteractiveRenderer's passive mount effects. This keeps
++  // five or more low-reading activities alive without lifting the general LRU
++  // limit. A classroom identity change clears even reused scene IDs.
++  useLayoutEffect(() => {
++    if (classroomId) configureClassroom(classroomId, retainedSceneIds);
++  }, [classroomId, retainedSceneIds, configureClassroom]);
+ 
+   // Standalone test/legacy mounts keep a fixed body fallback. Stage passes its
+   // stable container (initially null until the DOM ref attaches); fullscreen
+@@ -127,7 +145,7 @@
+     <>
+       {Object.entries(entries).map(([sceneId, entry]) => (
+         <PooledIframe
+-          key={sceneId}
++          key={`${classroomGeneration}:${sceneId}`}
+           sceneId={sceneId}
+           entry={entry}
+           visible={entry.owner !== null && sceneId === activeSceneId}
+diff --git a/components/scene-renderers/interactive-renderer.tsx b/components/scene-renderers/interactive-renderer.tsx
+--- a/components/scene-renderers/interactive-renderer.tsx
++++ b/components/scene-renderers/interactive-renderer.tsx
+@@ -3,6 +3,7 @@
+ import { useId, useMemo, useRef, useEffect } from 'react';
+ import type { InteractiveContent } from '@/lib/types/stage';
+ import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
++import { useStageStore } from '@/lib/store/stage';
+ import { patchHtmlForIframe } from '@/lib/utils/iframe';
+ import { visibleClientRect } from '@/lib/edit/visible-client-rect';
+ 
+@@ -21,6 +22,7 @@
+  * return on the next mount.
+  */
+ export function InteractiveRenderer({ content, sceneId }: InteractiveRendererProps) {
++  const classroomId = useStageStore((s) => s.stage?.id);
+   const slotRef = useRef<HTMLDivElement>(null);
+   // Unique per mounted placeholder instance — its visibility ownership token, so
+   // a stale unmount during the mode cross-fade can't hide a newer instance.
+@@ -47,7 +49,7 @@
+     setActive(sceneId);
+     claim(sceneId, owner);
+     return () => release(sceneId, owner);
+-  }, [sceneId, owner, patchedHtml, content.url, mount, setActive, claim, release]);
++  }, [classroomId, sceneId, owner, patchedHtml, content.url, mount, setActive, claim, release]);
+ 
+   // Track this slot's screen rect for the host. rAF loop mirrors useTrackedRect:
+   // one getBoundingClientRect read resolves canvas scale, viewport offset and
+diff --git a/tests/store/interactive-iframe-pool.test.ts b/tests/store/interactive-iframe-pool.test.ts
+--- a/tests/store/interactive-iframe-pool.test.ts
++++ b/tests/store/interactive-iframe-pool.test.ts
+@@ -137,3 +137,62 @@
+     expect(pool().activeSceneId).toBeNull();
+   });
+ });
++
++describe('current-classroom responsive activity retention', () => {
++  const responsive = ['a', 'b', 'c', 'd', 'e'];
++
++  test('late initial classroom identity preserves an already mounted first activity', () => {
++    pool().mount('a', { srcDoc: '<p>work</p>' });
++    pool().claim('a', 'owner');
++    pool().setActive('a');
++    const first = pool().entries.a;
++    pool().configureClassroom('lesson-one', responsive);
++    expect(pool().entries.a).toBe(first);
++    expect(pool().activeSceneId).toBe('a');
++    expect(pool().classroomGeneration).toBe(0);
++  });
++
++  test('retains five lesson activities while ordinary activities still obey LRU three', () => {
++    pool().configureClassroom('lesson-one', responsive);
++    for (const id of responsive) pool().mount(id, { srcDoc: id });
++    for (let i = 0; i < 5; i++) pool().mount(`ordinary-${i}`, { srcDoc: `ordinary-${i}` });
++    expect(responsive.every((id) => !!pool().entries[id])).toBe(true);
++    expect(Object.keys(pool().entries).filter((id) => !responsive.includes(id)))
++      .toEqual(['ordinary-2', 'ordinary-3', 'ordinary-4']);
++    pool().mount('a', { srcDoc: 'a' });
++    expect(Object.keys(pool().entries)).toHaveLength(8);
++  });
++
++  test('removed retention returns to the existing LRU bound', () => {
++    pool().configureClassroom('lesson-one', responsive);
++    for (const id of responsive) pool().mount(id, { srcDoc: id });
++    pool().configureClassroom('lesson-one', []);
++    expect(Object.keys(pool().entries)).toEqual(['c', 'd', 'e']);
++  });
++
++  test('a different classroom clears work even when it reuses scene IDs', () => {
++    pool().configureClassroom('lesson-one', responsive);
++    pool().mount('a', { srcDoc: 'old' });
++    pool().setActive('a');
++    pool().configureClassroom('lesson-two', ['a']);
++    expect(pool().entries).toEqual({});
++    expect(pool().activeSceneId).toBeNull();
++    expect(pool().tick).toBe(0);
++    expect(pool().retainedSceneIds).toEqual(['a']);
++    expect(pool().classroomGeneration).toBe(1);
++    pool().mount('a', { srcDoc: 'new' });
++    expect(pool().entries.a.srcDoc).toBe('new');
++  });
++
++  test('content replacement and explicit eviction still apply to retained scenes', () => {
++    pool().configureClassroom('lesson-one', responsive);
++    pool().mount('a', { srcDoc: 'old' });
++    pool().mount('a', { srcDoc: 'new' });
++    expect(pool().entries.a.srcDoc).toBe('new');
++    pool().evict('a');
++    expect(pool().entries.a).toBeUndefined();
++    pool().reset();
++    expect(pool().classroomId).toBeNull();
++    expect(pool().retainedSceneIds).toEqual([]);
++  });
++});
+diff --git a/tests/scene-renderers/interactive-classroom-retention.browser.test.ts b/tests/scene-renderers/interactive-classroom-retention.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/interactive-classroom-retention.browser.test.ts
+@@ -0,0 +1,125 @@
++import { describe, expect, it } from 'vitest';
++import { chromium } from 'playwright-core';
++import { createRequire } from 'node:module';
++
++type ActivityWindow = Window & {
++  cards: number;
++  documentToken: string;
++  poolInfo: () => { ids: string[]; retained: string[]; classroomId: string | null; active: string | null };
++};
++type BuildHooks = {
++  onResolve: (options: { filter: RegExp }, callback: (args: { path: string }) =>
++    { path: string; namespace: string } | undefined) => void;
++  onLoad: (options: { filter: RegExp; namespace: string }, callback: (args: { path: string }) =>
++    { contents: string; loader: string; resolveDir: string }) => void;
++};
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')(
++  'current classroom activity retention in a real browser',
++  () => {
++    it('keeps five responsive works, bounds ordinary frames, and resets on content or classroom changes', async () => {
++      const require = createRequire(import.meta.url);
++      const { build } = createRequire(require.resolve('tsx'))('esbuild');
++      const mocks: Record<string, string> = {
++        '@/lib/contexts/mira-student-runtime-context':
++          'export const useMiraStudentRuntimeEvents=()=>null;',
++        '@/lib/mira/student-interaction-bridge':
++          "export const studentInteractionObjectives=()=>[];export const connectStudentInteractionFrame=()=>()=>{};export const STUDENT_INTERACTION_OBSERVER='';",
++        '@/lib/hooks/use-i18n': 'export const useI18n=()=>({t:k=>k});',
++        '@/lib/store/stage':
++          "import {create} from 'zustand';export const useStageStore=create(()=>({stage:null,scenes:[]}));",
++        '@/lib/store/canvas':
++          'const s={pickTarget:null,setPickTarget(){}};export const useCanvasStore={use:{pickTarget:()=>null},getState:()=>s};',
++        '@/lib/store/element-refs':
++          'const refs=[];export const useElementRefsStore={use:{refs:()=>refs},getState:()=>({refs})};',
++      };
++      const html = `<!doctype html><html><head><meta name="mira-responsive-activity" content="low-reading-v1"></head><body>
++<button id="make">Add to my work</button><output id="work">0</output>
++<script>window.documentToken=Math.random().toString(36);window.cards=0;make.onclick=()=>{work.textContent=String(++cards)};</script></body></html>`;
++      const bundle = await build({
++        stdin: {
++          resolveDir: process.cwd(), loader: 'tsx',
++          contents: `
++import React,{useState} from 'react';import {createRoot} from 'react-dom/client';
++import {InteractiveIframeHost} from './components/scene-renderers/InteractiveIframeHost';
++import {InteractiveRenderer} from './components/scene-renderers/interactive-renderer';
++import {useInteractiveIframePool} from './lib/store/interactive-iframe-pool';
++import {useStageStore} from '@/lib/store/stage';
++const initial=${JSON.stringify(html)};const ids=['a','b','c','d','e'];
++const ordinary=initial.replace('<meta name="mira-responsive-activity" content="low-reading-v1">','');
++const scenes=[...ids.map(id=>({id,order:1,type:'interactive',content:{type:'interactive',html:initial}})),
++...Array.from({length:5},(_,i)=>({id:'ordinary-'+i,order:2,type:'interactive',content:{type:'interactive',html:ordinary}})),
++{id:'comment-marker',order:3,type:'interactive',content:{type:'interactive',html:ordinary.replace('<head>','<head><!-- <meta name="mira-responsive-activity" content="low-reading-v1"> -->')}},
++{id:'slide-marker',order:4,type:'slide',content:{type:'slide',html:initial}}];
++window.poolInfo=()=>{const p=useInteractiveIframePool.getState();return{ids:Object.keys(p.entries),retained:p.retainedSceneIds,classroomId:p.classroomId,active:p.activeSceneId}};
++function App(){const[container,setContainer]=useState(null);const[host,setHost]=useState(true);const[current,setCurrent]=useState(null);const[revision,setRevision]=useState(false);return <div ref={setContainer} style={{height:'100vh',background:'white'}}>
++<button id='load' onClick={()=>useStageStore.setState({stage:{id:'lesson-one'},scenes})}>Load lesson</button>
++{[...ids,...Array.from({length:5},(_,i)=>'ordinary-'+i)].map(id=><button key={id} id={'visit-'+id} onClick={()=>setCurrent(id)}>{id}</button>)}
++<button id='replace' onClick={()=>setRevision(true)}>Update activity</button>
++<button id='switch' onClick={()=>useStageStore.setState({stage:{id:'lesson-two'},scenes})}>Switch classroom</button>
++<button id='leave' onClick={()=>setHost(false)}>Leave classroom</button>
++{host&&current&&<div style={{position:'absolute',left:10,top:160,width:360,height:320}}><InteractiveRenderer sceneId={current} content={{type:'interactive',url:'',html:ids.includes(current)?(revision?initial.replace('window.cards=0','window.cards=40'):initial):ordinary}}/></div>}
++{host&&<InteractiveIframeHost container={container}/>}</div>};createRoot(document.querySelector('#app')).render(<App/>);`,
++        },
++        bundle: true, write: false, format: 'iife', platform: 'browser', logLevel: 'silent',
++        define: { 'process.env.NODE_ENV': '"test"' },
++        plugins: [{ name: 'isolated-app-integrations', setup(b: BuildHooks) {
++          b.onResolve({ filter: /^@\// }, (args) => mocks[args.path]
++            ? { path: args.path, namespace: 'test-mock' } : undefined);
++          b.onLoad({ filter: /.*/, namespace: 'test-mock' }, (args) =>
++            ({ contents: mocks[args.path], loader: 'js', resolveDir: process.cwd() }));
++        } }],
++      });
++      const browser = await chromium.launch({
++        executablePath: process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++          '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true,
++      });
++      try {
++        const page = await browser.newPage({ viewport: { width: 800, height: 600 } });
++        page.setDefaultTimeout(8000);
++        await page.route('**/*', (route) => route.abort());
++        await page.setContent('<style>.w-full{width:100%}.h-full{height:100%}</style><div id="app"></div>');
++        await page.addScriptTag({ content: bundle.outputFiles[0].text });
++        // The first child may mount before the asynchronous classroom identity.
++        await page.locator('#visit-a').click();
++        const first = await (await page.locator('iframe[title="Interactive Scene a"]').elementHandle())!.contentFrame();
++        await first!.getByRole('button', { name: 'Add to my work' }).click();
++        const token = await first!.evaluate(() => (window as unknown as ActivityWindow).documentToken);
++        await page.locator('#load').click();
++        await page.waitForFunction(() => (window as unknown as ActivityWindow).poolInfo().classroomId === 'lesson-one');
++        expect(await first!.evaluate(() => (window as unknown as ActivityWindow).cards)).toBe(1);
++        expect(await first!.evaluate(() => (window as unknown as ActivityWindow).documentToken)).toBe(token);
++        expect(await page.evaluate(() => (window as unknown as ActivityWindow).poolInfo().retained)).toEqual(['a', 'b', 'c', 'd', 'e']);
++        for (const id of ['b', 'c', 'd', 'e']) {
++          await page.locator('#visit-' + id).click();
++          const child = await (await page.locator(`iframe[title="Interactive Scene ${id}"]`).elementHandle())!.contentFrame();
++          await child!.getByRole('button', { name: 'Add to my work' }).click();
++        }
++        await page.locator('#visit-a').click();
++        expect(await first!.evaluate(() => ({ token: (window as unknown as ActivityWindow).documentToken, cards: (window as unknown as ActivityWindow).cards })))
++          .toEqual({ token, cards: 1 });
++        for (let i = 0; i < 5; i++) await page.locator('#visit-ordinary-' + i).click();
++        const info = await page.evaluate(() => (window as unknown as ActivityWindow).poolInfo());
++        expect(info.ids).toHaveLength(8);
++        expect(info.ids.filter((id: string) => id.startsWith('ordinary-')))
++          .toEqual(['ordinary-2', 'ordinary-3', 'ordinary-4']);
++        await page.locator('#visit-a').click();
++        expect(await first!.evaluate(() => (window as unknown as ActivityWindow).cards)).toBe(1);
++        await page.locator('#switch').click();
++        await page.waitForFunction(() => (window as unknown as ActivityWindow).poolInfo().classroomId === 'lesson-two');
++        expect(await page.evaluate(() => (window as unknown as ActivityWindow).poolInfo().ids)).toEqual(['a']);
++        const second = await (await page.locator('iframe[title="Interactive Scene a"]').elementHandle())!.contentFrame();
++        await second!.waitForFunction(() => (window as unknown as ActivityWindow).cards === 0);
++        expect(await second!.evaluate(() => (window as unknown as ActivityWindow).documentToken)).not.toBe(token);
++        const secondToken = await second!.evaluate(() => (window as unknown as ActivityWindow).documentToken);
++        await page.locator('#replace').click();
++        await second!.waitForFunction(() => (window as unknown as ActivityWindow).cards === 40);
++        expect(await second!.evaluate(() => (window as unknown as ActivityWindow).documentToken)).not.toBe(secondToken);
++        await page.locator('#leave').click();
++        await page.waitForFunction(() => document.querySelectorAll('iframe').length === 0);
++        expect(await page.evaluate(() => (window as unknown as ActivityWindow).poolInfo()))
++          .toEqual({ ids: [], retained: [], classroomId: null, active: null });
++      } finally { await browser.close(); }
++    }, 30000);
++  },
++);

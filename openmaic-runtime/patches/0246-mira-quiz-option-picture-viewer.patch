@@ -1,0 +1,300 @@
+diff --git a/components/scene-renderers/fixed-textbook-picture-layout.module.css b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+--- a/components/scene-renderers/fixed-textbook-picture-layout.module.css
++++ b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+@@ -105,7 +105,15 @@
+     gap: 6px;
+   }
+ 
+-  .question .options > button {
++  .question .options:has([data-quiz-picture-option]) { min-height: 108px; }
++
++  .question .options > [data-quiz-picture-option] {
++    height: 100%;
++    min-height: 108px;
++  }
++
++  .question .options > button,
++  .question .options > [data-quiz-picture-option] > button {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+@@ -117,14 +125,22 @@
+     padding: 4px;
+   }
+ 
+-  .question .options > button > [data-quiz-visual="image"] {
+-    flex: 1 1 0%;
+-    width: 100%;
+-    height: 100%;
+-    min-height: 0;
+-  }
+-
+-  .question .options > button > [data-quiz-visual="image"] > img {
++  .question .options > [data-quiz-picture-option] > button {
++    flex: 1 1 0%;
++    height: auto;
++    min-height: 60px;
++  }
++
++  .question .options > button > [data-quiz-visual="image"],
++  .question .options > [data-quiz-picture-option] > button > [data-quiz-visual="image"] {
++    flex: 1 1 0%;
++    width: 100%;
++    height: 100%;
++    min-height: 0;
++  }
++
++  .question .options > button > [data-quiz-visual="image"] > img,
++  .question .options > [data-quiz-picture-option] > button > [data-quiz-visual="image"] > img {
+     width: 100%;
+     height: 100%;
+     max-height: 136px;
+@@ -176,6 +192,8 @@
+   .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) > button { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
+   .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .question .options { grid-column: 1 / 3; grid-row: 2; }
++  .task:has([data-quiz-picture-option]) { grid-template-rows: auto minmax(108px, 1fr); }
++  .task:has([data-quiz-picture-option]) .scenePicture { height: clamp(96px, calc(100cqh - 198px), 156px); }
+ }
+ 
+ @container fixed-picture-quiz (min-width: 561px) and (max-height: 260px) {
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -151,11 +151,20 @@
+               controlSlot={q.visual?.kind === 'image' ? <QuizReferencePicture visual={q.visual} /> : undefined} />
+               : q.visual?.kind === 'image' && <div className={referencePictureStyles.controls} data-question-narration-controls=""><QuizReferencePicture visual={q.visual} /></div>}
+             <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${compactImages ? pictureOptionStyles.options + ' ' + compactPictureStyles.options : ''}`} role="radiogroup" aria-label={q.question}>
+-              {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
++              {(q.options || []).map((option, optionIndex) => {
++                const visual = q.optionVisuals?.[option.value];
++                const choice = <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+                 aria-label={option.label} key={option.value} disabled={done || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+                 className={`min-h-14 min-w-14 rounded-xl border p-1 text-2xl transition-colors [&_img]:h-24 [&_svg]:max-h-24 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
+                 <FixedTextbookOptionFace visual={q.optionVisuals?.[option.value]} label={option.label} />
+-              </button>)}
++              </button>;
++                return visual?.kind === 'image' ? <div key={option.value} className={pictureOptionStyles.option} data-quiz-picture-option>
++                  {choice}
++                  <div className={pictureOptionStyles.optionControl}>
++                    <QuizReferencePicture visual={visual} optionLabel={`放大第${optionIndex + 1}幅选项图`} />
++                  </div>
++                </div> : choice;
++              })}
+             </div>
+             {feedback && <div className={`mt-3 rounded-2xl border p-3 ${feedback.correct ? 'border-[#b9d8c5] bg-[#edf7f0] text-[#285d43]' : 'border-[#ead0a9] bg-[#fff8e8] text-[#805328]'}`}
+               data-quiz-selected-feedback={feedback.response} role="status">
+diff --git a/components/scene-renderers/picture-quiz-layout.module.css b/components/scene-renderers/picture-quiz-layout.module.css
+--- a/components/scene-renderers/picture-quiz-layout.module.css
++++ b/components/scene-renderers/picture-quiz-layout.module.css
+@@ -30,7 +30,7 @@
+     gap: 6px;
+   }
+   .root [data-quiz-option-group="2"] > div { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+-  .root [data-quiz-option-group] button {
++  .root [data-quiz-option-group] button:not([data-quiz-option-picture]) {
+     display: flex; flex-direction: column; justify-content: center;
+     width: 100%; min-width: 48px; min-height: 80px;
+     height: clamp(80px, 25cqh, 160px);
+@@ -93,7 +93,7 @@
+   .root [data-quiz-picture-card] > div:has(> button) > button { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
+   .root [data-quiz-picture-card] > div:has(> button) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .root [data-quiz-option-group] { grid-column: 3; grid-row: 1; align-self: center; }
+-  .root [data-quiz-option-group] button { height: clamp(96px, calc(100cqh - 86px), 160px); }
++  .root [data-quiz-option-group] button:not([data-quiz-option-picture]) { height: clamp(96px, calc(100cqh - 86px), 160px); }
+   .root [data-quiz-picture-card]:not(:has([data-quiz-scene-picture])) { grid-template-columns: auto minmax(0, 1fr); }
+   .root [data-quiz-picture-card]:not(:has([data-quiz-scene-picture])) > div:has(> button) { grid-column: 1; }
+   .root [data-quiz-picture-card]:not(:has([data-quiz-scene-picture])) [data-quiz-option-group] { grid-column: 2; }
+diff --git a/components/scene-renderers/quiz-picture-options.module.css b/components/scene-renderers/quiz-picture-options.module.css
+--- a/components/scene-renderers/quiz-picture-options.module.css
++++ b/components/scene-renderers/quiz-picture-options.module.css
+@@ -8,7 +8,8 @@
+     grid-template-columns: minmax(0, 1fr);
+   }
+ 
+-  .options > button {
++  .options > button,
++  .options > .option > button {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+@@ -17,14 +18,21 @@
+     min-height: 136px;
+   }
+ 
+-  .options > button > [data-quiz-visual="image"] {
++  .options > button > [data-quiz-visual="image"],
++  .options > .option > button > [data-quiz-visual="image"] {
+     flex: 1 1 0%;
+     min-width: 0;
+   }
+ 
+   /* Labels remain supplementary; the picture receives the available width. */
+-  .options > button > span:last-of-type {
++  .options > button > span:last-of-type,
++  .options > .option > button > span:last-of-type {
+     flex: 0 0 4em;
+     overflow-wrap: anywhere;
+   }
+ }
++
++/* The viewer is a sibling of the answer, with its own touch area. */
++.option { min-width: 0; display: flex; flex-direction: column; }
++.option > button { width: 100%; }
++.optionControl { flex: 0 0 auto; display: flex; justify-content: center; }
+diff --git a/components/scene-renderers/quiz-reference-picture.tsx b/components/scene-renderers/quiz-reference-picture.tsx
+--- a/components/scene-renderers/quiz-reference-picture.tsx
++++ b/components/scene-renderers/quiz-reference-picture.tsx
+@@ -6,8 +6,8 @@
+ import type { QuizVisual } from '@openmaic/dsl';
+ import styles from './quiz-reference-picture.module.css';
+ 
+-/** Reference pictures alone can expand; this component never owns an answer or audio. */
+-export function QuizReferencePicture({ visual }: { visual: QuizVisual }) {
++/** Original quiz pictures can expand; this component never owns an answer or audio. */
++export function QuizReferencePicture({ visual, optionLabel }: { visual: QuizVisual; optionLabel?: string }) {
+   const trigger = useRef<HTMLButtonElement>(null);
+   const [host, setHost] = useState<Element | null>(null);
+   const [open, setOpen] = useState(false);
+@@ -42,12 +42,14 @@
+         ref={trigger}
+         className={styles.control}
+         data-quiz-reference-picture
+-        aria-label="放大题干图片"
++        data-quiz-option-picture={optionLabel ? true : undefined}
++        aria-label={optionLabel ?? '放大题干图片'}
+         title="看大图"
+         aria-haspopup="dialog"
+         aria-expanded={open}
+         onKeyDown={(event) => event.stopPropagation()}
+-        onClick={() => {
++        onClick={(event) => {
++          if (optionLabel) event.stopPropagation();
+           openedSource.current = visual.src;
+           const doc = trigger.current!.ownerDocument;
+           setHost(doc.fullscreenElement ?? doc.body);
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -297,13 +297,13 @@
+     <QuestionCard question={question} index={index} result={result} autoNarrate={autoNarrate}>
+       <div data-quiz-option-group={compactImageQuestion(question) ? String(question.options!.length) : undefined} className={threeImages ? pictureOptionStyles.container : undefined}>
+       <div className={cn('grid min-w-0 gap-2', threePictures ? 'grid-cols-3' : 'grid-cols-1 sm:grid-cols-2', threeImages && pictureOptionStyles.options)}>
+-        {question.options?.map((opt) => {
++        {question.options?.map((opt, optionIndex) => {
+           const visual = question.optionVisuals?.[opt.value];
+           const selected = value === opt.value;
+           const isCorrectOpt = isReview && question.answer?.includes(opt.value);
+           const isWrong = isReview && selected && result?.status === 'incorrect';
+ 
+-          return (
++          const choice = (
+             <button
+               key={opt.value}
+               data-quiz-option={opt.value}
+@@ -370,6 +370,14 @@
+               )}
+             </button>
+           );
++          return visual?.kind === 'image' ? (
++            <div key={`${question.id}:${opt.value}`} className={pictureOptionStyles.option} data-quiz-picture-option>
++              {choice}
++              <div className={pictureOptionStyles.optionControl}>
++                <QuizReferencePicture visual={visual} optionLabel={`放大第${optionIndex + 1}幅选项图`} />
++              </div>
++            </div>
++          ) : choice;
+         })}
+       </div>
+       </div>
+diff --git a/tests/scene-renderers/quiz-picture-layout.test.ts b/tests/scene-renderers/quiz-picture-layout.test.ts
+--- a/tests/scene-renderers/quiz-picture-layout.test.ts
++++ b/tests/scene-renderers/quiz-picture-layout.test.ts
+@@ -1,6 +1,7 @@
+ import { createElement } from 'react';
+ import { renderToStaticMarkup } from 'react-dom/server';
+ import { describe, expect, it, vi } from 'vitest';
++import { parseHTML } from 'linkedom';
+ import { SingleChoiceQuestion } from '@/components/scene-renderers/quiz-view';
+ import type { QuizQuestion } from '@/lib/types/stage';
+ 
+@@ -15,6 +16,23 @@
+ }));
+ 
+ describe('narrow image-choice presentation', () => {
++  it('keeps neutral enlargement controls outside answer buttons, including disabled review', () => {
++    const { document } = parseHTML(render(question, { disabled: true }));
++    const choices = [...document.querySelectorAll('[data-quiz-option]')];
++    expect(choices).toHaveLength(3);
++    for (const [index, choice] of choices.entries()) {
++      expect(choice.querySelector('button')).toBeNull();
++      const viewer = choice.parentElement!.querySelector('[data-quiz-option-picture]')!;
++      expect(viewer.getAttribute('aria-label')).toBe(`放大第${index + 1}幅选项图`);
++      expect(viewer.getAttribute('type')).toBe('button');
++      expect(viewer.hasAttribute('disabled')).toBe(false);
++      expect(viewer.closest('[data-quiz-option]')).toBeNull();
++    }
++    for (const optionVisuals of [undefined, Object.fromEntries(['A', 'B', 'C'].map(value => [value, { kind: 'quantity' as const, count: 3 }]))]) {
++      expect(render({ ...question, optionVisuals })).not.toContain('data-quiz-option-picture');
++    }
++  });
++
+   it('uses the scoped container only for three actual image options', () => {
+     const html = render(question);
+     expect(html).toMatch(/class="[^"]*container/);
+diff --git a/tests/scene-renderers/quiz-reference-picture.browser.test.ts b/tests/scene-renderers/quiz-reference-picture.browser.test.ts
+--- a/tests/scene-renderers/quiz-reference-picture.browser.test.ts
++++ b/tests/scene-renderers/quiz-reference-picture.browser.test.ts
+@@ -206,6 +206,41 @@
+         const audio = await page.evaluate(() => ({
+           ...(window as unknown as FixtureWindow).audioStats,
+         }));
++        // Each answer picture has a neutral, separate viewer on both real quiz paths.
++        const optionViewers = page.locator('[data-quiz-option-picture]');
++        expect(await optionViewers.count()).toBe(3);
++        expect(await page.locator('[data-quiz-option] button,[role=radio] button').count()).toBe(0);
++        expect(new Set(await optionViewers.evaluateAll(els => els.map(el => el.className))).size).toBe(1);
++        await page.setViewportSize({ width: 320, height: 563 });
++        for (let optionIndex = 0; optionIndex < 3; optionIndex++) {
++          const enlarge = page.getByRole('button', { name: `放大第${optionIndex + 1}幅选项图`, exact: true });
++          await enlarge.scrollIntoViewIfNeeded();
++          const bounds = await enlarge.boundingBox();
++          expect(bounds!.width).toBeGreaterThanOrEqual(48);
++          expect(bounds!.height).toBeGreaterThanOrEqual(48);
++          const originalOptionSrc = await choices.nth(optionIndex).locator('img').getAttribute('src');
++          const choiceBox = await choices.nth(optionIndex).boundingBox();
++          expect(bounds!.y >= choiceBox!.y + choiceBox!.height || bounds!.x >= choiceBox!.x + choiceBox!.width).toBe(true);
++          await enlarge.focus();
++          const shortcutCount = await page.evaluate(() => (window as unknown as FixtureWindow).shortcutCalls);
++          await page.keyboard.press('Space');
++          const optionDialog = page.locator('[data-quiz-reference-dialog]');
++          await optionDialog.waitFor();
++          expect(await optionDialog.locator('img').getAttribute('src')).toBe(originalOptionSrc);
++          await optionDialog.getByRole('button', { name: '放大图片', exact: true }).click();
++          expect((await optionDialog.locator('img').boundingBox())!.width).toBeGreaterThanOrEqual(352);
++          expect(await optionDialog.getByRole('region').evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
++          await page.keyboard.press('Escape');
++          expect(await optionDialog.count()).toBe(0);
++          expect(await enlarge.evaluate(el => el === document.activeElement)).toBe(true);
++          expect(await page.evaluate(() => (window as unknown as FixtureWindow).shortcutCalls)).toBe(shortcutCount);
++          expect(await choices.nth(1).getAttribute('class')).toBe(beforeChoice);
++          if (fixed) expect(await choices.nth(1).getAttribute('aria-checked')).toBe('true');
++          else expect(await page.locator('#selection').textContent()).toBe('B');
++          expect(await page.evaluate(() => (window as unknown as FixtureWindow).audioStats)).toEqual(audio);
++          expect(await page.evaluate(() => (window as unknown as FixtureWindow).posts)).toEqual([]);
++        }
++        await page.setViewportSize({ width: 390, height: 563 });
+         const trigger = page.getByRole('button', { name: '放大题干图片', exact: true });
+         const originalSrc = await page.locator('[data-quiz-scene-picture] img').getAttribute('src');
+         expect(await page.locator('[data-quiz-scene-picture] > button').count()).toBe(0);
+@@ -330,6 +365,10 @@
+                 height: r.height,
+                 visible: r.top >= 0 && r.bottom <= innerHeight,
+               })),
++              fieldsetMetrics: fieldset ? {
++                clientHeight: fieldset.clientHeight, scrollHeight: fieldset.scrollHeight,
++                boxes: [...fieldset.querySelectorAll('[data-quiz-scene-picture],[role=radiogroup],[data-quiz-picture-option],[data-quiz-option-picture]')].map(el => ({ tag: el.tagName, classes: el.className, height: el.getBoundingClientRect().height, top: el.getBoundingClientRect().top })),
++              } : null,
+               fieldsetOverflow: fieldset
+                 ? fieldset.scrollHeight > fieldset.clientHeight + 1
+                 : false,

@@ -1,0 +1,90 @@
+{
+  "policyVersion": "mira.textbook.pinyin-iuu-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "symbols": {
+    "i": {
+      "ph": "yi1",
+      "carrier": "衣"
+    },
+    "ī": {
+      "ph": "yi1",
+      "carrier": "衣"
+    },
+    "í": {
+      "ph": "yi2",
+      "carrier": "衣"
+    },
+    "ǐ": {
+      "ph": "yi3",
+      "carrier": "衣"
+    },
+    "ì": {
+      "ph": "yi4",
+      "carrier": "衣"
+    },
+    "u": {
+      "ph": "wu1",
+      "carrier": "乌"
+    },
+    "ū": {
+      "ph": "wu1",
+      "carrier": "乌"
+    },
+    "ú": {
+      "ph": "wu2",
+      "carrier": "乌"
+    },
+    "ǔ": {
+      "ph": "wu3",
+      "carrier": "乌"
+    },
+    "ù": {
+      "ph": "wu4",
+      "carrier": "乌"
+    },
+    "ü": {
+      "ph": "yu1",
+      "carrier": "迂"
+    },
+    "ǖ": {
+      "ph": "yu1",
+      "carrier": "迂"
+    },
+    "ǘ": {
+      "ph": "yu2",
+      "carrier": "迂"
+    },
+    "ǚ": {
+      "ph": "yu3",
+      "carrier": "迂"
+    },
+    "ǜ": {
+      "ph": "yu4",
+      "carrier": "迂"
+    }
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak"
+  },
+  "listeningRequired": true
+}

@@ -1,0 +1,2644 @@
+{
+  "draftSha256": "b40891f9d609a1629ce913213bf73d2075c52ac35fb24f03e60d35bb5f2b4bd5",
+  "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+  "tokens": [
+    [
+      "bo",
+      "bo5",
+      "卜"
+    ],
+    [
+      "bá",
+      "ba2",
+      "拔"
+    ],
+    [
+      "bō",
+      "bo1",
+      "波"
+    ],
+    [
+      "c",
+      "ci1",
+      "疵"
+    ],
+    [
+      "ch",
+      "chi1",
+      "吃"
+    ],
+    [
+      "chá",
+      "cha2",
+      "茶"
+    ],
+    [
+      "chī",
+      "chi1",
+      "吃"
+    ],
+    [
+      "cā",
+      "ca1",
+      "擦"
+    ],
+    [
+      "dì",
+      "di4",
+      "地"
+    ],
+    [
+      "fà",
+      "fa4",
+      "发"
+    ],
+    [
+      "guā",
+      "gua1",
+      "瓜"
+    ],
+    [
+      "hē",
+      "he1",
+      "喝"
+    ],
+    [
+      "jià",
+      "jia4",
+      "架"
+    ],
+    [
+      "li",
+      "li5",
+      "璃"
+    ],
+    [
+      "luó",
+      "luo2",
+      "萝"
+    ],
+    [
+      "lǐ",
+      "li3",
+      "里"
+    ],
+    [
+      "mǎ",
+      "ma3",
+      "马"
+    ],
+    [
+      "mǔ",
+      "mu3",
+      "母"
+    ],
+    [
+      "qí",
+      "qi2",
+      "骑"
+    ],
+    [
+      "s",
+      "si1",
+      "丝"
+    ],
+    [
+      "sh",
+      "shi1",
+      "诗"
+    ],
+    [
+      "shuā",
+      "shua1",
+      "刷"
+    ],
+    [
+      "shè",
+      "she4",
+      "舍"
+    ],
+    [
+      "shū",
+      "shu1",
+      "书"
+    ],
+    [
+      "sù",
+      "su4",
+      "素"
+    ],
+    [
+      "tuō",
+      "tuo1",
+      "拖"
+    ],
+    [
+      "x",
+      "xi1",
+      "西"
+    ],
+    [
+      "xī",
+      "xi1",
+      "西"
+    ],
+    [
+      "yá",
+      "ya2",
+      "牙"
+    ],
+    [
+      "z",
+      "zi1",
+      "资"
+    ],
+    [
+      "zh",
+      "zhi1",
+      "知"
+    ],
+    [
+      "zhī",
+      "zhi1",
+      "知"
+    ],
+    [
+      "zhū",
+      "zhu1",
+      "蛛"
+    ],
+    [
+      "zì",
+      "zi4",
+      "字"
+    ]
+  ],
+  "probes": {
+    "zimu-zhizhu-context": [
+      "zì",
+      "mǔ",
+      "zhī",
+      "zhū"
+    ],
+    "ca-boli-neutral-context": [
+      "cā",
+      "bō",
+      "li"
+    ],
+    "sushe-shujia-context": [
+      "sù",
+      "shè",
+      "shū",
+      "jià"
+    ],
+    "qi-ma-context": [
+      "qí",
+      "mǎ"
+    ],
+    "tuo-di-context": [
+      "tuō",
+      "dì"
+    ],
+    "li-fa-context": [
+      "lǐ",
+      "fà"
+    ],
+    "ba-luobo-neutral-context": [
+      "bá",
+      "luó",
+      "bo"
+    ]
+  },
+  "probeTargets": {
+    "zimu-zhizhu-context": "zì",
+    "ca-boli-neutral-context": "li",
+    "sushe-shujia-context": "shè",
+    "qi-ma-context": "qí",
+    "tuo-di-context": "tuō",
+    "li-fa-context": "fà",
+    "ba-luobo-neutral-context": "luó"
+  },
+  "probeRequests": [
+    {
+      "label": "zimu-zhizhu-context",
+      "sourceText": "zì mǔ。zhī zhū。",
+      "body": {
+        "model": "cosyvoice-v3-flash",
+        "input": {
+          "text": "<speak><phoneme alphabet=\"py\" ph=\"zi4\">字</phoneme> <phoneme alphabet=\"py\" ph=\"mu3\">母</phoneme>。<phoneme alphabet=\"py\" ph=\"zhi1\">知</phoneme> <phoneme alphabet=\"py\" ph=\"zhu1\">蛛</phoneme>。</speak>",
+          "voice": "longanwen_v3",
+          "format": "wav",
+          "sample_rate": 24000,
+          "enable_ssml": true,
+          "rate": 1,
+          "pitch": 1,
+          "seed": 0,
+          "language_hints": [
+            "zh"
+          ]
+        }
+      },
+      "requestSha256": "48a56facb5a80c023259fee4cfaa5298951c846d3b3b75e35e1e8ab1db6b6e0a",
+      "ssmlSha256": "5b02e7ddb8301400db37afd22843e6118bcb928d9859a29902ab657d696646d0"
+    },
+    {
+      "label": "ca-boli-neutral-context",
+      "sourceText": "cā bō li。",
+      "body": {
+        "model": "cosyvoice-v3-flash",
+        "input": {
+          "text": "<speak><phoneme alphabet=\"py\" ph=\"ca1\">擦</phoneme> <phoneme alphabet=\"py\" ph=\"bo1\">波</phoneme> <phoneme alphabet=\"py\" ph=\"li5\">璃</phoneme>。</speak>",
+          "voice": "longanwen_v3",
+          "format": "wav",
+          "sample_rate": 24000,
+          "enable_ssml": true,
+          "rate": 1,
+          "pitch": 1,
+          "seed": 0,
+          "language_hints": [
+            "zh"
+          ]
+        }
+      },
+      "requestSha256": "07f719ce3f4c43f5d317a32d09aefc0df6653cee1f5000740b66f03ae7fdb331",
+      "ssmlSha256": "99b3ce5b6b5e8452c31a541261046c5a427496dddda3c6a13d35a16fc666d273"
+    },
+    {
+      "label": "sushe-shujia-context",
+      "sourceText": "sù shè。shū jià。",
+      "body": {
+        "model": "cosyvoice-v3-flash",
+        "input": {
+          "text": "<speak><phoneme alphabet=\"py\" ph=\"su4\">素</phoneme> <phoneme alphabet=\"py\" ph=\"she4\">舍</phoneme>。<phoneme alphabet=\"py\" ph=\"shu1\">书</phoneme> <phoneme alphabet=\"py\" ph=\"jia4\">架</phoneme>。</speak>",
+          "voice": "longanwen_v3",
+          "format": "wav",
+          "sample_rate": 24000,
+          "enable_ssml": true,
+          "rate": 1,
+          "pitch": 1,
+          "seed": 0,
+          "language_hints": [
+            "zh"
+          ]
+        }
+      },
+      "requestSha256": "6e6b1529ab2a967c559dcc0475083bc3d30e02aba67485c35a7d7f563737b032",
+      "ssmlSha256": "3baf48429f9786912cf920f6e22202cf9315fc37d7dadcebfd7e090e0dcf795a"
+    },
+    {
+      "label": "qi-ma-context",
+      "sourceText": "qí mǎ。",
+      "body": {
+        "model": "cosyvoice-v3-flash",
+        "input": {
+          "text": "<speak><phoneme alphabet=\"py\" ph=\"qi2\">骑</phoneme> <phoneme alphabet=\"py\" ph=\"ma3\">马</phoneme>。</speak>",
+          "voice": "longanwen_v3",
+          "format": "wav",
+          "sample_rate": 24000,
+          "enable_ssml": true,
+          "rate": 1,
+          "pitch": 1,
+          "seed": 0,
+          "language_hints": [
+            "zh"
+          ]
+        }
+      },
+      "requestSha256": "8a844882a9cdb4219919036535260d175227f0d2f009da7d12f2fcb06635a361",
+      "ssmlSha256": "83948d0ae9fa0b0dc30f9270bc4cb7e37d2a9b416397c1951419216f3d7e1575"
+    },
+    {
+      "label": "tuo-di-context",
+      "sourceText": "tuō dì。",
+      "body": {
+        "model": "cosyvoice-v3-flash",
+        "input": {
+          "text": "<speak><phoneme alphabet=\"py\" ph=\"tuo1\">拖</phoneme> <phoneme alphabet=\"py\" ph=\"di4\">地</phoneme>。</speak>",
+          "voice": "longanwen_v3",
+          "format": "wav",
+          "sample_rate": 24000,
+          "enable_ssml": true,
+          "rate": 1,
+          "pitch": 1,
+          "seed": 0,
+          "language_hints": [
+            "zh"
+          ]
+        }
+      },
+      "requestSha256": "949c5c0175a9b899f86a9a15666c96c5719ed6e14c583e5cc514bbf3792ec78b",
+      "ssmlSha256": "b6c31ee39b6b710da48d96f06a24933b4be6a08be18ad053fc9c6cf5162fce72"
+    },
+    {
+      "label": "li-fa-context",
+      "sourceText": "lǐ fà。",
+      "body": {
+        "model": "cosyvoice-v3-flash",
+        "input": {
+          "text": "<speak><phoneme alphabet=\"py\" ph=\"li3\">里</phoneme> <phoneme alphabet=\"py\" ph=\"fa4\">发</phoneme>。</speak>",
+          "voice": "longanwen_v3",
+          "format": "wav",
+          "sample_rate": 24000,
+          "enable_ssml": true,
+          "rate": 1,
+          "pitch": 1,
+          "seed": 0,
+          "language_hints": [
+            "zh"
+          ]
+        }
+      },
+      "requestSha256": "e55dd0c40ad52a29295bf9c38d2198f34993c3c0760461fdfaf004300cb6699c",
+      "ssmlSha256": "e5a3a3d34c9106c463e53d7675f31ab093d87000bf5e80f098c611c795efd107"
+    },
+    {
+      "label": "ba-luobo-neutral-context",
+      "sourceText": "bá luó bo。",
+      "body": {
+        "model": "cosyvoice-v3-flash",
+        "input": {
+          "text": "<speak><phoneme alphabet=\"py\" ph=\"ba2\">拔</phoneme> <phoneme alphabet=\"py\" ph=\"luo2\">萝</phoneme> <phoneme alphabet=\"py\" ph=\"bo5\">卜</phoneme>。</speak>",
+          "voice": "longanwen_v3",
+          "format": "wav",
+          "sample_rate": 24000,
+          "enable_ssml": true,
+          "rate": 1,
+          "pitch": 1,
+          "seed": 0,
+          "language_hints": [
+            "zh"
+          ]
+        }
+      },
+      "requestSha256": "da713db7461550824213f23d3498cec82562cd5c03ed60b4114674dadb4d4888",
+      "ssmlSha256": "8b1dcfb3d007235a7db2c780e1c91ade49b29794d0f6094c94319b5151e56ea7"
+    }
+  ],
+  "speech": [
+    {
+      "page": 1,
+      "actionId": "speech-p1-hello",
+      "text": "我们一起来到语文园地三，先看看上学时用的课程表。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "d12d925d530d707a9483610945fb3d751d48e005be70bfce063ba024ddf55e9c",
+        "sourceTextSha256": "a55a6db061455de909f8dc0b1c52f76f6f44c41392cdeddf22cc821164267825",
+        "providerBodySha256": "668ff7616c6316687024f6af29f624540f5cdc7e0c43b48a74de5865f2e2ee64",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 1,
+      "actionId": "speech-p1-route",
+      "text": "我们还会摆字母、看动作、拼图景，做出自己喜欢的作品。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "d0e92b75b076de322658ef8dfd16ec636d12be97042d784627f0ee22f65c746a",
+        "sourceTextSha256": "a9b4951423e09e8caae8d447a0203db937ef2b77060a96b8eabf8cf33c20b129",
+        "providerBodySha256": "5e57d3e0aaec7b534c206b14b03470b6098588957585bc5e4dfb00c2504292d4",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 1,
+      "actionId": "speech-p1-reading",
+      "text": "最后可以带上语文书，和大人一起读一读。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b4a5ddf75ed89102cbe935332232fa8fd6c32da2e20161f368ad39b458169c04",
+        "sourceTextSha256": "b931316f572dad28d78cd2d1ed2043741bd4ab3a4975f11a144ca38841a2d431",
+        "providerBodySha256": "5a5e2195fe013d3aa7b780266bf03defdda7330f9b3d801e0546b09fe9ab1ce6",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-start",
+      "text": "这是一张示例课程表，和你的课程表可能不一样。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "dc04a8c610867a8bee1d64d83e94491fe1f41edaf16efb22c852412ee85eacd9",
+        "sourceTextSha256": "d9e93c47bfe94fa4ac099767966a822211020ef0375d0395637f2bba56545c88",
+        "providerBodySha256": "39c04de224f7a673ece999968376ec2da3d12768ca8dd6b0f6dea83018be51b6",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-demo",
+      "text": "我们来看星期三。从上往下，一格表示一节课。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "3a35844038b82b593844640a4731fcb7d050e66ec9cecbc1b071c9fbd7366dbc",
+        "sourceTextSha256": "21d842c2ebd7831c5ffaf2eab05ada6ebe761b9233ac04afab7c1275ea4e0547",
+        "providerBodySha256": "3c7f63ca9ed1635b27e187ac7e619aed4ed72afd626ae9937a3fe8b2ac472ec4",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-one",
+      "text": "第一节，数学。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "92c99bf23b83c50bff25a057c83183b9aa186767e039013072f857d979be84e0",
+        "sourceTextSha256": "439501bfbdc9698d3e3135dfb78f5b134beaeb23e3948baa602f80786e8522da",
+        "providerBodySha256": "53b9b6b75e37754ec3777d7acb1543917d6daa24689d05ab5da87aaf14745040",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-two",
+      "text": "第二节，语文。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "a9cb2ab0d55377d70f22b67f86fb0adb88c73d4c0e9992a7fd356b16f770d747",
+        "sourceTextSha256": "0bf98ca76ee4a3c6c06e5e572ddc153c175da9d274d1f6d7b7529fa0b1d8220e",
+        "providerBodySha256": "d461571c349055934cd63940b43c226f2dd4f623771e8d21c48dcc7b5fe5047e",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-three",
+      "text": "第三节，体育与健康。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "6840f7409d0afc415e4b99919acdb653a067de849499309ef776839be70b144f",
+        "sourceTextSha256": "819544c05b172bf74f64d9cbb01135b10a02507fc9d459185770c81ae134d207",
+        "providerBodySha256": "32f57da8b482a199f84f9ae86b1d0c8e4f053849c2405231d69d107a09f9778b",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-four",
+      "text": "第四节，语文。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "289924c721458e8c8dc0a1ff9a34099f22f78d229a9e3e3b04c2ee1b02b274dc",
+        "sourceTextSha256": "84184966970ff788d6f2f1ed139f7060fcbf1590594e0864687189ead7f44a90",
+        "providerBodySha256": "d82cb011b5784e3bc435a90f132c54d28d23bd9e11804818a91aa1b7194ceb55",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-five",
+      "text": "第五节，道德与法治。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "394522dff2956d35484961f46c6dd86397fe4f2bab44764187f2a12451eb1320",
+        "sourceTextSha256": "82b968ad1826eb623f3ac21b246de18c3ef7e1d909867ddc182be5a6927ad28f",
+        "providerBodySha256": "5c09095eb4840942635aa6802dbc85ac23dbaa48c6017aab370c7b8fe74e6ceb",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-six",
+      "text": "第六节，劳动。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "1e46b85be147fa995b9a3356793cef4cfa55c009923ce6b1cefee5430c1f9bc6",
+        "sourceTextSha256": "a0dec7f032056e3d85434462fef5aaa6b7fe5981f0a001a62c0fd255c454cc04",
+        "providerBodySha256": "201386841410f6a6e98e9f58ac5c8734275778a7379094493857a5ae6fa4c09b",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-prompt",
+      "text": "现在请从上往下，点一点第三节，看看是什么课。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "922c60edbf32d8bc2b6f5d4963e810fa8efd72902eeadf581d8b8fdc62166836",
+        "sourceTextSha256": "83b6519570f6891cc75f66f59ef531f83da52589ed41e3ac8ebb28581b46695f",
+        "providerBodySha256": "0af9036e51b145fd024baf2d318b6f9196f5cf14bec293e5277cb0df7583c1a7",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-correct",
+      "text": "你找到了第三节。还可以点其他格子，再听听课程。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f387abb8061a9e6dfcf808a6723f576b5458bef1fa43ab9e61ff47b54c2f1edc",
+        "sourceTextSha256": "c7719ff90459244e64a00702285b4a293ab3606988793a37e689742a4353f84a",
+        "providerBodySha256": "30695088da652d1a719868f16f7833d37a6fbe7952d30c78d5220b0907a4fd9d",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-retry",
+      "text": "还不是第三节。先从第一格开始，往下数一数，再试一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "0bb45263bffc9a204cf1507679c2c3246ba1325d1c7b51dd2190717b83c09401",
+        "sourceTextSha256": "91d9337eb4596a3634f196a10a54ab9b276c898e4817ef269fae3352c2f4a8eb",
+        "providerBodySha256": "cb69da1607edb03b59148ecc7068c72bd1879bf8b83e87bc573f70eda23e2659",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-help",
+      "text": "老师从第一格往下指，第一节、第二节、第三节。看完以后，再自己找一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "49e72eb2783fbfc8556afa8541ac9d3e439b8cb86904952f454764c89b0bd12f",
+        "sourceTextSha256": "f16f65b49863a8337a7344a9fa2e19788d99c65ffd6891e4a3e89d806404da04",
+        "providerBodySha256": "37edeac2ac53c1d61701d0c312a7a3da7965ef8120ce9f170536e86237293899",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 2,
+      "actionId": "speech-p2-done",
+      "text": "示例星期三看过了。你还可以换一格，听听那一节是什么课。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "1cc7144838b950920d044c3ad911122858621c0f177e284801f900594990c6e0",
+        "sourceTextSha256": "d281cf3ef76f2a24357a95dae90070e922d8c2fc8ed2755d4334b1a01d1b5848",
+        "providerBodySha256": "e96b0eeb0db237ccefe107a2afd47c4989d8645ab62459e6605dd1a56bf0d677",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-start",
+      "text": "我们把课程表里的字和它的意思联系起来，每次看两张字卡。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "18ea817abccab177a1106261bcce24c37f6abd3bb0077cea6cff5af2f740716b",
+        "sourceTextSha256": "c94d543754542be976b46b5ee0bd4ffdd4094fe276805342c0ba44d686ad1107",
+        "providerBodySha256": "bc19c1bed62126ae798367a73702efa556e37310585da5eecb264f85e4dde5b1",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-wu",
+      "text": "上午和下午都有这个字：午。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "6a52b7374a8d4f488d51625ac658d69910ab67bb17cd63c70d79998bd3a9f775",
+        "sourceTextSha256": "6acd0447b9676cfc657a9265a095cc7f8314af447503c6893063ea9653da1e4e",
+        "providerBodySha256": "14a3c94f092baa11b94437b27db99142b6aa01db93c29bd7071157d9689aa8d6",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-xing",
+      "text": "星期的第一个字是星，看看这个字：星。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "10d78c390ff47672827705f057fc6895118e4d009ab90de1cf6d315ea62521f3",
+        "sourceTextSha256": "76a01eab8aea09a7f973342d2211e52e7ce284961005aa45547f2db2da652801",
+        "providerBodySha256": "56754426517f253bcac35a636eb4057cc3242f13066795e0af503a25ddedef03",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-qi",
+      "text": "星期的第二个字是期，听老师读：期。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "d1d61375dbf93b2e52fb3762c8ed6c8312cb94b2118fe6a3d45e55b93a34176f",
+        "sourceTextSha256": "0f9c7d4fbf6fe0b204adcb9b14b2cafdac0cfa546e3fa90bf097673b8cfbcbb8",
+        "providerBodySha256": "f7f3fa476dbd05c5a9a4699716db4c72115b7b229609be66b923991607f3ad9a",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-yu",
+      "text": "语文的第一个字是语，听老师读：语。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b908b50dc433ca56dd5bd38d54782b21036e27535609f7c1a9b643b6b208f7b1",
+        "sourceTextSha256": "1d7bf13117451e3efd498acef233bcc773cafd710036f6fe15a6451858b819ba",
+        "providerBodySha256": "e96650b0cb924912e9f37450afb9b4ea6a0e9dc124329d770c7528193a06fdb1",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-wen",
+      "text": "语文的第二个字是文，听老师读：文。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "cbcbf4382533709d3366c813992affc040e494cd859a21204c8a6d53fe8844a5",
+        "sourceTextSha256": "e561c8e07396e6197b3037944658f71d36e4b0fa30d95cafa719602a507dcccd",
+        "providerBodySha256": "37946fcc2c728c1a5a4ae2cff1e10a88014fca3bc63fb1ddc488cce2c7c6d8f3",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-shu",
+      "text": "数学的第一个字是数，在这里读：数。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "453d0a90499f873bcb29f7a663bdff4058c79989afdd3055496410494da380d2",
+        "sourceTextSha256": "c4c158d20851a6829520d5164999cde2fe99cb9f978487d8679ee14882243f99",
+        "providerBodySha256": "4e1b1e402fa983ef93c0a7c5331f2bac6cdfe1cf09dd39160ca4c050a61e18f1",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-xie",
+      "text": "写字的时候会用到这个字：写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "3a7b3600541cfdf13365f0ce33255664c799eff7accfa69ac5da36017885ba71",
+        "sourceTextSha256": "be38dca758725be70fabd38092eb0b75c56a706f1c0db8671ec0920b74ad169b",
+        "providerBodySha256": "154615187d6704b0ec20f5c02fc268f1e03e9255f8f54ec2f706b2516fcea2ae",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-hui",
+      "text": "班会的会，大家一起说一说，听一听。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "038edf5b5e9cd6d3394b62a5d2f40bff5c7172e06bfa766cbcab3adb6d1361c7",
+        "sourceTextSha256": "3a331376802d961ff3087c17b399b63362f4c61224d6322c5dfbd419fe00e28a",
+        "providerBodySha256": "121ec49601c194dd264fab4b9b663e6f04d5a7e6dee28fbae7f41845ea9a4cd5",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-prompt",
+      "text": "先听示范，再把刚才看到的那张字卡放到图旁边。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8619af174dd12b30705af87f2dacb76eff9973a7654294e077dbf1e9edd34865",
+        "sourceTextSha256": "76f476712575278acb5a44ecf92e413ee0ef08cc080e8a5d4fc9d8adefc853bd",
+        "providerBodySha256": "40e3f5afd812a48f3d61dac0acbece9d3cb57cf03f94d88b52c95564c4996e95",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-correct",
+      "text": "这张字卡和示范相同，我们再看下一张。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "798bc73955a22e653c0c051da169f245b4a1886cc61e9cb61645fe5371aed008",
+        "sourceTextSha256": "10554021897a4d439fe63c2ec506b0e354af93e533c9a3daff7de90ef1bbf25d",
+        "providerBodySha256": "046b961237be87f81ee02e114b648994a2ce2f86a54a7925aa0776ad924f10aa",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-retry",
+      "text": "再看看字卡的样子，可以重听一次，再换一张。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "78aa917a74491d258af8232188ac917567060e020161d270fd7d4015a91cdc3b",
+        "sourceTextSha256": "2e96740c8ca87d467e20a2c9ec5f7ae16c6db73c5a6f77721413cc177de9ab27",
+        "providerBodySha256": "bcfb4eb1e752a64e3d9260004765c49a2585303070ea030716c635ce42852428",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-help",
+      "text": "老师把示范字和同样的字卡放在一起。看清以后，你再来一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "ce9e2fb1e7a7001e5ebdc2c335edc77d60d999cd480885986af118f10b782501",
+        "sourceTextSha256": "34dbd9a8e0c700af41503c3944dc31222e981a7573a7513e6e88977b4d3384ca",
+        "providerBodySha256": "0c1c3551e3031c06faa276e3610a5e4139283fc06b0c9db2dfb504ec4b255e25",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 3,
+      "actionId": "speech-p3-done",
+      "text": "八个字都联系过情境了。点一张字卡，还可以再听一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "adfba0a1e6e7240c9d0573e8f605eee1d760fda0ddf881c862b8692ec0bc4a52",
+        "sourceTextSha256": "96f1fda371a56d344698aacca45cc29b1a61dfa47e12d42fcf7066c56cf44cbf",
+        "providerBodySha256": "28e4399f00fa543e92110eb983bdaae89e03dd26fcd9ca92e8a39291932ad387",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-start",
+      "text": "我们来看怎样写午。先看老师按顺序写一遍。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "295af6e900443be152ea89c06dcd14310e337f1d78ecbf2c0848403ba1cbfe81",
+        "sourceTextSha256": "8585b8cc579760d62edee364aa1a402cf9144cb13e1e0e95cd9cdab331590a08",
+        "providerBodySha256": "125eef5134403ed9f9d370d9a451a47bde3647b41675f337958fd42e6a24a38c",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-demo",
+      "text": "午一共四笔，按顺序是：撇、横、横、竖。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b66d130164e868af6dc89936b550614e6fe7fa683187b38260fedafa8ff175fd",
+        "sourceTextSha256": "b78f89487f8404dbde72b37847964bbbed6381367b4a9b6a3a9a48f7966a53d6",
+        "providerBodySha256": "b67ab1a80cad18f26def65fd10acdd10a7871f3d5b5c1f1cc44306d35a9e5880",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-stroke1",
+      "text": "第一笔，撇。从起点出发，沿着这一笔慢慢写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "6868c0162066e2b989bc3ec06f7d585638428730bf4fdb95e7dcab99ac43f563",
+        "sourceTextSha256": "cce368cb56d206b4f5d8017eee8c84bbeddeace9882d719c1d349b116e24e437",
+        "providerBodySha256": "903db13a824b4540312cc570cfc27ec1387e708f2bc94e98de7c28f01d0b55e6",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-stroke2",
+      "text": "第二笔，横。从起点出发，沿着这一笔慢慢写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "05bc53414a96d6306db17cb59db8ae62e55cc903113bf78033903c687328e015",
+        "sourceTextSha256": "75d1a259bb74a784222de22d276e39550e6b3e035a080d064642ae28943d7bad",
+        "providerBodySha256": "e33547d1f39fca1055baa202a5d811f3e3e5078d6575752bb42fdeeb6fbd8b10",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-stroke3",
+      "text": "第三笔，横。从起点出发，沿着这一笔慢慢写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "c3ab7891808cad6a4c6f990d2ebe916c32279b23bd8f4c386b9666f39bf53e84",
+        "sourceTextSha256": "ed62199b02fbd5256eccfa02d5c6b38ccc6eeec3dc45c31320d95cc0459ccd3a",
+        "providerBodySha256": "ee6e1d0e121be982e0be98e512b25ef043236ae88b72ee4de994fa5dbed4195d",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-stroke4",
+      "text": "第四笔，竖。从起点出发，沿着这一笔慢慢写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "af4eab8d2b6a0c028fe1ebccc83c78a620b73e92913078daba7f3a0d5e20b8f7",
+        "sourceTextSha256": "ccb77cf2366442ded3deca37114f6d96abc33c86e33c1a46386dfeabab9caecd",
+        "providerBodySha256": "90b8243f24a9b9608a72c9a3202b77fcd8431d9f0049b1743ddf1f562ce26bee",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-prompt",
+      "text": "现在从亮起的起点出发，一笔一笔写，写完一笔再写下一笔。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "1d6e522205b057cb428156647c6ae85070c8064bf2855103f52cb489f81047b4",
+        "sourceTextSha256": "1acddc5381aaf322dd990edb6e1247bf3c79ebf185b68e992db3e69f9120b389",
+        "providerBodySha256": "4285542767a44d0f7f9e65aff71d58479bc2c6e3e6b5689e8aaa84290166b136",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-retry",
+      "text": "这一笔还没有连着走完。回到这一笔的起点，慢慢再试一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f0f35ac9a6c4090b340a9c1a0a7cbab88ca2474a70ae89343bd0d4cbf6fec822",
+        "sourceTextSha256": "1e68c0fff24e93e7687c17b4081f18e94dceaaf57897f1bf714ebff1cf7a1fcb",
+        "providerBodySha256": "212809ebdcaf4117b9f30d194260f09ee5a4511bab4ac223986ba3449381d476",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-help",
+      "text": "先看这一笔怎样走，再从同一个起点自己写一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b36ee4b26087e9fbbc08b88ea726e719602c9c70216c45fab2cc4c9fe736fd92",
+        "sourceTextSha256": "567550aa4ff455020987857f859cb0ace64e18c67525ae9b75f5b447a8e2f396",
+        "providerBodySha256": "c9aafa250e4230e1fa3176cd2d8219954e530c9da312edfccd16f9d8f3773791",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 4,
+      "actionId": "speech-p4-done",
+      "text": "午的笔画走完了。你可以再看一遍，也可以重新写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "896735ea5c316831f3b01b86088bf4405f89e567c801234aa8b4d76577d57f6f",
+        "sourceTextSha256": "557568fb24c7d922c0cb4664a65db8c501971310aa3df40f080cfc80230b0d14",
+        "providerBodySha256": "c965cedc4fcaf6b25ef2c8a545ceee75d0f7441dadcf0aa9ba3edb93acb44351",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-start",
+      "text": "我们来看怎样写下。先看老师按顺序写一遍。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "e8cef28695997fa77feb01e1dc804a9b15b774d89346c52206945f3dfdcdae9a",
+        "sourceTextSha256": "8f7aa863b6148a47e3a08d132bbf1329780ebf2047302dc5215242e39ea6cc6c",
+        "providerBodySha256": "b0aad972f3185404533d447c5f69e75c3fb95fdb0473ee3ca7099a615e4ce682",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-demo",
+      "text": "下一共三笔，按顺序是：横、竖、点。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "1888483731c0480eec8bbfc6964cb67b539693b975f9a833cb155467bd324008",
+        "sourceTextSha256": "2db86e3cf81a4e94b5ac3e00e24a37796f9582a46ad9d955b6b61dc21f659d03",
+        "providerBodySha256": "27a63a5e5b4cf4fbccac23b6dc2135ba3403da192dd223ca98a7c2d734c1ed6a",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-stroke1",
+      "text": "第一笔，横。从起点出发，沿着这一笔慢慢写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b1910b65547d28421fbe34d06189af9e31cb474aeb6b58a488f76dc52bcfb6ca",
+        "sourceTextSha256": "372f62df3adff632a1c72933202535e5b848032ea0ee188196308bcc0b5f9ba0",
+        "providerBodySha256": "b79d086a7677ed686f1b49fb6e70fe66cbe2a547ab4ee3647d2a53affe0e7a13",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-stroke2",
+      "text": "第二笔，竖。从起点出发，沿着这一笔慢慢写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "853591b02350817dda0d15e5a2bb997aeb2c1b1aa8dbdf5de22c9f680dffede8",
+        "sourceTextSha256": "b696b8ac64c18521401e835bfc0b99c4f2ae5dd9e57dd951f8ece8089d23e974",
+        "providerBodySha256": "5d3b7976c6f9d5d031aa636df2eb4cb1df1429dbeecb8baf63b0a44afa600884",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-stroke3",
+      "text": "第三笔，点。从起点出发，沿着这一笔慢慢写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "338655e93323f089d3c120b1b46ef3df0a397362ae2f5b38185bf7afab2a7152",
+        "sourceTextSha256": "2835f6f7b565c290f12baf678f060e60912839891e54c008ac2bc18998018254",
+        "providerBodySha256": "a31cb6bb171f0321fc13d1558dcfee614f4575aca113da056f4c2cecf4656cca",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-prompt",
+      "text": "现在从亮起的起点出发，一笔一笔写，写完一笔再写下一笔。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "1d6e522205b057cb428156647c6ae85070c8064bf2855103f52cb489f81047b4",
+        "sourceTextSha256": "1acddc5381aaf322dd990edb6e1247bf3c79ebf185b68e992db3e69f9120b389",
+        "providerBodySha256": "4285542767a44d0f7f9e65aff71d58479bc2c6e3e6b5689e8aaa84290166b136",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-retry",
+      "text": "这一笔还没有连着走完。回到这一笔的起点，慢慢再试一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f0f35ac9a6c4090b340a9c1a0a7cbab88ca2474a70ae89343bd0d4cbf6fec822",
+        "sourceTextSha256": "1e68c0fff24e93e7687c17b4081f18e94dceaaf57897f1bf714ebff1cf7a1fcb",
+        "providerBodySha256": "212809ebdcaf4117b9f30d194260f09ee5a4511bab4ac223986ba3449381d476",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-help",
+      "text": "先看这一笔怎样走，再从同一个起点自己写一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b36ee4b26087e9fbbc08b88ea726e719602c9c70216c45fab2cc4c9fe736fd92",
+        "sourceTextSha256": "567550aa4ff455020987857f859cb0ace64e18c67525ae9b75f5b447a8e2f396",
+        "providerBodySha256": "c9aafa250e4230e1fa3176cd2d8219954e530c9da312edfccd16f9d8f3773791",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 5,
+      "actionId": "speech-p5-done",
+      "text": "下的笔画走完了。你可以再看一遍，也可以重新写。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "0d0e27566fa916984f504fd03b08a26fe285ef985355db817545663e56b9ef6d",
+        "sourceTextSha256": "a1b42c99947435714f2923473c511447909d82f5542ed0f9967110adfa1c6524",
+        "providerBodySha256": "a7335d762f9d25b294e75983adda61f452edcac4196f36d2373e02d3e19aaaa4",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 6,
+      "actionId": "speech-p6-guide",
+      "text": "先听老师说完，再看清每张图，选择你认为合适的一张。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "64809fe4f7013e486cf0c048c45a7eb24d64d0c7203c70b1b13a2507166ed459",
+        "sourceTextSha256": "b466cfdd96aa7bf51a6f9b488e62d64f88a5b385791efa7c94932224f5dfd737",
+        "providerBodySha256": "32f31d8f6a7774ff951e7561c10aebebbc6575e5b806ddd7e20c108b4901bbe9",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 6,
+      "actionId": "speech-p6-question",
+      "text": "看这张示例星期三课表。从上往下，第三节是什么课？请找出对应的图片。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "87445f550436f8cd644d07429ec1d2306d4d45fa558e156d10d3eed0d29d0de2",
+        "sourceTextSha256": "336c5da71022c329517b0edfb519e6e552a5f6659bfab6a888e00ac2a84de2c6",
+        "providerBodySha256": "ad038bc89e2aebbf26df209b63b24fe901e23fa8fd4807eb48edb26684d47c20",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 7,
+      "actionId": "speech-p7-start",
+      "text": "绳子可以弯，短棒可以摆。你想摆出哪一个学过的字母呢？",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "4dc5ca4252d2fd619fd63b2c9df652912f88b7c90596f42756db226748916db0",
+        "sourceTextSha256": "52040d12e1b7d6fc67ca6405cb4b4a1a83b88db58d58df952d630640af015ec4",
+        "providerBodySha256": "d06b0b8642a209cff44d0b8405d003ec2e3b73553a7d12a84318bca697d2f77c",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 7,
+      "actionId": "speech-p7-c",
+      "text": "看这个学过的字母：c。可以用弯弯的材料试着摆一摆。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "04a3286bbe3558aa4827e6e60376c725e6ab1f3d7447a824dfa78e258d8893b9",
+        "sourceTextSha256": "374da7b6f057c9daceb96f5a015c1e15f26c54f887889d785cde4ce82cc4e480",
+        "providerBodySha256": "528828b89698efb492dd964d6b4d3927e9dd33c966bfb202bb768a20a7a3cc85",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 7,
+      "actionId": "speech-p7-s",
+      "text": "再看这个字母：s。它有两处转弯，可以慢慢调整材料。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "77301dbe4184f58fab298c64ef3dac3decb63768721b55ff695b7410f3b86cc9",
+        "sourceTextSha256": "688cdac9b441c155a8140ec56dcbce428845add781733e962b8536e9a59d44a5",
+        "providerBodySha256": "38f7ae29e786afd9d7eaffbd504580d85ab8b2a5de9744126bb6de3c65a9f528",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 7,
+      "actionId": "speech-p7-x",
+      "text": "这是字母x。两根短棒交叉，就可以试着摆出它的样子。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "d79ff06c04a9d67a3292b83ddcc4693dbca502546242439090e14b397a5c8561",
+        "sourceTextSha256": "b9fd16b95633375dcb5f7360f8bf3302ee649b2184e26bf320f6060c77def557",
+        "providerBodySha256": "c37cd921dd8776d151bf34bba64824f5507f92136bf01c7680c6e86f27b2dfb7",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 7,
+      "actionId": "speech-p7-prompt",
+      "text": "先选一个字母，再移动或转动材料，做出自己的造型。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "d07419fb148744fc3d502cd1c26ff49b1e225a1acf6a8921423bd35396b3ab3f",
+        "sourceTextSha256": "9b360bbabfb9c3ea840b6f0b45ca1afaf6d6e98b4808a64db678e89e590f4317",
+        "providerBodySha256": "444871c90a758ee8c8600834539608e3192d454d5f317c7d568a852ebcab8709",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 7,
+      "actionId": "speech-p7-help",
+      "text": "可以暂时看看字母轮廓，把材料的位置和方向比一比，再关掉轮廓继续调整。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "3324064140c7251963189e5774ca8930766d45bb02a91bbf299ab5c001d75ac1",
+        "sourceTextSha256": "8977a656d8a307d36eef0b6da93560d57674722dceb0c054c7743cf5d7bb48fb",
+        "providerBodySha256": "4661befcacbd258c47cf1c97c67800e3885531de0e1d2d1c835cb2343479ef2b",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 7,
+      "actionId": "speech-p7-change",
+      "text": "你可以移动、转动，也可以拿掉一块，换一种摆法。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "aec322d75aded010cc57c260d12cb747a4adc068f69f03316a6cb43d8d8bf020",
+        "sourceTextSha256": "204dcfcb634703ef747e85cc80bc2438a53e920bc53c82ce6fe1f3149a5207d1",
+        "providerBodySha256": "5bcb85dd8fc247ecb5ab2c08df21e8047c51e1b76e7c1b46593fd05099b0171d",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 7,
+      "actionId": "speech-p7-done",
+      "text": "这是你刚才摆出的作品。可以再改一改，也可以换个字母试试。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "9b19eea54fcbfe0ff0b6e867811eedd8d0f929f91f688f31d21289971570773e",
+        "sourceTextSha256": "01f913990bfdc2afe657b42f81613e226cd0cf900b73c1091fd0de487e98730f",
+        "providerBodySha256": "f3fbb7ee87a313d382f86d42e065de9dfc328e82cf9b242b4654a563c7dd3fbc",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 8,
+      "actionId": "speech-p8-start",
+      "text": "把学过的声母放在一起，听听它们有什么不同。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "cea4a8658992ec175ebf8989e84bbafff757e75661c431d3a68132822322659b",
+        "sourceTextSha256": "8653da4a8a07e1e83128fcf63aee67bd1c3f0c50fffddecd79c41326ed0f068b",
+        "providerBodySha256": "996f8021640d5f683cc1357d4c0bb1cb8e8f80a6f081a72976a4b4d1aa41895e",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 8,
+      "actionId": "speech-p8-z",
+      "text": "先听这一边的声母：z。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "1eb0e7a1a014757f453459c925e42cff7328f09f0c0b494907e027facb93c990",
+        "sourceTextSha256": "a6a38f343f57405dfc98313f784255e96fc54eb93b0346920c3a51063ab42eac",
+        "providerBodySha256": "94cb725023a999ac583ddfb45774566ec3a72a1408691109c474ed29625d3e21",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 8,
+      "actionId": "speech-p8-zh",
+      "text": "再听另一边的声母：zh。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "36910d165f7ae0190eab6ce92435253020f66067870ad158bb5513e527615915",
+        "sourceTextSha256": "44dd4b03f77c3837b48c2434d6495f02cfb9bbdb5dfb0adc2c5040be4fe84238",
+        "providerBodySha256": "3d44ca6f3240aa85abaf35b39e19ea29c9e142d949f9d9d36f5bb901c628182d",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 8,
+      "actionId": "speech-p8-c",
+      "text": "这一边是声母c。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "611809075db75e46a30a160b8bd665f33dbfdfa15ad76da84cc6ef68c190fc8c",
+        "sourceTextSha256": "d468a4528de90d0ef881d90fd313029571a0fef212971e8f893776434895c5e4",
+        "providerBodySha256": "52d7493650aacc3687265509290383d0ea323f5b1141b16f1e8a46c2da9a6e03",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 8,
+      "actionId": "speech-p8-ch",
+      "text": "另一边是声母ch。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8145d3ff37a100eb7a9e316d74a070a39a9918cffa33263d67f5630a476a4cef",
+        "sourceTextSha256": "cc83ca821a6d32f7e5c949fa54c94f7d29ce799f139d3c9f280071867029d6ec",
+        "providerBodySha256": "8aa3433e32cc657f4dbd4f150da5f24ce24954b9b4c5f0a0b6406fc5e5ae9cdb",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 8,
+      "actionId": "speech-p8-s",
+      "text": "这一边是声母s。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "ef1f37e6bdd3a21cef9f21d40703577c90d853594c0cc46201e38f55c1ca607c",
+        "sourceTextSha256": "9c91ab05d1a9fa2fbd75b4928cb9f30888af5954b68b181b515c0309e0262275",
+        "providerBodySha256": "c81fb58e744be78d36f4e792664752f7ecd224f6d73c06a9ff1658d7d73f6f34",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 8,
+      "actionId": "speech-p8-sh",
+      "text": "另一边是声母sh。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "0a263b4fd343c6aa3a9db09ae7a45302fa2d96532062caa97e15a396f431f7a8",
+        "sourceTextSha256": "39fa6d084b19543f89a21a4665b70e33b7d6ede6516741c9ecb2feba96736063",
+        "providerBodySha256": "244c4825b2dd9b5c13467cf9d58736a464ec221c6e44c5b34c0b07f45b01987e",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 8,
+      "actionId": "speech-p8-method",
+      "text": "拼读时，声母要轻短。接下来，我们听完整的词语。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "9de7e1f3f7feb7e5b9bee18db6abe8012cbe11e2c4d325825fa6bc678d3ec233",
+        "sourceTextSha256": "92b105abcff37ece35686f6000736c748b566a4f34c2da50633850e27fbfbe4e",
+        "providerBodySha256": "aeac02d51e79e79f49a7b0809b1472ad3644984e4297ab34fd351f7af54e7fb4",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-start",
+      "text": "每次有两幅图。先听两个词语，再按听到的先后摆好图片。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "508664ac892ccad678e9ce06dcb4d121ded3dda777d65becd7aa54540f71cb6e",
+        "sourceTextSha256": "7a7b8d74bbcdf93f6886652c5dd74ee0bc7c908899e678639c0cfca4bcc5477f",
+        "providerBodySha256": "ad2c01aa5d76093c1c32a262182627c1dd88ed1c18e9b850ea409a54326a0446",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-word1",
+      "text": "zì mǔ。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "d5276d8c9c7f3660e65465d40c2862995647ed8a28a246235f0c680467418dbb",
+        "sourceTextSha256": "4f252e47bf20859641633d2e946ea847ccad7ffbc2e15a1b4d7ffa25bd78b334",
+        "providerBodySha256": "7613e97125be1a85e7781244bac3a5653944a9bed674aa69e02a9727d5906941",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-word2",
+      "text": "zhī zhū。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "ba811aaa01441ec270b9d62d54e32bf91a7eb1a5c41abacbe5e8e21c21b4671e",
+        "sourceTextSha256": "8343effae8d1726a2f9ac119d81974928b898de996094c2c68f8b22362f6051d",
+        "providerBodySha256": "f7824a10f03028b68d9a03c2c46d719f7577a33fbea6ee4fff36ec5d04ef36e0",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-word3",
+      "text": "cā bō li。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "99b3ce5b6b5e8452c31a541261046c5a427496dddda3c6a13d35a16fc666d273",
+        "sourceTextSha256": "ca5cdbd82403d76b9e2610b53b430adb70d70a71e84a7f66b80e90c2efb6798d",
+        "providerBodySha256": "07f719ce3f4c43f5d317a32d09aefc0df6653cee1f5000740b66f03ae7fdb331",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-word4",
+      "text": "hē chá。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f8eeb3cf35aa9cab973f4789e39bf4151fa27eabb50999b5ca30af39f356407f",
+        "sourceTextSha256": "f41d15e9e0a5246382cb283d73c959c026909d6cda8196036935691329a52946",
+        "providerBodySha256": "1e3be542eca59955a177a71de0ca52f0dadc9fbac76170e0987f397c7608da42",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-word5",
+      "text": "sù shè。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "2c7ca03660b833a20b0c6fb3cd1a2d5bd89addfbd447983c11db1f576bb7a4cc",
+        "sourceTextSha256": "366dcfd5550fee4eab56d7c1bc792cef902469e8064926c0c9c9935795543684",
+        "providerBodySha256": "881da3a554d01a831c879083c6bb8969379ddd5079806b032a566d1b0c991453",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-word6",
+      "text": "shū jià。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8ac31e766cfc5c728ae8287d05f7794b5617b8a92f75e56ca13c70b7cbea4ec0",
+        "sourceTextSha256": "c43e068f7c82984bd68f0ac92bd28630177a426f0b331e023b45ccc9aac90e0e",
+        "providerBodySha256": "52821ac81a502f903e4df56e434641013b4a0791b14a7926dbcf1e5d42068f0b",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-prompt",
+      "text": "把先听到的图放在前面，后听到的图放在后面。摆好后，点播放听一听。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "0666e1a90d6ebd2b01094896948dbfa984e53949cb0cc1e3192533a672f54c75",
+        "sourceTextSha256": "59b83a53a5b3c0bd2654d7ce88dee81e0f1e63f8549540bda37625461fc9014b",
+        "providerBodySha256": "7626a681c54a2b696b5e211e30bd0ad9c4317a43242604e09f939d42d1e2df56",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-correct",
+      "text": "图片顺序和刚才听到的一样了，我们再换一组。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "6bdfc1139441770385631ec0b240efa85fbe617dac07a260ac39ab11de41f055",
+        "sourceTextSha256": "68c697ab6dd856267ca98e71473f4aa28dca0c662b12b98c35bb6f72eda1c496",
+        "providerBodySha256": "dda3fd3d5163db9fba2d514410e2ef7275ae1097fbc83552255e359f1f54f467",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-retry",
+      "text": "顺序还不一样。可以重听，再交换两幅图的位置。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "a1e8b919048f38242b18b0f3e9c7971661383bcaf4aaa7ae9493a8437e61f9fb",
+        "sourceTextSha256": "27d26fad7f61e9f18471c9eb95fe519620b262f68edcf7c189810a6906d7e236",
+        "providerBodySha256": "1c2a4038844be0994f1802d5f09b1f3c8cf930ac579e1532e1640a8c9971ef67",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-help",
+      "text": "老师按两个词语的先后指给你看。看完以后，图片回到原处，你再排一次。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "dd834e2203690c71de3f3b3cae4452446ba1a7d2c7ab25126ad5c756067c2879",
+        "sourceTextSha256": "fa9e51da71ea145bd746ffa2765189e065e70df03a48019041a86dff9d8fffb9",
+        "providerBodySha256": "c680399f6e8f3d6ad1def5803c4599d7c6943112cfeccdc596a68613f61d2db1",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 9,
+      "actionId": "speech-p9-done",
+      "text": "三组图都排过了。你可以选一组，再听两个完整词语。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "99da9e7ca9ba1302e0e39c62686d7b26e88ce8f80af736e69aef478965ee431e",
+        "sourceTextSha256": "cf3a4125a688a86f324eb9ea7a6c4c9597b2b5e2d600cfa661f228f8957da704",
+        "providerBodySha256": "8b3102905d97540f1d2f51b8eb163d73f0573379e9b73b7c48da81f03c608112",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 10,
+      "actionId": "speech-p10-guide",
+      "text": "先听老师说完，再看清每张图，选择你认为合适的一张。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "64809fe4f7013e486cf0c048c45a7eb24d64d0c7203c70b1b13a2507166ed459",
+        "sourceTextSha256": "b466cfdd96aa7bf51a6f9b488e62d64f88a5b385791efa7c94932224f5dfd737",
+        "providerBodySha256": "32f31d8f6a7774ff951e7561c10aebebbc6575e5b806ddd7e20c108b4901bbe9",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 10,
+      "actionId": "speech-p10-question",
+      "text": "听老师读这个词语：hē chá。请找出意思相同的图片。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "1eb09c940bdc4e4065435160101ef55e42083da8cd54a885e7a8d1b1e1bda953",
+        "sourceTextSha256": "3651dc09d7058f8dde7e28835dbcf1b5a7903e30c588e585bb0b20799383c275",
+        "providerBodySha256": "930f016c0a8c18fc461a0e90c82a00b76773375c9306f4c57e3b00f50243e833",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 11,
+      "actionId": "speech-p11-start",
+      "text": "看看图里的人在做什么。听完整的词语，再看看动作。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "743e74c55b724690f041a7a1b187d7d813f25df39532d1ee0ca3bb5be502dc07",
+        "sourceTextSha256": "60d310ffe9eab4a922e2196e3cfb8c5c2a1a872f8ef4fbda7a19578756179617",
+        "providerBodySha256": "7a0e9666027e06e75b34a3b76e229b917dd2dc623f711c253eab98111eb07c35",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 11,
+      "actionId": "speech-p11-brush",
+      "text": "shuā yá。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "6aafbb6840913c0b0b7ad331db4483684f558618630b1b8f041b39c03dadaad2",
+        "sourceTextSha256": "bd2a3e607c7e24954ef128c41db20f334629eec1b21d0ad8f9d0ab1aa09ac9aa",
+        "providerBodySha256": "91aae3f25fbc53bc2409376bde3afd282e03b175bd0bf89d44942a9726293454",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 11,
+      "actionId": "speech-p11-ride",
+      "text": "qí mǎ。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "83948d0ae9fa0b0dc30f9270bc4cb7e37d2a9b416397c1951419216f3d7e1575",
+        "sourceTextSha256": "1f5b7f75eabf8fb0f7e9c4c84433b91b1b1bca6aa227c0f47fc5a62b7e38156e",
+        "providerBodySha256": "8a844882a9cdb4219919036535260d175227f0d2f009da7d12f2fcb06635a361",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 11,
+      "actionId": "speech-p11-eat",
+      "text": "chī xī guā。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "c7ce583ca77886e5e58456c6af873541fadbd7e40a706acbb03a69a1d2860440",
+        "sourceTextSha256": "4e55586e301287e6bb3bc852e8ba31e383f7cc86bb1aa86ee6a6a6bb03df7359",
+        "providerBodySha256": "536f7caf582ea3e782a582626f602e86c509cf1fa4b9a389b246af5a0c4136a2",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 11,
+      "actionId": "speech-p11-mop",
+      "text": "tuō dì。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b6c31ee39b6b710da48d96f06a24933b4be6a08be18ad053fc9c6cf5162fce72",
+        "sourceTextSha256": "4a8934931b1bcef516a5471eafb5b7c9851b08cbdd850bbdd85d729925431d56",
+        "providerBodySha256": "949c5c0175a9b899f86a9a15666c96c5719ed6e14c583e5cc514bbf3792ec78b",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 11,
+      "actionId": "speech-p11-haircut",
+      "text": "lǐ fà。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "e5a3a3d34c9106c463e53d7675f31ab093d87000bf5e80f098c611c795efd107",
+        "sourceTextSha256": "b96662b3dbe5b7ccaabe69287ba0f0feb119cc6ca00d931c5c404ffc5fd8de9a",
+        "providerBodySha256": "e55dd0c40ad52a29295bf9c38d2198f34993c3c0760461fdfaf004300cb6699c",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 11,
+      "actionId": "speech-p11-radish",
+      "text": "bá luó bo。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8b1dcfb3d007235a7db2c780e1c91ade49b29794d0f6094c94319b5151e56ea7",
+        "sourceTextSha256": "fdd8935d10f51fcf45cc22b0f32217096333077ac35e25cbb99191cde247d3eb",
+        "providerBodySha256": "da713db7461550824213f23d3498cec82562cd5c03ed60b4114674dadb4d4888",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-start",
+      "text": "你来做小导演。选两幅动作图，排成你想介绍的先后。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "16bacb8d41f21df2818b1213619b7ea21de31f80143a1c0ba19b7d3a63c5d696",
+        "sourceTextSha256": "834d2df82cf5f64351243799dfc3c16ad4cad7fb33df57391dcc160c3baa0ca5",
+        "providerBodySha256": "034be4831edffa9be7204f968fdae604b71c4da05f974755f19b6dfedc207881",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-brush",
+      "text": "shuā yá。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "6aafbb6840913c0b0b7ad331db4483684f558618630b1b8f041b39c03dadaad2",
+        "sourceTextSha256": "bd2a3e607c7e24954ef128c41db20f334629eec1b21d0ad8f9d0ab1aa09ac9aa",
+        "providerBodySha256": "91aae3f25fbc53bc2409376bde3afd282e03b175bd0bf89d44942a9726293454",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-ride",
+      "text": "qí mǎ。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "83948d0ae9fa0b0dc30f9270bc4cb7e37d2a9b416397c1951419216f3d7e1575",
+        "sourceTextSha256": "1f5b7f75eabf8fb0f7e9c4c84433b91b1b1bca6aa227c0f47fc5a62b7e38156e",
+        "providerBodySha256": "8a844882a9cdb4219919036535260d175227f0d2f009da7d12f2fcb06635a361",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-eat",
+      "text": "chī xī guā。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "c7ce583ca77886e5e58456c6af873541fadbd7e40a706acbb03a69a1d2860440",
+        "sourceTextSha256": "4e55586e301287e6bb3bc852e8ba31e383f7cc86bb1aa86ee6a6a6bb03df7359",
+        "providerBodySha256": "536f7caf582ea3e782a582626f602e86c509cf1fa4b9a389b246af5a0c4136a2",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-mop",
+      "text": "tuō dì。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b6c31ee39b6b710da48d96f06a24933b4be6a08be18ad053fc9c6cf5162fce72",
+        "sourceTextSha256": "4a8934931b1bcef516a5471eafb5b7c9851b08cbdd850bbdd85d729925431d56",
+        "providerBodySha256": "949c5c0175a9b899f86a9a15666c96c5719ed6e14c583e5cc514bbf3792ec78b",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-haircut",
+      "text": "lǐ fà。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "e5a3a3d34c9106c463e53d7675f31ab093d87000bf5e80f098c611c795efd107",
+        "sourceTextSha256": "b96662b3dbe5b7ccaabe69287ba0f0feb119cc6ca00d931c5c404ffc5fd8de9a",
+        "providerBodySha256": "e55dd0c40ad52a29295bf9c38d2198f34993c3c0760461fdfaf004300cb6699c",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-radish",
+      "text": "bá luó bo。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8b1dcfb3d007235a7db2c780e1c91ade49b29794d0f6094c94319b5151e56ea7",
+        "sourceTextSha256": "fdd8935d10f51fcf45cc22b0f32217096333077ac35e25cbb99191cde247d3eb",
+        "providerBodySha256": "da713db7461550824213f23d3498cec82562cd5c03ed60b4114674dadb4d4888",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-prompt",
+      "text": "把一幅图放在前面，再把另一幅图放在后面。点播放，就按你的顺序听。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "493e8c605e3e263f5f37c64abe906cec0a1d325ed3489d2f7a69a7308b04ee05",
+        "sourceTextSha256": "42fd293fc70677325e63f75d98c2b20aa0dd8e1b9cbd0fbe168a71e4cca8a837",
+        "providerBodySha256": "6e614ebac46d0360950ae405ebd8a8632cdfda43390af8472ff7f0f497ffddd5",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-help",
+      "text": "先选一幅放进空位，再选另一幅。想换顺序，可以交换两幅图。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "36d0c8e5ed12c95eb5676cddbebe3ea651314a25a8d8b4f070bb93648950a834",
+        "sourceTextSha256": "0af46c568c382cb14be81579bd2e10105f6e748cca028044a09346cbeda7a0b9",
+        "providerBodySha256": "c76e0b03fac7b679673d4b302ea0b3e3669b389b398024bea2235eadf98d1d47",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-retry",
+      "text": "还有一个位置是空的。选好两幅图，再来播放。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8858877219d377a869f17c5cf820422e669463dc68870d1fd05564d143f021c6",
+        "sourceTextSha256": "e2d8e34ce022ca1a3953431998c11e9b2e0b8dd31f5e4cb677686f7c4e6f51d1",
+        "providerBodySha256": "2121d2628c1e5839c74709cc340429d6a7f098724080f8062aab1d8f89626cc2",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 12,
+      "actionId": "speech-p12-done",
+      "text": "这就是你排的两幅动作图。可以换图、换顺序，也可以把它讲给身边的人听。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "4da365bc22c462b9ce27cbf1a2a561f982802845ed07f886aeefa335ba52fad6",
+        "sourceTextSha256": "56ece6796c8477338145c277ac637bfd484840b50ea31257e9dd210257a2a916",
+        "providerBodySha256": "09d23aea4770503b9c385b04db103af215920c83ce2e0a9120cbce2c6c84e6e6",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-start",
+      "text": "看看这幅新画的图景。听老师说，再找找对应的地方。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f8bc9e8143512a1ddd898d626f8c679b091992974fc7db92ca0dfc660be249f3",
+        "sourceTextSha256": "4dcfbd74664ef3192396b7bbf015cdf3fd6c1e21c53fdc8a256f974f666d3d62",
+        "providerBodySha256": "9c9ba2fd61220a91dde28a22cb031a088f397dc053c85d37bdd145878dd69230",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-chicken",
+      "text": "鸡。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "21283d6fbf44191e81f49f5cd947b5ae7b27b6349a82a4dc6399b76a235b815c",
+        "sourceTextSha256": "e82d4233d8b0b05d85d7bc76cafad25bb0aa8dfccb52ff3f9867c29854d421d8",
+        "providerBodySha256": "5084c3281a9a71e672d7d067db2ee578654d444fd3ed541578af2b114391daaa",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-fish",
+      "text": "鱼。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "fb8f1efe5e967f1a82227e854ecb44fde9f741ee75ea574d7978a15fdb74ae87",
+        "sourceTextSha256": "c35866c81f8bb3ff271601b7907288eadb8b991174b476c488c16f0e9c1edc90",
+        "providerBodySha256": "cbb2493c59ada4a7f509ab1e2288c97731909d5278ae959f3006be49c1b37974",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-river",
+      "text": "河。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "9ab1f9513758e883f9fccc10876993c02e57a899bc08ba0915720b1b15fb65ef",
+        "sourceTextSha256": "3e4e5ce5aaeba87b8b4aaa3fae284df95180b7f47b711995813326a4ec92b6fc",
+        "providerBodySha256": "73b78aba8b967c15de2d1eccaf8b1ebd933df4defa675296caaf6d5494e3f284",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-mountain",
+      "text": "一座山。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8b0f4aa64d858f325cf6228ccb3237a0944eb3e473dfc06f13b4583ba1e7f4ff",
+        "sourceTextSha256": "fc19e34211bd92883a2787e9eef9e5bb1dd8ca42a4018d069b3c426ba844b14e",
+        "providerBodySha256": "e8578650dac4e252853f2c173bdf6f0385c9880ea5e3d524e3b5d371d193b428",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-tree",
+      "text": "一棵树。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "9225ea8c65514ce45dd78c9df8e37ba0054a0b2ec5fd4cea29f8b8a743bebbd7",
+        "sourceTextSha256": "5cf6916f00483390aaa408129189c5366e95be47524f12a29c26a411b7f56f4c",
+        "providerBodySha256": "191bb10068df5bce28e889ae493248b77d61a0cbaf6f2b17a4f6e1801c6475c2",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-pigeons4",
+      "text": "四只鸽子。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "69925e407bedfa48eed5c9f8602ac12b8318053fabfc15e1c7eced8bac8f21c3",
+        "sourceTextSha256": "182f05661723f0b8209e38e8e6d64f339f38603fc0b5999f7ebe0c01ac7f87b5",
+        "providerBodySha256": "d3e21896cd5807d98d5071242a9e0386d375412307599256dbdb10c11b69899f",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-flowers7",
+      "text": "七朵花。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "e9ee23ba641045c85e391093eab4dbec87d5e1a4fe84b433f1a2dadad0b5f24d",
+        "sourceTextSha256": "ee673159660cdfa2171a4ff083f99a0f8f9fe97703a4a8dff78925e074434a6b",
+        "providerBodySha256": "1ed5c42797271023c1dcb40735762927dc805b8d3ff33a4d8f5cd640e625d558",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-prompt",
+      "text": "听清这一项以后，点一点它对应的图。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "067cfd3baff0a292fdf2de0a5e468e3575558479f460f7e1063c40f410625b25",
+        "sourceTextSha256": "005d052aeca176081cefa39d27b4b3a4171b9d4053d357cdee6622fb99fb4321",
+        "providerBodySha256": "55820925ca6aefa39dd07518a1c2b89e829b00f59cb5ac67760d367906f3f793",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-correct",
+      "text": "你找到这一项了，我们再找下一项。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "da913f9add055a6ba27b16a3a8bbc6ac2c12dfc77f004184ea907a76e3e730e0",
+        "sourceTextSha256": "1ca5bc735bdee73a13d01bdb8e1ad3716933520763516eb6e3c82a572fa20b71",
+        "providerBodySha256": "4ae8722bc077cc9c81edb7e73f3816d679a8805bb3214cda6e3058b12d814ffd",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-retry",
+      "text": "还没有对应起来。可以重听，再看看别的地方。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "fa7dfe63b76a81fe7f051d239dc3c361c15ec1d48a1ddb4ad00a674e237c8ccf",
+        "sourceTextSha256": "9f8bb410bf6d9a1392c69f6b1bf0c78db3550428ac92ae5d581a0a48f95f88e8",
+        "providerBodySha256": "27e8dd476e2dd05f6838f67d0ecc67d71ff26ea647ccc63424f2061a4af0815b",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-help",
+      "text": "老师先指给你看。看清以后，提示会收起来，你再自己找一找。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f13696c797bdcd574d00ae713fbf332ec7013b823ef1bf51d599da42a2e8873e",
+        "sourceTextSha256": "3d0cac9df89d5704445642645637c5a916b289bf61307457094c40dc61cdf0ef",
+        "providerBodySha256": "8bcc61429cbb524fb2feb612156b45c0552411f3935fd00c93dc83daefd2c23e",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 13,
+      "actionId": "speech-p13-done",
+      "text": "图中的这些词语都找过了。点图，还可以再听它的名字。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "2104797739d4adaf81ea7cc88bad9e502b5fb0174957a05a778da05c0052f0a3",
+        "sourceTextSha256": "9709c489eced5ea2c325ce7d93660938e98fd39cd83cda5739111366bacbf820",
+        "providerBodySha256": "b7c22e871a4dfe071b6ca9cd00a4798207ca3484f4e2283140a9a961c16ed420",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-start",
+      "text": "这次由你来摆图景。山、树、鸽子和花，可以放在不同的位置。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "34066d10fc8cc2886dff0bf5120757498508f8965cf505d7fb5fc98574e2c108",
+        "sourceTextSha256": "33de3322452ff576eafce37f5191901193926e9d78848171a67754e6f5b285f8",
+        "providerBodySha256": "ce2caad6648bc651e75bb7f73a99ffdb0e5584fb810e84e0f35aff4c98eb7428",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-mountain",
+      "text": "一座山。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8b0f4aa64d858f325cf6228ccb3237a0944eb3e473dfc06f13b4583ba1e7f4ff",
+        "sourceTextSha256": "fc19e34211bd92883a2787e9eef9e5bb1dd8ca42a4018d069b3c426ba844b14e",
+        "providerBodySha256": "e8578650dac4e252853f2c173bdf6f0385c9880ea5e3d524e3b5d371d193b428",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-tree",
+      "text": "一棵树。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "9225ea8c65514ce45dd78c9df8e37ba0054a0b2ec5fd4cea29f8b8a743bebbd7",
+        "sourceTextSha256": "5cf6916f00483390aaa408129189c5366e95be47524f12a29c26a411b7f56f4c",
+        "providerBodySha256": "191bb10068df5bce28e889ae493248b77d61a0cbaf6f2b17a4f6e1801c6475c2",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-pigeons4",
+      "text": "四只鸽子。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "69925e407bedfa48eed5c9f8602ac12b8318053fabfc15e1c7eced8bac8f21c3",
+        "sourceTextSha256": "182f05661723f0b8209e38e8e6d64f339f38603fc0b5999f7ebe0c01ac7f87b5",
+        "providerBodySha256": "d3e21896cd5807d98d5071242a9e0386d375412307599256dbdb10c11b69899f",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-flowers7",
+      "text": "七朵花。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "e9ee23ba641045c85e391093eab4dbec87d5e1a4fe84b433f1a2dadad0b5f24d",
+        "sourceTextSha256": "ee673159660cdfa2171a4ff083f99a0f8f9fe97703a4a8dff78925e074434a6b",
+        "providerBodySha256": "1ed5c42797271023c1dcb40735762927dc805b8d3ff33a4d8f5cd640e625d558",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-prompt",
+      "text": "选一组图，放到画面里。还可以移动它，或者拿掉重新摆。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f27775fefe1a42b4ee53eda24d61af3771d3b994c306c0e276191f932d0c44b6",
+        "sourceTextSha256": "654ce40d5139a7e52e81a05d11941f0cd3179403c9cb9ea0ce3ce071da38878c",
+        "providerBodySha256": "fb3ce0a3cc4709abffc3e9abdea8c9e382342de47f3e3f7564c2067808dbab1a",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-help",
+      "text": "点一组图，再点画面里想放的位置。可以用方向按钮慢慢挪动。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "df8619178e8bcbcd882aa2741df4b96ddc50ce05416a321f809bd5f32c9e635f",
+        "sourceTextSha256": "7b0f8bb47d03922f208713b474ecbbf3096d3d02113a678c545e754515b93cf9",
+        "providerBodySha256": "18d1fd2d73c5e8c473a1ba289c1dc18e2f4a339e2ece57f4db5c87bc13248ae5",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-review",
+      "text": "看看现在的作品。点你摆好的图组，还可以听听它的名字。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "24605859866961fb49d17945732285648bc919ebbf5bff4ac5634de7c76d4eaf",
+        "sourceTextSha256": "f4ba4428415a5cfffcee46b745edc09d3e313c808534f9360f278e3336b167f3",
+        "providerBodySha256": "2be082f2378bdc12d78a02b8bb128e019618d65f79cdcff6244fba434b53e4df",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 14,
+      "actionId": "speech-p14-done",
+      "text": "这幅图景是你摆出来的。你可以继续修改，也可以介绍给身边的人。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "e2d005ecc6386bd173ce7d6ac9e04257e9aa7793673bc153b418a038637cbe89",
+        "sourceTextSha256": "92a08207e56960cb43e7aa5d793c3f29b5a897410fe7b0d7098e93f6fa6e366e",
+        "providerBodySha256": "4f4e1120ca8a625447596e7de194c2056b8057b202660a72ace2b61dbca91c98",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 15,
+      "actionId": "speech-p15-guide",
+      "text": "先听老师说完，再看清每张图，选择你认为合适的一张。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "64809fe4f7013e486cf0c048c45a7eb24d64d0c7203c70b1b13a2507166ed459",
+        "sourceTextSha256": "b466cfdd96aa7bf51a6f9b488e62d64f88a5b385791efa7c94932224f5dfd737",
+        "providerBodySha256": "32f31d8f6a7774ff951e7561c10aebebbc6575e5b806ddd7e20c108b4901bbe9",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 15,
+      "actionId": "speech-p15-question",
+      "text": "听老师读：四只鸽子。哪张图是四只鸽子？",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "ddfe2810fb82effb516fa8c39b92837da7ea10460f3dd08de8ebe783e4f77693",
+        "sourceTextSha256": "e1b7f5b58b5e568919116dde3e3a3788dc93abba27053354c24bbb536137631c",
+        "providerBodySha256": "9b11760ee959f9e938f80139166a8cdb5c62602d879549b08746bf4cffb5102c",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 16,
+      "actionId": "speech-p16-same",
+      "text": "两张图案的颜色、形状和位置都相同，可以说一模一样。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f38c14af5ca2d3a823bb57b2ebf03bd66884456c50504486621e3a83a602ee61",
+        "sourceTextSha256": "67236cde84ddff0384af329c863a3e2cd03c0b735e5c1bdee1afbf847cd6eece",
+        "providerBodySha256": "8b00ee43ff962495f8ec57e976fdb7f351aad3f76d073258bb8fc05826b6f036",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 16,
+      "actionId": "speech-p16-focus",
+      "text": "小朋友专心做眼前这一件事，可以说一心一意。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "98c782f7336179c51875505dfc7d2985d765f96758e5c05bb0891e0271e29b33",
+        "sourceTextSha256": "72cf3f586e0ae47d7b647a851a0f4ce83c93e3791ead56dee1c36e6b058d6556",
+        "providerBodySha256": "5bdbdbe7aa2de38ca524c7429d3d8fd9ca312e9533503a978e23b878433d5bd6",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 16,
+      "actionId": "speech-p16-unique",
+      "text": "这一张图案有自己的样子，没有另一张和它完全相同，可以说独一无二。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "9bbd0e38f16552cbed62d05fc07961ce3e46894893fc641efc9bdeac56f8b6d7",
+        "sourceTextSha256": "8f81ac0bdbaa55061349bebbc7175846532961a52f0164843250869730936e35",
+        "providerBodySha256": "095703b8817a62b8fb86ac2a1b7b687bda9c618b5880634d5f74b17dc6282d8f",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 16,
+      "actionId": "speech-p16-look",
+      "text": "看看这几种不同的情景，词语说的是不同的意思。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "d295ef9806448a55062fe28ed217d8bdccd71fabf17e677d9144f90f9c6598eb",
+        "sourceTextSha256": "221c52dd390af7a75928e2312e4354600a56f9470597bed1eeb4c41a41a9568a",
+        "providerBodySha256": "decaa427f62a57f61483c9f406f6a14b155353363f8bc4b2d128aadc27f19089",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 17,
+      "actionId": "speech-p17-skill",
+      "text": "说一个人本领很强，有时会说他好像有三头六臂。这是一种夸张的说法。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "3653709875ac269875aeca7a98d7d30f55e4df98898e8a3d3898d588afaca9e5",
+        "sourceTextSha256": "75328cd09df721e651f31d5e31e4cd90de8a58fbced549ece7c74cb24275cca3",
+        "providerBodySha256": "9173007c57f15cf2f3cd72cac8daa729c7d3ed7c8cf407f4c0cdce3ad4a543b0",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 17,
+      "actionId": "speech-p17-color",
+      "text": "许多不同的颜色放在一起，看起来五颜六色。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "e80dac4b05ae41e4ba675d2150b1887187830d47a6cf770a25bbc02685396d7c",
+        "sourceTextSha256": "f801350e064ff1fa50c5009b44210373ce7830b929c2c1df175097c4e8462772",
+        "providerBodySha256": "f99b98a8d3afd02da6a555c02914e89237da684f30af2de8fa192bf7ae6e4b42",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 17,
+      "actionId": "speech-p17-perfect",
+      "text": "十全十美，是说各方面都很美好、很完善。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "58bddb8825b7d9d89cb7806c571a40bcc8fb0434cfdd61d784dda191c7ad4ec3",
+        "sourceTextSha256": "77c99c7fc63285fb87065ff03320e8b335e1bef60aa37235595c7bc796a5a3bd",
+        "providerBodySha256": "89b4c3bc44aa51ca599b17efdb6f8e1d34891cdb47e041876d08384371207a2f",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 17,
+      "actionId": "speech-p17-gentle",
+      "text": "做自己的作品时，不用每次都十全十美。愿意试一试、改一改，也很好。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "53633cc9b6dd50d411c72f78bacca9fe7608072d18a6a16ef766796680edf2ac",
+        "sourceTextSha256": "75c83e1234a34a7ebfb8e3c84b37c238eec3d29fb5ffa7aa19d0f2ce6bb35b39",
+        "providerBodySha256": "0351a60b69ccdd4bb8603a1089592457a8976d7a634470591c720e82d8594efd",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 18,
+      "actionId": "speech-p18-start",
+      "text": "选几块喜欢的颜色和形状，做出自己的图案。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b1eea15a7db13bff4e547e0d8acb22cbcd8d54e98c7a0068d120696ef7b86026",
+        "sourceTextSha256": "639efcf180cfe669db474a24489d69744d2b5e29a814ba56e96728e5b31264b0",
+        "providerBodySha256": "7f0f19216be37e0ea24d5464b9ba35c3a8dd19855873e06244e0a214d8cd0a54",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 18,
+      "actionId": "speech-p18-prompt",
+      "text": "选一块，再点空白格放进去。想换一换，可以再选另一块。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "fbd1aa58107770310b23591c2f8b180bd3cbdecc2d957c5c2810abe0c2b62092",
+        "sourceTextSha256": "3630fed7a74b9b6047b8cf76c402ad660369d192517b2559af5a003fecdc6f56",
+        "providerBodySha256": "165defb0ea10119d59515db008fd415ee3db52667c4fb483b68a8d86dc37736d",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 18,
+      "actionId": "speech-p18-same",
+      "text": "想做两张一模一样的图案，可以看着左边的作品，在右边一格一格摆。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "be03bff90ff18897e1ff0d6f51220a6d9df20e156b5c81d0b81215a03da20a2e",
+        "sourceTextSha256": "86ae1381003e6c89ccf35bf94b5225b60bf7fa73c73ec182c19235eb3b77e1b7",
+        "providerBodySha256": "419d37536bd8ee3a1a0640ee97c425862bd068c97eb4e627c705aeca5df3c42e",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 18,
+      "actionId": "speech-p18-different",
+      "text": "也可以换一种颜色或位置，做出不一样的图案。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8da1b5a232171859d2362370a7d464692ae1336baf9c13dd59d850e4be153ebe",
+        "sourceTextSha256": "213ef2ab9aabb7df4cf07f50c68d23f25e1c2f818badcca7218bd539b9b4d1c3",
+        "providerBodySha256": "861c000e65eb4862a40d7ca8b18084aaeb64be3cef4cabbd8131818411e8a0f6",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 18,
+      "actionId": "speech-p18-color",
+      "text": "多种颜色放在一起，画面可以五颜六色。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8dbdbbb81bb552c1eba6dff702f4b1fe2a08d15c961a34774e7505372f45a90a",
+        "sourceTextSha256": "46d956bfa21bbce90f717c7c57a9139ca9049ee22d4c6b6815730498285956a6",
+        "providerBodySha256": "e3ff409619388342df55dde2a628677af578fc85d2b563d6111c401b4cc76dd9",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 18,
+      "actionId": "speech-p18-help",
+      "text": "先选一种颜色和形状，再放进格子。点已经放好的位置，可以换掉或拿走。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "4918720dfc40d6159f046601c9575f49b55e9e5d8eb6633e8cfa4ccb279fc365",
+        "sourceTextSha256": "c88d51ed9bd615630f7f79b7270f400e2985dc76daf329af394fcc0f027be005",
+        "providerBodySha256": "a4214c212431416f0d8d564289425aaaa94d8d452583a77d555a3b17fe61afee",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 18,
+      "actionId": "speech-p18-done",
+      "text": "这是你做的图案。你可以比较两张作品，再改一改喜欢的地方。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "219c7e7bd1c88f73b3bdc269df7f0f42418717397a2d2a433e224fce889857c1",
+        "sourceTextSha256": "7adc1685641582acda852cfe518f3cf1205c9d5e0c9251173953f73cc6469e94",
+        "providerBodySha256": "e5edeb7337c57bb7817e635055ffc64bd35a496d3a603f784e0fac66b3cee4ac",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 19,
+      "actionId": "speech-p19-start",
+      "text": "如果语文书在身边，请和大人一起找到谁会飞。可以先听大人读，再慢慢跟着读。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "f139ad933c9e57a0a470ae0685c9c29a4350c9700cd2602931fae3dd0e93106c",
+        "sourceTextSha256": "227296e21ec3338c01902a4650d3918ee42d7522f305ea68a18498f2f20a86ac",
+        "providerBodySha256": "72608a1f1be6017aac5f97345d5847873985a17690c800bbdea31bda47d28520",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 19,
+      "actionId": "speech-p19-bird",
+      "text": "看看鸟张开翅膀飞起来的样子。愿意的话，可以张开双臂，比一比。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "810d07549b1bb642d245ab9ed28dedb3478e5a261cfd75e1b08f4d8cc6338ad4",
+        "sourceTextSha256": "70b8c0e353843e33079feb32bb66ad4aa950d95f786db852621197db25c496da",
+        "providerBodySha256": "b4ebd8bd9c40613ae701cfedd8151f4fbea0c3fbce54e9111b06e755ef345817",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 19,
+      "actionId": "speech-p19-horse",
+      "text": "看看马跑动的样子。可以说说你看到它怎样活动。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "599815e7fb94b66d66d1d5581356e041c325f1ebe870f7c891b8db8c914245f4",
+        "sourceTextSha256": "faa431e2743d3dd41383fd1e1887600f4be6183b65bb45a411769a2220af65dd",
+        "providerBodySha256": "96391b5e045fa1df648f8e1caf7dd2b5417472d8b3d0bda79229f40f8b26b17a",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 19,
+      "actionId": "speech-p19-fish",
+      "text": "看看鱼在水里游动的样子。可以用手轻轻比一比。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "a00ec0ae328c8c5d9ebe9757f89fa1986d04ffc2e0a0c5886c7976ce65d340ad",
+        "sourceTextSha256": "76dd03283b713a56f7e4149e2150a6bdc93f7e3cfc44f3bdcae13d64ca170550",
+        "providerBodySha256": "3ac0ed553120d537b433843f3b54a81c0072c449d95fd7b5e6e0afee26fe2851",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 19,
+      "actionId": "speech-p19-prompt",
+      "text": "你想先观察哪一种动物？点一张图，听一听，再看看它的活动。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "0106f26dcfd65e5f45a1a3ac879adddaef7e753af6c4897354fb8c9d6d2d2ca0",
+        "sourceTextSha256": "ce495c9658a2bedf64539f8f1d012074be3a3e9b967ff7a01992472961c2ed99",
+        "providerBodySha256": "12fceadeccbcf46a819f7e2fd9e92e168d47485337ba6f4c1d7d31605589345c",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 19,
+      "actionId": "speech-p19-help",
+      "text": "点鸟、马或鱼的图片，会看到对应的动作，也会听到老师的话。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "8c1f29df13ffd47274ddfb5b37c48e1ca71bf9f127c82a6826702dc05444abad",
+        "sourceTextSha256": "308b86b4e7c4ffa9d3c11eb02ccdcf857f6123e6d946cb3c4e29b1eef8f04c4b",
+        "providerBodySha256": "5708f327163ca908060bc59b8d818584b4602ba0b679e42e6083e31b57e8e398",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 19,
+      "actionId": "speech-p19-later",
+      "text": "书不在身边也没关系，可以先看图，等有书时再和大人一起读。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "b0ea73e9ed2732b550070a76892ca9e901898968206b041ebeb6a505d3829234",
+        "sourceTextSha256": "ca8eba9d4af4597f69720ca1273ba6e2d4c26837d9d92580f74d575453086e70",
+        "providerBodySha256": "52ebd0abdf1f410d606a07ad8a5712f9eaa9a9644b88450cc50ac39832cd8c3a",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 19,
+      "actionId": "speech-p19-done",
+      "text": "你可以换一种动物再看看，也可以把你观察到的样子说给身边的人听。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "1d571d1006ff2f52f1f61350f8517a6ff3858873cdbfd0944683c4bf1d6f64d7",
+        "sourceTextSha256": "0793852debdbd84ef5d9efaf744c2e02fb43f8e4873bc4142d24ea98a0dfdc74",
+        "providerBodySha256": "9adf37019413def153b442cf265902716e739f606325b27494f2b206b683628e",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 20,
+      "actionId": "speech-p20-schedule",
+      "text": "我们看了示例课程表，联系了课程里的字，也看了午和下的写法。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "860a3e42fd3811f370cf81635fab0df7f80a3dc7424085374f122cae1971e0a7",
+        "sourceTextSha256": "908e59899e2c12f905b48be326056822c74a0957c3df2c6b07ac0c263bb75858",
+        "providerBodySha256": "2d0db8ef9623a3ff7498e8bd7c1e0b749097a400a8e15295220d13ae3b3d2350",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 20,
+      "actionId": "speech-p20-works",
+      "text": "我们比较词语、排动作、摆图景，也做了自己的颜色图案。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "09f99035da1f43a7e0c991cbe62e0a38d0cf17dcad8a149209df202f85ac03a8",
+        "sourceTextSha256": "b12a5d77a03276e94b9e436d1a7cab4196d231523ac7bf35826744d47f33f305",
+        "providerBodySha256": "e90a4e6d0432d9b238ebdc16cbfa7fa6a9c4aa4248429fcca989b9654ebb0da8",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 20,
+      "actionId": "speech-p20-again",
+      "text": "想再看哪一部分，可以用课堂里的页面和重听功能回去看看。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "3b6c5cd2848a712c77ae6bf0965b7dbd344d861ead18354ff79fcf2184acf4bf",
+        "sourceTextSha256": "36195a83e61cdae22e585a3a4e003252a9ebfb6f03aab4be9c370c81a05e369e",
+        "providerBodySha256": "cbf2f2b07f826b933fd38f8369bc90d02fef7e22cd94472f233bc944c92a6b74",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    },
+    {
+      "page": 20,
+      "actionId": "speech-p20-book",
+      "text": "有书时，再和大人一起读谁会飞。愿意的话，也可以介绍你喜欢的作品。",
+      "providerPronunciation": {
+        "policyVersion": "mira.textbook.pinyin-garden3-ssml.v1",
+        "policySha256": "472da6bc4ce841cc9916593db4ec1837576a7ab66761975725d68622264b6e6a",
+        "ssmlSha256": "222d986efe374471347adab0942839ef5c23bd2218770d12b2b93107acab80f9",
+        "sourceTextSha256": "2a21515d37299a2a5fe98431543e0914ddc7c1f0ee7c550232a2e0964c8926fb",
+        "providerBodySha256": "b57a617bb08737da426e304303a4ec6c12136f59c4e033238a7a55401e61a759",
+        "providerId": "aliyun-cosyvoice",
+        "modelId": "cosyvoice-v3-flash",
+        "voiceId": "longanwen_v3"
+      }
+    }
+  ],
+  "controlledSpeechCount": 28,
+  "tokenOccurrences": 52,
+  "priorHashes": {
+    "mira.textbook.pinyin-aoe-ssml.v1": "e325a2ef4706cb6e5cf6b11691d05ee0b30e59ce37d8a06c1528d8c6adf578c7",
+    "mira.textbook.pinyin-iuu-ssml.v1": "09776788ae5c1dfbbf137179be923550e5838256f5abd30ae8b78b5493f2f8fb",
+    "mira.textbook.pinyin-bpmf-ssml.v1": "0db25c66499d66ddf8569e6c621d74fc63e344ff3436cfd7908e78e5509a84de",
+    "mira.textbook.pinyin-dtnl-ssml.v1": "20e7b95f0c368e54f2ca219643381d8fec6244ede8d44c7f106a47c7c4a4a709",
+    "mira.textbook.pinyin-garden2-ssml.v1": "36c5b794c1e80ff0d6491e83e983d60915229c3f4275d5c69f7ad842588ad72b",
+    "mira.textbook.pinyin-gkh-ssml.v1": "c007c1ba8cbfab2b565a432de8f3e379290839dbe3f10df678e2b3c4757b382c",
+    "mira.textbook.pinyin-jqx-ssml.v1": "0f1957af0ce218d3f0323c79886f199a80210d2e1c49a7b68f6dc70071d6366b",
+    "mira.textbook.pinyin-zcs-ssml.v1": "5d311c9a903e00c9f819ec404af571bf21ef9a9caed229109ec7e2768e73815a",
+    "mira.textbook.pinyin-zcs-ssml.v2": "aa4ccf02d781fcbec0212f469abdfc035f610de1c5ef56ce8688c7fa8683017c",
+    "mira.textbook.pinyin-zhchshr-ssml.v1": "e4faadb5854f3813b1ea94a20aee7ff4496dc6f2ac9b889686555d4405c8b800",
+    "mira.textbook.pinyin-yw-ssml.v1": "77b30e78c17440453999a96b4dfb77fb95bd538e814419289a6bcbc942052335"
+  }
+}

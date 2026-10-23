@@ -7,9 +7,9 @@ import { useState, type ReactNode } from "react";
 import type { Student } from "@/lib/contracts/student-session";
 import { useSchoolbagMotion } from "@/components/schoolbag/schoolbag-motion";
 
-export function SchoolbagShell({ children, className = "", home = false, navigation, tools }: {
+export function SchoolbagShell({ children, className = "", home = false, navigation, tools, onRest }: {
   student?: Student; children: ReactNode; className?: string; home?: boolean;
-  navigation?: ReactNode; tools?: ReactNode;
+  navigation?: ReactNode; tools?: ReactNode; onRest?: () => void;
 }) {
   const router = useRouter();
   const { returnHome, busy } = useSchoolbagMotion();
@@ -21,6 +21,7 @@ export function SchoolbagShell({ children, className = "", home = false, navigat
   }
   async function rest() {
     if (locking) return;
+    onRest?.();
     setLocking(true); setError("");
     try {
       const response = await fetch("/api/auth/logout", { method: "POST" });

@@ -1,0 +1,675 @@
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -47,6 +47,7 @@
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import { FixedTextbookQuiz } from './fixed-textbook-quiz';
+ import { QuizPicture } from './quiz-picture';
++import { QuizReferencePicture } from './quiz-reference-picture';
+ import pictureOptionStyles from './quiz-picture-options.module.css';
+ import pictureQuizStyles from './picture-quiz-layout.module.css';
+ 
+@@ -681,7 +682,7 @@
+ 
+       {/* Body */}
+       {narrationSource && <QuestionNarration src={narrationSource} number={index + 1} autoPlay={autoNarrate && !isReview} />}
+-      {question.visual && <div className="mb-4" data-quiz-scene-picture><QuizPicture visual={question.visual} scene /></div>}
++      {question.visual && <div className="mb-4" data-quiz-scene-picture><QuizReferencePicture visual={question.visual} /></div>}
+       {children}
+ 
+       {/* Analysis (review only) */}
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -8,6 +8,7 @@
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { QuizPicture } from './quiz-picture';
++import { QuizReferencePicture } from './quiz-reference-picture';
+ import pictureOptionStyles from './quiz-picture-options.module.css';
+ import compactPictureStyles from './fixed-textbook-picture-layout.module.css';
+ 
+@@ -107,7 +108,7 @@
+         <fieldset key={q.id} data-fixed-question={q.id} className={`${compactImages ? compactPictureStyles.fieldset : ''} min-w-0 rounded-2xl border border-[#e9dfcd] bg-white/80 p-3 sm:p-4`}>
+           <legend className="px-2 text-sm text-[#788275]">第 {questionIndex + 1} 题</legend>
+           <div className={`${compactImages ? compactPictureStyles.task : ''} grid min-w-0 items-center gap-3 ${q.visual ? 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]' : ''}`}>
+-            {q.visual && <div className={`${compactImages ? compactPictureStyles.scenePicture : ''} min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44`} data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
++            {q.visual && <div className={`${compactImages ? compactPictureStyles.scenePicture : ''} min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44`} data-quiz-scene-picture><QuizReferencePicture visual={q.visual} /></div>}
+             <div className={`${compactImages ? compactPictureStyles.question : ''} min-w-0 ${compactImages ? pictureOptionStyles.container : ''}`}>
+             <p className="mb-2 text-base leading-relaxed sm:text-lg">{q.question}</p>
+             {audio && <QuestionNarration key={q.id} src={audio} number={questionIndex + 1} sceneId={sceneId} questionId={q.id} autoPlay={!done && !feedback && !sending} />}
+diff --git a/components/scene-renderers/quiz-reference-picture.tsx b/components/scene-renderers/quiz-reference-picture.tsx
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/quiz-reference-picture.tsx
+@@ -0,0 +1,174 @@
++'use client';
++
++import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
++import { createPortal } from 'react-dom';
++import { X, ZoomIn, ZoomOut } from 'lucide-react';
++import type { QuizVisual } from '@openmaic/dsl';
++import { QuizPicture } from './quiz-picture';
++import styles from './quiz-reference-picture.module.css';
++
++/** Reference pictures alone can expand; this component never owns an answer or audio. */
++export function QuizReferencePicture({ visual }: { visual: QuizVisual }) {
++  const trigger = useRef<HTMLButtonElement>(null);
++  const [host, setHost] = useState<Element | null>(null);
++  const [open, setOpen] = useState(false);
++  const openedSource = useRef<string | null>(null);
++
++  useEffect(() => {
++    if (!open) return;
++    const sync = () => {
++      const doc = trigger.current?.ownerDocument;
++      if (doc) setHost(doc.fullscreenElement ?? doc.body);
++    };
++    sync();
++    const doc = trigger.current?.ownerDocument;
++    doc?.addEventListener('fullscreenchange', sync);
++    return () => doc?.removeEventListener('fullscreenchange', sync);
++  }, [open]);
++
++  // A new question must not retain the previous question's enlarged picture.
++  useEffect(() => {
++    if (open && (visual.kind !== 'image' || visual.src !== openedSource.current)) setOpen(false);
++  }, [open, visual]);
++
++  if (visual.kind !== 'image') return <QuizPicture visual={visual} scene />;
++  const close = () => {
++    setOpen(false);
++    trigger.current?.focus({ preventScroll: true });
++  };
++  return (
++    <span className={styles.reference} data-quiz-reference-picture>
++      <span className={styles.preview}>
++        <QuizPicture visual={visual} scene />
++      </span>
++      <button
++        type="button"
++        ref={trigger}
++        className={styles.control}
++        aria-label="放大题干图片"
++        title="看大图"
++        aria-haspopup="dialog"
++        aria-expanded={open}
++        onKeyDown={(event) => event.stopPropagation()}
++        onClick={() => {
++          openedSource.current = visual.src;
++          const doc = trigger.current!.ownerDocument;
++          setHost(doc.fullscreenElement ?? doc.body);
++          setOpen(true);
++        }}
++      >
++        <ZoomIn size={18} aria-hidden />
++      </button>
++      {open &&
++        host &&
++        createPortal(<ReferenceDialog src={visual.src} alt={visual.alt} onClose={close} />, host)}
++    </span>
++  );
++}
++
++function ReferenceDialog({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
++  const dialog = useRef<HTMLDialogElement>(null);
++  const viewport = useRef<HTMLDivElement>(null);
++  const closeButton = useRef<HTMLButtonElement>(null);
++  const title = useId();
++  const [width, setWidth] = useState(320);
++  const [zoom, setZoom] = useState(1);
++  const [failed, setFailed] = useState(false);
++
++  useLayoutEffect(() => {
++    const node = dialog.current!;
++    node.showModal();
++    closeButton.current?.focus();
++    const measure = () => setWidth(Math.max(1, viewport.current!.clientWidth - 16));
++    measure();
++    const observer = new ResizeObserver(measure);
++    observer.observe(viewport.current!);
++    return () => {
++      observer.disconnect();
++      node.close();
++    };
++  }, []);
++
++  const close = () => {
++    dialog.current?.close();
++    onClose();
++  };
++  return (
++    <dialog
++      ref={dialog}
++      className={styles.dialog}
++      aria-labelledby={title}
++      data-quiz-reference-dialog
++      onCancel={(event) => {
++        event.preventDefault();
++        close();
++      }}
++      onKeyDown={(event) => {
++        // PlaybackChrome owns window shortcuts. A picture viewer must not change the lesson.
++        event.stopPropagation();
++        if (event.key === 'Escape') {
++          event.preventDefault();
++          close();
++        }
++      }}
++    >
++      <header className={styles.toolbar}>
++        <h2 id={title}>看大图</h2>
++        <div className={styles.zoomControls}>
++          <button
++            type="button"
++            className={styles.control}
++            aria-label="缩小图片"
++            disabled={zoom <= 1}
++            onClick={() => setZoom((value) => Math.max(1, value - 0.5))}
++          >
++            <ZoomOut size={18} aria-hidden />
++          </button>
++          <output aria-live="polite">{Math.round(zoom * 100)}%</output>
++          <button
++            type="button"
++            className={styles.control}
++            aria-label="放大图片"
++            disabled={zoom >= 4}
++            onClick={() => setZoom((value) => Math.min(4, value + 0.5))}
++          >
++            <ZoomIn size={18} aria-hidden />
++          </button>
++        </div>
++        <button
++          type="button"
++          ref={closeButton}
++          className={styles.control}
++          aria-label="关闭大图"
++          title="关闭大图"
++          onClick={close}
++        >
++          <X size={18} aria-hidden />
++        </button>
++      </header>
++      <div
++        ref={viewport}
++        className={styles.viewport}
++        tabIndex={0}
++        role="region"
++        aria-label="大图，可滚动查看"
++      >
++        {failed ? (
++          <p role="alert">图片暂时没有打开，请关闭后重试。</p>
++        ) : (
++          <div className={styles.surface} style={{ width: width * zoom }}>
++            {/* Keep the exact original media URL; no derived picture or provider call. */}
++            {/* eslint-disable-next-line @next/next/no-img-element */}
++            <img
++              src={src}
++              alt={alt}
++              className={styles.fullImage}
++              draggable={false}
++              onError={() => setFailed(true)}
++            />
++          </div>
++        )}
++      </div>
++    </dialog>
++  );
++}
+diff --git a/components/scene-renderers/quiz-reference-picture.module.css b/components/scene-renderers/quiz-reference-picture.module.css
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/quiz-reference-picture.module.css
+@@ -0,0 +1,137 @@
++.reference {
++  position: relative;
++  display: flex;
++  align-items: center;
++  gap: 6px;
++  width: 100%;
++  height: 100%;
++  min-width: 0;
++  min-height: 48px;
++}
++
++.reference > .control {
++  position: absolute;
++  right: 0;
++  bottom: 0;
++  z-index: 1;
++}
++
++.preview {
++  display: block;
++  flex: 1 1 0%;
++  min-width: 0;
++  height: 100%;
++}
++
++.preview > span {
++  height: 100%;
++}
++
++.control {
++  display: inline-flex;
++  flex: 0 0 48px;
++  align-items: center;
++  justify-content: center;
++  width: 48px;
++  height: 48px;
++  min-width: 48px;
++  min-height: 48px;
++  padding: 0;
++  border: 1px solid #597469;
++  border-radius: 10px;
++  background: #fff;
++  color: #254b3b;
++  cursor: pointer;
++  touch-action: manipulation;
++}
++
++.control > svg {
++  width: 18px;
++  height: 18px;
++  flex: none;
++}
++.control:hover:not(:disabled) {
++  background: #edf4ef;
++}
++.control:focus-visible,
++.viewport:focus-visible {
++  outline: 3px solid #31775a;
++  outline-offset: 2px;
++}
++.control:disabled {
++  opacity: 0.4;
++  cursor: default;
++}
++
++/* Portalled outside question descendants, and showModal enters the top layer. */
++.dialog {
++  position: fixed;
++  inset: 0;
++  width: min(1100px, calc(100vw - 16px));
++  height: calc(100dvh - 16px);
++  max-width: none;
++  max-height: none;
++  box-sizing: border-box;
++  margin: auto;
++  padding: 0;
++  border: 2px solid #597469;
++  border-radius: 12px;
++  background: #f7faf8;
++  color: #254b3b;
++  overflow: hidden;
++}
++
++.dialog[open] {
++  display: flex;
++  flex-direction: column;
++}
++.dialog::backdrop {
++  background: rgb(15 30 23 / 60%);
++}
++.toolbar {
++  display: flex;
++  flex: 0 0 auto;
++  align-items: center;
++  justify-content: space-between;
++  gap: 4px;
++  padding: 6px;
++  border-bottom: 1px solid #b9c9bf;
++  background: #fff;
++}
++.toolbar h2 {
++  margin: 0;
++  font-size: 16px;
++  font-weight: 600;
++  white-space: nowrap;
++}
++.zoomControls {
++  display: flex;
++  align-items: center;
++  gap: 4px;
++}
++.zoomControls output {
++  min-width: 42px;
++  font-size: 14px;
++  text-align: center;
++}
++.viewport {
++  flex: 1 1 0%;
++  min-height: 0;
++  min-width: 0;
++  padding: 8px;
++  overflow: auto;
++  overscroll-behavior: contain;
++  touch-action: pan-x pan-y pinch-zoom;
++}
++.surface {
++  min-width: 100%;
++  margin: 0 auto;
++}
++.fullImage {
++  display: block;
++  width: 100%;
++  height: auto;
++  max-width: none;
++  max-height: none;
++  object-fit: contain;
++}
+diff --git a/tests/scene-renderers/quiz-reference-picture.browser.test.ts b/tests/scene-renderers/quiz-reference-picture.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/quiz-reference-picture.browser.test.ts
+@@ -0,0 +1,309 @@
++import { describe, expect, it } from 'vitest';
++import { chromium } from 'playwright-core';
++import { createRequire } from 'node:module';
++import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
++import { dirname, join } from 'node:path';
++
++type FixtureWindow = Window & {
++  mountReferenceQuiz: (fixed: boolean) => void;
++  changeReferenceSource: () => void;
++  unmountReferenceQuiz: () => void;
++  audioStats: { created: number; plays: number; pauses: number };
++  shortcutCalls: number;
++  posts: unknown[];
++};
++type BundleFile = { path: string; text: string };
++type BuildHooks = {
++  onResolve: (
++    options: { filter: RegExp },
++    callback: (args: { path: string }) => { path: string; namespace: string } | undefined,
++  ) => void;
++  onLoad: (
++    options: { filter: RegExp; namespace: string },
++    callback: (args: { path: string }) => { contents: string; loader: string },
++  ) => void;
++};
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')('reference picture viewer', () => {
++  it('enlarges the original in both quizzes/fullscreen without changing answers, audio or lesson shortcuts', async () => {
++    const require = createRequire(import.meta.url);
++    const { build } = createRequire(require.resolve('tsx'))('esbuild');
++    const mocks: Record<string, string> = {
++      '@/lib/hooks/use-i18n': `export const useI18n=()=>({t:k=>k,locale:'zh-CN'});`,
++      '@/lib/store': `const state={stage:{fixedTextbook:true},currentSceneId:'quiz',scenes:[]};export const useStageStore=f=>f(state);useStageStore.getState=()=>state;`,
++      '@/lib/contexts/mira-student-runtime-context': `export const useMiraStudentRuntimeEvents=()=>null;`,
++      '@/lib/quiz/runtime': `export const createQuizAttemptWriter=()=>({});export const loadQuizAttemptState=async()=>({attemptId:'fixture'});export class QuizRetryProgressedError extends Error {}`,
++      '@/lib/quiz/view-state': `export const createQuizViewLifetime=()=>({});export const isQuizRuntimeReady=()=>true;export const persistQuizReview=async()=>{};export const persistQuizRetry=async()=>{};export const persistQuizSubmission=async()=>{};export const quizViewStateFromAttempt=()=>({});export const runQuizPersistenceTransition=async()=>{};`,
++      '@/lib/utils/model-config': `export const getCurrentModelConfig=()=>({});`,
++      '@/components/audio/speech-button': `export const SpeechButton=()=>null;`,
++    };
++    const bundle = await build({
++      stdin: {
++        resolveDir: process.cwd(),
++        loader: 'tsx',
++        contents: `
++import React,{useState} from 'react';import {createRoot} from 'react-dom/client';
++import {FixedTextbookQuiz} from './components/scene-renderers/fixed-textbook-quiz';
++import {SingleChoiceQuestion} from './components/scene-renderers/quiz-view';
++import {beginQuestionNarrationScene,releaseQuestionNarrationScene} from './lib/mira/lecture-audio';
++import styles from './components/scene-renderers/picture-quiz-layout.module.css';
++const image=(color,w=400,h=300)=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'"><rect width="100%" height="100%" fill="'+color+'"/><path d="M0 100H400M0 300H400M0 500H400M0 700H400" stroke="black" stroke-width="4"/></svg>');
++const base=window.fixtureQuestion||{id:'q',type:'single',question:'看图，听老师说，再选一张。',visual:{kind:'image',src:image('#d9e8dc',400,800),alt:'reference'},options:['A','B','C'].map(value=>({value,label:value})),optionVisuals:Object.fromEntries(['A','B','C'].map((value,i)=>[value,{kind:'image',src:image(['#7cad98','#e0b183','#8fafd0'][i]),alt:value}]))};
++window.posts=[];window.fetch=async(_url,init)=>{if(init?.method==='POST')window.posts.push(JSON.parse(init.body));return{ok:true,json:async()=>({ok:true})}};
++const root=createRoot(document.querySelector('#app'));let generation=0;
++function Fixture({fixed}){const [value,setValue]=useState();const [q,setQ]=useState(()=>({...base,...(window.referenceTestAudio?{questionAudioUrl:'/api/classroom-media/fixture/audio/q.wav'}:{questionAudioUrl:undefined})}));window.changeReferenceSource=()=>setQ(old=>({...old,visual:{...old.visual,src:image('#c7d4e1',400,700)}}));return <><button id="fullscreen" type="button" onClick={()=>document.querySelector('#classroom').requestFullscreen()}>全屏</button><div className="fixture-lesson">{fixed?<FixedTextbookQuiz questions={[q]}/>:<div className={styles.root} data-quiz-phase="answering"><SingleChoiceQuestion question={q} index={0} value={value} onChange={setValue}/></div>}</div><output id="selection">{value||''}</output></>}
++window.mountReferenceQuiz=(fixed)=>{beginQuestionNarrationScene('quiz');releaseQuestionNarrationScene('quiz');root.render(<Fixture key={++generation} fixed={fixed}/>)};window.unmountReferenceQuiz=()=>root.render(null);
++const params=new URLSearchParams(location.search);const classroom=document.querySelector('#classroom');for(const name of ['w','h']){const n=Number(params.get(name));if(n>=280&&n<=1600)classroom.style[name==='w'?'width':'height']=n+'px'}window.mountReferenceQuiz(params.get('fixed')!=='0');`,
++      },
++      bundle: true,
++      write: false,
++      outfile: 'reference-test.js',
++      format: 'iife',
++      platform: 'browser',
++      logLevel: 'silent',
++      define: { 'process.env.NODE_ENV': '"test"' },
++      plugins: [
++        {
++          name: 'fixture-integrations',
++          setup(b: BuildHooks) {
++            b.onResolve({ filter: /^@\// }, (a) =>
++              mocks[a.path] ? { path: a.path, namespace: 'mock' } : undefined,
++            );
++            b.onLoad({ filter: /.*/, namespace: 'mock' }, (a) => ({
++              contents: mocks[a.path],
++              loader: 'js',
++            }));
++          },
++        },
++      ],
++    });
++    const tw = require('tailwindcss');
++    const compiled = await tw.compile(
++      readFileSync(join(dirname(require.resolve('tailwindcss/package.json')), 'index.css'), 'utf8'),
++    );
++    const source =
++      ['fixed-textbook-quiz', 'quiz-view', 'quiz-picture', 'quiz-reference-picture']
++        .map((f) => readFileSync(`components/scene-renderers/${f}.tsx`, 'utf8'))
++        .join('\n') + readFileSync('components/audio/question-narration.tsx', 'utf8');
++    const css =
++      compiled.build([
++        ...new Set(source.split(/[\s'"`{}(),]+/)),
++        'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]',
++      ]) +
++      '\n' +
++      bundle.outputFiles.find((f: BundleFile) => f.path.endsWith('.css')).text +
++      '\nhtml,body{margin:0;width:100%;height:100%}#classroom{width:100%;height:100%;background:white;overflow:auto}#classroom:fullscreen{width:100%!important;height:100%!important}.fixture-lesson{height:calc(100% - 48px)}#app{height:100%}#fullscreen{height:48px;min-width:48px}';
++    const js = bundle.outputFiles.find((f: BundleFile) => f.path.endsWith('.js')).text;
++    const html = '<html><body><main id="classroom"><div id="app"></div></main></body></html>';
++    // Optional operator fixture uses original local bytes; never calls a provider or a server API.
++    if (process.env.MIRA_FORMAL_QA_EXPORT_DIR) {
++      let question: unknown = null;
++      if (process.env.MIRA_QUIZ_REFERENCE_SCENE) {
++        const scene = JSON.parse(readFileSync(process.env.MIRA_QUIZ_REFERENCE_SCENE, 'utf8'));
++        question = scene.content.questions[0];
++        const embed = (value: unknown): unknown => {
++          if (Array.isArray(value)) return value.map(embed);
++          if (value && typeof value === 'object')
++            return Object.fromEntries(
++              Object.entries(value).map(([key, item]) => [
++                key,
++                key === 'src' &&
++                typeof item === 'string' &&
++                item.startsWith('/api/classroom-media/')
++                  ? 'data:image/png;base64,' +
++                    readFileSync(
++                      join('data/classrooms', item.slice('/api/classroom-media/'.length)),
++                    ).toString('base64')
++                  : embed(item),
++              ]),
++            );
++          return value;
++        };
++        question = embed(question);
++      }
++      mkdirSync(process.env.MIRA_FORMAL_QA_EXPORT_DIR, { recursive: true });
++      writeFileSync(
++        join(process.env.MIRA_FORMAL_QA_EXPORT_DIR, 'index.html'),
++        html
++          .replace(
++            '<body>',
++            `<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>题干原图组件检查（非正式课堂音频）</title><style>${css}</style></head><body>`,
++          )
++          .replace(
++            '</body>',
++            () =>
++              `<script>window.fixtureQuestion=${JSON.stringify(question)};</script><script>${js.replaceAll('</script', '<\\/script')}</script></body>`,
++          ),
++      );
++    }
++    const browser = await chromium.launch({
++      executablePath:
++        process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++      headless: true,
++    });
++    try {
++      const page = await browser.newPage({ viewport: { width: 390, height: 563 } });
++      const errors: string[] = [];
++      page.on('pageerror', (error) => errors.push(error.message));
++      await page.route('**/*', (route) => route.abort());
++      await page.setContent(html);
++      await page.addStyleTag({ content: css });
++      await page.evaluate(() => {
++        const win = window as unknown as FixtureWindow;
++        win.audioStats = { created: 0, plays: 0, pauses: 0 };
++        win.shortcutCalls = 0;
++        Object.assign(window, { referenceTestAudio: true });
++        window.addEventListener('keydown', () => {
++          win.shortcutCalls++;
++        });
++        class FakeAudio extends EventTarget {
++          paused = true;
++          ended = false;
++          currentTime = 0;
++          src = '';
++          constructor() {
++            super();
++            win.audioStats.created++;
++          }
++          play() {
++            this.paused = false;
++            win.audioStats.plays++;
++            return Promise.resolve();
++          }
++          pause() {
++            if (!this.paused) {
++              this.paused = true;
++              win.audioStats.pauses++;
++              this.dispatchEvent(new Event('pause'));
++            }
++          }
++          removeAttribute() {}
++        }
++        Object.assign(window, { Audio: FakeAudio });
++      });
++      await page.addScriptTag({ content: js });
++      for (const fixed of [false, true]) {
++        await page.evaluate(
++          (value) => (window as unknown as FixtureWindow).mountReferenceQuiz(value),
++          fixed,
++        );
++        const choices = page.locator(fixed ? '[role=radio]' : '[data-quiz-option]');
++        await choices.last().waitFor();
++        await choices.nth(1).click();
++        const beforeChoice = await choices.nth(1).getAttribute('class');
++        if (!fixed) {
++          await page.getByRole('button', { name: '听第 1 题', exact: true }).click();
++        }
++        await page.getByRole('button', { name: '暂停第 1 题', exact: true }).waitFor();
++        const audio = await page.evaluate(() => ({
++          ...(window as unknown as FixtureWindow).audioStats,
++        }));
++        const trigger = page.getByRole('button', { name: '放大题干图片', exact: true });
++        const originalSrc = await page.locator('[data-quiz-scene-picture] img').getAttribute('src');
++        expect(await page.locator('[data-quiz-scene-picture] > button').count()).toBe(0);
++        for (const viewport of [
++          { width: 390, height: 563 },
++          { width: 667, height: 300 },
++          { width: 305, height: 367 },
++          { width: 320, height: 351 },
++          { width: 320, height: 283 },
++          { width: 667, height: 205 },
++        ]) {
++          await page.setViewportSize(viewport);
++          const pictureBox = await page.locator('[data-quiz-scene-picture] img').boundingBox();
++          expect(
++            pictureBox!.width,
++            JSON.stringify({ fixed, viewport, pictureBox }),
++          ).toBeGreaterThanOrEqual(96);
++          expect(
++            pictureBox!.height,
++            JSON.stringify({ fixed, viewport, pictureBox }),
++          ).toBeGreaterThanOrEqual(96);
++          const triggerBox = await trigger.boundingBox();
++          expect(triggerBox!.width).toBeGreaterThanOrEqual(48);
++          expect(triggerBox!.height).toBeGreaterThanOrEqual(48);
++          await trigger.focus();
++          const beforeOpenShortcuts = await page.evaluate(
++            () => (window as unknown as FixtureWindow).shortcutCalls,
++          );
++          await page.keyboard.press('Space');
++          expect(
++            await page.evaluate(() => (window as unknown as FixtureWindow).shortcutCalls),
++          ).toBe(beforeOpenShortcuts);
++          const dialog = page.locator('[data-quiz-reference-dialog]');
++          await dialog.waitFor();
++          expect(await dialog.locator('img').getAttribute('src')).toBe(originalSrc);
++          const dimensions = await dialog.locator('button').evaluateAll((elements) =>
++            elements.map((element) => {
++              const rect = element.getBoundingClientRect();
++              return [rect.width, rect.height];
++            }),
++          );
++          expect(dimensions.every(([w, h]) => w >= 48 && h >= 48)).toBe(true);
++          const baseWidth = (await dialog.locator('img').boundingBox())!.width;
++          expect(baseWidth).toBeGreaterThan(viewport.width - 80);
++          const region = dialog.getByRole('region');
++          expect(await region.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
++          await dialog.getByRole('button', { name: '放大图片', exact: true }).click();
++          expect((await dialog.locator('img').boundingBox())!.width).toBeGreaterThan(
++            baseWidth * 1.4,
++          );
++          expect(await region.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
++          await region.evaluate((el) => {
++            el.scrollTop = 100;
++            el.scrollLeft = 60;
++          });
++          expect(await region.evaluate((el) => el.scrollTop > 0 && el.scrollLeft > 0)).toBe(true);
++          await dialog.getByRole('button', { name: '缩小图片', exact: true }).click();
++          expect((await dialog.locator('img').boundingBox())!.width).toBeCloseTo(baseWidth, 0);
++          await region.focus();
++          const shortcuts = await page.evaluate(
++            () => (window as unknown as FixtureWindow).shortcutCalls,
++          );
++          await page.keyboard.press('ArrowDown');
++          await page.keyboard.press('ArrowRight');
++          await page.keyboard.press('Space');
++          await page.keyboard.press('Escape');
++          expect(await dialog.count()).toBe(0);
++          expect(await trigger.evaluate((el) => el === document.activeElement)).toBe(true);
++          expect(
++            await page.evaluate(() => (window as unknown as FixtureWindow).shortcutCalls),
++          ).toBe(shortcuts);
++          expect(await choices.nth(1).getAttribute('class')).toBe(beforeChoice);
++          if (fixed) expect(await choices.nth(1).getAttribute('aria-checked')).toBe('true');
++          else expect(await page.locator('#selection').textContent()).toBe('B');
++          expect(
++            await page.evaluate(() => (window as unknown as FixtureWindow).audioStats),
++          ).toEqual(audio);
++          expect(await page.evaluate(() => (window as unknown as FixtureWindow).posts)).toEqual([]);
++        }
++        await page.locator('#fullscreen').click();
++        await page.waitForFunction(() => !!document.fullscreenElement);
++        await trigger.click();
++        expect(
++          await page
++            .locator('[data-quiz-reference-dialog]')
++            .evaluate((el) => document.fullscreenElement!.contains(el)),
++        ).toBe(true);
++        await page.keyboard.press('Escape');
++        expect(await page.locator('[data-quiz-reference-dialog]').count()).toBe(0);
++        expect(await page.evaluate(() => !!document.fullscreenElement)).toBe(true);
++        await trigger.click();
++        await page.getByRole('button', { name: '关闭大图', exact: true }).click();
++        expect(await trigger.evaluate((el) => el === document.activeElement)).toBe(true);
++        await page.evaluate(() => document.exitFullscreen());
++        await trigger.click();
++        await page.evaluate(() => (window as unknown as FixtureWindow).changeReferenceSource());
++        await page.waitForFunction(() => !document.querySelector('[data-quiz-reference-dialog]'));
++        await trigger.click();
++        await page.evaluate(() => (window as unknown as FixtureWindow).unmountReferenceQuiz());
++        await page.waitForFunction(() => !document.querySelector('dialog'));
++        expect(await page.locator('dialog').count()).toBe(0);
++      }
++      expect(errors).toEqual([]);
++    } finally {
++      await browser.close();
++    }
++  }, 120_000);
++});

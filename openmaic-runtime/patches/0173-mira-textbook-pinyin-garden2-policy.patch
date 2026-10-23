@@ -1,0 +1,422 @@
+diff --git a/lib/server/mira-textbook-pinyin-pronunciation.ts b/lib/server/mira-textbook-pinyin-pronunciation.ts
+--- a/lib/server/mira-textbook-pinyin-pronunciation.ts
++++ b/lib/server/mira-textbook-pinyin-pronunciation.ts
+@@ -721,6 +721,289 @@
+   }
+ } as const;
+ 
++/** Garden 2 recipe; registration does not approve probes or formal listening. */
++export const MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY = {
++  "policyVersion": "mira.textbook.pinyin-garden2-ssml.v1",
++  "subject": "chinese",
++  "providerId": "aliyun-cosyvoice",
++  "modelId": "cosyvoice-v3-flash",
++  "voiceId": "longanwen_v3",
++  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
++  "inputParameters": {
++    "voice": "longanwen_v3",
++    "format": "wav",
++    "sample_rate": 24000,
++    "enable_ssml": true,
++    "rate": 1,
++    "pitch": 1,
++    "seed": 0,
++    "language_hints": [
++      "zh"
++    ]
++  },
++  "symbols": {
++    "dǎ": {
++      "ph": "da3",
++      "carrier": "打"
++    },
++    "dà": {
++      "ph": "da4",
++      "carrier": "大"
++    },
++    "mō": {
++      "ph": "mo1",
++      "carrier": "摸"
++    },
++    "mó": {
++      "ph": "mo2",
++      "carrier": "磨"
++    },
++    "bí": {
++      "ph": "bi2",
++      "carrier": "鼻"
++    },
++    "bǐ": {
++      "ph": "bi3",
++      "carrier": "笔"
++    },
++    "pú": {
++      "ph": "pu2",
++      "carrier": "葡"
++    },
++    "pù": {
++      "ph": "pu4",
++      "carrier": "铺"
++    },
++    "là": {
++      "ph": "la4",
++      "carrier": "蜡"
++    },
++    "mǐ": {
++      "ph": "mi3",
++      "carrier": "米"
++    },
++    "fú": {
++      "ph": "fu2",
++      "carrier": "扶"
++    },
++    "tī": {
++      "ph": "ti1",
++      "carrier": "梯"
++    },
++    "dì": {
++      "ph": "di4",
++      "carrier": "地"
++    },
++    "tú": {
++      "ph": "tu2",
++      "carrier": "图"
++    },
++    "b": {
++      "ph": "bo1",
++      "carrier": "波"
++    },
++    "d": {
++      "ph": "de1",
++      "carrier": "的"
++    },
++    "f": {
++      "ph": "fo1",
++      "carrier": "佛"
++    },
++    "t": {
++      "ph": "te1",
++      "carrier": "特"
++    },
++    "ɑ": {
++      "ph": "a1",
++      "carrier": "啊"
++    },
++    "i": {
++      "ph": "yi1",
++      "carrier": "衣"
++    },
++    "u": {
++      "ph": "wu1",
++      "carrier": "乌"
++    }
++  },
++  "textHandling": {
++    "normalization": "none",
++    "xmlEscape": "amp_lt_gt_quot_apos",
++    "unsupportedLatin": "reject",
++    "combiningMarks": "reject",
++    "wrapper": "speak",
++    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
++    "latinRunRanges": [
++      [
++        48,
++        57
++      ],
++      [
++        65,
++        90
++      ],
++      [
++        97,
++        122
++      ],
++      [
++        170,
++        170
++      ],
++      [
++        186,
++        186
++      ],
++      [
++        192,
++        214
++      ],
++      [
++        216,
++        246
++      ],
++      [
++        248,
++        696
++      ],
++      [
++        736,
++        740
++      ],
++      [
++        7424,
++        7461
++      ],
++      [
++        7468,
++        7516
++      ],
++      [
++        7522,
++        7525
++      ],
++      [
++        7531,
++        7543
++      ],
++      [
++        7545,
++        7614
++      ],
++      [
++        7680,
++        7935
++      ],
++      [
++        8305,
++        8305
++      ],
++      [
++        8319,
++        8319
++      ],
++      [
++        8336,
++        8348
++      ],
++      [
++        8490,
++        8491
++      ],
++      [
++        8498,
++        8498
++      ],
++      [
++        8526,
++        8526
++      ],
++      [
++        8544,
++        8584
++      ],
++      [
++        11360,
++        11391
++      ],
++      [
++        42786,
++        42887
++      ],
++      [
++        42891,
++        42972
++      ],
++      [
++        42993,
++        43007
++      ],
++      [
++        43824,
++        43866
++      ],
++      [
++        43868,
++        43876
++      ],
++      [
++        43878,
++        43881
++      ],
++      [
++        64256,
++        64262
++      ],
++      [
++        65313,
++        65338
++      ],
++      [
++        65345,
++        65370
++      ],
++      [
++        67456,
++        67461
++      ],
++      [
++        67463,
++        67504
++      ],
++      [
++        67506,
++        67514
++      ],
++      [
++        119808,
++        120831
++      ],
++      [
++        122624,
++        122654
++      ],
++      [
++        122661,
++        122666
++      ]
++    ]
++  },
++  "listeningRequired": true,
++  "words": {},
++  "approvalBoundary": {
++    "recipeStatus": "candidate-pending-nine-new-whole-syllable-probes-and-exact-formal-sentence-listening",
++    "approvedProbeScope": "none-for-u2-l5-pending-human-review",
++    "shortConsonantAccepted": false,
++    "formalListeningScope": "every-formal-segment-containing-a-registered-latin-token-including-question-feedback-and-repetition",
++    "humanReview": "pending",
++    "pronunciationApproved": false,
++    "formalUseAllowed": false,
++    "probeScope": "nine-new-whole-syllables-only; twelve unchanged prior symbol mappings do not need duplicate base probes",
++    "probeSuccessDoesNotProve": "formal-context tone accuracy, light-short consonant delivery, complete-sentence fidelity, or publication readiness"
++  }
++} as const;
++
+ function canonical(value: unknown): unknown {
+   if (Array.isArray(value)) return value.map(canonical);
+   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value)
+@@ -737,7 +1020,9 @@
+ export const MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY));
+ export const MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY));
+ export const MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY));
+-type WholeTokenPolicy = typeof MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY;
++export const MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY));
++type WholeTokenPolicy = typeof MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY
++  | typeof MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY;
+ type RegisteredPolicy = typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY | WholeTokenPolicy;
+ 
+ // Only server-owned recipes can enter this registry. A caller supplies an
+@@ -758,6 +1043,10 @@
+   [MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY.policyVersion, {
+     policy: MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY,
+     sha256: MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY_SHA256,
++  }],
++  [MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY.policyVersion, {
++    policy: MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY,
++    sha256: MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY_SHA256,
+   }],
+ ]);
+ 
+@@ -832,6 +1121,7 @@
+   const symbols: Record<string, { ph: string; carrier: string }> = policy.symbols;
+   const parts = policy.policyVersion === MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY.policyVersion
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY.policyVersion
++      || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY.policyVersion
+     ? wholeTokenParts(text, policy) : Array.from(text).map(character => {
+     const symbol = symbols[character];
+     if (symbol) return `<phoneme alphabet="py" ph="${symbol.ph}">${symbol.carrier}</phoneme>`;
+diff --git a/tests/server/mira-textbook-pinyin-pronunciation.test.ts b/tests/server/mira-textbook-pinyin-pronunciation.test.ts
+--- a/tests/server/mira-textbook-pinyin-pronunciation.test.ts
++++ b/tests/server/mira-textbook-pinyin-pronunciation.test.ts
+@@ -11,11 +11,66 @@
+   MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY_SHA256,
+   MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY,
+   MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY_SHA256,
++  MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY,
++  MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY_SHA256,
+   isMiraTextbookPinyinProviderPronunciation,
+   prepareMiraTextbookPinyinPronunciation,
+ } from '@/lib/server/mira-textbook-pinyin-pronunciation';
+ 
+ const sha = (text: string) => createHash('sha256').update(text).digest('hex');
++
++describe('lesson-bound Garden 2 whole-token recipe', () => {
++  const version = 'mira.textbook.pinyin-garden2-ssml.v1';
++  const cases = [
++    ['dǎ', 'da3', '打'], ['dà', 'da4', '大'], ['mō', 'mo1', '摸'], ['mó', 'mo2', '磨'],
++    ['bí', 'bi2', '鼻'], ['bǐ', 'bi3', '笔'], ['pú', 'pu2', '葡'], ['pù', 'pu4', '铺'],
++    ['là', 'la4', '蜡'], ['mǐ', 'mi3', '米'], ['fú', 'fu2', '扶'], ['tī', 'ti1', '梯'],
++    ['dì', 'di4', '地'], ['tú', 'tu2', '图'], ['b', 'bo1', '波'], ['d', 'de1', '的'],
++    ['f', 'fo1', '佛'], ['t', 'te1', '特'], ['ɑ', 'a1', '啊'], ['i', 'yi1', '衣'], ['u', 'wu1', '乌'],
++  ];
++
++  it('mirrors the backend policy and physical-body vector without claiming human approval', () => {
++    const policy = MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY;
++    expect(MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY_SHA256)
++      .toBe('36c5b794c1e80ff0d6491e83e983d60915229c3f4275d5c69f7ad842588ad72b');
++    const source = path.resolve(process.cwd(), '../../../backend/content/textbook_pinyin_pronunciation_garden2.v1.json');
++    if (existsSync(source)) expect(policy).toEqual(JSON.parse(readFileSync(source, 'utf8')));
++    expect(policy.inputParameters).toEqual(MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY.inputParameters);
++    expect(policy.listeningRequired).toBe(true);
++    expect(policy.approvalBoundary).toMatchObject({
++      humanReview: 'pending', pronunciationApproved: false, formalUseAllowed: false, shortConsonantAccepted: false,
++    });
++    const text = '请听：' + cases.map(([token]) => token).join('，') + '。蜡笔、大米、扶梯、地图。';
++    const prepared = prepareMiraTextbookPinyinPronunciation(text, version);
++    expect(prepared.profile.ssmlSha256).toBe('6d0bd49f01e52829e1dac9c24769105ef6294e1a6f3a48203722815eb38f943e');
++    expect(prepared.providerPronunciation.providerBodySha256)
++      .toBe('f2241ed04b80d52b573044a69012757a5398a10c4775727757f09b6e5387618e');
++    expect(Object.keys(prepared.profile).sort()).toEqual(['policySha256', 'policyVersion', 'ssmlSha256']);
++    expect(isMiraTextbookPinyinProviderPronunciation(prepared.providerPronunciation, sha(text))).toBe(true);
++    for (const prior of [MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY, MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY,
++      MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY, MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY]) {
++      expect(isMiraTextbookPinyinProviderPronunciation({ ...prepared.providerPronunciation,
++        policyVersion: prior.policyVersion }, sha(text))).toBe(false);
++    }
++  });
++
++  it('keeps exactly 21 complete tokens and leaves unannotated Chinese text unchanged', () => {
++    expect(Object.keys(MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY.symbols).sort()).toEqual(cases.map(c => c[0]).sort());
++    expect(MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY.words).toEqual({});
++    for (const [token, ph, carrier] of cases) expect(prepareMiraTextbookPinyinPronunciation(`请听：${token}。`, version).ssml)
++      .toBe(`<speak>请听：<phoneme alphabet="py" ph="${ph}">${carrier}</phoneme>。</speak>`);
++    const chinese = '蜡笔、大米、扶梯、地图；本、学、校、班、级、姓、名、王、九。';
++    expect(prepareMiraTextbookPinyinPronunciation(chinese, version).ssml).toBe(`<speak>${chinese}</speak>`);
++    expect(prepareMiraTextbookPinyinPronunciation('😀<&>"\'bǐ。', version).ssml)
++      .toBe('<speak>😀&lt;&amp;&gt;&quot;&apos;<phoneme alphabet="py" ph="bi3">笔</phoneme>。</speak>');
++  });
++
++  it.each(['da', 'da3', 'dǎmō', 'momo', 'pu2', 'p', 'm', 'n', 'l', 'e', 'ü',
++    'xué', 'bān', 'jiǔ', 'di\u0300', 'D', 'ｄ', '𝒅', 'constructor', 'x\x00'])(
++    'rejects an unsupported whole token without character fallback: %s', token => {
++      expect(() => prepareMiraTextbookPinyinPronunciation(`请听${token}。`, version)).toThrow();
++    });
++});
+ 
+ describe('fixed textbook aoe SSML policy', () => {
+   it('matches the separately frozen Python policy digest', () => {
+diff --git a/tests/server/mira-textbook-pinyin-audio.test.ts b/tests/server/mira-textbook-pinyin-audio.test.ts
+--- a/tests/server/mira-textbook-pinyin-audio.test.ts
++++ b/tests/server/mira-textbook-pinyin-audio.test.ts
+@@ -197,6 +197,7 @@
+   it.each([
+     ['mira.textbook.pinyin-iuu-ssml.v1', '听第二声，í ú ǘ。'],
+     ['mira.textbook.pinyin-dtnl-ssml.v1', '请听nǚ和lǘ，再看看马路。'],
++    ['mira.textbook.pinyin-garden2-ssml.v1', '听老师把两个音节连起来读，再联系图片：là bǐ，蜡笔。'],
+   ])('sends exact registered %s SSML once and preserves its version through TTS replay and ASR', async (version, sourceText) => {
+     const input = ttsInput(sourceText, version);
+     const prepared = prepareMiraTextbookPinyinPronunciation(input.text, version);
+@@ -231,7 +232,7 @@
+     expect(fetchAsr).toHaveBeenCalledTimes(1);
+   });
+ 
+-  it.each(['mira.textbook.pinyin-iuu-ssml.v1', 'mira.textbook.pinyin-dtnl-ssml.v1'])(
++  it.each(['mira.textbook.pinyin-iuu-ssml.v1', 'mira.textbook.pinyin-dtnl-ssml.v1', 'mira.textbook.pinyin-garden2-ssml.v1'])(
+     'rejects unknown, missing, swapped or caller-expanded %s profiles before any claim, budget or POST', async version => {
+     const input = ttsInput('请听。', version);
+     const fetchMock = vi.fn();
+@@ -253,7 +254,7 @@
+     expect(fetchMock).not.toHaveBeenCalled();
+   });
+ 
+-  it.each(['mira.textbook.pinyin-iuu-ssml.v1', 'mira.textbook.pinyin-dtnl-ssml.v1'])(
++  it.each(['mira.textbook.pinyin-iuu-ssml.v1', 'mira.textbook.pinyin-dtnl-ssml.v1', 'mira.textbook.pinyin-garden2-ssml.v1'])(
+     'does not reuse or resend a %s request ID across policies even when ordinary provider bytes match', async version => {
+     const input = ttsInput('请听。', version);
+     const fetchMock = vi.fn(async () => { throw new Error('unknown provider outcome'); });

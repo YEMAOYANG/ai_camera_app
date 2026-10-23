@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "mira.learning.unit-blueprints.v1",
+  "editionId": "pep-math-g1-upper-2022-standard",
+  "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+  "unitId": "a3092e38-7973-4659-86cb-a3c5aa8805b2",
+  "source": {
+    "url": "https://basic.smartedu.cn/tchMaterial/detail?contentType=assets_document&contentId=c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc&catalogType=tchMaterial&subCatalog=tchMaterial",
+    "resourceId": "c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc",
+    "verifiedAt": "2026-10-16",
+    "method": "Read and visually inspect the official public preview images for printed pages 2 and 3, match the official directory node, and consult the named school teaching plan. Record the lesson scope only; do not import textbook text, questions, pictures, audio or page layout into delivered courseware.",
+    "printedPages": [2, 3],
+    "publicPreviewPages": [7, 8],
+    "metadataUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/resources/tch_material/details/c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc.json",
+    "supportingSources": [
+      {
+        "id": "official-directory",
+        "title": "国家中小学智慧教育平台：人教版数学一年级上册官方目录",
+        "url": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/trees/ba9d9c0b-2c1c-4bba-84d7-369fb405bb13.json",
+        "verifiedAt": "2026-10-16",
+        "scope": "数学游戏单元第一课《在校园里找一找》；下一课为《在操场上玩一玩》。"
+      },
+      {
+        "id": "official-school-plan",
+        "title": "固原市实验小学：一年级数学上册《数学游戏》单元教学计划（郭亚宁）",
+        "url": "https://gyssyxx.nxeduyun.com/index.php?cid=912916&id=2407221&r=space%2Fschool%2Ftheme%2Fcontent%2Fview&sid=d66d92976901445da30dbd7bd59fa969",
+        "publishedAt": "2025-09-22 10:05",
+        "verifiedAt": "2026-10-16",
+        "scope": "以幼小衔接、校园观察和激活已有经验为主；单元计划中的全部知识不能归到第一课。"
+      }
+    ],
+    "usageBoundary": "仅核验本课教学范围。原目录 rightsReview 维持 pending；本蓝图不更改教材修订、家长选择，也不代表课件原创性、配音、教学终审或发布通过。"
+  },
+  "lessons": [
+    {
+      "nodeId": "2524deea-316d-4978-85a3-fdaac5ac3c6b",
+      "title": "在校园里找一找",
+      "status": "scope_verified_preview_only",
+      "targets": [
+        "图片支持下逐个点数并找到同样多的物件组",
+        "在熟悉窗户情境中匹配相同外形",
+        "在清楚的教学楼图片中从下往上指出指定楼层",
+        "把逐个点数的方法迁移到新的校园物件"
+      ],
+      "scopePages": [2, 3],
+      "mediaManifest": "math-campus.original-v1.json",
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "听懂一条口头要求，在校园情境中找到指定物件，尝试点一个数一个，不漏数、不重复数。",
+          "观察熟悉窗户的外形，用图片匹配相同的长方形轮廓，不要求独立读形状名称。",
+          "观察楼房图片，从最下面一层向上逐层找出老师口头指定的楼层。",
+          "换一种校园物件继续点数，并尝试向成人口头分享自己的发现。"
+        ],
+        "knowledgePoints": [
+          "数过的物件留下标记或移到已数区，帮助建立一个物件对应一次点数的经验。",
+          "窗户的外形可以与熟悉的长方形轮廓对应；本课只做直观观察和匹配。",
+          "从最下面开始逐层观察楼房，图片中的楼层必须分隔清楚，不能把窗户排数当成楼层。",
+          "同一种点数方法可以用于不同物件；正确图选只说明在图片和语音支持下完成了本次任务。"
+        ],
+        "priorKnowledge": [
+          "能听懂简短普通话日常指令；不要求会读题目、数字标签、形状名称或文字选项。",
+          "允许孩子已有点数和校园生活经验的差异；提供可主动请求的分步示范。"
+        ],
+        "excludedTopics": [
+          "教材原文、原题、插图、录音与版式复制",
+          "数字书写、独立读数字与抽象数符号考核",
+          "加减计算、大小符号、分合及系统的基数或序数定义",
+          "长方形边角性质、立体图形定义及完整方位词教学",
+          "把本原创练习的一至五数量范围说成教材规定的教学范围",
+          "把听题选图正确等同于掌握正式数认识单元、独立识字或完整口头表达能力"
+        ],
+        "assessmentMode": "objective",
+        "reviewNote": "2026-10-16 已核对精确目录身份、官方公开预览的印刷第2、3页，并阅读学校公开单元教学计划。原页支持校园数量、窗户外形和楼层的生活观察。本课原创任务选用少量物件控制难度；四道图片小测与四个目标按顺序对应。口头分享不计分。仅完成范围核验，未完成课件制作、教师终审、配音审核或发布。"
+      },
+      "assessmentMapping": [
+        {
+          "targetIndex": 0,
+          "questionId": "campus-count-01",
+          "page": 5,
+          "evidence": "听语音观察三盆花的情境图，从两、三、四盆的独立图片组中找同样多的一组。"
+        },
+        {
+          "targetIndex": 1,
+          "questionId": "campus-shape-02",
+          "page": 8,
+          "evidence": "观察原创长方形窗户，从三幅不同轮廓图片中选出相同外形，不要求读出名称。"
+        },
+        {
+          "targetIndex": 2,
+          "questionId": "campus-floor-03",
+          "page": 11,
+          "evidence": "听老师指定第二层，从三幅同样的三层楼图中选出教室标记位于该层的一幅。"
+        },
+        {
+          "targetIndex": 3,
+          "questionId": "campus-transfer-04",
+          "page": 13,
+          "evidence": "在新的校园角落点数四个独立交通锥，从三、四、五个锥的图片组中找同样多的一组。"
+        }
+      ],
+      "game": "听要求点出校园物件；把四盆花逐个拖进已数区，重复拖动不重复计数；给窗户拖上相配的图形框；听语音点清楚分隔的楼层；点亮交通锥的已数标记。拖错复原，帮助由孩子主动请求，重置真正清空状态。",
+      "transfer": "换成校园另一角落的原创交通锥，继续用点一个数一个的方法；自由说一个观察发现，不将口头表达计入选择题成绩。",
+      "parentSupport": "和孩子找一处安全的校园或家中场景，让孩子选少量可见物件逐个数，再说一处外形或位置的发现。不要求读题或抄写。",
+      "generationReady": false,
+      "missing": [
+        "本课原创图片与继承素材清单及摘要冻结",
+        "14页实际课件和四道按目标顺序排列的图片小测",
+        "逐页画面验收、真实点击和拖拽、错误与重置恢复验收",
+        "数学小数老师 Ethan 正式配音及逐段 ASR 与数词语义审核",
+        "局部 sourceScope 与原创表达审查、发布收据、同课原图封面及学生端验收"
+      ]
+    }
+  ]
+}

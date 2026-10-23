@@ -22,6 +22,8 @@ EXPECTED_OPENMAIC_VERSION="1.0.0"
 # Caller-supplied MODEL_ROUTES or MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY cannot
 # bypass the frozen route policy below.
 OPENMAIC_STRUCTURED_SCENE_POLICY_ID=""
+# Set only by the isolated operator model trial below.
+OPENMAIC_OPERATOR_TRIAL="0"
 OPENMAIC_RECOVERY_POLICY_VERSION="mira-sample-deterministic-classroom.v1"
 OPENMAIC_RECOVERY_CANONICAL_SPEC_SHA256="879040700d374f045058b09cbf6ed6e956ebf97d8c8d9008477063458c5ef7b6"
 OPENMAIC_TTS_CREDENTIAL_RECOVERY_POLICY_VERSION="mira-sample-tts-credential-recovery.v1"
@@ -30,7 +32,10 @@ OPENMAIC_TTS_CREDENTIAL_RECOVERY_FIXED_PARENT_ID="omrec_383729f8f7f637dc1cdc65d4
 OPENMAIC_FORMAL_CITATION_RECOVERY_POLICY_VERSION="mira-formal-citation-recovery.v1"
 OPENMAIC_FORMAL_CITATION_RECOVERY_FIXED_SOURCE_JOB_ID="omformal_e6b6986c631a548c9756037e"
 OPENMAIC_QWEN_IMAGE_BASE_URL_CONTRACT="https://dashscope.aliyuncs.com"
-OPENMAIC_QWEN_IMAGE_MODEL_CONTRACT="qwen-image-max"
+# DashScope retired qwen-image-max ("Model not exist"). The formal image policy
+# mira-formal-qwen-image.v1 still names it, so formal image generation reports
+# not ready until that policy gets a new version; operator authoring uses this.
+OPENMAIC_QWEN_IMAGE_MODEL_CONTRACT="qwen-image-3.0"
 OPENMAIC_HAPPYHORSE_BASE_URL_CONTRACT="https://dashscope.aliyuncs.com"
 OPENMAIC_HAPPYHORSE_MODEL_CONTRACT="happyhorse-1.0-t2v"
 HEALTH_TIMEOUT_SECONDS="${MIRA_OPENMAIC_HEALTH_TIMEOUT_SECONDS:-3}"
@@ -83,6 +88,17 @@ provider_env_file() {
 # override the paid courseware-provider key.
 model_provider_env_file() {
   printf '%s' "${RUNTIME_ROOT}/.env"
+}
+
+# Health/status must read the non-secret desired service independently of the
+# short-lived provider variables, which are cleared immediately after launch.
+expected_openmaic_authoring_service() {
+  local selected
+  selected="$(read_env_value MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE "$(model_provider_env_file)" || true)"
+  case "${selected:-inherit}" in
+    inherit|autorouter) printf '%s' "${selected:-inherit}" ;;
+    *) echo "Unsupported OpenMAIC authoring DeepSeek service." >&2; return 1 ;;
+  esac
 }
 
 # Read only the fixed model-owner dotenv, without sourcing it. A process
@@ -194,11 +210,18 @@ load_runtime_origin_env() {
 
 clear_openmaic_provider_env() {
   OPENMAIC_DEFAULT_MODEL=""
+  OPENMAIC_OPENROUTER_API_KEY=""
+  OPENMAIC_OPENROUTER_MODELS=""
   OPENMAIC_DEEPSEEK_API_KEY=""
   OPENMAIC_DEEPSEEK_BASE_URL=""
   OPENMAIC_DEEPSEEK_MODELS=""
   OPENMAIC_COURSEWARE_VERIFIER_MODEL=""
+  OPENMAIC_AUTHORING_DEEPSEEK_SERVICE=""
+  OPENMAIC_AUTHORING_DEEPSEEK_API_KEY=""
+  OPENMAIC_AUTHORING_DEEPSEEK_BASE_URL=""
   OPENMAIC_AGENT_RUNTIME_ENABLED="0"
+  OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT="2"
+  OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=""
   OPENMAIC_AGENT_DATABASE_URL=""
   OPENMAIC_PERSISTENCE_DEV_TOKEN=""
   OPENMAIC_MODEL_ROUTES=""
@@ -400,12 +423,56 @@ clear_openmaic_provider_env
 clear_openmaic_recovery_env
 clear_openmaic_internal_token
 
+# Operator model comparison. A second instance on its own port and its own
+# Agent database builds the same lesson with another model through OpenRouter,
+# so the result can be compared with the frozen DeepSeek policy. It carries no
+# frozen policy, so it must never be the runtime that serves students or formal
+# generation; images, speech and search keep their usual providers.
+load_openmaic_operator_trial_model_env() {
+  local env_file model api_key main_database_url
+  env_file="$(model_provider_env_file)"
+  [[ "${OPENMAIC_PORT}" != "3100" && "${OPENMAIC_PORT}" != "${GATEWAY_PORT}" ]] || {
+    echo "An operator model trial needs its own OPENMAIC_ADMIN_PORT; 3100 serves students." >&2
+    return 1
+  }
+  main_database_url="$(read_env_value MIRA_OPENMAIC_AGENT_DATABASE_URL "$(provider_env_file)" || true)"
+  [[ -n "${MIRA_OPENMAIC_AGENT_DATABASE_URL:-}" && "${MIRA_OPENMAIC_AGENT_DATABASE_URL}" != "${main_database_url}" ]] || {
+    echo "An operator model trial needs its own MIRA_OPENMAIC_AGENT_DATABASE_URL." >&2
+    return 1
+  }
+  model="${MIRA_OPENMAIC_OPERATOR_TRIAL_MODEL:-}"
+  [[ "${model}" =~ ^[a-z0-9-]+/[a-z0-9.-]+$ ]] || {
+    echo "MIRA_OPENMAIC_OPERATOR_TRIAL_MODEL must be an OpenRouter model id such as vendor/model." >&2
+    return 1
+  }
+  api_key="$(read_env_value OPENROUTER_API_KEY "${env_file}" || true)"
+  [[ -n "${api_key}" ]] || {
+    echo "An operator model trial requires OPENROUTER_API_KEY in ${env_file}." >&2
+    return 1
+  }
+  OPENMAIC_STRUCTURED_SCENE_POLICY_ID=""
+  OPENMAIC_OPERATOR_TRIAL="1"
+  OPENMAIC_DEFAULT_MODEL="openrouter:${model}"
+  OPENMAIC_OPENROUTER_API_KEY="${api_key}"
+  OPENMAIC_OPENROUTER_MODELS="${model}"
+}
+
 load_openmaic_model_env() {
   OPENMAIC_DEFAULT_MODEL=""
+  OPENMAIC_OPENROUTER_API_KEY=""
+  OPENMAIC_OPENROUTER_MODELS=""
   OPENMAIC_DEEPSEEK_API_KEY=""
   OPENMAIC_DEEPSEEK_BASE_URL=""
   OPENMAIC_DEEPSEEK_MODELS=""
   OPENMAIC_COURSEWARE_VERIFIER_MODEL=""
+  OPENMAIC_AUTHORING_DEEPSEEK_SERVICE=""
+  OPENMAIC_AUTHORING_DEEPSEEK_API_KEY=""
+  OPENMAIC_AUTHORING_DEEPSEEK_BASE_URL=""
+
+  if [[ "${MIRA_OPENMAIC_OPERATOR_MODEL_TRIAL:-0}" == "1" ]]; then
+    load_openmaic_operator_trial_model_env
+    return $?
+  fi
 
   case "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" in
     deepseek-v4-pro-flash-v1|deepseek-v4.1-flash-candidate-v1|deepseek-v4-pro-current-flash-v1) ;;
@@ -525,6 +592,41 @@ load_openmaic_model_env() {
   esac
 }
 
+# Authoring-only supply override. Global DeepSeek credentials still own student
+# runtime calls; no caller dotenv or inherited key may replace this private pair.
+load_openmaic_authoring_model_env() {
+  OPENMAIC_AUTHORING_DEEPSEEK_SERVICE=""
+  OPENMAIC_AUTHORING_DEEPSEEK_API_KEY=""
+  OPENMAIC_AUTHORING_DEEPSEEK_BASE_URL=""
+  local env_file service api_key base_url
+  env_file="$(model_provider_env_file)"
+  service="$(expected_openmaic_authoring_service)" || return 1
+  case "${service:-inherit}" in
+    inherit) return 0 ;;
+    autorouter) ;;
+    *) echo "Unsupported OpenMAIC authoring DeepSeek service." >&2; return 1 ;;
+  esac
+  case "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" in
+    deepseek-v4-pro-current-flash-v1|deepseek-v4.1-flash-candidate-v1) ;;
+    *) echo "AutoRouter authoring requires a current-Flash model policy." >&2; return 1 ;;
+  esac
+  [[ "${OPENMAIC_DEFAULT_MODEL}" == deepseek:* ]] || {
+    echo "AutoRouter authoring requires the configured DeepSeek model provider." >&2; return 1;
+  }
+  api_key="$(read_env_value AUTOROUTER_DEEPSEEK_API_KEY "${env_file}" || true)"
+  base_url="$(read_env_value AUTOROUTER_DEEPSEEK_BASE_URL "${env_file}" || true)"
+  [[ -n "${api_key}" && -n "${base_url}" ]] || {
+    echo "AutoRouter authoring requires its own key and base URL." >&2; return 1;
+  }
+  if ! node -e 'try { const u=new URL(process.argv[1]);process.exit(u.protocol==="https:" && u.hostname==="api.autorouter.top" && !u.port && !u.username && !u.password && !u.search && !u.hash && /^\/v1\/?$/.test(u.pathname)?0:1) } catch { process.exit(1) }' "${base_url}"; then
+    echo "AutoRouter authoring requires the reviewed HTTPS api.autorouter.top/v1 endpoint." >&2
+    return 1
+  fi
+  OPENMAIC_AUTHORING_DEEPSEEK_SERVICE="autorouter"
+  OPENMAIC_AUTHORING_DEEPSEEK_API_KEY="${api_key}"
+  OPENMAIC_AUTHORING_DEEPSEEK_BASE_URL="${base_url}"
+}
+
 validate_postgresql_database_url() {
   local label="$1"
   local value="$2"
@@ -555,11 +657,13 @@ validate_postgresql_database_url() {
 # the reviewed policy used for professional courseware creation.
 load_openmaic_agent_runtime_env() {
   OPENMAIC_AGENT_RUNTIME_ENABLED="0"
+  OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT="2"
+  OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS=""
   OPENMAIC_AGENT_DATABASE_URL=""
   OPENMAIC_PERSISTENCE_DEV_TOKEN=""
   OPENMAIC_MODEL_ROUTES=""
 
-  local env_file enabled database_url expected_model
+  local env_file enabled database_url expected_model max_concurrent driver_output_cap
   env_file="$(provider_env_file)"
   enabled="${MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED:-}"
   [[ -n "${enabled}" ]] || enabled="$(read_env_value MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED "${env_file}" || true)"
@@ -567,8 +671,33 @@ load_openmaic_agent_runtime_env() {
   validate_opt_in MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED "${enabled}" || return 1
   [[ "${enabled}" == "1" ]] || return 0
 
+  max_concurrent="${MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT:-}"
+  [[ -n "${max_concurrent}" ]] || max_concurrent="$(read_env_value MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT "${env_file}" || true)"
+  [[ -n "${max_concurrent}" ]] || max_concurrent="2"
+  [[ "${max_concurrent}" =~ ^[1-4]$ ]] || {
+    echo "MIRA_OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT must be an integer from 1 through 4." >&2
+    return 1
+  }
+  OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT="${max_concurrent}"
+
+  # Parent-only opt-in. An explicit empty process value clears a dotenv cap.
+  # Keep the same canonical integer grammar as the Native config parser.
+  if [[ -n "${MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS+x}" ]]; then
+    driver_output_cap="${MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}"
+  else
+    driver_output_cap="$(read_env_value MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS "${env_file}" || true)"
+  fi
+  if [[ -n "${driver_output_cap}" ]]; then
+    [[ "${driver_output_cap}" =~ ^[1-9][0-9]{0,9}$ ]] && ((driver_output_cap <= 2147483647)) || {
+      echo "MIRA_OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS must be empty or an integer from 1 through 2147483647." >&2
+      return 1
+    }
+  fi
+  OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS="${driver_output_cap}"
+
   expected_model="deepseek:deepseek-v4-pro"
   [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" != "deepseek-v4.1-flash-candidate-v1" ]] || expected_model="deepseek:deepseek-flash"
+  [[ "${OPENMAIC_OPERATOR_TRIAL}" != "1" ]] || expected_model="${OPENMAIC_DEFAULT_MODEL}"
   [[ "${OPENMAIC_DEFAULT_MODEL}" == "${expected_model}" ]] || {
     echo "Professional Agent Runtime does not match the selected model policy." >&2
     return 1
@@ -588,6 +717,12 @@ load_openmaic_agent_runtime_env() {
   # document branch. Keep it private and process-local: authoring never sends
   # this token and learner/runtime persistence remains disabled in the browser.
   OPENMAIC_PERSISTENCE_DEV_TOKEN="$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("hex"))')"
+  if [[ "${OPENMAIC_OPERATOR_TRIAL}" == "1" ]]; then
+    # Every stage without its own route follows DEFAULT_MODEL, so the whole
+    # lesson is built by the model under comparison.
+    OPENMAIC_MODEL_ROUTES="{\"maic-agent-driver\":{\"model\":\"${OPENMAIC_DEFAULT_MODEL}\",\"api\":\"openai-completions\",\"thinking\":{\"mode\":\"enabled\",\"enabled\":true}}}"
+    return 0
+  fi
   OPENMAIC_MODEL_ROUTES='{"maic-agent-driver":{"model":"deepseek:deepseek-v4-pro","api":"openai-completions","thinking":{"mode":"enabled","enabled":true}},"generate-classroom":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-creator":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-verifier":{"model":"deepseek:deepseek-v4-flash","thinking":{"mode":"disabled","enabled":false}},"web-search-query-rewrite":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}}}'
   if [[ "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" == "deepseek-v4.1-flash-candidate-v1" ]]; then
     OPENMAIC_MODEL_ROUTES='{"maic-agent-driver":{"model":"deepseek:deepseek-flash","api":"openai-completions","thinking":{"mode":"enabled","enabled":true}},"generate-classroom":{"model":"deepseek:deepseek-flash","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-creator":{"model":"deepseek:deepseek-flash","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-verifier":{"model":"deepseek:deepseek-flash","thinking":{"mode":"disabled","enabled":false}},"web-search-query-rewrite":{"model":"deepseek:deepseek-flash","thinking":{"mode":"disabled","enabled":false}}}'
@@ -832,6 +967,7 @@ load_openmaic_happyhorse_env() {
 load_openmaic_provider_env() {
   clear_openmaic_provider_env
   load_openmaic_model_env || { clear_openmaic_provider_env; return 1; }
+  load_openmaic_authoring_model_env || { clear_openmaic_provider_env; return 1; }
   load_openmaic_agent_runtime_env || { clear_openmaic_provider_env; return 1; }
   load_openmaic_web_search_env || { clear_openmaic_provider_env; return 1; }
   load_openmaic_qwen_tts_env || { clear_openmaic_provider_env; return 1; }
@@ -842,13 +978,20 @@ load_openmaic_provider_env() {
 
 show_provider_status() {
   load_openmaic_provider_env || return 1
-  if [[ -n "${OPENMAIC_DEFAULT_MODEL}" ]]; then
+  if [[ "${OPENMAIC_OPERATOR_TRIAL}" == "1" ]]; then
+    echo "LLM: operator model trial (${OPENMAIC_DEFAULT_MODEL}); not for students or formal generation"
+  elif [[ -n "${OPENMAIC_DEFAULT_MODEL}" ]]; then
     echo "LLM: enabled (deepseek, ${OPENMAIC_DEEPSEEK_MODELS})"
     local model_service
     model_service="$(read_env_value DEEPSEEK_SERVICE "$(model_provider_env_file)" || true)"
     echo "LLM service: ${model_service:-official} (no automatic fallback)"
     if [[ "${model_service}" == "bailian" ]]; then
       echo "LLM wire models: deepseek-v4-pro-0813,deepseek-v4-flash-0731"
+    fi
+    if [[ "${OPENMAIC_AUTHORING_DEEPSEEK_SERVICE}" == "autorouter" ]]; then
+      echo "LLM authoring supply: autorouter (api.autorouter.top; no automatic fallback)"
+      echo "LLM authoring wire models: deepseek-v4-pro,deepseek-v4.1-flash"
+      echo "LLM student supply: unchanged"
     fi
     echo "LLM professional creation: ${OPENMAIC_DEFAULT_MODEL}"
     echo "LLM independent verification: ${OPENMAIC_COURSEWARE_VERIFIER_MODEL}"
@@ -858,6 +1001,8 @@ show_provider_status() {
   fi
   if [[ "${OPENMAIC_AGENT_RUNTIME_ENABLED}" == "1" ]]; then
     echo "Agent Runtime: enabled (PostgreSQL connection configured; URL redacted)"
+    echo "Agent concurrent sessions: ${OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT}"
+    echo "Agent driver output cap: ${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS:-unset (catalog/formal limits unchanged)}"
     echo "Agent driver: ${OPENMAIC_DEFAULT_MODEL} (openai-completions, thinking enabled)"
   else
     echo "Agent Runtime: disabled (set MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1 to opt in)"
@@ -1301,8 +1446,9 @@ remove_gateway_start_records_if_matching() {
 validate_health_payload() {
   local kind="$1"
   local payload="$2"
-  local node_bin
+  local node_bin expected_authoring_service
   node_bin="$(command -v node)" || return 1
+  expected_authoring_service="$(expected_openmaic_authoring_service)" || return 1
   printf '%s' "${payload}" | "${node_bin}" -e '
     const kind = process.argv[1];
     const expectedRecovery = {
@@ -1690,6 +1836,12 @@ validate_health_payload() {
           expectedFormalGeneration.professionalCreation.modelPolicyId = process.argv[17];
           expectedFormalProviderReadiness.modelPolicyId = process.argv[17];
         }
+        const expectedAuthoringService = process.argv[18] === "autorouter"
+          ? { scope: "courseware-authoring", service: "autorouter", host: "api.autorouter.top",
+              wireModels: { "deepseek-v4-pro": "deepseek-v4-pro", "deepseek-flash": "deepseek-v4.1-flash" }, automaticFallback: false }
+          : { scope: "courseware-authoring", service: "inherit", automaticFallback: false };
+        const authoringServiceReady = require("node:util").isDeepStrictEqual(
+          body.runtimePolicy?.authoringModelService, expectedAuthoringService);
         const structuredSceneReady =
           JSON.stringify(body.runtimePolicy?.structuredScene) ===
           JSON.stringify(expectedStructuredScene);
@@ -1749,6 +1901,7 @@ validate_health_payload() {
             asrReady &&
             structuredSceneReady &&
             modelPolicyReady &&
+            authoringServiceReady &&
             studentChromeReady &&
             formalGenerationReady &&
             professionalResearchReady &&
@@ -1772,7 +1925,7 @@ validate_health_payload() {
                 require("node:util").isDeepStrictEqual(
                   body.runtimePolicy?.formalProviderReadiness,
                   expectedFormalProviderReadiness) &&
-                modelPolicyReady
+                modelPolicyReady && authoringServiceReady
             : body.ok === true && body.service === "mira-openmaic-runtime-gateway" && body.sourceVersion === "openmaic@1.0.0";
         process.exit(ok ? 0 : 1);
       } catch { process.exit(1); }
@@ -1793,7 +1946,8 @@ validate_health_payload() {
     "${OPENMAIC_FORMAL_CITATION_RECOVERY_SOURCE_JOB_ID:-}" \
     "${OPENMAIC_FORMAL_CITATION_RECOVERY_POLICY_VERSION}" \
     "${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256:-}" \
-    "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" >/dev/null 2>&1
+    "${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" \
+    "${expected_authoring_service}" >/dev/null 2>&1
 }
 
 probe_health() {
@@ -1983,14 +2137,26 @@ require_generation_build_idle() {
 build_generation_package() {
   reject_openmaic_build_dotenv_files || return 1
   require_generation_build_idle || return 1
-  local node_bin generation_dir tsc_script
+  local node_bin dsl_dir generation_dir tsc_script
   node_bin="$(command -v node)" || return 1
+  dsl_dir="${SOURCE_DIR}/packages/@openmaic/dsl"
   generation_dir="${SOURCE_DIR}/packages/@openmaic/generation"
   tsc_script="${SOURCE_DIR}/node_modules/typescript/bin/tsc"
-  [[ -f "${generation_dir}/tsconfig.json" && -f "${tsc_script}" ]] || {
+  [[ -f "${dsl_dir}/tsconfig.json" && -f "${generation_dir}/tsconfig.json" && -f "${tsc_script}" ]] || {
     echo "OpenMAIC generation package or local TypeScript compiler is missing; install the pinned workspace dependencies first." >&2
     return 1
   }
+  # Both generation and Next consume the DSL's dist exports. Rebuild the
+  # contract first so reviewed source patches cannot leave stale union types.
+  (
+    cd "${dsl_dir}" || return 1
+    env -i PATH="${PATH}" HOME="${HOME}" TMPDIR="${TMPDIR:-/tmp}" \
+      LANG="${LANG:-en_US.UTF-8}" NODE_ENV=production \
+      "${node_bin}" "${tsc_script}" -p tsconfig.json --incremental false &&
+    env -i PATH="${PATH}" HOME="${HOME}" TMPDIR="${TMPDIR:-/tmp}" \
+      LANG="${LANG:-en_US.UTF-8}" NODE_ENV=production \
+      "${node_bin}" scripts/gen-schema.mjs
+  ) || return 1
   (
     cd "${generation_dir}" || return 1
     env -i PATH="${PATH}" HOME="${HOME}" TMPDIR="${TMPDIR:-/tmp}" \
@@ -2042,6 +2208,8 @@ build_openmaic_production() {
     NEXT_PUBLIC_ENABLE_VIDEO_EXPORT=true \
     NEXT_PUBLIC_ENABLE_PPTX_IMPORT=true \
     ALLOWED_FRAME_ANCESTORS="${MIRA_STUDENT_WEB_ORIGIN}" \
+    MIRA_RUNTIME_PUBLIC_ORIGIN="${MIRA_RUNTIME_PUBLIC_ORIGIN}" \
+    MIRA_LOCAL_LAN_PRODUCTION_MODE="${MIRA_LOCAL_LAN_PRODUCTION_MODE:-0}" \
     "${node_bin}" scripts/assert-vendor-maic-importer.mjs
   env -i \
     PATH="${PATH}" \
@@ -2061,6 +2229,8 @@ build_openmaic_production() {
     NEXT_PUBLIC_ENABLE_VIDEO_EXPORT=true \
     NEXT_PUBLIC_ENABLE_PPTX_IMPORT=true \
     ALLOWED_FRAME_ANCESTORS="${MIRA_STUDENT_WEB_ORIGIN}" \
+    MIRA_RUNTIME_PUBLIC_ORIGIN="${MIRA_RUNTIME_PUBLIC_ORIGIN}" \
+    MIRA_LOCAL_LAN_PRODUCTION_MODE="${MIRA_LOCAL_LAN_PRODUCTION_MODE:-0}" \
     "${node_bin}" node_modules/next/dist/bin/next build --webpack
 }
 
@@ -2110,8 +2280,12 @@ run_openmaic_production_foreground() {
     NEXT_PUBLIC_ENABLE_VIDEO_EXPORT=true \
     NEXT_PUBLIC_ENABLE_PPTX_IMPORT=true \
     ALLOWED_FRAME_ANCESTORS="${MIRA_STUDENT_WEB_ORIGIN}" \
+    MIRA_RUNTIME_PUBLIC_ORIGIN="${MIRA_RUNTIME_PUBLIC_ORIGIN}" \
+    MIRA_LOCAL_LAN_PRODUCTION_MODE="${MIRA_LOCAL_LAN_PRODUCTION_MODE:-0}" \
     DEFAULT_MODEL="${OPENMAIC_DEFAULT_MODEL}" \
     OPENMAIC_AGENT_RUNTIME_ENABLED="${OPENMAIC_AGENT_RUNTIME_ENABLED}" \
+    OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT="${OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT}" \
+    OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS="${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}" \
     DATABASE_URL="${OPENMAIC_AGENT_DATABASE_URL}" \
     PERSISTENCE_DEV_TOKEN="${OPENMAIC_PERSISTENCE_DEV_TOKEN}" \
     MODEL_ROUTES="${OPENMAIC_MODEL_ROUTES}" \
@@ -2127,6 +2301,11 @@ run_openmaic_production_foreground() {
     DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
     DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
     DEEPSEEK_MODELS="${OPENMAIC_DEEPSEEK_MODELS}" \
+    MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE="${OPENMAIC_AUTHORING_DEEPSEEK_SERVICE}" \
+    AUTOROUTER_DEEPSEEK_API_KEY="${OPENMAIC_AUTHORING_DEEPSEEK_API_KEY}" \
+    AUTOROUTER_DEEPSEEK_BASE_URL="${OPENMAIC_AUTHORING_DEEPSEEK_BASE_URL}" \
+    OPENROUTER_API_KEY="${OPENMAIC_OPENROUTER_API_KEY}" \
+    OPENROUTER_MODELS="${OPENMAIC_OPENROUTER_MODELS}" \
     TTS_QWEN_API_KEY="${OPENMAIC_TTS_QWEN_API_KEY}" \
     TTS_QWEN_BASE_URL="${OPENMAIC_TTS_QWEN_BASE_URL}" \
     TTS_QWEN_MODELS="${OPENMAIC_TTS_QWEN_MODELS}" \
@@ -2202,8 +2381,12 @@ run_openmaic_foreground() {
     NEXT_PUBLIC_ENABLE_VIDEO_EXPORT=true \
     NEXT_PUBLIC_ENABLE_PPTX_IMPORT=true \
     ALLOWED_FRAME_ANCESTORS="${MIRA_STUDENT_WEB_ORIGIN}" \
+    MIRA_RUNTIME_PUBLIC_ORIGIN="${MIRA_RUNTIME_PUBLIC_ORIGIN}" \
+    MIRA_LOCAL_LAN_PRODUCTION_MODE="${MIRA_LOCAL_LAN_PRODUCTION_MODE:-0}" \
     DEFAULT_MODEL="${OPENMAIC_DEFAULT_MODEL}" \
     OPENMAIC_AGENT_RUNTIME_ENABLED="${OPENMAIC_AGENT_RUNTIME_ENABLED}" \
+    OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT="${OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT}" \
+    OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS="${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}" \
     DATABASE_URL="${OPENMAIC_AGENT_DATABASE_URL}" \
     PERSISTENCE_DEV_TOKEN="${OPENMAIC_PERSISTENCE_DEV_TOKEN}" \
     MODEL_ROUTES="${OPENMAIC_MODEL_ROUTES}" \
@@ -2219,6 +2402,11 @@ run_openmaic_foreground() {
     DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
     DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
     DEEPSEEK_MODELS="${OPENMAIC_DEEPSEEK_MODELS}" \
+    MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE="${OPENMAIC_AUTHORING_DEEPSEEK_SERVICE}" \
+    AUTOROUTER_DEEPSEEK_API_KEY="${OPENMAIC_AUTHORING_DEEPSEEK_API_KEY}" \
+    AUTOROUTER_DEEPSEEK_BASE_URL="${OPENMAIC_AUTHORING_DEEPSEEK_BASE_URL}" \
+    OPENROUTER_API_KEY="${OPENMAIC_OPENROUTER_API_KEY}" \
+    OPENROUTER_MODELS="${OPENMAIC_OPENROUTER_MODELS}" \
     TTS_QWEN_API_KEY="${OPENMAIC_TTS_QWEN_API_KEY}" \
     TTS_QWEN_BASE_URL="${OPENMAIC_TTS_QWEN_BASE_URL}" \
     TTS_QWEN_MODELS="${OPENMAIC_TTS_QWEN_MODELS}" \
@@ -2367,8 +2555,12 @@ start_openmaic() {
       NEXT_PUBLIC_ENABLE_VIDEO_EXPORT=true \
       NEXT_PUBLIC_ENABLE_PPTX_IMPORT=true \
       ALLOWED_FRAME_ANCESTORS="${MIRA_STUDENT_WEB_ORIGIN}" \
+      MIRA_RUNTIME_PUBLIC_ORIGIN="${MIRA_RUNTIME_PUBLIC_ORIGIN}" \
+      MIRA_LOCAL_LAN_PRODUCTION_MODE="${MIRA_LOCAL_LAN_PRODUCTION_MODE:-0}" \
       DEFAULT_MODEL="${OPENMAIC_DEFAULT_MODEL}" \
       OPENMAIC_AGENT_RUNTIME_ENABLED="${OPENMAIC_AGENT_RUNTIME_ENABLED}" \
+    OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT="${OPENMAIC_AGENT_RUNTIME_MAX_CONCURRENT}" \
+    OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS="${OPENMAIC_AGENT_DRIVER_MAX_OUTPUT_TOKENS}" \
       DATABASE_URL="${OPENMAIC_AGENT_DATABASE_URL}" \
       PERSISTENCE_DEV_TOKEN="${OPENMAIC_PERSISTENCE_DEV_TOKEN}" \
       MODEL_ROUTES="${OPENMAIC_MODEL_ROUTES}" \
@@ -2384,6 +2576,11 @@ start_openmaic() {
       DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
       DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
       DEEPSEEK_MODELS="${OPENMAIC_DEEPSEEK_MODELS}" \
+    MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE="${OPENMAIC_AUTHORING_DEEPSEEK_SERVICE}" \
+    AUTOROUTER_DEEPSEEK_API_KEY="${OPENMAIC_AUTHORING_DEEPSEEK_API_KEY}" \
+    AUTOROUTER_DEEPSEEK_BASE_URL="${OPENMAIC_AUTHORING_DEEPSEEK_BASE_URL}" \
+      OPENROUTER_API_KEY="${OPENMAIC_OPENROUTER_API_KEY}" \
+      OPENROUTER_MODELS="${OPENMAIC_OPENROUTER_MODELS}" \
       TTS_QWEN_API_KEY="${OPENMAIC_TTS_QWEN_API_KEY}" \
       TTS_QWEN_BASE_URL="${OPENMAIC_TTS_QWEN_BASE_URL}" \
       TTS_QWEN_MODELS="${OPENMAIC_TTS_QWEN_MODELS}" \

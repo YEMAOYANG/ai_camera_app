@@ -1,8 +1,9 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LearningTextbooks } from "@/features/learning/learning-textbooks";
+import { preloadTextbookContents } from "@/features/learning/textbook-contents-client";
 import { textbookContentsSchema } from "@/lib/contracts/textbooks";
 
 const { router, startLearningCourse } = vi.hoisted(() => ({ router: { replace: vi.fn(), push: vi.fn() }, startLearningCourse: vi.fn() }));
@@ -21,6 +22,66 @@ const reply = (value: unknown, status = 200) => new Response(JSON.stringify(valu
 describe("school textbooks", () => {
   beforeEach(() => vi.clearAllMocks());
   afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+
+  it("loads an exact directory in parallel with the catalog and can render it first", async () => {
+    let finishCatalog!: (value: Response) => void;
+    let finishContents!: (value: Response) => void;
+    const contentsPath = "/api/learning/textbooks/pep-chinese-g1/contents?alignmentRevisionId=review-1";
+    const fetch = vi.fn((path: string | URL | Request) => {
+      const value = String(path);
+      if (value === "/api/learning/textbooks") return new Promise<Response>(resolve => { finishCatalog = resolve; });
+      if (value === contentsPath) return new Promise<Response>(resolve => { finishContents = resolve; });
+      throw new Error(`Unexpected request: ${value}`);
+    });
+    vi.stubGlobal("fetch", fetch);
+    render(<LearningTextbooks student={student} location={{ editionId: book.editionId, revisionId: book.revisionId }} />);
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+    await act(async () => finishContents(reply(detail())));
+    expect(await screen.findByRole("region", { name: "走进这门学科" })).toBeVisible();
+    expect(screen.queryByText("正在打开教材目录")).not.toBeInTheDocument();
+    await act(async () => finishCatalog(reply(catalog())));
+    expect(fetch.mock.calls.filter(([path]) => String(path) === contentsPath)).toHaveLength(1);
+  });
+
+  it("reuses the directory request started while the book opens and refreshes explicitly", async () => {
+    const contentsPath = "/api/learning/textbooks/pep-chinese-g1/contents?alignmentRevisionId=review-1";
+    const fetch = vi.fn((path: string | URL | Request) => Promise.resolve(String(path) === "/api/learning/textbooks" ? reply(catalog()) : reply(detail())));
+    vi.stubGlobal("fetch", fetch);
+    preloadTextbookContents(student, book);
+    render(<LearningTextbooks student={student} location={{ editionId: book.editionId, revisionId: book.revisionId }} />);
+    expect(await screen.findByRole("region", { name: "走进这门学科" })).toBeVisible();
+    expect(fetch.mock.calls.filter(([path]) => String(path) === contentsPath)).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "完整目录" }));
+    fireEvent.click(screen.getByRole("button", { name: "教材信息与学习说明" }));
+    fireEvent.click(screen.getByRole("button", { name: "刷新教材" }));
+    await waitFor(() => expect(fetch.mock.calls.filter(([path]) => String(path) === contentsPath)).toHaveLength(2));
+  });
+
+  it("refreshes an open picture directory when a newly published lesson becomes available", async () => {
+    let now = 1_000;
+    const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => now);
+    const contentsPath = "/api/learning/textbooks/pep-chinese-g1/contents?alignmentRevisionId=review-1";
+    const readyLesson = (index: number) => ({ ...detail().units[0].lessons[0], nodeId: `u1-l${index}`, title: `课程 ${index}`, sequence: index,
+      status: "ready", course: { courseId: `course-${index}`, courseVersion: "1", contentKey: index.toString(16).padStart(64, "0"), delivery: "fixed_textbook" } });
+    const initial = { ...detail(), book: { ...book, lessonCount: 2 }, units: [{ ...detail().units[0], lessons: [readyLesson(1), { ...detail().units[0].lessons[0], nodeId: "u1-l2", title: "课程 2", sequence: 2 }] }] };
+    const updated = { ...initial, units: [{ ...initial.units[0], lessons: [readyLesson(1), readyLesson(2)] }] };
+    let contentsReads = 0;
+    const fetch = vi.fn((path: string | URL | Request) => Promise.resolve(String(path) === "/api/learning/textbooks"
+      ? reply(catalog())
+      : String(path) === contentsPath ? reply(contentsReads++ ? updated : initial) : reply({}, 404)));
+    vi.stubGlobal("fetch", fetch);
+
+    render(<LearningTextbooks student={student} />);
+    const pictures = within(await screen.findByRole("region", { name: "图片选课" }));
+    expect(pictures.getByRole("link", { name: "开始上课，课程 1" })).toBeVisible();
+    expect(pictures.queryByRole("link", { name: "开始上课，课程 2" })).not.toBeInTheDocument();
+
+    now += 31_000;
+    fireEvent.focus(window);
+    expect(await pictures.findByRole("link", { name: "开始上课，课程 2" })).toBeVisible();
+    expect(fetch.mock.calls.filter(([path]) => String(path) === contentsPath)).toHaveLength(2);
+    nowSpy.mockRestore();
+  });
 
   it("offers every published edition in a subject before reading the chosen directory", async () => {
     const books = [

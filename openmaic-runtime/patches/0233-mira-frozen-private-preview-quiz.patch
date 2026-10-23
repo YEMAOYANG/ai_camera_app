@@ -1,0 +1,518 @@
+diff --git a/app/api/classroom/route.ts b/app/api/classroom/route.ts
+--- a/app/api/classroom/route.ts
++++ b/app/api/classroom/route.ts
+@@ -8,6 +8,7 @@
+   readClassroom,
+ } from '@/lib/server/classroom-storage';
+ import { createLogger } from '@/lib/logger';
++import { readFrozenPreview } from '@/lib/server/mira-textbook-preview-quiz';
+ 
+ const log = createLogger('Classroom API');
+ 
+@@ -69,6 +70,13 @@
+       return apiError(API_ERROR_CODES.INVALID_REQUEST, 404, 'Classroom not found');
+     }
+ 
++    if (request.nextUrl.searchParams.get('presentation') === 'private-preview') {
++      if (!['localhost', '127.0.0.1', '[::1]'].includes(request.nextUrl.hostname))
++        return apiError(API_ERROR_CODES.INVALID_REQUEST, 403, 'Private preview requires local runtime');
++      const verified = await readFrozenPreview(id);
++      return apiSuccess({ classroom: { ...verified.room, stage: { ...verified.room.stage,
++        miraTextbookPreviewNarration: true, miraTextbookPreviewQuiz: true } } });
++    }
+     return apiSuccess({ classroom });
+   } catch (error) {
+     log.error(
+diff --git a/lib/classroom/load-classroom.ts b/lib/classroom/load-classroom.ts
+--- a/lib/classroom/load-classroom.ts
++++ b/lib/classroom/load-classroom.ts
+@@ -132,6 +132,9 @@
+   log,
+ }: RunClassroomLoadArgs<TMediaTasks>): Promise<void> {
+   try {
++    // A frozen operator preview must revalidate its server source on each load.
++    // Its presentation markers never derive authority from a cached document.
++    requireServerClassroom ||= /^tbprev_[a-f0-9]{24}$/.test(classroomId);
+     if (!requireServerClassroom) {
+       await loadFromStorage(classroomId, loadToken);
+       if (!isCurrent()) return;
+@@ -267,7 +270,8 @@
+   _shouldConvert: () => boolean = () => true,
+   _deps: DocumentMigrationDeps = {},
+ ): Promise<ClassroomPayload | null> {
+-  const res = await fetch(`/api/classroom?id=${encodeURIComponent(classroomId)}`);
++  const presentation = /^tbprev_[a-f0-9]{24}$/.test(classroomId) ? '&presentation=private-preview' : '';
++  const res = await fetch(`/api/classroom?id=${encodeURIComponent(classroomId)}${presentation}`);
+   if (!res.ok) return null;
+ 
+   const json = (await res.json()) as {
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -796,7 +796,10 @@
+ // ─── Main Component ─────────────────────────────────────────────────────────
+ 
+ export function QuizView(props: QuizViewProps) {
+-  const fixed = useStageStore(state => (state.stage as { fixedTextbook?: boolean } | null)?.fixedTextbook === true);
++  const fixed = useStageStore(state => {
++    const stage = state.stage as { fixedTextbook?: boolean; miraTextbookPreviewQuiz?: boolean } | null;
++    return stage?.fixedTextbook === true || stage?.miraTextbookPreviewQuiz === true;
++  });
+   const fixedPageKey = JSON.stringify([props.sceneId, props.questions.map(question => question.id)]);
+   return fixed && !props.readOnly ? <FixedTextbookQuiz key={fixedPageKey} questions={props.questions} /> : <StandardQuizView {...props} />;
+ }
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -33,8 +33,15 @@
+  * A lesson may hold several of these pages; each hands in only its own
+  * questions and the server adds them up to one lesson result.
+  */
+-export function FixedTextbookQuiz({ questions }: { questions: QuizQuestion[] }) {
++export function FixedTextbookQuiz({ questions: suppliedQuestions }: { questions: QuizQuestion[] }) {
+   const sceneId = useStageStore(state => state.currentSceneId) ?? undefined;
++  const stageId = useStageStore(state => state.stage?.id) ?? '';
++  const privatePreview = /^tbprev_[a-f0-9]{24}$/.test(stageId);
++  const endpoint = privatePreview
++    ? `/api/textbook-preview-quiz/${stageId}?sceneId=${encodeURIComponent(sceneId ?? '')}`
++    : '/mira/textbook-quiz';
++  const [previewQuestions, setPreviewQuestions] = useState<QuizQuestion[]>([]);
++  const questions = privatePreview ? previewQuestions : suppliedQuestions;
+   const [answers, setAnswers] = useState<Record<string, string>>({});
+   const [graded, setGraded] = useState<Graded[]>([]);
+   const [loading, setLoading] = useState(true);
+@@ -52,21 +59,25 @@
+   }, [events]);
+ 
+   const read = useCallback(async (signal?: AbortSignal) => {
+-    const response = await fetch('/mira/textbook-quiz', { cache: 'no-store', signal });
++    const response = await fetch(endpoint, { cache: 'no-store', signal });
+     const payload = await response.json();
+     if (signal?.aborted) return;
+     if (!response.ok || !payload.ok) throw new Error(payload.message || '练习暂时没有加载成功');
+-    const saved = gradedOnThisPage(payload, questions.map(q => q.id));
+-    if (saved.length) {
++    const currentQuestions = privatePreview ? payload.questions : suppliedQuestions;
++    if (!Array.isArray(currentQuestions) || !currentQuestions.length)
++      throw new Error('预览原题没有加载成功');
++    if (privatePreview) setPreviewQuestions(currentQuestions);
++    const saved = gradedOnThisPage(payload, currentQuestions.map((q: QuizQuestion) => q.id));
++    {
+       setFreshFeedbackQuestionId(null);
+       setGraded(saved);
+       setAnswers(Object.fromEntries(saved.map(r => [r.questionId, r.response])));
+-      const firstUnanswered = questions.findIndex(q => !saved.some(r => r.questionId === q.id));
++      const firstUnanswered = currentQuestions.findIndex((q: QuizQuestion) => !saved.some(r => r.questionId === q.id));
+       setQuestionIndex(Math.max(0, firstUnanswered));
+     }
+     setLoading(false);
+     setError('');
+-  }, [questions]);
++  }, [endpoint, privatePreview, suppliedQuestions]);
+ 
+   useEffect(() => {
+     const controller = new AbortController();
+@@ -84,16 +95,34 @@
+     submission.current = controller;
+     setSending(true); setError('');
+     try {
+-      const response = await fetch('/mira/textbook-quiz', { method: 'POST', signal: controller.signal,
++      const response = await fetch(endpoint, { method: 'POST', signal: controller.signal,
+         headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers }) });
+       const payload = await response.json();
+       if (controller.signal.aborted) return;
+       if (!response.ok || !payload.ok) throw new Error(payload.message || '回答暂时没有保存，请重试');
+       setGraded(gradedOnThisPage(payload, questions.map(q => q.id)));
+       setFreshFeedbackQuestionId(questions[questionIndex]?.id ?? null);
+-      if (payload.result) await complete();
++      if (payload.result && !privatePreview) await complete();
+     } catch (caught) { if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : '回答暂时没有保存，请重试'); }
+     finally { if (!controller.signal.aborted) setSending(false); submission.current = null; }
++  }
++
++  async function resetPreview() {
++    if (!privatePreview || submission.current) return;
++    const controller = new AbortController();
++    submission.current = controller; setSending(true); setError('');
++    try {
++      const response = await fetch(endpoint, { method: 'POST', signal: controller.signal,
++        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reset: true }) });
++      const payload = await response.json();
++      if (!response.ok || !payload.ok) throw new Error(payload.message || '预览重试未保存');
++      await read(controller.signal);
++    } catch (caught) {
++      if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : '请重新打开预览');
++    } finally {
++      if (!controller.signal.aborted) setSending(false);
++      submission.current = null;
++    }
+   }
+ 
+   const q = questions[questionIndex];
+@@ -110,6 +139,7 @@
+         <h2 className="text-lg font-semibold sm:text-2xl">{done ? `答对 ${graded.filter(r => r.correct).length} / ${graded.length} 题` : '听一听，选一选'}</h2>
+         <span className="text-sm text-[#697a6c]" aria-label="题目进度">{questionIndex + 1} / {questions.length}</span>
+       </header>
++      {privatePreview && <p className="mb-2 text-sm text-[#697a6c]">教研预览 · 不记录学生进度</p>}
+       {loading ? <p role="status">正在打开练习…</p> : q &&
+         <fieldset key={q.id} data-fixed-question={q.id} className={`${compactImages ? compactPictureStyles.fieldset : ''} min-w-0 rounded-2xl border border-[#e9dfcd] bg-white/80 p-3 sm:p-4`}>
+           <legend className="px-2 text-sm text-[#788275]">第 {questionIndex + 1} 题</legend>
+@@ -150,6 +180,8 @@
+           {sending ? <><Loader2 className="animate-spin" size={20} aria-hidden />正在保存</> : <>完成练习<ArrowRight size={20} aria-hidden /></>}
+         </button>}
+         {done && questionIndex === questions.length - 1 && <p className="text-sm text-[#68766b]">答案已保存，继续往下学吧。</p>}
++        {privatePreview && done && <button type="button" disabled={sending} onClick={() => void resetPreview()}
++          className="min-h-14 rounded-full border border-[#c7d1c5] px-4">重新试一次</button>}
+       </footer>
+     </div>
+   </section>;
+diff --git a/lib/server/mira-textbook-preview-quiz.ts b/lib/server/mira-textbook-preview-quiz.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-textbook-preview-quiz.ts
+@@ -0,0 +1,132 @@
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import type { QuizQuestion } from '@/lib/types/stage';
++import type { QuizOptionFeedback } from '@openmaic/dsl';
++import { readClassroom, type PersistedClassroomData } from './classroom-storage';
++import { qualitySha } from './mira-formal-quality-contract';
++
++export const PREVIEW_ID = /^tbprev_[a-f0-9]{24}$/;
++export const PREVIEW_ATTEMPT = /^[a-f0-9]{64}$/;
++type Graded = { questionId: string; response: string; correct: boolean; explanation: string;
++  correctAnswer: string; feedback?: QuizOptionFeedback };
++type Attempt = { sourceSha256: string; results: Graded[] };
++type Preview = { id: string; sourceSha256: string; room: PersistedClassroomData; questions: QuizQuestion[] };
++
++function reject(message: string): never { throw new Error(message); }
++function rewriteIdentity(value: unknown, source: string, target: string): unknown {
++  if (Array.isArray(value)) return value.map(item => rewriteIdentity(item, source, target));
++  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(
++    ([key, item]) => [key, rewriteIdentity(item, source, target)]));
++  return value === source ? target : value;
++}
++
++/** A freeze alias is only an identity rewrite of one exact saved source.
++ * The source hash, not a caller-supplied question or passing flag, is authority. */
++export function verifyFrozenPreview(room: PersistedClassroomData, source: PersistedClassroomData): Preview {
++  const sourceSha256 = qualitySha(source);
++  if (!PREVIEW_ID.test(room.id) || room.stage.id !== room.id || source.id === room.id
++      || room.id !== `tbprev_${sourceSha256.slice(0, 24)}`
++      || qualitySha(rewriteIdentity(source.stage, source.id, room.id)) !== qualitySha(room.stage)
++      || qualitySha(rewriteIdentity(source.scenes, source.id, room.id)) !== qualitySha(room.scenes))
++    reject('预览与原冻结课件不同，请重新冻结当前版本');
++  const questions = room.scenes.flatMap(scene => scene.type === 'quiz'
++    ? ((scene.content as unknown as { questions?: QuizQuestion[] }).questions ?? []) : []);
++  if (!questions.length || new Set(questions.map(q => q.id)).size !== questions.length
++      || questions.some(q => q.type !== 'single' || !Array.isArray(q.options) || q.options.length < 2
++        || new Set(q.options.map(o => o.value)).size !== q.options.length
++        || !Array.isArray(q.answer) || q.answer.length !== 1
++        || !q.options.some(o => o.value === q.answer![0])))
++    reject('此预览只支持具有原答案和明确图片选项的单选锁题');
++  return { id: room.id, sourceSha256, room, questions };
++}
++
++export async function readFrozenPreview(id: string): Promise<Preview> {
++  if (!PREVIEW_ID.test(id)) reject('只有已冻结的本机教材预览可使用此入口');
++  const room = await readClassroom(id);
++  if (!room) reject('没有找到冻结预览');
++  const sources = new Set(room.scenes.flatMap(scene => (scene.actions ?? []).flatMap(action => {
++    if (action.type !== 'speech' || typeof action.audioUrl !== 'string') return [];
++    const match = new URL(action.audioUrl, 'http://localhost').pathname.match(/^\/api\/classroom-media\/([A-Za-z0-9_-]+)\/audio\//);
++    return match ? [match[1]] : [];
++  })));
++  if (sources.size !== 1) reject('预览录音不能唯一追溯原课件');
++  const source = await readClassroom([...sources][0]);
++  if (!source) reject('预览的原课件不存在');
++  return verifyFrozenPreview(room, source);
++}
++
++export function sceneQuestions(preview: Preview, sceneId: string): QuizQuestion[] {
++  const scene = preview.room.scenes.find(s => s.id === sceneId && s.type === 'quiz');
++  const questions = (scene?.content as unknown as { questions?: QuizQuestion[] })?.questions;
++  if (!questions?.length) reject('当前页面不是此冻结预览的测验');
++  return questions;
++}
++
++export function publicQuestions(questions: QuizQuestion[]) {
++  return questions.map(({ answer: _answer, analysis: _analysis, optionFeedback: _feedback, ...q }) => q);
++}
++
++export function gradePreview(preview: Preview, sceneId: string, answers: Record<string, string>): Graded[] {
++  const questions = sceneQuestions(preview, sceneId);
++  if (!answers || typeof answers !== 'object' || Array.isArray(answers)
++      || Object.keys(answers).length !== questions.length || Object.keys(answers).some(id => !questions.some(q => q.id === id)))
++    reject('只可提交当前预览页面的原题');
++  return questions.map(q => {
++    const response = answers[q.id];
++    if (typeof response !== 'string' || !q.options?.some(o => o.value === response)) reject('预览选项无效');
++    const expected = q.answer![0];
++    return { questionId: q.id, response, correct: expected === response,
++      explanation: q.analysis ?? '', correctAnswer: expected,
++      ...(q.optionFeedback?.[response] ? { feedback: q.optionFeedback[response] } : {}) };
++  });
++}
++
++const root = () => path.join(process.cwd(), 'data', 'textbook-preview-quiz');
++function attemptPath(preview: Preview, attempt: string, directory = root()) {
++  if (!PREVIEW_ATTEMPT.test(attempt)) reject('预览尝试编号无效');
++  return path.join(directory, preview.sourceSha256, `${attempt}.json`);
++}
++async function readAttempt(preview: Preview, attempt: string, directory: string): Promise<Attempt> {
++  try {
++    const value = JSON.parse(await fs.readFile(attemptPath(preview, attempt, directory), 'utf8')) as Attempt;
++    if (value.sourceSha256 !== preview.sourceSha256 || !Array.isArray(value.results)
++        || new Set(value.results.map(r => r.questionId)).size !== value.results.length
++        || value.results.some(r => !preview.questions.some(q => q.id === r.questionId))) reject('预览尝试来源不一致');
++    return value;
++  } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
++  return { sourceSha256: preview.sourceSha256, results: [] };
++}
++
++export async function previewQuiz(preview: Preview, sceneId: string, attempt: string,
++  operation?: { answers?: Record<string, string>; reset?: boolean }, directory = root()) {
++  const questions = sceneQuestions(preview, sceneId);
++  let saved: Attempt;
++  if (operation) {
++    const file = attemptPath(preview, attempt, directory), lock = `${file}.lock`;
++    await fs.mkdir(path.dirname(file), { recursive: true });
++    try { await fs.mkdir(lock); } catch { reject('预览答案正在保存，请稍后重试'); }
++    try {
++      saved = await readAttempt(preview, attempt, directory);
++      const pageIds = new Set(questions.map(q => q.id));
++      if (operation.reset === true) saved.results = saved.results.filter(r => !pageIds.has(r.questionId));
++      else {
++        const results = gradePreview(preview, sceneId, operation.answers!);
++        const previous = saved.results.filter(r => pageIds.has(r.questionId));
++        if (previous.length && qualitySha(previous) !== qualitySha(results)) reject('先点重新试一次，再修改预览答案');
++        saved.results = [...saved.results.filter(r => !pageIds.has(r.questionId)), ...results];
++      }
++      const temporary = `${file}.tmp`;
++      await fs.writeFile(temporary, JSON.stringify(saved), { mode: 0o600 });
++      await fs.rename(temporary, file);
++    } finally { await fs.rmdir(lock); }
++  } else saved = await readAttempt(preview, attempt, directory);
++  const results = preview.questions.flatMap(q => saved.results.filter(r => r.questionId === q.id));
++  const complete = results.length === preview.questions.length;
++  const correctCount = results.filter(r => r.correct).length;
++  const points = (id: string) => preview.questions.find(q => q.id === id)?.points ?? 1;
++  return { ok: true, privatePreview: true, studentProgressWritten: false, publicationAllowed: false,
++    sourceSha256: preview.sourceSha256, questions: publicQuestions(questions),
++    ...(complete ? { result: { score: results.reduce((sum, r) => sum + (r.correct ? points(r.questionId) : 0), 0),
++      maxScore: results.reduce((sum, r) => sum + points(r.questionId), 0), correctCount,
++      totalQuestions: results.length, results } } : { partial: { results } }) };
++}
+diff --git a/app/api/textbook-preview-quiz/[classroomId]/route.ts b/app/api/textbook-preview-quiz/[classroomId]/route.ts
+new file mode 100644
+--- /dev/null
++++ b/app/api/textbook-preview-quiz/[classroomId]/route.ts
+@@ -0,0 +1,44 @@
++import { randomBytes } from 'node:crypto';
++import { NextRequest, NextResponse } from 'next/server';
++import { PREVIEW_ATTEMPT, PREVIEW_ID, previewQuiz, readFrozenPreview } from '@/lib/server/mira-textbook-preview-quiz';
++
++export const runtime = 'nodejs';
++export const dynamic = 'force-dynamic';
++type Context = { params: Promise<{ classroomId: string }> };
++
++async function respond(request: NextRequest, context: Context, write: boolean) {
++  try {
++    const { classroomId } = await context.params;
++    if (!['localhost', '127.0.0.1', '[::1]'].includes(request.nextUrl.hostname) || !PREVIEW_ID.test(classroomId)
++        || write && request.headers.get('origin') !== request.nextUrl.origin)
++      return NextResponse.json({ ok: false, message: '此入口仅用于同源本机冻结预览' }, { status: 403 });
++    const sceneId = request.nextUrl.searchParams.get('sceneId') ?? '';
++    const cookie = `mira-preview-quiz-${classroomId}`;
++    const prior = request.cookies.get(cookie)?.value;
++    const attempt = prior && PREVIEW_ATTEMPT.test(prior) ? prior : randomBytes(32).toString('hex');
++    let operation: { answers?: Record<string, string>; reset?: boolean } | undefined;
++    if (write) {
++      if (!prior || !PREVIEW_ATTEMPT.test(prior)) throw new Error('请先打开此冻结预览的题目');
++      const raw = await request.text();
++      if (raw.length > 8192 || !request.headers.get('content-type')?.startsWith('application/json'))
++        throw new Error('预览提交格式无效');
++      const parsed: unknown = JSON.parse(raw);
++      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)
++          || !('answers' in parsed || 'reset' in parsed)
++          || Object.keys(parsed).some(key => !['answers', 'reset'].includes(key))
++          || 'reset' in parsed && (parsed.reset !== true || 'answers' in parsed))
++        throw new Error('预览提交字段无效');
++      operation = parsed as typeof operation;
++    }
++    const result = await previewQuiz(await readFrozenPreview(classroomId), sceneId, attempt, operation);
++    const response = NextResponse.json(result, { headers: { 'Cache-Control': 'private, no-store' } });
++    if (prior !== attempt) response.cookies.set(cookie, attempt, { httpOnly: true, sameSite: 'strict',
++      path: `/api/textbook-preview-quiz/${classroomId}`, maxAge: 86400 });
++    return response;
++  } catch (error) {
++    return NextResponse.json({ ok: false, message: error instanceof Error ? error.message : '预览测验没有加载成功' },
++      { status: 409, headers: { 'Cache-Control': 'private, no-store' } });
++  }
++}
++export const GET = (request: NextRequest, context: Context) => respond(request, context, false);
++export const POST = (request: NextRequest, context: Context) => respond(request, context, true);
+diff --git a/tests/server/mira-textbook-preview-quiz.test.ts b/tests/server/mira-textbook-preview-quiz.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-textbook-preview-quiz.test.ts
+@@ -0,0 +1,79 @@
++import { promises as fs } from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { afterEach, describe, expect, it } from 'vitest';
++import type { PersistedClassroomData } from '@/lib/server/classroom-storage';
++import { gradePreview, previewQuiz, publicQuestions, verifyFrozenPreview } from '@/lib/server/mira-textbook-preview-quiz';
++import { qualitySha } from '@/lib/server/mira-formal-quality-contract';
++
++function fixture(fixed = true) {
++  const source = { id: 'tbrev_source', createdAt: 'synthetic',
++    stage: { id: 'tbrev_source', name: 'Original source', ...(fixed ? { fixedTextbook: true } : {}) },
++    scenes: [1, 2].map(index => ({ id: `quiz-${index}`, stageId: 'tbrev_source', order: index, type: 'quiz', actions: [],
++      content: { questions: [{ id: `q${index}`, type: 'single', question: '听一听。', points: 10,
++        answer: ['B'], analysis: '请看人物动作。', options: [{ value: 'A', label: '第一张图' }, { value: 'B', label: '第二张图' }],
++        optionFeedback: { A: { text: '他们正在离开。', audioUrl: '/api/classroom-media/tbrev_source/audio/wrong.wav' },
++                          B: { text: '他们正在见面。', audioUrl: '/api/classroom-media/tbrev_source/audio/right.wav' } } }] } }))
++  } as unknown as PersistedClassroomData;
++  const id = `tbprev_${qualitySha(source).slice(0, 24)}`;
++  const room = structuredClone(source);
++  room.id = room.stage.id = id;
++  room.createdAt = 'new snapshot time';
++  room.scenes.forEach(scene => { scene.stageId = id; });
++  return { source, room, preview: verifyFrozenPreview(room, source) };
++}
++
++const folders: string[] = [];
++afterEach(async () => { await Promise.all(folders.splice(0).map(folder => fs.rm(folder, { recursive: true, force: true }))); });
++
++describe('exact frozen private quiz', () => {
++  it('accepts both authored and published-derived sources without mutating their stage flags', () => {
++    for (const fixed of [true, false]) {
++      const { source, room, preview } = fixture(fixed);
++      expect(preview.sourceSha256).toBe(qualitySha(source));
++      expect(room.stage).not.toHaveProperty('miraTextbookPreviewQuiz');
++      expect((source.stage as { fixedTextbook?: boolean }).fixedTextbook).toBe(fixed ? true : undefined);
++    }
++  });
++  it('rejects changed body, source, published identities and client-supplied answers', () => {
++    const { source, room, preview } = fixture();
++    for (const changed of [
++      { ...room, id: 'tbpub_not-a-preview' },
++      { ...room, stage: { ...room.stage, name: 'changed' } },
++      { ...room, scenes: [] },
++    ]) expect(() => verifyFrozenPreview(changed, source)).toThrow();
++    expect(() => verifyFrozenPreview(room, { ...source, createdAt: 'different' })).toThrow();
++    expect(() => gradePreview(preview, 'quiz-1', { q1: 'C' })).toThrow();
++    expect(() => gradePreview(preview, 'quiz-1', { q2: 'B' })).toThrow();
++    expect(() => gradePreview(preview, 'quiz-1', { q1: 'B', correct: 'true' })).toThrow();
++  });
++  it('returns only original selected feedback and hides answers before submission', () => {
++    const { preview } = fixture();
++    const [wrong] = gradePreview(preview, 'quiz-1', { q1: 'A' });
++    expect(wrong.correct).toBe(false);
++    expect(wrong.feedback?.text).toBe('他们正在离开。');
++    expect(gradePreview(preview, 'quiz-1', { q1: 'B' })[0].correct).toBe(true);
++    const questions = publicQuestions(preview.questions);
++    expect(questions[0]).not.toHaveProperty('answer');
++    expect(questions[0]).not.toHaveProperty('analysis');
++    expect(questions[0]).not.toHaveProperty('optionFeedback');
++  });
++  it('keeps browser attempts and source identities isolated, with an explicit current-page retry', async () => {
++    const folder = await fs.mkdtemp(path.join(process.env.MIRA_TASK_TMPDIR ?? os.tmpdir(), 'preview-quiz-'));
++    folders.push(folder);
++    const { preview, source } = fixture();
++    const original = qualitySha(source), a = 'a'.repeat(64), b = 'b'.repeat(64);
++    await previewQuiz(preview, 'quiz-1', a, { answers: { q1: 'A' } }, folder);
++    const otherAttempt = await previewQuiz(preview, 'quiz-1', b, undefined, folder);
++    expect('partial' in otherAttempt && otherAttempt.partial.results).toEqual([]);
++    await expect(previewQuiz(preview, 'quiz-1', a, { answers: { q1: 'B' } }, folder)).rejects.toThrow();
++    await previewQuiz(preview, 'quiz-2', a, { answers: { q2: 'B' } }, folder);
++    await previewQuiz(preview, 'quiz-1', a, { reset: true }, folder);
++    const result = await previewQuiz(preview, 'quiz-1', a, { answers: { q1: 'B' } }, folder);
++    expect('result' in result && result.result.score).toBe(20);
++    expect('result' in result && result.result.results.map(r => r.questionId)).toEqual(['q1', 'q2']);
++    expect(result.studentProgressWritten).toBe(false);
++    expect(result.publicationAllowed).toBe(false);
++    expect(qualitySha(source)).toBe(original);
++  });
++});
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-private-preview.test.ts b/tests/scene-renderers/fixed-textbook-quiz-private-preview.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/fixed-textbook-quiz-private-preview.test.ts
+@@ -0,0 +1,75 @@
++// @vitest-environment jsdom
++import { act, createElement } from 'react';
++import { createRoot, type Root } from 'react-dom/client';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import type { QuizQuestion } from '@/lib/types/stage';
++
++const complete = vi.hoisted(() => vi.fn(async () => {}));
++vi.mock('@/lib/contexts/mira-student-runtime-context', () => ({ useMiraStudentRuntimeEvents: () => ({ completeWhenReady: complete }) }));
++vi.mock('@/lib/store', () => {
++  const state = { stage: { id: 'tbprev_' + 'a'.repeat(24), miraTextbookPreviewQuiz: true }, currentSceneId: 'quiz-scene', scenes: [{ id: 'last', order: 3 }] };
++  return { useStageStore: Object.assign((select: (value: typeof state) => unknown) => select(state), { getState: () => state }) };
++});
++vi.mock('@/lib/hooks/use-i18n', () => ({ useI18n: () => ({ t: (key: string) => key, locale: 'zh-CN' }) }));
++vi.mock('@/components/audio/question-narration', () => ({
++  questionNarrationSource: (q: QuizQuestion) => q.questionAudioUrl,
++  classroomNarrationSource: (value: unknown) => typeof value === 'string' ? value : null,
++  QuestionNarration: ({ autoPlay, questionId, src }: { autoPlay?: boolean; questionId?: string; src?: string }) => createElement('span', {
++    'data-autoplay': String(autoPlay), 'data-question': questionId, 'data-src': src,
++  }),
++}));
++import { FixedTextbookQuiz } from '@/components/scene-renderers/fixed-textbook-quiz';
++
++let root: Root | undefined;
++(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
++afterEach(() => { act(() => root?.unmount()); root = undefined; document.body.replaceChildren(); complete.mockClear(); vi.unstubAllGlobals(); });
++const question: QuizQuestion = { id: 'q1', type: 'single', question: '听一听。', points: 1,
++  options: [{ value: 'A', label: '挥手离开' }, { value: 'B', label: '挥手见面' }],
++  optionVisuals: { A: { kind: 'image', src: '/api/classroom-media/source/media/leave.png', alt: '离开' },
++    B: { kind: 'image', src: '/api/classroom-media/source/media/meet.png', alt: '见面' } },
++  questionAudioUrl: '/api/classroom-media/source/audio/question.wav' };
++const wrong = { questionId: 'q1', response: 'A', correct: false, correctAnswer: 'B', explanation: '看动作。',
++  feedback: { text: '他们正在离开。', audioUrl: '/api/classroom-media/source/audio/wrong.wav' } };
++async function mount() {
++  const host = document.createElement('div'); document.body.append(host); root = createRoot(host);
++  // Native shared documents can omit private options; the verified server snapshot supplies them.
++  await act(async () => root!.render(createElement(FixedTextbookQuiz, { questions: [{ ...question, options: [] }] })));
++  return host;
++}
++async function clickText(host: HTMLElement, text: string) {
++  const button = [...host.querySelectorAll('button')].find(item => item.textContent?.includes(text));
++  expect(button).toBeTruthy(); await act(async () => button!.click());
++}
++describe('private frozen quiz in the native renderer', () => {
++  it('loads literal picture choices, renders selected feedback, retries, and never writes student completion', async () => {
++    let saved = false;
++    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
++      if (init?.method === 'POST') saved = !JSON.parse(String(init.body)).reset;
++      return { ok: true, json: async () => ({ ok: true, questions: [question], ...(saved ? { result: { results: [wrong] } } : { partial: { results: [] } }) }) };
++    });
++    vi.stubGlobal('fetch', fetchMock);
++    const host = await mount();
++    expect(host.querySelectorAll('[role=radio]')).toHaveLength(2);
++    expect(host.querySelectorAll('[role=radio] img')).toHaveLength(2);
++    await act(async () => (host.querySelector('[aria-label="挥手离开"]') as HTMLButtonElement).click());
++    await clickText(host, '完成练习');
++    expect(host.querySelector('[data-quiz-selected-feedback="A"]')?.textContent).toContain('他们正在离开。');
++    expect(host.querySelector('[data-question="q1:feedback:A"]')?.getAttribute('data-autoplay')).toBe('true');
++    expect(complete).not.toHaveBeenCalled();
++    await clickText(host, '重新试一次');
++    expect(host.querySelector('[data-quiz-selected-feedback]')).toBeNull();
++    expect(host.querySelector('[data-question="q1"]')?.getAttribute('data-autoplay')).toBe('true');
++    expect(host.querySelector('[role=radio]')).toHaveProperty('disabled', false);
++    expect(fetchMock.mock.calls.every(([url]) => url === `/api/textbook-preview-quiz/tbprev_${'a'.repeat(24)}?sceneId=quiz-scene`)).toBe(true);
++    expect(complete).not.toHaveBeenCalled();
++  });
++  it('shows source verification failure without falling back to unverified choices or the student endpoint', async () => {
++    const fetchMock = vi.fn(async () => ({ ok: false, json: async () => ({ ok: false, message: '预览与原冻结课件不同，请重新冻结当前版本' }) }));
++    vi.stubGlobal('fetch', fetchMock);
++    const host = await mount();
++    expect(host.querySelector('[role=alert]')?.textContent).toContain('预览与原冻结课件不同');
++    expect(host.querySelectorAll('[role=radio]')).toHaveLength(0);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    expect(complete).not.toHaveBeenCalled();
++  });
++});

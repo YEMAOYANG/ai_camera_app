@@ -1,0 +1,504 @@
+diff --git a/lib/server/mira-textbook-pinyin-pronunciation.ts b/lib/server/mira-textbook-pinyin-pronunciation.ts
+--- a/lib/server/mira-textbook-pinyin-pronunciation.ts
++++ b/lib/server/mira-textbook-pinyin-pronunciation.ts
+@@ -3664,7 +3664,428 @@
+ export const MIRA_TEXTBOOK_PINYIN_YW_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_YW_PRONUNCIATION_POLICY));
+ export const MIRA_TEXTBOOK_PINYIN_GARDEN3_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_GARDEN3_PRONUNCIATION_POLICY));
+ export const MIRA_TEXTBOOK_PINYIN_GARDEN3_V2_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_GARDEN3_V2_PRONUNCIATION_POLICY));
++/** Exact frozen v4 recipe; registration is not a listening verdict. */
++export const MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY = {
++  "policyVersion": "mira.textbook.pinyin-aieiui-ssml.v4",
++  "subject": "chinese",
++  "providerId": "aliyun-cosyvoice",
++  "modelId": "cosyvoice-v3-flash",
++  "voiceId": "longanwen_v3",
++  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
++  "inputParameters": {
++    "voice": "longanwen_v3",
++    "format": "wav",
++    "sample_rate": 24000,
++    "enable_ssml": true,
++    "rate": 1,
++    "pitch": 1,
++    "seed": 0,
++    "language_hints": [
++      "zh"
++    ]
++  },
++  "textHandling": {
++    "normalization": "none",
++    "xmlEscape": "amp_lt_gt_quot_apos",
++    "unsupportedLatin": "reject",
++    "combiningMarks": "reject",
++    "wrapper": "speak",
++    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
++    "latinRunRanges": [
++      [
++        48,
++        57
++      ],
++      [
++        65,
++        90
++      ],
++      [
++        97,
++        122
++      ],
++      [
++        170,
++        170
++      ],
++      [
++        186,
++        186
++      ],
++      [
++        192,
++        214
++      ],
++      [
++        216,
++        246
++      ],
++      [
++        248,
++        696
++      ],
++      [
++        736,
++        740
++      ],
++      [
++        7424,
++        7461
++      ],
++      [
++        7468,
++        7516
++      ],
++      [
++        7522,
++        7525
++      ],
++      [
++        7531,
++        7543
++      ],
++      [
++        7545,
++        7614
++      ],
++      [
++        7680,
++        7935
++      ],
++      [
++        8305,
++        8305
++      ],
++      [
++        8319,
++        8319
++      ],
++      [
++        8336,
++        8348
++      ],
++      [
++        8490,
++        8491
++      ],
++      [
++        8498,
++        8498
++      ],
++      [
++        8526,
++        8526
++      ],
++      [
++        8544,
++        8584
++      ],
++      [
++        11360,
++        11391
++      ],
++      [
++        42786,
++        42887
++      ],
++      [
++        42891,
++        42972
++      ],
++      [
++        42993,
++        43007
++      ],
++      [
++        43824,
++        43866
++      ],
++      [
++        43868,
++        43876
++      ],
++      [
++        43878,
++        43881
++      ],
++      [
++        64256,
++        64262
++      ],
++      [
++        65313,
++        65338
++      ],
++      [
++        65345,
++        65370
++      ],
++      [
++        67456,
++        67461
++      ],
++      [
++        67463,
++        67504
++      ],
++      [
++        67506,
++        67514
++      ],
++      [
++        119808,
++        120831
++      ],
++      [
++        122624,
++        122654
++      ],
++      [
++        122661,
++        122666
++      ]
++    ]
++  },
++  "listeningRequired": true,
++  "symbols": {
++    "ɑi": {
++      "ph": "ai1",
++      "carrier": "哀"
++    },
++    "āi": {
++      "ph": "ai1",
++      "carrier": "哀"
++    },
++    "ái": {
++      "ph": "ai2",
++      "carrier": "挨"
++    },
++    "ǎi": {
++      "ph": "ai3",
++      "carrier": "矮"
++    },
++    "ài": {
++      "ph": "ai4",
++      "carrier": "爱"
++    },
++    "ei": {
++      "ph": "ei1",
++      "carrier": "诶"
++    },
++    "ēi": {
++      "ph": "ei1",
++      "carrier": "诶"
++    },
++    "éi": {
++      "ph": "ei2",
++      "carrier": "诶"
++    },
++    "ěi": {
++      "ph": "ei3",
++      "carrier": "诶"
++    },
++    "èi": {
++      "ph": "ei4",
++      "carrier": "诶"
++    },
++    "ui": {
++      "ph": "wei1",
++      "carrier": "威"
++    },
++    "uī": {
++      "ph": "wei1",
++      "carrier": "威"
++    },
++    "uí": {
++      "ph": "wei2",
++      "carrier": "围"
++    },
++    "uǐ": {
++      "ph": "wei3",
++      "carrier": "伟"
++    },
++    "uì": {
++      "ph": "wei4",
++      "carrier": "味"
++    },
++    "g": {
++      "ph": "ge1",
++      "carrier": "哥"
++    },
++    "u": {
++      "ph": "wu1",
++      "carrier": "乌"
++    },
++    "l": {
++      "ph": "le1",
++      "carrier": "勒"
++    },
++    "t": {
++      "ph": "te1",
++      "carrier": "特"
++    },
++    "gāi": {
++      "ph": "gai1",
++      "carrier": "该"
++    },
++    "guāi": {
++      "ph": "guai1",
++      "carrier": "乖"
++    },
++    "tái": {
++      "ph": "tai2",
++      "carrier": "台"
++    },
++    "kāi": {
++      "ph": "kai1",
++      "carrier": "开"
++    },
++    "cāi": {
++      "ph": "cai1",
++      "carrier": "猜"
++    },
++    "huài": {
++      "ph": "huai4",
++      "carrier": "坏"
++    },
++    "kuài": {
++      "ph": "kuai4",
++      "carrier": "快"
++    },
++    "lèi": {
++      "ph": "lei4",
++      "carrier": "泪"
++    },
++    "bēi": {
++      "ph": "bei1",
++      "carrier": "杯"
++    },
++    "péi": {
++      "ph": "pei2",
++      "carrier": "陪"
++    },
++    "fēi": {
++      "ph": "fei1",
++      "carrier": "飞"
++    },
++    "gěi": {
++      "ph": "gei3",
++      "carrier": "给"
++    },
++    "wéi": {
++      "ph": "wei2",
++      "carrier": "围"
++    },
++    "hēi": {
++      "ph": "hei1",
++      "carrier": "黑"
++    },
++    "tuǐ": {
++      "ph": "tui3",
++      "carrier": "腿"
++    },
++    "huì": {
++      "ph": "hui4",
++      "carrier": "会"
++    },
++    "duī": {
++      "ph": "dui1",
++      "carrier": "堆"
++    },
++    "chuī": {
++      "ph": "chui1",
++      "carrier": "吹"
++    },
++    "zuǐ": {
++      "ph": "zui3",
++      "carrier": "嘴"
++    },
++    "suì": {
++      "ph": "sui4",
++      "carrier": "岁"
++    },
++    "ruì": {
++      "ph": "rui4",
++      "carrier": "瑞"
++    },
++    "pái": {
++      "ph": "pai2",
++      "carrier": "排"
++    },
++    "duì": {
++      "ph": "dui4",
++      "carrier": "队"
++    },
++    "luó": {
++      "ph": "luo2",
++      "carrier": "萝"
++    },
++    "bo": {
++      "ph": "bo5",
++      "carrier": "卜"
++    },
++    "bái": {
++      "ph": "bai2",
++      "carrier": "白"
++    },
++    "cài": {
++      "ph": "cai4",
++      "carrier": "菜"
++    },
++    "yā": {
++      "ph": "ya1",
++      "carrier": "鸭"
++    },
++    "lí": {
++      "ph": "li2",
++      "carrier": "梨"
++    },
++    "xī": {
++      "ph": "xi1",
++      "carrier": "西"
++    },
++    "guā": {
++      "ph": "gua1",
++      "carrier": "瓜"
++    },
++    "shū": {
++      "ph": "shu1",
++      "carrier": "蔬"
++    },
++    "shuǐ": {
++      "ph": "shui3",
++      "carrier": "水"
++    },
++    "guǒ": {
++      "ph": "guo3",
++      "carrier": "果"
++    }
++  },
++  "words": {},
++  "approvalBoundary": {
++    "recipeStatus": "registered-exact-sub-alias-candidate-pending-six-fixed-probes-and-exact-formal-sentence-listening",
++    "approvedProbeScope": "none-for-u4-l1-pending-human-review",
++    "formalListeningScope": "Every formal segment containing a registered Latin token, including all final, tone, spelling, picture-word, question, feedback and repetition segments.",
++    "humanReview": "pending",
++    "humanListeningVerified": false,
++    "perceptualToneVerified": false,
++    "pronunciationApproved": false,
++    "formalUseAllowed": false,
++    "probeScope": "six fixed files: ai base and four tones; ei base and four tones; ui base and four tones; four textbook spelling demonstrations; pai-dui; luo-bo with neutral bo.",
++    "wholeTokenBoundary": "Every Latin run is one complete registered token. No Unicode normalization, alpha-a/ASCII-a equivalence, numeric tone spelling, combining tone mark, per-letter fallback or concatenated phoneme recipe is allowed.",
++    "uiToneBoundary": "ui uses wei1 only as the unmarked final carrier recipe. Correct marked forms are uī/uí/uǐ/uì and map to wei1..4; ūi/úi/ǔi/ùi are rejected.",
++    "neutralToneBoundary": "bo maps only to bo5 in the fixed luó bo probe. The exact full source luó bo uses the Garden3 request representation sub alias 萝卜 followed by one Chinese full stop; all other source text keeps the v1 request. This is only a provider request representation and does not establish the second tone or neutral tone. Both must be verified by user listening before formal use.",
++    "pictureWordBoundary": "Registered picture/category tokens cover luó bo, bái cài, yā lí, xī guā, shū cài and shuǐ guǒ. Chinese words remain natural Chinese unless the frozen narration uses these exact pinyin tokens.",
++    "probeSuccessDoesNotProve": "all 21 textbook whole syllables, unprobed picture-word tokens, complete formal sentence fidelity, or publication readiness; every formal Latin-bearing segment still requires full human listening and ASR cannot establish tone or neutral-tone accuracy.",
++    "scopeBoundary": "Version 4 changes only the exact full-source luó bo provider request from the version 3 multi-character phoneme form to the Garden3 sub alias representation. Versions 1 through 3 remain registered for recovery, and no other request, token recipe or approval state changes."
++  },
++  "exactTextSsml": {
++    "luó bo": "<speak><sub alias=\"萝卜\">luó bo</sub>。</speak>"
++  }
++} as const;
++
+ export const MIRA_TEXTBOOK_PINYIN_AIEIUI_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_AIEIUI_PRONUNCIATION_POLICY));
++export const MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY));
+ type WholeTokenPolicy = typeof MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_GKH_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_JQX_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY
+@@ -3673,13 +4094,15 @@
+   | typeof MIRA_TEXTBOOK_PINYIN_YW_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_GARDEN3_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_GARDEN3_V2_PRONUNCIATION_POLICY
+-  | typeof MIRA_TEXTBOOK_PINYIN_AIEIUI_PRONUNCIATION_POLICY;
++  | typeof MIRA_TEXTBOOK_PINYIN_AIEIUI_PRONUNCIATION_POLICY
++  | typeof MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY;
+ type RegisteredPolicy = typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY | WholeTokenPolicy;
+ 
+ // Only server-owned recipes can enter this registry. A caller supplies an
+ // identity, never provider settings, an SSML template, or a symbol table.
+ const REGISTERED_POLICIES = new Map<string, { policy: RegisteredPolicy; sha256: string }>([
+   [MIRA_TEXTBOOK_PINYIN_AIEIUI_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_AIEIUI_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_AIEIUI_PRONUNCIATION_POLICY_SHA256 }],
++  [MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY_SHA256 }],
+   [MIRA_TEXTBOOK_PINYIN_GARDEN3_V2_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_GARDEN3_V2_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_GARDEN3_V2_PRONUNCIATION_POLICY_SHA256 }],
+   [MIRA_TEXTBOOK_PINYIN_GARDEN3_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_GARDEN3_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_GARDEN3_PRONUNCIATION_POLICY_SHA256 }],
+   [MIRA_TEXTBOOK_PINYIN_YW_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_YW_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_YW_PRONUNCIATION_POLICY_SHA256 }],
+@@ -3805,6 +4228,7 @@
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_GARDEN3_PRONUNCIATION_POLICY.policyVersion
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_GARDEN3_V2_PRONUNCIATION_POLICY.policyVersion
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_AIEIUI_PRONUNCIATION_POLICY.policyVersion
++      || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY.policyVersion
+     ? wholeTokenParts(text, policy) : Array.from(text).map(character => {
+     const symbol = symbols[character];
+     if (symbol) return `<phoneme alphabet="py" ph="${symbol.ph}">${symbol.carrier}</phoneme>`;
+diff --git a/tests/server/mira-textbook-pinyin-aieiui.test.ts b/tests/server/mira-textbook-pinyin-aieiui.test.ts
+--- a/tests/server/mira-textbook-pinyin-aieiui.test.ts
++++ b/tests/server/mira-textbook-pinyin-aieiui.test.ts
+@@ -129,3 +129,43 @@
+     expect(() => prepare(text, version)).toThrow();
+   });
+ });
++
++
++describe('AI EI UI frozen v4 registration', () => {
++  const v4 = 'mira.textbook.pinyin-aieiui-ssml.v4';
++  const backendV4 = JSON.parse(readFileSync(fileURLToPath(new URL(
++    '../../../../../backend/content/textbook_pinyin_pronunciation_aieiui.v4.json',
++    import.meta.url,
++  )), 'utf8'));
++
++  it('matches the frozen backend policy without changing v1', () => {
++    expect(registry.MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY).toEqual(backendV4);
++    expect(prepare('请听。', v4).profile.policySha256).toBe(
++      'd26d1744a110f0ed327d08cdfeb950fe8f15b198fb322f98aa5611f866c6b8b8',
++    );
++    expect(prepare('请听。', version).profile.policySha256).toBe(
++      '8b927f95d0f279c31c9ae90c7aebcaf8520c34ed829982fda8aa4dfebadd4188',
++    );
++    expect(prepare('luó bo', version).ssml).toBe(
++      '<speak><phoneme alphabet="py" ph="luo2">萝</phoneme> <phoneme alphabet="py" ph="bo5">卜</phoneme></speak>',
++    );
++  });
++
++  it('uses the approved full-source override only for its exact source', () => {
++    expect(prepare('luó bo', v4).ssml).toBe('<speak><sub alias="萝卜">luó bo</sub>。</speak>');
++    expect(prepare('请听，luó bo。', v4).ssml).toBe(prepare('请听，luó bo。', version).ssml);
++    expect(prepare('luó  bo', v4).ssml).not.toContain('<sub');
++    expect(() => prepare(' luó bo', v4)).toThrow();
++  });
++
++  it('keeps other whole-token recipes identical and rejects unregistered tokens', () => {
++    for (const text of Object.keys(probes).filter(text => text !== 'luó bo')) {
++      expect(prepare(text, v4).ssml).toBe(prepare(text, version).ssml);
++      expect(prepare(text, v4).providerRequest).toEqual(prepare(text, version).providerRequest);
++    }
++    for (const text of ['ai', 'ūi', 'bo5', 'luo', 'áí', 'abc', 'u\u0301i']) {
++      expect(() => prepare(text, v4)).toThrow();
++    }
++    expect(() => prepare('请听。', 'mira.textbook.pinyin-aieiui-ssml.v5')).toThrow();
++  });
++});

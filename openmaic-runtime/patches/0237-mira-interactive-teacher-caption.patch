@@ -1,0 +1,297 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -51,12 +51,12 @@
+ import { ChatArea, type ChatAreaRef } from '@/components/chat/chat-area';
+ import type { SessionCleanupPayload } from '@/components/chat/use-chat-sessions';
+ import { agentsToParticipants, useAgentRegistry } from '@/lib/orchestration/registry/store';
+-import { ACTIVITY_AUDIO_EVENT, beginQuestionNarrationScene, releaseQuestionNarrationScene, setLectureSpeaking, subscribeQuestionNarration } from '@/lib/mira/lecture-audio';
++import { ACTIVITY_AUDIO_EVENT, beginQuestionNarrationScene, releaseQuestionNarrationScene, setLectureSpeaking, subscribeQuestionNarration, subscribeInteractiveNarration } from '@/lib/mira/lecture-audio';
+ import { getPageNarration, subscribePageNarration, setPageAudioPreferences, pausePageNarration, releasePageNarrationPause, togglePageNarration } from '@/lib/mira/page-narration';
+ import { isStudentParentPause } from '@/lib/mira/student-parent-pause';
+ import { useMiraStudentParentOrigins } from '@/lib/contexts/mira-student-runtime-context';
+ import { fixedQuizQuestionNarrationText } from '@/lib/mira/fixed-quiz-narration';
+-import { fixedPageManagedSpeechIds, lectureModeOwnsAudio, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
++import { fixedPageManagedSpeechIds, fixedInteractiveNarrationText, speechAfterActivityGesture, lectureModeOwnsAudio, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
+ import { classroomFullscreenRoot } from '@/lib/interactive/classroom-fullscreen-root';
+ import type { AgentConfig } from '@/lib/orchestration/registry/types';
+ import {
+@@ -360,7 +360,7 @@
+       const pauseForActivity = () => {
+         releasePageNarrationPause();
+         engineRef.current?.pause();
+-        setLectureSpeech(null);
++        setLectureSpeech(previous => speechAfterActivityGesture(useStageStore.getState().getCurrentScene(), previous));
+         setLiveSpeech(null);
+         setSuppressIdleSpeech(true);
+         const sceneId = useStageStore.getState().currentSceneId;
+@@ -376,8 +376,18 @@
+         setLiveSpeech(null);
+         setSuppressIdleSpeech(true);
+       });
++      const unsubscribeInteractive = subscribeInteractiveNarration((sceneId, cueId) => {
++        const state = useStageStore.getState();
++        const text = fixedInteractiveNarrationText(state.getCurrentScene(),
++          usesTextbookPageNarration(state.stage), sceneId, cueId);
++        if (text === null) return;
++        setLectureSpeech(text);
++        setLiveSpeech(null);
++        setSuppressIdleSpeech(true);
++      });
+       return () => {
+         window.removeEventListener(ACTIVITY_AUDIO_EVENT, pauseForActivity);
++        unsubscribeInteractive();
+         unsubscribeQuestion();
+         setLectureSpeaking(false);
+       };
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -20,8 +20,10 @@
+   LECTURE_AUDIO_EVENT,
+   isLectureSpeaking,
+   pageNarrationAllowed,
++  notifyInteractiveNarration,
+ } from '@/lib/mira/lecture-audio';
+ import { getPageNarration, subscribePageNarration } from '@/lib/mira/page-narration';
++import { fixedInteractiveNarrationText, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
+ import { intersectClientBoxes } from '@/lib/edit/visible-client-rect';
+ import { useCanvasStore } from '@/lib/store/canvas';
+ import { useElementRefsStore } from '@/lib/store/element-refs';
+@@ -330,6 +332,22 @@
+     window.addEventListener('message', interact);
+     return () => window.removeEventListener('message', interact);
+   }, [shown]);
++  useEffect(() => {
++    const caption = (event: MessageEvent) => {
++      const state = useStageStore.getState();
++      const data = event.data;
++      if (!shown || !visibleRef.current || isLectureSpeaking() || getPageNarration().paused
++          || state.currentSceneId !== sceneId || event.source !== iframeRef.current?.contentWindow
++          || !data || typeof data !== 'object' || Array.isArray(data)
++          || Object.keys(data).length !== 3 || data.type !== 'MIRA_ACTIVITY_NARRATION'
++          || data.status !== 'playing' || typeof data.cueId !== 'string') return;
++      if (fixedInteractiveNarrationText(state.getCurrentScene(), usesTextbookPageNarration(state.stage),
++        sceneId, data.cueId) === null) return;
++      notifyInteractiveNarration(sceneId, data.cueId);
++    };
++    window.addEventListener('message', caption);
++    return () => window.removeEventListener('message', caption);
++  }, [shown, sceneId, entry.srcDoc]);
+   // A tap inside the page moves focus into the frame: pause the lecture so the
+   // child hears the answer to what they did. The play control resumes it.
+   useEffect(() => {
+diff --git a/lib/mira/lecture-audio.ts b/lib/mira/lecture-audio.ts
+--- a/lib/mira/lecture-audio.ts
++++ b/lib/mira/lecture-audio.ts
+@@ -55,3 +55,14 @@
+   if (!isQuestionNarrationReady(sceneId)) return;
+   questionListeners.forEach(listener => listener(sceneId, questionId));
+ }
++
++// Interactive captions use fixed cue identities; authored iframe text is never accepted.
++type InteractiveNarrationListener = (sceneId: string, cueId: string) => void;
++const interactiveListeners = new Set<InteractiveNarrationListener>();
++export function subscribeInteractiveNarration(listener: InteractiveNarrationListener): () => void {
++  interactiveListeners.add(listener);
++  return () => { interactiveListeners.delete(listener); };
++}
++export function notifyInteractiveNarration(sceneId: string, cueId: string): void {
++  interactiveListeners.forEach(listener => listener(sceneId, cueId));
++}
+diff --git a/lib/mira/page-managed-narration.ts b/lib/mira/page-managed-narration.ts
+--- a/lib/mira/page-managed-narration.ts
++++ b/lib/mira/page-managed-narration.ts
+@@ -117,3 +117,35 @@
+   } catch { return new Set<string>(); }
+   return managed;
+ }
++
++/** Resolve a caption from the same exact audio/text binding used for ownership.
++ * A playing event is only a cue identity, never an authority for teacher text. */
++export function fixedInteractiveNarrationText(scene: Scene | null | undefined, fixedTextbook: boolean,
++  sceneId: string, cueId: string): string | null {
++  if (!scene || scene.id !== sceneId || scene.type !== 'interactive' || scene.content.type !== 'interactive'
++      || !/^[\w-]{1,128}$/.test(cueId)) return null;
++  const managed = fixedPageManagedSpeechIds(scene, fixedTextbook);
++  if (!managed.size) return null;
++  if (scene.miraPageNarration !== undefined) {
++    const binding = scene.miraPageNarration.bindings.find(item => item.cueId === cueId && managed.has(item.speechId));
++    return binding?.text ?? null;
++  }
++  try {
++    const html = scene.content.html ?? '';
++    const cues = JSON.parse(script(html, 'mira-narration-cues', 'application/json') ?? 'null');
++    const helper = script(html, 'mira-pre-recorded-audio');
++    const clips = JSON.parse(helper?.match(/\bconst clips=(\{[^\n]*?\});let active=null;/)?.[1] ?? 'null');
++    const cue = cues.cues.find((item: { id: string }) => item.id === cueId);
++    const audioPath = recordedPath(clips?.[cueId]);
++    if (!cue || !audioPath) return null;
++    const action = scene.actions?.find(action => action.type === 'speech' && managed.has(action.id)
++      && action.text.trim() === cue.text.trim() && recordedPath(action.audioUrl) === audioPath);
++    return action?.type === 'speech' ? action.text : null;
++  } catch { return null; }
++}
++
++/** A gesture takes the sound channel, not the already visible teacher sentence. */
++export function speechAfterActivityGesture(scene: Scene | null | undefined, previous: string | null): string | null {
++  if (scene?.type !== 'interactive') return null;
++  return previous ?? scene.actions?.find(action => action.type === 'speech')?.text ?? null;
++}
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -110,6 +110,13 @@
+     if (!event.isTrusted || (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ')) return;
+     window.parent.postMessage({ type: 'MIRA_ACTIVITY_INTERACTION' }, '*');
+   }
++  // Captions carry identities only. The host resolves text from its own bound
++  // scene, and only an actually playing cue may replace the visible sentence.
++  window.addEventListener('mira-narration-state', function (event) {
++    var detail = event && event.detail;
++    if (!detail || detail.status !== 'playing' || typeof detail.cueId !== 'string') return;
++    window.parent.postMessage({ type: 'MIRA_ACTIVITY_NARRATION', cueId: detail.cueId, status: 'playing' }, '*');
++  });
+   document.addEventListener('pointerdown', notify, true);
+   document.addEventListener('keydown', notify, true);
+ })();
+diff --git a/tests/lib/utils/iframe.test.ts b/tests/lib/utils/iframe.test.ts
+--- a/tests/lib/utils/iframe.test.ts
++++ b/tests/lib/utils/iframe.test.ts
+@@ -145,3 +145,23 @@
+     expect(posts).toHaveLength(4);
+   });
+ });
++
++
++describe('interactive caption shim', () => {
++  it('forwards only a playing cue identity before authored scripts without carrying their text', () => {
++    const out = patchHtmlForIframe('<html><head><script>window.authored = true</script></head><body></body></html>');
++    const shim = out.match(/<script data-mira-activity-intent>([\s\S]*?)<\/script>/)?.[1];
++    expect(shim).toBeTruthy();
++    expect(out.indexOf('MIRA_ACTIVITY_NARRATION')).toBeLessThan(out.indexOf('window.authored'));
++    const posts: unknown[] = [];
++    const handlers: Record<string, (event: unknown) => void> = {};
++    const win = { parent: { postMessage: (data: unknown) => posts.push(data) },
++      addEventListener: (name: string, callback: (event: unknown) => void) => { handlers[name] = callback; } };
++    new Function('window', 'document', shim!)(win, { addEventListener: () => {} });
++    for (const status of ['ready', 'error', 'missing', 'hidden', 'queued'])
++      handlers['mira-narration-state']({ detail: { cueId: 'old', status } });
++    expect(posts).toEqual([]);
++    handlers['mira-narration-state']({ detail: { cueId: 'retry', status: 'playing', text: 'ignore me' } });
++    expect(posts).toEqual([{ type: 'MIRA_ACTIVITY_NARRATION', cueId: 'retry', status: 'playing' }]);
++  });
++});
+diff --git a/tests/playback/page-managed-narration.test.ts b/tests/playback/page-managed-narration.test.ts
+--- a/tests/playback/page-managed-narration.test.ts
++++ b/tests/playback/page-managed-narration.test.ts
+@@ -1,5 +1,5 @@
+ import { afterEach, describe, expect, it, vi } from 'vitest';
+-import { fixedPageManagedSpeechIds, lectureModeOwnsAudio, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
++import { fixedPageManagedSpeechIds, fixedInteractiveNarrationText, speechAfterActivityGesture, lectureModeOwnsAudio, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
+ import { PlaybackEngine } from '@/lib/playback/engine';
+ import type { Scene } from '@/lib/types/stage';
+ import type { SpeechAction } from '@/lib/types/action';
+@@ -182,3 +182,26 @@
+     expect([...fixedPageManagedSpeechIds(scene, true)]).toEqual(cues.map(c => `speech-${c.id}`));
+   });
+ });
++
++
++describe('current interactive teacher captions', () => {
++  it.each([activity, () => deliveredActivity(false), () => deliveredActivity(true)])
++    ('resolves each bound cue after real delivery transforms and never accepts arbitrary text', factory => {
++      const scene = factory();
++      for (const cue of cues) expect(fixedInteractiveNarrationText(scene, true, scene.id, cue.id)).toBe(cue.text);
++      expect(fixedInteractiveNarrationText(scene, false, scene.id, 'start')).toBeNull();
++      expect(fixedInteractiveNarrationText(scene, true, 'other-scene', 'start')).toBeNull();
++      expect(fixedInteractiveNarrationText(scene, true, scene.id, 'unbound')).toBeNull();
++      (scene.actions!.find(action => action.id === 'speech-start') as SpeechAction).text = 'changed text';
++      expect(fixedInteractiveNarrationText(scene, true, scene.id, 'start')).toBeNull();
++    });
++  it('keeps the latest teacher sentence through repeated gestures, and handles the displayed opening before a cue plays', () => {
++    const scene = activity();
++    expect(speechAfterActivityGesture(scene, null)).toBe(cues[0].text);
++    let text: string | null = cues[2].text;
++    for (let i = 0; i < 4; i++) text = speechAfterActivityGesture(scene, text);
++    expect(text).toBe(cues[2].text);
++    expect(speechAfterActivityGesture({ ...scene, type: 'quiz' } as Scene, text)).toBeNull();
++    expect(speechAfterActivityGesture(null, text)).toBeNull();
++  });
++});
+diff --git a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+--- a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
++++ b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+@@ -2,7 +2,7 @@
+ import { act, createElement } from 'react';
+ import { createRoot, type Root } from 'react-dom/client';
+ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+-import { ACTIVITY_AUDIO_EVENT, setLectureSpeaking } from '@/lib/mira/lecture-audio';
++import { ACTIVITY_AUDIO_EVENT, setLectureSpeaking, subscribeInteractiveNarration } from '@/lib/mira/lecture-audio';
+ import { lectureModeOwnsAudio } from '@/lib/mira/page-managed-narration';
+ import { PlaybackEngine } from '@/lib/playback/engine';
+ import type { Scene } from '@/lib/types/stage';
+@@ -11,6 +11,7 @@
+ import { pausePageNarration, releasePageNarrationPause } from '@/lib/mira/page-narration';
+ import { InteractiveIframeHost } from '@/components/scene-renderers/InteractiveIframeHost';
+ import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
++import { useStageStore } from '@/lib/store/stage';
+ 
+ vi.mock('@/lib/contexts/mira-student-runtime-context', () => ({
+   useMiraStudentRuntimeEvents: () => null,
+@@ -192,3 +193,55 @@
+     engine.stop();
+   });
+ });
++
++
++describe('interactive narration caption boundary', () => {
++  it('accepts only current visible bound playing cues and ignores end/error noise and foreign frames', async () => {
++    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
++    releasePageNarrationPause(); setLectureSpeaking(false);
++    messages = new WeakMap(); windows = new WeakMap();
++    vi.spyOn(HTMLIFrameElement.prototype, 'contentWindow', 'get').mockImplementation(function (this: HTMLIFrameElement) {
++      if (!messages.has(this)) messages.set(this, vi.fn());
++      if (!windows.has(this)) windows.set(this, { postMessage: messages.get(this)! } as unknown as Window);
++      return windows.get(this)!;
++    });
++    const scene = (id: string) => ({ id, stageId: 'lesson-caption', title: 'practice', order: 1, type: 'interactive',
++      actions: [{ id: 'speech-task', type: 'speech', text: '把三位伙伴放进队圈。', audioUrl: '/api/classroom-media/lesson-caption/audio/task.wav' },
++        { id: 'speech-retry', type: 'speech', text: '再数数，多了一位。', audioUrl: '/api/classroom-media/lesson-caption/audio/retry.wav' }],
++      content: { type: 'interactive', html: `<script id="mira-narration-cues" type="application/json">{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"task","text":"把三位伙伴放进队圈。"},{"id":"retry","text":"再数数，多了一位。"}]}</script><script id="mira-pre-recorded-audio">const clips={"task":"/api/classroom-media/lesson-caption/audio/task.wav","retry":"/api/classroom-media/lesson-caption/audio/retry.wav"};let active=null;</script>` },
++    } as Scene);
++    useStageStore.setState({ stage: { id: 'lesson-caption', fixedTextbook: true } as never,
++      scenes: [scene('one'), scene('two')], currentSceneId: 'one' });
++    useInteractiveIframePool.getState().configureClassroom('lesson-caption', []);
++    prepare('one'); prepare('two'); useInteractiveIframePool.getState().setActive('one');
++    const heard = vi.fn(); const unsubscribe = subscribeInteractiveNarration(heard);
++    try {
++      await mountHost();
++      const emit = (source: Window, data: unknown) => act(() => {
++        window.dispatchEvent(new MessageEvent('message', { source, data }));
++      });
++      const cue = (cueId = 'task', status = 'playing') => ({ type: 'MIRA_ACTIVITY_NARRATION', cueId, status });
++      emit(frame().contentWindow!, cue());
++      expect(heard.mock.calls).toEqual([['one', 'task']]);
++      emit(window, cue()); emit(frame('two').contentWindow!, cue());
++      emit(frame().contentWindow!, { ...cue(), text: 'forged teacher text' });
++      emit(frame().contentWindow!, cue('unknown')); emit(frame().contentWindow!, cue('task', 'queued'));
++      expect(heard).toHaveBeenCalledTimes(1);
++      emit(frame().contentWindow!, cue('retry'));
++      for (const status of ['ready', 'error', 'missing', 'hidden']) emit(frame().contentWindow!, cue('task', status));
++      expect(heard.mock.calls).toEqual([['one', 'task'], ['one', 'retry']]);
++      act(() => pausePageNarration()); emit(frame().contentWindow!, cue());
++      act(() => releasePageNarrationPause()); act(() => setLectureSpeaking(true)); emit(frame().contentWindow!, cue());
++      act(() => setLectureSpeaking(false));
++      expect(heard).toHaveBeenCalledTimes(2);
++      await act(async () => { useStageStore.setState({ currentSceneId: 'two' }); useInteractiveIframePool.getState().setActive('two'); });
++      emit(frame().contentWindow!, cue('retry')); emit(frame('two').contentWindow!, cue());
++      expect(heard.mock.calls.at(-1)).toEqual(['two', 'task']); expect(heard).toHaveBeenCalledTimes(3);
++    } finally {
++      unsubscribe(); await act(async () => root?.unmount()); root = undefined;
++      useStageStore.setState({ stage: null, scenes: [], currentSceneId: null });
++      useInteractiveIframePool.getState().reset(); document.body.replaceChildren();
++      vi.restoreAllMocks(); vi.unstubAllGlobals(); releasePageNarrationPause(); setLectureSpeaking(false);
++    }
++  });
++});

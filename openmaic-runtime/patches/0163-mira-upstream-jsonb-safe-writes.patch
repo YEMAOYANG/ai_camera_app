@@ -1,0 +1,673 @@
+diff --git a/lib/persistence/owner-materials.ts b/lib/persistence/owner-materials.ts
+index 46e2b276..455b6410 100644
+--- a/lib/persistence/owner-materials.ts
++++ b/lib/persistence/owner-materials.ts
+@@ -22,6 +22,7 @@
+  * the pointer to the bytes.
+  */
+ import { splitSqlStatements, type Queryable } from '@openmaic/storage/document/pg';
++import { encodeJson } from '@openmaic/storage/pg-json';
+ import {
+   nodePostgresTransaction,
+   type ConnectableQueryable,
+@@ -332,7 +333,7 @@ export async function registerOwnerMaterial(
+         input.bytes,
+         input.originalName ?? null,
+         input.ossKey,
+-        input.extraction ? JSON.stringify(input.extraction) : null,
++        input.extraction ? encodeJson(input.extraction, 'owner material extraction') : null,
+         Date.now(),
+       ],
+     );
+diff --git a/packages/@openmaic/storage/package.json b/packages/@openmaic/storage/package.json
+index 4e5e8afa..67f91473 100644
+--- a/packages/@openmaic/storage/package.json
++++ b/packages/@openmaic/storage/package.json
+@@ -74,6 +74,10 @@
+     "./server/reference": {
+       "types": "./dist/server/reference.d.ts",
+       "import": "./dist/server/reference.js"
++    },
++    "./pg-json": {
++      "types": "./dist/pg-json.d.ts",
++      "import": "./dist/pg-json.js"
+     }
+   },
+   "files": [
+diff --git a/packages/@openmaic/storage/src/agent-session/pg.ts b/packages/@openmaic/storage/src/agent-session/pg.ts
+index 401c1890..0d85ee25 100644
+--- a/packages/@openmaic/storage/src/agent-session/pg.ts
++++ b/packages/@openmaic/storage/src/agent-session/pg.ts
+@@ -8,6 +8,7 @@
+  */
+ import { randomUUID } from 'node:crypto';
+ 
++import { encodeJson } from '../pg-json.js';
+ import type { Queryable, WithTransaction } from '../runtime/pg.js';
+ import {
+   AGENT_SESSION_LIFECYCLE,
+@@ -314,16 +315,6 @@ function sessionMeta(row: SessionRow): AgentSessionMeta {
+   };
+ }
+ 
+-function encodeJson(value: unknown, label: string): string {
+-  try {
+-    const encoded = JSON.stringify(value === undefined ? null : value);
+-    if (encoded === undefined) throw new TypeError('value is not JSON-serializable');
+-    return encoded;
+-  } catch (error) {
+-    throw new Error(`@openmaic/storage: ${label} is not JSON-serializable`, { cause: error });
+-  }
+-}
+-
+ function decodedObject(value: unknown): Record<string, unknown> {
+   const decoded = typeof value === 'string' ? (JSON.parse(value) as unknown) : value;
+   return decoded && typeof decoded === 'object' ? (decoded as Record<string, unknown>) : {};
+diff --git a/packages/@openmaic/storage/src/asset/pg.ts b/packages/@openmaic/storage/src/asset/pg.ts
+index 72832bf3..be96fde2 100644
+--- a/packages/@openmaic/storage/src/asset/pg.ts
++++ b/packages/@openmaic/storage/src/asset/pg.ts
+@@ -36,6 +36,7 @@ import {
+   type AssetStore,
+ } from './types.js';
+ import { assertJsonValue, isLosslessJsonString } from '../runtime/json-value.js';
++import { encodeJson } from '../pg-json.js';
+ import type { Queryable, WithTransaction } from '../runtime/pg.js';
+ 
+ export type { QueryResult, Queryable, WithTransaction } from '../runtime/pg.js';
+@@ -156,13 +157,7 @@ class RegistryAssetQuotaExceeded extends Error {}
+ 
+ function encodeMeta(meta: AssetMeta): string {
+   assertJsonValue(meta, 'asset metadata');
+-  try {
+-    const encoded = JSON.stringify(meta);
+-    if (encoded === undefined) throw new TypeError('not serializable');
+-    return encoded;
+-  } catch {
+-    throw new Error('@openmaic/storage: asset metadata is not JSON-serializable');
+-  }
++  return encodeJson(meta, 'asset metadata');
+ }
+ 
+ function byteView(buffer: ArrayBuffer): Uint8Array {
+diff --git a/packages/@openmaic/storage/src/document/pg.ts b/packages/@openmaic/storage/src/document/pg.ts
+index 5fc4f32a..98411a94 100644
+--- a/packages/@openmaic/storage/src/document/pg.ts
++++ b/packages/@openmaic/storage/src/document/pg.ts
+@@ -36,6 +36,7 @@ import type {
+ } from './types.js';
+ import { DocumentFolderLimitError, DocumentNotFoundError, DocumentVersionError } from './types.js';
+ import { assertJsonValue, isLosslessJsonString } from '../runtime/json-value.js';
++import { encodeJson } from '../pg-json.js';
+ import type { Queryable, WithTransaction } from '../runtime/pg.js';
+ 
+ export type { QueryResult, Queryable, WithTransaction } from '../runtime/pg.js';
+@@ -411,16 +412,6 @@ function isPlainObject(value: unknown): boolean {
+   return prototype === Object.prototype || prototype === null;
+ }
+ 
+-function encodeJson(value: unknown, label: string): string {
+-  try {
+-    const encoded = JSON.stringify(value);
+-    if (encoded === undefined) throw new TypeError('value is not JSON-serializable');
+-    return encoded;
+-  } catch (error) {
+-    throw new Error(`@openmaic/storage: ${label} is not JSON-serializable`, { cause: error });
+-  }
+-}
+-
+ function isFutureVersioned(versioned: unknown): boolean {
+   if (typeof versioned !== 'object' || versioned === null) return false;
+   return !needsMigration(versioned) && dslVersionOf(versioned) !== DSL_VERSION;
+diff --git a/packages/@openmaic/storage/src/material/pg.ts b/packages/@openmaic/storage/src/material/pg.ts
+index 4d8196e1..b056cc3f 100644
+--- a/packages/@openmaic/storage/src/material/pg.ts
++++ b/packages/@openmaic/storage/src/material/pg.ts
+@@ -15,6 +15,7 @@
+  * dependency the URL trust-gate table has inside the agent-session schema.
+  */
+ import type { Queryable } from '../runtime/pg.js';
++import { encodeJson } from '../pg-json.js';
+ import {
+   AGENT_SESSION_MATERIAL_KINDS,
+   AgentSessionMaterialError,
+@@ -428,7 +429,7 @@ export class PgAgentSessionMaterialStore implements AgentSessionMaterialStore {
+       [
+         input.sourceId,
+         input.workerId,
+-        JSON.stringify(input.stats),
++        encodeJson(input.stats, 'material extraction stats'),
+         input.extractorVersion,
+         derived.map((item) => item.id),
+         derived.map((item) => item.kind),
+diff --git a/packages/@openmaic/storage/src/pg-json.ts b/packages/@openmaic/storage/src/pg-json.ts
+new file mode 100644
+index 00000000..27763208
+--- /dev/null
++++ b/packages/@openmaic/storage/src/pg-json.ts
+@@ -0,0 +1,114 @@
++/**
++ * Shared encoding boundary for every PostgreSQL JSONB parameter written by the
++ * storage backends. JSON.stringify emits two escape families that PostgreSQL
++ * jsonb refuses, aborting the whole statement (and, for an agent session, the
++ * whole run):
++ *
++ *  - U+0000, serialized as `\u0000`   -> SQLSTATE 22P05
++ *  - a lone UTF-16 surrogate (`\udXXX`) -> SQLSTATE 22P02
++ *
++ * Both are replaced with U+FFFD before the value reaches a jsonb parameter.
++ * Valid surrogate pairs (emoji) are legal and must survive.
++ *
++ * Sanitizing the *serialized* text is unsafe: a literal `\ud800` in the content
++ * is emitted as `\\ud800`, so any regex or scanner that does not pair backslash
++ * escapes would rewrite it and produce invalid JSON. Instead the replacement
++ * runs on the in-memory values and object keys before `JSON.stringify`. A
++ * replacer cannot see object keys, so an object whose keys contain an offender
++ * is rebuilt explicitly; values are otherwise serialized exactly as before.
++ *
++ * Two distinct keys can sanitize to the same string (for example `"a\u0000"`
++ * and `"a\uFFFD"` both become `"a\uFFFD"`). Emitting both members under that
++ * one key would silently drop one, so a later colliding member is emitted under
++ * a deterministic disambiguated key instead.
++ */
++
++const REPLACEMENT = '\uFFFD';
++
++/**
++ * Disambiguation for two members whose sanitized keys collide. The first member
++ * keeps the plain sanitized key; each later colliding member gets `#2`, `#3`,
++ * ... appended to that key until the result is unique among the keys emitted so
++ * far (whether a prior key was sanitized or already collision-free). The
++ * separator is ASCII `#` followed by an ordinal: it contains no NUL or
++ * surrogate, and the sanitizer alone can only ever emit U+FFFD, never `#`, so a
++ * suffixed key cannot be confused with a bare replacement result. Member order
++ * is preserved.
++ */
++const KEY_COLLISION_SEPARATOR = '#';
++
++/**
++ * Replace every U+0000 and unpaired UTF-16 surrogate code unit with U+FFFD.
++ * Returns the input unchanged when it contains no offender, so the common case
++ * allocates nothing and JSON output stays byte-identical.
++ */
++export function sanitizeJsonString(value: string): string {
++  let result = '';
++  let last = 0;
++  for (let index = 0; index < value.length; index += 1) {
++    const code = value.charCodeAt(index);
++    const isHighSurrogate = code >= 0xd800 && code <= 0xdbff;
++    const isLowSurrogate = code >= 0xdc00 && code <= 0xdfff;
++    if (isHighSurrogate && index + 1 < value.length) {
++      const next = value.charCodeAt(index + 1);
++      if (next >= 0xdc00 && next <= 0xdfff) {
++        // A valid pair is one astral code point: keep both code units.
++        index += 1;
++        continue;
++      }
++    }
++    if (code !== 0x0000 && !isHighSurrogate && !isLowSurrogate) continue;
++    result += value.slice(last, index) + REPLACEMENT;
++    last = index + 1;
++  }
++  return last === 0 ? value : result + value.slice(last);
++}
++
++/**
++ * `JSON.stringify` replacer: sanitize string values, and rebuild an object only
++ * when one of its keys needs sanitizing. Arrays and all other values pass
++ * through so stringify's own member/array/toJSON semantics are preserved.
++ *
++ * The rebuilt object has a null prototype so an own `__proto__` member stays an
++ * own data property: assigning `__proto__` on a normal `{}` invokes the
++ * prototype setter and drops the member from the JSON output. Colliding
++ * sanitized keys are disambiguated as described on `KEY_COLLISION_SEPARATOR`.
++ * Exported for direct unit testing of the fast path and disambiguation.
++ */
++export function sanitizeJsonValue(_key: string, value: unknown): unknown {
++  if (typeof value === 'string') return sanitizeJsonString(value);
++  if (value === null || typeof value !== 'object' || Array.isArray(value)) return value;
++  let keysChanged = false;
++  const rebuilt: Record<string, unknown> = Object.create(null);
++  const emitted = new Set<string>();
++  for (const key of Object.keys(value)) {
++    const safeKey = sanitizeJsonString(key);
++    if (safeKey !== key) keysChanged = true;
++    let emittedKey = safeKey;
++    if (emitted.has(emittedKey)) {
++      let ordinal = 2;
++      do {
++        emittedKey = `${safeKey}${KEY_COLLISION_SEPARATOR}${ordinal}`;
++        ordinal += 1;
++      } while (emitted.has(emittedKey));
++    }
++    emitted.add(emittedKey);
++    rebuilt[emittedKey] = (value as Record<string, unknown>)[key];
++  }
++  return keysChanged ? rebuilt : value;
++}
++
++/**
++ * Serialize `value` for a PostgreSQL JSONB parameter, sanitizing the two
++ * escape families jsonb cannot store. `label` names the value in the thrown
++ * error when it is not JSON-serializable.
++ */
++export function encodeJson(value: unknown, label: string): string {
++  try {
++    const encoded = JSON.stringify(value === undefined ? null : value, sanitizeJsonValue);
++    if (encoded === undefined) throw new TypeError('value is not JSON-serializable');
++    return encoded;
++  } catch (error) {
++    throw new Error(`@openmaic/storage: ${label} is not JSON-serializable`, { cause: error });
++  }
++}
+diff --git a/packages/@openmaic/storage/src/runtime/pg.ts b/packages/@openmaic/storage/src/runtime/pg.ts
+index 3c76aa38..6d1d3d85 100644
+--- a/packages/@openmaic/storage/src/runtime/pg.ts
++++ b/packages/@openmaic/storage/src/runtime/pg.ts
+@@ -37,6 +37,7 @@ import type {
+ } from './types.js';
+ import { RuntimeAppendConflictError } from './types.js';
+ import { assertJsonValue, isLosslessJsonString } from './json-value.js';
++import { encodeJson } from '../pg-json.js';
+ 
+ export interface QueryResult<TRow extends Record<string, unknown> = Record<string, unknown>> {
+   rows: TRow[];
+@@ -165,16 +166,6 @@ function isPlainObject(value: unknown): boolean {
+   return prototype === Object.prototype || prototype === null;
+ }
+ 
+-function encodeJson(value: unknown, label: string): string {
+-  try {
+-    const encoded = JSON.stringify(value);
+-    if (encoded === undefined) throw new TypeError('value is not JSON-serializable');
+-    return encoded;
+-  } catch (error) {
+-    throw new Error(`@openmaic/storage: ${label} is not JSON-serializable`, { cause: error });
+-  }
+-}
+-
+ function isFutureRuntimeVersioned(row: unknown): boolean {
+   if (typeof row !== 'object' || row === null) return false;
+   return !needsRuntimeMigration(row) && runtimeDslVersionOf(row) !== RUNTIME_DSL_VERSION;
+diff --git a/packages/@openmaic/storage/test/pg-agent-session-material.test.ts b/packages/@openmaic/storage/test/pg-agent-session-material.test.ts
+index 8c1401dd..8fed906c 100644
+--- a/packages/@openmaic/storage/test/pg-agent-session-material.test.ts
++++ b/packages/@openmaic/storage/test/pg-agent-session-material.test.ts
+@@ -181,6 +181,44 @@ describe('PgAgentSessionMaterialStore with PGlite', () => {
+     });
+   });
+ 
++  test('persists extraction stats containing NUL and lone surrogates', async () => {
++    const sessions = new PgAgentSessionStore(db, {
++      withTransaction: (body) => db.transaction((tx: Queryable) => body(tx)),
++    });
++    await sessions.createSession({ id: 'session-1', ownerId: 'owner-a', prompt: 'p' });
++    const source = await store.createMaterial('session-1', {
++      id: 'mat_source',
++      kind: 'source',
++      title: 'notes.txt',
++    });
++    await store.enqueueExtraction('session-1', source.id);
++    await store.claimNextExtraction('worker-a', { leaseTtlMs: 10_000 });
++
++    expect(
++      await store.completeExtraction({
++        sourceId: source.id,
++        workerId: 'worker-a',
++        extractorVersion: 'plain-text@1',
++        stats: {
++          chars: 5,
++          pages: 0,
++          imageCount: 0,
++          diagnostics: [`bad\u0000diag`, `bad\uD800diag`],
++        },
++        derived: {
++          id: 'mat_extracted',
++          kind: 'extraction',
++          textAssetId: 'ast_text',
++          textChars: 5,
++        },
++      }),
++    ).toBe(true);
++
++    expect((await store.getMaterial('session-1', source.id))?.extraction.stats).toMatchObject({
++      diagnostics: ['bad\uFFFDdiag', 'bad\uFFFDdiag'],
++    });
++  });
++
+   test('reclaims an expired running lease and fences the previous worker', async () => {
+     const sessions = new PgAgentSessionStore(db, {
+       withTransaction: (body) => db.transaction((tx: Queryable) => body(tx)),
+diff --git a/packages/@openmaic/storage/test/pg-agent-session-store.test.ts b/packages/@openmaic/storage/test/pg-agent-session-store.test.ts
+index 1d2eca04..ba0b1060 100644
+--- a/packages/@openmaic/storage/test/pg-agent-session-store.test.ts
++++ b/packages/@openmaic/storage/test/pg-agent-session-store.test.ts
+@@ -193,6 +193,95 @@ describe('PgAgentSessionStore with PGlite', () => {
+     await expect(tree.getLeafId()).rejects.toBeInstanceOf(AgentSessionEntryTreeError);
+   });
+ 
++  test('persists NUL and lone surrogates in tree entries and events', async () => {
++    await store.createSession(makeAgentSessionInput());
++    await store.claimNextSession('worker-a', 101, { leaseTtlMs: 10_000, maxAttempts: 3 });
++    const tree = await store.openEntryTree('session-1', 'worker-a', 1);
++    const replacement = '\uFFFD';
++    const emoji = '\u{1F600}';
++    const dirty = `a\u0000b\uD800c\uDC00d`;
++
++    await tree.appendEntry({
++      id: 'dirty',
++      parentId: null,
++      type: 'message',
++      timestamp: '2026-01-01T00:00:00.000Z',
++      message: { role: 'assistant', content: dirty, [`key\u0000`]: `value\uD800` },
++      emoji,
++    });
++    await store.appendControlEvent('session-1', {
++      ts: 1,
++      type: 'control',
++      data: { text: dirty, emoji },
++    });
++
++    const reopened = await store.openEntryTree('session-1', 'worker-a', 1);
++    const entry = (await reopened.getEntries())[0] as Record<string, unknown>;
++    expect(entry.message).toEqual({
++      role: 'assistant',
++      content: `a${replacement}b${replacement}c${replacement}d`,
++      [`key${replacement}`]: `value${replacement}`,
++    });
++    expect(entry.emoji).toBe(emoji);
++
++    const events = await store.readEventsAfter('session-1', 0);
++    const control = events.find((event) => event.type === 'control');
++    expect(control?.data).toEqual({
++      text: `a${replacement}b${replacement}c${replacement}d`,
++      emoji,
++    });
++  });
++
++  test('keeps colliding sanitized keys as separate tree-entry members', async () => {
++    await store.createSession(makeAgentSessionInput());
++    await store.claimNextSession('worker-a', 101, { leaseTtlMs: 10_000, maxAttempts: 3 });
++    const tree = await store.openEntryTree('session-1', 'worker-a', 1);
++    const replacement = '\uFFFD';
++
++    await tree.appendEntry({
++      id: 'collide',
++      parentId: null,
++      type: 'message',
++      timestamp: '2026-01-01T00:00:00.000Z',
++      message: {
++        [`a\u0000`]: { first: true },
++        [`a${replacement}`]: { second: true },
++      },
++    });
++
++    const reopened = await store.openEntryTree('session-1', 'worker-a', 1);
++    const entry = (await reopened.getEntries())[0] as Record<string, unknown>;
++    expect(entry.message).toEqual({
++      [`a${replacement}`]: { first: true },
++      [`a${replacement}#2`]: { second: true },
++    });
++  });
++
++  test('keeps an own __proto__ member alongside a NUL key in a tree entry', async () => {
++    await store.createSession(makeAgentSessionInput());
++    await store.claimNextSession('worker-a', 101, { leaseTtlMs: 10_000, maxAttempts: 3 });
++    const tree = await store.openEntryTree('session-1', 'worker-a', 1);
++    const message = JSON.parse(`{"__proto__":{"own":true},"x\\u0000":1}`) as Record<
++      string,
++      unknown
++    >;
++
++    await tree.appendEntry({
++      id: 'proto',
++      parentId: null,
++      type: 'message',
++      timestamp: '2026-01-01T00:00:00.000Z',
++      message,
++    });
++
++    const reopened = await store.openEntryTree('session-1', 'worker-a', 1);
++    const entry = (await reopened.getEntries())[0] as Record<string, unknown>;
++    const stored = entry.message as Record<string, unknown>;
++    expect(Object.prototype.hasOwnProperty.call(stored, '__proto__')).toBe(true);
++    expect(stored['__proto__']).toEqual({ own: true });
++    expect(stored['x\uFFFD']).toBe(1);
++  });
++
+   test('keeps event and tree rows physically present after a tombstone', async () => {
+     await store.createSession(makeAgentSessionInput());
+     await store.appendControlEvent('session-1', {
+diff --git a/packages/@openmaic/storage/test/pg-json.test.ts b/packages/@openmaic/storage/test/pg-json.test.ts
+new file mode 100644
+index 00000000..c103d5a1
+--- /dev/null
++++ b/packages/@openmaic/storage/test/pg-json.test.ts
+@@ -0,0 +1,197 @@
++import { describe, expect, test } from 'vitest';
++import { encodeJson, sanitizeJsonString, sanitizeJsonValue } from '../src/pg-json.js';
++
++const NUL = '\u0000';
++const REPLACEMENT = '\uFFFD';
++
++describe('sanitizeJsonString', () => {
++  test('replaces NUL with U+FFFD', () => {
++    expect(sanitizeJsonString(`a${NUL}b`)).toBe(`a${REPLACEMENT}b`);
++  });
++
++  test('replaces a lone high surrogate with U+FFFD', () => {
++    expect(sanitizeJsonString('a\uD800b')).toBe(`a${REPLACEMENT}b`);
++  });
++
++  test('replaces a lone low surrogate with U+FFFD', () => {
++    expect(sanitizeJsonString('a\uDC00b')).toBe(`a${REPLACEMENT}b`);
++  });
++
++  test('replaces a trailing lone high surrogate with U+FFFD', () => {
++    expect(sanitizeJsonString('a\uD800')).toBe(`a${REPLACEMENT}`);
++  });
++
++  test('replaces a leading lone low surrogate with U+FFFD', () => {
++    expect(sanitizeJsonString('\uDC00a')).toBe(`${REPLACEMENT}a`);
++  });
++
++  test('preserves a valid surrogate pair (emoji)', () => {
++    const emoji = '\u{1F600}';
++    expect(sanitizeJsonString(`a${emoji}b`)).toBe(`a${emoji}b`);
++  });
++
++  test('preserves adjacent valid surrogate pairs', () => {
++    const pairs = '\u{1F600}\u{1F601}';
++    expect(sanitizeJsonString(pairs)).toBe(pairs);
++  });
++
++  test('replaces a lone high surrogate immediately before a valid pair', () => {
++    expect(sanitizeJsonString(`\uD800\u{1F600}`)).toBe(`${REPLACEMENT}\u{1F600}`);
++  });
++
++  test('returns the same string reference when nothing changes', () => {
++    const input = 'plain text';
++    expect(sanitizeJsonString(input)).toBe(input);
++  });
++});
++
++describe('encodeJson', () => {
++  test('sanitizes NUL and lone surrogates in nested values and arrays', () => {
++    const encoded = encodeJson({ a: [`x${NUL}y`, { b: '\uD800' }], c: '\uDC00' }, 'value');
++    expect(JSON.parse(encoded)).toEqual({
++      a: [`x${REPLACEMENT}y`, { b: REPLACEMENT }],
++      c: REPLACEMENT,
++    });
++  });
++
++  test('sanitizes object keys as well as values, at every depth', () => {
++    const encoded = encodeJson({ [`k${NUL}`]: 1, [`h\uD800`]: { [`l\uDC00`]: 2 } }, 'value');
++    expect(JSON.parse(encoded)).toEqual({
++      [`k${REPLACEMENT}`]: 1,
++      [`h${REPLACEMENT}`]: { [`l${REPLACEMENT}`]: 2 },
++    });
++  });
++
++  test('does not corrupt literal backslash-u text', () => {
++    const encoded = encodeJson({ text: 'literal \\ud800 and \\u0000' }, 'value');
++    expect(JSON.parse(encoded)).toEqual({ text: 'literal \\ud800 and \\u0000' });
++  });
++
++  test('preserves valid surrogate pairs through serialization', () => {
++    const emoji = '\u{1F600}';
++    expect(JSON.parse(encodeJson({ text: `emoji ${emoji}` }, 'value'))).toEqual({
++      text: `emoji ${emoji}`,
++    });
++  });
++
++  test('maps undefined to JSON null', () => {
++    expect(encodeJson(undefined, 'value')).toBe('null');
++  });
++
++  test('wraps a value that JSON cannot serialize', () => {
++    const circular: Record<string, unknown> = {};
++    circular.self = circular;
++    expect(() => encodeJson(circular, 'value')).toThrow(
++      '@openmaic/storage: value is not JSON-serializable',
++    );
++  });
++});
++
++describe('sanitizeJsonValue', () => {
++  test('returns the same object reference when nothing needs sanitizing', () => {
++    const value = { plain: 'text', nested: { ok: true } };
++    expect(sanitizeJsonValue('', value)).toBe(value);
++  });
++
++  test('returns the same array reference and leaves its members to stringify', () => {
++    const value = [1, 'text', { plain: true }];
++    expect(sanitizeJsonValue('', value)).toBe(value);
++  });
++
++  test('rebuilds with a null prototype when a key changes', () => {
++    const rebuilt = sanitizeJsonValue('', { [`x${NUL}`]: 1 }) as Record<string, unknown>;
++    // A normal `{}` would invoke the `__proto__` setter on assignment; the null
++    // prototype makes every emitted member an own data property.
++    expect(Object.getPrototypeOf(rebuilt)).toBeNull();
++    expect(rebuilt[`x${REPLACEMENT}`]).toBe(1);
++  });
++});
++
++describe('encodeJson key collisions', () => {
++  test('keeps both members when a NUL key collides with the replacement key', () => {
++    const encoded = encodeJson(
++      { [`a${NUL}`]: { first: true }, [`a${REPLACEMENT}`]: { second: true } },
++      'value',
++    );
++    expect(Object.keys(JSON.parse(encoded))).toEqual([`a${REPLACEMENT}`, `a${REPLACEMENT}#2`]);
++    expect(JSON.parse(encoded)).toEqual({
++      [`a${REPLACEMENT}`]: { first: true },
++      [`a${REPLACEMENT}#2`]: { second: true },
++    });
++  });
++
++  test('keeps the replacement key first and suffixes the later NUL key', () => {
++    const encoded = encodeJson(
++      { [`a${REPLACEMENT}`]: { second: true }, [`a${NUL}`]: { first: true } },
++      'value',
++    );
++    expect(Object.keys(JSON.parse(encoded))).toEqual([`a${REPLACEMENT}`, `a${REPLACEMENT}#2`]);
++    expect(JSON.parse(encoded)).toEqual({
++      [`a${REPLACEMENT}`]: { second: true },
++      [`a${REPLACEMENT}#2`]: { first: true },
++    });
++  });
++
++  test('disambiguates a three-way collision with increasing ordinals', () => {
++    const encoded = encodeJson({ [`a${NUL}`]: 1, [`a${REPLACEMENT}`]: 2, ['a\uD800']: 3 }, 'value');
++    expect(JSON.parse(encoded)).toEqual({
++      [`a${REPLACEMENT}`]: 1,
++      [`a${REPLACEMENT}#2`]: 2,
++      [`a${REPLACEMENT}#3`]: 3,
++    });
++  });
++
++  test('bumps past a disambiguated key that is also an original key', () => {
++    const encoded = encodeJson(
++      { [`a${NUL}`]: 'nul', [`a${REPLACEMENT}#2`]: 'original', [`a${REPLACEMENT}`]: 'rc' },
++      'value',
++    );
++    expect(JSON.parse(encoded)).toEqual({
++      [`a${REPLACEMENT}`]: 'nul',
++      [`a${REPLACEMENT}#2`]: 'original',
++      [`a${REPLACEMENT}#3`]: 'rc',
++    });
++  });
++
++  test('never emits a duplicate or still-offending key', () => {
++    const encoded = encodeJson(
++      {
++        [`a${NUL}`]: 1,
++        [`a${REPLACEMENT}`]: 2,
++        ['b\uD800']: 3,
++        [`b${REPLACEMENT}`]: 4,
++        [`b${REPLACEMENT}#2`]: 5,
++      },
++      'value',
++    );
++    const keys = Object.keys(JSON.parse(encoded));
++    expect(new Set(keys).size).toBe(keys.length);
++    for (const key of keys) expect(sanitizeJsonString(key)).toBe(key);
++  });
++});
++
++describe('encodeJson own __proto__ members', () => {
++  test('keeps an own __proto__ member when a sibling key needs sanitizing', () => {
++    const value = JSON.parse(`{"__proto__":{"own":true},"x\\u0000":1}`) as Record<string, unknown>;
++    expect(Object.prototype.hasOwnProperty.call(value, '__proto__')).toBe(true);
++
++    const encoded = encodeJson(value, 'value');
++    expect(encoded).toContain('"__proto__"');
++    const parsed = JSON.parse(encoded) as Record<string, unknown>;
++    expect(Object.prototype.hasOwnProperty.call(parsed, '__proto__')).toBe(true);
++    expect(parsed['__proto__']).toEqual({ own: true });
++    expect(parsed[`x${REPLACEMENT}`]).toBe(1);
++  });
++
++  test('keeps an own __proto__ member inside an array element', () => {
++    const element = JSON.parse(`{"__proto__":{"own":true},"x\\u0000":1}`) as Record<
++      string,
++      unknown
++    >;
++    const encoded = encodeJson({ list: [element] }, 'value');
++    const parsed = JSON.parse(encoded) as { list: Record<string, unknown>[] };
++    expect(Object.prototype.hasOwnProperty.call(parsed.list[0], '__proto__')).toBe(true);
++    expect(parsed.list[0]['__proto__']).toEqual({ own: true });
++    expect(parsed.list[0][`x${REPLACEMENT}`]).toBe(1);
++  });
++});
+diff --git a/tests/persistence/owner-materials.test.ts b/tests/persistence/owner-materials.test.ts
+index c7cd651c..05f4ba43 100644
+--- a/tests/persistence/owner-materials.test.ts
++++ b/tests/persistence/owner-materials.test.ts
+@@ -124,6 +124,25 @@ describe('owner material reservations', () => {
+     expect(insertStatement).toBeGreaterThan(usageStatement);
+   });
+ 
++  it('stores extraction metadata containing NUL and lone surrogates', async () => {
++    const record = await registerOwnerMaterial(
++      pool as unknown as ConnectableQueryable,
++      input({
++        extraction: {
++          status: 'idle',
++          diagnostics: [`bad\u0000diag`, `bad\uD800diag`],
++          emoji: '\u{1F600}',
++        },
++      }),
++      { maxCount: 10, maxTotalBytes: 1_000 },
++    );
++    expect(record.extraction).toEqual({
++      status: 'idle',
++      diagnostics: ['bad\uFFFDdiag', 'bad\uFFFDdiag'],
++      emoji: '\u{1F600}',
++    });
++  });
++
+   it('rejects a reservation when the owner count quota is already spent', async () => {
+     const limits = { maxCount: 1, maxTotalBytes: 1_000 };
+     await registerOwnerMaterial(pool as unknown as ConnectableQueryable, input(), limits);

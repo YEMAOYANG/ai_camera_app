@@ -1,0 +1,271 @@
+{
+  "policyVersion": "mira.textbook.pinyin-jqx-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "symbols": {
+    "j": {
+      "ph": "ji1",
+      "carrier": "鸡"
+    },
+    "q": {
+      "ph": "qi1",
+      "carrier": "七"
+    },
+    "x": {
+      "ph": "xi1",
+      "carrier": "西"
+    },
+    "jī": {
+      "ph": "ji1",
+      "carrier": "鸡"
+    },
+    "qì": {
+      "ph": "qi4",
+      "carrier": "气"
+    },
+    "xī": {
+      "ph": "xi1",
+      "carrier": "西"
+    },
+    "jiā": {
+      "ph": "jia1",
+      "carrier": "家"
+    },
+    "qiā": {
+      "ph": "qia1",
+      "carrier": "掐"
+    },
+    "xiá": {
+      "ph": "xia2",
+      "carrier": "霞"
+    },
+    "jū": {
+      "ph": "ju1",
+      "carrier": "居"
+    },
+    "qū": {
+      "ph": "qu1",
+      "carrier": "区"
+    },
+    "xū": {
+      "ph": "xu1",
+      "carrier": "虚"
+    },
+    "i": {
+      "ph": "yi1",
+      "carrier": "衣"
+    },
+    "ī": {
+      "ph": "yi1",
+      "carrier": "衣"
+    },
+    "ā": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "ü": {
+      "ph": "yu1",
+      "carrier": "迂"
+    },
+    "ǖ": {
+      "ph": "yu1",
+      "carrier": "迂"
+    },
+    "u": {
+      "ph": "wu1",
+      "carrier": "乌"
+    }
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "words": {},
+  "approvalBoundary": {
+    "recipeStatus": "candidate-pending-six-jqx-probes-and-exact-formal-sentence-listening",
+    "approvedProbeScope": "none-for-u3-l2-pending-human-review",
+    "shortConsonantAccepted": false,
+    "formalListeningScope": "every-formal-segment-containing-a-registered-latin-token-including-question-feedback-and-repetition",
+    "humanReview": "pending",
+    "pronunciationApproved": false,
+    "formalUseAllowed": false,
+    "consonantRecipeBoundary": "j/q/x map to ji1/qi1/xi1 call-name syllables. Explicit light-short context uses the same recipe; isolated consonants and duration are not encoded or guaranteed.",
+    "umlautRecipeBoundary": "ju1/qu1/xu1 are proposed complete-syllable spellings, not already vendor-dictionary or human validated; spelling omits the two dots but the vowel sound remains umlaut. No automatic jv/qv/xv fallback.",
+    "wholeSyllableBoundary": "Each jī/qì/xī/jiā/qiā/xiá/jū/qū/xū is one complete py phoneme; never letter-by-letter synthesis or concatenated audio.",
+    "naturalChineseWords": "打鼓、下棋、搭积木 remain natural Chinese text, requiring later whole-sentence listening for faithful pronunciation and natural connected speech."
+  }
+}

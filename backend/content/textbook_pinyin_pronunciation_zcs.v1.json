@@ -1,0 +1,318 @@
+{
+  "policyVersion": "mira.textbook.pinyin-zcs-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "symbols": {
+    "z": {
+      "ph": "zi1",
+      "carrier": "资"
+    },
+    "c": {
+      "ph": "ci1",
+      "carrier": "疵"
+    },
+    "s": {
+      "ph": "si1",
+      "carrier": "丝"
+    },
+    "zi": {
+      "ph": "zi1",
+      "carrier": "资"
+    },
+    "ci": {
+      "ph": "ci1",
+      "carrier": "疵"
+    },
+    "si": {
+      "ph": "si1",
+      "carrier": "丝"
+    },
+    "zá": {
+      "ph": "za2",
+      "carrier": "砸"
+    },
+    "zé": {
+      "ph": "ze2",
+      "carrier": "责"
+    },
+    "zǔ": {
+      "ph": "zu3",
+      "carrier": "祖"
+    },
+    "zuó": {
+      "ph": "zuo2",
+      "carrier": "昨"
+    },
+    "cā": {
+      "ph": "ca1",
+      "carrier": "擦"
+    },
+    "cè": {
+      "ph": "ce4",
+      "carrier": "册"
+    },
+    "cū": {
+      "ph": "cu1",
+      "carrier": "粗"
+    },
+    "cuō": {
+      "ph": "cuo1",
+      "carrier": "搓"
+    },
+    "sǎ": {
+      "ph": "sa3",
+      "carrier": "洒"
+    },
+    "sè": {
+      "ph": "se4",
+      "carrier": "色"
+    },
+    "sù": {
+      "ph": "su4",
+      "carrier": "素"
+    },
+    "suǒ": {
+      "ph": "suo3",
+      "carrier": "锁"
+    },
+    "zǐ": {
+      "ph": "zi3",
+      "carrier": "子"
+    },
+    "cì": {
+      "ph": "ci4",
+      "carrier": "次"
+    },
+    "sī": {
+      "ph": "si1",
+      "carrier": "丝"
+    },
+    "á": {
+      "ph": "a2",
+      "carrier": "啊"
+    },
+    "ā": {
+      "ph": "a1",
+      "carrier": "啊"
+    },
+    "ǎ": {
+      "ph": "a3",
+      "carrier": "啊"
+    },
+    "ó": {
+      "ph": "o2",
+      "carrier": "哦"
+    },
+    "ō": {
+      "ph": "o1",
+      "carrier": "哦"
+    },
+    "ǒ": {
+      "ph": "o3",
+      "carrier": "哦"
+    },
+    "u": {
+      "ph": "wu1",
+      "carrier": "乌"
+    }
+  },
+  "words": {
+    "句子": {
+      "ph": "ju4 zi5",
+      "carrier": "句子"
+    }
+  },
+  "approvalBoundary": {
+    "recipeStatus": "registered-recipe-pending-six-zcs-probe-protocol-verification-and-separate-formal-operator-review",
+    "approvedProbeScope": "none-for-u3-l3-not-dispatched",
+    "shortConsonantAccepted": false,
+    "formalListeningScope": "every-formal-segment-containing-a-registered-latin-token-or-chinese-word; separate operator inventory also covers natural Chinese target 字/词/句/子 and the full original sentence",
+    "humanReview": "not-requested-under-user-authorized-automated-workflow",
+    "humanListeningVerified": false,
+    "perceptualToneVerified": false,
+    "pronunciationApproved": false,
+    "formalUseAllowed": false,
+    "consonantRecipeBoundary": "z/c/s map to zi1/ci1/si1 call-name syllables. The light-short instruction uses the same recipe. Isolated consonants, absence of a trailing vowel, and shorter duration are not encoded or guaranteed; syntax and ASR cannot establish these perceptual qualities.",
+    "wholeSyllableBoundary": "zi/ci/si and each marked textbook syllable are single complete py phonemes. Never split zi/ci/si into a consonant plus the prior yi1 vowel, and never concatenate separately synthesized audio.",
+    "neutralToneBoundary": "句子 is matched as one Chinese word with ju4 zi5, using documented tone 5. No global 子-to-zi3 replacement: that would also rewrite natural compounds such as 孩子. Standalone 字/词/句/子 remain original Chinese and must be included in separate formal sentence verification.",
+    "scopeBoundary": "The 28 listed Latin tokens and whole word 句子 cover the reviewed 162-speech u3-l3 draft. No unknown Latin token or automatic character fallback is allowed."
+  }
+}

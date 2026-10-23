@@ -1,0 +1,293 @@
+diff --git a/PRODUCT.md b/PRODUCT.md
+--- a/PRODUCT.md
++++ b/PRODUCT.md
+@@ -23,7 +23,7 @@
+ ## Design Principles
+ 
+ - Keep the learner's next action clear.
+-- Keep classroom controls visually consistent across current and historical discussion. Desktop discussion choices, history actions and playback controls share a 36 px height; coarse-pointer controls use 48 px. Voice capture remains a larger dedicated target.
++- Keep classroom controls visually consistent across current and historical discussion. Desktop discussion choices and history actions use 36 px; playback controls use 30 px with 16 px icons in a 40 px toolbar. Coarse-pointer controls use 48 px. Voice capture remains a larger dedicated target.
+ - Scope the student theme to classroom chrome; preserve authored lesson and whiteboard content.
+ - Preserve meaningful status labels and the existing interaction flow.
+ 
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1910,3 +1910,69 @@
+     display: block; width: 48px; min-width: 48px; height: 48px; scale: var(--mira-orbit-touch-scale, 1) !important; transform: none !important; scroll-snap-align: start;
+   }
+ }
++
++/* Mouse-operated classrooms use the original toolbar's quiet, compact scale.
++ * Narrow / touch layouts retain their existing 48px targets and wrapping. */
++@media (min-width: 641px) and (min-height: 501px) and (hover: hover) and (pointer: fine) {
++  html[data-mira-student-theme='storybook'] {
++    --mira-orbit-control-height: 36px;
++    --mira-orbit-control-radius: 7px;
++    --mira-orbit-toolbar-control-height: 30px;
++  }
++
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'],
++  html[data-mira-student-theme='storybook']
++    [data-mira-roundtable-layout='standard']
++    [data-mira-chrome='playback-controls'] {
++    min-height: 40px;
++    padding-block: 4px;
++    gap: 4px;
++  }
++
++  html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] button {
++    min-width: var(--mira-orbit-toolbar-control-height);
++    min-height: var(--mira-orbit-toolbar-control-height);
++    height: var(--mira-orbit-toolbar-control-height);
++    border-radius: 6px;
++    font-weight: 500;
++    font-size: 12px;
++    line-height: 16px;
++  }
++
++  html[data-mira-student-theme='storybook']
++    [data-mira-chrome='playback-controls']
++    button > svg {
++    width: 16px;
++    height: 16px;
++    stroke-width: 1.6;
++  }
++
++  html[data-mira-student-theme='storybook']
++    [data-mira-chrome='playback-controls']
++    [data-mira-playback-group] {
++    min-height: 32px;
++    height: 32px;
++    padding-inline: 2px;
++    gap: 0;
++    border-radius: 7px;
++    background: var(--mira-orbit-raised);
++  }
++
++  html[data-mira-student-theme='storybook']
++    [data-mira-chrome='playback-controls']
++    > :is(div:first-child, div:last-child) {
++    gap: 2px;
++  }
++
++  html[data-mira-student-theme='storybook']
++    [data-mira-chrome='playback-controls']
++    [data-mira-indicator='toolbar-divider'] {
++    height: 12px;
++    margin-inline: 3px;
++    opacity: 0.7;
++  }
++
++  html[data-mira-student-theme='storybook'] [data-mira-chrome] [data-mira-discussion-action] {
++    font-weight: 500;
++  }
++}
+diff --git a/components/canvas/canvas-toolbar.tsx b/components/canvas/canvas-toolbar.tsx
+--- a/components/canvas/canvas-toolbar.tsx
++++ b/components/canvas/canvas-toolbar.tsx
+@@ -184,6 +184,7 @@
+       {/* ── Center: unified playback controls ── */}
+       <div className="flex-1 flex items-center justify-center min-w-0">
+         <div
++          data-mira-playback-group
+           className={cn(
+             'inline-flex items-center gap-0.5 px-1 h-7',
+             isPresenting
+diff --git a/components/audio/question-narration.tsx b/components/audio/question-narration.tsx
+--- a/components/audio/question-narration.tsx
++++ b/components/audio/question-narration.tsx
+@@ -126,7 +126,7 @@
+   return <div className={`mb-3${controlSlot ? ` ${referencePictureStyles.controls}` : ''}`}
+     data-question-narration-controls={controlSlot ? '' : undefined}>
+     <button type="button" onClick={toggle} aria-label={label ? `${playing ? '暂停' : '听'}${label}` : `${playing ? '暂停' : '听'}第 ${number} 题`}
+-      className="inline-flex min-h-14 items-center gap-2 rounded-full bg-amber-100 px-5 text-base font-medium text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
++      className={`${referencePictureStyles.activityControl} inline-flex items-center bg-amber-100 text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700`}>
+       {playing ? <Pause size={20} aria-hidden /> : <Volume2 size={20} aria-hidden />}
+       {controlSlot ? <span className="sr-only">{playing ? '暂停' : label ? `听${label}` : '听题目'}</span> : playing ? '暂停' : label ? `听${label}` : '听题目'}
+     </button>
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -201,18 +201,18 @@
+       {error && <p role="alert" className="mt-5 text-[#9b503b]">{error}</p>}
+       <footer className={`${compactImages ? compactPictureStyles.footer : ''} mt-auto flex shrink-0 items-center justify-between gap-3 pt-3`}>
+         {!loading && q && <button type="button" aria-label="上一题" onClick={() => setQuestionIndex(index => index - 1)} disabled={sending || questionIndex === 0}
+-          className="inline-flex min-h-14 min-w-14 items-center justify-center rounded-full border border-[#c7d1c5] px-3 disabled:opacity-30"><ArrowLeft size={18} aria-hidden /></button>}
++          className={`${referencePictureStyles.activityControl} ${referencePictureStyles.activityIconControl} inline-flex items-center justify-center border border-[#c7d1c5] disabled:opacity-30`}><ArrowLeft size={18} aria-hidden /></button>}
+         {!loading && q && questionIndex < questions.length - 1 && <button type="button" aria-label="下一题"
+           disabled={sending || (!done && !answers[q.id])} onClick={() => setQuestionIndex(index => index + 1)}
+-          className="inline-flex min-h-14 items-center gap-2 rounded-full bg-[#466a53] px-5 text-base text-white disabled:opacity-40">下一题<ArrowRight size={18} aria-hidden /></button>}
++          className={`${referencePictureStyles.activityControl} ${referencePictureStyles.activityPrimary} inline-flex items-center bg-[#466a53] text-white disabled:opacity-40`}>下一题<ArrowRight size={18} aria-hidden /></button>}
+         {!done && !loading && questionIndex === questions.length - 1 && <button type="button" onClick={() => void submit()}
+           disabled={sending || questions.some(q => !answers[q.id])}
+-          className="inline-flex min-h-14 items-center gap-3 rounded-full bg-[#466a53] px-7 text-lg text-white disabled:opacity-40">
++          className={`${referencePictureStyles.activityControl} ${referencePictureStyles.activityPrimary} inline-flex items-center bg-[#466a53] text-white disabled:opacity-40`}>
+           {sending ? <><Loader2 className="animate-spin" size={20} aria-hidden />正在保存</> : <>完成练习<ArrowRight size={20} aria-hidden /></>}
+         </button>}
+         {done && questionIndex === questions.length - 1 && <p className="text-sm text-[#68766b]">答案已保存，继续往下学吧。</p>}
+         {privatePreview && done && <button type="button" disabled={sending} onClick={() => void resetPreview()}
+-          className="min-h-14 rounded-full border border-[#c7d1c5] px-4">重新试一次</button>}
++          className={`${referencePictureStyles.activityControl} border border-[#c7d1c5]`}>重新试一次</button>}
+       </footer>
+     </div>
+   </section>;
+diff --git a/components/scene-renderers/quiz-reference-picture.module.css b/components/scene-renderers/quiz-reference-picture.module.css
+--- a/components/scene-renderers/quiz-reference-picture.module.css
++++ b/components/scene-renderers/quiz-reference-picture.module.css
+@@ -59,6 +59,50 @@
+ .control:disabled {
+   opacity: 0.4;
+   cursor: default;
++}
++
++/* Utility actions share a fine-pointer scale without shrinking picture answers. */
++.activityControl {
++  box-sizing: border-box;
++  min-width: 48px;
++  min-height: 48px;
++  padding: 8px 12px;
++  gap: 6px;
++  border-radius: 8px;
++  font-size: 14px;
++  font-weight: 500;
++  line-height: 20px;
++}
++.activityControl > svg {
++  flex-shrink: 0;
++  width: 18px;
++  height: 18px;
++}
++.activityIconControl {
++  width: 48px;
++  height: 48px;
++  padding: 0;
++}
++
++@media (hover: hover) and (pointer: fine) {
++  .activityControl {
++    min-width: 36px;
++    min-height: 36px;
++    padding-block: 6px;
++  }
++  .activityPrimary {
++    min-height: 40px;
++    padding-inline: 14px;
++  }
++  .activityIconControl,
++  .control,
++  .controls.controls[data-question-narration-controls] > button {
++    flex-basis: 36px;
++    width: 36px;
++    min-width: 36px;
++    height: 36px;
++    min-height: 36px;
++  }
+ }
+ 
+ /* Portalled outside question descendants, and showModal enters the top layer. */
+diff --git a/components/scene-renderers/textbook-play.module.css b/components/scene-renderers/textbook-play.module.css
+--- a/components/scene-renderers/textbook-play.module.css
++++ b/components/scene-renderers/textbook-play.module.css
+@@ -73,6 +73,30 @@
+   padding: 0;
+   border-radius: 12px;
+ }
++@media (hover: hover) and (pointer: fine) {
++  .root :is(.listen, .secondary, .primary, .help button, .feedback button, .footer button, .evidence summary) {
++    min-height: 36px;
++    border-width: 1px;
++    font-weight: 500 !important;
++  }
++  .root :is(button, a).primary {
++    min-height: 40px;
++    padding: 8px 14px;
++    border-radius: 8px;
++    font-size: 14px;
++  }
++  .header > .listen {
++    width: 36px;
++    height: 36px;
++    border-radius: 8px;
++  }
++}
++@media (pointer: coarse) {
++  .root :is(.listen, .secondary, .primary, .help button, .feedback button, .footer button, .evidence summary) {
++    min-width: 48px;
++    min-height: 48px;
++  }
++}
+ .root button:disabled {
+   cursor: default;
+   opacity: 0.55;
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -308,6 +308,58 @@
+  * it also observes the storage shim).
+  */
+ export function patchHtmlForIframe(html: string): string {
++  // Authored controls live in an isolated document. Only declared utility
++  // controls and known toolbar actions share this scale; lesson objects keep
++  // their authored geometry. Important overrides precede the authored CSS and
++  // also cover its normal inline dimensions without rewriting saved content.
++  const activityControl = `:is(
++    :is(.tools, #tools) > button:is(#start, #replay, #again, #finish, #reset, #restart, #retry, #listen, #hint),
++    button[data-mira-activity-control]
++  ):not([data-mira-picture-choice]):not([draggable="true"])`;
++  const activityControlsCss = `<style data-mira-activity-controls>
++  ${activityControl} {
++    box-sizing: border-box !important;
++    align-items: center !important;
++    justify-content: center !important;
++    gap: 6px !important;
++    width: auto !important;
++    min-width: 48px !important;
++    height: 48px !important;
++    min-height: 48px !important;
++    padding: 6px 10px !important;
++    border-width: 1px !important;
++    border-radius: 8px !important;
++    box-shadow: none !important;
++    font-size: 14px !important;
++    font-weight: 500 !important;
++    line-height: 20px !important;
++  }
++  ${activityControl} > svg {
++    flex: 0 0 18px !important;
++    width: 18px !important;
++    height: 18px !important;
++    max-width: 18px !important;
++    max-height: 18px !important;
++  }
++  ${activityControl} > span {
++    margin: 0 !important;
++    font-size: 14px !important;
++    font-weight: 500 !important;
++    line-height: 20px !important;
++  }
++  @media (hover: hover) and (pointer: fine) {
++    ${activityControl} {
++      min-width: 36px !important;
++      height: 36px !important;
++      min-height: 36px !important;
++    }
++    ${activityControl}:is(#start, #finish, [data-mira-activity-control="primary"]) {
++      height: 40px !important;
++      min-height: 40px !important;
++      padding-inline: 14px !important;
++    }
++  }
++</style>`;
+   const iframeCss = `<style data-iframe-patch>
+   html, body {
+     width: 100%;
+@@ -323,7 +375,7 @@
+ </style>`;
+ 
+   const injection =
+-    '\n' + ACTIVITY_INTENT_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss;
++    '\n' + ACTIVITY_INTENT_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss + '\n' + activityControlsCss;
+ 
+   return injectIntoDocumentHead(html, injection);
+ }

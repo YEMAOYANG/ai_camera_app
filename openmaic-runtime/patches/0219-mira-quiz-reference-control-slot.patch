@@ -1,0 +1,359 @@
+diff --git a/components/scene-renderers/quiz-reference-picture.tsx b/components/scene-renderers/quiz-reference-picture.tsx
+--- a/components/scene-renderers/quiz-reference-picture.tsx
++++ b/components/scene-renderers/quiz-reference-picture.tsx
+@@ -4,7 +4,6 @@
+ import { createPortal } from 'react-dom';
+ import { X, ZoomIn, ZoomOut } from 'lucide-react';
+ import type { QuizVisual } from '@openmaic/dsl';
+-import { QuizPicture } from './quiz-picture';
+ import styles from './quiz-reference-picture.module.css';
+ 
+ /** Reference pictures alone can expand; this component never owns an answer or audio. */
+@@ -31,20 +30,18 @@
+     if (open && (visual.kind !== 'image' || visual.src !== openedSource.current)) setOpen(false);
+   }, [open, visual]);
+ 
+-  if (visual.kind !== 'image') return <QuizPicture visual={visual} scene />;
++  if (visual.kind !== 'image') return null;
+   const close = () => {
+     setOpen(false);
+     trigger.current?.focus({ preventScroll: true });
+   };
+   return (
+-    <span className={styles.reference} data-quiz-reference-picture>
+-      <span className={styles.preview}>
+-        <QuizPicture visual={visual} scene />
+-      </span>
++    <>
+       <button
+         type="button"
+         ref={trigger}
+         className={styles.control}
++        data-quiz-reference-picture
+         aria-label="放大题干图片"
+         title="看大图"
+         aria-haspopup="dialog"
+@@ -62,7 +59,7 @@
+       {open &&
+         host &&
+         createPortal(<ReferenceDialog src={visual.src} alt={visual.alt} onClose={close} />, host)}
+-    </span>
++    </>
+   );
+ }
+ 
+diff --git a/components/scene-renderers/quiz-reference-picture.module.css b/components/scene-renderers/quiz-reference-picture.module.css
+--- a/components/scene-renderers/quiz-reference-picture.module.css
++++ b/components/scene-renderers/quiz-reference-picture.module.css
+@@ -1,30 +1,28 @@
+-.reference {
+-  position: relative;
++.controls {
+   display: flex;
+   align-items: center;
+-  gap: 6px;
+-  width: 100%;
+-  height: 100%;
++  flex-wrap: wrap;
++  gap: 4px;
+   min-width: 0;
+-  min-height: 48px;
+ }
+ 
+-.reference > .control {
+-  position: absolute;
+-  right: 0;
+-  bottom: 0;
+-  z-index: 1;
++.controls.controls[data-question-narration-controls] > button {
++  flex: 0 0 48px;
++  width: 48px;
++  min-width: 48px;
++  height: 48px;
++  min-height: 48px;
++  padding: 0;
++  justify-content: center;
+ }
+ 
+-.preview {
+-  display: block;
+-  flex: 1 1 0%;
+-  min-width: 0;
+-  height: 100%;
++.controls > button > svg {
++  width: 18px;
++  height: 18px;
+ }
+ 
+-.preview > span {
+-  height: 100%;
++.controls > [role='status'] {
++  flex-basis: 100%;
+ }
+ 
+ .control {
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -48,6 +48,7 @@
+ import { FixedTextbookQuiz } from './fixed-textbook-quiz';
+ import { QuizPicture } from './quiz-picture';
+ import { QuizReferencePicture } from './quiz-reference-picture';
++import referencePictureStyles from './quiz-reference-picture.module.css';
+ import pictureOptionStyles from './quiz-picture-options.module.css';
+ import pictureQuizStyles from './picture-quiz-layout.module.css';
+ 
+@@ -681,8 +682,10 @@
+       </div>
+ 
+       {/* Body */}
+-      {narrationSource && <QuestionNarration src={narrationSource} number={index + 1} autoPlay={autoNarrate && !isReview} />}
+-      {question.visual && <div className="mb-4" data-quiz-scene-picture><QuizReferencePicture visual={question.visual} /></div>}
++      {narrationSource ? <QuestionNarration src={narrationSource} number={index + 1} autoPlay={autoNarrate && !isReview}
++        controlSlot={question.visual?.kind === 'image' ? <QuizReferencePicture visual={question.visual} /> : undefined} />
++        : question.visual?.kind === 'image' && <div className={referencePictureStyles.controls} data-question-narration-controls=""><QuizReferencePicture visual={question.visual} /></div>}
++      {question.visual && <div className="mb-4" data-quiz-scene-picture><QuizPicture visual={question.visual} scene /></div>}
+       {children}
+ 
+       {/* Analysis (review only) */}
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -9,6 +9,7 @@
+ import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { QuizPicture } from './quiz-picture';
+ import { QuizReferencePicture } from './quiz-reference-picture';
++import referencePictureStyles from './quiz-reference-picture.module.css';
+ import pictureOptionStyles from './quiz-picture-options.module.css';
+ import compactPictureStyles from './fixed-textbook-picture-layout.module.css';
+ 
+@@ -108,10 +109,12 @@
+         <fieldset key={q.id} data-fixed-question={q.id} className={`${compactImages ? compactPictureStyles.fieldset : ''} min-w-0 rounded-2xl border border-[#e9dfcd] bg-white/80 p-3 sm:p-4`}>
+           <legend className="px-2 text-sm text-[#788275]">第 {questionIndex + 1} 题</legend>
+           <div className={`${compactImages ? compactPictureStyles.task : ''} grid min-w-0 items-center gap-3 ${q.visual ? 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]' : ''}`}>
+-            {q.visual && <div className={`${compactImages ? compactPictureStyles.scenePicture : ''} min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44`} data-quiz-scene-picture><QuizReferencePicture visual={q.visual} /></div>}
++            {q.visual && <div className={`${compactImages ? compactPictureStyles.scenePicture : ''} min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44`} data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
+             <div className={`${compactImages ? compactPictureStyles.question : ''} min-w-0 ${compactImages ? pictureOptionStyles.container : ''}`}>
+             <p className="mb-2 text-base leading-relaxed sm:text-lg">{q.question}</p>
+-            {audio && <QuestionNarration key={q.id} src={audio} number={questionIndex + 1} sceneId={sceneId} questionId={q.id} autoPlay={!done && !feedback && !sending} />}
++            {audio ? <QuestionNarration key={q.id} src={audio} number={questionIndex + 1} sceneId={sceneId} questionId={q.id} autoPlay={!done && !feedback && !sending}
++              controlSlot={q.visual?.kind === 'image' ? <QuizReferencePicture visual={q.visual} /> : undefined} />
++              : q.visual?.kind === 'image' && <div className={referencePictureStyles.controls} data-question-narration-controls=""><QuizReferencePicture visual={q.visual} /></div>}
+             <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${compactImages ? pictureOptionStyles.options + ' ' + compactPictureStyles.options : ''}`} role="radiogroup" aria-label={q.question}>
+               {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+                 aria-label={option.label} key={option.value} disabled={done || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+diff --git a/components/audio/question-narration.tsx b/components/audio/question-narration.tsx
+--- a/components/audio/question-narration.tsx
++++ b/components/audio/question-narration.tsx
+@@ -1,10 +1,11 @@
+ 'use client';
+ 
+-import { useEffect, useRef, useState } from 'react';
++import { useEffect, useRef, useState, type ReactNode } from 'react';
+ import { Pause, Volume2 } from 'lucide-react';
+ import { ACTIVITY_AUDIO_EVENT, isLectureSpeaking, isQuestionNarrationReady, LECTURE_AUDIO_EVENT, notifyQuestionNarration } from '@/lib/mira/lecture-audio';
+ 
+ import { getPageNarration, registerPageNarration, releasePageNarrationPause, subscribePageNarration } from '@/lib/mira/page-narration';
++import referencePictureStyles from '@/components/scene-renderers/quiz-reference-picture.module.css';
+ 
+ /** Only already-authored, same-origin classroom audio; never calls a TTS API. */
+ export function questionNarrationSource(question: unknown): string | null {
+@@ -17,7 +18,7 @@
+ 
+ let activeAudio: HTMLAudioElement | null = null;
+ 
+-export function QuestionNarration({ src, number, autoPlay = false, sceneId, questionId }: { src: string; number: number; autoPlay?: boolean; sceneId?: string; questionId?: string }) {
++export function QuestionNarration({ src, number, autoPlay = false, sceneId, questionId, controlSlot }: { src: string; number: number; autoPlay?: boolean; sceneId?: string; questionId?: string; controlSlot?: ReactNode }) {
+   const audio = useRef<HTMLAudioElement | null>(null);
+   const play = useRef<(() => Promise<void>) | null>(null);
+   const [playing, setPlaying] = useState(false);
+@@ -119,12 +120,14 @@
+     await play.current?.();
+   }
+ 
+-  return <div className="mb-3">
++  return <div className={`mb-3${controlSlot ? ` ${referencePictureStyles.controls}` : ''}`}
++    data-question-narration-controls={controlSlot ? '' : undefined}>
+     <button type="button" onClick={toggle} aria-label={`${playing ? '暂停' : '听'}第 ${number} 题`}
+       className="inline-flex min-h-14 items-center gap-2 rounded-full bg-amber-100 px-5 text-base font-medium text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
+       {playing ? <Pause size={20} aria-hidden /> : <Volume2 size={20} aria-hidden />}
+-      {playing ? '暂停' : '听题目'}
++      {controlSlot ? <span className="sr-only">{playing ? '暂停' : '听题目'}</span> : playing ? '暂停' : '听题目'}
+     </button>
++    {controlSlot}
+     {failed && <p role="status" className="mt-2 text-sm text-amber-800">声音暂时没放出来，请再试一次。</p>}
+   </div>;
+ }
+diff --git a/tests/scene-renderers/quiz-reference-picture.browser.test.ts b/tests/scene-renderers/quiz-reference-picture.browser.test.ts
+--- a/tests/scene-renderers/quiz-reference-picture.browser.test.ts
++++ b/tests/scene-renderers/quiz-reference-picture.browser.test.ts
+@@ -9,6 +9,7 @@
+   changeReferenceSource: () => void;
+   unmountReferenceQuiz: () => void;
+   audioStats: { created: number; plays: number; pauses: number };
++  failAudio: () => void;
+   shortcutCalls: number;
+   posts: unknown[];
+ };
+@@ -51,7 +52,7 @@
+ const base=window.fixtureQuestion||{id:'q',type:'single',question:'看图，听老师说，再选一张。',visual:{kind:'image',src:image('#d9e8dc',400,800),alt:'reference'},options:['A','B','C'].map(value=>({value,label:value})),optionVisuals:Object.fromEntries(['A','B','C'].map((value,i)=>[value,{kind:'image',src:image(['#7cad98','#e0b183','#8fafd0'][i]),alt:value}]))};
+ window.posts=[];window.fetch=async(_url,init)=>{if(init?.method==='POST')window.posts.push(JSON.parse(init.body));return{ok:true,json:async()=>({ok:true})}};
+ const root=createRoot(document.querySelector('#app'));let generation=0;
+-function Fixture({fixed}){const [value,setValue]=useState();const [q,setQ]=useState(()=>({...base,...(window.referenceTestAudio?{questionAudioUrl:'/api/classroom-media/fixture/audio/q.wav'}:{questionAudioUrl:undefined})}));window.changeReferenceSource=()=>setQ(old=>({...old,visual:{...old.visual,src:image('#c7d4e1',400,700)}}));return <><button id="fullscreen" type="button" onClick={()=>document.querySelector('#classroom').requestFullscreen()}>全屏</button><div className="fixture-lesson">{fixed?<FixedTextbookQuiz questions={[q]}/>:<div className={styles.root} data-quiz-phase="answering"><SingleChoiceQuestion question={q} index={0} value={value} onChange={setValue}/></div>}</div><output id="selection">{value||''}</output></>}
++function Fixture({fixed}){const [value,setValue]=useState();const [q,setQ]=useState(()=>({...base,...(window.referenceTestAudio?{questionAudioUrl:'/api/classroom-media/fixture/audio/q.wav'}:{questionAudioUrl:undefined})}));window.changeReferenceSource=()=>setQ(old=>({...old,visual:{...old.visual,src:image('#c7d4e1',400,700)}}));return <><button id="fullscreen" type="button" onClick={()=>document.querySelector('#classroom').requestFullscreen()}>全屏</button><div className="fixture-lesson">{fixed?<FixedTextbookQuiz questions={[q]}/>:<div className={styles.root} data-quiz-phase="answering" style={{height:"100%"}}><SingleChoiceQuestion question={q} index={0} value={value} onChange={setValue}/></div>}</div><output id="selection">{value||''}</output></>}
+ window.mountReferenceQuiz=(fixed)=>{beginQuestionNarrationScene('quiz');releaseQuestionNarrationScene('quiz');root.render(<Fixture key={++generation} fixed={fixed}/>)};window.unmountReferenceQuiz=()=>root.render(null);
+ const params=new URLSearchParams(location.search);const classroom=document.querySelector('#classroom');for(const name of ['w','h']){const n=Number(params.get(name));if(n>=280&&n<=1600)classroom.style[name==='w'?'width':'height']=n+'px'}window.mountReferenceQuiz(params.get('fixed')!=='0');`,
+       },
+@@ -149,6 +150,8 @@
+       await page.route('**/*', (route) => route.abort());
+       await page.setContent(html);
+       await page.addStyleTag({ content: css });
++      // Requested sizes are lesson-canvas sizes, excluding the fixture-only fullscreen row.
++      await page.addStyleTag({ content: '#fullscreen{display:none}.fixture-lesson{height:100%}' });
+       await page.evaluate(() => {
+         const win = window as unknown as FixtureWindow;
+         win.audioStats = { created: 0, plays: 0, pauses: 0 };
+@@ -165,6 +168,10 @@
+           constructor() {
+             super();
+             win.audioStats.created++;
++            win.failAudio = () => {
++              this.paused = true;
++              this.dispatchEvent(new Event('error'));
++            };
+           }
+           play() {
+             this.paused = false;
+@@ -223,6 +230,13 @@
+           const triggerBox = await trigger.boundingBox();
+           expect(triggerBox!.width).toBeGreaterThanOrEqual(48);
+           expect(triggerBox!.height).toBeGreaterThanOrEqual(48);
++          expect(
++            triggerBox!.x >= pictureBox!.x + pictureBox!.width ||
++              triggerBox!.x + triggerBox!.width <= pictureBox!.x ||
++              triggerBox!.y >= pictureBox!.y + pictureBox!.height ||
++              triggerBox!.y + triggerBox!.height <= pictureBox!.y,
++            JSON.stringify({ fixed, viewport, triggerBox, pictureBox }),
++          ).toBe(true);
+           await trigger.focus();
+           const beforeOpenShortcuts = await page.evaluate(
+             () => (window as unknown as FixtureWindow).shortcutCalls,
+@@ -278,8 +292,86 @@
+           ).toEqual(audio);
+           expect(await page.evaluate(() => (window as unknown as FixtureWindow).posts)).toEqual([]);
+         }
++        await page.evaluate(() => (window as unknown as FixtureWindow).failAudio());
++        await page.locator('[data-question-narration-controls] > [role=status]').waitFor();
++        for (const viewport of [
++          { width: 390, height: 563 },
++          { width: 667, height: 300 },
++          { width: 305, height: 367 },
++          { width: 320, height: 351 },
++          { width: 320, height: 283 },
++          { width: 667, height: 205 },
++        ]) {
++          await page.setViewportSize(viewport);
++          const layout = await page.evaluate(() => {
++            const picture = document
++              .querySelector('[data-quiz-scene-picture] img')!
++              .getBoundingClientRect();
++            const controls = [
++              ...document.querySelectorAll('[data-question-narration-controls] > button'),
++            ].map((e) => e.getBoundingClientRect());
++            const options = [...document.querySelectorAll('[role=radio],[data-quiz-option]')].map(
++              (e) => e.getBoundingClientRect(),
++            );
++            const fieldset = document.querySelector('[data-fixed-question]');
++            return {
++              controls: controls.map((r) => ({
++                width: r.width,
++                height: r.height,
++                visible: r.top >= 0 && r.bottom <= innerHeight,
++                separate:
++                  r.right <= picture.left ||
++                  r.left >= picture.right ||
++                  r.bottom <= picture.top ||
++                  r.top >= picture.bottom,
++              })),
++              options: options.map((r) => ({
++                width: r.width,
++                height: r.height,
++                visible: r.top >= 0 && r.bottom <= innerHeight,
++              })),
++              fieldsetOverflow: fieldset
++                ? fieldset.scrollHeight > fieldset.clientHeight + 1
++                : false,
++            };
++          });
++          expect(layout.controls.length).toBe(2);
++          expect(
++            layout.controls.every(
++              (r) => r.width >= 48 && r.height >= 48 && r.visible && r.separate,
++            ),
++            JSON.stringify({ fixed, viewport, layout }),
++          ).toBe(true);
++          expect(
++            layout.options.every((r) => r.width >= 48 && r.height >= 48 && r.visible),
++            JSON.stringify({ fixed, viewport, layout }),
++          ).toBe(true);
++          expect(layout.fieldsetOverflow, JSON.stringify({ fixed, viewport, layout })).toBe(false);
++          await trigger.click();
++          await page.getByRole('button', { name: '关闭大图', exact: true }).click();
++          expect(
++            await page.locator('[data-question-narration-controls] > [role=status]').count(),
++          ).toBe(1);
++        }
++        await page.getByRole('button', { name: '听第 1 题', exact: true }).click();
++        await page.getByRole('button', { name: '暂停第 1 题', exact: true }).waitFor();
++        expect(
++          await page.locator('[data-question-narration-controls] > [role=status]').count(),
++        ).toBe(0);
++        await page.locator('#fullscreen').evaluate((el) => {
++          Object.assign(el.style, {
++            display: 'block',
++            position: 'fixed',
++            top: '0',
++            left: '0',
++            zIndex: '100',
++          });
++        });
+         await page.locator('#fullscreen').click();
+         await page.waitForFunction(() => !!document.fullscreenElement);
++        await page.locator('#fullscreen').evaluate((el) => {
++          el.style.display = 'none';
++        });
+         await trigger.click();
+         expect(
+           await page
+@@ -301,6 +393,18 @@
+         await page.waitForFunction(() => !document.querySelector('dialog'));
+         expect(await page.locator('dialog').count()).toBe(0);
+       }
++      for (const fixed of [false, true]) {
++        await page.evaluate((value) => {
++          Object.assign(window, { referenceTestAudio: false });
++          (window as unknown as FixtureWindow).mountReferenceQuiz(value);
++        }, fixed);
++        const trigger = page.getByRole('button', { name: '放大题干图片', exact: true });
++        await trigger.waitFor();
++        expect(await page.locator('[data-question-narration-controls] > button').count()).toBe(1);
++        expect(await page.locator('[data-quiz-scene-picture] button').count()).toBe(0);
++        await trigger.click();
++        await page.getByRole('button', { name: '关闭大图', exact: true }).click();
++      }
+       expect(errors).toEqual([]);
+     } finally {
+       await browser.close();
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -1907,6 +1907,6 @@
+     margin: 0; padding: 0; max-width: 100%; min-width: 0; overflow-x: auto; touch-action: pan-x; scroll-snap-type: x proximity;
+   }
+   html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-participant-avatar] {
+-    width: 48px; min-width: 48px; height: 48px; scale: 1 !important; transform: none !important; scroll-snap-align: start;
+-  }
+-}
++    display: block; width: 48px; min-width: 48px; height: 48px; scale: var(--mira-orbit-touch-scale, 1) !important; transform: none !important; scroll-snap-align: start;
++  }
++}

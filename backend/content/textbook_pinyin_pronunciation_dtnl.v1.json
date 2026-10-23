@@ -1,0 +1,297 @@
+{
+  "policyVersion": "mira.textbook.pinyin-dtnl-ssml.v1",
+  "subject": "chinese",
+  "providerId": "aliyun-cosyvoice",
+  "modelId": "cosyvoice-v3-flash",
+  "voiceId": "longanwen_v3",
+  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
+  "inputParameters": {
+    "voice": "longanwen_v3",
+    "format": "wav",
+    "sample_rate": 24000,
+    "enable_ssml": true,
+    "rate": 1,
+    "pitch": 1,
+    "seed": 0,
+    "language_hints": [
+      "zh"
+    ]
+  },
+  "symbols": {
+    "d": {
+      "ph": "de1",
+      "carrier": "的"
+    },
+    "t": {
+      "ph": "te1",
+      "carrier": "特"
+    },
+    "n": {
+      "ph": "ne1",
+      "carrier": "呢"
+    },
+    "l": {
+      "ph": "le1",
+      "carrier": "勒"
+    },
+    "ǎ": {
+      "ph": "a3",
+      "carrier": "啊"
+    },
+    "dǎ": {
+      "ph": "da3",
+      "carrier": "打"
+    },
+    "dé": {
+      "ph": "de2",
+      "carrier": "得"
+    },
+    "dī": {
+      "ph": "di1",
+      "carrier": "低"
+    },
+    "dú": {
+      "ph": "du2",
+      "carrier": "读"
+    },
+    "tā": {
+      "ph": "ta1",
+      "carrier": "他"
+    },
+    "tè": {
+      "ph": "te4",
+      "carrier": "特"
+    },
+    "tǐ": {
+      "ph": "ti3",
+      "carrier": "体"
+    },
+    "tú": {
+      "ph": "tu2",
+      "carrier": "图"
+    },
+    "ná": {
+      "ph": "na2",
+      "carrier": "拿"
+    },
+    "né": {
+      "ph": "ne2",
+      "carrier": "哪"
+    },
+    "nǐ": {
+      "ph": "ni3",
+      "carrier": "你"
+    },
+    "nù": {
+      "ph": "nu4",
+      "carrier": "怒"
+    },
+    "nǚ": {
+      "ph": "nv3",
+      "carrier": "女"
+    },
+    "lā": {
+      "ph": "la1",
+      "carrier": "拉"
+    },
+    "lè": {
+      "ph": "le4",
+      "carrier": "乐"
+    },
+    "lǐ": {
+      "ph": "li3",
+      "carrier": "里"
+    },
+    "lù": {
+      "ph": "lu4",
+      "carrier": "路"
+    },
+    "lǘ": {
+      "ph": "lv2",
+      "carrier": "驴"
+    }
+  },
+  "textHandling": {
+    "normalization": "none",
+    "xmlEscape": "amp_lt_gt_quot_apos",
+    "unsupportedLatin": "reject",
+    "combiningMarks": "reject",
+    "wrapper": "speak",
+    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
+    "latinRunRanges": [
+      [
+        48,
+        57
+      ],
+      [
+        65,
+        90
+      ],
+      [
+        97,
+        122
+      ],
+      [
+        170,
+        170
+      ],
+      [
+        186,
+        186
+      ],
+      [
+        192,
+        214
+      ],
+      [
+        216,
+        246
+      ],
+      [
+        248,
+        696
+      ],
+      [
+        736,
+        740
+      ],
+      [
+        7424,
+        7461
+      ],
+      [
+        7468,
+        7516
+      ],
+      [
+        7522,
+        7525
+      ],
+      [
+        7531,
+        7543
+      ],
+      [
+        7545,
+        7614
+      ],
+      [
+        7680,
+        7935
+      ],
+      [
+        8305,
+        8305
+      ],
+      [
+        8319,
+        8319
+      ],
+      [
+        8336,
+        8348
+      ],
+      [
+        8490,
+        8491
+      ],
+      [
+        8498,
+        8498
+      ],
+      [
+        8526,
+        8526
+      ],
+      [
+        8544,
+        8584
+      ],
+      [
+        11360,
+        11391
+      ],
+      [
+        42786,
+        42887
+      ],
+      [
+        42891,
+        42972
+      ],
+      [
+        42993,
+        43007
+      ],
+      [
+        43824,
+        43866
+      ],
+      [
+        43868,
+        43876
+      ],
+      [
+        43878,
+        43881
+      ],
+      [
+        64256,
+        64262
+      ],
+      [
+        65313,
+        65338
+      ],
+      [
+        65345,
+        65370
+      ],
+      [
+        67456,
+        67461
+      ],
+      [
+        67463,
+        67504
+      ],
+      [
+        67506,
+        67514
+      ],
+      [
+        119808,
+        120831
+      ],
+      [
+        122624,
+        122654
+      ],
+      [
+        122661,
+        122666
+      ]
+    ]
+  },
+  "listeningRequired": true,
+  "words": {
+    "大地": {
+      "ph": "da4 di4",
+      "carrier": "大地"
+    },
+    "马路": {
+      "ph": "ma3 lu4",
+      "carrier": "马路"
+    },
+    "泥土": {
+      "ph": "ni2 tu3",
+      "carrier": "泥土"
+    }
+  },
+  "approvalBoundary": {
+    "recipeStatus": "candidate-pending-exact-formal-whole-sentence-listening",
+    "approvedProbeScope": "four-base-call-names-and-two-whole-umlaut-syllables-only",
+    "shortConsonantAccepted": false,
+    "formalListeningScope": "every-segment-containing-a-registered-latin-token-or-chinese-word"
+  }
+}

@@ -8,7 +8,66 @@ CUE_SCRIPT = "mira-narration-cues"
 AUDIO_SCRIPT = "mira-pre-recorded-audio"
 IDENTITY = re.compile(r"[A-Za-z0-9_-]{1,128}\Z")
 AUDIO_BLOCK = re.compile(r'<script id="mira-pre-recorded-audio">[\s\S]*?</script>')
-AUDIO_CODE = """(()=>{
+# A line that is being spoken is not cut off by the next one: the newest
+# request waits for it to end, and asking for the same line again restarts it.
+# While the page may not speak (off screen, or the lecture is speaking), the
+# newest line asked for is kept and plays if the page may speak within 4 s.
+_WAITING_AUDIO_CODE = """(()=>{
+const clips=MAP;let active=null;
+let activeCue=null,pending=null,waiting=null,waitingAt=0,generation=0,visible=false;
+const state=(cueId,status)=>{document.documentElement.dataset.miraAudioState=status;
+window.dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status}}));};
+const stop=(status)=>{generation++;pending=null;const previous=active;active=null;activeCue=null;
+if(previous){previous.onended=null;previous.onerror=null;previous.pause();previous.currentTime=0;}
+state(null,status);};
+window.addEventListener('message',(event)=>{if(event.source!==parent||event.data?.type!=='MIRA_NARRATION_VISIBILITY')return;
+visible=event.data.visible===true;if(!visible){stop('hidden');return;}
+const cueId=waiting;waiting=null;if(cueId&&Date.now()-waitingAt<=4000)window.miraNarrate(cueId);});
+const next=()=>{const cueId=pending;pending=null;if(cueId)play(cueId);};
+const play=async(cueId)=>{const ticket=generation;
+const clip=new Audio(clips[cueId]);active=clip;activeCue=cueId;const current=()=>generation===ticket&&active===clip;
+clip.onended=()=>{if(current()){active=null;activeCue=null;state(cueId,'ready');next();}};
+clip.onerror=()=>{if(current()){active=null;activeCue=null;state(cueId,'error');next();}};
+try{await clip.play();if(!current()){clip.pause();return false;}state(cueId,'playing');return true;}
+catch(_){if(current()){active=null;activeCue=null;state(cueId,'error');next();}return false;}};
+window.miraNarrate=async(cueId)=>{
+if(!Object.prototype.hasOwnProperty.call(clips,cueId)){state(cueId,'missing');return false;}
+if(!visible){waiting=cueId;waitingAt=Date.now();state(cueId,'hidden');return false;}
+if(active&&activeCue!==cueId){pending=cueId;state(cueId,'queued');return true;}
+stop('ready');return play(cueId);};
+state(null,'ready');})();"""
+# Activities can invalidate a teacher cue when a child changes the task. Keep
+# the former helper recognizable so existing published audio stays immutable.
+AUDIO_CODE = _WAITING_AUDIO_CODE.replace(
+    "window.addEventListener('message'",
+    "window.miraCancelNarration=()=>{waiting=null;waitingAt=0;stop('ready');};\n"
+    "window.addEventListener('message'", 1)
+# Lessons narrated before the waiting line keep the queue helper.
+_QUEUE_AUDIO_CODE = """(()=>{
+const clips=MAP;let active=null;
+let activeCue=null,pending=null,generation=0,visible=false;
+const state=(cueId,status)=>{document.documentElement.dataset.miraAudioState=status;
+window.dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status}}));};
+const stop=(status)=>{generation++;pending=null;const previous=active;active=null;activeCue=null;
+if(previous){previous.onended=null;previous.onerror=null;previous.pause();previous.currentTime=0;}
+state(null,status);};
+window.addEventListener('message',(event)=>{if(event.source!==parent||event.data?.type!=='MIRA_NARRATION_VISIBILITY')return;
+visible=event.data.visible===true;if(!visible)stop('hidden');});
+const next=()=>{const cueId=pending;pending=null;if(cueId)play(cueId);};
+const play=async(cueId)=>{const ticket=generation;
+const clip=new Audio(clips[cueId]);active=clip;activeCue=cueId;const current=()=>generation===ticket&&active===clip;
+clip.onended=()=>{if(current()){active=null;activeCue=null;state(cueId,'ready');next();}};
+clip.onerror=()=>{if(current()){active=null;activeCue=null;state(cueId,'error');next();}};
+try{await clip.play();if(!current()){clip.pause();return false;}state(cueId,'playing');return true;}
+catch(_){if(current()){active=null;activeCue=null;state(cueId,'error');next();}return false;}};
+window.miraNarrate=async(cueId)=>{
+if(!visible){state(cueId,'hidden');return false;}
+if(!Object.prototype.hasOwnProperty.call(clips,cueId)){state(cueId,'missing');return false;}
+if(active&&activeCue!==cueId){pending=cueId;state(cueId,'queued');return true;}
+stop('ready');return play(cueId);};
+state(null,'ready');})();"""
+# Lessons narrated before the queue still carry the interrupting helper.
+_INTERRUPTING_AUDIO_CODE = """(()=>{
 const clips=MAP;let active=null;
 let generation=0,visible=false;
 const state=(cueId,status)=>{document.documentElement.dataset.miraAudioState=status;
@@ -29,8 +88,8 @@ catch(_){if(current()){active=null;state(cueId,'error');}return false;}};
 state(null,'ready');})();"""
 
 
-def _helper(urls):
-    return '<script id="mira-pre-recorded-audio">' + AUDIO_CODE.replace(
+def _helper(urls, code=AUDIO_CODE):
+    return '<script id="mira-pre-recorded-audio">' + code.replace(
         "MAP", json.dumps(urls, ensure_ascii=True, separators=(",", ":"))) + "</script>"
 
 
@@ -98,7 +157,7 @@ def without_audio_helper(html):
             urls = json.loads(block[start:end])
         except (ValueError, TypeError) as exc:
             raise ValueError("interactive_audio_helper_changed") from exc
-        if (not isinstance(urls, dict) or block != _helper(urls)
+        if (not isinstance(urls, dict) or block not in {_helper(urls, code) for code in (AUDIO_CODE, _WAITING_AUDIO_CODE, _QUEUE_AUDIO_CODE, _INTERRUPTING_AUDIO_CODE)}
                 or any(IDENTITY.fullmatch(key) is None or not isinstance(url, str)
                        or re.fullmatch(r"/api/classroom-media/[A-Za-z0-9_-]+/audio/[A-Za-z0-9_-]+\.wav", url) is None
                        for key, url in urls.items())):
@@ -119,9 +178,20 @@ def bind_interactive_audio(html, urls, classroom_id):
     # Only our helper owns this symbol. Generated activities call it; they do
     # not synthesise speech or override the finite, audited sound inventory.
     source = without_audio_helper(html)
-    if re.search(r"(?:window\s*\.\s*miraNarrate\s*=|function\s+miraNarrate\b)", source):
+    if re.search(r"(?:window\s*\.\s*mira(?:Narrate|CancelNarration)\s*=(?!=)|function\s+mira(?:Narrate|CancelNarration)\b)", source):
         raise ValueError("interactive_audio_player_override_forbidden")
-    helper = _helper(urls)
+    # Rebinding is also used to verify immutable published snapshots. Preserve
+    # their accepted player version; only a newly bound activity gets cancel.
+    code = AUDIO_CODE
+    existing = AUDIO_BLOCK.findall(html)
+    if existing:
+        block = existing[0]
+        start = block.index("const clips=") + len("const clips=")
+        prior_urls = json.loads(block[start:block.index(";let active=null;", start)])
+        code = next(version for version in (
+            AUDIO_CODE, _WAITING_AUDIO_CODE, _QUEUE_AUDIO_CODE, _INTERRUPTING_AUDIO_CODE
+        ) if block == _helper(prior_urls, version))
+    helper = _helper(urls, code)
     opening = re.search(r"<head(?:\s[^>]*)?>", source, re.I)
     if opening:
         return source[:opening.end()] + helper + source[opening.end():]

@@ -1,0 +1,157 @@
+diff --git a/components/scene-renderers/quiz-view.tsx b/components/scene-renderers/quiz-view.tsx
+--- a/components/scene-renderers/quiz-view.tsx
++++ b/components/scene-renderers/quiz-view.tsx
+@@ -46,6 +46,7 @@
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import { FixedTextbookQuiz } from './fixed-textbook-quiz';
+ import { QuizPicture } from './quiz-picture';
++import pictureOptionStyles from './quiz-picture-options.module.css';
+ 
+ // ─── Types ──────────────────────────────────────────────────────────────────
+ 
+@@ -276,10 +277,14 @@
+ }) {
+   const isReview = !!result;
+   const threePictures = question.options?.length === 3 && question.options.every(option => !!question.optionVisuals?.[option.value]);
++  const threeImages = threePictures && question.options!.every(
++    option => question.optionVisuals?.[option.value]?.kind === 'image',
++  );
+ 
+   return (
+     <QuestionCard question={question} index={index} result={result} autoNarrate={autoNarrate}>
+-      <div className={cn('grid min-w-0 gap-2', threePictures ? 'grid-cols-3' : 'grid-cols-1 sm:grid-cols-2')}>
++      <div className={threeImages ? pictureOptionStyles.container : undefined}>
++      <div className={cn('grid min-w-0 gap-2', threePictures ? 'grid-cols-3' : 'grid-cols-1 sm:grid-cols-2', threeImages && pictureOptionStyles.options)}>
+         {question.options?.map((opt) => {
+           const visual = question.optionVisuals?.[opt.value];
+           const selected = value === opt.value;
+@@ -355,6 +360,7 @@
+           );
+         })}
+       </div>
++      </div>
+     </QuestionCard>
+   );
+ }
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -8,6 +8,7 @@
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
+ import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { QuizPicture } from './quiz-picture';
++import pictureOptionStyles from './quiz-picture-options.module.css';
+ 
+ type Graded = { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string };
+ type Result = { score: number; maxScore: number; correctCount: number; totalQuestions: number; results: Graded[] };
+@@ -92,6 +93,9 @@
+   const q = questions[questionIndex];
+   const feedback = q && graded.find(r => r.questionId === q.id);
+   const audio = q && questionNarrationSource(q);
++  const threeImages = q?.options?.length === 3 && q.options.every(
++    option => q.optionVisuals?.[option.value]?.kind === 'image',
++  );
+   return <section className="h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]" aria-label="课堂练习">
+     <div className="mx-auto flex min-h-full max-w-5xl flex-col p-3 sm:p-5">
+       <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
+@@ -103,10 +107,10 @@
+           <legend className="px-2 text-sm text-[#788275]">第 {questionIndex + 1} 题</legend>
+           <div className={`grid min-w-0 items-center gap-3 ${q.visual ? 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]' : ''}`}>
+             {q.visual && <div className="min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44" data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
+-            <div className="min-w-0">
++            <div className={`min-w-0 ${threeImages ? pictureOptionStyles.container : ''}`}>
+             <p className="mb-2 text-base leading-relaxed sm:text-lg">{q.question}</p>
+             {audio && <QuestionNarration key={q.id} src={audio} number={questionIndex + 1} sceneId={sceneId} questionId={q.id} autoPlay={!done && !feedback && !sending} />}
+-            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'}`} role="radiogroup" aria-label={q.question}>
++            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${threeImages ? pictureOptionStyles.options : ''}`} role="radiogroup" aria-label={q.question}>
+               {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+                 aria-label={option.label} key={option.value} disabled={done || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+                 className={`min-h-14 min-w-14 rounded-xl border p-1 text-2xl transition-colors [&_img]:h-24 [&_svg]:max-h-24 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
+diff --git a/components/scene-renderers/quiz-picture-options.module.css b/components/scene-renderers/quiz-picture-options.module.css
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/quiz-picture-options.module.css
+@@ -0,0 +1,30 @@
++/* Query the actual question width, including a narrow embedded classroom. */
++.container {
++  container-type: inline-size;
++}
++
++@container (max-width: 560px) {
++  .options {
++    grid-template-columns: minmax(0, 1fr);
++  }
++
++  .options > button {
++    display: flex;
++    align-items: center;
++    justify-content: center;
++    flex-direction: row;
++    min-width: 56px;
++    min-height: 136px;
++  }
++
++  .options > button > [data-quiz-visual="image"] {
++    flex: 1 1 0%;
++    min-width: 0;
++  }
++
++  /* Labels remain supplementary; the picture receives the available width. */
++  .options > button > span:last-of-type {
++    flex: 0 0 4em;
++    overflow-wrap: anywhere;
++  }
++}
+diff --git a/tests/scene-renderers/quiz-picture-layout.test.ts b/tests/scene-renderers/quiz-picture-layout.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/quiz-picture-layout.test.ts
+@@ -0,0 +1,48 @@
++import { createElement } from 'react';
++import { renderToStaticMarkup } from 'react-dom/server';
++import { describe, expect, it, vi } from 'vitest';
++import { SingleChoiceQuestion } from '@/components/scene-renderers/quiz-view';
++import type { QuizQuestion } from '@/lib/types/stage';
++
++vi.mock('@/lib/hooks/use-i18n', () => ({ useI18n: () => ({ t: (key: string) => key, locale: 'zh-CN' }) }));
++const question: QuizQuestion = {
++  id: 'picture-choice', type: 'single', question: '听一听，找到见面的图。', answer: ['B'], points: 10,
++  options: [{ value: 'A', label: '第一幅' }, { value: 'B', label: '第二幅' }, { value: 'C', label: '第三幅' }],
++  optionVisuals: Object.fromEntries(['A', 'B', 'C'].map(value => [value, { kind: 'image', src: `/media/${value}.png`, alt: value }])),
++};
++const render = (q: QuizQuestion, extra = {}) => renderToStaticMarkup(createElement(SingleChoiceQuestion, {
++  question: q, index: 0, onChange: () => {}, ...extra,
++}));
++
++describe('narrow image-choice presentation', () => {
++  it('uses the scoped container only for three actual image options', () => {
++    const html = render(question);
++    expect(html).toMatch(/class="[^"]*container/);
++    expect(html).toMatch(/class="[^"]*options/);
++    for (const value of ['A', 'B', 'C']) {
++      expect(html).toContain(`data-quiz-option="${value}"`);
++      expect(html).toContain(`src="/media/${value}.png"`);
++    }
++    expect(html.match(/border-gray-200/g)).toHaveLength(3);
++    expect(html).not.toContain('border-emerald-400');
++  });
++
++  it('preserves text and quantity-choice layout and answer values', () => {
++    const text = render({ ...question, optionVisuals: undefined });
++    const quantities = render({ ...question, optionVisuals: Object.fromEntries(['A', 'B', 'C'].map((value, i) => [value, { kind: 'quantity', count: i + 1 }])) });
++    expect(text).not.toMatch(/class="[^"]*container/);
++    expect(quantities).not.toMatch(/class="[^"]*container/);
++    expect(quantities).toContain('grid-cols-3');
++    expect(text).toContain('data-quiz-option="B"');
++  });
++
++  it('keeps selection, disabled controls, and post-submission review styling', () => {
++    const selected = render(question, { value: 'C' });
++    expect(selected.match(/border-violet-400/g)).toHaveLength(1);
++    const review = render(question, { value: 'C', disabled: true, result: { questionId: question.id, correct: false, status: 'incorrect', earned: 0 } });
++    expect(review.match(/disabled=""/g)).toHaveLength(3);
++    expect(review.match(/border-emerald-400/g)).toHaveLength(1);
++    expect(review.match(/border-red-300/g)).toHaveLength(1);
++    expect(question.answer).toEqual(['B']);
++  });
++});

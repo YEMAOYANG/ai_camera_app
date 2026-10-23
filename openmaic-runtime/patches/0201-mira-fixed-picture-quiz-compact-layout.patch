@@ -1,0 +1,269 @@
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -9,6 +9,7 @@
+ import { QuestionNarration, questionNarrationSource } from '@/components/audio/question-narration';
+ import { QuizPicture } from './quiz-picture';
+ import pictureOptionStyles from './quiz-picture-options.module.css';
++import compactPictureStyles from './fixed-textbook-picture-layout.module.css';
+ 
+ type Graded = { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string };
+ type Result = { score: number; maxScore: number; correctCount: number; totalQuestions: number; results: Graded[] };
+@@ -96,21 +97,21 @@
+   const threeImages = q?.options?.length === 3 && q.options.every(
+     option => q.optionVisuals?.[option.value]?.kind === 'image',
+   );
+-  return <section className="h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]" aria-label="课堂练习">
+-    <div className="mx-auto flex min-h-full max-w-5xl flex-col p-3 sm:p-5">
+-      <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
++  return <section data-picture-layout={threeImages ? 'three-images' : undefined} className={`${threeImages ? compactPictureStyles.root : ''} h-full min-h-0 overflow-y-auto bg-[#fbf7ed] text-[#31473f]`} aria-label="课堂练习">
++    <div className={`${threeImages ? compactPictureStyles.shell : ''} mx-auto flex min-h-full max-w-5xl flex-col p-3 sm:p-5`}>
++      <header className={`${threeImages ? compactPictureStyles.header : ''} mb-3 flex shrink-0 items-center justify-between gap-3`}>
+         <h2 className="text-lg font-semibold sm:text-2xl">{done ? `答对 ${graded.filter(r => r.correct).length} / ${graded.length} 题` : '听一听，选一选'}</h2>
+         <span className="text-sm text-[#697a6c]" aria-label="题目进度">{questionIndex + 1} / {questions.length}</span>
+       </header>
+       {loading ? <p role="status">正在打开练习…</p> : q &&
+-        <fieldset key={q.id} data-fixed-question={q.id} className="min-w-0 rounded-2xl border border-[#e9dfcd] bg-white/80 p-3 sm:p-4">
++        <fieldset key={q.id} data-fixed-question={q.id} className={`${threeImages ? compactPictureStyles.fieldset : ''} min-w-0 rounded-2xl border border-[#e9dfcd] bg-white/80 p-3 sm:p-4`}>
+           <legend className="px-2 text-sm text-[#788275]">第 {questionIndex + 1} 题</legend>
+-          <div className={`grid min-w-0 items-center gap-3 ${q.visual ? 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]' : ''}`}>
+-            {q.visual && <div className="min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44" data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
+-            <div className={`min-w-0 ${threeImages ? pictureOptionStyles.container : ''}`}>
++          <div className={`${threeImages ? compactPictureStyles.task : ''} grid min-w-0 items-center gap-3 ${q.visual ? 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]' : ''}`}>
++            {q.visual && <div className={`${threeImages ? compactPictureStyles.scenePicture : ''} min-w-0 [&_img]:max-h-24 sm:[&_img]:max-h-44 [&_svg]:max-h-24 sm:[&_svg]:max-h-44`} data-quiz-scene-picture><QuizPicture visual={q.visual} scene /></div>}
++            <div className={`${threeImages ? compactPictureStyles.question : ''} min-w-0 ${threeImages ? pictureOptionStyles.container : ''}`}>
+             <p className="mb-2 text-base leading-relaxed sm:text-lg">{q.question}</p>
+             {audio && <QuestionNarration key={q.id} src={audio} number={questionIndex + 1} sceneId={sceneId} questionId={q.id} autoPlay={!done && !feedback && !sending} />}
+-            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${threeImages ? pictureOptionStyles.options : ''}`} role="radiogroup" aria-label={q.question}>
++            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${threeImages ? pictureOptionStyles.options + ' ' + compactPictureStyles.options : ''}`} role="radiogroup" aria-label={q.question}>
+               {(q.options || []).map(option => <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+                 aria-label={option.label} key={option.value} disabled={done || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+                 className={`min-h-14 min-w-14 rounded-xl border p-1 text-2xl transition-colors [&_img]:h-24 [&_svg]:max-h-24 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
+@@ -124,7 +125,7 @@
+           </div>
+         </fieldset>}
+       {error && <p role="alert" className="mt-5 text-[#9b503b]">{error}</p>}
+-      <footer className="mt-auto flex shrink-0 items-center justify-between gap-3 pt-3">
++      <footer className={`${threeImages ? compactPictureStyles.footer : ''} mt-auto flex shrink-0 items-center justify-between gap-3 pt-3`}>
+         {!loading && q && <button type="button" aria-label="上一题" onClick={() => setQuestionIndex(index => index - 1)} disabled={sending || questionIndex === 0}
+           className="inline-flex min-h-14 min-w-14 items-center justify-center rounded-full border border-[#c7d1c5] px-3 disabled:opacity-30"><ArrowLeft size={18} aria-hidden /></button>}
+         {!loading && q && questionIndex < questions.length - 1 && <button type="button" aria-label="下一题"
+diff --git a/components/scene-renderers/fixed-textbook-picture-layout.module.css b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+new file mode 100644
+--- /dev/null
++++ b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+@@ -0,0 +1,147 @@
++/* Only the fixed student three-image question opts into this size container.
++   Ordinary QuizView, text answers and other option counts keep their layout. */
++.root {
++  container: fixed-picture-quiz / size;
++}
++
++@container fixed-picture-quiz (max-width: 560px) {
++  .shell {
++    height: 100%;
++    min-height: 0;
++    padding: 8px;
++    gap: 4px;
++    overflow: hidden;
++  }
++
++  .header {
++    margin: 0;
++    min-height: 24px;
++  }
++
++  .header h2 { font-size: 18px; line-height: 24px; }
++
++  .fieldset {
++    flex: 1 1 0%;
++    min-height: 0;
++    padding: 6px 8px;
++    overflow-y: auto;
++  }
++
++  .fieldset > legend {
++    position: absolute;
++    width: 1px;
++    height: 1px;
++    padding: 0;
++    overflow: hidden;
++    clip: rect(0, 0, 0, 0);
++    white-space: nowrap;
++  }
++
++  .task {
++    display: flex;
++    flex-direction: column;
++    align-items: stretch;
++    height: 100%;
++    min-height: 0;
++    gap: 4px;
++  }
++
++  .scenePicture {
++    flex: 0 0 clamp(48px, 18cqh, 88px);
++    height: clamp(48px, 18cqh, 88px);
++    min-height: 48px;
++  }
++
++  .scenePicture > [data-quiz-visual],
++  .scenePicture [data-quiz-visual] > img {
++    width: 100%;
++    height: 100%;
++    max-height: 100%;
++    object-fit: contain;
++  }
++
++  .question {
++    display: flex;
++    flex-direction: column;
++    flex: 1 1 0%;
++    min-height: 0;
++    gap: 4px;
++  }
++
++  .question > p:first-child {
++    flex: 0 0 auto;
++    margin: 0;
++    font-size: 14px;
++    line-height: 20px;
++  }
++
++  /* The real QuestionNarration component and its failure/retry UI are retained. */
++  .question > div:not([role="radiogroup"]) {
++    flex: 0 0 auto;
++    margin: 0;
++  }
++
++  .question > div:not([role="radiogroup"]) > button {
++    min-width: 48px;
++    min-height: 48px;
++    height: 48px;
++    padding: 0 16px;
++  }
++
++  .question > div:not([role="radiogroup"]) > button > svg {
++    width: 18px;
++    height: 18px;
++  }
++
++  .question .options {
++    display: grid;
++    grid-template-columns: repeat(3, minmax(0, 1fr));
++    flex: 1 1 0%;
++    min-height: 80px;
++    align-items: center;
++    gap: 6px;
++  }
++
++  .question .options > button {
++    display: flex;
++    align-items: center;
++    justify-content: center;
++    width: 100%;
++    height: 100%;
++    max-height: 144px;
++    min-width: 48px;
++    min-height: 80px;
++    padding: 4px;
++  }
++
++  .question .options > button > [data-quiz-visual="image"] {
++    flex: 1 1 0%;
++    width: 100%;
++    height: 100%;
++    min-height: 0;
++  }
++
++  .question .options > button > [data-quiz-visual="image"] > img {
++    width: 100%;
++    height: 100%;
++    max-height: 136px;
++    object-fit: contain;
++  }
++
++  .footer {
++    flex: 0 0 auto;
++    min-height: 48px;
++    margin: 0;
++    padding: 0;
++  }
++
++  .footer > button {
++    min-width: 48px;
++    min-height: 48px;
++    height: 48px;
++    padding: 0 16px;
++    font-size: 16px;
++  }
++
++  .footer > button > svg { width: 18px; height: 18px; }
++}
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts b/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
+--- a/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
++++ b/tests/scene-renderers/fixed-textbook-quiz-sequence.test.ts
+@@ -37,11 +37,11 @@
+ });
+ const questions = [question('q1'), question('q2')];
+ const graded = (id: string) => ({ questionId: id, response: 'B', correct: true, explanation: '选对了。', correctAnswer: 'B' });
+-async function mount() {
++async function mount(pageQuestions: QuizQuestion[] = questions) {
+   const host = document.createElement('div');
+   document.body.append(host);
+   root = createRoot(host);
+-  await act(async () => root!.render(createElement(FixedTextbookQuiz, { questions })));
++  await act(async () => root!.render(createElement(FixedTextbookQuiz, { questions: pageQuestions })));
+   return host;
+ }
+ async function click(host: HTMLElement, selector: string) {
+@@ -142,3 +142,49 @@
+     expect(text).not.toContain('grid-cols-3');
+   });
+ });
++
++
++describe('fixed three-image compact presentation preserves task semantics', () => {
++  const pictured = (count = 3): QuizQuestion => ({ ...question('pictures'),
++    options: Array.from({ length: count }, (_, i) => ({ value: String.fromCharCode(65 + i), label: `图${i + 1}` })),
++    optionVisuals: Object.fromEntries(Array.from({ length: count }, (_, i) => [String.fromCharCode(65 + i),
++      { kind: 'image', src: `/api/classroom-media/lesson/media/${i}.png`, alt: `图${i + 1}` }])),
++    visual: { kind: 'image', src: '/api/classroom-media/lesson/media/stem.png', alt: '情境图' },
++  });
++
++  it('keeps the stem, three equal initial choices, original narration and exact answer submission', async () => {
++    const q = pictured();
++    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => ({ ok: true, json: async () => init?.method === 'POST'
++      ? { ok: true, result: { results: [graded(q.id)] } } : { ok: true } }));
++    vi.stubGlobal('fetch', fetchMock);
++    const host = await mount([q]);
++    expect(host.querySelector('[data-picture-layout="three-images"]')).not.toBeNull();
++    expect([...host.querySelectorAll('img')].map(img => img.getAttribute('src'))).toEqual([
++      '/api/classroom-media/lesson/media/stem.png',
++      '/api/classroom-media/lesson/media/0.png', '/api/classroom-media/lesson/media/1.png', '/api/classroom-media/lesson/media/2.png',
++    ]);
++    const buttons = [...host.querySelectorAll<HTMLButtonElement>('[role=radio]')];
++    expect(new Set(buttons.map(button => button.className)).size).toBe(1);
++    expect(buttons.map(button => button.getAttribute('aria-checked'))).toEqual(['false', 'false', 'false']);
++    expect(host.querySelector('[data-narration-question]')!.getAttribute('data-narration-question')).toBe(q.id);
++    expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('true');
++    await click(host, '[role=radio][aria-label="图3"]');
++    await click(host, '[role=radio][aria-label="图2"]');
++    const submit = [...host.querySelectorAll('footer button')].find(button => button.textContent?.includes('完成练习')) as HTMLButtonElement;
++    expect(submit.disabled).toBe(false);
++    await act(async () => { submit.click(); submit.click(); });
++    const posts = fetchMock.mock.calls.filter(([, init]) => init?.method === 'POST');
++    expect(posts).toHaveLength(1);
++    expect(JSON.parse(posts[0][1]!.body as string)).toEqual({ answers: { pictures: 'B' } });
++    expect(host.querySelector('[data-narration-autoplay]')!.getAttribute('data-narration-autoplay')).toBe('false');
++  });
++
++  it.each(['four-images', 'text', 'quantity'] as const)('does not opt %s into the compact picture branch', async kind => {
++    const q = kind === 'four-images' ? pictured(4) : kind === 'text' ? { ...question('text'), optionVisuals: undefined } : question('quantity');
++    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => ({ ok: true }) })));
++    const host = await mount([q]);
++    expect(host.querySelector('[data-picture-layout]')).toBeNull();
++    expect(host.querySelectorAll('[role=radio]')).toHaveLength(q.options!.length);
++    expect(host.querySelector('[role=radiogroup]')!.getAttribute('aria-label')).toBe(q.question);
++  });
++});

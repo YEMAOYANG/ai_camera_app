@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "mira.learning.unit-blueprints.v1",
+  "editionId": "smartedu-science-six-year-g1-upper-5082db8c",
+  "revisionId": "directory-85c5a7913d61bf6ad6fd9a50",
+  "unitId": "d761c8f1-ed10-40ca-8694-202bc5a9e260",
+  "source": {
+    "url": "https://basic.smartedu.cn/tchMaterial/detail?contentId=5082db8c-82e3-4253-be5a-36a4cc7473a6",
+    "resourceId": "5082db8c-82e3-4253-be5a-36a4cc7473a6",
+    "verifiedAt": "2026-10-19",
+    "metadataUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/resources/tch_material/details/5082db8c-82e3-4253-be5a-36a4cc7473a6.json",
+    "method": "沿用本课已冻结的官方目录、印刷第2—4页逐页观察及来源审核；登记精确课次范围，不复制原教材图片、课文、题目、音频或版式。",
+    "printedPages": [
+      2,
+      3,
+      4
+    ],
+    "publicPreviewPages": [
+      8,
+      9,
+      10
+    ],
+    "reviewerKind": "ai",
+    "humanReviewed": false,
+    "localReviewPath": "output/textbook-operator-lessons/smartedu-science-six-year-g1-upper-5082db8c/494da807-9085-427e-a1c4-bc7d3f4c826f/teaching-1/sources/source-review.json",
+    "sourceReviewSha256": "f0cf903957c19441819c263a59515ba4f90a26f463700805ce1da15dfe0bf27a",
+    "authoringDraftSha256": "fd9eb4ea74580668bd8bf45e43bf43efe8ac72677c6a5b14b9fa1fb2e35f9f89",
+    "usageBoundary": "仅登记本课范围并允许接收已保存的原创运营课件；目录 rightsReview 仍为 pending，不代表配音、教学终审、发布或学生验收通过。"
+  },
+  "lessons": [
+    {
+      "nodeId": "494da807-9085-427e-a1c4-bc7d3f4c826f",
+      "title": "1.我们知道的植物",
+      "status": "scope_verified_preview_only",
+      "scopePages": [
+        2,
+        3,
+        4
+      ],
+      "mediaManifest": "science-known-plants.original-v1.json",
+      "targets": [
+        "听名称并结合图片辨认本课熟悉的向日葵",
+        "在校园图片中从熟悉物品里找出植物",
+        "在新的场景中继续辨认本课认识过的植物",
+        "根据可见的枝条特点在图片中辨认柳树"
+      ],
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "听老师说名称，观察原创全株图，认识向日葵、柳树和竹子等本课熟悉植物。",
+          "在熟悉校园场景中寻找并圈出植物；区分植物和长椅、球等常见物品。",
+          "换一处原创情境，继续用图片中的可见特点寻找本课认识过的植物。",
+          "用指图或简短口语交流观察发现；不知道名称时可以先指出对象，不以独立命名计分。"
+        ],
+        "knowledgePoints": [
+          "身边有样子不同的植物，先观察全株和显眼部位，再结合老师口头名称进行辨认。",
+          "观察校园图可以找到树、草和花等植物；不能仅凭绿色、是否移动或有没有花来判断。",
+          "柳树枝条下垂、向日葵花盘显眼等可见特点用于本课直观观察，不扩展为普遍分类规则。",
+          "圈找、相册和图片小测只记录有图片与语音支持的理解；不等于独立读字、无提示命名或真实种植能力。"
+        ],
+        "priorKnowledge": [
+          "能理解简短日常口语并指向图片；不要求独立阅读题目、植物名称或答案标签。",
+          "允许已有植物经验不同，可主动重听或请求图片示范。"
+        ],
+        "excludedTopics": [
+          "教材原文、原题、原图、音频与版式复制",
+          "根茎叶的系统分类、光合作用、生长条件实验或后续课次的完整植物学知识",
+          "以绿色、会不会移动或有没有花作为单一判定规则",
+          "把可选种植拓展变成评分任务或声称孩子已掌握种植技能",
+          "把图片支持下的正确选择等同于独立命名、识字或全单元掌握"
+        ],
+        "assessmentMode": "objective",
+        "reviewNote": "2026-10-19 沿用本课已冻结的 AI 来源核验：官方目录第一课自印刷2页起、第二课从5页起；第2—4页涉及熟悉植物交流、校园图圈找和可选种植拓展。只登记这一课，四个图片小测依次对应四个目标。原始14页和 lockedAssessments 不变；未作人工终审或发布确认。"
+      },
+      "assessmentMapping": [
+        {
+          "targetIndex": 0,
+          "questionId": "plant-known-01",
+          "page": 5,
+          "evidence": "请找出刚才观察过的向日葵。",
+          "correctAnswer": "B",
+          "optionAssets": {
+            "A": "bamboo-full",
+            "B": "sunflower-full",
+            "C": "willow-full"
+          }
+        },
+        {
+          "targetIndex": 1,
+          "questionId": "plant-campus-02",
+          "page": 8,
+          "evidence": "哪张图片里是我们要找的植物呢？",
+          "correctAnswer": "C",
+          "optionAssets": {
+            "A": "bench",
+            "B": "ball",
+            "C": "grass"
+          }
+        },
+        {
+          "targetIndex": 2,
+          "questionId": "plant-transfer-03",
+          "page": 11,
+          "evidence": "请找出我们今天认识过的植物。",
+          "correctAnswer": "A",
+          "optionAssets": {
+            "A": "bamboo-full",
+            "B": "stone-seat",
+            "C": "ball"
+          }
+        },
+        {
+          "targetIndex": 3,
+          "questionId": "plant-evidence-04",
+          "page": 13,
+          "evidence": "哪一张是枝条向下垂的柳树呢？",
+          "correctAnswer": "B",
+          "optionAssets": {
+            "A": "bamboo-full",
+            "B": "willow-full",
+            "C": "sunflower-full"
+          }
+        }
+      ],
+      "game": "观察放大镜改变所见部位；按口头描述寻找植物并建立相册；用画笔圈出植物并可撤回；在新场景中继续寻找；选择可见特征组织自己的观察表达。保留可编辑状态、解释与重试，不把所有活动改成三选一。",
+      "transfer": "换成新的原创植物场景，保留同一观察方法，改变布局与对象组合；不复现原题原布局来冒充迁移。",
+      "parentSupport": "在安全地点与孩子观察熟悉植物，允许指图或指物说一条发现；种植仅作可选亲子拓展，不计入本课成绩。",
+      "generationReady": false,
+      "missing": [
+        "正式教师配音与完整逐句审核",
+        "实际课堂教学终审和原创素材来源终审",
+        "发布收据与学生端实际验收"
+      ]
+    }
+  ]
+}

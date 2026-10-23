@@ -1,0 +1,453 @@
+diff --git a/lib/server/mira-textbook-rejected-scene-repair.ts b/lib/server/mira-textbook-rejected-scene-repair.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/mira-textbook-rejected-scene-repair.ts
+@@ -0,0 +1,225 @@
++/** Local operator repair only: no HTTP route, model, audio, or publication side effects. */
++import { createHash } from 'node:crypto';
++import { constants, promises as fs } from 'node:fs';
++import path from 'node:path';
++import { validateScene } from '@openmaic/dsl';
++import { PgDocumentStore, type Queryable } from '@openmaic/storage/document/pg';
++import { validateAppStage } from '@/lib/document-store/validators';
++import { createOwnerBoundDocumentStore, type TransactionSource } from '@/lib/persistence/owner-bound-document-store';
++import { resolveRequestOwnerId } from './agent-runtime/owner';
++import type { CourseDocument, CourseStore } from './agent-runtime/course-tools';
++import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest, textbookContractFromPrompt } from './mira-textbook-scene-contract';
++
++type Json = Record<string, any>;
++const digestBytes = (v: string | Buffer) => createHash('sha256').update(v).digest('hex');
++const fail = (code: string): never => { throw new Error(`TEXTBOOK_REPAIR_${code}`); };
++const check = (ok: unknown, code: string): void => { if (!ok) fail(code); };
++const seal = (body: Json): Json => ({ ...body, sha256: textbookDigest(body) });
++function unseal(value: Json): Json {
++  const { sha256, ...body } = value;
++  check(sha256 === textbookDigest(body), 'SEAL_INVALID');
++  return body;
++}
++async function privateRead(file: string): Promise<Buffer> {
++  const absolute = path.resolve(file);
++  check(!(await fs.lstat(absolute)).isSymbolicLink(), 'SYMLINK_REFUSED');
++  const handle = await fs.open(absolute, constants.O_RDONLY | constants.O_NOFOLLOW);
++  try { check((await handle.stat()).isFile(), 'FILE_INVALID'); return await handle.readFile(); }
++  finally { await handle.close(); }
++}
++async function immutable(file: string, value: Json): Promise<void> {
++  const directory = path.dirname(file);
++  let current = path.parse(directory).root;
++  for (const component of directory.slice(current.length).split(path.sep)) {
++    current = path.join(current, component);
++    try { await fs.mkdir(current, { mode: 0o700 }); } catch (e: any) { if (e.code !== 'EEXIST') throw e; }
++    const stat = await fs.lstat(current);
++    check(stat.isDirectory() && !stat.isSymbolicLink(), 'PRIVATE_PATH_INVALID');
++  }
++  const bytes = textbookCanonical(value) + '\n';
++  try {
++    const handle = await fs.open(file, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600);
++    try { await handle.writeFile(bytes); await handle.sync(); } finally { await handle.close(); }
++  } catch (e: any) {
++    if (e.code !== 'EEXIST') throw e;
++    check((await privateRead(file)).toString() === bytes, 'IMMUTABLE_COLLISION');
++  }
++}
++export interface RepairInput {
++  jobDir: string;
++  archivePath: string;
++  archiveSha256: string;
++  revisedHtmlPath: string;
++  revisedHtmlSha256: string;
++}
++export interface RepairEnvironment {
++  pool: TransactionSource;
++  /** Existing Native data directory, never an arbitrary public media directory. */
++  dataDir: string;
++}
++async function inputs(input: RepairInput, env: RepairEnvironment) {
++  check(Object.keys(input).sort().join(',') === 'archivePath,archiveSha256,jobDir,revisedHtmlPath,revisedHtmlSha256', 'INPUT_SHAPE');
++  const dataDir = await fs.realpath(env.dataDir);
++  const archiveBytes = await privateRead(input.archivePath);
++  check(digestBytes(archiveBytes) === input.archiveSha256, 'ARCHIVE_SHA');
++  const archive = JSON.parse(archiveBytes.toString());
++  check(archive.schemaVersion === 'mira.textbook.rejected-scene.v1' && archive.status === 'rejected' && archive.verification === 'rejected_not_saved_not_reviewed', 'ARCHIVE_SCHEMA');
++  check(/^[A-Za-z0-9_-]{1,160}$/.test(archive.stageId) && typeof archive.sessionId === 'string', 'ARCHIVE_ID');
++  check(path.resolve(input.archivePath) === path.join(dataDir, 'textbook-rejected-scenes', digestBytes(archive.sessionId), archive.stageId, `${input.archiveSha256}.json`), 'ARCHIVE_LOCATION');
++  const scene = JSON.parse(archive.sceneCanonicalJson);
++  check(textbookCanonical(scene) === archive.sceneCanonicalJson && textbookDigest(scene) === archive.sceneSha256 && scene.stageId === archive.stageId, 'ARCHIVE_SCENE_SHA');
++  check(scene.type === 'interactive' && scene.content?.type === 'interactive' && typeof scene.content.html === 'string', 'HTML_ONLY');
++  // This version replaces only the sole HTML body; legacy duplicate bodies need an explicit future contract.
++  check(scene.content.widgetConfig?.html === undefined && (scene.content.url === undefined || scene.content.url === ''), 'DUPLICATE_HTML_UNSUPPORTED');
++  const html = await privateRead(input.revisedHtmlPath);
++  check(digestBytes(html) === input.revisedHtmlSha256 && html.length > 0 && html.length <= 4 * 1024 * 1024, 'HTML_SHA');
++  const revised = structuredClone(scene);
++  revised.content.html = new TextDecoder('utf-8', { fatal: true }).decode(html);
++  check(revised.content.html !== scene.content.html, 'NO_CHANGE');
++  const validation = validateScene(revised);
++  check(validation.valid, 'STRICT_DSL');
++  const job = path.resolve(input.jobDir);
++  const cookies = (await privateRead(path.join(job, 'owner.cookies'))).toString();
++  const owners = cookies.split(/\r?\n/).map(line => line.replace(/^#HttpOnly_/, '')).filter(line => line && !line.startsWith('#')).map(line => line.split('\t')).filter(parts => parts.length === 7 && parts[5] === 'anonymous_id').map(parts => parts[6]);
++  check(owners.length === 1 && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(owners[0]), 'OWNER_COOKIE');
++  const headers = new Headers();
++  const ownerId = resolveRequestOwnerId({ headers: new Headers({ cookie: `anonymous_id=${owners[0]}` }) }, headers);
++  check(!headers.has('set-cookie'), 'OWNER_COOKIE');
++  const ownerFingerprint = digestBytes(owners[0]);
++  const jobState = JSON.parse((await privateRead(path.join(job, 'state.json'))).toString());
++  check(jobState.sessionId === archive.sessionId, 'JOB_SESSION');
++  const dispatch = JSON.parse((await privateRead(path.join(job, 'dispatch.json'))).toString());
++  const frozenFile = JSON.parse((await privateRead(path.join(job, 'frozen.json'))).toString());
++  check(dispatch.ownerFingerprint === ownerFingerprint && frozenFile.sceneContract?.sha256 === archive.contractSha256, 'JOB_BINDING');
++  const ledgerPath = path.join(dataDir, 'classrooms', archive.stageId, 'textbook-authoring-candidate.json');
++  const ledger = JSON.parse((await privateRead(ledgerPath)).toString());
++  unseal(ledger);
++  return { archive, scene, revised, ownerId, ownerFingerprint, frozenFile, ledger, ledgerPath, dataDir };
++}
++
++/** Reuse the real owner-bound store inside one outer transaction. Its nested transactions are SAVEPOINTs. */
++async function transaction<T>(env: RepairEnvironment, readOnly: boolean, fn: (q: Queryable, pool: TransactionSource) => Promise<T>): Promise<T> {
++  const client = await env.pool.connect();
++  const q: Queryable = { query: async <R extends Record<string, unknown>>(sql: string, args?: unknown[]) => {
++    if (readOnly) {
++      check(/^\s*SELECT\b/i.test(sql), 'READ_ONLY_QUERY');
++      // PgDocumentStore requests a share row lock for reads; the consistent
++      // read-only snapshot needs no lock, and PostgreSQL forbids it here.
++      sql = sql.replace(/\s+FOR SHARE\s*$/i, '');
++    }
++    return { rows: (await client.query(sql, args)).rows as R[] };
++  } };
++  let serial = 0;
++  const nested: TransactionSource = { connect: async () => {
++    let savepoint: string | undefined;
++    return { release() {}, query: async (sql, args) => {
++      if (sql.startsWith('BEGIN')) { check(!savepoint, 'NESTED_TRANSACTION'); savepoint = `repair_${++serial}`; return client.query(`SAVEPOINT ${savepoint}`); }
++      if (sql === 'COMMIT' || sql === 'ROLLBACK') {
++        check(savepoint, 'NESTED_TRANSACTION');
++        if (sql === 'ROLLBACK') await client.query(`ROLLBACK TO SAVEPOINT ${savepoint}`);
++        const result = await client.query(`RELEASE SAVEPOINT ${savepoint}`); savepoint = undefined; return result;
++      }
++      return client.query(sql, args);
++    } };
++  } };
++  try {
++    await client.query(readOnly ? 'BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY' : 'BEGIN');
++    const result = await fn(q, nested);
++    await client.query('COMMIT');
++    return result;
++  } catch (error) { await client.query('ROLLBACK'); throw error; }
++  finally { client.release(); }
++}
++async function authority(q: Queryable, state: Awaited<ReturnType<typeof inputs>>, lock: boolean) {
++  const a = state.archive;
++  const session = (await q.query('SELECT owner_id, prompt, status, deleted_at, lease_worker_id FROM agent_sessions WHERE id=$1' + (lock ? ' FOR UPDATE' : ''), [a.sessionId])).rows[0];
++  check(session && session.owner_id === state.ownerId && session.deleted_at === null && ['succeeded', 'failed', 'cancelled'].includes(String(session.status)) && session.lease_worker_id === null, 'SESSION_NOT_TERMINAL_OWNED');
++  const meta = (await q.query('SELECT owner_id, deleted_at FROM stage_meta WHERE stage_id=$1' + (lock ? ' FOR UPDATE' : ''), [a.stageId])).rows[0];
++  check(meta && meta.owner_id === state.ownerId && meta.deleted_at === null, 'STAGE_NOT_OWNED');
++  const frozen = textbookContractFromPrompt(String(session.prompt));
++  check(frozen && frozen.sha256 === a.contractSha256 && textbookDigest(frozen) === textbookDigest(state.frozenFile.sceneContract), 'SESSION_FROZEN_MISMATCH');
++  const document = await new PgDocumentStore(q, { withTransaction: async body => body(q) }).loadDocument(a.stageId) as CourseDocument | null;
++  check(document && (document.outline as Json)?.producerRef === a.sessionId, 'DOCUMENT_SESSION_MISMATCH');
++  return { frozen: frozen!, document: document! };
++}
++function describe(input: RepairInput, state: Awaited<ReturnType<typeof inputs>>, document: CourseDocument, frozen: NonNullable<ReturnType<typeof textbookContractFromPrompt>>) {
++  const a = state.archive;
++  check(!document.scenes.some(s => s.id === state.scene.id || s.order === state.scene.order), 'PAGE_EXISTS');
++  check(textbookDigest(document) === a.beforeDocumentSha256 && state.ledger.sha256 === a.beforeCandidateSha256, 'STALE_BEFORE');
++  check(state.ledger.sessionId === a.sessionId && state.ledger.stageId === a.stageId && textbookDigest(state.ledger.frozenContract) === textbookDigest(frozen), 'LEDGER_BINDING');
++  check(state.ledger.scenes.length === document.scenes.length && document.scenes.every(s => state.ledger.scenes.some((e: Json) => e.sceneId === s.id && e.sha256 === textbookDigest(s))), 'LEDGER_DOCUMENT');
++  const after = { ...document, scenes: [...document.scenes, state.revised].sort((a, b) => a.order - b.order) };
++  const ledgerBody = unseal(state.ledger);
++  const afterLedger = { ...ledgerBody, scenes: after.scenes.map(s => ({ sceneId: s.id, order: s.order, sha256: textbookDigest(s), canonicalJson: textbookCanonical(s), contractSha256: frozen.sha256 })) };
++  return seal({ schemaVersion: 'mira.textbook.rejected-scene-repair-plan.v1', verification: 'static_only_not_play_audio_or_publication', input, sessionId: a.sessionId, stageId: a.stageId, sceneId: state.scene.id, order: state.scene.order, ownerFingerprint: state.ownerFingerprint, contractSha256: a.contractSha256, archiveSceneSha256: a.sceneSha256, revisedSceneSha256: textbookDigest(state.revised), beforeDocumentSha256: a.beforeDocumentSha256, afterDocumentSha256: textbookDigest(after), beforeCandidateSha256: a.beforeCandidateSha256, afterCandidateSha256: textbookDigest(afterLedger), originalError: a.error.code });
++}
++async function dryGuard(state: Awaited<ReturnType<typeof inputs>>, frozen: NonNullable<ReturnType<typeof textbookContractFromPrompt>>, document: CourseDocument) {
++  const validated = new Error('REPAIR_DRY_RUN_VALIDATED');
++  const guard = createTextbookAuthoringGuard(frozen, state.archive.sessionId, { classroomsDir: path.join(state.dataDir, 'classrooms'), ownsStage: async () => false });
++  const store = { loadDocument: async () => document, putScene: async () => { throw validated; } } as unknown as CourseStore;
++  try { await guard.wrapStore(store).putScene(state.archive.stageId, state.revised); }
++  catch (e) { if (e === validated) return; throw e; }
++  fail('DRY_RUN_UNEXPECTED');
++}
++/** Read-only: no intent, candidate ledger, archive, DB write, model, or status transition. */
++export async function prepareRejectedSceneRepair(input: RepairInput, env: RepairEnvironment): Promise<Json> {
++  const state = await inputs(input, env);
++  return transaction(env, true, async q => {
++    const { frozen, document } = await authority(q, state, false);
++    const plan = describe(input, state, document, frozen);
++    await dryGuard(state, frozen, document);
++    return plan;
++  });
++}
++
++/** Explicit approved-plan execution. Exact intent recovery is safe even across DB/file commit interruption. */
++export async function runRejectedSceneRepair(plan: Json, approvedPlanSha256: string, env: RepairEnvironment): Promise<Json> {
++  unseal(plan);
++  check(plan.schemaVersion === 'mira.textbook.rejected-scene-repair-plan.v1' && plan.sha256 === approvedPlanSha256, 'PLAN_APPROVAL_SHA');
++  const state = await inputs(plan.input, env);
++  const directory = path.join(state.dataDir, 'textbook-rejected-scene-repairs', digestBytes(state.archive.sessionId), state.archive.stageId, plan.sha256);
++  const intentPath = path.join(directory, 'intent.json');
++  const receiptPath = path.join(directory, 'receipt.json');
++  let priorIntent: Json | undefined;
++  try { priorIntent = JSON.parse((await privateRead(intentPath)).toString()); } catch (e: any) { if (e.code !== 'ENOENT') throw e; }
++  if (priorIntent) check(textbookCanonical(priorIntent) === textbookCanonical(plan), 'INTENT_COLLISION');
++  const result = await transaction(env, false, async (q, pool) => {
++    const { frozen, document } = await authority(q, state, true);
++    let before = document;
++    let beforeLedger = state.ledger;
++    const actualSha = textbookDigest(document);
++    if (priorIntent && actualSha === plan.afterDocumentSha256) {
++      check(document.scenes.some(s => s.id === state.scene.id && textbookDigest(s) === plan.revisedSceneSha256), 'RECOVERY_SCENE');
++      before = { ...document, scenes: document.scenes.filter(s => s.id !== state.scene.id) };
++    }
++    if (priorIntent && state.ledger.sha256 === plan.afterCandidateSha256) {
++      const body = unseal(state.ledger);
++      beforeLedger = seal({ ...body, scenes: body.scenes.filter((s: Json) => s.sceneId !== state.scene.id) });
++    }
++    check(textbookCanonical(describe(plan.input, { ...state, ledger: beforeLedger }, before, frozen)) === textbookCanonical(plan), 'PLAN_STALE');
++    check(actualSha === plan.beforeDocumentSha256 || (priorIntent && actualSha === plan.afterDocumentSha256), 'DOCUMENT_CHANGED');
++    await dryGuard(state, frozen, before);
++    await immutable(intentPath, plan);
++    // All owner-store transactions share this connection. The outer session and
++    // stage locks remain held through the guard's filesystem ledger update.
++    let fenceCalls = 0;
++    const ownerStore = createOwnerBoundDocumentStore({ pool, ownerId: state.ownerId, validateScene, validateStage: validateAppStage,
++      mutationFence: async tx => {
++        const current = await authority(tx, state, true);
++        check(textbookDigest(current.document) === (fenceCalls++ === 0 ? plan.beforeDocumentSha256 : plan.afterDocumentSha256), 'ATOMIC_DOCUMENT_FENCE');
++      },
++    });
++    const store = ownerStore as unknown as CourseStore;
++    const target = actualSha === plan.afterDocumentSha256
++      ? new Proxy(store, { get(t, key) { if (key === 'putScene') return async () => {}; const value = Reflect.get(t, key); return typeof value === 'function' ? value.bind(t) : value; } })
++      : store;
++    await createTextbookAuthoringGuard(frozen, state.archive.sessionId, { classroomsDir: path.join(state.dataDir, 'classrooms'), ownsStage: async () => false }).wrapStore(target).putScene(state.archive.stageId, state.revised);
++    const final = await authority(q, state, true);
++    check(textbookDigest(final.document) === plan.afterDocumentSha256, 'AFTER_DOCUMENT');
++    const ledger = JSON.parse((await privateRead(state.ledgerPath)).toString());
++    unseal(ledger); check(ledger.sha256 === plan.afterCandidateSha256, 'AFTER_LEDGER');
++    return seal({ schemaVersion: 'mira.textbook.rejected-scene-repair-receipt.v1', status: 'static_candidate_accepted', verification: 'static_only_not_play_audio_or_publication', planSha256: plan.sha256, archiveSha256: plan.input.archiveSha256, sessionId: plan.sessionId, stageId: plan.stageId, sceneId: plan.sceneId, sceneSha256: plan.revisedSceneSha256, documentSha256: plan.afterDocumentSha256, candidateSha256: plan.afterCandidateSha256, providerCalls: 0 });
++  });
++  await immutable(receiptPath, result);
++  return result;
++}
+diff --git a/scripts/repair-textbook-rejected-scene.ts b/scripts/repair-textbook-rejected-scene.ts
+new file mode 100644
+--- /dev/null
++++ b/scripts/repair-textbook-rejected-scene.ts
+@@ -0,0 +1,29 @@
++/** Local operator entry point. Reads one JSON request from stdin; never mints an owner. */
++import { promises as fs } from 'node:fs';
++import path from 'node:path';
++import { Pool } from 'pg';
++import { prepareRejectedSceneRepair, runRejectedSceneRepair } from '../lib/server/mira-textbook-rejected-scene-repair';
++
++async function main() {
++  const mode = process.argv[2];
++  if (!['prepare', 'run'].includes(mode)) throw new Error('Usage: repair-textbook-rejected-scene.ts prepare|run < request.json');
++  let body = '';
++  for await (const chunk of process.stdin) { body += chunk; if (body.length > 1024 * 1024) throw new Error('INPUT_TOO_LARGE'); }
++  const request = JSON.parse(body);
++  const connectionString = process.env.MIRA_OPENMAIC_AGENT_DATABASE_URL ?? process.env.DATABASE_URL;
++  if (!connectionString) throw new Error('EXISTING_DATABASE_CONFIGURATION_REQUIRED');
++  const pool = new Pool({ connectionString, max: 1 });
++  try {
++    const env = { pool, dataDir: path.resolve('data') };
++    const result = mode === 'prepare'
++      ? await prepareRejectedSceneRepair(request, env)
++      : await runRejectedSceneRepair(JSON.parse(await fs.readFile(request.planPath, 'utf8')), request.approvedPlanSha256, env);
++    process.stdout.write(JSON.stringify(result, null, 2) + '\n');
++  } finally { await pool.end(); }
++}
++main().catch(error => {
++  // Driver errors can contain connection or row data. Only expose known guard/operator codes.
++  const message = String(error?.message ?? '');
++  process.stderr.write(JSON.stringify({ error: /^(TEXTBOOK_REPAIR_|TEXTBOOK_SCENE_)[A-Z0-9_]+$/.test(message) ? message : 'LOCAL_REPAIR_FAILED_NO_AUTOMATIC_RETRY' }) + '\n');
++  process.exitCode = 1;
++});
+diff --git a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+@@ -0,0 +1,184 @@
++import { createHash } from 'node:crypto';
++import { promises as fs } from 'node:fs';
++import { tmpdir } from 'node:os';
++import path from 'node:path';
++import sharp from 'sharp';
++import { PGlite } from '@electric-sql/pglite';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { ensureDocumentSchema, type Queryable } from '@openmaic/storage/document/pg';
++import { ensureAgentSessionSchema } from '@openmaic/storage/agent-session/pg';
++import { ensureStageMetaSchema } from '@/lib/persistence/stage-meta';
++import { createOwnerBoundDocumentStore } from '@/lib/persistence/owner-bound-document-store';
++import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
++import { archiveRejectedTextbookScene } from '@/lib/server/mira-textbook-rejected-scene';
++import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest, type FrozenTextbookContract } from '@/lib/server/mira-textbook-scene-contract';
++import { prepareRejectedSceneRepair, runRejectedSceneRepair, type RepairInput } from '@/lib/server/mira-textbook-rejected-scene-repair';
++import type { CourseStore } from '@/lib/server/agent-runtime/course-tools';
++import frozenFixture from '../fixtures/textbook-scene-contract.v1.json';
++
++const hash = (s: string | Buffer) => createHash('sha256').update(s).digest('hex');
++const cookie = '11111111-1111-4111-8111-111111111111';
++const owner = `anon:${cookie}`, stageId = 'stage-repair', sessionId = 'session-repair';
++class Pool {
++  constructor(readonly db: PGlite) {}
++  query = (sql: string, args?: unknown[]) => this.db.query(sql, args);
++  connect = async () => ({ query: this.query, release() {} });
++}
++let root: string, db: PGlite, pool: Pool, env: { pool: Pool; dataDir: string }, input: RepairInput;
++let frozen: FrozenTextbookContract, scene: any, store: ReturnType<typeof createOwnerBoundDocumentStore>, ledger: any, originalBytes: Buffer;
++const ledgerFile = () => path.join(root, 'classrooms', stageId, 'textbook-authoring-candidate.json');
++const prompt = () => '\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n' + JSON.stringify(frozen) + '\nEND_MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT\n';
++const readLedger = async () => JSON.parse(await fs.readFile(ledgerFile(), 'utf8'));
++const document = () => store.loadDocument(stageId);
++async function sql(text: string, args?: unknown[]) { return db.query(text, args); }
++
++beforeEach(async () => {
++  root = await fs.realpath(await fs.mkdtemp(path.join(tmpdir(), 'rejected-repair-')));
++  db = new PGlite(); await db.waitReady; pool = new Pool(db); env = { pool, dataDir: root };
++  const schemaQuery: Queryable = { query: <R extends Record<string, unknown>>(text: string, args?: unknown[]) => db.query<R>(text, args) };
++  await ensureDocumentSchema(schemaQuery); await ensureStageMetaSchema(schemaQuery); await ensureAgentSessionSchema(schemaQuery);
++  frozen = structuredClone(frozenFixture) as FrozenTextbookContract;
++  frozen.contract.pagePlan = [{ page: 1, title: '观察', type: 'interactive', widgetType: 'simulation', move: '看图并点选', cueSpeech: [{ cueId: 'intro', text: '看图，听老师说。' }] }];
++  frozen.contract.lockedAssessments = []; frozen.sha256 = textbookDigest(frozen.contract);
++  await sql('INSERT INTO agent_sessions(id,owner_id,prompt,stage_id,status) VALUES($1,$2,$3,$4,$5)', [sessionId, owner, prompt(), stageId, 'succeeded']);
++  store = createOwnerBoundDocumentStore({ pool, ownerId: owner, validateScene: validateAppScene, validateStage: validateAppStage });
++  await store.saveDocument({ stage: { id: stageId, name: 'Fixture', createdAt: 1, updatedAt: 1 }, scenes: [], outline: { producerRef: sessionId, outlines: [] } } as never);
++  const imageDir = path.join(root, 'classrooms', stageId, 'media'); await fs.mkdir(imageDir, { recursive: true });
++  await sharp({ create: { width: 64, height: 64, channels: 3, background: '#ff0000' } }).png().toFile(path.join(imageDir, 'picture.png'));
++  const src = `/api/classroom-media/${stageId}/media/picture.png`;
++  const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') });
++  guard.wrapStore(store as unknown as CourseStore);
++  await guard.context({ stageId, order: 1, type: 'interactive', title: '观察', widgetType: 'simulation', media: [{ src, assetKey: 'picture' }] });
++  const html = `<html><head><meta name="mira-responsive-activity" content="low-reading-v1"></head><body><img src="${src}"><script type="application/json" id="mira-narration-cues">${JSON.stringify({ schemaVersion: 'mira.interactive.narration-cues.v1', cues: [{ id: 'intro', text: '看图，听老师说。' }] })}</script><script>document.querySelector('img').onclick=()=>window.miraNarrate('intro');</script></body></html>`;
++  scene = { id: 'scene-p1', stageId, order: 1, title: '观察', type: 'interactive', content: { type: 'interactive', widgetType: 'simulation', widgetConfig: { type: 'simulation' }, url: '', html: html.replace('</head>', "<style>:root{--avatar:url('/avatars/unbound.png')}</style></head>") }, actions: [{ id: 'speech-intro', type: 'speech', text: '看图，听老师说。' }] };
++  ledger = await readLedger();
++  const receipt = await archiveRejectedTextbookScene({ root: path.join(root, 'textbook-rejected-scenes'), sessionId, stageId, sceneCanonicalJson: textbookCanonical(scene), contractSha256: frozen.sha256, beforeDocumentSha256: textbookDigest(await document()), beforeCandidateSha256: ledger.sha256, code: 'TEXTBOOK_SCENE_IMAGE_BINDING_MISSING', diagnostics: {} });
++  const jobDir = path.join(root, 'job'); await fs.mkdir(jobDir);
++  await fs.writeFile(path.join(jobDir, 'owner.cookies'), `# Netscape HTTP Cookie File\nlocalhost\tFALSE\t/\tTRUE\t0\tanonymous_id\t${cookie}\n`);
++  await fs.writeFile(path.join(jobDir, 'state.json'), JSON.stringify({ sessionId }));
++  await fs.writeFile(path.join(jobDir, 'dispatch.json'), JSON.stringify({ ownerFingerprint: hash(cookie) }));
++  await fs.writeFile(path.join(jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen }));
++  const htmlPath = path.join(root, 'repair.html'); await fs.writeFile(htmlPath, html);
++  input = { jobDir, archivePath: path.join(root, 'textbook-rejected-scenes', receipt.archiveId!), archiveSha256: receipt.archiveSha256!, revisedHtmlPath: htmlPath, revisedHtmlSha256: hash(html) };
++  originalBytes = await fs.readFile(input.archivePath);
++});
++afterEach(async () => { vi.restoreAllMocks(); await db.close(); await fs.rm(root, { recursive: true, force: true }); });
++
++describe('local rejected-scene repair using real SQL owner store and frozen guard', () => {
++  it('prepares without writes, inserts only HTML-repaired missing scene, and replays one immutable receipt', async () => {
++    const before = await document(); const beforeLedger = await fs.readFile(ledgerFile());
++    const plan = await prepareRejectedSceneRepair(input, env);
++    expect(await document()).toEqual(before); expect(await fs.readFile(ledgerFile())).toEqual(beforeLedger);
++    await expect(fs.stat(path.join(root, 'textbook-rejected-scene-repairs'))).rejects.toMatchObject({ code: 'ENOENT' });
++    const result = await runRejectedSceneRepair(plan, plan.sha256, env);
++    expect(result.status).toBe('static_candidate_accepted'); expect(result.providerCalls).toBe(0);
++    const after = (await document())!; expect(after.scenes).toHaveLength(1);
++    expect({ ...after.scenes[0], content: scene.content }).toEqual(scene);
++    expect(after.stage).toEqual(before!.stage); expect(after.outline).toEqual(before!.outline);
++    expect(await runRejectedSceneRepair(plan, plan.sha256, env)).toEqual(result);
++    expect(await fs.readFile(input.archivePath)).toEqual(originalBytes);
++    expect((await sql('SELECT status FROM agent_sessions')).rows).toEqual([{ status: 'succeeded' }]);
++  });
++  it('keeps the original guard rejection and never saves or archives a failed repair', async () => {
++    const invalid = scene.content.html; await fs.writeFile(input.revisedHtmlPath, invalid + ' '); input.revisedHtmlSha256 = hash(invalid + ' ');
++    await expect(prepareRejectedSceneRepair(input, env)).rejects.toThrow('TEXTBOOK_SCENE_IMAGE_BINDING_MISSING');
++    expect((await document())!.scenes).toEqual([]); expect(await readLedger()).toEqual(ledger);
++    expect(await fs.readdir(path.dirname(input.archivePath))).toHaveLength(1);
++  });
++  it.each(['owner', 'session-owner', 'running', 'lease', 'deleted', 'frozen'])('fails closed for live %s changes after prepare', async kind => {
++    const plan = await prepareRejectedSceneRepair(input, env);
++    if (kind === 'owner') await sql("UPDATE stage_meta SET owner_id='foreign'");
++    if (kind === 'session-owner') await sql("UPDATE agent_sessions SET owner_id='foreign'");
++    if (kind === 'running') await sql("UPDATE agent_sessions SET status='running'");
++    if (kind === 'lease') await sql("UPDATE agent_sessions SET lease_worker_id='worker'");
++    if (kind === 'deleted') await sql('UPDATE stage_meta SET deleted_at=now()');
++    if (kind === 'frozen') await sql("UPDATE agent_sessions SET prompt='changed'");
++    await expect(runRejectedSceneRepair(plan, plan.sha256, env)).rejects.toThrow();
++    expect((await sql('SELECT id FROM document_scenes')).rows).toEqual([]);
++    expect(await readLedger()).toEqual(ledger);
++  });
++  it('refuses an existing page/order and stale whole document even with matching producer', async () => {
++    const plan = await prepareRejectedSceneRepair(input, env);
++    await store.putScene(stageId, { ...scene, id: 'different-scene' });
++    await expect(runRejectedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('PAGE_EXISTS');
++    expect((await document())!.scenes.map(s => s.id)).toEqual(['different-scene']);
++  });
++  it('refuses changed source bytes, repair bytes, or an unapproved plan seal', async () => {
++    const plan = await prepareRejectedSceneRepair(input, env);
++    await expect(runRejectedSceneRepair(plan, '0'.repeat(64), env)).rejects.toThrow('PLAN_APPROVAL_SHA');
++    await fs.appendFile(input.revisedHtmlPath, ' ');
++    await expect(runRejectedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('HTML_SHA');
++    await fs.appendFile(input.archivePath, ' ');
++    await expect(prepareRejectedSceneRepair(input, env)).rejects.toThrow('ARCHIVE_SHA');
++    expect((await document())!.scenes).toEqual([]);
++  });
++  it('refuses image byte changes at the real guard before any insertion', async () => {
++    const plan = await prepareRejectedSceneRepair(input, env);
++    await sharp({ create: { width: 64, height: 64, channels: 3, background: '#0000ff' } }).png().toFile(path.join(root, 'classrooms', stageId, 'media', 'picture.png'));
++    await expect(runRejectedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('IMAGE_BYTES_CHANGED');
++    expect((await document())!.scenes).toEqual([]);
++  });
++  it('recovers after a ledger write followed by a DB rollback without treating it as a saved page', async () => {
++    const plan = await prepareRejectedSceneRepair(input, env);
++    const originalQuery = pool.query;
++    let failed = false;
++    pool.query = async (text, args) => {
++      if (text === 'COMMIT' && !failed) { failed = true; throw new Error('simulated commit interrupted'); }
++      return originalQuery(text, args);
++    };
++    await expect(runRejectedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('simulated commit');
++    pool.query = originalQuery;
++    expect((await document())!.scenes).toEqual([]);
++    expect((await readLedger()).sha256).toBe(plan.afterCandidateSha256);
++    const receipt = await runRejectedSceneRepair(plan, plan.sha256, env);
++    expect(receipt.documentSha256).toBe(plan.afterDocumentSha256);
++    expect((await document())!.scenes).toHaveLength(1);
++  });
++  it('recovers after committed DB/ledger and missing receipt, without another write', async () => {
++    const plan = await prepareRejectedSceneRepair(input, env);
++    const open = fs.open.bind(fs); let failed = false;
++    vi.spyOn(fs, 'open').mockImplementation(async (...args: Parameters<typeof fs.open>) => {
++      if (String(args[0]).endsWith('/receipt.json') && !failed) { failed = true; throw new Error('receipt interrupted'); }
++      return open(...args);
++    });
++    await expect(runRejectedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('receipt interrupted');
++    expect((await document())!.scenes).toHaveLength(1);
++    const queries: string[] = []; const originalQuery = pool.query;
++    pool.query = async (text, args) => { queries.push(text); return originalQuery(text, args); };
++    await runRejectedSceneRepair(plan, plan.sha256, env);
++    expect(queries.some(q => q.includes('INSERT INTO document_scenes'))).toBe(false);
++  });
++  it('rejects a complete-scene override and symlink inputs instead of widening HTML-only repair', async () => {
++    await expect(prepareRejectedSceneRepair({ ...input, scene: { ...scene, actions: [] } } as RepairInput, env)).rejects.toThrow('INPUT_SHAPE');
++    const link = path.join(root, 'repair-link.html'); await fs.symlink(input.revisedHtmlPath, link);
++    await expect(prepareRejectedSceneRepair({ ...input, revisedHtmlPath: link }, env)).rejects.toThrow('SYMLINK_REFUSED');
++    expect((await document())!.scenes).toEqual([]);
++  });
++  it('preserves another saved page, stage and outline byte semantics while inserting the missing page', async () => {
++    frozen.contract.pagePlan.push({ ...frozen.contract.pagePlan[0], page: 2, title: '另一页' });
++    frozen.sha256 = textbookDigest(frozen.contract);
++    await sql('UPDATE agent_sessions SET prompt=$1', [prompt()]);
++    await fs.writeFile(path.join(input.jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen }));
++    const { sha256: _oldSeal, ...body } = ledger;
++    body.frozenContract = frozen;
++    await fs.writeFile(ledgerFile(), JSON.stringify({ ...body, sha256: textbookDigest(body) }));
++    const other = { ...scene, id: 'scene-other', order: 2, title: '另一页', content: { ...scene.content, html: await fs.readFile(input.revisedHtmlPath, 'utf8') } };
++    await createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') }).wrapStore(store as unknown as CourseStore).putScene(stageId, other);
++    const before = (await document())!;
++    const archived = await archiveRejectedTextbookScene({ root: path.join(root, 'textbook-rejected-scenes'), sessionId, stageId, sceneCanonicalJson: textbookCanonical(scene), contractSha256: frozen.sha256, beforeDocumentSha256: textbookDigest(before), beforeCandidateSha256: (await readLedger()).sha256, code: 'TEXTBOOK_SCENE_IMAGE_BINDING_MISSING', diagnostics: {} });
++    input.archivePath = path.join(root, 'textbook-rejected-scenes', archived.archiveId!); input.archiveSha256 = archived.archiveSha256!;
++    const plan = await prepareRejectedSceneRepair(input, env);
++    await runRejectedSceneRepair(plan, plan.sha256, env);
++    const after = (await document())!;
++    expect(after.scenes).toHaveLength(2);
++    expect(textbookCanonical(after.scenes.find(s => s.id === other.id))).toBe(textbookCanonical(before.scenes[0]));
++    expect(after.stage).toEqual(before.stage); expect(after.outline).toEqual(before.outline);
++  });
++  it('does not treat an unrelated after-shaped page as interrupted execution without the exact intent', async () => {
++    const plan = await prepareRejectedSceneRepair(input, env);
++    await store.putScene(stageId, { ...scene, content: { ...scene.content, html: await fs.readFile(input.revisedHtmlPath, 'utf8') } });
++    await expect(runRejectedSceneRepair(plan, plan.sha256, env)).rejects.toThrow('PAGE_EXISTS');
++    expect(await readLedger()).toEqual(ledger);
++  });
++
++});

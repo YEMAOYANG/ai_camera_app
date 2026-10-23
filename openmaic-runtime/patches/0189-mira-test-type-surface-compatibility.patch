@@ -1,0 +1,74 @@
+diff --git a/packages/@openmaic/generation/test/type-surface.test.ts b/packages/@openmaic/generation/test/type-surface.test.ts
+--- a/packages/@openmaic/generation/test/type-surface.test.ts
++++ b/packages/@openmaic/generation/test/type-surface.test.ts
+@@ -29,6 +29,8 @@
+     | 'explorationGame'
+     | 'textbookPromptProfile'
+     | 'editDirective'
++    | 'exactActions'
++    | 'includeWidgetOutline'
+     | 'baselineContent'
+     | 'pblLoopFallback'
+     | 'logger'
+diff --git a/tests/scene-renderers/interactive-fullscreen-preservation.test.ts b/tests/scene-renderers/interactive-fullscreen-preservation.test.ts
+--- a/tests/scene-renderers/interactive-fullscreen-preservation.test.ts
++++ b/tests/scene-renderers/interactive-fullscreen-preservation.test.ts
+@@ -20,6 +20,7 @@
+ vi.mock("@/lib/hooks/use-i18n", () => ({
+   useI18n: () => ({ t: (key: string) => key }),
+ }));
++type IframeHostProps = NonNullable<Parameters<typeof InteractiveIframeHost>[0]>;
+ let root: Root | undefined;
+ let container: HTMLDivElement;
+ let messages: WeakMap<HTMLIFrameElement, ReturnType<typeof vi.fn>>;
+@@ -82,17 +83,17 @@
+   });
+   it("does not briefly mount into body while the Stage DOM ref is still null", async () => {
+     await act(async () =>
+-      root!.render(createElement(InteractiveIframeHost, { container: null })),
++      root!.render(createElement<IframeHostProps>(InteractiveIframeHost, { container: null })),
+     );
+     expect(frame()).toBeNull();
+     await act(async () =>
+-      root!.render(createElement(InteractiveIframeHost, { container })),
++      root!.render(createElement<IframeHostProps>(InteractiveIframeHost, { container })),
+     );
+     expect(container.contains(frame())).toBe(true);
+   });
+   it("preserves iframe identity and its registered window on enter, exit and repeated fullscreen", async () => {
+     await act(async () =>
+-      root!.render(createElement(InteractiveIframeHost, { container })),
++      root!.render(createElement<IframeHostProps>(InteractiveIframeHost, { container })),
+     );
+     const initial = frame(),
+       windowRef = initial.contentWindow;
+@@ -103,7 +104,7 @@
+       });
+       await act(async () => {
+         document.dispatchEvent(new Event("fullscreenchange"));
+-        root!.render(createElement(InteractiveIframeHost, { container }));
++        root!.render(createElement<IframeHostProps>(InteractiveIframeHost, { container }));
+       });
+       expect(frame()).toBe(initial);
+       expect(frame().contentWindow).toBe(windowRef);
+@@ -115,7 +116,7 @@
+   });
+   it("retains cancellation and explicit resume while the same fullscreen document stays mounted", async () => {
+     await act(async () =>
+-      root!.render(createElement(InteractiveIframeHost, { container })),
++      root!.render(createElement<IframeHostProps>(InteractiveIframeHost, { container })),
+     );
+     const initial = frame();
+     Object.defineProperty(document, "fullscreenElement", {
+diff --git a/tests/server/mira-meaningful-interaction-policy.test.ts b/tests/server/mira-meaningful-interaction-policy.test.ts
+--- a/tests/server/mira-meaningful-interaction-policy.test.ts
++++ b/tests/server/mira-meaningful-interaction-policy.test.ts
+@@ -81,7 +81,7 @@
+       offset: 1,
+       limit: text.split(/\r?\n/).length,
+     });
+-    expect(result.isError).not.toBe(true);
++    expect(result).not.toMatchObject({ isError: true });
+     expect(result.content).toEqual([{ type: 'text', text }]);
+     expect(result.details).toMatchObject({
+       path,

@@ -1,0 +1,267 @@
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -1,7 +1,7 @@
+ 'use client';
+ 
+ import { useCallback, useEffect, useRef, useState } from 'react';
+-import { Check, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
++import { Check, X, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+ import type { QuizQuestion } from '@/lib/types/stage';
+ import type { QuizOptionFeedback, QuizVisual } from '@openmaic/dsl';
+ import { useStageStore } from '@/lib/store';
+@@ -16,6 +16,22 @@
+ type Graded = { questionId: string; response: string; correct: boolean; explanation: string; correctAnswer: string; feedback?: QuizOptionFeedback };
+ type Result = { score: number; maxScore: number; correctCount: number; totalQuestions: number; results: Graded[] };
+ type Saved = { result?: Result | null; partial?: { results: Graded[] } | null };
++type OptionResult = 'correct' | 'incorrect';
++
++/** Result marks exist only after the server grades this question. */
++export function fixedTextbookOptionResult(value: string, feedback?: Graded): OptionResult | undefined {
++  if (!feedback) return undefined;
++  if (value === feedback.response) return feedback.correct ? 'correct' : 'incorrect';
++  return value === feedback.correctAnswer ? 'correct' : undefined;
++}
++
++export function FixedTextbookResultMark({ result }: { result: OptionResult }) {
++  const Icon = result === 'correct' ? Check : X;
++  return <span role="img" aria-label={result === 'correct' ? '正确' : '不正确'} data-quiz-result-symbol={result}
++    className={`inline-flex shrink-0 items-center justify-center ${result === 'correct' ? 'text-[#285d43]' : 'text-[#9b3f32]'}`}>
++    <Icon size={28} strokeWidth={3} aria-hidden />
++  </span>;
++}
+ 
+ /** The questions of one in-class check that the server has already graded. */
+ export function gradedOnThisPage(saved: Saved, questionIds: string[]): Graded[] {
+@@ -150,16 +166,22 @@
+             {audio ? <QuestionNarration key={q.id} src={audio} number={questionIndex + 1} sceneId={sceneId} questionId={q.id} autoPlay={!done && !feedback && !sending}
+               controlSlot={q.visual?.kind === 'image' ? <QuizReferencePicture visual={q.visual} /> : undefined} />
+               : q.visual?.kind === 'image' && <div className={referencePictureStyles.controls} data-question-narration-controls=""><QuizReferencePicture visual={q.visual} /></div>}
+-            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${compactImages ? pictureOptionStyles.options + ' ' + compactPictureStyles.options : ''}`} role="radiogroup" aria-label={q.question}>
++            <div className={`grid min-w-0 gap-2 ${(q.options?.length ?? 0) === 3 ? 'grid-cols-3' : 'grid-cols-2'} ${compactImages ? pictureOptionStyles.options + ' ' + compactPictureStyles.options : ''}`} role="radiogroup" aria-label={q.question} data-quiz-graded={feedback ? 'true' : undefined}>
+               {(q.options || []).map((option, optionIndex) => {
+                 const visual = q.optionVisuals?.[option.value];
++                const result = fixedTextbookOptionResult(option.value, feedback);
+                 const choice = <button type="button" role="radio" aria-checked={answers[q.id] === option.value}
+                 aria-label={option.label} key={option.value} disabled={done || sending} onClick={() => setAnswers(previous => ({ ...previous, [q.id]: option.value }))}
+-                className={`min-h-14 min-w-14 rounded-xl border p-1 text-2xl transition-colors [&_img]:h-24 [&_svg]:max-h-24 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
++                data-quiz-option-result={result}
++                className={`min-h-14 min-w-14 rounded-xl border p-1 text-2xl transition-colors [&_img]:h-24 [&_svg]:max-h-24 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#467060] ${result === 'incorrect' ? 'border-[#b75c48] bg-[#fff0e9] text-[#9b3f32]' : result === 'correct' || answers[q.id] === option.value ? 'border-[#467060] bg-[#e1eee3] text-[#214b36]' : 'border-[#e5dfd3] bg-[#faf8f1] hover:bg-[#f2eddf]'}`}>
+                 <FixedTextbookOptionFace visual={q.optionVisuals?.[option.value]} label={option.label} />
++                {visual?.kind !== 'image' && result && <FixedTextbookResultMark result={result} />}
+               </button>;
+                 return visual?.kind === 'image' ? <div key={option.value} className={pictureOptionStyles.option} data-quiz-picture-option>
+                   {choice}
++                  {feedback && <span className={compactPictureStyles.optionStatus} data-quiz-option-status={result ?? 'unmarked'}>
++                    {result && <FixedTextbookResultMark result={result} />}
++                  </span>}
+                   <div className={pictureOptionStyles.optionControl}>
+                     <QuizReferencePicture visual={visual} optionLabel={`放大第${optionIndex + 1}幅选项图`} />
+                   </div>
+@@ -169,7 +191,7 @@
+             {feedback && <div className={`mt-3 rounded-2xl border p-3 ${feedback.correct ? 'border-[#b9d8c5] bg-[#edf7f0] text-[#285d43]' : 'border-[#ead0a9] bg-[#fff8e8] text-[#805328]'}`}
+               data-quiz-selected-feedback={feedback.response} role="status">
+               {selectedFeedback?.visual && <div className="mb-2 [&_img]:max-h-40 [&_svg]:max-h-40" data-quiz-feedback-picture><QuizPicture visual={selectedFeedback.visual} scene /></div>}
+-              <p className="flex items-start gap-2 text-base">{feedback.correct && <Check size={20} className="mt-0.5 shrink-0" aria-hidden />}{selectedFeedback?.text ?? feedback.explanation}</p>
++              <p className="flex items-start gap-2 text-base"><FixedTextbookResultMark result={feedback.correct ? 'correct' : 'incorrect'} />{selectedFeedback?.text ?? feedback.explanation}</p>
+               {feedbackAudio && <QuestionNarration src={feedbackAudio} number={questionIndex + 1} sceneId={sceneId}
+                 questionId={`${q.id}:feedback:${feedback.response}`} autoPlay={freshFeedbackQuestionId === q.id} label="这次反馈" />}
+             </div>}
+diff --git a/components/scene-renderers/fixed-textbook-picture-layout.module.css b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+--- a/components/scene-renderers/fixed-textbook-picture-layout.module.css
++++ b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+@@ -2,6 +2,15 @@
+    Ordinary QuizView, text answers and other option counts keep their layout. */
+ .root {
+   container: fixed-picture-quiz / size;
++}
++
++/* A dedicated result row never covers the original answer picture or viewer. */
++.optionStatus {
++  display: flex;
++  flex: 0 0 32px;
++  height: 32px;
++  align-items: center;
++  justify-content: center;
+ }
+ 
+ @container fixed-picture-quiz (max-width: 560px) or (max-height: 400px) {
+@@ -110,6 +119,11 @@
+   .question .options > [data-quiz-picture-option] {
+     height: 100%;
+     min-height: 108px;
++  }
++
++  .question .options[data-quiz-graded="true"],
++  .question .options[data-quiz-graded="true"] > [data-quiz-picture-option] {
++    min-height: 140px;
+   }
+ 
+   .question .options > button,
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts b/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
+--- a/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
++++ b/tests/scene-renderers/fixed-textbook-quiz-pictures.test.ts
+@@ -1,7 +1,32 @@
+ import { createElement } from 'react';
+ import { renderToStaticMarkup } from 'react-dom/server';
+ import { describe, expect, it } from 'vitest';
+-import { FixedTextbookOptionFace, gradedOnThisPage } from '@/components/scene-renderers/fixed-textbook-quiz';
++import { FixedTextbookOptionFace, FixedTextbookResultMark, fixedTextbookOptionResult, gradedOnThisPage } from '@/components/scene-renderers/fixed-textbook-quiz';
++
++describe('server-graded picture results', () => {
++  it('shows no result before grading, whatever value the child selects', () => {
++    expect(['A', 'B', 'C'].map(value => fixedTextbookOptionResult(value))).toEqual([undefined, undefined, undefined]);
++  });
++
++  it('distinguishes the wrong response from the server correct answer without changing either', () => {
++    const feedback = { questionId: 'q', response: 'A', correct: false, explanation: '原反馈', correctAnswer: 'B' };
++    const before = JSON.stringify(feedback);
++    expect(['A', 'B', 'C'].map(value => fixedTextbookOptionResult(value, feedback))).toEqual(['incorrect', 'correct', undefined]);
++    expect(JSON.stringify(feedback)).toBe(before);
++    expect(fixedTextbookOptionResult('B', { ...feedback, response: 'B', correct: true })).toBe('correct');
++  });
++
++  it('renders distinct check and cross shapes with accessible results', () => {
++    const correct = renderToStaticMarkup(createElement(FixedTextbookResultMark, { result: 'correct' }));
++    const incorrect = renderToStaticMarkup(createElement(FixedTextbookResultMark, { result: 'incorrect' }));
++    expect(correct).toContain('data-quiz-result-symbol="correct"');
++    expect(correct).toContain('lucide-check');
++    expect(correct).toContain('aria-label="正确"');
++    expect(incorrect).toContain('data-quiz-result-symbol="incorrect"');
++    expect(incorrect).toContain('lucide-x');
++    expect(incorrect).toContain('aria-label="不正确"');
++  });
++});
+ 
+ describe('published textbook quiz options', () => {
+   it('shows the reviewed picture and keeps the label for assistive technology only', () => {
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-results.browser.test.ts b/tests/scene-renderers/fixed-textbook-quiz-results.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/fixed-textbook-quiz-results.browser.test.ts
+@@ -0,0 +1,125 @@
++import { describe, expect, it } from 'vitest';
++import { chromium } from 'playwright-core';
++import { createRequire } from 'node:module';
++import { readFileSync, mkdirSync } from 'node:fs';
++import { dirname, join } from 'node:path';
++
++type FixtureWindow = Window & {
++  mountResultQuiz: (restoreWrong?: boolean) => void;
++  posts: Array<{ answers: Record<string, string> }>;
++};
++type BundleFile = { path: string; text: string };
++type BuildHooks = {
++  onResolve: (options: { filter: RegExp }, callback: (args: { path: string }) => { path: string; namespace: string } | undefined) => void;
++  onLoad: (options: { filter: RegExp; namespace: string }, callback: (args: { path: string }) => { contents: string; loader: string }) => void;
++};
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')('fixed textbook result pictures', () => {
++  it('keeps preanswer selection neutral and uses server check/cross results at 390 and 320 pixels', async () => {
++    const require = createRequire(import.meta.url);
++    const { build } = createRequire(require.resolve('tsx'))('esbuild');
++    const mocks: Record<string, string> = {
++      '@/lib/store': `const state={stage:{fixedTextbook:true},currentSceneId:'quiz',scenes:[]};export const useStageStore=f=>f(state);useStageStore.getState=()=>state;`,
++      '@/lib/contexts/mira-student-runtime-context': `export const useMiraStudentRuntimeEvents=()=>null;`,
++    };
++    const bundle = await build({
++      stdin: { resolveDir: process.cwd(), loader: 'tsx', contents: `
++import React from 'react';import {createRoot} from 'react-dom/client';import {FixedTextbookQuiz} from './components/scene-renderers/fixed-textbook-quiz';
++const picture=color=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="white"/><g fill="'+color+'"><rect x="20" y="50" width="95" height="200"/><rect x="150" y="50" width="95" height="200"/><rect x="280" y="50" width="95" height="200"/></g></svg>');
++const question={id:'q',type:'single',question:'听老师说，再选一幅图。',answer:'B',hasAnswer:true,analysis:'原分析保持不变',visual:{kind:'image',src:picture('#c9dfd0'),alt:'情境图'},options:['A','B','C'].map(value=>({value,label:value})),optionVisuals:Object.fromEntries(['A','B','C'].map((value,i)=>[value,{kind:'image',src:picture(['#75a98d','#d4a26a','#849fbd'][i]),alt:'选项'+value}]))};
++const root=createRoot(document.querySelector('#app'));let generation=0;
++const result=response=>({questionId:'q',response,correct:response==='B',explanation:'原分析保持不变',correctAnswer:'B'});
++window.mountResultQuiz=(restoreWrong=false)=>{window.posts=[];window.fetch=async(url,init)=>{let saved=restoreWrong?[result('A')]:[];if(init?.method==='POST'){const body=JSON.parse(init.body);window.posts.push(body);saved=[result(body.answers.q)]}return{ok:true,json:async()=>({ok:true,partial:{results:saved}})}};root.render(<FixedTextbookQuiz key={++generation} questions={[question]}/>)};window.mountResultQuiz();` },
++      bundle: true, write: false, outfile: 'fixed-result-test.js', format: 'iife', platform: 'browser', logLevel: 'silent',
++      define: { 'process.env.NODE_ENV': '"test"' },
++      plugins: [{ name: 'fixture-integrations', setup(b: BuildHooks) {
++        b.onResolve({ filter: /^@\// }, a => mocks[a.path] ? { path: a.path, namespace: 'mock' } : undefined);
++        b.onLoad({ filter: /.*/, namespace: 'mock' }, a => ({ contents: mocks[a.path], loader: 'js' }));
++      } }],
++    });
++    const compiled = await require('tailwindcss').compile(readFileSync(join(dirname(require.resolve('tailwindcss/package.json')), 'index.css'), 'utf8'));
++    const source = ['fixed-textbook-quiz', 'quiz-picture', 'quiz-reference-picture'].map(file => readFileSync(`components/scene-renderers/${file}.tsx`, 'utf8')).join('\n') + readFileSync('components/audio/question-narration.tsx', 'utf8');
++    const css = compiled.build([...new Set(source.split(/[\s'"`{}(),]+/)), 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]']) + '\n' + bundle.outputFiles.find((file: BundleFile) => file.path.endsWith('.css')).text + '\nhtml,body,#app{margin:0;width:100%;height:100%}';
++    const js = bundle.outputFiles.find((file: BundleFile) => file.path.endsWith('.js')).text;
++    const browser = await chromium.launch({ executablePath: process.env.MIRA_FORMAL_QA_BROWSER_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
++    try {
++      const page = await browser.newPage({ viewport: { width: 390, height: 563 } });
++      const errors: string[] = [];
++      page.on('pageerror', error => errors.push(error.message));
++      await page.route('**/*', route => route.abort());
++      await page.setContent('<html><body><main id="app"></main></body></html>');
++      await page.addStyleTag({ content: css });
++      await page.addScriptTag({ content: js });
++      for (const width of [390, 320]) {
++        await page.setViewportSize({ width, height: 563 });
++        const choices = page.getByRole('radio');
++        for (const answer of ['A', 'B']) {
++          await page.evaluate(() => (window as unknown as FixtureWindow).mountResultQuiz());
++          await choices.last().waitFor();
++          expect(await page.locator('[data-quiz-result-symbol]').count()).toBe(0);
++          expect(await page.locator('[data-quiz-option-result]').count()).toBe(0);
++          expect(new Set(await choices.evaluateAll(elements => elements.map(element => element.className))).size).toBe(1);
++          const choice = page.getByRole('radio', { name: answer, exact: true });
++          await choice.click();
++          const selectedClass = await choice.getAttribute('class');
++          const other = page.getByRole('radio', { name: answer === 'A' ? 'B' : 'A', exact: true });
++          await other.click();
++          expect(await other.getAttribute('class')).toBe(selectedClass);
++          expect(await page.locator('[data-quiz-result-symbol]').count()).toBe(0);
++          await choice.click();
++          for (const button of await page.locator('[data-quiz-option-picture]').all()) {
++            const box = await button.boundingBox();
++            expect(box!.width).toBeGreaterThanOrEqual(48); expect(box!.height).toBeGreaterThanOrEqual(48);
++          }
++          await page.getByRole('button', { name: '完成练习', exact: true }).click();
++          await page.locator('[data-quiz-selected-feedback]').waitFor();
++          expect(await choice.getAttribute('aria-checked')).toBe('true');
++          expect(await choice.getAttribute('data-quiz-option-result')).toBe(answer === 'B' ? 'correct' : 'incorrect');
++          expect(await page.getByRole('radio', { name: 'B', exact: true }).getAttribute('data-quiz-option-result')).toBe('correct');
++          if (answer === 'A') {
++            expect(await page.getByRole('radio', { name: 'B', exact: true }).getAttribute('aria-checked')).toBe('false');
++            expect(await choice.getAttribute('class')).not.toContain('bg-[#e1eee3]');
++            expect(await page.locator('[data-quiz-option-status="incorrect"] svg.lucide-x').count()).toBe(1);
++          }
++          expect(await page.locator('[data-quiz-selected-feedback] [data-quiz-result-symbol]').getAttribute('data-quiz-result-symbol')).toBe(answer === 'B' ? 'correct' : 'incorrect');
++          expect(await page.locator('[data-quiz-selected-feedback]').textContent()).toContain('原分析保持不变');
++          const posts = await page.evaluate(() => (window as unknown as FixtureWindow).posts);
++          expect(posts).toEqual([{ answers: { q: answer } }]);
++          for (const option of await page.locator('[data-quiz-picture-option]').all()) {
++            const image = await option.locator('[role="radio"] img').boundingBox();
++            const status = await option.locator('[data-quiz-option-status]').boundingBox();
++            expect(image!.height).toBeGreaterThanOrEqual(48);
++            expect(status!.y).toBeGreaterThanOrEqual(image!.y + image!.height - 1);
++          }
++          const enlarge = page.getByRole('button', { name: '放大第1幅选项图', exact: true });
++          await enlarge.click();
++          const dialog = page.locator('[data-quiz-reference-dialog]');
++          await dialog.getByRole('button', { name: '放大图片', exact: true }).click();
++          expect((await dialog.locator('img').boundingBox())!.width).toBeGreaterThanOrEqual(352);
++          await page.keyboard.press('Escape');
++          expect(await choice.getAttribute('aria-checked')).toBe('true');
++          expect(await page.evaluate(() => (window as unknown as FixtureWindow).posts)).toEqual(posts);
++          // Cover supplementary text: the actual shape remains present and visible.
++          const mask = await page.addStyleTag({ content: 'h2,p,legend,[role="radio"]>.sr-only{font-size:0!important;color:transparent!important}' });
++          const mark = page.locator('[data-quiz-selected-feedback] [data-quiz-result-symbol]');
++          await mark.scrollIntoViewIfNeeded();
++          expect(await mark.isVisible()).toBe(true);
++          expect((await mark.locator('svg').boundingBox())!.width).toBeGreaterThanOrEqual(28);
++          if (process.env.MIRA_FORMAL_QA_EXPORT_DIR) {
++            mkdirSync(process.env.MIRA_FORMAL_QA_EXPORT_DIR, { recursive: true });
++            await page.screenshot({ path: join(process.env.MIRA_FORMAL_QA_EXPORT_DIR, `fixed-result-${width}-${answer}.png`) });
++          }
++          await mask.evaluate(element => element.remove());
++          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
++        }
++        await page.evaluate(() => (window as unknown as FixtureWindow).mountResultQuiz(true));
++        await page.locator('[data-quiz-selected-feedback]').waitFor();
++        expect(await page.getByRole('radio', { name: 'A', exact: true }).getAttribute('aria-checked')).toBe('true');
++        expect(await page.getByRole('radio', { name: 'B', exact: true }).getAttribute('aria-checked')).toBe('false');
++        expect(await page.locator('[data-quiz-selected-feedback] svg.lucide-x').count()).toBe(1);
++        expect(await page.evaluate(() => (window as unknown as FixtureWindow).posts)).toEqual([]);
++      }
++      expect(errors).toEqual([]);
++    } finally { await browser.close(); }
++  }, 60000);
++});

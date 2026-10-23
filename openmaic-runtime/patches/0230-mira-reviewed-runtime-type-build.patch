@@ -1,0 +1,76 @@
+diff --git a/lib/server/mira-textbook-scene-contract.ts b/lib/server/mira-textbook-scene-contract.ts
+--- a/lib/server/mira-textbook-scene-contract.ts
++++ b/lib/server/mira-textbook-scene-contract.ts
+@@ -518,16 +518,20 @@
+           fail('QUIZ_OPTION_FEEDBACK_INCOMPLETE');
+         for (const value of values) {
+           const feedback = q.optionFeedback[value];
+-          if (!object(feedback) || typeof feedback.text !== 'string' || !feedback.text.trim()
+-              || !object(feedback.visual) || !nonempty(feedback.visual.alt))
++          if (!object(feedback) || typeof feedback.text !== 'string' || !feedback.text.trim())
+             fail('QUIZ_OPTION_FEEDBACK_INVALID');
+-          if (feedback.visual.kind === 'image') {
+-            if (typeof feedback.visual.src !== 'string'
+-                || !bindings.some((binding) => binding.src === feedback.visual.src))
++          const visual = feedback.visual;
++          if (!object(visual) || (visual.kind !== 'image' && visual.kind !== 'relationship')
++              || !nonempty(visual.alt))
++            fail('QUIZ_OPTION_FEEDBACK_INVALID');
++          if (visual.kind === 'image') {
++            const src = visual.src;
++            if (typeof src !== 'string'
++                || !bindings.some((binding) => binding.src === src))
+               fail('QUIZ_OPTION_FEEDBACK_INVALID');
+-          } else if (feedback.visual.kind === 'relationship') {
+-            const actors = feedback.visual.actors;
+-            const links = feedback.visual.links;
++          } else if (visual.kind === 'relationship') {
++            const actors = visual.actors;
++            const links = visual.links;
+             const allowed = new Set(['speaks-to', 'voice-match', 'mismatch', 'corrects-name', 'farewell']);
+             if (!Array.isArray(actors) || actors.length < 1 || actors.length > 3
+                 || actors.some((actor: Json) => !object(actor) || !CATALOG_ID.test(actor.id)
+diff --git a/packages/@openmaic/generation/src/learning-scene-contract.ts b/packages/@openmaic/generation/src/learning-scene-contract.ts
+--- a/packages/@openmaic/generation/src/learning-scene-contract.ts
++++ b/packages/@openmaic/generation/src/learning-scene-contract.ts
+@@ -93,7 +93,9 @@
+ }
+ function fingerprint(visual: QuizVisual): string {
+   return visual.kind === 'quantity' ? `quantity:${visual.count}` : visual.kind === 'people'
+-    ? 'people:' + JSON.stringify(visual.members) : `image:${visual.src}:${visual.cue ?? ''}`;
++    ? 'people:' + JSON.stringify(visual.members) : visual.kind === 'relationship'
++    ? 'relationship:' + JSON.stringify({ actors: visual.actors, links: visual.links })
++    : `image:${visual.src}:${visual.cue ?? ''}`;
+ }
+ function assertArithmetic(text: string, maximum: number): void {
+   // Only arithmetic operands/results, not positions, timings, IDs or page numbers.
+diff --git a/lib/server/mira-textbook-current-review-revision.ts b/lib/server/mira-textbook-current-review-revision.ts
+--- a/lib/server/mira-textbook-current-review-revision.ts
++++ b/lib/server/mira-textbook-current-review-revision.ts
+@@ -16,7 +16,7 @@
+ import sharp from 'sharp';
+ import { validateScene } from '@openmaic/dsl';
+ import { PgDocumentStore, type Queryable } from '@openmaic/storage/document/pg';
+-import { validateAppStage } from '@/lib/document-store/validators';
++import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
+ import { createOwnerBoundDocumentStore, type TransactionSource } from '@/lib/persistence/owner-bound-document-store';
+ import { resolveRequestOwnerId } from './agent-runtime/owner';
+ import type { CourseDocument, CourseStore } from './agent-runtime/course-tools';
+@@ -34,6 +34,9 @@
+ const check: (value: unknown, code: string) => asserts value = (value, code) => {
+   if (!value) throw new Error(`TEXTBOOK_CURRENT_REVIEW_REVISION_${code}`);
+ };
++function assertValidRevisionScene(value: unknown): asserts value is CourseDocument['scenes'][number] {
++  check(validateAppScene(value).valid, 'SCENE_DSL');
++}
+ const object = (value: unknown): value is Json => !!value && typeof value === 'object' && !Array.isArray(value);
+ const hex = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+ const keys = (value: unknown, fields: string[]) => object(value) && Object.keys(value).sort().join(',') === [...fields].sort().join(',');
+@@ -617,6 +620,7 @@
+     const index = after.scenes.findIndex(scene => scene.id === revision.sceneId);
+     check(index >= 0, 'SCENE_MISSING');
+     const result = applySceneRevision(doc.scenes[index], revision, state.html.get(revision.sceneId), state.completeScenes.get(revision.sceneId), state.frozen.sha256, boundSources);
++    assertValidRevisionScene(result.next);
+     after.scenes[index] = result.next;
+     revisions.push(result.evidence);
+   }

@@ -152,9 +152,116 @@ class TextbookRepository:
                             (edition_id, revision_id)).fetchall()
         return sorted(rows, key=lambda row: (row['node_id'], row['part_index'], -int(row['created_at']), row['content_key']))
 
+    def directory_builds(self, conn, edition_id, revision_id):
+        """Read directory authority without returning the full saved classroom.
+
+        ``review_json.release`` contains the classroom, media inventory and raw
+        audio audit. Those immutable artifacts are needed when a child actually
+        enters a course, but moving every release through Python just to render
+        a directory makes a catalogue request proportional to all published
+        courseware. Keep the complete frozen input and small review evidence so
+        the directory can still check identities and publication authority.
+        The strict launch path continues to use ``get_build`` and
+        ``validate_release`` over the complete row.
+        """
+        mysql = getattr(conn, "dialect", None) == "mysql"
+        array_length = "JSON_LENGTH" if mysql else "json_array_length"
+        def json_type(path):
+            return (f"JSON_TYPE(JSON_EXTRACT(b.review_json, '{path}'))" if mysql
+                    else f"json_type(b.review_json, '{path}')")
+        review_evidence = "JSON_REMOVE(b.review_json, '$.release')"
+        review_evidence_bytes = (f"OCTET_LENGTH({review_evidence})" if mysql
+                                 else f"LENGTH(CAST({review_evidence} AS BLOB))")
+        course_title = "c.title"
+        if not mysql:
+            # The isolated SQLite contract fixture predates the production title
+            # column. Keep the production projection fixed while allowing empty
+            # test catalogues to exercise the same read path.
+            columns = conn.execute("PRAGMA table_info(learning_courses)").fetchall()
+            if not any(row.get("name") == "title" for row in columns):
+                course_title = "NULL"
+        # Keep the exact top-level evidence because its frozen digest includes
+        # versioned review fields beyond the common contract. Bound it at 1 MiB
+        # so an unrelated top-level payload can never recreate the transfer
+        # problem. CASE also isolates a malformed SQLite fixture row so one
+        # damaged release cannot fail the complete catalogue query.
+        rows = conn.execute(f"""
+            SELECT b.content_key,b.edition_id,b.revision_id,b.node_id,b.part_index,
+              b.teaching_revision,b.input_json,b.status,b.course_id,b.course_version,
+              b.course_content_sha256,b.created_at,b.updated_at,
+              CASE WHEN JSON_VALID(b.review_json)
+                  AND {review_evidence_bytes} <= 1048576
+                THEN {review_evidence} ELSE NULL END AS directory_review_evidence_json,
+              CASE WHEN JSON_VALID(b.review_json) THEN JSON_OBJECT(
+                  'schemaVersion', JSON_EXTRACT(b.review_json, '$.release.schemaVersion'),
+                  'sha256', JSON_EXTRACT(b.review_json, '$.release.sha256'),
+                  'contentKey', JSON_EXTRACT(b.review_json, '$.release.contentKey'),
+                  'classroomId', JSON_EXTRACT(b.review_json, '$.release.classroomId'),
+                  'classroomSha256', JSON_EXTRACT(b.review_json, '$.release.classroomSha256'),
+                  'assessmentMode', JSON_EXTRACT(b.review_json, '$.release.assessmentMode'),
+                  'activityScope', JSON_EXTRACT(b.review_json, '$.release.activityScope'),
+                  'activityScopeType', {json_type('$.release.activityScope')},
+                  'audioAudit', JSON_OBJECT(
+                    'sha256', JSON_EXTRACT(b.review_json, '$.release.audioAudit.sha256'),
+                    'passed', JSON_EXTRACT(b.review_json, '$.release.audioAudit.passed'),
+                    'passedType', {json_type('$.release.audioAudit.passed')},
+                    'segments', JSON_EXTRACT(b.review_json, '$.release.audioAudit.segments'),
+                    'segmentsType', {json_type('$.release.audioAudit.segments')},
+                    'minSimilarityBps', JSON_EXTRACT(b.review_json, '$.release.audioAudit.minSimilarityBps')
+                  ),
+                  'mediaCount', {array_length}(JSON_EXTRACT(b.review_json, '$.release.media')),
+                  'mediaType', {json_type('$.release.media')},
+                  'sceneCount', {array_length}(JSON_EXTRACT(b.review_json, '$.release.classroom.scenes')),
+                  'scenesType', {json_type('$.release.classroom.scenes')},
+                  'classroomObjectId', JSON_EXTRACT(b.review_json, '$.release.classroom.id'),
+                  'stageId', JSON_EXTRACT(b.review_json, '$.release.classroom.stage.id')
+                ) ELSE NULL END AS directory_release_summary_json,
+              c.id AS directory_course_id,c.version AS directory_course_version,
+              {course_title} AS directory_course_title,c.grade_code AS directory_course_grade_code,
+              c.subject AS directory_course_subject,c.content_json AS directory_course_content_json,
+              c.status AS directory_course_status,c.quality_status AS directory_course_quality_status,
+              c.content_origin AS directory_course_content_origin,
+              c.retired_at AS directory_course_retired_at
+            FROM learning_textbook_course_builds b
+            JOIN learning_courses c ON c.id=b.course_id AND c.version=b.course_version
+            WHERE b.edition_id=? AND b.revision_id=? AND b.status='published'
+            """, (edition_id, revision_id)).fetchall()
+        return sorted(rows, key=lambda row: (row['node_id'], row['part_index'], -int(row['created_at']), row['content_key']))
+
     def get_build(self, conn, content_key, *, lock=False):
         return conn.execute("SELECT * FROM learning_textbook_course_builds WHERE content_key=?" + (" FOR UPDATE" if lock else ""),
                             (content_key,)).fetchone()
+
+    def runtime_release_identity(self, conn, content_key):
+        """Read current publication bytes' hashes without transferring the audit.
+
+        The production database hashes the original JSON text, not a claimed
+        SHA stored inside it. Shared locking reads also avoid an older MVCC
+        snapshot created by the authentication reads in this transaction.
+        """
+        mysql = getattr(conn, 'dialect', None) == 'mysql'
+        fields = ('content_key', 'edition_id', 'revision_id', 'node_id',
+                  'part_index', 'teaching_revision', 'course_id', 'course_version',
+                  'course_content_sha256', 'status', 'created_at', 'updated_at')
+        hashes = ('SHA2(input_json,256) AS input_sha256, '
+                  'SHA2(review_json,256) AS review_sha256') if mysql else 'input_json, review_json'
+        shared = ' FOR SHARE' if mysql else ''
+        build = conn.execute('SELECT ' + ','.join(fields) + ',' + hashes
+                             + ' FROM learning_textbook_course_builds WHERE content_key=?' + shared,
+                             (content_key,)).fetchone()
+        if build is None:
+            return None
+        if not mysql:
+            # Isolated SQLite tests; production never transfers these bytes.
+            from services.textbook_directory_access import _value_sha256
+            build['input_sha256'] = _value_sha256(build.pop('input_json'))
+            build['review_sha256'] = _value_sha256(build.pop('review_json'))
+        revision = conn.execute('SELECT * FROM learning_textbook_revisions '
+            'WHERE edition_id=? AND revision_id=?' + shared,
+            (build['edition_id'], build['revision_id'])).fetchone()
+        course = conn.execute('SELECT * FROM learning_courses WHERE id=? AND version=?' + shared,
+            (build['course_id'], build['course_version'])).fetchone()
+        return {'build': build, 'revision': revision, 'course': course}
 
     def course_build(self, conn, course_id, version):
         return conn.execute("SELECT * FROM learning_textbook_course_builds WHERE course_id=? AND course_version=? AND status='published'",

@@ -1,0 +1,214 @@
+diff --git a/lib/ai/autorouter-tool-deltas.ts b/lib/ai/autorouter-tool-deltas.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/ai/autorouter-tool-deltas.ts
+@@ -0,0 +1,69 @@
++/** AutoRouter's empty tool-call header deltas mean "no new header value". */
++export function wrapAutoRouterToolCallDeltas(response: Response): Response {
++  if (!response.body) return response;
++  const started = new Map<string, { id: string; name: string }>();
++  const decoder = new TextDecoder();
++  const encoder = new TextEncoder();
++  let buffer = '';
++
++  const rewriteLine = (line: string): string => {
++    if (!line.startsWith('data:')) return line;
++    let value: unknown;
++    try { value = JSON.parse(line.slice(5).trim()); } catch { return line; }
++    if (!value || typeof value !== 'object') return line;
++    const choices = (value as { choices?: unknown }).choices;
++    if (!Array.isArray(choices)) return line;
++    let changed = false;
++    for (const [position, choice] of choices.entries()) {
++      if (!choice || typeof choice !== 'object') continue;
++      const calls = choice.delta?.tool_calls;
++      if (!Array.isArray(calls)) continue;
++      for (const call of calls) {
++        if (!call || typeof call !== 'object') continue;
++        const key = `${choice.index ?? position}:${call.index}`;
++        const previous = started.get(key);
++        const fn = call.function;
++        // Never invent an initial identity. Missing initial id/name still fails
++        // the SDK; empty continuations cannot overwrite an established identity.
++        if (call.id === '') { delete call.id; changed = true; }
++        if (fn && typeof fn === 'object' && fn.name === '') {
++          delete fn.name;
++          changed = true;
++        }
++        const sameIdentity = previous
++          && (call.id == null || call.id === previous.id)
++          && (fn?.name == null || fn.name === previous.name);
++        if (call.type === '' && sameIdentity) {
++          delete call.type;
++          changed = true;
++        }
++        if (Number.isInteger(call.index) && call.index >= 0
++          && (call.type == null || call.type === 'function')
++          && typeof call.id === 'string' && call.id.length > 0
++          && typeof fn?.name === 'string' && fn.name.length > 0 && !previous) {
++          started.set(key, { id: call.id, name: fn.name });
++        }
++        // Arguments, unknown nonempty types, and conflicting identities are
++        // deliberately untouched. The SDK remains the validation authority.
++      }
++    }
++    return changed ? 'data: ' + JSON.stringify(value) + (line.endsWith('\r') ? '\r' : '') : line;
++  };
++  const transform = new TransformStream<Uint8Array, Uint8Array>({
++    transform(bytes, controller) {
++      buffer += decoder.decode(bytes, { stream: true });
++      const lines = buffer.split('\n');
++      buffer = lines.pop() ?? '';
++      for (const line of lines) controller.enqueue(encoder.encode(rewriteLine(line) + '\n'));
++    },
++    flush(controller) {
++      buffer += decoder.decode();
++      if (buffer) controller.enqueue(encoder.encode(rewriteLine(buffer)));
++    },
++  });
++  const headers = new Headers(response.headers);
++  headers.delete('content-length');
++  return new Response(response.body.pipeThrough(transform), {
++    status: response.status, statusText: response.statusText, headers,
++  });
++}
+diff --git a/lib/ai/providers.ts b/lib/ai/providers.ts
+--- a/lib/ai/providers.ts
++++ b/lib/ai/providers.ts
+@@ -37,6 +37,7 @@
+ import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
+ import { createGoogleGenerativeAI } from '@ai-sdk/google';
+ import { wrapLanguageModel, extractReasoningMiddleware } from 'ai';
++import { wrapAutoRouterToolCallDeltas } from './autorouter-tool-deltas';
+ import {
+   createKimiReasoningPreservationMiddleware as createReasoningContentPreservationMiddleware,
+   restoreKimiReasoningInRequestBody as restoreReasoningContentInRequestBody,
+@@ -2303,7 +2304,8 @@
+             }
+           }
+           const normalizedReasoningResponse = streaming
+-            ? wrapResponseWithReasoning(response)
++            ? wrapResponseWithReasoning(strictAutoRouterStreamingChatCompat
++                ? wrapAutoRouterToolCallDeltas(response) : response)
+             : strictAutoRouterStreamingChatCompat ||
+                 (providerId === 'kimi' && config.modelId === 'kimi-k3')
+               ? await wrapJsonResponseWithReasoning(response)
+diff --git a/tests/ai/autorouter-tool-deltas.test.ts b/tests/ai/autorouter-tool-deltas.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/ai/autorouter-tool-deltas.test.ts
+@@ -0,0 +1,114 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { getModel } from '@/lib/ai/providers';
++import { wrapAutoRouterToolCallDeltas } from '@/lib/ai/autorouter-tool-deltas';
++
++const line = (delta: unknown, index = 0, finish_reason: string | null = null) =>
++  'data: ' + JSON.stringify({ id: 'completion-test', object: 'chat.completion.chunk',
++    created: 1, model: 'deepseek-v4-pro-0813', choices: [{ index, delta, finish_reason }] }) + '\r\n\r\n';
++const header = (index = 0, id = 'call-zero', name = 'read_skill') =>
++  ({ index, id, type: 'function', function: { name, arguments: '' } });
++const continuation = (text: string, index = 0) =>
++  ({ index, id: '', type: '', function: { name: '', arguments: text } });
++const fixture = () => line({ role: 'assistant', reasoning_content: '先读规则。' })
++  + line({ tool_calls: [header()] })
++  + line({ tool_calls: [continuation('{"path":"规则')] })
++  + line({ tool_calls: [continuation('/a\\nb.md"}')] })
++  + line({}, 0, 'tool_calls') + 'data: [DONE]\r\n\r\n';
++
++function response(text: string, fragmentSize = 7) {
++  const bytes = new TextEncoder().encode(text);
++  return new Response(new ReadableStream<Uint8Array>({ start(controller) {
++    for (let n = 0; n < bytes.length; n += fragmentSize) controller.enqueue(bytes.slice(n, n + fragmentSize));
++    controller.close();
++  } }), { headers: { 'content-type': 'text/event-stream', 'content-length': String(bytes.length) } });
++}
++const chunks = (text: string) => text.split('\n').filter(s => s.startsWith('data: {'))
++  .map(s => JSON.parse(s.slice(5)));
++
++afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
++
++describe('AutoRouter streaming empty tool-call header compatibility', () => {
++  it('preserves UTF-8, CRLF, reasoning, DONE and exact argument fragments', async () => {
++    const result = await wrapAutoRouterToolCallDeltas(response(fixture(), 1)).text();
++    const data = chunks(result);
++    const calls = data.flatMap(c => c.choices[0].delta.tool_calls ?? []);
++    expect(calls[0]).toEqual(header());
++    expect(calls[1]).toEqual({ index: 0, function: { arguments: '{"path":"规则' } });
++    expect(calls[2]).toEqual({ index: 0, function: { arguments: '/a\\nb.md"}' } });
++    expect(data[0].choices[0].delta.reasoning_content).toBe('先读规则。');
++    expect(result).toContain('data: [DONE]\r\n\r\n');
++    expect(result.replaceAll('\r\n', '')).not.toContain('\n');
++  });
++
++  it('tracks independent indexes and choices without creating missing identities', async () => {
++    const text = line({ tool_calls: [header(), header(1, 'call-one', 'read_stage')] })
++      + line({ tool_calls: [continuation('{}', 1), continuation('{}', 0)] })
++      + line({ tool_calls: [continuation('{}', 0)] }, 1);
++    const data = chunks(await wrapAutoRouterToolCallDeltas(response(text)).text());
++    expect(data[1].choices[0].delta.tool_calls.every((c: object) => !('type' in c))).toBe(true);
++    expect(data[2].choices[0].delta.tool_calls[0].type).toBe('');
++  });
++
++  it('does not normalize unknown types, conflicting identities, initial empty type or another response', async () => {
++    const invalid = [continuation('{}'), { ...continuation('{}'), type: 'other' },
++      { ...continuation('{}'), id: 'different-call' }];
++    const text = line({ tool_calls: [header()] }) + invalid.slice(1).map(c => line({ tool_calls: [c] })).join('');
++    const data = chunks(await wrapAutoRouterToolCallDeltas(response(text)).text());
++    expect(data[1].choices[0].delta.tool_calls[0].type).toBe('other');
++    expect(data[2].choices[0].delta.tool_calls[0]).toMatchObject({ id: 'different-call', type: '' });
++    const initial = chunks(await wrapAutoRouterToolCallDeltas(response(line({ tool_calls: [invalid[0]] }))).text());
++    expect(initial[0].choices[0].delta.tool_calls[0]).toEqual({ index: 0, type: '', function: { arguments: '{}' } });
++  });
++
++  it('preserves non-data lines and malformed JSON; removes stale content-length', async () => {
++    const raw = ': keepalive\n\ndata: not-json\n\ndata: [DONE]\n\n';
++    const result = wrapAutoRouterToolCallDeltas(response(raw));
++    expect(result.headers.has('content-length')).toBe(false);
++    expect(await result.text()).toBe(raw);
++  });
++
++  it('propagates upstream stream errors', async () => {
++    const body = new ReadableStream<Uint8Array>({ start(controller) { controller.error(new Error('upstream interrupted')); } });
++    await expect(wrapAutoRouterToolCallDeltas(new Response(body)).text()).rejects.toThrow('upstream interrupted');
++  });
++
++  it('propagates consumer cancellation', async () => {
++    const cancel = vi.fn();
++    const body = new ReadableStream<Uint8Array>({ cancel });
++    await wrapAutoRouterToolCallDeltas(new Response(body)).body!.cancel('leave');
++    await vi.waitFor(() => expect(cancel).toHaveBeenCalledWith('leave'));
++  });
++
++  async function sdkParts(wire: string, endpoint = 'https://api.autorouter.top/v1') {
++    const fetchMock = vi.fn(async () => response(wire, 1));
++    vi.stubGlobal('fetch', fetchMock);
++    vi.stubEnv('OPENAI_COMPAT_USE_STREAMING_CHAT', 'true');
++    const { model } = getModel({ providerId: 'deepseek', modelId: 'deepseek-v4-pro', apiKey: 'local-fixture-only', baseUrl: endpoint });
++    if (typeof model === 'string') throw new Error('Expected the configured provider model');
++    const result = await model.doStream({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'Read the known skill.' }] }],
++      tools: [{ type: 'function', name: 'read_skill', inputSchema: { type: 'object', properties: { path: { type: 'string' } } } }] });
++    const parts = [];
++    for await (const part of result.stream) parts.push(part);
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    return parts;
++  }
++
++  it('replays through the actual provider and installed SDK with no provider call or tool execution', async () => {
++    const parts = await sdkParts(fixture());
++    expect(parts.filter(p => p.type === 'error')).toEqual([]);
++    expect(parts.find(p => p.type === 'tool-call')).toMatchObject({ type: 'tool-call',
++      toolCallId: 'call-zero', toolName: 'read_skill', input: '{"path":"规则/a\\nb.md"}' });
++    expect(parts.filter(p => p.type === 'reasoning-delta').map(p => p.delta).join('')).toBe('先读规则。');
++  });
++
++  it.each(['', 'other'])('keeps SDK rejection for unestablished type %j', async type => {
++    const parts = await sdkParts(line({ tool_calls: [{ ...continuation('{}'), type }] }) + 'data: [DONE]\n\n');
++    expect(parts.some(p => p.type === 'error')).toBe(true);
++    expect(parts.some(p => p.type === 'tool-call')).toBe(false);
++  });
++
++  it('does not apply this compatibility outside the exact AutoRouter endpoint', async () => {
++    const parts = await sdkParts(fixture(), 'https://api.deepseek.com/v1');
++    expect(parts.some(p => p.type === 'error')).toBe(true);
++  });
++});

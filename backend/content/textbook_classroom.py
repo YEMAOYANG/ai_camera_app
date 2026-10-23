@@ -29,8 +29,10 @@ def classroom_roster(frozen, release, *, private=False):
             config['persona'] += '\n' + '\n'.join(LOW_READING_POLICY['rules'])
     # Older previews used the built-in six-person classroom. Replace only the
     # generic teacher, retaining its built-in assistant/classmate identities.
+    # Workbench lessons name their own classmates, for whom the student runtime
+    # has no voices or personas; they sit with the built-in classmates instead.
     peers = [agent for agent in release['classroom']['stage'].get('agentIds', COMPANIONS)
-             if agent in COMPANIONS]
+             if agent in COMPANIONS] or COMPANIONS
     return [config['id'], *dict.fromkeys(peers)], [config]
 
 

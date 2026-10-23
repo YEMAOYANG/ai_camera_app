@@ -1,0 +1,254 @@
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -40,7 +40,12 @@
+ // the generation package consumes structurally before any provider call.
+ const WidgetOutlineParams = Type.Object({
+   concept: Type.Optional(Type.String()),
+-  keyVariables: Type.Optional(Type.Array(Type.Union([Type.String(), Type.Record(Type.String(), Type.Unknown())]))),
++  // Accept both frozen forms before the agent framework's Value.Convert runs;
++  // coercing an object into an array would change the exact contract digest.
++  keyVariables: Type.Optional(Type.Union([
++    Type.Record(Type.String(), Type.Unknown()),
++    Type.Array(Type.Union([Type.String(), Type.Record(Type.String(), Type.Unknown())])),
++  ])),
+   diagramType: Type.Optional(Type.Union(['flowchart', 'mindmap', 'hierarchy', 'system', 'interactive-visual-structure'].map(value => Type.Literal(value)))),
+   notTeachingFlowchart: Type.Optional(Type.Boolean()),
+   nodeCount: Type.Optional(Type.Integer({ minimum: 0 })),
+@@ -56,7 +61,7 @@
+   task: Type.Optional(Type.String()), tools: Type.Optional(Type.Array(Type.String())),
+   steps: Type.Optional(Type.Array(Type.String())), successCriteria: Type.Optional(Type.Array(Type.String())),
+   errorConsequences: Type.Optional(Type.Array(Type.String())), challenge: Type.Optional(Type.String()),
+-  playerControls: Type.Optional(Type.Array(Type.String())), challengeType: Type.Optional(Type.String()),
++  playerControls: Type.Optional(Type.Union([Type.String(), Type.Array(Type.String())])), challengeType: Type.Optional(Type.String()),
+ }, { additionalProperties: true, description: 'Complete approved widget design, including exact geometry and interaction extensions. Preserve the supplied object; notTeachingFlowchart opts diagram pages into picture-led structure authoring.' });
+ 
+ const SceneParams = Type.Object({
+diff --git a/lib/types/generation.ts b/lib/types/generation.ts
+--- a/lib/types/generation.ts
++++ b/lib/types/generation.ts
+@@ -118,7 +118,7 @@
+   concept?: string;
+ 
+   // Type-specific fields
+-  keyVariables?: Array<string | Record<string, unknown>>; // simulation
++  keyVariables?: Record<string, unknown> | Array<string | Record<string, unknown>>; // simulation
+   diagramType?: 'flowchart' | 'mindmap' | 'hierarchy' | 'system' | 'interactive-visual-structure'; // diagram
+   /** Explicit picture-led task opt-in; ordinary diagrams retain their template. */
+   notTeachingFlowchart?: boolean;
+@@ -134,7 +134,7 @@
+   successCriteria?: string[]; // procedural-skill - checks for completion
+   errorConsequences?: string[]; // procedural-skill - consequences for unsafe or incorrect actions
+   challenge?: string; // game - description of what player does
+-  playerControls?: string[]; // game - what player controls
++  playerControls?: string | string[]; // game - preserve the caller's frozen form
+   nodeCount?: number; // diagram - approximate node count
+   nodes?: Array<{
+     id: string;
+diff --git a/packages/@openmaic/generation/src/outline-types.ts b/packages/@openmaic/generation/src/outline-types.ts
+--- a/packages/@openmaic/generation/src/outline-types.ts
++++ b/packages/@openmaic/generation/src/outline-types.ts
+@@ -32,7 +32,7 @@
+ 
+ export interface WidgetOutline {
+   concept?: string;
+-  keyVariables?: Array<string | Record<string, unknown>>;
++  keyVariables?: Record<string, unknown> | Array<string | Record<string, unknown>>;
+   diagramType?: 'flowchart' | 'mindmap' | 'hierarchy' | 'system' | 'interactive-visual-structure';
+   /** Explicit picture-led task opt-in; ordinary diagrams retain their template. */
+   notTeachingFlowchart?: boolean;
+@@ -48,7 +48,7 @@
+   successCriteria?: string[];
+   errorConsequences?: string[];
+   challenge?: string;
+-  playerControls?: string[];
++  playerControls?: string | string[];
+   nodeCount?: number;
+   nodes?: Array<{
+     id: string;
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -1162,7 +1162,9 @@
+         conceptName: widgetOutline.concept || outline.title,
+         conceptOverview: outline.description,
+         keyPoints: (outline.keyPoints || []).join('\n'),
+-        variables: widgetOutline.keyVariables?.map(value => typeof value === 'string' ? value : JSON.stringify(value)).join(', ') || '',
++        variables: Array.isArray(widgetOutline.keyVariables)
++          ? widgetOutline.keyVariables.map(value => typeof value === 'string' ? value : JSON.stringify(value)).join(', ')
++          : widgetOutline.keyVariables ? JSON.stringify(widgetOutline.keyVariables) : '',
+         designIdea: '',
+         languageDirective: languageDirective || '',
+       };
+diff --git a/tests/agent-runtime/textbook-scene-contract.test.ts b/tests/agent-runtime/textbook-scene-contract.test.ts
+--- a/tests/agent-runtime/textbook-scene-contract.test.ts
++++ b/tests/agent-runtime/textbook-scene-contract.test.ts
+@@ -3,6 +3,7 @@
+ import { tmpdir } from 'node:os';
+ import path from 'node:path';
+ import sharp from 'sharp';
++import { validateToolArguments } from '@earendil-works/pi-ai';
+ import realSnapshot from '../fixtures/textbook-scene-contract.v1.json';
+ import type { Scene } from '@/lib/types/stage';
+ import type { CourseDocument, CourseStore } from '@/lib/server/agent-runtime/course-tools';
+@@ -208,6 +209,30 @@
+   };
+ }
+ const find = (tools: any[], name: string) => tools.find((t) => t.name === name)!;
++
++// Shapes from the frozen zh/ch/sh/r draft that the real agent validator used to
++// wrap in arrays before the exact-contract check ever saw them.
++const structuredSimulation = {
++  concept: '组合字形表示一个声母，整音播放',
++  keyVariables: {
++    decision: '选左部z/c并摆右部h；不分别发两字母音',
++    state: '两部件位置与当前zh/ch组合',
++    transition: '真实位置+身份均正确才确认，替换左部改变整声母',
++  },
++  notTeachingFlowchart: true,
++};
++const structuredGame = {
++  gameType: '两项声音顺序记忆',
++  challenge: '区分声音先后而非只认单卡',
++  playerControls: '听后排第一/第二张，允许交换',
++  notTeachingFlowchart: true,
++};
++function withWidgetOutline(widgetType: string, widgetOutline: Record<string, unknown>) {
++  const f = frozen();
++  Object.assign(f.contract.pagePlan[1], { widgetType, widgetOutline });
++  f.sha256 = textbookDigest(f.contract);
++  return f;
++}
+ async function bind(s: ReturnType<typeof setup>) {
+   await s.guard.context({
+     stageId,
+@@ -220,6 +245,104 @@
+ }
+ 
+ describe('frozen textbook authoring boundary', () => {
++  it.each([
++    { name: 'object variables', widgetType: 'simulation', widgetOutline: structuredSimulation, omit: false },
++    { name: 'string controls', widgetType: 'game', widgetOutline: structuredGame, omit: false },
++    { name: 'legacy variables array', widgetType: 'simulation', widgetOutline: {
++      ...structuredSimulation, keyVariables: ['selectedCard', { name: 'round', initial: 0 }],
++    }, omit: false },
++    { name: 'legacy controls array', widgetType: 'game', widgetOutline: {
++      ...structuredGame, playerControls: ['重听', '交换', '重来'],
++    }, omit: false },
++    { name: 'server-injected object variables', widgetType: 'simulation', widgetOutline: structuredSimulation, omit: true },
++    { name: 'server-injected string controls', widgetType: 'game', widgetOutline: structuredGame, omit: true },
++  ])('preserves $name through real agent validation, frozen context and generation', async ({ widgetType, widgetOutline, omit }) => {
++    const s = setup(withWidgetOutline(widgetType, widgetOutline));
++    const frozenBefore = textbookCanonical(s.f);
++    const aiCall = vi.fn(async (_system: string, _user: string) =>
++      html().replace('"type":"simulation"', `"type":"${widgetType}"`));
++    const generateActions = vi.fn();
++    const tool = find(buildGenerationTools({ ...s.deps, aiCall, generateActions } as any), 'generate_scene');
++    const input = {
++      stageId, order: 2, title: '改变情境', type: 'interactive', widgetType,
++      brief: '遵守原始逐页合同', media: s.media, actions: activity().actions,
++      ...(!omit ? { widgetOutline: structuredClone(widgetOutline) } : {}),
++    };
++    const inputBefore = textbookCanonical(input);
++    // execute() alone misses pi-agent's parameter coercion, which caused the
++    // production failure before the child model was called.
++    const validated = validateToolArguments(tool, {
++      type: 'toolCall', id: 'frozen-shape', name: tool.name, arguments: input,
++    });
++    expect(textbookCanonical(validated)).toBe(inputBefore);
++    expect(textbookCanonical(input)).toBe(inputBefore);
++    const result = await tool.execute('frozen-shape', validated);
++    expect(result).not.toMatchObject({ isError: true });
++    expect(aiCall).toHaveBeenCalledTimes(1);
++    expect(aiCall.mock.calls[0]![1]).toContain(JSON.stringify(widgetOutline));
++    expect(aiCall.mock.calls[0]![1]).not.toContain('[object Object]');
++    if ('keyVariables' in widgetOutline) {
++      const variables = widgetOutline.keyVariables;
++      const expected = Array.isArray(variables)
++        ? variables.map(value => typeof value === 'string' ? value : JSON.stringify(value)).join(', ')
++        : JSON.stringify(variables);
++      expect(aiCall.mock.calls[0]![1]).toContain(expected);
++    }
++    expect(generateActions).not.toHaveBeenCalled();
++    expect(s.base.putScene).toHaveBeenCalledOnce();
++    expect(s.doc().scenes[0].actions).toEqual(activity().actions);
++    expect((s.doc().scenes[0].content as { widgetType?: string }).widgetType).toBe(widgetType);
++    expect(textbookCanonical(s.f)).toBe(frozenBefore);
++    const candidate = JSON.parse(await fs.readFile(path.join(root, stageId, 'textbook-authoring-candidate.json'), 'utf8'));
++    expect(candidate.frozenContract).toEqual(s.f);
++    expect(candidate.contractSha256 ?? candidate.frozenContract.sha256).toBe(s.f.sha256);
++  });
++
++  it.each([
++    ['title', { title: '另一个目标' }],
++    ['order', { order: 1 }],
++    ['type', { type: 'slide' }],
++    ['widget type', { widgetType: 'game' }],
++    ['object value', { widgetOutline: { ...structuredSimulation,
++      keyVariables: { ...structuredSimulation.keyVariables, decision: '直接显示正确答案' },
++    } }],
++    ['object changed into array', { widgetOutline: { ...structuredSimulation,
++      keyVariables: [structuredSimulation.keyVariables],
++    } }],
++    ['object field removed', { widgetOutline: { concept: structuredSimulation.concept,
++      notTeachingFlowchart: true,
++    } }],
++  ])('still rejects changed %s after real argument validation, before any child call', async (_name, changed) => {
++    const s = setup(withWidgetOutline('simulation', structuredSimulation));
++    const aiCall = vi.fn();
++    const tool = find(buildGenerationTools({ ...s.deps, aiCall } as any), 'generate_scene');
++    const input = { stageId, order: 2, title: '改变情境', type: 'interactive',
++      widgetType: 'simulation', widgetOutline: structuredClone(structuredSimulation),
++      brief: '保持原合同', media: s.media, ...changed };
++    const validated = validateToolArguments(tool, {
++      type: 'toolCall', id: 'changed-shape', name: tool.name, arguments: input,
++    });
++    await expect(tool.execute('changed-shape', validated)).rejects.toThrow('PAGE_SCOPE_MISMATCH');
++    expect(aiCall).not.toHaveBeenCalled();
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++
++  it('does not equate a controls array with a frozen controls string', async () => {
++    const s = setup(withWidgetOutline('game', structuredGame));
++    const aiCall = vi.fn();
++    const tool = find(buildGenerationTools({ ...s.deps, aiCall } as any), 'generate_scene');
++    const validated = validateToolArguments(tool, {
++      type: 'toolCall', id: 'changed-controls', name: tool.name, arguments: {
++        stageId, order: 2, title: '改变情境', type: 'interactive', widgetType: 'game',
++        widgetOutline: { ...structuredGame, playerControls: [structuredGame.playerControls] },
++        brief: '保持原合同', media: s.media,
++      },
++    });
++    await expect(tool.execute('changed-controls', validated)).rejects.toThrow('PAGE_SCOPE_MISMATCH');
++    expect(aiCall).not.toHaveBeenCalled();
++    expect(s.base.putScene).not.toHaveBeenCalled();
++  });
++
+   it('accepts the actual Python-frozen English lesson and a trimmed session prompt without changing its contract', () => {
+     assertTextbookContract(realSnapshot);
+     expect(textbookDigest(realSnapshot.contract)).toBe(realSnapshot.sha256);
+diff --git a/lib/server/mira-sample-structural-policy.ts b/lib/server/mira-sample-structural-policy.ts
+--- a/lib/server/mira-sample-structural-policy.ts
++++ b/lib/server/mira-sample-structural-policy.ts
+@@ -256,7 +256,9 @@
+           widgetOutline: {
+             ...outline.widgetOutline,
+             ...(outline.widgetOutline.keyVariables
+-              ? { keyVariables: [...outline.widgetOutline.keyVariables] }
++              ? { keyVariables: Array.isArray(outline.widgetOutline.keyVariables)
++                ? [...outline.widgetOutline.keyVariables]
++                : { ...outline.widgetOutline.keyVariables } }
+               : {}),
+             ...(outline.widgetOutline.objects
+               ? { objects: [...outline.widgetOutline.objects] }
+@@ -265,7 +267,9 @@
+               ? { interactions: [...outline.widgetOutline.interactions] }
+               : {}),
+             ...(outline.widgetOutline.playerControls
+-              ? { playerControls: [...outline.widgetOutline.playerControls] }
++              ? { playerControls: typeof outline.widgetOutline.playerControls === 'string'
++                ? outline.widgetOutline.playerControls
++                : [...outline.widgetOutline.playerControls] }
+               : {}),
+           },
+         }
