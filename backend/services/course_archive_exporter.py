@@ -29,6 +29,7 @@ SCHEMA = "mira.course-archive.export.v1"
 MAX_FILE_BYTES = 768 * 1024 * 1024
 MAX_ARCHIVE_BYTES = 4 * 1024 * 1024 * 1024
 MAX_FILES = 12000
+PRIVATE_DISK_RESERVE = 1024**3
 _ID = re.compile(r"[A-Za-z0-9_.:-]+\Z")
 _SECRET_KEYS = frozenset({"apikey", "accesskey", "accesskeyid", "secretaccesskey", "secretkey", "password",
     "accesstoken", "refreshtoken", "runtimetoken", "cookie", "cookies", "privatekey",
@@ -63,6 +64,13 @@ class CourseArchiveError(ValueError):
 def _require(value, code):
     if not value:
         raise CourseArchiveError(code)
+
+
+def _require_private_space(directory, byte_size, *, phase="payload"):
+    """Keep the shared filesystem reserve before another private write."""
+    stat = os.statvfs(directory)
+    _require(stat.f_bavail * stat.f_frsize >= byte_size + PRIVATE_DISK_RESERVE,
+             "archive_" + phase + "_space_insufficient")
 
 
 def _json(value):
@@ -686,6 +694,13 @@ class CourseArchiveExporter:
                             "archiveSourcePath": relative,
                             **{k: entry[k] for k in ("sha256", "byteSize", "mimeType")}})
                         continue
+                    recovered = self._retained_audio_alias(bound, match)
+                    if recovered is not None:
+                        media, alias, evidence = recovered
+                        bound.media.append(media)
+                        bound.recovered_aliases.append(alias)
+                        bound.source_files.extend(evidence)
+                        continue
                 if entry is None:
                     bound.missing_sources.append({"kind": "native_media", "sourceIdentity": relative,
                                                   "reason": "saved_media_source_missing"})
@@ -764,6 +779,125 @@ class CourseArchiveExporter:
                         "archiveSourcePath": correct, "sha256": checksum, "byteSize": size, "mimeType": "image/png"}
                     candidates.append((media, alias, evidence))
             except (CourseArchiveError, OSError, ValueError, KeyError, TypeError, AttributeError):
+                continue
+        return candidates[0] if len(candidates) == 1 else None
+
+    def _retained_audio_alias(self, bound, match):
+        """Map an old role-game filename through its exact inherited receipt.
+
+        The generated HTML stays unchanged. This is deliberately limited to
+        the five existing role cues: a filename, matching hash or nearby stage
+        alone never authorizes another classroom's recording.
+        """
+        if not re.fullmatch(r"(?:speaker-(?:teal|coral)|cue-(?:me|you|he))\.wav", match[3]):
+            return None
+        from content.textbook_catalog import digest
+        from core.errors import ApiError
+        from services.textbook_operator_revision_service import load_inheritance
+        from services.textbook_preview_audio import core_content
+
+        candidates = []
+        for root in set(bound.source_roots):
+            try:
+                root = self._source_path(root)
+                if root != self.native_root / "data/classrooms" / match[1]:
+                    continue
+                row = bound.documents.get("数据库/原始预览记录.json")
+                _require(isinstance(row, dict) and row.get("classroom_id") == match[1]
+                    and row.get("status") in {"preview_ready", "review_required"}, "audio_alias_preview_unbound")
+                frozen, room = releases.parsed(row["input_json"]), releases.parsed(row["classroom_json"])
+                _require(room.get("stage", {}).get("id") == match[1]
+                    and digest(room) == row.get("classroom_sha256"), "audio_alias_preview_changed")
+                folder = self._source_path(root / "textbook-preview-audio")
+                archive = self._source_path(folder / "operator-parent")
+                # Preflight every path before the read-only producer validator
+                # opens it; its generic loader otherwise resolves symlinks.
+                prepared_path = self._source_path(archive / "prepared.json")
+                _require(prepared_path.is_file() and prepared_path.stat().st_size <= 4 * 1024**2,
+                    "audio_alias_preparation_invalid")
+                prepared = json.loads(prepared_path.read_bytes())
+                prepared_files = prepared.get("files")
+                _require(isinstance(prepared_files, dict) and 0 < len(prepared_files) <= 2048,
+                    "audio_alias_preparation_invalid")
+                for name, checksum in prepared_files.items():
+                    _safe_relative(name)
+                    source = self._source_path(archive / name)
+                    _require(source.is_relative_to(archive) and source.is_file()
+                        and source.stat().st_size <= MAX_FILE_BYTES
+                        and re.fullmatch(r"[a-f0-9]{64}", str(checksum)), "audio_alias_preparation_invalid")
+                    if not name.startswith(("audio/", "images/")):
+                        _require(_hash_file(source) == checksum, "audio_alias_preparation_changed")
+                plan_path, proof_path = [self._source_path(p) for p in (folder / "plan.json", archive / "provenance.json")]
+                _require(all(p.is_file() and p.stat().st_size <= 4 * 1024**2 for p in (plan_path, proof_path))
+                    and not (folder / "parent-audio-restorations").exists(), "audio_alias_proof_invalid")
+                plan = json.loads(plan_path.read_bytes())
+                context = load_inheritance(folder, plan, frozen=frozen)
+                _require(context and context["archive"] == archive
+                    and context["provenance"].get("targetClassroomId") == match[1]
+                    and context["provenance"].get("targetPreviewKey") == row.get("preview_key")
+                    and plan.get("previewKey") == row.get("preview_key")
+                    and core_content(context["candidate"]["classroom"]) == core_content(room),
+                    "audio_alias_inheritance_unbound")
+                parent, candidate = context["parent"], context["candidate"]
+                action_id = "review_" + match[3].removesuffix(".wav")
+                actions = [(scene, action) for scene in bound.classroom["scenes"]
+                    for action in scene.get("actions", []) if action.get("type") == "speech"
+                    and action.get("id") == action_id
+                    and f"/api/classroom-media/{match[1]}/audio/" in scene.get("content", {}).get("html", "")]
+                _require(len(actions) == 1, "audio_alias_scene_unbound")
+                scene, action = actions[0]
+                segments = [s for s in candidate["inheritedSegments"]
+                    if (s.get("sceneId"), s.get("actionId")) == (scene["id"], action_id)]
+                entries = [e for e in parent["audit"]["segments"]
+                    if (e.get("sceneId"), e.get("actionId")) == (scene["id"], action_id)]
+                _require(len(segments) == len(entries) == 1, "audio_alias_segment_ambiguous")
+                segment, entry = segments[0], entries[0]
+                request, checksum = segment["ttsRequestId"], segment["audioSha256"]
+                _require(re.fullmatch(r"tbprev_[a-f0-9]{64}", request)
+                    and re.fullmatch(r"[a-f0-9]{64}", checksum)
+                    and action.get("audioId") == request
+                    and digest(entry) == segment["asrEntrySha256"]
+                    and entry.get("ttsRequestId") == request and entry.get("audioSha256") == checksum
+                    and _sha(action.get("text", "").strip().encode()) == segment["textSha256"],
+                    "audio_alias_segment_changed")
+                target_actions = [a for s in room["scenes"] if s.get("id") == scene["id"]
+                    for a in s.get("actions", []) if a.get("type") == "speech" and a.get("id") == action_id]
+                _require(len(target_actions) == 1 and target_actions[0].get("audioId") == request
+                    and target_actions[0].get("text") == action.get("text"), "audio_alias_target_changed")
+                receipts = [r for r in parent["receipts"] if r.get("requestId") == request]
+                target_receipts = [r for r in releases.parsed(row["result_json"]).get("audioReceipts", [])
+                    if r.get("requestId") == request]
+                _require(len(receipts) == len(target_receipts) == 1
+                    and digest(receipts[0]) == segment["ttsReceiptSha256"]
+                    and all(r.get("status") == "succeeded" and r.get("audioSha256") == checksum
+                        and r.get("mimeType") == "audio/wav" for r in (*receipts, *target_receipts)),
+                    "audio_alias_receipt_invalid")
+                job_path = self._source_path(self.native_root / "data/formal-audio/jobs/tts" / (_sha(request.encode()) + ".json"))
+                _require(job_path.is_file() and job_path.stat().st_size <= 1024**2, "audio_alias_job_missing")
+                job = json.loads(job_path.read_bytes())
+                size = job.get("sizeBytes")
+                _require(job.get("requestId") == request and job.get("classroomId") == parent["preview"]["classroom_id"]
+                    and job.get("state") == "succeeded" and job.get("kind") == "tts"
+                    and job.get("mimeType") == "audio/wav" and job.get("audioSha256") == checksum
+                    and type(size) is int and 0 < size <= 32 * 1024**2, "audio_alias_job_invalid")
+                source = self._source_path(archive / "audio" / (request + ".wav"))
+                _require(prepared_files.get("audio/" + request + ".wav") == checksum
+                    and source.stat().st_size == size and _hash_file(source) == checksum, "audio_alias_bytes_changed")
+                names = ("prepared.json", "parent.json", "candidate.json", "input.json", "source.json",
+                    "source-plan.json", "source-receipts.json", "source-audit.json", "provenance.json",
+                    "audio/" + request + ".wav", "asr/" + segment["asrRequestId"] + ".json")
+                evidence = [self._source_path(archive / name) for name in names] + [plan_path, job_path]
+                hashes = {p.relative_to(self.root).as_posix(): _hash_file(p) for p in evidence}
+                correct = f"openmaic-runtime/.runtime/OpenMAIC/data/classrooms/{match[1]}/audio/{request}.wav"
+                alias = {"originalReference": match[0], "archivePath": "媒体/" + correct,
+                    "sha256": checksum, "byteSize": size, "mimeType": "audio/wav",
+                    "sceneId": scene["id"], "actionId": action_id, "ttsRequestId": request,
+                    "recoveryReason": "historical_audio_alias_from_verified_inherited_receipt",
+                    "evidence": list(hashes), "evidenceSha256": hashes}
+                media = {"path": match[0], "sourcePath": source.relative_to(self.root).as_posix(),
+                    "archiveSourcePath": correct, "sha256": checksum, "byteSize": size, "mimeType": "audio/wav"}
+                candidates.append((media, alias, evidence))
+            except (CourseArchiveError, ApiError, OSError, ValueError, KeyError, TypeError, AttributeError):
                 continue
         return candidates[0] if len(candidates) == 1 else None
 
@@ -1313,7 +1447,7 @@ class CourseArchiveExporter:
             # never written back into the frozen/original classroom document.
             scan_document = {**value, "_miraArchiveReferencedMedia": collected_refs}
             extra = ArchiveSnapshot(identity=snapshot.identity, metadata=snapshot.metadata, classroom=scan_document,
-                source_roots=list(snapshot.source_roots))
+                source_roots=list(snapshot.source_roots), documents=snapshot.documents)
             self._collect_snapshot_media(extra)
             missing.extend(extra.missing_sources)
             queued_sources.update(extra.source_files)
@@ -1356,6 +1490,7 @@ class CourseArchiveExporter:
             total += len(raw)
             _require(total <= MAX_ARCHIVE_BYTES, "archive_byte_limit_exceeded")
             path = payload / relative
+            _require_private_space(payload, len(raw))
             path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
             with path.open("xb") as stream:
                 os.chmod(path, 0o600)
@@ -1442,6 +1577,13 @@ class CourseArchiveExporter:
                 add(archive_path, raw=raw, kind="referenced_media",
                     identity=item["path"], mime=item["mimeType"])
             archived_files = {item["archivePath"]: item for item in files}
+            for alias in recovered_aliases.values():
+                for relative in alias.get("evidence", []):
+                    archived = archived_files.get("原稿/" + relative)
+                    if archived is None or (relative in alias.get("evidenceSha256", {})
+                            and archived["sha256"] != alias["evidenceSha256"][relative]):
+                        missing.append({"kind": "native_asset", "sourceIdentity": alias["originalReference"],
+                            "reason": "media_alias_evidence_not_archived"})
             for item in files:
                 receipt = item.get("sourceReceipt")
                 if receipt and archived_files.get(receipt["archivePath"], {}).get("sha256") != receipt["sha256"]:
@@ -1463,11 +1605,19 @@ class CourseArchiveExporter:
             self._write_private(manifest_path, _json(manifest))
             title = _safe_name(snapshot.metadata["title"])
             zip_path = target / (title + "-完整课程资料包.zip")
+            zip_inputs = [p for p in sorted(payload.rglob("*")) if p.is_file()]
+            # zlib compressBound plus local/central ZIP headers, UTF-8 names,
+            # ZIP64 extras and end records. Incompressible media still fits.
+            zip_upper_bound = 98
+            for path in zip_inputs:
+                size = path.stat().st_size
+                zip_upper_bound += size + (size >> 12) + (size >> 14) + (size >> 25) + 13
+                zip_upper_bound += 128 + 2 * len(path.relative_to(payload).as_posix().encode("utf8"))
+            _require_private_space(target, zip_upper_bound, phase="zip")
             with zipfile.ZipFile(zip_path, "x", compression=zipfile.ZIP_DEFLATED, compresslevel=6,
                                  allowZip64=True) as archive:
-                for path in sorted(payload.rglob("*")):
-                    if path.is_file():
-                        archive.write(path, path.relative_to(payload).as_posix())
+                for path in zip_inputs:
+                    archive.write(path, path.relative_to(payload).as_posix())
             zip_path.chmod(0o600)
             self._verify_zip(zip_path, manifest)
             public = []
@@ -1511,6 +1661,7 @@ class CourseArchiveExporter:
 
     @staticmethod
     def _write_private(path, raw):
+        _require_private_space(path.parent, len(raw))
         with path.open("xb") as stream:
             os.chmod(path, 0o600)
             stream.write(raw)

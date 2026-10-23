@@ -5,6 +5,7 @@ from io import BytesIO
 import json
 import os
 from pathlib import Path
+import re
 import stat
 import tempfile
 import unittest
@@ -936,6 +937,163 @@ class CourseArchiveExporterTest(unittest.TestCase):
         self.assertFalse(result["complete"])
         self.assertEqual(result["generatedPublicFiles"], [])
         self.assertEqual(result["missingSources"][0]["sourceIdentity"], "ast_owned_image")
+
+    def inherited_audio_alias_fixture(self):
+        """The producer validator is separately exercised by its own suite."""
+        from content.textbook_catalog import canonical, digest
+        stage, parent_stage, scene_id = "tbrev_role", "original_role", "role_scene"
+        request, preview = "tbprev_" + "a" * 64, "d" * 64
+        name, text = "cue-me", "请你指一指，谁用我称呼自己？"
+        checksum = hashlib.sha256(self.media).hexdigest()
+        action = {"id": "review_" + name, "type": "speech", "text": text, "audioId": request}
+        html = "<script>player.src='/api/classroom-media/" + stage + "/audio/'+file+'.wav'</script>"
+        room = {"stage": {"id": stage}, "scenes": [{"id": scene_id, "content": {"html": html}, "actions": [action]}]}
+        frozen = {"operatorRevision": {"revisionId": "frozen-parent"}}
+        receipt = {"requestId": request, "status": "succeeded", "audioSha256": checksum, "mimeType": "audio/wav"}
+        entry = {"sceneId": scene_id, "actionId": action["id"], "text": text,
+            "textSha256": hashlib.sha256(text.encode()).hexdigest(), "ttsRequestId": request,
+            "audioSha256": checksum}
+        segment = {"sceneId": scene_id, "actionId": action["id"], "ttsRequestId": request,
+            "audioSha256": checksum, "textSha256": entry["textSha256"], "asrEntrySha256": digest(entry),
+            "ttsReceiptSha256": digest(receipt), "asrRequestId": "saved-asr"}
+        row = {"classroom_id": stage, "status": "preview_ready", "preview_key": preview,
+            "input_json": canonical(frozen), "classroom_json": canonical(room), "classroom_sha256": digest(room),
+            "result_json": canonical({"audioReceipts": [receipt]})}
+        root = self.exporter.native_root / "data/classrooms" / stage
+        folder, archive = root / "textbook-preview-audio", root / "textbook-preview-audio/operator-parent"
+        archive.mkdir(parents=True)
+        parent = {"preview": {"classroom_id": parent_stage}, "audit": {"segments": [entry]}, "receipts": [receipt]}
+        candidate = {"classroom": room, "inheritedSegments": [segment]}
+        context = {"archive": archive, "parent": parent, "candidate": candidate,
+            "provenance": {"targetClassroomId": stage, "targetPreviewKey": preview}}
+        plan = {"previewKey": preview}
+        documents = {"parent.json": parent, "candidate.json": candidate, "input.json": frozen,
+            "source.json": room, "source-plan.json": {}, "source-receipts.json": [receipt],
+            "source-audit.json": parent["audit"], "asr/saved-asr.json": entry}
+        for relative, value in documents.items():
+            path = archive / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(canonical(value))
+        audio = archive / "audio" / (request + ".wav")
+        audio.parent.mkdir()
+        audio.write_bytes(self.media)
+        prepared = {"files": {p.relative_to(archive).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in archive.rglob("*") if p.is_file()}}
+        (archive / "prepared.json").write_text(canonical(prepared))
+        (archive / "provenance.json").write_text(canonical(context["provenance"]))
+        (folder / "plan.json").write_text(canonical(plan))
+        job_path = self.exporter.native_root / "data/formal-audio/jobs/tts" / (hashlib.sha256(request.encode()).hexdigest() + ".json")
+        job_path.parent.mkdir(parents=True, exist_ok=True)
+        job = {"requestId": request, "classroomId": parent_stage, "state": "succeeded", "kind": "tts",
+            "mimeType": "audio/wav", "audioSha256": checksum, "sizeBytes": len(self.media)}
+        job_path.write_text(canonical(job))
+        self.snapshot.source_roots = [root]
+        self.snapshot.classroom = deepcopy(room)
+        self.snapshot.documents["数据库/原始预览记录.json"] = row
+        self.snapshot.documents["原始课堂.json"] = row["classroom_json"]
+        self.store.config = CourseStorageConfig(mode="local")
+        self.store.read.side_effect = lambda path, **kwargs: self.media if path.name == "teacher.mp3" else None
+        ref = f"/api/classroom-media/{stage}/audio/{name}.wav"
+        self.exporter.standard_asset_resolver = lambda *args, **kwargs: {
+            "entries": [{"ref": ref, "kind": "audio", "status": "already_collected"}], "unresolved": []}
+        match = re.fullmatch(r"/api/classroom-media/([A-Za-z0-9_-]+)/(audio|media)/([A-Za-z0-9_.-]+)", ref)
+        return {"root": root, "archive": archive, "context": context, "row": row, "audio": audio,
+            "ref": ref, "match": match, "job": job, "job_path": job_path}
+
+    def test_inherited_audio_alias_is_private_and_preserves_original_document(self):
+        fixture = self.inherited_audio_alias_fixture()
+        original = deepcopy(self.snapshot.classroom)
+        # The pure loader owns the complete producer contract; this fixture
+        # isolates the archive adapter's independent scene/receipt/byte checks.
+        with patch("services.textbook_operator_revision_service.load_inheritance", return_value=fixture["context"]):
+            result = self.export()
+        self.assertTrue(result["complete"], result["missingSources"])
+        self.assertEqual(self.snapshot.classroom, original)
+        self.assertFalse((fixture["root"] / "audio/cue-me.wav").exists())
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            manifest = json.loads(archive.read("manifest.json"))
+            alias = manifest["recoveredAliases"][0]
+            self.assertEqual(alias["originalReference"], fixture["ref"])
+            self.assertEqual(archive.read(alias["archivePath"]), self.media)
+            by_path = {f["archivePath"]: f for f in manifest["files"]}
+            for relative, checksum in alias["evidenceSha256"].items():
+                self.assertEqual(by_path["原稿/" + relative]["sha256"], checksum)
+            self.assertIn("/audio/'+file+'.wav", archive.read("classroom.json").decode())
+
+    def test_inherited_audio_alias_rejects_changed_ambiguous_and_unowned_evidence(self):
+        from content.textbook_catalog import canonical
+        cases = ("wrong_stage", "wrong_scene", "draft", "duplicate_receipt", "duplicate_segment",
+            "changed_frozen", "symlink", "hash", "size", "job_stage", "unknown_name", "invalid_lineage")
+        for case in cases:
+            with self.subTest(case=case):
+                fixture = self.inherited_audio_alias_fixture()
+                try:
+                    if case == "wrong_stage":
+                        self.snapshot.source_roots = []
+                    elif case == "wrong_scene":
+                        self.snapshot.classroom["scenes"][0]["id"] = "unrelated"
+                    elif case == "draft":
+                        fixture["row"]["status"] = "draft"
+                    elif case == "duplicate_receipt":
+                        fixture["context"]["parent"]["receipts"] *= 2
+                    elif case == "duplicate_segment":
+                        fixture["context"]["candidate"]["inheritedSegments"] *= 2
+                    elif case == "changed_frozen":
+                        (fixture["archive"] / "input.json").write_text('{"changed":true}')
+                    elif case == "symlink":
+                        fixture["audio"].unlink()
+                        fixture["audio"].symlink_to(self.root / "unowned.wav")
+                    elif case == "hash":
+                        fixture["audio"].write_bytes(self.media + b"changed")
+                    elif case in {"size", "job_stage"}:
+                        job = dict(fixture["job"])
+                        job["sizeBytes" if case == "size" else "classroomId"] = len(self.media) + 1 if case == "size" else "other"
+                        fixture["job_path"].write_text(canonical(job))
+                    match = fixture["match"]
+                    if case == "unknown_name":
+                        match = re.fullmatch(r"/api/classroom-media/([A-Za-z0-9_-]+)/(audio|media)/([A-Za-z0-9_.-]+)",
+                            fixture["ref"].replace("cue-me.wav", "unknown.wav"))
+                    with patch("services.textbook_operator_revision_service.load_inheritance",
+                            side_effect=ValueError("invalid frozen lineage") if case == "invalid_lineage" else None,
+                            return_value=fixture["context"]):
+                        self.assertIsNone(self.exporter._retained_audio_alias(self.snapshot, match))
+                finally:
+                    import shutil
+                    shutil.rmtree(fixture["root"])
+
+    def test_inherited_audio_alias_requires_every_evidence_file_in_final_manifest(self):
+        fixture = self.inherited_audio_alias_fixture()
+        self.snapshot.private_source_files.append(fixture["job_path"])
+        with patch("services.textbook_operator_revision_service.load_inheritance", return_value=fixture["context"]):
+            result = self.export()
+        self.assertFalse(result["complete"])
+        self.assertEqual(result["generatedPublicFiles"], [])
+        self.assertTrue(any(m["reason"] == "media_alias_evidence_not_archived" for m in result["missingSources"]))
+
+    def test_payload_disk_reserve_rejects_before_writing_payload(self):
+        from services import course_archive_exporter as module
+        with patch.object(module.os, "statvfs", return_value=Mock(f_bavail=1024**3, f_frsize=1)):
+            with self.assertRaisesRegex(CourseArchiveError, "archive_payload_space_insufficient"):
+                self.export()
+        self.assertFalse(list(self.staging.rglob("classroom.json")))
+        self.assertFalse(list(self.staging.rglob("*.zip")))
+
+    def test_zip_disk_reserve_rejects_before_creating_zip(self):
+        from services import course_archive_exporter as module
+        self.snapshot.documents.update({f"small-original-{i}.json": {"content": "x" * 2000} for i in range(40)})
+        with patch.object(module.os, "statvfs", return_value=Mock(f_bavail=1024**3 + 32768, f_frsize=1)):
+            with self.assertRaisesRegex(CourseArchiveError, "archive_zip_space_insufficient"):
+                self.export()
+        self.assertTrue(list(self.staging.rglob("manifest.json")))
+        self.assertFalse(list(self.staging.rglob("*.zip")))
+
+    def test_disk_reserve_allows_verified_complete_archive_with_sufficient_space(self):
+        from services import course_archive_exporter as module
+        with patch.object(module.os, "statvfs", return_value=Mock(f_bavail=4 * 1024**3, f_frsize=1)):
+            result = self.export()
+        self.assertTrue(result["complete"])
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            self.assertIsNone(archive.testzip())
 
     def test_resolved_standard_asset_is_verified_and_original_reference_is_preserved(self):
         ref, data = "ast_owned_image", b"the exact registered image bytes"
