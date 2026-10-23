@@ -23,14 +23,16 @@ from content.textbook_whole_course_quality import validate_whole_course_quality_
 from core.errors import ApiError
 from core.security import now_ms
 from services.textbook_preview_audio import verify_segment_receipt
+from services.course_media_object_store import CourseMediaObjectStore, CourseMediaStorageError
 
 
 class TextbookPublicationService:
-    def __init__(self, preview_service, delivery_copy=None):
+    def __init__(self, preview_service, delivery_copy=None, *, course_media_store=None):
         self.preview = preview_service
         self.repository = preview_service.repository
         # Optional smaller copy of a reviewed picture or narration file.
         self.delivery_copy = delivery_copy
+        self.course_media_store = course_media_store or CourseMediaObjectStore()
 
     def prepare(self, *, key, edition, revision, node, teaching_revision, review, audio_audit, classroom_directory,
                 asr_reconciliation=None, pronunciation_review=None):
@@ -331,12 +333,21 @@ class TextbookPublicationService:
             relative = f'{kind}/{sha}{suffix}'
             url = f'/api/classroom-media/{classroom_id}/{relative}'
             target_path = root / classroom_id / relative
-            target_path.parent.mkdir(parents=True, exist_ok=True)
-            if target_path.exists() and target_path.read_bytes() != raw:
+            try:
+                migrated = self.course_media_store.read(target_path, expected_sha256=sha,
+                    expected_bytes=len(raw), max_bytes=MAX_MEDIA_BYTES)
+            except CourseMediaStorageError:
                 fail('已归档的素材发生变化')
-            if not target_path.exists():
-                with target_path.open('xb') as output:
-                    output.write(raw)
+            if migrated is not None:
+                if migrated != raw:
+                    fail('已归档的素材发生变化')
+            else:
+                target_path.parent.mkdir(parents=True, exist_ok=True)
+                if target_path.exists() and target_path.read_bytes() != raw:
+                    fail('已归档的素材发生变化')
+                if not target_path.exists():
+                    with target_path.open('xb') as output:
+                        output.write(raw)
             media[url] = {'path': url, 'sha256': sha, 'byteSize': len(raw), 'mimeType': mime_type}
             if sha != reviewed_sha:
                 media[url]['sourceSha256'] = reviewed_sha

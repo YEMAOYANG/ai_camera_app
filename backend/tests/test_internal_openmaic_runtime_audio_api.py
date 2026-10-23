@@ -26,6 +26,7 @@ class _Guard:
 class _AudioService:
     def __init__(self, path: Path):
         self.path = path
+        self.data = None
         self.manifest_calls = []
         self.asset_calls = []
 
@@ -48,8 +49,9 @@ class _AudioService:
             path=self.path,
             mime_type="audio/wav",
             content_hash="a" * 64,
-            byte_size=self.path.stat().st_size,
+            byte_size=len(self.data) if self.data is not None else self.path.stat().st_size,
             duration_ms=1_000,
+            data=self.data,
         )
 
 
@@ -138,6 +140,24 @@ class InternalOpenMaicRuntimeAudioApiTest(unittest.TestCase):
         )
         self.assertEqual(missing.status_code, 404)
         self.assertEqual(missing.json["error"], "openmaic_runtime_audio_not_found")
+
+    def test_remote_bytes_keep_private_delivery_contract_without_local_file(self):
+        self.service.data = self.service.path.read_bytes()
+        self.service.path.unlink()
+        delivered = self.client.get(
+            "/internal/learning/openmaic/runtime/audio/formal-audio-0", headers=self._headers())
+        self.assertEqual(delivered.status_code, 200)
+        self.assertEqual(delivered.data, self.service.data)
+        self.assertEqual(delivered.headers["X-Mira-Media-Source"], "remote")
+        self.assertEqual(delivered.headers["Cache-Control"], "private, no-store")
+        delivered.close()
+        # This internal route has always ignored Range (conditional=False).
+        ranged = self.client.get(
+            "/internal/learning/openmaic/runtime/audio/formal-audio-0",
+            headers={**self._headers(), "Range": "bytes=0-9"})
+        self.assertEqual(ranged.status_code, 200)
+        self.assertEqual(ranged.data, self.service.data)
+        ranged.close()
 
     @staticmethod
     def _headers(*, source="openmaic-runtime-gateway"):

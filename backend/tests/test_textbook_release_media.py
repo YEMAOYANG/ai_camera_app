@@ -19,6 +19,7 @@ from core.errors import ApiError
 from core.security import now_ms
 from services.textbook_preview_audio import core_content
 from services.textbook_publication_service import TextbookPublicationService
+from services.course_media_object_store import CourseMediaStorageError
 
 
 def mp4_bytes():
@@ -317,6 +318,31 @@ class MediaArchiveTests(unittest.TestCase):
             self.assertIn(item['path'], prepared['release']['classroom']['scenes'][1]['content']['html'])
         self.repository.reserve_build.assert_not_called()
         self.assertEqual(self.prepare(assets)['release']['sha256'], prepared['release']['sha256'])
+
+    def test_preparing_migrated_targets_reuses_remote_bytes_without_recreating_local_copies(self):
+        assets = {'picture.png': b'reviewed-picture-fixture', 'lesson.mp4': mp4_bytes()}
+        prepared = self.prepare(assets)
+        archived = {(self.root / item['path'].removeprefix('/api/classroom-media/')).resolve(): item
+                    for item in prepared['release']['media']}
+        remote_bytes = {path: path.read_bytes() for path in archived}
+        for path in archived:
+            path.unlink()
+        remote = Mock()
+        remote.read.side_effect = lambda target, **_expected: remote_bytes.get(target)
+        self.service.course_media_store = remote
+        replayed = self.prepare(assets)
+        self.assertEqual(replayed['release']['sha256'], prepared['release']['sha256'])
+        self.assertFalse(any(path.exists() for path in archived))
+        self.assertEqual((self.root / self.source_id / 'audio/tts1.wav').read_bytes(), self.audio)
+        for call in remote.read.call_args_list:
+            item = archived[call.args[0]]
+            self.assertEqual(call.kwargs['expected_sha256'], item['sha256'])
+            self.assertEqual(call.kwargs['expected_bytes'], item['byteSize'])
+        remote.read.side_effect = CourseMediaStorageError('remote unavailable')
+        with self.assertRaises(ApiError):
+            self.prepare(assets)
+        self.assertFalse(any(path.exists() for path in archived))
+        self.repository.reserve_build.assert_not_called()
 
     def test_delivery_copy_is_archived_and_still_bound_to_the_reviewed_bytes(self):
         picture = b'reviewed-picture-fixture'

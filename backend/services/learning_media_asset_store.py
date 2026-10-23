@@ -7,6 +7,8 @@ from pathlib import Path
 import tempfile
 from typing import Protocol
 
+from services.course_media_object_store import CourseMediaObjectStore
+
 
 @dataclass(frozen=True)
 class StoredMediaAsset:
@@ -49,8 +51,9 @@ class FilesystemLearningMediaAssetStore:
         "audio/webm": "webm",
     }
 
-    def __init__(self, root: str | Path):
+    def __init__(self, root: str | Path, *, course_media_store: CourseMediaObjectStore | None = None):
         self.root = Path(root).expanduser().resolve()
+        self.course_media_store = course_media_store or CourseMediaObjectStore()
 
     def put_audio(
         self,
@@ -103,7 +106,12 @@ class FilesystemLearningMediaAssetStore:
         if not normalized or Path(normalized).is_absolute():
             raise ValueError("invalid media storage key")
         source = (self.root / normalized).resolve()
-        if self.root not in source.parents or not source.is_file():
+        if self.root not in source.parents:
+            raise ValueError("media object is unavailable")
+        migrated = self.course_media_store.read(source)
+        if migrated is not None:
+            return migrated
+        if not source.is_file():
             raise ValueError("media object is unavailable")
         return source.read_bytes()
 

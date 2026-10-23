@@ -22,6 +22,14 @@ OpenMAIC full runtime
 
 Students never receive the OpenMAIC editor, provider settings, API keys or an unrestricted classroom URL. They enter through the gateway with a 60-second, single-use Mira ticket. The gateway binds its HttpOnly runtime cookie to one student, one Mira learning session and one released classroom.
 
+## Published course media storage
+
+Patch `0251` keeps the frozen classroom URLs and media hashes while allowing exact published-media entries to be served from S3-compatible object storage. The sole manually maintained configuration is `COURSE_STORAGE_*` in `backend/.env`; the native launcher forwards only those keys. `local` keeps existing filesystem behavior. `manifest` requires remote delivery for every registered file and keeps unregistered originals local. `remote` rejects unregistered files. Remote errors never fall back to a registered local copy.
+
+`scripts/course-storage.mjs` inventories files from the backend's validated publication index, uploads immutable SHA-256 blobs, reads every remote blob back for verification, activates the private local manifest, restores exact files, and prunes only an explicitly accepted scope. Endpoint, bucket and prefix belong to the verification identity. Migration manifests and receipts stay in the ignored `backend/data/course-storage/` directory so the existing backend-data backup includes them; they are operational recovery records, not public course assets. Provider credentials, cookies, original authoring files, database rows, paid-call receipts and recovery backups are outside a public-media migration.
+
+For the `study` development bucket, public delivery is an explicit operator choice. Only media in a current verified publication may be uploaded. Upload completion alone is insufficient for pruning: verify all remote bytes, actual classroom delivery and audio/video ranges, test restoration, stop managed writers, then prune the exact unchanged media files. Preserve the original source media, database, frozen release and private manifest. The existing deployment/data-bundle workflow remains responsible for complete backups.
+
 OpenMAIC-generated quiz feedback is formative. Mira's backend remains the authority for final assessment and mastery.
 
 ## Pinned upstream

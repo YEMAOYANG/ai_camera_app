@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from io import BytesIO
+
 from flask import Blueprint, current_app, jsonify, request, send_file
 
 from core.database import Database
@@ -389,7 +391,7 @@ def runtime_audio_asset(asset_id: str):
             asset_id=asset_id,
         )
         response = send_file(
-            asset.path,
+            BytesIO(asset.data) if asset.data is not None else asset.path,
             mimetype=asset.mime_type,
             as_attachment=False,
             download_name=f"{asset_id}.wav",
@@ -399,6 +401,7 @@ def runtime_audio_asset(asset_id: str):
         )
         response.headers["Cache-Control"] = "private, no-store"
         response.headers["Content-Length"] = str(asset.byte_size)
+        response.headers["X-Mira-Media-Source"] = "remote" if asset.data is not None else "local"
         response.headers["X-Mira-Audio-Sha256"] = asset.content_hash
         response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
         response.headers["X-Content-Type-Options"] = "nosniff"

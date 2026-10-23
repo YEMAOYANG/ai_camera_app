@@ -14,6 +14,7 @@ from core.security import now_ms
 from scripts.narrate_textbook_batch import load_candidate
 from scripts.private_textbook_preview_snapshot import verify_complete_audio
 from services.textbook_batch_audio import build_audio_plan, audio_language_policy_from_plan
+from services.course_media_object_store import CourseMediaObjectStore, CourseMediaStorageError
 from content.textbook_deepseek_release import validate_new_authoring, validate_new_release_admission
 
 
@@ -62,10 +63,11 @@ def reviewed_estimated_minutes(review):
 
 
 class TextbookActivityPublicationService:
-    def __init__(self, repository, runtime_origin, classroom_directory):
+    def __init__(self, repository, runtime_origin, classroom_directory, *, course_media_store=None):
         self.repository = repository
         self.origin = runtime_origin.rstrip('/')
         self.root = Path(classroom_directory).resolve()
+        self.course_media_store = course_media_store or CourseMediaObjectStore()
         if urlparse(self.origin).hostname not in {'localhost', '127.0.0.1', '::1'}:
             fail('本机发布工具不能写入其他运行环境')
 
@@ -131,13 +133,22 @@ class TextbookActivityPublicationService:
             relative = ('audio/' if mime.startswith('audio/') else 'media/') + sha + suffix
             url = f'/api/classroom-media/{classroom_id}/{relative}'
             target = self.root / classroom_id / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            if target.exists():
-                if target.read_bytes() != raw:
+            try:
+                migrated = self.course_media_store.read(target, expected_sha256=sha,
+                    expected_bytes=len(raw), max_bytes=MAX_MEDIA_BYTES)
+            except CourseMediaStorageError:
+                fail('已发布的媒体不能覆盖')
+            if migrated is not None:
+                if migrated != raw:
                     fail('已发布的媒体不能覆盖')
             else:
-                with target.open('xb') as stream:
-                    stream.write(raw)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if target.exists():
+                    if target.read_bytes() != raw:
+                        fail('已发布的媒体不能覆盖')
+                else:
+                    with target.open('xb') as stream:
+                        stream.write(raw)
             media[url] = {'path': url, 'sha256': sha, 'byteSize': len(raw), 'mimeType': mime}
             return url
 
@@ -188,7 +199,16 @@ class TextbookActivityPublicationService:
         for asset in prepared['release']['media']:
             match = MEDIA.fullmatch(asset['path'])
             path = self.root / match.group(1) / match.group(2)
-            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != asset['sha256']:
+            try:
+                raw = self.course_media_store.read(path, expected_sha256=asset['sha256'],
+                    expected_bytes=asset['byteSize'], max_bytes=MAX_MEDIA_BYTES)
+                if raw is None:
+                    if not path.is_file():
+                        fail('发布媒体已变化')
+                    raw = path.read_bytes()
+            except (OSError, CourseMediaStorageError):
+                fail('发布媒体已变化')
+            if len(raw) != asset['byteSize'] or hashlib.sha256(raw).hexdigest() != asset['sha256']:
                 fail('发布媒体已变化')
         with self.repository.transaction() as conn:
             row = self.repository.get_revision(conn, binding['editionId'], binding['alignmentRevisionId'])

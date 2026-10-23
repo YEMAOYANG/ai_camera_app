@@ -1,8 +1,11 @@
 """Ungraded releases keep exact scope, student authority and honest progress."""
 from copy import deepcopy
+import hashlib
 import json
+from pathlib import Path
+import tempfile
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock, patch
 
 from content.teacher_profiles import get_formal_subject_qwen_voice_identity
 from content.textbook_catalog import canonical, digest
@@ -12,7 +15,8 @@ from core.errors import ApiError
 from services.textbook_classroom_service import TextbookClassroomService
 from services.textbook_course_policy import assert_textbook_course
 from services.textbook_activity_publication_service import (knowledge_brief, normalize_interactive_content,
-                                                           reviewed_estimated_minutes)
+                                                           reviewed_estimated_minutes, TextbookActivityPublicationService)
+from services.course_media_object_store import CourseMediaStorageError
 from tests import test_textbook_learning as existing
 
 
@@ -130,6 +134,64 @@ class ActivityReleaseTest(unittest.TestCase):
         service._complete(conn, {**session, 'task_id': 'task'}, {'family_id': 'family'}, {}, None)
         self.assertIn('未进行独立能力测评', service.learning.mark_task_completed.call_args.kwargs['summary'])
         service.learning.create_or_get_report.assert_not_called()
+
+
+class ActivityPublishedMediaTest(unittest.TestCase):
+    def test_idempotent_publish_revalidates_migrated_media_and_never_falls_back(self):
+        manifest, frozen, build, release, course = fixture()
+        raw = b'exact already-reviewed activity media'
+        sha = hashlib.sha256(raw).hexdigest()
+        media_path = f"/api/classroom-media/{release['classroomId']}/audio/{sha}.wav"
+        release['classroom']['scenes'][0]['actions'][0]['audioUrl'] = media_path
+        release['media'][0].update(path=media_path, sha256=sha, byteSize=len(raw))
+        release['classroomSha256'] = digest(release['classroom'])
+        release['sha256'] = digest({k: v for k, v in release.items() if k != 'sha256'})
+        content = json.loads(course['content_json'])
+        content['releaseSha256'] = release['sha256']
+        course['content_json'] = canonical(content)
+        review = json.loads(build['review_json'])
+        review['release'] = release
+        build.update(review_json=canonical(review), course_content_sha256=digest(content))
+        prepared = {'frozen': frozen, 'release': release, 'review': review,
+                    'course': course, 'manifest': manifest}
+        before = canonical(prepared)
+        repository = MagicMock()
+        repository.parse.side_effect = json.loads
+        repository.get_revision.return_value = {'manifest_sha256': digest(manifest)}
+        repository.reserve_build.return_value = (build, False)
+        repository.get_build.return_value = build
+        repository.bind_published.return_value = False
+        repository.transaction.return_value.__enter__.return_value.execute.return_value.fetchone.return_value = course
+        remote = Mock()
+        remote.read.return_value = raw
+        with tempfile.TemporaryDirectory(prefix='activity-published-media-') as folder:
+            service = TextbookActivityPublicationService(repository, 'http://127.0.0.1:3100', folder,
+                                                        course_media_store=remote)
+            # The historical synthetic fixture predates the new author gate;
+            # its absent admission must still fail before any byte or DB read.
+            with self.assertRaises(ApiError):
+                service.publish(prepared)
+            remote.read.assert_not_called()
+            repository.transaction.assert_not_called()
+            with patch('services.textbook_activity_publication_service.validate_new_release_admission'):
+                for _ in range(2):
+                    result = service.publish(prepared)
+                    self.assertFalse(result['created'])
+                    self.assertEqual(result['releaseSha256'], release['sha256'])
+                target = Path(folder) / media_path.removeprefix('/api/classroom-media/')
+                self.assertFalse(target.exists())
+                self.assertEqual(remote.read.call_args.kwargs['expected_sha256'], sha)
+                self.assertEqual(remote.read.call_args.kwargs['expected_bytes'], len(raw))
+                target.parent.mkdir(parents=True)
+                target.write_bytes(raw)
+                remote.read.side_effect = CourseMediaStorageError('remote unavailable')
+                with self.assertRaises(ApiError):
+                    service.publish(prepared)
+                self.assertEqual(target.read_bytes(), raw)
+                remote.read.side_effect = None
+                remote.read.return_value = None
+                self.assertTrue(service.publish(prepared)['ok'])
+        self.assertEqual(canonical(prepared), before)
 
 
 class ActivityCatalogTest(unittest.TestCase):

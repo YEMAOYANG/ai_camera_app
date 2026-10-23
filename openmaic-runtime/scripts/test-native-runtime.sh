@@ -60,6 +60,35 @@ MIRA_OPENMAIC_MODEL_POLICY=deepseek-v4-pro-flash-v1
 source "${RUNTIME_SCRIPT}"
 unset MIRA_OPENMAIC_MODEL_POLICY
 
+# Media storage has one private owner and an exact key allowlist. Dotenv
+# contents are data, and unrelated/inherited AWS or provider keys stay out.
+(
+  cat > "${TMP_ROOT}/course-storage.env" <<'EOF'
+COURSE_STORAGE_ENDPOINT=http://storage.invalid:9000
+COURSE_STORAGE_BUCKET=study
+COURSE_STORAGE_PREFIX=mira-courseware/v1
+COURSE_STORAGE_REGION=us-east-1
+COURSE_STORAGE_ACCESS_KEY='$(exit 99)'
+COURSE_STORAGE_SECRET_KEY=fixture-course-secret
+COURSE_STORAGE_MANIFEST_PATH=/private/course-storage/active-manifest.json
+COURSE_STORAGE_MODE=manifest
+AWS_SECRET_ACCESS_KEY=must-not-forward
+UNRELATED_VALUE=must-not-forward
+EOF
+  MIRA_BACKEND_ENV_FILE="${TMP_ROOT}/course-storage.env"
+  COURSE_STORAGE_SECRET_KEY=inherited-wrong-owner
+  load_course_storage_env
+  [[ "${#OPENMAIC_COURSE_STORAGE_ENV[@]}" == 8 ]] || fail 'Course storage allowlist changed'
+  env -i "${OPENMAIC_COURSE_STORAGE_ENV[@]}" "$(command -v node)" -e '
+    const assert = require("node:assert/strict");
+    assert.equal(process.env.COURSE_STORAGE_MODE, "manifest");
+    assert.equal(process.env.COURSE_STORAGE_SECRET_KEY, "fixture-course-secret");
+    assert.equal(process.env.COURSE_STORAGE_ACCESS_KEY, "$(exit 99)");
+    assert.equal(process.env.AWS_SECRET_ACCESS_KEY, undefined);
+    assert.equal(process.env.UNRELATED_VALUE, undefined);
+  '
+)
+
 # Dependency checks run before credentials, process ownership or launch work.
 # These fixtures never contact npm or the live Gateway.
 (

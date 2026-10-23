@@ -1,0 +1,740 @@
+diff --git a/app/api/classroom-media/[classroomId]/[...path]/route.ts b/app/api/classroom-media/[classroomId]/[...path]/route.ts
+index 6be7618..85e2bf7 100644
+--- a/app/api/classroom-media/[classroomId]/[...path]/route.ts
++++ b/app/api/classroom-media/[classroomId]/[...path]/route.ts
+@@ -4,6 +4,10 @@ import { NextRequest, NextResponse } from 'next/server';
+ import { CLASSROOMS_DIR, isValidClassroomId } from '@/lib/server/classroom-storage';
+ import { parseClassroomMediaRange } from '@/lib/server/classroom-media-range';
+ import { createLogger } from '@/lib/logger';
++import {
++  ClassroomMediaStorageError,
++  remoteClassroomMedia,
++} from '@/lib/server/classroom-media-object-store';
+ 
+ const log = createLogger('ClassroomMedia');
+ 
+@@ -21,78 +25,89 @@ const MIME_TYPES: Record<string, string> = {
+   '.aac': 'audio/aac',
+ };
+ 
+-export async function GET(
+-  req: NextRequest,
+-  { params }: { params: Promise<{ classroomId: string; path: string[] }> },
+-) {
++type MediaContext = { params: Promise<{ classroomId: string; path: string[] }> };
++
++async function serveMedia(req: NextRequest, { params }: MediaContext, headOnly = false) {
++  const failure = (error: string, status: number) =>
++    headOnly ? new NextResponse(null, { status }) : NextResponse.json({ error }, { status });
+   const { classroomId, path: pathSegments } = await params;
+ 
+   // Validate classroomId
+   if (!isValidClassroomId(classroomId)) {
+-    return NextResponse.json({ error: 'Invalid classroom ID' }, { status: 400 });
++    return failure('Invalid classroom ID', 400);
+   }
+ 
+   // Validate path segments — no traversal
+   const joined = pathSegments.join('/');
+   if (joined.includes('..') || pathSegments.some((s) => s.includes('\0'))) {
+-    return NextResponse.json({ error: 'Invalid path' }, { status: 400 });
++    return failure('Invalid path', 400);
+   }
+ 
+   // Only allow media/ and audio/ subdirectories
+   const subDir = pathSegments[0];
+   if (subDir !== 'media' && subDir !== 'audio') {
+-    return NextResponse.json({ error: 'Invalid path' }, { status: 404 });
++    return failure('Invalid path', 404);
+   }
+ 
+   // Credential-recovery classrooms reserve their final directory exclusively,
+   // then publish the complete artifact with one rename into artifact/. Until
+   // that rename, both classroom JSON and media remain unreachable.
+   try {
+-    // The configured storage root may itself be a trusted mounted/symlinked
+-    // directory. Canonicalize that root only; per-classroom/file symlinks still
+-    // have to remain inside the requested classroom below it.
+-    const storageRoot = await fs.realpath(CLASSROOMS_DIR);
+-    const classroomBase = classroomId.startsWith('omclass_')
+-      ? path.join(storageRoot, classroomId, 'artifact')
+-      : path.join(storageRoot, classroomId);
+-    const filePath = path.join(classroomBase, ...pathSegments);
+-    const resolvedBase = path.resolve(classroomBase);
+-    // Resolve symlinks and verify the real path stays within the classroom dir
+-    const realPath = await fs.realpath(filePath);
+-    if (!realPath.startsWith(resolvedBase + path.sep) && realPath !== resolvedBase) {
+-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+-    }
+-
+-    const stat = await fs.stat(realPath);
+-    if (!stat.isFile()) {
+-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
++    const remote = await remoteClassroomMedia(classroomId, pathSegments);
++    let realPath = '';
++    let byteSize: number;
++    let contentType: string;
++    if (remote) {
++      byteSize = remote.byteSize;
++      contentType = MIME_TYPES[path.extname(joined).toLowerCase()] || remote.mimeType;
++    } else {
++      // A trusted mounted/symlinked root is allowed; per-classroom/file
++      // symlinks must still stay inside the requested classroom.
++      const storageRoot = await fs.realpath(CLASSROOMS_DIR);
++      const classroomBase = classroomId.startsWith('omclass_')
++        ? path.join(storageRoot, classroomId, 'artifact')
++        : path.join(storageRoot, classroomId);
++      const resolvedBase = path.resolve(classroomBase);
++      realPath = await fs.realpath(path.join(classroomBase, ...pathSegments));
++      if (!realPath.startsWith(resolvedBase + path.sep) && realPath !== resolvedBase) {
++        return failure('Not found', 404);
++      }
++      const stat = await fs.stat(realPath);
++      if (!stat.isFile()) return failure('Not found', 404);
++      byteSize = stat.size;
++      contentType = MIME_TYPES[path.extname(realPath).toLowerCase()] || 'application/octet-stream';
+     }
+-
+-    const ext = path.extname(realPath).toLowerCase();
+-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+-    const range = parseClassroomMediaRange(req.headers.get('range'), stat.size);
++    const range = parseClassroomMediaRange(req.headers.get('range'), byteSize);
+     const headers: Record<string, string> = {
+       'Content-Type': contentType,
+       'Accept-Ranges': 'bytes',
+       'Access-Control-Allow-Origin': '*',
+       'Cache-Control': 'public, max-age=86400, immutable',
++      'X-Mira-Media-Source': remote ? 'remote' : 'local',
+     };
+     if (range.kind === 'unsatisfiable') {
+       return new NextResponse(null, {
+         status: 416,
+         headers: {
+           ...headers,
+-          'Content-Range': `bytes */${stat.size}`,
++          'Content-Range': `bytes */${byteSize}`,
+           'Content-Length': '0',
+         },
+       });
+     }
+     const partial = range.kind === 'partial';
+-    headers['Content-Length'] = String(partial ? range.end - range.start + 1 : stat.size);
++    headers['Content-Length'] = String(partial ? range.end - range.start + 1 : byteSize);
+     if (partial) {
+-      headers['Content-Range'] = `bytes ${range.start}-${range.end}/${stat.size}`;
++      headers['Content-Range'] = `bytes ${range.start}-${range.end}/${byteSize}`;
+     }
+ 
++    if (headOnly) return new NextResponse(null, { status: partial ? 206 : 200, headers });
++    if (remote)
++      return new NextResponse(await remote.open(range), {
++        status: partial ? 206 : 200,
++        headers,
++      });
++
+     // Stream the file to avoid loading large videos into memory
+     const stream = createReadStream(
+       realPath,
+@@ -114,13 +129,26 @@ export async function GET(
+       headers,
+     });
+   } catch (error) {
++    if (error instanceof ClassroomMediaStorageError) {
++      // SDK/configuration errors can include endpoint or credential material.
++      // Report only the public failure category, never raw remote errors.
++      return failure(error.message, error.status);
++    }
+     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
++      return failure('Not found', 404);
+     }
+     log.error(
+       `Classroom media serving failed [classroomId=${classroomId}, path=${joined}]:`,
+       error,
+     );
+-    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
++    return failure('Internal error', 500);
+   }
+ }
++
++export async function GET(req: NextRequest, context: MediaContext) {
++  return serveMedia(req, context);
++}
++
++export async function HEAD(req: NextRequest, context: MediaContext) {
++  return serveMedia(req, context, true);
++}
+diff --git a/lib/server/classroom-media-object-store.ts b/lib/server/classroom-media-object-store.ts
+new file mode 100644
+index 0000000..75f39d1
+--- /dev/null
++++ b/lib/server/classroom-media-object-store.ts
+@@ -0,0 +1,275 @@
++import { promises as fs } from 'node:fs';
++import { createHash } from 'node:crypto';
++import path from 'node:path';
++import { GetObjectCommand, HeadObjectCommand, S3Client } from '@aws-sdk/client-s3';
++import type { ClassroomMediaRange } from './classroom-media-range';
++
++const NATIVE_MEDIA_ROOT = 'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/';
++const MAX_MANIFEST_BYTES = 64 * 1024 * 1024;
++const REQUEST_TIMEOUT_MS = 30_000;
++
++interface StorageConfig {
++  mode: 'manifest' | 'remote';
++  endpoint: string;
++  bucket: string;
++  prefix: string;
++  region: string;
++  accessKeyId: string;
++  secretAccessKey: string;
++  manifestPath: string;
++}
++
++interface ManifestFile {
++  path: string;
++  objectKey: string;
++  sha256: string;
++  byteSize: number;
++  mimeType: string;
++}
++
++/** Only non-sensitive public failure classes cross the media HTTP boundary. */
++export class ClassroomMediaStorageError extends Error {
++  constructor(public readonly status: 404 | 502) {
++    super(status === 404 ? 'Not found' : 'Media storage unavailable');
++    this.name = 'ClassroomMediaStorageError';
++  }
++}
++
++function unavailable(): never {
++  throw new ClassroomMediaStorageError(502);
++}
++
++function storageConfig(): StorageConfig | undefined {
++  const mode = process.env.COURSE_STORAGE_MODE?.trim() || 'local';
++  if (mode === 'local') return undefined;
++  if (mode !== 'manifest' && mode !== 'remote') return unavailable();
++  const required = (key: string): string => process.env[key]?.trim() || unavailable();
++  const endpoint = required('COURSE_STORAGE_ENDPOINT');
++  try {
++    const url = new URL(endpoint);
++    if (
++      !['http:', 'https:'].includes(url.protocol) ||
++      url.username ||
++      url.password ||
++      url.pathname !== '/' ||
++      url.search ||
++      url.hash
++    )
++      return unavailable();
++  } catch {
++    return unavailable();
++  }
++  const bucket = required('COURSE_STORAGE_BUCKET');
++  const prefix = required('COURSE_STORAGE_PREFIX');
++  const region = required('COURSE_STORAGE_REGION');
++  const manifestPath = required('COURSE_STORAGE_MANIFEST_PATH');
++  if (
++    !/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(bucket) ||
++    bucket.includes('..') ||
++    !/^[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*$/.test(prefix) ||
++    !/^[A-Za-z0-9_-]+$/.test(region) ||
++    !path.isAbsolute(manifestPath)
++  )
++    return unavailable();
++  return {
++    mode,
++    endpoint,
++    bucket,
++    prefix,
++    region,
++    manifestPath,
++    accessKeyId: required('COURSE_STORAGE_ACCESS_KEY'),
++    secretAccessKey: required('COURSE_STORAGE_SECRET_KEY'),
++  };
++}
++
++let manifestCache: { identity: string; files: Map<string, ManifestFile> } | undefined;
++
++async function manifestFiles(config: StorageConfig): Promise<Map<string, ManifestFile>> {
++  const stat = await fs.stat(config.manifestPath);
++  if (!stat.isFile() || stat.size > MAX_MANIFEST_BYTES) return unavailable();
++  // Atomic manifest replacement is visible without a restart; no failed read is cached.
++  const identity = [
++    config.manifestPath,
++    config.prefix,
++    stat.dev,
++    stat.ino,
++    stat.size,
++    stat.mtimeMs,
++    stat.ctimeMs,
++  ].join(':');
++  if (manifestCache?.identity === identity) return manifestCache.files;
++  const manifest = JSON.parse(await fs.readFile(config.manifestPath, 'utf8'));
++  if (
++    manifest?.schemaVersion !== 'mira.course-storage.manifest.v1' ||
++    typeof manifest.snapshotId !== 'string' ||
++    !manifest.snapshotId.trim() ||
++    !Array.isArray(manifest.files)
++  )
++    return unavailable();
++  const files = new Map<string, ManifestFile>();
++  for (const item of manifest.files) {
++    if (
++      !item ||
++      typeof item.path !== 'string' ||
++      !item.path ||
++      item.path.includes('\\') ||
++      /[\u0000-\u001f]/.test(item.path) ||
++      item.path
++        .split('/')
++        .some((segment: string) => !segment || segment === '.' || segment === '..') ||
++      typeof item.sha256 !== 'string' ||
++      !/^[a-f0-9]{64}$/.test(item.sha256) ||
++      item.objectKey !== `${config.prefix}/blobs/sha256/${item.sha256}` ||
++      !Number.isSafeInteger(item.byteSize) ||
++      item.byteSize < 0 ||
++      typeof item.mimeType !== 'string' ||
++      !/^[a-z0-9.+-]+\/[a-z0-9.+-]+$/.test(item.mimeType) ||
++      files.has(item.path)
++    )
++      return unavailable();
++    files.set(item.path, item);
++  }
++  manifestCache = { identity, files };
++  return files;
++}
++
++let clientCache: { identity: string; client: S3Client } | undefined;
++
++function storageClient(config: StorageConfig): S3Client {
++  const identity = JSON.stringify([
++    config.endpoint,
++    config.region,
++    config.accessKeyId,
++    config.secretAccessKey,
++  ]);
++  if (clientCache?.identity !== identity) {
++    clientCache?.client.destroy();
++    clientCache = {
++      identity,
++      client: new S3Client({
++        endpoint: config.endpoint,
++        region: config.region,
++        forcePathStyle: true,
++        credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey },
++        maxAttempts: 2,
++        requestChecksumCalculation: 'WHEN_REQUIRED',
++        responseChecksumValidation: 'WHEN_REQUIRED',
++      }),
++    };
++  }
++  return clientCache.client;
++}
++
++function mappedError(error: unknown): ClassroomMediaStorageError {
++  if (error instanceof ClassroomMediaStorageError) return error;
++  const remote = error as { name?: string; $metadata?: { httpStatusCode?: number } };
++  return new ClassroomMediaStorageError(
++    remote?.name === 'NoSuchKey' ||
++      remote?.name === 'NotFound' ||
++      remote?.$metadata?.httpStatusCode === 404
++      ? 404
++      : 502,
++  );
++}
++
++export interface RemoteClassroomMedia {
++  byteSize: number;
++  mimeType: string;
++  open: (
++    range: Exclude<ClassroomMediaRange, { kind: 'unsatisfiable' }>,
++  ) => Promise<ReadableStream<Uint8Array>>;
++}
++
++/**
++ * An exact private-manifest match opts this URL into remote delivery. A remote
++ * failure NEVER falls back to disk. Strict remote mode also rejects unlisted
++ * files, allowing acceptance after the local copy has been removed.
++ * The browser still receives only its original authenticated relative URL.
++ */
++export async function remoteClassroomMedia(
++  classroomId: string,
++  segments: string[],
++): Promise<RemoteClassroomMedia | undefined> {
++  try {
++    const config = storageConfig();
++    if (!config) return undefined;
++    // Recovered private classrooms remain exclusively under artifact/.
++    const relative = classroomId.startsWith('omclass_') ? ['artifact', ...segments] : segments;
++    const entry = (await manifestFiles(config)).get(
++      `${NATIVE_MEDIA_ROOT}${classroomId}/${relative.join('/')}`,
++    );
++    if (!entry) {
++      if (config.mode === 'remote') throw new ClassroomMediaStorageError(404);
++      return undefined;
++    }
++    const client = storageClient(config);
++    const input = { Bucket: config.bucket, Key: entry.objectKey };
++    const head = await client.send(new HeadObjectCommand(input), {
++      abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
++    });
++    if (
++      head.ContentLength !== entry.byteSize ||
++      !['application/octet-stream', entry.mimeType].includes(head.ContentType ?? '') ||
++      (head.Metadata?.sha256 && head.Metadata.sha256 !== entry.sha256)
++    )
++      return unavailable();
++    return {
++      byteSize: entry.byteSize,
++      mimeType: entry.mimeType,
++      open: async (range) => {
++        try {
++          const partial = range.kind === 'partial';
++          const expectedLength = partial ? range.end - range.start + 1 : entry.byteSize;
++          const result = await client.send(
++            new GetObjectCommand({
++              ...input,
++              IfMatch: head.ETag,
++              ...(partial ? { Range: `bytes=${range.start}-${range.end}` } : {}),
++            }),
++            { abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) },
++          );
++          if (
++            !result.Body ||
++            result.ContentLength !== expectedLength ||
++            !['application/octet-stream', entry.mimeType].includes(result.ContentType ?? '') ||
++            (partial &&
++              result.ContentRange !== `bytes ${range.start}-${range.end}/${entry.byteSize}`)
++          ) {
++            if (result.Body) await result.Body.transformToWebStream().cancel();
++            return unavailable();
++          }
++          const reader = result.Body.transformToWebStream().getReader();
++          const hash = partial ? undefined : createHash('sha256');
++          let count = 0;
++          return new ReadableStream<Uint8Array>({
++            async pull(controller) {
++              try {
++                const { done, value } = await reader.read();
++                if (done) {
++                  if (count !== expectedLength || (hash && hash.digest('hex') !== entry.sha256)) {
++                    throw new ClassroomMediaStorageError(502);
++                  }
++                  controller.close();
++                  return;
++                }
++                count += value.byteLength;
++                if (count > expectedLength) throw new ClassroomMediaStorageError(502);
++                hash?.update(value);
++                controller.enqueue(value);
++              } catch {
++                await reader.cancel().catch(() => {});
++                controller.error(new ClassroomMediaStorageError(502));
++              }
++            },
++            cancel: (reason) => reader.cancel(reason),
++          });
++        } catch (error) {
++          throw mappedError(error);
++        }
++      },
++    };
++  } catch (error) {
++    throw mappedError(error);
++  }
++}
+diff --git a/tests/server/classroom-media-object-store.test.ts b/tests/server/classroom-media-object-store.test.ts
+new file mode 100644
+index 0000000..1316161
+--- /dev/null
++++ b/tests/server/classroom-media-object-store.test.ts
+@@ -0,0 +1,287 @@
++import { promises as fs } from 'node:fs';
++import { createHash } from 'node:crypto';
++import os from 'node:os';
++import path from 'node:path';
++import { NextRequest } from 'next/server';
++import { HeadObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
++import { afterEach, beforeEach, expect, it, vi } from 'vitest';
++
++const storage = vi.hoisted(() => ({ root: '' }));
++const aws = vi.hoisted(() => ({ send: vi.fn(), configurations: [] as Record<string, unknown>[] }));
++vi.mock('@/lib/server/classroom-storage', () => ({
++  get CLASSROOMS_DIR() {
++    return storage.root;
++  },
++  isValidClassroomId: (value: string) => /^[A-Za-z0-9_-]+$/.test(value),
++}));
++vi.mock('@/lib/logger', () => ({ createLogger: () => ({ error: vi.fn() }) }));
++vi.mock('@aws-sdk/client-s3', async () => ({
++  ...(await vi.importActual('@aws-sdk/client-s3')),
++  S3Client: class {
++    constructor(config: Record<string, unknown>) {
++      aws.configurations.push(config);
++    }
++    send = aws.send;
++    destroy() {}
++  },
++}));
++import { GET, HEAD } from '@/app/api/classroom-media/[classroomId]/[...path]/route';
++import { middleware } from '@/middleware';
++
++const classroomId = 'tbpub_1234567890abcdef12345678';
++const bytes = Buffer.from('0123456789abcdefghij');
++const sha256 = createHash('sha256').update(bytes).digest('hex');
++const objectKey = `mira-courseware/v1/blobs/sha256/${sha256}`;
++let folder = '';
++let manifestPath = '';
++let cancelled = false;
++let entry: { path: string; objectKey: string; sha256: string; byteSize: number; mimeType: string };
++
++const manifest = () =>
++  fs.writeFile(
++    manifestPath,
++    JSON.stringify({
++      schemaVersion: 'mira.course-storage.manifest.v1',
++      snapshotId: 'fixture',
++      files: [entry],
++    }),
++  );
++
++function body(value: Uint8Array) {
++  return {
++    transformToWebStream: () =>
++      new ReadableStream<Uint8Array>({
++        start(controller) {
++          controller.enqueue(value);
++          controller.close();
++        },
++        cancel() {
++          cancelled = true;
++        },
++      }),
++  };
++}
++
++beforeEach(async () => {
++  folder = await fs.mkdtemp(path.join(process.env.MIRA_TASK_TMPDIR ?? os.tmpdir(), 'media-s3-'));
++  storage.root = path.join(folder, 'classrooms');
++  await fs.mkdir(path.join(storage.root, classroomId, 'audio'), { recursive: true });
++  await fs.writeFile(path.join(storage.root, classroomId, 'audio', 'teacher.wav'), bytes);
++  await fs.writeFile(path.join(storage.root, classroomId, 'audio', 'unlisted.wav'), 'local-only');
++  manifestPath = path.join(folder, 'manifest.json');
++  entry = {
++    path: `openmaic-runtime/.runtime/OpenMAIC/data/classrooms/${classroomId}/audio/teacher.wav`,
++    objectKey,
++    sha256,
++    byteSize: bytes.length,
++    mimeType: 'audio/wav',
++  };
++  await manifest();
++  for (const [key, value] of Object.entries({
++    COURSE_STORAGE_MODE: 'manifest',
++    COURSE_STORAGE_ENDPOINT: 'http://minio.invalid:9000',
++    COURSE_STORAGE_BUCKET: 'study',
++    COURSE_STORAGE_PREFIX: 'mira-courseware/v1',
++    COURSE_STORAGE_REGION: 'us-east-1',
++    COURSE_STORAGE_ACCESS_KEY: 'fixture-access',
++    COURSE_STORAGE_SECRET_KEY: 'fixture-secret',
++    COURSE_STORAGE_MANIFEST_PATH: manifestPath,
++  }))
++    vi.stubEnv(key, value);
++  cancelled = false;
++  aws.configurations.length = 0;
++  aws.send.mockReset().mockImplementation(async (command) => {
++    if (command instanceof HeadObjectCommand)
++      return {
++        ContentLength: bytes.length,
++        ContentType: 'audio/wav',
++        ETag: '"fixture-etag"',
++        Metadata: { sha256 },
++      };
++    if (command instanceof GetObjectCommand) {
++      const range = /^bytes=(\d+)-(\d+)$/.exec(command.input.Range ?? '');
++      const selected = range ? bytes.subarray(Number(range[1]), Number(range[2]) + 1) : bytes;
++      return {
++        ContentLength: selected.length,
++        ContentType: 'audio/wav',
++        Body: body(selected),
++        ...(range ? { ContentRange: `bytes ${range[1]}-${range[2]}/${bytes.length}` } : {}),
++      };
++    }
++    throw new Error('Unexpected SDK request');
++  });
++});
++
++afterEach(async () => {
++  vi.unstubAllEnvs();
++  if (folder) await fs.rm(folder, { recursive: true, force: true });
++});
++
++function read(range: string | null = null, file = 'teacher.wav', id = classroomId, head = false) {
++  const request = new NextRequest(`http://runtime.test/api/classroom-media/${id}/audio/${file}`, {
++    method: head ? 'HEAD' : 'GET',
++    headers: range === null ? {} : { Range: range },
++  });
++  return (head ? HEAD : GET)(request, {
++    params: Promise.resolve({ classroomId: id, path: ['audio', file] }),
++  });
++}
++
++it('serves a migrated original URL with no local directory and keeps credentials and S3 URLs private', async () => {
++  await fs.rm(storage.root, { recursive: true });
++  const response = await read();
++  expect(response.status).toBe(200);
++  expect(response.headers.get('x-mira-media-source')).toBe('remote');
++  expect(response.headers.get('content-type')).toBe('audio/wav');
++  expect(response.headers.get('content-length')).toBe('20');
++  expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes);
++  const headers = JSON.stringify([...response.headers]);
++  expect(headers).not.toMatch(/fixture-secret|fixture-access|minio\.invalid/);
++  const config = aws.configurations.at(-1);
++  if (config)
++    expect(config).toMatchObject({
++      forcePathStyle: true,
++      credentials: { accessKeyId: 'fixture-access', secretAccessKey: 'fixture-secret' },
++    });
++  expect(aws.send.mock.calls[0][0].input).toMatchObject({ Bucket: 'study', Key: objectKey });
++  expect(aws.send.mock.calls[1][0].input.IfMatch).toBe('"fixture-etag"');
++});
++
++it('delivers the original logical MIME when globally deduplicated blobs use a generic S3 type', async () => {
++  const implementation = aws.send.getMockImplementation()!;
++  aws.send.mockImplementation(async (command) => ({
++    ...(await implementation(command)),
++    ContentType: 'application/octet-stream',
++  }));
++  const response = await read();
++  expect(response.headers.get('content-type')).toBe('audio/wav');
++  expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes);
++});
++
++it.each([
++  ['bytes=3-6', 3, 6],
++  ['bytes=14-', 14, 19],
++  ['bytes=-4', 16, 19],
++  ['bytes=18-999', 18, 19],
++  ['bytes=0-0', 0, 0],
++])('preserves exact remote byte range %s', async (range, start, end) => {
++  const response = await read(String(range));
++  expect(response.status).toBe(206);
++  expect(response.headers.get('content-range')).toBe(`bytes ${start}-${end}/20`);
++  expect(response.headers.get('content-length')).toBe(String(Number(end) - Number(start) + 1));
++  expect(response.headers.get('accept-ranges')).toBe('bytes');
++  expect(Buffer.from(await response.arrayBuffer())).toEqual(
++    bytes.subarray(Number(start), Number(end) + 1),
++  );
++});
++
++it('returns 416 and HEAD without opening or downloading the remote object body', async () => {
++  const unsatisfiable = await read('bytes=20-');
++  expect(unsatisfiable.status).toBe(416);
++  expect(unsatisfiable.headers.get('content-range')).toBe('bytes */20');
++  expect((await unsatisfiable.arrayBuffer()).byteLength).toBe(0);
++  const head = await read(null, 'teacher.wav', classroomId, true);
++  expect(head.status).toBe(200);
++  expect(head.headers.get('content-length')).toBe('20');
++  expect((await head.arrayBuffer()).byteLength).toBe(0);
++  expect(aws.send.mock.calls.every(([command]) => command instanceof HeadObjectCommand)).toBe(true);
++});
++
++it('ignores unsupported multipart ranges exactly as the local route does', async () => {
++  const response = await read('bytes=0-2,5-6');
++  expect(response.status).toBe(200);
++  expect(Buffer.from(await response.arrayBuffer())).toEqual(bytes);
++});
++
++it('uses local bytes only for unlisted entries in manifest mode; strict remote mode denies them', async () => {
++  const local = await read(null, 'unlisted.wav');
++  expect(local.status).toBe(200);
++  expect(local.headers.get('x-mira-media-source')).toBe('local');
++  expect(await local.text()).toBe('local-only');
++  expect(aws.send).not.toHaveBeenCalled();
++  vi.stubEnv('COURSE_STORAGE_MODE', 'remote');
++  expect((await read(null, 'unlisted.wav')).status).toBe(404);
++  expect(aws.send).not.toHaveBeenCalled();
++});
++
++it.each([
++  [{ name: 'NoSuchKey', $metadata: { httpStatusCode: 404 } }, 404],
++  [{ name: 'AccessDenied', message: 'fixture-secret', $metadata: { httpStatusCode: 403 } }, 502],
++  [new Error('endpoint or credential failure fixture-secret'), 502],
++])('fails closed for a listed object when S3 fails', async (error, status) => {
++  aws.send.mockRejectedValue(error);
++  const response = await read();
++  expect(response.status).toBe(status);
++  expect(await response.text()).not.toMatch(/fixture-secret|local-only|012345/);
++});
++
++it('fails closed on an invalid manifest, unsafe object key, or metadata mismatch', async () => {
++  entry.objectKey = '../private';
++  await manifest();
++  expect((await read()).status).toBe(502);
++  expect(aws.send).not.toHaveBeenCalled();
++  entry.objectKey = objectKey;
++  await manifest();
++  aws.send.mockResolvedValue({ ContentLength: bytes.length + 1, ContentType: 'audio/wav' });
++  expect((await read()).status).toBe(502);
++  await fs.writeFile(manifestPath, '{}');
++  expect((await read()).status).toBe(502);
++});
++
++it('checks actual streamed full-object bytes against the frozen migration hash', async () => {
++  aws.send.mockImplementation(async (command) =>
++    command instanceof HeadObjectCommand
++      ? { ContentLength: bytes.length, ContentType: 'audio/wav', ETag: '"fixture-etag"' }
++      : {
++          ContentLength: bytes.length,
++          ContentType: 'audio/wav',
++          Body: body(Buffer.alloc(bytes.length, 1)),
++        },
++  );
++  const response = await read();
++  await expect(response.arrayBuffer()).rejects.toThrow('Media storage unavailable');
++});
++
++it('rejects a storage server that ignores the requested Range', async () => {
++  aws.send.mockImplementation(async (command) =>
++    command instanceof HeadObjectCommand
++      ? { ContentLength: bytes.length, ContentType: 'audio/wav' }
++      : { ContentLength: bytes.length, ContentType: 'audio/wav', Body: body(bytes) },
++  );
++  expect((await read('bytes=1-2')).status).toBe(502);
++});
++
++it('retains path, recovery-classroom, and existing access-code boundaries before reading S3', async () => {
++  expect((await read(null, '../teacher.wav')).status).toBe(400);
++  expect((await read(null, 'teacher.wav', '../other')).status).toBe(400);
++  vi.stubEnv('COURSE_STORAGE_MODE', 'remote');
++  expect((await read(null, 'teacher.wav', 'omclass_private')).status).toBe(404);
++  vi.stubEnv('ACCESS_CODE', 'fixture-access-code');
++  const denied = await middleware(
++    new NextRequest('http://runtime.test/api/classroom-media/test/audio/teacher.wav'),
++  );
++  expect(denied.status).toBe(401);
++  expect(aws.send).not.toHaveBeenCalled();
++});
++
++it('forwards cancellation to the S3 response stream', async () => {
++  aws.send.mockImplementation(async (command) =>
++    command instanceof HeadObjectCommand
++      ? { ContentLength: bytes.length, ContentType: 'audio/wav' }
++      : {
++          ContentLength: bytes.length,
++          ContentType: 'audio/wav',
++          Body: {
++            transformToWebStream: () =>
++              new ReadableStream<Uint8Array>({
++                cancel() {
++                  cancelled = true;
++                },
++              }),
++          },
++        },
++  );
++  const response = await read();
++  await response.body?.cancel();
++  expect(cancelled).toBe(true);
++});

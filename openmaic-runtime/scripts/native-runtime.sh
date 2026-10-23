@@ -208,6 +208,22 @@ load_runtime_origin_env() {
   MIRA_STUDENT_WEB_ORIGIN="$(normalize_credential_free_http_origin MIRA_STUDENT_WEB_PUBLIC_URL "${student_web_origin}")" || return 1
 }
 
+# Course media storage has one configuration owner: the backend private dotenv.
+# Copy only these keys into the clean runtime environment. Never source the file
+# or inherit generic AWS/provider credentials from a calling shell.
+OPENMAIC_COURSE_STORAGE_ENV=()
+load_course_storage_env() {
+  OPENMAIC_COURSE_STORAGE_ENV=()
+  local env_file key value
+  env_file="${MIRA_BACKEND_ENV_FILE:-${REPO_ROOT}/backend/.env}"
+  for key in COURSE_STORAGE_ENDPOINT COURSE_STORAGE_BUCKET COURSE_STORAGE_PREFIX \
+    COURSE_STORAGE_REGION COURSE_STORAGE_ACCESS_KEY COURSE_STORAGE_SECRET_KEY \
+    COURSE_STORAGE_MANIFEST_PATH COURSE_STORAGE_MODE; do
+    value="$(read_env_value "${key}" "${env_file}" || true)"
+    OPENMAIC_COURSE_STORAGE_ENV+=("${key}=${value}")
+  done
+}
+
 clear_openmaic_provider_env() {
   OPENMAIC_DEFAULT_MODEL=""
   OPENMAIC_OPENROUTER_API_KEY=""
@@ -2253,6 +2269,7 @@ run_openmaic_production_foreground() {
     node_options="--no-experimental-webstorage"
   fi
   load_runtime_origin_env || return 1
+  load_course_storage_env
   load_openmaic_provider_env || return 1
   load_openmaic_recovery_env || return 1
   load_openmaic_formal_citation_recovery_env || return 1
@@ -2337,6 +2354,7 @@ run_openmaic_production_foreground() {
     MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256="${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256}" \
     MIRA_BACKEND_INTERNAL_URL="${MIRA_BACKEND_INTERNAL_URL:-http://127.0.0.1:8000}" \
     MIRA_INTERNAL_API_TOKEN="${OPENMAIC_INTERNAL_API_TOKEN}" \
+    "${OPENMAIC_COURSE_STORAGE_ENV[@]}" \
     "${node_bin}" node_modules/next/dist/bin/next start \
       --hostname 127.0.0.1 --port "${OPENMAIC_PORT}"
 }
@@ -2354,6 +2372,7 @@ run_openmaic_foreground() {
     node_options="--no-experimental-webstorage"
   fi
   load_runtime_origin_env
+  load_course_storage_env
   load_openmaic_provider_env
   load_openmaic_recovery_env
   load_openmaic_formal_citation_recovery_env
@@ -2438,6 +2457,7 @@ run_openmaic_foreground() {
     MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256="${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256}" \
     MIRA_BACKEND_INTERNAL_URL="${MIRA_BACKEND_INTERNAL_URL:-http://127.0.0.1:8000}" \
     MIRA_INTERNAL_API_TOKEN="${OPENMAIC_INTERNAL_API_TOKEN}" \
+    "${OPENMAIC_COURSE_STORAGE_ENV[@]}" \
     "${node_bin}" node_modules/next/dist/bin/next dev --webpack \
       --hostname 127.0.0.1 --port "${OPENMAIC_PORT}"
 }
@@ -2531,6 +2551,7 @@ start_openmaic() {
     node_options="--no-experimental-webstorage"
   fi
   load_runtime_origin_env
+  load_course_storage_env
 
   (
     cd "${SOURCE_DIR}"
@@ -2612,12 +2633,14 @@ start_openmaic() {
       MIRA_OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256="${OPENMAIC_FORMAL_CITATION_RECOVERY_PATCH_SHA256}" \
       MIRA_BACKEND_INTERNAL_URL="${MIRA_BACKEND_INTERNAL_URL:-http://127.0.0.1:8000}" \
     MIRA_INTERNAL_API_TOKEN="${OPENMAIC_INTERNAL_API_TOKEN}" \
+      "${OPENMAIC_COURSE_STORAGE_ENV[@]}" \
       "${python_bin}" -c 'import os, sys; os.setsid(); os.execv(sys.argv[1], sys.argv[1:])' \
       "${node_bin}" node_modules/next/dist/bin/next start \
         --hostname 127.0.0.1 --port "${OPENMAIC_PORT}" \
         > "${OPENMAIC_LOG}" 2>&1 < /dev/null &
     echo "$!" > "${OPENMAIC_PID_FILE}"
   )
+  OPENMAIC_COURSE_STORAGE_ENV=()
   started_pid="$(tr -d '[:space:]' < "${OPENMAIC_PID_FILE}")"
   if [[ ! "${started_pid}" =~ ^[1-9][0-9]*$ ]] || \
     ! started_start_hash="$(process_start_hash "${started_pid}")" || \

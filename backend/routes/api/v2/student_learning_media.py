@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from io import BytesIO
+
 from flask import Blueprint, request, send_file
 
 from core.errors import ApiError, error_response
@@ -30,14 +32,15 @@ def deliver_learning_asset(asset_id: str):
             variant_key=request.args.get("variant") or "original",
         )
         response = send_file(
-            asset.path,
+            BytesIO(asset.data) if asset.data is not None else asset.path,
             mimetype=asset.mime_type,
             conditional=True,
             etag=asset.content_hash,
-            last_modified=asset.path.stat().st_mtime,
+            last_modified=asset.path.stat().st_mtime if asset.data is None else None,
             max_age=0,
             download_name=asset.download_name,
         )
+        response.headers["X-Mira-Media-Source"] = "remote" if asset.data is not None else "local"
         response.headers["Accept-Ranges"] = "bytes"
         response.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
         response.headers["X-Content-Type-Options"] = "nosniff"

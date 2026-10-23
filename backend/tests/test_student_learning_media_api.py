@@ -154,6 +154,38 @@ class StudentLearningMediaApiTest(unittest.TestCase):
         )
         self.assertEqual(parent.status_code, 401, parent.json)
 
+    def test_remote_delivery_range_etag_head_and_authorization_survive_local_removal(self):
+        from services.service_factory import student_learning_media_service
+        with self.app.app_context():
+            service = student_learning_media_service()
+            authorized = service.authorize_asset(self.student_access_token, self.asset_ids[0])
+        data = authorized.path.read_bytes()
+        authorized.path.unlink()
+        asset_path = f"/api/v2/student/learning/assets/{self.asset_ids[0]}"
+        with patch.object(service.course_media_store, "read", return_value=data) as remote:
+            delivered = self.client.get(asset_path, headers=self._student_headers())
+            self.assertEqual(delivered.status_code, 200, delivered.json)
+            self.assertEqual(delivered.data, data)
+            self.assertEqual(delivered.headers["X-Mira-Media-Source"], "remote")
+            etag = delivered.headers["ETag"]
+            delivered.close()
+            ranged = self.client.get(asset_path, headers={**self._student_headers(), "Range": "bytes=0-9"})
+            self.assertEqual(ranged.status_code, 206)
+            self.assertEqual(ranged.data, data[:10])
+            ranged.close()
+            unchanged = self.client.get(asset_path, headers={**self._student_headers(), "If-None-Match": etag})
+            self.assertEqual(unchanged.status_code, 304)
+            unchanged.close()
+            head = self.client.head(asset_path, headers=self._student_headers())
+            self.assertEqual(head.status_code, 200)
+            self.assertEqual(head.data, b"")
+            self.assertEqual(int(head.headers["Content-Length"]), len(data))
+            head.close()
+            remote.reset_mock()
+            sibling = self.client.get(asset_path, headers=self._student_headers(self.sibling_access_token))
+            self.assertEqual(sibling.status_code, 404)
+            remote.assert_not_called()
+
     def test_review_regression_and_storage_escape_are_never_delivered(self):
         review_blocked_id = self.asset_ids[1]
         traversal_id = self.asset_ids[2]

@@ -12,6 +12,7 @@ from repositories.student_learning_media_repository import (
     StudentLearningMediaRepository,
 )
 from services.student_auth_service import StudentAuthService
+from services.course_media_object_store import CourseMediaObjectStore, CourseMediaStorageError
 
 
 _ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$")
@@ -28,6 +29,7 @@ class AuthorizedLearningAsset:
     content_hash: str
     byte_size: int
     download_name: str
+    data: bytes | None = None
 
 
 class StudentLearningMediaService:
@@ -39,10 +41,12 @@ class StudentLearningMediaService:
         *,
         student_auth_service: StudentAuthService,
         storage_root: str | Path,
+        course_media_store: CourseMediaObjectStore | None = None,
     ):
         self.student_auth_service = student_auth_service
         self.repository = StudentLearningMediaRepository(Database(database_url))
         self.storage_root = Path(storage_root).expanduser().resolve()
+        self.course_media_store = course_media_store or CourseMediaObjectStore()
 
     def session_manifest(self, access_token: str, session_id: object) -> dict[str, Any]:
         context = self.student_auth_service.authenticate(access_token)
@@ -150,6 +154,19 @@ class StudentLearningMediaService:
             raise ApiError("learning_asset_unavailable", "课程素材不可用", 404)
         path = self._safe_storage_path(str(row["storage_key"] or ""))
         try:
+            data = self.course_media_store.read(
+                path, expected_sha256=content_hash, expected_bytes=byte_size,
+                max_bytes=_MAX_DELIVERY_BYTES,
+            )
+        except CourseMediaStorageError as exc:
+            raise ApiError("learning_asset_storage_missing", "课程素材暂时不可用", 503) from exc
+        if data is not None:
+            return AuthorizedLearningAsset(
+                path=path, mime_type=mime_type, content_hash=content_hash,
+                byte_size=byte_size, download_name=f"{normalized_asset_id}{path.suffix.lower()}",
+                data=data,
+            )
+        try:
             stat = path.stat()
         except OSError as exc:
             raise ApiError(
@@ -200,7 +217,7 @@ class StudentLearningMediaService:
         ):
             raise ApiError("learning_asset_unavailable", "课程素材不可用", 404)
         try:
-            candidate = self.storage_root.joinpath(*pure.parts).resolve(strict=True)
+            candidate = self.storage_root.joinpath(*pure.parts).resolve(strict=False)
         except OSError as exc:
             raise ApiError(
                 "learning_asset_storage_missing",

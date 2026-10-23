@@ -10,6 +10,7 @@ from core.database import Database
 from core.errors import ApiError
 from core.security import now_ms
 from repositories.openmaic_runtime_repository import OpenMaicRuntimeRepository
+from services.course_media_object_store import CourseMediaObjectStore, CourseMediaStorageError
 
 
 _ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$")
@@ -30,6 +31,7 @@ class AuthorizedOpenMaicRuntimeAudio:
     content_hash: str
     byte_size: int
     duration_ms: int
+    data: bytes | None = None
 
 
 class OpenMaicRuntimeAudioService:
@@ -41,11 +43,13 @@ class OpenMaicRuntimeAudioService:
         *,
         storage_root: str | Path,
         repository: OpenMaicRuntimeRepository | None = None,
+        course_media_store: CourseMediaObjectStore | None = None,
     ):
         self.repository = repository or OpenMaicRuntimeRepository(
             Database(database_url)
         )
         self.storage_root = Path(storage_root).expanduser().resolve()
+        self.course_media_store = course_media_store or CourseMediaObjectStore()
 
     def manifest(
         self,
@@ -233,17 +237,17 @@ class OpenMaicRuntimeAudioService:
             self._identifier(row.get("asset_id"), "audio asset")
         return rows
 
-    def _verify_asset(
-        self, row: Mapping[str, Any]
-    ) -> AuthorizedOpenMaicRuntimeAudio:
+    @classmethod
+    def verify_asset_metadata(cls, row: Mapping[str, Any]) -> tuple[str, int, int]:
+        """Validate the frozen audio contract only; no authorization or byte I/O."""
         digest = str(row.get("runtime_audio_sha256") or "").lower()
         byte_size = int(row.get("segment_byte_size") or 0)
         duration_ms = int(row.get("segment_duration_ms") or 0)
         exact = (
             str(row.get("segment_state") or "") == "auto_validated"
             and row.get("safe_error_code") is None
-            and self._hash(str(row.get("machine_receipt_hash") or ""))
-            and self._hash(digest)
+            and cls._hash(str(row.get("machine_receipt_hash") or ""))
+            and cls._hash(digest)
             and all(
                 str(row.get(field) or "").lower() == digest
                 for field in (
@@ -282,25 +286,41 @@ class OpenMaicRuntimeAudioService:
             == str(row.get("variant_storage_key") or "")
         )
         if not exact:
-            return self._integrity_failed()
+            return cls._integrity_failed()
+
+        return digest, byte_size, duration_ms
+
+    def _verify_asset(
+        self, row: Mapping[str, Any]
+    ) -> AuthorizedOpenMaicRuntimeAudio:
+        digest, byte_size, duration_ms = self.verify_asset_metadata(row)
 
         path = self._safe_storage_path(str(row["storage_key"]))
         try:
-            stat = path.stat()
-            with path.open("rb") as audio_file:
-                header = audio_file.read(12)
-                content_hash = hashlib.sha256(header)
-                for chunk in iter(lambda: audio_file.read(64 * 1024), b""):
-                    content_hash.update(chunk)
-        except OSError as exc:
+            data = self.course_media_store.read(
+                path, expected_sha256=digest, expected_bytes=byte_size,
+                max_bytes=_MAX_AUDIO_BYTES,
+            )
+            if data is None:
+                stat = path.stat()
+                with path.open("rb") as audio_file:
+                    header = audio_file.read(12)
+                    content_hash = hashlib.sha256(header)
+                    for chunk in iter(lambda: audio_file.read(64 * 1024), b""):
+                        content_hash.update(chunk)
+                valid_file = path.is_file() and stat.st_size == byte_size
+            else:
+                header = data[:12]
+                content_hash = hashlib.sha256(data)
+                valid_file = len(data) == byte_size
+        except (OSError, CourseMediaStorageError) as exc:
             raise ApiError(
                 "openmaic_runtime_audio_storage_missing",
                 "课堂音频暂时不可用",
                 503,
             ) from exc
         if (
-            not path.is_file()
-            or stat.st_size != byte_size
+            not valid_file
             or header[:4] != b"RIFF"
             or header[8:12] != b"WAVE"
             or content_hash.hexdigest() != digest
@@ -312,6 +332,7 @@ class OpenMaicRuntimeAudioService:
             content_hash=digest,
             byte_size=byte_size,
             duration_ms=duration_ms,
+            data=data,
         )
 
     def _safe_storage_path(self, storage_key: str) -> Path:
@@ -324,7 +345,7 @@ class OpenMaicRuntimeAudioService:
             return self._integrity_failed()
         try:
             path = (self.storage_root / Path(*PurePosixPath(storage_key).parts)).resolve(
-                strict=True
+                strict=False
             )
             path.relative_to(self.storage_root)
         except (OSError, ValueError) as exc:

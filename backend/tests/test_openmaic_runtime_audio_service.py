@@ -6,6 +6,9 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import Mock
+
+from services.course_media_object_store import CourseMediaStorageError
 
 from core.errors import ApiError
 from core.security import now_ms
@@ -79,6 +82,32 @@ class OpenMaicRuntimeAudioServiceTest(unittest.TestCase):
         self.assertTrue(asset.path.is_file())
         self.assertEqual(asset.mime_type, "audio/wav")
         self.assertEqual(asset.byte_size, 64)
+
+    def test_migrated_audio_survives_local_removal_and_binding_failure_never_reads_remote(self):
+        path = self.root / self.rows[0]["storage_key"]
+        data = path.read_bytes()
+        path.unlink()
+        self.assertEqual(
+            OpenMaicRuntimeAudioService.verify_asset_metadata(self.rows[0]),
+            (self.rows[0]["runtime_audio_sha256"], len(data), 1000),
+        )
+        remote = Mock()
+        remote.read.return_value = data
+        self.service.course_media_store = remote
+        asset = self.service.authorize_asset(**self._identity(), asset_id="formal-audio-0")
+        self.assertEqual(asset.data, data)
+        self.assertFalse(asset.path.exists())
+        self.assertEqual(remote.read.call_args.kwargs["expected_sha256"], asset.content_hash)
+        remote.read.reset_mock()
+        self.rows[0]["segment_state"] = "pending"
+        with self.assertRaises(ApiError):
+            self.service.authorize_asset(**self._identity(), asset_id="formal-audio-0")
+        remote.read.assert_not_called()
+        self.rows[0]["segment_state"] = "auto_validated"
+        remote.read.side_effect = CourseMediaStorageError("unavailable")
+        with self.assertRaises(ApiError) as missing:
+            self.service.authorize_asset(**self._identity(), asset_id="formal-audio-0")
+        self.assertEqual(missing.exception.status_code, 503)
 
     def test_manifest_uses_the_classroom_scene_count(self):
         self.rows = self._rows(count=7)
