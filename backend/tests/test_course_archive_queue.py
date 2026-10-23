@@ -8,6 +8,7 @@ import stat
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
+import zipfile
 
 from services.course_archive_queue import (
     ArchiveQueueError, CourseArchiveProcessor, CourseArchiveQueue, CourseArchiveWorker,
@@ -676,6 +677,171 @@ class CourseArchiveQueueTest(unittest.TestCase):
         self.assertEqual({p.name for p in stage.iterdir()}, {"index.json", "manifest.json", "incomplete-prune.json"})
         self.assertEqual(original.read_bytes(), b"retained paid source")
         self.assertEqual(self.processor.prune_incomplete_captures(job["key"], dry_run=False)["removedBytes"], 0)
+
+    def record_zip_only_cleanup(self, job, stage):
+        """Model the operator's byte-verified ZIP-only journal, without a prune marker."""
+        index_path = stage / "index.json"
+        raw = index_path.read_bytes()
+        index = json.loads(raw)
+        manifest_path = Path(index["manifestPath"])
+        manifest_raw = manifest_path.read_bytes()
+        manifest = json.loads(manifest_raw)
+        originals = {entry["archivePath"]: entry["original"] for entry in manifest["files"]}
+        zip_path = Path(index["zip"]["path"])
+        entries = []
+        with zipfile.ZipFile(zip_path) as archive:
+            for info in archive.infolist():
+                payload = manifest_path.parent / info.filename
+                evidence = self.processor._cleanup_file(payload)
+                self.assertEqual(archive.read(info), payload.read_bytes())
+                entries.append({"archivePath": info.filename, "payloadPath": str(payload),
+                    "sha256": evidence["sha256"], "byteSize": evidence["byteSize"],
+                    "original": originals.get(info.filename, False), "payloadIdentity": evidence["identity"],
+                    "zipCRC": info.CRC, "compression": info.compress_type, "dateTime": list(info.date_time),
+                    "extraHex": info.extra.hex(), "commentHex": info.comment.hex(), "externalAttr": info.external_attr})
+        directory = self.queue.root / "archive-retirements" / job["key"] / "zip-only-captures" / stage.name
+        directory.mkdir(parents=True, mode=0o700)
+        for name, data in (("index.json", raw), ("manifest.json", manifest_raw)):
+            (directory / name).write_bytes(data)
+            (directory / name).chmod(0o600)
+        proof = {"schemaVersion": "mira.course-archive.zip-only-cleanup.v1",
+            "status": "zip-removed-payload-retained", "mode": "zip-only", "jobKey": job["key"],
+            "indexPath": str(index_path), "indexSha256": digest(raw), "manifestPath": str(manifest_path),
+            "manifestSha256": digest(manifest_raw), "retainedIndexPath": str(directory / "index.json"),
+            "retainedManifestPath": str(directory / "manifest.json"),
+            "removedZip": {"path": str(zip_path), **self.processor._cleanup_file(zip_path)},
+            "verifiedEntries": entries, "payloadPruned": False, "establishesComplete": False,
+            "queueRecordChanged": False}
+        journal = directory / "zip-only-cleanup.json"
+        journal.write_bytes(encoded(proof))
+        journal.chmod(0o600)
+        zip_path.unlink()
+        return journal, proof
+
+    def test_zip_only_journal_allows_missing_zip_after_complete_replacement_without_faking_intent(self):
+        job, stage, original = self.completed_with_incomplete_capture()
+        journal, proof = self.record_zip_only_cleanup(job, stage)
+        journal_raw = journal.read_bytes()
+        before = {p.relative_to(stage): p.read_bytes() for p in stage.rglob("*") if p.is_file()}
+        plan = self.processor.prune_incomplete_captures(job["key"])
+        self.assertEqual(plan["eligibleCaptures"], 1, plan)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+        self.assertEqual(before, {p.relative_to(stage): p.read_bytes() for p in stage.rglob("*") if p.is_file()})
+        result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(result["eligibleCaptures"], 1, result)
+        marker = json.loads((stage / "incomplete-prune.json").read_bytes())
+        self.assertEqual(marker["zipOnlyProof"], {"path": str(journal), "sha256": digest(journal_raw)})
+        self.assertEqual(journal.read_bytes(), journal_raw)
+        self.assertEqual(original.read_bytes(), b"retained paid source")
+        self.assertEqual({p.name for p in stage.iterdir()}, {"index.json", "manifest.json", "incomplete-prune.json"})
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"], dry_run=False)["removedBytes"], 0)
+
+    def test_zip_only_journal_rejects_missing_mismatched_or_incomplete_evidence_without_payload_deletion(self):
+        job, stage, _ = self.completed_with_incomplete_capture()
+        journal, proof = self.record_zip_only_cleanup(job, stage)
+        before = {p.relative_to(stage): p.read_bytes() for p in stage.rglob("*") if p.is_file()}
+        mutations = [
+            ("job", lambda value: value.update(jobKey="f" * 64)),
+            ("index", lambda value: value.update(indexSha256="f" * 64)),
+            ("manifest", lambda value: value.update(manifestSha256="f" * 64)),
+            ("zip digest", lambda value: value["removedZip"].update(sha256="f" * 64)),
+            ("zip size", lambda value: value["removedZip"].update(byteSize=value["removedZip"]["byteSize"] + 1)),
+            ("zip member missing", lambda value: value["verifiedEntries"].pop()),
+            ("zip member duplicate", lambda value: value["verifiedEntries"].__setitem__(0, value["verifiedEntries"][-1])),
+            ("member digest", lambda value: value["verifiedEntries"][0].update(sha256="f" * 64)),
+            ("foreign payload", lambda value: value["verifiedEntries"][0].update(payloadPath=str(self.root / "original.json"))),
+            ("unbound backup", lambda value: value.update(retainedManifestPath=str(stage / "manifest.json"))),
+            ("not completed", lambda value: value.update(status="zip-removal-planned")),
+        ]
+        for name, mutate in mutations:
+            with self.subTest(name=name):
+                changed = deepcopy(proof)
+                mutate(changed)
+                journal.write_bytes(encoded(changed))
+                result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+                self.assertEqual(result["eligibleCaptures"], 0, result)
+                self.assertEqual(result["captures"][0]["reason"], "archive_incomplete_cleanup_zip_only_proof_invalid")
+                self.assertFalse((stage / "incomplete-prune.json").exists())
+                self.assertEqual(before, {p.relative_to(stage): p.read_bytes() for p in stage.rglob("*") if p.is_file()})
+        journal.unlink()
+        result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(result["eligibleCaptures"], 0, result)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+
+    def test_zip_only_journal_rejects_linked_proof_changed_backups_and_changed_or_missing_payload(self):
+        job, stage, _ = self.completed_with_incomplete_capture()
+        journal, proof = self.record_zip_only_cleanup(job, stage)
+        raw = journal.read_bytes()
+        backup = journal.parent / "manifest.json"
+        saved = backup.read_bytes()
+        backup.write_bytes(saved + b" ")
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        backup.write_bytes(saved)
+        journal.chmod(0o644)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        journal.unlink()
+        alias = self.root / "journal.json"
+        alias.write_bytes(raw)
+        alias.chmod(0o600)
+        journal.symlink_to(alias)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        journal.unlink()
+        journal.write_bytes(raw)
+        journal.chmod(0o600)
+        filename = Path(proof["verifiedEntries"][0]["payloadPath"])
+        saved = filename.read_bytes()
+        filename.write_bytes(bytes([saved[0] ^ 1]) + saved[1:])
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        # A forged current identity cannot replace the existing full payload SHA check.
+        proof["verifiedEntries"][0]["payloadIdentity"] = self.processor._cleanup_file(filename)["identity"]
+        journal.write_bytes(encoded(proof))
+        result = self.processor.prune_incomplete_captures(job["key"])
+        self.assertEqual(result["captures"][0]["reason"], "archive_incomplete_cleanup_derivative_changed")
+        filename.unlink()
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+
+    def test_zip_only_proof_does_not_replace_original_coverage(self):
+        job, stage, _ = self.completed_with_incomplete_capture(unique_old_original=True)
+        self.record_zip_only_cleanup(job, stage)
+        result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(result["captures"][0]["reason"], "archive_incomplete_cleanup_original_not_covered")
+        self.assertTrue((stage / "课程资料" / "唯一原稿.json").exists())
+
+    def test_zip_only_proof_does_not_replace_existing_zip_validation(self):
+        job, stage, _ = self.completed_with_incomplete_capture()
+        self.record_zip_only_cleanup(job, stage)
+        index = json.loads((stage / "index.json").read_bytes())
+        Path(index["zip"]["path"]).write_bytes(b"recreated changed ZIP must not use journal")
+        result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(result["captures"][0]["reason"], "archive_incomplete_cleanup_zip_changed")
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+
+    def test_zip_only_cleanup_resume_binds_journal_and_allows_only_planned_missing_payload(self):
+        job, stage, _ = self.completed_with_incomplete_capture()
+        journal, proof = self.record_zip_only_cleanup(job, stage)
+        unlink = Path.unlink
+        interrupted = False
+
+        def interrupted_unlink(path, *args, **kwargs):
+            nonlocal interrupted
+            result = unlink(path, *args, **kwargs)
+            if path.is_relative_to(stage / "课程资料") and not interrupted:
+                interrupted = True
+                raise OSError("interrupted after persisted cleanup intent")
+            return result
+
+        with patch.object(Path, "unlink", interrupted_unlink):
+            first = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertFalse(first["captures"][0]["eligible"])
+        raw = journal.read_bytes()
+        proof["auditChanged"] = True
+        journal.write_bytes(encoded(proof))
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        journal.write_bytes(raw)
+        second = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(second["eligibleCaptures"], 1, second)
+        self.assertEqual({p.name for p in stage.iterdir()}, {"index.json", "manifest.json", "incomplete-prune.json"})
 
     def test_incomplete_capture_unique_original_is_retained_without_touching_any_derivative(self):
         job, stage, _ = self.completed_with_incomplete_capture(unique_old_original=True)

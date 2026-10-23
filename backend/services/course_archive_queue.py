@@ -597,6 +597,89 @@ class CourseArchiveProcessor:
             result[name] = entry
         return result
 
+    def _zip_only_cleanup_proof(self, job, reference, index, raw, manifest_raw, old_files, previous):
+        """Accept only the private, byte-bound evidence of an earlier ZIP-only removal."""
+        stage = Path(reference["indexPath"]).parent
+        directory = self.queue.root / "archive-retirements" / job["key"] / "zip-only-captures" / stage.name
+        journal = directory / "zip-only-cleanup.json"
+        invalid = "archive_incomplete_cleanup_zip_only_proof_invalid"
+
+        def private_bytes(path):
+            # lstat first: a missing proof must not create its directory via _read.
+            before = path.lstat()
+            if not stat.S_ISREG(before.st_mode) or stat.S_IMODE(before.st_mode) != 0o600:
+                raise ArchiveQueueError(invalid)
+            value = _read(path)
+            after = path.lstat()
+            fields = ("st_dev", "st_ino", "st_mode", "st_size", "st_mtime_ns", "st_ctime_ns")
+            if any(getattr(before, k) != getattr(after, k) for k in fields):
+                raise ArchiveQueueError(invalid)
+            return value
+
+        def file_identity(value, size):
+            return (isinstance(value, list) and len(value) == 6
+                    and all(type(part) is int for part in value)
+                    and stat.S_ISREG(value[2]) and value[3] == size)
+
+        try:
+            journal_raw = private_bytes(journal)
+            proof = json.loads(journal_raw)
+            zip_record = proof.get("removedZip") if isinstance(proof, dict) else None
+            expected = {"schemaVersion": "mira.course-archive.zip-only-cleanup.v1",
+                "status": "zip-removed-payload-retained", "mode": "zip-only", "jobKey": job["key"],
+                "indexPath": reference["indexPath"], "indexSha256": _sha(raw),
+                "manifestPath": index["manifestPath"], "manifestSha256": _sha(manifest_raw),
+                "retainedIndexPath": str(directory / "index.json"),
+                "retainedManifestPath": str(directory / "manifest.json")}
+            if (not isinstance(zip_record, dict) or any(proof.get(k) != v for k, v in expected.items())
+                    or proof.get("payloadPruned") is not False or proof.get("establishesComplete") is not False
+                    or proof.get("queueRecordChanged") is not False
+                    or any(zip_record.get(k) != index["zip"].get(k) for k in ("path", "sha256", "byteSize"))
+                    or not SHA.fullmatch(str(zip_record.get("sha256", "")))
+                    or type(zip_record.get("byteSize")) is not int or zip_record["byteSize"] < 0
+                    or not file_identity(zip_record.get("identity"), zip_record["byteSize"])
+                    or private_bytes(directory / "index.json") != raw
+                    or private_bytes(directory / "manifest.json") != manifest_raw):
+                raise ArchiveQueueError(invalid)
+            result = {"path": str(journal), "sha256": _sha(journal_raw)}
+            if previous and previous.get("zipOnlyProof") != result:
+                raise ArchiveQueueError(invalid)
+            entries = proof.get("verifiedEntries")
+            if not isinstance(entries, list) or len(entries) != len(old_files) + 1:
+                raise ArchiveQueueError(invalid)
+            expected_entries = {**old_files, "manifest.json": {
+                "sha256": _sha(manifest_raw), "byteSize": len(manifest_raw), "original": False}}
+            payload = stage / "课程资料"
+            prior_files = {entry["path"]: entry for entry in previous.get("files", [])} if previous else {}
+            seen = set()
+            for entry in entries:
+                name = entry.get("archivePath") if isinstance(entry, dict) else None
+                if not isinstance(name, str) or name not in expected_entries or name in seen:
+                    raise ArchiveQueueError(invalid)
+                seen.add(name)
+                wanted, filename = expected_entries[name], payload / name
+                if (entry.get("payloadPath") != str(filename)
+                        or any(entry.get(k) != wanted[k] for k in ("sha256", "byteSize", "original"))
+                        or type(entry.get("byteSize")) is not int or type(entry.get("original")) is not bool
+                        or not file_identity(entry.get("payloadIdentity"), wanted["byteSize"])
+                        or type(entry.get("zipCRC")) is not int or not 0 <= entry["zipCRC"] <= 0xffffffff):
+                    raise ArchiveQueueError(invalid)
+                if previous and not filename.exists() and not filename.is_symlink():
+                    # Only an already-persisted normal cleanup plan may account
+                    # for payload files removed during an interrupted cleanup.
+                    prior = prior_files.get(filename.relative_to(stage).as_posix(), {})
+                    if any(prior.get(k) != wanted[k] for k in ("sha256", "byteSize")):
+                        raise ArchiveQueueError(invalid)
+                    continue
+                _directory(filename.parent)
+                info = filename.lstat()
+                fields = ("st_dev", "st_ino", "st_mode", "st_size", "st_mtime_ns", "st_ctime_ns")
+                if [getattr(info, k) for k in fields] != entry["payloadIdentity"]:
+                    raise ArchiveQueueError(invalid)
+            return result
+        except (OSError, ValueError, TypeError, KeyError) as error:
+            raise ArchiveQueueError(invalid) from error
+
     def _incomplete_cleanup_plan(self, job, reference, replacement, replacement_manifest):
         path = Path(reference.get("indexPath", ""))
         stage = path.parent
@@ -654,7 +737,8 @@ class CourseArchiveProcessor:
         previous = json.loads(_read(marker)) if marker.exists() else None
         if previous and any(previous.get(k) != v for k, v in binding.items()):
             raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
-        if not previous:
+        zip_only_proof = previous.get("zipOnlyProof") if previous else None
+        if zip_path.exists() or zip_path.is_symlink():
             evidence = self._cleanup_file(zip_path)
             if (evidence["sha256"] != index["zip"].get("sha256")
                     or evidence["byteSize"] != index["zip"].get("byteSize")):
@@ -664,6 +748,9 @@ class CourseArchiveProcessor:
                         or set(archive.namelist()) != set(old_files) | {"manifest.json"}
                         or archive.read("manifest.json") != manifest_raw):
                     raise ArchiveQueueError("archive_incomplete_cleanup_zip_manifest_mismatch")
+        elif not previous or zip_only_proof:
+            zip_only_proof = self._zip_only_cleanup_proof(
+                job, reference, index, raw, manifest_raw, old_files, previous)
         allowed = {"index.json", "manifest.json", "incomplete-prune.json", "课程资料", "asset-sources", zip_path.name}
         if any(item.name not in allowed for item in stage.iterdir()):
             raise ArchiveQueueError("archive_incomplete_cleanup_unexpected_file")
@@ -703,7 +790,8 @@ class CourseArchiveProcessor:
                                                              for k in ("sha256", "byteSize"))):
                 raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
             files.append({"path": relative, **evidence})
-        return {**binding, "originalFilesCovered": len(originals), "files": files,
+        return {**binding, **({"zipOnlyProof": zip_only_proof} if zip_only_proof else {}),
+                "originalFilesCovered": len(originals), "files": files,
                 "directories": [str(p.relative_to(stage)) for p in directories],
                 "bytes": sum(item["byteSize"] for item in files), "stage": str(stage),
                 "manifestRaw": manifest_raw}
