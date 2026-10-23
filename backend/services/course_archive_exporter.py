@@ -280,6 +280,130 @@ def _inspect_original(raw, path):
     return None, False
 
 
+def validate_material_bytes(raw, mime_type, *, expected_sha256=None, expected_bytes=None):
+    """Validate a DB-bound material's real format, including extensionless originals.
+
+    Return the canonical MIME; no arbitrary binary passthrough or execution is
+    allowed. Both the automatic exporter and material migration use this seam.
+    """
+    import wave
+    mime = {"audio/x-wav": "audio/wav", "audio/mp3": "audio/mpeg", "image/jpg": "image/jpeg"}.get(mime_type, mime_type)
+    _require(isinstance(raw, bytes) and 0 < len(raw) <= MAX_FILE_BYTES, "course_material_bytes_invalid")
+    _require(isinstance(mime, str), "course_material_mime_invalid")
+    _require(expected_sha256 is None or _sha(raw) == expected_sha256, "course_material_sha_mismatch")
+    _require(expected_bytes is None or len(raw) == expected_bytes, "course_material_size_mismatch")
+    try:
+        if mime in {"text/plain", "text/markdown", "text/html", "text/csv", "application/json", "image/svg+xml"}:
+            text = raw.decode("utf8")
+            _require("\x00" not in text, "course_material_text_invalid")
+            suffix = {"text/markdown": ".md", "text/html": ".html", "text/csv": ".csv",
+                      "application/json": ".json", "image/svg+xml": ".svg"}.get(mime, ".txt")
+            _check_source_text(raw, suffix)
+            if mime == "text/csv":
+                import csv
+                from io import StringIO
+                try:
+                    rows = csv.reader(StringIO(text, newline=""), strict=True)
+                    headings = next(rows, [])
+                    for row in rows:
+                        _check_public(dict(zip(headings, row)))
+                except csv.Error as error:
+                    raise CourseArchiveError("course_material_csv_invalid") from error
+            if mime == "application/json":
+                _check_public(json.loads(text))
+            if mime == "image/svg+xml":
+                import xml.etree.ElementTree as etree
+                _require(etree.fromstring(text).tag.rsplit("}", 1)[-1] == "svg", "course_material_svg_invalid")
+        elif mime in {"image/png", "image/jpeg", "image/webp", "image/gif", "image/avif"}:
+            from PIL import Image
+            with Image.open(BytesIO(raw)) as image:
+                expected = {"image/png": "PNG", "image/jpeg": "JPEG", "image/webp": "WEBP",
+                            "image/gif": "GIF", "image/avif": "AVIF"}[mime]
+                _require(image.format == expected, "course_material_image_mismatch")
+                image.verify()
+        elif mime == "application/pdf":
+            _require(raw.startswith(b"%PDF-") and b"%%EOF" in raw[-4096:], "course_material_pdf_invalid")
+        elif mime in {
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        }:
+            required = {"application/vnd.openxmlformats-officedocument.presentationml.presentation": "ppt/presentation.xml",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "word/document.xml",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xl/workbook.xml"}[mime]
+            with zipfile.ZipFile(BytesIO(raw)) as archive:
+                members = archive.infolist()
+                _require(len(members) <= MAX_FILES and sum(item.file_size for item in members) <= MAX_FILE_BYTES,
+                         "course_material_office_limit")
+                _require({"[Content_Types].xml", required} <= set(archive.namelist())
+                         and archive.testzip() is None, "course_material_office_invalid")
+        elif mime == "audio/wav":
+            with wave.open(BytesIO(raw), "rb") as audio:
+                _require(audio.getnchannels() > 0 and audio.getframerate() > 0 and audio.getnframes() > 0,
+                         "course_material_audio_invalid")
+                _require(len(audio.readframes(audio.getnframes())) == audio.getnframes() * audio.getnchannels() * audio.getsampwidth(),
+                         "course_material_audio_invalid")
+        elif mime == "audio/mpeg":
+            _require(raw.startswith(b"ID3") or (len(raw) > 2 and raw[0] == 255 and raw[1] & 224 == 224),
+                     "course_material_audio_invalid")
+        elif mime == "audio/aac":
+            offset, frames = 0, 0
+            if raw.startswith(b"ID3"):
+                _require(len(raw) >= 10 and all(value < 128 for value in raw[6:10]),
+                         "course_material_audio_invalid")
+                size = sum(value << shift for value, shift in zip(raw[6:10], (21, 14, 7, 0)))
+                offset = 10 + size + (10 if raw[5] & 16 else 0)
+            # Uploaded .aac streams use ADTS framing. Check every complete
+            # frame so a magic prefix or a truncated last packet cannot pass.
+            while offset < len(raw):
+                frame = raw[offset:offset + 7]
+                _require(len(frame) == 7 and frame[0] == 255 and frame[1] & 246 == 240
+                         and (frame[2] >> 2) & 15 < 13, "course_material_audio_invalid")
+                header = 7 if frame[1] & 1 else 9
+                size = ((frame[3] & 3) << 11) | (frame[4] << 3) | (frame[5] >> 5)
+                _require(size > header and offset + size <= len(raw), "course_material_audio_invalid")
+                offset += size
+                frames += 1
+            _require(frames > 0, "course_material_audio_invalid")
+        elif mime in {"audio/ogg", "video/ogg"}:
+            _require(raw.startswith(b"OggS"), "course_material_audio_invalid")
+        elif mime in {"audio/mp4", "video/mp4"}:
+            _require(len(raw) > 12 and raw[4:8] == b"ftyp", "course_material_video_invalid")
+        elif mime == "video/quicktime":
+            offset, movie, media = 0, False, False
+            while offset < len(raw):
+                _require(offset + 8 <= len(raw), "course_material_video_invalid")
+                size = int.from_bytes(raw[offset:offset + 4], "big")
+                kind, header = raw[offset + 4:offset + 8], 8
+                if size == 1:
+                    _require(offset + 16 <= len(raw), "course_material_video_invalid")
+                    size, header = int.from_bytes(raw[offset + 8:offset + 16], "big"), 16
+                elif size == 0:
+                    size = len(raw) - offset
+                _require(size >= header and offset + size <= len(raw)
+                         and all(32 <= value <= 126 for value in kind), "course_material_video_invalid")
+                payload = raw[offset + header:offset + size]
+                if kind == b"ftyp":
+                    _require(len(payload) >= 8 and len(payload) % 4 == 0
+                             and b"qt  " in [payload[:4], *[payload[i:i + 4] for i in range(8, len(payload), 4)]],
+                             "course_material_video_invalid")
+                if kind == b"moov":
+                    movie = len(payload) >= 8
+                elif kind == b"mdat":
+                    media = len(payload) > 0
+                offset += size
+            _require(movie and media, "course_material_video_invalid")
+        elif mime in {"audio/webm", "video/webm"}:
+            _require(raw.startswith(b"\x1a\x45\xdf\xa3"), "course_material_video_invalid")
+        else:
+            raise CourseArchiveError("course_material_format_unsupported")
+    except CourseArchiveError:
+        raise
+    except (ValueError, OSError, SyntaxError, EOFError, zipfile.BadZipFile, wave.Error) as error:
+        raise CourseArchiveError("course_material_format_invalid") from error
+    return mime
+
+
 @dataclass
 class ArchiveSnapshot:
     """A source adapter must bind these artifacts to one verified course release."""
@@ -290,6 +414,8 @@ class ArchiveSnapshot:
     # Repository-relative exact roots, established by the source adapter.
     source_roots: list[Path] = field(default_factory=list)
     source_files: list[Path] = field(default_factory=list)
+    material_sources: dict[str, dict] = field(default_factory=dict)
+    material_bindings: list[dict] = field(default_factory=list)
     private_source_files: list[Path] = field(default_factory=list)
     media: list[dict] = field(default_factory=list)
     recovered_aliases: list[dict] = field(default_factory=list)
@@ -299,7 +425,7 @@ class ArchiveSnapshot:
 
 class CourseArchiveExporter:
     def __init__(self, *, project_root=None, media_store=None, native_document_loader=None,
-                 standard_asset_resolver=None):
+                 standard_asset_resolver=None, material_inventory_loader=None):
         self.root = Path(project_root or ROOT).resolve()
         self.native_root = self.root / "openmaic-runtime/.runtime/OpenMAIC"
         self.media_store = media_store or CourseMediaObjectStore(project_root=self.root)
@@ -307,6 +433,57 @@ class CourseArchiveExporter:
         self._workbench_index = None
         self._catalog_file_cache = {}
         self.standard_asset_resolver = standard_asset_resolver or self._standard_assets
+        self.material_inventory_loader = material_inventory_loader or self._material_inventory
+
+    def _material_inventory(self, request):
+        """One read-only producer lookup; no application/schema initialization."""
+        helper = self.root / "openmaic-runtime/scripts/course-material-inventory.mjs"
+        _require(helper.is_file(), "course_material_inventory_unavailable")
+        result = subprocess.run(["node", str(helper)], input=json.dumps(request), text=True,
+            capture_output=True, timeout=60)
+        _require(result.returncode == 0, "course_material_inventory_failed")
+        try:
+            value = json.loads(result.stdout)
+        except ValueError as error:
+            raise CourseArchiveError("course_material_inventory_invalid") from error
+        return value
+
+    def _add_course_materials(self, snapshot, *, stage_id, session_id=None, source_digest=None):
+        _require(isinstance(stage_id, str) and _ID.fullmatch(stage_id), "course_material_stage_invalid")
+        request = {"stageId": stage_id}
+        if session_id is not None:
+            _require(isinstance(session_id, str) and _ID.fullmatch(session_id), "course_material_session_invalid")
+            request["sessionId"] = session_id
+            request["bindingKind"] = "native_event" if source_digest is not None else "frozen_authoring"
+        if source_digest is not None:
+            request["sourceDigest"] = source_digest
+        if any(item["request"] == request for item in snapshot.material_bindings):
+            return
+        value = self.material_inventory_loader(request)
+        _require(isinstance(value, dict) and value.get("schemaVersion") == "mira.course-material-inventory.v1"
+                 and isinstance(value.get("materials"), list) and len(value["materials"]) <= 12288,
+                 "course_material_inventory_invalid")
+        _require(value.get("dependencySha256") == _sha(releases.canonical(value["materials"]).encode()),
+                 "course_material_inventory_digest_mismatch")
+        additions = {}
+        for item in value["materials"]:
+            _require(isinstance(item, dict) and isinstance(item.get("sourcePath"), str)
+                     and item["sourcePath"].startswith("openmaic-runtime/.runtime/OpenMAIC/data/materials/")
+                     and isinstance(item.get("mimeType"), str) and isinstance(item.get("displayName"), str),
+                     "course_material_inventory_invalid")
+            _check_public(item)
+            path = self._source_path(item["sourcePath"])
+            _safe_relative(item["sourcePath"])
+            existing = snapshot.material_sources.get(item["sourcePath"])
+            _require(existing is None or existing == item, "course_material_identity_conflict")
+            _require(item["sourcePath"] not in additions, "course_material_inventory_duplicate")
+            additions[item["sourcePath"]] = item
+        snapshot.material_bindings.append({"request": request, "dependencySha256": value["dependencySha256"]})
+        snapshot.material_sources.update(additions)
+        for source in additions:
+            path = self._source_path(source)
+            if path not in snapshot.source_files:
+                snapshot.source_files.append(path)
 
     def _binary_original_mime(self, source):
         """A named HTTP response is a PDF only with exact retained evidence."""
@@ -581,6 +758,12 @@ class CourseArchiveExporter:
                     if parent.is_relative_to(root) and _private_runtime_exclusion(parent)), None)
                 if excluded is not None:
                     files.add(excluded)
+                elif (_credential_file(path) or path.name == ".DS_Store"
+                      or path.suffix.lower() in {".lock", ".pid", ".tmp", ".part"}):
+                    # Local authoring control can coexist with registered
+                    # originals. Retain its omission identity without asking
+                    # the remote registry to normalize a forbidden secret path.
+                    files.add(path)
                 elif course_exists(path):
                     files.add(path)
         return files
@@ -614,17 +797,23 @@ class CourseArchiveExporter:
                 excluded += 1
                 continue
             counts[suffix or "<no-extension>"] = counts.get(suffix or "<no-extension>", 0) + 1
-            if not _supported_source_file(source):
+            material = snapshot.material_sources.get(relative)
+            if material is None and not _supported_source_file(source):
                 failures.append({"sourceIdentity": relative, "reason": "original_requires_safe_format_adapter"})
                 continue
             info = course_stat(source)
             total += info.st_size
             _require(course_exists(source) and info.st_size <= MAX_FILE_BYTES, "source_file_unavailable_or_oversized")
-            identity = (str(source), info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+            identity = (str(source), info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns,
+                        releases.canonical(material) if material is not None else None)
             if identity not in file_cache:
                 try:
-                    self._binary_original_mime(source)
-                    if _original_suffix(source) == ".json" or _source_text_file(source):
+                    if material is not None:
+                        validate_material_bytes(course_bytes(source), material["mimeType"],
+                            expected_sha256=material.get("sha256"), expected_bytes=material.get("byteSize"))
+                    else:
+                        self._binary_original_mime(source)
+                    if material is None and (_original_suffix(source) == ".json" or _source_text_file(source)):
                         _inspect_original(course_bytes(source), source)
                     file_cache[identity] = None
                 except (CourseArchiveError, UnicodeDecodeError, json.JSONDecodeError) as error:
@@ -674,7 +863,7 @@ class CourseArchiveExporter:
         metadata["storageEditionLabel"] = "未绑定教材（历史课件）"
         bound = ArchiveSnapshot(identity=identity, metadata=metadata, classroom=snapshot,
             documents={"Native终态快照.json": raw}, status="generated_saved")
-        self._native_authoring_sources(bound, authoring_binding)
+        self._native_authoring_sources(bound, authoring_binding, source_digest=source_digest)
         self._collect_snapshot_media(bound)
         release = {**identity, **({"storageDirectory": meta["storageDirectory"]} if meta.get("storageDirectory") else {})}
         return self.export_snapshot(bound, source_kind=source_kind, source_digest=source_digest,
@@ -1159,6 +1348,8 @@ class CourseArchiveExporter:
         binding = frozen["textbookBinding"]
         authoring = original_input.get("authoring", {})
         session, stage = authoring.get("sessionId"), authoring.get("stageId")
+        if session and stage:
+            self._add_course_materials(snapshot, stage_id=stage, session_id=session)
         if isinstance(session, str) and isinstance(stage, str) and _ID.fullmatch(stage):
             # Complete-scene review is immutable evidence owned by this frozen
             # authoring session and stage, separate from exported classroom data.
@@ -1232,7 +1423,7 @@ class CourseArchiveExporter:
                     self._workbench_index.append((path.parent, value, state_value))
         return self._workbench_index
 
-    def _native_authoring_sources(self, snapshot, binding):
+    def _native_authoring_sources(self, snapshot, binding, *, source_digest=None):
         """Bind private control identity to exact frozen originals, never export it."""
         session_id = None
         if binding is not None:
@@ -1250,6 +1441,8 @@ class CourseArchiveExporter:
         owned = matches(jobs)
         if not owned and not session_id:
             owned = matches(self._workbench_jobs(refresh=True))
+        self._add_course_materials(snapshot, stage_id=stage_id, session_id=session_id,
+                                   source_digest=source_digest)
         # No Backend job means this was authored directly in Native. Its
         # captured outline/scenes are its originals; do not invent a missing job.
         if not owned:
@@ -1334,6 +1527,7 @@ class CourseArchiveExporter:
             _require(document.get("stage", {}).get("id") == stage_id,
                      "native_document_identity_mismatch")
             snapshot.documents["原稿/Native数据库课堂.json"] = document
+        self._add_course_materials(snapshot, stage_id=stage_id)
 
     def _formal_snapshot(self, conn, course_id, course_version):
         course = conn.execute("SELECT * FROM learning_courses WHERE id=? AND version=?",
@@ -1534,7 +1728,8 @@ class CourseArchiveExporter:
             # never written back into the frozen/original classroom document.
             scan_document = {**value, "_miraArchiveReferencedMedia": collected_refs}
             extra = ArchiveSnapshot(identity=snapshot.identity, metadata=snapshot.metadata, classroom=scan_document,
-                source_roots=list(snapshot.source_roots), documents=snapshot.documents)
+                source_roots=list(snapshot.source_roots), documents=snapshot.documents,
+                material_sources=dict(snapshot.material_sources))
             self._collect_snapshot_media(extra)
             for proof in result.get("entries", []):
                 if proof.get("status") != "already_collected" or "registrySourcePath" not in proof:
@@ -1555,7 +1750,7 @@ class CourseArchiveExporter:
                 if old is None:
                     all_media[item["path"]] = item
 
-        def add(relative, *, raw=None, source=None, kind, identity, original=True, mime=None, source_receipt=None):
+        def add(relative, *, raw=None, source=None, kind, identity, original=True, mime=None, source_receipt=None, material=None):
             nonlocal total
             _safe_relative(relative)
             _require(not any(item["archivePath"] == relative for item in files), "duplicate_archive_path")
@@ -1572,7 +1767,11 @@ class CourseArchiveExporter:
             suffix = _original_suffix(Path(relative))
             format_name = relative if Path(relative).suffix.lower() == suffix else str(Path(relative).with_suffix(""))
             original_format = None
-            if suffix == ".json":
+            if material is not None:
+                mime = validate_material_bytes(raw, material["mimeType"],
+                    expected_sha256=material.get("sha256"), expected_bytes=material.get("byteSize"))
+                original_format = "course-material"
+            elif suffix == ".json":
                 value, structured = _inspect_original(raw, Path(relative))
                 if structured:
                     ensure_document_assets(value)
@@ -1594,6 +1793,9 @@ class CourseArchiveExporter:
                 "original": original, **({"originalFormat": original_format} if original_format else {})})
             if source_receipt is not None:
                 files[-1]["sourceReceipt"] = source_receipt
+            if material is not None:
+                files[-1].update({"sourcePath": material["sourcePath"], "displayName": material["displayName"],
+                    **({"originalName": material["originalName"]} if material.get("originalName") else {})})
 
         try:
             add("classroom.json", raw=_json(snapshot.classroom), kind="classroom",
@@ -1635,7 +1837,8 @@ class CourseArchiveExporter:
                 if _credential_file(relative):
                     omissions.append({"sourceIdentity": relative.as_posix(), "reason": "credential_or_runtime_file_excluded"})
                     continue
-                if not _supported_source_file(source):
+                material = snapshot.material_sources.get(relative.as_posix())
+                if material is None and not _supported_source_file(source):
                     if source.name == ".DS_Store" or source.suffix.lower() in {".lock", ".pid", ".tmp", ".part"}:
                         omissions.append({"sourceIdentity": relative.as_posix(), "reason": "runtime_file_excluded"})
                     else:
@@ -1644,7 +1847,8 @@ class CourseArchiveExporter:
                     continue
                 try:
                     add("原稿/" + relative.as_posix(), source=source, kind="owned_original_file",
-                        identity=relative.as_posix(), mime=self._binary_original_mime(source))
+                        identity=relative.as_posix(), mime=None if material is not None else self._binary_original_mime(source),
+                        material=material)
                 except CourseArchiveError as error:
                     if str(error) != "credential_or_student_data_in_artifact":
                         raise
@@ -1682,6 +1886,13 @@ class CourseArchiveExporter:
                 if receipt and archived_files.get(receipt["archivePath"], {}).get("sha256") != receipt["sha256"]:
                     missing.append({"kind": "native_asset", "sourceIdentity": item["sourceIdentity"],
                                     "reason": "review_asset_receipt_not_archived"})
+            # Material rows can gain extraction derivatives while an authoring
+            # session finishes. Never publish an archive marked complete after
+            # its captured dependency set changed underneath it.
+            for binding in snapshot.material_bindings:
+                current = self.material_inventory_loader(binding["request"])
+                _require(isinstance(current, dict) and current.get("dependencySha256") == binding["dependencySha256"],
+                         "course_material_dependencies_changed")
             metadata = {"schemaVersion": SCHEMA, **snapshot.identity, **snapshot.metadata,
                 "status": snapshot.status, "archiveFormat": "mira-course-archive-zip-v1",
                 "objectDirectory": object_directory, "exportedAt": exported_at,

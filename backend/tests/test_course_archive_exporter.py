@@ -33,7 +33,9 @@ class CourseArchiveExporterTest(unittest.TestCase):
         self.store = Mock()
         self.exporter = CourseArchiveExporter(project_root=self.root, media_store=self.store,
             native_document_loader=lambda stage: None,
-            standard_asset_resolver=lambda document, **kwargs: {"entries": [], "unresolved": []})
+            standard_asset_resolver=lambda document, **kwargs: {"entries": [], "unresolved": []},
+            material_inventory_loader=lambda request: {"schemaVersion": "mira.course-material-inventory.v1",
+                "materials": [], "dependencySha256": hashlib.sha256(b"[]").hexdigest()})
         self.media = b"already migrated recording\x00\x01"
         self.media_path = "openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_test/audio/teacher.mp3"
         self.identity = {"courseId": "course", "courseVersion": "1", "classroomId": "tbpub_test",

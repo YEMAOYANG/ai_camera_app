@@ -32,7 +32,9 @@ class CourseArchiveHistoryTest(unittest.TestCase):
         self.plan = self.owner / "plan.json"
         self.plan.write_bytes(b'{"goal":"retained first teaching plan"}\n')
         self.exporter = CourseArchiveExporter(project_root=self.root,
-            standard_asset_resolver=lambda document, **kwargs: {"entries": [], "unresolved": []})
+            standard_asset_resolver=lambda document, **kwargs: {"entries": [], "unresolved": []},
+            material_inventory_loader=lambda request: {"schemaVersion": "mira.course-material-inventory.v1",
+                "materials": [], "dependencySha256": hashlib.sha256(b"[]").hexdigest()})
 
     def discover(self, **kwargs):
         return discover_authoring_history(self.root, paths=[self.source], **kwargs)

@@ -1,0 +1,226 @@
+diff --git a/lib/server/materials/bytes.ts b/lib/server/materials/bytes.ts
+--- a/lib/server/materials/bytes.ts
++++ b/lib/server/materials/bytes.ts
+@@ -1,8 +1,14 @@
+ import { createWriteStream } from 'node:fs';
++import { createHash } from 'node:crypto';
+ import { mkdir, readFile, rm } from 'node:fs/promises';
+ import { dirname, resolve, sep } from 'node:path';
+ import { Readable } from 'node:stream';
+ import { pipeline } from 'node:stream/promises';
++
++import {
++  readCourseStorageFile,
++  registeredCourseStorageFile,
++} from '@/lib/server/course-storage-registry';
+ 
+ export type MaterialByteInput = Buffer | Uint8Array | Readable | ReadableStream<Uint8Array>;
+ 
+@@ -54,10 +60,61 @@
+   }
+ }
+ 
++const MAX_REGISTERED_MATERIAL_BYTES = 64 * 1024 * 1024;
++
++/**
++ * Archived course materials are immutable originals, read through the same
++ * registry as their classroom. New authoring inputs remain local until their
++ * course archive is verified and registered; no registered read falls back.
++ */
++export class CourseMaterialByteStore implements MaterialByteStore {
++  private readonly root: string;
++  private readonly local: LocalMaterialByteStore;
++
++  constructor(root: string = resolve(process.cwd(), 'data')) {
++    this.root = resolve(root);
++    this.local = new LocalMaterialByteStore(this.root);
++  }
++
++  async put(key: string, body: MaterialByteInput, mime?: string): Promise<void> {
++    const filePath = safeLocalPath(this.root, key);
++    const asset = await registeredCourseStorageFile(filePath);
++    if (!asset) return this.local.put(key, body, mime);
++    if (asset.byteSize > MAX_REGISTERED_MATERIAL_BYTES) {
++      throw new Error('registered material exceeds its byte limit');
++    }
++    const checksum = createHash('sha256');
++    let size = 0;
++    for await (const chunk of nodeReadable(body)) {
++      const bytes = Buffer.from(chunk);
++      size += bytes.byteLength;
++      if (size > MAX_REGISTERED_MATERIAL_BYTES || size > asset.byteSize) {
++        throw new Error('registered material is immutable');
++      }
++      checksum.update(bytes);
++    }
++    if (size !== asset.byteSize || checksum.digest('hex') !== asset.sha256) {
++      throw new Error('registered material is immutable');
++    }
++  }
++
++  async get(key: string): Promise<Buffer> {
++    return readCourseStorageFile(safeLocalPath(this.root, key));
++  }
++
++  async delete(key: string): Promise<void> {
++    const filePath = safeLocalPath(this.root, key);
++    // Compensation for an authoring-row failure must never remove archived
++    // course originals or their local recovery copies.
++    if (await registeredCourseStorageFile(filePath)) return;
++    return this.local.delete(key);
++  }
++}
++
+ let sharedStore: MaterialByteStore | null = null;
+ 
+ export function getMaterialByteStore(): MaterialByteStore {
+-  sharedStore ??= new LocalMaterialByteStore();
++  sharedStore ??= new CourseMaterialByteStore();
+   return sharedStore;
+ }
+ 
+diff --git a/tests/persistence/course-material-bytes.test.ts b/tests/persistence/course-material-bytes.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/persistence/course-material-bytes.test.ts
+@@ -0,0 +1,140 @@
++import { createHash } from 'node:crypto';
++import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
++import { Readable } from 'node:stream';
++
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++const registry = vi.hoisted(() => ({
++  read: vi.fn(),
++  resolve: vi.fn(),
++}));
++vi.mock('@/lib/server/course-storage-registry', () => ({
++  readCourseStorageFile: registry.read,
++  registeredCourseStorageFile: registry.resolve,
++}));
++
++import { CourseMaterialByteStore, getMaterialByteStore, setMaterialByteStoreForTests } from '@/lib/server/materials/bytes';
++
++const roots: string[] = [];
++const content = Buffer.from('archived textbook source');
++const sha256 = createHash('sha256').update(content).digest('hex');
++
++beforeEach(() => {
++  registry.read.mockReset();
++  registry.resolve.mockReset();
++  registry.resolve.mockResolvedValue(undefined);
++  setMaterialByteStoreForTests(null);
++});
++
++afterEach(async () => {
++  setMaterialByteStoreForTests(null);
++  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
++});
++
++async function fixture() {
++  const root = await mkdtemp(join(tmpdir(), 'openmaic-course-materials-'));
++  roots.push(root);
++  return { root, store: new CourseMaterialByteStore(root) };
++}
++
++function archived() {
++  registry.resolve.mockResolvedValue({ byteSize: content.length, sha256 });
++}
++
++describe('CourseMaterialByteStore', () => {
++  it('selects the course-aware store for production consumers', () => {
++    expect(getMaterialByteStore()).toBeInstanceOf(CourseMaterialByteStore);
++  });
++
++  it('reads an archived material when no local file exists', async () => {
++    const { root, store } = await fixture();
++    registry.read.mockResolvedValue(content);
++    await expect(store.get('source.png')).resolves.toEqual(content);
++    expect(registry.read).toHaveBeenCalledWith(join(root, 'source.png'));
++    await expect(readFile(join(root, 'source.png'))).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++
++  it('propagates a registry outage even when a stale local copy exists', async () => {
++    const { root, store } = await fixture();
++    await writeFile(join(root, 'source.png'), 'stale local bytes');
++    registry.read.mockRejectedValue(new Error('Course storage unavailable'));
++    await expect(store.get('source.png')).rejects.toThrow('Course storage unavailable');
++    expect((await readFile(join(root, 'source.png'))).toString()).toBe('stale local bytes');
++  });
++
++  it('permits an identical streamed put without restoring a local file', async () => {
++    const { root, store } = await fixture();
++    archived();
++    await store.put('source.png', Readable.from([content.subarray(0, 5), content.subarray(5)]));
++    await expect(readFile(join(root, 'source.png'))).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++
++  it('rejects a same-size changed put and preserves the local recovery copy', async () => {
++    const { root, store } = await fixture();
++    archived();
++    await writeFile(join(root, 'source.png'), content);
++    await expect(store.put('source.png', Buffer.alloc(content.length, 'x'))).rejects.toThrow('immutable');
++    expect(await readFile(join(root, 'source.png'))).toEqual(content);
++  });
++
++  it('rejects a short stream and cancels an oversized stream', async () => {
++    const { store } = await fixture();
++    archived();
++    await expect(store.put('source.png', content.subarray(1))).rejects.toThrow('immutable');
++    let readAfterLimit = false;
++    const stream = Readable.from((async function* () {
++      yield Buffer.alloc(content.length + 1);
++      readAfterLimit = true;
++      yield Buffer.from('must not be read');
++    })(), { highWaterMark: 0 });
++    await expect(store.put('source.png', stream)).rejects.toThrow('immutable');
++    expect(readAfterLimit).toBe(false);
++    expect(stream.destroyed).toBe(true);
++  });
++
++  it('accepts identical Web stream bytes and rejects an unsafe registered size', async () => {
++    const { store } = await fixture();
++    archived();
++    await store.put('source.png', new ReadableStream({ start(controller) {
++      controller.enqueue(content); controller.close();
++    } }));
++    registry.resolve.mockResolvedValue({ byteSize: 64 * 1024 * 1024 + 1, sha256 });
++    await expect(store.put('source.png', content)).rejects.toThrow('byte limit');
++  });
++
++  it('preserves an archived original when compensation deletes its key', async () => {
++    const { root, store } = await fixture();
++    archived();
++    await writeFile(join(root, 'source.png'), content);
++    await store.delete('source.png');
++    expect(await readFile(join(root, 'source.png'))).toEqual(content);
++  });
++
++  it('fails a put and delete closed when registration cannot be checked', async () => {
++    const { root, store } = await fixture();
++    await writeFile(join(root, 'source.png'), content);
++    registry.resolve.mockRejectedValue(new Error('Course storage unavailable'));
++    await expect(store.put('source.png', Buffer.from('replacement'))).rejects.toThrow('unavailable');
++    await expect(store.delete('source.png')).rejects.toThrow('unavailable');
++    expect(await readFile(join(root, 'source.png'))).toEqual(content);
++  });
++
++  it('retains local staging for new unregistered authoring materials', async () => {
++    const { root, store } = await fixture();
++    await store.put('materials/new-source', content);
++    expect(await readFile(join(root, 'materials/new-source'))).toEqual(content);
++    await store.delete('materials/new-source');
++    await expect(readFile(join(root, 'materials/new-source'))).rejects.toMatchObject({ code: 'ENOENT' });
++  });
++
++  it('rejects traversal before resolving or reading a registry record', async () => {
++    const { store } = await fixture();
++    await expect(store.get('../outside')).rejects.toThrow('invalid material object key');
++    await expect(store.put('../outside', content)).rejects.toThrow('invalid material object key');
++    await expect(store.delete('../outside')).rejects.toThrow('invalid material object key');
++    expect(registry.read).not.toHaveBeenCalled();
++    expect(registry.resolve).not.toHaveBeenCalled();
++  });
++});

@@ -643,7 +643,9 @@ class CourseArchiveQueueTest(unittest.TestCase):
         from services.course_archive_exporter import CourseArchiveExporter
         self.processor.exporter = CourseArchiveExporter(project_root=self.root,
             media_store=Mock(), native_document_loader=lambda _: None,
-            standard_asset_resolver=lambda *args, **kwargs: {"entries": [], "unresolved": []})
+            standard_asset_resolver=lambda *args, **kwargs: {"entries": [], "unresolved": []},
+            material_inventory_loader=lambda request: {"schemaVersion": "mira.course-material-inventory.v1",
+                "materials": [], "dependencySha256": hashlib.sha256(b"[]").hexdigest()})
         path = self.fs()
         event = filesystem_event(path)
         job = self.queue.enqueue(event)
@@ -741,7 +743,9 @@ class CourseArchiveQueueTest(unittest.TestCase):
                 return super().export_snapshot(snapshot, **options)
 
         exporter = RecoverableExporter(project_root=self.root, media_store=Mock(read=Mock(return_value=None)),
-            native_document_loader=lambda _: None, standard_asset_resolver=standard_assets)
+            native_document_loader=lambda _: None, standard_asset_resolver=standard_assets,
+            material_inventory_loader=lambda request: {"schemaVersion": "mira.course-material-inventory.v1",
+                "materials": [], "dependencySha256": hashlib.sha256(b"[]").hexdigest()})
         self.processor.exporter = exporter
         job = self.queue.enqueue(self.pg())
         with self.assertRaisesRegex(ArchiveQueueError, "archive_export_incomplete"):
