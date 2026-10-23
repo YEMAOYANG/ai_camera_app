@@ -615,7 +615,7 @@ a {
   .classroom-scene-count { display: none; }
   .classroom-mobile-scenes span { display: none; }
   .classroom-mobile-scenes { min-width: 46px; padding: 0; }
-  .classroom-continue { min-width: 0; flex: 1; padding-inline: 12px; font-size: 15px; }
+  .classroom-continue { min-width: 0; flex: 1; }
   .classroom-teacher { grid-template-columns: 68px minmax(0, 1fr) 48px; gap: 7px; padding: 8px; }
   .classroom-teacher-heading { min-height: 60px; }
   .classroom-teacher-avatar { width: 68px; height: 60px; }
@@ -656,7 +656,7 @@ a {
   margin: 0 auto;
 }
 
-.learning-topbar > a { width: fit-content; border-radius: 14px; text-decoration: none; }
+.learning-topbar > a { width: fit-content; text-decoration: none; }
 .learning-topbar > button,
 .learning-topbar > span { justify-self: end; }
 
@@ -1086,7 +1086,7 @@ a {
 }
 
 @media (max-width: 390px) {
-  .learning-topbar button { padding-inline: 11px; }
+  .learning-topbar button:not(.mira-button) { padding-inline: 11px; }
   .learning-library-hero { grid-template-columns: 1fr; }
   .learning-library-buddy { display: none; }
   .learning-teacher-option { flex-basis: 91%; }
@@ -2035,9 +2035,6 @@ a {
   .classroom-continue {
     min-width: 0;
     flex: 1;
-    min-height: 52px;
-    padding-inline: 10px;
-    font-size: 16px;
   }
 
   .controlled-slide {

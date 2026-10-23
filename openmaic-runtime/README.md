@@ -1078,6 +1078,8 @@ Patch `0107` distinguishes real learner replies from virtual classmates at the a
 
 Patch `0108` aligns desktop discussion choices, recovery controls, history actions and playback controls to 36 px with 48 px coarse-pointer targets. Semantic avatar, collapsed-message and response-cue hooks remove the remaining purple chrome in student discussion, including user messages. Student primary/secondary/end actions retain distinct colors; dedicated voice controls stay large. Operator styling, model routing, authored courseware and discussion behavior are unchanged.
 
+Patch `0250` centralizes ordinary classroom utility buttons in `lib/ui/classroom-controls.ts`, reused by native UI and isolated iframe tools. Semantic roles select 30 px desktop playback controls, 36 px secondary actions or 40 px primary actions; any coarse pointer keeps at least 48 px targets. Component CSS now owns layout instead of competing button dimensions. Picture answers, drag targets, authored visibility and operator toolbar styling retain their dedicated contracts.
+
 Patch `0156` keeps Mira provider policy outside the upstream routing module, restores the registered teacher avatar and skill translations, and maintains the existing runtime verification fixtures on Node 24.
 
 Patch `0248` preserves the current approved teacher sentence when a textbook quiz takes the sound channel. After a question or selected-feedback clip actually starts, its caption resolves from the active scene's saved speech and exact local audio path. Unknown options, other scenes, unrelated clips and iframe text cannot supply captions; grading, frozen questions and recorded audio stay unchanged.

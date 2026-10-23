@@ -1,53 +1,11 @@
-/* Shared controls: precise edges and brief feedback, with no idle animation. */
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button {
-  position: relative;
-  flex-shrink: 0;
-  gap: 9px;
-  border: 1px solid transparent;
-  border-radius: 14px;
-  padding-inline: 19px;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: .01em;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, transform 140ms ease;
+/* Shared control palette; Button geometry and states live in buttons.css. */
+:is(.space-shell, .space-auth, .classroom-page, .learning-space) {
+  --mira-button-primary-border: #e9ffb569;
+  --mira-button-primary-hover: #e5ff9c;
+  --mira-button-secondary-background: #142236b8;
+  --mira-control-hover: #1b2d45;
+  --mira-focus: #a8ddff;
 }
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="primary"] {
-  background: var(--mira-brand-deep);
-  color: var(--mira-on-brand);
-  border-color: #e9ffb569;
-  box-shadow: inset 0 1px 0 #ffffff35, 0 3px 10px #0000001c;
-}
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="secondary"] {
-  color: #e2eaf5;
-  border-color: #b7d0ee2b;
-  background: #142236b8;
-  box-shadow: inset 0 1px 0 #ffffff05, 0 2px 5px #0000000f;
-}
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="quiet"] {
-  color: #acbed4;
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-size="compact"] { min-height: 40px; height: 40px; padding-inline: 15px; border-radius: 11px; font-size: 14px; }
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-size="icon"] { width: 44px; min-width: 44px; height: 44px; padding: 0; border-radius: 12px; }
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button > svg { flex: none; width: 18px; height: 18px; stroke-width: 1.8; }
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(1px); box-shadow: inset 0 1px 3px #00000019; }
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button:focus-visible { outline: 2px solid #a8ddff; outline-offset: 3px; }
-:is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button:is(:disabled, [aria-disabled="true"]) {
-  color: #72859c;
-  background: #142133;
-  border-color: #9fb6d111;
-  box-shadow: none;
-  transform: none;
-  cursor: not-allowed;
-}
-/* Keep the approved home launch control prominent without enlarging other actions. */
-.space-shell .mira-button.space-hero-action { min-height: 52px; height: auto; border-radius: 999px; font-size: 19px; padding-inline: 26px; gap: 12px; }
-.space-shell .mira-button.space-hero-action > svg { width: 24px; height: 24px; }
 
 .space-shell .space-filter-tabs.space-segmented {
   display: flex;
@@ -137,16 +95,11 @@
 .space-shell .space-subject-tabs.space-subject-chips button:focus-visible { outline: 2px solid #a8ddff; outline-offset: 2px; }
 .space-shell .space-subject-tabs.space-subject-chips button::after { content: none; animation: none; }
 
-.space-shell.space-grade-lower .mira-button,
 .space-grade-lower .space-filter-tabs.space-segmented .space-segment,
 .space-grade-lower .space-subject-tabs.space-subject-chips button { min-height: 48px; }
-.space-grade-lower .mira-button[data-size="icon"] { width: 48px; height: 48px; }
 .space-grade-lower .space-filter-tabs.space-segmented .space-segment,
 .space-grade-lower .space-subject-tabs.space-subject-chips button { font-size: 15px; }
 @media (hover: hover) and (pointer: fine) {
-  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="primary"]:hover:not(:disabled):not([aria-disabled="true"]) { background: #e5ff9c; border-color: #efffc580; box-shadow: inset 0 1px 0 #ffffff4a, 0 4px 14px #c4ed701a; }
-  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="secondary"]:hover:not(:disabled):not([aria-disabled="true"]) { background: #1b2d45; border-color: #b9d4f14c; color: #f3f8ff; }
-  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button[data-variant="quiet"]:hover:not(:disabled):not([aria-disabled="true"]) { background: #bdd5ee0b; color: #e3edf8; }
   .space-shell .space-filter-tabs.space-segmented .space-segment:hover:not(.is-active) { color: #ccdaec; }
   .space-shell .space-subject-tabs.space-subject-chips button:hover:not(.is-active) { color: #cadbeb; background: #a4c7e908; }
 }
@@ -155,7 +108,6 @@
   .space-shell .space-filter-tabs.space-segmented .space-segment { min-height: 44px; padding-inline: 5px; }
   .space-grade-lower .space-filter-tabs.space-segmented .space-segment { min-height: 48px; }
   .space-shell .space-subject-tabs.space-subject-chips { flex-wrap: wrap; }
-  .space-auth .mira-button { min-height: 48px; }
 }
 @media (max-width: 374px) {
   .space-shell .space-filter-tabs.space-segmented { flex-wrap: wrap; }
@@ -166,14 +118,9 @@
   .space-grade-lower .space-filter-tabs.space-segmented .space-segment { flex-basis: calc(33.333% - 2px); }
 }
 @media (prefers-reduced-motion: reduce) {
-  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button,
   .space-shell .space-filter-tabs.space-segmented .space-segment,
   .space-shell .space-subject-tabs.space-subject-chips button { transition: none; }
-  :is(.space-shell, .space-auth, .classroom-page, .learning-space) .mira-button:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
 }
 
-/* Legacy lesson pages have no grade marker; preserve their larger study controls. */
-.space-lesson .mira-button,
-.classroom-page.classroom-grade-lower button,
-.classroom-page.classroom-grade-lower .mira-button { min-height: 48px; min-width: 48px; }
-:is(.space-lesson, .classroom-grade-lower) .mira-button[data-size="icon"] { width: 48px; height: 48px; }
+/* Learning objects retain their dedicated study targets. */
+.classroom-page.classroom-grade-lower button:not(.mira-button) { min-height: 48px; min-width: 48px; }

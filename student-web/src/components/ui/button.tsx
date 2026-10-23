@@ -1,37 +1,16 @@
 import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-const buttonVariants = cva(
-  "mira-button focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-[14px] px-5 text-[15px] font-semibold leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-200 disabled:cursor-not-allowed disabled:bg-[var(--mira-disabled)] disabled:text-[var(--mira-subtle)]",
-  {
-    variants: {
-      variant: {
-        primary:
-          "bg-[var(--mira-brand-deep)] text-[var(--mira-on-brand)] shadow-[var(--mira-shadow-action)] hover:bg-[var(--mira-brand)]",
-        secondary:
-          "border border-[var(--mira-border)] bg-[var(--mira-surface)] text-[var(--mira-ink)] hover:border-[var(--mira-brand)] hover:bg-[var(--mira-brand-wash)]",
-        quiet: "text-[var(--mira-muted)] hover:bg-white/10 hover:text-[var(--mira-ink)]",
-      },
-      size: {
-        default: "h-11",
-        compact: "h-10 min-h-10 text-[14px]",
-        icon: "size-11 min-h-11 px-0",
-      },
-    },
-    defaultVariants: { variant: "primary", size: "default" },
-  },
-);
-
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "primary" | "secondary" | "quiet";
+  size?: "default" | "compact" | "icon";
   asChild?: boolean;
 }
 
 export function Button({ className, variant, size, asChild, ...props }: ButtonProps) {
   const Comp = asChild ? Slot : "button";
-  return <Comp data-variant={variant ?? "primary"} data-size={size ?? "default"} className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+  return <Comp data-variant={variant ?? "primary"} data-size={size ?? "default"} className={cn("mira-button", className)} {...props} />;
 }

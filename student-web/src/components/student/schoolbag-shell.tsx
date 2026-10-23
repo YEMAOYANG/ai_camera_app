@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import type { Student } from "@/lib/contracts/student-session";
 import { useSchoolbagMotion } from "@/components/schoolbag/schoolbag-motion";
+import { Button } from "@/components/ui/button";
 
 export function SchoolbagShell({ children, className = "", home = false, navigation, tools, onRest }: {
   student?: Student; children: ReactNode; className?: string; home?: boolean;
@@ -36,7 +37,7 @@ export function SchoolbagShell({ children, className = "", home = false, navigat
         {navigation && <nav className="schoolbag-context-nav" aria-label="学生导航">{navigation}</nav>}
       </div>
       <div className="schoolbag-account">{tools}
-        <button type="button" className="schoolbag-rest" onClick={() => void rest()} disabled={locking} aria-label={locking ? "正在锁定" : "休息一下"}>{locking ? <LoaderCircle size={19} aria-hidden="true" /> : <Pause size={19} aria-hidden="true" />}<span>休息一下</span></button>
+        <Button type="button" size="compact" variant="quiet" className="schoolbag-rest" onClick={() => void rest()} disabled={locking} aria-label={locking ? "正在锁定" : "休息一下"}>{locking ? <LoaderCircle aria-hidden="true" /> : <Pause aria-hidden="true" />}<span>休息一下</span></Button>
       </div>
     </header>
     {error && <p className="schoolbag-lock-error" role="alert">{error}</p>}

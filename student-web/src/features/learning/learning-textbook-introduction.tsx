@@ -95,7 +95,7 @@ function PictureIntroduction({ student, contents, introduction, unitId }: Props)
 
   return <SchoolbagShell student={student} className="space-textbooks picture-guide-page storybook-guide"
     navigation={<Link href={returnPath}><ArrowLeft size={21} aria-hidden="true" /><span>返回目录</span></Link>}
-    tools={<>{pagination}{current && <button type="button" className="storybook-caption-toggle" aria-label="字幕" aria-pressed={showTranscript} aria-controls={transcriptId} onClick={() => setShowTranscript(value => !value)}><Captions size={21} aria-hidden="true" /><span>字幕</span></button>}</>}>
+    tools={<>{pagination}{current && <Button type="button" size="compact" variant="quiet" className="storybook-caption-toggle" aria-label="字幕" aria-pressed={showTranscript} aria-controls={transcriptId} onClick={() => setShowTranscript(value => !value)}><Captions aria-hidden="true" /><span>字幕</span></Button>}</>}>
     <header className="storybook-title"><p>{contents.book.title}</p><h1>{presentation?.title ?? introduction.title}</h1></header>
     {!presentation || !current ? <section className="picture-guide-unavailable"><BookOpen size={40} aria-hidden="true" /><h2>图画和配音正在准备</h2><p>准备好后，就可以一起看图听故事了。</p><Button asChild><Link href={returnPath}>返回教材目录</Link></Button></section> : <section className="storybook-lesson" aria-label="看图听故事">
       <div className="storybook-scene" data-interactive={index === 1} data-speaking={phase === "playing"}>
@@ -108,11 +108,11 @@ function PictureIntroduction({ student, contents, introduction, unitId }: Props)
         {!finished && <button type="button" onClick={listen} aria-pressed={phase === "playing"} className="storybook-play"><span>{phase === "playing" || phase === "loading" ? <Pause size={26} fill="currentColor" aria-hidden="true" /> : <Play size={26} fill="currentColor" aria-hidden="true" />}</span><b>{playLabel}</b></button>}
         <h2 ref={heading} tabIndex={-1}>{finished ? "带上好奇心，出发！" : current.caption}</h2>
         {finished ? <div className="storybook-finish"><Button asChild><Link href={returnPath}>去看教材<ArrowRight size={22} aria-hidden="true" /></Link></Button><Button variant="quiet" onClick={() => { setChoice(null); setTried(false); move(0); }}><RotateCcw size={18} aria-hidden="true" />再玩一次</Button></div>
-          : <div className="storybook-turns">{index > 0 && <button type="button" onClick={() => move(index - 1)} aria-label="上一幅"><ArrowLeft size={22} aria-hidden="true" /></button>}<button type="button" className="storybook-next" onClick={() => move(index + 1)}><span>{index === 3 ? "准备好啦" : "下一幅"}</span><ArrowRight size={30} strokeWidth={1.5} aria-hidden="true" /></button></div>}
+          : <div className="storybook-turns">{index > 0 && <Button type="button" size="icon" variant="quiet" onClick={() => move(index - 1)} aria-label="上一幅"><ArrowLeft aria-hidden="true" /></Button>}<Button type="button" size="compact" variant="quiet" onClick={() => move(index + 1)}><span>{index === 3 ? "准备好啦" : "下一幅"}</span><ArrowRight aria-hidden="true" /></Button></div>}
       </div>
       {!finished && <div className="storybook-audio-progress" role="progressbar" aria-label="语音播放进度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}><span style={{ width: `${progress * 100}%` }} /></div>}
       {phase === "error" ? <p role="status" className="picture-guide-notice">声音暂时没连上，点“重试播放”再听一次。</p> : phase === "loading" ? <p role="status" className="picture-guide-notice">声音加载中…</p> : null}
-      {index === 2 && <button type="button" className="storybook-tried" aria-pressed={tried} onClick={() => setTried(value => !value)}><Check size={22} aria-hidden="true" />{tried ? "我试过啦" : "我来试一试"}</button>}
+      {index === 2 && <Button type="button" variant="secondary" className="storybook-tried" aria-pressed={tried} onClick={() => setTried(value => !value)}><Check aria-hidden="true" />{tried ? "我试过啦" : "我来试一试"}</Button>}
       <p hidden={!showTranscript} id={transcriptId} className="storybook-transcript">{current.narration}</p>
     </section>}
   </SchoolbagShell>;

@@ -10,10 +10,9 @@ body:has(.schoolbag-shell) { background: #f6f8fa; }
 .schoolbag-brand small { font-size: 13px; font-weight: 500; color: var(--mira-muted); letter-spacing: .08em; }
 .schoolbag-home-link { display: flex; gap: 9px; align-items: center; min-height: 48px; padding: 0 19px; border-radius: 12px; font-size: 16px; font-weight: 700; }
 .schoolbag-home-link[aria-current] { background: #e7edf1; }
-.schoolbag-home-link:hover, .schoolbag-rest:hover { background: #e4ebf0; }
+.schoolbag-home-link:hover { background: #e4ebf0; }
 .schoolbag-account { display: flex; justify-content: end; align-items: center; gap: 24px; }
 .schoolbag-grade { font-size: 14px; font-weight: 600; color: var(--mira-muted); }
-.schoolbag-rest { display: flex; align-items: center; gap: 8px; padding: 0 12px; min-width: 48px; height: 48px; border: 1px solid var(--mira-border); border-radius: 12px; font-size: 14px; }
 .schoolbag-lock-error { max-width: 1200px; margin: 12px auto; color: var(--mira-danger); }
 .schoolbag-main { max-width: 1200px; margin: 0 auto; padding: 32px 44px 36px; }
 .schoolbag-home .schoolbag-main { padding-top: 54px; }
@@ -111,7 +110,6 @@ body:has(.schoolbag-shell) { background: #f6f8fa; }
   .schoolbag-header { height: 78px; padding: 0 20px; gap: 12px; }
   .schoolbag-brand strong { font-size: 19px; }
   .schoolbag-brand small, .schoolbag-grade, .schoolbag-rest span { display: none; }
-  .schoolbag-rest { justify-content: center; padding: 0; border-color: transparent; }
   .schoolbag-brand > span { width: 40px; height: 40px; border-radius: 11px; }
   .schoolbag-main { padding: 24px 20px; }
   .schoolbag-home .schoolbag-main { padding-top: 24px; }

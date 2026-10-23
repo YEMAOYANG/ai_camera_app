@@ -14,6 +14,14 @@ const runtime = join(scripts, 'native-runtime.sh');
 // Also used by the existing native-runtime environment boundary harness.
 export function writeFixture(root, mutation = '') {
   const packageDir = join(root, 'packages/@openmaic/generation');
+  const dslDir = join(root, 'packages/@openmaic/dsl');
+  mkdirSync(join(dslDir, 'scripts'), { recursive: true });
+  writeFileSync(join(dslDir, 'tsconfig.json'), '{}');
+  writeFileSync(join(dslDir, 'scripts/gen-schema.mjs'), `
+import { existsSync, writeFileSync } from 'node:fs';
+if (!existsSync('compiled.test-only')) throw new Error('DSL must compile before schema generation');
+writeFileSync('schema.test-only', 'generated');
+`);
   mkdirSync(join(packageDir, 'dist'), { recursive: true });
   mkdirSync(join(root, 'node_modules/@openmaic'), { recursive: true });
   mkdirSync(join(root, 'node_modules/typescript/bin'), { recursive: true });
@@ -22,6 +30,7 @@ export function writeFixture(root, mutation = '') {
   writeFileSync(join(packageDir, 'tsconfig.json'), '{}');
   writeFileSync(join(root, 'node_modules/typescript/bin/tsc'), `
 const fs = require('node:fs');
+if (process.cwd().endsWith('/generation') && !fs.existsSync('../dsl/schema.test-only')) throw new Error('DSL schema must precede generation compilation');
 if(process.env.APP_AI_API_KEY || process.env.DEEPSEEK_API_KEY || process.env.MIRA_INTERNAL_API_TOKEN || process.env.NEXT_PUBLIC_UNRELATED) throw new Error('dirty compiler environment');
 if(JSON.stringify(process.argv.slice(2)) !== JSON.stringify(['-p','tsconfig.json','--incremental','false'])) throw new Error('compiler arguments');
 fs.writeFileSync('compiled.test-only', 'compiled');
@@ -88,6 +97,8 @@ if (process.argv[2] === '--write-fixture') {
         env: { ...process.env, APP_AI_API_KEY: 'test-no-log', DEEPSEEK_API_KEY: 'test-no-log', MIRA_INTERNAL_API_TOKEN: 'test-no-log', NEXT_PUBLIC_UNRELATED: 'test-no-log' },
       });
       assert.equal(result.status, 0, result.stderr);
+      assert.equal(readFileSync(join(root, 'packages/@openmaic/dsl/compiled.test-only'), 'utf8'), 'compiled');
+      assert.equal(readFileSync(join(root, 'packages/@openmaic/dsl/schema.test-only'), 'utf8'), 'generated');
       assert.equal(readFileSync(join(root, 'packages/@openmaic/generation/compiled.test-only'), 'utf8'), 'compiled');
       assert.equal(JSON.parse(result.stdout).status, 'passed');
       assert.ok(!result.stdout.includes('test-no-log'));

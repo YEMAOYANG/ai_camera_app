@@ -1,0 +1,1681 @@
+diff --git a/PRODUCT.md b/PRODUCT.md
+--- a/PRODUCT.md
++++ b/PRODUCT.md
+@@ -23,7 +23,7 @@
+ ## Design Principles
+ 
+ - Keep the learner's next action clear.
+-- Keep classroom controls visually consistent across current and historical discussion. Desktop discussion choices and history actions use 36 px; playback controls use 30 px with 16 px icons in a 40 px toolbar. Coarse-pointer controls use 48 px. Voice capture remains a larger dedicated target.
++- Keep classroom controls visually consistent across current and historical discussion. Desktop discussion choices and history actions use 36 px; playback controls use 30 px with 16 px icons in a 40 px toolbar. Coarse-pointer controls use 48 px. Ordinary classroom buttons use the single `lib/ui/classroom-controls.ts` presentation contract in both native UI and isolated iframe tools; components and CSS Modules own layout only. Voice capture remains a larger dedicated target.
+ - Scope the student theme to classroom chrome; preserve authored lesson and whiteboard content.
+ - Preserve meaningful status labels and the existing interaction flow.
+ 
+diff --git a/app/layout.tsx b/app/layout.tsx
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -1,5 +1,6 @@
+ import type { Metadata } from 'next';
+ import { headers } from 'next/headers';
++import { classroomControlCss } from '@/lib/ui/classroom-controls';
+ import { isAgentRuntimeConfigured, isProWorkbenchEnabled } from '@/lib/config/feature-flags';
+ import {
+   MIRA_DOCUMENT_SCOPE_HEADER,
+@@ -58,6 +59,12 @@
+   if (privatePreview) {
+     return (
+       <html lang="zh-CN" suppressHydrationWarning>
++        <head>
++          <style
++            data-mira-classroom-controls
++            dangerouslySetInnerHTML={{ __html: classroomControlCss() }}
++          />
++        </head>
+         <body
+           className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
+           suppressHydrationWarning
+@@ -78,6 +85,12 @@
+   });
+   return (
+     <html lang="en" data-mira-document-storage={documentStorage} suppressHydrationWarning>
++      <head>
++        <style
++          data-mira-classroom-controls
++          dangerouslySetInnerHTML={{ __html: classroomControlCss() }}
++        />
++      </head>
+       <body
+         className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
+         suppressHydrationWarning
+diff --git a/app/mira-student-orbit.css b/app/mira-student-orbit.css
+--- a/app/mira-student-orbit.css
++++ b/app/mira-student-orbit.css
+@@ -15,9 +15,9 @@
+   --mira-orbit-muted: #6d726b;
+   --mira-orbit-cyan: #786747;
+   --mira-orbit-lime: #f3c65b;
+-  --mira-orbit-control-height: 48px;
+-  --mira-orbit-control-radius: 9px;
+-  --mira-orbit-compact-control-height: 36px;
++  --mira-orbit-control-height: var(--mira-classroom-secondary-size, 48px);
++  --mira-orbit-control-radius: var(--mira-classroom-control-radius, 8px);
++  --mira-orbit-compact-control-height: var(--mira-classroom-secondary-size, 48px);
+   --mira-orbit-control-font-size: 15px;
+   --mira-orbit-compact-font-size: 14px;
+   --mira-orbit-control-icon-size: 18px;
+@@ -470,7 +470,6 @@
+   overflow: visible;
+ }
+ 
+-html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] button,
+ html[data-mira-student-theme='storybook']
+   [data-mira-chrome='scene-sidebar']
+   > div
+@@ -487,9 +486,6 @@
+ }
+ 
+ html[data-mira-student-theme='storybook']
+-  [data-mira-chrome='playback-controls']
+-  button:not(:disabled):hover,
+-html[data-mira-student-theme='storybook']
+   [data-mira-chrome='chat']
+   [role='tab'][data-state='active'] {
+   color: var(--mira-orbit-cyan);
+@@ -504,26 +500,6 @@
+ html[data-mira-student-theme='storybook'] [data-mira-chrome='chat'] [role='tab']:focus-visible {
+   border-color: transparent;
+   box-shadow: none;
+-}
+-
+-html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] button:disabled {
+-  opacity: 0.4;
+-}
+-
+-html[data-mira-student-theme='storybook']
+-  [data-mira-chrome='playback-controls']
+-  button[aria-label='Play'],
+-html[data-mira-student-theme='storybook']
+-  [data-mira-chrome='playback-controls']
+-  button[aria-label='Pause'] {
+-  color: var(--mira-orbit-text);
+-  background: var(--mira-orbit-lime);
+-}
+-
+-html[data-mira-student-theme='storybook']
+-  [data-mira-chrome='playback-controls']
+-  button[aria-pressed='true'] {
+-  color: var(--mira-orbit-cyan);
+ }
+ 
+ html[data-mira-student-theme='storybook']
+@@ -1261,7 +1237,7 @@
+ 
+ @media (pointer: coarse) {
+   html[data-mira-student-theme='storybook'] {
+-    --mira-orbit-control-height: 48px;
++    --mira-orbit-control-height: var(--mira-classroom-secondary-size, 48px);
+   }
+ }
+ 
+@@ -1638,15 +1614,6 @@
+   }
+   [data-mira-presentation-chrome]
+     [data-mira-chrome="playback-controls"]
+-    button {
+-    box-sizing: border-box;
+-    flex-shrink: 0;
+-    min-width: max(48px, var(--mira-orbit-control-height, 48px));
+-    min-height: max(48px, var(--mira-orbit-control-height, 48px));
+-    height: auto;
+-  }
+-  [data-mira-presentation-chrome]
+-    [data-mira-chrome="playback-controls"]
+     [data-mira-indicator="toolbar-divider"] {
+     display: none;
+   }
+@@ -1710,7 +1677,6 @@
+   }
+   [data-mira-presentation-chrome] [data-mira-presentation-toolbar] > div { max-width: 100%; padding: 4px; }
+   [data-mira-presentation-chrome] [data-mira-chrome="playback-controls"] { height: auto; padding: 0; gap: 0; }
+-  [data-mira-presentation-chrome] [data-mira-chrome="playback-controls"] button,
+   [data-mira-presentation-chrome] [data-mira-discussion-rail="dock"] > button {
+     box-sizing: border-box; min-width: 48px; min-height: 48px; height: 48px; flex-shrink: 0;
+   }
+@@ -1741,9 +1707,6 @@
+   }
+   html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-chrome='playback-controls'] {
+     display: flex !important; flex-wrap: nowrap; height: 48px; min-height: 48px; padding: 0 4px; gap: 0;
+-  }
+-  html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-chrome='playback-controls'] button {
+-    box-sizing: border-box; min-width: 48px; min-height: 48px; height: 48px; flex-shrink: 0;
+   }
+   html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-indicator='toolbar-divider'],
+   html [data-mira-classroom-root] [data-mira-roundtable-layout='standard'] [data-mira-rail-decoration],
+@@ -1823,9 +1786,6 @@
+   html [data-mira-classroom-root] :is([data-mira-roundtable-layout='standard'], [data-mira-presentation-chrome]) [data-mira-chrome='playback-controls'] > div:last-child {
+     grid-column: 2; grid-row: 1; padding: 0; gap: 0;
+   }
+-  html [data-mira-classroom-root] :is([data-mira-roundtable-layout='standard'], [data-mira-presentation-chrome]) [data-mira-chrome='playback-controls'] button {
+-    box-sizing: border-box; min-width: 48px; min-height: 48px; height: 48px; flex-shrink: 0;
+-  }
+   html [data-mira-classroom-root] :is([data-mira-roundtable-layout='standard'], [data-mira-presentation-chrome]) [data-mira-chrome='playback-controls'] [data-mira-whiteboard-toggle] {
+     position: absolute; top: 0; right: 96px;
+   }
+@@ -1869,9 +1829,6 @@
+  * complete action names remain accessible while compact controls use icons. */
+ @media (max-width: 640px), (min-width: 641px) and (max-height: 500px) {
+   [data-mira-classroom-root] [data-mira-chrome='playback-controls'] [data-mira-live-controls] { gap: 0; }
+-  [data-mira-classroom-root] [data-mira-chrome='playback-controls'] [data-mira-live-control] {
+-    width: 48px; height: 48px; min-width: 48px; min-height: 48px; padding: 0; gap: 0; justify-content: center;
+-  }
+   [data-mira-classroom-root] [data-mira-live-control-label] { display: none; }
+   [data-mira-classroom-root] [data-mira-live-control-icon] { display: block; }
+ }
+@@ -1915,9 +1872,8 @@
+  * Narrow / touch layouts retain their existing 48px targets and wrapping. */
+ @media (min-width: 641px) and (min-height: 501px) and (hover: hover) and (pointer: fine) {
+   html[data-mira-student-theme='storybook'] {
+-    --mira-orbit-control-height: 36px;
+-    --mira-orbit-control-radius: 7px;
+-    --mira-orbit-toolbar-control-height: 30px;
++    --mira-orbit-control-height: var(--mira-classroom-secondary-size, 48px);
++    --mira-orbit-control-radius: var(--mira-classroom-control-radius, 8px);
+   }
+ 
+   html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'],
+@@ -1927,24 +1883,6 @@
+     min-height: 40px;
+     padding-block: 4px;
+     gap: 4px;
+-  }
+-
+-  html[data-mira-student-theme='storybook'] [data-mira-chrome='playback-controls'] button {
+-    min-width: var(--mira-orbit-toolbar-control-height);
+-    min-height: var(--mira-orbit-toolbar-control-height);
+-    height: var(--mira-orbit-toolbar-control-height);
+-    border-radius: 6px;
+-    font-weight: 500;
+-    font-size: 12px;
+-    line-height: 16px;
+-  }
+-
+-  html[data-mira-student-theme='storybook']
+-    [data-mira-chrome='playback-controls']
+-    button > svg {
+-    width: 16px;
+-    height: 16px;
+-    stroke-width: 1.6;
+   }
+ 
+   html[data-mira-student-theme='storybook']
+diff --git a/components/audio/question-narration.tsx b/components/audio/question-narration.tsx
+--- a/components/audio/question-narration.tsx
++++ b/components/audio/question-narration.tsx
+@@ -125,9 +125,9 @@
+ 
+   return <div className={`mb-3${controlSlot ? ` ${referencePictureStyles.controls}` : ''}`}
+     data-question-narration-controls={controlSlot ? '' : undefined}>
+-    <button type="button" onClick={toggle} aria-label={label ? `${playing ? '暂停' : '听'}${label}` : `${playing ? '暂停' : '听'}第 ${number} 题`}
+-      className={`${referencePictureStyles.activityControl} inline-flex items-center bg-amber-100 text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700`}>
+-      {playing ? <Pause size={20} aria-hidden /> : <Volume2 size={20} aria-hidden />}
++    <button type="button" data-mira-control="secondary" data-mira-control-icon={controlSlot ? true : undefined} onClick={toggle} aria-label={label ? `${playing ? '暂停' : '听'}${label}` : `${playing ? '暂停' : '听'}第 ${number} 题`}
++      className="inline-flex">
++      {playing ? <Pause  aria-hidden /> : <Volume2  aria-hidden />}
+       {controlSlot ? <span className="sr-only">{playing ? '暂停' : label ? `听${label}` : '听题目'}</span> : playing ? '暂停' : label ? `听${label}` : '听题目'}
+     </button>
+     {controlSlot}
+diff --git a/components/canvas/canvas-toolbar.tsx b/components/canvas/canvas-toolbar.tsx
+--- a/components/canvas/canvas-toolbar.tsx
++++ b/components/canvas/canvas-toolbar.tsx
+@@ -21,6 +21,7 @@
+ import { useStageStore } from '@/lib/store';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
++import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ import { useSoftCloseCountdown } from '@/components/chat/use-soft-close-countdown';
+ 
+ export interface CanvasToolbarProps {
+@@ -57,7 +58,10 @@
+   readonly onCycleSpeed?: () => void;
+ }
+ 
+-/* Compact control button */
++/* Student appearance is owned by classroom-controls; operator styles stay local. */
++const ctrlLayout = 'relative flex items-center justify-center shrink-0';
++
++/* Official operator control button */
+ const ctrlBtn = cn(
+   'relative w-7 h-7 rounded-md flex items-center justify-center',
+   'transition-all duration-150 outline-none cursor-pointer',
+@@ -79,12 +83,14 @@
+   muted,
+   volume,
+   disabled,
++  studentMode,
+ }: {
+   muted: boolean;
+   volume: number;
+   disabled: boolean;
++  studentMode: boolean;
+ }) {
+-  const cls = 'w-3.5 h-3.5';
++  const cls = studentMode ? undefined : 'w-3.5 h-3.5';
+   if (disabled || muted || volume === 0) return <VolumeX className={cls} />;
+   if (volume < 0.5) return <Volume1 className={cls} />;
+   return <Volume2 className={cls} />;
+@@ -123,6 +129,7 @@
+   onCycleSpeed,
+ }: CanvasToolbarProps) {
+   const { t } = useI18n();
++  const studentMode = useMiraStudentRuntime();
+   const remainingSoftCloseSeconds = useSoftCloseCountdown(softCloseDeadline);
+   const canGoPrev = currentSceneIndex > 0;
+   const canGoNext = currentSceneIndex < scenesCount - 1;
+@@ -159,17 +166,24 @@
+       <div className="flex items-center gap-1 shrink-0 pl-1">
+         {onToggleSidebar && (
+           <button
++            data-mira-control={studentMode ? 'toolbar' : undefined}
++            data-mira-control-icon={studentMode ? true : undefined}
++            data-mira-control-active={studentMode ? !sidebarCollapsed : undefined}
+             onClick={onToggleSidebar}
+-            className={cn(
+-              ctrlBtn,
+-              'w-6 h-6',
+-              sidebarCollapsed
+-                ? 'text-gray-400 dark:text-gray-500'
+-                : 'text-gray-600 dark:text-gray-300',
+-            )}
++            className={
++              studentMode
++                ? ctrlLayout
++                : cn(
++                    ctrlBtn,
++                    'w-6 h-6',
++                    sidebarCollapsed
++                      ? 'text-gray-400 dark:text-gray-500'
++                      : 'text-gray-600 dark:text-gray-300',
++                  )
++            }
+             aria-label="Toggle sidebar"
+           >
+-            <LayoutList className="w-3.5 h-3.5" />
++            <LayoutList className={studentMode ? undefined : "w-3.5 h-3.5"} />
+           </button>
+         )}
+         <span className="text-[11px] text-gray-400 dark:text-gray-500 tabular-nums select-none font-medium">
+@@ -201,20 +215,27 @@
+               onMouseLeave={handleVolumeLeave}
+             >
+               <button
++                data-mira-control={studentMode ? 'toolbar' : undefined}
++                data-mira-control-icon={studentMode ? true : undefined}
+                 onClick={onToggleMute}
+                 disabled={!audioPlaybackAvailable}
+-                className={cn(
+-                  ctrlBtn,
+-                  'w-6 h-6',
+-                  !audioPlaybackAvailable
+-                    ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+-                    : ttsMuted
+-                      ? 'text-red-500 dark:text-red-400'
+-                      : 'text-gray-500 dark:text-gray-400',
+-                )}
++                className={
++                  studentMode
++                    ? ctrlLayout
++                    : cn(
++                        ctrlBtn,
++                        'w-6 h-6',
++                        !audioPlaybackAvailable
++                          ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
++                          : ttsMuted
++                            ? 'text-red-500 dark:text-red-400'
++                            : 'text-gray-500 dark:text-gray-400',
++                      )
++                }
+                 aria-label={ttsMuted ? 'Unmute' : 'Mute'}
+               >
+                 <VolumeIcon
++                  studentMode={studentMode}
+                   muted={!!ttsMuted}
+                   volume={ttsVolume}
+                   disabled={!audioPlaybackAvailable}
+@@ -270,16 +291,22 @@
+               <Tooltip>
+                 <TooltipTrigger asChild>
+                   <button
++                    data-mira-control={studentMode ? 'toolbar' : undefined}
++                    data-mira-control-active={studentMode ? playbackSpeed !== 1 : undefined}
+                     onClick={onCycleSpeed}
+-                    className={cn(
+-                      'w-8 h-5 rounded flex items-center justify-center',
+-                      'transition-all duration-150 outline-none cursor-pointer',
+-                      'text-[11px] font-semibold tabular-nums leading-none',
+-                      'active:scale-90',
+-                      playbackSpeed !== 1
+-                        ? 'text-violet-600 dark:text-violet-400 bg-violet-500/10 dark:bg-violet-400/10'
+-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200',
+-                    )}
++                    className={
++                      studentMode
++                        ? ctrlLayout
++                        : cn(
++                            'w-8 h-5 rounded flex items-center justify-center',
++                            'transition-all duration-150 outline-none cursor-pointer',
++                            'text-[11px] font-semibold tabular-nums leading-none',
++                            'active:scale-90',
++                            playbackSpeed !== 1
++                              ? 'text-violet-600 dark:text-violet-400 bg-violet-500/10 dark:bg-violet-400/10'
++                              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200',
++                          )
++                    }
+                     aria-label="Playback speed"
+                   >
+                     {playbackSpeed === 1.5 ? '1.5x' : `${playbackSpeed}x`}
+@@ -297,15 +324,21 @@
+           {/* Prev scene */}
+           {scenesCount > 1 && (
+             <button
++              data-mira-control={studentMode ? 'toolbar' : undefined}
++              data-mira-control-icon={studentMode ? true : undefined}
+               onClick={onPrevSlide}
+               disabled={!canGoPrev}
+-              className={cn(
+-                ctrlBtn,
+-                'w-6 h-6 text-gray-500 dark:text-gray-400 disabled:opacity-20 disabled:pointer-events-none',
+-              )}
++              className={
++                studentMode
++                  ? ctrlLayout
++                  : cn(
++                      ctrlBtn,
++                      'w-6 h-6 text-gray-500 dark:text-gray-400 disabled:opacity-20 disabled:pointer-events-none',
++                    )
++              }
+               aria-label="Previous scene"
+             >
+-              <ChevronLeft className="w-3.5 h-3.5" />
++              <ChevronLeft className={studentMode ? undefined : "w-3.5 h-3.5"} />
+             </button>
+           )}
+ 
+@@ -313,38 +346,53 @@
+           {showStopDiscussion && onStopDiscussion ? (
+             <div data-mira-live-controls className="flex items-center gap-1.5">
+               <button
++                data-mira-control={studentMode ? 'toolbar' : undefined}
++                data-mira-control-tone={studentMode ? 'danger' : undefined}
+                 data-mira-live-control="stop"
+                 aria-label={t('roundtable.stopDiscussion')}
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   onStopDiscussion();
+                 }}
+-                className={cn(
+-                  'flex items-center gap-1.5 h-6 px-2.5 rounded-md',
+-                  'bg-red-500/10 dark:bg-red-400/10 text-red-600 dark:text-red-400',
+-                  'text-[11px] font-semibold whitespace-nowrap',
+-                  'hover:bg-red-500/20 dark:hover:bg-red-400/20 active:scale-95 transition-all cursor-pointer',
+-                )}
++                className={
++                  studentMode
++                    ? ctrlLayout
++                    : cn(
++                        'flex items-center gap-1.5 h-6 px-2.5 rounded-md',
++                        'bg-red-500/10 dark:bg-red-400/10 text-red-600 dark:text-red-400',
++                        'text-[11px] font-semibold whitespace-nowrap',
++                        'hover:bg-red-500/20 dark:hover:bg-red-400/20 active:scale-95 transition-all cursor-pointer',
++                      )
++                }
+                 title={t('roundtable.stopDiscussion')}
+               >
+-                <Square data-mira-live-control-icon aria-hidden="true" className="hidden w-5 h-5 fill-current" />
++                <Square
++                  data-mira-live-control-icon
++                  aria-hidden="true"
++                  className={studentMode ? "hidden fill-current" : "hidden w-5 h-5 fill-current"}
++                />
+                 <span data-mira-live-control-label className="flex items-center gap-1.5">
+-                  <span className="inline-flex rounded-full h-1.5 w-1.5 bg-red-500" />
++                  <span data-mira-indicator="discussion-active" className={studentMode ? "inline-flex" : "inline-flex rounded-full h-1.5 w-1.5 bg-red-500"} />
+                   {t('roundtable.stopDiscussion')}
+                 </span>
+               </button>
+               {isSoftClosing && onContinueDiscussion && (
+                 <button
++                  data-mira-control={studentMode ? 'toolbar' : undefined}
+                   data-mira-live-control="continue"
+                   aria-label={t('roundtable.softClosing')}
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     onContinueDiscussion();
+                   }}
+-                  className="flex items-center gap-1.5 h-6 px-2.5 rounded-md border border-purple-200 dark:border-purple-700 bg-white/70 dark:bg-gray-800/70 text-purple-600 dark:text-purple-300 text-[11px] font-semibold whitespace-nowrap hover:bg-purple-50 dark:hover:bg-purple-900/20 active:scale-95 transition-all cursor-pointer"
++                  className={
++                    studentMode
++                      ? ctrlLayout
++                      : 'flex items-center gap-1.5 h-6 px-2.5 rounded-md border border-purple-200 dark:border-purple-700 bg-white/70 dark:bg-gray-800/70 text-purple-600 dark:text-purple-300 text-[11px] font-semibold whitespace-nowrap hover:bg-purple-50 dark:hover:bg-purple-900/20 active:scale-95 transition-all cursor-pointer'
++                  }
+                   title={t('roundtable.softClosing')}
+                 >
+-                  <Play data-mira-live-control-icon aria-hidden="true" className="hidden w-5 h-5" />
++                  <Play data-mira-live-control-icon aria-hidden="true" className={studentMode ? "hidden" : "hidden w-5 h-5"} />
+                   <span data-mira-live-control-label className="flex items-center gap-1.5">
+                     {t('roundtable.softClosing')}
+                     {remainingSoftCloseSeconds !== undefined && (
+@@ -358,20 +406,27 @@
+             </div>
+           ) : showPlayPause ? (
+             <button
++              data-mira-control={studentMode ? 'toolbar' : undefined}
++              data-mira-control-icon={studentMode ? true : undefined}
++              data-mira-control-active={studentMode ? engineState === 'playing' : undefined}
+               onClick={onPlayPause}
+-              className={cn(
+-                ctrlBtn,
+-                'w-7 h-6',
+-                engineState === 'playing'
+-                  ? 'text-violet-600 dark:text-violet-400'
+-                  : 'text-gray-500 dark:text-gray-400',
+-              )}
++              className={
++                studentMode
++                  ? ctrlLayout
++                  : cn(
++                      ctrlBtn,
++                      'w-7 h-6',
++                      engineState === 'playing'
++                        ? 'text-violet-600 dark:text-violet-400'
++                        : 'text-gray-500 dark:text-gray-400',
++                    )
++              }
+               aria-label={engineState === 'playing' ? 'Pause' : 'Play'}
+             >
+               {engineState === 'playing' ? (
+-                <Pause className="w-3.5 h-3.5" />
++                <Pause className={studentMode ? undefined : "w-3.5 h-3.5"} />
+               ) : (
+-                <Play className="w-3.5 h-3.5 ml-px" />
++                <Play className={studentMode ? "ml-px" : "w-3.5 h-3.5 ml-px"} />
+               )}
+             </button>
+           ) : null}
+@@ -379,15 +434,21 @@
+           {/* Next scene */}
+           {scenesCount > 1 && (
+             <button
++              data-mira-control={studentMode ? 'toolbar' : undefined}
++              data-mira-control-icon={studentMode ? true : undefined}
+               onClick={onNextSlide}
+               disabled={!canGoNext}
+-              className={cn(
+-                ctrlBtn,
+-                'w-6 h-6 text-gray-500 dark:text-gray-400 disabled:opacity-20 disabled:pointer-events-none',
+-              )}
++              className={
++                studentMode
++                  ? ctrlLayout
++                  : cn(
++                      ctrlBtn,
++                      'w-6 h-6 text-gray-500 dark:text-gray-400 disabled:opacity-20 disabled:pointer-events-none',
++                    )
++              }
+               aria-label="Next scene"
+             >
+-              <ChevronRight className="w-3.5 h-3.5" />
++              <ChevronRight className={studentMode ? undefined : "w-3.5 h-3.5"} />
+             </button>
+           )}
+ 
+@@ -399,18 +460,24 @@
+               <Tooltip>
+                 <TooltipTrigger asChild>
+                   <button
++                    data-mira-control={studentMode ? 'toolbar' : undefined}
++                    data-mira-control-icon={studentMode ? true : undefined}
+                     onClick={onToggleAutoPlay}
+-                    className={cn(
+-                      ctrlBtn,
+-                      'w-8 h-6',
+-                      autoPlayLecture
+-                        ? 'text-violet-600 dark:text-violet-400'
+-                        : 'text-gray-500 dark:text-gray-400',
+-                    )}
++                    className={
++                      studentMode
++                        ? ctrlLayout
++                        : cn(
++                            ctrlBtn,
++                            'w-8 h-6',
++                            autoPlayLecture
++                              ? 'text-violet-600 dark:text-violet-400'
++                              : 'text-gray-500 dark:text-gray-400',
++                          )
++                    }
+                     aria-label="Auto-play"
+                     aria-pressed={autoPlayLecture === true}
+                   >
+-                    <Repeat className="w-3.5 h-3.5" />
++                    <Repeat className={studentMode ? undefined : "w-3.5 h-3.5"} />
+                   </button>
+                 </TooltipTrigger>
+                 <TooltipContent side="top" className="text-xs">
+@@ -422,25 +489,32 @@
+ 
+           {/* Whiteboard */}
+           <button
++            data-mira-control={studentMode ? 'toolbar' : undefined}
++            data-mira-control-icon={studentMode ? true : undefined}
++            data-mira-control-active={studentMode ? whiteboardOpen : undefined}
+             data-mira-whiteboard-toggle
+             onClick={(e) => {
+               e.stopPropagation();
+               onWhiteboardClose();
+             }}
+-            className={cn(
+-              ctrlBtn,
+-              'w-6 h-6',
+-              whiteboardOpen
+-                ? 'text-violet-600 dark:text-violet-400'
+-                : 'text-gray-500 dark:text-gray-400',
+-            )}
++            className={
++              studentMode
++                ? ctrlLayout
++                : cn(
++                    ctrlBtn,
++                    'w-6 h-6',
++                    whiteboardOpen
++                      ? 'text-violet-600 dark:text-violet-400'
++                      : 'text-gray-500 dark:text-gray-400',
++                  )
++            }
+             title={whiteboardOpen ? t('whiteboard.minimize') : t('whiteboard.open')}
+           >
+-            <PencilLine className="w-3.5 h-3.5" />
++            <PencilLine className={studentMode ? undefined : "w-3.5 h-3.5"} />
+             {!whiteboardOpen && whiteboardElementCount > 0 && (
+               <span
+                 data-mira-indicator="whiteboard-content"
+-                className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-violet-500 dark:bg-violet-400 rounded-full"
++                className={studentMode ? "absolute top-0.5 right-0.5" : "absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-violet-500 dark:bg-violet-400 rounded-full"}
+               />
+             )}
+           </button>
+@@ -452,37 +526,51 @@
+         <CtrlDivider />
+         {onTogglePresentation && (
+           <button
++            data-mira-control={studentMode ? 'toolbar' : undefined}
++            data-mira-control-icon={studentMode ? true : undefined}
++            data-mira-control-active={studentMode ? isPresenting : undefined}
+             onClick={onTogglePresentation}
+-            className={cn(
+-              ctrlBtn,
+-              'w-6 h-6',
+-              isPresenting
+-                ? 'text-violet-600 dark:text-violet-400'
+-                : 'text-gray-500 dark:text-gray-400',
+-            )}
++            className={
++              studentMode
++                ? ctrlLayout
++                : cn(
++                    ctrlBtn,
++                    'w-6 h-6',
++                    isPresenting
++                      ? 'text-violet-600 dark:text-violet-400'
++                      : 'text-gray-500 dark:text-gray-400',
++                  )
++            }
+             aria-label={presentationLabel}
+             title={presentationLabel}
+           >
+             {isPresenting ? (
+-              <Minimize2 className="w-3.5 h-3.5" />
++              <Minimize2 className={studentMode ? undefined : "w-3.5 h-3.5"} />
+             ) : (
+-              <Maximize2 className="w-3.5 h-3.5" />
++              <Maximize2 className={studentMode ? undefined : "w-3.5 h-3.5"} />
+             )}
+           </button>
+         )}
+         {onToggleChat && (
+           <button
++            data-mira-control={studentMode ? 'toolbar' : undefined}
++            data-mira-control-icon={studentMode ? true : undefined}
++            data-mira-control-active={studentMode ? !chatCollapsed : undefined}
+             onClick={onToggleChat}
+-            className={cn(
+-              ctrlBtn,
+-              'w-6 h-6',
+-              chatCollapsed
+-                ? 'text-gray-400 dark:text-gray-500'
+-                : 'text-gray-600 dark:text-gray-300',
+-            )}
++            className={
++              studentMode
++                ? ctrlLayout
++                : cn(
++                    ctrlBtn,
++                    'w-6 h-6',
++                    chatCollapsed
++                      ? 'text-gray-400 dark:text-gray-500'
++                      : 'text-gray-600 dark:text-gray-300',
++                  )
++            }
+             aria-label="Toggle chat"
+           >
+-            <MessageSquare className="w-3.5 h-3.5" />
++            <MessageSquare className={studentMode ? undefined : "w-3.5 h-3.5"} />
+           </button>
+         )}
+       </div>
+diff --git a/components/scene-renderers/fixed-textbook-picture-layout.module.css b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+--- a/components/scene-renderers/fixed-textbook-picture-layout.module.css
++++ b/components/scene-renderers/fixed-textbook-picture-layout.module.css
+@@ -93,18 +93,6 @@
+     margin: 0;
+   }
+ 
+-  .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) > button {
+-    min-width: 48px;
+-    min-height: 48px;
+-    height: 48px;
+-    padding: 0 16px;
+-  }
+-
+-  .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) > button > svg {
+-    width: 18px;
+-    height: 18px;
+-  }
+-
+   .question .options {
+     display: grid;
+     grid-template-columns: repeat(3, minmax(0, 1fr));
+@@ -167,16 +155,6 @@
+     margin: 0;
+     padding: 0;
+   }
+-
+-  .footer > button {
+-    min-width: 48px;
+-    min-height: 48px;
+-    height: 48px;
+-    padding: 0 16px;
+-    font-size: 16px;
+-  }
+-
+-  .footer > button > svg { width: 18px; height: 18px; }
+ }
+ 
+ @container fixed-picture-quiz (max-width: 560px) or (max-height: 400px) {
+@@ -203,7 +181,6 @@
+   .question { display: contents; }
+   .scenePicture { grid-column: 1; grid-row: 1; height: clamp(96px, calc(100cqh - 170px), 156px); min-height: 96px; align-self: center; }
+   .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) { grid-column: 2; grid-row: 1; align-self: center; }
+-  .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) > button { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
+   .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .question .options { grid-column: 1 / 3; grid-row: 2; }
+   .task:has([data-quiz-picture-option]) { grid-template-rows: auto minmax(108px, 1fr); }
+@@ -219,7 +196,6 @@
+   .question > p { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+   .scenePicture { grid-column: 1; grid-row: 1; height: 100%; min-height: 96px; }
+   .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) { grid-column: 2; grid-row: 1; align-self: center; }
+-  .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) > button { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
+   .question > div:not([role="radiogroup"]):not([data-quiz-selected-feedback]) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .question .options { grid-column: 3; grid-row: 1; height: 100%; min-height: 100px; }
+   .task:not(:has(.scenePicture)) { grid-template-columns: auto minmax(0, 1fr); }
+@@ -284,14 +260,4 @@
+     min-width: 0;
+     margin: 0;
+   }
+-  .question > div[data-quiz-selected-feedback] > div:not([data-quiz-feedback-picture]) > button {
+-    width: 100%;
+-    min-width: 48px;
+-    min-height: 48px;
+-    height: 48px;
+-    padding: 0 8px;
+-    justify-content: center;
+-    gap: 4px;
+-    font-size: 14px;
+-  }
+-}
++}
+diff --git a/components/scene-renderers/fixed-textbook-quiz.tsx b/components/scene-renderers/fixed-textbook-quiz.tsx
+--- a/components/scene-renderers/fixed-textbook-quiz.tsx
++++ b/components/scene-renderers/fixed-textbook-quiz.tsx
+@@ -201,18 +201,18 @@
+       {error && <p role="alert" className="mt-5 text-[#9b503b]">{error}</p>}
+       <footer className={`${compactImages ? compactPictureStyles.footer : ''} mt-auto flex shrink-0 items-center justify-between gap-3 pt-3`}>
+         {!loading && q && <button type="button" aria-label="上一题" onClick={() => setQuestionIndex(index => index - 1)} disabled={sending || questionIndex === 0}
+-          className={`${referencePictureStyles.activityControl} ${referencePictureStyles.activityIconControl} inline-flex items-center justify-center border border-[#c7d1c5] disabled:opacity-30`}><ArrowLeft size={18} aria-hidden /></button>}
++          data-mira-control="secondary" data-mira-control-icon className="inline-flex"><ArrowLeft  aria-hidden /></button>}
+         {!loading && q && questionIndex < questions.length - 1 && <button type="button" aria-label="下一题"
+           disabled={sending || (!done && !answers[q.id])} onClick={() => setQuestionIndex(index => index + 1)}
+-          className={`${referencePictureStyles.activityControl} ${referencePictureStyles.activityPrimary} inline-flex items-center bg-[#466a53] text-white disabled:opacity-40`}>下一题<ArrowRight size={18} aria-hidden /></button>}
++          data-mira-control="primary" className="inline-flex">下一题<ArrowRight  aria-hidden /></button>}
+         {!done && !loading && questionIndex === questions.length - 1 && <button type="button" onClick={() => void submit()}
+           disabled={sending || questions.some(q => !answers[q.id])}
+-          className={`${referencePictureStyles.activityControl} ${referencePictureStyles.activityPrimary} inline-flex items-center bg-[#466a53] text-white disabled:opacity-40`}>
+-          {sending ? <><Loader2 className="animate-spin" size={20} aria-hidden />正在保存</> : <>完成练习<ArrowRight size={20} aria-hidden /></>}
++          data-mira-control="primary" className="inline-flex">
++          {sending ? <><Loader2 className="animate-spin"  aria-hidden />正在保存</> : <>完成练习<ArrowRight  aria-hidden /></>}
+         </button>}
+         {done && questionIndex === questions.length - 1 && <p className="text-sm text-[#68766b]">答案已保存，继续往下学吧。</p>}
+         {privatePreview && done && <button type="button" disabled={sending} onClick={() => void resetPreview()}
+-          className={`${referencePictureStyles.activityControl} border border-[#c7d1c5]`}>重新试一次</button>}
++          data-mira-control="secondary" className="inline-flex">重新试一次</button>}
+       </footer>
+     </div>
+   </section>;
+diff --git a/components/scene-renderers/picture-quiz-layout.module.css b/components/scene-renderers/picture-quiz-layout.module.css
+--- a/components/scene-renderers/picture-quiz-layout.module.css
++++ b/components/scene-renderers/picture-quiz-layout.module.css
+@@ -15,7 +15,7 @@
+   .root [data-quiz-question-heading] { margin-bottom: 4px; }
+   .root [data-quiz-question-heading] p { display: none; }
+   .root [data-quiz-picture-card] > div:has(> button) { margin-bottom: 4px; }
+-  .root [data-quiz-picture-card] > div > button[aria-label] { min-height: 48px; }
++  .root [data-quiz-picture-card] > div > button[aria-label]:not([data-mira-control]) { min-height: 48px; }
+   .root [data-quiz-scene-picture] {
+     height: clamp(96px, 24cqh, 168px);
+     margin-bottom: 6px;
+@@ -61,7 +61,7 @@
+   .root [data-quiz-scene-picture] { grid-column: 1; grid-row: 1; height: clamp(96px, calc(100cqh - 210px), 156px); margin: 0; align-self: center; }
+   .root [data-quiz-picture-card] > div:has(> button) { grid-column: 2; grid-row: 1; margin: 0; align-self: center; }
+   /* Reserve room for both the scene and the visible narration retry message. */
+-  .root [data-quiz-picture-card] > div:has(> button) > button {
++  .root [data-quiz-picture-card] > div:has(> button) > button:not([data-mira-control]) {
+     width: 100px; height: 48px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center;
+   }
+   .root [data-quiz-picture-card] > div:has(> button) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+@@ -90,7 +90,7 @@
+   .root [data-quiz-question-heading] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+   .root [data-quiz-scene-picture] { grid-column: 1; grid-row: 1; height: clamp(96px, calc(100cqh - 86px), 160px); margin: 0; }
+   .root [data-quiz-picture-card] > div:has(> button) { grid-column: 2; grid-row: 1; margin: 0; align-self: center; }
+-  .root [data-quiz-picture-card] > div:has(> button) > button { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
++  .root [data-quiz-picture-card] > div:has(> button) > button:not([data-mira-control]) { width: 100px; min-width: 48px; padding: 0 8px; gap: 4px; font-size: 14px; justify-content: center; }
+   .root [data-quiz-picture-card] > div:has(> button) > [role="status"] { margin-top: 4px; font-size: 12px; line-height: 16px; }
+   .root [data-quiz-option-group] { grid-column: 3; grid-row: 1; align-self: center; }
+   .root [data-quiz-option-group] button:not([data-quiz-option-picture]) { height: clamp(96px, calc(100cqh - 86px), 160px); }
+diff --git a/components/scene-renderers/quiz-reference-picture.module.css b/components/scene-renderers/quiz-reference-picture.module.css
+--- a/components/scene-renderers/quiz-reference-picture.module.css
++++ b/components/scene-renderers/quiz-reference-picture.module.css
+@@ -6,103 +6,17 @@
+   min-width: 0;
+ }
+ 
+-.controls.controls[data-question-narration-controls] > button {
+-  flex: 0 0 48px;
+-  width: 48px;
+-  min-width: 48px;
+-  height: 48px;
+-  min-height: 48px;
+-  padding: 0;
+-  justify-content: center;
+-}
+-
+-.controls > button > svg {
+-  width: 18px;
+-  height: 18px;
+-}
+-
+ .controls > [role='status'] {
+   flex-basis: 100%;
+ }
+ 
+ .control {
+   display: inline-flex;
+-  flex: 0 0 48px;
+-  align-items: center;
+-  justify-content: center;
+-  width: 48px;
+-  height: 48px;
+-  min-width: 48px;
+-  min-height: 48px;
+-  padding: 0;
+-  border: 1px solid #597469;
+-  border-radius: 10px;
+-  background: #fff;
+-  color: #254b3b;
+-  cursor: pointer;
+-  touch-action: manipulation;
+ }
+ 
+-.control > svg {
+-  width: 18px;
+-  height: 18px;
+-  flex: none;
+-}
+-.control:hover:not(:disabled) {
+-  background: #edf4ef;
+-}
+-.control:focus-visible,
+ .viewport:focus-visible {
+   outline: 3px solid #31775a;
+   outline-offset: 2px;
+-}
+-.control:disabled {
+-  opacity: 0.4;
+-  cursor: default;
+-}
+-
+-/* Utility actions share a fine-pointer scale without shrinking picture answers. */
+-.activityControl {
+-  box-sizing: border-box;
+-  min-width: 48px;
+-  min-height: 48px;
+-  padding: 8px 12px;
+-  gap: 6px;
+-  border-radius: 8px;
+-  font-size: 14px;
+-  font-weight: 500;
+-  line-height: 20px;
+-}
+-.activityControl > svg {
+-  flex-shrink: 0;
+-  width: 18px;
+-  height: 18px;
+-}
+-.activityIconControl {
+-  width: 48px;
+-  height: 48px;
+-  padding: 0;
+-}
+-
+-@media (hover: hover) and (pointer: fine) {
+-  .activityControl {
+-    min-width: 36px;
+-    min-height: 36px;
+-    padding-block: 6px;
+-  }
+-  .activityPrimary {
+-    min-height: 40px;
+-    padding-inline: 14px;
+-  }
+-  .activityIconControl,
+-  .control,
+-  .controls.controls[data-question-narration-controls] > button {
+-    flex-basis: 36px;
+-    width: 36px;
+-    min-width: 36px;
+-    height: 36px;
+-    min-height: 36px;
+-  }
+ }
+ 
+ /* Portalled outside question descendants, and showModal enters the top layer. */
+diff --git a/components/scene-renderers/quiz-reference-picture.tsx b/components/scene-renderers/quiz-reference-picture.tsx
+--- a/components/scene-renderers/quiz-reference-picture.tsx
++++ b/components/scene-renderers/quiz-reference-picture.tsx
+@@ -41,6 +41,8 @@
+         type="button"
+         ref={trigger}
+         className={styles.control}
++            data-mira-control="secondary"
++            data-mira-control-icon
+         data-quiz-reference-picture
+         data-quiz-option-picture={optionLabel ? true : undefined}
+         aria-label={optionLabel ?? '放大题干图片'}
+@@ -56,7 +58,7 @@
+           setOpen(true);
+         }}
+       >
+-        <ZoomIn size={18} aria-hidden />
++        <ZoomIn  aria-hidden />
+       </button>
+       {open &&
+         host &&
+@@ -117,32 +119,38 @@
+           <button
+             type="button"
+             className={styles.control}
++            data-mira-control="secondary"
++            data-mira-control-icon
+             aria-label="缩小图片"
+             disabled={zoom <= 1}
+             onClick={() => setZoom((value) => Math.max(1, value - 0.5))}
+           >
+-            <ZoomOut size={18} aria-hidden />
++            <ZoomOut  aria-hidden />
+           </button>
+           <output aria-live="polite">{Math.round(zoom * 100)}%</output>
+           <button
+             type="button"
+             className={styles.control}
++            data-mira-control="secondary"
++            data-mira-control-icon
+             aria-label="放大图片"
+             disabled={zoom >= 4}
+             onClick={() => setZoom((value) => Math.min(4, value + 0.5))}
+           >
+-            <ZoomIn size={18} aria-hidden />
++            <ZoomIn  aria-hidden />
+           </button>
+         </div>
+         <button
+           type="button"
+           ref={closeButton}
+           className={styles.control}
++            data-mira-control="secondary"
++            data-mira-control-icon
+           aria-label="关闭大图"
+           title="关闭大图"
+           onClick={close}
+         >
+-          <X size={18} aria-hidden />
++          <X  aria-hidden />
+         </button>
+       </header>
+       <div
+diff --git a/components/scene-renderers/textbook-play.module.css b/components/scene-renderers/textbook-play.module.css
+--- a/components/scene-renderers/textbook-play.module.css
++++ b/components/scene-renderers/textbook-play.module.css
+@@ -7,7 +7,7 @@
+   container-type: inline-size;
+   padding: clamp(12px, 2.4%, 28px);
+ }
+-.root button {
++.root button:not([data-mira-control]) {
+   cursor: pointer;
+   touch-action: manipulation;
+   font: inherit;
+@@ -15,94 +15,15 @@
+     background 0.18s,
+     transform 0.18s;
+ }
+-/* One scale for activity actions; illustrated answer targets keep their own sizes. */
+-.root
+-  :is(
+-    .listen,
+-    .secondary,
+-    .primary,
+-    .help button,
+-    .feedback button,
+-    .footer button,
+-    .evidence summary
+-  ) {
+-  position: relative;
++.root [data-mira-control] {
+   display: inline-flex;
+-  align-items: center;
+-  justify-content: center;
+-  gap: 6px;
+-  min-height: var(--mira-orbit-compact-control-height, 36px);
+-  padding: 6px 10px;
+-  border-radius: 8px;
+-  font-size: var(--mira-orbit-compact-font-size, 14px);
+-  line-height: 22px;
+-}
+-.root
+-  :is(
+-    .listen,
+-    .secondary,
+-    .primary,
+-    .help button,
+-    .feedback button,
+-    .footer button,
+-    .evidence summary
+-  )::before {
+-  content: '';
+-  position: absolute;
+-  width: max(100%, var(--mira-orbit-control-height, 48px));
+-  height: max(100%, var(--mira-orbit-control-height, 48px));
+-  left: 50%;
+-  top: 50%;
+-  transform: translate(-50%, -50%);
+-}
+-.root :is(.listen, .secondary, .primary, .help button, .feedback button, .footer button) > svg {
+-  width: var(--mira-orbit-control-icon-size, 18px);
+-  height: var(--mira-orbit-control-icon-size, 18px);
+-  flex-shrink: 0;
+-}
+-.root :is(button, a).primary {
+-  min-height: var(--mira-orbit-control-height, 48px);
+-  padding: 8px 18px;
+-  border-radius: 24px;
+-  font-size: var(--mira-orbit-control-font-size, 15px);
+-}
+-.header > .listen {
+-  width: var(--mira-orbit-control-height, 48px);
+-  height: var(--mira-orbit-control-height, 48px);
+-  flex-shrink: 0;
+-  padding: 0;
+-  border-radius: 12px;
+-}
+-@media (hover: hover) and (pointer: fine) {
+-  .root :is(.listen, .secondary, .primary, .help button, .feedback button, .footer button, .evidence summary) {
+-    min-height: 36px;
+-    border-width: 1px;
+-    font-weight: 500 !important;
+-  }
+-  .root :is(button, a).primary {
+-    min-height: 40px;
+-    padding: 8px 14px;
+-    border-radius: 8px;
+-    font-size: 14px;
+-  }
+-  .header > .listen {
+-    width: 36px;
+-    height: 36px;
+-    border-radius: 8px;
+-  }
+-}
+-@media (pointer: coarse) {
+-  .root :is(.listen, .secondary, .primary, .help button, .feedback button, .footer button, .evidence summary) {
+-    min-width: 48px;
+-    min-height: 48px;
+-  }
+-}
+-.root button:disabled {
++}
++.root button:not([data-mira-control]):disabled {
+   cursor: default;
+   opacity: 0.55;
+ }
+-.root button:focus-visible,
+-.root summary:focus-visible {
++.root button:not([data-mira-control]):focus-visible,
++.root summary:not([data-mira-control]):focus-visible {
+   outline: 3px solid #28664d;
+   outline-offset: 4px;
+ }
+@@ -241,14 +162,6 @@
+   margin: 0;
+   color: #667457;
+ }
+-.listen,
+-.secondary {
+-  background: #f5e7bd;
+-  border: 1px solid #e8d391;
+-}
+-.listen:hover {
+-  background: #eddaa3;
+-}
+ .wordTray {
+   display: flex;
+   align-items: center;
+@@ -302,11 +215,6 @@
+   gap: 12px;
+   flex-wrap: wrap;
+ }
+-.help button,
+-.feedback button {
+-  background: #f2eddf;
+-  border: 1px solid #e3dac6;
+-}
+ .hint {
+   margin: 0;
+   font-size: 15px;
+@@ -332,15 +240,6 @@
+   line-height: 1.6;
+   margin: 4px 0;
+ }
+-.primary {
+-  background: #496d51;
+-  color: #fff;
+-  border: 0;
+-  font-weight: 600 !important;
+-}
+-.primary:hover:not(:disabled) {
+-  background: #365b3e;
+-}
+ .footer {
+   font-size: 13px;
+   color: #697467;
+@@ -357,7 +256,6 @@
+   color: #964a34;
+ }
+ .footer button {
+-  text-decoration: underline;
+   margin-left: 10px;
+ }
+ .loading {
+@@ -408,12 +306,6 @@
+   background: #f3eddf;
+   border-radius: 8px;
+   font-size: 14px;
+-}
+-.root .evidence summary {
+-  display: flex;
+-  padding: 6px 0;
+-  cursor: pointer;
+-  font-weight: 600;
+ }
+ .evidence[open] {
+   padding-bottom: 8px;
+@@ -456,7 +348,7 @@
+   .task h3 {
+     text-align: center;
+   }
+-  .task .listen {
++  .task > [data-mira-control="secondary"] {
+     align-self: center;
+   }
+   .wordTray {
+@@ -571,9 +463,6 @@
+   outline: 3px solid #28664d;
+   outline-offset: 2px;
+ }
+-.primary {
+-  text-decoration: none;
+-}
+ @container (max-width:700px) {
+   .playArea {
+     grid-template-columns: 1fr;
+diff --git a/components/scene-renderers/textbook-play.tsx b/components/scene-renderers/textbook-play.tsx
+--- a/components/scene-renderers/textbook-play.tsx
++++ b/components/scene-renderers/textbook-play.tsx
+@@ -305,7 +305,7 @@
+           {error || '正在打开字宝宝花园…'}
+           {error && (
+             <button
+-              className={styles.primary}
++              data-mira-control="primary"
+               onClick={() => void load().catch(() => setError('请重新进入课堂'))}
+             >
+               重新连接
+@@ -317,11 +317,12 @@
+           <header className={styles.header}>
+             {(view.done || view.phase === 'locked' || view.phase === 'break') && (
+               <button
+-                className={styles.listen}
++                data-mira-control="secondary"
+                 onClick={() => listen(view.audio)}
++                data-mira-control-icon
+                 aria-label="听老师说下一步"
+               >
+-                <Volume2 size={32} aria-hidden />
++                <Volume2  aria-hidden />
+               </button>
+             )}
+             <div>
+@@ -362,7 +363,7 @@
+                   : '会的字会自动缩短，没认熟的字一起练。'}
+               </p>
+               <button
+-                className={styles.primary}
++                data-mira-control="primary"
+                 disabled={busy}
+                 onClick={() => {
+                   if (view.phase === 'break') void act('resume');
+@@ -374,7 +375,7 @@
+                 }}
+               >
+                 {view.phase === 'break' ? '休息好了，再试一次' : '开始小任务'}
+-                <ArrowRight size={32} aria-hidden />
++                <ArrowRight  aria-hidden />
+               </button>
+             </div>
+           ) : view.done ? (
+@@ -406,7 +407,7 @@
+                     题
+                   </p>
+                   <details className={styles.evidence}>
+-                    <summary>给家长的学习记录</summary>
++                    <summary data-mira-control="secondary">给家长的学习记录</summary>
+                     <p>
+                       选择题提示 {snapshot.evidence.hints} 题，大人帮助{' '}
+                       {snapshot.evidence.adultHelp} 题。
+@@ -447,30 +448,30 @@
+                   <button
+                     disabled={busy}
+                     onClick={() => void act('replay')}
+-                    className={styles.secondary}
++                    data-mira-control="secondary"
+                   >
+-                    <RotateCcw size={19} />
++                    <RotateCcw  />
+                     再玩一次
+                   </button>
+                 )}
+                 {section === 'games' ? (
+-                  <button onClick={nextScene} className={styles.primary}>
++                  <button onClick={nextScene} data-mira-control="primary">
+                     换个场景试试
+-                    <ArrowRight size={20} />
++                    <ArrowRight  />
+                   </button>
+                 ) : snapshot.journey?.reviewDue ? (
+                   <button
+                     disabled={busy}
+                     onClick={() => void act('review')}
+-                    className={styles.primary}
++                    data-mira-control="primary"
+                   >
+                     开始今天的短复习
+-                    <ArrowRight size={20} />
++                    <ArrowRight  />
+                   </button>
+                 ) : (
+                   <a
+                     href="#"
+-                    className={styles.primary}
++                    data-mira-control="primary"
+                     onClick={(event) => {
+                       event.preventDefault();
+                       if (window.parent !== window)
+@@ -478,7 +479,7 @@
+                       else window.history.back();
+                     }}
+                   >
+-                    <Backpack size={36} aria-hidden />
++                    <Backpack  aria-hidden />
+                     今天先到这里
+                   </a>
+                 )}
+@@ -547,22 +548,22 @@
+                 )}
+                 {view.speaker && !view.options && (
+                   <button
+-                    className={styles.listen}
++                    data-mira-control="secondary"
+                     disabled={frozen}
+                     onClick={() => void act('speaker', view.speaker === 'teal' ? 'coral' : 'teal')}
+                   >
+-                    <Mic size={20} />
++                    <Mic  />
+                     换个人说话
+                   </button>
+                 )}
+                 <h3>{view.options ? '听一听，点图片' : view.prompt}</h3>
+                 <button
+-                  className={styles.listen}
++                  data-mira-control="secondary"
+                   disabled={busy}
+                   onClick={() => (playing ? silence() : listen(view.audio))}
+                   aria-label={playing ? '暂停声音' : '听一听题目'}
+                 >
+-                  <Volume2 size={32} aria-hidden />
++                  <Volume2  aria-hidden />
+                   {playing ? '暂停声音' : '听题'}
+                 </button>
+                 {view.options ? (
+@@ -616,18 +617,19 @@
+                 )}
+                 <div className={styles.help}>
+                   <button
++                    data-mira-control="secondary"
+                     disabled={frozen || (view.hintLevel ?? 0) >= 3}
+                     onClick={() => void act('hint')}
+                   >
+-                    <Lightbulb size={26} aria-hidden />
++                    <Lightbulb  aria-hidden />
+                     {(view.hintLevel ?? 0) === 0
+                       ? '给我一点提示'
+                       : view.hintLevel === 1
+                         ? '举个例子'
+                         : '带我做一次'}
+                   </button>
+-                  <button disabled={frozen || view.adultHelp} onClick={() => void act('adult')}>
+-                    <Hand size={26} aria-hidden />
++                  <button data-mira-control="secondary" disabled={frozen || view.adultHelp} onClick={() => void act('adult')}>
++                    <Hand  aria-hidden />
+                     请大人帮了忙
+                   </button>
+                 </div>
+@@ -652,8 +654,8 @@
+                     </strong>
+                     <p>{view.feedback.explanation}</p>
+                     {!!view.feedback.audio?.length && (
+-                      <button onClick={() => listen(view.feedback?.audio)}>
+-                        <Volume2 size={18} />
++                      <button data-mira-control="secondary" onClick={() => listen(view.feedback?.audio)}>
++                        <Volume2  />
+                         听讲解
+                       </button>
+                     )}
+@@ -662,12 +664,12 @@
+                 {view.feedback?.canNext ? (
+                   <button
+                     ref={nextAction}
+-                    className={styles.primary}
++                    data-mira-control="primary"
+                     disabled={busy}
+                     onClick={() => void act('next')}
+                   >
+                     下一步
+-                    <ArrowRight size={32} aria-hidden />
++                    <ArrowRight  aria-hidden />
+                   </button>
+                 ) : null}
+               </div>
+@@ -682,11 +684,11 @@
+             <p role="status">{busy ? '正在保存…' : '学到哪里，课堂都会记住'}</p>
+             {soundError && (
+               <button
+-                className={styles.listen}
++                data-mira-control="secondary"
+                 onClick={() => listen(view.feedback?.audio ?? view.audio)}
+                 aria-label="重新播放老师声音"
+               >
+-                <Volume2 size={32} aria-hidden />
++                <Volume2  aria-hidden />
+                 点这里听老师说
+               </button>
+             )}
+@@ -694,6 +696,7 @@
+               <p role="alert">
+                 {error}
+                 <button
++                  data-mira-control="secondary"
+                   onClick={() =>
+                     void load()
+                       .then(() => setError(''))
+diff --git a/lib/ui/classroom-controls.ts b/lib/ui/classroom-controls.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/ui/classroom-controls.ts
+@@ -0,0 +1,133 @@
++/** One presentation contract for native classroom utilities and isolated games.
++ * Picture answers, draggable objects and visibility remain author-owned. */
++export function classroomControlCss(target: 'native' | 'iframe' = 'native'): string {
++  const utility =
++    ':is(.tools, #tools) > button:is(#start, #replay, #again, #finish, #reset, #restart, #retry, #listen, #hint)';
++  const control =
++    target === 'iframe'
++      ? `:is(${utility}, button[data-mira-activity-control]):not([data-mira-picture-choice]):not([draggable="true"])`
++      : '[data-mira-control][data-mira-control]';
++  const primary =
++    target === 'iframe'
++      ? `${control}:is(#start, #finish, [data-mira-activity-control="primary"])`
++      : `${control}[data-mira-control="primary"]`;
++  const toolbar = `${control}[data-mira-control="toolbar"]`;
++  // Iframe CSS precedes authored rules. Override normal inline dimensions,
++  // without changing display, visibility, pointer events or authored content.
++  const p = target === 'iframe' ? ' !important' : '';
++  return `
++:root {
++  --mira-classroom-secondary-size: 48px;
++  --mira-classroom-primary-size: 48px;
++  --mira-classroom-toolbar-size: 48px;
++  --mira-control-surface: var(--mira-orbit-panel, #fffbf3);
++  --mira-control-hover: var(--mira-orbit-raised, #f2eadb);
++  --mira-control-line: var(--mira-orbit-line, #ded4c2);
++  --mira-control-ink: var(--mira-orbit-text, #303b38);
++  --mira-control-muted: var(--mira-orbit-muted, #6d726b);
++  --mira-control-accent: var(--mira-orbit-lime, #f3c65b);
++  --mira-control-active: var(--mira-orbit-cyan, #786747);
++  --mira-control-danger: #9b3f32;
++  --mira-control-danger-surface: #fff0e9;
++}
++${control} {
++  --mira-control-size: var(--mira-classroom-secondary-size)${p};
++  --mira-control-icon: 18px${p};
++  --mira-control-font: 14px${p};
++  box-sizing: border-box${p};
++  flex-shrink: 0${p};
++  align-items: center${p};
++  justify-content: center${p};
++  gap: 6px${p};
++  width: auto${p};
++  min-width: var(--mira-control-size)${p};
++  height: var(--mira-control-size)${p};
++  min-height: var(--mira-control-size)${p};
++  padding: 6px 10px${p};
++  border: 1px solid var(--mira-control-line)${p};
++  border-radius: 8px${p};
++  background: var(--mira-control-surface)${p};
++  color: var(--mira-control-ink)${p};
++  box-shadow: none${p};
++  font-family: inherit${p};
++  font-size: var(--mira-control-font)${p};
++  font-weight: 500${p};
++  line-height: 20px${p};
++  text-decoration: none${p};
++  cursor: pointer${p};
++  touch-action: manipulation${p};
++  transition: background-color 150ms, border-color 150ms${p};
++}
++${control} > svg {
++  flex: 0 0 var(--mira-control-icon)${p};
++  width: var(--mira-control-icon)${p};
++  height: var(--mira-control-icon)${p};
++  max-width: var(--mira-control-icon)${p};
++  max-height: var(--mira-control-icon)${p};
++  vertical-align: middle${p};
++}
++${control} > span {
++  margin: 0${p};
++  font-size: inherit${p};
++  font-weight: inherit${p};
++  line-height: inherit${p};
++}
++${control} [data-mira-indicator="whiteboard-content"],
++${control} [data-mira-indicator="discussion-active"] {
++  width: 6px${p};
++  height: 6px${p};
++  min-width: 6px${p};
++  min-height: 6px${p};
++  flex: 0 0 6px${p};
++  border-radius: 50%${p};
++}
++${control} [data-mira-indicator="whiteboard-content"] { background: var(--mira-control-accent)${p}; }
++${control} [data-mira-indicator="discussion-active"] { background: var(--mira-control-danger)${p}; }
++${control}[data-mira-control-icon] {
++  width: var(--mira-control-size)${p};
++  padding: 0${p};
++}
++${toolbar} {
++  --mira-control-size: var(--mira-classroom-toolbar-size)${p};
++  --mira-control-icon: 16px${p};
++  --mira-control-font: 12px${p};
++  border-color: transparent${p};
++  background: transparent${p};
++  color: var(--mira-control-muted)${p};
++  padding-inline: 6px${p};
++}
++${primary} {
++  --mira-control-size: var(--mira-classroom-primary-size)${p};
++  border-color: var(--mira-control-accent)${p};
++  background: var(--mira-control-accent)${p};
++  color: var(--mira-control-ink)${p};
++  padding-inline: 14px${p};
++}
++${control}:hover:not(:disabled) { background: var(--mira-control-hover)${p}; }
++${primary}:hover:not(:disabled) { background: var(--mira-control-accent)${p}; }
++${toolbar}[aria-pressed="true"], ${toolbar}[data-mira-control-active="true"] {
++  color: var(--mira-control-active)${p};
++  background: var(--mira-control-hover)${p};
++}
++${control}[data-mira-control-tone="danger"] { color: var(--mira-control-danger)${p}; background: var(--mira-control-danger-surface)${p}; }
++${control}:disabled { opacity: .4${p}; cursor: default${p}; }
++${control}:focus-visible { outline: 2px solid var(--mira-control-active)${p}; outline-offset: 2px${p}; }
++@media (hover: hover) and (pointer: fine) {
++  :root {
++    --mira-classroom-secondary-size: 36px;
++    --mira-classroom-primary-size: 40px;
++    --mira-classroom-toolbar-size: 30px;
++  }
++}
++@media (any-pointer: coarse) {
++  :root {
++    --mira-classroom-secondary-size: 48px;
++    --mira-classroom-primary-size: 48px;
++    --mira-classroom-toolbar-size: 48px;
++  }
++}
++@media (prefers-reduced-motion: reduce) {
++  ${control} { transition: none${p}; }
++}
++`;
++}
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -1,3 +1,4 @@
++import { classroomControlCss } from '@/lib/ui/classroom-controls';
+ import { STUDENT_INTERACTION_OBSERVER } from '@/lib/mira/student-interaction-bridge';
+ import { injectIntoDocumentHead } from './html-document';
+ 
+@@ -308,58 +309,7 @@
+  * it also observes the storage shim).
+  */
+ export function patchHtmlForIframe(html: string): string {
+-  // Authored controls live in an isolated document. Only declared utility
+-  // controls and known toolbar actions share this scale; lesson objects keep
+-  // their authored geometry. Important overrides precede the authored CSS and
+-  // also cover its normal inline dimensions without rewriting saved content.
+-  const activityControl = `:is(
+-    :is(.tools, #tools) > button:is(#start, #replay, #again, #finish, #reset, #restart, #retry, #listen, #hint),
+-    button[data-mira-activity-control]
+-  ):not([data-mira-picture-choice]):not([draggable="true"])`;
+-  const activityControlsCss = `<style data-mira-activity-controls>
+-  ${activityControl} {
+-    box-sizing: border-box !important;
+-    align-items: center !important;
+-    justify-content: center !important;
+-    gap: 6px !important;
+-    width: auto !important;
+-    min-width: 48px !important;
+-    height: 48px !important;
+-    min-height: 48px !important;
+-    padding: 6px 10px !important;
+-    border-width: 1px !important;
+-    border-radius: 8px !important;
+-    box-shadow: none !important;
+-    font-size: 14px !important;
+-    font-weight: 500 !important;
+-    line-height: 20px !important;
+-  }
+-  ${activityControl} > svg {
+-    flex: 0 0 18px !important;
+-    width: 18px !important;
+-    height: 18px !important;
+-    max-width: 18px !important;
+-    max-height: 18px !important;
+-  }
+-  ${activityControl} > span {
+-    margin: 0 !important;
+-    font-size: 14px !important;
+-    font-weight: 500 !important;
+-    line-height: 20px !important;
+-  }
+-  @media (hover: hover) and (pointer: fine) {
+-    ${activityControl} {
+-      min-width: 36px !important;
+-      height: 36px !important;
+-      min-height: 36px !important;
+-    }
+-    ${activityControl}:is(#start, #finish, [data-mira-activity-control="primary"]) {
+-      height: 40px !important;
+-      min-height: 40px !important;
+-      padding-inline: 14px !important;
+-    }
+-  }
+-</style>`;
++  const activityControlsCss = `<style data-mira-activity-controls>${classroomControlCss('iframe')}</style>`;
+   const iframeCss = `<style data-iframe-patch>
+   html, body {
+     width: 100%;
+diff --git a/tests/roundtable/fullscreen-touch-layout.browser.test.ts b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+--- a/tests/roundtable/fullscreen-touch-layout.browser.test.ts
++++ b/tests/roundtable/fullscreen-touch-layout.browser.test.ts
+@@ -1,3 +1,4 @@
++import { classroomControlCss } from "@/lib/ui/classroom-controls";
+ import { describe, expect, it } from "vitest";
+ import { chromium } from "playwright-core";
+ import { createRequire } from "node:module";
+@@ -21,7 +22,7 @@
+         "@/lib/store/stage": `export const PENDING_SCENE_ID="pending";const s={scenes:[]};export const useStageStore=f=>f(s);useStageStore.getState=()=>s;`,
+         "@/lib/store/settings": `const s={ttsMuted:false,ttsEnabled:true,asrEnabled:false,ttsVolume:1,chatAreaWidth:320,playbackSpeed:1,setTTSMuted(){},setTTSVolume(){},setPlaybackSpeed(){}};export const useSettingsStore=f=>f(s);export const PLAYBACK_SPEEDS=[1,1.5,2];`,
+         "@/lib/hooks/use-audio-recorder": `export const useAudioRecorder=()=>({isRecording:false,isProcessing:false,startRecording(){},stopRecording(){},cancelRecording(){}});`,
+-        "@/lib/contexts/mira-student-runtime-context": `export const useMiraStudentRuntime=()=>false;export const useMiraStudentRuntimeEvents=()=>null;`,
++        "@/lib/contexts/mira-student-runtime-context": `export const useMiraStudentRuntime=()=>true;export const useMiraStudentRuntimeEvents=()=>null;`,
+         "@/lib/mira/student-interaction-bridge": `export const studentInteractionObjectives=()=>[];export const connectStudentInteractionFrame=()=>()=>{};export const STUDENT_INTERACTION_OBSERVER='';`,
+         "@/lib/mira/student-runtime": `export const getMiraEffectiveAsrEnabled=()=>false;`,
+         "@/lib/orchestration/registry/store": `export const useAgentRegistry={getState:()=>({getAgent:()=>undefined})};`,
+@@ -91,7 +92,7 @@
+         // the root from normal flow; a zero-height test body would falsely
+         // clip its pooled iframe through the storybook overflow boundary.
+         "\nhtml,body,#app{width:100%;height:100%;margin:0}body{overflow:hidden}\n" +
+-        readFileSync("app/mira-student-orbit.css", "utf8");
++        readFileSync("app/mira-student-orbit.css", "utf8") + classroomControlCss();
+       if (process.env.MIRA_FORMAL_QA_EXPORT_DIR) {
+         mkdirSync(process.env.MIRA_FORMAL_QA_EXPORT_DIR, { recursive: true });
+         writeFileSync(
+@@ -206,7 +207,9 @@
+               expect(portrait!.height).toBeGreaterThanOrEqual(48);
+               const reach=await avatar.evaluate(b=>{const r=b.getBoundingClientRect();const p=b.closest('[data-mira-participant-viewport]')!.getBoundingClientRect();return {contained:r.left>=p.left-0.5&&r.right<=p.right+0.5,hit:b.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))}});
+               expect(reach,JSON.stringify({theme,width,name,portrait,hit:await avatar.evaluate(b=>{const r=b.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.outerHTML.slice(0,500)})})).toEqual({contained:true,hit:true});
+-              await avatar.click();
++              // Touch must not synthesize the mouse hover that opens a profile
++              // card over the toolbar after its intentional 300ms delay.
++              await avatar.tap();
+             }
+ 
+             expect(canvasBefore!.height).toBeGreaterThanOrEqual(height - 48 - rowHeight - 20);
+diff --git a/tests/scene-renderers/fixed-textbook-quiz-results.browser.test.ts b/tests/scene-renderers/fixed-textbook-quiz-results.browser.test.ts
+--- a/tests/scene-renderers/fixed-textbook-quiz-results.browser.test.ts
++++ b/tests/scene-renderers/fixed-textbook-quiz-results.browser.test.ts
+@@ -1,3 +1,4 @@
++import { classroomControlCss } from '@/lib/ui/classroom-controls';
+ import { describe, expect, it } from 'vitest';
+ import { chromium } from 'playwright-core';
+ import { createRequire } from 'node:module';
+@@ -39,11 +40,11 @@
+     });
+     const compiled = await require('tailwindcss').compile(readFileSync(join(dirname(require.resolve('tailwindcss/package.json')), 'index.css'), 'utf8'));
+     const source = ['fixed-textbook-quiz', 'quiz-picture', 'quiz-reference-picture'].map(file => readFileSync(`components/scene-renderers/${file}.tsx`, 'utf8')).join('\n') + readFileSync('components/audio/question-narration.tsx', 'utf8');
+-    const css = compiled.build([...new Set(source.split(/[\s'"`{}(),]+/)), 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]']) + '\n' + bundle.outputFiles.find((file: BundleFile) => file.path.endsWith('.css')).text + '\nhtml,body,#app{margin:0;width:100%;height:100%}';
++    const css = compiled.build([...new Set(source.split(/[\s'"`{}(),]+/)), 'sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]']) + '\n' + bundle.outputFiles.find((file: BundleFile) => file.path.endsWith('.css')).text + classroomControlCss() + '\nhtml,body,#app{margin:0;width:100%;height:100%}';
+     const js = bundle.outputFiles.find((file: BundleFile) => file.path.endsWith('.js')).text;
+     const browser = await chromium.launch({ executablePath: process.env.MIRA_FORMAL_QA_BROWSER_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
+     try {
+-      const page = await browser.newPage({ viewport: { width: 390, height: 563 } });
++      const page = await browser.newPage({ viewport: { width: 390, height: 563 }, hasTouch: true });
+       const errors: string[] = [];
+       page.on('pageerror', error => errors.push(error.message));
+       await page.route('**/*', route => route.abort());
+diff --git a/tests/scene-renderers/quiz-reference-picture.browser.test.ts b/tests/scene-renderers/quiz-reference-picture.browser.test.ts
+--- a/tests/scene-renderers/quiz-reference-picture.browser.test.ts
++++ b/tests/scene-renderers/quiz-reference-picture.browser.test.ts
+@@ -1,3 +1,4 @@
++import { classroomControlCss } from '@/lib/ui/classroom-controls';
+ import { describe, expect, it } from 'vitest';
+ import { chromium } from 'playwright-core';
+ import { createRequire } from 'node:module';
+@@ -93,6 +94,7 @@
+       ]) +
+       '\n' +
+       bundle.outputFiles.find((f: BundleFile) => f.path.endsWith('.css')).text +
++      classroomControlCss() +
+       '\nhtml,body{margin:0;width:100%;height:100%}#classroom{width:100%;height:100%;background:white;overflow:auto}#classroom:fullscreen{width:100%!important;height:100%!important}.fixture-lesson{height:calc(100% - 48px)}#app{height:100%}#fullscreen{height:48px;min-width:48px}';
+     const js = bundle.outputFiles.find((f: BundleFile) => f.path.endsWith('.js')).text;
+     const html = '<html><body><main id="classroom"><div id="app"></div></main></body></html>';
+@@ -144,7 +146,33 @@
+       headless: true,
+     });
+     try {
+-      const page = await browser.newPage({ viewport: { width: 390, height: 563 } });
++      // The full interaction suite below exercises touch targets. This desktop
++      // mount uses the same production CSS entry and actual quiz components.
++      const desktop = await browser.newPage({ viewport: { width: 1200, height: 800 } });
++      await desktop.route('**/*', (route) => route.abort());
++      await desktop.setContent(html);
++      await desktop.addStyleTag({ content: css });
++      await desktop.addScriptTag({ content: js });
++      await desktop.locator('[data-quiz-reference-picture]').first().waitFor();
++      const desktopControls = await desktop.locator('[data-mira-control]').evaluateAll(elements =>
++        elements.map(element => ({ role: element.getAttribute('data-mira-control'), height: element.getBoundingClientRect().height })),
++      );
++      expect(desktopControls.length).toBeGreaterThan(0);
++      expect(desktopControls.every(control => control.height === (control.role === 'primary' ? 40 : 36))).toBe(true);
++      if (process.env.MIRA_FORMAL_QA_EXPORT_DIR)
++        await desktop.screenshot({ path: join(process.env.MIRA_FORMAL_QA_EXPORT_DIR, 'unified-controls-desktop.png') });
++      for (const viewport of [{ width: 390, height: 563 }, { width: 667, height: 300 }]) {
++        await desktop.setViewportSize(viewport);
++        await desktop.evaluate(() => (window as unknown as FixtureWindow).mountReferenceQuiz(false));
++        await desktop.locator('[data-quiz-reference-picture]').first().waitFor();
++        const controls = await desktop.locator('[data-mira-control]').evaluateAll(elements =>
++          elements.map(element => element.getBoundingClientRect().height),
++        );
++        expect(controls.length).toBeGreaterThan(0);
++        expect(controls.every(height => height === 36), JSON.stringify({ viewport, controls })).toBe(true);
++      }
++      await desktop.close();
++      const page = await browser.newPage({ viewport: { width: 390, height: 563 }, hasTouch: true });
+       const errors: string[] = [];
+       page.on('pageerror', (error) => errors.push(error.message));
+       await page.route('**/*', (route) => route.abort());

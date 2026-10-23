@@ -10,20 +10,12 @@
 .space-motion-toggle[aria-pressed="true"] > svg { color: #c9f78b; }
 .space-motion-toggle:disabled { opacity: 0.65; cursor: default; }
 
-/* A visible launch-button light sweep, with a quiet interval between each pass. */
-.space-hero-action { position: relative; isolation: isolate; overflow: hidden; }
-.space-hero-action::before { content: ""; position: absolute; z-index: -1; top: -30%; bottom: -30%; left: -45%; width: 34%; pointer-events: none; background: linear-gradient(90deg, transparent, rgb(255 255 255 / 65%), transparent); transform: skewX(-20deg) translateX(0); animation: space-launch-sweep 4.2s ease-in-out infinite; }
-.space-hero-action > svg:last-child { transition: transform 180ms ease-out; }
-.space-hero-action:hover > svg:last-child { transform: translateX(5px); }
 .space-course-tile[aria-pressed="true"]::before { animation: space-selected-edge-top 3s linear infinite; }
 .space-course-tile[aria-pressed="true"]::after { animation: space-selected-edge-bottom 3s linear infinite; animation-delay: -1.5s; }
-@keyframes space-launch-sweep { 0%, 14% { transform: skewX(-20deg) translateX(0); opacity: 0; } 19% { opacity: 0.85; } 40% { transform: skewX(-20deg) translateX(440%); opacity: 0; } 100% { transform: skewX(-20deg) translateX(440%); opacity: 0; } }
 @keyframes space-selected-edge-top { 0% { transform: translateX(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateX(270%); opacity: 0; } }
 @keyframes space-selected-edge-bottom { 0% { transform: translateX(0); opacity: 0; } 15%, 85% { opacity: 1; } 100% { transform: translateX(-270%); opacity: 0; } }
-.space-shell:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-hero-action::before,
 .space-shell:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-course-tile::before,
 .space-shell:is([data-space-motion="paused"], [data-space-motion="hidden"]) .space-course-tile::after { animation-play-state: paused; }
-.space-shell[data-space-motion="reduced"] .space-hero-action::before,
 .space-shell[data-space-motion="reduced"] .space-course-tile::before,
 .space-shell[data-space-motion="reduced"] .space-course-tile::after { animation: none; opacity: 0; }
 @media (max-width: 700px) {
@@ -34,6 +26,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .space-shell[data-space-motion] .space-scenery img { transform: none; will-change: auto; }
-  .space-hero-action::before, .space-course-tile::before, .space-course-tile::after { animation: none !important; opacity: 0 !important; }
-  .space-hero-action > svg:last-child { transition: none; transform: none !important; }
+  .space-course-tile::before, .space-course-tile::after { animation: none !important; opacity: 0 !important; }
 }

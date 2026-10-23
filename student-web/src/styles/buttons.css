@@ -1,82 +1,125 @@
 /*
- * Student button sizing: use <Button size="default|compact|icon">.
- * Keep dimensions here; page styles may position buttons, not resize them.
- * Picture choices, playback overlays and learning activities are separate controls.
+ * All ordinary student actions use <Button size="default|compact|icon">.
+ * This file owns their shape, dimensions, typography, icons and states.
+ * Page CSS may position them and themes may supply color tokens only.
+ * Picture choices, playback overlays and learning objects remain independent.
  */
-.schoolbag-shell, .mira-ui-surface {
-  --mira-button-height: 48px;
-  --mira-button-font-size: 15px;
-  --mira-button-padding: 8px 20px;
-  --mira-button-gap: 8px;
+:root {
+  --mira-button-height: 40px;
   --mira-button-compact-height: 36px;
-  --mira-button-compact-font-size: 14px;
-  --mira-button-compact-padding: 6px 10px;
-  --mira-button-compact-gap: 6px;
-  --mira-button-compact-radius: 8px;
-  --mira-button-icon-size: 18px;
   --mira-button-touch-target: 48px;
+  --mira-button-font-size: 14px;
+  --mira-button-font-weight: 500;
+  --mira-button-padding: 9px 14px;
+  --mira-button-compact-padding: 7px 10px;
+  --mira-button-gap: 6px;
+  --mira-button-radius: 8px;
+  --mira-button-border-width: 1px;
+  --mira-button-icon-size: 18px;
 }
 
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button {
+.mira-button {
   position: relative;
-  min-width: var(--mira-button-touch-target);
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--mira-button-compact-height);
   min-height: var(--mira-button-height);
   height: auto;
   gap: var(--mira-button-gap);
   padding: var(--mira-button-padding);
-  border-radius: var(--mira-radius-button);
+  border: var(--mira-button-border-width) solid transparent;
+  border-radius: var(--mira-button-radius);
+  font-family: var(--font-mira-sans);
   font-size: var(--mira-button-font-size);
-  font-weight: 550;
+  font-weight: var(--mira-button-font-weight);
   line-height: 20px;
   letter-spacing: 0;
+  text-align: center;
   text-decoration: none;
   box-shadow: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 140ms ease;
 }
 
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button[data-size="compact"] {
+.mira-button[data-size="compact"] {
   min-height: var(--mira-button-compact-height);
   padding: var(--mira-button-compact-padding);
-  gap: var(--mira-button-compact-gap);
-  border-radius: var(--mira-button-compact-radius);
-  font-size: var(--mira-button-compact-font-size);
-  font-weight: 500;
 }
 
-/* A small visual button retains a full touch target, including on phones. */
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button[data-size="compact"]::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: max(100%, var(--mira-button-touch-target));
-  height: max(100%, var(--mira-button-touch-target));
-  transform: translate(-50%, -50%);
-}
-
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button[data-size="icon"] {
-  flex: none;
-  width: var(--mira-button-height);
-  height: var(--mira-button-height);
+.mira-button[data-size="icon"] {
+  width: var(--mira-button-compact-height);
+  height: var(--mira-button-compact-height);
+  min-height: var(--mira-button-compact-height);
   padding: 0;
-  border-radius: var(--mira-button-compact-radius);
 }
 
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button > svg {
+.mira-button > svg {
   flex: none;
   width: var(--mira-button-icon-size);
   height: var(--mira-button-icon-size);
   stroke-width: 1.7;
 }
 
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button[data-variant="primary"] { border: 0; background: var(--mira-brand-deep); color: var(--mira-ink); }
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button[data-variant="secondary"] { border: 1px solid var(--mira-border); background: transparent; color: var(--mira-ink); }
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button[data-variant="quiet"] { border: 0; background: transparent; color: var(--mira-muted); }
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--mira-control-hover); color: var(--mira-ink); }
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button[data-variant="primary"]:hover:not(:disabled):not([aria-disabled="true"]) { background: #f3be43; }
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button:is(:disabled, [aria-disabled="true"]) { background: var(--mira-disabled); color: var(--mira-subtle); cursor: not-allowed; }
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button:focus-visible { outline: 2px solid var(--mira-focus); outline-offset: 4px; }
-:is(.schoolbag-shell, .mira-ui-surface) .mira-button:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(1px); }
+.mira-button[data-variant="primary"] {
+  background: var(--mira-brand-deep);
+  color: var(--mira-on-brand);
+  border-color: var(--mira-button-primary-border, transparent);
+}
+.mira-button[data-variant="secondary"] {
+  background: var(--mira-button-secondary-background, transparent);
+  color: var(--mira-ink);
+  border-color: var(--mira-border);
+}
+.mira-button[data-variant="quiet"] {
+  background: transparent;
+  color: var(--mira-muted);
+}
+.mira-button[aria-pressed="true"] {
+  background: var(--mira-brand-wash);
+  color: var(--mira-ink);
+  border-color: var(--mira-border);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mira-button:hover:not(:disabled):not([aria-disabled="true"]) {
+    background: var(--mira-control-hover, var(--mira-surface-soft));
+    color: var(--mira-ink);
+  }
+  .mira-button[data-variant="primary"]:hover:not(:disabled):not([aria-disabled="true"]) {
+    background: var(--mira-button-primary-hover, var(--mira-brand));
+    color: var(--mira-on-brand);
+  }
+}
+
+.mira-button:focus-visible { outline: 2px solid var(--mira-focus, var(--mira-brand)); outline-offset: 4px; }
+.mira-button:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(1px); }
+.mira-button:is(:disabled, [aria-disabled="true"]) {
+  background: var(--mira-disabled);
+  color: var(--mira-subtle);
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+
+/* Touch devices enlarge the real box, so adjacent targets never overlap. */
+@media (any-pointer: coarse) {
+  .mira-button,
+  .mira-button[data-size="compact"],
+  .mira-button[data-size="icon"] {
+    min-width: var(--mira-button-touch-target);
+    min-height: var(--mira-button-touch-target);
+  }
+  .mira-button[data-size="icon"] {
+    width: var(--mira-button-touch-target);
+    height: var(--mira-button-touch-target);
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.schoolbag-shell, .mira-ui-surface) .mira-button:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
+  .mira-button { transition: none; }
+  .mira-button:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
 }
