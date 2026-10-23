@@ -598,6 +598,59 @@ class CourseArchiveProcessor:
             result[name] = entry
         return result
 
+    def _review_asset_copy_ownership(self, name, evidence, old_files, new_files, stage, previous):
+        """Bind the exporter's review-PNG cache name to its exact archived receipts."""
+        match = re.fullmatch(r"review-([a-f0-9]{64})\.png", name)
+        if not match or match[1] != evidence["sha256"]:
+            return None
+        native = [entry for entry in old_files.values() if entry.get("original") is True
+                  and entry.get("sourceKind") == "native_standard_asset"
+                  and all(entry.get(k) == evidence[k] for k in ("sha256", "byteSize"))]
+        if not native:
+            return None
+        bindings = []
+        for old in native:
+            url, receipt = old["sourceIdentity"], old.get("sourceReceipt")
+            if (old.get("mimeType") != "image/png"
+                    or not re.fullmatch(r"/review-assets/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.png", url)
+                    or not isinstance(receipt, dict) or not isinstance(receipt.get("archivePath"), str)
+                    or not SHA.fullmatch(str(receipt.get("sha256", "")))):
+                return None
+            replacements = [entry for entry in new_files.values() if entry.get("original") is True
+                and entry.get("sourceKind") == "native_standard_asset" and entry.get("sourceIdentity") == url
+                and entry.get("sourceReceipt") == receipt
+                and all(entry.get(k) == old[k] for k in ("sha256", "byteSize", "mimeType"))]
+            old_receipt, new_receipt = old_files.get(receipt["archivePath"]), new_files.get(receipt["archivePath"])
+            if (len(replacements) != 1 or not old_receipt or not new_receipt
+                    or any(entry.get("original") is not True or entry.get("sourceKind") != "owned_original_file"
+                           or entry.get("mimeType") != "application/json" or entry["sha256"] != receipt["sha256"]
+                           for entry in (old_receipt, new_receipt))
+                    or any(new_receipt.get(k) != old_receipt[k] for k in ("sourceIdentity", "sha256", "byteSize"))):
+                return None
+            receipt_binding = {"schemaVersion": "mira.textbook.review-asset-source-receipt.v1",
+                               "reviewUrl": url, "sourceFileSha256": evidence["sha256"]}
+            receipt_path = stage / "课程资料" / receipt["archivePath"]
+            try:
+                receipt_path.lstat()  # Do not recreate a removed receipt's parents on resume.
+                raw = _read(receipt_path)
+                value = json.loads(raw)
+                if (not isinstance(value, dict) or _sha(raw) != receipt["sha256"] or len(raw) != old_receipt["byteSize"]
+                        or any(value.get(k) != v for k, v in receipt_binding.items())):
+                    return None
+            except FileNotFoundError:
+                prior = next((entry for entry in (previous or {}).get("files", [])
+                    if entry.get("path") == receipt_path.relative_to(stage).as_posix()), {})
+                if not previous or any(prior.get(k) != old_receipt[k] for k in ("sha256", "byteSize")):
+                    return None
+            except (OSError, ValueError, ArchiveQueueError):
+                return None
+            bindings.append({"sourceIdentity": url, "oldArchivePath": old["archivePath"],
+                "replacementArchivePath": replacements[0]["archivePath"], "sourceReceipt": deepcopy(receipt),
+                "receiptSourceIdentity": old_receipt["sourceIdentity"], "receiptByteSize": old_receipt["byteSize"],
+                "receiptBinding": receipt_binding})
+        return {"schemaVersion": "mira.course-archive.review-asset-copy.v1",
+                "nativeAssets": sorted(bindings, key=lambda entry: entry["sourceIdentity"])}
+
     def _zip_only_cleanup_proof(self, job, reference, index, raw, manifest_raw, old_files, previous):
         """Accept only the private, byte-bound evidence of an earlier ZIP-only removal."""
         stage = Path(reference["indexPath"]).parent
@@ -976,9 +1029,13 @@ class CourseArchiveProcessor:
         for filename in candidates:
             evidence = self._cleanup_file(filename)
             expected = (index["zip"] if filename == zip_path else expected_payload.get(filename))
+            review_asset_proof = None
             if expected is None and filename.parent == stage / "asset-sources":
-                if (not re.fullmatch(r"[a-f0-9]{64}\.[A-Za-z0-9]+", filename.name)
-                        or filename.stem != evidence["sha256"]
+                plain_cache_name = bool(re.fullmatch(r"[a-f0-9]{64}\.[A-Za-z0-9]+", filename.name)) and filename.stem == evidence["sha256"]
+                if not plain_cache_name:
+                    review_asset_proof = self._review_asset_copy_ownership(
+                        filename.name, evidence, old_files, new_files, stage, previous)
+                if ((not plain_cache_name and not review_asset_proof)
                         or (evidence["sha256"], evidence["byteSize"]) not in old_bytes):
                     raise ArchiveQueueError("archive_incomplete_cleanup_unowned_asset")
                 expected = evidence
@@ -988,7 +1045,10 @@ class CourseArchiveProcessor:
             if previous and (relative not in old_plan or any(old_plan[relative].get(k) != evidence[k]
                                                              for k in ("sha256", "byteSize"))):
                 raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
-            files.append({"path": relative, **evidence})
+            if previous and old_plan[relative].get("reviewAssetProof") != review_asset_proof:
+                raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
+            files.append({"path": relative, **evidence,
+                          **({"reviewAssetProof": review_asset_proof} if review_asset_proof else {})})
         if private_recovery_proof:
             # Payload hashing can be lengthy; recheck the independent recovery
             # bytes immediately before returning an actionable deletion plan.

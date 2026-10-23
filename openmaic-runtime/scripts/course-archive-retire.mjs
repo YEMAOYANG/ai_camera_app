@@ -16,7 +16,20 @@ const storage=config=>{const {prefix,...identity}=storageIdentity(config);return
 const date=value=>/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(new Date(value).valueOf())&&new Date(value).toISOString().slice(0,10)===value;
 const safe=value=>typeof value==='string'&&value.split('/').every(s=>s.trim()&&!['.','..'].includes(s)&&!/[\\\x00-\x1f\x7f-\x9f]/.test(s)&&Buffer.byteLength(s)<=255);
 const identityKeys=['courseId','courseVersion','classroomId','releaseSha256'];
+const savedIdentityKeys=['courseId','courseVersion','classroomId','contentKey','releaseSha256','sourceKind','sourceDigest','status'];
 const missing=error=>error.$metadata?.httpStatusCode===404||['NotFound','NoSuchKey','NoSuchVersion'].includes(error.name);
+
+function archiveIdentity(index){
+ if(index.status==='generated_saved'){
+  if(index.sourceKind!=='textbook_preview'||typeof index.sourceDigest!=='string'||!/^[a-f0-9]{64}$/.test(index.sourceDigest)||
+     ['courseId','courseVersion','classroomId'].some(k=>typeof index[k]!=='string'||!index[k].trim())||
+     !Object.hasOwn(index,'contentKey')||(index.contentKey!==null&&(typeof index.contentKey!=='string'||!/^[a-f0-9]{64}$/.test(index.contentKey)))||index.releaseSha256!==null)throw Error('A bound saved archive identity is required');
+  return Object.fromEntries(savedIdentityKeys.map(k=>[k,index[k]]));
+ }
+ if(index.status!==undefined&&index.status!=='published')throw Error('Unknown archive status');
+ if(identityKeys.some(k=>typeof index[k]!=='string'||!index[k])||!/^[a-f0-9]{64}$/.test(index.releaseSha256))throw Error('Published archive identity is required');
+ return Object.fromEntries(identityKeys.map(k=>[k,index[k]]));
+}
 
 async function privateDirectory(directory){
  const absolute=path.resolve(directory);let current=path.parse(absolute).root;
@@ -42,8 +55,9 @@ async function atomic(filename,value){
 function publicRoles(index){
  const entries=index.generatedPublicFiles;
  if(index.schemaVersion!=='mira.course-archive.export.v1'||index.complete!==true||(index.missingSources||[]).length||!Array.isArray(entries)||entries.length!==4)throw Error('Exactly four complete archive objects are required');
- if(!/^[a-f0-9]{24,64}$/.test(index.archiveId)||identityKeys.some(k=>typeof index[k]!=='string'||!index[k]))throw Error('Published archive identity is required');
- if(!/^[a-f0-9]{64}$/.test(index.releaseSha256)||!safe(index.objectDirectory))throw Error('Invalid published archive identity');
+ if(!/^[a-f0-9]{24,64}$/.test(index.archiveId))throw Error('Invalid archive identity');
+ archiveIdentity(index);
+ if(!safe(index.objectDirectory))throw Error('Invalid archive directory');
  const directory=index.objectDirectory.split('/'),named=directory.length===5&&date(directory[3]),legacy=directory.length===3&&date(directory[0]);
  if(!named&&!legacy)throw Error('Only the documented course archive layouts can be retired');
  const roles=new Map(),keys=new Set();
@@ -66,8 +80,9 @@ async function capture(filename){
  }
  if(!manifestRaw)manifestRaw=await readPrivate(path.join(parent,'manifest.json'));
  const manifest=JSON.parse(manifestRaw);
- if(sha(manifestRaw)!==roles.get('归档清单').sha256||manifestRaw.length!==roles.get('归档清单').byteSize||manifest.schemaVersion!==index.schemaVersion||manifest.archiveId!==index.archiveId||manifest.complete!==true||(manifest.missingSources||[]).length||!Array.isArray(manifest.files)||identityKeys.some(k=>manifest.identity?.[k]!==index[k]))throw Error('Archive original-file manifest is not bound to its public object');
- for(const file of manifest.files)if(typeof file.original!=='boolean'||typeof file.sourceIdentity!=='string'||!file.sourceIdentity||!/^[a-f0-9]{64}$/.test(file.sha256)||!Number.isSafeInteger(file.byteSize)||file.byteSize<0)throw Error('Original-file inventory is invalid');
+ const saved=index.status==='generated_saved',manifestIdentityKeys=saved?identityKeys.concat('contentKey'):identityKeys;
+ if(sha(manifestRaw)!==roles.get('归档清单').sha256||manifestRaw.length!==roles.get('归档清单').byteSize||manifest.schemaVersion!==index.schemaVersion||manifest.archiveId!==index.archiveId||manifest.complete!==true||(manifest.missingSources||[]).length||!Array.isArray(manifest.files)||manifestIdentityKeys.some(k=>manifest.identity?.[k]!==index[k])||saved&&manifest.status!==index.status)throw Error('Archive original-file manifest is not bound to its public object');
+ for(const file of manifest.files)if(typeof file.original!=='boolean'||typeof file.sourceIdentity!=='string'||!file.sourceIdentity||!/^[a-f0-9]{64}$/.test(file.sha256)||!Number.isSafeInteger(file.byteSize)||file.byteSize<0||saved&&(['sourceKind','mimeType'].some(k=>typeof file[k]!=='string'||!file[k])))throw Error('Original-file inventory is invalid');
  return {index,raw,indexSha256:sha(raw),manifest,manifestRaw,roles,filename:path.resolve(filename)};
 }
 async function receipt(capture,state,config){
@@ -89,23 +104,24 @@ async function receipt(capture,state,config){
  }
  throw Error('Exact durable archive verification is required');
 }
-const tuple=file=>canonical([file.sourceIdentity,file.sha256,file.byteSize]);
-export function originalCoverage(oldManifest,replacementManifest){
- const originals=oldManifest.files.filter(f=>f.original),replacement=new Set(replacementManifest.files.filter(f=>f.original).map(tuple));
- if(!originals.length||originals.some(file=>!replacement.has(tuple(file))))throw Error('Replacement does not cover every original byte');
+const tuple=(file,strict)=>canonical([file.sourceIdentity,file.sha256,file.byteSize,...(strict?[file.sourceKind,file.mimeType]:[])]);
+export function originalCoverage(oldManifest,replacementManifest,{strict=false}={}){
+ const originals=oldManifest.files.filter(f=>f.original),replacement=new Set(replacementManifest.files.filter(f=>f.original).map(f=>tuple(f,strict)));
+ if(!originals.length||originals.some(file=>!replacement.has(tuple(file,strict))))throw Error('Replacement does not cover every original byte');
  return {originalFiles:originals.length,replacementOriginalFiles:replacementManifest.files.filter(f=>f.original).length};
 }
 async function context(options,dependencies){
  const config=dependencies.config||readConfig(),state=dependencies.state||STATE;
  const old=await capture(options.index),replacement=await capture(options.replacementIndex);
- if(identityKeys.some(k=>old.index[k]!==replacement.index[k]))throw Error('Replacement course, version, classroom and release must match');
+ const identity=archiveIdentity(old.index);
+ if(canonical(identity)!==canonical(archiveIdentity(replacement.index)))throw Error('Replacement archive identity must match');
  const oldKeys=new Set(old.index.generatedPublicFiles.map(e=>e.relativePath));
  if(replacement.index.generatedPublicFiles.some(e=>oldKeys.has(e.relativePath)))throw Error('Replacement must use disjoint object keys');
- const coverage=originalCoverage(old.manifest,replacement.manifest);
+ const coverage=originalCoverage(old.manifest,replacement.manifest,{strict:old.index.status==='generated_saved'});
  const oldReceipt=await receipt(old,state,config),replacementReceipt=await receipt(replacement,state,config);
  const id=sha(canonical({oldIndexSha256:old.indexSha256,replacementIndexSha256:replacement.indexSha256,storage:storage(config)}));
  const directory=await privateDirectory(path.join(state,'archive-retirements',id));
- const binding={schemaVersion:'mira.course-archive.retirement.v1',id,storage:storage(config),identity:Object.fromEntries(identityKeys.map(k=>[k,old.index[k]])),oldIndexSha256:old.indexSha256,replacementIndexSha256:replacement.indexSha256,oldReceiptSha256:sha(oldReceipt.raw),replacementReceiptSha256:sha(replacementReceipt.raw),oldObjects:old.index.generatedPublicFiles.map(e=>({objectKey:e.relativePath,sha256:e.sha256,byteSize:e.byteSize})),replacementObjects:replacement.index.generatedPublicFiles.map(e=>({objectKey:e.relativePath,sha256:e.sha256,byteSize:e.byteSize})),...coverage};
+ const binding={schemaVersion:'mira.course-archive.retirement.v1',id,storage:storage(config),identity,oldIndexSha256:old.indexSha256,replacementIndexSha256:replacement.indexSha256,oldReceiptSha256:sha(oldReceipt.raw),replacementReceiptSha256:sha(replacementReceipt.raw),oldObjects:old.index.generatedPublicFiles.map(e=>({objectKey:e.relativePath,sha256:e.sha256,byteSize:e.byteSize})),replacementObjects:replacement.index.generatedPublicFiles.map(e=>({objectKey:e.relativePath,sha256:e.sha256,byteSize:e.byteSize})),...coverage};
  const filename=path.join(directory,'plan.json');
  try{if(canonical(JSON.parse(await readPrivate(filename)))!==canonical(binding))throw Error('Retirement journal binding changed');}catch(error){if(error.code!=='ENOENT')throw error;await atomic(filename,binding);}
  for(const [name,raw]of [['old-index.json',old.raw],['replacement-index.json',replacement.raw],['old-originals.json',old.manifestRaw],['replacement-originals.json',replacement.manifestRaw],['old-verification.json',oldReceipt.raw],['replacement-verification.json',replacementReceipt.raw]]){

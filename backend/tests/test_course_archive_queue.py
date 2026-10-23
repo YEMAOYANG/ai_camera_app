@@ -638,7 +638,7 @@ class CourseArchiveQueueTest(unittest.TestCase):
         self.assertFalse(path.exists())
 
     def completed_with_incomplete_capture(self, *, unique_old_original=False, private_old_originals=False,
-                                          inherited_audio_alias=False):
+                                          inherited_audio_alias=False, review_asset_copy=False):
         from services.course_archive_exporter import CourseArchiveExporter
 
         private_sources = []
@@ -674,6 +674,35 @@ class CourseArchiveQueueTest(unittest.TestCase):
                 "evidence": evidence, "evidenceSha256": {p: digest((self.root / p).read_bytes()) for p in evidence}}
             self.audio_alias_fixture = {"physicalPath": self.root / physical, "originalBytes": raw,
                                         "oldIdentity": media["path"], "alias": alias}
+        review_sources, review_entry = [], None
+        if review_asset_copy:
+            from PIL import Image
+            source = self.root / "output/textbook-operator-lessons/fixture-edition/review-assets/test/portrait.png"
+            source.parent.mkdir(parents=True)
+            Image.new("RGB", (1, 1), "blue").save(source)
+            raw = source.read_bytes()
+            url = "/review-assets/test/portrait.png"
+            receipt = self.root / "output/textbook-operator-lessons/fixture-edition/lesson/teaching-1/authoring-job/asset-source-receipts/portrait.json"
+            receipt.parent.mkdir(parents=True)
+            receipt.write_bytes(encoded({"schemaVersion": "mira.textbook.review-asset-source-receipt.v1",
+                "reviewUrl": url, "sourceFilePath": str(source), "sourceFileSha256": digest(raw)}))
+            review_sources = [source, receipt]
+            review_entry = {"ref": url, "kind": "image", "status": "resolved", "sha256": digest(raw),
+                "byteSize": len(raw), "mimeType": "image/png", "sourceReceipt": {
+                    "archivePath": "原稿/" + receipt.relative_to(self.root).as_posix(), "sha256": digest(receipt.read_bytes())}}
+            self.snapshot["scenes"][0]["content"] = {"html": '<img src="' + url + '">'}
+            self.review_asset_fixture = {"source": source, "receipt": receipt, "entry": review_entry,
+                                        "copyName": "review-" + digest(raw) + ".png"}
+
+        def standard_assets(document, *, staging_root):
+            if not review_entry:
+                return {"entries": [], "unresolved": []}
+            staging_root.mkdir(parents=True, exist_ok=True)
+            destination = staging_root / self.review_asset_fixture["copyName"]
+            if not destination.exists():
+                destination.write_bytes(self.review_asset_fixture["source"].read_bytes())
+                destination.chmod(0o600)
+            return {"entries": [{**review_entry, "sourcePath": str(destination)}], "unresolved": []}
 
         class RecoverableExporter(CourseArchiveExporter):
             incomplete = True
@@ -681,6 +710,7 @@ class CourseArchiveQueueTest(unittest.TestCase):
             def export_snapshot(inner, snapshot, **options):
                 snapshot.source_roots.extend(source.parent.parent for source in private_sources)
                 snapshot.source_files.extend(audio_sources)
+                snapshot.source_files.extend(review_sources)
                 if media:
                     snapshot.media.append({**media, "path": media["path"] if inner.incomplete else alias["originalReference"]})
                     if not inner.incomplete:
@@ -696,8 +726,7 @@ class CourseArchiveQueueTest(unittest.TestCase):
                 return super().export_snapshot(snapshot, **options)
 
         exporter = RecoverableExporter(project_root=self.root, media_store=Mock(read=Mock(return_value=None)),
-            native_document_loader=lambda _: None,
-            standard_asset_resolver=lambda *args, **kwargs: {"entries": [], "unresolved": []})
+            native_document_loader=lambda _: None, standard_asset_resolver=standard_assets)
         self.processor.exporter = exporter
         job = self.queue.enqueue(self.pg())
         with self.assertRaisesRegex(ArchiveQueueError, "archive_export_incomplete"):
@@ -1216,6 +1245,122 @@ class CourseArchiveQueueTest(unittest.TestCase):
         second = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
         self.assertEqual(second["eligibleCaptures"], 1, second)
         self.assertEqual(self.audio_alias_fixture["physicalPath"].read_bytes(), self.audio_alias_fixture["originalBytes"])
+
+    def test_review_png_copy_cleanup_records_exact_url_and_receipt_ownership_and_preserves_sources(self):
+        job, stage, _ = self.completed_with_incomplete_capture(review_asset_copy=True)
+        fixture = self.review_asset_fixture
+        source_raw, receipt_raw = fixture["source"].read_bytes(), fixture["receipt"].read_bytes()
+        dry = self.processor.prune_incomplete_captures(job["key"])
+        self.assertEqual(dry["eligibleCaptures"], 1, dry)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+        result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(result["eligibleCaptures"], 1, result)
+        marker = json.loads((stage / "incomplete-prune.json").read_bytes())
+        copied = next(entry for entry in marker["files"] if entry["path"] == "asset-sources/" + fixture["copyName"])
+        binding = copied["reviewAssetProof"]["nativeAssets"][0]
+        self.assertEqual(binding["sourceIdentity"], fixture["entry"]["ref"])
+        self.assertEqual(binding["sourceReceipt"], fixture["entry"]["sourceReceipt"])
+        self.assertEqual(binding["receiptBinding"]["sourceFileSha256"], fixture["entry"]["sha256"])
+        self.assertEqual(fixture["source"].read_bytes(), source_raw)
+        self.assertEqual(fixture["receipt"].read_bytes(), receipt_raw)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"], dry_run=False)["removedBytes"], 0)
+
+    def test_review_png_copy_requires_exact_name_original_native_semantics_and_archived_receipt(self):
+        job, stage, _ = self.completed_with_incomplete_capture(review_asset_copy=True)
+        fixture = self.review_asset_fixture
+        old = self.processor._cleanup_manifest_files(json.loads((stage / "课程资料/manifest.json").read_bytes()))
+        new = self.processor._cleanup_manifest_files(json.loads(Path(job["retainedManifestPath"]).read_bytes()))
+        name = fixture["copyName"]
+        evidence = self.processor._cleanup_file(stage / "asset-sources" / name)
+        native = next(key for key, entry in old.items() if entry.get("sourceKind") == "native_standard_asset")
+        receipt = fixture["entry"]["sourceReceipt"]["archivePath"]
+        mutations = [
+            ("missing native", lambda a, b: b.pop(native)),
+            ("derived native", lambda a, b: b[native].update(original=False)),
+            ("old derived native", lambda a, b: a[native].update(original=False)),
+            ("changed URL", lambda a, b: b[native].update(sourceIdentity="/review-assets/other/portrait.png")),
+            ("wrong native MIME", lambda a, b: b[native].update(mimeType="image/jpeg")),
+            ("wrong source kind", lambda a, b: b[native].update(sourceKind="owned_original_file")),
+            ("missing sourceReceipt", lambda a, b: a[native].pop("sourceReceipt")),
+            ("foreign sourceReceipt", lambda a, b: b[native].update(sourceReceipt={"archivePath": "原稿/other-lesson/receipt.json", "sha256": a[receipt]["sha256"]})),
+            ("missing archived receipt", lambda a, b: b.pop(receipt)),
+            ("derived receipt", lambda a, b: b[receipt].update(original=False)),
+            ("changed receipt hash", lambda a, b: b[receipt].update(sha256="f" * 64)),
+            ("changed receipt identity", lambda a, b: b[receipt].update(sourceIdentity="other-lesson/receipt.json")),
+        ]
+        for title, mutate in mutations:
+            with self.subTest(title=title):
+                a, b = deepcopy(old), deepcopy(new)
+                mutate(a, b)
+                self.assertIsNone(self.processor._review_asset_copy_ownership(name, evidence, a, b, stage, None))
+        for bad in ("other-" + name, name.replace("review-", "reviewx-"), name.replace(".png", ".jpg"),
+                    name.replace(".png", ".PNG"), "review-" + "f" * 64 + ".png", "sub/" + name):
+            with self.subTest(name=bad):
+                self.assertIsNone(self.processor._review_asset_copy_ownership(bad, evidence, old, new, stage, None))
+
+    def test_review_png_copy_checks_actual_receipt_semantics_and_rejects_links_or_unknown_prefix(self):
+        job, stage, _ = self.completed_with_incomplete_capture(review_asset_copy=True)
+        fixture = self.review_asset_fixture
+        old = self.processor._cleanup_manifest_files(json.loads((stage / "课程资料/manifest.json").read_bytes()))
+        new = self.processor._cleanup_manifest_files(json.loads(Path(job["retainedManifestPath"]).read_bytes()))
+        name, receipt = fixture["copyName"], fixture["entry"]["sourceReceipt"]["archivePath"]
+        filename = stage / "asset-sources" / name
+        evidence = self.processor._cleanup_file(filename)
+        native = next(key for key, entry in old.items() if entry.get("sourceKind") == "native_standard_asset")
+        receipt_path = stage / "课程资料" / receipt
+        raw = receipt_path.read_bytes()
+        for change in ({"schemaVersion": "unrelated-receipt"}, {"reviewUrl": "/review-assets/other/portrait.png"},
+                       {"sourceFileSha256": "f" * 64}):
+            with self.subTest(change=change):
+                changed_raw = encoded({**json.loads(raw), **change})
+                receipt_path.write_bytes(changed_raw)
+                a, b = deepcopy(old), deepcopy(new)
+                for mapping in (a, b):
+                    mapping[receipt].update(sha256=digest(changed_raw), byteSize=len(changed_raw))
+                    mapping[native]["sourceReceipt"]["sha256"] = digest(changed_raw)
+                self.assertIsNone(self.processor._review_asset_copy_ownership(name, evidence, a, b, stage, None))
+        receipt_path.write_bytes(raw)
+        foreign = filename.with_name("other-" + name)
+        filename.rename(foreign)
+        result = self.processor.prune_incomplete_captures(job["key"])
+        self.assertEqual(result["captures"][0]["reason"], "archive_incomplete_cleanup_unowned_asset")
+        foreign.rename(filename)
+        copied = filename.read_bytes()
+        filename.unlink()
+        filename.symlink_to(fixture["source"])
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        filename.unlink()
+        filename.write_bytes(copied)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+
+    def test_review_png_copy_resume_keeps_proof_when_planned_receipt_was_already_removed(self):
+        job, stage, _ = self.completed_with_incomplete_capture(review_asset_copy=True)
+        fixture = self.review_asset_fixture
+        receipt_path = stage / "课程资料" / fixture["entry"]["sourceReceipt"]["archivePath"]
+        unlink = Path.unlink
+
+        def interrupted_unlink(path, *args, **kwargs):
+            result = unlink(path, *args, **kwargs)
+            if path == receipt_path:
+                raise OSError("interrupted after deleting a receipt covered by persisted ownership intent")
+            return result
+
+        with patch.object(Path, "unlink", interrupted_unlink):
+            first = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(first["eligibleCaptures"], 0)
+        self.assertFalse(receipt_path.exists())
+        marker = stage / "incomplete-prune.json"
+        raw = marker.read_bytes()
+        altered = json.loads(raw)
+        entry = next(e for e in altered["files"] if e.get("reviewAssetProof"))
+        entry["reviewAssetProof"]["nativeAssets"][0]["receiptBinding"]["reviewUrl"] = "/review-assets/other/portrait.png"
+        marker.write_bytes(encoded(altered))
+        result = self.processor.prune_incomplete_captures(job["key"])
+        self.assertEqual(result["captures"][0]["reason"], "archive_incomplete_cleanup_plan_changed")
+        marker.write_bytes(raw)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"], dry_run=False)["eligibleCaptures"], 1)
+        self.assertTrue(fixture["source"].exists())
+        self.assertTrue(fixture["receipt"].exists())
 
     def test_incomplete_capture_unique_original_is_retained_without_touching_any_derivative(self):
         job, stage, _ = self.completed_with_incomplete_capture(unique_old_original=True)
