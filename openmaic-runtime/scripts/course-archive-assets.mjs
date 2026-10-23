@@ -20,6 +20,11 @@ const parseCssValue=require('postcss-value-parser');
 const ts=require('typescript');
 const MAX_BYTES=768*1024**2,MAX_TOTAL=4*1024**3,MAX_INPUT=128*1024**2;
 const sha=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
+const THREE_BASE='https://unpkg.com/three@0.160.0/';
+const THREE_ENTRIES=new Set(['build/three.module.js','examples/jsm/controls/OrbitControls.js']);
+// Official npm three@0.160.0 tarball integrity and the exact inert file pins.
+// sha512-DLU8lc0zNIPkM7rH5/e1Ks1Z8tWCGRq6g8mPowdDJpw1CFBJMU7UoJjC6PefXW7z//SSl0b2+GCw14LB+uDhng==
+const THREE_FILES={"build/three.module.js":[1272972,"76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495"],"examples/jsm/controls/OrbitControls.js":[29868,"5a44a9e86a2a0fb11933eed69bc2cd33c76a496854c1aed6ed776efa87d7b064"],"LICENSE":[1081,"852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d"],"package.json":[3997,"f0392af130d7a636b1ebf086509ae2d71d69a3d89e93b2e081c1b556b94dc266"]};
 const KATEX_BASE='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/';
 const KATEX_ENTRIES=new Set(['katex.min.css','katex.min.js','contrib/auto-render.min.js']);
 // Official npm katex@0.16.9 tarball, verified before deriving these file pins:
@@ -109,10 +114,65 @@ const NAMESPACES=new Set(['http://www.w3.org/2000/svg','http://www.w3.org/1999/x
 const classroomDirectory=ref=>typeof ref==='string'&&/^\/api\/classroom-media\/[A-Za-z0-9_-]+\/media\/$/.test(ref);
 const staticPublic=ref=>typeof ref==='string'&&/^\/(?:review-assets\/v3-world-action\/[A-Za-z0-9_-]+\.(?:png|jpg|jpeg|webp)|avatars\/teacher-[1-9][0-9]*\.png)$/.test(ref);
 
+
+function moduleSpecifiers(text){
+ const source=ts.createSourceFile('module.js',text,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
+ const imports=[];
+ if(source.parseDiagnostics.length)imports.push(null);
+ const visit=node=>{
+  if((ts.isImportDeclaration(node)||ts.isExportDeclaration(node))&&node.moduleSpecifier)imports.push(node.moduleSpecifier.text);
+  if(ts.isCallExpression(node)&&node.expression.kind===ts.SyntaxKind.ImportKeyword){
+   const value=node.arguments[0];imports.push(value&&(ts.isStringLiteral(value)||ts.isNoSubstitutionTemplateLiteral(value))?value.text:null);
+  }
+  ts.forEachChild(node,visit);
+ };
+ visit(source);return imports;
+}
+function mappedModule(specifier,imports,base){
+ if(typeof specifier!=='string'||!specifier||/[\x00-\x20\x7f-\x9f]/.test(specifier))throw Error('module_specifier_invalid');
+ let target=imports[specifier];
+ if(target===undefined){
+  const prefix=Object.keys(imports).filter(key=>key.endsWith('/')&&specifier.startsWith(key)).sort((a,b)=>b.length-a.length)[0];
+  if(prefix){
+   if(typeof imports[prefix]!=='string'||!imports[prefix].endsWith('/'))throw Error('module_prefix_invalid');
+   target=new URL(specifier.slice(prefix.length),imports[prefix]).href;
+  }
+ }
+ if(target!==undefined){if(typeof target!=='string')throw Error('module_target_invalid');return new URL(target).href;}
+ if(/^https?:\/\//.test(specifier))return new URL(specifier).href;
+ if(base&&/^\.{1,2}\//.test(specifier))return new URL(specifier,base).href;
+ throw Error('module_specifier_unmapped');
+}
+function threeHtmlModules(document){
+ const maps=[...document.querySelectorAll('script[type="importmap"]')],modules=[...document.querySelectorAll('script[type="module"]')];
+ const active=maps.some(node=>/three/.test(node.textContent))||modules.some(node=>moduleSpecifiers(node.textContent).some(ref=>typeof ref==='string'&&/^(?:three(?:\/|$)|https:\/\/unpkg\.com\/three@)/.test(ref)));
+ if(!active)return {scripts:new Set(),refs:[]};
+ const refs=[],scripts=new Set(maps);let imports={};
+ try{
+  if(maps.length>1)throw Error('multiple_module_maps');
+  for(const node of maps){
+   const map=JSON.parse(node.textContent);
+   if(!map||typeof map!=='object'||Array.isArray(map)||Object.keys(map).some(key=>key!=='imports')||!map.imports||typeof map.imports!=='object'||Array.isArray(map.imports)||Object.keys(map.imports).length>64)throw Error('module_map_invalid');
+   imports=map.imports;
+  }
+ }catch{refs.push({ref:'mira:three-module-map-invalid',kind:'dependency'});}
+ for(const script of modules){
+  for(const specifier of moduleSpecifiers(script.textContent)){
+   try{
+    const ref=mappedModule(specifier,imports);refs.push({ref,kind:'dependency'});
+    if(ref===THREE_BASE+'examples/jsm/controls/OrbitControls.js')refs.push({ref:mappedModule('three',imports),kind:'dependency'});
+   }
+   catch{refs.push({ref:specifier===null?'mira:three-computed-module-import':'mira:three-unmapped-module:'+encodeURIComponent(String(specifier)),kind:'dependency'});}
+  }
+ }
+ return {scripts,refs};
+}
+
 function htmlReferences(html){
  const result=[];
  if(typeof html!=='string'||!html)return result;
  const document=new DOMParser().parseFromString(html,'text/html');
+ const threeModules=threeHtmlModules(document);result.push(...threeModules.refs);
  const add=(ref,kind)=>{if(typeof ref==='string'&&ref.trim())result.push({ref:ref.trim(),kind});};
  for(const node of document.querySelectorAll('img,video,audio,source,image,use,input[type="image"],object,embed,iframe,script[src],link[href]')){
   const tag=node.localName;
@@ -137,6 +197,7 @@ function htmlReferences(html){
  // Allocated ids interpolated by a generated activity's script have no DOM
  // src yet. Capture explicit literals; never run or evaluate the activity.
  for(const script of document.querySelectorAll('script')){
+  if(threeModules.scripts.has(script))continue;
   // Parse JavaScript literals without evaluating it. A regexp over quoted
   // source accidentally retained the backslash in nested escaped SVG markup.
   const source=ts.createSourceFile('course.js',script.textContent,ts.ScriptTarget.Latest,true,ts.ScriptKind.JS);
@@ -435,6 +496,105 @@ export function createKatexArchiveResolver({root,cacheRoot=root,localRoot,pins=K
  };
 }
 
+
+function threeName(ref,evidence=false){
+ if(typeof ref!=='string'||!ref.startsWith(THREE_BASE))return;
+ const name=ref.slice(THREE_BASE.length);
+ if(Object.hasOwn(THREE_FILES,name)&&(evidence||THREE_ENTRIES.has(name)))return name;
+}
+function threeCdnLookup(hostname,options,callback){
+ if(hostname!=='unpkg.com'){callback(Error('archive_three_host_rejected'));return;}
+ dnsLookup(hostname,{all:true,verbatim:true},(error,addresses)=>{
+  if(error){callback(error);return;}
+  if(!addresses.length||addresses.some(item=>!publicCdnAddress(item.address))){callback(Error('archive_cdn_private_address'));return;}
+  const selected=addresses.filter(item=>!options.family||item.family===options.family);
+  if(!selected.length){callback(Error('archive_cdn_address_unavailable'));return;}
+  if(options.all)callback(null,selected);else callback(null,selected[0].address,selected[0].family);
+ });
+}
+export function downloadThreeBytes(url,{maxBytes,timeoutMs=10000,request=https.get}={}){
+ if(!threeName(url,true)||!Number.isSafeInteger(maxBytes)||maxBytes<1||maxBytes>2*1024**2)throw Error('archive_three_request_rejected');
+ return new Promise((resolve,reject)=>{
+  let req,timer,settled=false;
+  const finish=(error,bytes)=>{if(settled)return;settled=true;clearTimeout(timer);error?reject(error):resolve(bytes);};
+  req=request(url,{agent:false,lookup:threeCdnLookup,maxHeaderSize:16384,
+   headers:{'Accept-Encoding':'identity','User-Agent':'Mira-course-archive/1'}},response=>{
+   response.on('error',error=>finish(error));
+   const fail=()=>{response.destroy();req?.destroy();finish(Error('archive_cdn_response_rejected'));};
+   if(response.statusCode!==200||(response.headers['content-encoding']&&response.headers['content-encoding']!=='identity')){fail();return;}
+   const length=response.headers['content-length'];
+   if(length!==undefined&&(!/^\d+$/.test(length)||Number(length)!==maxBytes)){fail();return;}
+   const chunks=[];let size=0;
+   response.on('data',chunk=>{size+=chunk.length;if(size>maxBytes){fail();return;}chunks.push(chunk);});
+   response.on('end',()=>size===maxBytes?finish(null,Buffer.concat(chunks)):finish(Error('archive_cdn_size_mismatch')));
+  });
+  req.on('error',error=>finish(error));
+  timer=setTimeout(()=>{req.destroy();finish(Error('archive_cdn_timeout'));},Math.max(1,Math.min(timeoutMs,10000)));
+ });
+}
+/** Test-only pins/transports are dependency injection, never document fields. */
+export function createThreeArchiveResolver({root,cacheRoot=root,localRoot,pins=THREE_FILES,fetchBytes=downloadThreeBytes,limits={}}){
+ const maxRequests=Math.min(limits.requests??4,4),maxTotal=Math.min(limits.totalBytes??4*1024**2,4*1024**2);
+ const deadline=Date.now()+Math.min(limits.timeoutMs??60000,60000),records=new Map();let requests=0,total=0;
+ const load=name=>{
+  if(records.has(name))return records.get(name);
+  const promise=(async()=>{
+   const ref=THREE_BASE+name,entry={ref,originalURL:ref,kind:'dependency',status:'unresolved',reason:'versioned_public_dependency_unavailable'};
+   try{
+    const pin=pins[name];
+    if(!Object.hasOwn(THREE_FILES,name)||!Array.isArray(pin)||!Number.isSafeInteger(pin[0])||pin[0]<1||pin[0]>2*1024**2||!/^[a-f0-9]{64}$/.test(pin[1]))throw Error('archive_three_pin_invalid');
+    if(Date.now()>deadline||(total+=pin[0])>maxTotal)throw Error('archive_three_budget');
+    const ext=path.extname(name),cached=pin[1]+ext;let bytes;
+    try{bytes=await pinnedFile(cacheRoot,cached,pin);}catch(error){if(error.code!=='ENOENT')throw error;}
+    if(!bytes&&localRoot){
+     try{
+      const directory=await fs.realpath(localRoot),info=await readJson(path.join(directory,'package.json'));
+      if(info.name==='three'&&info.version==='0.160.0')bytes=await pinnedFile(directory,name,pin);
+     }catch{}
+    }
+    if(!bytes){
+     if(++requests>maxRequests)throw Error('archive_three_request_budget');
+     bytes=await fetchBytes(ref,{maxBytes:pin[0],timeoutMs:Math.max(1,Math.min(10000,deadline-Date.now()))});
+    }
+    if(!(bytes instanceof Uint8Array)||bytes.length!==pin[0]||sha(bytes)!==pin[1])throw Error('archive_three_integrity');
+    bytes=Buffer.from(bytes);await saveBytes(cacheRoot,pin[1],ext,bytes);
+    const mimeType=name.endsWith('.js')?'application/javascript':name==='package.json'?'application/json':'text/plain';
+    Object.assign(entry,{status:'resolved',sourcePath:await saveBytes(root,pin[1],ext,bytes),sha256:pin[1],byteSize:bytes.length,mimeType,
+     packageName:'three',packageVersion:'0.160.0'});delete entry.reason;
+    return {entry,bytes};
+   }catch{return {entry};}
+  })();records.set(name,promise);return promise;
+ };
+ return async ref=>{
+  const name=threeName(ref);if(!name)throw Error('archive_three_url_rejected');
+  const results=[],visited=new Set();
+  const visit=async current=>{
+   if(visited.has(current))return;visited.add(current);
+   const value=await load(current);results.push(value.entry);
+   if(value.entry.status!=='resolved'||!current.endsWith('.js'))return;
+   const dependencies=[];
+   for(const specifier of moduleSpecifiers(value.bytes.toString('utf8'))){
+    const url=mappedModule(specifier,{three:THREE_BASE+'build/three.module.js','three/addons/':THREE_BASE+'examples/jsm/'},THREE_BASE+current),child=threeName(url);
+    if(!child)throw Error('archive_three_dependency_unpinned');
+    dependencies.push(url);await visit(child);
+   }
+   value.entry.dependencyRefs=[...new Set(dependencies)];
+  };
+  try{
+   await visit(name);
+   for(const evidence of ['LICENSE','package.json']){
+    const item=(await load(evidence)).entry;results.push({...item,dependencyOf:ref,packageEvidence:true});
+   }
+   if(results.some(item=>item.status!=='resolved'))throw Error('archive_three_dependency_incomplete');
+   results[0].packageEvidenceRefs=['LICENSE','package.json'].map(name=>THREE_BASE+name);
+  }catch{
+   if(!results.length)results.push((await load(name)).entry);
+   results[0]={...results[0],status:'unresolved',reason:'versioned_public_dependency_incomplete'};
+  }
+  return results;
+ };
+}
+
 export async function resolveArchiveAssets(input,dependencies={}){
  const {snapshot,stageId,stagingRoot}=input;
  if(typeof stageId!=='string'||!/^[A-Za-z0-9_-]{1,255}$/.test(stageId)||snapshot?.stage?.id!==stageId)throw Error('archive_asset_stage_identity_invalid');
@@ -444,10 +604,22 @@ export async function resolveArchiveAssets(input,dependencies={}){
  const roots=dependencies.allowedRoots||[path.join(ROOT,'backend/data/course-storage/archives'),...(process.env.MIRA_TASK_TMPDIR?[await fs.realpath(process.env.MIRA_TASK_TMPDIR)]:[])];
  const target=await directory(stagingRoot,roots);
  const config=dependencies.config||await configuration();
- let katex;
+ let katex,three;
  for(const entry of [...entries]){
   if(entry.status!=='unresolved')continue;
-  if(katexName(entry.ref)){
+  if(threeName(entry.ref)){
+   try{
+    if(!three){
+     const state=dependencies.stateRoot||path.join(ROOT,'backend/data/course-storage');
+     const cache=await directory(path.join(state,'public-dependency-cache/three-0.160.0'),dependencies.allowedRoots||[state,...roots]);
+     let localRoot;try{localRoot=path.dirname(require.resolve('three/package.json'));}catch{}
+     three=createThreeArchiveResolver({root:target,cacheRoot:cache,localRoot,fetchBytes:dependencies.downloadThreeBytes||downloadThreeBytes});
+    }
+    const [resolved,...children]=await three(entry.ref);Object.assign(entry,resolved);
+    if(entry.status==='resolved')delete entry.reason;
+    for(const child of children)if(!entries.some(existing=>existing.ref===child.ref))entries.push(child);
+   }catch{entry.reason='versioned_public_dependency_unavailable';}
+  }else if(katexName(entry.ref)){
    try{
     if(!katex){
      const state=dependencies.stateRoot||path.join(ROOT,'backend/data/course-storage');

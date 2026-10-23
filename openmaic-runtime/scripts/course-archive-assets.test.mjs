@@ -8,7 +8,7 @@ import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {EventEmitter} from 'node:events';
 import {Readable} from 'node:stream';
-import {canonical,enumerateSnapshotAssets,resolveArchiveAssets,createKatexArchiveResolver,downloadKatexBytes,publicCdnAddress} from './course-archive-assets.mjs';
+import {canonical,enumerateSnapshotAssets,resolveArchiveAssets,createKatexArchiveResolver,downloadKatexBytes,createThreeArchiveResolver,downloadThreeBytes,publicCdnAddress} from './course-archive-assets.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const require=createRequire(path.join(root,'openmaic-runtime/.runtime/OpenMAIC/packages/@openmaic/storage/package.json'));
@@ -240,4 +240,109 @@ test('HTTPS redirects, oversized bodies and non-exact lengths are rejected witho
   await assert.rejects(downloadKatexBytes(katexBase+'katex.min.js',{maxBytes:2,request}));
   assert.equal(calls,1);
  }
+});
+
+const threeBase='https://unpkg.com/three@0.160.0/';
+const threeMap={imports:{three:threeBase+'build/three.module.js','three/addons/':threeBase+'examples/jsm/'}};
+function threeRoom(code,map=threeMap){
+ const snapshot=room([]);
+ snapshot.scenes[0].content={type:'interactive',html:`<script type="importmap">${JSON.stringify(map)}</script><script type="module">${code}</script>`};
+ return snapshot;
+}
+async function threeFixture(t,{limits={},moduleSource}={}){
+ const directory=await fs.realpath(await fs.mkdtemp(path.join(process.env.MIRA_TASK_TMPDIR||os.tmpdir(),'archive-three-')));
+ t.after(()=>fs.rm(directory,{recursive:true,force:true}));
+ const root=path.join(directory,'assets'),cacheRoot=path.join(directory,'cache');await fs.mkdir(root);await fs.mkdir(cacheRoot);
+ const sources={
+  'build/three.module.js':Buffer.from('export class EventDispatcher{};throw Error("archive never executes code");'),
+  'examples/jsm/controls/OrbitControls.js':Buffer.from(moduleSource||'import {EventDispatcher} from "three";export class OrbitControls extends EventDispatcher{};'),
+  LICENSE:Buffer.from('MIT license fixture'),
+  'package.json':Buffer.from(JSON.stringify({name:'three',version:'0.160.0'})),
+ };
+ const pins=Object.fromEntries(Object.entries(sources).map(([name,bytes])=>[name,[bytes.length,digest(bytes)]])),calls=[];
+ const fetchBytes=async(url,options)=>{calls.push(url);const bytes=sources[url.slice(threeBase.length)];assert.equal(options.maxBytes,bytes.length);return bytes;};
+ return{directory,root,cacheRoot,sources,pins,calls,fetchBytes,resolver:createThreeArchiveResolver({root,cacheRoot,pins,fetchBytes,limits})};
+}
+test('Three import maps expand actual static, export and literal dynamic modules without downloading directory declarations',()=>{
+ const original=threeRoom('import * as THREE from "three";import {OrbitControls} from "three/addons/controls/OrbitControls.js";');
+ const before=JSON.stringify(original),refs=enumerateSnapshotAssets(original).map(e=>e.ref);
+ assert.deepEqual(refs.sort(),[threeBase+'build/three.module.js',threeBase+'examples/jsm/controls/OrbitControls.js'].sort());
+ assert.equal(JSON.stringify(original),before);
+ assert.deepEqual(enumerateSnapshotAssets(threeRoom('import * as THREE from "three";')).map(e=>e.ref),[threeBase+'build/three.module.js']);
+ assert.deepEqual(enumerateSnapshotAssets(threeRoom('const unused=1;')),[]);
+ const other=enumerateSnapshotAssets(threeRoom('export {OrbitControls} from "three/addons/controls/OrbitControls.js";import("three");'));
+ assert.equal(other.length,2);assert(!other.some(e=>e.ref.endsWith('/')));
+});
+test('Three unknown addons, unmapped bare and computed imports remain explicit unresolved dependencies',async t=>{
+ for(const code of ['import "unknown-package";','import(variableName);','import `three/addons/${addon}.js`;']){
+  const entries=enumerateSnapshotAssets(threeRoom(code));
+  assert(entries.some(e=>e.status==='unresolved'&&e.ref.startsWith('mira:three-')));
+ }
+ const unknown=threeRoom('import "three/addons/controls/UnknownControls.js";'),f=await fixture(t,unknown);let downloads=0;
+ const result=await resolveArchiveAssets(f.input,{...f.dependencies,downloadThreeBytes:()=>{downloads++;throw Error('unknown addon must not download');}});
+ assert.equal(result.unresolved.length,1);assert.equal(downloads,0);assert.equal(f.calls.length,0);
+ const altered=enumerateSnapshotAssets(threeRoom('import "three/addons/controls/OrbitControls.js";',
+  {imports:{...threeMap.imports,three:threeBase.replace('0.160.0','0.180.0')+'build/three.module.js'}}));
+ assert(altered.some(e=>e.ref.includes('0.180.0')&&e.status==='unresolved'));
+});
+test('Three resolver preserves its exact transitive modules, package evidence and license bytes in private cache',async t=>{
+ const f=await threeFixture(t),entries=await f.resolver(threeBase+'examples/jsm/controls/OrbitControls.js');
+ assert.equal(entries.length,4);assert(entries.every(e=>e.status==='resolved'));assert.equal(f.calls.length,4);
+ assert.deepEqual(entries[0].dependencyRefs,[threeBase+'build/three.module.js']);
+ const license=entries.find(e=>e.originalURL===threeBase+'LICENSE');assert(license.packageEvidence);assert.equal(license.mimeType,'text/plain');
+ for(const e of entries){assert.equal(digest(await fs.readFile(e.sourcePath)),e.sha256);assert.equal((await fs.stat(e.sourcePath)).mode&0o777,0o600);assert.equal(e.packageVersion,'0.160.0');}
+ const other=path.join(f.directory,'other');await fs.mkdir(other);
+ const cached=createThreeArchiveResolver({...f,root:other,fetchBytes:()=>{throw Error('no cache redownload');}});
+ assert((await cached(threeBase+'examples/jsm/controls/OrbitControls.js')).every(e=>e.status==='resolved'));assert.equal(f.calls.length,4);
+});
+test('Three unknown transitive imports, incomplete bytes and finite budgets never qualify a complete dependency',async t=>{
+ for(const moduleSource of ['import "three/addons/Unknown.js";','import "unknown-package";','import(variableName);']){
+  const f=await threeFixture(t,{moduleSource});assert.equal((await f.resolver(threeBase+'examples/jsm/controls/OrbitControls.js'))[0].status,'unresolved');
+ }
+ const budget=await threeFixture(t,{limits:{requests:3}});
+ assert.equal((await budget.resolver(threeBase+'examples/jsm/controls/OrbitControls.js'))[0].status,'unresolved');assert.equal(budget.calls.length,3);
+ const bytes=await threeFixture(t,{limits:{totalBytes:1}});
+ assert.equal((await bytes.resolver(threeBase+'build/three.module.js'))[0].status,'unresolved');assert.equal(bytes.calls.length,0);
+ const corrupt=await threeFixture(t),resolver=createThreeArchiveResolver({...corrupt,fetchBytes:async()=>Buffer.from('not the pinned artifact')});
+ assert.equal((await resolver(threeBase+'build/three.module.js'))[0].status,'unresolved');
+ const pins={...corrupt.pins,'build/three.module.js':[2*1024**2+1,'a'.repeat(64)]};let calls=0;
+ const oversized=createThreeArchiveResolver({...corrupt,pins,fetchBytes:()=>{calls++;throw Error('oversized pin must not fetch');}});
+ assert.equal((await oversized(threeBase+'build/three.module.js'))[0].status,'unresolved');assert(calls<=2);
+});
+test('Three local package version, file SHA and symlink cache checks cannot substitute a different release',async t=>{
+ const f=await threeFixture(t),localRoot=path.join(f.directory,'local');
+ for(const [name,bytes]of Object.entries(f.sources)){const p=path.join(localRoot,name);await fs.mkdir(path.dirname(p),{recursive:true});await fs.writeFile(p,bytes);}
+ const local=createThreeArchiveResolver({...f,localRoot,fetchBytes:()=>{throw Error('exact local bytes must avoid network');}});
+ assert((await local(threeBase+'examples/jsm/controls/OrbitControls.js')).every(e=>e.status==='resolved'));
+ const cacheRoot=path.join(f.directory,'wrong-version');await fs.mkdir(cacheRoot);
+ await fs.writeFile(path.join(localRoot,'package.json'),JSON.stringify({name:'three',version:'0.180.0'}));
+ const wrong=createThreeArchiveResolver({...f,cacheRoot,localRoot,fetchBytes:async()=>{throw Error('no replacement release');}});
+ assert.equal((await wrong(threeBase+'build/three.module.js'))[0].status,'unresolved');
+ const linkedCache=path.join(f.directory,'linked');await fs.mkdir(linkedCache);
+ await fs.symlink(path.join(localRoot,'build/three.module.js'),path.join(linkedCache,f.pins['build/three.module.js'][1]+'.js'));
+ const linked=createThreeArchiveResolver({...f,cacheRoot:linkedCache});assert.equal((await linked(threeBase+'build/three.module.js'))[0].status,'unresolved');
+});
+test('Three accepts only its four exact HTTPS artifact paths and has independent transport limits',async t=>{
+ const f=await threeFixture(t),entry=threeBase+'build/three.module.js';
+ for(const ref of [entry.replace('0.160.0','0.180.0'),entry+'?token=secret',entry+'#fragment',threeBase+'examples/jsm/',threeBase+'../package.json',entry.replace('unpkg.com','127.0.0.1'),entry.replace('https:','http:'),entry.replace('unpkg.com','user:password@unpkg.com')]){
+  await assert.rejects(f.resolver(ref),/url_rejected/);assert.throws(()=>downloadThreeBytes(ref,{maxBytes:2}),/request_rejected/);
+ }
+ assert.equal(f.calls.length,0);assert.throws(()=>downloadThreeBytes(entry,{maxBytes:2*1024**2+1}),/request_rejected/);
+ assert.throws(()=>downloadKatexBytes(katexBase+'katex.min.js',{maxBytes:512*1024+1}),/request_rejected/);
+ for(const [statusCode,body,headers]of [[302,'',{location:'https://127.0.0.1/private'}],[200,'oversized',{}],[200,'ok',{'content-length':'3'}]]){
+  let calls=0;
+  const request=(url,options,callback)=>{
+   calls++;assert.equal(url,entry);assert.equal(options.headers['Accept-Encoding'],'identity');
+   options.lookup('127.0.0.1',{},error=>assert(error));
+   const req=new EventEmitter();req.destroy=()=>{};
+   queueMicrotask(()=>{const response=Readable.from([Buffer.from(body)]);response.statusCode=statusCode;response.headers=headers;callback(response);});return req;
+  };
+  await assert.rejects(downloadThreeBytes(entry,{maxBytes:2,request}));assert.equal(calls,1);
+ }
+});
+test('Three document fields cannot override production file pins',async t=>{
+ const snapshot=threeRoom('import "three";'),f=await fixture(t,snapshot),fake=Buffer.from('invented code');
+ const result=await resolveArchiveAssets({...f.input,pins:{'build/three.module.js':[fake.length,digest(fake)]}},
+  {...f.dependencies,downloadThreeBytes:async()=>fake});
+ assert(result.unresolved.some(e=>e.ref===threeBase+'build/three.module.js'));assert.equal(f.calls.length,0);
 });

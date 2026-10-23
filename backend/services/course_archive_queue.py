@@ -14,6 +14,7 @@ import stat
 import subprocess
 import tempfile
 import time
+import unicodedata
 from urllib.parse import urlsplit
 import zipfile
 
@@ -680,6 +681,128 @@ class CourseArchiveProcessor:
         except (OSError, ValueError, TypeError, KeyError) as error:
             raise ArchiveQueueError(invalid) from error
 
+    @staticmethod
+    def _private_recovery_omissions(uncovered, manifest):
+        def normalized_parts(value):
+            if (not isinstance(value, str) or not value or value.startswith("/") or "\\" in value
+                    or any(unicodedata.category(c) in {"Cc", "Cf", "Cs"} for c in value)
+                    or any(part in {"", ".", ".."} for part in value.split("/"))):
+                return None
+            return tuple(value.split("/"))
+
+        approved = []
+        entries = manifest.get("excludedFiles", [])
+        for entry in entries if isinstance(entries, list) else []:
+            if (isinstance(entry, dict) and isinstance(entry.get("reason"), str) and entry["reason"] in {
+                    "retained_private_runtime_recovery_backup", "retained_private_runtime_compile_staging"}):
+                parts = normalized_parts(entry.get("sourceIdentity"))
+                if parts:
+                    approved.append((parts, {k: entry[k] for k in ("sourceIdentity", "reason")}))
+        result = {}
+        for entry in uncovered:
+            parts = normalized_parts(entry["sourceIdentity"])
+            matches = [(prefix, omission) for prefix, omission in approved
+                       if parts and len(prefix) <= len(parts) and parts[:len(prefix)] == prefix]
+            if not matches:
+                raise ArchiveQueueError("archive_incomplete_cleanup_original_not_covered")
+            longest = max(len(prefix) for prefix, _ in matches)
+            specific = {(omission["sourceIdentity"], omission["reason"]) for prefix, omission in matches
+                        if len(prefix) == longest}
+            if len(specific) != 1:
+                raise ArchiveQueueError("archive_incomplete_cleanup_original_not_covered")
+            source, reason = specific.pop()
+            result[(entry["sourceIdentity"], entry["sha256"], entry["byteSize"])] = {
+                "sourceIdentity": source, "reason": reason}
+        return result
+
+    def _private_recovery_cleanup_proof(self, job, reference, index, raw, manifest_raw, uncovered, omissions, previous):
+        """Supplement explicit private omissions with independently retained original bytes."""
+        stage = Path(reference["indexPath"]).parent
+        directory = self.queue.root / "archive-retirements" / job["key"] / "private-recovery" / stage.name
+        path = directory / "private-recovery.json"
+        invalid = "archive_incomplete_cleanup_private_recovery_invalid"
+
+        def private_bytes(filename):
+            before = filename.lstat()
+            if not stat.S_ISREG(before.st_mode) or stat.S_IMODE(before.st_mode) != 0o600:
+                raise ArchiveQueueError(invalid)
+            value = _read(filename)
+            after = filename.lstat()
+            fields = ("st_dev", "st_ino", "st_mode", "st_size", "st_mtime_ns", "st_ctime_ns")
+            if any(getattr(before, k) != getattr(after, k) for k in fields):
+                raise ArchiveQueueError(invalid)
+            return value
+
+        identity = lambda entry: (entry.get("sourceIdentity"), entry.get("sha256"), entry.get("byteSize"))
+        try:
+            proof_raw = private_bytes(path)
+            proof = json.loads(proof_raw)
+            old_binding = {"jobKey": job["key"], "captureStage": str(stage), "indexPath": reference["indexPath"],
+                "indexSha256": _sha(raw), "manifestPath": index["manifestPath"],
+                "manifestSha256": _sha(manifest_raw), "retainedIndexPath": str(directory / "index.json"),
+                "retainedManifestPath": str(directory / "manifest.json")}
+            expected = {**old_binding, "schemaVersion": "mira.course-archive.private-recovery.v2",
+                "status": "bound-complete-replacement", "replacementIndexSha256": job["export"]["indexSha256"],
+                "receiptSha256": job["receiptSha256"],
+                "provisionalProofPath": str(directory / "private-recovery.provisional.json")}
+            if (not isinstance(proof, dict) or any(proof.get(k) != v for k, v in expected.items())
+                    or any(proof.get(k) is not False for k in ("publicUploadAllowed", "payloadPruned", "queueRecordChanged"))
+                    or private_bytes(directory / "index.json") != raw
+                    or private_bytes(directory / "manifest.json") != manifest_raw):
+                raise ArchiveQueueError(invalid)
+            provisional_raw = private_bytes(directory / "private-recovery.provisional.json")
+            provisional = json.loads(provisional_raw)
+            if (not isinstance(provisional, dict) or _sha(provisional_raw) != proof.get("provisionalProofSha256")
+                    or provisional.get("schemaVersion") != "mira.course-archive.private-recovery.v1"
+                    or provisional.get("status") != "verified-private-recovery"
+                    or any(provisional.get(k) != v for k, v in old_binding.items())
+                    or not isinstance(provisional.get("files"), list)
+                    or not all(isinstance(entry, dict) for entry in provisional["files"])):
+                raise ArchiveQueueError(invalid)
+            provisional_files = {identity(entry): entry for entry in provisional["files"]}
+            wanted = {identity(entry): entry for entry in uncovered}
+            entries, seen = proof.get("files"), set()
+            if (not isinstance(entries, list) or len(entries) != len(wanted)
+                    or type(proof.get("fileCount")) is not int or proof["fileCount"] != len(wanted)
+                    or type(proof.get("byteSize")) is not int
+                    or proof["byteSize"] != sum(entry["byteSize"] for entry in wanted.values())):
+                raise ArchiveQueueError(invalid)
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    raise ArchiveQueueError(invalid)
+                key = identity(entry)
+                if (key not in wanted or key in seen or entry.get("original") is not True
+                        or type(entry.get("byteSize")) is not int or entry.get("archivePath") != wanted[key]["archivePath"]
+                        or entry.get("matchedOmission") != omissions[key]
+                        or key not in provisional_files
+                        or entry.get("recoveryPath") != provisional_files[key].get("recoveryPath")):
+                    raise ArchiveQueueError(invalid)
+                seen.add(key)
+                filename = Path(entry["recoveryPath"])
+                if (str(filename) != entry["recoveryPath"] or filename.parent != directory / "files"
+                        or not re.fullmatch(r"[a-f0-9]{64}\.[A-Za-z0-9]+", filename.name)
+                        or filename.stem != entry["sha256"]):
+                    raise ArchiveQueueError(invalid)
+                evidence = self._cleanup_file(filename)
+                descriptor = os.open(filename, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+                with os.fdopen(descriptor, "rb") as stream:
+                    info = os.fstat(stream.fileno())
+                    fields = ("st_dev", "st_ino", "st_mode", "st_size", "st_mtime_ns", "st_ctime_ns")
+                    if (stat.S_IMODE(info.st_mode) != 0o600 or info.st_nlink != 1
+                            or [getattr(info, k) for k in fields] != evidence["identity"]
+                            or any(evidence[k] != entry[k] for k in ("sha256", "byteSize"))):
+                        raise ArchiveQueueError(invalid)
+                    os.fsync(stream.fileno())
+                    current = filename.lstat()
+                    if current.st_nlink != 1 or [getattr(current, k) for k in fields] != evidence["identity"]:
+                        raise ArchiveQueueError(invalid)
+            result = {"path": str(path), "sha256": _sha(proof_raw)}
+            if previous and previous.get("privateRecoveryProof") != result:
+                raise ArchiveQueueError(invalid)
+            return result
+        except (OSError, ValueError, TypeError, KeyError) as error:
+            raise ArchiveQueueError(invalid) from error
+
     def _incomplete_cleanup_plan(self, job, reference, replacement, replacement_manifest):
         path = Path(reference.get("indexPath", ""))
         stage = path.parent
@@ -725,8 +848,10 @@ class CourseArchiveProcessor:
         original = lambda entry: (entry["sourceIdentity"], entry["sha256"], entry["byteSize"])
         covered = {original(entry) for entry in new_files.values() if entry["original"]}
         originals = [entry for entry in old_files.values() if entry["original"]]
-        if not originals or any(original(entry) not in covered for entry in originals):
+        uncovered = [entry for entry in originals if original(entry) not in covered]
+        if not originals:
             raise ArchiveQueueError("archive_incomplete_cleanup_original_not_covered")
+        private_omissions = self._private_recovery_omissions(uncovered, replacement_manifest)
         zip_path = Path(index.get("zip", {}).get("path", ""))
         if zip_path.parent != stage or zip_path.suffix != ".zip":
             raise ArchiveQueueError("archive_incomplete_cleanup_zip_invalid")
@@ -737,6 +862,10 @@ class CourseArchiveProcessor:
         previous = json.loads(_read(marker)) if marker.exists() else None
         if previous and any(previous.get(k) != v for k, v in binding.items()):
             raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
+        private_recovery_proof = None
+        if uncovered:
+            private_recovery_proof = self._private_recovery_cleanup_proof(
+                job, reference, index, raw, manifest_raw, uncovered, private_omissions, previous)
         zip_only_proof = previous.get("zipOnlyProof") if previous else None
         if zip_path.exists() or zip_path.is_symlink():
             evidence = self._cleanup_file(zip_path)
@@ -790,7 +919,14 @@ class CourseArchiveProcessor:
                                                              for k in ("sha256", "byteSize"))):
                 raise ArchiveQueueError("archive_incomplete_cleanup_plan_changed")
             files.append({"path": relative, **evidence})
+        if private_recovery_proof:
+            # Payload hashing can be lengthy; recheck the independent recovery
+            # bytes immediately before returning an actionable deletion plan.
+            if self._private_recovery_cleanup_proof(
+                    job, reference, index, raw, manifest_raw, uncovered, private_omissions, previous) != private_recovery_proof:
+                raise ArchiveQueueError("archive_incomplete_cleanup_private_recovery_invalid")
         return {**binding, **({"zipOnlyProof": zip_only_proof} if zip_only_proof else {}),
+                **({"privateRecoveryProof": private_recovery_proof} if private_recovery_proof else {}),
                 "originalFilesCovered": len(originals), "files": files,
                 "directories": [str(p.relative_to(stage)) for p in directories],
                 "bytes": sum(item["byteSize"] for item in files), "stage": str(stage),

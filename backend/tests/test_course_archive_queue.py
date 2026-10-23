@@ -637,17 +637,32 @@ class CourseArchiveQueueTest(unittest.TestCase):
         self.assertTrue(Path(job["retainedManifestPath"]).is_file())
         self.assertFalse(path.exists())
 
-    def completed_with_incomplete_capture(self, *, unique_old_original=False):
+    def completed_with_incomplete_capture(self, *, unique_old_original=False, private_old_originals=False):
         from services.course_archive_exporter import CourseArchiveExporter
+
+        private_sources = []
+        if private_old_originals:
+            base = self.root / "output/textbook-operator-lessons/pep-chinese-g1-upper-2022-standard"
+            for name in ("u4-l1/teaching-1/quality-repairs/formal-audio-predispatch-recovery-v1/old-build/4839.js",
+                         "u4-l3/teaching-1/planning/native-operator-staging-0242/9196.js"):
+                source = base / name
+                source.parent.mkdir(parents=True, exist_ok=True)
+                source.write_bytes(("/* retained private runtime " + source.name + " */").encode())
+                private_sources.append(source)
 
         class RecoverableExporter(CourseArchiveExporter):
             incomplete = True
 
             def export_snapshot(inner, snapshot, **options):
+                snapshot.source_roots.extend(source.parent.parent for source in private_sources)
                 if inner.incomplete:
                     snapshot.missing_sources.append({"kind": "media", "sourceIdentity": "needed.wav"})
                     if unique_old_original:
                         snapshot.documents["唯一原稿.json"] = '{"unique":"must survive"}'
+                    if private_old_originals:
+                        # The older capture predates the explicit private-runtime exclusions.
+                        with patch("services.course_archive_exporter._private_runtime_exclusion", return_value=None):
+                            return super().export_snapshot(snapshot, **options)
                 return super().export_snapshot(snapshot, **options)
 
         exporter = RecoverableExporter(project_root=self.root, media_store=Mock(),
@@ -839,6 +854,221 @@ class CourseArchiveQueueTest(unittest.TestCase):
         journal.write_bytes(encoded(proof))
         self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
         journal.write_bytes(raw)
+        second = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(second["eligibleCaptures"], 1, second)
+        self.assertEqual({p.name for p in stage.iterdir()}, {"index.json", "manifest.json", "incomplete-prune.json"})
+
+    def bind_private_recovery(self, job, stage):
+        index_raw = (stage / "index.json").read_bytes()
+        index = json.loads(index_raw)
+        manifest_raw = Path(index["manifestPath"]).read_bytes()
+        old = json.loads(manifest_raw)
+        replacement = json.loads(Path(job["retainedManifestPath"]).read_bytes())
+        identity = lambda entry: (entry["sourceIdentity"], entry["sha256"], entry["byteSize"])
+        covered = {identity(entry) for entry in replacement["files"] if entry["original"]}
+        uncovered = [entry for entry in old["files"] if entry["original"] and identity(entry) not in covered]
+        self.assertEqual(len(uncovered), 2)
+        directory = self.queue.root / "archive-retirements" / job["key"] / "private-recovery" / stage.name
+        (directory / "files").mkdir(parents=True, mode=0o700)
+        for name, raw in (("index.json", index_raw), ("manifest.json", manifest_raw)):
+            (directory / name).write_bytes(raw)
+            (directory / name).chmod(0o600)
+        entries = []
+        for entry in uncovered:
+            target = directory / "files" / (entry["sha256"] + ".js")
+            target.write_bytes((stage / "课程资料" / entry["archivePath"]).read_bytes())
+            target.chmod(0o600)
+            entries.append({**entry, "recoveryPath": str(target)})
+        provisional = {"schemaVersion": "mira.course-archive.private-recovery.v1",
+            "status": "verified-private-recovery", "jobKey": job["key"], "captureStage": str(stage),
+            "indexPath": str(stage / "index.json"), "indexSha256": digest(index_raw),
+            "manifestPath": index["manifestPath"], "manifestSha256": digest(manifest_raw),
+            "retainedIndexPath": str(directory / "index.json"), "retainedManifestPath": str(directory / "manifest.json"),
+            "files": entries, "fileCount": len(entries), "byteSize": sum(entry["byteSize"] for entry in entries),
+            "publicUploadAllowed": False, "payloadPruned": False, "queueRecordChanged": False}
+        raw = encoded(provisional)
+        provisional_path = directory / "private-recovery.provisional.json"
+        provisional_path.write_bytes(raw)
+        provisional_path.chmod(0o600)
+        bound_entries = []
+        for entry in entries:
+            omission = next(item for item in replacement["excludedFiles"]
+                if Path(entry["sourceIdentity"]).is_relative_to(item["sourceIdentity"]))
+            bound_entries.append({**entry, "matchedOmission": omission})
+        proof = {**provisional, "files": bound_entries, "schemaVersion": "mira.course-archive.private-recovery.v2",
+            "status": "bound-complete-replacement", "replacementIndexSha256": job["export"]["indexSha256"],
+            "receiptSha256": job["receiptSha256"], "provisionalProofPath": str(provisional_path),
+            "provisionalProofSha256": digest(raw)}
+        journal = directory / "private-recovery.json"
+        journal.write_bytes(encoded(proof))
+        journal.chmod(0o600)
+        return journal, proof
+
+    def test_explicit_private_omissions_can_use_bound_independent_recovery_without_public_upload(self):
+        job, stage, original = self.completed_with_incomplete_capture(private_old_originals=True)
+        journal, proof = self.bind_private_recovery(job, stage)
+        self.record_zip_only_cleanup(job, stage)
+        before = {path: path.read_bytes() for path in journal.parent.rglob("*") if path.is_file()}
+        calls = (self.client.uploads, self.exporter.calls)
+        plan = self.processor.prune_incomplete_captures(job["key"])
+        self.assertEqual(plan["eligibleCaptures"], 1, plan)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+        result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(result["eligibleCaptures"], 1, result)
+        marker = json.loads((stage / "incomplete-prune.json").read_bytes())
+        self.assertEqual(marker["privateRecoveryProof"], {"path": str(journal), "sha256": digest(journal.read_bytes())})
+        self.assertEqual(before, {path: path.read_bytes() for path in journal.parent.rglob("*") if path.is_file()})
+        self.assertEqual(calls, (self.client.uploads, self.exporter.calls))
+        self.assertEqual(original.read_bytes(), b"retained paid source")
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"], dry_run=False)["removedBytes"], 0)
+
+    def test_private_recovery_rejects_unbound_or_nonexact_proof_without_deleting_capture(self):
+        job, stage, _ = self.completed_with_incomplete_capture(private_old_originals=True)
+        journal, proof = self.bind_private_recovery(job, stage)
+        before = {p.relative_to(stage): p.read_bytes() for p in stage.rglob("*") if p.is_file()}
+        mutations = [
+            ("unfinalized", lambda p: p.update(schemaVersion="mira.course-archive.private-recovery.v1")),
+            ("job", lambda p: p.update(jobKey="a" * 64)),
+            ("old index", lambda p: p.update(indexSha256="a" * 64)),
+            ("old manifest", lambda p: p.update(manifestSha256="a" * 64)),
+            ("replacement", lambda p: p.update(replacementIndexSha256="a" * 64)),
+            ("receipt", lambda p: p.update(receiptSha256="a" * 64)),
+            ("provisional", lambda p: p.update(provisionalProofSha256="a" * 64)),
+            ("missing original", lambda p: p["files"].pop()),
+            ("duplicate", lambda p: p["files"].__setitem__(0, p["files"][1])),
+            ("extra", lambda p: p["files"].append(deepcopy(p["files"][0]))),
+            ("outside", lambda p: p["files"][0].update(recoveryPath=str(self.root / "needed.wav"))),
+            ("wrong omission", lambda p: p["files"][0].update(matchedOmission={"sourceIdentity": "unrelated", "reason": "retained_private_runtime_recovery_backup"})),
+            ("wrong omission reason", lambda p: p["files"][0]["matchedOmission"].update(reason="runtime_file_excluded")),
+        ]
+        for name, mutate in mutations:
+            with self.subTest(name=name):
+                changed = deepcopy(proof)
+                mutate(changed)
+                journal.write_bytes(encoded(changed))
+                result = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+                self.assertEqual(result["captures"][0]["reason"], "archive_incomplete_cleanup_private_recovery_invalid")
+                self.assertEqual(before, {p.relative_to(stage): p.read_bytes() for p in stage.rglob("*") if p.is_file()})
+                self.assertFalse((stage / "incomplete-prune.json").exists())
+        journal.unlink()
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+
+    def test_private_recovery_cannot_replace_explicit_omission_or_verified_replacement_guards(self):
+        job, stage, _ = self.completed_with_incomplete_capture(private_old_originals=True)
+        self.bind_private_recovery(job, stage)
+        replacement = self.processor._index(job)
+        manifest = json.loads(Path(job["retainedManifestPath"]).read_bytes())
+        variants = [[], [{"sourceIdentity": "different-original.js", "reason": "retained_private_runtime_recovery_backup"}],
+                    [{**entry, "reason": "credential_or_runtime_file_excluded"} for entry in manifest["excludedFiles"]]]
+        for omissions in variants:
+            with self.subTest(omissions=omissions), self.assertRaisesRegex(ArchiveQueueError, "original_not_covered"):
+                self.processor._incomplete_cleanup_plan(job, job["incompleteExports"][0], replacement,
+                    {**manifest, "excludedFiles": omissions})
+        saved = deepcopy(job)
+        job["status"] = "uploaded"
+        self.queue.save(job)
+        with self.assertRaisesRegex(ArchiveQueueError, "replacement_not_complete"):
+            self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.queue.save(saved)
+        receipt = Path(saved["receiptPath"])
+        receipt.write_bytes(receipt.read_bytes() + b" ")
+        with self.assertRaisesRegex(ArchiveQueueError, "archive_receipt_changed"):
+            self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+
+    def test_private_omission_paths_match_only_normalized_exact_files_or_segment_descendants(self):
+        entry = {"sourceIdentity": "output/old-build/server/chunks/4839.js", "sha256": "a" * 64, "byteSize": 5}
+        reason = "retained_private_runtime_recovery_backup"
+        for root in ("output/old-build", entry["sourceIdentity"]):
+            omission = {"sourceIdentity": root, "reason": reason}
+            result = self.processor._private_recovery_omissions([entry], {"excludedFiles": [omission]})
+            self.assertEqual(list(result.values()), [omission])
+        for bad in ("output/old-build-evil/server/4839.js", "output/old-build/../4839.js",
+                    "/output/old-build/4839.js", "output//old-build/4839.js", "output/./old-build/4839.js",
+                    "output/old-build\\4839.js", "output/old-build/\n4839.js", "output/old-build/\u202e4839.js"):
+            with self.subTest(source=bad), self.assertRaisesRegex(ArchiveQueueError, "original_not_covered"):
+                self.processor._private_recovery_omissions([{**entry, "sourceIdentity": bad}], {
+                    "excludedFiles": [{"sourceIdentity": "output/old-build", "reason": reason}]})
+        for bad in ("output/old-build-evil", "output/old-build/..", "/output/old-build", "output//old-build",
+                    "output\\old-build", "output/old-build\x00", "output/old-build/."):
+            with self.subTest(omission=bad), self.assertRaisesRegex(ArchiveQueueError, "original_not_covered"):
+                self.processor._private_recovery_omissions([entry], {
+                    "excludedFiles": [{"sourceIdentity": bad, "reason": reason}]})
+        with self.assertRaisesRegex(ArchiveQueueError, "original_not_covered"):
+            self.processor._private_recovery_omissions([entry], {"excludedFiles": [
+                {"sourceIdentity": "output/old-build", "reason": reason},
+                {"sourceIdentity": "output/old-build", "reason": "retained_private_runtime_compile_staging"}]})
+
+    def test_private_recovery_requires_independent_private_unchanged_bytes_not_original_presence(self):
+        job, stage, _ = self.completed_with_incomplete_capture(private_old_originals=True)
+        journal, proof = self.bind_private_recovery(job, stage)
+        journal_raw = journal.read_bytes()
+        journal.chmod(0o644)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        journal.chmod(0o600)
+        provisional = Path(proof["provisionalProofPath"])
+        provisional_raw = provisional.read_bytes()
+        provisional.write_bytes(provisional_raw + b" ")
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        provisional.write_bytes(provisional_raw)
+        journal.unlink()
+        alias = self.root / "private-proof.json"
+        alias.write_bytes(journal_raw)
+        alias.chmod(0o600)
+        journal.symlink_to(alias)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        journal.unlink()
+        journal.write_bytes(journal_raw)
+        journal.chmod(0o600)
+        filename = Path(proof["files"][0]["recoveryPath"])
+        saved = filename.read_bytes()
+        source = self.root / proof["files"][0]["sourceIdentity"]
+        self.assertEqual(source.read_bytes(), saved)
+        filename.write_bytes(bytes([saved[0] ^ 1]) + saved[1:])
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        filename.unlink()
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        filename.symlink_to(source)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        filename.unlink()
+        os.link(source, filename)
+        filename.chmod(0o600)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        filename.unlink()
+        filename.write_bytes(saved)
+        filename.chmod(0o644)
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        filename.chmod(0o600)
+        source.unlink()  # The verified independent backup is sufficient without a live source.
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 1)
+        self.assertFalse((stage / "incomplete-prune.json").exists())
+
+    def test_private_recovery_cleanup_resume_revalidates_bound_proof_and_retained_bytes(self):
+        job, stage, _ = self.completed_with_incomplete_capture(private_old_originals=True)
+        journal, proof = self.bind_private_recovery(job, stage)
+        unlink = Path.unlink
+        interrupted = False
+
+        def interrupted_unlink(path, *args, **kwargs):
+            nonlocal interrupted
+            result = unlink(path, *args, **kwargs)
+            if path.is_relative_to(stage / "课程资料") and not interrupted:
+                interrupted = True
+                raise OSError("interrupted after persisted private recovery cleanup intent")
+            return result
+
+        with patch.object(Path, "unlink", interrupted_unlink):
+            first = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
+        self.assertEqual(first["eligibleCaptures"], 0)
+        original_raw = journal.read_bytes()
+        journal.write_bytes(original_raw + b" ")
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        journal.write_bytes(original_raw)
+        filename = Path(proof["files"][0]["recoveryPath"])
+        saved = filename.read_bytes()
+        filename.write_bytes(bytes([saved[0] ^ 1]) + saved[1:])
+        self.assertEqual(self.processor.prune_incomplete_captures(job["key"])["eligibleCaptures"], 0)
+        filename.write_bytes(saved)
         second = self.processor.prune_incomplete_captures(job["key"], dry_run=False)
         self.assertEqual(second["eligibleCaptures"], 1, second)
         self.assertEqual({p.name for p in stage.iterdir()}, {"index.json", "manifest.json", "incomplete-prune.json"})
