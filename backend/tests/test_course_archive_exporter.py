@@ -7,13 +7,14 @@ import os
 from pathlib import Path
 import re
 import stat
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
 import zipfile
 
 from services.course_archive_exporter import (
-    ArchiveSnapshot, CourseArchiveError, CourseArchiveExporter, _check_public,
+    ArchiveSnapshot, CourseArchiveError, CourseArchiveExporter, _check_public, _safe_name, _storage_name,
 )
 from services.course_media_object_store import CourseMediaStorageError
 from core.course_storage_config import CourseStorageConfig
@@ -219,6 +220,60 @@ class CourseArchiveExporterTest(unittest.TestCase):
             self.assertEqual(metadata["schoolSystem"], "six_year")
         self.release["storageDirectory"] = "科学/已冻结版本/已冻结年级/2026-10-23/原目录"
         self.assertEqual(self.export()["objectDirectory"], self.release["storageDirectory"])
+
+    def test_storage_name_matches_the_actual_node_display_name_contract(self):
+        values = [
+            "外研社版（一年级起点，陈琳主编） · 2011课标版",
+            "Unit 1 What's your name?", "快乐读书吧：读书真快乐",
+            "一年级上册（五四制）", " .-  spaced\u00a0\u2003name -.. ",
+            "\ufeffname\ufeff", "a\u0085b", 'a\\/:*?"<>|#%\x00\x1fb',
+            "世" * 41, "a" * 119 + "🌏tail", "a" * 119 + "-tail",
+            "", "... --", "？：#", "语文", "ordinary file",
+        ]
+        script = """import {displayName} from './openmaic-runtime/scripts/course-storage.mjs';
+            let data='';for await(const chunk of process.stdin)data+=chunk;
+            console.log(JSON.stringify(JSON.parse(data).map(value=>{
+              try{return displayName(value);}catch{return null;}
+            })));"""
+        expected = json.loads(subprocess.check_output(["node", "--input-type=module", "-e", script],
+            cwd=Path(__file__).resolve().parents[2], input=json.dumps(values), text=True))
+        for value, node_name in zip(values, expected):
+            with self.subTest(value=value):
+                if node_name is None:
+                    with self.assertRaisesRegex(CourseArchiveError, "storage_name_invalid"):
+                        _storage_name(value)
+                else:
+                    self.assertEqual(_storage_name(value), node_name)
+        # Original source paths and generated public basenames keep their contract.
+        self.assertEqual(_safe_name("快乐读书吧：读书真快乐"), "快乐读书吧：读书真快乐")
+        self.assertEqual(len(_safe_name("a" * 161).encode()), 160)
+
+    def test_saved_and_future_fallback_normalize_only_the_four_storage_fields(self):
+        raw = {"subjectName": " 英语\u00a0 ",
+            "storageEditionLabel": "外研社版（一年级起点，陈琳主编） · 2011课标版",
+            "storageGradeLabel": "一年级上册（五四制）", "title": "Unit 1 What's your name?"}
+        self.snapshot.metadata.update(raw)
+        self.release = {**self.identity, "uploadDate": "2026-10-23"}
+        for status in ("published", "generated_saved"):
+            with self.subTest(status=status):
+                self.snapshot.status = status
+                result = self.export()
+                self.assertEqual(result["objectDirectory"],
+                    "英语/外研社版(一年级起点,陈琳主编) · 2011课标版/一年级上册(五四制)/2026-10-23/Unit 1 What's your name")
+                for item in result["generatedPublicFiles"]:
+                    self.assertTrue(item["relativePath"].split("/")[-1].startswith("Unit 1 What's your name--"))
+                with zipfile.ZipFile(result["zip"]["path"]) as archive:
+                    metadata = json.loads(archive.read("metadata.json"))
+                    for key, value in raw.items():
+                        self.assertEqual(metadata[key], value)
+
+    def test_frozen_published_directory_preserves_non_normalized_collision_suffix(self):
+        frozen = "英语/外研社版（一年级起点，陈琳主编）/一年级上册（五四制）/2026-10-23/How are you（版本2）"
+        self.release["storageDirectory"] = frozen
+        result = self.export()
+        self.assertEqual(result["objectDirectory"], frozen)
+        self.assertTrue(all(item["relativePath"].startswith(frozen + "/")
+                            for item in result["generatedPublicFiles"]))
 
     def active_release_manifest(self, entries):
         path = self.root / "backend/data/course-storage/active-manifest.json"
@@ -583,7 +638,7 @@ class CourseArchiveExporterTest(unittest.TestCase):
         self.assertEqual(result["status"], "generated_saved")
         self.assertIsNone(result["releaseSha256"])
         self.assertEqual(result["sourceDigest"], hashlib.sha256(raw.encode()).hexdigest())
-        self.assertTrue(result["objectDirectory"].startswith("课程/未绑定教材（历史课件）/未标注年级/"))
+        self.assertTrue(result["objectDirectory"].startswith("课程/未绑定教材(历史课件)/未标注年级/"))
         with zipfile.ZipFile(result["zip"]["path"]) as archive:
             self.assertEqual(archive.read("Native终态快照.json"), raw.encode())
         with self.assertRaisesRegex(CourseArchiveError, "source_digest_mismatch"):
@@ -597,11 +652,11 @@ class CourseArchiveExporterTest(unittest.TestCase):
             "gradeLabel": "一年级", "storageGradeLabel": "一年级上册", "schoolSystem": "six_year"}
         result = self.exporter.export_native_snapshot(room, source_kind="native_pg_stage",
             source_digest=self.exporter._native_digest(room), staging_root=self.staging / "native", meta=meta)
-        self.assertIn("/未绑定教材（历史课件）/", result["objectDirectory"])
+        self.assertIn("/未绑定教材(历史课件)/", result["objectDirectory"])
         meta["editionId"] = "pep-chinese-g1-upper-2022-standard"
         bound = self.exporter.export_native_snapshot(room, source_kind="native_pg_stage",
             source_digest=self.exporter._native_digest(room), staging_root=self.staging / "native", meta=meta)
-        self.assertIn("/未绑定教材（历史课件）/", bound["objectDirectory"])
+        self.assertIn("/未绑定教材(历史课件)/", bound["objectDirectory"])
         with zipfile.ZipFile(bound["zip"]["path"]) as archive:
             self.assertEqual(json.loads(archive.read("metadata.json"))["editionId"], meta["editionId"])
 
@@ -670,7 +725,7 @@ class CourseArchiveExporterTest(unittest.TestCase):
                     source_digest=self.exporter._native_digest(room), staging_root=self.staging / "native", meta=meta,
                     authoring_binding={"sessionId": "private-author"})
                 self.assertTrue(result["complete"])
-                self.assertIn("/未绑定教材（历史课件）/", result["objectDirectory"])
+                self.assertIn("/未绑定教材(历史课件)/", result["objectDirectory"])
                 with zipfile.ZipFile(result["zip"]["path"]) as archive:
                     self.assertNotIn("原稿/backend/content/textbooks/revisions/original.json", archive.namelist())
 

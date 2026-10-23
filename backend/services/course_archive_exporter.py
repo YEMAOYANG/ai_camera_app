@@ -16,6 +16,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
+import unicodedata
 import uuid
 import zipfile
 
@@ -100,6 +101,24 @@ def _safe_name(value):
     while len(value.encode("utf8")) > 160:
         value = value[:-1]
     return value
+
+
+def _storage_name(value):
+    """Match course-storage.mjs displayName for newly derived public directories."""
+    value = unicodedata.normalize("NFKC", str(value or ""))
+    value = re.sub(r'[\\/:*?"<>|#%\x00-\x1f\x7f]', "-", value)
+    # ECMAScript whitespace differs from Python \s (notably U+0085/FEFF).
+    value = re.sub(r"[ \t\n\v\f\r\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+", " ", value)
+    value = value.strip(". -")
+    result, byte_size = "", 0
+    for character in value:
+        size = len(character.encode("utf8"))
+        if byte_size + size > 120:
+            break
+        result += character
+        byte_size += size
+    _require(result and result not in {".", ".."}, "storage_name_invalid")
+    return result
 
 
 def _safe_relative(value):
@@ -1354,9 +1373,9 @@ class CourseArchiveExporter:
             volume = snapshot.metadata.get("volumeLabel")
             if not storage_edition and volume and volume not in edition:
                 edition += "-" + volume
-            object_directory = "/".join((_safe_name(snapshot.metadata.get("subjectName") or "课程"),
-                _safe_name(edition), _safe_name(snapshot.metadata.get("storageGradeLabel") or snapshot.metadata.get("gradeLabel") or "未标注年级"),
-                date, _safe_name(snapshot.metadata["title"])))
+            object_directory = "/".join((_storage_name(snapshot.metadata.get("subjectName") or "课程"),
+                _storage_name(edition), _storage_name(snapshot.metadata.get("storageGradeLabel") or snapshot.metadata.get("gradeLabel") or "未标注年级"),
+                date, _storage_name(snapshot.metadata["title"])))
         _safe_relative(object_directory)
         _require(len(object_directory.split("/")) == 5
                  and re.fullmatch(r"\d{4}-\d{2}-\d{2}", object_directory.split("/")[3]),
