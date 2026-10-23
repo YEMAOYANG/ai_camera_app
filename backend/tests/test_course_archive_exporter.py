@@ -1,6 +1,7 @@
 """Archive recovery bytes, ownership boundaries and public upload contracts."""
 from copy import deepcopy
 import hashlib
+from io import BytesIO
 import json
 import os
 from pathlib import Path
@@ -50,6 +51,125 @@ class CourseArchiveExporterTest(unittest.TestCase):
     def export(self, snapshot=None, **kwargs):
         return self.exporter.export_snapshot(snapshot or self.snapshot,
             staging_root=self.staging / "exports", release=self.release, **kwargs)
+
+    def retained_review_fixture(self):
+        from PIL import Image
+        edition = self.root / "output/textbook-operator-lessons/book"
+        teaching = edition / "lesson/teaching-1"
+        job = teaching / "authoring-job"
+        receipts = job / "followup/asset-receipts"
+        receipts.mkdir(parents=True)
+        draft = b'{"lesson":"picture actions"}'
+        (job / "draft.json").write_bytes(draft)
+        frozen = {"binding": {"editionId": "book", "nodeId": "lesson"},
+                  "teachingRevision": 1, "draftSha256": hashlib.sha256(draft).hexdigest()}
+        (job / "frozen.json").write_text(json.dumps(frozen))
+        source = edition / "review-assets/actions/teacher.png"
+        source.parent.mkdir(parents=True)
+        image = BytesIO()
+        Image.new("RGB", (2, 2), "red").save(image, format="PNG")
+        raw = image.getvalue()
+        source.write_bytes(raw)
+        ref = "/review-assets/actions/teacher.png"
+        receipt = receipts / "teacher.json"
+        value = {"schemaVersion": "mira.textbook.review-asset-source-receipt.v1",
+                 "sourceFilePath": str(source), "sourceFileSha256": hashlib.sha256(raw).hexdigest(),
+                 "reviewUrl": ref}
+        receipt.write_text(json.dumps(value))
+        self.snapshot.metadata["editionId"] = "book"
+        self.snapshot.source_roots = [teaching]
+        self.snapshot.classroom["scenes"][0]["content"]["html"] = '<img src="' + ref + '">'
+        entry = {"ref": ref, "kind": "image", "status": "unresolved",
+                 "reason": "controlled_public_asset_missing_or_invalid"}
+        result = {"entries": [entry], "unresolved": [entry.copy()]}
+        return source, receipt, value, raw, result
+
+    def test_owned_review_receipt_recovers_exact_png_and_is_itself_archived(self):
+        source, receipt, _, raw, unresolved = self.retained_review_fixture()
+        self.exporter.standard_asset_resolver = lambda *args, **kwargs: deepcopy(unresolved)
+        result = self.export()
+        self.assertTrue(result["complete"], result["missingSources"])
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            manifest = json.loads(archive.read("manifest.json"))
+            asset = next(x for x in manifest["files"] if x["sourceKind"] == "native_standard_asset")
+            self.assertEqual(archive.read(asset["archivePath"]), raw)
+            proof = asset["sourceReceipt"]
+            proof_file = next(x for x in manifest["files"] if x["archivePath"] == proof["archivePath"])
+            self.assertEqual(proof_file["sha256"], hashlib.sha256(receipt.read_bytes()).hexdigest())
+            self.assertEqual(proof["sha256"], proof_file["sha256"])
+            self.assertIn(unresolved["entries"][0]["ref"], archive.read("classroom.json").decode())
+        self.assertEqual(source.read_bytes(), raw)
+        self.assertFalse((self.root / "openmaic-runtime/.runtime/OpenMAIC/public/review-assets").exists())
+
+    def test_review_recovery_rejects_unbound_or_changed_sources(self):
+        source, receipt, value, raw, unresolved = self.retained_review_fixture()
+        frozen_path = self.snapshot.source_roots[0] / "authoring-job/frozen.json"
+        frozen = frozen_path.read_bytes()
+        outside = self.root / "output/textbook-operator-lessons/other/review-assets/actions/teacher.png"
+        outside.parent.mkdir(parents=True)
+        outside.write_bytes(raw)
+        cases = ("hash", "outside_edition", "wrong_ref", "symlink", "no_receipt",
+                 "no_owned_root", "wrong_frozen_edition", "changed_draft", "not_png")
+        for case in cases:
+            with self.subTest(case=case):
+                if source.is_symlink():
+                    source.unlink()
+                source.write_bytes(raw)
+                receipt.write_text(json.dumps(value))
+                frozen_path.write_bytes(frozen)
+                (frozen_path.parent / "draft.json").write_bytes(b'{"lesson":"picture actions"}')
+                roots = self.snapshot.source_roots[:]
+                current = dict(value)
+                if case == "hash": current["sourceFileSha256"] = "0" * 64
+                elif case == "outside_edition": current["sourceFilePath"] = str(outside)
+                elif case == "wrong_ref": current["reviewUrl"] = "/review-assets/actions/another.png"
+                elif case == "symlink":
+                    source.unlink(); source.symlink_to(outside)
+                elif case == "no_receipt": receipt.unlink()
+                elif case == "no_owned_root": self.snapshot.source_roots = []
+                elif case == "wrong_frozen_edition":
+                    altered = json.loads(frozen); altered["binding"]["editionId"] = "other"
+                    frozen_path.write_text(json.dumps(altered))
+                elif case == "changed_draft": (frozen_path.parent / "draft.json").write_text("{}")
+                elif case == "not_png":
+                    source.write_bytes(b"not a picture")
+                    current["sourceFileSha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
+                if case != "no_receipt": receipt.write_text(json.dumps(current))
+                self.assertEqual(self.exporter._retained_review_assets(self.snapshot), {})
+                self.snapshot.source_roots = roots
+        receipt.write_text(json.dumps(value))
+        source.write_bytes(raw)
+        frozen_path.write_bytes(frozen)
+        (frozen_path.parent / "draft.json").write_bytes(b'{"lesson":"picture actions"}')
+        sources = self.exporter._retained_review_assets(self.snapshot)
+        unknown = deepcopy(unresolved)
+        unknown["unresolved"][0]["reason"] = "asset_bytes_unresolved"
+        recovered = self.exporter._recover_review_assets(unknown, sources, staging_root=self.staging / "assets")
+        self.assertEqual(recovered, unknown)
+
+    def test_recovered_asset_without_archived_receipt_cannot_be_complete(self):
+        _, _, _, _, unresolved = self.retained_review_fixture()
+        self.exporter.standard_asset_resolver = lambda *args, **kwargs: deepcopy(unresolved)
+        with patch.object(self.exporter, "_owned_source_files", return_value=[]):
+            result = self.export()
+        self.assertFalse(result["complete"])
+        self.assertEqual(result["generatedPublicFiles"], [])
+        self.assertIn("review_asset_receipt_not_archived", [x["reason"] for x in result["missingSources"]])
+
+    def test_two_valid_receipts_observing_changed_bytes_are_ambiguous(self):
+        from PIL import Image
+        source, receipt, value, raw, _ = self.retained_review_fixture()
+        image = BytesIO()
+        Image.new("RGB", (2, 2), "blue").save(image, format="PNG")
+        other_raw = image.getvalue()
+        other = {**value, "sourceFileSha256": hashlib.sha256(other_raw).hexdigest()}
+        (receipt.parent / "teacher-later.json").write_text(json.dumps(other))
+        read_bytes = Path.read_bytes
+        observed = iter((raw, other_raw))
+        def changing_bytes(path):
+            return next(observed) if path == source else read_bytes(path)
+        with patch.object(Path, "read_bytes", changing_bytes):
+            self.assertEqual(self.exporter._retained_review_assets(self.snapshot), {})
 
     def test_remote_only_archive_contains_actual_bytes_exact_original_json_and_extracted_html(self):
         self.assertFalse((self.root / self.media_path).exists())

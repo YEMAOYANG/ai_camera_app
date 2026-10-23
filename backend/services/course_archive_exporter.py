@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 import hashlib
+from io import BytesIO
 import json
 import mimetypes
 import os
@@ -318,6 +319,88 @@ class CourseArchiveExporter:
                  and isinstance(value.get("entries"), list) and isinstance(value.get("unresolved"), list),
                  "standard_asset_resolver_contract_invalid")
         return value
+
+    def _retained_review_assets(self, snapshot):
+        """Index exact review-asset receipts inside this course's owned jobs."""
+        from PIL import Image
+        assets, ambiguous = {}, set()
+        edition = snapshot.metadata.get("editionId")
+        if not isinstance(edition, str) or not _ID.fullmatch(edition):
+            return assets
+        edition_root = self.root / "output/textbook-operator-lessons" / edition
+        review_root = edition_root / "review-assets"
+        for root in set(snapshot.source_roots):
+            try:
+                root = self._source_path(root)
+                if not root.name.startswith("teaching-") or not root.is_relative_to(edition_root):
+                    continue
+                job = root / "authoring-job"
+                frozen_path, draft = self._source_path(job / "frozen.json"), self._source_path(job / "draft.json")
+                frozen = json.loads(frozen_path.read_bytes())
+                binding = frozen.get("binding", {})
+                _require(binding.get("editionId") == edition and binding.get("nodeId") == root.parent.name
+                    and root.name == "teaching-" + str(frozen.get("teachingRevision"))
+                    and _hash_file(draft) == frozen.get("draftSha256"), "review_asset_course_unbound")
+                for receipt in root.rglob("*.json"):
+                    if not {"asset-receipts", "asset-source-receipts"}.intersection(receipt.parts):
+                        continue
+                    try:
+                        receipt = self._source_path(receipt)
+                        _require(receipt.stat().st_size <= 1024 * 1024, "review_asset_receipt_invalid")
+                        receipt_raw = receipt.read_bytes(); value = json.loads(receipt_raw)
+                        if value.get("schemaVersion") != "mira.textbook.review-asset-source-receipt.v1":
+                            continue
+                        ref, checksum = value.get("reviewUrl"), value.get("sourceFileSha256")
+                        _require(isinstance(ref, str) and ref.startswith("/review-assets/")
+                            and re.fullmatch(r"[a-f0-9]{64}", str(checksum)), "review_asset_receipt_invalid")
+                        _safe_relative(ref.removeprefix("/"))
+                        source = self._source_path(value["sourceFilePath"])
+                        _require(source.is_relative_to(review_root) and source.suffix.lower() == ".png"
+                            and ref == "/review-assets/" + source.relative_to(review_root).as_posix()
+                            and source.is_file() and 0 < source.stat().st_size <= 32 * 1024 * 1024,
+                            "review_asset_source_unbound")
+                        raw = source.read_bytes()
+                        _require(_sha(raw) == checksum, "review_asset_source_hash_mismatch")
+                        with Image.open(BytesIO(raw)) as image:
+                            _require(image.format == "PNG", "review_asset_not_png")
+                            image.verify()
+                        item = {"raw": raw, "sha256": checksum, "byteSize": len(raw), "mimeType": "image/png",
+                            "sourceReceipt": {"archivePath": "原稿/" + receipt.relative_to(self.root).as_posix(),
+                                              "sha256": _sha(receipt_raw)}}
+                        old = assets.get(ref)
+                        if old is not None and old["sha256"] != checksum:
+                            ambiguous.add(ref)
+                            assets.pop(ref, None)
+                        if ref not in ambiguous:
+                            assets[ref] = item
+                    except (CourseArchiveError, OSError, ValueError, KeyError, TypeError, AttributeError):
+                        continue
+            except (CourseArchiveError, OSError, ValueError, KeyError, TypeError, AttributeError):
+                continue
+        return assets
+
+    def _recover_review_assets(self, result, sources, *, staging_root):
+        """Resolve only the helper's missing controlled refs into private copies."""
+        reason = "controlled_public_asset_missing_or_invalid"
+        eligible = {item.get("ref") for item in result.get("unresolved", []) if item.get("reason") == reason}
+        recovered, entries = set(), []
+        for entry in result.get("entries", []):
+            ref = entry.get("ref")
+            if entry.get("status") == "unresolved" and ref in eligible and ref in sources:
+                item = sources[ref]
+                staging_root.mkdir(mode=0o700, parents=True, exist_ok=True)
+                path = staging_root / ("review-" + item["sha256"] + ".png")
+                if not path.exists():
+                    _require(not path.is_symlink(), "review_asset_private_copy_invalid")
+                    self._write_private(path, item["raw"])
+                _require(not path.is_symlink() and path.stat().st_size == item["byteSize"]
+                    and _hash_file(path) == item["sha256"], "review_asset_private_copy_invalid")
+                entry = {**entry, "status": "resolved", "sourcePath": str(path),
+                    **{k: item[k] for k in ("sha256", "byteSize", "mimeType", "sourceReceipt")}}
+                entry.pop("reason", None); recovered.add(ref)
+            entries.append(entry)
+        return {**result, "entries": entries, "unresolved": [item for item in result.get("unresolved", [])
+            if not (item.get("ref") in recovered and item.get("reason") == reason)]}
 
     def list_courses(self, conn, *, include_saved=False):
         """List identities without media reads, generation, session or DB writes."""
@@ -1159,9 +1242,11 @@ class CourseArchiveExporter:
         all_media = {item["path"]: item for item in snapshot.media}
         queued_sources = set(snapshot.source_files)
         document_assets, resolved_assets = set(), {}
+        retained_review_sources = None
         recovered_aliases = {item["originalReference"]: item for item in snapshot.recovered_aliases}
 
         def ensure_document_assets(value):
+            nonlocal retained_review_sources
             if not (isinstance(value, dict) and isinstance(value.get("stage"), dict)
                     and isinstance(value["stage"].get("id"), str)
                     and isinstance(value.get("scenes"), list) and value["scenes"]):
@@ -1172,6 +1257,10 @@ class CourseArchiveExporter:
             document_assets.add(identity)
             asset_root = target / "asset-sources"
             result = self.standard_asset_resolver(value, staging_root=asset_root)
+            if any(item.get("reason") == "controlled_public_asset_missing_or_invalid" for item in result.get("unresolved", [])):
+                if retained_review_sources is None:
+                    retained_review_sources = self._retained_review_assets(snapshot)
+                result = self._recover_review_assets(result, retained_review_sources, staging_root=asset_root)
             reported_refs = {str(entry.get("ref", "unknown")) for entry in result.get("unresolved", [])}
             for entry in result.get("unresolved", []):
                 missing.append({"kind": "native_asset", "sourceIdentity": entry.get("ref", "unknown"),
@@ -1202,7 +1291,8 @@ class CourseArchiveExporter:
                 _require(len(raw) == entry["byteSize"] and _sha(raw) == entry["sha256"],
                          "standard_asset_bytes_changed")
                 add(f"Native素材/{kind}-{len(resolved_assets):03d}{extension}", raw=raw,
-                    kind="native_standard_asset", identity=entry["ref"], mime=entry["mimeType"])
+                    kind="native_standard_asset", identity=entry["ref"], mime=entry["mimeType"],
+                    source_receipt=entry.get("sourceReceipt"))
             # The DSL evolves. A new allocatedAssetId field or a dynamically
             # referenced HTML asset must not silently disappear just because
             # an older enumeration does not yet visit that structural slot.
@@ -1238,7 +1328,7 @@ class CourseArchiveExporter:
                 if old is None:
                     all_media[item["path"]] = item
 
-        def add(relative, *, raw=None, source=None, kind, identity, original=True, mime=None):
+        def add(relative, *, raw=None, source=None, kind, identity, original=True, mime=None, source_receipt=None):
             nonlocal total
             _safe_relative(relative)
             _require(not any(item["archivePath"] == relative for item in files), "duplicate_archive_path")
@@ -1274,6 +1364,8 @@ class CourseArchiveExporter:
                 "sha256": _sha(raw), "byteSize": len(raw),
                 "mimeType": mime or mimetypes.guess_type(format_name)[0] or "application/octet-stream",
                 "original": original, **({"originalFormat": original_format} if original_format else {})})
+            if source_receipt is not None:
+                files[-1]["sourceReceipt"] = source_receipt
 
         try:
             add("classroom.json", raw=_json(snapshot.classroom), kind="classroom",
@@ -1349,6 +1441,12 @@ class CourseArchiveExporter:
                 # classroom links have an explicit path-to-file mapping.
                 add(archive_path, raw=raw, kind="referenced_media",
                     identity=item["path"], mime=item["mimeType"])
+            archived_files = {item["archivePath"]: item for item in files}
+            for item in files:
+                receipt = item.get("sourceReceipt")
+                if receipt and archived_files.get(receipt["archivePath"], {}).get("sha256") != receipt["sha256"]:
+                    missing.append({"kind": "native_asset", "sourceIdentity": item["sourceIdentity"],
+                                    "reason": "review_asset_receipt_not_archived"})
             metadata = {"schemaVersion": SCHEMA, **snapshot.identity, **snapshot.metadata,
                 "status": snapshot.status, "archiveFormat": "mira-course-archive-zip-v1",
                 "objectDirectory": object_directory, "exportedAt": exported_at,
