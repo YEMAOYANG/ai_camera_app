@@ -1236,10 +1236,13 @@ class CourseArchiveExporter:
         _require(all(isinstance(x, str) and x and len(x) <= 255 for x in
                      (course_id, course_version)), "course_identity_invalid")
         if source_adapter is None and course_id.startswith("textbook-preview:"):
-            result = self.export_saved_preview(conn, preview_key=course_id.removeprefix("textbook-preview:"),
-                                               staging_root=staging_root, release=release)
-            _require(result["courseVersion"] == course_version, "saved_preview_version_mismatch")
-            return result
+            snapshot, source_digest = self._saved_preview_snapshot(
+                conn, course_id.removeprefix("textbook-preview:"))
+            _require(snapshot.identity.get("courseId") == course_id
+                     and snapshot.identity.get("courseVersion") == course_version,
+                     "saved_preview_version_mismatch")
+            return self.export_snapshot(snapshot, staging_root=staging_root, release=release,
+                source_kind="textbook_preview", source_digest=source_digest)
         snapshot = (source_adapter(conn, course_id=course_id, course_version=course_version,
                                    content_key=content_key) if source_adapter else
                     self._published_snapshot(conn, course_id, course_version, content_key))

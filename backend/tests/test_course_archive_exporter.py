@@ -838,7 +838,7 @@ class CourseArchiveExporterTest(unittest.TestCase):
                 {"sourceScope": {"localReviewPath": str(review.relative_to(self.root))}},
                 {"textbookBinding": {"editionId": "other-book", "nodeId": "node", "teachingRevision": "5"}})
 
-    def test_saved_preview_preserves_plan_review_and_raw_database_fields(self):
+    def saved_preview_fixture(self):
         from content.textbook_catalog import digest
         room_raw = json.dumps(self.snapshot.classroom, ensure_ascii=False, indent=2)
         plan = {"subject": "science", "gradeCode": "primary_1", "lessonTitle": "怎样学科学",
@@ -852,6 +852,10 @@ class CourseArchiveExporterTest(unittest.TestCase):
         revision = {"manifest_json": json.dumps(manifest, ensure_ascii=False), "manifest_sha256": digest(manifest)}
         conn = Mock()
         conn.execute.return_value.fetchone.side_effect = [row, revision]
+        return conn, row, room_raw
+
+    def test_saved_preview_preserves_plan_review_and_raw_database_fields(self):
+        conn, row, room_raw = self.saved_preview_fixture()
         result = self.exporter.export_saved_preview(conn, preview_key="d" * 64, staging_root=self.staging / "review")
         self.assertTrue(result["complete"])
         self.assertEqual(result["status"], "generated_saved")
@@ -860,6 +864,42 @@ class CourseArchiveExporterTest(unittest.TestCase):
             self.assertEqual(archive.read("原始课堂.json"), room_raw.encode())
             self.assertEqual(archive.read("冻结创作请求.json"), row["input_json"].encode())
             self.assertEqual(archive.read("数据库原字段/原始预览记录/000-result_json.json"), row["result_json"].encode())
+        self.assertTrue(all(c.args[0].lstrip().startswith("SELECT") for c in conn.execute.call_args_list))
+
+    def test_old_saved_preview_version_is_rejected_before_export_or_staging(self):
+        conn, row, _ = self.saved_preview_fixture()
+        staging = self.staging / "old-version"
+        with patch.object(self.exporter, "_saved_preview_snapshot", wraps=self.exporter._saved_preview_snapshot) as load, \
+                patch.object(self.exporter, "export_snapshot", wraps=self.exporter.export_snapshot) as export, \
+                patch.object(self.exporter, "_staging_root", wraps=self.exporter._staging_root) as allocate:
+            with self.assertRaisesRegex(CourseArchiveError, "saved_preview_version_mismatch"):
+                self.exporter.export_course(conn, course_id="textbook-preview:" + row["preview_key"],
+                    course_version="saved-" + "0" * 16, staging_root=staging)
+        load.assert_called_once_with(conn, row["preview_key"])
+        export.assert_not_called()
+        allocate.assert_not_called()
+        self.assertFalse(staging.exists())
+        self.assertFalse(list(self.staging.rglob("*.zip")))
+
+    def test_current_saved_preview_version_exports_the_single_validated_snapshot(self):
+        conn, row, room_raw = self.saved_preview_fixture()
+        staging = self.staging / "current-version"
+        version = "saved-" + row["classroom_sha256"][:16]
+        with patch.object(self.exporter, "_saved_preview_snapshot", wraps=self.exporter._saved_preview_snapshot) as load, \
+                patch.object(self.exporter, "export_snapshot", wraps=self.exporter.export_snapshot) as export:
+            result = self.exporter.export_course(conn, course_id="textbook-preview:" + row["preview_key"],
+                course_version=version, staging_root=staging)
+        load.assert_called_once_with(conn, row["preview_key"])
+        export.assert_called_once()
+        self.assertEqual(export.call_args.kwargs, {"staging_root": staging, "release": None,
+            "source_kind": "textbook_preview", "source_digest": row["classroom_sha256"]})
+        self.assertTrue(result["complete"])
+        self.assertEqual(result["courseVersion"], version)
+        self.assertEqual(result["status"], "generated_saved")
+        self.assertEqual(result["sourceKind"], "textbook_preview")
+        self.assertEqual(result["sourceDigest"], row["classroom_sha256"])
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            self.assertEqual(archive.read("原始课堂.json"), room_raw.encode())
         self.assertTrue(all(c.args[0].lstrip().startswith("SELECT") for c in conn.execute.call_args_list))
 
     def test_unknown_original_format_blocks_complete_instead_of_silently_omitting(self):

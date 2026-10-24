@@ -441,7 +441,7 @@ class CourseArchiveQueueTest(unittest.TestCase):
             instances.append(worker)
             return worker
 
-        with patch.dict(os.environ, {"COURSE_STORAGE_ARCHIVE_ENABLED": "true",
+        with patch.dict(os.environ, {"COURSE_STORAGE_ARCHIVE_ENABLED": "true", "COURSE_STORAGE_MODE": "local",
                 "COURSE_STORAGE_ENDPOINT": self.storage["endpoint"], "COURSE_STORAGE_BUCKET": "study"}), \
                 patch("core.config.AppConfig.from_env", return_value=Mock(DATABASE_URL="unused-test-database")), \
                 patch("core.database.Database", return_value=Mock()), \
