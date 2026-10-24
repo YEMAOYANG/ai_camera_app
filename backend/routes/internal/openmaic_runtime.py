@@ -449,6 +449,36 @@ def record_runtime_event():
         return error_response(exc)
 
 
+@internal_openmaic_runtime_bp.route("/runtime/activity-state", methods=["GET", "POST"])
+@internal_openmaic_runtime_bp.get("/runtime/activity-manifest")
+def runtime_activity_state():
+    """Trusted formal-session UI continuity; probes have no such authority."""
+    try:
+        manifest_only = request.path.endswith('/activity-manifest')
+        route = '/internal/learning/openmaic/runtime/' + ('activity-manifest' if manifest_only else 'activity-state')
+        context = _authorize(route)
+        _require_runtime_gateway(context)
+        data = None
+        if request.method == 'POST':
+            if not request.is_json:
+                raise ApiError('textbook_activity_state_invalid', '小游戏进度格式无效', 415)
+            from services.textbook_activity_state import load_post_bytes
+            data = load_post_bytes(request.get_data(cache=False))
+        from services.openmaic_runtime_activity_state_service import OpenMaicRuntimeActivityStateService
+        service = OpenMaicRuntimeActivityStateService(_runtime_event_service(),
+            classroom_reader=openmaic_full_runtime_service().client.get_classroom)
+        result = service.state(
+            runtime_session_id=_required_gateway_header('X-Mira-Runtime-Session'),
+            learning_session_id=_required_gateway_header('X-Mira-Learning-Session', maximum=255),
+            upstream_classroom_id=_required_gateway_header('X-Mira-Runtime-Classroom-Id', maximum=255),
+            data=data, manifest_only=manifest_only)
+        response = jsonify({**result, 'internal': context})
+        response.headers['Cache-Control'] = 'private, no-store'
+        return response
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @internal_openmaic_runtime_bp.get("/runtime/events")
 def runtime_event_status():
     try:

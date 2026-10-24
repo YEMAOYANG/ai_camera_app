@@ -14,6 +14,45 @@ class OpenMaicRuntimeEventRepository:
     def transaction(self):
         return self.database.transaction()
 
+    def get_activity_publication(self, conn, *, authority):
+        """Read the exact fully published receipt, never an authored hash."""
+        rows = conn.execute("""SELECT receipt.publication_receipt_hash,audio.classroom_content_sha256
+            FROM learning_curriculum_classroom_item_receipts receipt
+            JOIN learning_formal_qwen_audio_jobs audio ON audio.build_item_id=receipt.build_item_id
+              AND audio.release_id=receipt.release_id AND audio.grade_code=receipt.grade_code
+              AND audio.target_fingerprint=receipt.target_fingerprint
+              AND audio.runtime_classroom_id=receipt.runtime_classroom_id
+              AND audio.course_id=receipt.course_id AND audio.course_version=receipt.course_version
+              AND audio.package_id=receipt.package_id AND audio.package_version=receipt.package_version
+            WHERE receipt.runtime_classroom_id=? AND receipt.build_item_id=? AND receipt.release_id=?
+              AND receipt.target_fingerprint=? AND receipt.grade_code=?
+              AND receipt.course_id=? AND receipt.course_version=?
+              AND receipt.package_id=? AND receipt.package_version=?
+              AND receipt.classroom_status='passed' AND receipt.tts_status='passed'
+              AND receipt.asr_roundtrip_status='passed' AND receipt.conversation_provider_status='passed'
+              AND receipt.auto_validated=1 AND receipt.publication_status='published'
+              AND receipt.published_at IS NOT NULL AND audio.state='auto_validated'
+              AND audio.upstream_classroom_id=?
+              AND audio.expected_segment_count BETWEEN 1 AND 240
+              AND audio.tts_attempted_count=audio.expected_segment_count
+              AND audio.tts_completed_count=audio.expected_segment_count
+              AND audio.audio_validated_count=audio.expected_segment_count
+              AND audio.asr_attempted_count=audio.expected_segment_count
+              AND audio.asr_passed_count=audio.expected_segment_count""",
+            (authority['runtime_classroom_id'], authority['candidate_build_item_id'],
+             authority['candidate_release_id'], authority['candidate_target_fingerprint'],
+             authority['candidate_grade_code'], authority['session_course_id'], authority['session_course_version'],
+             authority['runtime_package_id'], authority['runtime_package_version'],
+             authority['upstream_classroom_id'])).fetchall()
+        return rows[0] if len(rows) == 1 else None
+
+    def save_activity_state(self, conn, *, authority, runtime_state_json, now):
+        """Only the existing learning session's UI field; no evidence writes."""
+        conn.execute('UPDATE learning_sessions SET runtime_state_json=?,updated_at=? '
+            'WHERE id=? AND family_id=? AND child_id=? AND course_id=? AND course_version=?',
+            (runtime_state_json, now, authority['learning_session_id'], authority['family_id'],
+             authority['child_id'], authority['session_course_id'], authority['session_course_version']))
+
     def get_runtime_subject(
         self,
         conn: DatabaseConnection,

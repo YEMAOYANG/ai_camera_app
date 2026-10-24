@@ -170,10 +170,12 @@ class TextbookActivityStateTests(unittest.TestCase):
             self.error('textbook_activity_state_invalid', lambda value=value: parse_post({**good, 'state': value}))
         for change in ({'score': 100}, {'expectedRevision': True}, {'sceneIndex': True}, {'mutationId': ''}):
             self.error('textbook_activity_state_invalid', lambda change=change: parse_post({**good, **change}))
-        oversized = {**good, 'state': {str(i): 'x' * 10000 for i in range(7)}}
+        within_limit = {str(i): '\u6c49' * 10000 for i in range(8)}
+        self.assertEqual(parse_post({**good, 'state': within_limit})['state'], within_limit)
+        oversized = {**good, 'state': {str(i): 'x' * 10000 for i in range(27)}}
         self.error('textbook_activity_state_invalid', lambda: parse_post(oversized))
         for raw in (b'{}', b'{"state":{},"state":{}}', b'{"state":NaN}', b'[' * 1100,
-                    b'x' * (64 * 1024 + 1)):
+                    b'x' * (384 * 1024 + 1)):
             self.error('textbook_activity_state_invalid', lambda raw=raw: load_post_bytes(raw))
 
     def test_native_replacements_keep_their_existing_progress_owner(self):
@@ -249,7 +251,7 @@ class TextbookActivityStateRouteTests(unittest.TestCase):
 
     def test_internal_body_boundary_rejects_oversize_duplicate_and_non_json(self):
         for raw, content_type, status in (
-            (b'x' * (64 * 1024 + 1), 'application/json', 413),
+            (b'x' * (384 * 1024 + 1), 'application/json', 413),
             (b'{"state":{},"state":{}}', 'application/json', 400),
             (b'{"state":NaN}', 'application/json', 400),
             (b'{}', 'text/plain', 415),

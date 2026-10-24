@@ -388,9 +388,6 @@ class TextbookClassroomService:
         if data is not None:
             data = activity_state.parse_post(data)
         definitions = activity_state.descriptors(release)
-        identity = {'ok': True, 'schemaVersion': activity_state.SCHEMA,
-            'classroomId': release['classroomId'], 'learningSessionId': initial_session['id'],
-            'releaseSha256': release['sha256']}
         with self.repository.transaction() as conn:
             session = self.learning.get_session(conn, family_id=child['family_id'],
                 session_id=initial_session['id'], for_update=True)
@@ -399,35 +396,12 @@ class TextbookClassroomService:
                     or (data is not None and data['learningSessionId'] != session['id'])):
                 raise ApiError('textbook_activity_state_identity', '课堂进度身份已变化，请重新进入', 409)
             progress = self._state(session)
-            saved_scope = activity_state.scope(progress, session_id=session['id'], release=release)
-            if data is None:
-                return activity_state.response_within_budget({**identity, 'activities': [activity_state.activity(item,
-                    saved_scope['scenes'].get(item['sceneId'])) for item in definitions]})
-            definition = next((item for item in definitions if item['sceneId'] == data['sceneId']), None)
-            if (definition is None or data['sceneIndex'] != definition['sceneIndex']
-                    or data['releaseSha256'] != release['sha256']
-                    or data['contentSha256'] != definition['contentSha256']):
-                raise ApiError('textbook_activity_state_identity', '小游戏版本已变化，请重新进入', 409)
-            stored = saved_scope['scenes'].get(definition['sceneId'])
-            current = activity_state.activity(definition, stored)
-            request_sha = activity_state.request_sha(data)
-            mutations = dict((stored or {}).get('mutations', {}))
-            if data['mutationId'] in mutations:
-                if mutations[data['mutationId']] != request_sha:
-                    raise ApiError('textbook_activity_mutation_conflict', '小游戏保存标识已用于另一份进度', 409)
-                return {**identity, 'activity': current}
-            if data['expectedRevision'] != current['revision']:
-                raise ApiError('textbook_activity_revision_conflict', '小游戏已在其他页面更新，请重新进入', 409)
-            mutations[data['mutationId']] = request_sha
-            mutations = dict(list(mutations.items())[-activity_state.MAX_MUTATIONS:])
-            updated = {key: deepcopy(data[key]) for key in ('sceneIndex', 'contentSha256', 'mutationId', 'state')}
-            updated.update(revision=current['revision'] + 1, mutations=mutations)
-            saved_scope = activity_state.scope(progress, session_id=session['id'], release=release, create=True)
-            saved_scope['scenes'][definition['sceneId']] = updated
-            activity_state.validate_storage_budget(progress)
-            conn.execute('UPDATE learning_sessions SET runtime_state_json=?,updated_at=? WHERE id=?',
-                (canonical(progress), now_ms(), session['id']))
-            return {**identity, 'activity': activity_state.activity(definition, updated)}
+            result, changed = activity_state.exchange(progress, session_id=session['id'],
+                release=release, definitions=definitions, data=data)
+            if changed:
+                conn.execute('UPDATE learning_sessions SET runtime_state_json=?,updated_at=? WHERE id=?',
+                    (canonical(progress), now_ms(), session['id']))
+            return result
 
     def quiz(self, token, answers=None):
         _, child, _, release, course, initial_session = self._authority(token)

@@ -5,6 +5,7 @@ import { URL } from "node:url";
 import { parse } from "parse5";
 
 const DEFAULT_MAX_BODY_BYTES = 25 * 1024 * 1024;
+const MAX_ACTIVITY_STATE_BODY_BYTES = 384 * 1024;
 const MAX_RUNTIME_AUDIO_BYTES = 16 * 1024 * 1024;
 const RUNTIME_COOKIE = "mira_openmaic_runtime";
 const CLASSROOM_COOKIE_PREFIX = `${RUNTIME_COOKIE}_classroom_`;
@@ -143,6 +144,9 @@ async function handleRequest(request, response, config) {
   if (url.pathname === "/mira/runtime-events") {
     return recordRuntimeEvent(request, response, runtime, config);
   }
+  if (url.pathname === "/mira/activity-state") {
+    return recordRuntimeActivityState(request, response, runtime, config);
+  }
   const decision = authorizeRuntimeRequest(request, url, runtime);
   if (!decision.allowed) {
     return json(response, decision.status || 403, {
@@ -206,6 +210,23 @@ async function recordRuntimeEvent(request, response, runtime, config) {
   );
   const { internal: _internal, ...publicReceipt } = result;
   return json(response, 200, publicReceipt);
+}
+
+async function recordRuntimeActivityState(request, response, runtime, config) {
+  if (runtime.purpose === 'conversation_probe') return json(response, 403,
+    { ok: false, error: 'openmaic_probe_activity_state_blocked', message: '验证课堂不能保存学生游戏进度' });
+  if (!['GET', 'POST'].includes(request.method)) return methodNotAllowed(response);
+  let data;
+  if (request.method === 'POST') {
+    if (!isJsonRequest(request)) return json(response, 415, { ok: false, error: 'activity_state_json_required' });
+    try { data = JSON.parse((await readBody(request, MAX_ACTIVITY_STATE_BODY_BYTES)).toString('utf8')); }
+    catch (error) { return json(response, error.statusCode === 413 ? 413 : 400,
+      { ok: false, error: 'activity_state_json_invalid' }); }
+  }
+  const result = await backendJson(config, '/internal/learning/openmaic/runtime/activity-state',
+    data, trustedRuntimeHeaders(runtime), request.method);
+  const { internal: _internal, ...publicState } = result;
+  return json(response, 200, publicState);
 }
 
 export function prepareRuntimeEvent(raw, runtime) {
@@ -505,7 +526,7 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
     let data;
     if (request.method === 'POST') {
       if (!isJsonRequest(request)) return json(response, 415, { ok: false, error: 'textbook_json_required' });
-      try { data = JSON.parse((await readBody(request, url.pathname === '/mira/activity-state' ? 64 * 1024 : 8192)).toString('utf8')); }
+      try { data = JSON.parse((await readBody(request, url.pathname === '/mira/activity-state' ? MAX_ACTIVITY_STATE_BODY_BYTES : 8192)).toString('utf8')); }
       catch (error) { return json(response, url.pathname === '/mira/activity-state' && error.statusCode === 413 ? 413 : 400,
         { ok: false, error: 'textbook_json_invalid' }); }
     }
@@ -848,7 +869,14 @@ async function proxyToUpstream(request, response, url, runtime, config, decision
       trustedRuntimeHeaders(runtime),
       "GET",
     );
-    const assembled = injectRuntimeAudioBindings(rawClassroom, runtime, manifest);
+    let assembled = injectRuntimeAudioBindings(rawClassroom, runtime, manifest);
+    if (runtime.features?.formalEvidence?.runtimeEventAuthority?.schemaVersion
+        === 'mira.openmaic.runtime-event-authority.v1') {
+      const activityManifest = await backendJson(config,
+        '/internal/learning/openmaic/runtime/activity-manifest', undefined,
+        trustedRuntimeHeaders(runtime), 'GET');
+      assembled = injectRuntimeActivityBindings(assembled, runtime, activityManifest);
+    }
     response.statusCode = upstream.status;
     copyResponseHeaders(upstream.headers, response, config, decision, url.pathname);
     response.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -865,6 +893,49 @@ async function proxyToUpstream(request, response, url, runtime, config, decision
   // pipeTo owns upstream errors and cancels its reader when the client closes;
   // its rejection stays in this request's async error path.
   await upstream.body.pipeTo(Writable.toWeb(response));
+}
+
+export function injectRuntimeActivityBindings(raw, runtime, manifest) {
+  let payload;
+  try { payload = JSON.parse(raw.toString('utf8')); }
+  catch { return runtimeAudioBindingError(); }
+  const classroom = payload?.classroom;
+  const hash = /^[a-f0-9]{64}$/;
+  if (runtime.purpose === 'conversation_probe' || manifest?.ok !== true
+      || manifest.schemaVersion !== 'mira.textbook.activity-state.v1'
+      || manifest.classroomId !== runtime.classroomId
+      || manifest.learningSessionId !== runtime.learningSessionId
+      || !hash.test(manifest.releaseSha256 || '')
+      || !classroom || classroom.id !== runtime.classroomId
+      || classroom.stage?.id !== runtime.classroomId || !Array.isArray(classroom.scenes)
+      || classroom.scenes.length < 1 || classroom.scenes.length > 60
+      || !Array.isArray(manifest.activities) || manifest.activities.length > 60) return runtimeAudioBindingError();
+  const byId = new Map();
+  for (const item of manifest.activities) {
+    if (!item || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(item.sceneId || '')
+        || !Number.isInteger(item.sceneIndex) || item.sceneIndex < 0 || item.sceneIndex >= classroom.scenes.length
+        || !hash.test(item.contentSha256 || '') || byId.has(item.sceneId)) return runtimeAudioBindingError();
+    byId.set(item.sceneId, item);
+  }
+  const ordered = [...classroom.scenes].sort((a, b) => a.order - b.order);
+  for (const [index, scene] of ordered.entries()) {
+    delete scene.miraActivityPersistence;
+    const item = byId.get(scene.id);
+    const inline = scene.type === 'interactive' && scene.content?.type === 'interactive'
+      && typeof scene.content.html === 'string' && scene.content.html.trim();
+    if (!inline) {
+      if (item) return runtimeAudioBindingError();
+      continue;
+    }
+    if (!item || item.sceneIndex !== index || scene.stageId !== runtime.classroomId
+        || createHash('sha256').update(scene.content.html, 'utf8').digest('hex') !== item.contentSha256)
+      return runtimeAudioBindingError();
+    scene.miraActivityPersistence = { schemaVersion: 'mira.textbook.activity-state.v1',
+      releaseSha256: manifest.releaseSha256, contentSha256: item.contentSha256 };
+    byId.delete(scene.id);
+  }
+  if (byId.size) return runtimeAudioBindingError();
+  return Buffer.from(JSON.stringify(payload));
 }
 
 export function injectRuntimeAudioBindings(raw, runtime, manifest) {

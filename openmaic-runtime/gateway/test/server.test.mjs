@@ -13,6 +13,7 @@ import {
   bindTextbookPageNarration,
   createGateway,
   embedTextbookSceneMedia,
+  injectRuntimeActivityBindings,
   injectRuntimeAudioBindings,
   mergeContentSecurityPolicy,
   prepareRuntimeEvent,
@@ -337,10 +338,131 @@ test('activity snapshots retain cookie authority and their dedicated body limit 
   assert.equal((await fetch(gateway+'/mira/textbook-quiz',{method:'POST',headers:{...headers,'content-type':'application/json'},
     body:JSON.stringify(data)})).status,400);
   assert.equal((await post('{broken')).status,400);
-  assert.equal((await post(JSON.stringify({...data,state:{history:'x'.repeat(64*1024)}}))).status,413);
+  const largeSnapshot={...data,state:{history:'x'.repeat(192*1024)}};
+  assert.equal((await post(JSON.stringify(largeSnapshot))).status,200);
+  assert.deepEqual(submitted,largeSnapshot);
+  assert.equal((await post(JSON.stringify({...data,state:{history:'x'.repeat(384*1024)}}))).status,413);
   assert.equal((await fetch(gateway+'/mira/activity-state',{method:'POST',headers:{...headers,'content-type':'text/plain'},body:'{}'})).status,415);
-  assert.equal(writes,1);
+  assert.equal(writes,2);
   assert.equal(upstreamReads,0);
+});
+
+test('formal activity manifests bind original HTML and reject altered or ambiguous scene authority', () => {
+  const { runtime, classroom, manifest } = formalActivityFixture();
+  classroom.scenes[0].miraActivityPersistence = { forged: true };
+  classroom.scenes[1].miraActivityPersistence = { forged: true };
+  const assembled = JSON.parse(injectRuntimeActivityBindings(
+    Buffer.from(JSON.stringify({ success: true, classroom })), runtime, manifest));
+  assert.equal(Object.hasOwn(assembled.classroom.scenes[0], 'miraActivityPersistence'), false);
+  assert.deepEqual(assembled.classroom.scenes[1].miraActivityPersistence, {
+    schemaVersion: 'mira.textbook.activity-state.v1', releaseSha256: manifest.releaseSha256,
+    contentSha256: manifest.activities[0].contentSha256,
+  });
+  const cases = [
+    (_c, _r, m) => { m.learningSessionId = 'another-session'; },
+    (_c, _r, m) => { m.classroomId = 'another-classroom'; },
+    (_c, _r, m) => { m.releaseSha256 = 'not-a-release'; },
+    (_c, _r, m) => { m.activities = []; },
+    (_c, _r, m) => { m.activities.push({ ...m.activities[0] }); },
+    (_c, _r, m) => { m.activities[0].sceneIndex = 0; },
+    (_c, _r, m) => { m.activities[0].contentSha256 = 'b'.repeat(64); },
+    (c) => { c.scenes[1].content.html += '<button>altered</button>'; },
+    (c) => { c.scenes[1].stageId = 'another-classroom'; },
+    (c) => { c.scenes[1].type = 'slide'; },
+    (c) => { c.stage.id = 'another-classroom'; },
+    (_c, r) => { r.purpose = 'conversation_probe'; },
+  ];
+  for (const change of cases) {
+    const c = structuredClone(classroom), r = structuredClone(runtime), m = structuredClone(manifest);
+    change(c, r, m);
+    assert.throws(() => injectRuntimeActivityBindings(Buffer.from(JSON.stringify({ classroom: c })), r, m),
+      error => error.statusCode === 502 && error.payload.error === 'openmaic_runtime_audio_binding_invalid');
+  }
+});
+
+test('formal activity GET and POST use cookie authority, preserve backend conflicts and isolate their body limit', async () => {
+  const { runtime, manifest } = formalActivityFixture();
+  const calls = [];
+  let upstreamCalls = 0;
+  const backend = await listen(http.createServer(async (request, response) => {
+    const body = await jsonBody(request);
+    if (request.url.endsWith('/validate')) {
+      assert.equal(body.runtimeToken, 'omr_good');
+      return reply(response, runtime);
+    }
+    assert.equal(request.url, '/internal/learning/openmaic/runtime/activity-state');
+    assert.equal(request.headers['x-mira-internal-token'], 'test-internal-token');
+    assert.equal(request.headers['x-mira-internal-source'], 'openmaic-runtime-gateway');
+    assert.equal(request.headers['x-mira-runtime-session'], runtime.runtimeSessionId);
+    assert.equal(request.headers['x-mira-learning-session'], runtime.learningSessionId);
+    assert.equal(request.headers['x-mira-runtime-classroom-id'], runtime.classroomId);
+    assert.equal(request.headers.cookie, undefined);
+    assert.equal(request.headers.authorization, undefined);
+    calls.push({ method: request.method, body });
+    if (body.learningSessionId && body.learningSessionId !== runtime.learningSessionId) {
+      response.writeHead(409, { 'content-type': 'application/json' });
+      return response.end(JSON.stringify({ ok: false, error: 'textbook_activity_state_identity' }));
+    }
+    reply(response, { ok: true, schemaVersion: manifest.schemaVersion, classroomId: runtime.classroomId,
+      learningSessionId: runtime.learningSessionId, releaseSha256: manifest.releaseSha256,
+      activities: [], internal: { mustNotLeak: true } });
+  }));
+  const upstream = await listen(http.createServer((_request, response) => {
+    upstreamCalls++; response.writeHead(500).end();
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  assert.equal((await fetch(gateway + '/mira/activity-state')).status, 401);
+  const headers = { cookie: 'mira_openmaic_runtime=omr_good', authorization: 'forged',
+    'x-mira-internal-token': 'forged', 'x-mira-runtime-session': 'forged',
+    'x-mira-learning-session': 'forged', 'x-mira-runtime-classroom-id': 'forged' };
+  const get = await fetch(gateway + '/mira/activity-state', { headers });
+  assert.equal(get.status, 200);
+  assert.equal((await get.json()).internal, undefined);
+  const data = { schemaVersion: manifest.schemaVersion, learningSessionId: runtime.learningSessionId,
+    sceneId: manifest.activities[0].sceneId, sceneIndex: 1, releaseSha256: manifest.releaseSha256,
+    contentSha256: manifest.activities[0].contentSha256, expectedRevision: 0, mutationId: 'world-1',
+    state: { archive: 'x'.repeat(192 * 1024) } };
+  const post = value => fetch(gateway + '/mira/activity-state', { method: 'POST',
+    headers: { ...headers, 'content-type': 'application/json' }, body: JSON.stringify(value) });
+  const saved = await post(data);
+  assert.equal(saved.status, 200);
+  assert.equal((await saved.json()).internal, undefined);
+  assert.deepEqual(calls[1], { method: 'POST', body: data });
+  const conflict = await post({ ...data, learningSessionId: 'another-session' });
+  assert.equal(conflict.status, 409);
+  assert.equal((await conflict.json()).error, 'textbook_activity_state_identity');
+  const beforeRejected = calls.length;
+  assert.equal((await post({ ...data, state: { archive: 'x'.repeat(384 * 1024) } })).status, 413);
+  assert.equal((await fetch(gateway + '/mira/activity-state', { method: 'POST', headers: {
+    ...headers, 'content-type': 'application/json' }, body: '{broken' })).status, 400);
+  assert.equal((await fetch(gateway + '/mira/activity-state', { method: 'POST', headers: {
+    ...headers, 'content-type': 'text/plain' }, body: '{}' })).status, 415);
+  assert.equal((await fetch(gateway + '/mira/activity-state', { method: 'DELETE', headers })).status, 405);
+  assert.equal(calls.length, beforeRejected);
+  assert.equal(upstreamCalls, 0);
+});
+
+test('conversation probes cannot read or write formal activity progress', async () => {
+  let activityCalls = 0, upstreamCalls = 0;
+  const backend = await listen(http.createServer(async (request, response) => {
+    if (request.url.endsWith('/validate')) return reply(response, {
+      ...formalRuntime(), purpose: 'conversation_probe', runtimeSessionId: 'probe-session',
+    });
+    activityCalls++; response.writeHead(500).end();
+  }));
+  const upstream = await listen(http.createServer((_request, response) => {
+    upstreamCalls++; response.writeHead(500).end();
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  for (const method of ['GET', 'POST']) {
+    const result = await fetch(gateway + '/mira/activity-state', { method,
+      headers: { cookie: 'mira_openmaic_runtime=omr_probe', 'content-type': 'application/json' },
+      body: method === 'POST' ? '{}' : undefined });
+    assert.equal(result.status, 403);
+    assert.equal((await result.json()).error, 'openmaic_probe_activity_state_blocked');
+  }
+  assert.equal(activityCalls, 0);
+  assert.equal(upstreamCalls, 0);
 });
 
 test('published video and GLB bytes retain exact session, hash, size and format boundaries', async () => {
@@ -1806,13 +1928,15 @@ test("conversation probe is cookie-authenticated, scope-bound, and streams chat 
 });
 
 test("formal classroom JSON is assembled with session-bound audio and same-origin WAV delivery", async () => {
+  const { runtime, classroom, manifest: activityManifest } = formalActivityFixture();
   const wav = Buffer.alloc(64);
   wav.write("RIFF", 0, "ascii");
   wav.writeUInt32LE(wav.length - 8, 4);
   wav.write("WAVE", 8, "ascii");
   const digest = createHash("sha256").update(wav).digest("hex");
-  const manifest = formalAudioManifest(digest, wav.length);
+  const manifest = formalAudioManifest(digest, wav.length, classroom);
   let manifestCalls = 0;
+  let activityManifestCalls = 0;
   let audioCalls = 0;
   const backend = await listen(
     http.createServer(async (request, response) => {
@@ -1823,7 +1947,7 @@ test("formal classroom JSON is assembled with session-bound audio and same-origi
           response.end(JSON.stringify({ ok: false, error: "invalid" }));
           return;
         }
-        return reply(response, formalRuntime());
+        return reply(response, runtime);
       }
       assert.equal(request.headers["x-mira-internal-token"], "test-internal-token");
       assert.equal(request.headers["x-mira-internal-source"], "openmaic-runtime-gateway");
@@ -1838,6 +1962,11 @@ test("formal classroom JSON is assembled with session-bound audio and same-origi
           ...manifest,
           internal: { mustNotLeak: true },
         });
+      }
+      if (request.url === "/internal/learning/openmaic/runtime/activity-manifest") {
+        activityManifestCalls += 1;
+        assert.equal(request.method, 'GET');
+        return reply(response, { ...activityManifest, internal: { mustNotLeak: true } });
       }
       if (request.url === "/internal/learning/openmaic/runtime/audio/formal-audio-0") {
         audioCalls += 1;
@@ -1860,7 +1989,7 @@ test("formal classroom JSON is assembled with session-bound audio and same-origi
       assert.equal(request.headers["x-mira-learning-session"], "learning-session-a");
       assert.equal(request.headers["x-mira-runtime-classroom-id"], "classroom-a");
       assert.notEqual(request.headers["x-mira-runtime-session"], "forged-session");
-      reply(response, { success: true, classroom: formalClassroom() });
+      reply(response, { success: true, classroom });
     }),
   );
   const gateway = await listenGateway({ backend, upstream });
@@ -1883,6 +2012,11 @@ test("formal classroom JSON is assembled with session-bound audio and same-origi
   assert.equal(speech.audioId, "formal-audio-0");
   assert.equal(speech.audioUrl, "/mira/runtime-audio/formal-audio-0");
   assert.equal(manifestCalls, 1);
+  assert.equal(activityManifestCalls, 1);
+  assert.deepEqual(classroomPayload.classroom.scenes[1].miraActivityPersistence, {
+    schemaVersion: activityManifest.schemaVersion, releaseSha256: activityManifest.releaseSha256,
+    contentSha256: activityManifest.activities[0].contentSha256,
+  });
 
   const audioResponse = await fetch(`${gateway}${speech.audioUrl}`, {
     headers: { cookie, "x-mira-runtime-session": "forged-session" },
@@ -2130,6 +2264,24 @@ function formalRuntime() {
     classroomId: "classroom-a",
     expiresAt: Date.now() + 60_000,
   };
+}
+
+function formalActivityFixture() {
+  const runtime = { ...formalRuntime(), features: { formalEvidence: { runtimeEventAuthority: {
+    schemaVersion: 'mira.openmaic.runtime-event-authority.v1',
+  } } } };
+  const classroom = formalClassroom();
+  classroom.stage.id = runtime.classroomId;
+  classroom.scenes.forEach((scene, order) => Object.assign(scene, {
+    order, stageId: runtime.classroomId, type: 'slide',
+  }));
+  classroom.scenes[1].type = 'interactive';
+  classroom.scenes[1].content = { type: 'interactive', html: '<button id="move">move</button>' };
+  const manifest = { ok: true, schemaVersion: 'mira.textbook.activity-state.v1',
+    classroomId: runtime.classroomId, learningSessionId: runtime.learningSessionId,
+    releaseSha256: 'a'.repeat(64), activities: [{ sceneId: classroom.scenes[1].id, sceneIndex: 1,
+      contentSha256: createHash('sha256').update(classroom.scenes[1].content.html).digest('hex') }] };
+  return { runtime, classroom, manifest };
 }
 
 function formalClassroom(sceneCount = 10) {

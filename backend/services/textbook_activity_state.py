@@ -11,7 +11,8 @@ from core.errors import ApiError
 
 
 SCHEMA = 'mira.textbook.activity-state.v1'
-MAX_BODY_BYTES = 64 * 1024
+MAX_BODY_BYTES = 384 * 1024
+MAX_STATE_BYTES = 256 * 1024
 MAX_MUTATIONS = 128
 MAX_STORED_BYTES = 8 * 1024 * 1024
 MAX_RESPONSE_BYTES = 8 * 1024 * 1024
@@ -56,7 +57,7 @@ def validate_json_state(value):
         else:
             invalid()
     try:
-        if len(canonical(value).encode('utf-8')) > MAX_BODY_BYTES - 1024:
+        if len(canonical(value).encode('utf-8')) > MAX_STATE_BYTES:
             invalid('小游戏进度内容过大', status=413)
     except (ValueError, TypeError, UnicodeError, OverflowError, RecursionError):
         invalid()
@@ -155,6 +156,44 @@ def response_within_budget(value):
     if len(json.dumps(value, ensure_ascii=True, separators=(',', ':'), allow_nan=False).encode('ascii')) > MAX_RESPONSE_BYTES:
         invalid('保存的小游戏进度过大', code='textbook_activity_state_unavailable', status=503)
     return value
+
+
+def exchange(progress, *, session_id, release, definitions, data=None):
+    """Shared, pure snapshot CAS; callers own authentication, row locks and SQL.
+
+    Both fixed textbook and formal runtime classrooms use the same bounded
+    namespace. No event, answer, score or completion field is inspected or
+    changed here. ``changed`` distinguishes a new write from an idempotent read.
+    """
+    identity = {'ok': True, 'schemaVersion': SCHEMA,
+        'classroomId': release['classroomId'], 'learningSessionId': session_id,
+        'releaseSha256': release['sha256']}
+    saved_scope = scope(progress, session_id=session_id, release=release)
+    if data is None:
+        return response_within_budget({**identity, 'activities': [activity(item,
+            saved_scope['scenes'].get(item['sceneId'])) for item in definitions]}), False
+    definition = next((item for item in definitions if item['sceneId'] == data['sceneId']), None)
+    if (data['learningSessionId'] != session_id or definition is None
+            or data['sceneIndex'] != definition['sceneIndex']
+            or data['releaseSha256'] != release['sha256']
+            or data['contentSha256'] != definition['contentSha256']):
+        invalid('小游戏版本已变化，请重新进入', code='textbook_activity_state_identity', status=409)
+    stored = saved_scope['scenes'].get(definition['sceneId'])
+    current = activity(definition, stored)
+    request_digest = request_sha(data)
+    mutations = dict((stored or {}).get('mutations', {}))
+    if data['mutationId'] in mutations:
+        if mutations[data['mutationId']] != request_digest:
+            invalid('小游戏保存标识已用于另一份进度', code='textbook_activity_mutation_conflict', status=409)
+        return {**identity, 'activity': current}, False
+    if data['expectedRevision'] != current['revision']:
+        invalid('小游戏已在其他页面更新，请重新进入', code='textbook_activity_revision_conflict', status=409)
+    mutations[data['mutationId']] = request_digest
+    updated = {key: deepcopy(data[key]) for key in ('sceneIndex', 'contentSha256', 'mutationId', 'state')}
+    updated.update(revision=current['revision'] + 1, mutations=dict(list(mutations.items())[-MAX_MUTATIONS:]))
+    scope(progress, session_id=session_id, release=release, create=True)['scenes'][definition['sceneId']] = updated
+    validate_storage_budget(progress)
+    return {**identity, 'activity': activity(definition, updated)}, True
 
 
 def load_post_bytes(raw):
