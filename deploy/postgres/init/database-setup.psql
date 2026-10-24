@@ -1,0 +1,12 @@
+-- Per-database layout for the Mira PostgreSQL cluster. Idempotent; after
+-- creating a database (here or on a server without Docker), run it as a
+-- superuser with
+--   psql -v ON_ERROR_STOP=1 -v db=<name> -f database-setup.psql <name>
+-- The login `mira` owns the database and both schemas: `public` holds the
+-- OpenMAIC classroom runtime, `app` the Python backend. The .psql suffix keeps
+-- the image entrypoint from running it directly; 01-mira-init.sh applies it.
+ALTER DATABASE :"db" OWNER TO mira;
+REVOKE ALL ON DATABASE :"db" FROM PUBLIC;
+ALTER SCHEMA public OWNER TO mira;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+CREATE SCHEMA IF NOT EXISTS app AUTHORIZATION mira;

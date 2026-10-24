@@ -1,0 +1,42 @@
+# Local PostgreSQL for Mira development, run in Docker Desktop.
+# One daily database `mira` (schema `public` for the OpenMAIC classroom runtime,
+# schema `app` for the Python backend) and `mira_test`, which tests wipe.
+# Programs and database browsers all use the login `mira`; the image's
+# superuser `postgres` is for administration through `docker exec` only.
+#
+#   docker compose -f deploy/compose.local-db.yml --env-file deploy/env/local-db.env up -d
+#
+# Data lives in the named volume `mira-pgdata`. Docker Desktop's "Clean / Purge
+# data", `docker volume prune` or `down -v` deletes it; keep logical backups.
+name: mira-local-db
+
+services:
+  postgres:
+    # Same major version as deploy/compose.production.yml.
+    image: postgres:16.15-alpine@sha256:f4610795587492cd4fb887c2dc3de301b813278bb6f616992061141b5f15ac36
+    container_name: mira-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${MIRA_LOCAL_PG_SUPERUSER_PASSWORD:?required}
+      POSTGRES_DB: mira
+      # C.UTF-8 sorts by code point here (musl) and on glibc servers alike.
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=C.UTF-8
+      MIRA_DB_PASSWORD: ${MIRA_DB_PASSWORD:?required}
+      TZ: Asia/Shanghai
+    command: ["postgres", "-c", "timezone=Asia/Shanghai", "-c", "log_timezone=Asia/Shanghai"]
+    ports:
+      - "127.0.0.1:${MIRA_LOCAL_PG_PORT:-5433}:5432"
+    volumes:
+      - mira-pgdata:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mira"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  mira-pgdata:
+    name: mira-pgdata

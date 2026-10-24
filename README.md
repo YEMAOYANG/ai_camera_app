@@ -77,7 +77,9 @@ python3 app.py
 
 ## 数据库用途
 
-业务数据位于 MySQL，开发库通常是 `ai_camera_app_dev`，测试库是 `ai_camera_app_test`；连接以 `backend/.env` 为准。课堂 Agent 使用独立 PostgreSQL，连接以运行配置中的 `MIRA_OPENMAIC_AGENT_DATABASE_URL` 为准。它们不存放在 `backend/data/`。
+业务数据位于 MySQL，开发库通常是 `ai_camera_app_dev`，测试库是 `ai_camera_app_test`；连接以 `backend/.env` 为准。课堂 Agent 使用 PostgreSQL，连接以 `backend/.env` 中的 `MIRA_OPENMAIC_AGENT_DATABASE_URL` 为准。它们不存放在 `backend/data/`。
+
+本机 PostgreSQL 自 2026-10-25 起运行在 Docker Desktop：`docker compose -f deploy/compose.local-db.yml --env-file deploy/env/local-db.env up -d`（127.0.0.1:5433，库 `mira`）。课堂表在 `public` schema，业务表计划迁入同库的 `app` schema；`mira_test` 供测试清空重建。程序和数据库浏览工具共用登录账号 `mira`，密码在 git 忽略的 `deploy/env/local-db.env`。数据保存在 Docker 卷 `mira-pgdata`：不要执行 `docker compose down -v`、`docker volume prune`，也不要在 Docker Desktop 中清除数据。本地服务启动前 Docker Desktop 必须已运行。原 Homebrew 库 `openmaic_mira` 保留未删，但已拒绝新连接，仅供回退。
 
 | 表组 | 负责什么 |
 | --- | --- |
