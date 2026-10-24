@@ -1460,6 +1460,48 @@ class WorkbenchClientTest(unittest.TestCase):
         return Cookie(0, 'anonymous_id', self.owner, None, False, '127.0.0.1', False, False,
                       '/', True, True, None, True, None, None, {}, False)
 
+    def test_registry_mode_keeps_owner_cookie_local_without_consulting_course_storage(self):
+        self.client.jar.set_cookie(self.cookie())
+        self.client.opener = Mock()
+        self.client.opener.open.return_value = io.BytesIO(b'[]')
+        with patch.dict('os.environ', {'COURSE_STORAGE_MODE': 'registry'}), \
+                patch('services.course_file_store.course_write_bytes',
+                      side_effect=AssertionError('owner credentials must never reach course storage')) as remote:
+            self.assertEqual(self.client.sessions(), [])
+            self.path.chmod(0o666)
+            self.client._save_owner()
+            remote.assert_not_called()
+        self.assertEqual(stat.S_IMODE(self.path.stat().st_mode), 0o600)
+        restored = OpenMaicWorkbenchClient(self.client.origin, self.path)
+        self.assertEqual(restored.owner_fingerprint(), sha(self.owner.encode()))
+        self.assertEqual(list(self.path.parent.glob('.owner-*')), [])
+        self.assertEqual(list(self.path.parent.glob('.authoring-*')), [])
+
+    def test_registry_registered_state_still_uses_remote_writer_without_a_local_shadow(self):
+        state = self.path.with_name('state.json')
+        original = b'{"status":"saved-original"}'
+        updated = b'{"status":"running"}'
+        state.write_bytes(original)
+        with patch.dict('os.environ', {'COURSE_STORAGE_MODE': 'registry'}), \
+                patch('services.course_file_store.course_write_bytes', return_value=True) as remote:
+            private_write(state, updated)
+            remote.assert_called_once_with(state, updated)
+        self.assertEqual(state.read_bytes(), original)
+        self.assertEqual(list(self.path.parent.glob('.authoring-*')), [])
+
+    def test_registry_state_write_error_never_falls_back_to_local(self):
+        state = self.path.with_name('state.json')
+        original = b'{"status":"saved-original"}'
+        state.write_bytes(original)
+        with patch.dict('os.environ', {'COURSE_STORAGE_MODE': 'registry'}), \
+                patch('services.course_file_store.course_write_bytes',
+                      side_effect=RuntimeError('remote state write failed')) as remote:
+            with self.assertRaisesRegex(RuntimeError, 'remote state write failed'):
+                private_write(state, b'{"status":"replacement"}')
+            remote.assert_called_once()
+        self.assertEqual(state.read_bytes(), original)
+        self.assertEqual(list(self.path.parent.glob('.authoring-*')), [])
+
     def test_private_get_establishes_owner_secure_cookie_survives_loopback_http_and_reload(self):
         def get(request, timeout):
             self.assertEqual(request.get_method(), 'GET')
