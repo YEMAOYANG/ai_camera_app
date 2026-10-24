@@ -72,6 +72,24 @@ def quiz():
         return error_response(exc)
 
 
+@internal_textbooks_bp.route('/runtime/activity-state', methods=['GET', 'POST'])
+def activity_state():
+    try:
+        authorize()
+        from services.textbook_activity_state import MAX_BODY_BYTES, load_post_bytes, invalid
+        data = None
+        if request.method == 'POST':
+            if not request.is_json:
+                invalid('小游戏进度需要 JSON 格式', status=415)
+            if request.content_length is not None and request.content_length > MAX_BODY_BYTES:
+                invalid('小游戏进度内容过大', status=413)
+            data = load_post_bytes(request.stream.read(MAX_BODY_BYTES + 1))
+        return jsonify(textbook_classroom_service().activity_state(
+            request.headers.get('X-Mira-Textbook-Token'), data))
+    except ApiError as exc:
+        return error_response(exc)
+
+
 @internal_textbooks_bp.route('/runtime/play', methods=['GET', 'POST'])
 def play():
     try:

@@ -437,7 +437,7 @@ async function launchTextbook(_request, response, url, config) {
 
 export function authorizeTextbookRequest(request, url, runtime) {
   const method = String(request.method || 'GET').toUpperCase();
-  if (['/mira/runtime-events', '/mira/textbook-quiz', '/mira/textbook-play'].includes(url.pathname))
+  if (['/mira/runtime-events', '/mira/textbook-quiz', '/mira/textbook-play', '/mira/activity-state'].includes(url.pathname))
     return { allowed: ['GET', 'POST'].includes(method) && !url.search, kind: 'textbook-record' };
   if (/^\/mira\/textbook-audio\/[a-f0-9]{24}\.wav$/.test(url.pathname))
     return { allowed: method === 'GET' && !url.search, kind: 'textbook-activity-audio' };
@@ -485,6 +485,7 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
     for (const scene of result.classroom?.scenes || []) {
       // This is delivery metadata, never an authored assertion of ownership.
       delete scene.miraPageNarration;
+      bindTextbookActivityPersistence(scene, runtime);
       if (scene.miraActivity || scene.type !== 'interactive' || typeof scene.content?.html !== 'string') continue;
       const embedded = runtime.media.filter(media => scene.content.html.includes(media.path));
       const assets = await Promise.all(embedded.map(async media => {
@@ -504,11 +505,13 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
     let data;
     if (request.method === 'POST') {
       if (!isJsonRequest(request)) return json(response, 415, { ok: false, error: 'textbook_json_required' });
-      try { data = JSON.parse((await readBody(request, 8192)).toString('utf8')); }
-      catch { return json(response, 400, { ok: false, error: 'textbook_json_invalid' }); }
+      try { data = JSON.parse((await readBody(request, url.pathname === '/mira/activity-state' ? 64 * 1024 : 8192)).toString('utf8')); }
+      catch (error) { return json(response, url.pathname === '/mira/activity-state' && error.statusCode === 413 ? 413 : 400,
+        { ok: false, error: 'textbook_json_invalid' }); }
     }
     const endpoint = url.pathname === '/mira/textbook-quiz' ? 'quiz'
-      : url.pathname === '/mira/textbook-play' ? 'play' : 'events';
+      : url.pathname === '/mira/textbook-play' ? 'play'
+      : url.pathname === '/mira/activity-state' ? 'activity-state' : 'events';
     const result = await backendJson(config, `/internal/learning/textbooks/runtime/${endpoint}`, data, trusted, request.method);
     return json(response, 200, result);
   }
@@ -531,6 +534,21 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
  * Called after archived media verification, before sandbox delivery rewriting.
  * Never execute authored JavaScript or recover metadata from an embedding shell.
  */
+/** Preserve the backend's hash of immutable source HTML before delivery transforms. */
+export function bindTextbookActivityPersistence(scene, runtime) {
+  delete scene.miraActivityPersistence;
+  if (runtime?.purpose !== 'fixed_textbook' || !/^[a-f0-9]{64}$/.test(runtime.releaseSha256 || '')
+      || scene.type !== 'interactive' || scene.content?.type !== 'interactive'
+      || typeof scene.content.html !== 'string' || !scene.content.html.trim()
+      || scene.miraActivity || scene.stageId !== runtime.classroomId
+      || !Array.isArray(runtime.activityPersistence)) return;
+  const matches = runtime.activityPersistence.filter(item => item?.sceneId === scene.id);
+  if (matches.length !== 1 || !/^[a-f0-9]{64}$/.test(matches[0].contentSha256 || '')
+      || !Number.isInteger(matches[0].sceneIndex) || matches[0].sceneIndex < 0 || matches[0].sceneIndex >= 60) return;
+  scene.miraActivityPersistence = { schemaVersion: 'mira.textbook.activity-state.v1',
+    releaseSha256: runtime.releaseSha256, contentSha256: matches[0].contentSha256 };
+}
+
 export function bindTextbookPageNarration(scene, runtime, verifiedMediaPaths = new Set()) {
   delete scene.miraPageNarration;
   if (runtime?.purpose !== 'fixed_textbook' || !/^tbpub_[a-f0-9]{24}$/.test(runtime.classroomId)

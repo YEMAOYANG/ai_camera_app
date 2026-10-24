@@ -1,0 +1,1768 @@
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -34,6 +34,7 @@
+   studentInteractionObjectives,
+ } from '@/lib/mira/student-interaction-bridge';
+ import { useI18n } from '@/lib/hooks/use-i18n';
++import { connectActivityCheckpointFrame } from '@/lib/mira/activity-checkpoint-bridge';
+ import {
+   ELEMENT_REF_SELECTOR_MAX,
+   ELEMENT_SNAPSHOT_MAX,
+@@ -193,6 +194,32 @@
+   const visibleRef = useRef(visible);
+   visibleRef.current = visible;
+   const iframeRef = useRef<HTMLIFrameElement>(null);
++  const classroomId = useStageStore((state) => state.stage?.id);
++  const sceneIndex = scenes.findIndex((scene) => scene.id === sceneId);
++  const checkpoint = scenes[sceneIndex]?.miraActivityPersistence;
++  const checkpointRelease = checkpoint?.releaseSha256;
++  const checkpointContent = checkpoint?.contentSha256;
++  const checkpointSchema = checkpoint?.schemaVersion;
++  const checkpointKey = `${classroomId}:${sceneId}:${checkpointRelease}:${checkpointContent}`;
++  const [readyCheckpoint, setReadyCheckpoint] = useState<string | null>(null);
++  const needsCheckpoint = !!runtimeEvents && !!entry.srcDoc?.includes('<meta name="mira-activity-checkpoint" content="v1">') && !!classroomId && sceneIndex >= 0
++    && checkpointSchema === 'mira.textbook.activity-state.v1'
++    && /^[a-f0-9]{64}$/.test(checkpointRelease ?? '') && /^[a-f0-9]{64}$/.test(checkpointContent ?? '');
++  useEffect(() => {
++    const frame = iframeRef.current;
++    if (!frame || !needsCheckpoint || !runtimeEvents || !classroomId || sceneIndex < 0 || !entry.srcDoc
++        || checkpointSchema !== 'mira.textbook.activity-state.v1'
++        || !/^[a-f0-9]{64}$/.test(checkpointRelease ?? '')
++        || !/^[a-f0-9]{64}$/.test(checkpointContent ?? '')) return;
++    return connectActivityCheckpointFrame({ frame,
++      identity: { classroomId, sceneId, sceneIndex,
++        releaseSha256: checkpointRelease!, contentSha256: checkpointContent! },
++      active: () => visibleRef.current && useStageStore.getState().currentSceneId === sceneId,
++      onRestoring: () => setReadyCheckpoint(null),
++      onReady: () => setReadyCheckpoint(checkpointKey),
++      onError: () => toast.error('小游戏进度暂未保存，请保持页面打开，网络恢复后再试；重新进入可读取已保存的进度。'),
++    });
++  }, [runtimeEvents, needsCheckpoint, classroomId, sceneId, sceneIndex, entry.srcDoc, checkpointSchema, checkpointRelease, checkpointContent, checkpointKey]);
+   const registerIframe = useWidgetIframeStore((s) => s.registerIframe);
+   const getSendMessage = useWidgetIframeStore((s) => s.getSendMessage);
+   const pickTarget = useCanvasStore.use.pickTarget();
+@@ -321,7 +348,8 @@
+     return () => window.removeEventListener(LECTURE_AUDIO_EVENT, onLecture);
+   }, []);
+   const pageNarration = useSyncExternalStore(subscribePageNarration, getPageNarration, getPageNarration);
+-  const narrationAllowed = pageNarrationAllowed(shown, lectureSpeaking) && !pageNarration.paused;
++  const narrationAllowed = pageNarrationAllowed(shown, lectureSpeaking) && !pageNarration.paused
++    && (!needsCheckpoint || readyCheckpoint === checkpointKey);
+   useEffect(() => {
+     const interact = (event: MessageEvent) => {
+       if (!shown || event.source !== iframeRef.current?.contentWindow
+@@ -399,12 +427,13 @@
+         ref={iframeRef}
+         srcDoc={entry.srcDoc}
+         src={entry.srcDoc ? undefined : entry.src}
+-        onLoad={() =>
++        onLoad={() => {
++          if (needsCheckpoint) setReadyCheckpoint(null);
+           iframeRef.current?.contentWindow?.postMessage(
+-            { type: 'MIRA_NARRATION_VISIBILITY', visible: narrationAllowed },
++            { type: 'MIRA_NARRATION_VISIBILITY', visible: needsCheckpoint ? false : narrationAllowed },
+             '*',
+-          )
+-        }
++          );
++        }}
+         style={iframeStyle}
+         data-mira-viewport-mode={viewportMode}
+         title={`Interactive Scene ${sceneId}`}
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -1,5 +1,7 @@
+ import { classroomControlCss } from '@/lib/ui/classroom-controls';
+ import { STUDENT_INTERACTION_OBSERVER } from '@/lib/mira/student-interaction-bridge';
++import { ACTIVITY_CHECKPOINT_SHIM } from '@/lib/mira/activity-checkpoint-bridge';
++import { mapEmbeddedActivityDocument, patchActivityCheckpointAdapters } from '@/lib/mira/activity-checkpoint-adapters';
+ import { injectIntoDocumentHead } from './html-document';
+
+ /**
+@@ -308,7 +310,19 @@
+  * placed first so they run before the page's own scripts (error capture first, so
+  * it also observes the storage shim).
+  */
+-export function patchHtmlForIframe(html: string): string {
++export function patchHtmlForIframe(html: string, embeddedDepth = 0): string {
++  const checkpointMarker = '<meta name="mira-activity-checkpoint" content="v1">';
++  if (embeddedDepth < 4) {
++    let nestedCheckpoint = false;
++    const embedded = mapEmbeddedActivityDocument(html, page => {
++      const patched = patchHtmlForIframe(page, embeddedDepth + 1);
++      nestedCheckpoint = patched.includes(checkpointMarker);
++      return patched;
++    });
++    if (embedded !== null) return nestedCheckpoint ? injectIntoDocumentHead(embedded, checkpointMarker) : embedded;
++  }
++  const adaptedHtml = patchActivityCheckpointAdapters(html);
++  const checkpointSupported = adaptedHtml !== html || /window\.miraActivityCheckpoint\s*=/.test(html);
+   const activityControlsCss = `<style data-mira-activity-controls>${classroomControlCss('iframe')}</style>`;
+   const iframeCss = `<style data-iframe-patch>
+   html, body {
+@@ -325,7 +339,7 @@
+ </style>`;
+
+   const injection =
+-    '\n' + ACTIVITY_INTENT_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss + '\n' + activityControlsCss;
+-
+-  return injectIntoDocumentHead(html, injection);
++    '\n' + ACTIVITY_INTENT_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + (checkpointSupported ? checkpointMarker + ACTIVITY_CHECKPOINT_SHIM : '') + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss + '\n' + activityControlsCss;
++
++  return injectIntoDocumentHead(adaptedHtml, injection);
+ }
+diff --git a/lib/types/stage.ts b/lib/types/stage.ts
+--- a/lib/types/stage.ts
++++ b/lib/types/stage.ts
+@@ -108,6 +108,12 @@
+   };
+   /** Server-bound native activities for reviewed Mira textbook releases. */
+   miraActivity?: { id: string; section: 'games' | 'challenge' };
++  /** Authenticated release metadata for UI continuity, never learning credit. */
++  miraActivityPersistence?: {
++    schemaVersion: 'mira.textbook.activity-state.v1';
++    releaseSha256: string;
++    contentSha256: string;
++  };
+   /**
+    * Stable id of the generation outline this scene was built from. Lets editor
+    * agent tools resolve a scene's outline by identity instead of by the mutable
+diff --git a/lib/mira/activity-checkpoint-client.ts b/lib/mira/activity-checkpoint-client.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/activity-checkpoint-client.ts
+@@ -0,0 +1,206 @@
++/** UI continuity only. These snapshots never submit answers or learning credit. */
++export const ACTIVITY_CHECKPOINT_SCHEMA = 'mira.textbook.activity-state.v1';
++export type ActivityState = Record<string, unknown>;
++export type ActivityIdentity = {
++  classroomId: string; sceneId: string; sceneIndex: number;
++  releaseSha256: string; contentSha256: string;
++};
++type Descriptor = {
++  sceneId: string; sceneIndex: number; contentSha256: string;
++  revision: number; mutationId: string | null; state: ActivityState | null;
++};
++type Mutation = ActivityIdentity & {
++  schemaVersion: string; learningSessionId: string; expectedRevision: number; mutationId: string; state: ActivityState;
++};
++type Outbox = { version: 1; pending: Mutation | null; desired: ActivityState | null };
++
++export function activityState(value: unknown): ActivityState {
++  let nodes = 0;
++  const inspect = (item: unknown, depth: number): void => {
++    if (++nodes > 4096 || depth > 16) throw new Error('activity_state_invalid');
++    if (item === null || typeof item === 'boolean') return;
++    if (typeof item === 'number' && Number.isFinite(item) && Math.abs(item) <= Number.MAX_SAFE_INTEGER) return;
++    if (typeof item === 'string' && item.length <= 16000) return;
++    if (Array.isArray(item) && item.length <= 2000) { item.forEach(v => inspect(v, depth + 1)); return; }
++    if (item && typeof item === 'object' && Object.getPrototypeOf(item) === Object.prototype) {
++      for (const [key, child] of Object.entries(item)) {
++        if (!key || ['__proto__', 'constructor', 'prototype'].includes(key) || key.length > 128) throw new Error('activity_state_invalid');
++        inspect(child, depth + 1);
++      }
++      return;
++    }
++    throw new Error('activity_state_invalid');
++  };
++  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('activity_state_invalid');
++  inspect(value, 0);
++  const json = JSON.stringify(value);
++  if (new TextEncoder().encode(json).length > 48 * 1024) throw new Error('activity_state_too_large');
++  return JSON.parse(json) as ActivityState;
++}
++
++function canonical(value: unknown): string | undefined {
++  const ordered = (item: unknown): unknown => Array.isArray(item) ? item.map(ordered)
++    : item && typeof item === 'object' ? Object.fromEntries(Object.keys(item).sort()
++      .map(key => [key, ordered((item as Record<string, unknown>)[key])])) : item;
++  return JSON.stringify(ordered(value));
++}
++const equal = (a: unknown, b: unknown) => canonical(a) === canonical(b);
++const mutationIdentifier = () => typeof globalThis.crypto?.randomUUID === 'function'
++  ? globalThis.crypto.randomUUID()
++  : 'activity_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
++export function createActivityCheckpointClient(identity: ActivityIdentity, options: {
++  fetcher?: typeof fetch; storage?: Storage | null; onError?: (error: Error) => void;
++} = {}) {
++  const fetcher = options.fetcher ?? fetch;
++  let storage: Storage | null = options.storage ?? null;
++  if (options.storage === undefined) { try { storage = window.localStorage; } catch { /* server remains authoritative */ } }
++  let scope = '', learningSessionId = '', current: Descriptor | null = null, desired: ActivityState | null = null;
++  let pending: Mutation | null = null, saving: Promise<void> | null = null, closed = false;
++  let loaded = false, failureNotified = false, lastStored: string | null = null, conflicted = false;
++  const notify = (reason: unknown) => {
++    const error = reason instanceof Error ? reason : new Error('activity_checkpoint_failed');
++    if (!closed && !failureNotified) { failureNotified = true; options.onError?.(error); }
++    return error;
++  };
++  const descriptor = (value: unknown): Descriptor => {
++    const d = value as Descriptor;
++    if (!d || d.sceneId !== identity.sceneId || d.sceneIndex !== identity.sceneIndex
++        || d.contentSha256 !== identity.contentSha256 || !Number.isSafeInteger(d.revision) || d.revision < 0
++        || !(d.mutationId === null || typeof d.mutationId === 'string')) throw new Error('activity_identity_changed');
++    return { ...d, state: d.state === null ? null : activityState(d.state) };
++  };
++  const checkAuthority = (data: Record<string, unknown>) => {
++    if (data.ok !== true || data.schemaVersion !== ACTIVITY_CHECKPOINT_SCHEMA
++        || data.classroomId !== identity.classroomId || data.releaseSha256 !== identity.releaseSha256
++        || typeof data.learningSessionId !== 'string' || !data.learningSessionId) throw new Error('activity_identity_changed');
++    const nextScope = 'mira:activity-checkpoint:v1:' + encodeURIComponent(JSON.stringify([
++      data.learningSessionId, identity.classroomId, identity.releaseSha256, identity.sceneId, identity.contentSha256,
++    ]));
++    if (scope && scope !== nextScope) throw new Error('activity_session_changed');
++    scope = nextScope;
++    learningSessionId = data.learningSessionId;
++  };
++  const persist = () => {
++    if (!scope || !storage || closed || conflicted) return;
++    try {
++      if (storage.getItem(scope) !== lastStored) {
++        conflicted = true;
++        notify(new Error('activity_state_conflict'));
++        return;
++      }
++      if (!pending && equal(desired, current?.state)) { storage.removeItem(scope); lastStored = null; }
++      else {
++        const nextStored = JSON.stringify({ version: 1, pending, desired } satisfies Outbox);
++        storage.setItem(scope, nextStored);
++        lastStored = nextStored;
++      }
++    } catch {
++      // A full browser quota must not disable the authoritative server writes.
++      storage = null;
++      notify(new Error('activity_local_buffer_unavailable'));
++    }
++  };
++  const request = async (body?: Mutation) => {
++    const controller = new AbortController();
++    const deadline = setTimeout(() => controller.abort(), 12000);
++    try {
++      // The endpoint uses the existing HttpOnly classroom ticket. No token enters Storage.
++      const response = await fetcher('/mira/activity-state', {
++        method: body ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
++        headers: body ? { 'Content-Type': 'application/json' } : undefined,
++        body: body ? JSON.stringify(Object.fromEntries(Object.entries(body).filter(([key]) => key !== 'classroomId'))) : undefined,
++        keepalive: !!body, signal: controller.signal,
++      });
++      if (!response.ok) throw new Error(response.status === 409 ? 'activity_state_conflict' : 'activity_checkpoint_unavailable');
++      const result = await response.json() as Record<string, unknown>;
++      checkAuthority(result);
++      return result;
++    } finally { clearTimeout(deadline); }
++  };
++  const flush = (): Promise<void> => {
++    if (saving) return saving;
++    if (!loaded || closed) return Promise.resolve();
++    saving = (async () => {
++      while (!closed && !conflicted && current && (pending || !equal(desired, current.state))) {
++        if (!pending) {
++          if (desired === null) break;
++          pending = { ...identity, schemaVersion: ACTIVITY_CHECKPOINT_SCHEMA, learningSessionId,
++            expectedRevision: current.revision, mutationId: mutationIdentifier(), state: desired };
++          persist();
++        }
++        const sent = pending;
++        const result = await request(sent);
++        const accepted = descriptor(result.activity);
++        // Replaying an old idempotency key must never overwrite a newer document's work.
++        if (accepted.mutationId !== sent.mutationId || accepted.revision < sent.expectedRevision + 1)
++          throw new Error('activity_state_conflict');
++        current = accepted;
++        pending = null;
++        failureNotified = false;
++        persist();
++      }
++    })().catch(reason => {
++      if (reason instanceof Error && reason.message === 'activity_state_conflict') conflicted = true;
++      throw notify(reason);
++    }).finally(() => { saving = null; });
++    return saving;
++  };
++  return {
++    async load(): Promise<ActivityState | null> {
++      try {
++        const result = await request();
++        if (closed) throw new Error('activity_checkpoint_closed');
++        if (!Array.isArray(result.activities)) throw new Error('activity_identity_changed');
++        current = descriptor(result.activities.find((d: Descriptor) => d.sceneId === identity.sceneId));
++        desired = current.state;
++        let raw: string | null = null;
++        try { raw = storage?.getItem(scope) ?? null; lastStored = raw; } catch { notify(new Error('activity_local_buffer_unavailable')); }
++        if (raw) {
++          const saved = JSON.parse(raw) as Outbox;
++          if (saved.version !== 1) throw new Error('activity_local_buffer_invalid');
++          if (saved.pending) {
++            const p = saved.pending;
++            if (p.learningSessionId !== learningSessionId || p.classroomId !== identity.classroomId || p.sceneId !== identity.sceneId || p.sceneIndex !== identity.sceneIndex
++                || p.releaseSha256 !== identity.releaseSha256 || p.contentSha256 !== identity.contentSha256
++                || p.schemaVersion !== ACTIVITY_CHECKPOINT_SCHEMA || !Number.isSafeInteger(p.expectedRevision)
++                || p.expectedRevision < 0 || typeof p.mutationId !== 'string') throw new Error('activity_local_buffer_invalid');
++            pending = { ...p, state: activityState(p.state) };
++          }
++          desired = saved.desired === null ? null : activityState(saved.desired);
++        }
++        loaded = true;
++        await flush();
++        return current.state;
++      } catch (reason) {
++        // A stale tab's obsolete outbox cannot trap the returning learner in a
++        // permanent conflict. Read the accepted state; never replay stale UI on it.
++        if (reason instanceof Error && reason.message === 'activity_state_conflict' && !closed) {
++          const result = await request();
++          if (!Array.isArray(result.activities)) throw new Error('activity_identity_changed');
++          current = descriptor(result.activities.find((d: Descriptor) => d.sceneId === identity.sceneId));
++          pending = null; desired = current.state; conflicted = false; persist();
++          if (conflicted) { loaded = false; throw notify(reason); }
++          loaded = true;
++          return current.state;
++        }
++        loaded = false; throw notify(reason);
++      }
++    },
++    save(value: unknown): boolean {
++      if (!loaded || closed || conflicted) return false;
++      try {
++        const next = activityState(value);
++        if (equal(next, desired)) return true;
++        desired = next;
++        // Persist before the first await: immediate reload can retry the same mutation.
++        if (!pending && current) pending = { ...identity, schemaVersion: ACTIVITY_CHECKPOINT_SCHEMA, learningSessionId,
++          expectedRevision: current.revision, mutationId: mutationIdentifier(), state: next };
++        persist();
++        void flush().catch(() => undefined);
++        return !conflicted;
++      } catch (reason) { notify(reason); return false; }
++    },
++    flush,
++    close() { closed = true; },
++  };
++}
+diff --git a/lib/mira/activity-checkpoint-bridge.ts b/lib/mira/activity-checkpoint-bridge.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/activity-checkpoint-bridge.ts
+@@ -0,0 +1,157 @@
++import { activityState, createActivityCheckpointClient, type ActivityIdentity } from './activity-checkpoint-client';
++
++/** Separate from participation/assessment channels; no completion or grading calls. */
++export function connectActivityCheckpointFrame(options: {
++  frame: HTMLIFrameElement; identity: ActivityIdentity; active: () => boolean;
++  onError: (error: Error) => void; fetcher?: typeof fetch; storage?: Storage | null;
++  onReady?: () => void; onRestoring?: () => void;
++}): () => void {
++  let alive = true, channel: MessageChannel | null = null;
++  let retry: ReturnType<typeof setTimeout> | undefined;
++  let client: ReturnType<typeof createActivityCheckpointClient> | null = null;
++  let connectedDocument: string | null = null;
++  let restoring: Promise<unknown> | null = null;
++  const connect = () => {
++    if (!alive) return;
++    clearTimeout(retry);
++    channel?.port1.close();
++    const current = new MessageChannel(); channel = current;
++    let ready = false;
++    current.port1.onmessage = async event => {
++      if (!alive || channel !== current) return;
++      const data = event.data;
++      if (data?.type === 'mira:checkpoint-unsupported') { clearTimeout(retry); options.onReady?.(); return; }
++      if (data?.type === 'mira:checkpoint-ready' && typeof data.documentId === 'string') {
++        clearTimeout(retry);
++        if (connectedDocument !== data.documentId) {
++          options.onRestoring?.();
++          client?.close();
++          client = createActivityCheckpointClient(options.identity, options);
++          connectedDocument = data.documentId;
++          restoring = client.load();
++        }
++        try {
++          const state = await restoring;
++          if (!alive || channel !== current) return;
++          current.port1.postMessage({ type: 'mira:checkpoint-restore', state, active: options.active() });
++        } catch {
++          // Keep the old server snapshot; never replace it with fresh initial state.
++          if (alive && channel === current) current.port1.postMessage({ type: 'mira:checkpoint-unavailable' });
++        }
++        return;
++      }
++      if (data?.type === 'mira:checkpoint-restored') { ready = true; options.onReady?.(); return; }
++      if (data?.type === 'mira:checkpoint-rejected') {
++        ready = false;
++        current.port1.postMessage({ type: 'mira:checkpoint-unavailable' });
++        options.onError(new Error('activity_restore_rejected')); return;
++      }
++      if (data?.type === 'mira:checkpoint-state' && ready && options.active()) {
++        try {
++          const accepted = client?.save(activityState(data.state)) === true;
++          current.port1.postMessage({ type: 'mira:checkpoint-captured', snapshotId: data.snapshotId, accepted });
++        } catch (error) { options.onError(error as Error); }
++      } else if (data?.type === 'mira:checkpoint-state') {
++        current.port1.postMessage({ type: 'mira:checkpoint-captured', snapshotId: data.snapshotId, accepted: false });
++      }
++    };
++    retry = setTimeout(connect, 500);
++    options.frame.contentWindow?.postMessage({ type: 'mira:activity-checkpoint-connect' }, '*', [current.port2]);
++  };
++  const flush = () => { void client?.flush().catch(() => undefined); };
++  options.frame.addEventListener('load', connect);
++  window.addEventListener('pagehide', flush);
++  window.addEventListener('online', flush);
++  connect();
++  return () => {
++    alive = false; clearTimeout(retry);
++    flush(); client?.close();
++    options.frame.removeEventListener('load', connect);
++    window.removeEventListener('pagehide', flush);
++    window.removeEventListener('online', flush);
++    channel?.port1.close();
++  };
++}
++
++/** A private port, sandbox preserved. Restoring does not replay input or teacher cues. */
++export const ACTIVITY_CHECKPOINT_SHIM = `<script data-mira-activity-checkpoint>
++(function () {
++  var port = null, hydrated = false, restoring = false, last = null, notice = null, sent = null, sequence = 0, fresh = false;
++  var documentId = Math.random().toString(36).slice(2) + Date.now().toString(36);
++  function contract() {
++    var api = window.miraActivityCheckpoint;
++    return api && api.version === 1 && typeof api.capture === 'function' && typeof api.restore === 'function' ? api : null;
++  }
++  function send(data) { if (port) { try { port.postMessage(data); } catch (_) {} } }
++  function status(text) {
++    if (!document.body) return;
++    if (!notice) {
++      notice = document.createElement('div'); notice.setAttribute('role','status');
++      notice.setAttribute('data-mira-progress-notice','');
++      notice.style.cssText = 'position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:2147483646;padding:6px 12px;border-radius:10px;background:#fff;color:#334155;font:14px system-ui;box-shadow:0 1px 6px #0002;';
++      document.body.appendChild(notice);
++    }
++    notice.textContent = text; notice.hidden = !text;
++  }
++  function capture() {
++    if (!port || !hydrated || restoring) return;
++    var api = contract(); if (!api) return;
++    try {
++      var state = api.capture(), json = JSON.stringify(state);
++      if (!json || json.length > 49152 || json === last || (sent && sent.json === json)) return;
++      sent = {id:++sequence,json:json};
++      send({type:'mira:checkpoint-state', snapshotId:sent.id, state:JSON.parse(json)});
++    } catch (_) { send({type:'mira:checkpoint-rejected'}); }
++  }
++  window.addEventListener('message', function (event) {
++    if (event.source !== window.parent) return;
++    if (event.data?.type === 'MIRA_NARRATION_VISIBILITY') {
++      if (event.data.visible === true && hydrated && fresh) {
++        fresh = false;
++        queueMicrotask(function () { var api = contract(); if (api && typeof api.begin === 'function') api.begin(); });
++      }
++      return;
++    }
++    if (event.data?.type !== 'mira:activity-checkpoint-connect' || !event.ports[0]) return;
++    event.stopImmediatePropagation();
++    if (port) port.close(); port = event.ports[0]; sent = null;
++    port.onmessage = function (message) {
++      var data = message.data;
++      if (data?.type === 'mira:checkpoint-captured' && sent && data.snapshotId === sent.id) {
++        if (data.accepted === true) last = sent.json;
++        sent = null; return;
++      }
++      if (data?.type === 'mira:checkpoint-unavailable') {
++        status('进度暂时无法恢复，请重新进入课堂。'); return;
++      }
++      if (data?.type !== 'mira:checkpoint-restore') return;
++      try {
++        if (!hydrated) {
++          fresh = data.state === null;
++          if (!fresh) {
++            restoring = true;
++            if (contract().restore(data.state) !== true) throw new Error('invalid_checkpoint');
++          }
++        }
++        hydrated = true; restoring = false;
++        status('');
++        // Baseline is captured without emitting: hydration is never a new action.
++        last = JSON.stringify(contract().capture());
++        send({type:'mira:checkpoint-restored'});
++      } catch (_) { restoring = false; status('进度暂时无法恢复，请重新进入课堂。'); send({type:'mira:checkpoint-rejected'}); }
++    };
++    if (contract()) { if (!hydrated) status('正在恢复小游戏进度…'); send({type:'mira:checkpoint-ready', documentId:documentId}); }
++    else if (document.readyState === 'complete') send({type:'mira:checkpoint-unsupported'});
++  });
++  // Capture after authored handlers, including bounded async transitions.
++  ['click','input','change','pointerup','keyup'].forEach(function (type) {
++    document.addEventListener(type, function () { queueMicrotask(capture); }, true);
++  });
++  ['pointerdown','click','keydown','input','change'].forEach(function (type) {
++    document.addEventListener(type, function (event) {
++      if (contract() && !hydrated && port) { event.preventDefault(); event.stopImmediatePropagation(); }
++    }, true);
++  });
++  setInterval(capture, 250);
++})();
++</script>`;
+diff --git a/lib/mira/activity-checkpoint-adapters.ts b/lib/mira/activity-checkpoint-adapters.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/activity-checkpoint-adapters.ts
+@@ -0,0 +1,280 @@
++/** Runtime-only compatibility for two reviewed legacy state machines. Authored
++ * HTML and their existing widget APIs stay intact. This checksum is a fail-closed
++ * compatibility check, not authentication: the release/content digest and the
++ * authenticated checkpoint transport provide that boundary. */
++function modelSignature(source: string): string {
++  const normalized = source.replace(
++    /(['"])(?:\/api\/classroom-media\/|data:(?:image|audio)\/|blob:)[^'"\r\n]*\1/g,
++    '"MIRA_MEDIA"',
++  ).replace(/\r\n/g, '\n').trim();
++  let first = 2166136261, second = 2246822507;
++  for (let index = 0; index < normalized.length; index++) {
++    first = Math.imul(first ^ normalized.charCodeAt(index), 16777619) >>> 0;
++    second = Math.imul(second ^ normalized.charCodeAt(index), 3266489917) >>> 0;
++  }
++  return `${normalized.length}:${first.toString(16)}:${second.toString(16)}`;
++}
++
++const VALIDATION = String.raw`
++  const checkpointObject = value => !!value && typeof value === 'object' && !Array.isArray(value);
++  const checkpointKeys = (value, names) => checkpointObject(value)
++    && Object.keys(value).sort().join(',') === names.split(',').sort().join(',');
++  const checkpointClone = value => JSON.parse(JSON.stringify(value));
++  const checkpointBooleans = value => checkpointKeys(value, 'brown,white')
++    && typeof value.brown === 'boolean' && typeof value.white === 'boolean';
++  const checkpointUnique = (value, allowed) => Array.isArray(value) && value.length <= allowed.length
++    && new Set(value).size === value.length && value.every(item => allowed.includes(item));
++`;
++
++const CONDITION_MOTION = String.raw`
++  /* mira-activity-checkpoint-adapter:condition-motion:v1 */
++  (function () {
++    ${VALIDATION}
++    const schemaVersion = 'mira.activity-checkpoint.condition-motion.v1';
++    let testVisible = false;
++    let checkpointStarted = false, checkpointRestored = false;
++    const originalRenderWorld = renderWorld, originalAnimateActor = animateActor;
++    renderWorld = function () { testVisible = false; return originalRenderWorld(); };
++    animateActor = function (kind, duration) { testVisible = true; return originalAnimateActor(kind, duration); };
++    const environment = value => value === null || Object.prototype.hasOwnProperty.call(ENV_IMGS, value);
++    const motion = value => value === null || REQUEST_NAMES.includes(value);
++    const test = value => checkpointKeys(value, 'requestId,env,motion')
++      && REQUEST_NAMES.includes(value.requestId) && value.env !== null && environment(value.env)
++      && value.motion !== null && motion(value.motion);
++    function historyItem(value) {
++      if (!checkpointObject(value)) return false;
++      if (value.type === 'request-change') return checkpointKeys(value, 'type,requestId,env,motion')
++        && REQUEST_NAMES.includes(value.requestId) && environment(value.env) && motion(value.motion);
++      if (value.type === 'env-change') return checkpointKeys(value, 'type,before,after,motion')
++        && environment(value.before) && value.after !== null && environment(value.after) && motion(value.motion);
++      if (value.type === 'motion-change') return checkpointKeys(value, 'type,before,after,env')
++        && motion(value.before) && value.after !== null && motion(value.after) && environment(value.env);
++      return value.type === 'test'
++        && checkpointKeys(value, 'type,requestId,env,motion,validPhysics,matchesRequest,revisedAfterTest')
++        && test({requestId:value.requestId,env:value.env,motion:value.motion})
++        && value.validPhysics === (SUPPORT_MAP[value.motion] === value.env)
++        && value.matchesRequest === (SUPPORT_MAP[value.motion] === value.env && value.requestId === value.motion)
++        && typeof value.revisedAfterTest === 'boolean';
++    }
++    function valid(value) {
++      if (!checkpointKeys(value, 'schemaVersion,environmentId,motionKitId,requestId,history,usedHelp,hasTested,hasRevised,lastTest,consecutiveDifficulty,externalAssisted,paused,testVisible')
++        || value.schemaVersion !== schemaVersion || !environment(value.environmentId)
++        || !motion(value.motionKitId) || !motion(value.requestId)
++        || !Array.isArray(value.history) || value.history.length > 64 || !value.history.every(historyItem)
++        || !checkpointUnique(value.usedHelp, ['general', ...REQUEST_NAMES])
++        || !['hasTested','hasRevised','externalAssisted','paused','testVisible'].every(key => typeof value[key] === 'boolean')
++        || !Number.isSafeInteger(value.consecutiveDifficulty) || value.consecutiveDifficulty < 0 || value.consecutiveDifficulty > 1000000
++        || (value.hasRevised && !value.hasTested)
++        || (value.lastTest !== null && !test(value.lastTest))
++        || value.hasTested !== (value.lastTest !== null)
++        || (value.lastTest && value.lastTest.requestId !== value.requestId)) return false;
++      const tests = value.history.filter(item => item.type === 'test');
++      const last = tests[tests.length - 1];
++      if (last && (!value.lastTest || ['requestId','env','motion'].some(key => last[key] !== value.lastTest[key]))) return false;
++      if (value.history.some(item => item.requestId && item.requestId !== value.requestId)) return false;
++      if (value.testVisible && (!last || last.env !== value.environmentId || last.motion !== value.motionKitId)) return false;
++      if (!value.requestId && (value.lastTest || value.history.length || value.testVisible)) return false;
++      return true;
++    }
++    window.miraActivityCheckpoint = Object.freeze({version:1,
++      begin() {
++        if (checkpointStarted || checkpointRestored || state.requestId || state.history.length) return false;
++        const cue = Object.keys(CUE_TEXT).find(key => key.endsWith('-intro'));
++        if (!cue) return false;
++        checkpointStarted = true;
++        playCue(cue);
++        return true;
++      },
++      capture() {
++        return checkpointClone({schemaVersion, environmentId:state.environmentId, motionKitId:state.motionKitId,
++          requestId:state.requestId, history:state.history.slice(-64), usedHelp:Array.from(state.usedHelp),
++          hasTested:state.hasTested, hasRevised:state.hasRevised, lastTest:state.lastTest,
++          consecutiveDifficulty:state.consecutiveDifficulty, externalAssisted:state.externalAssisted,
++          paused:state.paused, testVisible});
++      },
++      restore(value) {
++        try {
++          if (!valid(value)) return false;
++          const next = checkpointClone(value);
++          checkpointRestored = true;
++          const assistance = new Set([...state.usedHelp, ...next.usedHelp]);
++          const externalAssisted = state.externalAssisted || next.externalAssisted;
++          cancelLocalAudio();
++          Object.assign(state, {environmentId:next.environmentId, motionKitId:next.motionKitId,
++            requestId:next.requestId, history:next.history, usedHelp:assistance, hasTested:next.hasTested,
++            hasRevised:next.hasRevised, lastTest:next.lastTest, consecutiveDifficulty:next.consecutiveDifficulty,
++            externalAssisted, paused:next.paused, requestAudioReady:false, requestMatchedDerived:false,
++            currentCueId:null, currentTicket:null});
++          renderWorld();
++          testVisible = next.testVisible;
++          const last = next.history.filter(item => item.type === 'test').at(-1);
++          if (testVisible) {
++            const physical = SUPPORT_MAP[state.motionKitId] === state.environmentId;
++            els.actorLayer.dataset.feedback = physical ? 'settled-moving' : 'settled-stuck';
++            // Recompute the authored comparison from the retained actual test;
++            // readiness is deliberately still false until explicit real replay.
++            state.requestMatchedDerived = !!(physical && state.motionKitId === state.requestId && last.revisedAfterTest);
++          }
++          els.helpBanner.classList.toggle('hidden', !assistance.size);
++          if (assistance.size) {
++            const lastHelp = Array.from(assistance).at(-1);
++            const cue = Object.keys(CUE_TEXT).find(key => key.endsWith('-help-' + (lastHelp === 'general' ? 'empty' : lastHelp)));
++            els.helpBanner.textContent = cue ? CUE_TEXT[cue] : '';
++          }
++          els.exitRetryRow.hidden = false;
++          enableAnswerControls(false);
++          return true;
++        } catch (_) { return false; }
++      }
++    });
++  })();
++`;
++
++const BRIDGE_CROSSING = String.raw`
++  /* mira-activity-checkpoint-adapter:bridge-crossing:v1 */
++  (function () {
++    ${VALIDATION}
++    const schemaVersion = 'mira.activity-checkpoint.bridge-crossing.v1';
++    let checkpointStarted = false, checkpointRestored = false;
++    const helpIds = Object.keys(CUES).filter(key => key.includes('-help-'));
++    const originalReplay = replayPendingSpeech;
++    replayPendingSpeech = function () {
++      if (!pendingSpeech && !lastCueStarted) {
++        const cue = Object.keys(CUES).find(key => key.endsWith(state.completedRound ? '-complete' : '-intro'));
++        if (cue) { requestSpeech(cue); return; }
++      }
++      originalReplay();
++    };
++    function world(value, layout) {
++      if (!checkpointKeys(value, 'positions,origins,arrived,waiting,selectedSheep,completedRound')
++        || !checkpointKeys(value.positions, 'brown,white') || !checkpointKeys(value.origins, 'brown,white')
++        || !checkpointBooleans(value.arrived) || !checkpointBooleans(value.waiting)
++        || ![null,'brown','white'].includes(value.selectedSheep) || typeof value.completedRound !== 'boolean') return false;
++      const expected = layout === 'standard' ? {brown:0,white:4} : {brown:4,white:0};
++      for (const key of ['brown','white']) {
++        if (value.origins[key] !== expected[key] || ![0,1,2,3,4].includes(value.positions[key])
++          || value.arrived[key] !== (value.positions[key] === 4 - value.origins[key])) return false;
++      }
++      return !(value.positions.brown === value.positions.white && INTERIOR.includes(value.positions.brown))
++        && value.completedRound === (value.arrived.brown && value.arrived.white);
++    }
++    const worldFields = value => ({positions:value.positions,origins:value.origins,arrived:value.arrived,
++      waiting:value.waiting,selectedSheep:value.selectedSheep,completedRound:value.completedRound});
++    function valid(value) {
++      return checkpointKeys(value, 'schemaVersion,positions,origins,arrived,waiting,selectedSheep,completedRound,roundLayout,history,usedHelp,consecutiveBlocked')
++        && value.schemaVersion === schemaVersion && ['standard','swapped'].includes(value.roundLayout)
++        && world(worldFields(value), value.roundLayout)
++        && Array.isArray(value.history) && value.history.length <= TRUE_MAX_HISTORY
++        && value.history.every(item => world(item, value.roundLayout))
++        && checkpointUnique(value.usedHelp, helpIds)
++        && Number.isSafeInteger(value.consecutiveBlocked) && value.consecutiveBlocked >= 0 && value.consecutiveBlocked < 3;
++    }
++    window.miraActivityCheckpoint = Object.freeze({version:1,
++      begin() {
++        if (checkpointStarted || checkpointRestored || state.history.length || state.selectedSheep !== null) return false;
++        const cue = Object.keys(CUES).find(key => key.endsWith('-intro'));
++        if (!cue) return false;
++        checkpointStarted = true;
++        requestSpeech(cue);
++        return true;
++      },
++      capture() {
++        return checkpointClone({schemaVersion,...worldFields(state),roundLayout:state.roundLayout,
++          history:state.history,usedHelp:Array.from(state.usedHelp),consecutiveBlocked:state.consecutiveBlocked});
++      },
++      restore(value) {
++        try {
++          if (!valid(value)) return false;
++          const next = checkpointClone(value);
++          checkpointRestored = true;
++          const assistance = new Set([...state.usedHelp, ...next.usedHelp]);
++          cancelNarrationLocal(); invalidateTicket();
++          state = {...worldFields(next),roundLayout:next.roundLayout,history:next.history,
++            usedHelp:assistance,consecutiveBlocked:next.consecutiveBlocked};
++          // These flags are derived from actual legal positions, never a saved claim.
++          for (const key of ['brown','white']) state.arrived[key] = state.positions[key] === 4 - state.origins[key];
++          state.completedRound = state.arrived.brown && state.arrived.white;
++          worldRevision++;
++          pendingSpeech = null; lastCueStarted = null; audioLocked = false;
++          currentNarrationStatus = 'idle';
++          audioErrorBox.classList.add('hidden');
++          updateUI();
++          const completeCue = Object.keys(CUES).find(key => key.endsWith('-complete'));
++          narrationStatus.textContent = state.completedRound && completeCue
++            ? CUES[completeCue] : '已恢复刚才的位置，可以继续。';
++          return true;
++        } catch (_) { return false; }
++      }
++    });
++  })();
++`;
++
++const EMBEDDED_DOCUMENT_PREFIX = /^<!doctype html><html><head><meta charset="utf-8">(?:<meta name="mira-responsive-activity" content="low-reading-v1">)?<\/head><body><script>\(function\(\)\{const assets=/;
++const EMBEDDED_DOCUMENT_SUFFIX = ';for(const asset of assets){const binary=atob(asset.base64);const bytes=new Uint8Array(binary.length);'
++  + 'for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);'
++  + 'const url=URL.createObjectURL(new Blob([bytes],{type:asset.mimeType}));page=page.split(asset.path).join(url);}'
++  + 'document.open();document.write(page);document.close();})();</script></body></html>';
++
++/** Locate a JSON array or string without executing JavaScript. JSON.parse below
++ * validates the complete literal; this scanner only finds its exact boundary. */
++function jsonLiteralEnd(source: string, start: number): number | null {
++  if (!['[', '"'].includes(source[start])) return null;
++  let quoted = false, escaped = false, depth = 0;
++  for (let index = start; index < source.length; index++) {
++    const char = source[index];
++    if (quoted) {
++      if (escaped) escaped = false;
++      else if (char === '\\') escaped = true;
++      else if (char === '"') { quoted = false; if (!depth) return index + 1; }
++    } else if (char === '"') quoted = true;
++    else if (char === '[' || char === '{') depth++;
++    else if (char === ']' || char === '}') { depth--; if (!depth) return index + 1; }
++  }
++  return null;
++}
++
++/** Map the real document carried by the exact Gateway media wrapper. Returning
++ * null means unsupported wrapper, not a successfully patched page. Preserve
++ * assets and outer bytes verbatim; only re-encode the transformed JSON literal.
++ * Unknown code is never evaluated or treated as the known wrapper contract. */
++export function mapEmbeddedActivityDocument(html: string, transform: (document: string) => string): string | null {
++  const prefix = EMBEDDED_DOCUMENT_PREFIX.exec(html);
++  if (!prefix) return null;
++  const assetsEnd = jsonLiteralEnd(html, prefix[0].length);
++  if (assetsEnd === null || html.slice(assetsEnd, assetsEnd + 10) !== ';let page=') return null;
++  const pageStart = assetsEnd + 10, pageEnd = jsonLiteralEnd(html, pageStart);
++  if (pageEnd === null || html.slice(pageEnd) !== EMBEDDED_DOCUMENT_SUFFIX) return null;
++  let document: unknown;
++  try {
++    const assets: unknown = JSON.parse(html.slice(prefix[0].length, assetsEnd));
++    if (!Array.isArray(assets) || !assets.every(value => value && typeof value === 'object'
++      && Object.keys(value).sort().join(',') === 'base64,mimeType,path'
++      && ['path','mimeType','base64'].every(key => typeof value[key] === 'string'))) return null;
++    document = JSON.parse(html.slice(pageStart, pageEnd));
++  } catch { return null; }
++  if (typeof document !== 'string') return null;
++  return html.slice(0, pageStart) + JSON.stringify(transform(document)).replace(/</g, '\\u003c') + html.slice(pageEnd);
++}
++
++/** Unknown models retain their original behavior. Match the complete legacy
++ * program (except delivery-only media URLs), not an author-supplied marker or a
++ * classroom/scene identity. New authoring should implement the API directly. */
++export function patchActivityCheckpointAdapters(html: string): string {
++  if (html.includes('mira-activity-checkpoint-adapter:') || html.includes('window.miraActivityCheckpoint')) return html;
++  // Patch only the exact known wrapper. The caller can use the exported mapper
++  // to put all iframe shims in the inner document that survives document.write.
++  if (html.includes('document.open();document.write(page);document.close();')) {
++    return mapEmbeddedActivityDocument(html, patchActivityCheckpointAdapters) ?? html;
++  }
++  const matches = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)].filter(match =>
++    !/\b(?:src|type)\s*=/.test(match[1]) && /const (?:SUPPORT_MAP|TRUE_MAX_HISTORY)\s*=/.test(match[2]));
++  if (matches.length !== 1) return html;
++  const script = matches[0], signature = modelSignature(script[2]);
++  const contract = signature === '25271:81c15376:252ec508'
++    ? { anchor:'        function bindUI() {', adapter:CONDITION_MOTION }
++    : signature === '24180:855cb384:b0a04236'
++      ? { anchor:'    window.getState = function() {', adapter:BRIDGE_CROSSING } : null;
++  if (!contract || script[2].split(contract.anchor).length !== 2) return html;
++  const revised = script[0].replace(contract.anchor, contract.adapter + '\n' + contract.anchor);
++  return html.slice(0, script.index) + revised + html.slice(script.index! + script[0].length);
++}
+diff --git a/tests/runtime/activity-checkpoint-adapters.browser.test.ts b/tests/runtime/activity-checkpoint-adapters.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/activity-checkpoint-adapters.browser.test.ts
+@@ -0,0 +1,276 @@
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { readFileSync } from 'node:fs';
++import { resolve } from 'node:path';
++import { chromium, type Browser, type Frame, type Page } from 'playwright-core';
++import { mapEmbeddedActivityDocument, patchActivityCheckpointAdapters } from '@/lib/mira/activity-checkpoint-adapters';
++
++type Json = Record<string, unknown>;
++type CheckpointWindow = Window & {
++  miraActivityCheckpoint: { version: number; begin(): boolean; capture(): Json; restore(value: unknown): boolean };
++  checkpointNarrations: string[];
++  getState(): Json;
++};
++
++function embeddedDocument(html: string) {
++  return '<!doctype html><html><head><meta charset="utf-8"><meta name="mira-responsive-activity" content="low-reading-v1"></head><body><script>'
++    + '(function(){const assets=[];let page=' + JSON.stringify(html).replace(/</g, '\\u003c') + ';'
++    + 'for(const asset of assets){const binary=atob(asset.base64);const bytes=new Uint8Array(binary.length);'
++    + 'for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);'
++    + 'const url=URL.createObjectURL(new Blob([bytes],{type:asset.mimeType}));page=page.split(asset.path).join(url);}'
++    + 'document.open();document.write(page);document.close();})();</script></body></html>';
++}
++
++describe('activity checkpoint compatibility boundary', () => {
++  it('leaves unknown and externally hosted activities unchanged', () => {
++    for (const html of ['', '<button>Play</button>', '<script>window.getState=()=>({score:1});</script>',
++      '<script src="/legacy.js"></script>', '<script>window.miraActivityCheckpoint={version:2};</script>']) {
++      expect(patchActivityCheckpointAdapters(html)).toBe(html);
++    }
++  });
++  it('maps only the exact Gateway wrapper, preserving assets and rejecting unknown code without executing it', () => {
++    const document = '<html><head></head><body>inner "page" \\ escape</body></html>';
++    const wrapped = embeddedDocument(document);
++    expect(mapEmbeddedActivityDocument(wrapped, value => value)).toBe(wrapped);
++    const revised = mapEmbeddedActivityDocument(wrapped, value => value.replace('<head>', '<head><meta name="test-inner-shim">'))!;
++    expect(revised).not.toBe(wrapped);
++    expect(mapEmbeddedActivityDocument(revised, value => {
++      expect(value).toContain('<head><meta name="test-inner-shim">'); return value;
++    })).toBe(revised);
++    for (const unknown of [document, wrapped.replace('document.open();', 'window.unreviewed();document.open();'),
++      wrapped.replace('const assets=[]', 'const assets=notJson()'),
++      '<script>let page="x";document.open();document.write(page);document.close();</script>']) {
++      let called = false;
++      expect(mapEmbeddedActivityDocument(unknown, value => { called = true; return value; })).toBeNull();
++      expect(called).toBe(false);
++    }
++  });
++});
++
++/** Explicit offline browser opt-in reuses the already-reviewed original instead
++ * of copying paid lesson/media into a permanent fixture. Override the release
++ * path for another publication of the same models. Every request is aborted;
++ * narration below is a synthetic lifecycle for state-machine testing only. */
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')('legacy checkpoint state round trips', () => {
++  let browser: Browser, motionHtml: string, bridgeHtml: string;
++  beforeAll(async () => {
++    const publicationPath = process.env.MIRA_ACTIVITY_CHECKPOINT_RELEASE_PATH || resolve(process.cwd(),
++      '../../../output/textbook-operator-lessons/pep-chinese-g1-upper-2022-standard/u4-l5/teaching-1/publication/prepared-release.json');
++    const publication = JSON.parse(readFileSync(publicationPath, 'utf8'));
++    const scenes = publication.release.classroom.scenes as { content?: { html?: string } }[];
++    motionHtml = scenes.find(scene => scene.content?.html?.includes('const SUPPORT_MAP'))!.content!.html!;
++    bridgeHtml = scenes.find(scene => scene.content?.html?.includes('const TRUE_MAX_HISTORY'))!.content!.html!;
++    expect(patchActivityCheckpointAdapters(motionHtml)).not.toBe(motionHtml);
++    expect(patchActivityCheckpointAdapters(bridgeHtml)).not.toBe(bridgeHtml);
++    browser = await chromium.launch({ executablePath: process.env.MIRA_FORMAL_QA_BROWSER_PATH ||
++      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
++  });
++  afterAll(async () => { await browser?.close(); });
++
++  async function createFrame(page: Page, html: string, holdNarration = false): Promise<Frame> {
++    const scaffold = `<script>
++      window.checkpointNarrations=[];
++      Math.random=()=>0.05;
++      window.miraCancelNarration=()=>{};
++      window.miraNarrate=cueId=>{checkpointNarrations.push(cueId);if(${holdNarration})return true;queueMicrotask(()=>{
++        dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status:'playing'}}));
++        dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status:'ready'}}));
++      });return true;};
++    </script>`;
++    await page.setContent('<style>body{margin:0}iframe{width:1100px;height:800px;border:0}</style>');
++    // Replace only media delivery with a synthetic lifecycle; execute the real
++    // frozen game program, selectors and interactions unchanged.
++    const isolateMedia = (document: string) => document.replace(
++      /<script\b[^>]*\bid=["']mira-pre-recorded-audio["'][^>]*>[\s\S]*?<\/script\s*>/i, scaffold);
++    const patched = patchActivityCheckpointAdapters(html);
++    const isolated = mapEmbeddedActivityDocument(patched, isolateMedia) ?? isolateMedia(patched);
++    await page.evaluate(content => {
++      const frame = document.createElement('iframe'); frame.sandbox.add('allow-scripts');
++      frame.srcdoc = content; document.body.appendChild(frame);
++    }, isolated);
++    const frame = (await (await page.locator('iframe').elementHandle())!.contentFrame())!;
++    await frame.waitForFunction(() => !!(window as unknown as CheckpointWindow).miraActivityCheckpoint);
++    return frame;
++  }
++  async function capture(frame: Frame): Promise<Json> {
++    return frame.evaluate(() => (window as unknown as CheckpointWindow).miraActivityCheckpoint.capture());
++  }
++  async function restore(frame: Frame, value: Json): Promise<boolean> {
++    return frame.evaluate(value => {
++      const view = window as unknown as CheckpointWindow;
++      view.checkpointNarrations.length = 0;
++      return view.miraActivityCheckpoint.restore(value);
++    }, value);
++  }
++  async function quiet(frame: Frame) {
++    // Let any queued or delayed accidental playback run before asserting quiet.
++    await frame.waitForTimeout(30);
++    expect(await frame.evaluate(() => (window as unknown as CheckpointWindow).checkpointNarrations)).toEqual([]);
++  }
++  async function newPage() {
++    const page = await browser.newPage({ viewport: { width: 1200, height: 900 } });
++    page.setDefaultTimeout(6000);
++    await page.route('**/*', route => route.abort());
++    return page;
++  }
++
++  it('matches complete programs, tolerates delivery URLs, and refuses source drift or duplicate models', () => {
++    for (const html of [motionHtml, bridgeHtml]) {
++      const patched = patchActivityCheckpointAdapters(html);
++      expect(patched).toContain('window.miraActivityCheckpoint = Object.freeze');
++      expect(patchActivityCheckpointAdapters(patched)).toBe(patched);
++      expect(patchActivityCheckpointAdapters(html + html)).toBe(html + html);
++    }
++    const revised = bridgeHtml.replace('const TRUE_MAX_HISTORY = 24', 'const TRUE_MAX_HISTORY = 25');
++    expect(patchActivityCheckpointAdapters(revised)).toBe(revised);
++    const delivered = motionHtml.replace(/\/api\/classroom-media\/[^'"\s<>]+/g, 'data:image/webp;base64,eA==');
++    expect(patchActivityCheckpointAdapters(delivered)).not.toBe(delivered);
++    const wrapper = embeddedDocument(bridgeHtml);
++    expect(patchActivityCheckpointAdapters(wrapper)).not.toBe(wrapper);
++    expect(patchActivityCheckpointAdapters(patchActivityCheckpointAdapters(wrapper))).toBe(patchActivityCheckpointAdapters(wrapper));
++  });
++
++  it('starts a fresh document once with a real authored ticket, never auto-starts restored work, including an embedded document', async () => {
++    const page = await newPage();
++    try {
++      for (const html of [motionHtml, embeddedDocument(bridgeHtml)]) {
++        let frame = await createFrame(page, html, true);
++        const initial = await capture(frame);
++        const result = await frame.evaluate(() => {
++          const view = window as unknown as CheckpointWindow;
++          view.checkpointNarrations.length = 0;
++          return {first:view.miraActivityCheckpoint.begin(),second:view.miraActivityCheckpoint.begin(),
++            cues:[...view.checkpointNarrations]};
++        });
++        expect(result.first).toBe(true); expect(result.second).toBe(false);
++        expect(result.cues).toHaveLength(1); expect(result.cues[0]).toMatch(/-intro$/);
++        if (initial.schemaVersion === 'mira.activity-checkpoint.condition-motion.v1') {
++          expect(await frame.evaluate(() => (window as unknown as CheckpointWindow).getState().requestAudioReady)).toBe(false);
++          // begin creates the native ticket, but a bare ready cannot complete it.
++          await frame.evaluate(cueId => dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status:'ready'}})),result.cues[0]);
++          expect((await capture(frame)).requestId).toBeNull();
++          await frame.evaluate(cueId => {
++            dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status:'playing'}}));
++            dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status:'ready'}}));
++          },result.cues[0]);
++          expect((await capture(frame)).requestId).toBe('swimming');
++          expect(await frame.evaluate(() => (window as unknown as CheckpointWindow).getState().requestAudioReady)).toBe(false);
++        }
++        const saved = await capture(frame);
++        frame = await createFrame(page, html, true);
++        expect(await restore(frame,saved)).toBe(true);
++        expect(await frame.evaluate(() => (window as unknown as CheckpointWindow).miraActivityCheckpoint.begin())).toBe(false);
++        await quiet(frame);
++        expect(await capture(frame)).toEqual(saved);
++      }
++    } finally { await page.close(); }
++  },30000);
++
++  it('restores motion conditions and tested consequences quietly into a new opaque iframe, preserving undo and assistance', async () => {
++    const page = await newPage();
++    try {
++      let frame = await createFrame(page, motionHtml);
++      await frame.waitForFunction(() => (window as unknown as CheckpointWindow).getState().requestAudioReady === true);
++      await frame.locator('[data-env="ice"]').click();
++      await frame.locator('[data-motion="swimming"]').click();
++      await frame.locator('#testBtn').click();
++      const blocked = await capture(frame);
++      expect(blocked.testVisible).toBe(true);
++      expect(blocked).not.toHaveProperty('requestAudioReady');
++      expect(blocked).not.toHaveProperty('currentTicket');
++      frame = await createFrame(page, motionHtml);
++      expect(await restore(frame, blocked)).toBe(true);
++      await quiet(frame);
++      expect(await frame.locator('#actorLayer').getAttribute('data-feedback')).toBe('settled-stuck');
++      expect(await frame.locator('#actorLayer').getAttribute('data-environment')).toBe('ice');
++      expect(await frame.locator('#testBtn').isDisabled()).toBe(true);
++      // Bare completion of an old cue cannot unlock restored controls.
++      await frame.evaluate(() => dispatchEvent(new CustomEvent('mira-narration-state',
++        {detail:{cueId:'l5-p10-request-swimming',status:'ready'}})));
++      expect(await frame.locator('#testBtn').isDisabled()).toBe(true);
++      await frame.locator('#speakerBtn').click();
++      await frame.waitForFunction(() => (window as unknown as CheckpointWindow).getState().requestAudioReady === true);
++      await frame.locator('[data-env="water"]').click();
++      await frame.locator('#testBtn').click();
++      expect(await frame.evaluate(() => (window as unknown as CheckpointWindow).getState().requestMatchedDerived)).toBe(true);
++      await frame.locator('#helpBtn').click();
++      const matched = await capture(frame);
++      frame = await createFrame(page, motionHtml);
++      expect(await restore(frame, matched)).toBe(true);
++      await quiet(frame);
++      expect(await frame.locator('#actorLayer').getAttribute('data-feedback')).toBe('settled-moving');
++      expect((await capture(frame)).usedHelp).toEqual(['swimming']);
++      expect(await frame.evaluate(() => (window as unknown as CheckpointWindow).getState().externalAssisted)).toBe(false);
++      for (const invalid of [
++        {...matched,schemaVersion:'unknown'}, {...matched,requestAudioReady:true},
++        {...matched,motionKitId:'unknown'}, {...matched,environmentId:'ice'},
++        {...matched,lastTest:{requestId:'swimming',env:'unknown',motion:'swimming'}},
++      ]) {
++        const before = await capture(frame);
++        expect(await restore(frame, invalid)).toBe(false);
++        expect(await capture(frame)).toEqual(before);
++      }
++      await frame.locator('#speakerBtn').click();
++      await frame.waitForFunction(() => (window as unknown as CheckpointWindow).getState().requestAudioReady === true);
++      await frame.locator('#undoBtn').click();
++      expect(await frame.locator('#actorLayer').getAttribute('data-environment')).toBe('ice');
++      expect(await frame.locator('#actorLayer').getAttribute('data-feedback')).toBe('idle');
++      expect((await capture(frame)).usedHelp).toEqual(['swimming']);
++    } finally { await page.close(); }
++  }, 30000);
++
++  it('restores both bridge roles, shared banks and completed work, keeps undo across documents, and atomically rejects impossible worlds', async () => {
++    const page = await newPage();
++    try {
++      let frame = await createFrame(page, bridgeHtml);
++      await frame.locator('#touch-brown').click();
++      await frame.locator('#btn-forward-brown').click();
++      await frame.locator('#touch-white').click();
++      await frame.locator('#btn-forward-white').click(); // blocked, no teleport
++      await frame.locator('#btn-help').click();
++      await frame.locator('#touch-brown').click();
++      await frame.locator('#btn-retreat-brown').click();
++      await frame.locator('#btn-retreat-brown').click();
++      await frame.locator('#touch-white').click();
++      for (let count = 0; count < 3; count++) await frame.locator('#btn-forward-white').click();
++      const sharedBank = await capture(frame);
++      expect(sharedBank.positions).toEqual({brown:0,white:0});
++      frame = await createFrame(page, bridgeHtml);
++      expect(await restore(frame, sharedBank)).toBe(true);
++      await quiet(frame);
++      expect(await frame.locator('#sheep-brown').evaluate(element => (element as HTMLElement).style.bottom)).toBe('16%');
++      expect(await frame.locator('#sheep-white').evaluate(element => (element as HTMLElement).style.bottom)).toBe('50%');
++      await frame.locator('#touch-brown').click();
++      for (let count = 0; count < 4; count++) await frame.locator('#btn-forward-brown').click();
++      const completed = await capture(frame);
++      expect(completed.completedRound).toBe(true);
++      expect((completed.history as unknown[]).length).toBeGreaterThan(0);
++      frame = await createFrame(page, bridgeHtml);
++      expect(await restore(frame, completed)).toBe(true);
++      await quiet(frame);
++      expect(await frame.locator('#sheep-brown').evaluate(element => (element as HTMLElement).style.left)).toBe('79.5%');
++      expect(await frame.locator('#sheep-white').evaluate(element => (element as HTMLElement).style.left)).toBe('2%');
++      expect(await capture(frame)).toEqual(completed);
++      for (const invalid of [
++        {...completed,schemaVersion:'unknown'}, {...completed,positions:{brown:2,white:2}},
++        {...completed,completedRound:false}, {...completed,origins:{brown:4,white:4}},
++        {...completed,history:[{positions:{brown:1,white:1}}]}, {...completed,consecutiveBlocked:3},
++      ]) {
++        const before = await capture(frame);
++        expect(await restore(frame, invalid)).toBe(false);
++        expect(await capture(frame)).toEqual(before);
++      }
++      await frame.locator('#btn-undo').click();
++      const undone = await capture(frame);
++      expect(undone.positions).toEqual({brown:3,white:0});
++      expect(undone.completedRound).toBe(false);
++      expect(undone.usedHelp).toEqual(completed.usedHelp);
++      await frame.locator('#btn-forward-brown').click();
++      expect((await capture(frame)).completedRound).toBe(true);
++      // Reopening the completed result stays quiet; explicit replay speaks once.
++      expect(await restore(frame, completed)).toBe(true);
++      await quiet(frame);
++      await frame.locator('#btn-replay').click();
++      expect(await frame.evaluate(() => (window as unknown as CheckpointWindow).checkpointNarrations.length)).toBe(1);
++    } finally { await page.close(); }
++  }, 30000);
++});
+diff --git a/tests/runtime/mira-activity-checkpoint-client.test.ts b/tests/runtime/mira-activity-checkpoint-client.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/mira-activity-checkpoint-client.test.ts
+@@ -0,0 +1,292 @@
++import { describe, expect, it, vi } from 'vitest';
++import {
++  ACTIVITY_CHECKPOINT_SCHEMA, activityState, createActivityCheckpointClient,
++  type ActivityIdentity,
++} from '@/lib/mira/activity-checkpoint-client';
++
++const identity: ActivityIdentity = {
++  classroomId: 'classroom-a', sceneId: 'bridge', sceneIndex: 12,
++  releaseSha256: 'a'.repeat(64), contentSha256: 'b'.repeat(64),
++};
++const state = (step: number) => ({ version: 1, sheep: [step, 3], selected: 'brown', history: [] });
++function memoryStorage(): Storage {
++  const values = new Map<string, string>();
++  return {
++    get length() { return values.size; }, clear: () => values.clear(),
++    getItem: key => values.get(key) ?? null, key: index => [...values.keys()][index] ?? null,
++    removeItem: key => { values.delete(key); }, setItem: (key, value) => { values.set(key, value); },
++  } as Storage;
++}
++function deferred<T>() {
++  let resolve!: (value: T) => void, reject!: (reason: unknown) => void;
++  const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; });
++  return { promise, resolve, reject };
++}
++function response(body: unknown, status = 200) {
++  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
++}
++function authority(options: { id?: ActivityIdentity; session?: string; revision?: number; mutationId?: string | null; value?: unknown } = {}) {
++  const id = options.id ?? identity;
++  const activity = { sceneId: id.sceneId, sceneIndex: id.sceneIndex, contentSha256: id.contentSha256,
++    revision: options.revision ?? 0, mutationId: options.mutationId ?? null, state: options.value ?? null };
++  return { ok: true, schemaVersion: ACTIVITY_CHECKPOINT_SCHEMA, classroomId: id.classroomId,
++    releaseSha256: id.releaseSha256, learningSessionId: options.session ?? 'learning-session-a',
++    activities: [activity], activity };
++}
++type Mutation = ActivityIdentity & { learningSessionId: string; expectedRevision: number; mutationId: string; state: unknown };
++const bodyOf = (init?: RequestInit) => JSON.parse(String(init?.body)) as Mutation;
++const keyFor = (id = identity, session = 'learning-session-a') => 'mira:activity-checkpoint:v1:' + encodeURIComponent(JSON.stringify([
++  session, id.classroomId, id.releaseSha256, id.sceneId, id.contentSha256,
++]));
++
++describe('activity continuity outbox', () => {
++  it('buffers synchronously and replays the identical mutation after a committed response is lost', async () => {
++    const storage = memoryStorage(), unknown = deferred<Response>();
++    let sent: Mutation | undefined;
++    const client = createActivityCheckpointClient(identity, { storage, fetcher: vi.fn(async (_url, init) => {
++      if (init?.method === 'POST') { sent = bodyOf(init); return unknown.promise; }
++      return response(authority());
++    }) });
++    await expect(client.load()).resolves.toBeNull();
++    client.save(state(1));
++    const raw = storage.getItem(keyFor())!;
++    expect(JSON.parse(raw)).toMatchObject({ version: 1, pending: { state: state(1), expectedRevision: 0 }, desired: state(1) });
++    expect(sent).toBeDefined();
++    unknown.reject(new Error('response lost after commit'));
++    await expect(client.flush()).rejects.toThrow('response lost');
++    client.close();
++    const replayed: Mutation[] = [];
++    const next = createActivityCheckpointClient(identity, { storage, fetcher: vi.fn(async (_url, init) => {
++      if (init?.method === 'POST') replayed.push(bodyOf(init));
++      return response(authority({ revision: 1, mutationId: sent!.mutationId, value: sent!.state }));
++    }) });
++    await expect(next.load()).resolves.toEqual(state(1));
++    expect(replayed).toEqual([sent]);
++    expect(storage.length).toBe(0);
++    next.close();
++  });
++
++  it('queues newer desired work while the first save is pending and uses the accepted next revision', async () => {
++    const first = deferred<Response>(), storage = memoryStorage(), posted: Mutation[] = [];
++    const fetcher = vi.fn(async (_url, init) => {
++      if (init?.method !== 'POST') return response(authority());
++      const mutation = bodyOf(init); posted.push(mutation);
++      if (posted.length === 1) return first.promise;
++      return response(authority({ revision: 2, mutationId: mutation.mutationId, value: mutation.state }));
++    });
++    const client = createActivityCheckpointClient(identity, { storage, fetcher });
++    await client.load(); client.save(state(1)); client.save(state(2));
++    expect(JSON.parse(storage.getItem(keyFor())!)).toMatchObject({ pending: { state: state(1) }, desired: state(2) });
++    expect(posted).toHaveLength(1);
++    first.resolve(response(authority({ revision: 1, mutationId: posted[0].mutationId, value: state(1) })));
++    await client.flush();
++    expect(posted.map(p => [p.expectedRevision, p.state])).toEqual([[0, state(1)], [1, state(2)]]);
++    expect(posted[0].mutationId).not.toBe(posted[1].mutationId);
++    expect(storage.length).toBe(0); client.close();
++  });
++
++  it.each([
++    ['scene', { ...identity, sceneId: 'sports', sceneIndex: 9 }, 'learning-session-a'],
++    ['release', { ...identity, releaseSha256: 'c'.repeat(64) }, 'learning-session-a'],
++    ['session', identity, 'learning-session-b'],
++    ['content', { ...identity, contentSha256: 'd'.repeat(64) }, 'learning-session-a'],
++  ] as const)('isolates the %s identity without consuming another outbox', async (_name, id, session) => {
++    const storage = memoryStorage(), original = '{"version":1,"pending":null,"desired":{"step":2}}';
++    storage.setItem(keyFor(), original);
++    const fetcher = vi.fn(async () => response(authority({ id, session })));
++    const client = createActivityCheckpointClient(id, { storage, fetcher });
++    await expect(client.load()).resolves.toBeNull();
++    expect(fetcher).toHaveBeenCalledTimes(1);
++    expect(storage.getItem(keyFor())).toBe(original); client.close();
++  });
++
++  it('does not turn a 409 from an older tab into a last-write-wins update', async () => {
++    const storage = memoryStorage(), posted: Mutation[] = [], errors: Error[] = [];
++    const client = createActivityCheckpointClient(identity, { storage, onError: error => errors.push(error),
++      fetcher: vi.fn(async (_url, init) => {
++        if (init?.method !== 'POST') return response(authority({ revision: 2, value: state(2) }));
++        posted.push(bodyOf(init)); return response({ ok: false }, 409);
++      }) });
++    await client.load(); client.save(state(3));
++    await expect(client.flush()).rejects.toThrow('activity_state_conflict');
++    expect(posted).toHaveLength(1);
++    expect(posted[0].expectedRevision).toBe(2);
++    expect(errors.map(error => error.message)).toEqual(['activity_state_conflict']);
++    const rejectedBuffer = storage.getItem(keyFor());
++    expect(rejectedBuffer).toContain(posted[0].mutationId);
++    client.save(state(4)); await client.flush();
++    expect(posted).toHaveLength(1);
++    expect(storage.getItem(keyFor())).toBe(rejectedBuffer); client.close();
++  });
++
++  it('a new document drops only an obsolete conflicting outbox and resumes the latest accepted state', async () => {
++    const storage = memoryStorage();
++    storage.setItem(keyFor(), JSON.stringify({ version: 1, pending: { ...identity,
++      schemaVersion: ACTIVITY_CHECKPOINT_SCHEMA, learningSessionId: 'learning-session-a',
++      expectedRevision: 1, mutationId: 'stale-tab-mutation', state: state(1) }, desired: state(2) }));
++    const requests: string[] = [];
++    const client = createActivityCheckpointClient(identity, { storage, fetcher: vi.fn(async (_url, init) => {
++      requests.push(init?.method ?? 'GET');
++      if (init?.method === 'POST') {
++        expect(bodyOf(init)).toMatchObject({ expectedRevision: 1, mutationId: 'stale-tab-mutation' });
++        return response({ ok: false }, 409);
++      }
++      return response(authority({ revision: 5, mutationId: 'winning-tab-mutation', value: state(5) }));
++    }) });
++    await expect(client.load()).resolves.toEqual(state(5));
++    expect(requests).toEqual(['GET', 'POST', 'GET']);
++    expect(storage.length).toBe(0);
++    client.close();
++  });
++
++  it('writes once when the server recursively reorders JSON object keys', async () => {
++    const storage = memoryStorage(), posted: Mutation[] = [];
++    const authored = { z: [{ b: 2, a: 1 }], a: { z: 3, a: 4 } };
++    const reordered = { a: { a: 4, z: 3 }, z: [{ a: 1, b: 2 }] };
++    const client = createActivityCheckpointClient(identity, { storage, fetcher: vi.fn(async (_url, init) => {
++      if (init?.method !== 'POST') return response(authority());
++      const mutation = bodyOf(init); posted.push(mutation);
++      if (posted.length > 1) throw new Error('reordered receipt must not cause another POST');
++      return response(authority({ revision: 1, mutationId: mutation.mutationId, value: reordered }));
++    }) });
++    await client.load(); client.save(authored); await client.flush();
++    expect(posted).toHaveLength(1); expect(storage.length).toBe(0);
++    client.save(reordered); await client.flush();
++    expect(posted).toHaveLength(1); client.close();
++  });
++
++  it('saves once without randomUUID on an insecure LAN origin', async () => {
++    vi.stubGlobal('crypto', undefined);
++    try {
++      const posted: Mutation[] = [];
++      const client = createActivityCheckpointClient(identity, { storage: memoryStorage(), fetcher: vi.fn(async (_url, init) => {
++        if (init?.method !== 'POST') return response(authority());
++        const mutation = bodyOf(init); posted.push(mutation);
++        return response(authority({ revision: 1, mutationId: mutation.mutationId, value: mutation.state }));
++      }) });
++      await client.load(); client.save(state(1)); await client.flush();
++      expect(posted).toHaveLength(1);
++      expect(posted[0].mutationId).toMatch(/^activity_[a-z0-9]+_[a-z0-9]+$/);
++      client.close();
++    } finally { vi.unstubAllGlobals(); }
++  });
++
++  it('retains corrupt outbox bytes and refuses to save fresh initial state over them', async () => {
++    for (const raw of ['{broken', '{"version":2}', '{"version":1,"pending":null,"desired":{"constructor":5}}']) {
++      const storage = memoryStorage(); storage.setItem(keyFor(), raw);
++      const fetcher = vi.fn(async () => response(authority({ revision: 5, value: state(3) })));
++      const client = createActivityCheckpointClient(identity, { storage, fetcher });
++      await expect(client.load()).rejects.toThrow(); client.save(state(0));
++      expect(storage.getItem(keyFor())).toBe(raw);
++      expect(fetcher).toHaveBeenCalledTimes(1); client.close();
++    }
++  });
++
++  it('a closed document response cannot clear or overwrite a newer document outbox', async () => {
++    const storage = memoryStorage(), old = deferred<Response>(); let sent!: Mutation;
++    const client = createActivityCheckpointClient(identity, { storage, fetcher: vi.fn(async (_url, init) => {
++      if (init?.method === 'POST') { sent = bodyOf(init); return old.promise; }
++      return response(authority());
++    }) });
++    await client.load(); client.save(state(1)); const waiting = client.flush(); client.close();
++    const newer = JSON.stringify({ version: 1, pending: { mutationId: 'new-document' }, desired: state(4) });
++    storage.setItem(keyFor(), newer);
++    old.resolve(response(authority({ revision: 1, mutationId: sent.mutationId, value: state(1) })));
++    await waiting;
++    expect(storage.getItem(keyFor())).toBe(newer);
++  });
++
++  it('freezes the session from GET in every POST when the classroom cookie changes to another child', async () => {
++    const storage = memoryStorage(), posted: Mutation[] = [];
++    let cookieSession = 'learning-session-a', writesToOtherChild = 0;
++    const fetcher = vi.fn(async (_url, init) => {
++      if (init?.method !== 'POST') return response(authority({ session: cookieSession,
++        value: cookieSession === 'learning-session-a' ? state(1) : state(9) }));
++      const mutation = bodyOf(init); posted.push(mutation);
++      // Backend must compare the frozen requested identity before any write.
++      if (mutation.learningSessionId !== cookieSession) return response({ ok: false }, 409);
++      if (cookieSession === 'learning-session-b') writesToOtherChild++;
++      return response(authority({ session: cookieSession, revision: 1,
++        mutationId: mutation.mutationId, value: mutation.state }));
++    });
++    const oldDocument = createActivityCheckpointClient(identity, { storage, fetcher });
++    await expect(oldDocument.load()).resolves.toEqual(state(1));
++    cookieSession = 'learning-session-b'; oldDocument.save(state(2));
++    await expect(oldDocument.flush()).rejects.toThrow('activity_state_conflict');
++    expect(posted).toHaveLength(1);
++    expect(posted[0].learningSessionId).toBe('learning-session-a');
++    expect(writesToOtherChild).toBe(0);
++    const originalBuffer = storage.getItem(keyFor())!;
++    expect(JSON.parse(originalBuffer).pending.learningSessionId).toBe('learning-session-a');
++    oldDocument.close();
++    const nextChild = createActivityCheckpointClient(identity, { storage, fetcher });
++    await expect(nextChild.load()).resolves.toEqual(state(9));
++    expect(posted).toHaveLength(1);
++    expect(storage.getItem(keyFor())).toBe(originalBuffer);
++    expect(storage.getItem(keyFor(identity, 'learning-session-b'))).toBeNull();
++    nextChild.close();
++  });
++
++  it.each(['learning-session-other', undefined])('rejects an outbox whose pending session is %s without removing its bytes', async learningSessionId => {
++    const storage = memoryStorage();
++    const raw = JSON.stringify({ version: 1, pending: { ...identity, learningSessionId,
++      schemaVersion: ACTIVITY_CHECKPOINT_SCHEMA, expectedRevision: 0, mutationId: 'foreign-session', state: state(3) }, desired: state(3) });
++    storage.setItem(keyFor(), raw);
++    const fetcher = vi.fn(async () => response(authority()));
++    const client = createActivityCheckpointClient(identity, { storage, fetcher });
++    await expect(client.load()).rejects.toThrow('activity_local_buffer_invalid');
++    client.save(state(0));
++    expect(storage.getItem(keyFor())).toBe(raw);
++    expect(fetcher).toHaveBeenCalledTimes(1); client.close();
++  });
++
++  it('continues consecutive authoritative writes after localStorage quota fails', async () => {
++    const storage = memoryStorage(), posted: Mutation[] = [], errors: Error[] = [];
++    const setItem = vi.spyOn(storage, 'setItem').mockImplementation(() => { throw new DOMException('quota full', 'QuotaExceededError'); });
++    const client = createActivityCheckpointClient(identity, { storage, onError: error => errors.push(error),
++      fetcher: vi.fn(async (_url, init) => {
++        if (init?.method !== 'POST') return response(authority());
++        const mutation = bodyOf(init); posted.push(mutation);
++        return response(authority({ revision: posted.length, mutationId: mutation.mutationId, value: mutation.state }));
++      }) });
++    try {
++      await client.load();
++      for (const step of [1, 2, 3]) {
++        expect(client.save(state(step))).toBe(true);
++        await client.flush();
++      }
++      expect(posted.map(mutation => [mutation.expectedRevision, mutation.state])).toEqual([
++        [0, state(1)], [1, state(2)], [2, state(3)],
++      ]);
++      expect(posted.every(mutation => mutation.learningSessionId === 'learning-session-a')).toBe(true);
++      expect(setItem).toHaveBeenCalledTimes(1);
++      expect(errors.map(error => error.message)).toEqual(['activity_local_buffer_unavailable']);
++      expect(storage.length).toBe(0);
++    } finally { client.close(); setItem.mockRestore(); }
++  });
++
++  it('detects a concurrent storage owner before sending new work', async () => {
++    const storage = memoryStorage(), fetcher = vi.fn(async () => response(authority()));
++    const client = createActivityCheckpointClient(identity, { storage, fetcher });
++    await client.load(); storage.setItem(keyFor(), 'new tab owns this outbox'); client.save(state(3));
++    await client.flush();
++    expect(fetcher).toHaveBeenCalledTimes(1);
++    expect(storage.getItem(keyFor())).toBe('new tab owns this outbox'); client.close();
++  });
++
++  it('rejects mismatched server authority instead of hydrating or sending', async () => {
++    const fetcher = vi.fn(async () => response(authority({ id: { ...identity, releaseSha256: 'c'.repeat(64) } })));
++    const client = createActivityCheckpointClient(identity, { storage: memoryStorage(), fetcher });
++    await expect(client.load()).rejects.toThrow('activity_identity_changed'); client.save(state(1));
++    expect(fetcher).toHaveBeenCalledTimes(1); client.close();
++  });
++
++  it('accepts only bounded plain JSON state and does not alias caller objects', () => {
++    const source = { nested: [1, true, null, '汉字'] }; const copy = activityState(source);
++    source.nested[0] = 9; expect(copy).toEqual({ nested: [1, true, null, '汉字'] });
++    const invalid = [null, [], new Date(), { x: NaN }, { x: Infinity }, { x: undefined },
++      JSON.parse('{"__proto__":{}}'), { x: 'x'.repeat(16001) }, { x: Array(2001).fill(1) }];
++    for (const value of invalid) expect(() => activityState(value)).toThrow('activity_state_invalid');
++    expect(() => activityState({ a: '汉'.repeat(16000), b: '汉'.repeat(1000) })).toThrow('activity_state_too_large');
++  });
++});
+diff --git a/tests/runtime/mira-activity-checkpoint-bridge.browser.test.ts b/tests/runtime/mira-activity-checkpoint-bridge.browser.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/mira-activity-checkpoint-bridge.browser.test.ts
+@@ -0,0 +1,273 @@
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { chromium, type Browser, type Page } from 'playwright-core';
++import { createRequire } from 'node:module';
++
++const identity = {
++  classroomId: 'classroom-a', sceneId: 'bridge', sceneIndex: 12,
++  releaseSha256: 'a'.repeat(64), contentSha256: 'b'.repeat(64),
++};
++/** Tiny authored game: restore changes domain state directly, never input, audio or credit. */
++function authoredGame(hooks = true) {
++  return `<button id="forward">向前一步</button><output id="position">0</output>
++<script>
++window.game={step:0,history:[],clicks:0,audio:0,restoreCalls:0,beginCalls:0};
++document.querySelector('#forward').onclick=function(event){game.step++;game.history.push(game.step);game.clicks++;game.audio++;document.querySelector('#position').textContent=String(game.step);document.body.dataset.trusted=String(event.isTrusted)};
++${hooks ? `window.miraActivityCheckpoint={version:1,begin:function(){game.beginCalls++;game.audio++},capture:function(){return {step:game.step,history:game.history.slice()}},restore:function(s){if(!s||!Number.isInteger(s.step)||!Array.isArray(s.history))return false;game.step=s.step;game.history=s.history.slice();game.restoreCalls++;document.querySelector('#position').textContent=String(game.step);return true}};` : ''}
++</script>`;
++}
++
++type Host = Window & {
++  events: { method: string; path: string; body?: { learningSessionId: string; state: { step: number; history: number[] } } }[];
++  errors: string[]; saved: { step: number; history: number[] } | null; active: boolean;
++  checkpointReady: boolean; phases: string[];
++  connect: () => void; disconnect: () => void; releaseGet: () => void;
++  replaceDocument: () => void; reenter: () => void; forgedMessages?: unknown[];
++};
++type GameWindow = Window & { game: { step: number; clicks: number; audio: number; restoreCalls: number; beginCalls: number } };
++
++async function harness(page: Page, options: { hooks?: boolean; holdGet?: boolean; saved?: unknown; gatewayWrapped?: boolean } = {}) {
++  const require = createRequire(import.meta.url);
++  const { build } = createRequire(require.resolve('tsx'))('esbuild');
++  let authored = authoredGame(options.hooks !== false);
++  if (options.gatewayWrapped) {
++    const gateway = await import(new URL('../../../../gateway/src/server.mjs', import.meta.url).href) as {
++      embedTextbookSceneMedia: (html: string, assets: { path: string; mimeType: string; base64: string }[]) => string;
++    };
++    // A valid tiny image with padding makes the actual Gateway choose its >2MiB
++    // deduplicated Blob wrapper. No network, provider, or production data is used.
++    const png = Buffer.concat([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6rWQAAAAASUVORK5CYII=', 'base64'), Buffer.alloc(32768)]);
++    const document = '<!doctype html><html><head><meta name="mira-responsive-activity" content="low-reading-v1"></head><body>'
++      + authored + '<img hidden src="/checkpoint-atlas.png">'.repeat(70) + '</body></html>';
++    authored = gateway.embedTextbookSceneMedia(document, [{ path: '/checkpoint-atlas.png', mimeType: 'image/png', base64: png.toString('base64') }]);
++    expect(authored).toContain('document.open();document.write(page);document.close();');
++  }
++  const bundle = await build({
++    stdin: { resolveDir: process.cwd(), loader: 'ts', contents: `
++import {connectActivityCheckpointFrame,ACTIVITY_CHECKPOINT_SHIM} from './lib/mira/activity-checkpoint-bridge';
++import {patchHtmlForIframe} from './lib/utils/iframe';
++const identity=${JSON.stringify(identity)};
++window.events=[];window.errors=[];window.active=true;window.checkpointReady=false;window.phases=[];window.saved=${JSON.stringify('saved' in options ? options.saved : { step: 3, history: [1, 2, 3] })};
++let revision=4, mutationId=null, resolveGet;
++const gate=${options.holdGet ? 'new Promise(resolve=>{resolveGet=resolve})' : 'Promise.resolve()'};
++window.releaseGet=()=>resolveGet?.();
++const descriptor=()=>({sceneId:identity.sceneId,sceneIndex:identity.sceneIndex,contentSha256:identity.contentSha256,revision,mutationId,state:window.saved});
++const authority=()=>({ok:true,schemaVersion:'mira.textbook.activity-state.v1',classroomId:identity.classroomId,releaseSha256:identity.releaseSha256,learningSessionId:'session-a',activities:[descriptor()],activity:descriptor()});
++const storageValues=new Map();
++const storage={getItem:key=>storageValues.get(key)??null,setItem:(key,value)=>storageValues.set(key,value),removeItem:key=>storageValues.delete(key)};
++const fetcher=async(path,init)=>{
++ const method=init?.method??'GET', body=init?.body?JSON.parse(init.body):undefined;
++ window.events.push({path,method,...(body?{body}:{})});
++ if(method==='GET')await gate;
++ else {if(body.learningSessionId!=='session-a'||body.expectedRevision!==revision)return new Response('{}',{status:409});window.saved=body.state;revision++;mutationId=body.mutationId;}
++ return new Response(JSON.stringify(authority()),{headers:{'content-type':'application/json'}});
++};
++const html=${options.gatewayWrapped ? `patchHtmlForIframe(${JSON.stringify(authored)})` : `${JSON.stringify(authored)}+ACTIVITY_CHECKPOINT_SHIM`};
++window.connect=()=>{window.disconnect?.();window.disconnect=connectActivityCheckpointFrame({frame:document.querySelector('#game'),identity,active:()=>window.active,onError:error=>window.errors.push(error.message),onRestoring:()=>{window.checkpointReady=false;window.phases.push('restoring')},onReady:()=>{window.checkpointReady=true;window.phases.push('ready')},fetcher,storage});};
++window.replaceDocument=()=>{document.querySelector('#game').srcdoc=html;};
++window.reenter=()=>{window.disconnect?.();document.querySelector('#game').remove();const frame=document.createElement('iframe');frame.id='game';frame.sandbox='allow-scripts';frame.style='width:700px;height:180px';frame.srcdoc=html;document.body.prepend(frame);window.connect();};
++document.querySelector('#game').srcdoc=html;window.connect();
++` },
++    bundle: true, write: false, format: 'iife', platform: 'browser', logLevel: 'silent',
++  });
++  await page.route('**/*', route => route.request().url() === 'http://localhost/checkpoint-test'
++    ? route.fulfill({ contentType: 'text/html', body: '<iframe id="game" sandbox="allow-scripts" style="width:700px;height:180px"></iframe><iframe id="sibling" sandbox="allow-scripts" srcdoc="<p>Untrusted sibling</p>"></iframe>' })
++    : route.abort());
++  await page.goto('http://localhost/checkpoint-test');
++  await page.addScriptTag({ content: bundle.outputFiles[0].text });
++  const frame = page.frameLocator('#game');
++  await frame.getByRole('button', { name: '向前一步' }).waitFor();
++  return frame;
++}
++
++async function gameMetrics(page: Page) {
++  const element = await page.$('#game');
++  const frame = await element!.contentFrame();
++  return frame!.evaluate(() => (window as GameWindow).game);
++}
++async function setNarrationVisibility(page: Page, visible: boolean) {
++  await page.evaluate(value => {
++    const frame = document.querySelector('#game') as HTMLIFrameElement;
++    frame.contentWindow!.postMessage({ type: 'MIRA_NARRATION_VISIBILITY', visible: value }, '*');
++  }, visible);
++}
++
++describe.skipIf(process.env.FORMAL_INSPECTION_BROWSER !== '1')('sandboxed activity checkpoint bridge', () => {
++  let browser: Browser;
++  beforeAll(async () => {
++    browser = await chromium.launch({
++      executablePath: process.env.MIRA_FORMAL_QA_BROWSER_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
++      headless: true,
++    });
++  });
++  afterAll(async () => { await browser?.close(); });
++
++  it('restores fresh documents quietly, then saves trusted actions and restores classroom reentry', async () => {
++    const page = await browser.newPage();
++    try {
++      const frame = await harness(page);
++      await expect.poll(() => frame.locator('#position').textContent()).toBe('3');
++      // Find by iframe element so an unrelated sibling can never masquerade as the game.
++      const metrics = async () => {
++        const element = await page.$('#game'); const game = await element!.contentFrame();
++        return game!.evaluate(() => (window as GameWindow).game);
++      };
++      expect(await metrics()).toMatchObject({ step: 3, clicks: 0, audio: 0, restoreCalls: 1 });
++      expect(await page.evaluate(() => (window as Host).events.map(event => event.method))).toEqual(['GET']);
++      await frame.getByRole('button', { name: '向前一步' }).click();
++      await page.waitForFunction(() => (window as Host).events.some(event => event.method === 'POST'));
++      expect(await metrics()).toMatchObject({ step: 4, clicks: 1, audio: 1 });
++      expect(await frame.locator('body').getAttribute('data-trusted')).toBe('true');
++      await page.evaluate(() => (window as Host).replaceDocument());
++      await expect.poll(() => frame.locator('#position').textContent()).toBe('4');
++      expect(await metrics()).toMatchObject({ step: 4, clicks: 0, audio: 0, restoreCalls: 1 });
++      await page.evaluate(() => (window as Host).reenter());
++      await expect.poll(() => frame.locator('#position').textContent()).toBe('4');
++      expect(await metrics()).toMatchObject({ step: 4, clicks: 0, audio: 0, restoreCalls: 1 });
++      const requests = await page.evaluate(() => (window as Host).events);
++      expect(requests.filter(event => event.method === 'POST')).toHaveLength(1);
++      expect(requests.find(event => event.method === 'POST')?.body?.learningSessionId).toBe('session-a');
++      expect(requests.every(event => event.path === '/mira/activity-state')).toBe(true);
++      await expect.poll(() => page.evaluate(() => (window as Host).phases)).toEqual([
++        'restoring', 'ready', 'restoring', 'ready', 'restoring', 'ready',
++      ]);
++      expect(await page.evaluate(() => (window as Host).errors)).toEqual([]);
++      expect(await page.locator('#game').getAttribute('sandbox')).toBe('allow-scripts');
++    } finally { await page.close(); }
++  }, 15_000);
++
++  it('does not save or accept initial clicks until authority hydration has completed', async () => {
++    const page = await browser.newPage();
++    try {
++      const frame = await harness(page, { holdGet: true });
++      await page.waitForFunction(() => (window as Host).events.length === 1);
++      expect(await page.evaluate(() => [(window as Host).checkpointReady, (window as Host).phases])).toEqual([false, ['restoring']]);
++      await frame.getByRole('button', { name: '向前一步' }).click();
++      await page.waitForTimeout(300);
++      expect(await frame.locator('#position').textContent()).toBe('0');
++      expect(await page.evaluate(() => (window as Host).events.map(event => event.method))).toEqual(['GET']);
++      await page.evaluate(() => (window as Host).releaseGet());
++      await expect.poll(() => frame.locator('#position').textContent()).toBe('3');
++      await expect.poll(() => page.evaluate(() => (window as Host).checkpointReady)).toBe(true);
++      await frame.getByRole('button', { name: '向前一步' }).click();
++      await expect.poll(() => page.evaluate(() => (window as Host).saved?.step)).toBe(4);
++      expect(await page.evaluate(() => (window as Host).events.filter(event => event.method === 'POST'))).toHaveLength(1);
++    } finally { await page.close(); }
++  }, 15_000);
++
++  it.each([false, true])('starts a fresh game once after hydration and visibility (real Gateway wrapper: %s)', async gatewayWrapped => {
++    const page = await browser.newPage();
++    try {
++      const frame = await harness(page, { gatewayWrapped, saved: null, holdGet: true });
++      await page.waitForFunction(() => (window as Host).events.length === 1);
++      await setNarrationVisibility(page, true);
++      await page.waitForTimeout(40);
++      expect(await gameMetrics(page)).toMatchObject({ step: 0, beginCalls: 0, audio: 0, restoreCalls: 0 });
++      expect(await page.evaluate(() => (window as Host).checkpointReady)).toBe(false);
++      await page.evaluate(() => (window as Host).releaseGet());
++      await page.waitForFunction(() => (window as Host).checkpointReady);
++      expect(await gameMetrics(page)).toMatchObject({ beginCalls: 0, audio: 0, restoreCalls: 0 });
++      await setNarrationVisibility(page, true);
++      await expect.poll(async () => (await gameMetrics(page)).beginCalls).toBe(1);
++      expect(await gameMetrics(page)).toMatchObject({ clicks: 0, audio: 1, restoreCalls: 0 });
++      for (const visible of [true, false, true, true]) await setNarrationVisibility(page, visible);
++      await page.waitForTimeout(300);
++      expect(await gameMetrics(page)).toMatchObject({ beginCalls: 1, audio: 1 });
++      expect(await page.evaluate(() => (window as Host).events.map(event => event.method))).toEqual(['GET']);
++      if (gatewayWrapped) {
++        expect(await page.locator('#game').getAttribute('srcdoc')).toContain('<meta name="mira-activity-checkpoint" content="v1">');
++        // The source wrapper and surviving inner document both carry the marker;
++        // document.write during parsing may retain both. Only one live shim runs.
++        expect(await frame.locator('meta[name="mira-activity-checkpoint"][content="v1"]').count()).toBeGreaterThanOrEqual(1);
++        expect(await frame.locator('script[data-mira-activity-checkpoint]').count()).toBe(1);
++      }
++      expect(await page.evaluate(() => (window as Host).errors)).toEqual([]);
++    } finally { await page.close(); }
++  }, 15_000);
++
++  it.each([false, true])('keeps restored games quiet across visibility and fresh documents (real Gateway wrapper: %s)', async gatewayWrapped => {
++    const page = await browser.newPage();
++    try {
++      const frame = await harness(page, { gatewayWrapped });
++      await page.waitForFunction(() => (window as Host).checkpointReady);
++      for (const visible of [true, false, true]) await setNarrationVisibility(page, visible);
++      await page.waitForTimeout(280);
++      expect(await gameMetrics(page)).toMatchObject({ step: 3, beginCalls: 0, audio: 0, restoreCalls: 1 });
++      expect(await page.evaluate(() => (window as Host).events.map(event => event.method))).toEqual(['GET']);
++      await frame.getByRole('button', { name: '向前一步' }).click();
++      await expect.poll(() => page.evaluate(() => (window as Host).saved?.step)).toBe(4);
++      await page.evaluate(() => (window as Host).replaceDocument());
++      await expect.poll(() => frame.locator('#position').textContent()).toBe('4');
++      await page.waitForFunction(() => (window as Host).checkpointReady);
++      await setNarrationVisibility(page, true);
++      await page.waitForTimeout(280);
++      expect(await gameMetrics(page)).toMatchObject({ step: 4, beginCalls: 0, audio: 0, clicks: 0, restoreCalls: 1 });
++      expect(await page.evaluate(() => (window as Host).events.filter(event => event.method === 'POST'))).toHaveLength(1);
++      expect(await page.evaluate(() => (window as Host).errors)).toEqual([]);
++    } finally { await page.close(); }
++  }, 15_000);
++
++  it('keeps older pages without checkpoint hooks playable and sends no state requests', async () => {
++    const page = await browser.newPage();
++    try {
++      const frame = await harness(page, { hooks: false });
++      await frame.getByRole('button', { name: '向前一步' }).click();
++      expect(await frame.locator('#position').textContent()).toBe('1');
++      await page.waitForTimeout(650);
++      expect(await page.evaluate(() => (window as Host).events)).toEqual([]);
++      expect(await page.evaluate(() => (window as Host).errors)).toEqual([]);
++      expect(await page.evaluate(() => [(window as Host).checkpointReady, (window as Host).phases])).toEqual([true, ['ready']]);
++    } finally { await page.close(); }
++  }, 15_000);
++
++  it('resends a rejected hidden snapshot after becoming active without requiring another action', async () => {
++    const page = await browser.newPage();
++    try {
++      const frame = await harness(page);
++      await expect.poll(() => frame.locator('#position').textContent()).toBe('3');
++      await page.evaluate(() => { (window as Host).active = false; });
++      await frame.getByRole('button', { name: '向前一步' }).click();
++      expect(await frame.locator('#position').textContent()).toBe('4');
++      await page.waitForTimeout(350);
++      expect(await page.evaluate(() => (window as Host).events.filter(event => event.method === 'POST'))).toEqual([]);
++      expect(await page.evaluate(() => (window as Host).saved?.step)).toBe(3);
++      // No new authored event: the 250ms capture loop must retry after the negative ACK.
++      await page.evaluate(() => { (window as Host).active = true; });
++      await expect.poll(() => page.evaluate(() => (window as Host).saved?.step)).toBe(4);
++      await page.waitForTimeout(550);
++      const posts = await page.evaluate(() => (window as Host).events.filter(event => event.method === 'POST'));
++      expect(posts).toHaveLength(1);
++      expect(posts[0].body).toMatchObject({ learningSessionId: 'session-a', state: { step: 4, history: [1, 2, 3, 4] } });
++      await page.evaluate(() => (window as Host).replaceDocument());
++      await expect.poll(() => frame.locator('#position').textContent()).toBe('4');
++      expect(await page.evaluate(() => (window as Host).errors)).toEqual([]);
++    } finally { await page.close(); }
++  }, 15_000);
++
++  it('ignores forged window messages, sibling ports and inactive or disconnected frames', async () => {
++    const page = await browser.newPage();
++    try {
++      const frame = await harness(page);
++      await expect.poll(() => frame.locator('#position').textContent()).toBe('3');
++      await page.evaluate(() => window.postMessage({ type: 'mira:checkpoint-state', state: { step: 99 } }, '*'));
++      const sibling = await (await page.$('#sibling'))!.contentFrame();
++      await sibling!.evaluate(() => {
++        const channel = new MessageChannel(); (window as Host).forgedMessages = [];
++        channel.port1.onmessage = event => (window as Host).forgedMessages!.push(event.data);
++        window.parent.frames[0].postMessage({ type: 'mira:activity-checkpoint-connect' }, '*', [channel.port2]);
++        channel.port1.postMessage({ type: 'mira:checkpoint-restore', state: { step: 99, history: [] } });
++      });
++      await page.waitForTimeout(300);
++      expect(await sibling!.evaluate(() => (window as Host).forgedMessages)).toEqual([]);
++      expect(await frame.locator('#position').textContent()).toBe('3');
++      expect(await page.evaluate(() => (window as Host).events.filter(event => event.method === 'POST'))).toEqual([]);
++      await page.evaluate(() => { (window as Host).active = false; });
++      await frame.getByRole('button', { name: '向前一步' }).click();
++      await page.waitForTimeout(300);
++      expect(await page.evaluate(() => (window as Host).events.filter(event => event.method === 'POST'))).toEqual([]);
++      await page.evaluate(() => (window as Host).disconnect());
++      await frame.getByRole('button', { name: '向前一步' }).click();
++      await page.waitForTimeout(300);
++      expect(await page.evaluate(() => (window as Host).events.filter(event => event.method === 'POST'))).toEqual([]);
++    } finally { await page.close(); }
++  }, 15_000);
++});
+diff --git a/tests/scene-renderers/interactive-checkpoint-narration-fence.test.ts b/tests/scene-renderers/interactive-checkpoint-narration-fence.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/interactive-checkpoint-narration-fence.test.ts
+@@ -0,0 +1,118 @@
++// @vitest-environment jsdom
++import { act, createElement } from 'react';
++import { createRoot, type Root } from 'react-dom/client';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { InteractiveIframeHost } from '@/components/scene-renderers/InteractiveIframeHost';
++import { useInteractiveIframePool } from '@/lib/store/interactive-iframe-pool';
++import { useStageStore } from '@/lib/store/stage';
++import { releasePageNarrationPause } from '@/lib/mira/page-narration';
++import { setLectureSpeaking } from '@/lib/mira/lecture-audio';
++import type { Scene } from '@/lib/types/stage';
++import type { connectActivityCheckpointFrame } from '@/lib/mira/activity-checkpoint-bridge';
++
++type BridgeOptions = Parameters<typeof connectActivityCheckpointFrame>[0];
++const mocks = vi.hoisted(() => ({ connect: vi.fn(), disconnect: vi.fn(), runtime: {} }));
++vi.mock('@/lib/contexts/mira-student-runtime-context', () => ({ useMiraStudentRuntimeEvents: () => mocks.runtime }));
++vi.mock('@/lib/mira/activity-checkpoint-bridge', () => ({
++  connectActivityCheckpointFrame: (options: BridgeOptions) => { mocks.connect(options); return mocks.disconnect; },
++}));
++vi.mock('@/lib/mira/student-interaction-bridge', () => ({
++  studentInteractionObjectives: () => [], connectStudentInteractionFrame: vi.fn(),
++}));
++vi.mock('@/lib/hooks/use-i18n', () => ({ useI18n: () => ({ t: (key: string) => key }) }));
++
++let root: Root | undefined;
++let messages: ReturnType<typeof vi.fn>;
++const rect = { left: 10, top: 20, width: 800, height: 450 };
++const metadata = {schemaVersion:'mira.textbook.activity-state.v1',releaseSha256:'a'.repeat(64),contentSha256:'b'.repeat(64)};
++function frame() { return document.querySelector('iframe') as HTMLIFrameElement; }
++function visibility() {
++  return messages.mock.calls.filter(([message]) => message.type === 'MIRA_NARRATION_VISIBILITY')
++    .map(([message]) => message.visible as boolean);
++}
++function callbacks() { return mocks.connect.mock.calls.at(-1)![0] as BridgeOptions; }
++async function mount(checkpoint: boolean, hasAdapter = checkpoint) {
++  const html = '<html><head>' + (hasAdapter ? '<meta name="mira-activity-checkpoint" content="v1">' : '')
++    + '</head><body>original activity</body></html>';
++  const scene = {id:'one',stageId:'room',order:1,type:'interactive',content:{type:'interactive',html},
++    ...(checkpoint ? {miraActivityPersistence:metadata} : {})} as Scene;
++  useStageStore.setState({stage:{id:'room'} as never,scenes:[scene],currentSceneId:'one'});
++  const pool = useInteractiveIframePool.getState();
++  pool.configureClassroom('room', []); pool.mount('one',{srcDoc:html});
++  pool.claim('one','visible-owner'); pool.setRect('one',rect); pool.setActive('one');
++  const container = document.createElement('div'); document.body.append(container);
++  root = createRoot(container);
++  await act(async () => root!.render(createElement(InteractiveIframeHost)));
++}
++
++describe('activity checkpoint restoration and narration fence', () => {
++  beforeEach(() => {
++    vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
++    useInteractiveIframePool.getState().reset();
++    useStageStore.setState({stage:null,scenes:[],currentSceneId:null});
++    releasePageNarrationPause(); setLectureSpeaking(false);
++    messages = vi.fn(); mocks.connect.mockClear(); mocks.disconnect.mockClear();
++    const view = {postMessage:messages} as unknown as Window;
++    vi.spyOn(HTMLIFrameElement.prototype,'contentWindow','get').mockReturnValue(view);
++  });
++  afterEach(async () => {
++    await act(async () => root?.unmount()); root = undefined;
++    useStageStore.setState({stage:null,scenes:[],currentSceneId:null});
++    useInteractiveIframePool.getState().reset(); document.body.replaceChildren();
++    vi.restoreAllMocks(); vi.unstubAllGlobals();
++    releasePageNarrationPause(); setLectureSpeaking(false);
++  });
++
++  it('keeps metadata-free legacy classrooms playable without a checkpoint connection', async () => {
++    await mount(false);
++    expect(mocks.connect).not.toHaveBeenCalled();
++    expect(visibility().at(-1)).toBe(true);
++    await act(async () => frame().dispatchEvent(new Event('load')));
++    expect(visibility().at(-1)).toBe(true);
++    expect(frame().srcdoc).toContain('original activity');
++    expect(frame().getAttribute('sandbox')).toBe('allow-scripts allow-forms allow-popups');
++  });
++
++  it('does not gate an older activity that has backend metadata but no supported adapter marker', async () => {
++    await mount(true, false);
++    expect(mocks.connect).not.toHaveBeenCalled();
++    expect(visibility().at(-1)).toBe(true);
++    await act(async () => frame().dispatchEvent(new Event('load')));
++    expect(visibility().at(-1)).toBe(true);
++  });
++
++  it('waits for restore acknowledgment before enabling narration and retains hydration across visibility changes', async () => {
++    await mount(true);
++    const original = frame();
++    expect(mocks.connect).toHaveBeenCalledTimes(1);
++    expect(visibility().length).toBeGreaterThan(0);
++    expect(visibility().every(value => value === false)).toBe(true);
++    expect(callbacks().identity).toEqual({classroomId:'room',sceneId:'one',sceneIndex:0,
++      releaseSha256:metadata.releaseSha256,contentSha256:metadata.contentSha256});
++    await act(async () => original.dispatchEvent(new Event('load')));
++    expect(visibility().at(-1)).toBe(false);
++    await act(async () => callbacks().onRestoring?.());
++    expect(visibility().at(-1)).toBe(false);
++    await act(async () => callbacks().onReady?.());
++    expect(visibility().at(-1)).toBe(true);
++    await act(async () => {
++      useStageStore.setState({currentSceneId:'another'});
++      useInteractiveIframePool.getState().setActive('another');
++    });
++    expect(visibility().at(-1)).toBe(false);
++    expect(mocks.connect).toHaveBeenCalledTimes(1);
++    await act(async () => {
++      useStageStore.setState({currentSceneId:'one'});
++      useInteractiveIframePool.getState().setActive('one');
++    });
++    expect(visibility().at(-1)).toBe(true);
++    expect(frame()).toBe(original);
++    expect(mocks.connect).toHaveBeenCalledTimes(1);
++    expect(mocks.disconnect).not.toHaveBeenCalled();
++    // A real document reload is different from hiding a retained iframe.
++    await act(async () => original.dispatchEvent(new Event('load')));
++    expect(visibility().at(-1)).toBe(false);
++    await act(async () => callbacks().onReady?.());
++    expect(visibility().at(-1)).toBe(true);
++  });
++});

@@ -9,6 +9,7 @@ import { parse } from "parse5";
 import {
   authorizeRuntimeRequest,
   authorizeTextbookRequest,
+  bindTextbookActivityPersistence,
   bindTextbookPageNarration,
   createGateway,
   embedTextbookSceneMedia,
@@ -53,6 +54,31 @@ test('gateway derives page speech ownership before data URI and blob embedding',
     scene.content.html = embedTextbookSceneMedia(scene.content.html,assets);
     assert.equal(scene.content.html.includes('document.write(page)'),large);
     assert.equal(scene.miraPageNarration.bindings[0].audioPath,audioPath);
+  }
+});
+
+test('activity continuity metadata uses only the authenticated immutable source identity', () => {
+  const {scene, runtime, bytes, audioPath} = narrationFixture();
+  const sourceSha = createHash('sha256').update(scene.content.html).digest('hex');
+  runtime.releaseSha256 = 'c'.repeat(64);
+  runtime.activityPersistence = [{sceneId:scene.id,sceneIndex:2,contentSha256:sourceSha}];
+  scene.miraActivityPersistence = {releaseSha256:'forged',contentSha256:'forged'};
+  bindTextbookActivityPersistence(scene,runtime);
+  assert.deepEqual(scene.miraActivityPersistence, {schemaVersion:'mira.textbook.activity-state.v1',
+    releaseSha256:runtime.releaseSha256,contentSha256:sourceSha});
+  scene.content.html = embedTextbookSceneMedia(scene.content.html,
+    [{path:audioPath,mimeType:'audio/mpeg',base64:bytes.toString('base64')}]);
+  assert.notEqual(createHash('sha256').update(scene.content.html).digest('hex'),sourceSha);
+  assert.equal(scene.miraActivityPersistence.contentSha256,sourceSha);
+  for (const change of [
+    (s,r)=>{r.purpose='learning';}, (s,r)=>{r.releaseSha256='invalid';},
+    (s,r)=>{r.activityPersistence=[];}, (s,r)=>{r.activityPersistence.push({...r.activityPersistence[0]});},
+    s=>{s.stageId='other';}, s=>{s.type='quiz';}, s=>{s.miraActivity={section:'games'};},
+    s=>{s.content.html='';},
+  ]) {
+    const s=structuredClone(scene),r=structuredClone(runtime);
+    change(s,r);bindTextbookActivityPersistence(s,r);
+    assert.equal(Object.hasOwn(s,'miraActivityPersistence'),false);
   }
 });
 
@@ -153,6 +179,10 @@ test('fixed textbook permits only its published snapshot and exact archived medi
   assert.equal(allowed('POST', '/mira/textbook-quiz'), true);
   assert.equal(allowed('GET', '/mira/textbook-play'), true);
   assert.equal(allowed('POST', '/mira/textbook-play'), true);
+  assert.equal(allowed('GET', '/mira/activity-state'), true);
+  assert.equal(allowed('POST', '/mira/activity-state'), true);
+  assert.equal(allowed('GET', '/mira/activity-state?scene=other'), false);
+  assert.equal(allowed('DELETE', '/mira/activity-state'), false);
   assert.equal(allowed('DELETE', '/mira/textbook-play'), false);
   assert.equal(allowed('GET', '/mira/textbook-audio/' + 'a'.repeat(24) + '.wav'), true);
   assert.equal(allowed('GET', '/mira/textbook-audio/other.wav'), false);
@@ -263,6 +293,54 @@ test('fixed textbook delivery uses private backend snapshot, verified media and 
   assert.equal((await fetch(gateway + mediaPath, { headers })).status, 502);
   assert.equal((await fetch(`${gateway}/api/classroom?id=${classroomId}`, {headers})).status,502);
   assert.equal(paidCalls, 0);
+});
+
+test('activity snapshots retain cookie authority and their dedicated body limit without widening quiz limits', async () => {
+  const classroomId='tbpub_'+'f'.repeat(24),releaseSha256='e'.repeat(64);
+  const html='<button id="move">move</button>',contentSha256=createHash('sha256').update(html).digest('hex');
+  let writes=0,upstreamReads=0,submitted;
+  const backend=await listen(http.createServer(async(request,response)=>{
+    assert.equal(request.headers['x-mira-internal-token'],'test-internal-token');
+    if(request.url.endsWith('/exchange'))return reply(response,{ok:true,runtimeToken:'tbpr_snapshots',classroomId,expiresAt:Date.now()+60000});
+    if(request.url.endsWith('/validate'))return reply(response,{ok:true,purpose:'fixed_textbook',classroomId,
+      runtimeSessionId:'bound-session',learningSessionId:'bound-session',releaseSha256,expiresAt:Date.now()+60000,media:[],
+      activityPersistence:[{sceneId:'game',sceneIndex:0,contentSha256}]});
+    assert.equal(request.headers['x-mira-textbook-token'],'tbpr_snapshots');
+    if(request.url.endsWith('/classroom'))return reply(response,{success:true,classroom:{id:classroomId,scenes:[
+      {id:'game',stageId:classroomId,type:'interactive',content:{type:'interactive',html},miraActivityPersistence:{forged:true}},
+      {id:'slide',stageId:classroomId,type:'slide',miraActivityPersistence:{forged:true}}]}});
+    if(request.url.endsWith('/activity-state')){
+      if(request.method==='POST'){writes++;submitted=await jsonBody(request);}
+      return reply(response,{ok:true,schemaVersion:'mira.textbook.activity-state.v1',classroomId,
+        learningSessionId:'bound-session',releaseSha256,activities:[]});
+    }
+    if(request.url.endsWith('/quiz')){writes++;return reply(response,{ok:true});}
+    response.writeHead(404).end();
+  }));
+  const upstream=await listen(http.createServer((_request,response)=>{upstreamReads++;response.writeHead(500).end();}));
+  const gateway=await listenGateway({backend,upstream});
+  assert.equal((await fetch(gateway+'/mira/activity-state')).status,401);
+  const launch=await fetch(gateway+'/mira/textbook-launch?ticket=tbpt_snapshot',{redirect:'manual'});
+  const headers={cookie:launch.headers.getSetCookie().map(item=>item.split(';')[0]).join('; '),
+    referer:`http://runtime.test/classroom/${classroomId}?mira=1&textbook=1`};
+  const classroom=(await (await fetch(gateway+`/api/classroom?id=${classroomId}`,{headers})).json()).classroom;
+  assert.deepEqual(classroom.scenes[0].miraActivityPersistence,{schemaVersion:'mira.textbook.activity-state.v1',releaseSha256,contentSha256});
+  assert.equal(Object.hasOwn(classroom.scenes[1],'miraActivityPersistence'),false);
+  assert.equal((await fetch(gateway+'/mira/activity-state',{headers})).status,200);
+  assert.equal((await fetch(gateway+'/mira/activity-state?child=other',{headers})).status,403);
+  assert.equal((await fetch(gateway+'/mira/activity-state',{method:'DELETE',headers})).status,403);
+  const post=body=>fetch(gateway+'/mira/activity-state',{method:'POST',headers:{...headers,'content-type':'application/json'},body});
+  const data={schemaVersion:'mira.textbook.activity-state.v1',sceneId:'game',sceneIndex:0,releaseSha256,contentSha256,
+    learningSessionId:'bound-session',expectedRevision:0,mutationId:'change-1',state:{history:'x'.repeat(12000)}};
+  assert.equal((await post(JSON.stringify(data))).status,200);
+  assert.deepEqual(submitted,data);
+  assert.equal((await fetch(gateway+'/mira/textbook-quiz',{method:'POST',headers:{...headers,'content-type':'application/json'},
+    body:JSON.stringify(data)})).status,400);
+  assert.equal((await post('{broken')).status,400);
+  assert.equal((await post(JSON.stringify({...data,state:{history:'x'.repeat(64*1024)}}))).status,413);
+  assert.equal((await fetch(gateway+'/mira/activity-state',{method:'POST',headers:{...headers,'content-type':'text/plain'},body:'{}'})).status,415);
+  assert.equal(writes,1);
+  assert.equal(upstreamReads,0);
 });
 
 test('published video and GLB bytes retain exact session, hash, size and format boundaries', async () => {

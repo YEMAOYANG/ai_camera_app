@@ -23,6 +23,7 @@ from repositories.learning_repository import LearningRepository
 from repositories.textbook_repository import TextbookRepository
 from repositories.course_storage_repository import CourseStorageRepository
 from services.course_file_store import CourseFileStore, CourseFileStorageError
+from services import textbook_activity_state as activity_state
 
 
 RECEIPT_SCHEMA = 'mira.openmaic.student-runtime-event-receipt.v1'
@@ -203,7 +204,8 @@ class TextbookClassroomService:
             raise ApiError('textbook_session_invalid', '请重新进入课堂', 401)
         return {'ok': True, 'purpose': 'fixed_textbook', 'classroomId': release['classroomId'],
             'runtimeSessionId': session['id'], 'learningSessionId': session['id'], 'expiresAt': data['expiresAt'],
-            'media': release['media']}
+            'media': release['media'], 'releaseSha256': release['sha256'],
+            'activityPersistence': activity_state.descriptors(release)}
 
     def classroom(self, token):
         _, child, build, release, _, _ = self._authority(token)
@@ -379,6 +381,53 @@ class TextbookClassroomService:
                 ('tbev_' + digest({'session': session['id'], 'seq': event['sequence']})[:40], session['id'], event['sequence'],
                  'textbook:' + str(event['sequence']), scene['id'], payload.get('actionId'), event['type'], canonical(event), canonical(receipt), now_ms()))
             return receipt
+
+    def activity_state(self, token, data=None):
+        """Persist only the bound iframe's UI continuity, independently of grades."""
+        _, child, _, release, course, initial_session = self._authority(token)
+        if data is not None:
+            data = activity_state.parse_post(data)
+        definitions = activity_state.descriptors(release)
+        identity = {'ok': True, 'schemaVersion': activity_state.SCHEMA,
+            'classroomId': release['classroomId'], 'learningSessionId': initial_session['id'],
+            'releaseSha256': release['sha256']}
+        with self.repository.transaction() as conn:
+            session = self.learning.get_session(conn, family_id=child['family_id'],
+                session_id=initial_session['id'], for_update=True)
+            if (session is None or session['id'] != initial_session['id'] or session['child_id'] != child['id']
+                    or session['course_id'] != course['id'] or session['course_version'] != course['version']
+                    or (data is not None and data['learningSessionId'] != session['id'])):
+                raise ApiError('textbook_activity_state_identity', '课堂进度身份已变化，请重新进入', 409)
+            progress = self._state(session)
+            saved_scope = activity_state.scope(progress, session_id=session['id'], release=release)
+            if data is None:
+                return activity_state.response_within_budget({**identity, 'activities': [activity_state.activity(item,
+                    saved_scope['scenes'].get(item['sceneId'])) for item in definitions]})
+            definition = next((item for item in definitions if item['sceneId'] == data['sceneId']), None)
+            if (definition is None or data['sceneIndex'] != definition['sceneIndex']
+                    or data['releaseSha256'] != release['sha256']
+                    or data['contentSha256'] != definition['contentSha256']):
+                raise ApiError('textbook_activity_state_identity', '小游戏版本已变化，请重新进入', 409)
+            stored = saved_scope['scenes'].get(definition['sceneId'])
+            current = activity_state.activity(definition, stored)
+            request_sha = activity_state.request_sha(data)
+            mutations = dict((stored or {}).get('mutations', {}))
+            if data['mutationId'] in mutations:
+                if mutations[data['mutationId']] != request_sha:
+                    raise ApiError('textbook_activity_mutation_conflict', '小游戏保存标识已用于另一份进度', 409)
+                return {**identity, 'activity': current}
+            if data['expectedRevision'] != current['revision']:
+                raise ApiError('textbook_activity_revision_conflict', '小游戏已在其他页面更新，请重新进入', 409)
+            mutations[data['mutationId']] = request_sha
+            mutations = dict(list(mutations.items())[-activity_state.MAX_MUTATIONS:])
+            updated = {key: deepcopy(data[key]) for key in ('sceneIndex', 'contentSha256', 'mutationId', 'state')}
+            updated.update(revision=current['revision'] + 1, mutations=mutations)
+            saved_scope = activity_state.scope(progress, session_id=session['id'], release=release, create=True)
+            saved_scope['scenes'][definition['sceneId']] = updated
+            activity_state.validate_storage_budget(progress)
+            conn.execute('UPDATE learning_sessions SET runtime_state_json=?,updated_at=? WHERE id=?',
+                (canonical(progress), now_ms(), session['id']))
+            return {**identity, 'activity': activity_state.activity(definition, updated)}
 
     def quiz(self, token, answers=None):
         _, child, _, release, course, initial_session = self._authority(token)
