@@ -1,0 +1,387 @@
+diff --git a/lib/server/mira-textbook-scene-contract.ts b/lib/server/mira-textbook-scene-contract.ts
+--- a/lib/server/mira-textbook-scene-contract.ts
++++ b/lib/server/mira-textbook-scene-contract.ts
+@@ -96,6 +96,11 @@
+   height: number;
+   bindingVersion: number;
+   status: 'author_candidate';
++}
++export interface MissingLockedQuizAssets {
++  page: number;
++  expectedCandidateSha256: string;
++  assets: { assetKey: string; src: string; sha256: string; width: number; height: number }[];
+ }
+ interface Candidate extends Json {
+   schemaVersion: 'mira.textbook.authoring-candidate.v1';
+@@ -581,6 +586,8 @@
+     rejectedScenesDir?: string;
+     ownsStage?: (stageId: string) => Promise<boolean>;
+     onCandidate?: (candidate: Json) => Promise<void>;
++    /** Local terminal-session operator only; never rebind a saved question. */
++    missingLockedQuizAssets?: MissingLockedQuizAssets;
+   } = {},
+ ) {
+   assertTextbookContract(frozen);
+@@ -638,6 +645,25 @@
+         bindingHistory: [],
+         scenes: [],
+       };
++    }
++    const recovery = options.missingLockedQuizAssets;
++    if (recovery) {
++      const page = frozen.contract.pagePlan.find(p => p.page === recovery.page);
++      const locks = frozen.contract.lockedAssessments.filter(q => q.page === recovery.page);
++      if (textbookDigest(candidate) !== recovery.expectedCandidateSha256 || !page || page.type !== 'quiz' ||
++          !locks.length || candidate.scenes.some(s => s.order === recovery.page)) fail('MISSING_QUIZ_ASSET_FENCE');
++      const keys = new Set(locks.flatMap(q => [q.visualAsset, ...q.choices.map((c: Json) => c.asset)]).filter(Boolean));
++      const missing = [...keys].filter(key => !candidate.assetBindings.some(b => b.assetKey === key));
++      if (recovery.assets.length !== missing.length || new Set(recovery.assets.map(a => a.assetKey)).size !== missing.length ||
++          recovery.assets.some(a => !missing.includes(a.assetKey))) fail('MISSING_QUIZ_ASSET_SCOPE');
++      for (const asset of recovery.assets) {
++        if (!CATALOG_ID.test(asset.assetKey) || !asset.src.endsWith('.png')) fail('MISSING_QUIZ_ASSET_SCOPE');
++        const actual = await image(asset.src, id);
++        if (actual.sha256 !== asset.sha256 || actual.width !== asset.width || actual.height !== asset.height)
++          fail('IMAGE_BYTES_CHANGED');
++        candidate.assetBindings.push({ ...actual, assetKey: asset.assetKey, bindingVersion: 1,
++          status: 'author_candidate' });
++      }
+     }
+     inMemory.set(id, candidate);
+     return candidate;
+diff --git a/lib/server/mira-textbook-rejected-scene-repair.ts b/lib/server/mira-textbook-rejected-scene-repair.ts
+--- a/lib/server/mira-textbook-rejected-scene-repair.ts
++++ b/lib/server/mira-textbook-rejected-scene-repair.ts
+@@ -2,6 +2,7 @@
+ import { createHash } from 'node:crypto';
+ import { constants, promises as fs } from 'node:fs';
+ import path from 'node:path';
++import sharp from 'sharp';
+ import { SVGPathData } from 'svg-pathdata';
+ import { parse, parseFragment, type DefaultTreeAdapterMap } from 'parse5';
+ import { validateScene } from '@openmaic/dsl';
+@@ -11,7 +12,7 @@
+ import { resolveRequestOwnerId } from './agent-runtime/owner';
+ import type { Scene } from '@/lib/types/stage';
+ import type { CourseDocument, CourseStore } from './agent-runtime/course-tools';
+-import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest, textbookContractFromPrompt } from './mira-textbook-scene-contract';
++import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest, textbookContractFromPrompt, type MissingLockedQuizAssets } from './mira-textbook-scene-contract';
+ import { deriveRejectedSpeechManifest, restoreDerivedSpeech } from './mira-textbook-derived-speech-repair';
+ import { inspectQuizLockedQuestionReview } from './mira-textbook-quiz-locked-question-review';
+ 
+@@ -1148,3 +1149,175 @@
+ 
+ export const prepareSavedSlideStaticRepair = (input: SavedSlideStaticRepairInput, env: RepairEnvironment) => prepareSavedRepair(input, env, 'slide-static');
+ export const runSavedSlideStaticRepair = (plan: Json, approvedPlanSha256: string, env: RepairEnvironment) => runSavedRepair(plan, approvedPlanSha256, env, 'slide-static');
++
++/** No rejected scene is invented: reconstruct only a genuinely absent frozen quiz. */
++export interface MissingLockedQuizInput {
++  jobDir: string;
++  stageId: string;
++  page: number;
++  expectedCurrentDocumentSha256: string;
++  expectedCurrentCandidateSha256: string;
++  /** Exact stage-owned PNGs, created locally before this read-only review. */
++  assets: MissingLockedQuizAssets['assets'];
++}
++const missingQuizSchema = 'mira.textbook.missing-locked-quiz-plan.v1';
++async function missingQuizInputs(input: MissingLockedQuizInput, env: RepairEnvironment) {
++  check(Object.keys(input).sort().join(',') === 'assets,expectedCurrentCandidateSha256,expectedCurrentDocumentSha256,jobDir,page,stageId', 'INPUT_SHAPE');
++  check(safeId(input.stageId) && Number.isInteger(input.page) && input.page > 0 &&
++    [input.expectedCurrentDocumentSha256, input.expectedCurrentCandidateSha256].every(s => /^[a-f0-9]{64}$/.test(s)), 'CURRENT_SNAPSHOT_SHA');
++  check(Array.isArray(input.assets) && input.assets.length <= 32 && new Set(input.assets.map(a => a.assetKey)).size === input.assets.length, 'MISSING_QUIZ_ASSETS');
++  const dataDir = await fs.realpath(env.dataDir), job = path.resolve(input.jobDir);
++  const cookies = (await privateRead(path.join(job, 'owner.cookies'))).toString();
++  const owners = cookies.split(/\r?\n/).map(line => line.replace(/^#HttpOnly_/, '')).filter(line => line && !line.startsWith('#')).map(line => line.split('\t')).filter(p => p.length === 7 && p[5] === 'anonymous_id').map(p => p[6]);
++  check(owners.length === 1 && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(owners[0]), 'OWNER_COOKIE');
++  const headers = new Headers(), ownerId = resolveRequestOwnerId({ headers: new Headers({ cookie: `anonymous_id=${owners[0]}` }) }, headers);
++  check(!headers.has('set-cookie'), 'OWNER_COOKIE');
++  const ownerFingerprint = digestBytes(owners[0]);
++  const state = JSON.parse((await privateRead(path.join(job, 'state.json'))).toString());
++  const dispatch = JSON.parse((await privateRead(path.join(job, 'dispatch.json'))).toString());
++  const frozenFile = JSON.parse((await privateRead(path.join(job, 'frozen.json'))).toString());
++  check(typeof state.sessionId === 'string' && state.sessionId && dispatch.ownerFingerprint === ownerFingerprint && frozenFile.sceneContract, 'JOB_BINDING');
++  const ledgerPath = path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json');
++  const ledger = JSON.parse((await privateRead(ledgerPath)).toString()); unseal(ledger);
++  const assetBytes = new Map<string, Buffer>();
++  for (const asset of input.assets) {
++    check(jsonObject(asset) && Object.keys(asset).sort().join(',') === 'assetKey,height,sha256,src,width' &&
++      safeId(asset.assetKey) && /^[a-f0-9]{64}$/.test(asset.sha256) && Number.isInteger(asset.width) && Number.isInteger(asset.height) && asset.width > 0 && asset.height > 0, 'MISSING_QUIZ_ASSETS');
++    const prefix = `/api/classroom-media/${input.stageId}/media/`;
++    check(asset.src.startsWith(prefix) && /^[A-Za-z0-9_.-]+\.png$/.test(asset.src.slice(prefix.length)), 'MISSING_QUIZ_ASSET_PATH');
++    const file = path.join(dataDir, 'classrooms', input.stageId, 'media', asset.src.slice(prefix.length));
++    check(await fs.realpath(file) === file, 'SYMLINK_REFUSED');
++    const raw = await privateRead(file);
++    check(raw.length > 0 && raw.length <= 32 * 1024 * 1024 && digestBytes(raw) === asset.sha256, 'MISSING_QUIZ_PNG_SHA');
++    const image = sharp(raw, { limitInputPixels: 40_000_000 }), meta = await image.metadata();
++    check(meta.format === 'png' && meta.width === asset.width && meta.height === asset.height, 'MISSING_QUIZ_PNG_FORMAT');
++    await image.raw().toBuffer(); // Decode all pixels, not just an apparently valid header.
++    assetBytes.set(asset.assetKey, raw);
++  }
++  return { input, sessionId: state.sessionId as string, ownerId, ownerFingerprint, frozenFile, ledger, ledgerPath, dataDir, assetBytes };
++}
++type MissingQuizState = Awaited<ReturnType<typeof missingQuizInputs>>;
++async function missingQuizAuthority(q: Queryable, state: MissingQuizState, lock: boolean) {
++  const session = (await q.query('SELECT owner_id, prompt, status, deleted_at, lease_worker_id FROM agent_sessions WHERE id=$1' + (lock ? ' FOR UPDATE' : ''), [state.sessionId])).rows[0];
++  check(session && session.owner_id === state.ownerId && session.deleted_at === null && ['succeeded', 'failed', 'cancelled'].includes(String(session.status)) && session.lease_worker_id === null, 'SESSION_NOT_TERMINAL_OWNED');
++  const meta = (await q.query('SELECT owner_id, deleted_at FROM stage_meta WHERE stage_id=$1' + (lock ? ' FOR UPDATE' : ''), [state.input.stageId])).rows[0];
++  check(meta && meta.owner_id === state.ownerId && meta.deleted_at === null, 'STAGE_NOT_OWNED');
++  const frozen = textbookContractFromPrompt(String(session.prompt));
++  check(frozen && textbookDigest(frozen) === textbookDigest(state.frozenFile.sceneContract), 'SESSION_FROZEN_MISMATCH');
++  const document = await new PgDocumentStore(q, { withTransaction: async body => body(q) }).loadDocument(state.input.stageId) as CourseDocument | null;
++  check(document && (document.outline as Json)?.producerRef === state.sessionId, 'DOCUMENT_SESSION_MISMATCH');
++  return { frozen: frozen!, document: document! };
++}
++function describeMissingQuiz(state: MissingQuizState, document: CourseDocument, frozen: NonNullable<ReturnType<typeof textbookContractFromPrompt>>) {
++  const { input, ledger } = state;
++  check(textbookDigest(document) === input.expectedCurrentDocumentSha256 && ledger.sha256 === input.expectedCurrentCandidateSha256, 'STALE_BEFORE');
++  check(ledger.stageId === input.stageId && ledger.sessionId === state.sessionId && textbookDigest(ledger.frozenContract) === textbookDigest(frozen), 'LEDGER_BINDING');
++  check(ledger.scenes.length === document.scenes.length && document.scenes.every(s => ledger.scenes.some((e: Json) => e.sceneId === s.id && e.sha256 === textbookDigest(s))), 'LEDGER_DOCUMENT');
++  const page = frozen.contract.pagePlan.find(p => p.page === input.page);
++  check(page && page.type === 'quiz' && Array.isArray(page.questionIds) && page.questionIds.length > 0, 'MISSING_QUIZ_FROZEN_PAGE');
++  const locks = frozen.contract.lockedAssessments.filter(q => q.page === input.page);
++  check(locks.length === page!.questionIds!.length && new Set(page!.questionIds).size === locks.length && page!.questionIds!.every((id: string) => locks.some(q => q.id === id)), 'MISSING_QUIZ_LOCKS');
++  check(!document.scenes.some(s => s.order === input.page), 'PAGE_EXISTS');
++  const keys = new Set(locks.flatMap(q => [q.visualAsset, ...q.choices.map((c: Json) => c.asset)]).filter(Boolean));
++  const missing = [...keys].filter(key => !ledger.assetBindings.some((b: Json) => b.assetKey === key));
++  check(input.assets.length === missing.length && input.assets.every(a => missing.includes(a.assetKey)), 'MISSING_QUIZ_ASSET_SCOPE');
++  const bindings = [...ledger.assetBindings, ...input.assets.map(a => ({ ...a, bindingVersion: 1, status: 'author_candidate' }))];
++  const byKey = new Map(bindings.map((b: Json) => [b.assetKey, b]));
++  const questions: Json[] = page!.questionIds!.map((id: string) => {
++    const q = locks.find(q => q.id === id)!;
++    check(q.type === 'single' && q.choices.every((c: Json) => byKey.has(c.asset)) && (!q.visualAsset || byKey.has(q.visualAsset)), 'MISSING_QUIZ_ASSET_SCOPE');
++    const visual = (key: string, alt: string) => ({ kind: 'image', src: byKey.get(key)!.src, alt });
++    return { id: q.id, type: q.type, question: q.question, points: q.points, hasAnswer: true,
++      options: q.choices.map((c: Json) => ({ value: c.value, label: c.label })), answer: Array.isArray(q.answer) ? q.answer : [q.answer], analysis: q.analysis,
++      optionVisuals: Object.fromEntries(q.choices.map((c: Json) => [c.value, visual(c.asset, c.label)])),
++      ...(q.visualAsset ? { visual: visual(q.visualAsset, q.question) } : {}) };
++  });
++  const scene: Scene = { id: 'missing-quiz-' + textbookDigest({ sessionId: state.sessionId, stageId: input.stageId, page: input.page }).slice(0, 32),
++    stageId: input.stageId, order: input.page, title: page!.title, type: 'quiz', content: { type: 'quiz', questions },
++    actions: questions.map(q => ({ id: 'locked-speech-' + digestBytes(q.id).slice(0, 32), type: 'speech', text: q.question })) } as Scene;
++  check(validateScene(scene).valid && !document.scenes.some(s => s.id === scene.id), 'STRICT_DSL');
++  const after = { ...document, scenes: [...document.scenes, scene].sort((a, b) => a.order - b.order) };
++  const nextLedger = { ...unseal(ledger), assetBindings: bindings, scenes: after.scenes.map(s => ({ sceneId: s.id, order: s.order, sha256: textbookDigest(s), canonicalJson: textbookCanonical(s), contractSha256: frozen.sha256 })) };
++  return { scene, after, nextLedger, plan: seal({ schemaVersion: missingQuizSchema, verification: 'static_only_not_play_audio_or_publication', input,
++    sessionId: state.sessionId, stageId: input.stageId, sceneId: scene.id, contractSha256: frozen.sha256, ownerFingerprint: state.ownerFingerprint,
++    beforeDocumentSha256: textbookDigest(document), beforeCandidateSha256: ledger.sha256,
++    afterDocumentSha256: textbookDigest(after), afterCandidateSha256: textbookDigest(nextLedger), sceneSha256: textbookDigest(scene),
++    assetProvenance: 'operator_deterministic_png', speechSource: 'lockedAssessments.question', questionIds: page!.questionIds }) };
++}
++function missingQuizGuard(state: MissingQuizState, frozen: NonNullable<ReturnType<typeof textbookContractFromPrompt>>, useNewAssets: boolean) {
++  return createTextbookAuthoringGuard(frozen, state.sessionId, { classroomsDir: path.join(state.dataDir, 'classrooms'), ownsStage: async () => false,
++    ...(useNewAssets ? { missingLockedQuizAssets: { page: state.input.page, expectedCandidateSha256: state.input.expectedCurrentCandidateSha256, assets: state.input.assets } } : {}) });
++}
++async function missingQuizDry(state: MissingQuizState, frozen: NonNullable<ReturnType<typeof textbookContractFromPrompt>>, document: CourseDocument, scene: Scene, useNewAssets = true) {
++  const validated = new Error('MISSING_QUIZ_DRY_VALIDATED');
++  const store = { loadDocument: async () => document, putScene: async () => { throw validated; } } as unknown as CourseStore;
++  try { await missingQuizGuard(state, frozen, useNewAssets).wrapStore(store).putScene(state.input.stageId, scene); }
++  catch (e) { if (e === validated) return; throw e; }
++  fail('DRY_RUN_UNEXPECTED');
++}
++export async function prepareMissingLockedQuiz(input: MissingLockedQuizInput, env: RepairEnvironment): Promise<Json> {
++  const state = await missingQuizInputs(input, env);
++  return transaction(env, true, async q => {
++    const { frozen, document } = await missingQuizAuthority(q, state, false), described = describeMissingQuiz(state, document, frozen);
++    await missingQuizDry(state, frozen, document, described.scene);
++    return described.plan;
++  });
++}
++async function immutablePng(file: string, raw: Buffer) {
++  const handle = await fs.open(file, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600).catch(async e => {
++    if (e.code !== 'EEXIST') throw e;
++    check((await privateRead(file)).equals(raw), 'IMMUTABLE_COLLISION');
++    return null;
++  });
++  if (handle) { try { await handle.writeFile(raw); await handle.sync(); } finally { await handle.close(); } }
++}
++export async function runMissingLockedQuiz(plan: Json, approvedPlanSha256: string, env: RepairEnvironment): Promise<Json> {
++  unseal(plan); check(plan.schemaVersion === missingQuizSchema && plan.sha256 === approvedPlanSha256, 'PLAN_APPROVAL_SHA');
++  const state = await missingQuizInputs(plan.input, env);
++  const directory = path.join(state.dataDir, 'textbook-missing-locked-quiz-repairs', digestBytes(state.sessionId), state.input.stageId, plan.sha256);
++  let intent: Json | undefined;
++  try { intent = JSON.parse((await privateRead(path.join(directory, 'intent.json'))).toString()); } catch (e: unknown) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e; }
++  if (intent) check(textbookCanonical(intent) === textbookCanonical(plan), 'INTENT_COLLISION');
++  const result = await transaction(env, false, async (q, pool) => {
++    const { frozen, document } = await missingQuizAuthority(q, state, true);
++    state.ledger = JSON.parse((await privateRead(state.ledgerPath)).toString()); unseal(state.ledger);
++    const actualDocumentSha = textbookDigest(document), actualLedgerSha = state.ledger.sha256;
++    check(actualDocumentSha === plan.beforeDocumentSha256 || (intent && actualDocumentSha === plan.afterDocumentSha256), 'DOCUMENT_CHANGED');
++    check(actualLedgerSha === plan.beforeCandidateSha256 || (intent && actualLedgerSha === plan.afterCandidateSha256), 'CANDIDATE_CHANGED');
++    const before = intent ? JSON.parse((await privateRead(path.join(directory, 'original-document.json'))).toString()) as CourseDocument : document;
++    const beforeLedger = intent ? JSON.parse((await privateRead(path.join(directory, 'original-candidate.json'))).toString()) : state.ledger;
++    unseal(beforeLedger);
++    const described = describeMissingQuiz({ ...state, ledger: beforeLedger }, before, frozen);
++    check(textbookCanonical(described.plan) === textbookCanonical(plan), 'PLAN_STALE');
++    await missingQuizDry(state, frozen, before, described.scene, actualLedgerSha === plan.beforeCandidateSha256);
++    const ledgerUnchanged = async () => {
++      const current = JSON.parse((await privateRead(state.ledgerPath)).toString()); unseal(current);
++      check(current.sha256 === actualLedgerSha, 'ATOMIC_LEDGER_FENCE');
++    };
++    await ledgerUnchanged();
++    await immutable(path.join(directory, 'original-document.json'), before);
++    await immutable(path.join(directory, 'original-candidate.json'), beforeLedger);
++    for (const asset of state.input.assets) await immutablePng(path.join(directory, asset.sha256 + '.png'), state.assetBytes.get(asset.assetKey)!);
++    await immutable(path.join(directory, 'intent.json'), plan);
++    let fences = 0;
++    const store = createOwnerBoundDocumentStore({ pool, ownerId: state.ownerId, validateScene, validateStage: validateAppStage,
++      mutationFence: async tx => {
++        const current = await missingQuizAuthority(tx, state, true);
++        check(textbookDigest(current.document) === (fences++ === 0 ? plan.beforeDocumentSha256 : plan.afterDocumentSha256), 'ATOMIC_DOCUMENT_FENCE');
++        await ledgerUnchanged();
++      } }) as unknown as CourseStore;
++    const target = actualDocumentSha === plan.afterDocumentSha256
++      ? new Proxy(store, { get(t, key) { if (key === 'putScene') return async () => {}; const v = Reflect.get(t, key); return typeof v === 'function' ? v.bind(t) : v; } }) : store;
++    await missingQuizGuard(state, frozen, actualLedgerSha === plan.beforeCandidateSha256).wrapStore(target).putScene(state.input.stageId, described.scene);
++    const final = await missingQuizAuthority(q, state, true);
++    check(textbookDigest(final.document) === plan.afterDocumentSha256, 'AFTER_DOCUMENT');
++    const ledger = JSON.parse((await privateRead(state.ledgerPath)).toString()); unseal(ledger);
++    check(ledger.sha256 === plan.afterCandidateSha256, 'AFTER_LEDGER');
++    return seal({ schemaVersion: 'mira.textbook.missing-locked-quiz-receipt.v1', status: 'static_candidate_accepted', verification: 'static_only_not_play_audio_or_publication',
++      planSha256: plan.sha256, sessionId: state.sessionId, stageId: state.input.stageId, sceneId: described.scene.id,
++      sceneSha256: textbookDigest(described.scene), documentSha256: plan.afterDocumentSha256, candidateSha256: plan.afterCandidateSha256,
++      assetProvenance: 'operator_deterministic_png', providerCalls: 0 });
++  });
++  await immutable(path.join(directory, 'receipt.json'), result);
++  return result;
++}
+diff --git a/scripts/repair-textbook-rejected-scene.ts b/scripts/repair-textbook-rejected-scene.ts
+--- a/scripts/repair-textbook-rejected-scene.ts
++++ b/scripts/repair-textbook-rejected-scene.ts
+@@ -2,11 +2,11 @@
+ import { promises as fs } from 'node:fs';
+ import path from 'node:path';
+ import { Pool } from 'pg';
+-import { prepareRejectedReviewedFrozenSpeechRepair, runRejectedReviewedFrozenSpeechRepair, prepareRejectedQuizLockedQuestionReview, runRejectedQuizLockedQuestionReview, prepareRejectedCurrentHtmlPreserveSpeechRepair, runRejectedCurrentHtmlPreserveSpeechRepair, prepareRejectedCurrentSlideRepair, runRejectedCurrentSlideRepair, prepareRejectedCurrentHtmlRepair, runRejectedCurrentHtmlRepair, prepareRejectedDerivedActionContentRepair, runRejectedDerivedActionContentRepair, prepareRejectedDerivedSpeechRepair, runRejectedDerivedSpeechRepair, prepareRejectedQuizFrozenSpeechRepair, runRejectedQuizFrozenSpeechRepair, prepareRejectedFrozenSpeechRepair, runRejectedFrozenSpeechRepair, prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair, prepareSavedSlideStaticRepair, runSavedSlideStaticRepair, prepareRejectedQuizPicturesRepair, runRejectedQuizPicturesRepair } from '../lib/server/mira-textbook-rejected-scene-repair';
++import { prepareMissingLockedQuiz, runMissingLockedQuiz, prepareRejectedReviewedFrozenSpeechRepair, runRejectedReviewedFrozenSpeechRepair, prepareRejectedQuizLockedQuestionReview, runRejectedQuizLockedQuestionReview, prepareRejectedCurrentHtmlPreserveSpeechRepair, runRejectedCurrentHtmlPreserveSpeechRepair, prepareRejectedCurrentSlideRepair, runRejectedCurrentSlideRepair, prepareRejectedCurrentHtmlRepair, runRejectedCurrentHtmlRepair, prepareRejectedDerivedActionContentRepair, runRejectedDerivedActionContentRepair, prepareRejectedDerivedSpeechRepair, runRejectedDerivedSpeechRepair, prepareRejectedQuizFrozenSpeechRepair, runRejectedQuizFrozenSpeechRepair, prepareRejectedFrozenSpeechRepair, runRejectedFrozenSpeechRepair, prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair, prepareSavedSlideStaticRepair, runSavedSlideStaticRepair, prepareRejectedQuizPicturesRepair, runRejectedQuizPicturesRepair } from '../lib/server/mira-textbook-rejected-scene-repair';
+ 
+ async function main() {
+   const mode = process.argv[2];
+-  if (!['prepare-reviewed-frozen-speech', 'run-reviewed-frozen-speech', 'prepare-quiz-locked-question-review', 'run-quiz-locked-question-review', 'prepare-current-html-preserve-speech', 'run-current-html-preserve-speech', 'prepare-current-slide', 'run-current-slide', 'prepare-current-html', 'run-current-html', 'prepare-derived-action-content', 'run-derived-action-content', 'prepare-derived-speech', 'run-derived-speech', 'prepare-quiz-frozen-speech', 'run-quiz-frozen-speech', 'prepare-frozen-speech', 'run-frozen-speech', 'prepare', 'run', 'prepare-saved', 'run-saved', 'prepare-quiz', 'run-quiz', 'prepare-quiz-pictures', 'run-quiz-pictures', 'prepare-slide', 'run-slide', 'prepare-saved-slide', 'run-saved-slide', 'prepare-saved-static', 'run-saved-static'].includes(mode)) throw new Error('Usage: repair-textbook-rejected-scene.ts prepare-reviewed-frozen-speech|run-reviewed-frozen-speech|prepare-quiz-locked-question-review|run-quiz-locked-question-review|prepare-current-html-preserve-speech|run-current-html-preserve-speech|prepare-current-slide|run-current-slide|prepare-current-html|run-current-html|prepare-derived-action-content|run-derived-action-content|prepare-derived-speech|run-derived-speech|prepare-quiz-frozen-speech|run-quiz-frozen-speech|prepare-frozen-speech|run-frozen-speech|prepare|run|prepare-saved|run-saved|prepare-quiz|run-quiz|prepare-quiz-pictures|run-quiz-pictures|prepare-slide|run-slide|prepare-saved-slide|run-saved-slide|prepare-saved-static|run-saved-static < request.json');
++  if (!['prepare-missing-locked-quiz', 'run-missing-locked-quiz', 'prepare-reviewed-frozen-speech', 'run-reviewed-frozen-speech', 'prepare-quiz-locked-question-review', 'run-quiz-locked-question-review', 'prepare-current-html-preserve-speech', 'run-current-html-preserve-speech', 'prepare-current-slide', 'run-current-slide', 'prepare-current-html', 'run-current-html', 'prepare-derived-action-content', 'run-derived-action-content', 'prepare-derived-speech', 'run-derived-speech', 'prepare-quiz-frozen-speech', 'run-quiz-frozen-speech', 'prepare-frozen-speech', 'run-frozen-speech', 'prepare', 'run', 'prepare-saved', 'run-saved', 'prepare-quiz', 'run-quiz', 'prepare-quiz-pictures', 'run-quiz-pictures', 'prepare-slide', 'run-slide', 'prepare-saved-slide', 'run-saved-slide', 'prepare-saved-static', 'run-saved-static'].includes(mode)) throw new Error('Usage: repair-textbook-rejected-scene.ts prepare-missing-locked-quiz|run-missing-locked-quiz|prepare-reviewed-frozen-speech|run-reviewed-frozen-speech|prepare-quiz-locked-question-review|run-quiz-locked-question-review|prepare-current-html-preserve-speech|run-current-html-preserve-speech|prepare-current-slide|run-current-slide|prepare-current-html|run-current-html|prepare-derived-action-content|run-derived-action-content|prepare-derived-speech|run-derived-speech|prepare-quiz-frozen-speech|run-quiz-frozen-speech|prepare-frozen-speech|run-frozen-speech|prepare|run|prepare-saved|run-saved|prepare-quiz|run-quiz|prepare-quiz-pictures|run-quiz-pictures|prepare-slide|run-slide|prepare-saved-slide|run-saved-slide|prepare-saved-static|run-saved-static < request.json');
+   let body = '';
+   for await (const chunk of process.stdin) { body += chunk; if (body.length > 1024 * 1024) throw new Error('INPUT_TOO_LARGE'); }
+   const request = JSON.parse(body);
+@@ -15,7 +15,11 @@
+   const pool = new Pool({ connectionString, max: 1 });
+   try {
+     const env = { pool, dataDir: path.resolve('data') };
+-    const result = mode === 'prepare-reviewed-frozen-speech'
++    const result = mode === 'prepare-missing-locked-quiz'
++      ? await prepareMissingLockedQuiz(request, env)
++      : mode === 'run-missing-locked-quiz'
++        ? await runMissingLockedQuiz(JSON.parse(await fs.readFile(request.planPath, 'utf8')), request.approvedPlanSha256, env)
++      : mode === 'prepare-reviewed-frozen-speech'
+       ? await prepareRejectedReviewedFrozenSpeechRepair(request, env)
+       : mode === 'run-reviewed-frozen-speech'
+         ? await runRejectedReviewedFrozenSpeechRepair(JSON.parse(await fs.readFile(request.planPath, 'utf8')), request.approvedPlanSha256, env)
+diff --git a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+--- a/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
++++ b/tests/agent-runtime/textbook-rejected-scene-repair.test.ts
+@@ -12,7 +12,7 @@
+ import { validateAppScene, validateAppStage } from '@/lib/document-store/validators';
+ import { archiveRejectedTextbookScene } from '@/lib/server/mira-textbook-rejected-scene';
+ import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest, type FrozenTextbookContract } from '@/lib/server/mira-textbook-scene-contract';
+-import { prepareRejectedCurrentHtmlPreserveSpeechRepair, runRejectedCurrentHtmlPreserveSpeechRepair, type CurrentHtmlPreserveSpeechRepairInput, prepareRejectedCurrentSlideRepair, runRejectedCurrentSlideRepair, type CurrentSlideRepairInput, prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair, prepareSavedSlideStaticRepair, runSavedSlideStaticRepair, type SavedSlideStaticRepairInput, type SavedSlideSpotlightRepairInput, type SlideRepairInput, type QuizRepairInput, type RepairInput, type SavedSceneRepairInput, prepareRejectedQuizPicturesRepair, runRejectedQuizPicturesRepair, type QuizPicturesRepairInput } from '@/lib/server/mira-textbook-rejected-scene-repair';
++import { prepareMissingLockedQuiz, runMissingLockedQuiz, type MissingLockedQuizInput, prepareRejectedCurrentHtmlPreserveSpeechRepair, runRejectedCurrentHtmlPreserveSpeechRepair, type CurrentHtmlPreserveSpeechRepairInput, prepareRejectedCurrentSlideRepair, runRejectedCurrentSlideRepair, type CurrentSlideRepairInput, prepareRejectedSceneRepair, runRejectedSceneRepair, prepareSavedSceneRepair, runSavedSceneRepair, prepareRejectedQuizRepair, runRejectedQuizRepair, prepareRejectedSlideRepair, runRejectedSlideRepair, prepareSavedSlideSpotlightRepair, runSavedSlideSpotlightRepair, prepareSavedSlideStaticRepair, runSavedSlideStaticRepair, type SavedSlideStaticRepairInput, type SavedSlideSpotlightRepairInput, type SlideRepairInput, type QuizRepairInput, type RepairInput, type SavedSceneRepairInput, prepareRejectedQuizPicturesRepair, runRejectedQuizPicturesRepair, type QuizPicturesRepairInput } from '@/lib/server/mira-textbook-rejected-scene-repair';
+ import type { CourseStore } from '@/lib/server/agent-runtime/course-tools';
+ import frozenFixture from '../fixtures/textbook-scene-contract.v1.json';
+ 
+@@ -1928,3 +1928,98 @@
+     expect(receipt.documentSha256).toBe(plan.afterDocumentSha256);
+   });
+ });
++
++describe('missing frozen quiz with first local deterministic PNG bindings', () => {
++  let request: MissingLockedQuizInput;
++  const directory = (plan: Record<string, unknown>) => path.join(root, 'textbook-missing-locked-quiz-repairs', hash(sessionId), stageId, String(plan.sha256));
++  beforeEach(async () => {
++    frozen.contract.pagePlan.push({ page: 2, title: '找整卡', type: 'quiz', move: '听音选图', questionIds: ['q-one'], narrationGuidance: [] });
++    frozen.contract.lockedAssessments = [{ id: 'q-one', page: 2, type: 'single', question: '听老师读声母：sh。请找出对应的整张卡。', choices: [
++      { label: '第一张图', value: 'A', asset: 'glyph-ch' }, { label: '第二张图', value: 'B', asset: 'glyph-sh' }, { label: '第三张图', value: 'C', asset: 'glyph-zh' },
++    ], answer: 'B', points: 10, analysis: '对应整卡是sh。' }];
++    frozen.sha256 = textbookDigest(frozen.contract);
++    await sql('UPDATE agent_sessions SET prompt=$1', [prompt()]);
++    await fs.writeFile(path.join(input.jobDir, 'frozen.json'), JSON.stringify({ sceneContract: frozen }));
++    await fs.rm(ledgerFile());
++    const guard = createTextbookAuthoringGuard(frozen, sessionId, { classroomsDir: path.join(root, 'classrooms') });
++    const guarded = guard.wrapStore(store as unknown as CourseStore);
++    await guard.context({ stageId, order: 1, type: 'interactive', title: '观察', widgetType: 'simulation', media: [{ src: `/api/classroom-media/${stageId}/media/picture.png`, assetKey: 'picture' }] });
++    await guarded.putScene(stageId, { ...scene, content: { ...scene.content, html: await fs.readFile(input.revisedHtmlPath, 'utf8') } });
++    const assets: MissingLockedQuizInput['assets'] = [];
++    for (const [i, key] of ['glyph-ch', 'glyph-sh', 'glyph-zh'].entries()) {
++      const file = path.join(root, 'classrooms', stageId, 'media', key + '.png');
++      await sharp({ create: { width: 64, height: 64, channels: 3, background: ['red', 'green', 'blue'][i] } }).png().toFile(file);
++      assets.push({ assetKey: key, src: `/api/classroom-media/${stageId}/media/${key}.png`, sha256: hash(await fs.readFile(file)), width: 64, height: 64 });
++    }
++    request = { jobDir: input.jobDir, stageId, page: 2, assets,
++      expectedCurrentDocumentSha256: textbookDigest(await document()), expectedCurrentCandidateSha256: (await readLedger()).sha256 };
++  });
++  it('prepares without writes, reconstructs exact frozen quiz, archives originals and replays idempotently', async () => {
++    const before = (await document())!, beforeLedger = await readLedger();
++    const plan = await prepareMissingLockedQuiz(request, env);
++    expect(await document()).toEqual(before); expect(await readLedger()).toEqual(beforeLedger);
++    await expect(fs.stat(directory(plan))).rejects.toMatchObject({ code: 'ENOENT' });
++    const result = await runMissingLockedQuiz(plan, plan.sha256, env), after = (await document())!;
++    expect(after.scenes[0]).toEqual(before.scenes[0]); expect(after.stage).toEqual(before.stage); expect(after.outline).toEqual(before.outline);
++    expect(after.scenes[1].order).toBe(2); expect(after.scenes[1].actions).toMatchObject([{ type: 'speech', text: frozen.contract.lockedAssessments[0].question }]);
++    expect((after.scenes[1].content as { questions: unknown[] }).questions[0]).toMatchObject({ id: 'q-one', answer: ['B'], points: 10, question: frozen.contract.lockedAssessments[0].question });
++    const ledger = await readLedger();
++    expect(ledger.bindingHistory).toEqual(beforeLedger.bindingHistory);
++    expect(ledger.assetBindings.slice(1)).toMatchObject(request.assets.map(a => ({ ...a, bindingVersion: 1 })));
++    for (const binding of ledger.assetBindings) expect(Object.keys(binding).sort()).toEqual(['assetKey', 'bindingVersion', 'height', 'sha256', 'src', 'status', 'width']);
++    expect(plan.assetProvenance).toBe('operator_deterministic_png');
++    expect(JSON.parse(await fs.readFile(path.join(directory(plan), 'original-document.json'), 'utf8'))).toEqual(before);
++    expect(JSON.parse(await fs.readFile(path.join(directory(plan), 'original-candidate.json'), 'utf8'))).toEqual(beforeLedger);
++    for (const asset of request.assets) expect(hash(await fs.readFile(path.join(directory(plan), asset.sha256 + '.png')))).toBe(asset.sha256);
++    expect(result.providerCalls).toBe(0); expect(result.verification).toBe('static_only_not_play_audio_or_publication');
++    expect(await runMissingLockedQuiz(plan, plan.sha256, env)).toEqual(result);
++    expect((await document())!.scenes).toHaveLength(2);
++  });
++  it.each(['owner', 'session-owner', 'running', 'lease', 'deleted', 'frozen'])('refuses changed live %s before mutation', async kind => {
++    const plan = await prepareMissingLockedQuiz(request, env), before = await document(), ledger = await readLedger();
++    if (kind === 'owner') await sql("UPDATE stage_meta SET owner_id='foreign'");
++    if (kind === 'session-owner') await sql("UPDATE agent_sessions SET owner_id='foreign'");
++    if (kind === 'running') await sql("UPDATE agent_sessions SET status='running'");
++    if (kind === 'lease') await sql("UPDATE agent_sessions SET lease_worker_id='worker'");
++    if (kind === 'deleted') await sql('UPDATE stage_meta SET deleted_at=now()');
++    if (kind === 'frozen') await sql("UPDATE agent_sessions SET prompt='changed'");
++    await expect(runMissingLockedQuiz(plan, plan.sha256, env)).rejects.toThrow('TEXTBOOK_REPAIR_');
++    expect((await sql('SELECT id FROM document_scenes')).rows).toHaveLength(before!.scenes.length); expect(await readLedger()).toEqual(ledger);
++  });
++  it('refuses stale documents, arbitrary scenes, rebinding keys and wrong approval', async () => {
++    const plan = await prepareMissingLockedQuiz(request, env), before = (await document())!;
++    await expect(runMissingLockedQuiz(plan, '0'.repeat(64), env)).rejects.toThrow('PLAN_APPROVAL_SHA');
++    await expect(prepareMissingLockedQuiz({ ...request, scene: {} } as unknown as MissingLockedQuizInput, env)).rejects.toThrow('INPUT_SHAPE');
++    await expect(prepareMissingLockedQuiz({ ...request, page: 1 }, env)).rejects.toThrow('MISSING_QUIZ_FROZEN_PAGE');
++    await expect(prepareMissingLockedQuiz({ ...request, assets: [{ ...request.assets[0], assetKey: 'picture' }, ...request.assets.slice(1)] }, env)).rejects.toThrow('ASSET_SCOPE');
++    await store.saveDocument({ ...before, stage: { ...before.stage, name: 'changed' } });
++    await expect(runMissingLockedQuiz(plan, plan.sha256, env)).rejects.toThrow('DOCUMENT_CHANGED');
++  });
++  it('checks actual PNG bytes, dimensions, file identity and unique choice images', async () => {
++    const plan = await prepareMissingLockedQuiz(request, env);
++    await expect(prepareMissingLockedQuiz({ ...request, assets: [{ ...request.assets[0], width: 65 }, ...request.assets.slice(1)] }, env)).rejects.toThrow('PNG_FORMAT');
++    const file = path.join(root, 'classrooms', stageId, 'media', 'glyph-ch.png');
++    await fs.appendFile(file, 'changed');
++    await expect(runMissingLockedQuiz(plan, plan.sha256, env)).rejects.toThrow('PNG_SHA');
++    const saved = file + '.original'; await fs.rename(file, saved); await fs.symlink(saved, file);
++    await expect(prepareMissingLockedQuiz(request, env)).rejects.toThrow('SYMLINK_REFUSED');
++    expect((await document())!.scenes).toHaveLength(1);
++  });
++  it('recovers a transaction rollback after candidate persistence without duplicating bindings', async () => {
++    const plan = await prepareMissingLockedQuiz(request, env), before = await document();
++    const query = pool.query; let failed = false;
++    pool.query = async (text, args) => { if (text === 'COMMIT' && !failed) { failed = true; throw new Error('missing quiz commit interrupted'); } return query(text, args); };
++    await expect(runMissingLockedQuiz(plan, plan.sha256, env)).rejects.toThrow('missing quiz commit interrupted');
++    pool.query = query; expect(await document()).toEqual(before); expect((await readLedger()).sha256).toBe(plan.afterCandidateSha256);
++    await runMissingLockedQuiz(plan, plan.sha256, env);
++    expect((await document())!.scenes).toHaveLength(2); expect((await readLedger()).assetBindings).toHaveLength(4);
++  });
++  it('recovers a missing receipt after commit, retaining the same original candidate', async () => {
++    const plan = await prepareMissingLockedQuiz(request, env), original = await readLedger(), open = fs.open.bind(fs); let failed = false;
++    vi.spyOn(fs, 'open').mockImplementation(async (...args: Parameters<typeof fs.open>) => { if (String(args[0]).endsWith('/receipt.json') && !failed) { failed = true; throw new Error('missing quiz receipt interrupted'); } return open(...args); });
++    await expect(runMissingLockedQuiz(plan, plan.sha256, env)).rejects.toThrow('missing quiz receipt interrupted');
++    expect((await document())!.scenes).toHaveLength(2);
++    await runMissingLockedQuiz(plan, plan.sha256, env);
++    expect(JSON.parse(await fs.readFile(path.join(directory(plan), 'original-candidate.json'), 'utf8'))).toEqual(original);
++  });
++});
