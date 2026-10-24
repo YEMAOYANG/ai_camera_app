@@ -4,8 +4,9 @@ from contextlib import redirect_stderr, redirect_stdout
 import io
 import hashlib
 import json
+from pathlib import Path
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from content.textbook_audio_language import ENGLISH_AUTO_LANGUAGE_POLICY_SHA256
 from content.textbook_catalog import canonical, digest
@@ -113,7 +114,7 @@ class PreviewAudioV2Tests(unittest.TestCase):
                 patch.object(audit_script, 'OpenMaicFullRuntimeClient', return_value=f.runtime), \
                 patch('sys.argv', argv), redirect_stdout(io.StringIO()):
             audit_script.main()
-        return json.loads((output / 'audit.json').read_text())
+        return json.loads(audit_script.course_text(output / 'audit.json'))
 
     def prepare(self, f, audit):
         row = f.service.get(f.key)
@@ -972,6 +973,31 @@ class PreviewAudioV2Tests(unittest.TestCase):
         changed['contract']['comparisonPolicySha256'] = '0' * 64
         changed['sha256'] = digest({k: v for k, v in changed.items() if k != 'sha256'})
         with self.assertRaises(ApiError): self.prepare(f, changed)
+
+    def test_registered_plan_audio_and_asr_cache_need_no_local_files_or_new_calls(self):
+        f = self.fixture()
+        expected = self.audit(f)
+        registered = [f.folder / 'plan.json', f.root / 'audit' / 'audit.json']
+        registered.extend(f.root / f.cid / 'audio' / (entry['ttsRequestId'] + '.wav')
+                          for entry in expected['segments'])
+        registered.extend(f.root / 'audit' / (entry['asr']['requestId'] + '.json')
+                          for entry in expected['segments'])
+        remote = {path: path.read_bytes() for path in registered}
+        for path in remote:
+            path.unlink()
+        store = Mock()
+        store.config.mode = 'registry'
+        store.project_root = f.root
+        store.resolve.side_effect = lambda path, **kwargs: ({'sha256': sha_bytes(remote[Path(path)])}
+                                                          if Path(path) in remote else None)
+        store.read_bytes.side_effect = lambda path, **kwargs: remote.get(Path(path))
+        f.runtime.get_formal_audio_asr.reset_mock()
+        f.runtime.start_formal_audio_asr.reset_mock()
+        with patch('services.course_file_store.CourseFileStore', return_value=store):
+            self.assertEqual(self.audit(f), expected)
+        f.runtime.get_formal_audio_asr.assert_not_called()
+        f.runtime.start_formal_audio_asr.assert_not_called()
+        self.assertTrue(all(not path.exists() for path in remote))
 
     def test_math_local_repair_preserves_contract_and_only_audits_replaced_audio(self):
         f = self.fixture('math', '请你仔细数一数校园里面一共有三个花盆。')

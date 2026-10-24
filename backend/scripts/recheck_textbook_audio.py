@@ -23,18 +23,19 @@ from content.textbook_preview_audio_contract import compare_transcript
 from core.config import AppConfig
 from core.security import now_ms
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient, OpenMaicFullRuntimeError
+from services.course_file_store import course_bytes, course_exists, course_text
 from services.textbook_preview_audio import verify_segment_receipt
 
 
 def read(path):
-    return json.loads(Path(path).read_text())
+    return json.loads(course_text(path))
 
 
 def immutable(path, value):
     path = Path(path)
     data = canonical(value).encode()
-    if path.exists():
-        if path.read_bytes() != data: raise RuntimeError('Immutable recheck evidence conflict: ' + path.name)
+    if course_exists(path):
+        if course_bytes(path) != data: raise RuntimeError('Immutable recheck evidence conflict: ' + path.name)
         return
     with path.open('xb') as out:
         out.write(data); out.flush()
@@ -61,11 +62,11 @@ def preflight(*, classroom_path, audit_path, audio_directory, selection, expecte
         request_plan = None
         if receipt.get('narrationRevisionId') is not None:
             # verify_segment_receipt has validated the revision ID and actual
-            # immutable local child plan before it is copied into evidence.
+            # immutable child plan before it is copied into evidence.
             request_plan = read(folder / 'textbook-preview-audio/narration-revisions' / receipt['narrationRevisionId'] / 'plan.json')
         effective = validate_tts_request_plan(plan, scenes[key[0]], action, receipt, request_plan)
         policy = policy_for_plan(effective)
-        audio = (folder / 'audio' / (action['audioId'] + '.wav')).read_bytes()
+        audio = course_bytes(folder / 'audio' / (action['audioId'] + '.wav'))
         validate_formal_receipt(receipt, action['text'].strip(), policy_version=policy['policyVersion'])
         validate_receipt_wav(receipt, audio)
         if receipt.get('audioSha256') != original['audioSha256']: raise RuntimeError('Original audit audio changed')
@@ -93,7 +94,7 @@ def preflight(*, classroom_path, audit_path, audio_directory, selection, expecte
 
 
 def verify_alias_sources(evidence, *, plan, classroom, audit, audio_directory, expected_source_sha256, latest):
-    """No text-only skip: revalidate the exact proof AND authoritative local bytes."""
+    """No text-only skip: revalidate the exact proof AND authoritative bytes."""
     from content.textbook_pinyin_alias_alignment import validate_evidence
     aligned = validate_evidence(evidence, plan=plan, classroom=classroom, audit=audit,
         expected_source_sha256=expected_source_sha256, now_ms=latest)
@@ -112,7 +113,7 @@ def verify_alias_sources(evidence, *, plan, classroom, audit, audio_directory, e
         if receipt.get('narrationRevisionId') is not None:
             actual = read(folder / 'textbook-preview-audio/narration-revisions' / receipt['narrationRevisionId'] / 'plan.json')
             if entry.get('requestPlan') != actual: raise RuntimeError('Alias child plan differs from its archive')
-        audio = (folder / 'audio' / (action['audioId'] + '.wav')).read_bytes()
+        audio = course_bytes(folder / 'audio' / (action['audioId'] + '.wav'))
         if base64.b64encode(audio).decode('ascii') != entry['audioBase64']:
             raise RuntimeError('Alias WAV differs from the actual formal audio')
         validate_receipt_wav(receipt, audio)
@@ -125,7 +126,7 @@ def dispatch_once(client, *, entry, directory, policy_version, native_audio_dire
     request = entry['request']; rid = request['requestId']
     response_path = directory / 'response.json'
     intent_path = directory / 'dispatch-intent.json'
-    if response_path.exists():
+    if course_exists(response_path):
         raw = read(response_path)
         response = client._validate_formal_asr_response(raw, request_id=rid,
             require_ephemeral_transcript=True, pronunciation_policy_version=policy_version)
@@ -148,7 +149,7 @@ def dispatch_once(client, *, entry, directory, policy_version, native_audio_dire
         response = {**found, 'transcript': transcript['transcript'], 'completionUsable': True}
         immutable(directory / 'recovered-response.json', {'durableGet': found, 'transcriptArchive': transcript})
         return response
-    if intent_path.exists():
+    if course_exists(intent_path):
         raise RuntimeError('Prior dispatch intent has unknown outcome; no retry even if GET is missing')
     immutable(directory / 'request.json', request)
     immutable(intent_path, {'schemaVersion': 'mira.textbook.audio-asr-dispatch.v1', 'requestId': rid,
@@ -186,7 +187,7 @@ def main():
         plan, classroom, audit, entries = preflight(classroom_path=args.classroom, audit_path=args.audit,
             audio_directory=args.audio_directory, selection=selection, expected_source_sha256=args.source_sha256)
         intent_path = args.output / 'intent.json'
-        created = read(intent_path)['createdAt'] if intent_path.exists() else now_ms()
+        created = read(intent_path)['createdAt'] if course_exists(intent_path) else now_ms()
         alias = read(args.exact_alias_evidence) if args.exact_alias_evidence else None
         if alias is not None:
             verify_alias_sources(alias, plan=plan, classroom=classroom, audit=audit,
@@ -212,7 +213,7 @@ def main():
         for entry in entries:
             policy_version = policy_for_plan(entry.get('requestPlan') or plan)['policyVersion']
             folder = args.output / entry['request']['requestId']
-            if (folder / 'result.json').exists():
+            if course_exists(folder / 'result.json'):
                 result = read(folder / 'result.json')
             else:
                 response = dispatch_once(client, entry=entry, directory=folder, policy_version=policy_version,
@@ -227,7 +228,7 @@ def main():
                 'transcript': result['asr']['transcript'], 'similarityBps': result['comparison']['similarityBps'],
                 'passed': result['comparison']['passed']}, ensure_ascii=False), flush=True)
         manifest_path = args.output / 'recheck.json'
-        completed_at = read(manifest_path)['createdAt'] if manifest_path.exists() else now_ms()
+        completed_at = read(manifest_path)['createdAt'] if course_exists(manifest_path) else now_ms()
         manifest = seal({'schemaVersion': SCHEMA_ALIAS if intent['schemaVersion'] == INTENT_SCHEMA_ALIAS else SCHEMA,
                          'intent': intent, 'segments': results, 'createdAt': completed_at})
         validate_asr_recheck(manifest, plan=plan, classroom=classroom, audit=audit,

@@ -16,6 +16,7 @@ from core.database import Database
 from core.security import now_ms
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient, OpenMaicFullRuntimeError
 from repositories.textbook_repository import TextbookRepository
+from services.course_file_store import course_bytes, course_exists, course_text
 from services.textbook_preview_service import TextbookPreviewService
 from services.textbook_preview_audio import atomic_json, verify_segment_receipt, segment_request_plan
 from services.learning_media_materialization_service import asr_similarity_bps, validate_formal_wav
@@ -49,7 +50,7 @@ def main():
     preview = TextbookPreviewService(TextbookRepository(Database(config.DATABASE_URL)), client)
     row = preview.get(args.key)
     content = json.loads(row['classroom_json'])
-    plan = json.loads((args.classroom_directory / row['classroom_id'] / 'textbook-preview-audio/plan.json').read_text())
+    plan = json.loads(course_text(args.classroom_directory / row['classroom_id'] / 'textbook-preview-audio/plan.json'))
     contract = resolve_audio_contract(plan, json.loads(row['input_json']))
     inheritance = load_inheritance(args.classroom_directory / row['classroom_id'] / 'textbook-preview-audio',
                                    plan, frozen=json.loads(row['input_json']))
@@ -62,7 +63,7 @@ def main():
         if args.listening_review is None and not args.collect_only:
             raise RuntimeError('Formal pinyin requires human listening evidence; ASR cannot approve pronunciation')
         if args.listening_review is not None:
-            listening = json.loads(args.listening_review.read_text())
+            listening = json.loads(course_text(args.listening_review))
             heard = validate_listening_review(plan, content, listening, now_ms=now_ms())
             if any(item['audioSha256'] != receipts.get(item['ttsRequestId'], {}).get('audioSha256') for item in heard.values()):
                 raise RuntimeError('Listening evidence does not match the current formal audio bytes')
@@ -77,15 +78,15 @@ def main():
         result['listeningReview'] = listening
     if inheritance:
         result['operatorParentProvenanceSha256'] = inheritance['provenance']['sha256']
-    reconciliation = (json.loads(args.asr_reconciliation.read_text())
+    reconciliation = (json.loads(course_text(args.asr_reconciliation))
                       if args.asr_reconciliation is not None else None)
     if args.recover_failed_asr:
         import re
         selected_path = args.output / (args.recover_failed_asr + '.json')
         if (contract['legacy'] or plan.get('schemaVersion') == PINYIN_SCHEMA
                 or not re.fullmatch(r'[A-Za-z0-9_]+', args.recover_failed_asr)
-                or not selected_path.is_file()
-                or json.loads(selected_path.read_text()).get('asr', {}).get('status') != 'failed'):
+                or not course_exists(selected_path)
+                or json.loads(course_text(selected_path)).get('asr', {}).get('status') != 'failed'):
             raise RuntimeError('Recovery requires one cached terminal ASR rejection; no dispatch')
     reconciled = set()
     for scene in content['scenes']:
@@ -103,7 +104,7 @@ def main():
             request_plan = plan if inherited is not None else segment_request_plan(
                 plan, receipt, args.classroom_directory / row['classroom_id'] / 'textbook-preview-audio', text=action['text'])
             client_options = pronunciation_client_options(request_plan)
-            audio = (args.classroom_directory / row['classroom_id'] / 'audio' / (action['audioId'] + '.wav')).read_bytes()
+            audio = course_bytes(args.classroom_directory / row['classroom_id'] / 'audio' / (action['audioId'] + '.wav'))
             if plan.get('schemaVersion') == PINYIN_SCHEMA:
                 validate_receipt_wav(receipt, audio)
             sha = hashlib.sha256(audio).hexdigest()
@@ -115,8 +116,8 @@ def main():
                 # Original raw ASR remains in the immutable parent archive.
                 # Only this new aggregate gains target-policy evidence.
                 entry = inherited
-            elif path.exists():
-                entry = json.loads(path.read_text())
+            elif course_exists(path):
+                entry = json.loads(course_text(path))
                 if entry['audioSha256'] != sha or entry['textSha256'] != hashlib.sha256(action['text'].strip().encode()).hexdigest():
                     raise RuntimeError('Audio audit identity changed')
             else:
@@ -151,11 +152,11 @@ def main():
             if inherited is None and entry.get('asr', {}).get('status') == 'failed':
                 from content.textbook_asr_terminal_recovery import evidence, request_id as recovery_id
                 recovery_path = args.output / (recovery_id(request_id) + '.json')
-                if recovery_path.exists() or args.recover_failed_asr == request_id:
+                if course_exists(recovery_path) or args.recover_failed_asr == request_id:
                     proof = evidence(entry, plan_sha256=digest(plan), action=action,
                         scene_id=scene['id'], expected_request_id=request_id, audio_sha256=sha)
-                    if recovery_path.exists():
-                        entry = json.loads(recovery_path.read_text())
+                    if course_exists(recovery_path):
+                        entry = json.loads(course_text(recovery_path))
                     else:
                         if args.preflight_existing:
                             raise RuntimeError('ASR recovery is missing; preflight performs no dispatch')
@@ -170,7 +171,7 @@ def main():
                                 raise
                             found = None
                         intent_path = args.output / (recovery_request + '.intent.json')
-                        if found is not None or intent_path.exists():
+                        if found is not None or course_exists(intent_path):
                             raise RuntimeError('Existing ASR recovery needs receipt recovery; will not dispatch again')
                         with intent_path.open('x') as stream:
                             stream.write(canonical(proof))
@@ -224,7 +225,11 @@ def main():
     result['passed'] = bool(result['segments']) and all(
         s['similarityBps'] >= 8500 if contract['legacy'] else s['comparison']['passed'] for s in result['segments'])
     result['sha256'] = digest(result)
-    atomic_json(args.output / 'audit.json', result)
+    aggregate = args.output / 'audit.json'
+    # Reuse identical archived evidence. If it differs, read its version before
+    # atomic_json applies the existing guarded writer; never create a shadow.
+    if not course_exists(aggregate) or course_bytes(aggregate) != canonical(result).encode('utf-8'):
+        atomic_json(aggregate, result)
     print(json.dumps({'passed': result['passed'], 'segments': len(result['segments']), 'auditSha256': result['sha256'],
                       'collectionOnly': args.collect_only, 'pronunciationAcceptancePending': args.collect_only,
                       'reconciledSegments': len(reconciled), 'publicationAllowed': False}))

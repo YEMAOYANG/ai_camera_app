@@ -1,11 +1,12 @@
 """Synthetic no-provider fixtures and once-only transport interruption tests."""
 import base64
+from contextlib import contextmanager
 from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from content.textbook_audio_recheck import (SCHEMA, build_intent, logical_request, provider_body,
     request_id, seal, validate_asr_recheck)
@@ -65,6 +66,19 @@ class AudioRecheckTests(unittest.TestCase):
         return validate_asr_recheck(manifest if manifest is not None else self.manifest,
             plan=self.f.plan, classroom=self.f.classroom, audit=self.f.audit,
             expected_source_sha256=self.f.row['classroom_sha256'], now_ms=self.now)
+
+    @contextmanager
+    def registered_only(self, paths):
+        remote = {path: path.read_bytes() for path in paths}
+        for path in remote:
+            path.unlink()
+        store = Mock()
+        store.resolve.side_effect = lambda path, **kwargs: ({'sha256': hashlib.sha256(remote[Path(path)]).hexdigest()}
+                                                          if Path(path) in remote else None)
+        store.read_bytes.side_effect = lambda path, **kwargs: remote.get(Path(path))
+        with patch('services.course_file_store.CourseFileStore', return_value=store):
+            yield remote
+        self.assertTrue(all(not path.exists() for path in remote))
 
     def test_complete_independent_results_preserve_original_false_and_bytes(self):
         before = canonical(self.f.audit)
@@ -193,6 +207,25 @@ class AudioRecheckTests(unittest.TestCase):
         (archive / 'plan.json').write_text('{}')
         with self.assertRaises(ApiError): preflight(**kwargs)
 
+    def test_registered_revised_preflight_and_immutable_evidence_need_no_local_shadow(self):
+        revision, kwargs, archive = self.revised_single_segment()
+        folder = self.f.root / self.f.cid / 'textbook-preview-audio'
+        action = self.f.classroom['scenes'][0]['actions'][0]
+        paths = [kwargs['classroom_path'], kwargs['audit_path'], folder / 'plan.json',
+                 folder / 'receipts.json', archive / 'plan.json',
+                 self.f.root / self.f.cid / 'audio' / (action['audioId'] + '.wav')]
+        with self.registered_only(paths) as remote:
+            plan, classroom, audit, entries = preflight(**kwargs)
+            self.assertEqual(plan, self.f.plan)
+            self.assertEqual(classroom, self.f.classroom)
+            self.assertEqual(audit, self.f.audit)
+            self.assertEqual(entries[0]['requestPlan'], revision)
+            self.assertEqual(entries[0]['audioBase64'], self.manifest['segments'][0]['audioBase64'])
+            immutable(archive / 'plan.json', revision)
+            with self.assertRaisesRegex(RuntimeError, 'Immutable recheck evidence conflict'):
+                immutable(archive / 'plan.json', {**revision, 'revisionId': '0' * 64})
+            self.assertEqual(json.loads(remote[archive / 'plan.json']), revision)
+
     def test_revision_recheck_survives_publication_and_still_low_is_rejected(self):
         from tests.test_textbook_pinyin_operator_review import OperatorReviewTests
         from content.textbook_release import validate_release
@@ -242,6 +275,24 @@ class AudioRecheckTests(unittest.TestCase):
         with self.assertRaises(TimeoutError): self.once(client, folder)
         with self.assertRaisesRegex(RuntimeError, 'unknown outcome'): self.once(client, folder)
         self.assertEqual(client._request_formal_audio_json.call_count, 1)
+
+    def test_registered_cached_response_and_unknown_intent_never_redispatch(self):
+        for cached in ('response.json', 'dispatch-intent.json'):
+            with self.subTest(cached=cached):
+                client = self.client()
+                folder = self.f.root / ('remote-' + cached)
+                folder.mkdir()
+                path = folder / cached
+                immutable(path, self.manifest['segments'][0]['asr'] if cached == 'response.json'
+                          else {'maximumPostAttempts': 1})
+                with self.registered_only([path]):
+                    if cached == 'response.json':
+                        self.assertEqual(self.once(client, folder), self.manifest['segments'][0]['asr'])
+                        client.get_formal_audio_asr.assert_not_called()
+                    else:
+                        with self.assertRaisesRegex(RuntimeError, 'unknown outcome'):
+                            self.once(client, folder)
+                client._request_formal_audio_json.assert_not_called()
 
     def test_existing_native_in_other_output_never_posts(self):
         client = self.client(); client.get_formal_audio_asr.side_effect = None
