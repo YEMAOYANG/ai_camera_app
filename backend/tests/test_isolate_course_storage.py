@@ -1,5 +1,5 @@
 """Isolation exercises only fresh private fixtures, never real course originals."""
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import replace
 import hashlib
 import io
@@ -39,6 +39,41 @@ class CourseStorageIsolationTest(unittest.TestCase):
 
     def journal(self):
         return self.state / 'journal.json'
+
+    def registry_scope(self, scope_key, entries, *, preview_key=None, content_key=None):
+        metadata = {'scopeKey': scope_key}
+        if preview_key is not None:
+            metadata['previewKey'] = preview_key
+        if content_key is not None:
+            metadata['contentKey'] = content_key
+        return {'storage_id': isolation.storage_id_for(self.config.endpoint, self.config.bucket, self.config.region),
+            'scope_key': scope_key, 'preview_key': preview_key, 'content_key': content_key,
+            'classroom_id': None, 'course_id': None, 'course_version': None,
+            'scope_json': json.dumps(metadata),
+            'bindings_json': json.dumps([{'sourcePath': e['sourcePath'], 'sha256': e['sha256'],
+                'sourcePathSha256': hashlib.sha256(e['sourcePath'].encode()).hexdigest()} for e in entries])}
+
+    def scoped_database(self, scopes, heads, *, current=True, owners=None):
+        conn, database = Mock(), Mock()
+        database.connect.return_value = conn
+        def execute(sql, params=()):
+            cursor = Mock()
+            if sql.startswith(('SET ', 'START ')):
+                return cursor
+            if sql.startswith(('SELECT p.preview_key', 'SELECT b.content_key')):
+                cursor.fetchone.return_value = {'key': params[0]} if current else None
+            elif 'FROM course_storage_scopes' in sql and 'AND scope_key=?' in sql:
+                cursor.fetchone.return_value = (owners or {}).get(params[1])
+            elif 'FROM course_storage_scopes' in sql:
+                cursor.fetchall.return_value = scopes
+            elif 'FROM course_storage_heads' in sql:
+                cursor.fetchall.return_value = [{**e, 'pathSha256': hashlib.sha256(e['sourcePath'].encode()).hexdigest()}
+                    for e in heads]
+            else:
+                raise AssertionError(sql)
+            return cursor
+        conn.execute.side_effect = execute
+        return database, conn
 
     def test_plan_is_private_durable_and_only_exact_registered_files_and_legacy_index(self):
         entry = self.source('lesson.json')
@@ -277,3 +312,137 @@ class CourseStorageIsolationTest(unittest.TestCase):
             isolation.current_heads(database, self.config)
         conn.rollback.assert_called_once()
         conn.close.assert_called_once()
+
+    def test_preview_scope_selects_only_bound_current_heads_in_read_only_snapshot(self):
+        key, owner = 'a' * 64, 'b' * 64
+        entry = self.source('one.json')
+        shared = self.source('shared.png', b'picture')
+        scopes = [self.registry_scope(owner, [entry, shared], preview_key=key)]
+        # A same-version shared dependency remains eligible even when another
+        # course owns its head. Its actual current owner is fenced in the plan.
+        expected = [{**entry, 'scopeKey': owner}, {**shared, 'scopeKey': 'c' * 64}]
+        database, conn = self.scoped_database(scopes, expected)
+        self.assertEqual(isolation.current_heads(database, self.config, preview_key=key), expected)
+        statements = [call.args[0] for call in conn.execute.call_args_list]
+        self.assertIn('READ ONLY', statements[1])
+        self.assertIn('p.status IN', statements[2])
+        self.assertIn('r.retired_at IS NULL', statements[2])
+        self.assertIn('preview_key=?', statements[3])
+        self.assertIn('h.source_path_sha256 IN (?,?)', statements[4])
+        self.assertTrue(all(sql.startswith(('SELECT ', 'SET ', 'START ')) for sql in statements))
+        conn.rollback.assert_called_once()
+        conn.close.assert_called_once()
+
+    def test_content_scope_requires_current_published_released_nonretired_build(self):
+        key, owner = 'a' * 64, 'b' * 64
+        entry = {**self.source('one.json'), 'scopeKey': owner}
+        database, conn = self.scoped_database([self.registry_scope(owner, [entry], content_key=key)], [entry])
+        self.assertEqual(isolation.current_heads(database, self.config, content_key=key), [entry])
+        statements = [call.args[0] for call in conn.execute.call_args_list]
+        self.assertIn("b.status='published'", statements[2])
+        self.assertIn("c.quality_status='released'", statements[2])
+        self.assertIn('c.retired_at IS NULL AND r.retired_at IS NULL', statements[2])
+        self.assertIn('content_key=?', statements[3])
+
+    def test_scoped_selection_rejects_retired_missing_or_unusable_course_before_reading_scopes(self):
+        database, conn = self.scoped_database([], [], current=False)
+        with self.assertRaisesRegex(isolation.IsolationError, 'scope_not_current'):
+            isolation.current_heads(database, self.config, preview_key='a' * 64)
+        self.assertEqual(len(conn.execute.call_args_list), 3)
+
+    def test_scoped_selection_uses_new_head_only_when_current_owner_binds_same_course(self):
+        key, old_owner, new_owner = 'a' * 64, 'b' * 64, 'c' * 64
+        old = self.source('one.json', b'old')
+        current = {**self.source('one.json', b'current'), 'scopeKey': new_owner}
+        scopes = [self.registry_scope(old_owner, [old], preview_key=key)]
+        database, _ = self.scoped_database(scopes, [current],
+            owners={new_owner: self.registry_scope(new_owner, [current], preview_key=key)})
+        self.assertEqual(isolation.current_heads(database, self.config, preview_key=key), [current])
+        other_owner = self.registry_scope(new_owner, [current], preview_key='d' * 64)
+        database, _ = self.scoped_database(scopes, [current], owners={new_owner: other_owner})
+        with self.assertRaisesRegex(isolation.IsolationError, 'scope_head_conflict'):
+            isolation.current_heads(database, self.config, preview_key=key)
+
+    def test_scoped_selection_does_not_silently_skip_missing_current_head(self):
+        key, owner = 'a' * 64, 'b' * 64
+        entry = self.source('one.json')
+        database, _ = self.scoped_database([self.registry_scope(owner, [entry], preview_key=key)], [])
+        with self.assertRaisesRegex(isolation.IsolationError, 'scope_head_missing'):
+            isolation.current_heads(database, self.config, preview_key=key)
+
+    def test_scoped_roundtrip_never_inspects_or_moves_global_index_and_restores_offline(self):
+        key, owner = 'a' * 64, 'b' * 64
+        entry = {**self.source('one.json'), 'scopeKey': owner}
+        other = self.source('other-course.json')
+        index = self.root / isolation.INDEX_PATH
+        index.parent.mkdir(parents=True)
+        index.write_bytes(b'keep global index')
+        result = isolation.isolate(self.root, config=self.config, heads=[entry], state_dir=self.state, preview_key=key)
+        self.assertEqual((result['filesToMove'], result['legacyIndexFiles']), (1, 0))
+        self.assertEqual(index.read_bytes(), b'keep global index')
+        self.assertTrue((self.root / other['sourcePath']).exists())
+        journal = isolation._load_journal(self.journal())[2]
+        self.assertEqual(journal['scope'], {'previewKey': key})
+        self.assertEqual(journal['entries'][0]['scopeKey'], owner)
+        self.assertEqual(journal['headsSha256'], isolation._sha(isolation._json([entry])))
+        with patch('core.config.AppConfig.from_env', side_effect=AssertionError('offline restore')), redirect_stdout(io.StringIO()):
+            self.assertEqual(isolation.main(['restore', '--journal', str(self.journal())]), 0)
+        self.assertTrue((self.root / entry['sourcePath']).exists())
+        self.assertEqual(index.read_bytes(), b'keep global index')
+
+    def test_scoped_resume_fences_selector_and_head_owner_even_for_identical_file_bytes(self):
+        key = 'a' * 64
+        entry = {**self.source('one.json'), 'scopeKey': 'b' * 64}
+        isolation.plan_isolation(self.root, config=self.config, heads=[entry], state_dir=self.state, preview_key=key)
+        with patch.object(isolation, '_rename_exclusive') as move:
+            for selection in ({}, {'content_key': key}, {'preview_key': 'c' * 64}):
+                with self.assertRaisesRegex(isolation.IsolationError, 'scope_changed'):
+                    isolation.isolate(self.root, config=self.config, heads=[entry], state_dir=self.state, **selection)
+            with self.assertRaisesRegex(isolation.IsolationError, 'heads_changed'):
+                isolation.isolate(self.root, config=self.config, heads=[{**entry, 'scopeKey': 'd' * 64}],
+                                  state_dir=self.state, preview_key=key)
+            move.assert_not_called()
+        self.assertTrue((self.root / entry['sourcePath']).exists())
+
+    def test_scoped_plan_rejects_missing_owner_and_local_version_mismatch_before_journal(self):
+        key = 'a' * 64
+        entry = self.source('one.json')
+        with self.assertRaisesRegex(isolation.IsolationError, 'scoped_heads_required'):
+            isolation.plan_isolation(self.root, config=self.config, heads=[entry], state_dir=self.state, preview_key=key)
+        current = {**entry, 'scopeKey': 'b' * 64, 'sha256': 'c' * 64}
+        with self.assertRaisesRegex(isolation.IsolationError, 'integrity_mismatch'):
+            isolation.isolate(self.root, config=self.config, heads=[current], state_dir=self.state, preview_key=key)
+        self.assertFalse(self.state.exists())
+        self.assertTrue((self.root / entry['sourcePath']).exists())
+
+    def test_scope_api_and_cli_selectors_are_validated_before_database_or_movement(self):
+        database = Mock()
+        for selection in ({'preview_key': 'not-a-key'}, {'preview_key': 'a' * 64, 'content_key': 'b' * 64}):
+            with self.assertRaises(isolation.IsolationError):
+                isolation.current_heads(database, self.config, **selection)
+        database.connect.assert_not_called()
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
+            isolation.main(['plan', '--project-root', str(self.root), '--preview-key', 'a' * 64,
+                            '--content-key', 'b' * 64])
+        self.assertEqual(error.exception.code, 2)
+
+    def test_cli_forwards_exact_selector_to_selection_and_isolation_and_keeps_default(self):
+        for operation in ('plan', 'isolate'):
+            for option in (None, '--preview-key', '--content-key'):
+                selection = {'preview_key': None, 'content_key': None}
+                argv = [operation, '--project-root', str(self.root), '--state-dir', str(self.state)]
+                if option is not None:
+                    argv += [option, 'a' * 64]
+                    selection[option[2:].replace('-', '_')] = 'a' * 64
+                expected_heads, database = [self.source('one.json')], Mock()
+                function = 'plan_isolation' if operation == 'plan' else 'isolate'
+                with patch('core.config.AppConfig.from_env', return_value=Mock(DATABASE_URL='private-fixture')), \
+                     patch('core.database.Database', return_value=database), \
+                     patch.object(isolation.CourseStorageConfig, 'from_env', return_value=self.config), \
+                     patch.object(isolation, 'current_heads', return_value=expected_heads) as select, \
+                     patch.object(isolation, function, return_value={'phase': 'fixture'}) as run, \
+                     redirect_stdout(io.StringIO()):
+                    self.assertEqual(isolation.main(argv), 0)
+                select.assert_called_once_with(database, self.config, **selection)
+                run.assert_called_once_with(str(self.root), config=self.config, heads=expected_heads,
+                                            state_dir=str(self.state), **selection)

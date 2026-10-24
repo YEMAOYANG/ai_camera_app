@@ -416,6 +416,7 @@ class ArchiveSnapshot:
     source_files: list[Path] = field(default_factory=list)
     material_sources: dict[str, dict] = field(default_factory=dict)
     material_bindings: list[dict] = field(default_factory=list)
+    operator_repair_bindings: list[dict] = field(default_factory=list)
     private_source_files: list[Path] = field(default_factory=list)
     media: list[dict] = field(default_factory=list)
     recovered_aliases: list[dict] = field(default_factory=list)
@@ -640,7 +641,11 @@ class CourseArchiveExporter:
             if not (item.get("ref") in recovered and item.get("reason") == reason)]}
 
     def list_courses(self, conn, *, include_saved=False):
-        """List identities without media reads, generation, session or DB writes."""
+        """List identities without generation, session or DB writes.
+
+        Completed missing-quiz repairs additionally bind their fixed evidence
+        so a previously delivered archive can receive the new originals.
+        """
         result, published_previews = [], set()
         for key in releases._current_keys(conn, None):
             row = conn.execute("SELECT b.content_key,b.course_id,b.course_version,b.input_json,"
@@ -652,11 +657,17 @@ class CourseArchiveExporter:
             frozen = releases.parsed(row["input_json"])
             if frozen.get("previewKey"):
                 published_previews.add(frozen["previewKey"])
-            preview = (conn.execute("SELECT updated_at,result_json FROM learning_textbook_course_previews WHERE preview_key=?",
+            preview = (conn.execute("SELECT updated_at,result_json,input_json FROM learning_textbook_course_previews WHERE preview_key=?",
                 (frozen["previewKey"],)).fetchone() if frozen.get("previewKey") else None)
-            source_revision = _sha(_json({"buildUpdatedAt": row["build_updated_at"],
+            # Preserve the previous revision for unaffected completed archives.
+            revision = {"buildUpdatedAt": row["build_updated_at"],
                 "courseUpdatedAt": row["course_updated_at"], "frozenSha256": _sha(row["input_json"].encode()),
-                "releaseSha256": row["release_sha256"], "preview": dict(preview) if preview else None}))
+                "releaseSha256": row["release_sha256"],
+                "preview": {k: preview[k] for k in ("updated_at", "result_json")} if preview else None}
+            repair_revision = self._operator_repair_revision(releases.parsed(preview.get("input_json") or "{}") if preview else {})
+            if repair_revision is not None:
+                revision["operatorRepairEvidenceSha256"] = repair_revision
+            source_revision = _sha(_json(revision))
             result.append({"courseId": row["course_id"], "courseVersion": row["course_version"],
                 "contentKey": key, "title": row["title"], "subject": row["subject"],
                 "gradeCode": row["grade_code"], "status": "published", "sourceKind": "textbook_release",
@@ -685,15 +696,19 @@ class CourseArchiveExporter:
                 if row["preview_key"] in published_previews:
                     continue
                 frozen = releases.parsed(row["input_json"])
+                revision = {"classroomSha256": row["classroom_sha256"],
+                    "status": row["status"], "updatedAt": row["updated_at"], "input": row["input_json"],
+                    "result": row["result_json"]}
+                repair_revision = self._operator_repair_revision(frozen)
+                if repair_revision is not None:
+                    revision["operatorRepairEvidenceSha256"] = repair_revision
                 result.append({"courseId": "textbook-preview:" + row["preview_key"],
                     "courseVersion": "saved-" + row["classroom_sha256"][:16], "contentKey": None,
                     "previewKey": row["preview_key"], "classroomId": row["classroom_id"],
                     "sourceDigest": row["classroom_sha256"], "title": frozen.get("lessonTitle", "已保存课件"),
                     "subject": frozen.get("subject"), "gradeCode": frozen.get("gradeCode"),
                     "status": "generated_saved", "reviewStatus": row["status"], "sourceKind": "textbook_preview",
-                    "archiveSourceRevision": _sha(_json({"classroomSha256": row["classroom_sha256"],
-                        "status": row["status"], "updatedAt": row["updated_at"], "input": row["input_json"],
-                        "result": row["result_json"]}))})
+                    "archiveSourceRevision": _sha(_json(revision))})
         return result
 
     def export_saved_preview(self, conn, *, preview_key, staging_root, release=None):
@@ -1191,7 +1206,7 @@ class CourseArchiveExporter:
     def _native_canonical(snapshot):
         # Use the producer's JavaScript number and UTF-16 key serialization.
         # Python JSON differs for 1e-7, integral floats and astral object keys.
-        code = r"""let s='';process.stdin.on('data',v=>s+=v);process.stdin.on('end',()=>{const sort=x=>Array.isArray(x)?x.map(sort):x&&typeof x==='object'?Object.fromEntries(Object.entries(x).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>[k,sort(v)])):x;process.stdout.write(JSON.stringify(sort(JSON.parse(s))));});"""
+        code = r"""let s='';process.stdin.setEncoding('utf8');process.stdin.on('data',v=>s+=v);process.stdin.on('end',()=>{const sort=x=>Array.isArray(x)?x.map(sort):x&&typeof x==='object'?Object.fromEntries(Object.entries(x).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>[k,sort(v)])):x;process.stdout.write(JSON.stringify(sort(JSON.parse(s))));});"""
         result = subprocess.run(["node", "-e", code], input=releases.canonical(snapshot),
                                 text=True, capture_output=True, timeout=15)
         _require(result.returncode == 0 and isinstance(json.loads(result.stdout), dict),
@@ -1350,6 +1365,7 @@ class CourseArchiveExporter:
         session, stage = authoring.get("sessionId"), authoring.get("stageId")
         if session and stage:
             self._add_course_materials(snapshot, stage_id=stage, session_id=session)
+            self._add_operator_repairs(snapshot, session, stage)
         if isinstance(session, str) and isinstance(stage, str) and _ID.fullmatch(stage):
             # Complete-scene review is immutable evidence owned by this frozen
             # authoring session and stage, separate from exported classroom data.
@@ -1441,6 +1457,9 @@ class CourseArchiveExporter:
         owned = matches(jobs)
         if not owned and not session_id:
             owned = matches(self._workbench_jobs(refresh=True))
+        repair_sessions = {session_id} if session_id else {state.get("sessionId") for _, _, state in owned}
+        for repair_session in sorted(s for s in repair_sessions if isinstance(s, str)):
+            self._add_operator_repairs(snapshot, repair_session, stage_id)
         self._add_course_materials(snapshot, stage_id=stage_id, session_id=session_id,
                                    source_digest=source_digest)
         # No Backend job means this was authored directly in Native. Its
@@ -1455,6 +1474,227 @@ class CourseArchiveExporter:
             # it local and explain its omission without publishing its values.
             snapshot.private_source_files.append(job / "state.json")
             self._native_textbook_metadata(snapshot, frozen)
+
+    _OPERATOR_REPAIRS = {
+        "textbook-missing-locked-quiz-repairs": "missing-locked-quiz",
+        "textbook-rejected-quiz-locked-question-reviews": "rejected-quiz-locked-question-review",
+        "textbook-saved-scene-repairs": "saved-scene-html-repair",
+    }
+
+    def _repair_receipts(self, session, stage, directory):
+        _require(isinstance(session, str) and 0 < len(session) <= 255 and _ID.fullmatch(session)
+                 and isinstance(stage, str) and 0 < len(stage) <= 255 and stage not in {".", ".."}
+                 and _ID.fullmatch(stage),
+                 "operator_repair_identity_invalid")
+        root = self.native_root / "data" / directory / _sha(session.encode()) / stage
+        paths = sorted(course_glob(root, "*/receipt.json"))
+        _require(len(paths) <= 256, "operator_repair_count_exceeded")
+        return [self._source_path(p) for p in paths]
+
+    def _operator_repair_revision(self, original_input):
+        """Only the new missing-quiz schema invalidates an old completed job.
+
+        Other existing courses retain their exact previous catalog revision;
+        their next normal export still collects all supported repair evidence.
+        """
+        authoring = original_input.get("authoring", {})
+        session, stage = authoring.get("sessionId"), authoring.get("stageId")
+        if not session or not stage:
+            return None
+        receipts = self._repair_receipts(session, stage, "textbook-missing-locked-quiz-repairs")
+        if not receipts:
+            return None
+        evidence = self._operator_repair_inventory(session, stage)
+        return _sha(_json(evidence))
+
+    def _operator_repair_inventory(self, session, stage):
+        """Capture completed exact-session evidence, including immutable originals.
+
+        Enumerate three precise prefixes, never the Native data tree. Registered
+        files use the same remote-first readers as every other course original.
+        No receipt means an unfinished intent and is deliberately not selected.
+        """
+        receipts = [(directory, p) for directory in self._OPERATOR_REPAIRS
+                    for p in self._repair_receipts(session, stage, directory)]
+        files = {}
+        # The textbook producer sorts Unicode code points and renders object
+        # members itself (JSON.stringify alone reorders numeric-looking keys).
+        def digest(parsed):
+            code = r"""let s='';process.stdin.setEncoding('utf8');process.stdin.on('data',v=>s+=v);process.stdin.on('end',()=>{const cmp=(a,b)=>{a=Array.from(a,c=>c.codePointAt(0));b=Array.from(b,c=>c.codePointAt(0));for(let i=0;i<Math.min(a.length,b.length);i++)if(a[i]!==b[i])return a[i]-b[i];return a.length-b.length;};const c=x=>Array.isArray(x)?'['+x.map(c).join(',')+']':x&&typeof x==='object'?'{'+Object.keys(x).sort(cmp).map(k=>JSON.stringify(k)+':'+c(x[k])).join(',')+'}':JSON.stringify(x);process.stdout.write(c(JSON.parse(s)));});"""
+            result = subprocess.run(["node", "-e", code], input=releases.canonical(parsed),
+                                    text=True, capture_output=True, timeout=15)
+            _require(result.returncode == 0, "operator_repair_digest_unavailable")
+            return _sha(result.stdout.encode())
+
+        def read(path, *, checksum=None, limit=64 * 1024 * 1024):
+            path = self._source_path(path)
+            _require(course_exists(path) and 0 < course_stat(path).st_size <= limit,
+                     "operator_repair_source_missing_or_oversized")
+            raw = course_bytes(path)
+            _require(0 < len(raw) <= limit and (checksum is None or _sha(raw) == checksum),
+                     "operator_repair_source_hash_mismatch")
+            files[path.relative_to(self.root).as_posix()] = _sha(raw)
+            return raw
+
+        def parse(raw):
+            _require(isinstance(raw, (bytes, str)), "operator_repair_json_invalid")
+            try:
+                parsed = json.loads(raw)
+            except (ValueError, UnicodeError) as error:
+                raise CourseArchiveError("operator_repair_json_invalid") from error
+            _require(isinstance(parsed, dict), "operator_repair_json_invalid")
+            return parsed
+
+        def value(path, *, checksum=None):
+            return parse(read(path, checksum=checksum))
+
+        def sealed(parsed):
+            _require(isinstance(parsed, dict), "operator_repair_seal_invalid")
+            checksum = parsed.get("sha256")
+            _require(re.fullmatch(r"[a-f0-9]{64}", str(checksum))
+                     and digest({k: v for k, v in parsed.items() if k != "sha256"}) == checksum,
+                     "operator_repair_seal_invalid")
+            return parsed
+
+        if not receipts:
+            return {"sessionId": session, "stageId": stage, "files": {}, "receipts": []}
+        candidate_path = self.native_root / "data/classrooms" / stage / "textbook-authoring-candidate.json"
+        candidate = sealed(value(candidate_path))
+        contract = candidate.get("frozenContract", {})
+        _require(isinstance(contract, dict) and contract.get("schemaVersion") == "mira.frozen-textbook-scene-authoring.v1"
+                 and isinstance(contract.get("contract"), dict) and digest(contract["contract"]) == contract.get("sha256"),
+                 "operator_repair_contract_invalid")
+        _require(candidate.get("schemaVersion") == "mira.textbook.authoring-candidate.v1"
+                 and candidate.get("sessionId") == session and candidate.get("stageId") == stage
+                 and candidate.get("status") == "author_candidate"
+                 and candidate.get("verification") == "static_contract_only_not_play_or_semantic_review",
+                 "operator_repair_candidate_unbound")
+        # The mutable current ledger establishes ownership, but is already
+        # captured by the stage adapter and is not immutable repair evidence.
+        files.pop(candidate_path.relative_to(self.root).as_posix())
+        completed = []
+        for directory, receipt_path in receipts:
+            plan = sealed(value(receipt_path.parent / "intent.json"))
+            receipt = sealed(value(receipt_path))
+            schema = "mira.textbook." + self._OPERATOR_REPAIRS[directory]
+            _require(plan.get("schemaVersion") == schema + "-plan.v1"
+                     and receipt.get("schemaVersion") == schema + "-receipt.v1"
+                     and receipt_path.parent.name == plan["sha256"]
+                     and receipt.get("planSha256") == plan["sha256"]
+                     and all(p.get("sessionId") == session and p.get("stageId") == stage for p in (plan, receipt))
+                     and plan.get("contractSha256") == contract["sha256"]
+                     and receipt.get("status") == "static_candidate_accepted"
+                     and receipt.get("providerCalls") == 0
+                     and all(p.get("verification") == "static_only_not_play_audio_or_publication" for p in (plan, receipt)),
+                     "operator_repair_receipt_unbound")
+            scene_sha = plan.get("sceneSha256", plan.get("revisedSceneSha256"))
+            _require(all(re.fullmatch(r"[a-f0-9]{64}", str(plan.get(k))) for k in
+                         ("beforeDocumentSha256", "afterDocumentSha256", "beforeCandidateSha256", "afterCandidateSha256"))
+                     and re.fullmatch(r"[a-f0-9]{64}", str(scene_sha))
+                     and receipt.get("sceneId") == plan.get("sceneId")
+                     and receipt.get("sceneSha256") == scene_sha
+                     and receipt.get("documentSha256") == plan["afterDocumentSha256"]
+                     and receipt.get("candidateSha256") == plan["afterCandidateSha256"],
+                     "operator_repair_result_mismatch")
+            inputs = plan.get("input", {})
+            _require(isinstance(inputs, dict) and isinstance(inputs.get("jobDir"), str), "operator_repair_input_invalid")
+            job = self._source_path(inputs.get("jobDir", ""))
+            _require(job.is_relative_to(self.root / "output") and job.name == "authoring-job"
+                     and job.parent.name.startswith("teaching-"), "operator_repair_job_unbound")
+            frozen = value(job / "frozen.json")
+            _require(frozen.get("sceneContract") == contract, "operator_repair_job_unbound")
+
+            def original(field, checksum_field):
+                _require(isinstance(inputs.get(field), str), "operator_repair_original_unbound")
+                path = self._source_path(inputs.get(field, ""))
+                checksum = inputs.get(checksum_field)
+                _require(path.is_relative_to(job.parent) and re.fullmatch(r"[a-f0-9]{64}", str(checksum)),
+                         "operator_repair_original_unbound")
+                return read(path, checksum=checksum)
+
+            if directory == "textbook-missing-locked-quiz-repairs":
+                before = value(receipt_path.parent / "original-document.json")
+                ledger = sealed(value(receipt_path.parent / "original-candidate.json"))
+                _require(digest(before) == plan["beforeDocumentSha256"]
+                         and before.get("stage", {}).get("id") == stage
+                         and ledger["sha256"] == plan["beforeCandidateSha256"]
+                         and ledger.get("sessionId") == session and ledger.get("stageId") == stage
+                         and ledger.get("frozenContract") == contract
+                         and inputs.get("stageId") == stage
+                         and inputs.get("expectedCurrentDocumentSha256") == plan["beforeDocumentSha256"]
+                         and inputs.get("expectedCurrentCandidateSha256") == plan["beforeCandidateSha256"]
+                         and plan.get("assetProvenance") == receipt.get("assetProvenance") == "operator_deterministic_png",
+                         "operator_repair_original_mismatch")
+                assets = inputs.get("assets")
+                _require(isinstance(assets, list) and len(assets) <= 128, "operator_repair_assets_invalid")
+                from PIL import Image
+                for asset in assets:
+                    _require(isinstance(asset, dict) and re.fullmatch(r"[a-f0-9]{64}", str(asset.get("sha256")))
+                             and isinstance(asset.get("src"), str)
+                             and re.fullmatch(r"/api/classroom-media/" + re.escape(stage) + r"/media/[A-Za-z0-9_.-]+\.png", asset["src"]),
+                             "operator_repair_assets_invalid")
+                    raw = read(receipt_path.parent / (asset["sha256"] + ".png"), checksum=asset["sha256"], limit=32 * 1024 * 1024)
+                    validate_material_bytes(raw, "image/png")
+                    try:
+                        with Image.open(BytesIO(raw)) as image:
+                            _require(type(asset.get("width")) is int and type(asset.get("height")) is int
+                                     and image.size == (asset["width"], asset["height"])
+                                     and image.width * image.height <= 40_000_000, "operator_repair_asset_dimensions_invalid")
+                            image.load()
+                    except OSError as error:
+                        raise CourseArchiveError("operator_repair_asset_decode_invalid") from error
+            elif directory == "textbook-rejected-quiz-locked-question-reviews":
+                _require(isinstance(inputs.get("archivePath"), str), "operator_repair_rejection_unbound")
+                archive = self._source_path(inputs.get("archivePath", ""))
+                checksum = inputs.get("archiveSha256")
+                expected = self.native_root / "data/textbook-rejected-scenes" / _sha(session.encode()) / stage / (str(checksum) + ".json")
+                _require(re.fullmatch(r"[a-f0-9]{64}", str(checksum))
+                         and archive == expected and receipt.get("archiveSha256") == checksum,
+                         "operator_repair_rejection_unbound")
+                rejected = value(archive, checksum=checksum)
+                old_scene = parse(rejected.get("sceneCanonicalJson", "null"))
+                new_scene = parse(original("revisedScenePath", "revisedSceneSha256"))
+                review = sealed(plan.get("lockedQuestionReview", {}))
+                _require(rejected.get("schemaVersion") == "mira.textbook.rejected-scene.v1"
+                         and rejected.get("sessionId") == session and rejected.get("stageId") == stage
+                         and rejected.get("contractSha256") == contract["sha256"]
+                         and digest(old_scene) == rejected.get("sceneSha256") == plan.get("archiveSceneSha256")
+                         and digest(new_scene) == scene_sha
+                         and new_scene.get("id") == old_scene.get("id") == plan.get("sceneId")
+                         and new_scene.get("stageId") == old_scene.get("stageId") == stage
+                         and review["sha256"] == receipt.get("lockedQuestionReviewSha256")
+                         and review.get("frozenContractSha256") == contract["sha256"]
+                         and review.get("originalSceneSha256") == plan["archiveSceneSha256"]
+                         and review.get("revisedSceneSha256") == scene_sha,
+                         "operator_repair_rejection_mismatch")
+            else:
+                old_scene = value(receipt_path.parent / "original-scene.json")
+                external = parse(original("originalScenePath", "originalSceneFileSha256"))
+                try:
+                    html = original("revisedHtmlPath", "revisedHtmlSha256").decode("utf8")
+                except UnicodeError as error:
+                    raise CourseArchiveError("operator_repair_html_invalid") from error
+                _require(old_scene == external and digest(old_scene) == plan.get("originalSceneSha256")
+                         and old_scene.get("id") == plan.get("sceneId") and old_scene.get("stageId") == stage
+                         and old_scene.get("type") == "interactive" and old_scene.get("content", {}).get("type") == "interactive"
+                         and inputs.get("stageId") == stage and inputs.get("sceneId") == plan["sceneId"]
+                         and receipt.get("originalSceneFileSha256") == inputs["originalSceneFileSha256"]
+                         and receipt.get("originalSceneSha256") == plan["originalSceneSha256"],
+                         "operator_repair_original_mismatch")
+                revised = {**old_scene, "content": {**old_scene["content"], "html": html}}
+                _require(digest(revised) == scene_sha, "operator_repair_result_mismatch")
+            completed.append({"sourcePath": receipt_path.relative_to(self.root).as_posix(), "sha256": receipt["sha256"]})
+        return {"sessionId": session, "stageId": stage, "files": dict(sorted(files.items())), "receipts": completed}
+
+    def _add_operator_repairs(self, snapshot, session, stage):
+        evidence = self._operator_repair_inventory(session, stage)
+        if not evidence["receipts"]:
+            return
+        snapshot.operator_repair_bindings.append(evidence)
+        for source in evidence["files"]:
+            path = self._source_path(source)
+            if path not in snapshot.source_files:
+                snapshot.source_files.append(path)
 
     def _native_textbook_metadata(self, snapshot, frozen):
         """Project names only from the exact catalog frozen for this job."""
@@ -1893,6 +2133,9 @@ class CourseArchiveExporter:
                 current = self.material_inventory_loader(binding["request"])
                 _require(isinstance(current, dict) and current.get("dependencySha256") == binding["dependencySha256"],
                          "course_material_dependencies_changed")
+            for binding in snapshot.operator_repair_bindings:
+                _require(self._operator_repair_inventory(binding["sessionId"], binding["stageId"]) == binding,
+                         "operator_repair_dependencies_changed")
             metadata = {"schemaVersion": SCHEMA, **snapshot.identity, **snapshot.metadata,
                 "status": snapshot.status, "archiveFormat": "mira-course-archive-zip-v1",
                 "objectDirectory": object_directory, "exportedAt": exported_at,

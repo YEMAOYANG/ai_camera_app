@@ -2,8 +2,9 @@
 """Plan, quarantine and restore exact registered local course files; never delete.
 
 Only current registry heads and the explicitly retired active-manifest index are
-eligible. A complete immutable journal is durable before the first same-device
-rename. Small cursors are advisory: recovery inspects both paths and their bytes.
+eligible. An exact preview/release selector leaves that global index in place.
+A complete immutable journal is durable before the first same-device rename.
+Small cursors are advisory: recovery inspects both paths and their bytes.
 """
 from __future__ import annotations
 
@@ -27,7 +28,9 @@ if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
 from core.course_storage_config import CourseStorageConfig
-from repositories.course_storage_repository import MAX_FILE_BYTES, normalize_source_path, storage_id_for
+from repositories.course_storage_repository import (
+    CourseStorageRepository, MAX_FILE_BYTES, normalize_source_path, storage_id_for,
+)
 
 SCHEMA = 'mira.course-storage.local-isolation.v1'
 INDEX_PATH = 'backend/data/course-storage/active-manifest.json'
@@ -254,8 +257,22 @@ def _heads(heads):
         _require(path not in seen and isinstance(checksum, str) and SHA.fullmatch(checksum)
                  and type(size) is int and 0 <= size <= MAX_FILE_BYTES, 'isolation_registry_snapshot_invalid', path)
         seen.add(path)
-        result.append({'sourcePath': path, 'sha256': checksum, 'byteSize': size})
+        entry = {'sourcePath': path, 'sha256': checksum, 'byteSize': size}
+        if 'scopeKey' in value:
+            _require(isinstance(value['scopeKey'], str) and SHA.fullmatch(value['scopeKey']),
+                     'isolation_registry_snapshot_invalid', path)
+            entry['scopeKey'] = value['scopeKey']
+        result.append(entry)
     return sorted(result, key=lambda e: e['sourcePath'])
+
+
+def _scope(preview_key=None, content_key=None):
+    _require(preview_key is None or content_key is None, 'isolation_scope_mutually_exclusive')
+    if preview_key is None and content_key is None:
+        return None
+    field, key = ('previewKey', preview_key) if preview_key is not None else ('contentKey', content_key)
+    _require(isinstance(key, str) and SHA.fullmatch(key), 'isolation_scope_key_invalid')
+    return {field: key}
 
 
 def _state(root, value=None):
@@ -299,6 +316,11 @@ def _load_journal(path):
              'isolation_journal_integrity_invalid')
     root, state = _state(journal['projectRoot'], journal['stateDir'])
     _require(path.parent == state and journal.get('ownerUid') == os.getuid(), 'isolation_journal_identity_invalid')
+    scope = journal.get('scope')
+    if scope is not None:
+        _require(isinstance(scope, dict) and len(scope) == 1 and set(scope) <= {'previewKey', 'contentKey'},
+                 'isolation_journal_scope_invalid')
+        _scope(scope.get('previewKey'), scope.get('contentKey'))
     _require(isinstance(journal.get('entries'), list) and len(journal['entries']) <= MAX_ENTRIES + 1,
              'isolation_journal_entries_invalid')
     registered, seen = [], set()
@@ -307,8 +329,9 @@ def _load_journal(path):
         if entry.get('kind') == 'registered':
             registered.append(entry)
             normalize_source_path(source)
+            _require(scope is None or 'scopeKey' in entry, 'isolation_journal_scope_invalid')
         else:
-            _require(entry.get('kind') == 'legacy_index' and source == INDEX_PATH,
+            _require(scope is None and entry.get('kind') == 'legacy_index' and source == INDEX_PATH,
                      'isolation_journal_entries_invalid')
         _require(source not in seen and entry.get('localState') in {'present', 'missing'}
                  and isinstance(entry.get('sha256'), str) and SHA.fullmatch(entry['sha256'])
@@ -325,11 +348,13 @@ def _load_journal(path):
     return root, state, journal
 
 
-def plan_isolation(project_root, *, config, heads, state_dir=None):
+def plan_isolation(project_root, *, config, heads, state_dir=None, preview_key=None, content_key=None):
     _require(config.mode == 'registry', 'isolation_registry_mode_required')
+    scope = _scope(preview_key, content_key)
     root, state = _state(project_root, state_dir)
     registered = _heads(heads)
     _require(registered, 'isolation_empty_registry')
+    _require(scope is None or all('scopeKey' in e for e in registered), 'isolation_scoped_heads_required')
     device = _directory_device(state)
     entries, physical_files = [], set()
     for value in registered:
@@ -343,7 +368,7 @@ def plan_isolation(project_root, *, config, heads, state_dir=None):
             physical_files.add(physical)
             entry['stat'] = observed['stat']
         entries.append(entry)
-    index = _inspect(root / INDEX_PATH)
+    index = _inspect(root / INDEX_PATH) if scope is None else None
     if index is not None:
         _require(index['stat']['dev'] == device, 'isolation_cross_device', INDEX_PATH)
         _require((index['stat']['dev'], index['stat']['ino']) not in physical_files,
@@ -356,6 +381,8 @@ def plan_isolation(project_root, *, config, heads, state_dir=None):
         'counts': {'registeredFiles': len(registered), 'missingRegisteredFiles': len(entries) - len(present),
                    'filesToMove': len(present), 'bytesToMove': sum(e['byteSize'] for e in present),
                    'legacyIndexFiles': sum(e['kind'] == 'legacy_index' for e in entries)}}
+    if scope is not None:
+        journal['scope'] = scope
     journal['planSha256'] = _sha(_json(journal))
     _require(len(_json(journal)) <= MAX_JOURNAL, 'isolation_plan_oversized')
     descriptor = _open_dir(state, create=True, private_root=state)
@@ -431,12 +458,15 @@ def _move_plan(root, state, journal, *, restoring=False):
     return _summary(journal, phase, completed=complete + len(actions), movedThisRun=len(actions), retainedCopies=retained)
 
 
-def isolate(project_root, *, config, heads, state_dir=None):
+def isolate(project_root, *, config, heads, state_dir=None, preview_key=None, content_key=None):
     _require(config.mode == 'registry', 'isolation_registry_mode_required')
+    scope = _scope(preview_key, content_key)
     root, state = _state(project_root, state_dir)
     if _inspect(state / 'journal.json') is None:
-        plan_isolation(root, config=config, heads=heads, state_dir=state)
+        plan_isolation(root, config=config, heads=heads, state_dir=state,
+                       preview_key=preview_key, content_key=content_key)
     root, state, journal = _load_journal(state / 'journal.json')
+    _require(journal.get('scope') == scope, 'isolation_registry_scope_changed')
     _require(journal['headsSha256'] == _sha(_json(_heads(heads)))
              and journal['storageId'] == storage_id_for(config.endpoint, config.bucket, config.region),
              'isolation_registry_heads_changed')
@@ -450,11 +480,79 @@ def restore_isolation(journal_path):
         return _move_plan(root, state, journal, restoring=True)
 
 
-def current_heads(database, config):
+def _scoped_heads(conn, identity, scope):
+    field, key = next(iter(scope.items()))
+    if field == 'previewKey':
+        current = conn.execute("SELECT p.preview_key FROM learning_textbook_course_previews p "
+            "JOIN learning_textbook_revisions r ON r.edition_id=p.edition_id AND r.revision_id=p.revision_id "
+            "WHERE p.preview_key=? AND p.status IN ('preview_ready','review_required') "
+            "AND p.classroom_id IS NOT NULL AND p.classroom_sha256 IS NOT NULL AND r.retired_at IS NULL",
+            (key,)).fetchone()
+        column = 'preview_key'
+    else:
+        current = conn.execute("SELECT b.content_key FROM learning_textbook_course_builds b "
+            "JOIN learning_courses c ON c.id=b.course_id AND c.version=b.course_version "
+            "JOIN learning_textbook_revisions r ON r.edition_id=b.edition_id AND r.revision_id=b.revision_id "
+            "WHERE b.content_key=? AND b.status='published' AND c.status='published' "
+            "AND c.quality_status='released' AND c.retired_at IS NULL AND r.retired_at IS NULL", (key,)).fetchone()
+        column = 'content_key'
+    _require(current is not None, 'isolation_scope_not_current')
+    rows = conn.execute('SELECT * FROM course_storage_scopes WHERE storage_id=? AND ' + column
+                        + '=? ORDER BY scope_key LIMIT ' + str(MAX_ENTRIES + 1), (identity, key)).fetchall()
+    _require(0 < len(rows) <= MAX_ENTRIES, 'isolation_scope_not_registered')
+    paths, owners = {}, {}
+    for row in rows:
+        decoded = CourseStorageRepository._decoded_scope(row)
+        _require(decoded['storageId'] == identity and decoded['metadata'].get(field) == key,
+                 'isolation_scope_identity_invalid')
+        owners[decoded['scopeKey']] = decoded
+        for binding in decoded['bindings']:
+            path_sha = binding['sourcePathSha256']
+            item = paths.setdefault(path_sha, {'sourcePath': binding['sourcePath'], 'versions': set()})
+            _require(item['sourcePath'] == binding['sourcePath'], 'isolation_registry_path_identity_invalid')
+            item['versions'].add(binding['sha256'])
+        _require(len(paths) <= MAX_ENTRIES, 'isolation_registry_snapshot_invalid')
+    result = []
+    keys = sorted(paths)
+    for offset in range(0, len(keys), BATCH):
+        batch = keys[offset:offset + BATCH]
+        rows = conn.execute('SELECT f.source_path AS sourcePath,f.content_sha256 AS sha256,'
+            'f.byte_size AS byteSize,f.source_path_sha256 AS pathSha256,h.scope_key AS scopeKey '
+            'FROM course_storage_heads h LEFT JOIN course_storage_files f '
+            'ON f.storage_id=h.storage_id AND f.source_path_sha256=h.source_path_sha256 '
+            'AND f.content_sha256=h.content_sha256 WHERE h.storage_id=? AND h.source_path_sha256 IN ('
+            + ','.join('?' for _ in batch) + ') ORDER BY f.source_path', (identity, *batch)).fetchall()
+        found = set()
+        for row in rows:
+            path, path_sha = row['sourcePath'], row['pathSha256']
+            _require(isinstance(path, str) and path_sha in batch and path_sha == _sha(path.encode())
+                     and path == paths[path_sha]['sourcePath'] and path_sha not in found,
+                     'isolation_registry_path_identity_invalid')
+            found.add(path_sha)
+            entry = _heads([dict(row)])[0]
+            if entry['sha256'] not in paths[path_sha]['versions']:
+                owner = owners.get(entry['scopeKey'])
+                if owner is None:
+                    owner = CourseStorageRepository._decoded_scope(conn.execute(
+                        'SELECT * FROM course_storage_scopes WHERE storage_id=? AND scope_key=?',
+                        (identity, entry['scopeKey'])).fetchone())
+                _require(owner is not None and owner['storageId'] == identity
+                         and owner['metadata'].get(field) == key
+                         and any(b['sourcePath'] == path and b['sha256'] == entry['sha256'] for b in owner['bindings']),
+                         'isolation_scope_head_conflict', path)
+            result.append(entry)
+        _require(found == set(batch), 'isolation_scope_head_missing')
+    return _heads(result)
+
+
+def current_heads(database, config, *, preview_key=None, content_key=None):
     _require(config.mode == 'registry', 'isolation_registry_mode_required')
+    scope = _scope(preview_key, content_key)
     from scripts.course_storage_releases import read_only_connection
     identity = storage_id_for(config.endpoint, config.bucket, config.region)
     with read_only_connection(database) as conn:
+        if scope is not None:
+            return _scoped_heads(conn, identity, scope)
         rows = conn.execute('SELECT f.source_path AS sourcePath,f.content_sha256 AS sha256,'
             'f.byte_size AS byteSize,f.source_path_sha256 AS pathSha256 FROM course_storage_heads h '
             'LEFT JOIN course_storage_files f ON f.storage_id=h.storage_id AND f.source_path_sha256=h.source_path_sha256 '
@@ -472,6 +570,9 @@ def main(argv=None):
         command = commands.add_parser(name)
         command.add_argument('--project-root', required=True)
         command.add_argument('--state-dir')
+        selector = command.add_mutually_exclusive_group()
+        selector.add_argument('--preview-key', help='Only this exact current usable preview and its current registered dependencies')
+        selector.add_argument('--content-key', help='Only this exact current published textbook release and its current registered dependencies')
     command = commands.add_parser('restore')
     command.add_argument('--journal', required=True)
     args = parser.parse_args(argv)
@@ -483,9 +584,10 @@ def main(argv=None):
             from core.database import Database
             app = AppConfig.from_env()
             config = CourseStorageConfig.from_env()
-            heads = current_heads(Database(app.DATABASE_URL), config)
+            selection = {'preview_key': args.preview_key, 'content_key': args.content_key}
+            heads = current_heads(Database(app.DATABASE_URL), config, **selection)
             operation = plan_isolation if args.operation == 'plan' else isolate
-            result = operation(args.project_root, config=config, heads=heads, state_dir=args.state_dir)
+            result = operation(args.project_root, config=config, heads=heads, state_dir=args.state_dir, **selection)
         print(json.dumps(result, ensure_ascii=False))
         return 0
     except (IsolationError, OSError, ValueError, KeyError, TypeError) as error:

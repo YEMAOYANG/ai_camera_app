@@ -550,6 +550,120 @@ class CourseFileWriter:
         return OpenMaicFullRuntimeClient._validate_formal_tts_response(
             {**job, "success": True}, request_id=request, **pronunciation_client_options(plan))
 
+    def _authoring_readback(self, folder, state):
+        """Verify an existing owner/session by GET; never dispatch or resume it."""
+        from content.textbook_catalog import digest, identifier
+        from core.errors import ApiError
+        from integrations.openmaic_workbench_client import OpenMaicWorkbenchClient, WorkbenchError
+        from services.textbook_workbench_authoring import TextbookWorkbenchAuthoring
+        try:
+            frozen = _json_bytes(self._read((folder / "frozen.json").as_posix()))
+            draft_raw = self._read((folder / "draft.json").as_posix())
+            draft = _json_bytes(draft_raw)
+            dispatch = _json_bytes(self._read((folder / "dispatch.json").as_posix()))
+            _require(isinstance(frozen, dict) and isinstance(draft, dict) and isinstance(dispatch, dict)
+                and frozen.get("draftSha256") == _hash(draft_raw)
+                and frozen.get("draftCanonicalSha256") == digest(draft)
+                and frozen.get("binding") == draft.get("binding")
+                and frozen.get("teacherContract") == draft.get("teacherContract")
+                and frozen.get("skillIds") == draft.get("skillIds")
+                and identifier(state.get("sessionId")), "course_storage_authoring_identity_invalid")
+            job = self.root / folder
+            authoring = TextbookWorkbenchAuthoring(None, self.root / "output", origin=frozen["origin"])
+            _, identity = authoring._material_payload(job, frozen, draft)
+            client = OpenMaicWorkbenchClient(frozen["origin"], job / "owner.cookies")
+            owner = client.owner_fingerprint()
+            _require(dispatch.get("ownerFingerprint") == owner
+                and dispatch.get("requestSha256") == identity["requestSha256"]
+                and dispatch.get("payloadSha256") == identity["payloadSha256"]
+                and dispatch.get("materialsSha256") == identity.get("materialsSha256")
+                and identity.get("materialsOwnerFingerprint", owner) == owner,
+                "course_storage_authoring_identity_invalid")
+            session = client.session(state["sessionId"])
+            _require(isinstance(session, dict) and session.get("id") == state["sessionId"] and authoring._match(session, identity)
+                and session.get("status") == state.get("sessionStatus"),
+                "course_storage_authoring_identity_invalid")
+            authoring._verify_session_materials(client, session["id"], identity)
+            return client, session
+        except CourseFileWriteError:
+            raise
+        except (ApiError, WorkbenchError, OSError, ValueError, KeyError, TypeError):
+            raise CourseFileWriteError("course_storage_authoring_readback_invalid") from None
+
+    def _authoring_stages(self, folder, state, client, session):
+        """The same event-derived stage identities consumed by _poll, with live bytes."""
+        from content.textbook_catalog import identifier
+        from integrations.openmaic_workbench_client import WorkbenchError
+        try:
+            events = client.stage_events(session["id"])
+            _require(isinstance(events, list) and all(isinstance(e, dict)
+                and isinstance(e.get("data", {}), dict) for e in events), "course_storage_authoring_readback_invalid")
+            candidates = {e.get("data", {}).get("stageId"): "session_stage_created" for e in events
+                if e.get("type") == "library_changed" and e.get("data", {}).get("change") == "stage_created"}
+            if not candidates and session.get("stageId"):
+                candidates[session["stageId"]] = "session_stage_id"
+            stages = {}
+            for stage_id, provenance in candidates.items():
+                if not identifier(stage_id):
+                    continue
+                try:
+                    document = client.stage(stage_id)
+                except WorkbenchError as exc:
+                    if exc.http_status == 404:
+                        continue
+                    raise
+                _require(isinstance(document, dict) and isinstance(document.get("stage"), dict)
+                    and document["stage"].get("id") == stage_id
+                    and isinstance(document.get("scenes"), list)
+                    and isinstance(document.get("outline"), dict)
+                    and document["outline"].get("producerRef") == session["id"],
+                    "course_storage_authoring_snapshot_invalid")
+                if document["scenes"]:
+                    stages[stage_id] = (document, provenance)
+            return stages
+        except CourseFileWriteError:
+            raise
+        except (WorkbenchError, OSError, ValueError, KeyError, TypeError):
+            raise CourseFileWriteError("course_storage_authoring_readback_invalid") from None
+
+    def _authoring_poll_state(self, folder, old, new, *, terminal):
+        from content.textbook_catalog import digest
+        mutable = {"status", "sessionId", "sessionStatus", "savedStages", "updatedAt", "message", "error", "httpStatus"}
+        _preserved(old, new, set(old) - mutable)
+        _preserved(old, new, {"sessionId"})
+        _require(set(new) <= set(old) | mutable)
+        client, session = self._authoring_readback(folder, new)
+        was_terminal = old.get("status") in terminal or (old.get("status") == "session_found"
+            and old.get("sessionStatus") in {"succeeded", "failed", "cancelled"})
+        _require(not was_terminal or session["status"] in {"succeeded", "failed", "cancelled"})
+        if new["status"] == "session_found":
+            _require(new.get("savedStages") == old.get("savedStages"))
+            return "authoring_status_readback"
+        stages = self._authoring_stages(folder, new, client, session)
+        expected_status = "saved_stage_available" if stages and session["status"] == "succeeded" else "session_" + session["status"]
+        _require(new["status"] == expected_status)
+        rows = new.get("savedStages", [])
+        _require(isinstance(rows, list) and len(rows) == len(stages)
+            and isinstance(old.get("savedStages", []), list))
+        by_id = {}
+        for entry in rows:
+            _require(isinstance(entry, dict) and set(entry) == {"stageId", "sceneCount", "sha256", "path", "provenance", "url"}
+                and isinstance(entry.get("stageId"), str) and entry["stageId"] in stages and entry["stageId"] not in by_id)
+            stage_id = entry["stageId"]
+            document, provenance = stages[stage_id]
+            snapshot = folder / ("saved-" + stage_id + ".json")
+            _require(type(entry["sceneCount"]) is int and entry["sceneCount"] == len(document["scenes"])
+                and entry["sha256"] == digest(document)
+                and entry["path"] == str(self.root / snapshot) and entry["provenance"] == provenance
+                and entry["url"] == client.origin + "/classroom/" + stage_id
+                and _json_bytes(self._read(snapshot.as_posix())) == document,
+                "course_storage_authoring_snapshot_invalid")
+            by_id[stage_id] = entry
+        for prior in old.get("savedStages", []):
+            _require(isinstance(prior, dict) and prior.get("stageId") in by_id)
+            _preserved(prior, by_id[prior["stageId"]], set(prior) - {"sceneCount", "sha256"})
+        return "authoring_status_readback"
+
     def _audio_revision(self, folder, revision, old_raw, new_raw, classroom, parent, meta):
         from content.textbook_catalog import digest
         from content.textbook_preview_audio_contract import revision_audio_plan
@@ -831,17 +945,26 @@ class CourseFileWriter:
                 return "traceable_amendment:" + self._amendment(path, old_raw, new_raw, old, new)
             if kind.startswith("saved-"):
                 state = _json_bytes(self._read((Path(path).parent / "state.json").as_posix()))
-                _require(state.get("status") in {"session_queued", "session_running", "session_pending", "session_generating"})
                 _require(isinstance(old, dict) and isinstance(new, dict)
                     and old.get("stage", {}).get("id") == author[2]
                     and new.get("stage", {}).get("id") == author[2]
                     and old.get("id") == new.get("id") and isinstance(new.get("scenes"), list))
+                if state.get("status") == "session_found" or state.get("status") in {
+                        "saved_stage_available", "session_succeeded", "session_failed", "session_cancelled"}:
+                    client, session = self._authoring_readback(Path(path).parent, state)
+                    stages = self._authoring_stages(Path(path).parent, state, client, session)
+                    _require(author[2] in stages and stages[author[2]][0] == new,
+                        "course_storage_authoring_snapshot_invalid")
+                    return "authoring_snapshot_readback"
+                _require(state.get("status") in {"session_queued", "session_running", "session_pending", "session_generating"})
                 return "running_authoring_snapshot"
             _require(isinstance(old, dict) and isinstance(new, dict))
             before, after = old.get("status"), new.get("status")
-            active = {"prepared", "reuse_review_required", "dispatch_unknown", "session_queued", "session_pending", "session_running", "session_generating"}
+            active = {"prepared", "reuse_review_required", "dispatch_unknown", "session_queued", "session_pending", "session_running", "session_generating", "session_found"}
             terminal = {"saved_stage_available", "session_succeeded", "session_failed", "session_cancelled"}
             _require(before in active | terminal and after in active | terminal)
+            if before in terminal or before == "session_found" or after == "session_found":
+                return self._authoring_poll_state(Path(path).parent, old, new, terminal=terminal)
             _require(before == after or (before in active and after != "prepared"))
             _preserved(old, new, {"sessionId", "stageId", "classroomId", "runtimeJobId", "requestSha256", "payloadSha256", "ownerFingerprint"})
             if old.get("savedStages"):

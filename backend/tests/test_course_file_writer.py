@@ -444,6 +444,129 @@ class CourseFileWriterTest(unittest.TestCase):
             scope = self.repo.head_scope(path, self.storage)
             self.assertEqual(scope["metadata"]["writePolicy"], "traceable_amendment:" + revision)
 
+    def authoring_poll(self, *, running=False):
+        from content.textbook_catalog import digest
+        folder = "output/lesson/authoring-job"
+        state_path, snapshot = folder + "/state.json", folder + "/saved-stage-test.json"
+        draft = {"request": "保留原课的完整请求", "skillIds": ["teacher"],
+            "binding": {"nodeId": "u4-l5"}, "teacherContract": {"id": "teacher"}}
+        identity = {"requestSha256": sha(draft["request"].encode()),
+            "payloadSha256": digest({"prompt": draft["request"], "skill": "teacher"}), "skillIds": ["teacher"]}
+        frozen = {"origin": "http://localhost:3100", "draftSha256": sha(raw(draft)),
+            "draftCanonicalSha256": digest(draft), "binding": draft["binding"],
+            "teacherContract": draft["teacherContract"], "skillIds": ["teacher"]}
+        room = {"stage": {"id": "stage-test"}, "outline": {"producerRef": "session-original"},
+            "scenes": [{"id": "scene-" + str(i), "order": i} for i in range(1, 15)]}
+        previous = {**room, "scenes": room["scenes"][:12]}
+        def row(document):
+            return {"stageId": "stage-test", "sceneCount": len(document["scenes"]), "sha256": digest(document),
+                "path": str(self.writer.root / snapshot), "provenance": "session_stage_created",
+                "url": "http://localhost:3100/classroom/stage-test"}
+        state = {"status": "session_running" if running else "saved_stage_available", "sessionId": "session-original",
+            "sessionStatus": "running" if running else "succeeded",
+            "savedStages": [row(previous)], "message": "旧的已保存快照", "updatedAt": "before"}
+        found = {**state, "status": "session_found", "sessionStatus": "succeeded", "updatedAt": "found"}
+        final = {**state, "status": "saved_stage_available", "sessionStatus": "succeeded",
+            "savedStages": [row(room)], "updatedAt": "after", "message": "仅记录已保存成果"}
+        mapping = {folder + "/draft.json": raw(draft), folder + "/frozen.json": raw(frozen),
+            folder + "/dispatch.json": raw({**identity, "ownerFingerprint": "c" * 64}),
+            state_path: raw(state), snapshot: raw(previous)}
+        self.read.side_effect = lambda p, *_a: mapping[p]
+        client = Mock(origin="http://localhost:3100")
+        client.owner_fingerprint.return_value = "c" * 64
+        client.session.return_value = {"id": "session-original", "status": "succeeded", "skillId": "teacher",
+            "prompt": draft["request"], "stageId": "stage-test"}
+        client.stage_events.return_value = [{"type": "library_changed", "data": {"change": "stage_created", "stageId": "stage-test"}}]
+        client.stage.return_value = room
+        self.register(path=state_path, body=raw(state))
+        self.register(path=snapshot, body=raw(previous))
+        factory = self.enterContext(patch("integrations.openmaic_workbench_client.OpenMaicWorkbenchClient", return_value=client))
+        self.enterContext(patch("services.textbook_workbench_authoring.TextbookWorkbenchAuthoring._material_payload",
+            return_value=({}, identity)))
+        return state_path, snapshot, mapping, state, found, final, previous, room, client, factory
+
+    def test_terminal_get_poll_refreshes_saved_12_to_14_and_retains_both_original_versions(self):
+        state_path, snapshot, files, state, found, final, previous, room, client, factory = self.authoring_poll()
+        self.writer.write_bytes(state_path, raw(found), expected_sha256=sha(raw(state)))
+        files[state_path] = raw(found)
+        self.writer.write_bytes(snapshot, raw(room), expected_sha256=sha(raw(previous)))
+        files[snapshot] = raw(room)
+        self.writer.write_bytes(state_path, raw(final), expected_sha256=sha(raw(found)))
+        for path, original, current in [(snapshot, previous, room), (state_path, state, final)]:
+            self.assertEqual(self.repo.resolve(path, self.storage, sha(raw(original)))["sha256"], sha(raw(original)))
+            self.assertEqual(self.repo.resolve(path, self.storage)["sha256"], sha(raw(current)))
+        self.assertEqual(self.uploader.upload.call_count, 3)
+        self.assertTrue({call[0] for call in client.method_calls} <= {"owner_fingerprint", "session", "stage_events", "stage"})
+        self.assertEqual(factory.call_args.args[1], self.writer.root / Path(state_path).parent / "owner.cookies")
+
+    def test_running_poll_can_record_session_found_then_observed_terminal(self):
+        state_path, snapshot, files, state, found, final, previous, room, client, _ = self.authoring_poll(running=True)
+        self.writer.write_bytes(state_path, raw(found), expected_sha256=sha(raw(state)))
+        files[state_path], files[snapshot] = raw(found), raw(room)
+        self.writer.write_bytes(state_path, raw(final), expected_sha256=sha(raw(found)))
+
+    def test_terminal_poll_rejects_identity_replacement_and_arbitrary_state_fields_before_upload(self):
+        state_path, _, files, state, found, _, _, _, client, _ = self.authoring_poll()
+        cases = [{**found, "sessionId": "session-other"}, {**found, "ownerFingerprint": "f" * 64},
+            {**found, "requestSha256": "f" * 64}, {**found, "teachingRevision": "other"},
+            {**found, "savedStages": []}, {**found, "status": "prepared"}]
+        for value in cases:
+            with self.subTest(value=list(value)), self.assertRaises(CourseFileWriteError):
+                self.writer.write_bytes(state_path, raw(value), expected_sha256=sha(raw(state)))
+        for field, value in [("id", "session-other"), ("prompt", "其他请求"), ("skillId", "other"), ("status", "running")]:
+            old_session = client.session.return_value
+            client.session.return_value = {**old_session, field: value}
+            with self.subTest(field=field), self.assertRaises(CourseFileWriteError):
+                self.writer.write_bytes(state_path, raw(found), expected_sha256=sha(raw(state)))
+            client.session.return_value = old_session
+        marker_path = str(Path(state_path).parent / "dispatch.json")
+        marker = json.loads(files[marker_path])
+        for field in ("requestSha256", "payloadSha256", "ownerFingerprint"):
+            files[marker_path] = raw({**marker, field: "f" * 64})
+            with self.subTest(dispatch=field), self.assertRaisesRegex(CourseFileWriteError, "identity_invalid"):
+                self.writer.write_bytes(state_path, raw(found), expected_sha256=sha(raw(state)))
+        files[marker_path] = raw(marker)
+        client.owner_fingerprint.return_value = "d" * 64
+        with self.assertRaisesRegex(CourseFileWriteError, "identity_invalid"):
+            self.writer.write_bytes(state_path, raw(found), expected_sha256=sha(raw(state)))
+        self.uploader.upload.assert_not_called()
+
+    def test_terminal_snapshot_must_be_exact_live_session_owned_document(self):
+        state_path, snapshot, files, _, found, final, previous, room, client, _ = self.authoring_poll()
+        files[state_path] = raw(found)
+        for value in [{**room, "stage": {"id": "stage-other"}}, {**room, "scenes": room["scenes"][:-1]},
+                {**room, "outline": {"producerRef": "session-other"}}]:
+            with self.subTest(value=list(value)), self.assertRaises(CourseFileWriteError):
+                self.writer.write_bytes(snapshot, raw(value), expected_sha256=sha(raw(previous)))
+        client.stage.return_value = {**room, "outline": {"producerRef": "session-other"}}
+        with self.assertRaisesRegex(CourseFileWriteError, "snapshot_invalid"):
+            self.writer.write_bytes(snapshot, raw(room), expected_sha256=sha(raw(previous)))
+        self.uploader.upload.assert_not_called()
+
+    def test_saved_stage_summary_preserves_path_provenance_and_matches_remote_snapshot(self):
+        state_path, snapshot, files, state, _, final, _, room, _, _ = self.authoring_poll()
+        files[snapshot] = raw(room)
+        for key, value in [("sceneCount", 13), ("sha256", "f" * 64), ("stageId", "stage-other"),
+                ("path", "/other/saved-stage-test.json"), ("url", "http://localhost:3100/classroom/other"),
+                ("provenance", "session_stage_id")]:
+            changed = {**final, "savedStages": [{**final["savedStages"][0], key: value}]}
+            with self.subTest(field=key), self.assertRaises(CourseFileWriteError):
+                self.writer.write_bytes(state_path, raw(changed), expected_sha256=sha(raw(state)))
+        files[snapshot] = raw({"stage": {"id": "stage-test"}, "scenes": []})
+        with self.assertRaisesRegex(CourseFileWriteError, "snapshot_invalid"):
+            self.writer.write_bytes(state_path, raw(final), expected_sha256=sha(raw(state)))
+        self.uploader.upload.assert_not_called()
+
+    def test_native_stage_change_during_upload_prevents_terminal_snapshot_activation(self):
+        state_path, snapshot, files, _, found, _, previous, room, client, _ = self.authoring_poll()
+        files[state_path] = raw(found)
+        client.stage.side_effect = [room, {**room, "scenes": room["scenes"][:-1]}]
+        with self.assertRaisesRegex(CourseFileWriteError, "snapshot_invalid"):
+            self.writer.write_bytes(snapshot, raw(room), expected_sha256=sha(raw(previous)))
+        self.uploader.upload.assert_called_once()
+        self.assertEqual(self.repo.resolve(snapshot, self.storage)["sha256"], sha(raw(previous)))
+        self.assertIsNone(self.repo.resolve(snapshot, self.storage, sha(raw(room))))
+
 
 class NodeUploaderTest(unittest.TestCase):
     def test_descriptor_is_bound_to_actual_body_destination_and_storage_without_secret_arguments(self):
