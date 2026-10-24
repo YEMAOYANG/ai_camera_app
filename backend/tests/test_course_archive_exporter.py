@@ -419,6 +419,62 @@ class CourseArchiveExporterTest(unittest.TestCase):
                 self.assertFalse(unsafe["complete"])
                 self.assertEqual(unsafe["generatedPublicFiles"], [])
 
+    def test_exact_build_id_adapter_preserves_bounded_ascii_text_with_plain_mime(self):
+        source = self.root / "output/one/BUILD_ID"
+        source.parent.mkdir(parents=True)
+        self.snapshot.source_files = [source]
+        for raw in (b"Next_build-2026_10", b"Next_build-2026_10\n", b"a" * 128):
+            with self.subTest(raw=raw):
+                source.write_bytes(raw)
+                result = self.export()
+                self.assertTrue(result["complete"])
+                with zipfile.ZipFile(result["zip"]["path"]) as archive:
+                    name = "原稿/output/one/BUILD_ID"
+                    self.assertEqual(archive.read(name), raw)
+                    manifest = json.loads(archive.read("manifest.json"))
+                    entry = next(e for e in manifest["files"] if e["archivePath"] == name)
+                    self.assertEqual(entry["mimeType"], "text/plain")
+                    self.assertEqual(entry["sha256"], hashlib.sha256(raw).hexdigest())
+
+    def test_build_id_rejects_binary_oversize_multiple_lines_and_credential_payloads(self):
+        source = self.root / "output/one/BUILD_ID"
+        source.parent.mkdir(parents=True)
+        self.snapshot.source_files = [source]
+        invalid = (b"", b"a" * 129, b"a" * 128 + b"\n", b"one\ntwo", b"one\n\n",
+                   b"one\r\n", b"with space", b"\x00build", b"\xff", "版本".encode(),
+                   b"password='private'", b"../other", b"Bearer credential-value")
+        for raw in invalid:
+            with self.subTest(raw=raw):
+                source.write_bytes(raw)
+                with self.assertRaisesRegex(CourseArchiveError, "original_build_id_invalid"):
+                    self.export()
+        # Even a syntactically valid identifier still crosses the normal
+        # credential/student-token scanner rather than bypassing it.
+        source.write_bytes(b"tbpt_" + b"a" * 20)
+        result = self.export()
+        self.assertFalse(result["complete"])
+        self.assertEqual(result["generatedPublicFiles"], [])
+        self.assertEqual(result["missingSources"][0]["kind"], "unsafe_original")
+
+    def test_build_id_adapter_does_not_admit_unknown_neighbor_or_similarly_named_files(self):
+        source = self.root / "output/one"
+        source.mkdir(parents=True)
+        (source / "BUILD_ID").write_bytes(b"Next_build")
+        for name in ("OTHER_ID", "lowercase/build_id", "BUILD_ID.before"):
+            path = source / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"unreviewed original")
+        self.snapshot.source_roots = [source]
+        result = self.export()
+        self.assertFalse(result["complete"])
+        self.assertEqual(result["generatedPublicFiles"], [])
+        self.assertEqual({Path(e["sourceIdentity"]).name for e in result["missingSources"]},
+                         {"OTHER_ID", "build_id", "BUILD_ID.before"})
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            self.assertIn("原稿/output/one/BUILD_ID", archive.namelist())
+            self.assertFalse(any(name.endswith(("/OTHER_ID", "/build_id", "/BUILD_ID.before"))
+                                 for name in archive.namelist()))
+
     def test_only_proven_runtime_backup_is_excluded_before_symlink_gate(self):
         source = self.root / "output/textbook-operator-lessons/pep-chinese-g1-upper-2022-standard/u4-l1/teaching-1"
         backup = source / "quality-repairs/formal-audio-predispatch-recovery-v1/old-build"

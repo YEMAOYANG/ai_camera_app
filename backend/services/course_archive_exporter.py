@@ -163,7 +163,7 @@ def _original_suffix(path):
 
 
 def _source_text_file(path):
-    return _original_suffix(path) in _SOURCE_TEXT_EXTENSIONS or (
+    return path.name == "BUILD_ID" or _original_suffix(path) in _SOURCE_TEXT_EXTENSIONS or (
         path.name == "LICENSE" and "/provenance/vendor/three-0.160.0/" in path.as_posix())
 
 
@@ -217,6 +217,9 @@ def _check_public(value):
 
 def _check_source_text(raw, suffix, *, source_path=None):
     """Inspect inert source/config text without importing or executing it."""
+    if source_path is not None and Path(source_path).name == "BUILD_ID":
+        _require(len(raw) <= 128 and re.fullmatch(rb"[A-Za-z0-9_-]+\n?", raw),
+                 "original_build_id_invalid")
     text = raw.decode("utf8")
     _check_public(text)
     # Logs keep their exact byte serialization. Inspect every complete JSON
@@ -488,6 +491,10 @@ class CourseArchiveExporter:
 
     def _binary_original_mime(self, source):
         """A named HTTP response is a PDF only with exact retained evidence."""
+        if source.name == "BUILD_ID":
+            _require(course_stat(source).st_size <= 128, "original_build_id_invalid")
+            _check_source_text(course_bytes(source), "", source_path=source)
+            return "text/plain"
         if source.suffix.lower() != ".bin":
             return None
         metadata = self._source_path(source.parent / "metadata.json")
