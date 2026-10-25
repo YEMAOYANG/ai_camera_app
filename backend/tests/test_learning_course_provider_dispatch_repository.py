@@ -4,7 +4,7 @@ import hashlib
 import json
 import unittest
 
-import pymysql
+import psycopg
 
 from core.database import Database
 import repositories.dynamic_learning_course_repository as dispatch_repository
@@ -12,7 +12,7 @@ from services.learning_curriculum_preparation_contract import TARGET_SCHEMA_V2
 from tests.support import fresh_test_config
 
 
-MIGRATION_VERSION = "056_learning_curriculum_preparation_content_stage.sql"
+BASELINE_VERSION = "100_postgres_baseline_schema.sql"
 
 
 def _checkpoint_sha256(checkpoint: dict[str, object]) -> str:
@@ -54,15 +54,15 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
     def setUp(self):
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
-        self.assertIn("/ai_camera_app_test", self.database_url)
-        self.assertNotIn("/ai_camera_app_dev", self.database_url)
+        self.assertIn("/mira_test", self.database_url)
+        self.assertNotRegex(self.database_url, r"/mira(\?|$)")
         self.database = Database(self.database_url)
         with self.database.transaction() as conn:
             marker = conn.execute(
                 "SELECT COUNT(*) AS count FROM schema_migrations WHERE version = ?",
-                (MIGRATION_VERSION,),
+                (BASELINE_VERSION,),
             ).fetchone()
-        self.assertEqual(marker["count"], 1, "056 must be installed on real MySQL")
+        self.assertEqual(marker["count"], 1, "the PostgreSQL baseline must be installed")
         self.begin_provider_dispatch = getattr(
             dispatch_repository, "begin_provider_dispatch", None
         )
@@ -107,11 +107,16 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
         with self.database.transaction() as conn:
             row = self._begin(conn)
             indexes = conn.execute(
-                "SELECT INDEX_NAME, COLUMN_NAME, SEQ_IN_INDEX "
-                "FROM INFORMATION_SCHEMA.STATISTICS "
-                "WHERE TABLE_SCHEMA = DATABASE() "
-                "AND TABLE_NAME = 'learning_course_provider_dispatches' "
-                "AND INDEX_NAME IN (?, ?) ORDER BY INDEX_NAME, SEQ_IN_INDEX",
+                "SELECT index_class.relname AS index_name, attribute.attname AS column_name "
+                "FROM pg_index AS index_row "
+                "JOIN pg_class AS index_class ON index_class.oid = index_row.indexrelid "
+                "JOIN pg_class AS table_class ON table_class.oid = index_row.indrelid "
+                "CROSS JOIN LATERAL unnest(index_row.indkey) WITH ORDINALITY AS key(attnum, position) "
+                "JOIN pg_attribute AS attribute ON attribute.attrelid = table_class.oid "
+                "AND attribute.attnum = key.attnum "
+                "WHERE table_class.relnamespace = current_schema()::regnamespace "
+                "AND table_class.relname = 'learning_course_provider_dispatches' "
+                "AND index_class.relname IN (?, ?) ORDER BY index_class.relname, key.position",
                 (
                     "uq_learning_provider_dispatch_phase",
                     "uq_learning_provider_dispatch_ordinal",
@@ -120,8 +125,8 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
 
         grouped: dict[str, list[str]] = {}
         for index in indexes:
-            grouped.setdefault(str(index["INDEX_NAME"]), []).append(
-                str(index["COLUMN_NAME"])
+            grouped.setdefault(str(index["index_name"]), []).append(
+                str(index["column_name"])
             )
         self.assertEqual(
             grouped,
@@ -143,7 +148,7 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
             with self.database.transaction() as conn:
                 self._begin(conn, phase="raw_candidate", phase_ordinal=1)
 
-        with self.assertRaises(pymysql.MySQLError) as raised:
+        with self.assertRaises(psycopg.Error) as raised:
             with self.database.transaction() as conn:
                 conn.execute(
                     "INSERT INTO learning_course_provider_dispatches("
@@ -158,16 +163,16 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
                     "FROM learning_course_provider_dispatches WHERE id = ?",
                     (row["id"],),
                 )
-        self.assertEqual(raised.exception.args[0], 1062)
+        self.assertEqual(raised.exception.sqlstate, "23505")  # unique_violation
 
-        with self.assertRaises(pymysql.MySQLError) as raised:
+        with self.assertRaises(psycopg.Error) as raised:
             with self.database.transaction() as conn:
                 conn.execute(
                     "UPDATE learning_course_provider_dispatches "
                     "SET phase = 'raw_candidate' WHERE id = ?",
                     (row["id"],),
                 )
-        self.assertEqual(raised.exception.args[0], 3819)
+        self.assertEqual(raised.exception.sqlstate, "23514")  # check_violation
 
     def test_new_dispatches_advance_strictly_beyond_max_succeeded_ordinal(self):
         with self.database.transaction() as conn:
@@ -198,8 +203,8 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
 
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
-        self.assertIn("/ai_camera_app_test", self.database_url)
-        self.assertNotIn("/ai_camera_app_dev", self.database_url)
+        self.assertIn("/mira_test", self.database_url)
+        self.assertNotRegex(self.database_url, r"/mira(\?|$)")
         self.database = Database(self.database_url)
         self._insert_active_content_item()
 
@@ -287,7 +292,7 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
         self.assertIn("ordinal", rollback_error or "")
         self.assertIn("ordinal", lower_error or "")
 
-    def test_logical_attempt_is_exactly_one_or_two_in_python_and_mysql(self):
+    def test_logical_attempt_is_exactly_one_or_two_in_python_and_database(self):
         for logical_attempt in (0, 3):
             with self.subTest(logical_attempt=logical_attempt):
                 with self.assertRaisesRegex(ValueError, "logical attempt"):
@@ -296,14 +301,14 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
 
         with self.database.transaction() as conn:
             row = self._begin(conn)
-        with self.assertRaises(pymysql.MySQLError) as raised:
+        with self.assertRaises(psycopg.Error) as raised:
             with self.database.transaction() as conn:
                 conn.execute(
                     "UPDATE learning_course_provider_dispatches "
                     "SET logical_attempt = 0 WHERE id = ?",
                     (row["id"],),
                 )
-        self.assertEqual(raised.exception.args[0], 3819)
+        self.assertEqual(raised.exception.sqlstate, "23514")  # check_violation
 
         with self.database.transaction() as conn:
             self.assertTrue(
@@ -392,7 +397,7 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
         self.assertEqual(persisted["output_tokens"], 34)
         self.assertIsNone(persisted["safe_error_code"])
 
-    def test_terminal_receipt_shapes_and_mysql_unknown_are_closed(self):
+    def test_terminal_receipt_shapes_and_sql_unknown_are_closed(self):
         with self.database.transaction() as conn:
             row = self._begin(conn)
 
@@ -464,10 +469,10 @@ class LearningCourseProviderDispatchRepositoryTest(unittest.TestCase):
         )
         for sql in invalid_dml:
             with self.subTest(sql=sql):
-                with self.assertRaises(pymysql.MySQLError) as raised:
+                with self.assertRaises(psycopg.Error) as raised:
                     with self.database.transaction() as conn:
                         conn.execute(sql, (row["id"],))
-                self.assertEqual(raised.exception.args[0], 3819)
+                self.assertEqual(raised.exception.sqlstate, "23514")  # check_violation
 
     def test_failed_safe_is_terminal_without_external_replay(self):
         with self.database.transaction() as conn:

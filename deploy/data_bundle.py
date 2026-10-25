@@ -23,9 +23,12 @@ from datetime import datetime, timezone
 from urllib.parse import parse_qs, unquote, urlsplit
 
 
-SCHEMA = "mira.data-bundle.v1"
+# v2: one PostgreSQL database holds the backend (schema app) and the classroom
+# runtime (schema public); v1 bundles also carried a MySQL dump.
+SCHEMA = "mira.data-bundle.v2"
 ARCHIVES = {"backend-data.tar": "backend-data", "openmaic-data.tar": "openmaic-data"}
-FILES = {"mysql.sql", "postgres.dump", "learning-budget-policy.json", *ARCHIVES}
+FILES = {"postgres.dump", "learning-budget-policy.json", *ARCHIVES}
+DATABASE_SCHEMAS = ["app", "public"]
 POLICY_DESTINATION = "deployment-policies/learning-budget-policy.json"
 SECRET_KEYS = (
     "APP_STUDENT_AUTH_PEPPER", "APP_DEVICE_SECRET_KEY", "INTERNAL_API_TOKEN",
@@ -139,17 +142,17 @@ def sources(args) -> dict:
     return {"repo": repo, "data": data, "policy": policy, "backend_env": backend_env, "runtime_env": runtime_env}
 
 
-def db_connection(value: str, kind: str) -> dict:
+def db_connection(value: str, label: str) -> dict:
     try:
-        parsed = urlsplit(literal(value, f"{kind} database URL"))
-        allowed = {"mysql", "mysql+pymysql"} if kind == "mysql" else {"postgres", "postgresql"}
+        parsed = urlsplit(literal(value, f"{label} database URL"))
         database = unquote(parsed.path.lstrip("/"))
-        if parsed.scheme not in allowed or not parsed.hostname or not parsed.username or not re.fullmatch(r"[A-Za-z0-9_]+", database):
+        if (parsed.scheme not in {"postgres", "postgresql"} or not parsed.hostname or not parsed.username
+                or not re.fullmatch(r"[A-Za-z0-9_]+", database)):
             raise ValueError()
         query = parse_qs(parsed.query)
-        if set(query) - ({"charset"} if kind == "mysql" else {"sslmode"}):
-            raise BundleError(f"Unsupported {kind} connection parameters; use a dedicated literal export dotenv file")
-        result = {"host": parsed.hostname, "port": str(parsed.port or (3306 if kind == "mysql" else 5432)),
+        if set(query) - {"sslmode"}:
+            raise BundleError(f"Unsupported {label} connection parameters; use a dedicated literal export dotenv file")
+        result = {"host": parsed.hostname, "port": str(parsed.port or 5432),
                   "user": unquote(parsed.username), "password": unquote(parsed.password or ""), "database": database}
         if "sslmode" in query:
             result["sslmode"] = query["sslmode"][0]
@@ -158,7 +161,7 @@ def db_connection(value: str, kind: str) -> dict:
                 raise ValueError()
         return result
     except (ValueError, TypeError):
-        raise BundleError(f"Invalid {kind} database URL; URL-encode credentials and select one named database") from None
+        raise BundleError(f"Invalid {label} database URL; use postgresql://, URL-encode credentials and select one named database") from None
 
 
 def private_write(path: Path, content: str | bytes):
@@ -181,21 +184,19 @@ def run_dump(command: list[str], target: Path, env: dict):
         raise BundleError(f"{Path(command[0]).name} produced an empty dump")
 
 
-def dump_databases(source: dict, output: Path, mysql_dump: str, pg_dump: str, pg_restore: str) -> dict:
+def dump_databases(source: dict, output: Path, pg_dump: str, pg_restore: str) -> dict:
     backend, runtime = source["backend_env"], source["runtime_env"]
-    mysql = db_connection(backend.get("APP_DATABASE_URL", ""), "mysql")
-    pg = db_connection(runtime.get("MIRA_OPENMAIC_AGENT_DATABASE_URL") or runtime.get("DATABASE_URL")
-                       or backend.get("MIRA_OPENMAIC_AGENT_DATABASE_URL", ""), "postgres")
-    env = {k: v for k, v in os.environ.items() if not k.startswith(("PG", "MYSQL"))}
+    pg = db_connection(backend.get("APP_DATABASE_URL", ""), "backend")
+    classroom = db_connection(runtime.get("MIRA_OPENMAIC_AGENT_DATABASE_URL") or runtime.get("DATABASE_URL")
+                              or backend.get("MIRA_OPENMAIC_AGENT_DATABASE_URL", ""), "classroom runtime")
+    def server(connection):
+        local = connection["host"] in {"localhost", "127.0.0.1", "::1"}
+        return ("loopback" if local else connection["host"], connection["port"], connection["database"])
+    if server(classroom) != server(pg):
+        raise BundleError("The backend and the classroom runtime must use the same database; finish the single-database migration first")
+    env = {k: v for k, v in os.environ.items() if not k.startswith("PG")}
     with tempfile.TemporaryDirectory(prefix="mira-dump-credentials-") as directory:
         temp = Path(directory)
-        def quoted(value):
-            return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
-        mysql_config = temp / "mysql.cnf"
-        private_write(mysql_config, "[client]\n" + "\n".join(f"{key}={quoted(mysql[key])}" for key in ("host", "port", "user", "password")) + "\nprotocol=tcp\n")
-        run_dump([mysql_dump, f"--defaults-file={mysql_config}", "--no-login-paths", "--single-transaction", "--skip-lock-tables",
-                  "--quick", "--routines", "--events", "--triggers", "--hex-blob", "--no-tablespaces",
-                  "--set-gtid-purged=OFF", "--default-character-set=utf8mb4", "--comments", mysql["database"]], output / "mysql.sql", env)
         def pg_escape(value):
             return value.replace("\\", "\\\\").replace(":", "\\:")
         passfile = temp / "pgpass"
@@ -208,9 +209,6 @@ def dump_databases(source: dict, output: Path, mysql_dump: str, pg_dump: str, pg
                       + ("\nsslmode=" + pg["sslmode"] if "sslmode" in pg else "") + "\n")
         run_dump([pg_dump, "--format=custom", "--no-owner", "--no-acl"], output / "postgres.dump",
                  {**env, "PGSERVICEFILE": str(servicefile), "PGSERVICE": "mira_bundle", "PGPASSFILE": str(passfile)})
-    with (output / "mysql.sql").open("rb") as stream:
-        mysql_header = stream.read(65536).decode("utf-8", errors="replace")
-    mysql_version = re.search(r"^-- Server version\s+(\d[^\r\n]*)", mysql_header, re.MULTILINE)
     try:
         listing = subprocess.run([pg_restore, "--list", str(output / "postgres.dump")],
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.DEVNULL,
@@ -218,11 +216,10 @@ def dump_databases(source: dict, output: Path, mysql_dump: str, pg_dump: str, pg
     except OSError:
         raise BundleError("pg_restore is required to record the PostgreSQL source version") from None
     pg_version = re.search(r"Dumped from database version:\s*(\d[^\r\n]*)", listing.stdout.decode("utf-8", errors="replace"))
-    if listing.returncode or not mysql_version or not pg_version:
-        raise BundleError("Could not establish both source database versions; no completed bundle was created")
-    return {kind: {"database": connection["database"], "format": fmt,
-                   "serverVersion": match.group(1).strip(), "serverMajor": int(match.group(1).split(".")[0])}
-            for kind, connection, fmt, match in (("mysql", mysql, "sql", mysql_version), ("postgres", pg, "custom", pg_version))}
+    if listing.returncode or not pg_version:
+        raise BundleError("Could not establish the source database version; no completed bundle was created")
+    return {"postgres": {"database": pg["database"], "format": "custom", "schemas": DATABASE_SCHEMAS,
+                         "serverVersion": pg_version.group(1).strip(), "serverMajor": int(pg_version.group(1).split(".")[0])}}
 
 
 def write_archive(root: Path, target: Path):
@@ -255,7 +252,7 @@ def export_local(args) -> dict:
         raise BundleError("Output must be a new directory; refusing to overwrite")
     output.mkdir(mode=0o700, parents=False)
     # A failed export deliberately has no manifest and cannot pass verification.
-    databases = dump_databases(source, output, args.mysqldump, args.pg_dump, args.pg_restore)
+    databases = dump_databases(source, output, args.pg_dump, args.pg_restore)
     for filename, root in source["data"].items():
         write_archive(root, output / filename)
     private_write(output / "learning-budget-policy.json", source["policy"].read_bytes())
@@ -304,9 +301,12 @@ def verify(bundle: Path) -> dict:
         if manifest["policies"] != [{"env": "LEARNING_BUDGET_POLICY_PATH", "file": "learning-budget-policy.json",
                                      "containerPath": "/app/data/" + POLICY_DESTINATION}]:
             raise ValueError()
-        for kind in ("mysql", "postgres"):
+        if set(manifest["databases"]) != {"postgres"}:
+            raise ValueError()
+        for kind in ("postgres",):
             database = manifest["databases"][kind]
             if (not re.fullmatch(r"[A-Za-z0-9_]+", database["database"])
+                    or database["format"] != "custom" or database["schemas"] != DATABASE_SCHEMAS
                     or type(database["serverMajor"]) is not int or database["serverMajor"] < 1
                     or not re.fullmatch(r"\d[^\r\n\x00]*", database["serverVersion"])
                     or int(database["serverVersion"].split(".")[0]) != database["serverMajor"]):
@@ -367,7 +367,6 @@ def parser():
         if command == "export-local":
             sub.add_argument("--output", type=Path, required=True)
             sub.add_argument("--services-stopped", action="store_true")
-            sub.add_argument("--mysqldump", default="mysqldump")
             sub.add_argument("--pg-dump", default="pg_dump")
             sub.add_argument("--pg-restore", default="pg_restore")
     sub = commands.add_parser("verify")

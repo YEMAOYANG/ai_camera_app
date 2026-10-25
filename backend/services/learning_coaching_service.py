@@ -50,7 +50,7 @@ def save_coaching(conn, *, family_id, user_id, session_id, data=None, record_dat
     row = conn.execute('SELECT s.id,s.runtime_state_json,s.started_at,r.created_at AS report_created_at '
         'FROM learning_sessions s LEFT JOIN learning_reports r ON r.session_id=s.id AND r.family_id=s.family_id '
         'AND r.child_id=s.child_id AND r.task_id=s.task_id AND r.course_id=s.course_id AND r.course_version=s.course_version '
-        'WHERE s.id=? AND s.family_id=?' + (' FOR UPDATE' if data is not None else ''),
+        'WHERE s.id=? AND s.family_id=?' + (' FOR UPDATE OF s' if data is not None else ''),
         (session_id, family_id)).fetchone()
     if row is None:
         raise ApiError('learning_session_not_found', '没有找到这次学习记录', 404)

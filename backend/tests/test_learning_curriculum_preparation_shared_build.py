@@ -46,7 +46,7 @@ from services.learning_curriculum_preparation_runner import (
     LearningCurriculumPreparationRunner,
 )
 from core.security import now_ms as system_now_ms
-from tests.support import fresh_test_config, reset_mysql_test_database
+from tests.support import fresh_test_config, reset_test_database
 from tests.test_learning_catalog_content_only import (
     _CompletePinyinCanaryAdapter,
     _CountingHostValidator,
@@ -2391,12 +2391,12 @@ class LearningCurriculumPreparationSharedBuildTest(unittest.TestCase):
                 )
 
 
-class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
+class LearningCurriculumPreparationSharedBuildDatabaseTest(unittest.TestCase):
     def setUp(self):
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
-        self.assertIn("/ai_camera_app_test", self.database_url)
-        self.assertNotIn("/ai_camera_app_dev", self.database_url)
+        self.assertIn("/mira_test", self.database_url)
+        self.assertNotRegex(self.database_url, r"/mira(\?|$)")
         self.database = Database(self.database_url)
         with self.database.transaction() as conn:
             for ordinal, revision in ((1, 2), (2, 9)):
@@ -2426,7 +2426,7 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
                 )
 
     def tearDown(self):
-        reset_mysql_test_database(self.database_url)
+        reset_test_database(self.database_url)
 
     @staticmethod
     def _profiles():
@@ -2649,9 +2649,12 @@ class LearningCurriculumPreparationSharedBuildMysqlTest(unittest.TestCase):
                 """
                 UPDATE learning_catalog_build_items
                 SET skill_id = 'drifted-after-create'
-                WHERE build_job_id = ?
-                ORDER BY subject_ordinal, boundary_ordinal, variant_ordinal
-                LIMIT 1
+                WHERE id = (
+                  SELECT id FROM learning_catalog_build_items
+                  WHERE build_job_id = ?
+                  ORDER BY subject_ordinal, boundary_ordinal, variant_ordinal
+                  LIMIT 1
+                )
                 """,
                 (build_id,),
             )

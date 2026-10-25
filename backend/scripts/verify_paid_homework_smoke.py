@@ -54,9 +54,9 @@ def original_page():
 
 def validate_config(config):
     url=urlparse(config['DATABASE_URL'])
-    if (config.get('APP_ENV')!='development' or url.scheme.split('+',1)[0]!='mysql'
-            or url.hostname not in {'127.0.0.1','localhost'} or url.path!='/ai_camera_app_dev'):
-        raise ValueError('Only exact localhost ai_camera_app_dev is allowed')
+    if (config.get('APP_ENV')!='development' or url.scheme.split('+',1)[0] not in {'postgresql','postgres'}
+            or url.hostname not in {'127.0.0.1','localhost'} or url.path!='/mira'):
+        raise ValueError('Only the exact localhost mira development database is allowed')
     if config.get('HOMEWORK_WORKER_ENABLED'):
         raise ValueError('Pause the shared homework worker before this bounded validation')
     if not config.get('HOMEWORK_ANALYSIS_ENABLED') or not config.get('HOMEWORK_AUDIO_ENABLED'):

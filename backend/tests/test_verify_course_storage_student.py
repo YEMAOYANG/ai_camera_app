@@ -152,12 +152,12 @@ class VerifyCourseStorageStudentTests(unittest.TestCase):
         self.assertEqual(conn.execute.call_count, 1)
 
     def test_database_hashing_returns_no_raw_rows_and_excludes_only_guard_audits(self):
-        metadata = [{'table_name': table, 'column_name': 'id', 'column_type': 'varchar(128)', 'is_nullable': 'NO'}
+        metadata = [{'table_name': table, 'column_name': 'id', 'column_type': 'character varying', 'is_nullable': 'NO'}
                     for table in ('audit_events', 'learning_sessions')]
         statements = []
         def execute(sql, params=()):
             statements.append((sql, params))
-            if 'INFORMATION_SCHEMA' in sql:
+            if 'information_schema.columns' in sql:
                 return SimpleNamespace(fetchall=lambda: metadata)
             if 'COUNT(*)' in sql:
                 return SimpleNamespace(fetchone=lambda: {'row_count': 4, 'cutoff': 100})
@@ -170,7 +170,7 @@ class VerifyCourseStorageStudentTests(unittest.TestCase):
         self.assertEqual(set(result['business']), {'audit_events', 'learning_sessions'})
         self.assertTrue(all(sql.startswith('SELECT') for sql, _ in statements))
         row_reads = [sql for sql, _ in statements if ' AS row_sha256' in sql]
-        self.assertTrue(all('SHA2(CAST(' in sql and 'SELECT *' not in sql for sql in row_reads))
+        self.assertTrue(all('encode(sha256(convert_to(CAST(' in sql and 'SELECT *' not in sql for sql in row_reads))
         self.assertTrue(any('audit_domain IS NULL OR audit_domain<>?' in sql for sql in row_reads))
 
 

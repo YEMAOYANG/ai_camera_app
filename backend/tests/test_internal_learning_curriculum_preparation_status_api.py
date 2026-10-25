@@ -141,7 +141,7 @@ class InternalLearningCurriculumPreparationStatusApiTest(unittest.TestCase):
         def snapshot_business_rows():
             with database.transaction() as conn:
                 return {
-                    table: tuple(conn.execute(f"SELECT * FROM `{table}`").fetchall())
+                    table: tuple(conn.execute(f'SELECT * FROM "{table}"').fetchall())
                     for table in business_tables
                 }
 

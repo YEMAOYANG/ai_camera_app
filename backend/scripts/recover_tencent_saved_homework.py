@@ -49,7 +49,8 @@ def recover(phone: str, identity: str, expected_revision: int, *, execute: bool 
     load_dotenv(ROOT / '.env', override=True)
     config = AppConfig.from_env().to_flask_config()
     target = urlsplit(config['DATABASE_URL'])
-    if target.hostname not in {'127.0.0.1', 'localhost'} or target.port != 3306 or target.path != '/ai_camera_app_dev':
+    if (target.scheme.split('+', 1)[0] not in {'postgresql', 'postgres'} or target.hostname not in {'127.0.0.1', 'localhost'}
+            or target.port not in {5432, 5433} or target.path != '/mira'):
         raise SafetyStop('recovery_requires_exact_local_development_database')
     app = Flask('tencent-saved-receipt-recovery')
     app.config.update(config)

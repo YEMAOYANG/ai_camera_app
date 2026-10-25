@@ -1,8 +1,8 @@
-"""Opt-in MySQL protocol checks, not business-service or provider acceptance.
+"""Opt-in database lock protocol checks, not business-service or provider acceptance.
 
-Run with MIRA_MYSQL_LOCK_PROTOCOL=1. Only the existing validated local
-ai_camera_app_test database is allowed. Each run owns randomly named InnoDB
-tables; no application table is queried or changed.
+Run with MIRA_DB_LOCK_PROTOCOL=1. Only the validated local mira_test database is
+allowed. Each run owns randomly named tables; no application table is queried or
+changed. Transactions use the production isolation level, READ COMMITTED.
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from threading import Barrier, Event
 import unittest
 import uuid
 
-from core.database import Database
+from core.database import Database, is_retryable_conflict
 from tests.support import validated_test_database_url
 
 
@@ -33,9 +33,12 @@ PAYLOADS = {name: _raw(name) for name in "ABC"}
 SHAS = {name: hashlib.sha256(raw.encode()).hexdigest() for name, raw in PAYLOADS.items()}
 
 
-@unittest.skipUnless(os.getenv("MIRA_MYSQL_LOCK_PROTOCOL") == "1",
-                     "requires explicit isolated MySQL protocol opt-in")
-class CourseStorageMySQLLockProtocolTest(unittest.TestCase):
+TEST_DATABASE = re.compile(r"mira_test(_[a-z0-9]+)?")
+
+
+@unittest.skipUnless(os.getenv("MIRA_DB_LOCK_PROTOCOL") == "1",
+                     "requires explicit isolated database protocol opt-in")
+class CourseStorageLockProtocolTest(unittest.TestCase):
     """Model the reviewed row/head protocol with real separate connections."""
 
     @classmethod
@@ -45,16 +48,16 @@ class CourseStorageMySQLLockProtocolTest(unittest.TestCase):
         cls.created = []
         # Verify the server boundary before even constructing DDL.
         with cls.database.transaction() as conn:
-            identity = conn.execute("SELECT DATABASE() AS db").fetchone()
-        if identity["db"] != "ai_camera_app_test":
+            identity = conn.execute("SELECT current_database() AS db").fetchone()
+        if not TEST_DATABASE.fullmatch(identity["db"]):
             raise RuntimeError("isolated_test_database_required")
         definitions = {
-            "previews": "id VARCHAR(32) PRIMARY KEY, classroom_sha CHAR(64) NOT NULL, "
-                        "body_json LONGTEXT NOT NULL, result_json LONGTEXT NOT NULL, "
+            "previews": "id VARCHAR(32) PRIMARY KEY, classroom_sha VARCHAR(64) NOT NULL, "
+                        "body_json TEXT NOT NULL, result_json TEXT NOT NULL, "
                         "status VARCHAR(32) NOT NULL, updated_at BIGINT NOT NULL",
-            "heads": "id VARCHAR(32) PRIMARY KEY, content_sha CHAR(64) NOT NULL, scope_key VARCHAR(32) NOT NULL",
-            "versions": "content_sha CHAR(64) PRIMARY KEY, body_json LONGTEXT NOT NULL",
-            "builds": "preview_id VARCHAR(32) PRIMARY KEY, release_sha CHAR(64) NOT NULL",
+            "heads": "id VARCHAR(32) PRIMARY KEY, content_sha VARCHAR(64) NOT NULL, scope_key VARCHAR(32) NOT NULL",
+            "versions": "content_sha VARCHAR(64) PRIMARY KEY, body_json TEXT NOT NULL",
+            "builds": "preview_id VARCHAR(32) PRIMARY KEY, release_sha VARCHAR(64) NOT NULL",
         }
         try:
             with cls.database.transaction() as conn:
@@ -62,7 +65,7 @@ class CourseStorageMySQLLockProtocolTest(unittest.TestCase):
                     # Remember the exact owned name before DDL, including a
                     # lost server response after a successful CREATE.
                     cls.created.append(name)
-                    conn.execute(f"CREATE TABLE {cls.table(name)} ({definition}) ENGINE=InnoDB")
+                    conn.execute(f"CREATE TABLE {cls.table(name)} ({definition})")
         except Exception:
             cls._drop_owned()
             raise
@@ -73,7 +76,7 @@ class CourseStorageMySQLLockProtocolTest(unittest.TestCase):
         if name not in {"previews", "heads", "versions", "builds"} or not re.fullmatch(
                 r"mira_lock_[a-f0-9]{32}_(previews|heads|versions|builds)", identifier):
             raise ValueError("isolated_table_name_invalid")
-        return "`" + identifier + "`"
+        return '"' + identifier + '"'
 
     @classmethod
     def _drop_owned(cls):
@@ -96,8 +99,7 @@ class CourseStorageMySQLLockProtocolTest(unittest.TestCase):
     @contextmanager
     def transaction(self):
         with self.database.transaction() as conn:
-            conn.execute("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ")
-            conn.execute("SET SESSION innodb_lock_wait_timeout=2")
+            conn.execute("SET LOCAL lock_timeout = '2s'")
             yield conn
 
     def setUp(self):
@@ -230,7 +232,7 @@ class CourseStorageMySQLLockProtocolTest(unittest.TestCase):
         with self.transaction() as conn:
             self.assertIsNone(conn.execute(f"SELECT * FROM {self.table('builds')}").fetchone())
 
-    def test_fresh_resolver_does_not_reuse_publisher_repeatable_read_snapshot(self):
+    def test_publisher_sees_a_head_committed_after_its_first_read(self):
         snapshot_ready, committed = Event(), Event()
 
         def writer():
@@ -245,8 +247,9 @@ class CourseStorageMySQLLockProtocolTest(unittest.TestCase):
                     self.assertEqual(self.head(conn)["content_sha"], SHAS["A"])
                     snapshot_ready.set()
                     self.wait(committed)
-                    # This is the real RR failure if a future guard reuses conn.
-                    self.assertEqual(self.head(conn)["content_sha"], SHAS["A"])
+                    # READ COMMITTED: each statement reads the latest commit, and
+                    # the fresh resolver below still rejects the old SQL sha.
+                    self.assertEqual(self.head(conn)["content_sha"], SHAS["B"])
                     with self.assertRaisesRegex(ProtocolConflict, "remote_frozen_changed"):
                         self.publish(conn)
                 future.result(timeout=8)
@@ -336,27 +339,31 @@ class CourseStorageMySQLLockProtocolTest(unittest.TestCase):
                 self.publish(conn)
 
 
-@unittest.skipUnless(os.getenv("MIRA_MYSQL_LOCK_PROTOCOL") == "1",
-                     "requires explicit isolated MySQL protocol opt-in")
-class CourseStorageMySQLScopeScanProtocolTest(unittest.TestCase):
-    """Detect the scope scan deadlock and retry its exact immutable guard."""
+@unittest.skipUnless(os.getenv("MIRA_DB_LOCK_PROTOCOL") == "1",
+                     "requires explicit isolated database protocol opt-in")
+class CourseStorageScopeScanProtocolTest(unittest.TestCase):
+    """The scope scan keeps its exact immutable guard under concurrent writers.
 
-    def test_scope_scan_deadlock_retries_fresh_transaction_and_preserves_immutable_guard(self):
+    MySQL locked every scanned row and deadlocked here, so writers retried.
+    PostgreSQL locks only the returned rows: no deadlock, and any retry that a
+    conflict still causes repeats the same guard.
+    """
+
+    def test_scope_scan_needs_no_deadlock_retry_and_preserves_immutable_guard(self):
         database = Database(validated_test_database_url())
         name = "mira_scope_" + uuid.uuid4().hex
         if re.fullmatch(r"mira_scope_[a-f0-9]{32}", name) is None:
             raise ValueError("isolated_table_name_invalid")
-        table, storage, created = "`" + name + "`", "f" * 64, False
+        table, storage, created = '"' + name + '"', "f" * 64, False
         keys = ["1" * 64, "2" * 64]
         try:
             with database.transaction() as conn:
-                if conn.execute("SELECT DATABASE() AS db").fetchone()["db"] != "ai_camera_app_test":
+                if not TEST_DATABASE.fullmatch(conn.execute("SELECT current_database() AS db").fetchone()["db"]):
                     raise RuntimeError("isolated_test_database_required")
                 created = True
-                conn.execute(f"CREATE TABLE {table} (storage_id CHAR(64) NOT NULL, scope_key CHAR(64) NOT NULL, "
-                             "scope_json LONGTEXT NOT NULL, bindings_json LONGTEXT NOT NULL, "
-                             "PRIMARY KEY(storage_id,scope_key)) ENGINE=InnoDB "
-                             "DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin")
+                conn.execute(f"CREATE TABLE {table} (storage_id VARCHAR(64) NOT NULL, scope_key VARCHAR(64) NOT NULL, "
+                             "scope_json TEXT NOT NULL, bindings_json TEXT NOT NULL, "
+                             "PRIMARY KEY(storage_id,scope_key))")
                 for key in keys:
                     conn.execute(f"INSERT INTO {table} VALUES (?,?,?,?)",
                                  (storage, key, '{"status":"preview_ready"}', '[]'))
@@ -374,8 +381,7 @@ class CourseStorageMySQLScopeScanProtocolTest(unittest.TestCase):
                 for attempt in range(1, 4):
                     try:
                         with database.transaction() as conn:
-                            conn.execute("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ")
-                            conn.execute("SET SESSION innodb_lock_wait_timeout=2")
+                            conn.execute("SET LOCAL lock_timeout = '2s'")
                             # compare_and_activate owns this path's scope before
                             # its before_activate lifecycle/policy callback.
                             conn.execute(f"SELECT * FROM {table} WHERE storage_id=? AND scope_key=? FOR UPDATE",
@@ -387,7 +393,7 @@ class CourseStorageMySQLScopeScanProtocolTest(unittest.TestCase):
                                 raise ProtocolConflict("published_immutable")
                         return {"attempts": attempt, "deadlocks": deadlocks, "uploads": uploads}
                     except Exception as exc:
-                        if not (exc.args and exc.args[0] == 1213):
+                        if not is_retryable_conflict(exc):
                             raise
                         deadlocks += 1
                         if attempt == 3:
@@ -396,8 +402,8 @@ class CourseStorageMySQLScopeScanProtocolTest(unittest.TestCase):
             with ThreadPoolExecutor(max_workers=2) as pool:
                 futures = [pool.submit(writer, key) for key in keys]
                 results = [future.result(timeout=8) for future in futures]
-            self.assertGreaterEqual(sum(result["deadlocks"] for result in results), 1)
-            self.assertTrue(all(1 <= result["attempts"] <= 3 for result in results))
+            self.assertEqual(sum(result["deadlocks"] for result in results), 0)
+            self.assertTrue(all(result["attempts"] == 1 for result in results))
             self.assertEqual([result["uploads"] for result in results], [1, 1])
             # Keep the exact predicate on every retry: a matching immutable
             # publication must still be refused, never bypassed to escape locks.
@@ -412,7 +418,7 @@ class CourseStorageMySQLScopeScanProtocolTest(unittest.TestCase):
                     conn.execute(f"DROP TABLE IF EXISTS {table}")
                 with database.transaction() as conn:
                     remaining = conn.execute("SELECT COUNT(*) AS n FROM information_schema.tables "
-                                             "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?", (name,)).fetchone()["n"]
+                                             "WHERE table_schema=current_schema() AND table_name=?", (name,)).fetchone()["n"]
                 self.assertEqual(remaining, 0)
 
 

@@ -57,7 +57,7 @@ class LearningPracticeRepository:
         # Two different children may project the same approved source at once.
         # The unique source identity arbitrates inserts without rewriting it.
         columns = list(row)
-        conn.execute(f"INSERT IGNORE INTO learning_practice_questions({','.join(columns)}) VALUES ({','.join('?' for _ in columns)})", tuple(row.values()))
+        conn.execute(f"INSERT INTO learning_practice_questions({','.join(columns)}) VALUES ({','.join('?' for _ in columns)}) ON CONFLICT DO NOTHING", tuple(row.values()))
         prior = conn.execute('SELECT * FROM learning_practice_questions WHERE source_key_sha256 = ? FOR UPDATE', (row['source_key_sha256'],)).fetchone()
         if prior is None or prior['contract_sha256'] != row['contract_sha256'] or prior['source_content_sha256'] != row['source_content_sha256']:
             raise ValueError('published practice source changed without a version')
@@ -73,7 +73,7 @@ class LearningPracticeRepository:
 
     def active(self, conn, *, family_id, child_id, grade_code, grade_revision, subject, skill_id):
         return conn.execute("""SELECT * FROM learning_practice_sessions WHERE family_id = ? AND child_id = ?
-            AND grade_code = ? AND grade_revision = ? AND subject = ? AND skill_id <=> ? AND status = 'in_progress'
+            AND grade_code = ? AND grade_revision = ? AND subject = ? AND skill_id IS NOT DISTINCT FROM ? AND status = 'in_progress'
             AND EXISTS (SELECT 1 FROM learning_practice_session_questions AS question WHERE question.session_id=learning_practice_sessions.id
               AND JSON_UNQUOTE(JSON_EXTRACT(question.snapshot_json,'$.practiceSource.curriculumVersion'))='mira.primary.progressive.v1')
             ORDER BY created_at LIMIT 1 FOR UPDATE""", (family_id, child_id, grade_code, grade_revision, subject, skill_id)).fetchone()

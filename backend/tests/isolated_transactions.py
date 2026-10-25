@@ -4,6 +4,7 @@ Production Database.transaction supplies commit/rollback behavior. SQLite has no
 row locks: this fixture serializes its connection and records FOR UPDATE SQL so
 tests can check the service's locking contract without claiming MySQL coverage.
 """
+import re
 import sqlite3
 from threading import RLock
 
@@ -39,7 +40,7 @@ class _MemoryConnection(DatabaseConnection):
 
     def _adapt_sql(self, sql):
         self.database.statements.append(sql)
-        return sql.replace(" FOR UPDATE", "")
+        return re.sub(r"\s+FOR UPDATE\b(?: OF [\w, ]+)?", "", sql)
 
     def close(self):
         self.database.lock.release()

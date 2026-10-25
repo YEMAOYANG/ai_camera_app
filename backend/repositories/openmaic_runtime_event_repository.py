@@ -349,7 +349,7 @@ class OpenMaicRuntimeEventRepository:
               AND course.retired_at IS NULL
               AND package.status = 'published'
               AND package.retired_at IS NULL
-            LIMIT 1 FOR UPDATE
+            LIMIT 1 FOR UPDATE OF binding, release_row, release_item, build_item, course, package
             """,
             (
                 learning_session_id,
@@ -471,7 +471,7 @@ class OpenMaicRuntimeEventRepository:
               release_id, target_fingerprint, expected_scene_count,
               last_sequence, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
-            ON DUPLICATE KEY UPDATE runtime_session_id = runtime_session_id
+            ON CONFLICT DO NOTHING
             """,
             (
                 authority["runtime_session_id"],

@@ -126,17 +126,17 @@ class FormalMultigradeRepositoryTest(unittest.TestCase):
             self.assertEqual(conn.execute('SELECT COUNT(*) AS n FROM learning_course_provider_dispatches').fetchone()['n'], 0)
 
     def test_multigrade_migration_keeps_explicit_grade_and_sealed_counts(self):
-        import pymysql
+        import psycopg
         library = self.plan('primary_6')
         plan = library.ensure_owner()
         for assignments, params in (
             ('grade_code = ?', ('primary_2',)),
             ('total_course_count = ?', (30,)),
             ('target_spec_json = JSON_REMOVE(target_spec_json, ?)', ('$.gradeCode',)),
-            ('target_spec_json = JSON_SET(target_spec_json, ?, ?)', ('$.courseTargets', 'missing')),
+            ("target_spec_json = jsonb_set(CAST(target_spec_json AS jsonb), '{courseTargets}', to_jsonb(CAST(? AS TEXT)))", ('missing',)),
         ):
             with self.subTest(assignments=assignments):
-                with self.assertRaises(pymysql.err.OperationalError):
+                with self.assertRaises(psycopg.errors.CheckViolation):
                     with self.catalog.transaction() as conn:
                         conn.execute('UPDATE learning_curriculum_preparation_plans SET '+assignments+' WHERE id = ?', (*params, plan['id']))
 

@@ -36,7 +36,7 @@ from services.learning_generated_course_validator import (
     LearningGeneratedCourseValidator,
     PrimaryOneHostGateDependencyError,
 )
-from tests.support import fresh_test_config, reset_mysql_test_database
+from tests.support import fresh_test_config, reset_test_database
 from tests.test_learning_catalog_content_only import (
     _resume_legacy_content_build,
     _CompletePinyinCanaryAdapter,
@@ -320,12 +320,12 @@ class _CompletePrimaryOneAdapter(_OutlineOnlyAdapter):
         )
 
 
-class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
+class LearningCatalogContentReviewFixTwoDatabaseRedTest(unittest.TestCase):
     def setUp(self):
         self.database_url = fresh_test_config()["DATABASE_URL"]
 
     def tearDown(self):
-        reset_mysql_test_database(self.database_url)
+        reset_test_database(self.database_url)
 
     def _service(self, *, now: int, reject_attempt_two: bool):
         database = Database(self.database_url)
@@ -1105,8 +1105,11 @@ class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
                 """
                 UPDATE learning_course_provider_dispatches
                 SET profile = ?
-                WHERE build_item_id = ? AND logical_attempt = 1
-                ORDER BY phase_ordinal DESC LIMIT 1
+                WHERE id = (
+                  SELECT id FROM learning_course_provider_dispatches
+                  WHERE build_item_id = ? AND logical_attempt = 1
+                  ORDER BY phase_ordinal DESC LIMIT 1
+                )
                 """,
                 lambda item: ("0" * 64, item["id"]),
             ),
@@ -1121,10 +1124,10 @@ class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
             "candidate": (
                 """
                 UPDATE learning_course_generation_candidates AS candidate
-                JOIN learning_course_generation_jobs AS job
-                  ON job.id = candidate.job_id
-                SET candidate.objective = 'drifted objective'
-                WHERE job.request_id = ?
+                SET objective = 'drifted objective'
+                FROM learning_course_generation_jobs AS job
+                WHERE job.id = candidate.job_id
+                  AND job.request_id = ?
                 """,
                 lambda item: (item["generation_request_id"],),
             ),
@@ -1139,7 +1142,7 @@ class LearningCatalogContentReviewFixTwoMysqlRedTest(unittest.TestCase):
         }
         for name, (sql, params) in mutations.items():
             with self.subTest(name=name):
-                reset_mysql_test_database(self.database_url)
+                reset_test_database(self.database_url)
                 database, adapter, service, build_id = self._service(
                     now=431_000,
                     reject_attempt_two=False,

@@ -201,7 +201,7 @@ class OpenMaicRuntimeRepository:
               circuit_key, provider_id, model_id, status, reason_code,
               opened_at, last_probe_at, revision, created_at, updated_at
             ) VALUES (?, ?, ?, 'open', 'initial_probe_pending', ?, ?, 1, ?, ?)
-            ON DUPLICATE KEY UPDATE circuit_key = circuit_key
+            ON CONFLICT DO NOTHING
             """,
             (self.FORMAL_PROVIDER_CIRCUIT_KEY, self.FORMAL_PROVIDER_ID,
              self.FORMAL_PROVIDER_MODEL_ID, now, now, now, now),
@@ -243,12 +243,12 @@ class OpenMaicRuntimeRepository:
               opened_by_runtime_id, opened_at, last_probe_at,
               probe_succeeded_at, closed_at, revision, created_at, updated_at
             ) VALUES (?, ?, ?, 'open', ?, ?, ?, NULL, NULL, NULL, 1, ?, ?)
-            ON DUPLICATE KEY UPDATE
-              status = 'open', reason_code = VALUES(reason_code),
-              opened_by_runtime_id = VALUES(opened_by_runtime_id),
-              opened_at = VALUES(opened_at), last_probe_at = NULL,
+            ON CONFLICT (circuit_key) DO UPDATE SET
+              status = 'open', reason_code = EXCLUDED.reason_code,
+              opened_by_runtime_id = EXCLUDED.opened_by_runtime_id,
+              opened_at = EXCLUDED.opened_at, last_probe_at = NULL,
               probe_succeeded_at = NULL, closed_at = NULL,
-              revision = revision + 1, updated_at = VALUES(updated_at)
+              revision = learning_openmaic_provider_circuits.revision + 1, updated_at = EXCLUDED.updated_at
             """,
             (
                 self.FORMAL_PROVIDER_CIRCUIT_KEY,
@@ -276,12 +276,12 @@ class OpenMaicRuntimeRepository:
               opened_by_runtime_id, opened_at, last_probe_at,
               probe_succeeded_at, closed_at, revision, created_at, updated_at
             ) VALUES (?, ?, ?, 'closed', NULL, NULL, NULL, ?, ?, ?, 1, ?, ?)
-            ON DUPLICATE KEY UPDATE
+            ON CONFLICT (circuit_key) DO UPDATE SET
               status = 'closed', reason_code = NULL,
-              opened_by_runtime_id = NULL, last_probe_at = VALUES(last_probe_at),
-              probe_succeeded_at = VALUES(probe_succeeded_at),
-              closed_at = VALUES(closed_at), revision = revision + 1,
-              updated_at = VALUES(updated_at)
+              opened_by_runtime_id = NULL, last_probe_at = EXCLUDED.last_probe_at,
+              probe_succeeded_at = EXCLUDED.probe_succeeded_at,
+              closed_at = EXCLUDED.closed_at, revision = learning_openmaic_provider_circuits.revision + 1,
+              updated_at = EXCLUDED.updated_at
             """,
             (
                 self.FORMAL_PROVIDER_CIRCUIT_KEY,
@@ -606,7 +606,7 @@ class OpenMaicRuntimeRepository:
             SET candidate_build_item_id = ?, candidate_release_id = ?,
               candidate_grade_code = ?, candidate_target_fingerprint = ?,
               candidate_binding_contract_version = ?, candidate_bound_at = ?,
-              updated_at = GREATEST(updated_at, ?)
+              updated_at = mysql_greatest(updated_at, ?)
             WHERE id = ? AND candidate_build_item_id IS NULL
               AND candidate_release_id IS NULL AND candidate_grade_code IS NULL
               AND candidate_target_fingerprint IS NULL
@@ -2080,7 +2080,7 @@ class OpenMaicRuntimeRepository:
             SET status = 'failed', quality_status = 'rejected',
               error_code = ?, error_message_safe = ?,
               provider_attempt_ordinal = CASE
-                WHEN ? THEN provider_attempt_ordinal ELSE NULL END,
+                WHEN ? = 1 THEN provider_attempt_ordinal ELSE NULL END,
               updated_at = ?
             WHERE id = ? AND candidate_build_item_id IS NOT NULL
               AND status IN ('pending', 'generating')
@@ -2889,7 +2889,7 @@ class OpenMaicRuntimeRepository:
               parent.tts_expected_call_count,
               parent.tts_attempted_call_count,
               parent.tts_completed_call_count,
-              ?, ?, 0, 0, 0, 0, 10, 0, 0, ?, ?, ?, FALSE, ?, ?
+              ?, ?, 0, 0, 0, 0, 10, 0, 0, ?, ?, ?, 0, ?, ?
             FROM learning_openmaic_deterministic_recoveries AS parent
             WHERE parent.id = ? AND parent.runtime_classroom_id = ?
               AND parent.status = 'failed' AND parent.dispatch_count = 2
@@ -2918,15 +2918,15 @@ class OpenMaicRuntimeRepository:
               AND parent.tts_provider_id = 'qwen-tts'
               AND parent.tts_model_id = 'qwen3-tts-flash'
               AND parent.tts_voice_id = 'Serena'
-              AND parent.tts_fallback_used = FALSE
+              AND parent.tts_fallback_used = 0
               AND parent.tts_verified_asset_count IS NULL
               AND parent.upstream_classroom_id IS NULL
               AND parent.scene_count IS NULL
               AND parent.content_sha256 IS NULL
               AND parent.final_artifact_sha256 IS NULL
               AND parent.artifact_created_at IS NULL
-              AND parent.static_contract_verified = FALSE
-              AND parent.conversation_probe_verified = FALSE
+              AND parent.static_contract_verified = 0
+              AND parent.conversation_probe_verified = 0
               AND parent.verified_at IS NULL
               AND parent.receipt_json IS NOT NULL""",
             (
@@ -3016,7 +3016,7 @@ class OpenMaicRuntimeRepository:
               tts_fallback_used, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, 'recovering', ?, ?, ?, ?,
               'failed', 'structured_output_exhausted', ?, ?, ?, ?, ?, ?,
-              0, 0, 0, 0, 10, 0, 0, ?, ?, ?, FALSE, ?, ?)""",
+              0, 0, 0, 0, 10, 0, 0, ?, ?, ?, 0, ?, ?)""",
             (
                 recovery_id,
                 recovery_request_id,
@@ -3114,13 +3114,13 @@ class OpenMaicRuntimeRepository:
               AND tts_completed_call_count = 0
               AND tts_provider_id = 'qwen-tts'
               AND tts_model_id = 'qwen3-tts-flash'
-              AND tts_voice_id = 'Serena' AND tts_fallback_used = FALSE
+              AND tts_voice_id = 'Serena' AND tts_fallback_used = 0
               AND tts_verified_asset_count IS NULL
               AND upstream_classroom_id IS NULL AND scene_count IS NULL
               AND content_sha256 IS NULL AND final_artifact_sha256 IS NULL
               AND artifact_created_at IS NULL
-              AND static_contract_verified = FALSE
-              AND conversation_probe_verified = FALSE
+              AND static_contract_verified = 0
+              AND conversation_probe_verified = 0
               AND verified_at IS NULL AND receipt_json IS NULL""",
             (
                 now,
@@ -3258,7 +3258,7 @@ class OpenMaicRuntimeRepository:
             """UPDATE learning_openmaic_tts_credential_recoveries
             SET receipt_json = ?, tts_attempted_call_count = ?,
               tts_completed_call_count = ?,
-              updated_at = CASE WHEN ? THEN ? ELSE updated_at END
+              updated_at = CASE WHEN ? = 1 THEN ? ELSE updated_at END
             WHERE id = ? AND status = 'recovering'
               AND upstream_child_id IS NOT NULL
               AND tts_attempted_call_count <= ?
@@ -3289,8 +3289,8 @@ class OpenMaicRuntimeRepository:
             SET status = 'validating',
               tts_attempted_call_count = 10,
               tts_completed_call_count = 10,
-              static_contract_verified = FALSE,
-              conversation_probe_verified = FALSE,
+              static_contract_verified = 0,
+              conversation_probe_verified = 0,
               receipt_json = ?, updated_at = ?
             WHERE id = ? AND status = 'recovering'
               AND upstream_child_id = expected_upstream_child_id
@@ -3328,10 +3328,10 @@ class OpenMaicRuntimeRepository:
             SET upstream_classroom_id = ?, scene_count = ?, audio_count = ?,
               content_sha256 = ?, final_artifact_sha256 = ?,
               artifact_created_at = ?, tts_verified_asset_count = 10,
-              static_contract_verified = TRUE, receipt_json = ?,
+              static_contract_verified = 1, receipt_json = ?,
               updated_at = ?
             WHERE id = ? AND status = 'validating'
-              AND static_contract_verified = FALSE
+              AND static_contract_verified = 0
               AND upstream_classroom_id IS NULL
               AND upstream_child_id = expected_upstream_child_id
               AND ? = expected_upstream_classroom_id
@@ -3339,7 +3339,7 @@ class OpenMaicRuntimeRepository:
               AND tts_attempted_call_count = 10
               AND tts_completed_call_count = 10
               AND conversation_probe_id IS NULL
-              AND conversation_probe_verified = FALSE
+              AND conversation_probe_verified = 0
               AND error_code IS NULL AND terminal_at IS NULL""",
             (
                 artifact["classroomId"],
@@ -3370,7 +3370,7 @@ class OpenMaicRuntimeRepository:
             SET status = 'publishing', updated_at = ?
             WHERE child.id = ? AND child.runtime_classroom_id = ?
               AND child.status = 'validating'
-              AND child.static_contract_verified = TRUE
+              AND child.static_contract_verified = 1
               AND child.upstream_child_id = child.expected_upstream_child_id
               AND child.upstream_classroom_id =
                 child.expected_upstream_classroom_id
@@ -3392,7 +3392,7 @@ class OpenMaicRuntimeRepository:
               AND child.final_artifact_sha256 IS NOT NULL
               AND child.artifact_created_at IS NOT NULL
               AND child.receipt_json IS NOT NULL
-              AND child.conversation_probe_verified = FALSE
+              AND child.conversation_probe_verified = 0
               AND child.conversation_probe_id IS NULL
               AND child.verified_at IS NULL
               AND child.error_code IS NULL AND child.terminal_at IS NULL
@@ -3482,15 +3482,15 @@ class OpenMaicRuntimeRepository:
                   AND (? IS NULL OR ? >= tts_completed_call_count)
                 THEN ? ELSE receipt_json
               END,
-              tts_attempted_call_count = GREATEST(
+              tts_attempted_call_count = mysql_greatest(
                 tts_attempted_call_count,
                 COALESCE(?, tts_attempted_call_count)
               ),
-              tts_completed_call_count = GREATEST(
+              tts_completed_call_count = mysql_greatest(
                 tts_completed_call_count,
                 COALESCE(?, tts_completed_call_count)
               ),
-              conversation_probe_verified = FALSE, verified_at = NULL,
+              conversation_probe_verified = 0, verified_at = NULL,
               updated_at = ?, terminal_at = ?
             WHERE id = ? AND runtime_classroom_id = ?
               AND status = ?""",
@@ -3589,7 +3589,7 @@ class OpenMaicRuntimeRepository:
         failed = conn.execute(
             """UPDATE learning_openmaic_tts_credential_recoveries
             SET status = 'failed', error_code = ?, error_message_safe = ?,
-              conversation_probe_verified = FALSE, verified_at = NULL,
+              conversation_probe_verified = 0, verified_at = NULL,
               updated_at = ?, terminal_at = ?
             WHERE id = ? AND runtime_classroom_id = ? AND status = ?
               AND updated_at = ? AND updated_at <= ?
@@ -3649,7 +3649,7 @@ class OpenMaicRuntimeRepository:
             raise RuntimeError("openmaic TTS credential parent missing")
         child = conn.execute(
             """UPDATE learning_openmaic_tts_credential_recoveries
-            SET status = 'succeeded', conversation_probe_verified = TRUE,
+            SET status = 'succeeded', conversation_probe_verified = 1,
               conversation_probe_id = ?, verified_at = ?, receipt_json = ?,
               error_code = NULL, error_message_safe = NULL,
               updated_at = ?, terminal_at = ?
@@ -3664,8 +3664,8 @@ class OpenMaicRuntimeRepository:
               AND upstream_classroom_id = ?
               AND scene_count = 10 AND audio_count = 10
               AND tts_verified_asset_count = 10
-              AND static_contract_verified = TRUE
-              AND conversation_probe_verified = FALSE
+              AND static_contract_verified = 1
+              AND conversation_probe_verified = 0
               AND llm_call_count = 0 AND web_search_call_count = 0
               AND image_generation_call_count = 0
               AND video_generation_call_count = 0
@@ -3745,7 +3745,7 @@ class OpenMaicRuntimeRepository:
             """UPDATE learning_openmaic_deterministic_recoveries
             SET receipt_json = ?, tts_attempted_call_count = ?,
               tts_completed_call_count = ?,
-              updated_at = CASE WHEN ? THEN ? ELSE updated_at END
+              updated_at = CASE WHEN ? = 1 THEN ? ELSE updated_at END
             WHERE id = ? AND status = 'recovering'
               AND upstream_recovery_id IS NOT NULL
               AND tts_attempted_call_count <= ?
@@ -3924,8 +3924,8 @@ class OpenMaicRuntimeRepository:
     ) -> None:
         recovery = conn.execute(
             """UPDATE learning_openmaic_deterministic_recoveries
-            SET status = 'succeeded', static_contract_verified = TRUE,
-              conversation_probe_verified = TRUE, verified_at = ?,
+            SET status = 'succeeded', static_contract_verified = 1,
+              conversation_probe_verified = 1, verified_at = ?,
               receipt_json = ?, updated_at = ?, terminal_at = ?
             WHERE id = ? AND runtime_classroom_id = ? AND status = 'validating'
               AND source_runtime_status = 'failed'
@@ -4125,7 +4125,7 @@ class OpenMaicRuntimeRepository:
                         IS NOT NULL
                       AND exact_item.content_validation_contract_version <> ''
                       AND exact_item.content_receipt_hash
-                        REGEXP '^[0-9a-f]{{64}}$'
+                        ~* '^[0-9a-f]{{64}}$'
                     )
                   )
                 LIMIT 1
@@ -4189,7 +4189,7 @@ class OpenMaicRuntimeRepository:
                   receipt_alias="receipt",
                   provider_alias="provider",
               )}
-            LIMIT 1 FOR UPDATE
+            LIMIT 1 FOR UPDATE OF session, child, course, package, plan, release_row, release_item, build_item, runtime, receipt, audio
             """,
             (
                 self.CANDIDATE_BINDING_CONTRACT_VERSION,
@@ -4331,7 +4331,7 @@ class OpenMaicRuntimeRepository:
                  AND build_item.content_gate_passed_at IS NOT NULL
                  AND build_item.content_validation_contract_version IS NOT NULL
                  AND build_item.content_validation_contract_version <> ''
-                 AND build_item.content_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+                 AND build_item.content_receipt_hash ~* '^[0-9a-f]{{64}}$'
                )
              )
             JOIN learning_curriculum_classroom_item_receipts AS receipt
@@ -4380,7 +4380,7 @@ class OpenMaicRuntimeRepository:
                   provider_alias="provider",
               )}
             LIMIT 1
-                FOR UPDATE
+                FOR UPDATE OF session, child, course, package, pointer, history, release_row, release_item, runtime, build_item, receipt, audio
                 """,
                 (
                     str(remedial["id"]) if remedial is not None else "",
@@ -4408,8 +4408,7 @@ class OpenMaicRuntimeRepository:
             ) VALUES (
               ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
-            ON DUPLICATE KEY UPDATE
-              learning_session_id = VALUES(learning_session_id)
+            ON CONFLICT DO NOTHING
             """,
             (
                 learning_session_id,
@@ -4666,7 +4665,7 @@ class OpenMaicRuntimeRepository:
             UPDATE learning_openmaic_runtime_classrooms
             SET feature_manifest_json = ?, updated_at = ?
             WHERE id = ? AND status = 'ready' AND retired_at IS NULL
-              AND BINARY feature_manifest_json = BINARY ?
+              AND feature_manifest_json = ?
             """,
             (
                 self.encode_json(updated_manifest), now, runtime_id,

@@ -287,7 +287,7 @@ class CourseStorageRepository:
         now = int(time.time() * 1000)
         with self.database.transaction() as conn:
             conn.execute("INSERT INTO course_storage_scopes(storage_id,scope_key,preview_key,content_key,classroom_id,course_id,course_version,scope_json,bindings_json,created_at) "
-                "VALUES(?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE scope_key=scope_key",
+                "VALUES(?,?,?,?,?,?,?,?,?,?) ON CONFLICT DO NOTHING",
                 (storage_id, key, *(meta.get(field) for field in _INDEXES), meta_json, bindings_json, now))
             saved = conn.execute("SELECT * FROM course_storage_scopes WHERE storage_id=? AND scope_key=? FOR UPDATE",
                                  (storage_id, key)).fetchone()
@@ -296,7 +296,7 @@ class CourseStorageRepository:
             for value in normalized:
                 identity = storage_id, value["sourcePathSha256"], value["sha256"]
                 conn.execute("INSERT INTO course_storage_files(storage_id,source_path_sha256,content_sha256,source_path,byte_size,mime_type,locator_json,created_at) "
-                    "VALUES(?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE storage_id=storage_id",
+                    "VALUES(?,?,?,?,?,?,?,?) ON CONFLICT DO NOTHING",
                     (*identity, value["sourcePath"], value["byteSize"], value["mimeType"], _json(value["locator"]), now))
                 existing = self._decoded_file(conn.execute("SELECT * FROM course_storage_files WHERE storage_id=? AND source_path_sha256=? AND content_sha256=? FOR UPDATE",
                                                           identity).fetchone())
@@ -306,7 +306,7 @@ class CourseStorageRepository:
                 # first locator immutable; a later scope binds that same version.
                 if activate:
                     conn.execute("INSERT INTO course_storage_heads(storage_id,source_path_sha256,content_sha256,scope_key,updated_at) "
-                        "VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE content_sha256=VALUES(content_sha256),scope_key=VALUES(scope_key),updated_at=VALUES(updated_at)",
+                        "VALUES(?,?,?,?,?) ON CONFLICT (storage_id, source_path_sha256) DO UPDATE SET content_sha256=EXCLUDED.content_sha256,scope_key=EXCLUDED.scope_key,updated_at=EXCLUDED.updated_at",
                         (*identity, key, now))
             return self._decoded_scope(saved)
 
@@ -344,14 +344,14 @@ class CourseStorageRepository:
                 before_activate(conn)
             now = int(time.time() * 1000)
             conn.execute("INSERT INTO course_storage_scopes(storage_id,scope_key,preview_key,content_key,classroom_id,course_id,course_version,scope_json,bindings_json,created_at) "
-                "VALUES(?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE scope_key=scope_key",
+                "VALUES(?,?,?,?,?,?,?,?,?,?) ON CONFLICT DO NOTHING",
                 (storage_id, key, *(meta.get(field) for field in _INDEXES), meta_json, bindings_json, now))
             saved = conn.execute("SELECT * FROM course_storage_scopes WHERE storage_id=? AND scope_key=? FOR UPDATE",
                                  (storage_id, key)).fetchone()
             if saved is None or saved["scope_json"] != meta_json or saved["bindings_json"] != bindings_json:
                 _fail("course_storage_scope_conflict")
             conn.execute("INSERT INTO course_storage_files(storage_id,source_path_sha256,content_sha256,source_path,byte_size,mime_type,locator_json,created_at) "
-                "VALUES(?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE storage_id=storage_id",
+                "VALUES(?,?,?,?,?,?,?,?) ON CONFLICT DO NOTHING",
                 (*identity, value["sourcePath"], value["byteSize"], value["mimeType"], _json(value["locator"]), now))
             existing = self._decoded_file(conn.execute("SELECT * FROM course_storage_files WHERE storage_id=? "
                 "AND source_path_sha256=? AND content_sha256=? FOR UPDATE", identity).fetchone())
@@ -397,7 +397,7 @@ class CourseStorageRepository:
             now = int(time.time() * 1000)
             for binding in accepted:
                 conn.execute("INSERT INTO course_storage_heads(storage_id,source_path_sha256,content_sha256,scope_key,updated_at) "
-                    "VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE content_sha256=VALUES(content_sha256),scope_key=VALUES(scope_key),updated_at=VALUES(updated_at)",
+                    "VALUES(?,?,?,?,?) ON CONFLICT (storage_id, source_path_sha256) DO UPDATE SET content_sha256=EXCLUDED.content_sha256,scope_key=EXCLUDED.scope_key,updated_at=EXCLUDED.updated_at",
                     (storage_id, binding["sourcePathSha256"], binding["sha256"], scope_key, now))
             return {"storageId": storage_id, "scopeKey": scope_key, "activated": len(accepted), "bindings": accepted}
 

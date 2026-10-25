@@ -250,9 +250,10 @@ def initialize_ledger(path: Path, plan: dict, *, now=None) -> tuple[LearningBudg
     path.parent.mkdir(parents=True, exist_ok=True)
     fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_EXCL, 0o600)
     os.close(fd)
-    schema = (BACKEND / "migrations/076_learning_paid_budget.sql").read_text()
+    # The private SQLite ledger reuses the historical MySQL table definitions.
+    schema = (BACKEND / "migrations/mysql/076_learning_paid_budget.sql").read_text()
     schema = schema.replace("BIGINT AUTO_INCREMENT PRIMARY KEY", "INTEGER PRIMARY KEY AUTOINCREMENT").replace(" ENGINE=InnoDB", "")
-    care = (BACKEND / "migrations/022_care_observation_contract.sql").read_text()
+    care = (BACKEND / "migrations/mysql/022_care_observation_contract.sql").read_text()
     audit = care[care.index("CREATE TABLE IF NOT EXISTS audit_events"):]
     audit = audit[:audit.index(";", audit.index("created_at BIGINT")) + 1]
     try:

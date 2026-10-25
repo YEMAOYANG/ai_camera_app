@@ -6,14 +6,13 @@
 
 | 迁移包文件 | 内容 |
 | --- | --- |
-| `mysql.sql` | 家长、孩子、学生身份、任务、积分、课程目录/发布状态、学习进度、预算授权和账本等 MySQL 数据与结构 |
-| `postgres.dump` | OpenMAIC Agent/课堂持久化 PostgreSQL，`pg_dump` custom 格式 |
+| `postgres.dump` | 唯一的 PostgreSQL 数据库 `mira`，`pg_dump` custom 格式：`app` 模式是家长、孩子、学生身份、任务、积分、课程目录/发布状态、学习进度、预算授权和账本等后端数据；`public` 模式是 OpenMAIC Agent/课堂持久化数据 |
 | `backend-data.tar` | 整个 `backend/data`：学习媒体、设备密钥文件和密文、Provider 回复与恢复审计等 |
 | `openmaic-data.tar` | 整个 OpenMAIC `data`：课堂、生成任务、TTS/ASR job 与音频、验收/修复证据、预算绑定等 |
 | `learning-budget-policy.json` | 当前预算政策的原始字节，包含政策版本、计价、额度与授权窗口；不扩展额度或续期 |
 | `manifest.json` | 文件 SHA-256 和大小、源数据库版本、配置密钥名及指纹、恢复路径约定 |
 
-`backend/data` 不是业务数据库。只复制它或只执行数据库迁移建表，都无法带走现有完整课程。源代码也要部署同一版本，包括 OpenMAIC 的补丁集合。迁移保持课程 ID、发布状态、未完成/`ambiguous` 任务状态原样；它不把尚未验收的课程变成可发布课程。
+`backend/data` 不是业务数据库。只复制它或只执行数据库迁移建表，都无法带走现有完整课程。迁移包格式为 `mira.data-bundle.v2`；带 `mysql.sql` 的旧 v1 包来自合并前的 MySQL 布局，不能直接恢复。源代码也要部署同一版本，包括 OpenMAIC 的补丁集合。迁移保持课程 ID、发布状态、未完成/`ambiguous` 任务状态原样；它不把尚未验收的课程变成可发布课程。
 
 ## 1. 只读盘点
 
@@ -29,7 +28,7 @@ python3 deploy/data_bundle.py inventory
 
 ## 2. 停止写入，再导出
 
-先检查任务状态，等现有课程生成和付费调用结束，停止后端、学生端、OpenMAIC、网关、全部 worker 及单独运行的生成/修复脚本。不要在不明确的 Provider 调用中途强杀并重试。项目管理的本地栈可使用 `openmaic-runtime/scripts/local-test-stack.sh stop`，但仍要确认没有独立运行的 operator/worker。MySQL 和 PostgreSQL 保持运行。
+先检查任务状态，等现有课程生成和付费调用结束，停止后端、学生端、OpenMAIC、网关、全部 worker 及单独运行的生成/修复脚本。不要在不明确的 Provider 调用中途强杀并重试。项目管理的本地栈可使用 `openmaic-runtime/scripts/local-test-stack.sh stop`，但仍要确认没有独立运行的 operator/worker。PostgreSQL 保持运行。
 
 ```bash
 python3 deploy/data_bundle.py export-local \
@@ -41,7 +40,7 @@ python3 deploy/data_bundle.py export-local \
 
 输出父目录须已存在，输出目录须不存在。`--services-stopped` 是操作者确认，不会替你停进程或证明跨库一致。数据库和两份文件目录必须来自同一段没有写入的时间，否则会出现课件、发布记录和音频对不上的情况。
 
-导出需要 `mysqldump`、`pg_dump` 和 `pg_restore`，也可以分别用 `--mysqldump`、`--pg-dump`、`--pg-restore` 指定可执行文件。工具使用临时 0600 客户端配置/密码文件传递数据库凭据，数据库 URL 和密码不会放进进程参数、日志或 manifest；不会通过 shell `source` 加载配置。数据库客户端必须兼容源服务器版本。
+导出需要 `pg_dump` 和 `pg_restore`，也可以用 `--pg-dump`、`--pg-restore` 指定可执行文件。后端的 `APP_DATABASE_URL` 和课堂运行时的数据库地址必须指向同一个数据库，否则工具会停止。工具使用临时 0600 服务/密码文件传递数据库凭据，数据库 URL 和密码不会放进进程参数、日志或 manifest；不会通过 shell `source` 加载配置。数据库客户端必须兼容源服务器版本。
 
 预算政策按 `--budget-policy` → 后端 dotenv 的 `LEARNING_BUDGET_POLICY_PATH` → `backend/content/learning_budget_policy.json` 读取，相对配置路径从 `backend/` 解析。代码默认政策是 disabled，不能把它误认为当前课堂政策。如果实际运行时在进程内覆盖过政策，必须显式加 `--budget-policy /absolute/path/to/actual-policy.json`。本项目没有 `LEARNING_CLASSROOM_BUDGET_POLICY_PATH` 配置。
 
@@ -63,7 +62,7 @@ env 文件和模型 API Key 不进入数据包。服务器使用新的数据库�
 python3 deploy/data_bundle.py verify /absolute/private-backups/mira-first-export
 ```
 
-服务器数据库镜像必须与 manifest 记录的源版本兼容。尤其不允许把本地 MySQL 9.x 的 dump 直接导入默认 MySQL 8.x；选择相同大版本，或另行执行经过验证的迁移升级方案。不要复制 MySQL/PostgreSQL 的底层数据库目录跨系统启动。
+服务器 PostgreSQL 必须与 manifest 记录的源大版本相同（本地为 16）；升级大版本需另行执行经过验证的方案。不要复制 PostgreSQL 的底层数据目录跨系统启动。
 
 文件恢复子命令如下。它只恢复文件，不导入数据库：
 
@@ -77,7 +76,7 @@ python3 deploy/data_bundle.py restore-files \
 
 恢复先检查全部 SHA-256 并拒绝绝对路径、`..`、软链接、硬链接及特殊文件。目录默认 0700，文件 0600；服务器部署入口应根据镜像运行 UID/GID 设置属主，再启动服务。不要用 `chmod 777`。中途失败可能留下部分文件，不能跳过空目标检查覆盖恢复。
 
-数据库导入必须在所有应用和 worker 停止、目标库为空、版本已检查时进行。`mysql.sql` 是单库结构与数据，没有创建服务器用户的 SQL；`postgres.dump` 不携带源 owner/ACL，使用目标账号导入。导入后再执行项目版本需要的结构迁移，保留原课程 ID 与发布状态。
+数据库导入必须在所有应用和 worker 停止、目标库为空、版本已检查时进行。`postgres.dump` 不携带源 owner/ACL，也没有创建服务器账号的 SQL。目标环境先按 `deploy/postgres/init/` 建好登录账号 `mira`、数据库 `mira` 和空的 `app` 模式；导入前删除这个空的 `app` 模式（转储会重建它），再以 `pg_restore --no-owner --no-privileges --role=mira` 导入，使所有对象仍归 `mira` 所有。`server.py restore` 按这个顺序执行；不用 Docker 的服务器照同样步骤手动执行。导入后再执行项目版本需要的结构迁移，保留原课程 ID 与发布状态。
 
 ## 5. 核验后启用应用
 

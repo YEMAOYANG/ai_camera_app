@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 from contextlib import contextmanager
 from pathlib import Path
@@ -9,7 +10,7 @@ from typing import Any
 from unittest.mock import patch
 from urllib.parse import unquote, urlparse
 
-from core.database import Database
+from core.database import DEFAULT_SCHEMA, Database
 from scripts.migrate import run_migrations
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -18,8 +19,7 @@ DEFAULT_PROMPT_ROOT = str(BACKEND_ROOT / "prompts")
 
 TEST_DATABASE_URL = os.getenv(
     "APP_TEST_DATABASE_URL",
-    "mysql+pymysql://ai_camera_app:ai_camera_app_dev@127.0.0.1:3306/"
-    "ai_camera_app_test?charset=utf8mb4",
+    "postgresql://mira@127.0.0.1:5433/mira_test",
 )
 
 
@@ -31,12 +31,13 @@ def validated_test_database_url(database_url: str | None = None) -> str:
     ).strip()
     parsed = urlparse(resolved)
     database_name = unquote(parsed.path.lstrip("/")).split("/", 1)[0]
-    if database_name != "ai_camera_app_test":
+    # mira_test, or mira_test_<suffix> for a parallel run; never the daily `mira`.
+    if re.fullmatch(r"mira_test(_[a-z0-9]+)?", database_name) is None:
         raise RuntimeError(
-            "APP_TEST_DATABASE_URL must name the exact ai_camera_app_test database"
+            "APP_TEST_DATABASE_URL must name the mira_test database"
         )
-    if parsed.scheme != "mysql+pymysql":
-        raise RuntimeError("APP_TEST_DATABASE_URL must use mysql+pymysql")
+    if parsed.scheme not in {"postgresql", "postgres"}:
+        raise RuntimeError("APP_TEST_DATABASE_URL must be a postgresql:// URL")
     if (parsed.hostname or "").lower() not in {"127.0.0.1", "localhost", "::1"}:
         raise RuntimeError("APP_TEST_DATABASE_URL must use a safe local test boundary")
     return resolved
@@ -85,20 +86,15 @@ def fresh_test_config(**overrides: Any) -> dict:
     config.update(overrides)
     database_url = validated_test_database_url(config["DATABASE_URL"])
     config["DATABASE_URL"] = database_url
-    reset_mysql_test_database(database_url)
+    reset_test_database(database_url)
     return config
 
 
-def reset_mysql_test_database(database_url: str | None = None) -> None:
+def reset_test_database(database_url: str | None = None) -> None:
     safe_database_url = validated_test_database_url(database_url)
     database = Database(safe_database_url)
     with database.transaction() as conn:
-        conn.execute("SET FOREIGN_KEY_CHECKS = 0")
-        rows = conn.execute("SHOW TABLES").fetchall()
-        for row in rows:
-            table_name = next(iter(row.values()))
-            conn.execute(f"DROP TABLE IF EXISTS `{table_name}`")
-        conn.execute("SET FOREIGN_KEY_CHECKS = 1")
+        conn.executescript(f"DROP SCHEMA IF EXISTS {DEFAULT_SCHEMA} CASCADE; CREATE SCHEMA {DEFAULT_SCHEMA}")
     run_migrations(safe_database_url, verbose=False)
 
 

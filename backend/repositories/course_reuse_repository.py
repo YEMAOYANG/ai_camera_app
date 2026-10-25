@@ -56,7 +56,7 @@ class CourseReuseRepository:
         conn.execute('INSERT INTO learning_course_reuse_slots '
                      '(identity_key,course_key,edition_id,node_id,part_index,teaching_revision,identity_json,'
                      'lesson_scope_sha256,preview_key,published_content_key,regeneration_json,created_at,updated_at) '
-                     'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE identity_key=identity_key',
+                     'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT DO NOTHING',
                      (key, digest({k: v for k, v in identity.items() if k != 'teachingRevision'}),
                       identity['editionId'], identity['nodeId'], identity['partIndex'], identity['teachingRevision'],
                       canonical(identity), scope_hash, preview_key, publication_key,

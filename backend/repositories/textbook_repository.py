@@ -30,14 +30,14 @@ class TextbookRepository:
         key = manifest["editionId"], manifest["revisionId"]
         identity = {k: manifest[k] for k in ("editionId", "publisher", "gradeCode", "subject", "volume", "schoolSystem")}
         identity["resourceId"] = manifest["source"]["resourceId"]
-        conn.execute("INSERT INTO learning_textbook_editions (edition_id,identity_sha256,identity_json,imported_at) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE edition_id=edition_id",
+        conn.execute("INSERT INTO learning_textbook_editions (edition_id,identity_sha256,identity_json,imported_at) VALUES (?,?,?,?) ON CONFLICT DO NOTHING",
                      (key[0], digest(identity), canonical(identity), now))
         edition = conn.execute("SELECT * FROM learning_textbook_editions WHERE edition_id=? FOR UPDATE", (key[0],)).fetchone()
         if edition["identity_sha256"] != digest(identity):
             raise ApiError("textbook_edition_conflict", "出版社、年级、学科、学制、册次或资源已变化，请建立新的教材版本", 409)
         # Unique key serializes concurrent imports; immutable hashes prevent replacement.
         cursor = conn.execute("INSERT INTO learning_textbook_revisions (edition_id,revision_id,grade_code,subject,manifest_sha256,manifest_json,imported_at) "
-                              "VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE edition_id=edition_id",
+                              "VALUES (?,?,?,?,?,?,?) ON CONFLICT DO NOTHING",
                               (*key, manifest["gradeCode"], manifest["subject"], digest(manifest), canonical(manifest), now))
         row = conn.execute("SELECT * FROM learning_textbook_revisions WHERE edition_id=? AND revision_id=? FOR UPDATE", key).fetchone()
         if row is None or row["manifest_sha256"] != digest(manifest):
@@ -131,7 +131,7 @@ class TextbookRepository:
     def reserve_build(self, conn, brief, now):
         b = brief["textbookBinding"]
         cursor = conn.execute("INSERT INTO learning_textbook_course_builds (content_key,edition_id,revision_id,node_id,part_index,teaching_revision,input_json,status,created_at,updated_at) "
-                              "VALUES (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE content_key=content_key",
+                              "VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT DO NOTHING",
                               (brief["contentKey"], b["editionId"], b["alignmentRevisionId"], b["nodeId"], b["partIndex"], b["teachingRevision"], canonical(brief), "prepared", now, now))
         # A current read is essential: under MySQL REPEATABLE READ a concurrent
         # no-op upsert can find a row newer than this transaction's snapshot.
@@ -164,16 +164,19 @@ class TextbookRepository:
         The strict launch path continues to use ``get_build`` and
         ``validate_release`` over the complete row.
         """
-        mysql = getattr(conn, "dialect", None) == "mysql"
-        array_length = "JSON_LENGTH" if mysql else "json_array_length"
+        # PostgreSQL runs these MySQL-style JSON calls through the
+        # migrations/103 helpers; the other dialect is the SQLite fixture.
+        server = getattr(conn, "dialect", None) == "postgresql"
+        json_object = "jsonb_build_object" if server else "JSON_OBJECT"
+        array_length = "JSON_LENGTH" if server else "json_array_length"
         def json_type(path):
-            return (f"JSON_TYPE(JSON_EXTRACT(b.review_json, '{path}'))" if mysql
+            return (f"JSON_TYPE(JSON_EXTRACT(b.review_json, '{path}'))" if server
                     else f"json_type(b.review_json, '{path}')")
         review_evidence = "JSON_REMOVE(b.review_json, '$.release')"
-        review_evidence_bytes = (f"OCTET_LENGTH({review_evidence})" if mysql
+        review_evidence_bytes = (f"OCTET_LENGTH(CAST({review_evidence} AS TEXT))" if server
                                  else f"LENGTH(CAST({review_evidence} AS BLOB))")
         course_title = "c.title"
-        if not mysql:
+        if not server:
             # The isolated SQLite contract fixture predates the production title
             # column. Keep the production projection fixed while allowing empty
             # test catalogues to exercise the same read path.
@@ -192,7 +195,7 @@ class TextbookRepository:
               CASE WHEN JSON_VALID(b.review_json)
                   AND {review_evidence_bytes} <= 1048576
                 THEN {review_evidence} ELSE NULL END AS directory_review_evidence_json,
-              CASE WHEN JSON_VALID(b.review_json) THEN JSON_OBJECT(
+              CASE WHEN JSON_VALID(b.review_json) THEN {json_object}(
                   'schemaVersion', JSON_EXTRACT(b.review_json, '$.release.schemaVersion'),
                   'sha256', JSON_EXTRACT(b.review_json, '$.release.sha256'),
                   'contentKey', JSON_EXTRACT(b.review_json, '$.release.contentKey'),
@@ -201,7 +204,7 @@ class TextbookRepository:
                   'assessmentMode', JSON_EXTRACT(b.review_json, '$.release.assessmentMode'),
                   'activityScope', JSON_EXTRACT(b.review_json, '$.release.activityScope'),
                   'activityScopeType', {json_type('$.release.activityScope')},
-                  'audioAudit', JSON_OBJECT(
+                  'audioAudit', {json_object}(
                     'sha256', JSON_EXTRACT(b.review_json, '$.release.audioAudit.sha256'),
                     'passed', JSON_EXTRACT(b.review_json, '$.release.audioAudit.passed'),
                     'passedType', {json_type('$.release.audioAudit.passed')},
@@ -239,19 +242,21 @@ class TextbookRepository:
         SHA stored inside it. Shared locking reads also avoid an older MVCC
         snapshot created by the authentication reads in this transaction.
         """
-        mysql = getattr(conn, 'dialect', None) == 'mysql'
+        server = getattr(conn, 'dialect', None) == 'postgresql'
         fields = ('content_key', 'edition_id', 'revision_id', 'node_id',
                   'part_index', 'teaching_revision', 'course_id', 'course_version',
                   'course_content_sha256', 'status', 'created_at', 'updated_at')
-        hashes = ('SHA2(input_json,256) AS input_sha256, '
-                  'SHA2(review_json,256) AS review_sha256') if mysql else 'input_json, review_json'
-        shared = ' FOR SHARE' if mysql else ''
+        # The JSON text hashed here is exactly the text a full read returns.
+        hashes = ("encode(sha256(convert_to(CAST(input_json AS TEXT),'UTF8')),'hex') AS input_sha256, "
+                  "encode(sha256(convert_to(CAST(review_json AS TEXT),'UTF8')),'hex') AS review_sha256"
+                  ) if server else 'input_json, review_json'
+        shared = ' FOR SHARE' if server else ''
         build = conn.execute('SELECT ' + ','.join(fields) + ',' + hashes
                              + ' FROM learning_textbook_course_builds WHERE content_key=?' + shared,
                              (content_key,)).fetchone()
         if build is None:
             return None
-        if not mysql:
+        if not server:
             # Isolated SQLite tests; production never transfers these bytes.
             from services.textbook_directory_access import _value_sha256
             build['input_sha256'] = _value_sha256(build.pop('input_json'))

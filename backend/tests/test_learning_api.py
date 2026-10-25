@@ -577,11 +577,11 @@ class LearningApiTest(unittest.TestCase):
             conn.execute(
                 """
                 UPDATE learning_courses AS course
-                JOIN tasks AS task
-                  ON task.learning_course_id = course.id
-                 AND task.learning_course_version = course.version
-                SET course.content_json = ?
-                WHERE task.id = ?
+                SET content_json = ?
+                FROM tasks AS task
+                WHERE task.learning_course_id = course.id
+                  AND task.learning_course_version = course.version
+                  AND task.id = ?
                 """,
                 (json.dumps(content, ensure_ascii=False), task_id),
             )
@@ -677,11 +677,11 @@ class LearningApiTest(unittest.TestCase):
             conn.execute(
                 """
                 UPDATE learning_courses AS course
-                JOIN tasks AS task
-                  ON task.learning_course_id = course.id
-                 AND task.learning_course_version = course.version
-                SET course.content_json = ?
-                WHERE task.id = ?
+                SET content_json = ?
+                FROM tasks AS task
+                WHERE task.learning_course_id = course.id
+                  AND task.learning_course_version = course.version
+                  AND task.id = ?
                 """,
                 (json.dumps(content, ensure_ascii=False), task_id),
             )

@@ -227,8 +227,8 @@ class CourseLibraryService:
         # earlier requests, and registering a slot does not call a Provider.
         conn.execute("""INSERT INTO learning_course_supply_requests(
             target_fingerprint, subject, skill_id, variant_ordinal, priority, purpose, enabled, created_at, updated_at)
-            VALUES (?, ?, ?, ?, 1, 'core', TRUE, ?, ?)
-            ON DUPLICATE KEY UPDATE priority = LEAST(priority, 1), updated_at = VALUES(updated_at)""",
+            VALUES (?, ?, ?, ?, 1, 'core', 1, ?, ?)
+            ON CONFLICT (target_fingerprint, subject, skill_id, variant_ordinal) DO UPDATE SET priority = mysql_least(learning_course_supply_requests.priority, 1), updated_at = EXCLUDED.updated_at""",
             (*key, timestamp, timestamp))
         requested[key] = {'planId': owner['id'], 'gradeCode': lesson['gradeCode'], 'subject': subject,
             'lessonId': lesson['lessonId'], 'variantOrdinal': variant, 'assessmentBatchOrdinal': batch,
@@ -251,11 +251,11 @@ class CourseLibraryService:
                 (plan['id'], self.fingerprint, self.target['gradeCode'])).fetchone()
             if locked is None:
                 raise RuntimeError('course library ownership changed')
-            conn.execute('UPDATE learning_course_supply_requests SET enabled = FALSE WHERE target_fingerprint = ?', (self.fingerprint,))
+            conn.execute('UPDATE learning_course_supply_requests SET enabled = 0 WHERE target_fingerprint = ?', (self.fingerprint,))
             conn.execute("""INSERT INTO learning_course_supply_requests(
                 target_fingerprint, subject, skill_id, variant_ordinal, priority, purpose, enabled, created_at, updated_at)
-                VALUES (?, ?, ?, ?, 0, 'core', TRUE, ?, ?)
-                ON DUPLICATE KEY UPDATE priority=0, enabled=TRUE, updated_at=VALUES(updated_at)""",
+                VALUES (?, ?, ?, ?, 0, 'core', 1, ?, ?)
+                ON CONFLICT (target_fingerprint, subject, skill_id, variant_ordinal) DO UPDATE SET priority=0, enabled=1, updated_at=EXCLUDED.updated_at""",
                 (self.fingerprint, subject, skill_id, variant_ordinal, timestamp, timestamp))
         invalidate_supply_cache(str(self.database.database_url), self.target['gradeCode'])
         return {'planId': plan['id'], 'scope': 'single_slot', 'gradeCode': self.target['gradeCode'],
@@ -317,15 +317,15 @@ class CourseLibraryService:
             desired = prioritize_demand(desired, mastery, forward_boundaries=self.policy['forwardBoundaryCount'])
             # A scope is an explicit production ceiling. Keep disabled requests
             # for audit, but never let an older, wider scope silently expand it.
-            conn.execute('UPDATE learning_course_supply_requests SET enabled = FALSE WHERE target_fingerprint = ?', (self.fingerprint,))
+            conn.execute('UPDATE learning_course_supply_requests SET enabled = 0 WHERE target_fingerprint = ?', (self.fingerprint,))
             for item in desired:
                 conn.execute(
                     """INSERT INTO learning_course_supply_requests(
                       target_fingerprint, subject, skill_id, variant_ordinal,
                       priority, purpose, enabled, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, TRUE, ?, ?)
-                    ON DUPLICATE KEY UPDATE priority = VALUES(priority),
-                      enabled = TRUE, updated_at = VALUES(updated_at)""",
+                    ) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
+                    ON CONFLICT (target_fingerprint, subject, skill_id, variant_ordinal) DO UPDATE SET priority = EXCLUDED.priority,
+                      enabled = 1, updated_at = EXCLUDED.updated_at""",
                     (self.fingerprint, item['subject'], item['skillId'], item['variantOrdinal'],
                      item['priority'], item['purpose'], timestamp, timestamp),
                 )
@@ -366,7 +366,7 @@ class CourseLibraryService:
                         AND resolved_failure.resolved_at IS NOT NULL
                     ) THEN COALESCE(production_runtime.error_code, 'classroom_failed') END) AS reason_code,
                   incident.stage AS blocked_stage, incident.blocked_at,
-                  FALSE AS ready
+                  0 AS ready
                 FROM learning_course_supply_requests AS request
                 JOIN learning_curriculum_preparation_plans AS owner
                   ON owner.library_target_fingerprint = request.target_fingerprint
@@ -387,7 +387,7 @@ class CourseLibraryService:
                   )
                 LEFT JOIN learning_course_supply_incidents AS incident
                   ON incident.build_item_id = item.id AND incident.resolved_at IS NULL
-                WHERE request.target_fingerprint = ? AND owner.grade_code = ? AND request.enabled = TRUE
+                WHERE request.target_fingerprint = ? AND owner.grade_code = ? AND request.enabled = 1
                 ORDER BY request.priority, request.subject, request.skill_id, request.variant_ordinal""",
                 (self.fingerprint, self.target['gradeCode']),
             ).fetchall()

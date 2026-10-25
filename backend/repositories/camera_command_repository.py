@@ -93,7 +93,7 @@ class CameraCommandRepository:
             """
             UPDATE camera_commands
             SET status = ?, message = ?, response_payload = ?, updated_at = ?,
-              completed_at = CASE WHEN ? THEN ? ELSE completed_at END
+              completed_at = CASE WHEN ? = 1 THEN ? ELSE completed_at END
             WHERE family_id = ? AND id = ?
             """,
             (

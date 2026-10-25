@@ -23,7 +23,7 @@
 | `student-web/src/`、`public/` | 学生网页源码、插画、字体和当前模型 | 业务源码与运行资源 |
 | `backend/routes/`、`services/`、`repositories/` | API、业务逻辑、数据库访问 | 业务源码 |
 | `backend/content/`、`prompts/` | 教材、AI 政策、版本化提示词 | 部分 Markdown 是程序输入，不能按扩展名删除 |
-| `backend/migrations/` | MySQL 表结构的有序变更历史 | 保留已应用迁移，新环境依赖完整历史 |
+| `backend/migrations/` | PostgreSQL 表结构的有序变更（`mysql/` 是合并前的 MySQL 历史） | 保留已应用迁移，新环境依赖完整历史 |
 | `backend/data/` | 作业附件、生成媒体、调用回执和设备密钥存储 | 不是数据库目录；其中包含有效运行数据 |
 | `backend/tests/`、`mobile/test/`、学生端 `*.test.*` 与 `tests/` | 回归测试、场景夹具和视觉基线 | 保留有效测试；截图失败产物可清 |
 | `openmaic-runtime/patches/` | 对上游课堂源码的持久修改 | 运行环境重建依赖这些补丁 |
@@ -77,9 +77,9 @@ python3 app.py
 
 ## 数据库用途
 
-业务数据位于 MySQL，开发库通常是 `ai_camera_app_dev`，测试库是 `ai_camera_app_test`；连接以 `backend/.env` 为准。课堂 Agent 使用 PostgreSQL，连接以 `backend/.env` 中的 `MIRA_OPENMAIC_AGENT_DATABASE_URL` 为准。它们不存放在 `backend/data/`。
+全部数据在一个 PostgreSQL 数据库 `mira` 里：业务表在 `app` schema，课堂表在 `public` schema。连接以 `backend/.env` 的 `APP_DATABASE_URL`（业务）和 `MIRA_OPENMAIC_AGENT_DATABASE_URL`（课堂）为准，两者指向同一个库。数据不存放在 `backend/data/`。
 
-本机 PostgreSQL 自 2026-10-25 起运行在 Docker Desktop：`docker compose -f deploy/compose.local-db.yml --env-file deploy/env/local-db.env up -d`（127.0.0.1:5433，库 `mira`）。课堂表在 `public` schema，业务表计划迁入同库的 `app` schema；`mira_test` 供测试清空重建。程序和数据库浏览工具共用登录账号 `mira`，密码在 git 忽略的 `deploy/env/local-db.env`。数据保存在 Docker 卷 `mira-pgdata`：不要执行 `docker compose down -v`、`docker volume prune`，也不要在 Docker Desktop 中清除数据。本地服务启动前 Docker Desktop 必须已运行。原 Homebrew 库 `openmaic_mira` 保留未删，但已拒绝新连接，仅供回退。
+本机 PostgreSQL 自 2026-10-25 起运行在 Docker Desktop：`docker compose -f deploy/compose.local-db.yml --env-file deploy/env/local-db.env up -d`（127.0.0.1:5433，库 `mira`）；`mira_test` 供测试清空重建。程序和数据库浏览工具共用登录账号 `mira`，密码在 git 忽略的 `deploy/env/local-db.env`。数据保存在 Docker 卷 `mira-pgdata`：不要执行 `docker compose down -v`、`docker volume prune`，也不要在 Docker Desktop 中清除数据。本地服务启动前 Docker Desktop 必须已运行。原来的 MySQL 库 `ai_camera_app_dev` 和 Homebrew PostgreSQL 库 `openmaic_mira` 已停用但保留未删，仅供回退核对。
 
 | 表组 | 负责什么 |
 | --- | --- |
@@ -90,8 +90,8 @@ python3 app.py
 | 作业 | 上传、识别、判题、订正、辅导和调用预算 |
 | 课程生成、发布、媒体 | 备课状态、预算凭据、音频、质量审核和课堂绑定 |
 | `schema_migrations` | 已应用迁移版本，支持安全升级 |
-| PostgreSQL `document_*`、`stage_meta` | 课堂场景和课件文档 |
-| PostgreSQL `agent_*` | Agent 会话、工具结果、事件重放、生成和恢复证据 |
+| `public` schema `document_*`、`stage_meta` | 课堂场景和课件文档 |
+| `public` schema `agent_*` | Agent 会话、工具结果、事件重放、生成和恢复证据 |
 
 空表可能是尚未使用的功能，也可能在代码中承担预留接口。删表必须同时核对读写代码、外键、迁移历史和有效数据；数据库整理不能只看表名或当前行数。
 

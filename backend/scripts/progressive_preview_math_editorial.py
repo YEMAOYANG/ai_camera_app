@@ -155,7 +155,7 @@ def prepare(path):
     database = Database(AppConfig.from_env().DATABASE_URL)
     conn = database.connect()
     try:
-        conn.execute("START TRANSACTION READ ONLY")
+        conn.execute("SET TRANSACTION READ ONLY")
         saved = snapshot(conn, selected)
         require(len(saved["ledger"]) == 8, "source must have exactly eight settled content calls")
         require(not _event(conn, selected, STARTED) and not conn.execute("SELECT id FROM learning_course_generation_jobs WHERE request_id=?", (EDITORIAL_REQUEST,)).fetchone(),

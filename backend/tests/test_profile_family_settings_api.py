@@ -1156,7 +1156,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
         ):
             if for_update:
                 connection_id = conn.execute(
-                    "SELECT CONNECTION_ID() AS id"
+                    "SELECT pg_backend_pid() AS id"
                 ).fetchone()["id"]
                 with connection_ids_lock:
                     connection_ids.append(connection_id)
@@ -2030,7 +2030,7 @@ class ProfileFamilySettingsApiTest(unittest.TestCase):
                   camera_name_intro_status, contacts_status, created_at, updated_at, completed_at
                 )
                 VALUES (?, 1, 'done', 'done', 'done', 'done', 'done', 'done', 'done', 1, 1, 1)
-                ON DUPLICATE KEY UPDATE
+                ON CONFLICT (family_id) DO UPDATE SET
                   completed = 1,
                   parent_identity_status = 'done',
                   device_binding_status = 'done',

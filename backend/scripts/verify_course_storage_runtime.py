@@ -49,7 +49,8 @@ class ReadOnlyConnection:
 
     def execute(self, sql, params=()):
         if (not re.match(r"\s*SELECT\b", sql, re.I) or ";" in sql
-                or re.search(r"\b(?:INTO\s+(?:OUTFILE|DUMPFILE)|FOR\s+UPDATE|GET_LOCK|RELEASE_LOCK)\b", sql, re.I)):
+                or re.search(r"\b(?:INTO\s+(?:OUTFILE|DUMPFILE)|FOR\s+(?:UPDATE|SHARE|NO\s+KEY\s+UPDATE|KEY\s+SHARE)"
+                             r"|GET_LOCK|RELEASE_LOCK|pg_(?:try_)?advisory\w*|pg_sleep\w*)\b", sql, re.I)):
             raise VerificationError("course_verification_database_write_forbidden")
         return self.connection.execute(sql, params)
 

@@ -268,7 +268,7 @@ class PracticeTest(unittest.TestCase):
             "student_receipt.publication_status = 'published'", "fine_child.grade_selection_revision >= 1"]:
             self.assertIn(condition, formal_sql)
     def test_migration_freezes_question_snapshots_and_never_updates_course_rows(self):
-        sql=(Path(__file__).parents[1]/'migrations/078_learning_versioned_practice.sql').read_text()
+        sql=(Path(__file__).parents[1]/'migrations/mysql/078_learning_versioned_practice.sql').read_text()
         self.assertEqual(len(_split_sql_script(sql)),4)
         self.assertIn('snapshot_json JSON NOT NULL',sql)
         self.assertIn('UNIQUE KEY uq_practice_session_question',sql)

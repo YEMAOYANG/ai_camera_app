@@ -9,7 +9,7 @@ import uuid
 from contextlib import contextmanager
 from typing import Any, Iterator, Mapping
 
-from core.database import Database, DatabaseConnection, DatabaseRow
+from core.database import Database, DatabaseConnection, DatabaseRow, lock_for_allocation
 from integrations.openmaic_formal_media import compatible_preparation_target
 from repositories.formal_student_runtime_gate import (
     current_formal_runtime_sql,
@@ -67,7 +67,7 @@ class LessonPackageRepository:
               created_at, updated_at
             )
             VALUES (?, ?, ?, ?, 'openmaic', 'pending', ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (job_id, request_id, course_id, course_version, now, now),
         )
@@ -238,20 +238,20 @@ class LessonPackageRepository:
                 SELECT 1 FROM learning_course_supply_requests AS request
                 WHERE request.target_fingerprint = plan.target_fingerprint
                   AND request.subject = item.subject AND request.skill_id = item.skill_id
-                  AND request.variant_ordinal = item.variant_ordinal AND request.enabled = TRUE
+                  AND request.variant_ordinal = item.variant_ordinal AND request.enabled = 1
               ))
               AND (
                 JSON_UNQUOTE(JSON_EXTRACT(plan.target_spec_json, '$.schemaVersion')) = 'mira.learning.preparation-target.progressive.v1'
                 OR plan.content_canary_passed_at IS NOT NULL
                 OR JSON_CONTAINS(
                   build.canary_manifest_json,
-                  JSON_OBJECT(
+                  jsonb_build_object(
                     'subject', item.subject,
                     'skillId', item.skill_id,
                     'variantOrdinal', item.variant_ordinal
                   ),
                   '$.targets'
-                ) = 1
+                )
               )
               AND NOT EXISTS (
                 SELECT 1
@@ -438,7 +438,7 @@ class LessonPackageRepository:
                 SELECT 1 FROM learning_course_supply_requests AS request
                 WHERE request.target_fingerprint = plan.target_fingerprint
                   AND request.subject = item.subject AND request.skill_id = item.skill_id
-                  AND request.variant_ordinal = item.variant_ordinal AND request.enabled = TRUE
+                  AND request.variant_ordinal = item.variant_ordinal AND request.enabled = 1
               ))
               AND JSON_UNQUOTE(JSON_EXTRACT(
                     plan.target_spec_json, '$.schemaVersion'
@@ -448,13 +448,13 @@ class LessonPackageRepository:
                 OR plan.content_canary_passed_at IS NOT NULL
                 OR JSON_CONTAINS(
                   build.canary_manifest_json,
-                  JSON_OBJECT(
+                  jsonb_build_object(
                     'subject', item.subject,
                     'skillId', item.skill_id,
                     'variantOrdinal', item.variant_ordinal
                   ),
                   '$.targets'
-                ) = 1
+                )
               )
             LIMIT 1 FOR UPDATE
             """,
@@ -737,11 +737,12 @@ class LessonPackageRepository:
         validation_report: Mapping[str, Any],
         now: int,
     ) -> DatabaseRow:
+        lock_for_allocation(conn, "learning_lesson_packages.version", package_id)
         current = conn.execute(
             """
             SELECT COALESCE(MAX(version), 0) AS maximum
             FROM learning_lesson_packages
-            WHERE id = ? FOR UPDATE
+            WHERE id = ?
             """,
             (package_id,),
         ).fetchone()
@@ -801,10 +802,10 @@ class LessonPackageRepository:
               course_id, course_version, package_id, package_version, updated_at
             )
             VALUES (?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-              package_id = VALUES(package_id),
-              package_version = VALUES(package_version),
-              updated_at = VALUES(updated_at)
+            ON CONFLICT (course_id, course_version) DO UPDATE SET
+              package_id = EXCLUDED.package_id,
+              package_version = EXCLUDED.package_version,
+              updated_at = EXCLUDED.updated_at
             """,
             (
                 job["course_id"],
@@ -855,11 +856,12 @@ class LessonPackageRepository:
     ) -> DatabaseRow:
         """Persist a validated package privately without making it student-visible."""
 
+        lock_for_allocation(conn, "learning_lesson_packages.version", package_id)
         current = conn.execute(
             """
             SELECT COALESCE(MAX(version), 0) AS maximum
             FROM learning_lesson_packages
-            WHERE id = ? FOR UPDATE
+            WHERE id = ?
             """,
             (package_id,),
         ).fetchone()
@@ -1157,10 +1159,10 @@ class LessonPackageRepository:
               course_id, course_version, package_id, package_version, updated_at
             )
             VALUES (?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-              package_id = VALUES(package_id),
-              package_version = VALUES(package_version),
-              updated_at = VALUES(updated_at)
+            ON CONFLICT (course_id, course_version) DO UPDATE SET
+              package_id = EXCLUDED.package_id,
+              package_version = EXCLUDED.package_version,
+              updated_at = EXCLUDED.updated_at
             """,
             (
                 package["course_id"],
@@ -1415,7 +1417,7 @@ class LessonPackageRepository:
                        IS NOT NULL
                      AND build_item.content_validation_contract_version <> ''
                      AND build_item.content_receipt_hash
-                       REGEXP '^[0-9a-f]{{64}}$'
+                       ~* '^[0-9a-f]{{64}}$'
                    )
                  )
                 JOIN learning_openmaic_runtime_classrooms AS runtime
@@ -1478,7 +1480,7 @@ class LessonPackageRepository:
                       receipt_alias="receipt",
                       provider_alias="provider",
                   )}
-                LIMIT 1 FOR UPDATE
+                LIMIT 1 FOR UPDATE OF child, plan, release_row, release_item, course, binding, package, build_item, runtime, receipt, audio
                 """,
                 (
                     self.CANDIDATE_BINDING_CONTRACT_VERSION,
@@ -1562,7 +1564,7 @@ class LessonPackageRepository:
                  AND build_item.content_gate_passed_at IS NOT NULL
                  AND build_item.content_validation_contract_version IS NOT NULL
                  AND build_item.content_validation_contract_version <> ''
-                 AND build_item.content_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+                 AND build_item.content_receipt_hash ~* '^[0-9a-f]{{64}}$'
                )
              )
             JOIN learning_curriculum_classroom_item_receipts AS receipt
@@ -1613,7 +1615,7 @@ class LessonPackageRepository:
                   receipt_alias="receipt",
                   provider_alias="provider",
               )}
-            LIMIT 1 FOR UPDATE
+            LIMIT 1 FOR UPDATE OF course, pointer, history, release_item, binding, package, runtime, build_item, receipt, audio
             """,
             (
                 self.CANDIDATE_BINDING_CONTRACT_VERSION,
@@ -1788,11 +1790,12 @@ class LessonPackageRepository:
         response: Mapping[str, Any],
         now: int,
     ) -> DatabaseRow:
+        lock_for_allocation(conn, "learning_session_runtime_records.seq", session_id)
         row = conn.execute(
             """
             SELECT COALESCE(MAX(seq), 0) AS maximum
             FROM learning_session_runtime_records
-            WHERE session_id = ? FOR UPDATE
+            WHERE session_id = ?
             """,
             (session_id,),
         ).fetchone()

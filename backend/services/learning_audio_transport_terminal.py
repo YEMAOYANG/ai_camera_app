@@ -222,7 +222,7 @@ def _preflight(conn):
 def prepare(database):
     conn = database.connect()
     try:
-        conn.execute("START TRANSACTION READ ONLY")
+        conn.execute("SET TRANSACTION READ ONLY")
         _require(not _events(conn), "an audit already exists; do not prepare another")
         plan = _preflight(conn)
     finally:

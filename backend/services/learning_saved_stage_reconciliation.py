@@ -361,7 +361,7 @@ def reconcile_saved_stage(*, runtime_service, preparation_repository, identity, 
             authorized_selection(conn, identity=identity, state={**state, 'runtimes': current_history},
                 runtime_id=runtime_id, audit_sha=duplicate_recovery_sha)
         requests = list(conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-            'WHERE target_fingerprint=? AND enabled=TRUE', (identity['targetFingerprint'],)).fetchall())
+            'WHERE target_fingerprint=? AND enabled = 1', (identity['targetFingerprint'],)).fetchall())
         if (dict(current or {}) != runtime or dict(current_owner or {}) != owner or dict(current_item or {}) != item
                 or requests != state['requests'] or promoted_path.read_bytes() != promoted_bytes):
             raise ValueError('saved-stage reconciliation source changed before compare-and-set')

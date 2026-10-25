@@ -185,8 +185,8 @@ policy, and never expose a raw storage key.
   hashes, no-clone policy, and public-data redaction.
 - `tests/test_voxcpm2_tts_provider.py` checks both HTTP contracts without a
   network connection and verifies no credential or clone fields are sent.
-- `tests/test_learning_teacher_media_assets.py` applies the real MySQL
-  migration and uses a test-only provider plus temporary filesystem to verify
+- `tests/test_learning_teacher_media_assets.py` applies the real database
+  migrations and uses a test-only provider plus temporary filesystem to verify
   idempotency, preference pinning, checksum persistence, failure behavior, and
   the pinyin/English manual-review visibility gate.
 - `tests/test_lesson_package_media_pipeline.py` verifies private staging,

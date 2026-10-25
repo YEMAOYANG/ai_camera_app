@@ -140,9 +140,9 @@ def delivery_media(release):
 def _other_published_courses(conn):
     # Non-textbook courses need their own durable formal publication evidence;
     # a course's published flag alone never authorizes its raw/runtime assets.
-    return [dict(row) for row in conn.execute("""SELECT c.id AS courseId,c.version AS courseVersion,
-        c.title,c.content_origin AS contentOrigin,c.subject AS subjectCode,
-        c.grade_code AS gradeCode,c.published_at AS publishedAt FROM learning_courses c
+    return [dict(row) for row in conn.execute("""SELECT c.id AS "courseId",c.version AS "courseVersion",
+        c.title,c.content_origin AS "contentOrigin",c.subject AS "subjectCode",
+        c.grade_code AS "gradeCode",c.published_at AS "publishedAt" FROM learning_courses c
         WHERE c.status='published' AND c.quality_status='released' AND c.retired_at IS NULL
         AND NOT EXISTS (SELECT 1 FROM learning_textbook_course_builds b
             JOIN learning_textbook_revisions r ON r.edition_id=b.edition_id AND r.revision_id=b.revision_id
@@ -450,8 +450,8 @@ def write_private_inventory(value, output):
 def read_only_connection(database):
     conn = database.connect()
     try:
-        conn.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
-        conn.execute('START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY')
+        # One snapshot for every read, taken at the first query.
+        conn.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY')
         yield conn
     finally:
         conn.rollback()

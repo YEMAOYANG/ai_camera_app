@@ -265,7 +265,7 @@ verify_worker_import() {
   if ! env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "
 from workers.camera_observation_worker import build_worker_from_env
 " >/dev/null 2>&1; then
-    err "camera_observation_worker 无法加载（常见原因：缺少 pymysql 等依赖）"
+    err "camera_observation_worker 无法加载（常见原因：缺少 psycopg 等依赖）"
     env PYTHONPATH="$BACKEND_DIR" "$GUARDIAN_PYTHON" -c "
 from workers.camera_observation_worker import build_worker_from_env
 " 2>&1 | tail -12 || true
@@ -376,12 +376,12 @@ if ! command -v "$GUARDIAN_PYTHON" >/dev/null 2>&1; then
   err "未找到 python3"
   exit 1
 fi
-if ! "$GUARDIAN_PYTHON" -c "import pymysql" >/dev/null 2>&1; then
+if ! "$GUARDIAN_PYTHON" -c "import psycopg" >/dev/null 2>&1; then
   warn "Guardian Python 缺少依赖，正在安装 requirements.txt …"
   "$GUARDIAN_PYTHON" -m pip install -r "$BACKEND_DIR/requirements.txt"
 fi
-if ! "$GUARDIAN_PYTHON" -c "import pymysql" >/dev/null 2>&1; then
-  err "依赖安装后仍无法 import pymysql，请手动执行: $GUARDIAN_PYTHON -m pip install -r $BACKEND_DIR/requirements.txt"
+if ! "$GUARDIAN_PYTHON" -c "import psycopg" >/dev/null 2>&1; then
+  err "依赖安装后仍无法 import psycopg，请手动执行: $GUARDIAN_PYTHON -m pip install -r $BACKEND_DIR/requirements.txt"
   exit 1
 fi
 

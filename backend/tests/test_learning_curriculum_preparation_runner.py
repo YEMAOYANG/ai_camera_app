@@ -853,7 +853,7 @@ class LearningCurriculumPreparationRunnerTest(unittest.TestCase):
     def test_checkpoint_factory_constructs_no_generation_or_provider_dependency(self):
         from services import service_factory
 
-        app = _app(DATABASE_URL="mysql+pymysql://unused:unused@127.0.0.1/unused")
+        app = _app(DATABASE_URL="postgresql://unused:unused@127.0.0.1/unused")
         with app.app_context(), patch.object(
             service_factory,
             "dynamic_learning_course_generation_service",
@@ -900,7 +900,7 @@ class LearningCurriculumPreparationRunnerTest(unittest.TestCase):
                 if missing is not None:
                     config[missing] = False if isinstance(config[missing], bool) else ""
                 app = _app(
-                    DATABASE_URL="mysql+pymysql://unused:unused@127.0.0.1/unused",
+                    DATABASE_URL="postgresql://unused:unused@127.0.0.1/unused",
                     **config,
                 )
                 with app.app_context(), patch.object(
@@ -928,7 +928,7 @@ class LearningCurriculumPreparationRunnerTest(unittest.TestCase):
         from services import service_factory
 
         app = _app(
-            DATABASE_URL="mysql+pymysql://unused:unused@127.0.0.1/unused",
+            DATABASE_URL="postgresql://unused:unused@127.0.0.1/unused",
             AI_PROVIDER="kimi",
             AI_MODEL="moonshot-v1-8k",
             AI_BASE_URL="https://api.moonshot.cn/v1",
@@ -1002,7 +1002,7 @@ class LearningCurriculumPreparationRunnerTest(unittest.TestCase):
         from services import service_factory
 
         app = _app(
-            DATABASE_URL="mysql+pymysql://unused:unused@127.0.0.1/unused",
+            DATABASE_URL="postgresql://unused:unused@127.0.0.1/unused",
             AI_PROVIDER="kimi",
             AI_MODEL="kimi-k2.6",
             AI_BASE_URL="https://api.moonshot.cn/v1",
@@ -1033,7 +1033,7 @@ class LearningCurriculumPreparationRunnerTest(unittest.TestCase):
     def test_default_runner_dependency_resolution_is_provider_free(self):
         from services import service_factory
 
-        app = _app(DATABASE_URL="mysql+pymysql://unused:unused@127.0.0.1/unused")
+        app = _app(DATABASE_URL="postgresql://unused:unused@127.0.0.1/unused")
         forbidden = (
             "sms_provider",
             "auth_service",
@@ -1206,7 +1206,7 @@ class LearningCurriculumPreparationRunnerTest(unittest.TestCase):
         }
         runner = LearningCurriculumPreparationRunner()
         app = _app(
-            DATABASE_URL="mysql+pymysql://unused:unused@127.0.0.1/unused"
+            DATABASE_URL="postgresql://unused:unused@127.0.0.1/unused"
         )
         with patch.object(
             service_factory,

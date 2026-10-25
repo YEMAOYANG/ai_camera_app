@@ -25,16 +25,12 @@ CANDIDATE_BINDING_CONTRACT_VERSION = (
 )
 REPORT_SCHEMA_VERSION = "mira.learning.grade-release-verification.v1"
 
+# The PostgreSQL baseline carries the former MySQL migrations 056-067.
 REQUIRED_MIGRATIONS = (
-    "056_learning_curriculum_preparation_content_stage.sql",
-    "057_learning_curriculum_classroom_publication.sql",
-    "058_learning_formal_qwen_audio_receipts.sql",
-    "059_learning_openmaic_provider_readiness.sql",
-    "060_learning_student_formal_session_bindings.sql",
-    "061_learning_openmaic_runtime_events.sql",
-    "065_learning_openmaic_release_provider_readiness.sql",
-    "066_learning_student_formal_session_binding_contract_split.sql",
-    "067_learning_student_formal_session_binding_build_package_split.sql",
+    "100_postgres_baseline_schema.sql",
+    "101_postgres_baseline_seed.sql",
+    "102_postgres_baseline_foreign_keys.sql",
+    "103_mysql_compat_functions.sql",
 )
 
 REQUIRED_TABLES = (
@@ -111,7 +107,7 @@ def _verify_connection(
             """
             SELECT /* verify_grade_release:schema */ table_name
             FROM information_schema.tables
-            WHERE table_schema = DATABASE()
+            WHERE table_schema = current_schema()
               AND table_name IN (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
               )
@@ -125,10 +121,10 @@ def _verify_connection(
         migrations = {
             str(row.get("version") or "")
             for row in conn.execute(
-                """
+                f"""
                 SELECT /* verify_grade_release:migrations */ version
                 FROM schema_migrations
-                WHERE version IN (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                WHERE version IN ({", ".join("?" for _ in REQUIRED_MIGRATIONS)})
                 """,
                 REQUIRED_MIGRATIONS,
             ).fetchall()
@@ -214,7 +210,7 @@ def _verify_connection(
                     AND runtime.course_version = release_item.course_version
                     AND runtime.package_id = release_item.package_id
                     AND runtime.package_version = release_item.package_version
-                    AND JSON_VALID(runtime.feature_manifest_json) = 1
+                    AND JSON_VALID(runtime.feature_manifest_json)
                     AND JSON_TYPE(JSON_EXTRACT(
                       runtime.feature_manifest_json, '$.sceneCount'
                     )) = 'INTEGER'
@@ -222,21 +218,21 @@ def _verify_connection(
                       runtime.feature_manifest_json,
                       '$.formalEvidence.speechActionCount'
                     )) = 'INTEGER'
-                    AND CAST(JSON_UNQUOTE(JSON_EXTRACT(
+                    AND mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
                       runtime.feature_manifest_json, '$.sceneCount'
-                    )) AS UNSIGNED) BETWEEN 1 AND 60
-                    AND CAST(JSON_UNQUOTE(JSON_EXTRACT(
+                    ))) BETWEEN 1 AND 60
+                    AND mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
                       runtime.feature_manifest_json,
                       '$.formalEvidence.speechActionCount'
-                    )) AS UNSIGNED) BETWEEN
-                      CAST(JSON_UNQUOTE(JSON_EXTRACT(
+                    ))) BETWEEN
+                      mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
                         runtime.feature_manifest_json, '$.sceneCount'
-                      )) AS UNSIGNED)
+                      )))
                       AND LEAST(
                         240,
-                        CAST(JSON_UNQUOTE(JSON_EXTRACT(
+                        mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
                           runtime.feature_manifest_json, '$.sceneCount'
-                        )) AS UNSIGNED) * 20
+                        ))) * 20
                       )
                     AND receipt.build_item_id = build_item.id
                     AND receipt.release_id = release_item.release_id
@@ -281,10 +277,10 @@ def _verify_connection(
                       'mira.learning.formal-qwen-audio-job.v1'
                     AND audio.expected_segment_count BETWEEN 1 AND 240
                     AND audio.expected_segment_count =
-                      CAST(JSON_UNQUOTE(JSON_EXTRACT(
+                      mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
                         runtime.feature_manifest_json,
                         '$.formalEvidence.speechActionCount'
-                      )) AS UNSIGNED)
+                      )))
                     AND audio.tts_attempted_count = audio.expected_segment_count
                     AND audio.tts_completed_count = audio.expected_segment_count
                     AND audio.audio_validated_count = audio.expected_segment_count

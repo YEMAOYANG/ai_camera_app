@@ -819,8 +819,8 @@ class AppConfig:
             raise ConfigError("APP_DATABASE_URL is required in staging/production.")
 
         dialect = _database_dialect(self.DATABASE_URL)
-        if dialect != "mysql":
-            raise ConfigError("Only MySQL databases are supported.")
+        if dialect not in POSTGRES_DIALECTS:
+            raise ConfigError("Only PostgreSQL databases are supported.")
 
         if self.APP_ENV == "production":
             if not self.CORS_ORIGINS or "*" in self.CORS_ORIGINS:
@@ -1245,8 +1245,8 @@ def validate_flask_config(config: dict) -> None:
     database_url = str(config.get("DATABASE_URL", ""))
     if app_env in {"staging", "production"} and not database_url:
         raise ConfigError("APP_DATABASE_URL is required in staging/production.")
-    if _database_dialect(database_url) != "mysql":
-        raise ConfigError("Only MySQL databases are supported.")
+    if _database_dialect(database_url) not in POSTGRES_DIALECTS:
+        raise ConfigError("Only PostgreSQL databases are supported.")
     if app_env == "production":
         if config.get("DEV_ADAPTERS_ENABLED"):
             raise ConfigError("APP_ENABLE_DEV_ADAPTERS must be false in production.")
@@ -1821,25 +1821,22 @@ def _bool(value: str) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+POSTGRES_DIALECTS = {"postgresql", "postgres"}
+
+
 def _database_dialect(database_url: str) -> str:
     parsed = urlparse(database_url)
     return parsed.scheme.split("+", 1)[0] if parsed.scheme else ""
 
 
 def _database_url_for_env(app_env: str) -> str:
+    # The local Docker database (deploy/compose.local-db.yml). The password
+    # comes from the URL in backend/.env, PGPASSWORD or ~/.pgpass.
     if app_env == "test":
-        return os.getenv(
-            "APP_TEST_DATABASE_URL",
-            "mysql+pymysql://ai_camera_app:ai_camera_app_dev@127.0.0.1:3306/"
-            "ai_camera_app_test?charset=utf8mb4",
-        )
+        return os.getenv("APP_TEST_DATABASE_URL", "postgresql://mira@127.0.0.1:5433/mira_test")
     if app_env in {"staging", "production"}:
         return os.getenv("APP_DATABASE_URL", "")
-    return os.getenv(
-        "APP_DATABASE_URL",
-        "mysql+pymysql://ai_camera_app:ai_camera_app_dev@127.0.0.1:3306/"
-        "ai_camera_app_dev?charset=utf8mb4",
-    )
+    return os.getenv("APP_DATABASE_URL", "postgresql://mira@127.0.0.1:5433/mira")
 
 
 def _default_ai_provider() -> str:

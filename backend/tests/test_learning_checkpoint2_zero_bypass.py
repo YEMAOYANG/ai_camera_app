@@ -42,7 +42,7 @@ class LearningCheckpoint2ZeroBypassTest(unittest.TestCase):
                 raise AssertionError(f"legacy generation was accessed: {name}")
 
         service = LearningCatalogReleaseService(
-            "mysql://unused:unused@127.0.0.1:3306/unused",
+            "postgresql://unused:unused@127.0.0.1:5433/unused",
             dynamic_generation_service=ForbiddenLegacyGeneration(),
             lesson_package_service=ForbiddenLegacyGeneration(),
         )
@@ -79,7 +79,7 @@ class LearningCheckpoint2ZeroBypassTest(unittest.TestCase):
             for role in ("generator", "verifier")
         }
         service = LearningCatalogReleaseService(
-            "mysql+pymysql://unused:unused@127.0.0.1:3306/unused",
+            "postgresql://unused:unused@127.0.0.1:5433/unused",
             dynamic_generation_service=legacy_generation,
             lesson_package_service=lesson_package,
             staged_content_candidate_generator=staged,
@@ -145,7 +145,7 @@ class LearningCheckpoint2ZeroBypassTest(unittest.TestCase):
             for role in ("generator", "verifier")
         }
         service = LearningCatalogReleaseService(
-            "mysql+pymysql://unused:unused@127.0.0.1:3306/unused",
+            "postgresql://unused:unused@127.0.0.1:5433/unused",
             dynamic_generation_service=_ExplodingLegacyDependency(),
             lesson_package_service=_ExplodingLegacyDependency(),
             staged_content_candidate_generator=staged,
@@ -652,7 +652,7 @@ def _memory_content_service(*, now, repository, staged, host):
         for role in ("generator", "verifier")
     }
     service = LearningCatalogReleaseService(
-        "mysql+pymysql://unused:unused@127.0.0.1:3306/unused",
+        "postgresql://unused:unused@127.0.0.1:5433/unused",
         dynamic_generation_service=_ExplodingLegacyDependency(),
         lesson_package_service=_ExplodingLegacyDependency(),
         staged_content_candidate_generator=staged,

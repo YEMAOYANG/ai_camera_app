@@ -586,10 +586,10 @@ class HomeworkService:
         self.tutor.revoke(conn,row,item=item)
         if not self.evidence_enabled:
             # The feature switch gates new evidence, never deletion of older private data.
-            if getattr(conn,'dialect',None)=='mysql':
-                exists=conn.execute('SELECT 1 FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=?',('learning_answer_events',)).fetchone()
+            if getattr(conn,'dialect',None)=='postgresql':
+                exists=conn.execute('SELECT 1 FROM information_schema.tables WHERE table_schema=current_schema() AND table_name=?',('learning_answer_events',)).fetchone()
             else:
-                # Isolated verification database only; production supports MySQL.
+                # Isolated verification database only; production uses PostgreSQL.
                 exists=conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",('learning_answer_events',)).fetchone()
             if exists is None:
                 return

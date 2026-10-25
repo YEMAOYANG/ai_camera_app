@@ -28,7 +28,7 @@ class AuthPointTransactionTest(unittest.TestCase):
     def setUp(self):
         self.db = MemoryDatabase()
         self.addCleanup(self.db.close)
-        self.auth = AuthService("mysql://localhost/unused", sms_resend_cooldown_seconds=0)
+        self.auth = AuthService("postgresql://localhost/unused", sms_resend_cooldown_seconds=0)
         self.auth.repository = AuthRepository(self.db)
         # Invitation presentation does not participate in code/session mutation.
         self.auth.repository.list_pending_family_invitations_by_phone = Mock(return_value=[])

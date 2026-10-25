@@ -9,7 +9,7 @@ class LearningReviewApplicationContractTest(unittest.TestCase):
     def test_disabled_and_enabled_application_factories_are_lazy(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {
             'APP_ENV':'test','MIRA_PROCESS_ROLE':'api-passive','APP_AI_PROVIDER':'disabled',
-            'APP_TEST_DATABASE_URL':'mysql://contract:contract@127.0.0.1:1/contract_only',
+            'APP_TEST_DATABASE_URL':'postgresql://contract:contract@127.0.0.1:1/contract_only',
         }, clear=True), patch('dotenv.load_dotenv',return_value=False), \
              patch('core.database.Database.connect',side_effect=AssertionError('Construction must not connect')) as connect, \
              patch('socket.socket.connect',side_effect=AssertionError('Construction must not use a network')) as network:

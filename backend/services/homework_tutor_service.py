@@ -1181,7 +1181,7 @@ class HomeworkTutorService:
         now=host.clock()
         with host.repository.transaction() as conn:
             # Do not hold a provider HTTP request in a database transaction.
-            sql='SELECT a.* FROM homework_actions a JOIN homework_submissions s ON s.id=a.submission_id WHERE s.deleted_at IS NULL AND a.result_json LIKE ?'
+            sql='SELECT a.* FROM homework_actions a JOIN homework_submissions s ON s.id=a.submission_id WHERE s.deleted_at IS NULL AND CAST(a.result_json AS TEXT) LIKE ?'
             args=('%'+SCHEMA+'%',)
             if submission_id is not None:
                 sql+=' AND a.submission_id=?';args+=(submission_id,)

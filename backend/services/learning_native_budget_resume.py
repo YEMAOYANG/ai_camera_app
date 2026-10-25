@@ -66,7 +66,7 @@ def _prepare_single_native_budget_resume(*, adapter, budget, config, identity, e
                 or any(r['status'] != 'pending' for r in rows if r['id'] != item['id'])):
             raise ValueError('Original accepted sample content has changed')
         requested = list(conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-            'WHERE target_fingerprint=? AND enabled=TRUE', (identity['targetFingerprint'],)).fetchall())
+            'WHERE target_fingerprint=? AND enabled = 1', (identity['targetFingerprint'],)).fetchall())
         if requested != [{'subject':'math','skill_id':'fraction_ratio_percentage','variant_ordinal':1}]:
             raise ValueError('Native recovery requires the original one-slot scope')
         runtimes = list(conn.execute('SELECT * FROM learning_openmaic_runtime_classrooms WHERE candidate_build_item_id=? FOR UPDATE',

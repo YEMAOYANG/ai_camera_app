@@ -98,7 +98,7 @@ export async function run(input: any) {
       createHash('sha256').update(input.feedback.text).digest('hex')!==input.feedback.sha256)) fail('FEEDBACK_CHANGED');
   const connectionString=process.env.MIRA_OPENMAIC_AGENT_DATABASE_URL || '';
   const url=new URL(connectionString);
-  if (!['localhost','127.0.0.1','[::1]'].includes(url.hostname) || url.pathname!=='/openmaic_mira') fail('DATABASE_BOUNDARY');
+  if (!['localhost','127.0.0.1','[::1]'].includes(url.hostname) || url.pathname!=='/mira') fail('DATABASE_BOUNDARY');
   const {Client}=nativeRequire('pg'); const conn=new Client({connectionString,connectionTimeoutMillis:5000});
   // The package exposes this subpath only under its ESM import condition.
   // The local CJS/tsx operator uses the exact installed source, before any write.

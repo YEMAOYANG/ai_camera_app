@@ -106,30 +106,32 @@ network can reach the backend through the computer LAN IP. If an older local
 `.env` still has `APP_HOST=127.0.0.1`, change it to `APP_HOST=0.0.0.0` and
 restart the backend.
 
-Production runtime expects a MySQL-compatible database. Create the database and
-grant an application user before starting the service:
+The backend uses PostgreSQL 16. Locally it runs in Docker Desktop from
+`deploy/compose.local-db.yml`: one database `mira`, where the backend's tables
+live in schema `app` and the OpenMAIC classroom runtime's tables in schema
+`public`, plus the disposable `mira_test`. Every program and database browser
+connects with the single login `mira`; its password is `MIRA_DB_PASSWORD` in
+the git-ignored `deploy/env/local-db.env`.
 
-```sql
-CREATE DATABASE IF NOT EXISTS ai_camera_app_dev
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-CREATE DATABASE IF NOT EXISTS ai_camera_app_test
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-CREATE USER IF NOT EXISTS 'ai_camera_app'@'localhost'
-  IDENTIFIED BY 'replace-with-a-strong-password';
-
-GRANT ALL PRIVILEGES ON ai_camera_app_dev.* TO 'ai_camera_app'@'localhost';
-GRANT ALL PRIVILEGES ON ai_camera_app_test.* TO 'ai_camera_app'@'localhost';
-FLUSH PRIVILEGES;
+```sh
+docker compose -f deploy/compose.local-db.yml --env-file deploy/env/local-db.env up -d
 ```
 
-Development manual debugging uses `ai_camera_app_dev`. Unit tests use
-`ai_camera_app_test` and reset it. Production must set `APP_DATABASE_URL`
-explicitly to a production database; the backend does not provide a production
-fallback database URL.
+The backend connects with `search_path=app`, so it never touches the classroom
+runtime's tables. Migrations live in `migrations/` (see its README); the
+historical MySQL migrations are kept read-only in `migrations/mysql/`.
+
+On a server without Docker, create the same layout as a database administrator:
+
+```sql
+CREATE ROLE mira LOGIN PASSWORD 'replace-with-a-strong-password';
+CREATE DATABASE mira ENCODING 'UTF8' LC_COLLATE 'C.UTF-8' LC_CTYPE 'C.UTF-8' TEMPLATE template0;
+```
+
+then run `deploy/postgres/init/database-setup.psql` in that database
+(`psql -d mira -v db=mira -f ...`), which gives it to `mira` and creates schema
+`app`. Production must set `APP_DATABASE_URL` explicitly; the backend does not
+provide a production fallback database URL.
 
 Run tests:
 
@@ -138,17 +140,18 @@ cd backend
 python3 -m unittest discover -s tests -t . -v
 ```
 
-Tests use the isolated MySQL database configured by `APP_TEST_DATABASE_URL`
-or the default local `ai_camera_app_test` database. The test runner resets that
-database before each test case and then applies migrations. Development,
-test, staging, and production all use MySQL.
+Tests use the isolated database configured by `APP_TEST_DATABASE_URL` (default
+`postgresql://mira@127.0.0.1:5433/mira_test`; a parallel run may use
+`mira_test_<suffix>`). The test runner drops and recreates schema `app` before
+each test case and then applies migrations. Development, test, staging and
+production all use PostgreSQL.
 
 Environment:
 
 ```text
 APP_ENV=development
-APP_DATABASE_URL=mysql+pymysql://ai_camera_app:ai_camera_app_dev@127.0.0.1:3306/ai_camera_app_dev?charset=utf8mb4
-APP_TEST_DATABASE_URL=mysql+pymysql://ai_camera_app:ai_camera_app_dev@127.0.0.1:3306/ai_camera_app_test?charset=utf8mb4
+APP_DATABASE_URL=postgresql://mira:<MIRA_DB_PASSWORD>@127.0.0.1:5433/mira
+APP_TEST_DATABASE_URL=postgresql://mira:<MIRA_DB_PASSWORD>@127.0.0.1:5433/mira_test
 APP_AUTH_ACCESS_SECONDS=900
 APP_AUTH_REFRESH_SECONDS=2592000
 APP_ENABLE_DEV_ADAPTERS=1
@@ -534,7 +537,7 @@ backend/
   models/                 # internal dataclasses
   schemas/                # request/response shaping and validation helpers
   prompts/                # versioned prompt files
-  migrations/             # MySQL SQL migrations
+  migrations/             # PostgreSQL migrations (schema app)
   scripts/migrate.py      # migration runner
   tests/                  # unittest coverage
 ```
@@ -544,7 +547,7 @@ Layering rules:
 - Routes parse HTTP input and return HTTP responses only.
 - Services own product behavior and call repositories/providers.
 - Repositories own SQL or filesystem access.
-- All environments use MySQL through `APP_DATABASE_URL` or
+- All environments use PostgreSQL through `APP_DATABASE_URL` or
   `APP_TEST_DATABASE_URL`.
 - Development, test, staging, and production should run migrations instead of
   relying on runtime schema creation.

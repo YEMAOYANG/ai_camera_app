@@ -57,6 +57,13 @@ def _json_type(value):
     return 'INTEGER' if type(parsed) is int else 'DOUBLE'
 
 
+def _unsigned(raw):  # migrations/103 mysql_unsigned
+    if raw is None:
+        return None
+    digits = re.match(r"\s*\+?([0-9]+)", str(raw))
+    return int(digits.group(1)) if digits else 0
+
+
 class FormalQualityModelRuntimeGateTest(unittest.TestCase):
     def setUp(self):
         # No server, disk DB, network or Provider. The production predicate is
@@ -67,10 +74,13 @@ class FormalQualityModelRuntimeGateTest(unittest.TestCase):
             ('JSON_EXTRACT', _json_extract, 2), ('JSON_UNQUOTE', _json_unquote, 1),
             ('JSON_LENGTH', _json_length, 1), ('JSON_TYPE', _json_type, 1),
             ('REGEXP', lambda pattern, value: value is not None and re.search(pattern, str(value)) is not None, 2),
+            ('mysql_unsigned', _unsigned, 1),
         ):
             self.conn.create_function(name, argc, fn)
         self.conn.execute('CREATE TABLE runtime(feature_manifest_json TEXT, upstream_classroom_id TEXT)')
-        self.predicate = _adaptive_skill_quality_sql('runtime')
+        self.gate_sql = _adaptive_skill_quality_sql('runtime')
+        # SQLite spells PostgreSQL's regex match operators as REGEXP.
+        self.predicate = self.gate_sql.replace(' ~* ', ' REGEXP ').replace(' ~ ', ' REGEXP ')
 
     def fixture(self, policy=PROFESSIONAL_POLICY):
         row, _ = adaptive_quality_fixture()
@@ -107,7 +117,7 @@ class FormalQualityModelRuntimeGateTest(unittest.TestCase):
             PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY):
             with self.subTest(policy=policy.get('modelPolicyId', 'legacy')):
                 self.assertTrue(self.allows(self.fixture(policy)))
-        self.assertIn(self.predicate, current_formal_runtime_sql(runtime_alias='runtime'))
+        self.assertIn(self.gate_sql, current_formal_runtime_sql(runtime_alias='runtime'))
 
     def test_model_name_cannot_cross_old_new_or_candidate_identity(self):
         for policy in (PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY,

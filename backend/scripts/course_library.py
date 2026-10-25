@@ -76,7 +76,7 @@ def unblock_known_retry(library, item_id):
             JOIN learning_catalog_build_items AS item ON item.id = runtime.candidate_build_item_id
             JOIN learning_course_supply_requests AS request ON request.target_fingerprint = runtime.candidate_target_fingerprint
               AND request.subject = item.subject AND request.skill_id = item.skill_id
-              AND request.variant_ordinal = item.variant_ordinal AND request.enabled = TRUE
+              AND request.variant_ordinal = item.variant_ordinal AND request.enabled = 1
             WHERE item.id = ? AND item.build_job_id = ? ORDER BY runtime.created_at DESC, runtime.id DESC LIMIT 1 FOR UPDATE""",
             (item_id, owner['catalog_build_id']),
         ).fetchone()

@@ -1,4 +1,4 @@
-"""Bounded MySQL regression for the practice migration and frozen ledger.
+"""Bounded database regression for the practice schema and frozen ledger.
 
 Uses only the exact local test database guarded by tests.support. No providers,
 workers, production courses, or external calls are involved.
@@ -17,7 +17,7 @@ from tests.support import fresh_test_config
 from tests.test_learning_practice import Repository as PublicationFixture, _Rows
 
 
-class PracticeMysqlTest(unittest.TestCase):
+class PracticeDatabaseTest(unittest.TestCase):
     def test_migrations_source_query_and_frozen_question_session_roundtrip(self):
         database = Database(fresh_test_config()["DATABASE_URL"])
         repository = LearningPracticeRepository(database)
@@ -25,11 +25,14 @@ class PracticeMysqlTest(unittest.TestCase):
         with repository.transaction() as conn:
             self.assertFalse(repository.eligible_sources(conn, **scope, grade_code="primary_1", subject="math", skill_id=None))
             self.assertIsNone(repository.lock_child(conn, {"id": "missing", **scope}))
-            checks = conn.execute("SHOW CREATE TABLE learning_openmaic_runtime_events").fetchone()
+            checks = conn.execute(
+                "SELECT string_agg(pg_get_constraintdef(oid), ' ') AS checks FROM pg_constraint "
+                "WHERE conrelid = 'learning_openmaic_runtime_events'::regclass AND contype = 'c'"
+            ).fetchone()
             self.assertIn("interaction_completed", str(checks))
 
         # Freeze only the upstream completed-publication fixture. Every practice
-        # ledger query still executes against MySQL, and the service rechecks the
+        # ledger query still executes against the database, and the service rechecks the
         # real fine binding, prerequisites and original Host validation receipt.
         publication = PublicationFixture()
         publication.child.update(id=scope['child_id'], family_id=scope['family_id'])

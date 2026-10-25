@@ -22,7 +22,7 @@ class _Connection:
     def __init__(self):
         self.raw = sqlite3.connect(":memory:")
         self.raw.row_factory = sqlite3.Row
-        migration = '\n'.join((Path(__file__).parents[1] / 'migrations' / filename).read_text()
+        migration = '\n'.join((Path(__file__).parents[1] / 'migrations' / 'mysql' / filename).read_text()
             for filename in ('080_learning_progressive_curriculum.sql', '081_learning_prerequisite_placement.sql'))
         for name, body in re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)\s*\((.*?)\)\s*(?:ENGINE=[^;]+)?;", migration, re.S):
             pieces, start, depth = [], 0, 0
@@ -50,7 +50,7 @@ class _Connection:
                          "answers_json TEXT, updated_at INTEGER)")
 
     def execute(self, sql, params=()):
-        sql = re.sub(r"\s+FOR UPDATE\b", "", sql)
+        sql = re.sub(r"\s+FOR UPDATE\b(?: OF [\w, ]+)?", "", sql)
         sql = sql.replace("ON DUPLICATE KEY UPDATE", "ON CONFLICT DO UPDATE SET")
         sql = re.sub(r"VALUES\((\w+)\)", r"excluded.\1", sql)
         cursor = self.raw.execute(sql, tuple(params))

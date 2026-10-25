@@ -271,11 +271,18 @@ class OpenMaicFormalVideoTest(unittest.TestCase):
         conn.create_function("JSON_TYPE", 1, kind)
         conn.create_function("JSON_LENGTH", 1, lambda raw: len(json.loads(raw)) if raw is not None else None)
         conn.create_function("regexp", 2, lambda expr, value: bool(value and re.fullmatch(expr, value)))
+        def unsigned(raw):  # migrations/103 mysql_unsigned
+            if raw is None: return None
+            digits = re.match(r"\s*\+?([0-9]+)", raw)
+            return int(digits.group(1)) if digits else 0
+        conn.create_function("mysql_unsigned", 1, unsigned)
         conn.execute("CREATE TABLE runtime (feature_manifest_json TEXT, request_id TEXT, candidate_build_item_id TEXT, upstream_classroom_id TEXT)")
         conn.execute("INSERT INTO runtime VALUES (?, 'runtime-request-1', 'build-item-1', 'classroom-1')", ("{}",))
         def accepted(manifest):
             conn.execute("UPDATE runtime SET feature_manifest_json = ?", (json.dumps(manifest),))
-            return conn.execute(f"SELECT 1 FROM runtime WHERE {_formal_video_sql('runtime')}").fetchone() is not None
+            # SQLite spells PostgreSQL's regex match operators as REGEXP.
+            condition = _formal_video_sql('runtime').replace(' ~* ', ' REGEXP ').replace(' ~ ', ' REGEXP ')
+            return conn.execute(f"SELECT 1 FROM runtime WHERE {condition}").fetchone() is not None
         current = video_fixture()[0]["feature_manifest_json"]
         self.assertTrue(accepted(current)); self.assertTrue(accepted(adaptive_quality_fixture()[0]["feature_manifest_json"]))
         for mutate in (lambda m: m.pop("video"), lambda m: m["video"].update(videoCount=True),

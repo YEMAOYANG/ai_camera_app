@@ -55,9 +55,9 @@ def parser():
 def validate_config(config):
     target = urlparse(config['DATABASE_URL'])
     query = parse_qsl(target.query, keep_blank_values=True, strict_parsing=True)
-    if (config.get('APP_ENV') != 'development' or target.scheme.split('+', 1)[0] != 'mysql'
-            or target.hostname != '127.0.0.1' or target.port not in {None, 3306}
-            or target.path != '/ai_camera_app_dev' or query not in ([], [('charset', 'utf8mb4')]) or target.fragment):
+    if (config.get('APP_ENV') != 'development' or target.scheme.split('+', 1)[0] not in {'postgresql', 'postgres'}
+            or target.hostname != '127.0.0.1' or target.port not in {None, 5432, 5433}
+            or target.path != '/mira' or query != [] or target.fragment):
         raise ValueError('exact_local_development_database_required')
     if not config.get('HOMEWORK_ANALYSIS_ENABLED'):
         raise ValueError('homework_analysis_disabled')
@@ -85,7 +85,7 @@ def main(argv=None):
                 else:
                     conn = database.connect()
                     try:
-                        conn.execute('START TRANSACTION READ ONLY')
+                        conn.execute('SET TRANSACTION READ ONLY')
                         result = authorize_recovery(service, conn, dict(AUTHORIZED_SCOPE))
                     finally:
                         conn.rollback()

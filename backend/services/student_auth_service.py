@@ -9,9 +9,8 @@ import time
 from pathlib import Path
 from typing import Callable
 
-import pymysql
 
-from core.database import Database, DatabaseRow
+from core.database import Database, DatabaseError, DatabaseRow, error_sqlstate, is_lock_timeout, is_retryable_conflict
 from core.errors import ApiError, AuthError
 from core.security import hash_value, new_token, now_ms
 from repositories.profile_repository import ProfileRepository
@@ -42,7 +41,6 @@ PARENT_CAPABILITY_FALLBACKS = {
     "guardian": {MANAGE_STUDENT_ACCESS_CAPABILITY},
     "viewer": set(),
 }
-QR_MAINTENANCE_RETRYABLE_DB_CODES = {1205, 1213}
 log = logging.getLogger(__name__)
 
 
@@ -1059,15 +1057,15 @@ class StudentAuthService:
                 with self.repository.transaction() as conn:
                     self._maintain_qr_challenges(conn, now=now)
                 return
-            except pymysql.MySQLError as exc:
-                error_code = exc.args[0] if exc.args else None
-                if error_code not in QR_MAINTENANCE_RETRYABLE_DB_CODES:
+            except DatabaseError as exc:
+                error_code = error_sqlstate(exc)
+                if not (is_retryable_conflict(exc) or is_lock_timeout(exc)):
                     raise
                 if attempt + 1 < max_attempts:
                     time.sleep(0.01 * (attempt + 1))
                     continue
                 log.warning(
-                    "Skipping QR maintenance after retryable MySQL error %s; "
+                    "Skipping QR maintenance after retryable database error %s; "
                     "challenge creation will continue in a fresh transaction.",
                     error_code,
                 )

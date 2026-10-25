@@ -64,7 +64,7 @@ class _Connection:
 class OpenMaicRuntimeEventRepositoryTest(unittest.TestCase):
     def setUp(self):
         self.repository = OpenMaicRuntimeEventRepository(
-            Database("mysql://user:pass@127.0.0.1/test")
+            Database("postgresql://user:pass@127.0.0.1/test")
         )
 
     def test_student_operations_are_scoped_to_the_full_frozen_learning_identity(self):
@@ -165,7 +165,9 @@ class OpenMaicRuntimeEventRepositoryTest(unittest.TestCase):
         self.assertNotIn("build_item.package_version = binding.package_version", sql)
         self.assertIn("release_item.package_id = binding.package_id", sql)
         self.assertIn("package.id = release_item.package_id", sql)
-        self.assertTrue(sql.endswith("FOR UPDATE"), sql)
+        # PostgreSQL cannot lock the outer-joined authority rows.
+        self.assertTrue(sql.endswith(
+            "FOR UPDATE OF binding, release_row, release_item, build_item, course, package"), sql)
 
     def test_append_event_advances_stream_by_compare_and_swap_and_freezes_completion(self):
         conn = _Connection()
@@ -286,7 +288,7 @@ class OpenMaicRuntimeEventRepositoryTest(unittest.TestCase):
                 for index, statement in enumerate(statements[1:], start=1)
                 if table in statement
             )
-            self.assertTrue(statements[position].endswith("FOR UPDATE"))
+            self.assertRegex(statements[position], r"FOR UPDATE(?: OF [\w, ]+)?$")
             lock_positions.append(position)
         self.assertEqual(lock_positions, sorted(lock_positions))
         self.assertIn(

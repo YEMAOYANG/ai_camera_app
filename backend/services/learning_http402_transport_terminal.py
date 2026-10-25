@@ -211,7 +211,7 @@ def preflight(conn):
 def prepare(database):
     conn = database.connect()
     try:
-        conn.execute('START TRANSACTION READ ONLY');require(not events(conn), 'terminal event already recorded')
+        conn.execute('SET TRANSACTION READ ONLY');require(not events(conn), 'terminal event already recorded')
         plan = preflight(conn)
     finally:conn.rollback();conn.close()
     identity = digest(plan);ARCHIVES.mkdir(parents=True, exist_ok=True)

@@ -80,7 +80,7 @@ class StudentAccessRepository:
             INSERT INTO student_pairing_challenge_rate_buckets(
               bucket_kind, bucket_hash, created_at, updated_at
             ) VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE updated_at = VALUES(updated_at)
+            ON CONFLICT DO NOTHING
             """,
             (bucket_kind, bucket_hash, now, now),
         )

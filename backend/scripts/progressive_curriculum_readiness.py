@@ -18,9 +18,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 SCHEMA = "mira.learning.progressive-readiness.v1"
+# The PostgreSQL baseline carries the former MySQL migrations 080 and 081.
 REQUIRED_MIGRATIONS = (
-    "080_learning_progressive_curriculum.sql",
-    "081_learning_prerequisite_placement.sql",
+    "100_postgres_baseline_schema.sql",
+    "101_postgres_baseline_seed.sql",
+    "102_postgres_baseline_foreign_keys.sql",
+    "103_mysql_compat_functions.sql",
 )
 REQUIRED_TABLES = (
     "schema_migrations", "learning_progressive_course_bindings",
@@ -71,7 +74,7 @@ def _block(report, code, action):
 def _schema_check(conn, report, *, child_scope):
     existing = {str(row["table_name"]) for row in conn.execute(
         "SELECT TABLE_NAME AS table_name FROM information_schema.tables "
-        "WHERE TABLE_SCHEMA = DATABASE()"
+        "WHERE TABLE_SCHEMA = current_schema()"
     ).fetchall()}
     required = set(REQUIRED_TABLES) | (set(CHILD_TABLES) if child_scope else set())
     missing = sorted(required - existing)

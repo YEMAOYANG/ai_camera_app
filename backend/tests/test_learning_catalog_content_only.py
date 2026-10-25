@@ -48,7 +48,7 @@ from services.learning_curriculum_preparation_contract import (
     preparation_target_fingerprint,
 )
 from services.learning_catalog_release_service import ContentAdvanceResult
-from tests.support import fresh_test_config, reset_mysql_test_database
+from tests.support import fresh_test_config, reset_test_database
 from tests.test_learning_generated_course_validator import formal_host_fixture
 from tests.test_openmaic_question_phase_adapter import _outline_checkpoint
 
@@ -1478,7 +1478,7 @@ class LearningCatalogContentOnlyContractTest(unittest.TestCase):
     def test_exact_canaries_then_fair_variant_order_reaches_all_thirty(self):
         target = build_preparation_target("primary_1")
         repository = LearningCatalogRepository(
-            Database("mysql+pymysql://unused:unused@127.0.0.1:3306/unused")
+            Database("postgresql://unused:unused@127.0.0.1:5433/unused")
         )
         rows = [
             {
@@ -2088,13 +2088,13 @@ class _BlockingOutlineAdapter(_OutlineOnlyAdapter):
         return super().execute_phase(prepared)
 
 
-class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
+class LearningCatalogContentProviderDatabaseTest(unittest.TestCase):
     def setUp(self):
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
 
     def tearDown(self):
-        reset_mysql_test_database(self.database_url)
+        reset_test_database(self.database_url)
 
     def test_canary_provider_phase_persists_then_authenticates_next_phase(self):
         now = 100_000
@@ -2737,7 +2737,7 @@ class LearningCatalogContentProviderMysqlTest(unittest.TestCase):
                     connection_ids.append(
                         int(
                             marker_conn.execute(
-                                "SELECT CONNECTION_ID() AS id"
+                                "SELECT pg_backend_pid() AS id"
                             ).fetchone()["id"]
                         )
                     )

@@ -26,7 +26,7 @@ from services.learning_budget_service import LearningBudgetService
 class IsolatedDatabase:
     def __init__(self, path):
         self.path = str(path)
-        schema = (Path(__file__).parents[1] / "migrations/076_learning_paid_budget.sql").read_text()
+        schema = (Path(__file__).parents[1] / "migrations/mysql/076_learning_paid_budget.sql").read_text()
         # Only auto-increment spelling differs. Production SQL remains untouched.
         schema = schema.replace("BIGINT AUTO_INCREMENT PRIMARY KEY", "INTEGER PRIMARY KEY AUTOINCREMENT").replace(" ENGINE=InnoDB", "")
         with sqlite3.connect(self.path) as conn:

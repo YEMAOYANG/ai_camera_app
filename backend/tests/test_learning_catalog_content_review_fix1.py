@@ -1264,7 +1264,7 @@ class LearningCatalogContentReviewFixOneRedTest(unittest.TestCase):
 
     def test_build_authority_rejects_counter_curriculum_and_request_drift(self):
         repository = LearningCatalogRepository(
-            Database("mysql+pymysql://unused:unused@127.0.0.1:3306/unused")
+            Database("postgresql://unused:unused@127.0.0.1:5433/unused")
         )
         target = build_preparation_target("primary_1")
         request_id = "formal-build-request"

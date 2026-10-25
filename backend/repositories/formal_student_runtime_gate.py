@@ -31,10 +31,10 @@ CURRENT_ARTIFACT_PUBLICATION_CONTRACT_VERSION = (
 def with_parsed_runtime_manifests(query: str) -> str:
     """Parse each Runtime manifest once within a single student read query.
 
-    The stored manifest is LONGTEXT. Repeated JSON_EXTRACT predicates otherwise
+    The stored manifest is text. Repeated JSON_EXTRACT predicates otherwise
     reparse the entire classroom for every expression, row and gate branch.
-    A non-mergeable CTE materializes MySQL's binary JSON representation while
-    retaining every existing predicate and identity column. Every caller already
+    A MATERIALIZED CTE parses each manifest into jsonb once while retaining
+    every existing predicate and identity column. Every caller already
     excludes retired runtimes in its joins, so do not parse historical manifests.
     It is not a cache:
     every request still reads current publication, retirement and asset state.
@@ -45,16 +45,15 @@ def with_parsed_runtime_manifests(query: str) -> str:
                                relation + ' AS ', query)
     if not count or re.match(r'\s*SELECT\b', query, re.IGNORECASE) is None:
         raise ValueError('parsed Runtime manifests require a student SELECT with Runtime aliases')
-    return f"""WITH {relation} AS (
+    return f"""WITH {relation} AS MATERIALIZED (
       SELECT id, candidate_binding_contract_version, candidate_build_item_id,
         candidate_grade_code, candidate_release_id, candidate_target_fingerprint,
         course_id, course_version, package_id, package_version, quality_status,
         request_id, retired_at, status, upstream_classroom_id,
-        CAST(IF(JSON_VALID(feature_manifest_json), feature_manifest_json, NULL) AS JSON)
+        CASE WHEN JSON_VALID(feature_manifest_json) THEN CAST(feature_manifest_json AS JSONB) END
           AS feature_manifest_json
       FROM learning_openmaic_runtime_classrooms
       WHERE retired_at IS NULL
-      LIMIT 18446744073709551615
     ) {rewritten}"""
 
 
@@ -81,14 +80,14 @@ def _formal_video_sql(alias: str) -> str:
         f"{text('video.buildItemId')} = {alias}.candidate_build_item_id",
         f"{text('video.classroomId')} = {alias}.upstream_classroom_id",
         f"{text('video.sessionId')} = {text('professionalCreation.sessionId')}",
-        f"{text('video.receiptSha256')} REGEXP '^[0-9a-f]{{64}}$'",
+        f"{text('video.receiptSha256')} ~ '^[0-9a-f]{{64}}$'",
         f"{text('formalEvidence.video.verified')} = 'true'",
         f"{text('formalEvidence.video.receiptSha256')} = {text('video.receiptSha256')}",
         f"JSON_TYPE({raw('video.assets')}) = 'ARRAY'",
         f"JSON_TYPE({raw('video.videoCount')}) = 'INTEGER'",
         f"JSON_LENGTH({raw('video.assets')}) BETWEEN 0 AND 1",
-        f"CAST({text('video.videoCount')} AS UNSIGNED) = JSON_LENGTH({raw('video.assets')})",
-        f"CAST({text('formalEvidence.video.verifiedAssetCount')} AS UNSIGNED) = JSON_LENGTH({raw('video.assets')})",
+        f"mysql_unsigned({text('video.videoCount')}) = JSON_LENGTH({raw('video.assets')})",
+        f"mysql_unsigned({text('formalEvidence.video.verifiedAssetCount')}) = JSON_LENGTH({raw('video.assets')})",
     ]
     return f"(({absent}) OR ({' AND '.join(checks)}))"
 
@@ -119,7 +118,7 @@ def _formal_quality_model_sql(alias: str) -> str:
         # compares the entire object (including types/unknown keys), unlike
         # JSON_CONTAINS or a handful of policy fields.
         value_json = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        escaped = value_json.replace("\\", "\\\\").replace("'", "''")
+        escaped = value_json.replace("'", "''")
         return f"JSON_EXTRACT('{escaped}', '$')"
 
     policy = raw("generationContract.professionalCreationPolicy")
@@ -151,7 +150,7 @@ def _formal_quality_model_sql(alias: str) -> str:
     # The audit projection omits modelPolicyId but locks the entire raw parent
     # receipt by SHA. Do not invent a new historical audit field/hash.
     return "(" + " AND ".join([
-        f"{text('professionalCreation.receiptSha256')} REGEXP '^[0-9a-f]{{64}}$'",
+        f"{text('professionalCreation.receiptSha256')} ~ '^[0-9a-f]{{64}}$'",
         f"{text('professionalCreation.receiptSha256')} = {text('formalEvidence.professionalCreation.receiptSha256')}",
         f"(({legacy_branch}) OR ({current_branch}) OR ({candidate_branch}))",
     ]) + ")"
@@ -167,7 +166,7 @@ def _adaptive_skill_quality_sql(alias: str) -> str:
     skill = "professionalCreation.skillOrchestration"
     plan = skill + ".selectionPlan"
     quality = "professionalCreation.teachingQuality"
-    scene_count = f"CAST({text('sceneCount')} AS UNSIGNED)"
+    scene_count = f"mysql_unsigned({text('sceneCount')})"
     conditions = [
         f"{text('generationContract.professionalCreationPolicy.skillOrchestration.schemaVersion')} = 'mira.openmaic.skill-orchestration.v2'",
         f"{text('generationContract.professionalCreationPolicy.skillOrchestration.profileId')} = 'mira-primary-adaptive.v2'",
@@ -175,15 +174,15 @@ def _adaptive_skill_quality_sql(alias: str) -> str:
         f"{text(skill + '.schemaVersion')} = 'mira.openmaic.skill-orchestration-receipt.v2'",
         f"{text(skill + '.profileId')} = 'mira-primary-adaptive.v2'",
         f"{text(skill + '.status')} = 'succeeded'",
-        f"{text(skill + '.receiptSha256')} REGEXP '^[0-9a-f]{{64}}$'",
+        f"{text(skill + '.receiptSha256')} ~ '^[0-9a-f]{{64}}$'",
         f"{text(skill + '.receiptSha256')} = {text('formalEvidence.' + skill + '.receiptSha256')}",
         f"{count(skill + '.skillReads')} BETWEEN 7 AND 23",
         f"{count(skill + '.skillReads')} = {count(plan + '.selectedSkillIds')}",
         f"{count(skill + '.referenceReads')} = 2",
         f"{count(skill + '.sceneContexts')} = {scene_count}",
         f"{count(plan + '.decisions')} = 23",
-        f"{text(plan + '.planSha256')} REGEXP '^[0-9a-f]{{64}}$'",
-        f"{text('generationContract.gradeBoundarySha256')} REGEXP '^[0-9a-f]{{64}}$'",
+        f"{text(plan + '.planSha256')} ~ '^[0-9a-f]{{64}}$'",
+        f"{text('generationContract.gradeBoundarySha256')} ~ '^[0-9a-f]{{64}}$'",
         f"JSON_TYPE(JSON_EXTRACT({alias}.feature_manifest_json, '$.generationContract.gradeBoundary')) = 'OBJECT'",
         f"{text(plan + '.gradeBoundarySha256')} = {text('generationContract.gradeBoundarySha256')}",
         f"{text(quality + '.schemaVersion')} = 'mira.openmaic.teaching-quality-receipt.v1'",
@@ -194,8 +193,8 @@ def _adaptive_skill_quality_sql(alias: str) -> str:
         f"{text(quality + '.gradeBoundarySha256')} = {text('generationContract.gradeBoundarySha256')}",
         f"{text(quality + '.selectionPlanSha256')} = {text(plan + '.planSha256')}",
         f"{text(quality + '.teachingBriefSha256')} = {text('generationContract.teachingBriefSha256')}",
-        f"{text(quality + '.snapshotSha256')} REGEXP '^[0-9a-f]{{64}}$'",
-        f"{text(quality + '.receiptSha256')} REGEXP '^[0-9a-f]{{64}}$'",
+        f"{text(quality + '.snapshotSha256')} ~ '^[0-9a-f]{{64}}$'",
+        f"{text(quality + '.receiptSha256')} ~ '^[0-9a-f]{{64}}$'",
         f"{text(quality + '.receiptSha256')} = {text('formalEvidence.' + quality + '.receiptSha256')}",
         f"{text(quality + '.receiptSha256')} = {text('formalEvidence.teachingQuality.receiptSha256')}",
         f"{text(quality + '.snapshotSha256')} = {text('formalEvidence.teachingQuality.snapshotSha256')}",
@@ -205,8 +204,8 @@ def _adaptive_skill_quality_sql(alias: str) -> str:
         f"{count(quality + '.renderChecks')} = 2 * {scene_count}",
         f"{text(quality + '.review.providerId')} = 'deepseek'",
         _formal_quality_model_sql(alias),
-        f"{text(quality + '.review.inputSha256')} REGEXP '^[0-9a-f]{{64}}$'",
-        f"{text(quality + '.review.requestIdHash')} REGEXP '^[0-9a-f]{{64}}$'",
+        f"{text(quality + '.review.inputSha256')} ~ '^[0-9a-f]{{64}}$'",
+        f"{text(quality + '.review.requestIdHash')} ~ '^[0-9a-f]{{64}}$'",
         f"{count(quality + '.review.dimensions')} = 7",
         f"{count(quality + '.review.objectives')} = {count('generationContract.gradeBoundary.learningObjectives')}",
     ]
@@ -235,19 +234,19 @@ def current_formal_validation_authority_sql(
         (
           {receipt}.conversation_provider_status = 'passed'
           AND {receipt}.conversation_provider_receipt_hash
-            REGEXP '^[0-9a-f]{{64}}$'
+            ~* '^[0-9a-f]{{64}}$'
           AND {receipt}.auto_validated = 1
           AND {receipt}.auto_validation_contract_version =
             '{CURRENT_ARTIFACT_PUBLICATION_CONTRACT_VERSION}'
           AND {receipt}.auto_validation_receipt_hash
-            REGEXP '^[0-9a-f]{{64}}$'
+            ~* '^[0-9a-f]{{64}}$'
         )
         OR (
           {provider}.state = 'auto_validated'
           AND {provider}.expected_provider_call_count = 5
           AND {provider}.provider_attempted_count = 5
           AND {provider}.provider_passed_count = 5
-          AND {provider}.provider_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+          AND {provider}.provider_receipt_hash ~* '^[0-9a-f]{{64}}$'
           AND {provider}.route_session_provider_call = 0
           AND {provider}.route_session_status = 'passed'
         )
@@ -320,10 +319,10 @@ def current_formal_runtime_sql(*, runtime_alias: str) -> str:
         {alias}.feature_manifest_json,
         '$.generationContract.course.packageId'
       )) = {alias}.package_id
-      AND CAST(JSON_UNQUOTE(JSON_EXTRACT(
+      AND mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
         {alias}.feature_manifest_json,
         '$.generationContract.course.packageVersion'
-      )) AS UNSIGNED) = {alias}.package_version
+      ))) = {alias}.package_version
       AND JSON_UNQUOTE(JSON_EXTRACT(
         {alias}.feature_manifest_json,
         '$.generationContract.coursewareAuthority.schemaVersion'
@@ -392,7 +391,7 @@ def current_formal_runtime_sql(*, runtime_alias: str) -> str:
       )) = 'true'
       AND JSON_UNQUOTE(JSON_EXTRACT(
         {alias}.feature_manifest_json, '$.professionalCreation.receiptSha256'
-      )) REGEXP '^[0-9a-f]{{64}}$'
+      )) ~ '^[0-9a-f]{{64}}$'
       AND JSON_UNQUOTE(JSON_EXTRACT(
         {alias}.feature_manifest_json, '$.research.schemaVersion'
       )) = '{CURRENT_RESEARCH_RECEIPT_SCHEMA}'
@@ -410,16 +409,16 @@ def current_formal_runtime_sql(*, runtime_alias: str) -> str:
       )) = {alias}.upstream_classroom_id
       AND JSON_UNQUOTE(JSON_EXTRACT(
         {alias}.feature_manifest_json, '$.research.providerId'
-      )) REGEXP '^[A-Za-z0-9_-]{{1,64}}$'
-      AND CAST(JSON_UNQUOTE(JSON_EXTRACT(
+      )) ~ '^[A-Za-z0-9_-]{{1,64}}$'
+      AND mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
         {alias}.feature_manifest_json, '$.research.searchCount'
-      )) AS UNSIGNED) >= 1
-      AND CAST(JSON_UNQUOTE(JSON_EXTRACT(
+      ))) >= 1
+      AND mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
         {alias}.feature_manifest_json, '$.research.fetchedSourceCount'
-      )) AS UNSIGNED) >= 1
-      AND CAST(JSON_UNQUOTE(JSON_EXTRACT(
+      ))) >= 1
+      AND mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
         {alias}.feature_manifest_json, '$.research.citationCount'
-      )) AS UNSIGNED) >= 1
+      ))) >= 1
       AND (
         (
           JSON_EXTRACT({alias}.feature_manifest_json,
@@ -451,14 +450,14 @@ def current_formal_runtime_sql(*, runtime_alias: str) -> str:
             '$.media.sessionId')) = JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.professionalCreation.sessionId'))
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
-            '$.media.receiptSha256')) REGEXP '^[0-9a-f]{{64}}$'
+            '$.media.receiptSha256')) ~ '^[0-9a-f]{{64}}$'
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.formalEvidence.media.verified')) = 'true'
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.formalEvidence.media.receiptSha256')) = JSON_UNQUOTE(JSON_EXTRACT(
             {alias}.feature_manifest_json, '$.media.receiptSha256'))
-          AND CAST(JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
-            '$.media.imageCount')) AS UNSIGNED) = JSON_LENGTH(JSON_EXTRACT(
+          AND mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
+            '$.media.imageCount'))) = JSON_LENGTH(JSON_EXTRACT(
             {alias}.feature_manifest_json, '$.media.assets'))
         )
       )
@@ -484,7 +483,7 @@ def current_formal_runtime_sql(*, runtime_alias: str) -> str:
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.professionalCreation.skillOrchestration.status')) = 'succeeded'
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
-            '$.professionalCreation.skillOrchestration.receiptSha256')) REGEXP '^[0-9a-f]{{64}}$'
+            '$.professionalCreation.skillOrchestration.receiptSha256')) ~ '^[0-9a-f]{{64}}$'
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.formalEvidence.professionalCreation.skillOrchestration.receiptSha256')) = JSON_UNQUOTE(JSON_EXTRACT(
             {alias}.feature_manifest_json, '$.professionalCreation.skillOrchestration.receiptSha256'))
@@ -493,8 +492,8 @@ def current_formal_runtime_sql(*, runtime_alias: str) -> str:
           AND JSON_LENGTH(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.professionalCreation.skillOrchestration.referenceReads')) = 2
           AND JSON_LENGTH(JSON_EXTRACT({alias}.feature_manifest_json,
-            '$.professionalCreation.skillOrchestration.sceneContexts')) = CAST(JSON_UNQUOTE(JSON_EXTRACT(
-            {alias}.feature_manifest_json, '$.sceneCount')) AS UNSIGNED)
+            '$.professionalCreation.skillOrchestration.sceneContexts')) = mysql_unsigned(JSON_UNQUOTE(JSON_EXTRACT(
+            {alias}.feature_manifest_json, '$.sceneCount')))
         )
         OR ({_adaptive_skill_quality_sql(alias)})
       )

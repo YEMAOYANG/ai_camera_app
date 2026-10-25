@@ -20,7 +20,7 @@
 
 五个域名都解析到服务器公网 IP。学生网页和课堂使用同一主域名下的子域名，并保持配置中的 origin 完全一致，以满足 Cookie、iframe 和麦克风授权条件。
 
-服务器只公开 Caddy 的 80/443 端口；SSH 按运维需要限制访问。不要把 MySQL、PostgreSQL、8000、8001、3000 或 3101 直接开放到公网。TLS 签发还要求域名解析正确且证书验证流量能到达 Caddy。受限 preview 使用直接 DNS，不在前面套 CDN 或未配置受信客户端 IP 的代理，以免白名单识别成代理地址。
+服务器只公开 Caddy 的 80/443 端口；SSH 按运维需要限制访问。不要把 PostgreSQL、8000、8001、3000 或 3101 直接开放到公网。TLS 签发还要求域名解析正确且证书验证流量能到达 Caddy。受限 preview 使用直接 DNS，不在前面套 CDN 或未配置受信客户端 IP 的代理，以免白名单识别成代理地址。
 
 ### 局域网麦克风验收
 
@@ -138,11 +138,11 @@ flutter build web --release \
 python3 deploy/server.py --env /etc/mira/compose.env prepare
 ```
 
-`prepare` 准备持久化目录、课堂预算政策及空数据库，然后通过 `operations` profile 的 `database-migrate` 服务执行后端表结构迁移。该迁移服务用于维护操作，不启动应用或备课 worker。新库没有现有课程，此步骤也不会调用模型备课或把本地已发布课程自动复制过来。若需要展示已有课程，采用下面的迁移流程。
+`prepare` 准备持久化目录、课堂预算政策及空数据库，然后通过 `operations` profile 的 `database-migrate` 服务执行后端表结构迁移。整套系统只用一个 PostgreSQL 数据库 `mira`：后端表在 `app` 模式，OpenMAIC 课堂表在 `public` 模式，程序都用登录账号 `mira` 连接；数据库容器首次启动时由 `deploy/postgres/init/` 建好账号、数据库和 `app` 模式。该迁移服务用于维护操作，不启动应用或备课 worker。新库没有现有课程，此步骤也不会调用模型备课或把本地已发布课程自动复制过来。若需要展示已有课程，采用下面的迁移流程。
 
 ### B. 迁移电脑上已经生成的课程
 
-课程依赖 MySQL 业务记录、PostgreSQL 课堂记录、后端媒体、OpenMAIC 文件及预算策略。只复制一个课程 JSON、音频目录或数据库都不完整。
+课程依赖数据库 `mira` 里的后端业务记录和课堂记录、后端媒体、OpenMAIC 文件及预算策略。只复制一个课程 JSON、音频目录或数据库都不完整。
 
 先在开发电脑的项目根目录做只读盘点：
 
@@ -152,7 +152,7 @@ python3 deploy/data_bundle.py inventory
 
 如果系统自带 Python 无法运行，改用已安装的 Python 3 解释器路径；不必因此改动项目环境。若实际运行进程覆盖了预算策略路径，以下导出命令必须用 `--budget-policy` 指向那份实际文件。
 
-导出前停止所有可能写入的应用进程：后端、Student Web、OpenMAIC、网关、备课和媒体 worker，以及仍在运行的恢复或课程验收操作。使用项目的受管启动脚本停止已经确认身份的本地服务。**MySQL 和 PostgreSQL 保持运行**，供导出工具读取。`--services-stopped` 是你确认写入已停的声明，工具不会自动停进程。
+导出前停止所有可能写入的应用进程：后端、Student Web、OpenMAIC、网关、备课和媒体 worker，以及仍在运行的恢复或课程验收操作。使用项目的受管启动脚本停止已经确认身份的本地服务。**PostgreSQL 保持运行**，供导出工具读取。`--services-stopped` 是你确认写入已停的声明，工具不会自动停进程。
 
 ```sh
 python3 deploy/data_bundle.py export-local \
@@ -161,11 +161,11 @@ python3 deploy/data_bundle.py export-local \
 python3 deploy/data_bundle.py verify /tmp/mira-migration-20260916
 ```
 
-输出目录必须尚不存在，且不能位于待备份的数据目录内部。数据库导出需要可用的 `mysqldump`、`pg_dump` 和 `pg_restore`；非默认位置可用导出命令的对应参数指定。工具会记录源数据库版本，目标镜像的数据库主版本应匹配，不能把更高版本的源库直接恢复到较低版本。
+输出目录必须尚不存在，且不能位于待备份的数据目录内部。数据库导出需要可用的 `pg_dump` 和 `pg_restore`；非默认位置可用导出命令的对应参数指定。工具会记录源数据库版本，目标镜像的数据库主版本应匹配，不能把更高版本的源库直接恢复到较低版本。
 
 数据包包括：
 
-- `mysql.sql`、`postgres.dump`。
+- `postgres.dump`（整个数据库 `mira`，含 `app` 和 `public` 两个模式）。
 - `backend-data.tar`、`openmaic-data.tar`。
 - `learning-budget-policy.json`。
 - `manifest.json`，记录文件校验和及数据库版本。
@@ -182,11 +182,23 @@ python3 deploy/server.py --env /etc/mira/compose.env restore \
   /srv/mira/backups/mira-migration-20260916
 ```
 
-恢复期间不得运行应用和 worker。`restore` 先恢复原数据库及文件，再通过同一个 `database-migrate` 服务补齐当前项目版本所需的结构。不要先在目标环境注册账号、创建课程或使用 `prepare` 写入业务表再覆盖恢复；恢复工具的空目标检查失败时，应查明目标状态，不能删掉校验或强行覆盖。
+恢复期间不得运行应用和 worker。`restore` 先恢复原数据库及文件（以 `mira` 账号身份导入，对象归属与源库一致），再通过同一个 `database-migrate` 服务补齐当前项目版本所需的结构。不要先在目标环境注册账号、创建课程或使用 `prepare` 写入业务表再覆盖恢复；恢复工具的空目标检查失败时，应查明目标状态，不能删掉校验或强行覆盖。
 
 `data_bundle.py restore-files` 只解包文件，不恢复数据库；完整服务器恢复使用 `server.py restore`。恢复后，预算策略路径必须指向 `/app/data/deployment-policies/learning-budget-policy.json`，并保留原有付费账本、授权范围、ID、课程哈希、发布状态及 ambiguous 记录。不能通过改状态或重新生成课程来掩盖迁移问题。
 
 旧课程可能含绝对媒体地址。先检查迁移数据中的 localhost、局域网地址和旧域名引用；不要对 SQL 或课堂 JSON 全局替换字符串，这可能破坏内容哈希及验收回执。发现需要调整的历史引用，应单独处理并重新核对证据。迁移工具的边界和完整参数见 [data-migration.md](data-migration.md)。
+
+### C. 服务器不用 Docker 运行数据库
+
+数据库也可以直接安装在服务器上（PostgreSQL 16，与本地同一大版本），布局保持一致：一个登录账号 `mira`、一个数据库 `mira`、其中的 `app` 模式归 `mira` 所有。用数据库管理员身份执行：
+
+```sh
+psql -v ON_ERROR_STOP=1 -d postgres -c "CREATE ROLE mira LOGIN PASSWORD '<强密码>'"
+psql -v ON_ERROR_STOP=1 -d postgres -c "CREATE DATABASE mira ENCODING 'UTF8' LC_COLLATE 'C.UTF-8' LC_CTYPE 'C.UTF-8' TEMPLATE template0"
+psql -v ON_ERROR_STOP=1 -d mira -v db=mira -f deploy/postgres/init/database-setup.psql
+```
+
+后端配置 `APP_DATABASE_URL=postgresql://mira:<密码>@<数据库地址>:5432/mira`，课堂运行时使用同一个地址。恢复迁移包时按 [data-migration.md](data-migration.md) 第 4 节：先删除空的 `app` 模式，再用 `pg_restore --no-owner --no-privileges --role=mira` 导入，最后运行 `backend/scripts/migrate.py`。数据库只监听内网地址，不开放到公网。
 
 ## 5. 启动与浏览器验收
 
@@ -218,7 +230,6 @@ python3 deploy/server.py --env /etc/mira/compose.env logs
 
 ```text
 /srv/mira/data/
-  mysql/
   postgres/
   backend-data/
   openmaic-data/
@@ -228,9 +239,9 @@ python3 deploy/server.py --env /etc/mira/compose.env logs
 /etc/mira/
 ```
 
-更换容器镜像不应删除这些目录。MySQL/PostgreSQL 的运行目录不能在数据库运行时直接复制充当完整备份。
+更换容器镜像不应删除这些目录。PostgreSQL 的运行目录不能在数据库运行时直接复制充当完整备份。
 
-备份前先停止应用与所有其他写入者，再按工具要求执行逻辑导出；输出目录必须是新目录，其父目录须存在。`server.py stop` 停止网页、网关、后端、OpenMAIC 和备课 worker，保留 MySQL/PostgreSQL 运行，以供导出；另行运行的操作脚本也需要先停止。`backup` 只接受数据库仍运行且其他服务已停止的状态，不会代为停服务：
+备份前先停止应用与所有其他写入者，再按工具要求执行逻辑导出；输出目录必须是新目录，其父目录须存在。`server.py stop` 停止网页、网关、后端、OpenMAIC 和备课 worker，保留 PostgreSQL 运行，以供导出；另行运行的操作脚本也需要先停止。`backup` 只接受数据库仍运行且其他服务已停止的状态，不会代为停服务：
 
 ```sh
 python3 deploy/server.py --env /etc/mira/compose.env stop

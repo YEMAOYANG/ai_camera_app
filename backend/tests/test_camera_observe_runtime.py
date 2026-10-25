@@ -9,7 +9,7 @@ from repositories.care_repository import CareRepository
 from services.camera_observe_service import CameraObserveService
 from services.observation_runtime_state import ObservationRuntimeStateStore
 from services.vision_prefilter_service import PrefilterResult
-from tests.support import TEST_DATABASE_URL, reset_mysql_test_database
+from tests.support import TEST_DATABASE_URL, reset_test_database
 
 
 class _NoPersonPrefilter:
@@ -41,7 +41,7 @@ class _AbsentVision:
 
 class CameraObserveRuntimePersistenceTest(unittest.TestCase):
     def setUp(self):
-        reset_mysql_test_database()
+        reset_test_database()
         self.database_url = TEST_DATABASE_URL
         self.repository = CareRepository(Database(self.database_url))
         self.runtime_store = ObservationRuntimeStateStore(self.repository)

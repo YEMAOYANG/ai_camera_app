@@ -35,7 +35,7 @@ class MemoryConnection:
         self.statements.append((sql, tuple(params)))
         if sql.startswith('SELECT package.id FROM learning_lesson_packages'):
             return SimpleNamespace(fetchone=lambda: {'id': 'package-new'} if self.assets_available else None)
-        sql = re.sub(r'\s+FOR UPDATE(?: SKIP LOCKED)?', '', sql)
+        sql = re.sub(r'\s+FOR UPDATE(?: OF [\w, ]+?)?(?: SKIP LOCKED)?\b', '', sql)
         sql = sql.replace('ON DUPLICATE KEY UPDATE id = id', 'ON CONFLICT DO NOTHING')
         cursor = self.raw.execute(sql, params)
         return SimpleNamespace(

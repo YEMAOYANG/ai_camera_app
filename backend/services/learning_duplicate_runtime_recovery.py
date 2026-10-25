@@ -241,7 +241,7 @@ def plan_or_apply(*, runtime_service, preparation_repository, identity, state, r
         item = conn.execute('SELECT * FROM learning_catalog_build_items WHERE id=? FOR UPDATE', (identity['buildItemId'],)).fetchone()
         receipt = conn.execute('SELECT * FROM learning_curriculum_classroom_item_receipts WHERE build_item_id=? FOR UPDATE', (identity['buildItemId'],)).fetchone()
         requests = [dict(r) for r in conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-            'WHERE target_fingerprint=? AND enabled=TRUE', (identity['targetFingerprint'],)).fetchall()]
+            'WHERE target_fingerprint=? AND enabled = 1', (identity['targetFingerprint'],)).fetchall()]
         if (current != rows or dict(owner or {}) != state['owner'] or dict(item or {}) != state['item']
                 or receipt or requests != state['requests']):
             _fail()

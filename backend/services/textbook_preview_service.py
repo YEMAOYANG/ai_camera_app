@@ -87,7 +87,7 @@ class TextbookPreviewService:
             now = now_ms()
             conn.execute("INSERT INTO learning_textbook_course_previews "
                          "(preview_key,edition_id,revision_id,node_id,input_json,runtime_origin,status,created_at,updated_at) "
-                         "VALUES (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE preview_key=preview_key",
+                         "VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT DO NOTHING",
                          (frozen["previewKey"], edition, revision, node, canonical(frozen), self.runtime.base_url, "queued", now, now))
             row = conn.execute("SELECT * FROM learning_textbook_course_previews WHERE preview_key=? FOR UPDATE", (frozen["previewKey"],)).fetchone()
             if self.repository.parse(row["input_json"]) != frozen or row["runtime_origin"] != self.runtime.base_url:
@@ -162,7 +162,7 @@ class TextbookPreviewService:
             conn.execute("INSERT INTO learning_textbook_course_previews "
                          "(preview_key,edition_id,revision_id,node_id,input_json,runtime_origin,status,runtime_job_id,"
                          "classroom_id,classroom_sha256,classroom_json,result_json,created_at,updated_at) "
-                         "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE preview_key=preview_key",
+                         "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT DO NOTHING",
                          (frozen["previewKey"], edition, revision, node, canonical(frozen), self.runtime.base_url,
                           "review_required", runtime_job_id, classroom_id, digest(classroom),
                           canonical(classroom), canonical(checks), now, now))

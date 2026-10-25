@@ -217,7 +217,7 @@ class HomeworkTencentGrading:
                     raise ApiError('homework_provider_unknown', '本次仅恢复原批改任务，不会新增提交', 409)
                 # Same live child/document can reuse a saved result. An ambiguous
                 # submit with identical bytes cannot be bypassed by a new upload.
-                prior = conn.execute('SELECT c.* FROM homework_provider_calls c JOIN homework_submissions s ON s.id=c.submission_id WHERE c.child_id=? AND s.family_id=? AND s.deleted_at IS NULL AND c.provider=? AND c.receipt_json LIKE ? ORDER BY c.created_at DESC',
+                prior = conn.execute('SELECT c.* FROM homework_provider_calls c JOIN homework_submissions s ON s.id=c.submission_id WHERE c.child_id=? AND s.family_id=? AND s.deleted_at IS NULL AND c.provider=? AND CAST(c.receipt_json AS TEXT) LIKE ? ORDER BY c.created_at DESC',
                     (row['child_id'], row['family_id'], 'tencent', '%' + source_sha + '%')).fetchall()
                 prior = [c for c in prior if parsed(c['receipt_json'], {}).get('sourceSha256') == source_sha]
                 cached = next((c for c in prior if c['status'] == 'succeeded' and c['request_sha256'] == request_sha), None)

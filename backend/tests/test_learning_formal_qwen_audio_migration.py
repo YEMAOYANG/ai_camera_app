@@ -6,58 +6,58 @@ from core.database import Database
 from tests.support import fresh_test_config
 
 
-MIGRATION_VERSION = "058_learning_formal_qwen_audio_receipts.sql"
+# The PostgreSQL baseline carries the contract MySQL migration 058 added.
+BASELINE_VERSION = "100_postgres_baseline_schema.sql"
 
 
 class LearningFormalQwenAudioMigrationTest(unittest.TestCase):
     def setUp(self) -> None:
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
-        self.assertIn("/ai_camera_app_test", self.database_url)
-        self.assertNotIn("/ai_camera_app_dev", self.database_url)
+        self.assertIn("/mira_test", self.database_url)
+        self.assertNotRegex(self.database_url, r"/mira(\?|$)")
         self.database = Database(self.database_url)
 
-    def test_058_registers_exact_job_and_segment_receipt_contract(self) -> None:
+    def test_baseline_registers_exact_job_and_segment_receipt_contract(self) -> None:
         with self.database.transaction() as conn:
             marker = conn.execute(
                 "SELECT COUNT(*) AS count FROM schema_migrations WHERE version = ?",
-                (MIGRATION_VERSION,),
+                (BASELINE_VERSION,),
             ).fetchone()
             tables = {
-                row["TABLE_NAME"]
+                row["table_name"]
                 for row in conn.execute(
-                    "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES "
-                    "WHERE TABLE_SCHEMA = DATABASE()"
+                    "SELECT table_name FROM information_schema.tables "
+                    "WHERE table_schema = current_schema()"
                 ).fetchall()
             }
             columns = {
-                row["TABLE_NAME"]: set()
+                row["table_name"]: set()
                 for row in conn.execute(
-                    "SELECT DISTINCT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                    "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ("
+                    "SELECT DISTINCT table_name FROM information_schema.columns "
+                    "WHERE table_schema = current_schema() AND table_name IN ("
                     "'learning_formal_qwen_audio_jobs', "
                     "'learning_formal_qwen_audio_segment_receipts')"
                 ).fetchall()
             }
             for row in conn.execute(
-                "SELECT TABLE_NAME, COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN ("
+                "SELECT table_name, column_name FROM information_schema.columns "
+                "WHERE table_schema = current_schema() AND table_name IN ("
                 "'learning_formal_qwen_audio_jobs', "
                 "'learning_formal_qwen_audio_segment_receipts')"
             ).fetchall():
-                columns[row["TABLE_NAME"]].add(row["COLUMN_NAME"])
+                columns[row["table_name"]].add(row["column_name"])
             constraints = {
-                row["CONSTRAINT_NAME"]
+                row["constraint_name"]
                 for row in conn.execute(
-                    "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS "
-                    "WHERE TABLE_SCHEMA = DATABASE()"
+                    "SELECT constraint_name FROM information_schema.table_constraints "
+                    "WHERE table_schema = current_schema()"
                 ).fetchall()
             }
             indexes = {
-                row["INDEX_NAME"]
+                row["indexname"]
                 for row in conn.execute(
-                    "SELECT DISTINCT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS "
-                    "WHERE TABLE_SCHEMA = DATABASE()"
+                    "SELECT indexname FROM pg_indexes WHERE schemaname = current_schema()"
                 ).fetchall()
             }
 

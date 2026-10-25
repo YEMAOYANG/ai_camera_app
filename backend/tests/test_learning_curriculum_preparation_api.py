@@ -1430,10 +1430,10 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
         lock_orders_by_thread: dict[int, list[str]] = {}
         original_execute = DatabaseConnection.execute
 
-        def mysql_connection_id(connection: DatabaseConnection) -> int:
+        def database_connection_id(connection: DatabaseConnection) -> int:
             row = original_execute(
                 connection,
-                "SELECT CONNECTION_ID() AS connection_id",
+                "SELECT pg_backend_pid() AS connection_id",
             ).fetchone()
             return int(row["connection_id"])
 
@@ -1444,7 +1444,7 @@ class LearningCurriculumPreparationApiTest(unittest.TestCase):
             if is_hint:
                 result = original_execute(connection, sql, params)
                 thread_id = get_ident()
-                connection_id = mysql_connection_id(connection)
+                connection_id = database_connection_id(connection)
                 with evidence_lock:
                     lock_orders_by_thread.setdefault(thread_id, []).append("hint")
                     first_hint_connection_by_thread.setdefault(

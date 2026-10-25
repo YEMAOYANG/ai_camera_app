@@ -127,7 +127,7 @@ def recover_preflight_content(*, adapter, identity, expected_history_sha, now, f
                 or policy_from_target(json.loads(build['target_spec_json'])) != REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY):
             raise ValueError('preflight recovery requires the unchanged failed v2 single course')
         requested = conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-            'WHERE target_fingerprint=? AND enabled=TRUE', (identity['targetFingerprint'],)).fetchall()
+            'WHERE target_fingerprint=? AND enabled = 1', (identity['targetFingerprint'],)).fetchall()
         if list(requested) != [{'subject': 'english', 'skill_id': 'past_future', 'variant_ordinal': 1}]:
             raise ValueError('preflight recovery single-slot supply scope changed')
         plans = conn.execute('SELECT * FROM learning_curriculum_preparation_plans WHERE catalog_build_id=? '

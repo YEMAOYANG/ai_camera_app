@@ -18,7 +18,7 @@ import shutil
 import subprocess
 import uuid
 
-from pymysql.err import OperationalError
+from core.database import DatabaseError, is_retryable_conflict
 
 from core.course_storage_config import CourseStorageConfig
 from repositories.course_storage_repository import (
@@ -50,7 +50,7 @@ def _hash(raw):
 
 
 def _retry_deadlock(operation):
-    """Retry only transactions MySQL has already rolled back as deadlocks.
+    """Retry only transactions PostgreSQL has already rolled back as deadlocks.
 
     Lifecycle validation and the original expected head are repeated. This
     boundary never retries an upload, provider call, or ambiguous I/O failure.
@@ -58,8 +58,8 @@ def _retry_deadlock(operation):
     for attempt in range(3):
         try:
             return operation()
-        except OperationalError as error:
-            if not error.args or error.args[0] != 1213:
+        except DatabaseError as error:
+            if not is_retryable_conflict(error):
                 raise
             if attempt == 2:
                 raise CourseFileWriteError('course_storage_write_conflict', 409) from None

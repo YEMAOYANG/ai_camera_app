@@ -23,10 +23,10 @@ import data_bundle as bundle
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 ORIGINS = tuple(f"MIRA_{name}_ORIGIN" for name in ("PARENT", "STUDENT", "CLASSROOM", "API", "REALTIME"))
-SECRETS = ("MIRA_MYSQL_PASSWORD", "MIRA_MYSQL_ROOT_PASSWORD", "MIRA_POSTGRES_PASSWORD",
+SECRETS = ("MIRA_DB_PASSWORD", "MIRA_POSTGRES_SUPERUSER_PASSWORD",
            "MIRA_INTERNAL_API_TOKEN", "MIRA_PERSISTENCE_TOKEN", "MIRA_STUDENT_AUTH_PEPPER")
 WRITERS = ("edge", "student-web", "gateway", "curriculum-worker", "backend", "openmaic")
-START_SERVICES = ("mysql", "postgres", "storage-init", "openmaic", "backend", "gateway", "student-web", "edge")
+START_SERVICES = ("postgres", "storage-init", "openmaic", "backend", "gateway", "student-web", "edge")
 MARKER = ".mira-deployment.json"
 GENERATION_FLAGS = ("LEARNING_DAILY_PREPARATION_ENABLED", "LEARNING_DYNAMIC_GENERATION_ENABLED",
                     "LEARNING_FORMAL_RUNTIME_CANDIDATE_ENABLED",
@@ -67,7 +67,7 @@ def absolute_path(value: str, key: str) -> Path:
 def validate(values: dict) -> dict:
     required = (*ORIGINS, *SECRETS, "MIRA_DEPLOY_MODE", "MIRA_PROJECT_NAME", "MIRA_RELEASE_TAG",
                 "MIRA_BASE_DOMAIN", "MIRA_ACCESS_CIDRS", "MIRA_DATA_ROOT", "MIRA_PARENT_WEB_DIST",
-                "MIRA_BACKEND_ENV_FILE", "MIRA_RUNTIME_ENV_FILE", "MIRA_MYSQL_IMAGE", "MIRA_POSTGRES_IMAGE")
+                "MIRA_BACKEND_ENV_FILE", "MIRA_RUNTIME_ENV_FILE", "MIRA_POSTGRES_IMAGE")
     missing = [key for key in required if not values.get(key)]
     if missing:
         raise DeployError("Missing configuration keys: " + ", ".join(missing))
@@ -93,8 +93,6 @@ def validate(values: dict) -> dict:
     for key in ("MIRA_PROJECT_NAME", "MIRA_RELEASE_TAG"):
         if not re.fullmatch(r"[a-z0-9][a-z0-9_.-]{0,62}", values[key]):
             raise DeployError(f"{key} has an invalid project name or image tag")
-    if not re.fullmatch(r"mysql:\d+\.\d+(?:\.\d+)?", values["MIRA_MYSQL_IMAGE"]):
-        raise DeployError("MIRA_MYSQL_IMAGE must use an explicit official mysql version, e.g. mysql:8.4")
     pg_image = re.fullmatch(r"postgres:(\d+)(?:\.\d+)?-alpine", values["MIRA_POSTGRES_IMAGE"])
     if not pg_image or not 14 <= int(pg_image[1]) <= 17:
         raise DeployError("Use postgres:14-17-alpine with this data mount; newer versions need a reviewed volume-layout update")
@@ -163,7 +161,7 @@ def run(prefix: list, env: dict, *args: str, input_file: Path | None = None, cap
 
 def ensure_stopped(prefix: list, env: dict):
     running = set(run(prefix, env, "ps", "--status", "running", "--services", capture=True).split())
-    if running - {"mysql", "postgres"}:
+    if running - {"postgres"}:
         raise DeployError("Stop application writers before preparing/restoring data")
 
 
@@ -191,12 +189,10 @@ def validate_prepared(root: Path, values: dict):
         state = json.loads(marker.read_text())
         if marker.is_symlink() or state.get("schema") != "mira.deployment.v1" or state.get("kind") not in ("empty", "restored"):
             raise ValueError()
-        for name in ("mysql", "postgres", "backend-data", "openmaic-data"):
+        for name in ("postgres", "backend-data", "openmaic-data"):
             directory = root / name
             if not directory.is_dir() or directory.is_symlink():
                 raise ValueError()
-        if not (root / "mysql/auto.cnf").is_file() or not (root / "mysql/mysql").is_dir():
-            raise ValueError()
         pg_major = (root / "postgres/PG_VERSION").read_text().strip()
         if values["MIRA_POSTGRES_IMAGE"].split(":")[1].split("-")[0].split(".")[0] != pg_major:
             raise DeployError("PostgreSQL image major differs from the existing data directory; use a reviewed migration")
@@ -208,15 +204,9 @@ def validate_prepared(root: Path, values: dict):
 
 
 def version_compatible(values: dict, manifest: dict):
-    for kind, key in (("mysql", "MIRA_MYSQL_IMAGE"), ("postgres", "MIRA_POSTGRES_IMAGE")):
-        target = re.search(r":(\d+)(?:\.(\d+))?", values[key])
-        source = manifest["databases"][kind]
-        if int(target[1]) != source["serverMajor"]:
-            raise DeployError(f"{key} must match the bundle's {kind} server major version")
-        if kind == "mysql":
-            source_minor = re.match(r"\d+\.(\d+)", source["serverVersion"])
-            if source_minor and int(target[2]) < int(source_minor[1]):
-                raise DeployError("Refusing a MySQL minor-version downgrade")
+    target = re.search(r":(\d+)", values["MIRA_POSTGRES_IMAGE"])
+    if int(target[1]) != manifest["databases"]["postgres"]["serverMajor"]:
+        raise DeployError("MIRA_POSTGRES_IMAGE must match the bundle's PostgreSQL server major version")
 
 
 def check_secret_continuity(values: dict, backend: dict, manifest: dict):
@@ -294,11 +284,11 @@ def main(argv=None) -> int:
             policy = root / "backend-data" / bundle.POLICY_DESTINATION
             policy.parent.mkdir(mode=0o700)
             bundle.private_write(policy, (ROOT / "backend/content/learning_classroom_policy.json").read_bytes())
-            run(prefix, env, "up", "-d", "--wait", "mysql", "postgres")
+            run(prefix, env, "up", "-d", "--wait", "postgres")
             run(prefix, env, "run", "--rm", "storage-init")
             migrate(prefix, env)
             record(root, "empty")
-            print("Empty databases prepared. Existing courses have not been imported.")
+            print("Empty database prepared. Existing courses have not been imported.")
         elif args.command == "restore":
             manifest = bundle.verify(args.bundle)
             version_compatible(values, manifest)
@@ -307,17 +297,20 @@ def main(argv=None) -> int:
             ensure_empty(root)
             root.parent.mkdir(parents=True, exist_ok=True)
             bundle.restore_files(args.bundle, root)
-            run(prefix, env, "up", "-d", "--wait", "mysql", "postgres")
-            run(prefix, env, "exec", "-T", "mysql", "sh", "-ec",
-                'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" exec mysql --user=root --default-character-set=utf8mb4 "$MYSQL_DATABASE"',
-                input_file=args.bundle / "mysql.sql", capture=True)
+            run(prefix, env, "up", "-d", "--wait", "postgres")
+            # The dump recreates schema app; the fresh one from initialization
+            # is empty, and DROP refuses if anything was written to it.
             run(prefix, env, "exec", "-T", "postgres", "sh", "-ec",
-                'PGPASSWORD="$POSTGRES_PASSWORD" exec pg_restore --exit-on-error --no-owner --no-privileges --username="$POSTGRES_USER" --dbname="$POSTGRES_DB"',
+                'PGPASSWORD="$POSTGRES_PASSWORD" exec psql --no-psqlrc --set=ON_ERROR_STOP=1 --username="$POSTGRES_USER" --dbname="$POSTGRES_DB" --command="DROP SCHEMA app"',
+                capture=True)
+            # Restored objects belong to the application login, as in the source.
+            run(prefix, env, "exec", "-T", "postgres", "sh", "-ec",
+                'PGPASSWORD="$POSTGRES_PASSWORD" exec pg_restore --exit-on-error --no-owner --no-privileges --role=mira --username="$POSTGRES_USER" --dbname="$POSTGRES_DB"',
                 input_file=args.bundle / "postgres.dump", capture=True)
             run(prefix, env, "run", "--rm", "storage-init")
             migrate(prefix, env)
             record(root, "restored", manifest)
-            print("Both databases and data directories restored. Applications remain stopped; review migration notes before start.")
+            print("Database and data directories restored. Applications remain stopped; review migration notes before start.")
         elif args.command == "start":
             validate_prepared(root, values)
             # Namespace sharing requires the four runtime services to be recreated
@@ -328,12 +321,12 @@ def main(argv=None) -> int:
         elif args.command == "migrate":
             validate_prepared(root, values)
             ensure_stopped(prefix, env)
-            run(prefix, env, "up", "-d", "--wait", "mysql", "postgres")
+            run(prefix, env, "up", "-d", "--wait", "postgres")
             migrate(prefix, env)
             print("Schema migrations completed. Application services remain stopped.")
         elif args.command == "stop":
             run(prefix, env, "stop", *WRITERS)
-            print("Application writers stopped. Databases remain running for backup; data was not deleted.")
+            print("Application writers stopped. The database remains running for backup; data was not deleted.")
         elif args.command == "status":
             run(prefix, env, "ps", "--all")
         elif args.command == "logs":

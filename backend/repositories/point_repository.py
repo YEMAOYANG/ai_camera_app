@@ -5,7 +5,7 @@ import uuid
 from contextlib import contextmanager
 from typing import Iterator
 
-from pymysql.err import IntegrityError
+from core.database import IntegrityError
 
 from core.database import Database, DatabaseConnection, DatabaseRow
 from core.errors import ApiError

@@ -444,7 +444,7 @@ class HomeworkTest(unittest.TestCase):
     def test_factory_binds_worker_disabled_to_analysis_availability(self):
         from services import service_factory
         app=Flask(__name__)
-        app.config.update(DATABASE_URL='mysql://isolated/example',HOMEWORK_ANALYSIS_ENABLED=True,HOMEWORK_WORKER_ENABLED=False,HOMEWORK_ASSET_ROOT=self.tmp.name)
+        app.config.update(DATABASE_URL='postgresql://isolated/example',HOMEWORK_ANALYSIS_ENABLED=True,HOMEWORK_WORKER_ENABLED=False,HOMEWORK_ASSET_ROOT=self.tmp.name)
         with app.app_context(),patch.multiple(service_factory,Database=Mock(return_value=self.db),
             profile_service=Mock(return_value=self.service.profile),student_auth_service=Mock(return_value=self.service.student_auth),
             prompt_registry=Mock(return_value=self.service.prompts),homework_vision_provider=Mock(return_value=self.provider),

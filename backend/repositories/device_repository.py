@@ -258,6 +258,8 @@ class DeviceRepository:
             self.clear_default_device(conn, family_id=family_id)
         return None
 
+    # Parents type binding codes, so the lookups below ignore letter case,
+    # as the old MySQL collation did.
     def find_active_device_by_binding_code(
         self,
         conn: DatabaseConnection,
@@ -269,7 +271,7 @@ class DeviceRepository:
             """
             SELECT *
             FROM devices
-            WHERE family_id = ? AND binding_code = ? AND status <> 'unbound'
+            WHERE family_id = ? AND LOWER(binding_code) = LOWER(?) AND status <> 'unbound'
             ORDER BY created_at ASC, id ASC
             LIMIT 1
             """,
@@ -286,7 +288,7 @@ class DeviceRepository:
             """
             SELECT *
             FROM devices
-            WHERE binding_code = ? AND status <> 'unbound'
+            WHERE LOWER(binding_code) = LOWER(?) AND status <> 'unbound'
             ORDER BY created_at ASC, id ASC
             LIMIT 1
             """,
@@ -304,7 +306,7 @@ class DeviceRepository:
             """
             SELECT *
             FROM devices
-            WHERE family_id = ? AND binding_code = ? AND status = 'unbound'
+            WHERE family_id = ? AND LOWER(binding_code) = LOWER(?) AND status = 'unbound'
             ORDER BY updated_at DESC, id DESC
             LIMIT 1
             """,

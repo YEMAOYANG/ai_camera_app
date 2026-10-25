@@ -13,14 +13,15 @@ x-backend-environment: &backend-environment
   APP_HOST: 0.0.0.0
   APP_PORT: "8000"
   MIRA_BACKEND_BIND: 0.0.0.0:8000
-  APP_DATABASE_URL: mysql+pymysql://mira:${MIRA_MYSQL_PASSWORD:?required}@mysql:3306/mira?charset=utf8mb4
+  # One database: the backend uses schema app, the classroom runtime public.
+  APP_DATABASE_URL: postgresql://mira:${MIRA_DB_PASSWORD:?required}@postgres:5432/mira
   APP_CORS_ORIGINS: ${MIRA_PARENT_ORIGIN:?required},${MIRA_STUDENT_ORIGIN:?required}
   APP_STUDENT_AUTH_PEPPER: ${MIRA_STUDENT_AUTH_PEPPER:?required}
   INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?required}
   INTERNAL_ALLOWED_SOURCES: 127.0.0.1,::1
   OPENMAIC_FULL_RUNTIME_INTERNAL_URL: http://127.0.0.1:3000
   OPENMAIC_FULL_RUNTIME_PUBLIC_URL: ${MIRA_CLASSROOM_ORIGIN:?required}
-  MIRA_OPENMAIC_AGENT_DATABASE_URL: postgresql://openmaic:${MIRA_POSTGRES_PASSWORD:?required}@postgres:5432/openmaic
+  MIRA_OPENMAIC_AGENT_DATABASE_URL: postgresql://mira:${MIRA_DB_PASSWORD:?required}@postgres:5432/mira
   LEARNING_BUDGET_INTERNAL_URL: http://127.0.0.1:8000
   APP_DEVICE_SECRET_STORE_DIR: /app/data/device-secrets
   APP_DEVICE_SECRET_KEY_FILE: /app/data/.device-secret.key
@@ -37,43 +38,33 @@ services:
     # Schema-only command: no app initialization, worker or Provider calls.
     command: [python, -c, "import os; from scripts.migrate import run_migrations; run_migrations(os.environ['APP_DATABASE_URL'])"]
     environment:
-      APP_DATABASE_URL: mysql+pymysql://mira:${MIRA_MYSQL_PASSWORD:?required}@mysql:3306/mira?charset=utf8mb4
+      APP_DATABASE_URL: postgresql://mira:${MIRA_DB_PASSWORD:?required}@postgres:5432/mira
     networks: [database]
     depends_on:
-      mysql: {condition: service_healthy}
+      postgres: {condition: service_healthy}
     restart: "no"
     logging: *logging
 
-  mysql:
-    image: ${MIRA_MYSQL_IMAGE:-mysql:8.4}
-    environment:
-      MYSQL_DATABASE: mira
-      MYSQL_USER: mira
-      MYSQL_PASSWORD: ${MIRA_MYSQL_PASSWORD:?required}
-      MYSQL_ROOT_PASSWORD: ${MIRA_MYSQL_ROOT_PASSWORD:?required}
-    volumes:
-      - ${MIRA_DATA_ROOT:?required}/mysql:/var/lib/mysql
-    networks: [database]
-    healthcheck:
-      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysql --user=root --batch --skip-column-names --execute="SELECT 1" >/dev/null']
-      interval: 5s
-      timeout: 5s
-      retries: 40
-      start_period: 30s
-    restart: unless-stopped
-    logging: *logging
-
+  # Same layout as deploy/compose.local-db.yml: the init scripts create the
+  # application login `mira`, its database and schema app. The superuser is
+  # only for initialization, backup and restore inside this container.
   postgres:
     image: ${MIRA_POSTGRES_IMAGE:-postgres:16-alpine}
+    command: [postgres, -c, timezone=Asia/Shanghai, -c, log_timezone=Asia/Shanghai]
     environment:
-      POSTGRES_DB: openmaic
-      POSTGRES_USER: openmaic
-      POSTGRES_PASSWORD: ${MIRA_POSTGRES_PASSWORD:?required}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${MIRA_POSTGRES_SUPERUSER_PASSWORD:?required}
+      POSTGRES_DB: mira
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=C.UTF-8
+      MIRA_DB_PASSWORD: ${MIRA_DB_PASSWORD:?required}
+      TZ: Asia/Shanghai
     volumes:
       - ${MIRA_DATA_ROOT:?required}/postgres:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    shm_size: 256mb
     networks: [database]
     healthcheck:
-      test: [CMD-SHELL, 'pg_isready -U openmaic -d openmaic']
+      test: [CMD-SHELL, 'pg_isready -U postgres -d mira']
       interval: 5s
       timeout: 5s
       retries: 30
@@ -116,7 +107,7 @@ services:
       OPENMAIC_AGENT_RUNTIME_ENABLED: "false"
       # Preserve migrated assets until post-migration acceptance is complete.
       ASSET_COLLECTION_ENABLED: "false"
-      DATABASE_URL: postgresql://openmaic:${MIRA_POSTGRES_PASSWORD:?required}@postgres:5432/openmaic
+      DATABASE_URL: postgresql://mira:${MIRA_DB_PASSWORD:?required}@postgres:5432/mira
       PERSISTENCE_DEV_TOKEN: ${MIRA_PERSISTENCE_TOKEN:?required}
       MIRA_INTERNAL_API_TOKEN: ${MIRA_INTERNAL_API_TOKEN:?required}
       MIRA_BACKEND_INTERNAL_URL: http://127.0.0.1:8000
@@ -159,7 +150,7 @@ services:
       - ${MIRA_DATA_ROOT:?required}/backend-data:/app/data
     depends_on:
       openmaic: {condition: service_started, restart: true}
-      mysql: {condition: service_healthy}
+      postgres: {condition: service_healthy}
       storage-init: {condition: service_completed_successfully}
     healthcheck:
       test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5)"]

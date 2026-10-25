@@ -39,7 +39,7 @@ class LearningTeacherMediaRepository:
               content_hash, published_at, created_at, updated_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'active', ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 profile.profile_id,
@@ -176,11 +176,11 @@ class LearningTeacherMediaRepository:
               teacher_profile_version, updated_by_user_id, created_at, updated_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-              teacher_profile_id = VALUES(teacher_profile_id),
-              teacher_profile_version = VALUES(teacher_profile_version),
-              updated_by_user_id = VALUES(updated_by_user_id),
-              updated_at = VALUES(updated_at)
+            ON CONFLICT (family_id, child_id, subject) DO UPDATE SET
+              teacher_profile_id = EXCLUDED.teacher_profile_id,
+              teacher_profile_version = EXCLUDED.teacher_profile_version,
+              updated_by_user_id = EXCLUDED.updated_by_user_id,
+              updated_at = EXCLUDED.updated_at
             """,
             (
                 family_id,
@@ -230,7 +230,7 @@ class LearningTeacherMediaRepository:
               segment_count, created_at, updated_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 job_id,
@@ -1694,7 +1694,7 @@ class LearningTeacherMediaRepository:
             ) VALUES (?, 'audio', ?, ?, 'audio/wav', ?, NULL, 'pending',
               'pending', 'not_required', 'quarantined', 'formal_qwen_tts',
               ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 asset_id, storage_key, audio_sha256, int(byte_size), source_ref,
@@ -1728,7 +1728,7 @@ class LearningTeacherMediaRepository:
               byte_size, duration_ms, status, created_at, updated_at
             ) VALUES (?, 'original', ?, ?, 'audio/wav', ?, NULL,
               'quarantined', ?, ?)
-            ON DUPLICATE KEY UPDATE asset_id = asset_id
+            ON CONFLICT DO NOTHING
             """,
             (
                 asset_id, storage_key, audio_sha256, int(byte_size),
@@ -2234,9 +2234,10 @@ class LearningTeacherMediaRepository:
         conn.execute(
             """
             UPDATE learning_media_asset_variants AS variant
-            JOIN learning_media_assets AS asset ON asset.id = variant.asset_id
-            SET variant.status = 'quarantined', variant.updated_at = ?
-            WHERE asset.source_type = 'formal_qwen_tts'
+            SET status = 'quarantined', updated_at = ?
+            FROM learning_media_assets AS asset
+            WHERE asset.id = variant.asset_id
+              AND asset.source_type = 'formal_qwen_tts'
               AND asset.source_ref LIKE ?
             """,
             (int(now), f"{job['build_item_id']}:%"),

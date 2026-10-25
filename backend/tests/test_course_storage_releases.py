@@ -317,9 +317,8 @@ class PublishedMediaInventoryTest(unittest.TestCase):
             with storage.read_only_connection(database):
                 raise RuntimeError('interrupted')
         self.assertEqual(connection.execute.call_args_list[0].args,
-                         ('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ',))
-        self.assertEqual(connection.execute.call_args_list[1].args,
-                         ('START TRANSACTION WITH CONSISTENT SNAPSHOT, READ ONLY',))
+                         ('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY',))
+        self.assertEqual(len(connection.execute.call_args_list), 1)
         connection.rollback.assert_called_once()
         connection.close.assert_called_once()
 

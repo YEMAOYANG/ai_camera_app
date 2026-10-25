@@ -40,7 +40,7 @@ def inherited_scope_request_state(conn, target: Mapping) -> list[dict] | None:
         f"""SELECT owner.id AS source_plan_id, request.subject, request.skill_id,
           request.variant_ordinal, request.priority, request.purpose, request.enabled,
           NULL AS build_item_id, NULL AS publication_status,
-          NULL AS reason_code, NULL AS runtime_status, FALSE AS ready
+          NULL AS reason_code, NULL AS runtime_status, 0 AS ready
         FROM learning_curriculum_preparation_plans AS owner
         LEFT JOIN learning_course_supply_requests AS request
           ON request.target_fingerprint = owner.library_target_fingerprint
@@ -154,7 +154,7 @@ def published_supply(conn, target: Mapping, *, for_generation: bool = False) -> 
           AND audio.audio_validated_count = audio.expected_segment_count
           AND audio.asr_attempted_count = audio.expected_segment_count
           AND audio.asr_passed_count = audio.expected_segment_count
-          AND audio.terminal_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+          AND audio.terminal_receipt_hash ~* '^[0-9a-f]{{64}}$'
         LEFT JOIN learning_openmaic_provider_readiness_jobs AS provider
           ON provider.release_id = receipt.release_id AND provider.grade_code = receipt.grade_code
           AND provider.target_fingerprint = receipt.target_fingerprint
@@ -162,7 +162,7 @@ def published_supply(conn, target: Mapping, *, for_generation: bool = False) -> 
           AND receipt.classroom_status = 'passed' AND receipt.tts_status = 'passed'
           AND receipt.asr_roundtrip_status = 'passed' AND receipt.auto_validated = 1
           AND receipt.publication_status = 'published'
-          AND receipt.publication_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+          AND receipt.publication_receipt_hash ~* '^[0-9a-f]{{64}}$'
           {current_formal_validation_authority_sql(receipt_alias='receipt', provider_alias='provider')}
           AND {_student_required_package_assets_sql(package_alias='package')}
         ORDER BY (receipt.target_fingerprint = ?) DESC, receipt.published_at DESC, item.id"""),

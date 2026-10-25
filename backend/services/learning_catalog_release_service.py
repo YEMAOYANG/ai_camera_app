@@ -5570,8 +5570,8 @@ class LearningCatalogReleaseService:
                 if item["skillId"] not in identifiers or item["variantOrdinal"] > variants:
                     continue
                 conn.execute("INSERT INTO learning_course_supply_requests(target_fingerprint, subject, skill_id, variant_ordinal, "
-                    "priority, purpose, enabled, created_at, updated_at) VALUES (?, ?, ?, ?, 0, 'core', TRUE, ?, ?) "
-                    "ON DUPLICATE KEY UPDATE enabled=TRUE, updated_at=VALUES(updated_at)",
+                    "priority, purpose, enabled, created_at, updated_at) VALUES (?, ?, ?, ?, 0, 'core', 1, ?, ?) "
+                    "ON CONFLICT (target_fingerprint, subject, skill_id, variant_ordinal) DO UPDATE SET enabled=1, updated_at=EXCLUDED.updated_at",
                     (fingerprint, item["subject"], item["skillId"], item["variantOrdinal"], timestamp, timestamp))
             release = self.repository.get_release(conn, release_id=build["release_id"])
             items = self.repository.list_build_items(conn, build_id=build["id"])

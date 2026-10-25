@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
-from pymysql.err import OperationalError
+from psycopg.errors import DeadlockDetected, LockNotAvailable
 
 from core.course_storage_config import CourseStorageConfig
 from repositories.course_storage_repository import CourseStorageRepository, storage_id_for
@@ -147,14 +147,14 @@ class CourseFileWriterTest(unittest.TestCase):
         self.assertEqual(self.repo.resolve(self.path, self.storage)["sha256"], sha(self.old))
         self.assertIsNone(self.repo.resolve(self.path, self.storage, sha(self.new)))
 
-    def test_only_mysql_deadlock_preflight_retries_in_fresh_transaction(self):
+    def test_only_deadlock_preflight_retries_in_fresh_transaction(self):
         self.register()
         policy = self.writer._policy
         attempts = []
         def check(*args):
             attempts.append(args[-1])
             if len(attempts) < 3:
-                raise OperationalError(1213, 'synthetic test deadlock')
+                raise DeadlockDetected('synthetic test deadlock')
             return policy(*args)
         with patch.object(self.writer, '_policy', check):
             value = self.write()
@@ -171,7 +171,7 @@ class CourseFileWriterTest(unittest.TestCase):
         def cas(*args, **kwargs):
             calls.append(kwargs)
             if len(calls) < 3:
-                raise OperationalError(1213, 'synthetic test deadlock')
+                raise DeadlockDetected('synthetic test deadlock')
             return activate(*args, **kwargs)
         with patch.object(self.repo, 'compare_and_activate', cas):
             self.write()
@@ -189,7 +189,7 @@ class CourseFileWriterTest(unittest.TestCase):
             calls.append(args[-1])
             result = original(*args)
             if len(calls) == 2:  # first transaction's CAS guard
-                raise OperationalError(1213, 'synthetic test scope scan deadlock')
+                raise DeadlockDetected('synthetic test scope scan deadlock')
             return result
         with patch.object(self.writer, '_policy', policy):
             self.write()
@@ -201,7 +201,7 @@ class CourseFileWriterTest(unittest.TestCase):
 
     def test_cas_deadlock_exhaustion_preserves_old_version_and_does_not_reupload(self):
         self.register()
-        with patch.object(self.repo, 'compare_and_activate', side_effect=OperationalError(1213, 'synthetic')) as activate:
+        with patch.object(self.repo, 'compare_and_activate', side_effect=DeadlockDetected('synthetic')) as activate:
             with self.assertRaisesRegex(CourseFileWriteError, 'write_conflict') as caught:
                 self.write()
         self.assertEqual(caught.exception.status_code, 409)
@@ -212,13 +212,13 @@ class CourseFileWriterTest(unittest.TestCase):
 
     def test_deadlock_exhaustion_returns_conflict_and_other_failures_never_retry(self):
         self.register()
-        for code, expected in ((1213, 3), (1205, 1)):
-            with self.subTest(code=code):
-                with patch.object(self.writer, '_policy', side_effect=OperationalError(code, 'synthetic')) as policy:
-                    with self.assertRaises(CourseFileWriteError if code == 1213 else OperationalError) as raised:
+        for error, expected in ((DeadlockDetected, 3), (LockNotAvailable, 1)):
+            with self.subTest(error=error.__name__):
+                with patch.object(self.writer, '_policy', side_effect=error('synthetic')) as policy:
+                    with self.assertRaises(CourseFileWriteError if error is DeadlockDetected else LockNotAvailable) as raised:
                         self.write()
                     self.assertEqual(policy.call_count, expected)
-                    if code == 1213:
+                    if error is DeadlockDetected:
                         self.assertEqual(raised.exception.status_code, 409)
         self.uploader.upload.assert_not_called()
         self.assertEqual(self.repo.resolve(self.path, self.storage)['sha256'], sha(self.old))
@@ -235,7 +235,7 @@ class CourseFileWriterTest(unittest.TestCase):
                     'sha256': sha(winning), 'byteSize': len(winning), 'mimeType': 'application/json',
                     'locator': {'kind': 'object', 'objectKey': '胜出/工作记录.json', 'etag': '"winner"'}}],
                     self.storage, expected_old_sha=sha(self.old))
-                raise OperationalError(1213, 'synthetic test deadlock')
+                raise DeadlockDetected('synthetic test deadlock')
             return activate(*args, **kwargs)
         with patch.object(self.repo, 'compare_and_activate', cas), self.assertRaisesRegex(CourseFileWriteError, 'head_conflict'):
             self.write()

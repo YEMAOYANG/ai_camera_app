@@ -12,16 +12,9 @@ import subprocess
 import data_bundle
 
 
-# These scripts are fixed text, never assembled from a password or other config
-# value. The database containers already hold their credentials in environment.
-MYSQL_DUMP = ('export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; '
-              'exec mysqldump --no-defaults --no-login-paths --user=root '
-              '--single-transaction --skip-lock-tables --quick --routines --events '
-              '--triggers --hex-blob --no-tablespaces --set-gtid-purged=OFF '
-              '--default-character-set=utf8mb4 --comments "$MYSQL_DATABASE"')
-MYSQL_VERSION = ('export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; '
-                 'exec mysql --no-defaults --no-login-paths --user=root --batch '
-                 '--skip-column-names --execute="SELECT VERSION()"')
+# This script is fixed text, never assembled from a password or other config
+# value. The database container already holds its credentials in environment.
+# One dump covers the backend (schema app) and the classroom runtime (public).
 POSTGRES_DUMP = ('export PGPASSWORD="$POSTGRES_PASSWORD"; '
                  'exec pg_dump --host=127.0.0.1 --username="$POSTGRES_USER" '
                  '--dbname="$POSTGRES_DB" --format=custom --no-owner --no-acl')
@@ -41,8 +34,8 @@ def run(command, *, env, label, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE
 def assert_writers_stopped(prefix, env):
     result = run([*prefix, "ps", "--status", "running", "--services"], env=env, label="Compose writer-state check")
     services = set(result.stdout.decode("utf-8").split())
-    if services != {"mysql", "postgres"}:
-        raise data_bundle.BundleError("Backup requires mysql and postgres running, with every application, worker and other service stopped")
+    if services != {"postgres"}:
+        raise data_bundle.BundleError("Backup requires postgres running, with every application, worker and other service stopped")
 
 
 def source_version(text: str, label: str) -> dict:
@@ -83,25 +76,21 @@ def export_server(config: dict, compose_prefix: list[str], command_env: dict, ou
     for directory in roots.values():
         data_bundle.tree_stats(directory)
     output.mkdir(mode=0o700, parents=False)
-    mysql_version = run([*compose_prefix, "exec", "-T", "mysql", "sh", "-ec", MYSQL_VERSION],
-                        env=command_env, label="MySQL version query").stdout.decode("utf-8")
-    databases = {"mysql": {"database": "mira", "format": "sql", **source_version(mysql_version, "MySQL")}}
-    for service, command, filename in (("mysql", MYSQL_DUMP, "mysql.sql"),
-                                       ("postgres", POSTGRES_DUMP, "postgres.dump")):
-        path = output / filename
-        with path.open("xb") as destination:
-            os.chmod(path, 0o600)
-            run([*compose_prefix, "exec", "-T", service, "sh", "-ec", command],
-                env=command_env, label=f"{service} dump", stdout=destination)
-        if not path.stat().st_size:
-            raise data_bundle.BundleError(f"{service} produced an empty dump")
+    path = output / "postgres.dump"
+    with path.open("xb") as destination:
+        os.chmod(path, 0o600)
+        run([*compose_prefix, "exec", "-T", "postgres", "sh", "-ec", POSTGRES_DUMP],
+            env=command_env, label="postgres dump", stdout=destination)
+    if not path.stat().st_size:
+        raise data_bundle.BundleError("postgres produced an empty dump")
     with (output / "postgres.dump").open("rb") as incoming:
         listing = run([*compose_prefix, "exec", "-T", "postgres", "pg_restore", "--list"],
                       env=command_env, label="PostgreSQL archive version check", stdin=incoming)
     match = re.search(r"Dumped from database version:\s*(\d[^\r\n]*)", listing.stdout.decode("utf-8"))
     if not match:
         raise data_bundle.BundleError("PostgreSQL archive does not identify its source version")
-    databases["postgres"] = {"database": "openmaic", "format": "custom", **source_version(match.group(1), "PostgreSQL")}
+    databases = {"postgres": {"database": "mira", "format": "custom", "schemas": data_bundle.DATABASE_SCHEMAS,
+                              **source_version(match.group(1), "PostgreSQL")}}
     for filename, directory in roots.items():
         data_bundle.write_archive(directory, output / filename)
     data_bundle.private_write(output / "learning-budget-policy.json", policy.read_bytes())
@@ -116,7 +105,7 @@ def export_server(config: dict, compose_prefix: list[str], command_env: dict, ou
         "policies": [{"env": "LEARNING_BUDGET_POLICY_PATH", "file": "learning-budget-policy.json",
                       "containerPath": "/app/data/" + data_bundle.POLICY_DESTINATION}],
         "secretsToMigrateSeparately": secrets,
-        "notes": ["Exported from a deployed Compose stack with only database services running.",
+        "notes": ["Exported from a deployed Compose stack with only the database service running.",
                   "All external database writers must also remain stopped for the entire export.",
                   "Preserve IDs, publication states, ambiguous jobs and audit evidence exactly.",
                   "No dotenv files or Provider keys are exported; preserve identity secrets separately."],

@@ -1359,7 +1359,7 @@ class DynamicLearningCourseRepository:
               requested_candidate_count, status, created_at, updated_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'queued', ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 job_id,
@@ -1514,7 +1514,7 @@ class DynamicLearningCourseRepository:
               content_json, created_at, updated_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'generated', ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 candidate_id,
@@ -1735,7 +1735,7 @@ class DynamicLearningCourseRepository:
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'validated',
                   'auto_validated', ?, ?, ?, ?, ?, NULL, ?, ?)
-                ON DUPLICATE KEY UPDATE id = id
+                ON CONFLICT DO NOTHING
                 """,
                 (
                     candidate["course_id"],

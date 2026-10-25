@@ -8,20 +8,20 @@ from core.database import _split_sql_script
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MIGRATION = ROOT / "migrations" / "060_learning_student_formal_session_bindings.sql"
+MIGRATION = ROOT / "migrations" / "mysql" / "060_learning_student_formal_session_bindings.sql"
 CONTRACT_SPLIT_MIGRATION = (
     ROOT
-    / "migrations"
+    / "migrations" / "mysql"
     / "066_learning_student_formal_session_binding_contract_split.sql"
 )
 BUILD_PACKAGE_SPLIT_MIGRATION = (
     ROOT
-    / "migrations"
+    / "migrations" / "mysql"
     / "067_learning_student_formal_session_binding_build_package_split.sql"
 )
 PROGRESSIVE_AUTHORITY_MIGRATION = (
     ROOT
-    / "migrations"
+    / "migrations" / "mysql"
     / "070_learning_student_progressive_session_authority.sql"
 )
 

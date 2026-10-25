@@ -36,9 +36,9 @@ class DataBundleTests(unittest.TestCase):
         self.policy_bytes = b'{"schemaVersion":"mira.learning.budget-policy.v1", "enabled":false}\n'
         (self.backend / "content/learning_budget_policy.json").write_bytes(self.policy_bytes)
         (self.backend / ".env").write_text(
-            "APP_DATABASE_URL=mysql+pymysql://mira:MYSQL_PRIVATE@localhost:3306/mira?charset=utf8mb4\n"
+            "APP_DATABASE_URL=postgresql://mira:PG_PRIVATE@localhost:5432/mira\n"
             "APP_STUDENT_AUTH_PEPPER=PEPPER_PRIVATE\nINTERNAL_API_TOKEN=TOKEN_PRIVATE\n")
-        (self.runtime / ".env").write_text("MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://mira:PG_PRIVATE@localhost:5432/openmaic\n")
+        (self.runtime / ".env").write_text("MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://mira:PG_PRIVATE@127.0.0.1:5432/mira\n")
         (self.backend_data / ".device-secret.key").write_bytes(b"DEVICE_PRIVATE")
         (self.backend_data / "learning-media").mkdir()
         (self.backend_data / "learning-media/lesson.mp3").write_bytes(b"audio fixture")
@@ -50,15 +50,9 @@ class DataBundleTests(unittest.TestCase):
 
     def fake_process(self, command, *, stdout, stderr, stdin, env, check):
         self.assertEqual(stdin, subprocess.DEVNULL)
-        for secret in ("MYSQL_PRIVATE", "PG_PRIVATE", "PEPPER_PRIVATE", "DEVICE_PRIVATE"):
+        for secret in ("PG_PRIVATE", "PEPPER_PRIVATE", "DEVICE_PRIVATE"):
             self.assertNotIn(secret, " ".join(command))
             self.assertNotIn(secret, str(env))
-        if command[0] == "mysqldump":
-            config = Path(command[1].split("=", 1)[1])
-            self.assertEqual(config.stat().st_mode & 0o777, 0o600)
-            self.assertIn("MYSQL_PRIVATE", config.read_text())
-            stdout.write(b"-- Server version\t9.3.0\nCREATE TABLE fixture(id INT);\n")
-            return subprocess.CompletedProcess(command, 0)
         if command[0] == "pg_dump":
             password_file = Path(env["PGPASSFILE"])
             self.assertEqual(password_file.stat().st_mode & 0o777, 0o600)
@@ -84,8 +78,10 @@ class DataBundleTests(unittest.TestCase):
     def test_roundtrip_preserves_audio_ambiguous_jobs_device_key_policy_and_db_versions(self):
         self.export()
         manifest = bundle.verify(self.output)
-        self.assertEqual(manifest["databases"]["mysql"]["serverMajor"], 9)
+        self.assertEqual(set(manifest["databases"]), {"postgres"})
         self.assertEqual(manifest["databases"]["postgres"]["serverVersion"], "16.9")
+        self.assertEqual(manifest["databases"]["postgres"]["database"], "mira")
+        self.assertEqual(manifest["databases"]["postgres"]["schemas"], ["app", "public"])
         target = self.root / "restored"
         result = bundle.restore_files(self.output, target)
         self.assertFalse(result["databasesRestored"])
@@ -95,9 +91,27 @@ class DataBundleTests(unittest.TestCase):
                     self.assertEqual(path.read_bytes(), (target / destination / path.relative_to(root)).read_bytes())
         self.assertEqual((target / "backend-data" / bundle.POLICY_DESTINATION).read_bytes(), self.policy_bytes)
         manifest_text = (self.output / "manifest.json").read_text()
-        for secret in ("MYSQL_PRIVATE", "PG_PRIVATE", "PEPPER_PRIVATE", "TOKEN_PRIVATE", "DEVICE_PRIVATE"):
+        for secret in ("PG_PRIVATE", "PEPPER_PRIVATE", "TOKEN_PRIVATE", "DEVICE_PRIVATE"):
             self.assertNotIn(secret, manifest_text)
-        self.assertEqual((self.output / "mysql.sql").stat().st_mode & 0o777, 0o600)
+        self.assertEqual((self.output / "postgres.dump").stat().st_mode & 0o777, 0o600)
+
+    def test_export_refuses_a_classroom_runtime_on_another_database(self):
+        (self.runtime / ".env").write_text("MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://mira:PG_PRIVATE@localhost:5432/openmaic\n")
+        with patch.object(bundle.subprocess, "run") as run:
+            with self.assertRaisesRegex(bundle.BundleError, "same database") as error:
+                bundle.export_local(self.args)
+        run.assert_not_called()
+        self.assertNotIn("PG_PRIVATE", str(error.exception))
+        self.assertFalse((self.output / "manifest.json").exists())
+
+    def test_export_refuses_a_legacy_mysql_backend_url(self):
+        with (self.backend / ".env").open("a") as stream:
+            stream.write("APP_DATABASE_URL=mysql+pymysql://mira:MYSQL_PRIVATE@localhost:3306/mira\n")
+        with patch.object(bundle.subprocess, "run") as run:
+            with self.assertRaisesRegex(bundle.BundleError, "postgresql://") as error:
+                bundle.export_local(self.args)
+        run.assert_not_called()
+        self.assertNotIn("MYSQL_PRIVATE", str(error.exception))
 
     def test_export_requires_writer_stop_acknowledgement_before_touching_output(self):
         self.args.services_stopped = False
@@ -108,18 +122,18 @@ class DataBundleTests(unittest.TestCase):
     def test_failed_database_dump_has_no_completed_manifest_and_no_credentials_in_error(self):
         def failure(command, **kwargs):
             kwargs["stdout"].write(b"partial")
-            return subprocess.CompletedProcess(command, 7, stderr=b"password MYSQL_PRIVATE")
+            return subprocess.CompletedProcess(command, 7, stderr=b"password PG_PRIVATE")
         with patch.object(bundle.subprocess, "run", side_effect=failure):
             with self.assertRaisesRegex(bundle.BundleError, "exit 7") as error:
                 bundle.export_local(self.args)
-        self.assertNotIn("MYSQL_PRIVATE", str(error.exception))
+        self.assertNotIn("PG_PRIVATE", str(error.exception))
         self.assertFalse((self.output / "manifest.json").exists())
         with self.assertRaisesRegex(bundle.BundleError, "No completed manifest"):
             bundle.verify(self.output)
 
     def test_tampered_dump_refused_before_creating_restore_directory(self):
         self.export()
-        (self.output / "mysql.sql").write_bytes(b"tampered")
+        (self.output / "postgres.dump").write_bytes(b"tampered")
         target = self.root / "restore"
         with self.assertRaisesRegex(bundle.BundleError, "Checksum"):
             bundle.restore_files(self.output, target)
@@ -192,7 +206,7 @@ class DataBundleTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 0, stdout=b"no source version")
             return self.fake_process(command, **kwargs)
         with patch.object(bundle.subprocess, "run", side_effect=no_version):
-            with self.assertRaisesRegex(bundle.BundleError, "source database versions"):
+            with self.assertRaisesRegex(bundle.BundleError, "source database version"):
                 bundle.export_local(self.args)
         self.assertFalse((self.output / "manifest.json").exists())
 
@@ -212,18 +226,13 @@ class DataBundleTests(unittest.TestCase):
         for secret in ("SERVER_PRIVATE_PEPPER", "SERVER_PRIVATE_TOKEN", "SERVER_PRIVATE_PERSISTENCE"):
             self.assertNotIn(secret, " ".join(command))
         if "ps" in command:
-            return subprocess.CompletedProcess(command, 0, stdout=b"mysql\npostgres\n")
+            return subprocess.CompletedProcess(command, 0, stdout=b"postgres\n")
         if "pg_restore" in command:
             self.assertEqual(stdin.read(), b"PGDMP server fixture")
             return subprocess.CompletedProcess(command, 0, stdout=b"; Dumped from database version: 16.9\n")
-        if "SELECT VERSION()" in command[-1]:
-            return subprocess.CompletedProcess(command, 0, stdout=b"9.4.0\n")
-        if "mysqldump" in command[-1]:
-            self.assertIn('MYSQL_PWD="$MYSQL_ROOT_PASSWORD"', command[-1])
-            stdout.write(b"-- Server version\t9.4.0\nCREATE TABLE fixture(id INT);\n")
-        else:
-            self.assertIn('PGPASSWORD="$POSTGRES_PASSWORD"', command[-1])
-            stdout.write(b"PGDMP server fixture")
+        self.assertIn('PGPASSWORD="$POSTGRES_PASSWORD"', command[-1])
+        self.assertIn("pg_dump", command[-1])
+        stdout.write(b"PGDMP server fixture")
         return subprocess.CompletedProcess(command, 0)
 
     def test_server_backup_roundtrip_uses_containers_and_compatible_manifest(self):
@@ -232,8 +241,9 @@ class DataBundleTests(unittest.TestCase):
             result = server_backup.export_server(config, ["docker", "compose"], {}, self.output)
         self.assertTrue(result["verified"])
         manifest = bundle.verify(self.output)
-        self.assertEqual(manifest["databases"]["mysql"]["serverVersion"], "9.4.0")
+        self.assertEqual(set(manifest["databases"]), {"postgres"})
         self.assertEqual(manifest["databases"]["postgres"]["serverMajor"], 16)
+        self.assertEqual(manifest["databases"]["postgres"]["database"], "mira")
         self.assertEqual(sum("ps" in call.args[0] for call in calls.call_args_list), 2)
         target = self.root / "restored-server"
         bundle.restore_files(self.output, target)
@@ -244,7 +254,7 @@ class DataBundleTests(unittest.TestCase):
 
     def test_server_backup_refuses_running_writer_before_creating_output(self):
         config = self.server_fixture()
-        with patch.object(server_backup.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, stdout=b"mysql\npostgres\nbackend\n")):
+        with patch.object(server_backup.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, stdout=b"postgres\nbackend\n")):
             with self.assertRaisesRegex(bundle.BundleError, "every application"):
                 server_backup.export_server(config, ["docker", "compose"], {}, self.output)
         self.assertFalse(self.output.exists())
@@ -252,11 +262,11 @@ class DataBundleTests(unittest.TestCase):
     def test_server_dump_failure_does_not_leave_completed_manifest_or_echo_secret(self):
         config = self.server_fixture()
         def fail_dump(command, **kwargs):
-            if "mysqldump" in command[-1]:
+            if "pg_dump" in command[-1]:
                 return subprocess.CompletedProcess(command, 1, stderr=b"password SERVER_PRIVATE_TOKEN")
             return self.fake_server_process(command, **kwargs)
         with patch.object(server_backup.subprocess, "run", side_effect=fail_dump):
-            with self.assertRaisesRegex(bundle.BundleError, "mysql dump failed") as error:
+            with self.assertRaisesRegex(bundle.BundleError, "postgres dump failed") as error:
                 server_backup.export_server(config, ["docker", "compose"], {}, self.output)
         self.assertNotIn("SERVER_PRIVATE_TOKEN", str(error.exception))
         self.assertFalse((self.output / "manifest.json").exists())
@@ -269,7 +279,7 @@ class DataBundleTests(unittest.TestCase):
             if "ps" in command:
                 checks += 1
                 if checks == 2:
-                    return subprocess.CompletedProcess(command, 0, stdout=b"mysql\npostgres\ncurriculum-worker\n")
+                    return subprocess.CompletedProcess(command, 0, stdout=b"postgres\ncurriculum-worker\n")
             return self.fake_server_process(command, **kwargs)
         with patch.object(server_backup.subprocess, "run", side_effect=writer_started):
             with self.assertRaisesRegex(bundle.BundleError, "every application"):

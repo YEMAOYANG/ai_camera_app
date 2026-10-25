@@ -986,8 +986,8 @@ class Task5ProviderDispatchMySqlTest(unittest.TestCase):
     def setUp(self):
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
-        self.assertIn("/ai_camera_app_test", self.database_url)
-        self.assertNotIn("/ai_camera_app_dev", self.database_url)
+        self.assertIn("/mira_test", self.database_url)
+        self.assertNotRegex(self.database_url, r"/mira(\?|$)")
         self.database = Database(self.database_url)
         self.repository = DynamicLearningCourseRepository(self.database)
         self._insert_active_content_item()
@@ -1714,7 +1714,7 @@ class Task5ProviderDispatchMySqlTest(unittest.TestCase):
         def complete_owner():
             try:
                 with self.database.transaction() as conn:
-                    connection_ids.append(conn.execute("SELECT CONNECTION_ID() AS id").fetchone()["id"])
+                    connection_ids.append(conn.execute("SELECT pg_backend_pid() AS id").fetchone()["id"])
                     conn.execute(
                         "SELECT id FROM learning_catalog_build_items WHERE id = ? FOR UPDATE",
                         ("task5-item",),
@@ -1729,7 +1729,7 @@ class Task5ProviderDispatchMySqlTest(unittest.TestCase):
             try:
                 self.assertTrue(item_locked.wait(5))
                 with self.database.transaction() as conn:
-                    connection_ids.append(conn.execute("SELECT CONNECTION_ID() AS id").fetchone()["id"])
+                    connection_ids.append(conn.execute("SELECT pg_backend_pid() AS id").fetchone()["id"])
                     replay_started.set()
                     outcomes.append(self._reserve(conn, prepared).created)
             except BaseException as error:
@@ -1759,7 +1759,7 @@ class Task5ProviderDispatchMySqlTest(unittest.TestCase):
         def lock_owner():
             try:
                 with self.database.transaction() as conn:
-                    connection_ids.append(conn.execute("SELECT CONNECTION_ID() AS id").fetchone()["id"])
+                    connection_ids.append(conn.execute("SELECT pg_backend_pid() AS id").fetchone()["id"])
                     conn.execute(
                         "SELECT id FROM learning_catalog_build_items WHERE id = ? FOR UPDATE",
                         ("task5-item",),
@@ -1778,7 +1778,7 @@ class Task5ProviderDispatchMySqlTest(unittest.TestCase):
             try:
                 self.assertTrue(locks_held.wait(5))
                 with self.database.transaction() as conn:
-                    connection_ids.append(conn.execute("SELECT CONNECTION_ID() AS id").fetchone()["id"])
+                    connection_ids.append(conn.execute("SELECT pg_backend_pid() AS id").fetchone()["id"])
                     waiter_started.set()
                     with self.assertRaisesRegex(ValueError, "budget|deadline"):
                         self._reserve(

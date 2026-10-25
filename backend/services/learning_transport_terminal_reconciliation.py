@@ -276,7 +276,7 @@ def plan_reconciliation(*, database, source_audit, stop_evidence, approval_refer
     ids = sorted(row['id'] for row in audit['globalPendingRows'])
     conn = database.connect()
     try:
-        conn.execute('START TRANSACTION READ ONLY')
+        conn.execute('SET TRANSACTION READ ONLY')
         rows, authorities = _load_rows(conn, ids)
         _source_rows(audit, rows)
         events = _events(conn, ids)

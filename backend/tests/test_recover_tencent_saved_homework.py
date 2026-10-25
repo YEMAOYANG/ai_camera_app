@@ -27,7 +27,7 @@ class SavedHomeworkRecoveryOperatorTest(unittest.TestCase):
         self.db.raw.commit()
         return submission
 
-    def invoke(self, submission, *, execute=False, database='mysql://fixture@127.0.0.1:3306/ai_camera_app_dev', revision=None):
+    def invoke(self, submission, *, execute=False, database='postgresql://fixture@127.0.0.1:5433/mira', revision=None):
         config = SimpleNamespace(to_flask_config=lambda: {'DATABASE_URL': database})
         with patch.object(operator, 'load_dotenv'), patch.object(operator, 'validate_flask_config'), \
                 patch.object(operator.AppConfig, 'from_env', return_value=config), \
@@ -72,7 +72,8 @@ class SavedHomeworkRecoveryOperatorTest(unittest.TestCase):
 
     def test_wrong_database_revision_and_owner_refuse_without_backup(self):
         submission = self.prepared()
-        for database in ('mysql://fixture@127.0.0.1:3306/production', 'mysql://fixture@remote.example:3306/ai_camera_app_dev'):
+        for database in ('postgresql://fixture@127.0.0.1:5433/production', 'postgresql://fixture@remote.example:5433/mira',
+                         'mysql://fixture@127.0.0.1:5433/mira'):
             with self.assertRaises(operator.SafetyStop):
                 self.invoke(submission, execute=True, database=database)
         with self.assertRaises(operator.SafetyStop):

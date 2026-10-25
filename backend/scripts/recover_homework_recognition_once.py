@@ -49,8 +49,8 @@ def parser():
 
 def validate_config(config):
     target=urlparse(config['DATABASE_URL'])
-    if (config.get('APP_ENV')!='development' or target.scheme.split('+',1)[0]!='mysql'
-            or target.hostname not in {'127.0.0.1','localhost'} or target.path!='/ai_camera_app_dev'):
+    if (config.get('APP_ENV')!='development' or target.scheme.split('+',1)[0] not in {'postgresql','postgres'}
+            or target.hostname not in {'127.0.0.1','localhost'} or target.path!='/mira'):
         raise ValueError('exact_local_development_database_required')
     # Do not override the worker/audio flags or use a synthetic submission.
     if not config.get('HOMEWORK_ANALYSIS_ENABLED'):
@@ -77,7 +77,7 @@ def main(argv=None):
                 else:
                     conn=database.connect()
                     try:
-                        conn.execute('START TRANSACTION READ ONLY')
+                        conn.execute('SET TRANSACTION READ ONLY')
                         result=service.authorize_recognition_repair(conn,dict(AUTHORIZED_SCOPE))
                     finally:
                         conn.rollback()

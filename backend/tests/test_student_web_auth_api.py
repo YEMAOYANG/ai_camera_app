@@ -467,7 +467,7 @@ class StudentAuthConfigTest(unittest.TestCase):
             validate_flask_config(
                 {
                     "APP_ENV": "production",
-                    "DATABASE_URL": "mysql+pymysql://user:pass@db.example/mira",
+                    "DATABASE_URL": "postgresql://user:pass@db.example/mira",
                     "STUDENT_AUTH_PEPPER": "",
                     "DEV_ADAPTERS_ENABLED": False,
                     "SMS_PROVIDER": "aliyun",

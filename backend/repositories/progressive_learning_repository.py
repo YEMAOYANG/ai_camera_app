@@ -35,7 +35,7 @@ class ProgressiveLearningRepository:
         conn.execute(
             f"INSERT INTO learning_progressive_course_bindings({','.join(columns)}) "
             f"VALUES ({','.join('?' for _ in columns)}) "
-            "ON DUPLICATE KEY UPDATE course_id = course_id",
+            "ON CONFLICT DO NOTHING",
             tuple(binding[column] for column in columns),
         )
         existing = conn.execute(
@@ -125,7 +125,7 @@ class ProgressiveLearningRepository:
         columns = tuple(evidence)
         conn.execute(
             f"INSERT INTO learning_progressive_evidence({','.join(columns)}) "
-            f"VALUES ({','.join('?' for _ in columns)}) ON DUPLICATE KEY UPDATE id = id",
+            f"VALUES ({','.join('?' for _ in columns)}) ON CONFLICT DO NOTHING",
             tuple(evidence[column] for column in columns),
         )
         existing = conn.execute(
@@ -168,8 +168,9 @@ class ProgressiveLearningRepository:
         mutable = [column for column in columns if column not in identity]
         conn.execute(
             f"INSERT INTO learning_progressive_lesson_progress({','.join(columns)}) "
-            f"VALUES ({','.join('?' for _ in columns)}) ON DUPLICATE KEY UPDATE "
-            + ",".join(f"{column}=VALUES({column})" for column in mutable),
+            f"VALUES ({','.join('?' for _ in columns)}) "
+            "ON CONFLICT (family_id, child_id, curriculum_version, lesson_id) DO UPDATE SET "
+            + ",".join(f"{column}=EXCLUDED.{column}" for column in mutable),
             tuple(progress[column] for column in columns),
         )
         return dict(progress)

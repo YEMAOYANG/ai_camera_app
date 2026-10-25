@@ -33,7 +33,7 @@ class IsolatedDatabase:
         self.raw = sqlite3.connect(":memory:")
         self.raw.row_factory = sqlite3.Row
         self.raw.execute("PRAGMA foreign_keys=ON")
-        source = "\n".join((ROOT / "migrations" / name).read_text() for name in migrations)
+        source = "\n".join((ROOT / "migrations" / "mysql" / name).read_text() for name in migrations)
         for name, body in re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)\s*\((.*?)\)\s*ENGINE=[^;]+;", source, re.S):
             items, start, depth = [], 0, 0
             for i, char in enumerate(body):
@@ -45,7 +45,7 @@ class IsolatedDatabase:
             # the exact final predicate from migration 084; MySQL DDL is verified
             # separately on a disposable MySQL instance.
             if name == "learning_textbook_selections" and "084_textbook_science_selection.sql" in migrations:
-                extension = (ROOT / "migrations/084_textbook_science_selection.sql").read_text()
+                extension = (ROOT / "migrations/mysql/084_textbook_science_selection.sql").read_text()
                 constraint = re.search(r"ADD (CONSTRAINT chk_textbook_selection CHECK .*);", extension, re.S).group(1)
                 items = [constraint if item.startswith("CONSTRAINT chk_textbook_selection CHECK") else item for item in items]
             # Preserve CHECK/FK/UNIQUE constraints; MySQL syntax is also checked
@@ -58,7 +58,7 @@ class IsolatedDatabase:
         self.raw.execute("CREATE TABLE learning_courses (id TEXT,version TEXT,grade_code TEXT,subject TEXT,content_json TEXT,status TEXT,quality_status TEXT,content_origin TEXT,retired_at INT,PRIMARY KEY(id,version))")
 
     def execute(self, sql, params=()):
-        sql = re.sub(r"\s+FOR UPDATE\b", "", sql)
+        sql = re.sub(r"\s+FOR UPDATE\b(?: OF [\w, ]+)?", "", sql)
         sql = re.sub(r"ON DUPLICATE KEY UPDATE \w+=\w+", "ON CONFLICT DO NOTHING", sql)
         cursor = self.raw.execute(sql, tuple(params))
         return SimpleNamespace(fetchone=lambda: self.row(cursor.fetchone()), fetchall=lambda: [dict(r) for r in cursor.fetchall()], rowcount=cursor.rowcount)

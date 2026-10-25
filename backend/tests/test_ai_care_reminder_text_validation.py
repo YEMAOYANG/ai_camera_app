@@ -8,7 +8,7 @@ from services.ai_text_provider import AiTextResponse
 from services.reminder_text_validator import ReminderTextValidator
 from services.auth_service import AuthService
 from services.prompt_registry import PromptRegistry
-from tests.support import TEST_DATABASE_URL, reset_mysql_test_database
+from tests.support import TEST_DATABASE_URL, reset_test_database
 
 
 class FakeAiProvider:
@@ -66,7 +66,7 @@ class AiCareReminderTextValidationTest(unittest.TestCase):
         )
 
     def test_service_uses_fallback_when_ai_is_unavailable_or_invalid(self):
-        reset_mysql_test_database()
+        reset_test_database()
         service = AiCareReminderService(
             TEST_DATABASE_URL,
             auth_service=AuthService(TEST_DATABASE_URL),

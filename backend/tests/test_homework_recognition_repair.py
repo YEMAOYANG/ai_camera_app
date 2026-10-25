@@ -180,7 +180,7 @@ class RecognitionRepairTest(unittest.TestCase):
             '--submission-id',scope['submissionId'],'--revision',str(scope['expectedRevision']),
             '--unknown-call-id',scope['unknownCallId']])
         self.assertFalse(args.execute_authorized_reanalysis)
-        for url in ('mysql://localhost/other_dev','mysql://remote.invalid/ai_camera_app_dev'):
+        for url in ('postgresql://localhost/other_dev','postgresql://remote.invalid/mira','mysql://localhost/mira'):
             with self.assertRaises(ValueError):cli.validate_config({'DATABASE_URL':url,'APP_ENV':'development','HOMEWORK_ANALYSIS_ENABLED':True})
 
 

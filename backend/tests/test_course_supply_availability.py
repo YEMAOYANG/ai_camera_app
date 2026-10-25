@@ -13,7 +13,7 @@ from services import course_library_service as supply
 from services.learning_curriculum_preparation_contract import build_preparation_target, build_progressive_preparation_target
 
 
-DATABASE = 'mysql+pymysql://unused:unused@127.0.0.1/ai_camera_app_test'
+DATABASE = 'postgresql://unused:unused@127.0.0.1/mira_test'
 
 
 class Rows:
@@ -329,7 +329,7 @@ class PlayfulGenerationSupplyTest(unittest.TestCase):
                 connection = RecordedConnection([{'id': 'owner'}],
                     [pending_slot('math', 'fraction_ratio_percentage')], [self.published(source)])
                 self.assertEqual(requested_supply(connection, {'target_spec_json': self.target}), expected)
-                self.assertTrue(all(sql.lstrip().startswith(('SELECT', 'WITH student_runtime_manifests AS ('))
+                self.assertTrue(all(sql.lstrip().startswith(('SELECT', 'WITH student_runtime_manifests AS MATERIALIZED ('))
                                     for sql, _ in connection.calls))
 
     def test_runtime_claim_uses_each_candidates_frozen_target_not_current_registry(self):

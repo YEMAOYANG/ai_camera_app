@@ -96,7 +96,7 @@ class ConversationRepository:
             """
             INSERT INTO conversation_daily_usage(family_id, date_key, free_chat_seconds, updated_at)
             VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE free_chat_seconds = VALUES(free_chat_seconds), updated_at = VALUES(updated_at)
+            ON CONFLICT (family_id, date_key) DO UPDATE SET free_chat_seconds = EXCLUDED.free_chat_seconds, updated_at = EXCLUDED.updated_at
             """,
             (family_id, date_key, total, now),
         )

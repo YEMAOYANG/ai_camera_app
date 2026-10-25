@@ -35,8 +35,8 @@ class FormalStudentCatalogVisibilityContractTest(unittest.TestCase):
                 'student_runtime_manifests AS ', 'learning_openmaic_runtime_classrooms AS ')
             self.assertEqual(' '.join(restored.split()), ' '.join(query.split()))
             self.assertEqual(parsed.count('?'), query.count('?'))
-            self.assertIn('CAST(IF(JSON_VALID(feature_manifest_json), feature_manifest_json, NULL) AS JSON)', parsed)
-            self.assertIn('LIMIT 18446744073709551615', parsed)
+            self.assertIn('CASE WHEN JSON_VALID(feature_manifest_json) THEN CAST(feature_manifest_json AS JSONB) END', parsed)
+            self.assertIn('student_runtime_manifests AS MATERIALIZED', parsed)
             self.assertIn('WHERE retired_at IS NULL', parsed)
             aliases = re.findall(r'learning_openmaic_runtime_classrooms\s+AS\s+(\w+)', query)
             for alias in aliases:
@@ -66,7 +66,7 @@ class FormalStudentCatalogVisibilityContractTest(unittest.TestCase):
         self.assertIn("generation.enablewebsearch", sql)
         self.assertIn("research.providerid", sql)
         self.assertIn(
-            "'$.research.providerid' )) regexp '^[a-za-z0-9_-]{1,64}$'", sql
+            "'$.research.providerid' )) ~ '^[a-za-z0-9_-]{1,64}$'", sql
         )
         self.assertIn("formalevidence.research.providerid", sql)
 
@@ -151,7 +151,7 @@ class FormalStudentCatalogVisibilityContractTest(unittest.TestCase):
         self.assertIn("student_build_item.content_gate_status = 'passed'", sql)
         self.assertIn("student_build_item.content_gate_passed_at is not null", sql)
         self.assertIn(
-            "student_build_item.content_receipt_hash regexp '^[0-9a-f]{64}$'",
+            "student_build_item.content_receipt_hash ~* '^[0-9a-f]{64}$'",
             sql,
         )
         self.assertIn(

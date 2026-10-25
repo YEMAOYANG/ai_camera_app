@@ -98,7 +98,7 @@ def main():
         entries = [args]
     config = AppConfig.from_env()
     target = urlparse(config.DATABASE_URL)
-    print(json.dumps({'database': {'host': target.hostname, 'port': target.port or 3306, 'name': target.path.lstrip('/')},
+    print(json.dumps({'database': {'host': target.hostname, 'port': target.port or 5432, 'name': target.path.lstrip('/')},
                       'action': args.action, 'courseCount': len(entries)}), flush=True)
     repo = TextbookRepository(Database(config.DATABASE_URL))
     service = TextbookActivityPublicationService(repo, config.OPENMAIC_FULL_RUNTIME_INTERNAL_URL, args.classroom_directory)

@@ -36,8 +36,8 @@ STATE_ROOT = ROOT.parent / '.local_backups' / 'student-learning-demo-v1'
 def local_app():
     app = local_parent_app()
     url = urlparse(app.config['DATABASE_URL'])
-    if url.scheme.split('+', 1)[0] != 'mysql' or url.hostname not in {'127.0.0.1', 'localhost', '::1'} or url.path != '/ai_camera_app_dev':
-        raise SafeStop('only_local_ai_camera_app_dev_is_allowed')
+    if url.scheme.split('+', 1)[0] not in {'postgresql', 'postgres'} or url.hostname not in {'127.0.0.1', 'localhost', '::1'} or url.path != '/mira':
+        raise SafeStop('only_local_mira_development_database_is_allowed')
     if not app.config.get('LEARNING_TEXTBOOK_LIBRARY_ONLY', True):
         raise SafeStop('textbook_library_only_required_no_generation_queue')
     if not app.config.get('LEARNING_REVIEW_ENABLED') or not app.config.get('HOMEWORK_ANALYSIS_ENABLED'):

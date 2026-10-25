@@ -16,7 +16,7 @@ class HomeworkBudgetDatabase(IsolatedDatabase):
     def __init__(self, path):
         self.path = str(path)
         # SQLite cannot DROP CHECK. Start with the final 076 + 088 constraint.
-        sql = (Path(__file__).parents[1] / 'migrations/076_learning_paid_budget.sql').read_text()
+        sql = (Path(__file__).parents[1] / 'migrations/mysql/076_learning_paid_budget.sql').read_text()
         sql = sql.replace("'optional_interaction'))", "'optional_interaction', 'homework'))")
         sql = sql.replace('BIGINT AUTO_INCREMENT PRIMARY KEY', 'INTEGER PRIMARY KEY AUTOINCREMENT').replace(' ENGINE=InnoDB', '')
         with sqlite3.connect(self.path) as conn:

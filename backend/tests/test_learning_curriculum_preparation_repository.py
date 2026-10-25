@@ -8,7 +8,7 @@ from threading import Barrier
 import unittest
 from unittest.mock import patch
 
-import pymysql
+import psycopg
 
 from core.database import Database
 from repositories.learning_curriculum_preparation_repository import (
@@ -16,38 +16,25 @@ from repositories.learning_curriculum_preparation_repository import (
     LearningCurriculumPreparationRepository,
 )
 from repositories.profile_repository import ProfileRepository
-from scripts.migrate import run_migrations
 from services.learning_curriculum_preparation_contract import (
     TARGET_SCHEMA_V1,
     build_preparation_target,
     preparation_target_fingerprint,
 )
-from tests.support import fresh_test_config, migration_fixture_through
+from tests.support import fresh_test_config
 
 
-MIGRATION_VERSION = "054_learning_curriculum_preparations.sql"
-RUNNER_MIGRATION_VERSION = "055_learning_curriculum_preparation_runner_evidence.sql"
-CONTENT_STAGE_MIGRATION_VERSION = (
-    "056_learning_curriculum_preparation_content_stage.sql"
-)
+# The PostgreSQL baseline carries the schema of MySQL migrations 054-057; their
+# replay and legacy-row upgrade tests retired with MySQL.
+BASELINE_VERSION = "100_postgres_baseline_schema.sql"
 
 
 class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
     def setUp(self):
-        historical_boundaries = {
-            "test_partial_migration_replay_creates_tables_and_constraints_once": MIGRATION_VERSION,
-            "test_055_replay_accepts_deadline_preserving_retry_and_rejects_null_deadline": CONTENT_STAGE_MIGRATION_VERSION,
-            "test_055_upgrade_normalizes_054_legacy_rows_before_replacing_check": CONTENT_STAGE_MIGRATION_VERSION,
-            "test_055_restart_after_partial_ddl_restores_check_for_legacy_rows": CONTENT_STAGE_MIGRATION_VERSION,
-            "test_checkpoint_schema_verifier_reports_exact_contract_after_two_replays": "057_learning_curriculum_classroom_publication.sql",
-        }
-        boundary = historical_boundaries.get(self._testMethodName)
-        if boundary is not None:
-            self.enterContext(migration_fixture_through(boundary))
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
-        self.assertIn("/ai_camera_app_test", self.database_url)
-        self.assertNotIn("/ai_camera_app_dev", self.database_url)
+        self.assertIn("/mira_test", self.database_url)
+        self.assertNotRegex(self.database_url, r"/mira(\?|$)")
         self.database = Database(self.database_url)
         self.repository = LearningCurriculumPreparationRepository(self.database)
         self.target = build_preparation_target("primary_1")
@@ -126,7 +113,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
         with self.database.transaction() as conn:
             marker = conn.execute(
                 "SELECT COUNT(*) AS count FROM schema_migrations WHERE version = ?",
-                (CONTENT_STAGE_MIGRATION_VERSION,),
+                (BASELINE_VERSION,),
             ).fetchone()
         self.assertEqual(marker["count"], 1)
 
@@ -1505,22 +1492,19 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
                             now=5251,
                         )
 
-    def test_checkpoint_schema_verifier_reports_exact_contract_after_two_replays(self):
-        evidence = self._checkpoint_schema_evidence_after_two_replays()
+    def test_checkpoint_schema_verifier_reports_exact_baseline_contract(self):
+        evidence = self._checkpoint_schema_evidence()
 
         self.assertEqual(
             evidence,
             {
-                "migrations": {
-                    MIGRATION_VERSION: 1,
-                    RUNNER_MIGRATION_VERSION: 1,
-                    CONTENT_STAGE_MIGRATION_VERSION: 1,
-                },
+                "migrations": {BASELINE_VERSION: 1},
                 "tables": [
                     "learning_curriculum_preparation_events",
                     "learning_curriculum_preparation_plans",
                 ],
                 "uniqueKeys": [
+                    "uq_learning_library_owner",
                     "uq_learning_prep_identity",
                     "uq_learning_prep_request",
                     "uq_learning_prep_retry_source",
@@ -1533,6 +1517,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
                     "fk_learning_prep_retry",
                 ],
                 "checks": [
+                    "chk_learning_library_owner",
                     "chk_learning_prep_content_counts",
                     "chk_learning_prep_counts",
                     "chk_learning_prep_event_json",
@@ -1549,34 +1534,35 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
             },
         )
 
-    def test_checkpoint_invalid_terminal_and_null_evidence_dml_returns_3819(self):
+    def test_checkpoint_invalid_terminal_and_null_evidence_dml_is_a_check_violation(self):
         error_codes = self._checkpoint_invalid_dml_error_codes()
 
         self.assertEqual(
             error_codes,
-            {
-                "failed_without_error_evidence": 3819,
-                "ready_without_completed_evidence": 3819,
-                "retry_wait_without_deadline": 3819,
-                "running_without_deadline": 3819,
-                "superseded_without_superseded_evidence": 3819,
+            {  # 23514: check_violation
+                "failed_without_error_evidence": "23514",
+                "ready_without_completed_evidence": "23514",
+                "retry_wait_without_deadline": "23514",
+                "running_without_deadline": "23514",
+                "superseded_without_superseded_evidence": "23514",
             },
         )
 
-    def test_show_create_has_unique_keys_and_evidence_checks_reject_invalid_dml(self):
+    def test_unique_keys_exist_and_evidence_checks_reject_invalid_dml(self):
         with self.database.transaction() as conn:
-            create_row = conn.execute(
-                "SHOW CREATE TABLE learning_curriculum_preparation_plans"
-            ).fetchone()
-        create_sql = next(
-            value for key, value in create_row.items() if key != "Table"
-        )
+            unique_keys = {
+                row["conname"]
+                for row in conn.execute(
+                    "SELECT conname FROM pg_constraint WHERE contype = 'u' "
+                    "AND conrelid = 'learning_curriculum_preparation_plans'::regclass"
+                ).fetchall()
+            }
         for key_name in (
             "uq_learning_prep_identity",
             "uq_learning_prep_request",
             "uq_learning_prep_retry_source",
         ):
-            self.assertIn(key_name, create_sql)
+            self.assertIn(key_name, unique_keys)
 
         with self.repository.transaction() as conn:
             plan, _ = self._reserve(conn, now=5300)
@@ -1599,140 +1585,9 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
             "WHERE id = ?",
         )
         for sql in invalid_updates:
-            with self.assertRaises(pymysql.MySQLError, msg=sql):
+            with self.assertRaises(psycopg.Error, msg=sql):
                 with self.database.transaction() as conn:
                     conn.execute(sql, (plan["id"],))
-
-    def test_partial_migration_replay_creates_tables_and_constraints_once(self):
-        with self.database.transaction() as conn:
-            column = conn.execute(
-                """
-                SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'children'
-                  AND COLUMN_NAME = 'grade_selection_revision'
-                """
-            ).fetchone()
-            self.assertEqual(column["count"], 1)
-            conn.execute("DROP TABLE learning_curriculum_preparation_events")
-            conn.execute("DROP TABLE learning_curriculum_preparation_plans")
-            conn.execute(
-                "DELETE FROM schema_migrations WHERE version = ?",
-                (MIGRATION_VERSION,),
-            )
-
-        run_migrations(self.database_url, verbose=False)
-        run_migrations(self.database_url, verbose=False)
-        with self.database.transaction() as conn:
-            rows = conn.execute(
-                """
-                SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME IN (
-                    'learning_curriculum_preparation_plans',
-                    'learning_curriculum_preparation_events'
-                  )
-                """
-            ).fetchall()
-            migration_rows = conn.execute(
-                "SELECT COUNT(*) AS count FROM schema_migrations WHERE version = ?",
-                (MIGRATION_VERSION,),
-            ).fetchone()
-            check_rows = conn.execute(
-                """
-                SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME = 'learning_curriculum_preparation_plans'
-                  AND CONSTRAINT_TYPE = 'CHECK'
-                """
-            ).fetchall()
-        self.assertEqual(len(rows), 2)
-        self.assertEqual(migration_rows["count"], 1)
-        self.assertGreaterEqual(len(check_rows), 8)
-
-    def test_055_replay_accepts_deadline_preserving_retry_and_rejects_null_deadline(self):
-        with self.repository.transaction() as conn:
-            plan = self._insert_historical_v1_plan(
-                conn, grade_code="primary_2", request_id="migration-055-evidence", now=5350
-            )
-            target = json.loads(plan["target_spec_json"])
-            self.assertEqual(target["schemaVersion"], TARGET_SCHEMA_V1)
-            self.assertEqual(plan["target_fingerprint"], preparation_target_fingerprint(target))
-            # Construct the historical running lease directly: the current
-            # repository uses columns introduced after this DDL fixture.
-            conn.execute(
-                "UPDATE learning_curriculum_preparation_plans SET status = 'running', "
-                "stage = 'planning', lease_token = 'historical-055-lease', "
-                "lease_expires_at = 95350, heartbeat_at = 5350, hard_deadline_at = 125350 WHERE id = ?",
-                (plan["id"],),
-            )
-            claimed = {"hard_deadline_at": 125350}
-            conn.execute(
-                "DELETE FROM schema_migrations WHERE version = ?",
-                (RUNNER_MIGRATION_VERSION,),
-            )
-            conn.execute(
-                "DELETE FROM schema_migrations WHERE version = ?",
-                (CONTENT_STAGE_MIGRATION_VERSION,),
-            )
-            conn.execute(
-                "ALTER TABLE learning_curriculum_preparation_plans "
-                "DROP CHECK chk_learning_prep_content_state_evidence"
-            )
-
-        run_migrations(self.database_url, verbose=False)
-        run_migrations(self.database_url, verbose=False)
-        with self.database.transaction() as conn:
-            migration_rows = conn.execute(
-                """
-                SELECT version, COUNT(*) AS count FROM schema_migrations
-                WHERE version IN (?, ?) GROUP BY version
-                """,
-                (RUNNER_MIGRATION_VERSION, CONTENT_STAGE_MIGRATION_VERSION),
-            ).fetchall()
-            conn.execute(
-                """
-                UPDATE learning_curriculum_preparation_plans
-                SET status = 'queued', stage = 'retry_wait',
-                  resume_stage = 'planning', lease_token = NULL,
-                  lease_expires_at = NULL, heartbeat_at = NULL,
-                  next_run_at = ?, hard_deadline_at = ?
-                WHERE id = ?
-                """,
-                (5351, claimed["hard_deadline_at"], plan["id"]),
-            )
-        with self.assertRaises(pymysql.MySQLError):
-            with self.database.transaction() as conn:
-                conn.execute(
-                    "UPDATE learning_curriculum_preparation_plans SET hard_deadline_at = NULL WHERE id = ?",
-                    (plan["id"],),
-                )
-        self.assertEqual(
-            {row["version"]: row["count"] for row in migration_rows},
-            {
-                RUNNER_MIGRATION_VERSION: 1,
-                CONTENT_STAGE_MIGRATION_VERSION: 1,
-            },
-        )
-
-    def test_055_upgrade_normalizes_054_legacy_rows_before_replacing_check(self):
-        retry_id, running_queued_id = self._install_legacy_054_rows(
-            install_old_check=True
-        )
-
-        run_migrations(self.database_url, verbose=False)
-        run_migrations(self.database_url, verbose=False)
-
-        self._assert_055_legacy_upgrade(retry_id, running_queued_id)
-
-    def test_055_restart_after_partial_ddl_restores_check_for_legacy_rows(self):
-        retry_id, running_queued_id = self._install_legacy_054_rows(
-            install_old_check=False
-        )
-
-        run_migrations(self.database_url, verbose=False)
-        run_migrations(self.database_url, verbose=False)
-
-        self._assert_055_legacy_upgrade(retry_id, running_queued_id)
 
     def test_orphan_family_cleanup_cascades_plan_retry_and_events(self):
         failed = self._create_failed_plan(now=5400)
@@ -1788,9 +1643,7 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
         self.assertEqual(events["count"], 0)
         self.assertIsNone(family)
 
-    def _checkpoint_schema_evidence_after_two_replays(self):
-        run_migrations(self.database_url, verbose=False)
-        run_migrations(self.database_url, verbose=False)
+    def _checkpoint_schema_evidence(self):
         preparation_tables = (
             "learning_curriculum_preparation_plans",
             "learning_curriculum_preparation_events",
@@ -1800,54 +1653,52 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
                 """
                 SELECT version, COUNT(*) AS count
                 FROM schema_migrations
-                WHERE version IN (?, ?, ?)
+                WHERE version = ?
                 GROUP BY version
-                ORDER BY version
                 """,
-                (
-                    MIGRATION_VERSION,
-                    RUNNER_MIGRATION_VERSION,
-                    CONTENT_STAGE_MIGRATION_VERSION,
-                ),
+                (BASELINE_VERSION,),
             ).fetchall()
             table_rows = conn.execute(
                 """
-                SELECT TABLE_NAME
-                FROM INFORMATION_SCHEMA.TABLES
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME IN (?, ?)
-                ORDER BY TABLE_NAME
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name IN (?, ?)
+                ORDER BY table_name
                 """,
                 preparation_tables,
             ).fetchall()
+            # pg_constraint holds only declared constraints; NOT NULL is not one.
             constraint_rows = conn.execute(
                 """
-                SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE
-                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME IN (?, ?)
-                  AND CONSTRAINT_TYPE IN ('UNIQUE', 'FOREIGN KEY', 'CHECK')
-                ORDER BY CONSTRAINT_NAME
+                SELECT constraint_row.conname AS constraint_name,
+                  constraint_row.contype AS constraint_type
+                FROM pg_constraint AS constraint_row
+                JOIN pg_class AS table_row ON table_row.oid = constraint_row.conrelid
+                WHERE table_row.relnamespace = current_schema()::regnamespace
+                  AND table_row.relname IN (?, ?)
+                  AND constraint_row.contype IN ('u', 'f', 'c')
+                ORDER BY constraint_row.conname
                 """,
                 preparation_tables,
             ).fetchall()
 
         by_type = {
             constraint_type: sorted(
-                row["CONSTRAINT_NAME"]
+                row["constraint_name"]
                 for row in constraint_rows
-                if row["CONSTRAINT_TYPE"] == constraint_type
+                if row["constraint_type"] == constraint_type
             )
-            for constraint_type in ("UNIQUE", "FOREIGN KEY", "CHECK")
+            for constraint_type in ("u", "f", "c")
         }
         return {
             "migrations": {
                 row["version"]: int(row["count"]) for row in migration_rows
             },
-            "tables": [row["TABLE_NAME"] for row in table_rows],
-            "uniqueKeys": by_type["UNIQUE"],
-            "foreignKeys": by_type["FOREIGN KEY"],
-            "checks": by_type["CHECK"],
+            "tables": [row["table_name"] for row in table_rows],
+            "uniqueKeys": by_type["u"],
+            "foreignKeys": by_type["f"],
+            "checks": by_type["c"],
         }
 
     def _checkpoint_invalid_dml_error_codes(self):
@@ -1912,8 +1763,8 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
             try:
                 with self.database.transaction() as conn:
                     conn.execute(sql, params)
-            except pymysql.MySQLError as exc:
-                error_codes[label] = int(exc.args[0])
+            except psycopg.Error as exc:
+                error_codes[label] = exc.sqlstate
             else:  # pragma: no cover - required failure evidence
                 self.fail(f"invalid DML was accepted: {label}")
         return error_codes
@@ -1937,139 +1788,6 @@ class LearningCurriculumPreparationRepositoryTest(unittest.TestCase):
                 )
             )
             return self.repository.get_plan(conn, plan["id"])
-
-    def _install_legacy_054_rows(self, *, install_old_check: bool):
-        with self.repository.transaction() as conn:
-            retry = self._insert_historical_v1_plan(
-                conn,
-                grade_code="primary_2",
-                request_id="legacy-retry-null-deadline",
-                now=5500,
-            )
-            running = self._insert_historical_v1_plan(
-                conn,
-                family_id="fam_2",
-                child_id="child_2",
-                grade_code="primary_3",
-                request_id="legacy-running-queued",
-                now=5501,
-            )
-            conn.execute(
-                "ALTER TABLE learning_curriculum_preparation_plans "
-                "DROP CHECK chk_learning_prep_content_state_evidence"
-            )
-            conn.execute(
-                """
-                UPDATE learning_curriculum_preparation_plans
-                SET status = 'queued', stage = 'retry_wait',
-                  resume_stage = 'planning', next_run_at = 5510,
-                  hard_deadline_at = NULL
-                WHERE id = ?
-                """,
-                (retry["id"],),
-            )
-            conn.execute(
-                """
-                UPDATE learning_curriculum_preparation_plans
-                SET status = 'running', stage = 'queued',
-                  lease_token = 'legacy-token', lease_expires_at = 5600,
-                  heartbeat_at = 5501, next_run_at = 5501,
-                  hard_deadline_at = 5700
-                WHERE id = ?
-                """,
-                (running["id"],),
-            )
-            if install_old_check:
-                conn.execute(
-                    """
-                    ALTER TABLE learning_curriculum_preparation_plans
-                    ADD CONSTRAINT chk_learning_prep_state_evidence CHECK (
-                      (status = 'queued' AND stage = 'retry_wait'
-                        AND next_run_at IS NOT NULL AND lease_token IS NULL
-                        AND lease_expires_at IS NULL AND heartbeat_at IS NULL
-                        AND hard_deadline_at IS NULL AND resume_stage IN (
-                          'planning', 'generating_content', 'building_classrooms',
-                          'generating_speech', 'validating', 'publishing'
-                        ) AND completed_at IS NULL AND superseded_at IS NULL
-                        AND error_code IS NULL AND error_message_safe IS NULL)
-                      OR
-                      (status = 'running' AND stage = 'queued'
-                        AND next_run_at IS NOT NULL AND lease_token IS NOT NULL
-                        AND lease_expires_at IS NOT NULL AND heartbeat_at IS NOT NULL
-                        AND hard_deadline_at IS NOT NULL AND resume_stage IS NULL
-                        AND completed_at IS NULL AND superseded_at IS NULL
-                        AND error_code IS NULL AND error_message_safe IS NULL)
-                      OR
-                      (status = 'failed' AND stage = 'completed'
-                        AND completed_at IS NOT NULL AND superseded_at IS NULL
-                        AND error_code IS NOT NULL AND error_message_safe IS NOT NULL
-                        AND lease_token IS NULL AND lease_expires_at IS NULL
-                        AND heartbeat_at IS NULL AND next_run_at IS NULL
-                        AND hard_deadline_at IS NULL AND resume_stage IS NULL)
-                    )
-                    """
-                )
-            conn.execute(
-                "DELETE FROM schema_migrations WHERE version = ?",
-                (RUNNER_MIGRATION_VERSION,),
-            )
-            conn.execute(
-                "DELETE FROM schema_migrations WHERE version = ?",
-                (CONTENT_STAGE_MIGRATION_VERSION,),
-            )
-        return retry["id"], running["id"]
-
-    def _assert_055_legacy_upgrade(self, retry_id: str, running_id: str):
-        with self.repository.transaction() as conn:
-            retry = self.repository.get_plan(conn, retry_id)
-            running = self.repository.get_plan(conn, running_id)
-            checks = conn.execute(
-                """
-                SELECT COUNT(*) AS count
-                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME = 'learning_curriculum_preparation_plans'
-                  AND CONSTRAINT_NAME = 'chk_learning_prep_content_state_evidence'
-                  AND CONSTRAINT_TYPE = 'CHECK'
-                """
-            ).fetchone()
-            old_checks = conn.execute(
-                """
-                SELECT COUNT(*) AS count
-                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME = 'learning_curriculum_preparation_plans'
-                  AND CONSTRAINT_NAME = 'chk_learning_prep_state_evidence'
-                  AND CONSTRAINT_TYPE = 'CHECK'
-                """
-            ).fetchone()
-            migration_rows = conn.execute(
-                """
-                SELECT version, COUNT(*) AS count FROM schema_migrations
-                WHERE version IN (?, ?) GROUP BY version
-                """,
-                (RUNNER_MIGRATION_VERSION, CONTENT_STAGE_MIGRATION_VERSION),
-            ).fetchall()
-        self.assertEqual(checks["count"], 1)
-        self.assertEqual(old_checks["count"], 0)
-        self.assertEqual(
-            {row["version"]: row["count"] for row in migration_rows},
-            {
-                RUNNER_MIGRATION_VERSION: 1,
-                CONTENT_STAGE_MIGRATION_VERSION: 1,
-            },
-        )
-        self.assertEqual(retry["status"], "failed")
-        self.assertEqual(retry["stage"], "completed")
-        self.assertEqual(
-            retry["error_code"], "preparation_upgrade_retry_state_invalid"
-        )
-        self.assertEqual(
-            retry["error_message_safe"],
-            "课程准备重试状态已安全终止，请重新准备",
-        )
-        self.assertEqual(running["status"], "running")
-        self.assertEqual(running["stage"], "planning")
 
     def _insert_historical_v1_plan(
         self, conn, *, grade_code, request_id, now,

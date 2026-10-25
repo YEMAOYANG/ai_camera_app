@@ -10,8 +10,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from core.config import AppConfig
-from core.database import Database, _split_sql_script
+from core.database import DEFAULT_SCHEMA, Database, _split_sql_script
 from core.security import now_ms
+
+# First key of the two-integer advisory lock; the classroom runtime uses the
+# single-bigint lock space, which never overlaps with this one.
+_LOCK_NAMESPACE = 0x4D495241  # "MIRA"
 
 
 def main() -> int:
@@ -21,20 +25,33 @@ def main() -> int:
     return 0
 
 
-def run_migrations(database_url: str, *, verbose: bool = True) -> None:
+def run_migrations(database_url: str, *, verbose: bool = True, stop_before: str | None = None) -> None:
+    """Apply pending migrations in name order; `stop_before` leaves that file and later ones pending."""
     database = Database(database_url)
     migrations_dir = ROOT / "migrations"
     files = sorted(migrations_dir.glob("*.sql"))
+    if stop_before is not None:
+        if not (migrations_dir / stop_before).is_file():
+            raise ValueError(f"unknown migration {stop_before}")
+        files = [path for path in files if path.name < stop_before]
 
     with database.transaction() as conn:
-        database_name = conn.execute("SELECT DATABASE() AS migration_database").fetchone()["migration_database"]
+        target = conn.execute(
+            "SELECT current_database() AS migration_database, current_schema() AS migration_schema"
+        ).fetchone()
+        database_name = target["migration_database"]
         if not database_name:
             raise RuntimeError("Cannot migrate without a selected database.")
-        # MySQL named locks survive the implicit commits caused by DDL. A row
-        # lock inside the transaction would be released by the first ALTER.
-        lock_name = "mira:migrations:" + hashlib.sha256(database_name.encode("utf-8")).hexdigest()[:40]
-        acquired = conn.execute("SELECT GET_LOCK(?, 0) AS acquired", (lock_name,)).fetchone()
-        if acquired is None or acquired["acquired"] != 1:
+        if target["migration_schema"] != DEFAULT_SCHEMA:
+            raise RuntimeError(
+                f"Schema {DEFAULT_SCHEMA!r} is missing or not first on the search path. No migration was started."
+            )
+        # A session lock outlives the per-file commits below.
+        lock_key = int.from_bytes(hashlib.sha256(database_name.encode("utf-8")).digest()[:4], "big", signed=True)
+        acquired = conn.execute(
+            "SELECT pg_try_advisory_lock(?, ?) AS acquired", (_LOCK_NAMESPACE, lock_key)
+        ).fetchone()
+        if acquired is None or not acquired["acquired"]:
             raise RuntimeError("Another migration is running for this database, or the migration lock is unavailable. No migration was started.")
         try:
             conn.execute(
@@ -45,6 +62,7 @@ def run_migrations(database_url: str, *, verbose: bool = True) -> None:
                 )
                 """
             )
+            conn.commit()
             applied = {
                 row["version"]
                 for row in conn.execute("SELECT version FROM schema_migrations").fetchall()
@@ -58,7 +76,7 @@ def run_migrations(database_url: str, *, verbose: bool = True) -> None:
                     statements = _split_sql_script(path.read_text(encoding="utf-8"))
                     for index, statement in enumerate(statements, 1):
                         step = f"SQL statement {index}/{len(statements)}"
-                        conn.execute(statement)
+                        conn.executescript(statement)
                     step = "registering the completed migration version"
                     conn.execute(
                         "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
@@ -68,24 +86,21 @@ def run_migrations(database_url: str, *, verbose: bool = True) -> None:
                     conn.commit()
                 except Exception as exc:
                     raise RuntimeError(
-                        f"Migration {version} failed while {step}. MySQL DDL may already "
-                        "have committed; rollback does not restore the earlier schema. "
-                        "Inspect the current schema, schema_migrations and the saved backup "
-                        "before resuming. Do not blindly rerun the migration."
+                        f"Migration {version} failed while {step}. Its transaction was rolled back, "
+                        "so this file left no changes; earlier files remain applied."
                     ) from exc
                 if verbose:
                     print(f"applied {version}", flush=True)
         except BaseException:
-            # Release pending DML before another process can acquire the lock.
-            # Previously committed DDL and completed files remain in place.
+            # Clear an aborted transaction before the unlock below.
             with suppress(Exception):
                 conn.rollback()
             raise
         finally:
-            # A failed connection also releases this lock when closed. Avoid
-            # hiding the precise migration error with a cleanup error.
+            # Closing the connection also releases this lock. Avoid hiding the
+            # precise migration error with a cleanup error.
             with suppress(Exception):
-                conn.execute("SELECT RELEASE_LOCK(?)", (lock_name,))
+                conn.execute("SELECT pg_advisory_unlock(?, ?)", (_LOCK_NAMESPACE, lock_key))
 
     if verbose:
         print("migrations complete")

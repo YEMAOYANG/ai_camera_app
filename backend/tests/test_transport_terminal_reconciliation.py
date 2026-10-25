@@ -18,7 +18,7 @@ class ReadConnection:
         self.conn = sqlite3.connect(path)
         self.conn.row_factory = lambda cur, row: {desc[0]: value for desc, value in zip(cur.description, row)}
     def execute(self, sql, args=()):
-        return self.conn.execute('BEGIN' if sql == 'START TRANSACTION READ ONLY' else sql, args)
+        return self.conn.execute('BEGIN' if sql == 'SET TRANSACTION READ ONLY' else sql, args)
     def rollback(self):
         self.conn.rollback()
     def close(self):

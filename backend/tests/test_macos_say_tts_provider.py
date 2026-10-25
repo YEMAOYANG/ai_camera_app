@@ -125,7 +125,7 @@ class MacOsSayTtsProviderTest(unittest.TestCase):
             validate_flask_config(
                 {
                     "APP_ENV": "production",
-                    "DATABASE_URL": "mysql+pymysql://mira:mira@db/mira",
+                    "DATABASE_URL": "postgresql://mira:mira@db/mira",
                     "LEARNING_TTS_PROVIDER": "macos-say",
                 }
             )

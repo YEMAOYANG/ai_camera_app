@@ -165,7 +165,7 @@ class _NoDatabaseRepository:
 class LearningCatalogReleaseStateMachineUnitTest(unittest.TestCase):
     def _service(self, *, dynamic=None, lesson=None):
         return LearningCatalogReleaseService(
-            "mysql://unused@127.0.0.1/unused",
+            "postgresql://unused@127.0.0.1/unused",
             dynamic_generation_service=dynamic or _FailingDynamicService(),
             lesson_package_service=lesson or _UnexpectedLessonService(),
         )

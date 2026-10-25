@@ -19,7 +19,7 @@ class Connection:
         self.raw = sqlite3.connect(':memory:')
         self.raw.row_factory = sqlite3.Row
     def execute(self, sql, params=()):
-        sql = re.sub(r'\s+FOR UPDATE\b', '', sql)
+        sql = re.sub(r'\s+FOR UPDATE\b(?: OF [\w, ]+)?', '', sql)
         sql = re.sub(r'ON DUPLICATE KEY UPDATE id\s*=\s*id', 'ON CONFLICT DO NOTHING', sql)
         cursor = self.raw.execute(sql, tuple(params))
         row = lambda x: dict(x) if x is not None else None
@@ -85,17 +85,16 @@ class JourneyPersistenceTests(unittest.TestCase):
         self.assertIn(journey.FLOW['teachingGuidance'], question['question'])
         self.assertEqual(current['content']['type'], 'quiz')
 
-    def test_catalog_query_is_safe_for_mysql_parameter_interpolation(self):
-        import pymysql
+    def test_catalog_query_is_safe_for_driver_parameter_interpolation(self):
         from core.database import DatabaseConnection
         captured = Mock()
         captured.execute.return_value.fetchone.return_value = {'id': 'task', 'status': 'in_progress'}
         self.service.learning.assign_catalog_task(captured, family_id='family', child_id='child', course=self.course, created_by='student', now=self.time)
         sql, args = captured.execute.call_args.args
-        db = pymysql.connect(defer_connect=True)
-        db.server_status = 0
-        adapted = DatabaseConnection(db, dialect='mysql')._adapt_sql(sql)
-        self.assertIn("NOT LIKE 'tbr_%'", db.cursor().mogrify(adapted, args))
+        adapted = DatabaseConnection(None, dialect='postgresql')._adapt_sql(sql)
+        # psycopg reads %s and %% exactly as Python's % operator does.
+        literals = tuple("'" + str(value).replace("'", "''") + "'" for value in args)
+        self.assertIn("NOT LIKE 'tbr_%'", adapted % literals)
 
     def test_complete_lesson_and_two_due_reviews_persist_three_tasks_one_immutable_baseline(self):
         self.finish('games'); self.finish('challenge')

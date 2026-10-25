@@ -33,7 +33,7 @@ class OnvifBootstrapConfigTest(unittest.TestCase):
     def test_curriculum_preparation_runner_interval_and_lease_are_bounded(self):
         base = {
             "APP_ENV": "test",
-            "DATABASE_URL": "mysql+pymysql://test:test@127.0.0.1:3306/ai_camera_app_test",
+            "DATABASE_URL": "postgresql://test:test@127.0.0.1:5433/mira_test",
             "DEV_ADAPTERS_ENABLED": True,
             "ONVIF_BOOTSTRAP_CREDENTIALS_ENABLED": False,
         }

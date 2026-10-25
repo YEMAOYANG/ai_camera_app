@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 import hashlib
 import json
+import re
 from pathlib import Path
 import sqlite3
 import unittest
@@ -21,7 +22,7 @@ class _Connection:
 
     def execute(self, sql, params=()):
         self.database.statements.append(sql)
-        sql = sql.replace(" FOR UPDATE", "")
+        sql = re.sub(r"\s+FOR UPDATE\b(?: OF [\w, ]+)?", "", sql)
         if " ON DUPLICATE KEY UPDATE " in sql:
             sql, update = sql.split(" ON DUPLICATE KEY UPDATE ", 1)
             if "content_sha256=VALUES" in update:
@@ -441,7 +442,7 @@ class CourseStorageRepositoryTest(unittest.TestCase):
             self.repo.resolve(direct["sourcePath"], self.storage)
 
     def test_migration_is_additive_and_contains_only_the_three_registry_tables(self):
-        migration = Path(__file__).parents[1] / "migrations/089_course_storage_registry.sql"
+        migration = Path(__file__).parents[1] / "migrations/mysql/089_course_storage_registry.sql"
         sql = migration.read_text()
         self.assertEqual(sql.count("CREATE TABLE IF NOT EXISTS course_storage_"), 3)
         self.assertNotRegex(sql.upper(), r"\b(?:ALTER|DROP|DELETE|TRUNCATE|UPDATE)\s+(?:TABLE\s+)?learning_")

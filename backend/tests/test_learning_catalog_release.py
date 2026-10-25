@@ -193,8 +193,8 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             repository = PausingRepository(Database(self.database_url))
             with repository.transaction() as conn:
                 session = conn.execute(
-                    "SELECT CONNECTION_ID() AS connection_id, "
-                    "@@transaction_isolation AS isolation_level"
+                    "SELECT pg_backend_pid() AS connection_id, "
+                    "current_setting('transaction_isolation') AS isolation_level"
                 ).fetchone()
                 connection_ids.append(session["connection_id"])
                 isolation_levels.append(str(session["isolation_level"]).upper())
@@ -239,7 +239,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
         self.assertEqual(results[0][0]["id"], results[1][0]["id"])
         self.assertEqual(results[0][1]["id"], results[1][1]["id"])
         self.assertEqual(len(set(connection_ids)), 2)
-        self.assertEqual(isolation_levels, ["REPEATABLE-READ", "REPEATABLE-READ"])
+        self.assertEqual(isolation_levels, ["READ COMMITTED", "READ COMMITTED"])
         build_id = str(results[0][0]["id"])
         expected_items = set()
         for target in targets:
@@ -308,8 +308,8 @@ class LearningCatalogReleaseTest(unittest.TestCase):
             repository = PausingRepository(Database(self.database_url))
             with repository.transaction() as conn:
                 session = conn.execute(
-                    "SELECT CONNECTION_ID() AS connection_id, "
-                    "@@transaction_isolation AS isolation_level"
+                    "SELECT pg_backend_pid() AS connection_id, "
+                    "current_setting('transaction_isolation') AS isolation_level"
                 ).fetchone()
                 connection_ids.append(session["connection_id"])
                 isolation_levels.append(str(session["isolation_level"]).upper())
@@ -347,7 +347,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
 
         self.assertTrue(winner_result[1])
         self.assertEqual(len(set(connection_ids)), 2)
-        self.assertEqual(isolation_levels, ["REPEATABLE-READ", "REPEATABLE-READ"])
+        self.assertEqual(isolation_levels, ["READ COMMITTED", "READ COMMITTED"])
         repository = LearningCatalogRepository(Database(self.database_url))
         with repository.transaction() as conn:
             items = repository.list_build_items(
@@ -448,7 +448,7 @@ class LearningCatalogReleaseTest(unittest.TestCase):
     def test_039_retires_stale_pinyin_in_place_without_deleting_history(self):
         migration = (
             Path(__file__).resolve().parents[1]
-            / "migrations"
+            / "migrations" / "mysql"
             / "039_learning_catalog_releases.sql"
         ).read_text(encoding="utf-8")
         retirement = migration[migration.index("UPDATE learning_courses") :]

@@ -279,7 +279,7 @@ class LearningCurriculumPreparationRepository:
               NULL, 0, NULL, NULL,
               NULL, NULL, ?, NULL, NULL, NULL, ?, NULL, NULL, NULL, ?, ?, ?
             )
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 plan_id,
@@ -511,13 +511,13 @@ class LearningCurriculumPreparationRepository:
         build_items = conn.execute(
             """
             SELECT COUNT(*) AS item_count,
-              COALESCE(SUM(
+              COALESCE(SUM(CAST((
                 status = 'course_ready'
                 AND content_phase = 'course_ready'
                 AND content_gate_status = 'passed'
                 AND course_id IS NOT NULL AND course_id <> ''
                 AND course_version IS NOT NULL AND course_version <> ''
-              ), 0) AS exact_count
+              ) AS INTEGER)), 0) AS exact_count
             FROM learning_catalog_build_items
             WHERE build_job_id = ? AND release_id = ?
             """,
@@ -526,12 +526,12 @@ class LearningCurriculumPreparationRepository:
         release_items = conn.execute(
             """
             SELECT COUNT(*) AS item_count,
-              COALESCE(SUM(
+              COALESCE(SUM(CAST((
                 grade_code = ?
                 AND status = 'published'
                 AND quality_status = 'ready'
                 AND retired_at IS NULL
-              ), 0) AS exact_count
+              ) AS INTEGER)), 0) AS exact_count
             FROM learning_catalog_release_items
             WHERE release_id = ?
             """,
@@ -797,7 +797,7 @@ class LearningCurriculumPreparationRepository:
               NULL, NULL, NULL, NULL, ?, NULL, NULL,
               NULL, ?, NULL, NULL, NULL, ?, ?
             )
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 retry_id,
@@ -1364,13 +1364,13 @@ class LearningCurriculumPreparationRepository:
             WHERE id = ? AND status IN ('queued', 'running')
               AND target_fingerprint = ?
               AND (lease_expires_at IS NULL OR lease_expires_at <= ?)
-              AND lease_token <=> ? AND lease_expires_at <=> ?
-              AND heartbeat_at <=> ?
-              AND hard_deadline_at <=> ?
-              AND work_unit_kind <=> ?
-              AND bound_catalog_item_id <=> ?
-              AND bound_content_attempt_ordinal <=> ?
-              AND bound_content_phase <=> ?
+              AND lease_token IS NOT DISTINCT FROM ? AND lease_expires_at IS NOT DISTINCT FROM ?
+              AND heartbeat_at IS NOT DISTINCT FROM ?
+              AND hard_deadline_at IS NOT DISTINCT FROM ?
+              AND work_unit_kind IS NOT DISTINCT FROM ?
+              AND bound_catalog_item_id IS NOT DISTINCT FROM ?
+              AND bound_content_attempt_ordinal IS NOT DISTINCT FROM ?
+              AND bound_content_phase IS NOT DISTINCT FROM ?
             """,
             (
                 next_stage,
@@ -1414,7 +1414,7 @@ class LearningCurriculumPreparationRepository:
         cursor = conn.execute(
             """
             UPDATE learning_curriculum_preparation_plans
-            SET lease_expires_at = LEAST(?, hard_deadline_at),
+            SET lease_expires_at = mysql_least(?, hard_deadline_at),
               heartbeat_at = ?, updated_at = ?
             WHERE id = ? AND status = 'running' AND lease_token = ?
               AND target_fingerprint = ? AND lease_expires_at > ?
@@ -1481,7 +1481,7 @@ class LearningCurriculumPreparationRepository:
             UPDATE learning_curriculum_preparation_plans
             SET status = 'running', stage = 'generating_content',
               catalog_build_id = ?, catalog_release_id = ?,
-              progress_percent = GREATEST(progress_percent, 5),
+              progress_percent = mysql_greatest(progress_percent, 5),
               lease_token = NULL, lease_expires_at = NULL,
               heartbeat_at = NULL, next_run_at = ?, hard_deadline_at = NULL,
               resume_stage = NULL, work_unit_kind = NULL,
@@ -1754,7 +1754,7 @@ class LearningCurriculumPreparationRepository:
             UPDATE learning_curriculum_preparation_plans
             SET work_unit_kind = ?, bound_catalog_item_id = ?,
               bound_content_attempt_ordinal = ?, bound_content_phase = ?,
-              hard_deadline_at = ?, lease_expires_at = LEAST(lease_expires_at, ?),
+              hard_deadline_at = ?, lease_expires_at = mysql_least(lease_expires_at, ?),
               heartbeat_at = ?, retry_reason_code = NULL,
               retry_message_safe = NULL, updated_at = ?
             WHERE id = ? AND status = 'running'
@@ -1905,7 +1905,7 @@ class LearningCurriculumPreparationRepository:
         plan_cursor = conn.execute(
             """
             UPDATE learning_curriculum_preparation_plans
-            SET lease_expires_at = LEAST(?, hard_deadline_at),
+            SET lease_expires_at = mysql_least(?, hard_deadline_at),
               heartbeat_at = ?, updated_at = ?
             WHERE id = ? AND status = 'running'
               AND stage = 'generating_content' AND lease_token = ?
@@ -2037,7 +2037,7 @@ class LearningCurriculumPreparationRepository:
               bound_content_attempt_ordinal = NULL,
               bound_content_phase = NULL, retry_reason_code = NULL,
               retry_message_safe = NULL,
-              last_progress_at = CASE WHEN ? THEN ? ELSE last_progress_at END,
+              last_progress_at = CASE WHEN ? = 1 THEN ? ELSE last_progress_at END,
               updated_at = ?
             WHERE id = ? AND status = 'running'
               AND stage = 'generating_content' AND lease_token = ?
@@ -2287,9 +2287,9 @@ class LearningCurriculumPreparationRepository:
               AND hard_deadline_at = ? AND hard_deadline_at > ?
               AND lease_expires_at > ?
               AND work_unit_kind = ?
-              AND bound_catalog_item_id <=> ?
-              AND bound_content_attempt_ordinal <=> ?
-              AND bound_content_phase <=> ?
+              AND bound_catalog_item_id IS NOT DISTINCT FROM ?
+              AND bound_content_attempt_ordinal IS NOT DISTINCT FROM ?
+              AND bound_content_phase IS NOT DISTINCT FROM ?
             """,
             (
                 expected_stage,
@@ -3621,7 +3621,7 @@ class LearningCurriculumPreparationRepository:
                 WHERE release_item.release_id = ?
                 ORDER BY release_item.subject, release_item.skill_id,
                   release_item.variant_ordinal, release_item.course_id
-                FOR UPDATE
+                FOR UPDATE OF release_item
                 """,
                 (build_id, release_id),
             ).fetchall()
@@ -4357,7 +4357,7 @@ class LearningCurriculumPreparationRepository:
         evidence = conn.execute(
             """
             SELECT COUNT(*) AS receipt_count,
-              SUM(
+              SUM(CAST((
                 receipt.grade_code = plan.grade_code
                 AND receipt.release_id = plan.catalog_release_id
                 AND receipt.target_fingerprint = plan.target_fingerprint
@@ -4417,7 +4417,7 @@ class LearningCurriculumPreparationRepository:
                       WHERE provider_call.readiness_id = provider.id
                         AND provider_call.state = 'passed'
                         AND provider_call.provider_call = 1) = 5
-              ) AS exact_count
+              ) AS INTEGER)) AS exact_count
             FROM learning_curriculum_preparation_plans AS plan
             JOIN learning_catalog_build_items AS item
               ON item.build_job_id = plan.catalog_build_id
@@ -4880,7 +4880,7 @@ class LearningCurriculumPreparationRepository:
                 ELSE NULL END,
               retry_message_safe = CASE WHEN ? = 'retry_wait'
                 THEN COALESCE(retry_message_safe, ?) ELSE NULL END,
-              next_run_at = LEAST(?, COALESCE(hard_deadline_at, ?)), updated_at = ?
+              next_run_at = mysql_least(?, COALESCE(hard_deadline_at, ?)), updated_at = ?
             WHERE id = ? AND status = 'running' AND stage = ?
               AND lease_token = ?
             """,
@@ -4923,7 +4923,7 @@ class LearningCurriculumPreparationRepository:
             INSERT INTO learning_curriculum_preparation_events(
               id, plan_id, event_type, stage, payload_json, created_at
             ) VALUES (?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (event_id, plan_id, event_type, stage, payload_json, int(now)),
         )
@@ -6265,7 +6265,7 @@ class LearningCurriculumPreparationRepository:
                       content_canary_passed_at = CASE WHEN ? = {len(canary_keys)}
                         THEN COALESCE(content_canary_passed_at, ?) ELSE NULL END,
                       stage_progress_json = ?, subject_progress_json = ?,
-                      progress_percent = GREATEST(progress_percent, ?),
+                      progress_percent = mysql_greatest(progress_percent, ?),
                       last_progress_at = ?, updated_at = ?
                     WHERE id = ? AND status = 'running'
                       AND stage = 'generating_content' AND lease_token = ?
@@ -6311,7 +6311,7 @@ class LearningCurriculumPreparationRepository:
                       content_canary_passed_at = CASE WHEN ? = {len(canary_keys)}
                         THEN COALESCE(content_canary_passed_at, ?) ELSE NULL END,
                       stage_progress_json = ?, subject_progress_json = ?,
-                      progress_percent = GREATEST(progress_percent, ?),
+                      progress_percent = mysql_greatest(progress_percent, ?),
                       last_progress_at = ?, updated_at = ?
                     WHERE id = ? AND status = 'queued' AND stage = 'retry_wait'
                     """,
@@ -6346,7 +6346,7 @@ class LearningCurriculumPreparationRepository:
                       content_canary_passed_at = CASE WHEN ? = {len(canary_keys)}
                         THEN COALESCE(content_canary_passed_at, ?) ELSE NULL END,
                       stage_progress_json = ?, subject_progress_json = ?,
-                      progress_percent = GREATEST(progress_percent, ?),
+                      progress_percent = mysql_greatest(progress_percent, ?),
                       lease_token = NULL, lease_expires_at = NULL,
                       heartbeat_at = NULL, next_run_at = ?,
                       hard_deadline_at = NULL, resume_stage = NULL,

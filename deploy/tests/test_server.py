@@ -75,15 +75,12 @@ class ServerDeploymentTest(unittest.TestCase):
         self.assertEqual(env["MIRA_INTERNAL_API_TOKEN"], self.values["MIRA_INTERNAL_API_TOKEN"])
 
     def test_database_versions_and_secret_continuity(self):
-        manifest = {"databases": {"mysql": {"serverMajor": 8, "serverVersion": "8.4.6"},
-                                  "postgres": {"serverMajor": 16, "serverVersion": "16.9"}},
+        manifest = {"databases": {"postgres": {"serverMajor": 16, "serverVersion": "16.9"}},
                     "secretsToMigrateSeparately": {"backend_env": {"APP_STUDENT_AUTH_PEPPER": {
                         "configured": True, "sha256": hashlib.sha256(self.values["MIRA_STUDENT_AUTH_PEPPER"].encode()).hexdigest()}},
                         "runtime_env": {}}}
         server.version_compatible(self.values, manifest)
         server.check_secret_continuity(self.values, {}, manifest)
-        with self.assertRaises(server.DeployError):
-            server.version_compatible({**self.values, "MIRA_MYSQL_IMAGE": "mysql:8.0"}, manifest)
         with self.assertRaises(server.DeployError):
             server.version_compatible({**self.values, "MIRA_POSTGRES_IMAGE": "postgres:17-alpine"}, manifest)
         with self.assertRaises(server.DeployError):
@@ -124,7 +121,7 @@ class ServerDeploymentTest(unittest.TestCase):
             self.assertEqual(server.main(["--env", str(self.env_path), "stop"]), 0)
         args = run.call_args.args
         self.assertIn("backend", args)
-        self.assertNotIn("mysql", args)
+        self.assertNotIn("postgres", args)
         web = Path(self.values["MIRA_PARENT_WEB_DIST"])
         web.mkdir()
         (web / "index.html").write_text("demo")
@@ -136,7 +133,7 @@ class ServerDeploymentTest(unittest.TestCase):
         result = type("Result", (), {"returncode": 1, "stderr": b"secret-password"})()
         with patch.object(server.subprocess, "run", return_value=result):
             with self.assertRaises(server.DeployError) as caught:
-                server.run(["docker", "compose"], {}, "exec", "mysql")
+                server.run(["docker", "compose"], {}, "exec", "postgres")
         self.assertNotIn("secret-password", str(caught.exception))
 
     def test_start_refuses_marker_with_missing_database_storage(self):
@@ -166,6 +163,26 @@ class ServerDeploymentTest(unittest.TestCase):
                 self.assertEqual(server.main(["--env", str(self.env_path), "restore", str(self.root / "bundle")]), 1)
             self.assertFalse((root / server.MARKER).exists())
             self.assertFalse(any("backend" in args or "openmaic" in args for args in calls))
+
+    def test_restore_replaces_the_empty_app_schema_and_restores_as_the_application_login(self):
+        manifest = {"createdAt": "fixture", "files": {}, "databases": {}}
+        calls = []
+        def fake_run(prefix, env, *args, **kwargs):
+            calls.append((args, kwargs))
+        def restore_files(source, target):
+            target.mkdir()
+        with patch.object(server.bundle, "verify", return_value=manifest), \
+                patch.object(server, "version_compatible"), patch.object(server, "check_secret_continuity"), \
+                patch.object(server, "ensure_stopped"), patch.object(server.bundle, "restore_files", side_effect=restore_files), \
+                patch.object(server, "run", side_effect=fake_run), patch.object(server.bundle, "private_write"), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(server.main(["--env", str(self.env_path), "restore", str(self.root / "bundle")]), 0)
+        scripts = [args[-1] for args, _ in calls if args[:2] == ("exec", "-T")]
+        self.assertIn('--command="DROP SCHEMA app"', scripts[0])
+        self.assertIn("pg_restore", scripts[1])
+        self.assertIn("--role=mira", scripts[1])
+        self.assertEqual(calls[2][1]["input_file"], self.root / "bundle" / "postgres.dump")
+        self.assertEqual(calls[0][0], ("up", "-d", "--wait", "postgres"))
 
 
 if __name__ == "__main__":

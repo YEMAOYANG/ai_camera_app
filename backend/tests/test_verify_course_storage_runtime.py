@@ -24,7 +24,8 @@ class RemoteRuntimeVerificationTests(unittest.TestCase):
         with ReadOnlyDatabase(database).transaction() as reader:
             reader.execute("SELECT * FROM courses WHERE id=?", ("one",))
             for sql in ("UPDATE courses SET x=1", "DELETE FROM courses", "SELECT 1; DELETE FROM courses",
-                        "SELECT * FROM courses FOR UPDATE", "SELECT x INTO OUTFILE '/tmp/x'", "SELECT GET_LOCK('x',1)"):
+                        "SELECT * FROM courses FOR UPDATE", "SELECT x INTO OUTFILE '/tmp/x'", "SELECT GET_LOCK('x',1)",
+                        "SELECT * FROM courses FOR SHARE", "SELECT pg_advisory_lock(1)", "SELECT pg_sleep(5)"):
                 with self.subTest(sql=sql), self.assertRaises(VerificationError):
                     reader.execute(sql)
             with self.assertRaises(VerificationError):

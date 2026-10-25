@@ -556,7 +556,7 @@ class StudentLearningLibraryRepository:
                   family_id, child_id, course_id, course_version,
                   created_at, updated_at
                 ) VALUES (?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE updated_at = VALUES(updated_at)
+                ON CONFLICT DO NOTHING
                 """,
                 (family_id, child_id, course_id, course_version, now, now),
             )

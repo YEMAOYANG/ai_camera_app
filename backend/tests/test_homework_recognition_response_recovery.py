@@ -302,20 +302,20 @@ class ResponseRecoveryCliTest(unittest.TestCase):
         config.assert_not_called()
         self.assertEqual(json.loads(output.getvalue())['error'], 'homework_repair_approval_required')
 
-    def test_exact_dev_mysql_target_only(self):
-        self.cli.validate_config({'APP_ENV': 'development', 'DATABASE_URL': 'mysql://127.0.0.1:3306/ai_camera_app_dev', 'HOMEWORK_ANALYSIS_ENABLED': True})
-        self.cli.validate_config({'APP_ENV': 'development', 'DATABASE_URL': 'mysql://127.0.0.1:3306/ai_camera_app_dev?charset=utf8mb4', 'HOMEWORK_ANALYSIS_ENABLED': True})
-        for url in ['mysql://localhost:3306/ai_camera_app_dev', 'mysql://remote.invalid/ai_camera_app_dev',
-                    'mysql://127.0.0.1:3307/ai_camera_app_dev', 'mysql://127.0.0.1:3306/other',
-                    'sqlite:///ai_camera_app_dev', 'mysql://127.0.0.1:3306/ai_camera_app_dev?other=1',
-                    'mysql://127.0.0.1:3306/ai_camera_app_dev?charset=utf8mb4&charset=utf8mb4',
-                    'mysql://127.0.0.1:3306/ai_camera_app_dev?charset=utf8mb4&other=1',
-                    'mysql://127.0.0.1:3306/ai_camera_app_dev?charset=latin1']:
+    def test_exact_dev_database_target_only(self):
+        self.cli.validate_config({'APP_ENV': 'development', 'DATABASE_URL': 'postgresql://127.0.0.1:5433/mira', 'HOMEWORK_ANALYSIS_ENABLED': True})
+        self.cli.validate_config({'APP_ENV': 'development', 'DATABASE_URL': 'postgresql://mira:secret@127.0.0.1/mira', 'HOMEWORK_ANALYSIS_ENABLED': True})
+        for url in ['postgresql://localhost:5433/mira', 'postgresql://remote.invalid/mira',
+                    'postgresql://127.0.0.1:3307/mira', 'postgresql://127.0.0.1:5433/other',
+                    'postgresql://127.0.0.1:5433/mira_test', 'mysql://127.0.0.1:3306/mira',
+                    'sqlite:///mira', 'postgresql://127.0.0.1:5433/mira?other=1',
+                    'postgresql://127.0.0.1:5433/mira?options=-c%20search_path%3Dpublic',
+                    'postgresql://127.0.0.1:5433/mira#fragment']:
             with self.subTest(url=url), self.assertRaises(ValueError):
                 self.cli.validate_config({'APP_ENV': 'development', 'DATABASE_URL': url, 'HOMEWORK_ANALYSIS_ENABLED': True})
 
     def test_preflight_starts_a_read_only_transaction_without_worker_or_write(self):
-        config = {'APP_ENV': 'development', 'DATABASE_URL': 'mysql://127.0.0.1:3306/ai_camera_app_dev',
+        config = {'APP_ENV': 'development', 'DATABASE_URL': 'postgresql://127.0.0.1:5433/mira',
                   'HOMEWORK_ANALYSIS_ENABLED': True, 'PROMPT_ROOT': 'prompts'}
         fake_database = Mock(); conn = fake_database.connect.return_value
         fake_service = Mock()
@@ -324,7 +324,7 @@ class ResponseRecoveryCliTest(unittest.TestCase):
                 patch.object(self.cli, 'authorize_recovery', return_value={'ok': True, 'authorized': False}) as authorize, redirect_stdout(io.StringIO()):
             app_config.return_value.to_flask_config.return_value = config
             self.assertEqual(self.cli.main(self.arguments()), 0)
-        conn.execute.assert_called_once_with('START TRANSACTION READ ONLY')
+        conn.execute.assert_called_once_with('SET TRANSACTION READ ONLY')
         conn.rollback.assert_called_once(); conn.close.assert_called_once()
         fake_database.transaction.assert_not_called()
         authorize.assert_called_once_with(fake_service, conn, self.cli.AUTHORIZED_SCOPE)

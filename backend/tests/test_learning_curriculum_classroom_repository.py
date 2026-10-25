@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import unittest
 from unittest import mock
 
-import pymysql
+import psycopg
 
 from core.database import Database
 from content.teacher_profiles import get_formal_runtime_teacher_contract, get_formal_subject_qwen_voice_identity
@@ -93,8 +93,8 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
     def setUp(self) -> None:
         config = fresh_test_config()
         self.database_url = config["DATABASE_URL"]
-        self.assertIn("/ai_camera_app_test", self.database_url)
-        self.assertNotIn("/ai_camera_app_dev", self.database_url)
+        self.assertIn("/mira_test", self.database_url)
+        self.assertNotRegex(self.database_url, r"/mira(\?|$)")
         self.database = Database(self.database_url)
         self.catalog = LearningCatalogRepository(self.database)
         self.preparations = LearningCurriculumPreparationRepository(self.database)
@@ -657,9 +657,9 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                     elif drift == "runtime_manifest_drift":
                         conn.execute(
                             "UPDATE learning_openmaic_runtime_classrooms SET "
-                            "feature_manifest_json = JSON_SET(" 
-                            "feature_manifest_json, "
-                            "'$.generationContract.course.id', 'wrong-course') "
+                            "feature_manifest_json = jsonb_set("
+                            "CAST(feature_manifest_json AS jsonb), "
+                            "'{generationContract,course,id}', '\"wrong-course\"') "
                             "WHERE id = ?",
                             (runtime["id"],),
                         )
@@ -794,7 +794,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                   content_canary_failed_count = 0,
                   content_canary_passed_at = 8001,
                   content_generation_completed_at = 8002,
-                  stage_progress_json = JSON_OBJECT(
+                  stage_progress_json = jsonb_build_object(
                     'candidateCount', 30, 'canaryCandidateCount', 3,
                     'canaryFailedCount', 0, 'canaryTargetCount', 3,
                     'failedCount', 0, 'targetCount', 30),
@@ -1163,7 +1163,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                     "WHERE build_item_id = ?",
                     (null_fixture["item_id"],),
                 )
-        self.assertEqual(raised.exception.args[0], 3819)
+        self.assertEqual(raised.exception.sqlstate, "23514")  # check_violation
 
     def test_receipt_validation_and_publication_timeline_is_fail_closed(self) -> None:
         fixture = self._seed_candidate("receipt-timeline")
@@ -1174,7 +1174,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                 "auto_validation_receipt_hash = REPEAT('a', 64), "
                 "auto_validated_at = 2001, updated_at = 2001 "
                 "WHERE build_item_id = ?",
-                3819,
+                "23514",
             ),
             (
                 "UPDATE learning_curriculum_classroom_item_receipts SET "
@@ -1192,15 +1192,15 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                 "auto_validated_at = 2050, publication_status = 'published', "
                 "publication_receipt_hash = REPEAT('6',64), published_at = 2040, "
                 "updated_at = 2200 WHERE build_item_id = ?",
-                3819,
+                "23514",
             ),
         )
         for sql, error_code in invalid_updates:
             with self.subTest(sql=sql[:80]):
-                with self.assertRaises(pymysql.MySQLError) as raised:
+                with self.assertRaises(psycopg.Error) as raised:
                     with self.database.transaction() as conn:
                         conn.execute(sql, (fixture["item_id"],))
-                self.assertEqual(raised.exception.args[0], error_code)
+                self.assertEqual(raised.exception.sqlstate, error_code)
 
     def test_grade_pointer_is_idempotent_and_cross_grade_isolated(self) -> None:
         fixture = self._seed_candidate("pointer")
@@ -1385,7 +1385,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                 activated_at=8_050,
             )
 
-        with self.assertRaises(pymysql.MySQLError) as forged:
+        with self.assertRaises(psycopg.Error) as forged:
             with self.database.transaction() as conn:
                 conn.execute(
                     """
@@ -1415,7 +1415,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                         fixture["plan_id"],
                     ),
                 )
-        self.assertEqual(forged.exception.args[0], 1452)
+        self.assertEqual(forged.exception.sqlstate, "23503")  # foreign_key_violation
 
         with self.assertRaisesRegex(RuntimeError, "rollback contract drift"):
             with self.database.transaction() as conn:
@@ -1505,15 +1505,15 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
             "history-that-does-not-exist",
         ):
             with self.subTest(forged_history_id=forged_history_id):
-                with self.assertRaises(pymysql.MySQLError) as raised:
+                with self.assertRaises(psycopg.Error) as raised:
                     with self.database.transaction() as conn:
                         conn.execute(
                             "UPDATE learning_curriculum_preparation_plans "
                             "SET formal_publication_history_id = ? WHERE id = ?",
                             (forged_history_id, fixture["plan_id"]),
                         )
-                self.assertEqual(raised.exception.args[0], 1452)
-        with self.assertRaises(pymysql.MySQLError) as forged_hash:
+                self.assertEqual(raised.exception.sqlstate, "23503")  # foreign_key_violation
+        with self.assertRaises(psycopg.Error) as forged_hash:
             with self.database.transaction() as conn:
                 conn.execute(
                     "UPDATE learning_curriculum_preparation_plans "
@@ -1521,7 +1521,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                     "WHERE id = ?",
                     (fixture["plan_id"],),
                 )
-        self.assertEqual(forged_hash.exception.args[0], 1452)
+        self.assertEqual(forged_hash.exception.sqlstate, "23503")  # foreign_key_violation
 
     def test_formal_stage_handoffs_use_frozen_deadlines_and_rollback(self) -> None:
         target = build_preparation_target("primary_1")
@@ -1567,7 +1567,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                   content_canary_failed_count = 0,
                   content_canary_passed_at = 6001,
                   content_generation_completed_at = 6002,
-                  stage_progress_json = JSON_OBJECT(
+                  stage_progress_json = jsonb_build_object(
                     'candidateCount', 30, 'canaryCandidateCount', 3,
                     'canaryFailedCount', 0, 'canaryTargetCount', 3,
                     'failedCount', 0, 'targetCount', 30),
@@ -2065,7 +2065,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                   content_canary_failed_count = 0,
                   content_canary_passed_at = 7001,
                   content_generation_completed_at = 7002,
-                  stage_progress_json = JSON_OBJECT(
+                  stage_progress_json = jsonb_build_object(
                     'candidateCount', 30, 'canaryCandidateCount', 3,
                     'canaryFailedCount', 0, 'canaryTargetCount', 3,
                     'failedCount', 0, 'targetCount', 30),
@@ -2119,7 +2119,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                   content_canary_failed_count = 0,
                   content_canary_passed_at = 7001,
                   content_generation_completed_at = 7002,
-                  stage_progress_json = JSON_OBJECT(
+                  stage_progress_json = jsonb_build_object(
                     'candidateCount', 30, 'canaryCandidateCount', 3,
                     'canaryFailedCount', 0, 'canaryTargetCount', 3,
                     'failedCount', 0, 'targetCount', 30),
@@ -2227,7 +2227,7 @@ class LearningCurriculumClassroomRepositoryTest(unittest.TestCase):
                   content_candidate_count = 30, content_canary_candidate_count = 3,
                   content_canary_passed_at = 8501, content_generation_completed_at = 8502,
                   progress_percent = 35, next_run_at = NULL, last_progress_at = 8502, updated_at = 8502,
-                  stage_progress_json = JSON_OBJECT('candidateCount', 30, 'canaryCandidateCount', 3,
+                  stage_progress_json = jsonb_build_object('candidateCount', 30, 'canaryCandidateCount', 3,
                     'canaryFailedCount', 0, 'canaryTargetCount', 3, 'failedCount', 0, 'targetCount', 30)
                 WHERE id = ?""", (fixture['build_id'], fixture['release_id'], follower['id']))
             args = dict(runtime_id=runtime['id'], build_item_id=fixture['item_id'],

@@ -450,7 +450,7 @@ class SetupApiTest(unittest.TestCase):
 
         def record_lock_connection(repository, conn, *, family_id: str):
             connection_id = conn.execute(
-                "SELECT CONNECTION_ID() AS id"
+                "SELECT pg_backend_pid() AS id"
             ).fetchone()["id"]
             with connection_ids_lock:
                 connection_ids.append(connection_id)

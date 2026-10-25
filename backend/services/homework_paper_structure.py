@@ -207,7 +207,7 @@ def _bound_receipts(host, conn, row, page):
         # new call. The original live owner/revision still binds the journals.
         reused = conn.execute('SELECT c.* FROM homework_provider_calls c JOIN homework_submissions s ON s.id=c.submission_id '
             'WHERE c.child_id=? AND s.family_id=? AND s.deleted_at IS NULL AND c.provider=? AND c.status=? '
-            'AND c.receipt_json LIKE ?', (row['child_id'], row['family_id'], 'tencent', 'succeeded', '%' + source_sha + '%')).fetchall()
+            'AND CAST(c.receipt_json AS TEXT) LIKE ?', (row['child_id'], row['family_id'], 'tencent', 'succeeded', '%' + source_sha + '%')).fetchall()
         for call in reused:
             owner = conn.execute('SELECT * FROM homework_submissions WHERE id=?', (call['submission_id'],)).fetchone()
             if owner:

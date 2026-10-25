@@ -7,7 +7,7 @@ from pathlib import Path
 
 MIGRATION = (
     Path(__file__).resolve().parents[1]
-    / "migrations"
+    / "migrations" / "mysql"
     / "065_learning_openmaic_release_provider_readiness.sql"
 )
 

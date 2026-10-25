@@ -297,9 +297,9 @@ class CourseStorageIsolationTest(unittest.TestCase):
             'pathSha256': hashlib.sha256(entry['sourcePath'].encode()).hexdigest()}]
         self.assertEqual(isolation.current_heads(database, self.config), [entry])
         statements = [call.args[0] for call in conn.execute.call_args_list]
-        self.assertIn('READ ONLY', statements[1])
-        self.assertIn('FROM course_storage_heads h LEFT JOIN course_storage_files f', statements[2])
-        self.assertTrue(statements[2].startswith('SELECT '))
+        self.assertIn('READ ONLY', statements[0])
+        self.assertIn('FROM course_storage_heads h LEFT JOIN course_storage_files f', statements[1])
+        self.assertTrue(statements[1].startswith('SELECT '))
         conn.rollback.assert_called_once()
         conn.close.assert_called_once()
 
@@ -324,11 +324,11 @@ class CourseStorageIsolationTest(unittest.TestCase):
         database, conn = self.scoped_database(scopes, expected)
         self.assertEqual(isolation.current_heads(database, self.config, preview_key=key), expected)
         statements = [call.args[0] for call in conn.execute.call_args_list]
-        self.assertIn('READ ONLY', statements[1])
-        self.assertIn('p.status IN', statements[2])
-        self.assertIn('r.retired_at IS NULL', statements[2])
-        self.assertIn('preview_key=?', statements[3])
-        self.assertIn('h.source_path_sha256 IN (?,?)', statements[4])
+        self.assertIn('READ ONLY', statements[0])
+        self.assertIn('p.status IN', statements[1])
+        self.assertIn('r.retired_at IS NULL', statements[1])
+        self.assertIn('preview_key=?', statements[2])
+        self.assertIn('h.source_path_sha256 IN (?,?)', statements[3])
         self.assertTrue(all(sql.startswith(('SELECT ', 'SET ', 'START ')) for sql in statements))
         conn.rollback.assert_called_once()
         conn.close.assert_called_once()
@@ -339,16 +339,16 @@ class CourseStorageIsolationTest(unittest.TestCase):
         database, conn = self.scoped_database([self.registry_scope(owner, [entry], content_key=key)], [entry])
         self.assertEqual(isolation.current_heads(database, self.config, content_key=key), [entry])
         statements = [call.args[0] for call in conn.execute.call_args_list]
-        self.assertIn("b.status='published'", statements[2])
-        self.assertIn("c.quality_status='released'", statements[2])
-        self.assertIn('c.retired_at IS NULL AND r.retired_at IS NULL', statements[2])
-        self.assertIn('content_key=?', statements[3])
+        self.assertIn("b.status='published'", statements[1])
+        self.assertIn("c.quality_status='released'", statements[1])
+        self.assertIn('c.retired_at IS NULL AND r.retired_at IS NULL', statements[1])
+        self.assertIn('content_key=?', statements[2])
 
     def test_scoped_selection_rejects_retired_missing_or_unusable_course_before_reading_scopes(self):
         database, conn = self.scoped_database([], [], current=False)
         with self.assertRaisesRegex(isolation.IsolationError, 'scope_not_current'):
             isolation.current_heads(database, self.config, preview_key='a' * 64)
-        self.assertEqual(len(conn.execute.call_args_list), 3)
+        self.assertEqual(len(conn.execute.call_args_list), 2)
 
     def test_scoped_selection_uses_new_head_only_when_current_owner_binds_same_course(self):
         key, old_owner, new_owner = 'a' * 64, 'b' * 64, 'c' * 64

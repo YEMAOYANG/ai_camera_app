@@ -53,7 +53,7 @@ class LearningContentGenerationRepository:
               started_at, created_at, updated_at
             )
             VALUES (?, ?, ?, ?, ?, 'generating', ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 job_id,
@@ -143,7 +143,7 @@ class LearningContentGenerationRepository:
               content_hash, payload_json, elapsed_ms, created_at, updated_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'validated_draft', ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 draft_id,

@@ -116,15 +116,15 @@ class RuntimeReleaseCacheTest(unittest.TestCase):
         self.assertEqual(len(runtime._cache), 1)
         self.assertTrue(all('audioAudit' not in v['value'][1] for v in runtime._cache.values()))
 
-    def test_mysql_hashes_original_bytes_with_current_reads(self):
+    def test_server_hashes_original_bytes_with_current_reads(self):
         key, _, _ = self.publish()
         identity = self.repo.runtime_release_identity(self.db, key)
-        conn = Mock(dialect='mysql')
+        conn = Mock(dialect='postgresql')
         conn.execute.side_effect = [Mock(fetchone=Mock(return_value=identity[name]))
                                     for name in ('build', 'revision', 'course')]
         self.assertEqual(self.repo.runtime_release_identity(conn, key), identity)
         statements = [call.args[0] for call in conn.execute.call_args_list]
-        self.assertIn('SHA2(review_json,256)', statements[0])
+        self.assertIn("encode(sha256(convert_to(CAST(review_json AS TEXT),'UTF8')),'hex')", statements[0])
         self.assertTrue(all(sql.endswith(' FOR SHARE') for sql in statements))
 
 

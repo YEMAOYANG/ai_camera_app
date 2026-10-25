@@ -20,7 +20,7 @@ class _Guard:
 class CourseStorageRoutesTest(unittest.TestCase):
     def setUp(self):
         app = Flask(__name__)
-        app.config["DATABASE_URL"] = "mysql+pymysql://unused.invalid/test"
+        app.config["DATABASE_URL"] = "postgresql://unused.invalid/test"
         app.register_blueprint(internal_course_storage_bp, url_prefix="/internal/learning/course-storage")
         self.client = app.test_client()
         self.data = b'{"original":"course"}'

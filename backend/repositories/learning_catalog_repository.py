@@ -105,10 +105,10 @@ class LearningCatalogRepository:
                   status, created_at, updated_at
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'ready', 'active', ?, ?)
-                ON DUPLICATE KEY UPDATE
-                  title = VALUES(title), payload_json = VALUES(payload_json),
+                ON CONFLICT (curriculum_version, boundary_version) DO UPDATE SET
+                  title = EXCLUDED.title, payload_json = EXCLUDED.payload_json,
                   quality_status = 'ready', status = 'active', retired_at = NULL,
-                  updated_at = VALUES(updated_at)
+                  updated_at = EXCLUDED.updated_at
                 """,
                 (
                     boundary["gradeCode"],
@@ -165,7 +165,7 @@ class LearningCatalogRepository:
                   required_boundary_count, ready_item_count, created_at, updated_at
                 )
                 VALUES (?, ?, ?, 'draft', 'building', ?, 0, ?, ?)
-                ON DUPLICATE KEY UPDATE id = id
+                ON CONFLICT DO NOTHING
                 """,
                 (release_id, curriculum_version, title, boundary_count, now, now),
             )
@@ -195,7 +195,7 @@ class LearningCatalogRepository:
                 )
                 VALUES (?, ?, ?, ?, 'queued', ?, ?, 0, 0, 'full_pipeline',
                   NULL, NULL, 'active_release', ?, ?)
-                ON DUPLICATE KEY UPDATE id = id
+                ON CONFLICT DO NOTHING
                 """,
                 (
                     build_id,
@@ -383,7 +383,7 @@ class LearningCatalogRepository:
                   required_boundary_count, ready_item_count, created_at, updated_at
                 )
                 VALUES (?, ?, ?, 'draft', 'building', ?, 0, ?, ?)
-                ON DUPLICATE KEY UPDATE id = id
+                ON CONFLICT DO NOTHING
                 """,
                 (release_id, curriculum_version, title, boundary_count, now, now),
             )
@@ -413,7 +413,7 @@ class LearningCatalogRepository:
                 )
                 VALUES (?, ?, ?, ?, 'queued', ?, ?, 0, 0, 'content_only',
                   ?, ?, 'content_ready', ?, ?)
-                ON DUPLICATE KEY UPDATE id = id
+                ON CONFLICT DO NOTHING
                 """,
                 (
                     build_id,
@@ -1643,7 +1643,7 @@ class LearningCatalogRepository:
               AND (
                 (? = 1 AND course_id IS NULL AND course_version IS NULL)
                 OR
-                (? = 2 AND course_id <=> ? AND course_version <=> ?)
+                (? = 2 AND course_id IS NOT DISTINCT FROM ? AND course_version IS NOT DISTINCT FROM ?)
               )
             """,
             (
@@ -2637,7 +2637,7 @@ class LearningCatalogRepository:
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'validated',
                   'auto_validated', 'openmaic_generated', ?, ?, ?, ?,
                   NULL, ?, ?)
-                ON DUPLICATE KEY UPDATE id = id
+                ON CONFLICT DO NOTHING
                 """,
                 (
                     normalized["id"],
@@ -2836,7 +2836,7 @@ class LearningCatalogRepository:
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'unverified',
               'legacy_unreviewed', 'openmaic_generated', ?, ?, ?, ?,
               NULL, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 candidate["course_id"],
@@ -4106,7 +4106,7 @@ class LearningCatalogRepository:
               status, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'openmaic_question_phase_v2',
               ?, ?, 'mira.learning.question-contract.v2', 1, 'generating', ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 job_id,
@@ -4172,7 +4172,7 @@ class LearningCatalogRepository:
               title, objective, status, content_hash, content_json,
               created_at, updated_at
             ) VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'generated', ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 candidate_id,
@@ -5023,12 +5023,12 @@ class LearningCatalogRepository:
         conn.execute(
             """
             UPDATE learning_course_generation_jobs AS job
-            JOIN learning_course_generation_candidates AS candidate
-              ON candidate.job_id = job.id
-            SET job.status = 'failed', job.error_code = ?,
-              job.error_message_safe = ?, job.completed_at = ?,
-              job.updated_at = ?
-            WHERE candidate.course_id = ? AND candidate.course_version = ?
+            SET status = 'failed', error_code = ?,
+              error_message_safe = ?, completed_at = ?,
+              updated_at = ?
+            FROM learning_course_generation_candidates AS candidate
+            WHERE candidate.job_id = job.id
+              AND candidate.course_id = ? AND candidate.course_version = ?
             """,
             (
                 safe_code,
@@ -5399,11 +5399,11 @@ class LearningCatalogRepository:
         conn.execute(
             """
             UPDATE learning_catalog_release_items AS item
-            JOIN learning_catalog_releases AS old_release
-              ON old_release.id = item.release_id
-            SET item.status = 'retired', item.quality_status = 'superseded',
-              item.retired_at = COALESCE(item.retired_at, ?), item.updated_at = ?
-            WHERE old_release.curriculum_version = ?
+            SET status = 'retired', quality_status = 'superseded',
+              retired_at = COALESCE(item.retired_at, ?), updated_at = ?
+            FROM learning_catalog_releases AS old_release
+            WHERE old_release.id = item.release_id
+              AND old_release.curriculum_version = ?
               AND old_release.status = 'retired' AND old_release.id <> ?
             """,
             (now, now, release["curriculum_version"], release_id),
@@ -5420,12 +5420,12 @@ class LearningCatalogRepository:
                 )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published',
                   'ready', ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                  package_id = VALUES(package_id),
-                  package_version = VALUES(package_version),
+                ON CONFLICT (release_id, course_id, course_version) DO UPDATE SET
+                  package_id = EXCLUDED.package_id,
+                  package_version = EXCLUDED.package_version,
                   status = 'published', quality_status = 'ready',
-                  published_at = COALESCE(published_at, VALUES(published_at)),
-                  retired_at = NULL, updated_at = VALUES(updated_at)
+                  published_at = COALESCE(learning_catalog_release_items.published_at, EXCLUDED.published_at),
+                  retired_at = NULL, updated_at = EXCLUDED.updated_at
                 """,
                 (
                     release_id,
@@ -6753,7 +6753,7 @@ class LearningCatalogRepository:
                 WHERE item.id IN ({markers})
                 ORDER BY item.subject_ordinal, item.boundary_ordinal,
                   item.variant_ordinal, item.id
-                FOR UPDATE
+                FOR UPDATE OF item, course, receipt, runtime, package, audio, segment
                 """,
                 item_ids,
             ).fetchall()
@@ -7236,9 +7236,10 @@ class LearningCatalogRepository:
 
         conn.execute(
             """
-            INSERT IGNORE INTO learning_curriculum_grade_release_pointers(
+            INSERT INTO learning_curriculum_grade_release_pointers(
               grade_code, pointer_revision, updated_at
             ) VALUES (?, 0, ?)
+            ON CONFLICT DO NOTHING
             """,
             (grade_code, int(now)),
         )
@@ -7825,7 +7826,9 @@ class LearningCatalogRepository:
         grade_code: str,
         for_update: bool = False,
     ) -> DatabaseRow | None:
-        lock = " FOR UPDATE" if for_update else ""
+        # The pointer row is the activation lock; PostgreSQL cannot lock the
+        # optional history row through the outer join.
+        lock = " FOR UPDATE OF pointer" if for_update else ""
         return conn.execute(
             """
             SELECT pointer.*, history.activation_source,
@@ -7893,9 +7896,10 @@ class LearningCatalogRepository:
             raise ValueError("publication timestamp is invalid")
         conn.execute(
             """
-            INSERT IGNORE INTO learning_curriculum_grade_release_pointers(
+            INSERT INTO learning_curriculum_grade_release_pointers(
               grade_code, pointer_revision, updated_at
             ) VALUES (?, 0, ?)
+            ON CONFLICT DO NOTHING
             """,
             (grade_code, int(activated_at)),
         )
@@ -8096,7 +8100,7 @@ class LearningCatalogRepository:
               contract_version = ?, release_id = ?, history_id = ?,
               activated_at = ?, updated_at = ?
             WHERE grade_code = ? AND pointer_revision = ?
-              AND history_id <=> ? AND release_id <=> ?
+              AND history_id IS NOT DISTINCT FROM ? AND release_id IS NOT DISTINCT FROM ?
             """,
             (
                 revision,

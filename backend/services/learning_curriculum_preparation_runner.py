@@ -1108,7 +1108,7 @@ class LearningCurriculumPreparationRunner:
                     "AND item.subject=request.subject AND item.skill_id=request.skill_id AND item.variant_ordinal=request.variant_ordinal "
                     "LEFT JOIN learning_curriculum_classroom_item_receipts AS receipt ON receipt.build_item_id=item.id "
                     "AND receipt.target_fingerprint=plan.target_fingerprint "
-                    "WHERE request.target_fingerprint=plan.target_fingerprint AND request.enabled=TRUE "
+                    "WHERE request.target_fingerprint=plan.target_fingerprint AND request.enabled = 1 "
                     "AND (item.id IS NULL OR item.status IN ('pending','processing') OR "
                     "(item.status='course_ready' AND (receipt.publication_status IS NULL OR receipt.publication_status<>'published')))) "
                     "ORDER BY plan.next_run_at, plan.updated_at, plan.id LIMIT 1", (grade_code,)).fetchone()

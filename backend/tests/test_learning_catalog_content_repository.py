@@ -214,7 +214,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
                   id, curriculum_version, title, status, quality_status,
                   required_boundary_count, ready_item_count, created_at, updated_at
                 ) VALUES (?, ?, ?, 'draft', 'building', 10, 0, ?, ?)
-                ON DUPLICATE KEY UPDATE id = id
+                ON CONFLICT DO NOTHING
                 """,
                 (release_id, curriculum_version, title, now, now),
             )
@@ -278,7 +278,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
                   source_artifact_id, compiler_version, public_content_hash,
                   private_content_hash, public_payload_json,
                   validation_report_json, created_at, published_at, updated_at
-                ) VALUES (?, 1, ?, '1.0.0', SHA2('{}', 256),
+                ) VALUES (?, 1, ?, '1.0.0', encode(sha256(convert_to('{}', 'UTF8')), 'hex'),
                   'mira.lesson-package.v2', 'published', ?, 'pollution-test',
                   ?, ?, '{}', '{}', ?, ?, ?)
                 """,
@@ -396,7 +396,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
         self.assertEqual(self.dynamic.calls, [])
         self.assertEqual(self.lesson.calls, [])
 
-    def test_content_claim_has_one_real_mysql_winner_and_manifest_driven_order(self):
+    def test_content_claim_has_one_real_database_winner_and_manifest_driven_order(self):
         created = self._create("cp2-content-claim")
         build_id = str(created["build"]["id"])
         barrier = Barrier(2)
@@ -407,7 +407,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
             barrier.wait()
             with local.transaction() as conn:
                 connection_ids.append(
-                    int(conn.execute("SELECT CONNECTION_ID() AS id").fetchone()["id"])
+                    int(conn.execute("SELECT pg_backend_pid() AS id").fetchone()["id"])
                 )
                 return local.claim_next_content_item(
                     conn,
@@ -661,8 +661,9 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
                     else:
                         conn.execute(
                             "UPDATE learning_catalog_build_items "
-                            "SET curriculum_version = ? "
-                            "WHERE build_job_id = ? ORDER BY id LIMIT 1",
+                            "SET curriculum_version = ? WHERE id = ("
+                            "SELECT id FROM learning_catalog_build_items "
+                            "WHERE build_job_id = ? ORDER BY id LIMIT 1)",
                             (wrong_curriculum, build_id),
                         )
                 with self.repository.transaction() as conn:
@@ -709,8 +710,9 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
         missing_build_id = str(missing["build"]["id"])
         with self.repository.transaction() as conn:
             conn.execute(
-                "DELETE FROM learning_catalog_build_items "
-                "WHERE build_job_id = ? ORDER BY id LIMIT 1",
+                "DELETE FROM learning_catalog_build_items WHERE id = ("
+                "SELECT id FROM learning_catalog_build_items "
+                "WHERE build_job_id = ? ORDER BY id LIMIT 1)",
                 (missing_build_id,),
             )
         with self.assertRaises(ApiError) as missing_error:
@@ -807,7 +809,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
                 original_id = item_id
                 with self.repository.transaction() as conn:
                     conn.execute(
-                        f"UPDATE learning_catalog_build_items SET `{column}` = ? "
+                        f'UPDATE learning_catalog_build_items SET "{column}" = ? '
                         "WHERE id = ?",
                         (value, original_id),
                     )
@@ -823,7 +825,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
                         )
                     else:
                         conn.execute(
-                            f"UPDATE learning_catalog_build_items SET `{column}` = ? "
+                            f'UPDATE learning_catalog_build_items SET "{column}" = ? '
                             "WHERE id = ?",
                             (drift_items[0][column], item_id),
                         )
@@ -888,7 +890,7 @@ class LearningCatalogContentRepositoryTest(unittest.TestCase):
             repository = PausingRepository(Database(self.database_url))
             with repository.transaction() as conn:
                 connection_ids.append(
-                    int(conn.execute("SELECT CONNECTION_ID() AS id").fetchone()["id"])
+                    int(conn.execute("SELECT pg_backend_pid() AS id").fetchone()["id"])
                 )
                 absent = repository.get_build_by_request(
                     conn,

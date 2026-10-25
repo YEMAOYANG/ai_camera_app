@@ -118,7 +118,7 @@ def operator_app(args, *, publishing=False):
 def inventory(library, identity):
     with library.database.transaction() as conn:
         requests = list(conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-            'WHERE target_fingerprint=? AND enabled=TRUE', (library.fingerprint,)).fetchall())
+            'WHERE target_fingerprint=? AND enabled = 1', (library.fingerprint,)).fetchall())
         owner = conn.execute('SELECT * FROM learning_curriculum_preparation_plans '
             'WHERE library_target_fingerprint=? AND grade_code=?', (library.fingerprint,library.target['gradeCode'])).fetchone()
         item = conn.execute('SELECT * FROM learning_catalog_build_items WHERE id=?', (identity['buildItemId'],)).fetchone()

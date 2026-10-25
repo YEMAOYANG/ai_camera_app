@@ -53,22 +53,22 @@ def json_bytes(value):
 
 def _quoted(name):
     require(isinstance(name, str) and IDENTIFIER.fullmatch(name), 'student_verification_database_identifier_invalid')
-    return '`' + name + '`'
+    return '"' + name + '"'
 
 
 def database_snapshot(database, *, guard_cutoff=None):
-    """Hash every base-table row on MySQL; no private row body leaves MySQL.
+    """Hash every base-table row in the database; no private row body leaves it.
 
     Per-column SHA avoids concatenating large frozen JSON documents. Sorting
-    fixed-size row hashes, rather than source rows, avoids MySQL JSON filesort.
+    fixed-size row hashes, rather than source rows, avoids sorting JSON bodies.
     Existing internal audit rows remain protected; new guard appends are counted.
     """
     result = {}
     with database.transaction() as conn:
-        columns = conn.execute('SELECT c.TABLE_NAME AS table_name,c.COLUMN_NAME AS column_name,'
-            'c.COLUMN_TYPE AS column_type,c.IS_NULLABLE AS is_nullable FROM INFORMATION_SCHEMA.COLUMNS c '
-            'JOIN INFORMATION_SCHEMA.TABLES t ON t.TABLE_SCHEMA=c.TABLE_SCHEMA AND t.TABLE_NAME=c.TABLE_NAME '
-            "WHERE c.TABLE_SCHEMA=DATABASE() AND t.TABLE_TYPE='BASE TABLE' ORDER BY c.TABLE_NAME,c.ORDINAL_POSITION").fetchall()
+        columns = conn.execute('SELECT c.table_name AS table_name,c.column_name AS column_name,'
+            'c.data_type AS column_type,c.is_nullable AS is_nullable FROM information_schema.columns c '
+            'JOIN information_schema.tables t ON t.table_schema=c.table_schema AND t.table_name=c.table_name '
+            "WHERE c.table_schema=current_schema() AND t.table_type='BASE TABLE' ORDER BY c.table_name,c.ordinal_position").fetchall()
         groups = {}
         for row in columns:
             groups.setdefault(row['table_name'], []).append(row)
@@ -80,9 +80,11 @@ def database_snapshot(database, *, guard_cutoff=None):
             pieces = []
             for field in fields:
                 name = _quoted(field['column_name'])
-                pieces.append("IF(" + name + " IS NULL,'N',CONCAT('V',LENGTH(CAST(" + name
-                    + " AS BINARY)),':',SHA2(CAST(" + name + " AS BINARY),256)))")
-            expression = "SHA2(CONCAT(" + ','.join(pieces) + "),256)"
+                value = "convert_to(CAST(" + name + " AS TEXT),'UTF8')"
+                pieces.append("CASE WHEN " + name + " IS NULL THEN 'N' ELSE 'V' || octet_length(" + value
+                    + ") || ':' || encode(sha256(" + value + "),'hex') END")
+            # || has no argument limit, unlike concat(); every piece is non-null.
+            expression = "encode(sha256(convert_to(" + ' || '.join(pieces) + ",'UTF8')),'hex')"
             rows = conn.execute('SELECT ' + expression + ' AS row_sha256 FROM ' + _quoted(table) + where, params).fetchall()
             require(len(rows) <= 1_000_000 and all(SHA.fullmatch(r['row_sha256'] or '') for r in rows),
                     'student_verification_database_snapshot_invalid')

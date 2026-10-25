@@ -1591,10 +1591,10 @@ class StudentLearningApiTest(unittest.TestCase):
                   public_content_hash, private_content_hash,
                   public_payload_json, validation_report_json,
                   created_at, published_at, updated_at
-                ) VALUES (?, 1, ?, ?, SHA2((
+                ) VALUES (?, 1, ?, ?, encode(sha256(convert_to((
                     SELECT content_json FROM learning_courses
                     WHERE id = ? AND version = ? LIMIT 1
-                  ), 256), 'mira.lesson-package.v2', 'published', ?,
+                  ), 'UTF8')), 'hex'), 'mira.lesson-package.v2', 'published', ?,
                   'library-gate-test', ?, ?, '{}', '{}', ?, ?, ?)
                 """,
                 (

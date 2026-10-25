@@ -23,7 +23,7 @@ def requested_supply(conn, build):
         return None
     rows = conn.execute(
         """SELECT subject, skill_id, variant_ordinal, priority
-        FROM learning_course_supply_requests WHERE target_fingerprint = ? AND enabled = TRUE""",
+        FROM learning_course_supply_requests WHERE target_fingerprint = ? AND enabled = 1""",
         (fingerprint,),
     ).fetchall()
     ready = published_supply(conn, target, for_generation=True)
@@ -47,11 +47,13 @@ def record_supply_incident(conn, *, item_id, stage, reason, now, runtime_id=None
         """INSERT INTO learning_course_supply_incidents
         (build_item_id, stage, reason_code, blocked_at, last_observed_at, failure_runtime_id)
         VALUES (?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-          resolved_at = IF(failure_runtime_id <=> VALUES(failure_runtime_id), resolved_at, NULL),
-          failure_runtime_id = VALUES(failure_runtime_id),
-          stage = VALUES(stage), reason_code = VALUES(reason_code),
-          last_observed_at = VALUES(last_observed_at)""",
+        ON CONFLICT (build_item_id) DO UPDATE SET
+          resolved_at = CASE WHEN learning_course_supply_incidents.failure_runtime_id
+                          IS NOT DISTINCT FROM EXCLUDED.failure_runtime_id
+                        THEN learning_course_supply_incidents.resolved_at ELSE NULL END,
+          failure_runtime_id = EXCLUDED.failure_runtime_id,
+          stage = EXCLUDED.stage, reason_code = EXCLUDED.reason_code,
+          last_observed_at = EXCLUDED.last_observed_at""",
         (item_id, stage, reason, now, now, runtime_id),
     )
 
@@ -132,7 +134,7 @@ def observe_supply_incidents(conn, *, build_id, now):
                                runtime_id=row['runtime_id'])
     counts = conn.execute(
         """SELECT COUNT(*) AS blocked,
-          SUM(item.content_phase = 'course_ready') AS blocked_ready
+          SUM(CAST((item.content_phase = 'course_ready') AS INTEGER)) AS blocked_ready
         FROM learning_course_supply_incidents AS incident
         JOIN learning_catalog_build_items AS item ON item.id = incident.build_item_id
         WHERE item.build_job_id = ? AND incident.resolved_at IS NULL""", (build_id,),

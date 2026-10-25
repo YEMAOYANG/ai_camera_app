@@ -163,7 +163,7 @@ def _student_progressive_slot_exists_sql(
              AND overlay_build_item.content_validation_contract_version
                IS NOT NULL
              AND overlay_build_item.content_validation_contract_version <> ''
-             AND overlay_build_item.content_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+             AND overlay_build_item.content_receipt_hash ~* '^[0-9a-f]{{64}}$'
            )
          )
         JOIN learning_curriculum_classroom_item_receipts AS overlay_receipt
@@ -282,7 +282,7 @@ def _student_visible_course_sql(
     )
     history_gate = (f"""OR (
               {course}.curriculum_version = 'mira.primary.progressive.v1'
-              AND student_receipt.publication_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+              AND student_receipt.publication_receipt_hash ~* '^[0-9a-f]{{64}}$'
               AND student_receipt.published_at IS NOT NULL
               AND EXISTS (
                 SELECT 1 FROM learning_curriculum_preparation_plans AS fine_owner
@@ -332,7 +332,7 @@ def _student_visible_course_sql(
              AND student_build_item.content_validation_contract_version
                IS NOT NULL
              AND student_build_item.content_validation_contract_version <> ''
-             AND student_build_item.content_receipt_hash REGEXP '^[0-9a-f]{{64}}$'
+             AND student_build_item.content_receipt_hash ~* '^[0-9a-f]{{64}}$'
            )
          )
         JOIN learning_curriculum_classroom_item_receipts AS student_receipt
@@ -504,19 +504,19 @@ class LearningRepository:
                       boundary_version, content_json, published_at, created_at, updated_at
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'legacy_seed', ?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE
-                      grade_code = VALUES(grade_code),
-                      subject = VALUES(subject),
-                      node_code = VALUES(node_code),
-                      title = VALUES(title),
-                      objective = VALUES(objective),
-                      status = VALUES(status),
-                      quality_status = VALUES(quality_status),
-                      curriculum_version = VALUES(curriculum_version),
-                      boundary_version = VALUES(boundary_version),
-                      content_json = VALUES(content_json),
-                      published_at = COALESCE(published_at, VALUES(published_at)),
-                      updated_at = VALUES(updated_at)
+                    ON CONFLICT (id, version) DO UPDATE SET
+                      grade_code = EXCLUDED.grade_code,
+                      subject = EXCLUDED.subject,
+                      node_code = EXCLUDED.node_code,
+                      title = EXCLUDED.title,
+                      objective = EXCLUDED.objective,
+                      status = EXCLUDED.status,
+                      quality_status = EXCLUDED.quality_status,
+                      curriculum_version = EXCLUDED.curriculum_version,
+                      boundary_version = EXCLUDED.boundary_version,
+                      content_json = EXCLUDED.content_json,
+                      published_at = COALESCE(learning_courses.published_at, EXCLUDED.published_at),
+                      updated_at = EXCLUDED.updated_at
                     """,
                     (
                         course["id"],
@@ -721,7 +721,7 @@ class LearningRepository:
                   AND prior_lru_task.learning_course_id = course.id
                   AND prior_lru_task.learning_course_version = course.version
               ), '0000-00-00') ASC,
-              SHA2(CONCAT(?, ':', course.id, ':', course.version), 256) ASC,
+              encode(sha256(convert_to(concat(?, ':', course.id, ':', course.version), 'UTF8')), 'hex') ASC,
               course.published_at ASC,
               course.id ASC
             LIMIT 1
@@ -1205,7 +1205,7 @@ class LearningRepository:
                 ORDER BY
                   CASE WHEN last_learning_date IS NULL THEN 0 ELSE 1 END,
                   COALESCE(last_learning_date, '0000-00-00') ASC,
-                  SHA2(CONCAT(CURRENT_DATE(), ':', course.id, ':', course.version), 256),
+                  encode(sha256(convert_to(concat(CURRENT_DATE, ':', course.id, ':', course.version), 'UTF8')), 'hex'),
                   course.published_at DESC,
                   course.id
                 LIMIT ?
@@ -1653,7 +1653,7 @@ class LearningRepository:
               id, family_id, child_id, source_task_id, origin_date,
               target_date, target_slot, reason, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 carryover_id,
@@ -1904,7 +1904,7 @@ class LearningRepository:
             )
             VALUES (?, ?, ?, ?, ?, 'learning', 'scheduled', ?, ?, NULL, 'one_time',
               ?, NULL, NULL, 3, 0, 0, ?, 5, 'pending', 'Asia/Shanghai', ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 task_id,
@@ -2052,7 +2052,7 @@ class LearningRepository:
               answers_json, started_at, created_at, updated_at
             )
             VALUES (?, ?, ?, ?, ?, ?, 'in_progress', 0, 0, 0, '[]', ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 session_id,
@@ -2201,7 +2201,7 @@ class LearningRepository:
               strengths_json, next_step, created_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE id = id
+            ON CONFLICT DO NOTHING
             """,
             (
                 report_id,
@@ -2389,18 +2389,18 @@ class LearningRepository:
               next_review_date, course_id, course_version, updated_at
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-              attempts = attempts + VALUES(attempts),
-              correct_count = correct_count + VALUES(correct_count),
-              independent_correct_count = independent_correct_count + VALUES(independent_correct_count),
-              hint_count = hint_count + VALUES(hint_count),
-              latest_score = VALUES(latest_score),
-              mastery_level = VALUES(mastery_level),
-              last_practiced_at = VALUES(last_practiced_at),
-              next_review_date = VALUES(next_review_date),
-              course_id = VALUES(course_id),
-              course_version = VALUES(course_version),
-              updated_at = VALUES(updated_at)
+            ON CONFLICT (family_id, child_id, grade_code, node_code, subject) DO UPDATE SET
+              attempts = learning_mastery_states.attempts + EXCLUDED.attempts,
+              correct_count = learning_mastery_states.correct_count + EXCLUDED.correct_count,
+              independent_correct_count = learning_mastery_states.independent_correct_count + EXCLUDED.independent_correct_count,
+              hint_count = learning_mastery_states.hint_count + EXCLUDED.hint_count,
+              latest_score = EXCLUDED.latest_score,
+              mastery_level = EXCLUDED.mastery_level,
+              last_practiced_at = EXCLUDED.last_practiced_at,
+              next_review_date = EXCLUDED.next_review_date,
+              course_id = EXCLUDED.course_id,
+              course_version = EXCLUDED.course_version,
+              updated_at = EXCLUDED.updated_at
             """,
             (
                 family_id,

@@ -7,9 +7,9 @@ from core.database import _split_sql_script
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MIGRATION = ROOT / "migrations" / "061_learning_openmaic_runtime_events.sql"
-ASR_MIGRATION = ROOT / "migrations" / "062_learning_openmaic_asr_transcription_events.sql"
-ADAPTIVE_MIGRATION = ROOT / "migrations" / "069_learning_adaptive_formal_runtime.sql"
+MIGRATION = ROOT / "migrations" / "mysql" / "061_learning_openmaic_runtime_events.sql"
+ASR_MIGRATION = ROOT / "migrations" / "mysql" / "062_learning_openmaic_asr_transcription_events.sql"
+ADAPTIVE_MIGRATION = ROOT / "migrations" / "mysql" / "069_learning_adaptive_formal_runtime.sql"
 
 
 class LearningOpenMaicRuntimeEventsMigrationTest(unittest.TestCase):
@@ -63,7 +63,7 @@ class LearningOpenMaicRuntimeEventsMigrationTest(unittest.TestCase):
         self.assertNotIn("update learning_openmaic_runtime_events", normalized)
 
     def test_interaction_extension_keeps_non_assessment_shape_and_adaptive_bounds(self):
-        sql = (ROOT / "migrations/075_learning_openmaic_interaction_events.sql").read_text(encoding="utf-8")
+        sql = (ROOT / "migrations/mysql/075_learning_openmaic_interaction_events.sql").read_text(encoding="utf-8")
         normalized = " ".join(sql.split()).lower()
         self.assertEqual(len(_split_sql_script(sql)), 1)
         self.assertIn("'interaction_completed'", normalized)

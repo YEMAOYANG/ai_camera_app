@@ -92,7 +92,7 @@ def require_playful_billed_recovery_authority(conn, *, build, item, histories, n
         if identity != expected_identity or identity['targetFingerprint'] != fingerprint or identity['buildId'] != build['id']:
             raise ValueError('playful billed replay single-course identity changed')
     requested = list(conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-        'WHERE target_fingerprint=? AND enabled=TRUE', (fingerprint,)).fetchall())
+        'WHERE target_fingerprint=? AND enabled = 1', (fingerprint,)).fetchall())
     if requested != [{'subject': item['subject'], 'skill_id': item['skill_id'], 'variant_ordinal': 1}]:
         raise ValueError('playful billed replay requires one unchanged enabled supply slot')
     all_calls = list(conn.execute('SELECT id FROM learning_course_provider_dispatches WHERE build_item_id=? '
@@ -301,7 +301,7 @@ def recover_billed_single_content_reply(*, adapter, identity, expected_history_s
                 or any(row['status']!='pending' for row in rows if row['id']!=item['id'])):
             raise ValueError('billed reply recovery authority changed')
         requested = conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-            'WHERE target_fingerprint=? AND enabled=TRUE',(identity['targetFingerprint'],)).fetchall()
+            'WHERE target_fingerprint=? AND enabled = 1',(identity['targetFingerprint'],)).fetchall()
         if list(requested)!=[{'subject':item['subject'],'skill_id':item['skill_id'],'variant_ordinal':1}]:
             raise ValueError('billed reply recovery requires unchanged single-slot scope')
         histories = repository._load_content_attempt_histories_locked(conn,rows=[item])[item['id']]
@@ -397,7 +397,7 @@ def recover_single_runtime_preflight(*, adapter, identity, expected_history_sha,
                 or any(row['status']!='pending' for row in rows if row['id']!=item['id'])):
             raise ValueError('Runtime preflight recovery requires unchanged passed single-course content')
         requested=conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-            'WHERE target_fingerprint=? AND enabled=TRUE',(identity['targetFingerprint'],)).fetchall()
+            'WHERE target_fingerprint=? AND enabled = 1',(identity['targetFingerprint'],)).fetchall()
         if list(requested)!=[{'subject':item['subject'],'skill_id':item['skill_id'],'variant_ordinal':item['variant_ordinal']}]:
             raise ValueError('Runtime preflight recovery scope changed')
         proof=catalog.audit_locked_content_proofs(conn,build_id=build['id'])
@@ -475,7 +475,7 @@ def recover_single_content_item(*, adapter, identity, expected_history_sha, now,
                 or any(row['status'] != 'pending' for row in rows if row['id'] != item['id'])):
             raise ValueError('single content recovery authority changed')
         requested = conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
-            'WHERE target_fingerprint=? AND enabled=TRUE', (identity['targetFingerprint'],)).fetchall()
+            'WHERE target_fingerprint=? AND enabled = 1', (identity['targetFingerprint'],)).fetchall()
         if list(requested) != [{'subject': item['subject'], 'skill_id': item['skill_id'], 'variant_ordinal': 1}]:
             raise ValueError('recovery requires the unchanged exact single-slot supply request')
         histories = repository._load_content_attempt_histories_locked(conn, rows=[item])[item['id']]

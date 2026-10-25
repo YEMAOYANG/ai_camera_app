@@ -126,7 +126,7 @@ def run(apply):
     conn = database.connect()
     try:
         if not apply:
-            conn.execute("START TRANSACTION READ ONLY")
+            conn.execute("SET TRANSACTION READ ONLY")
         checked = conn if apply else ReadonlyConnection(conn)
         owner = preparations.get_plan(checked, plan_id=state["owner"]["id"], for_update=True)
         require(dict(owner) == saved["owner"], "owner changed before recovery lock")

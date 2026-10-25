@@ -174,11 +174,11 @@ class PaidHomeworkValidationTest(unittest.TestCase):
     def test_original_page_quality_and_local_guard(self):
         image=Image.open(io.BytesIO(smoke.original_page()))
         self.assertIsNone(quality_error(image,POLICY))
-        config={'DATABASE_URL':'mysql://user:private@127.0.0.1/ai_camera_app_dev','APP_ENV':'development',
+        config={'DATABASE_URL':'postgresql://user:private@127.0.0.1:5433/mira','APP_ENV':'development',
                 'HOMEWORK_WORKER_ENABLED':False,'HOMEWORK_ANALYSIS_ENABLED':True,'HOMEWORK_AUDIO_ENABLED':True,
                 'HOMEWORK_TTS_RUNTIME_URL':'http://127.0.0.1:3102','INTERNAL_API_TOKEN':'private'}
         smoke.validate_config(config)
-        for key,value in [('HOMEWORK_WORKER_ENABLED',True),('HOMEWORK_AUDIO_ENABLED',False),('DATABASE_URL','mysql://user:private@remote/ai_camera_app_dev')]:
+        for key,value in [('HOMEWORK_WORKER_ENABLED',True),('HOMEWORK_AUDIO_ENABLED',False),('DATABASE_URL','postgresql://user:private@remote/mira'),('DATABASE_URL','mysql://user:private@127.0.0.1/mira')]:
             with self.assertRaises(ValueError):smoke.validate_config({**config,key:value})
 
     def test_relative_prompt_root_is_script_local_and_existing_absolute_is_kept(self):

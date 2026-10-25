@@ -516,8 +516,8 @@ def _scoped_heads(conn, identity, scope):
     keys = sorted(paths)
     for offset in range(0, len(keys), BATCH):
         batch = keys[offset:offset + BATCH]
-        rows = conn.execute('SELECT f.source_path AS sourcePath,f.content_sha256 AS sha256,'
-            'f.byte_size AS byteSize,f.source_path_sha256 AS pathSha256,h.scope_key AS scopeKey '
+        rows = conn.execute('SELECT f.source_path AS "sourcePath",f.content_sha256 AS sha256,'
+            'f.byte_size AS "byteSize",f.source_path_sha256 AS "pathSha256",h.scope_key AS "scopeKey" '
             'FROM course_storage_heads h LEFT JOIN course_storage_files f '
             'ON f.storage_id=h.storage_id AND f.source_path_sha256=h.source_path_sha256 '
             'AND f.content_sha256=h.content_sha256 WHERE h.storage_id=? AND h.source_path_sha256 IN ('
@@ -553,8 +553,8 @@ def current_heads(database, config, *, preview_key=None, content_key=None):
     with read_only_connection(database) as conn:
         if scope is not None:
             return _scoped_heads(conn, identity, scope)
-        rows = conn.execute('SELECT f.source_path AS sourcePath,f.content_sha256 AS sha256,'
-            'f.byte_size AS byteSize,f.source_path_sha256 AS pathSha256 FROM course_storage_heads h '
+        rows = conn.execute('SELECT f.source_path AS "sourcePath",f.content_sha256 AS sha256,'
+            'f.byte_size AS "byteSize",f.source_path_sha256 AS "pathSha256" FROM course_storage_heads h '
             'LEFT JOIN course_storage_files f ON f.storage_id=h.storage_id AND f.source_path_sha256=h.source_path_sha256 '
             'AND f.content_sha256=h.content_sha256 WHERE h.storage_id=? ORDER BY f.source_path LIMIT ' + str(MAX_ENTRIES + 1),
             (identity,)).fetchall()

@@ -46,7 +46,7 @@ class CourseStorageShadowWriteVerificationTest(unittest.TestCase):
             "mimeType": "application/json", "locator": {"kind": "object", "objectKey": "原有/完整原稿.json", "etag": '"original"'}}], self.storage_id)
         self.db.raw.execute("INSERT INTO learning_textbook_course_previews VALUES(?,?,?,?)", (self.key, self.cid, "review_required", self.sha))
         self.db.raw.commit()
-        self.app_config = SimpleNamespace(DATABASE_URL="mysql+pymysql://unused.invalid/test", INTERNAL_API_TOKEN="fixture-internal-token-that-is-private")
+        self.app_config = SimpleNamespace(DATABASE_URL="postgresql://unused.invalid/test", INTERNAL_API_TOKEN="fixture-internal-token-that-is-private")
         p = patch.object(tool.CourseStorageConfig, "from_env", return_value=self.config)
         p.start(); self.addCleanup(p.stop)
 

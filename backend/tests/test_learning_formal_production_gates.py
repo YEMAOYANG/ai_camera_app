@@ -119,8 +119,8 @@ class LearningFormalProductionGatesTest(unittest.TestCase):
                                 "TESTING": True,
                                 "APP_ENV": "test",
                                 "DATABASE_URL": (
-                                    "mysql+pymysql://test:test@127.0.0.1:3306/"
-                                    "ai_camera_app_test"
+                                    "postgresql://test:test@127.0.0.1:5433/"
+                                    "mira_test"
                                 ),
                             }
                         ),
