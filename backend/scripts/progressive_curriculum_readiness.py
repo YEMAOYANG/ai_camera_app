@@ -321,8 +321,9 @@ def run_readiness(database, args):
     connection = None
     try:
         connection = database.connect()
-        connection.execute("SET SESSION MAX_EXECUTION_TIME = 5000")
         connection.execute("SET TRANSACTION READ ONLY")
+        # Each statement may run at most 5 seconds within this transaction.
+        connection.execute("SET LOCAL statement_timeout = 5000")
         conn = ReadOnlyConnection(connection, time.monotonic() + args.timeout_seconds)
         if _schema_check(conn, report, child_scope=bool(args.child_id)):
             _inventory(conn, database, report, args)
