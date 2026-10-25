@@ -79,7 +79,7 @@ python3 app.py
 
 全部数据在一个 PostgreSQL 数据库 `mira` 里：业务表在 `app` schema，课堂表在 `public` schema。连接以 `backend/.env` 的 `APP_DATABASE_URL`（业务）和 `MIRA_OPENMAIC_AGENT_DATABASE_URL`（课堂）为准，两者指向同一个库。数据不存放在 `backend/data/`。
 
-本机 PostgreSQL 自 2026-10-25 起运行在 Docker Desktop：`docker compose -f deploy/compose.local-db.yml --env-file deploy/env/local-db.env up -d`（127.0.0.1:5433，库 `mira`）；`mira_test` 供测试清空重建。程序和数据库浏览工具共用登录账号 `mira`，密码在 git 忽略的 `deploy/env/local-db.env`。数据保存在 Docker 卷 `mira-pgdata`：不要执行 `docker compose down -v`、`docker volume prune`，也不要在 Docker Desktop 中清除数据。本地服务启动前 Docker Desktop 必须已运行。原来的 MySQL 库 `ai_camera_app_dev` 和 Homebrew PostgreSQL 库 `openmaic_mira` 已停用但保留未删，仅供回退核对。
+本机 PostgreSQL 自 2026-10-25 起运行在 Docker Desktop：`docker compose -f deploy/compose.local-db.yml --env-file deploy/env/local-db.env up -d`（127.0.0.1:5433，库 `mira`）；`mira_test` 供测试清空重建。程序和数据库浏览工具共用登录账号 `mira`，密码在 git 忽略的 `deploy/env/local-db.env`。数据保存在 Docker 卷 `mira-pgdata`：不要执行 `docker compose down -v`、`docker volume prune`，也不要在 Docker Desktop 中清除数据。本地服务启动前 Docker Desktop 必须已运行。原来的 MySQL 业务库和 Homebrew PostgreSQL 里的旧课堂库已于 2026-10-26 删除，数据都在 Docker 库 `mira` 里；Docker 之外另有一份 `pg_dump` 备份在 `.local_backups/mira-postgres-*/`（git 忽略，用 `pg_restore` 恢复）。
 
 | 表组 | 负责什么 |
 | --- | --- |
