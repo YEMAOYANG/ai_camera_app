@@ -7,6 +7,44 @@ from content.textbook_catalog import canonical, digest
 from core.errors import ApiError
 
 
+# The exact top-level review evidence is kept because its frozen digest includes
+# versioned review fields beyond the common contract. The projection function in
+# migrations/104 bounds it at 1 MiB, so an unrelated top-level payload can never
+# recreate the transfer problem, and returns NULL for a damaged record so that
+# one damaged release cannot fail the complete catalogue query.
+_POSTGRES_DIRECTORY_PROJECTION = """d.review_evidence_json AS directory_review_evidence_json,
+              d.release_summary_json AS directory_release_summary_json,"""
+
+# The isolated SQLite contract fixture computes the same two values inline.
+_SQLITE_DIRECTORY_PROJECTION = """CASE WHEN JSON_VALID(b.review_json)
+                  AND LENGTH(CAST(JSON_REMOVE(b.review_json, '$.release') AS BLOB)) <= 1048576
+                THEN JSON_REMOVE(b.review_json, '$.release') ELSE NULL END AS directory_review_evidence_json,
+              CASE WHEN JSON_VALID(b.review_json) THEN JSON_OBJECT(
+                  'schemaVersion', JSON_EXTRACT(b.review_json, '$.release.schemaVersion'),
+                  'sha256', JSON_EXTRACT(b.review_json, '$.release.sha256'),
+                  'contentKey', JSON_EXTRACT(b.review_json, '$.release.contentKey'),
+                  'classroomId', JSON_EXTRACT(b.review_json, '$.release.classroomId'),
+                  'classroomSha256', JSON_EXTRACT(b.review_json, '$.release.classroomSha256'),
+                  'assessmentMode', JSON_EXTRACT(b.review_json, '$.release.assessmentMode'),
+                  'activityScope', JSON_EXTRACT(b.review_json, '$.release.activityScope'),
+                  'activityScopeType', json_type(b.review_json, '$.release.activityScope'),
+                  'audioAudit', JSON_OBJECT(
+                    'sha256', JSON_EXTRACT(b.review_json, '$.release.audioAudit.sha256'),
+                    'passed', JSON_EXTRACT(b.review_json, '$.release.audioAudit.passed'),
+                    'passedType', json_type(b.review_json, '$.release.audioAudit.passed'),
+                    'segments', JSON_EXTRACT(b.review_json, '$.release.audioAudit.segments'),
+                    'segmentsType', json_type(b.review_json, '$.release.audioAudit.segments'),
+                    'minSimilarityBps', JSON_EXTRACT(b.review_json, '$.release.audioAudit.minSimilarityBps')
+                  ),
+                  'mediaCount', json_array_length(JSON_EXTRACT(b.review_json, '$.release.media')),
+                  'mediaType', json_type(b.review_json, '$.release.media'),
+                  'sceneCount', json_array_length(JSON_EXTRACT(b.review_json, '$.release.classroom.scenes')),
+                  'scenesType', json_type(b.review_json, '$.release.classroom.scenes'),
+                  'classroomObjectId', JSON_EXTRACT(b.review_json, '$.release.classroom.id'),
+                  'stageId', JSON_EXTRACT(b.review_json, '$.release.classroom.stage.id')
+                ) ELSE NULL END AS directory_release_summary_json,"""
+
+
 class TextbookRepository:
     def __init__(self, database):
         self.database = database
@@ -163,62 +201,33 @@ class TextbookRepository:
         the directory can still check identities and publication authority.
         The strict launch path continues to use ``get_build`` and
         ``validate_release`` over the complete row.
+
+        On PostgreSQL the evidence and the release summary come from
+        ``learning_textbook_build_directory`` (migration 104), which a trigger
+        refreshes whenever ``review_json`` is written. Extracting them from
+        ``review_json`` here decompresses each stored document once per
+        extracted field, and a few releases carry 100-200 MB of audio audit:
+        one catalogue request exhausted the database server's memory.
         """
-        # PostgreSQL runs these MySQL-style JSON calls through the
-        # migrations/103 helpers; the other dialect is the SQLite fixture.
         server = getattr(conn, "dialect", None) == "postgresql"
-        json_object = "jsonb_build_object" if server else "JSON_OBJECT"
-        array_length = "JSON_LENGTH" if server else "json_array_length"
-        def json_type(path):
-            return (f"JSON_TYPE(JSON_EXTRACT(b.review_json, '{path}'))" if server
-                    else f"json_type(b.review_json, '{path}')")
-        review_evidence = "JSON_REMOVE(b.review_json, '$.release')"
-        review_evidence_bytes = (f"OCTET_LENGTH(CAST({review_evidence} AS TEXT))" if server
-                                 else f"LENGTH(CAST({review_evidence} AS BLOB))")
         course_title = "c.title"
-        if not server:
+        if server:
+            projection = _POSTGRES_DIRECTORY_PROJECTION
+            projection_join = "LEFT JOIN learning_textbook_build_directory d ON d.content_key=b.content_key"
+        else:
             # The isolated SQLite contract fixture predates the production title
             # column. Keep the production projection fixed while allowing empty
             # test catalogues to exercise the same read path.
             columns = conn.execute("PRAGMA table_info(learning_courses)").fetchall()
             if not any(row.get("name") == "title" for row in columns):
                 course_title = "NULL"
-        # Keep the exact top-level evidence because its frozen digest includes
-        # versioned review fields beyond the common contract. Bound it at 1 MiB
-        # so an unrelated top-level payload can never recreate the transfer
-        # problem. CASE also isolates a malformed SQLite fixture row so one
-        # damaged release cannot fail the complete catalogue query.
+            projection = _SQLITE_DIRECTORY_PROJECTION
+            projection_join = ""
         rows = conn.execute(f"""
             SELECT b.content_key,b.edition_id,b.revision_id,b.node_id,b.part_index,
               b.teaching_revision,b.input_json,b.status,b.course_id,b.course_version,
               b.course_content_sha256,b.created_at,b.updated_at,
-              CASE WHEN JSON_VALID(b.review_json)
-                  AND {review_evidence_bytes} <= 1048576
-                THEN {review_evidence} ELSE NULL END AS directory_review_evidence_json,
-              CASE WHEN JSON_VALID(b.review_json) THEN {json_object}(
-                  'schemaVersion', JSON_EXTRACT(b.review_json, '$.release.schemaVersion'),
-                  'sha256', JSON_EXTRACT(b.review_json, '$.release.sha256'),
-                  'contentKey', JSON_EXTRACT(b.review_json, '$.release.contentKey'),
-                  'classroomId', JSON_EXTRACT(b.review_json, '$.release.classroomId'),
-                  'classroomSha256', JSON_EXTRACT(b.review_json, '$.release.classroomSha256'),
-                  'assessmentMode', JSON_EXTRACT(b.review_json, '$.release.assessmentMode'),
-                  'activityScope', JSON_EXTRACT(b.review_json, '$.release.activityScope'),
-                  'activityScopeType', {json_type('$.release.activityScope')},
-                  'audioAudit', {json_object}(
-                    'sha256', JSON_EXTRACT(b.review_json, '$.release.audioAudit.sha256'),
-                    'passed', JSON_EXTRACT(b.review_json, '$.release.audioAudit.passed'),
-                    'passedType', {json_type('$.release.audioAudit.passed')},
-                    'segments', JSON_EXTRACT(b.review_json, '$.release.audioAudit.segments'),
-                    'segmentsType', {json_type('$.release.audioAudit.segments')},
-                    'minSimilarityBps', JSON_EXTRACT(b.review_json, '$.release.audioAudit.minSimilarityBps')
-                  ),
-                  'mediaCount', {array_length}(JSON_EXTRACT(b.review_json, '$.release.media')),
-                  'mediaType', {json_type('$.release.media')},
-                  'sceneCount', {array_length}(JSON_EXTRACT(b.review_json, '$.release.classroom.scenes')),
-                  'scenesType', {json_type('$.release.classroom.scenes')},
-                  'classroomObjectId', JSON_EXTRACT(b.review_json, '$.release.classroom.id'),
-                  'stageId', JSON_EXTRACT(b.review_json, '$.release.classroom.stage.id')
-                ) ELSE NULL END AS directory_release_summary_json,
+              {projection}
               c.id AS directory_course_id,c.version AS directory_course_version,
               {course_title} AS directory_course_title,c.grade_code AS directory_course_grade_code,
               c.subject AS directory_course_subject,c.content_json AS directory_course_content_json,
@@ -227,6 +236,7 @@ class TextbookRepository:
               c.retired_at AS directory_course_retired_at
             FROM learning_textbook_course_builds b
             JOIN learning_courses c ON c.id=b.course_id AND c.version=b.course_version
+            {projection_join}
             WHERE b.edition_id=? AND b.revision_id=? AND b.status='published'
             """, (edition_id, revision_id)).fetchall()
         return sorted(rows, key=lambda row: (row['node_id'], row['part_index'], -int(row['created_at']), row['content_key']))
