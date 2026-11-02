@@ -8,7 +8,7 @@ from courseware.tools.glyph_picture import png_name, render_picture
 
 
 _EMOJI = re.compile('[\U0001f000-\U0001faff\u2600-\u27bf\ufe0f\u200d\u20e3]')
-_PREFIX = re.compile(r'^\s*(?:[①-⑳]+|\d+[.、．)）]|【[^】]*】|\[[^\]]*\])\s*')
+_PREFIX = re.compile(r'^\s*(?:[①-⑳]+|\d+[.、．)）](?!\s*\d)|【[^】]*】|\[[^\]]*\])\s*')
 _READING = re.compile(r'(?:自己|自行|独自|先|请|来).{0,8}(?:读题|读一读|阅读题|读一下题|读一遍题)|(?:读题|阅读题).{0,8}(?:自己|自行|独自)|read\s+(?:it|the question)\s+yourself', re.IGNORECASE)
 
 
