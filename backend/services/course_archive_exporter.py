@@ -1330,6 +1330,32 @@ class CourseArchiveExporter:
         _require(content_key is None, "published_content_key_not_found")
         return self._formal_snapshot(conn, course_id, course_version)
 
+    @staticmethod
+    def _validate_light_release(frozen):
+        _require("previewKey" not in frozen, "light_release_preview_conflict")
+        light = frozen.get("coursewareLight")
+        _require(isinstance(light, dict) and set(light) == {
+            "schemaVersion", "source", "gates", "confirmation", "evidence"}
+            and light.get("schemaVersion") == "mira.courseware.light-release.v1",
+            "light_release_schema_invalid")
+        source = light.get("source")
+        _require(isinstance(source, dict) and set(source) == {"stageId", "bodySha256"}
+            and isinstance(source.get("stageId"), str) and _ID.fullmatch(source["stageId"])
+            and isinstance(source.get("bodySha256"), str)
+            and re.fullmatch(r"[a-f0-9]{64}", source["bodySha256"]), "light_release_source_invalid")
+        _require(isinstance(light.get("gates"), dict), "light_release_gates_invalid")
+        confirmation = light.get("confirmation")
+        _require(isinstance(confirmation, dict) and set(confirmation) == {
+            "userQuote", "confirmedAt", "confirmedBy"}
+            and isinstance(confirmation.get("userQuote"), str)
+            and isinstance(confirmation.get("confirmedAt"), str)
+            and confirmation.get("confirmedBy") == "owner", "light_release_confirmation_invalid")
+        evidence = light.get("evidence")
+        _require(isinstance(evidence, dict) and set(evidence) == {
+            "notesSha256", "briefSha256", "receiptSha256", "verificationSha256"}
+            and all(isinstance(value, str) and re.fullmatch(r"[a-f0-9]{64}", value)
+                    for value in evidence.values()), "light_release_evidence_invalid")
+
     def _textbook_snapshot(self, conn, key):
         build, course, release, manifest = releases._validated_release(conn, key)
         # A review whose audio evidence was split out (migration 105) is packed whole, byte
@@ -1348,7 +1374,9 @@ class CourseArchiveExporter:
             classroom=release["classroom"], documents=documents,
             media=releases.delivery_media(release))
         preview_key = frozen.get("previewKey")
-        if preview_key:
+        if "coursewareLight" in frozen:
+            self._validate_light_release(frozen)
+        elif preview_key:
             preview = conn.execute("SELECT * FROM learning_textbook_course_previews WHERE preview_key=?",
                                    (preview_key,)).fetchone()
             if not preview:
