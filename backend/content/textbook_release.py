@@ -4,6 +4,7 @@ import hashlib
 import re
 
 from content.textbook_catalog import canonical, digest, lesson_by_id
+from content.textbook_review_evidence import restore_split_review
 from core.errors import ApiError
 
 INPUT_SCHEMA = 'mira.textbook.saved-classroom-input.v1'
@@ -98,6 +99,9 @@ def validate_release(build, manifest, course=None):
         return validate_activity_release(build, manifest, course)
     if not isinstance(frozen, dict) or frozen.get('schemaVersion') != INPUT_SCHEMA:
         return None
+    # A review whose bulky audio evidence was split out (migration 105) is put
+    # back exactly before any digest is checked; ordinary reviews pass through.
+    review = restore_split_review(review)
     release = (review or {}).get('release')
     if not isinstance(release, dict) or release.get('schemaVersion') != RELEASE_SCHEMA:
         fail()

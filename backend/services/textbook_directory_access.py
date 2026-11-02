@@ -13,6 +13,7 @@ from content.textbook_batch_release import (
     validate_input as validate_activity_input,
 )
 from content.textbook_catalog import canonical, digest, lesson_by_id
+from content.textbook_review_evidence import restore_split_review
 from content.textbook_release import (
     INPUT_SCHEMA as CLASSROOM_INPUT_SCHEMA,
     KEY,
@@ -77,9 +78,11 @@ def _cache_entry(fingerprint):
 
 def _release_from_entry(repo, build, entry):
     try:
-        review = repo.parse(build.get('review_json')) or {}
+        # A hit must return what the full validation returned, so a split
+        # review gets its evidence back here too; if that fails, validate again.
+        review = restore_split_review(repo.parse(build.get('review_json')) or {})
         release = review.get('release')
-    except (ValueError, TypeError, AttributeError):
+    except (ValueError, TypeError, AttributeError, ApiError):
         return None
     if (not isinstance(release, dict)
             or release.get('sha256') != entry['releaseSha256']

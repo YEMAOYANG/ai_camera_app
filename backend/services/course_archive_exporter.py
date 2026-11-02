@@ -20,6 +20,7 @@ import unicodedata
 import uuid
 import zipfile
 
+from content.textbook_review_evidence import restore_review_text
 from scripts import course_storage_releases as releases
 from services.course_media_object_store import CourseMediaObjectStore
 from services.course_file_store import (CourseFileStore, course_bytes, course_exists, course_is_dir, course_glob, course_stat)
@@ -1321,6 +1322,10 @@ class CourseArchiveExporter:
 
     def _textbook_snapshot(self, conn, key):
         build, course, release, manifest = releases._validated_release(conn, key)
+        # A review whose audio evidence was split out (migration 105) is packed whole, byte
+        # for byte as it was stored before the split. A package then never depends on the
+        # evidence table, and re-exporting such a course leaves every file digest unchanged.
+        build = {**build, "review_json": restore_review_text(build["review_json"])}
         frozen = releases.parsed(build["input_json"])
         documents = {"数据库/课程记录.json": dict(course), "数据库/教材构建记录.json": dict(build),
                      "教材目录.json": manifest, "冻结发布请求.json": build["input_json"],

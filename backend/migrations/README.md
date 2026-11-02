@@ -26,5 +26,18 @@ copy can load every table before references are validated.
 `JSON_EXTRACT`, `JSON_UNQUOTE`, `JSON_CONTAINS` (MySQL's containment rules,
 not PostgreSQL's `@>`), `JSON_LENGTH`, `JSON_TYPE`, `JSON_VALID`,
 `JSON_REMOVE`, `mysql_unsigned` (a lenient `CAST(... AS UNSIGNED)`) and the
-NULL-propagating `mysql_least` / `mysql_greatest`. Add new migrations from
-`104_` onwards.
+NULL-propagating `mysql_least` / `mysql_greatest`.
+
+`105` adds `learning_textbook_review_evidence`, a content-addressed store (the
+key is the SHA-256 of the bytes, enforced by a CHECK constraint; rows cannot be
+updated). The review records that reuse ASR provenance (audio-audit v3 and v4)
+embedded every recording three to eleven times inside
+`release.audioAudit.literalAudit`: 100-200 MB each, about 30-45 MB of it
+distinct audio. `scripts/split_textbook_review_evidence.py` moves those bytes
+here and leaves references in `review_json`; `content/textbook_review_evidence.py`
+puts them back exactly when `validate_release` runs, so no sealed digest, content
+key or course identity changes. Use the tool's `plan`, `backup`, `apply`,
+`verify` and `restore` steps in that order, never move `updated_at` (the archive
+worker treats a changed value as a new course version), and deploy the code that
+understands split records before applying: older code rejects them. Add new
+migrations from `106_` onwards.
