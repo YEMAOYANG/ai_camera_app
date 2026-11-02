@@ -35,6 +35,18 @@ GENERATION_FLAGS = ("LEARNING_DAILY_PREPARATION_ENABLED", "LEARNING_DYNAMIC_GENE
                     "LEARNING_CURRICULUM_PREPARATION_CONTENT_GENERATION_ENABLED",
                     "OPENMAIC_FULL_RUNTIME_GENERATION_ENABLED", "OPENMAIC_FULL_RUNTIME_AUTORUN_ENABLED",
                     "LEARNING_FORMAL_AUTO_PUBLICATION_ENABLED")
+PRODUCTION_SMS_REQUIRED = (
+    "APP_SMS_TENCENT_SECRET_ID",
+    "APP_SMS_TENCENT_SECRET_KEY",
+    "APP_SMS_TENCENT_SDK_APP_ID",
+    "APP_SMS_TENCENT_SIGN_NAME",
+    "APP_SMS_TEMPLATE_ID",
+    "APP_SMS_TENCENT_REGION",
+    "APP_SMS_HOURLY_SEND_LIMIT",
+    "APP_SMS_SOURCE_WINDOW_SECONDS",
+    "APP_SMS_SOURCE_SEND_LIMIT",
+    "APP_SMS_CODE_PEPPER",
+)
 
 
 class DeployError(Exception):
@@ -125,10 +137,41 @@ def validate_runtime(values: dict, *, starting: bool = False):
         if not (Path(values["MIRA_PARENT_WEB_DIST"]) / "index.html").is_file():
             raise DeployError("Build and upload the complete parent Web output before start")
         if values["MIRA_DEPLOY_MODE"] == "production":
-            # Current provider registry returns UnavailableSmsProvider for every
-            # non-development provider. Do not silently expose development OTPs.
-            raise DeployError("Production SMS providers are not implemented in this revision. Complete SMS integration, or use IP-restricted preview mode for the boss demo")
+            validate_production_sms(backend)
     return backend, runtime
+
+
+def validate_production_sms(backend: dict) -> None:
+    if backend.get("APP_SMS_PROVIDER", "").strip().lower() != "tencent":
+        raise DeployError("Production SMS requires APP_SMS_PROVIDER=tencent")
+    missing = [key for key in PRODUCTION_SMS_REQUIRED if not backend.get(key, "").strip()]
+    if missing:
+        raise DeployError("Missing production SMS configuration keys: " + ", ".join(missing))
+    if not backend["APP_SMS_TENCENT_SDK_APP_ID"].isdigit():
+        raise DeployError("APP_SMS_TENCENT_SDK_APP_ID must be numeric")
+    if not backend["APP_SMS_TEMPLATE_ID"].isdigit():
+        raise DeployError("APP_SMS_TEMPLATE_ID must be a numeric Tencent template ID")
+    if not 2 <= len(backend["APP_SMS_TENCENT_SIGN_NAME"]) <= 12:
+        raise DeployError("APP_SMS_TENCENT_SIGN_NAME must contain 2 to 12 characters")
+    try:
+        hourly_limit = int(backend["APP_SMS_HOURLY_SEND_LIMIT"])
+    except ValueError:
+        raise DeployError("APP_SMS_HOURLY_SEND_LIMIT must be numeric") from None
+    if not 1 <= hourly_limit <= 100000:
+        raise DeployError("APP_SMS_HOURLY_SEND_LIMIT must be between 1 and 100000")
+    try:
+        source_window = int(backend["APP_SMS_SOURCE_WINDOW_SECONDS"])
+        source_limit = int(backend["APP_SMS_SOURCE_SEND_LIMIT"])
+    except ValueError:
+        raise DeployError("Production SMS source limits must be numeric") from None
+    if not 60 <= source_window <= 3600:
+        raise DeployError("APP_SMS_SOURCE_WINDOW_SECONDS must be between 60 and 3600")
+    if not 1 <= source_limit <= hourly_limit:
+        raise DeployError(
+            "APP_SMS_SOURCE_SEND_LIMIT must be between 1 and APP_SMS_HOURLY_SEND_LIMIT"
+        )
+    if len(backend["APP_SMS_CODE_PEPPER"]) < 32:
+        raise DeployError("APP_SMS_CODE_PEPPER must contain at least 32 characters")
 
 
 def command_env(values: dict) -> dict:

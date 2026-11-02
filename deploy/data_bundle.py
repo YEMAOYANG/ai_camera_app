@@ -32,7 +32,9 @@ DATABASE_SCHEMAS = ["app", "public"]
 POLICY_DESTINATION = "deployment-policies/learning-budget-policy.json"
 SECRET_KEYS = (
     "APP_STUDENT_AUTH_PEPPER", "APP_DEVICE_SECRET_KEY", "INTERNAL_API_TOKEN",
-    "APP_INTERNAL_API_TOKEN", "MIRA_INTERNAL_API_TOKEN", "MIRA_OPENMAIC_PERSISTENCE_DEV_TOKEN",
+    "APP_INTERNAL_API_TOKEN", "APP_SMS_TENCENT_SECRET_ID", "APP_SMS_TENCENT_SECRET_KEY",
+    "APP_SMS_CODE_PEPPER",
+    "MIRA_INTERNAL_API_TOKEN", "MIRA_OPENMAIC_PERSISTENCE_DEV_TOKEN",
 )
 
 
@@ -264,7 +266,7 @@ def export_local(args) -> dict:
                 "secretsToMigrateSeparately": secret_inventory(source),
                 "notes": ["Preserve IDs, publication states, ambiguous jobs and audit evidence exactly.",
                           "Database dumps and data archives contain private information; restrict transfer and storage.",
-                          "No environment files or Provider keys are exported; preserve student pepper and device key separately.",
+                          "No environment files or Provider keys are exported; preserve identity-bound secrets and securely reconfigure or rotate SMS credentials separately.",
                           "If policy was overridden in a process, pass --budget-policy for that exact file."]}
     private_write(output / "manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
     try:

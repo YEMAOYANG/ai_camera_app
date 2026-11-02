@@ -37,7 +37,10 @@ class DataBundleTests(unittest.TestCase):
         (self.backend / "content/learning_budget_policy.json").write_bytes(self.policy_bytes)
         (self.backend / ".env").write_text(
             "APP_DATABASE_URL=postgresql://mira:PG_PRIVATE@localhost:5432/mira\n"
-            "APP_STUDENT_AUTH_PEPPER=PEPPER_PRIVATE\nINTERNAL_API_TOKEN=TOKEN_PRIVATE\n")
+            "APP_STUDENT_AUTH_PEPPER=PEPPER_PRIVATE\nINTERNAL_API_TOKEN=TOKEN_PRIVATE\n"
+            "APP_SMS_TENCENT_SECRET_ID=SMS_ID_PRIVATE\n"
+            "APP_SMS_TENCENT_SECRET_KEY=SMS_KEY_PRIVATE\n"
+            "APP_SMS_CODE_PEPPER=SMS_PEPPER_PRIVATE_12345678901234567890\n")
         (self.runtime / ".env").write_text("MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://mira:PG_PRIVATE@127.0.0.1:5432/mira\n")
         (self.backend_data / ".device-secret.key").write_bytes(b"DEVICE_PRIVATE")
         (self.backend_data / "learning-media").mkdir()
@@ -50,7 +53,7 @@ class DataBundleTests(unittest.TestCase):
 
     def fake_process(self, command, *, stdout, stderr, stdin, env, check):
         self.assertEqual(stdin, subprocess.DEVNULL)
-        for secret in ("PG_PRIVATE", "PEPPER_PRIVATE", "DEVICE_PRIVATE"):
+        for secret in ("PG_PRIVATE", "PEPPER_PRIVATE", "DEVICE_PRIVATE", "SMS_ID_PRIVATE", "SMS_KEY_PRIVATE", "SMS_PEPPER_PRIVATE"):
             self.assertNotIn(secret, " ".join(command))
             self.assertNotIn(secret, str(env))
         if command[0] == "pg_dump":
@@ -91,8 +94,20 @@ class DataBundleTests(unittest.TestCase):
                     self.assertEqual(path.read_bytes(), (target / destination / path.relative_to(root)).read_bytes())
         self.assertEqual((target / "backend-data" / bundle.POLICY_DESTINATION).read_bytes(), self.policy_bytes)
         manifest_text = (self.output / "manifest.json").read_text()
-        for secret in ("PG_PRIVATE", "PEPPER_PRIVATE", "TOKEN_PRIVATE", "DEVICE_PRIVATE"):
+        for secret in ("PG_PRIVATE", "PEPPER_PRIVATE", "TOKEN_PRIVATE", "DEVICE_PRIVATE", "SMS_ID_PRIVATE", "SMS_KEY_PRIVATE", "SMS_PEPPER_PRIVATE"):
             self.assertNotIn(secret, manifest_text)
+        self.assertTrue(
+            manifest["secretsToMigrateSeparately"]["backend_env"]
+            ["APP_SMS_TENCENT_SECRET_ID"]["configured"]
+        )
+        self.assertTrue(
+            manifest["secretsToMigrateSeparately"]["backend_env"]
+            ["APP_SMS_TENCENT_SECRET_KEY"]["configured"]
+        )
+        self.assertTrue(
+            manifest["secretsToMigrateSeparately"]["backend_env"]
+            ["APP_SMS_CODE_PEPPER"]["configured"]
+        )
         self.assertEqual((self.output / "postgres.dump").stat().st_mode & 0o777, 0o600)
 
     def test_export_refuses_a_classroom_runtime_on_another_database(self):
@@ -223,7 +238,14 @@ class DataBundleTests(unittest.TestCase):
                 "MIRA_PERSISTENCE_TOKEN": "SERVER_PRIVATE_PERSISTENCE"}
 
     def fake_server_process(self, command, *, stdin, stdout, stderr, env, check):
-        for secret in ("SERVER_PRIVATE_PEPPER", "SERVER_PRIVATE_TOKEN", "SERVER_PRIVATE_PERSISTENCE"):
+        for secret in (
+            "SERVER_PRIVATE_PEPPER",
+            "SERVER_PRIVATE_TOKEN",
+            "SERVER_PRIVATE_PERSISTENCE",
+            "SMS_ID_PRIVATE",
+            "SMS_KEY_PRIVATE",
+            "SMS_PEPPER_PRIVATE",
+        ):
             self.assertNotIn(secret, " ".join(command))
         if "ps" in command:
             return subprocess.CompletedProcess(command, 0, stdout=b"postgres\n")
@@ -251,6 +273,9 @@ class DataBundleTests(unittest.TestCase):
         for secret in ("SERVER_PRIVATE_PEPPER", "SERVER_PRIVATE_TOKEN", "SERVER_PRIVATE_PERSISTENCE"):
             self.assertNotIn(secret, (self.output / "manifest.json").read_text())
         self.assertTrue(manifest["secretsToMigrateSeparately"]["backend_env"]["APP_STUDENT_AUTH_PEPPER"]["configured"])
+        self.assertTrue(manifest["secretsToMigrateSeparately"]["backend_env"]["APP_SMS_TENCENT_SECRET_ID"]["configured"])
+        self.assertTrue(manifest["secretsToMigrateSeparately"]["backend_env"]["APP_SMS_TENCENT_SECRET_KEY"]["configured"])
+        self.assertTrue(manifest["secretsToMigrateSeparately"]["backend_env"]["APP_SMS_CODE_PEPPER"]["configured"])
 
     def test_server_backup_refuses_running_writer_before_creating_output(self):
         config = self.server_fixture()

@@ -72,7 +72,7 @@ python3 deploy/server.py --env /etc/mira/compose.env check
 
 ### 选择正式模式或受限演示模式
 
-正式模式在 `compose.env` 中设置 `MIRA_DEPLOY_MODE=production`，使用 `compose.production.yml`，保留生产登录约束。当前真实短信 Provider 尚未实现完整接入；正式启动应明确阻断此情况，不能只把 Provider 名称改成阿里云或腾讯云就视为接通。
+正式模式在 `compose.env` 中设置 `MIRA_DEPLOY_MODE=production`，使用 `compose.production.yml`，保留生产登录约束。正式启动只接受已完整配置的腾讯云短信 Provider；`backend.env` 必须包含专用 CAM 凭据、短信应用 ID、已生效签名、已审核模板 ID、地域、独立验证码 pepper、每小时发送上限和来源 IP 窗口限流，缺少任一项都会在启动前阻断。生产 Compose 明确只信任前方一层 Caddy 的 `X-Forwarded-For`，来源 IP 仅以 HMAC 指纹写入限流表。凭据和 pepper 只放在权限为 600 的私有配置中，不提交 Git，也不复用主账号或作业批改密钥。
 
 自己和老板演示时，设置 `MIRA_DEPLOY_MODE=preview`，由工具叠加 `compose.preview.yml`。preview 使用开发短信适配器、关闭调试模式，并要求填写 `MIRA_ACCESS_CIDRS`。所有浏览器入口都受 Caddy IP 白名单限制；不能保留生产模板中的 `0.0.0.0/0` 或 `::/0`。
 
@@ -170,7 +170,7 @@ python3 deploy/data_bundle.py verify /tmp/mira-migration-20260916
 - `learning-budget-policy.json`。
 - `manifest.json`，记录文件校验和及数据库版本。
 
-数据包含账号、孩子、课程、媒体和审计信息，应通过受控通道传到服务器并限制文件访问。它不会导出 Provider 密钥或完整 `.env`。`APP_STUDENT_AUTH_PEPPER`、已有设备密钥及其他必要的原生密钥要按清单单独安全迁移；服务器 Compose 用 `MIRA_STUDENT_AUTH_PEPPER` 向后端注入该 pepper。若设备密钥来自 data 中的 `.device-secret.key`，该文件随数据归档迁移；若来自环境变量 `APP_DEVICE_SECRET_KEY`，需要单独保留原值。更换 pepper 或解密密钥会影响已有身份和设备数据。
+数据包含账号、孩子、课程、媒体和审计信息，应通过受控通道传到服务器并限制文件访问。它不会导出 Provider 密钥或完整 `.env`。`APP_STUDENT_AUTH_PEPPER`、已有设备密钥、`APP_SMS_TENCENT_SECRET_ID` / `APP_SMS_TENCENT_SECRET_KEY`、`APP_SMS_CODE_PEPPER` 及其他必要的原生密钥要按清单单独安全配置；清单只记录这些值是否存在及其 SHA-256 指纹，不记录原值。短信 CAM 凭据可以在恢复时安全轮换，不参与历史数据解密；更换验证码 pepper 只会使当时尚未过期的验证码失效。服务器 Compose 用 `MIRA_STUDENT_AUTH_PEPPER` 向后端注入该 pepper。若设备密钥来自 data 中的 `.device-secret.key`，该文件随数据归档迁移；若来自环境变量 `APP_DEVICE_SECRET_KEY`，需要单独保留原值。更换学生 pepper 或设备解密密钥会影响已有身份和设备数据。
 
 `init` 生成的是新密钥，不能自动匹配旧数据；`restore` 会核对必要密钥的指纹并拒绝不匹配。源环境若没有显式设置 `APP_STUDENT_AUTH_PEPPER`、使用本地默认 pepper，不得把默认值带进 production；应使用新私密值，并由家长重新设置学习 PIN、重新配对。不要将默认 pepper 写进生产配置以绕过检查。
 
@@ -259,7 +259,7 @@ python3 deploy/server.py --env /etc/mira/compose.env backup \
 ## 尚需现场验证的事项
 
 - 没有真实 Docker/服务器运行证据前，构建成功、数据库恢复、自动HTTPS和外网访问仍待验证。
-- 正式模式需要完成真实短信 Provider 接入；preview 必须持续保留访问白名单。
+- 正式模式需要用三大运营商真实号码完成腾讯短信发送、验证码登录和换绑手机号验收；preview 必须持续保留访问白名单。
 - 家长 Flutter Web 的移动端专用功能、实时消息和浏览器兼容性尚需验收。
 - 自动备课需单独确认模型配置、预算授权、队列状态和生成发布门槛，再决定是否开启。不能直接启用 worker 来验证部署。
 - 正式课件验收使用 Chromium sandbox；安装浏览器不代表容器 sandbox 已可用，应先完成不调用 Provider 的浏览器环境验证。

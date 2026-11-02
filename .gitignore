@@ -46,3 +46,7 @@ backend/backend-8000.pid
 /student-web/output/
 **/.pytest_cache/
 **/.ruff_cache/
+
+# Stray local files: an empty SQLite placeholder and a root-level vitest cache.
+/backend/data/app.db
+/node_modules/

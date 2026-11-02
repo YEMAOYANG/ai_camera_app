@@ -86,6 +86,30 @@ class ServerDeploymentTest(unittest.TestCase):
         with self.assertRaises(server.DeployError):
             server.check_secret_continuity({**self.values, "MIRA_STUDENT_AUTH_PEPPER": "different"}, {}, manifest)
 
+    def test_sms_credentials_are_inventoried_but_may_rotate_on_restore(self):
+        backend = {
+            "APP_SMS_TENCENT_SECRET_ID": "AKID-source",
+            "APP_SMS_TENCENT_SECRET_KEY": "source-key",
+        }
+        manifest = {
+            "secretsToMigrateSeparately": {
+                "backend_env": {
+                    key: {
+                        "configured": True,
+                        "sha256": hashlib.sha256(value.encode()).hexdigest(),
+                    }
+                    for key, value in backend.items()
+                },
+                "runtime_env": {},
+            }
+        }
+        server.check_secret_continuity(self.values, backend, manifest)
+        server.check_secret_continuity(
+            self.values,
+            {**backend, "APP_SMS_TENCENT_SECRET_KEY": "rotated"},
+            manifest,
+        )
+
     def test_generation_flags_cannot_accidentally_resume(self):
         server.validate_runtime(self.values)
         path = Path(self.values["MIRA_BACKEND_ENV_FILE"])
@@ -99,6 +123,32 @@ class ServerDeploymentTest(unittest.TestCase):
         (web / "index.html").write_text("demo")
         with self.assertRaisesRegex(server.DeployError, "SMS"):
             server.validate_runtime({**self.values, "MIRA_DEPLOY_MODE": "production"}, starting=True)
+
+        backend = Path(self.values["MIRA_BACKEND_ENV_FILE"])
+        backend.write_text(
+            backend.read_text()
+            + "\nAPP_SMS_PROVIDER=tencent\n"
+            + "APP_SMS_TENCENT_SECRET_ID=AKID-server-fixture\n"
+            + "APP_SMS_TENCENT_SECRET_KEY=private-server-fixture\n"
+            + "APP_SMS_TENCENT_SDK_APP_ID=1400006666\n"
+            + "APP_SMS_TENCENT_SIGN_NAME=米拉守护\n"
+            + "APP_SMS_TEMPLATE_ID=123456\n"
+            + "APP_SMS_TENCENT_REGION=ap-guangzhou\n"
+            + "APP_SMS_HOURLY_SEND_LIMIT=300\n"
+            + "APP_SMS_SOURCE_WINDOW_SECONDS=600\n"
+            + "APP_SMS_SOURCE_SEND_LIMIT=10\n"
+            + "APP_SMS_CODE_PEPPER=private-sms-code-pepper-value-1234567890\n"
+        )
+        loaded, _ = server.validate_runtime(
+            {**self.values, "MIRA_DEPLOY_MODE": "production"}, starting=True
+        )
+        self.assertEqual(loaded["APP_SMS_PROVIDER"], "tencent")
+
+        backend.write_text(backend.read_text().replace("APP_SMS_TEMPLATE_ID=123456", "APP_SMS_TEMPLATE_ID="))
+        with self.assertRaisesRegex(server.DeployError, "APP_SMS_TEMPLATE_ID"):
+            server.validate_runtime(
+                {**self.values, "MIRA_DEPLOY_MODE": "production"}, starting=True
+            )
 
     def test_prepare_failure_never_creates_success_marker(self):
         with patch.object(server, "ensure_stopped"), patch.object(server, "run", side_effect=server.DeployError("dump failed")), \

@@ -12,6 +12,8 @@ x-backend-environment: &backend-environment
   APP_DEBUG: "0"
   APP_HOST: 0.0.0.0
   APP_PORT: "8000"
+  # The public API has exactly one trusted reverse proxy: Caddy edge.
+  APP_TRUST_PROXY_HOPS: "1"
   MIRA_BACKEND_BIND: 0.0.0.0:8000
   # One database: the backend uses schema app, the classroom runtime public.
   APP_DATABASE_URL: postgresql://mira:${MIRA_DB_PASSWORD:?required}@postgres:5432/mira

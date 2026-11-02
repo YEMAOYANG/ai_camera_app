@@ -62,7 +62,10 @@ def export_server(config: dict, compose_prefix: list[str], command_env: dict, ou
         secrets = data_bundle.secret_inventory({
             "backend_env": {"APP_STUDENT_AUTH_PEPPER": config["MIRA_STUDENT_AUTH_PEPPER"],
                             "INTERNAL_API_TOKEN": config["MIRA_INTERNAL_API_TOKEN"],
-                            "APP_DEVICE_SECRET_KEY": backend_env.get("APP_DEVICE_SECRET_KEY", "")},
+                            "APP_DEVICE_SECRET_KEY": backend_env.get("APP_DEVICE_SECRET_KEY", ""),
+                            "APP_SMS_TENCENT_SECRET_ID": backend_env.get("APP_SMS_TENCENT_SECRET_ID", ""),
+                            "APP_SMS_TENCENT_SECRET_KEY": backend_env.get("APP_SMS_TENCENT_SECRET_KEY", ""),
+                            "APP_SMS_CODE_PEPPER": backend_env.get("APP_SMS_CODE_PEPPER", "")},
             "runtime_env": {"MIRA_INTERNAL_API_TOKEN": config["MIRA_INTERNAL_API_TOKEN"],
                             "MIRA_OPENMAIC_PERSISTENCE_DEV_TOKEN": config["MIRA_PERSISTENCE_TOKEN"]},
         })
