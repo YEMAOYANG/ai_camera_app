@@ -31,13 +31,13 @@
       "intro": ["第二站的小检查，听题，看图，点一点。"],
       "questions": [
         {
-          "id": "q3", "skill": "比大小", "question": "兔子5只，胡萝卜3根，哪个多？",
-          "answer": ["A"], "analysis": "兔子5只，胡萝卜3根，一一对应后兔子多2只。",
-          "visual": {"kind": "picture", "alt": "5只小兔和3根胡萝卜", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🐰"}, {"glyph": "🐰"}, {"glyph": "🐰"}, {"glyph": "🐰"}, {"glyph": "🐰"}]}, {"cells": [{"glyph": "🥕"}, {"glyph": "🥕"}, {"glyph": "🥕"}]}]}},
+          "id": "q3", "skill": "比大小", "question": "气球5个，皮球3个，哪个多？",
+          "answer": ["A"], "analysis": "气球5个，皮球3个，一一对应后气球多2个。",
+          "visual": {"kind": "picture", "alt": "5个气球和3个皮球", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🎈"}, {"glyph": "🎈"}, {"glyph": "🎈"}, {"glyph": "🎈"}, {"glyph": "🎈"}]}, {"cells": [{"glyph": "⚽"}, {"glyph": "⚽"}, {"glyph": "⚽"}]}]}},
           "options": {
-            "A": {"label": "兔子多", "visual": {"kind": "picture", "alt": "小兔", "picture": {"groups": [{"cells": [{"glyph": "🐰"}]}]}}},
+            "A": {"label": "气球多", "visual": {"kind": "picture", "alt": "气球", "picture": {"groups": [{"cells": [{"glyph": "🎈"}]}]}}},
             "B": {"label": "一样多", "visual": {"kind": "picture", "alt": "等号，表示一样多", "picture": {"groups": [{"cells": [{"glyph": "＝"}]}]}}},
-            "C": {"label": "胡萝卜多", "visual": {"kind": "picture", "alt": "胡萝卜", "picture": {"groups": [{"cells": [{"glyph": "🥕"}]}]}}}
+            "C": {"label": "皮球多", "visual": {"kind": "picture", "alt": "皮球", "picture": {"groups": [{"cells": [{"glyph": "⚽"}]}]}}}
           }
         },
         {
@@ -83,23 +83,23 @@
       "intro": ["最后的小检查，加油！"],
       "questions": [
         {
-          "id": "q7", "skill": "减法表", "question": "看算式，5减2等于几？",
-          "answer": ["A"], "analysis": "想加算减：2+3=5，所以5−2=3。",
-          "visual": {"kind": "picture", "alt": "算式5减2等于问号", "picture": {"groups": [{"cells": [{"glyph": "5"}, {"glyph": "−"}, {"glyph": "2"}, {"glyph": "＝"}, {"glyph": "？"}]}]}},
+          "id": "q7", "skill": "减法表", "question": "看算式，5减3等于几？",
+          "answer": ["A"], "analysis": "想加算减：3+2=5，所以5−3=2。",
+          "visual": {"kind": "picture", "alt": "算式5减3等于问号", "picture": {"groups": [{"cells": [{"glyph": "5"}, {"glyph": "−"}, {"glyph": "3"}, {"glyph": "＝"}, {"glyph": "？"}]}]}},
           "options": {
-            "A": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}},
-            "B": {"label": "4", "visual": {"kind": "picture", "alt": "数字4", "picture": {"groups": [{"cells": [{"glyph": "4"}]}]}}},
-            "C": {"label": "5", "visual": {"kind": "picture", "alt": "数字5", "picture": {"groups": [{"cells": [{"glyph": "5"}]}]}}}
+            "A": {"label": "2", "visual": {"kind": "picture", "alt": "数字2", "picture": {"groups": [{"cells": [{"glyph": "2"}]}]}}},
+            "B": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}},
+            "C": {"label": "4", "visual": {"kind": "picture", "alt": "数字4", "picture": {"groups": [{"cells": [{"glyph": "4"}]}]}}}
           }
         },
         {
-          "id": "q8", "skill": "想加算减", "question": "4减2等于几？想一想，2加几等于4？",
-          "answer": ["B"], "analysis": "因为2+2=4，所以4−2=2。",
-          "visual": {"kind": "picture", "alt": "算式4减2等于问号", "picture": {"groups": [{"cells": [{"glyph": "4"}, {"glyph": "−"}, {"glyph": "2"}, {"glyph": "＝"}, {"glyph": "？"}]}]}},
+          "id": "q8", "skill": "想加算减", "question": "4减3等于几？想一想，3加几等于4？",
+          "answer": ["B"], "analysis": "因为3+1=4，所以4−3=1。",
+          "visual": {"kind": "picture", "alt": "算式4减3等于问号", "picture": {"groups": [{"cells": [{"glyph": "4"}, {"glyph": "−"}, {"glyph": "3"}, {"glyph": "＝"}, {"glyph": "？"}]}]}},
           "options": {
-            "A": {"label": "1", "visual": {"kind": "picture", "alt": "数字1", "picture": {"groups": [{"cells": [{"glyph": "1"}]}]}}},
-            "B": {"label": "2", "visual": {"kind": "picture", "alt": "数字2", "picture": {"groups": [{"cells": [{"glyph": "2"}]}]}}},
-            "C": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}}
+            "A": {"label": "0", "visual": {"kind": "picture", "alt": "数字0", "picture": {"groups": [{"cells": [{"glyph": "0"}]}]}}},
+            "B": {"label": "1", "visual": {"kind": "picture", "alt": "数字1", "picture": {"groups": [{"cells": [{"glyph": "1"}]}]}}},
+            "C": {"label": "2", "visual": {"kind": "picture", "alt": "数字2", "picture": {"groups": [{"cells": [{"glyph": "2"}]}]}}}
           }
         }
       ]
