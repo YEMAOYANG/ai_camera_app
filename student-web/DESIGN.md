@@ -19,7 +19,7 @@ These are principles, not copied branding, characters or textbook covers. The bo
 
 ## Interaction and authority
 
-- Grade 1–2 experiences assume the child cannot independently read. Use meaningful scene illustrations, distinguishable picture answers, consistent character portraits and prerecorded teacher narration. Text is supplementary; native OpenMAIC activities follow the same rule as generated courseware. Apply `../docs/learning/low-reading-interaction-rule.md` and verify the task with non-target text covered.
+- Grade 1–2 experiences assume the child cannot independently read. Use meaningful scene illustrations, distinguishable picture answers, consistent character portraits and prerecorded teacher narration. Text is supplementary; native OpenMAIC activities follow the same rule as generated courseware. Apply `../docs/learning/courseware-standard.md` and verify the task with non-target text covered.
 
 - `/learning` is the homepage. Children choose subjects; parents select school system, edition and volume in the parent App's existing School Textbooks screen.
 - Unlock and pairing show a closed bag. Only successful authentication triggers lid opening and books flying into the bag, followed by a continuous landing on the homepage. The scene is shared across these routes.
