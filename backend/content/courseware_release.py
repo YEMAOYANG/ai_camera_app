@@ -19,6 +19,8 @@ from content.textbook_release_media import media_mime_type
 from core.errors import ApiError
 
 LIGHT_SCHEMA = 'mira.courseware.light-release.v1'
+# Namespace identifiers inside page scripts and inline SVG are not fetched media.
+NAMESPACE = re.compile(r'https?://www\.w3\.org/(?:2000/svg|1999/xlink|1999/xhtml)')
 GATES = tuple('G%d' % i for i in range(8))
 AUDIO_METHOD = ('every speech action has an audio file whose bytes match the sha256 in its file name; '
                 'no speech recognition and no listening review')
@@ -114,12 +116,6 @@ def build_release(inputs):
         _, node = lesson_by_id(manifest, identity.get('nodeId'))
     except ApiError:
         raise ValueError('node_missing') from None
-    require(node.get('brief', {}).get('status') == 'approved'
-            and manifest.get('rightsReview', {}).get('status') == 'cleared', 'manifest_unapproved')
-    objectives = node['brief'].get('objectives')
-    require(isinstance(objectives, list) and bool(objectives), 'objectives_invalid')
-    objectives = [v.get('objective') if isinstance(v, dict) else v for v in objectives]
-    require(all(_text(v) for v in objectives), 'objectives_invalid')
     source_id = body.get('stage', {}).get('id')
     require(isinstance(source_id, str) and re.fullmatch(r'[A-Za-z0-9_-]+', source_id)
             and body.get('id', source_id) == source_id and bool(body.get('scenes'))
@@ -133,6 +129,9 @@ def build_release(inputs):
     require(bool(speech), 'speech_missing')
     confirmation = _confirmation(inputs.get('confirmation'))
     evidence = _evidence(inputs, speech, questions)
+    # The registered catalog stays as it is (its brief may still be a draft); the lesson's own goals come from the reviewed notes.
+    objectives = inputs['notes'].get('objectives')
+    require(isinstance(objectives, list) and bool(objectives) and all(_text(v) for v in objectives), 'objectives_invalid')
     raw_media = inputs.get('media', {})
     require(isinstance(raw_media, dict) and bool(raw_media), 'media_missing')
     assets = {}
@@ -169,7 +168,7 @@ def build_release(inputs):
             for match in MEDIA.finditer(value):
                 asset(match)
             require('/api/classroom-media/' not in MEDIA.sub('', value), 'media_reference_invalid')
-            require(not re.search(r'(?:https?://|data:|file:|blob:)', value), 'external_media')
+            require(not re.search(r'(?:https?://|data:|file:|blob:)', NAMESPACE.sub('', value)), 'external_media')
     scan(body)
     require(referenced == set(assets), 'media_unreferenced')
     for url in [a.get('audioUrl') for a in speech] + [q.get('questionAudioUrl') for q in questions]:

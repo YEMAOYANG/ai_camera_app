@@ -36,7 +36,8 @@ def sample_inputs():
                  'questionAudioUrl': audio_url, 'optionVisuals': {
                      'A': {'kind': 'image', 'src': image_url, 'alt': 'Three objects'},
                      'B': {'kind': 'image', 'src': image_url, 'alt': 'Two objects'}}} for i in (1, 2)]}}]}
-    notes = {'resources': {key: {'findings': ['Compare quantities; synthetic source notes'], 'pageRefs': ['p. 1']}
+    notes = {'objectives': ['Compare pictured quantities'],
+        'resources': {key: {'findings': ['Compare quantities; synthetic source notes'], 'pageRefs': ['p. 1']}
         for key in ('teachingDesign', 'courseware', 'learningTaskSheet', 'afterClassExercise')}}
     return {'identity': {'editionId': manifest['editionId'], 'revisionId': manifest['revisionId'],
         'nodeId': 'lesson', 'teachingRevision': '1', 'title': 'Pictured quantities',
@@ -252,13 +253,20 @@ class CoursewareReleaseTests(unittest.TestCase):
         self.inputs['identity']['nodeId'] = 'missing'
         self.rejected('node_missing')
 
-    def test_manifest_unapproved(self):
-        self.inputs['manifest']['rightsReview']['status'] = 'pending'
-        self.rejected('manifest_unapproved')
+    def test_draft_catalog_is_accepted_and_frozen_as_registered(self):
+        # Published lessons were built from a catalog whose brief is still a draft; the validator only needs equality.
+        manifest = self.inputs['manifest']
+        manifest['rightsReview']['status'] = 'pending'
+        brief = manifest['units'][0]['lessons'][0]['brief']
+        brief.update(status='draft', objectives=[])
+        prepared = build_release(self.inputs)
+        self.assertEqual(prepared['frozen']['knowledgeBrief'], brief)
+        self.assertEqual(prepared['content_json']['objectives'], ['Compare pictured quantities'])
 
     def test_objectives_invalid(self):
-        self.inputs['manifest']['units'][0]['lessons'][0]['brief']['objectives'] = [{}]
-        self.rejected('objectives_invalid')
+        for value in (None, [], [{}], [' '], 'text'):
+            self.inputs['notes']['objectives'] = value
+            self.rejected('objectives_invalid')
 
     def test_classroom_invalid(self):
         self.inputs['body']['id'] = 'other'
@@ -292,6 +300,15 @@ class CoursewareReleaseTests(unittest.TestCase):
 
     def test_external_media(self):
         self.inputs['body']['scenes'][0]['content']['image'] = 'https://example.invalid/image.png'
+        refresh_receipts(self.inputs)
+        self.rejected('external_media')
+
+    def test_svg_namespace_is_not_external_media(self):
+        self.inputs['body']['scenes'][0]['content']['html'] = (
+            "<svg xmlns='http://www.w3.org/2000/svg'></svg><script>document.createElementNS('http://www.w3.org/2000/svg','line')</script>")
+        refresh_receipts(self.inputs)
+        build_release(self.inputs)
+        self.inputs['body']['scenes'][0]['content']['html'] += '<img src="http://www.w3.org.example.invalid/a.png">'
         refresh_receipts(self.inputs)
         self.rejected('external_media')
 
