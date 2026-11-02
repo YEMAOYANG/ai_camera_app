@@ -23,6 +23,7 @@ from repositories.learning_repository import LearningRepository
 from repositories.textbook_repository import TextbookRepository
 from repositories.course_storage_repository import CourseStorageRepository
 from services.course_file_store import CourseFileStore, CourseFileStorageError
+from services.textbook_quiz_evidence import record_quiz_evidence
 from services import textbook_activity_state as activity_state
 from content import textbook_course_interaction as course_interaction
 
@@ -456,6 +457,8 @@ class TextbookClassroomService:
                 raise ApiError('textbook_answers_already_submitted', '这次练习已经提交，请查看已保存的结果', 409)
             if state['quiz']:
                 return {'ok': True, 'result': state['quiz'], 'partial': None}
+            record_quiz_evidence(conn, session, course, release['classroom'],
+                [r for r in graded['results'] if r['questionId'] not in saved], now_ms())
             merged = {**saved, **{r['questionId']: r for r in graded['results']}}
             if len(merged) < len(questions(release['classroom'])):
                 state['quizPartial'] = {'results': list(merged.values())}
