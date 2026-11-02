@@ -32,9 +32,9 @@ OPENMAIC_TTS_CREDENTIAL_RECOVERY_FIXED_PARENT_ID="omrec_383729f8f7f637dc1cdc65d4
 OPENMAIC_FORMAL_CITATION_RECOVERY_POLICY_VERSION="mira-formal-citation-recovery.v1"
 OPENMAIC_FORMAL_CITATION_RECOVERY_FIXED_SOURCE_JOB_ID="omformal_e6b6986c631a548c9756037e"
 OPENMAIC_QWEN_IMAGE_BASE_URL_CONTRACT="https://dashscope.aliyuncs.com"
-# DashScope retired qwen-image-max ("Model not exist"). The formal image policy
-# mira-formal-qwen-image.v1 still names it, so formal image generation reports
-# not ready until that policy gets a new version; operator authoring uses this.
+# Current formal jobs use the versioned qwen-image-3.0 policy. Historical
+# qwen-image-max jobs keep their original policy identity and are validated by
+# the durable runtime, but provider readiness is intentionally current-only.
 OPENMAIC_QWEN_IMAGE_MODEL_CONTRACT="qwen-image-3.0"
 OPENMAIC_HAPPYHORSE_BASE_URL_CONTRACT="https://dashscope.aliyuncs.com"
 OPENMAIC_HAPPYHORSE_MODEL_CONTRACT="happyhorse-1.0-t2v"
@@ -227,6 +227,9 @@ load_course_storage_env() {
 
 clear_openmaic_provider_env() {
   OPENMAIC_DEFAULT_MODEL=""
+  OPENMAIC_OPENAI_API_KEY=""
+  OPENMAIC_OPENAI_BASE_URL=""
+  OPENMAIC_OPENAI_MODELS=""
   OPENMAIC_OPENROUTER_API_KEY=""
   OPENMAIC_OPENROUTER_MODELS=""
   OPENMAIC_DEEPSEEK_API_KEY=""
@@ -267,6 +270,7 @@ clear_openmaic_provider_env() {
   OPENMAIC_VIDEO_HAPPYHORSE_API_KEY=""
   OPENMAIC_VIDEO_HAPPYHORSE_BASE_URL=""
   OPENMAIC_VIDEO_HAPPYHORSE_MODELS=""
+  OPENMAIC_OPERATOR_TRIAL_PROVIDER=""
 }
 
 clear_openmaic_recovery_env() {
@@ -441,41 +445,108 @@ clear_openmaic_recovery_env
 clear_openmaic_internal_token
 
 # Operator model comparison. A second instance on its own port and its own
-# Agent database builds the same lesson with another model through OpenRouter,
-# so the result can be compared with the frozen DeepSeek policy. It carries no
-# frozen policy, so it must never be the runtime that serves students or formal
-# generation; images, speech and search keep their usual providers.
+# Agent database builds the same lesson with either OpenRouter or the reviewed
+# TokenDance OpenAI-compatible endpoint, so the result can be compared with the
+# frozen DeepSeek policy. It carries no frozen policy, so it must never be the
+# runtime that serves students or formal generation; images, speech and search
+# keep their usual providers.
 load_openmaic_operator_trial_model_env() {
-  local env_file model api_key main_database_url
+  local env_file provider model api_key base_url configured_models main_database_url
+  local trial_database_url main_database_identity trial_database_identity
   env_file="$(model_provider_env_file)"
   [[ "${OPENMAIC_PORT}" != "3100" && "${OPENMAIC_PORT}" != "${GATEWAY_PORT}" ]] || {
     echo "An operator model trial needs its own OPENMAIC_ADMIN_PORT; 3100 serves students." >&2
     return 1
   }
   main_database_url="$(read_env_value MIRA_OPENMAIC_AGENT_DATABASE_URL "$(provider_env_file)" || true)"
-  [[ -n "${MIRA_OPENMAIC_AGENT_DATABASE_URL:-}" && "${MIRA_OPENMAIC_AGENT_DATABASE_URL}" != "${main_database_url}" ]] || {
+  trial_database_url="${MIRA_OPENMAIC_AGENT_DATABASE_URL:-}"
+  [[ -n "${main_database_url}" && -n "${trial_database_url}" ]] || {
     echo "An operator model trial needs its own MIRA_OPENMAIC_AGENT_DATABASE_URL." >&2
     return 1
   }
+  validate_postgresql_database_url MIRA_OPENMAIC_AGENT_DATABASE_URL "${main_database_url}" || return 1
+  validate_postgresql_database_url MIRA_OPENMAIC_AGENT_DATABASE_URL "${trial_database_url}" || return 1
+  main_database_identity="$(postgresql_database_identity "${main_database_url}")" || return 1
+  trial_database_identity="$(postgresql_database_identity "${trial_database_url}")" || return 1
+  [[ "${trial_database_identity}" != "${main_database_identity}" ]] || {
+    echo "An operator model trial must use a different PostgreSQL host/port/database identity." >&2
+    return 1
+  }
+  provider="${MIRA_OPENMAIC_OPERATOR_TRIAL_PROVIDER:-}"
+  [[ -n "${provider}" ]] || provider="$(read_env_value MIRA_OPENMAIC_OPERATOR_TRIAL_PROVIDER "${env_file}" || true)"
+  [[ -n "${provider}" ]] || provider="openrouter"
+  provider="$(printf '%s' "${provider}" | tr '[:upper:]' '[:lower:]')"
   model="${MIRA_OPENMAIC_OPERATOR_TRIAL_MODEL:-}"
-  [[ "${model}" =~ ^[a-z0-9-]+/[a-z0-9.-]+$ ]] || {
-    echo "MIRA_OPENMAIC_OPERATOR_TRIAL_MODEL must be an OpenRouter model id such as vendor/model." >&2
-    return 1
-  }
-  api_key="$(read_env_value OPENROUTER_API_KEY "${env_file}" || true)"
-  [[ -n "${api_key}" ]] || {
-    echo "An operator model trial requires OPENROUTER_API_KEY in ${env_file}." >&2
-    return 1
-  }
+  [[ -n "${model}" ]] || model="$(read_env_value MIRA_OPENMAIC_OPERATOR_TRIAL_MODEL "${env_file}" || true)"
+
+  case "${provider}" in
+    openrouter)
+      [[ "${model}" =~ ^[a-z0-9-]+/[a-z0-9.-]+$ ]] || {
+        echo "MIRA_OPENMAIC_OPERATOR_TRIAL_MODEL must be an OpenRouter model id such as vendor/model." >&2
+        return 1
+      }
+      api_key="$(read_env_value OPENROUTER_API_KEY "${env_file}" || true)"
+      [[ -n "${api_key}" ]] || {
+        echo "An OpenRouter operator trial requires OPENROUTER_API_KEY in ${env_file}." >&2
+        return 1
+      }
+      OPENMAIC_DEFAULT_MODEL="openrouter:${model}"
+      OPENMAIC_OPENROUTER_API_KEY="${api_key}"
+      OPENMAIC_OPENROUTER_MODELS="${model}"
+      ;;
+    tokendance)
+      [[ "${model}" == "cogevol-interactive-0828" ]] || {
+        echo "The TokenDance operator trial accepts only cogevol-interactive-0828." >&2
+        return 1
+      }
+      api_key="$(read_env_value TOKENDANCE_API_KEY "${env_file}" || true)"
+      base_url="$(read_env_value TOKENDANCE_BASE_URL "${env_file}" || true)"
+      [[ -n "${base_url}" ]] || base_url="https://tokendance.space/gateway/v1"
+      configured_models="$(read_env_value TOKENDANCE_MODELS "${env_file}" || true)"
+      [[ -n "${configured_models}" ]] || configured_models="${model}"
+      configured_models="$(printf '%s' "${configured_models}" | tr -d '[:space:]')"
+      [[ -n "${api_key}" ]] || {
+        echo "A TokenDance operator trial requires TOKENDANCE_API_KEY in ${env_file}." >&2
+        return 1
+      }
+      if ! node -e '
+        try {
+          const u = new URL(process.argv[1]);
+          const valid = u.protocol === "https:" && u.hostname === "tokendance.space"
+            && !u.port && !u.username && !u.password && !u.search && !u.hash
+            && /^\/gateway\/v1\/?$/.test(u.pathname);
+          process.exit(valid ? 0 : 1);
+        } catch { process.exit(1); }
+      ' "${base_url}"; then
+        echo "TOKENDANCE_BASE_URL must be exactly the reviewed TokenDance HTTPS gateway /gateway/v1." >&2
+        return 1
+      fi
+      [[ "${configured_models}" == "${model}" ]] || {
+        echo "TOKENDANCE_MODELS must contain only cogevol-interactive-0828 for this trial." >&2
+        return 1
+      }
+      OPENMAIC_DEFAULT_MODEL="openai:${model}"
+      OPENMAIC_OPENAI_API_KEY="${api_key}"
+      OPENMAIC_OPENAI_BASE_URL="${base_url%/}"
+      OPENMAIC_OPENAI_MODELS="${configured_models}"
+      ;;
+    *)
+      echo "MIRA_OPENMAIC_OPERATOR_TRIAL_PROVIDER must be openrouter or tokendance." >&2
+      return 1
+      ;;
+  esac
   OPENMAIC_STRUCTURED_SCENE_POLICY_ID=""
   OPENMAIC_OPERATOR_TRIAL="1"
-  OPENMAIC_DEFAULT_MODEL="openrouter:${model}"
-  OPENMAIC_OPENROUTER_API_KEY="${api_key}"
-  OPENMAIC_OPENROUTER_MODELS="${model}"
+  OPENMAIC_OPERATOR_TRIAL_PROVIDER="${provider}"
 }
 
 load_openmaic_model_env() {
+  OPENMAIC_OPERATOR_TRIAL="0"
+  OPENMAIC_OPERATOR_TRIAL_PROVIDER=""
   OPENMAIC_DEFAULT_MODEL=""
+  OPENMAIC_OPENAI_API_KEY=""
+  OPENMAIC_OPENAI_BASE_URL=""
+  OPENMAIC_OPENAI_MODELS=""
   OPENMAIC_OPENROUTER_API_KEY=""
   OPENMAIC_OPENROUTER_MODELS=""
   OPENMAIC_DEEPSEEK_API_KEY=""
@@ -615,6 +686,10 @@ load_openmaic_authoring_model_env() {
   OPENMAIC_AUTHORING_DEEPSEEK_SERVICE=""
   OPENMAIC_AUTHORING_DEEPSEEK_API_KEY=""
   OPENMAIC_AUTHORING_DEEPSEEK_BASE_URL=""
+  # A comparison process owns exactly one candidate model path. Do not let an
+  # existing DeepSeek authoring override block the trial or leak its separate
+  # credential into the candidate process.
+  [[ "${OPENMAIC_OPERATOR_TRIAL}" != "1" ]] || return 0
   local env_file service api_key base_url
   env_file="$(model_provider_env_file)"
   service="$(expected_openmaic_authoring_service)" || return 1
@@ -666,6 +741,26 @@ validate_postgresql_database_url() {
     echo "${label} must be a PostgreSQL URL with a host and database name." >&2
     return 1
   fi
+}
+
+# Compare PostgreSQL destinations without credentials or connection options.
+# Different users, passwords, URL schemes or ssl/query flags do not make a
+# separate Agent database. Common loopback spellings are one host identity.
+postgresql_database_identity() {
+  local value="$1"
+  local node_bin
+  node_bin="$(command -v node)" || return 1
+  "${node_bin}" -e '
+    try {
+      const url = new URL(process.argv[1]);
+      let host = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+      if (["localhost", "127.0.0.1", "::1"].includes(host)) host = "loopback";
+      const port = url.port || "5432";
+      const database = decodeURIComponent(url.pathname.replace(/^\/+|\/+$/g, ""));
+      if (!host || !database || database.includes("/")) process.exit(1);
+      process.stdout.write(JSON.stringify([host, port, database]));
+    } catch { process.exit(1); }
+  ' "${value}"
 }
 
 # Professional generation is a durable, server-owned Agent Runtime. Its
@@ -737,7 +832,11 @@ load_openmaic_agent_runtime_env() {
   if [[ "${OPENMAIC_OPERATOR_TRIAL}" == "1" ]]; then
     # Every stage without its own route follows DEFAULT_MODEL, so the whole
     # lesson is built by the model under comparison.
-    OPENMAIC_MODEL_ROUTES="{\"maic-agent-driver\":{\"model\":\"${OPENMAIC_DEFAULT_MODEL}\",\"api\":\"openai-completions\",\"thinking\":{\"mode\":\"enabled\",\"enabled\":true}}}"
+    if [[ "${OPENMAIC_OPERATOR_TRIAL_PROVIDER}" == "tokendance" ]]; then
+      OPENMAIC_MODEL_ROUTES="{\"maic-agent-driver\":{\"model\":\"${OPENMAIC_DEFAULT_MODEL}\",\"api\":\"openai-completions\",\"contextWindow\":32768,\"thinking\":{\"mode\":\"disabled\",\"enabled\":false}}}"
+    else
+      OPENMAIC_MODEL_ROUTES="{\"maic-agent-driver\":{\"model\":\"${OPENMAIC_DEFAULT_MODEL}\",\"api\":\"openai-completions\",\"thinking\":{\"mode\":\"enabled\",\"enabled\":true}}}"
+    fi
     return 0
   fi
   OPENMAIC_MODEL_ROUTES='{"maic-agent-driver":{"model":"deepseek:deepseek-v4-pro","api":"openai-completions","thinking":{"mode":"enabled","enabled":true}},"generate-classroom":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-creator":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}},"mira-courseware-verifier":{"model":"deepseek:deepseek-v4-flash","thinking":{"mode":"disabled","enabled":false}},"web-search-query-rewrite":{"model":"deepseek:deepseek-v4-pro","thinking":{"mode":"disabled","enabled":false}}}'
@@ -1599,12 +1698,12 @@ validate_health_payload() {
               minimumFetchedSources: 1,
             },
             image: {
-              schemaVersion: "mira.openmaic.formal-image-policy.v1",
-              policyId: "mira-formal-qwen-image.v1",
+              schemaVersion: "mira.openmaic.formal-image-policy.v2",
+              policyId: "mira-formal-qwen-image.v2",
               enabled: true,
               providerManaged: true,
               providerId: "qwen-image",
-              modelId: "qwen-image-max",
+              modelId: "qwen-image-3.0",
               usage: "teaching_need",
               assetValidationRequired: true,
             },
@@ -2316,6 +2415,9 @@ run_openmaic_production_foreground() {
     BAIDU_API_KEY="${OPENMAIC_BAIDU_API_KEY}" \
     BAIDU_ENABLED="${OPENMAIC_BAIDU_ENABLED}" \
     MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY="${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" \
+    OPENAI_API_KEY="${OPENMAIC_OPENAI_API_KEY}" \
+    OPENAI_BASE_URL="${OPENMAIC_OPENAI_BASE_URL}" \
+    OPENAI_MODELS="${OPENMAIC_OPENAI_MODELS}" \
     DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
     DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
     DEEPSEEK_MODELS="${OPENMAIC_DEEPSEEK_MODELS}" \
@@ -2419,6 +2521,9 @@ run_openmaic_foreground() {
     BAIDU_API_KEY="${OPENMAIC_BAIDU_API_KEY}" \
     BAIDU_ENABLED="${OPENMAIC_BAIDU_ENABLED}" \
     MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY="${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" \
+    OPENAI_API_KEY="${OPENMAIC_OPENAI_API_KEY}" \
+    OPENAI_BASE_URL="${OPENMAIC_OPENAI_BASE_URL}" \
+    OPENAI_MODELS="${OPENMAIC_OPENAI_MODELS}" \
     DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
     DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
     DEEPSEEK_MODELS="${OPENMAIC_DEEPSEEK_MODELS}" \
@@ -2595,6 +2700,9 @@ start_openmaic() {
     BAIDU_API_KEY="${OPENMAIC_BAIDU_API_KEY}" \
     BAIDU_ENABLED="${OPENMAIC_BAIDU_ENABLED}" \
       MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY="${OPENMAIC_STRUCTURED_SCENE_POLICY_ID}" \
+      OPENAI_API_KEY="${OPENMAIC_OPENAI_API_KEY}" \
+      OPENAI_BASE_URL="${OPENMAIC_OPENAI_BASE_URL}" \
+      OPENAI_MODELS="${OPENMAIC_OPENAI_MODELS}" \
       DEEPSEEK_API_KEY="${OPENMAIC_DEEPSEEK_API_KEY}" \
       DEEPSEEK_BASE_URL="${OPENMAIC_DEEPSEEK_BASE_URL}" \
       DEEPSEEK_MODELS="${OPENMAIC_DEEPSEEK_MODELS}" \

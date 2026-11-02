@@ -30,6 +30,7 @@ ASR_QWEN_API_KEY=test-qwen-asr-secret-never-log
 ASR_QWEN_BASE_URL=https://dashscope.example.invalid/api/v1
 OPENMAIC_FULL_RUNTIME_PUBLIC_URL=http://192.168.228.95:3101
 INTERNAL_API_TOKEN=test-internal-token-never-log
+MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://mira@127.0.0.1:5433/mira
 OPENMAIC_DETERMINISTIC_RECOVERY_ENABLED=1
 OPENMAIC_DETERMINISTIC_RECOVERY_SOURCE_JOB_ID=uKQl3vMr4d
 OPENMAIC_TTS_CREDENTIAL_RECOVERY_ENABLED=1
@@ -47,6 +48,11 @@ MIRA_OPENMAIC_VERIFIER_MODEL=deepseek-v4-flash
 DEEPSEEK_API_KEY=test-deepseek-secret-never-log
 DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
 DEEPSEEK_MODELS=deepseek-v4-pro,deepseek-v4-flash
+MIRA_OPENMAIC_OPERATOR_TRIAL_PROVIDER=tokendance
+MIRA_OPENMAIC_OPERATOR_TRIAL_MODEL=cogevol-interactive-0828
+TOKENDANCE_API_KEY=test-tokendance-secret-never-log
+TOKENDANCE_BASE_URL=https://tokendance.space/gateway/v1
+TOKENDANCE_MODELS=cogevol-interactive-0828
 MIRA_OPENMAIC_ENABLE_HAPPYHORSE_VIDEO=1
 VIDEO_HAPPYHORSE_API_KEY=test-video-secret-never-log
 EOF
@@ -601,6 +607,56 @@ load_openmaic_provider_env
 [[ "${OPENMAIC_DEEPSEEK_BASE_URL}" == "https://api.deepseek.com/v1" ]]
 [[ "${OPENMAIC_DEEPSEEK_MODELS}" == "deepseek-v4-pro,deepseek-v4-flash" ]]
 [[ "${OPENMAIC_COURSEWARE_VERIFIER_MODEL}" == "deepseek-v4-flash" ]]
+# TokenDance is accepted only in the isolated operator trial. It uses the
+# built-in OpenAI-compatible transport without changing the formal DeepSeek
+# model policy, and its 32.8K context is frozen into the Agent route.
+(
+  cp "${TMP_ROOT}/openmaic.env" "${TMP_ROOT}/tokendance-trial.env"
+  cat >> "${TMP_ROOT}/tokendance-trial.env" <<'EOF'
+MIRA_OPENMAIC_AUTHORING_DEEPSEEK_SERVICE=autorouter
+AUTOROUTER_DEEPSEEK_API_KEY=test-authoring-key-never-log
+AUTOROUTER_DEEPSEEK_BASE_URL=https://api.autorouter.top/v1
+EOF
+  model_provider_env_file() { printf '%s' "${TMP_ROOT}/tokendance-trial.env"; }
+  OPENMAIC_PORT=3198
+  GATEWAY_PORT=3199
+  MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1
+  MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/tokendance_trial
+  MIRA_OPENMAIC_OPERATOR_MODEL_TRIAL=1
+  load_openmaic_provider_env
+  [[ "${OPENMAIC_OPERATOR_TRIAL}" == "1" ]] || fail 'TokenDance trial flag missing'
+  [[ "${OPENMAIC_OPERATOR_TRIAL_PROVIDER}" == "tokendance" ]] || fail 'TokenDance trial provider missing'
+  [[ "${OPENMAIC_DEFAULT_MODEL}" == "openai:cogevol-interactive-0828" ]] || fail 'TokenDance trial model mismatch'
+  [[ "${OPENMAIC_OPENAI_API_KEY}" == "test-tokendance-secret-never-log" ]] || fail 'TokenDance trial key missing'
+  [[ "${OPENMAIC_OPENAI_BASE_URL}" == "https://tokendance.space/gateway/v1" ]] || fail 'TokenDance trial endpoint mismatch'
+  [[ "${OPENMAIC_OPENAI_MODELS}" == "cogevol-interactive-0828" ]] || fail 'TokenDance trial catalog mismatch'
+  [[ -z "${OPENMAIC_OPENROUTER_API_KEY}" && -z "${OPENMAIC_DEEPSEEK_API_KEY}" ]] || fail 'TokenDance trial leaked another model credential'
+  [[ -z "${OPENMAIC_AUTHORING_DEEPSEEK_SERVICE}" && -z "${OPENMAIC_AUTHORING_DEEPSEEK_API_KEY}" ]] \
+    || fail 'TokenDance trial inherited the DeepSeek authoring override'
+  node -e '
+    const routes=JSON.parse(process.argv[1]), route=routes["maic-agent-driver"];
+    if (route.model !== "openai:cogevol-interactive-0828" || route.api !== "openai-completions"
+      || route.contextWindow !== 32768 || route.thinking?.mode !== "disabled"
+      || route.thinking?.enabled !== false) process.exit(1);
+  ' "${OPENMAIC_MODEL_ROUTES}" || fail 'TokenDance Agent route is not bounded'
+)
+(
+  cp "${TMP_ROOT}/openmaic.env" "${TMP_ROOT}/bad-tokendance.env"
+  model_provider_env_file() { printf '%s' "${TMP_ROOT}/bad-tokendance.env"; }
+  sed -i.bak 's|https://tokendance.space/gateway/v1|https://untrusted.invalid/gateway/v1|' "${TMP_ROOT}/bad-tokendance.env"
+  OPENMAIC_PORT=3198
+  GATEWAY_PORT=3199
+  MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/tokendance_trial
+  MIRA_OPENMAIC_OPERATOR_MODEL_TRIAL=1
+  if load_openmaic_model_env 2>/dev/null; then fail 'Untrusted TokenDance endpoint accepted'; fi
+)
+(
+  OPENMAIC_PORT=3198
+  GATEWAY_PORT=3199
+  MIRA_OPENMAIC_AGENT_DATABASE_URL='postgresql://other:changed@localhost:5433/mira?sslmode=disable'
+  MIRA_OPENMAIC_OPERATOR_MODEL_TRIAL=1
+  if load_openmaic_model_env 2>/dev/null; then fail 'Same logical Agent database accepted for operator trial'; fi
+)
 # The new operator opt-in selects one current Flash model for every stage,
 # using official credentials without rewriting the legacy dotenv or routes.
 (
@@ -974,6 +1030,13 @@ if (manifest.count !== patches.length || manifest.latest !== latest || manifest.
   throw new Error('Native patch manifest does not match the installed patch series');
 }
 NODE
+formal_generation_policy="${SOURCE_DIR}/lib/server/mira-formal-generation-policy.ts"
+grep -Fq "schemaVersion: 'mira.openmaic.formal-image-policy.v1'" "${formal_generation_policy}" || fail 'durable runtime lost legacy image policy validation'
+grep -Fq "policyId: 'mira-formal-qwen-image.v1'" "${formal_generation_policy}" || fail 'durable runtime lost legacy image policy identity'
+grep -Fq "modelId: 'qwen-image-max'" "${formal_generation_policy}" || fail 'durable runtime lost legacy image model identity'
+grep -Fq "schemaVersion: 'mira.openmaic.formal-image-policy.v2'" "${formal_generation_policy}" || fail 'durable runtime lacks current image policy validation'
+grep -Fq "policyId: 'mira-formal-qwen-image.v2'" "${formal_generation_policy}" || fail 'durable runtime lacks current image policy identity'
+grep -Fq "modelId: 'qwen-image-3.0'" "${formal_generation_policy}" || fail 'durable runtime lacks current image model identity'
 grep -Fq 'interactiveIncludeKatex' "${formal_interactive_patch}"
 grep -Fq 'video_stream' "${video_duration_patch}"
 grep -Fq 'mira-formal-happyhorse-video.v1' "${video_patch}"
@@ -1107,7 +1170,7 @@ load_openmaic_formal_citation_recovery_env
 clear_openmaic_provider_env
 clear_openmaic_recovery_secret
 [[ -z "${OPENMAIC_RECOVERY_INTERNAL_TOKEN}" ]]
-structured_health_payload='{"success":true,"status":"ok","version":"1.0.0","capabilities":{"webSearch":true,"tts":true,"asr":true},"runtimePolicy":{"tts":{"enforced":true,"providerId":"qwen-tts","modelId":"qwen3-tts-flash","voiceId":"Serena"},"asr":{"enforced":true,"providerId":"qwen-asr","modelId":"qwen3-asr-flash","fallbackAllowed":false},"structuredScene":{"enforced":true,"policyId":"kimi-k2.6-thinking-disabled-v1","providerId":"kimi","modelId":"kimi-k2.6","stages":["scene-content","scene-content:slide","scene-content:quiz","scene-content:interactive","scene-content:pbl","scene-actions"],"thinking":{"mode":"disabled","enabled":false}},"studentChrome":{"enforced":true,"policyVersion":"mira-student-chrome.v6","marker":"mira=1","locale":"zh-CN","theme":"light","autoPlayDefault":true,"autoPlayPersistence":"student-session","audioStartPersistence":"classroom-tab-session","manualAutoPlayToggleEnabled":true,"asrEnabled":true,"asrPersistence":"student-session","manualAsrToggleEnabled":false,"operatorAsrPreferencePreserved":true,"operatorChromePreserved":true,"headerControlsHidden":true,"exportsHidden":true,"teacherIdentity":{"agentId":"mira-sample-teacher","avatar":"/avatars/teacher-2.png"}},"professionalResearch":{"schemaVersion":"mira.openmaic.professional-research.v1","professionalWorkbench":{"upstreamVersion":"1.0.0","primarySkillId":"mira-primary-courseware","proModeAvailableToOperators":true,"availableToStudentRuntime":false},"webSearch":{"defaultEnabled":true,"operatorOnly":false,"formalGenerationEnabled":true,"studentRuntimeEnabled":false,"maxCallsPerCourse":4,"citationsRequired":true,"primarySourcesPreferred":true}},"formalGeneration":{"enforced":true,"policyId":"mira.openmaic.formal-runtime.v3-adaptive","idempotencyKey":"runtimeRequestId","queryByRuntimeRequestId":true,"speechAudioGenerated":true,"coursewareAuthority":{"schemaVersion":"mira.openmaic.courseware-authority.v2-professional","generationOwner":"openmaic","providerInvocation":"professional_agent","classroomCompilation":"professional_skill_workflow","backendProviderCredentialsAccepted":false},"professionalCreation":{"schemaVersion":"mira.openmaic.professional-creation.v1","mode":"professional_skill","workflowVersion":"openmaic-pro-agent.v1","skillId":"mira-primary-courseware","supportingSkillIds":["k12-core-literacy-planning","deep-interactive"],"userPromptRequired":false,"webSearch":{"enabled":true,"providerManaged":true,"maxCalls":4,"citationsRequired":true,"primarySourcesPreferred":true,"minimumFetchedSources":1},"image":{"schemaVersion":"mira.openmaic.formal-image-policy.v1","policyId":"mira-formal-qwen-image.v1","enabled":true,"providerManaged":true,"providerId":"qwen-image","modelId":"qwen-image-max","usage":"teaching_need","assetValidationRequired":true},"studentToolsEnabled":false},"studentRuntimeEvents":{"enforced":true,"schemaVersion":"mira.openmaic.student-runtime-events.v1","classroomAuthoritySchema":"mira.openmaic.runtime-event-authority.v1","endpoint":"/mira/runtime-events","authority":"mira-backend","clientIdentityAccepted":false,"clientScoreAccepted":false},"contract":{"schemaVersion":"mira.openmaic.formal-runtime.v3-adaptive","scenePlanning":{"mode":"adaptive","authority":"openmaic_professional_agent","exactCountRequired":false,"allowedSceneTypes":["slide","quiz","interactive","pbl"],"requiredSceneTypes":["slide","quiz","interactive"],"defaultDurationMinutes":{"min":15,"max":30},"scenesPerMinute":{"min":1,"max":2},"maxSceneCount":60},"roster":{"teacherCount":1,"peerCount":4},"speechRequiredForEveryScene":true,"speechActions":{"perScene":{"min":1,"max":20},"total":{"min":1,"max":240},"interactiveSpotlightRequired":false},"distinctPeerDiscussions":2,"teacherEvidence":["spotlight","widget_highlight"],"slideSpotlight":{"minimumPerSlide":1,"targetMustBeRenderable":true,"focusExplanationSequenceRequired":true,"consecutiveSpotlightsAllowed":true},"interactive":{"allowedWidgetTypes":["simulation","diagram","code","game","visualization3d"],"widgetConfigRequired":true,"productiveScriptRequired":true,"noopRejected":true,"fake3dRejected":true},"whiteboardRequired":false}},"deterministicRecovery":{"enabled":true,"sourceJobId":"uKQl3vMr4d","policyVersion":"mira-sample-deterministic-classroom.v1","canonicalSpecSha256":"'"${OPENMAIC_RECOVERY_CANONICAL_SPEC_SHA256}"'","patchSha256":"'"${OPENMAIC_RECOVERY_PATCH_SHA256}"'"},"ttsCredentialRecovery":{"enabled":true,"sourceJobId":"uKQl3vMr4d","parentRecoveryId":"omrec_383729f8f7f637dc1cdc65d4","policyVersion":"mira-sample-tts-credential-recovery.v1","canonicalSpecSha256":"'"${OPENMAIC_TTS_CREDENTIAL_RECOVERY_CANONICAL_SPEC_SHA256}"'","patchSha256":"'"${OPENMAIC_TTS_CREDENTIAL_RECOVERY_PATCH_SHA256}"'"}}}'
+structured_health_payload='{"success":true,"status":"ok","version":"1.0.0","capabilities":{"webSearch":true,"tts":true,"asr":true},"runtimePolicy":{"tts":{"enforced":true,"providerId":"qwen-tts","modelId":"qwen3-tts-flash","voiceId":"Serena"},"asr":{"enforced":true,"providerId":"qwen-asr","modelId":"qwen3-asr-flash","fallbackAllowed":false},"structuredScene":{"enforced":true,"policyId":"kimi-k2.6-thinking-disabled-v1","providerId":"kimi","modelId":"kimi-k2.6","stages":["scene-content","scene-content:slide","scene-content:quiz","scene-content:interactive","scene-content:pbl","scene-actions"],"thinking":{"mode":"disabled","enabled":false}},"studentChrome":{"enforced":true,"policyVersion":"mira-student-chrome.v6","marker":"mira=1","locale":"zh-CN","theme":"light","autoPlayDefault":true,"autoPlayPersistence":"student-session","audioStartPersistence":"classroom-tab-session","manualAutoPlayToggleEnabled":true,"asrEnabled":true,"asrPersistence":"student-session","manualAsrToggleEnabled":false,"operatorAsrPreferencePreserved":true,"operatorChromePreserved":true,"headerControlsHidden":true,"exportsHidden":true,"teacherIdentity":{"agentId":"mira-sample-teacher","avatar":"/avatars/teacher-2.png"}},"professionalResearch":{"schemaVersion":"mira.openmaic.professional-research.v1","professionalWorkbench":{"upstreamVersion":"1.0.0","primarySkillId":"mira-primary-courseware","proModeAvailableToOperators":true,"availableToStudentRuntime":false},"webSearch":{"defaultEnabled":true,"operatorOnly":false,"formalGenerationEnabled":true,"studentRuntimeEnabled":false,"maxCallsPerCourse":4,"citationsRequired":true,"primarySourcesPreferred":true}},"formalGeneration":{"enforced":true,"policyId":"mira.openmaic.formal-runtime.v3-adaptive","idempotencyKey":"runtimeRequestId","queryByRuntimeRequestId":true,"speechAudioGenerated":true,"coursewareAuthority":{"schemaVersion":"mira.openmaic.courseware-authority.v2-professional","generationOwner":"openmaic","providerInvocation":"professional_agent","classroomCompilation":"professional_skill_workflow","backendProviderCredentialsAccepted":false},"professionalCreation":{"schemaVersion":"mira.openmaic.professional-creation.v1","mode":"professional_skill","workflowVersion":"openmaic-pro-agent.v1","skillId":"mira-primary-courseware","supportingSkillIds":["k12-core-literacy-planning","deep-interactive"],"userPromptRequired":false,"webSearch":{"enabled":true,"providerManaged":true,"maxCalls":4,"citationsRequired":true,"primarySourcesPreferred":true,"minimumFetchedSources":1},"image":{"schemaVersion":"mira.openmaic.formal-image-policy.v2","policyId":"mira-formal-qwen-image.v2","enabled":true,"providerManaged":true,"providerId":"qwen-image","modelId":"qwen-image-3.0","usage":"teaching_need","assetValidationRequired":true},"studentToolsEnabled":false},"studentRuntimeEvents":{"enforced":true,"schemaVersion":"mira.openmaic.student-runtime-events.v1","classroomAuthoritySchema":"mira.openmaic.runtime-event-authority.v1","endpoint":"/mira/runtime-events","authority":"mira-backend","clientIdentityAccepted":false,"clientScoreAccepted":false},"contract":{"schemaVersion":"mira.openmaic.formal-runtime.v3-adaptive","scenePlanning":{"mode":"adaptive","authority":"openmaic_professional_agent","exactCountRequired":false,"allowedSceneTypes":["slide","quiz","interactive","pbl"],"requiredSceneTypes":["slide","quiz","interactive"],"defaultDurationMinutes":{"min":15,"max":30},"scenesPerMinute":{"min":1,"max":2},"maxSceneCount":60},"roster":{"teacherCount":1,"peerCount":4},"speechRequiredForEveryScene":true,"speechActions":{"perScene":{"min":1,"max":20},"total":{"min":1,"max":240},"interactiveSpotlightRequired":false},"distinctPeerDiscussions":2,"teacherEvidence":["spotlight","widget_highlight"],"slideSpotlight":{"minimumPerSlide":1,"targetMustBeRenderable":true,"focusExplanationSequenceRequired":true,"consecutiveSpotlightsAllowed":true},"interactive":{"allowedWidgetTypes":["simulation","diagram","code","game","visualization3d"],"widgetConfigRequired":true,"productiveScriptRequired":true,"noopRejected":true,"fake3dRejected":true},"whiteboardRequired":false}},"deterministicRecovery":{"enabled":true,"sourceJobId":"uKQl3vMr4d","policyVersion":"mira-sample-deterministic-classroom.v1","canonicalSpecSha256":"'"${OPENMAIC_RECOVERY_CANONICAL_SPEC_SHA256}"'","patchSha256":"'"${OPENMAIC_RECOVERY_PATCH_SHA256}"'"},"ttsCredentialRecovery":{"enabled":true,"sourceJobId":"uKQl3vMr4d","parentRecoveryId":"omrec_383729f8f7f637dc1cdc65d4","policyVersion":"mira-sample-tts-credential-recovery.v1","canonicalSpecSha256":"'"${OPENMAIC_TTS_CREDENTIAL_RECOVERY_CANONICAL_SPEC_SHA256}"'","patchSha256":"'"${OPENMAIC_TTS_CREDENTIAL_RECOVERY_PATCH_SHA256}"'"}}}'
 structured_health_payload="${structured_health_payload//kimi-k2.6-thinking-disabled-v1/deepseek-v4-pro-flash-v1}"
 structured_health_payload="${structured_health_payload//\"providerId\":\"kimi\"/\"providerId\":\"deepseek\"}"
 structured_health_payload="${structured_health_payload//\"modelId\":\"kimi-k2.6\"/\"modelId\":\"deepseek-v4-pro\"}"
@@ -1161,7 +1224,7 @@ fi
 if validate_health_payload openmaic "${structured_health_payload/\"sceneContextRequired\":true/\"sceneContextRequired\":false}"; then
   fail "disabled scene skill context unexpectedly passed formal generation health"
 fi
-if validate_health_payload openmaic "${structured_health_payload/mira-formal-qwen-image.v1/unreviewed-image-policy}"; then
+if validate_health_payload openmaic "${structured_health_payload/mira-formal-qwen-image.v2/unreviewed-image-policy}"; then
   fail "unreviewed image policy unexpectedly passed formal generation health"
 fi
 if validate_health_payload openmaic "${structured_health_payload/\"assetValidationRequired\":true/\"assetValidationRequired\":true,\"unexpected\":true}"; then

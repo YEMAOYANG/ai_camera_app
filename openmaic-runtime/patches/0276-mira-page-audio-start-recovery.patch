@@ -1,0 +1,250 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -1537,7 +1537,13 @@
+ 
+     // play/pause toggle
+     const handlePlayPause = useCallback(() => {
+-      if (togglePageNarration()) return;
++      if (togglePageNarration(() => {
++        if (studentMode) {
++          audioPlayerRef.current.prepareStudentPlayback();
++          studentAutoPlayRuntime?.acceptAudioStart();
++          setAutoPlayLecture(true);
++        }
++      })) return;
+       releasePageNarrationPause();
+       const engine = engineRef.current;
+       if (!engine) return;
+diff --git a/lib/mira/page-narration.ts b/lib/mira/page-narration.ts
+--- a/lib/mira/page-narration.ts
++++ b/lib/mira/page-narration.ts
+@@ -39,10 +39,13 @@
+ export function releasePageNarrationPause() { publish({ paused: false }); }
+ 
+ /** True means the current page owns the click; do not restart the lecture opening. */
+-export function togglePageNarration(): boolean {
++export function togglePageNarration(beforePlay?: () => void): boolean {
+   if (!controller?.ready()) return false;
+   if (snapshot.phase === 'playing' || snapshot.phase === 'pending') pausePageNarration();
+   else {
++    // Preserve the originating click for browser audio activation and the
++    // student start gate, including when a page consumes the toolbar action.
++    beforePlay?.();
+     releasePageNarrationPause();
+     controller.play();
+   }
+diff --git a/lib/mira/interactive-audio-controls.ts b/lib/mira/interactive-audio-controls.ts
+--- a/lib/mira/interactive-audio-controls.ts
++++ b/lib/mira/interactive-audio-controls.ts
+@@ -66,6 +66,14 @@
+     window.parent.postMessage({ type: stateType, channel: channel, cueId: cueId,
+       status: phase, hasReplay: !!replay() }, '*');
+   }
++  function emitSettled() {
++    var owner = channel;
++    // This shim runs before authored handlers. Those handlers may enable,
++    // disable or replace the replay control when a cue settles. Read the live
++    // DOM after they finish, and read the latest phase too: a synchronous pause
++    // must supersede an earlier playing notification, never be undone by it.
++    queueMicrotask(function () { if (channel === owner) emit(); });
++  }
+   function clearPending() { if (timer !== null) clearTimeout(timer); timer = null; }
+   window.addEventListener('mira-narration-state', function (event) {
+     var detail = event && event.detail, known = cues();
+@@ -73,7 +81,7 @@
+     if (detail.status === 'hidden') {
+       clearPending(); phase = 'paused';
+       if (known.has(detail.cueId)) cueId = detail.cueId;
+-      emit(); return;
++      emitSettled(); return;
+     }
+     if (!known.has(detail.cueId)) return;
+     if (detail.status === 'playing') {
+@@ -84,7 +92,7 @@
+     } else if (['error', 'missing', 'cancelled'].includes(detail.status)) {
+       clearPending(); cueId = detail.cueId; phase = 'paused';
+     } else return;
+-    emit();
++    emitSettled();
+   });
+   window.addEventListener('message', function (event) {
+     if (event.source !== window.parent) return;
+@@ -93,7 +101,7 @@
+         && typeof data.visible === 'boolean') {
+       visible = data.visible;
+       if (!visible) { clearPending(); phase = 'paused'; }
+-      emit(); return;
++      emitSettled(); return;
+     }
+     if (!exact(data, ['type', 'command', 'channel']) || data.type !== type
+         || typeof data.channel !== 'string' || !/^[\\w-]{8,128}$/.test(data.channel)) return;
+@@ -110,6 +118,7 @@
+     // Use the authored handler so its cue queue and completion gate resume
+     // together. No fake trusted input or direct call to a detached audio clip.
+     button.click();
++    emitSettled();
+     if (phase === 'pending') timer = setTimeout(function () {
+       timer = null; if (phase === 'pending') { phase = 'paused'; emit(); }
+     }, 2000);
+@@ -168,7 +177,9 @@
+   );
+   const canAct = () => !disposed && active() && canControl();
+   const registration = registerPageNarration({
+-    ready: () => canAct() && (hasReplay || phase === 'playing' || phase === 'pending'),
++    // Never offer one-way Pause for a page whose authored audio cannot be
++    // resumed safely. Such pages keep their original classroom controls.
++    ready: () => canAct() && hasReplay,
+     play: () => {
+       if (!canAct() || !hasReplay) return;
+       phase = 'pending'; registration.phase(phase);
+@@ -185,7 +196,8 @@
+     const state = readState(event.data, channel, isBoundCue);
+     if (!state) return;
+     if (getPageNarration().paused && (state.status === 'playing' || state.status === 'pending')) return;
+-    hasReplay = state.hasReplay; phase = state.status;
++    hasReplay = state.hasReplay;
++    phase = hasReplay ? state.status : 'idle';
+     registration.phase(phase);
+   };
+   const connect = () => {
+diff --git a/tests/scene-renderers/interactive-audio-controls.test.ts b/tests/scene-renderers/interactive-audio-controls.test.ts
+--- a/tests/scene-renderers/interactive-audio-controls.test.ts
++++ b/tests/scene-renderers/interactive-audio-controls.test.ts
+@@ -50,7 +50,7 @@
+ });
+ 
+ describe('reviewed iframe audio control shim', () => {
+-  it('uses the original explicit audio replay handler, preserving domain state and real cue completion', () => {
++  it('uses the original explicit audio replay handler, preserving domain state and real cue completion', async () => {
+     const p = shim('<button aria-label="再听一次老师的话">听老师</button>');
+     const world = { answer: 3, completed: false };
+     let gateReady = false, replayCount = 0;
+@@ -68,9 +68,11 @@
+     expect(replayCount).toBe(0); // Mount/inspection never starts a completed or restored page.
+     p.visibility(true); p.command('play');
+     expect(replayCount).toBe(1); expect(explicitPlay).toHaveBeenCalledTimes(1);
++    await Promise.resolve();
+     expect(p.latest()).toMatchObject({ cueId: 'task', status: 'playing' });
+     expect(world).toEqual({ answer: 3, completed: false }); expect(gateReady).toBe(false);
+     p.narration('task', 'ready');
++    await Promise.resolve();
+     expect(gateReady).toBe(true); expect(p.latest().status).toBe('ended');
+     p.command('inspect'); expect(replayCount).toBe(1);
+   });
+@@ -118,16 +120,57 @@
+     expect(inert.parent.postMessage).not.toHaveBeenCalled(); expect(forbidden).not.toHaveBeenCalled();
+   });
+ 
+-  it('does not misreport an unrelated ended cue and bounds an unresponsive replay handler', () => {
++  it('does not misreport an unrelated ended cue and bounds an unresponsive replay handler', async () => {
+     vi.useFakeTimers();
+     const p = shim('<button aria-label="重播当前语音">听</button>');
+     p.visibility(true); p.narration('task', 'playing');
++    await Promise.resolve();
+     p.narration('feedback', 'ready'); expect(p.latest().status).toBe('playing');
+     p.command('play'); expect(p.latest().status).toBe('pending');
+     vi.advanceTimersByTime(2000); expect(p.latest().status).toBe('paused');
+-    p.narration('task', 'playing'); expect(p.latest().status).toBe('playing');
+-    p.visibility(false); expect(p.latest().status).toBe('paused');
+-    p.narration('task', 'playing'); expect(p.latest().status).toBe('paused');
++    p.narration('task', 'playing'); await Promise.resolve(); expect(p.latest().status).toBe('playing');
++    p.visibility(false); await Promise.resolve(); expect(p.latest().status).toBe('paused');
++    p.narration('task', 'playing'); await Promise.resolve(); expect(p.latest().status).toBe('paused');
++  });
++
++  it('refreshes the toolbar after an authored ready handler enables its replay control', async () => {
++    const p = shim('<button disabled aria-label="重听当前提示">听老师</button>');
++    const button = document.querySelector('button')!;
++    const replay = vi.fn(() => p.narration('task', 'playing'));
++    button.onclick = replay;
++    // The real authored listener is registered AFTER the injected shim and
++    // changes the UI only when the teacher clip actually finishes.
++    p.win.addEventListener('mira-narration-state', event => {
++      if (event.detail.status === 'ready') button.disabled = false;
++    });
++    const frame = document.createElement('iframe'); document.body.append(frame);
++    vi.spyOn(frame.contentWindow!, 'postMessage').mockImplementation(data => p.send(data));
++    p.parent.postMessage.mockImplementation(data => window.dispatchEvent(
++      new MessageEvent('message', { source: frame.contentWindow, data }),
++    ));
++    const dispose = connectInteractiveAudioControls({ frame, active: () => true,
++      isBoundCue: cue => cue === 'task' });
++    try {
++      p.visibility(true); p.narration('task', 'playing'); await Promise.resolve();
++      expect(p.latest()).toMatchObject({ status: 'playing', hasReplay: false });
++      p.narration('task', 'ready'); await Promise.resolve();
++      expect(p.latest()).toMatchObject({ status: 'ended', hasReplay: true });
++      expect(getPageNarration().phase).toBe('ended');
++      expect(togglePageNarration()).toBe(true);
++      expect(replay).toHaveBeenCalledTimes(1);
++      await Promise.resolve(); expect(getPageNarration().phase).toBe('playing');
++    } finally { dispose(); }
++  });
++
++  it('settled notifications keep a newer pause and do not leak across disconnect', async () => {
++    const p = shim('<button aria-label="重听当前提示">听老师</button>');
++    p.visibility(true); p.narration('task', 'playing');
++    p.visibility(false); p.command('pause');
++    await Promise.resolve(); expect(p.latest().status).toBe('paused');
++    expect(p.parent.postMessage.mock.calls.some(([data]) => data.status === 'playing')).toBe(false);
++    p.visibility(true); p.narration('task', 'playing'); p.command('disconnect');
++    const posted = p.parent.postMessage.mock.calls.length;
++    await Promise.resolve(); expect(p.parent.postMessage).toHaveBeenCalledTimes(posted);
+   });
+ });
+ 
+@@ -195,4 +238,20 @@
+       p.receive({ status: 'playing' }); expect(getPageNarration().phase).toBe('ended');
+     } finally { p.dispose(); }
+   });
+-});
++
++  it('does not take one-way pause ownership when a playing page has no safe replay', () => {
++    const p = setup();
++    try {
++      p.receive({ status: 'playing', hasReplay: false });
++      expect(getPageNarration().phase).toBe('idle');
++      const before = p.post.mock.calls.length;
++      expect(togglePageNarration()).toBe(false);
++      expect(p.post.mock.calls.length).toBe(before);
++      // A later authored render may expose a real replay. Only then can this
++      // page safely own both halves of the toolbar toggle.
++      p.receive({ status: 'ended', hasReplay: true });
++      expect(togglePageNarration()).toBe(true);
++      expect(p.post.mock.calls.at(-1)![0].command).toBe('play');
++    } finally { p.dispose(); }
++  });
++});
+diff --git a/tests/runtime/page-narration-start.test.ts b/tests/runtime/page-narration-start.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/runtime/page-narration-start.test.ts
+@@ -0,0 +1,27 @@
++import { describe, expect, it, vi } from 'vitest';
++import { registerPageNarration, togglePageNarration } from '@/lib/mira/page-narration';
++
++describe('page-owned student playback start', () => {
++  it('accepts audio in the originating click before replay, but never on pause or unavailable pages', () => {
++    const events: string[] = [];
++    const accept = vi.fn(() => events.push('accept'));
++    let ready = false;
++    const registration = registerPageNarration({
++      ready: () => ready,
++      play: () => events.push('play'),
++      pause: () => events.push('pause'),
++    });
++    try {
++      expect(togglePageNarration(accept)).toBe(false);
++      expect(events).toEqual([]);
++      ready = true;
++      registration.phase('paused');
++      expect(togglePageNarration(accept)).toBe(true);
++      expect(events).toEqual(['accept', 'play']);
++      registration.phase('playing');
++      expect(togglePageNarration(accept)).toBe(true);
++      expect(events).toEqual(['accept', 'play', 'pause']);
++      expect(accept).toHaveBeenCalledTimes(1);
++    } finally { registration.dispose(); }
++  });
++});

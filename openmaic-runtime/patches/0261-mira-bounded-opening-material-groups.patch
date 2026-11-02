@@ -1,0 +1,350 @@
+diff --git a/app/api/agent/sessions/route.ts b/app/api/agent/sessions/route.ts
+--- a/app/api/agent/sessions/route.ts
++++ b/app/api/agent/sessions/route.ts
+@@ -19,6 +19,15 @@
+ import { withRequestOwnerId } from '@/lib/server/agent-runtime/with-owner';
+ import { buildRequestOrigin, isValidClassroomId } from '@/lib/server/classroom-storage';
+ import { decodeCourseRefs } from '@/lib/workbench/course-refs';
++import { getReadyOwnerMaterials } from '@/lib/persistence/owner-materials';
++import { getServerPersistenceProvider } from '@/lib/persistence/server-provider';
++import {
++  assertGroupedOpeningMaterialBudget,
++  decodeOpeningMaterialIds,
++  OpeningMaterialGroupsError,
++  OPENING_MATERIAL_GROUPS_HEADER,
++  OPENING_MATERIAL_GROUPS_SCHEMA,
++} from '@/lib/server/agent-runtime/opening-material-groups';
+ 
+ export const runtime = 'nodejs';
+ 
+@@ -30,6 +39,8 @@
+   existingCourse?: boolean;
+   /** Existing owner-library uploads to bind before the first run is queued. */
+   materialIds?: unknown;
++  /** Explicit bounded groups; all bind before the opening message queues a run. */
++  materialIdGroups?: unknown;
+   /** Classrooms named on the opening message. */
+   courseRefs?: unknown;
+ }
+@@ -67,15 +78,15 @@
+       `prompt exceeds the ${MAX_SESSION_TEXT_LENGTH} character limit`,
+     );
+   }
+-  if (
+-    body.materialIds !== undefined &&
+-    (!Array.isArray(body.materialIds) || body.materialIds.some((id) => typeof id !== 'string'))
+-  ) {
+-    return apiError('INVALID_REQUEST', 400, 'materialIds must be an array of strings');
+-  }
+-  const materialIds = [...new Set(((body.materialIds ?? []) as string[]).map((id) => id.trim()))];
+-  if (materialIds.length > 20 || materialIds.some((id) => !id)) {
+-    return apiError('INVALID_REQUEST', 400, 'materialIds are invalid');
++  let materialIds: string[], groupedMaterials: boolean;
++  try {
++    const decoded = decodeOpeningMaterialIds(body);
++    materialIds = decoded.ids;
++    groupedMaterials = decoded.grouped;
++  } catch (error) {
++    if (error instanceof OpeningMaterialGroupsError)
++      return apiError('INVALID_REQUEST', 400, error.message);
++    throw error;
+   }
+   if (existingCourse && materialIds.length > 0) {
+     return apiError(
+@@ -90,6 +101,29 @@
+   }
+ 
+   return withRequestOwnerId(req, async (ownerId, responseHeaders) => {
++    if (groupedMaterials) {
++      try {
++        const connectionString = process.env.DATABASE_URL;
++        if (!connectionString)
++          throw new OpeningMaterialGroupsError('unavailable', 'material store unavailable');
++        const { pool } = await getServerPersistenceProvider(connectionString);
++        const ready = await getReadyOwnerMaterials(pool, ownerId, materialIds);
++        assertGroupedOpeningMaterialBudget(materialIds, ready);
++      } catch (error) {
++        if (error instanceof OpeningMaterialGroupsError) {
++          if (error.kind === 'unavailable')
++            return new Response('Not found', { status: 404, headers: responseHeaders });
++          const response = apiError(
++            'INVALID_REQUEST',
++            error.kind === 'too_large' ? 413 : 400,
++            error.message,
++          );
++          responseHeaders.forEach((value, name) => response.headers.append(name, value));
++          return response;
++        }
++        throw error;
++      }
++    }
+     // An EXPLICIT skill — a `?skill=` launch link, not composer UI — is
+     // rejected here rather than at claim time: a session created with a typo'd
+     // skill would otherwise sit queued and then quietly build an ordinary
+@@ -191,7 +225,11 @@
+   return withRequestOwnerId(req, async (ownerId, responseHeaders) => {
+     const store = await getAgentSessionStore();
+     const sessions = await store.listSessionsByOwner(ownerId);
+-    responseHeaders.set('x-mira-textbook-scene-contract', 'mira.frozen-textbook-scene-authoring.v1');
++    responseHeaders.set(
++      'x-mira-textbook-scene-contract',
++      'mira.frozen-textbook-scene-authoring.v1',
++    );
++    responseHeaders.set(OPENING_MATERIAL_GROUPS_HEADER, OPENING_MATERIAL_GROUPS_SCHEMA);
+     return NextResponse.json(sessions, { headers: responseHeaders });
+   });
+ }
+diff --git a/lib/server/agent-runtime/opening-material-groups.ts b/lib/server/agent-runtime/opening-material-groups.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/agent-runtime/opening-material-groups.ts
+@@ -0,0 +1,78 @@
++/** Bounded, atomic opening attachments; legacy materialIds stays capped at 20. */
++export const OPENING_MATERIAL_GROUPS_SCHEMA = 'mira.agent-opening-material-groups.v1';
++export const OPENING_MATERIAL_GROUPS_HEADER = 'x-mira-agent-material-groups';
++export const MAX_OPENING_MATERIALS = 64;
++export const MAX_OPENING_MATERIAL_BYTES = 128 * 1024 * 1024;
++
++export class OpeningMaterialGroupsError extends Error {
++  constructor(
++    readonly kind: 'invalid' | 'unavailable' | 'too_large',
++    message: string,
++  ) {
++    super(message);
++  }
++}
++
++export function decodeOpeningMaterialIds(body: {
++  materialIds?: unknown;
++  materialIdGroups?: unknown;
++}): {
++  ids: string[];
++  grouped: boolean;
++} {
++  const grouped = body.materialIdGroups !== undefined;
++  if (grouped && body.materialIds !== undefined) {
++    throw new OpeningMaterialGroupsError(
++      'invalid',
++      'materialIds and materialIdGroups are mutually exclusive',
++    );
++  }
++  if (!grouped && body.materialIds !== undefined && !Array.isArray(body.materialIds)) {
++    throw new OpeningMaterialGroupsError('invalid', 'materialIds are invalid');
++  }
++  const groups = grouped ? body.materialIdGroups : [body.materialIds ?? []];
++  if (
++    !Array.isArray(groups) ||
++    groups.length < 1 ||
++    groups.length > (grouped ? 4 : 1) ||
++    groups.some(
++      (group) =>
++        !Array.isArray(group) ||
++        (grouped && (group.length < 1 || group.length > 20)) ||
++        group.some((id) => typeof id !== 'string'),
++    )
++  ) {
++    throw new OpeningMaterialGroupsError('invalid', 'materialIdGroups/materialIds are invalid');
++  }
++  const ids = [...new Set((groups as string[][]).flat().map((id) => id.trim()))];
++  if (ids.some((id) => !id) || ids.length > (grouped ? MAX_OPENING_MATERIALS : 20)) {
++    throw new OpeningMaterialGroupsError('invalid', 'materialIdGroups/materialIds are invalid');
++  }
++  return { ids, grouped };
++}
++
++/** Records are read through the same owner's ready-material query, before a session exists. */
++export function assertGroupedOpeningMaterialBudget(
++  ids: readonly string[],
++  records: ReadonlyArray<{ id: string; bytes: number }>,
++): number {
++  const byId = new Map(records.map((record) => [record.id, record]));
++  if (byId.size !== ids.length || ids.some((id) => !byId.has(id))) {
++    throw new OpeningMaterialGroupsError('unavailable', 'one or more materials are unavailable');
++  }
++  let total = 0;
++  for (const id of ids) {
++    const bytes = byId.get(id)!.bytes;
++    if (!Number.isSafeInteger(bytes) || bytes <= 0) {
++      throw new OpeningMaterialGroupsError('unavailable', 'material size is unavailable');
++    }
++    total += bytes;
++    if (total > MAX_OPENING_MATERIAL_BYTES) {
++      throw new OpeningMaterialGroupsError(
++        'too_large',
++        'opening materials exceed the total byte limit',
++      );
++    }
++  }
++  return total;
++}
+diff --git a/tests/agent-runtime/sessions-route.test.ts b/tests/agent-runtime/sessions-route.test.ts
+--- a/tests/agent-runtime/sessions-route.test.ts
++++ b/tests/agent-runtime/sessions-route.test.ts
+@@ -12,6 +12,7 @@
+   listSkills: vi.fn(),
+   findSkill: vi.fn(),
+   inferSkillIdFromPrompt: vi.fn(),
++  getReadyOwnerMaterials: vi.fn(),
+ }));
+ 
+ vi.mock('@/lib/config/feature-flags', () => ({
+@@ -41,6 +42,12 @@
+ vi.mock('@/lib/server/agent-runtime/session-materials', () => ({
+   bindOwnerMaterialsToSession: mocks.bindOwnerMaterialsToSession,
+   SessionMaterialBindingError: class SessionMaterialBindingError extends Error {},
++}));
++vi.mock('@/lib/persistence/server-provider', () => ({
++  getServerPersistenceProvider: async () => ({ pool: {} }),
++}));
++vi.mock('@/lib/persistence/owner-materials', () => ({
++  getReadyOwnerMaterials: mocks.getReadyOwnerMaterials,
+ }));
+ 
+ import { GET, POST } from '@/app/api/agent/sessions/route';
+@@ -85,6 +92,9 @@
+   mocks.postUserMessage.mockResolvedValue({ seq: 1, delivery: 'queued', requeued: true });
+   mocks.softDeleteSession.mockResolvedValue(true);
+   mocks.bindOwnerMaterialsToSession.mockResolvedValue([]);
++  mocks.getReadyOwnerMaterials.mockImplementation(
++    async (_pool: unknown, _owner: string, ids: string[]) => ids.map((id) => ({ id, bytes: 1024 })),
++  );
+ });
+ 
+ describe('agent session collection route', () => {
+@@ -256,13 +266,64 @@
+   it('lists only sessions for the resolved owner', async () => {
+     mocks.listSessionsByOwner.mockResolvedValue([{ id: 'session-1', status: 'running' }]);
+     const response = await GET(new NextRequest('http://localhost/api/agent/sessions'));
+-    expect(response.headers.get('x-mira-textbook-scene-contract')).toBe('mira.frozen-textbook-scene-authoring.v1');
++    expect(response.headers.get('x-mira-textbook-scene-contract')).toBe(
++      'mira.frozen-textbook-scene-authoring.v1',
++    );
++    expect(response.headers.get('x-mira-agent-material-groups')).toBe(
++      'mira.agent-opening-material-groups.v1',
++    );
+ 
+     expect(response.status).toBe(200);
+     expect(mocks.listSessionsByOwner).toHaveBeenCalledWith('anon:test');
+     await expect(response.json()).resolves.toEqual([{ id: 'session-1', status: 'running' }]);
+   });
+ 
++  it('binds all bounded opening groups before queueing exactly one message', async () => {
++    vi.stubEnv('DATABASE_URL', 'postgres://fixture-only');
++    const ids = Array.from({ length: 43 }, (_, i) => `material-${i}`);
++    const groups = [ids.slice(0, 20), ids.slice(20, 40), ids.slice(40)];
++    mocks.bindOwnerMaterialsToSession.mockImplementation(async () => {
++      expect(mocks.postUserMessage).not.toHaveBeenCalled();
++      return ids.map((materialId) => ({ materialId, bytes: 1024 }));
++    });
++    const response = await post({ prompt: 'Reuse original media', materialIdGroups: groups });
++    expect(response.status).toBe(202);
++    expect(mocks.getReadyOwnerMaterials).toHaveBeenCalledWith({}, 'anon:test', ids);
++    expect(mocks.createSession).toHaveBeenCalledWith(
++      expect.objectContaining({ status: 'succeeded' }),
++    );
++    expect(mocks.bindOwnerMaterialsToSession).toHaveBeenCalledWith('session-1', 'anon:test', ids);
++    expect(mocks.postUserMessage).toHaveBeenCalledTimes(1);
++    expect(mocks.postUserMessage.mock.calls[0][1].materials).toHaveLength(43);
++    vi.unstubAllEnvs();
++  });
++
++  it('rejects oversized or unavailable groups before creating a session', async () => {
++    vi.stubEnv('DATABASE_URL', 'postgres://fixture-only');
++    mocks.getReadyOwnerMaterials.mockResolvedValue([{ id: 'one', bytes: 128 * 1024 * 1024 + 1 }]);
++    expect((await post({ prompt: 'p', materialIdGroups: [['one']] })).status).toBe(413);
++    mocks.getReadyOwnerMaterials.mockResolvedValue([]);
++    expect((await post({ prompt: 'p', materialIdGroups: [['one']] })).status).toBe(404);
++    expect(mocks.createSession).not.toHaveBeenCalled();
++    expect(mocks.bindOwnerMaterialsToSession).not.toHaveBeenCalled();
++    expect(mocks.postUserMessage).not.toHaveBeenCalled();
++    vi.unstubAllEnvs();
++  });
++
++  it('keeps legacy twenty-item validation and rejects malformed or conflicting groups', async () => {
++    const ids = Array.from({ length: 21 }, (_, i) => `material-${i}`);
++    for (const body of [
++      { materialIds: ids },
++      { materialIdGroups: [ids] },
++      { materialIds: [], materialIdGroups: [['one']] },
++      { materialIdGroups: Array.from({ length: 5 }, () => ['one']) },
++      { materialIdGroups: [['one', null]] },
++    ]) {
++      expect((await post({ prompt: 'p', ...body })).status).toBe(400);
++    }
++    expect(mocks.createSession).not.toHaveBeenCalled();
++  });
++
+   it('keeps both collection methods behind the runtime gate', async () => {
+     mocks.runtimeEnabled = false;
+ 
+diff --git a/tests/agent-runtime/opening-material-groups.test.ts b/tests/agent-runtime/opening-material-groups.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/agent-runtime/opening-material-groups.test.ts
+@@ -0,0 +1,66 @@
++import { describe, expect, it } from 'vitest';
++import {
++  assertGroupedOpeningMaterialBudget,
++  decodeOpeningMaterialIds,
++  MAX_OPENING_MATERIAL_BYTES,
++} from '@/lib/server/agent-runtime/opening-material-groups';
++
++describe('bounded opening material groups', () => {
++  it('accepts sixty-four unique materials over four finite groups', () => {
++    const ids = Array.from({ length: 64 }, (_, i) => `mat-${i}`);
++    const decoded = decodeOpeningMaterialIds({
++      materialIdGroups: [ids.slice(0, 20), ids.slice(20, 40), ids.slice(40, 60), ids.slice(60)],
++    });
++    expect(decoded).toEqual({ ids, grouped: true });
++    expect(
++      assertGroupedOpeningMaterialBudget(
++        ids,
++        ids.map((id) => ({ id, bytes: 1024 })),
++      ),
++    ).toBe(65536);
++  });
++  it('rejects sixty-five, empty, malformed or conflicting groups', () => {
++    const ids = Array.from({ length: 65 }, (_, i) => `mat-${i}`);
++    for (const body of [
++      { materialIdGroups: [ids.slice(0, 20), ids.slice(20, 40), ids.slice(40, 60), ids.slice(60)] },
++      { materialIdGroups: [] },
++      { materialIdGroups: [[]] },
++      { materialIdGroups: [[' ']] },
++      { materialIdGroups: [['ok', 1]] },
++      { materialIds: null },
++      { materialIds: [], materialIdGroups: [['one']] },
++    ]) {
++      expect(() => decodeOpeningMaterialIds(body)).toThrow();
++    }
++  });
++  it('bounds bytes and requires every material to belong to the ready owner query', () => {
++    expect(() => assertGroupedOpeningMaterialBudget(['one'], [])).toThrow('unavailable');
++    expect(() => assertGroupedOpeningMaterialBudget(['one'], [{ id: 'other', bytes: 1 }])).toThrow(
++      'unavailable',
++    );
++    expect(() => assertGroupedOpeningMaterialBudget(['one'], [{ id: 'one', bytes: NaN }])).toThrow(
++      'unavailable',
++    );
++    expect(() =>
++      assertGroupedOpeningMaterialBudget(
++        ['one'],
++        [{ id: 'one', bytes: MAX_OPENING_MATERIAL_BYTES + 1 }],
++      ),
++    ).toThrow('byte limit');
++    expect(
++      assertGroupedOpeningMaterialBudget(
++        ['one'],
++        [{ id: 'one', bytes: MAX_OPENING_MATERIAL_BYTES }],
++      ),
++    ).toBe(MAX_OPENING_MATERIAL_BYTES);
++  });
++  it('preserves legacy deduplication and its twenty-item cap', () => {
++    expect(decodeOpeningMaterialIds({ materialIds: ['one', ' one '] })).toEqual({
++      ids: ['one'],
++      grouped: false,
++    });
++    expect(() =>
++      decodeOpeningMaterialIds({ materialIds: Array.from({ length: 21 }, (_, i) => `mat-${i}`) }),
++    ).toThrow();
++  });
++});

@@ -1,0 +1,650 @@
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -792,8 +792,9 @@
+       resetPresentationIdleTimer,
+     ]);
+ 
+-    // Initialize playback engine when scene changes
+-    useEffect(() => {
++    // Retire outgoing sound before the new page can speak or asynchronous
++    // progress restoration begins, including pages without timeline actions.
++    useLayoutEffect(() => {
+       let cancelled = false;
+       const initializeScene = async () => {
+         const managedPageSpeech = currentScene ? fixedPageManagedSpeechIds(
+@@ -803,6 +804,10 @@
+         if (previousSceneId && previousSceneId !== currentScene?.id) {
+           saveSceneResumePosition(previousSceneId, currentPlaybackActionIndexRef.current);
+         }
++        engineRef.current?.stop();
++        engineRef.current = null;
++        setEngineMode('idle');
++        setLectureSpeaking(false);
+ 
+         // Bump epoch so any stale SSE callbacks from the previous scene are discarded
+         sceneEpochRef.current++;
+@@ -897,11 +902,6 @@
+           if (currentScene) releaseQuestionNarrationScene(currentScene.id);
+ 
+           return;
+-        }
+-
+-        // Stop previous engine
+-        if (engineRef.current) {
+-          engineRef.current.stop();
+         }
+ 
+         // Widget iframe messaging callback for interactive scenes, resolved lazily
+@@ -1398,12 +1398,13 @@
+     const isTopicActive = playbackView.isTopicActive;
+ 
+     const armSelectedSceneAutoStart = useCallback(
+-      (targetSceneId: string) => {
++      (targetSceneId: string, continueOperatorPlayback = false) => {
+         autoStartRef.current = shouldAutoStartMiraStudentSelectedScene({
+           studentMode,
+           autoPlayLecture: studentAutoPlayRuntime?.autoPlayLectureRef.current ?? false,
+           audioStartAccepted: studentAutoPlayRuntime?.audioStartAccepted ?? false,
+           targetIsPlayableScene: targetSceneId !== PENDING_SCENE_ID,
++          continueOperatorPlayback,
+         });
+       },
+       [studentAutoPlayRuntime, studentMode],
+@@ -1447,6 +1448,8 @@
+     const gatedSceneSwitch = useCallback(
+       async (targetSceneId: string): Promise<boolean> => {
+         const requestId = ++sceneSwitchRequestRef.current;
++        const continueOperatorPlayback = engineRef.current?.getMode() === 'playing'
++          || getPageNarration().phase === 'playing';
+         if (targetSceneId === currentSceneId) {
+           setPendingSceneId(null);
+           return false;
+@@ -1484,7 +1487,7 @@
+         if (requestId !== sceneSwitchRequestRef.current) return false;
+         if (!(await saveDiscussionNavigation())) return false;
+         if (requestId !== sceneSwitchRequestRef.current) return false;
+-        armSelectedSceneAutoStart(targetSceneId);
++        armSelectedSceneAutoStart(targetSceneId, continueOperatorPlayback);
+         setCurrentSceneId(targetSceneId);
+         return true;
+       },
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -23,7 +23,8 @@
+   notifyInteractiveNarration,
+ } from '@/lib/mira/lecture-audio';
+ import { getPageNarration, subscribePageNarration } from '@/lib/mira/page-narration';
+-import { fixedInteractiveNarrationText, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
++import { fixedInteractiveNarrationText, fixedPageManagedSpeechIds, usesTextbookPageNarration } from '@/lib/mira/page-managed-narration';
++import { connectInteractiveAudioControls } from '@/lib/mira/interactive-audio-controls';
+ import { intersectClientBoxes } from '@/lib/edit/visible-client-rect';
+ import { useCanvasStore } from '@/lib/store/canvas';
+ import { useElementRefsStore } from '@/lib/store/element-refs';
+@@ -369,6 +370,22 @@
+   const pageNarration = useSyncExternalStore(subscribePageNarration, getPageNarration, getPageNarration);
+   const narrationAllowed = pageNarrationAllowed(shown, lectureSpeaking) && !pageNarration.paused
+     && (!needsCheckpoint || readyCheckpoint === checkpointKey);
++  useEffect(() => {
++    const frame = iframeRef.current;
++    const state = useStageStore.getState();
++    if (!frame || !shown || (needsCheckpoint && readyCheckpoint !== checkpointKey)
++        || state.currentSceneId !== sceneId || !state.getCurrentScene()
++        || !fixedPageManagedSpeechIds(state.getCurrentScene()!, usesTextbookPageNarration(state.stage)).size) return;
++    return connectInteractiveAudioControls({ frame,
++      active: () => visibleRef.current && useStageStore.getState().currentSceneId === sceneId
++        && (!needsCheckpoint || checkpointReadyRef.current === checkpointKey),
++      isBoundCue: cueId => {
++        const current = useStageStore.getState();
++        return fixedInteractiveNarrationText(current.getCurrentScene(), usesTextbookPageNarration(current.stage), sceneId, cueId) !== null;
++      },
++      canControl: () => !isLectureSpeaking(),
++    });
++  }, [shown, sceneId, entry.srcDoc, needsCheckpoint, readyCheckpoint, checkpointKey]);
+   useEffect(() => {
+     const interact = (event: MessageEvent) => {
+       if (!shown || event.source !== iframeRef.current?.contentWindow
+@@ -469,6 +486,9 @@
+         style={iframeStyle}
+         data-mira-viewport-mode={viewportMode}
+         title={`Interactive Scene ${sceneId}`}
++        // A navigation gesture belongs to the classroom, while this sandbox
++        // has an opaque origin. Delegate audio to the active game as well.
++        allow="autoplay *"
+         sandbox="allow-scripts allow-forms allow-popups"
+       />
+     </div>
+diff --git a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+--- a/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
++++ b/tests/scene-renderers/interactive-iframe-narration-visibility.test.ts
+@@ -14,6 +14,7 @@
+ import { useStageStore } from '@/lib/store/stage';
+ 
+ vi.mock('@/lib/contexts/mira-student-runtime-context', () => ({
++  useMiraStudentRuntime: () => false,
+   useMiraStudentRuntimeEvents: () => null,
+ }));
+ vi.mock('@/lib/mira/student-interaction-bridge', () => ({
+@@ -97,6 +98,8 @@
+     expect(frame('one')).toBe(first);
+     expect(frame('two')).toBe(second);
+     expect(first.getAttribute('sandbox')).toBe('allow-scripts allow-forms allow-popups');
++    expect(first.getAttribute('allow')).toBe('autoplay *');
++    expect(second.getAttribute('allow')).toBe('autoplay *');
+     expect(first.srcdoc).toContain('legacy or narrated activity');
+   });
+ 
+diff --git a/lib/mira/student-runtime.ts b/lib/mira/student-runtime.ts
+--- a/lib/mira/student-runtime.ts
++++ b/lib/mira/student-runtime.ts
+@@ -91,13 +91,17 @@
+   autoPlayLecture,
+   audioStartAccepted,
+   targetIsPlayableScene,
++  continueOperatorPlayback = false,
+ }: {
+   readonly studentMode: boolean;
+   readonly autoPlayLecture: boolean;
+   readonly audioStartAccepted: boolean;
+   readonly targetIsPlayableScene: boolean;
++  readonly continueOperatorPlayback?: boolean;
+ }): boolean {
+-  return studentMode && autoPlayLecture && audioStartAccepted && targetIsPlayableScene;
++  return targetIsPlayableScene && (studentMode
++    ? autoPlayLecture && audioStartAccepted
++    : continueOperatorPlayback);
+ }
+ 
+ /** Browsers require a direct user gesture before a classroom can reliably play audio. */
+diff --git a/tests/runtime/mira-student-runtime.test.ts b/tests/runtime/mira-student-runtime.test.ts
+--- a/tests/runtime/mira-student-runtime.test.ts
++++ b/tests/runtime/mira-student-runtime.test.ts
+@@ -128,6 +128,15 @@
+     }
+   });
+ 
++  it('continues an already playing operator preview on manual navigation, never a paused preview or pending page', () => {
++    const input = { studentMode: false, autoPlayLecture: false, audioStartAccepted: false,
++      targetIsPlayableScene: true, continueOperatorPlayback: true };
++    expect(shouldAutoStartMiraStudentSelectedScene(input)).toBe(true);
++    expect(shouldAutoStartMiraStudentSelectedScene({ ...input, continueOperatorPlayback: false })).toBe(false);
++    expect(shouldAutoStartMiraStudentSelectedScene({ ...input, targetIsPlayableScene: false })).toBe(false);
++    expect(shouldAutoStartMiraStudentSelectedScene({ ...input, studentMode: true })).toBe(false);
++  });
++
+   it('requires one explicit audio-start gesture only for an unstarted student classroom', () => {
+     expect(
+       shouldShowMiraStudentStartGate({
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -5,6 +5,7 @@
+ import { COURSE_OPERATION_ADAPTERS, MATH_COURSE_OPERATION_ADAPTERS, ENGLISH_CLASSROOM_OPERATION_ADAPTER, SPLIT_ADD_COURSE_OPERATION_ADAPTER, SCIENCE_SENSORY_OPERATION_ADAPTER } from '@/lib/mira/course-operation-adapters';
+ import { mapEmbeddedActivityDocument, patchActivityCheckpointAdapters } from '@/lib/mira/activity-checkpoint-adapters';
+ import { injectIntoDocumentHead } from './html-document';
++import { INTERACTIVE_AUDIO_CONTROL_SHIM } from '@/lib/mira/interactive-audio-controls';
+ 
+ /**
+  * In-memory localStorage/sessionStorage shim, injected as the FIRST thing in the
+@@ -341,7 +342,7 @@
+ </style>`;
+ 
+   const injection =
+-    '\n' + ACTIVITY_INTENT_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + (checkpointSupported ? checkpointMarker + ACTIVITY_CHECKPOINT_SHIM + COURSE_OPERATION_SHIM + COURSE_OPERATION_ADAPTERS + MATH_COURSE_OPERATION_ADAPTERS + ENGLISH_CLASSROOM_OPERATION_ADAPTER + SPLIT_ADD_COURSE_OPERATION_ADAPTER + SCIENCE_SENSORY_OPERATION_ADAPTER : '') + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss + '\n' + activityControlsCss;
++    '\n' + ACTIVITY_INTENT_SHIM + '\n' + INTERACTIVE_AUDIO_CONTROL_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + (checkpointSupported ? checkpointMarker + ACTIVITY_CHECKPOINT_SHIM + COURSE_OPERATION_SHIM + COURSE_OPERATION_ADAPTERS + MATH_COURSE_OPERATION_ADAPTERS + ENGLISH_CLASSROOM_OPERATION_ADAPTER + SPLIT_ADD_COURSE_OPERATION_ADAPTER + SCIENCE_SENSORY_OPERATION_ADAPTER : '') + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss + '\n' + activityControlsCss;
+ 
+   return injectIntoDocumentHead(adaptedHtml, injection);
+ }
+diff --git a/lib/mira/activity-checkpoint-profile.ts b/lib/mira/activity-checkpoint-profile.ts
+--- a/lib/mira/activity-checkpoint-profile.ts
++++ b/lib/mira/activity-checkpoint-profile.ts
+@@ -1,5 +1,6 @@
+ import { CHECKPOINT_VALUE_CODEC } from './activity-checkpoint-common-adapters';
+ import { ACTIVITY_CHECKPOINT_ARCHIVE_RUNTIME } from './activity-checkpoint-archive';
++import { INTERACTIVE_AUDIO_EXPLICIT_PLAY_EVENT } from './interactive-audio-controls';
+ 
+ /** Shared implementation for explicit, reviewed lexical-state profiles. It
+  * never enumerates window bindings, clones HTML, replays input or grants credit.
+@@ -58,6 +59,9 @@
+   for(const type of ['pointerdown','keydown'])document.addEventListener(type,event=>{
+     if(event.isTrusted){quietAfterRestore=false;profile.quiet?.(false);}
+   },true);
++  window.addEventListener('${INTERACTIVE_AUDIO_EXPLICIT_PLAY_EVENT}',()=>{
++    quietAfterRestore=false;profile.quiet?.(false);
++  });
+   function view() {
+     const result=[];
+     for(const id of ids){const node=document.getElementById(id);if(!node)continue;
+diff --git a/lib/mira/activity-checkpoint-pinyin-adapters.ts b/lib/mira/activity-checkpoint-pinyin-adapters.ts
+--- a/lib/mira/activity-checkpoint-pinyin-adapters.ts
++++ b/lib/mira/activity-checkpoint-pinyin-adapters.ts
+@@ -1,5 +1,6 @@
+ import { CHECKPOINT_VALUE_CODEC } from './activity-checkpoint-common-adapters';
+ import { ACTIVITY_CHECKPOINT_ARCHIVE_RUNTIME } from './activity-checkpoint-archive';
++import { INTERACTIVE_AUDIO_EXPLICIT_PLAY_EVENT } from './interactive-audio-controls';
+ 
+ /** Exact-program compatibility for reviewed, immutable phonics activities.
+  * Domain bindings are restored without synthesizing input, grading or speech.
+@@ -2695,6 +2696,7 @@
+     for(const type of ['pointerdown','keydown'])document.addEventListener(type,event=>{
+       if(event.isTrusted)quietAfterRestore=false;
+     },true);
++    window.addEventListener('${INTERACTIVE_AUDIO_EXPLICIT_PLAY_EVENT}',()=>{quietAfterRestore=false;});
+     function captureView(){
+       const nodes=[],all=Array.from(document.querySelectorAll('[id]')),counts=new Map();
+       for(const node of all)counts.set(node.id,(counts.get(node.id)||0)+1);
+diff --git a/lib/mira/interactive-audio-controls.ts b/lib/mira/interactive-audio-controls.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/mira/interactive-audio-controls.ts
+@@ -0,0 +1,206 @@
++import { getPageNarration, registerPageNarration } from './page-narration';
++import type { PageNarrationPhase } from './page-narration';
++
++/** An explicit parent-toolbar request, not a fabricated pointer/key event.
++ * Checkpoint profiles may listen to this to release their restore-only quiet
++ * flag. It never begins an activity or changes saved learning evidence. */
++export const INTERACTIVE_AUDIO_EXPLICIT_PLAY_EVENT = 'mira:interactive-audio-explicit-play';
++
++// Observed in reviewed course sources. Deliberately exclude generic "重播",
++// "重播当前顺序", help, demonstrations, start and reset: those may move objects
++// or give help. An ambiguous pair of matching controls is also unsupported.
++const REPLAY_LABELS = [
++  '重听当前提示', '再听一次老师的话', '重听任务', '重播当前语音',
++  '重听提示', '重听当前讲解', '重播老师提示', '重听口令', '再听任务',
++  '重听当前题目', '重听当前读题', '重听题目', '重听描红提示', '重听指令',
++  '重听当前页提示', '重听当前一句', '重听当前任务', '重听这回练习的方法',
++  '重播语音', '重播当前提示', '重播任务说明', '重播当前指导',
++  '重播任务语音', '重听任务说明', '再听当前任务', '再听老师的话',
++  '重播提示', '重播当前任务说明', '重听观察任务',
++] as const;
++
++/** Inject before authored scripts. Inert without the existing prerecorded
++ * helper and its finite cue manifest. The host separately requires a reviewed
++ * exact cue binding; iframe claims never establish that binding themselves. */
++export const INTERACTIVE_AUDIO_CONTROL_SHIM = `<script data-mira-interactive-audio-controls>
++(function () {
++  var type = 'MIRA_INTERACTIVE_AUDIO_CONTROL', stateType = 'MIRA_INTERACTIVE_AUDIO_STATE';
++  var labels = new Set(${JSON.stringify(REPLAY_LABELS)});
++  var channel = null, visible = false, cueId = null, phase = 'idle', timer = null;
++  function exact(value, keys) {
++    return value && typeof value === 'object' && !Array.isArray(value)
++      && Object.keys(value).length === keys.length && keys.every(function (key) { return Object.prototype.hasOwnProperty.call(value, key); });
++  }
++  function cues() {
++    var helpers = document.querySelectorAll('script[id="mira-pre-recorded-audio"]');
++    var manifests = document.querySelectorAll('script[id="mira-narration-cues"]');
++    if (helpers.length !== 1 || helpers[0].hasAttribute('src') || manifests.length !== 1
++        || manifests[0].getAttribute('type') !== 'application/json') return null;
++    try {
++      var value = JSON.parse(manifests[0].textContent);
++      if (value.schemaVersion !== 'mira.interactive.narration-cues.v1' || !Array.isArray(value.cues)
++          || !value.cues.length || value.cues.length > 120) return null;
++      var ids = value.cues.map(function (cue) { return cue && cue.id; });
++      if (ids.some(function (id) { return typeof id !== 'string' || !/^[\\w-]{1,128}$/.test(id); })
++          || new Set(ids).size !== ids.length) return null;
++      return new Set(ids);
++    } catch (_) { return null; }
++  }
++  function replay() {
++    if (!cues()) return null;
++    var matches = Array.from(document.querySelectorAll('button')).filter(function (button) {
++      // Prefer an explicit accessible label. Text fallback is also exact and
++      // audio-specific, never an id/name/substring or a guessed game action.
++      var label = (button.getAttribute('aria-label') || button.textContent || '').trim();
++      if (!labels.has(label) || button.disabled || button.closest('[hidden],[aria-hidden="true"]')) return false;
++      for (var node = button; node && node.nodeType === 1; node = node.parentElement) {
++        var style = window.getComputedStyle(node);
++        if (style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse') return false;
++      }
++      return true;
++    });
++    return matches.length === 1 ? matches[0] : null;
++  }
++  function emit() {
++    if (!channel || !cues()) return;
++    window.parent.postMessage({ type: stateType, channel: channel, cueId: cueId,
++      status: phase, hasReplay: !!replay() }, '*');
++  }
++  function clearPending() { if (timer !== null) clearTimeout(timer); timer = null; }
++  window.addEventListener('mira-narration-state', function (event) {
++    var detail = event && event.detail, known = cues();
++    if (!detail || !known) return;
++    if (detail.status === 'hidden') {
++      clearPending(); phase = 'paused';
++      if (known.has(detail.cueId)) cueId = detail.cueId;
++      emit(); return;
++    }
++    if (!known.has(detail.cueId)) return;
++    if (detail.status === 'playing') {
++      if (!visible || document.hidden) return;
++      clearPending(); cueId = detail.cueId; phase = 'playing';
++    } else if (detail.status === 'ready' && detail.cueId === cueId) {
++      clearPending(); phase = 'ended';
++    } else if (['error', 'missing', 'cancelled'].includes(detail.status)) {
++      clearPending(); cueId = detail.cueId; phase = 'paused';
++    } else return;
++    emit();
++  });
++  window.addEventListener('message', function (event) {
++    if (event.source !== window.parent) return;
++    var data = event.data;
++    if (exact(data, ['type', 'visible']) && data.type === 'MIRA_NARRATION_VISIBILITY'
++        && typeof data.visible === 'boolean') {
++      visible = data.visible;
++      if (!visible) { clearPending(); phase = 'paused'; }
++      emit(); return;
++    }
++    if (!exact(data, ['type', 'command', 'channel']) || data.type !== type
++        || typeof data.channel !== 'string' || !/^[\\w-]{8,128}$/.test(data.channel)) return;
++    if (data.command === 'connect') { channel = data.channel; emit(); return; }
++    if (data.channel !== channel) return;
++    if (data.command === 'disconnect') { clearPending(); channel = null; return; }
++    if (data.command === 'inspect') { emit(); return; }
++    if (data.command === 'pause') { clearPending(); phase = 'paused'; emit(); return; }
++    if (data.command !== 'play' || !visible || document.hidden) return;
++    var button = replay();
++    if (!button) { phase = 'paused'; emit(); return; }
++    clearPending(); phase = 'pending'; emit();
++    window.dispatchEvent(new CustomEvent('${INTERACTIVE_AUDIO_EXPLICIT_PLAY_EVENT}'));
++    // Use the authored handler so its cue queue and completion gate resume
++    // together. No fake trusted input or direct call to a detached audio clip.
++    button.click();
++    if (phase === 'pending') timer = setTimeout(function () {
++      timer = null; if (phase === 'pending') { phase = 'paused'; emit(); }
++    }, 2000);
++  });
++  window.addEventListener('load', emit);
++  document.addEventListener('visibilitychange', function () {
++    if (document.hidden) { clearPending(); phase = 'paused'; emit(); }
++  });
++})();
++</script>`;
++
++type StateMessage = {
++  type: 'MIRA_INTERACTIVE_AUDIO_STATE';
++  channel: string;
++  cueId: string | null;
++  status: PageNarrationPhase;
++  hasReplay: boolean;
++};
++
++function readState(value: unknown, channel: string, isBoundCue: (cueId: string) => boolean): StateMessage | null {
++  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
++  const state = value as StateMessage;
++  if (Object.keys(state).length !== 5 || !['type', 'channel', 'cueId', 'status', 'hasReplay'].every(key => Object.hasOwn(state, key))
++      || state.type !== 'MIRA_INTERACTIVE_AUDIO_STATE' || state.channel !== channel
++      || typeof state.hasReplay !== 'boolean'
++      || !['idle', 'pending', 'playing', 'paused', 'ended'].includes(state.status)) return null;
++  if (state.cueId === null) {
++    if (!['idle', 'pending', 'paused'].includes(state.status)) return null;
++  } else if (typeof state.cueId !== 'string' || !isBoundCue(state.cueId)) return null;
++  return state;
++}
++
++export interface InteractiveAudioControlsOptions {
++  frame: HTMLIFrameElement;
++  /** Must include active scene identity, visibility and checkpoint readiness. */
++  active: () => boolean;
++  /** Exact reviewed text/audio binding from the parent-owned scene. */
++  isBoundCue: (cueId: string) => boolean;
++  /** The lecture/discussion keeps its sound channel until it finishes. */
++  canControl?: () => boolean;
++}
++
++/** Connect only for a reviewed, currently shown page with managed speech.
++ * A connection advertises controls but never plays on mount/restore/re-entry. */
++export function connectInteractiveAudioControls({ frame, active, isBoundCue,
++  canControl = () => true }: InteractiveAudioControlsOptions): () => void {
++  let disposed = false;
++  let channel = crypto.randomUUID();
++  let hasReplay = false;
++  let phase: PageNarrationPhase = 'idle';
++  const post = (command: string) => frame.contentWindow?.postMessage(
++    { type: 'MIRA_INTERACTIVE_AUDIO_CONTROL', command, channel }, '*',
++  );
++  const visibility = (visible: boolean) => frame.contentWindow?.postMessage(
++    { type: 'MIRA_NARRATION_VISIBILITY', visible }, '*',
++  );
++  const canAct = () => !disposed && active() && canControl();
++  const registration = registerPageNarration({
++    ready: () => canAct() && (hasReplay || phase === 'playing' || phase === 'pending'),
++    play: () => {
++      if (!canAct() || !hasReplay) return;
++      phase = 'pending'; registration.phase(phase);
++      visibility(true); post('play');
++    },
++    pause: () => {
++      if (disposed || !active()) return;
++      phase = 'paused'; registration.phase(phase);
++      visibility(false); post('pause');
++    },
++  });
++  const receive = (event: MessageEvent) => {
++    if (!canAct() || event.source !== frame.contentWindow) return;
++    const state = readState(event.data, channel, isBoundCue);
++    if (!state) return;
++    if (getPageNarration().paused && (state.status === 'playing' || state.status === 'pending')) return;
++    hasReplay = state.hasReplay; phase = state.status;
++    registration.phase(phase);
++  };
++  const connect = () => {
++    // A frame reload replaces its program. Late messages from that earlier
++    // document cannot change the current toolbar, even with the same Window.
++    channel = crypto.randomUUID(); hasReplay = false; phase = 'idle';
++    registration.phase(phase); post('connect');
++  };
++  window.addEventListener('message', receive);
++  frame.addEventListener('load', connect);
++  connect();
++  return () => {
++    if (disposed) return;
++    disposed = true; post('disconnect'); registration.dispose();
++    window.removeEventListener('message', receive);
++    frame.removeEventListener('load', connect);
++  };
++}
+diff --git a/tests/scene-renderers/interactive-audio-controls.test.ts b/tests/scene-renderers/interactive-audio-controls.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/scene-renderers/interactive-audio-controls.test.ts
+@@ -0,0 +1,198 @@
++// @vitest-environment jsdom
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import { connectInteractiveAudioControls, INTERACTIVE_AUDIO_CONTROL_SHIM,
++  INTERACTIVE_AUDIO_EXPLICIT_PLAY_EVENT } from '@/lib/mira/interactive-audio-controls';
++import { getPageNarration, releasePageNarrationPause, togglePageNarration } from '@/lib/mira/page-narration';
++
++const channel = 'test-audio-channel';
++const helper = '<script id="mira-pre-recorded-audio">const clips={};let active=null;</script>';
++const manifest = '<script id="mira-narration-cues" type="application/json">'
++  + '{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"task","text":"数数小船"},{"id":"feedback","text":"再看看"}]}</script>';
++
++function shim(markup: string, withHelper = true) {
++  document.body.innerHTML = (withHelper ? helper + manifest : '') + markup;
++  const handlers = new Map<string, Array<(event: any) => void>>();
++  const parent = { postMessage: vi.fn() };
++  const win = {
++    parent,
++    addEventListener(type: string, listener: (event: any) => void) {
++      handlers.set(type, [...(handlers.get(type) ?? []), listener]);
++    },
++    dispatchEvent(event: Event) {
++      for (const handler of handlers.get(event.type) ?? []) handler(event);
++      return true;
++    },
++    getComputedStyle: window.getComputedStyle.bind(window),
++  };
++  const code = INTERACTIVE_AUDIO_CONTROL_SHIM.match(/<script[^>]*>([\s\S]*)<\/script>/)![1];
++  new Function('window', 'document', 'CustomEvent', 'setTimeout', 'clearTimeout', code)(
++    win, document, CustomEvent, setTimeout, clearTimeout,
++  );
++  const send = (data: unknown, source: unknown = parent) => {
++    for (const listener of handlers.get('message') ?? []) listener({ source, data });
++  };
++  const command = (command: string, extra = {}) => send({ type: 'MIRA_INTERACTIVE_AUDIO_CONTROL', command, channel, ...extra });
++  const visibility = (visible: boolean) => send({ type: 'MIRA_NARRATION_VISIBILITY', visible });
++  const narration = (cueId: string | null, status: string) => win.dispatchEvent(
++    new CustomEvent('mira-narration-state', { detail: { cueId, status } }),
++  );
++  command('connect');
++  return { parent, win, send, command, visibility, narration,
++    latest: () => parent.postMessage.mock.calls.at(-1)?.[0] };
++}
++
++beforeEach(() => {
++  releasePageNarrationPause();
++  vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
++});
++afterEach(() => {
++  document.body.replaceChildren(); vi.restoreAllMocks(); vi.useRealTimers(); releasePageNarrationPause();
++});
++
++describe('reviewed iframe audio control shim', () => {
++  it('uses the original explicit audio replay handler, preserving domain state and real cue completion', () => {
++    const p = shim('<button aria-label="再听一次老师的话">听老师</button>');
++    const world = { answer: 3, completed: false };
++    let gateReady = false, replayCount = 0;
++    const explicitPlay = vi.fn();
++    p.win.addEventListener(INTERACTIVE_AUDIO_EXPLICIT_PLAY_EVENT, explicitPlay);
++    const button = document.querySelector('button')!;
++    button.onclick = event => {
++      expect(event.isTrusted).toBe(false); // No fabricated trusted user gesture.
++      replayCount += 1; gateReady = false; p.narration('task', 'playing');
++    };
++    p.win.addEventListener('mira-narration-state', event => {
++      if (event.detail.cueId === 'task' && event.detail.status === 'ready') gateReady = true;
++    });
++    expect(p.latest()).toMatchObject({ hasReplay: true, status: 'idle' });
++    expect(replayCount).toBe(0); // Mount/inspection never starts a completed or restored page.
++    p.visibility(true); p.command('play');
++    expect(replayCount).toBe(1); expect(explicitPlay).toHaveBeenCalledTimes(1);
++    expect(p.latest()).toMatchObject({ cueId: 'task', status: 'playing' });
++    expect(world).toEqual({ answer: 3, completed: false }); expect(gateReady).toBe(false);
++    p.narration('task', 'ready');
++    expect(gateReady).toBe(true); expect(p.latest().status).toBe('ended');
++    p.command('inspect'); expect(replayCount).toBe(1);
++  });
++
++  it('rejects foreign messages, extra fields, wrong channels, and hidden-page play', () => {
++    const p = shim('<button aria-label="重听当前提示">听</button>');
++    const replay = vi.fn(); document.querySelector('button')!.onclick = replay;
++    p.command('play');
++    p.visibility(true);
++    p.send({ type: 'MIRA_INTERACTIVE_AUDIO_CONTROL', command: 'play', channel }, {});
++    p.command('play', { text: 'untrusted' });
++    p.command('play', { channel: 'stale-audio-channel' });
++    vi.spyOn(document, 'hidden', 'get').mockReturnValue(true); p.command('play');
++    expect(replay).not.toHaveBeenCalled();
++    vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
++    p.visibility(false); p.command('play'); expect(replay).not.toHaveBeenCalled();
++    p.visibility(true); p.command('play'); expect(replay).toHaveBeenCalledTimes(1);
++    p.command('disconnect'); p.command('play'); expect(replay).toHaveBeenCalledTimes(1);
++  });
++
++  it('never guesses game replay, reset, help, demonstration, start, or ambiguous audio controls', () => {
++    for (const label of ['重播', '重播当前顺序', '重置', '开始游戏', '帮助', '重听并看当前字的笔顺示范']) {
++      const p = shim(`<button aria-label="${label}">${label}</button>`);
++      const action = vi.fn(); document.querySelector('button')!.onclick = action;
++      p.visibility(true); p.command('play');
++      expect(p.latest().hasReplay).toBe(false); expect(action).not.toHaveBeenCalled();
++      p.command('disconnect');
++    }
++    const p = shim('<button aria-label="重听当前提示">A</button><button aria-label="重听任务">B</button>');
++    p.visibility(true); p.command('play'); expect(p.latest().hasReplay).toBe(false);
++  });
++
++  it('ignores hidden/disabled alternatives and stays inert without the prerecorded helper', () => {
++    const p = shim('<button hidden aria-label="重听任务">隐藏</button>'
++      + '<button disabled aria-label="重听任务">禁用</button>'
++      + '<div style="display:none"><button aria-label="重听任务">隐藏祖先</button></div>'
++      + '<button id="current">重听任务</button>');
++    expect(p.latest().hasReplay).toBe(true);
++    const action = vi.fn(); document.getElementById('current')!.onclick = action;
++    p.visibility(true); p.command('play'); expect(action).toHaveBeenCalledTimes(1);
++    p.command('disconnect');
++    const inert = shim('<button aria-label="重听任务">听</button>', false);
++    const forbidden = vi.fn(); document.querySelector('button')!.onclick = forbidden;
++    inert.visibility(true); inert.command('play');
++    expect(inert.parent.postMessage).not.toHaveBeenCalled(); expect(forbidden).not.toHaveBeenCalled();
++  });
++
++  it('does not misreport an unrelated ended cue and bounds an unresponsive replay handler', () => {
++    vi.useFakeTimers();
++    const p = shim('<button aria-label="重播当前语音">听</button>');
++    p.visibility(true); p.narration('task', 'playing');
++    p.narration('feedback', 'ready'); expect(p.latest().status).toBe('playing');
++    p.command('play'); expect(p.latest().status).toBe('pending');
++    vi.advanceTimersByTime(2000); expect(p.latest().status).toBe('paused');
++    p.narration('task', 'playing'); expect(p.latest().status).toBe('playing');
++    p.visibility(false); expect(p.latest().status).toBe('paused');
++    p.narration('task', 'playing'); expect(p.latest().status).toBe('paused');
++  });
++});
++
++describe('parent audio toolbar connector', () => {
++  function setup() {
++    const frame = document.createElement('iframe'); document.body.append(frame);
++    const post = vi.spyOn(frame.contentWindow!, 'postMessage').mockImplementation(() => {});
++    let active = true, allowed = true;
++    const dispose = connectInteractiveAudioControls({ frame, active: () => active,
++      canControl: () => allowed, isBoundCue: cue => cue === 'task' });
++    const currentChannel = () => post.mock.calls.filter(([data]) => data.command === 'connect').at(-1)![0].channel;
++    const receive = (overrides: Record<string, unknown> = {}, source: Window | null = frame.contentWindow) => {
++      window.dispatchEvent(new MessageEvent('message', { source, data: {
++        type: 'MIRA_INTERACTIVE_AUDIO_STATE', channel: currentChannel(), cueId: 'task',
++        status: 'ended', hasReplay: true, ...overrides,
++      } }));
++    };
++    return { frame, post, dispose, receive, currentChannel,
++      hide: () => { active = false; }, block: () => { allowed = false; } };
++  }
++
++  it('advertises without autoplay and delegates toolbar play/pause to the currently bound frame', () => {
++    const p = setup();
++    try {
++      expect(p.post.mock.calls.map(([data]) => data.command)).toEqual(['connect']);
++      expect(togglePageNarration()).toBe(false);
++      p.receive(); expect(getPageNarration().phase).toBe('ended');
++      expect(togglePageNarration()).toBe(true);
++      expect(p.post.mock.calls.slice(-2).map(([data]) => data)).toEqual([
++        { type: 'MIRA_NARRATION_VISIBILITY', visible: true },
++        { type: 'MIRA_INTERACTIVE_AUDIO_CONTROL', command: 'play', channel: p.currentChannel() },
++      ]);
++      p.receive({ status: 'playing' }); expect(getPageNarration().phase).toBe('playing');
++      expect(togglePageNarration()).toBe(true);
++      expect(p.post.mock.calls.slice(-2).map(([data]) => data)).toEqual([
++        { type: 'MIRA_NARRATION_VISIBILITY', visible: false },
++        { type: 'MIRA_INTERACTIVE_AUDIO_CONTROL', command: 'pause', channel: p.currentChannel() },
++      ]);
++      p.receive({ status: 'playing' }); expect(getPageNarration().phase).toBe('paused');
++    } finally { p.dispose(); }
++  });
++
++  it('rejects foreign frames, unknown cues, extra payloads, hidden pages and late document callbacks', () => {
++    const p = setup();
++    try {
++      p.receive({ status: 'playing' }, window);
++      p.receive({ status: 'playing', cueId: 'unbound' });
++      p.receive({ status: 'playing', cueId: null });
++      p.receive({ status: 'playing', text: 'forged caption' });
++      expect(getPageNarration().phase).toBe('idle');
++      p.receive({ status: 'playing' }); expect(getPageNarration().phase).toBe('playing');
++      const old = p.currentChannel(); p.frame.dispatchEvent(new Event('load'));
++      expect(p.currentChannel()).not.toBe(old); expect(getPageNarration().phase).toBe('idle');
++      p.receive({ status: 'playing', channel: old }); expect(getPageNarration().phase).toBe('idle');
++      p.hide(); p.receive({ status: 'playing' }); expect(getPageNarration().phase).toBe('idle');
++      expect(togglePageNarration()).toBe(false);
++    } finally { p.dispose(); }
++    p.receive({ status: 'playing' }); expect(getPageNarration().registered).toBe(false);
++  });
++
++  it('does not take the lecture or discussion sound channel', () => {
++    const p = setup();
++    try {
++      p.receive(); p.block(); expect(togglePageNarration()).toBe(false);
++      p.receive({ status: 'playing' }); expect(getPageNarration().phase).toBe('ended');
++    } finally { p.dispose(); }
++  });
++});

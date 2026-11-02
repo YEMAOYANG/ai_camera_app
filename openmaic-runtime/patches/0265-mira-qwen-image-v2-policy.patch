@@ -1,0 +1,659 @@
+diff --git a/lib/media/image-providers.ts b/lib/media/image-providers.ts
+index 44cc4e7..5954e0a 100644
+--- a/lib/media/image-providers.ts
++++ b/lib/media/image-providers.ts
+@@ -67,6 +67,7 @@ export const IMAGE_PROVIDERS: Record<ImageProviderId, ImageProviderConfig> = {
+     requiresApiKey: true,
+     defaultBaseUrl: 'https://dashscope.aliyuncs.com',
+     models: [
++      { id: 'qwen-image-3.0', name: 'Qwen Image 3.0' },
+       { id: 'qwen-image-2.0-pro', name: 'Qwen Image 2.0 Pro' },
+       { id: 'qwen-image-2.0-pro-2026-03-03', name: 'Qwen Image 2.0 Pro (2026-03-03)' },
+       { id: 'qwen-image-2.0', name: 'Qwen Image 2.0' },
+diff --git a/lib/server/agent-runtime/runner.ts b/lib/server/agent-runtime/runner.ts
+index a6c8e6a..7a5646e 100644
+--- a/lib/server/agent-runtime/runner.ts
++++ b/lib/server/agent-runtime/runner.ts
+@@ -30,6 +30,7 @@ import type { Scene, SlideContent } from '@/lib/types/stage';
+ import {
+   isMiraFormalProfessionalSessionIdentity,
+   isMiraFormalImageSession,
++  isMiraFormalCurrentImageSession,
+   isMiraFormalVideoSession,
+   isMiraFormalIntegratedSkillSession,
+   isMiraFormalAdaptiveSkillSession,
+@@ -40,6 +41,10 @@ import {
+   type MiraFormalResearchSearchTrace,
+ } from '@/lib/server/mira-professional-research-policy';
+ import { MIRA_FORMAL_IMAGE_EVENT, withMiraFormalImageTrace } from '@/lib/server/mira-formal-media';
++import {
++  MIRA_FORMAL_IMAGE_POLICY,
++  MIRA_LEGACY_FORMAL_IMAGE_POLICY,
++} from '@/lib/server/mira-formal-generation-policy';
+ import { MIRA_FORMAL_VIDEO_EVENT, withMiraFormalVideoTrace } from '@/lib/server/mira-formal-video';
+ import { buildFormalQualityTools } from '@/lib/server/mira-formal-teaching-quality';
+ import {
+@@ -1581,7 +1586,9 @@ async function runSessionWithBudget(ctx: RunContext, meta: ClaimedAgentSession):
+       const imageTool = isMiraFormalImageSession(formalMediaSession)
+         ? withMiraFormalImageTrace(tool, id, (trace) =>
+             appendRequiredRunEvent(MIRA_FORMAL_IMAGE_EVENT, trace, Date.now()),
+-          )
++          isMiraFormalCurrentImageSession(formalMediaSession)
++            ? MIRA_FORMAL_IMAGE_POLICY
++            : MIRA_LEGACY_FORMAL_IMAGE_POLICY)
+         : tool;
+       return isMiraFormalVideoSession(formalMediaSession)
+         ? withMiraFormalVideoTrace(
+diff --git a/lib/server/mira-formal-generation-policy.ts b/lib/server/mira-formal-generation-policy.ts
+index 08500fc..37e0ffe 100644
+--- a/lib/server/mira-formal-generation-policy.ts
++++ b/lib/server/mira-formal-generation-policy.ts
+@@ -43,7 +43,10 @@ export const MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY = {
+   studentToolsEnabled: false,
+ } as const;
+ 
+-export const MIRA_FORMAL_IMAGE_POLICY = {
++// Historical jobs, receipts and input hashes retain this exact provider/model
++// identity. They may be validated and played, but must never be silently
++// resumed through a different image model.
++export const MIRA_LEGACY_FORMAL_IMAGE_POLICY = {
+   schemaVersion: 'mira.openmaic.formal-image-policy.v1',
+   policyId: 'mira-formal-qwen-image.v1',
+   enabled: true,
+@@ -54,9 +57,26 @@ export const MIRA_FORMAL_IMAGE_POLICY = {
+   assetValidationRequired: true,
+ } as const;
+ 
++// New jobs use a new frozen identity for the operator-selected DashScope
++// model. Changing a provider model always creates another policy identity.
++export const MIRA_FORMAL_IMAGE_POLICY = {
++  schemaVersion: 'mira.openmaic.formal-image-policy.v2',
++  policyId: 'mira-formal-qwen-image.v2',
++  enabled: true,
++  providerManaged: true,
++  providerId: 'qwen-image',
++  modelId: 'qwen-image-3.0',
++  usage: 'teaching_need',
++  assetValidationRequired: true,
++} as const;
++
++export type MiraFormalImagePolicy =
++  | typeof MIRA_LEGACY_FORMAL_IMAGE_POLICY
++  | typeof MIRA_FORMAL_IMAGE_POLICY;
++
+ export const MIRA_IMAGE_PROFESSIONAL_CREATION_POLICY = {
+   ...MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
+-  image: MIRA_FORMAL_IMAGE_POLICY,
++  image: MIRA_LEGACY_FORMAL_IMAGE_POLICY,
+ } as const;
+ 
+ export const MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY = {
+@@ -128,10 +148,37 @@ export const MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY = {
+   modelPolicyId: MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID,
+ } as const;
+ 
++// Current jobs receive Qwen Image 3.0 through new creation-policy identities.
++// Every creation policy above remains byte-for-byte stable for persisted jobs.
++export const MIRA_QWEN3_PLAYFUL_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++  image: MIRA_FORMAL_IMAGE_POLICY,
++} as const;
++export const MIRA_QWEN3_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY,
++  image: MIRA_FORMAL_IMAGE_POLICY,
++} as const;
++export const MIRA_QWEN3_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY,
++  image: MIRA_FORMAL_IMAGE_POLICY,
++} as const;
++export const MIRA_QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY,
++  image: MIRA_FORMAL_IMAGE_POLICY,
++} as const;
++export const MIRA_QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY = {
++  ...MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY,
++  image: MIRA_FORMAL_IMAGE_POLICY,
++} as const;
++
+ export const MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES = [
+   MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY, MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY,
+   MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY, MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY,
+   MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY,
++  MIRA_QWEN3_PLAYFUL_PROFESSIONAL_CREATION_POLICY, MIRA_QWEN3_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY,
++  MIRA_QWEN3_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY,
++  MIRA_QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY,
++  MIRA_QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY,
+ ] as const;
+ 
+ export type MiraProfessionalCreationPolicy =
+@@ -146,7 +193,12 @@ export type MiraProfessionalCreationPolicy =
+   | typeof MIRA_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY
+   | typeof MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY
+-  | typeof MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY;
++  | typeof MIRA_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_QWEN3_PLAYFUL_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_QWEN3_PLAYFUL_3D_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_QWEN3_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY
++  | typeof MIRA_QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_CREATION_POLICY;
+ 
+ export const MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT = {
+   schemaVersion: MIRA_FORMAL_RUNTIME_CONTRACT_VERSION,
+@@ -192,7 +244,7 @@ export const MIRA_FORMAL_GENERATION_POLICY = {
+   queryByRuntimeRequestId: true,
+   speechAudioGenerated: true,
+   coursewareAuthority: MIRA_COURSEWARE_AUTHORITY,
+-  professionalCreation: MIRA_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++  professionalCreation: MIRA_QWEN3_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
+   studentRuntimeEvents: {
+     enforced: true,
+     schemaVersion: 'mira.openmaic.student-runtime-events.v1',
+@@ -274,6 +326,18 @@ export function isMiraInteractionCreationPolicy(value: unknown): boolean {
+   return [MIRA_INTERACTION_PROFESSIONAL_CREATION_POLICY, MIRA_MULTISTATE_PROFESSIONAL_CREATION_POLICY, ...MIRA_SUPPORTED_PLAYFUL_PROFESSIONAL_POLICIES].some(policy => JSON.stringify(canonical(value)) === JSON.stringify(canonical(policy)));
+ }
+ 
++export function getMiraFormalImagePolicy(
++  value: unknown,
++): MiraFormalImagePolicy | undefined {
++  if (!isMiraImageCreationPolicy(value) || !value || typeof value !== 'object') return undefined;
++  const image = (value as { image?: unknown }).image;
++  if (JSON.stringify(canonical(image)) === JSON.stringify(canonical(MIRA_FORMAL_IMAGE_POLICY)))
++    return MIRA_FORMAL_IMAGE_POLICY;
++  if (JSON.stringify(canonical(image)) === JSON.stringify(canonical(MIRA_LEGACY_FORMAL_IMAGE_POLICY)))
++    return MIRA_LEGACY_FORMAL_IMAGE_POLICY;
++  return undefined;
++}
++
+ export function assertMiraFormalGenerationInput(
+   input: GenerateClassroomInput,
+ ): asserts input is GenerateClassroomInput & {
+@@ -320,11 +384,11 @@ export function assertMiraFormalGenerationInput(
+ export function getMiraFormalGenerationRuntimePolicy() {
+   if (getMiraSelectedModelPolicyId() === MIRA_FLASH_CANDIDATE_MODEL_POLICY_ID) {
+     return { ...MIRA_FORMAL_GENERATION_POLICY,
+-      professionalCreation: MIRA_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY };
++      professionalCreation: MIRA_QWEN3_FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY };
+   }
+   if (getMiraSelectedModelPolicyId() === MIRA_PRO_CURRENT_FLASH_MODEL_POLICY_ID) {
+     return { ...MIRA_FORMAL_GENERATION_POLICY,
+-      professionalCreation: MIRA_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY };
++      professionalCreation: MIRA_QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY };
+   }
+   return MIRA_FORMAL_GENERATION_POLICY;
+ }
+diff --git a/lib/server/mira-formal-media.ts b/lib/server/mira-formal-media.ts
+index cd091d5..a44b582 100644
+--- a/lib/server/mira-formal-media.ts
++++ b/lib/server/mira-formal-media.ts
+@@ -10,7 +10,10 @@ import type { AgentTool } from '@earendil-works/pi-agent-core';
+ import type { Scene } from '@/lib/types/stage';
+ import { CLASSROOMS_DIR } from '@/lib/server/classroom-storage';
+ import { MAX_REMOTE_IMAGE_BYTES } from '@/lib/server/bounded-download';
+-import { MIRA_FORMAL_IMAGE_POLICY } from '@/lib/server/mira-formal-generation-policy';
++import {
++  MIRA_FORMAL_IMAGE_POLICY,
++  type MiraFormalImagePolicy,
++} from '@/lib/server/mira-formal-generation-policy';
+ import {
+   getServerImageProviders,
+   isServerProviderDisabled,
+@@ -28,7 +31,7 @@ export interface MiraFormalImageTrace {
+   toolCallId: string;
+   src: string;
+   providerId: 'qwen-image';
+-  modelId: 'qwen-image-max';
++  modelId: MiraFormalImagePolicy['modelId'];
+ }
+ 
+ export interface MiraFormalMediaAsset {
+@@ -48,17 +51,18 @@ export interface MiraFormalMediaReceipt {
+   buildItemId: string;
+   classroomId: string;
+   sessionId: string;
+-  policyId: typeof MIRA_FORMAL_IMAGE_POLICY.policyId;
+-  providerId: typeof MIRA_FORMAL_IMAGE_POLICY.providerId;
+-  modelId: typeof MIRA_FORMAL_IMAGE_POLICY.modelId;
++  policyId: MiraFormalImagePolicy['policyId'];
++  providerId: MiraFormalImagePolicy['providerId'];
++  modelId: MiraFormalImagePolicy['modelId'];
+   imageCount: number;
+   assets: MiraFormalMediaAsset[];
+   receiptSha256: string;
+ }
+ 
+ /** Configuration-only check: never invokes a paid provider from health or resume. */
+-export function assertMiraFormalImageProviderReady(): void {
+-  const policy = MIRA_FORMAL_IMAGE_POLICY;
++export function assertMiraFormalImageProviderReady(
++  policy: MiraFormalImagePolicy = MIRA_FORMAL_IMAGE_POLICY,
++): void {
+   const configured = getServerImageProviders()[policy.providerId];
+   if (
+     !configured ||
+@@ -81,12 +85,13 @@ export function withMiraFormalImageTrace(
+   tool: AgentTool<never, never>,
+   sessionId: string,
+   record: (trace: MiraFormalImageTrace) => Promise<void>,
++  policy: MiraFormalImagePolicy = MIRA_FORMAL_IMAGE_POLICY,
+ ): AgentTool<never, never> {
+   if (tool.name !== 'generate_image') return tool;
+   return {
+     ...tool,
+     async execute(...args: Parameters<typeof tool.execute>) {
+-      assertMiraFormalImageProviderReady();
++      assertMiraFormalImageProviderReady(policy);
+       const result = await tool.execute(...args);
+       const value = result as unknown as { isError?: boolean; details?: { src?: unknown } };
+       if (!value.isError) {
+@@ -101,8 +106,8 @@ export function withMiraFormalImageTrace(
+           classroomId: params.stageId,
+           toolCallId: args[0],
+           src,
+-          providerId: MIRA_FORMAL_IMAGE_POLICY.providerId,
+-          modelId: MIRA_FORMAL_IMAGE_POLICY.modelId,
++          providerId: policy.providerId,
++          modelId: policy.modelId,
+         });
+       }
+       return result;
+@@ -186,8 +191,9 @@ export async function buildMiraFormalMediaReceipt(
+     scenes: Scene[];
+     traces: unknown[];
+   },
+-  options: { classroomsDir?: string } = {},
++  options: { classroomsDir?: string; imagePolicy?: MiraFormalImagePolicy } = {},
+ ): Promise<MiraFormalMediaReceipt> {
++  const policy = options.imagePolicy ?? MIRA_FORMAL_IMAGE_POLICY;
+   const refs = new Map<string, string[]>();
+   for (const scene of input.scenes) {
+     if (scene.stageId !== input.classroomId) fail('SCENE_STAGE_MISMATCH');
+@@ -206,8 +212,8 @@ export async function buildMiraFormalMediaReceipt(
+       trace.schemaVersion !== 'mira.openmaic.formal-image-trace.v1' ||
+       trace.sessionId !== input.sessionId ||
+       trace.classroomId !== input.classroomId ||
+-      trace.providerId !== MIRA_FORMAL_IMAGE_POLICY.providerId ||
+-      trace.modelId !== MIRA_FORMAL_IMAGE_POLICY.modelId ||
++      trace.providerId !== policy.providerId ||
++      trace.modelId !== policy.modelId ||
+       typeof trace.toolCallId !== 'string' ||
+       !trace.toolCallId ||
+       typeof trace.src !== 'string'
+@@ -267,9 +273,9 @@ export async function buildMiraFormalMediaReceipt(
+     buildItemId: input.buildItemId,
+     classroomId: input.classroomId,
+     sessionId: input.sessionId,
+-    policyId: MIRA_FORMAL_IMAGE_POLICY.policyId,
+-    providerId: MIRA_FORMAL_IMAGE_POLICY.providerId,
+-    modelId: MIRA_FORMAL_IMAGE_POLICY.modelId,
++    policyId: policy.policyId,
++    providerId: policy.providerId,
++    modelId: policy.modelId,
+     imageCount: assets.length,
+     assets,
+   };
+diff --git a/lib/server/mira-formal-professional-classroom.ts b/lib/server/mira-formal-professional-classroom.ts
+index 2ae6c65..fb224f1 100644
+--- a/lib/server/mira-formal-professional-classroom.ts
++++ b/lib/server/mira-formal-professional-classroom.ts
+@@ -37,11 +37,13 @@ import {
+   MIRA_PROFESSIONAL_CREATION_POLICY,
+   MIRA_FORMAL_IMAGE_POLICY,
+   MIRA_FORMAL_VIDEO_POLICY,
++  getMiraFormalImagePolicy,
+   isMiraVideoCreationPolicy,
+   isMiraImageCreationPolicy,
+   isMiraIntegratedSkillCreationPolicy,
+   isMiraAdaptiveSkillCreationPolicy,
+   isMiraInteractionCreationPolicy,
++  type MiraFormalImagePolicy,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import {
+   buildMiraFormalSkillReceipt,
+@@ -85,7 +87,9 @@ import {
+   MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID,
+   MIRA_FORMAL_PROFESSIONAL_SESSION_ID_PREFIX,
+   MIRA_FORMAL_IMAGE_SESSION_ORIGIN,
++  MIRA_FORMAL_IMAGE_V2_SESSION_ORIGIN,
+   MIRA_FORMAL_VIDEO_SESSION_ORIGIN,
++  MIRA_FORMAL_VIDEO_V2_SESSION_ORIGIN,
+   MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE,
+   MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION,
+   type MiraFormalResearchSearchTrace,
+@@ -166,7 +170,7 @@ export interface MiraFormalProfessionalCreationReceipt {
+   studentToolsEnabled: false;
+   webSearchEnabled: true;
+   imageGenerationEnabled?: true;
+-  imagePolicyId?: typeof MIRA_FORMAL_IMAGE_POLICY.policyId;
++  imagePolicyId?: MiraFormalImagePolicy['policyId'];
+   videoGenerationEnabled?: true;
+   videoPolicyId?: typeof MIRA_FORMAL_VIDEO_POLICY.policyId;
+   skillOrchestration?: MiraFormalSkillReceipt;
+@@ -534,9 +538,10 @@ export function withMiraFormalImageInstructions(
+   creationPolicy: unknown,
+ ): string {
+   // Never rewrite an old job's prompt: its exact bytes are durable authority.
+-  if (!isMiraImageCreationPolicy(creationPolicy)) return originalPrompt;
++  const imagePolicy = getMiraFormalImagePolicy(creationPolicy);
++  if (!imagePolicy) return originalPrompt;
+   return (
+-    `${originalPrompt}\n\nFormal image policy (${MIRA_FORMAL_IMAGE_POLICY.policyId}):\n` +
++    `${originalPrompt}\n\nFormal image policy (${imagePolicy.policyId}):\n` +
+     'Qwen image generation is available when a concrete picture improves the teaching. ' +
+     'Do not generate decorative images or force an image into every lesson. ' +
+     'Use generate_image for the current stage only, obtain the real src first, then place it ' +
+@@ -575,14 +580,16 @@ export function withMiraFormalVideoInstructions(
+ }
+ 
+ function professionalSessionOrigin(input: GenerateClassroomInput): string {
++  const imagePolicy = getMiraFormalImagePolicy(input.professionalCreationPolicy);
++  const currentImagePolicy = imagePolicy?.policyId === MIRA_FORMAL_IMAGE_POLICY.policyId;
+   if (isMiraVideoCreationPolicy(input.professionalCreationPolicy))
+-    return MIRA_FORMAL_VIDEO_SESSION_ORIGIN;
++    return currentImagePolicy ? MIRA_FORMAL_VIDEO_V2_SESSION_ORIGIN : MIRA_FORMAL_VIDEO_SESSION_ORIGIN;
+   if (isMiraAdaptiveSkillCreationPolicy(input.professionalCreationPolicy))
+     return MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN;
+   if (isMiraIntegratedSkillCreationPolicy(input.professionalCreationPolicy))
+     return MIRA_FORMAL_SKILL_SESSION_ORIGIN;
+   return isMiraImageCreationPolicy(input.professionalCreationPolicy)
+-    ? MIRA_FORMAL_IMAGE_SESSION_ORIGIN
++    ? currentImagePolicy ? MIRA_FORMAL_IMAGE_V2_SESSION_ORIGIN : MIRA_FORMAL_IMAGE_SESSION_ORIGIN
+     : PROFESSIONAL_SESSION_ORIGIN;
+ }
+ 
+@@ -598,7 +605,9 @@ async function createOrReuseProfessionalSession(
+     throw new Error('FORMAL_PROFESSIONAL_WEB_SEARCH_NOT_CONFIGURED');
+   }
+   if (isMiraImageCreationPolicy(input.professionalCreationPolicy)) {
+-    assertMiraFormalImageProviderReady();
++    const imagePolicy = getMiraFormalImagePolicy(input.professionalCreationPolicy);
++    if (!imagePolicy) throw new Error('FORMAL_IMAGE_POLICY_INVALID');
++    assertMiraFormalImageProviderReady(imagePolicy);
+   }
+   if (isMiraVideoCreationPolicy(input.professionalCreationPolicy))
+     assertMiraFormalVideoProviderReady();
+@@ -1283,7 +1292,7 @@ function buildProfessionalCreationReceipt(
+     ...(isMiraImageCreationPolicy(input.professionalCreationPolicy)
+       ? {
+           imageGenerationEnabled: true as const,
+-          imagePolicyId: MIRA_FORMAL_IMAGE_POLICY.policyId,
++          imagePolicyId: getMiraFormalImagePolicy(input.professionalCreationPolicy)!.policyId,
+         }
+       : {}),
+     ...(skillOrchestration ? { skillOrchestration } : {}),
+@@ -1536,6 +1545,8 @@ async function completeMiraFormalProfessionalClassroomInner(
+         traces: events
+           .filter((event) => event.type === MIRA_FORMAL_IMAGE_EVENT)
+           .map((event) => event.data),
++      }, {
++        imagePolicy: getMiraFormalImagePolicy(input.professionalCreationPolicy),
+       })
+     : undefined;
+   await options.onProgress?.({
+diff --git a/lib/server/mira-professional-research-policy.ts b/lib/server/mira-professional-research-policy.ts
+index 73b8e29..a0f443d 100644
+--- a/lib/server/mira-professional-research-policy.ts
++++ b/lib/server/mira-professional-research-policy.ts
+@@ -37,6 +37,9 @@ export const MIRA_FORMAL_PROFESSIONAL_PRIMARY_SKILL_ID = 'mira-primary-coursewar
+ // distinguishes new image-capable jobs from historical formal jobs on resume.
+ export const MIRA_FORMAL_IMAGE_SESSION_ORIGIN = 'mira-formal-professional-qwen-image-v1';
+ export const MIRA_FORMAL_VIDEO_SESSION_ORIGIN = 'mira-formal-professional-happyhorse-video-v1';
++export const MIRA_FORMAL_IMAGE_V2_SESSION_ORIGIN = 'mira-formal-professional-qwen-image-v2';
++export const MIRA_FORMAL_VIDEO_V2_SESSION_ORIGIN =
++  'mira-formal-professional-happyhorse-video-qwen-image-v2';
+ export const MIRA_FORMAL_RESEARCH_SEARCH_EVENT_TYPE = 'mira_formal_research_search';
+ export const MIRA_FORMAL_RESEARCH_SEARCH_TRACE_SCHEMA_VERSION =
+   'mira.openmaic.research-search-trace.v1';
+@@ -74,9 +77,11 @@ export function isMiraFormalImageSession(input: {
+   return (
+     isMiraFormalProfessionalSessionIdentity(input) &&
+     (input.origin === MIRA_FORMAL_IMAGE_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_IMAGE_V2_SESSION_ORIGIN ||
+       input.origin === MIRA_FORMAL_SKILL_SESSION_ORIGIN ||
+       input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN ||
+-      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN)
++      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_VIDEO_V2_SESSION_ORIGIN)
+   );
+ }
+ 
+@@ -90,7 +95,8 @@ export function isMiraFormalIntegratedSkillSession(input: {
+     isMiraFormalProfessionalSessionIdentity(input) &&
+     (input.origin === MIRA_FORMAL_SKILL_SESSION_ORIGIN ||
+       input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN ||
+-      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN)
++      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_VIDEO_V2_SESSION_ORIGIN)
+   );
+ }
+ 
+@@ -103,7 +109,8 @@ export function isMiraFormalAdaptiveSkillSession(input: {
+   return (
+     isMiraFormalProfessionalSessionIdentity(input) &&
+     (input.origin === MIRA_ADAPTIVE_SKILL_SESSION_ORIGIN ||
+-      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN)
++      input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_VIDEO_V2_SESSION_ORIGIN)
+   );
+ }
+ 
+@@ -112,7 +119,18 @@ export function isMiraFormalVideoSession(
+ ): boolean {
+   return (
+     isMiraFormalProfessionalSessionIdentity(input) &&
+-    input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN
++    (input.origin === MIRA_FORMAL_VIDEO_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_VIDEO_V2_SESSION_ORIGIN)
++  );
++}
++
++export function isMiraFormalCurrentImageSession(
++  input: Parameters<typeof isMiraFormalImageSession>[0],
++): boolean {
++  return (
++    isMiraFormalProfessionalSessionIdentity(input) &&
++    (input.origin === MIRA_FORMAL_IMAGE_V2_SESSION_ORIGIN ||
++      input.origin === MIRA_FORMAL_VIDEO_V2_SESSION_ORIGIN)
+   );
+ }
+ 
+diff --git a/tests/server/health-route.test.ts b/tests/server/health-route.test.ts
+index 8b961a2..73c61f4 100644
+--- a/tests/server/health-route.test.ts
++++ b/tests/server/health-route.test.ts
+@@ -11,10 +11,10 @@ vi.mock('@/lib/server/provider-config', () => ({
+       : {},
+   getServerWebSearchProviders: () => ({}),
+   getServerImageProviders: () =>
+-    process.env.MIRA_TEST_QWEN_IMAGE_KEY ? { 'qwen-image': { models: ['qwen-image-max'] } } : {},
++    process.env.MIRA_TEST_QWEN_IMAGE_KEY ? { 'qwen-image': { models: ['qwen-image-3.0'] } } : {},
+   isServerProviderDisabled: () => false,
+   resolveImageApiKey: () => process.env.MIRA_TEST_QWEN_IMAGE_KEY || '',
+-  resolveImageModel: () => 'qwen-image-max',
++  resolveImageModel: () => 'qwen-image-3.0',
+   resolveImageBaseUrl: () => 'https://dashscope.aliyuncs.com',
+   getServerVideoProviders: () =>
+     process.env.MIRA_TEST_HAPPYHORSE_KEY ? { happyhorse: { models: ['happyhorse-1.0-t2v'] } } : {},
+@@ -289,12 +289,12 @@ describe('GET /api/health structured scene runtime policy', () => {
+         },
+         studentToolsEnabled: false,
+         image: {
+-          schemaVersion: 'mira.openmaic.formal-image-policy.v1',
+-          policyId: 'mira-formal-qwen-image.v1',
++          schemaVersion: 'mira.openmaic.formal-image-policy.v2',
++          policyId: 'mira-formal-qwen-image.v2',
+           enabled: true,
+           providerManaged: true,
+           providerId: 'qwen-image',
+-          modelId: 'qwen-image-max',
++          modelId: 'qwen-image-3.0',
+           usage: 'teaching_need',
+           assetValidationRequired: true,
+         },
+diff --git a/tests/server/mira-formal-media.test.ts b/tests/server/mira-formal-media.test.ts
+index 22d277c..6bbd30d 100644
+--- a/tests/server/mira-formal-media.test.ts
++++ b/tests/server/mira-formal-media.test.ts
+@@ -8,12 +8,12 @@ import type { Scene } from '@/lib/types/stage';
+ import type { AgentTool } from '@earendil-works/pi-agent-core';
+ 
+ const provider = vi.hoisted(() => ({
+-  configured: { 'qwen-image': { models: ['qwen-image-max'] } } as Record<
++  configured: { 'qwen-image': { models: ['qwen-image-3.0'] } } as Record<
+     string,
+     { models?: string[]; disabled?: boolean }
+   >,
+   disabled: false,
+-  model: 'qwen-image-max',
++  model: 'qwen-image-3.0',
+   key: 'test-key',
+   base: 'https://dashscope.aliyuncs.com',
+ }));
+@@ -32,6 +32,9 @@ import {
+   MIRA_FORMAL_RUNTIME_CLASSROOM_CONTRACT,
+   MIRA_PROFESSIONAL_CREATION_POLICY,
+   MIRA_LEGACY_PROFESSIONAL_CREATION_POLICY,
++  MIRA_FORMAL_IMAGE_POLICY,
++  MIRA_LEGACY_FORMAL_IMAGE_POLICY,
++  type MiraFormalImagePolicy,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import {
+   assertMiraFormalImageProviderReady,
+@@ -42,7 +45,9 @@ import {
+ } from '@/lib/server/mira-formal-media';
+ import {
+   filterMiraFormalMediaTools,
++  isMiraFormalCurrentImageSession,
+   MIRA_FORMAL_IMAGE_SESSION_ORIGIN,
++  MIRA_FORMAL_IMAGE_V2_SESSION_ORIGIN,
+ } from '@/lib/server/mira-professional-research-policy';
+ 
+ const session = {
+@@ -71,7 +76,10 @@ function slide(src?: string, id = 'scene-1'): Scene {
+     actions: [],
+   } as unknown as Scene;
+ }
+-function trace(src: string): MiraFormalImageTrace {
++function trace(
++  src: string,
++  policy: MiraFormalImagePolicy = MIRA_FORMAL_IMAGE_POLICY,
++): MiraFormalImageTrace {
+   return {
+     schemaVersion: 'mira.openmaic.formal-image-trace.v1',
+     sessionId: identity.sessionId,
+@@ -79,7 +87,7 @@ function trace(src: string): MiraFormalImageTrace {
+     toolCallId: 'image-call-1',
+     src,
+     providerId: 'qwen-image',
+-    modelId: 'qwen-image-max',
++    modelId: policy.modelId,
+   };
+ }
+ 
+@@ -87,9 +95,9 @@ describe('formal image policy and assets', () => {
+   let root: string;
+   beforeEach(async () => {
+     root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'mira-image-')));
+-    provider.configured = { 'qwen-image': { models: ['qwen-image-max'] } };
++    provider.configured = { 'qwen-image': { models: ['qwen-image-3.0'] } };
+     provider.disabled = false;
+-    provider.model = 'qwen-image-max';
++    provider.model = 'qwen-image-3.0';
+     provider.key = 'test-key';
+     provider.base = 'https://dashscope.aliyuncs.com';
+     vi.stubEnv('DEFAULT_IMAGE_PROVIDER', 'qwen-image');
+@@ -116,8 +124,14 @@ describe('formal image policy and assets', () => {
+       src: `/api/classroom-media/${identity.classroomId}/media/${filename}`,
+     };
+   }
+-  const receipt = (scenes: Scene[], traces: unknown[]) =>
+-    buildMiraFormalMediaReceipt({ ...identity, scenes, traces }, { classroomsDir: root });
++  const receipt = (
++    scenes: Scene[],
++    traces: unknown[],
++    imagePolicy: MiraFormalImagePolicy = MIRA_FORMAL_IMAGE_POLICY,
++  ) => buildMiraFormalMediaReceipt(
++    { ...identity, scenes, traces },
++    { classroomsDir: root, imagePolicy },
++  );
+ 
+   it('accepts only the exact legacy/false and image-policy/true pairs', () => {
+     const input = {
+@@ -168,6 +182,20 @@ describe('formal image policy and assets', () => {
+         origin: MIRA_FORMAL_IMAGE_SESSION_ORIGIN,
+       }).map((t) => t.name),
+     ).toEqual(['generate_image', 'generate_scene']);
++    expect(isMiraFormalCurrentImageSession({
++      ...session,
++      origin: MIRA_FORMAL_IMAGE_SESSION_ORIGIN,
++    })).toBe(false);
++    expect(isMiraFormalCurrentImageSession({
++      ...session,
++      origin: MIRA_FORMAL_IMAGE_V2_SESSION_ORIGIN,
++    })).toBe(true);
++    expect(
++      filterMiraFormalMediaTools(tools, {
++        ...session,
++        origin: MIRA_FORMAL_IMAGE_V2_SESSION_ORIGIN,
++      }).map((t) => t.name),
++    ).toEqual(['generate_image', 'generate_scene']);
+     expect(
+       filterMiraFormalMediaTools(tools, { ...session, sessionId: 'ordinary-session' }),
+     ).toEqual(tools);
+@@ -192,11 +220,31 @@ describe('formal image policy and assets', () => {
+       imageCount: 0,
+       assets: [],
+       status: 'succeeded',
+-      policyId: 'mira-formal-qwen-image.v1',
++      policyId: 'mira-formal-qwen-image.v2',
+     });
+     expect(result.receiptSha256).toMatch(/^[a-f0-9]{64}$/);
+   });
+ 
++  it('keeps a v1/max receipt exact only when the frozen legacy policy is supplied', async () => {
++    const result = await receipt([slide()], [], MIRA_LEGACY_FORMAL_IMAGE_POLICY);
++    expect(result).toMatchObject({
++      ...identity,
++      imageCount: 0,
++      policyId: 'mira-formal-qwen-image.v1',
++      modelId: 'qwen-image-max',
++    });
++    const asset = await image();
++    await expect(receipt(
++      [slide(asset.src)],
++      [trace(asset.src, MIRA_LEGACY_FORMAL_IMAGE_POLICY)],
++      MIRA_LEGACY_FORMAL_IMAGE_POLICY,
++    )).resolves.toMatchObject({ policyId: 'mira-formal-qwen-image.v1', imageCount: 1 });
++    await expect(receipt(
++      [slide(asset.src)],
++      [trace(asset.src, MIRA_LEGACY_FORMAL_IMAGE_POLICY)],
++    )).rejects.toThrow('TRACE_INVALID');
++  });
++
+   it('attests the bytes, dimensions, stage and actual scene references', async () => {
+     const asset = await image();
+     const result = await receipt(
+diff --git a/tests/server/mira-formal-professional-classroom.test.ts b/tests/server/mira-formal-professional-classroom.test.ts
+index 2602180..2d4c7ee 100644
+--- a/tests/server/mira-formal-professional-classroom.test.ts
++++ b/tests/server/mira-formal-professional-classroom.test.ts
+@@ -13,6 +13,7 @@ import {
+   MIRA_INTEGRATED_PROFESSIONAL_CREATION_POLICY,
+   MIRA_PROFESSIONAL_CREATION_POLICY,
+   MIRA_VIDEO_PROFESSIONAL_CREATION_POLICY,
++  MIRA_QWEN3_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
+ } from '@/lib/server/mira-formal-generation-policy';
+ import type { Scene } from '@/lib/types/stage';
+ 
+@@ -122,6 +123,11 @@ describe('Mira formal slide spotlight sequence', () => {
+     expect(updated).toContain('precise quantities, text, formulas, geometric relationships');
+     expect(updated).toContain('with verifiable slide elements or HTML');
+     expect(updated).toContain('Never use a generated image as the only basis');
++    expect(updated).toContain('mira-formal-qwen-image.v1');
++    expect(withMiraFormalImageInstructions(
++      original,
++      MIRA_QWEN3_PLAYFUL_PROFESSIONAL_CREATION_POLICY,
++    )).toContain('mira-formal-qwen-image.v2');
+   });
+   it('accepts official focus sequences while allowing unfocused transition speech', () => {
+     expect(

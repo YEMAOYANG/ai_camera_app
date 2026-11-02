@@ -1,0 +1,358 @@
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -358,6 +358,33 @@
+           return false;
+         })) return result('actions must satisfy the strict DSL with nonempty unique IDs; nothing was generated.', { error: 'invalid-exact-actions' }, true);
+         exactActions = structuredClone(params.actions) as Action[];
++      }
++      if (textbookContext && Object.hasOwn(textbookContext, 'speechPlan')) {
++        const plan = textbookContext.speechPlan;
++        const seen = new Set<string>();
++        if (!Array.isArray(plan) || !plan.length || plan.some(line => {
++          if (!line || typeof line !== 'object' || typeof line.actionId !== 'string'
++              || !line.actionId.trim() || line.actionId !== line.actionId.trim()
++              || typeof line.text !== 'string' || !line.text.trim() || line.text !== line.text.trim()
++              || seen.has(line.actionId)) return true;
++          seen.add(line.actionId);
++          return false;
++        })) return result('Frozen speechPlan is malformed; nothing was generated.', { error: 'invalid-frozen-speech-plan' }, true);
++        const speeches = plan.map(line => ({ id: line.actionId, type: 'speech' as const, text: line.text }));
++        if (exactActions === undefined) exactActions = speeches;
++        else {
++          const expected = new Map(speeches.map(action => [action.id, action.text]));
++          const actual = exactActions.filter(action => action.type === 'speech');
++          const planned = actual.filter(action => expected.has(action.id));
++          // Selected-option quiz feedback is checked against the generated
++          // optionFeedback by the existing save guard; do not remove it here.
++          if (planned.length !== speeches.length || planned.some((action, index) =>
++            action.id !== speeches[index].id || action.text !== speeches[index].text)
++            || actual.some(action => !expected.has(action.id)
++              && (params.type !== 'quiz' || speeches.some(line => line.text === action.text))))
++            return result('Explicit speech actions differ from the frozen IDs/text/order; nothing was generated.',
++              { error: 'frozen-speech-actions-mismatch' }, true);
++        }
+       }
+       const requestedMedia = params.media ?? [];
+       if (requestedMedia.length > MAX_GENERATE_SCENE_MEDIA) {
+@@ -452,6 +479,7 @@
+         content = await generateSceneContent(outline, contentCall.call, {
+           ...(deps.getGenerationLearningContract?.() ? { learningContract: deps.getGenerationLearningContract() } : {}),
+           ...(textbookContext ? { textbookPromptProfile: 'frozen-textbook-v1' as const } : {}),
++          ...(textbookContext?.pictureDomContract ? { pictureDomContract: textbookContext.pictureDomContract } : {}),
+           agents,
+           languageDirective: doc.stage.languageDirective ?? '',
+           allowProceduralSkill: true,
+diff --git a/lib/server/mira-textbook-scene-contract.ts b/lib/server/mira-textbook-scene-contract.ts
+--- a/lib/server/mira-textbook-scene-contract.ts
++++ b/lib/server/mira-textbook-scene-contract.ts
+@@ -4,6 +4,7 @@
+ import sharp from 'sharp';
+ import { parse, type DefaultTreeAdapterTypes as Tree } from 'parse5';
+ import type { Scene } from '@/lib/types/stage';
++import type { PictureDomContract } from '@openmaic/generation';
+ import type { CourseStore, CourseDocument } from './agent-runtime/course-tools';
+ import { CLASSROOMS_DIR } from './classroom-storage';
+ import { assertLearningInteractiveSyntax } from './mira-formal-learning-contract';
+@@ -80,6 +81,9 @@
+ export interface TextbookPageContext {
+   text: string;
+   brief: string;
++  pictureDomContract?: PictureDomContract;
++  /** Present only when this server-frozen page declared an authoritative plan. */
++  speechPlan?: unknown;
+   widgetOutline?: Json;
+   /** Derived only from this verified frozen page's locked assessments. */
+   quizConfig?: {
+@@ -808,6 +812,18 @@
+         await persist(next);
+         return {
+           brief: String(page.move ?? page.description ?? page.title),
++          ...(page.type === 'interactive' && ['primary_1', 'primary_2'].includes(frozen.contract.binding.gradeCode)
++            ? { pictureDomContract: {
++                schemaVersion: 'mira.frozen-textbook.picture-dom.v1' as const,
++                representation: 'initial-dom-img' as const, parser: 'parse5' as const,
++                minimumVisibleImages: 1 as const, allowHiddenSentinels: false as const,
++                dynamicBehavior: 'reuse-or-move-declared-img' as const,
++                sources: next.assetBindings
++                  .filter(binding => !input.media?.length || input.media.some(media => media.src.trim() === binding.src))
++                  .map(({ assetKey, src, sha256 }) => ({ assetKey, src, sha256 })),
++              } }
++            : {}),
++          ...(Object.hasOwn(page, 'speechPlan') ? { speechPlan: page.speechPlan } : {}),
+           ...(page.type === 'quiz'
+             ? { quizConfig: {
+                 questionCount: locked.length,
+diff --git a/packages/@openmaic/generation/src/index.ts b/packages/@openmaic/generation/src/index.ts
+--- a/packages/@openmaic/generation/src/index.ts
++++ b/packages/@openmaic/generation/src/index.ts
+@@ -15,7 +15,7 @@
+   PBLGenerationError,
+   resolveImageIds,
+ } from './scene-generator.js';
+-export type { SceneActionsOptions, SceneContentOptions } from './scene-generator.js';
++export type { SceneActionsOptions, SceneContentOptions, PictureDomContract } from './scene-generator.js';
+ export { assertLearningContract, assertLearningQuiz, assertLearningInteractive,
+   assertNoInventedMastery, interactiveScripts, learningSceneInstructions,
+   normalizeQuizValueAnswers, resolveQuizVisual, resolveInteractiveImageIds } from './learning-scene-contract.js';
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -75,6 +75,16 @@
+ 
+ // ── Options interfaces for scene generation functions ──
+ 
++export interface PictureDomContract {
++  schemaVersion: 'mira.frozen-textbook.picture-dom.v1';
++  representation: 'initial-dom-img';
++  parser: 'parse5';
++  minimumVisibleImages: 1;
++  allowHiddenSentinels: false;
++  dynamicBehavior: 'reuse-or-move-declared-img';
++  sources: { assetKey: string; src: string; sha256: string }[];
++}
++
+ export interface SceneContentOptions {
+   /** Server-owned grade boundary and picture interaction policy, opt-in for new jobs. */
+   learningContract?: LearningSceneContract;
+@@ -105,6 +115,8 @@
+   explorationGame?: boolean;
+   /** Host-selected textbook game/3D authoring; ordinary templates stay unchanged. */
+   textbookPromptProfile?: 'textbook-v1' | 'frozen-textbook-v1';
++  /** Server-derived verified sources and the existing static save representation. */
++  pictureDomContract?: PictureDomContract;
+   /**
+    * Natural-language edit instruction for whole-slide regeneration (MAIC Editor
+    * agent `regenerate_scene`). When set, the slide content prompt switches to
+@@ -286,6 +298,7 @@
+       includeKatex: options.interactiveIncludeKatex,
+       explorationGame: options.explorationGame,
+       textbookPromptProfile: options.textbookPromptProfile,
++      pictureDomContract: options.pictureDomContract,
+       learningContract: options.learningContract,
+       imageMapping: options.imageMapping,
+       assignedImages,
+@@ -1152,6 +1165,7 @@
+     includeKatex?: boolean;
+     explorationGame?: boolean;
+     textbookPromptProfile?: 'textbook-v1' | 'frozen-textbook-v1';
++    pictureDomContract?: PictureDomContract;
+     learningContract?: LearningSceneContract;
+     imageMapping?: ImageMapping;
+     assignedImages?: PdfImage[];
+@@ -1312,17 +1326,24 @@
+     ...(image.width !== undefined ? { width: image.width } : {}),
+     ...(image.height !== undefined ? { height: image.height } : {}),
+   }));
+-  const explicitInput = options.includeWidgetOutline === true || suppliedMedia.length > 0 || options.editDirective !== undefined || options.exactActions !== undefined || widgetOutline.notTeachingFlowchart === true;
++  const pictureDomContract = options.textbookPromptProfile === 'frozen-textbook-v1'
++    ? options.pictureDomContract : undefined;
++  const pictureDomInstructions = pictureDomContract
++    ? '\nSERVER-DERIVED PICTURE DOM CONTRACT:\n' + JSON.stringify(pictureDomContract)
++      + '\nThe save parser reads the initial HTML, without running JavaScript. Declare the task pictures as literal <img src="verified-source"> elements in the visible body DOM. JavaScript may reuse, move or update these declared nodes; createElement-only images are not the required initial teaching pictures. Do not add hidden, template, noscript, zero-size or decorative sentinel images to satisfy the parser.\n'
++    : '';
++  const explicitInput = !!pictureDomContract || options.includeWidgetOutline === true || suppliedMedia.length > 0 || options.editDirective !== undefined || options.exactActions !== undefined || widgetOutline.notTeachingFlowchart === true;
+   // No additions for legacy callers: ordinary diagram prompt bytes stay stable.
+   const inputContract = explicitInput ? '\n\n## Exact supplied page inputs\n'
+     + 'Implement this structured widget outline as the actual child-operable task, not a summary of teaching steps. Preserve exact geometry and source paths; do not invent glyphs, media URLs, or sound callbacks.\n'
+     + JSON.stringify({ widgetOutline, media: suppliedMedia,
++      ...(pictureDomContract ? { pictureDomContract } : {}),
+       ...(options.editDirective !== undefined ? { instruction: options.editDirective } : {}),
+       ...(options.exactActions !== undefined ? { actions: options.exactActions } : {}),
+     })
+     + '\nUse supplied images as real teaching content with these exact src values. Supplied actions are immutable; do not paraphrase, omit, add, or limit them to 3–8 items. Keep each required cue ID and text as specified in the page contract.\n'
+     : '';
+-  const response = await aiCall(prompts.system + (options.learningContract ? learningSceneInstructions(options.learningContract) : ''), prompts.user + mediaInstructions + inputContract);
++  const response = await aiCall(prompts.system + (options.learningContract ? learningSceneInstructions(options.learningContract) : '') + pictureDomInstructions, prompts.user + mediaInstructions + inputContract);
+   const rawHtml = extractHtml(response, log);
+   const html = rawHtml ? resolveInteractiveImageIds(rawHtml, options.imageMapping) : rawHtml;
+ 
+diff --git a/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/system.md b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/system.md
+--- a/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/system.md
++++ b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content/system.md
+@@ -1,4 +1,6 @@
+ # Frozen Textbook Interactive Authoring v1
++
++The server's pictureDomContract describes the existing static save boundary: the parser reads initial HTML without running scripts. Put the actual teaching pictures in literal, initially visible body <img src="..."> elements using the verified sources. JavaScript may move or reuse these declared nodes. Creating every image only through JavaScript does not satisfy this representation. Hidden, template, noscript, zero-size or decorative sentinel images do not satisfy it either; the pictures must carry the current task's meaning.
+ 
+ Implement the server's exact frozen page plan, not a generic widget demo. Its textbook scope, meaningful mechanism, widgetType, full widgetOutline, gameType, playerControls, teacher, narration, images and geometry are authoritative. Do not turn a child's task into a teaching-steps flowchart. Do not impose counts of actions, choices, rounds, tools, sliders or game types. Preserve ordinary observation, construction, revision and open expression where the plan calls for them. Never infer mastery from listening, clicking, teacher help or an external completion flag.
+ 
+diff --git a/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts b/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts
+--- a/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts
++++ b/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts
+@@ -12,6 +12,25 @@
+ const response = '<html><head></head><body><script id="widget-config" type="application/json">{"type":"game"}</script></body></html>';
+ 
+ describe('server-only frozen-textbook-v1 routing', () => {
++  it.each([undefined, 'textbook-v1'] as const)('ignores frozen DOM metadata for historical profile %s', async profile => {
++    const capture = async (withContract: boolean) => {
++      let captured;
++      await generateSceneContent(outline('game'), async (system, user) => {
++        captured = { system, user }; return response;
++      }, {
++        ...(profile ? { textbookPromptProfile: profile } : {}),
++        ...(withContract ? { pictureDomContract: {
++          schemaVersion: 'mira.frozen-textbook.picture-dom.v1' as const,
++          representation: 'initial-dom-img' as const, parser: 'parse5' as const,
++          minimumVisibleImages: 1 as const, allowHiddenSentinels: false as const,
++          dynamicBehavior: 'reuse-or-move-declared-img' as const,
++          sources: [{ assetKey: 'photo', src: '/owned/photo.png', sha256: 'a'.repeat(64) }],
++        } } : {}),
++      });
++      return captured;
++    };
++    expect(await capture(true)).toEqual(await capture(false));
++  });
+   it.each(kinds)('routes %s through the new contract without generic contradictory instructions', async kind => {
+     let captured = { system: '', user: '' };
+     await generateSceneContent(outline(kind), async (system, user) => { captured = { system, user }; return response; }, {
+diff --git a/tests/agent-runtime/generation-tools.test.ts b/tests/agent-runtime/generation-tools.test.ts
+--- a/tests/agent-runtime/generation-tools.test.ts
++++ b/tests/agent-runtime/generation-tools.test.ts
+@@ -103,6 +103,146 @@
+ }
+ 
+ describe('generation and deck tools', () => {
++  it('delivers frozen policy, three owned pictures and exact speech to the final simulation prompts', async () => {
++    const current = state(document([]));
++    const media = ['morning', 'afternoon', 'evening'].map((name, index) => ({
++      src: '/api/classroom-media/stage-test/media/' + name + '.png',
++      assetKey: name, description: 'Verified time-of-day picture ' + index,
++    }));
++    const pictureDomContract = {
++      schemaVersion: 'mira.frozen-textbook.picture-dom.v1' as const,
++      representation: 'initial-dom-img' as const, parser: 'parse5' as const,
++      minimumVisibleImages: 1 as const, allowHiddenSentinels: false as const,
++      dynamicBehavior: 'reuse-or-move-declared-img' as const,
++      sources: media.map((m, i) => ({ assetKey: m.assetKey, src: m.src, sha256: String(i).repeat(64) })),
++    };
++    const frozen = { binding: { gradeCode: 'primary_1', subject: 'chinese' },
++      interactionPolicy: { policy: { version: 'frozen-test', rules: [
++        { id: 'low-reading', requirement: 'pictures carry meaning' },
++        { id: 'evidence', requirement: 'observation is not mastery' },
++      ] } }, pagePlan: { title: 'Three times in one day', pictureMeaning: ['morning', 'afternoon', 'evening'] } };
++    const actions = [{ id: 'time-speech-1', type: 'speech', text: '先看看这一天的三幅图。' }];
++    const aiCall = vi.fn(async (_system: string, _user: string) =>
++      '<html><head></head><body><img src="img_1"><script id="widget-config" type="application/json">{"type":"simulation"}</script></body></html>');
++    const generateActions = vi.fn();
++    const tool = find(buildGenerationTools(deps(current.store, {
++      aiCall, generateActions,
++      getTextbookPageContext: async () => ({ brief: 'frozen meaning task', text: JSON.stringify(frozen), pictureDomContract }),
++    })), 'generate_scene');
++    await tool.execute('frozen-time-pictures', { stageId: 'stage-test', order: 2,
++      title: 'Three times in one day', type: 'interactive', widgetType: 'simulation',
++      brief: 'caller brief', widgetOutline: { concept: 'move the three pictures to revise time order' }, media, actions,
++    } as never);
++    expect(aiCall).toHaveBeenCalledTimes(1);
++    expect(generateActions).not.toHaveBeenCalled();
++    const [system, user] = aiCall.mock.calls[0]!;
++    expect(system).toContain('# Frozen Textbook Interactive Authoring v1');
++    expect(system).toContain(JSON.stringify(frozen));
++    expect(system).toContain(JSON.stringify(pictureDomContract));
++    expect(user).toContain(JSON.stringify(pictureDomContract));
++    expect(system).toContain('initial HTML, without running JavaScript');
++    expect(system).toContain('visible body DOM');
++    expect(system).toContain('decorative sentinel');
++    for (const image of media) expect(user).toContain(image.src);
++    expect(user).toContain(JSON.stringify(actions));
++    expect(current.get()?.scenes[0].actions).toEqual(actions);
++  });
++
++  const frozenSpeechPlan = [
++    { actionId: 'frozen-intro', text: '先观察这幅图。' },
++    { actionId: 'frozen-revise', text: '可以改一改，再试一次。' },
++  ];
++  const frozenSpeeches = frozenSpeechPlan.map(line => ({ id: line.actionId, type: 'speech', text: line.text }));
++  const frozenHtml = '<html><head></head><body><img src="/api/classroom-media/stage-test/media/picture.png"><script type="application/json" id="widget-config">{"type":"simulation"}</script></body></html>';
++  const frozenParams = { stageId: 'stage-test', order: 1, title: 'Frozen activity',
++    type: 'interactive', widgetType: 'simulation', brief: 'Observe and revise' };
++
++  it('uses the complete server-frozen speech plan without calling the action model', async () => {
++    const current = state(document([])), aiCall = vi.fn(async (_system: string, _user: string) => frozenHtml), generateActions = vi.fn();
++    const tool = find(buildGenerationTools(deps(current.store, { aiCall, generateActions,
++      getTextbookPageContext: async () => ({ brief: 'frozen', text: 'complete server contract', speechPlan: frozenSpeechPlan }),
++    })), 'generate_scene');
++    const output = await tool.execute('frozen-plan-default', frozenParams as never);
++    expect(output).not.toMatchObject({ isError: true });
++    expect(current.get()?.scenes[0].actions).toEqual(frozenSpeeches);
++    expect(aiCall).toHaveBeenCalledTimes(1);
++    expect(aiCall.mock.calls[0]?.[1]).toContain(JSON.stringify(frozenSpeeches));
++    expect(generateActions).not.toHaveBeenCalled();
++  });
++
++  it.each([null, undefined, [], 'not-a-plan', [{ actionId: 'missing-text' }],
++    [{ actionId: 'same', text: '第一句' }, { actionId: 'same', text: '第二句' }]].map(speechPlan => ({ speechPlan })))(
++    'rejects a declared malformed frozen plan before any provider call: %j', async ({ speechPlan }) => {
++      const current = state(document([])), aiCall = vi.fn(), generateActions = vi.fn();
++      const tool = find(buildGenerationTools(deps(current.store, { aiCall, generateActions,
++        getTextbookPageContext: async () => ({ brief: 'frozen', text: 'contract', speechPlan }),
++      })), 'generate_scene');
++      const output = await tool.execute('invalid-plan', frozenParams as never);
++      expect(output).toMatchObject({ isError: true, details: { error: 'invalid-frozen-speech-plan' } });
++      expect(aiCall).not.toHaveBeenCalled(); expect(generateActions).not.toHaveBeenCalled();
++      expect(current.store.putScene).not.toHaveBeenCalled();
++    },
++  );
++
++  it.each([
++    frozenSpeeches.slice(0, 1), [...frozenSpeeches].reverse(),
++    frozenSpeeches.map((line, index) => index ? line : { ...line, id: 'rewritten-id' }),
++    frozenSpeeches.map((line, index) => index ? line : { ...line, text: '改写过的句子。' }),
++    [...frozenSpeeches, { id: 'extra', type: 'speech', text: '未经冻结的新句子。' }],
++  ])('rejects explicit speech scope drift before generation: %j', async (...actions) => {
++    const current = state(document([])), aiCall = vi.fn();
++    const tool = find(buildGenerationTools(deps(current.store, { aiCall,
++      getTextbookPageContext: async () => ({ brief: 'frozen', text: 'contract', speechPlan: frozenSpeechPlan }),
++    })), 'generate_scene');
++    const output = await tool.execute('speech-scope-drift', { ...frozenParams, actions } as never);
++    expect(output).toMatchObject({ isError: true, details: { error: 'frozen-speech-actions-mismatch' } });
++    expect(aiCall).not.toHaveBeenCalled(); expect(current.store.putScene).not.toHaveBeenCalled();
++  });
++
++  it('preserves exact explicit speech and ordinary non-speech actions', async () => {
++    const current = state(document([])), generateActions = vi.fn();
++    const actions = [{ id: 'point-at-picture', type: 'spotlight', elementId: 'picture' }, ...frozenSpeeches];
++    const tool = find(buildGenerationTools(deps(current.store, { aiCall: async () => frozenHtml, generateActions,
++      getTextbookPageContext: async () => ({ brief: 'frozen', text: 'contract', speechPlan: frozenSpeechPlan }),
++    })), 'generate_scene');
++    await tool.execute('exact-with-spotlight', { ...frozenParams, actions } as never);
++    expect(current.get()?.scenes[0].actions).toEqual(actions);
++    expect(generateActions).not.toHaveBeenCalled();
++  });
++
++  it('keeps the historical action-generation path when a frozen page has no speechPlan', async () => {
++    const current = state(document([])), generateActions = vi.fn(async () => frozenSpeeches);
++    const aiCall = vi.fn(async (_system: string, _user: string) => frozenHtml);
++    const tool = find(buildGenerationTools(deps(current.store, { aiCall, generateActions,
++      getTextbookPageContext: async () => ({ brief: 'old frozen page', text: 'old contract without speechPlan' }),
++    })), 'generate_scene');
++    await tool.execute('legacy-no-plan', frozenParams as never);
++    expect(generateActions).toHaveBeenCalledTimes(1);
++    expect(current.get()?.scenes[0].actions).toEqual(frozenSpeeches);
++  });
++
++  it('retains explicit selected-option quiz feedback for the existing saving guard', async () => {
++    const current = state(document([])), generateActions = vi.fn();
++    const stem = { actionId: 'locked-stem', text: '请找出对应的图片。' };
++    const feedbackText = '看看图片的不同，再试一次。';
++    const picture = { kind: 'image', src: '/api/classroom-media/stage-test/media/picture.png', alt: '场景图片' };
++    const question = { id: 'locked-question', type: 'single', question: stem.text,
++      options: [{ value: 'A', label: '第一幅' }, { value: 'B', label: '第二幅' }], answer: ['B'], points: 10,
++      analysis: '按本题场景理解。', optionFeedback: { A: { text: feedbackText, visual: picture } } };
++    const actions = [{ id: stem.actionId, type: 'speech', text: stem.text },
++      { id: 'selected-feedback-a', type: 'speech', text: feedbackText }];
++    const tool = find(buildGenerationTools(deps(current.store, {
++      aiCall: async () => JSON.stringify([question]), generateActions,
++      getTextbookPageContext: async () => ({ brief: 'locked quiz', text: 'contract', speechPlan: [stem],
++        quizConfig: { questionCount: 1, difficulty: 'medium', questionTypes: ['single'] } }),
++    })), 'generate_scene');
++    const output = await tool.execute('quiz-feedback', { stageId: 'stage-test', order: 1, title: 'Locked quiz',
++      type: 'quiz', brief: 'one locked question', actions } as never);
++    expect(output).not.toMatchObject({ isError: true });
++    expect(current.get()?.scenes[0].actions).toEqual(actions);
++    expect(generateActions).not.toHaveBeenCalled();
++  });
++
+   it('rejects a frozen quiz without server-derived quiz config before any model call or save', async () => {
+     const current = state(document([]));
+     const aiCall = vi.fn();

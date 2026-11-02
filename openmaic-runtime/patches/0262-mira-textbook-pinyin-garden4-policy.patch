@@ -1,0 +1,632 @@
+diff --git a/lib/server/mira-textbook-pinyin-pronunciation.ts b/lib/server/mira-textbook-pinyin-pronunciation.ts
+--- a/lib/server/mira-textbook-pinyin-pronunciation.ts
++++ b/lib/server/mira-textbook-pinyin-pronunciation.ts
+@@ -5590,6 +5590,519 @@
+ 
+ export const MIRA_TEXTBOOK_PINYIN_ANGENGINGONG_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_ANGENGINGONG_PRONUNCIATION_POLICY));
+ 
++/** Garden four exact inventory; registration is not current-lesson audio approval. */
++export const MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY = {
++  "policyVersion": "mira.textbook.pinyin-garden4-ssml.v1",
++  "subject": "chinese",
++  "providerId": "aliyun-cosyvoice",
++  "modelId": "cosyvoice-v3-flash",
++  "voiceId": "longanwen_v3",
++  "endpointPath": "/services/audio/tts/SpeechSynthesizer",
++  "inputParameters": {
++    "enable_ssml": true,
++    "format": "wav",
++    "language_hints": [
++      "zh"
++    ],
++    "pitch": 1,
++    "rate": 1,
++    "sample_rate": 24000,
++    "seed": 0,
++    "voice": "longanwen_v3"
++  },
++  "textHandling": {
++    "combiningMarks": "reject",
++    "latinRunRanges": [
++      [
++        48,
++        57
++      ],
++      [
++        65,
++        90
++      ],
++      [
++        97,
++        122
++      ],
++      [
++        170,
++        170
++      ],
++      [
++        186,
++        186
++      ],
++      [
++        192,
++        214
++      ],
++      [
++        216,
++        246
++      ],
++      [
++        248,
++        696
++      ],
++      [
++        736,
++        740
++      ],
++      [
++        7424,
++        7461
++      ],
++      [
++        7468,
++        7516
++      ],
++      [
++        7522,
++        7525
++      ],
++      [
++        7531,
++        7543
++      ],
++      [
++        7545,
++        7614
++      ],
++      [
++        7680,
++        7935
++      ],
++      [
++        8305,
++        8305
++      ],
++      [
++        8319,
++        8319
++      ],
++      [
++        8336,
++        8348
++      ],
++      [
++        8490,
++        8491
++      ],
++      [
++        8498,
++        8498
++      ],
++      [
++        8526,
++        8526
++      ],
++      [
++        8544,
++        8584
++      ],
++      [
++        11360,
++        11391
++      ],
++      [
++        42786,
++        42887
++      ],
++      [
++        42891,
++        42972
++      ],
++      [
++        42993,
++        43007
++      ],
++      [
++        43824,
++        43866
++      ],
++      [
++        43868,
++        43876
++      ],
++      [
++        43878,
++        43881
++      ],
++      [
++        64256,
++        64262
++      ],
++      [
++        65313,
++        65338
++      ],
++      [
++        65345,
++        65370
++      ],
++      [
++        67456,
++        67461
++      ],
++      [
++        67463,
++        67504
++      ],
++      [
++        67506,
++        67514
++      ],
++      [
++        119808,
++        120831
++      ],
++      [
++        122624,
++        122654
++      ],
++      [
++        122661,
++        122666
++      ]
++    ],
++    "normalization": "none",
++    "tokenization": "whole-latin-run-and-longest-chinese-word-v1",
++    "unsupportedLatin": "reject",
++    "wrapper": "speak",
++    "xmlEscape": "amp_lt_gt_quot_apos"
++  },
++  "listeningRequired": true,
++  "symbols": {
++    "yǎn": {
++      "carrier": "眼",
++      "ph": "yan3"
++    },
++    "yuǎn": {
++      "ph": "yuan3",
++      "carrier": "远"
++    },
++    "yīn": {
++      "carrier": "因",
++      "ph": "yin1"
++    },
++    "yīng": {
++      "carrier": "英",
++      "ph": "ying1"
++    },
++    "jiǎn": {
++      "ph": "jian3",
++      "carrier": "剪"
++    },
++    "juǎn": {
++      "ph": "juan3",
++      "carrier": "卷"
++    },
++    "zuān": {
++      "ph": "zuan1",
++      "carrier": "钻"
++    },
++    "zhuān": {
++      "ph": "zhuan1",
++      "carrier": "砖"
++    },
++    "chán": {
++      "ph": "chan2",
++      "carrier": "蝉"
++    },
++    "chuán": {
++      "carrier": "船",
++      "ph": "chuan2"
++    },
++    "chuáng": {
++      "ph": "chuang2",
++      "carrier": "床"
++    },
++    "b": {
++      "carrier": "波",
++      "ph": "bo1"
++    },
++    "p": {
++      "carrier": "坡",
++      "ph": "po1"
++    },
++    "m": {
++      "carrier": "摸",
++      "ph": "mo1"
++    },
++    "f": {
++      "carrier": "佛",
++      "ph": "fo1"
++    },
++    "d": {
++      "carrier": "的",
++      "ph": "de1"
++    },
++    "t": {
++      "carrier": "特",
++      "ph": "te1"
++    },
++    "n": {
++      "carrier": "呢",
++      "ph": "ne1"
++    },
++    "l": {
++      "carrier": "勒",
++      "ph": "le1"
++    },
++    "g": {
++      "carrier": "哥",
++      "ph": "ge1"
++    },
++    "k": {
++      "carrier": "科",
++      "ph": "ke1"
++    },
++    "h": {
++      "carrier": "喝",
++      "ph": "he1"
++    },
++    "j": {
++      "carrier": "鸡",
++      "ph": "ji1"
++    },
++    "q": {
++      "carrier": "七",
++      "ph": "qi1"
++    },
++    "x": {
++      "carrier": "西",
++      "ph": "xi1"
++    },
++    "zh": {
++      "carrier": "知",
++      "ph": "zhi1"
++    },
++    "ch": {
++      "carrier": "吃",
++      "ph": "chi1"
++    },
++    "sh": {
++      "carrier": "诗",
++      "ph": "shi1"
++    },
++    "r": {
++      "carrier": "日",
++      "ph": "ri1"
++    },
++    "z": {
++      "carrier": "资",
++      "ph": "zi1"
++    },
++    "c": {
++      "carrier": "疵",
++      "ph": "ci1"
++    },
++    "s": {
++      "carrier": "丝",
++      "ph": "si1"
++    },
++    "y": {
++      "carrier": "衣",
++      "ph": "yi1"
++    },
++    "w": {
++      "carrier": "乌",
++      "ph": "wu1"
++    },
++    "a": {
++      "carrier": "啊",
++      "ph": "a1"
++    },
++    "o": {
++      "carrier": "哦",
++      "ph": "o1"
++    },
++    "e": {
++      "carrier": "鹅",
++      "ph": "e1"
++    },
++    "i": {
++      "carrier": "衣",
++      "ph": "yi1"
++    },
++    "u": {
++      "carrier": "乌",
++      "ph": "wu1"
++    },
++    "ü": {
++      "carrier": "迂",
++      "ph": "yu1"
++    },
++    "ai": {
++      "carrier": "哀",
++      "ph": "ai1"
++    },
++    "ei": {
++      "carrier": "诶",
++      "ph": "ei1"
++    },
++    "ui": {
++      "carrier": "威",
++      "ph": "wei1"
++    },
++    "ao": {
++      "carrier": "凹",
++      "ph": "ao1"
++    },
++    "ou": {
++      "carrier": "欧",
++      "ph": "ou1"
++    },
++    "iu": {
++      "carrier": "优",
++      "ph": "you1"
++    },
++    "ie": {
++      "carrier": "椰",
++      "ph": "ye1"
++    },
++    "üe": {
++      "carrier": "约",
++      "ph": "yue1"
++    },
++    "er": {
++      "carrier": "儿",
++      "ph": "er1"
++    },
++    "an": {
++      "carrier": "安",
++      "ph": "an1"
++    },
++    "en": {
++      "carrier": "恩",
++      "ph": "en1"
++    },
++    "in": {
++      "carrier": "因",
++      "ph": "yin1"
++    },
++    "un": {
++      "carrier": "温",
++      "ph": "wen1"
++    },
++    "ün": {
++      "carrier": "晕",
++      "ph": "yun1"
++    },
++    "ang": {
++      "carrier": "肮",
++      "ph": "ang1"
++    },
++    "eng": {
++      "carrier": "鞥",
++      "ph": "eng1"
++    },
++    "ing": {
++      "carrier": "英",
++      "ph": "ying1"
++    },
++    "ong": {
++      "carrier": "嗡",
++      "ph": "ong1"
++    },
++    "zhi": {
++      "carrier": "知",
++      "ph": "zhi1"
++    },
++    "chi": {
++      "carrier": "吃",
++      "ph": "chi1"
++    },
++    "shi": {
++      "carrier": "诗",
++      "ph": "shi1"
++    },
++    "ri": {
++      "carrier": "日",
++      "ph": "ri1"
++    },
++    "zi": {
++      "carrier": "资",
++      "ph": "zi1"
++    },
++    "ci": {
++      "carrier": "疵",
++      "ph": "ci1"
++    },
++    "si": {
++      "carrier": "丝",
++      "ph": "si1"
++    },
++    "yi": {
++      "carrier": "衣",
++      "ph": "yi1"
++    },
++    "wu": {
++      "carrier": "乌",
++      "ph": "wu1"
++    },
++    "yu": {
++      "carrier": "迂",
++      "ph": "yu1"
++    },
++    "ye": {
++      "carrier": "椰",
++      "ph": "ye1"
++    },
++    "yue": {
++      "carrier": "约",
++      "ph": "yue1"
++    },
++    "yuan": {
++      "carrier": "冤",
++      "ph": "yuan1"
++    },
++    "yin": {
++      "carrier": "因",
++      "ph": "yin1"
++    },
++    "yun": {
++      "carrier": "晕",
++      "ph": "yun1"
++    },
++    "ying": {
++      "carrier": "英",
++      "ph": "ying1"
++    }
++  },
++  "words": {
++    "谁": {
++      "ph": "shui2",
++      "carrier": "谁"
++    }
++  },
++  "approvalBoundary": {
++    "recipeStatus": "registered-textbook-scoped-ssml-recipe-pending-current-lesson-probes-and-formal-audio-review",
++    "sourceScope": "pep-chinese-g1-upper-2022-standard / 20260924-directory-3 / u4-l6; 人教2024年8月一年级上册语文园地四 printed56–59. Exact voiced inventory: 11 contrast syllables, 23 initials, 24 finals and 16 whole syllables; 74 unique Latin tokens.",
++    "sourceDraftSha256": "9ad55554474202dd8ad506e68c7a7a0beda51a455e62869fbb9252575377161e",
++    "sourceSpeechInventorySha256": "7c80ff6fada2d1d9943c9709f6cb4081bc979804d8c753aa1f132de95262b376",
++    "providerReuse": "Unchanged Aliyun cosyvoice-v3-flash / longanwen_v3 / py SSML / 24kHz WAV / seed0 rate1 pitch1 zh. Reuse equal registered symbol recipes, never prior lesson files, receipts or listening verdicts.",
++    "providerDocumentation": "https://help.aliyun.com/en/model-studio/ssml-latex-user-guide",
++    "humanReview": "not-performed-for-this-lesson",
++    "humanListeningVerified": false,
++    "perceptualToneVerified": false,
++    "pronunciationApproved": false,
++    "formalUseAllowed": false,
++    "wholeTokenBoundary": "Every Latin run must be one exact registered token. No Unicode normalization, combining marks, numeric-tone spellings, unknown tokens, per-letter fallback, concatenated component speech or Cartesian tone expansion.",
++    "asciiBoundary": "a/ai/an/ang/ao are explicitly registered because these exact ASCII spellings occur in the frozen speech inventory. ai/an/ang/ao reuse the same recipe as existing ɑi/ɑn/ɑng/ɑo; this is an explicit entry, not normalization. Unlisted alpha-a aliases remain rejected.",
++    "umlautBoundary": "yuǎn and juǎn are complete yuan3/juan3 recipes; written u after y/j follows the printed orthography and is never assembled as wu or j+u fragments. jiǎn is jian3. No alternate decomposition is allowed.",
++    "newWholeSyllableBoundary": "yuan3/jian3/juan3/zuan1/zhuan1/chan2/chuang2 and the new exact yīng spelling are pending real current-lesson protocol and perceptual review. Explicit ph reflects the printed token/tone; carrier glyphs are inert payload, not vocabulary or permission for carrier-reading fallback.",
++    "initialBoundary": "The 23 initial recipes preserve existing call-name recipes. Their protocol/WAV probes do not establish light-short consonant delivery. Actual formal table narration needs separate acoustic and browser review; no shortened or chopped old audio may be reused.",
++    "bareFinalBoundary": "eng1/ong1 and the existing final recipes have no inherited approval in this lesson. Provider acceptance or audible accuracy must be observed; never replace ong with weng/hong or another sound to pass a check.",
++    "naturalChineseWords": "Only the exact Chinese 谁 is overridden to shui2 within this lesson policy, following the printed 悯农 谁知 annotation; other Chinese remains natural sentence text. This override is not global and has no inherited ASR or human exception.",
++    "probeScope": "Four server-owned fixed probes: 11 contrast tokens plus 谁知盘中餐 context; 23 initials; 24 finals; 16 whole syllables. Together they cover all 74 actual Latin tokens and the one Chinese-word override in 75 phoneme positions. Probe bytes are evidence only, never formal lesson media.",
++    "publicationBoundary": "Registration is neither provider acceptance, audio generation, human listening, tone approval, review, publication nor student acceptance. Initialize with exact new probe evidence, then verify formal audio and real browser play. No prior lesson unresolved-ASR exemption or exactTextSsml override is inherited."
++  }
++} as const;
++
++export const MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY_SHA256 = sha(canonicalJson(MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY));
++
+ type WholeTokenPolicy = typeof MIRA_TEXTBOOK_PINYIN_BPMF_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_DTNL_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_GARDEN2_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_GKH_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_JQX_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_ZCS_PRONUNCIATION_POLICY
+@@ -5603,12 +6116,14 @@
+   | typeof MIRA_TEXTBOOK_PINYIN_AOUIU_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_IEUEER_PRONUNCIATION_POLICY
+   | typeof MIRA_TEXTBOOK_PINYIN_ANENINUNUN_PRONUNCIATION_POLICY
+-  | typeof MIRA_TEXTBOOK_PINYIN_ANGENGINGONG_PRONUNCIATION_POLICY;
++  | typeof MIRA_TEXTBOOK_PINYIN_ANGENGINGONG_PRONUNCIATION_POLICY
++  | typeof MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY;
+ type RegisteredPolicy = typeof MIRA_TEXTBOOK_PINYIN_PRONUNCIATION_POLICY | typeof MIRA_TEXTBOOK_PINYIN_IUU_PRONUNCIATION_POLICY | WholeTokenPolicy;
+ 
+ // Only server-owned recipes can enter this registry. A caller supplies an
+ // identity, never provider settings, an SSML template, or a symbol table.
+ const REGISTERED_POLICIES = new Map<string, { policy: RegisteredPolicy; sha256: string }>([
++  [MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY_SHA256 }],
+   [MIRA_TEXTBOOK_PINYIN_ANGENGINGONG_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_ANGENGINGONG_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_ANGENGINGONG_PRONUNCIATION_POLICY_SHA256 }],
+   [MIRA_TEXTBOOK_PINYIN_ANENINUNUN_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_ANENINUNUN_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_ANENINUNUN_PRONUNCIATION_POLICY_SHA256 }],
+   [MIRA_TEXTBOOK_PINYIN_IEUEER_PRONUNCIATION_POLICY.policyVersion, { policy: MIRA_TEXTBOOK_PINYIN_IEUEER_PRONUNCIATION_POLICY, sha256: MIRA_TEXTBOOK_PINYIN_IEUEER_PRONUNCIATION_POLICY_SHA256 }],
+@@ -5745,6 +6260,7 @@
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_IEUEER_PRONUNCIATION_POLICY.policyVersion
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_ANENINUNUN_PRONUNCIATION_POLICY.policyVersion
+       || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_ANGENGINGONG_PRONUNCIATION_POLICY.policyVersion
++      || policy.policyVersion === MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY.policyVersion
+     ? wholeTokenParts(text, policy) : Array.from(text).map(character => {
+     const symbol = symbols[character];
+     if (symbol) return `<phoneme alphabet="py" ph="${symbol.ph}">${symbol.carrier}</phoneme>`;
+diff --git a/tests/server/mira-textbook-pinyin-garden4.test.ts b/tests/server/mira-textbook-pinyin-garden4.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/mira-textbook-pinyin-garden4.test.ts
+@@ -0,0 +1,80 @@
++import { createHash } from 'crypto';
++import { readFileSync } from 'fs';
++import { fileURLToPath } from 'url';
++import { describe, expect, it } from 'vitest';
++import * as registry from '@/lib/server/mira-textbook-pinyin-pronunciation';
++import { assertMiraFormalTtsRequest, MiraFormalAudioError } from '@/lib/server/mira-formal-audio';
++
++const version = 'mira.textbook.pinyin-garden4-ssml.v1';
++const checksum = 'd3c08335bc9137633bba84d2d338c2dc23d9509bf6a923dab1ded03619f235a2';
++const policy = JSON.parse(readFileSync(fileURLToPath(new URL(
++  '../../../../../backend/content/textbook_pinyin_pronunciation_garden4.v1.json', import.meta.url,
++)), 'utf8'));
++const prepare = registry.prepareMiraTextbookPinyinPronunciation;
++const sha = (text: string) => createHash('sha256').update(text).digest('hex');
++const contrasts = [
++  ['yǎn', 'yan3'], ['yuǎn', 'yuan3'], ['yīn', 'yin1'], ['yīng', 'ying1'],
++  ['jiǎn', 'jian3'], ['juǎn', 'juan3'], ['zuān', 'zuan1'], ['zhuān', 'zhuan1'],
++  ['chán', 'chan2'], ['chuán', 'chuan2'], ['chuáng', 'chuang2'],
++] as const;
++const initials = 'b p m f d t n l g k h j q x zh ch sh r z c s y w'.split(' ');
++const finals = 'a o e i u ü ai ei ui ao ou iu ie üe er an en in un ün ang eng ing ong'.split(' ');
++const whole = 'zhi chi shi ri zi ci si yi wu yu ye yue yuan yin yun ying'.split(' ');
++
++describe('Garden four exact scoped pronunciation registration', () => {
++  it('matches the Python policy and leaves perceptual/formal approval pending', () => {
++    expect(registry.MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY).toEqual(policy);
++    expect(registry.MIRA_TEXTBOOK_PINYIN_GARDEN4_PRONUNCIATION_POLICY_SHA256).toBe(checksum);
++    expect(Object.keys(policy.symbols).sort())
++      .toEqual([...contrasts.map(([t]) => t), ...initials, ...finals, ...whole].sort());
++    expect(Object.keys(policy.symbols)).toHaveLength(74);
++    for (const key of ['humanListeningVerified', 'perceptualToneVerified', 'pronunciationApproved', 'formalUseAllowed'])
++      expect(policy.approvalBoundary[key]).toBe(false);
++    expect(policy.exactTextSsml).toBeUndefined();
++    expect(prepare('请听。', version).profile.policySha256).toBe(checksum);
++  });
++
++  it.each(contrasts)('keeps the complete contrast token %s, without vowel fragments', (token, phoneme) => {
++    const result = prepare(`请听：${token}。`, version);
++    expect(result.ssml).toBe(`<speak>请听：<phoneme alphabet="py" ph="${phoneme}">${policy.symbols[token].carrier}</phoneme>。</speak>`);
++    expect(sha(result.providerBody)).toBe(result.providerPronunciation.providerBodySha256);
++  });
++
++  it.each([...initials, ...finals, ...whole])('registers the actual printed table token %s', token => {
++    const result = prepare(token, version);
++    expect(result.ssml).toBe(`<speak><phoneme alphabet="py" ph="${policy.symbols[token].ph}">${policy.symbols[token].carrier}</phoneme></speak>`);
++  });
++
++  it('registers ASCII entries explicitly and the lesson-only Chinese 谁 override', () => {
++    expect(prepare('ai an ang ao', version).ssml)
++      .toContain('<phoneme alphabet="py" ph="ai1">');
++    expect(policy.symbols.ai).toEqual(registry.MIRA_TEXTBOOK_PINYIN_AIEIUI_V4_PRONUNCIATION_POLICY.symbols['ɑi']);
++    expect(prepare('谁知盘中餐。', version).ssml)
++      .toBe('<speak><phoneme alphabet="py" ph="shui2">谁</phoneme>知盘中餐。</speak>');
++    expect(prepare('老师陪你读诗。', version).ssml).toBe('<speak>老师陪你读诗。</speak>');
++  });
++
++  it.each(['ɑi', 'ɑn', 'ɑng', 'ɑo', 'AI', 'ａｉ', 'ai1', 'yuan3', 'yǎnyuǎn',
++    'juǎn1', 'a\u0304i', 'ng', 'weng', 'men', 'li5', 'constructor']) (
++    'rejects unsupported aliases or concatenated token %s before any provider request', token => {
++      expect(() => prepare(`请听：${token}。`, version)).toThrow();
++    });
++
++  it('passes the existing pure formal validator only with its exact new profile', () => {
++    const text = '请听：yǎn、yuǎn。谁知盘中餐。';
++    const request = { requestId: `tbptts1_${'a'.repeat(64)}`, classroomId: 'classroom-garden-four',
++      classroomContentSha256: 'b'.repeat(64), subject: 'chinese', sceneId: 'scene-one', sceneOrder: 0,
++      actionId: 'speech-one', narrationSegmentId: 'speech-one', text, textSha256: sha(text),
++      teacherProfileId: 'mira_chinese_gentle', teacherProfileVersion: 2, teacherGender: 'female',
++      teacherProfileSha256: 'a5fd163af249705bda4bb0be5448f65d275eb423285557727f9c50ea442f01f8',
++      pronunciationProfile: prepare(text, version).profile };
++    expect(assertMiraFormalTtsRequest(request)).toEqual(request);
++    expect(() => assertMiraFormalTtsRequest({ ...request, pronunciationProfile: {
++      ...request.pronunciationProfile, policySha256: '0'.repeat(64),
++    } })).toThrow(MiraFormalAudioError);
++    expect(prepare('请听。', 'mira.textbook.pinyin-angengingong-ssml.v1').profile.policySha256)
++      .toBe('77c1218ebc89639fbcb6360dfa0db0fdb5faccdeb09b3559c4c124a9acc63514');
++    expect(prepare('luó bo', 'mira.textbook.pinyin-aieiui-ssml.v4').ssml)
++      .toBe('<speak><sub alias="萝卜">luó bo</sub>。</speak>');
++  });
++});

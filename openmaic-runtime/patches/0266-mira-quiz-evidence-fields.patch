@@ -1,0 +1,80 @@
+diff --git a/lib/server/agent-runtime/dsl-tools.ts b/lib/server/agent-runtime/dsl-tools.ts
+index 77566f4..c667c03 100644
+--- a/lib/server/agent-runtime/dsl-tools.ts
++++ b/lib/server/agent-runtime/dsl-tools.ts
+@@ -23,7 +23,14 @@ import { COURSE_STAGE_ID_DESCRIPTION } from './course-stage';
+ 
+ // Consume the built DSL schema, including nested additionalProperties:false.
+ // Keep legacy app extensions separate from the canonical learning fields.
+-const QUIZ_LEARNING_FIELDS = ['visual', 'optionVisuals', 'questionAudioUrl', 'questionAudioBinding'] as const;
++const QUIZ_LEARNING_FIELDS = [
++  'visual',
++  'optionVisuals',
++  'questionAudioUrl',
++  'questionAudioBinding',
++  'targetId',
++  'evidenceLimit',
++] as const;
+ const QUIZ_LEARNING_SCHEMAS = Object.fromEntries(QUIZ_LEARNING_FIELDS.map(field => [field, {
+   definitions: dslSceneSchema.definitions,
+   ...dslSceneSchema.definitions.QuizQuestion.properties[field],
+diff --git a/packages/@openmaic/dsl/src/stage.ts b/packages/@openmaic/dsl/src/stage.ts
+index 878ddda..118cd9c 100644
+--- a/packages/@openmaic/dsl/src/stage.ts
++++ b/packages/@openmaic/dsl/src/stage.ts
+@@ -224,6 +224,10 @@ export interface QuizQuestion {
+   id: string;
+   type: 'single' | 'multiple' | 'short_answer';
+   question: string;
++  /** Stable curriculum objective sampled by this question. */
++  targetId?: string;
++  /** Bounded claim describing what this response can and cannot establish. */
++  evidenceLimit?: string;
+   options?: QuizOption[];
+   /** Optional scene illustration and distinct pictures keyed by the locked option value. */
+   visual?: QuizVisual;
+diff --git a/tests/agent-runtime/dsl-tools.test.ts b/tests/agent-runtime/dsl-tools.test.ts
+index f995797..a0bf85e 100644
+--- a/tests/agent-runtime/dsl-tools.test.ts
++++ b/tests/agent-runtime/dsl-tools.test.ts
+@@ -603,6 +603,40 @@ describe('DSL agent tools', () => {
+     expect(current.putScene).toHaveBeenCalledOnce();
+     expect((current.get().scenes[1]!.content as QuizContent).questions[0]).toMatchObject({ questionAudioUrl: url, questionAudioBinding: binding });
+   });
++
++  it('preserves optional curriculum evidence fields and rejects invalid or invented fields', async () => {
++    const current = state();
++    const patch = tool(dslTools(current.store), 'patch_stage');
++    const accepted = await patch.execute('curriculum-evidence', {
++      target: '/scenes/2',
++      intent: 'Bind the locked question to its reviewed objective and evidence boundary',
++      ops: [
++        { op: 'set', path: '/content/questions/0/targetId', value: 'garden-four-pinyin' },
++        { op: 'set', path: '/content/questions/0/evidenceLimit', value: '只记录图片和教师语音支持下的一次辨认。' },
++      ],
++    } as never);
++    expect(accepted).not.toMatchObject({ isError: true });
++    expect((current.get().scenes[1]!.content as QuizContent).questions[0]).toMatchObject({
++      targetId: 'garden-four-pinyin',
++      evidenceLimit: '只记录图片和教师语音支持下的一次辨认。',
++    });
++
++    const invalid = await patch.execute('invalid-curriculum-evidence', {
++      target: '/scenes/2',
++      intent: 'Reject a malformed evidence boundary',
++      ops: [{ op: 'set', path: '/content/questions/0/evidenceLimit', value: ['not', 'a', 'string'] }],
++    } as never);
++    expect(invalid).toMatchObject({ isError: true });
++    expect(textOf(invalid)).toContain('/content/questions/0/evidenceLimit: does not match the strict DSL schema');
++
++    const invented = await patch.execute('invented-curriculum-evidence', {
++      target: '/scenes/2',
++      intent: 'Reject an unregistered evidence field',
++      ops: [{ op: 'set', path: '/content/questions/0/masteryClaim', value: 'mastered' }],
++    } as never);
++    expect(invented).toMatchObject({ isError: true });
++    expect(textOf(invented)).toContain('/content/questions/0: unknown field(s) masteryClaim');
++  });
+ 
+   it('keeps add_element/delete_element semantics aligned with edit_slide', async () => {
+     const current = state();

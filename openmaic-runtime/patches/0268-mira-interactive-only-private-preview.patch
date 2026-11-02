@@ -1,0 +1,46 @@
+diff --git a/lib/server/mira-textbook-preview-quiz.ts b/lib/server/mira-textbook-preview-quiz.ts
+--- a/lib/server/mira-textbook-preview-quiz.ts
++++ b/lib/server/mira-textbook-preview-quiz.ts
+@@ -32,7 +32,12 @@
+     reject('预览与原冻结课件不同，请重新冻结当前版本');
+   const questions = room.scenes.flatMap(scene => scene.type === 'quiz'
+     ? ((scene.content as unknown as { questions?: QuizQuestion[] }).questions ?? []) : []);
+-  if (!questions.length || new Set(questions.map(q => q.id)).size !== questions.length
++  const emptyQuiz = room.scenes.some(scene => scene.type === 'quiz'
++    && !((scene.content as unknown as { questions?: QuizQuestion[] }).questions?.length));
++  // Pure interactive lessons have no quiz score; the quiz endpoint still
++  // rejects every non-quiz scene through sceneQuestions. Never invent a test.
++  if (emptyQuiz || (!questions.length && !room.scenes.some(scene => scene.type === 'interactive'))
++      || new Set(questions.map(q => q.id)).size !== questions.length
+       || questions.some(q => q.type !== 'single' || !Array.isArray(q.options) || q.options.length < 2
+         || new Set(q.options.map(o => o.value)).size !== q.options.length
+         || !Array.isArray(q.answer) || q.answer.length !== 1
+diff --git a/tests/server/mira-textbook-preview-quiz.test.ts b/tests/server/mira-textbook-preview-quiz.test.ts
+--- a/tests/server/mira-textbook-preview-quiz.test.ts
++++ b/tests/server/mira-textbook-preview-quiz.test.ts
+@@ -47,6 +47,25 @@
+     expect(() => gradePreview(preview, 'quiz-1', { q2: 'B' })).toThrow();
+     expect(() => gradePreview(preview, 'quiz-1', { q1: 'B', correct: 'true' })).toThrow();
+   });
++  it('opens exact interactive-only lessons without creating quiz grading', async () => {
++    const source = fixture().source;
++    source.scenes = [{ ...source.scenes[0], id: 'play', type: 'interactive',
++      content: { html: '<p>Picture activity</p>' } } as unknown as typeof source.scenes[number]];
++    const alias = () => {
++      const room = structuredClone(source);
++      room.id = room.stage.id = `tbprev_${qualitySha(source).slice(0, 24)}`;
++      room.scenes.forEach(scene => { scene.stageId = room.id; });
++      return room;
++    };
++    const room = alias(), preview = verifyFrozenPreview(room, source);
++    expect(preview.questions).toEqual([]);
++    expect(() => gradePreview(preview, 'play', {})).toThrow();
++    await expect(previewQuiz(preview, 'play', 'a'.repeat(64))).rejects.toThrow();
++    expect(() => verifyFrozenPreview({ ...room, scenes: [] }, source)).toThrow();
++    source.scenes.push({ ...source.scenes[0], id: 'empty-quiz', type: 'quiz',
++      content: { questions: [] } } as unknown as typeof source.scenes[number]);
++    expect(() => verifyFrozenPreview(alias(), source)).toThrow();
++  });
+   it('returns only original selected feedback and hides answers before submission', () => {
+     const { preview } = fixture();
+     const [wrong] = gradePreview(preview, 'quiz-1', { q1: 'A' });

@@ -1,0 +1,1252 @@
+diff --git a/app/api/agent/sessions/route.ts b/app/api/agent/sessions/route.ts
+index 74dd0f0..d935024 100644
+--- a/app/api/agent/sessions/route.ts
++++ b/app/api/agent/sessions/route.ts
+@@ -227,7 +227,7 @@ export async function GET(req: NextRequest) {
+     const sessions = await store.listSessionsByOwner(ownerId);
+     responseHeaders.set(
+       'x-mira-textbook-scene-contract',
+-      'mira.frozen-textbook-scene-authoring.v1',
++      'mira.frozen-textbook-scene-authoring.v1,mira.frozen-textbook-author-dispatch.v1',
+     );
+     responseHeaders.set(OPENING_MATERIAL_GROUPS_HEADER, OPENING_MATERIAL_GROUPS_SCHEMA);
+     return NextResponse.json(sessions, { headers: responseHeaders });
+diff --git a/lib/server/agent-runtime/generation-tools.ts b/lib/server/agent-runtime/generation-tools.ts
+index 2c26899..4b17651 100644
+--- a/lib/server/agent-runtime/generation-tools.ts
++++ b/lib/server/agent-runtime/generation-tools.ts
+@@ -478,7 +478,12 @@ export function buildGenerationTools(deps: GenerationToolDeps): AgentTool<never,
+       try {
+         content = await generateSceneContent(outline, contentCall.call, {
+           ...(deps.getGenerationLearningContract?.() ? { learningContract: deps.getGenerationLearningContract() } : {}),
+-          ...(textbookContext ? { textbookPromptProfile: 'frozen-textbook-v1' as const } : {}),
++          ...(textbookContext
++            ? {
++                textbookPromptProfile:
++                  textbookContext.textbookPromptProfile ?? 'frozen-textbook-v1',
++              }
++            : {}),
+           ...(textbookContext?.pictureDomContract ? { pictureDomContract: textbookContext.pictureDomContract } : {}),
+           agents,
+           languageDirective: doc.stage.languageDirective ?? '',
+diff --git a/lib/server/mira-textbook-asset-revision.ts b/lib/server/mira-textbook-asset-revision.ts
+index 329fc12..3831bf6 100644
+--- a/lib/server/mira-textbook-asset-revision.ts
++++ b/lib/server/mira-textbook-asset-revision.ts
+@@ -10,7 +10,7 @@ import { validateAppStage } from '@/lib/document-store/validators';
+ import { createOwnerBoundDocumentStore, type TransactionSource } from '@/lib/persistence/owner-bound-document-store';
+ import { resolveRequestOwnerId } from './agent-runtime/owner';
+ import type { CourseDocument, CourseStore } from './agent-runtime/course-tools';
+-import { assertTextbookContract, assertTextbookScene, textbookCanonical, textbookDigest, textbookContractFromPrompt } from './mira-textbook-scene-contract';
++import { assertTextbookScene, textbookCanonical, textbookDigest, textbookContractFromFrozenFile, textbookContractFromPrompt } from './mira-textbook-scene-contract';
+ 
+ type Json = Record<string, any>;
+ const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex');
+@@ -101,7 +101,7 @@ async function inputs(input: AssetRevisionInput, env: AssetRevisionEnvironment)
+   const dispatch = JSON.parse((await read(path.join(job, 'dispatch.json'))).toString());
+   const frozenFile = JSON.parse((await read(path.join(job, 'frozen.json'))).toString());
+   check(typeof state.sessionId === 'string' && state.sessionId.length > 0 && dispatch.ownerFingerprint === ownerFingerprint, 'JOB_BINDING');
+-  assertTextbookContract(frozenFile.sceneContract);
++  const frozen = textbookContractFromFrozenFile(frozenFile);
+   const replacements = [];
+   for (const c of input.changes) {
+     const fields = ['assetKey', 'expectedOldBindingSha256', 'expectedOldBytesSha256', 'newFilePath', 'newBytesSha256', 'reviewBasis', ...(c.lockedQuizOptionLeaf ? ['lockedQuizOptionLeaf'] : [])];
+@@ -115,7 +115,7 @@ async function inputs(input: AssetRevisionInput, env: AssetRevisionEnvironment)
+     const src = `/api/classroom-media/${input.stageId}/media/revised-${meta.sha256}.${meta.extension}`;
+     replacements.push({ input: c, bytes, meta, src });
+   }
+-  return { dataDir, ownerId, ownerFingerprint, sessionId: state.sessionId as string, stageId: input.stageId, frozen: frozenFile.sceneContract, replacements, candidatePath: path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json') };
++  return { dataDir, ownerId, ownerFingerprint, sessionId: state.sessionId as string, stageId: input.stageId, frozen, replacements, candidatePath: path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json') };
+ }
+ type State = Awaited<ReturnType<typeof inputs>>;
+ async function transaction<T>(env: AssetRevisionEnvironment, readOnly: boolean, body: (q: Queryable, pool: TransactionSource) => Promise<T>): Promise<T> {
+diff --git a/lib/server/mira-textbook-current-review-revision.ts b/lib/server/mira-textbook-current-review-revision.ts
+index d69360d..aa08571 100644
+--- a/lib/server/mira-textbook-current-review-revision.ts
++++ b/lib/server/mira-textbook-current-review-revision.ts
+@@ -20,7 +20,7 @@ import { validateAppScene, validateAppStage } from '@/lib/document-store/validat
+ import { createOwnerBoundDocumentStore, type TransactionSource } from '@/lib/persistence/owner-bound-document-store';
+ import { resolveRequestOwnerId } from './agent-runtime/owner';
+ import type { CourseDocument, CourseStore } from './agent-runtime/course-tools';
+-import { assertTextbookContract, assertTextbookScene, textbookCanonical, textbookDigest, textbookContractFromPrompt } from './mira-textbook-scene-contract';
++import { assertTextbookScene, textbookCanonical, textbookDigest, textbookContractFromFrozenFile, textbookContractFromPrompt } from './mira-textbook-scene-contract';
+ 
+ // The operator validates every externally supplied object before use. Dynamic
+ // scene leaves stay intentionally JSON-shaped because the DSL is a tagged
+@@ -398,15 +398,15 @@ async function inputs(input: CurrentReviewRevisionInput, env: CurrentReviewRevis
+   const dispatch = JSON.parse((await read(path.join(jobDir, 'dispatch.json'))).toString());
+   const frozenFile = JSON.parse((await read(path.join(jobDir, 'frozen.json'))).toString());
+   check(typeof state.sessionId === 'string' && state.sessionId.length > 0 && dispatch.ownerFingerprint === ownerFingerprint, 'JOB_BINDING');
+-  assertTextbookContract(frozenFile.sceneContract);
+-  for (const revision of input.revisions) if (revision.completeSceneReplacement) check(revision.completeSceneReplacement.expectedFrozenContractSha256 === frozenFile.sceneContract.sha256, 'COMPLETE_SCENE_CONTRACT');
++  const frozen = textbookContractFromFrozenFile(frozenFile);
++  for (const revision of input.revisions) if (revision.completeSceneReplacement) check(revision.completeSceneReplacement.expectedFrozenContractSha256 === frozen.sha256, 'COMPLETE_SCENE_CONTRACT');
+   return {
+     dataDir,
+     ownerId,
+     ownerFingerprint,
+     sessionId: state.sessionId as string,
+     stageId: input.stageId,
+-    frozen: frozenFile.sceneContract,
++    frozen,
+     html,
+     completeScenes,
+     assetAdditions,
+diff --git a/lib/server/mira-textbook-derived-speech-repair.ts b/lib/server/mira-textbook-derived-speech-repair.ts
+index 8da4003..ce17640 100644
+--- a/lib/server/mira-textbook-derived-speech-repair.ts
++++ b/lib/server/mira-textbook-derived-speech-repair.ts
+@@ -2,6 +2,7 @@
+ import { createHash } from 'node:crypto';
+ import { parse, type DefaultTreeAdapterMap } from 'parse5';
+ import { extractLiteralJsCueSource } from './mira-textbook-literal-js-cue-source';
++import { textbookContractSnapshotFromFrozenFile } from './mira-textbook-scene-contract';
+ 
+ type Json = Record<string, any>;
+ type Cue = { id: string; text: string };
+@@ -119,7 +120,7 @@ export function deriveRejectedSpeechManifest(scene: Json, sceneSha256: string) {
+ }
+ 
+ export function restoreDerivedSpeech(scene: Json, revised: Json, frozenFile: Json, sceneSha256: string) {
+-  const page = frozenFile.sceneContract?.contract?.pagePlan?.[scene.order - 1];
++  const page = textbookContractSnapshotFromFrozenFile(frozenFile).contract?.pagePlan?.[scene.order - 1];
+   check(page?.page === scene.order && page.type === 'interactive' && page.title === scene.title, 'FROZEN_PAGE');
+   check(page.speechPlan === undefined && page.cueSpeechMap === undefined, 'FROZEN_PLAN_PRESENT');
+   const manifest = deriveRejectedSpeechManifest(scene, sceneSha256);
+diff --git a/lib/server/mira-textbook-quiz-locked-question-review.ts b/lib/server/mira-textbook-quiz-locked-question-review.ts
+index 02c6f25..6554f1f 100644
+--- a/lib/server/mira-textbook-quiz-locked-question-review.ts
++++ b/lib/server/mira-textbook-quiz-locked-question-review.ts
+@@ -1,6 +1,6 @@
+ /** Pure, bounded review of one rejected quiz. No files, DB, provider, or policy mutation. */
+ import { createHash } from 'node:crypto';
+-import { textbookCanonical, textbookDigest, type FrozenTextbookContract } from './mira-textbook-scene-contract';
++import { textbookCanonical, textbookDigest, type TextbookAuthoringContract } from './mira-textbook-scene-contract';
+ 
+ type Json = Record<string, any>;
+ const object = (v: unknown): v is Json => !!v && typeof v === 'object' && !Array.isArray(v);
+@@ -19,7 +19,7 @@ function containsAudio(value: unknown): boolean {
+  * This deliberately does not infer, add, or rewrite a frozen speechPlan.
+  */
+ export function inspectQuizLockedQuestionReview(
+-  original: Json, revised: Json, frozen: FrozenTextbookContract, archiveSceneSha256: string,
++  original: Json, revised: Json, frozen: TextbookAuthoringContract, archiveSceneSha256: string,
+ ) {
+   check(object(original) && object(revised) && original.type === 'quiz' && revised.type === 'quiz'
+     && original.content?.type === 'quiz' && revised.content?.type === 'quiz', 'ONLY');
+diff --git a/lib/server/mira-textbook-rejected-scene-repair.ts b/lib/server/mira-textbook-rejected-scene-repair.ts
+index e204702..9f8d487 100644
+--- a/lib/server/mira-textbook-rejected-scene-repair.ts
++++ b/lib/server/mira-textbook-rejected-scene-repair.ts
+@@ -12,7 +12,7 @@ import { createOwnerBoundDocumentStore, type TransactionSource } from '@/lib/per
+ import { resolveRequestOwnerId } from './agent-runtime/owner';
+ import type { Scene } from '@/lib/types/stage';
+ import type { CourseDocument, CourseStore } from './agent-runtime/course-tools';
+-import { createTextbookAuthoringGuard, textbookCanonical, textbookDigest, textbookContractFromPrompt, type MissingLockedQuizAssets } from './mira-textbook-scene-contract';
++import { assertTextbookContract, createTextbookAuthoringGuard, textbookCanonical, textbookDigest, textbookContractSnapshotFromFrozenFile, textbookContractFromPrompt, type MissingLockedQuizAssets } from './mira-textbook-scene-contract';
+ import { deriveRejectedSpeechManifest, restoreDerivedSpeech } from './mira-textbook-derived-speech-repair';
+ import { inspectQuizLockedQuestionReview } from './mira-textbook-quiz-locked-question-review';
+ 
+@@ -280,7 +280,7 @@ async function revisedQuizPictures(scene: Json, input: QuizPicturesRepairInput)
+ }
+ /** Add only absent frozen sentences. Every original action remains an exact ordered subsequence. */
+ function restoreMissingFrozenSpeech(scene: Json, revised: Json, frozenFile: Json): void {
+-  const page = frozenFile.sceneContract?.contract?.pagePlan?.[scene.order - 1];
++  const page = textbookContractSnapshotFromFrozenFile(frozenFile).contract?.pagePlan?.[scene.order - 1];
+   check(page?.page === scene.order && ['interactive', 'quiz'].includes(page.type) && page.type === scene.type && page.title === scene.title, 'FROZEN_SPEECH_PAGE');
+   const plan: Json[] = page.speechPlan, cues: Json[] = page.cueSpeechMap;
+   check(Array.isArray(plan) && plan.length > 0 && plan.length <= 256 &&
+@@ -292,7 +292,7 @@ function restoreMissingFrozenSpeech(scene: Json, revised: Json, frozenFile: Json
+       cues.every(c => plan.some(p => p.actionId === c.actionId && p.text === c.text)) &&
+       new Set(cues.map(c => c.actionId)).size === cues.length, 'FROZEN_SPEECH_CUES');
+   } else {
+-    const locks = frozenFile.sceneContract?.contract?.lockedAssessments;
++    const locks = textbookContractSnapshotFromFrozenFile(frozenFile).contract?.lockedAssessments;
+     const ids = page.questionIds, guidance = page.narrationGuidance ?? [];
+     check(Array.isArray(ids) && ids.length > 0 && Array.isArray(locks) && Array.isArray(guidance), 'FROZEN_QUIZ_SPEECH_PLAN');
+     const questions: Json[] = ids.map((id: string) => locks.find((q: Json) => q.id === id && q.page === scene.order));
+@@ -327,7 +327,7 @@ function restoreMissingFrozenSpeech(scene: Json, revised: Json, frozenFile: Json
+ 
+ /** Remove exactly one declared non-frozen speech; all other original actions remain unchanged. */
+ function restoreReviewedFrozenSpeech(scene: Json, revised: Json, frozenFile: Json, input: ReviewedFrozenSpeechRepairInput): Json {
+-  const page = frozenFile.sceneContract?.contract?.pagePlan?.[scene.order - 1];
++  const page = textbookContractSnapshotFromFrozenFile(frozenFile).contract?.pagePlan?.[scene.order - 1];
+   check(page?.page === scene.order && page.type === 'interactive' && scene.type === page.type && page.title === scene.title && Array.isArray(page.speechPlan), 'FROZEN_SPEECH_PAGE');
+   const actions: Json[] = scene.actions;
+   check(Array.isArray(actions) && actions.every(a => jsonObject(a) && safeId(a.id)) && new Set(actions.map(a => a.id)).size === actions.length, 'FROZEN_SPEECH_ACTIONS');
+@@ -473,7 +473,7 @@ function revisedDerivedActionContent(scene: Json, input: DerivedActionContentRep
+   check(digestBytes(scene.content.html) === input.expectedOriginalHtmlSha256, 'ORIGINAL_HTML_SHA');
+   check(Array.isArray(scene.actions) && digestBytes(textbookCanonical(scene.actions)) === input.expectedOriginalActionsSha256, 'ORIGINAL_ACTIONS_SHA');
+   check(safeId(input.actionId) && typeof input.expectedOriginalContent === 'string' && typeof input.replacementContent === 'string' && input.replacementContent === input.replacementContent.trim() && input.replacementContent.length > 0 && Array.from(input.replacementContent).length <= 1000 && input.replacementContent !== input.expectedOriginalContent, 'ACTION_CONTENT_INPUT');
+-  const page = frozenFile.sceneContract?.contract?.pagePlan?.[scene.order - 1];
++  const page = textbookContractSnapshotFromFrozenFile(frozenFile).contract?.pagePlan?.[scene.order - 1];
+   check(page?.page === scene.order && page.type === 'interactive' && page.title === scene.title && page.speechPlan === undefined && page.cueSpeechMap === undefined, 'DERIVED_ACTION_FROZEN_PAGE');
+   const manifest = deriveRejectedSpeechManifest(scene, sceneSha256);
+   check(!manifest.mergedSpeech?.length && manifest.addedSpeech.length > 0 && manifest.addedSpeech.every(action => manifest.textOrigins.some(origin => origin.text === action.text && origin.cueIds.length > 0 && origin.actionIds.length === 0)), 'DERIVED_ACTION_SPEECH');
+@@ -568,9 +568,11 @@ async function inputs(input: RejectedRepairInput, env: RepairEnvironment, mode:
+   check(jobState.sessionId === archive.sessionId, 'JOB_SESSION');
+   const dispatch = JSON.parse((await privateRead(path.join(job, 'dispatch.json'))).toString());
+   const frozenFile = JSON.parse((await privateRead(path.join(job, 'frozen.json'))).toString());
+-  check(dispatch.ownerFingerprint === ownerFingerprint && frozenFile.sceneContract?.sha256 === archive.contractSha256, 'JOB_BINDING');
++  const jobContract = textbookContractSnapshotFromFrozenFile(frozenFile);
++  check(dispatch.ownerFingerprint === ownerFingerprint && jobContract.sha256 === archive.contractSha256, 'JOB_BINDING');
+   if (mode === 'quiz-locked-question-review') {
+-    lockedQuestionReview = inspectQuizLockedQuestionReview(scene, revised, frozenFile.sceneContract, archive.sceneSha256);
++    assertTextbookContract(jobContract);
++    lockedQuestionReview = inspectQuizLockedQuestionReview(scene, revised, jobContract, archive.sceneSha256);
+   }
+   let derivedSpeech: ReturnType<typeof restoreDerivedSpeech> | undefined;
+   if (mode === 'html-frozen-speech' || mode === 'html-reviewed-frozen-speech' || mode === 'quiz-frozen-speech' || mode === 'quiz-locked-question-review' || mode === 'html-derived-speech' || mode === 'html-current' || mode === 'derived-action-content' || mode === 'slide-current' || mode === 'html-current-preserve-speech') {
+@@ -589,7 +591,7 @@ async function inputs(input: RejectedRepairInput, env: RepairEnvironment, mode:
+   const validation = validateScene(revised);
+   check(validation.valid, 'STRICT_DSL');
+   if (mode === 'quiz-pictures') {
+-    const locks = frozenFile.sceneContract?.contract?.lockedAssessments;
++    const locks = jobContract.contract.lockedAssessments;
+     const lock = Array.isArray(locks) ? locks.find((q: Json) => q.id === (input as QuizPicturesRepairInput).questionId && q.page === scene.order) : undefined;
+     // This mode restores a required frozen target picture, never introduces one
+     // merely because the general quiz DSL permits an optional visual.
+@@ -641,7 +643,7 @@ async function authority(q: Queryable, state: Awaited<ReturnType<typeof inputs>>
+   const meta = (await q.query('SELECT owner_id, deleted_at FROM stage_meta WHERE stage_id=$1' + (lock ? ' FOR UPDATE' : ''), [a.stageId])).rows[0];
+   check(meta && meta.owner_id === state.ownerId && meta.deleted_at === null, 'STAGE_NOT_OWNED');
+   const frozen = textbookContractFromPrompt(String(session.prompt));
+-  check(frozen && frozen.sha256 === a.contractSha256 && textbookDigest(frozen) === textbookDigest(state.frozenFile.sceneContract), 'SESSION_FROZEN_MISMATCH');
++  check(frozen && frozen.sha256 === a.contractSha256 && textbookDigest(frozen) === textbookDigest(textbookContractSnapshotFromFrozenFile(state.frozenFile)), 'SESSION_FROZEN_MISMATCH');
+   const document = await new PgDocumentStore(q, { withTransaction: async body => body(q) }).loadDocument(a.stageId) as CourseDocument | null;
+   check(document && (document.outline as Json)?.producerRef === a.sessionId, 'DOCUMENT_SESSION_MISMATCH');
+   return { frozen: frozen!, document: document! };
+@@ -1032,7 +1034,7 @@ async function savedInputs(input: SavedRepairInput, env: RepairEnvironment, mode
+   check(typeof jobState.sessionId === 'string' && jobState.sessionId.length > 0, 'JOB_SESSION');
+   const dispatch = JSON.parse((await privateRead(path.join(job, 'dispatch.json'))).toString());
+   const frozenFile = JSON.parse((await privateRead(path.join(job, 'frozen.json'))).toString());
+-  check(dispatch.ownerFingerprint === ownerFingerprint && frozenFile.sceneContract?.sha256, 'JOB_BINDING');
++  check(dispatch.ownerFingerprint === ownerFingerprint && textbookContractSnapshotFromFrozenFile(frozenFile).sha256, 'JOB_BINDING');
+   const ledgerPath = path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json');
+   return { sessionId: jobState.sessionId as string, stageId: input.stageId, scene, revised: revised as Scene, ownerId, ownerFingerprint, frozenFile, ledgerPath, dataDir };
+ }
+@@ -1048,7 +1050,7 @@ async function savedAuthority(q: Queryable, state: SavedState, lock: boolean) {
+   const meta = (await q.query('SELECT owner_id, deleted_at FROM stage_meta WHERE stage_id=$1' + (lock ? ' FOR UPDATE' : ''), [state.stageId])).rows[0];
+   check(meta && meta.owner_id === state.ownerId && meta.deleted_at === null, 'STAGE_NOT_OWNED');
+   const frozen = textbookContractFromPrompt(String(session.prompt));
+-  check(frozen && textbookDigest(frozen) === textbookDigest(state.frozenFile.sceneContract), 'SESSION_FROZEN_MISMATCH');
++  check(frozen && textbookDigest(frozen) === textbookDigest(textbookContractSnapshotFromFrozenFile(state.frozenFile)), 'SESSION_FROZEN_MISMATCH');
+   const document = await new PgDocumentStore(q, { withTransaction: async body => body(q) }).loadDocument(state.stageId) as CourseDocument | null;
+   check(document && (document.outline as Json)?.producerRef === state.sessionId, 'DOCUMENT_SESSION_MISMATCH');
+   return { frozen: frozen!, document: document! };
+@@ -1176,7 +1178,7 @@ async function missingQuizInputs(input: MissingLockedQuizInput, env: RepairEnvir
+   const state = JSON.parse((await privateRead(path.join(job, 'state.json'))).toString());
+   const dispatch = JSON.parse((await privateRead(path.join(job, 'dispatch.json'))).toString());
+   const frozenFile = JSON.parse((await privateRead(path.join(job, 'frozen.json'))).toString());
+-  check(typeof state.sessionId === 'string' && state.sessionId && dispatch.ownerFingerprint === ownerFingerprint && frozenFile.sceneContract, 'JOB_BINDING');
++  check(typeof state.sessionId === 'string' && state.sessionId && dispatch.ownerFingerprint === ownerFingerprint && textbookContractSnapshotFromFrozenFile(frozenFile), 'JOB_BINDING');
+   const ledgerPath = path.join(dataDir, 'classrooms', input.stageId, 'textbook-authoring-candidate.json');
+   const ledger = JSON.parse((await privateRead(ledgerPath)).toString()); unseal(ledger);
+   const assetBytes = new Map<string, Buffer>();
+@@ -1203,7 +1205,7 @@ async function missingQuizAuthority(q: Queryable, state: MissingQuizState, lock:
+   const meta = (await q.query('SELECT owner_id, deleted_at FROM stage_meta WHERE stage_id=$1' + (lock ? ' FOR UPDATE' : ''), [state.input.stageId])).rows[0];
+   check(meta && meta.owner_id === state.ownerId && meta.deleted_at === null, 'STAGE_NOT_OWNED');
+   const frozen = textbookContractFromPrompt(String(session.prompt));
+-  check(frozen && textbookDigest(frozen) === textbookDigest(state.frozenFile.sceneContract), 'SESSION_FROZEN_MISMATCH');
++  check(frozen && textbookDigest(frozen) === textbookDigest(textbookContractSnapshotFromFrozenFile(state.frozenFile)), 'SESSION_FROZEN_MISMATCH');
+   const document = await new PgDocumentStore(q, { withTransaction: async body => body(q) }).loadDocument(state.input.stageId) as CourseDocument | null;
+   check(document && (document.outline as Json)?.producerRef === state.sessionId, 'DOCUMENT_SESSION_MISMATCH');
+   return { frozen: frozen!, document: document! };
+diff --git a/lib/server/mira-textbook-scene-contract.ts b/lib/server/mira-textbook-scene-contract.ts
+index b543586..6018fad 100644
+--- a/lib/server/mira-textbook-scene-contract.ts
++++ b/lib/server/mira-textbook-scene-contract.ts
+@@ -13,6 +13,8 @@ import { formalSceneImageReferences } from './mira-formal-media';
+ 
+ const START = '\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n';
+ const END = '\nEND_MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT\n';
++const AUTHOR_START = '\nMIRA_TEXTBOOK_AUTHOR_DISPATCH_CONTRACT:\n';
++const AUTHOR_END = '\nEND_MIRA_TEXTBOOK_AUTHOR_DISPATCH_CONTRACT\n';
+ const HEX = /^[a-f0-9]{64}$/;
+ const CATALOG_ID = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/;
+ const STAGE_ID = /^[A-Za-z0-9_-]{1,160}$/;
+@@ -69,6 +71,25 @@ export interface FrozenTextbookContract {
+   };
+   sha256: string;
+ }
++export interface FrozenTextbookAuthorDispatch {
++  schemaVersion: 'mira.frozen-textbook-author-dispatch.v1';
++  contract: {
++    schemaVersion: 'mira.textbook.author-dispatch-contract.v1';
++    sourceSceneContractSha256: string;
++    binding: Json;
++    catalogEvidence: Json;
++    teacherContract: Json;
++    policyRef: Json;
++    authoringRules: { id: string; requirement: string }[];
++    qualityRules: string[];
++    courseScope: Json;
++    officialResourceSummary: Json;
++    pagePlan: Json[];
++    lockedAssessments: Json[];
++  };
++  sha256: string;
++}
++export type TextbookAuthoringContract = FrozenTextbookContract | FrozenTextbookAuthorDispatch;
+ export interface TextbookPageInput {
+   stageId: string;
+   order: number;
+@@ -81,6 +102,8 @@ export interface TextbookPageInput {
+ export interface TextbookPageContext {
+   text: string;
+   brief: string;
++  /** The immutable opening-envelope generation profile; missing means legacy v1. */
++  textbookPromptProfile?: 'frozen-textbook-v1' | 'frozen-textbook-v2';
+   pictureDomContract?: PictureDomContract;
+   /** Present only when this server-frozen page declared an authoritative plan. */
+   speechPlan?: unknown;
+@@ -110,7 +133,7 @@ interface Candidate extends Json {
+   schemaVersion: 'mira.textbook.authoring-candidate.v1';
+   sessionId: string;
+   stageId: string;
+-  frozenContract: FrozenTextbookContract;
++  frozenContract: TextbookAuthoringContract;
+   assetBindings: AssetBinding[];
+   bindingHistory: { assetKey: string; from: AssetBinding; to: AssetBinding }[];
+   scenes: {
+@@ -122,7 +145,7 @@ interface Candidate extends Json {
+   }[];
+ }
+ 
+-export function assertTextbookContract(raw: unknown): asserts raw is FrozenTextbookContract {
++function assertLegacyTextbookContract(raw: unknown): asserts raw is FrozenTextbookContract {
+   safeContractJson(raw);
+   if (
+     !object(raw) ||
+@@ -255,14 +278,134 @@ export function assertTextbookContract(raw: unknown): asserts raw is FrozenTextb
+     fail('LOCKED_QUESTION_SCOPE');
+ }
+ 
++function assertAuthorDispatchContract(raw: unknown): asserts raw is FrozenTextbookAuthorDispatch {
++  safeContractJson(raw);
++  if (
++    !object(raw) ||
++    Object.keys(raw).sort().join(',') !== 'contract,schemaVersion,sha256' ||
++    raw.schemaVersion !== 'mira.frozen-textbook-author-dispatch.v1' ||
++    !object(raw.contract) ||
++    raw.sha256 !== textbookDigest(raw.contract)
++  )
++    fail('CONTRACT_INTEGRITY');
++  const c = raw.contract;
++  if (
++    Object.keys(c).sort().join(',') !==
++      'authoringRules,binding,catalogEvidence,courseScope,lockedAssessments,officialResourceSummary,pagePlan,policyRef,qualityRules,schemaVersion,sourceSceneContractSha256,teacherContract' ||
++    c.schemaVersion !== 'mira.textbook.author-dispatch-contract.v1' ||
++    !HEX.test(c.sourceSceneContractSha256) ||
++    !object(c.policyRef) ||
++    Object.keys(c.policyRef).sort().join(',') !== 'policyId,schemaVersion,sha256,version' ||
++    c.policyRef.schemaVersion !== 'mira.frozen-interaction-policy.v1' ||
++    !nonempty(c.policyRef.policyId) ||
++    !Number.isSafeInteger(c.policyRef.version) ||
++    c.policyRef.version < 1 ||
++    !HEX.test(c.policyRef.sha256) ||
++    !Array.isArray(c.authoringRules) ||
++    !c.authoringRules.length ||
++    c.authoringRules.some(
++      (rule: unknown) =>
++        !object(rule) ||
++        Object.keys(rule).sort().join(',') !== 'id,requirement' ||
++        !nonempty(rule.id) ||
++        !nonempty(rule.requirement) ||
++        ['official_source_review_before_authoring', 'review_actual_play'].includes(rule.id),
++    ) ||
++    new Set(c.authoringRules.map((rule: Json) => rule.id)).size !== c.authoringRules.length ||
++    !object(c.courseScope) ||
++    Object.hasOwn(c.courseScope, 'officialResourceReview') ||
++    !object(c.officialResourceSummary)
++  )
++    fail('CONTRACT_INVALID');
++  const official = c.officialResourceSummary;
++  if (
++    Object.keys(official).sort().join(',') !==
++      'adaptation,classHours,officialTextbook,schemaVersion,sha256' ||
++    !nonempty(official.schemaVersion) ||
++    !HEX.test(official.sha256) ||
++    !object(official.officialTextbook) ||
++    !Array.isArray(official.classHours) ||
++    !official.classHours.length ||
++    !object(official.adaptation) ||
++    official.classHours.some((hour: unknown) => {
++      if (
++        !object(hour) ||
++        Object.keys(hour).sort().join(',') !==
++          'classHourId,learningObjectives,resources,title' ||
++        !nonempty(hour.classHourId) ||
++        !nonempty(hour.title) ||
++        !Array.isArray(hour.learningObjectives) ||
++        !hour.learningObjectives.length ||
++        hour.learningObjectives.some((goal: unknown) => !nonempty(goal)) ||
++        !object(hour.resources) ||
++        !Object.keys(hour.resources).length
++      )
++        return true;
++      return Object.values(hour.resources).some(
++        (resource: unknown) =>
++          !object(resource) ||
++          Object.keys(resource).sort().join(',') !== 'findings,locations,status' ||
++          !nonempty(resource.status) ||
++          !Array.isArray(resource.locations) ||
++          !Array.isArray(resource.findings),
++      );
++    })
++  )
++    fail('CONTRACT_INVALID');
++
++  // Reuse the established binding, teacher, page and locked-assessment guard.
++  // The compact projection intentionally carries only a policy reference and
++  // author-facing rules; neither is expanded back into the opening prompt.
++  const policyIdentity = {
++    schemaVersion: c.policyRef.schemaVersion,
++    policyId: c.policyRef.policyId,
++    version: c.policyRef.version,
++  };
++  const legacyContract = {
++    schemaVersion: 'mira.textbook.scene-authoring-contract.v1' as const,
++    binding: c.binding,
++    catalogEvidence: c.catalogEvidence,
++    teacherContract: c.teacherContract,
++    interactionPolicy: {
++      schemaVersion: 'mira.frozen-interaction-policy.v1',
++      policy: policyIdentity,
++      sha256: textbookDigest(policyIdentity),
++    },
++    qualityRules: c.qualityRules,
++    scopeReview: Object.keys(c.courseScope).length
++      ? c.courseScope
++      : { authorDispatchSourceSha256: c.sourceSceneContractSha256 },
++    pagePlan: c.pagePlan,
++    lockedAssessments: c.lockedAssessments,
++  };
++  assertLegacyTextbookContract({
++    schemaVersion: 'mira.frozen-textbook-scene-authoring.v1',
++    contract: legacyContract,
++    sha256: textbookDigest(legacyContract),
++  });
++}
++
++export function assertTextbookContract(raw: unknown): asserts raw is TextbookAuthoringContract {
++  if (object(raw) && raw.schemaVersion === 'mira.frozen-textbook-author-dispatch.v1') {
++    assertAuthorDispatchContract(raw);
++    return;
++  }
++  assertLegacyTextbookContract(raw);
++}
++
+ /** Only the immutable opening request is authority; follow-ups/tool booleans cannot downgrade it. */
+-export function textbookContractFromPrompt(prompt: string): FrozenTextbookContract | undefined {
+-  if (!prompt.includes('MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT')) return undefined;
+-  const parts = prompt.split(START);
+-  if (parts.length !== 2 || parts[1].split(END).length !== 2) fail('CONTRACT_ENVELOPE_INVALID');
++export function textbookContractFromPrompt(prompt: string): TextbookAuthoringContract | undefined {
++  const hasLegacy = prompt.includes('MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT');
++  const hasAuthorDispatch = prompt.includes('MIRA_TEXTBOOK_AUTHOR_DISPATCH_CONTRACT');
++  if (!hasLegacy && !hasAuthorDispatch) return undefined;
++  if (hasLegacy && hasAuthorDispatch) fail('CONTRACT_ENVELOPE_INVALID');
++  const start = hasAuthorDispatch ? AUTHOR_START : START;
++  const end = hasAuthorDispatch ? AUTHOR_END : END;
++  const parts = prompt.split(start);
++  if (parts.length !== 2 || parts[1].split(end).length !== 2) fail('CONTRACT_ENVELOPE_INVALID');
+   let raw: unknown;
+   try {
+-    raw = JSON.parse(parts[1].split(END)[0]);
++    raw = JSON.parse(parts[1].split(end)[0]);
+   } catch {
+     fail('CONTRACT_ENVELOPE_INVALID');
+   }
+@@ -270,8 +413,38 @@ export function textbookContractFromPrompt(prompt: string): FrozenTextbookContra
+   return raw;
+ }
+ 
++/**
++ * Select the job field without broadening a repair consumer's validation.
++ * Historical repair helpers intentionally accept a smaller frozen fixture and
++ * validate only the leaves they use. Formal session/candidate entry points call
++ * textbookContractFromFrozenFile below for the complete schema check.
++ */
++export function textbookContractSnapshotFromFrozenFile(raw: unknown): Json {
++  if (!object(raw)) fail('CONTRACT_INTEGRITY');
++  const compact = raw.schemaVersion === 'mira.operator.workbench-authoring.v4';
++  const contract = compact ? raw.authorDispatchContract : raw.sceneContract;
++  if (!object(contract)) fail('CONTRACT_INTEGRITY');
++  return contract;
++}
++
++/** Select and fully validate the same immutable contract used by the opening prompt. */
++export function textbookContractFromFrozenFile(raw: unknown): TextbookAuthoringContract {
++  if (object(raw) && raw.schemaVersion === 'mira.operator.workbench-authoring.v4') {
++    const compact = raw.authorDispatchContract;
++    const source = raw.sceneContract;
++    assertAuthorDispatchContract(compact);
++    assertLegacyTextbookContract(source);
++    if (compact.contract.sourceSceneContractSha256 !== source.sha256)
++      fail('CONTRACT_SOURCE_MISMATCH');
++    return compact;
++  }
++  const contract = textbookContractSnapshotFromFrozenFile(raw);
++  assertTextbookContract(contract);
++  return contract;
++}
++
+ function pageFor(
+-  frozen: FrozenTextbookContract,
++  frozen: TextbookAuthoringContract,
+   input: Pick<TextbookPageInput, 'order' | 'type' | 'title' | 'widgetType' | 'widgetOutline'>,
+ ): Json {
+   const p = frozen.contract.pagePlan[input.order - 1];
+@@ -413,7 +586,7 @@ function sceneImages(scene: Scene): string[] {
+ /** Static contract checks, never a claim that a game or pictured meaning was play-tested. */
+ export function assertTextbookScene(
+   scene: Scene,
+-  frozen: FrozenTextbookContract,
++  frozen: TextbookAuthoringContract,
+   bindings: AssetBinding[],
+ ): void {
+   if (scene.content.type !== scene.type) fail('PAGE_SCOPE_MISMATCH');
+@@ -583,7 +756,7 @@ export function assertTextbookScene(
+ }
+ 
+ export function createTextbookAuthoringGuard(
+-  frozen: FrozenTextbookContract,
++  frozenInput: unknown,
+   sessionId: string,
+   options: {
+     classroomsDir?: string;
+@@ -594,7 +767,8 @@ export function createTextbookAuthoringGuard(
+     missingLockedQuizAssets?: MissingLockedQuizAssets;
+   } = {},
+ ) {
+-  assertTextbookContract(frozen);
++  assertTextbookContract(frozenInput);
++  const frozen = frozenInput;
+   const root = path.resolve(options.classroomsDir ?? CLASSROOMS_DIR);
+   const rejectedRoot = options.rejectedScenesDir ?? (options.classroomsDir
+     ? path.join(root, '.private-rejected-scenes')
+@@ -812,6 +986,10 @@ export function createTextbookAuthoringGuard(
+         await persist(next);
+         return {
+           brief: String(page.move ?? page.description ?? page.title),
++          textbookPromptProfile:
++            frozen.schemaVersion === 'mira.frozen-textbook-author-dispatch.v1'
++              ? 'frozen-textbook-v2'
++              : 'frozen-textbook-v1',
+           ...(page.type === 'interactive' && ['primary_1', 'primary_2'].includes(frozen.contract.binding.gradeCode)
+             ? { pictureDomContract: {
+                 schemaVersion: 'mira.frozen-textbook.picture-dom.v1' as const,
+diff --git a/packages/@openmaic/generation/src/index.ts b/packages/@openmaic/generation/src/index.ts
+index f24b227..e075ad3 100644
+--- a/packages/@openmaic/generation/src/index.ts
++++ b/packages/@openmaic/generation/src/index.ts
+@@ -15,7 +15,12 @@ export {
+   PBLGenerationError,
+   resolveImageIds,
+ } from './scene-generator.js';
+-export type { SceneActionsOptions, SceneContentOptions, PictureDomContract } from './scene-generator.js';
++export type {
++  SceneActionsOptions,
++  SceneContentOptions,
++  PictureDomContract,
++  TextbookPromptProfile,
++} from './scene-generator.js';
+ export { assertLearningContract, assertLearningQuiz, assertLearningInteractive,
+   assertNoInventedMastery, interactiveScripts, learningSceneInstructions,
+   normalizeQuizValueAnswers, resolveQuizVisual, resolveInteractiveImageIds } from './learning-scene-contract.js';
+diff --git a/packages/@openmaic/generation/src/prompts/index.ts b/packages/@openmaic/generation/src/prompts/index.ts
+index 498e78d..dc66187 100644
+--- a/packages/@openmaic/generation/src/prompts/index.ts
++++ b/packages/@openmaic/generation/src/prompts/index.ts
+@@ -21,6 +21,7 @@ export const PROMPT_IDS = {
+   CODE_CONTENT: 'code-content',
+   GAME_CONTENT: 'game-content',
+   FROZEN_TEXTBOOK_INTERACTIVE_CONTENT: 'frozen-textbook-interactive-content',
++  FROZEN_TEXTBOOK_INTERACTIVE_CONTENT_V2: 'frozen-textbook-interactive-content-v2',
+   TEXTBOOK_GAME_CONTENT: 'textbook-game-content',
+   TEXTBOOK_VISUALIZATION3D_CONTENT: 'textbook-visualization3d-content',
+   VISUALIZATION3D_CONTENT: 'visualization3d-content',
+diff --git a/packages/@openmaic/generation/src/prompts/types.ts b/packages/@openmaic/generation/src/prompts/types.ts
+index 1bdc25a..021606f 100644
+--- a/packages/@openmaic/generation/src/prompts/types.ts
++++ b/packages/@openmaic/generation/src/prompts/types.ts
+@@ -14,6 +14,7 @@ export type PromptId =
+   | 'code-content'
+   | 'game-content'
+   | 'frozen-textbook-interactive-content'
++  | 'frozen-textbook-interactive-content-v2'
+   | 'textbook-game-content'
+   | 'textbook-visualization3d-content'
+   | 'visualization3d-content'
+diff --git a/packages/@openmaic/generation/src/scene-generator.ts b/packages/@openmaic/generation/src/scene-generator.ts
+index 11924aa..9c27d66 100644
+--- a/packages/@openmaic/generation/src/scene-generator.ts
++++ b/packages/@openmaic/generation/src/scene-generator.ts
+@@ -85,6 +85,17 @@ export interface PictureDomContract {
+   sources: { assetKey: string; src: string; sha256: string }[];
+ }
+ 
++export type TextbookPromptProfile =
++  | 'textbook-v1'
++  | 'frozen-textbook-v1'
++  | 'frozen-textbook-v2';
++
++function isFrozenTextbookPromptProfile(
++  profile: TextbookPromptProfile | undefined,
++): profile is 'frozen-textbook-v1' | 'frozen-textbook-v2' {
++  return profile === 'frozen-textbook-v1' || profile === 'frozen-textbook-v2';
++}
++
+ export interface SceneContentOptions {
+   /** Server-owned grade boundary and picture interaction policy, opt-in for new jobs. */
+   learningContract?: LearningSceneContract;
+@@ -114,7 +125,7 @@ export interface SceneContentOptions {
+   /** Host-selected exploration: AI chooses a non-quiz game with local, unscored feedback. */
+   explorationGame?: boolean;
+   /** Host-selected textbook game/3D authoring; ordinary templates stay unchanged. */
+-  textbookPromptProfile?: 'textbook-v1' | 'frozen-textbook-v1';
++  textbookPromptProfile?: TextbookPromptProfile;
+   /** Server-derived verified sources and the existing static save representation. */
+   pictureDomContract?: PictureDomContract;
+   /**
+@@ -884,7 +895,7 @@ async function generateQuizContent(
+   log: GenerationLogger = noopGenerationLogger,
+   options: SceneContentOptions = {},
+ ): Promise<GeneratedQuizContent | null> {
+-  const frozen = options.textbookPromptProfile === 'frozen-textbook-v1';
++  const frozen = isFrozenTextbookPromptProfile(options.textbookPromptProfile);
+   if (
+     frozen &&
+     (!outline.quizConfig ||
+@@ -1164,7 +1175,7 @@ export async function generateWidgetContent(
+     allowProceduralSkill?: boolean;
+     includeKatex?: boolean;
+     explorationGame?: boolean;
+-    textbookPromptProfile?: 'textbook-v1' | 'frozen-textbook-v1';
++    textbookPromptProfile?: TextbookPromptProfile;
+     pictureDomContract?: PictureDomContract;
+     learningContract?: LearningSceneContract;
+     imageMapping?: ImageMapping;
+@@ -1188,9 +1199,11 @@ export async function generateWidgetContent(
+   let promptId: PromptId;
+   let variables: Record<string, unknown>;
+ 
+-  if (options.textbookPromptProfile === 'frozen-textbook-v1') {
++  if (isFrozenTextbookPromptProfile(options.textbookPromptProfile)) {
+     if (widgetType === 'procedural-skill' && !options.allowProceduralSkill) return null;
+-    promptId = PROMPT_IDS.FROZEN_TEXTBOOK_INTERACTIVE_CONTENT;
++    promptId = options.textbookPromptProfile === 'frozen-textbook-v2'
++      ? PROMPT_IDS.FROZEN_TEXTBOOK_INTERACTIVE_CONTENT_V2
++      : PROMPT_IDS.FROZEN_TEXTBOOK_INTERACTIVE_CONTENT;
+     variables = {
+       title: outline.title, description: outline.description,
+       keyPoints: (outline.keyPoints || []).join('\n'), widgetType, widgetOutline,
+@@ -1315,7 +1328,7 @@ export async function generateWidgetContent(
+ 
+   log.info(`Generating ${widgetType} widget for: ${outline.title}`);
+   const generatedMedia = outline.mediaGenerations || [];
+-  const mediaInstructions = options.textbookPromptProfile === 'frozen-textbook-v1'
++  const mediaInstructions = isFrozenTextbookPromptProfile(options.textbookPromptProfile)
+     ? '' // Frozen pages may use only the server's already verified media bindings.
+     : generatedMedia.length
+     ? '\nGenerated media will be resolved after authoring. Use each exact elementId as a literal HTML src attribute on video/source for video or img for image. Never invent a URL or a fake player. Keep native video controls visible and play only on an explicit student action.\n' + JSON.stringify(generatedMedia)
+@@ -1326,7 +1339,7 @@ export async function generateWidgetContent(
+     ...(image.width !== undefined ? { width: image.width } : {}),
+     ...(image.height !== undefined ? { height: image.height } : {}),
+   }));
+-  const pictureDomContract = options.textbookPromptProfile === 'frozen-textbook-v1'
++  const pictureDomContract = isFrozenTextbookPromptProfile(options.textbookPromptProfile)
+     ? options.pictureDomContract : undefined;
+   const pictureDomInstructions = pictureDomContract
+     ? '\nSERVER-DERIVED PICTURE DOM CONTRACT:\n' + JSON.stringify(pictureDomContract)
+diff --git a/packages/@openmaic/generation/templates/frozen-textbook-interactive-content-v2/system.md b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content-v2/system.md
+new file mode 100644
+index 0000000..357e8d9
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content-v2/system.md
+@@ -0,0 +1,27 @@
++# Frozen Textbook Interactive Authoring v2
++
++The server's pictureDomContract describes the existing static save boundary: the parser reads initial HTML without running scripts. Put the actual teaching pictures in literal, initially visible body <img src="..."> elements using the verified sources. JavaScript may move or reuse these declared nodes. Creating every image only through JavaScript does not satisfy this representation. Hidden, template, noscript, zero-size or decorative sentinel images do not satisfy it either; the pictures must carry the current task's meaning.
++
++Implement the server's exact frozen page plan, not a generic widget demo. Its textbook scope, meaningful mechanism, widgetType, full widgetOutline, gameType, playerControls, teacher, narration, images and geometry are authoritative. Do not turn a child's task into a teaching-steps flowchart. Do not impose counts of actions, choices, rounds, tools, sliders or game types. Preserve ordinary observation, construction, revision and open expression where the plan calls for them. Never infer mastery from listening, clicking, teacher help or an external completion flag.
++
++Implement the prescribed mechanism as a real direct-manipulation HTML experience, using inline SVG or canvas when they best express the domain. The visible world should change through the learner's knowledge-related decisions: an object moves along a meaningful route, parts combine, a condition changes a result, relevant items are collected or transformed, a sequence unfolds, a memory state is revised, or the frozen design's own mechanism takes effect. These are examples, not a required list. Do not flatten the mechanism into a button wall, animated multiple choice, tap-to-advance cards or drag-to-the-only-slot. Tapping and dragging are inputs, not game designs.
++
++Make the game stage visually dominant and keep utility controls peripheral. Group start, replay, hint, reset and continue into a compact toolbar or contextual cluster, with at most one visually prominent command. Avoid full-width pills, repeated oversized buttons, stacked rounded cards and option grids unless the frozen teaching object itself truly requires that representation. On fine pointers, paint auxiliary control faces at roughly 28–40 CSS pixels high. On coarse pointers, retain at least a 48 CSS-pixel hit target through a transparent outer hit box, spacing or a coarse-pointer rule; do not interpret the touch target as a 48–56 pixel visible button. Meaningful picture choices and manipulable learning objects remain large enough to recognize and use.
++
++Keep domain state explicit in JavaScript and render each consequential transition in the scene. Feedback must name or show the actual break and leave a revision path. Motion explains a change or consequence and respects reduced motion; it cannot be the only evidence of a result. Provide focus-visible keyboard equivalents and safe pointer cancellation without adding a second button-based version of the whole game.
++
++Do not assume that a referenced controller, geometry file or attachment was supplied to this child call. If required source bytes or exact implementation details are absent, identify the missing inputs for the director instead of inventing a controller, glyph path, URL or passing placeholder.
++
++Return one complete self-contained HTML document, without Markdown fences. Include exactly one `<meta name="mira-responsive-activity" content="low-reading-v1">` in its head. Include a static `application/json` script with id `mira-narration-cues` and shape `{"schemaVersion":"mira.interactive.narration-cues.v1","cues":[{"id":"exact-cue-id","text":"exact speech text"}]}`. The finite cue set and same-page speech actions must correspond one-to-one, with identical text. Preserve every frozen cue/action; do not invent, paraphrase, truncate or duplicate them. Include an `application/json` script id `widget-config` whose `type` equals the frozen widgetType.
++
++For primary_1/primary_2, at least one real `<img src="...">` from the page's server-verified bindings must carry teaching meaning. Use distinguishable task pictures, exact supplied character paths and pictorial controls. SVG and canvas may implement geometry but do not replace the required real img. Do not invent a media URL, placeholder, emoji, font approximation of a supplied precision glyph, or an answer-revealing option style. Cover non-target text: the child must still be able to act from the pictures and teacher audio. Use one task per screen with responsive reflow; keep drag source and destination in the same usable viewport. Follow the frozen page/interaction-policy touch dimensions; do not substitute a different historical pixel minimum.
++
++Reuse the supplied narration controller and its page hooks unchanged. Request a supplied cue through the existing host helper. Keep controller type checks and variable cue IDs when prescribed. Only that cue's real playing event may start its demonstration; only ready after matching playing may admit action or advance. Initial null-ready is not completion; hidden, cancellation, failure and rejected playback do not succeed. Preserve the current round for explicit retry; help must not trap replay in a help loop; completion replay must not count again. Do not redefine or simulate the host helper, synthesize speech, create audio players, use duration timers as sound completion, or fabricate success events. Real audio is bound later by the server.
++
++Keep state only in memory. Do not use browser persistence, cookies, network requests, external script/style/module imports, CDN dependencies, iframe, object, embed, audio, video, source or stylesheet link elements. Do not echo forbidden API names into HTML comments or explanatory text: the save guard scans the complete document. Use only supplied local img URLs and inline safe SVG/CSS/JS. This frozen profile has no generic storage, score/speed/achievement or video requirement.
++
++Preserve the renderer's four parent commands SET_WIDGET_STATE, HIGHLIGHT_ELEMENT, ANNOTATE_ELEMENT and REVEAL_ELEMENT where applicable. Accept messages only from window.parent; validate their shapes and targets. These commands can demonstrate or reveal but cannot certify a child's completion. The frozen domain state and actual operations determine consequences. Do not let external completedSteps or a start click bypass required actions/audio.
++
++This is authored candidate content. Do not claim audio audit, real browser play, image semantics, publication or independent mastery has passed.
++
++{{languageDirective}}
+diff --git a/packages/@openmaic/generation/templates/frozen-textbook-interactive-content-v2/user.md b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content-v2/user.md
+new file mode 100644
+index 0000000..6c21daf
+--- /dev/null
++++ b/packages/@openmaic/generation/templates/frozen-textbook-interactive-content-v2/user.md
+@@ -0,0 +1,14 @@
++Implement this exact frozen activity as working HTML.
++
++Title: {{title}}
++Widget type: {{widgetType}}
++Teaching task: {{description}}
++Scope:
++{{keyPoints}}
++
++Complete prescribed widget outline (preserve all fields and their shapes):
++{{widgetOutline}}
++
++The server context and exact supplied page inputs below contain the frozen narration, real image bindings and source geometry. Follow that mechanism rather than generic widget conventions. A simulation must use its prescribed domain state; a diagram must expose its actual picture/structure task; a game must retain its frozen rules and controls; a procedural activity must use the assigned local teaching images and actual steps. Do not add quotas or reinterpret the task as a quiz, flowchart, timer or storage-backed achievement game.
++
++{{languageDirective}}
+diff --git a/packages/@openmaic/generation/test/assets.test.ts b/packages/@openmaic/generation/test/assets.test.ts
+index 451bba3..47ce274 100644
+--- a/packages/@openmaic/generation/test/assets.test.ts
++++ b/packages/@openmaic/generation/test/assets.test.ts
+@@ -16,11 +16,14 @@ const PROMPT_IDS = [
+   'requirements-to-outlines',
+   'slide-content',
+   'quiz-content',
++  'frozen-textbook-quiz-content',
+   'simulation-content',
+   'diagram-content',
+   'picture-structure-content',
+   'code-content',
+   'game-content',
++  'frozen-textbook-interactive-content',
++  'frozen-textbook-interactive-content-v2',
+   'textbook-game-content',
+   'textbook-visualization3d-content',
+   'visualization3d-content',
+diff --git a/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts b/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts
+index 9ef4a14..2bb5eda 100644
+--- a/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts
++++ b/packages/@openmaic/generation/test/frozen-textbook-widget-routing.test.ts
+@@ -1,3 +1,4 @@
++import { createHash } from 'node:crypto';
+ import { describe, expect, it } from 'vitest';
+ import { buildPrompt, generateSceneContent, generateWidgetContent, type SceneOutline } from '@openmaic/generation';
+ 
+@@ -10,8 +11,9 @@ const outline = (widgetType: (typeof kinds)[number]): SceneOutline => ({
+   type: 'interactive', widgetType, widgetOutline: precise, keyPoints: ['scope only'],
+ });
+ const response = '<html><head></head><body><script id="widget-config" type="application/json">{"type":"game"}</script></body></html>';
++const sha256 = (value: string) => createHash('sha256').update(value).digest('hex');
+ 
+-describe('server-only frozen-textbook-v1 routing', () => {
++describe('server-only frozen textbook prompt routing', () => {
+   it.each([undefined, 'textbook-v1'] as const)('ignores frozen DOM metadata for historical profile %s', async profile => {
+     const capture = async (withContract: boolean) => {
+       let captured;
+@@ -31,19 +33,37 @@ describe('server-only frozen-textbook-v1 routing', () => {
+     };
+     expect(await capture(true)).toEqual(await capture(false));
+   });
++  it('keeps the pre-v2 frozen-textbook-v1 system bytes as a fixed golden', async () => {
++    let captured = { system: '', user: '' };
++    await generateSceneContent(outline('game'), async (system, user) => {
++      captured = { system, user };
++      return response;
++    }, { textbookPromptProfile: 'frozen-textbook-v1' });
++    expect(captured.system).toContain('# Frozen Textbook Interactive Authoring v1');
++    expect(captured.system).not.toContain('28–40 CSS pixels');
++    expect(sha256(captured.system)).toBe(
++      'ac0e537b7f4a7a9a924b0e38e0872fede189511214c26e5c73e0ddb75a33fc08',
++    );
++  });
+   it.each(kinds)('routes %s through the new contract without generic contradictory instructions', async kind => {
+     let captured = { system: '', user: '' };
+     await generateSceneContent(outline(kind), async (system, user) => { captured = { system, user }; return response; }, {
+-      textbookPromptProfile: 'frozen-textbook-v1', allowProceduralSkill: true,
++      textbookPromptProfile: 'frozen-textbook-v2', allowProceduralSkill: true,
+       interactiveIncludeKatex: false, includeWidgetOutline: true, editDirective: 'exact source controller here',
+       exactActions: [{ id: 'speech-intro', type: 'speech', text: 'exact words' }],
+       assignedImages: [{ id: 'real', pageNumber: 1, src: '/api/classroom-media/stage-fixture/media/real.png', description: 'real teaching picture' }],
+     });
+-    expect(captured.system).toContain('# Frozen Textbook Interactive Authoring v1');
++    expect(captured.system).toContain('# Frozen Textbook Interactive Authoring v2');
+     expect(captured.system).toContain('exactly one `<meta name="mira-responsive-activity"');
+     expect(captured.system).toContain('mira.interactive.narration-cues.v1');
+     expect(captured.system).toContain('only ready after matching playing');
+     expect(captured.system).toContain('If required source bytes or exact implementation details are absent');
++    expect(captured.system).toContain('real direct-manipulation HTML experience');
++    expect(captured.system).toContain('Tapping and dragging are inputs, not game designs');
++    expect(captured.system).toContain('28–40 CSS pixels');
++    expect(captured.system).toContain('48 CSS-pixel hit target');
++    expect(captured.system).toContain('do not interpret the touch target as a 48–56 pixel visible button');
++    expect(captured.system).toContain('button wall');
+     expect(captured.user).toContain(JSON.stringify(precise));
+     expect(captured.user).toContain('exact source controller here');
+     expect(captured.user).toContain('speech-intro');
+@@ -54,7 +74,7 @@ describe('server-only frozen-textbook-v1 routing', () => {
+   });
+   it('does not enable procedural widgets when the existing capability is absent', async () => {
+     let calls = 0;
+-    expect(await generateWidgetContent(outline('procedural-skill'), async () => { calls++; return response; }, '', { textbookPromptProfile: 'frozen-textbook-v1' })).toBeNull();
++    expect(await generateWidgetContent(outline('procedural-skill'), async () => { calls++; return response; }, '', { textbookPromptProfile: 'frozen-textbook-v2' })).toBeNull();
+     expect(calls).toBe(0);
+   });
+   it.each(['game', 'visualization3d'] as const)('keeps historical textbook-v1 %s system and user bytes exact', async kind => {
+@@ -65,5 +85,10 @@ describe('server-only frozen-textbook-v1 routing', () => {
+       ...(kind === 'game' ? { gameType: 'Choose puzzle, card or strategy with picture matching, placement, sorting or building for the exact frozen objective. No quiz or assessment.', scoring: {} }
+         : { visualizationType: 'geometry', objects: [], interactions: [] }) };
+     expect(captured).toEqual(buildPrompt(kind === 'game' ? 'textbook-game-content' : 'textbook-visualization3d-content', variables));
++    if (kind === 'game') {
++      expect(sha256((captured as { system: string }).system)).toBe(
++        'b74b8fe00f30a82c987e7255b1adb167a5d57a19e07988ff2f1cf7fe90b1e149',
++      );
++    }
+   });
+ });
+diff --git a/skills/agent-runtime/mira-primary-courseware/SKILL.md b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+index 8228c89..8a754b0 100644
+--- a/skills/agent-runtime/mira-primary-courseware/SKILL.md
++++ b/skills/agent-runtime/mira-primary-courseware/SKILL.md
+@@ -15,17 +15,15 @@ For an existing stage, follow pro-editing and repair only the weak pages.
+ 
+ ## Learning arc
+ 
+-Set one bounded skill and one visible success condition. For an ordinary
+-interactive Pro-workbench request, prefer 6–8 pages:
+-
+-1. a familiar situation and one question;
+-2. concrete objects, sound, movement or visual grouping;
+-3. the rule or pattern discovered from that evidence;
+-4. one worked example with the reason shown step by step;
+-5. guided manipulation or choice with immediate explanatory feedback;
+-6. one diagnostic check aimed at the most likely misconception;
+-7. transfer to a small new situation;
+-8. optional recap that names the method in the learner's own words.
++Set one bounded skill and one visible success condition. When the opening
++request contains a frozen `pagePlan`, that plan is authoritative for the exact
++page count, page types and order, titles, widget outlines and question IDs. Do
++not apply a generic 6–8-page target, insert a scene type to fill a quota or
++split one planned move into extra pages. Without a frozen plan, choose the
++smallest complete deck supported by the actual teaching moves. A useful arc may
++include a familiar situation, concrete evidence, discovery, demonstration,
++guided practice, diagnosis, revision and transfer, but these are teaching
++moves to combine as needed, not a page template.
+ 
+ For a server-authored Mira formal brief, plan the whole deck internally under
+ the official `stage-design` and K12 rules, then continue straight through the
+@@ -33,19 +31,25 @@ build sequence without asking for approval. Choose the smallest complete page
+ count from the actual teaching moves needed for the brief's grade and bounded
+ skill. Treat estimated duration only as an upper time budget, never as a
+ page-count formula: do not default to one page per minute and do not default to
+-10 pages. There is no fixed page count or fixed type order, but never exceed 60 pages. Use only
+-`slide`, `quiz`, `interactive` and `pbl`, with at least one `slide`, one `quiz`
+-and one `interactive`; use `pbl` only for a genuinely multi-step task.
++10 pages. There is no fixed page count or fixed type order, but never exceed 60
++pages. Use only `slide`, `quiz`, `interactive` and `pbl`; use `pbl` only for a
++genuinely multi-step task. Preserve any scene-type minimum explicitly frozen by
++an active legacy formal profile, but do not project that historical requirement
++onto a compact frozen plan or an ordinary course.
+ 
+ Preserve the brief's locked grade, subject, ability boundary, teacher identity,
+ four-peer roster and assessment IDs/text/options without paraphrasing them.
+-Use one to four quiz pages and place all four locked assessment questions once,
+-in original order, across those pages. For each `interactive` page, choose the
++Use exactly the quiz pages and locked questions supplied by the frozen plan,
++including zero when none are supplied. Place each locked question exactly once
++on its assigned page and preserve its identity and order; never assume a
++generic one-to-four-page or four-question quota. For each `interactive` page, choose the
+ content-appropriate `widgetType` from `simulation`, `diagram`, `code`, `game`
+ or `visualization3d`; do not manufacture a fixed widget sequence.
+ 
+-The learner must do something on at least every second page. Do not produce a
+-sequence of static definition slides.
++Use explanation pages when the learning move needs them, and use interaction
++when a knowledge-related decision can change a meaningful state. Do not enforce
++an every-second-page interaction quota or produce a sequence of static
++definitions.
+ 
+ Every formal scene must contain 1–20 non-empty `speech` actions, with at most
+ 240 speech actions in the whole classroom. Every formal `slide` needs at least
+@@ -70,6 +74,19 @@ Interactive, quiz and PBL scenes do not need spotlight actions.
+   plausible misconceptions and feedback that teaches the correction.
+ - Interactive pages must change a meaningful state and make the consequence
+   visible. Never label a static picture as a game, simulation or 3D.
++- Treat free HTML, inline SVG and canvas as first-class activity surfaces.
++  Prefer continuous manipulation, routes, collection and transformation,
++  construction, condition-driven simulation, sound or memory state, branching
++  situations and editable creations when they serve the frozen objective.
++  Tapping and dragging are inputs, not mechanisms; do not reduce a planned
++  activity to a button grid, animated multiple choice or one-slot drag task.
++- Let the learning world dominate the frame. Keep replay, hint, reset and
++  continue in a compact edge toolbar or contextual cluster. A 48px requirement
++  applies to the hit area on coarse pointers, not the painted button face;
++  ordinary auxiliary controls are normally 28–40px visually and may use a
++  transparent hit box. Avoid full-width pills, equal-size button walls and
++  stacked card chrome. Meaningful picture choices and manipulable learning
++  objects may be larger because they carry the task.
+ 
+ ## Narration and focus
+ 
+@@ -115,8 +132,8 @@ Do not call an ordinary Pro classroom complete until every approved page is
+ persisted, every speech action has audio, each explanation page has a valid
+ spotlight target, at least one misconception is diagnosed, and the final task
+ checks the same skill in a new context. A server-authored formal classroom
+-instead leaves speech audio to the server promotion boundary and requires
+-an adaptive deck within the formal planning bounds, all required scene types,
+-the intact locked assessments and roster, 1–4 successful searches, at least
+-one same-session fetched source, and a persisted citation that resolves to that
++instead leaves speech audio to the server promotion boundary and requires the
++exact frozen plan, any explicit active-profile scene requirements, the intact
++locked assessments and roster, 1–4 successful searches, at least one
++same-session fetched source, and a persisted citation that resolves to that
+ source.
+diff --git a/skills/agent-runtime/mira-primary-courseware/references/meaningful-interactivity.v1.json b/skills/agent-runtime/mira-primary-courseware/references/meaningful-interactivity.v1.json
+index e614cc4..700d6e5 100644
+--- a/skills/agent-runtime/mira-primary-courseware/references/meaningful-interactivity.v1.json
++++ b/skills/agent-runtime/mira-primary-courseware/references/meaningful-interactivity.v1.json
+@@ -1,8 +1,13 @@
+ {
+-  "schemaVersion": "mira.textbook.interaction-policy.v1",
+-  "policyId": "mira-textbook-meaningful-interactivity",
++  "schemaVersion": "mira.textbook.author-experience-projection.v1",
++  "policyId": "mira-textbook-author-experience-projection",
+   "version": 1,
+-  "title": "教材约束下的多样化互动与游戏规则",
++  "sourcePolicySchemaVersion": "mira.textbook.interaction-policy.v1",
++  "sourcePolicyId": "mira-textbook-meaningful-interactivity",
++  "sourcePolicyVersion": 6,
++  "sourcePolicySha256": "724b598914f131c9848aca2303c3f756024ec2078d8a970990f4febb14e2c6c8",
++  "projectionBoundary": "这是后端权威公共策略v6中与作者体验直接相关的只读投影，不是第二份完整策略。新任务以冻结派发合同中的policyRef和authoringRules为权威；源版本或SHA变化时必须显式更新投影，不能独立演进或覆盖旧冻结任务。",
++  "title": "教材公共策略的作者体验投影",
+   "appliesTo": ["chinese", "math", "english", "science"],
+   "executionBoundary": {
+     "automatic": "新工作台任务冻结完整策略及摘要，并注入实际派发请求；只证明规则已交给作者。",
+@@ -34,6 +39,12 @@
+       "repetitionRationale": "重复主要机制时说明具体巩固目标、难度/情境变化及如何迁移；非重复时可为空。"
+     }
+   },
++  "htmlGameExperienceContract": {
++    "purpose": "自由HTML小游戏是一等教学载体，不是把纸面题换成一排大按钮。按本课目标自由组合DOM、SVG、Canvas、动画、声音和状态机；玩法由儿童在知识世界里的决策与后果定义，不由tap、drag或widgetType定义。",
++    "stage": "主要画面用于可直接操控的场景、对象、路线、结构、参数、角色或作品，控件只辅助操作。可采用调节并观察、轨迹与书写、收集与路线、构建与试验、节奏或声音记忆、情境分支、角色轮流、编辑作品等机制；这些是灵感而非每课配额或固定模板。",
++    "controls": "至少48px指可命中的触控区域，不等于可视按钮必须48px高或使用大胶囊。可用内边距、透明命中层或伪元素扩大点击范围；普通辅助控件的可见按钮芯通常约28–40px，单页只保留必要的主操作。不得用全宽药丸、等大按钮矩阵、重复卡片或常驻大工具栏占据主要舞台。",
++    "acceptance": "在桌面和触屏真实操作有效、错误、修订、重置及恢复路径，确认直接操控确实改变领域状态并产生可见结果；同时检查舞台占比、控件层级与误触。HTML可运行、按钮可点或动画存在都不等于玩法与视觉验收通过。"
++  },
+   "rules": [
+     {
+       "id": "goal_before_mechanic",
+@@ -47,6 +58,10 @@
+       "id": "real_exploration_and_creation",
+       "requirement": "适合的目标提供探索、构建试验、调整条件、空间路线、声音比较/记忆、角色轮流、情景分支或表达创作。构建须保留孩子作品并按结构检验；路线须按当前位置移动；实验须由条件驱动结果。禁止选中预定答案后自动完成全部操作。允许多条有效路径和多个合理作品；开放表达不得伪造唯一正确答案。"
+     },
++    {
++      "id": "free_html_game_stage_and_compact_controls",
++      "requirement": "需要游戏时允许作者自由使用HTML、CSS、SVG、Canvas、声音和动画形成直接操控的场景与状态机，不套固定按钮或卡片组件清单。学习对象和可见后果占主要舞台，按钮只是必要的开始、帮助、重播、重置或确认工具。至少48px是命中区，不是可视尺寸；用透明命中层、内边距或伪元素兼顾触控，普通辅助控件保持28–40px左右的精细可见层级。全宽大药丸、等大按钮墙、只点按钮换文案或得分、把拖拽唯一答案当整课主玩法均判失败。"
++    },
+     {
+       "id": "purposeful_lesson_structure",
+       "requirement": "按需要组合情境、观察、教师示范、尝试、解释、巩固、迁移与回顾，允许必要短讲解，不把讲解硬套互动外壳。页数取完成教学所需的规模，遵守现有技术上限，不能凑固定页数或类型顺序。一屏一事可以通过多阶段状态推进；较长任务分段并可恢复。保留本课已有锁定题数量与顺序，不把某课四题推广为所有课程硬配额。"
+@@ -57,7 +72,7 @@
+     },
+     {
+       "id": "low_reading_and_accessibility",
+-      "requirement": "一二年级遮住非目标文字仍能听懂当前任务、识别有意义且可区分的图片、操作、理解反馈并继续。目标字形可见但指令不可依赖识字；人物造型和说听关系一致。装饰图、emoji、拼音和给纯文字选项加喇叭不达标。触控目标至少48px，窄屏可玩；精细拖动/轨迹提供容错及等价点选操作，手部精度与学科证据分开。不能机械强制所有活动有三个选项。"
++      "requirement": "一二年级遮住非目标文字仍能听懂当前任务、识别有意义且可区分的图片、操作、理解反馈并继续。目标字形可见但指令不可依赖识字；人物造型和说听关系一致。装饰图、emoji、拼音和给纯文字选项加喇叭不达标。粗指针触控命中区至少48px，但可视控件不必同样巨大；普通辅助控件用28–40px左右的可见按钮芯配合透明命中层、间距或媒体查询，窄屏仍可玩。精细拖动和轨迹提供容错及等价易操作路径，手部精度与学科证据分开。不能机械强制所有活动有三个选项。"
+     },
+     {
+       "id": "teacher_and_audio_pacing",
+diff --git a/tests/agent-runtime/generation-tools.test.ts b/tests/agent-runtime/generation-tools.test.ts
+index d9e06ea..ddf1a32 100644
+--- a/tests/agent-runtime/generation-tools.test.ts
++++ b/tests/agent-runtime/generation-tools.test.ts
+@@ -127,7 +127,12 @@ describe('generation and deck tools', () => {
+     const generateActions = vi.fn();
+     const tool = find(buildGenerationTools(deps(current.store, {
+       aiCall, generateActions,
+-      getTextbookPageContext: async () => ({ brief: 'frozen meaning task', text: JSON.stringify(frozen), pictureDomContract }),
++      getTextbookPageContext: async () => ({
++        brief: 'frozen meaning task',
++        text: JSON.stringify(frozen),
++        textbookPromptProfile: 'frozen-textbook-v2' as const,
++        pictureDomContract,
++      }),
+     })), 'generate_scene');
+     await tool.execute('frozen-time-pictures', { stageId: 'stage-test', order: 2,
+       title: 'Three times in one day', type: 'interactive', widgetType: 'simulation',
+@@ -136,7 +141,7 @@ describe('generation and deck tools', () => {
+     expect(aiCall).toHaveBeenCalledTimes(1);
+     expect(generateActions).not.toHaveBeenCalled();
+     const [system, user] = aiCall.mock.calls[0]!;
+-    expect(system).toContain('# Frozen Textbook Interactive Authoring v1');
++    expect(system).toContain('# Frozen Textbook Interactive Authoring v2');
+     expect(system).toContain(JSON.stringify(frozen));
+     expect(system).toContain(JSON.stringify(pictureDomContract));
+     expect(user).toContain(JSON.stringify(pictureDomContract));
+diff --git a/tests/agent-runtime/sessions-route.test.ts b/tests/agent-runtime/sessions-route.test.ts
+index 4a20a67..c698217 100644
+--- a/tests/agent-runtime/sessions-route.test.ts
++++ b/tests/agent-runtime/sessions-route.test.ts
+@@ -267,7 +267,7 @@ describe('agent session collection route', () => {
+     mocks.listSessionsByOwner.mockResolvedValue([{ id: 'session-1', status: 'running' }]);
+     const response = await GET(new NextRequest('http://localhost/api/agent/sessions'));
+     expect(response.headers.get('x-mira-textbook-scene-contract')).toBe(
+-      'mira.frozen-textbook-scene-authoring.v1',
++      'mira.frozen-textbook-scene-authoring.v1,mira.frozen-textbook-author-dispatch.v1',
+     );
+     expect(response.headers.get('x-mira-agent-material-groups')).toBe(
+       'mira.agent-opening-material-groups.v1',
+diff --git a/tests/agent-runtime/textbook-scene-contract.test.ts b/tests/agent-runtime/textbook-scene-contract.test.ts
+index aa8e0d9..df6bf40 100644
+--- a/tests/agent-runtime/textbook-scene-contract.test.ts
++++ b/tests/agent-runtime/textbook-scene-contract.test.ts
+@@ -15,10 +15,14 @@ import {
+   assertTextbookContract,
+   assertTextbookScene,
+   createTextbookAuthoringGuard,
++  textbookContractFromFrozenFile,
+   textbookContractFromPrompt,
++  textbookContractSnapshotFromFrozenFile,
+   textbookDigest,
+   textbookCanonical,
++  type FrozenTextbookAuthorDispatch,
+   type FrozenTextbookContract,
++  type TextbookAuthoringContract,
+ } from '@/lib/server/mira-textbook-scene-contract';
+ 
+ vi.mock('@openmaic/generation', async () => import('@/packages/@openmaic/generation/src/index'));
+@@ -98,10 +102,55 @@ const frozen = (grade = 'primary_1', subject = 'english'): FrozenTextbookContrac
+     sha256: textbookDigest(contract),
+   };
+ };
+-const envelope = (f: FrozenTextbookContract) =>
++const envelope = (f: unknown) =>
+   '\nMIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT:\n' +
+   JSON.stringify(f) +
+   '\nEND_MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT\n';
++const authorDispatch = (source = frozen()): FrozenTextbookAuthorDispatch => {
++  const contract = {
++    schemaVersion: 'mira.textbook.author-dispatch-contract.v1' as const,
++    sourceSceneContractSha256: source.sha256,
++    binding: structuredClone(source.contract.binding),
++    catalogEvidence: structuredClone(source.contract.catalogEvidence),
++    teacherContract: structuredClone(source.contract.teacherContract),
++    policyRef: {
++      schemaVersion: source.contract.interactionPolicy.schemaVersion,
++      policyId: source.contract.interactionPolicy.policy.policyId,
++      version: source.contract.interactionPolicy.policy.version,
++      sha256: source.contract.interactionPolicy.sha256,
++    },
++    authoringRules: [{ id: 'mechanic', requirement: 'Make the teaching state visibly change.' }],
++    qualityRules: structuredClone(source.contract.qualityRules),
++    courseScope: { postClassPractice: { targets: ['hello'] } },
++    officialResourceSummary: {
++      schemaVersion: 'mira.official-resource-review.v1',
++      sha256: 'd'.repeat(64),
++      officialTextbook: { editionId: 'book', gradeCode: 'primary_1' },
++      classHours: [{
++        classHourId: 'lesson-1',
++        title: 'Hello friends',
++        learningObjectives: ['Recognize the greeting scene.'],
++        resources: {
++          teachingDesign: { status: 'reviewed', locations: ['p.1'], findings: ['Teach through a meeting scene.'] },
++          learningTaskSheet: { status: 'reviewed', locations: ['task 1'], findings: ['Match speaker and listener.'] },
++          afterClassExercise: { status: 'reviewed', locations: ['exercise 1'], findings: ['Transfer to a new picture.'] },
++        },
++      }],
++      adaptation: { originalDesign: ['Use an original picture simulation.'] },
++    },
++    pagePlan: structuredClone(source.contract.pagePlan),
++    lockedAssessments: structuredClone(source.contract.lockedAssessments),
++  };
++  return {
++    schemaVersion: 'mira.frozen-textbook-author-dispatch.v1',
++    contract,
++    sha256: textbookDigest(contract),
++  };
++};
++const authorEnvelope = (f: FrozenTextbookAuthorDispatch) =>
++  '\nMIRA_TEXTBOOK_AUTHOR_DISPATCH_CONTRACT:\n' +
++  JSON.stringify(f) +
++  '\nEND_MIRA_TEXTBOOK_AUTHOR_DISPATCH_CONTRACT\n';
+ const source = (name: string) => `/api/classroom-media/${stageId}/media/${name}.png`;
+ const html = () =>
+   `<html><head><meta name="mira-responsive-activity" content="low-reading-v1"></head><body><img src="${source('meeting')}"><script id="mira-narration-cues" type="application/json">${JSON.stringify({ schemaVersion: 'mira.interactive.narration-cues.v1', cues: [{ id: 'intro', text: cue }] })}</script><script type="application/json" id="widget-config">{"type":"simulation"}</script><script>document.querySelector('img').onclick=()=>window.miraNarrate('intro');</script></body></html>`;
+@@ -163,7 +212,7 @@ beforeEach(async () => {
+ afterEach(async () => {
+   await fs.rm(root, { recursive: true, force: true });
+ });
+-function setup(f = frozen()) {
++function setup(f: TextbookAuthoringContract = frozen()) {
+   let doc = {
+     stage: { id: stageId, name: 'Test', createdAt: 1, updatedAt: 1 },
+     scenes: [],
+@@ -383,6 +432,70 @@ describe('frozen textbook authoring boundary', () => {
+       ),
+     ).toEqual(realSnapshot);
+   });
++  it('accepts the compact v4 author dispatch, preserves its identity in the candidate, and keeps page/quiz authority', async () => {
++    const compact = authorDispatch();
++    expect(textbookContractFromPrompt(('精简作者合同' + authorEnvelope(compact) + '原始请求').trim()))
++      .toEqual(compact);
++    const s = setup(compact);
++    const interactive = await s.guard.context({
++      stageId, order: 2, title: '改变情境', type: 'interactive', widgetType: 'simulation', media: s.media,
++    });
++    expect(interactive.brief).toBe('孩子改变位置，再判断问候。');
++    expect(interactive.textbookPromptProfile).toBe('frozen-textbook-v2');
++    const quizContext = await s.guard.context({
++      stageId, order: 3, title: '听到问候', type: 'quiz', media: s.media,
++    });
++    expect(quizContext.textbookPromptProfile).toBe('frozen-textbook-v2');
++    expect(quizContext.quizConfig).toEqual({
++      questionCount: 1, difficulty: 'medium', questionTypes: ['single'],
++    });
++    const candidate = JSON.parse(
++      await fs.readFile(path.join(root, stageId, 'textbook-authoring-candidate.json'), 'utf8'),
++    );
++    expect(candidate.frozenContract).toEqual(compact);
++  });
++  it('selects historical and v4 frozen-file contracts without imposing the full schema on repair-only fixtures', () => {
++    const historicalMinimum = { contract: { pagePlan: [{ page: 1 }] }, sha256: 'legacy-minimum' };
++    const compactMinimum = { contract: { pagePlan: [{ page: 2 }] }, sha256: 'compact-minimum' };
++    expect(textbookContractSnapshotFromFrozenFile({ sceneContract: historicalMinimum }))
++      .toBe(historicalMinimum);
++    expect(textbookContractSnapshotFromFrozenFile({
++      schemaVersion: 'mira.operator.workbench-authoring.v4',
++      sceneContract: historicalMinimum,
++      authorDispatchContract: compactMinimum,
++    })).toBe(compactMinimum);
++    expect(() => textbookContractSnapshotFromFrozenFile({
++      schemaVersion: 'mira.operator.workbench-authoring.v4',
++      sceneContract: historicalMinimum,
++    })).toThrow('CONTRACT_INTEGRITY');
++  });
++  it('fully validates both v4 frozen contracts and their source hash binding', () => {
++    const source = frozen();
++    const compact = authorDispatch(source);
++    const file = {
++      schemaVersion: 'mira.operator.workbench-authoring.v4',
++      sceneContract: source,
++      authorDispatchContract: compact,
++    };
++    expect(textbookContractFromFrozenFile(file)).toBe(compact);
++
++    const mismatched = structuredClone(compact);
++    mismatched.contract.sourceSceneContractSha256 = 'e'.repeat(64);
++    mismatched.sha256 = textbookDigest(mismatched.contract);
++    expect(() => textbookContractFromFrozenFile({
++      ...file,
++      authorDispatchContract: mismatched,
++    })).toThrow('CONTRACT_SOURCE_MISMATCH');
++
++    expect(() => textbookContractFromFrozenFile({
++      ...file,
++      sceneContract: { ...source, sha256: 'f'.repeat(64) },
++    })).toThrow('CONTRACT_INTEGRITY');
++    expect(() => textbookContractFromFrozenFile({
++      ...file,
++      authorDispatchContract: { ...compact, sha256: 'f'.repeat(64) },
++    })).toThrow('CONTRACT_INTEGRITY');
++  });
+   it('keeps ordinary prompts unchanged and rejects malformed/missing/tampered scoped contracts', () => {
+     expect(textbookContractFromPrompt('ordinary course')).toBeUndefined();
+     expect(textbookContractFromPrompt(envelope(frozen()))?.sha256).toBe(frozen().sha256);
+@@ -397,6 +510,14 @@ describe('frozen textbook authoring boundary', () => {
+     missing.sha256 = textbookDigest(missing.contract);
+     expect(() => assertTextbookContract(missing)).toThrow('CONTRACT_INVALID');
+     expect(() => assertTextbookContract(frozen('primary_1', 'science'))).not.toThrow();
++    expect(() => textbookContractFromPrompt(envelope(frozen()) + authorEnvelope(authorDispatch())))
++      .toThrow('ENVELOPE');
++    const compact = authorDispatch();
++    compact.contract.authoringRules.push({
++      id: 'review_actual_play', requirement: 'This review-only rule must not enter the author prompt.',
++    });
++    compact.sha256 = textbookDigest(compact.contract);
++    expect(() => assertTextbookContract(compact)).toThrow('CONTRACT_INVALID');
+   });
+   it('injects the exact frozen policy and page into both child calls without any formal skill bundle', async () => {
+     const s = setup();
+diff --git a/tests/server/mira-meaningful-interaction-policy.test.ts b/tests/server/mira-meaningful-interaction-policy.test.ts
+index 46e3ecd..ade0348 100644
+--- a/tests/server/mira-meaningful-interaction-policy.test.ts
++++ b/tests/server/mira-meaningful-interaction-policy.test.ts
+@@ -59,7 +59,7 @@ describe('meaningful textbook interaction source and context', () => {
+     ).toContain('`widgetOutline.concept` missing on scene(s) 1');
+   });
+ 
+-  it('makes the complete policy readable without silently upgrading historical formal contexts', async () => {
++  it('makes the source-bound author projection readable without creating a second policy identity', async () => {
+     const installed = await listSkills();
+     const primary = installed.find(
+       (skill) => skill.id === 'mira-primary-courseware',
+@@ -70,10 +70,41 @@ describe('meaningful textbook interaction source and context', () => {
+       'references/meaningful-interactivity.v1.json',
+     );
+     const text = await readFile(path, 'utf8');
+-    const policy = JSON.parse(text);
+-    expect(policy.schemaVersion).toBe('mira.textbook.interaction-policy.v1');
+-    expect(policy.policyId).toBe('mira-textbook-meaningful-interactivity');
+-    expect(policy.appliesTo).toEqual(['chinese', 'math', 'english', 'science']);
++    const projection = JSON.parse(text);
++    expect(projection).toMatchObject({
++      schemaVersion: 'mira.textbook.author-experience-projection.v1',
++      policyId: 'mira-textbook-author-experience-projection',
++      version: 1,
++      sourcePolicySchemaVersion: 'mira.textbook.interaction-policy.v1',
++      sourcePolicyId: 'mira-textbook-meaningful-interactivity',
++      sourcePolicyVersion: 6,
++      sourcePolicySha256: '724b598914f131c9848aca2303c3f756024ec2078d8a970990f4febb14e2c6c8',
++    });
++    expect(projection.projectionBoundary).toContain('不是第二份完整策略');
++    expect(projection.appliesTo).toEqual(['chinese', 'math', 'english', 'science']);
++    expect(projection.htmlGameExperienceContract).toMatchObject({
++      purpose: expect.stringContaining('HTML'),
++      stage: expect.stringContaining('主要画面'),
++      controls: expect.stringContaining('28–40px'),
++    });
++    expect(
++      projection.rules.find(
++        (rule: { id: string }) => rule.id === 'free_html_game_stage_and_compact_controls',
++      )?.requirement,
++    ).toContain('至少48px是命中区，不是可视尺寸');
++    expect(
++      projection.rules.find((rule: { id: string }) => rule.id === 'low_reading_and_accessibility')
++        ?.requirement,
++    ).toContain('可视控件不必同样巨大');
++
++    const skillText = await readFile(primary.filePath, 'utf8');
++    expect(skillText).toContain('frozen `pagePlan`');
++    expect(skillText).toContain('free HTML, inline SVG and canvas');
++    expect(skillText).toContain('ordinary auxiliary controls are normally 28–40px visually');
++    expect(skillText).not.toContain('prefer 6–8 pages');
++    expect(skillText).not.toContain('Use one to four quiz pages');
++    expect(skillText).not.toContain('all four locked assessment questions');
++    expect(skillText).not.toContain('at least every second page');
+ 
+     const read = createNativeSkillReadTool(installed, () => undefined);
+     const result = await read.execute('read-meaningful-interaction-policy', {
+@@ -90,7 +121,8 @@ describe('meaningful textbook interaction source and context', () => {
+     });
+ 
+     // The new workbench freezes and dispatches the full policy explicitly.
+-    // Adding a reference must not rewrite older formal bundle/receipt identities.
++    // The public Skill body is intentionally upgraded, while the extra policy
++    // reference remains outside the legacy bundle and frozen prompt profiles.
+     expect(formalSkillReferencePaths('math')).not.toContain(policyReference);
+     const legacy = await prepareMiraFormalSkillBundle(installed, 'math');
+     expect(
+@@ -103,6 +135,6 @@ describe('meaningful textbook interaction source and context', () => {
+         sceneType: 'interactive',
+         phase: 'content',
+       }).contextSha256,
+-    ).toBe('6d428dfbdef4bb7e4f229952d932bae48fba5bf487aa4f133c5527a0a60c68d6');
++    ).toBe('5a52f21c5903949753cb67b1959a6f9d627faca40bf11bd087be3d2492741f12');
+   });
+ });

@@ -257,6 +257,7 @@ export function prepareRuntimeEvent(raw, runtime) {
     answer_submitted: ["attemptNumber", "questionId", "response", "sceneId", "sceneIndex"],
     asr_transcribed: ["sceneId", "sceneIndex", "transcript", "turnId"],
     interaction_completed: ["action", "controlSelector", "feedbackText", "objectiveIndex", "sceneId", "sceneIndex", "value"],
+    interaction_operation: ["contractSha256", "operation", "operationId", "sceneId", "sceneIndex"],
     classroom_completed: ["sceneId", "sceneIndex"],
   };
   const expectedFields = fieldsByType[input.type];
@@ -308,6 +309,13 @@ export function prepareRuntimeEvent(raw, runtime) {
     typeof payload.value !== "string" || payload.value.length > 500 ||
     (payload.action === "click" && payload.value !== "") ||
     typeof payload.feedbackText !== "string" || !payload.feedbackText.trim() || payload.feedbackText.length > 2000
+  )) return invalidRuntimeEvent();
+  if (input.type === "interaction_operation" && (
+    typeof payload.operationId !== "string" || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(payload.operationId) ||
+    typeof payload.contractSha256 !== "string" || !/^[a-f0-9]{64}$/.test(payload.contractSha256) ||
+    !payload.operation || typeof payload.operation !== "object" || Array.isArray(payload.operation) ||
+    typeof payload.operation.name !== "string" || !/^[A-Za-z][A-Za-z0-9]{0,63}$/.test(payload.operation.name) ||
+    Buffer.byteLength(canonicalJson(payload.operation), "utf8") > 16384
   )) return invalidRuntimeEvent();
   if (!runtime.runtimeSessionId || !runtime.learningSessionId || !runtime.classroomId) {
     const error = new Error("runtime identity incomplete");
@@ -526,8 +534,18 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
     let data;
     if (request.method === 'POST') {
       if (!isJsonRequest(request)) return json(response, 415, { ok: false, error: 'textbook_json_required' });
-      try { data = JSON.parse((await readBody(request, url.pathname === '/mira/activity-state' ? MAX_ACTIVITY_STATE_BODY_BYTES : 8192)).toString('utf8')); }
-      catch (error) { return json(response, url.pathname === '/mira/activity-state' && error.statusCode === 413 ? 413 : 400,
+      try {
+        const limit = url.pathname === '/mira/activity-state' ? MAX_ACTIVITY_STATE_BODY_BYTES
+          : url.pathname === '/mira/runtime-events' ? 24576 : 8192;
+        const raw = await readBody(request, limit);
+        data = JSON.parse(raw.toString('utf8'));
+        // The fixed-course backend uses the authenticated token rather than
+        // the generic event's extra idempotency field. Validate the exact
+        // envelope here, then forward the unchanged event.
+        if (url.pathname === '/mira/runtime-events') prepareRuntimeEvent(raw, runtime);
+      }
+      catch (error) { return json(response, error.statusCode === 413 &&
+        ['/mira/activity-state', '/mira/runtime-events'].includes(url.pathname) ? 413 : 400,
         { ok: false, error: 'textbook_json_invalid' }); }
     }
     const endpoint = url.pathname === '/mira/textbook-quiz' ? 'quiz'
@@ -558,6 +576,7 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
 /** Preserve the backend's hash of immutable source HTML before delivery transforms. */
 export function bindTextbookActivityPersistence(scene, runtime) {
   delete scene.miraActivityPersistence;
+  delete scene.miraCourseInteraction;
   if (runtime?.purpose !== 'fixed_textbook' || !/^[a-f0-9]{64}$/.test(runtime.releaseSha256 || '')
       || scene.type !== 'interactive' || scene.content?.type !== 'interactive'
       || typeof scene.content.html !== 'string' || !scene.content.html.trim()
@@ -565,9 +584,18 @@ export function bindTextbookActivityPersistence(scene, runtime) {
       || !Array.isArray(runtime.activityPersistence)) return;
   const matches = runtime.activityPersistence.filter(item => item?.sceneId === scene.id);
   if (matches.length !== 1 || !/^[a-f0-9]{64}$/.test(matches[0].contentSha256 || '')
-      || !Number.isInteger(matches[0].sceneIndex) || matches[0].sceneIndex < 0 || matches[0].sceneIndex >= 60) return;
+      || !Number.isInteger(matches[0].sceneIndex) || matches[0].sceneIndex < 0 || matches[0].sceneIndex >= 60
+      || createHash('sha256').update(scene.content.html, 'utf8').digest('hex') !== matches[0].contentSha256) return;
   scene.miraActivityPersistence = { schemaVersion: 'mira.textbook.activity-state.v1',
     releaseSha256: runtime.releaseSha256, contentSha256: matches[0].contentSha256 };
+  const contract = runtime.courseInteraction;
+  if (contract?.schemaVersion !== 'mira.textbook.interaction-operation.v1'
+      || !/^[a-f0-9]{64}$/.test(contract.contractSha256 || '') || !Array.isArray(contract.scenes)) return;
+  const operations = contract.scenes.filter(item => item?.sceneId === scene.id);
+  if (operations.length !== 1 || operations[0].sceneIndex !== matches[0].sceneIndex
+      || operations[0].contentSha256 !== matches[0].contentSha256) return;
+  scene.miraCourseInteraction = { schemaVersion: contract.schemaVersion,
+    contractSha256: contract.contractSha256, contentSha256: operations[0].contentSha256 };
 }
 
 export function bindTextbookPageNarration(scene, runtime, verifiedMediaPaths = new Set()) {

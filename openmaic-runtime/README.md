@@ -213,6 +213,44 @@ needs a compatibility decision for released classrooms first. Upstream 1.0.1
 to 1.0.3 fixes that change classroom storage or stored slide HTML, audio
 provider transports, the access code or the render service are not included.
 
+### Upgrading the patched runtime
+
+Rehearse an upstream upgrade in a separate checkout with a separately restored
+PostgreSQL database, private data directory and unused ports. Keep the running
+checkout, build, configuration and patch series intact. Replay the complete
+locked patch chain on its original upstream commit and compare its source
+hashes with the live checkout before porting it; also freeze the gateway and
+interaction adapters. Concurrent changes invalidate that baseline and must be
+included in a new comparison before cutover. A successful upstream build or
+database migration does not establish compatibility with Mira's patches.
+
+OpenMAIC 1.2.1 removes the old classroom API and changes generation, owner
+resolution, document ownership and model configuration. Preserve Mira's
+authenticated launch, formal generation/audio receipts, course archives,
+teacher dialogue, assessment and activity recovery contracts through reviewed
+adapters. Do not restore an unrestricted document store or weaken owner checks
+to make an old call work. Port and test the numbered patch series before changing
+the active lock or launcher's expected version.
+
+Keep a published course's original `sourceVersion`, `sourceCommit`, bytes and
+release hashes. They describe its generation evidence, not the version of the
+player currently serving it. The 1.2.1 document reader migrates the DSL in memory
+and can add element defaults, so equal database bytes can yield different
+serialized documents. Verify the original publication first and separately
+verify any playback projection; never overwrite frozen manifests or accept
+arbitrary source versions just to pass the student gate.
+
+Before switching, verify database restoration, original row counts, course
+content and ownership, then exercise released courses through the normal
+student entry: teacher audio, pictures and quizzes, toolbar, required
+discussions, activity restoration, answers and parent evidence. Preserve the
+existing MinIO objects and verify the media needed for rollback. A database dump
+alone is not a complete course-media backup. Take the final coordinated backup
+after stopping the identified writers for cutover; a live rehearsal dump is
+not that final backup. Once new answers or other business writes are accepted,
+restoring an older database would lose them: retain and reconcile those writes
+or use a verified compatible code rollback instead.
+
 ## OpenMAIC v1 professional workbench and Skills
 
 The pinned v1 source keeps OpenMAIC's professional workbench, editable Stage/Scene

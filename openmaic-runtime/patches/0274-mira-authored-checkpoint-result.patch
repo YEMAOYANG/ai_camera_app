@@ -1,0 +1,70 @@
+--- a/lib/mira/activity-checkpoint-adapters.ts
++++ b/lib/mira/activity-checkpoint-adapters.ts
+@@ -266,13 +266,29 @@
+ /** Unknown models retain their original behavior. Match the complete legacy
+  * program (except delivery-only media URLs), not an author-supplied marker or a
+  * classroom/scene identity. New authoring should implement the API directly. */
++/** This exact reviewed program restores its world but historically returned
++ * undefined. Normalize only its return contract; unknown programs, source HTML,
++ * publication identity and independently computed interaction evidence stay intact. */
++function patchKnownAuthoredRestoreResult(html: string): string {
++  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)].filter(match =>
++    !/\b(?:src|type)\s*=/.test(match[1]) && match[2].includes('window.miraActivityCheckpoint = {'));
++  if (scripts.length !== 1 || modelSignature(scripts[0][2]) !== '20703:5984d986:e705a356') return html;
++  const before = 'render();updateStatusForPhase();maybeAutoAdvance();\n                    } catch (e) {}';
++  if (scripts[0][2].split(before).length !== 2) return html;
++  const script = scripts[0];
++  const revised = script[0].replace(before,
++    'render();updateStatusForPhase();maybeAutoAdvance();return true;\n                    } catch (e) { return false; }');
++  return html.slice(0, script.index) + revised + html.slice(script.index! + script[0].length);
++}
++
+ export function patchActivityCheckpointAdapters(html: string): string {
+-  if (html.includes('mira-activity-checkpoint-adapter:') || html.includes('window.miraActivityCheckpoint')) return html;
+   // Patch only the exact known wrapper. The caller can use the exported mapper
+   // to put all iframe shims in the inner document that survives document.write.
+   if (html.includes('document.open();document.write(page);document.close();')) {
+     return mapEmbeddedActivityDocument(html, patchActivityCheckpointAdapters) ?? html;
+   }
++  if (html.includes('window.miraActivityCheckpoint')) return patchKnownAuthoredRestoreResult(html);
++  if (html.includes('mira-activity-checkpoint-adapter:')) return html;
+   for (const patch of [patchCommonActivityCheckpointAdapters, patchPinyinActivityCheckpointAdapters,
+     patchCustomActivityCheckpointAdapters, patchFormalActivityCheckpointAdapters,patchClassroomGameCheckpointAdapters,
+     patchEarlyChineseActivityCheckpointAdapters]) {
+--- /dev/null
++++ b/tests/runtime/authored-checkpoint-result.test.ts
+@@ -0,0 +1,34 @@
++import { describe, expect, it } from 'vitest';
++import { readFileSync } from 'node:fs';
++import { patchActivityCheckpointAdapters } from '@/lib/mira/activity-checkpoint-adapters';
++
++it('never upgrades an unknown authored restore function', () => {
++  const html = '<script>window.miraActivityCheckpoint = {restore(){}}</script>';
++  expect(patchActivityCheckpointAdapters(html)).toBe(html);
++});
++
++// Reuse the reviewed local publication; do not duplicate paid course/media fixtures.
++describe.skipIf(!process.env.MIRA_SPLIT_CHECKPOINT_RELEASE)('reviewed split checkpoint return contract', () => {
++  const original = process.env.MIRA_SPLIT_CHECKPOINT_RELEASE
++    ? JSON.parse(readFileSync(process.env.MIRA_SPLIT_CHECKPOINT_RELEASE, 'utf8')).release.classroom.scenes.find((s: {id:string}) => s.id === 'scene-p2').content.html : '';
++  it('normalizes success and failure without altering the rest of the game', () => {
++    const patched = patchActivityCheckpointAdapters(original);
++    expect(patched).toBe(original.replace('render();updateStatusForPhase();maybeAutoAdvance();\n                    } catch (e) {}',
++      'render();updateStatusForPhase();maybeAutoAdvance();return true;\n                    } catch (e) { return false; }'));
++    expect(patched).not.toBe(original);
++    expect(patchActivityCheckpointAdapters(patched)).toBe(patched);
++  });
++  it('fails closed if any executable part of the reviewed model changes', () => {
++    const changed = original.replace('phase = snapshot.phase;', 'phase = 9;');
++    expect(patchActivityCheckpointAdapters(changed)).toBe(changed);
++  });
++  it('returns success only after rendering the restored world', () => {
++    const patched = patchActivityCheckpointAdapters(original);
++    const body = patched.slice(patched.indexOf('restore(snapshot) {') + 'restore(snapshot) {'.length).split('\n                }\n            };')[0];
++    const restore = new Function('snapshot', 'broken', `let phase,currentDirection,unsentBalls,leftDock,rightDock,ballIdCounter,helpShown,currentHelpBallId,hasPlayedCue2,hasStartedInitialCue;const allBalls=new Map();const getBallColor=()=> 'color';const render=()=>{if(broken)throw new Error('render failed')};const updateStatusForPhase=()=>{};const maybeAutoAdvance=()=>{};${body}`);
++    const snapshot = {phase:2,currentDirection:'left',unsentBalls:[],leftDock:['ball-3'],rightDock:['ball-1','ball-2']};
++    expect(restore(snapshot, false)).toBe(true);
++    expect(restore(snapshot, true)).toBe(false);
++    expect(restore({}, false)).toBe(false);
++  });
++});

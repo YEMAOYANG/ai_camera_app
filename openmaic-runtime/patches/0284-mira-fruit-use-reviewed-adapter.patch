@@ -1,0 +1,48 @@
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -7,18 +7,6 @@ import { INTERACTIVE_AUDIO_CONTROL_SHIM } from '@/lib/mira/interactive-audio-con
+ import { activityViewportMode } from '@/lib/interactive/activity-viewport';
+ import { RESPONSIVE_FRAME_LAYOUT_SHIM } from '@/lib/interactive/responsive-frame-layout';
+ 
+-// The saved operation keeps immutable attempt metadata while the authored
+-// checkpoint restores only the visible fruit-observation world. Compare the
+-// resumable decision state exactly, without requiring that historical response
+-// payload to be re-created inside the iframe.
+-const SCIENCE_FRUIT_RESTORE_COMPATIBLE_ADAPTER = SCIENCE_FRUIT_OPERATION_ADAPTER.replace(
+-  'stable(work)===stable(server.lastWork)',
+-  "stable(Object.fromEntries(Object.entries(work).filter(([key])=>key!=='response')))===stable(Object.fromEntries(Object.entries(server.lastWork).filter(([key])=>key!=='response')))",
+-).replace(
+-  'started:x.started,decision,domain',
+-  'started:page===6?s.started:x.started,decision,domain',
+-);
+-
+ /**
+  * In-memory localStorage/sessionStorage shim, injected as the FIRST thing in the
+  * document so the page's own scripts see working storage.
+@@ -355,7 +343,7 @@ export function patchHtmlForIframe(html: string, embeddedDepth = 0): string {
+ 
+   const layoutRecovery = activityViewportMode(adaptedHtml) === 'responsive' ? RESPONSIVE_FRAME_LAYOUT_SHIM : '';
+   const injection = layoutRecovery +
+-    '\n' + ACTIVITY_INTENT_SHIM + '\n' + INTERACTIVE_AUDIO_CONTROL_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + (checkpointSupported ? checkpointMarker + ACTIVITY_CHECKPOINT_SHIM + COURSE_OPERATION_SHIM + COURSE_OPERATION_ADAPTERS + MATH_COURSE_OPERATION_ADAPTERS + ENGLISH_CLASSROOM_OPERATION_ADAPTER + SPLIT_ADD_COURSE_OPERATION_ADAPTER + SCIENCE_SENSORY_OPERATION_ADAPTER + SCIENCE_FRUIT_RESTORE_COMPATIBLE_ADAPTER + MATH_SUBTRACT_ZERO_COURSE_OPERATION_ADAPTER : '') + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss + '\n' + activityControlsCss;
++    '\n' + ACTIVITY_INTENT_SHIM + '\n' + INTERACTIVE_AUDIO_CONTROL_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + (checkpointSupported ? checkpointMarker + ACTIVITY_CHECKPOINT_SHIM + COURSE_OPERATION_SHIM + COURSE_OPERATION_ADAPTERS + MATH_COURSE_OPERATION_ADAPTERS + ENGLISH_CLASSROOM_OPERATION_ADAPTER + SPLIT_ADD_COURSE_OPERATION_ADAPTER + SCIENCE_SENSORY_OPERATION_ADAPTER + SCIENCE_FRUIT_OPERATION_ADAPTER + MATH_SUBTRACT_ZERO_COURSE_OPERATION_ADAPTER : '') + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss + '\n' + activityControlsCss;
+ 
+   return injectIntoDocumentHead(adaptedHtml, injection);
+ }
+diff --git a/tests/lib/utils/iframe.test.ts b/tests/lib/utils/iframe.test.ts
+--- a/tests/lib/utils/iframe.test.ts
++++ b/tests/lib/utils/iframe.test.ts
+@@ -14,11 +14,11 @@ describe('patchHtmlForIframe', () => {
+     const out = patchHtmlForIframe(
+       '<html><head><script>window.miraActivityCheckpoint = {version: 1};</script></head><body></body></html>',
+     );
+-    expect(out).toContain("Object.entries(work).filter(([key])=>key!=='response')");
+-    expect(out).toContain("Object.entries(server.lastWork).filter(([key])=>key!=='response')");
++    expect(out).toContain('stable(restoreComparable(work))===stable(restoreComparable(server.lastWork))');
+     expect(out).not.toContain('stable(work)===stable(server.lastWork)');
+     expect(out).toContain('started:page===6?s.started:x.started,decision,domain');
+     expect(out).not.toContain('JSON.stringify({started:x.started,decision,domain');
++    expect(out).toContain("recovery && control?.id !== 'resetBtn'");
+   });
+ 
+   it('runs the storage shim before the page scripts', () => {

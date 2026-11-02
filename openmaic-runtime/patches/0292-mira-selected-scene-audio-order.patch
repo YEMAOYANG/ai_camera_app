@@ -1,0 +1,131 @@
+--- a/lib/mira/activity-checkpoint-bridge.ts
++++ b/lib/mira/activity-checkpoint-bridge.ts
+@@ -164,7 +164,13 @@
+         if (fresh && initial && typeof initial.begin === 'function' && initial.beginRequiresSelectedSceneIntent !== true) {
+           fresh = false;
+           queueMicrotask(function () { var api = contract(); if (api && api.beginRequiresSelectedSceneIntent !== true && typeof api.begin === 'function') api.begin(); });
+-        } else maybeBeginSelectedIntro();
++        } else {
++          // This bridge is injected before the prerecorded helper. Let that
++          // helper observe visible=true before the authored intro calls it;
++          // otherwise its hidden result cancels the queue and consumes intent.
++          // Recheck all live guards in the microtask so pause/leave still win.
++          queueMicrotask(maybeBeginSelectedIntro);
++        }
+       }
+       return;
+     }
+--- /dev/null
++++ b/tests/runtime/mira-selected-intro-helper-order.test.ts
+@@ -0,0 +1,111 @@
++// @vitest-environment jsdom
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { ACTIVITY_CHECKPOINT_SHIM } from '@/lib/mira/activity-checkpoint-bridge';
++
++// The reviewed production prerecorded helper state machine (only its clip map
++// is reduced to one local fixture URL). In particular hidden -> authored cancel
++// clears waiting synchronously. A generic fake begin counter misses this race.
++const prerecordedHelper = "(()=>{\nconst clips={\"intro\":\"/intro.mp3\"};let active=null;\nlet activeCue=null,pending=null,waiting=null,waitingAt=0,generation=0,visible=false;\nconst state=(cueId,status)=>{document.documentElement.dataset.miraAudioState=status;\nwindow.dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId,status}}));};\nconst stop=(status)=>{generation++;pending=null;const previous=active;active=null;activeCue=null;\nif(previous){previous.onended=null;previous.onerror=null;previous.pause();previous.currentTime=0;}\nstate(null,status);};\nwindow.miraCancelNarration=()=>{waiting=null;waitingAt=0;stop('ready');};\nwindow.addEventListener('message',(event)=>{if(event.source!==parent||event.data?.type!=='MIRA_NARRATION_VISIBILITY')return;\nvisible=event.data.visible===true;if(!visible){stop('hidden');return;}\nconst cueId=waiting;waiting=null;if(cueId&&Date.now()-waitingAt<=4000)window.miraNarrate(cueId);});\nconst next=()=>{const cueId=pending;pending=null;if(cueId)play(cueId);};\nconst play=async(cueId)=>{const ticket=generation;\nconst clip=new Audio(clips[cueId]);active=clip;activeCue=cueId;const current=()=>generation===ticket&&active===clip;\nclip.onended=()=>{if(current()){active=null;activeCue=null;state(cueId,'ready');next();}};\nclip.onerror=()=>{if(current()){active=null;activeCue=null;state(cueId,'error');next();}};\ntry{await clip.play();if(!current()){clip.pause();return false;}state(cueId,'playing');return true;}\ncatch(_){if(current()){active=null;activeCue=null;state(cueId,'error');next();}return false;}};\nwindow.miraNarrate=async(cueId)=>{\nif(!Object.prototype.hasOwnProperty.call(clips,cueId)){state(cueId,'missing');return false;}\nif(!visible){waiting=cueId;waitingAt=Date.now();state(cueId,'hidden');return false;}\nif(active&&activeCue!==cueId){pending=cueId;state(cueId,'queued');return true;}\nstop('ready');return play(cueId);};\nstate(null,'ready');})();";
++
++type FixtureEvent = {type: string; source?: unknown; data?: Record<string, unknown>;
++  detail?: {cueId: string | null; status: string}; ports?: unknown[];
++  stopImmediatePropagation?: () => void; isTrusted?: boolean};
++type Listener = (event: FixtureEvent) => void;
++function fixture(saved: Record<string, unknown> | null = null) {
++  document.body.innerHTML = '<button id="start">开始</button><output id="feedback">点开始</output>';
++  const listeners = new Map<string, Listener[]>(), documentListeners = new Map<string, Listener[]>();
++  const parent = {}, replies: Record<string, unknown>[] = [], audioEvents: string[] = [];
++  let hidden = false, openingCalls = 0, activeCue: string | null = null, instructionsComplete = false;
++  const play = vi.fn(() => Promise.resolve());
++  const win = {
++    parent,
++    miraActivityCheckpoint: {version:1, capture:() => ({instructionsComplete}), restore:(_s: unknown) => true},
++    miraNarrate: undefined as undefined | ((cue: string) => Promise<boolean>),
++    miraCancelNarration: undefined as undefined | (() => void),
++    addEventListener(type: string, handler: Listener) {
++      listeners.set(type, [...(listeners.get(type) ?? []), handler]);
++    },
++    dispatchEvent(event: FixtureEvent) {
++      for (const handler of listeners.get(event.type) ?? []) handler(event);
++      return true;
++    },
++  };
++  const doc = {
++    body: document.body, documentElement: document.documentElement,
++    readyState: 'complete', get hidden() { return hidden; },
++    createElement: document.createElement.bind(document),
++    addEventListener(type: string, handler: Listener) {
++      documentListeners.set(type, [...(documentListeners.get(type) ?? []), handler]);
++    },
++  };
++  const code = ACTIVITY_CHECKPOINT_SHIM.match(/<script[^>]*>([\s\S]*)<\/script>/)![1];
++  new Function('window','document','CustomEvent','setInterval','queueMicrotask',code)(win,doc,CustomEvent,vi.fn(),queueMicrotask);
++  const AudioFixture = class {onended=null; onerror=null; currentTime=0; pause() {} play=play;};
++  new Function('window','document','parent','CustomEvent','Audio',prerecordedHelper)(win,doc,parent,CustomEvent,AudioFixture);
++  const feedback = document.querySelector('#feedback')!;
++  const failed = () => {activeCue=null; win.miraCancelNarration!(); feedback.textContent='点喇叭，再听一次。';};
++  win.addEventListener('mira-narration-state',event => {
++    audioEvents.push(event.detail!.status);
++    if(event.detail?.cueId===activeCue && activeCue!==null && ['hidden','cancelled','error'].includes(event.detail.status)) failed();
++  });
++  (document.querySelector('#start') as HTMLButtonElement).onclick = () => {
++    win.miraCancelNarration!(); activeCue='intro'; feedback.textContent='两边工具架要一样多。';
++    void win.miraNarrate!('intro').then(ok=>{if(!ok && activeCue)failed();});
++  };
++  const port = {postMessage:(data: Record<string, unknown>) => replies.push(data), close() {},
++    onmessage: undefined as undefined | ((event: {data: Record<string, unknown>}) => void)};
++  const message=(data: Record<string, unknown>)=>win.dispatchEvent({type:'message',source:parent,data,stopImmediatePropagation(){}});
++  win.dispatchEvent({type:'message',source:parent,data:{type:'mira:activity-checkpoint-connect'},ports:[port],stopImmediatePropagation(){}});
++  port.onmessage!({data:{type:'mira:checkpoint-restore',state:saved,active:true}});
++  const request=(requested: boolean)=>port.onmessage!({data:{type:'mira:checkpoint-selected-intro',requested}});
++  const installOpening=()=>{
++    win.miraActivityCheckpoint = {...win.miraActivityCheckpoint,...{
++      beginRequiresSelectedSceneIntent:true,
++      begin:()=>{openingCalls++; const button=document.querySelector('#start') as HTMLButtonElement; button.onclick!.call(button,undefined!); return true;},
++    }};
++    win.dispatchEvent({type:'mira-course-operation-ready'});
++  };
++  return {play,replies,audioEvents,message,request,installOpening,
++    hidden:()=>{hidden=true;}, openingCalls:()=>openingCalls,
++    feedback:()=>feedback.textContent, instructionsComplete:()=>instructionsComplete};
++}
++const settle = async () => {for(let i=0;i<5;i++)await Promise.resolve();};
++afterEach(()=>{document.body.replaceChildren();delete document.documentElement.dataset.miraAudioState;vi.restoreAllMocks();});
++
++describe('selected intro and prerecorded helper listener order',()=>{
++  it('waits for the later helper visibility listener before the authored opening calls miraNarrate',async()=>{
++    const f=fixture(); f.request(true); f.installOpening();
++    expect(f.openingCalls()).toBe(0);
++    f.message({type:'MIRA_NARRATION_VISIBILITY',visible:true});
++    expect(f.openingCalls()).toBe(0); // No authored call inside an earlier visibility listener.
++    await settle();
++    expect(f.play).toHaveBeenCalledTimes(1);
++    expect(f.audioEvents).not.toContain('hidden');
++    expect(document.documentElement.dataset.miraAudioState).toBe('playing');
++    expect(f.feedback()).toBe('两边工具架要一样多。');
++    expect(f.instructionsComplete()).toBe(false); // Starting audio grants no completion.
++    f.message({type:'MIRA_NARRATION_VISIBILITY',visible:true}); await settle();
++    expect(f.openingCalls()).toBe(1);
++  });
++
++  it.each(['pause','leave','document-hidden','cancel-intent'] as const)('does not play a queued intro after %s',async(mode)=>{
++    const f=fixture(); f.request(true); f.installOpening();
++    f.message({type:'MIRA_NARRATION_VISIBILITY',visible:true});
++    if(mode==='pause')f.message({type:'MIRA_NARRATION_VISIBILITY',visible:false});
++    if(mode==='leave')f.message({type:'mira:checkpoint-visibility',active:false});
++    if(mode==='document-hidden')f.hidden();
++    if(mode==='cancel-intent')f.request(false);
++    await settle(); expect(f.play).not.toHaveBeenCalled(); expect(f.openingCalls()).toBe(0);
++  });
++
++  it('keeps a restored page quiet unless its reviewed adapter explicitly allows selected resumption',async()=>{
++    const f=fixture({instructionsComplete:false});f.request(true);f.installOpening();
++    f.message({type:'MIRA_NARRATION_VISIBILITY',visible:true}); await settle();
++    expect(f.play).not.toHaveBeenCalled();expect(f.openingCalls()).toBe(0);
++  });
++
++  it('still starts when operation authorization arrives after visibility',async()=>{
++    const f=fixture();f.request(true);f.message({type:'MIRA_NARRATION_VISIBILITY',visible:true});await settle();
++    expect(f.play).not.toHaveBeenCalled();f.installOpening();await settle();expect(f.play).toHaveBeenCalledTimes(1);
++  });
++});

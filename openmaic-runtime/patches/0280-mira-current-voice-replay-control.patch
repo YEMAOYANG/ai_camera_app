@@ -1,0 +1,24 @@
+--- a/lib/mira/interactive-audio-controls.ts
++++ b/lib/mira/interactive-audio-controls.ts
+@@ -16,7 +16,7 @@
+   '重听当前页提示', '重听当前一句', '重听当前任务', '重听这回练习的方法',
+   '重播语音', '重播当前提示', '重播任务说明', '重播当前指导',
+   '重播任务语音', '重听任务说明', '再听当前任务', '再听老师的话',
+-  '重播提示', '重播当前任务说明', '重听观察任务',
++  '重播提示', '重播当前任务说明', '重听观察任务', '重听当前语音',
+ ] as const;
+ 
+ /** Inject before authored scripts. Inert without the existing prerecorded
+--- a/tests/scene-renderers/interactive-audio-controls.test.ts
++++ b/tests/scene-renderers/interactive-audio-controls.test.ts
+@@ -50,8 +50,8 @@
+ });
+ 
+ describe('reviewed iframe audio control shim', () => {
+-  it('uses the original explicit audio replay handler, preserving domain state and real cue completion', async () => {
+-    const p = shim('<button aria-label="再听一次老师的话">听老师</button>');
++  it.each(['再听一次老师的话', '重听当前语音'])('uses the exact %s replay handler, preserving domain state and real cue completion', async label => {
++    const p = shim(`<button aria-label="${label}">听老师</button>`);
+     const world = { answer: 3, completed: false };
+     let gateReady = false, replayCount = 0;
+     const explicitPlay = vi.fn();

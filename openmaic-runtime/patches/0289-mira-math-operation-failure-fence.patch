@@ -1,0 +1,40 @@
+--- a/lib/mira/course-operation-bridge.ts
++++ b/lib/mira/course-operation-bridge.ts
+@@ -78,9 +78,13 @@
+         // This is not an acknowledgement and cannot credit a replay. Never
+         // discard an operation already posted to the server by a prior port.
+         const request = replayRequests.get(data.requestId);
+-        if (!request || request.operation) { ready = false; options.onError(); return; }
++        if (!request || request.operation) {
++          ready = false; current.port1.postMessage({type:'mira:course-operation-unavailable'}); options.onError(); return;
++        }
+         replayRequests.delete(data.requestId);
+       } else if (data?.type === 'mira:course-operation-replay-unavailable' && ready) {
++        ready = false; options.onError();
++      } else if (data?.type === 'mira:course-operation-client-error' && ready) {
+         ready = false; options.onError();
+       } else if (data?.type === 'mira:course-operation' && ready && options.active()) {
+         try {
+@@ -117,6 +121,10 @@
+ (function () {
+   var port=null, ready=false, pending=new Map(), tail=Promise.resolve(), adapter=null, mathFence=false, mathGuardEnabled=false;
+   function disarm(){ready=false;if(mathGuardEnabled)mathFence=true;}
++  window.addEventListener('mira-course-operation-error',function(){
++    if(!mathGuardEnabled)return;
++    disarm();if(port)port.postMessage({type:'mira:course-operation-client-error'});
++  });
+   // Retain a fail-closed input fence during math adapter replacement. The
+   // old checkpoint remains unavailable until an authorized successor exists.
+   ['pointerdown','pointermove','pointerup','pointercancel','click','keydown','input','change'].forEach(function(type){
+--- a/tests/runtime/math-operation-fence.browser.test.ts
++++ b/tests/runtime/math-operation-fence.browser.test.ts
+@@ -70,6 +70,9 @@
+       await parentMessage({type:'SET_WIDGET_STATE',state:{phase:'playing'}});
+       await expect.poll(async()=>(await metrics()).teacher).toBe(2);
+       await frame.locator('#step').click();expect((await metrics()).child).toBe(2);
++      await frame.locator('body').evaluate(()=>window.dispatchEvent(new Event('mira-course-operation-error')));
++      await expect.poll(async()=>(await messages(1)).some(x=>x.type==='mira:course-operation-client-error')).toBe(true);
++      await frame.locator('#step').click();expect(await metrics()).toMatchObject({child:2,checkpoint:null});
+       await frame.locator('body').evaluate(()=>{(window as unknown as {throwInstall:boolean}).throwInstall=true});
+       await connect();await expect.poll(async()=>(await messages(2)).some(x=>x.type==='mira:course-operation-ready')).toBe(true);
+       await post(2,restore);await expect.poll(async()=>(await messages(2)).some(x=>x.type==='mira:course-operation-restored'&&x.matches===false)).toBe(true);

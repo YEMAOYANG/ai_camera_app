@@ -1,0 +1,145 @@
+diff --git a/lib/mira/activity-checkpoint-bridge.ts b/lib/mira/activity-checkpoint-bridge.ts
+--- a/lib/mira/activity-checkpoint-bridge.ts
++++ b/lib/mira/activity-checkpoint-bridge.ts
+@@ -86,7 +86,7 @@
+ /** A private port, sandbox preserved. Restoring does not replay input or teacher cues. */
+ export const ACTIVITY_CHECKPOINT_SHIM = `<script data-mira-activity-checkpoint>
+ (function () {
+-  var port = null, hydrated = false, restoring = false, last = null, notice = null, sent = null, sequence = 0, fresh = false, active = false, resumedWorld = false, selectedIntro = false, narrationVisible = false;
++  var port = null, hydrated = false, restoring = false, last = null, notice = null, sent = null, sequence = 0, fresh = false, active = false, resumedWorld = false, selectedIntro = false, narrationVisible = false, selectedIntroTimer = null;
+   var documentId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+   function contract() {
+     var api = window.miraActivityCheckpoint;
+@@ -94,8 +94,20 @@
+   }
+   function send(data) { if (port) { try { port.postMessage(data); } catch (_) {} } }
+   function cancelSelectedIntro() {
++    if (selectedIntroTimer !== null) { clearTimeout(selectedIntroTimer); selectedIntroTimer = null; }
+     if (selectedIntro) send({type:'mira:checkpoint-intro-consumed'});
+     selectedIntro = false;
++  }
++  // A native message dispatch can run microtasks between its listeners. The
++  // prerecorded helper is registered later, so a microtask is still too early.
++  // One bounded task lets every visibility listener settle; execution rechecks
++  // the live intent/visibility/authority guards and never replays child input.
++  function scheduleSelectedIntro() {
++    if (!selectedIntro || selectedIntroTimer !== null) return;
++    selectedIntroTimer = setTimeout(function () {
++      selectedIntroTimer = null;
++      maybeBeginSelectedIntro();
++    }, 0);
+   }
+   function maybeBeginSelectedIntro() {
+     if (!selectedIntro || !hydrated || !active || !narrationVisible || document.hidden) return;
+@@ -147,7 +159,7 @@
+     if (event.source !== window.parent) return;
+     if (event.data?.type === 'mira:checkpoint-visibility') {
+       active = event.data.active === true;
+-      if (active) { queueMicrotask(capture); maybeBeginSelectedIntro(); }
++      if (active) { queueMicrotask(capture); scheduleSelectedIntro(); }
+       else cancelSelectedIntro();
+       return;
+     }
+@@ -165,11 +177,7 @@
+           fresh = false;
+           queueMicrotask(function () { var api = contract(); if (api && api.beginRequiresSelectedSceneIntent !== true && typeof api.begin === 'function') api.begin(); });
+         } else {
+-          // This bridge is injected before the prerecorded helper. Let that
+-          // helper observe visible=true before the authored intro calls it;
+-          // otherwise its hidden result cancels the queue and consumes intent.
+-          // Recheck all live guards in the microtask so pause/leave still win.
+-          queueMicrotask(maybeBeginSelectedIntro);
++          scheduleSelectedIntro();
+         }
+       }
+       return;
+@@ -189,7 +197,8 @@
+       }
+       if (data?.type === 'mira:checkpoint-selected-intro') {
+         selectedIntro = data.requested === true;
+-        maybeBeginSelectedIntro(); return;
++        if (selectedIntro) scheduleSelectedIntro(); else cancelSelectedIntro();
++        return;
+       }
+       if (data?.type !== 'mira:checkpoint-restore') return;
+       try {
+@@ -227,9 +236,9 @@
+     queueMicrotask(function () { queueMicrotask(function () { queueMicrotask(capture); }); });
+   });
+   window.addEventListener('mira-activity-state-changed', function () {
+-    queueMicrotask(function () { capture(); maybeBeginSelectedIntro(); });
+-  });
+-  window.addEventListener('mira-course-operation-ready', maybeBeginSelectedIntro);
++    queueMicrotask(capture); scheduleSelectedIntro();
++  });
++  window.addEventListener('mira-course-operation-ready', scheduleSelectedIntro);
+   window.addEventListener('pagehide', capture);
+   document.addEventListener('visibilitychange', function () { if (document.hidden) capture(); });
+   ['pointerdown','click','keydown','input','change'].forEach(function (type) {
+diff --git a/tests/runtime/mira-selected-intro-helper-order.test.ts b/tests/runtime/mira-selected-intro-helper-order.test.ts
+--- a/tests/runtime/mira-selected-intro-helper-order.test.ts
++++ b/tests/runtime/mira-selected-intro-helper-order.test.ts
+@@ -1,5 +1,5 @@
+ // @vitest-environment jsdom
+-import { afterEach, describe, expect, it, vi } from 'vitest';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+ import { ACTIVITY_CHECKPOINT_SHIM } from '@/lib/mira/activity-checkpoint-bridge';
+ 
+ // The reviewed production prerecorded helper state machine (only its clip map
+@@ -55,6 +55,16 @@
+   const port = {postMessage:(data: Record<string, unknown>) => replies.push(data), close() {},
+     onmessage: undefined as undefined | ((event: {data: Record<string, unknown>}) => void)};
+   const message=(data: Record<string, unknown>)=>win.dispatchEvent({type:'message',source:parent,data,stopImmediatePropagation(){}});
++  // Native dispatch enters each callback with an otherwise empty JS stack.
++  // Model its callback-cleanup microtask checkpoint, unlike dispatchEvent()
++  // called from JS (which keeps the outer script on the stack until it returns).
++  const nativeMessage=async(data: Record<string, unknown>)=>{
++    const event={type:'message',source:parent,data,stopImmediatePropagation(){}};
++    for(const handler of listeners.get('message') ?? []){
++      handler(event);
++      for(let i=0;i<5;i++)await Promise.resolve();
++    }
++  };
+   win.dispatchEvent({type:'message',source:parent,data:{type:'mira:activity-checkpoint-connect'},ports:[port],stopImmediatePropagation(){}});
+   port.onmessage!({data:{type:'mira:checkpoint-restore',state:saved,active:true}});
+   const request=(requested: boolean)=>port.onmessage!({data:{type:'mira:checkpoint-selected-intro',requested}});
+@@ -65,14 +75,36 @@
+     }};
+     win.dispatchEvent({type:'mira-course-operation-ready'});
+   };
+-  return {play,replies,audioEvents,message,request,installOpening,
++  return {play,replies,audioEvents,message,nativeMessage,request,installOpening,
+     hidden:()=>{hidden=true;}, openingCalls:()=>openingCalls,
+     feedback:()=>feedback.textContent, instructionsComplete:()=>instructionsComplete};
+ }
+-const settle = async () => {for(let i=0;i<5;i++)await Promise.resolve();};
+-afterEach(()=>{document.body.replaceChildren();delete document.documentElement.dataset.miraAudioState;vi.restoreAllMocks();});
++const settle = async () => {for(let i=0;i<5;i++)await Promise.resolve();await vi.runOnlyPendingTimersAsync();};
++beforeEach(()=>vi.useFakeTimers({toFake:['setTimeout','clearTimeout']}));
++afterEach(()=>{document.body.replaceChildren();delete document.documentElement.dataset.miraAudioState;vi.restoreAllMocks();vi.useRealTimers();});
+ 
+ describe('selected intro and prerecorded helper listener order',()=>{
++  it('waits a full task when native message callback cleanup runs microtasks between listeners',async()=>{
++    const f=fixture();f.request(true);f.installOpening();
++    await f.nativeMessage({type:'MIRA_NARRATION_VISIBILITY',visible:true});
++    expect(f.openingCalls()).toBe(0);
++    await settle();
++    expect(f.play).toHaveBeenCalledTimes(1);
++    expect(f.audioEvents).not.toContain('hidden');
++    expect(f.feedback()).toBe('两边工具架要一样多。');
++    expect(document.documentElement.dataset.miraAudioState).toBe('playing');
++    expect(f.instructionsComplete()).toBe(false);
++  });
++
++  it.each(['pause','leave','cancel-intent'] as const)('cancels the task after native visibility before %s',async(mode)=>{
++    const f=fixture();f.request(true);f.installOpening();
++    await f.nativeMessage({type:'MIRA_NARRATION_VISIBILITY',visible:true});
++    if(mode==='pause')await f.nativeMessage({type:'MIRA_NARRATION_VISIBILITY',visible:false});
++    if(mode==='leave')await f.nativeMessage({type:'mira:checkpoint-visibility',active:false});
++    if(mode==='cancel-intent')f.request(false);
++    await settle();expect(f.play).not.toHaveBeenCalled();expect(f.openingCalls()).toBe(0);
++  });
++
+   it('waits for the later helper visibility listener before the authored opening calls miraNarrate',async()=>{
+     const f=fixture(); f.request(true); f.installOpening();
+     expect(f.openingCalls()).toBe(0);

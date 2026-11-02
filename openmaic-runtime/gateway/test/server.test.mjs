@@ -83,6 +83,31 @@ test('activity continuity metadata uses only the authenticated immutable source 
   }
 });
 
+test('course operation metadata is derived only from the exact authenticated scene contract', () => {
+  const {scene, runtime} = narrationFixture();
+  const sourceSha = createHash('sha256').update(scene.content.html).digest('hex');
+  runtime.releaseSha256 = 'c'.repeat(64);
+  runtime.activityPersistence = [{sceneId:scene.id,sceneIndex:2,contentSha256:sourceSha}];
+  runtime.courseInteraction = {schemaVersion:'mira.textbook.interaction-operation.v1',
+    contractSha256:'d'.repeat(64), scenes:[{sceneId:scene.id,sceneIndex:2,contentSha256:sourceSha}]};
+  scene.miraCourseInteraction = {contractSha256:'forged'};
+  bindTextbookActivityPersistence(scene,runtime);
+  assert.deepEqual(scene.miraCourseInteraction, {schemaVersion:'mira.textbook.interaction-operation.v1',
+    contractSha256:'d'.repeat(64),contentSha256:sourceSha});
+  for (const change of [
+    (s,r)=>{r.courseInteraction.contractSha256='bad';},
+    (s,r)=>{r.courseInteraction.scenes[0].contentSha256='e'.repeat(64);},
+    (s,r)=>{r.courseInteraction.scenes[0].sceneIndex=3;},
+    (s,r)=>{r.courseInteraction.scenes.push({...r.courseInteraction.scenes[0]});},
+    s=>{s.content.html += '<!-- changed after freeze -->';},
+    (s,r)=>{r.purpose='learning';},
+  ]) {
+    const s=structuredClone(scene),r=structuredClone(runtime);
+    change(s,r);bindTextbookActivityPersistence(s,r);
+    assert.equal(Object.hasOwn(s,'miraCourseInteraction'),false);
+  }
+});
+
 test('gateway clears authored claims and rejects invalid cue, action and media bindings', () => {
   const cases = {
     ordinary: (s,r) => { r.purpose='learning'; },
@@ -345,6 +370,29 @@ test('activity snapshots retain cookie authority and their dedicated body limit 
   assert.equal((await fetch(gateway+'/mira/activity-state',{method:'POST',headers:{...headers,'content-type':'text/plain'},body:'{}'})).status,415);
   assert.equal(writes,2);
   assert.equal(upstreamReads,0);
+});
+
+test('fixed textbook forwards bounded stroke events unchanged under its authenticated identity', async () => {
+  const classroomId='tbpub_'+'f'.repeat(24); let submitted;
+  const backend=await listen(http.createServer(async(request,response)=>{
+    if(request.url.endsWith('/exchange'))return reply(response,{ok:true,runtimeToken:'tbpr_strokes',classroomId,expiresAt:Date.now()+60000});
+    if(request.url.endsWith('/validate'))return reply(response,{ok:true,purpose:'fixed_textbook',classroomId,
+      runtimeSessionId:'bound-session',learningSessionId:'bound-session',expiresAt:Date.now()+60000,media:[]});
+    if(request.url.endsWith('/events')){submitted=await jsonBody(request);return reply(response,{ok:true});}
+    response.writeHead(404).end();
+  }));
+  const upstream=await listen(http.createServer((_request,response)=>response.writeHead(500).end()));
+  const gateway=await listenGateway({backend,upstream});
+  const launch=await fetch(gateway+'/mira/textbook-launch?ticket=tbpt_strokes',{redirect:'manual'});
+  const headers={cookie:launch.headers.getSetCookie().map(item=>item.split(';')[0]).join('; '),
+    referer:`http://runtime.test/classroom/${classroomId}?mira=1&textbook=1`,'content-type':'application/json'};
+  const event={schemaVersion:'mira.openmaic.student-runtime-event.v1',sequence:1,type:'interaction_operation',
+    payload:{sceneId:'scene-p10',sceneIndex:9,contractSha256:'a'.repeat(64),operationId:'op-1',
+      operation:{name:'stroke',character:'ren',points:Array.from({length:256},()=>({x:0.123456789123,y:0.987654321987}))}}};
+  assert.ok(Buffer.byteLength(JSON.stringify(event))>8192);
+  assert.equal((await fetch(gateway+'/mira/runtime-events',{method:'POST',headers,body:JSON.stringify(event)})).status,200);
+  assert.deepEqual(submitted,event);
+  assert.equal((await fetch(gateway+'/mira/runtime-events',{method:'POST',headers,body:JSON.stringify({...event,passed:true})})).status,400);
 });
 
 test('formal activity manifests bind original HTML and reject altered or ambiguous scene authority', () => {
@@ -2393,6 +2441,18 @@ test("student interaction events bind exact fields and cannot claim grades or ar
     {controlSelector:"body *"}, {value:"x".repeat(501)}, {feedbackText:""}, {passed:true},
     {action:"click", value:"12"}]) assert.throws(() => prepareRuntimeEvent(encode({...payload,...change}), runtime));
   assert.equal(prepareRuntimeEvent(encode({...payload, objectiveIndex:29}), runtime).payload.objectiveIndex, 29);
+});
+
+test("course operation events require bounded action, immutable contract and operation identity", () => {
+  const runtime = { runtimeSessionId: "runtime-1", learningSessionId: "learning-1", classroomId: "classroom-1" };
+  const payload = { sceneIndex: 1, sceneId: "scene-p2", contractSha256: "a".repeat(64),
+    operationId: "op-1", operation: { name: "place", slot: 0 } };
+  const encode = value => Buffer.from(JSON.stringify({ schemaVersion: "mira.openmaic.student-runtime-event.v1",
+    sequence: 2, type: "interaction_operation", payload: value }));
+  assert.deepEqual(prepareRuntimeEvent(encode(payload), runtime).payload, payload);
+  for (const change of [{ contractSha256: "z".repeat(64) }, { operationId: "" },
+    { operation: [] }, { operation: { name: "submit", text: "x".repeat(16385) } },
+    { completed: true }]) assert.throws(() => prepareRuntimeEvent(encode({...payload, ...change}), runtime));
 });
 
 test("new paid classrooms receive only backend-authorized budget headers and canonical teaching requests", async () => {

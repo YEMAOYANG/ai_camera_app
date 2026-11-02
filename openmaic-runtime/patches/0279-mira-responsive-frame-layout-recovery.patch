@@ -1,0 +1,63 @@
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -6,6 +6,8 @@
+ import { mapEmbeddedActivityDocument, patchActivityCheckpointAdapters } from '@/lib/mira/activity-checkpoint-adapters';
+ import { injectIntoDocumentHead } from './html-document';
+ import { INTERACTIVE_AUDIO_CONTROL_SHIM } from '@/lib/mira/interactive-audio-controls';
++import { activityViewportMode } from '@/lib/interactive/activity-viewport';
++import { RESPONSIVE_FRAME_LAYOUT_SHIM } from '@/lib/interactive/responsive-frame-layout';
+ 
+ /**
+  * In-memory localStorage/sessionStorage shim, injected as the FIRST thing in the
+@@ -341,7 +343,8 @@
+   body { min-height: 100vh; }
+ </style>`;
+ 
+-  const injection =
++  const layoutRecovery = activityViewportMode(adaptedHtml) === 'responsive' ? RESPONSIVE_FRAME_LAYOUT_SHIM : '';
++  const injection = layoutRecovery +
+     '\n' + ACTIVITY_INTENT_SHIM + '\n' + INTERACTIVE_AUDIO_CONTROL_SHIM + '\n' + STUDENT_INTERACTION_OBSERVER + '\n' + (checkpointSupported ? checkpointMarker + ACTIVITY_CHECKPOINT_SHIM + COURSE_OPERATION_SHIM + COURSE_OPERATION_ADAPTERS + MATH_COURSE_OPERATION_ADAPTERS + ENGLISH_CLASSROOM_OPERATION_ADAPTER + SPLIT_ADD_COURSE_OPERATION_ADAPTER + SCIENCE_SENSORY_OPERATION_ADAPTER + SCIENCE_FRUIT_OPERATION_ADAPTER + MATH_SUBTRACT_ZERO_COURSE_OPERATION_ADAPTER : '') + '\n' + ERROR_CAPTURE_SHIM + '\n' + ELEMENT_PICKER_SHIM + '\n' + STORAGE_SHIM + '\n' + iframeCss + '\n' + activityControlsCss;
+ 
+   return injectIntoDocumentHead(adaptedHtml, injection);
+--- /dev/null
++++ b/lib/interactive/responsive-frame-layout.ts
+@@ -0,0 +1,39 @@
++/** A pooled frame can parse while its measured viewport is still 0 x 0.
++ * Notify authored resize handlers when real dimensions arrive. This changes
++ * layout only: it neither reloads the document nor starts activity/audio work. */
++export const RESPONSIVE_FRAME_LAYOUT_SHIM = `<script data-mira-responsive-frame-layout>
++(function () {
++  var queued = false, width = 0, height = 0;
++  function measure() {
++    queued = false;
++    var root = document.documentElement;
++    var nextWidth = root && root.clientWidth, nextHeight = root && root.clientHeight;
++    if (!(nextWidth > 0 && nextHeight > 0)) { width = height = 0; return; }
++    if (nextWidth === width && nextHeight === height) return;
++    width = nextWidth; height = nextHeight;
++    window.dispatchEvent(new Event('resize'));
++  }
++  function schedule() {
++    if (!queued) { queued = true; requestAnimationFrame(measure); }
++  }
++  function start() {
++    if (typeof ResizeObserver === 'function') {
++      var observer = new ResizeObserver(schedule);
++      observer.observe(document.documentElement);
++    }
++    schedule();
++  }
++  window.addEventListener('resize', schedule);
++  window.addEventListener('message', function (event) {
++    var value = event.data;
++    if (event.source !== window.parent || !value || typeof value !== 'object') return;
++    var visible = value.type === 'mira:checkpoint-visibility' ? value.active
++      : value.type === 'MIRA_NARRATION_VISIBILITY' ? value.visible : undefined;
++    if (typeof visible !== 'boolean') return;
++    width = height = 0;
++    if (visible) schedule();
++  });
++  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
++  else start();
++})();
++</script>`;

@@ -1,0 +1,280 @@
+--- a/components/classroom/ClassroomSurface.tsx
++++ b/components/classroom/ClassroomSurface.tsx
+@@ -30,7 +30,7 @@
+ import { useSettingsStore } from '@/lib/store/settings';
+ import { claimStageSceneLoadToken, isCurrentStageSceneLoadToken } from '@/lib/store/stage';
+ import { loadImageMapping } from '@/lib/utils/image-storage';
+-import { useEffect, useRef, useState, useCallback } from 'react';
++import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
+ import { useSceneGenerator } from '@/lib/hooks/use-scene-generator';
+ import { useMediaGenerationStore } from '@/lib/store/media-generation';
+ import { useWhiteboardHistoryStore } from '@/lib/store/whiteboard-history';
+@@ -54,7 +54,9 @@
+ import {
+   useMiraStudentRuntime,
+   useMiraStudentRuntimeEvents,
++  useMiraStudentParentOrigins,
+ } from '@/lib/contexts/mira-student-runtime-context';
++import { connectStudentParentReady, hasVisibleStudentClassroom, type StudentParentReadyChannel } from '@/lib/mira/student-parent-ready';
+ import { studentResumeSceneId } from '@/lib/mira/student-resume-scene';
+ import {
+   applyHydratedClassroomFallbackScenes,
+@@ -78,7 +80,11 @@
+   const { loadFromStorage } = useStageStore();
+   const studentMode = useMiraStudentRuntime();
+   const runtimeEvents = useMiraStudentRuntimeEvents();
++  const parentOrigins = useMiraStudentParentOrigins();
+   const loadedClassroomId = useStageStore((s) => s.stage?.id ?? null);
++  const currentScene = useStageStore((s) => s.getCurrentScene());
++  const surfaceRef = useRef<HTMLDivElement>(null);
++  const readyChannelRef = useRef<StudentParentReadyChannel | null>(null);
+   const { t } = useI18n();
+   // The retry loop below reads the message after async gaps, so it must see
+   // the CURRENT translation (a locale switch may have happened since mount).
+@@ -99,6 +105,28 @@
+    * deleted or never existed.
+    */
+   const [notFound, setNotFound] = useState(false);
++
++  // Install before classroom loading completes so an early parent ping can be
++  // answered after the matching playback scene is actually mounted. The
++  // parent retries pings that arrive before this listener itself exists.
++  useLayoutEffect(() => {
++    if (!studentMode || variant !== 'page') return;
++    const channel = connectStudentParentReady(window, parentOrigins, () => {
++      const state = useStageStore.getState();
++      const scene = state.getCurrentScene();
++      return state.stage?.id === classroomId && !!scene && scene.stageId === classroomId
++        && scene.content.type === scene.type
++        && hasVisibleStudentClassroom(surfaceRef.current, scene.id);
++    });
++    readyChannelRef.current = channel;
++    return () => {
++      if (readyChannelRef.current === channel) readyChannelRef.current = null;
++      channel.dispose();
++    };
++  }, [classroomId, parentOrigins, studentMode, variant]);
++  useLayoutEffect(() => {
++    readyChannelRef.current?.flush();
++  }, [classroomId, currentScene, error, loadedClassroomId, loading, notFound]);
+ 
+   const generationStartedRef = useRef(false);
+ 
+@@ -368,6 +396,7 @@
+     <ThemeProvider>
+       <MediaStageProvider value={classroomId}>
+         <div
++          ref={surfaceRef}
+           data-mira-classroom-surface={studentMode ? 'storybook' : undefined}
+           className={
+             variant === 'pane'
+--- a/components/canvas/canvas-area.tsx
++++ b/components/canvas/canvas-area.tsx
+@@ -122,7 +122,8 @@
+           onClick={handleSlideClick}
+         >
+           {/* Whiteboard Layer */}
+-          <div className="absolute inset-0 z-[110] pointer-events-none">
++          <div className="absolute inset-0 z-[110] pointer-events-none"
++            data-mira-whiteboard-scene={whiteboardOpen ? currentScene?.id : undefined}>
+             <SceneProvider>
+               <Whiteboard isOpen={whiteboardOpen} onClose={onWhiteboardClose} />
+             </SceneProvider>
+@@ -130,7 +131,7 @@
+ 
+           {/* Scene Content */}
+           {currentScene && !whiteboardOpen && (
+-            <div className="absolute inset-0">
++            <div className="absolute inset-0" data-mira-scene-content={currentScene.id}>
+               <SceneProvider>
+                 <SceneRenderer scene={currentScene} mode={mode} />
+               </SceneProvider>
+--- /dev/null
++++ b/lib/mira/student-parent-ready.ts
+@@ -0,0 +1,89 @@
++/** A ready message is a presentation handshake, not a learning receipt. */
++const READY_PING = 'mira.textbook.ready-ping';
++const READY = 'mira.textbook.ready';
++
++export interface StudentParentReadyChannel {
++  /** Recheck a previously validated ping after the classroom commits. */
++  flush(): void;
++  dispose(): void;
++}
++
++/**
++ * Only the configured immediate parent can ask whether this document has
++ * mounted its classroom.  Never post to '*', and never include a ticket,
++ * course identity, or learning state in the reply.
++ */
++export function connectStudentParentReady(
++  self: Window,
++  origins: readonly string[],
++  canAnnounce: () => boolean,
++): StudentParentReadyChannel {
++  const parent = self.parent;
++  let active = true;
++  let pendingOrigin: string | null = null;
++  let retry: number | null = null;
++  let retryCount = 0;
++
++  const flush = () => {
++    if (!active || !pendingOrigin || parent === self) return;
++    let ready = false;
++    try { ready = canAnnounce(); } catch { /* Remain silent until ready can be verified. */ }
++    if (!ready) {
++      // A scene can mount at opacity zero or before its viewport is sized;
++      // a bounded retry also handles a ping received during the load screen.
++      if (retry === null && retryCount < 100) {
++        retryCount += 1;
++        retry = self.setTimeout(() => { retry = null; flush(); }, 100);
++      }
++      return;
++    }
++    const origin = pendingOrigin;
++    pendingOrigin = null;
++    if (retry !== null) self.clearTimeout(retry);
++    retry = null;
++    parent.postMessage({ type: READY }, origin);
++  };
++  const receive = (event: MessageEvent) => {
++    if (!active || parent === self || event.source !== parent || !origins.includes(event.origin)
++        || event.isTrusted !== true || !event.data || typeof event.data !== 'object'
++        || Array.isArray(event.data) || Object.keys(event.data).length !== 1
++        || event.data.type !== READY_PING) return;
++    pendingOrigin = event.origin;
++    retryCount = 0;
++    flush();
++  };
++  self.addEventListener('message', receive);
++  return {
++    flush,
++    dispose() {
++      active = false;
++      pendingOrigin = null;
++      if (retry !== null) self.clearTimeout(retry);
++      retry = null;
++      self.removeEventListener('message', receive);
++    },
++  };
++}
++
++/** The current scene or its open whiteboard must have a laid-out playback canvas. */
++export function hasVisibleStudentClassroom(root: HTMLElement | null, sceneId: string): boolean {
++  if (!root?.isConnected || !sceneId) return false;
++  const shell = root.querySelector<HTMLElement>('[data-mira-playback-shell="storybook"]');
++  const scene = shell?.querySelector<HTMLElement>('[data-mira-scene-content], [data-mira-whiteboard-scene]');
++  if (!scene || (scene.getAttribute('data-mira-scene-content') ?? scene.getAttribute('data-mira-whiteboard-scene')) !== sceneId
++      || !scene.isConnected) return false;
++  const view = root.ownerDocument.defaultView;
++  if (!view) return false;
++  const box = scene.getBoundingClientRect();
++  if (!(box.width > 0 && box.height > 0)) return false;
++  // Motion may initially mount its shell at zero opacity. Do not advertise a
++  // classroom that is still hidden by its own layout or transition.
++  let withinRoot = false;
++  for (let node: HTMLElement | null = scene; node; node = node.parentElement) {
++    const style = view.getComputedStyle(node);
++    if (style.display === 'none' || style.visibility === 'hidden' || style.visibility === 'collapse'
++        || Number(style.opacity) === 0) return false;
++    if (node === root) withinRoot = true;
++  }
++  return withinRoot;
++}
+--- /dev/null
++++ b/tests/runtime/student-parent-ready.test.ts
+@@ -0,0 +1,94 @@
++// @vitest-environment jsdom
++import { describe, expect, it, vi } from 'vitest';
++import { connectStudentParentReady, hasVisibleStudentClassroom } from '../../lib/mira/student-parent-ready';
++
++function fixture() {
++  let receiver: ((event: MessageEvent) => void) | undefined;
++  let ready = false;
++  const parent = { postMessage: vi.fn() };
++  const listeners = {
++    parent,
++    addEventListener: (_type: string, fn: (event: MessageEvent) => void) => { receiver = fn; },
++    removeEventListener: (_type: string, fn: (event: MessageEvent) => void) => { if (receiver === fn) receiver = undefined; },
++    setTimeout: globalThis.setTimeout,
++    clearTimeout: globalThis.clearTimeout,
++  };
++  const channel = connectStudentParentReady(listeners as unknown as Window, ['https://student.example'], () => ready);
++  const ping = (changes: Partial<MessageEvent> = {}) => receiver?.({
++    isTrusted: true, source: parent, origin: 'https://student.example',
++    data: {type: 'mira.textbook.ready-ping'}, ...changes,
++  } as unknown as MessageEvent);
++  return { channel, ping, parent, setReady: (value: boolean) => { ready = value; } };
++}
++
++describe('student parent readiness channel', () => {
++  it('accepts only a trusted exact ping from the configured immediate parent', () => {
++    const f = fixture(); f.setReady(true);
++    for (const changes of [
++      {origin: 'null'}, {origin: 'https://student.example.evil.test'}, {origin: 'http://student.example'},
++      {source: {} as Window}, {isTrusted: false}, {data: null},
++      {data: {type: 'mira.textbook.ready-ping', ticket: 'extra'}}, {data: {type: 'mira.textbook.pause'}},
++    ]) f.ping(changes);
++    expect(f.parent.postMessage).not.toHaveBeenCalled();
++    f.ping();
++    expect(f.parent.postMessage).toHaveBeenCalledExactlyOnceWith({type: 'mira.textbook.ready'}, 'https://student.example');
++    f.channel.dispose();
++    f.ping();
++    expect(f.parent.postMessage).toHaveBeenCalledTimes(1);
++  });
++
++  it('holds an early ping until the scene is ready, then cleans up on course change', () => {
++    vi.useFakeTimers();
++    try {
++      const f = fixture(); f.ping();
++      expect(f.parent.postMessage).not.toHaveBeenCalled();
++      vi.advanceTimersByTime(300);
++      expect(f.parent.postMessage).not.toHaveBeenCalled();
++      f.setReady(true); vi.advanceTimersByTime(100);
++      expect(f.parent.postMessage).toHaveBeenCalledExactlyOnceWith({type: 'mira.textbook.ready'}, 'https://student.example');
++      const other = fixture(); other.ping(); other.channel.dispose(); other.setReady(true);
++      vi.advanceTimersByTime(1000);
++      expect(other.parent.postMessage).not.toHaveBeenCalled();
++      f.channel.dispose();
++    } finally { vi.useRealTimers(); }
++  });
++
++  it('does not answer loading/error content, detached or invisible scenes, or another scene', () => {
++    const scene = document.createElement('div');
++    const shell = document.createElement('div');
++    const root = document.createElement('div');
++    root.appendChild(shell); shell.appendChild(scene); document.body.appendChild(root);
++    shell.setAttribute('data-mira-playback-shell', 'storybook');
++    scene.setAttribute('data-mira-scene-content', 'scene-p1');
++    vi.spyOn(scene, 'getBoundingClientRect').mockReturnValue({width: 800,height: 450} as DOMRect);
++    const styles = vi.spyOn(window, 'getComputedStyle').mockReturnValue({display:'block',visibility:'visible',opacity:'1'} as CSSStyleDeclaration);
++    try {
++      expect(hasVisibleStudentClassroom(root, 'scene-p1')).toBe(true);
++      expect(hasVisibleStudentClassroom(root, 'scene-p2')).toBe(false);
++      styles.mockReturnValue({display:'block',visibility:'hidden',opacity:'1'} as CSSStyleDeclaration);
++      expect(hasVisibleStudentClassroom(root, 'scene-p1')).toBe(false);
++      styles.mockImplementation(node => ({display:'block',visibility:'visible',opacity:node===document.body?'0':'1'}) as CSSStyleDeclaration);
++      expect(hasVisibleStudentClassroom(root, 'scene-p1')).toBe(false); // A hidden ancestor above the classroom also counts.
++      scene.remove(); // Loading, error, or not-found surfaces have no scene marker.
++      expect(hasVisibleStudentClassroom(root, 'scene-p1')).toBe(false);
++      root.remove();
++      expect(hasVisibleStudentClassroom(root, 'scene-p1')).toBe(false);
++    } finally { styles.mockRestore(); root.remove(); }
++  });
++
++  it('accepts the visible whiteboard for the current scene without accepting a previous scene', () => {
++    const root = document.createElement('div'); const shell = document.createElement('div');
++    const whiteboard = document.createElement('div'); document.body.appendChild(root);
++    root.appendChild(shell); shell.appendChild(whiteboard);
++    shell.setAttribute('data-mira-playback-shell', 'storybook');
++    whiteboard.setAttribute('data-mira-whiteboard-scene', 'scene-p1');
++    vi.spyOn(whiteboard, 'getBoundingClientRect').mockReturnValue({width: 800,height: 450} as DOMRect);
++    const styles = vi.spyOn(window, 'getComputedStyle').mockReturnValue({display:'block',visibility:'visible',opacity:'1'} as CSSStyleDeclaration);
++    try {
++      expect(hasVisibleStudentClassroom(root, 'scene-p1')).toBe(true);
++      expect(hasVisibleStudentClassroom(root, 'scene-p2')).toBe(false);
++      whiteboard.removeAttribute('data-mira-whiteboard-scene');
++      expect(hasVisibleStudentClassroom(root, 'scene-p1')).toBe(false);
++    } finally { styles.mockRestore(); root.remove(); }
++  });
++});

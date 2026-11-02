@@ -1,0 +1,27 @@
+diff --git a/lib/utils/iframe.ts b/lib/utils/iframe.ts
+--- a/lib/utils/iframe.ts
++++ b/lib/utils/iframe.ts
+@@ -16,7 +16,10 @@ import { RESPONSIVE_FRAME_LAYOUT_SHIM } from '@/lib/interactive/responsive-frame
+ const SCIENCE_FRUIT_RESTORE_COMPATIBLE_ADAPTER = SCIENCE_FRUIT_OPERATION_ADAPTER.replace(
+   'stable(work)===stable(server.lastWork)',
+   "stable(Object.fromEntries(Object.entries(work).filter(([key])=>key!=='response')))===stable(Object.fromEntries(Object.entries(server.lastWork).filter(([key])=>key!=='response')))",
+-);
++).replace(
++  'started:x.started,decision,domain',
++  'started:page===6?s.started:x.started,decision,domain',
++);
+ 
+ /**
+  * In-memory localStorage/sessionStorage shim, injected as the FIRST thing in the
+diff --git a/tests/lib/utils/iframe.test.ts b/tests/lib/utils/iframe.test.ts
+--- a/tests/lib/utils/iframe.test.ts
++++ b/tests/lib/utils/iframe.test.ts
+@@ -17,6 +17,8 @@ describe('patchHtmlForIframe', () => {
+     expect(out).toContain("Object.entries(work).filter(([key])=>key!=='response')");
+     expect(out).toContain("Object.entries(server.lastWork).filter(([key])=>key!=='response')");
+     expect(out).not.toContain('stable(work)===stable(server.lastWork)');
++    expect(out).toContain('started:page===6?s.started:x.started,decision,domain');
++    expect(out).not.toContain('JSON.stringify({started:x.started,decision,domain');
+   });
+ 
+   it('runs the storage shim before the page scripts', () => {

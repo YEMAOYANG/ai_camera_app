@@ -1,0 +1,67 @@
+--- a/lib/mira/activity-checkpoint-bridge.ts
++++ b/lib/mira/activity-checkpoint-bridge.ts
+@@ -97,7 +97,11 @@
+     if (!port || !hydrated || restoring || !active) return;
+     var api = contract(); if (!api) return;
+     try {
+-      var state = api.capture(), json = JSON.stringify(state);
++      var state = api.capture();
++      // An authored animation/audio transition may not have a stable snapshot.
++      // Keep the last valid state; the settled narration event/interval retries.
++      if (state === null) return;
++      var json = JSON.stringify(state);
+       if (!json || json.length > ${ACTIVITY_CHECKPOINT_MAX_BYTES} || json === last || (sent && sent.json === json)) return;
+       sent = {id:++sequence,json:json};
+       send({type:'mira:checkpoint-state', snapshotId:sent.id, state:JSON.parse(json)});
+--- /dev/null
++++ b/tests/runtime/activity-checkpoint-transient.test.ts
+@@ -0,0 +1,49 @@
++import { describe, expect, it } from 'vitest';
++import { runInNewContext } from 'node:vm';
++import { ACTIVITY_CHECKPOINT_SHIM } from '@/lib/mira/activity-checkpoint-bridge';
++
++function fixture() {
++  const handlers: Record<string, ((event: any) => void)[]> = {};
++  const sent: any[] = [];
++  let state: unknown = { position: 0 };
++  let fails = false;
++  let tick = () => {};
++  const parent = {};
++  const port = { postMessage: (data: unknown) => sent.push(data), close() {}, onmessage: null as any };
++  const window = {
++    parent,
++    addEventListener: (name: string, fn: (event: any) => void) => (handlers[name] ??= []).push(fn),
++    miraActivityCheckpoint: { version: 1, capture() { if (fails) throw Error('broken'); return state; }, restore: () => true },
++  };
++  const document = { readyState: 'complete', body: { appendChild() {} }, addEventListener() {},
++    createElement: () => ({ setAttribute() {}, style: {} }) };
++  runInNewContext(ACTIVITY_CHECKPOINT_SHIM.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, ''), {
++    window, document, queueMicrotask: (fn: () => void) => fn(), setInterval: (fn: () => void) => { tick = fn; },
++  });
++  handlers.message.forEach(fn => fn({ source: parent, data: { type: 'mira:activity-checkpoint-connect' }, ports: [port], stopImmediatePropagation() {} }));
++  port.onmessage({ data: { type: 'mira:checkpoint-restore', state: null, active: true } });
++  sent.length = 0;
++  return { sent, tick: () => tick(), state: (value: unknown) => { state = value; }, fail: () => { fails = true; },
++    acknowledge: () => port.onmessage({ data: { type: 'mira:checkpoint-captured', snapshotId: sent.at(-1).snapshotId, accepted: true } }) };
++}
++
++describe('transient authored checkpoint capture', () => {
++  it('retains the last valid state while busy, then captures the settled world once', () => {
++    const f = fixture();
++    f.state(null); f.tick(); f.tick();
++    expect(f.sent).toEqual([]);
++    f.state({ position: 1 }); f.tick();
++    expect(f.sent).toEqual([{ type: 'mira:checkpoint-state', snapshotId: 1, state: { position: 1 } }]);
++    f.acknowledge();
++    f.state(null); f.tick();
++    f.state({ position: 1 }); f.tick();
++    expect(f.sent).toHaveLength(1);
++    f.state({ position: 2 }); f.tick();
++    expect(f.sent.at(-1).state).toEqual({ position: 2 });
++  });
++
++  it('still rejects actual capture failures', () => {
++    const f = fixture(); f.fail(); f.tick();
++    expect(f.sent).toEqual([{ type: 'mira:checkpoint-rejected' }]);
++  });
++});
