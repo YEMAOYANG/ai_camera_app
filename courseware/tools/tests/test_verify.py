@@ -111,6 +111,7 @@ class VerifyTests(unittest.TestCase):
             if len(calls) == 1:
                 raise subprocess.CalledProcessError(1, command)
             Path(command[command.index('-o') + 1]).write_text('{"verdicts": []}')
+            return subprocess.CompletedProcess(command, 0, stderr='')
         run.side_effect = fake
         with patch.dict('os.environ', {'MIRA_CODEX_BIN': '/fake/codex'}):
             self.assertEqual(verify.default_runner('prompt', verify._schema('speech'), 'model', 'low'),
@@ -118,10 +119,21 @@ class VerifyTests(unittest.TestCase):
         command, kwargs = calls[-1]
         self.assertEqual(command[:8], ['/fake/codex', 'exec', '-m', 'model', '-c',
                                       'model_reasoning_effort=low', '-s', 'read-only'])
+        self.assertEqual(command[8:10], ['--skip-git-repo-check', '--ephemeral'])
         self.assertEqual(command[-1], '-')
         self.assertEqual(kwargs['input'], 'prompt')
         self.assertEqual(len(calls), 2)
         self.assertFalse(Path(kwargs['cwd']).exists())
+
+    @patch('courseware.tools.verify.subprocess.run')
+    def test_default_runner_surfaces_stderr(self, run):
+        stderr = 'x' * 301 + ' diagnostic cause'
+        run.side_effect = subprocess.CalledProcessError(1, ['codex'], stderr=stderr)
+        with self.assertRaises(RuntimeError) as caught:
+            verify.default_runner('prompt', verify._schema('speech'), 'model', 'low')
+        self.assertIn(stderr[-300:], str(caught.exception))
+        self.assertNotIn(stderr, str(caught.exception))
+        self.assertEqual(run.call_count, 2)
 
 
 if __name__ == '__main__':

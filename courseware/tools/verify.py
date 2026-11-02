@@ -117,15 +117,19 @@ def default_runner(prompt, schema, model, effort):
         output_path = Path(directory) / 'output.json'
         schema_path.write_text(json.dumps(schema), encoding='utf-8')
         command = [binary, 'exec', '-m', model, '-c', 'model_reasoning_effort=' + effort,
-                   '-s', 'read-only', '--output-schema', str(schema_path), '-o', str(output_path), '-']
+                   '-s', 'read-only', '--skip-git-repo-check', '--ephemeral', '--output-schema', str(schema_path), '-o', str(output_path), '-']
         for attempt in range(2):
+            stderr = ''
             try:
                 output_path.unlink(missing_ok=True)
-                subprocess.run(command, input=prompt, text=True, cwd=directory, check=True, capture_output=True)
+                result = subprocess.run(command, input=prompt, text=True, cwd=directory, check=True, capture_output=True)
+                stderr = result.stderr or ''
                 return json.loads(output_path.read_text(encoding='utf-8'))
             except (OSError, subprocess.SubprocessError, ValueError) as exc:
                 if attempt == 1:
-                    raise RuntimeError('Codex verification failed after two attempts: ' + str(exc)) from exc
+                    stderr = getattr(exc, 'stderr', None) or stderr
+                    detail = ': ' + stderr[-300:] if stderr else ''
+                    raise RuntimeError('Codex verification failed after two attempts: ' + str(exc) + detail) from exc
 
 
 def run_requests(requests, runner=default_runner, *, model=VERIFIER_MODEL, effort=VERIFIER_EFFORT):
