@@ -4,7 +4,7 @@ import unittest
 
 from PIL import Image
 
-from courseware.tools.glyph_picture import _layout_cells, png_name, render_picture
+from courseware.tools.glyph_picture import _is_emoji, _layout_cells, png_name, render_picture
 
 
 class GlyphPictureTests(unittest.TestCase):
@@ -28,6 +28,12 @@ class GlyphPictureTests(unittest.TestCase):
             self.assertEqual(len(signs), 1)
             self.assertTrue(all(0 <= x < width and 0 <= y < height for x, y, _ in layout))
         render_picture(spec)
+
+    def test_symbol_emoji_use_the_emoji_font(self):
+        for glyph in ('🦆', '⚽', '⚪', '🔴'):
+            self.assertTrue(_is_emoji(glyph), glyph)
+        for glyph in ('3', '＝', '−', '？', '＋'):
+            self.assertFalse(_is_emoji(glyph), glyph)
 
     def test_marks_change_image(self):
         def picture(**marks):

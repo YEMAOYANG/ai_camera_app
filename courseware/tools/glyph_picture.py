@@ -3,6 +3,7 @@
 import hashlib
 import io
 import math
+import unicodedata
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -10,6 +11,11 @@ from PIL import Image, ImageDraw, ImageFont
 _SIZE = (480, 240)
 _EMOJI_FONT = '/System/Library/Fonts/Apple Color Emoji.ttc'
 _TEXT_FONT = '/System/Library/Fonts/Supplemental/Arial Unicode.ttf'
+
+
+def _is_emoji(glyph):
+    # Emoji below U+1F000 (the ball, the white circle) are symbols; the text font draws them as empty boxes.
+    return any(ord(c) >= 0x1F000 or unicodedata.category(c) == 'So' for c in glyph)
 
 
 def _layout_cells(spec):
@@ -45,7 +51,7 @@ def render_picture(spec):
     text_font = ImageFont.truetype(_TEXT_FONT, 140)
     for x, y, cell in cells:
         glyph = cell['glyph']
-        emoji = any(ord(c) >= 0x1F000 for c in glyph)
+        emoji = _is_emoji(glyph)
         font = emoji_font if emoji else text_font
         box = draw.textbbox((0, 0), glyph, font=font, embedded_color=emoji)
         draw.text((x * unit + (unit - box[2] - box[0]) / 2,
