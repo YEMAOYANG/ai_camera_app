@@ -119,11 +119,14 @@ class VerifyTests(unittest.TestCase):
             for name in ('question.png', 'option.png'):
                 (media / name).write_bytes(b'image')
             requests = verify.build_requests(body, self.notes, media=media)
-            solve = requests[1]
+            solve, analysis = requests[1:]
             self.assertEqual(solve['items'][0]['pictures'], [
                 {'for': 'question', 'attachment': 1}, {'for': 'option A', 'count': 3},
                 {'for': 'option B', 'attachment': 2}])
             self.assertEqual(solve['images'], [str((media / 'question.png').resolve()), str((media / 'option.png').resolve())])
+            self.assertEqual(analysis['items'][0]['pictures'], solve['items'][0]['pictures'])
+            self.assertEqual(analysis['images'], solve['images'])
+            self.assertNotIn('secret', analysis['prompt'])
             self.assertNotIn('secret', solve['prompt'])
             self.assertNotIn('"answer":', solve['prompt'])
             self.assertNotIn('"analysis":', solve['prompt'])
@@ -132,7 +135,7 @@ class VerifyTests(unittest.TestCase):
                 calls.append(images)
                 return self.runner(prompt, schema, model, effort, images)
             verdicts = verify.run_requests(requests, runner, model='v', effort='low')
-            self.assertEqual(calls, [[], solve['images'], []])
+            self.assertEqual(calls, [[], solve['images'], analysis['images']])
             verify.build_receipt(body, self.notes, requests, verdicts, self.answers,
                                  model='v', effort='low', ran_at='now')
             altered = copy.deepcopy(requests)
@@ -140,9 +143,22 @@ class VerifyTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 verify.build_receipt(body, self.notes, altered, verdicts, self.answers,
                                      model='v', effort='low', ran_at='now')
+            altered = copy.deepcopy(requests)
+            altered[2]['items'][0]['pictures'][0]['attachment'] = 2
+            with self.assertRaises(ValueError):
+                verify.build_receipt(body, self.notes, altered, verdicts, self.answers,
+                                     model='v', effort='low', ran_at='now')
+            altered = copy.deepcopy(requests)
+            altered[2]['images'].reverse()
+            with self.assertRaises(ValueError):
+                verify.build_receipt(body, self.notes, altered, verdicts, self.answers,
+                                     model='v', effort='low', ran_at='now')
             (media / 'option.png').unlink()
             with self.assertRaisesRegex(ValueError, 'option.png'):
                 verify.build_requests(body, self.notes, media=media)
+            with self.assertRaisesRegex(ValueError, 'option.png'):
+                verify.default_runner(analysis['prompt'], verify._schema('question_analysis'),
+                                      'model', 'low', analysis['images'])
 
     def test_unsolved_and_invalid_values(self):
         request = self.requests[1]
@@ -161,7 +177,7 @@ class VerifyTests(unittest.TestCase):
             questions.append(question)
         requests = verify.build_requests(body, self.notes)
         self.assertEqual([len(r['items']) for r in requests if r['kind'] == 'question_solve'], [4, 4, 1])
-        self.assertEqual([len(r['items']) for r in requests if r['kind'] == 'question_analysis'], [9])
+        self.assertEqual([len(r['items']) for r in requests if r['kind'] == 'question_analysis'], [4, 4, 1])
 
     @patch('courseware.tools.verify.subprocess.run')
     def test_default_runner_images(self, run):
@@ -173,7 +189,7 @@ class VerifyTests(unittest.TestCase):
                 Path(command[command.index('-o') + 1]).write_text('{"verdicts": []}')
                 return subprocess.CompletedProcess(command, 0, stderr='')
             run.side_effect = fake
-            verify.default_runner('prompt', verify._schema('question_solve'), 'model', 'low', paths)
+            verify.default_runner('prompt', verify._schema('question_analysis'), 'model', 'low', paths)
             command = run.call_args.args[0]
             index = command.index('--image')
             self.assertEqual(command[index:index + 4], ['--image', str(paths[0].resolve()), '--image', str(paths[1].resolve())])

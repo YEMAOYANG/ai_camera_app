@@ -61,7 +61,8 @@ def _items(body):
                 solves.append({'id': question['id'], 'question': question['question'],
                                'options': options, 'skill': question['skill'], 'visuals': visuals})
                 analyses.append({'id': question['id'], 'question': question['question'],
-                                 'options': options, 'answer': answer[0], 'analysis': question['analysis']})
+                                 'options': options, 'answer': answer[0], 'analysis': question['analysis'],
+                                 'visuals': visuals})
     for items in (speeches, solves):
         ids = [item['id'] for item in items]
         if any(not isinstance(ident, str) or not ident for ident in ids) or len(ids) != len(set(ids)):
@@ -69,7 +70,7 @@ def _items(body):
     return speeches, solves, analyses
 
 
-def _solve_batch(items, media, *, check_files):
+def _picture_batch(items, media, *, check_files):
     batch, images = [], []
     for item in items:
         pictures = []
@@ -100,12 +101,12 @@ def build_requests(body, notes, *, batch_size=40, media=None):
     requests = []
     for kind, items in zip(('speech', 'question_solve', 'question_analysis'), _items(body)):
         template = (ANALYSIS_PROMPT if kind == 'question_analysis' else PROMPT).read_text(encoding='utf-8')
-        size = min(batch_size, 4) if kind == 'question_solve' else batch_size
+        size = min(batch_size, 4) if kind != 'speech' else batch_size
         for start in range(0, len(items), size):
             batch = items[start:start + size]
             images = []
-            if kind == 'question_solve':
-                batch, images = _solve_batch(batch, media, check_files=True)
+            if kind != 'speech':
+                batch, images = _picture_batch(batch, media, check_files=True)
             prompt = template.replace('$NOTES', json.dumps(notes, ensure_ascii=False, sort_keys=True))
             prompt = prompt.replace('$KIND', kind).replace('$ITEMS', json.dumps(batch, ensure_ascii=False, sort_keys=True))
             requests.append({'kind': kind, 'items': batch, 'prompt': prompt, 'images': images})
@@ -193,13 +194,13 @@ def build_receipt(body, notes, requests, verdicts, stored_answers, *, model, eff
     for request in requests:
         kind = request['kind']
         count = len(request['items'])
-        if not count or (kind == 'question_solve' and count > 4):
+        if not count or (kind != 'speech' and count > 4):
             raise ValueError('Invalid request batch size')
         batch = expected[kind][offsets[kind]:offsets[kind] + count]
         images = request.get('images', [])
-        if kind == 'question_solve':
+        if kind != 'speech':
             media = Path(images[0]).parent if images else None
-            batch, expected_images = _solve_batch(batch, media, check_files=False)
+            batch, expected_images = _picture_batch(batch, media, check_files=False)
             if images != expected_images:
                 raise ValueError('Request images do not match the body')
         elif images:
