@@ -1,0 +1,7 @@
+[
+  "const clickableSelector = 'button,a[href],[role=\"button\"],input,select,[onclick]'",
+  "for (let parent = el.parentElement; parent; parent = parent.parentElement)",
+  "parent.matches(clickableSelector) || getComputedStyle(parent).cursor === 'pointer'",
+  "r.x1-r.x0 < 44 || r.y1-r.y0 < 44",
+  "overlay && !overlay.contains(el)"
+]
