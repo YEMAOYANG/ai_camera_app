@@ -6,20 +6,22 @@
       "questions": [
         {
           "id": "q1", "skill": "数一数", "question": "数一数，一共有几只小鸭？",
+          "answer": ["C"], "analysis": "从左到右一个一个数：1、2、3、4、5，一共5只。",
           "visual": {"kind": "picture", "alt": "5只小鸭排成一排", "picture": {"groups": [{"cells": [{"glyph": "🦆"}, {"glyph": "🦆"}, {"glyph": "🦆"}, {"glyph": "🦆"}, {"glyph": "🦆"}]}]}},
           "options": {
-            "A": {"label": "4", "visual": {"kind": "quantity", "count": 4, "alt": "4个"}},
-            "B": {"label": "5", "visual": {"kind": "quantity", "count": 5, "alt": "5个"}},
-            "C": {"label": "6", "visual": {"kind": "quantity", "count": 6, "alt": "6个"}}
+            "A": {"label": "3", "visual": {"kind": "quantity", "count": 3, "alt": "3个"}},
+            "B": {"label": "4", "visual": {"kind": "quantity", "count": 4, "alt": "4个"}},
+            "C": {"label": "5", "visual": {"kind": "quantity", "count": 5, "alt": "5个"}}
           }
         },
         {
-          "id": "q2", "skill": "数序", "question": "0、1、2、3、4、5排队，1的后面一个数是几？",
-          "visual": {"kind": "picture", "alt": "数字0到5排成一排，圈出了1", "picture": {"groups": [{"cells": [{"glyph": "0"}, {"glyph": "1", "highlight": true}, {"glyph": "2"}, {"glyph": "3"}, {"glyph": "4"}, {"glyph": "5"}]}]}},
+          "id": "q2", "skill": "数序", "question": "0、1、2、3、4、5排队，2的后面一个数是几？",
+          "answer": ["A"], "analysis": "数一数：0、1、2、3……2的后面一个是3。",
+          "visual": {"kind": "picture", "alt": "数字0到5排成一排，圈出了2", "picture": {"groups": [{"cells": [{"glyph": "0"}, {"glyph": "1"}, {"glyph": "2", "highlight": true}, {"glyph": "3"}, {"glyph": "4"}, {"glyph": "5"}]}]}},
           "options": {
-            "A": {"label": "0", "visual": {"kind": "picture", "alt": "数字0", "picture": {"groups": [{"cells": [{"glyph": "0"}]}]}}},
-            "B": {"label": "2", "visual": {"kind": "picture", "alt": "数字2", "picture": {"groups": [{"cells": [{"glyph": "2"}]}]}}},
-            "C": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}}
+            "A": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}},
+            "B": {"label": "4", "visual": {"kind": "picture", "alt": "数字4", "picture": {"groups": [{"cells": [{"glyph": "4"}]}]}}},
+            "C": {"label": "5", "visual": {"kind": "picture", "alt": "数字5", "picture": {"groups": [{"cells": [{"glyph": "5"}]}]}}}
           }
         }
       ]
@@ -29,16 +31,18 @@
       "intro": ["第二站的小检查，听题，看图，点一点。"],
       "questions": [
         {
-          "id": "q3", "skill": "比大小", "question": "鸭子3只，胡萝卜4根，哪个多？",
-          "visual": {"kind": "picture", "alt": "3只小鸭和4根胡萝卜", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🦆"}, {"glyph": "🦆"}, {"glyph": "🦆"}]}, {"cells": [{"glyph": "🥕"}, {"glyph": "🥕"}, {"glyph": "🥕"}, {"glyph": "🥕"}]}]}},
+          "id": "q3", "skill": "比大小", "question": "兔子5只，胡萝卜3根，哪个多？",
+          "answer": ["A"], "analysis": "兔子5只，胡萝卜3根，一一对应后兔子多2只。",
+          "visual": {"kind": "picture", "alt": "5只小兔和3根胡萝卜", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🐰"}, {"glyph": "🐰"}, {"glyph": "🐰"}, {"glyph": "🐰"}, {"glyph": "🐰"}]}, {"cells": [{"glyph": "🥕"}, {"glyph": "🥕"}, {"glyph": "🥕"}]}]}},
           "options": {
-            "A": {"label": "鸭子多", "visual": {"kind": "picture", "alt": "小鸭", "picture": {"groups": [{"cells": [{"glyph": "🦆"}]}]}}},
+            "A": {"label": "兔子多", "visual": {"kind": "picture", "alt": "小兔", "picture": {"groups": [{"cells": [{"glyph": "🐰"}]}]}}},
             "B": {"label": "一样多", "visual": {"kind": "picture", "alt": "等号，表示一样多", "picture": {"groups": [{"cells": [{"glyph": "＝"}]}]}}},
             "C": {"label": "胡萝卜多", "visual": {"kind": "picture", "alt": "胡萝卜", "picture": {"groups": [{"cells": [{"glyph": "🥕"}]}]}}}
           }
         },
         {
           "id": "q4", "skill": "第几", "question": "小动物排队，从左边数，小猫排第几？",
+          "answer": ["B"], "analysis": "从左往右数：第1小兔、第2小熊、第3小猫，所以小猫排第3。",
           "visual": {"kind": "picture", "alt": "小兔、小熊、小猫、小狗、熊猫排成一排", "picture": {"groups": [{"cells": [{"glyph": "🐰"}, {"glyph": "🐻"}, {"glyph": "🐱"}, {"glyph": "🐶"}, {"glyph": "🐼"}]}]}},
           "options": {
             "A": {"label": "第2", "visual": {"kind": "picture", "alt": "五个圆点，第2个是红色", "picture": {"groups": [{"cells": [{"glyph": "⚪"}, {"glyph": "🔴"}, {"glyph": "⚪"}, {"glyph": "⚪"}, {"glyph": "⚪"}]}]}}},
@@ -53,16 +57,18 @@
       "intro": ["第三站的小检查，一起来试试。"],
       "questions": [
         {
-          "id": "q5", "skill": "分与合", "question": "把4个圆片分成两堆，可以分成几和几？",
-          "visual": {"kind": "picture", "alt": "4个红色圆片", "picture": {"groups": [{"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}]}]}},
+          "id": "q5", "skill": "分与合", "question": "把3个圆片分成两堆，可以分成几和几？",
+          "answer": ["C"], "analysis": "3可以分成1和2，因为1+2=3。",
+          "visual": {"kind": "picture", "alt": "3个红色圆片", "picture": {"groups": [{"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}]}]}},
           "options": {
-            "A": {"label": "1和3", "visual": {"kind": "picture", "alt": "一堆1个，一堆3个", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🔴"}]}, {"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}]}]}}},
-            "B": {"label": "2和3", "visual": {"kind": "picture", "alt": "一堆2个，一堆3个", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}]}, {"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}]}]}}},
-            "C": {"label": "5和0", "visual": {"kind": "picture", "alt": "一堆5个，另一堆没有", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}]}, {"cells": [{"glyph": "0"}]}]}}}
+            "A": {"label": "2和2", "visual": {"kind": "picture", "alt": "一堆2个，一堆2个", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}]}, {"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}]}]}}},
+            "B": {"label": "1和1", "visual": {"kind": "picture", "alt": "一堆1个，一堆1个", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🔴"}]}, {"cells": [{"glyph": "🔴"}]}]}}},
+            "C": {"label": "1和2", "visual": {"kind": "picture", "alt": "一堆1个，一堆2个", "picture": {"separator": "gap", "groups": [{"cells": [{"glyph": "🔴"}]}, {"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}]}]}}}
           }
         },
         {
           "id": "q6", "skill": "分与合", "question": "3和几合起来是5？",
+          "answer": ["B"], "analysis": "因为3+2=5，所以3和2合起来是5。",
           "visual": {"kind": "picture", "alt": "3个红色圆片加上一个问号", "picture": {"separator": "plus", "groups": [{"cells": [{"glyph": "🔴"}, {"glyph": "🔴"}, {"glyph": "🔴"}]}, {"cells": [{"glyph": "？"}]}]}},
           "options": {
             "A": {"label": "1", "visual": {"kind": "quantity", "count": 1, "alt": "1个"}},
@@ -78,20 +84,22 @@
       "questions": [
         {
           "id": "q7", "skill": "减法表", "question": "看算式，5减2等于几？",
+          "answer": ["A"], "analysis": "想加算减：2+3=5，所以5−2=3。",
           "visual": {"kind": "picture", "alt": "算式5减2等于问号", "picture": {"groups": [{"cells": [{"glyph": "5"}, {"glyph": "−"}, {"glyph": "2"}, {"glyph": "＝"}, {"glyph": "？"}]}]}},
           "options": {
-            "A": {"label": "2", "visual": {"kind": "picture", "alt": "数字2", "picture": {"groups": [{"cells": [{"glyph": "2"}]}]}}},
-            "B": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}},
-            "C": {"label": "4", "visual": {"kind": "picture", "alt": "数字4", "picture": {"groups": [{"cells": [{"glyph": "4"}]}]}}}
+            "A": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}},
+            "B": {"label": "4", "visual": {"kind": "picture", "alt": "数字4", "picture": {"groups": [{"cells": [{"glyph": "4"}]}]}}},
+            "C": {"label": "5", "visual": {"kind": "picture", "alt": "数字5", "picture": {"groups": [{"cells": [{"glyph": "5"}]}]}}}
           }
         },
         {
-          "id": "q8", "skill": "想加算减", "question": "4减1等于几？想一想，1加几等于4？",
-          "visual": {"kind": "picture", "alt": "算式4减1等于问号", "picture": {"groups": [{"cells": [{"glyph": "4"}, {"glyph": "−"}, {"glyph": "1"}, {"glyph": "＝"}, {"glyph": "？"}]}]}},
+          "id": "q8", "skill": "想加算减", "question": "4减2等于几？想一想，2加几等于4？",
+          "answer": ["B"], "analysis": "因为2+2=4，所以4−2=2。",
+          "visual": {"kind": "picture", "alt": "算式4减2等于问号", "picture": {"groups": [{"cells": [{"glyph": "4"}, {"glyph": "−"}, {"glyph": "2"}, {"glyph": "＝"}, {"glyph": "？"}]}]}},
           "options": {
-            "A": {"label": "2", "visual": {"kind": "picture", "alt": "数字2", "picture": {"groups": [{"cells": [{"glyph": "2"}]}]}}},
-            "B": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}},
-            "C": {"label": "4", "visual": {"kind": "picture", "alt": "数字4", "picture": {"groups": [{"cells": [{"glyph": "4"}]}]}}}
+            "A": {"label": "1", "visual": {"kind": "picture", "alt": "数字1", "picture": {"groups": [{"cells": [{"glyph": "1"}]}]}}},
+            "B": {"label": "2", "visual": {"kind": "picture", "alt": "数字2", "picture": {"groups": [{"cells": [{"glyph": "2"}]}]}}},
+            "C": {"label": "3", "visual": {"kind": "picture", "alt": "数字3", "picture": {"groups": [{"cells": [{"glyph": "3"}]}]}}}
           }
         }
       ]

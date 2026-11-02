@@ -86,6 +86,22 @@ class QuizUpgradeTests(unittest.TestCase):
         self.assertTrue({a['id'] for a in old_speech}.isdisjoint(a['id'] for a in actions[2:]))
         self.assertEqual(len({a['id'] for a in actions}), len(actions))
 
+    def test_spec_may_replace_answer_and_analysis(self):
+        item = self.spec['scenes'][0]['questions'][0]
+        item['answer'], item['analysis'] = ['C'], ' 新的解析。 '
+        with tempfile.TemporaryDirectory() as directory:
+            result, _ = upgrade_quiz(self.body, self.spec, stage_id='stage-test', media_dir=directory)
+        question = result['scenes'][self.index]['content']['questions'][0]
+        self.assertEqual((question['answer'], question['analysis']), (['C'], '新的解析。'))
+
+    def test_invalid_answer_or_analysis_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for field, value in (('answer', ['Z']), ('answer', ['A', 'B']), ('answer', 'A'), ('analysis', ' ')):
+                self.spec = make_spec(self.body)
+                self.spec['scenes'][0]['questions'][0][field] = value
+                with self.assertRaisesRegex(ValueError, 'question (answer|analysis)'):
+                    upgrade_quiz(self.body, self.spec, stage_id='stage-test', media_dir=directory)
+
     def test_number_sequence_in_a_question_is_kept(self):
         # A list of numbers is question content, not a numbering label.
         self.spec['scenes'][0]['questions'][1]['question'] = '0、1、2、3、4、5排队，1的后面一个数是几？'

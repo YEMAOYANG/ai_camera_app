@@ -93,6 +93,14 @@ def upgrade_quiz(body, spec, *, stage_id, media_dir, audio_urls=None):
                 raise ValueError('missing or extra option visual')
             question['question'] = text
             question['skill'] = item['skill']
+            if 'answer' in item:
+                if not (isinstance(item['answer'], list) and len(item['answer']) == 1 and item['answer'][0] in values):
+                    raise ValueError('question answer must be one option value')
+                question['answer'] = list(item['answer'])
+            if 'analysis' in item:
+                if not isinstance(item['analysis'], str) or not item['analysis'].strip():
+                    raise ValueError('question analysis must be non-empty')
+                question['analysis'] = item['analysis'].strip()
             if item.get('visual') is None:
                 question.pop('visual', None)
             else:
