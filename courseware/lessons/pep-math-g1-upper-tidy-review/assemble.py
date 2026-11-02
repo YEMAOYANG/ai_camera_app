@@ -47,7 +47,7 @@ for idx, name in MAP.items():
     assert s["type"] == "interactive", idx
     html = built[name]
     if name in build.IMG and "K.ready({" in html:
-        html = html.replace("K.ready({", "K.ready({img:'" + build.FULL[build.IMG[name]] + "',", 1)
+        html = html.replace("K.ready({", "K.ready({img:'/api/classroom-media/__STAGE__/media/" + build.FULL[build.IMG[name]] + "',", 1)
     html = html.replace("__IMG__", build.FULL[build.PREVIEW])
     assert not re.search(r"__(IMG|MODE|DEMO|PAGE|TITLE|SUB|SAY)__", html), name
     html = strip_tests(html)

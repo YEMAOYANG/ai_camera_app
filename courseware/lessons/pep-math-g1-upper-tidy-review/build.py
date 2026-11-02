@@ -32,6 +32,6 @@ if __name__ == "__main__":
         html = html.replace('__IMG__', FULL[PREVIEW])
         pre = IMG.get(name)
         if pre and "K.ready({" in html:
-            html = html.replace("K.ready({", "K.ready({img:'" + FULL[pre] + "',", 1)
+            html = html.replace("K.ready({", "K.ready({img:'/api/classroom-media/__STAGE__/media/" + FULL[pre] + "',", 1)
         open(f"{HERE}/out/{name}.html", "w", encoding="utf-8").write(html)
         print(name, len(html.encode("utf-8")), "bytes")
