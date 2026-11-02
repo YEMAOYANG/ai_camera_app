@@ -1404,12 +1404,13 @@ Future<void> _loginSuccessfully(
   await tester.pump(const Duration(milliseconds: 250));
 
   expect(find.text('验证码已发送，稍后可重新获取。'), findsOneWidget);
-  expect(find.text('59 秒'), findsOneWidget);
+  expect(find.text('60 秒'), findsOneWidget);
   final codeField = tester.widget<EditableText>(
     find.byType(EditableText).at(1),
   );
   expect(codeField.controller.text, '123456');
   expect(codeField.focusNode.hasFocus, isTrue);
+  expect(codeField.autofillHints, contains(AutofillHints.oneTimeCode));
 
   await tester.tap(find.textContaining('我已阅读并同意'));
   await tester.pump(const Duration(milliseconds: 250));
@@ -1900,6 +1901,7 @@ class _FakeApiServer {
         'ok': true,
         'codeSent': true,
         'debugCode': '123456',
+        'retryAfterSeconds': 60,
         'message': '验证码已发送',
       });
     }

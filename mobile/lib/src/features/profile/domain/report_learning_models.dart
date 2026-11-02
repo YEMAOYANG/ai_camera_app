@@ -1,3 +1,5 @@
+import 'package:warm_sight/src/features/learning_review/domain/learning_review_models.dart';
+
 class ReportLearningSummary {
   const ReportLearningSummary({
     this.lessonCount = 0,
@@ -6,6 +8,7 @@ class ReportLearningSummary {
     this.lessons = const [],
     this.coachingSummary = const {},
     this.homeworkProgress,
+    this.weekendReviews = const [],
   });
 
   final int lessonCount;
@@ -14,6 +17,7 @@ class ReportLearningSummary {
   final List<ReportLearningLesson> lessons;
   final Map<String, dynamic> coachingSummary;
   final ReportHomeworkProgress? homeworkProgress;
+  final List<ReviewDetail> weekendReviews;
 
   factory ReportLearningSummary.fromJson(Object? value) {
     final json = _map(value);
@@ -25,6 +29,20 @@ class ReportLearningSummary {
       homeworkProgress: ReportHomeworkProgress.fromJson(
         json['homeworkProgress'],
       ),
+      weekendReviews:
+          (json['weekendReviews'] is List
+                  ? json['weekendReviews'] as List
+                  : const [])
+              .whereType<Map>()
+              .map((item) {
+                final entry = _map(item);
+                return ReviewDetail({
+                  'review': entry,
+                  'report': entry['report'],
+                });
+              })
+              .where((item) => item.run.id.trim().isNotEmpty)
+              .toList(),
       lessons: (json['lessons'] is List ? json['lessons'] as List : const [])
           .whereType<Map>()
           .map((item) => ReportLearningLesson.fromJson(_map(item)))

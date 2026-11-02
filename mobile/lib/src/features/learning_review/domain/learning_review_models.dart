@@ -50,6 +50,58 @@ class ReviewDetail {
   final Json report;
 }
 
+class ReviewEvidenceItem {
+  const ReviewEvidenceItem(this.data);
+  final Json data;
+
+  String get goal => textValue(data['knowledgeLabel']).isNotEmpty
+      ? textValue(data['knowledgeLabel'])
+      : '本题学习目标';
+  String get target => textValue(data['target']);
+  String get assessmentMode => textValue(data['assessmentMode']);
+  String get assessmentLabel =>
+      const {
+        'listening_picture': '听音选图',
+        'character_picture': '看字选图',
+        'pinyin_picture': '拼音配图',
+        'picture_comprehension': '图境理解',
+      }[assessmentMode] ??
+      '';
+  Json get sourceIdentity => jsonMap(data['sourceIdentity']);
+  String get sourceTitle => textValue(sourceIdentity['title']).isNotEmpty
+      ? textValue(sourceIdentity['title'])
+      : textValue(data['courseTitle']);
+  Json get claim => jsonMap(data['evidenceClaim']);
+  List<String> claimTexts(String key) => claim[key] is List
+      ? (claim[key] as List)
+            .whereType<String>()
+            .where((s) => s.isNotEmpty)
+            .toList()
+      : [];
+  bool get repeated => data['evidenceMode'] == 'repeated_practice';
+  bool get adultHelpUnknown =>
+      data['adultHelpKnown'] == false ||
+      data['independenceStatus'] == 'adult_help_unknown';
+  String get resultLabel => data['correct'] == true
+      ? '本题答对'
+      : data['correct'] == false
+      ? '本题未答对'
+      : '结果待核实';
+  String get supportLabel {
+    final labels = <String>[
+      if (repeated) '原题复练',
+      if (data['hintUsed'] == true) '已使用提示',
+      if (data['explanationSeen'] == true) '已看讲解',
+      if (data['adultHelp'] == true) '家长协助',
+      if (adultHelpUnknown)
+        data['systemUnaided'] == true ? '未用系统提示，家长帮助未知' : '家长帮助未知',
+    ];
+    if (labels.isNotEmpty) return labels.join(' · ');
+    if (data['independenceStatus'] == 'assisted_or_repeated') return '已获助或复现';
+    return data['independent'] == true ? '首次独立作答' : '独立性未确认';
+  }
+}
+
 class ReviewPreferences {
   const ReviewPreferences(this.data);
   final Json data;

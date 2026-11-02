@@ -58,6 +58,58 @@ ReportData reportFixture({bool weekly = false, bool support = true}) =>
       },
     });
 
+ReportData weekendReportFixture() => ReportData.fromJson({
+  'title': '周报',
+  'periodLabel': '2026-10-26 至 2026-11-01',
+  'learning': {
+    'weekendReviews': [
+      {
+        'id': 'review_garden_four',
+        'childId': 'child',
+        'title': '已学内容周末复习',
+        'status': 'completed',
+        'weekStart': '2026-10-26',
+        'coverage': {
+          'notes': ['已审核题量不足30分钟，按实际题量安排。'],
+        },
+        'report': {
+          'answeredCount': 1,
+          'totalQuestions': 1,
+          'independentFirstCorrect': 0,
+          'independentFirstCount': 0,
+          'repeatedPracticeCount': 0,
+          'assessmentScope': '本次图片测评未评价口语发音和纸笔书写。',
+          'items': [
+            {
+              'questionId': 'word-writing',
+              'knowledgeLabel': '动作词与图义',
+              'target': 'xiě zì',
+              'assessmentMode': 'pinyin_picture',
+              'sourceIdentity': {
+                'title': '语文园地四',
+                'courseVersion': 'published-v2',
+                'contentKey': 'frozen-content',
+              },
+              'evidenceClaim': {
+                'observed': ['点选动作图片'],
+                'supports': ['本课拼音与图义匹配'],
+                'doesNotSupport': ['口语发音和纸笔书写未观察'],
+              },
+              'correct': true,
+              'independent': false,
+              'evidenceMode': 'new_variant',
+              'systemUnaided': true,
+              'adultHelpKnown': false,
+              'independenceStatus': 'adult_help_unknown',
+              'prompt': '看看拼音，选一幅图。',
+            },
+          ],
+        },
+      },
+    ],
+  },
+});
+
 void main() {
   setUpAll(loadParentTextbookPreviewFont);
   test('old reports remain compatible and new evidence retains its scope', () {
@@ -66,6 +118,96 @@ void main() {
     expect(lesson.baselineLabel, '前测独立答对 4/6');
     expect(lesson.helpLabel, '前测提示 1 题 · 家长帮助 1 题');
     expect(lesson.reviewDueAt!.hour, 12);
+  });
+
+  test(
+    'weekend evidence keeps its exact scope and old report data stays valid',
+    () {
+      expect(ReportData.fromJson({}).learning.weekendReviews, isEmpty);
+      final review = weekendReportFixture().learning.weekendReviews.single;
+      expect(review.run.id, 'review_garden_four');
+      expect(review.run.coverage['notes'], ['已审核题量不足30分钟，按实际题量安排。']);
+      final item = (review.report['items'] as List).single as Map;
+      expect(item['target'], 'xiě zì');
+      expect(item['assessmentMode'], 'pinyin_picture');
+      expect(item['independenceStatus'], 'adult_help_unknown');
+      expect((item['sourceIdentity'] as Map)['courseVersion'], 'published-v2');
+      expect((item['evidenceClaim'] as Map)['doesNotSupport'], [
+        '口语发音和纸笔书写未观察',
+      ]);
+      expect(
+        ReportData.fromJson({
+          'learning': {
+            'weekendReviews': [
+              null,
+              {'report': {}},
+            ],
+          },
+        }).learning.weekendReviews,
+        isEmpty,
+      );
+    },
+  );
+
+  testWidgets('a report with only weekend assessment displays its evidence', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          dailyReportProvider.overrideWith(
+            (ref) async => weekendReportFixture(),
+          ),
+          weeklyReportProvider.overrideWith(
+            (ref) async => weekendReportFixture(),
+          ),
+        ],
+        child: MaterialApp(theme: AppTheme.light, home: const ReportsHubPage()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(ReportLearningSection), findsOneWidget);
+    expect(find.text('周末课后测评'), findsOneWidget);
+    expect(find.text('来源课程：语文园地四'), findsOneWidget);
+    expect(find.text('已审核题量不足30分钟，按实际题量安排。'), findsOneWidget);
+    expect(find.text('本次图片测评未评价口语发音和纸笔书写。'), findsOneWidget);
+    expect(find.text('本期完成 1 次间隔复习'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('weekend scope stays readable with narrow large text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.5)),
+          child: child!,
+        ),
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: ReportLearningSection(
+              learning: weekendReportFixture().learning,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('周末课后测评'), findsOneWidget);
+    expect(find.text('本次图片测评未评价口语发音和纸笔书写。'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('daily and weekly report pages show learning and can refresh', (

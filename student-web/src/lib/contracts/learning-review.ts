@@ -24,9 +24,13 @@ export const reviewQuestionSchema = z.object({
   explanation: z.string().nullable().default(null), explanationAudioUrl: z.string().nullable().default(null),
   selectedResponse: z.string().nullable().default(null), helpUsed: z.boolean().default(false),
   evidenceMode: z.string().optional(),
-  target: z.string().optional(),
+  target: z.string().min(1).max(24).optional(),
+  assessmentMode: z.enum(["listening_picture", "character_picture", "pinyin_picture", "picture_comprehension"]).optional(),
   homeworkSource: z.object({ submissionId: homeworkIdSchema, itemId: homeworkItemIdSchema, itemRevision: z.number().int().positive() }).optional(),
 }).superRefine((value, context) => {
+  if ((value.assessmentMode === "pinyin_picture" || value.assessmentMode === "character_picture") && (!value.target || value.prompt.includes(value.target))) {
+    context.addIssue({ code: "custom", message: "被测字音必须与题干口播分离" });
+  }
   if (value.renderer === "homework_original" || ("kind" in value.visual && value.visual.kind === "homework_original")) {
     if (value.renderer !== "homework_original" || !("kind" in value.visual) || value.visual.kind !== "homework_original" || !value.homeworkSource || value.visual.submissionId !== value.homeworkSource.submissionId || value.options.length !== 0) {
       context.addIssue({ code: "custom", message: "原图复习缺少一致的作业来源" });
@@ -62,4 +66,12 @@ export function reviewAudioPath(value: string | undefined | null, id: string): s
     return value.replace("/api/v2/student/", "/api/");
   }
   return null;
+}
+
+/** Images use the same authenticated proxy as voice, with no bearer in the URL. */
+export function reviewPicturePaths<T>(value: T, id: string): T {
+  if (typeof value === "string") return (reviewAudioPath(value, id) ?? value) as T;
+  if (Array.isArray(value)) return value.map(item => reviewPicturePaths(item, id)) as T;
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, reviewPicturePaths(item, id)])) as T;
+  return value;
 }

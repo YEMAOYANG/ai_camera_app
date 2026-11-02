@@ -5,6 +5,8 @@ import 'package:warm_sight/src/core/theme/app_tokens.dart';
 import 'package:warm_sight/src/features/profile/domain/report_learning_models.dart';
 import 'package:warm_sight/src/shared/widgets/app_surface.dart';
 import 'package:warm_sight/src/features/profile/presentation/widgets/learning_coaching_form.dart';
+import 'package:warm_sight/src/features/learning_review/domain/learning_review_models.dart';
+import 'package:warm_sight/src/features/learning_review/presentation/learning_support_widgets.dart';
 
 class ReportLearningSection extends StatelessWidget {
   const ReportLearningSection({super.key, required this.learning});
@@ -83,9 +85,63 @@ class ReportLearningSection extends StatelessWidget {
               const Divider(height: 24, color: AppColors.border),
               _LessonEvidence(lesson: learning.lessons[index]),
             ],
+            if (learning.weekendReviews.isNotEmpty) ...[
+              const Divider(height: 24, color: AppColors.border),
+              Text('周末课后测评', style: Theme.of(context).textTheme.titleMedium),
+              for (
+                var index = 0;
+                index < learning.weekendReviews.length;
+                index++
+              ) ...[
+                if (index > 0)
+                  const Divider(height: 24, color: AppColors.border)
+                else
+                  const SizedBox(height: 8),
+                _WeekendReviewEvidence(detail: learning.weekendReviews[index]),
+              ],
+            ],
           ],
         ),
       ),
+    );
+  }
+}
+
+class _WeekendReviewEvidence extends StatelessWidget {
+  const _WeekendReviewEvidence({required this.detail});
+  final ReviewDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final run = detail.run;
+    final courseTitles = jsonList(detail.report['items'])
+        .map(
+          (item) => textValue(
+            item['courseTitle'] ?? jsonMap(item['sourceIdentity'])['title'],
+          ).trim(),
+        )
+        .where((title) => title.isNotEmpty)
+        .toSet();
+    final notes = run.coverage['notes'] is List
+        ? (run.coverage['notes'] as List).whereType<String>()
+        : const <String>[];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (run.title.isNotEmpty)
+          Text(run.title, style: _body.copyWith(fontWeight: FontWeight.w600)),
+        Text(run.statusLabel, style: _secondary),
+        if (textValue(run.data['weekStart']).isNotEmpty)
+          Text('测评周：${textValue(run.data['weekStart'])}', style: _secondary),
+        if (run.scheduledAt != null)
+          Text('安排时间：${learningDate(run.scheduledAt)}', style: _secondary),
+        if (courseTitles.isNotEmpty)
+          Text('来源课程：${courseTitles.join('、')}', style: _body),
+        for (final note in notes)
+          if (note.trim().isNotEmpty) Text(note, style: _secondary),
+        const SizedBox(height: 8),
+        ReviewReportEvidence(report: detail.report),
+      ],
     );
   }
 }

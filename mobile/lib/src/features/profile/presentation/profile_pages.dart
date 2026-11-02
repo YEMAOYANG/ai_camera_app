@@ -5933,6 +5933,7 @@ List<Widget> _reportSections(ReportData data) {
   final sections = <Widget>[
     _ReportHero(data: data),
     if (data.learning.lessons.isNotEmpty ||
+        data.learning.weekendReviews.isNotEmpty ||
         (data.learning.homeworkProgress?.submissionCount ?? 0) > 0)
       ReportLearningSection(learning: data.learning),
     if (data.skillMaps.isNotEmpty) ReportGrowthSection(maps: data.skillMaps),

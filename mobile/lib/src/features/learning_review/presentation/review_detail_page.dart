@@ -143,53 +143,7 @@ class _ReviewDetailPageState extends ConsumerState<ReviewDetailPage> {
                 if (error != null)
                   Text(error!, style: const TextStyle(color: AppColors.danger)),
                 const LearningHeading('具体学习记录'),
-                if (r['notParticipated'] == true)
-                  const Text('孩子尚未参加。没有作答记录不代表不会。')
-                else
-                  Text(
-                    '已答 ${number(r['answeredCount'])} / ${number(r['totalQuestions'])} 题\n新题独立答对 ${number(r['independentFirstCorrect'])} / ${number(r['independentFirstCount'])} 题\n原题复练 ${number(r['repeatedPracticeCount'])} 题',
-                    style: const TextStyle(height: 1.8),
-                  ),
-                if (number(r['withdrawnCount']) > 0)
-                  Text('${number(r['withdrawnCount'])} 题因原始记录更正或删除已撤回，不参与评估。'),
-                for (final item in jsonList(r['items']))
-                  ExpansionTile(
-                    tilePadding: EdgeInsets.zero,
-                    title: Text(textValue(item['knowledgeLabel'])),
-                    subtitle: Text(
-                      '${item['correct'] == true ? '答对' : '需要复习'} · ${item['independent'] == true
-                          ? '独立完成'
-                          : item['hintUsed'] == true
-                          ? '使用提示'
-                          : '非独立新题证据'}',
-                    ),
-                    childrenPadding: const EdgeInsets.only(bottom: 16),
-                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(textValue(item['prompt'])),
-                      Text(
-                        '孩子的作答：${textValue(item['answerLabel'] ?? learningAnswerLabel(item['answer'], item['options']))}',
-                      ),
-                      Text(
-                        '参考答案：${textValue(item['correctAnswerLabel'] ?? learningAnswerLabel(item['correctAnswer'], item['options']))}',
-                      ),
-                      Text(textValue(item['explanation'])),
-                      if (item['evidenceMode'] == 'repeated_practice')
-                        const Text('原题再次练习，不计为新的独立掌握证据。'),
-                    ],
-                  ),
-                const SizedBox(height: 12),
-                Text(
-                  textValue(r['assessmentScope']),
-                  style: const TextStyle(
-                    color: AppColors.mutedStrong,
-                    height: 1.6,
-                  ),
-                ),
-                Text(
-                  textValue(r['parentAction']),
-                  style: const TextStyle(height: 1.6),
-                ),
+                ReviewReportEvidence(report: r),
                 const SizedBox(height: 16),
                 AppSecondaryButton(
                   label: '刷新进度',

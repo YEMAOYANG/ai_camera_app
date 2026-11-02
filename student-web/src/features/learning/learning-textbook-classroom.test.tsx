@@ -39,6 +39,48 @@ describe('classroom entry recovery', () => {
     expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it('keeps a visible loading state until the correct classroom confirms readiness', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(new Response(JSON.stringify(launch))));
+    render(<LearningTextbookClassroom student={student} contentKey={contentKey} />);
+    const frame = await screen.findByTitle('课堂') as HTMLIFrameElement;
+    expect(screen.getByRole('status')).toHaveTextContent('正在翻开课本');
+    fireEvent(window, new MessageEvent('message', { source: frame.contentWindow, origin: 'http://wrong.test', data: { type: 'mira.textbook.ready' } }));
+    expect(screen.getByRole('status')).toBeVisible();
+    fireEvent(window, new MessageEvent('message', { source: window, origin: 'http://localhost:3101', data: { type: 'mira.textbook.ready' } }));
+    expect(screen.getByRole('status')).toBeVisible();
+    fireEvent(window, new MessageEvent('message', { source: frame.contentWindow, origin: 'http://localhost:3101', data: { type: 'mira.textbook.ready' } }));
+    expect(screen.queryByText('正在翻开课本…')).not.toBeInTheDocument();
+    expect(frame).toBeInTheDocument();
+  });
+
+  it('offers a fresh entry when the classroom does not become ready', async () => {
+    vi.useFakeTimers();
+    const fetch = vi.fn().mockImplementation(() => Promise.resolve(new Response(JSON.stringify(launch))));
+    vi.stubGlobal('fetch', fetch);
+    render(<LearningTextbookClassroom student={student} contentKey={contentKey} />);
+    await act(async () => {});
+    expect(screen.getByTitle('课堂')).toBeInTheDocument();
+    await act(() => vi.advanceTimersByTimeAsync(12_000));
+    expect(screen.getByRole('alert')).toHaveTextContent('课堂暂时没有打开');
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: '重新进入' })); });
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(screen.getByTitle('课堂')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('正在翻开课本');
+  });
+
+  it('accepts a late classroom readiness signal after the timeout', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() => Promise.resolve(new Response(JSON.stringify(launch)))));
+    render(<LearningTextbookClassroom student={student} contentKey={contentKey} />);
+    await act(async () => {});
+    const frame = screen.getByTitle('课堂') as HTMLIFrameElement;
+    await act(() => vi.advanceTimersByTimeAsync(12_000));
+    expect(screen.getByRole('alert')).toBeVisible();
+    fireEvent(window, new MessageEvent('message', { source: frame.contentWindow, origin: 'http://localhost:3101', data: { type: 'mira.textbook.ready' } }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(frame).toBeInTheDocument();
+  });
 });
 
 describe('rest stops the current textbook before logout', () => {

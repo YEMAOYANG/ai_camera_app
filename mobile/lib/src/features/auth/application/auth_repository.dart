@@ -176,18 +176,31 @@ class SmsCodeRequestResult {
     required this.codeSent,
     required this.message,
     this.debugCode = '',
+    this.retryAfterSeconds = 60,
   });
 
   final bool codeSent;
   final String message;
   final String debugCode;
+  final int retryAfterSeconds;
 
   static SmsCodeRequestResult fromJson(Map<String, dynamic> json) {
     return SmsCodeRequestResult(
-      codeSent: json['codeSent'] != false,
+      codeSent: json['codeSent'] == true,
       message: _asString(json['message'], fallback: '验证码已发送'),
       debugCode: _asString(json['debugCode']),
+      retryAfterSeconds: _boundedRetryAfterSeconds(json['retryAfterSeconds']),
     );
+  }
+
+  static int _boundedRetryAfterSeconds(dynamic value) {
+    final parsed = switch (value) {
+      int value => value,
+      num value when value.isFinite => value.round(),
+      String value => int.tryParse(value.trim()),
+      _ => null,
+    };
+    return (parsed ?? 60).clamp(1, 300);
   }
 }
 

@@ -10,12 +10,16 @@ import { Button } from "@/components/ui/button";
 import { textbookLaunchSchema } from "@/lib/contracts/textbooks";
 import type { Student } from "@/lib/contracts/student-session";
 
+const FRAME_READY_TIMEOUT_MS = 12_000;
+
 export function LearningTextbookClassroom({ student, contentKey }: { student: Student; contentKey: string }) {
   const router = useRouter();
   const frame = useRef<HTMLIFrameElement>(null);
   const [entry, setEntry] = useState<z.infer<typeof textbookLaunchSchema>>();
   const [error, setError] = useState("");
   const [revision, retry] = useState(0);
+  const [frameReady, setFrameReady] = useState(false);
+  const [frameTimedOut, setFrameTimedOut] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => {
@@ -31,7 +35,9 @@ export function LearningTextbookClassroom({ student, contentKey }: { student: St
       if (!response.ok) throw new Error(payload.message || "课堂暂时打不开");
       const result = textbookLaunchSchema.parse(payload);
       if (result.contentKey !== contentKey) throw new Error("课程身份已变化，请返回目录");
-      if (!controller.signal.aborted) { setEntry(result); setError(""); }
+      if (!controller.signal.aborted) {
+        setFrameReady(false); setFrameTimedOut(false); setEntry(result); setError("");
+      }
     }).catch((caught: unknown) => {
       if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "课堂暂时打不开");
     }).finally(() => window.clearTimeout(timeout));
@@ -40,12 +46,20 @@ export function LearningTextbookClassroom({ student, contentKey }: { student: St
   useEffect(() => {
     if (!entry) return;
     const origin = new URL(entry.launchUrl).origin;
+    const ping = () => frame.current?.contentWindow?.postMessage({ type: 'mira.textbook.ready-ping' }, origin);
+    const timeout = window.setTimeout(() => setFrameTimedOut(true), FRAME_READY_TIMEOUT_MS);
+    const interval = window.setInterval(ping, 1_000);
     const receive = (event: MessageEvent) => {
-      if (event.source === frame.current?.contentWindow && event.origin === origin
-          && event.data?.type === 'mira.textbook.close') router.push('/learning');
+      if (event.source !== frame.current?.contentWindow || event.origin !== origin) return;
+      if (event.data?.type === 'mira.textbook.close') router.push('/learning');
+      if (event.data?.type === 'mira.textbook.ready') {
+        window.clearTimeout(timeout); window.clearInterval(interval);
+        setFrameTimedOut(false); setFrameReady(true);
+      }
     };
     window.addEventListener('message', receive);
-    return () => window.removeEventListener('message', receive);
+    ping();
+    return () => { window.clearTimeout(timeout); window.clearInterval(interval); window.removeEventListener('message', receive); };
   }, [entry, router]);
   const back = entry ? `/learning/textbooks?${new URLSearchParams({ editionId: entry.editionId, revisionId: entry.revisionId, ...(entry.unitId ? { unitId: entry.unitId } : {}) })}` : "/learning";
   const pauseBeforeRest = () => {
@@ -60,8 +74,17 @@ export function LearningTextbookClassroom({ student, contentKey }: { student: St
       // The authenticated, origin-pinned runtime owns storage and nested
       // interactive sandboxes, like FullOpenMaicClassroom. Keep that reviewed
       // isolation inside the runtime instead of sandboxing the application.
-      : entry ? <iframe ref={frame} className="textbook-classroom-frame" key={entry.launchUrl} src={entry.launchUrl}
-        title={entry.title} allow="microphone; autoplay; fullscreen" allowFullScreen referrerPolicy="no-referrer" />
+      : entry ? <div className="textbook-classroom-stage">
+        <iframe ref={frame} className="textbook-classroom-frame" key={entry.launchUrl} src={entry.launchUrl}
+          title={entry.title} allow="microphone; autoplay; fullscreen" allowFullScreen referrerPolicy="no-referrer"
+          tabIndex={frameReady ? undefined : -1} aria-hidden={!frameReady} />
+        {!frameReady && <div className="textbook-state textbook-classroom-state textbook-classroom-loading" role={frameTimedOut ? "alert" : "status"}>
+          <BookOpen className="textbook-classroom-state-icon" aria-hidden="true" />
+          <h1>{frameTimedOut ? "课堂暂时没有打开" : "正在翻开课本…"}</h1>
+          <p>{frameTimedOut ? "打开课堂花的时间有点久，请再试一次。" : "准备好，一起看图、听故事。"}</p>
+          {frameTimedOut && <Button onClick={() => { setEntry(undefined); setFrameTimedOut(false); retry(value => value + 1); }}><RotateCcw size={18} aria-hidden="true" />重新进入</Button>}
+        </div>}
+      </div>
       : <div className="textbook-state textbook-classroom-state" role="status"><BookOpen className="textbook-classroom-state-icon" aria-hidden="true" /><h1>正在翻开课本…</h1><p>准备好，一起看图、听故事。</p></div>}
   </SchoolbagShell>;
 }

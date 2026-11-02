@@ -43,6 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   var _agreementAccepted = false;
   var _codeSent = false;
   var _countdown = 0;
+  var _requestingCode = false;
   var _loading = false;
   var _success = false;
   var _lastPhoneText = '';
@@ -101,7 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   bool get _canSubmit {
-    return !_loading;
+    return !_loading && !_requestingCode;
   }
 
   bool _validatePhone() {
@@ -118,7 +119,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   bool _validateCodeFormat() {
     final code = _codeController.text.trim();
-    if (RegExp(r'^\d{4,6}$').hasMatch(code)) return true;
+    if (RegExp(r'^\d{6}$').hasMatch(code)) return true;
 
     setState(() {
       _codeError = code.isEmpty ? '请输入验证码' : '请输入完整验证码';
@@ -129,8 +130,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   Future<void> _requestCode() async {
-    if (_loading || _countdown > 0) return;
+    if (_loading || _requestingCode || _countdown > 0) return;
     if (!_validatePhone()) return;
+
+    setState(() {
+      _requestingCode = true;
+      _statusMessage = null;
+    });
 
     late final SmsCodeRequestResult result;
     try {
@@ -138,13 +144,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           .read(authRepositoryProvider)
           .requestSmsCode(_phoneDigits);
     } on AuthException catch (error) {
+      if (!mounted) return;
       setState(() {
+        _requestingCode = false;
         _phoneError = error.code == 'invalid_phone' ? error.message : null;
         _statusMessage = error.code == 'invalid_phone' ? null : error.message;
       });
       if (error.code == 'invalid_phone') {
         _phoneFocus.requestFocus();
       }
+      return;
+    } on Object {
+      if (!mounted) return;
+      setState(() {
+        _requestingCode = false;
+        _statusMessage = '验证码发送失败，请稍后重试。';
+      });
+      return;
+    }
+    if (!mounted) return;
+
+    if (!result.codeSent) {
+      setState(() {
+        _requestingCode = false;
+        _codeSent = false;
+        _statusMessage = '验证码发送失败，请稍后重试。';
+      });
       return;
     }
 
@@ -163,8 +188,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     }
 
     setState(() {
+      _requestingCode = false;
       _codeSent = result.codeSent;
-      _countdown = 59;
+      _countdown = result.retryAfterSeconds;
       _statusMessage = debugCode.isEmpty
           ? '验证码已发送，未注册手机号验证后会自动创建家庭账户。'
           : '验证码已自动填入，未注册手机号验证后会自动创建家庭账户。';
@@ -178,16 +204,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       Future<void>.delayed(const Duration(milliseconds: 90), _focusCodeField),
     );
 
-    _countdownTimer?.cancel();
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) return;
-      if (_countdown <= 1) {
-        timer.cancel();
-        setState(() => _countdown = 0);
-        return;
-      }
-      setState(() => _countdown -= 1);
-    });
+    if (_countdown > 0) {
+      _countdownTimer?.cancel();
+      _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) return;
+        if (_countdown <= 1) {
+          timer.cancel();
+          setState(() => _countdown = 0);
+          return;
+        }
+        setState(() => _countdown -= 1);
+      });
+    }
   }
 
   void _toggleAgreement() {
@@ -220,7 +248,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         ? '请输入验证码'
         : !_codeSent
         ? '请先获取验证码'
-        : RegExp(r'^\d{4,6}$').hasMatch(code)
+        : RegExp(r'^\d{6}$').hasMatch(code)
         ? null
         : '请输入完整验证码';
     final nextAgreementError = _agreementAccepted ? null : '请先同意用户协议和隐私政策';
@@ -390,6 +418,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           codeError: _codeError,
                           codeSent: _codeSent,
                           countdown: _countdown,
+                          requestingCode: _requestingCode,
                           loading: _loading,
                           success: _success,
                           statusMessage: _statusMessage,
@@ -424,6 +453,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               codeError: _codeError,
                               codeSent: _codeSent,
                               countdown: _countdown,
+                              requestingCode: _requestingCode,
                               loading: _loading,
                               success: _success,
                               statusMessage: _statusMessage,
@@ -481,6 +511,7 @@ class _LoginContent extends StatelessWidget {
     required this.codeError,
     required this.codeSent,
     required this.countdown,
+    required this.requestingCode,
     required this.loading,
     required this.success,
     required this.statusMessage,
@@ -502,6 +533,7 @@ class _LoginContent extends StatelessWidget {
   final String? codeError;
   final bool codeSent;
   final int countdown;
+  final bool requestingCode;
   final bool loading;
   final bool success;
   final String? statusMessage;
@@ -530,6 +562,7 @@ class _LoginContent extends StatelessWidget {
           codeError: codeError,
           codeSent: codeSent,
           countdown: countdown,
+          requestingCode: requestingCode,
           onRequestCode: onRequestCode,
         ),
         const SizedBox(height: 16),
@@ -697,6 +730,7 @@ class _LoginForm extends StatelessWidget {
     required this.codeError,
     required this.codeSent,
     required this.countdown,
+    required this.requestingCode,
     required this.onRequestCode,
   });
 
@@ -708,6 +742,7 @@ class _LoginForm extends StatelessWidget {
   final String? codeError;
   final bool codeSent;
   final int countdown;
+  final bool requestingCode;
   final VoidCallback onRequestCode;
 
   @override
@@ -756,6 +791,7 @@ class _LoginForm extends StatelessWidget {
               errorText: codeError,
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.oneTimeCode],
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(6),
@@ -763,6 +799,7 @@ class _LoginForm extends StatelessWidget {
               trailing: _CodeRequestButton(
                 sent: codeSent,
                 countdown: countdown,
+                requesting: requestingCode,
                 onTap: onRequestCode,
               ),
             ),
@@ -799,6 +836,7 @@ class _AuthTextField extends StatelessWidget {
     required this.keyboardType,
     required this.textInputAction,
     this.inputFormatters,
+    this.autofillHints,
     this.errorText,
     this.trailing,
     this.onSubmitted,
@@ -813,6 +851,7 @@ class _AuthTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
   final List<TextInputFormatter>? inputFormatters;
+  final Iterable<String>? autofillHints;
   final String? errorText;
   final Widget? trailing;
   final ValueChanged<String>? onSubmitted;
@@ -902,6 +941,7 @@ class _AuthTextField extends StatelessWidget {
                       keyboardType: keyboardType,
                       textInputAction: textInputAction,
                       inputFormatters: inputFormatters,
+                      autofillHints: autofillHints,
                       onSubmitted: onSubmitted,
                       style: const TextStyle(
                         color: AppColors.ink,
@@ -971,17 +1011,23 @@ class _CodeRequestButton extends StatelessWidget {
   const _CodeRequestButton({
     required this.sent,
     required this.countdown,
+    required this.requesting,
     required this.onTap,
   });
 
   final bool sent;
   final int countdown;
+  final bool requesting;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final active = countdown <= 0;
-    final label = active ? (sent ? '重新获取' : '获取验证码') : '$countdown 秒';
+    final active = countdown <= 0 && !requesting;
+    final label = requesting
+        ? '发送中'
+        : active
+        ? (sent ? '重新获取' : '获取验证码')
+        : '$countdown 秒';
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
