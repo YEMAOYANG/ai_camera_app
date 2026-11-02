@@ -169,6 +169,11 @@ class CoursewarePublishService:
                 conn.execute("UPDATE learning_textbook_course_builds SET status='retired', updated_at=? "
                     "WHERE edition_id=? AND revision_id=? AND node_id=? AND part_index=? AND status='published' AND content_key<>?",
                     (timestamp, b['editionId'], b['alignmentRevisionId'], b['nodeId'], b['partIndex'], frozen['contentKey']))
+                # The archive catalog treats a published course without a published build as a formal release.
+                for row in predecessors:
+                    conn.execute("UPDATE learning_courses SET status='retired', quality_status='superseded', "
+                        "retired_at=COALESCE(retired_at, ?), updated_at=? WHERE id=? AND version=?",
+                        (timestamp, timestamp, row['course_id'], row['course_version']))
             result.update(applied=True, created=created, status='published', retiredBuilds=len(predecessors),
                 openSessionsOnRetiredBuilds=sessions)
             scopes = conn.execute('SELECT content_key FROM course_storage_scopes WHERE classroom_id=?',

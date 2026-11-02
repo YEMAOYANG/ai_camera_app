@@ -359,7 +359,14 @@ class CoursewarePublishDatabaseTests(unittest.TestCase):
         self.assertEqual(new['openSessionsOnRetiredBuilds'], 1)
         self.assertEqual(self.repo.get_build(self.db, old['contentKey'])['status'], 'retired')
         self.assertEqual(self.repo.get_build(self.db, other_release['contentKey']), other_before)
-        self.assertEqual(self.db.execute('SELECT * FROM learning_courses WHERE id=?', (old['courseId'],)).fetchone(), old_course)
+        retired = self.db.execute('SELECT * FROM learning_courses WHERE id=?', (old['courseId'],)).fetchone()
+        self.assertEqual((retired['status'], retired['quality_status'], retired['retired_at'], retired['updated_at']),
+                         ('retired', 'superseded', 100, 100))
+        unchanged = ('status', 'quality_status', 'retired_at', 'updated_at')
+        self.assertEqual({k: retired[k] for k in retired.keys() if k not in unchanged},
+                         {k: old_course[k] for k in old_course.keys() if k not in unchanged})
+        other_course = self.db.execute('SELECT * FROM learning_courses WHERE id=?', (other_release['courseId'],)).fetchone()
+        self.assertEqual((other_course['status'], other_course['retired_at']), ('published', None))
         self.assertEqual(len(self.db.execute('SELECT * FROM learning_sessions').fetchall()), 2)
 
     def test_same_key_is_unchanged(self):
@@ -393,6 +400,7 @@ class CoursewarePublishDatabaseTests(unittest.TestCase):
         self.assertEqual(self.repo.get_build(self.db, old['contentKey'])['status'], 'published')
         self.assertEqual(len(self.db.execute('SELECT * FROM learning_courses').fetchall()), 1)
         self.assertEqual(len(self.db.execute('SELECT * FROM learning_textbook_course_builds').fetchall()), 1)
+        self.assertEqual(self.db.execute('SELECT status, retired_at FROM learning_courses').fetchone()['retired_at'], None)
 
     def test_retired_key_never_resurrected(self):
         old = self.publish('1')
