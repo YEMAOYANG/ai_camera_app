@@ -1,0 +1,708 @@
+{
+ "stage": {
+  "id": "stage-I81QjmOZJO",
+  "name": "整理和复习·数学整理小站",
+  "agentIds": [
+   "gen-PM09O8K2",
+   "gen-auq1WXF9",
+   "gen-5NL4Nj5P",
+   "gen-sywg6RYA"
+  ],
+  "createdAt": 1793608977483,
+  "updatedAt": 1793609012457,
+  "description": "人教版一年级上册第一单元《5以内数的认识和加、减法》整理和复习，故事线\"数学整理小站\"。",
+  "generatedAgentConfigs": [
+   {
+    "id": "gen-PM09O8K2",
+    "name": "小数老师",
+    "role": "teacher",
+    "color": "#4A90D9",
+    "avatar": "/avatars/teacher.png",
+    "persona": "温和有耐心的男老师，喜欢用身边的小故事把数学讲明白，话短而清楚，爱用“看、数、摆、想”带着孩子们动手。孩子答错时不急着给答案，先提示“再数一遍、再看一眼”，再错才亲自示范，让孩子自己找到答案。",
+    "priority": 10,
+    "voiceDesign": {
+     "texture": "温暖清亮的男声",
+     "delivery": "亲切耐心，语速适中",
+     "identity": "青年男老师"
+    },
+    "voiceConfig": {
+     "providerId": "qwen-tts",
+     "modelId": "qwen3-tts-flash",
+     "voiceId": "Ethan"
+    }
+   },
+   {
+    "id": "gen-auq1WXF9",
+    "name": "站长猫头鹰",
+    "role": "assistant",
+    "color": "#E8A13D",
+    "avatar": "/avatars/assist.png",
+    "persona": "数学整理小站的女站长，热情又有点小迷糊，总请小朋友们帮忙把乱掉的东西整理好。说话俏皮爱出主意，偶尔故意提个不太对的想法，等着孩子们发现和纠正。",
+    "priority": 7,
+    "voiceDesign": {
+     "texture": "清脆俏皮",
+     "delivery": "活泼轻快，带点小得意",
+     "identity": "年轻女声"
+    },
+    "voiceConfig": {
+     "providerId": "qwen-tts",
+     "modelId": "qwen3-tts-flash",
+     "voiceId": "Cherry"
+    }
+   },
+   {
+    "id": "gen-5NL4Nj5P",
+    "name": "小满",
+    "role": "student",
+    "color": "#57B05A",
+    "avatar": "/avatars/curious.png",
+    "persona": "好奇爱动手的小男孩，数数快但偶尔粗心，喜欢大声说出自己的发现，有时会数错或说错。被老师提醒“再数一遍”后能自己改正，越试越有信心。",
+    "priority": 5,
+    "voiceDesign": {
+     "texture": "明亮活泼的童声",
+     "delivery": "好奇雀跃，语速稍快",
+     "identity": "小男孩"
+    },
+    "voiceConfig": {
+     "providerId": "qwen-tts",
+     "modelId": "qwen3-tts-flash",
+     "voiceId": "Aiden"
+    }
+   },
+   {
+    "id": "gen-sywg6RYA",
+    "name": "朵朵",
+    "role": "student",
+    "color": "#D65A8A",
+    "avatar": "/avatars/thinker.png",
+    "persona": "细心爱观察的小女孩，喜欢摆一摆、画一画，总能发现规律。一开始有点害羞，声音轻轻的，受到鼓励后就会大方地说出自己的发现。",
+    "priority": 4,
+    "voiceDesign": {
+     "texture": "柔和的童声",
+     "delivery": "轻声细语，有点害羞",
+     "identity": "小女孩"
+    },
+    "voiceConfig": {
+     "providerId": "qwen-tts",
+     "modelId": "qwen3-tts-flash",
+     "voiceId": "Bella"
+    }
+   }
+  ]
+ },
+ "scenes": [
+  {
+   "id": "scene-p1",
+   "type": "slide",
+   "order": 1,
+   "title": "数学整理小站开张啦",
+   "actions": [
+    {
+     "id": "action_nF-53iux",
+     "type": "spotlight",
+     "elementId": "text_Zc0q_yBa"
+    },
+    {
+     "id": "action_J1OoUm3u",
+     "text": "小朋友们好，数学整理小站今天开张啦！",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_J1OoUm3u-d16820c232048cb05d3a1a2bdb642aec56adc6742864ecc572330ddabd349190.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_J1OoUm3u-d16820c232048cb05d3a1a2bdb642aec56adc6742864ecc572330ddabd349190.wav"
+    },
+    {
+     "id": "action_-D8KdDY6",
+     "type": "spotlight",
+     "elementId": "image_IY0511Gv"
+    },
+    {
+     "id": "action_Z1pmgYEN",
+     "text": "看，站长猫头鹰在门口着急呢，小站里太乱啦。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_Z1pmgYEN-23b8985e1facde0ff1ab57bf2107bd94ea165121a1aa0770e2c993bffbd31468.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_Z1pmgYEN-23b8985e1facde0ff1ab57bf2107bd94ea165121a1aa0770e2c993bffbd31468.wav"
+    },
+    {
+     "id": "action_PhZgEFb6",
+     "type": "spotlight",
+     "elementId": "text_pun69M86"
+    },
+    {
+     "id": "action_4NcuLBUv",
+     "text": "咱们先看看今天的路线图，要帮站长整理六样东西。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_4NcuLBUv-41b9116262cf8e65e49455962350afffe9a353653a799c278be838761e734de9.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_4NcuLBUv-41b9116262cf8e65e49455962350afffe9a353653a799c278be838761e734de9.wav"
+    },
+    {
+     "id": "action_VtuuToPv",
+     "type": "spotlight",
+     "elementId": "text_-_ULDtRV"
+    },
+    {
+     "id": "action_s3QTpler",
+     "text": "第一站，认识0到5，数一数、摆一摆。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_s3QTpler-8d5c14fffd1b38579cc3bfe424b9077d7d8bbe3aae535f03f73a7c1c4adef0ef.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_s3QTpler-8d5c14fffd1b38579cc3bfe424b9077d7d8bbe3aae535f03f73a7c1c4adef0ef.wav"
+    },
+    {
+     "id": "action_NjbA_wii",
+     "type": "spotlight",
+     "elementId": "text_c0cYgJYl"
+    },
+    {
+     "id": "action_lk_tk7zk",
+     "text": "第二站，比一比和第几，看谁眼睛亮。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_lk_tk7zk-b10facb94e0fe8fd6a411289022e77bf8783cf1d5c7881fcffc2e06243ee1b17.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_lk_tk7zk-b10facb94e0fe8fd6a411289022e77bf8783cf1d5c7881fcffc2e06243ee1b17.wav"
+    },
+    {
+     "id": "action_9xkjk4rX",
+     "type": "spotlight",
+     "elementId": "text_0idSGbII"
+    },
+    {
+     "id": "action_3cjIhvvT",
+     "text": "第三站，分与合，把数字朋友分分组、合起来。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_3cjIhvvT-63825c8acf7fb0f031b0b1cc5abfb6e3fb914511edebd05d459586ec35b104d6.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_3cjIhvvT-63825c8acf7fb0f031b0b1cc5abfb6e3fb914511edebd05d459586ec35b104d6.wav"
+    },
+    {
+     "id": "action_4zvvMUHR",
+     "type": "spotlight",
+     "elementId": "text_Na92gRfH"
+    },
+    {
+     "id": "action_deQVtT4m",
+     "text": "第四站加法表，第五站减法表，算一算就知道。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_deQVtT4m-16b21316818ad4321cb08328395253c10088a8e43fdcdb4e47278c083c969890.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_deQVtT4m-16b21316818ad4321cb08328395253c10088a8e43fdcdb4e47278c083c969890.wav"
+    },
+    {
+     "id": "action_OCBxAX1n",
+     "type": "spotlight",
+     "elementId": "text_bQ8TR7kQ"
+    },
+    {
+     "id": "action_uo1Ms4uu",
+     "text": "最后一站知识图，复习完小站就能开张。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_uo1Ms4uu-bcebef13220134be0b36d570001639a28342867b5a8c7e201e13cfd7c2fd4ffd.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_uo1Ms4uu-bcebef13220134be0b36d570001639a28342867b5a8c7e201e13cfd7c2fd4ffd.wav"
+    },
+    {
+     "id": "action_ANXiNlIa",
+     "text": "听，好像有小助手想说话，我们问问他们发现了什么。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_ANXiNlIa-681b1e2dc749e917ce9c3b79cd8b8eb5f201957025e86f35f22d411a2b9f7bb4.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_ANXiNlIa-681b1e2dc749e917ce9c3b79cd8b8eb5f201957025e86f35f22d411a2b9f7bb4.wav"
+    },
+    {
+     "id": "action_OefSuDZM",
+     "type": "discussion",
+     "topic": "你发现小站里什么东西乱了？",
+     "prompt": "观察图片里的小站，说说你看到哪些东西摆得不对，你想先帮忙整理哪一样？",
+     "agentId": "gen-5NL4Nj5P"
+    }
+   ],
+   "content": {
+    "type": "slide",
+    "canvas": {
+     "id": "ZGmHIL-ZJTGQrPxlMSx7A",
+     "theme": {
+      "shadow": {
+       "h": 0,
+       "v": 0,
+       "blur": 10,
+       "color": "#000000"
+      },
+      "outline": {
+       "color": "#d14424",
+       "style": "solid",
+       "width": 2
+      },
+      "fontName": "Microsoft YaHei",
+      "fontColor": "#333333",
+      "themeColors": [
+       "#5b9bd5",
+       "#ed7d31",
+       "#a5a5a5",
+       "#ffc000",
+       "#4472c4"
+      ],
+      "backgroundColor": "#ffffff"
+     },
+     "elements": [
+      {
+       "id": "text_Zc0q_yBa",
+       "top": 35,
+       "left": 60,
+       "type": "text",
+       "width": 880,
+       "height": 76,
+       "rotate": 0,
+       "content": "<p style=\"font-size:36px; text-align:center; color:#E76F51;\"><strong>数学整理小站开张啦</strong></p>",
+       "defaultColor": "#E76F51",
+       "defaultFontName": "Microsoft YaHei"
+      },
+      {
+       "id": "image_IY0511Gv",
+       "src": "/api/classroom-media/stage-I81QjmOZJO/media/generated-9c545b5ffa5f52d5dc863a38751bcb2b9ddd115cdf751e15c06f24d868c96a60.png",
+       "top": 130,
+       "left": 250,
+       "type": "image",
+       "width": 500,
+       "height": 281,
+       "rotate": 0,
+       "fixedRatio": true
+      },
+      {
+       "id": "text_pun69M86",
+       "top": 430,
+       "left": 60,
+       "type": "text",
+       "width": 880,
+       "height": 46,
+       "rotate": 0,
+       "content": "<p style=\"font-size:20px; text-align:center; color:#264653;\"><strong>今天的路线图</strong></p>",
+       "defaultColor": "#264653",
+       "defaultFontName": "Microsoft YaHei"
+      },
+      {
+       "id": "shape_5lZ6ojK2",
+       "top": 478,
+       "fill": "#F4A261",
+       "left": 45,
+       "path": "M 0 0 L 1 0 L 1 1 L 0 1 Z",
+       "type": "shape",
+       "width": 145,
+       "height": 60,
+       "rotate": 0,
+       "viewBox": [
+        1,
+        1
+       ],
+       "fixedRatio": false
+      },
+      {
+       "id": "text_-_ULDtRV",
+       "top": 493,
+       "left": 45,
+       "type": "text",
+       "width": 145,
+       "height": 30,
+       "rotate": 0,
+       "content": "<p style=\"font-size:16px; text-align:center; color:#FFFFFF;\"><strong>认识0~5</strong></p>",
+       "defaultColor": "#FFFFFF",
+       "defaultFontName": "Microsoft YaHei"
+      },
+      {
+       "id": "shape_OGKHvBji",
+       "top": 478,
+       "fill": "#E9C46A",
+       "left": 200,
+       "path": "M 0 0 L 1 0 L 1 1 L 0 1 Z",
+       "type": "shape",
+       "width": 145,
+       "height": 60,
+       "rotate": 0,
+       "viewBox": [
+        1,
+        1
+       ],
+       "fixedRatio": false
+      },
+      {
+       "id": "text_c0cYgJYl",
+       "top": 493,
+       "left": 200,
+       "type": "text",
+       "width": 145,
+       "height": 30,
+       "rotate": 0,
+       "content": "<p style=\"font-size:16px; text-align:center; color:#FFFFFF;\"><strong>比一比和第几</strong></p>",
+       "defaultColor": "#FFFFFF",
+       "defaultFontName": "Microsoft YaHei"
+      },
+      {
+       "id": "shape_GCMIC3nL",
+       "top": 478,
+       "fill": "#2A9D8F",
+       "left": 355,
+       "path": "M 0 0 L 1 0 L 1 1 L 0 1 Z",
+       "type": "shape",
+       "width": 145,
+       "height": 60,
+       "rotate": 0,
+       "viewBox": [
+        1,
+        1
+       ],
+       "fixedRatio": false
+      },
+      {
+       "id": "text_0idSGbII",
+       "top": 493,
+       "left": 355,
+       "type": "text",
+       "width": 145,
+       "height": 30,
+       "rotate": 0,
+       "content": "<p style=\"font-size:16px; text-align:center; color:#FFFFFF;\"><strong>分与合</strong></p>",
+       "defaultColor": "#FFFFFF",
+       "defaultFontName": "Microsoft YaHei"
+      },
+      {
+       "id": "shape_aoD12Lg7",
+       "top": 478,
+       "fill": "#264653",
+       "left": 510,
+       "path": "M 0 0 L 1 0 L 1 1 L 0 1 Z",
+       "type": "shape",
+       "width": 145,
+       "height": 60,
+       "rotate": 0,
+       "viewBox": [
+        1,
+        1
+       ],
+       "fixedRatio": false
+      },
+      {
+       "id": "text_Na92gRfH",
+       "top": 493,
+       "left": 510,
+       "type": "text",
+       "width": 145,
+       "height": 30,
+       "rotate": 0,
+       "content": "<p style=\"font-size:16px; text-align:center; color:#FFFFFF;\"><strong>加法表</strong></p>",
+       "defaultColor": "#FFFFFF",
+       "defaultFontName": "Microsoft YaHei"
+      },
+      {
+       "id": "shape_J5W-wAEM",
+       "top": 478,
+       "fill": "#E76F51",
+       "left": 665,
+       "path": "M 0 0 L 1 0 L 1 1 L 0 1 Z",
+       "type": "shape",
+       "width": 145,
+       "height": 60,
+       "rotate": 0,
+       "viewBox": [
+        1,
+        1
+       ],
+       "fixedRatio": false
+      },
+      {
+       "id": "text_WU-IWJqe",
+       "top": 493,
+       "left": 665,
+       "type": "text",
+       "width": 145,
+       "height": 30,
+       "rotate": 0,
+       "content": "<p style=\"font-size:16px; text-align:center; color:#FFFFFF;\"><strong>减法表</strong></p>",
+       "defaultColor": "#FFFFFF",
+       "defaultFontName": "Microsoft YaHei"
+      },
+      {
+       "id": "shape_Bu43F99g",
+       "top": 478,
+       "fill": "#8AB17D",
+       "left": 820,
+       "path": "M 0 0 L 1 0 L 1 1 L 0 1 Z",
+       "type": "shape",
+       "width": 145,
+       "height": 60,
+       "rotate": 0,
+       "viewBox": [
+        1,
+        1
+       ],
+       "fixedRatio": false
+      },
+      {
+       "id": "text_bQ8TR7kQ",
+       "top": 493,
+       "left": 820,
+       "type": "text",
+       "width": 145,
+       "height": 30,
+       "rotate": 0,
+       "content": "<p style=\"font-size:16px; text-align:center; color:#FFFFFF;\"><strong>知识图与预告</strong></p>",
+       "defaultColor": "#FFFFFF",
+       "defaultFontName": "Microsoft YaHei"
+      }
+     ],
+     "background": {
+      "type": "solid",
+      "color": "#FFF6E5"
+     },
+     "viewportSize": 1000,
+     "viewportRatio": 0.5625
+    }
+   },
+   "stageId": "stage-I81QjmOZJO",
+   "createdAt": 1793610211951,
+   "outlineId": "p1",
+   "updatedAt": 1793610211951
+  },
+  {
+   "id": "scene-p5",
+   "type": "interactive",
+   "order": 5,
+   "title": "0是起点，数字排队",
+   "actions": [
+    {
+     "id": "action_oZD6DJ1w",
+     "text": "小朋友们，请看这些数字卡片，它们现在乱了队。我们一起帮它们从0开始排好队。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_oZD6DJ1w-d956f633d3d6139719b1afa58a07008f32baa2b74dfe56d31afe1fc0678c09b4.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_oZD6DJ1w-d956f633d3d6139719b1afa58a07008f32baa2b74dfe56d31afe1fc0678c09b4.wav"
+    },
+    {
+     "id": "action_cQe-Lybw",
+     "type": "widget_highlight",
+     "target": "#numberTray",
+     "content": "这些数字卡片需要重新排队"
+    },
+    {
+     "id": "action_cvueaTge",
+     "type": "widget_reveal",
+     "target": "#num-card-0",
+     "content": "0是起点，它排在最前面"
+    },
+    {
+     "id": "action_BGhnLuSg",
+     "text": "看，0表示没有，但它很重要，是数字队伍的起点。我们把0放在第一个位置。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_BGhnLuSg-ee091ee3a1aeb0c35afa92accc20c71cb440fc4049342945001ab66c6e662d00.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_BGhnLuSg-ee091ee3a1aeb0c35afa92accc20c71cb440fc4049342945001ab66c6e662d00.wav"
+    },
+    {
+     "id": "action_mzHZwUP8",
+     "type": "widget_setState",
+     "state": {
+      "currentStep": 1,
+      "completedSteps": [
+       0
+      ]
+     },
+     "content": "把0放到第一个位置"
+    },
+    {
+     "id": "action_l6hHrQ6s",
+     "type": "widget_annotation",
+     "target": "#num-card-0",
+     "content": "0表示没有，也是起点"
+    },
+    {
+     "id": "action_xRxU3B2q",
+     "text": "再想一想，1添上1是几？对，是2。所以1后面跟着2。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_xRxU3B2q-3c0f9a9c66cda0893508683854d91f6f14319ea915baa303f50c858112cca5be.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_xRxU3B2q-3c0f9a9c66cda0893508683854d91f6f14319ea915baa303f50c858112cca5be.wav"
+    },
+    {
+     "id": "action_5Iw_wt7P",
+     "type": "widget_highlight",
+     "target": "#num-card-1",
+     "content": "1已经就位，接下来是2"
+    },
+    {
+     "id": "action_dIFOxK61",
+     "text": "现在轮到你们来帮忙。请把剩下的数字卡片按顺序摆到槽位里，摆好后点检查按钮。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_dIFOxK61-458607d5fd75934ed7aafdaac393d14cf753cf0375a14882a2cfa43f8004418c.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_dIFOxK61-458607d5fd75934ed7aafdaac393d14cf753cf0375a14882a2cfa43f8004418c.wav"
+    },
+    {
+     "id": "action_0yWDetTi",
+     "type": "widget_highlight",
+     "target": "#btn-check",
+     "content": "摆好后点这里检查"
+    }
+   ],
+   "content": {
+    "url": "",
+    "html": "<!DOCTYPE html><html lang=\"zh-CN\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>数字小火车</title><style>\n:root{--ink:#6B4423;--ink2:#8A5A24;--paper:#FFFDF6;--line:#E8C48F;--or:#F6A935;--or2:#C47A12;--gr:#58B45C;--gr2:#2F8A3A;--rd:#E4572E;--rd2:#B23A17;--bl:#4C8DDB;--bl2:#2F66AE;--pu:#8B5CF6}\n*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}\nhtml,body{width:100%;height:100%;overflow:hidden;background:#FDE9C0;font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;color:var(--ink)}\n#cv{position:absolute;left:50%;top:50%;width:1280px;height:720px;margin:-360px 0 0 -640px;transform:scale(var(--k,1));transform-origin:50% 50%;overflow:hidden;background:linear-gradient(180deg,#FFF5D8 0%,#FFE9B8 100%)}\n#hud{position:absolute;left:24px;right:24px;top:14px;height:60px;display:flex;align-items:center;gap:18px;z-index:5}\n#hud .chip{display:flex;align-items:center;gap:10px;height:56px;padding:0 26px 0 16px;border-radius:28px;background:#fff;border:3px solid var(--line);font-size:28px;font-weight:800;color:var(--ink2)}\n#hud .ic{font-size:32px;line-height:1}\n#dots{display:flex;gap:10px;margin-left:auto;align-items:center}\n#dots i{display:block;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--line)}\n#dots i.cur{background:var(--or);border-color:var(--or2);transform:scale(1.25)}\n#dots i.done{background:var(--gr);border-color:var(--gr2)}\n#stars{display:flex;align-items:center;gap:8px;height:56px;padding:0 22px;border-radius:28px;background:#FFF7D6;border:3px solid #F2C94C;font-size:30px;font-weight:900;color:#B7791F}\n#play{position:absolute;left:24px;top:86px;width:1232px;height:552px}\n#owlbar{position:absolute;left:24px;top:650px;width:1232px;height:58px;display:flex;align-items:center;gap:14px;z-index:5}\n#owlbar .owl{font-size:46px;line-height:1}\n#say{flex:1;height:54px;line-height:48px;padding:0 26px;border-radius:27px;background:#fff;border:3px solid var(--line);font-size:26px;font-weight:700;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n#say.ok{background:#E9F8E5;border-color:#7CC77F;color:#2F7A36}\n#say.no{background:#FFF0E6;border-color:#F0A070;color:#B24A1C}\n.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:20px;padding:0 28px;height:62px;min-width:62px;font-family:inherit;font-size:28px;font-weight:800;color:#fff;background:var(--or);box-shadow:0 6px 0 var(--or2);cursor:pointer;transition:transform .08s}\n.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--or2)}\n.btn.green{background:var(--gr);box-shadow:0 6px 0 var(--gr2)}\n.btn.blue{background:var(--bl);box-shadow:0 6px 0 var(--bl2)}\n.btn.red{background:var(--rd);box-shadow:0 6px 0 var(--rd2)}\n.btn.ghost{background:#fff;color:var(--ink2);border:3px solid var(--line);box-shadow:0 5px 0 #E3C9A0}\n.btn.sm{height:52px;font-size:24px;padding:0 20px;border-radius:16px}\n.btn.xl{height:84px;font-size:38px;padding:0 54px;border-radius:28px}\n.btn[disabled]{opacity:.45;filter:grayscale(.5);cursor:default;transform:none}\n.hide{display:none!important}\n#ready,#finish{position:absolute;left:0;top:0;right:0;bottom:0;z-index:20;background:rgba(255,238,196,.86);display:flex;align-items:center;justify-content:center;transition:opacity .35s}\n#ready.gone,#finish.gone{opacity:0;visibility:hidden;pointer-events:none}\n#ready .card,#finish .card{background:#fff;border:4px solid var(--line);border-radius:40px;padding:34px 70px 40px;text-align:center;box-shadow:0 20px 44px rgba(120,80,30,.24)}\n#ready .pic{display:block;width:560px;height:315px;object-fit:cover;border-radius:26px;border:4px solid var(--line);margin:0 auto 10px}\n#ready .big,#finish .big{font-size:120px;line-height:1.1}\n#ready h1,#finish h1{font-size:58px;color:var(--ink2);margin-top:4px}\n#ready p,#finish p{font-size:30px;margin:12px 0 26px;color:var(--ink)}\n.teach-hl{outline:6px solid #FF6B35!important;outline-offset:5px;border-radius:16px;animation:tp .9s ease-in-out 4}\n@keyframes tp{50%{outline-color:#FFD166;outline-offset:10px}}\n#tip{position:absolute;z-index:30;display:none;max-width:440px;background:#5B3A1E;color:#fff;padding:12px 20px;border-radius:18px;font-size:24px;font-weight:700;line-height:1.35;pointer-events:none;box-shadow:0 8px 22px rgba(0,0,0,.3)}\n@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}\n.shake{animation:shake .45s}\n@keyframes popk{0%{transform:scale(1)}40%{transform:scale(1.22)}100%{transform:scale(1)}}\n.pop{animation:popk .35s}\n@keyframes cfall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(780px) rotate(540deg);opacity:.9}}\n.cf{position:absolute;top:-30px;width:14px;height:22px;border-radius:3px;animation:cfall 1.9s ease-in forwards;z-index:40;pointer-events:none}\n.flystar{position:absolute;z-index:45;font-size:44px;line-height:1;pointer-events:none;transition:left .7s cubic-bezier(.3,.7,.3,1),top .7s cubic-bezier(.3,.7,.3,1),opacity .7s}\n.truck{position:absolute;left:-160px;top:330px;font-size:100px;line-height:1;z-index:12;transition:left 1.5s ease-in}\n.dragging{z-index:60!important;cursor:grabbing;filter:drop-shadow(0 12px 14px rgba(0,0,0,.25))}\n\n#train{position:absolute;left:10px;top:60px;width:1200px;height:200px;display:flex;align-items:flex-end;gap:10px;transition:transform 1.6s ease-in}\n#loco{width:130px;font-size:118px;line-height:1;text-align:center;padding-bottom:14px}\n#wagons{display:flex;gap:10px}\n.wagon{position:relative;width:150px;height:178px;border-radius:18px;border:5px solid rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center}\n.wagon::before,.wagon::after{content:'';position:absolute;bottom:-20px;width:38px;height:38px;border-radius:50%;background:#5B3A1E;border:6px solid #C9A36A}\n.wagon::before{left:20px}.wagon::after{right:20px}\n.wagon .slot{width:116px;height:116px;border-radius:20px;border:4px dashed rgba(255,255,255,.9);background:rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center}\n.wagon.bad{animation:shake .45s}\n#rail{position:absolute;left:0;top:270px;width:1232px;height:14px;border-radius:7px;background:#8E5820;box-shadow:0 8px 0 #C99A5A}\n#station{position:absolute;left:0;top:330px;width:1232px;height:222px;display:flex;align-items:center;gap:30px;padding:0 30px;background:#FFF9E8;border:4px solid var(--line);border-radius:36px}\n#numberTray{flex:1;height:170px;display:flex;gap:20px;align-items:center;justify-content:center;border-radius:28px;background:repeating-linear-gradient(90deg,#F4D9A8 0 30px,#EBC98F 30px 34px);padding:0 20px}\n.ncard{width:118px;height:118px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:84px;font-weight:900;color:#fff;text-shadow:0 4px 0 rgba(0,0,0,.25);box-shadow:0 8px 0 rgba(0,0,0,.2);cursor:grab;position:relative}\n.ncard.sel{outline:6px solid #FF6B35;outline-offset:4px}\n.ncard.lock{cursor:default;opacity:.92}\n#btn-check{height:84px;font-size:34px;padding:0 34px}\n</style></head><body><div id=\"cv\"><div id=\"play\">\n<div id=\"train\" class=\"nocheck\"><div id=\"loco\">🚂</div><div id=\"wagons\"></div></div><div id=\"rail\"></div>\n<div id=\"station\"><div id=\"numberTray\"></div><button class=\"btn green\" id=\"btn-check\" disabled>检查 ✔</button></div></div></div><script>\n(function(){\nvar W=window,D=document;\nvar K=W.K={log:[],errs:[],problems:[],cps:[],started:false,scale:1,stars:0};\nW.__errs=K.errs;\nW.addEventListener('error',function(e){K.errs.push(String(e.message||e.type)+' @'+(e.lineno||0))});\nW.addEventListener('unhandledrejection',function(e){K.errs.push('rej:'+String(e.reason))});\nK.$=function(s,r){return (r||D).querySelector(s)};\nK.$$=function(s,r){return Array.prototype.slice.call((r||D).querySelectorAll(s))};\nK.el=function(tag,cls,html,parent){var e=D.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;if(parent)parent.appendChild(e);return e};\nK.rnd=function(n){return Math.floor(Math.random()*n)};\nK.shuffle=function(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=K.rnd(i+1),t=a[i];a[i]=a[j];a[j]=t}return a};\nK.wait=function(ms){return new Promise(function(r){setTimeout(r,ms)})};\nK.rm=function(a,x){var i=a.indexOf(x);if(i>=0)a.splice(i,1)};\nfunction fit(){var k=Math.min(W.innerWidth/1280,W.innerHeight/720);if(!(k>0))k=1;D.documentElement.style.setProperty('--k',k);K.scale=k}\nW.addEventListener('resize',fit);fit();\nK.stage=function(){return K.$('#cv')};\nK.pos=function(el){var s=K.stage().getBoundingClientRect(),r=el.getBoundingClientRect(),k=K.scale||1;return {x:(r.left-s.left)/k,y:(r.top-s.top)/k,w:r.width/k,h:r.height/k}};\nK.hud=function(o){var h=K.el('div','',null,K.stage());h.id='hud';h.innerHTML='<div class=\"chip\"><span class=\"ic\">'+o.icon+'</span>'+o.title+'</div><div id=\"dots\"></div><div id=\"stars\"><span class=\"ic\">⭐</span><b id=\"star-n\">0</b></div>';K.levels(o.levels||0,0)};\nK.levels=function(n,i){var d=K.$('#dots');if(!d)return;d.innerHTML='';for(var k=0;k<n;k++)K.el('i',k<i?'done':(k===i?'cur':''),'',d)};\nK.owl=function(){var b=K.el('div','',null,K.stage());b.id='owlbar';b.innerHTML='<div class=\"owl\">🦉</div><div id=\"say\"></div>';var t=K.el('div','',null,K.stage());t.id='tip'};\nK.say=function(t,kind){var s=K.$('#say');if(!s)return;s.className=kind||'';s.textContent=t||'';K.log.push('say:'+(kind||'')+':'+t)};\nK.star=function(n,from){K.stars+=n;var b=K.$('#star-n');if(b)b.textContent=K.stars;var box=K.$('#stars');\n if(from&&box){var p=K.pos(from),q=K.pos(box);var f=K.el('div','flystar','⭐',K.stage());f.style.left=(p.x+p.w/2-20)+'px';f.style.top=(p.y+p.h/2-20)+'px';\n  setTimeout(function(){f.style.left=(q.x+20)+'px';f.style.top=(q.y+4)+'px'},30);setTimeout(function(){f.remove();if(box){box.classList.remove('pop');void box.offsetWidth;box.classList.add('pop')}},780)}\n else if(box){box.classList.remove('pop');void box.offsetWidth;box.classList.add('pop')}};\nK.confetti=function(){var st=K.stage();for(var i=0;i<44;i++){var c=K.el('i','cf','',st);c.style.left=(4+Math.random()*92)+'%';c.style.background=['#F6A935','#E4572E','#58B45C','#4C8DDB','#B06BD9'][i%5];c.style.animationDelay=(Math.random()*0.5)+'s';(function(c){setTimeout(function(){c.remove()},2600)})(c)}};\nK.shake=function(el){if(!el)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake')};\nK.pop=function(el){if(!el)return;el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')};\nvar ac;function A(){if(!ac){try{ac=new (W.AudioContext||W.webkitAudioContext)()}catch(e){}}if(ac&&ac.state==='suspended'){try{ac.resume()}catch(e){}}return ac}\nfunction tone(f,t,d,type,v){try{var a=A();if(!a)return;var o=a.createOscillator(),g=a.createGain(),s=a.currentTime+t;o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,s);g.gain.exponentialRampToValueAtTime(v||0.16,s+0.02);g.gain.exponentialRampToValueAtTime(0.0001,s+d);o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+0.05)}catch(e){}}\nK.sfx={tick:function(n){tone(392*Math.pow(1.122,(n||0)),0,0.14,'triangle')},pick:function(){tone(520,0,0.08,'triangle')},ok:function(){tone(523,0,0.12);tone(659,0.1,0.12);tone(784,0.2,0.2)},no:function(){tone(220,0,0.18,'sawtooth',0.07);tone(196,0.14,0.22,'sawtooth',0.06)},win:function(){[523,659,784,1047].forEach(function(f,i){tone(f,i*0.12,0.22,'triangle',0.18)})},drop:function(){tone(330,0,0.1,'square',0.06)}};\nK.ready=function(o){var r=K.el('div','',null,K.stage());r.id='ready';r.innerHTML='<div class=\"card\">'+(o.img?'<img class=\"pic\" alt=\"\" src=\"/api/classroom-media/stage-I81QjmOZJO/media/'+o.img+'\">':'<div class=\"big\">'+o.emoji+'</div>')+'<h1>'+o.title+'</h1><p>'+o.sub+'</p><button class=\"btn xl\" id=\"'+(o.btn||'start-btn')+'\">开始 ▶</button></div>';\n var im=K.$('.pic',r);if(im)im.addEventListener('error',function(){var d=K.el('div','big',o.emoji);im.replaceWith(d)});\n K.$('button',r).addEventListener('click',function(){K.sfx.pick();K.begin()})};\nK.finish=function(o){var r=K.$('#finish')||K.el('div','',null,K.stage());r.id='finish';r.className='';r.innerHTML='<div class=\"card\"><div class=\"big\">🏆</div><h1>'+o.title+'</h1><p>'+o.sub+'</p><button class=\"btn xl green\" id=\"btn-again\">再玩一次 ↺</button></div>';K.$('button',r).addEventListener('click',function(){K.sfx.pick();r.classList.add('gone');if(o.again)o.again()});K.sfx.win();K.confetti()};\nK.begin=function(){if(K.started)return;K.started=true;var r=K.$('#ready');if(r)r.classList.add('gone');if(K.onStart)K.onStart()};\nK.highlight=function(sel){K.$$(sel).forEach(function(el){el.classList.remove('teach-hl');void el.offsetWidth;el.classList.add('teach-hl');setTimeout(function(){el.classList.remove('teach-hl')},3600)})};\nK.annotate=function(sel,text){var el=K.$(sel),tip=K.$('#tip');if(!el||!text||!tip)return;var p=K.pos(el);tip.textContent=text;tip.style.display='block';\n var w=tip.offsetWidth,h=tip.offsetHeight;var x=Math.max(12,Math.min(1280-12-w,p.x+p.w/2-w/2));var y=p.y-h-14;if(y<80)y=p.y+p.h+14;if(y+h>712)y=Math.max(80,p.y+p.h/2-h/2);tip.style.left=x+'px';tip.style.top=y+'px';clearTimeout(K._tt);K._tt=setTimeout(function(){tip.style.display='none'},4600)};\nK.reveal=function(sel){var el=K.$(sel);if(!el)return;el.classList.remove('hide','hidden');el.style.visibility='visible';el.style.opacity='1';if(K.onReveal)K.onReveal(sel,el);K.highlight(sel)};\nW.addEventListener('message',function(e){var d=e.data||{};if(!d||typeof d!=='object')return;\n if(d.type==='SET_WIDGET_STATE'){K.begin();if(K.onState)K.onState(d.state||{},d.content)}\n else if(d.type==='HIGHLIGHT_ELEMENT'){var ht=K.$(d.target);if(!(ht&&ht.closest('#ready')))K.begin();K.highlight(d.target)}\n else if(d.type==='ANNOTATE_ELEMENT'){var at=K.$(d.target);if(!(at&&at.closest('#ready')))K.begin();K.annotate(d.target,d.content)}\n else if(d.type==='REVEAL_ELEMENT'){K.begin();K.reveal(d.target)}});\nK.drag=function(el,o){el.style.touchAction='none';\n el.addEventListener('pointerdown',function(e){if(e.button&&e.button!==0)return;if(o.enabled&&!o.enabled(el))return;e.preventDefault();\n  var sx=e.clientX,sy=e.clientY,moved=false,k=K.scale||1;el.style.transition='none';el.classList.add('dragging');\n  function mv(ev){var dx=(ev.clientX-sx)/k,dy=(ev.clientY-sy)/k;if(!moved&&Math.abs(dx)+Math.abs(dy)>8)moved=true;el.style.transform='translate('+dx+'px,'+dy+'px)'}\n  function up(ev){D.removeEventListener('pointermove',mv);D.removeEventListener('pointerup',up);D.removeEventListener('pointercancel',up);el.classList.remove('dragging');\n   el.style.transition='transform .25s ease';el.style.transform='';\n   if(!moved){if(o.onTap)o.onTap(el);return}\n   var t=null;(o.targets?o.targets():[]).some(function(c){var r=c.getBoundingClientRect();if(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom){t=c;return true}return false});\n   if(o.onDrop)o.onDrop(el,t,ev)}\n  D.addEventListener('pointermove',mv);D.addEventListener('pointerup',up);D.addEventListener('pointercancel',up)})};\n\n})();\n</script><script>\n(function(){\nvar COL=['#E4572E','#F6A935','#58B45C','#4C8DDB','#8B5CF6','#E0508F'],WC=['#FFD6A5','#FDFFB6','#CAFFBF','#9BF6FF','#BDB2FF','#FFC6FF'];\nvar level=0,tries=0,sel=null,wag=[],cards=[];\nK.hud({icon:'🚂',title:'数字小火车',levels:2});K.owl();K.say('把数字卡片排成队，从 0 开始');\nK.ready({img:'generated-9c545b5ffa5f52d5dc863a38751bcb2b9ddd115cdf751e15c06f24d868c96a60.png',emoji:'🚂',title:'数字小火车',sub:'把数字宝宝送上车厢，从 0 开始排队！',btn:'start-btn'});\nvar wagons=K.$('#wagons'),tray=K.$('#numberTray');\nfor(var i=0;i<6;i++){var w=K.el('div','wagon','<div class=\"slot\" data-i=\"'+i+'\"></div>',wagons);w.style.background=WC[i];w.id='wagon-'+i;wag.push(w)}\nfor(var n=0;n<6;n++){var c=K.el('div','ncard',String(n));c.id='num-card-'+n;c.dataset.v=n;c.style.background=COL[n];cards.push(c)}\nfunction slotOf(i){return K.$('.slot',wag[i])}\nfunction val(i){var s=slotOf(i),c=s.firstElementChild;return c?+c.dataset.v:null}\nfunction refresh(){var full=true;for(var i=0;i<6;i++)if(val(i)===null)full=false;K.$('#btn-check').disabled=!full}\nfunction toTray(c){c.classList.remove('sel');tray.appendChild(c)}\nfunction place(c,i,force){var s=slotOf(i),old=s.firstElementChild;if(old&&old!==c){if(old.classList.contains('lock')&&!force)return false;toTray(old)}c.classList.remove('sel');s.appendChild(c);K.sfx.drop();refresh();return true}\nfunction setup(lv){level=lv;tries=0;sel=null;K.levels(2,lv);cards.forEach(function(c){c.classList.remove('lock');toTray(c)});wag.forEach(function(w){w.classList.remove('bad')});\n K.$('#train').style.transition='none';K.$('#train').style.transform='';void K.$('#train').offsetWidth;K.$('#train').style.transition='';\n tray.innerHTML='';\n if(lv===0){K.shuffle(cards).forEach(function(c){tray.appendChild(c)});K.say('把数字卡片排成队，从 0 开始')}\n else{var fixed=[0,1,3,5];cards.forEach(function(c){if(fixed.indexOf(+c.dataset.v)>=0){place(c,+c.dataset.v,true);c.classList.add('lock')}else tray.appendChild(c)});K.say('车厢里少了数字，把它们补上')}\n refresh()}\ncards.forEach(function(c){K.drag(c,{enabled:function(el){return K.started&&!el.classList.contains('lock')},targets:function(){return K.$$('.slot')},\n onTap:function(el){if(!K.started||el.classList.contains('lock'))return;K.sfx.pick();if(sel)sel.classList.remove('sel');sel=el;el.classList.add('sel')},\n onDrop:function(el,t){if(t){place(el,+t.dataset.i)}}})});\nK.$$('.slot').forEach(function(s){s.addEventListener('click',function(){if(sel&&K.started){place(sel,+s.dataset.i);sel=null}})});\ntray.addEventListener('click',function(e){if(e.target===tray&&sel){toTray(sel);sel=null;refresh()}});\nfunction check(){if(!K.started)return;var bad=[];for(var i=0;i<6;i++)if(val(i)!==i)bad.push(i);\n if(!bad.length){K.sfx.win();K.confetti();K.star(level===0?2:1,K.$('#btn-check'));K.say(level===0?'排对了！0 是起点，一个比一个多 1':'补齐了！火车出发','ok');K.$('#train').style.transform='translateX(1300px)';\n  setTimeout(function(){if(level===0)setup(1);else{K.levels(2,2);K.finish({title:'火车开走啦！',sub:'数字从 0 开始，一个比一个多 1',again:function(){setup(0)}})}},2100);return}\n tries++;K.sfx.no();bad.forEach(function(i){var w=wag[i];w.classList.remove('bad');void w.offsetWidth;w.classList.add('bad');var c=slotOf(i).firstElementChild;if(c&&!c.classList.contains('lock'))toTray(c)});refresh();\n if(tries===1)K.say(val(0)!==0&&bad.indexOf(0)>=0?'0 表示没有，是数字队伍的起点，排最前面':'再想想：数字一个比一个多 1','no');\n else if(tries===2)K.say('车厢抖动的，是放错的位置','no');\n else{var i0=bad[0],c0=cards[i0];place(c0,i0,true);c0.classList.add('lock');K.say('老师帮你放好了第一个，接着排','no')}}\nK.$('#btn-check').addEventListener('click',check);\nK.onState=function(s){if(s.completedSteps){s.completedSteps.forEach(function(i){var c=K.$('#num-card-'+i);if(c&&c.parentNode===tray)place(c,i)})}};\nK.onReveal=function(){};\nsetup(0);\n})();\n</script></body></html>",
+    "type": "interactive",
+    "widgetType": "diagram",
+    "widgetConfig": {
+     "type": "diagram",
+     "edges": [
+      {
+       "to": "n1",
+       "from": "n0",
+       "label": "下一个"
+      },
+      {
+       "to": "n2",
+       "from": "n1",
+       "label": "下一个"
+      },
+      {
+       "to": "n3",
+       "from": "n2",
+       "label": "下一个"
+      },
+      {
+       "to": "n4",
+       "from": "n3",
+       "label": "下一个"
+      },
+      {
+       "to": "n5",
+       "from": "n4",
+       "label": "下一个"
+      }
+     ],
+     "nodes": [
+      {
+       "id": "n0",
+       "icon": "⭕",
+       "label": "0",
+       "details": "0表示没有，也是起点"
+      },
+      {
+       "id": "n1",
+       "icon": "1️⃣",
+       "label": "1",
+       "details": "1添上1是2"
+      },
+      {
+       "id": "n2",
+       "icon": "2️⃣",
+       "label": "2",
+       "details": "2比1多1"
+      },
+      {
+       "id": "n3",
+       "icon": "3️⃣",
+       "label": "3",
+       "details": "3在2后面"
+      },
+      {
+       "id": "n4",
+       "icon": "4️⃣",
+       "label": "4",
+       "details": "4继续排队"
+      },
+      {
+       "id": "n5",
+       "icon": "5️⃣",
+       "label": "5",
+       "details": "5是队伍末尾"
+      }
+     ],
+     "revealOrder": [
+      "n0",
+      "n1",
+      "n2",
+      "n3",
+      "n4",
+      "n5"
+     ]
+    }
+   },
+   "stageId": "stage-I81QjmOZJO",
+   "createdAt": 1793610427351,
+   "outlineId": "p5",
+   "updatedAt": 1793610427351
+  },
+  {
+   "id": "scene-p6",
+   "type": "quiz",
+   "order": 6,
+   "title": "第1站·小检查",
+   "actions": [
+    {
+     "id": "action_hppGKmkN",
+     "text": "好，刚才我们一起数了小鸭、认了数字，现在到“小检查”时间啦。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_hppGKmkN-a866bcdb586358adaaeed34d1a97e7fe32fabe3c98575494ccd2169bfc212f8d.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_hppGKmkN-a866bcdb586358adaaeed34d1a97e7fe32fabe3c98575494ccd2169bfc212f8d.wav"
+    },
+    {
+     "id": "action_hppGKmkN_s2",
+     "text": "请你先自己读题、自己选一选，遇到拿不准的，就像我们刚才那样，再数一遍、再看一眼。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_hppGKmkN_s2-d10b46ef9e2f4a5521ac634111adc8e6d2db449eeb2182040fce92dd10d61450.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_hppGKmkN_s2-d10b46ef9e2f4a5521ac634111adc8e6d2db449eeb2182040fce92dd10d61450.wav"
+    },
+    {
+     "id": "action_hppGKmkN_s3",
+     "text": "等你提交完了，我再和你一起看看答得怎么样。",
+     "type": "speech",
+     "audioId": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_hppGKmkN_s3-c3cc4f0e14f850d6c9ad4817fcee8ba4e5251a5291804fa7cb8735a0a8102902.wav",
+     "audioUrl": "/api/classroom-media/stage-I81QjmOZJO/media/tts-action_hppGKmkN_s3-c3cc4f0e14f850d6c9ad4817fcee8ba4e5251a5291804fa7cb8735a0a8102902.wav"
+    }
+   ],
+   "content": {
+    "type": "quiz",
+    "questions": [
+     {
+      "id": "q1",
+      "type": "single",
+      "answer": [
+       "B"
+      ],
+      "points": 10,
+      "options": [
+       {
+        "label": "4只",
+        "value": "A"
+       },
+       {
+        "label": "5只",
+        "value": "B"
+       },
+       {
+        "label": "6只",
+        "value": "C"
+       }
+      ],
+      "analysis": "从左到右一个一个数：1、2、3、4、5，一共5只。",
+      "question": "①【数一数】数一数，一共有几只小鸭？🦆🦆🦆🦆🦆",
+      "hasAnswer": true
+     },
+     {
+      "id": "q2",
+      "type": "single",
+      "answer": [
+       "B"
+      ],
+      "points": 10,
+      "options": [
+       {
+        "label": "0",
+        "value": "A"
+       },
+       {
+        "label": "2",
+        "value": "B"
+       },
+       {
+        "label": "3",
+        "value": "C"
+       }
+      ],
+      "analysis": "数一数：0、1、2……1的后面一个是2。",
+      "question": "②【数序】0、1、2、3、4、5 排队，1 的后面一个数是几？",
+      "hasAnswer": true
+     }
+    ]
+   },
+   "stageId": "stage-I81QjmOZJO",
+   "createdAt": 1793610435376,
+   "outlineId": "p6",
+   "updatedAt": 1793610435376
+  }
+ ]
+}
