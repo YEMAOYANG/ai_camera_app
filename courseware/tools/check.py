@@ -63,6 +63,7 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
 
     scenes = body.get('scenes', [])
     speech_count = question_count = 0
+    answers = []
     referenced = set()
     for index, scene in enumerate(scenes, 1):
         actions = scene.get('actions', [])
@@ -124,6 +125,8 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
                 answer = question.get('answer')
                 if not isinstance(answer, list) or len(answer) != 1 or answer[0] not in values:
                     add('G4', 'quiz_answer_invalid', index, name)
+                else:
+                    answers.append(answer[0])
                 for field in ('analysis', 'skill', 'questionAudioUrl'):
                     if not isinstance(question.get(field), str) or not question[field].strip():
                         add('G4', 'quiz_' + field + '_missing', index, name)
@@ -136,6 +139,12 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
                         add('G4', 'quiz_visuals_invalid', index, name)
                     if EMOJI.search(text) or any(EMOJI.search(str(o.get('label', ''))) for o in options):
                         add('G4', 'quiz_emoji', index, name)
+
+    if len(answers) >= 4:
+        # A child who always taps the same place must not pass by luck.
+        value, count = max(((v, answers.count(v)) for v in set(answers)), key=lambda pair: (pair[1], str(pair[0])))
+        if count * 2 > len(answers):
+            add('G4', 'answer_position_skewed', None, '%s is the answer to %d of %d questions' % (value, count, len(answers)))
 
     if media_dir is not None:
         directory = Path(media_dir)

@@ -107,6 +107,16 @@ class CheckTests(unittest.TestCase):
         self.assertTrue({'quiz_options_invalid', 'quiz_answer_invalid', 'quiz_analysis_missing', 'quiz_skill_missing', 'quiz_questionAudioUrl_missing', 'quiz_visuals_invalid', 'quiz_emoji', 'self_read_instruction'} <= codes(check_classroom(self.body, grade=1)))
         self.assertNotIn('quiz_emoji', codes(check_classroom(self.body, grade=3)))
 
+    def test_answer_positions_must_be_spread(self):
+        template = self.body['scenes'][2]['content']['questions'][0]
+
+        def with_answers(letters):
+            self.body['scenes'][2]['content']['questions'] = [dict(template, id='q%d' % i, answer=[letter]) for i, letter in enumerate(letters)]
+            return codes(check_classroom(self.body))
+        self.assertIn('answer_position_skewed', with_answers('AAAB'))
+        self.assertNotIn('answer_position_skewed', with_answers('AABB'))
+        self.assertNotIn('answer_position_skewed', with_answers('AAB'))
+
     def test_voices(self):
         agent = self.body['stage']['generatedAgentConfigs'][0]
         agent['voiceConfig'] = {}
