@@ -43,12 +43,24 @@ class AuthRepository:
                 );
 
                 CREATE TABLE IF NOT EXISTS sms_codes (
-                  phone VARCHAR(255) PRIMARY KEY,
+                  phone VARCHAR(255) NOT NULL,
+                  purpose VARCHAR(32) NOT NULL,
                   code_hash VARCHAR(255) NOT NULL,
                   expires_at BIGINT NOT NULL,
                   created_at BIGINT NOT NULL,
                   attempt_count INTEGER NOT NULL DEFAULT 0,
-                  last_sent_at BIGINT NOT NULL
+                  last_sent_at BIGINT NOT NULL,
+                  PRIMARY KEY (phone, purpose),
+                  CHECK (purpose IN ('login', 'phone_change'))
+                );
+
+                CREATE TABLE IF NOT EXISTS sms_send_windows (
+                  scope_key VARCHAR(128) NOT NULL,
+                  window_start BIGINT NOT NULL,
+                  reserved_count INTEGER NOT NULL,
+                  updated_at BIGINT NOT NULL,
+                  PRIMARY KEY (scope_key, window_start),
+                  CHECK (reserved_count >= 0)
                 );
 
                 CREATE TABLE IF NOT EXISTS sessions (
@@ -73,46 +85,120 @@ class AuthRepository:
                 """
             )
 
-    def upsert_sms_code(
+    def reserve_sms_send_budget(
+        self,
+        conn: DatabaseConnection,
+        *,
+        now: int,
+        scope_key: str,
+        window_seconds: int,
+        max_sends: int,
+    ) -> bool:
+        """Atomically reserve one provider submission in a scoped window."""
+        if max_sends < 1 or window_seconds < 1:
+            return False
+        window_ms = window_seconds * 1000
+        window_start = now - now % window_ms
+        cursor = conn.execute(
+            """
+            INSERT INTO sms_send_windows(
+              scope_key, window_start, reserved_count, updated_at
+            ) VALUES (?, ?, 1, ?)
+            ON CONFLICT (scope_key, window_start) DO UPDATE SET
+              reserved_count = sms_send_windows.reserved_count + 1,
+              updated_at = EXCLUDED.updated_at
+            WHERE sms_send_windows.reserved_count < ?
+            """,
+            (scope_key, window_start, now, max_sends),
+        )
+        conn.execute(
+            "DELETE FROM sms_send_windows WHERE window_start < ?",
+            (now - 7 * 24 * 60 * 60 * 1000,),
+        )
+        return cursor.rowcount == 1
+
+    def reserve_sms_code(
         self,
         conn: DatabaseConnection,
         *,
         phone: str,
+        purpose: str,
         code_hash: str,
         expires_at: int,
         created_at: int,
-    ) -> None:
-        existing = self.find_sms_code(conn, phone)
-        if existing:
-            conn.execute(
-                """
-                UPDATE sms_codes
-                SET code_hash = ?, expires_at = ?, created_at = ?, attempt_count = 0, last_sent_at = ?
-                WHERE phone = ?
-                """,
-                (code_hash, expires_at, created_at, created_at, phone),
-            )
-            return
+        resend_cooldown_seconds: int,
+    ) -> bool:
+        """Atomically reserve one provider send for a phone and purpose.
 
-        conn.execute(
+        The single INSERT/ON CONFLICT statement closes the first-request race:
+        concurrent requests cannot both observe an absent row and send separate
+        messages. The reservation intentionally commits before the provider is
+        called, so an ambiguous provider timeout still enforces the cooldown.
+        """
+        cursor = conn.execute(
             """
-            INSERT INTO sms_codes(phone, code_hash, expires_at, created_at, attempt_count, last_sent_at)
-            VALUES (?, ?, ?, ?, 0, ?)
+            INSERT INTO sms_codes(
+              phone, purpose, code_hash, expires_at, created_at, attempt_count, last_sent_at
+            ) VALUES (?, ?, ?, ?, ?, 0, ?)
+            ON CONFLICT (phone, purpose) DO UPDATE SET
+              code_hash = EXCLUDED.code_hash,
+              expires_at = EXCLUDED.expires_at,
+              created_at = EXCLUDED.created_at,
+              attempt_count = 0,
+              last_sent_at = EXCLUDED.last_sent_at
+            WHERE sms_codes.last_sent_at <= ?
             """,
-            (phone, code_hash, expires_at, created_at, created_at),
+            (
+                phone,
+                purpose,
+                code_hash,
+                expires_at,
+                created_at,
+                created_at,
+                created_at - max(0, resend_cooldown_seconds) * 1000,
+            ),
+        )
+        return cursor.rowcount == 1
+
+    def find_sms_code(
+        self,
+        conn: DatabaseConnection,
+        phone: str,
+        *,
+        purpose: str = "login",
+        for_update: bool = False,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM sms_codes WHERE phone = ? AND purpose = ?"
+            + (" FOR UPDATE" if for_update else ""),
+            (phone, purpose),
+        ).fetchone()
+
+    def delete_sms_code(
+        self,
+        conn: DatabaseConnection,
+        phone: str,
+        *,
+        purpose: str = "login",
+    ) -> None:
+        conn.execute(
+            "DELETE FROM sms_codes WHERE phone = ? AND purpose = ?",
+            (phone, purpose),
         )
 
-    def find_sms_code(self, conn: DatabaseConnection, phone: str, *, for_update: bool = False) -> DatabaseRow | None:
-        return conn.execute("SELECT * FROM sms_codes WHERE phone = ?" + (" FOR UPDATE" if for_update else ""),
-                            (phone,)).fetchone()
-
-    def delete_sms_code(self, conn: DatabaseConnection, phone: str) -> None:
-        conn.execute("DELETE FROM sms_codes WHERE phone = ?", (phone,))
-
-    def increment_sms_attempts(self, conn: DatabaseConnection, phone: str) -> None:
+    def increment_sms_attempts(
+        self,
+        conn: DatabaseConnection,
+        phone: str,
+        *,
+        purpose: str = "login",
+    ) -> None:
         conn.execute(
-            "UPDATE sms_codes SET attempt_count = attempt_count + 1 WHERE phone = ?",
-            (phone,),
+            """
+            UPDATE sms_codes SET attempt_count = attempt_count + 1
+            WHERE phone = ? AND purpose = ?
+            """,
+            (phone, purpose),
         )
 
     def find_user_by_phone(self, conn: DatabaseConnection, phone: str) -> DatabaseRow | None:

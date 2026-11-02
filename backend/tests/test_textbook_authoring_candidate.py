@@ -11,12 +11,16 @@ from unittest.mock import Mock
 
 from PIL import Image
 
-from content.textbook_authoring_candidate import (validate_authoring_candidate, CANDIDATE_FILE,
+from content.textbook_authoring_candidate import (validate_authoring_candidate,
+    resolve_authoring_interaction_policy, CANDIDATE_FILE,
     _assets, _scenes, _questions, _image_coverage)
 from content.textbook_catalog import canonical, digest, lesson_by_id
 from content.textbook_interaction_policy import freeze_interaction_policy
-from content.textbook_scene_contract import freeze_scene_contract, validate_scene_contract
+from content.textbook_scene_contract import (
+    freeze_author_dispatch_contract, freeze_scene_contract, validate_scene_contract,
+)
 from core.errors import ApiError
+from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from repositories.textbook_repository import TextbookRepository
 from services.course_reuse_resolver import lesson_scope
 from services.textbook_learning_service import TextbookLearningService
@@ -94,6 +98,7 @@ class CandidateFixture:
             'teacherContract': self.draft['teacherContract'], 'catalogCheck': check, 'interactionPolicy': policy,
             'draftSha256': hashlib.sha256(raw).hexdigest(), 'draftCanonicalSha256': digest(self.draft),
             'requestSha256': hashlib.sha256(self.draft['request'].encode()).hexdigest(), 'origin': 'http://127.0.0.1:3100',
+            'payloadSha256': '3' * 64,
             'sceneContract': freeze_scene_contract(self.draft, check, policy)}
         (self.job / 'draft.json').write_bytes(raw)
         self.write(self.job / 'frozen.json', self.frozen)
@@ -105,7 +110,8 @@ class CandidateFixture:
 
     def snapshot(self):
         self.ledger['scenes'] = [{'sceneId': s['id'], 'order': s['order'], 'canonicalJson': canonical(s),
-            'sha256': digest(s), 'contractSha256': self.frozen['sceneContract']['sha256']} for s in self.classroom['scenes']]
+            'sha256': digest(s), 'contractSha256': self.ledger['frozenContract']['sha256']}
+                                 for s in self.classroom['scenes']]
         self.save()
 
     def save(self):
@@ -129,8 +135,32 @@ class CandidateFixture:
         self.ledger['frozenContract'] = self.frozen['sceneContract']
         self.snapshot()
 
+    def use_v4(self):
+        self.draft['scopeReview']['officialResourceReview'] = {
+            'schemaVersion': 'mira.official-resource-review.v1',
+            'officialTextbook': deepcopy(self.draft['binding']),
+            'classHours': [{
+                'classHourId': 'lesson_1', 'title': 'Synthetic reviewed hour',
+                'learningObjectives': ['Use pictures and teacher narration to complete the lesson scope.'],
+                'resources': {
+                    kind: {'status': 'reviewed', 'locations': [f'{kind}:1'],
+                           'findings': [f'Synthetic reviewed {kind} finding.']}
+                    for kind in ('teachingDesign', 'learningTaskSheet', 'afterClassExercise')
+                },
+            }],
+            'adaptation': {'originalDesign': ['Use original scenes and interactions.']},
+        }
+        self.freeze()
+        self.frozen['schemaVersion'] = 'mira.operator.workbench-authoring.v4'
+        self.frozen['authorDispatchContract'] = freeze_author_dispatch_contract(
+            self.frozen['sceneContract'])
+        self.write(self.job / 'frozen.json', self.frozen)
+        self.ledger['frozenContract'] = self.frozen['authorDispatchContract']
+        self.snapshot()
+
     def archive_complete_scene_revision(self):
         after = deepcopy(self.ledger)
+        contract_sha = after['frozenContract']['sha256']
         after_raw = (self.store / self.stage / CANDIDATE_FILE).read_bytes()
         replacement = deepcopy(self.classroom['scenes'][1])
         original = deepcopy(replacement)
@@ -138,14 +168,14 @@ class CandidateFixture:
         before = deepcopy(after)
         before['scenes'][1] = {'sceneId': original['id'], 'order': original['order'],
             'canonicalJson': canonical(original), 'sha256': digest(original),
-            'contractSha256': self.frozen['sceneContract']['sha256']}
+            'contractSha256': contract_sha}
         before['sha256'] = digest({key: value for key, value in before.items() if key != 'sha256'})
         before_raw = (canonical(before) + '\n').encode()
         original_raw = (canonical(original) + '\n').encode()
         replacement_raw = (canonical(replacement) + '\n').encode()
         scene_suffix = hashlib.sha256(original['id'].encode()).hexdigest()
         complete = {'exactSceneId': original['id'],
-            'frozenContractSha256': self.frozen['sceneContract']['sha256'],
+            'frozenContractSha256': contract_sha,
             'originalSceneSha256': digest(original), 'currentSceneSha256': digest(original),
             'replacementSceneSha256': digest(replacement),
             'preservedIdentity': {key: original.get(key) for key in
@@ -167,7 +197,7 @@ class CandidateFixture:
                 'expectedCandidateFileSha256': hashlib.sha256(before_raw).hexdigest(),
                 'stateTransitionNotes': ['Synthetic revision.'], 'revisions': []},
             'dataDir': str(self.store.parent), 'sessionId': self.session, 'stageId': self.stage,
-            'ownerFingerprint': '2' * 64, 'contractSha256': self.frozen['sceneContract']['sha256'],
+            'ownerFingerprint': '2' * 64, 'contractSha256': contract_sha,
             'beforeDocumentSha256': '3' * 64, 'afterDocumentSha256': '4' * 64,
             'beforeCandidateSha256': before['sha256'],
             'beforeCandidateFileSha256': hashlib.sha256(before_raw).hexdigest(),
@@ -212,11 +242,114 @@ class CandidateIntegrityTest(unittest.TestCase):
         before = deepcopy(self.f.classroom)
         summary = self.f.validate()
         self.assertEqual(summary['sceneCount'], 6)
-        self.assertEqual(summary['interactionPolicyVersion'], 2)
+        self.assertEqual(summary['interactionPolicyVersion'],
+                         self.f.frozen['interactionPolicy']['policy']['version'])
         self.assertEqual(summary['interactionPolicySha256'], self.f.frozen['interactionPolicy']['sha256'])
         self.assertEqual(summary['wholeCourseQualityContractSha256'],
                          digest(self.f.frozen['interactionPolicy']['policy']['wholeCourseQualityContract']))
+        self.assertEqual(summary['contractSha256'], self.f.frozen['sceneContract']['sha256'])
         self.assertEqual(self.f.classroom, before)
+
+    def test_v4_compact_candidate_passes_while_full_contract_guards_pages_quizzes_and_assets(self):
+        self.f.use_v4()
+        before = deepcopy(self.f.classroom)
+        summary = self.f.validate()
+        self.assertEqual(summary['contractSha256'], self.f.frozen['authorDispatchContract']['sha256'])
+        self.assertEqual(summary['sceneCount'], len(self.f.frozen['sceneContract']['contract']['pagePlan']))
+        for label, mutation in (
+                ('page', lambda: self.f.classroom['scenes'][0].update(title='Rehashed but unplanned')),
+                ('quiz', lambda: self.f.classroom['scenes'][2]['content']['questions'][0].update(
+                    question='Rehashed but unlocked question')),
+                ('asset', lambda: self.f.classroom['scenes'][0]['content']['canvas']['elements'].append(
+                    {'type': 'image', 'src': '/unbound/rehashed.png'}))):
+            with self.subTest(label=label):
+                self.f.classroom = deepcopy(before)
+                mutation()
+                self.f.snapshot()
+                self.rejected()
+        self.f.classroom = before
+        self.f.snapshot()
+        self.assertIsNotNone(self.f.validate())
+
+    def test_v4_publication_policy_resolver_rejects_compact_ref_or_full_snapshot_tamper(self):
+        self.f.use_v4()
+        summary = self.f.validate()
+        resolved = resolve_authoring_interaction_policy(
+            self.f.store, self.f.authoring, self.f.manifest, self.f.node, summary,
+            output_root=self.f.output)
+        self.assertEqual(resolved, self.f.frozen['interactionPolicy'])
+        original_frozen, original_ledger = deepcopy(self.f.frozen), deepcopy(self.f.ledger)
+
+        self.f.ledger['frozenContract']['contract']['policyRef']['sha256'] = '0' * 64
+        self.f.ledger['frozenContract']['sha256'] = digest(self.f.ledger['frozenContract']['contract'])
+        self.f.save()
+        with self.assertRaises(ApiError):
+            resolve_authoring_interaction_policy(
+                self.f.store, self.f.authoring, self.f.manifest, self.f.node, summary,
+                output_root=self.f.output)
+
+        self.f.ledger = deepcopy(original_ledger)
+        self.f.save()
+        self.f.frozen = deepcopy(original_frozen)
+        self.f.frozen['interactionPolicy']['policy']['title'] = 'Tampered policy bytes'
+        self.f.frozen['interactionPolicy']['sha256'] = digest(
+            self.f.frozen['interactionPolicy']['policy'])
+        self.f.write(self.f.job / 'frozen.json', self.f.frozen)
+        with self.assertRaises(ApiError):
+            resolve_authoring_interaction_policy(
+                self.f.store, self.f.authoring, self.f.manifest, self.f.node, summary,
+                output_root=self.f.output)
+
+    def test_v4_compact_candidate_keeps_complete_scene_followup_validation(self):
+        self.f.use_v4()
+        folder = self.f.archive_complete_scene_revision()
+        followup = self.f.validate()['completeSceneReviewFollowup']
+        self.assertEqual(followup['revisionIds'], [folder.name])
+        self.assertEqual(followup['completeSceneIds'], ['two'])
+        self.assertEqual(followup['baseInteractionPolicySha256'],
+                         self.f.frozen['interactionPolicy']['sha256'])
+
+    def test_v4_rejects_dispatch_source_tamper_full_contract_substitution_and_unknown_schema(self):
+        self.f.use_v4()
+        original_frozen, original_ledger = deepcopy(self.f.frozen), deepcopy(self.f.ledger)
+
+        changed = deepcopy(original_frozen)
+        changed['authorDispatchContract']['contract']['sourceSceneContractSha256'] = '0' * 64
+        changed['authorDispatchContract']['sha256'] = digest(
+            changed['authorDispatchContract']['contract'])
+        self.f.frozen = changed
+        self.f.write(self.f.job / 'frozen.json', changed)
+        self.f.ledger = deepcopy(original_ledger)
+        self.f.ledger['frozenContract'] = deepcopy(changed['authorDispatchContract'])
+        self.f.snapshot()
+        self.rejected()
+
+        self.f.frozen = deepcopy(original_frozen)
+        self.f.write(self.f.job / 'frozen.json', self.f.frozen)
+        self.f.ledger = deepcopy(original_ledger)
+        self.f.ledger['frozenContract'] = deepcopy(self.f.frozen['sceneContract'])
+        self.f.snapshot()
+        self.rejected()
+
+        self.f.ledger = deepcopy(original_ledger)
+        self.f.snapshot()
+        self.f.frozen['schemaVersion'] = 'mira.operator.workbench-authoring.v5'
+        self.f.write(self.f.job / 'frozen.json', self.f.frozen)
+        self.rejected()
+
+    def test_v4_rejects_full_scene_contract_tamper_and_cross_session_rebinding(self):
+        self.f.use_v4()
+        self.f.frozen['sceneContract']['contract']['pagePlan'][0]['title'] = 'Tampered locally'
+        self.f.frozen['sceneContract']['sha256'] = digest(
+            self.f.frozen['sceneContract']['contract'])
+        self.f.write(self.f.job / 'frozen.json', self.f.frozen)
+        self.rejected()
+
+        self.f.use_v4()
+        other_authoring = {**self.f.authoring, 'sessionId': 'another-session'}
+        with self.assertRaises(ApiError) as error:
+            self.f.validate(authoring=other_authoring)
+        self.assertEqual(error.exception.code, 'textbook_preview_candidate_invalid')
 
     def test_complete_scene_followup_binds_legacy_candidate_to_current_policy(self):
         self.f.use_legacy_interaction_policy()
@@ -499,8 +632,40 @@ class CandidateAdoptionTest(unittest.TestCase):
         self.repo = TextbookRepository(self.db)
         TextbookLearningService(self.repo).import_manifest(self.f.manifest)
         self.runtime = Mock(base_url='http://127.0.0.1:3100')
-        self.runtime.get_classroom.side_effect = lambda _: deepcopy(self.f.classroom)
-        self.service = TextbookPreviewService(self.repo, self.runtime, authoring_output_root=self.f.output)
+        self.materialized_id = TextbookPreviewService._materialized_adoption_id(
+            self.f.stage, self.f.ledger['sha256'], '1')
+        self.public_classrooms = {}
+        def public_classroom(classroom_id):
+            if classroom_id not in self.public_classrooms:
+                raise OpenMaicFullRuntimeError('not_found', 'not found', status_code=404)
+            return deepcopy(self.public_classrooms[classroom_id])
+        def save_public(classroom):
+            if classroom['id'] == self.f.stage:
+                raise AssertionError('original author stage must remain immutable')
+            self.public_classrooms[classroom['id']] = deepcopy(classroom)
+        self.runtime.get_classroom.side_effect = public_classroom
+        self.runtime.save_preview_classroom.side_effect = save_public
+        self.owner_fingerprint = '2' * 64
+        (self.f.job / 'owner.cookies').write_text('synthetic private owner; never exported')
+        self.f.write(self.f.job / 'dispatch.json', {
+            'createdAt': '2026-01-01T00:00:00+00:00',
+            'requestSha256': self.f.frozen['requestSha256'],
+            'payloadSha256': self.f.frozen['payloadSha256'],
+            'ownerFingerprint': self.owner_fingerprint,
+            'action': 'single_post_intent',
+        })
+        self.workbench = Mock()
+        self.workbench.owner_fingerprint.return_value = self.owner_fingerprint
+        self.workbench.stage.side_effect = lambda _: {
+            'stage': deepcopy(self.f.classroom['stage']),
+            'scenes': deepcopy(self.f.classroom['scenes']),
+            'outline': {'producerRef': self.f.session},
+            'dslVersion': 'synthetic-test',
+        }
+        self.workbench_factory = Mock(return_value=self.workbench)
+        self.service = TextbookPreviewService(
+            self.repo, self.runtime, authoring_output_root=self.f.output,
+            workbench_client_factory=self.workbench_factory)
 
     def adopt(self):
         f = self.f
@@ -528,28 +693,203 @@ class CandidateAdoptionTest(unittest.TestCase):
         self.assert_no_writes()
 
     def test_valid_candidate_adopts_without_mutating_original_classroom(self):
+        original = deepcopy(self.f.classroom)
+        self.assertEqual(self.materialized_id,
+            TextbookPreviewService._materialized_adoption_id(
+                self.f.stage, self.f.ledger['sha256'], '1'))
+        self.assertNotEqual(self.materialized_id,
+            TextbookPreviewService._materialized_adoption_id(
+                self.f.stage, self.f.ledger['sha256'], '2'))
         result = self.adopt()
         self.assertEqual(result['status'], 'review_required')
-        self.runtime.save_preview_classroom.assert_not_called()
+        self.assertEqual(result['classroomId'], self.materialized_id)
+        self.workbench_factory.assert_called_with(
+            self.runtime.base_url, (self.f.job / 'owner.cookies').resolve())
+        self.workbench.stage.assert_called_with(self.f.stage)
+        self.runtime.save_preview_classroom.assert_called_once()
+        self.assertEqual([item.args[0] for item in self.runtime.get_classroom.call_args_list],
+                         [self.materialized_id, self.materialized_id])
         self.runtime.start_generation.assert_not_called()
-        row = self.db.execute('SELECT input_json FROM learning_textbook_course_previews WHERE preview_key=?',
-                              (result['previewKey'],)).fetchone()
+        clone = self.runtime.save_preview_classroom.call_args.args[0]
+        self.assertEqual((clone['id'], clone['stage']['id']),
+                         (self.materialized_id, self.materialized_id))
+        self.assertEqual({scene['stageId'] for scene in clone['scenes']},
+                         {self.materialized_id})
+        self.assertIn(f'/api/classroom-media/{self.f.stage}/media/', canonical(clone))
+        self.assertEqual(self.f.classroom, original)
+        row = self.db.execute(
+            'SELECT input_json,classroom_id,classroom_json,runtime_job_id '
+            'FROM learning_textbook_course_previews WHERE preview_key=?',
+            (result['previewKey'],)).fetchone()
         candidate = json.loads(row['input_json'])['authoringCandidate']
-        self.assertEqual(candidate['interactionPolicyVersion'], 2)
+        self.assertEqual(candidate['interactionPolicyVersion'],
+                         self.f.frozen['interactionPolicy']['policy']['version'])
         self.assertEqual(candidate['interactionPolicySha256'], self.f.frozen['interactionPolicy']['sha256'])
+        frozen = json.loads(row['input_json'])
+        self.assertEqual(frozen['authoring']['stageId'], self.f.stage)
+        self.assertEqual(row['classroom_id'], self.materialized_id)
+        self.assertEqual(json.loads(row['classroom_json']), clone)
+        self.assertEqual(row['runtime_job_id'], f'agent-session:{self.f.session}:{self.f.stage}')
         self.assertEqual(self.adopt()['previewKey'], result['previewKey'])
+        self.runtime.save_preview_classroom.assert_called_once()
+        self.assertEqual(self.runtime.get_classroom.call_count, 3)
+
+    def test_verified_zero_question_candidate_adopts_without_inventing_a_quiz(self):
+        self.f.draft['lockedAssessments'] = []
+        self.f.draft['pagePlan'] = self.f.draft['pagePlan'][:2] + [{
+            'page': 3, 'type': 'interactive', 'title': 'Try again', 'move': 'Revise.'}]
+        third = deepcopy(self.f.classroom['scenes'][1])
+        third.update(id='three', order=3, title='Try again')
+        third['actions'][0]['id'] = 'three-speech'
+        self.f.classroom['scenes'] = self.f.classroom['scenes'][:2] + [third]
+        # Neither a request nor a document field may override the frozen zero.
+        self.f.authoring['request'] = '{"expectedQuestionCount":4,"lockedAssessments":[{"id":"invented"}]}'
+        self.f.classroom['expectedQuestionCount'] = 4
+        self.f.freeze()
+        self.f.ledger['frozenContract'] = self.f.frozen['sceneContract']
+        self.f.snapshot()
+        original = deepcopy(self.f.classroom)
+
+        result = self.adopt()
+        row = self.service.get(result['previewKey'])
+        prompt = json.loads(row['input_json'])['previewPrompt']
+        self.assertEqual((prompt['expectedSceneCount'], prompt['expectedQuestionCount']), (3, 0))
+        self.assertEqual(prompt['requiredSceneTypes'], ['slide', 'interactive'])
+        self.assertEqual(json.loads(row['result_json'])['issues'], ['speech_audio_missing'])
+        self.assertFalse(any(s['type'] == 'quiz' for s in json.loads(row['classroom_json'])['scenes']))
+        self.assertEqual(self.f.classroom, original)
+        self.runtime.start_generation.assert_not_called()
+        self.runtime.start_formal_audio_tts.assert_not_called()
+
+    def test_verified_nonempty_locks_override_blueprint_count_without_weakening_quizzes(self):
+        self.f.draft['lockedAssessments'] = self.f.draft['lockedAssessments'][:2]
+        self.f.draft['pagePlan'] = self.f.draft['pagePlan'][:4]
+        self.f.classroom['scenes'] = self.f.classroom['scenes'][:4]
+        self.f.freeze()
+        self.f.ledger['frozenContract'] = self.f.frozen['sceneContract']
+        self.f.snapshot()
+        result = self.adopt()
+        row = self.service.get(result['previewKey'])
+        prompt = json.loads(row['input_json'])['previewPrompt']
+        self.assertEqual(prompt['expectedQuestionCount'], 2)
+        self.assertIn('quiz', prompt['requiredSceneTypes'])
+        self.assertEqual(json.loads(row['result_json'])['issues'], ['speech_audio_missing'])
+        self.runtime.start_generation.assert_not_called()
+        self.runtime.start_formal_audio_tts.assert_not_called()
+
+    def test_all_interactive_candidate_preserves_frozen_plan_without_inventing_a_slide(self):
+        self.f.draft['lockedAssessments'] = []
+        template = deepcopy(self.f.classroom['scenes'][1])
+        self.f.draft['pagePlan'] = []
+        self.f.classroom['scenes'] = []
+        for page in range(1, 4):
+            scene = deepcopy(template)
+            scene.update(id=f'play-{page}', order=page, title=f'Activity {page}')
+            scene['actions'][0]['id'] = f'speech-{page}'
+            self.f.classroom['scenes'].append(scene)
+            self.f.draft['pagePlan'].append({'page': page, 'type': 'interactive',
+                'title': scene['title'], 'move': 'Try and revise.'})
+        self.f.freeze()
+        self.f.ledger['frozenContract'] = self.f.frozen['sceneContract']
+        self.f.snapshot()
+        original = deepcopy(self.f.classroom)
+        result = self.adopt()
+        row = self.service.get(result['previewKey'])
+        prompt = json.loads(row['input_json'])['previewPrompt']
+        self.assertEqual(prompt['requiredSceneTypes'], ['interactive'])
+        self.assertEqual(json.loads(row['result_json'])['issues'], ['speech_audio_missing'])
+        self.assertEqual(self.f.classroom, original)
+        self.assertEqual({s['type'] for s in json.loads(row['classroom_json'])['scenes']}, {'interactive'})
+        self.runtime.start_generation.assert_not_called()
+        self.runtime.start_formal_audio_tts.assert_not_called()
+
+    def test_owner_cookie_and_dispatch_identity_fail_closed_before_stage_or_database(self):
+        (self.f.job / 'owner.cookies').unlink()
+        with self.assertRaises(ApiError) as error:
+            self.adopt()
+        self.assertEqual(error.exception.code, 'textbook_preview_candidate_invalid')
+        self.workbench_factory.assert_not_called()
+        self.assert_no_writes()
+
+        (self.f.job / 'owner.cookies').write_text('synthetic private owner; never exported')
+        self.f.write(self.f.job / 'dispatch.json', {
+            'createdAt': '2026-01-01T00:00:00+00:00',
+            'requestSha256': self.f.frozen['requestSha256'],
+            'payloadSha256': self.f.frozen['payloadSha256'],
+            'ownerFingerprint': '4' * 64,
+            'action': 'single_post_intent',
+        })
+        with self.assertRaises(ApiError) as error:
+            self.adopt()
+        self.assertEqual(error.exception.code, 'textbook_preview_candidate_invalid')
+        self.workbench.stage.assert_not_called()
+        self.assert_no_writes()
+
+    def test_revised_session_keeps_original_dispatch_hashes_and_uses_current_candidate(self):
+        self.f.write(self.f.job / 'dispatch.json', {
+            'createdAt': '2026-01-01T00:00:00+00:00',
+            # A repaired/follow-up session keeps the original one-POST marker;
+            # these intentionally differ from the current frozen revision.
+            'requestSha256': '5' * 64,
+            'payloadSha256': '6' * 64,
+            'ownerFingerprint': self.owner_fingerprint,
+            'action': 'single_post_intent',
+        })
+        result = self.adopt()
+        self.assertEqual(result['status'], 'review_required')
+        self.workbench.stage.assert_called_once_with(self.f.stage)
+        self.runtime.save_preview_classroom.assert_called_once()
+
+    def test_authoritative_stage_must_belong_to_original_session(self):
+        self.workbench.stage.side_effect = None
+        self.workbench.stage.return_value = {
+            'stage': deepcopy(self.f.classroom['stage']),
+            'scenes': deepcopy(self.f.classroom['scenes']),
+            'outline': {'producerRef': 'another-session'},
+        }
+        with self.assertRaises(ApiError) as error:
+            self.adopt()
+        self.assertEqual(error.exception.code, 'textbook_preview_candidate_invalid')
+        self.runtime.get_classroom.assert_not_called()
+        self.assert_no_writes()
+
+    def test_materialized_public_readback_must_match_authoritative_stage(self):
+        wrong = deepcopy(self.f.classroom)
+        wrong['id'] = wrong['stage']['id'] = self.materialized_id
+        for scene in wrong['scenes']:
+            scene['stageId'] = self.materialized_id
+        wrong['scenes'][0]['title'] = 'different deterministic preview'
+        self.public_classrooms[self.materialized_id] = wrong
+        with self.assertRaises(ApiError) as error:
+            self.adopt()
+        self.assertEqual(error.exception.code, 'textbook_preview_snapshot_conflict')
+        self.runtime.save_preview_classroom.assert_not_called()
+        self.runtime.get_classroom.assert_called_once_with(self.materialized_id)
+        self.assertEqual(self.db.execute(
+            'SELECT COUNT(*) AS n FROM learning_textbook_course_previews').fetchone()['n'], 0)
+        self.assertEqual(self.db.execute(
+            'SELECT COUNT(*) AS n FROM learning_course_reuse_slots').fetchone()['n'], 0)
+
+    def test_materialization_conflict_stops_after_version_read_without_database_write(self):
+        self.runtime.save_preview_classroom.side_effect = OpenMaicFullRuntimeError(
+            'course_storage_write_conflict', 'stale version', status_code=409)
+        with self.assertRaises(OpenMaicFullRuntimeError) as error:
+            self.adopt()
+        self.assertEqual(error.exception.code, 'course_storage_write_conflict')
+        self.runtime.get_classroom.assert_called_once_with(self.materialized_id)
+        self.runtime.save_preview_classroom.assert_called_once()
+        self.assertEqual(self.db.execute(
+            'SELECT COUNT(*) AS n FROM learning_textbook_course_previews').fetchone()['n'], 0)
+        self.assertEqual(self.db.execute(
+            'SELECT COUNT(*) AS n FROM learning_course_reuse_slots').fetchone()['n'], 0)
 
     def test_legacy_complete_scene_followup_is_frozen_into_the_preview_input(self):
         self.f.use_legacy_interaction_policy()
-        folder = self.f.archive_complete_scene_revision()
-        result = self.adopt()
-        row = self.db.execute('SELECT input_json FROM learning_textbook_course_previews WHERE preview_key=?',
-                              (result['previewKey'],)).fetchone()
-        frozen = json.loads(row['input_json'])
-        followup = frozen['authoringCandidate']['completeSceneReviewFollowup']
-        self.assertEqual(followup['revisionIds'], [folder.name])
-        self.assertEqual(followup['candidateSourceSha256'], frozen['sourceSha256'])
-        self.assertEqual(followup['currentInteractionPolicySha256'], freeze_interaction_policy()['sha256'])
+        self.f.archive_complete_scene_revision()
+        with self.assertRaises(ApiError) as error:
+            self.adopt()
+        self.assertEqual(error.exception.code, 'textbook_preview_candidate_revision_required')
+        self.assert_no_writes()
 
 
 class NativeCandidateInteropTest(unittest.TestCase):

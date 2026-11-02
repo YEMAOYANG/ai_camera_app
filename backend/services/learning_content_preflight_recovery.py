@@ -104,7 +104,11 @@ def _check_source_archives(audit, dispatches):
 
 
 def recover_preflight_content(*, adapter, identity, expected_history_sha, now, failure_audit_path, apply=False):
-    from integrations.openmaic_formal_media import REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, policy_from_target
+    from integrations.openmaic_formal_media import (
+        REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+        QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+        policy_from_target,
+    )
     from integrations.openmaic_question_adapter import _normalize_phase_output_checkpoint
     from services.learning_content_recovery import EVENT
     audit = json.loads(Path(failure_audit_path).read_text())
@@ -124,7 +128,10 @@ def recover_preflight_content(*, adapter, identity, expected_history_sha, now, f
                 or any(item.get(key) is not None for key in ('course_id', 'course_version', 'content_lease_token'))
                 or any(row['status'] != 'pending' for row in rows if row['id'] != item['id'])
                 or build['status'] != 'failed' or build['error_code'] != 'preparation_content_provider_unavailable'
-                or policy_from_target(json.loads(build['target_spec_json'])) != REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY):
+                or policy_from_target(json.loads(build['target_spec_json'])) not in (
+                    REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+                    QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+                )):
             raise ValueError('preflight recovery requires the unchanged failed v2 single course')
         requested = conn.execute('SELECT subject,skill_id,variant_ordinal FROM learning_course_supply_requests '
             'WHERE target_fingerprint=? AND enabled = 1', (identity['targetFingerprint'],)).fetchall()

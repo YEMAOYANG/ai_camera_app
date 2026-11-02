@@ -66,22 +66,27 @@ class _NoRedirect(HTTPRedirectHandler):
 
 
 class OpenMaicWorkbenchClient:
-    def __init__(self, origin, cookie_path, *, timeout=20):
+    def __init__(self, origin, cookie_path, *, timeout=20, read_only=False):
         self.origin = local_origin(origin)
         self.cookie_path = Path(cookie_path)
         self.timeout = timeout
+        self.read_only = read_only
         self.scene_contract_schema = None
+        self.material_groups_schema = None
         # Production emits Secure even on its loopback HTTP listener. Browsers
         # trust localhost; this jar is likewise used ONLY at the validated origin.
         self.jar = MozillaCookieJar(policy=DefaultCookiePolicy(secure_protocols=('https', 'http')))
         if self.cookie_path.is_symlink():
             raise WorkbenchError('owner_cookie_invalid', '私有身份文件不能为符号链接')
         if self.cookie_path.exists():
-            os.chmod(self.cookie_path, 0o600)
+            if not self.read_only:
+                os.chmod(self.cookie_path, 0o600)
             try:
                 self.jar.load(str(self.cookie_path), ignore_discard=True, ignore_expires=True)
             except (OSError, ValueError):
                 raise WorkbenchError('owner_cookie_invalid', '私有身份文件不可读，保留原文件后核查') from None
+        if self.read_only:
+            self.owner_fingerprint()  # Never acquire a new identity in a read audit.
         self.opener = build_opener(ProxyHandler({}), _NoRedirect(), HTTPCookieProcessor(self.jar))
 
     def owner_fingerprint(self):
@@ -93,6 +98,8 @@ class OpenMaicWorkbenchClient:
 
     def _save_owner(self):
         self.owner_fingerprint()
+        if self.read_only:
+            return
         fd, temporary = tempfile.mkstemp(prefix='.owner-', dir=self.cookie_path.parent)
         os.close(fd)
         try:
@@ -102,6 +109,8 @@ class OpenMaicWorkbenchClient:
             os.unlink(temporary)
 
     def _open(self, path, payload=None, *, raw=None, headers=None):
+        if self.read_only and (payload is not None or raw is not None):
+            raise WorkbenchError('workbench_read_only', '只读核验不能提交工作台请求')
         before = self.owner_fingerprint() if self.cookie_path.exists() else None
         if (payload is not None or raw is not None) and before is None:
             raise WorkbenchError('owner_cookie_missing', '派发前须先 GET 并保存工作台身份')
@@ -131,6 +140,8 @@ class OpenMaicWorkbenchClient:
                 if path == '/api/agent/sessions' and payload is None:
                     self.scene_contract_schema = getattr(response, 'headers', {}).get(
                         'x-mira-textbook-scene-contract')
+                    self.material_groups_schema = getattr(response, 'headers', {}).get(
+                        'x-mira-agent-material-groups')
             if len(raw) > 64 * 1024 * 1024:
                 raise ValueError()
             return json.loads(raw)

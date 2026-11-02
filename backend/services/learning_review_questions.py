@@ -44,29 +44,35 @@ def authored_question(spec, course, skill, original, *, verify_audio=True, relea
 def published_question_pool(conn, child):
     from content.textbook_release import validate_release
     from repositories.textbook_repository import TextbookRepository
+    from services.learning_review_content import approved_question_pool
     repo = TextbookRepository(None)
     rows = conn.execute('''SELECT DISTINCT c.* FROM learning_sessions s
         JOIN learning_courses c ON c.id=s.course_id AND c.version=s.course_version
         WHERE s.family_id=? AND s.child_id=? AND c.grade_code=?''',
         (child['family_id'], child['id'], child['grade_code'])).fetchall()
-    result, gaps = [], []
+    approved, approved_gaps = approved_question_pool(conn, child)
+    result, gaps = list(approved), list(approved_gaps)
+    covered = {(q['courseId'], q['courseVersion']) for q in approved
+               if q.get('approved') is True and q.get('learnedScopeVerified') is True}
+    legacy_gaps = []
     for row in rows:
         course = dict(row)
         build = conn.execute("SELECT * FROM learning_textbook_course_builds WHERE course_id=? AND course_version=? AND status='published'",
             (course['id'], course['version'])).fetchone()
         if not build:
-            gaps.append(course['title'])
+            legacy_gaps.append(((course['id'], course['version']), course['title']))
             continue
         directory = repo.get_revision(conn, build['edition_id'], build['revision_id'])
         try:
             release = validate_release(build, repo.manifest(directory), course) if directory else None
             if release is None or not journey.supported(release):
-                gaps.append(course['title'])
+                legacy_gaps.append(((course['id'], course['version']), course['title']))
                 continue
             spec = journey.definition(release=release)
             for skill in spec.skills:
                 for original in spec.flow['bank'][skill]:
                     result.append(authored_question(spec, course, skill, original, release=release))
         except (ApiError, KeyError, ValueError, OSError):
-            gaps.append(course['title'])
+            legacy_gaps.append(((course['id'], course['version']), course['title']))
+    gaps.extend(title for identity, title in legacy_gaps if identity not in covered)
     return result, sorted(set(gaps))

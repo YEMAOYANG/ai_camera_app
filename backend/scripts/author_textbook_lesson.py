@@ -9,13 +9,18 @@ amend --job-directory PATH --draft revised.json --expected-draft-sha256 SHA
 any dispatch/owner/session/artifact exists. The same command resumes interrupted
 local writes; immutable archives remain. It never creates a Pro client or POST.
 start --job-directory PATH may POST once. status is GET-only, including recovery.
-attach-materials --job-directory PATH --materials-manifest PATH freezes 1–20
+hold --job-directory PATH --reviewer NAME --basis REASON permanently fences an
+undispatched frozen job whose review evidence is insufficient. It has no
+unhold action; corrected work must use a separate, traceable teaching revision.
+attach-materials --job-directory PATH --materials-manifest PATH freezes 1–64
 PNG/UTF-8 text assets and uploads each once before start. Manifest schema is
 mira.operator.material-attachments.v1, with assets[{assetKey,path,sha256,mimeType}].
 mimeType defaults to image/png, requiring width/height; text/plain needs neither.
 Optional byteSize must match. Shared text sources do not add planned image assets.
 Text can be read by the agent after local plain-text extraction; this CLI never
-extracts or invokes a provider. All materialIds bind before the first run starts.
+extracts or invokes a provider. Above twenty files requires the bounded Native
+materialIdGroups capability (four groups, 64 files, 128 MiB total). All opening
+materials bind before the first run starts; historical <=20 payloads are unchanged.
 Finish amendments first. Unknown upload outcomes stop; never blindly retry them.
 An existing preview/build always requires reuse review, even a legacy release.
 
@@ -25,6 +30,18 @@ requires an exact source draft hash and reviewer/basis. The parent must have
 no saved stage, candidate, generated media or non-text material. Its original
 bytes and negative asset check are archived; all other duplicate fences remain.
 This action prepares only. A later start repeats the parent checks before POST.
+
+revise-terminal prepares a deliberate new teaching revision of a terminal
+parent with saved work. It requires the same source/reviewer flags as
+supersede-widget, plus scopeReview.authoringRevisionAuthorization in the new
+draft. It preserves the parent request, stage, candidate and all media bytes;
+only the exact reviewed parent duplicate is exempted. Locked questions may
+move pages but all their other fields and order must stay unchanged. No POST.
+
+revise-prepared prepares a review-evidence correction of a permanently held,
+never-dispatched prepared parent. The exact parent and its complete ready
+attachment evidence are archived without owner cookies; teaching content must
+remain unchanged. It performs no provider call and does not start the target.
 """
 import argparse
 import json
@@ -44,7 +61,8 @@ from services.textbook_workbench_authoring import TextbookWorkbenchAuthoring, Wo
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('prepare', 'amend', 'attach-materials', 'supersede-widget', 'start', 'status'))
+    parser.add_argument('action', choices=('prepare', 'amend', 'hold', 'attach-materials', 'supersede-widget',
+                                           'revise-terminal', 'revise-prepared', 'start', 'status'))
     parser.add_argument('--draft', type=Path)
     parser.add_argument('--job-directory', type=Path)
     parser.add_argument('--materials-manifest', type=Path, help='attach-materials: reviewed PNG/UTF-8 text manifest')
@@ -61,6 +79,9 @@ def main(argv=None):
         parser.error('prepare requires --draft and does not accept --job-directory')
     if args.action in ('start', 'status') and (not args.job_directory or args.draft):
         parser.error('start/status require --job-directory and do not accept --draft')
+    if args.action == 'hold' and (not args.job_directory or args.draft or not args.reviewer or not args.basis
+                                  or args.expected_draft_sha256):
+        parser.error('hold requires --job-directory, --reviewer and --basis; it does not accept a draft or expected draft hash')
     if args.action == 'attach-materials' and (not args.job_directory or not args.materials_manifest or args.draft):
         parser.error('attach-materials requires --job-directory and --materials-manifest, without --draft')
     if args.action != 'attach-materials' and args.materials_manifest is not None:
@@ -68,17 +89,24 @@ def main(argv=None):
     amendment_args = (args.expected_draft_sha256, args.reviewer, args.basis)
     if args.action == 'amend' and (not args.job_directory or not args.draft or not all(amendment_args)):
         parser.error('amend requires --job-directory, --draft, --expected-draft-sha256, --reviewer and --basis')
-    if args.action not in ('amend', 'supersede-widget') and any(value is not None for value in amendment_args):
+    if args.action not in ('amend', 'hold', 'supersede-widget', 'revise-terminal', 'revise-prepared') and any(value is not None for value in amendment_args):
         parser.error('amendment review arguments apply only to amend')
-    successor_args = (args.source_job, args.expected_source_draft_sha256, args.classroom_directory)
-    if args.action == 'supersede-widget' and (not all(successor_args) or not args.draft
-            or not args.teaching_revision or not args.reviewer or not args.basis
+    successor_args = (args.source_job, args.expected_source_draft_sha256)
+    if args.action in ('supersede-widget', 'revise-terminal') and (not all(successor_args) or not args.draft
+            or not args.classroom_directory or not args.teaching_revision or not args.reviewer or not args.basis
             or args.job_directory or args.expected_draft_sha256):
-        parser.error('supersede-widget requires source-job, expected-source-draft-sha256, classroom-directory, '
+        parser.error('supersede-widget/revise-terminal require source-job, expected-source-draft-sha256, classroom-directory, '
                      'draft, teaching-revision, reviewer and basis; no job-directory or expected-draft-sha256')
-    if args.action != 'supersede-widget' and any(value is not None for value in successor_args):
-        parser.error('source-job, expected-source-draft-sha256 and classroom-directory apply only to supersede-widget')
-    if args.action not in ('prepare', 'supersede-widget') and args.teaching_revision is not None:
+    if args.action == 'revise-prepared' and (not all(successor_args) or not args.draft
+            or args.classroom_directory or not args.teaching_revision or not args.reviewer or not args.basis
+            or args.job_directory or args.expected_draft_sha256):
+        parser.error('revise-prepared requires source-job, expected-source-draft-sha256, draft, teaching-revision, '
+                     'reviewer and basis; no classroom-directory, job-directory or expected-draft-sha256')
+    if args.action not in ('supersede-widget', 'revise-terminal', 'revise-prepared') and any(value is not None for value in successor_args):
+        parser.error('source-job, expected-source-draft-sha256 and classroom-directory apply only to reviewed successors')
+    if args.action not in ('supersede-widget', 'revise-terminal') and args.classroom_directory is not None:
+        parser.error('classroom-directory applies only to terminal reviewed successors')
+    if args.action not in ('prepare', 'supersede-widget', 'revise-terminal', 'revise-prepared') and args.teaching_revision is not None:
         parser.error('amend/start/status use the frozen teaching revision; do not pass --teaching-revision')
     try:
         config = AppConfig.from_env()
@@ -90,6 +118,8 @@ def main(argv=None):
         elif args.action == 'amend':
             result = service.amend(args.job_directory, args.draft, expected_draft_sha256=args.expected_draft_sha256,
                                    reviewer=args.reviewer, basis=args.basis)
+        elif args.action == 'hold':
+            result = service.hold(args.job_directory, reviewer=args.reviewer, basis=args.basis)
         elif args.action == 'attach-materials':
             result = service.attach_materials(args.job_directory, args.materials_manifest)
         elif args.action == 'supersede-widget':
@@ -97,6 +127,16 @@ def main(argv=None):
                 teaching_revision=args.teaching_revision,
                 expected_source_draft_sha256=args.expected_source_draft_sha256,
                 reviewer=args.reviewer, basis=args.basis, classroom_directory=args.classroom_directory)
+        elif args.action == 'revise-terminal':
+            result = service.revise_terminal(args.source_job, args.draft,
+                teaching_revision=args.teaching_revision,
+                expected_source_draft_sha256=args.expected_source_draft_sha256,
+                reviewer=args.reviewer, basis=args.basis, classroom_directory=args.classroom_directory)
+        elif args.action == 'revise-prepared':
+            result = service.revise_prepared(args.source_job, args.draft,
+                teaching_revision=args.teaching_revision,
+                expected_source_draft_sha256=args.expected_source_draft_sha256,
+                reviewer=args.reviewer, basis=args.basis)
         else:
             result = service.run(args.job_directory, start=args.action == 'start')
         print(json.dumps(result, ensure_ascii=False, indent=2))

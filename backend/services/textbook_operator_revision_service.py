@@ -474,6 +474,7 @@ def prepare_revision(service, content_key, classroom_directory, patch, source_au
         responsive_ids = ({c['sceneId'] for c in candidate['visualPatch']['changes']}
                           if candidate['patch']['schemaVersion'] == VISUAL_PATCH_SCHEMA else None)
         checks = preview_checks(candidate['classroom'], prompt['expectedSceneCount'], frozen['originalMedia'], prompt.get('expectedQuestionCount', 6),
+                                required_scene_types=prompt.get('requiredSceneTypes'),
                                 grade_code=frozen.get('gradeCode'), responsive_scene_ids=responsive_ids)
         if any(i != 'speech_audio_missing' for i in checks['issues']):
             fail('候选结构或图片检查未通过')
@@ -603,6 +604,7 @@ def register_revision(service, prepared_directory, classroom_directory, *, budge
             responsive_ids = ({c['sceneId'] for c in candidate['visualPatch']['changes']}
                               if candidate['patch']['schemaVersion'] == VISUAL_PATCH_SCHEMA else None)
             checks = preview_checks(saved, prompt['expectedSceneCount'], frozen['originalMedia'], prompt.get('expectedQuestionCount', 6),
+                                    required_scene_types=prompt.get('requiredSceneTypes'),
                                     grade_code=frozen.get('gradeCode'), responsive_scene_ids=responsive_ids)
             checks.update(audioReceipts=receipts, audioStopCode=None, operatorParentProvenanceSha256=provenance['sha256'])
             timestamp = now_ms()

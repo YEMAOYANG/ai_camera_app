@@ -23,10 +23,10 @@ FORMAL_EVENT_RECEIPT_SCHEMA = (
 RUNTIME_UPSTREAM_VERSION = "1.0.0"
 RUNTIME_UPSTREAM_COMMIT = "aa2bfb3c1d406c47100c6744d90e788abdf1f6d5"
 # Deployment pins must match openmaic-runtime/upstream.lock.json.
-RUNTIME_PATCH_COUNT = 166
-RUNTIME_LATEST_PATCH = "0166-mira-interactive-lines-wait-for-lecture.patch"
+RUNTIME_PATCH_COUNT = 265
+RUNTIME_LATEST_PATCH = "0265-mira-qwen-image-v2-policy.patch"
 RUNTIME_LATEST_PATCH_SHA256 = (
-    "5a0308872b293690106537f77daef5fbcc109a5ee9295ed22ad0753d71ea60ea"
+    "8f6dd212dcef28b032d3da0344c499388979c67a199ef9b597f4b6646d9ad4f9"
 )
 
 

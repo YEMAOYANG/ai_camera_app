@@ -15,6 +15,7 @@ from scripts.narrate_textbook_batch import load_candidate
 from scripts.private_textbook_preview_snapshot import verify_complete_audio
 from services.textbook_batch_audio import build_audio_plan, audio_language_policy_from_plan
 from services.course_media_object_store import CourseMediaObjectStore, CourseMediaStorageError
+from services.textbook_cover_guard import verify_textbook_cover
 from content.textbook_deepseek_release import validate_new_authoring, validate_new_release_admission
 
 
@@ -63,11 +64,13 @@ def reviewed_estimated_minutes(review):
 
 
 class TextbookActivityPublicationService:
-    def __init__(self, repository, runtime_origin, classroom_directory, *, course_media_store=None):
+    def __init__(self, repository, runtime_origin, classroom_directory, *, course_media_store=None,
+                 cover_guard=verify_textbook_cover):
         self.repository = repository
         self.origin = runtime_origin.rstrip('/')
         self.root = Path(classroom_directory).resolve()
         self.course_media_store = course_media_store or CourseMediaObjectStore()
+        self.cover_guard = cover_guard
         if urlparse(self.origin).hostname not in {'localhost', '127.0.0.1', '::1'}:
             fail('本机发布工具不能写入其他运行环境')
 
@@ -214,6 +217,9 @@ class TextbookActivityPublicationService:
             row = self.repository.get_revision(conn, binding['editionId'], binding['alignmentRevisionId'])
             if row is None or row['manifest_sha256'] != binding['alignmentManifestSha256']:
                 fail('教材修订已变化')
+            previous = self.repository.get_build(conn, frozen['contentKey'])
+            if previous is None or previous['status'] != 'published':
+                self.cover_guard(prepared, media_root=self.root, media_store=self.course_media_store)
             now = now_ms()
             build, _ = self.repository.reserve_build(conn, frozen, now)
             old = conn.execute('SELECT * FROM learning_courses WHERE id=? AND version=? FOR UPDATE',

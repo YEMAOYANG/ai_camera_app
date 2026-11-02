@@ -105,6 +105,10 @@ def _formal_quality_model_sql(alias: str) -> str:
         MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
         REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY,
         PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
+        QWEN3_PLAYFUL_PROFESSIONAL_POLICY, QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+        QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY,
+        QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY,
+        QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
     )
 
     def raw(path: str) -> str:
@@ -127,7 +131,9 @@ def _formal_quality_model_sql(alias: str) -> str:
     reviewer = text("professionalCreation.teachingQuality.review.modelId")
     legacy = (PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY,
               MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
-              REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)
+              REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+              QWEN3_PLAYFUL_PROFESSIONAL_POLICY,
+              QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)
     legacy_branch = " AND ".join([
         "(" + " OR ".join(f"{policy} = {frozen(value)}" for value in legacy) + ")",
         f"{raw('professionalCreation.modelPolicyId')} IS NULL",
@@ -136,13 +142,16 @@ def _formal_quality_model_sql(alias: str) -> str:
     ])
     current_branch = " AND ".join([
         "(" + " OR ".join(f"{policy} = {frozen(value)}" for value in
-            (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)) + ")",
+            (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
+             QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY,
+             QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)) + ")",
         f"{model_id} = 'deepseek-v4-pro-current-flash-v1'",
         f"{scene_policy} IS NULL",
         f"{reviewer} = 'deepseek-flash'",
     ])
     candidate_branch = " AND ".join([
-        f"{policy} = {frozen(FLASH_CANDIDATE_PROFESSIONAL_POLICY)}",
+        f"({policy} = {frozen(FLASH_CANDIDATE_PROFESSIONAL_POLICY)} OR "
+        f"{policy} = {frozen(QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY)})",
         f"{model_id} = 'deepseek-v4.1-flash-candidate-v1'",
         f"{scene_policy} = {frozen(FLASH_CANDIDATE_PROFESSIONAL_POLICY['sceneLearningPolicy'])}",
         f"{reviewer} = 'deepseek-flash'",
@@ -429,17 +438,31 @@ def current_formal_runtime_sql(*, runtime_alias: str) -> str:
         )
         OR (
           JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
-            '$.generationContract.professionalCreationPolicy.image.policyId')) = 'mira-formal-qwen-image.v1'
+            '$.generationContract.professionalCreationPolicy.image.policyId')) IN (
+              'mira-formal-qwen-image.v1', 'mira-formal-qwen-image.v2'
+            )
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.generationContract.generation.enableImageGeneration')) = 'true'
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.professionalCreation.imageGenerationEnabled')) = 'true'
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
-            '$.professionalCreation.imagePolicyId')) = 'mira-formal-qwen-image.v1'
+            '$.professionalCreation.imagePolicyId')) = JSON_UNQUOTE(JSON_EXTRACT(
+              {alias}.feature_manifest_json,
+              '$.generationContract.professionalCreationPolicy.image.policyId'))
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.media.schemaVersion')) = 'mira.openmaic.formal-media-receipt.v1'
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.media.status')) = 'succeeded'
+          AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
+            '$.media.policyId')) = JSON_UNQUOTE(JSON_EXTRACT(
+              {alias}.feature_manifest_json,
+              '$.generationContract.professionalCreationPolicy.image.policyId'))
+          AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
+            '$.media.providerId')) = 'qwen-image'
+          AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
+            '$.media.modelId')) = JSON_UNQUOTE(JSON_EXTRACT(
+              {alias}.feature_manifest_json,
+              '$.generationContract.professionalCreationPolicy.image.modelId'))
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,
             '$.media.runtimeRequestId')) = {alias}.request_id
           AND JSON_UNQUOTE(JSON_EXTRACT({alias}.feature_manifest_json,

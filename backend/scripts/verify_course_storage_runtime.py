@@ -27,6 +27,7 @@ from core.course_storage_config import CourseStorageConfig
 from core.database import Database
 from core.errors import ApiError
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
+from integrations.openmaic_workbench_client import OpenMaicWorkbenchClient
 from repositories.course_storage_repository import CourseStorageRepository, storage_id_for
 from repositories.textbook_repository import TextbookRepository
 from services import course_file_store
@@ -370,7 +371,9 @@ def main():
             repository=registry), PROJECT_ROOT, Path(task).resolve())
         runtime = ReadOnlyRuntime(OpenMaicFullRuntimeClient(read_url,
             formal_audio_internal_token=config.INTERNAL_API_TOKEN), canonical_origin=config.OPENMAIC_FULL_RUNTIME_INTERNAL_URL)
-        service = TextbookPreviewService(TextbookRepository(database), runtime)
+        service = TextbookPreviewService(TextbookRepository(database), runtime,
+            workbench_client_factory=lambda origin, cookie_path: OpenMaicWorkbenchClient(
+                origin, cookie_path, read_only=True))
         output.mkdir(mode=0o700, parents=True, exist_ok=True)
         sys.addaudithook(WriteGuard(output, CLASSROOMS).check)
         results = []

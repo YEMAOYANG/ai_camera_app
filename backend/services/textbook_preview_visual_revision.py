@@ -607,6 +607,7 @@ def revise_preview_visuals(service, key, classroom_directory, patch):
                 responsive_ids = {s['id'] for s in target['scenes'] if s.get('type') == 'interactive'
                                   and s.get('content', {}).get('html') != original_html.get(s['id'])}
                 checks = preview_checks(target, prompt['expectedSceneCount'], frozen.get('originalMedia'), prompt.get('expectedQuestionCount', 6),
+                                        required_scene_types=prompt.get('requiredSceneTypes'),
                                         grade_code=frozen.get('gradeCode'), responsive_scene_ids=responsive_ids)
                 if checks['issues']:
                     fail('修订后课件结构或插画检查未通过：' + '、'.join(checks['issues']))
@@ -741,10 +742,28 @@ def verify_quantity_visual_revisions(row, classroom_directory):
     revisions = result.get('visualRevisions', [])
     if not any(r.get('patchSchemaVersion') == QUANTITY_VISUAL_SCHEMA for r in revisions):
         return
+    verify_visual_revisions(row, classroom_directory)
+
+
+def verify_visual_revisions(row, classroom_directory):
+    """Read and rebuild the full visual history, returning its original source.
+
+    This also serves native-source ancestry checks. It never relaxes the native
+    content comparison: callers must verify the returned original separately.
+    Narration and visual changes interleaved in this history fail closed.
+    """
+    result = json.loads(row['result_json'])
+    revisions = result.get('visualRevisions', [])
+    if not isinstance(revisions, list) or len(revisions) > 16:
+        fail('视觉修订链格式或长度无效')
+    if not revisions:
+        return json.loads(row['classroom_json'])
     root = Path(classroom_directory).resolve()
     audio = root / row['classroom_id'] / 'textbook-preview-audio'
     previous = None
+    original = None
     try:
+        plan = json.loads(course_text(audio / 'plan.json'))
         for receipt in revisions:
             revision_id = receipt.get('revisionId')
             if not SHA.fullmatch(str(revision_id)):
@@ -754,10 +773,20 @@ def verify_quantity_visual_revisions(row, classroom_directory):
             patch = intent['patch']
             validate_patch(patch)
             if (receipt.get('sha256') != digest({k: v for k, v in receipt.items() if k != 'sha256'})
+                    or receipt.get('schemaVersion') != 'mira.textbook.preview-visual-amendment.v1'
+                    or intent.get('schemaVersion') != 'mira.textbook.preview-visual-intent.v1'
+                    or intent.get('revisionId') != revision_id
                     or intent.get('sha256') != digest({k: v for k, v in intent.items() if k != 'sha256'})
                     or receipt.get('intentSha256') != intent['sha256']
                     or digest({'previewKey': row['preview_key'], 'patch': patch}) != revision_id
                     or intent.get('previewKey') != row['preview_key'] or intent.get('classroomId') != row['classroom_id']
+                    or receipt.get('previewKey') != row['preview_key'] or receipt.get('classroomId') != row['classroom_id']
+                    or plan.get('previewKey') != row['preview_key']
+                    or intent.get('audioIdentityClassroomSha256') != plan.get('classroomSha256')
+                    or receipt.get('audioIdentityClassroomSha256') != plan.get('classroomSha256')
+                    or any(receipt.get(k) is not False for k in ('generationDispatched', 'ttsDispatched', 'asrDispatched', 'publicationAllowed'))
+                    or receipt.get('sceneIds') != [c['sceneId'] for c in patch['changes']]
+                    or any(receipt.get(k) != patch[k] for k in ('reviewer', 'basis'))
                     or json.loads(course_text(archive / 'amendment.json')) != receipt):
                 fail('视觉修订回执或归档绑定已变化')
             expected = {'source.json', 'source-row.json', 'target.json', 'plan.json', 'receipts.json'}
@@ -769,18 +798,26 @@ def verify_quantity_visual_revisions(row, classroom_directory):
                 if sha_bytes(course_bytes(archive / name)) != sha:
                     fail('视觉修订归档字节已变化')
             for name in ('plan.json', 'receipts.json'):
-                if course_bytes(archive / name) != course_bytes(audio / name):
+                field = 'audioPlanSha256' if name == 'plan.json' else 'audioReceiptsSha256'
+                if (course_bytes(archive / name) != course_bytes(audio / name)
+                        or receipt.get(field) != intent['files'][name]):
                     fail('数量图修订不能改变原配音计划或收据')
             source = json.loads(course_text(archive / 'source.json'))
             source_row = json.loads(course_text(archive / 'source-row.json'))
             target = json.loads(course_text(archive / 'target.json'))
             saved = json.loads(course_text(archive / 'saved.json'))
             if (source_row['input_json'] != row['input_json'] or digest(source) != patch['expectedSourceSha256']
+                    or source_row['preview_key'] != row['preview_key'] or source_row['classroom_id'] != row['classroom_id']
+                    or source_row['classroom_sha256'] != digest(source)
+                    or json.loads(source_row['classroom_json']) != source
+                    or source.get('id') != row['classroom_id'] or saved.get('id') != row['classroom_id']
                     or digest(source) != receipt['sourceSha256']
                     or previous is not None and previous != receipt['sourceSha256']
                     or persisted(saved) != persisted(target) or digest(saved) != receipt['targetSha256']
                     or candidate(source, patch, root, json.loads(row['input_json'])) != target):
                 fail('视觉修订链与冻结输入或原课件不一致')
+            if original is None:
+                original = source
             derived, files = quantity_assets(source, patch, root, json.loads(row['input_json']))
             if derived:
                 if (json.loads(course_text(archive / 'derived-images.json')) != derived
@@ -793,5 +830,6 @@ def verify_quantity_visual_revisions(row, classroom_directory):
             previous = receipt['targetSha256']
         if previous != row['classroom_sha256'] or digest(json.loads(row['classroom_json'])) != previous:
             fail('待发布课件不是完整视觉修订链的最终版本')
+        return original
     except (OSError, KeyError, TypeError, ValueError) as exc:
-        fail('无法核验数量图派生归档：' + str(exc))
+        fail('无法核验视觉修订归档：' + str(exc))

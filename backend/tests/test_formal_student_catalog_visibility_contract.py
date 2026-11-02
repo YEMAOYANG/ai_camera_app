@@ -69,6 +69,12 @@ class FormalStudentCatalogVisibilityContractTest(unittest.TestCase):
             "'$.research.providerid' )) ~ '^[a-za-z0-9_-]{1,64}$'", sql
         )
         self.assertIn("formalevidence.research.providerid", sql)
+        self.assertIn("mira-formal-qwen-image.v1", sql)
+        self.assertIn("mira-formal-qwen-image.v2", sql)
+        self.assertIn("professionalcreation.imagepolicyid", sql)
+        self.assertIn("media.policyid", sql)
+        self.assertIn("media.modelid", sql)
+        self.assertIn("professionalcreationpolicy.image.modelid", sql)
 
     def test_today_and_assignment_accept_exact_grade_pointer_publication(self):
         joins = LearningRepository._catalog_release_joins().lower()

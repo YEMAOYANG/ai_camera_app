@@ -31,8 +31,10 @@ def single_answer(question):
     return answer
 
 
-def check_questions(classroom):
+def check_questions(classroom, *, allow_empty=False):
     items = questions(classroom)
+    if not items and allow_empty and not any(s.get('type') == 'quiz' for s in classroom['scenes']):
+        return []
     if not items or len(items) > 30 or len({q['id'] for q in items}) != len(items):
         fail('题目数量或身份无效')
     for q in items:
@@ -85,6 +87,41 @@ def check_questions(classroom):
     return items
 
 
+def validate_authored_no_quiz_evidence(frozen, review):
+    """Keep new-author zero-quiz releases bound to their reviewed v4 candidate."""
+    evidence = frozen.get('authoredNoQuizEvidence')
+    if evidence is None:
+        return False
+    binding = frozen.get('textbookBinding', {})
+    candidate = evidence.get('authoringCandidate', {}) if isinstance(evidence, dict) else {}
+    quality = review.get('coursewareQuality', {})
+    authoring = evidence.get('authoring', {}) if isinstance(evidence, dict) else {}
+    if (not isinstance(evidence, dict)
+            or set(evidence) != {'schemaVersion', 'binding', 'authoring', 'authoringCandidate',
+                                 'lockedAssessments', 'expectedQuestionCount', 'sourceInputSha256'}
+            or evidence.get('schemaVersion') != 'mira.textbook.authored-no-quiz-evidence.v1'
+            or evidence.get('binding') != {'editionId': binding.get('editionId'),
+                'revisionId': binding.get('alignmentRevisionId'), 'nodeId': binding.get('nodeId')}
+            or evidence.get('lockedAssessments') != [] or type(evidence.get('expectedQuestionCount')) is not int
+            or evidence['expectedQuestionCount'] != 0
+            or not KEY.fullmatch(str(evidence.get('sourceInputSha256', '')))
+            or not isinstance(authoring, dict) or set(authoring) != {'stageId', 'sessionId'}
+            or any(not isinstance(v, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', v) for v in authoring.values())
+            or not isinstance(candidate, dict)
+            or candidate.get('schemaVersion') != 'mira.textbook.authoring-candidate.v1'
+            or candidate.get('verification') != 'frozen_identity_and_artifact_integrity_only'
+            or type(candidate.get('interactionPolicyVersion')) is not int or candidate['interactionPolicyVersion'] < 2
+            or any(not KEY.fullmatch(str(candidate.get(k, ''))) for k in
+                   ('sha256', 'contractSha256', 'interactionPolicySha256', 'wholeCourseQualityContractSha256'))
+            or candidate.get('completeSceneReviewFollowup') is not None
+            or not isinstance(quality, dict) or quality.get('status') != 'passed'
+            or quality.get('policySha256') != candidate.get('interactionPolicySha256')
+            or quality.get('sourceSha256') != frozen.get('sourceSha256')
+            or digest(quality) != frozen.get('wholeCourseQualityReviewSha256')):
+        fail('新作者无测验合同或整课审核身份无效')
+    return True
+
+
 def validate_release(build, manifest, course=None):
     """Validate exact hashes and the separate saved-artifact publication contract.
 
@@ -130,12 +167,38 @@ def validate_release(build, manifest, course=None):
     if (not release.get('media') or not release.get('audioAudit', {}).get('passed')
             or release['audioAudit'].get('segments') != sum(a.get('type') == 'speech' for s in release['classroom']['scenes'] for a in s.get('actions', []))):
         fail()
+    if ('interactionCompletionContract' in release and frozen.get('zeroNativeQuiz') is not True):
+        fail('互动完成合同缺少已核验的无测验课程身份')
+    correction = frozen.get('stageDescriptionCorrection')
+    if correction is not None and (not isinstance(correction, dict)
+            or set(correction) != {'beforeSha256','text','reason'}
+            or correction != review.get('stageDescriptionCorrection')
+            or not KEY.fullmatch(str(correction.get('beforeSha256', '')))
+            or not correction.get('reason')
+            or release['classroom'].get('stage', {}).get('description') != correction.get('text')):
+        fail('课程说明修订与发布冻结身份不一致')
     quality_sha = frozen.get('wholeCourseQualityReviewSha256')
     if quality_sha is not None and (not isinstance(quality_sha, str) or not KEY.fullmatch(quality_sha)
             or not isinstance(review.get('coursewareQuality'), dict)
             or digest(review['coursewareQuality']) != quality_sha):
         fail('课件本体质量审核与发布冻结身份不一致')
     complete_scene_followup = frozen.get('completeSceneReviewFollowup')
+    if frozen.get('nativeRevisionSource') is not None and complete_scene_followup is None:
+        fail('原生修订双来源证明缺少完整修订链')
+    official_followup = frozen.get('officialReviewFollowup')
+    if official_followup is not None:
+        try:
+            from content.textbook_official_followup import validate_frozen_followup
+            validate_frozen_followup(official_followup, frozen.get('nativeRevisionSource'))
+            official_record = official_followup['followup']
+            recorded_binding = official_record['binding']
+            if (recorded_binding.get('editionId') != binding['editionId']
+                    or recorded_binding.get('revisionId') != binding['alignmentRevisionId']
+                    or recorded_binding.get('nodeId') != binding['nodeId']
+                    or official_record.get('teachingRevision') != binding['teachingRevision']):
+                raise ValueError('official follow-up course identity differs')
+        except (ValueError, KeyError, TypeError):
+            fail('官方资源授权追溯与原生课堂不一致')
     if complete_scene_followup is not None:
         try:
             from content.textbook_review_followup import validate_complete_scene_review_followup
@@ -151,6 +214,41 @@ def validate_release(build, manifest, course=None):
                 or quality.get('policySha256') != complete_scene_followup['currentInteractionPolicySha256']
                 or quality.get('sourceSha256') != frozen.get('sourceSha256')):
             fail('完整场景修订缺少对应规则和课件的本体质量证据')
+        native_source = frozen.get('nativeRevisionSource')
+        if native_source is not None:
+            fields = {'schemaVersion', 'sessionId', 'stageId', 'ownerFingerprint',
+                      'authoringSourceSha256', 'nativeDocumentSha256', 'savedStageFileSha256',
+                      'revisionIds', 'revisionReceiptSha256s', 'candidateSha256',
+                      'candidateFileSha256', 'followupSha256', 'cloneCoreSha256', 'previewSourceSha256'}
+            audio = frozen.get('audioContract')
+            if (not isinstance(native_source, dict) or set(native_source) != fields
+                    or native_source.get('schemaVersion') != 'mira.textbook.native-preview-source.v1'
+                    or native_source.get('authoringSourceSha256') != frozen.get('authoringSourceSha256')
+                    or native_source.get('followupSha256') != complete_scene_followup.get('sha256')
+                    or any(native_source.get(k) != complete_scene_followup.get(k) for k in
+                           ('sessionId', 'stageId', 'revisionIds', 'revisionReceiptSha256s',
+                            'candidateSha256', 'candidateFileSha256'))
+                    or any(not isinstance(native_source.get(k), str) or not KEY.fullmatch(native_source[k])
+                           for k in ('ownerFingerprint', 'nativeDocumentSha256', 'savedStageFileSha256',
+                                     'cloneCoreSha256', 'previewSourceSha256'))
+                    or not isinstance(audio, dict)
+                    or audio.get('classroomSha256') != native_source['previewSourceSha256']
+                    or audio.get('coreSha256') != native_source['cloneCoreSha256']):
+                fail('原生修订与预览双来源证明不一致')
+    narration_target = frozen.get('sourceSha256')
+    if 'nativeVisualChain' in frozen:
+        try:
+            from content.textbook_native_revision_adoption import validate_visual_chain
+            validate_visual_chain(frozen['nativeVisualChain'], frozen.get('nativeRevisionSource'), narration_target)
+            narration_target = frozen['nativeVisualChain']['originalSourceSha256']
+        except (ValueError, KeyError, TypeError):
+            fail('视觉修订来源链与当前发布不一致')
+    if 'nativeNarrationChain' in frozen:
+        try:
+            from content.textbook_native_revision_adoption import validate_narration_chain
+            validate_narration_chain(frozen['nativeNarrationChain'], frozen.get('nativeRevisionSource'), narration_target)
+        except (ValueError, KeyError, TypeError):
+            fail('旁白修订来源链与当前发布不一致')
     if 'audioContract' in frozen:
         from content.textbook_preview_audio_contract import audit_contract_identity, resolve_audio_contract
         plan = frozen['audioContract']
@@ -160,6 +258,51 @@ def validate_release(build, manifest, course=None):
         if (contract['legacy'] or plan['previewKey'] != frozen['previewKey']
                 or release['audioAudit'].get('contract') != audit_contract_identity(plan)):
             fail('发布配音合同与学科或审核身份不一致')
+        if ('partialAudioParent' in frozen or 'partialAudioEvidence' in release['audioAudit']
+                or 'partialAudioEvidenceSha256' in frozen):
+            try:
+                from content.textbook_partial_audio_inheritance import validate_partial_release
+                validate_partial_release(frozen=frozen, release=release)
+            except (ValueError, KeyError, TypeError, StopIteration, ApiError):
+                fail('部分配音的原始来源或逐段识别审核无效')
+        if frozen.get('zeroNativeQuiz'):
+            authored_ok = validate_authored_no_quiz_evidence(frozen, review)
+            evidence = release['audioAudit'].get('partialAudioEvidence', {})
+            native_evidence = frozen.get('nativeNoQuizEvidence')
+            native_ok = bool(isinstance(native_evidence, dict)
+                and set(native_evidence) == {'expectedQuestionCount','candidateSha256','contractSha256','sourceInputSha256'}
+                and native_evidence.get('expectedQuestionCount') == 0
+                and frozen.get('nativeRevisionSource', {}).get('candidateSha256') == native_evidence.get('candidateSha256')
+                and all(KEY.fullmatch(str(native_evidence.get(k, ''))) for k in ('candidateSha256','contractSha256','sourceInputSha256')))
+            partial_ok = bool('partialAudioParent' in frozen
+                and evidence.get('sourceInput', {}).get('previewPrompt', {}).get('expectedQuestionCount') == 0
+                and evidence.get('targetInput', {}).get('previewPrompt', {}).get('expectedQuestionCount') == 0
+                and KEY.fullmatch(str(evidence.get('sourceInput', {}).get('authoringCandidate', {}).get('contractSha256', '')))
+                and evidence.get('sourceInput', {}).get('authoringCandidate', {}).get('contractSha256') ==
+                    evidence.get('targetInput', {}).get('authoringCandidate', {}).get('contractSha256'))
+            if (frozen['zeroNativeQuiz'] is not True or not (authored_ok or native_ok or partial_ok)
+                    or release.get('assessmentPolicy') != 'verified-frozen-no-native-quiz'
+                    or any(s.get('type') == 'quiz' for s in release['classroom']['scenes'])):
+                fail('无原生测验的冻结合同无效')
+            try:
+                from content.textbook_course_interaction import validate_contract, validate_delivery_templates
+                if release.get('textbookBinding') != {'editionId': binding['editionId'],
+                        'revisionId': binding['alignmentRevisionId'], 'nodeId': binding['nodeId']}:
+                    fail('互动合同与发布教材不一致')
+                validate_contract(release)
+                validate_delivery_templates(frozen, release)
+            except (ValueError, KeyError, TypeError, ApiError):
+                fail('发布互动合同不完整或页面内容已变化')
+            check_questions(release['classroom'], allow_empty=True)
+            if course is not None:
+                content = parse(course['content_json'])
+                if (not isinstance(content, dict) or content.get('schemaVersion') != 'mira.learning.fixed-textbook-course.v1'
+                        or content.get('assessmentPolicy') != 'verified-frozen-no-native-quiz'
+                        or content.get('outcomeMode') != 'ungraded' or content.get('questions') != []
+                        or content.get('releaseSha256') != release.get('sha256')):
+                    fail('无测验课程的学生展示身份无效')
+        elif release.get('assessmentPolicy') == 'verified-frozen-no-native-quiz':
+            fail('无原生测验的发布缺少冻结合同')
         from content.textbook_pinyin_pronunciation import PLAN_SCHEMA as PINYIN_SCHEMA, validate_listening_review
         if 'visualAudioInheritanceSha256' in frozen or 'visualAudioInheritance' in release['audioAudit']:
             from content.textbook_operator_revision import validate_visual_audio_acceptance
@@ -276,7 +419,7 @@ def validate_release(build, manifest, course=None):
             elif (acceptance is not None or 'reconciliation' in audit
                     or audit.get('acceptanceMethod') != 'literal-asr'):
                 fail('正式拼音音频接受方式与原始审核不一致')
-        elif (frozen.get('subject') == 'english'
+        elif (frozen.get('subject') in ('english', 'chinese')
                 and ('audioAcceptance' in frozen or 'reconciliation' in release['audioAudit'])):
             from content.textbook_english_asr_reconciliation import (
                 METHOD as ENGLISH_RECONCILIATION_METHOD,
@@ -284,6 +427,13 @@ def validate_release(build, manifest, course=None):
             )
             from content.textbook_preview_audio_contract import validate_v2_audit_segment
             from core.security import now_ms
+            if frozen.get('subject') == 'chinese':
+                from content.textbook_user_audio_reconciliation import (
+                    METHOD as reconciliation_method, validate_reconciliation,
+                )
+            else:
+                reconciliation_method = ENGLISH_RECONCILIATION_METHOD
+                validate_reconciliation = validate_english_reconciliation
             audit = release['audioAudit']
             raw = audit.get('literalAudit', {})
             reconciliation = audit.get('reconciliation', {})
@@ -298,16 +448,16 @@ def validate_release(build, manifest, course=None):
                     or raw.get('passed') is not False
                     or audit.get('sha256') != raw.get('sha256')
                     or audit.get('literalPassed') is not False
-                    or audit.get('acceptanceMethod') != ENGLISH_RECONCILIATION_METHOD
+                    or audit.get('acceptanceMethod') != reconciliation_method
                     or audit.get('minSimilarityBps') != min(
                         (item.get('similarityBps', -1) for item in raw.get('segments', [])), default=-1)
-                    or acceptance != {'method': ENGLISH_RECONCILIATION_METHOD,
+                    or acceptance != {'method': reconciliation_method,
                         'literalAuditSha256': raw.get('sha256'),
                         'reconciliationSha256': reconciliation.get('sha256')}
                     or any(k in frozen for k in ('pronunciationReviewSha256', 'visualAudioInheritanceSha256'))
                     or any(k in audit for k in ('pronunciationReview', 'visualAudioInheritance', 'listeningReview'))):
-                fail('英语正字法复核没有保持完整原始审核和冻结身份')
-            validate_english_reconciliation(reconciliation, plan=plan,
+                fail('逐段音频复核没有保持完整原始审核和冻结身份')
+            validate_reconciliation(reconciliation, plan=plan,
                 classroom=release['classroom'], audit=raw,
                 expected_source_sha256=frozen['sourceSha256'], now_ms=now_ms(),
                 expected_source_classroom_id=frozen['sourceClassroomId'])
@@ -331,7 +481,9 @@ def validate_release(build, manifest, course=None):
                 or 'pronunciationReview' in release['audioAudit']
                 or 'reconciliation' in release['audioAudit']):
             fail('配音复核不能用于其他学科或合同')
-    elif ('audioAcceptance' in frozen or 'pronunciationReviewSha256' in frozen
+    elif ('zeroNativeQuiz' in frozen or release.get('assessmentPolicy') == 'verified-frozen-no-native-quiz'
+            or 'interactionCompletionContract' in release
+            or 'audioAcceptance' in frozen or 'pronunciationReviewSha256' in frozen
             or 'visualAudioInheritanceSha256' in frozen
             or 'visualAudioInheritance' in release.get('audioAudit', {})
             or 'pronunciationReview' in release.get('audioAudit', {})):

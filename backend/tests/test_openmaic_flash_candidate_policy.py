@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient as Client, OpenMaicFullRuntimeError, _canonical_sha256
 from integrations.openmaic_formal_media import (FLASH_CANDIDATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+    QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY, QWEN3_PLAYFUL_PROFESSIONAL_POLICY,
     compatible_preparation_targets, professional_policy, professional_scene_learning_fields)
 from tests.test_formal_provider_readiness_client import _request, _response, _sha
 
@@ -17,7 +18,7 @@ class FlashFormalPolicyTest(unittest.TestCase):
         with patch.dict("os.environ", {"MIRA_FORMAL_MODEL_POLICY": "", "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
             self.assertEqual(_canonical_sha256(Client.FORMAL_PROFESSIONAL_MODEL_POLICY), "ea231a83dcd2c22d3a29197d2f6edc0a80c1ca58a0d8707fa4d3f4218168daff")
             self.assertEqual(Client.selected_professional_model_policy(), Client.FORMAL_PROFESSIONAL_MODEL_POLICY)
-            self.assertEqual(Client.selected_professional_creation_policy(), PLAYFUL_PROFESSIONAL_POLICY)
+            self.assertEqual(Client.selected_professional_creation_policy(), QWEN3_PLAYFUL_PROFESSIONAL_POLICY)
             selected = Client.selected_professional_model_policy()
             selected["agentDriver"]["modelId"] = "changed"
             self.assertEqual(Client.FORMAL_PROFESSIONAL_MODEL_POLICY["agentDriver"]["modelId"], "deepseek-v4-pro")
@@ -30,7 +31,7 @@ class FlashFormalPolicyTest(unittest.TestCase):
             for role in ("agentDriver", "coursewareCreator", "coursewareVerifier", "structuredScene"):
                 self.assertEqual(candidate[role]["modelId"], "deepseek-flash")
             self.assertIs(candidate["fallbackAllowed"], False)
-            self.assertEqual(Client.selected_professional_creation_policy(), FLASH_CANDIDATE_PROFESSIONAL_POLICY)
+            self.assertEqual(Client.selected_professional_creation_policy(), QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY)
         with self.assertRaises(ValueError):
             Client.selected_professional_model_policy("unreviewed-model-policy")
         with patch.dict("os.environ", {"MIRA_FORMAL_MODEL_POLICY": "unknown"}), self.assertRaises(ValueError):
@@ -39,7 +40,7 @@ class FlashFormalPolicyTest(unittest.TestCase):
     def test_registry_and_scene_policy_are_exact_and_not_an_arbitrary_runtime_flag(self):
         registry = json.loads((Path(__file__).resolve().parents[1] / "content" / "openmaic_formal_flash_candidate.v1.json").read_text())
         self.assertEqual(registry["modelPolicy"], Client.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY)
-        self.assertEqual(registry["sceneLearningPolicy"], FLASH_CANDIDATE_PROFESSIONAL_POLICY["sceneLearningPolicy"])
+        self.assertEqual(registry["sceneLearningPolicy"], QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY["sceneLearningPolicy"])
         self.assertEqual(professional_policy(FLASH_CANDIDATE_PROFESSIONAL_POLICY), FLASH_CANDIDATE_PROFESSIONAL_POLICY)
         changed = deepcopy(FLASH_CANDIDATE_PROFESSIONAL_POLICY)
         changed["sceneLearningPolicy"]["noMasteryClaims"] = False
@@ -49,11 +50,11 @@ class FlashFormalPolicyTest(unittest.TestCase):
 
     def test_candidate_target_only_matches_its_frozen_model_and_creation_pair(self):
         target = {"schemaVersion": "mira.learning.preparation-target.v1", "formalRuntimePolicy": {
-            "professionalCreationPolicy": deepcopy(FLASH_CANDIDATE_PROFESSIONAL_POLICY),
+            "professionalCreationPolicy": deepcopy(QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY),
             "professionalModelPolicy": deepcopy(Client.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY)}}
         self.assertEqual(compatible_preparation_targets(target), (target,))
         hybrid = deepcopy(target)
-        hybrid["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(PLAYFUL_PROFESSIONAL_POLICY)
+        hybrid["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(QWEN3_PLAYFUL_PROFESSIONAL_POLICY)
         with self.assertRaises(ValueError): compatible_preparation_targets(hybrid)
         for invalid in (Client.FORMAL_PROFESSIONAL_MODEL_POLICY,
             {**deepcopy(Client.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY), "fallbackAllowed": True}):
@@ -62,8 +63,8 @@ class FlashFormalPolicyTest(unittest.TestCase):
             with self.assertRaises(ValueError): compatible_preparation_targets(changed)
 
     def test_creation_receipt_requires_both_new_fields_and_exact_contract(self):
-        fields = {key: deepcopy(FLASH_CANDIDATE_PROFESSIONAL_POLICY[key]) for key in ("modelPolicyId", "sceneLearningPolicy")}
-        contract = {"professionalCreationPolicy": deepcopy(FLASH_CANDIDATE_PROFESSIONAL_POLICY)}
+        fields = {key: deepcopy(QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY[key]) for key in ("modelPolicyId", "sceneLearningPolicy")}
+        contract = {"professionalCreationPolicy": deepcopy(QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY)}
         self.assertEqual(professional_scene_learning_fields(fields, generation_contract=contract), fields)
         with self.assertRaises(ValueError): professional_scene_learning_fields({}, generation_contract=contract)
         with self.assertRaises(ValueError): professional_scene_learning_fields({"modelPolicyId": POLICY_ID})
@@ -129,11 +130,11 @@ class FlashFormalPolicyTest(unittest.TestCase):
         client = Client("http://127.0.0.1:3100")
         with patch.dict("os.environ", {"MIRA_FORMAL_MODEL_POLICY": POLICY_ID}):
             policy = client.selected_formal_generation_policy()
-            self.assertEqual(policy["professionalCreation"], FLASH_CANDIDATE_PROFESSIONAL_POLICY)
+            self.assertEqual(policy["professionalCreation"], QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY)
             healthy = {"success": True, "status": "ok", "version": client.FORMAL_RUNTIME_VERSION,
                 "capabilities": {"formalGeneration": True, "professionalAgent": True, "webSearch": True, "speechAudioGeneration": True},
                 "runtimePolicy": {"formalGeneration": policy,
-                    "formalGenerationSupportedProfessionalPolicies": [deepcopy(FLASH_CANDIDATE_PROFESSIONAL_POLICY)],
+                    "formalGenerationSupportedProfessionalPolicies": [deepcopy(QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY)],
                     "professionalResearch": deepcopy(client.FORMAL_PROFESSIONAL_RESEARCH_POLICY),
                     "modelPolicy": client.selected_professional_model_policy(),
                     "webSearch": {"schemaVersion": "mira.openmaic.web-search-production-config.v1", "providerId": "baidu",

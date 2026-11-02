@@ -1,13 +1,16 @@
 from copy import deepcopy
 import json
+import os
 import unittest
+from unittest.mock import patch
 
 from integrations.openmaic_formal_interaction import (
     PLAN_SCHEMA, RECEIPT_SCHEMA, INTERACTION_DESIGN_POLICY, interaction_design_receipt,
     validate_classroom_interaction, validate_interaction_manifest,
 )
 from integrations.openmaic_formal_media import (
-    INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY,
+    INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+    QWEN3_PLAYFUL_PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY,
     compatible_preparation_target, generation_options,
 )
 from integrations.openmaic_formal_quality import quality_sha, quality_snapshot, QUALITY_VIEWPORTS
@@ -75,12 +78,14 @@ def interaction_fixture(*, discussion=False):
 
 class FormalInteractionTest(unittest.TestCase):
     def test_new_policy_and_exact_published_video_target_compatibility(self):
-        current = build_preparation_target("primary_1")
-        self.assertEqual(current["formalRuntimePolicy"]["professionalCreationPolicy"], PLAYFUL_PROFESSIONAL_POLICY)
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "", "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
+            current = build_preparation_target("primary_1")
+        self.assertEqual(current["formalRuntimePolicy"]["professionalCreationPolicy"],
+                         QWEN3_PLAYFUL_PROFESSIONAL_POLICY)
         old = deepcopy(current)
         old["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(VIDEO_PROFESSIONAL_POLICY)
         self.assertEqual(preparation_target_fingerprint(old), "e7f3d4be11e40d516d68b793682c67afe6e515b9e18bab1cd12d6649435cc0cc")
-        self.assertTrue(compatible_preparation_target(old, current))
+        self.assertFalse(compatible_preparation_target(old, current))
         old["formalRuntimePolicy"]["professionalCreationPolicy"]["webSearch"]["enabled"] = False
         self.assertFalse(compatible_preparation_target(old, current))
 

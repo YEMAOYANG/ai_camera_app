@@ -20,6 +20,7 @@ POLICY = json.loads((Path(__file__).parents[1] / 'content/learning_review_policy
 SCHEMA = 'mira.learning.reviews.v1'
 TERMINAL = ('completed', 'skipped', 'superseded', 'rest', 'content_gap')
 CLOCK = re.compile(r'^(?:[01][0-9]|2[0-3]):[0-5][0-9]$')
+REVIEW_PACK_ASSET = re.compile(r'reviewpack\.[a-f0-9]{64}\.(png|jpg|webp|wav|mp3)\Z')
 
 
 def decode(value, fallback=None):
@@ -189,6 +190,23 @@ class LearningReviewService:
     def _audio(run_id, asset):
         return f'/api/v2/student/learning/reviews/{run_id}/media/{asset}'
 
+    def _question_media(self, run_id, value):
+        if isinstance(value, str):
+            return self._audio(run_id, value) if REVIEW_PACK_ASSET.fullmatch(value) else value
+        if isinstance(value, dict):
+            return {key: self._question_media(run_id, item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [self._question_media(run_id, item) for item in value]
+        return value
+
+    @staticmethod
+    def _picture_assets(value):
+        if isinstance(value, str):
+            match = REVIEW_PACK_ASSET.fullmatch(value)
+            return {value} if match and match[1] in {'png', 'jpg', 'webp'} else set()
+        values = value.values() if isinstance(value, dict) else value if isinstance(value, list) else []
+        return set().union(*(LearningReviewService._picture_assets(item) for item in values))
+
     def _summary(self, run):
         coverage=decode(run['coverage_json'])
         title=coverage.get('demoTitle') if synthetic_fixture(run) else None
@@ -212,7 +230,10 @@ class LearningReviewService:
                     (self.clock(),run['id'],current['ordinal']))
             # The frozen evidenceMode was selected at creation. Another lesson
             # may expose this exact item before the child opens the review.
-            public = {k:q.get(k) for k in ('renderer','prompt','visual','options','homeworkSource') if k in q}
+            public = {k:q.get(k) for k in ('renderer','prompt','visual','options','homeworkSource','target','assessmentMode') if k in q}
+            for key in ('visual', 'options'):
+                if key in public:
+                    public[key] = self._question_media(run['id'], public[key])
             public.update(id=current['question_id'],promptAudioUrl=self._audio(run['id'],q['promptAudioAsset']),
                 hint=None,hintAudioUrl=None,explanation=None,explanationAudioUrl=None,
                 selectedResponse=decode(current['answer_json']),helpUsed=bool(current['hint_level'] or current['explanation_seen']),
@@ -250,6 +271,10 @@ class LearningReviewService:
                 'correctAnswer':q['correctAnswer'],'explanation':q['explanation'],'correct':feedback['correct'],
                 'independent':feedback['independent'],'evidenceMode':item['evidence_mode'],
                 'hintUsed':bool(item['hint_level']),'explanationSeen':bool(item['explanation_seen']),'answeredAt':item['answered_at']})
+            evidence[-1].update({key: q[key] for key in
+                ('target', 'assessmentMode', 'evidenceClaim', 'targetId', 'sourceIdentity', 'packSha256') if key in q})
+            evidence[-1].update({key: feedback[key] for key in
+                ('systemUnaided', 'adultHelpKnown', 'independenceStatus') if key in feedback})
         return {'status':run['status'],'weekStart':run['week_start'],'completedAt':run['completed_at'],
             'answeredCount':len(evidence),'totalQuestions':run['total_questions'],
             'independentFirstCount':sum(e['independent'] for e in evidence),
@@ -258,7 +283,7 @@ class LearningReviewService:
             'withdrawnCount':sum(i['evidence_mode']=='withdrawn' for i in items),
             'sourceReviewCount':source_review_count,
             'items':evidence,'notParticipated':not bool(run['started_at']),
-            'assessmentScope':'测试演示记录；不参与孩子真实薄弱点、成长评分或正式学习报告。' if synthetic_fixture(run) else '图片支持下的情境理解；原题重做与提示后作答不计新题独立掌握。',
+            'assessmentScope':'测试演示记录；不参与孩子真实薄弱点、成长评分或正式学习报告。' if synthetic_fixture(run) else '按各题标注的测评方式和目标记录作答；图片点选、听辨与拼音图义匹配不能证明口语发音或纸笔书写已掌握，原题重做与提示后作答不计新题独立表现。',
             'parentAction':'仅用于体验答题和报告流程，预设表现不代表孩子的实际能力。' if synthetic_fixture(run) else '先看孩子需要帮助的具体一步；没有参加不代表不会。'}
 
     def _revision(self, run, data, key='revision'):
@@ -365,15 +390,25 @@ class LearningReviewService:
             prior=conn.execute('SELECT id FROM learning_answer_events WHERE family_id=? AND child_id=? AND question_fingerprint=? AND revoked_at IS NULL LIMIT 1',
                 (child['family_id'],child['id'],q['fingerprint'])).fetchone()
             mode='repeated_practice' if prior else item['evidence_mode']
-            independent=not item['hint_level'] and not item['explanation_seen'] and mode=='new_variant'
+            system_unaided=not item['hint_level'] and not item['explanation_seen'] and mode=='new_variant'
+            # New review packs do not have an adult-observation input. Preserve
+            # the old API's boolean while keeping actual independence unknown
+            # in append-only evidence, rather than inventing adultHelp=false.
+            pack_question=bool(q.get('packSha256'))
+            independent=system_unaided and not pack_question
             feedback={'correct':correct,'independent':independent,'explanation':q['explanation'],
                 'explanationAudioUrl':self._audio(run_id,q['explanationAudioAsset']),'correctAnswer':q['correctAnswer']}
+            if pack_question:
+                feedback.update(systemUnaided=bool(system_unaided),adultHelpKnown=False,
+                    independenceStatus='adult_help_unknown' if system_unaided else 'assisted_or_repeated')
             conn.execute('UPDATE learning_review_items SET answer_json=?,answer_sha256=?,feedback_json=?,answered_at=?,evidence_mode=? WHERE run_id=? AND ordinal=?',
                 (canonical(data['response']),digest(data['response']),canonical(feedback),now,mode,run_id,item['ordinal']))
             if not synthetic_fixture(run):
                 record_answer(conn,family_id=child['family_id'],child_id=child['id'],source_kind='review',source_id=run_id,
                     event_key=item['question_id'],question=q,answer=data['response'],correct=correct,occurred_at=now,
-                    hint_used=bool(item['hint_level'] or item['explanation_seen']),adult_help=False,independent=independent)
+                    hint_used=bool(item['hint_level'] or item['explanation_seen']),
+                    adult_help=None if pack_question else False,
+                    independent=None if pack_question and system_unaided else independent)
             self.repository.update(conn,run,now,correct_count=run['correct_count']+int(correct),
                 independent_correct_count=run['independent_correct_count']+int(correct and independent))
             self.repository.remember(conn,run,data,now)
@@ -446,12 +481,22 @@ class LearningReviewService:
                 allowed.update(q['hintAudioAssets'][:item['hint_level']])
                 if item['explanation_seen'] or item['answered_at']:
                     allowed.add(q['explanationAudioAsset'])
+                if item['ordinal'] == run['current_index'] or item['answered_at']:
+                    allowed.update(self._picture_assets([q.get('visual'), q.get('options')]))
             if asset not in allowed:
                 raise ApiError('review_audio_unavailable','这段语音暂不可用',404)
             if asset.startswith('homework.'):
                 if self.private_audio_file is None:
                     raise ApiError('review_audio_unavailable','这段语音暂不可用',404)
                 return self.private_audio_file(asset)
+            if REVIEW_PACK_ASSET.fullmatch(asset):
+                from services.learning_review_content import review_pack_media_file
+                try:
+                    return review_pack_media_file(asset)
+                except FileNotFoundError:
+                    raise ApiError('review_media_unavailable','这份复习的图片或语音暂不可用',404) from None
+                except (ValueError, OSError, KeyError, TypeError):
+                    raise ApiError('review_media_unavailable','这份复习的图片或语音暂不可用，请稍后重试',502) from None
             return audio_file(asset)
 
     def ensure_week(self,conn,child,now):
@@ -488,17 +533,19 @@ class LearningReviewService:
             self.repository.task_status(conn,old,'cancelled',now)
         evidence=weaknesses(conn,family_id=child['family_id'],child_id=child['id'],since=now-POLICY['evidenceWindowDays']*86400000)
         evidence=[e for e in evidence if e['gradeCode']==child['grade_code']]
-        if not evidence:
-            return None
         wanted=[e['knowledgeId'] for e in evidence if e['status']=='needs_review']
-        pool,gaps=self.question_pool(conn,child) if evidence else ([],[])
+        pool,gaps=self.question_pool(conn,child)
         pool,gaps=list(pool),list(gaps)
         if self.private_question_pool:
             private_pool,private_gaps=self.private_question_pool(conn,child)
             pool.extend(q for q in private_pool if q.get('private') is True and q.get('sourceEventId'))
             gaps.extend(private_gaps)
         known={e['knowledgeId'] for e in evidence if e['sampleCount']}
-        pool=[q for q in pool if q['knowledgeId'] in known]
+        pool=[q for q in pool if q.get('approved') is True and q.get('gradeCode') == child['grade_code']
+              and (q['knowledgeId'] in known or q.get('learnedScopeVerified') is True)
+              and type(q.get('estimatedSeconds')) is int and q['estimatedSeconds'] > 0]
+        if not evidence and not pool:
+            return None
         seen={row['question_fingerprint'] for row in conn.execute('SELECT DISTINCT question_fingerprint FROM learning_answer_events WHERE family_id=? AND child_id=? AND revoked_at IS NULL',
             (child['family_id'],child['id'])).fetchall()}
         # Already displayed review questions remain exposures even if unanswered.
@@ -509,13 +556,20 @@ class LearningReviewService:
             seen.add(decode(row['snapshot_json'])['fingerprint'])
         pool.sort(key=lambda q:(q['knowledgeId'] not in wanted,q['fingerprint'] in seen,
             wanted.index(q['knowledgeId']) if q['knowledgeId'] in wanted else len(wanted),digest([week,child['id'],q['fingerprint']])))
-        chosen,counts,seconds=[],Counter(),0
+        chosen,counts,seconds,fingerprints=[],Counter(),0,set()
+        repeated_counts=Counter()
         for q in pool:
-            if counts[q['knowledgeId']]>=POLICY['maximumPerKnowledge'] or seconds+q['estimatedSeconds']>POLICY['maximumSeconds']:
+            repeated=bool(q.get('private') or q['fingerprint'] in seen)
+            # A targeted correction can be useful practice. Replaying an
+            # observing skill merely to fill the time budget is not a new test.
+            if repeated and (q['knowledgeId'] not in wanted or repeated_counts[q['knowledgeId']]>=1):
                 continue
-            if not wanted and len(chosen)>=3:
-                break
-            chosen.append((q,'repeated_practice' if q.get('private') or q['fingerprint'] in seen else 'new_variant'))
+            if (q['fingerprint'] in fingerprints or counts[q['knowledgeId']]>=POLICY['maximumPerKnowledge']
+                    or seconds+q['estimatedSeconds']>POLICY['maximumSeconds']):
+                continue
+            chosen.append((q,'repeated_practice' if repeated else 'new_variant'))
+            if repeated:repeated_counts[q['knowledgeId']]+=1
+            fingerprints.add(q['fingerprint'])
             counts[q['knowledgeId']]+=1
             seconds+=q['estimatedSeconds']
             if seconds>=POLICY['targetSeconds'] or len(chosen)>=POLICY['maximumQuestions']:
@@ -524,10 +578,13 @@ class LearningReviewService:
         homework_count=sum(bool(q.get('private')) for q,_ in chosen)
         missing=[key for key in wanted if key not in counts]
         notes=[]
+        duration_gap=max(0,POLICY['targetSeconds']-seconds)
         if missing:notes.append(f'{len(missing)} 个待巩固知识点尚无审核通过的图片语音复习题。')
         if lesson_count==1:notes.append('目前只有一课的已审核图片语音题，按实际题量安排。')
         if any(q.get('private') for q,_ in chosen):notes.append('照片错题使用已核验的原题订正；暂缺审核通过的数学变式，不计新题独立掌握。')
         if not chosen:notes.append('暂无可用复习题；系统不会临时生成或把未参加计为答错。')
+        if chosen and duration_gap:
+            notes.append(f'按现有已审核题量安排，预计 {round(seconds/60,1):g} 分钟；距 {round(POLICY["targetSeconds"]/60,1):g} 分钟目标还差 {round(duration_gap/60,1):g} 分钟。')
         due_day=monday+timedelta(days=preferences['weekday']-1)
         scheduled=datetime.combine(due_day,time.fromisoformat(preferences['time']),ZoneInfo(preferences['timezone']))
         at=int(scheduled.timestamp()*1000)
@@ -540,7 +597,8 @@ class LearningReviewService:
             'status':status,'revision':0,'appointment_revision':0,'scheduled_at':at,
             'reminder_expires_at':at+POLICY['reminderValiditySeconds']*1000,'reminder_status':'pending' if status=='scheduled' else 'expired',
             'current_index':0,'total_questions':len(chosen),'correct_count':0,'independent_correct_count':0,'estimated_seconds':seconds,
-            'coverage_json':canonical({'lessonCount':lesson_count,'homeworkQuestionCount':homework_count,'questionCount':len(chosen),'contentGap':bool(missing or gaps or lesson_count<2 or homework_count),
+            'coverage_json':canonical({'lessonCount':lesson_count,'homeworkQuestionCount':homework_count,'questionCount':len(chosen),'contentGap':bool(missing or gaps or lesson_count<2 or homework_count or duration_gap),
+                'targetSeconds':POLICY['targetSeconds'],'estimatedSeconds':seconds,'durationGapSeconds':duration_gap,
                 'notes':notes,'missingKnowledgeIds':missing,'unsupportedCourses':gaps,'sourceCutoffAt':now}),
             'policy_json':canonical(POLICY),'created_at':now,'started_at':None,'completed_at':None,'updated_at':now}
         self.repository.create(conn,run,chosen,'learning_review_scheduler',preferences['timezone'])

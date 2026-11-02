@@ -356,6 +356,51 @@ class CourseStorageRepositoryTest(unittest.TestCase):
         self.assertEqual(self.repo.head_scope(revised["sourcePath"], self.storage)["scopeKey"], "4" * 64)
         self.assertIsNone(self.repo.resolve(extra["sourcePath"], self.storage))
 
+    def test_explicit_subset_cas_advances_only_selected_binding_and_keeps_other_head_and_old_bytes(self):
+        extra = {**self.file, "sourcePath": "output/unselected.json", "sha256": "2" * 64}
+        self.register(files=[self.file, extra])
+        meta, revised = self.revision()
+        self.register(meta=meta, files=[revised, {**extra, "sha256": "3" * 64}], activate=False)
+        expected = {self.file["sourcePath"]: {"sha256": self.file["sha256"], "scopeKey": self.meta["scopeKey"]}}
+        result = self.repo.activate_heads_if_unchanged(meta["scopeKey"], self.storage, expected,
+            source_paths=[self.file["sourcePath"]])
+        self.assertEqual(result["activated"], 1)
+        self.assertEqual(self.repo.resolve(self.file["sourcePath"], self.storage)["sha256"], revised["sha256"])
+        self.assertEqual(self.repo.resolve(extra["sourcePath"], self.storage)["sha256"], extra["sha256"])
+        self.assertEqual(self.repo.head_scope(extra["sourcePath"], self.storage)["scopeKey"], self.meta["scopeKey"])
+        self.assertIsNotNone(self.repo.resolve(self.file["sourcePath"], self.storage, self.file["sha256"]))
+
+    def test_explicit_subset_rejects_unknown_duplicate_empty_or_mismatched_expected_paths(self):
+        self.register()
+        meta, revised = self.revision()
+        self.register(meta=meta, files=[revised], activate=False)
+        path = revised["sourcePath"]
+        expected = {path: {"sha256": self.file["sha256"], "scopeKey": self.meta["scopeKey"]}}
+        for selected, heads in (([], expected), ([path, path], expected), ([path], {**expected, "output/extra.json": None}),
+                                (["output/unknown.json"], {"output/unknown.json": None})):
+            self.database.statements.clear()
+            with self.subTest(paths=selected), self.assertRaises(CourseStorageRegistryError):
+                self.repo.activate_heads_if_unchanged(meta["scopeKey"], self.storage, heads, source_paths=selected)
+            self.assertFalse(any(sql.startswith(("INSERT", "UPDATE")) for sql in self.database.statements))
+        self.assertEqual(self.repo.resolve(path, self.storage)["sha256"], self.file["sha256"])
+
+    def test_subset_competing_head_rejects_entire_selected_batch_without_partial_writes(self):
+        extra = {**self.file, "sourcePath": "output/z-selected.json", "sha256": "2" * 64}
+        self.register(files=[self.file, extra])
+        meta, revised = self.revision()
+        self.register(meta=meta, files=[revised, {**extra, "sha256": "3" * 64}], activate=False)
+        expected = {entry["sourcePath"]: {"sha256": entry["sha256"], "scopeKey": self.meta["scopeKey"]}
+                    for entry in [self.file, extra]}
+        winner = {**extra, "sha256": "4" * 64}
+        self.register(meta={**self.meta, "scopeKey": "5" * 64}, files=[winner])
+        self.database.statements.clear()
+        with self.assertRaisesRegex(CourseStorageRegistryError, "head_conflict"):
+            self.repo.activate_heads_if_unchanged(meta["scopeKey"], self.storage, expected,
+                source_paths=list(expected))
+        self.assertFalse(any(sql.startswith(("INSERT", "UPDATE")) for sql in self.database.statements))
+        self.assertEqual(self.repo.resolve(self.file["sourcePath"], self.storage)["sha256"], self.file["sha256"])
+        self.assertEqual(self.repo.resolve(extra["sourcePath"], self.storage)["sha256"], winner["sha256"])
+
     def test_scope_identity_and_bindings_are_immutable_with_no_partial_new_version(self):
         self.register()
         for meta, files in (({**self.meta, "courseVersion": "changed"}, [self.file]),

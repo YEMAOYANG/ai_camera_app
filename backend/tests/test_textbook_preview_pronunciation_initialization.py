@@ -59,7 +59,7 @@ class PronunciationInitializationTests(unittest.TestCase):
             'sourceLesson': {'editionId': frozen['editionId'], 'nodeId': frozen['nodeId']}, 'samples': []}
         for label, target in self.probe_targets.items():
             entry = self.policy['symbols'][target]
-            entries = [self.policy['symbols'][token]
+            entries = [self.policy['symbols'].get(token) or self.policy.get('words', {})[token]
                        for token in self.probe_token_sequences.get(label, (target, target))]
             source_text = self.probe_source_texts.get(label)
             ssml = (pronunciation.pinyin_ssml(source_text, policy_version=self.policy['policyVersion'])

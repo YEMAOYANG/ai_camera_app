@@ -41,6 +41,13 @@ def main():
     parser.add_argument("--expected-receipts-sha256")
     parser.add_argument("--classroom-id", help="adopt: the saved classroom to reserve this lesson for")
     parser.add_argument("--authoring", type=Path, help="adopt: JSON record of the Agent session that authored it")
+    parser.add_argument("--official-followup", type=Path, help="adopt: exact post-dispatch official-review follow-up")
+    parser.add_argument("--expected-official-followup-sha256")
+    parser.add_argument("--verified-user-message-id")
+    parser.add_argument("--verified-user-question")
+    parser.add_argument("--verified-user-answer")
+    parser.add_argument("--operator-reviewer")
+    parser.add_argument("--operator-basis", help="where the operator directly checked the authentic user conversation")
     parser.add_argument("--teaching-revision", help="Explicit teaching content version; default reuses the existing version")
     parser.add_argument("--regeneration-reason")
     parser.add_argument("--budget-reference")
@@ -53,6 +60,11 @@ def main():
         parser.error("start/status require --key")
     if args.action == "adopt" and not all((args.classroom_id, args.authoring, args.classroom_directory)):
         parser.error("adopt requires --classroom-id, --authoring and --classroom-directory")
+    official_options = (args.official_followup, args.expected_official_followup_sha256,
+                        args.verified_user_message_id, args.verified_user_question,
+                        args.verified_user_answer, args.operator_reviewer, args.operator_basis)
+    if any(official_options) and (args.action != 'adopt' or not all(official_options)):
+        parser.error('official follow-up requires adopt and all explicit operator-verified message fields')
     if args.action == "narrate" and not args.classroom_directory:
         parser.error("narrate requires --classroom-directory pointing to this local OpenMAIC classroom store")
     if args.speech_selection and args.action != "narrate":
@@ -97,6 +109,13 @@ def main():
             result = service.adopt(args.edition, args.revision, args.node, args.classroom_id, args.classroom_directory,
                                    json.loads(args.authoring.read_text(encoding="utf-8")),
                                    teaching_revision=args.teaching_revision,
+                                   official_followup_selection=({
+                                       'path': str(args.official_followup),
+                                       'expectedSha256': args.expected_official_followup_sha256,
+                                       'operatorAttestation': {'question': args.verified_user_question,
+                                           'answer': args.verified_user_answer, 'userMessageId': args.verified_user_message_id,
+                                           'reviewer': args.operator_reviewer, 'basis': args.operator_basis}}
+                                       if args.official_followup else None),
                                    regeneration={"reason": args.regeneration_reason, "budgetReference": args.budget_reference}
                                    if args.regeneration_reason else None)
         else:

@@ -41,6 +41,12 @@ SHA = re.compile(r'[a-f0-9]{64}\Z')
 # explicit reviewed probe set, never inference from arbitrary Latin input.
 PROBES = MappingProxyType({'i-base': 'i', 'u-base': 'u', 'umlaut-base': 'ü'})
 _PROBE_CONTRACTS = MappingProxyType({
+    'mira.textbook.pinyin-garden4-ssml.v1': (
+        MappingProxyType({'near-contrast-and-poem-context': 'yǎn',
+                          'initials-table-context': 'b',
+                          'finals-table-context': 'a',
+                          'whole-table-context': 'zhi'}),
+        'four_garden4_fixed_probes_inventory_and_source_context_approved'),
     'mira.textbook.pinyin-angengingong-ssml.v1': (
         MappingProxyType({'finals-whole-bases': 'ɑng',
                           'printed-syllables-context': 'bāng',
@@ -266,6 +272,32 @@ _ANGENGINGONG_PROBE_TOKENS = MappingProxyType({
         'jǐng', 'bǐng', 'tīng', 'qīng', 'hǒng', 'zhōng', 'sòng', 'qióng'),
     'writing-recognition-context': ('míng', 'liàng', 'bīng', 'zì', 'xíng', 'chē'),
 })
+# This lesson voices the full printed tables, not just the eleven contrasts.
+# 谁 is a Chinese-word override; its new lesson probe remains separate from
+# formal narration and never inherits listening or ASR approval.
+_GARDEN4_PROBE_TEXTS = MappingProxyType({
+    'near-contrast-and-poem-context': (
+        '请听：yǎn、yuǎn；yīn、yīng；jiǎn、juǎn；zuān、zhuān；chán、chuán、chuáng。谁知盘中餐。'),
+    'initials-table-context': (
+        '请听声母：b、p、m、f、d、t、n、l、g、k、h、j、q、x；zh、ch、sh、r、z、c、s；(y w)。'),
+    'finals-table-context': (
+        '请听韵母：a、o、e、i、u、ü；ai、ei、ui、ao、ou、iu、ie、üe、er；an、en、in、un、ün、ang、eng、ing、ong。'),
+    'whole-table-context': (
+        '请听整体认读音节：zhi、chi、shi、ri、zi、ci、si；yi、wu、yu、ye、yue、yuan、yin、yun、ying。'),
+})
+_GARDEN4_PROBE_TOKENS = MappingProxyType({
+    'near-contrast-and-poem-context': (
+        'yǎn', 'yuǎn', 'yīn', 'yīng', 'jiǎn', 'juǎn', 'zuān', 'zhuān', 'chán', 'chuán', 'chuáng', '谁'),
+    'initials-table-context': (
+        'b', 'p', 'm', 'f', 'd', 't', 'n', 'l', 'g', 'k', 'h', 'j', 'q', 'x',
+        'zh', 'ch', 'sh', 'r', 'z', 'c', 's', 'y', 'w'),
+    'finals-table-context': (
+        'a', 'o', 'e', 'i', 'u', 'ü', 'ai', 'ei', 'ui', 'ao', 'ou', 'iu', 'ie', 'üe', 'er',
+        'an', 'en', 'in', 'un', 'ün', 'ang', 'eng', 'ing', 'ong'),
+    'whole-table-context': (
+        'zhi', 'chi', 'shi', 'ri', 'zi', 'ci', 'si',
+        'yi', 'wu', 'yu', 'ye', 'yue', 'yuan', 'yin', 'yun', 'ying'),
+})
 ARCHIVE_FILES = {'row.json', 'source.json', 'frozen.json', 'base-plan.json', 'plan.json',
                  'evidence/human-approval.json', 'evidence/plan.json'} | {
                      f'evidence/{label}/{name}' for label in PROBES for name in PROBE_FILES}
@@ -489,6 +521,8 @@ def _verify_probe_files(files, approval, frozen, policy, probes, *, sample_resul
                   if policy['policyVersion'] == pronunciation.ANENINUNUN_POLICY_VERSION
                   else _ANGENGINGONG_PROBE_TOKENS[label]
                   if policy['policyVersion'] == pronunciation.ANGENGINGONG_POLICY_VERSION
+                  else _GARDEN4_PROBE_TOKENS[label]
+                  if policy['policyVersion'] == pronunciation.GARDEN4_POLICY_VERSION
                   else _AIEIUI_PROBE_TOKENS[label]
                   if policy['policyVersion'] in {
                       pronunciation.AIEIUI_POLICY_VERSION,
@@ -501,7 +535,9 @@ def _verify_probe_files(files, approval, frozen, policy, probes, *, sample_resul
             'carrier': ''.join(policy['symbols'][token]['carrier'] for token in tokens),
         }] if (policy['policyVersion'] == pronunciation.AIEIUI_V3_POLICY_VERSION
                and label == 'luo-bo-neutral')
-            else [policy['symbols'][token] for token in tokens])
+            else [(policy['symbols'].get(token) or policy.get('words', {}).get(token))
+                  if policy['policyVersion'] == pronunciation.GARDEN4_POLICY_VERSION
+                  else policy['symbols'][token] for token in tokens])
         v4_luo_bo = (policy['policyVersion'] == pronunciation.AIEIUI_V4_POLICY_VERSION
                      and label == 'luo-bo-neutral')
         aliases = list(xml.iter('sub'))
@@ -525,6 +561,7 @@ def _verify_probe_files(files, approval, frozen, policy, probes, *, sample_resul
                 pronunciation.IEUEER_POLICY_VERSION,
                 pronunciation.ANENINUNUN_POLICY_VERSION,
                 pronunciation.ANGENGINGONG_POLICY_VERSION,
+                pronunciation.GARDEN4_POLICY_VERSION,
         }:
             source_text = (_AOUIU_PROBE_TEXTS[label]
                            if policy['policyVersion'] == pronunciation.AOUIU_POLICY_VERSION
@@ -534,6 +571,8 @@ def _verify_probe_files(files, approval, frozen, policy, probes, *, sample_resul
                            if policy['policyVersion'] == pronunciation.ANENINUNUN_POLICY_VERSION
                            else _ANGENGINGONG_PROBE_TEXTS[label]
                            if policy['policyVersion'] == pronunciation.ANGENGINGONG_POLICY_VERSION
+                           else _GARDEN4_PROBE_TEXTS[label]
+                           if policy['policyVersion'] == pronunciation.GARDEN4_POLICY_VERSION
                            else _AIEIUI_PROBE_TEXTS[label])
             if (original.get('sourceText') != source_text
                     or original.get('tokens') != list(tokens)

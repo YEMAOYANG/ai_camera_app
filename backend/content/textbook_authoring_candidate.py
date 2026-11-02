@@ -2,7 +2,7 @@
 
 This verifies frozen identity and exact saved artifacts, not semantic teaching
 quality, real audio playback, review, or permission to publish. Historical jobs
-without the v3 contract retain their original adoption path.
+without a protected scene contract retain their original adoption path.
 """
 from __future__ import annotations
 
@@ -25,6 +25,8 @@ from services.course_file_store import course_bytes, course_exists, course_glob,
 from services.course_reuse_resolver import lesson_scope
 
 JOB_SCHEMA = 'mira.operator.workbench-authoring.v3'
+V4_JOB_SCHEMA = 'mira.operator.workbench-authoring.v4'
+CONTRACT_JOB_SCHEMAS = {JOB_SCHEMA, V4_JOB_SCHEMA}
 LEGACY_JOB_SCHEMAS = {'mira.operator.workbench-authoring.v1', 'mira.operator.workbench-authoring.v2'}
 CANDIDATE_SCHEMA = 'mira.textbook.authoring-candidate.v1'
 CANDIDATE_FILE = 'textbook-authoring-candidate.json'
@@ -88,8 +90,8 @@ def _find_job(output_root, edition, revision, node, session_id, stage_id, has_le
         reject('教材绑定身份无效')
     root = Path(output_root).resolve()
     lesson = _safe_child(root, root / edition / node)
-    jobs, v3_present = [], False
-    v3_stage_owners = set()
+    jobs, contract_job_present, v4_present = [], False, False
+    contract_stage_owners = set()
     for job in sorted(course_glob(lesson, 'teaching-*/authoring-job')):
         _safe_child(root, job)
         if not course_exists(job / 'frozen.json'):
@@ -99,29 +101,38 @@ def _find_job(output_root, edition, revision, node, session_id, stage_id, has_le
         binding = frozen.get('binding', {})
         if not isinstance(binding, dict) or binding.get('editionId') != edition or binding.get('nodeId') != node:
             reject('冻结任务目录与教材绑定不一致')
-        v3_present |= schema == JOB_SCHEMA
+        contract_job_present |= schema in CONTRACT_JOB_SCHEMAS
+        v4_present |= schema == V4_JOB_SCHEMA
         state = _read_json(job / 'state.json')
-        if schema == JOB_SCHEMA and stage_id in _saved_stages(state):
-            v3_stage_owners.add(state.get('sessionId'))
+        if schema in CONTRACT_JOB_SCHEMAS and stage_id in _saved_stages(state):
+            contract_stage_owners.add(state.get('sessionId'))
         if state.get('sessionId') == session_id and session_id:
             jobs.append((job, frozen, state))
     if len(jobs) > 1:
         reject('同一会话对应多个冻结任务，请先核对原任务')
     if not jobs:
-        if has_ledger or v3_present:
-            reject('候选缺少对应的真实冻结 v3 会话；不能通过替换会话或删除台账退回旧流程')
+        if has_ledger or contract_job_present:
+            reject('候选缺少对应的真实冻结 v4 会话；不能通过替换会话或删除台账退回旧流程'
+                   if v4_present else
+                   '候选缺少对应的真实冻结 v3 会话；不能通过替换会话或删除台账退回旧流程')
         return None
     job, frozen, state = jobs[0]
-    if v3_stage_owners and v3_stage_owners != {session_id}:
-        reject('当前原生课堂属于另一个 v3 会话，不能通过历史会话降级接收')
-    if frozen.get('schemaVersion') != JOB_SCHEMA:
-        if v3_present and stage_id not in _saved_stages(state):
-            reject('当前课堂不是所选历史会话的真实保存成果，不能绕过 v3 门禁')
+    if contract_stage_owners and contract_stage_owners != {session_id}:
+        reject('当前原生课堂属于另一个 v4 会话，不能通过历史会话降级接收'
+               if v4_present else
+               '当前原生课堂属于另一个 v3 会话，不能通过历史会话降级接收')
+    if frozen.get('schemaVersion') not in CONTRACT_JOB_SCHEMAS:
+        if contract_job_present and stage_id not in _saved_stages(state):
+            reject('当前课堂不是所选历史会话的真实保存成果，不能绕过 v4 门禁'
+                   if v4_present else
+                   '当前课堂不是所选历史会话的真实保存成果，不能绕过 v3 门禁')
         if has_ledger or frozen.get('schemaVersion') not in LEGACY_JOB_SCHEMAS:
             reject('候选台账不能绑定历史或未知任务版本')
         return None
     if not has_ledger:
-        reject('v3 任务必须保留原生候选台账，不能退回历史接收流程')
+        reject('v4 任务必须保留原生候选台账，不能退回历史接收流程'
+               if frozen.get('schemaVersion') == V4_JOB_SCHEMA else
+               'v3 任务必须保留原生候选台账，不能退回历史接收流程')
     if frozen['binding'].get('revisionId') != revision:
         reject('候选教材修订与原冻结任务不一致')
     return job, frozen, state
@@ -129,7 +140,7 @@ def _find_job(output_root, edition, revision, node, session_id, stage_id, has_le
 
 def _contract(job, frozen, manifest, node):
     # Imported here to keep legacy adoption independent of the new contract.
-    from content.textbook_scene_contract import validate_scene_contract
+    from content.textbook_scene_contract import validate_author_dispatch_contract, validate_scene_contract
     draft = _read_json(job / 'draft.json')
     try:
         raw = course_bytes(job / 'draft.json')
@@ -141,6 +152,9 @@ def _contract(job, frozen, manifest, node):
             raise ValueError()
         contract = validate_scene_contract(frozen.get('sceneContract'), draft=draft,
             catalog_check=frozen.get('catalogCheck'), interaction_policy=frozen.get('interactionPolicy'))
+        if frozen.get('schemaVersion') == V4_JOB_SCHEMA:
+            validate_author_dispatch_contract(
+                frozen.get('authorDispatchContract'), scene_contract=frozen.get('sceneContract'))
     except (OSError, UnicodeError, ValueError, KeyError, TypeError):
         reject('冻结场景合同或原始草稿摘要不一致，请从原任务建立明确修订')
     unit, lesson = lesson_by_id(manifest, node)
@@ -151,6 +165,50 @@ def _contract(job, frozen, manifest, node):
     if contract.get('binding') != frozen.get('binding') or contract.get('catalogEvidence') != {'manifestSha256': digest(manifest), 'lessonScopeSha256': lesson_scope(manifest, node)}:
         reject('教材目录或本课范围已变化，不能采用旧冻结合同的候选')
     return contract
+
+
+def resolve_authoring_interaction_policy(classroom_directory, authoring, manifest, node, candidate, *,
+                                         output_root=DEFAULT_AUTHORING_ROOT):
+    """Recover the exact v4 base policy from its verified authoring job."""
+    directory = Path(classroom_directory).resolve()
+    stage_id = authoring.get('stageId') if isinstance(authoring, dict) else None
+    session_id = authoring.get('sessionId') if isinstance(authoring, dict) else None
+    if not identifier(stage_id):
+        reject('候选课堂编号无效')
+    path = _safe_child(directory, directory / stage_id / CANDIDATE_FILE)
+    found = _find_job(output_root, manifest['editionId'], manifest['revisionId'], node,
+                      session_id, stage_id, course_exists(path) or path.is_symlink())
+    if found is None:
+        return None
+    job, frozen, state = found
+    if (frozen.get('schemaVersion') != V4_JOB_SCHEMA
+            or authoring.get('stageId') != stage_id
+            or stage_id not in _saved_stages(state)):
+        return None
+    ledger = _read_json(path)
+    if (set(ledger) != {'schemaVersion', 'sessionId', 'stageId', 'frozenContract', 'status', 'verification',
+                         'assetBindings', 'bindingHistory', 'scenes', 'sha256'}
+            or ledger.get('schemaVersion') != CANDIDATE_SCHEMA or ledger.get('status') != 'author_candidate'
+            or ledger.get('verification') != 'static_contract_only_not_play_or_semantic_review'
+            or ledger.get('sessionId') != session_id or ledger.get('stageId') != stage_id
+            or ledger.get('frozenContract') != frozen.get('authorDispatchContract')
+            or digest({k: v for k, v in ledger.items() if k != 'sha256'}) != ledger.get('sha256')):
+        reject('原生候选台账与真实冻结会话不一致')
+    contract = _contract(job, frozen, manifest, node)
+    interaction_policy = contract.get('interactionPolicy')
+    policy = interaction_policy.get('policy') if isinstance(interaction_policy, dict) else None
+    expected = {'schemaVersion': CANDIDATE_SCHEMA, 'sha256': ledger['sha256'],
+        'contractSha256': ledger['frozenContract']['sha256'], 'sceneCount': len(ledger['scenes']),
+        'assetCount': len(ledger['assetBindings']),
+        'verification': 'frozen_identity_and_artifact_integrity_only',
+        'interactionPolicyVersion': policy.get('version') if isinstance(policy, dict) else None,
+        'interactionPolicySha256': interaction_policy.get('sha256') if isinstance(interaction_policy, dict) else None}
+    if isinstance(policy, dict) and isinstance(policy.get('wholeCourseQualityContract'), dict):
+        expected['wholeCourseQualityContractSha256'] = digest(policy['wholeCourseQualityContract'])
+    if (not isinstance(candidate, dict)
+            or any(candidate.get(key) != value for key, value in expected.items())):
+        reject('发布候选摘要与原作者冻结记录不一致')
+    return interaction_policy
 
 
 ASSET_FIELDS = {'assetKey', 'src', 'sha256', 'width', 'height', 'bindingVersion', 'status'}
@@ -424,7 +482,7 @@ def _image_coverage(classroom, contract, assets):
 
 def validate_authoring_candidate(classroom, classroom_directory, authoring, manifest, node, *,
                                  output_root=DEFAULT_AUTHORING_ROOT, runtime_origin=None):
-    """Return a verified summary for v3; None means a genuine legacy path."""
+    """Return a verified summary for v3/v4; None means a genuine legacy path."""
     directory = Path(classroom_directory).resolve()
     stage_id = classroom.get('id')
     if not identifier(stage_id):
@@ -441,12 +499,15 @@ def validate_authoring_candidate(classroom, classroom_directory, authoring, mani
             or stage_id not in _saved_stages(state)):
         reject('原生课堂、作者会话和真实保存记录不一致')
     ledger = _read_json(path)
+    expected_native_contract = (frozen.get('authorDispatchContract')
+                                if frozen.get('schemaVersion') == V4_JOB_SCHEMA
+                                else frozen.get('sceneContract'))
     if (set(ledger) != {'schemaVersion', 'sessionId', 'stageId', 'frozenContract', 'status', 'verification',
                          'assetBindings', 'bindingHistory', 'scenes', 'sha256'}
             or ledger.get('schemaVersion') != CANDIDATE_SCHEMA or ledger.get('status') != 'author_candidate'
             or ledger.get('verification') != 'static_contract_only_not_play_or_semantic_review'
             or ledger.get('sessionId') != session_id
-            or ledger.get('stageId') != stage_id or ledger.get('frozenContract') != frozen.get('sceneContract')):
+            or ledger.get('stageId') != stage_id or ledger.get('frozenContract') != expected_native_contract):
         reject('原生候选台账与真实冻结会话不一致')
     # Native uses Unicode-codepoint key order; the envelope contains only safe
     # integers and full scenes are serialized strings, so Python bytes match.
@@ -467,10 +528,12 @@ def validate_authoring_candidate(classroom, classroom_directory, authoring, mani
     if isinstance(policy.get('wholeCourseQualityContract'), dict):
         summary['wholeCourseQualityContractSha256'] = digest(policy['wholeCourseQualityContract'])
     try:
+        followup_kwargs = ({'base_interaction_policy': interaction_policy}
+                           if frozen.get('schemaVersion') == V4_JOB_SCHEMA else {})
         followup = discover_complete_scene_review_followup(
             classroom, directory, session_id=session_id, stage_id=stage_id,
             base_policy_version=policy['version'],
-            base_policy_sha256=interaction_policy['sha256'])
+            base_policy_sha256=interaction_policy['sha256'], **followup_kwargs)
     except ValueError:
         reject('完整场景修订追踪缺失、已改变，或与当前候选不一致')
     if followup is not None:

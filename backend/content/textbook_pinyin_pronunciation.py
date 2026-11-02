@@ -55,6 +55,8 @@ _ANENINUNUN_POLICY = json.loads(Path(__file__).with_name('textbook_pinyin_pronun
 ANENINUNUN_POLICY_VERSION = _ANENINUNUN_POLICY['policyVersion']
 _ANGENGINGONG_POLICY = json.loads(Path(__file__).with_name('textbook_pinyin_pronunciation_angengingong.v1.json').read_text())
 ANGENGINGONG_POLICY_VERSION = _ANGENGINGONG_POLICY['policyVersion']
+_GARDEN4_POLICY = json.loads(Path(__file__).with_name('textbook_pinyin_pronunciation_garden4.v1.json').read_text())
+GARDEN4_POLICY_VERSION = _GARDEN4_POLICY['policyVersion']
 # Store canonical strings, not mutable policy objects. The historical aliases
 # above remain compatible, but cannot mutate the registry used by validation.
 _POLICIES = MappingProxyType({AOE_POLICY_VERSION: canonical(POLICY),
@@ -77,7 +79,8 @@ _POLICIES = MappingProxyType({AOE_POLICY_VERSION: canonical(POLICY),
                             AOUIU_POLICY_VERSION: canonical(_AOUIU_POLICY),
                             IEUEER_POLICY_VERSION: canonical(_IEUEER_POLICY),
                             ANENINUNUN_POLICY_VERSION: canonical(_ANENINUNUN_POLICY),
-                            ANGENGINGONG_POLICY_VERSION: canonical(_ANGENGINGONG_POLICY)})
+                            ANGENGINGONG_POLICY_VERSION: canonical(_ANGENGINGONG_POLICY),
+                            GARDEN4_POLICY_VERSION: canonical(_GARDEN4_POLICY)})
 _AOE_LESSON_BINDING = ('pep-chinese-g1-upper-2022-standard', '20260924-directory-3',
                        'u2-l1', 'primary_1', 'chinese')
 _IUU_LESSON_BINDING = ('pep-chinese-g1-upper-2022-standard', '20260924-directory-3',
@@ -110,6 +113,8 @@ _ANENINUNUN_LESSON_BINDING = ('pep-chinese-g1-upper-2022-standard', '20260924-di
                             'u4-l4', 'primary_1', 'chinese')
 _ANGENGINGONG_LESSON_BINDING = ('pep-chinese-g1-upper-2022-standard', '20260924-directory-3',
                               'u4-l5', 'primary_1', 'chinese')
+_GARDEN4_LESSON_BINDING = ('pep-chinese-g1-upper-2022-standard', '20260924-directory-3',
+                         'u4-l6', 'primary_1', 'chinese')
 _LESSON_POLICIES = MappingProxyType({_AOE_LESSON_BINDING: AOE_POLICY_VERSION,
                                    _IUU_LESSON_BINDING: IUU_POLICY_VERSION,
                                    _BPMF_LESSON_BINDING: BPMF_POLICY_VERSION,
@@ -125,7 +130,8 @@ _LESSON_POLICIES = MappingProxyType({_AOE_LESSON_BINDING: AOE_POLICY_VERSION,
                                    _AOUIU_LESSON_BINDING: AOUIU_POLICY_VERSION,
                                    _IEUEER_LESSON_BINDING: IEUEER_POLICY_VERSION,
                                    _ANENINUNUN_LESSON_BINDING: ANENINUNUN_POLICY_VERSION,
-                                   _ANGENGINGONG_LESSON_BINDING: ANGENGINGONG_POLICY_VERSION})
+                                   _ANGENGINGONG_LESSON_BINDING: ANGENGINGONG_POLICY_VERSION,
+                                   _GARDEN4_LESSON_BINDING: GARDEN4_POLICY_VERSION})
 # Historical permissions are explicit, not derived from the current default:
 # changing a future default must not silently revoke an existing publication.
 _ALLOWED_LESSON_POLICIES = MappingProxyType({
@@ -146,6 +152,7 @@ _ALLOWED_LESSON_POLICIES = MappingProxyType({
     _IEUEER_LESSON_BINDING: frozenset({IEUEER_POLICY_VERSION}),
     _ANENINUNUN_LESSON_BINDING: frozenset({ANENINUNUN_POLICY_VERSION}),
     _ANGENGINGONG_LESSON_BINDING: frozenset({ANGENGINGONG_POLICY_VERSION}),
+    _GARDEN4_LESSON_BINDING: frozenset({GARDEN4_POLICY_VERSION}),
 })
 _BINDING_FIELDS = ('editionId', 'alignmentRevisionId', 'nodeId', 'gradeCode', 'subject')
 # Later pinyin lessons start with an approved probe profile and cannot dispatch the
@@ -157,14 +164,15 @@ _INITIALIZATION_REQUIRED = frozenset({_IUU_LESSON_BINDING, _BPMF_LESSON_BINDING,
                                       _ZHCHSHR_LESSON_BINDING, _YW_LESSON_BINDING, _GARDEN3_LESSON_BINDING,
                                       _AIEIUI_LESSON_BINDING, _AOUIU_LESSON_BINDING,
                                       _IEUEER_LESSON_BINDING, _ANENINUNUN_LESSON_BINDING,
-                                      _ANGENGINGONG_LESSON_BINDING})
+                                      _ANGENGINGONG_LESSON_BINDING, _GARDEN4_LESSON_BINDING})
 _WHOLE_TOKEN_POLICIES = frozenset({BPMF_POLICY_VERSION, DTNL_POLICY_VERSION, GARDEN2_POLICY_VERSION,
                                  GKH_POLICY_VERSION, JQX_POLICY_VERSION, ZCS_POLICY_VERSION, ZCS_V2_POLICY_VERSION,
                                  ZHCHSHR_POLICY_VERSION, YW_POLICY_VERSION, GARDEN3_POLICY_VERSION,
                                  GARDEN3_V2_POLICY_VERSION, AIEIUI_POLICY_VERSION,
                                  AIEIUI_V2_POLICY_VERSION, AIEIUI_V3_POLICY_VERSION,
                                  AIEIUI_V4_POLICY_VERSION, AOUIU_POLICY_VERSION, IEUEER_POLICY_VERSION,
-                                 ANENINUNUN_POLICY_VERSION, ANGENGINGONG_POLICY_VERSION})
+                                 ANENINUNUN_POLICY_VERSION, ANGENGINGONG_POLICY_VERSION,
+                                 GARDEN4_POLICY_VERSION})
 PLAN_SCHEMA = 'mira.textbook.preview-audio-plan.v3-pinyin'
 LISTENING_SCHEMA = 'mira.textbook.pinyin-listening.v1'
 SHA = re.compile(r'[a-f0-9]{64}\Z')

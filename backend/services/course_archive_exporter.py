@@ -164,7 +164,7 @@ def _original_suffix(path):
 
 
 def _source_text_file(path):
-    return path.name == "BUILD_ID" or _original_suffix(path) in _SOURCE_TEXT_EXTENSIONS or (
+    return path.name in {"BUILD_ID", "SHA256SUMS"} or _original_suffix(path) in _SOURCE_TEXT_EXTENSIONS or (
         path.name == "LICENSE" and "/provenance/vendor/three-0.160.0/" in path.as_posix())
 
 
@@ -221,6 +221,13 @@ def _check_source_text(raw, suffix, *, source_path=None):
     if source_path is not None and Path(source_path).name == "BUILD_ID":
         _require(len(raw) <= 128 and re.fullmatch(rb"[A-Za-z0-9_-]+\n?", raw),
                  "original_build_id_invalid")
+    if source_path is not None and Path(source_path).name == "SHA256SUMS":
+        _require(0 < len(raw) <= 1024 * 1024, "original_checksum_manifest_invalid")
+        for line in raw.splitlines():
+            match = re.fullmatch(rb"[a-f0-9]{64} [ *]([^\x00-\x1f\x7f]+)", line)
+            _require(match is not None, "original_checksum_manifest_invalid")
+            name = match[1].decode("utf8")
+            _safe_relative(name)
     text = raw.decode("utf8")
     _check_public(text)
     # Logs keep their exact byte serialization. Inspect every complete JSON
@@ -494,6 +501,9 @@ class CourseArchiveExporter:
         """A named HTTP response is a PDF only with exact retained evidence."""
         if source.name == "BUILD_ID":
             _require(course_stat(source).st_size <= 128, "original_build_id_invalid")
+            _check_source_text(course_bytes(source), "", source_path=source)
+            return "text/plain"
+        if source.name == "SHA256SUMS":
             _check_source_text(course_bytes(source), "", source_path=source)
             return "text/plain"
         if source.suffix.lower() != ".bin":

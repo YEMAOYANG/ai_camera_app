@@ -135,6 +135,31 @@ def atomic_json(path, value):
     temporary.replace(path)
 
 
+def atomic_partial_audio_json(path, value):
+    """Handle a first local→registry cutover without an unverified overwrite.
+
+    Only the explicit missing-read-version error is recoverable. Read and
+    verify the newly registered bytes, require monotonic content, then let the
+    normal writer repeat all provider/CAS guards. Any changed head or other
+    failure stops the caller; no TTS request is repeated here.
+    """
+    from services.course_file_store import CourseFileStorageError
+    try:
+        return atomic_json(path, value)
+    except CourseFileStorageError as exc:
+        if str(exc) != 'Course file must be read before it is updated':
+            raise
+        from services.textbook_partial_audio_reconciliation import _checkpoint_prefix, _receipt_prefix
+        remote = json.loads(course_text(path))
+        if path.name == 'receipts.json':
+            _receipt_prefix(remote, value)
+        elif path.name == 'checkpoint.json':
+            _checkpoint_prefix(remote, value)
+        else:
+            raise
+        return atomic_json(path, value)
+
+
 def assert_no_pending_pronunciation_revision(folder):
     """A profile switch must finish reconciliation before narration can resume."""
     if course_exists(folder / 'pronunciation-revision-pending.json'):
@@ -254,9 +279,15 @@ def preserved_receipts(plan, *sources, confirm_transition=None):
                 raise ApiError('textbook_preview_audio_conflict', '已有配音收据编号无效或重复', 409)
             seen.add(request)
             prior = by_id.get(request, {})
-            if (any(prior[k] != receipt[k] for k in prior.keys() & receipt.keys())
-                    and not (confirm_transition and confirm_transition(prior, receipt))):
-                raise ApiError('textbook_preview_audio_conflict', '数据库与本地配音收据冲突，请先恢复原记录', 409)
+            if any(prior[k] != receipt[k] for k in prior.keys() & receipt.keys()):
+                if not (confirm_transition and confirm_transition(prior, receipt)):
+                    # A local receipt write can fail after provider success is
+                    # retained in the DB result. Reconcile the stale claim in
+                    # either input order, only against that exact provider GET.
+                    # Keep the successful record, not unresolved-only fields.
+                    if confirm_transition and confirm_transition(receipt, prior):
+                        continue
+                    raise ApiError('textbook_preview_audio_conflict', '数据库与本地配音收据冲突，请先恢复原记录', 409)
             by_id[request] = {**deepcopy(prior), **deepcopy(receipt)}
     return by_id
 
@@ -275,7 +306,7 @@ def segment_request_plan(plan, receipt, folder, *, text):
     return child
 
 
-def verify_segment_receipt(plan, receipt, scene, action, folder, *, inheritance=...):
+def verify_segment_receipt(plan, receipt, scene, action, folder, *, inheritance=..., partial_inheritance=...):
     """Bind v2 audio to its original request or an archived local amendment.
 
     previewAudioIdentity is local request metadata, not a provider assertion.
@@ -288,6 +319,13 @@ def verify_segment_receipt(plan, receipt, scene, action, folder, *, inheritance=
     inherited = inherited_evidence(inheritance, plan, scene, action, receipt)
     if inherited is not None:
         return inherited
+    from services.textbook_partial_audio_inheritance import load_partial_audio, verify_partial_segment
+    if partial_inheritance is ...:
+        partial_inheritance = load_partial_audio(folder, plan)
+    if verify_partial_segment(partial_inheritance, scene, action, receipt, folder) is not None:
+        # Source TTS is verified, not source ASR. The target must still make
+        # and validate a real ASR request for this exact original WAV.
+        return None
     if contract['legacy']:
         check_receipt_language_policy(plan, receipt)
         return
@@ -313,7 +351,8 @@ def store_audio_result(service, row, saved, receipts, stopped, selection):
     frozen = service.repository.parse(row['input_json'])
     checks = {**(service.repository.parse(row['result_json']) or {}),
               **preview_checks(saved, frozen['previewPrompt']['expectedSceneCount'], frozen.get('originalMedia'),
-                               frozen['previewPrompt'].get('expectedQuestionCount', 6))}
+                               frozen['previewPrompt'].get('expectedQuestionCount', 6),
+                               required_scene_types=frozen['previewPrompt'].get('requiredSceneTypes'))}
     checks.pop('frozenPreview', None)
     by_id = {r['requestId']: r for r in receipts}
     speeches = [a for s in saved['scenes'] for a in s.get('actions', []) if a.get('type') == 'speech']
@@ -364,6 +403,8 @@ def recover_completed_audio_save(service, row, root, original):
         except (OSError, ValueError):
             fail()
         frozen = service.repository.parse(row['input_json'])
+        from services.textbook_partial_audio_inheritance import load_partial_audio
+        partial_inheritance = load_partial_audio(folder, plan, frozen=frozen)
         assert_required_pronunciation_plan(frozen, plan)
         contract = resolve_audio_contract(plan, frozen)
         if contract['legacy']:
@@ -381,7 +422,7 @@ def recover_completed_audio_save(service, row, root, original):
             receipt = by_id.get(action.get('audioId'), {})
             if receipt.get('status') != 'succeeded':
                 fail()
-            verify_segment_receipt(plan, receipt, scene, action, folder)
+            verify_segment_receipt(plan, receipt, scene, action, folder, partial_inheritance=partial_inheritance)
             request = receipt['requestId']
             asset = root / classroom_id / 'audio' / (request + '.wav')
             if (action.get('audioUrl') != f'{runtime.base_url}/api/classroom-media/{classroom_id}/audio/{request}.wav'
@@ -450,6 +491,10 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
             raise ApiError("textbook_preview_audio_conflict", "配音计划不属于当前课件", 409)
     from services.textbook_operator_revision_service import load_inheritance
     inheritance = load_inheritance(folder, plan, frozen=frozen) if plan is not None else None
+    from services.textbook_partial_audio_inheritance import load_partial_audio
+    partial_inheritance = load_partial_audio(folder, plan, frozen=frozen) if plan is not None else None
+    if frozen.get('partialAudioParent') and partial_inheritance is None:
+        raise ApiError('textbook_partial_audio_invalid', '部分配音修订缺少冻结计划和来源', 409)
     if frozen.get('operatorRevision') and inheritance is None:
         raise ApiError('textbook_preview_audio_conflict', '修订预览必须有独立计划和父来源证据', 409)
     if selected is None and row["status"] == "preview_ready" and receipts:
@@ -475,7 +520,8 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
             for scene in original['scenes']:
                 for action in scene.get('actions', []):
                     if action.get('type') == 'speech':
-                        verify_segment_receipt(plan, by_id[action['audioId']], scene, action, folder, inheritance=inheritance)
+                        verify_segment_receipt(plan, by_id[action['audioId']], scene, action, folder, inheritance=inheritance,
+                                               partial_inheritance=partial_inheritance)
             return service.summary(row)
     folder.mkdir(parents=True, exist_ok=True)
     with (folder / "operator.lock").open("a") as lock:
@@ -498,6 +544,12 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
         classroom = runtime.get_classroom(classroom_id)
         if core_content(classroom) != core_content(original):
             raise ApiError("textbook_preview_changed", "课件已被编辑，请先核对音频任务", 409)
+        if frozen.get('partialAudioParent') and course_exists(folder / 'checkpoint.json'):
+            # A prior archive may have registered this path between runs. Read
+            # its exact head before any write and reject a divergent checkpoint.
+            from services.textbook_partial_audio_reconciliation import _checkpoint_prefix
+            registered_checkpoint = json.loads(course_text(folder / 'checkpoint.json'))
+            _checkpoint_prefix(registered_checkpoint, classroom)
         # A page whose cues cannot be bound must stop before any paid speech.
         for scene in cue_pages(classroom):
             cue_speech(scene)
@@ -561,7 +613,7 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
         def remember(receipt):
             receipt_index[receipt['requestId']] = deepcopy(receipt)
             receipts[:] = receipt_index.values()
-            atomic_json(receipts_path, receipts)
+            (atomic_partial_audio_json if frozen.get('partialAudioParent') else atomic_json)(receipts_path, receipts)
 
         def dispatch_recorded_retry(scene, action, text):
             request_id = retry_target['requestId']
@@ -630,7 +682,8 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
                 if inheritance and (scene['id'], action['id']) in inheritance['segments']:
                     saved = inheritance['segments'][(scene['id'], action['id'])]
                     receipt = next(r for r in inheritance['parent']['receipts'] if r['requestId'] == saved['ttsRequestId'])
-                    verify_segment_receipt(plan, receipt, scene, action, folder, inheritance=inheritance)
+                    verify_segment_receipt(plan, receipt, scene, action, folder, inheritance=inheritance,
+                                           partial_inheritance=partial_inheritance)
                     asset = audio_dir / (saved['ttsRequestId'] + '.wav')
                     if not course_exists(asset) or hashlib.sha256(course_bytes(asset)).hexdigest() != saved['audioSha256']:
                         raise ApiError('textbook_preview_audio_asset_missing', '继承的原音频副本缺失或变化', 409)
@@ -639,7 +692,7 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
                     # Keep the original receipt byte-equivalent. The separate
                     # provenance binds it; no provider call or relabelled id.
                     remember(receipt)
-                    atomic_json(folder / 'checkpoint.json', classroom)
+                    (atomic_partial_audio_json if frozen.get('partialAudioParent') else atomic_json)(folder / 'checkpoint.json', classroom)
                     progress({'completedAudio': index, 'totalAudio': len(workload), 'inherited': True})
                     continue
                 if retry is not None:
@@ -653,26 +706,14 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
                         request_id = receipt['requestId']
                         attempt = receipt.get('previewAudioIdentity', {}).get('attempt', 1)
                         if action.get('audioId'):
-                            verify_segment_receipt(plan, receipt, scene, action, folder, inheritance=inheritance)
+                            verify_segment_receipt(plan, receipt, scene, action, folder, inheritance=inheritance,
+                                                   partial_inheritance=partial_inheritance)
                     else:
                         receipt, created = speak(request_id, scene, action, text)
                         attempt = 1
-                calls = int(created)
-                # A stalled or refused provider call is never sent again under
-                # its own id: the next attempt gets a new, recorded id. Earlier
-                # attempts are read back, and one run sends at most two calls
-                # for a line, so a provider hiccup (or a lapsed account that is
-                # topped up before the next run) does not stop a whole lesson.
-                # The pinyin lane requires explicit reconciliation after any
-                # failure; changing its id must not silently pay a second time.
-                while (plan.get('schemaVersion') != PINYIN_SCHEMA and selected is None
-                       and not (inheritance and inheritance['candidate'].get('completeSceneEvidence'))
-                       and receipt["status"] in ("ambiguous", "failed") and calls < 2):
-                    remember(receipt)
-                    attempt += 1
-                    request_id = tts_request_id(plan, scene['id'], action['id'], text, attempt=attempt)
-                    receipt, created = speak(request_id, scene, action, text)
-                    calls += created
+                # A failed or uncertain paid outcome stops this run. Another
+                # attempt requires the explicit, single-segment fenced retry
+                # path; a normal resume only reads the original request id.
                 if receipt["status"] != "succeeded":
                     remember(receipt)
                     stopped = "textbook_preview_audio_" + receipt["status"]
@@ -701,12 +742,18 @@ def narrate_preview(service, key, classroom_directory, *, speech_selection=None,
                 action.update(audioId=request_id, audioUrl=f"{runtime.base_url}/api/classroom-media/{classroom_id}/audio/{filename}",
                               audioMetadata={"schemaVersion": "mira.openmaic.speech-audio.v1", "providerId": teacher['tts']['providerId'],
                                              "modelId": teacher['tts']['modelId'], "voiceId": teacher['voiceId'], "fallbackUsed": False})
-                verify_segment_receipt(plan, receipt, scene, action, folder, inheritance=inheritance)
-                remember({**receipt, "durationSeconds": round(duration, 3)})
-                atomic_json(folder / "checkpoint.json", classroom)
+                verify_segment_receipt(plan, receipt, scene, action, folder, inheritance=inheritance,
+                                       partial_inheritance=partial_inheritance)
+                # Never rewrite the parent's successful receipt when reusing
+                # its WAV; its original byte-equivalent identity is evidence.
+                partial_segment = partial_inheritance and (scene['id'], action['id']) in partial_inheritance['segments']
+                remember(receipt if partial_segment else {**receipt, "durationSeconds": round(duration, 3)})
+                (atomic_partial_audio_json if frozen.get('partialAudioParent') else atomic_json)(folder / "checkpoint.json", classroom)
                 progress({"completedAudio": index, "totalAudio": len(workload)})
             except (OpenMaicFullRuntimeError, OSError, ValueError) as exc:
-                stopped = getattr(exc, "code", "textbook_preview_audio_invalid")
+                from services.course_file_store import CourseFileStorageError
+                stopped = ('textbook_preview_audio_storage_conflict' if isinstance(exc, CourseFileStorageError)
+                           else getattr(exc, "code", "textbook_preview_audio_invalid"))
                 break
         # Do not overwrite an independently edited classroom. A lost publish
         # response is reconciled against content on the next operator run.

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import os
 import unittest
+from unittest.mock import patch
 
 from integrations.openmaic_formal_media import (
     LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY,
@@ -57,7 +59,15 @@ def integrated_row(subject="math"):
 
 class OpenMaicFormalSkillsTest(unittest.TestCase):
     def test_three_exact_targets_remain_valid_without_mutating_historical_identity(self):
-        current = build_preparation_target("primary_1")
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "",
+                                      "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
+            current = build_preparation_target("primary_1")
+        historical_current = deepcopy(current)
+        from integrations.openmaic_formal_media import PLAYFUL_PROFESSIONAL_POLICY
+        historical_current["formalRuntimePolicy"]["professionalModelPolicy"] = deepcopy(
+            OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_MODEL_POLICY)
+        historical_current["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(
+            PLAYFUL_PROFESSIONAL_POLICY)
         for policy, digest in (
             (LEGACY_PROFESSIONAL_POLICY, "174a787e2ddbb8dd9c50e859a829bd2fe08fec71838448a8c5e5b0d2246766f1"),
             (IMAGE_PROFESSIONAL_POLICY, "48cceefd0543abe9e3bfcf2f8d640ef21b8e03503cfa3dc6ef89a0428bcef2df"),
@@ -70,11 +80,12 @@ class OpenMaicFormalSkillsTest(unittest.TestCase):
                 target["contentProviderProfileContractVersion"] = LEGACY_CONTENT_PROVIDER_PROFILE
                 frozen = deepcopy(target)
                 self.assertEqual(professional_policy(policy), policy)
-                self.assertTrue(compatible_preparation_target(target, current))
+                self.assertTrue(compatible_preparation_target(target, historical_current))
+                self.assertFalse(compatible_preparation_target(target, current))
                 self.assertEqual(preparation_target_fingerprint(target), digest)
                 self.assertEqual(target, frozen)
                 target["subjectTargets"]["math"]["totalCourseCount"] += 1
-                self.assertFalse(compatible_preparation_target(target, current))
+                self.assertFalse(compatible_preparation_target(target, historical_current))
 
     def test_new_and_both_historical_receipts_launch_without_rewriting(self):
         for row in (_formal_row(), _upgrade(_formal_row()), integrated_row()):

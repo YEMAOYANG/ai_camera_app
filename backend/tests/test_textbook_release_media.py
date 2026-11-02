@@ -224,13 +224,14 @@ class MediaArchiveTests(unittest.TestCase):
         self.assertEqual(release['classroomSha256'], digest(release['classroom']))
         self.assertEqual(release['sha256'], digest({k: v for k, v in release.items() if k != 'sha256'}))
 
-    def test_policy_v2_candidate_requires_and_binds_whole_course_quality_review(self):
-        policy_sha = digest({'policy': 'quality-v2'})
+    def test_current_policy_candidate_requires_and_binds_whole_course_quality_review(self):
+        policy = freeze_interaction_policy()
+        policy_sha = policy['sha256']
         self.operator_input = {'authoringCandidate': {
             'schemaVersion': 'mira.textbook.authoring-candidate.v1', 'sha256': 'a' * 64,
             'contractSha256': 'b' * 64, 'sceneCount': 3, 'assetCount': 1,
             'verification': 'frozen_identity_and_artifact_integrity_only',
-            'interactionPolicyVersion': 2, 'interactionPolicySha256': policy_sha,
+            'interactionPolicyVersion': policy['policy']['version'], 'interactionPolicySha256': policy_sha,
             'wholeCourseQualityContractSha256': 'c' * 64}}
         with self.assertRaises(ApiError):
             self.prepare({})
@@ -240,6 +241,30 @@ class MediaArchiveTests(unittest.TestCase):
         receipt = self.courseware_quality(prepared['frozen']['sourceSha256'])
         self.assertEqual(prepared['frozen']['wholeCourseQualityReviewSha256'], digest(receipt))
         self.assertEqual(prepared['review']['coursewareQuality'], receipt)
+
+    def test_v4_compact_candidate_history_check_uses_verified_base_policy(self):
+        current = freeze_interaction_policy()
+        base = deepcopy(current)
+        base['policy']['version'] = current['policy']['version'] - 1
+        base['sha256'] = digest(base['policy'])
+        candidate_source_sha = 'd' * 64
+        candidate = {'schemaVersion': 'mira.textbook.authoring-candidate.v1', 'sha256': 'a' * 64,
+            'contractSha256': 'b' * 64, 'sceneCount': 3, 'assetCount': 1,
+            'verification': 'frozen_identity_and_artifact_integrity_only',
+            'interactionPolicyVersion': base['policy']['version'],
+            'interactionPolicySha256': base['sha256'],
+            'wholeCourseQualityContractSha256': digest(base['policy']['wholeCourseQualityContract'])}
+        self.operator_input = {'sourceSha256': candidate_source_sha,
+            'authoring': {'sessionId': 'session-v4', 'stageId': self.source_id},
+            'authoringCandidate': candidate}
+        self.courseware_quality = lambda source_sha: whole_course_quality_review(source_sha, base['sha256'])
+        resolver = 'services.textbook_publication_service.resolve_authoring_interaction_policy'
+        discovery = 'services.textbook_publication_service.discover_complete_scene_review_followup'
+        with patch(resolver, return_value=base) as resolve, patch(discovery, return_value=None) as discover:
+            prepared = self.prepare({})
+        self.assertEqual(prepared['review']['coursewareQuality']['policySha256'], base['sha256'])
+        resolve.assert_called_once()
+        self.assertEqual(discover.call_args.kwargs['base_interaction_policy'], base)
 
     def test_legacy_complete_scene_followup_requires_current_policy_quality_and_trace(self):
         current = freeze_interaction_policy()

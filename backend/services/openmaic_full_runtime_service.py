@@ -19,9 +19,10 @@ from content.teacher_profiles import (
     list_teacher_profiles,
 )
 from integrations.openmaic_formal_media import (
-    professional_policy, generation_options, professional_image_fields,
+    professional_policy, generation_options, image_policy_for_creation_policy, professional_image_fields,
     media_receipt, validate_classroom_media, validate_media_manifest,
     REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+    QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
 )
 from integrations.openmaic_formal_skills import (
     professional_skill_fields, validate_classroom_skills,
@@ -2648,7 +2649,8 @@ class OpenMaicFullRuntimeService:
                     target_fingerprint=fingerprint,
                 )
                 selected_policy = professional_policy(authority.get("professionalCreationPolicy"))
-                if selected_policy == REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY and not any(
+                if selected_policy in (REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+                                       QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY) and not any(
                     isinstance(supported, Mapping)
                     and _canonical_sha256(supported) == _canonical_sha256(selected_policy)
                     for supported in readiness.get("supportedProfessionalPolicies", [])
@@ -3200,13 +3202,15 @@ class OpenMaicFullRuntimeService:
         except ValueError as exc:
             self._fail("openmaic_formal_teaching_quality_invalid", "正式课堂最终课件与独立教学质量验收不一致", 502)
             raise AssertionError("unreachable") from exc
-        if professional_image_fields(professional_creation):
+        if professional_image_fields(professional_creation, generation_contract=generation_contract):
             try:
                 media = media_receipt(getattr(job, "media", None),
                     runtime_request_id=str(runtime["request_id"]),
                     classroom_id=str(job.classroom_id),
                     build_item_id=str(runtime["candidate_build_item_id"]),
-                    session_id=professional_creation["sessionId"])
+                    session_id=professional_creation["sessionId"],
+                    image_policy=image_policy_for_creation_policy(
+                        generation_contract.get("professionalCreationPolicy")))
                 formal_evidence["media"] = validate_classroom_media(media, classroom, self._image_media_available)
             except ValueError as exc:
                 self._fail("invalid_openmaic_media_receipt", "正式课堂图片回执、场景引用或可读性验证失败", 502)
@@ -3449,7 +3453,7 @@ class OpenMaicFullRuntimeService:
             self._fail("openmaic_formal_skill_evidence_invalid", "正式课件缺少完整的技能加载或逐页应用证据", 502)
             raise AssertionError("unreachable") from exc
         if (
-            bool(professional_image_fields(professional)) != ("image" in selected_policy)
+            bool(professional_image_fields(professional, generation_contract=generation_contract)) != ("image" in selected_policy)
             or bool(professional_video_fields(professional)) != ("video" in selected_policy)
             or professional.get("buildItemId") != build_item_id
             or research.get("buildItemId") != build_item_id
@@ -3497,7 +3501,7 @@ class OpenMaicFullRuntimeService:
             "userPromptRequired": False,
             "studentToolsEnabled": False,
             "webSearchEnabled": True,
-            **professional_image_fields(professional),
+            **professional_image_fields(professional, generation_contract=generation_contract),
             **professional_video_fields(professional),
             **professional_skill_fields(professional),
             **professional_quality_fields(professional, generation_contract=generation_contract),
@@ -5134,7 +5138,7 @@ class OpenMaicFullRuntimeService:
                 "userPromptRequired": False,
                 "studentToolsEnabled": False,
                 "webSearchEnabled": True,
-                **professional_image_fields(professional_receipt),
+                **professional_image_fields(professional_receipt, generation_contract=generation),
                 **professional_video_fields(professional_receipt),
                 **professional_skill_fields(professional_receipt),
                 **professional_quality_fields(professional_receipt, generation_contract=generation),

@@ -206,9 +206,10 @@ class ReportHomeworkProgressTest(unittest.TestCase):
                 self.db, family_id='family', start_date='2026-09-29', end_date='2026-09-29'))
 
     def test_weekend_report_reprojects_counts_after_current_source_filter(self):
-        self.db.execute('CREATE TABLE learning_review_runs (id TEXT,family_id TEXT,child_id TEXT,created_at INTEGER,completed_at INTEGER,coverage_json TEXT)')
-        self.db.execute('INSERT INTO learning_review_runs VALUES (?,?,?,?,?,?)',
-            ('review', 'family', 'child', at('2026-09-29'), at('2026-09-29'), '{}'))
+        self.db.execute('CREATE TABLE learning_review_runs (id TEXT,family_id TEXT,child_id TEXT,created_at INTEGER,completed_at INTEGER,coverage_json TEXT,started_at INTEGER)')
+        self.db.execute('CREATE TABLE learning_review_items (run_id TEXT,answered_at INTEGER)')
+        self.db.execute('INSERT INTO learning_review_runs VALUES (?,?,?,?,?,?,?)',
+            ('review', 'family', 'child', at('2026-09-29'), at('2026-09-29'), '{}', at('2026-09-29')))
         filtered = {'sourceReviewCount': 1, 'items': [{'correct': True, 'independent': False}],
             'independentFirstCorrect': 0}
         with patch('services.learning_review_service.LearningReviewService._summary',

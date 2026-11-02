@@ -69,7 +69,7 @@ class QuizRevisionTests(unittest.TestCase):
         review = dict(alignmentConfirmed=True, originalExpressionConfirmed=True, sourceUsageConfirmed=True,
             publicationAuthorized=True, reviewer='isolated', basis='picture task checked',
             sourceSha256=row['classroom_sha256'], reviewedAt=now_ms() - 1)
-        publisher = TextbookPublicationService(self.service)
+        publisher = TextbookPublicationService(self.service, cover_guard=lambda *_a, **_k: None)
         release = publisher.prepare(key=row['preview_key'], edition=row['edition_id'], revision=row['revision_id'],
             node=row['node_id'], teaching_revision='quiz-4', review=review, audio_audit=audit,
             classroom_directory=self.root)

@@ -42,8 +42,14 @@ def structured_lesson_constraints_policy(policy: object) -> bool:
     """Only the frozen Flash candidate opts in; historical envelopes stay exact."""
     if not isinstance(policy, Mapping) or not ({"modelPolicyId", "sceneLearningPolicy"} & set(policy)):
         return False
-    from integrations.openmaic_formal_media import FLASH_CANDIDATE_PROFESSIONAL_POLICY
-    if _sha(policy) != _sha(FLASH_CANDIDATE_PROFESSIONAL_POLICY):
+    from integrations.openmaic_formal_media import (
+        FLASH_CANDIDATE_PROFESSIONAL_POLICY,
+        QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY,
+    )
+    if _sha(policy) not in {
+        _sha(FLASH_CANDIDATE_PROFESSIONAL_POLICY),
+        _sha(QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY),
+    }:
         raise ValueError("formal structured lesson constraints policy is invalid")
     return True
 

@@ -1,3 +1,4 @@
+import mimetypes
 from flask import Blueprint, current_app, jsonify, request, send_file
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, json_body
@@ -47,7 +48,12 @@ def answer(run_id):
 def audio(run_id,asset):
     try:
         path=service().audio(bearer_token(request),run_id,asset)
-        result=send_file(path,mimetype='audio/mpeg' if str(path).lower().endswith('.mp3') else 'audio/wav',conditional=True)
+        # Legacy remote audio can be a verified file-like stream without a
+        # filename. The already-authorized asset ID carries its actual suffix.
+        mime = mimetypes.guess_type(asset)[0] or 'audio/wav'
+        if mime not in {'audio/mpeg', 'audio/wav', 'audio/x-wav', 'image/png', 'image/jpeg', 'image/webp'}:
+            raise ApiError('review_media_unavailable', '复习素材暂不可用', 404)
+        result=send_file(path,mimetype='audio/wav' if mime=='audio/x-wav' else mime,conditional=True)
         result.headers['Cache-Control']='private, no-store'
         return result
     except ApiError as exc:return error_response(exc)

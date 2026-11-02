@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+import os
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from integrations.openmaic_formal_media import (
-    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY,
+    FORMAL_IMAGE_POLICY, LEGACY_FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY,
     INTEGRATED_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+    QWEN3_PLAYFUL_PROFESSIONAL_POLICY,
     canonical_sha256, classroom_image_references, compatible_preparation_target, generation_options,
-    media_evidence, media_receipt, policy_from_target, professional_policy,
+    media_evidence, media_receipt, policy_from_target, professional_image_fields, professional_policy,
     validate_classroom_media, validate_media_manifest,
 )
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient, OpenMaicFullRuntimeError
@@ -23,10 +25,13 @@ from tests import test_formal_student_runtime_launch as launch_fixtures
 
 def _media(professional: dict, assets: list | None = None) -> dict:
     items = assets or []
+    policy = (FORMAL_IMAGE_POLICY
+              if professional.get("imagePolicyId") == FORMAL_IMAGE_POLICY["policyId"]
+              else LEGACY_FORMAL_IMAGE_POLICY)
     return _with_receipt_sha256({
         "schemaVersion": "mira.openmaic.formal-media-receipt.v1", "status": "succeeded",
         **{k: professional[k] for k in ("runtimeRequestId", "buildItemId", "classroomId", "sessionId")},
-        **{k: FORMAL_IMAGE_POLICY[k] for k in ("policyId", "providerId", "modelId")},
+        **{k: policy[k] for k in ("policyId", "providerId", "modelId")},
         "imageCount": len(items), "assets": deepcopy(items),
     })
 
@@ -39,10 +44,10 @@ def _upgrade(row: dict, assets: list | None = None) -> dict:
     generation["generation"] = generation_options(IMAGE_PROFESSIONAL_POLICY)
     pro = manifest["professionalCreation"]
     pro.pop("receiptSha256")
-    pro.update(imageGenerationEnabled=True, imagePolicyId=FORMAL_IMAGE_POLICY["policyId"])
+    pro.update(imageGenerationEnabled=True, imagePolicyId=LEGACY_FORMAL_IMAGE_POLICY["policyId"])
     pro = manifest["professionalCreation"] = _with_receipt_sha256(pro)
     manifest["formalEvidence"]["professionalCreation"].update(
-        imageGenerationEnabled=True, imagePolicyId=FORMAL_IMAGE_POLICY["policyId"],
+        imageGenerationEnabled=True, imagePolicyId=LEGACY_FORMAL_IMAGE_POLICY["policyId"],
         receiptSha256=pro["receiptSha256"],
     )
     manifest["media"] = _media(pro, assets)
@@ -58,16 +63,50 @@ def _asset() -> dict:
 
 
 class OpenMaicFormalMediaTest(unittest.TestCase):
+    def test_qwen3_policy_is_versioned_and_never_accepts_a_v1_hybrid(self):
+        self.assertEqual(canonical_sha256(LEGACY_FORMAL_IMAGE_POLICY),
+                         "c49eae22efb8689a08772c2a9ffd459fd15e874d6289188f571e998540df774b")
+        self.assertEqual(canonical_sha256(PLAYFUL_PROFESSIONAL_POLICY),
+                         "78d034da03e5c292d383ca407cc64cbc42fafa77217cc4f846f63ee0404cb7bc")
+        self.assertEqual(FORMAL_IMAGE_POLICY["modelId"], "qwen-image-3.0")
+        generation = {"professionalCreationPolicy": deepcopy(QWEN3_PLAYFUL_PROFESSIONAL_POLICY)}
+        fields = {"imageGenerationEnabled": True, "imagePolicyId": FORMAL_IMAGE_POLICY["policyId"]}
+        self.assertEqual(professional_image_fields(fields, generation_contract=generation), fields)
+        legacy_fields = {**fields, "imagePolicyId": LEGACY_FORMAL_IMAGE_POLICY["policyId"]}
+        with self.assertRaisesRegex(ValueError, "policy mismatch"):
+            professional_image_fields(legacy_fields, generation_contract=generation)
+        identity = {"runtime_request_id": "runtime-1", "classroom_id": "classroom-1",
+                    "build_item_id": "build-1", "session_id": "session-1"}
+        receipt = _with_receipt_sha256({
+            "schemaVersion": "mira.openmaic.formal-media-receipt.v1", "status": "succeeded",
+            "runtimeRequestId": identity["runtime_request_id"],
+            "classroomId": identity["classroom_id"], "buildItemId": identity["build_item_id"],
+            "sessionId": identity["session_id"],
+            **{key: FORMAL_IMAGE_POLICY[key] for key in ("policyId", "providerId", "modelId")},
+            "imageCount": 0, "assets": [],
+        })
+        self.assertEqual(media_receipt(receipt, **identity, image_policy=FORMAL_IMAGE_POLICY), receipt)
+        with self.assertRaisesRegex(ValueError, "identity mismatch"):
+            media_receipt(receipt, **identity, image_policy=LEGACY_FORMAL_IMAGE_POLICY)
+
     def test_new_target_changes_fingerprint_and_exact_legacy_remains_resumable(self):
         current = build_preparation_target("primary_1")
-        legacy = deepcopy(current)
+        historical_current = deepcopy(current)
+        historical_current["formalRuntimePolicy"]["professionalModelPolicy"] = deepcopy(
+            OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_MODEL_POLICY)
+        historical_current["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(
+            PLAYFUL_PROFESSIONAL_POLICY)
+        legacy = deepcopy(historical_current)
         from integrations.openmaic_formal_media import LEGACY_CONTENT_PROVIDER_PROFILE
         legacy["contentProviderProfileContractVersion"] = LEGACY_CONTENT_PROVIDER_PROFILE
         legacy["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(LEGACY_PROFESSIONAL_POLICY)
-        self.assertEqual(policy_from_target(current), PLAYFUL_PROFESSIONAL_POLICY)
+        self.assertEqual(policy_from_target(current),
+                         OpenMaicFullRuntimeClient.selected_professional_creation_policy())
+        self.assertEqual(policy_from_target(current)["image"], FORMAL_IMAGE_POLICY)
         self.assertEqual(preparation_target_fingerprint(legacy), "174a787e2ddbb8dd9c50e859a829bd2fe08fec71838448a8c5e5b0d2246766f1")
         self.assertNotEqual(preparation_target_fingerprint(legacy), preparation_target_fingerprint(current))
-        self.assertTrue(compatible_preparation_target(legacy, current))
+        self.assertTrue(compatible_preparation_target(legacy, historical_current))
+        self.assertFalse(compatible_preparation_target(legacy, current))
         self.assertTrue(compatible_preparation_target(current, current))
         legacy["formalRuntimePolicy"]["enableWebSearch"] = False
         self.assertFalse(compatible_preparation_target(legacy, current))
@@ -130,13 +169,14 @@ class OpenMaicFormalMediaTest(unittest.TestCase):
         options = dict(requirement="persisted brief", enable_web_search=True,
             enable_video_generation=False, enable_tts=False, agent_mode="generate",
             runtime_request_id="request-1", formal_runtime_contract=client.FORMAL_RUNTIME_CLASSROOM_CONTRACT)
-        for policy in (LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY):
-            client.start_generation(**options, enable_image_generation="image" in policy,
-                                    professional_creation_policy=policy)
-            self.assertEqual(bodies[-1]["professionalCreationPolicy"], policy)
-            self.assertIs(bodies[-1]["enableImageGeneration"], "image" in policy)
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": ""}):
+            for policy in (LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY):
+                client.start_generation(**options, enable_image_generation="image" in policy,
+                                        professional_creation_policy=policy)
+                self.assertEqual(bodies[-1]["professionalCreationPolicy"], policy)
+                self.assertIs(bodies[-1]["enableImageGeneration"], "image" in policy)
         self.assertNotEqual(client.formal_input_sha256(bodies[0]), client.formal_input_sha256(bodies[1]))
-        with self.assertRaises(OpenMaicFullRuntimeError):
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": ""}), self.assertRaises(OpenMaicFullRuntimeError):
             client.start_generation(**options, enable_image_generation=False,
                                     professional_creation_policy=PROFESSIONAL_POLICY)
         self.assertEqual(len(bodies), 2)
@@ -145,7 +185,8 @@ class OpenMaicFormalMediaTest(unittest.TestCase):
         professional = _upgrade(_formal_row())["feature_manifest_json"]["professionalCreation"]
         original = _media(professional, [_asset()])
         identity = {"runtime_request_id": professional["runtimeRequestId"], "classroom_id": professional["classroomId"],
-                    "build_item_id": professional["buildItemId"], "session_id": professional["sessionId"]}
+                    "build_item_id": professional["buildItemId"], "session_id": professional["sessionId"],
+                    "image_policy": LEGACY_FORMAL_IMAGE_POLICY}
         self.assertEqual(media_receipt(original, **identity), original)
         changes = {
             "wrong stage": lambda x: x.update(classroomId="other-stage"),
@@ -280,13 +321,13 @@ class OpenMaicFormalMediaTest(unittest.TestCase):
                     "professionalCreation": manifest["professionalCreation"], "research": manifest["research"]}}
             if "media" in manifest:
                 payload["result"]["media"] = manifest["media"]
-            job = client._job_from_payload(payload)
+            job = client._job_from_payload(payload, generation_contract=manifest["generationContract"])
             self.assertEqual(job.professional_creation, manifest["professionalCreation"])
             self.assertEqual(job.media, manifest.get("media"))
             if "media" in manifest:
                 del payload["result"]["media"]
                 with self.assertRaises(OpenMaicFullRuntimeError) as caught:
-                    client._job_from_payload(payload)
+                    client._job_from_payload(payload, generation_contract=manifest["generationContract"])
                 self.assertEqual(caught.exception.code, "invalid_openmaic_media_receipt")
 
     def test_launch_preserves_legacy_and_rejects_new_missing_or_mismatched_media(self):

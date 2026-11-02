@@ -77,7 +77,9 @@ class LearningCurriculumPreparationContractTest(unittest.TestCase):
             )
 
     def test_formal_teacher_targets_and_runtime_policy_are_sample_independent(self):
-        target = build_preparation_target("primary_1")
+        with patch.dict('os.environ', {'MIRA_FORMAL_MODEL_POLICY': '',
+                                        'MIRA_FORMAL_PLAYFUL_REQUIRE_3D': ''}):
+            target = build_preparation_target("primary_1")
         self.assertEqual(
             [target["teacherTargets"][subject]["teacherProfile"]["id"] for subject in target["subjects"]],
             ["mira_chinese_gentle", "mira_math_clear", "mira_english_standard"],
@@ -239,7 +241,9 @@ class LearningCurriculumPreparationContractTest(unittest.TestCase):
             )
 
     def test_primary_one_sealed_dataset_and_target_fingerprint_are_pinned(self):
-        target = build_preparation_target("primary_1")
+        with patch.dict('os.environ', {'MIRA_FORMAL_MODEL_POLICY': '',
+                                        'MIRA_FORMAL_PLAYFUL_REQUIRE_3D': ''}):
+            target = build_preparation_target("primary_1")
         self.assertEqual(
             target["contentValidationDatasetSha256"],
             "1ca7707b75f9d55c775201676dfc234c496e1655b048494517ac2aea8736b63d",
@@ -255,7 +259,7 @@ class LearningCurriculumPreparationContractTest(unittest.TestCase):
         )
         self.assertEqual(
             preparation_target_fingerprint(target),
-            "51d9f37d20489a4255acea6507336daf0839228e395c11bac64e3bcd211e3431",
+            "6fe84d967359d59791f3dabfc71da0f1103626a20dff844c2dd228949645c687",
         )
 
     def test_v95_provider_phase_budget_fits_every_formal_deadline(self):

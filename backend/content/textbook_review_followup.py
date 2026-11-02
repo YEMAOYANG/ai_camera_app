@@ -232,7 +232,8 @@ def validate_complete_scene_review_followup(value, *, candidate_source_sha256, c
 
 def discover_complete_scene_review_followup(classroom, classroom_directory, *, session_id, stage_id,
                                               base_policy_version, base_policy_sha256,
-                                              candidate_source_sha256=None):
+                                              candidate_source_sha256=None,
+                                              base_interaction_policy=None):
     """Return a sealed bridge when the current candidate descends from a complete-scene revision."""
     directory = Path(classroom_directory).resolve()
     if (not isinstance(session_id, str) or not session_id or not isinstance(stage_id, str) or not stage_id
@@ -250,7 +251,20 @@ def discover_complete_scene_review_followup(classroom, classroom_directory, *, s
             or not _is_sha(contract.get("sha256"))
             or digest(contract["contract"]) != contract["sha256"]):
         raise ValueError("follow-up candidate contract is invalid")
-    base_policy = contract["contract"].get("interactionPolicy")
+    base_policy = (contract["contract"].get("interactionPolicy")
+                   if base_interaction_policy is None else base_interaction_policy)
+    if base_interaction_policy is not None:
+        policy_ref = contract["contract"].get("policyRef")
+        policy_value = (base_policy.get("policy")
+                        if isinstance(base_policy, dict) else None)
+        if (not isinstance(policy_ref, dict) or not isinstance(policy_value, dict)
+                or policy_ref != {
+                    "schemaVersion": base_policy.get("schemaVersion"),
+                    "policyId": policy_value.get("policyId"),
+                    "version": policy_value.get("version"),
+                    "sha256": base_policy.get("sha256"),
+                }):
+            raise ValueError("follow-up base policy reference differs from the frozen candidate")
     if (not isinstance(base_policy, dict) or not isinstance(base_policy.get("policy"), dict)
             or base_policy.get("sha256") != base_policy_sha256
             or digest(base_policy["policy"]) != base_policy_sha256

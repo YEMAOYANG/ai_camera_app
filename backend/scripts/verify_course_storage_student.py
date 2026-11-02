@@ -34,6 +34,8 @@ from services.textbook_classroom_service import TextbookClassroomService
 
 MAX_CLASSROOM_BYTES = 64 * 1024 * 1024
 MAX_AUDIO_BYTES = 16 * 1024 * 1024
+MAX_AUDIO_FILES = 2048
+MAX_TOTAL_AUDIO_BYTES = 512 * 1024 * 1024
 SHA = re.compile(r'[a-f0-9]{64}\Z')
 IDENTIFIER = re.compile(r'[A-Za-z0-9_]+\Z')
 
@@ -216,18 +218,45 @@ def verify_student_entry(*, database, identity, release, signer, gateway, snapsh
                     for scene in room['scenes'] if scene.get('type') == 'quiz'
                     for question in scene.get('content', {}).get('questions', [])),
                 'student_verification_private_answer_exposed')
-        audio = next((m for m in release['media'] if m.get('mimeType') in {'audio/wav', 'audio/mpeg'}), None)
-        require(audio is not None and re.fullmatch('/api/classroom-media/' + re.escape(cid)
-            + r'/audio/[A-Za-z0-9_-]+\.(?:wav|mp3)', audio.get('path', ''))
-            and type(audio.get('byteSize')) is int and 0 < audio['byteSize'] <= MAX_AUDIO_BYTES,
-            'student_verification_bound_audio_missing')
-        status, headers, raw = gateway.get(audio['path'], limit=MAX_AUDIO_BYTES)
-        require(status == 200 and headers.get('content-type', '').split(';')[0] == audio['mimeType']
-                and len(raw) == audio['byteSize'] and hashlib.sha256(raw).hexdigest() == audio['sha256'],
-                'student_verification_audio_hash_mismatch')
+        audio_assets = [m for m in release['media'] if m.get('mimeType') in {'audio/wav', 'audio/mpeg'}]
+        require(0 < len(audio_assets) <= MAX_AUDIO_FILES,
+                'student_verification_bound_audio_manifest_invalid')
+        expected_extensions = {'audio/wav': 'wav', 'audio/mpeg': 'mp3'}
+        audio_paths = set()
+        total_audio_bytes = 0
+        manifest_entries = []
+        for audio in audio_assets:
+            path = audio.get('path', '')
+            match = re.fullmatch('/api/classroom-media/' + re.escape(cid)
+                + r'/audio/[A-Za-z0-9_-]+\.(wav|mp3)', path)
+            size = audio.get('byteSize')
+            checksum = audio.get('sha256')
+            mime_type = audio.get('mimeType')
+            require(match is not None and match.group(1) == expected_extensions[mime_type]
+                    and type(size) is int and 0 < size <= MAX_AUDIO_BYTES
+                    and isinstance(checksum, str) and SHA.fullmatch(checksum)
+                    and path not in audio_paths,
+                    'student_verification_bound_audio_manifest_invalid')
+            audio_paths.add(path)
+            total_audio_bytes += size
+            require(total_audio_bytes <= MAX_TOTAL_AUDIO_BYTES,
+                    'student_verification_bound_audio_manifest_invalid')
+            manifest_entries.append({'path': path, 'mimeType': mime_type,
+                                     'byteSize': size, 'sha256': checksum})
+
+        for audio in audio_assets:
+            status, headers, raw = gateway.get(audio['path'], limit=MAX_AUDIO_BYTES)
+            require(status == 200 and headers.get('content-type', '').split(';')[0] == audio['mimeType']
+                    and len(raw) == audio['byteSize'] and hashlib.sha256(raw).hexdigest() == audio['sha256'],
+                    'student_verification_audio_hash_mismatch')
+        first_audio = audio_assets[0]
+        audio_manifest_sha256 = hashlib.sha256(json_bytes(sorted(
+            manifest_entries, key=lambda item: item['path']))).hexdigest()
         outcome = {'classroomId': cid, 'contentKey': identity['content_key'], 'releaseSha256': release['sha256'],
             'sceneCount': len(room['scenes']), 'classroomResponseSha256': hashlib.sha256(body).hexdigest(),
-            'audioSha256': audio['sha256'], 'audioBytes': len(raw), 'gatewayReads': gateway.requests,
+            'audioSha256': first_audio['sha256'], 'audioBytes': first_audio['byteSize'],
+            'audioVerifiedCount': len(audio_assets), 'audioVerifiedBytes': total_audio_bytes,
+            'audioVerifiedManifestSha256': audio_manifest_sha256, 'gatewayReads': gateway.requests,
             'runtimeExpiresAt': runtime['expiresAt'], 'gatewaySourceVersion': health.get('sourceVersion')}
     except Exception as caught:
         error = caught if isinstance(caught, StudentVerificationError) else StudentVerificationError('student_verification_http_or_contract_failed')

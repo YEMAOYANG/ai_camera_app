@@ -5,9 +5,12 @@ import unittest
 
 from content.textbook_catalog import digest
 from content.textbook_interaction_policy import freeze_interaction_policy
-from content.textbook_scene_contract import (PROMPT_END, PROMPT_START, freeze_scene_contract,
-                                             render_scene_contract, scene_canonical, scene_digest,
-                                             validate_scene_contract)
+from content.textbook_scene_contract import (
+    AUTHOR_PROMPT_END, AUTHOR_PROMPT_START, PROMPT_END, PROMPT_START,
+    freeze_author_dispatch_contract, freeze_scene_contract, render_author_dispatch_contract,
+    render_scene_contract, scene_canonical, scene_digest, validate_author_dispatch_contract,
+    validate_scene_contract,
+)
 from tests.test_textbook_workbench_authoring import reviewed_draft
 
 
@@ -60,6 +63,30 @@ class TextbookSceneContractTest(unittest.TestCase):
         self.assertNotIn('speech', contract)
         self.draft['pagePlan'][0]['title'] = 'Changed later'
         self.assertNotEqual(snapshot['contract']['pagePlan'], self.draft['pagePlan'])
+
+    def test_compact_author_projection_is_source_bound_and_omits_full_policy_and_review_urls(self):
+        complete = self.freeze()
+        compact = freeze_author_dispatch_contract(complete)
+        prompt = render_author_dispatch_contract(compact)
+        self.assertTrue(prompt.startswith(AUTHOR_PROMPT_START))
+        self.assertTrue(prompt.endswith(AUTHOR_PROMPT_END))
+        self.assertEqual(json.loads(prompt[len(AUTHOR_PROMPT_START):-len(AUTHOR_PROMPT_END)]), compact)
+        contract = validate_author_dispatch_contract(compact, scene_contract=complete)
+        self.assertEqual(contract['sourceSceneContractSha256'], complete['sha256'])
+        self.assertEqual(contract['pagePlan'], self.draft['pagePlan'])
+        self.assertEqual(contract['lockedAssessments'], self.draft['lockedAssessments'])
+        self.assertEqual(contract['officialResourceSummary']['sha256'],
+                         digest(self.draft['scopeReview']['officialResourceReview']))
+        self.assertNotIn('officialResourceReview', contract['courseScope'])
+        self.assertNotIn('policy', contract['policyRef'])
+        self.assertNotIn('sourceUrl', prompt)
+        self.assertLess(len(prompt), len(render_scene_contract(complete)))
+
+        changed = deepcopy(compact)
+        changed['contract']['pagePlan'][0]['title'] = 'tampered'
+        changed['sha256'] = digest(changed['contract'])
+        with self.assertRaisesRegex(ValueError, 'complete frozen source'):
+            validate_author_dispatch_contract(changed, scene_contract=complete)
 
     def test_missing_or_reordered_pages_and_quiz_coverage_are_rejected(self):
         cases = []

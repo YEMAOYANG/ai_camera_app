@@ -438,11 +438,13 @@ class CourseStorageRepository:
             return {'storageId': storage_id, 'scopeKey': scope_key, 'activated': len(pending),
                     'preserved': len(scope['bindings']) - len(pending)}
 
-    def activate_heads_if_unchanged(self, scope_key, storage_id, expected_heads):
-        """Activate a complete verified scope only if every planned head is unchanged.
+    def activate_heads_if_unchanged(self, scope_key, storage_id, expected_heads, *, source_paths=None):
+        """Activate verified bindings only if every planned head is unchanged.
 
         None requires a still-missing head. An existing head must match both its
         content SHA and owning scope. No upsert can replace a concurrent insert.
+        By default all scope bindings are required; an explicit nonempty unique
+        source_paths subset restricts both validation and mutation to those paths.
         """
         scope_key, storage_id = _sha(scope_key), _sha(storage_id)
         if not isinstance(expected_heads, dict) or not expected_heads:
@@ -455,12 +457,23 @@ class CourseStorageRepository:
                     _fail("course_storage_head_selection_invalid")
                 head = {"sha256": _sha(head["sha256"]), "scopeKey": _sha(head["scopeKey"])}
             expected[path] = head
+        selected = None
+        if source_paths is not None:
+            if not isinstance(source_paths, (list, tuple)) or not source_paths:
+                _fail("course_storage_head_selection_invalid")
+            selected = [normalize_source_path(path) for path in source_paths]
+            if len(set(selected)) != len(selected) or set(selected) != set(expected):
+                _fail("course_storage_head_selection_invalid")
         with self.database.transaction() as conn:
             scope = self._decoded_scope(conn.execute("SELECT * FROM course_storage_scopes WHERE storage_id=? AND scope_key=? FOR UPDATE",
                                                     (storage_id, scope_key)).fetchone())
             if scope is None:
                 _fail("course_storage_scope_not_found")
             bindings = sorted(scope["bindings"], key=lambda e: e["sourcePath"])
+            if selected is not None:
+                if not set(selected) <= {e["sourcePath"] for e in bindings}:
+                    _fail("course_storage_head_not_bound")
+                bindings = [entry for entry in bindings if entry["sourcePath"] in set(selected)]
             if len(bindings) != len(expected) or {e["sourcePath"] for e in bindings} != set(expected):
                 _fail("course_storage_head_not_bound")
             accepted = []

@@ -165,6 +165,7 @@ class LearningBudgetService:
         from integrations.openmaic_formal_media import (
             policy_from_target, compatible_preparation_target,
             REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+            QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
         )
         try:
             policy = policy_from_target(target)
@@ -187,7 +188,8 @@ class LearningBudgetService:
             # target, not a superseded curriculum. Only the exact registered v2
             # policy with otherwise unchanged authority and owner may coexist.
             required_3d_opt_in = (
-                policy == REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY
+                policy in (REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+                           QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)
                 and compatible_preparation_target(target, current_target)
                 and owner["library_target_fingerprint"] == fingerprint
                 and owner["grade_code"] == item["grade_code"]

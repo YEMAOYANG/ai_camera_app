@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
+import ipaddress
+import secrets
 from pathlib import Path
 
 from core.database import Database
@@ -12,6 +16,11 @@ from schemas.profile import pending_join_payload
 from services.sms_provider import SmsProvider, UnavailableSmsProvider
 
 
+SMS_PURPOSE_LOGIN = "login"
+SMS_PURPOSE_PHONE_CHANGE = "phone_change"
+SMS_PURPOSES = {SMS_PURPOSE_LOGIN, SMS_PURPOSE_PHONE_CHANGE}
+
+
 class AuthService:
     def __init__(
         self,
@@ -21,41 +30,82 @@ class AuthService:
         refresh_token_seconds: int = 60 * 60 * 24 * 30,
         sms_code_ttl_seconds: int = 300,
         sms_resend_cooldown_seconds: int = 60,
+        sms_hourly_send_limit: int = 300,
+        sms_source_window_seconds: int = 600,
+        sms_source_send_limit: int = 10,
         sms_max_attempts: int = 5,
+        sms_code_pepper: str = "mira-sms-code-development-only-pepper",
         sms_provider: SmsProvider | None = None,
     ):
         self.access_token_seconds = access_token_seconds
         self.refresh_token_seconds = refresh_token_seconds
         self.sms_code_ttl_seconds = sms_code_ttl_seconds
         self.sms_resend_cooldown_seconds = sms_resend_cooldown_seconds
+        self.sms_hourly_send_limit = sms_hourly_send_limit
+        self.sms_source_window_seconds = sms_source_window_seconds
+        self.sms_source_send_limit = sms_source_send_limit
         self.sms_max_attempts = sms_max_attempts
+        self.sms_code_pepper = sms_code_pepper
         self.sms_provider = sms_provider or UnavailableSmsProvider()
         self.repository = AuthRepository(Database(database_url))
 
-    def request_sms_code(self, phone: str) -> dict:
+    def request_sms_code(
+        self,
+        phone: str,
+        *,
+        purpose: str = SMS_PURPOSE_LOGIN,
+        source_ip: str | None = None,
+    ) -> dict:
         normalized = normalize_phone(phone)
+        if purpose not in SMS_PURPOSES:
+            raise ValueError(f"Unsupported SMS verification purpose: {purpose}")
         now = now_ms()
-        with self.repository.transaction() as conn:
-            existing = self.repository.find_sms_code(conn, normalized)
-            if (
-                existing
-                and existing["last_sent_at"] + self.sms_resend_cooldown_seconds * 1000 > now
-            ):
-                raise AuthError("sms_resend_too_soon", "验证码发送太频繁，请稍后再试", 429)
-
-        delivery = self.sms_provider.issue_verification_code(normalized)
+        code = f"{secrets.randbelow(1_000_000):06d}"
         expires_at = now + self.sms_code_ttl_seconds * 1000
         with self.repository.transaction() as conn:
-            self.repository.upsert_sms_code(
+            within_budget = self.repository.reserve_sms_send_budget(
+                conn,
+                now=now,
+                scope_key="global",
+                window_seconds=60 * 60,
+                max_sends=self.sms_hourly_send_limit,
+            )
+            if not within_budget:
+                raise AuthError(
+                    "sms_send_budget_exceeded",
+                    "短信服务繁忙，请稍后再试",
+                    429,
+                )
+            within_source_limit = self.repository.reserve_sms_send_budget(
+                conn,
+                now=now,
+                scope_key=self.sms_source_scope_key(source_ip),
+                window_seconds=self.sms_source_window_seconds,
+                max_sends=self.sms_source_send_limit,
+            )
+            if not within_source_limit:
+                raise AuthError(
+                    "sms_source_rate_limited",
+                    "验证码发送过于频繁，请稍后再试",
+                    429,
+                )
+            reserved = self.repository.reserve_sms_code(
                 conn,
                 phone=normalized,
-                code_hash=hash_value(delivery.code),
+                purpose=purpose,
+                code_hash=self.sms_code_digest(normalized, purpose, code),
                 expires_at=expires_at,
                 created_at=now,
+                resend_cooldown_seconds=self.sms_resend_cooldown_seconds,
             )
+            if not reserved:
+                raise AuthError("sms_resend_too_soon", "验证码发送太频繁，请稍后再试", 429)
+
+        delivery = self.sms_provider.send_verification_code(normalized, code)
         return {
             "phone": normalized,
             "expiresAt": expires_at,
+            "retryAfterSeconds": self.sms_resend_cooldown_seconds,
             "debugCode": delivery.debug_code,
             "provider": delivery.provider,
             "templateId": delivery.template_id,
@@ -70,18 +120,69 @@ class AuthService:
 
         now = now_ms()
         with self.repository.transaction() as conn:
-            sms = self.repository.find_sms_code(conn, normalized, for_update=True)
+            sms = self.repository.find_sms_code(
+                conn,
+                normalized,
+                purpose=SMS_PURPOSE_LOGIN,
+                for_update=True,
+            )
             if not sms or sms["expires_at"] < now:
                 raise AuthError("invalid_code", "验证码不正确，请重新输入")
             if sms["attempt_count"] >= self.sms_max_attempts:
                 raise AuthError("sms_attempts_exceeded", "验证码错误次数过多，请重新获取验证码", 429)
-            if sms["code_hash"] != hash_value(code):
-                self.repository.increment_sms_attempts(conn, normalized)
+            if not self.sms_code_matches(
+                sms["code_hash"],
+                normalized,
+                SMS_PURPOSE_LOGIN,
+                code,
+            ):
+                self.repository.increment_sms_attempts(
+                    conn,
+                    normalized,
+                    purpose=SMS_PURPOSE_LOGIN,
+                )
             else:
                 return self._login_verified_sms(conn, normalized, now, client_device)
         # A rejected attempt is durable even though the request returns an error.
         # Raising inside the transaction would roll the counter back to zero.
         raise AuthError("invalid_code", "验证码不正确，请重新输入")
+
+    def sms_code_digest(self, phone: str, purpose: str, code: str) -> str:
+        message = f"{purpose}:{phone}:{code}".encode("utf-8")
+        return hmac.new(
+            self.sms_code_pepper.encode("utf-8"),
+            message,
+            hashlib.sha256,
+        ).hexdigest()
+
+    def sms_source_scope_key(self, source_ip: str | None) -> str:
+        try:
+            address = ipaddress.ip_address(str(source_ip or "").strip())
+            source = (
+                f"{ipaddress.ip_network(f'{address}/64', strict=False).network_address}/64"
+                if address.version == 6
+                else str(address)
+            )
+        except ValueError:
+            source = "unknown"
+        digest = hmac.new(
+            self.sms_code_pepper.encode("utf-8"),
+            f"sms-source:{source}".encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
+        return f"source:{digest}"
+
+    def sms_code_matches(
+        self,
+        stored_digest: str,
+        phone: str,
+        purpose: str,
+        code: str,
+    ) -> bool:
+        return hmac.compare_digest(
+            str(stored_digest or ""),
+            self.sms_code_digest(phone, purpose, code),
+        )
 
     def _login_verified_sms(self, conn, normalized: str, now: int, client_device: dict | None) -> dict:
         user = self.repository.find_user_by_phone(conn, normalized)
@@ -90,7 +191,11 @@ class AuthService:
         elif user.get("account_status") != "active":
             raise AuthError("account_inactive", "账号已提交注销申请，无法继续登录", 403)
 
-        self.repository.delete_sms_code(conn, normalized)
+        self.repository.delete_sms_code(
+            conn,
+            normalized,
+            purpose=SMS_PURPOSE_LOGIN,
+        )
         session = self._new_session(now)
         device = self._client_device(client_device)
         self.repository.revoke_matching_device_sessions(

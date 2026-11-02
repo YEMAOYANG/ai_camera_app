@@ -6,6 +6,7 @@ from unittest.mock import patch
 from integrations.openmaic_formal_media import (
     MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
     REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+    QWEN3_PLAYFUL_PROFESSIONAL_POLICY, QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
     compatible_preparation_target, professional_policy, policy_from_target,
 )
 from integrations.openmaic_formal_playful import validate_playful_classroom
@@ -16,19 +17,19 @@ from services.learning_curriculum_preparation_contract import (
 
 class PlayfulCourseContractTest(unittest.TestCase):
     def test_required_3d_is_runtime_opt_in_with_a_distinct_frozen_target(self):
-        with patch.dict(os.environ, {"MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "", "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
             original = build_preparation_target("primary_6")
-        with patch.dict(os.environ, {"MIRA_FORMAL_PLAYFUL_REQUIRE_3D": "1"}):
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "", "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": "1"}):
             selected = build_preparation_target("primary_6")
-        with patch.dict(os.environ, {"MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "", "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
             self.assertEqual(build_preparation_target("primary_6"), original)
-        self.assertEqual(policy_from_target(original), PLAYFUL_PROFESSIONAL_POLICY)
-        self.assertEqual(policy_from_target(selected), REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)
+        self.assertEqual(policy_from_target(original), QWEN3_PLAYFUL_PROFESSIONAL_POLICY)
+        self.assertEqual(policy_from_target(selected), QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)
         self.assertNotEqual(preparation_target_fingerprint(original), preparation_target_fingerprint(selected))
         self.assertTrue(compatible_preparation_target(original, selected))
         self.assertTrue(compatible_preparation_target(selected, original))
         without_policy = deepcopy(selected)
-        without_policy["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(PLAYFUL_PROFESSIONAL_POLICY)
+        without_policy["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(QWEN3_PLAYFUL_PROFESSIONAL_POLICY)
         self.assertEqual(without_policy, original)
 
     def test_required_3d_needs_a_separate_interactive_3d_page_and_game(self):
@@ -55,12 +56,13 @@ class PlayfulCourseContractTest(unittest.TestCase):
                     professional_policy(policy)
 
     def test_new_target_is_distinct_and_old_published_target_remains_compatible(self):
-        current = build_preparation_target("primary_6")
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "", "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
+            current = build_preparation_target("primary_6")
         old = deepcopy(current)
         old["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(MULTISTATE_PROFESSIONAL_POLICY)
-        self.assertEqual(policy_from_target(current), PLAYFUL_PROFESSIONAL_POLICY)
+        self.assertEqual(policy_from_target(current), QWEN3_PLAYFUL_PROFESSIONAL_POLICY)
         self.assertNotEqual(preparation_target_fingerprint(old), preparation_target_fingerprint(current))
-        self.assertTrue(compatible_preparation_target(old, current))
+        self.assertFalse(compatible_preparation_target(old, current))
         old["formalRuntimePolicy"]["professionalCreationPolicy"]["webSearch"]["enabled"] = False
         self.assertFalse(compatible_preparation_target(old, current))
 

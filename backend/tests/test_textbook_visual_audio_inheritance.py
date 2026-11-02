@@ -273,7 +273,7 @@ class VisualPinyinInheritanceTests(unittest.TestCase):
         audit = json.loads((f.root / 'target-audit/audit.json').read_text())
         self.assertFalse(audit['passed'])
         target = service.get(prepared['previewKey'])
-        publisher = TextbookPublicationService(service)
+        publisher = TextbookPublicationService(service, cover_guard=lambda *_a, **_k: None)
         review = {**f.review, 'sourceSha256': target['classroom_sha256'], 'reviewedAt': now_ms() - 1}
         released = publisher.prepare(key=target['preview_key'], edition=target['edition_id'], revision=target['revision_id'],
             node=target['node_id'], teaching_revision='2', review=review, audio_audit=audit, classroom_directory=f.root)

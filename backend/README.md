@@ -43,6 +43,121 @@ attempt is possible. A successful redispatch performs the ten audited Qwen TTS
 calls while keeping LLM, web, image, video, and ASR calls at zero. The flag
 remains `0` by default.
 
+### Homework provider probes
+
+`scripts/verify_tal_homework.py` tests TAL independently of the homework worker
+and database. It defaults to a dry run; `--execute` submits exactly once for a
+new private output directory. A timeout or provider error retains the raw SSE
+receipt and blocks reuse of that directory. HTTP 200 with `execute_result=1001`
+is an image retrieval failure, not a completed grading result. Supply credentials
+through `TAL_ACCESS_KEY_ID` / `TAL_ACCESS_KEY_SECRET` in the operator process, or
+`--credentials-file` pointing to an absolute mode-600 JSON file containing
+`access_key_id` and `access_key_secret`. Keep credentials out of client code,
+source control, command arguments and public image URLs.
+
+For a controlled image retrieval test, run this foreground tool from `backend/`:
+
+```sh
+.venv/bin/python scripts/serve_homework_probe_images.py \
+  --image /absolute/path/to/deidentified-page1.jpg \
+  --image /absolute/path/to/deidentified-page2.jpg \
+  --output-dir /absolute/path/to/new-private-run/bridge \
+  --ttl-seconds 1800
+```
+
+The probe binds only to `127.0.0.1` and freezes one or two JPEGs in memory.
+Inputs must be at most 3,000,000 bytes, have a longest side of 2048 pixels or
+less, and contain no EXIF, XMP, comments or other private JPEG metadata. The
+operator must separately verify that identifying worksheet content is redacted.
+Only exact `GET` / `HEAD /homework-probe/<random-token>/<index>.jpg` paths return
+an image. Other paths and methods are rejected; the server stops automatically
+after at most 1800 seconds or on Ctrl+C.
+
+The mode-600 `state.json` contains the loopback address, bearer paths, input
+SHA-256 hashes and expiry. Keep it private. `access.jsonl` records image index,
+method, status and elapsed time without client IPs or bearer paths. The tool
+does not create a public endpoint; external testing needs an authorized HTTPS
+forwarder or deployment for this dedicated port. End that forwarding session
+when the test ends. These probes leave the production provider and student
+learning evidence unchanged.
+
+Run their isolated tests without connecting to the application database:
+
+```sh
+.venv/bin/python -m unittest tests.test_tal_homework_smoke tests.test_homework_image_probe -v
+```
+
+### Reviewed weekend practice packs
+
+Weekend reviews keep the existing `tasks`, frozen review runs and answer/report
+records. New runs target about 1800 seconds using real question estimates;
+insufficient reviewed material produces a duration/content gap, not cloned
+questions or invented ability scores. Existing runs retain their saved policy.
+
+`scripts/prepare_learning_review_pack.py` is an offline authoring boundary.
+Student reads never call its provider. It uses the existing `APP_AI_*`
+configuration, freezes the model, prompt and lesson identity, and permits one
+generation plus one answer-blind verification call per request. A saved intent
+without a result fences the request across restarts; changing the request ID is
+not permission to retry an ambiguous paid call.
+
+```sh
+# The identity JSON must contain the actual published courseId, courseVersion,
+# contentKey, releaseSha256 and title. The media JSON is a reviewed descriptor
+# list: id/path/sha256/mimeType/meaning, with real image bytes.
+.venv/bin/python scripts/prepare_learning_review_pack.py prepare-from-record \
+  --record <lesson/sources/post-class-practice-source.json> \
+  --identity <published-identity.json> --media <reviewed-images.json> \
+  --reviewer <actual-reader> --request-id <unique-frozen-request> --question-count 5
+.venv/bin/python scripts/prepare_learning_review_pack.py generate \
+  --request-id <same-request> --execute
+.venv/bin/python scripts/prepare_learning_review_pack.py narrate \
+  --request-id <same-request> --execute
+.venv/bin/python scripts/prepare_learning_review_pack.py approve \
+  --request-id <same-request> --media <job/audio-media.json> --review <review.json>
+.venv/bin/python scripts/prepare_learning_review_pack.py archive \
+  --pack-sha256 <approved-pack-sha256> --execute
+```
+
+Files live in `output/learning-review-content/jobs/<request>/` and
+`packs/<packSha256>/`. `prepare-from-record` accepts the self-owned
+`mira.textbook.post-class-practice.v1` review record and retains
+`sourceKind=reviewed-official-assignment-record, originalFileDownloaded=false`.
+Its SHA identifies those actual record bytes; it is not an invented SHA for an
+official PDF that was never downloaded. `prepare --source <manifest>` also
+accepts a complete `mira.learning.review-source.v1` manifest with exact binding,
+officialExercise provenance, objective/knowledge IDs, originalScope and media.
+For character/pinyin picture tasks, reviewed objective `targetTexts` and a
+separate question `targetText` are required; neutral instructions are recorded
+without reading the tested target first.
+
+Narration uses the existing configured OpenMAIC Qwen endpoint and the frozen
+subject teacher, with a separate immutable plan capped at 128 clips/30000
+characters. Chinese Latin/pinyin is rejected before dispatch through plain
+TTS; supply independently verified lesson-specific teacher recordings instead.
+Imported audio descriptors require exact text, Qwen/voice/profile identity,
+fallbackUsed=false and a hash-bound providerReceiptPath/providerReceiptSha256;
+the receipt binds textSha256 and WAV sha256. Every prompt, hint and explanation
+needs a real matching recording. `review.json` binds `draftSha256`, explicit
+reviewKind (`ai`, `maintainer` or `user`), reviewer/reviewedAt/basis, and sourceScopeConfirmed,
+originalExpressionConfirmed, imagesConfirmed, teacherAudioConfirmed,
+independentAnswersConfirmed and approvedForStudent. Structural checks and AI
+verification do not replace actual image/audio review. AI review is allowed;
+it must retain `humanListeningVerified=false` and cannot label ASR as human listening.
+
+The standalone `python -m workers.learning_review_content_worker --execute
+--once --limit 5` processes only already prepared requests. Without `--execute`,
+generation, narration, archive and worker commands are dry runs. Approval is
+separate from production. Approved and verified-archived packs enter the ordinary workbench-course
+review pool only for a child's exact completed lesson or matching real
+classroom answer evidence; an opened lesson alone never admits its goals.
+Shared immutable sources/questions/media and production receipts use the
+existing MinIO conditional upload, full readback and course storage registry.
+The verified upload receipt also lives in the immutable registry scope metadata,
+so eviction of its local copy does not block reading a remotely archived pack.
+Family assignments, answers and reports stay in the existing authenticated DB.
+Archive completion does not assert live student acceptance or deploy a frontend.
+
 Install and run:
 
 ```sh
@@ -184,11 +299,25 @@ courseware phase contract and internal token; OpenMAIC owns the Kimi credential,
 makes the courseware call once, and deterministically compiles the final
 classroom without a second model generation.
 
-Auth uses an `SmsProvider` abstraction. `DevelopmentSmsProvider` is allowed only
-in development/test with `APP_ENABLE_DEV_ADAPTERS=1`; it generates a random
-6-digit code and returns it in the API response for local development. Production
-must configure a real SMS provider; otherwise SMS login returns a clear
-provider-not-configured error.
+Auth uses an `SmsProvider` abstraction. The auth service generates and stores the
+6-digit code; `DevelopmentSmsProvider` is allowed only in development/test with
+`APP_ENABLE_DEV_ADAPTERS=1` and returns that code in the API response for local
+development. Production uses the Tencent Cloud SMS adapter and never returns the
+code to the client.
+Set `APP_SMS_PROVIDER=tencent` together with a dedicated CAM credential,
+`APP_SMS_TENCENT_SDK_APP_ID`, approved `APP_SMS_TENCENT_SIGN_NAME`, numeric
+`APP_SMS_TEMPLATE_ID`, and `APP_SMS_TENCENT_REGION`. The approved template must
+accept `[code, validity_minutes]` in that order. Keep
+`APP_SMS_TENCENT_SECRET_ID` / `APP_SMS_TENCENT_SECRET_KEY` only in the private
+runtime environment; do not reuse the homework-grading credential. Also set a
+unique `APP_SMS_CODE_PEPPER` (at least 32 random characters) and an intentional
+`APP_SMS_HOURLY_SEND_LIMIT`; the former protects stored six-digit codes with
+HMAC and the latter bounds paid submissions across rotating phone numbers.
+`APP_SMS_SOURCE_WINDOW_SECONDS` / `APP_SMS_SOURCE_SEND_LIMIT` additionally
+limit each HMAC-pseudonymized source IP. When a trusted reverse proxy fronts the
+API, set `APP_TRUST_PROXY_HOPS` to its exact hop count; leave it at `0` for a
+direct listener. Startup fails before serving traffic when a Tencent setting is
+missing or malformed.
 
 Setup V1 is available after login:
 
@@ -521,6 +650,65 @@ APP_AI_VISION_MAX_CALLS_PER_HOUR=20
 
 The runtime adapter only fetches JPEG snapshots from `ai_camera_test`; analysis
 no longer calls `/api/analyze_frame` on the legacy runtime.
+
+### Reviewed textbook workbench waves
+
+Use `scripts/run_textbook_workbench_batch.py` for reviewed v4 textbook drafts.
+Put 4–8 already reviewed and frozen lessons in one batch, prepare the whole wave
+without Provider calls, then keep at most two author sessions running. A new
+prompt/policy or lesson family should start with a two-lesson canary before a
+larger wave.
+
+```bash
+.venv/bin/python scripts/run_textbook_workbench_batch.py init \
+  --queue-directory ../output/textbook-operator-batches/<wave> \
+  --manifest ../output/textbook-operator-batch-requests/<wave>.json
+.venv/bin/python scripts/run_textbook_workbench_batch.py prepare \
+  --queue-directory ../output/textbook-operator-batches/<wave> \
+  --limit 8
+.venv/bin/python scripts/run_textbook_workbench_batch.py watch-bounded \
+  --queue-directory ../output/textbook-operator-batches/<wave> \
+  --max-starts 2 \
+  --max-total-starts 8 \
+  --poll-seconds 15 \
+  --confirm-batch-sha256 <exact-sha-from-init-or-status>
+```
+
+`watch-bounded` starts one session at a time and checks its durable state before
+filling the next slot. The exact batch SHA and finite total-start budget are
+mandatory. HTTP 402, unknown dispatch, failed/cancelled generation, missing
+saved stages, authoring review holds, existing artifacts, preparation errors, or unsafe
+external authoring state stop the wave without another POST. A successful saved
+stage only completes the author-generation phase: review, audio, browser play,
+publication and student delivery remain separate per-course gates. Audio stays
+on its independent single-task queue so it cannot delay author-slot refill.
+Explicit batch-held entries are skipped and reported as `completed_with_holds`;
+they are never counted as reviewed lessons.
+
+Batch dispatchers share an output-root admission lock, so simultaneous batches
+cannot both reserve the same free slots. Occupancy includes registered MinIO
+originals whose local JSON files have been archived; unreadable state or an
+unavailable registry blocks new starts. Keep paid authoring on this batch entry
+point while a wave runs: the legacy single-course `start` has its own node lock
+and does not participate in batch admission.
+
+Before publishing a new lesson or textbook activity, prepare its release and
+register a distinct cover from an image referenced by that exact release:
+
+```bash
+.venv/bin/python scripts/textbook_lesson_cover.py <content-key> <prepared-release.json> \
+  --store ../openmaic-runtime/.runtime/OpenMAIC/data/classrooms --alt '<picture description>'
+MIRA_LOCAL_TEST_REPAIR_MODE=1 bash -c 'source ../openmaic-runtime/scripts/local-test-stack.sh; start_student_web'
+```
+
+For an interactive page without a slide image, supply `--image` with its own
+released image. Registration records the source and release hashes, preserves
+old cover files, and serializes parallel registrations. Both textbook publish
+services reject a new release if its bound picture is missing, changed, too
+similar to an existing cover, or absent from the running student catalog's
+compiled bundle. Existing published releases can still be retried unchanged.
+The operator must still visually review whether the picture conveys this
+lesson; the automated gate cannot decide that.
 
 ## V1 Structure
 

@@ -104,6 +104,64 @@ class VisualRevisionTests(unittest.TestCase):
     def archive(self):
         return self.folder / 'visual-revisions' / digest({'previewKey': self.key, 'patch': self.patch})
 
+    def native_visual_check(self):
+        from content.textbook_native_revision_adoption import verify_native_visual_amendments
+        return verify_native_visual_amendments(self.service.get(self.key),
+            {'previewSourceSha256': self.plan['classroomSha256']}, self.root)
+
+    def test_native_visual_chain_rebuilds_multiple_changes_without_altering_audio(self):
+        original = deepcopy(self.classroom)
+        plan_bytes = (self.folder / 'plan.json').read_bytes()
+        receipt_bytes = (self.folder / 'receipts.json').read_bytes()
+        self.apply()
+        self.apply(self.canvas_patch())
+        before, chain = self.native_visual_check()
+        self.assertEqual(before, original)
+        self.assertEqual(chain['originalSourceSha256'], digest(original))
+        self.assertEqual(chain['targetSourceSha256'], digest(self.classroom))
+        self.assertEqual(len(chain['amendments']), 2)
+        self.assertEqual((self.folder / 'plan.json').read_bytes(), plan_bytes)
+        self.assertEqual((self.folder / 'receipts.json').read_bytes(), receipt_bytes)
+
+    def test_native_visual_chain_rejects_modified_archive_and_changed_final_source(self):
+        self.apply()
+        path = self.archive() / 'target.json'
+        raw = path.read_bytes()
+        path.write_bytes(raw + b' ')
+        with self.assertRaises(ApiError):
+            self.native_visual_check()
+        path.write_bytes(raw)
+        self.classroom['scenes'][0]['title'] = 'unrecorded change'
+        self.persist_source()
+        with self.assertRaises(ApiError):
+            self.native_visual_check()
+
+    def test_native_visual_chain_rejects_audio_changes_and_missing_amendment(self):
+        self.apply()
+        path = self.folder / 'receipts.json'
+        raw = path.read_bytes()
+        path.write_bytes(raw + b' ')
+        with self.assertRaises(ApiError):
+            self.native_visual_check()
+        path.write_bytes(raw)
+        (self.archive() / 'amendment.json').unlink()
+        with self.assertRaises(ApiError):
+            self.native_visual_check()
+
+    def test_native_visual_release_chain_rejects_resealed_wrong_audio_or_discontinuity(self):
+        from content.textbook_native_revision_adoption import validate_visual_chain
+        self.apply()
+        _, chain = self.native_visual_check()
+        proof = {'previewSourceSha256': self.plan['classroomSha256']}
+        for field in ('audioIdentityClassroomSha256', 'sourceSha256'):
+            changed = deepcopy(chain)
+            item = changed['amendments'][0]
+            item[field] = 'f' * 64
+            item['sha256'] = digest({k: v for k, v in item.items() if k != 'sha256'})
+            changed['sha256'] = digest({k: v for k, v in changed.items() if k != 'sha256'})
+            with self.assertRaises(ValueError):
+                validate_visual_chain(changed, proof, digest(self.classroom))
+
     def canvas_patch(self):
         old = self.classroom['scenes'][0]['content']['canvas']
         canvas = deepcopy(old)

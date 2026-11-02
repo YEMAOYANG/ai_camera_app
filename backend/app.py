@@ -4,6 +4,7 @@ import os
 
 from flask import Flask, jsonify
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from core.config import AppConfig, apply_test_defaults, validate_flask_config
 from routes.api.v1.ai import ai_bp
@@ -77,6 +78,12 @@ def create_app(test_config: dict | None = None) -> Flask:
         app.config.update(apply_test_defaults(test_config))
 
     validate_flask_config(app.config)
+    trusted_proxy_hops = int(app.config.get("TRUST_PROXY_HOPS", 0))
+    if trusted_proxy_hops:
+        # Production exposes the API through the configured Caddy hop. Trust
+        # only that exact number of X-Forwarded-For entries; direct/local
+        # deployments leave this at zero and use REMOTE_ADDR unchanged.
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=trusted_proxy_hops)
     CORS(app, origins=app.config["CORS_ORIGINS"])
 
     @app.before_request

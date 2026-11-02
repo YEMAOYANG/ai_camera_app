@@ -1,0 +1,279 @@
+{
+  "schemaVersion": "mira.learning.unit-blueprints.v1",
+  "editionId": "pep-math-g1-upper-2022-standard",
+  "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+  "unitId": "11265c70-adb5-4273-b3ea-11f2ba358205",
+  "source": {
+    "id": "official-textbook",
+    "title": "人教版一年级数学上册（2022课标）分与合、加法第一课时",
+    "url": "https://basic.smartedu.cn/tchMaterial/detail?contentType=assets_document&contentId=c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc&catalogType=tchMaterial&subCatalog=tchMaterial",
+    "accessedAt": "2026-10-28",
+    "verification": "教学范围分别为印刷20至21页、24至25页；逐页材料结论与原始字节SHA保存在各课 frozen scopeReview 和 official-source-manifest。仅供目标与范围核对，不能复制官方内容。"
+  },
+  "lessons": [
+    {
+      "nodeId": "2a0eae67-3639-46ec-abde-d3f879f88245",
+      "title": "分与合",
+      "status": "scope_verified_preview_only",
+      "targets": [
+        "在2至5范围把整体分成两个非空部分，并把两部分合回整体。",
+        "用实物、图形和分合式联系表示，理解总量不变与两部分一增一减。",
+        "有序找全分法，交换两部分发现对应分法，避免重复和遗漏。",
+        "根据总数和已知部分推知另一部分，检验两部分能否同样多。",
+        "迁移到生活隐藏部分猜测并解释理由；口头理由需真实观察。"
+      ],
+      "scopePages": [
+        20,
+        21
+      ],
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "在2至5范围把整体分成两个非空部分，并把两部分合回整体。",
+          "用实物、图形和分合式联系表示，理解总量不变与两部分一增一减。",
+          "有序找全分法，交换两部分发现对应分法，避免重复和遗漏。",
+          "根据总数和已知部分推知另一部分，检验两部分能否同样多。",
+          "迁移到生活隐藏部分猜测并解释理由；口头理由需真实观察。"
+        ],
+        "knowledgePoints": [
+          "在2至5范围把整体分成两个非空部分，并把两部分合回整体。",
+          "用实物、图形和分合式联系表示，理解总量不变与两部分一增一减。",
+          "有序找全分法，交换两部分发现对应分法，避免重复和遗漏。",
+          "根据总数和已知部分推知另一部分，检验两部分能否同样多。",
+          "迁移到生活隐藏部分猜测并解释理由；口头理由需真实观察。"
+        ],
+        "priorKnowledge": [
+          "能在图片和教师短句支持下点数、摆放1至5个对象；不预设独立读指令。"
+        ],
+        "excludedTopics": [
+          "0的系统教学、超过5的数量运算、减法算式和计时竞争。",
+          "复制官方视频、图片、原题或版式。",
+          "由点选、轨迹或保存作品推断实际口述、纸笔书写或稳定掌握。"
+        ],
+        "assessmentMode": "observed",
+        "reviewNote": "官方教学范围来自本课已逐页审阅的图文材料；视频例外与逐页结论仅见本课冻结 scopeReview。此登记用于接收既有候选，不授权重新派发，不代表配音、整课质量、发布或学生验收通过。冻结 lockedAssessments=[]，课堂记录基于实际操作。"
+      },
+      "game": [
+        {
+          "family": "routing-with-conserved-objects",
+          "childDecision": "决定每枚灯球的去向，检查两舱是否都有灯。",
+          "domainState": "稳定灯球ID、未发送集合、左舱与右舱集合、当前岔口。",
+          "stateTransition": "改岔口不增减灯球；每次发送仅移动一个现有ID，收回保留身份。",
+          "observableOutcome": "空舱或遗留灯球仍可见；两部分合起来等于原总数。",
+          "revisionOpportunity": "取回任一灯球、改变岔口、重新发送，局部修改不清空。"
+        },
+        {
+          "family": "construct-and-deduplicate-partitions",
+          "childDecision": "决定下一次如何改变分配，判断是否新分法。",
+          "domainState": "5个稳定ID、当前左右分配、已发现有序数量对和照片、帮助状态。",
+          "stateTransition": "仅按左右数量对去重；移动对象身份不制造新分法，照片对应真实场景。",
+          "observableOutcome": "重复方案回到已有照片；遗漏处不直接显示答案，可返回现场比较。",
+          "revisionOpportunity": "重开任一照片移动灯球，补录新分法，不要求固定路线。"
+        },
+        {
+          "family": "predict-and-test-conservation",
+          "childDecision": "预测哪部分增减，以及总数是否改变。",
+          "domainState": "移动前集合、预测、唯一移动ID、移动后集合、总量轨迹。",
+          "stateTransition": "一次移动严格从一舱转到另一舱；总量由集合并集计算。",
+          "observableOutcome": "两个部分一增一减，总量轨迹保持，错误预测与真实变化并列。",
+          "revisionOpportunity": "回放前后、撤回移动、修正预测；帮助与首答分记。"
+        },
+        {
+          "family": "symmetry-and-fixed-point-discovery",
+          "childDecision": "判断交换两部分是否得到不同数量分法。",
+          "domainState": "左右舱集合、交换前有序数量对、已有分法集合、儿童判断。",
+          "stateTransition": "交换舱整体位置后重新计数；2与2是同一数量对，不因身份改变而新增。",
+          "observableOutcome": "1与3对应3与1；2与2交换后已有照片重合。",
+          "revisionOpportunity": "返回交换前，重新比较或拆分后再试。"
+        },
+        {
+          "family": "part-to-whole-recomposition",
+          "childDecision": "根据两部分判断合起来的整体，选择何时验证。",
+          "domainState": "两个非空集合、预测整体、闸门状态、合流后对象集合。",
+          "stateTransition": "开闸只合并两组稳定ID，任何对象只计一次。",
+          "observableOutcome": "两队变成完整一队，实际总量与预测可对应核对。",
+          "revisionOpportunity": "倒放分回、调整预测、选择新两部分；不引入加号。"
+        },
+        {
+          "family": "concrete-to-part-whole-representation",
+          "childDecision": "识别图中哪一部分、哪个数代表整体，建立三者对应。",
+          "domainState": "选中真实照片、整体/左/右集合、三处数字、表征模式。",
+          "stateTransition": "选择数字不改对象，提交时逐一核算整体与部分基数。",
+          "observableOutcome": "触及任一图支只强调对应实际部分；错项可定位，不替孩子填对。",
+          "revisionOpportunity": "修改任一位置，回看照片，切回对象核对。"
+        },
+        {
+          "family": "hidden-part-inference-and-reveal",
+          "childDecision": "根据整体与可见部分预测隐藏数量，是否请求看一看。",
+          "domainState": "固定总量、可见集合、隐藏集合、预测影子数量、揭示与帮助状态。",
+          "stateTransition": "遮挡不更改集合；提交前不泄露隐藏数量，揭示后保留原预测。",
+          "observableOutcome": "预测与真实隐藏灯球可一一对应，多/少的断点可见。",
+          "revisionOpportunity": "重新合回并分开验证；下一次独立轮换数据与位置。"
+        },
+        {
+          "family": "feasibility-under-equal-part-constraint",
+          "childDecision": "判断指定总数能否满足两部分同样多并用真实方案证明。",
+          "domainState": "当前总量、两舱分配、已试分法集合、可行性判断。",
+          "stateTransition": "有效分法仍是非空二分；是否相等按两集合基数比较。",
+          "observableOutcome": "可行时两舱逐个对应；不可行时已试分法留证，不凭点错宣告不可能。",
+          "revisionOpportunity": "继续试另一分法、回看记录、改选总量后建构。"
+        },
+        {
+          "family": "transfer-across-representations",
+          "childDecision": "在陌生布局中自主判断整体与部分关系。",
+          "domainState": "三项独立关卡、对象集合、首答、重听、提示、修订、关卡进度。",
+          "stateTransition": "每关独立计算结果后推进，不复用上一关答案；首答锁定为历史记录。",
+          "observableOutcome": "对象分开或汇合后即时验证；改正后仍保留首次表现。",
+          "revisionOpportunity": "局部修改、重播、请求演示；援助后的通过单列。"
+        },
+        {
+          "family": "author-and-verify-hidden-part-story",
+          "childDecision": "决定整体、已知部分与藏起部分，验证伙伴的猜测。",
+          "domainState": "儿童作品、真实分配、遮挡侧、伙伴预测、揭示、保存状态。",
+          "stateTransition": "作品须两个非空部分；伙伴答案与实际状态分开保存，不随机改变真值。",
+          "observableOutcome": "保存可回放的谜题和验证过程，孩子自己的图成为解释依据。",
+          "revisionOpportunity": "调整分配再出题、恢复旧作品、修正验证；无需家长确认解锁。"
+        }
+      ],
+      "transfer": "新场景摆放与左右顺序改变，依次完成一次未演示的分配记录、一次合回、一次隐藏部分预测；逐关给简短反馈。",
+      "generationReady": false,
+      "missing": [
+        "正式教师配音和逐段审核",
+        "最终整课实玩与学生入口验收",
+        "原创课后题包及归档核验"
+      ]
+    },
+    {
+      "nodeId": "21fab431-9322-4bb0-aee8-1c4ad644bf55",
+      "title": "1～5的加、减法（加法）",
+      "status": "scope_verified_preview_only",
+      "targets": [
+        "理解把两个部分合起来求总数，用加法表达和不超过5的数量。",
+        "将实物、点图和算式联系，并解释两个加数与结果所指。",
+        "认识加号和等号意义，等号表示两边数量相等；保留加号书写目标。",
+        "允许从1数、接着数或数的组成等合理算法。",
+        "迁移到添补至同样多、交换部分和生活故事。"
+      ],
+      "scopePages": [
+        24,
+        25
+      ],
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "理解把两个部分合起来求总数，用加法表达和不超过5的数量。",
+          "将实物、点图和算式联系，并解释两个加数与结果所指。",
+          "认识加号和等号意义，等号表示两边数量相等；保留加号书写目标。",
+          "允许从1数、接着数或数的组成等合理算法。",
+          "迁移到添补至同样多、交换部分和生活故事。"
+        ],
+        "knowledgePoints": [
+          "理解把两个部分合起来求总数，用加法表达和不超过5的数量。",
+          "将实物、点图和算式联系，并解释两个加数与结果所指。",
+          "认识加号和等号意义，等号表示两边数量相等；保留加号书写目标。",
+          "允许从1数、接着数或数的组成等合理算法。",
+          "迁移到添补至同样多、交换部分和生活故事。"
+        ],
+        "priorKnowledge": [
+          "能在图片和教师短句支持下点数、摆放1至5个对象；不预设独立读指令。"
+        ],
+        "excludedTopics": [
+          "0的系统教学、超过5的数量运算、减法算式和计时竞争。",
+          "复制官方视频、图片、原题或版式。",
+          "由点选、轨迹或保存作品推断实际口述、纸笔书写或稳定掌握。"
+        ],
+        "assessmentMode": "observed",
+        "reviewNote": "官方教学范围来自本课已逐页审阅的图文材料；视频例外与逐页结论仅见本课冻结 scopeReview。此登记用于接收既有候选，不授权重新派发，不代表配音、整课质量、发布或学生验收通过。冻结 lockedAssessments=[]，课堂记录基于实际操作。"
+      },
+      "game": [
+        {
+          "family": "combine-visible-groups",
+          "childDecision": "预测两路会合后总数，决定验证时机。",
+          "domainState": "两个船队ID集合、闸门状态、预测、合流结果。",
+          "stateTransition": "开闸合并两个集合，前后镜头不能重复计同一对象。",
+          "observableOutcome": "原来两队成为一队，每艘去向可追踪。",
+          "revisionOpportunity": "倒放返回、逐船核对、修正预测，不消除首答。"
+        },
+        {
+          "family": "map-scene-to-equation",
+          "childDecision": "选择两部分与总数的对应数字，解释数字所指。",
+          "domainState": "真实两部分集合、算式三个数字位、指向关系、帮助。",
+          "stateTransition": "数字不改变对象；提交检查每个位置与集合基数的对应，允许两加数交换但须映射正确。",
+          "observableOutcome": "错误数字只指向需复查的实际部分，不仅显示红叉。",
+          "revisionOpportunity": "修改一个数字、查看点图再返回原场景。"
+        },
+        {
+          "family": "symbol-trace-and-semantic-binding",
+          "childDecision": "画出加号并把符号用于两部分合并。",
+          "domainState": "真实pointer轨迹、笔画序列、对象两部分、撤销栈。",
+          "stateTransition": "轨迹由输入产生而非自动补完；数学检查依合并关系，书写只保留观察。",
+          "observableOutcome": "符号连接两部分并触发可回放合并，解释其含义。",
+          "revisionOpportunity": "擦掉单笔、重画、回放范形；纸笔书写不由触屏轨迹推断。"
+        },
+        {
+          "family": "temporal-join-story",
+          "childDecision": "区分原有与新增，不把同一对象在前后镜头重复计数。",
+          "domainState": "原有ID、新来ID、时间阶段、两部分标记、结果。",
+          "stateTransition": "进港只把新来集合并入现有集合；回放不生成副本。",
+          "observableOutcome": "两幕之间船ID连续，算式各部分可逐段强调。",
+          "revisionOpportunity": "暂停、回到上一幕、改标记和结果。"
+        },
+        {
+          "family": "compare-valid-counting-strategies",
+          "childDecision": "自主选用从1数、接着数或组成并验证结果。",
+          "domainState": "当前两组对象、实际点数序列、起点、组成图、答案和方法证据。",
+          "stateTransition": "只记录真实操作路径，不能根据点了某个方法名称断言用过该方法。",
+          "observableOutcome": "每个被点对象可见标记，漏数/重复计数有对应位置。",
+          "revisionOpportunity": "擦除点数标记、换方法重试、对照先前路径。"
+        },
+        {
+          "family": "construct-equality-by-addition",
+          "childDecision": "判断应补几盏并检验等号两侧数量是否相等。",
+          "domainState": "现有集合、对照集合、待添加集合、提交结果、对应关系。",
+          "stateTransition": "每次加入真实新ID；等号只在两边基数相等时表达成立，不等同于出现答案。",
+          "observableOutcome": "逐个对应显示余项或缺项，等号连两侧整个数量。",
+          "revisionOpportunity": "取回多放的灯、补不足的灯、重新比较。"
+        },
+        {
+          "family": "commutation-with-persistent-identities",
+          "childDecision": "判断交换两部分的顺序后总数是否改变。",
+          "domainState": "固定A/B集合、顺序、预测、两条表达、回放阶段。",
+          "stateTransition": "仅交换出场顺序及加数位置，不改变对象集合。",
+          "observableOutcome": "两条不同次序路线汇入同一对象总集。",
+          "revisionOpportunity": "回看任一顺序，逐个比对，改预测。"
+        },
+        {
+          "family": "diagnose-and-repair-representation",
+          "childDecision": "判断哪部分与真实场景不符，选择局部修正。",
+          "domainState": "真实对象、伙伴表示、可编辑数字/点图、修订历史。",
+          "stateTransition": "真实场景锁定，儿童只修改表示；评分核对各部分对应。",
+          "observableOutcome": "修正后对象、点图、算式能逐项对应，错误原因具体可见。",
+          "revisionOpportunity": "撤销单步、尝试另一修正、回放实景。"
+        },
+        {
+          "family": "transfer-between-situations",
+          "childDecision": "在未示范场景中决定怎样合并、补足和表示。",
+          "domainState": "独立关卡、实际对象、首答、提示、重播、修订、进度。",
+          "stateTransition": "每关按领域状态计算，不从上一关颜色/位置/答案推断。",
+          "observableOutcome": "合并、对齐与对象强调展示结果，可修订后过关。",
+          "revisionOpportunity": "重播短指令、局部改正或请求演示，帮助后通过分记。"
+        },
+        {
+          "family": "author-playback-and-explain-addition-story",
+          "childDecision": "选择情境、两部分与总数，并校验自己故事的表示。",
+          "domainState": "原创作品、两组稳定对象、时间线、算式、指向映射、保存版本。",
+          "stateTransition": "作品满足非空两部分与和不超过5；回放按儿童保存状态运行。",
+          "observableOutcome": "保存可重播的故事与各数映射，不以自报会了替代作品。",
+          "revisionOpportunity": "编辑任一幕、改单个数字、重新保存；家庭分享可选不锁课。"
+        }
+      ],
+      "transfer": "改用同类货箱与新布局，完成合并列式、添补到相等、解释一个数所指的三关；数量仍不超过5，独立尝试前无答案提示。",
+      "generationReady": false,
+      "missing": [
+        "正式教师配音和逐段审核",
+        "最终整课实玩与学生入口验收",
+        "原创课后题包及归档核验"
+      ]
+    }
+  ]
+}

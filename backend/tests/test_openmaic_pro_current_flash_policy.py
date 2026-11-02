@@ -4,8 +4,9 @@ from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient as Client, OpenMaicFullRuntimeError, _canonical_sha256
-from integrations.openmaic_formal_media import (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY as Creation,
-    PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+from integrations.openmaic_formal_media import (QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY as Creation,
+    QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+    QWEN3_PLAYFUL_PROFESSIONAL_POLICY,
     compatible_preparation_targets, professional_policy, professional_scene_learning_fields)
 from integrations.openmaic_formal_quality import _quality_verifier_model
 from tests.test_formal_provider_readiness_client import _request, _response, _sha
@@ -22,7 +23,7 @@ class ProCurrentFlashPolicyTest(unittest.TestCase):
             self.assertEqual(model['coursewareVerifier']['modelId'],'deepseek-flash')
             self.assertFalse(model['fallbackAllowed'])
             self.assertEqual(Client.selected_professional_creation_policy(),Creation)
-            self.assertEqual({k:v for k,v in Creation.items() if k!='modelPolicyId'},PLAYFUL_PROFESSIONAL_POLICY)
+            self.assertEqual({k:v for k,v in Creation.items() if k!='modelPolicyId'},QWEN3_PLAYFUL_PROFESSIONAL_POLICY)
             self.assertNotIn('sceneLearningPolicy',Creation)
         self.assertEqual(_canonical_sha256(Client.FORMAL_PROFESSIONAL_MODEL_POLICY),registry['legacyModelPolicySha256'])
         self.assertEqual(Client.selected_professional_model_policy('deepseek-v4-pro-flash-v1'),Client.FORMAL_PROFESSIONAL_MODEL_POLICY)
@@ -43,7 +44,7 @@ class ProCurrentFlashPolicyTest(unittest.TestCase):
             'professionalCreationPolicy':Creation,'professionalModelPolicy':Client.selected_professional_model_policy(ID)}}
         targets=compatible_preparation_targets(target)
         self.assertEqual(targets[0],target)
-        self.assertTrue(any(t['formalRuntimePolicy']['professionalCreationPolicy']==PLAYFUL_PROFESSIONAL_POLICY and t['formalRuntimePolicy']['professionalModelPolicy']==Client.FORMAL_PROFESSIONAL_MODEL_POLICY for t in targets))
+        self.assertTrue(any(t['formalRuntimePolicy']['professionalCreationPolicy']==QWEN3_PLAYFUL_PROFESSIONAL_POLICY and t['formalRuntimePolicy']['professionalModelPolicy']==Client.FORMAL_PROFESSIONAL_MODEL_POLICY for t in targets))
         for value in (Client.FORMAL_PROFESSIONAL_MODEL_POLICY,Client.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY):
             changed=deepcopy(target);changed['formalRuntimePolicy']['professionalModelPolicy']=value
             with self.assertRaises(ValueError):compatible_preparation_targets(changed)
@@ -51,7 +52,7 @@ class ProCurrentFlashPolicyTest(unittest.TestCase):
         with self.assertRaises(ValueError):compatible_preparation_targets(changed)
 
     def test_required_3d_selection_is_preserved(self):
-        with patch.dict('os.environ',{'MIRA_FORMAL_MODEL_POLICY':ID,'MIRA_FORMAL_PLAYFUL_REQUIRE_3D':'1'}):self.assertEqual(Client.selected_professional_creation_policy(),PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)
+        with patch.dict('os.environ',{'MIRA_FORMAL_MODEL_POLICY':ID,'MIRA_FORMAL_PLAYFUL_REQUIRE_3D':'1'}):self.assertEqual(Client.selected_professional_creation_policy(),QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)
 
     def test_readiness_keeps_pro_with_new_identity(self):
         request=_request();request['modelPolicyId']=ID

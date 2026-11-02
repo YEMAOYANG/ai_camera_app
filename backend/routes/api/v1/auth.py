@@ -13,11 +13,15 @@ auth_bp = Blueprint("auth", __name__)
 @auth_bp.post("/sms/request")
 def request_sms_code():
     try:
-        result = auth_service().request_sms_code(json_body(request).get("phone", ""))
+        result = auth_service().request_sms_code(
+            json_body(request).get("phone", ""),
+            source_ip=request.remote_addr,
+        )
         payload = {
             "ok": True,
             "codeSent": True,
             "expiresAt": result["expiresAt"],
+            "retryAfterSeconds": result["retryAfterSeconds"],
             "provider": result["provider"],
             "templateId": result["templateId"],
             "deliveryStatus": result["deliveryStatus"],

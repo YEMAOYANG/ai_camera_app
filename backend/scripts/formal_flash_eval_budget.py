@@ -37,6 +37,7 @@ LEDGER_SCHEMA = "mira.eval.formal-flash-isolated-ledger.v1"
 APPROVAL_SCHEMA = "mira.eval.formal-flash-operator-approval.v1"
 PRICE_SCHEMA = "mira.eval.formal-flash-price-evidence.v1"
 PRICE_VERSION = "official-2026-10-08-peak-ceiling.v1"
+QWEN_IMAGE_PRICE_VERSION = "official-2026-10-27-beijing-output.v1"
 # Actual formal callers, not a made-up 16K catalog capacity:
 # agent-runtime/generation-ai-call.ts requests 65_536 for structured scenes;
 # mira-formal-agent-budget.ts requests 16_384 for the driver;
@@ -54,7 +55,7 @@ REQUIRED_QUOTES = {
     "deepseek-flash": ("deepseek", "deepseek", "deepseek-flash"),
     "qwen-tts": ("aliyun", "qwen-tts", "qwen3-tts-flash"),
     "qwen-asr": ("aliyun", "qwen-asr", "qwen3-asr-flash"),
-    "qwen-image": ("aliyun", "qwen-image", "qwen-image-max"),
+    "qwen-image": ("aliyun", "qwen-image", "qwen-image-3.0"),
     "happyhorse-video": ("aliyun", "happyhorse", "happyhorse-1.0-t2v"),
     "baidu-search": ("baidu", "baidu", "baidu-web-search"),
 }
@@ -97,9 +98,11 @@ def _price_profiles(evidence):
         _require(parsed.scheme == "https" and parsed.hostname in OFFICIAL_DOMAINS[vendor]
                  and not parsed.username and not parsed.password,
                  "official quote URL is not authoritative")
+        expected_version = QWEN_IMAGE_PRICE_VERSION if key == "qwen-image" else PRICE_VERSION
+        expected_date = "2026-10-27" if key == "qwen-image" else "2026-10-08"
         _require(quote.get("provider") == provider and quote.get("model") == model
-                 and quote.get("priceVersion") == PRICE_VERSION
-                 and quote.get("verifiedAt", "").startswith("2026-10-08")
+                 and quote.get("priceVersion") == expected_version
+                 and quote.get("verifiedAt", "").startswith(expected_date)
                  and quote.get("operatorVerified") is True
                  and isinstance(quote.get("sourceSnapshotSha256"), str)
                  and re.fullmatch(r"[a-f0-9]{64}", quote["sourceSnapshotSha256"]),
@@ -109,7 +112,7 @@ def _price_profiles(evidence):
         "deepseek-flash": {"currency": "USD", "inputMissPerMillion": "0.30", "outputPerMillion": "1.20"},
         "qwen-tts": {"currency": "CNY", "per10000Characters": "0.8"},
         "qwen-asr": {"currency": "CNY", "perSecond": "0.00022"},
-        "qwen-image": {"currency": "CNY", "perImage": "0.5"},
+        "qwen-image": {"currency": "CNY", "perImage": "0.18"},
         "happyhorse-video": {"currency": "CNY", "perSecond720p": "0.9"},
         "baidu-search": {"currency": "CNY", "perStandardCall": "0.036"},
     }
@@ -117,7 +120,8 @@ def _price_profiles(evidence):
              "official quote differs from frozen 2026-10-08 pricing; review a new version")
     def price(key, maximum, rates):
         _, provider, model = REQUIRED_QUOTES[key]
-        return {"provider": provider, "model": model, "version": PRICE_VERSION,
+        return {"provider": provider, "model": model,
+                "version": QWEN_IMAGE_PRICE_VERSION if key == "qwen-image" else PRICE_VERSION,
                 "allowedUnits": list(maximum), "perCallMax": maximum, "microsPerMillionUnits": rates}
     ceil = lambda value: int(value.to_integral_value(rounding=ROUND_CEILING))
     return {
@@ -126,7 +130,7 @@ def _price_profiles(evidence):
              "output_tokens": ceil(Decimal("1.20") * fx * 1000000)}),
         "qwen-tts": price("qwen-tts", {"calls": 1, "characters": TTS_CHARACTERS_MAX}, {"calls": 0, "characters": 80000000}),
         "qwen-asr": price("qwen-asr", {"calls": 1, "audio_ms": ASR_AUDIO_MS_MAX}, {"calls": 0, "audio_ms": 220000}),
-        "qwen-image": price("qwen-image", {"calls": 1, "images": 1}, {"calls": 0, "images": 500000000000}),
+        "qwen-image": price("qwen-image", {"calls": 1, "images": 1}, {"calls": 0, "images": 180000000000}),
         "happyhorse-video": price("happyhorse-video", {"calls": 1, "video_ms": 5000}, {"calls": 0, "video_ms": 900000000}),
         "baidu-search": price("baidu-search", {"calls": 1, "search_requests": 1}, {"calls": 0, "search_requests": 36000000000}),
     }

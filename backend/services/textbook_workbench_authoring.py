@@ -21,8 +21,16 @@ from PIL import Image
 from content.teacher_profiles import get_formal_subject_qwen_voice_identity
 from content.textbook_catalog import canonical, digest, identifier, lesson_by_id
 from content.textbook_interaction_policy import freeze_interaction_policy, interaction_policy_prompt
-from content.textbook_scene_contract import (PROMPT_END, PROMPT_START, SNAPSHOT_SCHEMA, freeze_scene_contract,
-                                             render_scene_contract, validate_scene_contract)
+from content.textbook_official_resource_review import (
+    OfficialResourceReviewError, validate_draft_official_resource_review,
+    validate_new_course_post_class_practice,
+)
+from content.textbook_scene_contract import (
+    AUTHOR_DISPATCH_SNAPSHOT_SCHEMA, AUTHOR_PROMPT_END, AUTHOR_PROMPT_START,
+    PROMPT_END, PROMPT_START, SNAPSHOT_SCHEMA, freeze_author_dispatch_contract,
+    freeze_scene_contract, render_author_dispatch_contract, render_scene_contract,
+    validate_author_dispatch_contract, validate_scene_contract,
+)
 from integrations.openmaic_workbench_client import (OpenMaicWorkbenchClient, WorkbenchError,
                                                    local_origin, private_write)
 from services.course_reuse_resolver import lesson_scope
@@ -32,6 +40,7 @@ from services.course_file_store import course_bytes, course_exists, course_glob,
 # The workbench generate_scene API accepts these five values. DSL-only widget
 # kinds do not establish that this authoring route can generate them.
 NATIVE_AUTHORING_WIDGET_TYPES = frozenset({'simulation', 'game', 'visualization3d', 'diagram', 'code'})
+REVIEW_HOLD_SCHEMA = 'mira.operator.review-hold.v1'
 
 
 def validate_native_widget_types(draft):
@@ -191,6 +200,18 @@ def validate_draft(draft, *, check_current_teacher=True):
     return binding
 
 
+def require_official_resource_review(draft):
+    """New preparation/POST gate; never retrofit historical read/recovery."""
+    try:
+        validate_draft_official_resource_review(draft)
+    except OfficialResourceReviewError as error:
+        missing = str(error) == 'official_resource_review_required'
+        fail('official_resource_review_required' if missing else 'official_resource_review_invalid',
+             '新课制作前须按准确教材与课时审阅国家智慧教育五类资源并记录原创改编；'
+             '未读、身份不符、视频画面或原音轨分项证据缺失均不能准备或首次派发。'
+             '字幕、ASR和文字稿不能代替原音轨听审；旧冻结稿保持原样，须另建可追溯的新修订')
+
+
 class WorkbenchCatalogGuard:
     """Narrow SELECTs only; no reuse reservation, migration or catalog import."""
     def __init__(self, repository):
@@ -261,7 +282,7 @@ class TextbookWorkbenchAuthoring:
             os.close(fd)
 
     @staticmethod
-    def _summary(job, frozen, state):
+    def _summary(job, frozen, state, *, review_hold=None):
         return {'jobDirectory': str(job), 'status': state['status'], 'requestSha256': frozen['requestSha256'],
                 'draftSha256': frozen['draftSha256'], 'binding': frozen['binding'],
                 'teachingRevision': frozen['teachingRevision'], 'teacherContract': frozen['teacherContract'],
@@ -273,8 +294,75 @@ class TextbookWorkbenchAuthoring:
                 **({'sceneContract': {'sha256': frozen['sceneContract']['sha256'],
                                       'verification': 'frozen_constraints_not_candidate_acceptance'}}
                    if 'sceneContract' in frozen else {}),
+                **({'authorDispatchContract': {
+                        'sha256': frozen['authorDispatchContract']['sha256'],
+                        'sourceSceneContractSha256': frozen['sceneContract']['sha256'],
+                        'verification': 'compact_creator_projection_not_acceptance'}}
+                   if 'authorDispatchContract' in frozen else {}),
                 **{k: state[k] for k in ('sessionId', 'sessionStatus', 'savedStages', 'error', 'httpStatus',
-                                        'existingArtifacts', 'message', 'materialsStatus', 'materialCount') if k in state}}
+                                        'existingArtifacts', 'message', 'materialsStatus', 'materialCount') if k in state},
+                **({'reviewHold': review_hold} if review_hold is not None else {})}
+
+    def _review_hold(self, job, frozen, state):
+        """Validate an immutable, irreversible local dispatch fence."""
+        path = job / 'review-hold.json'
+        if not path.exists() and not path.is_symlink():
+            return None
+        try:
+            if path.is_symlink() or not path.is_file():
+                raise ValueError()
+            sealed = json.loads(course_text(path))
+            body = {key: value for key, value in sealed.items() if key != 'sha256'}
+            created = datetime.fromisoformat(str(sealed.get('createdAt', '')).replace('Z', '+00:00'))
+            if (not isinstance(sealed, dict)
+                    or set(sealed) != {'schemaVersion', 'jobDirectory', 'draftSha256', 'frozenSha256',
+                                       'reviewer', 'basis', 'createdAt', 'sha256'}
+                    or sealed.get('schemaVersion') != REVIEW_HOLD_SCHEMA
+                    or sealed.get('sha256') != digest(body)
+                    or sealed.get('jobDirectory') != str(job)
+                    or sealed.get('draftSha256') != frozen.get('draftSha256')
+                    or sealed.get('frozenSha256') != sha(course_bytes(job / 'frozen.json'))
+                    or not isinstance(sealed.get('reviewer'), str)
+                    or not sealed['reviewer'].strip() or sealed['reviewer'] != sealed['reviewer'].strip()
+                    or not isinstance(sealed.get('basis'), str)
+                    or not sealed['basis'].strip() or sealed['basis'] != sealed['basis'].strip()
+                    or created.tzinfo is None
+                    or course_exists(job / 'dispatch.json')
+                    or any(state.get(key) for key in ('sessionId', 'sessionStatus', 'savedStages',
+                                                      'stageId', 'classroomId', 'runtimeJobId'))
+                    or course_exists(job.parent / 'authoring.json')
+                    or any(course_glob(job, 'saved-*.json'))):
+                raise ValueError()
+            return sealed
+        except (OSError, ValueError, KeyError, TypeError, AttributeError, UnicodeError):
+            fail('review_hold_invalid', '审查挂起记录或冻结身份不一致；禁止附件、派发或覆盖')
+
+    def hold(self, job_path, *, reviewer, basis):
+        """Permanently fence an undispatched frozen job; successors stay separate."""
+        if (not isinstance(reviewer, str) or not reviewer.strip() or reviewer != reviewer.strip()
+                or not isinstance(basis, str) or not basis.strip() or basis != basis.strip()):
+            fail('review_hold_invalid', '审查挂起须记录审核人和具体依据')
+        with self._locked(job_path) as job:
+            frozen, _, state = self._load(job)
+            current = self._review_hold(job, frozen, state)
+            if current is not None:
+                if current['reviewer'] != reviewer or current['basis'] != basis:
+                    fail('review_hold_conflict', '该冻结作业已有不同审查挂起；禁止覆盖或解除')
+                return self._summary(job, frozen, state, review_hold=current)
+            if (state.get('status') not in {'prepared', 'reuse_review_required'}
+                    or course_exists(job / 'dispatch.json')
+                    or any(state.get(key) for key in ('sessionId', 'sessionStatus', 'savedStages',
+                                                      'stageId', 'classroomId', 'runtimeJobId'))
+                    or course_exists(job.parent / 'authoring.json')
+                    or any(course_glob(job, 'saved-*.json'))):
+                fail('review_hold_ineligible', '只能挂起从未派发、没有会话或保存成果的冻结作业')
+            body = {'schemaVersion': REVIEW_HOLD_SCHEMA, 'jobDirectory': str(job),
+                    'draftSha256': frozen['draftSha256'],
+                    'frozenSha256': sha(course_bytes(job / 'frozen.json')),
+                    'reviewer': reviewer, 'basis': basis, 'createdAt': timestamp()}
+            immutable_write(job / 'review-hold.json', json_bytes({**body, 'sha256': digest(body)}))
+            sealed = self._review_hold(job, frozen, state)
+            return self._summary(job, frozen, state, review_hold=sealed)
 
     def _other_artifacts(self, job):
         records = []
@@ -295,7 +383,45 @@ class TextbookWorkbenchAuthoring:
             parent = receipt['sourceJob']
             records = [record for record in records if not (
                 record.get('kind') == 'operator_job' and record.get('path') == parent)]
+        predecessor = self._terminal_predecessor_receipt(job)
+        if predecessor:
+            parent = predecessor['sourceJob']
+            lineage = set(predecessor.get('sourceOperatorLineageJobs', [parent]))
+            authoring = str(Path(parent).parent / 'authoring.json')
+            records = [record for record in records if not (
+                record.get('kind') == 'operator_job' and record.get('path') in lineage
+                or record.get('kind') == 'authoring' and record.get('path') == authoring
+                and '../authoring.json' in predecessor['source']['sourceFiles'])]
+        prepared = self._prepared_predecessor_receipt(job)
+        if prepared:
+            parent = prepared['sourceJob']
+            records = [record for record in records if not (
+                record.get('kind') == 'operator_job' and record.get('path') == parent)]
         return records
+
+    def _terminal_predecessor_receipt(self, job, *, live=False):
+        from services.textbook_terminal_revision import validate_terminal_predecessor
+        return validate_terminal_predecessor(self, job, live=live)
+
+    def _prepared_predecessor_receipt(self, job, *, live=False):
+        from services.textbook_prepared_revision import validate_prepared_predecessor
+        return validate_prepared_predecessor(self, job, live=live)
+
+    def revise_terminal(self, source_job, draft_path, *, teaching_revision,
+                        expected_source_draft_sha256, reviewer, basis, classroom_directory):
+        """Prepare an intentional reviewed revision; do not dispatch it."""
+        from services.textbook_terminal_revision import revise_terminal
+        return revise_terminal(self, source_job, draft_path, teaching_revision=teaching_revision,
+            expected_source_draft_sha256=expected_source_draft_sha256, reviewer=reviewer,
+            basis=basis, classroom_directory=classroom_directory)
+
+    def revise_prepared(self, source_job, draft_path, *, teaching_revision,
+                       expected_source_draft_sha256, reviewer, basis):
+        """Prepare a review-evidence correction of a held, never-started parent."""
+        from services.textbook_prepared_revision import revise_prepared
+        return revise_prepared(self, source_job, draft_path, teaching_revision=teaching_revision,
+            expected_source_draft_sha256=expected_source_draft_sha256,
+            reviewer=reviewer, basis=basis)
 
     def _empty_terminal_source(self, source, frozen, draft, state, classroom_directory):
         """Read-only, fail-closed proof for the no-assets successor route."""
@@ -402,10 +528,11 @@ class TextbookWorkbenchAuthoring:
         source = Path(source_job).resolve()
         with self._locked(source):
             frozen, original, state = self._load(source)
-            if (frozen['schemaVersion'] != 'mira.operator.workbench-authoring.v3'
+            if (frozen['schemaVersion'] not in {'mira.operator.workbench-authoring.v3',
+                                                'mira.operator.workbench-authoring.v4'}
                     or frozen['draftSha256'] != expected_source_draft_sha256
                     or course_exists(source / 'widget-successor.json')):
-                fail('successor_parent_invalid', '只允许原始 v3 父任务及准确草稿摘要')
+                fail('successor_parent_invalid', '只允许原始 v3/v4 父任务及准确草稿摘要')
             raw = course_bytes(Path(draft_path))
             corrected = json.loads(raw)
             change = widget_successor_diff(original, corrected)
@@ -473,9 +600,16 @@ class TextbookWorkbenchAuthoring:
                 return self._summary(job, frozen, state)
             if job.exists() and any(job.iterdir()):
                 fail('incomplete_job', '已有不完整冻结记录，保留并核查，不能覆盖')
+            require_official_resource_review(draft)
+            try:
+                validate_new_course_post_class_practice(draft)
+            except OfficialResourceReviewError:
+                fail('post_class_practice_invalid',
+                     '新课须把已阅课后练习绑定到原创课内活动；若官方清单明确未提供，'
+                     '须逐课时记录缺项且不得凑目标，并保留周末题包来源摘要')
             check = self.guard.inspect(binding)
             artifacts = check['existingArtifacts'] + self._other_artifacts(job)
-            frozen = {'schemaVersion': 'mira.operator.workbench-authoring.v3', 'createdAt': timestamp(),
+            frozen = {'schemaVersion': 'mira.operator.workbench-authoring.v4', 'createdAt': timestamp(),
                       'draftSha256': sha(raw), 'draftCanonicalSha256': digest(draft),
                       'requestSha256': sha(draft['request'].encode()), 'binding': binding,
                       'teacherContract': draft['teacherContract'], 'skillIds': draft['skillIds'],
@@ -487,8 +621,9 @@ class TextbookWorkbenchAuthoring:
                 fail('interaction_policy_integrity_error', '互动规则无法完整冻结，停止准备新课')
             try:
                 frozen['sceneContract'] = freeze_scene_contract(draft, check, frozen['interactionPolicy'])
+                frozen['authorDispatchContract'] = freeze_author_dispatch_contract(frozen['sceneContract'])
             except ValueError:
-                fail('scene_contract_invalid', '新课须包含准确教材范围、完整逐页计划、互动规则和锁定测评')
+                fail('scene_contract_invalid', '新课须包含准确教材范围、完整逐页计划、互动规则、官方资源摘要和锁定测评')
             self._base_dispatch_payload(frozen, draft)
             state = {'status': 'reuse_review_required' if artifacts else 'prepared', 'existingArtifacts': artifacts,
                      'updatedAt': timestamp(), 'message': '已有记录须核查复用，未判断达到 Claude 标准' if artifacts else '冻结完成，尚未派发'}
@@ -579,12 +714,14 @@ class TextbookWorkbenchAuthoring:
             fail('job_invalid', '冻结记录不可读，禁止重新派发')
         schema = frozen.get('schemaVersion')
         if schema not in ('mira.operator.workbench-authoring.v1', 'mira.operator.workbench-authoring.v2',
-                          'mira.operator.workbench-authoring.v3'):
+                          'mira.operator.workbench-authoring.v3', 'mira.operator.workbench-authoring.v4'):
             fail('frozen_integrity_error', '冻结记录版本未知，禁止派发')
         if (schema != 'mira.operator.workbench-authoring.v1') != ('interactionPolicy' in frozen):
             fail('interaction_policy_integrity_error', '冻结记录版本与互动规则快照不匹配，禁止派发')
-        if (schema == 'mira.operator.workbench-authoring.v3') != ('sceneContract' in frozen):
+        if (schema in {'mira.operator.workbench-authoring.v3', 'mira.operator.workbench-authoring.v4'}) != ('sceneContract' in frozen):
             fail('scene_contract_integrity_error', '冻结记录版本与逐页生成合同不匹配，禁止派发')
+        if (schema == 'mira.operator.workbench-authoring.v4') != ('authorDispatchContract' in frozen):
+            fail('author_dispatch_contract_integrity_error', '冻结记录版本与精简作者合同不匹配，禁止派发')
         binding = validate_draft(draft, check_current_teacher=False)
         payload = {'prompt': draft['request'], 'skill': draft['skillIds'][0]}
         if (frozen['draftSha256'] != sha(raw) or frozen['draftCanonicalSha256'] != digest(draft)
@@ -609,6 +746,8 @@ class TextbookWorkbenchAuthoring:
         elif frozen.get('draftAmendmentId') and frozen['draftAmendmentId'] != ignore_amendment:
             fail('amendment_integrity_error', '冻结草稿缺少原修订归档')
         self._widget_successor_receipt(job)
+        self._terminal_predecessor_receipt(job)
+        self._prepared_predecessor_receipt(job)
         return frozen, draft, state
 
     def _initial_draft_sha(self, job, frozen):
@@ -759,6 +898,9 @@ class TextbookWorkbenchAuthoring:
                     try:
                         revised['sceneContract'] = freeze_scene_contract(new, revised['catalogCheck'],
                                                                          revised['interactionPolicy'])
+                        if revised.get('schemaVersion') == 'mira.operator.workbench-authoring.v4':
+                            revised['authorDispatchContract'] = freeze_author_dispatch_contract(
+                                revised['sceneContract'])
                     except ValueError:
                         fail('scene_contract_invalid', '修订后的逐页生成合同无效，原冻结记录保持不变')
                 self._base_dispatch_payload(revised, new)
@@ -800,8 +942,8 @@ class TextbookWorkbenchAuthoring:
         data = material_json(path)
         assets = data.get('assets')
         if (data.get('schemaVersion') != 'mira.operator.material-attachments.v1'
-                or not isinstance(assets, list) or not 1 <= len(assets) <= 20):
-            fail('material_manifest_invalid', '附件清单须有 1–20 个已审核的 PNG 或 UTF-8 纯文本')
+                or not isinstance(assets, list) or not 1 <= len(assets) <= 64):
+            fail('material_manifest_invalid', '附件清单须有 1–64 个已审核的 PNG 或 UTF-8 纯文本')
         records = []
         seen = set()
         for asset in assets:
@@ -845,6 +987,15 @@ class TextbookWorkbenchAuthoring:
         result = {'schemaVersion': 'mira.operator.frozen-material-attachments.v1',
                   'baseDraftSha256': frozen['draftSha256'], 'basePayloadSha256': frozen['payloadSha256'],
                   'inputSha256': sha(raw), 'input': data, 'assets': records}
+        total = sum(a['bytes'] for a in records)
+        if total > 128 * 1024 * 1024:
+            fail('material_manifest_invalid', '新首轮附件总量不能超过 128 MiB')
+        if len(records) > 20:
+            result['openingMaterialGroups'] = {
+                'schemaVersion': 'mira.agent-opening-material-groups.v1',
+                'assetKeyGroups': [[a['assetKey'] for a in records[i:i + 20]]
+                                   for i in range(0, len(records), 20)],
+                'totalBytes': total}
         result['sha256'] = digest(result)
         return result
 
@@ -859,20 +1010,73 @@ class TextbookWorkbenchAuthoring:
         if (manifest.get('sha256') != digest({k: v for k, v in manifest.items() if k != 'sha256'})
                 or manifest.get('baseDraftSha256') != frozen['draftSha256']
                 or manifest.get('basePayloadSha256') != frozen['payloadSha256']
-                or not isinstance(manifest.get('assets'), list) or not 1 <= len(manifest['assets']) <= 20):
+                or not isinstance(manifest.get('assets'), list) or not 1 <= len(manifest['assets']) <= 64):
             fail('material_integrity_error', '附件不属于当前冻结草稿，禁止派发')
+        if len(manifest['assets']) > 20:
+            expected = {'schemaVersion': 'mira.agent-opening-material-groups.v1',
+                        'assetKeyGroups': [[a['assetKey'] for a in manifest['assets'][i:i + 20]]
+                                           for i in range(0, len(manifest['assets']), 20)],
+                        'totalBytes': sum(a['bytes'] for a in manifest['assets'])}
+            if (manifest.get('openingMaterialGroups') != expected
+                    or expected['totalBytes'] > 128 * 1024 * 1024):
+                fail('material_integrity_error', '分组附件合同或总字节数无效')
+        elif 'openingMaterialGroups' in manifest:
+            fail('material_integrity_error', '历史单组附件合同不能改成分组')
         return manifest
 
     @staticmethod
+    def _opening_material_payload(payload, material_ids):
+        if len(material_ids) > 20:
+            payload['materialIdGroups'] = [material_ids[i:i + 20]
+                                            for i in range(0, len(material_ids), 20)]
+        else:
+            payload['materialIds'] = material_ids
+
+    @staticmethod
+    def _require_material_groups_runtime(client, manifest):
+        if (manifest and len(manifest['assets']) > 20
+                and getattr(client, 'material_groups_schema', None) != 'mira.agent-opening-material-groups.v1'):
+            fail('material_groups_runtime_unavailable', '当前原生运行服务不支持有界分组附件；禁止上传或派发')
+
+    @staticmethod
     def _base_dispatch_payload(frozen, draft):
-        """Historical jobs keep their exact bytes; v3 also binds each page generator."""
+        """Keep historical bytes; v4 sends one compact, source-bound brief."""
         prompt = draft['request']
-        if 'interactionPolicy' in frozen:
+        schema = frozen.get('schemaVersion')
+        if schema == 'mira.operator.workbench-authoring.v4':
+            if PROMPT_START in prompt or PROMPT_END in prompt:
+                fail('scene_contract_integrity_error', '原始请求不能伪造完整逐页生成合同标记')
+            if AUTHOR_PROMPT_START in prompt or AUTHOR_PROMPT_END in prompt:
+                fail('author_dispatch_contract_integrity_error', '原始请求不能伪造精简作者合同标记')
+            try:
+                interaction_policy_prompt(frozen['interactionPolicy'])
+            except (KeyError, ValueError):
+                fail('interaction_policy_integrity_error', '冻结互动规则的结构或摘要不一致，禁止派发')
+            try:
+                validate_scene_contract(frozen['sceneContract'], draft=draft,
+                                        catalog_check=frozen['catalogCheck'],
+                                        interaction_policy=frozen['interactionPolicy'])
+            except (KeyError, ValueError):
+                fail('scene_contract_integrity_error', '冻结逐页生成合同与教材、草稿或规则不一致，禁止派发')
+            try:
+                validate_author_dispatch_contract(
+                    frozen['authorDispatchContract'], scene_contract=frozen['sceneContract'])
+                prompt = ('【已冻结的精简作者合同】'
+                          + render_author_dispatch_contract(frozen['authorDispatchContract'])
+                          + '【原始已审课程请求】\n' + prompt)
+                if (prompt.count(AUTHOR_PROMPT_START) != 1
+                        or prompt.count(AUTHOR_PROMPT_END) != 1
+                        or PROMPT_START in prompt or PROMPT_END in prompt):
+                    raise ValueError('Ambiguous embedded author dispatch contract')
+            except (KeyError, ValueError):
+                fail('author_dispatch_contract_integrity_error',
+                     '精简作者合同与完整教材、草稿或规则快照不一致，禁止派发')
+        elif 'interactionPolicy' in frozen:
             try:
                 prompt = interaction_policy_prompt(frozen['interactionPolicy']) + prompt
             except ValueError:
                 fail('interaction_policy_integrity_error', '冻结互动规则的结构或摘要不一致，禁止派发')
-        if 'sceneContract' in frozen:
+        if 'sceneContract' in frozen and schema != 'mira.operator.workbench-authoring.v4':
             try:
                 validate_scene_contract(frozen['sceneContract'], draft=draft,
                                         catalog_check=frozen['catalogCheck'],
@@ -893,8 +1097,12 @@ class TextbookWorkbenchAuthoring:
     def _require_scene_contract_runtime(client, frozen):
         # Populated by the existing owner-scoped GET, before any new POST.
         # Recovery is deliberately independent of today's runtime capability.
-        if ('sceneContract' in frozen
-                and getattr(client, 'scene_contract_schema', None) != SNAPSHOT_SCHEMA):
+        required = (AUTHOR_DISPATCH_SNAPSHOT_SCHEMA
+                    if frozen.get('schemaVersion') == 'mira.operator.workbench-authoring.v4'
+                    else SNAPSHOT_SCHEMA if 'sceneContract' in frozen else None)
+        advertised = {part.strip() for part in str(
+            getattr(client, 'scene_contract_schema', '') or '').split(',') if part.strip()}
+        if required is not None and required not in advertised:
             fail('scene_contract_runtime_unavailable', '当前原生运行服务未加载逐页合同校验；保留新课草稿，禁止派发')
 
     def _material_payload(self, job, frozen, draft):
@@ -930,7 +1138,7 @@ class TextbookWorkbenchAuthoring:
             receipts[asset['assetKey']] = digest(receipt)
         if len(set(material_ids)) != len(material_ids):
             fail('material_integrity_error', '不同附件意外绑定同一素材 ID')
-        payload['materialIds'] = material_ids
+        self._opening_material_payload(payload, material_ids)
         expected_ready = {'schemaVersion': 'mira.operator.material-dispatch.v1',
                           'manifestSha256': manifest['sha256'], 'ownerFingerprint': owner['ownerFingerprint'],
                           'uploadReceiptSha256': receipts, 'payload': payload, 'payloadSha256': digest(payload)}
@@ -961,12 +1169,16 @@ class TextbookWorkbenchAuthoring:
         """Freeze/upload once per PNG or text. Unknown uploads remain fenced, never retried."""
         with self._locked(job_path) as job:
             frozen, draft, state = self._load(job)
+            if self._review_hold(job, frozen, state) is not None:
+                fail('review_hold_active', '该冻结作业因审查证据不足已永久挂起；只能另建可追踪的新修订')
             payload = self._base_dispatch_payload(frozen, draft)
             dispatch_frozen = {**frozen, 'requestSha256': sha(payload['prompt'].encode()),
                                'payloadSha256': digest(payload)}
             if (course_exists(job / 'dispatch.json') or state.get('sessionId')
                     or state.get('status') != 'prepared' or state.get('existingArtifacts')):
                 fail('materials_not_prepared', '只有尚未派发的 prepared 草稿可绑定首轮附件')
+            self._terminal_predecessor_receipt(job, live=True)
+            self._prepared_predecessor_receipt(job, live=True)
             proposed = self._material_manifest(manifest_path, frozen)
             planned = draft.get('assetPlan', {}).get('assetKeys')
             # Plain text carries shared vector/source data and does not add an image.
@@ -996,6 +1208,7 @@ class TextbookWorkbenchAuthoring:
             if self._recover_before_dispatch(job, client, frozen, dispatch_frozen, state, draft=draft):
                 fail('materials_existing_session', '已存在同请求会话，不能另绑定或派发')
             self._require_scene_contract_runtime(client, frozen)
+            self._require_material_groups_runtime(client, proposed)
             if not owner_path.exists():
                 owner = {'manifestSha256': proposed['sha256'], 'ownerFingerprint': client.owner_fingerprint()}
                 immutable_write(owner_path, json_bytes(owner))
@@ -1031,7 +1244,8 @@ class TextbookWorkbenchAuthoring:
                     self._save_state(job, state)
                     raise
             receipts = {a['assetKey']: material_json(folder / (a['assetKey'] + '-receipt.json')) for a in proposed['assets']}
-            payload['materialIds'] = [receipts[a['assetKey']]['response']['material']['materialId'] for a in proposed['assets']]
+            self._opening_material_payload(payload, [receipts[a['assetKey']]['response']['material']['materialId']
+                                                     for a in proposed['assets']])
             ready = {'schemaVersion': 'mira.operator.material-dispatch.v1', 'manifestSha256': proposed['sha256'],
                      'ownerFingerprint': owner['ownerFingerprint'],
                      'uploadReceiptSha256': {k: digest(v) for k, v in receipts.items()},
@@ -1154,11 +1368,14 @@ class TextbookWorkbenchAuthoring:
     def run(self, job_path, *, start=False):
         with self._locked(job_path) as job:
             frozen, draft, state = self._load(job)
+            review_hold = self._review_hold(job, frozen, state)
+            if start and review_hold is not None:
+                fail('review_hold_active', '该冻结作业因审查证据不足已永久挂起；只能另建可追踪的新修订')
             marker_path = job / 'dispatch.json'
             if state['status'] == 'reuse_review_required' and not course_exists(marker_path):
-                return self._summary(job, frozen, state)
+                return self._summary(job, frozen, state, review_hold=review_hold)
             if not start and not course_exists(marker_path) and not state.get('sessionId'):
-                return self._summary(job, frozen, state)
+                return self._summary(job, frozen, state, review_hold=review_hold)
             payload, dispatch_frozen = self._material_payload(job, frozen, draft)
             client = self.client_factory(self.origin, job / 'owner.cookies')
             try:
@@ -1179,8 +1396,11 @@ class TextbookWorkbenchAuthoring:
                     self._poll(job, client, dispatch_frozen, state)
                 elif start:
                     self._widget_successor_receipt(job, live=True)
+                    self._terminal_predecessor_receipt(job, live=True)
+                    self._prepared_predecessor_receipt(job, live=True)
                     validate_draft(draft)  # Recheck teacher before the first POST, never rewrite it.
-                    if frozen['schemaVersion'] == 'mira.operator.workbench-authoring.v3':
+                    if frozen['schemaVersion'] in {'mira.operator.workbench-authoring.v3',
+                                                   'mira.operator.workbench-authoring.v4'}:
                         validate_native_widget_types(draft)
                     check = self.guard.inspect(frozen['binding'])
                     artifacts = check['existingArtifacts'] + self._other_artifacts(job)
@@ -1192,7 +1412,9 @@ class TextbookWorkbenchAuthoring:
                         # GET establishes the private owner before any dispatch.
                         existing = self._recover_before_dispatch(job, client, frozen, dispatch_frozen, state, draft=draft)
                         if not existing:
+                            require_official_resource_review(draft)
                             self._require_scene_contract_runtime(client, frozen)
+                            self._require_material_groups_runtime(client, self._read_material_manifest(job, frozen))
                         owner = client.owner_fingerprint()
                         marker = {'createdAt': timestamp(), 'requestSha256': dispatch_frozen['requestSha256'],
                                   'payloadSha256': dispatch_frozen['payloadSha256'], 'ownerFingerprint': owner,
@@ -1221,4 +1443,4 @@ class TextbookWorkbenchAuthoring:
                 if course_exists(marker_path) and not state.get('sessionId'):
                     state['status'] = 'dispatch_unknown'
             self._save_state(job, state)
-            return self._summary(job, frozen, state)
+            return self._summary(job, frozen, state, review_hold=review_hold)

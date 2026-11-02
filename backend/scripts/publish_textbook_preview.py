@@ -29,7 +29,7 @@ def main():
     parser.add_argument('--audio-audit', type=Path, required=True)
     acceptance = parser.add_mutually_exclusive_group()
     acceptance.add_argument('--asr-reconciliation', type=Path,
-                        help='Exact human whole-sentence review for low-score formal pinyin ASR; preserves the original audit')
+                        help='Exact supported human confirmation of presented low-score audio; preserves the original ASR audit')
     acceptance.add_argument('--pronunciation-review', type=Path,
                         help='Independent user-authorized operator/automatic evidence; never human listening or a low-score waiver')
     parser.add_argument('--classroom-directory', type=Path, required=True)

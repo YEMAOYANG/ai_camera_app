@@ -115,6 +115,56 @@ class ReviewsTest(unittest.TestCase):
             self.service.answer('student-a',run['id'],{'questionId':view['currentQuestion']['id'],'response':'A',
                 'requestId':'bad-fixture','revision':view['review']['revision'],'syntheticFixture':True})
 
+    def test_weekend_results_never_backfill_the_day_before_the_child_participated(self):
+        from services.report_learning_summary import review_report_for_period
+        run=self.create()
+        self.now=at('2026-10-04',10)
+        self.action(run,'start')
+        for _ in range(self.view(run)['review']['totalQuestions']):
+            self.answer(run)
+            completed=self.action(run,'next')
+        completed_at=completed['review']['completedAt']
+        before_runs=self.db.execute('SELECT * FROM learning_review_runs').fetchall()
+        before_items=self.db.execute('SELECT * FROM learning_review_items').fetchall()
+        writes=self.db.raw.total_changes
+        saturday=review_report_for_period(self.db,family_id='family-a',start=at('2026-10-03',0),end=at('2026-10-04',0))['weekendReviews'][0]
+        self.assertEqual(saturday['report']['items'],[])
+        self.assertEqual(saturday['report']['answeredCount'],0)
+        self.assertTrue(saturday['report']['notParticipated'])
+        self.assertIsNone(saturday['completedAt'])
+        self.assertIsNone(saturday['report']['completedAt'])
+        self.assertEqual(saturday['correctCount'],0)
+        self.assertEqual(saturday['independentCorrectCount'],0)
+        self.assertNotEqual(saturday['status'],'completed')
+        sunday=review_report_for_period(self.db,family_id='family-a',start=at('2026-10-04',0),end=at('2026-10-05',0))['weekendReviews'][0]
+        self.assertEqual(sunday['report']['answeredCount'],completed['review']['totalQuestions'])
+        self.assertFalse(sunday['report']['notParticipated'])
+        self.assertEqual(sunday['completedAt'],completed_at)
+        weekly=review_report_for_period(self.db,family_id='family-a',start=at('2026-09-28',0),end=at('2026-10-05',0))['weekendReviews'][0]
+        self.assertEqual(weekly['report']['items'],sunday['report']['items'])
+        self.assertEqual(weekly['completedAt'],completed_at)
+        self.assertEqual(self.db.raw.total_changes,writes)
+        self.assertEqual(self.db.execute('SELECT * FROM learning_review_runs').fetchall(),before_runs)
+        self.assertEqual(self.db.execute('SELECT * FROM learning_review_items').fetchall(),before_items)
+
+    def test_partial_cross_day_review_uses_only_answers_before_the_report_end(self):
+        from services.report_learning_summary import review_report_for_period
+        run=self.create();self.action(run,'start');self.answer(run,'B')
+        self.now=at('2026-10-04',0)  # The exclusive day boundary belongs to Sunday.
+        self.action(run,'next');self.answer(run)
+        saturday=review_report_for_period(self.db,family_id='family-a',start=at('2026-10-03',0),end=at('2026-10-04',0))['weekendReviews'][0]
+        self.assertEqual(saturday['report']['answeredCount'],1)
+        self.assertFalse(saturday['report']['notParticipated'])
+        self.assertFalse(saturday['report']['items'][0]['correct'])
+        self.assertEqual(saturday['correctCount'],0)
+        self.assertEqual(saturday['currentIndex'],1)
+        sunday=review_report_for_period(self.db,family_id='family-a',start=at('2026-10-04',0),end=at('2026-10-05',0))['weekendReviews'][0]
+        self.assertEqual(sunday['report']['answeredCount'],2)
+        self.assertEqual(sunday['correctCount'],1)
+        self.assertIsNone(sunday['completedAt'])
+        weekly=review_report_for_period(self.db,family_id='family-a',start=at('2026-09-28',0),end=at('2026-10-05',0))['weekendReviews'][0]
+        self.assertEqual(weekly['report']['items'],sunday['report']['items'])
+
     def test_synthetic_paused_run_does_not_block_real_week_or_send_reminder(self):
         run=self.create()
         coverage=json.loads(run['coverage_json']);coverage['syntheticFixture']=True
@@ -305,6 +355,139 @@ class ReviewsTest(unittest.TestCase):
         self.assertEqual(self.view(run)['review']['estimatedMinutes'],4)
         self.assertIsNone(self.view(run)['currentQuestion'])
 
+    def test_completed_scope_can_schedule_thirty_minutes_without_wrong_answer_history(self):
+        self.questions=[]
+        for skill in range(16):
+            for variant in range(2):
+                q=question('learned-'+str(skill),variant,'course-'+str(skill//2))
+                q.update(learnedScopeVerified=True,packSha256='a'*64)
+                self.questions.append(q)
+        self.questions.extend([deepcopy(self.questions[0]),
+            {**question('unlearned',0),'estimatedSeconds':1},
+            {**question('other-grade',0),'gradeCode':'primary_2','learnedScopeVerified':True}])
+        with self.db.transaction():run=self.service.ensure_week(self.db,self.child,self.now)
+        items=self.service.repository.items(self.db,run['id'])
+        snapshots=[json.loads(item['snapshot_json']) for item in items]
+        self.assertEqual((run['total_questions'],run['estimated_seconds']),(30,1800))
+        self.assertEqual(len({q['fingerprint'] for q in snapshots}),30)
+        self.assertTrue(all(q.get('learnedScopeVerified') is True for q in snapshots))
+        self.assertTrue(all(q['gradeCode']=='primary_1' for q in snapshots))
+        self.assertEqual(json.loads(run['coverage_json'])['durationGapSeconds'],0)
+        self.assertEqual(json.loads(run['policy_json'])['maximumQuestions'],30)
+        self.assertEqual(self.db.execute('SELECT COUNT(*) n FROM learning_answer_events').fetchone()['n'],0)
+
+    def test_observing_scope_uses_real_estimates_without_three_question_cap_or_duplicates(self):
+        self.evidence(question(),answer='A',correct=True)
+        self.questions=[]
+        for ordinal,seconds in enumerate((40,90,120,75,60)):
+            q=question('learned-'+str(ordinal),0,'course-'+str(ordinal))
+            q.update(learnedScopeVerified=True,estimatedSeconds=seconds)
+            self.questions.append(q)
+        self.questions.extend([deepcopy(self.questions[0]),
+            {**question('invalid-duration',0),'learnedScopeVerified':True,'estimatedSeconds':True}])
+        with self.db.transaction():run=self.service.ensure_week(self.db,self.child,self.now)
+        coverage=json.loads(run['coverage_json'])
+        self.assertEqual((run['total_questions'],run['estimated_seconds']),(5,385))
+        self.assertEqual((coverage['targetSeconds'],coverage['estimatedSeconds'],coverage['durationGapSeconds']),
+                         (1800,385,1415))
+        self.assertTrue(coverage['contentGap'])
+        self.assertTrue(any('目标还差' in note for note in coverage['notes']))
+
+    def test_existing_paper_keeps_its_original_policy_when_current_duration_changes(self):
+        from services.learning_review_service import POLICY
+        old={**deepcopy(POLICY),'targetSeconds':600,'maximumSeconds':720,'maximumQuestions':10}
+        with patch('services.learning_review_service.POLICY',old):
+            run=self.create()
+        frozen=self.db.execute('SELECT policy_json FROM learning_review_runs WHERE id=?',(run['id'],)).fetchone()['policy_json']
+        self.service.question_pool=Mock(side_effect=AssertionError('existing paper must not be reselected'))
+        with self.db.transaction():current=self.service.ensure_week(self.db,self.child,self.now)
+        self.assertEqual(current['policy_json'],frozen)
+        self.assertEqual(json.loads(current['policy_json'])['targetSeconds'],600)
+        self.service.question_pool.assert_not_called()
+
+    def test_review_pack_media_is_only_available_after_its_question_is_exposed(self):
+        self.questions=[]
+        for ordinal in range(2):
+            q=question('scoped-'+str(ordinal),0,'course-'+str(ordinal))
+            picture='reviewpack.'+str(ordinal+1)*64+'.png'
+            q.update(learnedScopeVerified=True,packSha256='b'*64,
+                target='xiě',assessmentMode='pinyin_picture',targetId='target-'+str(ordinal),
+                sourceIdentity={'courseId':q['courseId'],'courseVersion':'1','releaseSha256':'c'*64},
+                evidenceClaim={'observed':'拼音与图义选择','supports':['本题图义对应'],
+                               'doesNotSupport':['口语发音','纸笔书写']},
+                visual={'art':{'src':picture}})
+            q['options'][0]['picture']=picture
+            self.questions.append(q)
+        with self.db.transaction():run=self.service.ensure_week(self.db,self.child,self.now)
+        first,future=[json.loads(i['snapshot_json']) for i in self.service.repository.items(self.db,run['id'])]
+        asset=first['visual']['art']['src'];future_asset=future['visual']['art']['src']
+        media_file=Mock(return_value='/verified/review-picture.png')
+        module=SimpleNamespace(review_pack_media_file=media_file)
+        with patch.dict('sys.modules',{'services.learning_review_content':module}):
+            with self.assertRaises(ApiError):self.service.audio('student-a',run['id'],asset)
+            view=self.action(run,'start')
+            expected=self.service._audio(run['id'],asset)
+            self.assertEqual(view['currentQuestion']['visual']['art']['src'],expected)
+            self.assertEqual(view['currentQuestion']['options'][0]['picture'],expected)
+            self.assertEqual(view['currentQuestion']['target'],'xiě')
+            self.assertEqual(view['currentQuestion']['assessmentMode'],'pinyin_picture')
+            self.assertNotIn('evidenceClaim',view['currentQuestion'])
+            self.assertEqual(self.service.audio('student-a',run['id'],asset),'/verified/review-picture.png')
+            with self.assertRaises(ApiError):self.service.audio('student-a',run['id'],future_asset)
+            media_file.assert_called_once_with(asset)
+        self.answer(run)
+        report=self.service.parent_detail('parent-a','child-a',run['id'])['report']
+        for key in ('target','assessmentMode','evidenceClaim','targetId','sourceIdentity','packSha256'):
+            self.assertEqual(report['items'][0][key],first[key])
+        self.assertIn('不能证明口语发音或纸笔书写已掌握',report['assessmentScope'])
+
+    def test_published_pool_includes_verified_review_pack_even_without_legacy_journey(self):
+        from services.learning_review_questions import published_question_pool
+        approved=question('new-scope',0)
+        approved.update(learnedScopeVerified=True,packSha256='d'*64)
+        pool=Mock(return_value=([approved],['缺少下一目标的审核题']))
+        with patch.dict('sys.modules',{'services.learning_review_content':SimpleNamespace(approved_question_pool=pool)}):
+            result,gaps=published_question_pool(self.db,self.child)
+        self.assertEqual(result,[approved])
+        self.assertEqual(gaps,['缺少下一目标的审核题'])
+        pool.assert_called_once_with(self.db,self.child)
+
+    def test_review_pack_coverage_removes_only_matching_legacy_course_version_gaps(self):
+        from services.learning_review_questions import published_question_pool
+        approved=question('new-scope',0,'covered-course')
+        approved.update(learnedScopeVerified=True,packSha256='e'*64)
+        pool=Mock(return_value=([approved],['新题包的真实缺口']))
+        courses=[{'id':'covered-course','version':'1','title':'已覆盖课'},
+                 {'id':'covered-course','version':'2','title':'另一版本课'}]
+        conn=Mock()
+        conn.execute.side_effect=lambda sql,args: SimpleNamespace(fetchall=lambda:courses,fetchone=lambda:None)
+        module=SimpleNamespace(approved_question_pool=pool)
+        with patch.dict('sys.modules',{'services.learning_review_content':module}):
+            _,gaps=published_question_pool(conn,self.child)
+            self.assertEqual(set(gaps),{'另一版本课','新题包的真实缺口'})
+            pool.return_value=([approved],['已覆盖课'])
+            _,gaps=published_question_pool(conn,self.child)
+            self.assertEqual(set(gaps),{'另一版本课','已覆盖课'})
+
+    def test_review_pack_media_errors_return_bounded_api_failures(self):
+        from content.learning_review_content import ReviewContentError
+        q=question('scoped',0)
+        asset='reviewpack.'+'f'*64+'.png'
+        q.update(learnedScopeVerified=True,visual={'art':{'src':asset}})
+        self.questions=[q]
+        with self.db.transaction():run=self.service.ensure_week(self.db,self.child,self.now)
+        self.action(run,'start')
+        loader=Mock()
+        with patch.dict('sys.modules',{'services.learning_review_content':SimpleNamespace(review_pack_media_file=loader)}):
+            for error,status in ((ReviewContentError('review_pack_integrity_failed'),502),
+                                 (OSError('private storage details'),502),(KeyError('assets'),502),
+                                 (FileNotFoundError('private source path'),404)):
+                with self.subTest(error=type(error).__name__):
+                    loader.side_effect=error
+                    with self.assertRaises(ApiError) as caught:self.service.audio('student-a',run['id'],asset)
+                    self.assertEqual((caught.exception.code,caught.exception.status_code),('review_media_unavailable',status))
+                    self.assertNotIn('private',str(caught.exception))
+
     def test_start_only_current_question_and_no_answer_before_help(self):
         run=self.create();view=self.action(run,'start')
         self.assertNotIn('correctAnswer',view['currentQuestion'])
@@ -465,6 +648,35 @@ class ReviewsTest(unittest.TestCase):
         self.assertEqual(view['review']['status'],'content_gap')
         self.assertTrue(view['review']['coverage']['contentGap'])
         self.assertEqual(view['review']['totalQuestions'],0)
+
+    def test_seen_observing_items_are_not_replayed_just_to_fill_thirty_minutes(self):
+        for q in self.questions:self.evidence(q,correct=True)
+        with self.db.transaction():run=self.service.ensure_week(self.db,self.child,self.now)
+        self.assertEqual(run['total_questions'],0)
+        self.assertEqual(json.loads(run['coverage_json'])['durationGapSeconds'],1800)
+        self.assertEqual(run['status'],'rest')
+
+    def test_targeted_original_correction_is_explicitly_repeated_practice_and_bounded(self):
+        q=question();self.evidence(q)
+        self.service.question_pool=lambda *_:([deepcopy(q),deepcopy(q)],[])
+        with self.db.transaction():run=self.service.ensure_week(self.db,self.child,self.now)
+        items=self.service.repository.items(self.db,run['id'])
+        self.assertEqual(len(items),1);self.assertEqual(items[0]['evidence_mode'],'repeated_practice')
+        self.assertEqual(json.loads(run['coverage_json'])['durationGapSeconds'],1740)
+
+    def test_new_pack_records_no_system_help_without_inventing_known_adult_help(self):
+        q={**question(),'learnedScopeVerified':True,'packSha256':'a'*64}
+        self.service.question_pool=lambda *_:([q],[])
+        with self.db.transaction():run=self.service.ensure_week(self.db,self.child,self.now)
+        self.action(run,'start');answer=self.answer(run)
+        self.assertFalse(answer['feedback']['independent'])
+        self.assertTrue(answer['feedback']['systemUnaided'])
+        self.action(run,'next')
+        report=self.service.parent_detail('parent-a','child-a',run['id'])['report']
+        self.assertEqual(report['independentFirstCount'],0)
+        self.assertEqual(report['items'][0]['independenceStatus'],'adult_help_unknown')
+        event=self.db.execute('SELECT * FROM learning_answer_events WHERE source_kind=\'review\'').fetchone()
+        self.assertIsNone(event['adult_help']);self.assertIsNone(event['independent'])
 
     def test_quiet_mode_and_disabled_voice_do_not_send(self):
         run=self.create();self.now=at('2026-10-03',10)

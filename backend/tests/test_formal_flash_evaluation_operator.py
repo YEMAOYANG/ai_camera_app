@@ -14,7 +14,7 @@ from scripts.evaluate_formal_flash_course import (
     bind_native_input, freeze_course, validate_frozen, write_json_new,
 )
 from scripts.formal_flash_eval_budget import (
-    APPROVAL_SCHEMA, PRICE_SCHEMA, PRICE_VERSION, REQUIRED_QUOTES, build_plan,
+    APPROVAL_SCHEMA, PRICE_SCHEMA, PRICE_VERSION, QWEN_IMAGE_PRICE_VERSION, REQUIRED_QUOTES, build_plan,
     create_app, initialize_ledger, open_ledger, validate_plan,
 )
 
@@ -34,7 +34,7 @@ def fixtures(path, *, calls=12, per_course=10):
         "deepseek-flash": {"currency": "USD", "inputMissPerMillion": "0.30", "outputPerMillion": "1.20"},
         "qwen-tts": {"currency": "CNY", "per10000Characters": "0.8"},
         "qwen-asr": {"currency": "CNY", "perSecond": "0.00022"},
-        "qwen-image": {"currency": "CNY", "perImage": "0.5"},
+        "qwen-image": {"currency": "CNY", "perImage": "0.18"},
         "happyhorse-video": {"currency": "CNY", "perSecond720p": "0.9"},
         "baidu-search": {"currency": "CNY", "perStandardCall": "0.036"},
     }
@@ -45,7 +45,8 @@ def fixtures(path, *, calls=12, per_course=10):
                 "fxPurpose": "budget_upper_bound_not_vendor_exchange_rate",
                 "quotes": {key: {"provider": provider, "model": model, "sourceUrl": urls[vendor],
                     "sourceSnapshotSha256": digest("synthetic quote evidence: " + key),
-                    "priceVersion": PRICE_VERSION, "verifiedAt": "2026-10-08T12:00:00+08:00",
+                    "priceVersion": QWEN_IMAGE_PRICE_VERSION if key == "qwen-image" else PRICE_VERSION,
+                    "verifiedAt": ("2026-10-27" if key == "qwen-image" else "2026-10-08") + "T12:00:00+08:00",
                     "operatorVerified": True, "rates": rate[key]} for key, (vendor, provider, model) in REQUIRED_QUOTES.items()}}
     return frozen, approval, evidence
 

@@ -18,6 +18,21 @@ PROMPT_END = "\nEND_MIRA_TEXTBOOK_SCENE_AUTHORING_CONTRACT\n"
 FIELDS = {"schemaVersion", "binding", "catalogEvidence", "teacherContract",
           "interactionPolicy", "qualityRules", "scopeReview", "pagePlan", "lockedAssessments"}
 
+# The complete scene contract above remains the audit/guard authority.  New
+# authoring jobs dispatch this deliberately smaller projection so the creator is
+# not asked to read the same policy twice (or to treat validator prose as a page
+# template).  Historical v3 jobs continue to render the original envelope.
+AUTHOR_DISPATCH_SCHEMA = "mira.textbook.author-dispatch-contract.v1"
+AUTHOR_DISPATCH_SNAPSHOT_SCHEMA = "mira.frozen-textbook-author-dispatch.v1"
+AUTHOR_PROMPT_START = "\nMIRA_TEXTBOOK_AUTHOR_DISPATCH_CONTRACT:\n"
+AUTHOR_PROMPT_END = "\nEND_MIRA_TEXTBOOK_AUTHOR_DISPATCH_CONTRACT\n"
+AUTHOR_FIELDS = {
+    "schemaVersion", "sourceSceneContractSha256", "binding", "catalogEvidence",
+    "teacherContract", "policyRef", "authoringRules", "qualityRules", "courseScope",
+    "officialResourceSummary", "pagePlan", "lockedAssessments",
+}
+_REVIEW_ONLY_RULES = frozenset({"official_source_review_before_authoring", "review_actual_play"})
+
 
 def scene_canonical(value):
     """Compare Native scene numbers without changing archived JSON bytes.
@@ -194,3 +209,124 @@ def validate_scene_contract(snapshot, *, draft=None, catalog_check=None, interac
 def render_scene_contract(snapshot):
     validate_scene_contract(snapshot)
     return PROMPT_START + canonical(snapshot) + PROMPT_END
+
+
+def _official_resource_summary(scope):
+    review = scope.get("officialResourceReview") if isinstance(scope, dict) else None
+    if not isinstance(review, dict):
+        raise ValueError("Author dispatch requires the reviewed official-resource record")
+    try:
+        hours = [{
+            "classHourId": hour["classHourId"],
+            "title": hour["title"],
+            "learningObjectives": deepcopy(hour["learningObjectives"]),
+            "resources": {
+                kind: {key: deepcopy(resource[key]) for key in ("status", "locations", "findings")}
+                for kind, resource in hour["resources"].items()
+            },
+        } for hour in review["classHours"]]
+        return {
+            "schemaVersion": review["schemaVersion"],
+            "sha256": digest(review),
+            "officialTextbook": deepcopy(review["officialTextbook"]),
+            "classHours": hours,
+            "adaptation": deepcopy(review["adaptation"]),
+        }
+    except (KeyError, TypeError) as error:
+        raise ValueError("Official-resource review cannot form an author summary") from error
+
+
+def _authoring_rules(interaction_policy):
+    """Project creator-facing requirements from the pinned policy.
+
+    Review acquisition and post-generation play inspection stay in the complete
+    frozen contract.  All other versioned rule requirements are kept verbatim,
+    without examples, provider boundaries or duplicate policy JSON.
+    """
+    try:
+        policy = interaction_policy["policy"]
+        return [{"id": rule["id"], "requirement": rule["requirement"]}
+                for rule in policy["rules"] if rule["id"] not in _REVIEW_ONLY_RULES]
+    except (KeyError, TypeError) as error:
+        raise ValueError("Frozen interaction policy cannot form an author brief") from error
+
+
+def freeze_author_dispatch_contract(scene_snapshot):
+    """Freeze a compact creator projection while retaining the full source hash."""
+    source = validate_scene_contract(scene_snapshot)
+    policy_snapshot = source["interactionPolicy"]
+    # interaction_policy_prompt is the existing canonical policy validator.  Do
+    # not render its large result into this author-facing envelope.
+    interaction_policy_prompt(policy_snapshot)
+    policy = policy_snapshot["policy"]
+    scope = source["scopeReview"]
+    contract = {
+        "schemaVersion": AUTHOR_DISPATCH_SCHEMA,
+        "sourceSceneContractSha256": scene_snapshot["sha256"],
+        "binding": deepcopy(source["binding"]),
+        "catalogEvidence": deepcopy(source["catalogEvidence"]),
+        "teacherContract": deepcopy(source["teacherContract"]),
+        "policyRef": {
+            "schemaVersion": policy_snapshot["schemaVersion"],
+            "policyId": policy["policyId"],
+            "version": policy["version"],
+            "sha256": policy_snapshot["sha256"],
+        },
+        "authoringRules": _authoring_rules(policy_snapshot),
+        "qualityRules": deepcopy(source["qualityRules"]),
+        "courseScope": {key: deepcopy(value) for key, value in scope.items()
+                        if key != "officialResourceReview"},
+        "officialResourceSummary": _official_resource_summary(scope),
+        "pagePlan": deepcopy(source["pagePlan"]),
+        "lockedAssessments": deepcopy(source["lockedAssessments"]),
+    }
+    _validate_author_dispatch_contract(contract)
+    return {"schemaVersion": AUTHOR_DISPATCH_SNAPSHOT_SCHEMA,
+            "contract": contract, "sha256": digest(contract)}
+
+
+def _validate_author_dispatch_contract(contract):
+    if (not isinstance(contract, dict) or set(contract) != AUTHOR_FIELDS
+            or contract.get("schemaVersion") != AUTHOR_DISPATCH_SCHEMA):
+        raise ValueError("Invalid author dispatch contract schema")
+    _portable_json(contract)
+    if not re.fullmatch(r"[0-9a-f]{64}", contract.get("sourceSceneContractSha256", "")):
+        raise ValueError("Author dispatch source contract digest is invalid")
+    policy = contract.get("policyRef")
+    if (not isinstance(policy, dict)
+            or set(policy) != {"schemaVersion", "policyId", "version", "sha256"}
+            or policy.get("schemaVersion") != "mira.frozen-interaction-policy.v1"
+            or not _text(policy.get("policyId"))
+            or type(policy.get("version")) is not int or policy["version"] < 1
+            or not re.fullmatch(r"[0-9a-f]{64}", policy.get("sha256", ""))):
+        raise ValueError("Author dispatch policy reference is invalid")
+    rules = contract.get("authoringRules")
+    if (not isinstance(rules, list) or not rules
+            or any(not isinstance(rule, dict) or set(rule) != {"id", "requirement"}
+                   or not _text(rule.get("id")) or not _text(rule.get("requirement")) for rule in rules)
+            or len({rule["id"] for rule in rules}) != len(rules)):
+        raise ValueError("Author dispatch rules are invalid")
+    if (not isinstance(contract.get("courseScope"), dict)
+            or "officialResourceReview" in contract["courseScope"]
+            or not isinstance(contract.get("officialResourceSummary"), dict)):
+        raise ValueError("Author dispatch course scope summary is invalid")
+    # Reuse the complete validator for page/quiz/binding semantics without
+    # creating a second, drifting implementation here.
+    return contract
+
+
+def validate_author_dispatch_contract(snapshot, *, scene_contract=None):
+    if (not isinstance(snapshot, dict) or set(snapshot) != {"schemaVersion", "contract", "sha256"}
+            or snapshot.get("schemaVersion") != AUTHOR_DISPATCH_SNAPSHOT_SCHEMA
+            or not isinstance(snapshot.get("contract"), dict)
+            or snapshot.get("sha256") != digest(snapshot["contract"])):
+        raise ValueError("Frozen author dispatch contract digest or schema mismatch")
+    contract = _validate_author_dispatch_contract(snapshot["contract"])
+    if scene_contract is not None and snapshot != freeze_author_dispatch_contract(scene_contract):
+        raise ValueError("Author dispatch contract differs from its complete frozen source")
+    return contract
+
+
+def render_author_dispatch_contract(snapshot):
+    validate_author_dispatch_contract(snapshot)
+    return AUTHOR_PROMPT_START + canonical(snapshot) + AUTHOR_PROMPT_END

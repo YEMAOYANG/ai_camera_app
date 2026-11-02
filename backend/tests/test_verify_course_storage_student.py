@@ -17,7 +17,7 @@ class FakeGateway:
         self.identity, self.release, self.signer = identity, release, signer
         self.cookies, self.paths, self.requests = {}, [], 0
         self.closed = False
-        self.invalid_audio = False
+        self.invalid_audio_index = None
         self.expose_answer = False
 
     def get(self, path, *, limit):
@@ -41,8 +41,10 @@ class FakeGateway:
             body = {'success': True, 'classroom': {'id': cid, 'stage': {'id': cid, 'fixedTextbook': True},
                     'scenes': [{'id': 'scene', 'type': 'quiz', 'content': {'questions': [question]}}]}}
             return 200, {'content-type': 'application/json'}, verification.json_bytes(body)
-        if path == self.release['media'][0]['path']:
-            return 200, {'content-type': 'audio/wav'}, b'broken' if self.invalid_audio else b'fixture-audio'
+        for index, media in enumerate(self.release['media']):
+            if path == media['path']:
+                raw = b'broken' if self.invalid_audio_index == index else media['_fixtureBytes']
+                return 200, {'content-type': media['mimeType']}, raw
         raise AssertionError('unexpected read')
 
     def close(self):
@@ -59,7 +61,8 @@ class VerifyCourseStorageStudentTests(unittest.TestCase):
                         'classroom': {'scenes': [{'id': 'scene'}]},
                         'media': [{'path': '/api/classroom-media/' + cid + '/audio/one.wav',
                                    'mimeType': 'audio/wav', 'byteSize': len(b'fixture-audio'),
-                                   'sha256': hashlib.sha256(b'fixture-audio').hexdigest()}]}
+                                   'sha256': hashlib.sha256(b'fixture-audio').hexdigest(),
+                                   '_fixtureBytes': b'fixture-audio'}]}
         self.signer = URLSafeTimedSerializer('isolated-fixture', salt='mira-fixed-textbook-runtime-v1',
                                             signer_kwargs={'digest_method': hashlib.sha256})
         self.gateway = FakeGateway(self.identity, self.release, self.signer)
@@ -77,6 +80,9 @@ class VerifyCourseStorageStudentTests(unittest.TestCase):
         result = self.verify()
         self.assertTrue(result['ok'])
         self.assertEqual(result['gatewayReads'], 5)
+        self.assertEqual(result['audioVerifiedCount'], 1)
+        self.assertEqual(result['audioVerifiedBytes'], len(b'fixture-audio'))
+        self.assertRegex(result['audioVerifiedManifestSha256'], r'^[a-f0-9]{64}$')
         self.assertEqual(result['guardAuditAppends'], 6)
         self.assertEqual(result['businessTablesUnchanged'], 1)
         self.assertEqual(self.gateway.authority['studentSession'], self.identity['student_session_id'])
@@ -90,6 +96,7 @@ class VerifyCourseStorageStudentTests(unittest.TestCase):
         self.assertNotIn('tbpr_', public)
         self.assertNotIn(self.identity['student_session_id'], public)
         self.assertNotIn(self.identity['learning_session_id'], public)
+        self.assertNotIn(self.release['media'][0]['path'], public)
         self.assertEqual(result['learningEventsSubmitted'], 0)
         self.assertEqual(result['providerCalls'], 0)
 
@@ -105,11 +112,79 @@ class VerifyCourseStorageStudentTests(unittest.TestCase):
             self.verify()
 
     def test_bad_audio_still_clears_cookies_and_checks_business_rows(self):
-        self.gateway.invalid_audio = True
+        self.gateway.invalid_audio_index = 0
         with self.assertRaisesRegex(verification.StudentVerificationError, 'audio_hash_mismatch'):
             self.verify()
         self.assertFalse(self.gateway.cookies)
         self.assertEqual(self.snapshot.call_count, 2)
+
+    def test_every_audio_is_read_and_aggregated(self):
+        second = b'fixture-mp3'
+        self.release['media'].append({'path': '/api/classroom-media/' + self.release['classroomId']
+            + '/audio/two.mp3', 'mimeType': 'audio/mpeg', 'byteSize': len(second),
+            'sha256': hashlib.sha256(second).hexdigest(), '_fixtureBytes': second})
+        result = self.verify()
+        self.assertEqual(result['audioVerifiedCount'], 2)
+        self.assertEqual(result['audioVerifiedBytes'], len(b'fixture-audio') + len(second))
+        self.assertEqual(result['gatewayReads'], 6)
+        self.assertEqual(self.gateway.paths[-2:], [m['path'] for m in self.release['media']])
+        public = json.dumps(result)
+        self.assertNotIn(self.release['media'][0]['path'], public)
+        self.assertNotIn(self.release['media'][1]['path'], public)
+
+    def test_later_audio_hash_failure_closes_gateway_and_checks_database(self):
+        second = b'fixture-second'
+        self.release['media'].append({'path': '/api/classroom-media/' + self.release['classroomId']
+            + '/audio/two.wav', 'mimeType': 'audio/wav', 'byteSize': len(second),
+            'sha256': hashlib.sha256(second).hexdigest(), '_fixtureBytes': second})
+        self.gateway.invalid_audio_index = 1
+        with self.assertRaisesRegex(verification.StudentVerificationError, 'audio_hash_mismatch'):
+            self.verify()
+        self.assertTrue(self.gateway.closed)
+        self.assertFalse(self.gateway.cookies)
+        self.assertEqual(self.snapshot.call_count, 2)
+
+    def test_audio_manifest_rejects_duplicates_invalid_bindings_and_bounds(self):
+        base = self.release['media'][0]
+        cases = {
+            'duplicate': {**base},
+            'mime-extension': {**base, 'path': base['path'].replace('.wav', '.mp3')},
+            'bad-sha': {**base, 'path': base['path'].replace('one.wav', 'bad.wav'), 'sha256': 'bad'},
+            'bad-size': {**base, 'path': base['path'].replace('one.wav', 'large.wav'),
+                         'byteSize': verification.MAX_AUDIO_BYTES + 1},
+            'wrong-classroom': {**base, 'path': base['path'].replace(self.release['classroomId'], 'tbpub_wrong')},
+        }
+        for label, invalid in cases.items():
+            with self.subTest(label=label):
+                release = deepcopy(self.release)
+                release['media'].append(invalid)
+                gateway = FakeGateway(self.identity, release, self.signer)
+                with self.assertRaisesRegex(verification.StudentVerificationError,
+                                             'bound_audio_manifest_invalid'):
+                    verification.verify_student_entry(database=object(), identity=self.identity, release=release,
+                        signer=self.signer, gateway=gateway, snapshot=self.snapshot)
+                self.assertTrue(gateway.closed)
+
+        release = deepcopy(self.release)
+        release['media'] = [{**base,
+            'path': '/api/classroom-media/' + self.release['classroomId'] + '/audio/a' + str(index) + '.wav'}
+            for index in range(verification.MAX_AUDIO_FILES + 1)]
+        gateway = FakeGateway(self.identity, release, self.signer)
+        with self.assertRaisesRegex(verification.StudentVerificationError, 'bound_audio_manifest_invalid'):
+            verification.verify_student_entry(database=object(), identity=self.identity, release=release,
+                signer=self.signer, gateway=gateway, snapshot=self.snapshot)
+        self.assertTrue(gateway.closed)
+
+        release = deepcopy(self.release)
+        release['media'] = [{**base,
+            'path': '/api/classroom-media/' + self.release['classroomId'] + '/audio/b' + str(index) + '.wav',
+            'byteSize': verification.MAX_AUDIO_BYTES}
+            for index in range(verification.MAX_TOTAL_AUDIO_BYTES // verification.MAX_AUDIO_BYTES + 1)]
+        gateway = FakeGateway(self.identity, release, self.signer)
+        with self.assertRaisesRegex(verification.StudentVerificationError, 'bound_audio_manifest_invalid'):
+            verification.verify_student_entry(database=object(), identity=self.identity, release=release,
+                signer=self.signer, gateway=gateway, snapshot=self.snapshot)
+        self.assertTrue(gateway.closed)
 
     def test_private_quiz_answers_fail_acceptance(self):
         self.gateway.expose_answer = True

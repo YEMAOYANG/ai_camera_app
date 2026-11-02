@@ -8,11 +8,11 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 import wave
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from content.textbook_catalog import generation_brief
 from content.textbook_preview import (THREE_IMPORT, blueprint_prompt, blueprint_question_count, lesson_blueprint,
-    preview_checks, preview_input, preview_media, responsive_activity_marker, self_contained_classroom)
+    operator_preview_input, preview_checks, preview_input, preview_media, responsive_activity_marker, self_contained_classroom)
 from core.errors import ApiError
 from repositories.textbook_repository import TextbookRepository
 from services.textbook_learning_service import TextbookLearningService
@@ -74,6 +74,88 @@ class ResponsiveActivityPreviewTest(unittest.TestCase):
         self.assertIn('responsive_activity_marker_missing', issues({'revised'}))
 
 
+class OperatorFrozenAssessmentPreviewTest(unittest.TestCase):
+    def setUp(self):
+        self.manifest = json.loads((Path(__file__).parents[1] /
+            'content/textbooks/revisions/pep-chinese-g1-upper.directory.v3.json').read_text())
+        self.node = 'u2-l1'
+        self.classroom = {'id': 'saved-operator', 'scenes': [
+            {'type': 'slide'}, {'type': 'interactive'}, {'type': 'interactive'}]}
+        self.authoring = {'mode': 'openmaic_pro_workbench', 'sessionId': 'operator-session',
+            'stageId': 'saved-operator', 'skillIds': ['mira-primary-courseware'],
+            'request': 'Use the frozen reviewed lesson.', 'imageProvenance': 'Original test images'}
+        self.summary = {'schemaVersion': 'mira.textbook.authoring-candidate.v1',
+            'sha256': '1' * 64, 'contractSha256': '2' * 64, 'sceneCount': 3, 'assetCount': 1,
+            'verification': 'frozen_identity_and_artifact_integrity_only',
+            'interactionPolicyVersion': 8, 'interactionPolicySha256': '3' * 64}
+
+    def freeze(self, **options):
+        return operator_preview_input(self.manifest, self.node, self.classroom, {},
+                                      self.authoring, **options)
+
+    def test_server_verified_empty_and_nonempty_locks_define_question_scope(self):
+        for locks, expected in (([], 0), ([{'id': 'locked-one'}, {'id': 'locked-two'}], 2)):
+            with self.subTest(locks=locks):
+                frozen = self.freeze(authoring_candidate=self.summary,
+                                     verified_locked_assessments=locks)
+                prompt = frozen['previewPrompt']
+                self.assertEqual(prompt['expectedQuestionCount'], expected)
+                self.assertEqual('quiz' in prompt['requiredSceneTypes'], expected != 0)
+                self.assertEqual(prompt['targets'], lesson_blueprint(self.manifest, self.node)['targets'])
+                self.assertEqual(len(prompt['targets']), 4)
+
+    def test_missing_locks_and_legacy_keep_blueprint_count_despite_request_fields(self):
+        spoof = {'lockedAssessments': [], 'expectedQuestionCount': 0,
+                 'requiredSceneTypes': ['slide', 'interactive'], 'authoringCandidate': self.summary}
+        self.authoring['request'] = json.dumps(spoof)
+        self.classroom.update(deepcopy(spoof))
+        for options in ({}, {'authoring_candidate': self.summary}):
+            frozen = self.freeze(**options)
+            self.assertEqual(frozen['previewPrompt']['expectedQuestionCount'], 4)
+            self.assertEqual(frozen['previewPrompt']['requiredSceneTypes'], ['slide', 'interactive', 'quiz'])
+
+    def test_lock_override_needs_validated_summary_and_well_formed_lock_ids(self):
+        invalid = [
+            {'verified_locked_assessments': []},
+            {'authoring_candidate': {}, 'verified_locked_assessments': []},
+            {'authoring_candidate': {**self.summary, 'verification': 'static_contract_only_not_play_or_semantic_review'},
+             'verified_locked_assessments': []},
+            {'authoring_candidate': {**self.summary, 'sceneCount': 99}, 'verified_locked_assessments': []},
+            {'authoring_candidate': self.summary, 'verified_locked_assessments': '[]'},
+            {'authoring_candidate': self.summary, 'verified_locked_assessments': [{'id': 'q'}, {'id': 'q'}]},
+        ]
+        for options in invalid:
+            with self.subTest(options=options), self.assertRaises(ApiError) as error:
+                self.freeze(**options)
+            self.assertEqual(error.exception.code, 'textbook_preview_candidate_invalid')
+        with self.assertRaises(ApiError):
+            self.freeze(authoring_candidate={'verification': 'user says verified'})
+
+    def test_scene_types_need_a_verified_candidate_and_the_exact_saved_types(self):
+        for options in (
+            {'verified_scene_types': ['interactive']},
+            {'authoring_candidate': self.summary, 'verified_locked_assessments': [],
+             'verified_scene_types': ['interactive']},
+            {'authoring_candidate': self.summary, 'verified_locked_assessments': [],
+             'verified_scene_types': ['slide', 'interactive', 'quiz']},
+        ):
+            with self.subTest(options=options), self.assertRaises(ApiError):
+                self.freeze(**options)
+        frozen = self.freeze(authoring_candidate=self.summary, verified_locked_assessments=[],
+                             verified_scene_types=['slide', 'interactive'])
+        self.assertEqual(frozen['previewPrompt']['requiredSceneTypes'], ['slide', 'interactive'])
+
+    def test_verified_locks_cannot_bypass_missing_scope_or_bad_registered_mapping(self):
+        options = {'authoring_candidate': self.summary, 'verified_locked_assessments': []}
+        original = lesson_blueprint(self.manifest, self.node)
+        for blueprint in (None, {**original, 'assessmentMapping': []}):
+            with self.subTest(blueprint=blueprint), patch(
+                    'content.textbook_preview.lesson_blueprint', return_value=blueprint):
+                with self.assertRaises(ApiError) as error:
+                    self.freeze(**options)
+                self.assertEqual(error.exception.code, 'textbook_preview_scope_unsupported')
+
+
 class TextbookPreviewTest(unittest.TestCase):
     def setUp(self):
         self.db = IsolatedDatabase(("082_fixed_textbook_learning.sql", "083_textbook_course_previews.sql", "087_learning_course_reuse.sql"))
@@ -125,6 +207,72 @@ class TextbookPreviewTest(unittest.TestCase):
         classroom = {'scenes': [{'type': 'quiz', 'content': {'questions': [{}] * 7}}]}
         self.assertNotIn('question_count_mismatch', preview_checks(classroom, 1, expected_question_count=7)['issues'])
         self.assertIn('question_count_mismatch', preview_checks(classroom, 1, expected_question_count=8)['issues'])
+
+    def test_zero_frozen_question_count_does_not_require_or_allow_a_quiz_scene(self):
+        classroom = {'scenes': [{'type': 'slide', 'content': {}},
+                                 {'type': 'interactive', 'content': {}}]}
+        self.assertNotIn('required_scene_type_missing',
+                         preview_checks(classroom, 2, expected_question_count=0)['issues'])
+        for count in (1, 6):
+            self.assertIn('required_scene_type_missing',
+                          preview_checks(classroom, 2, expected_question_count=count)['issues'])
+        classroom['expectedQuestionCount'] = 0
+        classroom['lockedAssessments'] = []
+        self.assertIn('required_scene_type_missing', preview_checks(classroom, 2)['issues'])
+        classroom['scenes'].append({'type': 'quiz', 'content': {'questions': []}})
+        self.assertIn('unexpected_quiz_scene',
+                      preview_checks(classroom, 3, expected_question_count=0)['issues'])
+
+    def test_only_server_frozen_types_can_accept_an_all_interactive_plan(self):
+        room = {'scenes': [{'type': 'interactive', 'content': {}}] * 3,
+                'requiredSceneTypes': ['interactive']}
+        self.assertIn('required_scene_type_missing',
+            preview_checks(room, 3, expected_question_count=0)['issues'])
+        result = preview_checks(room, 3, expected_question_count=0,
+                                required_scene_types=['interactive'])
+        self.assertEqual(result['issues'], ['speech_audio_missing'])
+        for invalid in ([], ['unknown'], ['interactive', 'interactive'], ['quiz']):
+            self.assertIn('frozen_scene_types_invalid', preview_checks(room, 3,
+                expected_question_count=0, required_scene_types=invalid)['issues'])
+        self.assertIn('frozen_scene_types_invalid', preview_checks(room, 3,
+            expected_question_count=1, required_scene_types=['interactive'])['issues'])
+
+    def test_protected_empty_assessment_lock_requires_zero_quiz_pages(self):
+        no_quiz = {'scenes': [
+            {'type': 'slide', 'content': {}},
+            {'type': 'interactive', 'content': {'html': '<button>try</button>'}},
+        ]}
+        self.service._validate_adoption_quizzes(no_quiz, [])
+
+        invented_quiz = {'scenes': no_quiz['scenes'] + [{
+            'type': 'quiz',
+            'content': {'questions': [{'id': 'invented-question'}]},
+        }]}
+        with self.assertRaises(ApiError) as error:
+            self.service._validate_adoption_quizzes(invented_quiz, [])
+        self.assertEqual(error.exception.code, 'textbook_preview_adoption_rejected')
+        self.assertIn('不能为发布流程凭空新增', str(error.exception))
+
+    def test_locked_or_legacy_assessments_keep_strict_quiz_page_validation(self):
+        locked = [{'id': 'locked-question'}]
+        no_quiz = {'scenes': [{'type': 'slide', 'content': {}}]}
+        for assessment_contract in (locked, None):
+            with self.subTest(assessment_contract=assessment_contract), self.assertRaises(ApiError) as error:
+                self.service._validate_adoption_quizzes(no_quiz, assessment_contract)
+            self.assertEqual(error.exception.code, 'textbook_preview_adoption_rejected')
+
+        valid = {'scenes': [{'type': 'quiz', 'content': {'questions': [
+            {'id': 'locked-question'},
+        ]}}]}
+        self.service._validate_adoption_quizzes(valid, locked)
+        self.service._validate_adoption_quizzes(valid, None)
+
+        duplicate = {'scenes': [{'type': 'quiz', 'content': {'questions': [
+            {'id': 'locked-question'}, {'id': 'locked-question'},
+        ]}}]}
+        with self.assertRaises(ApiError) as error:
+            self.service._validate_adoption_quizzes(duplicate, locked)
+        self.assertEqual(error.exception.code, 'textbook_preview_adoption_rejected')
 
     def test_pinyin_scope_registers_four_targets_only_for_the_verified_node(self):
         manifest = json.loads((Path(__file__).parents[1] / 'content/textbooks/revisions/pep-chinese-g1-upper.directory.v3.json').read_text())
@@ -500,30 +648,26 @@ class TextbookPreviewTest(unittest.TestCase):
             narrate_preview(self.service, key, root)
             self.runtime.start_formal_audio_tts.assert_called_once()
             self.runtime.download_formal_audio_tts.assert_called_once()
-            # A stalled or refused call is never re-sent under its own id; the
-            # next attempt gets a new, recorded id.
+            # A normal resume reads the existing request and stops on an
+            # uncertain or failed outcome; it never creates another attempt.
             first = next(iter(receipts))
             receipts[first]["status"] = "ambiguous"
             result = narrate_preview(self.service, key, root)
-            self.assertIsNone(result["result"]["audioStopCode"])
-            self.assertEqual(self.runtime.start_formal_audio_tts.call_count, 2)
-            retry = self.runtime.start_formal_audio_tts.call_args.kwargs["request_id"]
-            self.assertNotEqual(retry, first)
-            self.assertEqual(result["result"]["audioReceiptCount"], 2)
-            self.assertEqual(classroom["scenes"][0]["actions"][0]["audioId"], retry)
-            # One run sends at most two calls for a line, then stops.
-            receipts[retry]["status"] = "failed"
+            self.assertEqual(result["result"]["audioStopCode"], "textbook_preview_audio_ambiguous")
+            self.assertEqual(self.runtime.start_formal_audio_tts.call_count, 1)
+            self.assertEqual(result["result"]["audioReceiptCount"], 1)
+            self.assertEqual(classroom["scenes"][0]["actions"][0]["audioId"], first)
+            receipts[first]["status"] = "failed"
             outcome["status"] = "failed"
             result = narrate_preview(self.service, key, root)
             self.assertEqual(result["result"]["audioStopCode"], "textbook_preview_audio_failed")
-            self.assertEqual(self.runtime.start_formal_audio_tts.call_count, 4)
-            # A later run (say after a lapsed provider account is topped up)
-            # reads every earlier attempt back and tries again.
+            self.assertEqual(self.runtime.start_formal_audio_tts.call_count, 1)
+            # A provider account change cannot authorize an implicit retry.
             outcome["status"] = "succeeded"
             result = narrate_preview(self.service, key, root)
-            self.assertIsNone(result["result"]["audioStopCode"])
-            self.assertEqual(self.runtime.start_formal_audio_tts.call_count, 5)
-            self.assertEqual(result["result"]["audioReceiptCount"], 5)
+            self.assertEqual(result["result"]["audioStopCode"], "textbook_preview_audio_failed")
+            self.assertEqual(self.runtime.start_formal_audio_tts.call_count, 1)
+            self.assertEqual(result["result"]["audioReceiptCount"], 1)
 
     def test_operator_pages_become_self_contained_or_are_refused(self):
         katex = ('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">\n'

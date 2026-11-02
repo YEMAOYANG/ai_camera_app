@@ -325,18 +325,46 @@ class ProfileRepository:
         )
         return self.get_family_member(conn, family_id=family_id, member_id=member_id)
 
-    def find_sms_code(self, conn: DatabaseConnection, phone: str, *, for_update: bool = False) -> DatabaseRow | None:
-        return conn.execute("SELECT * FROM sms_codes WHERE phone = ?" + (" FOR UPDATE" if for_update else ""),
-                            (phone,)).fetchone()
+    def find_sms_code(
+        self,
+        conn: DatabaseConnection,
+        phone: str,
+        *,
+        purpose: str,
+        for_update: bool = False,
+    ) -> DatabaseRow | None:
+        return conn.execute(
+            "SELECT * FROM sms_codes WHERE phone = ? AND purpose = ?"
+            + (" FOR UPDATE" if for_update else ""),
+            (phone, purpose),
+        ).fetchone()
 
-    def increment_sms_attempts(self, conn: DatabaseConnection, phone: str) -> None:
+    def increment_sms_attempts(
+        self,
+        conn: DatabaseConnection,
+        phone: str,
+        *,
+        purpose: str,
+    ) -> None:
         conn.execute(
-            "UPDATE sms_codes SET attempt_count = attempt_count + 1 WHERE phone = ?",
-            (phone,),
+            """
+            UPDATE sms_codes SET attempt_count = attempt_count + 1
+            WHERE phone = ? AND purpose = ?
+            """,
+            (phone, purpose),
         )
 
-    def delete_sms_code(self, conn: DatabaseConnection, phone: str) -> None:
-        conn.execute("DELETE FROM sms_codes WHERE phone = ?", (phone,))
+    def delete_sms_code(
+        self,
+        conn: DatabaseConnection,
+        phone: str,
+        *,
+        purpose: str,
+    ) -> None:
+        conn.execute(
+            "DELETE FROM sms_codes WHERE phone = ? AND purpose = ?",
+            (phone, purpose),
+        )
 
     def list_family_members(self, conn: DatabaseConnection, *, family_id: str) -> list[DatabaseRow]:
         return list(

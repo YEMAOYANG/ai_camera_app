@@ -51,15 +51,18 @@ class PublicationRegistryRaceTest(unittest.TestCase):
         self.repository = Mock()
         self.repository.transaction.side_effect = self.business_transaction
         self.repository.get_revision.return_value = {'manifest_sha256': 'c' * 64}
+        self.repository.get_build.return_value = None
         self.repository.reserve_build.return_value = ({'id': 'build-fixture'}, False)
         self.repository.bind_published.return_value = True
         self.prepared = {'frozen': {'previewKey': 'fixture-preview', 'sourceSha256': digest(self.source),
             'contentKey': 'd' * 64, 'textbookBinding': {'editionId': 'edition', 'alignmentRevisionId': 'revision',
                 'alignmentManifestSha256': 'c' * 64}},
             'course': {'id': 'course-fixture', 'version': 'v1', 'content_json': '{"approved":true}'},
+            'sourceClassroomPath': str(self.root / self.source_path),
             'review': {}, 'manifest': {}, 'release': {'classroomId': 'tbpub_fixture', 'classroom': {'scenes': []},
                 'audioAudit': {'segments': 0}, 'sha256': 'e' * 64}}
-        self.service = TextbookPublicationService(SimpleNamespacePreview(self.repository), course_media_store=Mock(), course_file_store=self.store)
+        self.service = TextbookPublicationService(SimpleNamespacePreview(self.repository), course_media_store=Mock(),
+                                                  course_file_store=self.store, cover_guard=lambda *_a, **_k: None)
         self.opener = Mock()
         self.opener.open.side_effect = self.remote
         self.patchers = [patch('services.course_file_store.build_opener', return_value=self.opener),
@@ -121,6 +124,17 @@ class PublicationRegistryRaceTest(unittest.TestCase):
         self.assertTrue(any('course_storage_heads' in s for s in self.database.statements))
         self.assertFalse(any('FOR UPDATE' in s for s in self.database.statements))
         self.repository.reserve_build.assert_called_once()
+
+    def test_missing_cover_refuses_a_new_publication_before_database_writes(self):
+        self.service.cover_guard = Mock(side_effect=ApiError('textbook_cover_unavailable', '封面不可用', 409))
+        self.assert_refused()
+        self.service.cover_guard.assert_called_once()
+
+    def test_idempotent_historical_publication_does_not_require_a_retroactive_cover(self):
+        self.repository.get_build.return_value = {'status': 'published'}
+        self.service.cover_guard = Mock(side_effect=AssertionError('historical release must remain idempotent'))
+        self.assertTrue(self.service.publish(self.prepared)['ok'])
+        self.service.cover_guard.assert_not_called()
 
     def test_remote_head_committed_before_sql_snapshot_update_refuses_publication(self):
         changed = deepcopy(self.source)

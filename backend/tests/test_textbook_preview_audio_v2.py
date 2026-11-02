@@ -337,6 +337,27 @@ class PreviewAudioV2Tests(unittest.TestCase):
         self.assertEqual(len(json.loads((f.folder / 'receipts.json').read_text())), 1)
         f.runtime.download_formal_audio_tts.assert_not_called()
 
+    def test_default_full_run_stops_failed_or_uncertain_request_without_changing_id(self):
+        for status in ('failed', 'ambiguous', 'running'):
+            with self.subTest(status=status):
+                f = self.unnarrated()
+                f.runtime.start_formal_audio_tts.side_effect = lambda **kw: {
+                    'requestId': kw['request_id'], 'status': status, 'audioSha256': None}
+                result = narrate_preview(f.service, f.key, f.root)
+                request = f.runtime.start_formal_audio_tts.call_args.kwargs['request_id']
+                self.assertEqual(result['result']['audioStopCode'], 'textbook_preview_audio_' + status)
+                self.assertEqual(result['result']['audioCompleted'], 0)
+                self.assertEqual(f.runtime.start_formal_audio_tts.call_count, 1)
+                receipts = json.loads((f.folder / 'receipts.json').read_text())
+                self.assertEqual(receipts, [{'requestId': request, 'status': status, 'audioSha256': None}])
+                f.runtime.download_formal_audio_tts.assert_not_called()
+                # Even when GET has no record, the durable claim forbids POST.
+                again = narrate_preview(f.service, f.key, f.root)
+                self.assertEqual(again['result']['audioStopCode'], 'textbook_preview_audio_' + status)
+                self.assertEqual(f.runtime.start_formal_audio_tts.call_count, 1)
+                self.assertEqual(f.runtime.get_formal_audio_tts.call_args.args[0], request)
+                self.assertEqual(json.loads((f.folder / 'receipts.json').read_text()), receipts)
+
     def test_explicit_recorded_failure_retry_dispatches_only_attempt_two_and_stops(self):
         f, selection, plan, fences = self.recorded_retry()
         audio = next((f.root / f.cid / 'audio').glob('*.wav')).read_bytes()
@@ -502,6 +523,78 @@ class PreviewAudioV2Tests(unittest.TestCase):
         self.assertEqual(json.loads(f.service.get(f.key)['result_json'])['audioReceipts'][0]['status'], 'succeeded')
         self.assertEqual(f.runtime.start_formal_audio_tts.call_count, 1)
         self.assertEqual(f.runtime.download_formal_audio_tts.call_count, 1)
+
+    def test_success_before_unknown_checkpoint_recovers_interrupted_receipt_save_without_tts(self):
+        f = self.unnarrated()
+        selection = self.selection(f, 0)
+        receipts_path = f.folder / 'receipts.json'
+        write = audio_service.atomic_json
+        def fail_success_save(path, value):
+            if path.resolve() == receipts_path.resolve() and value and value[0].get('status') == 'succeeded':
+                raise OSError('simulated local receipt save interruption')
+            return write(path, value)
+        with patch.object(audio_service, 'atomic_json', side_effect=fail_success_save):
+            stopped = narrate_preview(f.service, f.key, f.root, speech_selection=selection)
+        self.assertEqual(stopped['result']['audioStopCode'], 'textbook_preview_audio_invalid')
+        success = json.loads(f.service.get(f.key)['result_json'])['audioReceipts'][0]
+        self.assertEqual(success['status'], 'succeeded')
+        self.assertNotIn('durationSeconds', success)
+        checkpoint = receipts_path.read_bytes()
+        self.assertEqual(json.loads(checkpoint)[0]['status'], 'unknown')
+        request = success['requestId']
+        self.assertFalse((f.root / f.cid / 'audio' / (request + '.wav')).exists())
+        self.assertEqual(f.runtime.start_formal_audio_tts.call_count, 1)
+        f.runtime.download_formal_audio_tts.assert_not_called()
+        authority = deepcopy(f.provider_receipts[request])
+        for changed in ({**authority, 'audioSha256': '0' * 64},
+                        {**authority, 'status': 'running'},
+                        {**authority, 'requestId': 'another-request'}):
+            with self.subTest(authority=changed):
+                f.runtime.get_formal_audio_tts.side_effect = lambda _, value=changed: deepcopy(value)
+                with self.assertRaises(ApiError) as error:
+                    narrate_preview(f.service, f.key, f.root, speech_selection=selection)
+                self.assertEqual(error.exception.code, 'textbook_preview_audio_conflict')
+                self.assertEqual(receipts_path.read_bytes(), checkpoint)
+                self.assertEqual(f.runtime.start_formal_audio_tts.call_count, 1)
+        f.runtime.get_formal_audio_tts.side_effect = lambda _: deepcopy(authority)
+        recovered = narrate_preview(f.service, f.key, f.root, speech_selection=selection)
+        self.assertEqual(recovered['result']['audioCompleted'], 1)
+        self.assertIsNone(recovered['result']['audioStopCode'])
+        recovered_receipt = json.loads(f.service.get(f.key)['result_json'])['audioReceipts'][0]
+        self.assertEqual(recovered_receipt['requestId'], request)
+        self.assertGreater(recovered_receipt['durationSeconds'], 0)
+        self.assertEqual(f.runtime.start_formal_audio_tts.call_count, 1)
+        self.assertEqual(f.runtime.download_formal_audio_tts.call_count, 1)
+
+    def test_receipt_merge_preserves_success_and_sources_in_both_orders(self):
+        f = self.unnarrated()
+        narrate_preview(f.service, f.key, f.root, speech_selection=self.selection(f, 0))
+        success = json.loads(f.service.get(f.key)['result_json'])['audioReceipts'][0]
+        unknown = {'requestId': success['requestId'], 'status': 'unknown', 'audioSha256': None}
+        plan = json.loads((f.folder / 'plan.json').read_text())
+        f.runtime.start_formal_audio_tts.reset_mock()
+        confirm = lambda old, new: audio_service.confirmed_success_transition(
+            plan, old, new, f.runtime, f.classroom)
+        for sources in (([success], [unknown]), ([unknown], [success])):
+            with self.subTest(order=[source[0]['status'] for source in sources]):
+                before = deepcopy(sources)
+                merged = audio_service.preserved_receipts(plan, *sources, confirm_transition=confirm)
+                self.assertEqual(merged, {success['requestId']: success})
+                self.assertEqual(sources, before)
+        with_extra = {**unknown, 'unverifiedCheckpointOnly': 'must not be imported'}
+        merged = audio_service.preserved_receipts(plan, [success], [with_extra], confirm_transition=confirm)
+        self.assertEqual(merged, {success['requestId']: success})
+        for changed in ({**success, 'audioSha256': '0' * 64},
+                        {**success, 'previewAudioIdentity': {'planSha256': '0' * 64, 'attempt': 1}},
+                        {**success, 'previewAudioIdentity': {'planSha256': digest(plan), 'attempt': 2}}):
+            with self.subTest(changed=changed), self.assertRaises(ApiError):
+                audio_service.preserved_receipts(plan, [changed], [unknown], confirm_transition=confirm)
+        for terminal in ('failed', 'succeeded'):
+            changed = {**unknown, 'status': terminal, 'audioSha256': '0' * 64}
+            for sources in (([success], [changed]), ([changed], [success])):
+                with self.subTest(terminal=terminal, sources=sources), self.assertRaises(ApiError):
+                    audio_service.preserved_receipts(plan, *sources, confirm_transition=confirm)
+        f.runtime.start_formal_audio_tts.assert_not_called()
 
     def test_completed_binding_recovers_lost_save_response_or_db_write_without_tts(self):
         for boundary in ('response', 'database'):

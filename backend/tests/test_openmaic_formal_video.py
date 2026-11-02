@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+import os
 import re
 import sqlite3
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from integrations.openmaic_formal_media import (
     LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY, INTEGRATED_PROFESSIONAL_POLICY,
-    PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, canonical_sha256, generation_options,
+    PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
+    QWEN3_PLAYFUL_PROFESSIONAL_POLICY, canonical_sha256, generation_options,
     professional_policy, validate_media_manifest,
 )
 from integrations.openmaic_formal_video import (
@@ -66,7 +68,8 @@ def _asset():
 
 class OpenMaicFormalVideoTest(unittest.TestCase):
     def test_exact_default_policy_preserves_all_four_historical_options(self):
-        self.assertEqual(OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_CREATION_POLICY, PLAYFUL_PROFESSIONAL_POLICY)
+        self.assertEqual(OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_CREATION_POLICY,
+                         QWEN3_PLAYFUL_PROFESSIONAL_POLICY)
         self.assertEqual(OpenMaicFullRuntimeClient.FORMAL_GENERATION_POLICY["professionalCreation"]["video"], FORMAL_VIDEO_POLICY)
         self.assertIn("scene-actions", OpenMaicFullRuntimeClient.SAMPLE_STRUCTURED_SCENE_POLICY["stages"])
         for policy in (LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY, INTEGRATED_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY):
@@ -108,23 +111,25 @@ class OpenMaicFormalVideoTest(unittest.TestCase):
         options = dict(requirement="offline", enable_web_search=True, enable_image_generation=True,
             enable_tts=False, agent_mode="generate", runtime_request_id="request-1",
             formal_runtime_contract=client.FORMAL_RUNTIME_CLASSROOM_CONTRACT)
-        for policy in (PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY):
-            client.start_generation(**options, enable_video_generation="video" in policy, professional_creation_policy=policy)
-            body = client._request_json.call_args.args[2]
-            self.assertEqual(body["professionalCreationPolicy"], policy)
-            self.assertIs(body["enableVideoGeneration"], "video" in policy)
-            with self.assertRaises(OpenMaicFullRuntimeError):
-                client.start_generation(**options, enable_video_generation="video" not in policy, professional_creation_policy=policy)
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": ""}):
+            for policy in (PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY):
+                client.start_generation(**options, enable_video_generation="video" in policy, professional_creation_policy=policy)
+                body = client._request_json.call_args.args[2]
+                self.assertEqual(body["professionalCreationPolicy"], policy)
+                self.assertIs(body["enableVideoGeneration"], "video" in policy)
+                with self.assertRaises(OpenMaicFullRuntimeError):
+                    client.start_generation(**options, enable_video_generation="video" not in policy, professional_creation_policy=policy)
         self.assertEqual(client._request_json.call_count, 2)
 
     def test_health_requires_the_exact_bounded_video_contract(self):
         client = OpenMaicFullRuntimeClient("http://127.0.0.1:3100")
         healthy = {"success": True, "status": "ok", "version": client.FORMAL_RUNTIME_VERSION,
             "capabilities": {"formalGeneration": True, "professionalAgent": True, "webSearch": True, "speechAudioGeneration": True},
-            "runtimePolicy": {"formalGeneration": deepcopy(client.FORMAL_GENERATION_POLICY),
+            "runtimePolicy": {"formalGeneration": deepcopy(client.selected_formal_generation_policy()),
+                "formalGenerationSupportedProfessionalPolicies": [deepcopy(client.selected_professional_creation_policy())],
                 "webSearch": {"schemaVersion":"mira.openmaic.web-search-production-config.v1","providerId":"brave","productionMode":"brave_api","formalProductionConfigured":True,"verification":"configuration_only"},
                 "professionalResearch": deepcopy(client.FORMAL_PROFESSIONAL_RESEARCH_POLICY),
-                "modelPolicy": deepcopy(client.FORMAL_PROFESSIONAL_MODEL_POLICY)}}
+                "modelPolicy": deepcopy(client.selected_professional_model_policy())}}
         client._request_json = Mock(return_value=healthy)
         self.assertTrue(client.formal_generation_readiness()["ready"])
         client._request_json.assert_called_once_with("GET", "/api/health?scope=formal-generation")

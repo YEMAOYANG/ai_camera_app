@@ -460,12 +460,24 @@ class CourseArchiveQueueTest(unittest.TestCase):
             self.assertEqual(path.read_bytes(), before)
             self.assertEqual((self.exporter.calls, self.client.uploads), (0, 0))
             self.assertEqual(cli.main(["--once", "--include-history"]), 0)
+            exact_key = "a" * 64
+            self.exporter.catalog = [{"courseId": "exact", "courseVersion": "1",
+                "contentKey": exact_key, "sourceKind": "textbook_release",
+                "sourceDigest": "c" * 64, "releaseSha256": "c" * 64,
+                "status": "published"}]
+            self.processor.database = Mock()
+            self.assertEqual(cli.main(["--once", "--content-key", exact_key]), 0)
         self.assertTrue(instances[1].scan_history)
         instances[1]._reconcile_legacy.assert_called_once()
         instances[1]._reconcile_postgres.assert_called_once()
         self.assertEqual(self.client.stage_cursors, [""])
-        self.assertEqual((self.exporter.calls, self.client.uploads), (1, 1))
+        self.assertEqual(instances[2].content_key, exact_key)
+        self.assertFalse(instances[2].scan_history)
+        self.assertEqual((self.exporter.calls, self.client.uploads), (2, 2))
         self.assertEqual(json.loads(path.read_bytes())["status"], "complete")
+        with self.assertRaises(SystemExit) as error:
+            cli.main(["--once", "--include-history", "--content-key", exact_key])
+        self.assertEqual(error.exception.code, 2)
 
     def test_catalog_scans_saved_and_published_but_unchanged_courses_are_not_exported(self):
         self.exporter.catalog = [{"courseId": "published", "courseVersion": "1", "sourceKind": "textbook_release",
@@ -479,6 +491,100 @@ class CourseArchiveQueueTest(unittest.TestCase):
         self.assertEqual((first["completed"], first["failed"], first["discoveryErrors"]), (2, 0, 0))
         self.assertEqual(worker.run_once(limit=2)["completed"], 0)
         self.assertEqual((self.exporter.calls, self.client.uploads), (2, 2))
+
+    def test_exact_content_key_only_discovers_and_processes_current_published_release(self):
+        target_key, other_key = "a" * 64, "b" * 64
+        target = {"courseId": "target", "courseVersion": "1", "contentKey": target_key,
+            "sourceKind": "textbook_release", "sourceDigest": "c" * 64,
+            "releaseSha256": "c" * 64, "status": "published"}
+        other = {"courseId": "other", "courseVersion": "1", "contentKey": other_key,
+            "sourceKind": "textbook_release", "sourceDigest": "d" * 64,
+            "releaseSha256": "d" * 64, "status": "published"}
+        saved = {"courseId": "textbook-preview:saved", "courseVersion": "saved-1",
+            "contentKey": None, "sourceKind": "textbook_preview", "sourceDigest": "e" * 64,
+            "status": "generated_saved"}
+        self.exporter.catalog = [other, saved, target]
+        database = Mock()
+        self.processor.database = database
+
+        unrelated = self.queue.enqueue(self.pg())
+        unrelated_path = self.queue.items / (unrelated["key"] + ".json")
+        unrelated_before = unrelated_path.read_bytes()
+        self.client.rows = [{"id": "99", "source_kind": "native_pg_stage", "stage_id": "stage-one",
+            "stage_revision": "8", "source_digest": digest(encoded(self.snapshot)),
+            "snapshot_json": self.snapshot, "created_at": "2026-10-23T01:00:00.000Z"}]
+        filesystem_path = self.fs()
+        worker = CourseArchiveWorker(self.queue, self.processor, database=database,
+                                     content_key=target_key)
+        with patch.object(worker, "_reconcile_legacy") as legacy, \
+                patch.object(worker, "_reconcile_postgres") as postgres:
+            result = worker.run_once(limit=10)
+
+        self.assertEqual(result, {"discovered": 1, "completed": 1, "failed": 0,
+                                  "discoveryErrors": 0})
+        self.assertEqual((self.exporter.calls, self.client.uploads), (1, 1))
+        self.assertEqual(self.client.cursors, [])
+        self.assertEqual(self.client.acks, [])
+        self.assertTrue(filesystem_path.is_file())
+        self.assertEqual(unrelated_path.read_bytes(), unrelated_before)
+        legacy.assert_not_called()
+        postgres.assert_not_called()
+        jobs = [json.loads(path.read_bytes()) for path in self.queue.items.glob("*.json")]
+        exact = [job for job in jobs if job.get("event", {}).get("course", {}).get("contentKey") == target_key]
+        self.assertEqual(len(exact), 1)
+        self.assertEqual(exact[0]["status"], "complete")
+        self.assertFalse(any(job.get("event", {}).get("course", {}).get("contentKey") == other_key
+                             for job in jobs))
+
+    def test_exact_content_key_rejects_non_published_or_ambiguous_catalog_identity(self):
+        key = "a" * 64
+        base = {"courseId": "target", "courseVersion": "1", "contentKey": key,
+            "sourceKind": "textbook_release", "sourceDigest": "c" * 64,
+            "releaseSha256": "c" * 64, "status": "generated_saved"}
+        database = Mock()
+        self.processor.database = database
+        worker = CourseArchiveWorker(self.queue, self.processor, database=database, content_key=key)
+        self.exporter.catalog = [base]
+        result = worker.run_once()
+        self.assertEqual((result["completed"], result["failed"], result["discoveryErrors"]), (0, 0, 1))
+        self.assertEqual(list(self.queue.items.glob("*.json")), [])
+        self.assertEqual((self.exporter.calls, self.client.uploads), (0, 0))
+
+        self.exporter.catalog = [{**base, "status": "published"},
+                                 {**base, "courseId": "duplicate"}]
+        result = worker.run_once()
+        self.assertEqual((result["completed"], result["failed"], result["discoveryErrors"]), (0, 0, 1))
+        self.assertEqual(list(self.queue.items.glob("*.json")), [])
+
+    def test_exact_content_key_rejects_colliding_non_target_job_before_any_queue_write(self):
+        target_key, wrong_key = "a" * 64, "b" * 64
+        shared = {"courseId": "same-course", "courseVersion": "1",
+            "sourceKind": "textbook_release", "sourceDigest": "c" * 64,
+            "releaseSha256": "c" * 64, "status": "published"}
+        wrong_event = {"origin": "catalog", "sourceKind": "textbook_release",
+            "sourceDigest": "c" * 64, "course": {**shared, "contentKey": wrong_key},
+            "createdAt": "2026-10-23T01:00:00.000Z", "priority": 2}
+        wrong = self.queue.enqueue(wrong_event)
+        path = self.queue.items / (wrong["key"] + ".json")
+        before = path.read_bytes()
+
+        self.exporter.catalog = [{**shared, "contentKey": target_key}]
+        database = Mock()
+        self.processor.database = database
+        worker = CourseArchiveWorker(self.queue, self.processor, database=database,
+                                     content_key=target_key)
+        result = worker.run_once()
+
+        self.assertEqual((result["completed"], result["failed"], result["discoveryErrors"]), (0, 0, 1))
+        self.assertEqual(path.read_bytes(), before)
+        self.assertEqual(json.loads(before)["priority"], 2)
+        self.assertEqual((self.exporter.calls, self.client.uploads), (0, 0))
+
+    def test_exact_content_key_configuration_fails_closed(self):
+        with self.assertRaisesRegex(ArchiveQueueError, "content_key_invalid"):
+            CourseArchiveWorker(self.queue, self.processor, database=Mock(), content_key="wrong")
+        with self.assertRaisesRegex(ArchiveQueueError, "requires_catalog"):
+            CourseArchiveWorker(self.queue, self.processor, content_key="a" * 64)
 
     def test_disabled_worker_never_connects_or_imports_application(self):
         from workers.course_archive_worker import main

@@ -17,6 +17,7 @@ class AuthApiTest(unittest.TestCase):
         self.assertTrue(sms.json["codeSent"])
         self.assertEqual(sms.json["provider"], "development")
         self.assertEqual(sms.json["deliveryStatus"], "delivered")
+        self.assertEqual(sms.json["retryAfterSeconds"], 60)
         self.assertRegex(sms.json["debugCode"], r"^\d{6}$")
 
         login = self.client.post(
@@ -79,6 +80,40 @@ class AuthApiTest(unittest.TestCase):
             headers={"Authorization": f"Bearer {tokens['accessToken']}"},
         )
         self.assertEqual(session.status_code, 401)
+
+    def test_trusted_proxy_hop_uses_rightmost_client_address_for_sms_limit(self):
+        app = create_app(
+            fresh_test_config(
+                TRUST_PROXY_HOPS=1,
+                SMS_HOURLY_SEND_LIMIT=10,
+                SMS_SOURCE_WINDOW_SECONDS=600,
+                SMS_SOURCE_SEND_LIMIT=1,
+            )
+        )
+        client = app.test_client()
+
+        first = client.post(
+            "/api/auth/sms/request",
+            json={"phone": "13800002031"},
+            headers={"X-Forwarded-For": "198.51.100.20, 203.0.113.8"},
+        )
+        self.assertEqual(first.status_code, 200)
+
+        # A caller-controlled, left-side value must not create a new source.
+        blocked = client.post(
+            "/api/auth/sms/request",
+            json={"phone": "13800002032"},
+            headers={"X-Forwarded-For": "198.51.100.21, 203.0.113.8"},
+        )
+        self.assertEqual(blocked.status_code, 429)
+        self.assertEqual(blocked.json["error"], "sms_source_rate_limited")
+
+        different_source = client.post(
+            "/api/auth/sms/request",
+            json={"phone": "13800002033"},
+            headers={"X-Forwarded-For": "198.51.100.21, 203.0.113.9"},
+        )
+        self.assertEqual(different_source.status_code, 200)
 
 
 if __name__ == "__main__":

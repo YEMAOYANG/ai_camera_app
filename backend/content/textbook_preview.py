@@ -295,8 +295,17 @@ def operator_media(classroom, classroom_directory, provenance):
 
 
 def operator_preview_input(manifest, node_id, classroom, media, authoring, *, teaching_revision="1",
-                           authoring_candidate=None):
-    """Freeze an operator-authored saved classroom. It is never a dispatch brief."""
+                           authoring_candidate=None, verified_locked_assessments=None,
+                           native_revision_source=None, official_review_followup=None,
+                           verified_scene_types=None):
+    """Freeze an operator-authored saved classroom. It is never a dispatch brief.
+
+    ``authoring_candidate`` and ``verified_locked_assessments`` are server-only
+    outputs of protected-candidate validation, not fields read from authoring
+    requests or classroom JSON. Missing locks retain the registered blueprint's
+    historical question count. Even protected locks cannot excuse a missing
+    scope or a malformed server-owned assessment mapping.
+    """
     manifest = validate_manifest(manifest)
     unit, lesson = lesson_by_id(manifest, node_id)
     blueprint = lesson_blueprint(manifest, node_id)
@@ -313,6 +322,37 @@ def operator_preview_input(manifest, node_id, classroom, media, authoring, *, te
     scenes = classroom.get("scenes", [])
     if not 3 <= len(scenes) <= 60:
         raise ApiError("textbook_preview_adoption_rejected", "课件页数不在可接收范围内", 409)
+    question_count = blueprint_question_count(blueprint)
+    if authoring_candidate is not None:
+        if (not isinstance(authoring_candidate, dict)
+                or authoring_candidate.get('schemaVersion') != 'mira.textbook.authoring-candidate.v1'
+                or authoring_candidate.get('verification') != 'frozen_identity_and_artifact_integrity_only'
+                or type(authoring_candidate.get('sceneCount')) is not int
+                or authoring_candidate['sceneCount'] != len(scenes)
+                or type(authoring_candidate.get('assetCount')) is not int
+                or authoring_candidate['assetCount'] < 0
+                or type(authoring_candidate.get('interactionPolicyVersion')) is not int
+                or authoring_candidate['interactionPolicyVersion'] < 1
+                or any(not isinstance(authoring_candidate.get(field), str)
+                       or re.fullmatch(r'[a-f0-9]{64}', authoring_candidate[field]) is None
+                       for field in ('sha256', 'contractSha256', 'interactionPolicySha256'))):
+            raise ApiError('textbook_preview_candidate_invalid', '作者候选必须是服务端验证后的摘要', 409)
+    if verified_locked_assessments is not None:
+        if (authoring_candidate is None or not isinstance(verified_locked_assessments, list)
+                or any(not isinstance(item, dict) or not isinstance(item.get('id'), str)
+                       or not item['id'].strip() for item in verified_locked_assessments)
+                or len({item['id'] for item in verified_locked_assessments}) != len(verified_locked_assessments)):
+            raise ApiError('textbook_preview_candidate_invalid', '冻结测评数量只能来自已验证的受保护作者候选', 409)
+        question_count = len(verified_locked_assessments)
+    required_scene_types = ['slide', 'interactive'] + (['quiz'] if question_count else [])
+    if verified_scene_types is not None:
+        if (authoring_candidate is None or not isinstance(verified_scene_types, list)
+                or not verified_scene_types or any(t not in ('slide', 'interactive', 'quiz') for t in verified_scene_types)
+                or len(set(verified_scene_types)) != len(verified_scene_types)
+                or set(verified_scene_types) != {s.get('type') for s in scenes}
+                or ('quiz' in verified_scene_types) != bool(question_count)):
+            raise ApiError('textbook_preview_candidate_invalid', '页面类型只能来自已验证的冻结场景计划', 409)
+        required_scene_types = [t for t in ('slide', 'interactive', 'quiz') if t in verified_scene_types]
     brief = {
         "schemaVersion": "mira.learning.textbook-private-preview.v1",
         "editionId": manifest["editionId"], "alignmentRevisionId": manifest["revisionId"],
@@ -322,15 +362,47 @@ def operator_preview_input(manifest, node_id, classroom, media, authoring, *, te
         "unitTitle": unit["title"], "lessonTitle": lesson["title"],
         "knowledgeBrief": blueprint["knowledgeBrief"], "sourceScope": blueprint["sourceScope"],
         "executionPolicy": "operator-authored-saved-classroom.v1",
-        # The saved page count is reviewed; question samples come only from the registered unit.
+        # Question scope comes from the verified frozen contract when present;
+        # legacy operator work keeps the server-registered unit mapping.
         "previewPrompt": {"schemaVersion": OPERATOR_PROMPT_SCHEMA, "version": "1",
-            "expectedSceneCount": len(scenes), "expectedQuestionCount": blueprint_question_count(blueprint),
-            "targets": blueprint["targets"], "requiredSceneTypes": ["slide", "interactive", "quiz"]},
+            "expectedSceneCount": len(scenes), "expectedQuestionCount": question_count,
+            "targets": blueprint["targets"], "requiredSceneTypes": required_scene_types},
         "originalMedia": media, "authoring": authoring, "sourceSha256": digest(classroom),
         "publicationAllowed": False,
     }
     if authoring_candidate is not None:
         brief["authoringCandidate"] = authoring_candidate
+    if native_revision_source is not None:
+        from content.textbook_native_revision_adoption import validate_native_source_proof, verify_preview_clone
+        from services.textbook_preview_audio import core_content
+        followup = (authoring_candidate or {}).get('completeSceneReviewFollowup')
+        if (not isinstance(native_revision_source, dict) or not isinstance(followup, dict)
+                or native_revision_source.get('schemaVersion') != 'mira.textbook.native-preview-source.v1'
+                or native_revision_source.get('stageId') != authoring['stageId']
+                or native_revision_source.get('sessionId') != authoring['sessionId']
+                or native_revision_source.get('authoringSourceSha256') != followup.get('candidateSourceSha256')
+                or native_revision_source.get('followupSha256') != followup.get('sha256')
+                or native_revision_source.get('previewSourceSha256') != digest(classroom)
+                or native_revision_source.get('cloneCoreSha256') != digest(core_content(classroom))):
+            raise ApiError('textbook_preview_candidate_invalid', '原生修订与预览双来源绑定无效', 409)
+        try:
+            validate_native_source_proof(native_revision_source, followup)
+            verify_preview_clone(classroom, authoring['stageId'], native_revision_source['authoringSourceSha256'])
+        except (ValueError, KeyError, TypeError):
+            raise ApiError('textbook_preview_candidate_invalid', '预览克隆与原生课堂不一致', 409) from None
+        brief['authoringSourceSha256'] = native_revision_source['authoringSourceSha256']
+        brief['nativeRevisionSource'] = native_revision_source
+    if official_review_followup is not None:
+        if (native_revision_source is None or not isinstance(official_review_followup, dict)
+                or official_review_followup.get('schemaVersion') != 'mira.textbook.operator-verified-official-followup.v1'
+                or official_review_followup.get('newDispatchAllowed') is not False):
+            raise ApiError('textbook_preview_candidate_invalid', '官方资料授权追溯记录无效', 409)
+        from content.textbook_official_followup import validate_frozen_followup
+        try:
+            validate_frozen_followup(official_review_followup, native_revision_source)
+        except (ValueError, KeyError, TypeError):
+            raise ApiError('textbook_preview_candidate_invalid', '官方资料授权追溯记录无效', 409) from None
+        brief['officialReviewFollowup'] = official_review_followup
     if teaching_revision != "1":
         brief["teachingRevision"] = teaching_revision
     return {**brief, "previewKey": digest(brief), "requirement": authoring["request"]}
@@ -375,15 +447,30 @@ def responsive_activity_marker(html):
 
 
 def preview_checks(classroom, expected_scene_count=8, media_manifest=None, expected_question_count=6,
-                   *, grade_code=None, responsive_scene_ids=None):
+                   *, grade_code=None, responsive_scene_ids=None, required_scene_types=None):
     """Structural checks only. Human pedagogy/originality review remains open."""
     scenes = classroom.get("scenes", [])
     issues = []
     if len(scenes) != expected_scene_count:
         issues.append("scene_count_mismatch")
     types = {s.get("type") for s in scenes}
-    if not {"slide", "interactive", "quiz"} <= types:
+    # expected_question_count is loaded from the server-frozen preview input.
+    # A verified protected contract may explicitly freeze zero quiz questions.
+    required_types = {"slide", "interactive"} | ({"quiz"} if expected_question_count != 0 else set())
+    # This argument comes only from the server-frozen preview input. Authored
+    # document/request fields cannot remove the legacy default requirements.
+    if required_scene_types is not None:
+        if (not isinstance(required_scene_types, list) or not required_scene_types
+                or any(t not in ('slide', 'interactive', 'quiz') for t in required_scene_types)
+                or len(set(required_scene_types)) != len(required_scene_types)
+                or ('quiz' in required_scene_types) != (expected_question_count != 0)):
+            issues.append('frozen_scene_types_invalid')
+        else:
+            required_types = set(required_scene_types)
+    if not required_types <= types:
         issues.append("required_scene_type_missing")
+    if expected_question_count == 0 and "quiz" in types:
+        issues.append("unexpected_quiz_scene")
     if any(s.get("type") == "interactive" and "widgetConfig" in s.get("content", {})
            and not isinstance(s["content"]["widgetConfig"], dict) for s in scenes):
         issues.append("interactive_config_invalid")

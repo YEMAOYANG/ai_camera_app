@@ -27,6 +27,7 @@ from integrations.camera_runtime.go2rtc_client import Go2RtcClient
 from integrations.onvif.client import OnvifClient
 from integrations.tts.macos_say import MacOsSayTtsProvider
 from integrations.tts.voxcpm2 import VoxCpm2HttpProvider
+from integrations.sms.tencent_cloud import TencentCloudSmsProvider
 from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeClient
 from integrations.openmaic_formal_citation_recovery_client import (
     OpenMaicFormalCitationRecoveryClient,
@@ -207,7 +208,11 @@ def auth_service() -> AuthService:
         refresh_token_seconds=current_app.config["AUTH_REFRESH_TOKEN_SECONDS"],
         sms_code_ttl_seconds=current_app.config["SMS_CODE_TTL_SECONDS"],
         sms_resend_cooldown_seconds=current_app.config["SMS_RESEND_COOLDOWN_SECONDS"],
+        sms_hourly_send_limit=current_app.config["SMS_HOURLY_SEND_LIMIT"],
+        sms_source_window_seconds=current_app.config["SMS_SOURCE_WINDOW_SECONDS"],
+        sms_source_send_limit=current_app.config["SMS_SOURCE_SEND_LIMIT"],
         sms_max_attempts=current_app.config["SMS_MAX_ATTEMPTS"],
+        sms_code_pepper=current_app.config["SMS_CODE_PEPPER"],
         sms_provider=sms_provider(),
     )
 
@@ -1184,7 +1189,18 @@ def sms_provider() -> SmsProvider:
         return DevelopmentSmsProvider(
             template_id=current_app.config.get("SMS_TEMPLATE_ID", "login-code"),
         )
-    if provider in {"aliyun", "tencent", "twilio"}:
+    if provider == "tencent":
+        return TencentCloudSmsProvider(
+            secret_id=current_app.config["SMS_TENCENT_SECRET_ID"],
+            secret_key=current_app.config["SMS_TENCENT_SECRET_KEY"],
+            sdk_app_id=current_app.config["SMS_TENCENT_SDK_APP_ID"],
+            sign_name=current_app.config["SMS_TENCENT_SIGN_NAME"],
+            template_id=current_app.config["SMS_TEMPLATE_ID"],
+            region=current_app.config["SMS_TENCENT_REGION"],
+            code_ttl_seconds=current_app.config["SMS_CODE_TTL_SECONDS"],
+            timeout_seconds=current_app.config["SMS_TENCENT_TIMEOUT_SECONDS"],
+        )
+    if provider in {"aliyun", "twilio"}:
         return UnavailableSmsProvider(provider)
     return UnavailableSmsProvider(provider or "unconfigured")
 

@@ -209,6 +209,27 @@ def learning_for_period(conn, *, family_id, start_date, end_date):
             'reviewCount': len(reviews), 'lessons': items, 'coachingSummary': coaching_summary(coaching_records)}
 
 
+def _review_as_of(run, items, end):
+    """Project recorded lifecycle/answer times without rewriting their source."""
+    projected = deepcopy(run)
+    visible = []
+    for original in items:
+        item = dict(original)
+        if item.get('answered_at') is not None and item['answered_at'] >= end:
+            item.update(answered_at=None, answer_json=None, feedback_json=None)
+        visible.append(item)
+    for key in ('started_at', 'completed_at'):
+        if projected.get(key) is not None and projected[key] >= end:
+            projected[key] = None
+    if run.get('updated_at', 0) >= end or (run.get('completed_at') or 0) >= end:
+        # Scheduling/pause edits have no historical payload. Only recorded
+        # start/completion can establish the lifecycle before this cutoff.
+        projected['status'] = ('completed' if projected.get('completed_at') else
+            'in_progress' if projected.get('started_at') else 'scheduled')
+        projected['scheduled_at'] = None
+    return projected, visible
+
+
 def review_report_for_period(conn, *, family_id, start, end):
     """Keep non-participation separate from course mastery and care task scores."""
     from services.learning_evidence_service import weaknesses
@@ -216,19 +237,23 @@ def review_report_for_period(conn, *, family_id, start, end):
     from repositories.learning_review_repository import LearningReviewRepository
     service = object.__new__(LearningReviewService)
     service.repository = LearningReviewRepository(None)
-    rows = conn.execute('SELECT * FROM learning_review_runs WHERE family_id=? AND '
-        '((created_at>=? AND created_at<?) OR (completed_at>=? AND completed_at<?)) ORDER BY created_at DESC',
-        (family_id,start,end,start,end)).fetchall()
+    rows = conn.execute('SELECT r.* FROM learning_review_runs r WHERE r.family_id=? AND r.created_at<? AND '
+        '(r.created_at>=? OR (r.started_at>=? AND r.started_at<?) OR (r.completed_at>=? AND r.completed_at<?) '
+        'OR EXISTS (SELECT 1 FROM learning_review_items i WHERE i.run_id=r.id AND i.answered_at>=? AND i.answered_at<?)) '
+        'ORDER BY r.created_at DESC', (family_id,end,start,start,end,start,end,start,end)).fetchall()
     reviews = []
     for row in rows:
         if synthetic_fixture(row):
             continue
-        run = dict(row)
-        report = service._report(run,service.repository.items(conn,run['id']),conn=conn)
+        run, items = _review_as_of(dict(row), service.repository.items(conn,row['id']), end)
+        report = service._report(run,items,conn=conn)
         summary = service._summary(run)
-        if report.get('sourceReviewCount'):
-            summary.update(correctCount=sum(bool(item['correct']) for item in report['items']),
-                independentCorrectCount=report['independentFirstCorrect'])
+        # Totals always come from the period projection after current privacy/
+        # source withdrawal checks, never the run's later aggregate counters.
+        summary.update(correctCount=sum(bool(item['correct']) for item in report['items']),
+            independentCorrectCount=report['independentFirstCorrect'],
+            currentIndex=report.get('answeredCount', len(report['items'])))
+        report['asOfExclusive'] = end
         reviews.append({**summary, 'childId':run['child_id'], 'report':report})
     children = conn.execute('SELECT id FROM children WHERE family_id=?', (family_id,)).fetchall()
     return {'weekendReviews':reviews, 'weaknesses':[

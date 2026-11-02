@@ -281,7 +281,12 @@ class CourseArchiveQueue:
                    if event.get("archiveSourceRevision") or event.get("course", {}).get("archiveSourceRevision") else {}),
                 "storage": self.storage}
 
-    def enqueue(self, event):
+    def enqueue(self, event, *, expected_content_key=None):
+        course = event.get("course") if isinstance(event, dict) else None
+        if expected_content_key is not None and (not isinstance(expected_content_key, str)
+                or not SHA.fullmatch(expected_content_key)
+                or not isinstance(course, dict) or course.get("contentKey") != expected_content_key):
+            raise ArchiveQueueError("archive_queue_content_key_mismatch")
         identity = self.identity(event)
         if not SHA.fullmatch(identity["sourceDigest"]):
             raise ArchiveQueueError("archive_source_digest_invalid")
@@ -291,6 +296,9 @@ class CourseArchiveQueue:
             job = json.loads(_read(path))
             if job.get("schemaVersion") != SCHEMA or job.get("identity") != identity:
                 raise ArchiveQueueError("archive_queue_identity_conflict")
+            if (expected_content_key is not None
+                    and job.get("event", {}).get("course", {}).get("contentKey") != expected_content_key):
+                raise ArchiveQueueError("archive_queue_content_key_mismatch")
             if event.get("snapshot") != job["event"].get("snapshot"):
                 raise ArchiveQueueError("archive_queue_snapshot_conflict")
             if event.get("priority", 0) < job.get("priority", 0):
@@ -1288,10 +1296,40 @@ class CourseArchiveProcessor:
 
 
 class CourseArchiveWorker:
-    def __init__(self, queue, processor, *, database=None, scan_catalog=True, scan_history=True):
+    def __init__(self, queue, processor, *, database=None, scan_catalog=True, scan_history=True,
+                 content_key=None):
+        if content_key is not None and (not isinstance(content_key, str) or not SHA.fullmatch(content_key)):
+            raise ArchiveQueueError("archive_content_key_invalid")
+        if content_key is not None and (not scan_catalog or database is None):
+            raise ArchiveQueueError("archive_exact_course_requires_catalog")
         self.queue, self.processor, self.database = queue, processor, database
         self.scan_catalog = scan_catalog
-        self.scan_history = scan_history
+        self.scan_history = scan_history and content_key is None
+        self.content_key = content_key
+
+    def _exact_catalog_event(self, event):
+        """Fail closed when exact mode is handed anything but one published release."""
+        if self.content_key is None:
+            return
+        if not isinstance(event, dict):
+            raise ArchiveQueueError("archive_exact_course_identity_mismatch")
+        course = event.get("course")
+        digest = event.get("sourceDigest")
+        if (event.get("origin") != "catalog" or event.get("sourceKind") != "textbook_release"
+                or not isinstance(course, dict) or course.get("contentKey") != self.content_key
+                or course.get("status") != "published" or course.get("sourceKind") != "textbook_release"
+                or course.get("releaseSha256") != digest or course.get("sourceDigest") != digest
+                or not isinstance(digest, str) or not SHA.fullmatch(digest)):
+            raise ArchiveQueueError("archive_exact_course_identity_mismatch")
+
+    def _exact_job(self, job):
+        if self.content_key is None:
+            return
+        event = job.get("event") if isinstance(job, dict) else None
+        self._exact_catalog_event(event)
+        if (job.get("schemaVersion") != SCHEMA or job.get("identity") != self.queue.identity(event)
+                or job.get("key") != _sha(_json(job["identity"]))):
+            raise ArchiveQueueError("archive_exact_job_identity_mismatch")
 
     def seed_native_snapshot(self, snapshot, *, source_kind, source_digest, created_at,
                              revision="0", source_raw=None):
@@ -1376,8 +1414,11 @@ class CourseArchiveWorker:
             raise ArchiveQueueError("archive_limit_invalid")
         summary = {"discovered": 0, "completed": 0, "failed": 0, "discoveryErrors": 0}
         deliveries = {}
-        events_root = _directory(self.queue.root / "archive-events")
-        for path in sorted(events_root.glob("*.json")):
+        exact_jobs = {}
+        # Exact textbook-release delivery must not observe, enqueue, acknowledge
+        # or advance cursors for unrelated native/filesystem/history work.
+        events_root = _directory(self.queue.root / "archive-events") if self.content_key is None else None
+        for path in sorted(events_root.glob("*.json")) if events_root is not None else ():
             try:
                 event = filesystem_event(path)
                 job = self.queue.enqueue(event)
@@ -1385,26 +1426,32 @@ class CourseArchiveWorker:
                 summary["discovered"] += 1
             except Exception:
                 summary["discoveryErrors"] += 1
-        cursor_path = self.queue.directory / "postgres-cursor.json"
-        cursor = json.loads(_read(cursor_path)).get("afterId", 0) if cursor_path.exists() else 0
-        try:
-            rows = self.processor.client.events(after_id=cursor, limit=100)
-            for row in rows:
-                try:
-                    event = postgres_event(row)
-                    job = self.queue.enqueue(event)
-                    deliveries.setdefault(job["key"], []).append(event)
-                    summary["discovered"] += 1
-                except Exception:
-                    summary["discoveryErrors"] += 1
-            _write(cursor_path, {"afterId": int(rows[-1]["id"]) if rows else 0})
-        except Exception:
-            summary["discoveryErrors"] += 1
+        if self.content_key is None:
+            cursor_path = self.queue.directory / "postgres-cursor.json"
+            cursor = json.loads(_read(cursor_path)).get("afterId", 0) if cursor_path.exists() else 0
+            try:
+                rows = self.processor.client.events(after_id=cursor, limit=100)
+                for row in rows:
+                    try:
+                        event = postgres_event(row)
+                        job = self.queue.enqueue(event)
+                        deliveries.setdefault(job["key"], []).append(event)
+                        summary["discovered"] += 1
+                    except Exception:
+                        summary["discoveryErrors"] += 1
+                _write(cursor_path, {"afterId": int(rows[-1]["id"]) if rows else 0})
+            except Exception:
+                summary["discoveryErrors"] += 1
         if self.scan_catalog and self.database is not None:
             try:
                 from scripts.course_storage_releases import read_only_connection
                 with read_only_connection(self.database) as conn:
                     courses = self.processor.exporter.list_courses(conn, include_saved=True)
+                if self.content_key is not None:
+                    courses = [course for course in courses
+                               if course.get("contentKey") == self.content_key]
+                    if len(courses) != 1:
+                        raise ArchiveQueueError("archive_exact_course_not_found_or_ambiguous")
                 for course in courses:
                     try:
                         digest = course.get("sourceDigest") or course.get("releaseSha256")
@@ -1413,19 +1460,29 @@ class CourseArchiveWorker:
                         event = {"origin": "catalog", "sourceKind": course["sourceKind"],
                             "sourceDigest": digest, "course": course,
                             "createdAt": datetime.now(timezone.utc).isoformat(), "priority": 1}
-                        self.queue.enqueue(event)
+                        self._exact_catalog_event(event)
+                        job = self.queue.enqueue(event, expected_content_key=self.content_key)
+                        self._exact_job(job)
+                        if self.content_key is not None:
+                            exact_jobs[job["key"]] = job
                         summary["discovered"] += 1
                     except Exception:
                         summary["discoveryErrors"] += 1
             except Exception:
                 summary["discoveryErrors"] += 1
-        if self.scan_history:
+        if self.scan_history and self.content_key is None:
             for reconcile in (self._reconcile_legacy, self._reconcile_postgres):
                 try:
                     summary["discovered"] += reconcile()
                 except Exception:
                     summary["discoveryErrors"] += 1
-        ready = self.queue.due(limit, max_priority=None if self.scan_history else 1)
+        if self.content_key is None:
+            ready = self.queue.due(limit, max_priority=None if self.scan_history else 1)
+        else:
+            ready = sorted((job for job in exact_jobs.values()
+                            if job.get("nextAttemptAt", 0) <= self.queue.clock()
+                            and not (job.get("status") == "complete" and job.get("stagingPruned") is True)),
+                           key=lambda job: (job.get("nextAttemptAt", 0), job["createdAt"], job["key"]))[:limit]
         # Completed content can have another producer event. Acknowledge it
         # against its durable verification without exporting/uploading again.
         for key, events in deliveries.items():
@@ -1437,6 +1494,7 @@ class CourseArchiveWorker:
         for job in ready:
             if stop_requested():
                 break
+            self._exact_job(job)
             if self.processor.process(job):
                 summary["completed"] += 1
                 for event in deliveries.get(job["key"], []):

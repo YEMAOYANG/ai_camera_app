@@ -12,7 +12,11 @@ from repositories.auth_repository import AuthRepository
 from repositories.point_repository import PointRepository
 from repositories.profile_repository import ProfileRepository
 from routes.api.v1.points import points_bp
-from services.auth_service import AuthService
+from services.auth_service import (
+    AuthService,
+    SMS_PURPOSE_LOGIN,
+    SMS_PURPOSE_PHONE_CHANGE,
+)
 from services.point_service import PointService
 from services.profile_service import ProfileService
 from services.sms_provider import SmsDelivery
@@ -21,6 +25,7 @@ from tests.isolated_transactions import MemoryDatabase
 
 PHONE = "13800000000"
 NEXT_PHONE = "13800000001"
+THIRD_PHONE = "13800000002"
 CODE = "654321"
 
 
@@ -33,8 +38,17 @@ class AuthPointTransactionTest(unittest.TestCase):
         # Invitation presentation does not participate in code/session mutation.
         self.auth.repository.list_pending_family_invitations_by_phone = Mock(return_value=[])
         self.auth.sms_provider = Mock()
-        self.auth.sms_provider.issue_verification_code.return_value = SmsDelivery(
-            code=CODE, provider="isolated", template_id="test", delivery_status="delivered")
+        self.auth.sms_provider.send_verification_code.side_effect = (
+            lambda _phone, code: SmsDelivery(
+                provider="isolated",
+                template_id="test",
+                delivery_status="delivered",
+                debug_code=code,
+            )
+        )
+        random_code = patch("services.auth_service.secrets.randbelow", return_value=int(CODE))
+        random_code.start()
+        self.addCleanup(random_code.stop)
         self.points_repo = PointRepository(self.db)
         self.db.allow_runtime_schema_creation = False
         with self.db.transaction() as conn:
@@ -56,9 +70,115 @@ class AuthPointTransactionTest(unittest.TestCase):
         if status is not None:
             self.assertEqual(caught.exception.status_code, status)
 
-    def attempts(self, phone=PHONE):
-        row = self.db.one("SELECT attempt_count FROM sms_codes WHERE phone=?", (phone,))
+    def attempts(self, phone=PHONE, purpose=SMS_PURPOSE_LOGIN):
+        row = self.db.one(
+            "SELECT attempt_count FROM sms_codes WHERE phone=? AND purpose=?",
+            (phone, purpose),
+        )
         return row["attempt_count"] if row else None
+
+    def test_concurrent_sms_requests_reserve_one_provider_send(self):
+        self.auth.sms_resend_cooldown_seconds = 60
+        results = self.concurrent(lambda: self.auth.request_sms_code(NEXT_PHONE), 2)
+        self.assertEqual(sum(isinstance(value, dict) for value in results), 1)
+        self.assertEqual(results.count("sms_resend_too_soon"), 1)
+        self.assertEqual(self.auth.sms_provider.send_verification_code.call_count, 1)
+
+    def test_provider_failure_keeps_cooldown_reservation(self):
+        self.auth.sms_resend_cooldown_seconds = 60
+        self.auth.sms_provider.send_verification_code.side_effect = ApiError(
+            "sms_provider_unavailable",
+            "短信服务暂时不可用",
+            503,
+        )
+        self.error(
+            lambda: self.auth.request_sms_code(NEXT_PHONE),
+            "sms_provider_unavailable",
+            503,
+        )
+        self.error(
+            lambda: self.auth.request_sms_code(NEXT_PHONE),
+            "sms_resend_too_soon",
+            429,
+        )
+        self.assertEqual(self.auth.sms_provider.send_verification_code.call_count, 1)
+
+    def test_global_hourly_budget_bounds_rotating_phone_numbers(self):
+        self.auth.sms_hourly_send_limit = 1
+        self.auth.request_sms_code(NEXT_PHONE)
+
+        self.error(
+            lambda: self.auth.request_sms_code(THIRD_PHONE),
+            "sms_send_budget_exceeded",
+            429,
+        )
+        self.assertEqual(self.auth.sms_provider.send_verification_code.call_count, 1)
+
+    def test_source_window_bounds_rotating_numbers_without_storing_raw_ip(self):
+        self.auth.sms_hourly_send_limit = 10
+        self.auth.sms_source_send_limit = 1
+        self.auth.sms_source_window_seconds = 600
+        self.auth.request_sms_code(NEXT_PHONE, source_ip="203.0.113.8")
+
+        self.error(
+            lambda: self.auth.request_sms_code(
+                THIRD_PHONE,
+                source_ip="203.0.113.8",
+            ),
+            "sms_source_rate_limited",
+            429,
+        )
+        self.auth.request_sms_code(THIRD_PHONE, source_ip="203.0.113.9")
+        self.assertEqual(self.auth.sms_provider.send_verification_code.call_count, 2)
+        leaked = self.db.one(
+            "SELECT COUNT(*) AS total FROM sms_send_windows WHERE scope_key LIKE ?",
+            ("%203.0.113%",),
+        )
+        self.assertEqual(leaked["total"], 0)
+
+    def test_sms_code_digest_is_keyed_and_bound_to_phone_and_purpose(self):
+        self.auth.request_sms_code(NEXT_PHONE)
+        row = self.db.one(
+            "SELECT code_hash FROM sms_codes WHERE phone=? AND purpose=?",
+            (NEXT_PHONE, SMS_PURPOSE_LOGIN),
+        )
+
+        self.assertNotEqual(row["code_hash"], hash_value(CODE))
+        self.assertTrue(
+            self.auth.sms_code_matches(
+                row["code_hash"], NEXT_PHONE, SMS_PURPOSE_LOGIN, CODE
+            )
+        )
+        self.assertFalse(
+            self.auth.sms_code_matches(
+                row["code_hash"], THIRD_PHONE, SMS_PURPOSE_LOGIN, CODE
+            )
+        )
+        self.assertFalse(
+            self.auth.sms_code_matches(
+                row["code_hash"], NEXT_PHONE, SMS_PURPOSE_PHONE_CHANGE, CODE
+            )
+        )
+
+    def test_login_and_phone_change_codes_are_isolated(self):
+        with patch(
+            "services.auth_service.secrets.randbelow",
+            side_effect=[111111, 222222],
+        ):
+            self.auth.request_sms_code(NEXT_PHONE)
+            self.auth.request_sms_code(
+                NEXT_PHONE,
+                purpose=SMS_PURPOSE_PHONE_CHANGE,
+            )
+
+        self.error(
+            lambda: self.auth.login_with_sms(NEXT_PHONE, "222222"),
+            "invalid_code",
+        )
+        login = self.auth.login_with_sms(NEXT_PHONE, "111111")
+        self.assertTrue(login["ok"])
+        self.assertIsNone(self.attempts(NEXT_PHONE, SMS_PURPOSE_LOGIN))
+        self.assertEqual(self.attempts(NEXT_PHONE, SMS_PURPOSE_PHONE_CHANGE), 0)
 
     def test_rejected_sms_attempts_commit_and_sixth_request_is_limited(self):
         self.auth.request_sms_code(PHONE)
@@ -137,35 +257,52 @@ class AuthPointTransactionTest(unittest.TestCase):
 
     def test_phone_change_rejections_commit_without_changing_phone(self):
         profile, token = self.profile()
-        self.auth.request_sms_code(NEXT_PHONE)
+        profile.request_account_phone_code(token, {"phone": NEXT_PHONE})
         for attempt in range(1, 6):
             self.error(lambda: profile.change_account_phone(token, {"phone": NEXT_PHONE, "code": "wrong"}), "invalid_code")
-            self.assertEqual(self.attempts(NEXT_PHONE), attempt)
+            self.assertEqual(
+                self.attempts(NEXT_PHONE, SMS_PURPOSE_PHONE_CHANGE),
+                attempt,
+            )
         self.error(lambda: profile.change_account_phone(token, {"phone": NEXT_PHONE, "code": CODE}), "sms_attempts_exceeded", 429)
+        self.assertEqual(self.db.one("SELECT phone FROM users")["phone"], PHONE)
+
+    def test_phone_change_cannot_consume_a_login_code(self):
+        profile, token = self.profile()
+        self.auth.request_sms_code(NEXT_PHONE)
+        self.error(
+            lambda: profile.change_account_phone(
+                token,
+                {"phone": NEXT_PHONE, "code": CODE},
+            ),
+            "invalid_code",
+        )
+        self.assertEqual(self.attempts(NEXT_PHONE, SMS_PURPOSE_LOGIN), 0)
+        self.assertIsNone(self.attempts(NEXT_PHONE, SMS_PURPOSE_PHONE_CHANGE))
         self.assertEqual(self.db.one("SELECT phone FROM users")["phone"], PHONE)
 
     def test_phone_change_resend_and_success_consume_code(self):
         profile, token = self.profile()
-        self.auth.request_sms_code(NEXT_PHONE)
+        profile.request_account_phone_code(token, {"phone": NEXT_PHONE})
         self.error(lambda: profile.change_account_phone(token, {"phone": NEXT_PHONE, "code": "wrong"}), "invalid_code")
-        self.auth.request_sms_code(NEXT_PHONE)
-        self.assertEqual(self.attempts(NEXT_PHONE), 0)
+        profile.request_account_phone_code(token, {"phone": NEXT_PHONE})
+        self.assertEqual(self.attempts(NEXT_PHONE, SMS_PURPOSE_PHONE_CHANGE), 0)
         with patch("services.profile_service.account_profile_payload", return_value={}), \
              patch("services.profile_service.account_security_payload", return_value={}):
             result = profile.change_account_phone(token, {"phone": NEXT_PHONE, "code": CODE})
         self.assertTrue(result["ok"])
         self.assertEqual(self.db.one("SELECT phone FROM users")["phone"], NEXT_PHONE)
-        self.assertIsNone(self.attempts(NEXT_PHONE))
+        self.assertIsNone(self.attempts(NEXT_PHONE, SMS_PURPOSE_PHONE_CHANGE))
         self.assertTrue(any("sms_codes" in sql and "FOR UPDATE" in sql for sql in self.db.statements))
 
     def test_phone_change_unexpected_error_rolls_back_phone_and_code(self):
         profile, token = self.profile()
-        self.auth.request_sms_code(NEXT_PHONE)
+        profile.request_account_phone_code(token, {"phone": NEXT_PHONE})
         with patch("services.profile_service.account_profile_payload", side_effect=RuntimeError("isolated failure")):
             with self.assertRaises(RuntimeError):
                 profile.change_account_phone(token, {"phone": NEXT_PHONE, "code": CODE})
         self.assertEqual(self.db.one("SELECT phone FROM users")["phone"], PHONE)
-        self.assertEqual(self.attempts(NEXT_PHONE), 0)
+        self.assertEqual(self.attempts(NEXT_PHONE, SMS_PURPOSE_PHONE_CHANGE), 0)
 
     def test_refresh_rotation_rejects_reuse_and_still_allows_logout(self):
         tokens = self.login()["tokens"]

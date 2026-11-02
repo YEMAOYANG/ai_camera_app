@@ -419,6 +419,27 @@ class CourseArchiveExporterTest(unittest.TestCase):
                 self.assertFalse(unsafe["complete"])
                 self.assertEqual(unsafe["generatedPublicFiles"], [])
 
+    def test_checksum_manifest_preserves_bytes_and_rejects_non_manifest_data(self):
+        source = self.root / "output/one/SHA256SUMS"
+        source.parent.mkdir(parents=True)
+        self.snapshot.source_files = [source]
+        raw = b"a" * 64 + b"  courseware/1.jpg\n"
+        source.write_bytes(raw)
+        result = self.export()
+        self.assertTrue(result["complete"])
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            name = "原稿/output/one/SHA256SUMS"
+            self.assertEqual(archive.read(name), raw)
+            entry = next(e for e in json.loads(archive.read("manifest.json"))["files"]
+                         if e["archivePath"] == name)
+            self.assertEqual(entry["mimeType"], "text/plain")
+        for invalid in (b"", b"not a manifest", b"a" * 64 + b"  ../secret",
+                        b"a" * 64 + b"  /absolute", b"password='secret'"):
+            with self.subTest(invalid=invalid):
+                source.write_bytes(invalid)
+                with self.assertRaises(CourseArchiveError):
+                    self.export()
+
     def test_exact_build_id_adapter_preserves_bounded_ascii_text_with_plain_mime(self):
         source = self.root / "output/one/BUILD_ID"
         source.parent.mkdir(parents=True)

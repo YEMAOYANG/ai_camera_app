@@ -19,8 +19,9 @@ from content.textbook_audio_language import (ENGLISH_AUTO_LANGUAGE_POLICY,
 from core.errors import ApiError
 
 from integrations.openmaic_formal_media import (
-    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY, FLASH_CANDIDATE_MODEL_POLICY, PRO_CURRENT_FLASH_MODEL_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
+    FORMAL_IMAGE_POLICY, LEGACY_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY, MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY, REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, FLASH_CANDIDATE_PROFESSIONAL_POLICY, FLASH_CANDIDATE_MODEL_POLICY, PRO_CURRENT_FLASH_MODEL_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY, QWEN3_PLAYFUL_PROFESSIONAL_POLICY, QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY, QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
     LEGACY_GENERATION_OPTIONS, generation_options, professional_policy,
+    image_policy_for_creation_policy, image_policy_for_professional_receipt,
     professional_image_fields, professional_scene_learning_fields, media_receipt,
 )
 from integrations.openmaic_formal_video import FORMAL_VIDEO_POLICY, professional_video_fields, video_receipt
@@ -195,14 +196,14 @@ class OpenMaicFullRuntimeClient:
     }
     FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY = FLASH_CANDIDATE_MODEL_POLICY
     PRO_CURRENT_FLASH_PROFESSIONAL_MODEL_POLICY = PRO_CURRENT_FLASH_MODEL_POLICY
-    PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY = PRO_CURRENT_FLASH_PROFESSIONAL_POLICY
+    PRO_CURRENT_FLASH_PROFESSIONAL_CREATION_POLICY = QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY
 
     FORMAL_IMAGE_POLICY = FORMAL_IMAGE_POLICY
     FORMAL_VIDEO_POLICY = FORMAL_VIDEO_POLICY
     LEGACY_FORMAL_PROFESSIONAL_CREATION_POLICY = LEGACY_PROFESSIONAL_POLICY
-    FORMAL_PROFESSIONAL_CREATION_POLICY = PLAYFUL_PROFESSIONAL_POLICY
+    FORMAL_PROFESSIONAL_CREATION_POLICY = QWEN3_PLAYFUL_PROFESSIONAL_POLICY
 
-    FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY = FLASH_CANDIDATE_PROFESSIONAL_POLICY
+    FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY = QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY
     FORMAL_MODEL_POLICY_ENV = "MIRA_FORMAL_MODEL_POLICY"
 
     @classmethod
@@ -223,9 +224,9 @@ class OpenMaicFullRuntimeClient:
         if cls.selected_professional_model_policy(policy_id)["policyId"] == cls.FLASH_CANDIDATE_PROFESSIONAL_MODEL_POLICY["policyId"]:
             return professional_policy(cls.FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY)
         if cls.selected_professional_model_policy(policy_id)["policyId"] == cls.PRO_CURRENT_FLASH_PROFESSIONAL_MODEL_POLICY["policyId"]:
-            return professional_policy(PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY
-                if os.environ.get("MIRA_FORMAL_PLAYFUL_REQUIRE_3D") == "1" else PRO_CURRENT_FLASH_PROFESSIONAL_POLICY)
-        policy = (REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY
+            return professional_policy(QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY
+                if os.environ.get("MIRA_FORMAL_PLAYFUL_REQUIRE_3D") == "1" else QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY)
+        policy = (QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY
                   if os.environ.get("MIRA_FORMAL_PLAYFUL_REQUIRE_3D") == "1"
                   else cls.FORMAL_PROFESSIONAL_CREATION_POLICY)
         return professional_policy(policy)
@@ -553,7 +554,10 @@ class OpenMaicFullRuntimeClient:
                               if isinstance(runtime_policy, Mapping) else None)
         selected_policy = self.selected_professional_creation_policy()
         required_3d_ready = (
-            selected_policy not in (REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, self.FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY, PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)
+            selected_policy not in (QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY,
+                self.FLASH_CANDIDATE_PROFESSIONAL_CREATION_POLICY,
+                QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY,
+                QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)
             or isinstance(supported_policies, list) and any(
                 isinstance(policy, Mapping)
                 and _canonical_sha256(policy) == _canonical_sha256(selected_policy)
@@ -2280,14 +2284,19 @@ class OpenMaicFullRuntimeClient:
                 "OpenMAIC 正式课件缺少专业创作或联网研究回执",
             )
         media = None
-        image_enabled = bool(professional_creation and professional_image_fields(professional_creation))
+        image_enabled = bool(professional_creation and professional_image_fields(
+            professional_creation, generation_contract=generation_contract))
         if image_enabled or raw_media is not None:
             if not image_enabled or not professional_creation:
                 raise OpenMaicFullRuntimeError("invalid_openmaic_media_receipt", "OpenMAIC 图片回执缺少专业图片策略")
             try:
+                expected_image_policy = (image_policy_for_creation_policy(
+                    generation_contract.get("professionalCreationPolicy"))
+                    if generation_contract is not None
+                    else image_policy_for_professional_receipt(professional_creation))
                 media = media_receipt(raw_media, runtime_request_id=str(runtime_request_id),
                     classroom_id=str(classroom_id), build_item_id=professional_creation["buildItemId"],
-                    session_id=professional_creation["sessionId"])
+                    session_id=professional_creation["sessionId"], image_policy=expected_image_policy)
             except ValueError as exc:
                 raise OpenMaicFullRuntimeError("invalid_openmaic_media_receipt", "OpenMAIC 正式图片回执无效") from exc
         raw_input_sha256 = str(payload.get("formalInputSha256") or "").strip()
@@ -2344,7 +2353,8 @@ class OpenMaicFullRuntimeClient:
         code = "invalid_openmaic_professional_creation_receipt"
         try:
             scene_learning_fields = professional_scene_learning_fields(value, generation_contract=generation_contract) if isinstance(value, Mapping) else {}
-            image_fields = professional_image_fields(value) if isinstance(value, Mapping) else {}
+            image_fields = (professional_image_fields(value, generation_contract=generation_contract)
+                            if isinstance(value, Mapping) else {})
             video_fields = professional_video_fields(value) if isinstance(value, Mapping) else {}
             skill_fields = professional_skill_fields(value) if isinstance(value, Mapping) else {}
             quality_fields = professional_quality_fields(value, generation_contract=generation_contract) if isinstance(value, Mapping) else {}

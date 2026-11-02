@@ -4,6 +4,7 @@ import ipaddress
 import json
 import os
 import platform
+import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from urllib.parse import urlparse
@@ -23,6 +24,7 @@ if load_dotenv is not None:
 VALID_APP_ENVS = {"development", "test", "staging", "production"}
 MEDIA_GATEWAY_REQUIRED_VERSION = "1.9.14"
 DEVELOPMENT_STUDENT_AUTH_PEPPER = "mira-student-auth-development-only-pepper"
+DEVELOPMENT_SMS_CODE_PEPPER = "mira-sms-code-development-only-pepper"
 LEARNING_CURRICULUM_PREPARATION_MIN_LEASE_SECONDS = 360
 
 
@@ -57,9 +59,19 @@ class AppConfig:
     STUDENT_PIN_LOCK_SECONDS: int
     SMS_PROVIDER: str
     SMS_TEMPLATE_ID: str
+    SMS_TENCENT_SECRET_ID: str
+    SMS_TENCENT_SECRET_KEY: str
+    SMS_TENCENT_SDK_APP_ID: str
+    SMS_TENCENT_SIGN_NAME: str
+    SMS_TENCENT_REGION: str
+    SMS_TENCENT_TIMEOUT_SECONDS: float
     SMS_CODE_TTL_SECONDS: int
     SMS_RESEND_COOLDOWN_SECONDS: int
+    SMS_HOURLY_SEND_LIMIT: int
+    SMS_SOURCE_WINDOW_SECONDS: int
+    SMS_SOURCE_SEND_LIMIT: int
     SMS_MAX_ATTEMPTS: int
+    SMS_CODE_PEPPER: str
     DEV_ADAPTERS_ENABLED: bool
     CAMERA_RUNTIME_PROVIDER: str
     CAMERA_RUNTIME_ADAPTER: str
@@ -200,6 +212,7 @@ class AppConfig:
     AI_EVAL_ENABLED: bool
     INTERNAL_API_TOKEN: str
     INTERNAL_ALLOWED_SOURCES: list[str]
+    TRUST_PROXY_HOPS: int
     HOST: str
     PORT: int
     DEBUG: bool
@@ -291,11 +304,35 @@ class AppConfig:
             STUDENT_PIN_LOCK_SECONDS=int(
                 _env("APP_STUDENT_PIN_LOCK_SECONDS", "900")
             ),
-            SMS_PROVIDER=_env("APP_SMS_PROVIDER", "development" if app_env in {"development", "test"} else "").strip(),
-            SMS_TEMPLATE_ID=_env("APP_SMS_TEMPLATE_ID", "login-code"),
+            SMS_PROVIDER=_env(
+                "APP_SMS_PROVIDER",
+                "development" if app_env in {"development", "test"} else "",
+            ).strip().lower(),
+            SMS_TEMPLATE_ID=_env("APP_SMS_TEMPLATE_ID", "login-code").strip(),
+            SMS_TENCENT_SECRET_ID=_env("APP_SMS_TENCENT_SECRET_ID", "").strip(),
+            SMS_TENCENT_SECRET_KEY=_env("APP_SMS_TENCENT_SECRET_KEY", "").strip(),
+            SMS_TENCENT_SDK_APP_ID=_env("APP_SMS_TENCENT_SDK_APP_ID", "").strip(),
+            SMS_TENCENT_SIGN_NAME=_env("APP_SMS_TENCENT_SIGN_NAME", "").strip(),
+            SMS_TENCENT_REGION=_env(
+                "APP_SMS_TENCENT_REGION", "ap-guangzhou"
+            ).strip(),
+            SMS_TENCENT_TIMEOUT_SECONDS=float(
+                _env("APP_SMS_TENCENT_TIMEOUT_SECONDS", "10")
+            ),
             SMS_CODE_TTL_SECONDS=int(_env("APP_SMS_CODE_TTL_SECONDS", "300")),
             SMS_RESEND_COOLDOWN_SECONDS=int(_env("APP_SMS_RESEND_COOLDOWN_SECONDS", "60")),
+            SMS_HOURLY_SEND_LIMIT=int(_env("APP_SMS_HOURLY_SEND_LIMIT", "300")),
+            SMS_SOURCE_WINDOW_SECONDS=int(
+                _env("APP_SMS_SOURCE_WINDOW_SECONDS", "600")
+            ),
+            SMS_SOURCE_SEND_LIMIT=int(_env("APP_SMS_SOURCE_SEND_LIMIT", "10")),
             SMS_MAX_ATTEMPTS=int(_env("APP_SMS_MAX_ATTEMPTS", "5")),
+            SMS_CODE_PEPPER=_env(
+                "APP_SMS_CODE_PEPPER",
+                DEVELOPMENT_SMS_CODE_PEPPER
+                if app_env in {"development", "test"}
+                else "",
+            ).strip(),
             DEV_ADAPTERS_ENABLED=_bool(_env("APP_ENABLE_DEV_ADAPTERS", dev_adapters_enabled_default)),
             CAMERA_RUNTIME_PROVIDER=camera_runtime_provider,
             CAMERA_RUNTIME_ADAPTER=camera_runtime_provider,
@@ -627,6 +664,7 @@ class AppConfig:
             AI_EVAL_ENABLED=_bool(_env("APP_AI_EVAL_ENABLED", "0")),
             INTERNAL_API_TOKEN=_env("INTERNAL_API_TOKEN", _env("APP_INTERNAL_API_TOKEN", "")).strip(),
             INTERNAL_ALLOWED_SOURCES=_csv(_env("INTERNAL_ALLOWED_SOURCES", _env("APP_INTERNAL_ALLOWED_SOURCES", ""))),
+            TRUST_PROXY_HOPS=int(_env("APP_TRUST_PROXY_HOPS", "0")),
             HOST=_env("APP_HOST", "0.0.0.0" if app_env == "development" else "127.0.0.1"),
             PORT=int(_env("APP_PORT", _env("PORT", "8000"))),
             DEBUG=_bool(_env("APP_DEBUG", _env("FLASK_DEBUG", "0"))),
@@ -817,12 +855,16 @@ class AppConfig:
 
         if self.APP_ENV in {"staging", "production"} and not self.DATABASE_URL:
             raise ConfigError("APP_DATABASE_URL is required in staging/production.")
+        if not 0 <= self.TRUST_PROXY_HOPS <= 2:
+            raise ConfigError("APP_TRUST_PROXY_HOPS must be between 0 and 2.")
 
         dialect = _database_dialect(self.DATABASE_URL)
         if dialect not in POSTGRES_DIALECTS:
             raise ConfigError("Only PostgreSQL databases are supported.")
 
         if self.APP_ENV == "production":
+            if self.DEBUG:
+                raise ConfigError("APP_DEBUG must be false in production.")
             if not self.CORS_ORIGINS or "*" in self.CORS_ORIGINS:
                 raise ConfigError("APP_CORS_ORIGINS must be explicit in production.")
             if self.DEV_ADAPTERS_ENABLED:
@@ -833,6 +875,26 @@ class AppConfig:
                 raise ConfigError("CAMERA_RUNTIME_PROVIDER cannot use development adapters in production.")
             if not self.INTERNAL_API_TOKEN:
                 raise ConfigError("INTERNAL_API_TOKEN is required in production.")
+
+        _validate_sms_config(
+            app_env=self.APP_ENV,
+            dev_adapters_enabled=self.DEV_ADAPTERS_ENABLED,
+            provider=self.SMS_PROVIDER,
+            template_id=self.SMS_TEMPLATE_ID,
+            secret_id=self.SMS_TENCENT_SECRET_ID,
+            secret_key=self.SMS_TENCENT_SECRET_KEY,
+            sdk_app_id=self.SMS_TENCENT_SDK_APP_ID,
+            sign_name=self.SMS_TENCENT_SIGN_NAME,
+            region=self.SMS_TENCENT_REGION,
+            timeout_seconds=self.SMS_TENCENT_TIMEOUT_SECONDS,
+            code_ttl_seconds=self.SMS_CODE_TTL_SECONDS,
+            resend_cooldown_seconds=self.SMS_RESEND_COOLDOWN_SECONDS,
+            hourly_send_limit=self.SMS_HOURLY_SEND_LIMIT,
+            source_window_seconds=self.SMS_SOURCE_WINDOW_SECONDS,
+            source_send_limit=self.SMS_SOURCE_SEND_LIMIT,
+            max_attempts=self.SMS_MAX_ATTEMPTS,
+            code_pepper=self.SMS_CODE_PEPPER,
+        )
 
 
 def apply_test_defaults(config: dict) -> dict:
@@ -1247,7 +1309,12 @@ def validate_flask_config(config: dict) -> None:
         raise ConfigError("APP_DATABASE_URL is required in staging/production.")
     if _database_dialect(database_url) not in POSTGRES_DIALECTS:
         raise ConfigError("Only PostgreSQL databases are supported.")
+    trusted_proxy_hops = config.get("TRUST_PROXY_HOPS", 0)
+    if type(trusted_proxy_hops) is not int or not 0 <= trusted_proxy_hops <= 2:
+        raise ConfigError("APP_TRUST_PROXY_HOPS must be between 0 and 2.")
     if app_env == "production":
+        if bool(config.get("DEBUG")):
+            raise ConfigError("APP_DEBUG must be false in production.")
         if config.get("DEV_ADAPTERS_ENABLED"):
             raise ConfigError("APP_ENABLE_DEV_ADAPTERS must be false in production.")
         if str(config.get("SMS_PROVIDER", "")).lower() == "development":
@@ -1262,6 +1329,124 @@ def validate_flask_config(config: dict) -> None:
         origins = config.get("CORS_ORIGINS") or []
         if not origins or "*" in origins:
             raise ConfigError("APP_CORS_ORIGINS must be explicit in production.")
+
+    _validate_sms_config(
+        app_env=app_env,
+        dev_adapters_enabled=bool(config.get("DEV_ADAPTERS_ENABLED")),
+        provider=str(config.get("SMS_PROVIDER") or ""),
+        template_id=str(config.get("SMS_TEMPLATE_ID") or ""),
+        secret_id=str(config.get("SMS_TENCENT_SECRET_ID") or ""),
+        secret_key=str(config.get("SMS_TENCENT_SECRET_KEY") or ""),
+        sdk_app_id=str(config.get("SMS_TENCENT_SDK_APP_ID") or ""),
+        sign_name=str(config.get("SMS_TENCENT_SIGN_NAME") or ""),
+        region=str(config.get("SMS_TENCENT_REGION") or ""),
+        timeout_seconds=config.get("SMS_TENCENT_TIMEOUT_SECONDS", 10),
+        code_ttl_seconds=config.get("SMS_CODE_TTL_SECONDS", 300),
+        resend_cooldown_seconds=config.get("SMS_RESEND_COOLDOWN_SECONDS", 60),
+        hourly_send_limit=config.get("SMS_HOURLY_SEND_LIMIT", 300),
+        source_window_seconds=config.get("SMS_SOURCE_WINDOW_SECONDS", 600),
+        source_send_limit=config.get("SMS_SOURCE_SEND_LIMIT", 10),
+        max_attempts=config.get("SMS_MAX_ATTEMPTS", 5),
+        code_pepper=str(config.get("SMS_CODE_PEPPER") or ""),
+    )
+
+
+def _validate_sms_config(
+    *,
+    app_env: str,
+    dev_adapters_enabled: bool,
+    provider: str,
+    template_id: str,
+    secret_id: str,
+    secret_key: str,
+    sdk_app_id: str,
+    sign_name: str,
+    region: str,
+    timeout_seconds: object,
+    code_ttl_seconds: object,
+    resend_cooldown_seconds: object,
+    hourly_send_limit: object,
+    source_window_seconds: object,
+    source_send_limit: object,
+    max_attempts: object,
+    code_pepper: str,
+) -> None:
+    provider = provider.strip().lower()
+    if provider not in {"", "development", "tencent"}:
+        raise ConfigError("APP_SMS_PROVIDER must be development or tencent.")
+    if provider == "development" and (
+        app_env not in {"development", "test"} or not dev_adapters_enabled
+    ):
+        raise ConfigError(
+            "APP_SMS_PROVIDER=development requires development/test with "
+            "APP_ENABLE_DEV_ADAPTERS=1."
+        )
+    if app_env == "production" and provider != "tencent":
+        raise ConfigError("APP_SMS_PROVIDER=tencent is required in production.")
+    if provider != "tencent":
+        return
+
+    required = {
+        "APP_SMS_TENCENT_SECRET_ID": secret_id,
+        "APP_SMS_TENCENT_SECRET_KEY": secret_key,
+        "APP_SMS_TENCENT_SDK_APP_ID": sdk_app_id,
+        "APP_SMS_TENCENT_SIGN_NAME": sign_name,
+        "APP_SMS_TEMPLATE_ID": template_id,
+        "APP_SMS_TENCENT_REGION": region,
+        "APP_SMS_CODE_PEPPER": code_pepper,
+    }
+    missing = [key for key, value in required.items() if not value.strip()]
+    if missing:
+        raise ConfigError(
+            "APP_SMS_PROVIDER=tencent requires: " + ", ".join(missing)
+        )
+    if not sdk_app_id.isdigit():
+        raise ConfigError("APP_SMS_TENCENT_SDK_APP_ID must be numeric.")
+    if not template_id.isdigit():
+        raise ConfigError("APP_SMS_TEMPLATE_ID must be a numeric Tencent template ID.")
+    if not 2 <= len(sign_name) <= 12:
+        raise ConfigError("APP_SMS_TENCENT_SIGN_NAME must contain 2 to 12 characters.")
+    if not re.fullmatch(r"[a-z0-9-]{1,64}", region):
+        raise ConfigError("APP_SMS_TENCENT_REGION is invalid.")
+    if type(timeout_seconds) not in {int, float} or not 1 <= timeout_seconds <= 30:
+        raise ConfigError("APP_SMS_TENCENT_TIMEOUT_SECONDS must be between 1 and 30.")
+    if (
+        type(code_ttl_seconds) is not int
+        or not 60 <= code_ttl_seconds <= 900
+        or code_ttl_seconds % 60
+    ):
+        raise ConfigError(
+            "APP_SMS_CODE_TTL_SECONDS must be a whole number of minutes between 60 and 900 for Tencent SMS."
+        )
+    if (
+        type(resend_cooldown_seconds) is not int
+        or not 30 <= resend_cooldown_seconds <= 300
+    ):
+        raise ConfigError(
+            "APP_SMS_RESEND_COOLDOWN_SECONDS must be between 30 and 300."
+        )
+    if type(hourly_send_limit) is not int or not 1 <= hourly_send_limit <= 100000:
+        raise ConfigError("APP_SMS_HOURLY_SEND_LIMIT must be between 1 and 100000.")
+    if (
+        type(source_window_seconds) is not int
+        or not 60 <= source_window_seconds <= 3600
+    ):
+        raise ConfigError(
+            "APP_SMS_SOURCE_WINDOW_SECONDS must be between 60 and 3600."
+        )
+    if (
+        type(source_send_limit) is not int
+        or not 1 <= source_send_limit <= hourly_send_limit
+    ):
+        raise ConfigError(
+            "APP_SMS_SOURCE_SEND_LIMIT must be between 1 and APP_SMS_HOURLY_SEND_LIMIT."
+        )
+    if type(max_attempts) is not int or not 3 <= max_attempts <= 10:
+        raise ConfigError("APP_SMS_MAX_ATTEMPTS must be between 3 and 10.")
+    if len(code_pepper) < 32 or code_pepper == DEVELOPMENT_SMS_CODE_PEPPER:
+        raise ConfigError(
+            "APP_SMS_CODE_PEPPER must be a private production value of at least 32 characters."
+        )
 
 
 def _validate_learning_curriculum_preparation_config(

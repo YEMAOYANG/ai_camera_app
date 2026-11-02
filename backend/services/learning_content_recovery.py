@@ -78,9 +78,12 @@ def playful_billed_attempt_one_evidence(*, item, histories):
 
 def require_playful_billed_recovery_authority(conn, *, build, item, histories, now, identity=None):
     """Frozen new-policy, one-slot authority; this function performs reads only."""
-    from integrations.openmaic_formal_media import PLAYFUL_PROFESSIONAL_POLICY
+    from integrations.openmaic_formal_media import (
+        PLAYFUL_PROFESSIONAL_POLICY, QWEN3_PLAYFUL_PROFESSIONAL_POLICY,
+    )
     target = json.loads(build['target_spec_json'])
-    if canonical((target.get('formalRuntimePolicy') or {}).get('professionalCreationPolicy')) != canonical(PLAYFUL_PROFESSIONAL_POLICY):
+    if canonical((target.get('formalRuntimePolicy') or {}).get('professionalCreationPolicy')) not in {
+            canonical(PLAYFUL_PROFESSIONAL_POLICY), canonical(QWEN3_PLAYFUL_PROFESSIONAL_POLICY)}:
         raise ValueError('first-attempt billed replay is restricted to the exact new playful policy')
     dispatches = playful_billed_attempt_one_evidence(item=item, histories=histories)
     if now >= dispatches[-1]['attempt_hard_deadline_at']:

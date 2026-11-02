@@ -21,6 +21,7 @@ from services.textbook_preview_service import TextbookPreviewService
 from services.textbook_preview_audio import atomic_json, verify_segment_receipt, segment_request_plan
 from services.learning_media_materialization_service import asr_similarity_bps, validate_formal_wav
 from services.textbook_operator_revision_service import load_inheritance
+from services.textbook_partial_audio_inheritance import load_partial_audio, verify_partial_segment
 
 
 def main():
@@ -54,6 +55,8 @@ def main():
     contract = resolve_audio_contract(plan, json.loads(row['input_json']))
     inheritance = load_inheritance(args.classroom_directory / row['classroom_id'] / 'textbook-preview-audio',
                                    plan, frozen=json.loads(row['input_json']))
+    audio_folder = args.classroom_directory / row['classroom_id'] / 'textbook-preview-audio'
+    partial = load_partial_audio(audio_folder, plan, frozen=json.loads(row['input_json']))
     if plan['previewKey'] != args.key:
         raise RuntimeError('Audio plan belongs to a different preview')
     receipts = {r['requestId']: r for r in json.loads(row['result_json'])['audioReceipts']}
@@ -78,6 +81,8 @@ def main():
         result['listeningReview'] = listening
     if inheritance:
         result['operatorParentProvenanceSha256'] = inheritance['provenance']['sha256']
+    if partial:
+        result['partialAudioParentSha256'] = digest(partial['targetInput']['partialAudioParent'])
     reconciliation = (json.loads(course_text(args.asr_reconciliation))
                       if args.asr_reconciliation is not None else None)
     if args.recover_failed_asr:
@@ -97,12 +102,13 @@ def main():
             if receipt['status'] != 'succeeded':
                 raise RuntimeError('Current TTS receipt is not succeeded')
             inherited = verify_segment_receipt(plan, receipt, scene, action,
-                args.classroom_directory / row['classroom_id'] / 'textbook-preview-audio', inheritance=inheritance)
+                audio_folder, inheritance=inheritance, partial_inheritance=partial)
+            partial_identity = verify_partial_segment(partial, scene, action, receipt, audio_folder)
             # Inherited segments already validate their original request plans
             # in the immutable ancestor archive. They perform no ASR request
             # and must not look for a fabricated target narration revision.
-            request_plan = plan if inherited is not None else segment_request_plan(
-                plan, receipt, args.classroom_directory / row['classroom_id'] / 'textbook-preview-audio', text=action['text'])
+            request_plan = (partial_identity['sourcePlan'] if partial_identity is not None else
+                plan if inherited is not None else segment_request_plan(plan, receipt, audio_folder, text=action['text']))
             client_options = pronunciation_client_options(request_plan)
             audio = course_bytes(args.classroom_directory / row['classroom_id'] / 'audio' / (action['audioId'] + '.wav'))
             if plan.get('schemaVersion') == PINYIN_SCHEMA:
@@ -120,6 +126,8 @@ def main():
                 entry = json.loads(course_text(path))
                 if entry['audioSha256'] != sha or entry['textSha256'] != hashlib.sha256(action['text'].strip().encode()).hexdigest():
                     raise RuntimeError('Audio audit identity changed')
+                if entry.get('partialAudioParent') != ({k: v for k, v in partial_identity.items() if k != 'sourcePlan'} if partial_identity else None):
+                    raise RuntimeError('Partial-audio ASR source identity changed')
             else:
                 if args.preflight_existing:
                     print(json.dumps({'preflightExisting': True,
@@ -138,18 +146,23 @@ def main():
                     raise RuntimeError('Existing ASR call needs receipt recovery; will not dispatch again')
                 # The durable transport records the claim before contacting ASR.
                 response = client.start_formal_audio_asr(request_id=request_id, tts_request_id=action['audioId'],
-                    classroom_id=row['classroom_id'], classroom_content_sha256=receipt.get('classroomContentSha256', plan['classroomSha256']),
+                    classroom_id=partial_identity['sourceClassroomId'] if partial_identity else row['classroom_id'],
+                    classroom_content_sha256=(partial_identity['sourceClassroomSha256'] if partial_identity else receipt.get('classroomContentSha256', plan['classroomSha256'])),
                     subject=contract['subject'], teacher_profile_id=teacher['teacherProfile']['id'],
                     teacher_profile_version=teacher['teacherProfile']['version'], teacher_profile_sha256=teacher['teacherProfile']['contentHash'],
-                    teacher_gender=teacher['teacherGender'], scene_id=scene['id'], scene_order=scene['order'],
+                    teacher_gender=teacher['teacherGender'], scene_id=scene['id'], scene_order=partial_identity['sourceSceneOrder'] if partial_identity else scene['order'],
                     action_id=action['id'], narration_segment_id=action['id'], audio_sha256=sha, **client_options)
                 transcript = response.get('transcript', '')
                 entry = {'sceneId': scene['id'], 'actionId': action['id'], 'ttsRequestId': action['audioId'],
                     'audioSha256': sha, 'textSha256': hashlib.sha256(action['text'].strip().encode()).hexdigest(),
                     'text': action['text'].strip(), 'transcript': transcript, 'durationMs': wav.duration_ms,
                     'similarityBps': asr_similarity_bps(action['text'], transcript), 'asr': response}
+                if partial_identity:
+                    entry['partialAudioParent'] = {k: v for k, v in partial_identity.items() if k != 'sourcePlan'}
                 atomic_json(path, entry)
             if inherited is None and entry.get('asr', {}).get('status') == 'failed':
+                if partial_identity:
+                    raise RuntimeError('Partial-parent ASR failed; preserve the original receipt and stop without retry')
                 from content.textbook_asr_terminal_recovery import evidence, request_id as recovery_id
                 recovery_path = args.output / (recovery_id(request_id) + '.json')
                 if course_exists(recovery_path) or args.recover_failed_asr == request_id:

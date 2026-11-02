@@ -1,0 +1,97 @@
+{
+ "schemaVersion": "mira.learning.unit-blueprints.v1",
+ "editionId": "pep-math-g1-upper-2022-standard",
+ "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+ "unitId": "11265c70-adb5-4273-b3ea-11f2ba358205",
+ "source": {
+  "id": "official-textbook",
+  "title": "人教版一年级数学上册（2022课标）整理和复习第一课时",
+  "url": "https://basic.smartedu.cn/tchMaterial/detail?contentType=assets_document&contentId=c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc&catalogType=tchMaterial&subCatalog=tchMaterial",
+  "accessedAt": "2026-10-30",
+  "verification": "教学范围为教材印刷31至32页；逐页材料结论与原始字节SHA保存在本课 frozen scopeReview 和 official-source-manifest。仅供目标与范围核对，不能复制官方内容。"
+ },
+ "lessons": [
+  {
+   "nodeId": "5cd47ba3-5d21-48a1-9fc8-a41358ecc4bd",
+   "title": "整理和复习",
+   "status": "scope_verified_preview_only",
+   "targets": [
+    "用实物点数回顾0～5的数量、顺序与相邻关系，理解最后一个数表示总数。",
+    "用一一对应回顾比大小与第几，能比较0～5中两个数并说明结果。",
+    "用摆一摆回顾2～5的分与合，并把两部分合回原数。",
+    "观察加法表的行、列与斜向规律，补全缺卡（含0的加法）。",
+    "制作减法表，观察规律，并用想加算减检验。",
+    "用自己选择的方式整理0～5的知识，绘制并完善自己的知识图，说明其中的联系。",
+    "结合已学经验预想6～10单元的学习内容，并用本课预告对照卡核对；真实看书核对另记。"
+   ],
+   "scopePages": [
+    31,
+    32
+   ],
+   "knowledgeBrief": {
+    "status": "draft",
+    "objectives": [
+     "用实物点数回顾0～5的数量、顺序与相邻关系，理解最后一个数表示总数。",
+     "用一一对应回顾比大小与第几，能比较0～5中两个数并说明结果。",
+     "用摆一摆回顾2～5的分与合，并把两部分合回原数。",
+     "观察加法表的行、列与斜向规律，补全缺卡（含0的加法）。",
+     "制作减法表，观察规律，并用想加算减检验。",
+     "用自己选择的方式整理0～5的知识，绘制并完善自己的知识图，说明其中的联系。",
+     "结合已学经验预想6～10单元的学习内容，并用本课预告对照卡核对；真实看书核对另记。"
+    ],
+    "knowledgePoints": [
+     "在图片与声音支持下盘点0～5并理解最后一个数表示总数。",
+     "一一对应比较大小与按起点顺序确定第几。",
+     "把2～5分成两部分并合回原数。",
+     "按行、列、斜向规律整理加法表，含0的加法。",
+     "制作减法表并用想加算减检验。",
+     "用自己的方式整理知识并绘制、完善、解释知识图。",
+     "结合已学经验预想6～10单元并对照核对，不展开新知识。"
+    ],
+    "priorKnowledge": [
+     "已在图片与教师短句支持下学习0～5的认识、比较、分与合和加减法；不预设独立读指令。"
+    ],
+    "excludedTopics": [
+     "6以上数量的运算或比较；6～10仅作下一站预告。",
+     "负数、除法、表格统计术语或教科书式列表。",
+     "复制官方课件页、表格版式、原题与插图。"
+    ],
+    "assessmentMode": "observed",
+    "reviewNote": "官方教学范围来自本课已逐页审阅的图文材料；视频例外与逐页结论仅见本课冻结 scopeReview。此登记用于接收既有候选，不授权重新派发，不代表配音、整课质量、发布或学生验收通过。冻结 lockedAssessments=[]，课堂记录基于实际操作。"
+   },
+   "game": [
+    {
+     "family": "tidy-count-and-order",
+     "childDecision": "盘点货篮并挂0至5号牌，再按顺序排队并补上缺号。",
+     "domainState": "货篮物品ID、号牌位置、序列与缺失位置。",
+     "stateTransition": "点数后挂牌；调整位置后顺序与相邻数一起核对。",
+     "observableOutcome": "号牌与篮内数量一致；0在1前，相邻数差1。",
+     "revisionOpportunity": "换牌、重点、重新排序，按需帮助。"
+    },
+    {
+     "family": "tidy-tables-by-rule",
+     "childDecision": "观察行、列、斜线规律，把散卡补进加法表和减法表。",
+     "domainState": "卡面算式、表格位置、缺失卡、规律观察记录。",
+     "stateTransition": "按已摆卡观察后补缺，再用想加算减反向核对。",
+     "observableOutcome": "行/列/斜线规律一致，0的行列按具体事件意义呈现。",
+     "revisionOpportunity": "移卡重摆、换卡重验。"
+    },
+    {
+     "family": "author-knowledge-map",
+     "childDecision": "自选节点、连线和解释，建立自己的知识图，先猜后核下一站预告。",
+     "domainState": "节点、连线、解释贴片、作品版本与保存状态。",
+     "stateTransition": "拖入节点并连线，编辑后重新核对；预想后翻开对照卡。",
+     "observableOutcome": "多种原创结构均有效；比对只记录相符或不同，不算分数。",
+     "revisionOpportunity": "增删节点、改解释、保存刷新继续。"
+    }
+   ],
+   "transfer": "综合检修三处错位（号牌顺序、货物比较、加法表缺卡），再在新情境预想6～10内容并与对照卡核对；逐处给具体反馈，不引入新知识。",
+   "generationReady": false,
+   "missing": [
+    "正式教师配音和逐段审核",
+    "最终整课实玩与学生入口验收",
+    "原创课后题包及归档核验"
+   ]
+  }
+ ]
+}

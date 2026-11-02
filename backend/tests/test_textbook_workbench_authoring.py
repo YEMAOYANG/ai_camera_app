@@ -15,19 +15,23 @@ from PIL import Image
 from content.teacher_profiles import get_formal_subject_qwen_voice_identity
 from content.textbook_catalog import digest
 from content.textbook_interaction_policy import interaction_policy_prompt
-from content.textbook_scene_contract import SNAPSHOT_SCHEMA, render_scene_contract
+from content.textbook_scene_contract import (
+    AUTHOR_DISPATCH_SNAPSHOT_SCHEMA, SNAPSHOT_SCHEMA, freeze_scene_contract,
+    render_author_dispatch_contract, render_scene_contract,
+)
 from integrations.openmaic_workbench_client import OpenMaicWorkbenchClient, WorkbenchError, local_origin, private_write, _NoRedirect
 from repositories.textbook_repository import TextbookRepository
 from services.textbook_learning_service import TextbookLearningService
 from services.textbook_workbench_authoring import TextbookWorkbenchAuthoring, WorkbenchCatalogGuard, amendment_draft, sha
 from tests.test_textbook_learning import IsolatedDatabase, sample
+from tests.test_textbook_official_resource_review import reviewed_official_resources
 
 
 def reviewed_draft():
     manifest = sample(reviewed=True)
     unit, lesson = manifest['units'][0], manifest['units'][0]['lessons'][0]
     voice = get_formal_subject_qwen_voice_identity('chinese')
-    return {'schemaVersion': 'mira.operator.workbench-request-draft.v1', 'draftOnly': True,
+    draft = {'schemaVersion': 'mira.operator.workbench-request-draft.v1', 'draftOnly': True,
             'binding': {**{k: manifest[k] for k in ('editionId', 'revisionId', 'gradeCode', 'subject', 'volume', 'schoolSystem')},
                         'unitId': unit['unitId'], 'unitTitle': unit['title'], 'lessonTitle': lesson['title'], 'nodeId': lesson['nodeId']},
             'skillIds': ['mira-primary-courseware', 'stage-design'],
@@ -41,6 +45,26 @@ def reviewed_draft():
             'pagePlan': [{'page': 1, 'type': 'slide', 'title': '完整保留额外已审核内容',
                           'move': '按图示范学校情境，不将看过图片推断为独立识字。'}],
             'lockedAssessments': []}
+    review = reviewed_official_resources(draft['binding'])
+    draft['scopeReview']['officialResourceReview'] = review
+    draft['scopeReview']['postClassPractice'] = {
+        'schemaVersion': 'mira.textbook.post-class-practice.v1',
+        'officialResourceReviewSha256': digest(review),
+        'sourceKind': 'synthetic-reviewed-official-assignment-record',
+        'sourceSha256': 'c' * 64,
+        'sourceContract': '合成测试题源，仅验证课内映射与周末题包边界。',
+        'originalFileDownloaded': False,
+        'targetSeconds': 1800,
+        'goals': ['school-scene-observation'],
+        'inCoursePractice': [{
+            'activityId': 'practice-school-scene', 'goalId': 'school-scene-observation',
+            'classHourId': 'lesson_1', 'page': 1,
+            'sourceLocations': review['classHours'][0]['resources']['afterClassExercise']['locations'],
+            'originalDesign': '把官方练习目标改编为原创学校场景中的观察与修改。',
+            'evidenceClaim': '只支持孩子在图片和语音支持下观察关系，不证明独立识字。',
+        }],
+    }
+    return draft
 
 
 class WorkbenchAuthoringTest(unittest.TestCase):
@@ -55,7 +79,7 @@ class WorkbenchAuthoringTest(unittest.TestCase):
         self.guard.inspect.return_value = {'manifestSha256': 'a' * 64, 'lessonScopeSha256': 'b' * 64,
                                           'existingArtifacts': []}
         self.client = Mock()
-        self.client.scene_contract_schema = SNAPSHOT_SCHEMA
+        self.client.scene_contract_schema = f'{SNAPSHOT_SCHEMA},{AUTHOR_DISPATCH_SNAPSHOT_SCHEMA}'
         self.client.sessions.return_value = []
         self.client.owner_fingerprint.return_value = 'owner-fingerprint-not-cookie'
         self.client.stage_events.return_value = []
@@ -70,6 +94,7 @@ class WorkbenchAuthoringTest(unittest.TestCase):
             frozen = json.loads((self.job / 'frozen.json').read_text())
             frozen.pop('interactionPolicy')
             frozen.pop('sceneContract')
+            frozen.pop('authorDispatchContract')
             frozen['schemaVersion'] = 'mira.operator.workbench-authoring.v1'
             (self.job / 'frozen.json').write_text(json.dumps(frozen))
             self.prepared = self.service.run(self.job)
@@ -90,6 +115,41 @@ class WorkbenchAuthoringTest(unittest.TestCase):
         self.assertFalse((self.job / 'owner.cookies').exists())
         self.assertEqual(stat.S_IMODE((self.job / 'draft.json').stat().st_mode), 0o600)
         self.assertEqual(self.service.run(self.job)['status'], 'prepared')
+        self.factory.assert_not_called()
+
+    def test_irreversible_review_hold_blocks_attach_and_start_without_mutating_state(self):
+        state_before = (self.job / 'state.json').read_bytes()
+        result = self.service.hold(self.job, reviewer='independent-reviewer',
+                                   basis='official video audio was not actually reviewed')
+        self.assertEqual(result['reviewHold']['schemaVersion'], 'mira.operator.review-hold.v1')
+        self.assertEqual(result['reviewHold']['draftSha256'], self.prepared['draftSha256'])
+        marker = (self.job / 'review-hold.json').read_bytes()
+        self.assertEqual((self.job / 'state.json').read_bytes(), state_before)
+        self.assertEqual(self.service.run(self.job)['reviewHold'], result['reviewHold'])
+        with self.assertRaises(WorkbenchError) as caught:
+            self.service.run(self.job, start=True)
+        self.assertEqual(caught.exception.code, 'review_hold_active')
+        with self.assertRaises(WorkbenchError) as caught:
+            self.service.attach_materials(self.job, self.root / 'not-read.json')
+        self.assertEqual(caught.exception.code, 'review_hold_active')
+        self.factory.assert_not_called()
+        replay = self.service.hold(self.job, reviewer='independent-reviewer',
+                                   basis='official video audio was not actually reviewed')
+        self.assertEqual(replay['reviewHold'], result['reviewHold'])
+        self.assertEqual((self.job / 'review-hold.json').read_bytes(), marker)
+        with self.assertRaises(WorkbenchError) as caught:
+            self.service.hold(self.job, reviewer='different-reviewer', basis='different basis')
+        self.assertEqual(caught.exception.code, 'review_hold_conflict')
+        self.assertEqual((self.job / 'state.json').read_bytes(), state_before)
+
+    def test_review_hold_tamper_fails_closed(self):
+        self.service.hold(self.job, reviewer='reviewer', basis='evidence incomplete')
+        sealed = json.loads((self.job / 'review-hold.json').read_text())
+        sealed['basis'] = 'silently changed'
+        (self.job / 'review-hold.json').write_text(json.dumps(sealed))
+        with self.assertRaises(WorkbenchError) as caught:
+            self.service.run(self.job)
+        self.assertEqual(caught.exception.code, 'review_hold_invalid')
         self.factory.assert_not_called()
 
     def test_changed_draft_and_teacher_cannot_overwrite_prepared_job(self):
@@ -213,6 +273,133 @@ class WorkbenchAuthoringTest(unittest.TestCase):
         self.client.create_session.assert_called_once()
 
 
+class WorkbenchOfficialResourceReviewTest(unittest.TestCase):
+    freeze_new_policy = True
+    setUp = WorkbenchAuthoringTest.setUp
+
+    def historical_without_review(self, schema='v3'):
+        """Build pre-gate bytes; operations under test must never retrofit them."""
+        draft = deepcopy(self.draft)
+        draft['scopeReview'].pop('officialResourceReview')
+        raw = (json.dumps(draft, ensure_ascii=False, indent=2) + '\n').encode()
+        frozen = json.loads((self.job / 'frozen.json').read_text())
+        frozen.update(schemaVersion='mira.operator.workbench-authoring.' + schema,
+                      draftSha256=sha(raw), draftCanonicalSha256=digest(draft))
+        frozen.pop('authorDispatchContract')
+        if schema == 'v1':
+            frozen.pop('interactionPolicy')
+            frozen.pop('sceneContract')
+        else:
+            policy = frozen['interactionPolicy']['policy']
+            policy['version'] = 2
+            policy.pop('officialResourceReviewContract', None)
+            policy['rules'] = [rule for rule in policy['rules']
+                               if rule['id'] != 'official_source_review_before_authoring']
+            frozen['interactionPolicy']['sha256'] = digest(policy)
+            if schema == 'v2':
+                frozen.pop('sceneContract')
+            else:
+                frozen['sceneContract'] = freeze_scene_contract(draft, frozen['catalogCheck'],
+                                                                frozen['interactionPolicy'])
+        (self.job / 'draft.json').write_bytes(raw)
+        self.draft_path.write_bytes(raw)
+        (self.job / 'frozen.json').write_text(json.dumps(frozen, ensure_ascii=False))
+        self.draft = draft
+        self.session['prompt'] = self.service._base_dispatch_payload(frozen, draft)['prompt']
+        return (self.job / 'frozen.json').read_bytes()
+
+    def test_new_prepare_blocks_missing_or_unread_resource_before_any_http(self):
+        for mode in ('missing', 'unread'):
+            with self.subTest(mode=mode):
+                draft = deepcopy(self.draft)
+                if mode == 'missing':
+                    draft['scopeReview'].pop('officialResourceReview')
+                else:
+                    draft['scopeReview']['officialResourceReview']['classHours'][0]['resources']['video']['status'] = 'unread'
+                path = self.root / (mode + '.json')
+                path.write_text(json.dumps(draft, ensure_ascii=False))
+                with self.assertRaises(WorkbenchError) as caught:
+                    self.service.prepare(path, teaching_revision=mode)
+                self.assertEqual(caught.exception.code, 'official_resource_review_required'
+                                 if mode == 'missing' else 'official_resource_review_invalid')
+                self.assertFalse(self.service._path(draft['binding'], mode).exists())
+        self.factory.assert_not_called()
+
+    def test_review_and_original_approach_are_frozen_in_the_actual_dispatch(self):
+        original = (self.job / 'frozen.json').read_bytes()
+        frozen = json.loads(original)
+        expected = self.draft['scopeReview']['officialResourceReview']
+        self.assertEqual(frozen['sceneContract']['contract']['scopeReview']['officialResourceReview'], expected)
+        self.assertEqual((self.job / 'draft.json').read_bytes(), self.draft_path.read_bytes())
+        with patch('services.textbook_workbench_authoring.freeze_interaction_policy',
+                   side_effect=AssertionError('A frozen policy is not refreshed at start')):
+            self.assertEqual(self.service.run(self.job, start=True)['sessionId'], 'session-one')
+        prompt = self.client.create_session.call_args.args[0]['prompt']
+        self.assertIn('officialResourceSummary', prompt)
+        self.assertNotIn('reviewExceptions', prompt)
+        self.assertIn(expected['adaptation']['originalApproach'][0], prompt)
+        self.assertEqual((self.job / 'frozen.json').read_bytes(), original)
+
+    def test_old_v1_v2_v3_status_and_repeated_prepare_keep_original_identity(self):
+        for schema in ('v1', 'v2', 'v3'):
+            with self.subTest(schema=schema):
+                # Restore the current fixture before constructing another era.
+                if schema != 'v1':
+                    self.setUp()
+                original = self.historical_without_review(schema)
+                self.assertEqual(self.service.run(self.job)['status'], 'prepared')
+                self.assertEqual(self.service.prepare(self.draft_path)['status'], 'prepared')
+                self.factory.assert_not_called()
+                self.assertEqual((self.job / 'frozen.json').read_bytes(), original)
+
+    def test_old_unstarted_job_without_review_cannot_make_a_new_post(self):
+        original = self.historical_without_review()
+        result = self.service.run(self.job, start=True)
+        self.assertEqual(result['error'], 'official_resource_review_required')
+        self.assertEqual(result['status'], 'prepared')
+        self.assertFalse((self.job / 'dispatch.json').exists())
+        self.client.create_session.assert_not_called()
+        self.assertEqual((self.job / 'frozen.json').read_bytes(), original)
+
+    def test_old_exact_existing_session_is_reused_before_new_post_gate(self):
+        original = self.historical_without_review()
+        self.client.sessions.return_value = [self.session]
+        with patch('services.textbook_workbench_authoring.require_official_resource_review',
+                   side_effect=AssertionError('Recovery does not acquire new requirements')):
+            self.assertEqual(self.service.run(self.job, start=True)['sessionId'], 'session-one')
+            self.assertEqual(self.service.run(self.job)['sessionId'], 'session-one')
+            self.assertEqual(self.service.run(self.job, start=True)['sessionId'], 'session-one')
+        self.client.create_session.assert_not_called()
+        marker = json.loads((self.job / 'dispatch.json').read_text())
+        self.assertEqual(marker['action'], 'reuse_existing_session')
+        self.assertEqual((self.job / 'frozen.json').read_bytes(), original)
+
+    def test_old_dispatched_status_and_unknown_outcome_recovery_do_not_require_review(self):
+        original = self.historical_without_review('v2')
+        frozen = json.loads(original)
+        _, identity = self.service._material_payload(self.job, frozen, self.draft)
+        marker = {'requestSha256': identity['requestSha256'], 'payloadSha256': identity['payloadSha256'],
+                  'ownerFingerprint': self.client.owner_fingerprint(), 'action': 'single_post_intent'}
+        (self.job / 'dispatch.json').write_text(json.dumps(marker))
+        self.client.sessions.return_value = [self.session]
+        with patch('services.textbook_workbench_authoring.require_official_resource_review',
+                   side_effect=AssertionError('An existing marker remains read-only recovery')):
+            self.assertEqual(self.service.run(self.job)['sessionId'], 'session-one')
+            self.assertEqual(self.service.run(self.job, start=True)['sessionId'], 'session-one')
+        self.client.create_session.assert_not_called()
+        self.assertEqual((self.job / 'frozen.json').read_bytes(), original)
+
+    def test_frozen_review_tamper_is_rejected_before_owner_or_post(self):
+        draft = deepcopy(self.draft)
+        draft['scopeReview']['officialResourceReview']['officialTextbook']['volume'] = 'lower'
+        (self.job / 'draft.json').write_text(json.dumps(draft, ensure_ascii=False))
+        with self.assertRaises(WorkbenchError) as caught:
+            self.service.run(self.job, start=True)
+        self.assertEqual(caught.exception.code, 'frozen_integrity_error')
+        self.factory.assert_not_called()
+        self.client.create_session.assert_not_called()
+
+
 class EmptyWidgetSuccessorTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -222,7 +409,7 @@ class EmptyWidgetSuccessorTest(unittest.TestCase):
         self.guard.inspect.return_value = {'manifestSha256': 'a' * 64, 'lessonScopeSha256': 'b' * 64,
                                           'existingArtifacts': []}
         self.client = Mock()
-        self.client.scene_contract_schema = SNAPSHOT_SCHEMA
+        self.client.scene_contract_schema = f'{SNAPSHOT_SCHEMA},{AUTHOR_DISPATCH_SNAPSHOT_SCHEMA}'
         self.client.owner_fingerprint.return_value = 'test-owner'
         self.client.sessions.return_value = []
         self.client.stage_events.return_value = []
@@ -458,21 +645,48 @@ class WorkbenchInteractionPolicyTest(unittest.TestCase):
     def test_new_job_keeps_reviewed_bytes_and_freezes_a_separate_dispatch_policy(self):
         frozen = json.loads((self.job / 'frozen.json').read_text())
         policy = frozen['interactionPolicy']
-        self.assertEqual(frozen['schemaVersion'], 'mira.operator.workbench-authoring.v3')
+        self.assertEqual(frozen['schemaVersion'], 'mira.operator.workbench-authoring.v4')
         self.assertEqual(policy['sha256'], digest(policy['policy']))
         self.assertEqual((self.job / 'draft.json').read_bytes(), self.draft_path.read_bytes())
         self.assertEqual(frozen['requestSha256'], sha(self.draft['request'].encode()))
         self.assertEqual(frozen['payloadSha256'], digest({'prompt': self.draft['request'],
                                                          'skill': self.draft['skillIds'][0]}))
-        expected = '【已冻结的逐页生成合同】' + render_scene_contract(frozen['sceneContract']) + interaction_policy_prompt(policy) + self.draft['request']
+        expected = ('【已冻结的精简作者合同】'
+                    + render_author_dispatch_contract(frozen['authorDispatchContract'])
+                    + '【原始已审课程请求】\n' + self.draft['request'])
         self.assertEqual(self.session['prompt'], expected)
         self.assertEqual(expected.strip(), expected)  # Native POST trims the prompt.
         self.assertNotEqual(sha(expected.encode()), frozen['requestSha256'])
         self.assertEqual(self.prepared['interactionPolicy']['sha256'], policy['sha256'])
         self.assertEqual(self.prepared['interactionPolicy']['verification'], 'frozen_prompt_requirement_only')
         self.assertEqual(self.prepared['sceneContract']['sha256'], frozen['sceneContract']['sha256'])
+        self.assertEqual(self.prepared['authorDispatchContract']['sha256'],
+                         frozen['authorDispatchContract']['sha256'])
         self.assertEqual(frozen['sceneContract']['contract']['pagePlan'], self.draft['pagePlan'])
+        compact = frozen['authorDispatchContract']['contract']
+        self.assertEqual(compact['sourceSceneContractSha256'], frozen['sceneContract']['sha256'])
+        self.assertEqual(compact['officialResourceSummary']['sha256'],
+                         digest(self.draft['scopeReview']['officialResourceReview']))
+        self.assertNotIn('officialResourceReview', compact['courseScope'])
+        self.assertNotIn('policy', compact['policyRef'])
+        self.assertLess(len(expected), len('【已冻结的逐页生成合同】'
+                                           + render_scene_contract(frozen['sceneContract'])
+                                           + interaction_policy_prompt(policy)
+                                           + self.draft['request']))
         self.factory.assert_not_called()
+
+    def test_historical_v3_keeps_its_exact_full_contract_prompt(self):
+        frozen = json.loads((self.job / 'frozen.json').read_text())
+        frozen.pop('authorDispatchContract')
+        frozen['schemaVersion'] = 'mira.operator.workbench-authoring.v3'
+        (self.job / 'frozen.json').write_text(json.dumps(frozen))
+        original = (self.job / 'frozen.json').read_bytes()
+        expected = ('【已冻结的逐页生成合同】' + render_scene_contract(frozen['sceneContract'])
+                    + interaction_policy_prompt(frozen['interactionPolicy']) + self.draft['request'])
+        self.session['prompt'] = expected
+        self.service.run(self.job, start=True)
+        self.assertEqual(self.client.create_session.call_args.args[0]['prompt'], expected)
+        self.assertEqual((self.job / 'frozen.json').read_bytes(), original)
 
     def test_effective_prompt_is_dispatched_once_and_marker_uses_effective_hashes(self):
         original = (self.job / 'frozen.json').read_bytes()
@@ -490,6 +704,7 @@ class WorkbenchInteractionPolicyTest(unittest.TestCase):
     def test_historical_v2_keeps_exact_policy_prompt_without_new_contract(self):
         frozen = json.loads((self.job / 'frozen.json').read_text())
         frozen.pop('sceneContract')
+        frozen.pop('authorDispatchContract')
         frozen['schemaVersion'] = 'mira.operator.workbench-authoring.v2'
         (self.job / 'frozen.json').write_text(json.dumps(frozen))
         original = (self.job / 'frozen.json').read_bytes()
@@ -544,7 +759,7 @@ class WorkbenchInteractionPolicyTest(unittest.TestCase):
         self.assertEqual(result['error'], 'scene_contract_runtime_unavailable')
         self.assertFalse((self.job / 'dispatch.json').exists())
         self.client.create_session.assert_not_called()
-        self.client.scene_contract_schema = SNAPSHOT_SCHEMA
+        self.client.scene_contract_schema = f'{SNAPSHOT_SCHEMA},{AUTHOR_DISPATCH_SNAPSHOT_SCHEMA}'
         self.assertEqual(self.service.run(self.job, start=True)['sessionId'], 'session-one')
         self.client.create_session.assert_called_once()
 
@@ -951,6 +1166,27 @@ class WorkbenchDraftAmendmentTest(unittest.TestCase):
 
 
 class WorkbenchAuthoringCliTest(unittest.TestCase):
+    def test_hold_requires_review_identity_and_routes_without_start(self):
+        from scripts import author_textbook_lesson as cli
+        with patch.object(cli.AppConfig, 'from_env') as config, redirect_stderr(io.StringIO()):
+            for args in (['hold', '--job-directory', '/job'],
+                         ['hold', '--job-directory', '/job', '--reviewer', 'reviewer', '--basis', 'evidence gap',
+                          '--draft', '/draft'],
+                         ['hold', '--job-directory', '/job', '--reviewer', 'reviewer', '--basis', 'evidence gap',
+                          '--teaching-revision', '2']):
+                with self.subTest(args=args), self.assertRaises(SystemExit):
+                    cli.main(args)
+            config.assert_not_called()
+        with patch.object(cli.AppConfig, 'from_env'), patch.object(cli, 'Database'), \
+                patch.object(cli, 'TextbookWorkbenchAuthoring') as service, redirect_stdout(io.StringIO()):
+            service.return_value.hold.return_value = {'status': 'prepared', 'reviewHold': {'active': True}}
+            self.assertEqual(cli.main(['hold', '--job-directory', '/job', '--reviewer', 'reviewer',
+                                       '--basis', 'official audio was not reviewed']), 0)
+            service.return_value.hold.assert_called_once_with(
+                Path('/job'), reviewer='reviewer', basis='official audio was not reviewed')
+            service.return_value.run.assert_not_called()
+            service.return_value.prepare.assert_not_called()
+
     def test_successor_requires_explicit_review_and_routes_without_start(self):
         from scripts import author_textbook_lesson as cli
         args = ['supersede-widget', '--source-job', '/source', '--draft', '/corrected',
@@ -1050,8 +1286,11 @@ class WorkbenchMaterialAttachmentsTest(unittest.TestCase):
         ready = json.loads((self.folder / 'ready.json').read_text())
         receipts = {json.loads(p.read_text())['response']['material']['materialId']:
                     json.loads(p.read_text())['response']['material'] for p in self.folder.glob('*-receipt.json')}
+        ids = ready['payload'].get('materialIds')
+        if ids is None:
+            ids = [mid for group in ready['payload']['materialIdGroups'] for mid in group]
         materials = [{key: receipts[mid][key] for key in ('materialId', 'originalName', 'mime', 'bytes')}
-                     for mid in ready['payload']['materialIds']]
+                     for mid in ids]
         return [{'type': 'user_message', 'data': {'text': ready['payload']['prompt'], 'materials': materials}}]
 
     def attach(self):
@@ -1134,6 +1373,85 @@ class WorkbenchMaterialAttachmentsTest(unittest.TestCase):
         self.assertEqual(marker['materialsSha256'], digest(ready))
         self.service.run(self.job, start=True)
         self.client.create_session.assert_called_once()
+
+    def grow_manifest(self, count):
+        data = json.loads(self.manifest.read_text())
+        base = data['assets'][0]
+        data['assets'] = [{**base, 'assetKey': 'picture-' + str(i)} for i in range(count)]
+        self.manifest.write_text(json.dumps(data))
+
+    def test_forty_three_materials_freeze_groups_and_bind_one_opening_post(self):
+        self.grow_manifest(43)
+        self.client.material_groups_schema = 'mira.agent-opening-material-groups.v1'
+        self.assertEqual(self.attach()['materialCount'], 43)
+        frozen_manifest = json.loads((self.folder / 'manifest.json').read_text())
+        self.assertEqual([len(group) for group in frozen_manifest['openingMaterialGroups']['assetKeyGroups']], [20, 20, 3])
+        self.assertEqual(self.client.upload_material.call_count, 43)
+        self.service.run(self.job, start=True)
+        payload = self.client.create_session.call_args.args[0]
+        self.assertNotIn('materialIds', payload)
+        self.assertEqual([len(group) for group in payload['materialIdGroups']], [20, 20, 3])
+        self.assertEqual((self.job / 'frozen.json').read_bytes(), self.original_frozen)
+        self.service.run(self.job, start=True)
+        self.client.create_session.assert_called_once()
+
+    def test_group_capability_is_required_before_upload_and_first_post_but_not_recovery(self):
+        self.grow_manifest(43)
+        self.client.material_groups_schema = None
+        with self.assertRaises(WorkbenchError) as caught:
+            self.attach()
+        self.assertEqual(caught.exception.code, 'material_groups_runtime_unavailable')
+        self.client.upload_material.assert_not_called()
+        self.assertFalse(list(self.folder.glob('*-intent.json')))
+        self.client.material_groups_schema = 'mira.agent-opening-material-groups.v1'
+        self.attach()
+        self.client.material_groups_schema = None
+        self.assertEqual(self.service.run(self.job, start=True)['error'], 'material_groups_runtime_unavailable')
+        self.client.create_session.assert_not_called()
+        self.assertFalse((self.job / 'dispatch.json').exists())
+        self.client.material_groups_schema = 'mira.agent-opening-material-groups.v1'
+        self.service.run(self.job, start=True)
+        self.client.material_groups_schema = None
+        self.service.run(self.job, start=True)
+        self.client.create_session.assert_called_once()
+
+    def test_new_materials_count_and_total_bytes_are_bounded_before_http(self):
+        self.grow_manifest(65)
+        with self.assertRaises(WorkbenchError) as caught:
+            self.attach()
+        self.assertEqual(caught.exception.code, 'material_manifest_invalid')
+        self.grow_manifest(3)
+        data = json.loads(self.manifest.read_text())
+        source = self.root / 'large.txt'
+        source.write_bytes(b'a')
+        for asset in data['assets']:
+            asset.update(path=source.name, mimeType='text/plain', sha256=sha(b'a'))
+        self.manifest.write_text(json.dumps(data))
+        class LargeBytes(bytes):
+            def __len__(self):
+                return 45 * 1024 * 1024
+        import services.textbook_workbench_authoring as module
+        original = module.course_bytes
+        with patch.object(module, 'course_bytes', side_effect=lambda path:
+                          LargeBytes(b'a') if Path(path).name == 'large.txt' else original(path)):
+            with self.assertRaises(WorkbenchError) as caught:
+                self.attach()
+        self.assertEqual(caught.exception.code, 'material_manifest_invalid')
+        self.factory.assert_not_called()
+
+    def test_group_marker_cannot_be_removed_or_changed_in_frozen_manifest(self):
+        self.grow_manifest(43)
+        self.client.material_groups_schema = 'mira.agent-opening-material-groups.v1'
+        self.attach()
+        path = self.folder / 'manifest.json'
+        manifest = json.loads(path.read_text())
+        manifest.pop('openingMaterialGroups')
+        manifest['sha256'] = digest({k: v for k, v in manifest.items() if k != 'sha256'})
+        path.write_text(json.dumps(manifest))
+        with self.assertRaises(WorkbenchError) as caught:
+            self.service.run(self.job, start=True)
+        self.assertEqual(caught.exception.code, 'material_integrity_error')
+        self.client.create_session.assert_not_called()
 
     def test_changed_sha_dimensions_duplicate_keys_and_limit_fail_before_any_http(self):
         original = json.loads(self.manifest.read_text())
@@ -1460,6 +1778,25 @@ class WorkbenchClientTest(unittest.TestCase):
         return Cookie(0, 'anonymous_id', self.owner, None, False, '127.0.0.1', False, False,
                       '/', True, True, None, True, None, None, {}, False)
 
+    def test_read_only_get_preserves_owner_file_and_refuses_post_and_new_identity(self):
+        with self.assertRaises(WorkbenchError):
+            OpenMaicWorkbenchClient(self.client.origin, self.path, read_only=True)
+        self.client.jar.set_cookie(self.cookie())
+        self.client._save_owner()
+        original = self.path.read_bytes()
+        before = self.path.stat().st_mtime_ns
+        with patch('integrations.openmaic_workbench_client.os.chmod', side_effect=AssertionError('write')), \
+                patch('integrations.openmaic_workbench_client.tempfile.mkstemp', side_effect=AssertionError('write')):
+            reader = OpenMaicWorkbenchClient(self.client.origin, self.path, read_only=True)
+            reader.opener = Mock()
+            reader.opener.open.return_value = io.BytesIO(b'[]')
+            self.assertEqual(reader.sessions(), [])
+            with self.assertRaises(WorkbenchError):
+                reader.create_session({'prompt': 'forbidden'})
+            self.assertEqual(reader.opener.open.call_count, 1)
+        self.assertEqual(self.path.read_bytes(), original)
+        self.assertEqual(self.path.stat().st_mtime_ns, before)
+
     def test_registry_mode_keeps_owner_cookie_local_without_consulting_course_storage(self):
         self.client.jar.set_cookie(self.cookie())
         self.client.opener = Mock()
@@ -1531,12 +1868,15 @@ class WorkbenchClientTest(unittest.TestCase):
 
     def test_scene_contract_capability_comes_from_latest_session_list_response(self):
         class Response(io.BytesIO):
-            headers = {'x-mira-textbook-scene-contract': SNAPSHOT_SCHEMA}
+            headers = {'x-mira-textbook-scene-contract': SNAPSHOT_SCHEMA,
+                       'x-mira-agent-material-groups': 'mira.agent-opening-material-groups.v1'}
         self.client._open = Mock(side_effect=[Response(b'[]'), io.BytesIO(b'[]')])
         self.assertEqual(self.client.sessions(), [])
         self.assertEqual(self.client.scene_contract_schema, SNAPSHOT_SCHEMA)
+        self.assertEqual(self.client.material_groups_schema, 'mira.agent-opening-material-groups.v1')
         self.assertEqual(self.client.sessions(), [])
         self.assertIsNone(self.client.scene_contract_schema)
+        self.assertIsNone(self.client.material_groups_schema)
 
     def test_sse_stops_at_caught_up_and_does_not_follow_live_tail(self):
         raw = (b'event: library_changed\ndata: {"type":"library_changed","data":{"change":"stage_created","stageId":"real"}}\n\n'

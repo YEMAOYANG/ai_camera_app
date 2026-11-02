@@ -17,7 +17,8 @@ from tests.test_learning_budget import IsolatedDatabase, test_policy
 
 class Required3dCatalogBudgetTest(unittest.TestCase):
     def setUp(self):
-        self.env = patch.dict(os.environ, {"MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""})
+        self.env = patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "",
+                                             "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""})
         self.env.start()
         self.addCleanup(self.env.stop)
         self.current = build_preparation_target("primary_6")

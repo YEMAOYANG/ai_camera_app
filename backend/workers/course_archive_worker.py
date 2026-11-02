@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import signal
 import subprocess
@@ -25,9 +26,15 @@ def main(argv=None):
     parser.add_argument("--limit", type=int, default=10, help="Maximum course deliveries per batch (1-1000)")
     parser.add_argument("--include-history", action="store_true",
                         help="Also scan and deliver historical PG/legacy backfill (priority 2)")
+    parser.add_argument("--content-key",
+                        help="Deliver only this exact published textbook content key")
     args = parser.parse_args(argv)
     if not 1 <= args.limit <= 1000:
         parser.error("--limit must be between 1 and 1000")
+    if args.content_key is not None and not re.fullmatch(r"[a-f0-9]{64}", args.content_key):
+        parser.error("--content-key must be 64 lowercase hexadecimal characters")
+    if args.content_key is not None and args.include_history:
+        parser.error("--content-key cannot be combined with --include-history")
     # Loading backend configuration does not create Flask, workers or a provider.
     from core.config import AppConfig
     if os.getenv("COURSE_STORAGE_ARCHIVE_ENABLED", "false").strip().lower() not in {"true", "1"}:
@@ -51,7 +58,8 @@ def main(argv=None):
     database = Database(config.DATABASE_URL)
     client = NodeArchiveClient(project_root=ROOT, node=node)
     processor = CourseArchiveProcessor(queue, CourseArchiveExporter(project_root=ROOT), client, database=database)
-    worker = CourseArchiveWorker(queue, processor, database=database, scan_history=args.include_history)
+    worker = CourseArchiveWorker(queue, processor, database=database, scan_history=args.include_history,
+                                 content_key=args.content_key)
     stopped = threading.Event()
 
     def stop(_signum, _frame):

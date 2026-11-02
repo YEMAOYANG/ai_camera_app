@@ -47,7 +47,7 @@ class LegacyNarrationInheritanceTests(unittest.TestCase):
         audit = f.audit(f.source_key)
         self.source_audit_dir = f.base / 'revised-source-audit'
         shutil.copytree(f.base / 'target-audit', self.source_audit_dir)
-        publisher = TextbookPublicationService(f.service)
+        publisher = TextbookPublicationService(f.service, cover_guard=lambda *_a, **_k: None)
         row = f.service.get(f.source_key)
         released = publisher.prepare(key=f.source_key, edition=row['edition_id'], revision=row['revision_id'], node=row['node_id'],
             teaching_revision='4', review=self.review(row), audio_audit=audit, classroom_directory=f.root)
@@ -86,7 +86,7 @@ class LegacyNarrationInheritanceTests(unittest.TestCase):
         self.assertTrue(audit['passed'])
         self.assertEqual(sum('operatorParent' in e for e in audit['segments']), 3)
         row = f.service.get(prepared['previewKey'])
-        publisher = TextbookPublicationService(f.service)
+        publisher = TextbookPublicationService(f.service, cover_guard=lambda *_a, **_k: None)
         released = publisher.prepare(key=row['preview_key'], edition=row['edition_id'], revision=row['revision_id'], node=row['node_id'],
             teaching_revision='5', review=self.review(row), audio_audit=audit, classroom_directory=f.root)
         receipt = publisher.publish(released)

@@ -1,0 +1,332 @@
+{
+  "schemaVersion": "mira.learning.unit-blueprints.v1",
+  "editionId": "pep-math-g1-upper-2022-standard",
+  "revisionId": "directory-ede7a8c63c337cf95a03fe79",
+  "unitId": "11265c70-adb5-4273-b3ea-11f2ba358205",
+  "source": {
+    "id": "official-textbook",
+    "title": "人教版一年级数学上册（2022课标）减法、0的认识和加减法第一课时",
+    "url": "https://basic.smartedu.cn/tchMaterial/detail?contentType=assets_document&contentId=c3e06fe4-c6b3-49cb-8727-4f8ff69bbfbc&catalogType=tchMaterial&subCatalog=tchMaterial",
+    "accessedAt": "2026-10-29",
+    "verification": "减法印刷26至27页；0印刷30页。逐页审阅与对应资源原始SHA保存在各课frozen scopeReview和source-input，二者教学目标已对照。官方资料仅用于目标、范围与重点难点核对，不复制内容；媒体豁免只限各自当前修订。"
+  },
+  "lessons": [
+    {
+      "nodeId": "0da8a119-4bc0-48c7-9fd7-9dc8c1c1fd34",
+      "title": "1～5的加、减法（减法）",
+      "status": "scope_verified_preview_only",
+      "targets": [
+        "从一个整体去掉一部分，理解减法求剩下的部分。",
+        "将情境、实物、点图与减法算式联系，解释每个数所指。",
+        "认识减号及等号，理解等号两边表示相同数量。",
+        "用逐个点数、倒着数或数的组成等合理方法计算5以内非零结果的减法。",
+        "在两组具体实物中，通过从较多一组移走对象使两组同样多。",
+        "自己构建5以内的生活减法故事或图画，说明原有、去掉与剩余。"
+      ],
+      "scopePages": [
+        26,
+        27
+      ],
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "从一个整体去掉一部分，理解减法求剩下的部分。",
+          "将情境、实物、点图与减法算式联系，解释每个数所指。",
+          "认识减号及等号，理解等号两边表示相同数量。",
+          "用逐个点数、倒着数或数的组成等合理方法计算5以内非零结果的减法。",
+          "在两组具体实物中，通过从较多一组移走对象使两组同样多。",
+          "自己构建5以内的生活减法故事或图画，说明原有、去掉与剩余。"
+        ],
+        "knowledgePoints": [
+          "从一个整体去掉一部分，理解减法求剩下的部分。",
+          "将情境、实物、点图与减法算式联系，解释每个数所指。",
+          "认识减号及等号，理解等号两边表示相同数量。",
+          "用逐个点数、倒着数或数的组成等合理方法计算5以内非零结果的减法。",
+          "在两组具体实物中，通过从较多一组移走对象使两组同样多。",
+          "自己构建5以内的生活减法故事或图画，说明原有、去掉与剩余。"
+        ],
+        "priorKnowledge": [
+          "能在图片和教师口语支持下点数、摆放1至5个对象，已学习分与合和加法；不预设独立读指令。"
+        ],
+        "excludedTopics": [
+          "0与0的加减法由下一课展开，不提前扩为本课评估。",
+          "不引入负数、减数大于被减数、6以上计算、未知数方程或形式化差比较。",
+          "不从屏幕操作、选择或保存作品推断真实口语、纸笔书写、独立阅读或稳定掌握。"
+        ],
+        "assessmentMode": "observed",
+        "reviewNote": "依据本课冻结scopeReview和逐页原始资料SHA登记教学范围，只接收同一原生作者候选。视频本修订的精确用户例外保存在该课冻结记录，不声称原视频听审；其余四类资料实际审阅。lockedAssessments=[]，操作题以本课专属领域validator重算，独立首答、帮助、修订和保存分记。登记不代表配音、实玩、发布、归档或学生入口已通过。"
+      },
+      "game": [
+        {
+          "family": "predict-and-verify-removal",
+          "childDecision": "5箱中2箱装车，先预测仓库余量再验证。",
+          "domainState": "初始5箱ID、离开子集2、预测、剩余集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "只把所选2箱移到车上，集合差决定余量。",
+          "observableOutcome": "仓库3箱可逐个追踪。",
+          "revisionOpportunity": "撤销装车、逐箱核对、修订但保留首答。"
+        },
+        {
+          "family": "construct-removal-subset",
+          "childDecision": "从4箱中任选1箱运走。",
+          "domainState": "仓库集合、选中子集、车上集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "移动哪个对象由孩子决定，两区成员真实改变。",
+          "observableOutcome": "不同对象选择均可得到余量3。",
+          "revisionOpportunity": "任意移回；点选替代拖拽。"
+        },
+        {
+          "family": "map-time-scene-to-equation",
+          "childDecision": "把算式三个数指向原有、去掉和剩余对象。",
+          "domainState": "前镜头整体、车上子集、仓库余量与算式连接。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "连接到区域后数字由其对象数生成。",
+          "observableOutcome": "每项都有可回放的数量含义。",
+          "revisionOpportunity": "换连接、看原始镜头、重试。"
+        },
+        {
+          "family": "symbol-trace-and-semantic-binding",
+          "childDecision": "用减号对应运走动作，尝试画短横。",
+          "domainState": "物品变化、减号轨迹、尝试记录。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "短横符号与运走事件连接；轨迹只记屏幕练习。",
+          "observableOutcome": "符号表达去掉，手部精度另记。",
+          "revisionOpportunity": "清除重画或点选继续。"
+        },
+        {
+          "family": "construct-equality-by-removal",
+          "childDecision": "5件与3件，从较多架移走物品直到相同。",
+          "domainState": "两架集合、移除集合、一一对应槽。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "每移一件重新配对；确认时比较真实数量。",
+          "observableOutcome": "两边相等才显示等号成立。",
+          "revisionOpportunity": "移回重试，接受任意合法子集。"
+        },
+        {
+          "family": "diagnose-whole-part-record",
+          "childDecision": "原有5箱运走2箱，找出记录把3当整体的错误。",
+          "domainState": "事实时间轴、错误整体字段、可编辑记录。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "选正确时间镜头后重建整体。",
+          "observableOutcome": "记录整体必须与原有5箱一致。",
+          "revisionOpportunity": "换证据、修订记录。"
+        },
+        {
+          "family": "compare-counting-strategies",
+          "childDecision": "同一4箱运走1箱事件，用数余箱或倒数验证。",
+          "domainState": "对象ID、计数指针、倒数步数。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "逐箱计数或每离开一箱倒退一步。",
+          "observableOutcome": "两条真实过程都核对余量3。",
+          "revisionOpportunity": "换方法重试，不清空场景。"
+        },
+        {
+          "family": "use-composition-to-infer-remainder",
+          "childDecision": "用5分成3和2的记录，识别运走3后留下哪部分。",
+          "domainState": "整体5、两组3和2、运走组。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "将真实运走组移开，留下另一组。",
+          "observableOutcome": "组成解释5减3剩2。",
+          "revisionOpportunity": "展开组成图或回到实物。"
+        },
+        {
+          "family": "controlled-removal-comparison",
+          "childDecision": "同样5箱分别运走1和3，预测哪次余量多。",
+          "domainState": "两个隔离实验、相同初始数、不同移走量。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "分别操作并并排回放同一时间。",
+          "observableOutcome": "余量4和2可一一对照。",
+          "revisionOpportunity": "改预测、重做；首答保留。"
+        },
+        {
+          "family": "transfer-removal-to-new-context",
+          "childDecision": "修理棚3件工具借走1件，自己表示剩余。",
+          "domainState": "新工具、借出区域、余量集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "真实借出后孩子给出数量表示。",
+          "observableOutcome": "3减1剩2，首答前不报结果。",
+          "revisionOpportunity": "首次后提供点数或演示帮助。"
+        },
+        {
+          "family": "author-and-replay-subtraction-story",
+          "childDecision": "自由选2至5件物品与非空且未全部离开的子集，构建故事。",
+          "domainState": "自建对象、原有/离开/剩余集合、两幕时间线。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "编辑任意一幕重算三数量，回放保留同一对象身份。",
+          "observableOutcome": "多种合法作品均保存。",
+          "revisionOpportunity": "自由修改、保存、刷新恢复。"
+        },
+        {
+          "family": "explain-and-revise-saved-story",
+          "childDecision": "将作品每个数指回对象，回看自己修改的证据。",
+          "domainState": "作品版本、数量记录、对象指针、帮助记录。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "作品变化后旧记录进入待核对状态。",
+          "observableOutcome": "作品与式子一致；口述另记真实观察。",
+          "revisionOpportunity": "重连、编辑并保留原版。"
+        }
+      ],
+      "transfer": "修理棚3件工具借走1件，自己表示剩余。 真实借出后孩子给出数量表示。 3减1剩2，首答前不报结果。；自由选2至5件物品与非空且未全部离开的子集，构建故事。 编辑任意一幕重算三数量，回放保留同一对象身份。 多种合法作品均保存。；将作品每个数指回对象，回看自己修改的证据。 作品变化后旧记录进入待核对状态。 作品与式子一致；口述另记真实观察。",
+      "generationReady": false,
+      "missing": [
+        "正式教师配音及严格逐段ASR核对",
+        "最终课件审阅与学生入口验收",
+        "原创课后题包及MinIO归档核验"
+      ]
+    },
+    {
+      "nodeId": "43bbcbb2-3898-444e-9da5-5302124adc63",
+      "title": "0的认识和加、减法",
+      "status": "scope_verified_preview_only",
+      "targets": [
+        "在具体数量情境中理解一个也没有可以用0表示。",
+        "区分0表示没有和0表示起点，在0至5的顺序中认识0。",
+        "认识0的字形并保留规范书写和纸笔练习目标。",
+        "用全部移走的对象状态解释一个数减去它自己得0。",
+        "用实物和画图验证一个数加0或减0仍是原数，含0+0与0−0。",
+        "在衣食住行中寻找0，说明它在当前情境的作用，创作有关0的数学故事或图画。"
+      ],
+      "scopePages": [
+        30
+      ],
+      "knowledgeBrief": {
+        "status": "draft",
+        "objectives": [
+          "在具体数量情境中理解一个也没有可以用0表示。",
+          "区分0表示没有和0表示起点，在0至5的顺序中认识0。",
+          "认识0的字形并保留规范书写和纸笔练习目标。",
+          "用全部移走的对象状态解释一个数减去它自己得0。",
+          "用实物和画图验证一个数加0或减0仍是原数，含0+0与0−0。",
+          "在衣食住行中寻找0，说明它在当前情境的作用，创作有关0的数学故事或图画。"
+        ],
+        "knowledgePoints": [
+          "在具体数量情境中理解一个也没有可以用0表示。",
+          "区分0表示没有和0表示起点，在0至5的顺序中认识0。",
+          "认识0的字形并保留规范书写和纸笔练习目标。",
+          "用全部移走的对象状态解释一个数减去它自己得0。",
+          "用实物和画图验证一个数加0或减0仍是原数，含0+0与0−0。",
+          "在衣食住行中寻找0，说明它在当前情境的作用，创作有关0的数学故事或图画。"
+        ],
+        "priorKnowledge": [
+          "能在图片和教师口语支持下点数、摆放1至5个对象，已学习分与合和加法；不预设独立读指令。"
+        ],
+        "excludedTopics": [
+          "不引入负数、温度计算、多位数占位系统或除法。",
+          "温度计、门锁等仅作不同用途例子，不要求一年级解释超出教材的计量知识。",
+          "不从屏幕操作、选择或保存作品推断真实口语、纸笔书写、独立阅读或稳定掌握。"
+        ],
+        "assessmentMode": "observed",
+        "reviewNote": "依据本课冻结scopeReview和逐页原始资料SHA登记教学范围，只接收同一原生作者候选。视频本修订的精确用户例外保存在该课冻结记录，不声称原视频听审；其余四类资料实际审阅。lockedAssessments=[]，操作题以本课专属领域validator重算，独立首答、帮助、修订和保存分记。登记不代表配音、实玩、发布、归档或学生入口已通过。"
+      },
+      "game": [
+        {
+          "family": "observe-empty-set",
+          "childDecision": "观察2艘到1艘再到空泊位，决定怎样表示数量。",
+          "domainState": "同一泊位船ID集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "每次真实移出1艘，最终集合为空。",
+          "observableOutcome": "空集合用0表示。",
+          "revisionOpportunity": "移回再离开、回放。"
+        },
+        {
+          "family": "contrast-zero-semantics",
+          "childDecision": "分辨空泊位0和测量尺起点0的作用。",
+          "domainState": "空集合、尺子原点、船的位置。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "选择场景后让空处或起点产生具体反馈。",
+          "observableOutcome": "没有与起点不同；有0不表示尺子消失。",
+          "revisionOpportunity": "切换场景，按需语音。"
+        },
+        {
+          "family": "construct-zero-to-five-sequence",
+          "childDecision": "把0放进0至5序列并匹配每处实物数量。",
+          "domainState": "数字序列、位置、相应数量集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "调整位置后数量与顺序一起核对。",
+          "observableOutcome": "0位于1前，从空增加1得到1。",
+          "revisionOpportunity": "重新排序或看一步示范。"
+        },
+        {
+          "family": "trace-zero-with-observed-direction",
+          "childDecision": "参照已核规范书写图与原创示范，先描写0，再独立写0，并可拿纸笔先描两个再写两个。",
+          "domainState": "上方起笔点、实际单笔轨迹、左侧下行与右侧回升的方向、闭合椭圆、帮助和独立尝试记录。",
+          "stateTransition": "依据已审课件第10页、任务单第1页的起笔点与回笔箭头制作原创示范：从上方起笔，沿左侧向下，绕过下端，再沿右侧向上回到起点，一笔闭合。孩子的轨迹只由真实输入产生，不能自动替写。",
+          "observableOutcome": "保留屏幕实际轨迹与是否借助示范；日字格里呈现闭合的纵向椭圆。纸笔先描2个再写2个，纸笔质量另记真实观察，不以触屏或点选证明。",
+          "revisionOpportunity": "可擦除重写、按需回放原创示范或拿纸笔练；每次帮助和独立尝试分开记录。"
+        },
+        {
+          "family": "construct-total-removal",
+          "childDecision": "从4艘中让全部4艘离港，再表示剩余。",
+          "domainState": "原有集合、离港子集、余量集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "全部移出后余量为空。",
+          "observableOutcome": "4减4得0，两个4有不同角色。",
+          "revisionOpportunity": "移回重选，记录帮助。"
+        },
+        {
+          "family": "test-self-subtraction-by-chosen-examples",
+          "childDecision": "自己选1至5数量，猜测全部离港结果并验证。",
+          "domainState": "n、初始集合、离开选择、预测。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "选定n生成对象，必须实际全移出。",
+          "observableOutcome": "每个实际样本得到n减n为0。",
+          "revisionOpportunity": "改选择、换n再试。"
+        },
+        {
+          "family": "simulate-zero-incoming-group",
+          "childDecision": "现有3艘，开启空的来船航道后预测总数。",
+          "domainState": "原有3、来船空集合、闸门、预测。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "开闸但无新ID加入。",
+          "observableOutcome": "3加0仍3，两个3的角色不同。",
+          "revisionOpportunity": "关闸复位、改预测。"
+        },
+        {
+          "family": "simulate-zero-departing-group",
+          "childDecision": "现有2艘，本次离港请求是0，判断余量。",
+          "domainState": "原有2、空离港请求、实际离开集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "0个离港请求使原集合留在泊位。",
+          "observableOutcome": "2减0仍2。",
+          "revisionOpportunity": "送回误移船重试。"
+        },
+        {
+          "family": "discriminate-event-semantics",
+          "childDecision": "给无新船录像和无离船录像配加减记录。",
+          "domainState": "两段不同方向的事件、待配符号。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "选择后回放方向，再确认语义。",
+          "observableOutcome": "n加0与n减0不可因数字相同混为一件事。",
+          "revisionOpportunity": "互换记录重看。"
+        },
+        {
+          "family": "test-empty-set-boundaries",
+          "childDecision": "空泊位没有到港，也没有离港，各做一次。",
+          "domainState": "原有、来船、离船均为空集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "分别执行真实空操作，不生成幽灵对象。",
+          "observableOutcome": "0加0和0减0都为0。",
+          "revisionOpportunity": "重新表示并验证。"
+        },
+        {
+          "family": "search-counterexample-under-fixed-condition",
+          "childDecision": "自己选0至5并尝试让加0或减0后数量改变。",
+          "domainState": "所选n、操作类型、空新增/离开、原始集合。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "非法偷加对象会改变0条件并可见提示。 有效试验保留实际n与操作；完成至少一次加0及一次减0、采用两个不同n后开放回顾结束，也允许继续试验，不以找到反例作为完成条件。",
+          "observableOutcome": "合法加0或减0试验数量不变。",
+          "revisionOpportunity": "恢复0条件或与非零事件对照。"
+        },
+        {
+          "family": "transfer-zero-meaning-to-life-context",
+          "childDecision": "在空工具架和步道起点新情境里指出0的含义。",
+          "domainState": "真实空集合或路径原点。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "选择后展示对应对象或路线证据。",
+          "observableOutcome": "仅评估学过的两种意义迁移。",
+          "revisionOpportunity": "帮助后换新例，首答与获助分记。"
+        },
+        {
+          "family": "author-zero-event-story",
+          "childDecision": "自由选空、全走、无新增、无离开的一种自建故事。",
+          "domainState": "作品类型、0至5对象、事件序列、0的语义。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "孩子配置并真实操作，事件计算结果。",
+          "observableOutcome": "多种有效作品均保存。",
+          "revisionOpportunity": "改事件、改数量、保存刷新继续。"
+        },
+        {
+          "family": "explain-and-revise-zero-meaning",
+          "childDecision": "为自己作品的0指向实际含义并回看证据。",
+          "domainState": "作品版本、0指针、算式或起点、帮助记录。 场景中的真实对象、区域、轨迹、连接或作品让儿童直接看见此状态；隐藏日志不算可见状态。",
+          "stateTransition": "编辑作品后重新核对标记。",
+          "observableOutcome": "真实作品解释一致；口语纸笔未观察明确记未观察。",
+          "revisionOpportunity": "改指向、编辑、保留修改史。"
+        }
+      ],
+      "transfer": "在空工具架和步道起点新情境里指出0的含义。 选择后展示对应对象或路线证据。 仅评估学过的两种意义迁移。；自由选空、全走、无新增、无离开的一种自建故事。 孩子配置并真实操作，事件计算结果。 多种有效作品均保存。；为自己作品的0指向实际含义并回看证据。 编辑作品后重新核对标记。 真实作品解释一致；口语纸笔未观察明确记未观察。",
+      "generationReady": false,
+      "missing": [
+        "正式教师配音及严格逐段ASR核对",
+        "最终课件审阅与学生入口验收",
+        "原创课后题包及MinIO归档核验"
+      ]
+    }
+  ]
+}

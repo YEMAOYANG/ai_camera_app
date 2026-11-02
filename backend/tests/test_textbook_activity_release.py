@@ -191,6 +191,13 @@ class ActivityPublishedMediaTest(unittest.TestCase):
                 remote.read.side_effect = None
                 remote.read.return_value = None
                 self.assertTrue(service.publish(prepared)['ok'])
+                repository.get_build.return_value = None
+                repository.reserve_build.reset_mock()
+                service.cover_guard = Mock(side_effect=ApiError('textbook_cover_unavailable', '封面不可用', 409))
+                with self.assertRaises(ApiError):
+                    service.publish(prepared)
+                repository.reserve_build.assert_not_called()
+                service.cover_guard.assert_called_once()
         self.assertEqual(canonical(prepared), before)
 
 

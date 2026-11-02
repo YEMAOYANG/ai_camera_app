@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "mira.learning.unit-blueprints.v1",
+  "editionId": "pep-chinese-g1-upper-2022-standard",
+  "revisionId": "20260924-directory-3",
+  "unitId": "unit-5-reading",
+  "authoringDraft": {
+    "path": "output/textbook-operator-lessons/pep-chinese-g1-upper-2022-standard/u5-l1/teaching-5/authoring-job/draft.json",
+    "sha256": "f0ef616aa941ac9afea798556c41d832750f1bb1ec9ccb6a52ec8f4f0446a785",
+    "byteSize": 58964
+  },
+  "source": {
+    "url": "https://basic.smartedu.cn/tchMaterial/detail?contentType=assets_document&contentId=1c73b348-e8b6-47d6-84b0-6dbacbe28268&catalogType=tchMaterial&subCatalog=tchMaterial",
+    "printedStartPage": 60,
+    "printedEndPage": 61,
+    "bodyPagesRead": [{"printedPage": 60, "pdfPage": 65}, {"printedPage": 61, "pdfPage": 66}],
+    "textbookBodyRead": true,
+    "sourcePeriods": 2,
+    "officialReviewReference": {
+      "path": "output/textbook-operator-lessons/pep-chinese-g1-upper-2022-standard/u5-l1/teaching-5/authoring-job/draft.json",
+      "jsonPointer": "/scopeReview/officialResourceReview",
+      "reviewedAt": "2026-10-27T06:28:51Z"
+    },
+    "sourceCorrectionReference": {
+      "path": "output/textbook-operator-lessons/pep-chinese-g1-upper-2022-standard/u5-l1/teaching-5/authoring-job/reviewed-repairs/reviewed-source-correction.json",
+      "sha256": "7560487b00552ccdf99dbc4243ac3e8f2261785c2edea4759d00ef55ba5d0799"
+    },
+    "unavailableMediaBoundary": "官方视频原音轨不可用，保留本课冻结的例外和已审阅资料记录，不声称听过原音轨。",
+    "scope": {
+      "recognizedCharacters": ["秋", "气", "了", "树", "叶", "黄", "片", "从", "来", "飞"],
+      "writingTargets": ["了", "子", "人", "大"],
+      "readingBoundary": "保留借拼音朗读、尝试背诵的目标；短句练习和点选不能证明全文朗读或背诵。"
+    }
+  },
+  "lessons": [{
+    "nodeId": "u5-l1",
+    "title": "1 秋天",
+    "status": "scope_verified_preview_only",
+    "targets": [
+      "观察天气变凉、树叶变黄和落叶，认识三个自然段中的秋景线索。",
+      "结合图片和语音尝试认读本课十个生字及相关偏旁。",
+      "比较一片和一片片、天空又蓝又高及大雁队形变化。",
+      "在本课词语中听辨一的变调并练习目标词。",
+      "观察并尝试规范书写了、子、人、大，修改自己的笔画。",
+      "借拼音练习短句朗读并尝试背诵，迁移观察其他秋景。"
+    ],
+    "scopePages": [60, 61],
+    "knowledgeBrief": {
+      "status": "draft",
+      "objectives": ["认识秋天的变化及课文的三个自然段。", "认识十个生字，尝试规范书写了、子、人、大。", "结合图片和语音理解落叶、天空与雁阵，练习一的变调。", "借拼音尝试朗读、背诵并观察其他秋景。"],
+      "knowledgePoints": ["秋、气、了、树、叶、黄、片、从、来、飞。", "了、子、人、大的笔画和书写位置。", "一片片、一群、一会儿和一字的语境读音。", "读好短句并结合观察表达；点选不等于口语或纸笔能力。"],
+      "priorKnowledge": ["已有拼音、声调和基础笔画经验。"],
+      "excludedTopics": ["不复制官方课件、插画或全文；未观察的全文朗读、背诵和纸笔书写不得判定完成。", "不得将语音或图片支持下的操作视为独立识字或口语掌握。"],
+      "assessmentMode": "observed",
+      "review": {"status": "reviewed", "scope": "textbook-and-frozen-official-resource-review-for-this-candidate", "reviewer": "Codex", "basis": "核对教材印刷60至61页，并保留本课逐课时资源审阅和教材字表差异修正记录；不表示配音、听审、发布或学生入口已通过。", "formalAudioApproved": false, "humanListeningVerified": false, "published": false}
+    },
+    "registrationBoundary": "仅登记此已保存候选的教学范围，不授权新作者任务，也不作为配音或发布验收。",
+    "generationReady": false,
+    "game": "儿童通过图片和语音自主操作落叶、天空、雁阵、词语、书写与秋景观察册，出错后可以修改。",
+    "transfer": "儿童自行制作并修改秋景观察作品；真实朗读、背诵及纸笔表现未观察时保留为未观察。",
+    "parentSupport": "课内完成和继续无需家长确认；教师语音与图片提供操作支持。"
+  }]
+}

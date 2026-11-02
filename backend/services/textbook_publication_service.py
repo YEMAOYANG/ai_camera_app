@@ -11,6 +11,7 @@ import re
 from urllib.parse import urlparse
 
 from content.textbook_catalog import canonical, digest, lesson_by_id
+from content.textbook_authoring_candidate import resolve_authoring_interaction_policy
 from content.textbook_interaction_policy import freeze_interaction_policy
 from content.textbook_preview import preview_checks
 from content.textbook_preview_audio_contract import (audit_contract_identity, check_receipt_language_policy,
@@ -23,20 +24,92 @@ from content.textbook_review_followup import (discover_complete_scene_review_fol
 from content.textbook_whole_course_quality import validate_whole_course_quality_review
 from core.errors import ApiError
 from core.security import now_ms
+from integrations.openmaic_workbench_client import WorkbenchError
+from integrations.openmaic_full_runtime_client import OpenMaicFullRuntimeError
 from services.textbook_preview_audio import verify_segment_receipt
+from services.textbook_partial_audio_inheritance import load_partial_audio, verify_partial_segment
 from services.course_media_object_store import CourseMediaObjectStore, CourseMediaStorageError
+from services.textbook_cover_guard import verify_textbook_cover
 from services.course_file_store import (MAX_FILE_BYTES, CourseFileStore, CourseFileStorageError,
     course_bytes, course_exists, course_text)
 
 
+def course_objective_texts(objectives):
+    """Project reviewed structured goals to the existing student text contract.
+
+    The frozen knowledge brief retains the original goal IDs and records.
+    Never stringify an arbitrary object or silently omit an invalid goal.
+    """
+    if not isinstance(objectives, list) or not objectives:
+        fail('课件学习目标无效')
+    result = []
+    for item in objectives:
+        value = item.get('objective') if isinstance(item, dict) else item
+        if not isinstance(value, str) or not value.strip():
+            fail('课件学习目标缺少文字说明')
+        result.append(value)
+    return result
+
+
+def require_textbook_completion_capability(*, zero_native_quiz, classroom=None, binding=None):
+    """Do not publish a lesson whose students cannot complete its tasks.
+
+    Generic iframe checkpoints remain UI continuity only. A zero-quiz lesson
+    needs every interactive page bound to a supported server state machine;
+    publication separately verifies its source, review and delivery template.
+    """
+    if zero_native_quiz:
+        from content.textbook_course_interaction import build_contract
+        try:
+            return build_contract(classroom, binding)
+        except (ApiError, KeyError, TypeError, ValueError):
+            raise ApiError('textbook_interaction_completion_unavailable',
+                           '课堂互动完成记录尚未完整接入，不能发布无法完成的课程', 409)
+
+
 class TextbookPublicationService:
-    def __init__(self, preview_service, delivery_copy=None, *, course_media_store=None, course_file_store=None):
+    def __init__(self, preview_service, delivery_copy=None, *, course_media_store=None, course_file_store=None,
+                 cover_guard=verify_textbook_cover):
         self.preview = preview_service
         self.repository = preview_service.repository
         # Optional smaller copy of a reviewed picture or narration file.
         self.delivery_copy = delivery_copy
         self.course_media_store = course_media_store or CourseMediaObjectStore()
         self._course_file_store = course_file_store
+        self.cover_guard = cover_guard
+
+    def _authored_no_quiz_evidence(self, original_input, source, manifest, node, classroom_directory):
+        """Recheck a new protected author's explicit empty assessment contract."""
+        candidate = original_input.get('authoringCandidate')
+        if (original_input.get('nativeRevisionSource') is not None
+                or original_input.get('previewPrompt', {}).get('expectedQuestionCount') != 0
+                or not isinstance(candidate, dict)
+                or candidate.get('completeSceneReviewFollowup') is not None):
+            return None
+        authoring = original_input.get('authoring')
+        if (not isinstance(authoring, dict) or not authoring.get('stageId')
+                or not authoring.get('sessionId')):
+            fail('新课无测验合同缺少原作者身份')
+        from content.textbook_authoring_candidate import validate_authoring_candidate
+        native, protected = self.preview._operator_adoption_classroom(
+            authoring['stageId'], classroom_directory, authoring, manifest, node)
+        verified = validate_authoring_candidate(native, classroom_directory, authoring, manifest, node,
+            output_root=self.preview.authoring_output_root, runtime_origin=self.preview.runtime.base_url)
+        if (verified != candidate or not isinstance(protected, dict)
+                or protected.get('jobSchema') != 'mira.operator.workbench-authoring.v4'
+                or protected.get('lockedAssessments') != []
+                or any(s.get('type') == 'quiz' for s in source['scenes'])):
+            fail('新课无测验合同与已保存候选不一致')
+        types = original_input.get('previewPrompt', {}).get('requiredSceneTypes')
+        if types is not None and (not isinstance(protected.get('pagePlan'), list)
+                or types != [t for t in ('slide', 'interactive', 'quiz')
+                    if any(p.get('type') == t for p in protected['pagePlan'])]):
+            fail('发布页面类型与已验证的冻结场景计划不一致')
+        return {'schemaVersion': 'mira.textbook.authored-no-quiz-evidence.v1',
+            'binding': {k: manifest[k] for k in ('editionId', 'revisionId')} | {'nodeId': node},
+            'authoring': {k: authoring[k] for k in ('stageId', 'sessionId')},
+            'authoringCandidate': deepcopy(candidate), 'lockedAssessments': [],
+            'expectedQuestionCount': 0, 'sourceInputSha256': digest(original_input)}
 
     def _verify_publication_source(self, current, frozen, prepared):
         """Read the committed head while holding only the preview business lock.
@@ -116,6 +189,26 @@ class TextbookPublicationService:
         contract = resolve_audio_contract(plan, original_input)
         from services.textbook_operator_revision_service import _same_parent, checked_bytes, load_inheritance, media_path
         inheritance = load_inheritance(root / row['classroom_id'] / 'textbook-preview-audio', plan, frozen=original_input)
+        audio_folder = root / row['classroom_id'] / 'textbook-preview-audio'
+        partial = load_partial_audio(audio_folder, plan, frozen=original_input)
+        if partial:
+            parent = self.preview.get(partial['sourcePlan']['previewKey'])
+            if (self.repository.parse(parent['input_json']) != partial['sourceInput']
+                    or self.repository.parse(parent['classroom_json']) != partial['sourceRoom']
+                    or parent['classroom_sha256'] != partial['proof']['sourceClassroomSha256']
+                    or self.repository.parse(parent['result_json']).get('audioReceipts') != partial['evidence']['databaseReceipts']):
+                fail('部分配音的原预览或回执已变化')
+            from content.textbook_preview_audio_contract import pronunciation_client_options
+            for segment in partial['proof']['segments']:
+                try:
+                    actual = self.preview.runtime.get_formal_audio_tts(segment['sourceRequestId'],
+                        **pronunciation_client_options(partial['sourcePlan']))
+                except Exception:
+                    fail('无法核对原配音服务的成功回执')
+                if digest(actual) != segment['providerReceiptSha256']:
+                    fail('原配音服务回执已变化')
+            if audio_audit.get('partialAudioParentSha256') != digest(original_input['partialAudioParent']):
+                fail('部分配音审核未绑定原来源')
         if inheritance:
             with self.repository.transaction() as conn:
                 _same_parent(self.preview, inheritance['parent'], conn)
@@ -151,9 +244,27 @@ class TextbookPublicationService:
         if not contract['legacy'] and ((audio_audit.get('schemaVersion') != 'mira.textbook.audio-audit.v2' and not origin_audit and not observation_audit)
                 or audio_audit.get('contract') != audit_contract_identity(plan)):
             fail('配音审核未绑定当前冻结的语言与比较策略')
-        if preview_checks(source, original_input['previewPrompt']['expectedSceneCount'], original_input.get('originalMedia'), original_input['previewPrompt'].get('expectedQuestionCount', 6))['issues']:
+        if preview_checks(source, original_input['previewPrompt']['expectedSceneCount'], original_input.get('originalMedia'), original_input['previewPrompt'].get('expectedQuestionCount', 6),
+                          required_scene_types=original_input['previewPrompt'].get('requiredSceneTypes'))['issues']:
             fail('课件结构或插画检查未通过')
-        check_questions(source)
+        native_no_quiz = bool(original_input.get('nativeRevisionSource')
+            and original_input.get('previewPrompt', {}).get('expectedQuestionCount') == 0
+            and re.fullmatch(r'[a-f0-9]{64}', str(original_input.get('authoringCandidate', {}).get('contractSha256', '')))
+            and not any(s.get('type') == 'quiz' for s in source['scenes']))
+        authored_no_quiz = self._authored_no_quiz_evidence(
+            original_input, source, manifest, node, classroom_directory)
+        narration_chain = None
+        visual_chain = None
+        allow_no_quiz = bool(authored_no_quiz) or native_no_quiz or bool(partial
+            and partial['sourceInput'].get('previewPrompt', {}).get('expectedQuestionCount') == 0
+            and original_input.get('previewPrompt', {}).get('expectedQuestionCount') == 0
+            and partial['sourceInput'].get('authoringCandidate', {}).get('contractSha256')
+                == original_input.get('authoringCandidate', {}).get('contractSha256')
+            and re.fullmatch(r'[a-f0-9]{64}', str(original_input.get('authoringCandidate', {}).get('contractSha256', '')))
+            and not any(s.get('type') == 'quiz' for s in source['scenes']))
+        require_textbook_completion_capability(zero_native_quiz=allow_no_quiz,
+            classroom=source, binding={'editionId': edition, 'revisionId': revision, 'nodeId': node})
+        check_questions(source, allow_empty=allow_no_quiz)
         if (audio_audit.get('sha256') != digest({k: v for k, v in audio_audit.items() if k != 'sha256'})
                 or audio_audit.get('previewKey') != key or audio_audit.get('sourceSha256') != row['classroom_sha256']):
             fail('配音识别审核未通过')
@@ -201,11 +312,20 @@ class TextbookPublicationService:
             if any(item['audioSha256'] != receipts.get(item['ttsRequestId'], {}).get('audioSha256') for item in heard.values()):
                 fail('拼音听验没有绑定当前正式音频字节')
         if asr_reconciliation is not None:
+            from content.textbook_user_audio_reconciliation import (
+                SCHEMA as USER_AUDIO_SCHEMA, METHOD as USER_AUDIO_METHOD,
+                validate_reconciliation as validate_user_audio,
+            )
             from content.textbook_english_asr_reconciliation import (
                 SCHEMA as ENGLISH_RECONCILIATION_SCHEMA,
                 METHOD as ENGLISH_RECONCILIATION_METHOD,
             )
-            if asr_reconciliation.get('schemaVersion') == ENGLISH_RECONCILIATION_SCHEMA:
+            if asr_reconciliation.get('schemaVersion') == USER_AUDIO_SCHEMA:
+                reconciled = validate_user_audio(asr_reconciliation, plan=plan,
+                    classroom=source, audit=audio_audit,
+                    expected_source_sha256=row['classroom_sha256'], now_ms=now_ms())
+                reconciliation_method = USER_AUDIO_METHOD
+            elif asr_reconciliation.get('schemaVersion') == ENGLISH_RECONCILIATION_SCHEMA:
                 from content.textbook_english_asr_reconciliation import validate_reconciliation
                 reconciled = validate_reconciliation(asr_reconciliation, plan=plan,
                     classroom=source, audit=audio_audit,
@@ -229,7 +349,28 @@ class TextbookPublicationService:
             if not valid_tts_request_id(plan, a.get('audioId')) or tts.get('status') != 'succeeded':
                 fail('配音收据与冻结的学科身份不一致')
             inherited = verify_segment_receipt(plan, tts, scene_for_action[a['id']], a,
-                root / row['classroom_id'] / 'textbook-preview-audio', inheritance=inheritance)
+                audio_folder, inheritance=inheritance, partial_inheritance=partial)
+            partial_identity = verify_partial_segment(partial, scene_for_action[a['id']], a, tts, audio_folder)
+            if audit.get('partialAudioParent') != ({k: v for k, v in partial_identity.items() if k != 'sourcePlan'} if partial_identity else None):
+                fail('逐段识别没有记录真实的原配音课堂身份')
+            if partial:
+                from content.textbook_preview_audio_contract import pronunciation_client_options
+                from services.textbook_preview_audio import segment_request_plan
+                request_plan = (partial_identity['sourcePlan'] if partial_identity else
+                                segment_request_plan(plan, tts, audio_folder, text=a['text']))
+                try:
+                    actual_tts = self.preview.runtime.get_formal_audio_tts(a['audioId'],
+                        **pronunciation_client_options(request_plan))
+                    actual_asr = self.preview.runtime.get_formal_audio_asr(audit.get('asr', {}).get('requestId'),
+                        **pronunciation_client_options(request_plan))
+                except Exception:
+                    fail('无法核对部分配音的真实识别回执')
+                if (actual_tts.get('status') != 'succeeded' or actual_tts.get('requestId') != a['audioId']
+                        or actual_tts.get('audioSha256') != tts.get('audioSha256')
+                        or actual_asr.get('status') != 'succeeded'
+                        or actual_asr.get('requestId') != audit['asr'].get('requestId')
+                        or actual_asr.get('transcriptSha256') != audit['asr'].get('transcriptSha256')):
+                    fail('部分配音的识别回执已变化')
             if plan.get('schemaVersion') == PINYIN_SCHEMA:
                 asset = root / row['classroom_id'] / 'audio' / (a['audioId'] + '.wav')
                 if not course_exists(asset):
@@ -284,26 +425,84 @@ class TextbookPublicationService:
                 fail('课件作者候选的互动规则身份无效')
             current_policy = freeze_interaction_policy()
             complete_scene_followup = candidate.get('completeSceneReviewFollowup')
+            native_source = original_input.get('nativeRevisionSource')
+            authoring_source_sha = original_input.get('authoringSourceSha256', original_input.get('sourceSha256'))
+            if ('authoringSourceSha256' in original_input) != (native_source is not None):
+                fail('原生课堂与预览的双来源证明不完整')
+            if native_source is not None and complete_scene_followup is None:
+                fail('原生课堂双来源证明缺少完整修订链')
             if complete_scene_followup is not None or candidate['interactionPolicyVersion'] < current_policy['policy']['version']:
                 authoring = original_input.get('authoring')
                 if (not isinstance(authoring, dict) or not isinstance(authoring.get('sessionId'), str)
                         or not isinstance(authoring.get('stageId'), str)):
                     fail('旧冻结课缺少可核验的完整场景修订身份')
                 try:
+                    authoring_root = getattr(self.preview, 'authoring_output_root', None)
+                    resolver_kwargs = ({'output_root': authoring_root}
+                                       if isinstance(authoring_root, (str, Path)) else {})
+                    base_policy = resolve_authoring_interaction_policy(
+                        classroom_directory, authoring, manifest, node, candidate,
+                        **resolver_kwargs)
+                    followup_kwargs = ({'base_interaction_policy': base_policy}
+                                       if base_policy is not None else {})
                     archived_followup = discover_complete_scene_review_followup(
                         None, classroom_directory, session_id=authoring['sessionId'],
                         stage_id=authoring['stageId'],
                         base_policy_version=candidate['interactionPolicyVersion'],
                         base_policy_sha256=candidate['interactionPolicySha256'],
-                        candidate_source_sha256=original_input.get('sourceSha256'))
+                        candidate_source_sha256=authoring_source_sha,
+                        **followup_kwargs)
                     if archived_followup != complete_scene_followup:
                         raise ValueError('frozen follow-up differs from the immutable archive')
                     if complete_scene_followup is not None:
                         validate_complete_scene_review_followup(
                             complete_scene_followup,
-                            candidate_source_sha256=original_input.get('sourceSha256'),
+                            candidate_source_sha256=authoring_source_sha,
                             candidate=candidate, current_policy=current_policy)
-                except ValueError:
+                    if native_source is not None:
+                        from content.textbook_authoring_candidate import validate_authoring_candidate
+                        from content.textbook_native_revision_adoption import verify_narration_amendments, verify_native_visual_amendments
+                        if (not isinstance(native_source, dict)
+                                or native_source.get('authoringSourceSha256') != authoring_source_sha
+                                or native_source.get('previewSourceSha256') != original_input.get('sourceSha256')
+                                or plan.get('classroomSha256') != original_input.get('sourceSha256')
+                                or plan.get('coreSha256') != native_source.get('cloneCoreSha256')):
+                            raise ValueError('native and preview source binding differs')
+                        native_classroom, _ = self.preview._operator_adoption_classroom(
+                            authoring['stageId'], classroom_directory, authoring, manifest, node)
+                        current_candidate = validate_authoring_candidate(
+                            native_classroom, classroom_directory, authoring, manifest, node,
+                            output_root=self.preview.authoring_output_root,
+                            runtime_origin=self.preview.runtime.base_url)
+                        if current_candidate != candidate:
+                            raise ValueError('native candidate changed')
+                        proof = self.preview._native_revision_source(
+                            native_classroom, classroom_directory, authoring, manifest, node, current_candidate)
+                        if {k: v for k, v in native_source.items() if k not in ('cloneCoreSha256', 'previewSourceSha256')} != proof:
+                            raise ValueError('native revision evidence changed')
+                        from content.textbook_authoring_candidate import _find_job, _read_json
+                        from content.textbook_official_followup import requires_official_followup, validate_followup
+                        found = _find_job(self.preview.authoring_output_root, manifest['editionId'],
+                                          manifest['revisionId'], node, authoring['sessionId'], authoring['stageId'], True)
+                        job, source_frozen, _ = found
+                        source_draft = _read_json(job / 'draft.json')
+                        official = original_input.get('officialReviewFollowup')
+                        if requires_official_followup(source_draft):
+                            if not isinstance(official, dict):
+                                raise ValueError('operator-verified official follow-up missing')
+                            checked = validate_followup(
+                                official['followupPath'], official['followupSha256'], official['operatorAttestation'],
+                                job=job, frozen=source_frozen, draft=source_draft,
+                                dispatch=_read_json(job/'dispatch.json'), native_proof=proof,
+                                followup=current_candidate['completeSceneReviewFollowup'])
+                            if checked != official:
+                                raise ValueError('official follow-up changed')
+                        elif official is not None:
+                            raise ValueError('unexpected official follow-up')
+                        before_visuals, visual_chain = verify_native_visual_amendments(row, native_source, classroom_directory)
+                        narration_chain = verify_narration_amendments(before_visuals, native_source, plan,
+                            folder=audio_folder, revisions=self.repository.parse(row['result_json']).get('narrationRevisions', []))
+                except (ValueError, ApiError, WorkbenchError, OpenMaicFullRuntimeError):
                     fail('完整场景修订追踪缺失、已改变，或未绑定当前互动规则')
             if complete_scene_followup is not None:
                 try:
@@ -343,7 +542,8 @@ class TextbookPublicationService:
             frozen['audioAcceptance'] = {'method': reconciliation_method,
                 'literalAuditSha256': audio_audit['sha256'],
                 'reconciliationSha256': asr_reconciliation['sha256']}
-            if reconciliation_method == 'exact-registered-full-sentence-orthography':
+            if reconciliation_method in ('exact-registered-full-sentence-orthography',
+                                         'user-confirmed-presented-audio'):
                 frozen['sourceClassroomId'] = source['id']
         if inheritance:
             frozen['operatorParent'] = deepcopy(inheritance['provenance'])
@@ -351,11 +551,79 @@ class TextbookPublicationService:
                 if self.repository.parse(row['result_json']).get('parentAudioRestorations') != inheritance['restorations']:
                     fail('原音频恢复归档与当前预览登记不同')
                 frozen['operatorParentAudioRestorations'] = deepcopy(inheritance['restorations'])
+        if partial:
+            frozen['partialAudioParent'] = deepcopy(original_input['partialAudioParent'])
+            frozen['partialAudioEvidenceSha256'] = digest(partial['evidence'])
+            frozen['audioAuditSha256'] = audio_audit['sha256']
+        # Media URLs include the to-be-computed contentKey, so freezing the
+        # final HTML hash here would create a digest cycle. Instead freeze a
+        # typed template of literal HTML and exact source-asset byte hashes,
+        # together with their deterministic delivery encodings. The release
+        # later binds the final HTML hash and proves the same template.
+        interactive_assets = {}
+        if allow_no_quiz:
+            from content.textbook_course_interaction import html_templates
+            media_root = Path(classroom_directory).resolve()
+            binding = {'editionId': edition, 'revisionId': revision, 'nodeId': node}
+
+            def source_asset_sha(match):
+                url = match.group(0)
+                if url.startswith('http') and urlparse(url).netloc != urlparse(self.preview.runtime.base_url).netloc:
+                    fail('存在未审核的外部素材')
+                path = (media_root / match.group(1) / match.group(2)).resolve()
+                if media_root not in path.parents or not course_exists(path):
+                    fail('互动页面素材丢失')
+                if path not in interactive_assets:
+                    raw = course_bytes(path, max_bytes=MAX_MEDIA_BYTES)
+                    if not raw:
+                        fail('互动页面素材格式或大小无效')
+                    suffix = path.suffix.lower()
+                    media_mime_type(suffix, raw)
+                    source_sha = hashlib.sha256(raw).hexdigest()
+                    if self.delivery_copy:
+                        suffix, raw = self.delivery_copy(suffix, raw)
+                    mime = media_mime_type(suffix, raw)
+                    interactive_assets[path] = {'sourceSha256': source_sha,
+                        'deliverySha256': hashlib.sha256(raw).hexdigest(), 'mimeType': mime,
+                        'byteSize': len(raw), 'suffix': suffix, 'bytes': raw}
+                return interactive_assets[path]['sourceSha256']
+
+            templates = html_templates(source, binding, source_asset_sha)
+            assets = [{k: item[k] for k in ('sourceSha256', 'deliverySha256', 'mimeType', 'byteSize')}
+                      for item in interactive_assets.values()]
+            assets = sorted({canonical(item): item for item in assets}.values(), key=canonical)
+            frozen['interactionCompletionTemplates'] = {
+                'schemaVersion': 'mira.textbook.interaction-delivery-templates.v1',
+                'scenes': templates, 'assets': assets}
+            frozen['zeroNativeQuiz'] = True
+            if authored_no_quiz is not None:
+                frozen['authoredNoQuizEvidence'] = authored_no_quiz
+            if native_no_quiz:
+                frozen['nativeNoQuizEvidence'] = {'expectedQuestionCount': 0,
+                    'candidateSha256': original_input['authoringCandidate']['sha256'],
+                    'contractSha256': original_input['authoringCandidate']['contractSha256'],
+                    'sourceInputSha256': digest(original_input)}
+        if narration_chain is not None:
+            frozen['nativeNarrationChain'] = narration_chain
+        if visual_chain is not None:
+            frozen['nativeVisualChain'] = visual_chain
         if quality_receipt is not None:
             frozen['wholeCourseQualityReviewSha256'] = quality_receipt['sha256']
         if complete_scene_followup is not None:
             frozen['completeSceneReviewFollowup'] = deepcopy(complete_scene_followup)
-            frozen['authoringSourceSha256'] = original_input['sourceSha256']
+            frozen['authoringSourceSha256'] = original_input.get('authoringSourceSha256', original_input['sourceSha256'])
+            if original_input.get('nativeRevisionSource') is not None:
+                frozen['nativeRevisionSource'] = deepcopy(original_input['nativeRevisionSource'])
+            if original_input.get('officialReviewFollowup') is not None:
+                frozen['officialReviewFollowup'] = deepcopy(original_input['officialReviewFollowup'])
+        correction = review.get('stageDescriptionCorrection')
+        if correction is not None:
+            if (not isinstance(correction, dict) or set(correction) != {'beforeSha256','text','reason'}
+                    or correction['beforeSha256'] != digest(source['stage'].get('description'))
+                    or any(not isinstance(correction[k], str) or not correction[k].strip() for k in ('text','reason'))
+                    or len(correction['text']) > 2000):
+                fail('课程说明修订必须绑定原文和明确审核依据')
+            frozen['stageDescriptionCorrection'] = deepcopy(correction)
         content_key = digest(frozen)
         frozen['contentKey'] = content_key
         classroom_id = 'tbpub_' + content_key[:24]
@@ -377,16 +645,21 @@ class TextbookPublicationService:
                 fail('课件素材丢失')
             if source_path in delivered:
                 return delivered[source_path]
-            raw = course_bytes(source_path, max_bytes=MAX_MEDIA_BYTES)
-            if not raw:
-                fail('课件素材格式或大小无效')
-            suffix = source_path.suffix.lower()
-            media_mime_type(suffix, raw)
-            reviewed_sha = hashlib.sha256(raw).hexdigest()
-            if self.delivery_copy:
-                suffix, raw = self.delivery_copy(suffix, raw)
-            sha = hashlib.sha256(raw).hexdigest()
-            mime_type = media_mime_type(suffix, raw)
+            cached = interactive_assets.get(source_path)
+            if cached is not None:
+                suffix, raw = cached['suffix'], cached['bytes']
+                reviewed_sha, sha, mime_type = cached['sourceSha256'], cached['deliverySha256'], cached['mimeType']
+            else:
+                raw = course_bytes(source_path, max_bytes=MAX_MEDIA_BYTES)
+                if not raw:
+                    fail('课件素材格式或大小无效')
+                suffix = source_path.suffix.lower()
+                media_mime_type(suffix, raw)
+                reviewed_sha = hashlib.sha256(raw).hexdigest()
+                if self.delivery_copy:
+                    suffix, raw = self.delivery_copy(suffix, raw)
+                sha = hashlib.sha256(raw).hexdigest()
+                mime_type = media_mime_type(suffix, raw)
             kind = 'audio' if mime_type.startswith('audio/') else 'media'
             relative = f'{kind}/{sha}{suffix}'
             url = f'/api/classroom-media/{classroom_id}/{relative}'
@@ -422,6 +695,8 @@ class TextbookPublicationService:
             return value
 
         classroom = convert(deepcopy(source))
+        if correction is not None:
+            classroom['stage']['description'] = correction['text']
         # A revision may carry scene.stageId from an earlier preview alias,
         # which the source-classroom string replacement cannot recognize.
         # Bind delivery ownership explicitly, leaving the reviewed source and
@@ -438,8 +713,17 @@ class TextbookPublicationService:
             'classroom': classroom, 'classroomSha256': digest(classroom), 'media': list(media.values()),
             'audioAudit': {'passed': True, 'segments': len(speech), 'sha256': audio_audit['sha256'],
                 'minSimilarityBps': min(s['similarityBps'] for s in audit_segments.values())}}
+        if allow_no_quiz:
+            from content.textbook_course_interaction import build_contract, validate_delivery_templates
+            release['textbookBinding'] = {'editionId': edition, 'revisionId': revision, 'nodeId': node}
+            release['interactionCompletionContract'] = build_contract(classroom, release['textbookBinding'])
+            release['assessmentPolicy'] = 'verified-frozen-no-native-quiz'
+            validate_delivery_templates(frozen, release)
         if not contract['legacy']:
             release['audioAudit']['contract'] = audit_contract_identity(plan)
+        if partial:
+            release['audioAudit'].update(literalPassed=audio_audit['passed'], acceptanceMethod='partial-parent-literal-asr',
+                literalAudit=deepcopy(audio_audit), partialAudioEvidence=deepcopy(partial['evidence']))
         if listening is not None:
             release['audioAudit']['listeningReview'] = deepcopy(listening)
             release['audioAudit'].update(literalPassed=audio_audit['passed'],
@@ -463,11 +747,14 @@ class TextbookPublicationService:
         release['sha256'] = digest(release)
         course_content = {'schemaVersion': 'mira.learning.fixed-textbook-course.v1',
             'textbookBinding': frozen['textbookBinding'], 'title': classroom['stage']['name'],
-            'objectives': original_input['knowledgeBrief']['objectives'] if original_input.get('sourceScope') else lesson['brief']['objectives'], 'estimatedMinutes': 10,
+            'objectives': course_objective_texts(original_input['knowledgeBrief']['objectives']
+                if original_input.get('sourceScope') else lesson['brief']['objectives']), 'estimatedMinutes': 10,
             'questions': [{'id': q['id'], 'type': 'single_choice', 'prompt': q['question'],
                 'choices': [{'id': o['value'], 'text': o['label']} for o in q['options']],
-                'answer': single_answer(q), 'explanation': q['analysis'], 'skill': original_input['previewPrompt'].get('targets', ['天地人、你我他'] * len(questions_for(classroom)))[i]} for i, q in enumerate(questions_for(classroom))],
+                'answer': single_answer(q), 'explanation': q['analysis'], 'skill': original_input['previewPrompt'].get('targets', ['天地人、你我他'] * len(questions_for(classroom, allow_empty=allow_no_quiz)))[i]} for i, q in enumerate(questions_for(classroom, allow_empty=allow_no_quiz))],
             'releaseSha256': release['sha256']}
+        if allow_no_quiz:
+            course_content.update(assessmentPolicy='verified-frozen-no-native-quiz', outcomeMode='ungraded')
         if inheritance and inheritance['candidate'].get('assessmentEvidence'):
             course_content['assessmentEvidence'] = inheritance['candidate']['assessmentEvidence']
         return {'frozen': frozen, 'release': release, 'review': {**review, 'release': release},
@@ -488,6 +775,12 @@ class TextbookPublicationService:
             directory = self.repository.get_revision(conn, binding['editionId'], binding['alignmentRevisionId'])
             if directory is None or directory['manifest_sha256'] != binding['alignmentManifestSha256']:
                 fail('教材目录已变化')
+            previous = self.repository.get_build(conn, frozen['contentKey'])
+            if previous is None or previous['status'] != 'published':
+                source_path = prepared.get('sourceClassroomPath')
+                if not isinstance(source_path, str) or not source_path:
+                    fail('课件来源位置不可用，不能核验封面')
+                self.cover_guard(prepared, media_root=Path(source_path).parent, media_store=self.course_media_store)
             timestamp = now_ms()
             build, _ = self.repository.reserve_build(conn, frozen, timestamp)
             old = conn.execute('SELECT * FROM learning_courses WHERE id=? AND version=? FOR UPDATE', (course['id'], course['version'])).fetchone()
@@ -503,8 +796,8 @@ class TextbookPublicationService:
         return {'ok': True, 'created': created, 'status': 'published', 'contentKey': frozen['contentKey'],
             'courseId': course['id'], 'courseVersion': course['version'], 'classroomId': prepared['release']['classroomId'],
             'sceneCount': len(prepared['release']['classroom']['scenes']), 'audioCount': prepared['release']['audioAudit']['segments'],
-            'questionCount': len(questions_for(prepared['release']['classroom'])), 'releaseSha256': prepared['release']['sha256']}
+            'questionCount': len(questions_for(prepared['release']['classroom'], allow_empty=bool(frozen.get('zeroNativeQuiz')))), 'releaseSha256': prepared['release']['sha256']}
 
 
-def questions_for(classroom):
-    return check_questions(classroom)
+def questions_for(classroom, *, allow_empty=False):
+    return check_questions(classroom, allow_empty=allow_empty)

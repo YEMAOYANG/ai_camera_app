@@ -33,7 +33,7 @@ from schemas.profile import (
     role_capabilities_from_option,
     setting_payload,
 )
-from services.auth_service import AuthService
+from services.auth_service import AuthService, SMS_PURPOSE_PHONE_CHANGE
 from services.learning_curriculum_preparation_service import (
     LearningCurriculumPreparationService,
 )
@@ -1156,7 +1156,13 @@ class ProfileService:
                 "deletionRequest": account_deletion_request_payload(deletion_request),
             }
 
-    def request_account_phone_code(self, access_token: str, data: dict) -> dict:
+    def request_account_phone_code(
+        self,
+        access_token: str,
+        data: dict,
+        *,
+        source_ip: str | None = None,
+    ) -> dict:
         context = self._auth_context(access_token)
         phone = normalize_phone(str(data.get("phone") or ""))
         with self.repository.transaction() as conn:
@@ -1167,11 +1173,16 @@ class ProfileService:
             if existing is not None:
                 raise ApiError("phone_in_use", "该手机号已被其他账号使用")
 
-        result = self.auth_service.request_sms_code(phone)
+        result = self.auth_service.request_sms_code(
+            phone,
+            purpose=SMS_PURPOSE_PHONE_CHANGE,
+            source_ip=source_ip,
+        )
         payload = {
             "ok": True,
             "codeSent": True,
             "expiresAt": result["expiresAt"],
+            "retryAfterSeconds": result["retryAfterSeconds"],
             "provider": result["provider"],
             "templateId": result["templateId"],
             "deliveryStatus": result["deliveryStatus"],
@@ -1195,20 +1206,38 @@ class ProfileService:
             if existing is not None and existing["id"] != user["id"]:
                 raise ApiError("phone_in_use", "该手机号已被其他账号使用")
 
-            sms = self.repository.find_sms_code(conn, phone, for_update=True)
+            sms = self.repository.find_sms_code(
+                conn,
+                phone,
+                purpose=SMS_PURPOSE_PHONE_CHANGE,
+                for_update=True,
+            )
             if not sms or sms["expires_at"] < now:
                 raise ApiError("invalid_code", "验证码不正确，请重新输入")
             if sms["attempt_count"] >= self.auth_service.sms_max_attempts:
                 raise ApiError("sms_attempts_exceeded", "验证码错误次数过多，请重新获取验证码", 429)
-            if sms["code_hash"] != hash_value(code):
-                self.repository.increment_sms_attempts(conn, phone)
+            if not self.auth_service.sms_code_matches(
+                sms["code_hash"],
+                phone,
+                SMS_PURPOSE_PHONE_CHANGE,
+                code,
+            ):
+                self.repository.increment_sms_attempts(
+                    conn,
+                    phone,
+                    purpose=SMS_PURPOSE_PHONE_CHANGE,
+                )
             else:
                 return self._change_verified_phone(conn, user, family, phone, now)
         # Keep failed verification attempts committed before reporting rejection.
         raise ApiError("invalid_code", "验证码不正确，请重新输入")
 
     def _change_verified_phone(self, conn, user, family, phone: str, now: int) -> dict:
-        self.repository.delete_sms_code(conn, phone)
+        self.repository.delete_sms_code(
+            conn,
+            phone,
+            purpose=SMS_PURPOSE_PHONE_CHANGE,
+        )
         user = self.repository.update_user_phone(conn, user_id=user["id"], phone=phone)
         parent_identity = self.repository.get_parent_identity(conn, family_id=family["id"])
         member, relationship, relationship_key = self._current_member_identity(

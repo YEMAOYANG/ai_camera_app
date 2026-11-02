@@ -105,7 +105,8 @@ def build_single_course_policy(*, grade, subject, skill, ordinal, now, ttl_ms=10
         "deepseek-vision-peak": price(vision_provider, "deepseek-v4-flash-vision-exp", {"input_tokens": 65536, "output_tokens": 8192}, {"input_tokens": 3000000, "output_tokens": 9000000}),
         "qwen-tts-beijing": price("qwen-tts", "qwen3-tts-flash", {"characters": 10000}, {"characters": 80000000}),
         "qwen-asr-beijing": price("qwen-asr", "qwen3-asr-flash", {"audio_ms": 600000}, {"audio_ms": 220000}),
-        "qwen-image-beijing": price("qwen-image", "qwen-image-max", {"images": 1}, {"images": 500000000000}),
+        "qwen-image-beijing": price("qwen-image", "qwen-image-3.0", {"images": 1},
+            {"images": 180000000000}, version="official-2026-10-27-beijing-output.v1"),
     }
     if current_flash:
         # A provider/model must resolve to exactly one frozen price. Text and

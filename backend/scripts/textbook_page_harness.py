@@ -23,6 +23,7 @@ from base64 import b64encode
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from content.textbook_interactive_narration import interactive_cues  # noqa: E402  (the same parser narration uses)
+from services.course_file_store import course_text  # noqa: E402  (registered sources read current object bytes)
 
 MIME = {'.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
         '.wav': 'audio/wav', '.mp3': 'audio/mpeg'}
@@ -37,7 +38,9 @@ const params = new URLSearchParams(location.search);
 const stub = (index, sandboxed) => `<script>(function(){var send=function(kind,value){${sandboxed
   ? "parent.postMessage({harness:true,kind:kind,value:String(value)},'*')"
   : `parent.__log(${index},kind,String(value))`}};
-window.miraNarrate=function(id){send('cue',id)};
+var activeCue=null;var narrationState=function(id,status){window.dispatchEvent(new CustomEvent('mira-narration-state',{detail:{cueId:id,status:status}}))};
+window.miraNarrate=function(id){activeCue=id;send('cue',id);narrationState(id,'playing');setTimeout(function(){if(activeCue===id){activeCue=null;narrationState(id,'ready')}},20);return Promise.resolve(true)};
+window.miraCancelNarration=function(){var id=activeCue;activeCue=null;narrationState(id,'ready')};
 window.addEventListener('error',function(e){send('error',e.message+' @'+e.lineno)});
 window.addEventListener('unhandledrejection',function(e){send('error','promise '+(e.reason&&e.reason.message||e.reason))});})();<\/script>`;
 const withStub = (page, sandboxed) => /<head[^>]*>/i.test(page.html)
@@ -131,7 +134,7 @@ def released_page(html, media, store):
 
 
 def build(source, target, store=None):
-    saved = json.loads(source.read_text(encoding='utf-8'))
+    saved = json.loads(course_text(source))
     release = saved.get('release', saved) if isinstance(saved.get('release', saved), dict) else saved
     if 'media' in release and 'classroom' in release:
         store = store or source.parent
@@ -167,6 +170,11 @@ def build(source, target, store=None):
 
 
 if __name__ == '__main__':
+    # Standalone operator tools load only the backend-owned dotenv before the
+    # first CourseFileStore is constructed. Library imports stay side-effect
+    # free, so a test process cannot silently switch every reader to registry.
+    from core import config as _backend_environment  # noqa: E402,F401
+
     arguments = sys.argv[1:]
     store = None
     if len(arguments) == 4 and arguments[2] == '--store':

@@ -83,7 +83,27 @@ class AssessmentMappingTests(unittest.TestCase):
                 continue
             for b in json.loads(path.read_text())['lessons']:
                 with self.subTest(path=path.name, node=b['nodeId']):
-                    self.assertEqual(blueprint_question_count(b), len(b['targets']))
+                    expected = len(b['assessmentMapping']) if 'assessmentMapping' in b else len(b['targets'])
+                    self.assertEqual(blueprint_question_count(b), expected)
+
+    def test_garden4_registered_scope_accepts_22_saved_pages_with_only_two_reviewed_samples(self):
+        blueprint = lesson_blueprint(self.manifest, 'u4-l6')
+        self.assertIsNotNone(blueprint)
+        self.assertEqual(blueprint['status'], 'scope_verified_preview_only')
+        self.assertEqual(len(blueprint['targets']), 9)
+        self.assertEqual(blueprint_question_count(blueprint), 2)
+        room = {'scenes': [{'id': 'scene-' + str(i)} for i in range(1, 23)]}
+        result = operator_preview_input(self.manifest, 'u4-l6', room, {}, self.author, teaching_revision='2')
+        self.assertEqual(result['previewPrompt']['expectedSceneCount'], 22)
+        self.assertEqual(result['previewPrompt']['expectedQuestionCount'], 2)
+        self.assertFalse(result['publicationAllowed'])
+        mapping = blueprint['assessmentMapping']
+        self.assertEqual([(item['questionId'], item['page'], item['answer']) for item in mapping],
+            [('u4-l6-q1-heard-writing', 11, 'B'), ('u4-l6-q2-yesterday-new-scene', 18, 'C')])
+        self.assertEqual([item['targetId'] for item in mapping], ['garden-four-pinyin', 'garden-four-time'])
+        self.assertEqual(mapping[0]['optionAssetKeys']['B'], 'assessment-new-writing')
+        self.assertEqual(mapping[1]['optionAssetKeys']['C'], 'assessment-time-drawing')
+        self.assertIn('不能证明独立拼读', mapping[0]['evidenceLimit'])
 
 
 if __name__ == '__main__':

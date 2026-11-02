@@ -1,7 +1,7 @@
 """Release integrity, private answers, and student authority boundaries."""
 from copy import deepcopy
 import unittest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock, MagicMock, patch
 
 from content.textbook_catalog import canonical, digest
 from content.textbook_interaction_policy import freeze_interaction_policy
@@ -9,6 +9,97 @@ from content.textbook_release import INPUT_SCHEMA, RELEASE_SCHEMA, validate_rele
 from core.errors import ApiError
 from core.security import now_ms
 from services.textbook_classroom_service import TextbookClassroomService
+
+
+class CourseObjectiveProjectionTest(unittest.TestCase):
+    def test_structured_goals_preserve_text_and_original_records(self):
+        from services.textbook_publication_service import course_objective_texts
+        goals = [{'id': 'listen-sit', 'objective': '听懂 Sit down! 并行动。'}, '理解 door 与 window。']
+        original = deepcopy(goals)
+        self.assertEqual(course_objective_texts(goals), ['听懂 Sit down! 并行动。', '理解 door 与 window。'])
+        self.assertEqual(goals, original)
+        for invalid in [[], {}, [None], [{'id': 'missing-text'}], [{'objective': []}], [' ']]:
+            with self.assertRaises(ApiError):
+                course_objective_texts(invalid)
+
+
+class AuthoredNoQuizEvidenceTests(unittest.TestCase):
+    def setUp(self):
+        from services.textbook_publication_service import TextbookPublicationService
+        self.preview = Mock()
+        self.preview.runtime.base_url = 'http://127.0.0.1:3100'
+        self.candidate = {'schemaVersion': 'mira.textbook.authoring-candidate.v1',
+            'sha256': 'a' * 64, 'contractSha256': 'b' * 64,
+            'verification': 'frozen_identity_and_artifact_integrity_only',
+            'interactionPolicyVersion': 8, 'interactionPolicySha256': 'c' * 64,
+            'wholeCourseQualityContractSha256': 'd' * 64}
+        self.source = {'scenes': [{'type': 'interactive', 'id': 'scene-p2'}]}
+        self.manifest = {'editionId': 'book', 'revisionId': 'directory'}
+        self.original = {'authoring': {'stageId': 'stage-test', 'sessionId': 'session-test'},
+            'previewPrompt': {'expectedQuestionCount': 0}, 'authoringCandidate': self.candidate}
+        self.preview._operator_adoption_classroom.return_value = (self.source,
+            {'jobSchema': 'mira.operator.workbench-authoring.v4', 'lockedAssessments': []})
+        self.service = TextbookPublicationService(self.preview, course_media_store=Mock())
+
+    def evidence(self):
+        return self.service._authored_no_quiz_evidence(
+            self.original, self.source, self.manifest, 'lesson', '/classrooms')
+
+    def test_only_verified_empty_native_contract_is_accepted(self):
+        with patch('content.textbook_authoring_candidate.validate_authoring_candidate', return_value=self.candidate):
+            evidence = self.evidence()
+            self.assertEqual(evidence['lockedAssessments'], [])
+            for bad in [None, {}, {'jobSchema': 'legacy', 'lockedAssessments': []},
+                        {'jobSchema': 'mira.operator.workbench-authoring.v4', 'lockedAssessments': [{'id': 'required'}]}]:
+                self.preview._operator_adoption_classroom.return_value = (self.source, bad)
+                with self.assertRaises(ApiError):
+                    self.evidence()
+
+    def test_changed_candidate_and_added_quiz_are_rejected(self):
+        with patch('content.textbook_authoring_candidate.validate_authoring_candidate', return_value={**self.candidate, 'sha256': 'e' * 64}):
+            with self.assertRaises(ApiError):
+                self.evidence()
+        with patch('content.textbook_authoring_candidate.validate_authoring_candidate', return_value=self.candidate):
+            self.source['scenes'].append({'type': 'quiz'})
+            with self.assertRaises(ApiError):
+                self.evidence()
+
+    def test_existing_paths_are_not_reclassified(self):
+        for extra in [{'nativeRevisionSource': {'original': True}}, {'authoringCandidate': None},
+                      {'previewPrompt': {'expectedQuestionCount': 3}}]:
+            self.original.update(extra)
+            self.assertIsNone(self.evidence())
+        self.preview._operator_adoption_classroom.assert_not_called()
+
+    def test_frozen_scene_types_are_rechecked_against_the_verified_author_plan(self):
+        self.original['previewPrompt']['requiredSceneTypes'] = ['interactive']
+        self.preview._operator_adoption_classroom.return_value = (self.source,
+            {'jobSchema': 'mira.operator.workbench-authoring.v4', 'lockedAssessments': [],
+             'pagePlan': [{'type': 'interactive'}]})
+        with patch('content.textbook_authoring_candidate.validate_authoring_candidate', return_value=self.candidate):
+            self.assertEqual(self.evidence()['lockedAssessments'], [])
+            self.original['previewPrompt']['requiredSceneTypes'] = ['slide', 'interactive']
+            with self.assertRaises(ApiError):
+                self.evidence()
+
+    def test_release_evidence_binds_lesson_policy_source_and_quality(self):
+        from content.textbook_release import validate_authored_no_quiz_evidence
+        with patch('content.textbook_authoring_candidate.validate_authoring_candidate', return_value=self.candidate):
+            evidence = self.evidence()
+        quality = {'status': 'passed', 'policySha256': 'c' * 64, 'sourceSha256': 'f' * 64}
+        frozen = {'authoredNoQuizEvidence': evidence, 'sourceSha256': 'f' * 64,
+            'wholeCourseQualityReviewSha256': digest(quality),
+            'textbookBinding': {'editionId': 'book', 'alignmentRevisionId': 'directory', 'nodeId': 'lesson'}}
+        self.assertTrue(validate_authored_no_quiz_evidence(frozen, {'coursewareQuality': quality}))
+        for field, value in [('lockedAssessments', [1]), ('expectedQuestionCount', False),
+                             ('sourceInputSha256', 'invalid'), ('binding', {'nodeId': 'other'}),
+                             ('authoring', {}), ('authoringCandidate', {})]:
+            bad = deepcopy(frozen); bad['authoredNoQuizEvidence'][field] = value
+            with self.assertRaises(ApiError, msg=field):
+                validate_authored_no_quiz_evidence(bad, {'coursewareQuality': quality})
+        for field in ('policySha256', 'sourceSha256', 'status'):
+            with self.assertRaises(ApiError, msg=field):
+                validate_authored_no_quiz_evidence(frozen, {'coursewareQuality': {**quality, field: 'different'}})
 
 
 def fixture():
@@ -43,6 +134,101 @@ def fixture():
 
 
 class ReleaseTests(unittest.TestCase):
+    def test_zero_quiz_release_validates_actual_binding_and_delivered_html(self):
+        from content.textbook_course_interaction import build_contract, html_templates
+        manifest, build, _ = fixture()
+        manifest['editionId'] = 'pep-chinese-g1-upper-2022-standard'
+        manifest['revisionId'] = '20260924-directory-3'
+        manifest['units'][0]['lessons'][0]['nodeId'] = 'u5-l1'
+        frozen = {'schemaVersion': INPUT_SCHEMA, 'previewKey': 'a' * 64, 'sourceSha256': 'b' * 64,
+            'gradeCode': 'primary_1', 'subject': 'chinese', 'knowledgeBrief': {'status': 'draft'},
+            'textbookBinding': {'editionId': manifest['editionId'], 'alignmentRevisionId': manifest['revisionId'],
+                'alignmentManifestSha256': digest(manifest), 'nodeId': 'u5-l1', 'partIndex': 1, 'teachingRevision': '6'},
+            'audioContract': {'previewKey': 'a' * 64, 'schemaVersion': 'ordinary'},
+            'partialAudioParent': {}, 'zeroNativeQuiz': True}
+        binding = {'editionId': manifest['editionId'], 'revisionId': manifest['revisionId'], 'nodeId': 'u5-l1'}
+        source_room = {'scenes': [
+            {'id': 'intro', 'order': 1, 'type': 'slide', 'actions': []}] + [
+            {'id': f'scene-p{i}', 'order': i, 'type': 'interactive', 'actions': [],
+             'content': {'html': f'<img src="/api/classroom-media/source/media/p{i}.png">'}}
+            for i in range(2, 13)]}
+        frozen['interactionCompletionTemplates'] = {
+            'schemaVersion': 'mira.textbook.interaction-delivery-templates.v1',
+            'scenes': html_templates(source_room, binding, lambda _: 'd' * 64),
+            'assets': [{'sourceSha256': 'd' * 64, 'deliverySha256': 'e' * 64,
+                        'mimeType': 'image/png', 'byteSize': 10}]}
+        key = digest(frozen)
+        frozen['contentKey'] = key
+        cid = 'tbpub_' + key[:24]
+        room = {'id': cid, 'stage': {'id': cid, 'name': '秋天'}, 'scenes': [
+            {'id': 'intro', 'order': 1, 'type': 'slide', 'actions': []}] + [
+            {'id': f'scene-p{i}', 'order': i, 'type': 'interactive', 'actions': [],
+             'content': {'html': f'<img src="/api/classroom-media/{cid}/media/p{i}.png">'}}
+            for i in range(2, 13)]}
+        source = {'previewPrompt': {'expectedQuestionCount': 0}, 'authoringCandidate': {'contractSha256': 'c' * 64}}
+        release = {'schemaVersion': RELEASE_SCHEMA, 'contentKey': key, 'classroomId': cid, 'classroom': room,
+            'classroomSha256': digest(room), 'media': [
+                {'path': f'/api/classroom-media/{cid}/media/p{i}.png', 'sha256': 'e' * 64,
+                 'sourceSha256': 'd' * 64, 'mimeType': 'image/png', 'byteSize': 10}
+                for i in range(2, 13)], 'textbookBinding': binding,
+            'interactionCompletionContract': build_contract(room, binding),
+            'assessmentPolicy': 'verified-frozen-no-native-quiz', 'audioAudit': {'passed': True, 'segments': 0,
+                'contract': {'identity': 'test'}, 'partialAudioEvidence': {'sourceInput': source, 'targetInput': source}}}
+        release['sha256'] = digest(release)
+        review = {'reviewer': 'test', 'basis': 'isolated', 'alignmentConfirmed': True,
+            'originalExpressionConfirmed': True, 'sourceUsageConfirmed': True, 'publicationAuthorized': True,
+            'release': release}
+        build.update(content_key=key, node_id='u5-l1', teaching_revision='6',
+                     input_json=canonical(frozen), review_json=canonical(review))
+        with patch('content.textbook_preview_audio_contract.resolve_audio_contract', return_value={'legacy': False}), \
+             patch('content.textbook_preview_audio_contract.audit_contract_identity', return_value={'identity': 'test'}), \
+             patch('content.textbook_partial_audio_inheritance.validate_partial_release', return_value={}):
+            self.assertEqual(validate_release(build, manifest), release)
+            for mutate in ('missing', 'html', 'binding', 'rehashed_html', 'asset_provenance'):
+                bad = deepcopy(review)
+                changed = bad['release']
+                if mutate == 'missing': changed['classroom']['scenes'].pop()
+                elif mutate == 'html': changed['classroom']['scenes'][1]['content']['html'] += 'changed'
+                elif mutate == 'binding': changed['textbookBinding']['nodeId'] = 'other'
+                elif mutate == 'rehashed_html':
+                    changed['classroom']['scenes'][1]['content']['html'] += 'changed'
+                    changed['interactionCompletionContract'] = build_contract(changed['classroom'], changed['textbookBinding'])
+                else:
+                    changed['media'][0]['sha256'] = 'f' * 64
+                changed['classroomSha256'] = digest(changed['classroom'])
+                changed.pop('sha256')
+                changed['sha256'] = digest(changed)
+                with self.assertRaises(ApiError, msg=mutate):
+                    validate_release({**build, 'review_json': canonical(bad)}, manifest)
+
+    def test_interaction_contract_cannot_be_added_to_ordinary_or_legacy_release(self):
+        manifest, build, _ = fixture()
+        review = __import__('json').loads(build['review_json'])
+        review['release']['interactionCompletionContract'] = {'schemaVersion': 'forged'}
+        review['release'].pop('sha256')
+        review['release']['sha256'] = digest(review['release'])
+        with self.assertRaises(ApiError):
+            validate_release({**build, 'review_json': canonical(review)}, manifest)
+
+    def test_zero_quiz_marker_without_audio_provenance_is_rejected(self):
+        manifest, build, _ = fixture()
+        frozen = __import__('json').loads(build['input_json'])
+        review = __import__('json').loads(build['review_json'])
+        frozen.pop('contentKey')
+        frozen['zeroNativeQuiz'] = True
+        key = digest(frozen)
+        frozen['contentKey'] = key
+        release = review['release']
+        classroom_id = 'tbpub_' + key[:24]
+        release.update(contentKey=key, classroomId=classroom_id)
+        release['classroom']['id'] = release['classroom']['stage']['id'] = classroom_id
+        release['classroomSha256'] = digest(release['classroom'])
+        release.pop('sha256')
+        release['sha256'] = digest(release)
+        with self.assertRaises(ApiError):
+            validate_release({**build, 'content_key': key, 'input_json': canonical(frozen),
+                              'review_json': canonical(review)}, manifest)
+
     def test_valid_review_is_for_one_exact_directory_lesson(self):
         manifest, build, release = fixture()
         self.assertEqual(validate_release(build, manifest), release)

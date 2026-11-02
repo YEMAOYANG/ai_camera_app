@@ -178,7 +178,7 @@ class OperatorRevisionServiceTests(unittest.TestCase):
             self.assertEqual(by_id[request], old_by_id[request])
         self.assertEqual(by_id[new_id]['status'], 'succeeded')
         self.assertEqual(by_id[new_id]['audioSha256'], sha_bytes(self.audio))
-        publisher = TextbookPublicationService(self.service)
+        publisher = TextbookPublicationService(self.service, cover_guard=lambda *_a, **_k: None)
         review = dict(alignmentConfirmed=True, originalExpressionConfirmed=True, sourceUsageConfirmed=True,
             publicationAuthorized=True, reviewer='test', basis='new complete review', sourceSha256=row['classroom_sha256'], reviewedAt=now_ms() - 1)
         altered = deepcopy(audit)
@@ -203,7 +203,7 @@ class OperatorRevisionServiceTests(unittest.TestCase):
         narrate_preview(self.service, prepared['previewKey'], self.root)
         audit = self.audit(prepared['previewKey'])
         row = self.service.get(prepared['previewKey'])
-        publisher = TextbookPublicationService(self.service)
+        publisher = TextbookPublicationService(self.service, cover_guard=lambda *_a, **_k: None)
         review = dict(alignmentConfirmed=True, originalExpressionConfirmed=True, sourceUsageConfirmed=True,
             publicationAuthorized=True, reviewer='test', basis='review source child',
             sourceSha256=row['classroom_sha256'], reviewedAt=now_ms() - 1)
@@ -295,7 +295,7 @@ class OperatorRevisionServiceTests(unittest.TestCase):
         expected_receipts = [r for r in json.loads(self.before_rows[1]['result_json'])['audioReceipts'] if r['status'] == 'succeeded']
         self.assertEqual(json.loads(row['result_json'])['audioReceipts'], expected_receipts)
         self.assertEqual(self.service.freeze(key)['status'], 'preview_ready')
-        publisher = TextbookPublicationService(self.service)
+        publisher = TextbookPublicationService(self.service, cover_guard=lambda *_a, **_k: None)
         review = dict(alignmentConfirmed=True, originalExpressionConfirmed=True, sourceUsageConfirmed=True,
             publicationAuthorized=True, reviewer='test', basis='new full visual review, exact source audio',
             sourceSha256=row['classroom_sha256'], reviewedAt=now_ms() - 1)
@@ -428,7 +428,7 @@ class SavedVisualRevisionTests(unittest.TestCase):
         review = dict(alignmentConfirmed=True, originalExpressionConfirmed=True, sourceUsageConfirmed=True,
             publicationAuthorized=True, reviewer='test', basis='saved source visual revision',
             sourceSha256=row['classroom_sha256'], reviewedAt=now_ms() - 1)
-        publisher = TextbookPublicationService(self.service)
+        publisher = TextbookPublicationService(self.service, cover_guard=lambda *_a, **_k: None)
         released = publisher.prepare(key=row['preview_key'], edition=row['edition_id'], revision=row['revision_id'],
             node=row['node_id'], teaching_revision='4', review=review, audio_audit=audit, classroom_directory=self.root)
         published = publisher.publish(released)

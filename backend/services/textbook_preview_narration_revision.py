@@ -583,7 +583,8 @@ def revise_preview_narration(service, key, classroom_directory, patch, failed_au
                 revised_feedback = bind_revised_feedback_audio(target, patch)
             frozen = json.loads(source_row['input_json'])
             prompt = frozen['previewPrompt']
-            checks = preview_checks(target, prompt['expectedSceneCount'], frozen.get('originalMedia'), prompt.get('expectedQuestionCount', 6))
+            checks = preview_checks(target, prompt['expectedSceneCount'], frozen.get('originalMedia'), prompt.get('expectedQuestionCount', 6),
+                                    required_scene_types=prompt.get('requiredSceneTypes'))
             if checks['issues']:
                 fail('修订后课件结构检查未通过：' + '、'.join(checks['issues']))
             immutable(saved_target_path, json_bytes(target))

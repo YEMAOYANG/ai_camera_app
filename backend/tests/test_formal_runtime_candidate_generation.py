@@ -959,13 +959,16 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
             "runtimePolicy": {
                 "webSearch": {"schemaVersion":"mira.openmaic.web-search-production-config.v1","providerId":"brave","productionMode":"brave_api","formalProductionConfigured":True,"verification":"configuration_only"},
                 "formalGeneration": (
-                    OpenMaicFullRuntimeClient.FORMAL_GENERATION_POLICY
+                    OpenMaicFullRuntimeClient.selected_formal_generation_policy()
                 ),
+                "formalGenerationSupportedProfessionalPolicies": [
+                    OpenMaicFullRuntimeClient.selected_professional_creation_policy()
+                ],
                 "professionalResearch": (
                     OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_RESEARCH_POLICY
                 ),
                 "modelPolicy": (
-                    OpenMaicFullRuntimeClient.FORMAL_PROFESSIONAL_MODEL_POLICY
+                    OpenMaicFullRuntimeClient.selected_professional_model_policy()
                 ),
             },
         }
@@ -1141,7 +1144,7 @@ class FormalRuntimeCandidateGenerationTest(unittest.TestCase):
         with patch(
             "integrations.openmaic_full_runtime_client.urlopen",
             side_effect=fake_urlopen,
-        ):
+        ), patch.dict("os.environ", {"MIRA_FORMAL_MODEL_POLICY": ""}):
             created = client.start_generation(
                 requirement="formal requirement",
                 enable_web_search=True,

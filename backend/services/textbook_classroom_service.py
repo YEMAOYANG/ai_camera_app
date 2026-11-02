@@ -24,6 +24,7 @@ from repositories.textbook_repository import TextbookRepository
 from repositories.course_storage_repository import CourseStorageRepository
 from services.course_file_store import CourseFileStore, CourseFileStorageError
 from services import textbook_activity_state as activity_state
+from content import textbook_course_interaction as course_interaction
 
 
 RECEIPT_SCHEMA = 'mira.openmaic.student-runtime-event-receipt.v1'
@@ -202,10 +203,15 @@ class TextbookClassroomService:
         data, _, _, release, _, session = self._authority(token)
         if int(data.get('expiresAt', 0)) <= now_ms():
             raise ApiError('textbook_session_invalid', '请重新进入课堂', 401)
-        return {'ok': True, 'purpose': 'fixed_textbook', 'classroomId': release['classroomId'],
+        result = {'ok': True, 'purpose': 'fixed_textbook', 'classroomId': release['classroomId'],
             'runtimeSessionId': session['id'], 'learningSessionId': session['id'], 'expiresAt': data['expiresAt'],
             'media': release['media'], 'releaseSha256': release['sha256'],
             'activityPersistence': activity_state.descriptors(release)}
+        if release.get('interactionCompletionContract'):
+            contract = course_interaction.validate_contract(release)
+            result['courseInteraction'] = {'schemaVersion': course_interaction.OP_SCHEMA,
+                'contractSha256': contract['sha256'], 'scenes': deepcopy(contract['scenes'])}
+        return result
 
     def classroom(self, token):
         _, child, build, release, _, _ = self._authority(token)
@@ -316,14 +322,23 @@ class TextbookClassroomService:
         # independent game result, a quiz grade, or evidence of subject mastery.
         ungraded_ready = (release.get('assessmentMode') == 'ungraded' and len(visited) == len(scenes)
                           and all(scene_id in completed_scenes for scene_id in required_audio))
+        # Page entry can establish browsing only. The generic iframe snapshot
+        # is deliberately untrusted UI continuity, not proof the game was done.
+        zero_quiz = release.get('assessmentPolicy') == 'verified-frozen-no-native-quiz'
+        zero_quiz_viewed = zero_quiz and {scene['id'] for scene in scenes}.issubset(visited)
+        interaction_contract = release.get('interactionCompletionContract')
+        verified_interactions = bool(interaction_contract and course_interaction.completion_ready(state, release))
+        zero_quiz_ready = bool(zero_quiz and interaction_contract and verified_interactions and zero_quiz_viewed)
         return {'ok': True, 'schemaVersion': RECEIPT_SCHEMA, 'runtimeSessionId': session['id'],
             'learningSessionId': session['id'], 'classroomId': release['classroomId'], 'releaseId': release['sha256'],
             'lastSequence': state['lastSequence'], 'nextSequence': state['lastSequence'] + 1, 'completed': complete,
-            'completionReady': ungraded_ready if release.get('assessmentMode') == 'ungraded' else textbook_activity.complete(state) if (play or {}).get('flowVersion') == 2 else bool(state['quiz'] and len(visited) == len(scenes)
+            'completionReady': zero_quiz_ready if zero_quiz else ungraded_ready if release.get('assessmentMode') == 'ungraded' else textbook_activity.complete(state) if (play or {}).get('flowVersion') == 2 else bool(state['quiz'] and len(visited) == len(scenes)
                                     and all(scene_id in completed_scenes for scene_id in required_audio)
                                     and (complete or not textbook_activity.supported(release)
                                          or textbook_activity.complete(state))),
-            'answeredQuestionIds': [r['questionId'] for r in (state['quiz'] or state.get('quizPartial') or {}).get('results', [])],
+            **({'viewingComplete': zero_quiz_viewed} if zero_quiz else {}),
+            **({'courseInteractionState': course_interaction.recovery_state(state, release)} if interaction_contract else {}),
+            'answeredQuestionIds': [] if zero_quiz else [r['questionId'] for r in (state['quiz'] or state.get('quizPartial') or {}).get('results', [])],
             'completedInteractionObjectiveIndexes': [], 'completedActionSceneIds': completed_scenes,
             'resumeScene': {'sceneIndex': resume, 'sceneId': scenes[resume]['id']} if resume >= 0 else None}
 
@@ -352,6 +367,7 @@ class TextbookClassroomService:
             if type(index) is not int or not 0 <= index < len(scenes) or payload.get('sceneId') != scenes[index]['id']:
                 raise ApiError('textbook_event_invalid', '课件页面身份无效', 400)
             scene = scenes[index]
+            interaction_result = None
             if event['type'] == 'scene_entered' and set(payload) == {'sceneIndex', 'sceneId'}:
                 if scene['id'] not in state['visited']:
                     state['visited'].append(scene['id'])
@@ -365,10 +381,21 @@ class TextbookClassroomService:
                 # to discussion. Keep its contract; speech is not quiz credit.
                 from services.openmaic_runtime_event_service import OpenMaicRuntimeEventService
                 OpenMaicRuntimeEventService._event({**event, 'idempotencyKey': digest(event)})
+            elif (event['type'] == 'interaction_operation'
+                    and set(payload) == {'sceneIndex', 'sceneId', 'contractSha256', 'operationId', 'operation'}):
+                if release.get('assessmentPolicy') != 'verified-frozen-no-native-quiz':
+                    raise ApiError('textbook_event_invalid', '本课程没有配置该互动记录', 400)
+                if scene['id'] not in state['visited']:
+                    raise ApiError('textbook_event_invalid', '请先进入当前互动页面', 400)
+                interaction_result = course_interaction.apply_operation(state, release=release, scene_index=index, scene_id=scene['id'],
+                    contract_sha256=payload['contractSha256'], operation_id=payload['operationId'],
+                    operation=payload['operation'])
             elif event['type'] == 'classroom_completed' and set(payload) == {'sceneIndex', 'sceneId'}:
                 if not self._status(session, release)['completionReady']:
                     raise ApiError('textbook_learning_incomplete', '请先完成学习和练习', 409)
-                self._complete(conn, session, child, course, state['quiz'])
+                result = None if release.get('assessmentPolicy') == 'verified-frozen-no-native-quiz' else state['quiz']
+                self._complete(conn, session, child, course, result,
+                    interaction_completed=bool(release.get('interactionCompletionContract') and result is None))
             else:
                 raise ApiError('textbook_event_invalid', '本节固定课程不接受这个操作', 400)
             state['lastSequence'] = event['sequence']
@@ -377,6 +404,8 @@ class TextbookClassroomService:
             completed = event['type'] == 'classroom_completed' or session['status'] == 'completed'
             receipt = {'ok': True, 'sequence': event['sequence'], 'completed': completed,
                 'receiptSha256': digest({'session': session['id'], 'event': event})}
+            if interaction_result is not None:
+                receipt['interaction'] = interaction_result
             conn.execute('INSERT INTO learning_session_runtime_records (id,session_id,seq,idempotency_key,scene_id,action_id,record_type,payload_json,response_json,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)',
                 ('tbev_' + digest({'session': session['id'], 'seq': event['sequence']})[:40], session['id'], event['sequence'],
                  'textbook:' + str(event['sequence']), scene['id'], payload.get('actionId'), event['type'], canonical(event), canonical(receipt), now_ms()))
@@ -412,6 +441,10 @@ class TextbookClassroomService:
             # Each check is graded when it is handed in; the lesson result and
             # the parent report exist only once every question is answered.
             saved = {r['questionId']: r for r in (state['quiz'] or state.get('quizPartial') or {}).get('results', [])}
+            if release.get('assessmentPolicy') == 'verified-frozen-no-native-quiz':
+                if answers is None:
+                    return {'ok': True, 'result': None, 'partial': None}
+                raise ApiError('textbook_activity_ungraded', '这份探索不提供评分或掌握度测评', 409)
             if answers is None:
                 return {'ok': True, 'result': state['quiz'], 'partial': state.get('quizPartial')}
             if release.get('assessmentMode') == 'ungraded':
@@ -495,11 +528,12 @@ class TextbookClassroomService:
             strengths=[r['explanation'] for r in result['results'] if r['correct']],
             next_step=next_step, now=now_ms())
 
-    def _complete(self, conn, session, child, course, result):
+    def _complete(self, conn, session, child, course, result, *, interaction_completed=False):
         if session['status'] == 'completed':
             return
         conn.execute("UPDATE learning_sessions SET status='completed',completed_at=?,classroom_completed_at=?,updated_at=? WHERE id=?",
                      (now_ms(), now_ms(), now_ms(), session['id']))
         self.learning.mark_task_completed(conn, family_id=child['family_id'], task_id=session['task_id'],
             summary=(f'教材课练习答对 {result["correctCount"]}/{result["totalQuestions"]} 题。' if result is not None
+                     else '已完成屏幕互动练习；未进行独立能力测评。' if interaction_completed
                      else '已浏览本次教学活动；未进行独立能力测评。'), now=now_ms())

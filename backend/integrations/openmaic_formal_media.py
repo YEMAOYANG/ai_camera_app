@@ -25,13 +25,23 @@ from integrations.openmaic_formal_interaction import INTERACTION_DESIGN_POLICY, 
 from integrations.openmaic_formal_playful import PLAYFUL_LEARNING_POLICY, REQUIRED_3D_PLAYFUL_LEARNING_POLICY
 
 
-FORMAL_IMAGE_POLICY = {
+LEGACY_FORMAL_IMAGE_POLICY = {
     "schemaVersion": "mira.openmaic.formal-image-policy.v1",
     "policyId": "mira-formal-qwen-image.v1",
     "enabled": True,
     "providerManaged": True,
     "providerId": "qwen-image",
     "modelId": "qwen-image-max",
+    "usage": "teaching_need",
+    "assetValidationRequired": True,
+}
+FORMAL_IMAGE_POLICY = {
+    "schemaVersion": "mira.openmaic.formal-image-policy.v2",
+    "policyId": "mira-formal-qwen-image.v2",
+    "enabled": True,
+    "providerManaged": True,
+    "providerId": "qwen-image",
+    "modelId": "qwen-image-3.0",
     "usage": "teaching_need",
     "assetValidationRequired": True,
 }
@@ -52,7 +62,9 @@ LEGACY_PROFESSIONAL_POLICY = {
     },
     "studentToolsEnabled": False,
 }
-IMAGE_PROFESSIONAL_POLICY = {**deepcopy(LEGACY_PROFESSIONAL_POLICY), "image": FORMAL_IMAGE_POLICY}
+IMAGE_PROFESSIONAL_POLICY = {
+    **deepcopy(LEGACY_PROFESSIONAL_POLICY), "image": LEGACY_FORMAL_IMAGE_POLICY,
+}
 INTEGRATED_PROFESSIONAL_POLICY = {
     **deepcopy(IMAGE_PROFESSIONAL_POLICY),
     "skillOrchestration": FORMAL_SKILL_ORCHESTRATION_POLICY,
@@ -102,6 +114,23 @@ PRO_CURRENT_FLASH_PROFESSIONAL_POLICY = {
 PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY = {
     **deepcopy(REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY), "modelPolicyId": PRO_CURRENT_FLASH_MODEL_POLICY["policyId"],
 }
+# New requests opt into Qwen Image 3.0 with new creation-policy identities.
+# Every policy above remains exact for historical request and receipt hashes.
+QWEN3_PLAYFUL_PROFESSIONAL_POLICY = {
+    **deepcopy(PLAYFUL_PROFESSIONAL_POLICY), "image": FORMAL_IMAGE_POLICY,
+}
+QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY = {
+    **deepcopy(REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY), "image": FORMAL_IMAGE_POLICY,
+}
+QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY = {
+    **deepcopy(FLASH_CANDIDATE_PROFESSIONAL_POLICY), "image": FORMAL_IMAGE_POLICY,
+}
+QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY = {
+    **deepcopy(PRO_CURRENT_FLASH_PROFESSIONAL_POLICY), "image": FORMAL_IMAGE_POLICY,
+}
+QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY = {
+    **deepcopy(PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY), "image": FORMAL_IMAGE_POLICY,
+}
 LEGACY_CONTENT_PROVIDER_PROFILE = "mira.learning.question-provider-profile.v105-deepseek-professional"
 VIDEO_CONTENT_PROVIDER_PROFILE = "mira.learning.question-provider-profile.v106-deepseek-professional-video"
 LEGACY_GENERATION_OPTIONS = {
@@ -140,7 +169,12 @@ def professional_policy(value: object) -> dict[str, Any]:
         canonical_sha256(VIDEO_PROFESSIONAL_POLICY), canonical_sha256(INTERACTIVE_PROFESSIONAL_POLICY), canonical_sha256(MULTISTATE_PROFESSIONAL_POLICY),
         canonical_sha256(PLAYFUL_PROFESSIONAL_POLICY), canonical_sha256(REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY),
         canonical_sha256(FLASH_CANDIDATE_PROFESSIONAL_POLICY),
-        canonical_sha256(PRO_CURRENT_FLASH_PROFESSIONAL_POLICY), canonical_sha256(PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)
+        canonical_sha256(PRO_CURRENT_FLASH_PROFESSIONAL_POLICY), canonical_sha256(PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY),
+        canonical_sha256(QWEN3_PLAYFUL_PROFESSIONAL_POLICY),
+        canonical_sha256(QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY),
+        canonical_sha256(QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY),
+        canonical_sha256(QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY),
+        canonical_sha256(QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY),
     }:
         raise ValueError("unsupported formal professional policy")
     return deepcopy(dict(value))
@@ -166,9 +200,17 @@ def compatible_preparation_targets(current: Mapping[str, Any]) -> tuple[dict[str
     current_policy = policy_from_target(current)
     runtime = current.get("formalRuntimePolicy")
     model = runtime.get("professionalModelPolicy") if isinstance(runtime, Mapping) else None
-    if isinstance(model, Mapping) and model.get("policyId") == FLASH_CANDIDATE_PROFESSIONAL_POLICY["modelPolicyId"] and current_policy != FLASH_CANDIDATE_PROFESSIONAL_POLICY:
+    flash_policies = (FLASH_CANDIDATE_PROFESSIONAL_POLICY,
+                      QWEN3_FLASH_CANDIDATE_PROFESSIONAL_POLICY)
+    pro_current_policies = (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY,
+                            PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY,
+                            QWEN3_PRO_CURRENT_FLASH_PROFESSIONAL_POLICY,
+                            QWEN3_PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)
+    if (isinstance(model, Mapping)
+            and model.get("policyId") == FLASH_CANDIDATE_PROFESSIONAL_POLICY["modelPolicyId"]
+            and current_policy not in flash_policies):
         raise ValueError("candidate model cannot use a legacy creation policy")
-    if current_policy == FLASH_CANDIDATE_PROFESSIONAL_POLICY:
+    if current_policy in flash_policies:
         # Never attach the new model identity to a historical creation policy.
         # Old published courses keep their original explicit target/hash and
         # remain usable through their historical playback contracts.
@@ -177,7 +219,7 @@ def compatible_preparation_targets(current: Mapping[str, Any]) -> tuple[dict[str
         return (deepcopy(dict(current)),)
     if isinstance(model, Mapping) and model.get("policyId") == PRO_CURRENT_FLASH_MODEL_POLICY["policyId"]:
         if (canonical_sha256(model) != canonical_sha256(PRO_CURRENT_FLASH_MODEL_POLICY)
-                or current_policy not in (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY)):
+                or current_policy not in pro_current_policies):
             raise ValueError("current Flash verifier preparation policy mismatch")
         # Preserve reuse by enumerating the exact old identity, never assigning
         # a new reviewer identity to an old receipt or modifying its hash.
@@ -187,11 +229,21 @@ def compatible_preparation_targets(current: Mapping[str, Any]) -> tuple[dict[str
         historical["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(current_policy)
         historical["formalRuntimePolicy"]["professionalCreationPolicy"].pop("modelPolicyId")
         return (deepcopy(dict(current)), *compatible_preparation_targets(historical))
-    if current_policy in (PRO_CURRENT_FLASH_PROFESSIONAL_POLICY, PRO_CURRENT_FLASH_3D_PROFESSIONAL_POLICY):
+    if current_policy in pro_current_policies:
         raise ValueError("current Flash verifier preparation model policy mismatch")
     if current.get("schemaVersion") == "mira.learning.preparation-target.progressive.v1":
         return (deepcopy(dict(current)),)
     targets = [deepcopy(dict(current))]
+    if image_policy_for_creation_policy(current_policy) == FORMAL_IMAGE_POLICY:
+        # Qwen Image 3.0 targets may retain the existing playful/required-3D
+        # coexistence, but can never silently reuse a v1/max preparation.
+        for compatible_policy in (QWEN3_PLAYFUL_PROFESSIONAL_POLICY,
+                                  QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY):
+            compatible = deepcopy(dict(current))
+            compatible["formalRuntimePolicy"]["professionalCreationPolicy"] = deepcopy(compatible_policy)
+            if canonical_sha256(compatible) not in {canonical_sha256(target) for target in targets}:
+                targets.append(compatible)
+        return tuple(targets)
     for historical_policy in (LEGACY_PROFESSIONAL_POLICY, IMAGE_PROFESSIONAL_POLICY,
                               INTEGRATED_PROFESSIONAL_POLICY, PROFESSIONAL_POLICY, VIDEO_PROFESSIONAL_POLICY, INTERACTIVE_PROFESSIONAL_POLICY,
                               MULTISTATE_PROFESSIONAL_POLICY, PLAYFUL_PROFESSIONAL_POLICY,
@@ -236,26 +288,61 @@ def professional_scene_learning_fields(receipt: Mapping[str, Any], *,
     return fields
 
 
-def professional_image_fields(receipt: Mapping[str, Any]) -> dict[str, Any]:
+def image_policy_for_creation_policy(value: object) -> dict[str, Any] | None:
+    policy = professional_policy(value)
+    image = policy.get("image")
+    if image is None:
+        return None
+    if canonical_sha256(image) == canonical_sha256(FORMAL_IMAGE_POLICY):
+        return deepcopy(FORMAL_IMAGE_POLICY)
+    if canonical_sha256(image) == canonical_sha256(LEGACY_FORMAL_IMAGE_POLICY):
+        return deepcopy(LEGACY_FORMAL_IMAGE_POLICY)
+    raise ValueError("unsupported formal image policy")
+
+
+def professional_image_fields(receipt: Mapping[str, Any], *,
+                              generation_contract: Mapping[str, Any] | None = None) -> dict[str, Any]:
     fields = {key: receipt[key] for key in ("imageGenerationEnabled", "imagePolicyId") if key in receipt}
-    if fields and fields != {"imageGenerationEnabled": True, "imagePolicyId": FORMAL_IMAGE_POLICY["policyId"]}:
+    expected_policy = (image_policy_for_creation_policy(
+        generation_contract.get("professionalCreationPolicy"))
+        if generation_contract is not None else None)
+    accepted_ids = {FORMAL_IMAGE_POLICY["policyId"], LEGACY_FORMAL_IMAGE_POLICY["policyId"]}
+    if fields and (fields.get("imageGenerationEnabled") is not True
+                   or fields.get("imagePolicyId") not in accepted_ids):
         raise ValueError("invalid professional image receipt policy")
-    if fields and fields.get("imageGenerationEnabled") is not True:
-        raise ValueError("invalid professional image receipt policy")
+    if generation_contract is not None:
+        expected = ({} if expected_policy is None else
+                    {"imageGenerationEnabled": True, "imagePolicyId": expected_policy["policyId"]})
+        if fields != expected:
+            raise ValueError("professional image receipt policy mismatch")
     return fields
 
 
+def image_policy_for_professional_receipt(receipt: Mapping[str, Any]) -> dict[str, Any] | None:
+    fields = professional_image_fields(receipt)
+    if not fields:
+        return None
+    return deepcopy(FORMAL_IMAGE_POLICY if fields["imagePolicyId"] == FORMAL_IMAGE_POLICY["policyId"]
+                    else LEGACY_FORMAL_IMAGE_POLICY)
+
+
 def media_receipt(value: object, *, runtime_request_id: str, classroom_id: str,
-                  build_item_id: str, session_id: str) -> dict[str, Any]:
+                  build_item_id: str, session_id: str,
+                  image_policy: Mapping[str, Any] | None = None) -> dict[str, Any]:
     fields = {"schemaVersion", "status", "runtimeRequestId", "buildItemId", "classroomId",
               "sessionId", "policyId", "providerId", "modelId", "imageCount", "assets", "receiptSha256"}
     if not isinstance(value, Mapping) or set(value) != fields:
         raise ValueError("invalid formal media receipt fields")
     receipt = deepcopy(dict(value))
+    expected_policy = deepcopy(dict(image_policy or FORMAL_IMAGE_POLICY))
+    if canonical_sha256(expected_policy) not in {
+        canonical_sha256(FORMAL_IMAGE_POLICY), canonical_sha256(LEGACY_FORMAL_IMAGE_POLICY),
+    }:
+        raise ValueError("unsupported formal media image policy")
     expected = {"schemaVersion": MEDIA_RECEIPT_SCHEMA, "status": "succeeded",
                 "runtimeRequestId": runtime_request_id, "classroomId": classroom_id,
                 "buildItemId": build_item_id, "sessionId": session_id,
-                **{k: FORMAL_IMAGE_POLICY[k] for k in ("policyId", "providerId", "modelId")}}
+                **{k: expected_policy[k] for k in ("policyId", "providerId", "modelId")}}
     if any(receipt.get(k) != v for k, v in expected.items()):
         raise ValueError("formal media receipt identity mismatch")
     if (not isinstance(runtime_request_id, str) or not _RUNTIME_REQUEST_ID.fullmatch(runtime_request_id)
@@ -462,7 +549,8 @@ def validate_media_manifest(manifest: Mapping[str, Any]) -> dict[str, Any] | Non
     validate_video_manifest(manifest)
     if canonical_sha256(generation.get("generation")) != canonical_sha256(generation_options(policy)):
         raise ValueError("formal media generation options mismatch")
-    image_fields = professional_image_fields(professional)
+    image_policy = image_policy_for_creation_policy(policy)
+    image_fields = professional_image_fields(professional, generation_contract=generation)
     if bool(image_fields) != ("image" in policy):
         raise ValueError("formal media professional policy mismatch")
     if not image_fields:
@@ -472,7 +560,7 @@ def validate_media_manifest(manifest: Mapping[str, Any]) -> dict[str, Any] | Non
     receipt = media_receipt(manifest.get("media"),
         runtime_request_id=professional["runtimeRequestId"],
         classroom_id=professional["classroomId"], build_item_id=professional["buildItemId"],
-        session_id=professional["sessionId"])
+        session_id=professional["sessionId"], image_policy=image_policy)
     if evidence.get("media") != media_evidence(receipt):
         raise ValueError("formal media validation evidence mismatch")
     return receipt

@@ -880,6 +880,9 @@ class LearningService:
     def authoritative_runtime_questions_complete(self, conn, *, authority: dict) -> bool:
         session, course = self._runtime_authority_session_course(authority)
         questions = self._questions(course)
+        if not questions and self._verified_zero_quiz_textbook(course):
+            # Viewing an ungraded textbook is not a completed question set.
+            return False
         answers = self.repository.parse_json(session.get("answers_json"), [])
         if not isinstance(answers, list):
             return False
@@ -2633,6 +2636,12 @@ class LearningService:
     def _questions(self, course) -> list[dict]:
         content = self.repository.parse_json(course.get("content_json"), {})
         questions = content.get("questions") if isinstance(content, dict) else None
+        if (isinstance(content, dict) and questions == []
+                and content.get('schemaVersion') == 'mira.learning.fixed-textbook-course.v1'
+                and content.get('assessmentPolicy') == 'verified-frozen-no-native-quiz'
+                and content.get('outcomeMode') == 'ungraded'
+                and self._verified_zero_quiz_textbook(course)):
+            return []
         if self._is_progressive_course(course) and isinstance(questions, list):
             steps = content.get("progressiveFlow")
             if not isinstance(steps, list):
@@ -2668,6 +2677,27 @@ class LearningService:
                 raise ApiError("invalid_course_content", "课程教学流程暂时不可用", 503)
             return [by_id[str(question_id)] for question_id in ids]
         return questions
+
+    def _verified_zero_quiz_textbook(self, course) -> bool:
+        """Never trust a caller-controlled empty-question marker by itself."""
+        if (course.get('content_origin') != 'openmaic_generated'
+                or course.get('status') != 'published' or course.get('quality_status') != 'released'):
+            return False
+        from repositories.textbook_repository import TextbookRepository
+        from content.textbook_release import validate_release
+        textbooks = TextbookRepository(self.repository.database)
+        try:
+            with textbooks.transaction() as conn:
+                build = textbooks.course_build(conn, course.get('id'), course.get('version'))
+                if build is None:
+                    return False
+                directory = textbooks.get_revision(conn, build['edition_id'], build['revision_id'])
+                if directory is None:
+                    return False
+                release = validate_release(build, textbooks.manifest(directory), course)
+                return bool(release and release.get('assessmentPolicy') == 'verified-frozen-no-native-quiz')
+        except (ApiError, ValueError, TypeError, KeyError):
+            return False
 
     def _course_has_teaching_flow(self, course) -> bool:
         content = self.repository.parse_json(course.get("content_json"), {})

@@ -6,7 +6,9 @@ import os
 import unittest
 from unittest.mock import Mock, patch
 
-from integrations.openmaic_formal_media import PLAYFUL_PROFESSIONAL_POLICY, REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, generation_options
+from integrations.openmaic_formal_media import (PLAYFUL_PROFESSIONAL_POLICY,
+    REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, QWEN3_PLAYFUL_PROFESSIONAL_POLICY,
+    QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY, generation_options)
 from integrations.openmaic_formal_playful import (
     PLAYFUL_LEARNING_POLICY, playful_generation_kwargs, playful_quality_context,
 )
@@ -70,12 +72,13 @@ class PlayfulQualityCompatibilityTest(unittest.TestCase):
                     "providerId": "baidu", "productionMode": "baidu_api",
                     "formalProductionConfigured": True, "verification": "configuration_only"}}}
         client._request_json = Mock(return_value=payload)
-        with patch.dict(os.environ, {"MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "", "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": ""}):
             self.assertTrue(client.formal_generation_readiness()["ready"])
-        with patch.dict(os.environ, {"MIRA_FORMAL_PLAYFUL_REQUIRE_3D": "1"}):
+        with patch.dict(os.environ, {"MIRA_FORMAL_MODEL_POLICY": "", "MIRA_FORMAL_PLAYFUL_REQUIRE_3D": "1"}):
             self.assertFalse(client.formal_generation_readiness()["ready"])
             payload["runtimePolicy"]["formalGenerationSupportedProfessionalPolicies"] = [
-                deepcopy(PLAYFUL_PROFESSIONAL_POLICY), deepcopy(REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)]
+                deepcopy(QWEN3_PLAYFUL_PROFESSIONAL_POLICY),
+                deepcopy(QWEN3_REQUIRED_3D_PLAYFUL_PROFESSIONAL_POLICY)]
             self.assertTrue(client.formal_generation_readiness()["ready"])
             payload["runtimePolicy"]["formalGenerationSupportedProfessionalPolicies"][1]["playfulLearningPolicy"]["minimumThreeDScenes"] = True
             self.assertFalse(client.formal_generation_readiness()["ready"])
