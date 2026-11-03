@@ -29,6 +29,29 @@ class GlyphPictureTests(unittest.TestCase):
             self.assertTrue(all(0 <= x < width and 0 <= y < height for x, y, _ in layout))
         render_picture(spec)
 
+    def test_rows_layout_and_a_bigger_size(self):
+        spec = {'layout': 'rows', 'size': [1280, 640], 'groups': [
+            {'cells': [{'glyph': '🦆'}] * 6}, {'cells': [{'glyph': '🔴'}] * 3}, {'cells': [{'glyph': '6'}]}]}
+        layout, signs, width, height = _layout_cells(spec)
+        self.assertEqual((width, height, signs), (6, 3, []))
+        self.assertEqual([(x, y) for x, y, _ in layout], [(i, 0) for i in range(6)] + [(i, 1) for i in range(3)] + [(0, 2)])
+        self.assertEqual(Image.open(io.BytesIO(render_picture(spec))).size, (1280, 640))
+        # more than eight cells stay on their row in this layout
+        self.assertEqual(_layout_cells({'layout': 'rows', 'groups': [{'cells': [{'glyph': 'x'}] * 10}]})[2:], (10, 1))
+
+    def test_invalid_layout_and_size_are_refused(self):
+        group = [{'cells': [{'glyph': '1'}]}]
+        for bad in ({'layout': 'diagonal'}, {'size': [100, 240]}, {'size': [480]}, {'size': '480x240'}, {'size': [480.0, 240]}):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                render_picture({'groups': group, **bad})
+
+    def test_a_glyph_the_font_cannot_draw_is_refused(self):
+        with self.assertRaises(ValueError) as caught:
+            render_picture({'groups': [{'cells': [{'glyph': '●'}]}]})
+        self.assertIn('draws nothing', str(caught.exception))
+        for glyph in ('🔴', '6', '🟦'):
+            render_picture({'groups': [{'cells': [{'glyph': glyph}]}]})
+
     def test_symbol_emoji_use_the_emoji_font(self):
         for glyph in ('🦆', '⚽', '⚪', '🔴'):
             self.assertTrue(_is_emoji(glyph), glyph)
