@@ -15,6 +15,14 @@ EMOJI = re.compile('[\U0001f000-\U0001faff\u2600-\u27bf\ufe0f\u20e3]')
 OPERATIONS = {'widget_highlight', 'widget_setState', 'widget_annotation', 'widget_reveal'}
 
 
+TRADITIONAL = frozenset(Path(__file__).with_name('traditional.txt').read_text(encoding='utf-8').strip())
+
+
+def traditional(text):
+    """Characters of text that exist only in Traditional Chinese; lessons are written in Simplified Chinese."""
+    return ''.join(sorted({ch for ch in text if ch in TRADITIONAL}))
+
+
 def body_hash(body):
     data = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
     return hashlib.sha256(data.encode('utf-8')).hexdigest()
@@ -87,6 +95,17 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
                 # A live discussion calls a paid model (paid classroom interactions are off) and the student runtime
                 # seats only its own roster. Write the question as a pre-recorded teacher line instead.
                 add('G3', 'discussion_not_allowed', index, str(action.get('id', 'discussion')) + ': write it as a teacher line such as 小满问：…')
+
+        texts = [(str(a.get('id', 'speech')), a.get('text', '')) for a in speeches]
+        if scene.get('type') == 'slide':
+            texts += [(str(e.get('id', '')), re.sub(r'<[^>]*>', '', e.get('content', ''))) for e in scene.get('content', {}).get('canvas', {}).get('elements', []) if e.get('type') == 'text']
+        if scene.get('type') == 'quiz':
+            for q in scene.get('content', {}).get('questions', []):
+                texts.append((str(q.get('id', '')), ' '.join([q.get('question', ''), q.get('analysis', '')] + [str(o.get('label', '')) for o in q.get('options', [])])))
+        for name, text in texts:
+            bad = traditional(text)
+            if bad:
+                add('G3', 'traditional_chinese', index, name + ': ' + bad)
 
         if scene.get('type') == 'slide':
             elements = scene.get('content', {}).get('canvas', {}).get('elements', [])

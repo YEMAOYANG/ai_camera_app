@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from courseware.tools.check import body_hash, check_classroom
+from courseware.tools.check import body_hash, check_classroom, traditional
 
 
 SAMPLE = Path(__file__).parent / 'fixtures' / 'sample_body.json'
@@ -59,6 +59,16 @@ class CheckTests(unittest.TestCase):
         self.assertIn('notes_incomplete', codes(check_classroom(self.body, notes=self.notes)))
         item.update(status='reviewed', evidence='kept but ignored')
         self.assertIn('notes_incomplete', codes(check_classroom(self.body, notes=self.notes)))
+
+    def test_traditional_chinese_is_refused_in_lines_slides_and_quizzes(self):
+        self.assertNotIn('traditional_chinese', codes(check_classroom(self.body)))
+        self.body['scenes'][0]['content']['canvas']['elements'][0]['content'] = '<p style="font-size:20px">開始</p>'
+        self.body['scenes'][1]['actions'][0]['text'] = '這個很簡單'
+        self.body['scenes'][2]['content']['questions'][0]['analysis'] = '數一數'
+        issues = [i for i in check_classroom(self.body) if i['code'] == 'traditional_chinese']
+        self.assertEqual(sorted((i['gate'], i['scene'], i['severity']) for i in issues), [('G3', 1, 'error'), ('G3', 2, 'error'), ('G3', 3, 'error')])
+        self.assertIn('開', next(i['detail'] for i in issues if i['scene'] == 1))
+        self.assertEqual(traditional('今天学习数一数，书、爱、门'), '')
 
     def test_media_and_hash(self):
         with tempfile.TemporaryDirectory() as directory:
