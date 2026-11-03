@@ -53,7 +53,7 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
     verification = _load(build / 'verification.json')
     grade = _load(build / 'draft.json').get('grade')
     issues = [i for i in check.check_classroom(body, build / 'media', notes=notes, roster=roster, receipt=receipt,
-                                               verification=verification, grade=grade) if i['severity'] == 'error']
+                                               verification=verification, grade=grade, teaching=True) if i['severity'] == 'error']
     if issues:
         raise PackageError('gates_failed', '; '.join(f"{i['gate']} {i['code']}" for i in issues))
     verifier = str(verification.get('verifier', {}).get('model', '')).lower()

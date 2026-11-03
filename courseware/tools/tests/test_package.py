@@ -55,6 +55,11 @@ class PackageTests(unittest.TestCase):
                          ('本课', '认识6；会数数', '1', 10))
         self.assertEqual(identity['authorModels'], ['gpt-6.1-terra', 'claude-sonnet-5-5'])
 
+    def test_the_lesson_is_checked_as_a_teaching_lesson(self):
+        with patch.object(package.check, 'check_classroom', return_value=[]) as checker:
+            package.package_lesson(self.lesson, self.build, self.out, **self.ids)
+        self.assertTrue(checker.call_args.kwargs['teaching'])
+
     def test_a_failing_gate_stops_packaging(self):
         issue = {'gate': 'G6', 'code': 'audit_receipt_stale', 'severity': 'error'}
         with self.assertRaises(package.PackageError) as caught:

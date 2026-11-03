@@ -69,6 +69,12 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
     voices = _read(Path(__file__).with_name('voices.json'), 'roster_invalid', 'voices')
     if not isinstance(roster, dict) or not roster:
         _fail('roster_invalid', 'roster')
+    # The owl, 小满 and 朵朵 join a lesson that lets them speak: {"say": "...", "by": "owl"} (cast.json holds their entries).
+    cast = _read(Path(__file__).with_name('cast.json'), 'roster_invalid', 'cast')
+    scenes_for_cast = lesson.get('scenes') if isinstance(lesson.get('scenes'), list) else []
+    used = {beat.get('by') for scene in scenes_for_cast if isinstance(scene, dict) and isinstance(scene.get('script'), list)
+            for beat in scene['script'] if isinstance(beat, dict)}
+    roster = {**roster, **{key: agent for key, agent in cast.items() if key in used and key not in roster}}
     teachers = []
     configs = []
     genders = {}
@@ -83,6 +89,7 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
         genders[agent['name']] = gender
         if role == 'teacher':
             teachers.append(agent)
+            teacher_key = key
         configs.append({'id': 'gen-' + key, 'name': agent['name'], 'role': role, 'color': agent['color'], 'avatar': agent['avatar'], 'persona': agent['persona'], 'priority': {'teacher': 10, 'assistant': 7, 'student': 5}[role], 'voiceConfig': {'providerId': 'qwen-tts', 'modelId': 'qwen3-tts-flash', 'voiceId': agent['voice']}})
     if len(teachers) != 1:
         _fail('roster_invalid', 'teacher')
@@ -120,6 +127,7 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
     now = int(time.time() * 1000) if now_ms is None else now_ms
     body = {'stage': {'id': stage_id, 'name': lesson['title'], 'agentIds': [c['id'] for c in configs], 'createdAt': now, 'updatedAt': now, 'description': lesson['description'], 'generatedAgentConfigs': configs}, 'scenes': []}
     quiz_specs = []
+    speakers = {}
     seen = set()
     for index, item in enumerate(scenes, 1):
         if not isinstance(item, dict):
@@ -192,11 +200,18 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
             if len(ops) != 1:
                 _fail('lesson_invalid', f'{key} script {number}')
             op = next(iter(ops)); value = beat[op]
-            if set(beat) - ({op, 'content'} if op in ('highlight', 'reveal', 'annotate', 'setState') else {op}):
+            if set(beat) - ({op, 'content'} if op in ('highlight', 'reveal', 'annotate', 'setState') else {op, 'by'} if op == 'say' else {op}):
                 _fail('lesson_invalid', f'{key} script {number}')
             action = {'id': f'{key}-{number}'}
             if op == 'say' and _string(value):
+                speaker = beat.get('by', teacher_key)
+                if speaker not in roster:
+                    _fail('roster_invalid', f'{key} script {number} by {speaker}')
+                if speaker != teacher_key and (roster[speaker].get('shortName') or roster[speaker]['name']) not in value[:12]:
+                    # No avatar lights up for a companion's line, so the words themselves must say who speaks.
+                    _fail('speaker_unnamed', f"{key} script {number}: a line by {speaker} must name {roster[speaker].get('shortName') or roster[speaker]['name']} at its start")
                 action.update(type='speech', text=value)
+                speakers[action['id']] = speaker
             elif op in ('spotlight', 'laser') and kind == 'slide' and _string(value):
                 target = names.get(value, value)
                 if target not in ids:
@@ -235,7 +250,7 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
             if line['questionId'] in question_audio:
                 _fail('quiz_invalid', 'duplicate question id ' + str(line['questionId']))
             question_audio[line['questionId']] = line['id']
-    lines = [{'id': a['id'], 'text': a['text'], 'voice': teachers[0]['voice']} for scene in body['scenes'] for a in scene['actions'] if a['type'] == 'speech']
+    lines = [{'id': a['id'], 'text': a['text'], 'voice': roster[speakers.get(a['id'], teacher_key)]['voice']} for scene in body['scenes'] for a in scene['actions'] if a['type'] == 'speech']
     draft = {'body': body, 'lines': lines, 'roster': genders, 'grade': lesson['grade'], 'questionAudio': question_audio}
     _write(out / 'draft.json', draft); _write(out / 'lines.json', lines); _write(out / 'roster.json', genders)
     return draft

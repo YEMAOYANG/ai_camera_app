@@ -70,7 +70,8 @@ class LaneTests(unittest.TestCase):
 
     def run_lane(self, **kw):
         return lane.run_lesson(self.lesson, self.work, stage_id='stage-lane', post=self.service.post, fetch=self.service.fetch,
-                               run_audit=fake_audit, run_play=lambda body, media: self.play(body, media), now_ms=1793700000000, sleep=lambda s: None, **kw)
+                               run_audit=fake_audit, run_play=lambda body, media: self.play(body, media), now_ms=1793700000000, sleep=lambda s: None,
+                               **{'teaching': False, **kw})
 
     def test_full_run_writes_the_package_and_reports_gate_issues(self):
         result = self.run_lane()
@@ -104,6 +105,12 @@ class LaneTests(unittest.TestCase):
         self.play = fake_play
         again = self.run_lane(steps=['check'])
         self.assertIn('play_unfinished', {i['code'] for i in again['issues']})
+
+    def test_a_lesson_is_checked_for_enough_spoken_explanation_unless_told_otherwise(self):
+        result = self.run_lane(teaching=True)
+        thin = [i for i in result['issues'] if i['code'] == 'narration_thin']
+        self.assertEqual({(i['gate'], i['severity']) for i in thin}, {('G3', 'error')})
+        self.assertTrue(thin)
 
     def test_second_run_reuses_voices_and_pictures(self):
         (self.lesson / 'pictures.json').write_text(json.dumps([{'key': 'cover', 'prompt': 'a pond'}]))

@@ -101,6 +101,34 @@ class BuildTests(unittest.TestCase):
             build.finish(draft, self.out, {})
         self.assertEqual(caught.exception.args[0], 'audio_missing')
 
+    def test_a_line_can_be_spoken_by_a_companion_with_its_own_voice(self):
+        def add_lines(lesson):
+            scene = lesson['scenes'][0]
+            scene['script'] += [{'say': '小满问：为什么要数一数？', 'by': 'xiaoman'}, {'say': '站长猫头鹰提醒我们：数到几就是几。', 'by': 'owl'}]
+        self.change(add_lines)
+        draft = self.prepare()
+        voices = {line['text'][:2]: line['voice'] for line in draft['lines']}
+        self.assertEqual((voices['小满'], voices['站长']), ('Aiden', 'Cherry'))
+        self.assertEqual(next(l['voice'] for l in draft['lines'] if l['id'] == 'intro-1'), 'Ethan')
+        self.assertEqual(draft['body']['stage']['agentIds'], ['gen-teacher', 'gen-student', 'gen-owl', 'gen-xiaoman'])
+        self.assertEqual(draft['roster']['小满'], 'male')
+        speech = [a for s in draft['body']['scenes'] for a in s['actions'] if a['type'] == 'speech' and a['text'].startswith('小满')]
+        self.assertNotIn('agentId', speech[0])
+
+    def test_a_companion_line_must_name_its_speaker_and_the_speaker_must_exist(self):
+        self.change(lambda lesson: lesson['scenes'][0]['script'].append({'say': '为什么要数一数？', 'by': 'xiaoman'}))
+        with self.assertRaises(build.BuildError) as caught:
+            self.prepare()
+        self.assertEqual(caught.exception.args[0], 'speaker_unnamed')
+        self.change(lambda lesson: lesson['scenes'][0]['script'].__setitem__(-1, {'say': '小满问：为什么？', 'by': 'nobody'}))
+        with self.assertRaises(build.BuildError) as caught:
+            self.prepare()
+        self.assertEqual(caught.exception.args[0], 'roster_invalid')
+        self.change(lambda lesson: lesson['scenes'][0]['script'].__setitem__(-1, {'highlight': '#x', 'by': 'owl'}))
+        with self.assertRaises(build.BuildError) as caught:
+            self.prepare()
+        self.assertEqual(caught.exception.args[0], 'lesson_invalid')
+
     def test_quiz_options_can_use_a_lesson_picture(self):
         def use_picture(lesson):
             quiz = next(s for s in lesson['scenes'] if s['type'] == 'quiz')

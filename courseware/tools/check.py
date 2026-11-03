@@ -15,6 +15,9 @@ EMOJI = re.compile('[\U0001f000-\U0001faff\u2600-\u27bf\ufe0f\u20e3]')
 OPERATIONS = {'widget_highlight', 'widget_setState', 'widget_annotation', 'widget_reveal'}
 
 
+# The spoken explanation a page must carry when a lesson is checked as a teaching lesson. The pilot lesson 整理和复习 averages
+# 162 characters on a slide and 131 on an interactive page; its thinnest slide has 6 lines and 100 characters.
+NARRATION_MINIMUM = {'slide': (6, 100), 'interactive': (5, 90)}
 TRADITIONAL = frozenset(Path(__file__).with_name('traditional.txt').read_text(encoding='utf-8').strip())
 
 
@@ -56,7 +59,8 @@ def text_box(element):
     return left, top, left + float(element.get('width', 0)), top + height
 
 
-def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=None, verification=None, grade=None):
+def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=None, verification=None, grade=None, teaching=False):
+    """All gates over a built classroom; teaching=True also requires enough spoken explanation on every slide and page."""
     issues = []
 
     def add(gate, code, scene, detail, severity='error'):
@@ -84,6 +88,12 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
         actions = scene.get('actions', [])
         speeches = [a for a in actions if a.get('type') == 'speech']
         speech_count += len(speeches)
+        if teaching and scene.get('type') in NARRATION_MINIMUM:
+            lines, characters = NARRATION_MINIMUM[scene['type']]
+            spoken = sum(len(a.get('text', '')) for a in speeches)
+            if len(speeches) < lines or spoken < characters:
+                add('G3', 'narration_thin', index, '%d lines and %d characters of speech; a %s needs at least %d lines and %d characters that explain the knowledge' % (
+                    len(speeches), spoken, scene['type'], lines, characters))
         for action in speeches:
             if not action.get('audioUrl'):
                 add('G1', 'speech_audio_missing', index, str(action.get('id', 'speech')))

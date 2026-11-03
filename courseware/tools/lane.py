@@ -32,7 +32,7 @@ def _save(path, value):
 
 def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://127.0.0.1:3100', jobs=4,
                post=voice.default_post, fetch=picture.default_fetch, run_audit=audit.audit_body, run_play=autoplay.play_body, now_ms=None,
-               sleep=time.sleep):
+               sleep=time.sleep, teaching=True):
     lesson, work = Path(lesson_dir), Path(work_dir)
     work.mkdir(parents=True, exist_ok=True)
     unknown = set(steps) - set(STEPS)
@@ -80,7 +80,7 @@ def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://
     if 'check' in steps or 'audit' in steps or 'play' in steps:
         notes_path = lesson / 'official-notes.json'
         notes = _load(notes_path) if notes_path.exists() else None
-        issues = check.check_classroom(body, work / 'media', notes=notes, roster=result['roster'], receipt=receipt, grade=result['grade'])
+        issues = check.check_classroom(body, work / 'media', notes=notes, roster=result['roster'], receipt=receipt, grade=result['grade'], teaching=teaching)
         if notes is None:
             issues.append(dict(gate='G0', code='notes_missing', scene=None, detail='official-notes.json is required', severity='error'))
         brief_path = lesson / 'brief.json'

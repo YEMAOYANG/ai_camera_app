@@ -73,6 +73,20 @@ class CheckTests(unittest.TestCase):
         self.assertEqual(traditional('历史著名，瞭望，紫色，繁花，警察，迎接，鞋子，餐桌，首先，骨头，魔法，擦黑板，支持，瓶子，素食，索引，角落，近处，啊，嘛'), '')
         self.assertEqual(traditional('嘗一嘗，總結，記住'), ''.join(sorted('嘗總結記')))
 
+    def test_a_teaching_lesson_needs_enough_spoken_explanation_on_every_slide_and_page(self):
+        def speech(count, characters):
+            return [{'id': 's%d' % i, 'type': 'speech', 'text': 'x' * (characters // count), 'audioUrl': '/a.wav'} for i in range(count)]
+        self.body['scenes'][0]['actions'] = speech(6, 120)
+        self.body['scenes'][1]['actions'] = self.body['scenes'][1]['actions'][:1] + speech(5, 100)
+        thin = [i for i in check_classroom(self.body, teaching=True) if i['code'] == 'narration_thin']
+        self.assertEqual(thin, [])
+        self.body['scenes'][0]['actions'] = speech(5, 400)          # enough characters, too few lines
+        self.body['scenes'][1]['actions'] = speech(8, 40)           # enough lines, too few characters
+        thin = [i for i in check_classroom(self.body, teaching=True) if i['code'] == 'narration_thin']
+        self.assertEqual([(i['gate'], i['scene'], i['severity']) for i in thin], [('G3', 1, 'error'), ('G3', 2, 'error')])
+        self.assertIn('5 lines and 400 characters', thin[0]['detail'])
+        self.assertEqual([i for i in check_classroom(self.body) if i['code'] == 'narration_thin'], [])  # off unless asked for
+
     def test_traditional_characters_in_the_notes_are_refused(self):
         self.assertNotIn('traditional_chinese', codes(check_classroom(self.body, notes=self.notes)))
         self.notes['resources']['courseware']['findings'] = ['嘗一嘗']
