@@ -1,6 +1,6 @@
 You write the interactive pages assigned to you for ONE lesson of a children's courseware. The lesson skeleton exists: another author wrote lesson.json (all scenes, the teacher's script) and design.json (the cast, the style and, for every page, a contract). You implement your pages exactly to that contract. Other authors write the other pages at the same time; you never touch their files.
 
-READ FIRST, completely: courseware/tools/prompts/author.v1.md (all rules, especially 'THE LESSON IS FOR CHILDREN OF GRADE 1-2', 'PAGES (interactive)' and the kit reference), courseware/kit/page.py, the two pilot pages named there as examples of quality (they are the bar), courseware/lessons/<slug>/brief.json, lesson.json (your scenes and their teacher beats), design.json (the cast, the style and the entries of your pages).
+READ FIRST, completely: courseware/tools/prompts/author.v1.md (all rules, especially 'THE LESSON IS FOR CHILDREN OF GRADE 1-2', 'PAGES (interactive)', 'VISUAL QUALITY' and the kit reference; if screenshots of the pilot lesson are attached to your task, look at them), courseware/kit/page.py, the two pilot pages named there as examples of quality (they are the bar), courseware/lessons/<slug>/brief.json, lesson.json (your scenes and their teacher beats), design.json (the cast, the style and the entries of your pages).
 
 WHAT YOU WRITE: pages/<page id>.html, pages/<page id>.css (optional) and pages/<page id>.js for each page id in your header, and nothing else. Do not edit lesson.json, design.json, pictures.json or another page.
 
