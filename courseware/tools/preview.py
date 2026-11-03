@@ -56,7 +56,7 @@ def stage_preview(build_dir, classrooms_dir, *, endpoint='http://127.0.0.1:3100'
         if not (target / name).exists():
             shutil.copyfile(build / 'media' / name, target / name)
     status, answer = post(endpoint.rstrip('/') + '/api/classroom', {'stage': body['stage'], 'scenes': body['scenes']})
-    if status != 200:
+    if not 200 <= status < 300:
         raise PreviewError('save_failed', f'HTTP {status}: {answer[:200]!r}')
     return {'stage': stage, 'media': len(names), 'url': f'http://localhost:3100/classroom/{stage}'}
 

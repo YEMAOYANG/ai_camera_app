@@ -17,25 +17,32 @@ const rand = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return s
 const pick = (list) => list[Math.floor(rand() * list.length)];
 
 const finished = () => { const f = document.querySelector('#finish'); return !!f && !f.classList.contains('gone') && getComputedStyle(f).display !== 'none'; };
-const visibleRect = (el) => {
-  const style = getComputedStyle(el);
-  if (style.visibility === 'hidden' || style.display === 'none' || style.pointerEvents === 'none') return null;
-  const r = el.getBoundingClientRect();
-  if (r.right < 0 || r.bottom < 0 || r.left > 1280 || r.top > 720) return null;
-  return r;
-};
 const candidates = () => {
+  const visibleRect = (el) => {
+    const style = getComputedStyle(el);
+    if (style.visibility === 'hidden' || style.display === 'none' || style.pointerEvents === 'none') return null;
+    const r = el.getBoundingClientRect();
+    if (r.right < 0 || r.bottom < 0 || r.left > 1280 || r.top > 720) return null;
+    return r;
+  };
   const out = [];
   for (const el of document.querySelectorAll('#play *, #finish *')) {
     const r = visibleRect(el);
     if (!r || r.width < 24 || r.height < 24) continue;
     const style = getComputedStyle(el);
     if (!(['pointer', 'grab'].includes(style.cursor) || ['BUTTON', 'CANVAS'].includes(el.tagName) || el.getAttribute('role') === 'button')) continue;
-    out.push({ x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height, canvas: el.tagName === 'CANVAS' });
+    out.push({ x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height, canvas: el.tagName === 'CANVAS', drag: !!el.closest('[style*="touch-action"]') });
   }
   return out;
 };
 const bigThings = () => {
+  const visibleRect = (el) => {
+    const style = getComputedStyle(el);
+    if (style.visibility === 'hidden' || style.display === 'none' || style.pointerEvents === 'none') return null;
+    const r = el.getBoundingClientRect();
+    if (r.right < 0 || r.bottom < 0 || r.left > 1280 || r.top > 720) return null;
+    return r;
+  };
   const out = [];
   for (const el of document.querySelectorAll('#play *')) {
     const r = visibleRect(el);
@@ -91,11 +98,20 @@ for (const file of files) {
       await page.waitForTimeout(1300);
       continue;
     }
+    if (list.length > 2 && rand() < 0.35) {
+      const ordered = [...list].sort((p, q) => (p.y - q.y > 40 ? 1 : q.y - p.y > 40 ? -1 : p.x - q.x));
+      const k = 1 + Math.floor(rand() * Math.min(ordered.length, 10));
+      for (const c of ordered.slice(0, k)) { await page.mouse.click(c.x, c.y); await page.waitForTimeout(90); }
+      const c = pick(list);
+      await page.mouse.click(c.x, c.y);
+      await page.waitForTimeout(250);
+      continue;
+    }
     const a = pick(list);
     if (a.canvas) {
       await page.mouse.move(a.x - a.w * 0.4, a.y); await page.mouse.down();
       await page.mouse.move(a.x + a.w * 0.4, a.y + a.h * 0.2, { steps: 12 }); await page.mouse.up();
-    } else if (rand() < 0.5 && list.length > 1) {
+    } else if (a.drag && rand() < 0.7 && list.length > 1) {
       const big = rand() < 0.5 ? await page.evaluate(bigThings) : [];
       const b = big.length ? pick(big) : pick(list.filter((c) => c !== a));
       await page.mouse.move(a.x, a.y); await page.mouse.down();

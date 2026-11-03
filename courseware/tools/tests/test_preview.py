@@ -41,8 +41,8 @@ class PreviewTests(unittest.TestCase):
         url, payload = self.saved[0]
         self.assertEqual(url, 'http://127.0.0.1:3100/api/classroom')
         self.assertEqual(set(payload), {'stage', 'scenes'})
-        self.run_preview()  # staging again is harmless
-        self.assertEqual(len(self.saved), 2)
+        self.run_preview(post=lambda url, payload: (201, b'{"success":true}'))  # the runtime answers 201 Created
+        self.assertEqual(len(self.saved), 1)
 
     def test_a_damaged_or_missing_media_file_stops_before_anything_is_copied(self):
         (self.build / 'media' / self.audio_name).write_bytes(b'tampered')
