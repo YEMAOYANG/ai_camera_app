@@ -58,7 +58,11 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
         resources = notes.get('resources', {})
         for name in ('teachingDesign', 'courseware', 'learningTaskSheet', 'afterClassExercise'):
             item = resources.get(name, {})
-            if not isinstance(item.get('findings'), list) or not item['findings'] or not isinstance(item.get('pageRefs'), list) or not item['pageRefs']:
+            if item.get('status') == 'not_provided':
+                # The official listing of this class hour has no such resource; the evidence names the saved listing.
+                if not isinstance(item.get('evidence'), str) or not item['evidence'].strip():
+                    add('G0', 'notes_incomplete', None, name + ' not_provided requires evidence')
+            elif not isinstance(item.get('findings'), list) or not item['findings'] or not isinstance(item.get('pageRefs'), list) or not item['pageRefs']:
                 add('G0', 'notes_incomplete', None, name + ' requires findings and pageRefs')
 
     scenes = body.get('scenes', [])
