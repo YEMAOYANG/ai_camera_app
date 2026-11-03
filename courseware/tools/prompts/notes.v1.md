@@ -48,5 +48,8 @@ Design OUR lesson, not a copy of theirs:
 - Every after-class objective is either practised in one of our pages (name the page) or listed under weekly with a reason.
 - Narration is Chinese. In an English lesson the target words and sentences stay English.
 
+LANGUAGE
+Write all Chinese in Simplified Chinese (简体中文) only. A Traditional character anywhere in your files is an error that a release gate rejects. Re-read both files for Traditional characters before you finish.
+
 HONESTY
 Write only what you saw. Do not invent pages or content for a resource that has no attached pages. Your final reply: the two files, then for each resource the pages you looked at, and anything unreadable or uncertain.
