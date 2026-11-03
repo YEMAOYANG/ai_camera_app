@@ -58,6 +58,16 @@ class SlideTests(unittest.TestCase):
             slides.render('missing', {}, image_urls=IMAGES)
         self.assertEqual(caught.exception.args, ('unknown_template', 'missing'))
 
+    def test_the_big_word_is_really_big(self):
+        import re
+        def word_size(word):
+            result = slides.render('big-word', {'word': word, 'pinyin': 'p', 'hint': 'h'}, image_urls=IMAGES)
+            element = next(e for e in result['elements'] if e['id'] == 'text_word')
+            return int(re.search(r'font-size:(\d+)px', element['content']).group(1))
+        self.assertGreaterEqual(word_size('山'), 100)
+        self.assertGreaterEqual(word_size('江南'), 100)
+        self.assertLess(word_size('六个字的词语啊'[:6]), word_size('山'))
+
     def test_long_chinese_text_passes_g2(self):
         text = '看一看图片里的事物并说出你的发现'
         cases = {
