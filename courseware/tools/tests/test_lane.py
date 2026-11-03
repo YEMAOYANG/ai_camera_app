@@ -99,11 +99,11 @@ class LaneTests(unittest.TestCase):
         self.play = stuck
         result = self.run_lane()
         self.assertEqual(result['steps']['play'], {'ok': False, 'pages': 1, 'failed': 1})
-        self.assertIn(('soft_lock', 2), {(i['code'], i['scene']) for i in result['issues']})
+        self.assertIn(('play_unfinished', 2), {(i['code'], i['scene']) for i in result['issues']})
         self.assertTrue((self.work / 'play-receipt.json').is_file())
         self.play = fake_play
         again = self.run_lane(steps=['check'])
-        self.assertIn('soft_lock', {i['code'] for i in again['issues']})
+        self.assertIn('play_unfinished', {i['code'] for i in again['issues']})
 
     def test_second_run_reuses_voices_and_pictures(self):
         (self.lesson / 'pictures.json').write_text(json.dumps([{'key': 'cover', 'prompt': 'a pond'}]))
