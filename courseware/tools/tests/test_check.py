@@ -120,7 +120,7 @@ class CheckTests(unittest.TestCase):
     def test_discussion_actions_are_refused(self):
         self.body['scenes'][0]['actions'].append({'id': 'talk', 'type': 'discussion', 'topic': 'x', 'prompt': 'y', 'agentId': 'a'})
         issues = [i for i in check_classroom(self.body) if i['code'] == 'discussion_not_allowed']
-        self.assertEqual([(i['gate'], i['severity'], i['scene'], i['detail']) for i in issues], [('G3', 'error', 1, 'talk')])
+        self.assertEqual([(i['gate'], i['severity'], i['scene'], i['detail']) for i in issues], [('G3', 'error', 1, 'talk: write it as a teacher line such as 小满问：…')])
 
     def test_voices(self):
         agent = self.body['stage']['generatedAgentConfigs'][0]

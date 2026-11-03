@@ -80,8 +80,9 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
 
         for action in actions:
             if action.get('type') == 'discussion':
-                # Live class discussion calls a paid model, and the student runtime only seats its own roster.
-                add('G3', 'discussion_not_allowed', index, str(action.get('id', 'discussion')))
+                # A live discussion calls a paid model (paid classroom interactions are off) and the student runtime
+                # seats only its own roster. Write the question as a pre-recorded teacher line instead.
+                add('G3', 'discussion_not_allowed', index, str(action.get('id', 'discussion')) + ': write it as a teacher line such as 小满问：…')
 
         if scene.get('type') == 'slide':
             elements = scene.get('content', {}).get('canvas', {}).get('elements', [])

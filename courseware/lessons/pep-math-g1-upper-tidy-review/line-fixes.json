@@ -1,5 +1,5 @@
 {
-  "note": "Reviewed fixes to the accepted pilot body, applied after the quiz upgrade. Found by the independent verifier (speech lines) and by reading each demo against its page (state mismatch). Seven discussion actions removed after the owner played the lesson.",
+  "note": "Reviewed fixes to the accepted pilot body, applied after the quiz upgrade. Found by the independent verifier (speech lines), by reading each demo against its page (state mismatch) and by the owner playing it (live class discussions cannot run: paid interactions are off and the runtime seats only its own roster).",
   "text": {
     "action_t3Xbsjby": {
       "text": "现在从右边数，好多小动物排第几都变了。数第几，先说清从哪边数。",
@@ -53,13 +53,41 @@
       "content": "点这里重玩，再选你的猜测。"
     }
   },
-  "remove": {
-    "action_OefSuDZM": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
-    "action_disc_p2": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
-    "action_rGft4xVv": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
-    "action_aP7xc52P": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
-    "action_VbjjmOZ1": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
-    "action_4RJftk6J": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
-    "action_SX_QXjk2": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model."
+  "replace": {
+    "action_OefSuDZM": {
+      "id": "action_ask_01",
+      "text": "小满问：小站里什么东西乱了？说给大人听。",
+      "why": "A live discussion calls a paid model; paid classroom interactions are switched off and the student runtime seats only its own roster. The same question is asked by the classmate in a pre-recorded teacher line."
+    },
+    "action_disc_p2": {
+      "id": "action_ask_02",
+      "text": "朵朵问：为什么要整理？乱放会怎么样？",
+      "why": "A live discussion calls a paid model; paid classroom interactions are switched off and the student runtime seats only its own roster. The same question is asked by the classmate in a pre-recorded teacher line."
+    },
+    "action_rGft4xVv": {
+      "id": "action_ask_03",
+      "text": "猫头鹰站长问：货篮里别的东西有几个？去数一数。",
+      "why": "A live discussion calls a paid model; paid classroom interactions are switched off and the student runtime seats only its own roster. The same question is asked by the classmate in a pre-recorded teacher line."
+    },
+    "action_aP7xc52P": {
+      "id": "action_ask_04",
+      "text": "朵朵问：你见过像大于号、小于号的东西吗？",
+      "why": "A live discussion calls a paid model; paid classroom interactions are switched off and the student runtime seats only its own roster. The same question is asked by the classmate in a pre-recorded teacher line."
+    },
+    "action_VbjjmOZ1": {
+      "id": "action_ask_05",
+      "text": "小满问：4个圆片，还有别的分法吗？想一想。",
+      "why": "A live discussion calls a paid model; paid classroom interactions are switched off and the student runtime seats only its own roster. The same question is asked by the classmate in a pre-recorded teacher line."
+    },
+    "action_4RJftk6J": {
+      "id": "action_ask_06",
+      "text": "小满问：这些加法卡片，可以按什么顺序摆？",
+      "why": "A live discussion calls a paid model; paid classroom interactions are switched off and the student runtime seats only its own roster. The same question is asked by the classmate in a pre-recorded teacher line."
+    },
+    "action_SX_QXjk2": {
+      "id": "action_ask_07",
+      "text": "小满问：今天你最大的收获是什么？说给大人听。",
+      "why": "A live discussion calls a paid model; paid classroom interactions are switched off and the student runtime seats only its own roster. The same question is asked by the classmate in a pre-recorded teacher line."
+    }
   }
 }
