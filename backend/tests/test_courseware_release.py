@@ -299,6 +299,30 @@ class CoursewareReleaseTests(unittest.TestCase):
         self.assertEqual(set(classroom), {'id', 'stage', 'scenes', 'createdAt'})
         self.assertEqual(classroom['createdAt'], 1793608977483)
 
+    def test_student_delivery_accepts_the_published_classroom(self):
+        # The student path re-reads the stored classroom with its own strict checks; it must accept what we freeze.
+        from collections import OrderedDict
+        from pathlib import Path
+        from threading import Lock
+        from services.textbook_classroom_service import TextbookClassroomService
+        release = build_release(self.inputs)['release']
+        raw = json.dumps(release['classroom'], ensure_ascii=False).encode()
+
+        class Store:
+            class config:
+                mode = 'registry'
+            project_root = Path('/project')
+
+            def resolve(self, source):
+                return {'mimeType': 'application/json', 'sha256': hashlib.sha256(raw).hexdigest(),
+                        'byteSize': len(raw), 'locator': {}}
+
+            def read_bytes(self, source, expected_sha256, expected_bytes):
+                return raw
+        service = TextbookClassroomService.__new__(TextbookClassroomService)
+        service.course_files, service._classroom_cache, service._classroom_cache_lock = Store(), OrderedDict(), Lock()
+        self.assertEqual(service._playback_release(release)['classroom'], release['classroom'])
+
     def test_classroom_without_creation_time_is_refused(self):
         for value in (None, 0, '', ' ', 1.5):
             self.inputs = sample_inputs()
