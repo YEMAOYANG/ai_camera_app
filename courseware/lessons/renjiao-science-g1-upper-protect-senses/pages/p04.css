@@ -1,0 +1,11 @@
+#sound-stage{position:absolute;inset:0;border:5px solid var(--line);border-radius:36px;background:radial-gradient(ellipse at 50% 55%,#fffdf6 0,#fff5dc 65%,#ffebbf 100%);overflow:hidden;box-shadow:0 10px 0 #e8c48f}
+#sound-title{position:absolute;top:10px;left:0;width:100%;text-align:center;font-size:34px;font-weight:900;color:var(--ink2)}
+#sound-replay{position:absolute;left:48px;top:30px;width:86px;height:86px;border-radius:50%;border:4px solid var(--line);background:#fff;box-shadow:0 5px 0 #dfbd84;display:grid;place-items:center;cursor:pointer}#sound-replay svg{width:68px;height:68px}
+#direction-area{position:absolute;left:30px;right:30px;top:106px;height:360px;display:flex;align-items:center;justify-content:space-between}
+.direction{position:relative;width:270px;height:285px;border:5px solid #edcf9e;border-radius:40px;background:#fffaf0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s,border-color .2s,background .2s}
+.direction svg{width:190px;height:160px}.direction.active{border-color:var(--or);background:#fff1cb;transform:scale(1.04)}.direction.correct{border-color:var(--gr);background:#e9f8e5}
+#bird-zone{width:390px;height:320px;border-radius:42px;background:#fff;border:4px dashed #dfbd84;display:grid;place-items:center}
+#listener{width:220px;height:210px;touch-action:none;cursor:grab;transition:transform .35s;z-index:2}#listener svg{width:100%;height:100%}#listener.turn-left{transform:scaleX(-1)}#listener.turn-right{transform:scaleX(1)}
+.waves{position:absolute;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;opacity:.12;transition:opacity .15s}.waves i{display:block;width:9px;height:34px;border-radius:8px;background:var(--bl)}.waves i:nth-child(2){height:52px}.waves i:nth-child(3){height:70px}.direction.heard .waves{opacity:1;animation:wave .75s ease-in-out 2}
+@keyframes wave{50%{transform:translateX(-50%) scale(1.28);opacity:.55}}
+#turn-indicator{position:absolute;left:calc(50% - 90px);bottom:10px;width:180px;height:75px;opacity:0;transition:opacity .2s}#turn-indicator.on{opacity:1}#turn-indicator svg{width:100%;height:100%}

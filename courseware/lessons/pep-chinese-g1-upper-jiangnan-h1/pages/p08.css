@@ -1,0 +1,3 @@
+.pond{position:absolute;top:18px;width:560px;height:350px;border:5px solid #7bbdb8;border-radius:48% 48% 43% 43%;background:repeating-linear-gradient(175deg,#d9f3ef 0 26px,#c6e8e7 27px 30px);cursor:pointer;overflow:hidden}
+#pond-1{left:20px}#pond-2{right:20px}.leaf{position:absolute;width:135px;height:135px;transition:transform .5s}.leaf svg{width:100%;height:100%}.pond.bloom .leaf{transform:scale(1.12)}
+#fish{position:absolute;left:538px;top:383px;width:155px;height:130px;cursor:grab;transition:left .5s,top .5s;z-index:3;touch-action:none}#fish svg{width:100%;height:100%;filter:drop-shadow(0 6px 3px #b4a47b)}

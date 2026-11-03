@@ -1,0 +1,14 @@
+#scene-card{position:absolute;inset:0;background:#fff9e9;border:5px solid var(--line);border-radius:36px;overflow:hidden;box-shadow:0 10px 0 #e8c48f}
+#scene-title{position:absolute;left:0;top:8px;width:100%;height:62px;text-align:center;font-size:34px;font-weight:900;color:var(--ink2)}
+#stage{position:absolute;left:28px;top:72px;width:1176px;height:340px;display:flex;align-items:center;justify-content:space-between;padding:0 35px;border-radius:32px;background:linear-gradient(180deg,#fffdf6,#fff1cf);border:4px solid #f2d49f}
+#covers,#clues{width:260px;height:300px;display:flex;flex-direction:column;justify-content:space-around;align-items:center}
+.cover,.clue{width:160px;height:86px;border:4px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 5px 0 #dfbd84;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:none}
+.cover svg{width:126px;height:76px}.clue{width:180px;height:84px}.clue svg{width:158px;height:124px}
+.cover.selected{outline:7px solid var(--or);background:#fff2cf}.clue.selected{outline:7px solid var(--bl)}
+#character{width:290px;height:300px;display:grid;place-items:center;transition:filter .2s,transform .2s}#character svg{width:230px;height:275px}
+#blindfold,#earmuffs{opacity:0;transition:opacity .2s}#character.cover-vision #blindfold{opacity:1}#character.cover-hearing #earmuffs{opacity:1}#character.cover-touch{filter:saturate(.65)}
+#clues{border-left:3px dashed #e8c48f;padding-left:30px}#clues .clue.dim{opacity:.28;filter:grayscale(.65)}
+#status{position:absolute;left:54px;right:54px;top:428px;height:92px;display:flex;align-items:center;justify-content:center;gap:30px}
+#cover-display,#drop-zone{width:220px;height:86px;border-radius:25px;border:4px solid var(--line);background:#fff;display:grid;place-items:center}
+#cover-display svg{width:150px;height:76px}#drop-zone{border:4px dashed #d7b77f;background:#fff8e8}#drop-zone.ready-drop{border-color:var(--gr);background:#e9f8e5}#drop-mark{font-size:60px;font-weight:800;color:#c19a61}
+#feedback-mark{position:absolute;right:78px;bottom:23px;font-size:0;color:var(--gr2);font-weight:900;opacity:0;transition:all .2s}#feedback-mark.on{font-size:62px;opacity:1}
