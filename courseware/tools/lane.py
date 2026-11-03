@@ -1,4 +1,4 @@
-"""Run one lesson through the factory: pictures, build with voices, static gates, play-through audit.
+"""Run one lesson through the factory: pictures, build with voices, static gates, page audit, random play.
 
 The lesson source is courseware/lessons/<slug> (lesson.json, pages/, pictures.json, official-notes.json); everything the run
 generates goes to a work folder outside git. Every step is cached and repeatable. The result lists the issues of the gates;
@@ -10,9 +10,9 @@ import sys
 import time
 from pathlib import Path
 
-from courseware.tools import audit, build, check, picture, voice
+from courseware.tools import audit, autoplay, build, check, picture, voice
 
-STEPS = ('pictures', 'build', 'check', 'audit')
+STEPS = ('pictures', 'build', 'check', 'audit', 'play')
 
 
 class LaneError(Exception):
@@ -31,7 +31,8 @@ def _save(path, value):
 
 
 def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://127.0.0.1:3100', jobs=4,
-               post=voice.default_post, fetch=picture.default_fetch, run_audit=audit.audit_body, now_ms=None, sleep=time.sleep):
+               post=voice.default_post, fetch=picture.default_fetch, run_audit=audit.audit_body, run_play=autoplay.play_body, now_ms=None,
+               sleep=time.sleep):
     lesson, work = Path(lesson_dir), Path(work_dir)
     work.mkdir(parents=True, exist_ok=True)
     unknown = set(steps) - set(STEPS)
@@ -56,7 +57,7 @@ def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://
         body = build.finish(draft, work, clips['files'])
         result['steps']['build'] = {'scenes': len(body['scenes']), 'lines': len(draft['lines']), 'voiced': clips['voiced'], 'reused': clips['reused']}
         result['roster'], result['grade'] = draft['roster'], draft['grade']
-    elif {'check', 'audit'} & set(steps):
+    elif {'check', 'audit', 'play'} & set(steps):
         body = _load(work / 'body.json')
         result['roster'], result['grade'] = _load(work / 'roster.json'), _load(work / 'draft.json')['grade']
 
@@ -68,7 +69,15 @@ def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://
     elif (work / 'audit-receipt.json').exists():
         receipt = _load(work / 'audit-receipt.json')
 
-    if 'check' in steps or 'audit' in steps:
+    play = None
+    if 'play' in steps:
+        play = run_play(body, work / 'media')
+        _save(work / 'play-receipt.json', play)
+        result['steps']['play'] = {'ok': play['ok'], 'pages': len(play['pages']), 'failed': sum(not p['ok'] for p in play['pages'])}
+    elif (work / 'play-receipt.json').exists():
+        play = _load(work / 'play-receipt.json')
+
+    if 'check' in steps or 'audit' in steps or 'play' in steps:
         notes_path = lesson / 'official-notes.json'
         notes = _load(notes_path) if notes_path.exists() else None
         issues = check.check_classroom(body, work / 'media', notes=notes, roster=result['roster'], receipt=receipt, grade=result['grade'])
@@ -81,6 +90,11 @@ def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://
             issues.append(dict(gate='G0', code='traditional_chinese', scene=None, detail='brief.json: ' + bad, severity='error'))
         if receipt is None:
             issues.append(dict(gate='G6', code='receipt_missing', scene=None, detail='the play-through audit has not run', severity='error'))
+        if play is not None:
+            if play.get('bodySha256') == check.body_hash(body):
+                issues += autoplay.issues(play)
+            else:
+                issues.append(dict(gate='G6', code='play_receipt_stale', scene=None, detail='the random-play receipt belongs to another build', severity='warn'))
         result['issues'] = issues
         _save(work / 'check.json', issues)
         result['steps']['check'] = {'errors': sum(i['severity'] == 'error' for i in issues), 'warnings': sum(i['severity'] == 'warn' for i in issues)}

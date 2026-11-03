@@ -53,6 +53,11 @@ def fake_audit(body, media_dir):
             'viewports': ['1280x720', '1000x563', '640x360'], 'pages': [{'scene': 2, 'viewport': '1280x720', 'ok': True}]}
 
 
+def fake_play(body, media_dir):
+    return {'schemaVersion': 'mira.courseware.autoplay-receipt.v1', 'bodySha256': body_hash(body), 'ok': True,
+            'pages': [{'scene': 2, 'finished': True, 'stepsToFinish': 9, 'finishedAgain': True, 'errors': [], 'stuck': None, 'ok': True}]}
+
+
 class LaneTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -61,10 +66,11 @@ class LaneTests(unittest.TestCase):
         shutil.copytree(FIXTURE, self.lesson)
         self.work = Path(self.tmp.name) / 'work'
         self.service = FakeService()
+        self.play = fake_play
 
     def run_lane(self, **kw):
         return lane.run_lesson(self.lesson, self.work, stage_id='stage-lane', post=self.service.post, fetch=self.service.fetch,
-                               run_audit=fake_audit, now_ms=1793700000000, sleep=lambda s: None, **kw)
+                               run_audit=fake_audit, run_play=lambda body, media: self.play(body, media), now_ms=1793700000000, sleep=lambda s: None, **kw)
 
     def test_full_run_writes_the_package_and_reports_gate_issues(self):
         result = self.run_lane()
@@ -83,6 +89,21 @@ class LaneTests(unittest.TestCase):
         found = [issue for issue in result['issues'] if issue['code'] == 'traditional_chinese']
         self.assertEqual([(issue['gate'], issue['severity']) for issue in found], [('G0', 'error')])
         self.assertIn('嘗', found[0]['detail'])
+
+    def test_random_play_failures_are_gate_issues_and_the_receipt_is_kept(self):
+        def stuck(body, media_dir):
+            receipt = fake_play(body, media_dir)
+            receipt['pages'][0].update(ok=False, finished=False, stuck='never finished in 400 steps')
+            receipt['ok'] = False
+            return receipt
+        self.play = stuck
+        result = self.run_lane()
+        self.assertEqual(result['steps']['play'], {'ok': False, 'pages': 1, 'failed': 1})
+        self.assertIn(('soft_lock', 2), {(i['code'], i['scene']) for i in result['issues']})
+        self.assertTrue((self.work / 'play-receipt.json').is_file())
+        self.play = fake_play
+        again = self.run_lane(steps=['check'])
+        self.assertIn('soft_lock', {i['code'] for i in again['issues']})
 
     def test_second_run_reuses_voices_and_pictures(self):
         (self.lesson / 'pictures.json').write_text(json.dumps([{'key': 'cover', 'prompt': 'a pond'}]))
