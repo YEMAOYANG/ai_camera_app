@@ -1,20 +1,65 @@
 {
-  "note": "Reviewed fixes to the accepted pilot body, applied after the quiz upgrade. Found by the independent verifier (speech lines) and by reading each demo against its page (state mismatch).",
+  "note": "Reviewed fixes to the accepted pilot body, applied after the quiz upgrade. Found by the independent verifier (speech lines) and by reading each demo against its page (state mismatch). Seven discussion actions removed after the owner played the lesson.",
   "text": {
-    "action_t3Xbsjby": {"text": "现在从右边数，好多小动物排第几都变了。数第几，先说清从哪边数。", "why": "Only most animals change place when the side changes; the middle one stays third."},
-    "action_XnKQYlNn": {"text": "方向变了，熊猫从右边数是第2，从左边数就是第4了。", "why": "Name the highlighted animal and both numbers instead of a claim about every animal."},
-    "action_kXODpC5A_s2": {"text": "我猜，要先认识6到10，还要学比大小、分与合。", "why": "The demo selects the first two guess cards; the line now says the same two things."},
-    "action_Dd6idt6B": {"text": "你看，卡上有三样：认识6到10，比大小、分与合，加法和减法。", "why": "The preview card shows exactly these three lines; 'bigger numbers' was not on it."},
-    "action_Dd6idt6B_s2": {"text": "老师猜对了两样，漏掉了加法和减法。", "why": "Say which one the demo guess missed."},
-    "action_Dd6idt6B_s3": {"text": "现在轮到你当小预言家。点一下重玩，选一选你的猜测，再翻开预告卡核对。", "why": "The teacher already flipped the card, so the child must reset it before guessing."}
+    "action_t3Xbsjby": {
+      "text": "现在从右边数，好多小动物排第几都变了。数第几，先说清从哪边数。",
+      "why": "Only most animals change place when the side changes; the middle one stays third."
+    },
+    "action_XnKQYlNn": {
+      "text": "方向变了，熊猫从右边数是第2，从左边数就是第4了。",
+      "why": "Name the highlighted animal and both numbers instead of a claim about every animal."
+    },
+    "action_kXODpC5A_s2": {
+      "text": "我猜，要先认识6到10，还要学比大小、分与合。",
+      "why": "The demo selects the first two guess cards; the line now says the same two things."
+    },
+    "action_Dd6idt6B": {
+      "text": "你看，卡上有三样：认识6到10，比大小、分与合，加法和减法。",
+      "why": "The preview card shows exactly these three lines; 'bigger numbers' was not on it."
+    },
+    "action_Dd6idt6B_s2": {
+      "text": "老师猜对了两样，漏掉了加法和减法。",
+      "why": "Say which one the demo guess missed."
+    },
+    "action_Dd6idt6B_s3": {
+      "text": "现在轮到你当小预言家。点一下重玩，选一选你的猜测，再翻开预告卡核对。",
+      "why": "The teacher already flipped the card, so the child must reset it before guessing."
+    }
   },
   "state": {
-    "action_DeJrfzfT": {"currentStep": "guessing", "selectedGuess": ["认识6-10", "比大小、分与合"]}
+    "action_DeJrfzfT": {
+      "currentStep": "guessing",
+      "selectedGuess": [
+        "认识6-10",
+        "比大小、分与合"
+      ]
+    }
   },
   "insertBefore": {
-    "action_czI2T7Jf": {"id": "action_fixDir01", "type": "widget_setState", "state": {"direction": "right"}, "content": "先切换为从右边数。"}
+    "action_czI2T7Jf": {
+      "id": "action_fixDir01",
+      "type": "widget_setState",
+      "state": {
+        "direction": "right"
+      },
+      "content": "先切换为从右边数。"
+    }
   },
   "insertAfter": {
-    "action_Dd6idt6B_s3": {"id": "action_fixRst01", "type": "widget_highlight", "target": "#btn-reset", "content": "点这里重玩，再选你的猜测。"}
+    "action_Dd6idt6B_s3": {
+      "id": "action_fixRst01",
+      "type": "widget_highlight",
+      "target": "#btn-reset",
+      "content": "点这里重玩，再选你的猜测。"
+    }
+  },
+  "remove": {
+    "action_OefSuDZM": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
+    "action_disc_p2": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
+    "action_rGft4xVv": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
+    "action_aP7xc52P": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
+    "action_VbjjmOZ1": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
+    "action_4RJftk6J": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model.",
+    "action_SX_QXjk2": "Live class discussion: the student runtime seats only its own roster, so these invitations failed with 'classroom discussion interrupted', and the replies would be unchecked live speech from a paid model."
   }
 }

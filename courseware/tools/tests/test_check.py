@@ -117,6 +117,11 @@ class CheckTests(unittest.TestCase):
         self.assertNotIn('answer_position_skewed', with_answers('AABB'))
         self.assertNotIn('answer_position_skewed', with_answers('AAB'))
 
+    def test_discussion_actions_are_refused(self):
+        self.body['scenes'][0]['actions'].append({'id': 'talk', 'type': 'discussion', 'topic': 'x', 'prompt': 'y', 'agentId': 'a'})
+        issues = [i for i in check_classroom(self.body) if i['code'] == 'discussion_not_allowed']
+        self.assertEqual([(i['gate'], i['severity'], i['scene'], i['detail']) for i in issues], [('G3', 'error', 1, 'talk')])
+
     def test_voices(self):
         agent = self.body['stage']['generatedAgentConfigs'][0]
         agent['voiceConfig'] = {}

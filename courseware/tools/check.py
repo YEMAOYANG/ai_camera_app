@@ -78,6 +78,11 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
             if any(phrase in text for phrase in ('自己读题', '请你读')):
                 add('G4', 'self_read_instruction', index, str(action.get('id', 'speech')))
 
+        for action in actions:
+            if action.get('type') == 'discussion':
+                # Live class discussion calls a paid model, and the student runtime only seats its own roster.
+                add('G3', 'discussion_not_allowed', index, str(action.get('id', 'discussion')))
+
         if scene.get('type') == 'slide':
             elements = scene.get('content', {}).get('canvas', {}).get('elements', [])
             boxes = [(e.get('id', ''), text_box(e)) for e in elements if e.get('type') == 'text']
