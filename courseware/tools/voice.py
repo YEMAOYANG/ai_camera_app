@@ -15,6 +15,10 @@ class VoiceError(Exception):
     pass
 
 
+# Seconds to wait before each retry; the speech service answers 429 when several lessons are voiced at once.
+RETRY_DELAYS = (1, 4, 10, 25)
+
+
 def default_post(url, payload):
     request = urllib.request.Request(
         url, data=json.dumps(payload).encode('utf-8'),
@@ -114,7 +118,7 @@ def voice_lines(lines, media_dir, *, post, cache_path,
         payload = {'text': line['text'], 'audioId': line['id'],
                    'ttsProviderId': 'qwen-tts', 'ttsModelId': 'qwen3-tts-flash',
                    'ttsVoice': line['voice']}
-        for attempt in range(3):
+        for attempt in range(len(RETRY_DELAYS) + 1):
             try:
                 status, body = post(endpoint.rstrip('/') + '/api/generate/tts', payload)
                 if status != 200:
@@ -131,8 +135,8 @@ def voice_lines(lines, media_dir, *, post, cache_path,
                 return key, name, None
             except Exception as exc:
                 error = f'{exc.args[0]}: {exc.args[1]}' if isinstance(exc, VoiceError) else str(exc)
-                if attempt < 2:
-                    sleep(2 ** attempt)
+                if attempt < len(RETRY_DELAYS):
+                    sleep(RETRY_DELAYS[attempt])
         return key, None, error
 
     with ThreadPoolExecutor(max_workers=jobs) as executor:

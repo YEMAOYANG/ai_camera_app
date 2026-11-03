@@ -86,6 +86,26 @@ class VoiceTests(unittest.TestCase):
         self.assertEqual(sleeps, [1])
         self.assertEqual(len(calls), 2)
 
+    def test_busy_service_is_retried_with_growing_pauses_and_then_gives_up(self):
+        sleeps, calls = [], []
+        def busy_then_ok(url, payload):
+            calls.append(1)
+            if len(calls) <= 3:
+                raise OSError('HTTP Error 429: Too Many Requests')
+            return 200, answer(wav())
+        self.assertEqual(self.run_lines(post=busy_then_ok, sleep=sleeps.append)['voiced'], 1)
+        self.assertEqual((sleeps, len(calls)), ([1, 4, 10], 4))
+        sleeps.clear()
+        calls.clear()
+        self.lines[0]['text'] = 'other'
+        def always_busy(url, payload):
+            calls.append(1)
+            raise OSError('HTTP Error 429: Too Many Requests')
+        with self.assertRaises(VoiceError) as caught:
+            self.run_lines(post=always_busy, sleep=sleeps.append)
+        self.assertEqual((sleeps, len(calls)), ([1, 4, 10, 25], 5))
+        self.assertIn('429', caught.exception.args[1])
+
     def test_failure_keeps_successes_and_order(self):
         lines = [{'id': i, 'text': i, 'voice': 'Ethan'} for i in ('bad1', 'ok', 'bad2')]
         def post(url, payload):
