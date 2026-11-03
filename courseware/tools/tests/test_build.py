@@ -84,6 +84,13 @@ class BuildTests(unittest.TestCase):
                     self.prepare()
                 self.assertEqual(caught.exception.args[0], code)
         (self.lesson / 'lesson.json').write_text(original)
+        play_html = (self.lesson / 'pages/play.html').read_text()
+        (self.lesson / 'pages/play.html').write_text(play_html + '<div id="dots"></div>')
+        with self.assertRaises(build.BuildError) as caught:
+            self.prepare()
+        self.assertEqual(caught.exception.args[0], 'id_reserved')
+        self.assertIn('dots', caught.exception.args[1])
+        (self.lesson / 'pages/play.html').write_text(play_html)
         (self.lesson / 'pages/play.js').write_text('var step = 1;')
         with self.assertRaises(build.BuildError) as caught:
             self.prepare()

@@ -28,6 +28,15 @@ class PageKitTests(unittest.TestCase):
         self.assertIn('K.ready=', shipped())
         self.assertIn('K.drag=', shipped())
 
+    def test_ids_the_kit_creates_are_reserved(self):
+        self.assertTrue({'dots', 'stars', 'hud', 'say', 'ready', 'finish', 'start-btn', 'btn-again'} <= page.reserved_ids())
+        self.assertNotIn('go', page.reserved_ids())
+
+    def test_defined_ids_cover_markup_strings_and_dom_calls(self):
+        source = ('<div id="a-1"></div><script>b.id="pin-"+i;c.id=\'seat\';d.setAttribute("id","zed");'
+                  "e.innerHTML='<i id=\\\"inner\\\"></i>';K.$('#only-a-reference')</script>")
+        self.assertEqual(page.defined_ids(source), {'a-1', 'pin-', 'seat', 'zed', 'inner'})
+
     def test_title_is_escaped_and_structure_is_complete(self):
         html = shipped()
         self.assertIn('<title>认识 &amp; 数一数</title>', html)

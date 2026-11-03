@@ -156,6 +156,9 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
                 css = css_path.read_text(encoding='utf-8') if css_path.exists() else ''
             except OSError as exc:
                 raise BuildError('page_missing', f'{key} {page_id}: {exc}') from exc
+            clash = page.defined_ids(html + js) & page.reserved_ids()
+            if clash:
+                _fail('id_reserved', f"{key} {page_id}: {', '.join(sorted(clash))}")
             html = page.page(item['title'], html, css, js).replace('__STAGE__', stage_id)
             if 'startImage' in item:
                 image_key = item['startImage']

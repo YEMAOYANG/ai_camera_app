@@ -7,6 +7,7 @@ state; the message types are in courseware/kit/contract.py). JS_TEST holds scrip
 K.check); they are only included when a page is built for a play-through (tests=True) and never ship to children.
 """
 import html
+import re
 
 CSS = r"""
 :root{--ink:#6B4423;--ink2:#8A5A24;--paper:#FFFDF6;--line:#E8C48F;--or:#F6A935;--or2:#C47A12;--gr:#58B45C;--gr2:#2F8A3A;--rd:#E4572E;--rd2:#B23A17;--bl:#4C8DDB;--bl2:#2F66AE;--pu:#8B5CF6}
@@ -157,3 +158,18 @@ def page(title, body, css, js, css_extra="", *, tests=False):
             '<title>' + html.escape(title) + '</title><style>' + CSS + css + css_extra + '</style></head><body>'
             '<div id="cv"><div id="play">' + body + '</div></div>'
             '<script>' + script + '</script><script>' + js + '</script></body></html>')
+
+
+_ID_PATTERNS = (re.compile(r"""\bid\s*=\s*\\?["']([A-Za-z][\w-]*)\\?["']"""),
+                re.compile(r"""\.id\s*=\s*['"]([A-Za-z][\w-]*)['"]"""),
+                re.compile(r"""setAttribute\(\s*['"]id['"]\s*,\s*['"]([A-Za-z][\w-]*)['"]"""))
+
+
+def defined_ids(source):
+    """Element ids that page source defines, in markup, in strings and through the DOM."""
+    return {found for pattern in _ID_PATTERNS for found in pattern.findall(source)}
+
+
+def reserved_ids():
+    """The ids the kit creates itself; a page that reuses one breaks the kit's own elements (a page once reused 'dots')."""
+    return frozenset(defined_ids(page('', '', '', '')) | {'start-btn'})
