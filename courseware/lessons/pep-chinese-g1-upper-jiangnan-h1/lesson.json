@@ -1,0 +1,660 @@
+{
+ "schemaVersion": "mira.courseware.lesson.v1",
+ "title": "江南：第一课时",
+ "description": "借助图画和听读认识生字，感受莲塘诗意并观察可、叶的字形。",
+ "grade": 1,
+ "roster": {
+  "teacher": {
+   "name": "小语老师",
+   "role": "teacher",
+   "gender": "female",
+   "voice": "Serena",
+   "avatar": "/avatars/teacher-2.png",
+   "color": "#D65A8A",
+   "persona": "温柔亲切的女老师，说话清楚有节奏，喜欢用图画和儿歌带孩子认字读诗；孩子答错时先让孩子再听一遍、再看一眼。"
+  }
+ },
+ "images": {
+  "water-town": {
+   "file": "assets/water-town.png"
+  },
+  "pond": {
+   "file": "assets/pond.png"
+  },
+  "word-scenes": {
+   "file": "assets/word-scenes.png"
+  },
+  "river": {
+   "file": "assets/river.png"
+  },
+  "mountain": {
+   "file": "assets/mountain.png"
+  },
+  "tree": {
+   "file": "assets/tree.png"
+  },
+  "dense": {
+   "file": "assets/dense.png"
+  },
+  "sparse": {
+   "file": "assets/sparse.png"
+  },
+  "empty": {
+   "file": "assets/empty.png"
+  }
+ },
+ "scenes": [
+  {
+   "key": "p01",
+   "type": "slide",
+   "title": "走进水乡",
+   "template": "big-word",
+   "data": {
+    "title": "走进水乡",
+    "word": "江南",
+    "pinyin": "jiāng nán",
+    "hint": "江南",
+    "picture": "water-town"
+   },
+   "script": [
+    {
+     "say": "看，小船来到水乡。"
+    },
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "这里叫江南。"
+    },
+    {
+     "spotlight": "word"
+    },
+    {
+     "say": "江，读 jiāng；南，读 nán。"
+    }
+   ]
+  },
+  {
+   "key": "p02",
+   "type": "interactive",
+   "title": "找出水字旁",
+   "page": "p02",
+   "widgetType": "game",
+   "startImage": "water-town",
+   "script": [
+    {
+     "say": "听，江。"
+    },
+    {
+     "highlight": "#jiang"
+    },
+    {
+     "say": "看看这三处地方。"
+    },
+    {
+     "highlight": "#river"
+    },
+    {
+     "say": "老师把江送到河边。"
+    },
+    {
+     "setState": {
+      "demo": "river"
+     }
+    },
+    {
+     "say": "三点水常提示和水有关。"
+    },
+    {
+     "highlight": "#water-radical"
+    },
+    {
+     "say": "再听一听，你来试试。"
+    }
+   ]
+  },
+  {
+   "key": "p03",
+   "type": "interactive",
+   "title": "给生字找家",
+   "page": "p03",
+   "widgetType": "game",
+   "startImage": "water-town",
+   "script": [
+    {
+     "say": "听老师读一个字。"
+    },
+    {
+     "highlight": "#character"
+    },
+    {
+     "say": "先看图里的事物。"
+    },
+    {
+     "highlight": "#lotus"
+    },
+    {
+     "say": "老师把莲送到莲花旁。"
+    },
+    {
+     "setState": {
+      "demo": "lotus"
+     }
+    },
+    {
+     "say": "莲是草字头。"
+    },
+    {
+     "highlight": "#grass-radical"
+    },
+    {
+     "say": "再听字音，把字送到图旁。"
+    }
+   ]
+  },
+  {
+   "key": "p04",
+   "type": "slide",
+   "title": "词语听音连图",
+   "template": "picture-points",
+   "data": {
+    "title": "听词看图",
+    "picture": "word-scenes",
+    "points": [
+     "可口 kě kǒu",
+     "游戏 yóu xì",
+     "中间 zhōng jiān",
+     "东西南北 dōng xī nán běi"
+    ]
+   },
+   "script": [
+    {
+     "say": "食物好吃，可以说可口。"
+    },
+    {
+     "spotlight": "point-1"
+    },
+    {
+     "say": "小鱼在做游戏。"
+    },
+    {
+     "spotlight": "point-2"
+    },
+    {
+     "say": "听，中间，东西南北。"
+    },
+    {
+     "spotlight": "point-3"
+    },
+    {
+     "spotlight": "point-4"
+    }
+   ]
+  },
+  {
+   "key": "p05",
+   "type": "quiz",
+   "title": "生字和词语小检查",
+   "intro": [
+    "听老师读题，再看图选一选。"
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "question": "江字有三点水，哪幅图和水有关？",
+     "skill": "识读带三点水的字",
+     "answer": [
+      "B"
+     ],
+     "analysis": "河里有水，江的三点水提示水义。",
+     "options": {
+      "A": {
+       "label": "山",
+       "visual": {
+        "kind": "asset",
+        "image": "mountain",
+        "alt": "山"
+       }
+      },
+      "B": {
+       "label": "河",
+       "visual": {
+        "kind": "asset",
+        "image": "river",
+        "alt": "河"
+       }
+      },
+      "C": {
+       "label": "树",
+       "visual": {
+        "kind": "asset",
+        "image": "tree",
+        "alt": "树"
+       }
+      }
+     }
+    },
+    {
+     "id": "q2",
+     "question": "哪幅图里黄色圆点在中间？",
+     "skill": "理解方位词",
+     "answer": [
+      "C"
+     ],
+     "analysis": "中间的黄色圆点两侧都有圆点。",
+     "options": {
+      "A": {
+       "label": "黄色在左",
+       "visual": {
+        "kind": "picture",
+        "alt": "黄色在左",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "🟡"
+            },
+            {
+             "glyph": "🔵"
+            },
+            {
+             "glyph": "🔵"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      },
+      "B": {
+       "label": "黄色在右",
+       "visual": {
+        "kind": "picture",
+        "alt": "黄色在右",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "🔵"
+            },
+            {
+             "glyph": "🔵"
+            },
+            {
+             "glyph": "🟡"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      },
+      "C": {
+       "label": "黄色在中间",
+       "visual": {
+        "kind": "picture",
+        "alt": "黄色在中间",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "🔵"
+            },
+            {
+             "glyph": "🟡"
+            },
+            {
+             "glyph": "🔵"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "key": "p06",
+   "type": "slide",
+   "title": "听诗看画面",
+   "template": "picture-points",
+   "data": {
+    "title": "江南",
+    "picture": "pond",
+    "points": [
+     "江南可采莲，莲叶何田田。",
+     "鱼戏莲叶间。",
+     "鱼戏莲叶东，鱼戏莲叶西，",
+     "鱼戏莲叶南，鱼戏莲叶北。"
+    ]
+   },
+   "script": [
+    {
+     "say": "这是一首汉乐府民歌。"
+    },
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "听老师读，想象莲塘。"
+    },
+    {
+     "spotlight": "point-1"
+    },
+    {
+     "say": "江南可采莲，莲叶何田田。"
+    },
+    {
+     "spotlight": "point-2"
+    },
+    {
+     "say": "鱼戏莲叶间。"
+    },
+    {
+     "spotlight": "point-3"
+    },
+    {
+     "say": "鱼戏莲叶东，鱼戏莲叶西，"
+    },
+    {
+     "spotlight": "point-4"
+    },
+    {
+     "say": "鱼戏莲叶南，鱼戏莲叶北。"
+    },
+    {
+     "say": "跟着老师读一读，不用打分。"
+    }
+   ]
+  },
+  {
+   "key": "p07",
+   "type": "interactive",
+   "title": "给诗句安上节拍",
+   "page": "p07",
+   "widgetType": "game",
+   "startImage": "pond",
+   "script": [
+    {
+     "say": "听老师慢慢读。"
+    },
+    {
+     "highlight": "#verse"
+    },
+    {
+     "say": "江南，可采莲。"
+    },
+    {
+     "highlight": "#pause-slot-1"
+    },
+    {
+     "say": "看，两段之间歇一歇。"
+    },
+    {
+     "setState": {
+      "demo": "pause"
+     }
+    },
+    {
+     "say": "老师把停顿放在这里。"
+    },
+    {
+     "highlight": "#beat"
+    },
+    {
+     "say": "再听一句，你来放停顿。"
+    }
+   ]
+  },
+  {
+   "key": "p08",
+   "type": "interactive",
+   "title": "莲叶有多少",
+   "page": "p08",
+   "widgetType": "game",
+   "startImage": "pond",
+   "script": [
+    {
+     "say": "听，莲叶何田田。"
+    },
+    {
+     "highlight": "#fish"
+    },
+    {
+     "say": "看看两处莲叶。"
+    },
+    {
+     "highlight": "#pond-1"
+    },
+    {
+     "say": "老师把鱼送到叶多的地方。"
+    },
+    {
+     "setState": {
+      "demo": "dense"
+     }
+    },
+    {
+     "say": "莲叶田田，是莲叶繁茂。"
+    },
+    {
+     "highlight": "#leaf-1"
+    },
+    {
+     "say": "换一片水面，你来找。"
+    }
+   ]
+  },
+  {
+   "key": "p09",
+   "type": "quiz",
+   "title": "读诗与理解小检查",
+   "intro": [
+    "听老师读题，再看图选一选。"
+   ],
+   "questions": [
+    {
+     "id": "q3",
+     "question": "听节奏：江南，何田田。哪幅图一样？",
+     "skill": "按停顿朗读诗句",
+     "answer": [
+      "A"
+     ],
+     "analysis": "江南两拍，何田田三拍，中间停一下。",
+     "options": {
+      "A": {
+       "label": "两拍后三拍",
+       "visual": {
+        "kind": "picture",
+        "alt": "两拍后三拍",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          },
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      },
+      "B": {
+       "label": "三拍后两拍",
+       "visual": {
+        "kind": "picture",
+        "alt": "三拍后两拍",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          },
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      },
+      "C": {
+       "label": "一拍后四拍",
+       "visual": {
+        "kind": "picture",
+        "alt": "一拍后四拍",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            }
+           ]
+          },
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "q4",
+     "question": "哪幅图最能让你想到莲叶田田？",
+     "skill": "理解莲叶繁茂",
+     "answer": [
+      "B"
+     ],
+     "analysis": "莲叶田田让人想到莲叶繁茂相连。",
+     "options": {
+      "A": {
+       "label": "空水面",
+       "visual": {
+        "kind": "asset",
+        "image": "empty",
+        "alt": "空水面"
+       }
+      },
+      "B": {
+       "label": "莲叶繁茂",
+       "visual": {
+        "kind": "asset",
+        "image": "dense",
+        "alt": "莲叶繁茂"
+       }
+      },
+      "C": {
+       "label": "莲叶稀疏",
+       "visual": {
+        "kind": "asset",
+        "image": "sparse",
+        "alt": "莲叶稀疏"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "key": "p10",
+   "type": "interactive",
+   "title": "看一看，写一写",
+   "page": "p10",
+   "widgetType": "game",
+   "startImage": "pond",
+   "script": [
+    {
+     "say": "看，可和叶都有口。"
+    },
+    {
+     "highlight": "#character"
+    },
+    {
+     "say": "可的口在里面，叶的口在左边。"
+    },
+    {
+     "highlight": "#mouth"
+    },
+    {
+     "say": "可的竖钩要写直。"
+    },
+    {
+     "highlight": "#hook"
+    },
+    {
+     "say": "老师先描一小段。"
+    },
+    {
+     "setState": {
+      "demo": "trace"
+     }
+    },
+    {
+     "say": "跟着淡淡的字描一描。"
+    },
+    {
+     "setState": {
+      "phase": "play"
+     }
+    },
+    {
+     "say": "再描叶，写在纸上请大人看看。"
+    }
+   ]
+  }
+ ]
+}

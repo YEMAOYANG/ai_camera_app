@@ -1,0 +1,653 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "保护感觉器官",
+  "description": "认识感觉器官的作用，学习在生活和实验中保护它们。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "好奇又细心的女老师，鼓励孩子用眼睛看、耳朵听、用手摸一摸，再说出自己的发现；总是先讲安全。"
+    }
+  },
+  "images": {
+    "discover": {
+      "file": "assets/discover.png"
+    },
+    "senses": {
+      "file": "assets/senses.png"
+    },
+    "hearing": {
+      "file": "assets/hearing.png"
+    },
+    "eye-care": {
+      "file": "assets/eye-care.png"
+    },
+    "care": {
+      "file": "assets/care.png"
+    },
+    "lab": {
+      "file": "assets/lab.png"
+    },
+    "eye": {
+      "file": "assets/eye.png"
+    },
+    "ear": {
+      "file": "assets/ear.png"
+    },
+    "nose": {
+      "file": "assets/nose.png"
+    },
+    "tongue": {
+      "file": "assets/tongue.png"
+    },
+    "skin": {
+      "file": "assets/skin.png"
+    },
+    "read-safe": {
+      "file": "assets/read-safe.png"
+    },
+    "rub-eye": {
+      "file": "assets/rub-eye.png"
+    },
+    "bright-light": {
+      "file": "assets/bright-light.png"
+    },
+    "ear-safe": {
+      "file": "assets/ear-safe.png"
+    },
+    "ear-stick": {
+      "file": "assets/ear-stick.png"
+    },
+    "nose-pick": {
+      "file": "assets/nose-pick.png"
+    },
+    "unknown-away": {
+      "file": "assets/unknown-away.png"
+    },
+    "unknown-touch": {
+      "file": "assets/unknown-touch.png"
+    },
+    "unknown-smell": {
+      "file": "assets/unknown-smell.png"
+    },
+    "ask-adult": {
+      "file": "assets/ask-adult.png"
+    },
+    "ignore-pain": {
+      "file": "assets/ignore-pain.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "我们用感官发现",
+      "template": "title-picture",
+      "data": {
+        "title": "我们用感官发现",
+        "picture": "discover"
+      },
+      "script": [
+        {
+          "say": "看看这个孩子。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "她用身体发现周围的事物。"
+        },
+        {
+          "say": "今天我们来认识并保护感觉器官。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "少了哪种感觉",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "senses",
+      "script": [
+        {
+          "say": "先看老师试一试。"
+        },
+        {
+          "highlight": "#character"
+        },
+        {
+          "say": "遮住眼睛，画面里的颜色看不清。"
+        },
+        {
+          "setState": {
+            "demo": "vision"
+          }
+        },
+        {
+          "say": "这是少了看的线索。"
+        },
+        {
+          "highlight": "#clue-vision"
+        },
+        {
+          "say": "现在换你来试。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "先选一种遮挡，再找少了的线索。"
+        },
+        {
+          "highlight": "#covers"
+        },
+        {
+          "say": "不确定时再听一听提示。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "五种感觉器官",
+      "template": "title-picture",
+      "data": {
+        "title": "五种感觉器官",
+        "picture": "senses"
+      },
+      "script": [
+        {
+          "say": "眼睛帮助我们看，耳朵帮助我们听。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "鼻子帮助我们闻，舌头帮助我们尝。"
+        },
+        {
+          "say": "皮肤帮助我们感觉触摸。"
+        },
+        {
+          "say": "这些都是感觉器官。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "听声音找位置",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "hearing",
+      "script": [
+        {
+          "say": "听，声音从哪里来？"
+        },
+        {
+          "highlight": "#listener"
+        },
+        {
+          "say": "先看老师把角色转向声音。"
+        },
+        {
+          "setState": {
+            "demo": "left"
+          }
+        },
+        {
+          "say": "耳朵帮助我们听到声音。"
+        },
+        {
+          "highlight": "#sound-left"
+        },
+        {
+          "say": "现在轮到你听。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "拖动角色转向声音传来的方向。"
+        },
+        {
+          "highlight": "#direction-area"
+        },
+        {
+          "say": "还可以点方向完成。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "感觉线索小检查",
+      "intro": [
+        "听一听，看看图，再选一选。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "闻到饭香，主要用哪个器官？",
+          "skill": "感觉器官与感觉线索对应",
+          "answer": [
+            "B"
+          ],
+          "analysis": "鼻子帮助我们闻气味。",
+          "options": {
+            "A": {
+              "label": "耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "ear",
+                "alt": "耳朵"
+              }
+            },
+            "B": {
+              "label": "鼻子",
+              "visual": {
+                "kind": "asset",
+                "image": "nose",
+                "alt": "鼻子"
+              }
+            },
+            "C": {
+              "label": "眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "eye",
+                "alt": "眼睛"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "用手感觉毛巾的柔软，靠什么？",
+          "skill": "感觉器官帮助认识环境",
+          "answer": [
+            "C"
+          ],
+          "analysis": "手上的皮肤帮助我们感觉触摸。",
+          "options": {
+            "A": {
+              "label": "舌头",
+              "visual": {
+                "kind": "asset",
+                "image": "tongue",
+                "alt": "舌头"
+              }
+            },
+            "B": {
+              "label": "耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "ear",
+                "alt": "耳朵"
+              }
+            },
+            "C": {
+              "label": "手部皮肤",
+              "visual": {
+                "kind": "asset",
+                "image": "skin",
+                "alt": "手部皮肤"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "先保护眼睛",
+      "template": "title-picture",
+      "data": {
+        "title": "先保护眼睛",
+        "picture": "eye-care"
+      },
+      "script": [
+        {
+          "say": "读书写字时坐端正。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "光线要合适，眼睛也要休息。"
+        },
+        {
+          "say": "不要长时间近看手机。"
+        },
+        {
+          "say": "不要直视强光，也不要揉眼睛。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "整理安全做法",
+      "page": "p07",
+      "widgetType": "game",
+      "startImage": "care",
+      "script": [
+        {
+          "say": "先看老师整理一个动作。"
+        },
+        {
+          "highlight": "#body"
+        },
+        {
+          "say": "读书坐端正，放到眼睛旁。"
+        },
+        {
+          "setState": {
+            "demo": "reading"
+          }
+        },
+        {
+          "say": "这样有助于保护眼睛。"
+        },
+        {
+          "highlight": "#eye-zone"
+        },
+        {
+          "say": "现在请你整理其他动作。"
+        },
+        {
+          "setState": {
+            "phase": "sort"
+          }
+        },
+        {
+          "say": "把动作放到对应的身体部位旁。"
+        },
+        {
+          "highlight": "#action-1"
+        },
+        {
+          "say": "再把不安全的动作换成安全做法。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "耳鼻口也要照顾",
+      "template": "title-picture",
+      "data": {
+        "title": "耳鼻口也要照顾",
+        "picture": "care"
+      },
+      "script": [
+        {
+          "say": "不要把小棒放进耳朵。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "不要长时间戴耳机。"
+        },
+        {
+          "say": "不抠鼻孔，也不用力擤鼻子。"
+        },
+        {
+          "say": "不要喝烫水。"
+        },
+        {
+          "say": "皮肤也需要保护，不碰陌生用品。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "保护方法小检查",
+      "intro": [
+        "听一听，看看图，再选一选。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "看了一阵书，哪个动作保护眼睛？",
+          "skill": "日常保护感觉器官",
+          "answer": [
+            "A"
+          ],
+          "analysis": "看书后让眼睛休息有助于保护眼睛。",
+          "options": {
+            "A": {
+              "label": "闭眼休息",
+              "visual": {
+                "kind": "asset",
+                "image": "read-safe",
+                "alt": "闭眼休息"
+              }
+            },
+            "B": {
+              "label": "揉眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "rub-eye",
+                "alt": "揉眼睛"
+              }
+            },
+            "C": {
+              "label": "直视强光",
+              "visual": {
+                "kind": "asset",
+                "image": "bright-light",
+                "alt": "直视强光"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "听了一会儿声音，哪个做法保护耳朵？",
+          "skill": "辨认安全的感官保护行动",
+          "answer": [
+            "B"
+          ],
+          "analysis": "不要长时间戴耳机，可以摘下休息。",
+          "options": {
+            "A": {
+              "label": "用小棒掏耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "ear-stick",
+                "alt": "用小棒掏耳朵"
+              }
+            },
+            "B": {
+              "label": "摘下耳机休息",
+              "visual": {
+                "kind": "asset",
+                "image": "ear-safe",
+                "alt": "摘下耳机休息"
+              }
+            },
+            "C": {
+              "label": "抠鼻孔",
+              "visual": {
+                "kind": "asset",
+                "image": "nose-pick",
+                "alt": "抠鼻孔"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "安全小侦探",
+      "page": "p10",
+      "widgetType": "game",
+      "startImage": "lab",
+      "script": [
+        {
+          "say": "实验桌上要先注意安全。"
+        },
+        {
+          "highlight": "#table"
+        },
+        {
+          "say": "看老师隔空轻轻扇闻。"
+        },
+        {
+          "setState": {
+            "demo": "waft"
+          }
+        },
+        {
+          "say": "不要把鼻子凑到容器口。"
+        },
+        {
+          "highlight": "#hand"
+        },
+        {
+          "say": "现在请你安排角色的动作。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "遇到陌生用品，先别碰。"
+        },
+        {
+          "highlight": "#unknown"
+        },
+        {
+          "say": "需要帮助时，找老师。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "遇到不舒服怎么办",
+      "intro": [
+        "听一听，看看图，再选一选。"
+      ],
+      "questions": [
+        {
+          "id": "q4",
+          "question": "看到不认识的实验用品，怎么做？",
+          "skill": "实验中的安全做法",
+          "answer": [
+            "C"
+          ],
+          "analysis": "不随意触碰陌生的实验用品。",
+          "options": {
+            "A": {
+              "label": "伸手触碰",
+              "visual": {
+                "kind": "asset",
+                "image": "unknown-touch",
+                "alt": "伸手触碰"
+              }
+            },
+            "B": {
+              "label": "凑近闻",
+              "visual": {
+                "kind": "asset",
+                "image": "unknown-smell",
+                "alt": "凑近闻"
+              }
+            },
+            "C": {
+              "label": "退开不碰",
+              "visual": {
+                "kind": "asset",
+                "image": "unknown-away",
+                "alt": "退开不碰"
+              }
+            }
+          }
+        },
+        {
+          "id": "q5",
+          "question": "耳朵不舒服时，怎么做？",
+          "skill": "感觉器官不适时求助",
+          "answer": [
+            "A"
+          ],
+          "analysis": "感觉器官不舒服时应告诉大人并寻求医生帮助。",
+          "options": {
+            "A": {
+              "label": "告诉大人",
+              "visual": {
+                "kind": "asset",
+                "image": "ask-adult",
+                "alt": "告诉大人"
+              }
+            },
+            "B": {
+              "label": "拿小棒掏耳",
+              "visual": {
+                "kind": "asset",
+                "image": "ear-stick",
+                "alt": "拿小棒掏耳"
+              }
+            },
+            "C": {
+              "label": "独自忍痛",
+              "visual": {
+                "kind": "asset",
+                "image": "ignore-pain",
+                "alt": "独自忍痛"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "带着方法去生活",
+      "template": "title-picture",
+      "data": {
+        "title": "带着方法去生活",
+        "picture": "care"
+      },
+      "script": [
+        {
+          "say": "眼看，耳听，鼻闻。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "舌尝，皮肤感觉触摸。"
+        },
+        {
+          "say": "保护它们，不舒服就告诉大人。"
+        },
+        {
+          "say": "需要时，请医生帮助。"
+        },
+        {
+          "say": "你记住了什么？做个动作给大人看。"
+        }
+      ]
+    }
+  ]
+}
