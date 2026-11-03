@@ -94,6 +94,27 @@ class BuildTests(unittest.TestCase):
             build.finish(draft, self.out, {})
         self.assertEqual(caught.exception.args[0], 'audio_missing')
 
+    def test_quiz_options_can_use_a_lesson_picture(self):
+        def use_picture(lesson):
+            quiz = next(s for s in lesson['scenes'] if s['type'] == 'quiz')
+            quiz['questions'][0]['options']['A']['visual'] = {'kind': 'asset', 'image': 'picture', 'alt': '一幅图'}
+        self.change(use_picture)
+        draft = self.prepare()
+        quiz = next(s for s in draft['body']['scenes'] if s['type'] == 'quiz')
+        visual = quiz['content']['questions'][0]['optionVisuals']['A']
+        self.assertEqual(visual['kind'], 'image')
+        self.assertEqual(visual['alt'], '一幅图')
+        self.assertRegex(visual['src'], r'^/api/classroom-media/stage-test/media/pic-[0-9a-f]{64}\.png$')
+        self.assertTrue((self.out / 'media' / visual['src'].rsplit('/', 1)[1]).is_file())
+
+        def unknown_picture(lesson):
+            quiz = next(s for s in lesson['scenes'] if s['type'] == 'quiz')
+            quiz['questions'][0]['options']['A']['visual']['image'] = 'missing'
+        self.change(unknown_picture)
+        with self.assertRaises(build.BuildError) as caught:
+            self.prepare()
+        self.assertEqual(caught.exception.args[0], 'image_missing')
+
     def test_quiz_script_order_and_invalid_beats(self):
         self.change(lambda lesson: lesson['scenes'][2].update(script=[{'say': '先看一看'}, {'discuss': {'by': 'student', 'topic': '数量', 'prompt': '说一说'}}]))
         draft = self.prepare()

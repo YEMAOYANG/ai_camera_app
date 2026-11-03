@@ -30,6 +30,22 @@ class QuizUpgradeTests(unittest.TestCase):
         self.spec = make_spec(self.body)
         self.index = self.spec['scenes'][0]['sceneIndex'] - 1
 
+    def test_image_visual_must_point_into_the_lesson_media(self):
+        question = self.spec['scenes'][0]['questions'][0]
+        option = next(iter(question['options']))
+        good = {'kind': 'image', 'src': '/api/classroom-media/stage-test/media/pic-' + 'a' * 64 + '.png', 'alt': '一幅图'}
+        for visual, accepted in ((good, True), (dict(good, src='/api/classroom-media/other/media/x.png'), False),
+                                 (dict(good, src='https://example.test/x.png'), False), (dict(good, alt=' '), False)):
+            question['options'][option]['visual'] = visual
+            with tempfile.TemporaryDirectory() as directory:
+                if accepted:
+                    result, _ = upgrade_quiz(self.body, self.spec, stage_id='stage-test', media_dir=directory)
+                    shown = result['scenes'][self.index]['content']['questions'][0]['optionVisuals'][option]
+                    self.assertEqual(shown, good)
+                else:
+                    with self.assertRaises(ValueError):
+                        upgrade_quiz(self.body, self.spec, stage_id='stage-test', media_dir=directory)
+
     def test_upgrade_preserves_answers_and_adds_picture_and_speech(self):
         original = deepcopy(self.body)
         with tempfile.TemporaryDirectory() as directory:

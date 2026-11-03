@@ -41,6 +41,19 @@ def _read(path, code, detail):
         raise BuildError(code, f'{detail}: {exc}') from exc
 
 
+def _resolve_assets(value, urls, where):
+    """Replace {'kind': 'asset', 'image': key, 'alt': ...} by the image visual of that lesson picture."""
+    if isinstance(value, dict):
+        if value.get('kind') == 'asset':
+            if value.get('image') not in urls:
+                _fail('image_missing', f"{where} {value.get('image')}")
+            return {'kind': 'image', 'src': urls[value['image']], 'alt': value.get('alt')}
+        return {k: _resolve_assets(v, urls, where) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_resolve_assets(v, urls, where) for v in value]
+    return value
+
+
 def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
     source, out = Path(lesson_dir), Path(out_dir)
     lesson = _read(source / 'lesson.json', 'lesson_invalid', 'lesson.json')
@@ -162,6 +175,7 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
             questions = item.get('questions')
             if not isinstance(questions, list) or not questions or not isinstance(item.get('intro'), list):
                 _fail('quiz_invalid', f'{key} questions or intro')
+            questions = _resolve_assets(questions, urls, key)
             try:
                 content = {'type': 'quiz', 'questions': [{'id': q['id'], 'type': 'single', 'answer': q['answer'], 'points': 10, 'options': [{'label': v['label'], 'value': k} for k, v in q['options'].items()], 'analysis': q['analysis'], 'question': q['question'], 'hasAnswer': True} for q in questions]}
             except (KeyError, TypeError, AttributeError) as exc:

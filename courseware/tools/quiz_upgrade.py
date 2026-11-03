@@ -31,6 +31,11 @@ def _visual(value, stage_id, media_dir):
         if 'alt' in value and (not isinstance(value['alt'], str) or not value['alt'].strip()):
             raise ValueError('visual alt must be non-empty')
         return deepcopy(value)
+    if kind == 'image':
+        src, alt = value.get('src'), value.get('alt')
+        if not isinstance(src, str) or not src.startswith(f'/api/classroom-media/{stage_id}/media/') or not isinstance(alt, str) or not alt.strip():
+            raise ValueError('image visual needs a lesson media src and a non-empty alt')
+        return {'kind': 'image', 'src': src, 'alt': alt}
     if kind == 'picture':
         alt = value.get('alt')
         if not isinstance(alt, str) or not alt.strip():
