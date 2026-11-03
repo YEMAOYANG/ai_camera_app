@@ -23,7 +23,7 @@ def sample_inputs():
     manifest = {'editionId': 'synthetic-book', 'revisionId': 'synthetic-revision',
         'gradeCode': 'primary_1', 'subject': 'math', 'rightsReview': {'status': 'cleared'},
         'units': [{'unitId': 'unit', 'title': 'Unit', 'lessons': [{'nodeId': 'lesson', 'brief': brief}]}]}
-    body = {'id': 'authored', 'stage': {'id': 'authored', 'name': 'Pictured quantities',
+    body = {'id': 'authored', 'stage': {'id': 'authored', 'name': 'Pictured quantities', 'createdAt': 1793608977483,
         'generatedAgentConfigs': [{'name': 'teacher', 'voiceConfig': {'voiceId': 'Ethan'}}]},
         'scenes': [{'id': 'slide', 'stageId': 'authored', 'type': 'slide',
             'content': {'canvas': {'elements': []}}, 'actions': [
@@ -292,6 +292,23 @@ class CoursewareReleaseTests(unittest.TestCase):
         name = next(iter(self.inputs['media']))
         self.inputs['media'][name] += b'changed'
         self.rejected('media_hash_mismatch')
+
+    def test_classroom_document_has_the_complete_native_shape(self):
+        prepared = build_release(self.inputs)
+        classroom = prepared['release']['classroom']
+        self.assertEqual(set(classroom), {'id', 'stage', 'scenes', 'createdAt'})
+        self.assertEqual(classroom['createdAt'], 1793608977483)
+
+    def test_classroom_without_creation_time_is_refused(self):
+        for value in (None, 0, '', ' ', 1.5):
+            self.inputs = sample_inputs()
+            self.inputs['body']['stage']['createdAt'] = value
+            refresh_receipts(self.inputs)
+            self.rejected('classroom_invalid')
+        self.inputs = sample_inputs()
+        del self.inputs['body']['stage']['createdAt']
+        refresh_receipts(self.inputs)
+        self.rejected('classroom_invalid')
 
     def test_media_reference_invalid(self):
         self.inputs['body']['scenes'][0]['actions'][0]['audioUrl'] = '/api/classroom-media/other/media/missing.wav'

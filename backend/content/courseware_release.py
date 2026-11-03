@@ -206,6 +206,10 @@ def build_release(inputs):
         return value
     classroom = convert(body)
     classroom['id'] = classroom_id
+    # The student delivery boundary reads the complete Native document, which carries createdAt.
+    created = body.get('createdAt', body['stage'].get('createdAt'))
+    require(type(created) is int and created > 0 or isinstance(created, str) and bool(created.strip()), 'classroom_invalid')
+    classroom['createdAt'] = created
     for scene in classroom['scenes']:
         scene['stageId'] = classroom_id
     inventory = sorted({entry['relative']: {'path': '/api/classroom-media/' + classroom_id + '/' + entry['relative'],
