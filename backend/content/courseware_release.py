@@ -69,6 +69,10 @@ def _evidence(inputs, speech, questions):
     require(isinstance(resources, dict), 'notes_invalid')
     for name in ('teachingDesign', 'courseware', 'learningTaskSheet', 'afterClassExercise'):
         item = resources.get(name, {})
+        if isinstance(item, dict) and item.get('status') == 'not_provided':
+            # The official listing of this class hour has no such resource; the evidence names the saved listing.
+            require(_text(item.get('evidence')), 'notes_invalid')
+            continue
         require(isinstance(item, dict) and isinstance(item.get('findings'), list)
                 and bool(item['findings']) and all(_text(v) for v in item['findings'])
                 and isinstance(item.get('pageRefs'), list) and bool(item['pageRefs'])

@@ -120,6 +120,14 @@ class CoursewareReleaseTests(unittest.TestCase):
         self.inputs['notes']['resources']['courseware']['pageRefs'] = []
         self.rejected('notes_invalid')
 
+    def test_a_resource_the_official_listing_lacks_needs_its_evidence(self):
+        item = self.inputs['notes']['resources']['afterClassExercise']
+        item.clear()
+        item.update(status='not_provided', evidence='the saved lesson listing sha256 ab12 has no after-class exercise')
+        self.assertEqual(validate_light_release(build_release(self.inputs), self.inputs['manifest']), [])
+        item['evidence'] = ' '
+        self.rejected('notes_invalid')
+
     def test_original_flag_refuses_missing_author_attestation(self):
         self.inputs['confirmation'].pop('authorAttestation')
         self.rejected('attestation_missing')
