@@ -69,6 +69,15 @@ class CheckTests(unittest.TestCase):
         self.assertEqual(sorted((i['gate'], i['scene'], i['severity']) for i in issues), [('G3', 1, 'error'), ('G3', 2, 'error'), ('G3', 3, 'error')])
         self.assertIn('開', next(i['detail'] for i in issues if i['scene'] == 1))
         self.assertEqual(traditional('今天学习数一数，书、爱、门'), '')
+        # Characters that Simplified Chinese keeps in ordinary use must never be flagged.
+        self.assertEqual(traditional('历史著名，瞭望，紫色，繁花，警察，迎接，鞋子，餐桌，首先，骨头，魔法，擦黑板，支持，瓶子，素食，索引，角落，近处，啊，嘛'), '')
+        self.assertEqual(traditional('嘗一嘗，總結，記住'), ''.join(sorted('嘗總結記')))
+
+    def test_traditional_characters_in_the_notes_are_refused(self):
+        self.assertNotIn('traditional_chinese', codes(check_classroom(self.body, notes=self.notes)))
+        self.notes['resources']['courseware']['findings'] = ['嘗一嘗']
+        issues = [i for i in check_classroom(self.body, notes=self.notes) if i['code'] == 'traditional_chinese']
+        self.assertEqual([(i['gate'], i['scene']) for i in issues], [('G0', None)])
 
     def test_media_and_hash(self):
         with tempfile.TemporaryDirectory() as directory:

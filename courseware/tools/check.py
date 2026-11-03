@@ -72,6 +72,9 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
                     add('G0', 'notes_incomplete', None, name + ' not_provided requires evidence')
             elif not isinstance(item.get('findings'), list) or not item['findings'] or not isinstance(item.get('pageRefs'), list) or not item['pageRefs']:
                 add('G0', 'notes_incomplete', None, name + ' requires findings and pageRefs')
+        bad = traditional(json.dumps(notes, ensure_ascii=False))
+        if bad:
+            add('G0', 'traditional_chinese', None, 'official notes: ' + bad)
 
     scenes = body.get('scenes', [])
     speech_count = question_count = 0

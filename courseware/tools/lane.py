@@ -74,6 +74,11 @@ def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://
         issues = check.check_classroom(body, work / 'media', notes=notes, roster=result['roster'], receipt=receipt, grade=result['grade'])
         if notes is None:
             issues.append(dict(gate='G0', code='notes_missing', scene=None, detail='official-notes.json is required', severity='error'))
+        brief_path = lesson / 'brief.json'
+        bad = check.traditional(brief_path.read_text(encoding='utf-8')) if brief_path.exists() else ''
+        if bad:
+            # The brief is what the authors copy from; Traditional characters in it end up in the lesson.
+            issues.append(dict(gate='G0', code='traditional_chinese', scene=None, detail='brief.json: ' + bad, severity='error'))
         if receipt is None:
             issues.append(dict(gate='G6', code='receipt_missing', scene=None, detail='the play-through audit has not run', severity='error'))
         result['issues'] = issues

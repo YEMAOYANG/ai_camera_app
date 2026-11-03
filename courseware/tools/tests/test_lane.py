@@ -77,6 +77,13 @@ class LaneTests(unittest.TestCase):
         self.assertEqual(codes, {'notes_missing'})
         self.assertEqual(result['steps']['check']['errors'], 1)
 
+    def test_traditional_characters_in_the_brief_are_a_gate_error(self):
+        (self.lesson / 'brief.json').write_text(json.dumps({'play': '看、听、闻、嘗、摸'}, ensure_ascii=False), encoding='utf-8')
+        result = self.run_lane()
+        found = [issue for issue in result['issues'] if issue['code'] == 'traditional_chinese']
+        self.assertEqual([(issue['gate'], issue['severity']) for issue in found], [('G0', 'error')])
+        self.assertIn('嘗', found[0]['detail'])
+
     def test_second_run_reuses_voices_and_pictures(self):
         (self.lesson / 'pictures.json').write_text(json.dumps([{'key': 'cover', 'prompt': 'a pond'}]))
         first = self.run_lane()
