@@ -1,11 +1,12 @@
 (function(){
+if(!K.$('#camp')||!K.$('#flags')||!K.$('#dot-choices'))return;
 var tent='<svg viewBox="0 0 170 170" aria-hidden="true"><path d="M12 136 68 34 128 136Z" fill="#f6a935" stroke="#b77225" stroke-width="5"/><path d="M68 34 93 136 128 136Z" fill="#e98d32"/><path d="M50 136 68 85 86 136Z" fill="#805534"/><path d="M10 137H131" stroke="#7ea65c" stroke-width="7"/><g class="flag"><path d="M132 137V34" stroke="#805534" stroke-width="5"/><path d="M134 34h30l-8 16 8 15h-30Z" fill="#e4572e" stroke="#b23a17" stroke-width="3"/></g></svg>';
 var flag='<svg viewBox="0 0 140 140" aria-hidden="true"><path d="M40 130V12" stroke="#805534" stroke-width="7"/><path d="M44 15h75l-20 25 20 25H44Z" fill="#e4572e" stroke="#b23a17" stroke-width="4"/></svg>';
 var pos=[[[30,20],[235,20],[440,20],[645,20],[130,240],[340,240],[550,240]],[[130,20],[340,20],[550,20],[30,240],[235,240],[440,240],[645,240]]],level=0,placed=[],tries=0,busy=false,timer,tents=[];
 K.hud({icon:'⚑',title:'给七个营地旗',levels:2});K.owl();K.ready({emoji:'🌲',title:'给七个营地旗',sub:'营地插旗',btn:'start-btn'});K.$('#flags').innerHTML=flag;
 for(var i=0;i<7;i++){(function(i){var e=K.el('button','tent',tent+'<span class="badge"></span>',K.$('#camp'));e.id='tent-'+(i+1);e.setAttribute('aria-label','帐篷 '+(i+1));e.addEventListener('click',function(){place(i)});tents.push(e)})(i)}
 K.drag(K.$('#flags'),{enabled:function(){return K.started&&!busy},targets:function(){return tents},onDrop:function(el,t){if(t)place(tents.indexOf(t));else miss(el)},onTap:function(){K.say('拖旗子到帐篷，或点帐篷')}});
-[6,7].forEach(function(n){var e=K.el('button','choice','',K.$('#dots'));e.id='choice-'+n;e.setAttribute('aria-label',n+'个点');for(var j=0;j<n;j++)K.el('i','dot','',e);e.addEventListener('click',function(){choose(n,e)})});
+[6,7].forEach(function(n){var e=K.el('button','choice','',K.$('#dot-choices'));e.id='choice-'+n;e.setAttribute('aria-label',n+'个点');for(var j=0;j<n;j++)K.el('i','dot','',e);e.addEventListener('click',function(){choose(n,e)})});
 function render(){tents.forEach(function(e,i){e.style.left=pos[level][i][0]+'px';e.style.top=pos[level][i][1]+'px';var n=placed.indexOf(i);e.classList.toggle('flagged',n>=0);K.$('.badge',e).textContent=n+1})}
 function place(i){if(!K.started||busy)return;if(placed.indexOf(i)>=0){miss(tents[i]);return}placed.push(i);render();K.sfx.tick(placed.length);K.say(placed.length===7?'旗子插好了，找同样多的点':'找没有旗的帐篷')}
 function miss(e){tries++;K.sfx.no();K.shake(e);if(tries===1)K.say('找没有旗的帐篷','no');else if(tries===2)K.say('一顶帐篷只插一面旗','no');else{placed=[0,1,2,3,4,5,6];render();K.say('一顶插一面，一起数旗子','no')}}
