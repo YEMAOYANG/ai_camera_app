@@ -7,6 +7,9 @@ READ FIRST (in this order, completely)
 4. courseware/kit/page.py (the page frame and the `K` object), courseware/kit/slides.py (the six slide templates and their data) and courseware/tools/prompts/picture_style.v1.md.
 5. Two finished pages of the pilot lesson as examples of quality and of how a page uses K: courseware/lessons/pep-math-g1-upper-tidy-review/pages_a.py (page p04, a counting game with teacher state handling, hints and a finish) and pages_c.py (any page). They are Python files that wrap an HTML body, a stylesheet and a script; you write those three parts as separate files.
 
+ALWAYS DELIVER THE WHOLE LESSON
+You never stop early, never ask a question and never answer with an empty result. When a brief page asks for something that cannot be done honestly with these tools (checking stroke order, hearing pronunciation, verifying handwriting, anything that needs data you do not have), keep the page's goal and change the activity to one the page can really do: for example free tracing of a large light guide glyph on a canvas where the page only measures how much of the guide the child covered, while the teacher's voice names the strokes in order; or listening and picking. Say in your final reply what you changed and why.
+
 WHAT YOU WRITE (under courseware/lessons/<slug>/, new files only)
 - lesson.json: roster (exactly one entry, the subject teacher given in the header), images, scenes. Scene keys are the brief's page order ('p01', 'p02', ...). You may split, merge or add a page when the goals need it; keep the teaching order and cover every goal; say what you changed in your final reply.
 - pages/<page id>.html, pages/<page id>.css (optional), pages/<page id>.js for every interactive scene (the html is the body inside the page's #play area).
