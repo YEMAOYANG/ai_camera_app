@@ -45,6 +45,46 @@ class VerifyTests(unittest.TestCase):
         self.assertEqual([issue for issue in check.check_classroom(self.body, verification=receipt)
                           if issue['gate'] == 'G7'], [])
 
+    def teaching_runner(self, verdicts):
+        def run(prompt, schema, model, effort, images=()):
+            if 'verdict' in schema['properties']['verdicts']['items']['properties']:
+                return {'verdicts': verdicts}
+            return self.runner(prompt, schema, model, effort, images)
+        return run
+
+    def test_the_teaching_pass_checks_every_goal_of_the_notes_and_reports_what_is_not_taught(self):
+        requests = verify.build_requests(self.body, self.notes, teaching=True)
+        teaching = [r for r in requests if r['kind'] == 'teaching']
+        self.assertEqual([(r['id'], r['kind']) for r in teaching[0]['items']],
+                         [('goal-1', 'objective'), ('keyPoint', 'key point'), ('difficultPoint', 'difficult point')])
+        self.assertIn('Count.', teaching[0]['prompt'])  # the narration is in the prompt
+        self.assertEqual(teaching[0]['images'], [])
+        good = [{'id': 'goal-1', 'verdict': 'taught', 'taughtAt': '1', 'issue': None},
+                {'id': 'keyPoint', 'verdict': 'weak', 'taughtAt': '1', 'issue': 'one sentence, no example'},
+                {'id': 'difficultPoint', 'verdict': 'missing', 'taughtAt': '', 'issue': 'never explained'}]
+        verdicts = verify.run_requests(requests, self.teaching_runner(good), model='v', effort='low')
+        receipt = verify.build_receipt(self.body, self.notes, requests, verdicts, self.answers, model='v', effort='low', ran_at='now')
+        self.assertEqual(receipt['goalsChecked'], 3)
+        self.assertEqual(receipt['disagreements'], [
+            {'kind': 'teaching', 'id': 'keyPoint', 'issue': 'one sentence, no example'},
+            {'kind': 'teaching', 'id': 'difficultPoint', 'issue': 'never explained'}])
+        self.assertEqual(self.receipt(verify.run_requests(self.requests, self.runner, model='v', effort='low'))['goalsChecked'], 0)
+
+    def test_teaching_verdicts_must_be_one_of_three_and_explain_a_gap(self):
+        requests = [r for r in verify.build_requests(self.body, self.notes, teaching=True) if r['kind'] == 'teaching']
+        base = [{'id': 'goal-1', 'verdict': 'taught', 'taughtAt': '1', 'issue': None},
+                {'id': 'keyPoint', 'verdict': 'taught', 'taughtAt': '1', 'issue': None},
+                {'id': 'difficultPoint', 'verdict': 'taught', 'taughtAt': '1', 'issue': None}]
+        verify.run_requests(requests, self.teaching_runner(base), model='v', effort='low')
+        for change in ({'verdict': 'great'}, {'verdict': 'weak', 'issue': ' '}):
+            bad = [dict(base[0], **change)] + base[1:]
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                verify.run_requests(requests, self.teaching_runner(bad), model='v', effort='low')
+
+    def test_notes_without_goals_cannot_be_checked_for_teaching(self):
+        with self.assertRaises(ValueError):
+            verify.build_requests(self.body, {'resources': {}}, teaching=True)
+
     def test_disagreements(self):
         original = verify.run_requests(self.requests, self.runner, model='v', effort='low')
         for index, field, value, kind in [(0, 'ok', False, 'speech'), (2, 'solved', 'A', 'answer'),

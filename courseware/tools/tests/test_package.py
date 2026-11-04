@@ -37,7 +37,7 @@ class PackageTests(unittest.TestCase):
         (self.build / 'media').mkdir(parents=True)
         (self.build / 'media' / 'a.wav').write_bytes(b'wav')
         for name, value in (('body.json', body()), ('roster.json', {'老师': 'male'}), ('audit-receipt.json', {'ok': True}),
-                            ('verification.json', {'verifier': {'model': 'gpt-6.1-sol'}}), ('draft.json', {'grade': 1})):
+                            ('verification.json', {'verifier': {'model': 'gpt-6.1-sol'}, 'goalsChecked': 4}), ('draft.json', {'grade': 1})):
             (self.build / name).write_text(json.dumps(value, ensure_ascii=False))
         self.ids = dict(edition_id='e', revision_id='r', node_id='n', teacher_code='mira_x', author_models=['gpt-6.1-terra', 'claude-sonnet-5-5'])
 
@@ -67,6 +67,13 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(caught.exception.args[0], 'gates_failed')
         self.assertIn('G6 audit_receipt_stale', caught.exception.args[1])
         self.assertNotIn('G3', caught.exception.args[1])
+        self.assertFalse(self.out.exists())
+
+    def test_a_verification_without_the_teaching_pass_is_refused(self):
+        (self.build / 'verification.json').write_text(json.dumps({'verifier': {'model': 'gpt-6.1-sol'}}))
+        with self.assertRaises(package.PackageError) as caught:
+            self.run_package()
+        self.assertEqual(caught.exception.args[0], 'teaching_unchecked')
         self.assertFalse(self.out.exists())
 
     def test_the_verifier_may_not_be_an_author(self):

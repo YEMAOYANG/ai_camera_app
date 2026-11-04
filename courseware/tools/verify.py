@@ -15,6 +15,7 @@ VERIFIER_MODEL = 'gpt-6.1-terra'
 VERIFIER_EFFORT = 'low'
 PROMPT = Path(__file__).parent / 'prompts' / 'verify.v1.md'
 ANALYSIS_PROMPT = Path(__file__).parent / 'prompts' / 'verify_analysis.v1.md'
+TEACHING_PROMPT = Path(__file__).parent / 'prompts' / 'verify_teaching.v1.md'
 SPEECH_VERDICT_SCHEMA = {
     'type': 'object', 'additionalProperties': False,
     'properties': {'id': {'type': 'string'}, 'ok': {'type': 'boolean'},
@@ -28,6 +29,13 @@ QUESTION_SOLVE_VERDICT_SCHEMA = {
                    'picturesMatch': {'type': 'boolean'},
                    'issue': {'type': ['string', 'null']}},
     'required': ['id', 'solved', 'skillMatchesObjectives', 'picturesMatch', 'issue'],
+}
+
+TEACHING_VERDICT_SCHEMA = {
+    'type': 'object', 'additionalProperties': False,
+    'properties': {'id': {'type': 'string'}, 'verdict': {'type': 'string'}, 'taughtAt': {'type': 'string'},
+                   'issue': {'type': ['string', 'null']}},
+    'required': ['id', 'verdict', 'taughtAt', 'issue'],
 }
 
 QUESTION_ANALYSIS_VERDICT_SCHEMA = {
@@ -70,6 +78,24 @@ def _items(body):
     return speeches, solves, analyses
 
 
+def _teaching_items(notes):
+    """The learning goals the narration must teach: the notes' objectives, key point and difficult point."""
+    items = [{'id': 'goal-%d' % number, 'goal': goal, 'kind': 'objective'}
+             for number, goal in enumerate(notes.get('objectives') or [], 1) if isinstance(goal, str) and goal.strip()]
+    for key, kind in (('keyPoint', 'key point'), ('difficultPoint', 'difficult point')):
+        if isinstance(notes.get(key), str) and notes[key].strip():
+            items.append({'id': key, 'goal': notes[key], 'kind': kind})
+    if not items:
+        raise ValueError('The official notes list no objectives, key point or difficult point to check the teaching against')
+    return items
+
+
+def _narration(body):
+    return [{'scene': number, 'type': scene.get('type'), 'title': scene.get('title'),
+             'lines': [a['text'] for a in scene.get('actions', []) if a.get('type') == 'speech']}
+            for number, scene in enumerate(body.get('scenes', []), 1)]
+
+
 def _picture_batch(items, media, *, check_files):
     batch, images = [], []
     for item in items:
@@ -95,7 +121,7 @@ def _picture_batch(items, media, *, check_files):
     return batch, images
 
 
-def build_requests(body, notes, *, batch_size=40, media=None):
+def build_requests(body, notes, *, batch_size=40, media=None, teaching=False):
     if type(batch_size) is not int or batch_size < 1:
         raise ValueError('batch_size must be a positive integer')
     requests = []
@@ -110,12 +136,18 @@ def build_requests(body, notes, *, batch_size=40, media=None):
             prompt = template.replace('$NOTES', json.dumps(notes, ensure_ascii=False, sort_keys=True))
             prompt = prompt.replace('$KIND', kind).replace('$ITEMS', json.dumps(batch, ensure_ascii=False, sort_keys=True))
             requests.append({'kind': kind, 'items': batch, 'prompt': prompt, 'images': images})
+    if teaching:
+        items = _teaching_items(notes)
+        prompt = TEACHING_PROMPT.read_text(encoding='utf-8').replace('$NOTES', json.dumps(notes, ensure_ascii=False, sort_keys=True))
+        prompt = prompt.replace('$NARRATION', json.dumps(_narration(body), ensure_ascii=False)).replace('$KIND', 'teaching')
+        prompt = prompt.replace('$ITEMS', json.dumps(items, ensure_ascii=False, sort_keys=True))
+        requests.append({'kind': 'teaching', 'items': items, 'prompt': prompt, 'images': []})
     return requests
 
 
 def _schema(kind):
     item_schema = {'speech': SPEECH_VERDICT_SCHEMA, 'question_solve': QUESTION_SOLVE_VERDICT_SCHEMA,
-                   'question_analysis': QUESTION_ANALYSIS_VERDICT_SCHEMA}[kind]
+                   'question_analysis': QUESTION_ANALYSIS_VERDICT_SCHEMA, 'teaching': TEACHING_VERDICT_SCHEMA}[kind]
     return {'type': 'object', 'additionalProperties': False,
             'properties': {'verdicts': {'type': 'array', 'items': item_schema}},
             'required': ['verdicts']}
@@ -146,6 +178,11 @@ def _validate(request, result):
                 raise ValueError('Solved answer is not an option: ' + ident)
             if (verdict['solved'] == 'unknown' or not verdict['picturesMatch']) and not (verdict['issue'] or '').strip():
                 raise ValueError('An issue is required for an unsolved question or picture mismatch: ' + ident)
+        if request['kind'] == 'teaching':
+            if verdict['verdict'] not in ('taught', 'weak', 'missing'):
+                raise ValueError('Teaching verdict must be taught, weak or missing: ' + ident)
+            if verdict['verdict'] != 'taught' and not (verdict['issue'] or '').strip():
+                raise ValueError('An issue is required when a goal is not fully taught: ' + ident)
         seen.add(ident)
     if seen != set(items):
         raise ValueError('Missing verdict ids: ' + ', '.join(sorted(set(items) - seen)))
@@ -189,16 +226,17 @@ def run_requests(requests, runner=default_runner, *, model=VERIFIER_MODEL, effor
 
 def build_receipt(body, notes, requests, verdicts, stored_answers, *, model, effort, ran_at):
     speeches, questions, analyses = _items(body)
-    expected = {'speech': speeches, 'question_solve': questions, 'question_analysis': analyses}
+    goals = _teaching_items(notes) if any(request['kind'] == 'teaching' for request in requests) else []
+    expected = {'speech': speeches, 'question_solve': questions, 'question_analysis': analyses, 'teaching': goals}
     offsets = dict.fromkeys(expected, 0)
     for request in requests:
         kind = request['kind']
         count = len(request['items'])
-        if not count or (kind != 'speech' and count > 4):
+        if not count or (kind in ('question_solve', 'question_analysis') and count > 4):
             raise ValueError('Invalid request batch size')
         batch = expected[kind][offsets[kind]:offsets[kind] + count]
         images = request.get('images', [])
-        if kind != 'speech':
+        if kind in ('question_solve', 'question_analysis'):
             media = Path(images[0]).parent if images else None
             batch, expected_images = _picture_batch(batch, media, check_files=False)
             if images != expected_images:
@@ -210,7 +248,7 @@ def build_receipt(body, notes, requests, verdicts, stored_answers, *, model, eff
         offsets[kind] += count
     if any(offsets[kind] != len(items) for kind, items in expected.items()):
         raise ValueError('Requests do not cover the body exactly')
-    if len(verdicts) != len(speeches) + len(questions) + len(analyses):
+    if len(verdicts) != len(speeches) + len(questions) + len(analyses) + len(goals):
         raise ValueError('Verdict count does not cover the body')
     body_answers = {q['id']: q['answer'] for scene in body.get('scenes', []) if scene.get('type') == 'quiz'
                     for q in scene.get('content', {}).get('questions', [])}
@@ -239,11 +277,14 @@ def build_receipt(body, notes, requests, verdicts, stored_answers, *, model, eff
                     disagreements.append({'kind': 'picture', 'id': ident, 'issue': issue})
                 if not verdict['skillMatchesObjectives']:
                     disagreements.append({'kind': 'skill', 'id': ident, 'issue': issue})
+            elif request['kind'] == 'teaching':
+                if verdict['verdict'] != 'taught':
+                    disagreements.append({'kind': 'teaching', 'id': ident, 'issue': issue})
             elif not verdict['analysisOk']:
                 disagreements.append({'kind': 'analysis', 'id': ident, 'issue': issue})
     return {'schemaVersion': 'mira.courseware.verification.v1', 'bodySha256': body_hash(body),
             'notesSha256': body_hash(notes), 'speechChecked': len(speeches),
-            'questionsChecked': len(questions), 'disagreements': disagreements,
+            'questionsChecked': len(questions), 'goalsChecked': len(goals), 'disagreements': disagreements,
             'verifier': {'model': model, 'effort': effort, 'ranAt': ran_at}}
 
 
@@ -258,7 +299,7 @@ def main():
     try:
         body = json.loads(Path(args.body).read_text(encoding='utf-8'))
         notes = json.loads(Path(args.notes).read_text(encoding='utf-8'))
-        requests = build_requests(body, notes, media=args.media or Path(args.body).resolve().parent / 'media')
+        requests = build_requests(body, notes, media=args.media or Path(args.body).resolve().parent / 'media', teaching=True)
         answers = {q['id']: q['answer'] for scene in body.get('scenes', []) if scene.get('type') == 'quiz'
                    for q in scene.get('content', {}).get('questions', [])}
         verdicts = run_requests(requests, model=args.model, effort=args.effort)

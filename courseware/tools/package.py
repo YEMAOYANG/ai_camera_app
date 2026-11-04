@@ -56,6 +56,8 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
                                                verification=verification, grade=grade, teaching=True) if i['severity'] == 'error']
     if issues:
         raise PackageError('gates_failed', '; '.join(f"{i['gate']} {i['code']}" for i in issues))
+    if not isinstance(verification.get('goalsChecked'), int) or verification['goalsChecked'] < 1:
+        raise PackageError('teaching_unchecked', 'the verification did not check that the narration teaches the learning goals')
     verifier = str(verification.get('verifier', {}).get('model', '')).lower()
     if not verifier or verifier in {str(m).lower() for m in author_models}:
         raise PackageError('verifier_not_independent', verifier or 'no verifier recorded')
