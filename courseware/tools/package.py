@@ -43,7 +43,9 @@ def estimate_minutes(body):
 
 
 def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, node_id, teacher_code, author_models,
-                   teaching_revision='1'):
+                   page_author_models=(), teaching_revision='1'):
+    """author_models wrote lines or questions and so may not verify them; page_author_models wrote only page code, which
+    the verifier does not read, so one of them may verify. Both are recorded as authors."""
     lesson, build, out = Path(lesson_dir), Path(build_dir), Path(out_dir)
     if out.exists():
         raise PackageError('out_exists', str(out))
@@ -69,7 +71,7 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
         raise PackageError('title_missing', 'body.stage.name')
     identity = {'editionId': edition_id, 'revisionId': revision_id, 'nodeId': node_id, 'teachingRevision': str(teaching_revision),
                 'title': title, 'objective': '；'.join(g.strip() for g in goals), 'teacherCode': teacher_code,
-                'authorModels': list(author_models), 'estimatedMinutes': estimate_minutes(body)}
+                'authorModels': list(author_models) + [m for m in page_author_models if m not in author_models], 'estimatedMinutes': estimate_minutes(body)}
     out.mkdir(parents=True)
     shutil.copytree(build / 'media', out / 'media')
     for name in ('body.json', 'roster.json', 'audit-receipt.json', 'verification.json'):
@@ -89,13 +91,14 @@ def main(argv=None):
     parser.add_argument('--revision-id', required=True)
     parser.add_argument('--node-id', required=True)
     parser.add_argument('--teacher-code', required=True)
-    parser.add_argument('--author-model', action='append', required=True, help='every model that wrote pages, lines or questions')
+    parser.add_argument('--author-model', action='append', required=True, help='every model that wrote lines or questions')
+    parser.add_argument('--page-author-model', action='append', default=[], help='every model that wrote only page code')
     parser.add_argument('--teaching-revision', default='1')
     args = parser.parse_args(argv)
     try:
         identity = package_lesson(args.lesson, args.build, args.out, edition_id=args.edition_id, revision_id=args.revision_id,
                                   node_id=args.node_id, teacher_code=args.teacher_code, author_models=args.author_model,
-                                  teaching_revision=args.teaching_revision)
+                                  page_author_models=args.page_author_model, teaching_revision=args.teaching_revision)
     except PackageError as exc:
         print(f'PackageError: {exc.args[0]}: {exc.args[1] if len(exc.args) > 1 else ""}', file=sys.stderr)
         return 1
