@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
-import { buildStudentSecurityHeaderRules } from "./src/lib/security/openmaic-runtime-policy";
+// The config is transpiled and loaded directly by Node before the app bundle
+// exists. Keep this dependency runtime-JavaScript so ESM resolution is stable.
+import { buildStudentSecurityHeaderRules } from "./src/lib/security/openmaic-runtime-policy-runtime.mjs";
 
 function configuredDevOrigins() {
   const origins = new Set(["localhost", "127.0.0.1"]);

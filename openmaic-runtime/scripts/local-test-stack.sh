@@ -48,6 +48,8 @@ HEALTH_ATTEMPTS="${MIRA_LOCAL_TEST_HEALTH_ATTEMPTS:-60}"
 
 BACKEND_HEALTH_URL="http://127.0.0.1:${BACKEND_PORT}/api/health"
 STUDENT_WEB_HEALTH_URL="http://127.0.0.1:${STUDENT_WEB_PORT}/"
+STUDENT_WEB_STATIC_HEALTH_PATH="${MIRA_LOCAL_TEST_STUDENT_WEB_STATIC_HEALTH_PATH:-/textbooks/navigation-v1/subjects-1670ad3a023e7649.png}"
+STUDENT_WEB_STATIC_HEALTH_URL="http://127.0.0.1:${STUDENT_WEB_PORT}${STUDENT_WEB_STATIC_HEALTH_PATH}"
 OPENMAIC_HEALTH_URL="http://127.0.0.1:${OPENMAIC_PORT}/api/health"
 GATEWAY_HEALTH_URL="http://127.0.0.1:${GATEWAY_PORT}/health"
 OPENMAIC_PRODUCTION_COMMAND_TOKEN="next-server (v16.3.3)"
@@ -909,6 +911,7 @@ student_web_runtime_is_healthy() {
   student_web_identity_is_current_production || return 1
   pid="${STUDENT_RECORD_PID}"
   probe "${STUDENT_WEB_HEALTH_URL}" || return 1
+  probe "${STUDENT_WEB_STATIC_HEALTH_URL}" || return 1
   student_web_identity_is_current_production || return 1
   [[ "${STUDENT_RECORD_PID}" == "${pid}" ]] || return 1
 }
@@ -1011,6 +1014,10 @@ launch_student_web_production() {
   pid="${STUDENT_RECORD_PID}"
   started_start_hash="${STUDENT_RECORD_START_HASH}"
   if ! wait_for_probe "Student Web" "${STUDENT_WEB_HEALTH_URL}" "${pid}" "${STUDENT_WEB_LOG}"; then
+    stop_student_web >/dev/null 2>&1 || true
+    return 1
+  fi
+  if ! wait_for_probe "Student Web static asset" "${STUDENT_WEB_STATIC_HEALTH_URL}" "${pid}" "${STUDENT_WEB_LOG}"; then
     stop_student_web >/dev/null 2>&1 || true
     return 1
   fi

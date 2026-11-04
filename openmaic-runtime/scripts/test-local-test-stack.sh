@@ -137,6 +137,20 @@ EOF
   [[ ! -e "${STUDENT_WEB_PID_FILE}" ]] || fail "successful safe stop left a process identity"
 )
 
+# A healthy shell page is insufficient: the runtime is healthy only when a
+# real bundled textbook image can also be read from Student Web's public tree.
+(
+  STUDENT_WEB_HEALTH_URL="http://127.0.0.1:53989/"
+  STUDENT_WEB_STATIC_HEALTH_URL="http://127.0.0.1:53989/textbooks/navigation-v1/subjects.png"
+  student_web_identity_is_current_production() { STUDENT_RECORD_PID=54320; return 0; }
+  probe() { [[ "$1" == "${STUDENT_WEB_HEALTH_URL}" ]]; }
+  if student_web_runtime_is_healthy; then
+    fail "Student Web accepted a runtime whose bundled static image was unreadable"
+  fi
+  probe() { [[ "$1" == "${STUDENT_WEB_HEALTH_URL}" || "$1" == "${STUDENT_WEB_STATIC_HEALTH_URL}" ]]; }
+  student_web_runtime_is_healthy || fail "Student Web rejected a runtime whose page and bundled static image were readable"
+)
+
 # An unknown listener cannot be adopted or killed, and build/launch are never
 # reached after that failure.
 (
