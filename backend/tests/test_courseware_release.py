@@ -5,7 +5,7 @@ import json
 import unittest
 from unittest.mock import patch
 
-from content.courseware_release import AUDIO_METHOD, build_release, validate_light_release
+from content.courseware_release import AUDIO_METHOD, WAIVER_LIGHT_SCHEMA, build_release, validate_light_release
 from content.textbook_catalog import canonical, digest
 from content.textbook_release import validate_release
 
@@ -72,6 +72,20 @@ def refresh_receipts(inputs):
     inputs['verification']['notesSha256'] = digest(inputs['notes'])
 
 
+def waive_g7(inputs):
+    """Bind the owner's direct-publication instruction to the current body and historical receipt."""
+    inputs['verification']['bodySha256'] = '0' * 64
+    inputs['ownerWaiver'] = {
+        'schemaVersion': 'mira.courseware.g7-owner-waiver.v1', 'gate': 'G7',
+        'bodySha256': digest(inputs['body']), 'notesSha256': digest(inputs['notes']),
+        'priorVerificationSha256': digest(inputs['verification']), 'confirmedBy': 'owner',
+        'userQuote': inputs['confirmation']['userQuote'],
+        'confirmedAt': inputs['confirmation']['confirmedAt'],
+        'reason': 'owner_direct_publication_without_independent_verification'}
+    inputs['gateIssues'] = [{'gate': 'G7', 'code': 'verification_receipt_stale',
+        'severity': 'waived', 'waiver': 'mira.courseware.g7-owner-waiver.v1'}]
+
+
 class CoursewareReleaseTests(unittest.TestCase):
     def setUp(self):
         self.inputs = sample_inputs()
@@ -117,6 +131,42 @@ class CoursewareReleaseTests(unittest.TestCase):
         self.assertIn('not an independent originality check', review['basis'])
         self.assertIn(canonical(self.inputs['identity']['authorModels']), review['basis'])
         self.assertIn(canonical(self.inputs['verification']['verifier']['model']), review['basis'])
+
+    def test_explicit_owner_waiver_is_truthful_bound_and_accepted(self):
+        waive_g7(self.inputs)
+        prepared = build_release(self.inputs)
+        light = prepared['frozen']['coursewareLight']
+        self.assertEqual(light['schemaVersion'], WAIVER_LIGHT_SCHEMA)
+        self.assertEqual(light['gates']['G7'], {'passed': False, 'waived': True,
+            'waiverSha256': digest(self.inputs['ownerWaiver'])})
+        self.assertNotIn('verifier', prepared['frozen'])
+        self.assertEqual(prepared['frozen']['verificationWaiver'], self.inputs['ownerWaiver'])
+        self.assertIn('was not performed', prepared['review']['basis'])
+        self.assertIn('not represented as current', prepared['review']['basis'])
+        self.assertEqual(validate_light_release(prepared, self.inputs['manifest']), [])
+
+    def test_owner_waiver_cannot_cover_other_gates_or_be_rebound(self):
+        waive_g7(self.inputs)
+        self.inputs['gateIssues'].append({'gate': 'G2', 'code': 'overlap', 'severity': 'error'})
+        self.rejected('gates_failed')
+        for field, value in (('userQuote', 'different publication'), ('bodySha256', 'f' * 64),
+                             ('priorVerificationSha256', 'e' * 64)):
+            with self.subTest(field=field):
+                self.inputs = sample_inputs()
+                waive_g7(self.inputs)
+                self.inputs['ownerWaiver'][field] = value
+                self.rejected('verification_invalid')
+
+    def test_waiver_release_validator_rejects_tampered_claims(self):
+        waive_g7(self.inputs)
+        for mutate in (
+                lambda p: p['frozen']['coursewareLight']['gates']['G7'].update(passed=True),
+                lambda p: p['frozen']['verificationWaiver'].update(userQuote='different'),
+                lambda p: p['review'].update(reviewer='independently verified')):
+            with self.subTest(mutate=mutate):
+                prepared = build_release(self.inputs)
+                mutate(prepared)
+                self.assertEqual(validate_light_release(prepared, self.inputs['manifest']), ['release_invalid'])
 
     def test_alignment_flag_refuses_missing_or_partial_evidence(self):
         for delta in ({'disagreements': ['wrong answer']}, {'speechChecked': 1}, {'questionsChecked': 1},

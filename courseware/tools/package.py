@@ -65,7 +65,8 @@ def _copy_referenced_media(body, source, destination):
 
 
 def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, node_id, teacher_code, author_models,
-                   page_author_models=(), teaching_revision='1'):
+                   page_author_models=(), teaching_revision='1', g7_owner_quote=None,
+                   g7_confirmed_at=None):
     """author_models wrote lines or questions and so may not verify them; page_author_models wrote only page code, which
     the verifier does not read, so one of them may verify. Both are recorded as authors."""
     lesson, build, out = Path(lesson_dir), Path(build_dir), Path(out_dir)
@@ -76,16 +77,31 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
     roster, receipt = _load(build / 'roster.json'), _load(build / 'audit-receipt.json')
     play_receipt = _load(build / 'play-receipt.json')
     verification = _load(build / 'verification.json')
+    if bool(g7_owner_quote) != bool(g7_confirmed_at):
+        raise PackageError('g7_owner_waiver_invalid', 'owner quote and confirmation time are both required')
+    waiver = None
+    if g7_owner_quote:
+        try:
+            waiver = check.g7_owner_waiver(body, notes, verification,
+                                            user_quote=g7_owner_quote, confirmed_at=g7_confirmed_at)
+        except ValueError as exc:
+            raise PackageError(str(exc), '') from exc
     grade = _load(build / 'draft.json').get('grade')
-    issues = [i for i in check.check_classroom(body, build / 'media', notes=notes, roster=roster, receipt=receipt,
-                                               play_receipt=play_receipt, verification=verification, grade=grade,
-                                               teaching=True, require_play=True) if i['severity'] == 'error']
+    checked = check.check_classroom(body, build / 'media', notes=notes, roster=roster, receipt=receipt,
+                                    play_receipt=play_receipt, verification=verification, grade=grade,
+                                    teaching=True, require_play=True)
+    try:
+        checked = check.apply_g7_owner_waiver(checked, waiver, body, notes, verification)
+    except ValueError as exc:
+        raise PackageError(str(exc), '') from exc
+    issues = [i for i in checked if i['severity'] == 'error']
     if issues:
         raise PackageError('gates_failed', '; '.join(f"{i['gate']} {i['code']}" for i in issues))
-    if type(verification.get('goalsChecked')) is not int or verification['goalsChecked'] < check.teaching_goal_count(notes):
+    if waiver is None and (type(verification.get('goalsChecked')) is not int
+                           or verification['goalsChecked'] < check.teaching_goal_count(notes)):
         raise PackageError('teaching_unchecked', 'the verification did not check that the narration teaches the learning goals')
     verifier = str(verification.get('verifier', {}).get('model', '')).lower()
-    if not verifier or verifier in {str(m).lower() for m in author_models}:
+    if waiver is None and (not verifier or verifier in {str(m).lower() for m in author_models}):
         raise PackageError('verifier_not_independent', verifier or 'no verifier recorded')
     goals = brief.get('goals')
     if not isinstance(goals, list) or not goals or not all(isinstance(g, str) and g.strip() for g in goals):
@@ -102,6 +118,9 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
         shutil.copyfile(build / name, out / name)
     for name in ('official-notes.json', 'brief.json'):
         shutil.copyfile(lesson / name, out / name)
+    if waiver is not None:
+        (out / 'owner-waiver.json').write_text(
+            json.dumps(waiver, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     (out / 'identity.json').write_text(json.dumps(identity, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     return identity
 
@@ -118,11 +137,15 @@ def main(argv=None):
     parser.add_argument('--author-model', action='append', required=True, help='every model that wrote lines or questions')
     parser.add_argument('--page-author-model', action='append', default=[], help='every model that wrote only page code')
     parser.add_argument('--teaching-revision', default='1')
+    parser.add_argument('--waive-g7-owner-quote')
+    parser.add_argument('--waive-g7-confirmed-at')
     args = parser.parse_args(argv)
     try:
         identity = package_lesson(args.lesson, args.build, args.out, edition_id=args.edition_id, revision_id=args.revision_id,
                                   node_id=args.node_id, teacher_code=args.teacher_code, author_models=args.author_model,
-                                  page_author_models=args.page_author_model, teaching_revision=args.teaching_revision)
+                                  page_author_models=args.page_author_model, teaching_revision=args.teaching_revision,
+                                  g7_owner_quote=args.waive_g7_owner_quote,
+                                  g7_confirmed_at=args.waive_g7_confirmed_at)
     except PackageError as exc:
         print(f'PackageError: {exc.args[0]}: {exc.args[1] if len(exc.args) > 1 else ""}', file=sys.stderr)
         return 1

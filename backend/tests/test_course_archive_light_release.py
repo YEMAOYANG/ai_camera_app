@@ -27,9 +27,16 @@ def light_request_v2():
     return value
 
 
+def light_request_v3():
+    value = light_request_v2()
+    value["coursewareLight"]["schemaVersion"] = "mira.courseware.light-release.v3"
+    value["coursewareLight"]["evidence"]["waiverSha256"] = "d" * 64
+    return value
+
+
 class LightReleaseValidationTest(unittest.TestCase):
     def test_valid_shape(self):
-        for frozen in (light_request(), light_request_v2()):
+        for frozen in (light_request(), light_request_v2(), light_request_v3()):
             with self.subTest(schema=frozen["coursewareLight"]["schemaVersion"]):
                 original = deepcopy(frozen)
                 CourseArchiveExporter._validate_light_release(frozen)

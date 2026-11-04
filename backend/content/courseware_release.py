@@ -19,6 +19,7 @@ from content.textbook_release_media import media_mime_type
 from core.errors import ApiError
 
 LIGHT_SCHEMA = 'mira.courseware.light-release.v2'
+WAIVER_LIGHT_SCHEMA = 'mira.courseware.light-release.v3'
 # Namespace identifiers inside page scripts and inline SVG are not fetched media.
 NAMESPACE = re.compile(r'https?://www\.w3\.org/(?:2000/svg|1999/xlink|1999/xhtml)')
 GATES = tuple('G%d' % i for i in range(8))
@@ -62,7 +63,7 @@ def _confirmation(value):
     return deepcopy(value)
 
 
-def _evidence(inputs, speech, questions):
+def _evidence(inputs, speech, questions, confirmation):
     notes, verification, receipt, play_receipt = (inputs.get(key) for key in ('notes', 'verification', 'receipt', 'playReceipt'))
     require(isinstance(notes, dict), 'notes_invalid')
     resources = notes.get('resources', {})
@@ -82,16 +83,33 @@ def _evidence(inputs, speech, questions):
             'objectives_invalid')
     require(isinstance(inputs.get('brief'), dict) and bool(inputs['brief']), 'brief_missing')
     body_sha = digest(inputs['body'])
-    require(isinstance(verification, dict) and verification.get('bodySha256') == body_sha
-            and verification.get('notesSha256') == digest(notes)
-            and verification.get('disagreements') == []
-            and type(verification.get('speechChecked')) is int and verification['speechChecked'] >= len(speech)
-            and type(verification.get('questionsChecked')) is int and verification['questionsChecked'] >= len(questions)
-            and type(verification.get('goalsChecked')) is int
-            and verification['goalsChecked'] >= sum(_text(goal) for goal in objectives)
-                + sum(_text(notes.get(key)) for key in ('keyPoint', 'difficultPoint')),
-            'verification_invalid')
-    _independent_verifier(inputs['identity'].get('authorModels'), verification.get('verifier'))
+    verification_valid = (isinstance(verification, dict) and verification.get('bodySha256') == body_sha
+        and verification.get('notesSha256') == digest(notes)
+        and verification.get('disagreements') == []
+        and type(verification.get('speechChecked')) is int and verification['speechChecked'] >= len(speech)
+        and type(verification.get('questionsChecked')) is int and verification['questionsChecked'] >= len(questions)
+        and type(verification.get('goalsChecked')) is int
+        and verification['goalsChecked'] >= sum(_text(goal) for goal in objectives)
+            + sum(_text(notes.get(key)) for key in ('keyPoint', 'difficultPoint')))
+    waiver = inputs.get('ownerWaiver')
+    if verification_valid:
+        require(waiver is None, 'g7_owner_waiver_unnecessary')
+        verifier_model = _independent_verifier(inputs['identity'].get('authorModels'), verification.get('verifier'))
+        verification_status = {'status': 'passed', 'verifierModel': verifier_model}
+    else:
+        require(isinstance(waiver, dict)
+                and waiver.get('schemaVersion') == 'mira.courseware.g7-owner-waiver.v1'
+                and waiver.get('gate') == 'G7'
+                and waiver.get('bodySha256') == body_sha
+                and waiver.get('notesSha256') == digest(notes)
+                and isinstance(verification, dict)
+                and waiver.get('priorVerificationSha256') == digest(verification)
+                and waiver.get('confirmedBy') == 'owner'
+                and waiver.get('userQuote') == confirmation['userQuote']
+                and waiver.get('confirmedAt') == confirmation['confirmedAt']
+                and waiver.get('reason') == 'owner_direct_publication_without_independent_verification',
+                'verification_invalid')
+        verification_status = {'status': 'waived', 'waiver': deepcopy(waiver)}
     require(isinstance(receipt, dict) and receipt.get('bodySha256') == body_sha and receipt.get('ok') is True
             and isinstance(receipt.get('viewports'), list)
             and all(v in receipt['viewports'] for v in ('1280x720', '1000x563', '640x360')), 'audit_invalid')
@@ -108,20 +126,38 @@ def _evidence(inputs, speech, questions):
     require(isinstance(inputs.get('roster'), dict) and bool(inputs['roster']), 'roster_missing')
     issues = inputs.get('gateIssues')
     require(isinstance(issues, list) and not any(i.get('severity') == 'error' for i in issues), 'gates_failed')
-    return {name: digest(inputs[key]) for name, key in (
+    if verification_status['status'] == 'waived':
+        require(any(i.get('gate') == 'G7' and i.get('severity') == 'waived' for i in issues),
+                'g7_owner_waiver_unnecessary')
+    evidence = {name: digest(inputs[key]) for name, key in (
         ('notesSha256', 'notes'), ('briefSha256', 'brief'), ('receiptSha256', 'receipt'),
         ('playReceiptSha256', 'playReceipt'),
         ('verificationSha256', 'verification'))}
+    if verification_status['status'] == 'waived':
+        evidence['waiverSha256'] = digest(waiver)
+    return evidence, verification_status
 
 
-def _review(evidence, confirmation, author_models, verifier_model):
+def _review(evidence, confirmation, author_models, verification_status):
+    if verification_status['status'] == 'passed':
+        reviewer = 'owner (quoted) + automated gates G0-G7'
+        verification_basis = ('Independent AI verification (not a human review), sha256 %s, covers every speech '
+            'action, question and teaching goal. Author models: %s; verifier model: %s. ' % (
+                evidence['verificationSha256'], canonical(author_models),
+                canonical(verification_status['verifierModel'])))
+    else:
+        waiver = verification_status['waiver']
+        reviewer = 'owner-authorized G7 waiver + automated gates G0-G6'
+        verification_basis = ('G7 independent verification was not performed for this body. The owner explicitly '
+            'waived G7 for direct publication; waiver sha256 %s, owner quote %s, confirmedAt %s. The earlier '
+            'verification receipt sha256 %s is retained as historical evidence and is not represented as current. ' % (
+                evidence['waiverSha256'], canonical(waiver['userQuote']), waiver['confirmedAt'],
+                evidence['verificationSha256']))
     return {'alignmentConfirmed': True, 'originalExpressionConfirmed': True, 'sourceUsageConfirmed': True,
-        'publicationAuthorized': True, 'reviewer': 'owner (quoted) + automated gates G0-G7',
-        'basis': ('Independent AI verification (not a human review), sha256 %s, covers every speech action and question. '
-            'Author models: %s; verifier model: %s. '
+        'publicationAuthorized': True, 'reviewer': reviewer,
+        'basis': (verification_basis +
             'Official notes passed G0, sha256 %s. Author attestation (not an independent originality check): %s '
             'Owner authorization: %s; confirmedAt %s. Browser audit receipt sha256 %s; random-play receipt sha256 %s; brief sha256 %s.' % (
-                evidence['verificationSha256'], canonical(author_models), canonical(verifier_model),
                 evidence['notesSha256'], canonical(confirmation['authorAttestation']),
                 canonical(confirmation['userQuote']), confirmation['confirmedAt'], evidence['receiptSha256'],
                 evidence['playReceiptSha256'], evidence['briefSha256']))}
@@ -151,7 +187,7 @@ def build_release(inputs):
     speech = [a for s in body['scenes'] for a in s.get('actions', []) if a.get('type') == 'speech']
     require(bool(speech), 'speech_missing')
     confirmation = _confirmation(inputs.get('confirmation'))
-    evidence = _evidence(inputs, speech, questions)
+    evidence, verification_status = _evidence(inputs, speech, questions, confirmation)
     # The registered catalog stays as it is (its brief may still be a draft); the lesson's own goals come from the reviewed notes.
     objectives = inputs['notes'].get('objectives')
     require(isinstance(objectives, list) and bool(objectives) and all(_text(v) for v in objectives), 'objectives_invalid')
@@ -200,18 +236,24 @@ def build_release(inputs):
     binding = {'editionId': manifest['editionId'], 'alignmentRevisionId': manifest['revisionId'],
         'alignmentManifestSha256': digest(manifest), 'nodeId': identity['nodeId'],
         'partIndex': 1, 'teachingRevision': identity['teachingRevision']}
+    gates = {gate: {'passed': True, 'warnings': sorted({issue['code'] for issue in inputs['gateIssues']
+        if issue.get('gate') == gate and issue.get('severity') == 'warn'})} for gate in GATES}
+    if verification_status['status'] == 'waived':
+        gates['G7'] = {'passed': False, 'waived': True, 'waiverSha256': evidence['waiverSha256']}
     frozen = {'schemaVersion': INPUT_SCHEMA, 'textbookBinding': binding,
         'knowledgeBrief': deepcopy(node['brief']), 'gradeCode': manifest['gradeCode'], 'subject': manifest['subject'],
         'sourceSha256': digest(body), 'identity': {k: deepcopy(identity[k]) for k in (
             'editionId', 'revisionId', 'nodeId', 'teachingRevision', 'title', 'objective', 'teacherCode',
             'authorModels', 'estimatedMinutes')},
-        'verifier': deepcopy(inputs['verification']['verifier']),
+        **({'verifier': deepcopy(inputs['verification']['verifier'])}
+           if verification_status['status'] == 'passed'
+           else {'verificationWaiver': deepcopy(verification_status['waiver'])}),
         'media': [{'sourceName': name, **entry} for name, entry in sorted(assets.items())],
         'rosterSha256': digest(inputs['roster']), 'authorAttestation': confirmation['authorAttestation'],
-        'coursewareLight': {'schemaVersion': LIGHT_SCHEMA,
+        'coursewareLight': {'schemaVersion': (LIGHT_SCHEMA if verification_status['status'] == 'passed'
+                                                else WAIVER_LIGHT_SCHEMA),
             'source': {'stageId': source_id, 'bodySha256': digest(body)},
-            'gates': {gate: {'passed': True, 'warnings': sorted({issue['code'] for issue in inputs['gateIssues']
-                if issue.get('gate') == gate and issue.get('severity') == 'warn'})} for gate in GATES},
+            'gates': gates,
             'confirmation': {k: confirmation[k] for k in ('userQuote', 'confirmedAt', 'confirmedBy')},
             'evidence': evidence}}
     key = digest(frozen)
@@ -242,7 +284,7 @@ def build_release(inputs):
         'classroom': classroom, 'classroomSha256': digest(classroom), 'media': inventory,
         'audioAudit': {'passed': True, 'segments': len(speech), 'method': AUDIO_METHOD}}
     release['sha256'] = digest(release)
-    review = {**_review(evidence, confirmation, identity['authorModels'], inputs['verification']['verifier']['model']),
+    review = {**_review(evidence, confirmation, identity['authorModels'], verification_status),
         'release': release}
     content = {'schemaVersion': 'mira.learning.fixed-textbook-course.v1', 'textbookBinding': binding,
         'title': identity['title'], 'objectives': objectives, 'estimatedMinutes': identity['estimatedMinutes'],
@@ -268,21 +310,48 @@ def validate_light_release(prepared, manifest):
         frozen, course = prepared['frozen'], prepared['course']
         light = frozen['coursewareLight']
         confirmation = _confirmation({**light['confirmation'], 'authorAttestation': frozen['authorAttestation']})
-        verifier_model = _independent_verifier(frozen['identity'].get('authorModels'), frozen.get('verifier'))
-        require(light['schemaVersion'] == LIGHT_SCHEMA and set(light) == {
+        schema = light['schemaVersion']
+        require(schema in (LIGHT_SCHEMA, WAIVER_LIGHT_SCHEMA) and set(light) == {
             'schemaVersion', 'source', 'gates', 'confirmation', 'evidence'}
             and set(light['confirmation']) == {'userQuote', 'confirmedAt', 'confirmedBy'}
-            and set(light['evidence']) == {'notesSha256', 'briefSha256', 'receiptSha256', 'playReceiptSha256', 'verificationSha256'}
+            and set(light['evidence']) == ({'notesSha256', 'briefSha256', 'receiptSha256',
+                'playReceiptSha256', 'verificationSha256'} | ({'waiverSha256'} if schema == WAIVER_LIGHT_SCHEMA else set()))
             and all(isinstance(sha, str) and re.fullmatch(r'[a-f0-9]{64}', sha) for sha in light['evidence'].values())
             and set(light['source']) == {'stageId', 'bodySha256'}
             and isinstance(light['source']['stageId'], str)
             and re.fullmatch(r'[A-Za-z0-9_-]+', light['source']['stageId'])
             and isinstance(frozen['sourceSha256'], str) and re.fullmatch(r'[a-f0-9]{64}', frozen['sourceSha256'])
             and light['source']['bodySha256'] == frozen['sourceSha256']
-            and set(light['gates']) == set(GATES)
-            and all(light['gates'][gate]['passed'] is True for gate in GATES)
-            and {k: v for k, v in prepared['review'].items() if k != 'release'} == _review(
-                light['evidence'], confirmation, frozen['identity']['authorModels'], verifier_model),
+            and set(light['gates']) == set(GATES),
+            'release_invalid')
+        if schema == LIGHT_SCHEMA:
+            require('verificationWaiver' not in frozen, 'release_invalid')
+            verifier_model = _independent_verifier(frozen['identity'].get('authorModels'), frozen.get('verifier'))
+            require(all(isinstance(light['gates'][gate], dict)
+                        and light['gates'][gate].get('passed') is True for gate in GATES), 'release_invalid')
+            verification_status = {'status': 'passed', 'verifierModel': verifier_model}
+        else:
+            waiver = frozen.get('verificationWaiver')
+            require('verifier' not in frozen and isinstance(waiver, dict) and set(waiver) == {
+                'schemaVersion', 'gate', 'bodySha256', 'notesSha256', 'priorVerificationSha256',
+                'confirmedBy', 'userQuote', 'confirmedAt', 'reason'}
+                and waiver.get('schemaVersion') == 'mira.courseware.g7-owner-waiver.v1'
+                and waiver.get('gate') == 'G7'
+                and waiver.get('bodySha256') == light['source']['bodySha256']
+                and waiver.get('notesSha256') == light['evidence']['notesSha256']
+                and waiver.get('priorVerificationSha256') == light['evidence']['verificationSha256']
+                and waiver.get('confirmedBy') == 'owner'
+                and waiver.get('userQuote') == confirmation['userQuote']
+                and waiver.get('confirmedAt') == confirmation['confirmedAt']
+                and waiver.get('reason') == 'owner_direct_publication_without_independent_verification'
+                and digest(waiver) == light['evidence']['waiverSha256']
+                and all(isinstance(light['gates'][gate], dict)
+                        and light['gates'][gate].get('passed') is True for gate in GATES[:-1])
+                and light['gates']['G7'] == {'passed': False, 'waived': True,
+                    'waiverSha256': light['evidence']['waiverSha256']}, 'release_invalid')
+            verification_status = {'status': 'waived', 'waiver': waiver}
+        require({k: v for k, v in prepared['review'].items() if k != 'release'} == _review(
+            light['evidence'], confirmation, frozen['identity']['authorModels'], verification_status),
             'release_invalid')
         binding = frozen['textbookBinding']
         build = {'status': 'published', 'content_key': frozen['contentKey'], 'node_id': binding['nodeId'],

@@ -89,6 +89,27 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(caught.exception.args[0], 'teaching_unchecked')
         self.assertFalse(self.out.exists())
 
+    def test_explicit_owner_waiver_covers_only_g7_and_is_packaged(self):
+        (self.build / 'verification.json').write_text(json.dumps({'verifier': {'model': 'gpt-6.1-sol'}}))
+        issue = {'gate': 'G7', 'code': 'verification_teaching_incomplete', 'severity': 'error'}
+        with patch.object(package.check, 'check_classroom', return_value=[issue]):
+            identity = package.package_lesson(self.lesson, self.build, self.out, **self.ids,
+                g7_owner_quote='直接发布这节课', g7_confirmed_at='2026-11-04T14:00:00+08:00')
+        waiver = json.loads((self.out / 'owner-waiver.json').read_text(encoding='utf-8'))
+        self.assertEqual(identity['title'], '本课')
+        self.assertEqual(waiver['gate'], 'G7')
+        self.assertEqual(waiver['confirmedBy'], 'owner')
+
+    def test_owner_waiver_does_not_cover_non_g7_errors(self):
+        issues = [{'gate': 'G7', 'code': 'verification_teaching_incomplete', 'severity': 'error'},
+                  {'gate': 'G2', 'code': 'text_overlap', 'severity': 'error'}]
+        with patch.object(package.check, 'check_classroom', return_value=issues), self.assertRaises(
+                package.PackageError) as caught:
+            package.package_lesson(self.lesson, self.build, self.out, **self.ids,
+                g7_owner_quote='直接发布这节课', g7_confirmed_at='2026-11-04T14:00:00+08:00')
+        self.assertEqual(caught.exception.args[0], 'gates_failed')
+        self.assertIn('G2 text_overlap', caught.exception.args[1])
+
     def test_the_verifier_may_not_be_an_author(self):
         self.ids['author_models'] = ['GPT-6.1-SOL']
         with self.assertRaises(package.PackageError) as caught:

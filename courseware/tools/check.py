@@ -1,5 +1,6 @@
 """Static courseware release checks; browser and editorial audits use receipts."""
 import argparse
+from datetime import datetime
 import hashlib
 import html
 import json
@@ -13,6 +14,7 @@ MEDIA_URL = re.compile(r'/api/classroom-media/[^/\s"\'<>]+/media/[^\s"\'<>+]+')
 HASH = re.compile(r'([0-9a-fA-F]{64})(?:\.[^./]+)?$')
 EMOJI = re.compile('[\U0001f000-\U0001faff\u2600-\u27bf\ufe0f\u20e3]')
 OPERATIONS = {'widget_highlight', 'widget_setState', 'widget_annotation', 'widget_reveal'}
+G7_OWNER_WAIVER_SCHEMA = 'mira.courseware.g7-owner-waiver.v1'
 
 
 # The spoken explanation a page must carry when a lesson is checked as a teaching lesson. The pilot lesson 整理和复习 averages
@@ -41,6 +43,70 @@ def teaching_goal_count(notes):
         return 0
     count = sum(isinstance(goal, str) and bool(goal.strip()) for goal in notes.get('objectives') or [])
     return count + sum(isinstance(notes.get(key), str) and bool(notes[key].strip()) for key in ('keyPoint', 'difficultPoint'))
+
+
+def g7_owner_waiver(body, notes, verification, *, user_quote, confirmed_at):
+    """Create a body-bound owner waiver without changing the earlier verification receipt."""
+    try:
+        stamp = datetime.fromisoformat(str(confirmed_at).replace('Z', '+00:00'))
+    except (TypeError, ValueError):
+        stamp = None
+    if (not isinstance(user_quote, str) or not user_quote.strip() or stamp is None
+            or stamp.utcoffset() is None or not isinstance(verification, dict)):
+        raise ValueError('g7_owner_waiver_invalid')
+    return {
+        'schemaVersion': G7_OWNER_WAIVER_SCHEMA,
+        'gate': 'G7',
+        'bodySha256': body_hash(body),
+        'notesSha256': body_hash(notes),
+        'priorVerificationSha256': body_hash(verification),
+        'confirmedBy': 'owner',
+        'userQuote': user_quote.strip(),
+        'confirmedAt': confirmed_at,
+        'reason': 'owner_direct_publication_without_independent_verification',
+    }
+
+
+def valid_g7_owner_waiver(value, body, notes, verification):
+    """Accept only the exact, current lesson scope and an untouched historical receipt."""
+    if not isinstance(value, dict) or set(value) != {
+            'schemaVersion', 'gate', 'bodySha256', 'notesSha256', 'priorVerificationSha256',
+            'confirmedBy', 'userQuote', 'confirmedAt', 'reason'}:
+        return False
+    try:
+        stamp = datetime.fromisoformat(str(value.get('confirmedAt', '')).replace('Z', '+00:00'))
+    except (TypeError, ValueError):
+        return False
+    return (value.get('schemaVersion') == G7_OWNER_WAIVER_SCHEMA
+            and value.get('gate') == 'G7'
+            and value.get('bodySha256') == body_hash(body)
+            and value.get('notesSha256') == body_hash(notes)
+            and isinstance(verification, dict)
+            and value.get('priorVerificationSha256') == body_hash(verification)
+            and value.get('confirmedBy') == 'owner'
+            and isinstance(value.get('userQuote'), str) and bool(value['userQuote'].strip())
+            and stamp.utcoffset() is not None
+            and value.get('reason') == 'owner_direct_publication_without_independent_verification')
+
+
+def apply_g7_owner_waiver(issues, waiver, body, notes, verification):
+    """Mark only G7 errors as waived; every other release gate stays blocking."""
+    if waiver is None:
+        return list(issues)
+    if not valid_g7_owner_waiver(waiver, body, notes, verification):
+        raise ValueError('g7_owner_waiver_invalid')
+    found = False
+    result = []
+    for issue in issues:
+        item = dict(issue)
+        if item.get('gate') == 'G7' and item.get('severity') == 'error':
+            item['severity'] = 'waived'
+            item['waiver'] = G7_OWNER_WAIVER_SCHEMA
+            found = True
+        result.append(item)
+    if not found:
+        raise ValueError('g7_owner_waiver_unnecessary')
+    return result
 
 
 def play_issues(receipt):

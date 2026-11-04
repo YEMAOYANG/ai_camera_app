@@ -1337,7 +1337,8 @@ class CourseArchiveExporter:
         _require(isinstance(light, dict) and set(light) == {
             "schemaVersion", "source", "gates", "confirmation", "evidence"}
             and light.get("schemaVersion") in {
-                "mira.courseware.light-release.v1", "mira.courseware.light-release.v2"},
+                "mira.courseware.light-release.v1", "mira.courseware.light-release.v2",
+                "mira.courseware.light-release.v3"},
             "light_release_schema_invalid")
         source = light.get("source")
         _require(isinstance(source, dict) and set(source) == {"stageId", "bodySha256"}
@@ -1353,8 +1354,11 @@ class CourseArchiveExporter:
             and confirmation.get("confirmedBy") == "owner", "light_release_confirmation_invalid")
         evidence = light.get("evidence")
         evidence_keys = {"notesSha256", "briefSha256", "receiptSha256", "verificationSha256"}
-        if light["schemaVersion"] == "mira.courseware.light-release.v2":
+        if light["schemaVersion"] in {
+                "mira.courseware.light-release.v2", "mira.courseware.light-release.v3"}:
             evidence_keys.add("playReceiptSha256")
+        if light["schemaVersion"] == "mira.courseware.light-release.v3":
+            evidence_keys.add("waiverSha256")
         _require(isinstance(evidence, dict) and set(evidence) == evidence_keys
             and all(isinstance(value, str) and re.fullmatch(r"[a-f0-9]{64}", value)
                     for value in evidence.values()), "light_release_evidence_invalid")

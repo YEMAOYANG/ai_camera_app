@@ -14,7 +14,7 @@ from content.courseware_release import build_release
 from content.textbook_catalog import canonical, digest
 from repositories.textbook_repository import TextbookRepository
 from services.courseware_publish_service import CoursewarePublishService
-from tests.test_courseware_release import sample_inputs, refresh_receipts
+from tests.test_courseware_release import sample_inputs, refresh_receipts, waive_g7
 
 
 def write_lesson(root, inputs):
@@ -26,6 +26,8 @@ def write_lesson(root, inputs):
             ('verification.json', inputs['verification']),
             ('roster.json', inputs['roster'])]:
         (root / filename).write_text(canonical(value), encoding='utf-8')
+    if inputs.get('ownerWaiver') is not None:
+        (root / 'owner-waiver.json').write_text(canonical(inputs['ownerWaiver']), encoding='utf-8')
     media = root / 'media'
     media.mkdir(exist_ok=True)
     for name, raw in inputs['media'].items():
@@ -69,6 +71,15 @@ class CoursewarePublishServiceTests(unittest.TestCase):
         write_lesson(self.lesson, self.inputs)
         result = self.service.check(self.lesson)
         self.assertEqual(result['errors'], ['verification_not_independent'])
+
+    def test_check_accepts_exact_owner_waiver_without_calling_it_a_pass(self):
+        waive_g7(self.inputs)
+        write_lesson(self.lesson, self.inputs)
+        result = self.service.check(self.lesson)
+        self.assertTrue(result['ok'], result)
+        self.assertFalse(result['gates']['G7']['passed'])
+        self.assertTrue(result['gates']['G7']['waived'])
+        self.assertIn('was not performed', result['prepared']['review']['basis'])
 
     def test_check_requires_estimated_minutes_in_identity(self):
         self.inputs['identity'].pop('estimatedMinutes')

@@ -21,13 +21,13 @@ from content.textbook_catalog import digest
 from content.textbook_release import validate_release
 
 
-def _checker():
+def _checker_module():
     # Backend-only test invocations do not put the repository root on sys.path.
     path = Path(__file__).resolve().parents[2] / 'courseware/tools/check.py'
     spec = importlib.util.spec_from_file_location('mira_courseware_check', path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.check_classroom
+    return module
 
 
 class CoursewarePublishService:
@@ -35,7 +35,9 @@ class CoursewarePublishService:
         self.repository = repository
         self.classroom_directory = Path(classroom_directory)
         self.manifest = manifest
-        self.checker = checker or _checker()
+        check_module = _checker_module()
+        self.checker = checker or check_module.check_classroom
+        self.apply_g7_owner_waiver = check_module.apply_g7_owner_waiver
         self.clock = clock or (lambda: int(time.time() * 1000))
 
     def _inputs(self, lesson_dir, confirmation):
@@ -44,6 +46,12 @@ class CoursewarePublishService:
         def read(name):
             path = root / name
             require(not path.is_symlink(), 'lesson_symlink')
+            return json.loads(path.read_text(encoding='utf-8'))
+        def read_optional(name):
+            path = root / name
+            if not path.exists():
+                return None
+            require(not path.is_symlink() and path.is_file(), 'lesson_symlink')
             return json.loads(path.read_text(encoding='utf-8'))
         identity = read('identity.json')
         manifest = self.manifest or identity.get('manifest')
@@ -58,6 +66,7 @@ class CoursewarePublishService:
             'notes': read('official-notes.json'), 'brief': read('brief.json'),
             'receipt': read('audit-receipt.json'), 'playReceipt': read('play-receipt.json'),
             'verification': read('verification.json'),
+            'ownerWaiver': read_optional('owner-waiver.json'),
             'roster': read('roster.json'), 'confirmation': confirmation if confirmation is not None else identity.get('confirmation')}
         media_dir = root / 'media'
         require(media_dir.is_dir() and not media_dir.is_symlink(), 'media_missing')
@@ -68,9 +77,11 @@ class CoursewarePublishService:
         inputs['media'] = media
         grade = manifest.get('gradeCode', '')
         grade = int(grade.split('_')[1]) if grade.startswith('primary_') and grade.split('_')[1].isdigit() else None
-        inputs['gateIssues'] = self.checker(inputs['body'], media_dir, notes=inputs['notes'], roster=inputs['roster'],
+        issues = self.checker(inputs['body'], media_dir, notes=inputs['notes'], roster=inputs['roster'],
             receipt=inputs['receipt'], play_receipt=inputs['playReceipt'], verification=inputs['verification'],
             grade=grade, teaching=True, require_play=True)
+        inputs['gateIssues'] = self.apply_g7_owner_waiver(
+            issues, inputs['ownerWaiver'], inputs['body'], inputs['notes'], inputs['verification'])
         return inputs
 
     def check(self, lesson_dir, *, confirmation=None):
