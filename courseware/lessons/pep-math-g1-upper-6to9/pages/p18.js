@@ -1,0 +1,9 @@
+(function(){
+var level=0,direction='left',marked=[],misses=0,busy=false;
+K.hud({icon:'●',title:'找位置',levels:6});K.owl();
+function draw(){K.$('#arrow').textContent=direction==='left'?'● ━━━━━━━━━━━▶':'◀━━━━━━━━━━━ ●';var box=K.$('#balloons'),order=direction==='left'?[0,1,2,3,4,5,6]:[6,5,4,3,2,1,0];box.innerHTML='';box.classList.toggle('from-right',direction==='right');order.forEach(function(i){var b=K.el('button','balloon','<span class="sprite" aria-hidden="true"></span>',box);b.id='balloon-'+(i+1);b.setAttribute('aria-label','气球 '+(i+1));var n=marked.indexOf(i);if(n>=0)K.el('span','mark',String(n+1),b);b.addEventListener('click',function(){tap(i,b)})});K.levels(6,marked.length)}
+function tap(i,b){if(busy)return;if(marked.indexOf(i)>=0)return;if(i!==(direction==='left'?marked.length:6-marked.length)){misses++;marked=[];K.sfx.no();K.say(misses===1?'先看箭头从哪边开始':misses===2?'从箭头起点逐只点数':'看示范：从右边数三只','no');draw();if(misses>=3)demo();return}marked.push(i);K.sfx.tick(marked.length);draw();if(marked.length<6)return;busy=true;K.sfx.ok();K.star(1,b);K.say('找到了！','ok');setTimeout(function(){level++;if(level===2){K.finish({title:'完成啦',sub:'再玩一次',again:reset});return}direction='right';marked=[];misses=0;busy=false;draw()},800)}
+function demo(){busy=true;direction='right';marked=[6,5,4];draw();K.$('#balloon-5').classList.add('selected');setTimeout(function(){direction=level?'right':'left';marked=[];busy=false;draw()},1800)}
+function reset(){level=0;direction='left';marked=[];misses=0;busy=false;K.stars=0;K.$('#star-n').textContent='0';draw();K.say('从箭头起点数一数')}
+K.onState=function(state){if(state.direction!==undefined){direction=state.direction;marked=[];draw()}if(state.marked!==undefined){marked=[];for(var i=0;i<Math.min(7,state.marked);i++)marked.push(direction==='right'?6-i:i);draw()}if(state.demo)demo()};K.ready({emoji:'🌲',title:'从另一边找位置',sub:'换方向找气球'});reset();
+})();

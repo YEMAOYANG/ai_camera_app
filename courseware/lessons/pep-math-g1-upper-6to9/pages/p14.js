@@ -1,0 +1,13 @@
+(function(){
+var level=0,aligned=false,selected='',tries=0,busy=false,timer;
+K.hud({icon:'▦',title:'比较相邻数量',levels:2});K.owl();K.ready({emoji:'🌲',title:'比较相邻数量',sub:'对齐彩带比大小'});
+function draw(id,n,color){var s='<svg viewBox="0 0 1080 150" preserveAspectRatio="xMinYMid meet">';for(var i=0;i<n;i++)s+='<rect x="'+(i*120+3)+'" y="12" width="112" height="120" rx="14" fill="'+color+'" stroke="#fff" stroke-width="5"/>';K.$(id).innerHTML=s+'</svg>'}
+function render(){var a=level?8:6,b=level?9:5;draw('#ribbon-a',a,'#f6a935');draw('#ribbon-b',b,'#4c8ddb');K.$('#ribbon-b').style.left=aligned?'70px':'170px';K.$('#ribbon-a').classList.toggle('selected',selected==='a');K.$('#ribbon-b').classList.toggle('selected',selected==='b');K.$('#left-num').textContent=level?a:a;K.$('#right-num').textContent=b;K.$('#slot').textContent='?';K.$('#task').textContent=level?'◀ 较短':'较长 ▶';var e=K.$('#edge');e.style.left=(70+(level?8:5)*850/9)+'px';e.style.top=(level?215:50)+'px';e.style.borderColor='transparent'}
+function reset(){clearTimeout(timer);level=0;aligned=false;selected='';tries=0;busy=false;K.stars=0;K.$('#star-n').textContent='0';K.levels(2,0);render();K.say('先把彩带的起点对齐')}
+function miss(){tries++;K.sfx.no();if(tries===1)K.say('先看两条彩带的起点和末端','no');else if(tries===2){K.say('对齐起点，再看末端多出的一格','no');K.highlight('#edge')}else{aligned=true;render();K.$('#edge').style.borderColor='var(--rd)';K.say('看，对齐后多出一格','no')}}
+['a','b'].forEach(function(id){K.drag(K.$('#ribbon-'+id),{enabled:function(){return K.started&&!busy},targets:function(){return [K.$('#ribbon-a')]},onDrop:function(e,t){if(id==='b'&&t){aligned=true;selected='';render();K.sfx.drop();K.say('起点对齐了，选一条彩带')}else miss()},onTap:function(){if(!aligned){miss();return}selected=id;render();K.sfx.pick();K.say('再选一个符号')}})});
+function answer(sign){if(!K.started||busy)return;if(!aligned||!selected){miss();return}if(!(selected==='a'&&sign===(level?'<':'>'))){selected='';render();miss();return}busy=true;K.$('#slot').textContent=sign;K.sfx.ok();K.star(1,K.$('#slot'));K.say('比对了！','ok');timer=setTimeout(function(){if(!level){level=1;aligned=false;selected='';tries=0;busy=false;K.levels(2,1);render();K.say('对齐后找较短的彩带')}else{K.levels(2,2);K.finish({title:'完成啦',sub:'再玩一次',again:reset})}},1000)}
+K.$('#greater').onclick=function(){answer('>')};K.$('#less').onclick=function(){answer('<')};
+K.onState=function(state){if(typeof state.aligned==='boolean'){aligned=state.aligned;render()}if(state.demo){busy=true;aligned=true;render();K.$('#edge').style.borderColor='var(--rd)';K.$('#slot').textContent='>';clearTimeout(timer);timer=setTimeout(function(){busy=false;aligned=false;selected='';render();K.say('你来对齐彩带')},1800)}};
+reset();
+})();

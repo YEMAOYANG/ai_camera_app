@@ -1,0 +1,1 @@
+K.ready({title:'开始',sub:'选一选'});K.onState=function(s){if(s.step)K.$('#go').disabled=false};K.$('#go').onclick=function(){K.finish({title:'完成',sub:'真棒'})};

@@ -1,0 +1,1333 @@
+{
+ "schemaVersion": "mira.courseware.lesson.v1",
+ "title": "江南：第一课时",
+ "description": "借助图画和听读认识生字，感受莲塘诗意并观察可、叶的字形。",
+ "grade": 1,
+ "roster": {
+  "teacher": {
+   "name": "小语老师",
+   "role": "teacher",
+   "gender": "female",
+   "voice": "Serena",
+   "avatar": "/avatars/teacher-2.png",
+   "color": "#D65A8A",
+   "persona": "温柔亲切的女老师，说话清楚有节奏，喜欢用图画和儿歌带孩子认字读诗；孩子答错时先让孩子再听一遍、再看一眼。"
+  }
+ },
+ "images": {
+  "water-town": {
+   "file": "assets/water-town.png"
+  },
+  "pond": {
+   "file": "assets/pond.png"
+  },
+  "word-scenes": {
+   "file": "assets/word-scenes.png"
+  },
+  "river": {
+   "file": "assets/river.png"
+  },
+  "mountain": {
+   "file": "assets/mountain.png"
+  },
+  "tree": {
+   "file": "assets/tree.png"
+  },
+  "dense": {
+   "file": "assets/dense.png"
+  },
+  "sparse": {
+   "file": "assets/sparse.png"
+  },
+  "empty": {
+   "file": "assets/empty.png"
+  },
+  "jiangnan-game-sprites-v2": {
+   "file": "assets/jiangnan-game-sprites-v2.png"
+  }
+ },
+ "scenes": [
+  {
+   "key": "p01",
+   "type": "slide",
+   "title": "走进水乡",
+   "template": "big-word",
+   "data": {
+    "title": "走进水乡",
+    "word": "江南",
+    "pinyin": "jiāng nán",
+    "hint": "江 jiāng：江河　南 nán：方向的南\n江南：长江中下游以南",
+    "picture": "water-town"
+   },
+   "script": [
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "小船驶过石桥，我们到水乡来读一首诗。"
+    },
+    {
+     "say": "图上有河水和莲叶，先把这幅画记在心里。"
+    },
+    {
+     "spotlight": "word"
+    },
+    {
+     "say": "诗的名字叫江南，题目告诉我们写的是哪里。"
+    },
+    {
+     "say": "把两个字连起来读，江南，别把字音读丢。"
+    },
+    {
+     "spotlight": "pinyin"
+    },
+    {
+     "say": "江，第一声，声音平平的，跟老师读。"
+    },
+    {
+     "say": "南，第二声，声音往上扬，再跟着读。"
+    },
+    {
+     "spotlight": "hint"
+    },
+    {
+     "say": "下面的提示里，江就是江河的江，让人想到水。"
+    },
+    {
+     "say": "小满问：江南的南，是方向的南吗？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "是呀，江南指长江中下游以南的地方。"
+    },
+    {
+     "say": "猫头鹰站长提醒我们：听字音，也要想画面。",
+     "by": "owl"
+    },
+    {
+     "say": "记住江河这个词，就把江的字音和意思连上了。"
+    },
+    {
+     "say": "江和水有什么联系呢？我们去看看这个字。"
+    }
+   ]
+  },
+  {
+   "key": "p02",
+   "type": "interactive",
+   "title": "找出水字旁",
+   "page": "p02",
+   "widgetType": "game",
+   "startImage": "water-town",
+   "script": [
+    {
+     "highlight": "#jiang"
+    },
+    {
+     "say": "这张字卡读江，先想江河里有什么。"
+    },
+    {
+     "say": "江河里有水，找图时就要留意流动的水。"
+    },
+    {
+     "highlight": "#river"
+    },
+    {
+     "say": "老师用河流图示范，水纹能帮我们认出河。"
+    },
+    {
+     "say": "老师先示范：看字形，再找图片里的线索。"
+    },
+    {
+     "setState": {
+      "demo": "river"
+     }
+    },
+    {
+     "say": "示范结束了，接着看看江字左边的部分。"
+    },
+    {
+     "highlight": "#water-radical"
+    },
+    {
+     "say": "江左边的三点水，正是在提醒我们想水。"
+    },
+    {
+     "say": "这个偏旁叫三点水，认江时别漏看左边。"
+    },
+    {
+     "say": "朵朵说：我把字音和水的画面连起来记。",
+     "by": "duoduo"
+    },
+    {
+     "say": "现在轮到你，把江字送到与水有关的图旁。"
+    },
+    {
+     "say": "可以拖字卡过去，也可以点你选的那幅图。"
+    },
+    {
+     "say": "图的位置变了也别急，先观察，再作选择。"
+    }
+   ]
+  },
+  {
+   "key": "words-picking",
+   "type": "slide",
+   "title": "可采莲是什么意思",
+   "template": "big-word",
+   "data": {
+    "title": "听字音，想意思",
+    "word": "可采莲",
+    "pinyin": "kě cǎi lián",
+    "picture": "pond",
+    "hint": "可：可以　采：采摘　莲：莲花、莲叶"
+   },
+   "script": [
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "莲塘里可以做什么？先认识三个字朋友。"
+    },
+    {
+     "spotlight": "word"
+    },
+    {
+     "say": "可、采、莲三个字连起来，我们读作可采莲。"
+    },
+    {
+     "spotlight": "pinyin"
+    },
+    {
+     "say": "可，第三声，先听老师读，再跟着读。"
+    },
+    {
+     "say": "采，也是第三声，听清声音再跟着读。"
+    },
+    {
+     "say": "莲，第二声，声音往上扬，再跟着读。"
+    },
+    {
+     "spotlight": "hint"
+    },
+    {
+     "say": "下面的提示告诉我们，可就是可以的意思。"
+    },
+    {
+     "say": "说可以去采莲，就是说能够去采莲。"
+    },
+    {
+     "say": "采是采摘的采，采莲是采摘莲，不是看一看莲。"
+    },
+    {
+     "say": "小满问：采莲里的莲，和莲花有关吗？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "是呀，莲是莲花的莲，莲花和莲叶帮你记住它。"
+    },
+    {
+     "say": "可、采、莲连起来，告诉我们可以去采莲。"
+    },
+    {
+     "say": "朵朵说：我先听清字音，再想它的意思。",
+     "by": "duoduo"
+    }
+   ]
+  },
+  {
+   "key": "words-playing",
+   "type": "slide",
+   "title": "小鱼在哪里玩",
+   "template": "two-columns",
+   "data": {
+    "title": "小鱼玩耍，莲叶之间",
+    "left": {
+     "heading": "戏 xì",
+     "body": "游戏　玩耍"
+    },
+    "right": {
+     "heading": "间 jiān",
+     "body": "中间　莲叶之间"
+    },
+    "left_picture": "pond",
+    "right_picture": "pond"
+   },
+   "script": [
+    {
+     "spotlight": "left-heading"
+    },
+    {
+     "say": "先听左边这个字：戏，第四声，声音往下落。"
+    },
+    {
+     "spotlight": "left-body"
+    },
+    {
+     "say": "左边的词语告诉我们，游戏的戏就是玩耍。"
+    },
+    {
+     "say": "小鱼游到莲叶旁，好像在和莲叶做游戏。"
+    },
+    {
+     "say": "读到鱼戏时，心里想一想小鱼玩耍的样子。"
+    },
+    {
+     "spotlight": "right-heading"
+    },
+    {
+     "say": "小满问：右边这个字，能说清小鱼的位置吗？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "这个字读间，第一声，声音要读得平平的。"
+    },
+    {
+     "spotlight": "right-body"
+    },
+    {
+     "say": "右边写着中间，中间的间帮我们说清位置。"
+    },
+    {
+     "say": "说莲叶之间，就想到小鱼游在莲叶之间。"
+    },
+    {
+     "say": "小鱼在什么地方玩？就在一片片莲叶之间。"
+    },
+    {
+     "say": "朵朵说：戏告诉我做什么，间告诉我在哪里。",
+     "by": "duoduo"
+    },
+    {
+     "say": "记字时想想意思，等会儿给字卡找图就有办法。"
+    }
+   ]
+  },
+  {
+   "key": "words-directions",
+   "type": "slide",
+   "title": "认一认方向字",
+   "template": "summary",
+   "data": {
+    "title": "听清方向的名字",
+    "items": [
+     "东 dōng　西 xī",
+     "南 nán　北 běi",
+     "东西南北 dōng xī nán běi"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "title"
+    },
+    {
+     "say": "小鱼一会儿游到这边，一会儿又游到那边。"
+    },
+    {
+     "say": "说清楚是哪边，可以用东、西、南、北。"
+    },
+    {
+     "spotlight": "item-1"
+    },
+    {
+     "say": "东，第一声，声音平平的，是东方的东。"
+    },
+    {
+     "say": "西，也是第一声，声音平平的，连起来读东、西。"
+    },
+    {
+     "say": "这里的东、西说两个方向，要把字音读清楚。"
+    },
+    {
+     "spotlight": "item-2"
+    },
+    {
+     "say": "南，第二声，声音往上扬，江南里也有它。"
+    },
+    {
+     "say": "北，第三声，跟老师读北，是北方的北。"
+    },
+    {
+     "say": "小满问：南和北，是同一个方向吗？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "南和北是不同的方向，不能把名字叫反。"
+    },
+    {
+     "spotlight": "item-3"
+    },
+    {
+     "say": "一起连起来读：东西南北，四个方向不漏掉。"
+    },
+    {
+     "say": "朵朵说：我记住名字，再听它说的是哪边。",
+     "by": "duoduo"
+    },
+    {
+     "say": "听清东西南北的名字，再把声音和方向连起来。"
+    }
+   ]
+  },
+  {
+   "key": "p03",
+   "type": "interactive",
+   "title": "莲叶上找同一个字",
+   "page": "p03",
+   "widgetType": "game",
+   "startImage": "water-town",
+   "script": [
+    {
+     "say": "刚才认过字，现在看大字，在莲叶上找完全相同的字。"
+    },
+    {
+     "highlight": "#character"
+    },
+    {
+     "say": "老师先用莲示范，莲读第二声。"
+    },
+    {
+     "highlight": "#lotus"
+    },
+    {
+     "say": "三片莲叶各有一个字，要找和大字完全相同的莲。"
+    },
+    {
+     "say": "老师比一比笔画，把小鱼送到写着莲的叶子旁。"
+    },
+    {
+     "setState": {
+      "demo": "lotus"
+     }
+    },
+    {
+     "say": "两个莲字形完全相同，不能靠猜图或猜位置。"
+    },
+    {
+     "highlight": "#grass-radical"
+    },
+    {
+     "say": "莲上面是草字头，也能帮助我们认清这个字。"
+    },
+    {
+     "say": "认莲时先听清第二声，再从上到下看字形。"
+    },
+    {
+     "say": "猫头鹰站长提醒我们：字音、字形一起记。",
+     "by": "owl"
+    },
+    {
+     "say": "接下来大字会更换，三片叶子上的字也会换位置。"
+    },
+    {
+     "say": "每一轮都要重新听、重新看，不能记住固定位置。"
+    },
+    {
+     "say": "轮到你了，先看大字，再逐笔比较三个小字。"
+    },
+    {
+     "say": "点莲叶或拖小鱼过去，错了就从头再比一次。"
+    }
+   ]
+  },
+  {
+   "key": "p04",
+   "type": "slide",
+   "title": "词语听音连图",
+   "template": "picture-points",
+   "data": {
+    "title": "听词看图",
+    "picture": "word-scenes",
+    "points": [
+     "可口 kě kǒu",
+     "游戏 yóu xì",
+     "中间 zhōng jiān",
+     "东西南北 dōng xī nán běi"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "title"
+    },
+    {
+     "say": "字还能组成词，词能把意思说得更明白。"
+    },
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "这幅图把食物、小鱼和方向放在同一个情景里。"
+    },
+    {
+     "spotlight": "point-1"
+    },
+    {
+     "say": "看食物图，饭菜好吃，我们可以说可口。"
+    },
+    {
+     "say": "可口，跟老师读，读词时别漏了这个口。"
+    },
+    {
+     "spotlight": "point-2"
+    },
+    {
+     "say": "小鱼玩耍像在做游戏，游戏，跟老师读。"
+    },
+    {
+     "say": "小满问：游戏的戏，也能用在诗里吗？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "能呀，鱼戏莲叶间，就是小鱼在莲叶间玩耍。"
+    },
+    {
+     "spotlight": "point-3"
+    },
+    {
+     "say": "中间，跟老师读，想想两边之间的位置。"
+    },
+    {
+     "say": "比如你坐在爸爸妈妈中间，两边各有一个人。"
+    },
+    {
+     "spotlight": "point-4"
+    },
+    {
+     "say": "再读东西南北，这个词说的是四个方向。"
+    },
+    {
+     "say": "朵朵说：把词语放进小情景，意思就明白了。",
+     "by": "duoduo"
+    }
+   ]
+  },
+  {
+   "key": "p05",
+   "type": "quiz",
+   "title": "生字和词语小检查",
+   "intro": [
+    "听老师读题，再从图片里慢慢选一选。",
+    "先想字的意思和位置，再仔细看看每幅图。",
+    "不急着点，想好了再选，不确定就再听一遍。"
+   ],
+   "questions": [
+    {
+     "id": "q1",
+     "question": "江字有三点水，哪幅图和水有关？",
+     "skill": "识读带三点水的字",
+     "answer": [
+      "B"
+     ],
+     "analysis": "河里有水，江的三点水提示水义。",
+     "options": {
+      "A": {
+       "label": "山",
+       "visual": {
+        "kind": "asset",
+        "image": "mountain",
+        "alt": "山"
+       }
+      },
+      "B": {
+       "label": "河",
+       "visual": {
+        "kind": "asset",
+        "image": "river",
+        "alt": "河"
+       }
+      },
+      "C": {
+       "label": "树",
+       "visual": {
+        "kind": "asset",
+        "image": "tree",
+        "alt": "树"
+       }
+      }
+     }
+    },
+    {
+     "id": "q2",
+     "question": "哪幅图里黄色圆点在中间？",
+     "skill": "理解词语中间的位置",
+     "answer": [
+      "C"
+     ],
+     "analysis": "中间的黄色圆点两侧都有圆点。",
+     "options": {
+      "A": {
+       "label": "黄色在左",
+       "visual": {
+        "kind": "picture",
+        "alt": "黄色在左",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "🟡"
+            },
+            {
+             "glyph": "🔵"
+            },
+            {
+             "glyph": "🔵"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      },
+      "B": {
+       "label": "黄色在右",
+       "visual": {
+        "kind": "picture",
+        "alt": "黄色在右",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "🔵"
+            },
+            {
+             "glyph": "🔵"
+            },
+            {
+             "glyph": "🟡"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      },
+      "C": {
+       "label": "黄色在中间",
+       "visual": {
+        "kind": "picture",
+        "alt": "黄色在中间",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "🔵"
+            },
+            {
+             "glyph": "🟡"
+            },
+            {
+             "glyph": "🔵"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "key": "p06",
+   "type": "slide",
+   "title": "听诗看画面",
+   "template": "picture-points",
+   "data": {
+    "title": "江南",
+    "picture": "pond",
+    "points": [
+     "江南／可采莲\njiāng nán kě cǎi lián",
+     "莲叶／何田田\nlián yè hé tián tián",
+     "鱼戏／莲叶间\nyú xì lián yè jiān"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "title"
+    },
+    {
+     "say": "这些字住进了一首汉乐府民歌，名字叫江南。"
+    },
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "听诗时把字变成画面，就像坐船来到莲塘。"
+    },
+    {
+     "spotlight": "point-1"
+    },
+    {
+     "say": "第一句跟着老师这样读：江南，可采莲。"
+    },
+    {
+     "say": "江南读完轻轻停一下，再把可采莲连着读。"
+    },
+    {
+     "say": "这句说在江南可以采莲，让人想到采莲的情景。"
+    },
+    {
+     "spotlight": "point-2"
+    },
+    {
+     "say": "第二句：莲叶，何田田。读出赞美的感觉。"
+    },
+    {
+     "say": "这里夸莲叶长得真茂盛，一片连着一片。"
+    },
+    {
+     "say": "朵朵说：我听着诗，心里看见了绿绿的莲叶。",
+     "by": "duoduo"
+    },
+    {
+     "say": "莲叶读后轻轻停，再连着读后半句何田田。"
+    },
+    {
+     "spotlight": "point-3"
+    },
+    {
+     "say": "第三句：鱼戏，莲叶间。戏是玩耍的意思。"
+    },
+    {
+     "say": "这句让我们看见小鱼在莲叶之间游来游去。"
+    },
+    {
+     "say": "鱼戏读后轻轻停，再连着读后半句莲叶间。"
+    },
+    {
+     "say": "猫头鹰站长提醒我们：停一下，意思别断开。",
+     "by": "owl"
+    }
+   ]
+  },
+  {
+   "key": "fish-verses",
+   "type": "slide",
+   "title": "小鱼游向四方",
+   "template": "picture-points",
+   "data": {
+    "title": "鱼戏莲叶东、西、南、北",
+    "picture": "pond",
+    "points": [
+     "鱼戏／莲叶东\nyú xì lián yè dōng",
+     "鱼戏／莲叶西\nyú xì lián yè xī",
+     "鱼戏／莲叶南\nyú xì lián yè nán",
+     "鱼戏／莲叶北\nyú xì lián yè běi"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "小鱼还会游到哪里呢？接着听后面的四句。"
+    },
+    {
+     "spotlight": "point-1"
+    },
+    {
+     "say": "鱼戏，莲叶东。小鱼在莲叶东边玩耍。"
+    },
+    {
+     "spotlight": "point-2"
+    },
+    {
+     "say": "鱼戏，莲叶西。小鱼又在莲叶西边玩耍。"
+    },
+    {
+     "say": "小满问：两句听起来很像，哪里换了呢？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "前面还是鱼戏莲叶，最后的方向字换了。"
+    },
+    {
+     "spotlight": "point-3"
+    },
+    {
+     "say": "鱼戏，莲叶南。这句说小鱼在莲叶南边玩。"
+    },
+    {
+     "spotlight": "point-4"
+    },
+    {
+     "say": "鱼戏，莲叶北。这句说小鱼在莲叶北边玩。"
+    },
+    {
+     "say": "读这四句，都在鱼戏后轻停，再读莲叶和方向。"
+    },
+    {
+     "say": "朵朵说：听清最后一个字，就知道换到了哪边。",
+     "by": "duoduo"
+    },
+    {
+     "say": "同样的句式反复读，小鱼四处玩耍的画面更清楚。"
+    }
+   ]
+  },
+  {
+   "key": "p07",
+   "type": "interactive",
+   "title": "给诗句安上节拍",
+   "page": "p07",
+   "widgetType": "game",
+   "startImage": "pond",
+   "script": [
+    {
+     "highlight": "#verse"
+    },
+    {
+     "say": "老师先用江南这句示范：江南，可采莲。"
+    },
+    {
+     "setState": {
+      "demo": "pause"
+     }
+    },
+    {
+     "say": "刚才两段水波一起提醒我们，停顿要轻轻的。"
+    },
+    {
+     "highlight": "#pause-slot-1"
+    },
+    {
+     "say": "江南先说地方，停顿就放在江南后面。"
+    },
+    {
+     "say": "后半句可采莲连着读，意思就不会读散。"
+    },
+    {
+     "say": "停顿不是把每个字隔开，是让诗句有节奏。"
+    },
+    {
+     "highlight": "#verse"
+    },
+    {
+     "say": "接下来看看新的诗句，留心它和示范不同。"
+    },
+    {
+     "highlight": "#beat"
+    },
+    {
+     "say": "这个水波标记，就是你要移动的停顿提醒。"
+    },
+    {
+     "say": "先听一句话，再想哪里声音轻轻歇了一下。"
+    },
+    {
+     "say": "听清再拖标记，也可以点你选中的空隙。"
+    },
+    {
+     "say": "做完再跟着轻声读，把句子的画面连起来想。"
+    }
+   ]
+  },
+  {
+   "key": "p08",
+   "type": "interactive",
+   "title": "莲叶有多少",
+   "page": "p08",
+   "widgetType": "game",
+   "startImage": "pond",
+   "script": [
+    {
+     "say": "莲叶何田田，在夸莲叶长得茂盛，真好看。"
+    },
+    {
+     "highlight": "#fish"
+    },
+    {
+     "say": "先看老师比较两片水面，再让小鱼去做客。"
+    },
+    {
+     "highlight": "#pond-1"
+    },
+    {
+     "say": "老师从这一片开始看，观察叶子挨得密不密。"
+    },
+    {
+     "say": "再看看另一片，比较哪片莲叶更多、更密。"
+    },
+    {
+     "highlight": "#leaf-1"
+    },
+    {
+     "say": "只看一片叶子不够，还要看旁边连着多少叶子。"
+    },
+    {
+     "say": "老师让鱼游向叶子密的一片，因为那里更茂盛。"
+    },
+    {
+     "setState": {
+      "demo": "dense"
+     }
+    },
+    {
+     "say": "小鱼来到叶子密的地方，展开的叶片连成一片。"
+    },
+    {
+     "say": "茂盛就是叶子多又密，我们要看整片水面。"
+    },
+    {
+     "say": "田田不是一片孤单的叶子，是莲叶繁茂的样子。"
+    },
+    {
+     "say": "轮到你时，先比较两片水面，再把小鱼送过去。"
+    },
+    {
+     "say": "每次都重新观察，不要一直只点同一边。"
+    },
+    {
+     "say": "拖小鱼或点水面都可以，选之前先想为什么。"
+    }
+   ]
+  },
+  {
+   "key": "lotus-pattern",
+   "type": "slide",
+   "title": "每句都有莲",
+   "template": "picture-points",
+   "data": {
+    "title": "莲 lián：草字头",
+    "picture": "pond",
+    "points": [
+     "采莲　莲叶",
+     "莲叶田田：莲叶繁茂",
+     "七句诗，每句都有莲"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "title"
+    },
+    {
+     "say": "莲，第二声，声音向上扬，上面有草字头。"
+    },
+    {
+     "say": "草字头提示和植物有关，莲花莲叶帮我们记。"
+    },
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "刚才看见一片片莲叶，再来看看诗里的莲。"
+    },
+    {
+     "spotlight": "point-1"
+    },
+    {
+     "say": "听到采莲想采莲的情景，听到莲叶想绿叶。"
+    },
+    {
+     "spotlight": "point-2"
+    },
+    {
+     "say": "说莲叶田田时，就想到叶子多又密的画面。"
+    },
+    {
+     "say": "猫头鹰站长提醒我们：读诗认字，也要想意思。",
+     "by": "owl"
+    },
+    {
+     "spotlight": "point-3"
+    },
+    {
+     "say": "小满问：诗里怎么总是能听到莲这个字？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "第一句采莲有莲，第二句莲叶也有莲。"
+    },
+    {
+     "say": "鱼戏莲叶间有莲，后面四句也都说到莲叶。"
+    },
+    {
+     "say": "这样一句一句找，七句诗里每句都有一个莲。"
+    }
+   ]
+  },
+  {
+   "key": "p09",
+   "type": "quiz",
+   "title": "读诗与理解小检查",
+   "intro": [
+    "这次听诗句的声音，再看图想一想诗里的画面。",
+    "先听清在哪里歇了一下，再比较图片的不同。",
+    "想想刚才读诗看画的办法，选好后再点图片。"
+   ],
+   "questions": [
+    {
+     "id": "q3",
+     "question": "听老师读：江南，可采莲。哪幅图的停顿一样？",
+     "skill": "按停顿朗读诗句",
+     "answer": [
+      "A"
+     ],
+     "analysis": "江南两个字，可采莲三个字，中间停一下。",
+     "options": {
+      "A": {
+       "label": "两个字后停",
+       "visual": {
+        "kind": "picture",
+        "alt": "两个字后停",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          },
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      },
+      "B": {
+       "label": "三个字后停",
+       "visual": {
+        "kind": "picture",
+        "alt": "三个字后停",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          },
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      },
+      "C": {
+       "label": "一个字后停",
+       "visual": {
+        "kind": "picture",
+        "alt": "一个字后停",
+        "picture": {
+         "groups": [
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            }
+           ]
+          },
+          {
+           "cells": [
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            },
+            {
+             "glyph": "👏"
+            }
+           ]
+          }
+         ]
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "q4",
+     "question": "哪幅图最能让你想到莲叶田田？",
+     "skill": "理解莲叶繁茂",
+     "answer": [
+      "B"
+     ],
+     "analysis": "莲叶田田让人想到莲叶繁茂相连。",
+     "options": {
+      "A": {
+       "label": "空水面",
+       "visual": {
+        "kind": "asset",
+        "image": "empty",
+        "alt": "空水面"
+       }
+      },
+      "B": {
+       "label": "莲叶繁茂",
+       "visual": {
+        "kind": "asset",
+        "image": "dense",
+        "alt": "莲叶繁茂"
+       }
+      },
+      "C": {
+       "label": "莲叶稀疏",
+       "visual": {
+        "kind": "asset",
+        "image": "sparse",
+        "alt": "莲叶稀疏"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "key": "writing-shapes",
+   "type": "slide",
+   "title": "口在哪里，钩怎么写",
+   "template": "two-columns",
+   "data": {
+    "title": "先观察，再写字",
+    "left": {
+     "heading": "可 kě",
+     "body": "口在横的下面\n竖钩写直，和了的弯钩不同"
+    },
+    "right": {
+     "heading": "叶 yè",
+     "body": "口在左，十在右\n正确、规范、整洁"
+    }
+   },
+   "script": [
+    {
+     "spotlight": "title"
+    },
+    {
+     "say": "诗里有可和叶，两个字都藏着一个口。"
+    },
+    {
+     "spotlight": "left-heading"
+    },
+    {
+     "say": "左边这个字读可，第三声，跟老师读一读。"
+    },
+    {
+     "spotlight": "left-body"
+    },
+    {
+     "say": "可的口，在最上面那一横的下面，看清楚。"
+    },
+    {
+     "say": "可一共五笔：先写横，再写竖，再写横折。"
+    },
+    {
+     "say": "然后写横，把口封住，最后写竖钩。"
+    },
+    {
+     "say": "再看看可的竖钩，竖的部分要写直。"
+    },
+    {
+     "say": "了的钩是弯钩，不能照着它把可的竖钩写弯。"
+    },
+    {
+     "say": "朵朵说：我记住口的位置，也记住竖钩要直。",
+     "by": "duoduo"
+    },
+    {
+     "spotlight": "right-heading"
+    },
+    {
+     "say": "右边这个字读叶，第四声，是莲叶、树叶的叶。"
+    },
+    {
+     "spotlight": "right-body"
+    },
+    {
+     "say": "叶的口在左边，十在右边，位置和可不一样。"
+    },
+    {
+     "say": "叶也是五笔：先写口，就是竖、横折、横。"
+    },
+    {
+     "say": "再写十，先写横，最后写竖。"
+    },
+    {
+     "say": "小满问：都有口，我能把口放在同一个地方吗？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "不能呀，部件位置放对了，才是我们要写的字。"
+    },
+    {
+     "say": "写好后比一比，字要正确、规范，还要整洁。"
+    }
+   ]
+  },
+  {
+   "key": "p10",
+   "type": "interactive",
+   "title": "看一看，写一写",
+   "page": "p10",
+   "widgetType": "game",
+   "startImage": "pond",
+   "script": [
+    {
+     "highlight": "#character"
+    },
+    {
+     "say": "先观察可和叶的样子，别一上来就急着描。"
+    },
+    {
+     "highlight": "#mouth"
+    },
+    {
+     "say": "可的口在横的下面，叶的口在左边，位置要记清。"
+    },
+    {
+     "highlight": "#hook"
+    },
+    {
+     "say": "老师描可时要留意竖钩，竖的部分写直。"
+    },
+    {
+     "say": "因为这是竖钩，不能把它写成了的弯钩。"
+    },
+    {
+     "say": "描可时按笔顺：横、竖、横折、横，最后竖钩。"
+    },
+    {
+     "say": "老师先沿着淡色的字描一小段，看手指跟着字形走。"
+    },
+    {
+     "setState": {
+      "demo": "trace"
+     }
+    },
+    {
+     "say": "慢慢移动，留心淡色字的形状，不乱涂一大片。"
+    },
+    {
+     "say": "现在擦去示范，你先描可，接着再观察叶。"
+    },
+    {
+     "setState": {
+      "phase": "play"
+     }
+    },
+    {
+     "say": "示范的描迹擦干净了，淡色的字留给你来描。"
+    },
+    {
+     "say": "描叶时记住口在左、十在右，照着字形描。"
+    },
+    {
+     "say": "叶的笔顺：先写口，再写十，十先横后竖。"
+    },
+    {
+     "say": "星星表示描过，还要看字是否正确、规范、整洁。"
+    },
+    {
+     "say": "页面会分步显示笔顺，描写时请大人帮你一起看。"
+    },
+    {
+     "say": "描过后在纸上写可和叶，请大人一起看看。"
+    },
+    {
+     "say": "对照范字查一查：正确吗，规范吗，整洁吗？"
+    }
+   ]
+  },
+  {
+   "key": "recap",
+   "type": "slide",
+   "title": "带着诗里的画回家",
+   "template": "summary",
+   "data": {
+    "title": "今天带走的好办法",
+    "items": [
+     "认字：听字音，想意思，看偏旁",
+     "读诗：轻轻停顿，心里有画面",
+     "莲叶田田：莲叶多又密；每句都有莲",
+     "写字：看口的位置，可的竖钩写直"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "title"
+    },
+    {
+     "say": "小船要靠岸了，把今天的好办法装进行囊。"
+    },
+    {
+     "spotlight": "item-1"
+    },
+    {
+     "say": "认字要听准声音，再把字和词语的意思连起来。"
+    },
+    {
+     "say": "江的三点水提示水，莲的草字头提示植物。"
+    },
+    {
+     "spotlight": "item-2"
+    },
+    {
+     "say": "读诗要轻轻停顿，词语连着读，心里想着画面。"
+    },
+    {
+     "spotlight": "item-3"
+    },
+    {
+     "say": "莲叶田田说莲叶多又密，读的时候想象绿叶。"
+    },
+    {
+     "say": "朵朵说：我还发现，七句诗每句都能找到莲。",
+     "by": "duoduo"
+    },
+    {
+     "spotlight": "item-4"
+    },
+    {
+     "say": "可的口在横的下面，叶的口在左边，别放错位置。"
+    },
+    {
+     "say": "猫头鹰站长提醒我们：可的竖钩要写直。",
+     "by": "owl"
+    },
+    {
+     "say": "回家找本书，看看可或叶的口分别在哪里。"
+    },
+    {
+     "say": "再把江南读给家人听，请他们听字音和停顿。"
+    }
+   ]
+  }
+ ]
+}

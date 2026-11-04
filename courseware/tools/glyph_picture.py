@@ -18,9 +18,24 @@ def _is_emoji(glyph):
     return any(ord(c) >= 0x1F000 or unicodedata.category(c) == 'So' for c in glyph)
 
 
+def _size(spec):
+    size = spec.get('size', _SIZE)
+    if (not isinstance(size, (list, tuple)) or len(size) != 2 or not all(type(v) is int and 120 <= v <= 2000 for v in size)):
+        raise ValueError('invalid size')
+    return tuple(size)
+
+
 def _layout_cells(spec):
-    """Return cell positions in logical units and the total layout dimensions."""
+    """Return cell positions in logical units and the total layout dimensions.
+
+    The default layout puts the groups side by side; layout 'rows' puts every group on a row of its own."""
     groups = spec['groups']
+    layout = spec.get('layout', 'row')
+    if layout not in {'row', 'rows'}:
+        raise ValueError('invalid layout')
+    if layout == 'rows':
+        return ([(x, y, cell) for y, group in enumerate(groups) for x, cell in enumerate(group['cells'])], [],
+                max(len(group['cells']) for group in groups) or 1, len(groups) or 1)
     separator = spec.get('separator', 'gap')
     if separator not in {'gap', 'plus', 'equals', 'none'}:
         raise ValueError('invalid separator')
@@ -44,15 +59,24 @@ def _layout_cells(spec):
 
 def render_picture(spec):
     cells, signs, width, height = _layout_cells(spec)
+    size = _size(spec)
     unit = 200
     canvas = Image.new('RGBA', (math.ceil(width * unit), height * unit), 'white')
     draw = ImageDraw.Draw(canvas)
     emoji_font = ImageFont.truetype(_EMOJI_FONT, 160)
     text_font = ImageFont.truetype(_TEXT_FONT, 140)
+    checked = set()
     for x, y, cell in cells:
         glyph = cell['glyph']
         emoji = _is_emoji(glyph)
         font = emoji_font if emoji else text_font
+        if glyph not in checked:
+            # A character the chosen font does not have is drawn as nothing at all (the black circle is one): refuse it.
+            probe = Image.new('RGBA', (unit, unit), 'white')
+            ImageDraw.Draw(probe).text((20, 0), glyph, font=font, fill='black', embedded_color=emoji)
+            if probe.convert('L').point(lambda v: 255 if v < 250 else 0).getbbox() is None:
+                raise ValueError(f'glyph draws nothing: {glyph!r}')
+            checked.add(glyph)
         box = draw.textbbox((0, 0), glyph, font=font, embedded_color=emoji)
         draw.text((x * unit + (unit - box[2] - box[0]) / 2,
                    y * unit + (unit - box[3] - box[1]) / 2), glyph,
@@ -68,9 +92,9 @@ def render_picture(spec):
         box = draw.textbbox((0, 0), sign, font=text_font)
         draw.text((x * unit - (box[2] + box[0]) / 2,
                    height * unit / 2 - (box[3] + box[1]) / 2), sign, font=text_font, fill='black')
-    canvas.thumbnail((_SIZE[0] - 16, _SIZE[1] - 16), Image.Resampling.LANCZOS)
-    result = Image.new('RGBA', _SIZE, 'white')
-    result.alpha_composite(canvas, ((_SIZE[0] - canvas.width) // 2, (_SIZE[1] - canvas.height) // 2))
+    canvas.thumbnail((size[0] - 16, size[1] - 16), Image.Resampling.LANCZOS)
+    result = Image.new('RGBA', size, 'white')
+    result.alpha_composite(canvas, ((size[0] - canvas.width) // 2, (size[1] - canvas.height) // 2))
     output = io.BytesIO()
     result.save(output, format='PNG')
     return output.getvalue()

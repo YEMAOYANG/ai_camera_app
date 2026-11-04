@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from courseware.tools.check import body_hash, check_classroom
+from courseware.tools.check import body_hash, check_classroom, traditional
 
 
 SAMPLE = Path(__file__).parent / 'fixtures' / 'sample_body.json'
@@ -40,16 +40,62 @@ class CheckTests(unittest.TestCase):
         self.body = valid_body()
         self.notes = {'resources': {name: {'findings': ['a'], 'pageRefs': ['1']} for name in ('teachingDesign', 'courseware', 'learningTaskSheet', 'afterClassExercise')}}
         self.receipt = {'bodySha256': body_hash(self.body), 'ok': True, 'viewports': ['1280x720', '1000x563', '640x360']}
-        self.verification = {'bodySha256': body_hash(self.body), 'speechChecked': 3, 'questionsChecked': 1, 'disagreements': []}
+        self.play_receipt = {'schemaVersion': 'mira.courseware.autoplay-receipt.v1', 'bodySha256': body_hash(self.body),
+            'ok': True, 'pages': [{'scene': 2, 'finished': True, 'finishedAgain': True, 'errors': [], 'stuck': None, 'ok': True}]}
+        self.verification = {'bodySha256': body_hash(self.body), 'notesSha256': body_hash(self.notes),
+            'speechChecked': 3, 'questionsChecked': 1, 'goalsChecked': 0, 'disagreements': []}
 
     def test_all_gates_pass(self):
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, 'a.wav').write_bytes(b'a')
-            self.assertEqual([], check_classroom(self.body, directory, notes=self.notes, roster={'Teacher': 'male'}, receipt=self.receipt, verification=self.verification, grade=1))
+            self.assertEqual([], check_classroom(self.body, directory, notes=self.notes, roster={'Teacher': 'male'},
+                receipt=self.receipt, play_receipt=self.play_receipt, verification=self.verification, grade=1, require_play=True))
 
     def test_notes(self):
         self.notes['resources']['courseware']['pageRefs'] = []
         self.assertIn('notes_incomplete', codes(check_classroom(self.body, notes=self.notes)))
+
+    def test_notes_not_provided_needs_evidence(self):
+        item = self.notes['resources']['afterClassExercise']
+        item.update(status='not_provided', findings=[], pageRefs=[], evidence='lesson details sha256 ab12 lists no after-class exercise')
+        self.assertNotIn('notes_incomplete', codes(check_classroom(self.body, notes=self.notes)))
+        item['evidence'] = ' '
+        self.assertIn('notes_incomplete', codes(check_classroom(self.body, notes=self.notes)))
+        item.update(status='reviewed', evidence='kept but ignored')
+        self.assertIn('notes_incomplete', codes(check_classroom(self.body, notes=self.notes)))
+
+    def test_traditional_chinese_is_refused_in_lines_slides_and_quizzes(self):
+        self.assertNotIn('traditional_chinese', codes(check_classroom(self.body)))
+        self.body['scenes'][0]['content']['canvas']['elements'][0]['content'] = '<p style="font-size:20px">開始</p>'
+        self.body['scenes'][1]['actions'][0]['text'] = '這個很簡單'
+        self.body['scenes'][2]['content']['questions'][0]['analysis'] = '數一數'
+        issues = [i for i in check_classroom(self.body) if i['code'] == 'traditional_chinese']
+        self.assertEqual(sorted((i['gate'], i['scene'], i['severity']) for i in issues), [('G3', 1, 'error'), ('G3', 2, 'error'), ('G3', 3, 'error')])
+        self.assertIn('開', next(i['detail'] for i in issues if i['scene'] == 1))
+        self.assertEqual(traditional('今天学习数一数，书、爱、门'), '')
+        # Characters that Simplified Chinese keeps in ordinary use must never be flagged.
+        self.assertEqual(traditional('历史著名，瞭望，紫色，繁花，警察，迎接，鞋子，餐桌，首先，骨头，魔法，擦黑板，支持，瓶子，素食，索引，角落，近处，啊，嘛'), '')
+        self.assertEqual(traditional('嘗一嘗，總結，記住'), ''.join(sorted('嘗總結記')))
+
+    def test_a_teaching_lesson_needs_enough_spoken_explanation_on_every_slide_and_page(self):
+        def speech(count, characters):
+            return [{'id': 's%d' % i, 'type': 'speech', 'text': 'x' * (characters // count), 'audioUrl': '/a.wav'} for i in range(count)]
+        self.body['scenes'][0]['actions'] = speech(6, 120)
+        self.body['scenes'][1]['actions'] = self.body['scenes'][1]['actions'][:1] + speech(5, 100)
+        thin = [i for i in check_classroom(self.body, teaching=True) if i['code'] == 'narration_thin']
+        self.assertEqual(thin, [])
+        self.body['scenes'][0]['actions'] = speech(5, 400)          # enough characters, too few lines
+        self.body['scenes'][1]['actions'] = speech(8, 40)           # enough lines, too few characters
+        thin = [i for i in check_classroom(self.body, teaching=True) if i['code'] == 'narration_thin']
+        self.assertEqual([(i['gate'], i['scene'], i['severity']) for i in thin], [('G3', 1, 'error'), ('G3', 2, 'error')])
+        self.assertIn('5 lines and 400 characters', thin[0]['detail'])
+        self.assertEqual([i for i in check_classroom(self.body) if i['code'] == 'narration_thin'], [])  # off unless asked for
+
+    def test_traditional_characters_in_the_notes_are_refused(self):
+        self.assertNotIn('traditional_chinese', codes(check_classroom(self.body, notes=self.notes)))
+        self.notes['resources']['courseware']['findings'] = ['嘗一嘗']
+        issues = [i for i in check_classroom(self.body, notes=self.notes) if i['code'] == 'traditional_chinese']
+        self.assertEqual([(i['gate'], i['scene']) for i in issues], [('G0', None)])
 
     def test_media_and_hash(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -115,7 +161,10 @@ class CheckTests(unittest.TestCase):
             return codes(check_classroom(self.body))
         self.assertIn('answer_position_skewed', with_answers('AAAB'))
         self.assertNotIn('answer_position_skewed', with_answers('AABB'))
-        self.assertNotIn('answer_position_skewed', with_answers('AAB'))
+        self.assertIn('answer_position_skewed', with_answers('AAB'))
+        self.assertIn('answer_position_skewed', with_answers('AA'))
+        self.assertNotIn('answer_position_skewed', with_answers('AB'))
+        self.assertNotIn('answer_position_skewed', with_answers('A'))
 
     def test_discussion_actions_are_refused(self):
         self.body['scenes'][0]['actions'].append({'id': 'talk', 'type': 'discussion', 'topic': 'x', 'prompt': 'y', 'agentId': 'a'})
@@ -133,13 +182,16 @@ class CheckTests(unittest.TestCase):
     def test_receipts(self):
         self.receipt.update(bodySha256='wrong', ok=False, viewports=[])
         self.assertTrue({'audit_receipt_stale', 'audit_receipt_missing_viewport'} <= codes(check_classroom(self.body, receipt=self.receipt)))
-        self.verification.update(bodySha256='wrong', speechChecked=2, questionsChecked=0, disagreements=['wrong'])
-        self.assertTrue({'verification_receipt_stale', 'verification_disagreements', 'verification_incomplete'} <= codes(check_classroom(self.body, verification=self.verification)))
+        self.play_receipt.update(bodySha256='wrong', ok=False)
+        self.assertIn('play_receipt_stale', codes(check_classroom(self.body, play_receipt=self.play_receipt, require_play=True)))
+        self.verification.update(bodySha256='wrong', notesSha256='wrong', speechChecked=2, questionsChecked=0, disagreements=['wrong'])
+        self.assertTrue({'verification_receipt_stale', 'verification_disagreements', 'verification_incomplete',
+                         'verification_notes_stale'} <= codes(check_classroom(self.body, notes=self.notes, verification=self.verification)))
 
     def test_cli_require_all_and_json(self):
         result = subprocess.run([sys.executable, '-B', '-m', 'courseware.tools.check', '--body', str(SAMPLE), '--require-all', '--json'], capture_output=True, text=True, check=False)
         self.assertEqual(1, result.returncode)
-        self.assertTrue({'notes_missing', 'receipt_missing', 'verification_missing'} <= codes(json.loads(result.stdout)))
+        self.assertTrue({'notes_missing', 'receipt_missing', 'play_receipt_missing', 'verification_missing'} <= codes(json.loads(result.stdout)))
 
 
 if __name__ == '__main__':

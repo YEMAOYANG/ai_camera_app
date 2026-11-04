@@ -20,12 +20,20 @@ def light_request():
                      ("notesSha256", "briefSha256", "receiptSha256", "verificationSha256")}}}
 
 
+def light_request_v2():
+    value = light_request()
+    value["coursewareLight"]["schemaVersion"] = "mira.courseware.light-release.v2"
+    value["coursewareLight"]["evidence"]["playReceiptSha256"] = "c" * 64
+    return value
+
+
 class LightReleaseValidationTest(unittest.TestCase):
     def test_valid_shape(self):
-        frozen = light_request()
-        original = deepcopy(frozen)
-        CourseArchiveExporter._validate_light_release(frozen)
-        self.assertEqual(frozen, original)
+        for frozen in (light_request(), light_request_v2()):
+            with self.subTest(schema=frozen["coursewareLight"]["schemaVersion"]):
+                original = deepcopy(frozen)
+                CourseArchiveExporter._validate_light_release(frozen)
+                self.assertEqual(frozen, original)
 
     def test_invalid_shapes(self):
         cases = []

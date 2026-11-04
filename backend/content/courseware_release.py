@@ -1,6 +1,6 @@
 """Build immutable light releases from in-memory evidence and media bytes.
 
-Inputs: identity, manifest, body, notes, brief, receipt, verification, roster,
+Inputs: identity, manifest, body, notes, brief, receipt, playReceipt, verification, roster,
 confirmation, media (source filename -> bytes), and gateIssues from the shared
 checker. Identity names every author in authorModels and requires integer
 estimatedMinutes (5-120). The verification receipt's verifier.model must differ
@@ -18,7 +18,7 @@ from content.textbook_release import INPUT_SCHEMA, RELEASE_SCHEMA, MEDIA, check_
 from content.textbook_release_media import media_mime_type
 from core.errors import ApiError
 
-LIGHT_SCHEMA = 'mira.courseware.light-release.v1'
+LIGHT_SCHEMA = 'mira.courseware.light-release.v2'
 # Namespace identifiers inside page scripts and inline SVG are not fetched media.
 NAMESPACE = re.compile(r'https?://www\.w3\.org/(?:2000/svg|1999/xlink|1999/xhtml)')
 GATES = tuple('G%d' % i for i in range(8))
@@ -63,32 +63,54 @@ def _confirmation(value):
 
 
 def _evidence(inputs, speech, questions):
-    notes, verification, receipt = (inputs.get(key) for key in ('notes', 'verification', 'receipt'))
+    notes, verification, receipt, play_receipt = (inputs.get(key) for key in ('notes', 'verification', 'receipt', 'playReceipt'))
     require(isinstance(notes, dict), 'notes_invalid')
     resources = notes.get('resources', {})
     require(isinstance(resources, dict), 'notes_invalid')
     for name in ('teachingDesign', 'courseware', 'learningTaskSheet', 'afterClassExercise'):
         item = resources.get(name, {})
+        if isinstance(item, dict) and item.get('status') == 'not_provided':
+            # The official listing of this class hour has no such resource; the evidence names the saved listing.
+            require(_text(item.get('evidence')), 'notes_invalid')
+            continue
         require(isinstance(item, dict) and isinstance(item.get('findings'), list)
                 and bool(item['findings']) and all(_text(v) for v in item['findings'])
                 and isinstance(item.get('pageRefs'), list) and bool(item['pageRefs'])
                 and all(_text(v) or type(v) is int and v > 0 for v in item['pageRefs']), 'notes_invalid')
+    objectives = notes.get('objectives')
+    require(isinstance(objectives, list) and bool(objectives) and all(_text(value) for value in objectives),
+            'objectives_invalid')
     require(isinstance(inputs.get('brief'), dict) and bool(inputs['brief']), 'brief_missing')
     body_sha = digest(inputs['body'])
     require(isinstance(verification, dict) and verification.get('bodySha256') == body_sha
+            and verification.get('notesSha256') == digest(notes)
             and verification.get('disagreements') == []
             and type(verification.get('speechChecked')) is int and verification['speechChecked'] >= len(speech)
-            and type(verification.get('questionsChecked')) is int and verification['questionsChecked'] >= len(questions),
+            and type(verification.get('questionsChecked')) is int and verification['questionsChecked'] >= len(questions)
+            and type(verification.get('goalsChecked')) is int
+            and verification['goalsChecked'] >= sum(_text(goal) for goal in objectives)
+                + sum(_text(notes.get(key)) for key in ('keyPoint', 'difficultPoint')),
             'verification_invalid')
     _independent_verifier(inputs['identity'].get('authorModels'), verification.get('verifier'))
     require(isinstance(receipt, dict) and receipt.get('bodySha256') == body_sha and receipt.get('ok') is True
             and isinstance(receipt.get('viewports'), list)
             and all(v in receipt['viewports'] for v in ('1280x720', '1000x563', '640x360')), 'audit_invalid')
+    expected_scenes = [index for index, scene in enumerate(inputs['body'].get('scenes', []), 1)
+                       if scene.get('type') == 'interactive']
+    require(isinstance(play_receipt, dict)
+            and play_receipt.get('schemaVersion') == 'mira.courseware.autoplay-receipt.v1'
+            and play_receipt.get('bodySha256') == body_sha and play_receipt.get('ok') is True
+            and isinstance(play_receipt.get('pages'), list)
+            and [page.get('scene') for page in play_receipt['pages'] if isinstance(page, dict)] == expected_scenes
+            and all(isinstance(page, dict) and page.get('ok') is True and page.get('finished') is True
+                    and page.get('errors') == [] and page.get('stuck') is None for page in play_receipt['pages']),
+            'play_receipt_invalid')
     require(isinstance(inputs.get('roster'), dict) and bool(inputs['roster']), 'roster_missing')
     issues = inputs.get('gateIssues')
     require(isinstance(issues, list) and not any(i.get('severity') == 'error' for i in issues), 'gates_failed')
     return {name: digest(inputs[key]) for name, key in (
         ('notesSha256', 'notes'), ('briefSha256', 'brief'), ('receiptSha256', 'receipt'),
+        ('playReceiptSha256', 'playReceipt'),
         ('verificationSha256', 'verification'))}
 
 
@@ -98,10 +120,11 @@ def _review(evidence, confirmation, author_models, verifier_model):
         'basis': ('Independent AI verification (not a human review), sha256 %s, covers every speech action and question. '
             'Author models: %s; verifier model: %s. '
             'Official notes passed G0, sha256 %s. Author attestation (not an independent originality check): %s '
-            'Owner authorization: %s; confirmedAt %s. Browser audit receipt sha256 %s; brief sha256 %s.' % (
+            'Owner authorization: %s; confirmedAt %s. Browser audit receipt sha256 %s; random-play receipt sha256 %s; brief sha256 %s.' % (
                 evidence['verificationSha256'], canonical(author_models), canonical(verifier_model),
                 evidence['notesSha256'], canonical(confirmation['authorAttestation']),
-                canonical(confirmation['userQuote']), confirmation['confirmedAt'], evidence['receiptSha256'], evidence['briefSha256']))}
+                canonical(confirmation['userQuote']), confirmation['confirmedAt'], evidence['receiptSha256'],
+                evidence['playReceiptSha256'], evidence['briefSha256']))}
 
 
 def build_release(inputs):
@@ -249,7 +272,7 @@ def validate_light_release(prepared, manifest):
         require(light['schemaVersion'] == LIGHT_SCHEMA and set(light) == {
             'schemaVersion', 'source', 'gates', 'confirmation', 'evidence'}
             and set(light['confirmation']) == {'userQuote', 'confirmedAt', 'confirmedBy'}
-            and set(light['evidence']) == {'notesSha256', 'briefSha256', 'receiptSha256', 'verificationSha256'}
+            and set(light['evidence']) == {'notesSha256', 'briefSha256', 'receiptSha256', 'playReceiptSha256', 'verificationSha256'}
             and all(isinstance(sha, str) and re.fullmatch(r'[a-f0-9]{64}', sha) for sha in light['evidence'].values())
             and set(light['source']) == {'stageId', 'bodySha256'}
             and isinstance(light['source']['stageId'], str)

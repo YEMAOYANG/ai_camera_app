@@ -22,7 +22,8 @@ def write_lesson(root, inputs):
     identity = {**inputs['identity'], 'manifest': inputs['manifest'], 'confirmation': inputs['confirmation']}
     for filename, value in [('identity.json', identity), ('body.json', inputs['body']),
             ('official-notes.json', inputs['notes']), ('brief.json', inputs['brief']),
-            ('audit-receipt.json', inputs['receipt']), ('verification.json', inputs['verification']),
+            ('audit-receipt.json', inputs['receipt']), ('play-receipt.json', inputs['playReceipt']),
+            ('verification.json', inputs['verification']),
             ('roster.json', inputs['roster'])]:
         (root / filename).write_text(canonical(value), encoding='utf-8')
     media = root / 'media'

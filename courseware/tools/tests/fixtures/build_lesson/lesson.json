@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "练习",
+  "description": "测试课",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "teacher",
+      "color": "orange",
+      "persona": "耐心"
+    },
+    "student": {
+      "name": "学生",
+      "role": "student",
+      "gender": "male",
+      "voice": "Aiden",
+      "avatar": "student",
+      "color": "green",
+      "persona": "好奇"
+    }
+  },
+  "images": {
+    "picture": {
+      "file": "assets/picture.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "intro",
+      "type": "slide",
+      "title": "看图",
+      "template": "title-picture",
+      "data": {
+        "title": "看图",
+        "picture": "picture"
+      },
+      "script": [
+        {
+          "say": "看图"
+        },
+        {
+          "spotlight": "picture"
+        }
+      ]
+    },
+    {
+      "key": "play",
+      "type": "interactive",
+      "title": "动手",
+      "page": "play",
+      "widgetType": "game",
+      "startImage": "picture",
+      "script": [
+        {
+          "say": "看这里"
+        },
+        {
+          "highlight": "#go"
+        },
+        {
+          "say": "来试试"
+        },
+        {
+          "setState": {
+            "step": 1
+          }
+        },
+        {
+          "say": "按按钮"
+        },
+        {
+          "annotate": "#go",
+          "content": "这里"
+        }
+      ]
+    },
+    {
+      "key": "quiz",
+      "type": "quiz",
+      "title": "小检查",
+      "intro": [
+        "来试一试"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "选一选",
+          "skill": "数量",
+          "answer": [
+            "A"
+          ],
+          "analysis": "数一数就知道",
+          "options": {
+            "A": {
+              "label": "一",
+              "visual": {
+                "kind": "quantity",
+                "count": 1
+              }
+            },
+            "B": {
+              "label": "二",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "选一选",
+          "skill": "数量",
+          "answer": [
+            "B"
+          ],
+          "analysis": "数一数就知道",
+          "options": {
+            "A": {
+              "label": "一",
+              "visual": {
+                "kind": "picture",
+                "alt": "一个圆",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "1"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "B": {
+              "label": "二",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
