@@ -1,4 +1,6 @@
 import json
+import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -44,14 +46,14 @@ class AutoplayTests(unittest.TestCase):
         self.assertEqual(receipt['bodySha256'], autoplay.body_hash(body()))
         self.assertIn('--max-steps', seen['command'])
 
-    def test_errors_and_a_broken_replay_are_errors_and_an_unfinished_page_is_a_warning(self):
+    def test_errors_a_broken_replay_and_an_unfinished_page_are_errors(self):
         receipt, _ = self.play([{'file': 'scene-02.html', 'finishes': [5], 'errors': ['TypeError: x', 'TypeError: x'], 'stuck': None},
                                 {'file': 'scene-04.html', 'finishes': [], 'errors': [], 'stuck': 'never finished in 400 steps'}])
         self.assertFalse(receipt['ok'])
         self.assertEqual(receipt['pages'][0]['errors'], ['TypeError: x'])
         found = autoplay.issues(receipt)
         self.assertEqual([(i['code'], i['scene'], i['gate'], i['severity']) for i in found],
-                         [('page_error_in_play', 2, 'G6', 'error'), ('play_unfinished', 4, 'G6', 'warn')])
+                         [('page_error_in_play', 2, 'G6', 'error'), ('play_unfinished', 4, 'G6', 'error')])
         replay, _ = self.play([{'file': 'scene-02.html', 'finishes': [5], 'errors': [], 'stuck': 'finish still showing after play again'},
                                {'file': 'scene-04.html', 'finishes': [3], 'errors': [], 'stuck': 'no play-again button'}])
         self.assertEqual([(i['code'], i['severity']) for i in autoplay.issues(replay)], [('play_again_broken', 'error')] * 2)
@@ -61,6 +63,12 @@ class AutoplayTests(unittest.TestCase):
             self.play([], code=1)
         with self.assertRaises(RuntimeError):
             self.play([{'file': 'scene-02.html', 'finishes': [1], 'errors': [], 'stuck': None}])
+
+    @unittest.skipUnless(shutil.which('node'), 'node is required for the autoplay strategy self-test')
+    def test_systematic_strategy_groups_controls_and_prioritizes_a_visible_number_hint(self):
+        result = subprocess.run([shutil.which('node'), str(autoplay.BOT), '--self-test'],
+                                capture_output=True, text=True, check=True)
+        self.assertEqual(json.loads(result.stdout), {'ok': True, 'groups': 2, 'first': 'station-6'})
 
 
 if __name__ == '__main__':

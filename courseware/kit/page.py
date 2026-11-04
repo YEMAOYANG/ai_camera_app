@@ -62,7 +62,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#FDE9C0;font-family:
 JS_HEAD = r"""
 (function(){
 var W=window,D=document;
-var K=W.K={log:[],errs:[],problems:[],cps:[],started:false,scale:1,stars:0};
+var K=W.K={log:[],errs:[],problems:[],cps:[],drags:[],started:false,scale:1,stars:0};
 W.__errs=K.errs;
 W.addEventListener('error',function(e){K.errs.push(String(e.message||e.type)+' @'+(e.lineno||0))});
 W.addEventListener('unhandledrejection',function(e){K.errs.push('rej:'+String(e.reason))});
@@ -105,7 +105,7 @@ W.addEventListener('message',function(e){var d=e.data||{};if(!d||typeof d!=='obj
  else if(d.type==='HIGHLIGHT_ELEMENT'){var ht=K.$(d.target);if(!(ht&&ht.closest('#ready')))K.begin();K.highlight(d.target)}
  else if(d.type==='ANNOTATE_ELEMENT'){var at=K.$(d.target);if(!(at&&at.closest('#ready')))K.begin();K.annotate(d.target,d.content)}
  else if(d.type==='REVEAL_ELEMENT'){K.begin();K.reveal(d.target)}});
-K.drag=function(el,o){el.style.touchAction='none';
+K.drag=function(el,o){K.drags.push({el:el,options:o});el.style.touchAction='none';
  el.addEventListener('pointerdown',function(e){if(e.button&&e.button!==0)return;if(o.enabled&&!o.enabled(el))return;e.preventDefault();
   var sx=e.clientX,sy=e.clientY,moved=false,k=K.scale||1;el.style.transition='none';el.classList.add('dragging');
   function mv(ev){var dx=(ev.clientX-sx)/k,dy=(ev.clientY-sy)/k;if(!moved&&Math.abs(dx)+Math.abs(dy)>8)moved=true;el.style.transform='translate('+dx+'px,'+dy+'px)'}

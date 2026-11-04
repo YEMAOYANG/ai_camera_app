@@ -35,6 +35,43 @@ def body_hash(body):
     return hashlib.sha256(data.encode('utf-8')).hexdigest()
 
 
+def teaching_goal_count(notes):
+    """The goals covered by verify.py: objectives plus the key and difficult points."""
+    if not isinstance(notes, dict):
+        return 0
+    count = sum(isinstance(goal, str) and bool(goal.strip()) for goal in notes.get('objectives') or [])
+    return count + sum(isinstance(notes.get(key), str) and bool(notes[key].strip()) for key in ('keyPoint', 'difficultPoint'))
+
+
+def play_issues(receipt):
+    """Turn a current random-play receipt into blocking G6 issues."""
+    if not isinstance(receipt, dict) or receipt.get('schemaVersion') != 'mira.courseware.autoplay-receipt.v1' \
+            or not isinstance(receipt.get('pages'), list):
+        return [dict(gate='G6', code='play_receipt_invalid', scene=None,
+                     detail='the random-play receipt has an invalid shape', severity='error')]
+    found = []
+    for page in receipt['pages']:
+        if not isinstance(page, dict) or type(page.get('scene')) is not int:
+            found.append(dict(gate='G6', code='play_receipt_invalid', scene=None,
+                              detail='a random-play page result has an invalid shape', severity='error'))
+            continue
+        scene, stuck = page['scene'], page.get('stuck')
+        errors = page.get('errors') if isinstance(page.get('errors'), list) else []
+        if errors:
+            found.append(dict(gate='G6', code='page_error_in_play', scene=scene,
+                              detail='; '.join(map(str, errors))[:300], severity='error'))
+        if stuck and str(stuck).startswith(('no play-again', 'finish still showing')):
+            found.append(dict(gate='G6', code='play_again_broken', scene=scene,
+                              detail=str(stuck), severity='error'))
+        elif stuck or page.get('finished') is not True:
+            found.append(dict(gate='G6', code='play_unfinished', scene=scene,
+                              detail=str(stuck or 'never finished'), severity='error'))
+    if receipt.get('ok') is not True and not found:
+        found.append(dict(gate='G6', code='play_receipt_failed', scene=None,
+                          detail='the random-play receipt is not successful', severity='error'))
+    return found
+
+
 def strings(value):
     if isinstance(value, str):
         yield value
@@ -63,7 +100,8 @@ def text_box(element):
     return left, top, left + float(element.get('width', 0)), top + height
 
 
-def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=None, verification=None, grade=None, teaching=False):
+def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=None, play_receipt=None,
+                    verification=None, grade=None, teaching=False, require_play=False):
     """All gates over a built classroom; teaching=True also requires enough spoken explanation on every slide and page,
     no pinyin letters in a spoken line and every numbered text of a slide lit in turn."""
     issues = []
@@ -84,6 +122,22 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
         bad = traditional(json.dumps(notes, ensure_ascii=False))
         if bad:
             add('G0', 'traditional_chinese', None, 'official notes: ' + bad)
+        facts = notes.get('factChecks', [])
+        if not isinstance(facts, list):
+            add('G0', 'fact_check_incomplete', None, 'factChecks must be a list')
+        else:
+            for number, fact in enumerate(facts, 1):
+                claims = fact.get('claims') if isinstance(fact, dict) else None
+                sources = fact.get('sources') if isinstance(fact, dict) else None
+                valid_sources = isinstance(sources, list) and len(sources) >= 2 and all(
+                    isinstance(source, dict) and isinstance(source.get('resource'), str)
+                    and source['resource'] in resources and isinstance(source.get('pageRefs'), list)
+                    and bool(source['pageRefs']) and isinstance(source.get('finding'), str)
+                    and bool(source['finding'].strip()) for source in sources or [])
+                if not isinstance(claims, list) or not claims or not all(
+                        isinstance(claim, str) and claim.strip() for claim in claims) or not valid_sources:
+                    add('G0', 'fact_check_incomplete', None,
+                        'factChecks[%d] needs claims and two cited official resources' % number)
 
     scenes = body.get('scenes', [])
     speech_count = question_count = 0
@@ -196,7 +250,7 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
                     if EMOJI.search(text) or any(EMOJI.search(str(o.get('label', ''))) for o in options):
                         add('G4', 'quiz_emoji', index, name)
 
-    if len(answers) >= 4:
+    if len(answers) >= 2:
         # A child who always taps the same place must not pass by luck.
         value, count = max(((v, answers.count(v)) for v in set(answers)), key=lambda pair: (pair[1], str(pair[0])))
         if count * 2 > len(answers):
@@ -245,6 +299,19 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
         viewports = receipt.get('viewports', [])
         if not all(v in viewports for v in ('1280x720', '1000x563', '640x360')):
             add('G6', 'audit_receipt_missing_viewport', None, 'Required viewports: 1280x720, 1000x563, 640x360')
+    if play_receipt is None:
+        if require_play:
+            add('G6', 'play_receipt_missing', None, 'the random-play check has not run')
+    elif not isinstance(play_receipt, dict):
+        issues += play_issues(play_receipt)
+    elif play_receipt.get('bodySha256') != digest:
+        add('G6', 'play_receipt_stale', None, 'the random-play receipt belongs to another build')
+    else:
+        expected = [index for index, scene in enumerate(scenes, 1) if scene.get('type') == 'interactive']
+        actual = [page.get('scene') for page in play_receipt.get('pages', []) if isinstance(page, dict)]
+        if actual != expected:
+            add('G6', 'play_receipt_incomplete', None, 'played scenes %s; expected %s' % (actual, expected))
+        issues += play_issues(play_receipt)
     if verification is not None:
         if verification.get('bodySha256') != digest:
             add('G7', 'verification_receipt_stale', None, 'Body hash does not match')
@@ -252,6 +319,12 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
             add('G7', 'verification_disagreements', None, 'Disagreements must be empty')
         if not isinstance(verification.get('speechChecked'), int) or verification['speechChecked'] < speech_count or not isinstance(verification.get('questionsChecked'), int) or verification['questionsChecked'] < question_count:
             add('G7', 'verification_incomplete', None, 'Counts must cover all speech and questions')
+        if notes is not None and verification.get('notesSha256') != body_hash(notes):
+            add('G7', 'verification_notes_stale', None, 'Official-notes hash does not match')
+        goals = teaching_goal_count(notes)
+        if goals and (type(verification.get('goalsChecked')) is not int or verification['goalsChecked'] < goals):
+            add('G7', 'verification_teaching_incomplete', None, 'Checked %s of %s teaching goals' % (
+                verification.get('goalsChecked'), goals))
     return issues
 
 
@@ -261,6 +334,7 @@ def main():
     parser.add_argument('--media-dir')
     for name in ('notes', 'roster', 'receipt', 'verification'):
         parser.add_argument('--' + name)
+    parser.add_argument('--play-receipt')
     parser.add_argument('--grade', type=int)
     parser.add_argument('--require-all', action='store_true')
     parser.add_argument('--json', action='store_true')
@@ -270,7 +344,10 @@ def main():
         return json.loads(Path(path).read_text(encoding='utf-8')) if path else None
 
     try:
-        issues = check_classroom(load(args.body), args.media_dir, notes=load(args.notes), roster=load(args.roster), receipt=load(args.receipt), verification=load(args.verification), grade=args.grade)
+        issues = check_classroom(load(args.body), args.media_dir, notes=load(args.notes), roster=load(args.roster),
+                                 receipt=load(args.receipt), play_receipt=load(args.play_receipt),
+                                 verification=load(args.verification), grade=args.grade,
+                                 require_play=args.require_all)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
     if args.require_all:

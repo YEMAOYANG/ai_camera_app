@@ -19,6 +19,7 @@ class PageAuthorTests(unittest.TestCase):
         (self.lesson / 'brief.json').write_text(json.dumps({'goals': ['认识6']}, ensure_ascii=False))
         (self.build / 'media').mkdir(parents=True)
         for name, value in (('body.json', body()), ('roster.json', {'老师': 'male'}), ('audit-receipt.json', {'ok': True}),
+                            ('play-receipt.json', {'schemaVersion': 'mira.courseware.autoplay-receipt.v1', 'ok': True, 'pages': []}),
                             ('draft.json', {'grade': 1})):
             (self.build / name).write_text(json.dumps(value, ensure_ascii=False))
 

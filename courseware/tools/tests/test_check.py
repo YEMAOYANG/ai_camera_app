@@ -40,12 +40,16 @@ class CheckTests(unittest.TestCase):
         self.body = valid_body()
         self.notes = {'resources': {name: {'findings': ['a'], 'pageRefs': ['1']} for name in ('teachingDesign', 'courseware', 'learningTaskSheet', 'afterClassExercise')}}
         self.receipt = {'bodySha256': body_hash(self.body), 'ok': True, 'viewports': ['1280x720', '1000x563', '640x360']}
-        self.verification = {'bodySha256': body_hash(self.body), 'speechChecked': 3, 'questionsChecked': 1, 'disagreements': []}
+        self.play_receipt = {'schemaVersion': 'mira.courseware.autoplay-receipt.v1', 'bodySha256': body_hash(self.body),
+            'ok': True, 'pages': [{'scene': 2, 'finished': True, 'finishedAgain': True, 'errors': [], 'stuck': None, 'ok': True}]}
+        self.verification = {'bodySha256': body_hash(self.body), 'notesSha256': body_hash(self.notes),
+            'speechChecked': 3, 'questionsChecked': 1, 'goalsChecked': 0, 'disagreements': []}
 
     def test_all_gates_pass(self):
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, 'a.wav').write_bytes(b'a')
-            self.assertEqual([], check_classroom(self.body, directory, notes=self.notes, roster={'Teacher': 'male'}, receipt=self.receipt, verification=self.verification, grade=1))
+            self.assertEqual([], check_classroom(self.body, directory, notes=self.notes, roster={'Teacher': 'male'},
+                receipt=self.receipt, play_receipt=self.play_receipt, verification=self.verification, grade=1, require_play=True))
 
     def test_notes(self):
         self.notes['resources']['courseware']['pageRefs'] = []
@@ -157,7 +161,10 @@ class CheckTests(unittest.TestCase):
             return codes(check_classroom(self.body))
         self.assertIn('answer_position_skewed', with_answers('AAAB'))
         self.assertNotIn('answer_position_skewed', with_answers('AABB'))
-        self.assertNotIn('answer_position_skewed', with_answers('AAB'))
+        self.assertIn('answer_position_skewed', with_answers('AAB'))
+        self.assertIn('answer_position_skewed', with_answers('AA'))
+        self.assertNotIn('answer_position_skewed', with_answers('AB'))
+        self.assertNotIn('answer_position_skewed', with_answers('A'))
 
     def test_discussion_actions_are_refused(self):
         self.body['scenes'][0]['actions'].append({'id': 'talk', 'type': 'discussion', 'topic': 'x', 'prompt': 'y', 'agentId': 'a'})
@@ -175,13 +182,16 @@ class CheckTests(unittest.TestCase):
     def test_receipts(self):
         self.receipt.update(bodySha256='wrong', ok=False, viewports=[])
         self.assertTrue({'audit_receipt_stale', 'audit_receipt_missing_viewport'} <= codes(check_classroom(self.body, receipt=self.receipt)))
-        self.verification.update(bodySha256='wrong', speechChecked=2, questionsChecked=0, disagreements=['wrong'])
-        self.assertTrue({'verification_receipt_stale', 'verification_disagreements', 'verification_incomplete'} <= codes(check_classroom(self.body, verification=self.verification)))
+        self.play_receipt.update(bodySha256='wrong', ok=False)
+        self.assertIn('play_receipt_stale', codes(check_classroom(self.body, play_receipt=self.play_receipt, require_play=True)))
+        self.verification.update(bodySha256='wrong', notesSha256='wrong', speechChecked=2, questionsChecked=0, disagreements=['wrong'])
+        self.assertTrue({'verification_receipt_stale', 'verification_disagreements', 'verification_incomplete',
+                         'verification_notes_stale'} <= codes(check_classroom(self.body, notes=self.notes, verification=self.verification)))
 
     def test_cli_require_all_and_json(self):
         result = subprocess.run([sys.executable, '-B', '-m', 'courseware.tools.check', '--body', str(SAMPLE), '--require-all', '--json'], capture_output=True, text=True, check=False)
         self.assertEqual(1, result.returncode)
-        self.assertTrue({'notes_missing', 'receipt_missing', 'verification_missing'} <= codes(json.loads(result.stdout)))
+        self.assertTrue({'notes_missing', 'receipt_missing', 'play_receipt_missing', 'verification_missing'} <= codes(json.loads(result.stdout)))
 
 
 if __name__ == '__main__':

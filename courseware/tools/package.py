@@ -1,13 +1,14 @@
 """Assemble a built and verified lesson into the folder that backend/scripts/publish_courseware.py checks and publishes.
 
-The folder holds body.json and media/ (from the lane's work folder), roster.json, audit-receipt.json and verification.json
-(also from the work folder), official-notes.json and brief.json (from the lesson source) and identity.json. The catalog ids
+The folder holds body.json and media/ (from the lane's work folder), roster.json, audit-receipt.json, play-receipt.json and
+verification.json (also from the work folder), official-notes.json and brief.json (from the lesson source) and identity.json. The catalog ids
 (edition, revision, node) come from the textbook catalogue and are passed in; title, objective and length are derived.
 Nothing is packaged while a gate of courseware/tools/check.py reports an error.
 """
 import argparse
 import json
 import math
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -17,6 +18,11 @@ from courseware.tools import check
 
 class PackageError(Exception):
     pass
+
+
+MEDIA_REFERENCE = re.compile(
+    r'/api/classroom-media/[A-Za-z0-9_-]+/(?:audio|media)/([A-Za-z0-9_.-]+)'
+)
 
 
 def _load(path):
@@ -42,6 +48,22 @@ def estimate_minutes(body):
     return min(60, max(10, 5 * math.ceil(seconds / 60 / 5)))
 
 
+def _copy_referenced_media(body, source, destination):
+    """Incremental builds keep content-addressed files from earlier drafts; a release package must not carry them."""
+    names = sorted(set(MEDIA_REFERENCE.findall(json.dumps(body, ensure_ascii=False))))
+    # Valid built lessons always have namespaced media. Keeping this fallback makes the helper compatible with synthetic
+    # callers whose checker is replaced in tests, while the real checker still rejects a lesson without bound media.
+    if not names:
+        shutil.copytree(source, destination)
+        return
+    missing = [name for name in names if not (source / name).is_file()]
+    if missing:
+        raise PackageError('media_missing', ', '.join(missing))
+    destination.mkdir()
+    for name in names:
+        shutil.copyfile(source / name, destination / name)
+
+
 def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, node_id, teacher_code, author_models,
                    page_author_models=(), teaching_revision='1'):
     """author_models wrote lines or questions and so may not verify them; page_author_models wrote only page code, which
@@ -52,13 +74,15 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
     body = _load(build / 'body.json')
     notes, brief = _load(lesson / 'official-notes.json'), _load(lesson / 'brief.json')
     roster, receipt = _load(build / 'roster.json'), _load(build / 'audit-receipt.json')
+    play_receipt = _load(build / 'play-receipt.json')
     verification = _load(build / 'verification.json')
     grade = _load(build / 'draft.json').get('grade')
     issues = [i for i in check.check_classroom(body, build / 'media', notes=notes, roster=roster, receipt=receipt,
-                                               verification=verification, grade=grade, teaching=True) if i['severity'] == 'error']
+                                               play_receipt=play_receipt, verification=verification, grade=grade,
+                                               teaching=True, require_play=True) if i['severity'] == 'error']
     if issues:
         raise PackageError('gates_failed', '; '.join(f"{i['gate']} {i['code']}" for i in issues))
-    if not isinstance(verification.get('goalsChecked'), int) or verification['goalsChecked'] < 1:
+    if type(verification.get('goalsChecked')) is not int or verification['goalsChecked'] < check.teaching_goal_count(notes):
         raise PackageError('teaching_unchecked', 'the verification did not check that the narration teaches the learning goals')
     verifier = str(verification.get('verifier', {}).get('model', '')).lower()
     if not verifier or verifier in {str(m).lower() for m in author_models}:
@@ -73,8 +97,8 @@ def package_lesson(lesson_dir, build_dir, out_dir, *, edition_id, revision_id, n
                 'title': title, 'objective': '；'.join(g.strip() for g in goals), 'teacherCode': teacher_code,
                 'authorModels': list(author_models) + [m for m in page_author_models if m not in author_models], 'estimatedMinutes': estimate_minutes(body)}
     out.mkdir(parents=True)
-    shutil.copytree(build / 'media', out / 'media')
-    for name in ('body.json', 'roster.json', 'audit-receipt.json', 'verification.json'):
+    _copy_referenced_media(body, build / 'media', out / 'media')
+    for name in ('body.json', 'roster.json', 'audit-receipt.json', 'play-receipt.json', 'verification.json'):
         shutil.copyfile(build / name, out / name)
     for name in ('official-notes.json', 'brief.json'):
         shutil.copyfile(lesson / name, out / name)

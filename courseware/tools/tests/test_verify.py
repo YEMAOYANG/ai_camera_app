@@ -144,6 +144,11 @@ class VerifyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify.build_requests(self.body, self.notes, batch_size=0)
 
+    def test_speech_scope_does_not_treat_an_unattached_page_as_a_disagreement(self):
+        prompt = verify.PROMPT.read_text(encoding='utf-8')
+        self.assertIn('Speech batches intentionally have no visual attachments', prompt)
+        self.assertIn('Visual rendering is a separate release gate', prompt)
+
     def test_pictures_and_missing_files(self):
         body = copy.deepcopy(self.body)
         question = body['scenes'][1]['content']['questions'][0]

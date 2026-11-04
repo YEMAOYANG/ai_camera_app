@@ -17,7 +17,7 @@ import sys
 import tempfile
 from urllib.parse import unquote
 
-from courseware.tools.check import MEDIA_URL, body_hash
+from courseware.tools.check import MEDIA_URL, body_hash, play_issues
 
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 BOT = Path(__file__).with_name('autoplay.mjs')
@@ -79,20 +79,8 @@ def play_body(body, media_dir, *, run=default_run, work_dir=None, max_steps=400,
 
 
 def issues(receipt):
-    """The receipt's failures as gate issues.
-
-    A script error or a broken "play again" is an error. A page that random play did not finish is only a warning: pages that
-    want an exact count and then a confirmation are hard to hit at random, so someone must check them by hand or by a script."""
-    found = []
-    for page in receipt['pages']:
-        scene, stuck = page['scene'], page['stuck']
-        if page['errors']:
-            found.append(dict(gate='G6', code='page_error_in_play', scene=scene, detail='; '.join(page['errors'])[:300], severity='error'))
-        if stuck and stuck.startswith(('no play-again', 'finish still showing')):
-            found.append(dict(gate='G6', code='play_again_broken', scene=scene, detail=stuck, severity='error'))
-        elif stuck or not page['finished']:
-            found.append(dict(gate='G6', code='play_unfinished', scene=scene, detail=stuck or 'never finished', severity='warn'))
-    return found
+    """Backward-compatible entry point for the shared blocking G6 interpretation."""
+    return play_issues(receipt)
 
 
 def main(argv=None):

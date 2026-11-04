@@ -2,7 +2,7 @@
 
 Layout: identity.json (editionId, revisionId, nodeId, teachingRevision, title,
 objective, teacherCode, authorModels, estimatedMinutes; optional confirmation), body.json, media/<sha256>.<ext>,
-official-notes.json, brief.json, audit-receipt.json, verification.json, roster.json.
+official-notes.json, brief.json, audit-receipt.json, play-receipt.json, verification.json, roster.json.
 Identity authorModels lists every model that wrote pages, lines or questions;
 verification.verifier.model must differ from each, case-insensitively.
 estimatedMinutes is a required integer from 5 to 120. Confirmation contains
@@ -56,7 +56,8 @@ class CoursewarePublishService:
                 require(digest(manifest) == revision['manifest_sha256'], 'manifest_mismatch')
         inputs = {'identity': identity, 'manifest': manifest, 'body': read('body.json'),
             'notes': read('official-notes.json'), 'brief': read('brief.json'),
-            'receipt': read('audit-receipt.json'), 'verification': read('verification.json'),
+            'receipt': read('audit-receipt.json'), 'playReceipt': read('play-receipt.json'),
+            'verification': read('verification.json'),
             'roster': read('roster.json'), 'confirmation': confirmation if confirmation is not None else identity.get('confirmation')}
         media_dir = root / 'media'
         require(media_dir.is_dir() and not media_dir.is_symlink(), 'media_missing')
@@ -67,8 +68,9 @@ class CoursewarePublishService:
         inputs['media'] = media
         grade = manifest.get('gradeCode', '')
         grade = int(grade.split('_')[1]) if grade.startswith('primary_') and grade.split('_')[1].isdigit() else None
-        inputs['gateIssues'] = self.checker(inputs['body'], media_dir, notes=inputs['notes'],
-            roster=inputs['roster'], receipt=inputs['receipt'], verification=inputs['verification'], grade=grade)
+        inputs['gateIssues'] = self.checker(inputs['body'], media_dir, notes=inputs['notes'], roster=inputs['roster'],
+            receipt=inputs['receipt'], play_receipt=inputs['playReceipt'], verification=inputs['verification'],
+            grade=grade, teaching=True, require_play=True)
         return inputs
 
     def check(self, lesson_dir, *, confirmation=None):

@@ -80,7 +80,8 @@ def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://
     if 'check' in steps or 'audit' in steps or 'play' in steps:
         notes_path = lesson / 'official-notes.json'
         notes = _load(notes_path) if notes_path.exists() else None
-        issues = check.check_classroom(body, work / 'media', notes=notes, roster=result['roster'], receipt=receipt, grade=result['grade'], teaching=teaching)
+        issues = check.check_classroom(body, work / 'media', notes=notes, roster=result['roster'], receipt=receipt,
+                                       play_receipt=play, grade=result['grade'], teaching=teaching, require_play=True)
         if notes is None:
             issues.append(dict(gate='G0', code='notes_missing', scene=None, detail='official-notes.json is required', severity='error'))
         brief_path = lesson / 'brief.json'
@@ -90,11 +91,6 @@ def run_lesson(lesson_dir, work_dir, *, stage_id, steps=STEPS, endpoint='http://
             issues.append(dict(gate='G0', code='traditional_chinese', scene=None, detail='brief.json: ' + bad, severity='error'))
         if receipt is None:
             issues.append(dict(gate='G6', code='receipt_missing', scene=None, detail='the play-through audit has not run', severity='error'))
-        if play is not None:
-            if play.get('bodySha256') == check.body_hash(body):
-                issues += autoplay.issues(play)
-            else:
-                issues.append(dict(gate='G6', code='play_receipt_stale', scene=None, detail='the random-play receipt belongs to another build', severity='warn'))
         result['issues'] = issues
         _save(work / 'check.json', issues)
         result['steps']['check'] = {'errors': sum(i['severity'] == 'error' for i in issues), 'warnings': sum(i['severity'] == 'warn' for i in issues)}

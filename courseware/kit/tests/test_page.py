@@ -27,6 +27,8 @@ class PageKitTests(unittest.TestCase):
         self.assertIn('K.hud=', shipped())
         self.assertIn('K.ready=', shipped())
         self.assertIn('K.drag=', shipped())
+        self.assertIn('drags:[]', shipped())
+        self.assertIn('K.drags.push({el:el,options:o})', shipped())
 
     def test_ids_the_kit_creates_are_reserved(self):
         self.assertTrue({'dots', 'stars', 'hud', 'say', 'ready', 'finish', 'start-btn', 'btn-again'} <= page.reserved_ids())

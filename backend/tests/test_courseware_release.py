@@ -27,12 +27,18 @@ def sample_inputs():
         'generatedAgentConfigs': [{'name': 'teacher', 'voiceConfig': {'voiceId': 'Ethan'}}]},
         'scenes': [{'id': 'slide', 'stageId': 'authored', 'type': 'slide',
             'content': {'canvas': {'elements': []}}, 'actions': [
-                {'id': 'speech-1', 'type': 'speech', 'text': '看看两幅图。', 'audioUrl': audio_url},
-                {'id': 'speech-2', 'type': 'speech', 'text': '哪边更多？', 'audioUrl': audio_url}]},
+                {'id': 'speech-%d' % i, 'type': 'speech',
+                 'text': text, 'audioUrl': audio_url} for i, text in enumerate((
+                    '先看左边的三个物品，点一个数一个。',
+                    '最后数到三，就表示左边一共有三个。',
+                    '再看右边的两个物品，也逐个数清楚。',
+                    '最后数到二，就表示右边一共有两个。',
+                    '三比二多，所以左边的数量比右边多。',
+                    '比较数量时，先数清两边，再比较多少。'), 1)]},
             {'id': 'quiz', 'stageId': 'authored', 'type': 'quiz', 'actions': [], 'content': {'questions': [
                 {'id': 'question-%d' % i, 'type': 'single', 'question': '哪边更多？',
                  'options': [{'value': 'A', 'label': '左边'}, {'value': 'B', 'label': '右边'}],
-                 'answer': ['A'], 'analysis': '左图有三个，右图有两个。', 'skill': 'quantity',
+                 'answer': ['A' if i == 1 else 'B'], 'analysis': '逐个数清两边，再比较数量。', 'skill': 'quantity',
                  'questionAudioUrl': audio_url, 'optionVisuals': {
                      'A': {'kind': 'image', 'src': image_url, 'alt': 'Three objects'},
                      'B': {'kind': 'image', 'src': image_url, 'alt': 'Two objects'}}} for i in (1, 2)]}}]}
@@ -47,8 +53,11 @@ def sample_inputs():
         'notes': notes,
         'brief': {'objectives': ['Compare pictured quantities'], 'pages': ['slide', 'quiz']},
         'receipt': {'bodySha256': digest(body), 'ok': True, 'viewports': ['1280x720', '1000x563', '640x360']},
+        'playReceipt': {'schemaVersion': 'mira.courseware.autoplay-receipt.v1', 'bodySha256': digest(body),
+            'ok': True, 'pages': []},
         'verification': {'schemaVersion': 'mira.courseware.verification.v1',
-            'bodySha256': digest(body), 'notesSha256': digest(notes), 'speechChecked': 2, 'questionsChecked': 2,
+            'bodySha256': digest(body), 'notesSha256': digest(notes), 'speechChecked': 6, 'questionsChecked': 2,
+            'goalsChecked': 1,
             'disagreements': [], 'verifier': {'model': 'fixture-verifier', 'effort': 'high',
                 'ranAt': '2026-11-03T11:00:00+08:00'}},
         'roster': {'teacher': 'male'}, 'gateIssues': [], 'media': {audio_name: audio, image_name: picture},
@@ -58,8 +67,9 @@ def sample_inputs():
 
 
 def refresh_receipts(inputs):
-    for name in ('receipt', 'verification'):
+    for name in ('receipt', 'playReceipt', 'verification'):
         inputs[name]['bodySha256'] = digest(inputs['body'])
+    inputs['verification']['notesSha256'] = digest(inputs['notes'])
 
 
 class CoursewareReleaseTests(unittest.TestCase):
@@ -82,7 +92,7 @@ class CoursewareReleaseTests(unittest.TestCase):
         self.assertEqual(validate_light_release(prepared, self.inputs['manifest']), [])
         self.assertEqual(self.inputs, original)
         self.assertEqual(len(prepared['content_json']['questions']), 2)
-        self.assertEqual(prepared['release']['audioAudit'], {'passed': True, 'segments': 2, 'method': AUDIO_METHOD})
+        self.assertEqual(prepared['release']['audioAudit'], {'passed': True, 'segments': 6, 'method': AUDIO_METHOD})
         self.assertNotIn('previewKey', frozen)
         self.assertNotIn('taskId', frozen)
         self.assertEqual(set(frozen['coursewareLight']), {'schemaVersion', 'source', 'gates', 'confirmation', 'evidence'})
@@ -98,7 +108,7 @@ class CoursewareReleaseTests(unittest.TestCase):
         review = prepared['review']
         self.assertEqual(set(review), {'alignmentConfirmed', 'originalExpressionConfirmed', 'sourceUsageConfirmed',
             'publicationAuthorized', 'reviewer', 'basis', 'release'})
-        for key in ('notes', 'brief', 'receipt', 'verification'):
+        for key in ('notes', 'brief', 'receipt', 'playReceipt', 'verification'):
             self.assertIn(digest(self.inputs[key]), review['basis'])
         self.assertIn(self.inputs['confirmation']['authorAttestation'], review['basis'])
         self.assertIn(self.inputs['confirmation']['userQuote'], review['basis'])
@@ -124,6 +134,7 @@ class CoursewareReleaseTests(unittest.TestCase):
         item = self.inputs['notes']['resources']['afterClassExercise']
         item.clear()
         item.update(status='not_provided', evidence='the saved lesson listing sha256 ab12 has no after-class exercise')
+        refresh_receipts(self.inputs)
         self.assertEqual(validate_light_release(build_release(self.inputs), self.inputs['manifest']), [])
         item['evidence'] = ' '
         self.rejected('notes_invalid')
@@ -192,7 +203,7 @@ class CoursewareReleaseTests(unittest.TestCase):
     def test_build_receipt_output_shape_is_accepted(self):
         receipt = self.inputs['verification']
         self.assertEqual(set(receipt), {'schemaVersion', 'bodySha256', 'notesSha256', 'speechChecked',
-            'questionsChecked', 'disagreements', 'verifier'})
+            'questionsChecked', 'goalsChecked', 'disagreements', 'verifier'})
         self.assertEqual(set(receipt['verifier']), {'model', 'effort', 'ranAt'})
         prepared = build_release(self.inputs)
         self.assertEqual(validate_light_release(prepared, self.inputs['manifest']), [])

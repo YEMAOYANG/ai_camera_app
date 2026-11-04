@@ -37,6 +37,7 @@ class PackageTests(unittest.TestCase):
         (self.build / 'media').mkdir(parents=True)
         (self.build / 'media' / 'a.wav').write_bytes(b'wav')
         for name, value in (('body.json', body()), ('roster.json', {'老师': 'male'}), ('audit-receipt.json', {'ok': True}),
+                            ('play-receipt.json', {'schemaVersion': 'mira.courseware.autoplay-receipt.v1', 'ok': True, 'pages': []}),
                             ('verification.json', {'verifier': {'model': 'gpt-6.1-sol'}, 'goalsChecked': 4}), ('draft.json', {'grade': 1})):
             (self.build / name).write_text(json.dumps(value, ensure_ascii=False))
         self.ids = dict(edition_id='e', revision_id='r', node_id='n', teacher_code='mira_x', author_models=['gpt-6.1-terra', 'claude-sonnet-5-5'])
@@ -48,17 +49,29 @@ class PackageTests(unittest.TestCase):
     def test_package_has_every_file_and_a_derived_identity(self):
         identity = self.run_package()
         self.assertEqual(sorted(p.name for p in self.out.iterdir()),
-                         ['audit-receipt.json', 'body.json', 'brief.json', 'identity.json', 'media', 'official-notes.json', 'roster.json', 'verification.json'])
+                         ['audit-receipt.json', 'body.json', 'brief.json', 'identity.json', 'media', 'official-notes.json',
+                          'play-receipt.json', 'roster.json', 'verification.json'])
         self.assertEqual((self.out / 'media' / 'a.wav').read_bytes(), b'wav')
         self.assertEqual(json.loads((self.out / 'identity.json').read_text(encoding='utf-8')), identity)
         self.assertEqual((identity['title'], identity['objective'], identity['teachingRevision'], identity['estimatedMinutes']),
                          ('本课', '认识6；会数数', '1', 10))
         self.assertEqual(identity['authorModels'], ['gpt-6.1-terra', 'claude-sonnet-5-5'])
 
+    def test_package_excludes_media_left_by_an_incremental_build(self):
+        current = body()
+        current['stage']['id'] = 'stage-one'
+        current['scenes'][0]['actions'][0]['audioUrl'] = '/api/classroom-media/stage-one/media/a.wav'
+        (self.build / 'body.json').write_text(json.dumps(current, ensure_ascii=False))
+        (self.build / 'media' / 'stale.png').write_bytes(b'old draft')
+        self.run_package()
+        self.assertEqual(sorted(path.name for path in (self.out / 'media').iterdir()), ['a.wav'])
+
     def test_the_lesson_is_checked_as_a_teaching_lesson(self):
         with patch.object(package.check, 'check_classroom', return_value=[]) as checker:
             package.package_lesson(self.lesson, self.build, self.out, **self.ids)
         self.assertTrue(checker.call_args.kwargs['teaching'])
+        self.assertTrue(checker.call_args.kwargs['require_play'])
+        self.assertEqual(checker.call_args.kwargs['play_receipt']['schemaVersion'], 'mira.courseware.autoplay-receipt.v1')
 
     def test_a_failing_gate_stops_packaging(self):
         issue = {'gate': 'G6', 'code': 'audit_receipt_stale', 'severity': 'error'}
