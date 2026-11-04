@@ -632,6 +632,15 @@ def textbook_classroom_service():
     return service
 
 
+def courseware_asset_store():
+    from services.courseware_asset_store import CoursewareAssetStore
+    service = current_app.extensions.get("mira_courseware_asset_store")
+    if service is None:
+        service = CoursewareAssetStore()
+        current_app.extensions["mira_courseware_asset_store"] = service
+    return service
+
+
 def student_learning_media_service() -> StudentLearningMediaService:
     service = current_app.extensions.get("mira_student_learning_media_service")
     if isinstance(service, StudentLearningMediaService):

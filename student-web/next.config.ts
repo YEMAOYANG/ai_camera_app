@@ -22,6 +22,23 @@ function configuredDevOrigins() {
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   allowedDevOrigins: configuredDevOrigins(),
+  async rewrites() {
+    return {
+      // These compatibility URLs are frozen into published textbook data.
+      // Resolve them before public/ so live requests use verified MinIO bytes;
+      // the old files remain only as an operator recovery copy.
+      beforeFiles: [
+        { source: "/textbooks/:path*", destination: "/api/learning/textbooks/assets/textbooks/:path*" },
+        { source: "/images/schoolbag/covers-v3/:path*", destination: "/api/learning/textbooks/assets/images/schoolbag/covers-v3/:path*" },
+        { source: "/images/storybook/welcome-school-hero.webp", destination: "/api/learning/textbooks/assets/images/storybook/welcome-school-hero.webp" },
+        { source: "/images/space/subject-chinese.png", destination: "/api/learning/textbooks/assets/images/space/subject-chinese.png" },
+        { source: "/images/space/subject-english.png", destination: "/api/learning/textbooks/assets/images/space/subject-english.png" },
+        { source: "/images/space/subject-math-lab.png", destination: "/api/learning/textbooks/assets/images/space/subject-math-lab.png" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async headers() {
     return buildStudentSecurityHeaderRules();
   },

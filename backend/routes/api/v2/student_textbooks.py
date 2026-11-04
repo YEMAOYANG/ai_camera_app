@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from core.errors import ApiError, error_response
 from schemas.auth import bearer_token, json_body
-from services.service_factory import textbook_learning_service, textbook_classroom_service
+from services.courseware_asset_store import CoursewareAssetNotFound, CoursewareAssetStorageError
+from services.service_factory import courseware_asset_store, textbook_learning_service, textbook_classroom_service
 
 student_textbooks_bp = Blueprint("student_textbooks", __name__)
 parent_textbooks_bp = Blueprint("parent_textbooks", __name__)
@@ -24,6 +25,29 @@ def catalog():
         return jsonify(textbook_learning_service().student_catalog(bearer_token(request), request.args))
     except ApiError as exc:
         return error_response(exc)
+
+
+@student_textbooks_bp.get("/assets/<path:asset_path>")
+def asset(asset_path):
+    """Serve only immutable, manifest-listed public courseware resources."""
+    if request.args:
+        return error_response(ApiError("courseware_asset_request_invalid", "课件资源请求无效", 400))
+    try:
+        entry, body = courseware_asset_store().read_public(asset_path)
+        return Response(body, content_type=entry["mimeType"], headers={
+            "Content-Length": str(len(body)),
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "ETag": entry["etag"],
+            "X-Mira-File-Sha256": entry["sha256"],
+            "X-Mira-File-Source": "remote",
+            "X-Content-Type-Options": "nosniff",
+        })
+    except CoursewareAssetNotFound:
+        return error_response(ApiError("courseware_asset_not_found", "课件资源不存在", 404))
+    except CoursewareAssetStorageError:
+        return error_response(ApiError("courseware_asset_unavailable", "课件资源暂时不可用", 502))
+    except Exception:
+        return error_response(ApiError("courseware_asset_unavailable", "课件资源暂时不可用", 502))
 
 
 @student_textbooks_bp.get("/<edition_id>/contents")
