@@ -1,13 +1,13 @@
-<div id="scene-card"><div id="scene-title">找出少掉的线索</div><div id="stage">
-  <div id="covers" aria-label="遮挡物">
-    <button class="cover" id="cover-eye" data-cover="vision" aria-label="眼罩"><svg viewBox="0 0 140 120"><path d="M12 56Q70 3 128 56Q70 113 12 56Z" fill="#F6A935" stroke="#8A5A24" stroke-width="7"/><path d="M40 55Q70 27 100 55Q70 84 40 55Z" fill="#FFFDF6" stroke="#8A5A24" stroke-width="5"/><path d="M12 56L0 42M128 56l12-14" stroke="#8A5A24" stroke-width="7"/></svg></button>
-    <button class="cover" id="cover-ear" data-cover="hearing" aria-label="耳罩"><svg viewBox="0 0 140 120"><path d="M35 78V54a35 35 0 0 1 70 0v24" fill="none" stroke="#4C8DDB" stroke-width="18" stroke-linecap="round"/><rect x="21" y="58" width="30" height="43" rx="12" fill="#F6A935" stroke="#8A5A24" stroke-width="5"/><rect x="89" y="58" width="30" height="43" rx="12" fill="#F6A935" stroke="#8A5A24" stroke-width="5"/></svg></button>
-    <button class="cover" id="cover-hand" data-cover="touch" aria-label="手套"><svg viewBox="0 0 140 120"><path d="M42 103Q28 95 31 81L35 35Q36 23 45 25Q54 26 53 38L52 55L58 17Q60 6 70 8Q80 9 78 20L73 55L83 22Q87 11 96 15Q105 19 101 29L91 60L104 38Q111 29 119 35Q127 41 121 51L100 95Q94 108 78 109Z" fill="#58B45C" stroke="#2F7A36" stroke-width="6" stroke-linejoin="round"/></svg></button>
+<div id="scene-card"><div id="scene-title">找出少掉的感觉线索</div><div id="stage">
+  <div id="covers" aria-label="感觉器官">
+    <button class="cover art-eye" id="cover-eye" data-cover="vision" aria-label="眼睛"></button>
+    <button class="cover art-ear" id="cover-ear" data-cover="hearing" aria-label="耳朵"></button>
+    <button class="cover art-skin" id="cover-hand" data-cover="touch" aria-label="手和皮肤"></button>
   </div>
-  <div id="character"><svg viewBox="0 0 240 280" role="img" aria-label="绿衣女孩"><path d="M64 257Q67 179 83 158L157 158Q177 182 180 257Z" fill="#58B45C" stroke="#2F7A36" stroke-width="7"/><path d="M93 229v36m54-36v36" stroke="#6B4423" stroke-width="15" stroke-linecap="round"/><ellipse cx="120" cy="94" rx="63" ry="72" fill="#F6C18D" stroke="#8A5A24" stroke-width="6"/><path d="M59 90Q46 15 117 14Q188 16 181 92L161 64Q131 76 86 57L66 81Z" fill="#29251F"/><circle cx="98" cy="99" r="7" fill="#39271B"/><circle cx="144" cy="99" r="7" fill="#39271B"/><path d="M105 124q15 13 30 0" fill="none" stroke="#B85F4B" stroke-width="5" stroke-linecap="round"/><g id="blindfold"><path d="M69 92Q120 64 171 92L162 119Q120 102 78 119Z" fill="#E4572E" stroke="#B23A17" stroke-width="5"/><path d="M70 98L42 84m128 14 28-14" stroke="#B23A17" stroke-width="6"/></g><g id="earmuffs"><path d="M57 95V81a63 63 0 0 1 126 0v14" fill="none" stroke="#4C8DDB" stroke-width="13"/><rect x="48" y="79" width="22" height="47" rx="10" fill="#F6A935" stroke="#8A5A24" stroke-width="4"/><rect x="170" y="79" width="22" height="47" rx="10" fill="#F6A935" stroke="#8A5A24" stroke-width="4"/></g></svg></div>
-  <div id="clues">
-   <button class="clue" id="clue-vision" data-clue="vision" aria-label="颜色线索"><svg viewBox="0 0 170 140"><circle cx="52" cy="70" r="36" fill="#E4572E" stroke="#B23A17" stroke-width="5"/><circle cx="112" cy="70" r="36" fill="#4C8DDB" stroke="#2F66AE" stroke-width="5"/><path d="M46 41q14-19 26-8" stroke="#fff" stroke-width="8" stroke-linecap="round"/></svg></button>
-   <button class="clue" id="clue-hearing" data-clue="hearing" aria-label="声音线索"><svg viewBox="0 0 170 140"><path d="M45 53Q76 25 108 53V86L137 62V111L108 90H91Q76 112 55 99" fill="#F6A935" stroke="#8A5A24" stroke-width="7" stroke-linejoin="round"/><path d="M122 38q20 17 0 34m13-48q35 33 0 65" fill="none" stroke="#4C8DDB" stroke-width="7" stroke-linecap="round"/></svg></button>
-   <button class="clue" id="clue-touch" data-clue="touch" aria-label="触感线索"><svg viewBox="0 0 170 140"><rect x="31" y="36" width="106" height="74" rx="18" fill="#C9955B" stroke="#8A5A24" stroke-width="6"/><path d="M43 54h80M43 72h80M43 90h80" stroke="#E8C48F" stroke-width="8" stroke-linecap="round"/><path d="M20 31l-9-12m39 12-1-17m39 17 8-15m35 22 13-10" stroke="#F6A935" stroke-width="6" stroke-linecap="round"/></svg></button>
+  <div id="character" role="img" aria-label="女孩用感觉器官观察周围"></div>
+  <div id="clues" aria-label="感觉线索">
+    <button class="clue clue-vision" id="clue-vision" data-clue="vision" aria-label="眼睛看到的线索"></button>
+    <button class="clue clue-hearing" id="clue-hearing" data-clue="hearing" aria-label="耳朵听到的线索"></button>
+    <button class="clue clue-touch" id="clue-touch" data-clue="touch" aria-label="皮肤摸到的线索"></button>
   </div>
  </div><div id="status"><div id="cover-display"></div><div id="drop-zone"><span id="drop-mark">＋</span></div></div><div id="feedback-mark" aria-hidden="true">✓</div></div>

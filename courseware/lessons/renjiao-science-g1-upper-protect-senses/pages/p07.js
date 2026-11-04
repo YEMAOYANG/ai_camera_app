@@ -10,6 +10,7 @@ var actions=[
  {id:'action-4',zone:'skin',safe:true,art:'hand'}
 ];
 function art(type){
+ return '<span class="action-art art-'+type+'" aria-hidden="true"></span>';
  if(type==='rub')return '<svg viewBox="0 0 180 160"><circle cx="89" cy="75" r="52" fill="#FFE4CF"/><path d="M92 20Q85 72 67 98q-4 13 25 15 31-2 25-16-15-27-25-77Z" fill="#E9AE80" stroke="#6B4423" stroke-width="7"/><path d="M35 30 145 137M145 30 35 137" stroke="#E4572E" stroke-width="10"/></svg>';
  if(type==='stick')return '<svg viewBox="0 0 180 160"><path d="M101 57q-8-25-30-18-18 7-14 36-3 36 31 39 23 2 32-21" fill="#E9AE80" stroke="#6B4423" stroke-width="7"/><path d="m105 106 36-65" stroke="#fff" stroke-width="12"/><path d="m105 106 36-65" stroke="#6B4423" stroke-width="5"/><path d="M34 27 146 139M146 27 34 139" stroke="#E4572E" stroke-width="9"/></svg>';
  if(type==='pick')return '<svg viewBox="0 0 180 160"><circle cx="88" cy="74" r="52" fill="#FFE4CF"/><path d="M91 18Q84 70 66 97q-4 13 25 15 31-2 25-16-15-27-25-78Z" fill="#E9AE80" stroke="#6B4423" stroke-width="7"/><path d="M34 28 144 137M144 28 34 137" stroke="#E4572E" stroke-width="10"/></svg>';

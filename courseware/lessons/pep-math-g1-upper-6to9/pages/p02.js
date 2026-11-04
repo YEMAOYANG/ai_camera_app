@@ -1,6 +1,6 @@
 (function(){
-var fruit='<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M60 34C42 17 13 28 15 62c2 25 20 43 36 40 5-1 6-2 9-2s4 1 9 2c16 3 34-15 36-40 2-34-27-45-45-28z" fill="#e4572e" stroke="#a63822" stroke-width="3"/><path d="M60 34C60 18 69 9 83 8c-2 15-11 24-23 26" fill="#58b45c"/><ellipse cx="39" cy="51" rx="7" ry="12" fill="#fff" opacity=".4"/></svg>';
-var disc='<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="49" fill="#f6a935" stroke="#c47a12" stroke-width="6"/><circle cx="60" cy="60" r="37" fill="none" stroke="#ffe3a5" stroke-width="4"/></svg>';
+var fruit='<span class="sprite sprite-apple" aria-hidden="true"></span>';
+var disc='<span class="sprite sprite-disc" aria-hidden="true"></span>';
 var level=0,added=false,counted=[],tries=0,busy=false,timer,items=[];
 K.hud({icon:'●',title:'从五颗果子继续数',levels:2});K.owl();K.ready({emoji:'🌲',title:'从五颗果子继续数',sub:'添一颗再数',btn:'start-btn'});
 var holder=K.$('#fruits');for(var i=0;i<6;i++){(function(i){var e=K.el('div','fruit','',holder);e.id='fruit-'+(i+1);items.push(e);K.drag(e,{enabled:function(){return K.started&&!busy&&i===0},targets:function(){return [K.$('#basket')]},onDrop:function(el,t){if(added)return;if(t){added=true;render();K.sfx.drop();K.say('一个一个点着数')}else miss(el)},onTap:function(){if(!added){K.say('把外面的一颗拖进篮子');return}tap(i)}});e.addEventListener('click',function(){if(i!==0)tap(i)})})(i)}

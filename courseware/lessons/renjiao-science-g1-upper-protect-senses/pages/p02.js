@@ -4,8 +4,7 @@ var level=0,cover=null,tries=0,locked=false,phase='play',selected=null;
 K.hud({icon:'🔎',title:'少了哪种感觉',levels:2});K.owl();K.say('选一种遮挡，再找少掉的线索');
 K.ready({emoji:'🔎',title:'少了哪种感觉',sub:'找一找线索',btn:'start-btn'});
 var character=K.$('#character'),display=K.$('#cover-display'),zone=K.$('#drop-zone'),mark=K.$('#feedback-mark');
-function coverSvg(type){var el=K.$('#'+labels[type]);return el?el.innerHTML:''}
-function setCover(type){cover=type;character.className=type?'cover-'+type:'';display.innerHTML=type?coverSvg(type):'';K.$$('#covers .cover').forEach(function(b){b.classList.toggle('selected',b.dataset.cover===type)});K.$$('#clues .clue').forEach(function(b){b.classList.remove('dim','selected')});mark.classList.remove('on');zone.classList.toggle('ready-drop',!!type);selected=null}
+function setCover(type){cover=type;character.className=type?'cover-'+type:'';display.className=type||'';K.$$('#covers .cover').forEach(function(b){b.classList.toggle('selected',b.dataset.cover===type)});K.$$('#clues .clue').forEach(function(b){b.classList.remove('dim','selected')});mark.classList.remove('on');zone.classList.toggle('ready-drop',!!type);selected=null}
 function setLevel(i){level=i;tries=0;locked=false;phase='play';setCover(null);K.levels(2,i);K.say(i===0?'给女孩戴上耳罩，再找声音线索':'给女孩戴上手套，再找触感线索')}
 function answer(type,el){if(!K.started||locked||phase!=='play')return;if(!cover){K.say('先选一个遮挡物','no');K.shake(K.$('#covers'));return}K.sfx.pick();var want=levels[level];
  if(type===want){locked=true;phase='done';K.sfx.ok();K.star(tries===0?2:1,el);K.pop(character);mark.textContent='✓';mark.classList.add('on');K.say(level===0?'耳罩挡住声音线索':'手套挡住触感线索','ok');K.$('#'+clues[want]).classList.add('selected');setTimeout(function(){if(level<1)setLevel(1);else{K.levels(2,2);K.finish({title:'线索找到了',sub:'感觉器官帮助我们发现',again:function(){setLevel(0)}})}},1200);return}

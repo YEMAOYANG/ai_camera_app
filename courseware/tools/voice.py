@@ -9,6 +9,7 @@ import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Lock
 
 
 class VoiceError(Exception):
@@ -72,6 +73,17 @@ def _validate_wav(data):
     raise VoiceError('wav_invalid', 'missing fmt or data chunk')
 
 
+def _write_cache(cache_path, cache):
+    """Replace the cache atomically so an interrupted batch keeps prior progress."""
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = cache_path.with_name(cache_path.name + '.tmp')
+    temporary.write_text(
+        json.dumps(cache, ensure_ascii=False, sort_keys=True, indent=1) + '\n',
+        encoding='utf-8',
+    )
+    temporary.replace(cache_path)
+
+
 def voice_lines(lines, media_dir, *, post, cache_path,
                 endpoint='http://127.0.0.1:3100', jobs=4, sleep=time.sleep):
     voices = json.loads(Path(__file__).with_name('voices.json').read_text(encoding='utf-8'))
@@ -112,12 +124,15 @@ def voice_lines(lines, media_dir, *, post, cache_path,
         else:
             pending.append((line, key))
     reused = len(files)
+    cache_lock = Lock()
 
     def record(item):
         line, key = item
         payload = {'text': line['text'], 'audioId': line['id'],
                    'ttsProviderId': 'qwen-tts', 'ttsModelId': 'qwen3-tts-flash',
                    'ttsVoice': line['voice']}
+        data = None
+        error = None
         for attempt in range(len(RETRY_DELAYS) + 1):
             try:
                 status, body = post(endpoint.rstrip('/') + '/api/generate/tts', payload)
@@ -125,19 +140,36 @@ def voice_lines(lines, media_dir, *, post, cache_path,
                     raise ValueError(f'HTTP {status}')
                 data = _wav_bytes(body)
                 _validate_wav(data)
-                name = f"tts-{line['id']}-{hashlib.sha256(data).hexdigest()}.wav"
-                media_dir.mkdir(parents=True, exist_ok=True)
-                (media_dir / name).write_bytes(data)
-                for old in media_dir.glob(f"tts-{line['id']}-*.wav"):
-                    if old.name != name and re.fullmatch(
-                            rf"tts-{re.escape(line['id'])}-[0-9a-f]{{64}}\.wav", old.name):
-                        old.unlink()
-                return key, name, None
+                break
             except Exception as exc:
+                data = None
                 error = f'{exc.args[0]}: {exc.args[1]}' if isinstance(exc, VoiceError) else str(exc)
                 if attempt < len(RETRY_DELAYS):
                     sleep(RETRY_DELAYS[attempt])
-        return key, None, error
+        if data is None:
+            return key, None, error
+
+        name = f"tts-{line['id']}-{hashlib.sha256(data).hexdigest()}.wav"
+        try:
+            media_dir.mkdir(parents=True, exist_ok=True)
+            target = media_dir / name
+            temporary = media_dir / ('.' + name + '.tmp')
+            temporary.write_bytes(data)
+            temporary.replace(target)
+            with cache_lock:
+                cache[key] = name
+                files[line['id']] = name
+                _write_cache(cache_path, cache)
+            for old in media_dir.glob(f"tts-{line['id']}-*.wav"):
+                if old.name != name and re.fullmatch(
+                        rf"tts-{re.escape(line['id'])}-[0-9a-f]{{64}}\.wav", old.name):
+                    try:
+                        old.unlink()
+                    except OSError:
+                        pass
+            return key, name, None
+        except Exception as exc:
+            return key, None, str(exc)
 
     with ThreadPoolExecutor(max_workers=jobs) as executor:
         outcomes = list(executor.map(record, pending))
@@ -145,11 +177,8 @@ def voice_lines(lines, media_dir, *, post, cache_path,
     for (line, _), (key, name, error) in zip(pending, outcomes):
         if error is not None:
             failures.append(f"{line['id']}: {error}")
-        else:
-            cache[key] = name
-            files[line['id']] = name
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
-    cache_path.write_text(json.dumps(cache, ensure_ascii=False, sort_keys=True, indent=1) + '\n', encoding='utf-8')
+    with cache_lock:
+        _write_cache(cache_path, cache)
     if failures:
         raise VoiceError('tts_failed', '; '.join(failures))
     return {'voiced': len(pending), 'reused': reused,

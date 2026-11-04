@@ -1,9 +1,8 @@
 (function(){
 var level=0,station=0,tries=0,busy=false,timer,counts=[1,3,2,4,1,3,4];
 K.hud({icon:'▣',title:'数序车站',levels:2});K.owl();K.ready({emoji:'🌲',title:'数序车站',sub:'数序车站'});
-var person='<svg viewBox="0 0 80 100"><circle cx="40" cy="22" r="15" fill="#f5b675"/><path d="M19 82 Q18 44 40 43 Q62 44 61 82Z" fill="#4c8ddb"/><path d="M25 80 V96 M55 80 V96" stroke="#6b4423" stroke-width="7"/></svg>';
-var stations=[];for(var i=1;i<=7;i++){(function(n){var b=K.el('button','station','<svg viewBox="0 0 150 190"><path d="M10 65 L75 15 L140 65 V175 H10Z" fill="#ffe8af" stroke="#c98c4b" stroke-width="5"/><rect x="25" y="72" width="100" height="88" rx="10" fill="#fff" stroke="#e8c48f" stroke-width="4"/><circle cx="75" cy="43" r="17" fill="#58b45c"/></svg>',K.$('#stations'));b.id='station-'+n;b.setAttribute('aria-label','车站 '+n);b.onclick=function(){move(n)};stations.push(b)})(i)}
-K.$('#car').innerHTML='<svg viewBox="0 0 140 90"><path d="M12 58 V31 Q12 16 28 16 H94 L120 36 H130 V65 H12Z" fill="#e4572e" stroke="#a83b1c" stroke-width="5"/><path d="M34 24 H87 V43 H34Z" fill="#c8efff"/><circle cx="37" cy="69" r="14" fill="#6b4423"/><circle cx="104" cy="69" r="14" fill="#6b4423"/></svg>';
+var person='<span class="person" aria-hidden="true"></span>';
+var stations=[];for(var i=1;i<=7;i++){(function(n){var b=K.el('button','station','<span class="sprite" aria-hidden="true"></span>',K.$('#stations'));b.id='station-'+n;b.setAttribute('aria-label','车站 '+n);b.onclick=function(){move(n)};stations.push(b)})(i)}
 [2,3,4,5].forEach(function(n){var b=K.el('button','',String(n),K.$('#numbers'));b.onclick=function(){answer(n,b)}});
 function render(){K.$('#goal').textContent='第 '+(level?7:6)+' 站';K.$('#car').style.left=(station?25+(station-1)*172:25)+'px';stations.forEach(function(b,i){b.classList.toggle('chosen',station===i+1)});K.$('#passengers').innerHTML=station?person.repeat(counts[station-1]):''}
 function reset(){clearTimeout(timer);level=0;station=0;tries=0;busy=false;K.stars=0;K.$('#star-n').textContent='0';K.levels(2,0);render();K.say('从箭头一端找车站')}

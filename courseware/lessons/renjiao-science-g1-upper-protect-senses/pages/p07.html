@@ -1,29 +1,18 @@
 <section id="board" aria-label="整理安全做法">
   <div id="body" class="body-card">
-    <svg viewBox="0 0 300 360" role="img" aria-label="绿衣小女孩">
-      <circle cx="150" cy="76" r="58" fill="#F2C69C" stroke="#6B4423" stroke-width="7"/>
-      <path d="M93 74Q92 12 151 14q58 0 59 61-23-20-44-18-34 4-73 17" fill="#302922"/>
-      <path d="M120 80h8m44 0h8" stroke="#302922" stroke-width="8" stroke-linecap="round"/>
-      <path d="M137 105q14 12 28 0" fill="none" stroke="#B95D45" stroke-width="5" stroke-linecap="round"/>
-      <path d="M103 150q47-24 94 0l34 119H69z" fill="#58B45C" stroke="#2F8A3A" stroke-width="7"/>
-      <path d="M110 266l-8 75m87-75 9 75" stroke="#6B4423" stroke-width="23" stroke-linecap="round"/>
-      <path d="M99 341h-34m131 0h36" stroke="#4C8DDB" stroke-width="22" stroke-linecap="round"/>
-      <circle class="zone" id="eye-zone" cx="151" cy="78" r="22" fill="none" stroke="#F6A935" stroke-width="8"/>
-      <circle class="zone" id="ear-zone" cx="93" cy="83" r="16" fill="none" stroke="#4C8DDB" stroke-width="7"/>
-      <circle class="zone" id="nose-zone" cx="151" cy="97" r="14" fill="none" stroke="#E4572E" stroke-width="7"/>
-      <circle class="zone" id="skin-zone" cx="218" cy="205" r="18" fill="none" stroke="#8B5CF6" stroke-width="7"/>
-    </svg>
+    <div class="body-picture" role="img" aria-label="女孩用感觉器官观察周围"></div>
+    <i class="zone" id="eye-zone"></i><i class="zone" id="ear-zone"></i><i class="zone" id="nose-zone"></i><i class="zone" id="skin-zone"></i>
     <div class="zone-dock" id="zones">
-      <button data-zone="eye" aria-label="眼睛"><svg viewBox="0 0 100 70"><path d="M8 35Q50-3 92 35 50 73 8 35Z" fill="#fff" stroke="#6B4423" stroke-width="6"/><circle cx="50" cy="35" r="15" fill="#4C8DDB"/><circle cx="50" cy="35" r="7" fill="#302922"/></svg></button>
-      <button data-zone="ear" aria-label="耳朵"><svg viewBox="0 0 100 100"><path d="M67 69q-4 24-25 20Q20 86 23 60q-1-30 26-42 29-8 38 19 7 21-15 39" fill="#E9AE80" stroke="#6B4423" stroke-width="7"/><path d="M64 64q13-15 3-25-13-12-25 1-7 8-2 20" fill="none" stroke="#B95D45" stroke-width="7"/></svg></button>
-      <button data-zone="nose" aria-label="鼻子"><svg viewBox="0 0 100 100"><path d="M50 10Q42 48 28 69q-5 14 22 16 29-2 24-16Q60 49 50 10Z" fill="#E9AE80" stroke="#6B4423" stroke-width="7"/><path d="M40 72q10 7 20 0" fill="none" stroke="#B95D45" stroke-width="5"/></svg></button>
-      <button data-zone="skin" aria-label="皮肤"><svg viewBox="0 0 100 100"><path d="M26 53V24q0-10 9-10t9 10v22-31q0-10 10-10t10 10v31-25q0-10 10-10t10 10v32q0 35-27 40-26 3-38-20L8 45q-4-9 4-13 9-5 14 5Z" fill="#E9AE80" stroke="#6B4423" stroke-width="6"/></svg></button>
+      <button class="zone-eye" data-zone="eye" aria-label="眼睛"></button>
+      <button class="zone-ear" data-zone="ear" aria-label="耳朵"></button>
+      <button class="zone-nose" data-zone="nose" aria-label="鼻子"></button>
+      <button class="zone-skin" data-zone="skin" aria-label="皮肤"></button>
     </div>
   </div>
   <div class="work">
     <div id="tray" class="tray"></div>
-    <div class="hint-pic" aria-hidden="true"><svg viewBox="0 0 140 100"><path d="M18 79q54-13 94-55M87 23l27 1-3 26" fill="none" stroke="#F6A935" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="74" r="16" fill="#58B45C"/></svg></div>
-    <button id="check" class="round green" aria-label="继续"><svg viewBox="0 0 100 100"><path d="m22 52 20 20 40-46" fill="none" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="hint-pic" aria-hidden="true">↗</div>
+    <button id="check" class="round green" aria-label="继续">✓</button>
     <div id="result" aria-live="polite"></div>
   </div>
 </section>

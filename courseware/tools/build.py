@@ -30,6 +30,17 @@ def _string(value):
     return isinstance(value, str) and bool(value.strip())
 
 
+def _validate_semantic_visual(grade, page_id, html, css, js):
+    """Keep early-grade games from shipping with only ad-hoc or textual stand-ins for pictures."""
+    if grade not in (1, 2):
+        return
+    source = html + '\n' + css + '\n' + js
+    uses_registered_picture = '__IMG:' in source
+    semantic_diagram = re.search(r'\bdata-semantic-diagram\s*=\s*["\'][^"\']+["\']', html)
+    if not uses_registered_picture and semantic_diagram is None:
+        _fail('semantic_visual_missing', f'{page_id}: use a registered lesson picture or mark a knowledge-only diagram')
+
+
 def _write(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
@@ -164,6 +175,7 @@ def prepare(lesson_dir, out_dir, *, stage_id, now_ms=None):
                 css = css_path.read_text(encoding='utf-8') if css_path.exists() else ''
             except OSError as exc:
                 raise BuildError('page_missing', f'{key} {page_id}: {exc}') from exc
+            _validate_semantic_visual(lesson['grade'], page_id, html, css, js)
             clash = page.defined_ids(html + js) & page.reserved_ids()
             if clash:
                 _fail('id_reserved', f"{key} {page_id}: {', '.join(sorted(clash))}")

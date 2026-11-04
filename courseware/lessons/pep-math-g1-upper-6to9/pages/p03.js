@@ -1,6 +1,6 @@
 (function(){
 if(!K.$('#birds')||!K.$('#dot-choices')||!K.$('#number-6'))return;
-var bird='<svg viewBox="0 0 140 140" aria-hidden="true"><path d="M17 92Q27 40 76 45Q103 46 112 67L130 73 112 81Q101 111 62 109Q40 108 17 92Z" fill="#70b8e7" stroke="#3974a9" stroke-width="4"/><path d="M43 71Q70 62 86 79Q76 100 46 94Z" fill="#397fbc"/><circle cx="98" cy="65" r="5" fill="#493622"/><path d="M28 92L9 78 15 102Z" fill="#397fbc"/><path d="M57 108v12m20-12v12" stroke="#c47a12" stroke-width="5"/></svg>';
+var bird='<span class="sprite" aria-hidden="true"></span>';
 var positions=[[[55,30],[300,0],[570,40],[150,210],[380,190],[650,230]],[[65,25],[320,25],[575,25],[65,220],[320,220],[575,220]]],level=0,marked=[],tries=0,busy=false,timer, birds=[];
 K.hud({icon:'●',title:'给六只小鸟配点阵',levels:2});K.owl();K.ready({emoji:'🌲',title:'给六只小鸟配点阵',sub:'六只鸟与点阵',btn:'start-btn'});
 for(var i=0;i<6;i++){(function(i){var e=K.el('button','bird',bird+'<span class="badge"></span>',K.$('#birds'));e.id='bird-'+(i+1);e.setAttribute('aria-label','小鸟 '+(i+1));e.addEventListener('click',function(){if(!K.started||busy||marked.indexOf(i)>=0)return;marked.push(i);K.sfx.tick(marked.length);render();K.say(marked.length===6?'数完了，找同样多的点':'找还没点过的小鸟')});birds.push(e)})(i)}
