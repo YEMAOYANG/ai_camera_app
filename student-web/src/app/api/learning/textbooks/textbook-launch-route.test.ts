@@ -76,6 +76,26 @@ describe("textbook launch BFF", () => {
     expect(response.headers.get("set-cookie")).not.toContain("Partitioned");
   });
 
+  it("accepts the backend's four-hour fixed-textbook runtime lifetime", async () => {
+    const headers = new Headers({
+      Location: `/classroom/${classroomId}?mira=1&textbook=1`,
+    });
+    const scoped = `mira_openmaic_runtime_classroom_${createHash("sha256")
+      .update(classroomId).digest("hex").slice(0, 32)}`;
+    headers.append("Set-Cookie",
+      `mira_openmaic_runtime=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=14400`);
+    headers.append("Set-Cookie",
+      `${scoped}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=14400`);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 303, headers })));
+
+    const response = await POST(request(), { params: Promise.resolve({ contentKey }) });
+
+    expect(response.status).toBe(200);
+    expect((await response.json()).launchUrl).toBe(
+      `http://localhost:3101/classroom/${classroomId}?mira=1&textbook=1`,
+    );
+  });
+
   it("keeps the pinned launch flow for a different browser hostname", async () => {
     const runtimeFetch = vi.fn();
     vi.stubGlobal("fetch", runtimeFetch);

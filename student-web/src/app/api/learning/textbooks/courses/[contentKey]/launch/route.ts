@@ -7,6 +7,10 @@ import { openMaicLaunchUrlForRequest, resolveOpenMaicRuntimeOrigin } from "@/lib
 
 const classroomPath = /^\/classroom\/(tbpub_[a-f0-9]{24})$/;
 const runtimeToken = /^tbpr_[A-Za-z0-9._~-]{1,512}$/;
+// The backend signs fixed-textbook runtime sessions for four hours. Keep the
+// BFF's cookie ceiling equal to that authority instead of rejecting its own
+// gateway's legitimate Max-Age value.
+const MAX_RUNTIME_COOKIE_AGE_SECONDS = 4 * 60 * 60;
 
 function setCookies(headers: Headers) {
   const extended = headers as Headers & { getSetCookie?: () => string[] };
@@ -40,7 +44,7 @@ function verifiedRuntimeCookies(headers: Headers, classroomId: string, secure: b
     const age = Number(attributes.get("max-age"));
     if (attributes.get("path") !== "/" || attributes.get("samesite") !== "lax"
         || !flags.has("httponly") || flags.has("partitioned") || attributes.has("domain")
-        || !Number.isInteger(age) || age < 1 || age > 3600
+        || !Number.isInteger(age) || age < 1 || age > MAX_RUNTIME_COOKIE_AGE_SECONDS
         || (secure ? !flags.has("secure") : flags.has("secure")))
       throw new Error("课堂凭证未通过检查");
     found.set(name, { raw: `${name}=${value}; Path=/; HttpOnly; SameSite=lax; Max-Age=${age}${secure ? "; Secure" : ""}`, value });
