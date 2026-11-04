@@ -18,6 +18,10 @@ OPERATIONS = {'widget_highlight', 'widget_setState', 'widget_annotation', 'widge
 # The spoken explanation a page must carry when a lesson is checked as a teaching lesson. The pilot lesson 整理和复习 averages
 # 162 characters on a slide and 131 on an interactive page; its thinnest slide has 6 lines and 100 characters.
 NARRATION_MINIMUM = {'slide': (6, 100), 'interactive': (5, 90)}
+# The speech voice cannot be trusted with pinyin letters: a spoken line names the character and its tone instead.
+TONE_MARKED = re.compile('[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]')
+# The numbered texts of a slide template (points, items, steps): the teacher lights each one while speaking about it.
+NUMBERED_TEXT = re.compile(r'text_(?:point|item|step)-\d+$')
 TRADITIONAL = frozenset(Path(__file__).with_name('traditional.txt').read_text(encoding='utf-8').strip())
 
 
@@ -60,7 +64,8 @@ def text_box(element):
 
 
 def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=None, verification=None, grade=None, teaching=False):
-    """All gates over a built classroom; teaching=True also requires enough spoken explanation on every slide and page."""
+    """All gates over a built classroom; teaching=True also requires enough spoken explanation on every slide and page,
+    no pinyin letters in a spoken line and every numbered text of a slide lit in turn."""
     issues = []
 
     def add(gate, code, scene, detail, severity='error'):
@@ -94,6 +99,15 @@ def check_classroom(body, media_dir=None, *, notes=None, roster=None, receipt=No
             if len(speeches) < lines or spoken < characters:
                 add('G3', 'narration_thin', index, '%d lines and %d characters of speech; a %s needs at least %d lines and %d characters that explain the knowledge' % (
                     len(speeches), spoken, scene['type'], lines, characters))
+        if teaching:
+            for action in speeches:
+                if TONE_MARKED.search(action.get('text', '')):
+                    add('G3', 'speech_pinyin', index, str(action.get('id', 'speech')) + ': say the character and its tone name, not pinyin letters')
+            if scene.get('type') == 'slide':
+                numbered = [e['id'] for e in scene.get('content', {}).get('canvas', {}).get('elements', []) if NUMBERED_TEXT.match(str(e.get('id', '')))]
+                lit = list(dict.fromkeys(a.get('elementId') for a in actions if a.get('type') in ('spotlight', 'laser') and a.get('elementId') in numbered))
+                if lit != [name for name in numbered if name in lit] or len(lit) < len(numbered):
+                    add('G3', 'spotlight_gap', index, 'lit in the order %s; the teacher must light every one of %s in that order' % (lit, numbered))
         for action in speeches:
             if not action.get('audioUrl'):
                 add('G1', 'speech_audio_missing', index, str(action.get('id', 'speech')))
