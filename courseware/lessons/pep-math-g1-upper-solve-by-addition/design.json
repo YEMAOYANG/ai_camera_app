@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "用加法解决问题",
+  "frame": {
+    "slides": [
+      1000,
+      562.5
+    ],
+    "interactive": [
+      1280,
+      720
+    ],
+    "kit": "courseware/kit"
+  },
+  "pages": [
+    {
+      "key": "p02",
+      "mechanism": "移动大括号范围卡，覆盖两部分再放问号",
+      "stateKeys": [
+        "demo",
+        "demoBoth",
+        "play"
+      ],
+      "teacherTargets": [
+        "#cup-left",
+        "#cup-right",
+        "#whole-bracket",
+        "#scope-options"
+      ],
+      "completion": "3关求一共范围判断",
+      "reset": "恢复未选择范围与首关"
+    },
+    {
+      "key": "p04",
+      "mechanism": "每只杯子下方有一个圆片配对位，点空位或将圆片拖入一边；已配位置不重复计数，两组均逐件对应后检查",
+      "stateKeys": [
+        "demo",
+        "demoModel",
+        "play"
+      ],
+      "teacherTargets": [
+        "#cups",
+        "#model-left",
+        "#model-right",
+        "#bead-supply"
+      ],
+      "completion": "3关每杯只配一枚，不能重复配；检查前必须补齐全部对应位",
+      "reset": "圆片全清空回供给处"
+    },
+    {
+      "key": "p07",
+      "mechanism": "运算符改变实物合并或移开状态，结果须对应求整体",
+      "stateKeys": [
+        "demo",
+        "demoPlus",
+        "play"
+      ],
+      "teacherTargets": [
+        "#scene-cups",
+        "#whole-bracket",
+        "#operation-options",
+        "#result-options"
+      ],
+      "completion": "3关运算意义和结果同时成立",
+      "reset": "清空运算与结果，实物回原两组"
+    },
+    {
+      "key": "p09",
+      "mechanism": "每个物品逐一计数，再修正错误思路或计算",
+      "stateKeys": [
+        "demo",
+        "demoCount",
+        "demoFixed",
+        "play"
+      ],
+      "teacherTargets": [
+        "#review-cups",
+        "#draft-equation",
+        "#review-operation",
+        "#review-options"
+      ],
+      "completion": "2份错误作业完成逐件核验并修正",
+      "reset": "所有标记、错误式与关卡复原"
+    }
+  ],
+  "visual": {
+    "pictures": [
+      "studio",
+      "cup",
+      "bead",
+      "quiz-shells",
+      "quiz-stickers",
+      "quiz-windmills",
+      "quiz-balls",
+      "quiz-pencils",
+      "quiz-cards"
+    ],
+    "knowledgeDiagrams": [
+      "大括号范围",
+      "问号和算式",
+      "一对一数量圆片"
+    ],
+    "lowReading": "杯子本身表达数量，老师说清两信息一问题。范围选项用两组点和不同跨度的真实括号表示，运算符和数字为学习目标，无须读按钮汉字。 小检查用正式贝壳、贴纸、风车、球、铅笔、卡片图呈现完整信息，不用数量点代替物品；选项数量点本身就是数量知识。"
+  },
+  "teacherHandoff": "每页至少3次真实画面操作，先操作后讲解，教师示范结束显式play，学生自己摆模和检查。",
+  "acceptance": "正式素材和音频到位后执行G6三尺寸、随机试玩、四状态视觉验收与独立核对；当前离线结构不能冒充这些闸门。"
+}

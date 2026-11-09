@@ -1,0 +1,14 @@
+(function(){
+K.hud({icon:'笔',title:'观察字形，慢慢描',levels:6});K.owl();
+var words=['春','冬','吹','花','飞','入'],level=0,board=K.$('#trace-board'),ctx=board.getContext('2d'),mask=document.createElement('canvas'),points=[],covered=0,down=false,prev=null,ready=false;mask.width=460;mask.height=460;
+function guide(){ctx.clearRect(0,0,460,460);ctx.strokeStyle='#ecd9c8';ctx.lineWidth=2;ctx.setLineDash([9,8]);ctx.beginPath();ctx.moveTo(230,12);ctx.lineTo(230,448);ctx.moveTo(12,230);ctx.lineTo(448,230);ctx.stroke();ctx.setLineDash([]);ctx.font='370px "Kaiti SC","STKaiti",serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#d9ded7';ctx.fillText(words[level],230,239);var m=mask.getContext('2d');m.clearRect(0,0,460,460);m.font=ctx.font;m.textAlign='center';m.textBaseline='middle';m.fillStyle='#000';m.fillText(words[level],230,239);var pixels=m.getImageData(0,0,460,460).data;points=[];for(var y=30;y<430;y+=8)for(var x=30;x<430;x+=8)if(pixels[(y*460+x)*4+3]>100)points.push({x:x,y:y,hit:false});covered=0;ready=false;K.$('#trace-next').disabled=true;K.$('#trace-meter i').style.width='0';K.$('#trace-title').textContent=words[level];K.levels(6,level)}
+function pos(e){var r=board.getBoundingClientRect();return{x:(e.clientX-r.left)*460/r.width,y:(e.clientY-r.top)*460/r.height}}
+function distance(p,a,b){var dx=b.x-a.x,dy=b.y-a.y,t=(dx||dy)?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy))):0;return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy)}
+function draw(p){if(!prev)prev=p;ctx.lineWidth=20;ctx.lineCap='round';ctx.strokeStyle='#5e9cae';ctx.beginPath();ctx.moveTo(prev.x,prev.y);ctx.lineTo(p.x,p.y);ctx.stroke();points.forEach(function(pt){if(!pt.hit&&distance(pt,prev,p)<18){pt.hit=true;covered++}});prev=p;var rate=points.length?covered/points.length:0;K.$('#trace-meter i').style.width=Math.min(100,Math.round(rate*100))+'%';if(rate>=.6&&!ready){ready=true;K.$('#trace-next').disabled=false;K.sfx.ok();K.say('字形覆盖有了，看看后再进入下一字。','ok')}}
+board.onpointerdown=function(e){e.preventDefault();down=true;prev=pos(e);try{board.setPointerCapture(e.pointerId)}catch(ignore){}draw(prev)};board.onpointermove=function(e){if(down){e.preventDefault();draw(pos(e))}};function stop(){if(down&&!ready)K.say('沿着浅灰字形再描一小段。');down=false;prev=null}board.onpointerup=stop;board.onpointercancel=stop;
+K.$('#trace-reset').onclick=function(){stop();guide();K.say('当前轨迹擦掉了，可以重新描。')};
+K.$('#trace-next').onclick=function(){if(!ready)return;stop();K.star(1,board);level++;if(level===words.length){K.levels(6,6);K.finish({title:'六个字都留下轨迹了',sub:'只记录覆盖，字形质量和笔顺待大人观察。',again:reset})}else guide()};
+function reset(){stop();level=0;K.stars=0;K.$('#star-n').textContent='0';guide();K.say('沿浅灰字形描，覆盖够了再点箭头。')}
+K.onState=function(state){if(typeof state.demo==='boolean')K.$('#trace-hand').classList.toggle('hide',!state.demo)};
+K.onStart=reset;K.ready({emoji:'✦',title:'六个字的描摹',sub:'只看字形覆盖，不判断笔顺。'});reset();
+})();

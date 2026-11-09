@@ -1,0 +1,13 @@
+
+.board{position:absolute;inset:4px 8px;border:3px solid var(--line);border-radius:28px;background:#fffdf5;padding:20px}
+.caption{font-size:30px;font-weight:800;text-align:center;line-height:1.4}
+.art{width:100%;height:100%;object-fit:contain;display:block;border-radius:16px}
+.tile{background:#fff;border:3px solid var(--line);border-radius:22px;cursor:pointer;position:relative;overflow:hidden;color:var(--ink);font:800 28px inherit}
+.tile.chosen{border:6px solid var(--bl)}
+.tile.done{border-color:var(--gr);background:#effbea;cursor:default}
+.row{display:flex;align-items:center;justify-content:center;gap:20px}
+.hint-btn{position:absolute;right:22px;top:20px;width:74px;height:64px;padding:0;font-size:30px}
+.small-note{font-size:24px;line-height:1.35;text-align:center;color:var(--ink2)}
+.broken{border:4px dashed var(--rd);background:#fff2e7}
+#writing-grid{position:absolute;left:100px;top:50px;width:420px;height:420px;border:4px solid #b88d65;background:#fffaf0}#writing-grid svg,#trace-canvas{position:absolute;inset:6px;width:400px;height:400px}#trace-canvas{touch-action:none}#writing-word{position:absolute;left:690px;top:40px;width:250px;text-align:center;font-size:120px}.writing-note{position:absolute;left:650px;top:220px;width:360px}#clear-trace{position:absolute;left:680px;top:360px;width:110px;height:90px;font-size:50px}#next-char{position:absolute;left:870px;top:360px;width:110px;height:90px;font-size:50px}
+#ready .pic{object-fit:contain;background:#fffdf5}.media-failure{position:absolute;inset:0;z-index:80;background:#fff4df;display:flex;align-items:center;justify-content:center}.media-failure-card{width:850px;padding:60px;background:#fff;border:4px solid var(--line);border-radius:30px;text-align:center}.media-failure h2{font-size:44px;margin-bottom:24px}.media-failure p{font-size:30px;line-height:1.6;margin-bottom:32px}.media-failure button{height:90px;width:150px;font-size:48px}

@@ -1,0 +1,1161 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "5 对韵歌",
+  "description": "看图认字、玩对子、读出节奏，再练五个汉字。统编语文一年级上册的两课时合为完整一课。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/mi-chinese-v1.png",
+      "color": "#39775C",
+      "persona": "耐心地用图画、口语和操作教一年级语文。"
+    }
+  },
+  "images": {
+    "rain": {
+      "file": "assets/rain.png"
+    },
+    "wind": {
+      "file": "assets/wind.png"
+    },
+    "flower": {
+      "file": "assets/flower.png"
+    },
+    "tree": {
+      "file": "assets/tree.png"
+    },
+    "bird": {
+      "file": "assets/bird.png"
+    },
+    "insect": {
+      "file": "assets/insect.png"
+    },
+    "landscape": {
+      "file": "assets/landscape.png"
+    },
+    "duet": {
+      "file": "assets/duet.png"
+    },
+    "q-rain": {
+      "file": "assets/q-rain.png"
+    },
+    "q-wind": {
+      "file": "assets/q-wind.png"
+    },
+    "q-park": {
+      "file": "assets/q-park.png"
+    },
+    "q-flower": {
+      "file": "assets/q-flower.png"
+    },
+    "q-bug": {
+      "file": "assets/q-bug.png"
+    },
+    "q-bird": {
+      "file": "assets/q-bird.png"
+    },
+    "q-valley": {
+      "file": "assets/q-valley.png"
+    },
+    "q-peach": {
+      "file": "assets/q-peach.png"
+    },
+    "q-singer": {
+      "file": "assets/q-singer.png"
+    },
+    "q-bag": {
+      "file": "assets/q-bag.png"
+    },
+    "q-boot": {
+      "file": "assets/q-boot.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "对和歌",
+      "template": "picture-points",
+      "data": {
+        "title": "对和歌",
+        "picture": "duet",
+        "points": [
+          "对　duì",
+          "歌　gē",
+          "duì　liǔ"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两个小朋友面对面，一人说，一人接。"
+        },
+        {
+          "say": "听上去就像在玩拍手的游戏。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "对，第四声。左边是又，右边是寸。"
+        },
+        {
+          "say": "把两样有关的东西放一组，可以说成一对。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "歌，第一声。我们能唱歌，也能念儿歌。"
+        },
+        {
+          "say": "小满问：一边拍手，一边说词，也可以吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "读课题时，看看对和柳的拼音。"
+        },
+        {
+          "say": "对的韵母先圆口，柳的韵母先展口。"
+        },
+        {
+          "say": "听我慢慢读：对，第四声；柳，第三声。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "看着课本读全歌",
+      "template": "picture-points",
+      "data": {
+        "title": "看着课本读全歌",
+        "picture": "landscape",
+        "points": [
+          "云 · 雨　雪 · 风",
+          "花 · 树　鸟 · 虫",
+          "山清 · 水秀",
+          "柳绿 · 桃红"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "翻到课本第七十三页，我们跟着词语看风景。"
+        },
+        {
+          "say": "每组中间加个对字，读完一组再停一下。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "开头先说云和雨，再接雪和风。"
+        },
+        {
+          "say": "听我读：云对雨，雪对风。逗号这里停一下。"
+        },
+        {
+          "say": "这四样都是抬头看天、出门能碰到的现象。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接着读花和树，再读鸟和虫。"
+        },
+        {
+          "say": "前一对是植物，后一对是动物。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看到山清和水秀，想一想青山和流水。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "再看绿柳枝和红桃花，像给春天涂颜色。"
+        },
+        {
+          "say": "指着课本从头读一遍，逗号处轻轻停一下。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "雨和风",
+      "template": "two-columns",
+      "data": {
+        "title": "雨和风",
+        "left": {
+          "heading": "雨　yǔ",
+          "body": "细雨"
+        },
+        "right": {
+          "heading": "风　fēng",
+          "body": "海风"
+        },
+        "left_picture": "rain",
+        "right_picture": "wind"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "雨，第三声，声音先低下去，再抬起来。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "细细的雨线落下来，水洼起了小圈。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "雨下得细细的，我们就叫它细雨。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "风，第一声。把尾音轻轻收在鼻腔后面。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看不见风，却看见布旗往旁边飘起来。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "从海面吹过来的风，可以叫海风。"
+        },
+        {
+          "say": "找天气的线索，先看雨滴，再看东西怎么动。"
+        },
+        {
+          "say": "朵朵说：原来布旗动了，也能提醒我有风。",
+          "by": "duoduo"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "字卡送到天气里",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "rain",
+      "script": [
+        {
+          "setState": {
+            "weatherDemo": "prepare"
+          }
+        },
+        {
+          "highlight": "#weather-token"
+        },
+        {
+          "say": "我们来给天气图找字卡。看这张卡，是雨。"
+        },
+        {
+          "highlight": "#weather-a"
+        },
+        {
+          "say": "这张图有落下的雨点，还有圈圈水纹。"
+        },
+        {
+          "setState": {
+            "weatherDemo": true
+          }
+        },
+        {
+          "say": "雨字送进去，因为图里真的在下雨。"
+        },
+        {
+          "highlight": "#weather-b"
+        },
+        {
+          "say": "另一张图里，布旗飘起来，却没有雨点。"
+        },
+        {
+          "say": "看见变化，先想那是下雨，还是刮风。"
+        },
+        {
+          "setState": {
+            "weatherDemo": false
+          }
+        },
+        {
+          "say": "轮到你了。把上方字卡拖到合适的图上。"
+        },
+        {
+          "say": "也可以先点字卡，再点图。第一次错了还能试。"
+        },
+        {
+          "say": "字卡留在图里，才表示这一关配上了。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "认识虫",
+      "template": "big-word",
+      "data": {
+        "title": "认识虫",
+        "word": "虫",
+        "pinyin": "chóng",
+        "picture": "insect",
+        "hint": "小虫"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "虫，第二声。先把舌尖轻轻翘起来。"
+        },
+        {
+          "spotlight": "pinyin"
+        },
+        {
+          "say": "再把声音往上扬，尾巴轻轻收在后鼻腔。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "叶子上这只小家伙，可以叫小虫。"
+        },
+        {
+          "say": "看看它的翅膀和脚，和小鸟不一样。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "说小虫的时候，用的就是这个虫字。"
+        },
+        {
+          "say": "有些写昆虫的字带虫字旁，例如蚂蚁。"
+        },
+        {
+          "say": "猫头鹰站长提醒：看字旁，可以猜一点意思。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "给对子牵线",
+      "page": "p06",
+      "widgetType": "game",
+      "startImage": "landscape",
+      "script": [
+        {
+          "setState": {
+            "pairDemo": "prepare"
+          }
+        },
+        {
+          "highlight": "#pair-left"
+        },
+        {
+          "say": "左边的花长在地上，有茎，还有叶子。"
+        },
+        {
+          "highlight": "#pair-option-tree"
+        },
+        {
+          "say": "右边的大树也长在地上，它们都是植物。"
+        },
+        {
+          "setState": {
+            "pairDemo": true
+          }
+        },
+        {
+          "say": "把花和树连起来，相关的事物就配成一对。"
+        },
+        {
+          "highlight": "#pair-link"
+        },
+        {
+          "say": "一条线连着两边，念的时候中间说对。"
+        },
+        {
+          "say": "等看到小鸟时，想一想它该找哪类伙伴。"
+        },
+        {
+          "setState": {
+            "pairDemo": false
+          }
+        },
+        {
+          "say": "现在你来接。先点左图，再点能配对的右图。"
+        },
+        {
+          "say": "连错了线会收回，换一个想法接着试。"
+        },
+        {
+          "say": "配好后跟着图说一说，这两样哪里有关。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "看图小检查",
+      "intro": [
+        "听老师读题，想一想图里画了什么。",
+        "每题选一张图。选好后，再听下一题。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "哪幅图最适合贴上雨字？",
+          "skill": "雨风字义",
+          "answer": [
+            "A"
+          ],
+          "analysis": "玻璃外的雨点往下落，窗上留下水滴，所以用雨。",
+          "options": {
+            "A": {
+              "label": "雨点落在窗上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rain",
+                "alt": "雨点落在窗上"
+              }
+            },
+            "B": {
+              "label": "围巾被风吹起",
+              "visual": {
+                "kind": "asset",
+                "image": "q-wind",
+                "alt": "围巾被风吹起"
+              }
+            },
+            "C": {
+              "label": "孩子在公园看书",
+              "visual": {
+                "kind": "asset",
+                "image": "q-park",
+                "alt": "孩子在公园看书"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "哪一个小家伙可以用虫字来介绍？",
+          "skill": "虫字义",
+          "answer": [
+            "B"
+          ],
+          "analysis": "瓢虫是虫，向日葵是花，小鸭是鸟。",
+          "options": {
+            "A": {
+              "label": "向日葵",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flower",
+                "alt": "向日葵"
+              }
+            },
+            "B": {
+              "label": "瓢虫",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bug",
+                "alt": "瓢虫"
+              }
+            },
+            "C": {
+              "label": "小鸭",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bird",
+                "alt": "小鸭"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "山清水秀",
+      "template": "picture-points",
+      "data": {
+        "title": "山清水秀",
+        "picture": "landscape",
+        "points": [
+          "清　qīng",
+          "山清",
+          "水秀"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "从河岸向远处看，青山和河水在同一幅画里。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "清，第一声。清水看起来透亮。"
+        },
+        {
+          "say": "有时你还能隔着水，看见底下的小石头。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "山清是说山看起来清秀好看。"
+        },
+        {
+          "say": "青绿山坡的轮廓，在亮亮的天底下很清楚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "水秀是说水也很好看，像这里弯弯的水面。"
+        },
+        {
+          "say": "两个字说山，两个字说水，合起来就是好风景。"
+        },
+        {
+          "say": "小满问：我家附近有这样的风景吗？",
+          "by": "xiaoman"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "柳绿桃红",
+      "template": "picture-points",
+      "data": {
+        "title": "柳绿桃红",
+        "picture": "landscape",
+        "points": [
+          "绿　lǜ",
+          "桃　táo",
+          "红　hóng",
+          "纟　绞丝旁"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "走到春天的河边，我们再看近处的树。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "绿，第四声。柳枝上嫩嫩的叶子是绿色。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "桃，第二声。这里的桃，说的是桃树。"
+        },
+        {
+          "say": "桃枝上开了花，我们把这种花叫桃花。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "红，第二声。桃花红红的，和绿叶很不一样。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "绿和红的左边有同一个偏旁，叫绞丝旁。"
+        },
+        {
+          "say": "柳绿说柳叶的颜色，桃红说桃花的颜色。"
+        },
+        {
+          "say": "朵朵说：先找树，再看看枝上是什么颜色。",
+          "by": "duoduo"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "用小镜头找春景",
+      "page": "p10",
+      "widgetType": "game",
+      "startImage": "landscape",
+      "script": [
+        {
+          "highlight": "#spring-view"
+        },
+        {
+          "say": "我们的镜头里有青山、河水、柳树和桃花。"
+        },
+        {
+          "highlight": "#spring-mountain"
+        },
+        {
+          "say": "老师先找山。远处高高起伏的，是青山。"
+        },
+        {
+          "setState": {
+            "springDemo": true
+          }
+        },
+        {
+          "say": "镜头在山上停一下，想想山清的样子。"
+        },
+        {
+          "highlight": "#spring-water"
+        },
+        {
+          "say": "弯弯的河面映着光，水秀就藏在这里。"
+        },
+        {
+          "say": "绿柳枝往下垂，粉红桃花开在另一侧。"
+        },
+        {
+          "setState": {
+            "springDemo": false
+          }
+        },
+        {
+          "say": "你来找。看上方的词，再点画里对应的地方。"
+        },
+        {
+          "say": "先找水，再找绿柳枝，最后找红桃花。"
+        },
+        {
+          "say": "找不到时，先看颜色和形状，再挪动镜头。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "看图小检查",
+      "intro": [
+        "听老师读题，想一想图里画了什么。",
+        "每题选一张图。选好后，再听下一题。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "哪幅新风景最能让你想到山清水秀？",
+          "skill": "山清水秀",
+          "answer": [
+            "C"
+          ],
+          "analysis": "远处青山清秀，近处溪水清亮，这两样合起来正是山清水秀。",
+          "options": {
+            "A": {
+              "label": "平地公园",
+              "visual": {
+                "kind": "asset",
+                "image": "q-park",
+                "alt": "平地公园"
+              }
+            },
+            "B": {
+              "label": "围巾随风飘动",
+              "visual": {
+                "kind": "asset",
+                "image": "q-wind",
+                "alt": "围巾随风飘动"
+              }
+            },
+            "C": {
+              "label": "青山与清溪",
+              "visual": {
+                "kind": "asset",
+                "image": "q-valley",
+                "alt": "青山与清溪"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "哪幅图最能让你想到桃红？",
+          "skill": "绿红桃字义",
+          "answer": [
+            "A"
+          ],
+          "analysis": "桃树枝上开着粉红桃花，正是桃红；黄花和绿草不是桃花的颜色。",
+          "options": {
+            "A": {
+              "label": "桃枝上的红花",
+              "visual": {
+                "kind": "asset",
+                "image": "q-peach",
+                "alt": "桃枝上的红花"
+              }
+            },
+            "B": {
+              "label": "黄色向日葵",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flower",
+                "alt": "黄色向日葵"
+              }
+            },
+            "C": {
+              "label": "绿色草地",
+              "visual": {
+                "kind": "asset",
+                "image": "q-park",
+                "alt": "绿色草地"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "为什么读着顺口",
+      "template": "picture-points",
+      "data": {
+        "title": "为什么读着顺口",
+        "picture": "duet",
+        "points": [
+          "两边字数一样",
+          "两边意思有关",
+          "句尾听一听"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看对字两边。一个字可以对一个字。"
+        },
+        {
+          "say": "两个字也能对两个字，念起来两边一样长。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再找意思有关的。比如溪和河，都和水有关。"
+        },
+        {
+          "say": "把它们读成溪对河，再试着找别的伙伴。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听课本三句话的末尾：风、虫、红。"
+        },
+        {
+          "say": "尾音听起来相近，接着读就有了押韵的感觉。"
+        },
+        {
+          "say": "跟大人一人念半句，念到逗号换一个人。"
+        },
+        {
+          "say": "朵朵说：我想把生活里的两样东西也配成对。",
+          "by": "duoduo"
+        },
+        {
+          "say": "试着说一对，或者合上书背给大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "云雨虫怎么写",
+      "template": "picture-points",
+      "data": {
+        "title": "云雨虫怎么写",
+        "picture": "rain",
+        "points": [
+          "云",
+          "雨",
+          "虫 · 提"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "云先写横、横，再写撇折，最后写点。"
+        },
+        {
+          "say": "上横短，下横长，下面两笔收在格子中间。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "雨先写横，再写竖、横折钩和中间竖。"
+        },
+        {
+          "say": "最后写四个点，先写左边两个，再写右边两个。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "虫先写竖、横折、横，写成上面的小口。"
+        },
+        {
+          "say": "再写中间的竖、提，最后写右下角的点。"
+        },
+        {
+          "say": "提从左下往右上走，收笔时轻轻提起来。"
+        },
+        {
+          "say": "先看位置再落笔，请大人帮你看看纸上怎么写。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "interactive",
+      "title": "跟着范字慢慢描",
+      "page": "trace",
+      "widgetType": "game",
+      "startImage": "rain",
+      "script": [
+        {
+          "highlight": "#ink-grid"
+        },
+        {
+          "say": "田字格有两条中线，能帮我们找准位置。"
+        },
+        {
+          "setState": {
+            "inkDemo": "cloud"
+          }
+        },
+        {
+          "say": "云上面的横短，下面的横长。看颜色依次走。"
+        },
+        {
+          "say": "横、横、撇折、点，下面的点别贴到格边。"
+        },
+        {
+          "setState": {
+            "inkDemo": "rain"
+          }
+        },
+        {
+          "say": "雨先横、竖、横折钩，再写中间竖。"
+        },
+        {
+          "say": "最后四个点，先左边两个，再右边两个。"
+        },
+        {
+          "setState": {
+            "inkDemo": "insect"
+          }
+        },
+        {
+          "say": "虫先竖、横折、横，然后是中间的竖。"
+        },
+        {
+          "say": "第五笔提往右上走，末笔在右下写点。"
+        },
+        {
+          "setState": {
+            "inkDemo": "practice"
+          }
+        },
+        {
+          "say": "手指沿浅线慢慢走。颜色只告诉你描过哪里。"
+        },
+        {
+          "say": "也可以点右边的小箭头，一笔一笔看。"
+        },
+        {
+          "say": "到纸上再写一次，请大人看笔顺和字形。"
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "山水站在格子里",
+      "template": "picture-points",
+      "data": {
+        "title": "山水站在格子里",
+        "picture": "landscape",
+        "points": [
+          "山",
+          "水"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "山先写中间的竖，第二笔从左边写竖折。"
+        },
+        {
+          "say": "最后写右边的竖，中间高，两边低一点。"
+        },
+        {
+          "say": "中间那笔靠着竖中线，字就站得稳。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "水先写中间的竖钩。钩在下边往左挑。"
+        },
+        {
+          "say": "第二笔是左边的横撇，接着写右上的撇。"
+        },
+        {
+          "say": "最后往右下写捺，右边和左边都有位置。"
+        },
+        {
+          "say": "看清拐弯的地方，再在纸上写给大人看。"
+        },
+        {
+          "say": "小满说：我会请大人看我有没有漏掉最后一笔。",
+          "by": "xiaoman"
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "interactive",
+      "title": "再描山和水",
+      "page": "trace",
+      "widgetType": "game",
+      "startImage": "landscape",
+      "script": [
+        {
+          "highlight": "#ink-grid"
+        },
+        {
+          "say": "这一页练两个新字，山和水。还要找中线。"
+        },
+        {
+          "setState": {
+            "inkDemo": "mountain"
+          }
+        },
+        {
+          "say": "山先中间一竖，第二笔竖折，最后右边一竖。"
+        },
+        {
+          "say": "第二笔是连着走的，往下之后往右转。"
+        },
+        {
+          "setState": {
+            "inkDemo": "water"
+          }
+        },
+        {
+          "say": "水的第一笔是竖钩，第二笔是横撇。"
+        },
+        {
+          "say": "第三笔从右上往左下撇，最后向右下写捺。"
+        },
+        {
+          "highlight": "#ink-example"
+        },
+        {
+          "say": "先看老师怎么走，再沿田字格里的浅线描。"
+        },
+        {
+          "setState": {
+            "inkDemo": "practice"
+          }
+        },
+        {
+          "say": "描完可以再玩，或者请大人看你在纸上写。"
+        },
+        {
+          "say": "要是忘了怎么走，点小箭头看看下一笔。"
+        },
+        {
+          "say": "页面只看你描过哪些线，不替大人评笔顺。"
+        }
+      ]
+    },
+    {
+      "key": "p17",
+      "type": "quiz",
+      "title": "看图小检查",
+      "intro": [
+        "听老师读题，想一想图里画了什么。",
+        "每题选一张图。选好后，再听下一题。"
+      ],
+      "questions": [
+        {
+          "id": "q5",
+          "question": "哪幅图里，小朋友在唱歌？",
+          "skill": "歌字义",
+          "answer": [
+            "B"
+          ],
+          "analysis": "小舞台上拿话筒张口唱的是唱歌，读书和吹风的画面都不是。",
+          "options": {
+            "A": {
+              "label": "风吹围巾",
+              "visual": {
+                "kind": "asset",
+                "image": "q-wind",
+                "alt": "风吹围巾"
+              }
+            },
+            "B": {
+              "label": "拿话筒唱歌",
+              "visual": {
+                "kind": "asset",
+                "image": "q-singer",
+                "alt": "拿话筒唱歌"
+              }
+            },
+            "C": {
+              "label": "安静看书",
+              "visual": {
+                "kind": "asset",
+                "image": "q-park",
+                "alt": "安静看书"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "小满穿上一只蓝雨靴。哪样能和它配成一对？",
+          "skill": "对字义",
+          "answer": [
+            "C"
+          ],
+          "analysis": "另一只蓝雨靴可以跟脚上的雨靴配成一对，书包和花不能。",
+          "options": {
+            "A": {
+              "label": "蓝色书包",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bag",
+                "alt": "蓝色书包"
+              }
+            },
+            "B": {
+              "label": "黄色向日葵",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flower",
+                "alt": "黄色向日葵"
+              }
+            },
+            "C": {
+              "label": "另一只蓝雨靴",
+              "visual": {
+                "kind": "asset",
+                "image": "q-boot",
+                "alt": "另一只蓝雨靴"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p18",
+      "type": "slide",
+      "title": "把一首歌带回家",
+      "template": "summary",
+      "data": {
+        "title": "把一首歌带回家",
+        "items": [
+          "对 歌 雨 风 虫 清 绿 桃 红",
+          "两边一样长，意思有关",
+          "风、虫、红的尾音",
+          "云、雨、虫、山、水"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们用听读和看图，认识了九个字。"
+        },
+        {
+          "say": "遇到不熟的字，想起它在画里是什么。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "配对子先看两边字数，再想意思有没有联系。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "读到每句最后，听一听风、虫、红的尾音。"
+        },
+        {
+          "say": "请大人和你拍手接读，再试试合上书背。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "纸上练云、雨、虫、山、水，先看格子再动笔。"
+        },
+        {
+          "say": "猫头鹰站长提醒：读得怎样、写得怎样，请大人看看。",
+          "by": "owl"
+        },
+        {
+          "say": "明天散步时，看看能不能再找一组新对子。"
+        }
+      ]
+    }
+  ]
+}

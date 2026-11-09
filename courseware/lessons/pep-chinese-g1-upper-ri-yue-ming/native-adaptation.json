@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "initialJob": "vsBIpvjzIZ",
+  "originalOutcome": "terminal local template EPERM after 12 scenes",
+  "savedJob": "D8P0AarViL",
+  "savedClassroomId": "JRuAY6Kkgf",
+  "savedClassroomSha256": "f1550bc4a85a33306d27d714a9f5eb5b3942fafa180a10aaac6ee4ad9acc658b",
+  "authoringModels": [
+    "deepseek-v4-pro",
+    "gpt-6.1-sol"
+  ],
+  "sceneBindings": [
+    {
+      "nativeSceneId": "scene_WYlMw3eGBI",
+      "nativeSceneTitle": "打开字形工作室",
+      "releaseSceneKey": "welcome"
+    },
+    {
+      "nativeSceneId": "scene_6gHUG2ar2V",
+      "nativeSceneTitle": "把前四句读顺",
+      "releaseSceneKey": "read-opening"
+    },
+    {
+      "nativeSceneId": "scene_rWmUwPs0UU",
+      "nativeSceneTitle": "明和男从哪里来",
+      "releaseSceneKey": "light-and-field"
+    },
+    {
+      "nativeSceneId": "scene_vnon0w1bq0",
+      "nativeSceneTitle": "小下面是什么",
+      "releaseSceneKey": "tips-and-dust"
+    },
+    {
+      "nativeSceneId": "scene_tAVnP2OYjR",
+      "nativeSceneTitle": "人和木怎么排",
+      "releaseSceneKey": "more-together"
+    },
+    {
+      "nativeSceneId": "scene_wqGLnydpdL",
+      "nativeSceneTitle": "两个合成一双",
+      "releaseSceneKey": "pairs"
+    },
+    {
+      "nativeSceneId": "scene_W8jZXVV0KS",
+      "nativeSceneTitle": "部件给我线索",
+      "releaseSceneKey": "new-characters"
+    },
+    {
+      "nativeSceneId": "scene_S9L9JrosGu",
+      "nativeSceneTitle": "力和男写在哪",
+      "releaseSceneKey": "write-first"
+    },
+    {
+      "nativeSceneId": "scene_md-9rdx_Aj",
+      "nativeSceneTitle": "后两句讲什么",
+      "releaseSceneKey": "read-ending"
+    },
+    {
+      "nativeSceneId": "scene_dnjyj2hCtx",
+      "nativeSceneTitle": "三个人合做一件事",
+      "releaseSceneKey": "work-together"
+    },
+    {
+      "nativeSceneId": "scene_zeyNqFVu4m",
+      "nativeSceneTitle": "合起来轻拍读",
+      "releaseSceneKey": "rhyme"
+    },
+    {
+      "nativeSceneId": "scene_V4h-A9SL9v",
+      "nativeSceneTitle": "词语开窗",
+      "releaseSceneKey": "words"
+    },
+    {
+      "nativeSceneId": "scene_o9garzuzFr",
+      "nativeSceneTitle": "卧钩弯着落",
+      "releaseSceneKey": "write-heart"
+    },
+    {
+      "nativeSceneId": "scene_dI1d2jwQQO",
+      "nativeSceneTitle": "土和木的横竖",
+      "releaseSceneKey": "write-soil-wood"
+    },
+    {
+      "nativeSceneId": "scene_otuhuVY0KV",
+      "nativeSceneTitle": "听题看图来检查",
+      "releaseSceneKey": "picture-quiz"
+    },
+    {
+      "nativeSceneId": "scene_8YnA5q170E",
+      "nativeSceneTitle": "部件、儿歌、写字",
+      "releaseSceneKey": "recap"
+    }
+  ],
+  "corrections": [
+    "根据教材恢复前四句和后两句的准确边界，增加听、指和停连示范。",
+    "修订歪的上下部件、月光、林森众及田力的易误解表述。",
+    "补齐认读十一字、八词、五个写字和卧钩的明确示范。",
+    "清除带调字母和原生文字题，使用六道本课目标下的新情境图片题。",
+    "原生草稿与终态恢复回执保持原样，后续适配公共互动框架并按 G0–G8 实测。"
+  ],
+  "sourceNotesSha256": "1350f6c410b5518e0d61ef6a140a2d241fdea2b7bb8311a9c90cde2fe6221155",
+  "editableLessonSha256": "c5f6136dc0ab0ccbd08a8eef73b29a91fdbb6695af4630e06897b45cd762aa59",
+  "adaptationRevisions": [
+    {
+      "adaptedAt": "2026-11-06T06:14:27.086573+00:00",
+      "previousEditableLessonSha256": "c5f6136dc0ab0ccbd08a8eef73b29a91fdbb6695af4630e06897b45cd762aa59",
+      "editableLessonSha256": "270eeaca87906e640fffdd2bde5d8e3a8c55eca2b522921c0895b85f8403e570",
+      "changes": [
+        "九个互动页映射到可恢复的工作台页面和田字格组件。",
+        "词语开窗逐个切画并读八个生活词；合作互动切到成品再讲解。",
+        "三组书写田字格由课件内可审计代码绘制，保留三张独立的小检查笔形图。"
+      ]
+    },
+    {
+      "adaptedAt": "2026-11-06T09:43:52.450584+00:00",
+      "previousEditableLessonSha256": "270eeaca87906e640fffdd2bde5d8e3a8c55eca2b522921c0895b85f8403e570",
+      "editableLessonSha256": "5ec7aa9bf820aee43f075e9b40f51bb5397c73ce0fbe3adca7a409f6a0abd1cd",
+      "changes": [
+        "新增两人同向前后行走插画，分别表达从与众。",
+        "按三人合作插画核对扶、递、贴三个画面和口播，围巾及读音用语同步。"
+      ]
+    },
+    {
+      "adaptedAt": "2026-11-06T19:09:03.335426+00:00",
+      "previousEditableLessonSha256": "5ec7aa9bf820aee43f075e9b40f51bb5397c73ce0fbe3adca7a409f6a0abd1cd",
+      "editableLessonSha256": "7b3c0f62fd4045a2de0db193a4524515a65f1d8b3d594bccdb606a9798640594",
+      "changes": [
+        "按小检查口播检查改为老师把问题读给学生听，保留题意并明确谁读。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "6和7的加、减法",
+  "frame": {
+    "slides": [
+      1000,
+      562.5
+    ],
+    "interactive": [
+      1280,
+      720
+    ],
+    "kit": "courseware/kit"
+  },
+  "pages": [
+    {
+      "key": "p02",
+      "mechanism": "整组物体合并、交换两组、选出整体数量",
+      "stateKeys": [
+        "demo",
+        "demoMerged",
+        "play"
+      ],
+      "teacherTargets": [
+        "#part-a",
+        "#part-b",
+        "#merge-zone",
+        "#equation"
+      ],
+      "completion": "3关图与加式对应",
+      "reset": "全部物体返回两组，清空所选数量与星星"
+    },
+    {
+      "key": "p04",
+      "mechanism": "逐个从整体移出指定数量，核验剩余部分",
+      "stateKeys": [
+        "demo",
+        "demoRemoved",
+        "play"
+      ],
+      "teacherTargets": [
+        "#whole-row",
+        "#removed-zone",
+        "#equation",
+        "#answer-options"
+      ],
+      "completion": "3关按式移出且余数正确",
+      "reset": "归还全部圆片，清空移出记录"
+    },
+    {
+      "key": "p07",
+      "mechanism": "同一物品图的两加两减卡片分类配组",
+      "stateKeys": [
+        "demo",
+        "play"
+      ],
+      "teacherTargets": [
+        "#diagram",
+        "#formula-pool",
+        "#addition-bank",
+        "#subtraction-bank"
+      ],
+      "completion": "两张新图各找到4个不同式子",
+      "reset": "图、卡片位置、已选式子和星星全复位"
+    },
+    {
+      "key": "p09",
+      "mechanism": "由已知加法找对应减法缺失部分，随后揭图验证",
+      "stateKeys": [
+        "demo",
+        "play"
+      ],
+      "teacherTargets": [
+        "#known-add",
+        "#ask-sub",
+        "#answer-options",
+        "#reveal-picture"
+      ],
+      "completion": "3关联系加法与减法",
+      "reset": "回首关，答案和揭图状态归零"
+    }
+  ],
+  "visual": {
+    "pictures": [
+      "studio",
+      "bead"
+    ],
+    "knowledgeDiagrams": [
+      "精确数量点",
+      "算式的数字与运算符",
+      "整体和部分的连接线"
+    ],
+    "lowReading": "运算符和数字是学习目标；数量图直接支持答案选择，老师预录音读完整题意与为什么。正式圆片表示物体，文字遮住仍可按数量操作。"
+  },
+  "teacherHandoff": "教师操作先于对应讲解，示范态由显式play状态结束，不用定时器自动开始。",
+  "acceptance": "静态结构不是发布证据；正式素材与音频后仍须G6三尺寸随机试玩和四状态截图、G7独立核对及G8发布校验。"
+}

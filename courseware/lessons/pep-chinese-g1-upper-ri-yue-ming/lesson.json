@@ -1,0 +1,1218 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "日月明",
+  "description": "两个课时合在一起看部件、认字读儿歌、观察笔画和格位。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "温和清楚地用图画、字形和短句带小朋友认字朗读，先做示范，再请孩子操作。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "sun-moon": {
+      "file": "assets/sun-moon.png"
+    },
+    "field-pull": {
+      "file": "assets/field-pull.png"
+    },
+    "tip-cone": {
+      "file": "assets/tip-cone.png"
+    },
+    "dust-beam": {
+      "file": "assets/dust-beam.png"
+    },
+    "people-group": {
+      "file": "assets/people-group.png"
+    },
+    "tree-grove": {
+      "file": "assets/tree-grove.png"
+    },
+    "paired-hands": {
+      "file": "assets/paired-hands.png"
+    },
+    "tears": {
+      "file": "assets/tears.png"
+    },
+    "seedling-bed": {
+      "file": "assets/seedling-bed.png"
+    },
+    "tilted-frame": {
+      "file": "assets/tilted-frame.png"
+    },
+    "paper-build": {
+      "file": "assets/paper-build.png"
+    },
+    "paper-built": {
+      "file": "assets/paper-built.png"
+    },
+    "gold-leaves": {
+      "file": "assets/gold-leaves.png"
+    },
+    "forest-view": {
+      "file": "assets/forest-view.png"
+    },
+    "care-help": {
+      "file": "assets/care-help.png"
+    },
+    "happy-child": {
+      "file": "assets/happy-child.png"
+    },
+    "mailbox-flat": {
+      "file": "assets/mailbox-flat.png"
+    },
+    "mailbox-point": {
+      "file": "assets/mailbox-point.png"
+    },
+    "mailbox-round": {
+      "file": "assets/mailbox-round.png"
+    },
+    "people-single": {
+      "file": "assets/people-single.png"
+    },
+    "people-pair": {
+      "file": "assets/people-pair.png"
+    },
+    "people-crowd": {
+      "file": "assets/people-crowd.png"
+    },
+    "strip-ribbon": {
+      "file": "assets/strip-ribbon.png"
+    },
+    "tall-cup": {
+      "file": "assets/tall-cup.png"
+    },
+    "closed-book": {
+      "file": "assets/closed-book.png"
+    },
+    "tray-dirt": {
+      "file": "assets/tray-dirt.png"
+    },
+    "tray-flower": {
+      "file": "assets/tray-flower.png"
+    },
+    "tray-sprout": {
+      "file": "assets/tray-sprout.png"
+    },
+    "picnic-alone-work": {
+      "file": "assets/picnic-alone-work.png"
+    },
+    "picnic-fold-together": {
+      "file": "assets/picnic-fold-together.png"
+    },
+    "picnic-conflict": {
+      "file": "assets/picnic-conflict.png"
+    },
+    "xin-hook": {
+      "file": "assets/xin-hook.png"
+    },
+    "xin-first-dot": {
+      "file": "assets/xin-first-dot.png"
+    },
+    "xin-middle-dot": {
+      "file": "assets/xin-middle-dot.png"
+    },
+    "people-follow": {
+      "file": "assets/people-follow.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "welcome",
+      "type": "slide",
+      "title": "打开字形工作室",
+      "template": "title-picture",
+      "data": {
+        "title": "日月明",
+        "picture": "studio",
+        "caption": "看部件、读儿歌、练写字"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小朋友们，欢迎来到字形工作室。"
+        },
+        {
+          "say": "今天我们一起看看，部件拼合怎样变出新的字。"
+        },
+        {
+          "say": "纸桌上这两张卡，一个像太阳，一个像月牙。"
+        },
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "我们要读的课文叫日月明。"
+        },
+        {
+          "say": "你可以先猜一猜，这两个形状和明亮有什么关系。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先拼一拼，听懂字的意思。"
+        },
+        {
+          "say": "再跟老师读儿歌，听短句之间怎么停。"
+        },
+        {
+          "say": "最后动动手，看看五个字在格子里怎么写。"
+        }
+      ]
+    },
+    {
+      "key": "read-opening",
+      "type": "slide",
+      "title": "把前四句读顺",
+      "template": "picture-points",
+      "data": {
+        "title": "把前四句读顺",
+        "picture": "studio",
+        "points": [
+          "每组短句，连着读",
+          "碰到逗号，轻轻停",
+          "句号落稳，再换一句"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "请把课本翻到七十四页，手指放到儿歌第一行。"
+        },
+        {
+          "say": "前四行里，每一行有两个短句。听我先读一行。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "日月明，田力男。听到逗号，我轻轻停一下。"
+        },
+        {
+          "say": "每组里的三个字连着读，别把每个字都隔开。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "下一行，上半说尖，下半说尘。"
+        },
+        {
+          "say": "再往下，一行说人，一行说树。按课本指给我看。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "句号后停得稍长，再起下一行。"
+        },
+        {
+          "say": "众读第四声，双读第一声，听清这两个翘舌音。"
+        },
+        {
+          "say": "林、森都读前鼻音，尾音收得短。跟我读林、森。"
+        },
+        {
+          "say": "现在按短句自己读这四行，请家人听听停顿。"
+        }
+      ]
+    },
+    {
+      "key": "light-and-field",
+      "type": "interactive",
+      "title": "明和男从哪里来",
+      "page": "light-and-field",
+      "widgetType": "game",
+      "startImage": "sun-moon",
+      "script": [
+        {
+          "highlight": "#ry-panel"
+        },
+        {
+          "say": "先看这幅图，明字是从哪里来的呢？"
+        },
+        {
+          "say": "左边白天看见太阳，右边夜晚看见月光。"
+        },
+        {
+          "setState": {
+            "demoRound": 0
+          }
+        },
+        {
+          "say": "日字放左边，月字放右边。"
+        },
+        {
+          "say": "部件挨在一起，成了明，想到明亮。"
+        },
+        {
+          "setState": {
+            "demoRound": 1
+          }
+        },
+        {
+          "say": "再看田地和用力拉车的人。"
+        },
+        {
+          "say": "男的上面是田，下面是力，给我们认字的线索。"
+        },
+        {
+          "say": "这只是字形提示，谁都可以用力干活。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "听图上的提示，先把卡片送到对应的位置。"
+        },
+        {
+          "say": "左右看清，先拼明，再把田和力拼成男。"
+        }
+      ]
+    },
+    {
+      "key": "tips-and-dust",
+      "type": "interactive",
+      "title": "小下面是什么",
+      "page": "tips-and-dust",
+      "widgetType": "game",
+      "startImage": "tip-cone",
+      "script": [
+        {
+          "highlight": "#ry-panel"
+        },
+        {
+          "say": "同学们，我们来看两个有趣的字。"
+        },
+        {
+          "say": "尖和尘的上面，都是小。我们看下面的部件。"
+        },
+        {
+          "setState": {
+            "demoRound": 0
+          }
+        },
+        {
+          "say": "小的下面是大，合起来是尖，读第一声。"
+        },
+        {
+          "say": "看锥子，顶端很细，下面渐渐变宽。"
+        },
+        {
+          "setState": {
+            "demoRound": 1
+          }
+        },
+        {
+          "say": "小的下面是土，合起来是尘，读第二声。"
+        },
+        {
+          "say": "光束里细细的土粒，是尘土。它不是大土块。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "每次先看窗里的样子，再选合适的字卡。"
+        },
+        {
+          "say": "看上面相同的部分，还要比较下面。"
+        }
+      ]
+    },
+    {
+      "key": "more-together",
+      "type": "interactive",
+      "title": "人和木怎么排",
+      "page": "more-together",
+      "widgetType": "game",
+      "startImage": "people-group",
+      "script": [
+        {
+          "highlight": "#ry-panel"
+        },
+        {
+          "say": "现在，我们来看人和木怎么排队变新字。"
+        },
+        {
+          "say": "一人走在前面，另一人跟着，字形提示从。"
+        },
+        {
+          "setState": {
+            "demoRound": 1
+          }
+        },
+        {
+          "say": "众字上面一个人，下面两个，提醒我们人多。"
+        },
+        {
+          "say": "众不是只说三个人。看图，很多人聚在一起。"
+        },
+        {
+          "setState": {
+            "demoRound": 2
+          }
+        },
+        {
+          "say": "林的两个木左右挨着。森林的森有三个木。"
+        },
+        {
+          "say": "森的上面是一个木，下面有两个。"
+        },
+        {
+          "setState": {
+            "demoRound": 3
+          }
+        },
+        {
+          "say": "木部件越多，越让我们联想到许多树。"
+        },
+        {
+          "say": "真正的树林和森林，不能只看两棵或三棵。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "选好图上提示的部件组合，再看看新字的样子。"
+        }
+      ]
+    },
+    {
+      "key": "pairs",
+      "type": "slide",
+      "title": "两个合成一双",
+      "template": "picture-points",
+      "data": {
+        "title": "两个怎样叫一双",
+        "picture": "paired-hands",
+        "points": [
+          "两只手，一双手",
+          "两只眼睛，一双眼睛",
+          "成对使用，才说一双"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看看，这里有一双手。"
+        },
+        {
+          "say": "请举起自己的两只手，让它们合在一起。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一只手是单只，两只手是一双手。"
+        },
+        {
+          "say": "双读第一声，跟我说，双手。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "眼睛也常成对，左一只，右一只。"
+        },
+        {
+          "say": "我说一双眼睛，你轻轻闭上再睁开。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两只同一对的鞋，也可以说一双鞋。"
+        },
+        {
+          "say": "随便拿两个东西，不一定能用一双来数。"
+        },
+        {
+          "say": "双的字形里有两个又，能帮我们记住成对。"
+        }
+      ]
+    },
+    {
+      "key": "new-characters",
+      "type": "interactive",
+      "title": "部件给我线索",
+      "page": "new-characters",
+      "widgetType": "game",
+      "startImage": "tears",
+      "script": [
+        {
+          "highlight": "#ry-panel"
+        },
+        {
+          "say": "小朋友们，今天我们一起玩一个猜字游戏。"
+        },
+        {
+          "say": "先看泪的左边是三点水，右边是目。"
+        },
+        {
+          "setState": {
+            "demoRound": 0
+          }
+        },
+        {
+          "say": "看到水和眼睛，就猜眼里流出的泪水。"
+        },
+        {
+          "say": "打开画窗，看看猜想能不能和图对上。"
+        },
+        {
+          "setState": {
+            "demoRound": 1
+          }
+        },
+        {
+          "say": "苗上面是草字头，下面是田。"
+        },
+        {
+          "say": "田里长出的嫩苗，是一株小植物。"
+        },
+        {
+          "setState": {
+            "demoRound": 2
+          }
+        },
+        {
+          "say": "歪的上面是不，下面是正。"
+        },
+        {
+          "say": "挂斜了的画框，不正，就是歪。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "先看部件猜意思，再让画面帮你核对。"
+        }
+      ]
+    },
+    {
+      "key": "write-first",
+      "type": "interactive",
+      "title": "力和男写在哪",
+      "page": "write-grid",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#ry-grid"
+        },
+        {
+          "say": "小朋友们，今天我们来学写两个字。"
+        },
+        {
+          "say": "先看力在田字格里，钩在右边，撇向左下。"
+        },
+        {
+          "setState": {
+            "demoRound": 0
+          }
+        },
+        {
+          "say": "力先写横折钩，横向右，折后下行再出钩。"
+        },
+        {
+          "say": "第二笔是撇，从上方穿过横，舒展到左下。"
+        },
+        {
+          "setState": {
+            "demoRound": 1
+          }
+        },
+        {
+          "say": "男先写上面的田，再写下面的力。"
+        },
+        {
+          "say": "下面的力比单写时紧凑，不能把上面的田撑歪。"
+        },
+        {
+          "say": "看男的撇，从上下两部分附近起，落向左下。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "看范字，用手描一描。清除以后，还能再试。"
+        },
+        {
+          "say": "真正落笔时，请家人看看顺序和字的格位。"
+        }
+      ]
+    },
+    {
+      "key": "read-ending",
+      "type": "slide",
+      "title": "后两句讲什么",
+      "template": "picture-points",
+      "data": {
+        "title": "听懂儿歌后半",
+        "picture": "paper-build",
+        "points": [
+          "不、条、心、金",
+          "一个人，一棵树",
+          "一起做，做好一件事"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "课本七十四页后半，先认识不、条、心、金。"
+        },
+        {
+          "say": "不在不成里读第四声，表示没有成为。"
+        },
+        {
+          "say": "条读第二声，一条围巾，也用这个条。"
+        },
+        {
+          "say": "心读第一声，一条心说的是大家想法一致。"
+        },
+        {
+          "say": "金读第一声，金黄的叶子有像金子一样的颜色。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一人不成众，独木不成林。逗号前一组读连贯。"
+        },
+        {
+          "say": "独木是一棵树，和一片树林比一比。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "末句里的黄土变成金，是说合作能做成好事。"
+        },
+        {
+          "say": "黄土没有真的变成金子。接下来我们看一个例子。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "大家一起做纸屋，各有一个动作，还要彼此配合。"
+        }
+      ]
+    },
+    {
+      "key": "work-together",
+      "type": "interactive",
+      "title": "三个人合做一件事",
+      "page": "work-together",
+      "widgetType": "game",
+      "startImage": "paper-build",
+      "script": [
+        {
+          "highlight": "#ry-panel"
+        },
+        {
+          "say": "先看这幅图，左边的孩子正扶着纸板。"
+        },
+        {
+          "say": "扶着墙面时，不容易腾出手拿胶带。"
+        },
+        {
+          "setState": {
+            "demoRound": 0
+          }
+        },
+        {
+          "say": "先请一位同伴把一侧的纸板扶稳。"
+        },
+        {
+          "say": "扶稳后，另一位才方便把胶带递过来。"
+        },
+        {
+          "setState": {
+            "demoRound": 1
+          }
+        },
+        {
+          "say": "第三位拿到胶带，把两条纸边固定起来。"
+        },
+        {
+          "say": "大家不是各做各的，是一起想办法让纸屋站住。"
+        },
+        {
+          "setState": {
+            "demoRound": 2
+          }
+        },
+        {
+          "highlight": "#ry-result"
+        },
+        {
+          "say": "散件变成一座站稳的纸屋，就是合作的成果。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "看每一步缺什么，再把合适的动作放过去。"
+        },
+        {
+          "say": "试完说一说，你们还在哪些地方合做过一件事。"
+        }
+      ]
+    },
+    {
+      "key": "rhyme",
+      "type": "slide",
+      "title": "合起来轻拍读",
+      "template": "two-columns",
+      "data": {
+        "title": "合起来轻拍读",
+        "left": {
+          "heading": "前四句",
+          "body": "一行两组，读出节奏"
+        },
+        "right": {
+          "heading": "后两句",
+          "body": "轻停，再接着读"
+        },
+        "left_picture": "studio",
+        "right_picture": "paper-built"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "请沿课本七十四页从第一行读起。"
+        },
+        {
+          "say": "手指跟字走，两个短句之间轻轻停一下。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "前四行的短句短，拍一下再读下一组。"
+        },
+        {
+          "say": "尖和尘留心声调，林和森不要把尾音拖长。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "读到后两句，短句变长了，留足一口气。"
+        },
+        {
+          "say": "句中不把一个意思拆散，先把一小组读连贯。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "读完末句想想，大家朝着一个目标合作。"
+        },
+        {
+          "say": "现在从头指读一遍，请家人听你读得是否清楚。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "用自己的话说说，纸屋怎样从散件变完整。"
+        }
+      ]
+    },
+    {
+      "key": "words",
+      "type": "interactive",
+      "title": "词语开窗",
+      "page": "words",
+      "widgetType": "game",
+      "startImage": "paired-hands",
+      "script": [
+        {
+          "highlight": "#ry-panel"
+        },
+        {
+          "say": "点一下开始，听老师说词，再看看对应的画。"
+        },
+        {
+          "setState": {
+            "demoRound": 0
+          }
+        },
+        {
+          "say": "搬重物要用力气。看手和小车怎样动。"
+        },
+        {
+          "setState": {
+            "demoRound": 1
+          }
+        },
+        {
+          "say": "光里细细的小土粒，就是尘土。"
+        },
+        {
+          "setState": {
+            "demoRound": 2
+          }
+        },
+        {
+          "say": "看同一个人的两只手，一起叫双手。"
+        },
+        {
+          "setState": {
+            "demoRound": 3
+          }
+        },
+        {
+          "say": "秋叶像金子一样黄，可以说金黄。"
+        },
+        {
+          "setState": {
+            "demoRound": 4
+          }
+        },
+        {
+          "say": "几处相连的树，能让人想到树林。"
+        },
+        {
+          "setState": {
+            "demoRound": 5
+          }
+        },
+        {
+          "say": "再看树密密的一大片，想到森林。别数固定棵数。"
+        },
+        {
+          "setState": {
+            "demoRound": 6
+          }
+        },
+        {
+          "say": "递给冷的小伙伴一条围巾，这个动作是关心。"
+        },
+        {
+          "setState": {
+            "demoRound": 7
+          }
+        },
+        {
+          "say": "玩得高兴，脸上笑开了，可以说开心。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "把刚听过的词和画面连起来，再跟老师念一遍。"
+        }
+      ]
+    },
+    {
+      "key": "write-heart",
+      "type": "interactive",
+      "title": "卧钩弯着落",
+      "page": "write-grid",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#ry-grid"
+        },
+        {
+          "say": "小朋友们，今天我们一起学写心字。"
+        },
+        {
+          "say": "先看左边一个点，另外两个点在弯钩上面。"
+        },
+        {
+          "setState": {
+            "demoRound": 0
+          }
+        },
+        {
+          "say": "第一笔是左边的点，位置稍低。"
+        },
+        {
+          "say": "第二笔卧钩从上往下弯，右端向左上出钩。"
+        },
+        {
+          "highlight": "#ry-sequence"
+        },
+        {
+          "say": "第三笔靠中间，第四笔在右上。"
+        },
+        {
+          "say": "最后两个点分开站，别挤成一团。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "指着淡字描一遍，弯钩要沿着范字转弯。"
+        },
+        {
+          "say": "请家人看看你在纸上写的心，三个点各在哪里。"
+        }
+      ]
+    },
+    {
+      "key": "write-soil-wood",
+      "type": "interactive",
+      "title": "土和木的横竖",
+      "page": "write-grid",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#ry-grid"
+        },
+        {
+          "say": "先看土和木，它们都有一横和一竖。"
+        },
+        {
+          "say": "横竖交叉时，竖在田字格的中线上。"
+        },
+        {
+          "setState": {
+            "demoRound": 0
+          }
+        },
+        {
+          "say": "土先写短横，接着写竖，最后写下面的长横。"
+        },
+        {
+          "say": "下横舒展些，好像把上面稳稳托住。"
+        },
+        {
+          "setState": {
+            "demoRound": 1
+          }
+        },
+        {
+          "say": "木先写横再写竖，从中间向左下写撇。"
+        },
+        {
+          "say": "最后向右下写捺，两边自然展开。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "先描土，比较短横长横，再换到木。"
+        },
+        {
+          "say": "手指描过只表示试过，纸笔还要看顺序和格位。"
+        }
+      ]
+    },
+    {
+      "key": "picture-quiz",
+      "type": "quiz",
+      "title": "听题看图来检查",
+      "intro": [
+        "老师把问题读给你听，再看三幅图。",
+        "每题只选最合适的一幅。",
+        "选图能帮我们看懂字词和图意。"
+      ],
+      "questions": [
+        {
+          "id": "shape-meaning",
+          "question": "听我说，尖。哪只邮箱的顶有尖尖的一角？",
+          "skill": "构字线索与尖的字义",
+          "answer": [
+            "B"
+          ],
+          "analysis": "顶端逐渐变窄，收成明显尖角，才和尖的意思相合。",
+          "options": {
+            "A": {
+              "label": "平顶邮箱",
+              "visual": {
+                "kind": "asset",
+                "image": "mailbox-flat",
+                "alt": "平顶邮箱"
+              }
+            },
+            "B": {
+              "label": "尖顶邮箱",
+              "visual": {
+                "kind": "asset",
+                "image": "mailbox-point",
+                "alt": "尖顶邮箱"
+              }
+            },
+            "C": {
+              "label": "圆顶邮箱",
+              "visual": {
+                "kind": "asset",
+                "image": "mailbox-round",
+                "alt": "圆顶邮箱"
+              }
+            }
+          }
+        },
+        {
+          "id": "human-group",
+          "question": "听我读，众。哪张图最能表示人多？",
+          "skill": "从、众的构字和意思",
+          "answer": [
+            "C"
+          ],
+          "analysis": "众表示人多；一个人和两个人都不能表示这张图中的人群。",
+          "options": {
+            "A": {
+              "label": "一个人",
+              "visual": {
+                "kind": "asset",
+                "image": "people-single",
+                "alt": "一个人"
+              }
+            },
+            "B": {
+              "label": "两个人",
+              "visual": {
+                "kind": "asset",
+                "image": "people-pair",
+                "alt": "两个人"
+              }
+            },
+            "C": {
+              "label": "一群人",
+              "visual": {
+                "kind": "asset",
+                "image": "people-crowd",
+                "alt": "一群人"
+              }
+            }
+          }
+        },
+        {
+          "id": "measure-word",
+          "question": "哪件东西，用一条来数更合适？",
+          "skill": "在语境里理解条",
+          "answer": [
+            "A"
+          ],
+          "analysis": "细长的丝带可以说一条，杯子和书有各自常用的量词。",
+          "options": {
+            "A": {
+              "label": "一条丝带",
+              "visual": {
+                "kind": "asset",
+                "image": "strip-ribbon",
+                "alt": "一条丝带"
+              }
+            },
+            "B": {
+              "label": "一只杯子",
+              "visual": {
+                "kind": "asset",
+                "image": "tall-cup",
+                "alt": "一只杯子"
+              }
+            },
+            "C": {
+              "label": "一本书",
+              "visual": {
+                "kind": "asset",
+                "image": "closed-book",
+                "alt": "一本书"
+              }
+            }
+          }
+        },
+        {
+          "id": "new-meaning",
+          "question": "看这个字，听我读，苗。哪张图和它的意思合得上？",
+          "skill": "部件猜字的迁移",
+          "answer": [
+            "C"
+          ],
+          "analysis": "刚长出来的小植物是苗，只有土或成熟花朵都不合适。",
+          "options": {
+            "A": {
+              "label": "只有土的托盘",
+              "visual": {
+                "kind": "asset",
+                "image": "tray-dirt",
+                "alt": "只有土的托盘"
+              }
+            },
+            "B": {
+              "label": "开花的托盘",
+              "visual": {
+                "kind": "asset",
+                "image": "tray-flower",
+                "alt": "开花的托盘"
+              }
+            },
+            "C": {
+              "label": "刚冒小苗的托盘",
+              "visual": {
+                "kind": "asset",
+                "image": "tray-sprout",
+                "alt": "刚冒小苗的托盘"
+              }
+            }
+          }
+        },
+        {
+          "id": "shared-purpose",
+          "question": "哪幅图里，大家在一起做好同一件事？",
+          "skill": "理解同心合作",
+          "answer": [
+            "B"
+          ],
+          "analysis": "孩子们配合着一起折同一张大垫；各做各的或往反方向拉都没一起解决。",
+          "options": {
+            "A": {
+              "label": "各做各的",
+              "visual": {
+                "kind": "asset",
+                "image": "picnic-alone-work",
+                "alt": "各做各的"
+              }
+            },
+            "B": {
+              "label": "一起折垫子",
+              "visual": {
+                "kind": "asset",
+                "image": "picnic-fold-together",
+                "alt": "一起折垫子"
+              }
+            },
+            "C": {
+              "label": "互相往反方向拉",
+              "visual": {
+                "kind": "asset",
+                "image": "picnic-conflict",
+                "alt": "互相往反方向拉"
+              }
+            }
+          }
+        },
+        {
+          "id": "resting-hook",
+          "question": "听我读，卧钩。哪张图标出了这一笔？",
+          "skill": "辨认心的卧钩",
+          "answer": [
+            "A"
+          ],
+          "analysis": "心的第二笔先下弯再向左上出钩。另两幅图标出的都是点。",
+          "options": {
+            "A": {
+              "label": "卧钩着色",
+              "visual": {
+                "kind": "asset",
+                "image": "xin-hook",
+                "alt": "卧钩着色"
+              }
+            },
+            "B": {
+              "label": "左点着色",
+              "visual": {
+                "kind": "asset",
+                "image": "xin-first-dot",
+                "alt": "左点着色"
+              }
+            },
+            "C": {
+              "label": "中点着色",
+              "visual": {
+                "kind": "asset",
+                "image": "xin-middle-dot",
+                "alt": "中点着色"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "部件、儿歌、写字",
+      "template": "summary",
+      "data": {
+        "title": "部件、儿歌、写字",
+        "items": [
+          "看部件，猜意思，再用图核对",
+          "读儿歌，听停顿，想合作",
+          "看笔顺和田字格，练写五个字"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天，我们先从部件找线索。"
+        },
+        {
+          "say": "看到一个新字，可以先猜意思，再放回图或词里核对。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "接着，我们用短句的停顿读儿歌。"
+        },
+        {
+          "say": "同心合作，是大家向同一个目标出力。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "写力、男、土、木、心，先看笔顺和格位。"
+        },
+        {
+          "say": "心的第二笔是卧钩，三个点要分开站。"
+        },
+        {
+          "say": "课后翻到七十四页读儿歌，再拿笔练写。"
+        },
+        {
+          "say": "请家人听一听读得是否连贯，看一看你怎样落笔。"
+        }
+      ]
+    }
+  ]
+}

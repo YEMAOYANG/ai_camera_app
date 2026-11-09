@@ -1,0 +1,8 @@
+#cv{background:#f9f0db;color:#303e36}
+.split-model{position:absolute;top:44px;left:100px;right:100px;display:flex;gap:38px;justify-content:center;align-items:center;height:145px;font-size:44px;font-weight:800}
+.group{display:flex;align-items:center;justify-content:center;gap:7px;min-width:71px;min-height:90px;border:2px solid #88a78b;border-radius:18px;background:#e6f1df;padding:12px}
+.group.warm{border-color:#bf9159;background:#fff2d8}.disc{width:29px;height:29px;border-radius:50%;background:#478672}.warm .disc,.disc.moved{background:#eaa348}
+.split-options{position:absolute;top:220px;left:84px;right:84px;display:flex;justify-content:center;gap:25px}
+.split-option{width:327px;height:128px;border:3px solid #b79565;border-radius:20px;background:#fffaf0;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:12px}
+.split-option:disabled{cursor:default}.split-option.chosen{outline:4px solid #477f65}
+.split-equation{position:absolute;top:395px;width:100%;text-align:center;font-size:50px;font-weight:800}

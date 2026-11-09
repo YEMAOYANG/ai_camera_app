@@ -1,0 +1,12 @@
+(function(){
+const urls={rub:'__IMG:rub-eye__',ear:'__IMG:poke-ear__',nose:'__IMG:poke-nose__','hands-down':'__IMG:hands-down__','stick-away':'__IMG:stick-away__','screen-break':'__IMG:screen-break__'};
+const tasks=[{image:'rub',want:['hands-down']},{image:'ear',want:['stick-away','hands-down']},{image:'nose',want:['hands-down']}];let level=0,tries=0,busy=false,phase='play',timer=null;
+const picture=K.$('#care-picture'),scene=K.$('#care-scene'),choices=K.$$('#care-options button'),demo=K.$('#care-demo');
+K.hud({icon:'',title:'把动作换得更安全',levels:3});K.owl();K.ready({emoji:'',title:'把动作换得更安全',sub:'把合适的行动，放到孩子身边'});
+function render(i){clearTimeout(timer);level=i;tries=0;busy=false;phase='play';demo.classList.add('hide');picture.src=urls[tasks[i].image];picture.alt=['揉眼睛','小棒靠近耳朵','手指靠近鼻孔'][i];scene.classList.remove('fixed');choices.forEach(b=>{b.disabled=false;b.classList.remove('placed')});K.levels(3,i);K.say('看清要改变的动作，再放上对应的安全行动')}
+function reset(){K.stars=0;K.$('#star-n').textContent='0';render(0)}
+function answer(key,el){if(!K.started||busy||phase!=='play')return;K.sfx.pick();if(!tasks[level].want.includes(key)){tries++;K.shake(el);K.sfx.no();if(tries===1)K.say('先看孩子正在做什么，需要停下什么','no');else if(tries===2)K.say('揉眼挖鼻先放手，小棒离开耳朵','no');else{K.highlight('#care-'+tasks[level].want[0]);K.say('老师提示能直接停止这个动作的行动','no')}return}busy=true;picture.src=urls[key];picture.alt='已经换成安全行动';scene.classList.add('fixed');el.classList.add('placed');K.sfx.ok();K.star(1,scene);K.say('动作改变了，把感官保护好','ok');timer=setTimeout(()=>{if(level<2)render(level+1);else{K.levels(3,3);K.finish({title:'行动换好了',sub:'把保护感官用在生活里',again:reset})}},900)}
+choices.forEach(b=>{b.addEventListener('click',()=>answer(b.dataset.key,b));K.drag(b,{enabled:()=>K.started&&!busy&&phase==='play',targets:()=>[scene],onDrop:(el,target)=>{if(target)answer(el.dataset.key,el)}})});
+K.onStart=reset;K.onState=function(state){if(state.demo==='reading'){clearTimeout(timer);phase='demo';busy=true;choices.forEach(b=>b.disabled=true);demo.classList.remove('hide');K.say('老师示范：坐好，与书保持合适距离')}if(state.phase==='play')reset()};K.lessonSnapshot=()=>({level,tries,busy,phase,fixed:scene.classList.contains('fixed')});K.$$('img').forEach(im=>im.onerror=function(){im.parentElement.classList.add('image-error');K.say('图片未加载，请退出后再试','no')});
+document.addEventListener('error',function(event){const im=event.target;if(im&&im.tagName==='IMG'&&im.closest('#play')){im.parentElement.classList.add('image-error');K.say('图片未加载，请退出后再试','no')}},true);
+})();

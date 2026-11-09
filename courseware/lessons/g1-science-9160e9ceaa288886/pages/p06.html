@@ -1,0 +1,13 @@
+<div id="roll-board" data-semantic-diagram="同一球的释放起点、斜轨和停球位置">
+ <button id="roll-reset" class="btn ghost" aria-label="清空实验记录重来">↺</button>
+ <div id="roll-note">屏幕示意 · 真实距离要观察</div>
+ <svg id="roll-ramp" width="1232" height="330" viewBox="0 0 1232 330" aria-label="斜轨平顺接到同一水平地面"><path d="M80 70 L350 280 L1110 280" fill="none" stroke="#5A7A68" stroke-width="15" stroke-linejoin="round"/><path d="M80 70 L80 280 L350 280 Z" fill="#CDE0CD"/><path d="M80 70 L350 280" stroke="#5A7A68" stroke-width="15"/></svg>
+ <div id="roll-ball" aria-label="同一颗橙色小球"></div>
+ <div id="roll-record" aria-label="两次停球位置的记录">
+  <button id="roll-choice-low" class="roll-end hide" data-end="low" aria-label="较近的停球标记"></button>
+  <button id="roll-choice-high" class="roll-end hide" data-end="high" aria-label="较远的停球标记"></button>
+ </div>
+ <button id="roll-high" class="roll-start" data-start="high" aria-label="从高起点轻轻放手"><svg viewBox="0 0 140 90" aria-hidden="true"><path d="M20 18 L95 70 L130 70" fill="none" stroke="#5A7A68" stroke-width="7"/><circle cx="30" cy="12" r="10" fill="#DA714B"/></svg><span>高处放手</span></button>
+ <button id="roll-low" class="roll-start" data-start="low" aria-label="从低起点轻轻放手"><svg viewBox="0 0 140 90" aria-hidden="true"><path d="M20 18 L95 70 L130 70" fill="none" stroke="#5A7A68" stroke-width="7"/><circle cx="80" cy="48" r="10" fill="#DA714B"/></svg><span>低处放手</span></button>
+ <div id="roll-observed" aria-label="已经完成的两个起点记录"></div>
+</div>

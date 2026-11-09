@@ -1,0 +1,13 @@
+(function(){
+K.hud({icon:'◉',title:'把看到的记下来',levels:3});K.owl();
+var trials=['down','up','down'],index=0,miss=0,demo=false,busy=false,chosen=null,view=K.$('#rec-cup-image'),grid=K.$('#rec-grid');var sources={up:'__IMG:egg-float__',down:'__IMG:egg-sink__'};
+function display(mark){view.src=sources[mark];view.alt=mark==='up'?'本次鸡蛋浮在水面':'本次鸡蛋沉在杯底'}
+function reset(){index=0;miss=0;busy=false;chosen=null;K.stars=0;K.$('#star-n').textContent='0';K.$$('.rec-slot').forEach(function(el){el.innerHTML='';el.classList.remove('filled','current')});K.$('#rec-slot-1').classList.add('current');K.levels(3,0);display(trials[0])}
+function put(mark,reward){var slot=K.$('#rec-slot-'+(index+1)),button=K.$('#rec-'+mark);slot.innerHTML=button.innerHTML;slot.classList.add('filled');slot.classList.remove('current');if(reward)K.star(1,slot);index++;K.levels(3,index);if(index<3){K.$('#rec-slot-'+(index+1)).classList.add('current')}}
+function choose(mark,el){if(!K.started||demo||busy||index>=3||view.dataset.failed)return;if(mark!==trials[index]){miss++;K.shake(el);K.sfx.no();K.say(miss===1?'先重新看看这一次的现象。':miss===2?'看鸡蛋靠近水面，还是靠近杯底。':'老师提示这一次的位置，再来试一试。','no');if(miss===2)K.highlight('#rec-view');if(miss>=3){K.highlight('#rec-'+trials[index]);miss=0}return}busy=true;put(mark,true);K.sfx.ok();K.say('记录跟这一次看到的现象一致。','ok');miss=0;setTimeout(function(){busy=false;if(index<3)display(trials[index]);if(index===3){busy=true;K.finish({title:'三次观察都有记录',sub:'箭头记录的是画面事实，真实动手还请大人观察。',again:function(){demo=false;reset();K.say('重新看每一次现象，再放记录箭头。')}})}},900)}
+K.$$('#rec-up,#rec-down').forEach(function(el){K.drag(el,{enabled:function(){return !demo&&!busy&&index<3},targets:function(){return [grid]},onDrop:function(e,target){if(target)choose(e.dataset.mark,e);else K.shake(e)},onTap:function(e){choose(e.dataset.mark,e)}})});K.onStart=function(){K.say('先看现象，把合适的箭头放入记录格。')};
+K.onState=function(s){if('demo'in s){demo=!!s.demo;reset()}if(s.view)display(s.view==='float'?'up':'down');if(s.mark){var slot=K.$('#rec-slot-1');slot.innerHTML=K.$('#rec-'+s.mark).innerHTML;slot.classList.add('filled')}if(s.demo===false)K.say('现在轮到你，根据画面如实记录。')};
+K.ready({emoji:'',title:'把看到的记下来',sub:'先看现象，再放箭头'});
+
+function installImageFallback(){K.$$('#play img').forEach(function(im){im.addEventListener('error',function(){if(im.dataset.failed)return;im.dataset.failed='1';im.classList.add('source-broken');var parent=im.parentElement;var retry=K.el('button','image-retry','↻',parent);retry.setAttribute('aria-label','重新加载图片');retry.addEventListener('click',function(e){e.stopPropagation();delete im.dataset.failed;im.classList.remove('source-broken');retry.remove();im.src=im.getAttribute('src')});})})}
+installImageFallback();reset();})();

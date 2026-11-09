@@ -1,0 +1,144 @@
+#play .ry-table {
+  position: absolute;
+  inset: 88px 70px 108px;
+  display: grid;
+  grid-template-columns: 555px 1fr;
+  gap: 24px;
+}
+#play .ry-portrait,
+#play .ry-work {
+  border: 3px solid #d4ad76;
+  border-radius: 24px;
+  background: #fff7e7;
+}
+#play .ry-portrait {
+  display: grid;
+  grid-template-rows: 310px 1fr;
+  gap: 16px;
+  padding: 16px;
+  box-shadow: 0 12px 28px #794b2224;
+}
+#play .ry-portrait img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #f2e0be;
+  border-radius: 16px;
+}
+#play .ry-picture-unavailable {
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: #f2e0be;
+  color: #68421b;
+  font-weight: 700;
+}
+#play .ry-word {
+  display: grid;
+  place-items: center;
+  min-height: 92px;
+  color: #432e1f;
+  font: 700 57px/1.05 "Kaiti SC", "Noto Serif CJK SC", serif;
+}
+#play .ry-work {
+  display: grid;
+  align-content: center;
+  gap: 24px;
+  padding: 20px;
+}
+#play .ry-slots {
+  display: grid;
+  grid-template-columns: repeat(2, 112px);
+  justify-content: center;
+  gap: 10px;
+}
+#play .ry-slots:empty {
+  display: none;
+}
+#play .ry-slots[data-layout="stack"] {
+  grid-template-columns: 112px;
+}
+#play .ry-slots[data-layout="crown"] > :first-child {
+  grid-column: span 2;
+  justify-self: center;
+}
+#play .ry-slots[data-layout="job-sequence"] {
+  grid-template-columns: repeat(3, 112px);
+}
+#play .ry-job {
+  width: 112px;
+  height: 86px;
+  overflow: hidden;
+  border: 3px dashed #a56a35;
+  border-radius: 12px;
+  background: #fffdf7;
+}
+#play .ry-job:has(img) { border: 3px solid #4b8a72; }
+#play .ry-job img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transform: scale(1.45);
+}
+#play .ry-job[data-crop="left"] img { object-position: left; transform-origin: left center; }
+#play .ry-job[data-crop="right"] img { object-position: right; transform-origin: right center; }
+#play .ry-slot {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 76px;
+  border: 3px dashed #a56a35;
+  border-radius: 12px;
+  background: #fffdf7;
+  color: #543521;
+  font: 700 56px/1.05 "Kaiti SC", "Noto Serif CJK SC", serif;
+}
+#play .ry-slot.placed {
+  border-style: solid;
+  border-color: #4b8a72;
+  background: #e8f5ec;
+}
+#play .ry-bank {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+#play .ry-choice {
+  display: grid;
+  place-items: center;
+  min-width: 100px;
+  height: 96px;
+  padding: 5px;
+  border: 3px solid #c99763;
+  border-radius: 16px;
+  background: #fffcf3;
+  color: #432e1f;
+  font: 700 58px/1 "Kaiti SC", "Noto Serif CJK SC", serif;
+  cursor: pointer;
+}
+#play .ry-choice[data-picture] {
+  width: 154px;
+  height: 155px;
+  overflow: hidden;
+}
+#play .ry-choice img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+#play .ry-choice[data-crop] img {
+  object-fit: cover;
+  transform: scale(1.65);
+}
+#play .ry-choice[data-crop="left"] img { object-position: left center; transform-origin: left center; }
+#play .ry-choice[data-crop="center"] img { object-position: center; transform-origin: center; }
+#play .ry-choice[data-crop="right"] img { object-position: right center; transform-origin: right center; }
+#play .ry-choice.selected { border-color: #bb531d; background: #fddcac; }
+#play .ry-choice.success { border-color: #4b8a72; background: #e8f5ec; }
+#play .ry-choice:disabled { opacity: 0.62; cursor: default; }
+#play .ry-choice:focus-visible,
+#play .ry-slot:focus-visible { outline: 5px solid #1b6381; outline-offset: 2px; }

@@ -1,0 +1,18 @@
+
+#cv{background:#f0eddf}
+#ready .pic{object-fit:contain;background:#f6f5e9}
+.ink-stage{height:100%;padding:25px;display:grid;grid-template-columns:540px 550px;gap:52px;justify-content:center;align-items:center;border:2px solid #bfd1c1;background:#e7f0e7;border-radius:28px}
+.ink-sheet{width:472px;height:472px;justify-self:center;border:5px solid #759e86;background:#fffdf4;border-radius:10px;box-shadow:0 8px #a9bdad;overflow:hidden}
+#ink-grid{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.ink-aside{height:472px;padding:24px;background:#fffaf0;border:3px solid #dfca9f;border-radius:28px;display:grid;grid-template-rows:210px 93px 84px;gap:14px;justify-items:center;align-items:center}
+#ink-image{grid-row:1;width:430px;height:210px;object-fit:contain;border-radius:16px}
+#ink-word{grid-row:2;font:700 90px/1 "Kaiti SC","Songti SC",serif;color:#285c47}
+.ink-aside[data-picture=false] #ink-word{grid-row:1 / 3;font-size:182px}
+.ink-buttons{grid-row:3;display:flex;justify-content:center;gap:30px}
+.ink-buttons button{width:100px;height:82px;border:3px solid #7a9b83;border-radius:20px;background:#e7f0e7;font:700 56px/1 sans-serif;color:#2c6148;cursor:pointer}
+.ink-buttons button:disabled{opacity:.4;cursor:default}
+#ink-paths path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ink-guide{stroke:#b6c4b5;stroke-width:3.7}
+.ink-guide.current{stroke:#9aaa8d}
+.ink-overlay{stroke:#38775c;stroke-width:4.2}
+

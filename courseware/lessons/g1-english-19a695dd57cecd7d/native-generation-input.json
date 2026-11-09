@@ -1,0 +1,278 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "nodeId": "b4f90f95-ed53-35b4-954b-dc1335b50941",
+    "unitId": "73a56a93-8bda-3c3b-9819-032cd5d10a2e",
+    "unitTitle": "Module 2",
+    "lessonTitle": "Unit 2 The toy car is under the bed.",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "lower",
+    "schoolSystem": "six_year",
+    "classHours": [
+      "第一课时",
+      "第二课时"
+    ]
+  },
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "objectives": [
+      "听教师示范，联系图片理解 toy car、bed、bear、hat 等物品名称；跟读不作为系统已会说的证据。",
+      "结合真实物体关系区分 in、on、under，能按听到的位置把物品摆进、摆上或摆到参照物下面。",
+      "理解 Where's the ...? 在问物品在哪里，先确定所问物品，再找它相对参照物的位置。",
+      "理解并跟随教师示范说出 The ... is in/on/under the ...，把物品、方位、参照物连成完整描述。",
+      "把方位表达用于找物和整理房间，愿意向大人描述摆放；系统只记录点击、摆放和图片选择，实际口语待观察。",
+      "通过持帽与戴帽的原创动作和节奏区分 in 和 on，听懂与手、头对应的口语线索。",
+      "在看图猜物时先听位置线索，再提出物品猜测并听懂肯定或否定反馈，按反馈缩小候选范围。"
+    ],
+    "coveredOfficialHours": [
+      "第一课时",
+      "第二课时"
+    ],
+    "videoStatus": "waived",
+    "excludedTopics": [
+      "Module 2 Unit 1 与 Module 3 的新增内容。",
+      "by、in front of、behind 等材料拓展词的计分教学。",
+      "本包未附正文的家庭拓展阅读，以及单独的拼写、语法术语和发音考核。"
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "c4a9fde22f724b3d76aa4c92526015d2d808ce66f734a0808343acc9e8b454c1",
+    "briefSha256": "dd765916eb150ed22ffc7976666c85b35d358bcd20d703afe216bdf298383e59",
+    "sourceInventorySha256": "263b6d11075ec1e2f1f37d38e83da0059f13fc6ae4b5ba9851f609ef063a4dcf",
+    "officialListingSha256": "372aef1b16ccafba6f06dd5135f5e22426027b0ebc2d2c0e4402fccd821f3a01",
+    "allHourManifestSha256": "11b974c4b5eac88a852f045842d3d8a3c57fe7d9a78371874f6049283d753031",
+    "textbookPageInventorySha256": "eb9ba0ea02d8e142f04df78bf9e3b5b223833a9a2b8af74150c6cc9f4e006586",
+    "picturePlanSha256": "b4374999dd4535e833f1766442fc0096a2ac03d6fd397dcf3c28660a04a9cab1"
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  },
+  "qualityRules": [
+    "用简体中文口语和准确英语。每句尽量25字内，最长40字。讲解页至少6句100字，互动页至少5句90字。",
+    "讲解页1000×562.5，逐个点亮要点。互动页1280×720，教师每页至少三次先操作画面再解释理由。",
+    "遮住非目标文字仍可听题、辨认图片、操作和继续。一页一件事，操作区至少44像素，先示范再交给孩子。",
+    "互动需改变画面中物品状态。首次答错只给线索，能复位并重玩。图文无答案泄露，无浏览器语音、实时讨论或外部链接。",
+    "图片题由老师读，四题逐题给技能、唯一正确答案和解释。正确选项位置分散，每个位置不超过两题。",
+    "图片选择和摆放可记录，跟读和真实口语待观察。最后带孩子回顾并向家人描述真实摆放。"
+  ],
+  "pagePlan": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "玩具小屋",
+      "play": "原创温暖玩具小屋中辨认玩具车、床、熊、帽子，教师示范词语并说明接下来帮助整理。图片承担物品意义，目标英文可以显示，儿童不用读中文。",
+      "bookActivities": [
+        1,
+        2
+      ]
+    },
+    {
+      "page": 2,
+      "type": "interactive",
+      "title": "听一听，摆一摆",
+      "play": "儿童听教师读方位，把正式玩具图片拖到真实家具图片的上面、下面或盒内，物品落定并保留位置。三关依次分辨不同物体关系；首错物品回到原处，仅提示观察参照物，不点亮正确区，第三错才示范。",
+      "bookActivities": [
+        2,
+        3
+      ]
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "在哪里",
+      "play": "教师用图解释 Where's the ...? 在问物品的位置，示范先听所问物品，再看它与参照物的关系。用目标英文呈现问题，不依赖儿童阅读指令。",
+      "bookActivities": [
+        1,
+        3
+      ]
+    },
+    {
+      "page": 4,
+      "type": "interactive",
+      "title": "帮忙找玩具",
+      "play": "听清被问的物品后，儿童依次掀开房间内的图片遮盖找它；找到后，物品从对应位置显露，位置与教师描述一致。干扰物有真实语义图片，首错只反馈不是正在找的物品，不揭露目标位置，三次后才示范。",
+      "bookActivities": [
+        3
+      ]
+    },
+    {
+      "type": "slide",
+      "title": "帽子跟着动作变位置",
+      "play": "用原创两幅动作图和原创短节奏，先指手持的帽子，再指头上的帽子，听出 in 与 on。允许孩子拿身边帽子或用手势跟做；发音与动作口头表现待观察。",
+      "bookActivities": [
+        4
+      ],
+      "page": 5
+    },
+    {
+      "page": 6,
+      "type": "quiz",
+      "title": "听位置选图片",
+      "play": "两道新情境图片题检查 in 和 on 的听辨，教师预录音读题，答案位置分散；题面不复用课上具体物品和参照物组合。",
+      "bookActivities": [
+        3
+      ]
+    },
+    {
+      "page": 7,
+      "type": "slide",
+      "title": "把位置说完整",
+      "play": "教师逐个点亮物品、方位、参照物，解释完整句的三个信息，再示范组合。跟读不评分，只说明可以说给大人听。",
+      "bookActivities": [
+        2,
+        6
+      ]
+    },
+    {
+      "type": "interactive",
+      "title": "听到线索，猜一件",
+      "play": "老师先给原创位置线索，再示范用物品图片猜测。孩子点选后让物品进入待验证区，听预录的肯定或否定；第一次错只排除当前物品，第三次才示范下一步。",
+      "bookActivities": [
+        5
+      ],
+      "page": 8
+    },
+    {
+      "page": 9,
+      "type": "interactive",
+      "title": "整理我们的玩具角",
+      "play": "儿童听完整描述，选中对应的物品再放到指定家具关系区；每次实际改变房间里的物品位置，全部安顿后形成整洁场景。与第2页单物位置辨认相比，本页加入物品辨认和参照物选择，检验完整句理解；首错不泄露正确落点。",
+      "bookActivities": [
+        6
+      ]
+    },
+    {
+      "page": 10,
+      "type": "quiz",
+      "title": "新的位置小检查",
+      "play": "两道新情境图片题检查 under 和完整位置句理解，教师配音，图片选项清楚区分参照物和位置；不重复教学关卡组合。",
+      "bookActivities": [
+        3,
+        6
+      ]
+    },
+    {
+      "page": 11,
+      "type": "slide",
+      "title": "位置小帮手",
+      "play": "用本课小屋图回顾 in、on、under 和提问、描述的顺序，邀请回家摆一个物品并告诉大人位置。只总结系统观察到的图片选择和摆放，口语写待观察。",
+      "bookActivities": [
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "assessmentBlueprint": {
+    "quiz": [
+      {
+        "id": "q1",
+        "skill": "听辨物品在里面",
+        "page": 6
+      },
+      {
+        "id": "q2",
+        "skill": "听辨物品在上面",
+        "page": 6
+      },
+      {
+        "id": "q3",
+        "skill": "听辨物品在下面",
+        "page": 10
+      },
+      {
+        "id": "q4",
+        "skill": "理解完整位置描述",
+        "page": 10
+      }
+    ],
+    "afterClass": {
+      "official": [
+        "用方位表达向家人描述自己的房间。",
+        "官方还建议拓展故事阅读，但本记录未附故事正文；本课不复制或补编该故事。"
+      ],
+      "inLesson": "第2、4页练听方位和配对，第5页做原创帽子动作节奏，第8页按线索猜物，第9页摆放并说位置，第11页回顾及家庭口头描述。口语待家长观察。",
+      "weekly": "题源包括物品词义图片辨认、in/on/under听辨、听问题确定物品、完整位置描述中物品与参照物配对。每周只从已学目标生成新情境变式，不单独制作本课周测。 另可从听线索排除物品、听动作词分辨 in/on 选原创图片变式。"
+    }
+  },
+  "assetPlan": [
+    {
+      "ids": [
+        "scene-home",
+        "obj-bed",
+        "obj-box",
+        "obj-desk",
+        "obj-car",
+        "obj-bear",
+        "obj-hat"
+      ],
+      "status": "existing_formal_assets",
+      "semanticNeeds": "同课原有场景、参照物和玩具素材。引用已有素材标识，位置关系由清楚的物体摆放状态呈现。"
+    },
+    {
+      "ids": [
+        "q-bear-on-bag",
+        "q-bear-in-bag",
+        "q-bear-under-bag",
+        "q-hat-under-chair",
+        "q-hat-in-box",
+        "q-hat-on-chair",
+        "q-kite-under-chair",
+        "q-kite-on-chair",
+        "q-kite-in-box",
+        "q-book-under-bag",
+        "q-book-in-bag",
+        "q-book-on-bag"
+      ],
+      "status": "existing_formal_assets",
+      "semanticNeeds": "同课原有题图。只在英语听题和图中关系完全一致、且未重复课堂例子时引用。"
+    },
+    {
+      "ids": [
+        "hat-in-hand-action",
+        "hat-on-head-action"
+      ],
+      "status": "planned_only",
+      "semanticNeeds": "两幅相同人物、相同帽子的新动作图。手持帽子与戴帽子的差异必须一眼看懂。由 Codex 后续提供，当前只输出素材标识。"
+    }
+  ],
+  "teachingFacts": {
+    "textbookPrintedPages": [
+      11,
+      12,
+      13
+    ],
+    "officialActivityNumbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reviewedSupportPageCount": 29,
+    "keyPoint": "从图片中的物品关系理解 in、on、under，并把物品名称和参照物连成位置描述。",
+    "difficultPoint": "不只辨认单词，还能听清被问的物品、选定参照物，把方位词用于实际找物和摆放。",
+    "targetStructures": [
+      "Where's the ...?",
+      "It's in/on/under the ...",
+      "The ... is in/on/under the ...",
+      "Is it a ...?",
+      "Yes, it is. / No, it isn’t."
+    ],
+    "activitySequence": [
+      "印刷第11页活动1，听问答并从参照物定位。活动2，听说物品加位置和参照物的完整句。",
+      "印刷第12页活动3，听取物品、关系、参照物后配对。活动4，用持帽和戴帽的动作、原创短节奏对照 in 和 on。",
+      "印刷第13页活动5，同一方位有两个可猜物品，用肯定或否定反馈再猜。活动6，看新室内图，说完整位置句。"
+    ]
+  },
+  "request": "为外研社一年级起点一年级下册 Module 2 Unit 2 创作一门完整可编辑课堂。沿用简要稿的玩具整理情境和六项原书活动范围，把两课时配套材料的摆放、找物、房间描述合为一课。原创故事、短节奏、台词和题面。按页提交语音文本和画面操作的对应、可操作状态、重试提示、正式素材引用和四题答案解析。"
+}

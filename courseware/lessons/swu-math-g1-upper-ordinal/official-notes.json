@@ -1,0 +1,898 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "reviewedAt": "2026-11-06T03:11:04.033177+00:00",
+  "reviewedBy": "lesson_32",
+  "reviewerKind": "author_review",
+  "binding": {
+    "editionId": "smartedu-math-six-year-g1-upper-3e6eb324",
+    "revisionId": "directory-2afc775be6bf98e9828f0115",
+    "nodeId": "ced9e227-2070-4909-aa59-ad547f9a540f",
+    "unitId": "78fd8d21-1807-4bf4-ba13-d96f6c69146f",
+    "unitTitle": "第一单元 0-9的认识",
+    "lessonTitle": "第几",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "classHour": "integrated_all",
+    "teachingRevision": "1",
+    "classHours": [
+      "lesson_1",
+      "lesson_2"
+    ]
+  },
+  "officialTextbook": {
+    "title": "新教材-小学数学西南大学版一年级上册",
+    "publisher": "西南大学出版社",
+    "textbookResourceId": "3e6eb324-6ea9-4c3a-a51f-fc37e07b38c1",
+    "sourceUrl": "https://basic.smartedu.cn/tchMaterial/detail?contentType=assets_document&contentId=3e6eb324-6ea9-4c3a-a51f-fc37e07b38c1&catalogType=tchMaterial&subCatalog=tchMaterial",
+    "printedStartPage": 24,
+    "printedEndPage": 26,
+    "pdfStartPage": 29,
+    "pdfEndPage": 31,
+    "nextPrintedPage": 27,
+    "pdfNextLessonStartPage": 32,
+    "nextLesson": "整理与复习",
+    "publication": "2024年6月",
+    "publicationEvidence": "两课时教学设计第1页、学习任务单第1页与课后练习第1页课本栏；页界据实时登记目录。",
+    "teachingMaterialId": "151fec89-f1eb-406a-8cf8-7f36033ff690",
+    "activityId": "633b6be4-0d04-2afb-5739-c1e8b52cd33d",
+    "directoryEvidencePath": "backend/content/textbooks/official-directories-v1/smartedu-math-six-year-g1-upper-3e6eb324.directory-2afc775be6bf98e9828f0115.json",
+    "directorySha256": "e294c7e18eddb865e636e68386f90a2b0f3cb168b57f940f6eef733362f3a808",
+    "pageMapPath": "backend/content/textbooks/sources/smartedu-directories-20260928/3e6eb324-6ea9-4c3a-a51f-fc37e07b38c1.json",
+    "pageMapSha256": "253dc731315f664011df5840333c08173790241539519ecedfdd7e88bebf4dae"
+  },
+  "sourceManifest": {
+    "path": "output/courseware-lessons/swu-math-g1-upper-ordinal/official/manifest.json",
+    "sha256": "7b5fa056846e924ec5a5a143e7895eedcb715f38e414693f40324b42bb6733cd",
+    "activityDetailsSha256": "ce36e505cc41240b1aba508df471b1d2e9d2c8c5cba33cfd4bce872ee5647bf5",
+    "activityDetailsUrl": "https://s-file-1.ykt.cbern.com.cn/zxx/ndrv2/national_lesson/resources/details/633b6be4-0d04-2afb-5739-c1e8b52cd33d.json",
+    "partsUrl": "https://s-file-2.ykt.cbern.com.cn/zxx/ndrs/national_lesson/teachingmaterials/151fec89-f1eb-406a-8cf8-7f36033ff690/resources/parts.json",
+    "partsSha256": "2ecabf28c402c42be9f494a6e7f19a0b17c06985338f28683418c1c5d5bfa17b",
+    "pageUrl": "https://s-file-2.ykt.cbern.com.cn/zxx/ndrs/national_lesson/teachingmaterials/151fec89-f1eb-406a-8cf8-7f36033ff690/resources/part_100.json",
+    "pageSha256": "ae37ba02a11fb2c8cb83b65e387f49c7e3449f69d7f08ae021661088a50376cc",
+    "exactNodeMatches": 1
+  },
+  "classHourCoverage": {
+    "expected": 2,
+    "reviewed": 2,
+    "documentPages": 61,
+    "method": "按关系索引核实两课时完整清单，逐页目视审读61张官方页图，逐页核字节与哈希。课时二作业第二页为官方空白页；任务单第二页局部覆盖用同课时教案与课件交叉确认。"
+  },
+  "contentBoundary": "整合两课时。第一课时为数量、序位、方向及数卡排序；第二课时练比较符号、队列前后与变化、固定楼层、遮挡队列和多解连续比较。零至九范围内排序、比较及实物重数，不引入下一课整理与复习或正式加减运算。",
+  "objectives": [
+    "分清数全组有几个、找某一个在第几个、选前几个。说清从哪端开始，并理解目标前有几个时不数目标本身。",
+    "用队列先确定方向再从第一件顺次点数，记录指定对象之前、之后与总量。改变起点、前方或后方人员后能重数，解释位序如何变化。",
+    "按从小到大或从大到小摆零至九的数字卡，区分卡片上写的数与卡片的次序。加入零卡后重新找位置。",
+    "在明示固定楼层号方向、每层一户的情境，用上面或下面有几户，确定目标楼层并从下核对。",
+    "用点数或一一对应巩固零至九的比较与三个符号。连续比较时核对两个条件，用图找一个或多个符合要求的数。"
+  ],
+  "keyPoint": "先说从哪里开始，再按次序一件一件数。用几表示数量，用第几表示其中一件的位置；连着比较时分别检验两次关系。",
+  "difficultPoint": "辨认前几个与某对象的前面有几个。改变方向或队列时重新找原对象，区分计数的顺序、卡片数字和固定楼层编号。",
+  "resources": {
+    "courseware": {
+      "status": "reviewed",
+      "findings": [
+        "第1课时第1页，封面确认西南大学版一年级《第几》第一课时。",
+        "第1课时第2页，运动会用九位动物选手和跑道建立先后顺序情境。",
+        "第1课时第3页，把同一时刻的赛跑画面按接近终点的先后排列，依次为九位选手确定名次。",
+        "第1课时第4页，依据一名选手的位置，分别数它之前、之后及总人数，并明确末尾名次。",
+        "第1课时第5页，借圈整组和圈一名选手区别数量和序数；同一个九可分别说九个与第九。",
+        "第1课时第6页，换到灯笼图，从明确的一端找单独第三个，另从一端圈起前三个。",
+        "第1课时第7页，队首持旗说明计数方向；指定第五个人，分别记录前面、后面和总数。",
+        "第1课时第8页，把零放到一至九的前面，从小到大排列时观察数字五的序位是否改变。",
+        "第1课时第9页，把零至九的散卡按从小到大、从大到小排；比较前几张与第几张。",
+        "第1课时第10页，迁移到真实教室位置，明确从哪里数，再用数量或序位表述。",
+        "第1课时第11页，引导回顾定义、计数方法与仍需澄清的问题。",
+        "第1课时第12页，西南大学出版社署名，第一课时结束。",
+        "第2课时第1页，封面确认《第几》第二课时、西南大学版一年级。",
+        "第2课时第2页，回顾数量比较的一一对应、三种符号以及几和第几的区别。",
+        "第2课时第3页，基本练习先用两组图形和两组动物分别比较数量。",
+        "第2课时第4页，五个方形与五个三角形数量相同，引出等号。",
+        "第2课时第5页，圈出每对中的两种图形，验证两边一一对应且都无剩余。",
+        "第2课时第6页，两组分别数数，同为五件，得到与配对相同的结论。",
+        "第2课时第7页，强调等号比较式从左向右的读法。",
+        "第2课时第8页，两组动物数量不等，从两个方向填写不同符号。",
+        "第2课时第9页，由四只与五只比较，得到四小于五，数量少对应较小数。",
+        "第2课时第10页，调换先后，五大于四，数量多的一组本身不变。",
+        "第2课时第11页，用宽口对较大数、尖端对较小数检验不等关系。",
+        "第2课时第12页，对同一组量的两个方向分别读出小于和大于。",
+        "第2课时第13页，用零至九的数字比较复习大于、小于、等于，包括零与零。",
+        "第2课时第14页，按队首标记数到第五，分别数目标前后人数和总人数。",
+        "第2课时第15页，提出前方第二人离开后，原目标是否仍排第五。",
+        "第2课时第16页，重新从队首数，前方少了一人，原第五现在是第四。",
+        "第2课时第17页，提出目标后方离开一人，后面还剩几人、全队有几人。",
+        "第2课时第18页，后面由四人变成三人，原目标仍在第五。",
+        "第2课时第19页，沿队列重数，确认全队变为八人。",
+        "第2课时第20页，分别提出只标第四个、只标第四个和第五个的涂色任务。",
+        "第2课时第21页，实际只把第四个图形涂色，前面的图形保留原样。",
+        "第2课时第22页，在另一排只标出第四和第五两个位置。",
+        "第2课时第23页，圈出第四前的三个、第五前的四个。累计数到某一位置包含当前那一件，序位名称仍只指当前一件。",
+        "第2课时第24页，九层且每层一户，从下面两户推到目标为第三层。",
+        "第2课时第25页，同一楼层图由上面两户推到第七层，可用从上和从下两种数法复核。",
+        "第2课时第26页，用两个同向大小关系推断首尾大小。",
+        "第2课时第27页，提供降序和升序各一种新例，指出可以用多种具体数组解释同一规律。",
+        "第2课时第28页，夹在四和七之间的整数可以有多个，分别检验左右条件。",
+        "第2课时第29页，固定中间数，分别寻找比它大和比它小的候选。",
+        "第2课时第30页，列出固定中间数两侧的零至九候选，验证每一种符合条件的填法。",
+        "第2课时第31页，练习在靠近零或九的边界按严格升序、降序补卡。",
+        "第2课时第32页，回顾比较方法、序数与数量关系及不同解法。",
+        "第2课时第33页，西南大学出版社署名，第二课时结束。"
+      ],
+      "pageRefs": [
+        "lesson_1:1",
+        "lesson_1:2",
+        "lesson_1:3",
+        "lesson_1:4",
+        "lesson_1:5",
+        "lesson_1:6",
+        "lesson_1:7",
+        "lesson_1:8",
+        "lesson_1:9",
+        "lesson_1:10",
+        "lesson_1:11",
+        "lesson_1:12",
+        "lesson_2:1",
+        "lesson_2:2",
+        "lesson_2:3",
+        "lesson_2:4",
+        "lesson_2:5",
+        "lesson_2:6",
+        "lesson_2:7",
+        "lesson_2:8",
+        "lesson_2:9",
+        "lesson_2:10",
+        "lesson_2:11",
+        "lesson_2:12",
+        "lesson_2:13",
+        "lesson_2:14",
+        "lesson_2:15",
+        "lesson_2:16",
+        "lesson_2:17",
+        "lesson_2:18",
+        "lesson_2:19",
+        "lesson_2:20",
+        "lesson_2:21",
+        "lesson_2:22",
+        "lesson_2:23",
+        "lesson_2:24",
+        "lesson_2:25",
+        "lesson_2:26",
+        "lesson_2:27",
+        "lesson_2:28",
+        "lesson_2:29",
+        "lesson_2:30",
+        "lesson_2:31",
+        "lesson_2:32",
+        "lesson_2:33"
+      ],
+      "classHours": [
+        {
+          "id": "lesson_1",
+          "status": "reviewed",
+          "resourceId": "0426fdb9-05eb-deb4-7fc7-bab75823a6fc",
+          "pageCount": 12,
+          "pageRefs": [
+            "lesson_1:1",
+            "lesson_1:2",
+            "lesson_1:3",
+            "lesson_1:4",
+            "lesson_1:5",
+            "lesson_1:6",
+            "lesson_1:7",
+            "lesson_1:8",
+            "lesson_1:9",
+            "lesson_1:10",
+            "lesson_1:11",
+            "lesson_1:12"
+          ],
+          "findings": [
+            "第1课时第1页，封面确认西南大学版一年级《第几》第一课时。",
+            "第1课时第2页，运动会用九位动物选手和跑道建立先后顺序情境。",
+            "第1课时第3页，把同一时刻的赛跑画面按接近终点的先后排列，依次为九位选手确定名次。",
+            "第1课时第4页，依据一名选手的位置，分别数它之前、之后及总人数，并明确末尾名次。",
+            "第1课时第5页，借圈整组和圈一名选手区别数量和序数；同一个九可分别说九个与第九。",
+            "第1课时第6页，换到灯笼图，从明确的一端找单独第三个，另从一端圈起前三个。",
+            "第1课时第7页，队首持旗说明计数方向；指定第五个人，分别记录前面、后面和总数。",
+            "第1课时第8页，把零放到一至九的前面，从小到大排列时观察数字五的序位是否改变。",
+            "第1课时第9页，把零至九的散卡按从小到大、从大到小排；比较前几张与第几张。",
+            "第1课时第10页，迁移到真实教室位置，明确从哪里数，再用数量或序位表述。",
+            "第1课时第11页，引导回顾定义、计数方法与仍需澄清的问题。",
+            "第1课时第12页，西南大学出版社署名，第一课时结束。"
+          ],
+          "pageProof": [
+            {
+              "page": 1,
+              "path": "lesson_1/courseware-01.jpg",
+              "sha256": "8b83955e01dc0781b087c9077089ea77614e6571a82d4d267acf3ec55c46ceb2"
+            },
+            {
+              "page": 2,
+              "path": "lesson_1/courseware-02.jpg",
+              "sha256": "c8ba5ba69442504d20b85f33f659ca18ab7186044e3609fa1558cb6ff5d54292"
+            },
+            {
+              "page": 3,
+              "path": "lesson_1/courseware-03.jpg",
+              "sha256": "26d686734990949e984401bf3f177470480222ead1ab60a4a6a501de1eb28b74"
+            },
+            {
+              "page": 4,
+              "path": "lesson_1/courseware-04.jpg",
+              "sha256": "bcfdb302d5f2154e278a391f22ac668296f774943e50c27db4f5f8fac7ebac6c"
+            },
+            {
+              "page": 5,
+              "path": "lesson_1/courseware-05.jpg",
+              "sha256": "1b2b6533e3c75e0a499570efab6a5c8fc976f344fe158ccf387f6edc0b7a5a1f"
+            },
+            {
+              "page": 6,
+              "path": "lesson_1/courseware-06.jpg",
+              "sha256": "68814ae52fbb532870e386e6f2b0b655f7f5bf9bf8878245885efaf1b4b963d1"
+            },
+            {
+              "page": 7,
+              "path": "lesson_1/courseware-07.jpg",
+              "sha256": "d7935d0c4f36f819272495d566edbc04c4e5131cadb732e7ddb90e12b2f17fed"
+            },
+            {
+              "page": 8,
+              "path": "lesson_1/courseware-08.jpg",
+              "sha256": "0652609f4b82b9e8615abe834bb4b3d08be4b30a38af7df0acd1c43dfe7d612d"
+            },
+            {
+              "page": 9,
+              "path": "lesson_1/courseware-09.jpg",
+              "sha256": "14a29517bd5608c469455729a36f56c42f032c418beeaf82201a0ff75cdd2cb2"
+            },
+            {
+              "page": 10,
+              "path": "lesson_1/courseware-10.jpg",
+              "sha256": "16ad4c6991a4821589bd7a9f57f1afd0b9f9ac2762bbb4298f18210065aea2a9"
+            },
+            {
+              "page": 11,
+              "path": "lesson_1/courseware-11.jpg",
+              "sha256": "f58cd39a8b360315587a16c1020952e05dc137156a882c7e8c03b58998f0cbac"
+            },
+            {
+              "page": 12,
+              "path": "lesson_1/courseware-12.jpg",
+              "sha256": "3889047cba6abe475cf9b40065c5d7bdf0441a3eba489ee44ab74460864c4297"
+            }
+          ]
+        },
+        {
+          "id": "lesson_2",
+          "status": "reviewed",
+          "resourceId": "a4a1b036-7c80-5079-f4f0-fb1674bac1c7",
+          "pageCount": 33,
+          "pageRefs": [
+            "lesson_2:1",
+            "lesson_2:2",
+            "lesson_2:3",
+            "lesson_2:4",
+            "lesson_2:5",
+            "lesson_2:6",
+            "lesson_2:7",
+            "lesson_2:8",
+            "lesson_2:9",
+            "lesson_2:10",
+            "lesson_2:11",
+            "lesson_2:12",
+            "lesson_2:13",
+            "lesson_2:14",
+            "lesson_2:15",
+            "lesson_2:16",
+            "lesson_2:17",
+            "lesson_2:18",
+            "lesson_2:19",
+            "lesson_2:20",
+            "lesson_2:21",
+            "lesson_2:22",
+            "lesson_2:23",
+            "lesson_2:24",
+            "lesson_2:25",
+            "lesson_2:26",
+            "lesson_2:27",
+            "lesson_2:28",
+            "lesson_2:29",
+            "lesson_2:30",
+            "lesson_2:31",
+            "lesson_2:32",
+            "lesson_2:33"
+          ],
+          "findings": [
+            "第2课时第1页，封面确认《第几》第二课时、西南大学版一年级。",
+            "第2课时第2页，回顾数量比较的一一对应、三种符号以及几和第几的区别。",
+            "第2课时第3页，基本练习先用两组图形和两组动物分别比较数量。",
+            "第2课时第4页，五个方形与五个三角形数量相同，引出等号。",
+            "第2课时第5页，圈出每对中的两种图形，验证两边一一对应且都无剩余。",
+            "第2课时第6页，两组分别数数，同为五件，得到与配对相同的结论。",
+            "第2课时第7页，强调等号比较式从左向右的读法。",
+            "第2课时第8页，两组动物数量不等，从两个方向填写不同符号。",
+            "第2课时第9页，由四只与五只比较，得到四小于五，数量少对应较小数。",
+            "第2课时第10页，调换先后，五大于四，数量多的一组本身不变。",
+            "第2课时第11页，用宽口对较大数、尖端对较小数检验不等关系。",
+            "第2课时第12页，对同一组量的两个方向分别读出小于和大于。",
+            "第2课时第13页，用零至九的数字比较复习大于、小于、等于，包括零与零。",
+            "第2课时第14页，按队首标记数到第五，分别数目标前后人数和总人数。",
+            "第2课时第15页，提出前方第二人离开后，原目标是否仍排第五。",
+            "第2课时第16页，重新从队首数，前方少了一人，原第五现在是第四。",
+            "第2课时第17页，提出目标后方离开一人，后面还剩几人、全队有几人。",
+            "第2课时第18页，后面由四人变成三人，原目标仍在第五。",
+            "第2课时第19页，沿队列重数，确认全队变为八人。",
+            "第2课时第20页，分别提出只标第四个、只标第四个和第五个的涂色任务。",
+            "第2课时第21页，实际只把第四个图形涂色，前面的图形保留原样。",
+            "第2课时第22页，在另一排只标出第四和第五两个位置。",
+            "第2课时第23页，圈出第四前的三个、第五前的四个。累计数到某一位置包含当前那一件，序位名称仍只指当前一件。",
+            "第2课时第24页，九层且每层一户，从下面两户推到目标为第三层。",
+            "第2课时第25页，同一楼层图由上面两户推到第七层，可用从上和从下两种数法复核。",
+            "第2课时第26页，用两个同向大小关系推断首尾大小。",
+            "第2课时第27页，提供降序和升序各一种新例，指出可以用多种具体数组解释同一规律。",
+            "第2课时第28页，夹在四和七之间的整数可以有多个，分别检验左右条件。",
+            "第2课时第29页，固定中间数，分别寻找比它大和比它小的候选。",
+            "第2课时第30页，列出固定中间数两侧的零至九候选，验证每一种符合条件的填法。",
+            "第2课时第31页，练习在靠近零或九的边界按严格升序、降序补卡。",
+            "第2课时第32页，回顾比较方法、序数与数量关系及不同解法。",
+            "第2课时第33页，西南大学出版社署名，第二课时结束。"
+          ],
+          "pageProof": [
+            {
+              "page": 1,
+              "path": "lesson_2/courseware-01.jpg",
+              "sha256": "fdccfeb877ac3d2e906759e74eba99f7ff4b536427b757ae80cbb5d009e36e6f"
+            },
+            {
+              "page": 2,
+              "path": "lesson_2/courseware-02.jpg",
+              "sha256": "793e25e649fdbf43e598d104f912b5ac9247e0680a29f89dfd9f14320316c49e"
+            },
+            {
+              "page": 3,
+              "path": "lesson_2/courseware-03.jpg",
+              "sha256": "91f509e01bf16c341ae6ad3d9ee7e7dc3bcf836dc1cfa83e09ebf87fa3d7fce0"
+            },
+            {
+              "page": 4,
+              "path": "lesson_2/courseware-04.jpg",
+              "sha256": "bd644b97734f9d39217bdd0b1ee827de7398d36ef35228c7815369131a82ee19"
+            },
+            {
+              "page": 5,
+              "path": "lesson_2/courseware-05.jpg",
+              "sha256": "a6d289b72496583fa62e9bb6e8d3f1d137884659508a67eabe88e236d1187107"
+            },
+            {
+              "page": 6,
+              "path": "lesson_2/courseware-06.jpg",
+              "sha256": "b1f3c9b1910ea7c8f9ea6b43d4e3494351a83add4d24ee545f5a19b80efc141a"
+            },
+            {
+              "page": 7,
+              "path": "lesson_2/courseware-07.jpg",
+              "sha256": "46ee331c1f2849869931db2092c1931155ca8372bed4e6b4e21c08462aeecb8b"
+            },
+            {
+              "page": 8,
+              "path": "lesson_2/courseware-08.jpg",
+              "sha256": "498c8af994e2bd509c7012b417e1a9069721a97ac6b619c7f34dbe23a0e0b1a5"
+            },
+            {
+              "page": 9,
+              "path": "lesson_2/courseware-09.jpg",
+              "sha256": "f344713042bb3e6e347a5f198b0bc0e17bf6a8924d34b09f482ed8eafa765a32"
+            },
+            {
+              "page": 10,
+              "path": "lesson_2/courseware-10.jpg",
+              "sha256": "3ff4ab4c1b9a3dce523988c2d070e986b85de4125f3b11fa834e529c39bcc65b"
+            },
+            {
+              "page": 11,
+              "path": "lesson_2/courseware-11.jpg",
+              "sha256": "aac59484820927152414ee9ba69471bb78c3d6e81e24f4364b25055cc2c67ba6"
+            },
+            {
+              "page": 12,
+              "path": "lesson_2/courseware-12.jpg",
+              "sha256": "219b90ba36318b8acf98f52086abb2b1c16b9e3292c600f4363c062f11e0e654"
+            },
+            {
+              "page": 13,
+              "path": "lesson_2/courseware-13.jpg",
+              "sha256": "7ad289a38c0116ba1d2a1c567ced436ce03a62c4b9b96e7e4f395147d0a36b2f"
+            },
+            {
+              "page": 14,
+              "path": "lesson_2/courseware-14.jpg",
+              "sha256": "2fda6feb06837fb9388393fd08b3abbdc102a3b0cbfbf9596a9ba86bd75cd468"
+            },
+            {
+              "page": 15,
+              "path": "lesson_2/courseware-15.jpg",
+              "sha256": "9e4993525367bfe69817663ea90a224b41bbab7cfdc7ea2872b003df8eb15605"
+            },
+            {
+              "page": 16,
+              "path": "lesson_2/courseware-16.jpg",
+              "sha256": "d387fc37460dc4fb405c91c04fb59737d227cfa3af6257344127cde27c65fc71"
+            },
+            {
+              "page": 17,
+              "path": "lesson_2/courseware-17.jpg",
+              "sha256": "d420fe8a66164188fb1da70daf1b95e1b5595db706d9a6cc5f5dd89fbb106235"
+            },
+            {
+              "page": 18,
+              "path": "lesson_2/courseware-18.jpg",
+              "sha256": "4455d9bf3beaa42dfb7aee3e806ba41f45323dd42f56306c28da8066adb7a01e"
+            },
+            {
+              "page": 19,
+              "path": "lesson_2/courseware-19.jpg",
+              "sha256": "09b0a27b6a1add4996cf658519669ae663d1587cf859b57e9c462d60b104b9e4"
+            },
+            {
+              "page": 20,
+              "path": "lesson_2/courseware-20.jpg",
+              "sha256": "93959af66746c5ee68eec5546ef29cb54dc9d16ccd4aab5b1223e638af172d8c"
+            },
+            {
+              "page": 21,
+              "path": "lesson_2/courseware-21.jpg",
+              "sha256": "ecd8ea74a57c805e33a0cca92adc03bec7c24e282f3b51c57399f2846f768d1c"
+            },
+            {
+              "page": 22,
+              "path": "lesson_2/courseware-22.jpg",
+              "sha256": "c0265af4aafec09096eb85accdd9cb04c1de99cd7e37b0c54e42ed93a6ce42a5"
+            },
+            {
+              "page": 23,
+              "path": "lesson_2/courseware-23.jpg",
+              "sha256": "906f333ca69fc3aa2037b42d113ddb6f1ba99d474d725e5c44f21ef10b01a965"
+            },
+            {
+              "page": 24,
+              "path": "lesson_2/courseware-24.jpg",
+              "sha256": "3b61e3187518826e916ca84a0c37a823e8b407720fc323461eb38660ac1cada2"
+            },
+            {
+              "page": 25,
+              "path": "lesson_2/courseware-25.jpg",
+              "sha256": "d53b23f88e95a918a60283b5cf27a582b1fa5f47c0c9faa24d43513dd889c522"
+            },
+            {
+              "page": 26,
+              "path": "lesson_2/courseware-26.jpg",
+              "sha256": "18c414943f07fd07d7e59c5799d3ab9849546b98edf679624fb7b07cf8fd5405"
+            },
+            {
+              "page": 27,
+              "path": "lesson_2/courseware-27.jpg",
+              "sha256": "2063eab66779def6ed4e859339ffa1ac34fbae06a1b9bd8ae07dde0316be15ce"
+            },
+            {
+              "page": 28,
+              "path": "lesson_2/courseware-28.jpg",
+              "sha256": "89cc414ebe0791caf40f18182a62c7ef8977aee982e0dca1e7a1836da00563af"
+            },
+            {
+              "page": 29,
+              "path": "lesson_2/courseware-29.jpg",
+              "sha256": "51ccd509876ad1b9981e78dd71e1d5552309e711788539572e02c8779ea3a55d"
+            },
+            {
+              "page": 30,
+              "path": "lesson_2/courseware-30.jpg",
+              "sha256": "1e793cccbcde7bbb896b23b4ad67f987e3b3e315c3d62ac26e196b889b11fd81"
+            },
+            {
+              "page": 31,
+              "path": "lesson_2/courseware-31.jpg",
+              "sha256": "e97f93a7188d9fa90a9c91a1914c0ca00b5dc5187c2af98863886fdc44e64e9f"
+            },
+            {
+              "page": 32,
+              "path": "lesson_2/courseware-32.jpg",
+              "sha256": "65240ebbeaa35ce498476fb257031291373225303b9dc56d6ab44812a71f4163"
+            },
+            {
+              "page": 33,
+              "path": "lesson_2/courseware-33.jpg",
+              "sha256": "6749f4f2077f6f1bf579c2b37b4427c0dc3ce96364483bce1b5466b34e82df08"
+            }
+          ]
+        }
+      ]
+    },
+    "teachingDesign": {
+      "status": "reviewed",
+      "findings": [
+        "第1课时第1页，确认2024年6月西南大学版与第一课时。目标是区分数量和序数，完整说出数学关系，难点是把两者说清。赛跑前后先练数总数。",
+        "第1课时第2页，先复盘逐个或分组数出数量，再按赛跑顺序排位置。用同一个数字在总量与名次中的意义作对照。",
+        "第1课时第3页，用灯笼和排队任务分别找单件与一段；人数分成前面、本人、后面三部分。把零放入一至九之前重数五的位置，再按升序与降序排卡。",
+        "第1课时第4页，借相邻数字相差一和已有大小关系发现规律；应用到教室。总结先定方向再从第一件数，位置或方向改变会改变所指序位。",
+        "第2课时第1页，确认2024年6月西南大学版及第二课时。目标包括数、摆或配对比较，正确用三符号，辨别几和第几并迁移生活。重点是比较方法与准确表达。",
+        "第2课时第2页，针对练习二分别通过配对、分别数数理解等量和不等量，互换比较顺序读式，并巩固零至九比较符号。",
+        "第2课时第3页，用排队实际数目标前后与总量。移走前方人员会改变目标序位，移走后方只改变后部与总数。用涂色核对单一指定位置及多个指定位置。",
+        "第2课时第4页，用每层一户的楼房判断层号；区分数自上而下遇到目标的序位与自下而上固定层号。再用两端条件做三个数的比较并讨论多解。",
+        "第2课时第5页，总结比较、序数与数量的区别，以及按多种方法、按两个约束筛选合法答案。"
+      ],
+      "pageRefs": [
+        "lesson_1:1",
+        "lesson_1:2",
+        "lesson_1:3",
+        "lesson_1:4",
+        "lesson_2:1",
+        "lesson_2:2",
+        "lesson_2:3",
+        "lesson_2:4",
+        "lesson_2:5"
+      ],
+      "classHours": [
+        {
+          "id": "lesson_1",
+          "status": "reviewed",
+          "resourceId": "d72e3851-cbc7-6dbb-0c62-7170a1d3f4df",
+          "pageCount": 4,
+          "pageRefs": [
+            "lesson_1:1",
+            "lesson_1:2",
+            "lesson_1:3",
+            "lesson_1:4"
+          ],
+          "findings": [
+            "第1课时第1页，确认2024年6月西南大学版与第一课时。目标是区分数量和序数，完整说出数学关系，难点是把两者说清。赛跑前后先练数总数。",
+            "第1课时第2页，先复盘逐个或分组数出数量，再按赛跑顺序排位置。用同一个数字在总量与名次中的意义作对照。",
+            "第1课时第3页，用灯笼和排队任务分别找单件与一段；人数分成前面、本人、后面三部分。把零放入一至九之前重数五的位置，再按升序与降序排卡。",
+            "第1课时第4页，借相邻数字相差一和已有大小关系发现规律；应用到教室。总结先定方向再从第一件数，位置或方向改变会改变所指序位。"
+          ],
+          "pageProof": [
+            {
+              "page": 1,
+              "path": "lesson_1/teachingDesign-01.jpg",
+              "sha256": "6535b040aaa47f6bda01c1b693bc6e0e7bd81a30bf5a830e2971497b0d790d46"
+            },
+            {
+              "page": 2,
+              "path": "lesson_1/teachingDesign-02.jpg",
+              "sha256": "8cd0e5fae7efa6d91baa8e4316b6f108c729f8f33ca453c4c145444e6dafa79a"
+            },
+            {
+              "page": 3,
+              "path": "lesson_1/teachingDesign-03.jpg",
+              "sha256": "82d2993abf22009d75a44009581549be2353c88d8461d41490dae50570d9f91e"
+            },
+            {
+              "page": 4,
+              "path": "lesson_1/teachingDesign-04.jpg",
+              "sha256": "49154f1317e3eb8ee984c6a553fc08084c4ba55fefa0f5d9ba790d35deb493bb"
+            }
+          ]
+        },
+        {
+          "id": "lesson_2",
+          "status": "reviewed",
+          "resourceId": "cac7b377-5841-97a3-e9ff-b8a21aea9a89",
+          "pageCount": 5,
+          "pageRefs": [
+            "lesson_2:1",
+            "lesson_2:2",
+            "lesson_2:3",
+            "lesson_2:4",
+            "lesson_2:5"
+          ],
+          "findings": [
+            "第2课时第1页，确认2024年6月西南大学版及第二课时。目标包括数、摆或配对比较，正确用三符号，辨别几和第几并迁移生活。重点是比较方法与准确表达。",
+            "第2课时第2页，针对练习二分别通过配对、分别数数理解等量和不等量，互换比较顺序读式，并巩固零至九比较符号。",
+            "第2课时第3页，用排队实际数目标前后与总量。移走前方人员会改变目标序位，移走后方只改变后部与总数。用涂色核对单一指定位置及多个指定位置。",
+            "第2课时第4页，用每层一户的楼房判断层号；区分数自上而下遇到目标的序位与自下而上固定层号。再用两端条件做三个数的比较并讨论多解。",
+            "第2课时第5页，总结比较、序数与数量的区别，以及按多种方法、按两个约束筛选合法答案。"
+          ],
+          "pageProof": [
+            {
+              "page": 1,
+              "path": "lesson_2/teachingDesign-01.jpg",
+              "sha256": "a8c60d61077e12d4cdbd77d4601257045d306bcb4327e9e0954608a0d53ca388"
+            },
+            {
+              "page": 2,
+              "path": "lesson_2/teachingDesign-02.jpg",
+              "sha256": "07a0bb1b07d4921a5a9757033b73c22602b2339a4df3bc1188f20b84b4add209"
+            },
+            {
+              "page": 3,
+              "path": "lesson_2/teachingDesign-03.jpg",
+              "sha256": "8784c5ae1dc004a06239830951fafdc788c8ad58f1eb8b758c255fa8dee74d1b"
+            },
+            {
+              "page": 4,
+              "path": "lesson_2/teachingDesign-04.jpg",
+              "sha256": "6cdc7844c5100671ebb890d58a740e621bb1e97f544371f29f77186488a91fa0"
+            },
+            {
+              "page": 5,
+              "path": "lesson_2/teachingDesign-05.jpg",
+              "sha256": "5a1ebc7c8019d32f54411e0e392a4692b78d68f1f5c636170aabec80343a0387"
+            }
+          ]
+        }
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed",
+      "findings": [
+        "第1课时第1页，确认版次与第一课时。课前复习零至九；课上先数动物数量，再根据赛跑找名次，最后区分几个与第几个并完整表达。",
+        "第2课时第1页，确认版次与第二课时；课前观察自己的队列位置，课上按图复习一一对应和两个数量的比较。",
+        "第2课时第2页，比较零至九的数字；数队伍的前面、后面和总人数。该页排版有覆盖，涂色任务及楼层题由同课时教案第三、四页和课件第二十至二十五页核清。",
+        "第2课时第3页，思维拓展用两次已知比较判断首尾，并补合适数；同时满足两边条件。"
+      ],
+      "pageRefs": [
+        "lesson_1:1",
+        "lesson_2:1",
+        "lesson_2:2",
+        "lesson_2:3"
+      ],
+      "classHours": [
+        {
+          "id": "lesson_1",
+          "status": "reviewed",
+          "resourceId": "d4306bd2-8ef7-489f-f6bb-c6c0451a0f38",
+          "pageCount": 1,
+          "pageRefs": [
+            "lesson_1:1"
+          ],
+          "findings": [
+            "第1课时第1页，确认版次与第一课时。课前复习零至九；课上先数动物数量，再根据赛跑找名次，最后区分几个与第几个并完整表达。"
+          ],
+          "pageProof": [
+            {
+              "page": 1,
+              "path": "lesson_1/learningTaskSheet-01.jpg",
+              "sha256": "f99c4e1b70451a786164af860c6d627a80a8b63aab238f1f5e0e04b7b69c293c"
+            }
+          ]
+        },
+        {
+          "id": "lesson_2",
+          "status": "reviewed",
+          "resourceId": "179e59fa-48da-c163-90ce-af2822c1298f",
+          "pageCount": 3,
+          "pageRefs": [
+            "lesson_2:1",
+            "lesson_2:2",
+            "lesson_2:3"
+          ],
+          "findings": [
+            "第2课时第1页，确认版次与第二课时；课前观察自己的队列位置，课上按图复习一一对应和两个数量的比较。",
+            "第2课时第2页，比较零至九的数字；数队伍的前面、后面和总人数。该页排版有覆盖，涂色任务及楼层题由同课时教案第三、四页和课件第二十至二十五页核清。",
+            "第2课时第3页，思维拓展用两次已知比较判断首尾，并补合适数；同时满足两边条件。"
+          ],
+          "pageProof": [
+            {
+              "page": 1,
+              "path": "lesson_2/learningTaskSheet-01.jpg",
+              "sha256": "14435a560bd80ec2e3c50a3c9b74af3fd2ca0a4f3e1b8b9a643897af975fa2c3"
+            },
+            {
+              "page": 2,
+              "path": "lesson_2/learningTaskSheet-02.jpg",
+              "sha256": "2e6f94d50166edd1665abd67a54f8e63f723a55333e657c425512cb7f34dc2a8"
+            },
+            {
+              "page": 3,
+              "path": "lesson_2/learningTaskSheet-03.jpg",
+              "sha256": "af2af63d9b7b49ac78efeb76c3a3820487ae9623f0a00cf3096b01005c364705"
+            }
+          ]
+        }
+      ]
+    },
+    "afterClassExercise": {
+      "status": "reviewed",
+      "findings": [
+        "第1课时第1页，按序位为鱼着色并圈指定数量；用一组不连续的零至九数字卡练比较、升序和第几个；每层一户的楼房题练用楼上或楼下户数反推楼层。",
+        "第2课时第1页，按指定方向将散数排序。用队列的右端已知序位与遮挡区边界推断总数和被遮人数，再把原左端两人移到最右，重数目标从右的序位与右边人数。",
+        "第2课时第2页，官方资源计为第二页，页图只有页首横线，未出现新增练习或内容。"
+      ],
+      "pageRefs": [
+        "lesson_1:1",
+        "lesson_2:1",
+        "lesson_2:2"
+      ],
+      "classHours": [
+        {
+          "id": "lesson_1",
+          "status": "reviewed",
+          "resourceId": "6885ddb0-298e-6dc7-a55b-22e8bd7ddaaf",
+          "pageCount": 1,
+          "pageRefs": [
+            "lesson_1:1"
+          ],
+          "findings": [
+            "第1课时第1页，按序位为鱼着色并圈指定数量；用一组不连续的零至九数字卡练比较、升序和第几个；每层一户的楼房题练用楼上或楼下户数反推楼层。"
+          ],
+          "pageProof": [
+            {
+              "page": 1,
+              "path": "lesson_1/afterClassExercise-01.jpg",
+              "sha256": "0da2cd27fc9bfc0324b9671fac5412b61e3cb371630084d3a4255a0258cf8120"
+            }
+          ]
+        },
+        {
+          "id": "lesson_2",
+          "status": "reviewed",
+          "resourceId": "fa04b8ef-dec5-e260-2b93-1df5545bb0eb",
+          "pageCount": 2,
+          "pageRefs": [
+            "lesson_2:1",
+            "lesson_2:2"
+          ],
+          "findings": [
+            "第2课时第1页，按指定方向将散数排序。用队列的右端已知序位与遮挡区边界推断总数和被遮人数，再把原左端两人移到最右，重数目标从右的序位与右边人数。",
+            "第2课时第2页，官方资源计为第二页，页图只有页首横线，未出现新增练习或内容。"
+          ],
+          "pageProof": [
+            {
+              "page": 1,
+              "path": "lesson_2/afterClassExercise-01.jpg",
+              "sha256": "2d4f41665e15f4eae0325a4232664f919f1503023a3a2b11ef11268cd7fa4f80"
+            },
+            {
+              "page": 2,
+              "path": "lesson_2/afterClassExercise-02.jpg",
+              "sha256": "b458ed6a45326c1b0c98d0a21e88ef20394f4a5f5722931abdd44574f4ce91bf"
+            }
+          ]
+        }
+      ]
+    },
+    "video": {
+      "status": "waived",
+      "authorization": "按2026-10-30用户明确同意豁免视频；两课时四类文档全页审读。",
+      "classHours": [
+        {
+          "id": "lesson_1",
+          "resourceId": "512bc996-3c55-e9f0-37cf-6d86507946ee",
+          "status": "waived"
+        },
+        {
+          "id": "lesson_2",
+          "resourceId": "d4658e5e-6283-1fdf-8e60-e829ef96a644",
+          "status": "waived"
+        }
+      ]
+    }
+  },
+  "factChecks": [
+    {
+      "claims": [
+        "数量说明有多少件；第几个只指一个位置。前几个包含第一件至指定件；指定件的前面有几件则不含指定件本身。"
+      ],
+      "sources": [
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "lesson_1:2",
+            "lesson_1:3",
+            "lesson_2:3"
+          ],
+          "finding": "明确数量、序位与前段，并在队列中分开前后和本人。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "lesson_1:5",
+            "lesson_1:6",
+            "lesson_2:21",
+            "lesson_2:22",
+            "lesson_2:23"
+          ],
+          "finding": "用圈整组、单件、前段、指定位置着色对照。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "同一排列先确定从哪端开始，一件一件数起点第一。换方向或有人在目标前移入移出，要从指定端重数；在目标后移出不改变它从原端数的位置。"
+      ],
+      "sources": [
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "lesson_1:4",
+            "lesson_2:3"
+          ],
+          "finding": "从第一件点数定位，并用队伍前后有人离开说明变化。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "lesson_1:7",
+            "lesson_2:15",
+            "lesson_2:16",
+            "lesson_2:17",
+            "lesson_2:18",
+            "lesson_2:19"
+          ],
+          "finding": "队首标记清楚；同一目标重数校验。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "零可以是数卡上写的数。按从小到大摆零至九时零那张是第一张，五是第六张；只摆一至九时，五是第五张。"
+      ],
+      "sources": [
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "lesson_1:3"
+          ],
+          "finding": "将两个排列对照，先数位置再说变动原因。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "lesson_1:8",
+            "lesson_1:9"
+          ],
+          "finding": "显示零与一至九的完整数序及反向排列。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "按常规从下往上编号的楼层，从上往下数到目标的位置是倒数序位；每层一户时，户数和层数可一一对应，再从下核对层号。"
+      ],
+      "sources": [
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "lesson_2:24",
+            "lesson_2:25"
+          ],
+          "finding": "由楼下、楼上户数分别确定楼层，标明总层数与每层一户。"
+        },
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "lesson_2:4"
+          ],
+          "finding": "从上下两端验证目标与固定楼层号。"
+        }
+      ]
+    },
+    {
+      "claims": [
+        "连续比较的两个约束都须成立。题目允许多解时逐项核对；若做单选题，选项只能有一个同时满足两个约束。"
+      ],
+      "sources": [
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            "lesson_2:4",
+            "lesson_2:5"
+          ],
+          "finding": "同向传递，夹在两个数间的候选不一定唯一。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            "lesson_2:26",
+            "lesson_2:27",
+            "lesson_2:28",
+            "lesson_2:29",
+            "lesson_2:30",
+            "lesson_2:31"
+          ],
+          "finding": "逐步列出同向比较与合格候选。"
+        }
+      ]
+    }
+  ]
+}

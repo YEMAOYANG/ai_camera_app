@@ -1,0 +1,1270 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "6和7的加、减法",
+  "description": "在原创圆片工坊合并、移出与配算式，把6和7的组成连到加法与减法，并理解同图四式的联系和等部分例外。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "依据正式数学教师档案，用短句准确解释整体、部分和每个运算符的含义；先操作再说明为什么，让儿童联系分合与加减。首次错误只提示，不泄露答案。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "bead": {
+      "file": "assets/bead.png"
+    },
+    "add-pair": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1100,
+          700
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "four-family": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1100,
+          700
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "1"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "6"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "7"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "6"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "1"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "7"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "7"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "1"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "7"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "6"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "1"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "equal-parts": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1100,
+          700
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "6"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "methods": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1100,
+          700
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "7"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "7"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "5"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "q1-parts": {
+      "glyph": {
+        "separator": "plus",
+        "size": [
+          1100,
+          360
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "🟠"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "q5-parts": {
+      "glyph": {
+        "separator": "gap",
+        "size": [
+          1100,
+          360
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "q6-parts": {
+      "glyph": {
+        "separator": "plus",
+        "size": [
+          1100,
+          360
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "算式从哪里来",
+      "template": "title-picture",
+      "data": {
+        "title": "6和7的加、减法",
+        "picture": "studio",
+        "caption": "两个部分，一个整体，连起加法和减法"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到圆片工坊，我是小数老师。"
+        },
+        {
+          "say": "今天把六和七的分合连成算式。"
+        },
+        {
+          "say": "两小组合起来，就是求全部有多少。"
+        },
+        {
+          "say": "我们用加法来表示这个合并过程。"
+        },
+        {
+          "say": "从全部里面拿走一组，还能找剩下的。"
+        },
+        {
+          "say": "这时用减法，求另外的那个部分。"
+        },
+        {
+          "say": "小满问：同一张图，能写几个算式？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "我们先摆一摆，再看每个数指谁。"
+        },
+        {
+          "say": "两个部分不同，通常能联系四个算式。"
+        },
+        {
+          "say": "如果两边一样多，还要留心重复。"
+        },
+        {
+          "say": "记住为什么算，比只记一个答案更有用。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "两组合到一起",
+      "page": "p02",
+      "widgetType": "arithmetic-merge-groups",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#part-a"
+        },
+        {
+          "say": "左边这两片，是其中一个部分。"
+        },
+        {
+          "highlight": "#part-b"
+        },
+        {
+          "say": "右边四片，是另一个部分。"
+        },
+        {
+          "setState": {
+            "demoMerged": true
+          }
+        },
+        {
+          "highlight": "#merge-zone"
+        },
+        {
+          "say": "两组放到一起，把每一片都算进去。"
+        },
+        {
+          "say": "二和四组成六，所以全部有六片。"
+        },
+        {
+          "setState": {
+            "demoSolved": true
+          }
+        },
+        {
+          "highlight": "#equation"
+        },
+        {
+          "say": "写成二加四等于六。"
+        },
+        {
+          "say": "加号连接两部分，等号后面是求出的整体。"
+        },
+        {
+          "say": "交换两组，四加二也等于六。"
+        },
+        {
+          "say": "数量没变，因为没有多拿或少拿一片。"
+        },
+        {
+          "say": "现在把两组都合起来，再选总数。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "同一张图，两道加法",
+      "template": "picture-points",
+      "data": {
+        "title": "同一张图，两道加法",
+        "picture": "add-pair",
+        "points": [
+          "2与4是两个部分",
+          "2＋4＝6：合起来求整体",
+          "4＋2＝6：交换两个加数",
+          "位置交换，得数相同"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "同一张图里有两片和四片。"
+        },
+        {
+          "say": "它们分别是整体里的两个部分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先说两片再说四片，写二加四等于六。"
+        },
+        {
+          "say": "加法把两个部分合成一个整体。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先说四片再说两片，写四加二等于六。"
+        },
+        {
+          "say": "相加的这两个数，叫作加数。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "两个加数交换位置，得数仍然是六。"
+        },
+        {
+          "say": "因为两组圆片还是同样的两组。"
+        },
+        {
+          "say": "朵朵说：观察角度变了，物品没有变。",
+          "by": "duoduo"
+        },
+        {
+          "say": "可以点数，也可以直接想六的组成。"
+        },
+        {
+          "say": "两种方法，都要把全部的物品算进去。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "从整体移出一部分",
+      "page": "p04",
+      "widgetType": "arithmetic-remove-part",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#whole-row"
+        },
+        {
+          "say": "减法开始时，先看整体的六片。"
+        },
+        {
+          "highlight": "#equation"
+        },
+        {
+          "say": "六减二，是从六片里移出两片。"
+        },
+        {
+          "setState": {
+            "demoRemoved": true
+          }
+        },
+        {
+          "highlight": "#removed-zone"
+        },
+        {
+          "say": "这两片在移出区，是减去的部分。"
+        },
+        {
+          "highlight": "#whole-row"
+        },
+        {
+          "say": "留在整体区的四片，是剩下的部分。"
+        },
+        {
+          "setState": {
+            "demoSolved": true
+          }
+        },
+        {
+          "say": "所以六减二等于四。"
+        },
+        {
+          "say": "算式先写整体，再减去其中一个部分。"
+        },
+        {
+          "say": "不能把移出的两片当成剩下的四片。"
+        },
+        {
+          "highlight": "#answer-options"
+        },
+        {
+          "say": "现在按算式移出，再选留下的数量。"
+        },
+        {
+          "say": "移错可以全部放回，不会扣分。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "合并还是拿走",
+      "intro": [
+        "换一种物品，想想合并和拿走的区别。",
+        "听完题意，再选择数量图。"
+      ],
+      "questions": [
+        {
+          "id": "as67-q1",
+          "question": "五枚拼图和一枚拼图合在一起，一共几枚？",
+          "skill": "两部分合成6",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            },
+            "C": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "五和一组成六，合并两个部分用加法，一共六枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-parts",
+            "alt": "对应题意的两个部分数量点示意"
+          }
+        },
+        {
+          "id": "as67-q2",
+          "question": "六颗彩石拿走一颗，还剩几颗？",
+          "skill": "6减去一个部分",
+          "options": {
+            "A": {
+              "label": "1",
+              "visual": {
+                "kind": "quantity",
+                "count": 1
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            },
+            "C": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "六是整体，一是拿走部分；六减一等于五，余下五颗。",
+          "visual": {
+            "kind": "quantity",
+            "count": 6
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "整体与部分连着四个算式",
+      "template": "picture-points",
+      "data": {
+        "title": "整体与部分连着四个算式",
+        "picture": "four-family",
+        "points": [
+          "1＋6＝7，6＋1＝7",
+          "7−1＝6，7−6＝1",
+          "加法：两个部分找整体",
+          "减法：整体和一部分找另一部分"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一片与六片合起来，整体是七片。"
+        },
+        {
+          "say": "一加六，或六加一，都等于七。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从整体七片移出一片，剩下六片。"
+        },
+        {
+          "say": "从整体七片移出六片，又剩下一片。"
+        },
+        {
+          "say": "所以七减一等于六，七减六等于一。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两道加法都在求同一个整体。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "两道减法都从这个整体开始。"
+        },
+        {
+          "say": "减去一个部分，就留下另一个部分。"
+        },
+        {
+          "say": "同一张图，把四个算式连在一起。"
+        },
+        {
+          "say": "加法里能交换加数，减法不能随便交换。"
+        },
+        {
+          "say": "减法开头的七，必须对应全部七片。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "给同一张图配算式",
+      "page": "p07",
+      "widgetType": "arithmetic-picture-four-equations",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#diagram"
+        },
+        {
+          "say": "示范图是两片和五片，合成七片。"
+        },
+        {
+          "highlight": "#formula-pool"
+        },
+        {
+          "say": "先看算式里的数，是否都和图对应。"
+        },
+        {
+          "setState": {
+            "demoAdd": true
+          }
+        },
+        {
+          "highlight": "#addition-bank"
+        },
+        {
+          "say": "二加五与五加二，都在求整体七。"
+        },
+        {
+          "say": "两道加法放在加号区域。"
+        },
+        {
+          "setState": {
+            "demoAll": true
+          }
+        },
+        {
+          "highlight": "#subtraction-bank"
+        },
+        {
+          "say": "七减二找五，七减五找二。"
+        },
+        {
+          "say": "两道减法都要从整体七开始。"
+        },
+        {
+          "say": "同一张图支持这四个不同的算式。"
+        },
+        {
+          "say": "错误算式里的数，和图的关系对不上。"
+        },
+        {
+          "say": "现在请选卡片，拖入对应的加减区域。"
+        },
+        {
+          "say": "也可以直接点卡片，核对后再收下。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "两边相同时不用重复",
+      "template": "picture-points",
+      "data": {
+        "title": "两边相同时不用重复",
+        "picture": "equal-parts",
+        "points": [
+          "3和3合成6",
+          "交换以后仍是3＋3＝6",
+          "6减去哪一组，都是6−3＝3",
+          "相同算式只保留一次"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这次六片，分成三片和三片。"
+        },
+        {
+          "say": "两个部分原来就一样多。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "三加三等于六，交换后仍是三加三。"
+        },
+        {
+          "say": "写两遍，并没有多出一个不同的算式。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从六片移出哪一组，都是移出三片。"
+        },
+        {
+          "say": "留下的也都是三片，六减三等于三。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "所以这里只保留一道不同的加法。"
+        },
+        {
+          "say": "再保留一道不同的减法，就已经说全。"
+        },
+        {
+          "say": "站长猫头鹰提醒：不用为了四个硬凑。",
+          "by": "owl"
+        },
+        {
+          "say": "通常的一图四式，要留心这个特殊情况。"
+        },
+        {
+          "say": "先看两个部分，才能判断是否重复。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "想加法，算减法",
+      "page": "p09",
+      "widgetType": "arithmetic-inverse-relation",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#known-add"
+        },
+        {
+          "say": "已知二加四等于六。"
+        },
+        {
+          "say": "这告诉我们，六里面有二和四两部分。"
+        },
+        {
+          "highlight": "#ask-sub"
+        },
+        {
+          "say": "要求六减二，就从整体去掉两片。"
+        },
+        {
+          "say": "另一个四片部分还留下来。"
+        },
+        {
+          "setState": {
+            "demoSolved": true
+          }
+        },
+        {
+          "say": "所以六减二等于四。"
+        },
+        {
+          "highlight": "#reveal-picture"
+        },
+        {
+          "say": "看图核对，移出二片，留下四片。"
+        },
+        {
+          "say": "即使暂时不看图，也能借加法来想。"
+        },
+        {
+          "highlight": "#answer-options"
+        },
+        {
+          "say": "先找减去了哪部分，再选另外的部分。"
+        },
+        {
+          "say": "需要时可以打开图，重新对应数量。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "会联系，也会区分",
+      "intro": [
+        "试着联系已知加法，再分清减法里的数。",
+        "每题只有一个合适的数量图。"
+      ],
+      "questions": [
+        {
+          "id": "as67-q3",
+          "question": "已知四加三等于七，七减四等于几？",
+          "skill": "由加法想减法",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "B": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            },
+            "C": {
+              "label": "3",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "四和三组成七，整体七减去四这一部分，留下三。"
+        },
+        {
+          "id": "as67-q4",
+          "question": "六个钥匙扣送走一个，求剩下的数量，应从几个减起？",
+          "skill": "减法中的整体与部分",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "1",
+              "visual": {
+                "kind": "quantity",
+                "count": 1
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "减法先写整体。原来全部六个，应从六减去送走的一个。",
+          "visual": {
+            "kind": "quantity",
+            "count": 6
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "把方法说清楚",
+      "template": "picture-points",
+      "data": {
+        "title": "把方法说清楚",
+        "picture": "methods",
+        "points": [
+          "可以把物品逐一点数",
+          "可以想6、7的组成",
+          "知道2＋5＝7，就能想7−2＝5",
+          "每个数都对应整体或部分"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "遇到计算，可以先用圆片摆一摆。"
+        },
+        {
+          "say": "合并后点数，或移出后再数留下的。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "熟悉组成，也能直接想六和七怎样分。"
+        },
+        {
+          "say": "二和五组成七，七分成二和五。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "知道二加五等于七，就知道七减二是五。"
+        },
+        {
+          "say": "也知道七减五等于二。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "说明方法时，先指出全部有多少。"
+        },
+        {
+          "say": "再说拿走或合并的是哪个部分。"
+        },
+        {
+          "say": "最后说另一部分，或合成后的总数。"
+        },
+        {
+          "say": "请把理由说给大人听，请他帮忙观察。"
+        },
+        {
+          "say": "只选对图片，还不能说明口头表达清楚。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "加减变式小检查",
+      "intro": [
+        "最后两题，检查特殊情况和位置交换。",
+        "先想每个数指的是哪一部分。"
+      ],
+      "questions": [
+        {
+          "id": "as67-q5",
+          "question": "把六片分成同样多的两组，能列出几道不同的加减算式？",
+          "skill": "等部分时算式去重",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "B": {
+              "label": "3",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            },
+            "C": {
+              "label": "2",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "两个部分同样多，交换后的算式重复。只保留一道加法和一道减法，一共有两道。",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-parts",
+            "alt": "对应题意的两个部分数量点示意"
+          }
+        },
+        {
+          "id": "as67-q6",
+          "question": "三枚和四枚拼片合成七枚。交换两组位置，一共还是几枚？",
+          "skill": "交换加数得数不变",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            },
+            "C": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "交换两个加数的位置，两个部分仍是三枚和四枚，整体还是七枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q6-parts",
+            "alt": "对应题意的两个部分数量点示意"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "两个部分，一个整体",
+      "template": "summary",
+      "data": {
+        "title": "两个部分，一个整体",
+        "items": [
+          "加法：两部分合成整体",
+          "减法：整体减去一部分",
+          "同一图通常连起两加两减",
+          "部分相同，重复算式只留一次"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "两部分合起来，用加法求整体。"
+        },
+        {
+          "say": "交换两个加数，得数仍然相同。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "整体减去一部分，就得到另一部分。"
+        },
+        {
+          "say": "可以想组成，也可以借加法想减法。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "两部分不同，一幅图通常连着四个算式。"
+        },
+        {
+          "say": "其中两道加法，两道减法。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "两边都是三时，重复算式只留一次。"
+        },
+        {
+          "say": "回家可以和家人抽零到七的数字卡。"
+        },
+        {
+          "say": "用较大数减较小数，先试六或七。"
+        },
+        {
+          "say": "把计算方法说出来，请家人帮忙观察。"
+        },
+        {
+          "say": "站长猫头鹰说：讲清每个数指谁。",
+          "by": "owl"
+        },
+        {
+          "say": "我们今天的摆物和选择，才是系统记录。"
+        }
+      ]
+    }
+  ]
+}

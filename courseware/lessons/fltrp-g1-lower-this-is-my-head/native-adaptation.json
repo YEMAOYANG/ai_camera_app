@@ -1,0 +1,91 @@
+{
+  "jobId": "-ldpUhO4SX",
+  "nativeClassroomId": "GzwrGiVlt3",
+  "nativeClassroomSha256": "dd70101053b33bf9aecc53753fd972f2a1591523fb9740f85dff466597110ad5",
+  "nativeProvider": "deepseek",
+  "sceneMapping": [
+    {
+      "nativeSceneId": "scene_QDXklH45Ib",
+      "nativeOutlineId": "scene_1",
+      "releaseSceneKey": "p01",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_HXqwxVWg1J",
+      "nativeOutlineId": "scene_2",
+      "releaseSceneKey": "p02",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_nWAR0T2WlA",
+      "nativeOutlineId": "scene_3",
+      "releaseSceneKey": "p03",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_rJS37h67N6",
+      "nativeOutlineId": "scene_4",
+      "releaseSceneKey": "p04",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_BK-qubHi4E",
+      "nativeOutlineId": "scene_5",
+      "releaseSceneKey": "p05",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_OUp39qob7j",
+      "nativeOutlineId": "scene_6",
+      "releaseSceneKey": "p06",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_LGnZhRAb4e",
+      "nativeOutlineId": "scene_7",
+      "releaseSceneKey": "p07",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_5BP2wiRdZa",
+      "nativeOutlineId": "scene_8",
+      "releaseSceneKey": "p08",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_7aHCycxwn1",
+      "nativeOutlineId": "scene_9",
+      "releaseSceneKey": "p09",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    },
+    {
+      "nativeSceneId": "scene_rj6ty15V4L",
+      "nativeOutlineId": "scene_10",
+      "releaseSceneKey": "p10",
+      "retained": "原生场景的教学任务、场景位置、形式与主要语音意图。适龄修订并换成实际图片及公共互动。"
+    }
+  ],
+  "scopeRepairs": [
+    "p02修正原草稿只有眼鼻嘴的不当限定。",
+    "p03改成点图，避免触摸眼睛。",
+    "p04补全具体局部与全身对照。",
+    "p06修正原草稿颜色和说话人不一致。",
+    "p09重做正式图选项及位置轮换，排除教材边界外手脚和头发作词汇考查。"
+  ],
+  "independentReviewRepairs": [
+    "明确小橙指的是小青画像的嘴。",
+    "给eye和ear分别增加有画面操作的听音对照；发音依据已入官方笔记的补充核对。"
+  ],
+  "preRevisionOfficialNotes": "output/courseware-lessons/fltrp-g1-lower-this-is-my-head/independent-review-v1/source-before-revisions/official-notes.json",
+  "photoDemoRevision": {
+    "actionId": "p05-8",
+    "change": "把与p05-6重复解释亮框的台词换成结果框高亮。前一动作先高亮脸部卡，再高亮放大结果框。",
+    "retainedNarration": "老师送对了，小橙的照片框就亮起来。",
+    "previousMediaRequest": "09c251d5c50d2b222ae8839624efd1c24afc5b6148abbe242fa95d4065a68a69",
+    "previousMediaStatus": "HTTP 500，原账留存，未重发。"
+  },
+  "speakerReversalRevision": {
+    "scene": "p06",
+    "evidence": "小青先指自己这只眼说my；随后小橙成为说话人，仍指小青同一只眼，对小青说your。只增加这组明确的双视角对照，不引入复数。"
+  }
+}

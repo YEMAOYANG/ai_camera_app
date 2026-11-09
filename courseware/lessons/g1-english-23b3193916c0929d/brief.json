@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "Where's the bird? 小鸟在哪里",
+  "objectives": ["辨认bird、hat和where的位置询问。", "把in、on、under与具体位置对应。", "听懂Where's the bird?并尝试用It's回答。", "新情境听辨位置，与家人练习；口语待观察。"],
+  "goals": ["听懂并辨认bird、hat及where的位置询问。", "用in、on、under说明具体位置，听指令移动鸟。", "尝试用Where's the bird?和It's进行位置问答。", "在新物品画面中听辨位置，与家人练习，口语待观察。"],
+  "pageOrder": [
+    {"key": "p01", "type": "slide", "goal": "bird、hat与询问位置", "play": "原创鸟与帽子情境，老师预录音引入。"},
+    {"key": "p02", "type": "slide", "goal": "三种位置的画面解释", "play": "in、on、under逐点高亮，明确里面、上面、下面。"},
+    {"key": "p03", "type": "interactive", "goal": "理解in", "play": "把正式小鸟图片放入帽子开口，鸟身进入帽内并被帽前部遮住。"},
+    {"key": "p04", "type": "interactive", "goal": "理解on", "play": "把小鸟放在帽沿上，脚与上表面接触。"},
+    {"key": "p05", "type": "interactive", "goal": "理解under", "play": "把小鸟放在悬浮魔术帽下方，形成明确上下关系。"},
+    {"key": "p06", "type": "slide", "goal": "询问与回答", "play": "老师读Where's the bird?并用It's回答，邀请向家人说，表现待观察。"},
+    {"key": "p07", "type": "quiz", "goal": "新物品情境听辨位置", "play": "红球和蓝箱图片选项，三题正确位置A/B/C，预录读题。"},
+    {"key": "p08", "type": "slide", "goal": "回顾和课后迁移", "play": "回顾位置词和问答，邀请用家中物品练习，口语待观察。"}
+  ],
+  "adjacentMechanismReason": "p03到p05保留同一鸟与帽、同一放置控制，只改变目标关系。控制物品和操作负担，让一年级儿童专注比较三个位置词。教师示范和学生操作有显式交接。",
+  "pictureQuiz": {"skills": ["position-in", "position-on", "position-under"], "newContext": "课堂鸟与帽，小检查改为红球与蓝箱，不复用课堂示范图作检查。", "correctAnswerPositions": ["A", "B", "C"]},
+  "afterClass": {"sourceRefs": ["第一份设计第4页、课件第14页", "第二份设计第4页、课件第26页"], "destination": "老师领读后与家人玩藏物找物；实际朗读、表达待成人观察。"},
+  "weeklyQuestionSource": {"skills": ["position-in", "position-on", "position-under", "where-question"], "sourceOnly": true},
+  "evidenceBoundary": "点击和拖放只证明图片位置对应；发音、朗读、会话表达均待成人观察。"
+}

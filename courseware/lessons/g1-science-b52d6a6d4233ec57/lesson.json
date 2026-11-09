@@ -1,0 +1,1056 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "从观察开始",
+  "description": "按目的安排观察，用适合的多种感官发现线索，并保护感觉器官。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "好奇又细心的科学女老师，先讲安全，再引导观察、如实描述和比较线索。"
+    }
+  },
+  "images": {
+    "station": {
+      "file": "assets/station.png"
+    },
+    "eye": {
+      "file": "assets/eye.png"
+    },
+    "ear": {
+      "file": "assets/ear.png"
+    },
+    "nose": {
+      "file": "assets/nose.png"
+    },
+    "tongue": {
+      "file": "assets/tongue.png"
+    },
+    "hand": {
+      "file": "assets/hand.png"
+    },
+    "apple": {
+      "file": "assets/apple.png"
+    },
+    "unknown": {
+      "file": "assets/unknown.png"
+    },
+    "adult": {
+      "file": "assets/adult.png"
+    },
+    "see-kite": {
+      "file": "assets/see-kite.png"
+    },
+    "hear-bell": {
+      "file": "assets/hear-bell.png"
+    },
+    "smell-flower": {
+      "file": "assets/smell-flower.png"
+    },
+    "taste-grape": {
+      "file": "assets/taste-grape.png"
+    },
+    "touch-sponge": {
+      "file": "assets/touch-sponge.png"
+    },
+    "bell": {
+      "file": "assets/bell.png"
+    },
+    "reading-safe": {
+      "file": "assets/reading-safe.png"
+    },
+    "rub-eye": {
+      "file": "assets/rub-eye.png"
+    },
+    "poke-ear": {
+      "file": "assets/poke-ear.png"
+    },
+    "poke-nose": {
+      "file": "assets/poke-nose.png"
+    },
+    "screen-break": {
+      "file": "assets/screen-break.png"
+    },
+    "hands-down": {
+      "file": "assets/hands-down.png"
+    },
+    "stick-away": {
+      "file": "assets/stick-away.png"
+    },
+    "quiz-write-card": {
+      "file": "assets/quiz-write-card.png"
+    },
+    "quiz-close-laptop": {
+      "file": "assets/quiz-close-laptop.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "观察有个小目标",
+      "template": "title-picture",
+      "data": {
+        "title": "从观察开始",
+        "picture": "station",
+        "caption": "先想知道什么，再安排怎样观察"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到观察驿站，桌上有个小铃铛。"
+        },
+        {
+          "say": "我想知道它是什么颜色，可以怎样做？"
+        },
+        {
+          "say": "先用眼睛仔细看，能找到颜色线索。"
+        },
+        {
+          "say": "如果想知道它的声音，就要请耳朵帮忙。"
+        },
+        {
+          "say": "小满问：观察就是一直盯着看吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "观察还可以用听、闻、摸等合适的方法。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先想清楚要了解什么，就有了观察目的。"
+        },
+        {
+          "say": "再安排先做什么，后做什么，就是计划。"
+        },
+        {
+          "say": "不同感官找到不同线索，要如实说出来。"
+        },
+        {
+          "say": "猫头鹰站长提醒：观察还要注意安全。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "给观察排顺序",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#plan-object"
+        },
+        {
+          "say": "做观察前，先想好我们要了解什么。"
+        },
+        {
+          "say": "老师先为一个小铃铛安排观察计划。"
+        },
+        {
+          "setState": {
+            "demo": "bell"
+          }
+        },
+        {
+          "say": "先看外形，再轻摇，最后用耳朵听声音。"
+        },
+        {
+          "highlight": "#plan-track"
+        },
+        {
+          "say": "按顺序做，才知道线索是从哪里来的。"
+        },
+        {
+          "say": "铃铛不是食物，不放进嘴里尝味道。"
+        },
+        {
+          "highlight": "#plan-choices"
+        },
+        {
+          "say": "水果这一关，先看外表，再摸一摸。"
+        },
+        {
+          "say": "接着闻熟悉水果，请大人确认能不能尝。"
+        },
+        {
+          "say": "要洗净双手，过敏或变坏的食物不能尝。"
+        },
+        {
+          "say": "大人确认可以尝时，品尝才放在最后。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "下一关是未知物，只看外观，再请大人。"
+        },
+        {
+          "say": "未知物不随便闻或尝，按图片排计划。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "眼睛与耳朵的线索",
+      "template": "two-columns",
+      "data": {
+        "title": "两种不同的线索",
+        "left": {
+          "heading": "眼睛看",
+          "body": "大小、形状、颜色"
+        },
+        "right": {
+          "heading": "耳朵听",
+          "body": "声音"
+        },
+        "left_picture": "eye",
+        "right_picture": "ear"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看一辆玩具车，眼睛能发现它的颜色。"
+        },
+        {
+          "say": "还可以看它的大小和外面的形状。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这些看得见的外观信息，由眼睛来帮忙。"
+        },
+        {
+          "say": "小满问：声音也能靠眼睛看出来吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "听见门外轻轻的敲门声，是耳朵在帮忙。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "耳朵得到声音线索，眼睛得到外观线索。"
+        },
+        {
+          "say": "想找哪一种信息，就用适合的感官。"
+        },
+        {
+          "say": "看到有人敲门，不等于自己听到了声音。"
+        },
+        {
+          "say": "记录时，要分清自己看到的和听到的。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "鼻子与舌头的线索",
+      "template": "two-columns",
+      "data": {
+        "title": "气味和味道要分清",
+        "left": {
+          "heading": "鼻子闻",
+          "body": "气味"
+        },
+        "right": {
+          "heading": "舌头尝",
+          "body": "味道；安全确认后才尝"
+        },
+        "left_picture": "nose",
+        "right_picture": "tongue"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "熟悉的花朵有气味，鼻子能帮助我们闻。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "闻到的叫气味，不把它说成尝到的味道。"
+        },
+        {
+          "say": "小满问：气味和味道有什么不同？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "舌头接触能吃的食物，才能得到味道线索。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "先让大人确认安全，洗净手后才能品尝。"
+        },
+        {
+          "say": "自己过敏的食物不能尝，坏了的也不尝。"
+        },
+        {
+          "say": "对不认识的物品，不随便靠近闻或尝。"
+        },
+        {
+          "say": "鼻子闻气味，舌头尝味道，分工不一样。"
+        },
+        {
+          "say": "屏幕里的选择，不能证明你真的尝过。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "皮肤也能帮助观察",
+      "template": "picture-points",
+      "data": {
+        "title": "用皮肤感受",
+        "picture": "hand",
+        "points": [
+          "冷暖、软硬",
+          "粗糙、光滑"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "手上也有皮肤，它能帮我们观察物品。"
+        },
+        {
+          "say": "摸一摸熟悉的毛巾，可以感受它的表面。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "皮肤可以感受冷暖，也能感受软和硬。"
+        },
+        {
+          "say": "用眼睛看到形状，和用手摸到感觉不同。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "皮肤还能帮助我们分辨粗糙和光滑。"
+        },
+        {
+          "say": "小满问：看图片就知道真实触感了吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "图片给我们线索，却不能替代亲手感受。"
+        },
+        {
+          "say": "生活观察要请大人选好可以摸的物品。"
+        },
+        {
+          "say": "只把实际摸到的说出来，不随便猜。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "给发现找到感官",
+      "page": "p06",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#match-board"
+        },
+        {
+          "say": "这里有五幅观察图，每幅想了解的信息不同。"
+        },
+        {
+          "say": "老师先用另一个例子示范，看看这只苹果。"
+        },
+        {
+          "setState": {
+            "demo": "eye"
+          }
+        },
+        {
+          "say": "想知道苹果的颜色，用眼睛看就合适。"
+        },
+        {
+          "highlight": "#match-demo"
+        },
+        {
+          "say": "我把眼睛放到苹果旁，记下用过的方法。"
+        },
+        {
+          "say": "接着轮到你，把感官放到合适的观察图上。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "看风筝颜色找眼睛，听铃铛声音找耳朵。"
+        },
+        {
+          "say": "闻熟悉花朵用鼻子，尝安全果肉用舌头。"
+        },
+        {
+          "say": "摸海绵的软硬，要请手上的皮肤来帮忙。"
+        },
+        {
+          "say": "这些图表示方法，不能代替真实闻尝触摸。"
+        },
+        {
+          "highlight": "#sense-sources"
+        },
+        {
+          "say": "先看看图里想了解什么，再连到合适感官。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "感官小检查",
+      "intro": [
+        "听老师读题，再看图片选择。",
+        "想一想要了解的信息，选择合适方法。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "想知道彩色陀螺的颜色，主要用哪个感官？",
+          "skill": "眼睛观察外观",
+          "answer": [
+            "B"
+          ],
+          "analysis": "眼睛能观察颜色、形状和大小。",
+          "options": {
+            "A": {
+              "label": "耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "ear",
+                "alt": "耳朵"
+              }
+            },
+            "B": {
+              "label": "眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "eye",
+                "alt": "眼睛"
+              }
+            },
+            "C": {
+              "label": "舌头",
+              "visual": {
+                "kind": "asset",
+                "image": "tongue",
+                "alt": "舌头"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "想听清墙上时钟的声音，用哪个感官？",
+          "skill": "耳朵获取声音",
+          "answer": [
+            "C"
+          ],
+          "analysis": "声音信息需要用耳朵听。",
+          "options": {
+            "A": {
+              "label": "鼻子",
+              "visual": {
+                "kind": "asset",
+                "image": "nose",
+                "alt": "鼻子"
+              }
+            },
+            "B": {
+              "label": "手的皮肤",
+              "visual": {
+                "kind": "asset",
+                "image": "hand",
+                "alt": "手的皮肤"
+              }
+            },
+            "C": {
+              "label": "耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "ear",
+                "alt": "耳朵"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "多条线索放在一起",
+      "template": "picture-points",
+      "data": {
+        "title": "把不同线索放在一起",
+        "picture": "station",
+        "points": [
+          "先确定想了解什么",
+          "多种合适的感官一起用",
+          "只说自己实际观察到的"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "桌上同一个铃铛，可以从不同方面观察。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "想知道颜色，就看；想知道声音，就听。"
+        },
+        {
+          "say": "先把目的想明白，选择方法才有根据。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "只看颜色，还不能说自己听到了什么。"
+        },
+        {
+          "say": "再听一听声音，就增加了另一种线索。"
+        },
+        {
+          "say": "合适的多种感官，能让观察更全面。"
+        },
+        {
+          "say": "小满问：每件物品都要用舌头尝吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "不用，方法要适合物品，还要遵守安全。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "没有实际闻到或摸到的，不能当成发现。"
+        },
+        {
+          "say": "如实说做过的方法，再说真正得到的线索。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "装满观察记录袋",
+      "page": "p09",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#record-object"
+        },
+        {
+          "say": "这次把不同观察方法，收进一个记录袋。"
+        },
+        {
+          "say": "老师先观察海绵，想知道颜色和软硬。"
+        },
+        {
+          "setState": {
+            "demo": "sponge"
+          }
+        },
+        {
+          "say": "眼睛看颜色，手的皮肤感受软硬。"
+        },
+        {
+          "highlight": "#record-demo-methods"
+        },
+        {
+          "say": "两种方法增加两条记录，了解得更全面。"
+        },
+        {
+          "say": "水果这一关，找颜色、表面触感和气味。"
+        },
+        {
+          "say": "铃铛这一关，找外形、表面触感和声音。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "想一想每种信息，分别由哪个感官获得。"
+        },
+        {
+          "say": "每选对一种方法，记录袋就增加一张图片。"
+        },
+        {
+          "say": "这里不用品尝，未知物也不能随便闻尝。"
+        },
+        {
+          "highlight": "#record-senses"
+        },
+        {
+          "say": "屏幕只记录选择，真实触感和气味待观察。"
+        },
+        {
+          "say": "生活中要做过才说，不用猜测代替发现。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "观察方法小检查",
+      "intro": [
+        "听老师读题，看看每一幅图片。",
+        "按学过的观察办法选择，不用自己认字。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "看过积木形状，还想了解软硬，该再用哪个感官？",
+          "skill": "多感官选择",
+          "answer": [
+            "A"
+          ],
+          "analysis": "在看外形之外，用手的皮肤感受软硬，可以增加一种线索。",
+          "options": {
+            "A": {
+              "label": "手的皮肤",
+              "visual": {
+                "kind": "asset",
+                "image": "hand",
+                "alt": "手的皮肤"
+              }
+            },
+            "B": {
+              "label": "耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "ear",
+                "alt": "耳朵"
+              }
+            },
+            "C": {
+              "label": "鼻子",
+              "visual": {
+                "kind": "asset",
+                "image": "nose",
+                "alt": "鼻子"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "路边有一株不认识的植物，先看外观后，怎样做更安全？",
+          "skill": "安全观察顺序",
+          "answer": [
+            "C"
+          ],
+          "analysis": "未知物不随便闻或尝，先请大人一起判断。",
+          "options": {
+            "A": {
+              "label": "凑近闻",
+              "visual": {
+                "kind": "asset",
+                "image": "nose",
+                "alt": "凑近闻"
+              }
+            },
+            "B": {
+              "label": "放嘴里尝",
+              "visual": {
+                "kind": "asset",
+                "image": "tongue",
+                "alt": "放嘴里尝"
+              }
+            },
+            "C": {
+              "label": "请大人一起判断",
+              "visual": {
+                "kind": "asset",
+                "image": "adult",
+                "alt": "请大人一起判断"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "保护观察的好帮手",
+      "template": "picture-points",
+      "data": {
+        "title": "保护感觉器官",
+        "picture": "reading-safe",
+        "points": [
+          "不揉眼，不挖鼻子和耳朵",
+          "读写保持合适距离",
+          "不长时间盯着电子屏幕",
+          "请大人指导眼保健操"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "感官帮助我们认识周围事物，也需要保护。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "手不要揉眼睛，也不要挖鼻孔和耳朵。"
+        },
+        {
+          "say": "不要把小棒伸进耳朵，把小棒放下。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看书写字保持合适距离，坐好再读写。"
+        },
+        {
+          "say": "小满问：趴在书上看可以吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "看书不要凑得太近，请大人帮助调整。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "也不要长时间盯着手机或平板的屏幕。"
+        },
+        {
+          "say": "用了一段时间，离开屏幕，让眼睛休息。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "眼保健操请大人教，照着正确步骤做。"
+        },
+        {
+          "say": "这节不凭记忆教动作，真实动作请大人看。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "interactive",
+      "title": "把动作换得更安全",
+      "page": "p12",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#care-scene"
+        },
+        {
+          "say": "看图里的孩子，哪一种动作需要改变？"
+        },
+        {
+          "say": "老师先示范读写姿势，请看眼睛和书。"
+        },
+        {
+          "setState": {
+            "demo": "reading"
+          }
+        },
+        {
+          "say": "坐好并保持合适距离，是保护眼睛的方法。"
+        },
+        {
+          "highlight": "#care-demo"
+        },
+        {
+          "say": "改动作要对准问题，先想哪里需要保护。"
+        },
+        {
+          "say": "接下来遇到揉眼或挖鼻，就把手放下。"
+        },
+        {
+          "say": "遇到小棒靠近耳朵，就把小棒放到桌上。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "把合适的行动图放到孩子身边，画面会改变。"
+        },
+        {
+          "say": "离开屏幕休息也很好，但要对应眼前问题。"
+        },
+        {
+          "highlight": "#care-options"
+        },
+        {
+          "say": "先看需要保护的部位，再选能停止的动作。"
+        },
+        {
+          "say": "选错可以重来，找到更安全的生活做法。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "quiz",
+      "title": "保护感官小检查",
+      "intro": [
+        "听老师读题，看看每一幅图片。",
+        "按学过的观察办法选择，不用自己认字。"
+      ],
+      "questions": [
+        {
+          "id": "q5",
+          "question": "姐姐要写贺卡，哪幅图里的姿势能保护眼睛？",
+          "skill": "保护眼睛",
+          "answer": [
+            "A"
+          ],
+          "analysis": "写字时坐好，眼睛与贺卡保持合适距离。",
+          "options": {
+            "A": {
+              "label": "合适距离写贺卡",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-write-card",
+                "alt": "小女孩坐好写贺卡，眼睛与卡片有距离"
+              }
+            },
+            "B": {
+              "label": "用手揉眼",
+              "visual": {
+                "kind": "asset",
+                "image": "rub-eye",
+                "alt": "用手揉眼"
+              }
+            },
+            "C": {
+              "label": "手指挖鼻",
+              "visual": {
+                "kind": "asset",
+                "image": "poke-nose",
+                "alt": "手指挖鼻"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "电脑画完图，哪幅图表示离开屏幕休息？",
+          "skill": "屏幕使用后休息",
+          "answer": [
+            "B"
+          ],
+          "analysis": "合上电脑并离开屏幕，让眼睛休息。",
+          "options": {
+            "A": {
+              "label": "拿小棒靠近耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "poke-ear",
+                "alt": "拿小棒靠近耳朵"
+              }
+            },
+            "B": {
+              "label": "合上电脑休息",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-close-laptop",
+                "alt": "放下电脑，站起离开屏幕"
+              }
+            },
+            "C": {
+              "label": "揉眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "rub-eye",
+                "alt": "揉眼睛"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "slide",
+      "title": "把观察带回家",
+      "template": "picture-points",
+      "data": {
+        "title": "和大人一起观察",
+        "picture": "adult",
+        "points": [
+          "请大人选合适的熟悉物品",
+          "说方法，再说真实发现",
+          "观察结束，收拾桌面"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "回家请大人选一种熟悉而适合观察的物品。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先商量想了解什么，再定观察的方法顺序。"
+        },
+        {
+          "say": "要打开物品或使用工具时，请大人帮忙。"
+        },
+        {
+          "say": "食物要由大人确认安全，过敏的不能尝。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "可以说，我用哪种感官，发现了什么。"
+        },
+        {
+          "say": "没亲自闻到、尝到或摸到的，先别当发现。"
+        },
+        {
+          "say": "小满说：我想把发现讲给家人听。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "屏幕不能检查真实口语，请家人听一听。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "观察结束把用品归位，收拾好桌面。"
+        },
+        {
+          "say": "请大人帮助看书写姿势，并指导眼保健操。"
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "今天学会的观察方法",
+      "template": "summary",
+      "data": {
+        "title": "带走五个观察办法",
+        "items": [
+          "有目的，有计划，有顺序",
+          "眼看、耳听、鼻闻、舌尝、皮肤感受",
+          "多种合适的感官，线索更全面",
+          "未知物不随便闻尝，过敏食物不尝",
+          "如实表达，保护感官，收拾桌面"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天先想知道什么，再安排观察顺序。"
+        },
+        {
+          "say": "这就是有目的、有计划地观察身边物品。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "眼看外观，耳听声音，鼻子闻气味。"
+        },
+        {
+          "say": "舌头尝味道，皮肤感受冷暖和表面。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "合适的多种感官合用，可以获得更多线索。"
+        },
+        {
+          "say": "小满说：只看外形，还不能当成听过。",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "未知物不随便闻或尝，过敏食物也不尝。"
+        },
+        {
+          "say": "是否能尝先请大人判断，安全放在前面。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "真实做过才如实说，观察结束收好桌面。"
+        },
+        {
+          "say": "不揉眼不挖鼻耳，也别长时间盯着屏幕。"
+        },
+        {
+          "say": "猫头鹰站长提醒：请家人观察实际表现。",
+          "by": "owl"
+        }
+      ]
+    }
+  ]
+}

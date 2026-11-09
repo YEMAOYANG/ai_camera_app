@@ -1,0 +1,1513 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "小书包",
+  "description": "一门课学习两个课时的文具字词、儿歌朗读、五字书写和书包整理。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "用实物图、短句和田字格带一年级小朋友读词写字，边做边说，让孩子看清以后动手。"
+    }
+  },
+  "images": {
+    "early-home": {
+      "file": "assets/early-home.png"
+    },
+    "empty-bag": {
+      "file": "assets/empty-bag.png"
+    },
+    "eraser": {
+      "file": "assets/eraser.png"
+    },
+    "exercisebook": {
+      "file": "assets/exercisebook.png"
+    },
+    "family-practice": {
+      "file": "assets/family-practice.png"
+    },
+    "glyph-components": {
+      "file": "assets/glyph-components.png"
+    },
+    "glyph-small-pair": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          700,
+          390
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "小"
+              },
+              {
+                "glyph": "少"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "opening-desk": {
+      "file": "assets/opening-desk.png"
+    },
+    "paper-tool-strip": {
+      "file": "assets/paper-tool-strip.png"
+    },
+    "pen-tool-strip": {
+      "file": "assets/pen-tool-strip.png"
+    },
+    "pencil": {
+      "file": "assets/pencil.png"
+    },
+    "pencilcase": {
+      "file": "assets/pencilcase.png"
+    },
+    "q-bag-folded": {
+      "file": "assets/q-bag-folded.png"
+    },
+    "q-bag-loose": {
+      "file": "assets/q-bag-loose.png"
+    },
+    "q-bag-neat": {
+      "file": "assets/q-bag-neat.png"
+    },
+    "q-canvas-tote": {
+      "file": "assets/q-canvas-tote.png"
+    },
+    "q-capped-sharpener": {
+      "file": "assets/q-capped-sharpener.png"
+    },
+    "q-clear-ruler": {
+      "file": "assets/q-clear-ruler.png"
+    },
+    "q-color-pencil": {
+      "file": "assets/q-color-pencil.png"
+    },
+    "q-dawn-walk": {
+      "file": "assets/q-dawn-walk.png"
+    },
+    "q-glyph-ben": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "本"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "q-glyph-mu": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "木"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "q-glyph-wei": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "未"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "q-lunchbox": {
+      "file": "assets/q-lunchbox.png"
+    },
+    "q-night-walk": {
+      "file": "assets/q-night-walk.png"
+    },
+    "q-noon-walk": {
+      "file": "assets/q-noon-walk.png"
+    },
+    "q-roll-pencilcase": {
+      "file": "assets/q-roll-pencilcase.png"
+    },
+    "q-rounded-eraser": {
+      "file": "assets/q-rounded-eraser.png"
+    },
+    "q-waterbottle": {
+      "file": "assets/q-waterbottle.png"
+    },
+    "ruler": {
+      "file": "assets/ruler.png"
+    },
+    "school-prep": {
+      "file": "assets/school-prep.png"
+    },
+    "start-class": {
+      "file": "assets/start-class.png"
+    },
+    "task-erase": {
+      "file": "assets/task-erase.png"
+    },
+    "task-line": {
+      "file": "assets/task-line.png"
+    },
+    "task-pens": {
+      "file": "assets/task-pens.png"
+    },
+    "textbook": {
+      "file": "assets/textbook.png"
+    },
+    "tidy-after": {
+      "file": "assets/tidy-after.png"
+    },
+    "tidy-before": {
+      "file": "assets/tidy-before.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "welcome",
+      "type": "slide",
+      "title": "打开晨光书包",
+      "template": "title-picture",
+      "data": {
+        "title": "7 小书包",
+        "picture": "opening-desk",
+        "caption": "看文具 · 读儿歌 · 整理书包"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小朋友，今天我们打开一只小书包。"
+        },
+        {
+          "say": "看看画里，哪样东西你也用过？"
+        },
+        {
+          "say": "找到书包了，再指给我看一件文具。"
+        },
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "我们今天一起学，小书包。"
+        },
+        {
+          "say": "先看看书包旁的文具，听老师读。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "接着认生字，看看有些字要怎么写。"
+        },
+        {
+          "say": "最后，我们给书和笔找好位置。"
+        },
+        {
+          "say": "拿好自己的书，我们开始吧。"
+        }
+      ]
+    },
+    {
+      "key": "tools-for-paper",
+      "type": "slide",
+      "title": "三件帮纸面变整齐的用品",
+      "template": "picture-points",
+      "data": {
+        "title": "三件帮纸面变整齐的用品",
+        "picture": "paper-tool-strip",
+        "points": [
+          "橡皮",
+          "尺子",
+          "作业本"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看浅木桌上的三件东西。"
+        },
+        {
+          "say": "它们能帮我们在纸上写写画画。"
+        },
+        {
+          "laser": "point-1"
+        },
+        {
+          "say": "先找小方块，它是橡皮。"
+        },
+        {
+          "say": "写错了铅笔字，用橡皮轻轻擦。"
+        },
+        {
+          "laser": "point-2"
+        },
+        {
+          "say": "长长的这件叫尺子。"
+        },
+        {
+          "say": "让铅笔沿着它的直边走，就能画直线。"
+        },
+        {
+          "say": "跟我读尺子，子的声音轻一点。"
+        },
+        {
+          "laser": "point-3"
+        },
+        {
+          "say": "有空白行格的，是作业本。"
+        },
+        {
+          "say": "听一听，作业，再接上一个本。"
+        },
+        {
+          "say": "指着图读一遍，作业本。"
+        }
+      ]
+    },
+    {
+      "key": "tools-for-pencil",
+      "type": "slide",
+      "title": "笔袋、铅笔、转笔刀",
+      "template": "picture-points",
+      "data": {
+        "title": "笔袋、铅笔、转笔刀",
+        "picture": "pen-tool-strip",
+        "points": [
+          "笔袋",
+          "铅笔",
+          "转笔刀"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看另外三样东西，样子各不相同。"
+        },
+        {
+          "say": "请你先找有拉链的那件。"
+        },
+        {
+          "laser": "point-1"
+        },
+        {
+          "say": "有拉链的小袋叫笔袋。"
+        },
+        {
+          "say": "它能把散开的笔装在一起。"
+        },
+        {
+          "laser": "point-2"
+        },
+        {
+          "say": "看有木头尖的这支，是铅笔。"
+        },
+        {
+          "say": "写字的时候，铅笔尖会在纸上留下痕迹。"
+        },
+        {
+          "laser": "point-3"
+        },
+        {
+          "say": "有小孔的文具叫转笔刀。"
+        },
+        {
+          "say": "铅笔尖用钝了，可以用它削一削。"
+        },
+        {
+          "say": "转笔刀的转读第四声，听我再读一遍。"
+        },
+        {
+          "say": "笔袋、铅笔、转笔刀，三个词都有笔。"
+        }
+      ]
+    },
+    {
+      "key": "find-tool",
+      "type": "interactive",
+      "title": "听任务，找对文具",
+      "page": "find-tool",
+      "widgetType": "game",
+      "startImage": "opening-desk",
+      "script": [
+        {
+          "setState": {
+            "task": "eraser",
+            "placed": false
+          }
+        },
+        {
+          "highlight": "#tool-clue"
+        },
+        {
+          "say": "纸上有一道多出来的铅笔痕。"
+        },
+        {
+          "say": "想擦掉这道痕，我要找橡皮。"
+        },
+        {
+          "highlight": "#tool-eraser"
+        },
+        {
+          "say": "看，这块小方块就是橡皮。"
+        },
+        {
+          "setState": {
+            "task": "eraser",
+            "placed": true
+          }
+        },
+        {
+          "highlight": "#tool-drop"
+        },
+        {
+          "say": "我把橡皮送到工作区。"
+        },
+        {
+          "setState": {
+            "task": "ruler",
+            "placed": false
+          }
+        },
+        {
+          "highlight": "#tool-clue"
+        },
+        {
+          "say": "这张纸上有两处记号，我想把它们直直连起来。"
+        },
+        {
+          "setState": {
+            "task": "ruler",
+            "placed": true
+          }
+        },
+        {
+          "highlight": "#tool-drop"
+        },
+        {
+          "say": "看，长长的尺子来帮忙。"
+        },
+        {
+          "setState": {
+            "task": "pencilcase",
+            "placed": false
+          }
+        },
+        {
+          "highlight": "#tool-clue"
+        },
+        {
+          "say": "桌上几支笔要一起带走，得先找个小袋。"
+        },
+        {
+          "setState": {
+            "task": "pencilcase",
+            "placed": true
+          }
+        },
+        {
+          "highlight": "#tool-drop"
+        },
+        {
+          "say": "我把有拉链的笔袋送过去。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "highlight": "#tool-choices"
+        },
+        {
+          "say": "现在轮到你，先看桌面的图。"
+        },
+        {
+          "say": "点中一件文具，也可以把它拖到工作区。"
+        },
+        {
+          "say": "每做完一张，我们再换下一张。"
+        }
+      ]
+    },
+    {
+      "key": "part-shapes",
+      "type": "slide",
+      "title": "三个偏旁在哪儿",
+      "template": "picture-points",
+      "data": {
+        "title": "三个偏旁在哪儿",
+        "picture": "glyph-components",
+        "points": [
+          "包 · 包字头",
+          "作 · 单人旁",
+          "笔 · 竹字头"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里上排是三个完整的字。"
+        },
+        {
+          "say": "看看下排，哪一部分藏在上排的字里？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边是书包的包。"
+        },
+        {
+          "say": "包字头从上边弯下来，右边也有一段。"
+        },
+        {
+          "say": "顺着它的样子，再认一次包。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "中间是作业的作。"
+        },
+        {
+          "say": "作的左边窄窄的两笔，是单人旁。"
+        },
+        {
+          "say": "作业里的第二个字读业。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "右边是铅笔的笔。"
+        },
+        {
+          "say": "笔字上面小小的两组笔画，叫竹字头。"
+        },
+        {
+          "say": "再指指书包、作业本和铅笔里的这些字。"
+        }
+      ]
+    },
+    {
+      "key": "treasures",
+      "type": "slide",
+      "title": "书包里的宝贝",
+      "template": "two-columns",
+      "data": {
+        "title": "书包里的宝贝",
+        "left": {
+          "heading": "宝贝",
+          "body": "宝贝是自己珍惜的东西。"
+        },
+        "left_picture": "opening-desk",
+        "right": {
+          "heading": "小和少",
+          "body": "小有竖钩，少是竖，末笔是长撇。"
+        },
+        "right_picture": "glyph-small-pair"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看看画里整齐的文具。"
+        },
+        {
+          "say": "陪着我们学习的东西，我们很珍惜。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这两个字读宝贝，先读宝，再读贝。"
+        },
+        {
+          "say": "你也可以说，铅笔是我珍惜的宝贝。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边是小和少，仔细看它们的中间。"
+        },
+        {
+          "say": "小有三笔，先写的是竖钩。"
+        },
+        {
+          "say": "少有四笔，第一笔是没有钩的竖。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "少最后有一笔长撇，小没有这笔。"
+        },
+        {
+          "say": "说东西不大，可以说小。"
+        },
+        {
+          "say": "说数量不多，可以说少。"
+        }
+      ]
+    },
+    {
+      "key": "rhythm-one",
+      "type": "slide",
+      "title": "听清文具词，再跟读",
+      "template": "picture-points",
+      "data": {
+        "title": "听清文具词，再跟读",
+        "picture": "school-prep",
+        "points": [
+          "尺子",
+          "我的尺子",
+          "这是我的尺子｜它在本子旁。"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看一眼桌面，尺子挨着作业本。"
+        },
+        {
+          "say": "我先读一个词，再把词放进句子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听，尺子。"
+        },
+        {
+          "say": "子的声音轻轻的，跟我读一遍。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再听，我的尺子。"
+        },
+        {
+          "say": "我的，这里的的也读得短一点。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这是我的尺子，它在本子旁。"
+        },
+        {
+          "say": "第一小句说完，停一小下再接着读。"
+        },
+        {
+          "say": "现在指着尺子，和我说一遍。"
+        },
+        {
+          "say": "翻开原书第七十六页，找前面介绍文具的句子。"
+        },
+        {
+          "say": "也试着一小句一小句读。"
+        }
+      ]
+    },
+    {
+      "key": "write-first",
+      "type": "interactive",
+      "title": "看笔顺，学写尺和刀",
+      "page": "write-grid",
+      "widgetType": "game",
+      "startImage": "family-practice",
+      "script": [
+        {
+          "setState": {
+            "glyph": "尺",
+            "reveal": 0
+          }
+        },
+        {
+          "highlight": "#schoolbag-glyph"
+        },
+        {
+          "say": "先看尺，伸出手指跟老师写。"
+        },
+        {
+          "setState": {
+            "glyph": "尺",
+            "reveal": 1
+          }
+        },
+        {
+          "highlight": "#schoolbag-grid"
+        },
+        {
+          "say": "第一笔，横折，转下去就停。"
+        },
+        {
+          "say": "横折的末尾不要加钩。"
+        },
+        {
+          "setState": {
+            "glyph": "尺",
+            "reveal": 2
+          }
+        },
+        {
+          "say": "第二笔是横，收在上半格。"
+        },
+        {
+          "setState": {
+            "glyph": "尺",
+            "reveal": 3
+          }
+        },
+        {
+          "say": "第三笔往左下走，是撇。"
+        },
+        {
+          "setState": {
+            "glyph": "尺",
+            "reveal": 4
+          }
+        },
+        {
+          "say": "第四笔捺往右下，和撇打开。"
+        },
+        {
+          "setState": {
+            "glyph": "刀",
+            "reveal": 0
+          }
+        },
+        {
+          "highlight": "#schoolbag-glyph"
+        },
+        {
+          "say": "再看转笔刀的刀。"
+        },
+        {
+          "setState": {
+            "glyph": "刀",
+            "reveal": 1
+          }
+        },
+        {
+          "highlight": "#schoolbag-grid"
+        },
+        {
+          "say": "第一笔横折钩，横着走，再折下去带出钩。"
+        },
+        {
+          "setState": {
+            "glyph": "刀",
+            "reveal": 2
+          }
+        },
+        {
+          "say": "第二笔是撇，从上面往左下写。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "highlight": "#schoolbag-strokes"
+        },
+        {
+          "say": "现在看格子，点下一笔。"
+        },
+        {
+          "say": "练过两字，可以请家人看你在纸上写。"
+        }
+      ]
+    },
+    {
+      "key": "school-words",
+      "type": "slide",
+      "title": "课和早，藏在日常里",
+      "template": "two-columns",
+      "data": {
+        "title": "课和早，藏在日常里",
+        "left": {
+          "heading": "课",
+          "body": "上课 · 课本"
+        },
+        "left_picture": "start-class",
+        "right": {
+          "heading": "早",
+          "body": "早上 · 起得早"
+        },
+        "right_picture": "early-home"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "老师走到教室前，孩子打开了书。"
+        },
+        {
+          "say": "大家开始上课了。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "上课的课，左边有言字旁。"
+        },
+        {
+          "say": "桌上打开的课本，也有这个课。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看看另一幅图，太阳刚升起来。"
+        },
+        {
+          "say": "孩子背上书包，要出门了。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "早上的早，上面是日，下面是十。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "说太阳刚出来的这时候，可以说早上。"
+        },
+        {
+          "say": "也可以说，我今天起得早。"
+        }
+      ]
+    },
+    {
+      "key": "rhythm-two",
+      "type": "slide",
+      "title": "练短句，听轻轻的得",
+      "template": "picture-points",
+      "data": {
+        "title": "练短句，听轻轻的得",
+        "picture": "early-home",
+        "points": [
+          "起得早",
+          "书包准备好",
+          "回原书读儿歌"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看图里，窗外的太阳刚升起。"
+        },
+        {
+          "say": "孩子已经把上学的东西准备好了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听我说，我今天起得早。"
+        },
+        {
+          "say": "得这个字，在起和早中间读得短短的。"
+        },
+        {
+          "say": "你也说一遍，我今天起得早。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我起得早，书包也准备好了。"
+        },
+        {
+          "say": "书和文具会陪我一起去上学。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "翻开原书第七十六页，把儿歌接着读完。"
+        },
+        {
+          "say": "轻轻读那几个字，短句之间停一小下。"
+        },
+        {
+          "say": "读完说说，哪些东西每天陪着你？"
+        }
+      ]
+    },
+    {
+      "key": "organize-show",
+      "type": "slide",
+      "title": "文具收好，书本放平",
+      "template": "two-columns",
+      "data": {
+        "title": "文具收好，书本放平",
+        "left": {
+          "heading": "收拾前",
+          "body": "先看看，哪些东西还散着？"
+        },
+        "left_picture": "tidy-before",
+        "right": {
+          "heading": "收拾后",
+          "body": "笔进袋，书本放平。"
+        },
+        "right_picture": "tidy-after"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左图是收拾前的桌面。"
+        },
+        {
+          "say": "笔散着，笔袋还空着，书本也没有叠平。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先把散开的笔和橡皮找出来。"
+        },
+        {
+          "say": "书页有些翘，轻轻把它们合平。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右图是收拾好的桌面。"
+        },
+        {
+          "say": "把文具收进笔袋，书和本子平平放好。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "我会把笔一支支收到袋里。"
+        },
+        {
+          "say": "我也会把课本和作业本放平。"
+        },
+        {
+          "say": "说一句，你会怎样把书包收好？"
+        }
+      ]
+    },
+    {
+      "key": "organize-play",
+      "type": "interactive",
+      "title": "给文具找回家",
+      "page": "organize",
+      "widgetType": "game",
+      "startImage": "tidy-after",
+      "script": [
+        {
+          "setState": {
+            "items": []
+          }
+        },
+        {
+          "highlight": "#pack-case"
+        },
+        {
+          "say": "先看看打开的笔袋，小文具可以放进去。"
+        },
+        {
+          "highlight": "#pack-pencil"
+        },
+        {
+          "say": "我先从桌面拿起一支铅笔。"
+        },
+        {
+          "setState": {
+            "items": [
+              "pencil"
+            ]
+          }
+        },
+        {
+          "highlight": "#pack-case"
+        },
+        {
+          "say": "铅笔进了笔袋。"
+        },
+        {
+          "setState": {
+            "items": [
+              "pencil",
+              "eraser"
+            ]
+          }
+        },
+        {
+          "say": "这块橡皮也放进笔袋。"
+        },
+        {
+          "highlight": "#pack-bag"
+        },
+        {
+          "say": "书包的大袋比较宽，能让书本平平放。"
+        },
+        {
+          "setState": {
+            "items": [
+              "pencil",
+              "eraser",
+              "textbook"
+            ]
+          }
+        },
+        {
+          "say": "我先把课本放进大袋。"
+        },
+        {
+          "setState": {
+            "items": [
+              "pencil",
+              "eraser",
+              "textbook",
+              "exercisebook"
+            ]
+          }
+        },
+        {
+          "say": "作业本也平放进大袋，两样都找对位置了。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "highlight": "#pack-items"
+        },
+        {
+          "say": "轮到你，先点一件物品，再点它要去的地方。"
+        },
+        {
+          "say": "你也可以拖着物品送过去。"
+        },
+        {
+          "say": "四样都放好了，再看看自己的书包。"
+        }
+      ]
+    },
+    {
+      "key": "write-second",
+      "type": "interactive",
+      "title": "练写本、不、少",
+      "page": "write-grid",
+      "widgetType": "game",
+      "startImage": "family-practice",
+      "script": [
+        {
+          "setState": {
+            "glyph": "本",
+            "reveal": 0
+          }
+        },
+        {
+          "highlight": "#schoolbag-glyph"
+        },
+        {
+          "say": "这次看三个字，从作业本的本开始。"
+        },
+        {
+          "setState": {
+            "glyph": "本",
+            "reveal": 1
+          }
+        },
+        {
+          "highlight": "#schoolbag-grid"
+        },
+        {
+          "say": "第一笔横，在格子的上半边。"
+        },
+        {
+          "setState": {
+            "glyph": "本",
+            "reveal": 2
+          }
+        },
+        {
+          "say": "第二笔竖，从上往下直直走。"
+        },
+        {
+          "setState": {
+            "glyph": "本",
+            "reveal": 3
+          }
+        },
+        {
+          "say": "左边是撇，从上往左下。"
+        },
+        {
+          "setState": {
+            "glyph": "本",
+            "reveal": 4
+          }
+        },
+        {
+          "say": "右边是捺，从上往右下。"
+        },
+        {
+          "setState": {
+            "glyph": "本",
+            "reveal": 5
+          }
+        },
+        {
+          "say": "最后的短横，在竖的下半部穿过去。"
+        },
+        {
+          "setState": {
+            "glyph": "不",
+            "reveal": 0
+          }
+        },
+        {
+          "highlight": "#schoolbag-glyph"
+        },
+        {
+          "say": "接着看，不。"
+        },
+        {
+          "setState": {
+            "glyph": "不",
+            "reveal": 1
+          }
+        },
+        {
+          "highlight": "#schoolbag-grid"
+        },
+        {
+          "say": "第一笔横，写在格子上半边。"
+        },
+        {
+          "setState": {
+            "glyph": "不",
+            "reveal": 2
+          }
+        },
+        {
+          "say": "第二笔撇，从上方向左下走。"
+        },
+        {
+          "setState": {
+            "glyph": "不",
+            "reveal": 3
+          }
+        },
+        {
+          "say": "第三笔竖，在格子中间往下。"
+        },
+        {
+          "setState": {
+            "glyph": "不",
+            "reveal": 4
+          }
+        },
+        {
+          "say": "第四笔在右边点下去，不一共四笔。"
+        },
+        {
+          "setState": {
+            "glyph": "少",
+            "reveal": 0
+          }
+        },
+        {
+          "highlight": "#schoolbag-glyph"
+        },
+        {
+          "say": "最后看少，也有四笔。"
+        },
+        {
+          "setState": {
+            "glyph": "少",
+            "reveal": 1
+          }
+        },
+        {
+          "highlight": "#schoolbag-grid"
+        },
+        {
+          "say": "先写没有钩的竖。"
+        },
+        {
+          "setState": {
+            "glyph": "少",
+            "reveal": 2
+          }
+        },
+        {
+          "say": "第二笔是左边的短撇。"
+        },
+        {
+          "setState": {
+            "glyph": "少",
+            "reveal": 3
+          }
+        },
+        {
+          "say": "第三笔是右边的点。"
+        },
+        {
+          "setState": {
+            "glyph": "少",
+            "reveal": 4
+          }
+        },
+        {
+          "say": "第四笔从右上往左下写长撇。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "highlight": "#schoolbag-strokes"
+        },
+        {
+          "say": "看格子里已有的笔画，选出下一笔。"
+        },
+        {
+          "say": "三字都练过了，再请家人看你纸上的字。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "文具管理员小检查",
+      "intro": [
+        "每道题我都会念给你听，三幅图都要看一看。",
+        "听清要找什么，选最合适的一幅。",
+        "看完反馈，再去看下一张。"
+      ],
+      "questions": [
+        {
+          "id": "bookmark-line",
+          "question": "给纸书签画直线，铅笔要沿哪件用品的边走？",
+          "skill": "用图片理解尺子的用途",
+          "answer": [
+            "B"
+          ],
+          "analysis": "直尺的直边用来导出直线。铅笔负责画痕，题干强调哪件东西帮画得直，读题时明确沿直边画。",
+          "options": {
+            "A": {
+              "label": "圆角橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "q-rounded-eraser",
+                "alt": "圆角橡皮"
+              }
+            },
+            "B": {
+              "label": "透明直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "q-clear-ruler",
+                "alt": "透明直尺"
+              }
+            },
+            "C": {
+              "label": "一支彩色铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q-color-pencil",
+                "alt": "一支彩色铅笔"
+              }
+            }
+          }
+        },
+        {
+          "id": "take-pen-pouch",
+          "question": "去画画前，哪件东西能把几支笔一起装好带走？",
+          "skill": "按收纳用途辨认笔袋",
+          "answer": [
+            "C"
+          ],
+          "analysis": "卷式软笔袋有专门的收纳口，直尺和转笔刀不装笔。",
+          "options": {
+            "A": {
+              "label": "带盖转笔刀",
+              "visual": {
+                "kind": "asset",
+                "image": "q-capped-sharpener",
+                "alt": "带盖转笔刀"
+              }
+            },
+            "B": {
+              "label": "透明直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "q-clear-ruler",
+                "alt": "透明直尺"
+              }
+            },
+            "C": {
+              "label": "卷式笔袋",
+              "visual": {
+                "kind": "asset",
+                "image": "q-roll-pencilcase",
+                "alt": "卷式笔袋"
+              }
+            }
+          }
+        },
+        {
+          "id": "new-bag-word",
+          "question": "听老师说包，选一个也能叫作包的用品。",
+          "skill": "把包字的常见含义迁移到新物品",
+          "answer": [
+            "A"
+          ],
+          "analysis": "有袋口和提手的小布包能用包装东西，饭盒和水瓶是不同用品。",
+          "options": {
+            "A": {
+              "label": "帆布提包",
+              "visual": {
+                "kind": "asset",
+                "image": "q-canvas-tote",
+                "alt": "帆布提包"
+              }
+            },
+            "B": {
+              "label": "方形饭盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q-lunchbox",
+                "alt": "方形饭盒"
+              }
+            },
+            "C": {
+              "label": "水瓶",
+              "visual": {
+                "kind": "asset",
+                "image": "q-waterbottle",
+                "alt": "水瓶"
+              }
+            }
+          }
+        },
+        {
+          "id": "dawn-street",
+          "question": "哪张是清早，太阳刚刚从远处升起来？",
+          "skill": "在新生活场景理解早",
+          "answer": [
+            "C"
+          ],
+          "analysis": "早晨的太阳刚从地平线升起，同一路口的正午和夜晚是不同时间。",
+          "options": {
+            "A": {
+              "label": "中午的路口",
+              "visual": {
+                "kind": "asset",
+                "image": "q-noon-walk",
+                "alt": "中午的路口"
+              }
+            },
+            "B": {
+              "label": "夜晚的路口",
+              "visual": {
+                "kind": "asset",
+                "image": "q-night-walk",
+                "alt": "夜晚的路口"
+              }
+            },
+            "C": {
+              "label": "清早的路口",
+              "visual": {
+                "kind": "asset",
+                "image": "q-dawn-walk",
+                "alt": "清早的路口"
+              }
+            }
+          }
+        },
+        {
+          "id": "ben-glyph",
+          "question": "老师读作业本的本，哪一格是这个字？",
+          "skill": "辨认作业本的本和关键短横",
+          "answer": [
+            "A"
+          ],
+          "analysis": "本最后有短横，位于木形主竖下半部，木和未不是本。",
+          "options": {
+            "A": {
+              "label": "本",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-ben",
+                "alt": "本"
+              }
+            },
+            "B": {
+              "label": "木",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-mu",
+                "alt": "木"
+              }
+            },
+            "C": {
+              "label": "未",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-wei",
+                "alt": "未"
+              }
+            }
+          }
+        },
+        {
+          "id": "activity-bag",
+          "question": "哪只书包里的书本放平了，笔也进了笔袋？",
+          "skill": "识别爱护用品的整理结果",
+          "answer": [
+            "B"
+          ],
+          "analysis": "两条要求都要满足，散笔图和折本图分别缺了一项。",
+          "options": {
+            "A": {
+              "label": "笔在袋外，书本平放",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bag-loose",
+                "alt": "笔在袋外，书本平放"
+              }
+            },
+            "B": {
+              "label": "笔在袋内，书本平放",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bag-neat",
+                "alt": "笔在袋内，书本平放"
+              }
+            },
+            "C": {
+              "label": "笔在袋内，本子折角",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bag-folded",
+                "alt": "笔在袋内，本子折角"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "合上书包，带走三个本领",
+      "template": "picture-points",
+      "data": {
+        "title": "合上书包，带走三个本领",
+        "picture": "tidy-after",
+        "points": [
+          "说文具",
+          "读儿歌 · 练写字",
+          "收好自己的书包"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看，桌上的书和文具收好了。"
+        },
+        {
+          "say": "我们再想想，今天带走了哪些本领。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "挑一件文具，说说它的名字和用处。"
+        },
+        {
+          "say": "比如，尺子能帮我画直线。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "回到原书，和家人读一遍小书包。"
+        },
+        {
+          "say": "想想短句怎么停，哪些字读得轻。"
+        },
+        {
+          "say": "再写写尺、刀、本、不、少，请家人看看。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "给自己的文具找位置，让书本放平。"
+        },
+        {
+          "say": "做完告诉家人，你先收了哪样东西？"
+        }
+      ]
+    }
+  ]
+}

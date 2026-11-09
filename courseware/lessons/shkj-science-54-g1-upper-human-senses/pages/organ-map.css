@@ -1,0 +1,16 @@
+.anatomy{display:grid;grid-template-columns:590px 1fr;gap:28px;height:100%;padding:6px 40px 6px 34px}
+.body-frame,.part-frame{border:3px solid #c6d8c3;border-radius:28px;background:#fffdf5;position:relative;overflow:hidden}
+.body-frame>img{position:absolute;left:50px;top:10px;width:476px;height:515px;object-fit:contain}
+.part-frame{display:grid;grid-template-columns:repeat(3,150px);grid-auto-rows:150px;gap:21px;align-content:center;justify-content:center;padding:14px}
+.part,.target{border:3px solid #80a892;background:#fbf8e9;border-radius:23px;cursor:pointer;overflow:hidden}
+.part img,.mouth-model img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.target{position:absolute;width:92px;height:92px;border-radius:50%;background:#fdf6d12b;border:3px dashed #2d665c;box-shadow:0 0 0 2px #fff5da}
+.anatomy-leaders{position:absolute;inset:0;width:100%;height:100%;color:#2d665c;pointer-events:none}
+.anatomy-leaders path{fill:none;stroke:currentColor;stroke-width:3;stroke-dasharray:5 6}.anatomy-leaders circle{fill:currentColor;stroke:#fff5da;stroke-width:1.5}
+#point-eye{left:71px;top:42px}#point-ear{left:424px;top:38px}#point-nose{left:65px;top:154px}#point-skin{left:66px;top:330px}
+.mouth-model{left:436px;top:184px;width:104px;height:104px;border-radius:22px}
+.part.selected,.target.demo{outline:5px solid #e28632;outline-offset:3px}
+.part:disabled{opacity:.44;cursor:default}.target.done{border-style:solid;border-color:#266856;background:#69a96e99;box-shadow:0 0 0 3px #d6eccd;cursor:default}
+.target.bad,.part.bad{outline:5px solid #be5c3e;outline-offset:2px}
+
+.btn.xl{height:90px}

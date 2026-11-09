@@ -1,0 +1,27 @@
+#play{font-family:'PingFang SC','Microsoft YaHei',sans-serif}
+.workshop{position:relative;width:1232px;height:552px}
+.replay{position:absolute;top:4px;left:6px;width:112px;height:92px;font-size:42px;z-index:2}
+.display{position:absolute;border:5px dashed #9F8058;border-radius:28px;background:#FFFDF6;display:grid;place-items:center;padding:12px}
+.display img,.tile img{display:block;width:100%;height:100%;min-height:0;object-fit:contain;pointer-events:none}
+.choices{position:absolute;bottom:6px;left:120px;right:120px;height:132px;display:flex;justify-content:center;align-items:center;gap:22px}
+.tile{width:154px;height:122px;display:grid;place-items:center;background:#FFFDF6;border:4px solid #BBA583;border-radius:21px;padding:5px;cursor:pointer}
+.tile.is-selected,.object.is-selected{outline:7px solid #3D796D;outline-offset:4px}
+.tile[disabled]{cursor:default}.outcome{width:372px;height:270px;left:716px;top:116px}
+.load-failed{position:absolute;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:18px;background:#FFF5DB;font-size:36px;font-weight:bold}
+.load-failed button{height:96px}
+.guess-window{width:360px;height:270px;left:230px;top:116px;cursor:pointer;font-size:70px;color:#765836}
+.guess-window img{clip-path:inset(0 19% 19% 8%)}
+.owner-row{position:absolute;left:180px;top:82px;display:flex;gap:28px}
+.owner-card{width:211px;height:245px;display:grid;grid-template-rows:154px 70px;gap:7px;justify-items:center;border:5px solid #C5AA80;border-radius:25px;background:#FFFDF6;padding:8px}
+.owner-card img{width:100%;height:100%;object-fit:contain}
+.owner-card.is-speaking{border-color:#287A70;box-shadow:0 0 0 6px #D2E5B0}
+#return-tray{cursor:pointer}
+.objects{position:absolute;left:170px;right:135px;top:95px;height:285px;display:flex;gap:32px;justify-content:center}
+.object{height:280px;width:360px}
+.swatch{width:112px;height:112px;border-radius:56px}
+.draw-cards{position:absolute;top:108px;left:40px;display:grid;gap:8px}
+.draw-cards .tile{width:170px;height:106px}
+.drawing{top:110px;left:250px;width:640px;height:320px;padding:0;touch-action:none}
+.drawing.passed{border-color:#287A70;border-style:solid}
+.draw-next,.draw-reset{position:absolute;top:178px;right:85px;width:125px;height:95px;font-size:46px}
+.draw-reset{top:287px}

@@ -1,0 +1,880 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "一起做家务",
+  "description": "依据北师大版2022课标一年级下册完整教材课目原创，结合家务认识20以内进位加法，体验顺数、满十换十、凑十和数线两跳。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "用儿童听得懂的短句讲清算理，数量操作与台词一致；只报告观察到的点击、计数、移动与选择。"
+    }
+  },
+  "images": {
+    "tidy": {
+      "file": "assets/tidy.png"
+    },
+    "ten-ones": {
+      "file": "assets/ten-ones.png"
+    },
+    "quiz-dots-4": {
+      "file": "assets/quiz-dots-4.png"
+    },
+    "quiz-dots-5": {
+      "file": "assets/quiz-dots-5.png"
+    },
+    "quiz-dots-6": {
+      "file": "assets/quiz-dots-6.png"
+    },
+    "quiz-dots-10": {
+      "file": "assets/quiz-dots-10.png"
+    },
+    "quiz-dots-11": {
+      "file": "assets/quiz-dots-11.png"
+    },
+    "quiz-dots-12": {
+      "file": "assets/quiz-dots-12.png"
+    },
+    "quiz-dots-13": {
+      "file": "assets/quiz-dots-13.png"
+    },
+    "quiz-dots-14": {
+      "file": "assets/quiz-dots-14.png"
+    },
+    "quiz-dots-15": {
+      "file": "assets/quiz-dots-15.png"
+    },
+    "quiz-dots-16": {
+      "file": "assets/quiz-dots-16.png"
+    },
+    "quiz-dots-17": {
+      "file": "assets/quiz-dots-17.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "一起整理小家",
+      "template": "picture-points",
+      "data": {
+        "title": "一起做家务",
+        "picture": "tidy",
+        "points": [
+          "妈妈7条，孩子6条",
+          "问一共，就把两部分合起来",
+          "7＋6＝13（条）"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们和家人一起整理小家。"
+        },
+        {
+          "say": "整理洗好的毛巾，也有加法问题。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "假设妈妈叠了七条，孩子叠了六条。"
+        },
+        {
+          "say": "这是同一类物品的两个部分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "可以问，她们一共叠好多少条？"
+        },
+        {
+          "say": "求合起来的数量，要把两部分相加。"
+        },
+        {
+          "say": "先找两个人各自整理的数量。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "用加法列式，七加六等于十三。"
+        },
+        {
+          "say": "一共叠了十三条毛巾，单位还是条。"
+        },
+        {
+          "say": "先找信息，再想清楚要问什么。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "接着数，一个也不少",
+      "template": "steps",
+      "data": {
+        "title": "七加六：从七接着数",
+        "steps": [
+          "先记住7",
+          "接着数6次",
+          "8、9、10、11、12、13"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "七加六，是在七的基础上再添六。"
+        },
+        {
+          "say": "先记住七，不必又从一数起。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "每添一个，数线就向前走一步。"
+        },
+        {
+          "say": "添几个，就要走几步，不能少走。"
+        },
+        {
+          "say": "第二个加数六，告诉我们走六步。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "第一步到八，第二步到九。"
+        },
+        {
+          "say": "第三步到十，第四步到十一。"
+        },
+        {
+          "say": "第五步到十二，第六步到十三。"
+        },
+        {
+          "say": "七不是新添的，不能把七算第一步。"
+        },
+        {
+          "say": "走完六步，七加六就得到十三。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "沿数线接着走",
+      "page": "p03",
+      "widgetType": "math-ten-housework",
+      "startImage": "tidy",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#numberline"
+        },
+        {
+          "say": "数线上每相邻两个数都相差一。"
+        },
+        {
+          "say": "小圆点从七出发，再走六步。"
+        },
+        {
+          "highlight": "#walk-dot"
+        },
+        {
+          "setState": {
+            "step": 2
+          }
+        },
+        {
+          "say": "老师走了两步，从七到了九。"
+        },
+        {
+          "say": "每走一步，就添了一个。"
+        },
+        {
+          "highlight": "#step-dots"
+        },
+        {
+          "say": "上面六个空圈，记录要走的六步。"
+        },
+        {
+          "setState": {
+            "step": 6
+          }
+        },
+        {
+          "say": "走满六步，落在十三的位置。"
+        },
+        {
+          "say": "数线上的十三，就是合起来的总数。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "现在请你点向前箭头，自己接着数。"
+        },
+        {
+          "say": "每次点一下走一步，圆圈也会点亮。"
+        },
+        {
+          "say": "走好以后，点对勾确认；走错可以重走。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "十个一换一个十",
+      "template": "picture-points",
+      "data": {
+        "title": "十个一，换成一个十",
+        "picture": "ten-ones",
+        "points": [
+          "10个一＝1个十",
+          "换一换，总数不变",
+          "1个十和3个一＝13"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "整理物品时，十个放一组很方便。"
+        },
+        {
+          "say": "我们用圆点表示一个一个的盘子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "十格里放满十个点，就是十个一。"
+        },
+        {
+          "say": "把它们换成一根十棒，表示一个十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "换成一条，只是重新分组。"
+        },
+        {
+          "say": "没有拿走盘子，也没有添盘子。"
+        },
+        {
+          "say": "所以换前换后，合起来的数量不变。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "七加六，十三个点先分出十个。"
+        },
+        {
+          "say": "还剩三个点，是三个一。"
+        },
+        {
+          "say": "一个十和三个一，合起来是十三。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "把十个一换成一个十",
+      "page": "p05",
+      "widgetType": "math-ten-housework",
+      "startImage": "tidy",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#ten-frame"
+        },
+        {
+          "say": "左边十格先放七个点，还空三个。"
+        },
+        {
+          "say": "右边六个点，是要添进来的六个。"
+        },
+        {
+          "highlight": "#add-pool"
+        },
+        {
+          "setState": {
+            "demoStage": 1
+          }
+        },
+        {
+          "say": "把右边三个点搬过来，十格就满了。"
+        },
+        {
+          "say": "六个点只搬走三个，还留下三个。"
+        },
+        {
+          "highlight": "#exchange"
+        },
+        {
+          "say": "十格满了，点中间的换十箭头。"
+        },
+        {
+          "setState": {
+            "demoStage": 2
+          }
+        },
+        {
+          "say": "十个点换成十棒，总数仍然不变。"
+        },
+        {
+          "highlight": "#ones-tray"
+        },
+        {
+          "say": "再把剩下三个点搬到个位托盘。"
+        },
+        {
+          "say": "一个十和三个一，读作十三。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "请你先填满十格，换十，再搬剩余点。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "quiz",
+      "title": "换个家务小检查",
+      "intro": [
+        "听老师读题，再选择合适的数量图。"
+      ],
+      "questions": [
+        {
+          "id": "hw-q1",
+          "question": "原来九块抹布，又放来两块。一共几块？",
+          "skill": "同类物品的两部分合并",
+          "options": {
+            "A": {
+              "label": "10",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-10",
+                "alt": "10个数量点"
+              }
+            },
+            "B": {
+              "label": "11",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-11",
+                "alt": "11个数量点"
+              }
+            },
+            "C": {
+              "label": "12",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-12",
+                "alt": "12个数量点"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "从九接着数两次到十一；九加二等于十一。"
+        },
+        {
+          "id": "hw-q2",
+          "question": "收好九块海绵，再收四块。一共几块？",
+          "skill": "顺数或凑十求总数",
+          "options": {
+            "A": {
+              "label": "13",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-13",
+                "alt": "13个数量点"
+              }
+            },
+            "B": {
+              "label": "12",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-12",
+                "alt": "12个数量点"
+              }
+            },
+            "C": {
+              "label": "14",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-14",
+                "alt": "14个数量点"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "九先添一到十，四还剩三，十加三等于十三。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "拆一拆，先到十",
+      "template": "steps",
+      "data": {
+        "title": "六加五：先到十，再加剩余",
+        "steps": [
+          "5分成4和1",
+          "6＋4＝10",
+          "10＋1＝11"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "六加五，也可以先凑成十。"
+        },
+        {
+          "say": "六到十还差四，就把五分成四和一。"
+        },
+        {
+          "say": "四和一合起来还是五，没有变多。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "先拿这四个，和六个放在一起。"
+        },
+        {
+          "say": "六加四正好是十，先把这一步算清。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "刚才拆出的一个，不能忘在旁边。"
+        },
+        {
+          "say": "十再加这个一，合起来就是十一。"
+        },
+        {
+          "say": "数线上从六跳四步到十。"
+        },
+        {
+          "say": "再跳一步到十一，两跳一共五步。"
+        },
+        {
+          "say": "也能把六拆成五和一，先算五加五。"
+        },
+        {
+          "say": "方法可以不同，但合起来总数一样。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "两次跳，先到十",
+      "page": "p08",
+      "widgetType": "math-ten-housework",
+      "startImage": "tidy",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#jump-line"
+        },
+        {
+          "say": "这次不用一步一步数，先跳到十。"
+        },
+        {
+          "say": "从六到十要跳四步，就选四个点。"
+        },
+        {
+          "highlight": "#hop-options"
+        },
+        {
+          "setState": {
+            "first": true
+          }
+        },
+        {
+          "say": "第一跳用了四步，小圆点停在十。"
+        },
+        {
+          "say": "原来要添五个，只用了四个。"
+        },
+        {
+          "highlight": "#remaining"
+        },
+        {
+          "say": "五分成四和一，还要再走一步。"
+        },
+        {
+          "setState": {
+            "second": true
+          }
+        },
+        {
+          "say": "第二跳落在十一，四步和一步合成五步。"
+        },
+        {
+          "say": "两段一起表示原来的第二个加数。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "轮到你，先选补到十的点数。"
+        },
+        {
+          "say": "再选剩余点数，让小圆点跳到总数。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "凑十小检查",
+      "intro": [
+        "听老师读题，再选择合适的数量图。"
+      ],
+      "questions": [
+        {
+          "id": "hw-q3",
+          "question": "五加九，先把五凑成十，要从九里拿几个？",
+          "skill": "根据加数确定补十数量",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-4",
+                "alt": "4个数量点"
+              }
+            },
+            "B": {
+              "label": "6",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-6",
+                "alt": "6个数量点"
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-5",
+                "alt": "5个数量点"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "五到十差五，把九分成五和四，先拿五个凑十。"
+        },
+        {
+          "id": "hw-q4",
+          "question": "七支刷子和七支刷子，合起来几支？",
+          "skill": "拆分后保留剩余数量",
+          "options": {
+            "A": {
+              "label": "13",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-13",
+                "alt": "13个数量点"
+              }
+            },
+            "B": {
+              "label": "14",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-14",
+                "alt": "14个数量点"
+              }
+            },
+            "C": {
+              "label": "15",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-15",
+                "alt": "15个数量点"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "七先添三到十，另一个七还剩四，十加四等于十四。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "把算式送回家",
+      "page": "p10",
+      "widgetType": "math-ten-housework",
+      "startImage": "tidy",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#sum-card"
+        },
+        {
+          "say": "每张卡上两组点，表示一个加法。"
+        },
+        {
+          "say": "先把两组数量合起来，才知道送哪里。"
+        },
+        {
+          "highlight": "#bin-11"
+        },
+        {
+          "say": "这里一个十和一个一，合起来是十一。"
+        },
+        {
+          "highlight": "#bin-12"
+        },
+        {
+          "say": "那里一个十和两个一，合起来是十二。"
+        },
+        {
+          "setState": {
+            "place": true
+          }
+        },
+        {
+          "say": "六加五等于十一，所以放进十一托盘。"
+        },
+        {
+          "setState": {
+            "exampleTwelve": true
+          }
+        },
+        {
+          "highlight": "#sum-card"
+        },
+        {
+          "say": "再看五加七。七个点再添三个，凑成十。"
+        },
+        {
+          "say": "五还剩两个，所以五加七等于十二。"
+        },
+        {
+          "setState": {
+            "placeTwelve": true
+          }
+        },
+        {
+          "say": "得数是十二，这张卡要放进十二托盘。"
+        },
+        {
+          "say": "不同算式，也可能得到同一个数。"
+        },
+        {
+          "say": "不能只看一个加数，就决定放哪边。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "现在拖动卡片，把它放进合适的托盘。"
+        },
+        {
+          "say": "放错先看看两组点，还能重新试。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "再看一组新情境",
+      "intro": [
+        "听老师读题，再选择合适的数量图。"
+      ],
+      "questions": [
+        {
+          "id": "hw-q5",
+          "question": "九把小勺和七把小勺，一共几把？",
+          "skill": "在新情境中迁移凑十方法",
+          "options": {
+            "A": {
+              "label": "15",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-15",
+                "alt": "15个数量点"
+              }
+            },
+            "B": {
+              "label": "17",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-17",
+                "alt": "17个数量点"
+              }
+            },
+            "C": {
+              "label": "16",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-16",
+                "alt": "16个数量点"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "九补一到十，七还剩六，十加六等于十六。"
+        },
+        {
+          "id": "hw-q6",
+          "question": "八个碗和八个碗，合起来几个碗？",
+          "skill": "两部分合并并求20以内进位和",
+          "options": {
+            "A": {
+              "label": "16",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-16",
+                "alt": "16个数量点"
+              }
+            },
+            "B": {
+              "label": "15",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-15",
+                "alt": "15个数量点"
+              }
+            },
+            "C": {
+              "label": "17",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-17",
+                "alt": "17个数量点"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "八补二到十，另一个八还剩六，十加六等于十六。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "我们把方法带回家",
+      "template": "summary",
+      "data": {
+        "title": "一起做家务，也一起想数学",
+        "items": [
+          "找同类信息，用加法求合起来",
+          "接着数：添几个，就走几步",
+          "十个一换一个十，总数不变",
+          "先凑十，再加剩余；两跳合起来"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们从家务中找到了加法问题。"
+        },
+        {
+          "say": "先分清两部分都在数什么物品。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "接着数时，先记住第一个加数。"
+        },
+        {
+          "say": "再添几个，就从它后面走几步。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "满十后，十个一可以换成一个十。"
+        },
+        {
+          "say": "这只是重新分组，总数量不改变。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "想快一点，就先补到十，再加剩余。"
+        },
+        {
+          "say": "拆开的两部分，合起来还是原来的数。"
+        },
+        {
+          "say": "在数线上，两次跳步也要合得对。"
+        },
+        {
+          "say": "请向大人讲一种方法，并一起整理物品。"
+        },
+        {
+          "say": "屏幕记录选择和移动，口述还要大人观察。"
+        }
+      ]
+    }
+  ]
+}

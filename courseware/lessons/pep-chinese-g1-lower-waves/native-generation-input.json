@@ -1,0 +1,677 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "ca716435-bec9-4afc-b45c-cb7f4f1a3c57",
+    "unitId": "2a9f8ec3-0486-4664-9478-9ace5cebb956",
+    "officialMaterialId": "2d22a5c9-80b8-46cb-8595-564f5c368f3e",
+    "activityId": "cb67b0c5-547f-92a8-0f7f-8138fcc5d102",
+    "lessonTitle": "11 浪花",
+    "schoolSystem": "six_year",
+    "gradeCode": "primary_1",
+    "subject": "chinese",
+    "volume": "lower",
+    "classHours": [
+      "lesson_1",
+      "lesson_2"
+    ],
+    "partIndex": 1,
+    "teachingRevision": "1",
+    "officialTextbookResourceId": "b87e153f-a64c-451a-aa6c-6ed9ac7d6821",
+    "slug": "pep-chinese-g1-lower-waves",
+    "publisher": "人民教育出版社",
+    "printedPages": [
+      64,
+      65
+    ],
+    "ebookPages": [
+      69,
+      70
+    ],
+    "unitTitle": "第六单元·阅读"
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "64ea22506a0a284ce4194297854f078ebae206b35e3de167f4f99f06c122c889",
+    "officialManifestSha256": "9b2c6ae10ea2830327d683bf9d9c2c6a315bea255564f3be0189538191b7edbb",
+    "officialTextbookManifestSha256": "d21f7c275d1e37050e44a10f38ebe9df15a7b4e566bef3ca50c8bf37ba59793f",
+    "briefSha256": "0c205894250d8753d7cb90170c6ae8a185912b03e0a1dbdf3db96b1e9176193f",
+    "coverPlanSha256": "e2c7e61f612b6b88f5bbb3474c648d3917c53ed902c206afd641947cee0ce6dc",
+    "catalogManifestSha256": "87750a784e70233d4c6024027d172c51d5c37d246f32ca68d797bc87aaa48dfd"
+  },
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "coveredOfficialHours": [
+      "lesson_1",
+      "lesson_2"
+    ],
+    "videoStatus": "waived-per-standard",
+    "objectives": [
+      "看海边图、听音并联系语境认读浪、迈、悄、泪、淘，理解迈着、轻轻、悄悄、挠和淘气，知道笑到流泪可表现玩得开心。",
+      "按第1自然段找出浪花轻轻靠近、轻触脚丫、退回去的顺序；听老师示范长句停连、轻声描绘和感叹语气，再拿课本练习正确流利朗读。",
+      "借第2、3自然段的场景认读次、给、壳、虾、装、像、娃。懂得又表示再一次，捧是用双手托着，联系图画和生活理解装不下。",
+      "听读比较同一意思的简短句和补上动作或样子细节的句子，体会唱着笑着和淘气的让浪花更活泼可爱。联系来回、轻触、带来礼物，体会课文中孩子喜爱浪花。",
+      "按本电子教材观察眼、泪、它、贝、气、娃的范字，比较结构和田字格位置，课后纸笔练写，请成人观察字形与笔顺。",
+      "借三幅画按顺序说出三段大意，在教材上有感情地朗读全篇，给目标字组词，并想象浪花还可能带来什么；真实朗读、口述和书写待成人观察。"
+    ],
+    "excludedTopics": [
+      "使用原创讲解、情境、题目和画面，只保留必要短词与短语作为指读目标；不复制教材正文或官方配套版式。",
+      "课件不布置独自进海或抓取小虾等现实行为，图片互动只复述故事。",
+      "不宣称课堂点击能证明会读会说会写，不自编未经两源核验的完整笔顺。"
+    ]
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  },
+  "qualityRules": [
+    "一年级，先看图和听小语老师。一页一项任务。遮住非目标文字仍可理解与操作，目标字和拼音留在画面。",
+    "讲解1000×562.5，每页至少6句100字。互动1280×720，每页至少5句90字，至少三次真实教师画面操作，逐项先点亮再讲。讲解短句优先，超过40字不能用。",
+    "互动页开始按钮、可见进度、第一次错只给线索并可重试、完成和复位。操作改变实物图。示范用独立场景或状态，不给学生积分或作答证据。",
+    "小检查五道全为三图单选。answer 只含一个实际 option id，选项 id 与答案类型一致，避免列表多答案。每题有口语读题、skill、独立情境和依图的解析；按题型分散正确位置。",
+    "不输出音视频、外链、讨论指令、浏览器机械配音、未校正的整课笔顺。老师声音后续绑定小语老师 Serena。学生实际朗读、说话和纸笔留成人观察。",
+    "不复现教材全文、配套原题和版式。必要目标字词可单独提示。全篇读书任务在手边的教材第64–65页完成。用原创短例带领读比和练习。"
+  ],
+  "pagePlan": [
+    {
+      "key": "shore",
+      "type": "slide",
+      "title": "听，海边来了什么",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        1,
+        2
+      ],
+      "visualRoles": [
+        "waves-cover"
+      ],
+      "teachingPlan": "原创封面引出海边玩耍。老师指沙地和泡沫，明白这道白边跟着海水来；借题目认浪。"
+    },
+    {
+      "key": "gentle-steps",
+      "type": "slide",
+      "title": "轻轻迈一步",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        1,
+        2
+      ],
+      "visualRoles": [
+        "shore-background",
+        "tippy-child"
+      ],
+      "teachingPlan": "先讲人迈步、悄悄走的生活画面，再回到浪花像在轻轻走。认识迈和悄。指故事画面讲轻轻、悄悄、挠的具体感觉。"
+    },
+    {
+      "key": "shore-move",
+      "type": "interactive",
+      "title": "浪花来过，又退回去",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        1,
+        2
+      ],
+      "visualRoles": [
+        "shore-background",
+        "foam-edge",
+        "happy-splash"
+      ],
+      "teachingPlan": "点击使白泡沫实际向岸边移动、轻触后退回。先看一次中间状态再配图排序。老师先点亮岸线、演示来与回、再交学生操作。错序给位置或声音线索，可重试。"
+    },
+    {
+      "key": "laugh-and-read",
+      "type": "slide",
+      "title": "痒得笑出眼泪",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        1,
+        2
+      ],
+      "visualRoles": [
+        "happy-splash",
+        "shore-background"
+      ],
+      "teachingPlan": "认泪、淘。对照先轻轻悄悄、后哗哗笑跑的画面。老师示范长句在哪里轻停，读出惊喜的感叹和哗哗声，孩子拿课本练第1段。"
+    },
+    {
+      "key": "eye-and-tear",
+      "type": "slide",
+      "title": "看眼和泪哪里不同",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        5
+      ],
+      "visualRoles": [
+        "grid-yan",
+        "grid-lei"
+      ],
+      "teachingPlan": "并排逐字点亮两个田字格。结合眼睛、眼泪辨不同部件，纸笔先看位置再写。"
+    },
+    {
+      "key": "waves-return",
+      "type": "slide",
+      "title": "浪花又来了",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        3
+      ],
+      "visualRoles": [
+        "shore-background",
+        "foam-edge"
+      ],
+      "teachingPlan": "先回想上一段已经来过，再看波浪再次回来。认识次，理解又。老师先展示两次来岸的顺序，再用原创生活情境说清一次和又来一次。"
+    },
+    {
+      "key": "gifts",
+      "type": "slide",
+      "title": "双手捧来小礼物",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        3
+      ],
+      "visualRoles": [
+        "hands-cupped",
+        "story-shell",
+        "story-shrimp"
+      ],
+      "teachingPlan": "按人物手心朝上托物、贝壳与小虾三个画面示范。认识给、壳和虾，区分礼物及颜色，读清雪白和青青的词组。"
+    },
+    {
+      "key": "basket",
+      "type": "interactive",
+      "title": "看小篮还能不能装",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        3
+      ],
+      "visualRoles": [
+        "story-basket",
+        "story-shell",
+        "story-shrimp"
+      ],
+      "teachingPlan": "数字故事情境选图并移动进篮子，实显有位置、逐渐装满、再放已经没有空间。老师示范用独立于学生任务的初始态。错项留在原处，给观察篮子里空位的线索。认识装与装不下。"
+    },
+    {
+      "key": "compare-arrival",
+      "type": "slide",
+      "title": "有声音的来和只说来了",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        4
+      ],
+      "visualRoles": [
+        "shore-background",
+        "foam-edge",
+        "playful-breeze"
+      ],
+      "teachingPlan": "听两版说法并看相应动作。围绕唱着笑着，说明听到水声、想到快乐的样子，使跑来更鲜活。先指书中读比位置，再用全新生活例子比较有无动作细节。"
+    },
+    {
+      "key": "playful-wave",
+      "type": "slide",
+      "title": "为什么像淘气的小娃娃",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        3,
+        4
+      ],
+      "visualRoles": [
+        "playful-child",
+        "story-order-strip"
+      ],
+      "teachingPlan": "用两次来去与礼物解释像的共同点，读像、淘、娃。围绕淘气的比较有无样子细节，并指出像是想象。把笑出眼泪和看到礼物的惊喜连起来，明确孩子喜爱浪花。"
+    },
+    {
+      "key": "write-it",
+      "type": "slide",
+      "title": "写它，先看上面",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        5
+      ],
+      "visualRoles": [
+        "grid-ta"
+      ],
+      "teachingPlan": "观察上下位置，提醒它在故事里代浪花。按范字看结构，纸笔练写。"
+    },
+    {
+      "key": "write-shell",
+      "type": "slide",
+      "title": "写贝，看看格子两边",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        5
+      ],
+      "visualRoles": [
+        "grid-bei"
+      ],
+      "teachingPlan": "结合贝壳认贝，分开观察边框与下部笔画位置。以正式范字为准。"
+    },
+    {
+      "key": "write-air",
+      "type": "slide",
+      "title": "写气，看看最后的形状",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        5
+      ],
+      "visualRoles": [
+        "grid-qi"
+      ],
+      "teachingPlan": "在淘气语境听字音，点亮范字末笔可见走向，纸笔对照，不编整字笔顺。"
+    },
+    {
+      "key": "write-child",
+      "type": "slide",
+      "title": "写娃，左右分开看",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "goalIds": [
+        5
+      ],
+      "visualRoles": [
+        "grid-wa"
+      ],
+      "teachingPlan": "现行电子书要求写娃。对照范字看左边女字旁和右边位置，写后拿实书给家人检查。"
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听问题，选你看到的图",
+      "officialHourIds": [
+        "lesson_1",
+        "lesson_2"
+      ],
+      "goalIds": [
+        1,
+        3,
+        4
+      ],
+      "visualRoles": [
+        "drum-by-cat",
+        "quiet-steps-cat",
+        "clap-by-cat",
+        "pinch-orange",
+        "point-orange",
+        "cup-orange",
+        "pencil-box-full",
+        "pencil-box-roomy",
+        "pencil-box-empty",
+        "toy-first-sequence",
+        "toy-return-sequence",
+        "toy-still-sequence",
+        "rabbit-sits-ears-up",
+        "rabbit-rests-ears-low",
+        "rabbit-leaps-ears-up"
+      ],
+      "teachingPlan": "一组5道原创图片单选。老师分题读题，每项三个有意义的图。正式问题、干扰项与解析由OpenMAIC按目标创作，后续按实际图审订。"
+    },
+    {
+      "key": "retell",
+      "type": "slide",
+      "title": "三幅图，说出一段海边故事",
+      "officialHourIds": [
+        "lesson_1",
+        "lesson_2"
+      ],
+      "goalIds": [
+        2,
+        4,
+        6
+      ],
+      "visualRoles": [
+        "story-order-strip"
+      ],
+      "teachingPlan": "老师按三幅图回顾第一次靠近、又来送礼、反复来去像淘气小娃娃。课后拿教材朗读全文、给生字组词、任选一种想象的浪花礼物说给成人听，纸笔六字待观察。"
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "id": "quiet",
+      "skill": "按动作理解悄悄",
+      "target": "新情境在家中看三种动作，判断哪幅最符合悄悄，不能复用课堂走廊示例原图。",
+      "optionVisualRoles": {
+        "A": "drum-by-cat",
+        "B": "quiet-steps-cat",
+        "C": "clap-by-cat"
+      },
+      "answerPlan": [
+        "B"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "support",
+      "skill": "辨认双手从下托的捧",
+      "target": "新情境判断哪幅在捧橙子，干扰是单手拿和指向桌面橙子。",
+      "optionVisualRoles": {
+        "A": "pinch-orange",
+        "B": "point-orange",
+        "C": "cup-orange"
+      },
+      "answerPlan": [
+        "C"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "capacity",
+      "skill": "从剩余空间判断装不下",
+      "target": "用新物体铅笔盒，听提示后选择里面没有位置再放同款新笔的图。",
+      "optionVisualRoles": {
+        "A": "pencil-box-full",
+        "B": "pencil-box-roomy",
+        "C": "pencil-box-empty"
+      },
+      "answerPlan": [
+        "A"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "again",
+      "skill": "在动作顺序中理解又",
+      "target": "用玩具去而复返，判断哪一组三帧明确表现曾经来过之后再来。",
+      "optionVisualRoles": {
+        "A": "toy-first-sequence",
+        "B": "toy-return-sequence",
+        "C": "toy-still-sequence"
+      },
+      "answerPlan": [
+        "B"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "detail",
+      "skill": "理解新增动作和样子细节",
+      "target": "先听小兔来了这样的简说，再听加入动作和耳朵细节的新说法，选择唯一同时符合的图片。",
+      "optionVisualRoles": {
+        "A": "rabbit-sits-ears-up",
+        "B": "rabbit-rests-ears-low",
+        "C": "rabbit-leaps-ears-up"
+      },
+      "answerPlan": [
+        "C"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "waves-cover",
+      "role": "原创封面兼海边导入，中央主体在16:9和目录裁切中仍可辨",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "shore-background",
+      "role": "固定视角的浅色沙滩与靠岸浅水，孩子在近岸湿沙，家长在干处；没有文字",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "foam-edge",
+      "role": "可独立移动的薄白泡沫浪边，与固定海岸底图色调一致，普通自然泡沫",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "tippy-child",
+      "role": "生活例子：孩子在家里轻轻抬脚走过安静的走廊，用于解释迈与悄，区别于检查场景",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "happy-splash",
+      "role": "故事里的孩子痒得开心笑，笑眼与浪花轻触脚丫的局部清楚；没有哭脸",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "story-shell",
+      "role": "故事海边雪白的贝壳，轮廓清楚",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "story-shrimp",
+      "role": "故事海边浅青色小虾，外形与贝壳区别清楚",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "story-basket",
+      "role": "故事的空篮与装入画面物件可分层，近景能看见篮口",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "hands-cupped",
+      "role": "解释捧的动作，手心朝上，两手合着从下方托起物品",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "playful-breeze",
+      "role": "原创句子比较场景，微风吹过树梢和纸风车，可对照动作有无细节",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "playful-child",
+      "role": "孩子活泼来回玩耍的生活图，用来与故事浪花的来回动作做比照",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "story-order-strip",
+      "role": "把三段各一幅已审核课堂图组合成顺序条，图片一致、按先后来排",
+      "status": "compose_reviewed_pictures"
+    },
+    {
+      "assetKey": "quiet-steps-cat",
+      "role": "检查专用，孩子踮脚安静走过睡猫，近景清楚显出姿态和睡猫",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "drum-by-cat",
+      "role": "检查专用，孩子明显用鼓槌敲小鼓，场景与题意区分明确",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "clap-by-cat",
+      "role": "检查专用，孩子双手用力拍掌，身体姿态动作明确",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "cup-orange",
+      "role": "检查专用，双手从下托着橙子，橙子接触两只手掌",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "pinch-orange",
+      "role": "检查专用，单手拿橙子，另一只手自然垂在旁边",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "point-orange",
+      "role": "检查专用，手指指向桌面上的橙子，没有托举动作",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "pencil-box-full",
+      "role": "检查专用，打开的笔盒中同类铅笔排满没有空处，另有同长度新笔在盒外",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "pencil-box-roomy",
+      "role": "检查专用，同一款打开的笔盒内有几支同款铅笔和显著空处，盒外也有新笔",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "pencil-box-empty",
+      "role": "检查专用，同一款打开的笔盒完全空，盒外有同款新笔",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "toy-return-sequence",
+      "role": "检查专用，用三个已核位置图排成先到孩子手边、离开、再到手边的顺序",
+      "status": "compose_reviewed_pictures"
+    },
+    {
+      "assetKey": "toy-first-sequence",
+      "role": "检查专用，同款玩具只向孩子第一次靠近，无离开后再来",
+      "status": "compose_reviewed_pictures"
+    },
+    {
+      "assetKey": "toy-still-sequence",
+      "role": "检查专用，同款玩具三个画面一直停在远处",
+      "status": "compose_reviewed_pictures"
+    },
+    {
+      "assetKey": "rabbit-leaps-ears-up",
+      "role": "检查专用，小兔抬着竖耳、向前跃起，耳朵和四脚姿势清楚",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "rabbit-sits-ears-up",
+      "role": "检查专用，同款竖耳小兔安静蹲坐，四脚没有跳跃姿态",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "rabbit-rests-ears-low",
+      "role": "检查专用，同款小兔趴着休息，耳朵自然放低",
+      "status": "planned_codex_picture"
+    },
+    {
+      "assetKey": "grid-yan",
+      "role": "原创可核验的眼字田字格范字图，使用本课标准楷体，字形与教材第65页逐项核对",
+      "status": "planned_code_diagram"
+    },
+    {
+      "assetKey": "grid-lei",
+      "role": "原创可核验的泪字田字格范字图，使用本课标准楷体，字形与教材第65页逐项核对",
+      "status": "planned_code_diagram"
+    },
+    {
+      "assetKey": "grid-ta",
+      "role": "原创可核验的它字田字格范字图，使用本课标准楷体，字形与教材第65页逐项核对",
+      "status": "planned_code_diagram"
+    },
+    {
+      "assetKey": "grid-bei",
+      "role": "原创可核验的贝字田字格范字图，使用本课标准楷体，字形与教材第65页逐项核对",
+      "status": "planned_code_diagram"
+    },
+    {
+      "assetKey": "grid-qi",
+      "role": "原创可核验的气字田字格范字图，使用本课标准楷体，字形与教材第65页逐项核对",
+      "status": "planned_code_diagram"
+    },
+    {
+      "assetKey": "grid-wa",
+      "role": "原创可核验的娃字田字格范字图，使用本课标准楷体，字形与教材第65页逐项核对",
+      "status": "planned_code_diagram"
+    }
+  ],
+  "teachingFacts": {
+    "readingCharacters": {
+      "lesson_1": [
+        "浪",
+        "迈",
+        "悄",
+        "泪",
+        "淘"
+      ],
+      "lesson_2": [
+        "次",
+        "给",
+        "壳",
+        "虾",
+        "装",
+        "像",
+        "娃"
+      ],
+      "contextOnly": [
+        "滩",
+        "玩"
+      ]
+    },
+    "writingCharacters": [
+      "眼",
+      "泪",
+      "它",
+      "贝",
+      "气",
+      "娃"
+    ],
+    "textbookParagraphs": [
+      "第1段：沙滩玩，浪花轻轻靠近并碰触脚丫，孩子痒得笑出眼泪，浪花响着退回去。",
+      "第2段：浪花过一会儿又来，想象它捧来雪白贝壳和青青小虾，小篮没有空位再装，孩子惊喜。",
+      "第3段：浪花发出哗哗声，反复来和去，叙述者把它想象成爱玩又淘气的娃娃。"
+    ],
+    "wordMeanings": [
+      "悄在悄悄里第一声；壳在贝壳里第二声；又表示先有过而再来；捧用两手由下托住；装不下是没有空处再放。"
+    ],
+    "comparisons": [
+      "增加唱着笑着，让人更能想象来时的水声和快乐。增加淘气的，让人更能想象爱玩的小娃娃。看图找出不同，明确是想象表达。"
+    ],
+    "sourceConflicts": [
+      {
+        "topic": "写字字表",
+        "sources": [
+          "电子书第70页（印65）",
+          "第1课时教案1–2页、课件18–22页",
+          "第2课时教案1–2页、课件18–22页"
+        ],
+        "resolution": "现行同节点官方电子书列眼、泪、它、贝、气、娃；配套资料列玩、眼、泪、它、贝、气。保留配套练写目标，正式目标和范字以现行电子书为准，玩只随语境读。"
+      },
+      {
+        "topic": "沙滩",
+        "sources": [
+          "电子书第70页（印65）",
+          "第1课时任务单第1页"
+        ],
+        "resolution": "任务单提到滩，当前电子书认读字表不列滩。只在沙滩词语中理解，不算第13个认读目标。"
+      },
+      {
+        "topic": "读比表述",
+        "sources": [
+          "电子书第70页（印65）",
+          "第2课时教案第2页",
+          "第2课时课件6–7页"
+        ],
+        "resolution": "第二课时教案第2页解释出现唱着跳着，但其示例、电子书和课件均为唱着笑着，采用原书措辞。"
+      }
+    ],
+    "afterClass": {
+      "reading": "在家长陪同下拿教材朗读第一段、再试着朗读全文，感叹和拟声读出愉快；口语质量待观察。",
+      "words": "看原创生活图给几个本课生字组词；另说出想象中浪花送来的一样或两样东西，可以先画后说。",
+      "writing": "对照现行教材范字纸笔练写眼、泪、它、贝、气、娃，成人观察字形、笔顺及写字姿势。"
+    },
+    "keyPoint": "两课时认读12字，依据当前教材观察6个写字范字。联系动作、声音和生活场景理解关键词，按三个自然段听读故事，并比较加上动作与样子细节的表达。",
+    "difficultPoint": "从浪花反复来去、轻触脚丫和带来礼物这些细节，理解它像淘气小娃娃是孩子的想象写法，并读出叙述者的惊喜和喜爱。比较时讲清新增词语如何让动作、声音或样子更具体。"
+  },
+  "request": "生成同一人教六三制一年级下册第11课《浪花》的唯一完整课堂，整合两个官方同步课时和三段课文目标。创作教学结构、逐场正式台词、动作示范、互动、原创新题及解析。课首用waves-cover素材标识，不复制官方文字、图片和版式。按已审读笔记解释三个自然段，角色称小语老师。显式讲出动作线索和孩子喜爱浪花。只供内部改稿与后续正式媒体适配，不发布。"
+}

@@ -1,0 +1,1271 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "猫和兔：身体线索观察站",
+  "description": "整合两个官方课时，有序观察比较猫兔，借助模拟理解身体与本领，如实记录并安全爱护动物。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "温和细心的科学女老师，先观察、再比较，用真实身体线索解释动物本领，提醒如实记录和安全。"
+    }
+  },
+  "images": {
+    "station": {
+      "file": "assets/station.png"
+    },
+    "cat-orange": {
+      "file": "assets/cat-orange.png"
+    },
+    "rabbit-white": {
+      "file": "assets/rabbit-white.png"
+    },
+    "cat-gray": {
+      "file": "assets/cat-gray.png"
+    },
+    "rabbit-brown": {
+      "file": "assets/rabbit-brown.png"
+    },
+    "cat-ear": {
+      "file": "assets/cat-ear.png"
+    },
+    "rabbit-ear": {
+      "file": "assets/rabbit-ear.png"
+    },
+    "cat-tail": {
+      "file": "assets/cat-tail.png"
+    },
+    "rabbit-tail": {
+      "file": "assets/rabbit-tail.png"
+    },
+    "pair-legs": {
+      "file": "assets/pair-legs.png"
+    },
+    "pad": {
+      "file": "assets/pad.png"
+    },
+    "claw": {
+      "file": "assets/claw.png"
+    },
+    "hindleg": {
+      "file": "assets/hindleg.png"
+    },
+    "cat-eye-bright": {
+      "file": "assets/cat-eye-bright.png"
+    },
+    "cat-eye-dim": {
+      "file": "assets/cat-eye-dim.png"
+    },
+    "table-bare": {
+      "file": "assets/table-bare.png"
+    },
+    "table-soft": {
+      "file": "assets/table-soft.png"
+    },
+    "listen-bare": {
+      "file": "assets/listen-bare.png"
+    },
+    "listen-cup": {
+      "file": "assets/listen-cup.png"
+    },
+    "listen-cone": {
+      "file": "assets/listen-cone.png"
+    },
+    "cat-walk": {
+      "file": "assets/cat-walk.png"
+    },
+    "cat-climb": {
+      "file": "assets/cat-climb.png"
+    },
+    "rabbit-jump": {
+      "file": "assets/rabbit-jump.png"
+    },
+    "wash": {
+      "file": "assets/wash.png"
+    },
+    "gloves": {
+      "file": "assets/gloves.png"
+    },
+    "tell-adult": {
+      "file": "assets/tell-adult.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "两位小伙伴",
+      "template": "title-picture",
+      "data": {
+        "title": "两位小伙伴",
+        "picture": "station",
+        "caption": "先看身体，再想本领"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天的观察角，来了猫和兔两位小伙伴。"
+        },
+        {
+          "say": "先看看全身，再找身体各部分。"
+        },
+        {
+          "say": "我们站在外面看，让动物自在活动。"
+        },
+        {
+          "say": "看到的相同和不同，都可以留下记录。"
+        },
+        {
+          "say": "小满问：长得不一样，也有相同点吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "有，要一处一处对照，不能只凭印象。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "看清身体后，还要想这些部位有什么用。"
+        },
+        {
+          "say": "用身边物品模拟，能帮助我们思考。"
+        },
+        {
+          "say": "现在带上眼睛和问题，和老师出发。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "身体从哪里看",
+      "template": "two-columns",
+      "data": {
+        "title": "身体从哪里看",
+        "left": {
+          "heading": "猫",
+          "body": "头、颈、躯干、四肢、尾"
+        },
+        "right": {
+          "heading": "兔",
+          "body": "也有这些身体部分"
+        },
+        "left_picture": "cat-orange",
+        "right_picture": "rabbit-white"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看这只猫的完整样子，不急着放大。"
+        },
+        {
+          "say": "从头往后，经过颈，再看到躯干。"
+        },
+        {
+          "say": "身体下面有四肢，后面有尾。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "头、颈、躯干、四肢和尾，合在一起。"
+        },
+        {
+          "say": "躯干就是身体中间的主要部分。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换成兔，也先整体，再往局部看。"
+        },
+        {
+          "say": "兔的颈有时被毛挡住，要仔细找。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "这些主要部分，猫和兔都有。"
+        },
+        {
+          "say": "不是外形不同，就没有相同的身体部分。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "page": "p03",
+      "widgetType": "game",
+      "title": "让镜头走一圈",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#scan-photo"
+        },
+        {
+          "say": "这次，镜头要有顺序地观察猫和兔。"
+        },
+        {
+          "say": "先看全身，知道完整轮廓在哪里。"
+        },
+        {
+          "setState": {
+            "demo": "whole"
+          }
+        },
+        {
+          "highlight": "#scan-whole"
+        },
+        {
+          "say": "老师先选整只动物，不漏耳、脚和尾。"
+        },
+        {
+          "setState": {
+            "demo": "head"
+          }
+        },
+        {
+          "highlight": "#scan-head"
+        },
+        {
+          "say": "再看头和颈，从前面慢慢往后看。"
+        },
+        {
+          "setState": {
+            "demo": "body"
+          }
+        },
+        {
+          "highlight": "#scan-body"
+        },
+        {
+          "say": "接着看躯干，再看身体下面的四肢。"
+        },
+        {
+          "setState": {
+            "demo": "tail"
+          }
+        },
+        {
+          "highlight": "#scan-tail"
+        },
+        {
+          "say": "最后找到尾，把这一圈观察补完整。"
+        },
+        {
+          "say": "小窗会把局部留下，帮我们回想看到什么。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在轮到你，两只动物都按顺序看一遍。"
+        },
+        {
+          "say": "点错别急，想想哪一处还没有看过。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "同样部位，不同样子",
+      "template": "two-columns",
+      "data": {
+        "title": "同样部位，不同样子",
+        "left": {
+          "heading": "看耳和尾",
+          "body": "这只猫耳较短，尾较长"
+        },
+        "right": {
+          "heading": "对照同一部位",
+          "body": "这只兔耳较长，尾较短"
+        },
+        "left_picture": "cat-orange",
+        "right_picture": "rabbit-white"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "要比较，先约好看同一个部位。"
+        },
+        {
+          "say": "看这只猫的耳，再看这只兔的耳。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "图里猫的耳较短，尾巴较长。"
+        },
+        {
+          "say": "不能拿猫的耳，去和兔的尾比较。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "兔的耳长长的，尾巴却短小。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "同样都有耳和尾，样子也会有不同。"
+        },
+        {
+          "say": "兔的后腿比前腿强健，外形也不一样。"
+        },
+        {
+          "say": "朵朵提醒：换一只动物，还要重新看。",
+          "by": "duoduo"
+        },
+        {
+          "say": "对，记录眼前这只，别把印象当观察。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "page": "p05",
+      "widgetType": "game",
+      "title": "比较记录架",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#compare-card"
+        },
+        {
+          "say": "这是一张身体照片，先看它是哪一部分。"
+        },
+        {
+          "say": "比较架有猫、两者共有和兔三个位置。"
+        },
+        {
+          "highlight": "#compare-cat"
+        },
+        {
+          "say": "这只猫的长尾照片，可以归在猫这边。"
+        },
+        {
+          "highlight": "#compare-rabbit"
+        },
+        {
+          "say": "兔的长耳照片，要和猫耳对照着看。"
+        },
+        {
+          "setState": {
+            "demo": "both"
+          }
+        },
+        {
+          "highlight": "#compare-both"
+        },
+        {
+          "say": "猫和兔都有四肢，共同线索放在中间。"
+        },
+        {
+          "highlight": "#compare-record"
+        },
+        {
+          "say": "放好后，照片会留在比较记录里。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "先看照片，再点选或拖到相应位置。"
+        },
+        {
+          "say": "这次整理的是图里的特征，不是猜字。"
+        },
+        {
+          "say": "第一下放错，老师会请你再看身体线索。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "quiz",
+      "title": "身体小检查",
+      "intro": [
+        "换成灰猫和棕兔，用观察方法想一想。",
+        "老师讲问题，你从图片里找线索。"
+      ],
+      "questions": [
+        {
+          "id": "cr-q1",
+          "question": "灰猫初次来到观察角，先看哪张图？",
+          "skill": "从整体到局部有序观察",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先看完整全身，再逐一观察局部。",
+          "options": {
+            "A": {
+              "label": "灰猫的完整全身",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-gray",
+                "alt": "灰猫的完整全身"
+              }
+            },
+            "B": {
+              "label": "猫耳局部",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-ear",
+                "alt": "猫耳局部"
+              }
+            },
+            "C": {
+              "label": "猫尾局部",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-tail",
+                "alt": "猫尾局部"
+              }
+            }
+          }
+        },
+        {
+          "id": "cr-q2",
+          "question": "棕兔身后露出短尾，哪张近景是它的尾？",
+          "skill": "比较猫兔的尾部特征",
+          "visual": {
+            "kind": "asset",
+            "image": "rabbit-brown",
+            "alt": "完整棕兔全身，身后有一条短小尾巴"
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "兔的尾巴短小，要与长耳和猫的长尾分清。",
+          "options": {
+            "A": {
+              "label": "猫的长尾",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-tail",
+                "alt": "猫的长尾"
+              }
+            },
+            "B": {
+              "label": "棕兔的短尾",
+              "visual": {
+                "kind": "asset",
+                "image": "rabbit-tail",
+                "alt": "棕兔的短尾"
+              }
+            },
+            "C": {
+              "label": "兔的长耳",
+              "visual": {
+                "kind": "asset",
+                "image": "rabbit-ear",
+                "alt": "兔的长耳"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "关心也要安全",
+      "template": "picture-points",
+      "data": {
+        "title": "关心也要安全",
+        "picture": "wash",
+        "points": [
+          "接触后，用肥皂洗手",
+          "清理用具，要做好防护",
+          "抓伤咬伤，及时告诉大人"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "爱小动物，也要照顾自己和它的安全。"
+        },
+        {
+          "say": "观察时不追赶，不拉耳朵，也不揪尾。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "接触动物以后，要用肥皂把手洗干净。"
+        },
+        {
+          "say": "洗手这件事，不能用点过图片来代替。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "清理食盆和用具时，让大人安排。"
+        },
+        {
+          "say": "需要戴好手套，别随手碰脏的用具。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果被抓伤或咬伤，要立即告诉大人。"
+        },
+        {
+          "say": "让大人及时带你就医，不自己乱处理。"
+        },
+        {
+          "say": "只有安全又耐心，才能继续好好观察。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "软软肉垫的线索",
+      "template": "two-columns",
+      "data": {
+        "title": "软软肉垫的线索",
+        "left": {
+          "heading": "猫爪下面",
+          "body": "厚实肉垫，走路声音较轻"
+        },
+        "right": {
+          "heading": "桌面小模拟",
+          "body": "用海绵垫，比较轻压的声音"
+        },
+        "left_picture": "pad",
+        "right_picture": "table-soft"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看照片中猫爪下面，能看到厚实的肉垫。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "肉垫软软的，猫走路的声音比较轻。"
+        },
+        {
+          "say": "想体会这条线索，可以用海绵垫模拟。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "两根手指像小脚，在桌面轻轻走。"
+        },
+        {
+          "say": "先直接接触桌面，再垫上小海绵。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "用同一只手、同一桌面，动作尽量一样。"
+        },
+        {
+          "say": "留意两次声音，把实际听到的告诉大人。"
+        },
+        {
+          "say": "模拟物不是猫爪，只帮助我们想作用。"
+        },
+        {
+          "say": "没有亲自比较，就先把感受留作待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "page": "p09",
+      "widgetType": "game",
+      "title": "模拟工具箱",
+      "startImage": "station",
+      "script": [
+        {
+          "setState": {
+            "demo": "pad"
+          }
+        },
+        {
+          "highlight": "#tool-part"
+        },
+        {
+          "say": "先找要模拟的身体部位，再挑工具。"
+        },
+        {
+          "say": "这张是猫爪肉垫，软垫能帮助我们模拟。"
+        },
+        {
+          "highlight": "#tool-choice-soft"
+        },
+        {
+          "say": "老师把垫海绵的手指，放到肉垫旁。"
+        },
+        {
+          "highlight": "#tool-record"
+        },
+        {
+          "say": "身体照片和模拟动作，要一对一留下。"
+        },
+        {
+          "setState": {
+            "demo": "ear"
+          }
+        },
+        {
+          "highlight": "#tool-choice-cone"
+        },
+        {
+          "say": "模拟兔耳，可以用纸卷在耳旁接收声音。"
+        },
+        {
+          "say": "纸卷只放耳外，不能塞进耳朵。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "看清当前部位，再挑一张合适的模拟图。"
+        },
+        {
+          "say": "选图只是配好工具，真正感受还要亲自试。"
+        },
+        {
+          "say": "手指和海绵轻轻放，不用真动物来做试验。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "用同一段声音比较",
+      "template": "picture-points",
+      "data": {
+        "title": "用同一段声音比较",
+        "picture": "listen-cone",
+        "points": [
+          "先直接听",
+          "再弯手放在耳旁",
+          "最后用纸卷，再听同一段"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "兔的长耳像接收器，帮助听周围的声音。"
+        },
+        {
+          "say": "我们用三种听法，体会这个想法。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先正常坐好，直接听一段轻轻的声音。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再把手弯起来，放在耳旁重复听。"
+        },
+        {
+          "say": "别把耳洞堵住，位置和声音尽量不变。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后用纸卷靠近耳外，再听同一段。"
+        },
+        {
+          "say": "不要一次轻、一次特别响，那就难比较。"
+        },
+        {
+          "say": "把三次真实感受告诉大人，不必硬说一样。"
+        },
+        {
+          "say": "大人还没观察到，就保留待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "page": "p11",
+      "widgetType": "game",
+      "title": "排好三次听法",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#listen-stage"
+        },
+        {
+          "say": "先把三次听法排好，再准备实际比较。"
+        },
+        {
+          "say": "这里的照片只示范动作，没有替你听。"
+        },
+        {
+          "setState": {
+            "demo": "normal"
+          }
+        },
+        {
+          "highlight": "#listen-normal"
+        },
+        {
+          "say": "第一次正常听，先留一张基本记录。"
+        },
+        {
+          "setState": {
+            "demo": "hand"
+          }
+        },
+        {
+          "highlight": "#listen-hand"
+        },
+        {
+          "say": "第二次弯手放耳旁，仍听相同声音。"
+        },
+        {
+          "setState": {
+            "demo": "paper"
+          }
+        },
+        {
+          "highlight": "#listen-paper"
+        },
+        {
+          "say": "第三次用纸卷，声音和位置尽量不变。"
+        },
+        {
+          "highlight": "#listen-strip"
+        },
+        {
+          "say": "三张动作图排在一起，就不容易漏步骤。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在按顺序放照片，让动作出现在大画面。"
+        },
+        {
+          "say": "亲自比较以后，把感受说给身边大人。"
+        },
+        {
+          "say": "没有做的实物活动，我们不会替你记成完成。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "爪子与瞳孔",
+      "template": "two-columns",
+      "data": {
+        "title": "爪子与瞳孔",
+        "left": {
+          "heading": "尖爪帮助攀爬",
+          "body": "抓住树皮，得到支撑"
+        },
+        "right": {
+          "heading": "瞳孔会变化",
+          "body": "光线较暗时，瞳孔扩大"
+        },
+        "left_picture": "claw",
+        "right_picture": "cat-eye-dim"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "猫的爪子有弯曲尖爪，能抓住粗糙树皮。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "抓得住，是猫会攀爬的一条身体线索。"
+        },
+        {
+          "say": "肉垫和尖爪不是同一个部分，作用也不同。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看眼睛中间黑黑的部分，叫瞳孔。"
+        },
+        {
+          "say": "猫能根据周围明暗，调节瞳孔大小。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "光线较暗时，瞳孔扩大，收集更多光线。"
+        },
+        {
+          "say": "这和猫在夜间观察物体的本领有关。"
+        },
+        {
+          "say": "观察图片就好，不拿强光照动物眼睛。"
+        },
+        {
+          "say": "也不让猫或小朋友做从高处跳下的试验。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "长耳与有力后腿",
+      "template": "two-columns",
+      "data": {
+        "title": "长耳与有力后腿",
+        "left": {
+          "heading": "长耳接收声音",
+          "body": "帮助发现周围的动静"
+        },
+        "right": {
+          "heading": "强健的后腿",
+          "body": "帮助兔子在平地跳跃"
+        },
+        "left_picture": "rabbit-ear",
+        "right_picture": "rabbit-jump"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "兔的长耳能接收声音，听觉很灵敏。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "听到周围动静，对兔的生活有帮助。"
+        },
+        {
+          "say": "纸卷模拟提醒我们，把形状和作用联系。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看兔跳起的样子，后腿强健有力。"
+        },
+        {
+          "say": "后腿蹬地，身体就能向前运动。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "所以说兔善于跳跃，要想到它的后腿。"
+        },
+        {
+          "say": "不能只说它可爱，还要给出身体线索。"
+        },
+        {
+          "say": "小满说：耳朵和后腿，各有自己的作用。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "对，观察到部位，再用现象解释它的本领。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "interactive",
+      "page": "p14",
+      "widgetType": "game",
+      "title": "给本领找到身体线索",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#skill-scene"
+        },
+        {
+          "say": "大画面给出一个动作，先看动物在做什么。"
+        },
+        {
+          "say": "走路、攀爬、倾听、跳跃，各有身体线索。"
+        },
+        {
+          "setState": {
+            "demo": "pad"
+          }
+        },
+        {
+          "highlight": "#skill-choice-pad"
+        },
+        {
+          "say": "老师看到走路声较轻，联系到软肉垫。"
+        },
+        {
+          "setState": {
+            "demo": "claw"
+          }
+        },
+        {
+          "highlight": "#skill-choice-claw"
+        },
+        {
+          "say": "抓树皮时，要找弯曲的尖爪。"
+        },
+        {
+          "setState": {
+            "demo": "hind"
+          }
+        },
+        {
+          "highlight": "#skill-choice-hind"
+        },
+        {
+          "say": "兔向前跳，强健后腿是重要线索。"
+        },
+        {
+          "highlight": "#skill-record"
+        },
+        {
+          "say": "部位图放好，和动作情境一起保存。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在换你找，先看动作，再选择身体照片。"
+        },
+        {
+          "say": "别只按动物颜色猜，要想这个部位有什么用。"
+        },
+        {
+          "say": "这记录的是图片判断，实际观察仍请大人陪伴。"
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "quiz",
+      "title": "模拟方法小检查",
+      "intro": [
+        "换个观察场景，看看能否说明理由。",
+        "每题只选最贴合老师问题的图片。"
+      ],
+      "questions": [
+        {
+          "id": "cr-q3",
+          "question": "小猫走过木地板，哪处帮助脚步声音轻？",
+          "skill": "肉垫与猫走路声轻的联系",
+          "answer": [
+            "C"
+          ],
+          "analysis": "猫爪下厚实的肉垫，让脚步声音较轻。",
+          "options": {
+            "A": {
+              "label": "猫耳",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-ear",
+                "alt": "猫耳"
+              }
+            },
+            "B": {
+              "label": "尖爪抓树皮",
+              "visual": {
+                "kind": "asset",
+                "image": "claw",
+                "alt": "尖爪抓树皮"
+              }
+            },
+            "C": {
+              "label": "猫爪下的厚肉垫",
+              "visual": {
+                "kind": "asset",
+                "image": "pad",
+                "alt": "猫爪下的厚肉垫"
+              }
+            }
+          }
+        },
+        {
+          "id": "cr-q4",
+          "question": "小朋友弯手听远处鸟叫，是在模拟哪处？",
+          "skill": "联系弯手听声与兔耳的作用",
+          "answer": [
+            "A"
+          ],
+          "analysis": "弯手放在耳旁接收声音，是在模拟兔耳的作用。",
+          "options": {
+            "A": {
+              "label": "兔的长耳",
+              "visual": {
+                "kind": "asset",
+                "image": "rabbit-ear",
+                "alt": "兔的长耳"
+              }
+            },
+            "B": {
+              "label": "猫爪下的肉垫",
+              "visual": {
+                "kind": "asset",
+                "image": "pad",
+                "alt": "猫爪下的肉垫"
+              }
+            },
+            "C": {
+              "label": "猫的长尾",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-tail",
+                "alt": "猫的长尾"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "slide",
+      "title": "留下真实的发现",
+      "template": "picture-points",
+      "data": {
+        "title": "留下真实的发现",
+        "picture": "station",
+        "points": [
+          "画身体，看同与不同",
+          "说一个部位和它的作用",
+          "亲自模拟后，记录实际感受"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "观察角快要收工，再给自己留一张记录。"
+        },
+        {
+          "say": "找张纸，简单画出眼前动物的身体。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从整体到局部画，头、颈、躯干别漏。"
+        },
+        {
+          "say": "再补四肢和尾，比较猫和兔的样子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "挑一个部位，说它怎样帮助动物生活。"
+        },
+        {
+          "say": "比如后腿帮助兔跳跃，要把关系说清。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "实际做过模拟，再说自己听到了什么。"
+        },
+        {
+          "say": "没有看到、没有做过的，不添成事实。"
+        },
+        {
+          "say": "请大人看看画和口述，这些还要实际观察。"
+        }
+      ]
+    },
+    {
+      "key": "p17",
+      "type": "quiz",
+      "title": "本领与安全小检查",
+      "intro": [
+        "最后换个新情境，想身体作用和安全。",
+        "听完问题，找最合适的一张图片。"
+      ],
+      "questions": [
+        {
+          "id": "cr-q5",
+          "question": "屋里光线变暗，猫的瞳孔会像哪张图？",
+          "skill": "瞳孔变化与光线联系",
+          "answer": [
+            "B"
+          ],
+          "analysis": "光线较暗时，猫的瞳孔扩大，能收集更多光线。",
+          "options": {
+            "A": {
+              "label": "明亮处瞳孔窄的灰猫",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-eye-bright",
+                "alt": "明亮处瞳孔窄的灰猫"
+              }
+            },
+            "B": {
+              "label": "较暗处瞳孔扩大的灰猫",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-eye-dim",
+                "alt": "较暗处瞳孔扩大的灰猫"
+              }
+            },
+            "C": {
+              "label": "兔的长耳",
+              "visual": {
+                "kind": "asset",
+                "image": "rabbit-ear",
+                "alt": "兔的长耳"
+              }
+            }
+          }
+        },
+        {
+          "id": "cr-q6",
+          "question": "刚接触过小兔，现在怎样清洁双手？",
+          "skill": "接触动物后的手部清洁",
+          "answer": [
+            "C"
+          ],
+          "analysis": "接触动物后，要用肥皂把双手洗干净。",
+          "options": {
+            "A": {
+              "label": "戴手套清洁食盆",
+              "visual": {
+                "kind": "asset",
+                "image": "gloves",
+                "alt": "戴手套清洁食盆"
+              }
+            },
+            "B": {
+              "label": "孩子把手给大人看",
+              "visual": {
+                "kind": "asset",
+                "image": "tell-adult",
+                "alt": "孩子把手给大人看"
+              }
+            },
+            "C": {
+              "label": "用肥皂洗双手",
+              "visual": {
+                "kind": "asset",
+                "image": "wash",
+                "alt": "用肥皂洗双手"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p18",
+      "type": "slide",
+      "title": "带着身体线索出发",
+      "template": "summary",
+      "data": {
+        "title": "带着身体线索出发",
+        "items": [
+          "先整体再局部，有序观察",
+          "同一部位，比较相同与不同",
+          "从身体线索，解释动物本领",
+          "如实记录，安全爱护动物"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天从完整动物出发，再找各个身体部分。"
+        },
+        {
+          "say": "头、颈、躯干、四肢和尾，猫兔都有。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "都有耳和尾，样子还可以不同。"
+        },
+        {
+          "say": "比较要对准同一部位，留下真实线索。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "软肉垫、尖爪和变化的瞳孔，帮助猫生活。"
+        },
+        {
+          "say": "兔用长耳听动静，用强健后腿跳跃。"
+        },
+        {
+          "say": "模拟能帮助思考，实际感受还要亲自记录。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "爱护动物，也要洗手和注意安全。"
+        },
+        {
+          "say": "画图、口述和实物模拟，请大人继续观察。"
+        },
+        {
+          "say": "猫头鹰站长说：带上方法，再认识新动物。",
+          "by": "owl"
+        }
+      ]
+    }
+  ]
+}

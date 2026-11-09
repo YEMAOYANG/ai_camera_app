@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "scope": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "directory-0c147a23366906ebae132dca",
+    "nodeId": "03dd2c14-479f-37cb-8740-06ca2f2b1679",
+    "unitId": "2d724efe-703a-3724-9def-b401dc96389b",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "upper",
+    "unitTitle": "Module 6",
+    "lessonTitle": "Unit 1 What's this?",
+    "schoolSystem": "six_year",
+    "teachingRevision": "1"
+  },
+  "editorModel": "gpt-6.1-sol",
+  "nativeModelRoute": "deepseek-v4-pro",
+  "openMaicJobId": "E8cbPhdKMq",
+  "openMaicClassroomId": "jghUJlgSAI",
+  "nativeClassroomSha256": "63491adde4802ae023a683e254a89bfa15ec884df0e40e23554f093f25dabff8",
+  "nativeDraftInputSha256": "5b5acc83875f33554fcc939a67f0a262df25fd54d9a9c186950c0bfa188aa2b8",
+  "nativeAdaptationPlanSha256": "6d72a8af1fcf0316781fb0fd39bc091eb1ef5294e1c78ca068b8008bac9d38fd",
+  "adaptedBriefSha256": "1ecde47660da0a5799a65befa010719798e5dd6b9a7d886ad8153fa3bc241eaf",
+  "adaptedLessonSha256": "38cfb50b7e36b44c9af4b0eedc72ac8bb72af60f796b99c2b65715cc77f379c7",
+  "adaptedPageFilesSha256": {
+    "object-stage.css": "1b4cfd7a41c53e01f9a2ba895729b3739faf1edb725a87e5031a5a45e60b0838",
+    "object-stage.html": "be7fefc8cebc295bde10733bf135eaa044c3be3112fcd707e592f505fe969ee6",
+    "object-stage.js": "01215d7bc10ff09f9cfd9708358ed7a78fe049919cc031b7fb1deb5d852a091e"
+  },
+  "assetProvenanceSha256": "9b46722a942e72af071d2e7ca38a8d79b7bd0b7f3432f6f21fcced62978927c6",
+  "widgetVoiceBindingSha256": "aff5643b79d5c154b69d2668b57613e109c1f9989ec13b6ad496fd33b7bc0e51",
+  "linesSha256": "68473fdbf55eeede2f22d24e2b2110ae3d28afb4c34d051f0985507b2517f536",
+  "bodySha256": "bcc4129e9d642715edb6d4b3db9ad743a545c3f38be3b41c25b1534cf154571b",
+  "bodyFileSha256": "7c083892f1c609e305e859c55f80e57d702f0deac3f7adfcb2dd7f4edf2f6df7",
+  "rawScenes": [
+    {
+      "id": "scene_yLRbIdybEp",
+      "title": "图画还差一点",
+      "type": "interactive"
+    },
+    {
+      "id": "scene_Du8dS75XBV",
+      "title": "书包里有什么",
+      "type": "interactive"
+    },
+    {
+      "id": "scene_8aKyRZhhHq",
+      "title": "拼好再来问",
+      "type": "interactive"
+    },
+    {
+      "id": "scene_zvzDUKELi9",
+      "title": "跟着说话人看",
+      "type": "interactive"
+    },
+    {
+      "id": "scene_Jl313cLp5c",
+      "title": "这一次轮到你问",
+      "type": "interactive"
+    },
+    {
+      "id": "scene_HWO8M4Huwz",
+      "title": "听一听，选一张",
+      "type": "quiz"
+    },
+    {
+      "id": "scene_t6ilT4nf_z",
+      "title": "今天我会问什么",
+      "type": "slide"
+    }
+  ],
+  "adaptedScenes": [
+    {
+      "key": "picture-reveal",
+      "originalSceneIds": [
+        "scene_yLRbIdybEp"
+      ],
+      "change": "原生四句、没有教师完整问答。大象、长颈鹿、企鹅、狮子没有原书复现基础，且图形是粗略内嵌SVG。改为两张原创猫和熊猫，在同一张图上先遮住有区别的部位，第一次猜无对错。补听指、完整问答、说出耳朵与尾巴的判断理由，保留先猜与修正两种状态。"
+    },
+    {
+      "key": "schoolbag-items",
+      "originalSceneIds": [
+        "scene_Du8dS75XBV"
+      ],
+      "change": "去掉emoji、浏览器语音、速度奖励与文字标签提示。钢笔和铅笔都可能有尖头，用墨水笔尖和木质削尖区分。把原生词表及省略号拆成五组实际问答，让书包主人先说It’s my schoolbag.，用身边物说明my属于说话人。第二关改为听音在换位后的实物图中选择。"
+    },
+    {
+      "key": "puzzle-listen",
+      "originalSceneIds": [
+        "scene_8aKyRZhhHq"
+      ],
+      "change": "原生口播只有钢笔一轮，HTML把落在画布中央附近近似视为拼对。改为按所缺物体与准确落槽判断，严格完成钢笔、书包两轮，补两轮真实问答。两块由登记正式图同图裁切，保证接缝可以辨认；去浏览器语音。"
+    },
+    {
+      "key": "speaker-position",
+      "originalSceneIds": [
+        "scene_zvzDUKELi9"
+      ],
+      "change": "原生只有四句，有跨课提示“上节课”，是百分比滑块和画布演示，没给六张教材图可听、可选。换成屏上人物向左右站位移动，两个对象保持原位，this或that在当前位置只能命中一个。六种提示轮换，示范至少有完整的窗与门问答。学生初始画面无答案箭头。"
+    },
+    {
+      "key": "take-turns",
+      "originalSceneIds": [
+        "scene_Jl313cLp5c"
+      ],
+      "change": "原生四句，pen对应铅笔emoji、pencil对应钢笔emoji，只有单词答语，缺第三课时的短节奏和用新学具换角色。配两名正式图人物与钢笔铅笔正确物件，先用原创新节奏拆听两词，再加入书或尺的问答变式，先后两次都用It’s a …，说给大人听记为待观察。"
+    },
+    {
+      "key": "transfer-quiz",
+      "originalSceneIds": [
+        "scene_HWO8M4Huwz"
+      ],
+      "change": "原生全是文字选项、无skill和预录题音。五道辨物在中文题干泄露目标；q6功能线索不排他，q7只考读句，q8缺物图且混入未教的是非问句。正式9题保留五个英语听辨，另做揭后看图认物、this近处、that稍远、窗门新情境问答。去掉问句中文翻译，独立题图换物件实例，使用完整英语音频、唯一图片答案、技能、解析。正确位置A、B、C、D依次拟2、3、2、2。"
+    },
+    {
+      "key": "recap",
+      "originalSceneIds": [
+        "scene_t6ilT4nf_z"
+      ],
+      "change": "文字框换成有意义的图像提示，保持1000×562.5，分句保留或增加老师讲解，去超长混合句与占位省略号。完整问答、两笔判断、说话人位置、换角色家练均带真实示例。标口语待观察。"
+    }
+  ]
+}

@@ -1,0 +1,318 @@
+{
+  "semanticDiagrams": {
+    "diagram-shapes": {
+      "file": "assets/diagram-shapes.svg",
+      "meaning": "四种平面轮廓；颜色不决定形状",
+      "knowledgeDiagram": true
+    },
+    "diagram-towers": {
+      "file": "assets/diagram-towers.svg",
+      "meaning": "同底线比高矮",
+      "knowledgeDiagram": true
+    },
+    "diagram-ribbons": {
+      "file": "assets/diagram-ribbons.svg",
+      "meaning": "两端点对齐比较长短",
+      "knowledgeDiagram": true
+    },
+    "diagram-pairing": {
+      "file": "assets/diagram-pairing.svg",
+      "meaning": "一一对应留下两个未配对点",
+      "knowledgeDiagram": true
+    },
+    "diagram-size": {
+      "file": "assets/diagram-size.svg",
+      "meaning": "同角对齐完全包含的纸片大小",
+      "knowledgeDiagram": true
+    },
+    "diagram-faces": {
+      "file": "assets/diagram-faces.svg",
+      "meaning": "选定平面对应印迹；互动另展示立体",
+      "knowledgeDiagram": true
+    },
+    "diagram-clue": {
+      "file": "assets/diagram-clue.svg",
+      "meaning": "已知总共一个，左空右一",
+      "knowledgeDiagram": true
+    },
+    "diagram-circle": {
+      "file": "assets/diagram-circle.svg",
+      "meaning": "单个circle轮廓",
+      "knowledgeDiagram": true
+    },
+    "diagram-triangle": {
+      "file": "assets/diagram-triangle.svg",
+      "meaning": "单个triangle轮廓",
+      "knowledgeDiagram": true
+    },
+    "diagram-square": {
+      "file": "assets/diagram-square.svg",
+      "meaning": "单个square轮廓",
+      "knowledgeDiagram": true
+    },
+    "diagram-rectangle": {
+      "file": "assets/diagram-rectangle.svg",
+      "meaning": "单个rectangle轮廓",
+      "knowledgeDiagram": true
+    },
+    "diagram-height-0": {
+      "file": "assets/diagram-height-0.svg",
+      "meaning": "第三幅两座塔的实际底边同在515，其他不齐",
+      "knowledgeDiagram": true
+    },
+    "diagram-height-1": {
+      "file": "assets/diagram-height-1.svg",
+      "meaning": "第三幅两座塔的实际底边同在515，其他不齐",
+      "knowledgeDiagram": true
+    },
+    "diagram-height-2": {
+      "file": "assets/diagram-height-2.svg",
+      "meaning": "两个底端同在515像素，基线也在515像素。",
+      "knowledgeDiagram": true
+    },
+    "diagram-length-0": {
+      "file": "assets/diagram-length-0.svg",
+      "meaning": "第一幅起点齐且直；第二未齐；第三弯曲",
+      "knowledgeDiagram": true
+    },
+    "diagram-length-1": {
+      "file": "assets/diagram-length-1.svg",
+      "meaning": "第一幅起点齐且直；第二未齐；第三弯曲",
+      "knowledgeDiagram": true
+    },
+    "diagram-length-2": {
+      "file": "assets/diagram-length-2.svg",
+      "meaning": "第一幅起点齐且直；第二未齐；第三弯曲",
+      "knowledgeDiagram": true
+    },
+    "diagram-containers-0": {
+      "file": "assets/diagram-containers-0.svg",
+      "meaning": "左盒0个、右盒3个，用于新总量3的推理检查。",
+      "knowledgeDiagram": true
+    },
+    "diagram-containers-1": {
+      "file": "assets/diagram-containers-1.svg",
+      "meaning": "左盒2个、右盒2个，用于新总量3的推理检查。",
+      "knowledgeDiagram": true
+    },
+    "diagram-containers-2": {
+      "file": "assets/diagram-containers-2.svg",
+      "meaning": "左盒2个、右盒1个，用于新总量3的推理检查。",
+      "knowledgeDiagram": true
+    },
+    "diagram-classify": {
+      "file": "assets/diagram-classify.svg",
+      "meaning": "六个方形与两个圆形",
+      "knowledgeDiagram": true
+    }
+  },
+  "cast": [
+    {
+      "name": "小数老师",
+      "look": "男数学老师旁白预录音，书本文具采用同系列原创插画。"
+    }
+  ],
+  "style": {
+    "notes": "奶油纸色、鼠尾草绿、陶土橙；数学图示与正式插画边缘清楚。"
+  },
+  "pages": [
+    {
+      "id": "p02",
+      "title": "一盆一盆数清楚",
+      "mechanism": "逐个点击正式盆栽图标做无数字记号，再选数量；错答先提醒是否重复或遗漏，不亮答案。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p04",
+      "title": "轮廓贴回原处",
+      "mechanism": "拖几何薄片到对应轮廓，物体贴合后变实色；遮文字仍能按形状操作。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p07",
+      "title": "让两座塔站齐",
+      "mechanism": "先把偏移的塔拖到底线，再点较高的一座；错误先提醒看脚下。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p09",
+      "title": "丝带排到起点",
+      "mechanism": "将两根丝带左端拖到同一线，弯带先拉直，再点较长者；真对象位置改变。与上一页同为对齐，但新增端点、方向和弯曲条件。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p11",
+      "title": "两排数量配成对",
+      "mechanism": "拖上排数量点与下排点连线，一一配对后选择有剩余一排，含一样多；错答不先报结果。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p13",
+      "title": "纸片叠起来",
+      "mechanism": "拖纸片同角对齐，观察露出部分后点较大纸片；不是只选文字。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p16",
+      "title": "按一个面印一印",
+      "mechanism": "把积木拖上印台，纸面出现真实轮廓；按目标挑选合适的面，不能仅看颜色。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p17",
+      "title": "形状大小刚好贴齐",
+      "mechanism": "按明确的“轮廓刚好补满”规则匹配形状与大小，填入后空缺变实色。保留官方观察目标，避免暗示小的异形物体在现实中一定不能过孔。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p19",
+      "title": "看一边摆另一边",
+      "mechanism": "先揭示一个容器，再拖数量点重建另一边；总量与看见数量都可见，验证后揭示。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p22",
+      "title": "东西送回各自的家",
+      "mechanism": "拖正式书本、练习本、铅笔图片到图示收纳区，完成分类归位。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    },
+    {
+      "id": "p23",
+      "title": "书本按大小排好",
+      "mechanism": "从左到右逐个开放摆放位置。每次选剩下书本中最大的一本，拖或点入该位置；错误不抹去之前正确摆放。三本排好后点对号。与上一页从类别判断转为大小排序。",
+      "ids": [
+        "garden-stage",
+        "garden-anchor",
+        "garden-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo显示示范题，show展示操作结果，play复位孩子的新题。"
+      },
+      "hints": [
+        "先提示观察属性，不亮正确项。",
+        "再出现对齐线、未配对点或边缘。",
+        "第三次展示示范，复位本关继续。"
+      ]
+    }
+  ]
+}

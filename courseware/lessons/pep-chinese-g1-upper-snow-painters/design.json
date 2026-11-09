@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "雪地里的小画家",
+  "singleCompleteLesson": true,
+  "authorModels": [
+    "gpt-6.1-sol"
+  ],
+  "style": {
+    "notes": "暖白纸底、冰蓝雪色、暖橙动物点缀，图片全部使用登记正式素材；字形和单笔轮廓本身才用知识图示。"
+  },
+  "pages": [
+    {
+      "id": "roof",
+      "scene": "p04",
+      "title": "给家找回宝盖头",
+      "mechanism": "把目标偏旁移入家的上方，两轮打乱候选卡的位置，正确后字形实际拼合。",
+      "ids": [
+        "house-base",
+        "roof-card",
+        "roof-slot"
+      ],
+      "stateKeys": {
+        "demo": "roof：演示把宝盖头放入上方",
+        "phase": "play：清空并恢复孩子操作"
+      },
+      "levels": [
+        "找出宝盖头",
+        "换位置再找"
+      ],
+      "evidence": "只记录偏旁字形与位置，不评写家。"
+    },
+    {
+      "id": "characters",
+      "scene": "p07",
+      "title": "把同一个字放到一起",
+      "mechanism": "目标字和候选字比较字形，卡片实际移入字册；11字轮换。",
+      "ids": [
+        "character-target",
+        "character-bank",
+        "character-album"
+      ],
+      "stateKeys": {
+        "demo": "home：用家字演示配对",
+        "phase": "play：恢复从的开始的完整游戏"
+      },
+      "levels": [
+        "的",
+        "家",
+        "鸡",
+        "竹",
+        "牙",
+        "用",
+        "几",
+        "步",
+        "没",
+        "参",
+        "加"
+      ],
+      "evidence": "字形匹配不等于独立认读，认读由家人听。"
+    },
+    {
+      "id": "tracks",
+      "scene": "p08",
+      "title": "小画家与它的脚印",
+      "mechanism": "四个正式动物图移动到相应正式足印旁，匹配后动物实际靠近足印、保留对照。",
+      "ids": [
+        "animal-chick",
+        "track-chick",
+        "animal-dog",
+        "animal-duck",
+        "animal-horse"
+      ],
+      "stateKeys": {
+        "demo": "chick：把小鸡移动到细长足印旁",
+        "phase": "play：清除示范并打乱足印位置"
+      },
+      "levels": [
+        "小鸡",
+        "小狗",
+        "小鸭",
+        "小马"
+      ],
+      "evidence": "四组课文中动物与足印的对应。"
+    },
+    {
+      "id": "analogy",
+      "scene": "p10",
+      "title": "脚印像什么",
+      "mechanism": "与上一页相反，给出足印找形状联想物；足印移到正式植物/月牙图旁，表现像而不是相等。",
+      "ids": [
+        "analogy-track",
+        "likeness-bamboo",
+        "likeness-bank"
+      ],
+      "stateKeys": {
+        "demo": "bamboo：比较细长足印与竹叶",
+        "phase": "play：恢复四轮"
+      },
+      "levels": [
+        "竹叶",
+        "梅花",
+        "枫叶",
+        "月牙"
+      ],
+      "evidence": "按课文形状联想，不作为现实物种分类器。"
+    },
+    {
+      "id": "stamps",
+      "scene": "p13",
+      "title": "让脚步连成画",
+      "mechanism": "从画面反找动物，然后沿前方踏点移动动物，正式足印逐个留在身后，表现不用笔也会留下图案。",
+      "ids": [
+        "stamp-target",
+        "stamp-chick",
+        "step-1",
+        "stamp-trail"
+      ],
+      "stateKeys": {
+        "demo": "steps：示范小鸡留下一枚足印",
+        "phase": "play：清空足印、恢复完整四轮"
+      },
+      "levels": [
+        "小鸡的脚步",
+        "小狗的脚步",
+        "小鸭的脚步",
+        "小马的脚步"
+      ],
+      "evidence": "几步不限定某个数字，踏点只是操作路径。"
+    },
+    {
+      "id": "stroke-match",
+      "scene": "p15",
+      "title": "三个转折笔形",
+      "mechanism": "比较来源核过的三种单笔轮廓，移动至相同笔形，转弯本身是知识。",
+      "ids": [
+        "stroke-sample",
+        "stroke-choice-vertical",
+        "stroke-choice-hook"
+      ],
+      "stateKeys": {
+        "demo": "vertical：示范竖折的对照",
+        "phase": "play：清除示范重置三轮"
+      },
+      "levels": [
+        "竖折",
+        "竖折折钩",
+        "横折钩"
+      ],
+      "evidence": "只比单笔形状，不绘制或核查整字笔顺。"
+    },
+    {
+      "id": "trace",
+      "scene": "p17",
+      "title": "沿淡字慢慢描",
+      "mechanism": "大号真实字体、田字格、自由笔迹和可清除画布；五字轮换，覆盖度解锁对勾。",
+      "ids": [
+        "trace-guide",
+        "trace-reset",
+        "trace-progress"
+      ],
+      "stateKeys": {
+        "demo": "trace：淡字中一小段描迹",
+        "phase": "play：擦去示范并恢复五字"
+      },
+      "levels": [
+        "用",
+        "马",
+        "牙",
+        "竹",
+        "几"
+      ],
+      "evidence": "只记录覆盖，纸笔的正确、规范、整洁和笔顺均待成人观察。"
+    }
+  ],
+  "hints": "首次错误只提示观察，第二次给比较方向，第三次才亮对应目标；完成可再玩并完全复位。",
+  "releaseLimits": "本课负责人通过统一全局限流与持久回执调度器生产正式图片和配音；正式图片四态视觉、三尺寸G6、独立G7、G8、归档和学生端验证必须实际完成后才报告上架。没有观察到的纸笔书写、朗读和背诵继续标为待观察。"
+}

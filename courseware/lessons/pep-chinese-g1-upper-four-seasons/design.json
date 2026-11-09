@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "四季",
+  "singleCompleteLesson": true,
+  "sourceAuthors": [
+    "gpt-6.1-sol"
+  ],
+  "cast": [
+    {
+      "name": "小语老师",
+      "look": "青绿色上衣，亲切温柔的女老师"
+    }
+  ],
+  "style": {
+    "notes": "同一暖白纸底、青绿湖蓝与赤陶配色，所有非知识图示用本课正式图片；知识字形与田字格才标记 semantic diagram。"
+  },
+  "pages": [
+    {
+      "id": "characters",
+      "scene": "p06",
+      "mechanism": "十二个目标字依次比同形卡，字卡实际移入字册。只记录字形匹配，不推断认读质量。",
+      "ids": [
+        "fs-character-target",
+        "fs-character-bank",
+        "fs-character-album"
+      ],
+      "stateKeys": {
+        "demo": "sample",
+        "phase": "play：清除教师示范、关卡、星星、选择和描迹后交还控制"
+      },
+      "firstWrong": "第一次不给正确答案；开放选择页不设错误答案。",
+      "finish": "本页操作完成不表述为已掌握口头或纸笔能力，可再玩一次并重置。"
+    },
+    {
+      "id": "radicals",
+      "scene": "p07",
+      "mechanism": "将三个目标偏旁形卡放到说、地、冬对应字旁，知识本身为字形，不拿临时图标假充语义图片。",
+      "ids": [
+        "fs-radical-word",
+        "fs-radical-bank",
+        "fs-radical-slot"
+      ],
+      "stateKeys": {
+        "demo": "say",
+        "phase": "play：清除教师示范、关卡、星星、选择和描迹后交还控制"
+      },
+      "firstWrong": "第一次不给正确答案；开放选择页不设错误答案。",
+      "finish": "本页操作完成不表述为已掌握口头或纸笔能力，可再玩一次并重置。"
+    },
+    {
+      "id": "seasons",
+      "scene": "p09",
+      "mechanism": "四个景物真实移入课文四季画面的图册，随机位置，第一次错误只提示看颜色与形状。",
+      "ids": [
+        "fs-season-object",
+        "fs-season-album"
+      ],
+      "stateKeys": {
+        "demo": "spring",
+        "phase": "play：清除教师示范、关卡、星星、选择和描迹后交还控制"
+      },
+      "firstWrong": "第一次不给正确答案；开放选择页不设错误答案。",
+      "finish": "本页操作完成不表述为已掌握口头或纸笔能力，可再玩一次并重置。"
+    },
+    {
+      "id": "shapes",
+      "scene": "p11",
+      "mechanism": "把草芽、荷叶、谷穗正式图送到尖尖、圆圆、弯弯目标词旁，观察轮廓而非猜文字标签。",
+      "ids": [
+        "fs-shape-word",
+        "fs-shape-bank",
+        "fs-shape-match"
+      ],
+      "stateKeys": {
+        "demo": "point",
+        "phase": "play：清除教师示范、关卡、星星、选择和描迹后交还控制"
+      },
+      "firstWrong": "第一次不给正确答案；开放选择页不设错误答案。",
+      "finish": "本页操作完成不表述为已掌握口头或纸笔能力，可再玩一次并重置。"
+    },
+    {
+      "id": "dialogue",
+      "scene": "p12",
+      "mechanism": "选择图像听众放到草芽或荷叶对面，理解说话人与听话人；允许自由选听众作仿说准备，不伪装唯一答案题。",
+      "ids": [
+        "fs-speaker",
+        "fs-listener",
+        "fs-dialogue-line"
+      ],
+      "stateKeys": {
+        "demo": "bird",
+        "phase": "play：清除教师示范、关卡、星星、选择和描迹后交还控制"
+      },
+      "firstWrong": "第一次不给正确答案；开放选择页不设错误答案。",
+      "finish": "本页操作完成不表述为已掌握口头或纸笔能力，可再玩一次并重置。"
+    },
+    {
+      "id": "theatre",
+      "scene": "p14",
+      "mechanism": "孩子分三步操作谷穗弯身与雪人挺肚子的画面，再换角色；动作改变物体位置角度，不只改变分数。",
+      "ids": [
+        "fs-actor",
+        "fs-theatre-word",
+        "fs-theatre-move"
+      ],
+      "stateKeys": {
+        "demo": "bend",
+        "phase": "play：清除教师示范、关卡、星星、选择和描迹后交还控制"
+      },
+      "firstWrong": "第一次不给正确答案；开放选择页不设错误答案。",
+      "finish": "本页操作完成不表述为已掌握口头或纸笔能力，可再玩一次并重置。"
+    },
+    {
+      "id": "postcard",
+      "scene": "p16",
+      "mechanism": "四幅官方支持的扩展景物任选，景物与句式支架同时换，准备好请家人听真实口头表达。",
+      "ids": [
+        "fs-postcard-picture",
+        "fs-postcard-lines",
+        "fs-postcard-bank"
+      ],
+      "stateKeys": {
+        "demo": "willow",
+        "phase": "play：清除教师示范、关卡、星星、选择和描迹后交还控制"
+      },
+      "firstWrong": "第一次不给正确答案；开放选择页不设错误答案。",
+      "finish": "本页操作完成不表述为已掌握口头或纸笔能力，可再玩一次并重置。"
+    },
+    {
+      "id": "trace",
+      "scene": "p19",
+      "mechanism": "四、小、鸟、是、天五字淡字田字格自由描画；覆盖阈值50%，可清除与复位；不验证笔顺或字形规范。",
+      "ids": [
+        "trace-word",
+        "trace-guide",
+        "trace-reset",
+        "trace-next"
+      ],
+      "stateKeys": {
+        "demo": "trace",
+        "phase": "play：清除教师示范、关卡、星星、选择和描迹后交还控制"
+      },
+      "firstWrong": "第一次不给正确答案；开放选择页不设错误答案。",
+      "finish": "本页操作完成不表述为已掌握口头或纸笔能力，可再玩一次并重置。"
+    }
+  ],
+  "releaseStatus": "正式媒体、三尺寸浏览器/四态语义、独立复核、发布与学生端尚未完成",
+  "adjacentMechanismReasons": [
+    {
+      "pages": [
+        "p06",
+        "p07"
+      ],
+      "reason": "先比较十二个完整字形，再在说、地、冬里辨认偏旁。同样保留点选和拖放，减少一二年级孩子切换操作的负担；观察对象从整字转为部件，不能把配对完成当成会认读。"
+    },
+    {
+      "pages": [
+        "p11",
+        "p12"
+      ],
+      "reason": "叠词页把图片和尖、圆、弯的形状相配；随后对话页允许自由选择听众，实际改变对话画面，作为口头仿说准备。沿用熟悉的拖放手势，但唯一形状判断转为开放表达，口语仍待家人观察。"
+    }
+  ]
+}

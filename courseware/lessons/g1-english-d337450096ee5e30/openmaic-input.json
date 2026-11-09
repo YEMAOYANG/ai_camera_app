@@ -1,0 +1,738 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "unitId": "082e6be1-31e4-3c35-b164-0a5a89e97ba7",
+    "nodeId": "f870af5f-3f8a-3c66-9681-aa2e8ffedad9",
+    "classHours": [
+      "lesson_1"
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "99066a267b9bb10f4d4a04a2eb5ac56e8475ea4d4c3d00446a271d418935de40",
+    "briefSha256": "6a923357984c95ec4a6c292ef0b858e6a9f1b2dad333d5465e57855f92ffc89c",
+    "g0FreezeSha256": "dc360ff0160a395f51dde057c9eea920770e3a49130cd8c27d7c79839d857566",
+    "pictureRegistrySha256": "1bc4a360a46f6135fd94cd03e8354893a20afa728c704370468cb013b9805dce",
+    "officialNotesPath": "courseware/lessons/g1-english-d337450096ee5e30/official-notes.json",
+    "briefPath": "courseware/lessons/g1-english-d337450096ee5e30/brief-native-v1.json",
+    "g0FreezePath": "output/courseware-lessons/g1-english-d337450096ee5e30/official/g0-source-freeze.json"
+  },
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "objectives": [
+      "听辨并结合图片理解 nurse、driver、policeman、pupil，认识拓展词 policewoman。",
+      "依据所介绍的具体人物区分 he 与 she，不按职业猜人称。",
+      "借助原创家庭照片理解 This is my mother/father. 与接续的职业介绍。",
+      "理解 This is me. 和 I'm a pupil.，尝试向大人介绍自己。",
+      "知道不同职业都能帮助他人，向朋友了解未来愿望；实际口语由大人观察。"
+    ],
+    "coveredOfficialHours": [
+      "lesson_1"
+    ],
+    "videoStatus": "waived",
+    "excludedTopics": [
+      "将 policewoman 变成核心掌握或必答知识",
+      "新增职业清单和语法术语",
+      "依据衣服、发型或职业猜测 he/she",
+      "声称点击证明孩子会说",
+      "复制教材人物图、原题、原歌曲或原听力顺序"
+    ]
+  },
+  "teachingFacts": {
+    "textbook": "外研社英语一年级起点一年级下册，2012 年教育部审定。Module 1 Unit 2 She's a nurse.",
+    "officialPrintPages": [
+      5,
+      6,
+      7
+    ],
+    "officialEbookPages": [
+      10,
+      11,
+      12
+    ],
+    "activityMap": [
+      {
+        "printedPage": 5,
+        "activities": [
+          1,
+          2
+        ],
+        "adaptation": "先听看家人和工作，再用原创相册分开练习家人关系、职业和本人。教师先说，再让孩子指出或操作，最后请大人听孩子开口。"
+      },
+      {
+        "printedPage": 6,
+        "activities": [
+          3,
+          4
+        ],
+        "adaptation": "用新的工作场景做职业词听辨和图片对应，可以边模仿驾驶或照护动作边说目标词。设计原创短节奏，无需复制教材歌曲、配乐或听题顺序。"
+      },
+      {
+        "printedPage": 7,
+        "activities": [
+          5,
+          6
+        ],
+        "adaptation": "用已由老师介绍的人物练习 he/she，示范发现用错后自己改正。最后用孩子自选照片或自制指偶向大人说一说家人职业。"
+      }
+    ],
+    "coreWords": [
+      "nurse",
+      "driver",
+      "policeman",
+      "pupil"
+    ],
+    "optionalExtension": "policewoman 来自本课官方配套教案和课件。doctor 与 teacher 可轻量复习。",
+    "targetPatterns": [
+      "This is my mother/father.",
+      "She's a … / He's a …",
+      "This is me.",
+      "I'm a pupil."
+    ],
+    "sceneFact": "原创安安家庭，爸爸戴眼镜并开公交，妈妈短棕发并做护理，安安是小学生。不要把教材中其他家庭的职业套给安安。",
+    "parentEvidence": "听辨和拖放只记录当次操作，孩子的口语和课后职业调查由大人观察。"
+  },
+  "request": "为外研社一年级起点一年级下册 Module 1 Unit 2 创作完整可编辑课件。讲解与玩法指令用儿童能听懂的简体中文，目标词和示范句用准确英语。按已审读原书活动1至6和一个官方课时整合。用原创安安家庭和校园职业场景，清楚教学职业词、家人介绍、人物指向和自我介绍。所有有评分的题均为 single，每题答案数组长度恰好为1，答案必须是现有唯一选项标识。实际口语由大人观察。只输出可编辑草稿及可检查的素材标识和互动操作，后续由 Codex 适配公共框架、绑定正式媒体并验收。",
+  "qualityRules": [
+    "一屏一事。非目标文字遮住也能根据老师声音和图片操作。",
+    "讲解页至少6句且100字，互动页至少5句且90字，先示范和解释理由。每次画面操作先于对应讲解。",
+    "互动采用1280×720逻辑画布，每页至少3个真实教师操作。图片可见，点击区域至少44px。",
+    "玩法至少有开始、进度、正确反馈、分级提示、完成、重玩复位。首错只提示观察，不显示正确答案。",
+    "图片使用 assetKey，练习和小检查人物图严格区分。没有合适图片时声明待适配素材。",
+    "小检查使用新的情境和正式图，题干可配音且有唯一答案、skill、解析。正确位置均衡。",
+    "不生成 discussion、外链、网页朗读、视频、自动媒体、发布操作或学习掌握判断。"
+  ],
+  "pagePlan": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "我们的家庭职业相册",
+      "play": "原创家庭情境引入本课。",
+      "assets": [
+        "family"
+      ]
+    },
+    {
+      "page": 2,
+      "type": "slide",
+      "title": "nurse 和 driver",
+      "play": "老师结合工作图讲清两个职业。",
+      "assets": [
+        "nurse",
+        "driver"
+      ]
+    },
+    {
+      "page": 3,
+      "type": "interactive",
+      "title": "照片回工作站",
+      "play": "把人物照片送进照护区或公交车。对后人物进入场景；首错提示看工作内容，第三次示范，重玩全复位。",
+      "assets": [
+        "clinic",
+        "bus",
+        "nurse",
+        "driver"
+      ],
+      "teacherMoves": [
+        "先高亮护士照片",
+        "标注两处工作场景的线索",
+        "把演示照片送入场景",
+        "清空演示回到待操作"
+      ],
+      "legacyInteractionCandidate": "p03"
+    },
+    {
+      "page": 4,
+      "type": "slide",
+      "title": "同样做警察工作，怎么说他和她",
+      "play": "教师先介绍两位虚构人物，再解释同一工作不决定人称。示范一次误用后，按人物线索改正。policewoman 只作拓展。",
+      "assets": [
+        "policeman",
+        "policewoman"
+      ]
+    },
+    {
+      "page": 5,
+      "type": "interactive",
+      "title": "he 和 she 相册",
+      "play": "将教师已经介绍的四位职业人物拖入 he/she 相册。老师先按人物身份讲理由并实际移入照片，再复位交给孩子。首次答错不显示答案。",
+      "assets": [
+        "policeman",
+        "policewoman",
+        "nurse",
+        "driver"
+      ],
+      "teacherMoves": [
+        "标出已介绍的人物",
+        "点亮人称相册",
+        "移入照片并说理由",
+        "复位交还孩子"
+      ],
+      "legacyInteractionCandidate": "p05"
+    },
+    {
+      "page": 6,
+      "type": "quiz",
+      "title": "小检查：职业词",
+      "play": "全新人物图，听 nurse/driver 作答。",
+      "assets": [
+        "q-nurse",
+        "q-driver",
+        "q-policeman",
+        "q-teacher",
+        "q-doctor"
+      ]
+    },
+    {
+      "page": 7,
+      "type": "slide",
+      "title": "先说家人，再说职业",
+      "play": "母亲、父亲与孩子的原创相册示范介绍句式。",
+      "assets": [
+        "family",
+        "nurse",
+        "driver"
+      ]
+    },
+    {
+      "page": 8,
+      "type": "interactive",
+      "title": "给家庭相册补照片",
+      "play": "孩子按相框中的家庭人物匹配同一个人的工作照，正确照片放进相册；首错只提示观察人物，第三错示范。",
+      "assets": [
+        "family",
+        "nurse",
+        "driver"
+      ],
+      "teacherMoves": [
+        "指出合照中的家人",
+        "提示看眼镜或发型辨认",
+        "放入同一人的工作照",
+        "清空示范卡"
+      ],
+      "legacyInteractionCandidate": "p08"
+    },
+    {
+      "page": 9,
+      "type": "quiz",
+      "title": "小检查：人物介绍",
+      "play": "新人物、新情境，听完整句识别人物和职业。",
+      "assets": [
+        "q-policeman",
+        "q-policewoman",
+        "q-driver",
+        "q-doctor",
+        "q-nurse"
+      ]
+    },
+    {
+      "page": 10,
+      "type": "slide",
+      "title": "This is me.",
+      "play": "老师解释 me、I 和 pupil 的自我指向。",
+      "assets": [
+        "pupil"
+      ]
+    },
+    {
+      "page": 11,
+      "type": "interactive",
+      "title": "我的小学生相册",
+      "play": "从成人和孩子照片中挑小学生，放入自我介绍相框；男女孩都能是 pupil，首错只提示看上学线索。",
+      "assets": [
+        "pupil",
+        "policeman",
+        "driver"
+      ],
+      "teacherMoves": [
+        "高亮上学线索",
+        "展示放入小学生照片",
+        "揭示本人用 I 的英语短句",
+        "清空待孩子选择"
+      ],
+      "legacyInteractionCandidate": "p11"
+    },
+    {
+      "page": 12,
+      "type": "quiz",
+      "title": "小检查：自己开口，介绍同学",
+      "play": "使用全新的男、女小学生图片，区分本人用 I 和介绍她用 she。成人职业图作干扰。",
+      "assets": [
+        "q-pupil-boy",
+        "q-pupil-girl",
+        "q-policeman",
+        "q-teacher",
+        "q-doctor"
+      ]
+    },
+    {
+      "page": 13,
+      "type": "slide",
+      "title": "带着相册说一说",
+      "play": "用图片回顾职业词、家人介绍、he/she 和本人用 I 的规则。邀请孩子用自己的照片或指偶向大人介绍家人。口语与调查结果待观察。",
+      "assets": [
+        "family",
+        "pupil"
+      ]
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "id": "q1",
+      "page": 6,
+      "skill": "听辨 nurse",
+      "task": "找正在照护小朋友的护士",
+      "options": [
+        {
+          "value": "A",
+          "assetKey": "q-policeman"
+        },
+        {
+          "value": "B",
+          "assetKey": "q-nurse"
+        },
+        {
+          "value": "C",
+          "assetKey": "q-driver"
+        }
+      ],
+      "type": "single",
+      "answer": [
+        "B"
+      ],
+      "analysis": "护理服、照护动作和测温情境符合护士。",
+      "audio": "正式 Mia 女声读题"
+    },
+    {
+      "id": "q2",
+      "page": 6,
+      "skill": "听辨 driver",
+      "task": "找握着公交方向盘的司机",
+      "options": [
+        {
+          "value": "A",
+          "assetKey": "q-doctor"
+        },
+        {
+          "value": "B",
+          "assetKey": "q-teacher"
+        },
+        {
+          "value": "C",
+          "assetKey": "q-driver"
+        }
+      ],
+      "type": "single",
+      "answer": [
+        "C"
+      ],
+      "analysis": "握着方向盘坐在公交驾驶座的人是司机。",
+      "audio": "正式 Mia 女声读题"
+    },
+    {
+      "id": "q3",
+      "page": 9,
+      "skill": "he 与人物指向",
+      "task": "结合英语介绍找已介绍的男警察",
+      "options": [
+        {
+          "value": "A",
+          "assetKey": "q-policeman"
+        },
+        {
+          "value": "B",
+          "assetKey": "q-policewoman"
+        },
+        {
+          "value": "C",
+          "assetKey": "q-driver"
+        }
+      ],
+      "type": "single",
+      "answer": [
+        "A"
+      ],
+      "analysis": "he 指已介绍的他，policeman 给出职业。",
+      "audio": "正式 Mia 女声读题"
+    },
+    {
+      "id": "q4",
+      "page": 9,
+      "skill": "介绍母亲及其职业",
+      "task": "听一位孩子介绍当司机的母亲，找对应工作照",
+      "options": [
+        {
+          "value": "A",
+          "assetKey": "q-doctor"
+        },
+        {
+          "value": "B",
+          "assetKey": "q-driver"
+        },
+        {
+          "value": "C",
+          "assetKey": "q-nurse"
+        }
+      ],
+      "type": "single",
+      "answer": [
+        "B"
+      ],
+      "analysis": "mother 给出家庭关系，driver 对应图中驾驶者。",
+      "audio": "正式 Mia 女声读题"
+    },
+    {
+      "id": "q5",
+      "page": 12,
+      "skill": "理解自我介绍 pupil",
+      "task": "听本人自我介绍，找说自己是小学生的人",
+      "options": [
+        {
+          "value": "A",
+          "assetKey": "q-teacher"
+        },
+        {
+          "value": "B",
+          "assetKey": "q-policeman"
+        },
+        {
+          "value": "C",
+          "assetKey": "q-pupil-boy"
+        }
+      ],
+      "type": "single",
+      "answer": [
+        "C"
+      ],
+      "analysis": "pupil 是小学生。本人用 I，和性别无关。",
+      "audio": "正式 Mia 女声读题"
+    },
+    {
+      "id": "q6",
+      "page": 12,
+      "skill": "听辨 she 与小学生身份",
+      "task": "听说话者介绍另一位同学，找她是小学生的画面",
+      "options": [
+        {
+          "value": "A",
+          "assetKey": "q-pupil-girl"
+        },
+        {
+          "value": "B",
+          "assetKey": "q-pupil-boy"
+        },
+        {
+          "value": "C",
+          "assetKey": "q-doctor"
+        }
+      ],
+      "type": "single",
+      "answer": [
+        "A"
+      ],
+      "analysis": "she 指已介绍的她，pupil 给出小学生身份。",
+      "audio": "正式 Mia 女声读题"
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "family",
+      "semantic": "同一家人合照，父亲在左且戴眼镜，安安居中，母亲在右且为短棕发",
+      "aspect": "16:9",
+      "reviewedAssetSha256": "fff6c05f7f2932a2cfc463f0060de8075466b822fafda4254c4612c7f3d97cbd",
+      "pixels": [
+        1024,
+        576
+      ],
+      "pages": [
+        1,
+        7,
+        8,
+        13
+      ],
+      "assessmentItems": [],
+      "scope": "lesson_only"
+    },
+    {
+      "assetKey": "nurse",
+      "semantic": "短棕发母亲在照护小朋友，主体为穿护理服的成年人",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "312eaa531c00ac5e866eca290e4738bdb8872146e6cf875d4ded58e9da1a9bef",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        2,
+        3,
+        5,
+        7,
+        8
+      ],
+      "assessmentItems": [],
+      "scope": "lesson_only"
+    },
+    {
+      "assetKey": "driver",
+      "semantic": "戴眼镜的父亲握公交车方向盘",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "6b492890134ecb1e674fde3c2c2d9bc3f76342f2784cbc26dc4f10b38787a799",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        2,
+        3,
+        5,
+        7,
+        8,
+        11
+      ],
+      "assessmentItems": [],
+      "scope": "lesson_only"
+    },
+    {
+      "assetKey": "policeman",
+      "semantic": "老师已介绍的男警察示例",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "79e479f491669d40607e7003287357e6d52d5257745a769d9032d3a9d06d0f25",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        4,
+        5,
+        11
+      ],
+      "assessmentItems": [],
+      "scope": "lesson_only"
+    },
+    {
+      "assetKey": "policewoman",
+      "semantic": "老师已介绍的女警察示例，职业词只作拓展",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "f186aefca8aeb4d4127e163b9b415f42234c8ec8b062bf5a94eaf2589e207129",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        4,
+        5
+      ],
+      "assessmentItems": [],
+      "scope": "lesson_only"
+    },
+    {
+      "assetKey": "pupil",
+      "semantic": "安安背书包拿书站在教室门口",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "45ddb07bc96d9599366c0c79d942f38ebf17025003ead8aa84e2b252ae503dc0",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        10,
+        11,
+        13
+      ],
+      "assessmentItems": [],
+      "scope": "lesson_only"
+    },
+    {
+      "assetKey": "clinic",
+      "semantic": "没有人物的诊室护理床、推车和工作台",
+      "aspect": "16:9",
+      "reviewedAssetSha256": "6c41edc6af71b3be415c0e03843298fea77fcc90b57500f54fcb3e37fbae8a1b",
+      "pixels": [
+        1024,
+        576
+      ],
+      "pages": [
+        3
+      ],
+      "assessmentItems": [],
+      "scope": "lesson_only"
+    },
+    {
+      "assetKey": "bus",
+      "semantic": "没有人物的公交驾驶座和方向盘",
+      "aspect": "16:9",
+      "reviewedAssetSha256": "0e050e37692c5857c0bf57ea89c15dcfc501f83e9dea8aeef5e311df0fbb3812",
+      "pixels": [
+        1024,
+        576
+      ],
+      "pages": [
+        3
+      ],
+      "assessmentItems": [],
+      "scope": "lesson_only"
+    },
+    {
+      "assetKey": "q-nurse",
+      "semantic": "新的银发护士给孩子测温，护士是画面主要人物",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "c4307145bd69250e3143ebb11b01b8e70bdb161a5bc1f29106deadc5b72349ad",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        6,
+        9
+      ],
+      "assessmentItems": [
+        "q1",
+        "q4"
+      ],
+      "scope": "quiz_only"
+    },
+    {
+      "assetKey": "q-driver",
+      "semantic": "新的长辫女司机握公交方向盘",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "986dd5a1e74bea43db2c58155731873d8157d42c68bdacf76d509e5848b9e91d",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        6,
+        9
+      ],
+      "assessmentItems": [
+        "q1",
+        "q2",
+        "q3",
+        "q4"
+      ],
+      "scope": "quiz_only"
+    },
+    {
+      "assetKey": "q-policeman",
+      "semantic": "新的男警察在公园指路",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "3027181bb68400ae9085a9e4b411caa651913a89985cf62a4dd9b695829e61fd",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        6,
+        9,
+        12
+      ],
+      "assessmentItems": [
+        "q1",
+        "q3",
+        "q5"
+      ],
+      "scope": "quiz_only"
+    },
+    {
+      "assetKey": "q-policewoman",
+      "semantic": "新的女警察在斑马线维持通行",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "c8c828d3caa3de636fac3144fe238d63bca1954620e4a50f13204a5de4bd4e52",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        9
+      ],
+      "assessmentItems": [
+        "q3"
+      ],
+      "scope": "quiz_only"
+    },
+    {
+      "assetKey": "q-pupil-boy",
+      "semantic": "新的男小学生背书包、拿书进教室",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "1b2f1c1dcfd5e2e1da336a706b778a9c839a83309536bfc8e48210d859965250",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        12
+      ],
+      "assessmentItems": [
+        "q5",
+        "q6"
+      ],
+      "scope": "quiz_only"
+    },
+    {
+      "assetKey": "q-pupil-girl",
+      "semantic": "新的女小学生背书包、拿书进教室",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "988f0e6fee000dd1f358e5f8dbe00170d031057fe30b306796e06d06f6f52274",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        12
+      ],
+      "assessmentItems": [
+        "q6"
+      ],
+      "scope": "quiz_only"
+    },
+    {
+      "assetKey": "q-teacher",
+      "semantic": "新男教师在黑板前教学",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "dd45c8493ef9b8d8e1f79606de0c7ab6c73592b46daa4a039cf8c3b77ae5a99d",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        6,
+        12
+      ],
+      "assessmentItems": [
+        "q2",
+        "q5"
+      ],
+      "scope": "quiz_only"
+    },
+    {
+      "assetKey": "q-doctor",
+      "semantic": "新女医生穿白袍、戴听诊器并示范检查",
+      "aspect": "1:1",
+      "reviewedAssetSha256": "f50e9d960f083cf9463e8282271d204872bb941035ab096feff612ca699692fc",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "pages": [
+        6,
+        9,
+        12
+      ],
+      "assessmentItems": [
+        "q2",
+        "q4",
+        "q6"
+      ],
+      "scope": "quiz_only"
+    }
+  ],
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  }
+}

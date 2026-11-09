@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation-plan.v1",
+  "jobId": "cRfJ3-enfv",
+  "classroomId": "2caABqIdZA",
+  "classroomSha256": "db7a56dd8e930fbbb21928d22d24e435c2dd2cd279459dc332b2cdb25d47914b",
+  "method": "native 引用同场景原生台词序号，baseline 引用同场景已验证脚本步号，rewrite 引用原生句并记录调整，focus 添加配图的真实聚光灯。序号从 1 起。",
+  "script": {
+    "p01": ["baseline:1", "native:1", "native:3", "native:4", "native:5", "baseline:5", "native:6", "baseline:8", "baseline:9", "baseline:10", "baseline:11", "native:7", "native:8", "baseline:14"],
+    "p02": ["baseline:1", "native:2", "baseline:2", "baseline:3", "baseline:4", "baseline:5", "baseline:7", "native:4", "baseline:9", "rewrite:5", "baseline:11", "native:3", "baseline:14", "baseline:15", "baseline:16"],
+    "p03": ["baseline:1", "native:2", "baseline:3", "baseline:4", "baseline:5", "baseline:6", "baseline:7", "baseline:8", "baseline:9", "baseline:10", "native:6", "baseline:13", "baseline:14", "baseline:15", "baseline:17", "rewrite:9", "native:10"],
+    "p04": ["baseline:1", "baseline:2", "baseline:3", "native:4", "baseline:5", "baseline:7", "baseline:9", "baseline:10", "native:5", "native:6", "baseline:15"],
+    "p05": ["baseline:1", "baseline:2", "native:1", "baseline:4", "native:2", "baseline:5", "baseline:6", "baseline:7", "baseline:8", "baseline:9", "native:4", "baseline:11", "baseline:12", "baseline:14", "baseline:15", "native:3", "native:5", "baseline:18", "baseline:19"],
+    "p06": ["baseline:1", "baseline:2", "native:1", "baseline:3", "native:3", "baseline:5", "baseline:6", "baseline:7", "native:4", "baseline:10", "baseline:11", "native:5", "baseline:14", "baseline:15", "baseline:16", "baseline:17", "baseline:18", "baseline:19", "baseline:20", "native:12"],
+    "p07": ["baseline:1", "native:1", "native:2", "baseline:2", "baseline:3", "baseline:4", "baseline:5", "baseline:6", "baseline:7", "baseline:8", "baseline:9", "baseline:10", "baseline:11", "rewrite:3", "baseline:13", "baseline:14", "baseline:16", "baseline:17", "baseline:18"],
+    "p08": ["baseline:1", "baseline:2", "native:1", "baseline:4", "native:3", "baseline:6", "baseline:7", "native:5", "baseline:9", "baseline:10", "native:6", "baseline:12", "baseline:14", "baseline:16", "baseline:17"],
+    "p09": ["baseline:1", "native:1", "baseline:2", "baseline:3", "native:11", "baseline:5", "baseline:6", "baseline:8", "baseline:9", "native:14", "baseline:11", "baseline:12"],
+    "p10": ["baseline:1", "native:1", "baseline:2", "baseline:4", "native:2", "baseline:6", "baseline:7", "baseline:8", "baseline:9", "baseline:10", "baseline:11", "baseline:12", "baseline:13", "baseline:14", "native:3", "baseline:16", "baseline:17"],
+    "p11": ["baseline:1", "native:2", "baseline:3", "baseline:4", "native:3", "native:6", "baseline:7", "native:4", "baseline:9", "baseline:10", "native:5", "native:7", "native:8", "baseline:12", "baseline:14"],
+    "p12": ["baseline:1", "native:1", "baseline:2", "native:2", "baseline:4", "baseline:5", "baseline:6", "baseline:7", "baseline:8", "baseline:9", "baseline:10", "baseline:11", "baseline:12", "baseline:13", "baseline:14", "rewrite:3", "native:4", "baseline:16"],
+    "p13": ["baseline:1", "native:1", "native:2", "baseline:4", "baseline:5", "native:3", "baseline:8", "baseline:9", "native:4", "native:5", "native:6", "baseline:14"],
+    "p14": ["baseline:1", "native:1", "native:2", "baseline:3", "baseline:4", "baseline:5", "native:3", "baseline:6", "baseline:7", "baseline:8", "native:4", "baseline:9", "baseline:10", "baseline:11", "baseline:12", "baseline:13", "baseline:14", "baseline:16"],
+    "p15": ["baseline:1", "native:1", "native:2", "baseline:3", "baseline:4", "focus:left-picture", "native:3", "baseline:5", "native:5", "native:6", "baseline:8", "baseline:9", "baseline:10", "baseline:11", "focus:right-picture", "native:4", "baseline:12", "baseline:15", "baseline:17", "baseline:18"],
+    "p16": ["baseline:1", "native:1", "baseline:2", "focus:left-picture", "native:2", "native:3", "baseline:4", "baseline:5", "baseline:7", "baseline:8", "baseline:9", "focus:right-picture", "native:4", "native:5", "baseline:11", "baseline:12", "baseline:13", "native:6", "baseline:15"],
+    "p17": ["baseline:1", "native:1", "baseline:2", "baseline:3", "baseline:4", "native:2", "baseline:5", "baseline:6", "baseline:7", "baseline:8", "baseline:9", "baseline:10", "baseline:11", "baseline:12", "baseline:13", "baseline:14", "baseline:15"],
+    "p18": ["baseline:1", "rewrite:1", "baseline:3", "native:2", "baseline:5", "baseline:6", "baseline:7", "baseline:8", "baseline:9", "baseline:10", "baseline:11", "baseline:12", "baseline:14", "rewrite:3", "baseline:16", "native:6", "baseline:17", "baseline:18"],
+    "p22": ["baseline:1", "native:1", "baseline:3", "native:2", "baseline:4", "baseline:5", "baseline:6", "baseline:7", "baseline:8", "baseline:9", "native:3", "baseline:10", "baseline:11", "native:5", "baseline:13", "rewrite:4", "baseline:14", "baseline:15", "baseline:16"]
+  },
+  "rewrites": {
+    "p02": {"5": {"say": "三点水像小水滴，提醒我们江字和水有关。", "reason": "避免说成字里有真的水。"}},
+    "p03": {
+      "9": {"say": "看莲的上面，是一个草字头。", "reason": "拼音已在画面，口播使用正常汉字。"}
+    },
+    "p07": {"3": {"say": "听清以后，拿起水波形的停顿标记。", "reason": "教师的操作目标是实际存在的水波标记。"}},
+    "p12": {"3": {"say": "看好了就点字卡，也可以把它拖进最后的格子。", "reason": "两种操作都由现有互动支持。"}},
+    "p18": {
+      "1": {"say": "再和这四个汉字朋友打个招呼。", "reason": "使用语文课堂的正式角色档案，不引入原生草稿的临时角色。"},
+      "3": {"say": "先用手指沿着淡色字形慢慢描。", "reason": "覆盖练习按字形，不要求完整笔顺。"}
+    },
+    "p22": {"4": {"say": "写字前先观察四个字的部件和位置。", "reason": "全课只教已核实的笔形，纸笔笔顺由家人观察。"}}
+  },
+  "writingIllustrations": {
+    "p15": ["diagram-grid-ke", "diagram-grid-ye"],
+    "p16": ["diagram-grid-dong", "diagram-grid-xi"]
+  },
+  "quiz": {
+    "p19": [
+      {"mode": "baseline_stem", "nativeReason": "原生题只问有水，并把带池塘的拍球图列为干扰；保留三点水与水义的关系，使用山路、树枝、洗手三种清楚图义。"},
+      {"mode": "native_stem", "nativeReason": "保留原生题对莲叶又多又密的提问，给出已登记的茂盛、稀疏和空水面图。"}
+    ],
+    "p20": [
+      {"mode": "baseline_stem", "nativeReason": "每幅图只有一艘船，题干问哪一幅。固定荷叶和纸船图元后按代码摆位。"},
+      {"mode": "baseline_stem", "nativeReason": "把原生稿倒置的参照关系改成小纸船在荷叶北边。固定荷叶和纸船图元后按代码摆位。"}
+    ],
+    "p21": [
+      {"mode": "baseline_stem", "nativeReason": "原生稿的拍球和打水仗都可能是玩耍，换用拍球、睡觉、洗手三个动作，只有一个正确选项。"},
+      {"mode": "baseline_stem", "nativeReason": "把原生稿缺失的两句听题材料补齐，用小鸟飞往两处的原创句子检验共同动作。"}
+    ]
+  },
+  "excludedNativeElements": {
+    "p03": "以采摘莲蓬作为采莲的情境例子。省去资料未教的花后发育知识，以及对原创新莲塘图中未显示的莲蓬特写的指认。",
+    "p09": "去掉超出本课的六个临时汉字，保留原生的中段休息和追鱼过渡。",
+    "p17": "原生稿使用滑杆，改接已验证的先辨笔形再拖小笔。按已核实的轨迹示范圆转和平收。",
+    "p18": "让老师说出画面上可见的圆箭头复位提示，避免假设按钮上写有清除。"
+  }
+}

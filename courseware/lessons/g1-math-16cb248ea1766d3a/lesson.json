@@ -1,0 +1,520 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "学习准备：上课前的小约定",
+  "description": "人教版一年级上册《学习准备》整课：按时参与，准备并摆整齐学具，学会倾听、举手和轮流表达。",
+  "grade": 1,
+  "roster": {
+    "math-teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher.png",
+      "color": "#D49142",
+      "persona": "耐心清楚的数学老师，用具体画面解释规则，边示范边说明原因，再请孩子尝试。"
+    }
+  },
+  "images": {
+    "class-ready": {
+      "file": "assets/class-ready.png"
+    },
+    "walk-class": {
+      "file": "assets/walk-class.png"
+    },
+    "keep-play": {
+      "file": "assets/keep-play.png"
+    },
+    "listen": {
+      "file": "assets/listen.png"
+    },
+    "raise-hand": {
+      "file": "assets/raise-hand.png"
+    },
+    "speak-turn": {
+      "file": "assets/speak-turn.png"
+    },
+    "math-book": {
+      "file": "assets/math-book.png"
+    },
+    "notebook": {
+      "file": "assets/notebook.png"
+    },
+    "pencil-case": {
+      "file": "assets/pencil-case.png"
+    },
+    "quiz-return": {
+      "file": "assets/quiz-return.png"
+    },
+    "quiz-stay": {
+      "file": "assets/quiz-stay.png"
+    },
+    "quiz-empty": {
+      "file": "assets/quiz-empty.png"
+    },
+    "quiz-prepared": {
+      "file": "assets/quiz-prepared.png"
+    },
+    "quiz-left": {
+      "file": "assets/quiz-left.png"
+    },
+    "quiz-right": {
+      "file": "assets/quiz-right.png"
+    },
+    "quiz-interrupt": {
+      "file": "assets/quiz-interrupt.png"
+    },
+    "quiz-wait": {
+      "file": "assets/quiz-wait.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "welcome",
+      "type": "slide",
+      "title": "上课前的小约定",
+      "template": "picture-points",
+      "data": {
+        "title": "学习准备",
+        "picture": "class-ready",
+        "points": [
+          "按时到，安静坐好",
+          "书本和文具准备好",
+          "轮流说，认真听"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你好，我是小数老师。"
+        },
+        {
+          "say": "今天，我们来学上课前的小约定。"
+        },
+        {
+          "say": "准备好了，上课时才能更专心。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一，跟着学校的信号安排活动。"
+        },
+        {
+          "say": "上课信号响了，就该回教室坐好。"
+        },
+        {
+          "say": "每所学校的时间表可能不同。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二，备好这一节课要用的用品。"
+        },
+        {
+          "say": "数学书、练习本和文具盒要摆整齐。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三，想说先举手，也要认真听。"
+        },
+        {
+          "say": "每个人都能说完，大家才听得清。"
+        },
+        {
+          "say": "我们一起把这些约定试一试。"
+        }
+      ]
+    },
+    {
+      "key": "bell",
+      "type": "interactive",
+      "title": "铃声里的约定",
+      "page": "bell",
+      "widgetType": "mira-learning-preparation-bell",
+      "startImage": "keep-play",
+      "script": [
+        {
+          "highlight": "#bell-signal"
+        },
+        {
+          "say": "铃声是学校提醒我们行动的信号。"
+        },
+        {
+          "say": "现在响的是开始上课的信号。"
+        },
+        {
+          "say": "刚才还在玩，也要把游戏先停下。"
+        },
+        {
+          "highlight": "#bell-route"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "老师先示范，平静地走回教室。"
+        },
+        {
+          "say": "回到座位，安静坐好，等着上课。"
+        },
+        {
+          "say": "这样不会耽误自己，也不影响别人。"
+        },
+        {
+          "highlight": "#bell-choices"
+        },
+        {
+          "say": "两张图里，孩子的行动不一样。"
+        },
+        {
+          "say": "一张回教室，一张还在操场玩。"
+        },
+        {
+          "say": "小满问：没有铃声时怎么办？"
+        },
+        {
+          "say": "可以查看本校的时间表，问老师。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        },
+        {
+          "say": "轮到你了，选出现在合适的行动。"
+        }
+      ]
+    },
+    {
+      "key": "desk",
+      "type": "interactive",
+      "title": "学具各就各位",
+      "page": "desk",
+      "widgetType": "mira-learning-preparation-desk",
+      "startImage": "class-ready",
+      "script": [
+        {
+          "highlight": "#desk-tray"
+        },
+        {
+          "say": "数学课前，要把需要的用品备齐。"
+        },
+        {
+          "say": "这里有数学书、练习本和文具盒。"
+        },
+        {
+          "highlight": "#desk-seat"
+        },
+        {
+          "say": "画面下边，是你坐的位置。"
+        },
+        {
+          "say": "找一找自己左手边是哪一边。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "highlight": "#desk-stack"
+        },
+        {
+          "say": "这次先把数学书放在桌子左上角。"
+        },
+        {
+          "say": "再把练习本叠在数学书的上面。"
+        },
+        {
+          "say": "书和本靠在一起，桌面就整齐了。"
+        },
+        {
+          "highlight": "#desk-case"
+        },
+        {
+          "say": "文具盒放在自己身体的正前方。"
+        },
+        {
+          "say": "用品不散乱，取用时才方便。"
+        },
+        {
+          "say": "摆放要听老师要求，不只摆这一种。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        },
+        {
+          "say": "现在照着示范，把三样用品摆好。"
+        },
+        {
+          "say": "可以拖过去，也能先点用品再点位置。"
+        },
+        {
+          "say": "摆完后，把它们的位置说给家人听。"
+        }
+      ]
+    },
+    {
+      "key": "turn",
+      "type": "interactive",
+      "title": "让每个人把话说完",
+      "page": "turn",
+      "widgetType": "mira-learning-preparation-turn",
+      "startImage": "listen",
+      "script": [
+        {
+          "highlight": "#turn-cards"
+        },
+        {
+          "say": "同桌正在讲想法，我们先认真听。"
+        },
+        {
+          "say": "不打断，才能知道他想说什么。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "highlight": "#turn-slot-1"
+        },
+        {
+          "say": "第一步，让同学把话完整说完。"
+        },
+        {
+          "highlight": "#turn-slot-2"
+        },
+        {
+          "say": "自己想补充时，先举手等一等。"
+        },
+        {
+          "say": "小满问：举手就能马上说吗？"
+        },
+        {
+          "say": "还不可以，要等老师点到自己。"
+        },
+        {
+          "highlight": "#turn-slot-3"
+        },
+        {
+          "say": "轮到自己，再清楚地说出想法。"
+        },
+        {
+          "say": "声音让同伴听清就好，不用喊。"
+        },
+        {
+          "say": "小组交流时，也要先听清老师要求。"
+        },
+        {
+          "say": "围绕要说的事情，轮流讲，认真听。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        },
+        {
+          "say": "把这三个动作，按先后顺序排好。"
+        },
+        {
+          "say": "先听完，再举手等待，点到后说。"
+        }
+      ]
+    },
+    {
+      "key": "check",
+      "type": "quiz",
+      "title": "看看这些新情境",
+      "intro": [
+        "听老师的问题，看图片选一选。",
+        "这些情境和刚才的画面不一样。",
+        "慢慢想，每道题只有一个合适答案。"
+      ],
+      "questions": [
+        {
+          "id": "prep-q1",
+          "question": "绘画课铃响了，女孩该做什么？",
+          "skill": "守时与活动信号",
+          "answer": [
+            "A"
+          ],
+          "analysis": "上课信号提醒开始上课，应停下游戏，平静回到相应教室做好准备。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-return",
+                "alt": "女孩平静走进绘画教室"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stay",
+                "alt": "女孩继续在游戏区玩滑梯"
+              }
+            }
+          }
+        },
+        {
+          "id": "prep-q2",
+          "question": "数学课快开始了，哪桌准备好了？",
+          "skill": "课前学具准备",
+          "answer": [
+            "B"
+          ],
+          "analysis": "准备好的桌面上有数学书、练习本和文具盒，并摆放整齐；空桌还没有准备。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-empty",
+                "alt": "桌面空着，书包合上"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-prepared",
+                "alt": "桌面有整齐的数学书、练习本和文具盒"
+              }
+            }
+          }
+        },
+        {
+          "id": "prep-q3",
+          "question": "从座位看，哪张图书在左、笔盒在右？",
+          "skill": "从自己位置描述学具左右",
+          "answer": [
+            "A"
+          ],
+          "analysis": "以画面下方学生的座位为方向，左边放书、右边放文具盒的图片符合要求。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-left",
+                "alt": "从座位方向看，左边是书，右边是文具盒"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-right",
+                "alt": "从座位方向看，右边是书，左边是文具盒"
+              }
+            }
+          }
+        },
+        {
+          "id": "prep-q4",
+          "question": "图书角里同学正在说，怎样做合适？",
+          "skill": "有序倾听与发言",
+          "answer": [
+            "B"
+          ],
+          "analysis": "同学正在发言时应认真倾听，不打断；有想法等他说完再按要求表达。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-interrupt",
+                "alt": "女孩在男孩还没有说完时抢着说"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wait",
+                "alt": "女孩安静倾听，等待男孩把话说完"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "remember",
+      "type": "slide",
+      "title": "把约定带到明天",
+      "template": "summary",
+      "data": {
+        "title": "我们学了哪些准备？",
+        "items": [
+          "按信号，准时回教室",
+          "书、本、文具盒摆整齐",
+          "先听完，举手等点到再说",
+          "回家聊一项作息变化"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天，我们认识了三类学习准备。"
+        },
+        {
+          "say": "第一，听信号，看本校的时间安排。"
+        },
+        {
+          "say": "该上课时，平静回教室，安静坐好。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "第二，备齐用品，并按要求摆整齐。"
+        },
+        {
+          "say": "能说出用品在哪里，也是一种表达。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "第三，让别人说完，再举手等待。"
+        },
+        {
+          "say": "等老师点到，清楚说出自己的想法。"
+        },
+        {
+          "say": "小组交流，要围绕要求，轮流来说。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家请家人看看你的学校时间表。"
+        },
+        {
+          "say": "和幼儿园相比，有哪一项不一样？"
+        },
+        {
+          "say": "再摆一次真学具，把位置说给家人听。"
+        },
+        {
+          "say": "实际做到没有，还需要家人观察。"
+        }
+      ]
+    }
+  ]
+}

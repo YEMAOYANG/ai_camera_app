@@ -1,0 +1,742 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "slug": "swu-math-g1-upper-recognize0to9",
+    "editionId": "smartedu-math-six-year-g1-upper-3e6eb324",
+    "revisionId": "directory-2afc775be6bf98e9828f0115",
+    "nodeId": "635c7531-f375-4b6b-91fb-7bf4f11d7b2e",
+    "unitId": "78fd8d21-1807-4bf4-ba13-d96f6c69146f",
+    "unitTitle": "第一单元 0-9的认识",
+    "lessonTitle": "认识0-9",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "classHour": "integrated_all",
+    "teachingRevision": "1",
+    "classHours": [
+      "lesson_1",
+      "lesson_2",
+      "lesson_3",
+      "lesson_4",
+      "lesson_5",
+      "lesson_6"
+    ],
+    "printedPages": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "pdfPages": [
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26
+    ]
+  },
+  "goalBasis": "依据准确版本的六个官方课时四类文档完整审读，原创归纳一门课的六项目标。",
+  "goals": [
+    "认识、读出和用1表示单件或按一个整体计数，能说明在数哪个单位。",
+    "逐个或按明确分组正确计数2—9，不重不漏，能把实际数量、点片和数字对应，并用添一理解相邻数。",
+    "观察田字格位置及写法范形，认读0—9，按清楚的起点和方向示范写法，纸笔表现请成人观察。",
+    "用实物把2—9分为两个非空部分再合回总数，按序移动一件记录不同分法，理解交换两部分总数不变和相同部分无需重复记录。",
+    "在具体情境区分0表示没有和0表示测量起点，能从0到9正数、从9到0倒数并补缺位。",
+    "发现数量逐一变化和从0逐二变化的规律，会把1—9件物体两两配对判断单数双数，能在生活中举例。"
+  ],
+  "goalMap": [
+    {
+      "id": "counting_unit",
+      "goal": "认识、读出和用1表示单件或按一个整体计数，能说明在数哪个单位。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "count_and_next",
+      "goal": "逐个或按明确分组正确计数2—9，不重不漏，能把实际数量、点片和数字对应，并用添一理解相邻数。",
+      "officialHourId": "lesson_2"
+    },
+    {
+      "id": "read_and_write",
+      "goal": "观察田字格位置及写法范形，认读0—9，按清楚的起点和方向示范写法，纸笔表现请成人观察。",
+      "officialHourId": "lesson_3"
+    },
+    {
+      "id": "split_and_join",
+      "goal": "用实物把2—9分为两个非空部分再合回总数，按序移动一件记录不同分法，理解交换两部分总数不变和相同部分无需重复记录。",
+      "officialHourId": "lesson_4"
+    },
+    {
+      "id": "zero_and_order",
+      "goal": "在具体情境区分0表示没有和0表示测量起点，能从0到9正数、从9到0倒数并补缺位。",
+      "officialHourId": "lesson_5"
+    },
+    {
+      "id": "group_in_pairs",
+      "goal": "发现数量逐一变化和从0逐二变化的规律，会把1—9件物体两两配对判断单数双数，能在生活中举例。",
+      "officialHourId": "lesson_6"
+    }
+  ],
+  "keyPoint": "经历由实物数量到数字表示，能在计数、排序、分合和零的语境中解释自己如何验证。",
+  "difficultPoint": "区分所数单位、总数与部分，保持总量时一个部分添1另一个少1，固定一部分时让另一部分随总量变化，结合图和实物有序验证。",
+  "pageSequence": [
+    {
+      "page": 1,
+      "key": "p01",
+      "type": "slide",
+      "title": "数数工坊",
+      "play": "以封面交代任务，再切到可精确数的图。明确数一件或数一组以前，要先说数的是什么。",
+      "goalIds": [
+        "counting_unit"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "cover-counting-workshop",
+        "counting-unit"
+      ]
+    },
+    {
+      "page": 2,
+      "key": "p02",
+      "type": "interactive",
+      "title": "一次数一个单位",
+      "play": "孩子切换单件与按组的计数单位并点选。高亮组边界，数记号与计数单位一一对应。",
+      "goalIds": [
+        "counting_unit"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "counting-unit"
+      ]
+    },
+    {
+      "page": 3,
+      "key": "p03",
+      "type": "slide",
+      "title": "添一后是下一个数",
+      "play": "用实际数量、记号和数字三层一一对应，示范在原有数量上只添一件后怎样读下一数。",
+      "goalIds": [
+        "count_and_next"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "one-more",
+        "quantity-to-digit"
+      ]
+    },
+    {
+      "page": 4,
+      "key": "p04",
+      "type": "interactive",
+      "title": "把数和数量配上",
+      "play": "孩子逐个标记后把数量和数字配对，或移入一件验证新数量。点过的东西要能区分。",
+      "goalIds": [
+        "count_and_next"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "quantity-to-digit",
+        "one-more"
+      ]
+    },
+    {
+      "page": 5,
+      "key": "p05",
+      "type": "slide",
+      "title": "小数量的两部分",
+      "play": "用2—5件实物展示两个非空部分，再合回原总数。先看两部分从哪里来，再说总数为何保持。",
+      "goalIds": [
+        "split_and_join"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "split-join"
+      ]
+    },
+    {
+      "page": 6,
+      "key": "p06",
+      "type": "slide",
+      "title": "辨认写法和格子位置",
+      "play": "用官方核准范形展示1—5，老师逐个聚光后分句示范起笔和形状。需要分屏时由 OpenMAIC 拆分。",
+      "goalIds": [
+        "read_and_write"
+      ],
+      "officialHourIds": [
+        "lesson_1",
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "digit-grid"
+      ]
+    },
+    {
+      "page": 7,
+      "key": "p07",
+      "type": "slide",
+      "title": "从6数到9",
+      "play": "分别呈现直列、环形的清楚计数起点。用不同路线数同样的物品，始终一件一个标记。",
+      "goalIds": [
+        "count_and_next"
+      ],
+      "officialHourIds": [
+        "lesson_3"
+      ],
+      "visualRoles": [
+        "ordered-count"
+      ]
+    },
+    {
+      "page": 8,
+      "key": "p08",
+      "type": "interactive",
+      "title": "圈起来不重数",
+      "play": "孩子先标起点再逐个数。环形最后一个物件标完便停，改变排列后验证总数。",
+      "goalIds": [
+        "count_and_next"
+      ],
+      "officialHourIds": [
+        "lesson_3"
+      ],
+      "visualRoles": [
+        "ordered-count"
+      ]
+    },
+    {
+      "page": 9,
+      "key": "p09",
+      "type": "slide",
+      "title": "格子里的6到9",
+      "play": "对照官方范形展示起点、方向和收笔，区分6与9的圈；可以拆屏，保留真实纸笔表现待成人观察。",
+      "goalIds": [
+        "read_and_write"
+      ],
+      "officialHourIds": [
+        "lesson_3"
+      ],
+      "visualRoles": [
+        "digit-grid"
+      ]
+    },
+    {
+      "page": 10,
+      "key": "p10",
+      "type": "slide",
+      "title": "两边怎么分有次序",
+      "play": "固定总数，只移动一件，观察一边少一而另一边多一。交换左右保持总数，相同两部分不重复记录。",
+      "goalIds": [
+        "split_and_join"
+      ],
+      "officialHourIds": [
+        "lesson_4"
+      ],
+      "visualRoles": [
+        "split-join"
+      ]
+    },
+    {
+      "page": 11,
+      "key": "p11",
+      "type": "interactive",
+      "title": "移动一件找下一种分法",
+      "play": "用两个能看清边界的区域和可移动物品，孩子选择下一步并复核全部物品。避免重复加上已经在整体内的部分。",
+      "goalIds": [
+        "split_and_join"
+      ],
+      "officialHourIds": [
+        "lesson_4"
+      ],
+      "visualRoles": [
+        "split-join"
+      ]
+    },
+    {
+      "page": 12,
+      "key": "p12",
+      "type": "slide",
+      "title": "没有和起点都能用到0",
+      "play": "用清空后的真实空位和从0开始的等距刻度两个场景区分语义。需要拆屏时单独示范0的闭合写法。",
+      "goalIds": [
+        "zero_and_order",
+        "read_and_write"
+      ],
+      "officialHourIds": [
+        "lesson_5"
+      ],
+      "visualRoles": [
+        "zero-meaning",
+        "number-line",
+        "digit-grid"
+      ]
+    },
+    {
+      "page": 13,
+      "key": "p13",
+      "type": "interactive",
+      "title": "在有序位置找空缺",
+      "play": "让孩子沿稳定刻度正数或倒数，再把数字移入正确空位。0是最左刻度，保持固定间距。",
+      "goalIds": [
+        "zero_and_order"
+      ],
+      "officialHourIds": [
+        "lesson_5"
+      ],
+      "visualRoles": [
+        "number-line"
+      ]
+    },
+    {
+      "page": 14,
+      "key": "p14",
+      "type": "slide",
+      "title": "总数固定与一边固定",
+      "play": "用可见的实体操作对照两个情形，先说明什么保持，再追踪谁增减。用情境判断规则，避免提前教下一课。",
+      "goalIds": [
+        "split_and_join",
+        "zero_and_order"
+      ],
+      "officialHourIds": [
+        "lesson_4",
+        "lesson_6"
+      ],
+      "visualRoles": [
+        "split-join",
+        "fixed-part"
+      ]
+    },
+    {
+      "page": 15,
+      "key": "p15",
+      "type": "slide",
+      "title": "每次添二和两两配对",
+      "play": "用清楚的组边界展现从0逐二变化，再用新的对象两两配对找有没有落单。",
+      "goalIds": [
+        "group_in_pairs"
+      ],
+      "officialHourIds": [
+        "lesson_6"
+      ],
+      "visualRoles": [
+        "pairing"
+      ]
+    },
+    {
+      "page": 16,
+      "key": "p16",
+      "type": "interactive",
+      "title": "两件一组找落单",
+      "play": "孩子配组后观察剩余一件或没有剩余，比较一次添一和添二的可见变化。",
+      "goalIds": [
+        "group_in_pairs"
+      ],
+      "officialHourIds": [
+        "lesson_6"
+      ],
+      "visualRoles": [
+        "pairing"
+      ]
+    },
+    {
+      "page": 17,
+      "key": "p17",
+      "type": "quiz",
+      "title": "选择符合指定计数单位的图",
+      "play": "OpenMAIC 创作新情境的单题图片检查并给出可回看的解析。",
+      "goalIds": [
+        "counting_unit"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "counting-unit"
+      ],
+      "questionIds": [
+        "q1-count-unit"
+      ]
+    },
+    {
+      "page": 18,
+      "key": "p18",
+      "type": "quiz",
+      "title": "在新排列中逐个计数",
+      "play": "OpenMAIC 创作新情境的单题图片检查并给出可回看的解析。",
+      "goalIds": [
+        "count_and_next"
+      ],
+      "officialHourIds": [
+        "lesson_2",
+        "lesson_3"
+      ],
+      "visualRoles": [
+        "ordered-count",
+        "quantity-to-digit"
+      ],
+      "questionIds": [
+        "q2-count-layout"
+      ]
+    },
+    {
+      "page": 19,
+      "key": "p19",
+      "type": "quiz",
+      "title": "添一后选新数量图",
+      "play": "OpenMAIC 创作新情境的单题图片检查并给出可回看的解析。",
+      "goalIds": [
+        "count_and_next"
+      ],
+      "officialHourIds": [
+        "lesson_2",
+        "lesson_3"
+      ],
+      "visualRoles": [
+        "one-more"
+      ],
+      "questionIds": [
+        "q3-next-number"
+      ]
+    },
+    {
+      "page": 20,
+      "key": "p20",
+      "type": "quiz",
+      "title": "从新格子图辨认被读出的数字",
+      "play": "OpenMAIC 创作新情境的单题图片检查并给出可回看的解析。",
+      "goalIds": [
+        "read_and_write"
+      ],
+      "officialHourIds": [
+        "lesson_3",
+        "lesson_5"
+      ],
+      "visualRoles": [
+        "digit-grid"
+      ],
+      "questionIds": [
+        "q4-glyph"
+      ]
+    },
+    {
+      "page": 21,
+      "key": "p21",
+      "type": "quiz",
+      "title": "由总数和一部分判断另一部分",
+      "play": "OpenMAIC 创作新情境的单题图片检查并给出可回看的解析。",
+      "goalIds": [
+        "split_and_join"
+      ],
+      "officialHourIds": [
+        "lesson_2",
+        "lesson_4"
+      ],
+      "visualRoles": [
+        "split-join"
+      ],
+      "questionIds": [
+        "q5-split-join"
+      ]
+    },
+    {
+      "page": 22,
+      "key": "p22",
+      "type": "quiz",
+      "title": "从新情境图区分没有与起点",
+      "play": "OpenMAIC 创作新情境的单题图片检查并给出可回看的解析。",
+      "goalIds": [
+        "zero_and_order"
+      ],
+      "officialHourIds": [
+        "lesson_5"
+      ],
+      "visualRoles": [
+        "zero-meaning",
+        "number-line"
+      ],
+      "questionIds": [
+        "q6-zero"
+      ]
+    },
+    {
+      "page": 23,
+      "key": "p23",
+      "type": "quiz",
+      "title": "在未练过的等距刻度排列补位",
+      "play": "OpenMAIC 创作新情境的单题图片检查并给出可回看的解析。",
+      "goalIds": [
+        "zero_and_order"
+      ],
+      "officialHourIds": [
+        "lesson_5",
+        "lesson_6"
+      ],
+      "visualRoles": [
+        "number-line"
+      ],
+      "questionIds": [
+        "q7-order"
+      ]
+    },
+    {
+      "page": 24,
+      "key": "p24",
+      "type": "quiz",
+      "title": "在新数量图找成对或落单",
+      "play": "OpenMAIC 创作新情境的单题图片检查并给出可回看的解析。",
+      "goalIds": [
+        "group_in_pairs"
+      ],
+      "officialHourIds": [
+        "lesson_6"
+      ],
+      "visualRoles": [
+        "pairing"
+      ],
+      "questionIds": [
+        "q8-pairs"
+      ]
+    },
+    {
+      "page": 25,
+      "key": "p25",
+      "type": "slide",
+      "title": "回顾数数的方法",
+      "play": "老师带孩子回顾单位、计数、认读写、分合、零和数序、配对落单；按实际观察说明纸笔与口述的后续练习。",
+      "goalIds": [
+        "counting_unit",
+        "count_and_next",
+        "read_and_write",
+        "split_and_join",
+        "zero_and_order",
+        "group_in_pairs"
+      ],
+      "officialHourIds": [
+        "lesson_1",
+        "lesson_2",
+        "lesson_3",
+        "lesson_4",
+        "lesson_5",
+        "lesson_6"
+      ],
+      "visualRoles": [
+        "quantity-to-digit",
+        "split-join",
+        "number-line",
+        "pairing"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1-count-unit",
+      "page": 17,
+      "skill": "counting_unit",
+      "target": "选择符合指定计数单位的图",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "counting-unit"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q2-count-layout",
+      "page": 18,
+      "skill": "count_and_next",
+      "target": "在新排列中逐个计数",
+      "officialHourIds": [
+        "lesson_2",
+        "lesson_3"
+      ],
+      "visualRoles": [
+        "ordered-count",
+        "quantity-to-digit"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q3-next-number",
+      "page": 19,
+      "skill": "count_and_next",
+      "target": "添一后选新数量图",
+      "officialHourIds": [
+        "lesson_2",
+        "lesson_3"
+      ],
+      "visualRoles": [
+        "one-more"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q4-glyph",
+      "page": 20,
+      "skill": "read_and_write",
+      "target": "从新格子图辨认被读出的数字",
+      "officialHourIds": [
+        "lesson_3",
+        "lesson_5"
+      ],
+      "visualRoles": [
+        "digit-grid"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q5-split-join",
+      "page": 21,
+      "skill": "split_and_join",
+      "target": "由总数和一部分判断另一部分",
+      "officialHourIds": [
+        "lesson_2",
+        "lesson_4"
+      ],
+      "visualRoles": [
+        "split-join"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q6-zero",
+      "page": 22,
+      "skill": "zero_and_order",
+      "target": "从新情境图区分没有与起点",
+      "officialHourIds": [
+        "lesson_5"
+      ],
+      "visualRoles": [
+        "zero-meaning",
+        "number-line"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q7-order",
+      "page": 23,
+      "skill": "zero_and_order",
+      "target": "在未练过的等距刻度排列补位",
+      "officialHourIds": [
+        "lesson_5",
+        "lesson_6"
+      ],
+      "visualRoles": [
+        "number-line"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q8-pairs",
+      "page": 24,
+      "skill": "group_in_pairs",
+      "target": "在新数量图找成对或落单",
+      "officialHourIds": [
+        "lesson_6"
+      ],
+      "visualRoles": [
+        "pairing"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    }
+  ],
+  "afterClass": {
+    "official": [
+      {
+        "classHourId": "lesson_1",
+        "sourcePageRefs": [
+          "lesson_1:1"
+        ],
+        "officialPurpose": [
+          "第1课时：第1页分别描述单件和按整体计数的物品，描写1，用歌曲或家庭口述讲数字故事。"
+        ],
+        "originalPracticeDirection": "在家选一个物品和一个整体单位，分别计数后口述理由。"
+      },
+      {
+        "classHourId": "lesson_2",
+        "sourcePageRefs": [
+          "lesson_2:1",
+          "lesson_2:2"
+        ],
+        "officialPurpose": [
+          "第2课时：第1页看图数、写2—5、把5分为两堆再探索三堆；第2页用绘画做数字故事。"
+        ],
+        "originalPracticeDirection": "用2—5件实物配数字，在田字格描写并说出一种分法。"
+      },
+      {
+        "classHourId": "lesson_3",
+        "sourcePageRefs": [
+          "lesson_3:1"
+        ],
+        "officialPurpose": [
+          "第3课时：第1页数量与6—9连线，按圈选的数量记录，在给定数量下补图。"
+        ],
+        "originalPracticeDirection": "先数新排列的6—9件物品，再任选相应数字在纸上试写。"
+      },
+      {
+        "classHourId": "lesson_4",
+        "sourcePageRefs": [
+          "lesson_4:1",
+          "lesson_4:2"
+        ],
+        "officialPurpose": [
+          "第4课时：第1页摆一摆并说9的分合，以数卡描述生活；第2页补分合图，数两色方格并检查各行总数保持9。"
+        ],
+        "originalPracticeDirection": "固定6—9中的一个总数，用两只盘分放并按序记录不同分法。"
+      },
+      {
+        "classHourId": "lesson_5",
+        "sourcePageRefs": [
+          "lesson_5:1",
+          "lesson_5:2"
+        ],
+        "officialPurpose": [
+          "第5课时：第1页辨认有珠和无珠、补顺数和跳数；第2页数点并补连续添1和从0每次添2的变化。"
+        ],
+        "originalPracticeDirection": "找一个表示没有和一个表示起点的0，口头练习正数、倒数与补位。"
+      },
+      {
+        "classHourId": "lesson_6",
+        "sourcePageRefs": [
+          "lesson_6:1"
+        ],
+        "officialPurpose": [
+          "第6课时：第1页给总量且观察一只手猜另一只手数量，改变已知部分并验证；以数字小报表达所学。"
+        ],
+        "originalPracticeDirection": "在生活中找能两两配对或留一件的情境，摆放后说明结果。"
+      }
+    ],
+    "inLesson": "把课后练习的能力点映射到对应讲解、操作及小检查，实际家庭观察写待观察。",
+    "weekly": "六项目标和本课已验收的 skill 作题源；由学过的课程共同形成周末变式题包。"
+  },
+  "assessmentBoundary": "平台记录实际听、选、拖、配对；书写规范、口头说明等由成人观察，未观察时记待观察。",
+  "authoring": {
+    "status": "generation-brief",
+    "formalBodyProducer": "OpenMAIC/DeepSeek",
+    "pageSequenceIsGuidance": true,
+    "automaticImageGeneration": false,
+    "formalImageProducer": "Codex",
+    "questionsLockedBeforeGeneration": false
+  }
+}

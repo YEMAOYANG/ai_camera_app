@@ -1,0 +1,883 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "植物长在哪里",
+  "description": "教科版一年级上册完整课：比较植物环境、地上地下、人工无土栽培与长期观察计划。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/ke-science-v1.png",
+      "color": "#4B8B67",
+      "persona": "温和好奇的科学老师，先观察再比较，只说有证据的发现。"
+    }
+  },
+  "images": {
+    "garden": {
+      "file": "assets/garden.png"
+    },
+    "pot": {
+      "file": "assets/pot.png"
+    },
+    "hill": {
+      "file": "assets/hill.png"
+    },
+    "cutaway": {
+      "file": "assets/cutaway.png"
+    },
+    "pond": {
+      "file": "assets/pond.png"
+    },
+    "culture": {
+      "file": "assets/culture.png"
+    },
+    "seed-setup": {
+      "file": "assets/seed-setup.png"
+    },
+    "quiz-soil": {
+      "file": "assets/quiz-soil.png"
+    },
+    "quiz-water": {
+      "file": "assets/quiz-water.png"
+    },
+    "quiz-culture": {
+      "file": "assets/quiz-culture.png"
+    },
+    "quiz-root": {
+      "file": "assets/quiz-root.png"
+    },
+    "quiz-leaf": {
+      "file": "assets/quiz-leaf.png"
+    },
+    "quiz-flower": {
+      "file": "assets/quiz-flower.png"
+    },
+    "quiz-record": {
+      "file": "assets/quiz-record.png"
+    },
+    "quiz-pull": {
+      "file": "assets/quiz-pull.png"
+    },
+    "quiz-play": {
+      "file": "assets/quiz-play.png"
+    },
+    "seed-count-a": {
+      "file": "assets/seed-count-a.png"
+    },
+    "seed-count-b": {
+      "file": "assets/seed-count-b.png"
+    },
+    "seed-count-c": {
+      "file": "assets/seed-count-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "植物的住处",
+      "template": "picture-points",
+      "data": {
+        "title": "植物的住处",
+        "picture": "garden",
+        "points": [
+          "看植物周围",
+          "连着看接触处",
+          "只说看见的"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我是小科老师，今天一起找植物的住处。"
+        },
+        {
+          "say": "有的植物在花盆，有的长在山坡。"
+        },
+        {
+          "say": "观察时，不能只盯着好看的花。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把眼光移到植物和地面接触的地方。"
+        },
+        {
+          "say": "花坛里，植物周围常能看见土壤。"
+        },
+        {
+          "say": "住处不同，植物的样子也可能不同。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先看清楚，再把发现说给大人听。"
+        },
+        {
+          "say": "我们只说图中看见的，不猜没看见的。"
+        },
+        {
+          "say": "爱护植物，观察时不随意拔起它。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "把土壤找出来",
+      "page": "soil",
+      "widgetType": "game",
+      "startImage": "garden",
+      "script": [
+        {
+          "highlight": "#observation-picture"
+        },
+        {
+          "say": "这三处植物长在不同的陆地环境里。"
+        },
+        {
+          "say": "先看花坛，沿着植物往下找接触处。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "棕色的土壤在植株周围，并不是天空。"
+        },
+        {
+          "say": "发现土的位置，观察镜就会留下来。"
+        },
+        {
+          "annotate": "#observation-picture",
+          "content": "先看见，再比较"
+        },
+        {
+          "say": "盆栽的土在盆口里面，要和盆壁分开。"
+        },
+        {
+          "say": "山坡也有土，我们只找图片看得见的土。"
+        },
+        {
+          "setState": {
+            "practice": true
+          }
+        },
+        {
+          "say": "每幅图有三个观察圈，点一处试试。"
+        },
+        {
+          "say": "点错不用急，回到植物的基部再找。"
+        },
+        {
+          "say": "图片没打开时，可以点转圈箭头重试。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "地上和地下连着看",
+      "template": "picture-points",
+      "data": {
+        "title": "地上和地下连着看",
+        "picture": "cutaway",
+        "points": [
+          "同一株植物",
+          "地面上有叶",
+          "地面下有根"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "剖面图像把土切开，帮助我们看地下。"
+        },
+        {
+          "say": "画面上和下，连着的是同一株植物。"
+        },
+        {
+          "say": "不能把旁边别株的根随便接过来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "地面线以上，能看见绿色的叶子。"
+        },
+        {
+          "say": "沿着这一株往下看，下面还有部分。"
+        },
+        {
+          "say": "只看地上的照片，地下暂时看不到。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这张图把地下画出来，根扎在土中。"
+        },
+        {
+          "say": "用地面线作比较，才能分清上和下。"
+        },
+        {
+          "say": "看图定位，不等于已经挖开真实植物。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "沿着同一株寻找",
+      "page": "parts",
+      "widgetType": "game",
+      "startImage": "cutaway",
+      "script": [
+        {
+          "highlight": "#observation-picture"
+        },
+        {
+          "say": "这次只研究同一株，别换到别的植物。"
+        },
+        {
+          "say": "先看横着的地面线，线把上下分开。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "绿色的叶子在地上，根伸在地下。"
+        },
+        {
+          "say": "老师先沿着植物，从叶子找到地下。"
+        },
+        {
+          "annotate": "#observation-picture",
+          "content": "先看见，再比较"
+        },
+        {
+          "say": "找根的时候，要看土里分枝的那部分。"
+        },
+        {
+          "say": "棕土是周围的环境，不要把土全叫根。"
+        },
+        {
+          "setState": {
+            "practice": true
+          }
+        },
+        {
+          "say": "听每一关的问题，再点相应的观察圈。"
+        },
+        {
+          "say": "镜框会跟着你的选择，错了还能再看。"
+        },
+        {
+          "say": "图片没打开时，可以点转圈箭头重试。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "土壤小检查",
+      "intro": [
+        "听老师读题，再看看图片。",
+        "错了也可以重新观察。"
+      ],
+      "questions": [
+        {
+          "id": "q-soil",
+          "question": "哪幅图能直接看见植物周围的土壤？",
+          "skill": "陆地植物与土壤",
+          "answer": [
+            "A"
+          ],
+          "analysis": "木箱口露出土壤；水面图看不到水下有没有土。",
+          "options": {
+            "A": {
+              "label": "土中植物",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-soil",
+                "alt": "土中植物"
+              }
+            },
+            "B": {
+              "label": "池塘植物",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-water",
+                "alt": "池塘植物"
+              }
+            },
+            "C": {
+              "label": "人工栽培",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-culture",
+                "alt": "人工栽培"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-root",
+          "question": "哪张图展示植物在地面下面的根？",
+          "skill": "地上地下的位置",
+          "answer": [
+            "B"
+          ],
+          "analysis": "分枝的根在地下的土中，叶和花是地上的部分。",
+          "options": {
+            "A": {
+              "label": "叶",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-leaf",
+                "alt": "叶"
+              }
+            },
+            "B": {
+              "label": "地下的根",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-root",
+                "alt": "地下的根"
+              }
+            },
+            "C": {
+              "label": "花",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flower",
+                "alt": "花"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "水中也是住处",
+      "template": "two-columns",
+      "data": {
+        "title": "水中也是住处",
+        "left": {
+          "heading": "花坛这一株",
+          "body": "看周围，也看叶子"
+        },
+        "right": {
+          "heading": "池塘这一株",
+          "body": "先比较看得见的"
+        },
+        "left_picture": "garden",
+        "right_picture": "pond"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "两幅图放在一起，先比较植物的周围。"
+        },
+        {
+          "say": "花坛这张，植株旁边看得见土地。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "池塘这张，叶子周围是大片水面。"
+        },
+        {
+          "say": "植物可以生长在不同的环境中。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "再看样子，花坛这株的叶沿着枝条长。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "池塘这株，圆圆的叶子贴近水面铺开。"
+        },
+        {
+          "say": "这是图里两株的差别，不代表所有植物。"
+        },
+        {
+          "say": "比较时选同一件事，把发现说给大人听。"
+        },
+        {
+          "say": "水面下面没画出来，我们暂时看不到。"
+        },
+        {
+          "say": "不能因为看不到，就直接说水下没有土。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "植物环境观察台",
+      "page": "sort",
+      "widgetType": "game",
+      "startImage": "pond",
+      "script": [
+        {
+          "highlight": "#observation-picture"
+        },
+        {
+          "say": "观察台有土地栏和水面栏，用图来比较。"
+        },
+        {
+          "say": "先看照片里，植物周围是什么环境。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "花坛和盆栽的植物，周围能看到土。"
+        },
+        {
+          "say": "池塘那张，植物周围是连着的水面。"
+        },
+        {
+          "annotate": "#observation-picture",
+          "content": "先看见，再比较"
+        },
+        {
+          "say": "把图片放进合适的栏，就能并排比较。"
+        },
+        {
+          "say": "拖不方便，可以先点图片再点观察栏。"
+        },
+        {
+          "setState": {
+            "practice": true
+          }
+        },
+        {
+          "say": "放错时图片会回来，先观察周围的线索。"
+        },
+        {
+          "say": "我们只分这些照片，不给所有植物下结论。"
+        },
+        {
+          "say": "图片没打开时，可以点转圈箭头重试。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "人工搭建的新环境",
+      "template": "picture-points",
+      "data": {
+        "title": "人工搭建的新环境",
+        "picture": "culture",
+        "points": [
+          "人工支撑植物",
+          "使用营养液",
+          "需要适宜环境"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "有些植物也能用人工无土栽培的办法种。"
+        },
+        {
+          "say": "看看支撑架，它托着上面的植物。"
+        },
+        {
+          "say": "根下面不是土，而是人工准备的营养液。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "营养液是栽培用的，不能当作普通清水。"
+        },
+        {
+          "say": "这不是说，任何植物放水里都能养好。"
+        },
+        {
+          "say": "这里介绍方法，不请孩子自己配营养液。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "不同植物需要适宜的生长环境。"
+        },
+        {
+          "say": "观察陆地、水中和人工栽培，要看具体条件。"
+        },
+        {
+          "say": "不能用一种植物的住处代替所有植物。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "环境小检查",
+      "intro": [
+        "听老师读题，再看看图片。",
+        "错了也可以重新观察。"
+      ],
+      "questions": [
+        {
+          "id": "q-water",
+          "question": "哪幅图里，叶子贴着大片水面？",
+          "skill": "观察水中环境",
+          "answer": [
+            "C"
+          ],
+          "analysis": "圆叶贴着大片水面，另外两幅画的是木箱和人工栽培罐。",
+          "options": {
+            "A": {
+              "label": "木箱",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-soil",
+                "alt": "木箱"
+              }
+            },
+            "B": {
+              "label": "栽培罐",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-culture",
+                "alt": "栽培罐"
+              }
+            },
+            "C": {
+              "label": "池塘",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-water",
+                "alt": "池塘"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-culture",
+          "question": "哪幅图是用营养液的人工无土栽培装置？",
+          "skill": "人工无土栽培",
+          "answer": [
+            "A"
+          ],
+          "analysis": "人工罐有支撑，根接触栽培液，没有种在土中。",
+          "options": {
+            "A": {
+              "label": "人工装置",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-culture",
+                "alt": "人工装置"
+              }
+            },
+            "B": {
+              "label": "池塘",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-water",
+                "alt": "池塘"
+              }
+            },
+            "C": {
+              "label": "土箱",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-soil",
+                "alt": "土箱"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "绿豆观察先做计划",
+      "template": "picture-points",
+      "data": {
+        "title": "绿豆观察先做计划",
+        "picture": "seed-setup",
+        "points": [
+          "两组种子同样多",
+          "土和纸分别放",
+          "持续记录真实变化"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们可以请大人帮助，准备两组绿豆。"
+        },
+        {
+          "say": "一组放在土里，另一组放在餐巾纸上。"
+        },
+        {
+          "say": "想比较这两个地方，种子数量要同样多。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "两组都需要定期照顾，不是放好就不管。"
+        },
+        {
+          "say": "今天屏幕里只准备，不会立刻长出真苗。"
+        },
+        {
+          "say": "以后按同样的时间，看看两组怎样变化。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "拍照或画图，把每次真实看到的留下来。"
+        },
+        {
+          "say": "没有变化也能记录，不能把想象当成结果。"
+        },
+        {
+          "say": "哪组长得怎样，要等持续观察后再说。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "title": "准备两组观察",
+      "page": "seeds",
+      "widgetType": "game",
+      "startImage": "seed-setup",
+      "script": [
+        {
+          "highlight": "#observation-picture"
+        },
+        {
+          "say": "这只是准备模型，不能代替真实种植。"
+        },
+        {
+          "say": "左盒是土，右盒铺着白色的餐巾纸。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "我们在每个盒子放四颗，数量要一样。"
+        },
+        {
+          "say": "先给土盒放一颗，另一盒也要安排好。"
+        },
+        {
+          "annotate": "#observation-picture",
+          "content": "先看见，再比较"
+        },
+        {
+          "say": "每放一颗，画面就多一个真实的数量点。"
+        },
+        {
+          "say": "盒子满四颗后，再放会回到原处。"
+        },
+        {
+          "setState": {
+            "practice": true
+          }
+        },
+        {
+          "say": "拖种子进盒，或先点种子再点盒子。"
+        },
+        {
+          "say": "准备好后，请大人帮忙在现实里持续观察。"
+        },
+        {
+          "say": "图片没打开时，可以点转圈箭头重试。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "观察小检查",
+      "intro": [
+        "听老师读题，再看看图片。",
+        "错了也可以重新观察。"
+      ],
+      "questions": [
+        {
+          "id": "q-equal",
+          "question": "比较土和纸时，哪张图的两组种子同样多？",
+          "skill": "同量对照准备",
+          "answer": [
+            "B"
+          ],
+          "analysis": "同量图的上排和下排都各有三颗，另外两张数量不同。",
+          "options": {
+            "A": {
+              "label": "两组数量不同",
+              "visual": {
+                "kind": "asset",
+                "image": "seed-count-a",
+                "alt": "种子数量图，上面二颗，下面三颗"
+              }
+            },
+            "B": {
+              "label": "两组同样多",
+              "visual": {
+                "kind": "asset",
+                "image": "seed-count-b",
+                "alt": "种子数量图，上面三颗，下面三颗"
+              }
+            },
+            "C": {
+              "label": "两组数量不同",
+              "visual": {
+                "kind": "asset",
+                "image": "seed-count-c",
+                "alt": "种子数量图，上面三颗，下面一颗"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-record",
+          "question": "想持续留下植物变化，哪种做法适合记录？",
+          "skill": "真实持续记录",
+          "answer": [
+            "C"
+          ],
+          "analysis": "为植物拍照可以留下实际样子，连续比较；不能靠拔苗或没看见时的想象作记录。",
+          "options": {
+            "A": {
+              "label": "拔出幼苗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pull",
+                "alt": "拔出幼苗"
+              }
+            },
+            "B": {
+              "label": "玩车",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-play",
+                "alt": "玩车"
+              }
+            },
+            "C": {
+              "label": "拍照记录",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-record",
+                "alt": "拍照记录"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "带着证据说发现",
+      "template": "summary",
+      "data": {
+        "title": "带着证据说发现",
+        "items": [
+          "连着植物找环境",
+          "用地面分清上下",
+          "比较环境与可见样子",
+          "真实变化持续记录"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们看植物，也看它周围的住处。"
+        },
+        {
+          "say": "陆地上的许多植物，根扎在土中。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "同一株连着看，地上地下不要弄混。"
+        },
+        {
+          "say": "没有展示的部分，不能随便猜结论。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "水中也有植物，还有人工无土栽培。"
+        },
+        {
+          "say": "具体植物需要什么，要看适宜的条件。"
+        },
+        {
+          "say": "具体样子要看见，不能只凭住处猜。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "两组绿豆先准备同量，再长期观察。"
+        },
+        {
+          "say": "真实照片和图画，帮我们留下变化。"
+        },
+        {
+          "say": "你的口头发现和现实照顾，还请大人观察。"
+        }
+      ]
+    }
+  ]
+}

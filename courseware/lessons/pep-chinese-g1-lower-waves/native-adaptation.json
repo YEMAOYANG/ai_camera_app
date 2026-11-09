@@ -1,0 +1,336 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "openMaicJobId": "fmAz3W9Gdp",
+  "openMaicClassroomId": "7udOuXE7Ma",
+  "nativeClassroomSha256": "833531f3736b80c580c37972da5606737659cf96aeb6d4a70cb1e3bc39f235a1",
+  "nativeDraftInputSha256": "6cac6549aea7bce84207c462dfa6d465e9ea83279e82b4b4fa1a743b55ad8504",
+  "nativeModelRoute": {
+    "modelPolicyId": "deepseek-v4-pro-current-flash-v1",
+    "providerId": "deepseek",
+    "modelId": "deepseek-v4-pro"
+  },
+  "authoringModels": [
+    "deepseek-v4-pro",
+    "gpt-6.1-sol"
+  ],
+  "officialNotesSha256": "64ea22506a0a284ce4194297854f078ebae206b35e3de167f4f99f06c122c889",
+  "frozenBriefSha256": "0c205894250d8753d7cb90170c6ae8a185912b03e0a1dbdf3db96b1e9176193f",
+  "frozenCoverPlanSha256": "e2c7e61f612b6b88f5bbb3474c648d3917c53ed902c206afd641947cee0ce6dc",
+  "sceneBindings": [
+    {
+      "nativeSceneId": "scene_kc0ok5_KoG",
+      "nativeTitle": "听，海边来了什么",
+      "nativeSceneSha256": "d88018f1482ee210a3fb7c9e999326504be155b01803ae781da71bb35f2daaa4",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_coi27LeC"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "shore",
+          "change": "保留原生入课的海边、沙滩和白泡沫观察，统一短句与正式原创封面。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_5wdNxklqOJ",
+      "nativeTitle": "轻轻迈一步",
+      "nativeSceneSha256": "9d6a7f58e0c234b0cf391d380d67ce7169320c25e85629c957823e0c4708a60e",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_mKNW2kyy",
+        "action_nhz_fEvS"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "gentle-steps",
+          "change": "保留原生踮脚示例，分开迈步与悄悄，说明故事中的浪花动作是想象。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_MiKp7F1QeS",
+      "nativeTitle": "浪花来过，又退回去",
+      "nativeSceneSha256": "d96159382655d74aa032af44a01363b942781b782c54d38abc060316c4c5bc1e",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_dU0agUQu"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "shore-move",
+          "change": "保留原生来、碰、回的连续状态，改为共享互动框架及可识别图选项。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_ClM1hBpmJf",
+      "nativeTitle": "痒得笑出眼泪",
+      "nativeSceneSha256": "0d72ffcec02aa4e41ee143633e3c852818e6f5a7262660cd378a1f70e72fb3c1",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_LWgtwMTu",
+        "action_Y-lWia9l",
+        "action_ZpQ-HteJ"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "laugh-and-read",
+          "change": "保留原生笑与泪、淘气和第1段朗读；纠正长句停在轻轻哗哗后的机械断句。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_6u21snaigv",
+      "nativeTitle": "看眼和泪哪里不同",
+      "nativeSceneSha256": "9dd35ac145a8993aa5d88b20476919f620c8b2404eff4cb538d3732f2ae53c8c",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_o_WfgZ5R"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "eye-and-tear",
+          "change": "纠正原生误说右边相同。现行范字中眼左目右艮，泪左三点水右目。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_Eo313cDeFh",
+      "nativeTitle": "浪花又来了",
+      "nativeSceneSha256": "f3fe150022f24c2206f5a10a711ba7c41d7cb6eddb3b3403db2b1f69ca4eab58",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_-zuyJI-s",
+        "action_pxoSNFsY"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "waves-return",
+          "change": "保留两次到岸的原生顺序，加入原创吹泡泡例解释又，补足次的认读。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_8NQaNmNu7H",
+      "nativeTitle": "双手捧来小礼物",
+      "nativeSceneSha256": "4908a5cee4b7130fce92b8c9645565ffa7d1028b67eef20d71c57522577bba48",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_YJBOxsAj"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "support",
+          "change": "将原生一场拆为动作示范和礼物识字，保留“捧”的原生概念，去掉把散文叫小诗。"
+        },
+        {
+          "releaseSceneKey": "gifts",
+          "change": "保留原生贝壳与小虾两幅图，讲准壳读音并联系两种颜色。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_-1Y8R-I3P-",
+      "nativeTitle": "看小篮还能不能装",
+      "nativeSceneSha256": "9d6dcc11595cdf633b4b22b78d9071781efe482c572ce3ce6eb34b423114f483",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_OVeCieJT"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "basket",
+          "change": "保留原生装入两件礼物再检查剩余空间，使用共享框架，无速度奖励或示范得分。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_xAa9WoyQIF",
+      "nativeTitle": "有声音的来和只说来了",
+      "nativeSceneSha256": "f074cd95eeb3725e5e7e4d1bf9319757b261679dd4bacbebaed7cebd8d360499",
+      "retainedOrEditedSpeechSourceActions": [],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "compare-arrival",
+          "change": "保留原生比较有无唱着笑着的表达，不将微风说成没有声音。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_hQ5D5m-UBt",
+      "nativeTitle": "为什么像淘气的小娃娃",
+      "nativeSceneSha256": "16fb169f4c408b3bd832ac39d2a44c49039d781606f123944866c028979e2fdd",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_uh-GeFrQ"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "playful-wave",
+          "change": "保留原生首尾相连、比喻与喜爱情绪，补说第3段末尾的表达比较。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_0Nyvh7Elqx",
+      "nativeTitle": "写它，先看上面",
+      "nativeSceneSha256": "4331467921cdd6114d74d18144c625ff2f0239c017acd779f68edbd80eaa189c",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_CghL80ni"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "write-it",
+          "change": "保留原生上下部件与代词指向，说明形状后交给成人观察，不推断整字笔顺。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_feiDIqiYPN",
+      "nativeTitle": "写贝，看看格子两边",
+      "nativeSceneSha256": "c80532509cba9ace26f684992789a6eafa86c3dea3c0c69fb4763aee9405cf99",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_pL06cnan"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "write-shell",
+          "change": "保留原生外形、下面笔画、边缘空间，按实际楷体范字讲形。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_DqseV0sdy0",
+      "nativeTitle": "写气，看看最后的形状",
+      "nativeSceneSha256": "14bd09094ce7cb89e4cf762f4e9aa5cca26f6bcaeebdd4b5b4d2b681ca644730",
+      "retainedOrEditedSpeechSourceActions": [],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "write-air",
+          "change": "保留原生末笔方向观察，依范字讲看到的形状，纠正把拐弯只说成直伸。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_bo9rFniELb",
+      "nativeTitle": "写娃，左右分开看",
+      "nativeSceneSha256": "60734fd5e7dc5cf90fd13fb916f028ac4801eee9369a9164e4c10b904bdea512",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_Qb2-_19S"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "write-child",
+          "change": "原生按新版娃目标正确，保留部件识别；以格中实际字形讲清宽窄。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_yeE1lJ0-w6",
+      "nativeTitle": "听问题，选你看到的图",
+      "nativeSceneSha256": "c845518c35e927e79fdb6a49ccdfdcdd5af2979e6bd83c88b8c890cf13d15e04",
+      "retainedOrEditedSpeechSourceActions": [],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "picture-check",
+          "change": "保留原生五题目标及前三题情境，去答案复述；“又”换成再来，“细节”换成听辨动作和样子。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_SFWqlCwpkk",
+      "nativeTitle": "三幅图，说出一段海边故事",
+      "nativeSceneSha256": "e4b533e68acb2aeb8b3c3913ce82f776ffd61ed815edc507fc46a6dadf759932",
+      "retainedOrEditedSpeechSourceActions": [
+        "action_W90aTW0a"
+      ],
+      "releaseScenes": [
+        {
+          "releaseSceneKey": "retell",
+          "change": "保留原生三幅图回顾和课后任务，明确纸笔目标、观察证据与情感线。"
+        }
+      ]
+    }
+  ],
+  "questionBindings": [
+    {
+      "nativeQuestionId": "q1",
+      "releaseQuestionId": "q-quiet",
+      "sourceAnswer": [
+        "B"
+      ],
+      "releaseAnswer": [
+        "B"
+      ],
+      "mappedAssetIds": {
+        "A": "quiet-shout",
+        "B": "quiet-whisper",
+        "C": "quiet-raised-hand"
+      }
+    },
+    {
+      "nativeQuestionId": "q2",
+      "releaseQuestionId": "q-support",
+      "sourceAnswer": [
+        "A"
+      ],
+      "releaseAnswer": [
+        "A"
+      ],
+      "mappedAssetIds": {
+        "A": "melon-cupped",
+        "B": "melon-pushed",
+        "C": "melon-pointed"
+      }
+    },
+    {
+      "nativeQuestionId": "q3",
+      "releaseQuestionId": "q-capacity",
+      "sourceAnswer": [
+        "C"
+      ],
+      "releaseAnswer": [
+        "C"
+      ],
+      "mappedAssetIds": {
+        "A": "truck-box-roomy",
+        "B": "truck-box-fit",
+        "C": "truck-box-full"
+      }
+    },
+    {
+      "nativeQuestionId": "q4",
+      "releaseQuestionId": "q-again",
+      "sourceAnswer": [
+        "A"
+      ],
+      "releaseAnswer": [
+        "A"
+      ],
+      "mappedAssetIds": {
+        "A": "toy-return-sequence",
+        "B": "toy-first-sequence",
+        "C": "toy-still-sequence"
+      }
+    },
+    {
+      "nativeQuestionId": "q5",
+      "releaseQuestionId": "q-detail",
+      "sourceAnswer": [
+        "B"
+      ],
+      "releaseAnswer": [
+        "B"
+      ],
+      "mappedAssetIds": {
+        "A": "rabbit-sits-ears-up",
+        "B": "rabbit-leaps-ears-up",
+        "C": "rabbit-rests-ears-low"
+      }
+    }
+  ],
+  "interactiveSourceSha256": {
+    "pages/basket.css": "4c159a584ffabd40a82212d007635e35f276c361b2d6519a163a6af12027989f",
+    "pages/basket.html": "2f91d664c028506eee26e06e14313cf5e174ee175a389d933dbbb673037f871e",
+    "pages/basket.js": "29aedee82a93ff181741a2356ce8accbbcc230eefd0445c10b88d181d21f1d8d",
+    "pages/shore-move.css": "75ee790405fba513146e7a06051969659b8308fcc4ab152c8191421911847ed6",
+    "pages/shore-move.html": "2539a030e2ac7a3696ec32fb7d578b19f8d301ccf3ee7fc59160734c7153dc37",
+    "pages/shore-move.js": "0e91a538acc3e26a7158dff9ef04eac25adb887cf65f75073dee95fd8dafa9b9"
+  },
+  "editableLessonSha256": "28a0a8c7ac1715013f420daa578e9a6e50e7a1a0c972dd8d556eb91756de85d4",
+  "picturePlanSha256": "9526b7a616c7d47c3aa72d470bbedb17f2b9ebfc83000f0d94ec17679adf75ea",
+  "glyphAssetsSha256": "ecae049124bd6dc2424a675d24e5c654549ed167e1e709fd58cce6d20d932c35",
+  "adaptedAt": "2026-11-06T12:30:43.316041+00:00"
+}

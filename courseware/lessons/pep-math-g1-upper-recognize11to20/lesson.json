@@ -1,0 +1,962 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "11～20 的认识",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "正式数学教师档案；先讲清相关信息和问题，边操作边解释整体与部分；低阅读、逐步提示，首错不揭答案，口述和纸笔均待观察。"
+    }
+  },
+  "images": {
+    "bundles-twenty": {
+      "file": "assets/bundles-twenty.png"
+    },
+    "card-02": {
+      "file": "assets/card-02.png"
+    },
+    "card-10": {
+      "file": "assets/card-10.png"
+    },
+    "card-12": {
+      "file": "assets/card-12.png"
+    },
+    "card-14": {
+      "file": "assets/card-14.png"
+    },
+    "card-15": {
+      "file": "assets/card-15.png"
+    },
+    "card-16": {
+      "file": "assets/card-16.png"
+    },
+    "card-17": {
+      "file": "assets/card-17.png"
+    },
+    "card-18": {
+      "file": "assets/card-18.png"
+    },
+    "card-19": {
+      "file": "assets/card-19.png"
+    },
+    "card-2": {
+      "file": "assets/card-2.png"
+    },
+    "card-20": {
+      "file": "assets/card-20.png"
+    },
+    "counter-eleven": {
+      "file": "assets/counter-eleven.png"
+    },
+    "counter-fourteen": {
+      "file": "assets/counter-fourteen.png"
+    },
+    "counter-twenty": {
+      "file": "assets/counter-twenty.png"
+    },
+    "cover-workshop": {
+      "file": "assets/cover-workshop.png"
+    },
+    "dots-4": {
+      "file": "assets/dots-4.png"
+    },
+    "dots-5": {
+      "file": "assets/dots-5.png"
+    },
+    "dots-6": {
+      "file": "assets/dots-6.png"
+    },
+    "line-all": {
+      "file": "assets/line-all.png"
+    },
+    "line-gap-14": {
+      "file": "assets/line-gap-14.png"
+    },
+    "line-near-13": {
+      "file": "assets/line-near-13.png"
+    },
+    "qty-17": {
+      "file": "assets/qty-17.png"
+    },
+    "rod-bundle": {
+      "file": "assets/rod-bundle.png"
+    },
+    "rod-unit": {
+      "file": "assets/rod-unit.png"
+    },
+    "span-14-18": {
+      "file": "assets/span-14-18.png"
+    },
+    "tray-ten": {
+      "file": "assets/tray-ten.png"
+    }
+  },
+  "description": "在纸艺补给站扎十、摆珠、找数牌和数小格，认识十一到二十的组成、数位和顺序。",
+  "scenes": [
+    {
+      "key": "intro",
+      "title": "纸艺补给站开门了",
+      "type": "slide",
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "同学们好，我是小数老师。"
+        },
+        {
+          "say": "今天带大家来到纸艺补给站。"
+        },
+        {
+          "say": "看看台上，有纸和整理材料的盘子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们用小棒来练习整理。"
+        },
+        {
+          "say": "十根小棒合成的一捆，就是一个十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "散棒一根一根放着，每根是一个一。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "数的时候，先数整捆，再数散棒。"
+        },
+        {
+          "say": "十根扎一捆，看总数就更清楚了。"
+        }
+      ],
+      "template": "picture-points",
+      "data": {
+        "title": "纸艺补给站开门了",
+        "picture": "cover-workshop",
+        "points": [
+          "十根扎成一捆",
+          "再数旁边的散棒",
+          "数出一共有多少"
+        ]
+      }
+    },
+    {
+      "key": "pack",
+      "title": "十根一捆，接着数",
+      "type": "interactive",
+      "script": [
+        {
+          "setState": {
+            "mode": "trays"
+          }
+        },
+        {
+          "say": "先看看三盘小棒，每盘不一样多。"
+        },
+        {
+          "highlight": "#pack-trays"
+        },
+        {
+          "say": "一根一根数，找正好十根的一盘。"
+        },
+        {
+          "setState": {
+            "mode": "bundle"
+          }
+        },
+        {
+          "say": "点对后，十根就扎成了一捆。"
+        },
+        {
+          "say": "一捆是十根，不是一根。"
+        },
+        {
+          "setState": {
+            "mode": "read"
+          }
+        },
+        {
+          "say": "这边是一捆，旁边是四根。"
+        },
+        {
+          "say": "看散棒。从最左边开始，每点一根，就向右移一根。"
+        },
+        {
+          "setState": {
+            "mode": "counted"
+          }
+        },
+        {
+          "say": "跟我点数，一、二、三、四。"
+        },
+        {
+          "say": "挨着数，不跳过，点过的也不回头。"
+        },
+        {
+          "say": "一捆和四根合起来，就是十四。"
+        },
+        {
+          "setState": {
+            "mode": "read-eight"
+          }
+        },
+        {
+          "highlight": "#pack-count"
+        },
+        {
+          "say": "一捆和八根合起来，就是十八。"
+        },
+        {
+          "say": "我们顺着读，十一、十二、十三、十四、十五。"
+        },
+        {
+          "say": "接着读，十六、十七、十八、十九。"
+        },
+        {
+          "say": "每次只添一根，整捆没有变。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "轮到你，找够十根，再选总数。"
+        }
+      ],
+      "page": "station",
+      "startImage": "tray-ten",
+      "widgetType": "numbers_pack"
+    },
+    {
+      "key": "twenty",
+      "title": "十九添一，换一捆",
+      "type": "interactive",
+      "script": [
+        {
+          "setState": {
+            "mode": "start"
+          }
+        },
+        {
+          "say": "现在有一捆和九根散棒。"
+        },
+        {
+          "say": "一捆是十，再接着数九根，就是十九。"
+        },
+        {
+          "highlight": "#exchange-controls"
+        },
+        {
+          "say": "给散棒添一根，看看它们有多少根。"
+        },
+        {
+          "setState": {
+            "mode": "full"
+          }
+        },
+        {
+          "say": "九根再添一根，正好十根。"
+        },
+        {
+          "say": "左边原来的一捆先放着。"
+        },
+        {
+          "highlight": "#exchange-ones"
+        },
+        {
+          "say": "只把这十根散棒扎起来。"
+        },
+        {
+          "setState": {
+            "mode": "traded"
+          }
+        },
+        {
+          "say": "现在有两捆，外面没有散棒。"
+        },
+        {
+          "say": "两捆表示两个十，读作二十。"
+        },
+        {
+          "say": "扎捆只换了样子，总数还是二十根。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "你来试试，先添一根，再扎一捆。"
+        }
+      ],
+      "page": "station",
+      "startImage": "bundles-twenty",
+      "widgetType": "numbers_twenty"
+    },
+    {
+      "key": "places",
+      "title": "两个一，位置不同",
+      "type": "slide",
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "我们用两根杆来看数的位置。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边的图，它拨出了十一。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "左杆是十位，一颗珠表示一个十。"
+        },
+        {
+          "say": "右杆是个位，一颗珠表示一个一。"
+        },
+        {
+          "say": "珠子一样，站的位置不同，意思就不同。"
+        },
+        {
+          "say": "十位和个位各写一个一，就写成十一。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再看二十，右图有两捆。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "两捆表示两个十，十位写二。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "外面没有散棒，个位上没有一个一。"
+        },
+        {
+          "say": "个位要写零，给这个位置占着。"
+        },
+        {
+          "say": "只写二，就看不出这两个十了。"
+        }
+      ],
+      "template": "two-columns",
+      "data": {
+        "title": "两个一，位置不同",
+        "left": {
+          "heading": "11",
+          "body": "左十位，右个位"
+        },
+        "left_picture": "counter-eleven",
+        "right": {
+          "heading": "20",
+          "body": "两个十，个位写0"
+        },
+        "right_picture": "bundles-twenty"
+      }
+    },
+    {
+      "key": "beads",
+      "title": "把数摆进两根杆",
+      "type": "interactive",
+      "script": [
+        {
+          "setState": {
+            "mode": "start"
+          }
+        },
+        {
+          "say": "我们来把数摆进两根杆。"
+        },
+        {
+          "say": "老师先摆十一。"
+        },
+        {
+          "highlight": "#bead-tens"
+        },
+        {
+          "setState": {
+            "mode": "left"
+          }
+        },
+        {
+          "say": "左杆是十位，先放一颗，表示一个十。"
+        },
+        {
+          "highlight": "#bead-ones"
+        },
+        {
+          "setState": {
+            "mode": "both"
+          }
+        },
+        {
+          "say": "右杆是个位，再放一颗，表示一个一。"
+        },
+        {
+          "say": "一十和一个一合起来，是十一。"
+        },
+        {
+          "setState": {
+            "mode": "sixteen"
+          }
+        },
+        {
+          "say": "看这里，一捆和六根，读作十六。"
+        },
+        {
+          "say": "写十六，左边十位写数字一，右边个位写数字六。"
+        },
+        {
+          "say": "写十一到十九，十位都写一，个位写散棒的根数。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "highlight": "#bead-target"
+        },
+        {
+          "say": "轮到你摆十五，先看亮起来的杆。"
+        },
+        {
+          "say": "看数牌上同一个位置，再点珠子。"
+        },
+        {
+          "say": "摆完十五，再摆十八。"
+        },
+        {
+          "say": "两次十位相同，个位不同。"
+        }
+      ],
+      "page": "station",
+      "startImage": "counter-eleven",
+      "widgetType": "numbers_beads"
+    },
+    {
+      "key": "numberline",
+      "title": "沿着等长小格走",
+      "type": "slide",
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "数线像一条带格子的路。"
+        },
+        {
+          "say": "每一个小格都一样长。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从左到右，零、十、二十各有自己的位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "相邻两个数之间只差一小格。"
+        },
+        {
+          "say": "越往右走，数越大；越往左，数越小。"
+        },
+        {
+          "say": "往右一格，接着数下一个。"
+        },
+        {
+          "say": "往左一格，倒着数前一个。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "十在零和二十的正中间。"
+        },
+        {
+          "say": "十五在十和二十的正中间。"
+        },
+        {
+          "say": "从十五到这两个数，小格一样多。"
+        }
+      ],
+      "template": "picture-points",
+      "data": {
+        "title": "沿着等长小格走",
+        "picture": "line-all",
+        "points": [
+          "从0到20",
+          "左右和相邻",
+          "两个中点"
+        ]
+      }
+    },
+    {
+      "key": "route",
+      "title": "给数牌找位置",
+      "type": "interactive",
+      "script": [
+        {
+          "setState": {
+            "mode": "blank"
+          }
+        },
+        {
+          "say": "数线上空着一个位置，等着数牌回家。"
+        },
+        {
+          "highlight": "#route-left"
+        },
+        {
+          "say": "先看左边，是十一。"
+        },
+        {
+          "say": "往右走一格，数到十二。"
+        },
+        {
+          "highlight": "#route-right"
+        },
+        {
+          "say": "再看右边，是十三。"
+        },
+        {
+          "say": "往左退一格，也是十二。"
+        },
+        {
+          "setState": {
+            "mode": "filled"
+          }
+        },
+        {
+          "say": "我把十二放进来，再一起读一遍。"
+        },
+        {
+          "say": "十一、十二、十三，顺序对了。"
+        },
+        {
+          "say": "从十一走到十三，要跨过两个小格。"
+        },
+        {
+          "say": "数刻度上的位置，把两端算上，一共有三个。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "轮到你，点数牌，把它放进空位。"
+        }
+      ],
+      "page": "station",
+      "startImage": "line-all",
+      "widgetType": "numbers_route"
+    },
+    {
+      "key": "near",
+      "title": "哪边的小格更少",
+      "type": "interactive",
+      "script": [
+        {
+          "setState": {
+            "mode": "start"
+          }
+        },
+        {
+          "say": "十二在十和二十之间。"
+        },
+        {
+          "say": "它离哪一个更近？我们数小格。"
+        },
+        {
+          "highlight": "#near-left"
+        },
+        {
+          "say": "从十走到十二，走一格，再走一格。"
+        },
+        {
+          "say": "左边一共两小格。"
+        },
+        {
+          "highlight": "#near-right"
+        },
+        {
+          "say": "再从十二往右，数到二十。"
+        },
+        {
+          "setState": {
+            "mode": "paths"
+          }
+        },
+        {
+          "say": "右边有八小格。"
+        },
+        {
+          "say": "两格比八格少，所以十二离十更近。"
+        },
+        {
+          "setState": {
+            "mode": "far"
+          }
+        },
+        {
+          "say": "把红点换到十八，再试一次。"
+        },
+        {
+          "say": "数两边小格，别把出发点算成一步。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "你来点步数少的一边。"
+        }
+      ],
+      "page": "station",
+      "startImage": "line-all",
+      "widgetType": "numbers_near"
+    },
+    {
+      "key": "check",
+      "type": "quiz",
+      "title": "换一批补给再试试",
+      "intro": [
+        "补给站换了一批材料。",
+        "先听题，再仔细看图。",
+        "每题选一张，想好了再点。"
+      ],
+      "questions": [
+        {
+          "id": "n1120-q1",
+          "question": "图里一共有多少枚印章？",
+          "analysis": "盘中两排各五枚，是一个十。盘外四枚加三枚，共七枚。合起来是十七枚。",
+          "skill": "十和几个一组成十几",
+          "options": {
+            "A": {
+              "label": "16",
+              "visual": {
+                "kind": "asset",
+                "image": "card-16",
+                "alt": "16"
+              }
+            },
+            "B": {
+              "label": "17",
+              "visual": {
+                "kind": "asset",
+                "image": "card-17",
+                "alt": "17"
+              }
+            },
+            "C": {
+              "label": "18",
+              "visual": {
+                "kind": "asset",
+                "image": "card-18",
+                "alt": "18"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "qty-17",
+            "alt": "盘内两排各五枚印章，盘外两排四枚和三枚"
+          }
+        },
+        {
+          "id": "n1120-q2",
+          "question": "看计数器，这个数写作多少？",
+          "analysis": "左边十位一珠表示一个十。右边个位四珠表示四个一。十位写一，个位写四。",
+          "skill": "根据两杆珠数写数",
+          "options": {
+            "A": {
+              "label": "14",
+              "visual": {
+                "kind": "asset",
+                "image": "card-14",
+                "alt": "14"
+              }
+            },
+            "B": {
+              "label": "15",
+              "visual": {
+                "kind": "asset",
+                "image": "card-15",
+                "alt": "15"
+              }
+            },
+            "C": {
+              "label": "19",
+              "visual": {
+                "kind": "asset",
+                "image": "card-19",
+                "alt": "19"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "counter-fourteen",
+            "alt": "左侧十位一珠，右侧个位四珠"
+          }
+        },
+        {
+          "id": "n1120-q3",
+          "question": "两捆小棒入库，哪张数牌写对了？",
+          "analysis": "十位两珠表示两个十，个位没有珠要写零。左边写二，右边写零，得到二十。",
+          "skill": "两个十和个位零占位",
+          "options": {
+            "A": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "card-2",
+                "alt": "2"
+              }
+            },
+            "B": {
+              "label": "02",
+              "visual": {
+                "kind": "asset",
+                "image": "card-02",
+                "alt": "02"
+              }
+            },
+            "C": {
+              "label": "20",
+              "visual": {
+                "kind": "asset",
+                "image": "card-20",
+                "alt": "20"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "counter-twenty",
+            "alt": "左侧十位两珠，右侧个位空"
+          }
+        },
+        {
+          "id": "n1120-q4",
+          "question": "数线的空格里该放哪张数牌？",
+          "analysis": "从十三向右一小格到十四，再向右一小格才到十五。空着的一格是十四。",
+          "skill": "等距数线补相邻数",
+          "options": {
+            "A": {
+              "label": "12",
+              "visual": {
+                "kind": "asset",
+                "image": "card-12",
+                "alt": "12"
+              }
+            },
+            "B": {
+              "label": "14",
+              "visual": {
+                "kind": "asset",
+                "image": "card-14",
+                "alt": "14"
+              }
+            },
+            "C": {
+              "label": "16",
+              "visual": {
+                "kind": "asset",
+                "image": "card-16",
+                "alt": "16"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "line-gap-14",
+            "alt": "数线上十二、十三、空格、十五、十六，刻度等距"
+          }
+        },
+        {
+          "id": "n1120-q5",
+          "question": "数一数小格，十三离哪一个数更近？",
+          "analysis": "十三到十要走三格，到二十要走七格。三格少于七格，所以十三离十更近。",
+          "skill": "按等长小格比较远近",
+          "options": {
+            "A": {
+              "label": "10",
+              "visual": {
+                "kind": "asset",
+                "image": "card-10",
+                "alt": "10"
+              }
+            },
+            "B": {
+              "label": "20",
+              "visual": {
+                "kind": "asset",
+                "image": "card-20",
+                "alt": "20"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "line-near-13",
+            "alt": "十到二十的等距数线，十三上方有红点"
+          }
+        },
+        {
+          "id": "n1120-q6",
+          "question": "红框从第十四格到第十八格，共圈几格？",
+          "analysis": "从十四数到十八，包括十四和十八。十四、十五、十六、十七、十八，一共五格。",
+          "skill": "按顺序数两端都包含的区段",
+          "options": {
+            "A": {
+              "label": "4个点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-4",
+                "alt": "4个点"
+              }
+            },
+            "B": {
+              "label": "6个点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-6",
+                "alt": "6个点"
+              }
+            },
+            "C": {
+              "label": "5个点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-5",
+                "alt": "5个点"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "visual": {
+            "kind": "asset",
+            "image": "span-14-18",
+            "alt": "十三到十九的七格，红框圈住十四至十八"
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "title": "把这些数用到身边",
+      "type": "slide",
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们来看看，这些数怎么用在身边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "十个一扎成一捆，一捆就是一个十。"
+        },
+        {
+          "say": "十九添一，新满十的散棒再扎一捆。"
+        },
+        {
+          "say": "这样有两个十，读作二十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "十位的一表示一个十，个位的一是一个一。"
+        },
+        {
+          "say": "二十没有散棒，个位照样写零。"
+        },
+        {
+          "say": "数线越往右，数越大。"
+        },
+        {
+          "say": "邻居只差一格，近不近也可以数格子。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "翻书时找第十六页，十六说的是位置。"
+        },
+        {
+          "say": "先翻到第十五页。往后翻一页，就到第十六页。"
+        },
+        {
+          "say": "看看页码，左边是一，右边是六。"
+        },
+        {
+          "say": "如果有十七张纸，十七说的是一共有几张。"
+        },
+        {
+          "say": "一组十张，再加七张，就是十七张。"
+        },
+        {
+          "say": "回家找个数，把它的组成说给大人听。"
+        }
+      ],
+      "template": "picture-points",
+      "data": {
+        "title": "把这些数用到身边",
+        "picture": "qty-17",
+        "points": [
+          "十根一捆，先数十",
+          "看十位个位，再看数线",
+          "把数用在生活里"
+        ]
+      }
+    }
+  ]
+}

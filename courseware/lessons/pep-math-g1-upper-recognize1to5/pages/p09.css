@@ -1,0 +1,20 @@
+#writing-board{position:absolute;left:115px;top:31px;width:500px;height:440px;border-radius:24px;background:#f7fbff;box-shadow:0 0 0 3px #9dbcd1 inset}
+#writing-board svg{display:block;position:absolute;inset:0;width:500px;height:440px;pointer-events:none}
+.writing-grid{stroke:#cce0ed;stroke-width:1.3;stroke-dasharray:4 4}
+.digit-outline{fill:none;stroke:#a6c4d5;stroke-width:13;stroke-linecap:round;stroke-linejoin:round}
+.digit-dashed{fill:none;stroke:#6f98ad;stroke-width:2;stroke-linecap:round;stroke-dasharray:3 5}
+.digit-ink{fill:none;stroke:#23795f;stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
+.digit-animate{stroke-dasharray:1;animation:write-number .54s ease-out both}
+@keyframes write-number{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.digit-arrow{fill:none;stroke:#234a61;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.digit-start{fill:#ed9a3b;stroke:#fff7e4;stroke-width:1.5}
+.writing-endpoint{position:absolute;width:88px;height:88px;transform:translate(-50%,-50%);padding:0;display:grid;place-items:center;border:0;background:transparent;cursor:pointer}
+.writing-endpoint span{display:block;width:46px;height:46px;border:4px solid #4a7a9b;border-radius:50%;background:#e8f5fd}
+.writing-endpoint:focus-visible span{outline:4px solid #d58228;outline-offset:3px}
+#writing-route{position:absolute;left:730px;top:31px;width:405px;height:440px;padding:25px 30px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:25px;border:3px solid #b9cfc4;border-radius:25px;background:#f3faf5;color:#234e49}
+.writing-number{display:grid;place-items:center;width:126px;height:119px;border-radius:21px;background:#e1f0f2;border:3px solid #aac8d0;font-size:83px;font-weight:900;line-height:1}
+.writing-row{display:flex;gap:12px}
+.writing-pill{display:block;width:32px;height:23px;border:3px solid #89a99b;border-radius:12px;background:#fff}
+.writing-pill.done{background:#559d7d;border-color:#327557}
+.writing-pill.active{border-color:#bc812a;background:#f8d39a}
+.writing-caption{font-size:29px;font-weight:800;line-height:1.35;text-align:center}

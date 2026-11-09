@@ -1,0 +1,1131 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "6、7的组成",
+  "description": "跟小数老师走进圆片工坊，动手分合、按顺序找全、交换两部分，并根据总数找出藏起的一边。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "依据正式数学教师档案，用准确短句解释每一步为什么。以数、摆、分、合引导儿童操作，首次错误给观察提示，不给答案或惩罚。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "bead": {
+      "file": "assets/bead.png"
+    },
+    "block": {
+      "file": "assets/block.png"
+    },
+    "box": {
+      "file": "assets/box.png"
+    },
+    "six-pairs": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "1"
+              },
+              {
+                "glyph": "5"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "4"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "seven-pairs": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "1"
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "5"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "four-shown": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "?"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "圆片工坊开门了",
+      "template": "title-picture",
+      "data": {
+        "title": "6、7的组成",
+        "picture": "studio",
+        "caption": "分成两部分，合回一个整体"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到圆片工坊，我是小数老师。"
+        },
+        {
+          "say": "这里有托盘，还有能藏东西的小盒子。"
+        },
+        {
+          "say": "今天我们研究六和七怎样分开。"
+        },
+        {
+          "say": "分开，是把全部物品分成两个部分。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "再把这两个部分放到一起，就是合。"
+        },
+        {
+          "say": "东西只是换了地方，没有增添或丢失。"
+        },
+        {
+          "say": "所以两部分合起来，仍是原来的总数。"
+        },
+        {
+          "say": "小满问：分得不一样，总数还一样吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "等会儿你来搬圆片，亲眼看看数量。"
+        },
+        {
+          "say": "先把六颗分好，再用同样办法研究七。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "六颗圆片分两组",
+      "page": "p02",
+      "widgetType": "composition-partition",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#whole-total"
+        },
+        {
+          "say": "顶上的六，表示六颗圆片的总数。"
+        },
+        {
+          "setState": {
+            "demoLeft": 2
+          }
+        },
+        {
+          "say": "老师把两颗放左边，四颗放右边。"
+        },
+        {
+          "highlight": "#tray-left"
+        },
+        {
+          "say": "这两颗，是整体中的一个部分。"
+        },
+        {
+          "highlight": "#tray-right"
+        },
+        {
+          "say": "另外四颗，是整体中的另一个部分。"
+        },
+        {
+          "say": "两边合着数，还是原来的六颗。"
+        },
+        {
+          "annotate": "#saved-splits",
+          "content": "换一种分法，也要保留全部六颗"
+        },
+        {
+          "say": "移动圆片，只会改变它在哪一边。"
+        },
+        {
+          "say": "不管怎样分，都不能多一颗或少一颗。"
+        },
+        {
+          "say": "这节课的两组，每一边都要有圆片。"
+        },
+        {
+          "say": "你来试着分，把三种不同的分法留下。"
+        },
+        {
+          "say": "拖进托盘，或点圆片换边，都可以。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "交换以后仍是六",
+      "template": "picture-points",
+      "data": {
+        "title": "交换两部分，总数仍是6",
+        "picture": "six-pairs",
+        "points": [
+          "1和5，交换成5和1",
+          "2和4，交换成4和2",
+          "3和3，交换后还是同一种"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边的数字，记录两个部分的数量。"
+        },
+        {
+          "say": "它们都可以组成六，只是分法不同。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一和五组成六，交换后是五和一。"
+        },
+        {
+          "say": "两部分换了位置，圆片并没有变多。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "二和四组成六，交换后是四和二。"
+        },
+        {
+          "say": "记住一边，就能想到交换后的另一边。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三和三两边一样，交换后仍然一样。"
+        },
+        {
+          "say": "所以三和三不用再重复记一次。"
+        },
+        {
+          "say": "朵朵说：成对想，记起来更方便。",
+          "by": "duoduo"
+        },
+        {
+          "say": "按左右位置记录，六一共有五种分法。"
+        },
+        {
+          "say": "接下来按顺序找，看看有没有漏掉。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "每次只搬一个",
+      "page": "p04",
+      "widgetType": "composition-ordered",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#whole-total"
+        },
+        {
+          "say": "还是六颗圆片，这次要找全所有分法。"
+        },
+        {
+          "setState": {
+            "demoLeft": 1
+          }
+        },
+        {
+          "highlight": "#ordered-left"
+        },
+        {
+          "say": "左边先放一颗，右边还留着五颗。"
+        },
+        {
+          "highlight": "#record-wall"
+        },
+        {
+          "say": "先把一和五记下来，这就是第一行。"
+        },
+        {
+          "setState": {
+            "demoLeft": 2
+          }
+        },
+        {
+          "highlight": "#ordered-right"
+        },
+        {
+          "say": "从右边搬一颗到左边，右边少一颗。"
+        },
+        {
+          "highlight": "#ordered-left"
+        },
+        {
+          "say": "左边就多一颗，变成二和四。"
+        },
+        {
+          "say": "搬动时没有增减，总数始终是六。"
+        },
+        {
+          "annotate": "#record-wall",
+          "content": "每次一颗，按顺序保存"
+        },
+        {
+          "say": "照这样一次搬一颗，不会跳过中间。"
+        },
+        {
+          "say": "一直找到左边五颗，右边剩一颗。"
+        },
+        {
+          "say": "按顺序保存五行，就能不重不漏。"
+        },
+        {
+          "say": "现在交给你，先保存第一行吧。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "六的组成小检查",
+      "intro": [
+        "现在换成新情境，听老师读题。",
+        "看图想分合，再自己选。"
+      ],
+      "questions": [
+        {
+          "id": "c67-q1",
+          "question": "六枚钮扣已经装好五枚。还要装几枚？",
+          "skill": "根据总数6和部分补足",
+          "answer": [
+            "B"
+          ],
+          "analysis": "六是总数，五枚已装好，再装一枚才正好六枚。",
+          "visual": {
+            "kind": "quantity",
+            "count": 5,
+            "alt": "5个数量点"
+          },
+          "options": {
+            "A": {
+              "label": "两枚",
+              "visual": {
+                "kind": "quantity",
+                "count": 2,
+                "alt": "2个数量点"
+              }
+            },
+            "B": {
+              "label": "一枚",
+              "visual": {
+                "kind": "quantity",
+                "count": 1,
+                "alt": "1个数量点"
+              }
+            },
+            "C": {
+              "label": "三枚",
+              "visual": {
+                "kind": "quantity",
+                "count": 3,
+                "alt": "3个数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "c67-q2",
+          "question": "两盘各有三颗弹珠，换个位置后，一共还是几颗？",
+          "skill": "交换部分总数不变",
+          "answer": [
+            "A"
+          ],
+          "analysis": "三和三合成六。交换的是位置，弹珠没有增加或减少。",
+          "visual": {
+            "kind": "picture",
+            "alt": "两组各三个数量点",
+            "picture": {
+              "groups": [
+                {
+                  "cells": [
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    }
+                  ]
+                },
+                {
+                  "cells": [
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "options": {
+            "A": {
+              "label": "六颗",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个数量点"
+              }
+            },
+            "B": {
+              "label": "五颗",
+              "visual": {
+                "kind": "quantity",
+                "count": 5,
+                "alt": "5个数量点"
+              }
+            },
+            "C": {
+              "label": "七颗",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个数量点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "七也能成对找",
+      "template": "picture-points",
+      "data": {
+        "title": "把方法用到7",
+        "picture": "seven-pairs",
+        "points": [
+          "从1和6开始",
+          "一边多1，另一边少1",
+          "交换两部分，总数不变",
+          "两部分合起来仍是7"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "研究七，也能用刚才的好办法。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "七先分成一和六，两部分合成七。"
+        },
+        {
+          "say": "想找下一种，就搬动其中一个。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一边多一，另一边就少一。"
+        },
+        {
+          "say": "于是接着得到二和五，再得到三和四。"
+        },
+        {
+          "say": "继续按顺序找，直到六和一。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一和六换成六和一，总数仍是七。"
+        },
+        {
+          "say": "二和五、三和四，也各有交换的一对。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "两部分合回去，每一对都组成七。"
+        },
+        {
+          "say": "按左右位置记录，七有六种分法。"
+        },
+        {
+          "say": "猫头鹰站长提醒：成对记，一共三对。",
+          "by": "owl"
+        },
+        {
+          "say": "我们再把七节组成条分开亲眼验证。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "七节积木在哪里分开",
+      "page": "p07",
+      "widgetType": "composition-cut-strip",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#whole-total"
+        },
+        {
+          "say": "组成条一共有七节，先确认这个总数。"
+        },
+        {
+          "highlight": "#block-strip"
+        },
+        {
+          "say": "每一节都是同样的一块，没有藏起来。"
+        },
+        {
+          "setState": {
+            "demoCut": 3
+          }
+        },
+        {
+          "highlight": "#part-left"
+        },
+        {
+          "say": "老师在第三节后分开，左边有三节。"
+        },
+        {
+          "highlight": "#part-right"
+        },
+        {
+          "say": "右边还有四节，三和四组成七。"
+        },
+        {
+          "say": "从另一边看，又能想到四和三。"
+        },
+        {
+          "setState": {
+            "demoCut": 0
+          }
+        },
+        {
+          "say": "把两段接回去，还是完整的七节。"
+        },
+        {
+          "annotate": "#block-strip",
+          "content": "分的是位置，七节都保留"
+        },
+        {
+          "say": "换一条接缝，两部分的数量就会改变。"
+        },
+        {
+          "say": "但所有积木都在，所以总数不会改变。"
+        },
+        {
+          "say": "现在找三处不同接缝，保存你的分法。"
+        },
+        {
+          "say": "想重来就点双向箭头，把它们接好。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "看见一边想另一边",
+      "template": "big-word",
+      "data": {
+        "title": "看见一部分，想藏起的另一部分",
+        "word": "6",
+        "picture": "four-shown",
+        "hint": "6是总数，4是露出的部分"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "盒里盒外一共有六颗，六是总数。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图上露出四颗，盒里那部分看不见。"
+        },
+        {
+          "say": "看得见四颗，不等于一共只有四颗。"
+        },
+        {
+          "say": "因为总数六，包括露出的和藏着的。"
+        },
+        {
+          "say": "可以从四接着数，数到五，再到六。"
+        },
+        {
+          "say": "接着数了两颗，所以藏着两颗。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "也能想分合：四和二正好组成六。"
+        },
+        {
+          "say": "知道全部和一部分，就能想另一部分。"
+        },
+        {
+          "say": "小满问：打开盒子，还要核验吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "要的，打开后把两边合起来再数一数。"
+        },
+        {
+          "say": "这是根据分合来推想，不是看穿盒子。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "盒子里还藏着几颗",
+      "page": "p09",
+      "widgetType": "composition-hidden-part",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#whole-total"
+        },
+        {
+          "say": "每关先看总数，可能是六，也可能是七。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#shown-beads"
+        },
+        {
+          "say": "老师示范总数六，外面看见四颗。"
+        },
+        {
+          "highlight": "#hidden-box"
+        },
+        {
+          "say": "盒内是另一部分，不能把它忘记。"
+        },
+        {
+          "say": "四颗接着数到六，还需要两颗。"
+        },
+        {
+          "annotate": "#hidden-box",
+          "content": "打开核验，不把露出的当总数"
+        },
+        {
+          "say": "示范盒打开了，里面确实是两颗。"
+        },
+        {
+          "say": "两颗和外面的四颗，合起来才是六。"
+        },
+        {
+          "highlight": "#missing-choices"
+        },
+        {
+          "say": "下面每张卡上的点，表示一种数量。"
+        },
+        {
+          "say": "听清总数，数露出的，再选择藏的。"
+        },
+        {
+          "say": "你的题目会换，不能一直选同一个数。"
+        },
+        {
+          "say": "选对后盒子会打开，让你逐个核验。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "藏起一边也会想",
+      "intro": [
+        "这次不打开盒子给你看。",
+        "用总数和已知的一边，自己想另一边。"
+      ],
+      "questions": [
+        {
+          "id": "c67-q3",
+          "question": "七张贴纸分两袋，一袋有五张，另一袋有几张？",
+          "skill": "根据总数7和部分补足",
+          "answer": [
+            "C"
+          ],
+          "analysis": "五和二组成七，因此另一袋有两张贴纸。",
+          "visual": {
+            "kind": "quantity",
+            "count": 5,
+            "alt": "5个数量点"
+          },
+          "options": {
+            "A": {
+              "label": "三张",
+              "visual": {
+                "kind": "quantity",
+                "count": 3,
+                "alt": "3个数量点"
+              }
+            },
+            "B": {
+              "label": "一张",
+              "visual": {
+                "kind": "quantity",
+                "count": 1,
+                "alt": "1个数量点"
+              }
+            },
+            "C": {
+              "label": "两张",
+              "visual": {
+                "kind": "quantity",
+                "count": 2,
+                "alt": "2个数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "c67-q4",
+          "question": "六个座位已有三人坐好。还空着几个座位？",
+          "skill": "区分总数与可见部分",
+          "answer": [
+            "B"
+          ],
+          "analysis": "六个座位由坐好的三个和空着的三个组成。",
+          "visual": {
+            "kind": "quantity",
+            "count": 3,
+            "alt": "3个数量点"
+          },
+          "options": {
+            "A": {
+              "label": "六个",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个数量点"
+              }
+            },
+            "B": {
+              "label": "三个",
+              "visual": {
+                "kind": "quantity",
+                "count": 3,
+                "alt": "3个数量点"
+              }
+            },
+            "C": {
+              "label": "两个",
+              "visual": {
+                "kind": "quantity",
+                "count": 2,
+                "alt": "2个数量点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "title": "把两盘接成一组",
+      "page": "p11",
+      "widgetType": "composition-join-groups",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#whole-total"
+        },
+        {
+          "say": "看顶上的数字，这是要合成的总数。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#group-pool"
+        },
+        {
+          "say": "老师找一盘两颗，再找一盘四颗。"
+        },
+        {
+          "highlight": "#merge-target"
+        },
+        {
+          "say": "把两盘放到一起，不能只数第一盘。"
+        },
+        {
+          "say": "两颗接着数三、四、五、六，一共六颗。"
+        },
+        {
+          "annotate": "#merge-target",
+          "content": "两部分合在一起，才是全部"
+        },
+        {
+          "say": "所以二和四组成六，正好满足目标。"
+        },
+        {
+          "say": "每一盘只能选一次，不能重复算同一盘。"
+        },
+        {
+          "say": "也可以先想一盘，再想还缺多少颗。"
+        },
+        {
+          "say": "你的目标和盘子都会换，要重新观察。"
+        },
+        {
+          "say": "拖两盘到中间，或点盘子选中都可以。"
+        },
+        {
+          "say": "选错了再点那盘撤回，慢慢换一换。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "分合变式小检查",
+      "intro": [
+        "最后两题，图和问题又换了。",
+        "把两部分与整体联系起来，想好再选。"
+      ],
+      "questions": [
+        {
+          "id": "c67-q5",
+          "question": "左边两颗种子，右边五颗种子，合起来一共几颗？",
+          "skill": "由两部分合成总数",
+          "answer": [
+            "C"
+          ],
+          "analysis": "二和五合成七，合并时要把左右两部分都数上。",
+          "visual": {
+            "kind": "picture",
+            "alt": "左边两个、右边五个数量点",
+            "picture": {
+              "groups": [
+                {
+                  "cells": [
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    }
+                  ]
+                },
+                {
+                  "cells": [
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "options": {
+            "A": {
+              "label": "六颗",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个数量点"
+              }
+            },
+            "B": {
+              "label": "五颗",
+              "visual": {
+                "kind": "quantity",
+                "count": 5,
+                "alt": "5个数量点"
+              }
+            },
+            "C": {
+              "label": "七颗",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "c67-q6",
+          "question": "七块分成左四右三。左边搬一块到右边后，右边有几块？",
+          "skill": "按顺序改变两个部分",
+          "answer": [
+            "A"
+          ],
+          "analysis": "右边得到一块，由三变成四；左边由四变成三，总数仍是七。",
+          "visual": {
+            "kind": "picture",
+            "alt": "初始分组：左边四个、右边三个数量点",
+            "picture": {
+              "groups": [
+                {"cells": [{"glyph":"🔵"},{"glyph":"🔵"},{"glyph":"🔵"},{"glyph":"🔵"}]},
+                {"cells": [{"glyph":"🔵"},{"glyph":"🔵"},{"glyph":"🔵"}]}
+              ]
+            }
+          },
+          "options": {
+            "A": {
+              "label": "四块",
+              "visual": {
+                "kind": "quantity",
+                "count": 4,
+                "alt": "4个数量点"
+              }
+            },
+            "B": {
+              "label": "三块",
+              "visual": {
+                "kind": "quantity",
+                "count": 3,
+                "alt": "3个数量点"
+              }
+            },
+            "C": {
+              "label": "五块",
+              "visual": {
+                "kind": "quantity",
+                "count": 5,
+                "alt": "5个数量点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "把好办法讲给家人",
+      "template": "summary",
+      "data": {
+        "title": "6、7的组成：四个好办法",
+        "items": [
+          "两部分合起来，就是整体",
+          "有序地找：一边多1，另一边少1",
+          "交换两个部分，总数不变",
+          "知道整体和一边，想另一边"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们把六和七分开，又重新合并。"
+        },
+        {
+          "say": "每个部分都要数上，合起来才是整体。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "有顺序地找，每次只从一边搬一个。"
+        },
+        {
+          "say": "一边多一，另一边少一，就不容易漏。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "交换两个部分，东西没有增添或丢失。"
+        },
+        {
+          "say": "用成对的办法，记分合会更方便。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "知道总数和一边，就能推想另一边。"
+        },
+        {
+          "say": "打开核验时，要检查两部分是否合适。"
+        },
+        {
+          "say": "猫头鹰站长提醒：会点，还要试着讲。",
+          "by": "owl"
+        },
+        {
+          "say": "请大人陪你拿六或七件安全物品。"
+        },
+        {
+          "say": "分一分，再把为什么这样分讲给家人。"
+        },
+        {
+          "say": "你讲得是否清楚，请家人帮忙观察。"
+        }
+      ]
+    }
+  ]
+}

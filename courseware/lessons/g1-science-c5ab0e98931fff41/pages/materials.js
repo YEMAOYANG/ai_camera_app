@@ -1,0 +1,13 @@
+(function(){
+K.hud({icon:'◉',title:'准备实验托盘',levels:6});K.owl();
+var bank=K.$('#mat-bank'),tray=K.$('#mat-tray'),collected=K.$('#mat-collected'),items=K.$$('#mat-bank button'),correct=['egg','salt','cup','spoon','chopsticks','tongs'],placed=[],miss=0,demo=false,busy=false;
+function restore(){items.forEach(function(el){el.disabled=false;el.classList.remove('placed','selected');bank.appendChild(el)});placed=[];miss=0;busy=false;K.stars=0;K.$('#star-n').textContent='0';K.$$('#mat-slots i').forEach(function(el){el.classList.remove('done')});K.levels(6,0)}
+function renderPlaced(key,reward){var el=K.$('#mat-'+key);if(!el||placed.indexOf(key)>=0)return;placed.push(key);el.classList.add('placed');el.disabled=true;collected.appendChild(el);K.$$('#mat-slots i')[placed.length-1].classList.add('done');K.levels(6,placed.length);if(reward){K.star(1,el);K.sfx.ok();K.say('材料已进入托盘，继续按用途找。','ok')}}
+function choose(el){if(!K.started||demo||busy||el.disabled||el.querySelector('[data-failed]'))return;var key=el.dataset.key;if(correct.indexOf(key)<0){miss++;K.shake(el);K.sfx.no();K.say(miss===1?'想想鸡蛋实验需要它做什么，再试一次。':miss===2?'看看托盘里已经有了什么，还缺什么。':'看看还缺哪件工具，老师提示一件。','no');if(miss===2)K.highlight('#mat-tray');if(miss>=3){var next=correct.find(function(k){return placed.indexOf(k)<0});if(next)K.highlight('#mat-'+next);miss=0}return}renderPlaced(key,true);miss=0;if(placed.length===correct.length){busy=true;setTimeout(function(){K.finish({title:'材料准备齐了',sub:'这些选择是画面练习，真实实验请大人协助。',again:function(){demo=false;restore();K.say('按用途重新准备实验材料。')}})},900)}}
+items.forEach(function(el){K.drag(el,{enabled:function(){return !demo&&!busy&&!el.disabled},targets:function(){return [tray]},onDrop:function(e,target){if(target)choose(e);else K.shake(e)},onTap:choose});el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(el)}})});
+K.onStart=function(){K.say('选需要的材料，拖进托盘；也可以点图片。')};
+K.onState=function(s){if('demo'in s){demo=!!s.demo;restore();if(demo)(s.placed||[]).forEach(function(k){renderPlaced(k,false)});else K.say('现在轮到你，按用途准备材料。')}else if(s.placed){restore();s.placed.forEach(function(k){renderPlaced(k,false)})}};
+K.ready({emoji:'',title:'准备实验托盘',sub:'听老师说，按图片做'});
+
+function installImageFallback(){K.$$('#play img').forEach(function(im){im.addEventListener('error',function(){if(im.dataset.failed)return;im.dataset.failed='1';im.classList.add('source-broken');var parent=im.parentElement;var retry=K.el('button','image-retry','↻',parent);retry.setAttribute('aria-label','重新加载图片');retry.addEventListener('click',function(e){e.stopPropagation();delete im.dataset.failed;im.classList.remove('source-broken');retry.remove();im.src=im.getAttribute('src')});})})}
+installImageFallback();})();

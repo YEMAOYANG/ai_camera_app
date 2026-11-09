@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "8和9的加、减法",
+  "frame": {
+    "slides": [
+      1000,
+      562.5
+    ],
+    "interactive": [
+      1280,
+      720
+    ],
+    "kit": "courseware/kit"
+  },
+  "pages": [
+    {
+      "key": "p02",
+      "mechanism": "整组物体真实进入共同托盘，再选出整体数量图",
+      "stateKeys": [
+        "demo",
+        "demoMerged",
+        "demoSwap",
+        "play"
+      ],
+      "teacherTargets": [
+        "#part-a",
+        "#part-b",
+        "#merge-zone",
+        "#merge-equation"
+      ],
+      "completion": "3关合并后数量正确",
+      "reset": "所有圆片返回两组，关卡、星星、错误次数归零"
+    },
+    {
+      "key": "p04",
+      "mechanism": "逐个移动到盖板下，剩余部分对应减法；支持退回",
+      "stateKeys": [
+        "demo",
+        "demoCovered",
+        "play"
+      ],
+      "teacherTargets": [
+        "#cover-equation",
+        "#whole-row",
+        "#covered-zone",
+        "#remain-options"
+      ],
+      "completion": "3关移出数量与余数都对",
+      "reset": "所有圆片回整体，盖板清空"
+    },
+    {
+      "key": "p07",
+      "mechanism": "两加两减卡分别入银行，与图内三数对应",
+      "stateKeys": [
+        "demo",
+        "demoAdd",
+        "demoAll",
+        "play"
+      ],
+      "teacherTargets": [
+        "#family-diagram",
+        "#formula-pool",
+        "#addition-bank",
+        "#subtraction-bank"
+      ],
+      "completion": "2张图各配4道不同算式",
+      "reset": "卡片归位，清空已放与星星"
+    },
+    {
+      "key": "p09",
+      "mechanism": "由已知加法选隐藏部分，盖板真实移开核对",
+      "stateKeys": [
+        "demo",
+        "demoReveal",
+        "play"
+      ],
+      "teacherTargets": [
+        "#known-add",
+        "#visible-part",
+        "#missing-equation",
+        "#hidden-part"
+      ],
+      "completion": "3关隐含部分正确",
+      "reset": "盖板归位，不预先显示答案"
+    },
+    {
+      "key": "p12",
+      "mechanism": "先交换两组，再将重复加式和减式叠放到同种式子上",
+      "stateKeys": [
+        "demo",
+        "demoSwap",
+        "demoStack",
+        "play"
+      ],
+      "teacherTargets": [
+        "#equal-diagram",
+        "#equal-equation",
+        "#equal-cards",
+        "#unique-bank"
+      ],
+      "completion": "交换一次，叠好重复加式与减式",
+      "reset": "两组返回，4张卡恢复，已叠状态和星星归零"
+    }
+  ],
+  "visual": {
+    "pictures": [
+      "workshop",
+      "counter"
+    ],
+    "knowledgeDiagrams": [
+      "精确数量点",
+      "被教学的数字、运算符和算式"
+    ],
+    "lowReading": "数量由代码精确排布；正式单圆片图作为被操作物，老师预录音承担完整题意，非目标说明字遮住仍能操作。",
+    "consistency": "全课暖白、赤陶橙、湖蓝、鼠尾草绿；不以无关图或emoji代替教学对象。"
+  },
+  "teacherHandoff": "显式play状态结束示范；示范阶段不会接收儿童答题或发星星。",
+  "acceptance": "正式图音后执行G6三尺寸、四状态截图、随机试玩与复位，G7独立逐句核题，G8发布包学生校验。"
+}

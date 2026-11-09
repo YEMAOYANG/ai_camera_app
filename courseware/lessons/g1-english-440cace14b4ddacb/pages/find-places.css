@@ -1,0 +1,114 @@
+#cv {
+  --tour-ink:#24504a;
+  --tour-border:#acc7bb;
+  --tour-warm:#fff9ee;
+  background:#f4e9d4;
+}
+#hud .chip {color:var(--tour-ink);border-color:var(--tour-border)}
+#say {border-color:var(--tour-border);color:var(--tour-ink)}
+#ready .btn.xl, #finish .btn.xl {min-height:90px}
+#ready .big {font-size:58px}
+.tour-bar {
+  height:90px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:var(--tour-ink);
+  padding:0 14px;
+}
+.tour-bar h2 {font-size:40px;line-height:1.18}
+.tour-replay {
+  width:100px;
+  height:88px;
+  flex:none;
+  border:3px solid #235d52;
+  border-radius:20px;
+  background:#2d7566;
+  color:white;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
+.tour-replay svg {width:48px;height:48px}
+.tour-replay:disabled {opacity:.52;cursor:default}
+.tour-board {
+  height:430px;
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr);
+  gap:18px;
+}
+.tour-options {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+  align-items:center;
+}
+.tour-choice {
+  width:100%;
+  height:304px;
+  padding:10px;
+  border:4px solid #c6d8c7;
+  border-radius:24px;
+  background:var(--tour-warm);
+  cursor:pointer;
+}
+.tour-choice:disabled {cursor:default}
+.tour-choice img, .tour-photo img {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  border-radius:12px;
+}
+.tour-choice.wrong {border-color:#cb784b}
+.tour-choice.correct {border-color:#348876}
+.tour-reward {
+  position:relative;
+  min-width:0;
+  min-height:0;
+  border:3px solid var(--tour-border);
+  border-radius:24px;
+  background:var(--tour-warm);
+  padding:16px;
+  display:grid;
+  grid-template-rows:45px minmax(0,1fr);
+  gap:8px;
+}
+.tour-reward h3 {color:var(--tour-ink);font-size:30px;line-height:1.2}
+.tour-gallery {
+  height:100%;
+  min-height:0;
+  display:grid;
+  gap:8px;
+  grid-template-rows:repeat(2,minmax(0,1fr));
+}
+.tour-gallery[data-layout=seat] {
+  align-items:end;
+  grid-template-rows:1fr;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.tour-gallery[data-layout=visit] {
+  grid-template-rows:2fr minmax(0,1fr);
+}
+.tour-photo {
+  display:block;
+  height:100%;
+  min-height:0;
+  border:3px dashed var(--tour-border);
+  border-radius:16px;
+  background:#edf4e8;
+  overflow:hidden;
+}
+.tour-photo.has-photo {border-style:solid;background:white}
+.tour-choice:focus-visible,.tour-replay:focus-visible,.photo-target:focus-visible,.photo-card:focus-visible {
+  outline:6px solid #b26933;
+  outline-offset:4px;
+}
+.tour-image-missing {background:#f0d4bc}
+.tour-replay.needs-cue {box-shadow:0 0 0 6px #bfd6a3}
+@media(prefers-reduced-motion:no-preference) {
+  .tour-photo.has-photo img {animation:tour-arrival .28s ease-out}
+}
+@keyframes tour-arrival {from {transform:scale(.84);opacity:.65} to {transform:scale(1);opacity:1}}

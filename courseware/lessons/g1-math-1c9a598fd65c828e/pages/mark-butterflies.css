@@ -1,0 +1,17 @@
+.mark-board{position:relative;width:1232px;height:552px}
+.mark-demo{position:absolute;left:0;top:20px;width:300px;height:510px;background:#fffdf6;border:3px solid #e3cf9e;border-radius:28px;text-align:center}
+.mark-demo h2{font-size:28px;margin:30px 0;color:#75502d}
+.mark-demo p{position:absolute;bottom:55px;width:100%;font-size:27px}
+.demo-marks{display:flex;justify-content:center;gap:6px;margin-top:65px;padding:0 12px}
+.demo-marks>div{position:relative;width:82px}
+.demo-marks img{display:block;width:82px;height:82px;object-fit:contain;border:3px solid transparent;border-radius:50%;padding:3px}
+.demo-marks b{display:block;visibility:hidden;font-size:38px;margin-top:16px}
+.demo-marks .marked img{border-color:#bd7049;background:#fff1dd}
+.demo-marks .marked b{visibility:visible}
+.butterfly-field{position:absolute;left:320px;top:20px;width:912px;height:510px;background:#fff6df;border:3px solid #e2cc98;border-radius:28px}
+.butterfly-item{position:absolute;width:120px;height:120px;padding:0;background:#fffdf6;border:4px solid transparent;border-radius:64px;cursor:pointer}
+.butterfly-item img{display:block;width:100%;height:100%;object-fit:contain;border-radius:60px;pointer-events:none}
+.butterfly-item.marked{border-color:#bd7049;background:#ffe6bd;box-shadow:0 0 0 5px #f3d293}
+.mark-count{position:absolute;bottom:20px;right:24px;width:86px;height:80px;background:white;border-radius:22px;border:3px solid #d3b87d;text-align:center;line-height:72px;font-size:54px;font-weight:800}
+.butterfly-item.load-error::after{content:'重试图片';position:absolute;inset:8px;display:grid;place-items:center;font-size:24px;background:#fff4df;border-radius:40px}
+#ready .pic{object-fit:contain;background:#fffdf6}

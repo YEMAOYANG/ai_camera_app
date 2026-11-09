@@ -1,0 +1,11 @@
+(function(){
+var tasks=[{src:'__IMG:cat-walk__',part:'pad'},{src:'__IMG:cat-climb__',part:'claw'},{src:'__IMG:listen-cone__',part:'ear'},{src:'__IMG:rabbit-jump__',part:'hind'}],parts={pad:'__IMG:pad__',claw:'__IMG:claw__',ear:'__IMG:rabbit-ear__',hind:'__IMG:hindleg__'},order=[],index=0,tries=0,phase='play',busy=false,epoch=0,missing=false;
+var photo=K.$('#skill-scene-photo'),record=K.$('#skill-record'),buttons=K.$$('#skill-choices button');
+K.hud({icon:'◉',title:'给本领找到身体线索',levels:4});K.owl();K.ready({emoji:'◉',title:'给本领找到身体线索',sub:'先看动作，再找相关的身体部位',btn:'start-btn'});
+K.$$('#skill-board img').forEach(function(im){im.onerror=function(){missing=true;im.style.visibility='hidden';K.say('图片暂未载入，请重新打开本页')}});
+function show(task){photo.style.visibility='visible';photo.src=task.src;photo.alt=task.part==='pad'?'猫在平地缓步走':task.part==='claw'?'猫抓住低处树干':task.part==='ear'?'用纸卷模拟耳朵倾听':'兔在平地自然跳跃'}
+function reset(){epoch++;phase='play';index=0;tries=0;busy=false;record.innerHTML='';order=K.shuffle(tasks);K.shuffle(buttons).forEach(function(b){K.$('#skill-choices').appendChild(b)});K.stars=0;K.$('#star-n').textContent='0';K.levels(4,0);show(order[0]);K.say('看大画面的动作，再选能解释的身体线索')}
+function choose(part,button){if(!K.started||busy||phase!=='play'||missing)return;var task=order[index];if(part!==task.part){tries++;K.sfx.no();K.shake(button);if(tries===1)K.say('先想它正在做什么，再看部位有什么用','no');else if(tries===2)K.say('把动作和部位的作用联系起来想一想','no');else{K.highlight('#skill-choice-'+task.part);K.say('老师提示这处身体线索，再由你选择','no')}return}
+busy=true;var pair=K.el('div','skill-pair',null,record),a=K.el('img','',null,pair),b=K.el('img','',null,pair);a.src=task.src;a.alt='动作情境';b.src=parts[part];b.alt='相关身体部位';K.star(1,button);K.sfx.ok();K.say('动作和身体线索配在一起了','ok');var token=epoch;setTimeout(function(){if(token!==epoch)return;index++;if(index===4){K.levels(4,4);K.finish({title:'身体线索找齐了',sub:'用身体部位，解释动物本领',again:reset});return}busy=false;tries=0;K.levels(4,index);show(order[index])},900)}
+buttons.forEach(function(b){b.addEventListener('click',function(){choose(b.dataset.part,b)})});K.$('#skill-reset').addEventListener('click',reset);K.onState=function(s){if(s.demo){phase='demo';var task=tasks.filter(function(t){return t.part===s.demo})[0];if(task)show(task)}if(s.phase==='play')reset()};K.onStart=reset;reset();
+})();

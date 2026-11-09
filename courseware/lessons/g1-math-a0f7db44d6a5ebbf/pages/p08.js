@@ -1,0 +1,13 @@
+(function(){
+var tasks=[[7,6],[8,7],[9,6]],lev=0,a=7,b=6,phase=0,demo=false,busy=false,miss=0,timer,choices=[];
+K.hud({icon:'＋',title:'先到十，再跳剩余',levels:tasks.length});K.owl();K.ready({emoji:'＋',title:'两次跳到总数',sub:'先选补到十的点数，再选剩余'});
+for(var n=0;n<=20;n++){var e=K.el('b','jump-tick',String(n),K.$('#jump-ticks'));e.style.left=(n*5)+'%'}
+function arc(x,y,up){var start=x*58.4,end=y*58.4,mid=(start+end)/2;return '<path d="M '+start+' 140 Q '+mid+' '+up+' '+end+' 140"/><text x="'+mid+'" y="'+(up/2+68)+'" text-anchor="middle">＋'+(y-x)+'</text>'}
+function expected(){return phase===0?10-a:b-(10-a)}
+function draw(){K.$('#jump-a').textContent=a;K.$('#jump-b').textContent=b;K.$('#jump-total').textContent=phase===2?a+b:'?';K.$('#remaining').textContent=b+'＝'+(phase?' '+(10-a)+' ＋ '+(phase===2?b-(10-a):'?'):'? ＋ ?');K.$('#jump-foot').style.left=((phase===0?a:phase===1?10:a+b)*5)+'%';K.$('#jump-arcs').innerHTML=phase===0?'':arc(a,10,0)+(phase===2?arc(10,a+b,30):'');K.$('#hop-options').innerHTML='';choices.forEach(function(v,i){var el=K.el('button','hop-choice','',K.$('#hop-options'));el.id='hop-'+(i+1);el.setAttribute('aria-label',v+'个数量点');for(var k=0;k<v;k++)K.el('i','','',el);el.onclick=function(){choose(v)}});K.levels(tasks.length,lev)}
+function options(){var n=expected();choices=K.shuffle([n,n===1?2:n-1,n+2])}
+function choose(v){if(demo||busy)return;if(v!==expected()){miss++;K.sfx.no();K.say(miss===1?'先看圆点现在在哪里，再想要跳几步。':phase===0?'第一跳先到十，看看还差多少。':'第二个加数分成两部分，想想还剩多少。','no');return}phase++;miss=0;K.sfx.ok();if(phase===1){options();draw();K.say('第一跳到十，再把剩余的步数跳完。');return}draw();busy=true;K.star(1,K.$('#jump-foot'));K.say('两段步数合起来，正好是要添的数量。','ok');timer=setTimeout(function(){lev++;if(lev===tasks.length)K.finish({title:'两跳也算清啦',sub:'先补十，再加剩下的。',again:reset});else load()},1000)}
+function load(){a=tasks[lev][0];b=tasks[lev][1];phase=0;busy=false;miss=0;options();draw();K.say('从'+a+'出发，先选补到十要走的点数。')}
+function reset(){clearTimeout(timer);demo=false;lev=0;K.stars=0;K.$('#star-n').textContent='0';load()}
+K.$('#jump-reset').onclick=function(){if(!demo&&!busy)load()};K.onStart=reset;K.onState=function(state){if(state.demo){clearTimeout(timer);var finish=K.$("#finish");if(finish)finish.classList.add("gone");K.stars=0;K.$("#star-n").textContent="0";demo=true;busy=false;lev=0;K.say("先看老师示范，再轮到你。");a=6;b=5;phase=0;choices=[4,3,5];draw()}if(state.first&&demo){phase=1;choices=[1,2,3];draw()}if(state.second&&demo){phase=2;draw()}if(state.play)reset()};load();
+})();

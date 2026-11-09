@@ -1,0 +1,17 @@
+
+#play{background:#fffdf6;border-radius:16px}
+button{font-family:inherit;cursor:pointer}button:focus-visible{outline:5px solid #2f66ae;outline-offset:3px}
+.co-reset{position:absolute;right:16px;top:10px;width:68px;height:68px;border:2px solid #c28b42;border-radius:16px;background:#fff;color:#6b4423;font-size:38px;z-index:2}
+.co-pic{width:100%;height:100%;object-fit:contain;pointer-events:none}
+.co-choice{border:3px solid #dfc799;border-radius:16px;background:#fff;overflow:hidden;position:relative;padding:10px}
+.co-choice:hover{background:#fff3ce}.co-choice.placed{opacity:.35;pointer-events:none}.co-choice.selected{outline:5px solid #db8c23;outline-offset:2px}
+.co-choice::after{content:'';position:absolute;right:10px;top:10px;width:38px;height:38px;border-radius:50%;background:#fff;border:2px solid #b69566;opacity:0}
+.co-choice.placed::after{content:'✓';opacity:1;line-height:34px;font-size:26px;color:#28753a}
+.co-tray{border:4px dashed #c6a36f;border-radius:16px;background:#fff6df;display:flex;align-items:center;justify-content:center;gap:20px}
+.co-missing{display:none;position:absolute;inset:85px 20px 20px;background:#fff6df;z-index:8;align-items:center;justify-content:center;font-size:28px;color:#6b4423;text-align:center}
+.co-missing.show{display:flex}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+#roller-parts{position:absolute;left:18px;top:16px;display:flex;gap:16px}#roller-parts button{width:202px;height:196px}
+#roller-work{position:absolute;left:18px;top:238px;width:430px;height:290px;padding:12px}#roller-made{position:absolute;left:470px;top:324px;width:188px;height:190px;padding:6px;border:3px solid #c49a5b;border-radius:16px;background:#fff;cursor:grab}
+#roller-cloth{position:absolute;left:710px;top:92px;width:496px;height:436px;background:#f0ecdf;border:3px dashed #bea26f;border-radius:16px;overflow:hidden;cursor:pointer}#roller-cloth>img{position:absolute;inset:12px;width:466px;height:406px;object-fit:contain}#roller-track{position:absolute;top:14px;bottom:14px;left:14px;width:0;background:rgba(141,190,142,.2);border-right:4px solid #6c9964;pointer-events:none}

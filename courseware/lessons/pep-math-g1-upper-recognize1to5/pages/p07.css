@@ -1,0 +1,18 @@
+#route-badge{position:absolute;left:66px;top:0;width:1100px;height:104px;display:flex;align-items:center;gap:24px;padding:0 25px;border:3px solid #bfd4d0;border-radius:22px;background:#f7fffc;color:#254c54;font-size:36px;font-weight:900}
+.route-mark{display:block;width:77px;height:77px;object-fit:contain;border-radius:14px}
+.route-stairs{display:flex;align-items:flex-end;gap:8px;height:66px;margin-left:24px}
+.route-stairs i{display:block;width:27px;border-radius:5px 5px 0 0;background:#5ba784}
+.route-direction{margin-left:auto;font-size:44px;line-height:1;color:#24634e}
+#route-slots,#route-tray{position:absolute;left:66px;width:1100px;height:161px;display:flex;justify-content:center;align-items:center;gap:16px;padding:9px 24px;border-radius:26px}
+#route-slots{top:144px;background:#f2fbf6;border:3px solid #bdd4c5}
+#route-tray{top:354px;background:#f9ebd0;border:3px solid #e4c18e}
+.route-card,.route-slot{width:182px;height:124px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:none;border-radius:18px}
+.route-slot{border:3px dashed #a9c5b3;background:#fff}
+.route-slot.next{border:4px solid #508e78;background:#e5f4ed}
+.route-card{padding:0;border:3px solid #b9ccda;background:#fbfdff;color:#183d55;font:inherit}
+button.route-card{cursor:pointer}
+.route-card.placed{border-color:#489b78;background:#e1f4e8}
+.route-card strong{font-size:61px;font-weight:900;line-height:66px}
+.route-dots{display:flex;align-items:center;gap:6px;min-height:21px}
+.route-dots i{width:17px;height:17px;border-radius:50%;background:#3f9674}
+.route-slot.vacant{opacity:.44}

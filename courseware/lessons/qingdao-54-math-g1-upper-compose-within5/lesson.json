@@ -1,0 +1,927 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "5以内数的组成",
+  "description": "青岛版五四制一年级上册。用同一批物品理解总数和部分，有序找齐五的分法，迁移到四、三、二，并用图找出藏着的一组。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "teacher-math",
+      "color": "#E8A22F",
+      "persona": "用儿童能听懂的短句示范和解释分合，关注整体不变，鼓励孩子观察、操作和说理由。"
+    }
+  },
+  "images": {
+    "label-station": {
+      "file": "assets/label-station.png"
+    },
+    "quiz-1-a": {
+      "file": "assets/quiz-1-a.png"
+    },
+    "quiz-1-b": {
+      "file": "assets/quiz-1-b.png"
+    },
+    "quiz-1-c": {
+      "file": "assets/quiz-1-c.png"
+    },
+    "quiz-1-prompt": {
+      "file": "assets/quiz-1-prompt.png"
+    },
+    "quiz-2-a": {
+      "file": "assets/quiz-2-a.png"
+    },
+    "quiz-2-b": {
+      "file": "assets/quiz-2-b.png"
+    },
+    "quiz-2-c": {
+      "file": "assets/quiz-2-c.png"
+    },
+    "quiz-2-prompt": {
+      "file": "assets/quiz-2-prompt.png"
+    },
+    "quiz-3-a": {
+      "file": "assets/quiz-3-a.png"
+    },
+    "quiz-3-b": {
+      "file": "assets/quiz-3-b.png"
+    },
+    "quiz-3-c": {
+      "file": "assets/quiz-3-c.png"
+    },
+    "quiz-3-prompt": {
+      "file": "assets/quiz-3-prompt.png"
+    },
+    "quiz-4-a": {
+      "file": "assets/quiz-4-a.png"
+    },
+    "quiz-4-b": {
+      "file": "assets/quiz-4-b.png"
+    },
+    "quiz-4-c": {
+      "file": "assets/quiz-4-c.png"
+    },
+    "quiz-4-prompt": {
+      "file": "assets/quiz-4-prompt.png"
+    },
+    "quiz-5-a": {
+      "file": "assets/quiz-5-a.png"
+    },
+    "quiz-5-b": {
+      "file": "assets/quiz-5-b.png"
+    },
+    "quiz-5-c": {
+      "file": "assets/quiz-5-c.png"
+    },
+    "quiz-5-prompt": {
+      "file": "assets/quiz-5-prompt.png"
+    },
+    "quiz-6-a": {
+      "file": "assets/quiz-6-a.png"
+    },
+    "quiz-6-b": {
+      "file": "assets/quiz-6-b.png"
+    },
+    "quiz-6-c": {
+      "file": "assets/quiz-6-c.png"
+    },
+    "quiz-6-prompt": {
+      "file": "assets/quiz-6-prompt.png"
+    },
+    "seed-workbench": {
+      "file": "assets/seed-workbench.png"
+    },
+    "sorting-shutter": {
+      "file": "assets/sorting-shutter.png"
+    },
+    "teach-join-five": {
+      "file": "assets/teach-join-five.png"
+    },
+    "teach-seed-groups": {
+      "file": "assets/teach-seed-groups.png"
+    },
+    "teach-split-five": {
+      "file": "assets/teach-split-five.png"
+    },
+    "teach-split-three": {
+      "file": "assets/teach-split-three.png"
+    },
+    "teach-split-two": {
+      "file": "assets/teach-split-two.png"
+    },
+    "sorting-shutter-open": {
+      "file": "assets/sorting-shutter-open.png"
+    },
+    "teach-clip-groups": {
+      "file": "assets/teach-clip-groups.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "种子分装台",
+      "template": "two-columns",
+      "data": {
+        "title": "种子分装台",
+        "left": {
+          "heading": "种植角",
+          "body": "两只空纸袋"
+        },
+        "left_picture": "seed-workbench",
+        "right": {
+          "heading": "同一批种子",
+          "body": "先数全部，再看两组"
+        },
+        "right_picture": "teach-seed-groups"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小朋友们，今天我们来到种子分装台。"
+        },
+        {
+          "say": "两只空纸袋，一只在左边，一只在右边。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "分以前，先把整批种子数一数。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看，这里有五粒种子，要分到两个袋子里。"
+        },
+        {
+          "say": "左边这个袋子，我们放一粒种子。"
+        },
+        {
+          "say": "右边这个袋子，我们放四粒种子。"
+        },
+        {
+          "say": "左边是一，右边是四。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "一粒和四粒是同一批种子的两个部分。"
+        },
+        {
+          "say": "把两袋合起来，还是原来那五粒种子。"
+        },
+        {
+          "say": "种子没有增加，也没有拿走，总数不变。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "每次移一粒",
+      "page": "p02",
+      "widgetType": "ordered-seed-transfer",
+      "startImage": "seed-workbench",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "left": 1
+          }
+        },
+        {
+          "say": "大家好，我们继续来看五粒种子怎么分。"
+        },
+        {
+          "highlight": "#seed-left"
+        },
+        {
+          "say": "现在左边有一粒，右边有四粒。"
+        },
+        {
+          "say": "两边都要有种子，这是我们今天的规则。"
+        },
+        {
+          "highlight": "#seed-direction"
+        },
+        {
+          "say": "请把右边的种子，轻轻移一粒到左边。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "left": 2
+          }
+        },
+        {
+          "say": "看一看，现在左边两粒，右边三粒。"
+        },
+        {
+          "say": "一边多一粒，另一边正好少一粒。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "left": 3
+          }
+        },
+        {
+          "say": "再移一粒，左边三粒，右边两粒。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "left": 4
+          }
+        },
+        {
+          "say": "最后是左边四粒，右边一粒。"
+        },
+        {
+          "say": "再移，右边就空了，所以在这里停。"
+        },
+        {
+          "highlight": "#seed-history"
+        },
+        {
+          "say": "从一到四逐个记录，才不会漏掉或重复。"
+        },
+        {
+          "say": "换的是左右位置，合起来总是五粒。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "轮到你。选一粒种子的图，就能移一粒。"
+        },
+        {
+          "say": "移动后再数左右，把四种摆法找齐。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "同一组能分也能合",
+      "template": "two-columns",
+      "data": {
+        "title": "同一组能分也能合",
+        "left": {
+          "heading": "从整批看两组",
+          "body": "五分成三和二"
+        },
+        "left_picture": "teach-split-five",
+        "right": {
+          "heading": "从两组看整批",
+          "body": "三和二组成五"
+        },
+        "right_picture": "teach-join-five"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "小朋友们，我们来看同一批种子的分与合。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这张图上面的五表示总数。"
+        },
+        {
+          "say": "左下是三粒，右下是两粒。"
+        },
+        {
+          "say": "从总数看向两个部分，就是分开。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "五粒种子可以分成左边三粒，右边两粒。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "现在从两个部分看回同一个整体。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "把左边三粒和右边两粒合在一起。"
+        },
+        {
+          "say": "右图的五在下方，因为它表示合起来的总数。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "三个和两个组成五个，还是这批种子。"
+        },
+        {
+          "say": "分开和合拢是在说同一组数量关系。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "四枚圆贴的三种分法",
+      "page": "p04",
+      "widgetType": "four-disc-trays",
+      "startImage": "label-station",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "round": 0,
+            "locations": [
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          }
+        },
+        {
+          "say": "小朋友，今天我们一起玩一个分贴纸的游戏。"
+        },
+        {
+          "highlight": "#disc-bank"
+        },
+        {
+          "say": "请你把四枚圆贴放进两个托盘里。"
+        },
+        {
+          "highlight": "#disc-target"
+        },
+        {
+          "say": "图上左边一枚，右边三枚，先照图摆。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "round": 0,
+            "locations": [
+              0,
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "say": "四可以分成一和三，一和三组成四。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "round": 1,
+            "locations": [
+              0,
+              0,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "say": "两边各两枚，二和二也组成四。"
+        },
+        {
+          "say": "左右都一样多，交换位置仍是这一种摆法。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "round": 2,
+            "locations": [
+              0,
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "say": "左边三枚，右边一枚，合起来还是四枚。"
+        },
+        {
+          "say": "三和一跟一和三的左右位置不同。"
+        },
+        {
+          "highlight": "#disc-board"
+        },
+        {
+          "say": "托盘都要有圆贴，桌上也不能剩圆贴。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "轮到你。可以拖，也可以先点圆贴，再点托盘。"
+        },
+        {
+          "say": "每摆好一张图，按对一对，再摆下一种。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "三和二也能分合",
+      "template": "two-columns",
+      "data": {
+        "title": "三和二也能分合",
+        "left": {
+          "heading": "三的两种摆法",
+          "body": "一和二 · 二和一"
+        },
+        "left_picture": "teach-split-three",
+        "right": {
+          "heading": "二的一种摆法",
+          "body": "一和一"
+        },
+        "right_picture": "teach-split-two"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看看三的分与合。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "顶端是三，它是整体。"
+        },
+        {
+          "say": "左边一枚，右边两枚，合起来还是三枚。"
+        },
+        {
+          "say": "也能左边两枚，右边一枚，合起来也是三枚。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "三枚分两边，一边至少一枚，只有这两种摆法。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再来看看二的分与合。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "顶端是二，左右两边各一枚。"
+        },
+        {
+          "say": "每边都有，二就只能分成一和一。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "把两边的一枚合到一起，又变回两枚。"
+        },
+        {
+          "say": "三有两种摆法，二在今天的规则里只有一种。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "找出盖住的一组",
+      "page": "p06",
+      "widgetType": "hidden-group-box",
+      "startImage": "sorting-shutter",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "round": 0,
+            "reveal": false
+          }
+        },
+        {
+          "say": "小朋友们，我们来看看收纳盒里的圆片。"
+        },
+        {
+          "highlight": "#cover-total"
+        },
+        {
+          "say": "先找第一个例子，总数是二，看得见一个。"
+        },
+        {
+          "say": "盒旁画了两个位置，表示一共两个圆片。"
+        },
+        {
+          "highlight": "#cover-open"
+        },
+        {
+          "say": "一个圆片对上一个位置，还空着一个。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "round": 0,
+            "reveal": true
+          }
+        },
+        {
+          "say": "盖子下藏着一个，我们揭开看看对不对。"
+        },
+        {
+          "say": "两边各一个，合起来正好是两个。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "round": 1,
+            "reveal": true
+          }
+        },
+        {
+          "say": "总数是三时，露出一个，另外两个就在盖下。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "round": 2,
+            "reveal": true
+          }
+        },
+        {
+          "say": "四个圆片按颜色分，三红和一蓝组成四。"
+        },
+        {
+          "say": "一个圆片只属于一组，两组都要数到。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "轮到你。先看总数，再对上已经看到的圆片。"
+        },
+        {
+          "say": "数一数还空几格，选盖子下面的那一组。"
+        },
+        {
+          "say": "打开以后，把两边合起来检查总数。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "分和合小检查",
+      "intro": [
+        "听老师说任务，再看图片来选。",
+        "每题只有一张图符合要求。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "两边的书签合起来有几张？选一样多的图。",
+          "skill": "辨认总数和两部分",
+          "answer": [
+            "B"
+          ],
+          "analysis": "左边一张，右边两张。同一批书签合起来是三张。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-1-prompt",
+            "alt": "左边一张青色书签，右边两张黄色书签"
+          },
+          "options": {
+            "A": {
+              "label": "四张书签",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-a",
+                "alt": "四张书签"
+              }
+            },
+            "B": {
+              "label": "三张书签",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-b",
+                "alt": "三张书签"
+              }
+            },
+            "C": {
+              "label": "两张书签",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-1-c",
+                "alt": "两张书签"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "右边只移一张牌到左边。哪张图是移完的样子？",
+          "skill": "五的有序分法",
+          "answer": [
+            "A"
+          ],
+          "analysis": "开始是左三右二。右边移走一张就只剩一张，左边收到一张变成四张。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-2-prompt",
+            "alt": "左边三张牌，右边两张牌，箭头向左"
+          },
+          "options": {
+            "A": {
+              "label": "左四右一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-a",
+                "alt": "左四右一"
+              }
+            },
+            "B": {
+              "label": "左二右三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-b",
+                "alt": "左二右三"
+              }
+            },
+            "C": {
+              "label": "左三右二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-2-c",
+                "alt": "左三右二"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "两边的书怎么合起来？选和这两组对得上的图。",
+          "skill": "分支图和合起来",
+          "answer": [
+            "C"
+          ],
+          "analysis": "左边两本，右边两本。要找两个部分都对应的图，合起来的总数是四本。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-3-prompt",
+            "alt": "左边两本青色的书，右边两本黄色的书"
+          },
+          "options": {
+            "A": {
+              "label": "左一本右三本组成四本",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-a",
+                "alt": "左一本右三本组成四本"
+              }
+            },
+            "B": {
+              "label": "左三本右一本组成四本",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-b",
+                "alt": "左三本右一本组成四本"
+              }
+            },
+            "C": {
+              "label": "左两本右两本组成四本",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-3-c",
+                "alt": "左两本右两本组成四本"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "把这四个圆印分到两边，每边一样多。选这个摆法。",
+          "skill": "四的分合",
+          "answer": [
+            "B"
+          ],
+          "analysis": "左边两个，右边两个，两边一样多，合起来恰好四个。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-4-prompt",
+            "alt": "一整排有四个印件"
+          },
+          "options": {
+            "A": {
+              "label": "左一右三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-a",
+                "alt": "左一右三"
+              }
+            },
+            "B": {
+              "label": "左二右二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-b",
+                "alt": "左二右二"
+              }
+            },
+            "C": {
+              "label": "左三右一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-4-c",
+                "alt": "左三右一"
+              }
+            }
+          }
+        },
+        {
+          "id": "q5",
+          "question": "上面有三片叶子，左边放一片。下面两块方纸，两边都要有。选对的图。",
+          "skill": "三和二的分合",
+          "answer": [
+            "A"
+          ],
+          "analysis": "上排三片，左边一片，右边两片。下排只有两块，两边都有就只能各放一块。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-5-prompt",
+            "alt": "上排三片叶形纸片，下排两块方形纸片"
+          },
+          "options": {
+            "A": {
+              "label": "上排左一右二，下排左一右一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-a",
+                "alt": "上排左一右二，下排左一右一"
+              }
+            },
+            "B": {
+              "label": "上排左二右一，下排左一右一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-b",
+                "alt": "上排左二右一，下排左一右一"
+              }
+            },
+            "C": {
+              "label": "上排左一右二，下排左一右二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-5-c",
+                "alt": "上排左一右二，下排左一右二"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "盒里一共有五个球。左边看见一个，右边盖住几个？",
+          "skill": "已知总数和一部分找另一部分",
+          "answer": [
+            "C"
+          ],
+          "analysis": "五格中已有一个球对上一格，还空四格。盖下四个球和露出的一个合起来才是五个。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-6-prompt",
+            "alt": "五个参照格，左边露出一个球，右边有盖"
+          },
+          "options": {
+            "A": {
+              "label": "两个球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-a",
+                "alt": "两个球"
+              }
+            },
+            "B": {
+              "label": "三个球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-b",
+                "alt": "三个球"
+              }
+            },
+            "C": {
+              "label": "四个球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-6-c",
+                "alt": "四个球"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "带着分合去生活里",
+      "template": "picture-points",
+      "data": {
+        "title": "带着分合去生活里",
+        "picture": "teach-clip-groups",
+        "points": [
+          "先数整批物品",
+          "分成两组，分别记录",
+          "合起来，再查总数",
+          "换个情境讲一讲"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们一起学了分与合。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先数一数整体有几个。"
+        },
+        {
+          "say": "每件物品只数一次，才不会数多或数少。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再把整体分成两个部分。"
+        },
+        {
+          "say": "要找全摆法，可以每次只把一件从右边移到左边。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "分完以后，两个部分还能合回整体。"
+        },
+        {
+          "say": "两边都数到，合起来应当和原来一样多。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "换到美工桌，先说按什么分。这里按夹子的颜色分。"
+        },
+        {
+          "say": "青色有一枚，黄色有两枚，合起来一共有三枚。"
+        },
+        {
+          "say": "换个摆放位置，夹子的颜色没变，仍然属于原来的那组。"
+        },
+        {
+          "say": "把三张大纸片分两堆，一堆在盒里，一堆在盒外。"
+        },
+        {
+          "say": "让大人盖住一堆，你先说看到几张，再猜盖住几张。"
+        },
+        {
+          "say": "打开核对后换个角色，跟大人说说你怎么想。"
+        }
+      ]
+    }
+  ]
+}

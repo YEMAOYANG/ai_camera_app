@@ -1,0 +1,856 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 This is my head.",
+  "description": "外研社一年级起点一年级下册 Module 4 Unit 1。用工作室里的原创图片听指身体部位，区别my与your。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#D67C53",
+      "persona": "用清楚的短句、原创图与画面操作讲解英语。口语表现由成人另行观察。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "maker-a": {
+      "file": "assets/maker-a.png"
+    },
+    "maker-b": {
+      "file": "assets/maker-b.png"
+    },
+    "a-head": {
+      "file": "assets/a-head.png"
+    },
+    "a-face": {
+      "file": "assets/a-face.png"
+    },
+    "a-ear": {
+      "file": "assets/a-ear.png"
+    },
+    "whole-a": {
+      "file": "assets/whole-a.png"
+    },
+    "portrait-buddies": {
+      "file": "assets/portrait-buddies.png"
+    },
+    "q-blue-ear": {
+      "file": "assets/q-blue-ear.png"
+    },
+    "q-blue-face": {
+      "file": "assets/q-blue-face.png"
+    },
+    "q-blue-head": {
+      "file": "assets/q-blue-head.png"
+    },
+    "q-blue-nose": {
+      "file": "assets/q-blue-nose.png"
+    },
+    "q-green-body": {
+      "file": "assets/q-green-body.png"
+    },
+    "q-green-ear": {
+      "file": "assets/q-green-ear.png"
+    },
+    "q-green-eye": {
+      "file": "assets/q-green-eye.png"
+    },
+    "q-green-head": {
+      "file": "assets/q-green-head.png"
+    },
+    "q-green-mouth": {
+      "file": "assets/q-green-mouth.png"
+    },
+    "q-green-nose": {
+      "file": "assets/q-green-nose.png"
+    },
+    "q-pair-blue-ear": {
+      "file": "assets/q-pair-blue-ear.png"
+    },
+    "q-pair-blue-eye": {
+      "file": "assets/q-pair-blue-eye.png"
+    },
+    "q-pair-green-eye": {
+      "file": "assets/q-pair-green-eye.png"
+    },
+    "q-pair-green-mouth": {
+      "file": "assets/q-pair-green-mouth.png"
+    },
+    "b-eye": {
+      "file": "assets/b-eye.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "身体照片工作室",
+      "template": "title-picture",
+      "data": {
+        "title": "身体照片工作室",
+        "picture": "studio",
+        "caption": "This is my head."
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到身体照片工作室。"
+        },
+        {
+          "say": "看照片，两个小伙伴来介绍身体。"
+        },
+        {
+          "say": "橙围裙的小橙先说，青围裙的小青听。"
+        },
+        {
+          "say": "小橙一边指头，一边用英语介绍。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "听：This is my head."
+        },
+        {
+          "say": "head说的是头，my说的是我的。"
+        },
+        {
+          "say": "话从谁嘴里出来，my就跟着谁。"
+        },
+        {
+          "say": "先听词，再找位置，最后试着说。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "头和脸指哪里",
+      "template": "two-columns",
+      "data": {
+        "title": "头和脸指哪里",
+        "left": {
+          "heading": "head",
+          "body": "整个头部"
+        },
+        "left_picture": "a-head",
+        "right": {
+          "heading": "face",
+          "body": "头的正面"
+        },
+        "right_picture": "a-face"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边，大圈圈住整颗头。"
+        },
+        {
+          "say": "从头顶一直看到下巴。"
+        },
+        {
+          "say": "这个词是head，整颗头。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "跟我听一次：head。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边，小圈对着头的正面。"
+        },
+        {
+          "say": "能看到眼睛、鼻子和嘴巴的这一面，是脸。"
+        },
+        {
+          "say": "这个词是face，脸。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "两个词说的是不同范围。"
+        },
+        {
+          "say": "听head，找整颗头；听face，找正面的脸。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "听到哪一处，点亮哪一处",
+      "page": "p03",
+      "startImage": "studio",
+      "widgetType": "head-feature-lights",
+      "script": [
+        {
+          "highlight": "#sound"
+        },
+        {
+          "say": "先听上面喇叭里的词，再在脸上找。"
+        },
+        {
+          "say": "小橙把照片放大，让每个部位都清楚。"
+        },
+        {
+          "setState": {
+            "demo": "nose"
+          }
+        },
+        {
+          "say": "老师点这里，脸中央的小鼻子就亮了。"
+        },
+        {
+          "say": "听：nose。"
+        },
+        {
+          "setState": {
+            "demo": "eye"
+          }
+        },
+        {
+          "say": "眼睛在鼻子上面，我们只点亮其中一只。"
+        },
+        {
+          "say": "听：eye。"
+        },
+        {
+          "setState": {
+            "demo": "ear"
+          }
+        },
+        {
+          "say": "耳朵靠在头的两旁，先找照片左边这一只。"
+        },
+        {
+          "say": "听：ear。"
+        },
+        {
+          "setState": {
+            "demo": "mouth"
+          }
+        },
+        {
+          "say": "嘴在鼻子下面，微笑时很容易看到。"
+        },
+        {
+          "say": "听：mouth。"
+        },
+        {
+          "say": "点对后，照片里的部位会亮起来。"
+        },
+        {
+          "say": "先听清，再选；选错还可以重新听。"
+        },
+        {
+          "setState": {
+            "demo": "eye"
+          }
+        },
+        {
+          "say": "eye开头嘴张开一些。再听：eye。"
+        },
+        {
+          "setState": {
+            "demo": "ear"
+          }
+        },
+        {
+          "say": "ear开头嘴张得小。再听：ear。"
+        },
+        {
+          "setState": {
+            "demo": null,
+            "handoff": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "局部与整个身体",
+      "template": "two-columns",
+      "data": {
+        "title": "局部与整个身体",
+        "left": {
+          "heading": "ear",
+          "body": "一只耳朵"
+        },
+        "left_picture": "a-ear",
+        "right": {
+          "heading": "body",
+          "body": "完整的身体"
+        },
+        "right_picture": "whole-a"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "左边的圈很小，只标出一只耳朵。"
+        },
+        {
+          "say": "一只耳朵叫ear。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "它只是身上的一个小部位。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边换成完整的人像。"
+        },
+        {
+          "say": "看看，从头到脚都在照片里面。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "介绍整个身体，可以说body。"
+        },
+        {
+          "say": "听：This is my body."
+        },
+        {
+          "say": "听body要找完整图，听ear才找小部位。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "照着声音做",
+      "page": "p05",
+      "startImage": "studio",
+      "widgetType": "self-command-photo",
+      "script": [
+        {
+          "highlight": "#sound"
+        },
+        {
+          "say": "现在把橙围裙照片当作你自己的照片。"
+        },
+        {
+          "say": "老师说Touch，是请你照着声音指一指。"
+        },
+        {
+          "setState": {
+            "demo": "face"
+          }
+        },
+        {
+          "say": "听到Touch your face，要找自己的脸。"
+        },
+        {
+          "say": "老师送对了，小橙的照片框就亮起来。"
+        },
+        {
+          "highlight": "#target-face"
+        },
+        {
+          "highlight": "#photo-slot"
+        },
+        {
+          "say": "每一轮先听你的口令，再选图卡。"
+        },
+        {
+          "say": "Touch your ear."
+        },
+        {
+          "say": "Touch your head."
+        },
+        {
+          "say": "Touch your face."
+        },
+        {
+          "say": "不用读字，看看光圈标在小橙哪里。"
+        },
+        {
+          "say": "如果要再听，就按小喇叭。"
+        },
+        {
+          "setState": {
+            "demo": null,
+            "handoff": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "换谁开口，my就跟谁",
+      "template": "two-columns",
+      "data": {
+        "title": "换谁开口，my就跟谁",
+        "left": {
+          "heading": "小橙开口",
+          "body": "This is my eye."
+        },
+        "left_picture": "maker-a",
+        "right": {
+          "heading": "小青开口",
+          "body": "This is my eye."
+        },
+        "right_picture": "b-eye"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一次，小橙先开口，小青听。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "小橙指自己的眼，说：This is my eye."
+        },
+        {
+          "say": "同一位小橙若指小青的眼，就改用your。"
+        },
+        {
+          "say": "听：This is your eye."
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在换成小青开口，小橙听。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "小青指自己的眼，也说：This is my eye."
+        },
+        {
+          "say": "my跟着正在说话的人。"
+        },
+        {
+          "say": "your指说话人正在对着说的人。"
+        },
+        {
+          "say": "换了说话人，要重新判断是谁。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小青指着自己这只眼，说：This is my eye."
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小橙指小青同一只眼，说：This is your eye."
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "给正确的照片盖章",
+      "page": "p07",
+      "startImage": "studio",
+      "widgetType": "role-photo-stamp",
+      "script": [
+        {
+          "highlight": "#speaker-cue"
+        },
+        {
+          "say": "先看两个人，戴橙围裙的是小橙。"
+        },
+        {
+          "say": "戴青围裙的是小青，这轮他来听。"
+        },
+        {
+          "setState": {
+            "demo": "a-nose"
+          }
+        },
+        {
+          "say": "老师试一次：小橙说This is my nose。"
+        },
+        {
+          "say": "她指自己的鼻子，印章落在小橙的照片。"
+        },
+        {
+          "highlight": "#maker-b"
+        },
+        {
+          "say": "如果她说your，照片就要找听话的小青。"
+        },
+        {
+          "say": "这一关会换发言的人，先听谁说话。"
+        },
+        {
+          "say": "小橙对小青说：This is your ear."
+        },
+        {
+          "say": "小青对小橙说：This is my nose."
+        },
+        {
+          "say": "小青对小橙说：This is your ear."
+        },
+        {
+          "say": "小橙对小青说：This is my nose."
+        },
+        {
+          "highlight": "#stamp"
+        },
+        {
+          "say": "听清部位后，给对的人盖到对应的位置。"
+        },
+        {
+          "say": "可以点照片上的位置，也可拖印章。"
+        },
+        {
+          "setState": {
+            "demo": null,
+            "handoff": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "一边指，一边向伙伴介绍",
+      "template": "picture-points",
+      "data": {
+        "title": "一边指，一边向伙伴介绍",
+        "picture": "portrait-buddies",
+        "points": [
+          "This is my face.",
+          "This is your mouth."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两个伙伴各画了一张自己的像。"
+        },
+        {
+          "say": "小橙手里是她画的自己。"
+        },
+        {
+          "say": "小青手里也有一张自己的画。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先由小橙介绍自己的脸。"
+        },
+        {
+          "say": "This is my face."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小橙指小青画像上的嘴，对小青说。"
+        },
+        {
+          "say": "This is your mouth."
+        },
+        {
+          "say": "听完停一停，指着照片跟我说。"
+        },
+        {
+          "say": "你也可以画一画，给家人介绍。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "四次新图小检查",
+      "intro": [
+        "换了新朋友，听录音，再选对的照片。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "蓝衣小朋友说：This is my face. 选对的照片。",
+          "skill": "部位听辨",
+          "answer": [
+            "A"
+          ],
+          "analysis": "face是正面的脸。只有这张图的圈标出正脸，其他圈指整颗头、鼻子或一只耳朵。",
+          "options": {
+            "A": {
+              "label": "圈在蓝衣孩子正面的脸上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-blue-face",
+                "alt": "圈在蓝衣孩子正面的脸上"
+              }
+            },
+            "B": {
+              "label": "圈住蓝衣孩子的整个头",
+              "visual": {
+                "kind": "asset",
+                "image": "q-blue-head",
+                "alt": "圈住蓝衣孩子的整个头"
+              }
+            },
+            "C": {
+              "label": "圈在蓝衣孩子的鼻子上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-blue-nose",
+                "alt": "圈在蓝衣孩子的鼻子上"
+              }
+            },
+            "D": {
+              "label": "圈在蓝衣孩子的一只耳朵上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-blue-ear",
+                "alt": "圈在蓝衣孩子的一只耳朵上"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "绿衣小朋友说：This is my body. 选对的照片。",
+          "skill": "部位听辨",
+          "answer": [
+            "B"
+          ],
+          "analysis": "body说的是整个身体。这张图从头到脚都看得见，其他图圈的是局部。",
+          "options": {
+            "A": {
+              "label": "圈在绿衣孩子的一只眼睛上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-eye",
+                "alt": "圈在绿衣孩子的一只眼睛上"
+              }
+            },
+            "B": {
+              "label": "框出绿衣孩子从头到脚的全身",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-body",
+                "alt": "框出绿衣孩子从头到脚的全身"
+              }
+            },
+            "C": {
+              "label": "圈住绿衣孩子的整个头",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-head",
+                "alt": "圈住绿衣孩子的整个头"
+              }
+            },
+            "D": {
+              "label": "圈在绿衣孩子的嘴巴上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-mouth",
+                "alt": "圈在绿衣孩子的嘴巴上"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "听口令：Touch your ear. 哪张照片圈对了地方？",
+          "skill": "听指令找部位",
+          "answer": [
+            "C"
+          ],
+          "analysis": "口令要找自己的一只耳朵。正确的照片把圈放在头侧的耳朵上。",
+          "options": {
+            "A": {
+              "label": "圈在鼻子上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-nose",
+                "alt": "圈在鼻子上"
+              }
+            },
+            "B": {
+              "label": "圈在嘴巴上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-mouth",
+                "alt": "圈在嘴巴上"
+              }
+            },
+            "C": {
+              "label": "圈在一只耳朵上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-ear",
+                "alt": "圈在一只耳朵上"
+              }
+            },
+            "D": {
+              "label": "圈住整个头",
+              "visual": {
+                "kind": "asset",
+                "image": "q-green-head",
+                "alt": "圈住整个头"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "蓝衣孩子对绿衣孩子说：This is your eye.",
+          "skill": "说话者视角",
+          "answer": [
+            "D"
+          ],
+          "analysis": "蓝衣孩子在说，绿衣孩子在听。your指绿衣孩子。eye是一只眼睛，所以要选圈在绿衣孩子一只眼睛上的照片。",
+          "options": {
+            "A": {
+              "label": "圈在蓝衣孩子的一只眼睛上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pair-blue-eye",
+                "alt": "圈在蓝衣孩子的一只眼睛上"
+              }
+            },
+            "B": {
+              "label": "圈在绿衣孩子的嘴巴上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pair-green-mouth",
+                "alt": "圈在绿衣孩子的嘴巴上"
+              }
+            },
+            "C": {
+              "label": "圈在蓝衣孩子的一只耳朵上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pair-blue-ear",
+                "alt": "圈在蓝衣孩子的一只耳朵上"
+              }
+            },
+            "D": {
+              "label": "圈在绿衣孩子的一只眼睛上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pair-green-eye",
+                "alt": "圈在绿衣孩子的一只眼睛上"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "回顾身体照片",
+      "template": "picture-points",
+      "data": {
+        "title": "回顾身体照片",
+        "picture": "studio",
+        "points": [
+          "听身体部位",
+          "听口令指一指",
+          "轮流用 my 和 your"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天工作室拍出了好多身体照片。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先复习整颗头和脸：head，face。"
+        },
+        {
+          "say": "鼻子是nose，一只眼睛是eye。"
+        },
+        {
+          "say": "一只耳朵是ear，嘴巴是mouth。"
+        },
+        {
+          "say": "整个人从头到脚，是body。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "听见Touch your，先听最后的部位。"
+        },
+        {
+          "say": "再指到自己图上的那个位置。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "轮到自己说，my指自己的。"
+        },
+        {
+          "say": "说给伙伴听，your指对方的。"
+        },
+        {
+          "say": "画好一张自己的像，给家人说一句。"
+        },
+        {
+          "say": "请家人听你说，看看你指的是哪里。"
+        }
+      ]
+    }
+  ]
+}

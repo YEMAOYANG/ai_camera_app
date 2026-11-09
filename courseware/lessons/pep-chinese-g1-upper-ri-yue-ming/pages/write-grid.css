@@ -1,0 +1,85 @@
+#play .ry-writing {
+  position: absolute;
+  inset: 94px 96px 104px;
+  display: grid;
+  grid-template-columns: 465px 1fr;
+  gap: 44px;
+  align-items: center;
+}
+#play .ry-grid {
+  position: relative;
+  width: 465px;
+  height: 465px;
+}
+#play .ry-grid svg,
+#play #ry-ink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+#play #ry-ink { touch-action: none; }
+#play .ry-writing-tools {
+  border: 3px solid #d4ad76;
+  border-radius: 26px;
+  padding: 30px 24px;
+  background: #fff8e8;
+}
+#play .ry-writing-word {
+  text-align: center;
+  color: #563721;
+  font: 700 84px/1.2 "Kaiti SC", "Noto Serif CJK SC", serif;
+}
+#play .ry-sequence {
+  min-height: 82px;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+#play .ry-sequence svg {
+  width: 55px;
+  height: 55px;
+  flex: 0 0 55px;
+  border: 2px solid #d4ad76;
+  border-radius: 7px;
+  background: #fffdf7;
+}
+#play .ry-sequence svg.active {
+  border-color: #b65036;
+  background: #fff0d7;
+}
+#play .ry-ink-progress {
+  height: 14px;
+  margin: 22px 12px 24px;
+  border-radius: 12px;
+  background: #dce8d9;
+}
+#play .ry-ink-progress > span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: #568f7d;
+}
+#play .ry-writing-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+#play .ry-writing-buttons button {
+  min-width: 75px;
+  min-height: 65px;
+  padding: 5px 12px;
+  border: 3px solid #d4ad76;
+  border-radius: 14px;
+  background: #fffdf7;
+  color: #563721;
+  font-size: 31px;
+  font-weight: 700;
+  cursor: pointer;
+}
+#play #ry-confirm-ink { background: #dceee2; color: #215a43; }
+#play .ry-writing-buttons button:disabled { opacity: 0.45; cursor: default; }
+#play .ry-writing-buttons button:focus-visible { outline: 5px solid #1b6381; outline-offset: 2px; }

@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-upper-64e96b25",
+    "revisionId": "directory-0e2e092fb846ac493525aece",
+    "nodeId": "5b1c7673-8e1c-419b-b378-4d4562265edc"
+  },
+  "officialTextbook": {
+    "materialId": "a6dfbe2b-c9a8-4e6d-83fc-c47bf4c2d13e",
+    "title": "新教材-小学科学人教鄂教版一年级上册",
+    "chapterId": "5b1c7673-8e1c-419b-b378-4d4562265edc",
+    "lessonTitle": "11.拆装玩具",
+    "classHours": [
+      "lesson_1"
+    ]
+  },
+  "reviewedAt": "2026-11-05T07:30:05+08:00",
+  "reviewedBy": "codex gpt-6.1-sol",
+  "reviewerKind": "ai",
+  "objectives": [
+    "观察并说出玩具小车由不同零件组成，能按拆下的顺序整理零件。",
+    "知道螺丝刀与螺丝钉配合使用，体会合适工具给拆装带来的便利。",
+    "根据说明书的图片、数字和箭头按顺序组装玩具。",
+    "组装后检查完整、稳固和能否正常行驶，发现问题后改进并再次测试。",
+    "理解合作时按顺序分工，愿意表达发现并听取同伴的想法。"
+  ],
+  "keyPoint": "观察零件并选用螺丝刀，参照说明书按顺序组装，完成后进行测试。",
+  "difficultPoint": "发现缺件、连接松动等测试结果，找到相关部位并改进；说明自己负责的一步与前后步骤的关系。",
+  "resources": {
+    "teachingDesign": {
+      "status": "reviewed",
+      "pageCount": 3,
+      "pageRefs": [
+        1,
+        2,
+        3
+      ],
+      "findings": [
+        "教学设计第1页：本课通过拆装玩具小车认识螺丝刀等工具的功能，分析小车结构；重点是工具使用，难点是表达结构并针对作品问题提出办法。",
+        "教学设计第2页：先观察螺丝和所需工具，再拆车认识部件；初次安装后测试和找原因，随后读说明书的数字、箭头，按顺序再装。合作采用分工接续的方式。",
+        "教学设计第3页：第二次测试后改进，归纳顺序和测试的意义；课后观察生活中有问题的物品，判断需要什么工具。原资料中的修理任务在本课改为与大人共同观察，不以屏幕点击推断真实操作能力。"
+      ]
+    },
+    "courseware": {
+      "status": "reviewed",
+      "pageCount": 15,
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "findings": [
+        "课件第1至4页：确认人教鄂教版一年级上册第四单元第11课；从手指活动引入可拆装玩具，观察螺丝连接和螺丝刀，体会工具的便利。",
+        "课件第5至7页：拆卸后把零件留在托盘内；辨认底座、车轮、车尾、机械臂、车厢这些官方示例的组成部分，再尝试组装。",
+        "课件第8至10页：先呈现未完成或组装有问题的作品，再比较安装成功的作品；说明书用步骤图、数字和箭头表示装配顺序。官方挖掘机示例先装车轮，接着装车厢，再装机械臂，最后装车尾；这是该模型的顺序，不是所有玩具的共同固定顺序。",
+        "课件第11至13页：流水线示意每人负责固定环节并按顺序接续；再次按照说明书合作组装，并回顾工具、顺序与合作的作用。",
+        "课件第14至15页：课后从破损或连接有问题的生活物品中观察修理需要，最后为制作信息页。"
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed",
+      "pageCount": 2,
+      "pageRefs": [
+        1,
+        2
+      ],
+      "findings": [
+        "学习任务单第1页：课前练习使用螺丝刀；课中按拆卸顺序整理零件，描述组成部分；装车后检查是否完整、稳固、能否正常行驶。",
+        "学习任务单第2页：用说明书解释组装顺序，采用分工接续方式再装再测；表达遇到的问题与解决方法。补充资料解释流水线中每人负责一道或少数几道工序。"
+      ]
+    },
+    "afterClassExercise": {
+      "status": "not_provided",
+      "evidence": "output/courseware-lessons/renjiao-science-g1-upper-disassemble-toys/official/manifest.json：classHours[0].resources.afterClassExercise.status=absent_in_listing。课后目标由课件第14页和学习任务单第2页承接。"
+    },
+    "video": {
+      "status": "waived",
+      "resourceId": "4a045183-eef8-2984-b2d9-be2385e63726",
+      "evidence": "官方 manifest 记录 waived；标准记录用户于2026-10-30批准视频豁免。"
+    }
+  },
+  "factChecks": [],
+  "originalAdaptation": {
+    "setting": "原创青绿色可拆装货车，画面呈现底座、车轮、车头、货斗。仅作为本课练习模型，各零件名称按可见形状描述。",
+    "assemblyScope": "自制练习图先车轮、再车头、后货斗；明确真实玩具遵循各自说明书，不把官方挖掘机的顺序推广到其他玩具。",
+    "observability": "页面记录选工具、移动零件、按图排序及排错选择；真实螺丝刀握持、口述和物理稳固性均待大人观察。",
+    "safetyBoundary": "不讲未有出处的旋转方向、力度或带电器具修理步骤；不要求儿童离开屏幕自行维修。"
+  }
+}

@@ -1,0 +1,1249 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "语文园地五",
+  "description": "从生活图画认识包字族，辨用青清和再在，发现身体相关形旁，复习音序查字；口语、纸笔和真实翻字典如实留待成人观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "温暖清楚的语文老师，用生活图画和具体步骤解释字义，不把屏幕操作说成会读会写。"
+    }
+  },
+  "images": {
+    "garden-cover": {
+      "file": "assets/garden-cover.png"
+    },
+    "full-meal": {
+      "file": "assets/full-meal.png"
+    },
+    "tea-pour": {
+      "file": "assets/tea-pour.png"
+    },
+    "child-run": {
+      "file": "assets/child-run.png"
+    },
+    "child-hug": {
+      "file": "assets/child-hug.png"
+    },
+    "long-robe": {
+      "file": "assets/long-robe.png"
+    },
+    "firecrackers": {
+      "file": "assets/firecrackers.png"
+    },
+    "green-grass": {
+      "file": "assets/green-grass.png"
+    },
+    "clear-stream": {
+      "file": "assets/clear-stream.png"
+    },
+    "child-blow": {
+      "file": "assets/child-blow.png"
+    },
+    "child-kick": {
+      "file": "assets/child-kick.png"
+    },
+    "quiz-hug-cat": {
+      "file": "assets/quiz-hug-cat.png"
+    },
+    "quiz-clear-glass": {
+      "file": "assets/quiz-clear-glass.png"
+    },
+    "quiz-eat-noodles": {
+      "file": "assets/quiz-eat-noodles.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "走进字的生活",
+      "template": "title-picture",
+      "data": {
+        "title": "语文园地五",
+        "picture": "garden-cover",
+        "caption": "从生活里的动作和东西，发现字的秘密"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到我们的识字生活工坊。"
+        },
+        {
+          "say": "桌上有米饭和茶，旁边还有长袍。"
+        },
+        {
+          "say": "这些东西能帮我们想明白字的意思。"
+        },
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天认识一个右边都有包的字族。"
+        },
+        {
+          "say": "它们读音有相近的地方，意思却不同。"
+        },
+        {
+          "say": "我们会看左边的偏旁，寻找意思线索。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "再听两个同音字，看看句子需要谁。"
+        },
+        {
+          "say": "接着让嘴、手和脚的动作帮助识字。"
+        },
+        {
+          "say": "最后拿起字典，复习找字的办法。"
+        },
+        {
+          "say": "跟着老师想一想，再动手试一试。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "饭香和茶香",
+      "template": "picture-points",
+      "data": {
+        "title": "饭香和茶香",
+        "picture": "tea-pour",
+        "points": [
+          "饭、饱：吃喝的线索",
+          "茶：草字头，注意字形",
+          "泡：三点水，联系水",
+          "包：右边相同的部件"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看成人把水倒进装茶叶的杯子。"
+        },
+        {
+          "say": "水和茶叶在一起，这个动作叫泡茶。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "饭，第四声；饱，第三声。"
+        },
+        {
+          "say": "吃了饭，肚子不饿了，可以说吃饱。"
+        },
+        {
+          "say": "饭和饱的左边都是食字旁。"
+        },
+        {
+          "say": "这个偏旁常提醒我们想到食物和吃喝。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "茶，第二声，茶的上面是草字头。"
+        },
+        {
+          "say": "看清上面的草字头，帮助我们记住茶的字形。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "泡，第四声，左边是三点水。"
+        },
+        {
+          "say": "泡茶需要水，这就把形旁和意思连上了。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "饱和泡右边都有包，读音有相近之处。"
+        },
+        {
+          "say": "左边换了，字的意思也要重新想。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "脚会跑，手会抱",
+      "template": "two-columns",
+      "data": {
+        "title": "脚会跑，手会抱",
+        "left": {
+          "heading": "跑",
+          "body": "足字旁，想到脚的动作"
+        },
+        "left_picture": "child-run",
+        "right": {
+          "heading": "抱",
+          "body": "提手旁，想到手的动作"
+        },
+        "right_picture": "child-hug"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看左边，孩子的双脚交替向前。"
+        },
+        {
+          "say": "跑，第三声，跑步是脚的动作。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "跑字左边是足字旁，右边还是包。"
+        },
+        {
+          "say": "形旁帮助我们把字和脚的动作连起来。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边，孩子双臂围住玩具。"
+        },
+        {
+          "say": "抱，第四声，要用手和胳膊来抱。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "抱字左边是提手旁，右边也是包。"
+        },
+        {
+          "say": "轻，第一声，轻轻抱就是动作轻一点。"
+        },
+        {
+          "say": "两张图都有人，动作却不能混在一起。"
+        },
+        {
+          "say": "看清用了身体哪里，再选合适的字。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "衣和火来帮忙",
+      "template": "two-columns",
+      "data": {
+        "title": "衣和火来帮忙",
+        "left": {
+          "heading": "穿长袍",
+          "body": "袍的衣字旁提示衣服"
+        },
+        "left_picture": "long-robe",
+        "right": {
+          "heading": "鞭炮",
+          "body": "炮的火字旁提示与火有关"
+        },
+        "right_picture": "firecrackers"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这件衣服的下摆很长，叫长袍。"
+        },
+        {
+          "say": "穿，第一声；袍，第二声。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "袍的左边是衣字旁，提示它是衣服。"
+        },
+        {
+          "say": "右边的包，和刚才几个字的右边一样。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边是一串没有点燃的鞭炮。"
+        },
+        {
+          "say": "鞭，第一声；炮，第四声。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "炮字左边是火字旁，是本课的新偏旁。"
+        },
+        {
+          "say": "看到这个形旁，我们想到它与火有关。"
+        },
+        {
+          "say": "小朋友只看图片，不去点燃或摆弄。"
+        },
+        {
+          "say": "饱、泡、跑、抱、袍、炮都有包。"
+        },
+        {
+          "say": "它们的读音相近，不能说成完全一样。"
+        },
+        {
+          "say": "形旁帮助想意思，包帮助记相近的声音。"
+        }
+      ]
+    },
+    {
+      "key": "p04-read",
+      "type": "slide",
+      "title": "把六幅画读成儿歌",
+      "template": "picture-points",
+      "data": {
+        "title": "听读教材字族儿歌",
+        "picture": "garden-cover",
+        "points": [
+          "有饭能吃饱，有水把茶泡。",
+          "有足快快跑，有手轻轻抱。",
+          "有衣穿长袍，有火放鞭炮。"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "现在把刚才的字放回教材儿歌里。"
+        },
+        {
+          "say": "老师先读，你可以轻声跟读。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "有饭能吃饱，"
+        },
+        {
+          "say": "有水把茶泡。"
+        },
+        {
+          "say": "第一组连着饭和水，把意思装进画面。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "有足快快跑，"
+        },
+        {
+          "say": "有手轻轻抱。"
+        },
+        {
+          "say": "跑可以读得轻快，抱的动作要轻柔。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "有衣穿长袍，"
+        },
+        {
+          "say": "有火放鞭炮。"
+        },
+        {
+          "say": "最后一组用衣和火，提醒我们看形旁。"
+        },
+        {
+          "say": "六个末尾的字都有包，声音有相近处。"
+        },
+        {
+          "say": "跟读的字音和节奏，请大人帮你听一听。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "给包字家族找画面",
+      "page": "p05",
+      "widgetType": "mira-p05",
+      "startImage": "garden-cover",
+      "script": [
+        {
+          "highlight": "#family-word"
+        },
+        {
+          "say": "先看大字，再观察它左边的形旁。"
+        },
+        {
+          "say": "老师用泡做一次示范，不算你的答题。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "泡的左边是三点水，我们想到水。"
+        },
+        {
+          "annotate": "#family-gallery",
+          "content": "看形旁，再联系意思"
+        },
+        {
+          "say": "画里成人把水倒进茶杯，正是在泡茶。"
+        },
+        {
+          "say": "我们把这幅图放进泡字的生活相册。"
+        },
+        {
+          "say": "等会儿出现新的字，先想它和什么有关。"
+        },
+        {
+          "say": "找饱想吃饭，找抱想手臂围住东西。"
+        },
+        {
+          "say": "找跑看脚的动作，找袍看衣服。"
+        },
+        {
+          "say": "找炮看对应的物品，不只看右边的包。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "现在轮到你，选中的图会进入相册。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "饱和抱进田字格",
+      "page": "p06",
+      "widgetType": "mira-p06",
+      "startImage": "garden-cover",
+      "script": [
+        {
+          "highlight": "#practice-glyph"
+        },
+        {
+          "say": "饱和抱的右边相同，左边的偏旁不同。"
+        },
+        {
+          "say": "先看清两个部分，再看它们在格中的位置。"
+        },
+        {
+          "annotate": "#write-grid",
+          "content": "观察两部分，轻轻描画"
+        },
+        {
+          "say": "老师先指着饱，左边是食字旁。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "换成抱时，左边要认清提手旁。"
+        },
+        {
+          "say": "描画时让笔迹跟着淡字走，不要着急。"
+        },
+        {
+          "say": "这里是自由描画，不会判断笔顺是否正确。"
+        },
+        {
+          "say": "如果想重来，点清除就能擦掉自己的笔迹。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "两个字都描过，再拿纸和笔各练一练。"
+        },
+        {
+          "say": "请大人看看笔画、字迹和书写姿势。"
+        },
+        {
+          "say": "屏幕上的完成，只表示你做过这次描画。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "青和清，声音相同",
+      "template": "two-columns",
+      "data": {
+        "title": "青和清，声音相同",
+        "left": {
+          "heading": "青色的草",
+          "body": "青，可以联系颜色"
+        },
+        "left_picture": "green-grass",
+        "right": {
+          "heading": "清澈的小溪",
+          "body": "清带三点水，这里联系水"
+        },
+        "right_picture": "clear-stream"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "草地绿绿的，可以说青青的草。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这里的青，帮助我们说出颜色。"
+        },
+        {
+          "say": "青，第一声，请听清楚它的声音。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "小溪里的石头能看清，是清澈的水。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "清，也是第一声，和青的读音相同。"
+        },
+        {
+          "say": "但清多了三点水，这里的意思和水有关。"
+        },
+        {
+          "say": "读音完全相同的字，叫同音字。"
+        },
+        {
+          "say": "同音字不一定意思相同，不能随便互换。"
+        },
+        {
+          "say": "看到句子先想意思，再决定用哪个字。"
+        },
+        {
+          "say": "说颜色时想青，说水清澈时想到清。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "再一次，在哪里",
+      "template": "two-columns",
+      "data": {
+        "title": "再一次，在哪里",
+        "left": {
+          "heading": "在草地上",
+          "body": "在，告诉我们所在的位置"
+        },
+        "left_picture": "child-run",
+        "right": {
+          "heading": "再跑一次",
+          "body": "再，表示又来一次"
+        },
+        "right_picture": "child-run"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "孩子在草地上跑步，草地是他所在的地方。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "说他在哪里，用表示位置的在。"
+        },
+        {
+          "say": "在，第四声，这里是在草地上。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这个小朋友刚才已经跑过一次。"
+        },
+        {
+          "say": "老师请他又跑一次，就说再跑一次。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再，也是第四声，和在的读音相同。"
+        },
+        {
+          "say": "再表示又一次，不能拿它来说明位置。"
+        },
+        {
+          "say": "听到同样的声音，也要想清楚意思。"
+        },
+        {
+          "say": "说一个人在哪里，就想位置的在。"
+        },
+        {
+          "say": "说做过以后又做一次，就想再次的再。"
+        },
+        {
+          "say": "先听句子在说什么，再把合适的字放进去。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "听意思，让画面动起来",
+      "page": "p09",
+      "widgetType": "mira-p09",
+      "startImage": "garden-cover",
+      "script": [
+        {
+          "highlight": "#context-picture"
+        },
+        {
+          "say": "这一关先听情境，再在两个字里作选择。"
+        },
+        {
+          "say": "看老师怎么从句子和生活画面里找线索。"
+        },
+        {
+          "annotate": "#word-options",
+          "content": "声音相同，联系意思来选"
+        },
+        {
+          "say": "先判断说的是颜色、水、位置，还是又一次。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "孩子坐在饭桌旁，说的是位置，老师选在。"
+        },
+        {
+          "say": "练习时先听懂意思，再点你选的字。"
+        },
+        {
+          "say": "老师的饭桌例子结束了，接下来是四幅新图。"
+        },
+        {
+          "say": "拿不准时可以再听一遍，慢慢想。"
+        },
+        {
+          "say": "放好字后，水面或人物动作会发生变化。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "现在听明白情境，再让合适的字帮助画面。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "形旁会提醒",
+      "template": "picture-points",
+      "data": {
+        "title": "形旁会提醒",
+        "picture": "child-blow",
+        "points": [
+          "吃、叫、吹、唱：口字旁",
+          "抱、拔、提、拍：提手旁",
+          "跑、跳、踢、跟：足字旁"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "孩子把气从嘴里吹出来，泡泡就飞走了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "吃、叫、吹、唱，都能联系到嘴。"
+        },
+        {
+          "say": "它们都有口字旁，大多和嘴有关。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "抱、拔、提、拍，我们可以做动作来想。"
+        },
+        {
+          "say": "这些字有提手旁，大多和手的动作有关。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "跑、跳、踢、跟，都可以联系脚的动作。"
+        },
+        {
+          "say": "它们的足字旁，给我们一个意思的线索。"
+        },
+        {
+          "say": "形旁像小提醒，能帮助猜字的大致意思。"
+        },
+        {
+          "say": "要说大多有关，不能说所有字都一样。"
+        },
+        {
+          "say": "猜了以后还要联系词语和句子再核对。"
+        },
+        {
+          "say": "一边做动作一边认字，记忆会更有联系。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "title": "动作图送到哪一家",
+      "page": "p11",
+      "widgetType": "mira-p11",
+      "startImage": "garden-cover",
+      "script": [
+        {
+          "highlight": "#mouth-home"
+        },
+        {
+          "say": "三个字族柜，分别放口、手和脚的动作。"
+        },
+        {
+          "say": "这里的口字旁，提醒我们想一想嘴。"
+        },
+        {
+          "annotate": "#action-card",
+          "content": "看动作，用到了身体哪里"
+        },
+        {
+          "say": "老师先拿吹泡泡的图，嘴把气吹出去。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "所以把吹的画面送到口字旁这一家。"
+        },
+        {
+          "say": "抱玩具要用手臂，想想提手旁这一家。"
+        },
+        {
+          "say": "踢球要用脚，想想足字旁这一家。"
+        },
+        {
+          "say": "拖动时看图里的动作，不按衣服颜色分。"
+        },
+        {
+          "say": "每放好一幅图，它就会留在对应的柜子里。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "现在请你自己观察，试着给动作图分家。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "字典里的寻字路",
+      "template": "steps",
+      "data": {
+        "title": "字典里的寻字路",
+        "steps": [
+          "准 zhǔn：开头 z → 大写 Z",
+          "示例索引 Z 栏：zhun → 26 页",
+          "示例正文第 26 页：找 zhǔn 准"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "以准这个字为例，画面里给出了它的拼音。"
+        },
+        {
+          "say": "知的声母，拼上温的韵母。听，准，第三声。"
+        },
+        {
+          "say": "准的首字母和资的一样。它的大写就是音序。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "在索引的大写下面，找准的整串拼音，先不看声调。"
+        },
+        {
+          "say": "练习小字典里，这行写着二十六，告诉我们翻哪页。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "翻到第二十六页，找同音节里的第三声，找到准。"
+        },
+        {
+          "say": "同一个音节可能跨页，要接着按声调寻找。"
+        },
+        {
+          "say": "准在本课读第三声，字和声音都要看清。"
+        },
+        {
+          "say": "不同的字典页码可能不同，不要照抄。"
+        },
+        {
+          "say": "这次要查溪、解、准、楼、伯五个字。"
+        },
+        {
+          "say": "先练音序，再请大人陪你用实际字典查。"
+        },
+        {
+          "say": "查到后，把自己这本字典的真实页码记下来。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "interactive",
+      "title": "给音序找大写伙伴",
+      "page": "p13",
+      "widgetType": "mira-p13",
+      "startImage": "garden-cover",
+      "script": [
+        {
+          "highlight": "#sound-card"
+        },
+        {
+          "say": "先看小写字母，给它找对应的大写伙伴。"
+        },
+        {
+          "say": "到了汉字关，再看它上方的目标拼音。"
+        },
+        {
+          "annotate": "#index-area",
+          "content": "只看开头字母，再找大写"
+        },
+        {
+          "say": "读音有几个字母，找音序先看最开头。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "老师把小写字母和它的大写伙伴放在一起。"
+        },
+        {
+          "say": "溪，第一声；解，在本课读第三声。"
+        },
+        {
+          "say": "准，第三声；楼，第二声；伯，第二声。"
+        },
+        {
+          "say": "它们的拼音会留在画面里，帮助你观察。"
+        },
+        {
+          "say": "选好音序，字卡就会进入对应的索引栏。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "这里完成的是字母和音序练习。"
+        },
+        {
+          "say": "真正翻到字典正文，还要拿自己的字典试。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "quiz",
+      "title": "换个情境小检查",
+      "intro": [
+        "现在换几个生活情境，听老师读题。",
+        "用图片、目标字卡和拼音来作答。",
+        "没有观察到的朗读和书写，不在这里判断。"
+      ],
+      "questions": [
+        {
+          "id": "garden5-q1",
+          "question": "轻轻抱住小猫，哪幅图最符合抱的意思？",
+          "skill": "包字族形旁与字义",
+          "answer": [
+            "B"
+          ],
+          "analysis": "抱带提手旁，图中孩子用双臂把小猫围在胸前，符合抱的意思。",
+          "options": {
+            "A": {
+              "label": "图片A",
+              "visual": {
+                "kind": "asset",
+                "image": "child-run",
+                "alt": "孩子跑步"
+              }
+            },
+            "B": {
+              "label": "图片B",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-hug-cat",
+                "alt": "孩子双臂抱住小猫"
+              }
+            },
+            "C": {
+              "label": "图片C",
+              "visual": {
+                "kind": "asset",
+                "image": "long-robe",
+                "alt": "挂在衣架上的长袍"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden5-q2",
+          "question": "清水的清，最适合用在哪幅新图里？",
+          "skill": "青清语境",
+          "answer": [
+            "C"
+          ],
+          "analysis": "清带三点水，这里的清水是透明干净的水；青草的青表示颜色。",
+          "options": {
+            "A": {
+              "label": "图片A",
+              "visual": {
+                "kind": "asset",
+                "image": "green-grass",
+                "alt": "绿色青草"
+              }
+            },
+            "B": {
+              "label": "图片B",
+              "visual": {
+                "kind": "asset",
+                "image": "firecrackers",
+                "alt": "未点燃的红色鞭炮"
+              }
+            },
+            "C": {
+              "label": "图片C",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-clear-glass",
+                "alt": "透明玻璃杯里的清水"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden5-q3",
+          "question": "画好一遍，又画一遍。哪个字表示又一次？",
+          "skill": "再在语境",
+          "answer": [
+            "A"
+          ],
+          "analysis": "再表示又一次；在可以表示所在的位置，青在本课联系颜色。",
+          "options": {
+            "A": {
+              "label": "字卡A",
+              "visual": {
+                "kind": "picture",
+                "alt": "目标字卡再",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "再"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "B": {
+              "label": "字卡B",
+              "visual": {
+                "kind": "picture",
+                "alt": "目标字卡在",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "在"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "C": {
+              "label": "字卡C",
+              "visual": {
+                "kind": "picture",
+                "alt": "目标字卡青",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "青"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "garden5-q4",
+          "question": "哪个新画面的动作最合口字旁的线索？",
+          "skill": "身体相关形旁",
+          "answer": [
+            "B"
+          ],
+          "analysis": "吃面要用嘴，吃带口字旁；踢球主要用脚，抱玩具主要用手和胳膊。",
+          "options": {
+            "A": {
+              "label": "图片A",
+              "visual": {
+                "kind": "asset",
+                "image": "child-kick",
+                "alt": "孩子用脚踢球"
+              }
+            },
+            "B": {
+              "label": "图片B",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-eat-noodles",
+                "alt": "孩子用嘴吃面条"
+              }
+            },
+            "C": {
+              "label": "图片C",
+              "visual": {
+                "kind": "asset",
+                "image": "child-hug",
+                "alt": "孩子抱玩具"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden5-q5",
+          "question": "看伯的拼音，哪个大写字母是它的音序？",
+          "skill": "音序与大小写",
+          "answer": [
+            "C"
+          ],
+          "analysis": "伯在这里读第二声，画面拼音开头字母是小写b，对应的大写是B。",
+          "options": {
+            "A": {
+              "label": "字卡A",
+              "visual": {
+                "kind": "picture",
+                "alt": "目标字卡D",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "D"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "B": {
+              "label": "字卡B",
+              "visual": {
+                "kind": "picture",
+                "alt": "目标字卡P",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "P"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "C": {
+              "label": "字卡C",
+              "visual": {
+                "kind": "picture",
+                "alt": "目标字卡B",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "B"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "visual": {
+            "kind": "picture",
+            "alt": "目标字卡伯 bó",
+            "picture": {
+              "groups": [
+                {
+                  "cells": [
+                    {
+                      "glyph": "伯"
+                    },
+                    {
+                      "glyph": "bó"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "把字用到生活里",
+      "template": "summary",
+      "data": {
+        "title": "把字用到生活里",
+        "items": [
+          "看形旁，联系意思；包字族读音相近",
+          "饱、抱：先观察，描画后再纸笔练写",
+          "青清、再在：同音字联系语境",
+          "口、手、足：动作帮助发现形旁线索",
+          "看拼音找音序，再去实际字典核对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天用生活图认识了包字族和九个新字。"
+        },
+        {
+          "say": "形旁提示大致意思，包提示相近的声音。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "我们观察饱和抱，描过它们的淡字。"
+        },
+        {
+          "say": "纸上的笔画和字形，还要请大人帮你看看。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "青和清、再和在，都要联系句子意思。"
+        },
+        {
+          "say": "听起来相同，不代表每个地方都能互换。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "口、提手、足这些形旁，常给意思线索。"
+        },
+        {
+          "say": "嘴、手、脚的动作，可以帮我们理解字。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "我们还给大小写字母找了伙伴，练了音序。"
+        },
+        {
+          "say": "拿自己的字典查五个字，记下真实页码。"
+        },
+        {
+          "say": "课后听读教材儿歌，请大人观察字音节奏。"
+        },
+        {
+          "say": "把字带回生活里，再找找它们出现在哪里。"
+        }
+      ]
+    }
+  ]
+}

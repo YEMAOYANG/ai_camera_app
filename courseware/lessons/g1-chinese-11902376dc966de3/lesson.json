@@ -1,0 +1,1175 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "古诗二首·池上与小池",
+  "description": "整合新版教材古诗二首全部官方课时，听读两诗、认识十二字、理解夏日童趣与初夏生机，按不同节奏朗读背诵并练写六字。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "语速清楚、温柔耐心的语文女老师，以图画、听读和生活联系讲清字词与诗意，不把选择记录说成会读会写。"
+    }
+  },
+  "images": {
+    "duckweed": {
+      "file": "assets/duckweed.png"
+    },
+    "boat": {
+      "file": "assets/boat.png"
+    },
+    "pick-tea": {
+      "file": "assets/pick-tea.png"
+    },
+    "water-tomato": {
+      "file": "assets/water-tomato.png"
+    },
+    "cut-paper": {
+      "file": "assets/cut-paper.png"
+    },
+    "tire-track": {
+      "file": "assets/tire-track.png"
+    },
+    "bike-shadow": {
+      "file": "assets/bike-shadow.png"
+    },
+    "grass": {
+      "file": "assets/grass.png"
+    },
+    "cork-float": {
+      "file": "assets/cork-float.png"
+    },
+    "stone-sink": {
+      "file": "assets/stone-sink.png"
+    },
+    "cup-table": {
+      "file": "assets/cup-table.png"
+    },
+    "grid-shou": {
+      "file": "assets/grid-shou.png"
+    },
+    "grid-chi": {
+      "file": "assets/grid-chi.png"
+    },
+    "grid-cai": {
+      "file": "assets/grid-cai.png"
+    },
+    "small-pond": {
+      "file": "assets/small-pond.png"
+    },
+    "thin-stream": {
+      "file": "assets/thin-stream.png"
+    },
+    "waterfall": {
+      "file": "assets/waterfall.png"
+    },
+    "closed-box": {
+      "file": "assets/closed-box.png"
+    },
+    "empty-box": {
+      "file": "assets/empty-box.png"
+    },
+    "peek-puppy": {
+      "file": "assets/peek-puppy.png"
+    },
+    "grid-jian": {
+      "file": "assets/grid-jian.png"
+    },
+    "grid-jiao": {
+      "file": "assets/grid-jiao.png"
+    },
+    "grid-zao": {
+      "file": "assets/grid-zao.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "两首诗，两幅夏日画",
+      "template": "two-columns",
+      "data": {
+        "title": "古诗二首",
+        "left": {
+          "heading": "池上",
+          "body": "小娃、竹竿、白莲"
+        },
+        "right": {
+          "heading": "小池",
+          "body": "泉眼、树阴、荷尖、蜻蜓"
+        },
+        "left_picture": "boat",
+        "right_picture": "small-pond"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小朋友们好，今天我们一起看两幅初夏水边的图画。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边这幅图，找一找小娃在哪里。"
+        },
+        {
+          "say": "小娃坐在小艇上，手里拿着竹竿，艇里还有白莲。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边这幅图，这是初夏的小池。"
+        },
+        {
+          "say": "小池边有泉眼、树阴，小荷上立着蜻蜓。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "第一首《池上》，看小娃在做什么。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "第二首《小池》，看水边有哪些景物。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "把字音装进诗里",
+      "template": "picture-points",
+      "data": {
+        "title": "把字音装进诗里",
+        "picture": "boat",
+        "points": [
+          "诗　首：一首诗",
+          "偷：悄悄地",
+          "浮　萍：浮在水面的水草"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看第一幅画面。你看到什么了？"
+        },
+        {
+          "say": "小娃撑小艇，跟着老师读一遍。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这个字读‘诗’，古诗的诗。"
+        },
+        {
+          "say": "这个字读‘首’，一首诗的首。"
+        },
+        {
+          "say": "数古诗时，我们说一首诗、两首诗。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这个字读‘偷’，悄悄采的偷。"
+        },
+        {
+          "say": "小娃悄悄采白莲，这里的偷就是悄悄地。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这个字读‘浮’，浮萍的浮。"
+        },
+        {
+          "say": "这个字读‘萍’，浮萍的萍。"
+        },
+        {
+          "say": "浮萍是漂在水面上的小水草。"
+        },
+        {
+          "say": "先记住这个画面，一会儿去找小艇走过的地方。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "小艇动起来",
+      "page": "p03",
+      "widgetType": "game",
+      "startImage": "boat",
+      "script": [
+        {
+          "highlight": "#boat-object"
+        },
+        {
+          "say": "看，这里有一个小小的池塘。"
+        },
+        {
+          "say": "有一个小娃，要撑着小艇去采白莲。"
+        },
+        {
+          "highlight": "#pole-control"
+        },
+        {
+          "say": "看看小娃手里的长竹竿。"
+        },
+        {
+          "setState": {
+            "demo": "push"
+          }
+        },
+        {
+          "say": "看，小艇动起来了，向前走了一段。"
+        },
+        {
+          "highlight": "#lotus-target"
+        },
+        {
+          "say": "等小艇靠近白莲，才能伸手采到。"
+        },
+        {
+          "highlight": "#collect-control"
+        },
+        {
+          "say": "现在，请你也来试一试。"
+        },
+        {
+          "say": "看看小艇能不能顺利采到白莲，再撑回来。"
+        },
+        {
+          "say": "每撑一次，小艇就往前走一段。"
+        },
+        {
+          "say": "小娃撑小艇，偷采白莲回。"
+        },
+        {
+          "say": "采，是从植物上摘取，像伸手摘下来。"
+        },
+        {
+          "say": "比如，在菜园里摘下一个豆荚，也叫采。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "是谁留下的水道",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "duckweed",
+      "script": [
+        {
+          "highlight": "#duckweed-view"
+        },
+        {
+          "say": "我们一起看看，小艇开过浮萍，会留下什么？"
+        },
+        {
+          "setState": {
+            "demo": "path"
+          }
+        },
+        {
+          "say": "看清水面的小绿叶，它们向两边分开了。"
+        },
+        {
+          "highlight": "#trace-path"
+        },
+        {
+          "say": "这条分开的水道，就是小艇留下的踪迹。"
+        },
+        {
+          "say": "踪迹就是经过以后留下的痕迹。"
+        },
+        {
+          "highlight": "#meaning-choices"
+        },
+        {
+          "say": "你们也来点一点，再找找踪迹在哪里。"
+        },
+        {
+          "say": "找水面发生的变化，再选它的图。"
+        },
+        {
+          "say": "诗里说，浮萍一道开。"
+        },
+        {
+          "say": "小娃没想到，池塘留下了他来过的痕迹。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "一句诗，一幅画",
+      "template": "picture-points",
+      "data": {
+        "title": "一句诗，一幅画",
+        "picture": "boat",
+        "points": [
+          "小娃 / 撑小艇",
+          "偷采 / 白莲回",
+          "不解 / 藏踪迹",
+          "浮萍 / 一道开"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "这首《池上》是唐代的白居易写的。"
+        },
+        {
+          "say": "先听老师读。每行前两个字读完，轻轻停一下。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "跟老师读第一行：小娃撑小艇。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二行：偷采白莲回。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "不解藏踪迹。这里的不解，就是不知道。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "浮萍一道开。踪迹是小艇经过留下的痕迹。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小娃用竹竿撑着小艇，采了白莲往回走。"
+        },
+        {
+          "say": "船经过的地方，浮萍就分开了一条路。"
+        },
+        {
+          "say": "这样的结尾，让我们觉得他天真又顽皮。"
+        },
+        {
+          "say": "借这两幅画想一想，试着背给大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p07-shou",
+      "type": "slide",
+      "title": "观察并练写：首",
+      "template": "big-word",
+      "data": {
+        "title": "观察并练写：首",
+        "word": "首",
+        "pinyin": "shǒu",
+        "picture": "grid-shou",
+        "hint": "上宽下窄；纸笔练写请家人观察"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "看这个要学写的字，首。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "首字上宽下窄。"
+        },
+        {
+          "say": "点和撇分在竖中线两边，横要写直。"
+        },
+        {
+          "say": "可以先对一对上面的点和撇，哪边各有一笔。"
+        },
+        {
+          "say": "看老师指的范字，再看看每部分占了多大地方。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "用田字格纸写一个，再拿它和范字比一比。"
+        },
+        {
+          "say": "字形和笔顺，请大人在你纸笔练习时帮忙看。"
+        }
+      ]
+    },
+    {
+      "key": "p07-chi",
+      "type": "slide",
+      "title": "观察并练写：池",
+      "template": "big-word",
+      "data": {
+        "title": "观察并练写：池",
+        "word": "池",
+        "pinyin": "chí",
+        "picture": "grid-chi",
+        "hint": "左窄右宽；纸笔练写请家人观察"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "看这个要学写的字，池。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "池的左边窄，右边宽。"
+        },
+        {
+          "say": "右边的竖写高，竖弯钩向右伸。"
+        },
+        {
+          "say": "看右边的笔画伸得更开，所以占的地方更宽。"
+        },
+        {
+          "say": "看老师指的范字，再看看每部分占了多大地方。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "用田字格纸写一个，再拿它和范字比一比。"
+        },
+        {
+          "say": "字形和笔顺，请大人在你纸笔练习时帮忙看。"
+        }
+      ]
+    },
+    {
+      "key": "p07-cai",
+      "type": "slide",
+      "title": "观察并练写：采",
+      "template": "big-word",
+      "data": {
+        "title": "观察并练写：采",
+        "word": "采",
+        "pinyin": "cǎi",
+        "picture": "grid-cai",
+        "hint": "上下部件对准看；纸笔练写请家人观察"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "看这个要学写的字，采。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "采的上面和木字底分开看。"
+        },
+        {
+          "say": "木的横靠近横中线，撇和捺向两边展开。"
+        },
+        {
+          "say": "写完看看下面两笔，是不是向左右舒展开了。"
+        },
+        {
+          "say": "看老师指的范字，再看看每部分占了多大地方。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "用田字格纸写一个，再拿它和范字比一比。"
+        },
+        {
+          "say": "字形和笔顺，请大人在你纸笔练习时帮忙看。"
+        }
+      ]
+    },
+    {
+      "key": "x01",
+      "type": "slide",
+      "title": "再到安静的小池边",
+      "template": "title-picture",
+      "data": {
+        "title": "再到安静的小池边",
+        "picture": "small-pond",
+        "caption": "小池　〔宋〕杨万里"
+      },
+      "script": [
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "接着看宋代诗人杨万里的《小池》。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先来看这幅画。"
+        },
+        {
+          "say": "左边的泉眼慢慢流出清水，细水流得轻轻的。"
+        },
+        {
+          "say": "树阴照在水面上，晴天里的光很柔和。"
+        },
+        {
+          "say": "小荷刚露出一个尖角，蜻蜓已经站在上面了。"
+        },
+        {
+          "say": "待会儿我们从第一句找起，把景物和诗句连起来。"
+        }
+      ]
+    },
+    {
+      "key": "x02",
+      "type": "slide",
+      "title": "细细的水，柔柔的光",
+      "template": "picture-points",
+      "data": {
+        "title": "细细的水，柔柔的光",
+        "picture": "small-pond",
+        "points": [
+          "泉：泉眼流出水",
+          "惜：爱惜；照：照映",
+          "柔：柔和，晴天的好风光"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看这幅图，小池边有一线清水。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "泉眼是泉水流出来的地方。听，泉。"
+        },
+        {
+          "say": "泉水细细的，流成了一条细流。你们找到了吗？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "惜是爱惜，诗里好像泉眼在爱惜它的细流。"
+        },
+        {
+          "say": "看水面映着树阴，照就是映在水上。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "柔是柔和。晴柔是晴天里柔和的景色。"
+        },
+        {
+          "say": "诗人把泉眼和树阴写得像人一样，会爱惜，也会喜爱。"
+        },
+        {
+          "say": "这样写，让我们读出诗人对自然的喜爱。"
+        }
+      ]
+    },
+    {
+      "key": "x03",
+      "type": "slide",
+      "title": "刚露尖角，蜻蜓已来",
+      "template": "picture-points",
+      "data": {
+        "title": "刚露尖角，蜻蜓已来",
+        "picture": "small-pond",
+        "points": [
+          "荷：小荷，初生的荷叶",
+          "露：露出；角：尖尖的部分",
+          "才露尖尖角，早有蜻蜓来"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "放大看，水上有一个绿绿的小荷尖。"
+        },
+        {
+          "say": "看，蜻蜓已经站在上头了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "认一认这个字：荷。荷花的荷。"
+        },
+        {
+          "say": "这里的小荷是初生的荷叶。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "露是显出来。听老师读，小荷才露尖尖角。"
+        },
+        {
+          "say": "这是角。尖尖角的角。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "读一读：才露尖尖角。"
+        },
+        {
+          "say": "再读：早有蜻蜓立上头。"
+        },
+        {
+          "say": "小荷刚露，蜻蜓就来了。初夏多有生机呀。"
+        }
+      ]
+    },
+    {
+      "key": "x04",
+      "type": "interactive",
+      "title": "发现小池里的景物",
+      "page": "x04",
+      "widgetType": "game",
+      "startImage": "small-pond",
+      "script": [
+        {
+          "highlight": "#spring-spot"
+        },
+        {
+          "say": "今天，我们一起在画里找出四种景物。"
+        },
+        {
+          "say": "看，泉眼在哪里？"
+        },
+        {
+          "setState": {
+            "demo": "spring"
+          }
+        },
+        {
+          "say": "找到了吗？泉眼的水细细地流。"
+        },
+        {
+          "highlight": "#shade-spot"
+        },
+        {
+          "say": "树阴照在水面上，请你找一找。"
+        },
+        {
+          "say": "晴柔，是晴天柔和的风光。"
+        },
+        {
+          "highlight": "#lotus-spot"
+        },
+        {
+          "say": "小荷才露出尖尖的角。"
+        },
+        {
+          "say": "你来点一点小荷的位置吧。"
+        },
+        {
+          "highlight": "#dragonfly-spot"
+        },
+        {
+          "say": "早有蜻蜓站在上头。"
+        },
+        {
+          "say": "请你找到蜻蜓，点一点它。"
+        },
+        {
+          "say": "按诗里的顺序找到它们，再试着说一句诗。"
+        }
+      ]
+    },
+    {
+      "key": "x05",
+      "type": "slide",
+      "title": "两次轻停，读出小池",
+      "template": "picture-points",
+      "data": {
+        "title": "两次轻停，读出小池",
+        "picture": "small-pond",
+        "points": [
+          "泉眼 / 无声 / 惜细流",
+          "树阴 / 照水 / 爱晴柔",
+          "小荷 / 才露 / 尖尖角",
+          "早有 / 蜻蜓 / 立上头"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "《小池》每行读成三小段，有两次轻轻的停顿。"
+        },
+        {
+          "say": "前两段各两个字，最后一段三个字。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先听老师读第一行。泉眼无声惜细流。"
+        },
+        {
+          "say": "这里画的是泉眼，泉水细细地流。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二行，树阴照水爱晴柔。"
+        },
+        {
+          "say": "树阴倒映在水里，多美呀。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三行，小荷才露尖尖角。"
+        },
+        {
+          "say": "小荷才露出一点尖尖的叶子。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "第四行，早有蜻蜓立上头。"
+        },
+        {
+          "say": "蜻蜓已经站在新荷尖上了。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "大家按顺序说，泉眼、树阴、小荷、蜻蜓。"
+        },
+        {
+          "say": "顺着四幅景物想诗句，试着背一遍。"
+        }
+      ]
+    },
+    {
+      "key": "x06-jian",
+      "type": "slide",
+      "title": "观察并练写：尖",
+      "template": "big-word",
+      "data": {
+        "title": "观察并练写：尖",
+        "word": "尖",
+        "pinyin": "jiān",
+        "picture": "grid-jian",
+        "hint": "上小下大；纸笔练写请家人观察"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "今天再看一个要学写的字，尖。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "尖字上面小，下面大。"
+        },
+        {
+          "say": "上面的小，竖钩变成短短的一竖。"
+        },
+        {
+          "say": "先找短竖，再看看下面大字铺开的样子。"
+        },
+        {
+          "say": "眼睛跟着老师指的地方，看看它在田字格哪一格。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "请在自己的田字格纸上写一个，和范字比一比。"
+        },
+        {
+          "say": "写得怎么样，笔顺对不对，请大人在旁边看看。"
+        }
+      ]
+    },
+    {
+      "key": "x06-jiao",
+      "type": "slide",
+      "title": "观察并练写：角",
+      "template": "big-word",
+      "data": {
+        "title": "观察并练写：角",
+        "word": "角",
+        "pinyin": "jiǎo",
+        "picture": "grid-jiao",
+        "hint": "上小下大，竖对中线；纸笔练写请家人观察"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "今天再看一个要学写的字，角。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "角字也是上面小，下面大。"
+        },
+        {
+          "say": "中间这根竖，写在竖中线上。"
+        },
+        {
+          "say": "看看格子正中的竖线，找到这根竖的位置。"
+        },
+        {
+          "say": "眼睛跟着老师指的地方，看看它在田字格哪一格。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "请在自己的田字格纸上写一个，和范字比一比。"
+        },
+        {
+          "say": "写得怎么样，笔顺对不对，请大人在旁边看看。"
+        }
+      ]
+    },
+    {
+      "key": "x06-zao",
+      "type": "slide",
+      "title": "观察并练写：早",
+      "template": "big-word",
+      "data": {
+        "title": "观察并练写：早",
+        "word": "早",
+        "pinyin": "zǎo",
+        "picture": "grid-zao",
+        "hint": "日字头略扁，下面横长；纸笔练写请家人观察"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "今天再看一个要学写的字，早。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "日字头要写得小一点，扁一点。"
+        },
+        {
+          "say": "下面的十横要长，竖写在竖中线上。"
+        },
+        {
+          "say": "比一比日字头和下面这道横，下面的横更长。"
+        },
+        {
+          "say": "眼睛跟着老师指的地方，看看它在田字格哪一格。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "请在自己的田字格纸上写一个，和范字比一比。"
+        },
+        {
+          "say": "写得怎么样，笔顺对不对，请大人在旁边看看。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "换一幅画，你还懂吗",
+      "intro": [
+        "小朋友们，我们来玩一个看图小检查。",
+        "听完老师的问题，在三张图里选一张。",
+        "做完后，小语老师再和你一起看。"
+      ],
+      "questions": [
+        {
+          "id": "q-cai",
+          "question": "哪一张图是在采茶？",
+          "skill": "联系生活理解采",
+          "answer": [
+            "B"
+          ],
+          "analysis": "女孩从茶树上摘嫩叶，这个动作是采茶。浇水和剪纸都没有采茶。",
+          "options": {
+            "A": {
+              "label": "给番茄浇水",
+              "visual": {
+                "kind": "asset",
+                "image": "water-tomato",
+                "alt": "给番茄浇水"
+              }
+            },
+            "B": {
+              "label": "采茶叶",
+              "visual": {
+                "kind": "asset",
+                "image": "pick-tea",
+                "alt": "采茶叶"
+              }
+            },
+            "C": {
+              "label": "剪纸",
+              "visual": {
+                "kind": "asset",
+                "image": "cut-paper",
+                "alt": "剪纸"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-trace",
+          "question": "哪一张图是车轮留下的痕迹？",
+          "skill": "联系生活理解踪迹",
+          "answer": [
+            "C"
+          ],
+          "analysis": "图中湿泥上的轮胎印是车轮经过留下的痕迹。草地和地上的影子没有这种压痕。",
+          "options": {
+            "A": {
+              "label": "自行车影子",
+              "visual": {
+                "kind": "asset",
+                "image": "bike-shadow",
+                "alt": "自行车影子"
+              }
+            },
+            "B": {
+              "label": "草地里的青蛙",
+              "visual": {
+                "kind": "asset",
+                "image": "grass",
+                "alt": "青蛙坐在没有车轮压痕的草地上"
+              }
+            },
+            "C": {
+              "label": "泥地轮胎痕迹",
+              "visual": {
+                "kind": "asset",
+                "image": "tire-track",
+                "alt": "泥地轮胎痕迹"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-float",
+          "question": "哪一样东西浮在水面上？",
+          "skill": "理解浮的词义",
+          "answer": [
+            "A"
+          ],
+          "analysis": "木塞停在水面上，露出了一部分。石头在水底，小杯在桌上。",
+          "options": {
+            "A": {
+              "label": "水面上的木塞",
+              "visual": {
+                "kind": "asset",
+                "image": "cork-float",
+                "alt": "水面上的木塞"
+              }
+            },
+            "B": {
+              "label": "盆底的石子",
+              "visual": {
+                "kind": "asset",
+                "image": "stone-sink",
+                "alt": "盆底的石子"
+              }
+            },
+            "C": {
+              "label": "桌上的小杯",
+              "visual": {
+                "kind": "asset",
+                "image": "cup-table",
+                "alt": "桌上的小杯"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-fine-stream",
+          "question": "哪一张图是细细的水流？",
+          "skill": "联系生活理解细流",
+          "answer": [
+            "B"
+          ],
+          "analysis": "从石缝里流出的一线清水是细流。瀑布水多，草地里没有这样的水线。",
+          "options": {
+            "A": {
+              "label": "宽阔大瀑布",
+              "visual": {
+                "kind": "asset",
+                "image": "waterfall",
+                "alt": "宽阔大瀑布"
+              }
+            },
+            "B": {
+              "label": "细细的泉水",
+              "visual": {
+                "kind": "asset",
+                "image": "thin-stream",
+                "alt": "细细的泉水"
+              }
+            },
+            "C": {
+              "label": "草地里的青蛙",
+              "visual": {
+                "kind": "asset",
+                "image": "grass",
+                "alt": "青蛙坐在没有车轮压痕的草地上"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-show-part",
+          "question": "哪一张图里小动物露出一部分？",
+          "skill": "联系生活理解露出",
+          "answer": [
+            "C"
+          ],
+          "analysis": "小狗的脑袋和前爪露出箱沿，身体还有一部分被纸箱挡住。关上的箱子和空箱里都看不到小狗露出来。",
+          "options": {
+            "A": {
+              "label": "完全合上的纸箱",
+              "visual": {
+                "kind": "asset",
+                "image": "closed-box",
+                "alt": "完全合上的纸箱"
+              }
+            },
+            "B": {
+              "label": "打开的空纸箱",
+              "visual": {
+                "kind": "asset",
+                "image": "empty-box",
+                "alt": "打开的空纸箱"
+              }
+            },
+            "C": {
+              "label": "露出脑袋和前爪的小狗",
+              "visual": {
+                "kind": "asset",
+                "image": "peek-puppy",
+                "alt": "小狗把脑袋和前爪露出纸箱上沿"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "把两幅夏日画带回家",
+      "template": "summary",
+      "data": {
+        "title": "古诗二首，一起回顾",
+        "items": [
+          "十二个生字：听音、看形、联系词义",
+          "池上：水道留下踪迹，读出童真",
+          "小池：细流、树阴、荷尖和蜻蜓",
+          "池上二三，小池二二三，借画面背诵",
+          "首池采尖角早：纸笔练写请家人看"
+        ]
+      },
+      "script": [
+        {
+          "say": "小朋友们，今天我们一起回顾两首小诗。"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先回想刚认识的十二个字。跟着图说一说你记住的词。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "看这艘小艇，想到哪首诗？"
+        },
+        {
+          "say": "《池上》里的水道，告诉我们小艇刚经过。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "《小池》里有细流、树阴、小荷尖和蜻蜓。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "《池上》先读两个字，再读三个字。"
+        },
+        {
+          "say": "《小池》是两个字、两个字、三个字。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "今天的课后任务要读背两首诗，还要练写六个字。"
+        },
+        {
+          "say": "也可以画一张小池书签，请大人听你说图上的诗句。"
+        }
+      ]
+    }
+  ]
+}

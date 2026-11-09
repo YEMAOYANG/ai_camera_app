@@ -1,0 +1,232 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "smartedu-math-five-four-g1-upper-18deb512",
+    "revisionId": "directory-8363732513177a3c8af63820",
+    "nodeId": "02aac822-4165-4269-bb7a-16d7a7bd7194",
+    "unitId": "82d8ad3f-067e-4382-8d0d-85d4f49ec941",
+    "subject": "math",
+    "volume": "upper",
+    "officialMaterialId": "8da32ba0-3a0a-46ef-b99d-611a76518e03",
+    "lessonTitle": "玩一玩",
+    "gradeCode": "primary_1",
+    "unitTitle": "第1单元 我是小学生",
+    "schoolSystem": "five_four",
+    "classHours": [],
+    "teachingRevision": "1"
+  },
+  "request": "为沪教版五四学制一年级上册第1单元第2课《玩一玩》写原创可编辑正文。教材完整正文为印刷第2页，官方完整课资源清单无对应课时。课中先看图商量选一个游戏，再在具体活动里讲约定和轮流。遵照下列6页顺序，产出场景动作、每句儿童口语、两页互动的先示范再操作和三道图题的题意及具体解析。说明例子中的约定，只把轻量人数体验用在游戏里。不要把原创活动口令说成教材固定规则。",
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "objectives": [
+      "看图认出几种熟悉的游戏，并和伙伴商量选择一个游戏一起玩。",
+      "先听清约好的规则再行动，能在游戏中照口令做并回看是否符合规则。",
+      "在合作游戏中轮到自己才操作，伙伴操作时在自己的位置等一等。"
+    ],
+    "coveredOfficialHours": [],
+    "videoStatus": "waived",
+    "excludedTopics": [
+      "无固定的跳房子或积木统一规则，本课讲清具体活动的事先约定。",
+      "不引入数学算式、形体术语或下一课方位教学；少量人数只用于照口令参加游戏。",
+      "真实合作、遵守规则、口头说明和线下操作由成人观察。线上作答只表示当下选择。"
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "91ccdb2df67d302e32a5c13801af568e5735865f6c01cc0086c71cc5eac5a3df",
+    "briefSha256": "00ceabf2d6b41bb660157bebe0238b9dd2b97699ee87c0bc4af607324dd3b9bd",
+    "officialManifestSha256": "503ca03655df94ef9e6c2df9d14c9def785124958d3acf86cb113bf7ab2cc510",
+    "textbookDirectorySha256": "3c0840817904574216995227e68e628735a6cf91cbc25a2ea2a37b907728d608",
+    "reviewedTextbookPageSha256": "71294c7896dd4b8d7ba13b4bb75f8d3e32ff9b90391c1da4fce25a0833230a27"
+  },
+  "teachingFacts": {
+    "objectiveBasis": "依据沪教版五四学制准确教材印刷第2页正文整理的原创目标。",
+    "textbookFindings": [
+      "教材把喊数抱团、折纸、跳房子、搭积木四个游戏作为可选活动。孩子选择一种参与，重点是按共同规则游戏、文明相处。",
+      "喊数抱团图里教师举两指，孩子两人结伴；游戏图片用于体验。课页未规定每种游戏的统一玩法，也无独立课后练习。"
+    ],
+    "originalGameRuleExamples": [
+      "本次跳房子一人离开最后一格后，下一位出发",
+      "本次结队只按当轮口令确认人数，走过去给同伴留位置",
+      "本次搭积木有接力牌的人放一块，随后交牌"
+    ],
+    "reportBoundary": "真实合作、遵守规则、口头说明和线下操作由成人观察。线上作答只表示当下选择。"
+  },
+  "qualityRules": [
+    "小数老师主讲。每句优先25个简体汉字以内，最长40字。给一年级新生举具体例子并讲明为什么。",
+    "讲解页至少6句并满100字，互动页至少5句并满90字。讲到每个要点之前先亮画面目标。互动页老师至少3次真实操作。",
+    "互动交给公共1280×720框架适配。第一次选错只给线索，不揭答案。画面对象会改变，完成可重玩。",
+    "图片表达语义，遮文字仍能听题和完成。只引用资产标识，不自动生成图、视频、音频，不放链接或课堂讨论。",
+    "小检查为不同的新场景和新数字，三题都有图、预录老师完整读题、对应技能、唯一答案和解析；正确位置二、一、三。最后一页回顾。"
+  ],
+  "pagePlan": [
+    {
+      "id": "p01",
+      "type": "slide",
+      "title": "今天玩什么",
+      "goal": "主讲依次点亮四种真实活动图，解释怎样从动作或物品认出游戏。示范同伴商量后选定一种，也邀请孩子口头说想选哪一种。",
+      "assetKeys": [
+        "game_group",
+        "game_folding",
+        "game_hop",
+        "game_blocks"
+      ]
+    },
+    {
+      "id": "p02",
+      "type": "slide",
+      "title": "先听约定再开始",
+      "goal": "以本次跳房子为例，给出清楚约定，一人离开最后一格后下一人从等待印出发。依次示范倾听、等候和出发，用画面说明为什么要等。",
+      "assetKeys": [
+        "hop_wait_demo",
+        "hop_ready_demo"
+      ]
+    },
+    {
+      "id": "p03",
+      "type": "interactive",
+      "title": "听口令结队",
+      "goal": "老师先圈出活动垫、说本轮口令、移动人物并复点核对。孩子听到预录口令后逐个点选或拖动伙伴，人物进入活动垫，达到约好人数后确认。早确认或多放有图声提示，第一次不揭底。示范二人、练习二人和三人，不做加减。",
+      "assetKeys": [
+        "group_mat",
+        "game_group",
+        "group_players"
+      ]
+    },
+    {
+      "id": "p04",
+      "type": "interactive",
+      "title": "积木接力",
+      "goal": "同一搭台有两名伙伴和一个可交接的接力牌。老师点亮持牌伙伴、示范放一块、再转交牌并解释轮流。孩子先按持牌身份操作，选择另一人时提示看牌，正确操作后木块出现、接力牌移到同伴。",
+      "assetKeys": [
+        "blocks_station",
+        "blocks_partner_pair",
+        "turn_marker"
+      ]
+    },
+    {
+      "id": "p05",
+      "type": "quiz",
+      "title": "看图小检查",
+      "goal": "三题都是新活动情境，图片选项可独立识别，老师完整读题，提交后给原因。",
+      "assetKeys": [
+        "quiz_choice",
+        "quiz_rule",
+        "quiz_wait"
+      ]
+    },
+    {
+      "id": "p06",
+      "type": "slide",
+      "title": "一起玩得开心",
+      "goal": "依次点亮共同选择、听清约定、轮流操作并解释每一步。邀请孩子和家人选一种游戏，先说清规则再试一轮。真实表现待成人观察。",
+      "assetKeys": [
+        "game_folding",
+        "game_group",
+        "game_blocks"
+      ]
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "id": "q01",
+      "skill": "认图并选择约好的游戏",
+      "probe": "校园游园会两人约好玩把布豆袋投进桶的游戏。三张不同活动图分别是套圈、投豆袋入桶、滚球撞瓶。靠道具和动作识别，只有投豆袋入桶符合约定。",
+      "correctSlot": 1,
+      "assetKey": "quiz_choice"
+    },
+    {
+      "id": "q02",
+      "skill": "按事先约定参与游戏",
+      "probe": "新的彩带游戏，约好每轮四名伙伴一起握同一根彩带，听到开始才举起。只问哪队人数合约定。三组选项用同样清楚的版式表现分别有四、三、五名同队伙伴，每人只出现一次且彼此留白。",
+      "correctSlot": 0,
+      "assetKey": "quiz_rule"
+    },
+    {
+      "id": "q03",
+      "skill": "等待轮流与文明参与",
+      "probe": "新场景为海绵套圈，轮到伙伴正在投。选择下一位孩子此时在地面等候印站好、走到投掷线旁并排、或提前拿圈从旁边投。三张都画同样物件与孩子，只有站在等候印符合约定。",
+      "correctSlot": 2,
+      "assetKey": "quiz_wait"
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "game_group",
+      "method": "Codex 图像工具",
+      "semantic": "操场上做结队游戏，发口令者和等待结队的伙伴明显，画面不作精确数题。"
+    },
+    {
+      "assetKey": "game_folding",
+      "method": "Codex 图像工具",
+      "semantic": "两名孩子一起折大纸船，桌上有可辨认的折纸、没有积木。"
+    },
+    {
+      "assetKey": "game_hop",
+      "method": "Codex 图像工具",
+      "semantic": "操场格子与一位单脚跳的孩子明确，身边有等待的伙伴。"
+    },
+    {
+      "assetKey": "game_blocks",
+      "method": "Codex 图像工具",
+      "semantic": "两名孩子一起用大木块搭桥，动作和木块轮廓清楚。"
+    },
+    {
+      "assetKey": "hop_wait_demo",
+      "method": "Codex 图像工具",
+      "semantic": "正在跳的伙伴与站在明确等待印上的另一名孩子，同一操场，地面空间留足。"
+    },
+    {
+      "assetKey": "hop_ready_demo",
+      "method": "Codex 图像工具",
+      "semantic": "同一操场，原先的伙伴已走出格子，新轮次的孩子站上起点。"
+    },
+    {
+      "assetKey": "group_mat",
+      "method": "Codex 图像工具",
+      "semantic": "固定操场图与有明确边界的空垫，无人群或其他可误计的人形。"
+    },
+    {
+      "assetKey": "group_players",
+      "method": "Codex 生成角色图后用程序精确摆放",
+      "semantic": "彼此可辨的单人角色，显示一次记一个。人数由互动元素个数准确控制。"
+    },
+    {
+      "assetKey": "blocks_station",
+      "method": "Codex 图像工具",
+      "semantic": "明亮活动室中的合作搭台，留空给动态放置的木块和角色。"
+    },
+    {
+      "assetKey": "blocks_partner_pair",
+      "method": "Codex 图像工具",
+      "semantic": "两名衣着、轮廓易辨的孩子角色，各自图片独立可交互。"
+    },
+    {
+      "assetKey": "turn_marker",
+      "method": "Codex 图像工具",
+      "semantic": "同一张醒目的活动接力牌，与人物分离，可在人物之间移动。"
+    },
+    {
+      "assetKey": "quiz_choice",
+      "method": "Codex 图像工具",
+      "semantic": "同风格三图分别为套圈、布豆袋投桶和滚球撞瓶。选项不放可泄露答案的对错符号。"
+    },
+    {
+      "assetKey": "quiz_rule",
+      "method": "Codex 生成单人角色后以代码精确布局",
+      "semantic": "三组选项各握同样彩带，准确呈现4、3、5名清楚可数的孩子，不计入无关人物。"
+    },
+    {
+      "assetKey": "quiz_wait",
+      "method": "Codex 图像工具",
+      "semantic": "同一套圈场地的三种动作。靠脚与等待印、投掷线和圈的位置分辨行为。"
+    }
+  ],
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  }
+}

@@ -1,0 +1,1349 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "走进科学课",
+  "description": "沪科技版五四制一年级上册完整起始课。观察校园和人体，寻找影子，认识实验室方法，练习鸡蛋实验与浮沉记录，制作并观察旋转小纸片。真实动手、测量及口述待大人观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/ke-science-v1.png",
+      "color": "#4B946B",
+      "persona": "温和、清晰的科学老师，引导孩子观察、猜想、实验并如实记录；只描述实际可见的学习证据。"
+    }
+  },
+  "images": {
+    "scene-lab": {
+      "file": "assets/scene-lab.png"
+    },
+    "egg-sink": {
+      "file": "assets/egg-sink.png"
+    },
+    "egg-float": {
+      "file": "assets/egg-float.png"
+    },
+    "egg": {
+      "file": "assets/egg.png"
+    },
+    "salt": {
+      "file": "assets/salt.png"
+    },
+    "cup": {
+      "file": "assets/cup.png"
+    },
+    "spoon": {
+      "file": "assets/spoon.png"
+    },
+    "chopsticks": {
+      "file": "assets/chopsticks.png"
+    },
+    "tongs": {
+      "file": "assets/tongs.png"
+    },
+    "tuningfork": {
+      "file": "assets/tuningfork.png"
+    },
+    "ball": {
+      "file": "assets/ball.png"
+    },
+    "observe-record": {
+      "file": "assets/observe-record.png"
+    },
+    "guess-record": {
+      "file": "assets/guess-record.png"
+    },
+    "leaf-float": {
+      "file": "assets/leaf-float.png"
+    },
+    "stone-sink": {
+      "file": "assets/stone-sink.png"
+    },
+    "arrow-up": {
+      "glyph": {
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "↑"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "arrow-down": {
+      "glyph": {
+        "size": [
+          480,
+          480
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "↓"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "scene-campus": {
+      "file": "assets/scene-campus.png"
+    },
+    "sun-shadow": {
+      "file": "assets/sun-shadow.png"
+    },
+    "lamp-shadow": {
+      "file": "assets/lamp-shadow.png"
+    },
+    "paper-kit": {
+      "file": "assets/paper-kit.png"
+    },
+    "rotate-world": {
+      "file": "assets/rotate-world.png"
+    },
+    "street-unlit": {
+      "file": "assets/street-unlit.png"
+    },
+    "street-shadow": {
+      "file": "assets/street-shadow.png"
+    },
+    "toy-wheel": {
+      "file": "assets/toy-wheel.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "campus-questions",
+      "type": "slide",
+      "title": "在校园找一个问题",
+      "template": "picture-points",
+      "data": {
+        "title": "在校园找一个问题",
+        "picture": "scene-campus",
+        "points": [
+          "先说看到什么",
+          "问想知道什么",
+          "带着问题再观察"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来科学课，我是小科老师。"
+        },
+        {
+          "say": "今天从这条校园小路开始找问题。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我看见楼前的蓝旗向一边飘起来了。"
+        },
+        {
+          "say": "这句话说的是画面里看见的现象。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我想知道，旗子什么时候会垂下来？"
+        },
+        {
+          "say": "这是一件还想知道的事，可以提出问题。"
+        },
+        {
+          "say": "小满问：我也能从身边找问题吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "当然，先看一看，再想还有什么不知道。"
+        },
+        {
+          "say": "下次走到校园里，找一样有变化的东西。"
+        },
+        {
+          "say": "试着把自己的一个问题说给大人听。"
+        },
+        {
+          "say": "猫头鹰提醒：观察可以帮我们找到问题。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "body-observe",
+      "type": "slide",
+      "title": "每个人都有相同和不同",
+      "template": "picture-points",
+      "data": {
+        "title": "每个人都有相同和不同",
+        "picture": "scene-campus",
+        "points": [
+          "找相同的地方",
+          "找不同的地方",
+          "从动作里提问"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看小路上的同学，他们在用手做什么？"
+        },
+        {
+          "say": "一位用手指旗子，一位用手拿本子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "他们都可以用手做动作，这是相同的地方。"
+        },
+        {
+          "say": "相同的身体部位，可以做不同的事。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看看他们的头发，样子有些不一样。"
+        },
+        {
+          "say": "人有相同的地方，也有各自的样子。"
+        },
+        {
+          "say": "朵朵说：我可以看看手摆出的不同样子。",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "拿本子时，手指做了什么动作呢？"
+        },
+        {
+          "say": "你可以先试着看看自己的手，再提个问题。"
+        },
+        {
+          "say": "把想问的问题告诉大人，和大人一起观察。"
+        }
+      ]
+    },
+    {
+      "key": "shadow-game",
+      "type": "interactive",
+      "title": "两种光下找影子",
+      "page": "shadow",
+      "widgetType": "game",
+      "startImage": "sun-shadow",
+      "script": [
+        {
+          "setState": {
+            "demo": "sun"
+          }
+        },
+        {
+          "highlight": "#shadow-scene"
+        },
+        {
+          "say": "这里是有太阳的院子，光照到了木块。"
+        },
+        {
+          "say": "台面上那片深色的形状，是木块的影子。"
+        },
+        {
+          "setState": {
+            "demo": "lamp"
+          }
+        },
+        {
+          "highlight": "#shadow-scene"
+        },
+        {
+          "say": "这里换成屋里，亮着的是台灯。"
+        },
+        {
+          "say": "台面上那片深色的形状，是积木的影子。"
+        },
+        {
+          "highlight": "#shadow-controls"
+        },
+        {
+          "say": "太阳光下能看到影子，灯光下也能看到。"
+        },
+        {
+          "say": "看影子时，先找光源，再找物体和影子。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "现在你来切换，先找台灯，再找太阳。"
+        },
+        {
+          "say": "每切换一次，停下来看看影子在哪里。"
+        },
+        {
+          "say": "小满问：回家能和大人一起找影子吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "可以，请大人陪你在熟悉的地方观察。"
+        }
+      ]
+    },
+    {
+      "key": "lab-methods",
+      "type": "slide",
+      "title": "进实验室学办法",
+      "template": "picture-points",
+      "data": {
+        "title": "进实验室学办法",
+        "picture": "scene-lab",
+        "points": [
+          "观察",
+          "测量",
+          "记录"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "进了科学实验室，我们会学习几种办法。"
+        },
+        {
+          "say": "图里的老师正拿着音叉给同学看。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "仔细看音叉的形状，这叫作观察。"
+        },
+        {
+          "say": "看清我们要研究的东西，再说有什么发现。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "想知道纸条有多长，可以用尺子量。"
+        },
+        {
+          "say": "借助工具了解它有多少，这叫作测量。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把看见的现象或量到的结果记下来。"
+        },
+        {
+          "say": "可以画图或用简单的符号，这叫作记录。"
+        },
+        {
+          "say": "朵朵说：记下来以后，还能拿出来比较。",
+          "by": "duoduo"
+        },
+        {
+          "say": "接下来，我们用观察和记录练习做实验。"
+        }
+      ]
+    },
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "科学课里做实验",
+      "template": "picture-points",
+      "data": {
+        "title": "走进科学课",
+        "picture": "scene-lab",
+        "points": [
+          "提出问题",
+          "作出猜想",
+          "实验观察"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "身边的问题，可以带到科学课里来研究。"
+        },
+        {
+          "say": "桌上这些普通物品，也能帮助我们探究。"
+        },
+        {
+          "say": "我们会把想知道的事情变成一个问题。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "比如，怎样让水里的鸡蛋浮起来呢？"
+        },
+        {
+          "say": "这是想要找出答案的问题。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先想一想可能的办法，这叫作猜想。"
+        },
+        {
+          "say": "小满问：猜到了，就能当作答案吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "还不能，猜想要通过观察和实验来验证。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "动手试一试，仔细看发生了什么。"
+        },
+        {
+          "say": "实验是我们常用的一种科学方法。"
+        },
+        {
+          "say": "猫头鹰提醒：看清事实，再说发现。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "准备实验托盘",
+      "page": "materials",
+      "widgetType": "game",
+      "startImage": "scene-lab",
+      "script": [
+        {
+          "highlight": "#mat-egg"
+        },
+        {
+          "say": "先为鸡蛋实验准备材料，想清每件的用途。"
+        },
+        {
+          "say": "鸡蛋是我们要观察的物体。"
+        },
+        {
+          "highlight": "#mat-cup"
+        },
+        {
+          "say": "水杯装着水，让我们看见鸡蛋的位置。"
+        },
+        {
+          "say": "我先把鸡蛋和水杯放进托盘。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "placed": [
+              "egg",
+              "cup"
+            ]
+          }
+        },
+        {
+          "say": "看，材料从左边移动到了实验托盘。"
+        },
+        {
+          "highlight": "#mat-salt"
+        },
+        {
+          "say": "食盐是这次要尝试加入水里的材料。"
+        },
+        {
+          "say": "勺子用来取盐，筷子用来轻轻搅拌。"
+        },
+        {
+          "highlight": "#mat-tongs"
+        },
+        {
+          "say": "夹子帮助大人把鸡蛋轻轻放入杯中。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "现在换你准备，选需要的物品送进托盘。"
+        },
+        {
+          "say": "不需要的先留在原处，选错可以再试。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "材料从哪里来",
+      "template": "picture-points",
+      "data": {
+        "title": "按问题选择材料",
+        "picture": "scene-lab",
+        "points": [
+          "生活里的材料",
+          "实验室的器材",
+          "看任务选材料"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "刚才的鸡蛋、盐、水杯，在生活中能见到。"
+        },
+        {
+          "say": "做一些简单实验，可以利用身边的材料。"
+        },
+        {
+          "say": "不用把每样东西都换成特别的实验工具。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里老师拿的是音叉，双叉像一个开口。"
+        },
+        {
+          "say": "它是一种实验器材，可用于声音实验。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "还有一些实验，需要实验室的器材。"
+        },
+        {
+          "say": "小满问：所有实验都用同一套材料吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "不是，先看想研究什么，再选合适材料。"
+        },
+        {
+          "say": "生活物品和实验室器材，都能帮助探究。"
+        },
+        {
+          "say": "猫头鹰提醒：材料要服务于实验的问题。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "quiz",
+      "title": "材料与观察",
+      "intro": [
+        "听小科老师读题，再仔细看图。",
+        "用刚才学到的方法想一想。",
+        "选的是这一次看到的事实。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "小云想用音叉做声音实验。应拿哪件器材？",
+          "skill": "依据探究问题选择实验器材",
+          "answer": [
+            "B"
+          ],
+          "analysis": "音叉有清楚的双叉和长柄，是这里用于声音实验的器材。",
+          "options": {
+            "A": {
+              "label": "皮球",
+              "visual": {
+                "kind": "asset",
+                "image": "ball",
+                "alt": "皮球"
+              }
+            },
+            "B": {
+              "label": "音叉",
+              "visual": {
+                "kind": "asset",
+                "image": "tuningfork",
+                "alt": "音叉"
+              }
+            },
+            "C": {
+              "label": "勺子",
+              "visual": {
+                "kind": "asset",
+                "image": "spoon",
+                "alt": "勺子"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "小禾要记植物的样子。哪幅图在看实物记录？",
+          "skill": "观察后再记录",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先看实物，再把发现画下来，记录才有观察依据。",
+          "options": {
+            "A": {
+              "label": "看着植物记录",
+              "visual": {
+                "kind": "asset",
+                "image": "observe-record",
+                "alt": "看着植物记录"
+              }
+            },
+            "B": {
+              "label": "闭眼凭空记录",
+              "visual": {
+                "kind": "asset",
+                "image": "guess-record",
+                "alt": "闭眼凭空记录"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "问题与猜想",
+      "template": "picture-points",
+      "data": {
+        "title": "先猜想，再验证",
+        "picture": "egg-sink",
+        "points": [
+          "先看原来的位置",
+          "想一想可能的办法",
+          "实验后再下结论"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这只杯子，鸡蛋停在靠近杯底的地方。"
+        },
+        {
+          "say": "这是这一次画面里，我们已经看到的现象。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "开始实验前，先看清楚它原来的位置。"
+        },
+        {
+          "say": "如果想知道怎样让它浮起，就提出问题。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "你可以先猜想，加入食盐会怎样呢？"
+        },
+        {
+          "say": "小满说：我猜它的位置可能会改变。",
+          "by": "xiaoman"
+        },
+        {
+          "say": "猜想是还要检验的想法，不是观察结果。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接着按步骤实验，仔细看鸡蛋在哪里。"
+        },
+        {
+          "say": "最后根据看到的现象，说明这一次的发现。"
+        },
+        {
+          "say": "猫头鹰提醒：猜想和事实，要分清。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "按步骤做实验",
+      "page": "sequence",
+      "widgetType": "game",
+      "startImage": "scene-lab",
+      "script": [
+        {
+          "highlight": "#seq-view"
+        },
+        {
+          "say": "现在在画面中练习实验顺序。"
+        },
+        {
+          "say": "这只是学习示意，真实实验请大人协助。"
+        },
+        {
+          "say": "先观察鸡蛋原来在什么位置。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "phase": 0
+          }
+        },
+        {
+          "say": "示范中，鸡蛋开始停在杯底附近。"
+        },
+        {
+          "highlight": "#seq-spoon"
+        },
+        {
+          "say": "接着用勺子，把食盐加入准备好的水中。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "phase": 1
+          }
+        },
+        {
+          "say": "盐已经加入，接着要轻轻搅拌。"
+        },
+        {
+          "highlight": "#seq-chopsticks"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "phase": 2
+          }
+        },
+        {
+          "say": "搅拌后再放入鸡蛋，看看这次的位置。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "phase": 3
+          }
+        },
+        {
+          "say": "这张图里，鸡蛋靠近水面，我们记录浮起。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "phase": 0
+          }
+        },
+        {
+          "say": "现在换你依次选工具，完成画面的实验。"
+        },
+        {
+          "say": "顺序做错会弹回，你可以重新想一想。"
+        },
+        {
+          "say": "不要背加入几勺，观察到什么就记什么。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "把看到的记下来",
+      "page": "record",
+      "widgetType": "game",
+      "startImage": "scene-lab",
+      "script": [
+        {
+          "highlight": "#rec-view"
+        },
+        {
+          "say": "实验做完，还要把看到的现象记下来。"
+        },
+        {
+          "say": "先看鸡蛋在杯里的位置，再选记录箭头。"
+        },
+        {
+          "highlight": "#rec-up"
+        },
+        {
+          "say": "向上的箭头，表示这次看到它浮起来。"
+        },
+        {
+          "highlight": "#rec-down"
+        },
+        {
+          "say": "向下的箭头，表示这次看到它沉下去。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "view": "float",
+            "mark": "up"
+          }
+        },
+        {
+          "say": "我示范一次：看到它浮着，就放向上箭头。"
+        },
+        {
+          "say": "箭头进了记录格，别人也能看懂这次发现。"
+        },
+        {
+          "highlight": "#rec-grid"
+        },
+        {
+          "say": "不能因为自己原来猜会浮，就改画面事实。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "现在轮到你，逐次看清现象，再拖箭头。"
+        },
+        {
+          "say": "每次记录都对照眼前画面，选错还能重看。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "不背固定勺数",
+      "template": "picture-points",
+      "data": {
+        "title": "记录的是这次事实",
+        "picture": "egg-float",
+        "points": [
+          "每次重新观察",
+          "如实记录位置",
+          "说清过程和结果",
+          "记录示例  2勺 ↑"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这张图里，鸡蛋靠近水面，我们记录浮起。"
+        },
+        {
+          "say": "这说明这一次看到了什么，不代表每次都一样。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "勺子大小和实验条件可能不同。"
+        },
+        {
+          "say": "不要背一个固定勺数，来代替自己的观察。"
+        },
+        {
+          "say": "每次加盐和搅拌后，都要再看一看。"
+        },
+        {
+          "say": "每次加了多少盐，也请大人帮你记清楚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "如果看到它仍在下面，就如实记录沉。"
+        },
+        {
+          "say": "小满问：和我猜的不一样，也照实记吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "对，记录要跟看到的事实一致。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "借助记录，说说做了什么、看到了什么。"
+        },
+        {
+          "say": "猫头鹰提醒：真实记录比猜中更重要。",
+          "by": "owl"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "比如这次用两勺盐，就在盐量格写两勺。"
+        },
+        {
+          "say": "图里的鸡蛋浮着，在同一行画向上箭头。"
+        },
+        {
+          "say": "一行记下加了多少盐，也记下浮还是沉。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "如实记录",
+      "intro": [
+        "听小科老师读题，再仔细看图。",
+        "用刚才学到的方法想一想。",
+        "选的是这一次看到的事实。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "看这一次观察图，落叶靠近水面。选哪个箭头记录？",
+          "visual": {
+            "kind": "asset",
+            "image": "leaf-float",
+            "alt": "一片落叶在杯中水面"
+          },
+          "skill": "用箭头记录浮沉",
+          "answer": [
+            "A"
+          ],
+          "analysis": "图中落叶在水面，这一次用向上箭头记录浮。",
+          "options": {
+            "A": {
+              "label": "向上箭头",
+              "visual": {
+                "kind": "asset",
+                "image": "arrow-up",
+                "alt": "向上箭头"
+              }
+            },
+            "B": {
+              "label": "向下箭头",
+              "visual": {
+                "kind": "asset",
+                "image": "arrow-down",
+                "alt": "向下箭头"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "小新猜石子会浮。看图却在杯底，应选哪个箭头记录？",
+          "visual": {
+            "kind": "asset",
+            "image": "stone-sink",
+            "alt": "一颗小石子在杯底"
+          },
+          "skill": "记录事实而非猜想",
+          "answer": [
+            "B"
+          ],
+          "analysis": "记录要根据实际画面。图里石子在杯底，用向下箭头，不能按原先猜想改记录。",
+          "options": {
+            "A": {
+              "label": "向上箭头",
+              "visual": {
+                "kind": "asset",
+                "image": "arrow-up",
+                "alt": "向上箭头"
+              }
+            },
+            "B": {
+              "label": "向下箭头",
+              "visual": {
+                "kind": "asset",
+                "image": "arrow-down",
+                "alt": "向下箭头"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "科学家也做实验",
+      "template": "picture-points",
+      "data": {
+        "title": "和大人继续探索",
+        "picture": "scene-lab",
+        "points": [
+          "科学家也做实验",
+          "认识我国科学家",
+          "和大人查一个故事",
+          "试办法，再比较记录"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里的实验工作是示意，不是某位科学家的照片。"
+        },
+        {
+          "say": "科学家也会通过实验和观察研究问题。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们今天的认真观察，就是学习探究的开始。"
+        },
+        {
+          "say": "发现新的问题，可以继续想办法寻找证据。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "钱学森、袁隆平、屠呦呦，都是我国的科学家。"
+        },
+        {
+          "say": "今天先认识名字，不凭想象编他们的故事。"
+        },
+        {
+          "say": "小满问：我能和爸爸妈妈再查一查吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "可以，请大人一起找一个可靠的科学家故事。"
+        },
+        {
+          "say": "听完后，说说你发现他们怎样认真探究。"
+        },
+        {
+          "say": "这段真实交流，请大人帮你观察和记录。"
+        },
+        {
+          "say": "猫头鹰提醒：愿意提问，也要愿意听别人。",
+          "by": "owl"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "想象一位科学家要研究纸片怎么转。"
+        },
+        {
+          "say": "她先试一种办法，看看纸片转起来没有。"
+        },
+        {
+          "say": "再换一种办法，把每次看到的记下来。"
+        },
+        {
+          "say": "比较两次记录，才能说哪种办法试成了。"
+        }
+      ]
+    },
+    {
+      "key": "paper-workshop",
+      "type": "interactive",
+      "title": "做会转的小纸片",
+      "page": "paper",
+      "widgetType": "game",
+      "startImage": "paper-kit",
+      "script": [
+        {
+          "highlight": "#paper-materials"
+        },
+        {
+          "say": "科学课还会动手制作，这次做会转的纸片。"
+        },
+        {
+          "say": "图上有纸片、小杆、胶带和圆头剪刀。"
+        },
+        {
+          "say": "真动手时，剪刀和牙签请大人负责。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "phase": 1
+          }
+        },
+        {
+          "highlight": "#paper-diagram"
+        },
+        {
+          "say": "先沿折痕折纸片，看看它的样子变了。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "phase": 2
+          }
+        },
+        {
+          "say": "再把小杆穿过中间，画面用小圆表示它。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "phase": 3
+          }
+        },
+        {
+          "say": "最后用胶带固定纸片和小杆。"
+        },
+        {
+          "say": "纸片做好了，可以试一试让它转起来。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "phase": 4
+          }
+        },
+        {
+          "say": "从上面看，纸片围着中间的点转。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "轮到你了，按折、穿、缠的顺序做。"
+        },
+        {
+          "say": "做完试慢转和快转，看哪个部分一直在转。"
+        },
+        {
+          "say": "和大人用实物尝试时，说说你看到什么。"
+        }
+      ]
+    },
+    {
+      "key": "spinning-things",
+      "type": "slide",
+      "title": "找到会转的部分",
+      "template": "picture-points",
+      "data": {
+        "title": "找到会转的部分",
+        "picture": "rotate-world",
+        "points": [
+          "看中间的位置",
+          "找会转的部分",
+          "说相同的发现"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看风车、电扇和风力发电机的画面。"
+        },
+        {
+          "say": "它们的样子不一样，先找各自的中间。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "刚才的纸片，是围着中间的小杆转。"
+        },
+        {
+          "say": "我们可以用这个办法，再去看别的物体。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "风车有会转的叶片，电扇也有。"
+        },
+        {
+          "say": "风力发电机上，你也能找到会转的叶片。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "它们都能找到一个会转的部分。"
+        },
+        {
+          "say": "小满问：我还能找什么会转的东西？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "找一个生活里的例子，观察后说给大人听。"
+        },
+        {
+          "say": "猫头鹰提醒：先看它怎么动，再说发现。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "quiz-shadows-rotation",
+      "type": "quiz",
+      "title": "影子与旋转",
+      "intro": [
+        "听老师说完，再看每幅图。",
+        "观察图里能看到的现象。"
+      ],
+      "questions": [
+        {
+          "id": "q5",
+          "question": "哪幅图能看到路灯照出的影子？",
+          "skill": "从照明场景观察影子",
+          "answer": [
+            "B"
+          ],
+          "analysis": "亮着的路灯照在邮筒上，地面可以看到贴着邮筒的深色影子。",
+          "options": {
+            "A": {
+              "label": "熄灯的小路",
+              "visual": {
+                "kind": "asset",
+                "image": "street-unlit",
+                "alt": "熄灯的小路"
+              }
+            },
+            "B": {
+              "label": "亮着路灯和影子",
+              "visual": {
+                "kind": "asset",
+                "image": "street-shadow",
+                "alt": "亮着路灯和影子"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "哪个物体的圆轮绕着中间在转？",
+          "skill": "识别会转动的部分",
+          "answer": [
+            "A"
+          ],
+          "analysis": "图里的玩具推车有一个圆轮，圆轮旁的弧线画出了它正在转。",
+          "options": {
+            "A": {
+              "label": "玩具推车的圆轮",
+              "visual": {
+                "kind": "asset",
+                "image": "toy-wheel",
+                "alt": "玩具推车的圆轮"
+              }
+            },
+            "B": {
+              "label": "圆皮球",
+              "visual": {
+                "kind": "asset",
+                "image": "ball",
+                "alt": "圆皮球"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "今天的科学办法",
+      "template": "summary",
+      "data": {
+        "title": "把科学办法带回家",
+        "items": [
+          "看身边的现象，提个问题",
+          "观察、测量和记录",
+          "按步骤实验，如实记结果",
+          "动手制作，再观察旋转",
+          "请大人一起继续探索"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "校园、身体和游戏里都可以找到问题。"
+        },
+        {
+          "say": "阳光下能看见影子，灯光下也能看见。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "观察让我们看清现象，测量要借助工具。"
+        },
+        {
+          "say": "发现了什么，就画下来或用符号记下来。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "实验可以检验猜想，要按顺序认真操作。"
+        },
+        {
+          "say": "看到浮起记向上，看到沉下记向下。"
+        },
+        {
+          "say": "实验用什么材料，要看想研究的问题。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "小纸片折、穿、缠以后，可以试着转。"
+        },
+        {
+          "say": "仔细看看物体的哪个部分绕着中间转。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "科学家也做实验，和大人一起查个故事。"
+        },
+        {
+          "say": "真实的实验、制作和口述，请大人观察。"
+        },
+        {
+          "say": "朵朵说：我想把今天的发现说给大人听。",
+          "by": "duoduo"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Where's the bird? 小鸟在哪里",
+  "description": "外研社一年级起点一年级下册Module 2 Unit 1完整课目；听图认识in、on、under，移动小鸟并尝试询问和回答位置，口语待成人观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {"name": "Mia 老师", "role": "teacher", "gender": "female", "voice": "Jennifer", "avatar": "/teachers/coco-english-v1.png", "color": "#367d7c", "persona": "温柔清楚的英语女老师，慢速示范标准英语，用简短中文解释位置，先看实物关系，再听英语和尝试说；不把点击当口语能力。"}
+  },
+  "images": {
+    "bird": {"file": "assets/bird.png"}, "hat": {"file": "assets/hat.png"},
+    "bird-in": {"file": "assets/bird-in.png"}, "bird-on": {"file": "assets/bird-on.png"}, "bird-under": {"file": "assets/bird-under.png"},
+    "ball-in": {"file": "assets/ball-in.png"}, "ball-on": {"file": "assets/ball-on.png"}, "ball-under": {"file": "assets/ball-under.png"}
+  },
+  "scenes": [
+    {
+      "key": "p01", "type": "slide", "title": "今天找什么", "template": "title-picture",
+      "data": {"title": "Where's the bird?", "picture": "bird-under", "caption": "先找物品，再看位置"},
+      "script": [
+        {"spotlight": "picture"},
+        {"say": "你好，我是Mia老师，今天一起找小鸟。"},
+        {"say": "这只蓝色的小鸟，英语说bird。"},
+        {"say": "这顶魔术帽，英语说hat。"},
+        {"say": "同一只鸟，换个位置，意思就会改变。"},
+        {"spotlight": "title"},
+        {"say": "想问它在哪里，可以用where来问。"},
+        {"say": "Where's the bird?"},
+        {"say": "这句话就是问：小鸟在哪里？"},
+        {"spotlight": "caption"},
+        {"say": "先听老师说，再看鸟和帽子的关系。"},
+        {"say": "今天会把小鸟摆到里面、上面和下面。"},
+        {"say": "摆对只记录位置对应，开口说请家人听。"}
+      ]
+    },
+    {
+      "key": "p02", "type": "slide", "title": "里面和上面", "template": "two-columns",
+      "data": {"title": "in 和 on 看哪里", "left": {"heading": "in", "body": "在里面"}, "right": {"heading": "on", "body": "在上面"}, "left_picture": "bird-in", "right_picture": "bird-on"},
+      "script": [
+        {"spotlight": "left-picture"},
+        {"say": "先看左边，小鸟的身体进入帽子内部。"},
+        {"say": "前面的帽子挡住了鸟身体的一部分。"},
+        {"spotlight": "left-heading"},
+        {"say": "在里面，英语用in。"},
+        {"say": "It's in the hat."},
+        {"say": "这里的it指刚才说的那只小鸟。"},
+        {"spotlight": "right-picture"},
+        {"say": "再看右边，小鸟的脚落在帽沿上。"},
+        {"say": "鸟在外面，脚接触帽子上面的表面。"},
+        {"spotlight": "right-heading"},
+        {"say": "在上面，英语用on。"},
+        {"say": "It's on the hat."},
+        {"say": "里面看进入内部，上面看落在表面。"}
+      ]
+    },
+    {
+      "key": "p03", "type": "interactive", "title": "小鸟进帽子", "page": "p03", "widgetType": "bird-position-in", "startImage": "bird-in",
+      "script": [
+        {"setState": {"demo": "on"}},
+        {"say": "同一顶帽子，位置一变，说法也要变。"},
+        {"highlight": "#hat-shell"},
+        {"say": "帽子的开口朝上，里面有可以进入的地方。"},
+        {"setState": {"demo": "in"}},
+        {"say": "老师把小鸟放进去，鸟身被帽前部挡住。"},
+        {"highlight": "#bird-token"},
+        {"say": "现在鸟在帽子里面，我们用in来说明。"},
+        {"say": "It's in the hat."},
+        {"annotate": "#hat-shell", "content": "在里面"},
+        {"say": "要看它有没有进入内部，不只看谁更高。"},
+        {"say": "可以拖小鸟，也可以直接点一个位置。"},
+        {"setState": {"play": true}},
+        {"say": "轮到你，把小鸟放进帽子里面。"},
+        {"say": "放好后再跟我轻轻说：in。"}
+      ]
+    },
+    {
+      "key": "p04", "type": "interactive", "title": "小鸟落帽沿", "page": "p04", "widgetType": "bird-position-on", "startImage": "bird-on",
+      "script": [
+        {"setState": {"demo": "in"}},
+        {"say": "刚才鸟进了帽子，这次请它飞到外面。"},
+        {"highlight": "#hat-shell"},
+        {"say": "看帽子向右伸出的帽沿，它也有上表面。"},
+        {"setState": {"demo": "on"}},
+        {"say": "老师把鸟的脚放在帽沿上，脚贴着表面。"},
+        {"highlight": "#bird-token"},
+        {"say": "鸟的整个身体在外面，没有钻进帽子。"},
+        {"annotate": "#hat-shell", "content": "在上面"},
+        {"say": "在帽子上面，英语用on。"},
+        {"say": "It's on the hat."},
+        {"say": "别只把鸟放得很高，要让脚落在帽沿上。"},
+        {"setState": {"play": true}},
+        {"say": "现在请你把小鸟放到帽沿上面。"},
+        {"say": "放好后再试着说：on。"}
+      ]
+    },
+    {
+      "key": "p05", "type": "interactive", "title": "小鸟到帽子下", "page": "p05", "widgetType": "bird-position-under", "startImage": "bird-under",
+      "script": [
+        {"setState": {"demo": "on"}},
+        {"say": "魔术帽悬在空中，下面也留出了位置。"},
+        {"highlight": "#hat-shell"},
+        {"say": "先找帽子，再看它的下方在哪里。"},
+        {"setState": {"demo": "under"}},
+        {"say": "老师把小鸟移到帽子下方，两者有空隙。"},
+        {"highlight": "#bird-token"},
+        {"say": "帽子在上，小鸟在下，鸟也没有进入帽子。"},
+        {"annotate": "#hat-shell", "content": "在下面"},
+        {"say": "在下面，英语用under。"},
+        {"say": "It's under the hat."},
+        {"say": "这和落在帽沿上不同，要看清上下关系。"},
+        {"setState": {"play": true}},
+        {"say": "请你把小鸟放到魔术帽的下面。"},
+        {"say": "摆好后，试着跟读under。"}
+      ]
+    },
+    {
+      "key": "p06", "type": "slide", "title": "一句问，一句答", "template": "title-picture",
+      "data": {"title": "Where's the bird?", "picture": "bird-under", "caption": "It's under the hat."},
+      "script": [
+        {"spotlight": "title"},
+        {"say": "现在把位置放进一句完整的回答。"},
+        {"say": "Where's the bird?"},
+        {"say": "where's把where is合在了一起。"},
+        {"say": "它还是在问：那只小鸟在哪里？"},
+        {"spotlight": "picture"},
+        {"say": "先看图，帽子在上，小鸟在它的下方。"},
+        {"spotlight": "caption"},
+        {"say": "It's under the hat."},
+        {"say": "这句先说它，再说明在帽子的下面。"},
+        {"say": "位置改变时，把under换成in或on。"},
+        {"say": "请家人问一句，你看图尝试回答一句。"},
+        {"say": "系统没有听你的声音，说得怎样待观察。"}
+      ]
+    },
+    {
+      "key": "p07", "type": "quiz", "title": "换成红球和蓝箱",
+      "intro": ["这次换成红球和蓝箱，不再用鸟和帽子。", "箱子英语说box，小球英语说ball。", "听老师说位置，选择对应的图片。"],
+      "questions": [
+        {"id": "bird-q1", "question": "请听：It's in the box. 选对应图片。", "skill": "position-in", "options": {"A": {"label": "图一", "visual": {"kind": "asset", "image": "ball-in", "alt": "红球在蓝箱内部"}}, "B": {"label": "图二", "visual": {"kind": "asset", "image": "ball-on", "alt": "红球在蓝箱上面"}}, "C": {"label": "图三", "visual": {"kind": "asset", "image": "ball-under", "alt": "红球在蓝箱正下方"}}}, "answer": ["A"], "analysis": "in表示在里面。球的下部在箱子内部，被前壁挡住，所以选图一。"},
+        {"id": "bird-q2", "question": "请听：It's on the box. 选对应图片。", "skill": "position-on", "options": {"A": {"label": "图一", "visual": {"kind": "asset", "image": "ball-in", "alt": "红球在蓝箱内部"}}, "B": {"label": "图二", "visual": {"kind": "asset", "image": "ball-on", "alt": "红球在蓝箱上面"}}, "C": {"label": "图三", "visual": {"kind": "asset", "image": "ball-under", "alt": "红球在蓝箱正下方"}}}, "answer": ["B"], "analysis": "on表示在上面。球在箱盖上方，球下缘接触箱盖表面，所以选图二。"},
+        {"id": "bird-q3", "question": "请听：It's under the box. 选对应图片。", "skill": "position-under", "options": {"A": {"label": "图一", "visual": {"kind": "asset", "image": "ball-in", "alt": "红球在蓝箱内部"}}, "B": {"label": "图二", "visual": {"kind": "asset", "image": "ball-on", "alt": "红球在蓝箱上面"}}, "C": {"label": "图三", "visual": {"kind": "asset", "image": "ball-under", "alt": "红球在蓝箱正下方"}}}, "answer": ["C"], "analysis": "under表示在下面。蓝箱在矮凳上，红球在它的正下方，所以选图三。"}
+      ]
+    },
+    {
+      "key": "p08", "type": "slide", "title": "位置小回顾", "template": "summary",
+      "data": {"title": "带着三种位置去找一找", "items": ["in 里面 / on 上面 / under 下面", "Where's the bird? 问位置", "It's ... the hat. 回答位置", "和家人藏一藏、找一找、说一说"]},
+      "script": [
+        {"spotlight": "item-1"},
+        {"say": "回想鸟与帽子的画面，三个位置不一样。"},
+        {"say": "in在里面，on在上面，under在下面。"},
+        {"spotlight": "item-2"},
+        {"say": "不知道位置时，可以用where来询问。"},
+        {"say": "Where's the bird?"},
+        {"spotlight": "item-3"},
+        {"say": "回答时先看清物品关系，再挑位置词。"},
+        {"say": "It's in the hat."},
+        {"say": "鸟换位置，回答中的位置词也要跟着换。"},
+        {"spotlight": "item-4"},
+        {"say": "和家人把物品藏好，再看图或实物问答。"},
+        {"say": "只听和摆还不等于会说，口语请家人听。"},
+        {"say": "玩完把物品收好，下次继续用英语找一找。"}
+      ]
+    }
+  ]
+}

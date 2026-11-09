@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "stageId": "fltrp-g1-upper-its-my-ruler-v1",
+  "authorModels": [
+    "deepseek-v4-pro",
+    "gpt-6.1-sol"
+  ],
+  "audioBindings": {
+    "pen": "s02-4",
+    "ask": "s02-6",
+    "pen-answer": "s02-7",
+    "pencil": "s02-11",
+    "pencil-answer": "s02-14",
+    "ruler": "s03-4",
+    "ruler-answer": "s03-6",
+    "eraser": "s03-11",
+    "eraser-answer": "s03-12",
+    "pencil-case": "s04-4",
+    "case-answer": "s04-6",
+    "crayon": "s04-10",
+    "crayon-answer": "s04-11",
+    "book-answer": "s05-7",
+    "guess-hint": "s05-12",
+    "my-ruler": "s06-11",
+    "owner-hint": "s07-12",
+    "colour-pencil": "s08-7",
+    "colour-hint": "s08-10",
+    "colour-bag": "s08-12"
+  },
+  "origin": {
+    "jobId": "aNMsqqUoN_",
+    "classroomId": "0yRe_eThrY",
+    "nativeClassroomSha256": "82ba0fdd2726ecd496cddc01343129ef208ad5fb548c26ed3958f1556410b9de"
+  },
+  "sceneMap": [
+    {
+      "nativeSceneId": "scene_Ub3nQfaF56",
+      "finalSceneKey": "s01",
+      "printedPages": []
+    },
+    {
+      "nativeSceneId": "scene_DP_vQ-LZcB",
+      "finalSceneKey": "s02",
+      "printedPages": [
+        35,
+        36
+      ]
+    },
+    {
+      "nativeSceneId": "scene_VVNbWR9LZc",
+      "finalSceneKey": "s03",
+      "printedPages": [
+        35,
+        37
+      ]
+    },
+    {
+      "nativeSceneId": "scene_T6Otie3ck7",
+      "finalSceneKey": "s04",
+      "printedPages": [
+        35
+      ]
+    },
+    {
+      "nativeSceneId": "scene_twmHNEDk1b",
+      "finalSceneKey": "s05",
+      "printedPages": [
+        35,
+        37
+      ]
+    },
+    {
+      "nativeSceneId": "scene_jeMIQ8jhcZ",
+      "finalSceneKey": "s06",
+      "printedPages": [
+        35
+      ]
+    },
+    {
+      "nativeSceneId": "scene_izMyIR78fC",
+      "finalSceneKey": "s07",
+      "printedPages": [
+        35
+      ]
+    },
+    {
+      "nativeSceneId": "scene_kfkejpuzX4",
+      "finalSceneKey": "s08",
+      "printedPages": [
+        36
+      ]
+    },
+    {
+      "nativeSceneId": "scene_NTYFyiAqCL",
+      "finalSceneKey": "s09",
+      "printedPages": [
+        36
+      ]
+    },
+    {
+      "nativeSceneId": "scene_YhC2VmA4OZ",
+      "finalSceneKey": "s10",
+      "printedPages": [
+        37
+      ]
+    },
+    {
+      "nativeSceneId": "scene_UL9Fh_DThs",
+      "finalSceneKey": "s11",
+      "printedPages": [
+        35,
+        36,
+        37
+      ]
+    },
+    {
+      "nativeSceneId": "scene_hxj8zSUwxA",
+      "finalSceneKey": "s12",
+      "printedPages": [
+        35,
+        36,
+        37
+      ]
+    }
+  ],
+  "adaptation": [
+    "去掉按未实测口语答对计分。",
+    "用明确说话者画面和同类物品检验所属。",
+    "画图活动保留自由画和实物问答，记录过程。",
+    "小检查改为新图音题和均衡答案，颜色指令使用教材英式 Colour。"
+  ],
+  "assetBindings": {
+    "stationery-workbench": {
+      "status": "accepted_for_lesson_source",
+      "file": "assets/stationery-workbench.png",
+      "sha256": "5234cad194be98bb75f38d36b10eb341c6482e4a74c798b3a36f7a5a585c27a5",
+      "review": {
+        "path": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler/codex-imagegen-v1/stationery-workbench-binding.json",
+        "sha256": "9cdf043a8fd1a5a17328c284b27cdb384d022f144dc49c4cc1eb56c316c6581b"
+      }
+    },
+    "pen": {
+      "status": "accepted_for_lesson_source",
+      "file": "assets/pen.png",
+      "sha256": "32e707a2e5a32f6334ee6e92780e33882c57ca919d0fef4e611126e11ed335b8",
+      "review": {
+        "path": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler/codex-imagegen-v1/pen.json",
+        "sha256": "14b5f0e456b9e90bf9fc2652e2b8f8b630fc5949789df7fa81411a901d44c67f"
+      },
+      "acceptedScenes": [
+        "s02",
+        "s09"
+      ],
+      "pendingUseReviews": [
+        {
+          "scene": "s10",
+          "status": "pending-context-crop-review",
+          "finding": "原图右下角有另一块蓝白橡皮。画画页有专门的橡皮卡，必须单独验证钢笔卡裁切能排除该橡皮并完整保留钢笔和笔帽。"
+        }
+      ]
+    },
+    "pencil": {
+      "status": "accepted_for_lesson_source",
+      "file": "assets/pencil.png",
+      "sha256": "becc3ae523f081a3e50d4b9e0feefdf970ba43eec786905111bab07cebb60a34",
+      "review": {
+        "path": "output/courseware-lessons/fltrp-g1-upper-its-my-ruler/codex-imagegen-v1/pencil.json",
+        "sha256": "b5de1e53d860b113bc07b72543e1f530254bf23434a1d627fd76193f7d4c68bc"
+      },
+      "acceptedScenes": [
+        "s02",
+        "s09"
+      ]
+    }
+  }
+}

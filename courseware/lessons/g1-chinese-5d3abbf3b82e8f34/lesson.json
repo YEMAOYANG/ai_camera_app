@@ -1,0 +1,1603 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "语文园地五",
+  "description": "整合四个官方课时：成对词和偏旁、写字观察、惜时名言、四季生活识字、成人共读与续编、主动礼貌交朋友。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "温和清楚的语文老师。用具体例子解释字词和方法；认真区分屏幕互动与成人观察。"
+    }
+  },
+  "images": {
+    "garden": {
+      "file": "assets/garden.png"
+    },
+    "open-box": {
+      "file": "assets/open-box.png"
+    },
+    "closed-box": {
+      "file": "assets/closed-box.png"
+    },
+    "book-front": {
+      "file": "assets/book-front.png"
+    },
+    "book-back": {
+      "file": "assets/book-back.png"
+    },
+    "cat-inside": {
+      "file": "assets/cat-inside.png"
+    },
+    "cat-outside": {
+      "file": "assets/cat-outside.png"
+    },
+    "spring": {
+      "file": "assets/spring.png"
+    },
+    "summer": {
+      "file": "assets/summer.png"
+    },
+    "autumn": {
+      "file": "assets/autumn.png"
+    },
+    "winter": {
+      "file": "assets/winter.png"
+    },
+    "boy": {
+      "file": "assets/boy.png"
+    },
+    "girl": {
+      "file": "assets/girl.png"
+    },
+    "prepare": {
+      "file": "assets/prepare.png"
+    },
+    "root": {
+      "file": "assets/root.png"
+    },
+    "grandpa": {
+      "file": "assets/grandpa.png"
+    },
+    "grandma": {
+      "file": "assets/grandma.png"
+    },
+    "dog": {
+      "file": "assets/dog.png"
+    },
+    "cat": {
+      "file": "assets/cat.png"
+    },
+    "mouse": {
+      "file": "assets/mouse.png"
+    },
+    "blocks": {
+      "file": "assets/blocks.png"
+    },
+    "paint": {
+      "file": "assets/paint.png"
+    },
+    "ball": {
+      "file": "assets/ball.png"
+    },
+    "help": {
+      "file": "assets/help.png"
+    },
+    "alone": {
+      "file": "assets/alone.png"
+    },
+    "ignore": {
+      "file": "assets/ignore.png"
+    },
+    "attend": {
+      "file": "assets/attend.png"
+    },
+    "hello": {
+      "file": "assets/hello.png"
+    },
+    "wait": {
+      "file": "assets/wait.png"
+    },
+    "plan": {
+      "file": "assets/plan.png"
+    },
+    "mess": {
+      "file": "assets/mess.png"
+    },
+    "bird": {
+      "file": "assets/bird.png"
+    },
+    "fish": {
+      "file": "assets/fish.png"
+    },
+    "frog": {
+      "file": "assets/frog.png"
+    },
+    "leaf": {
+      "file": "assets/leaf.png"
+    },
+    "old-strokes": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "可"
+              },
+              {
+                "glyph": "了"
+              },
+              {
+                "glyph": "西"
+              },
+              {
+                "glyph": "用"
+              },
+              {
+                "glyph": "马"
+              },
+              {
+                "glyph": "牙"
+              }
+            ]
+          }
+        ],
+        "size": [
+          1200,
+          300
+        ],
+        "separator": "none"
+      }
+    },
+    "share-book": {
+      "file": "assets/share-book.png"
+    },
+    "ask-name": {
+      "file": "assets/ask-name.png"
+    },
+    "root-out": {
+      "file": "assets/root-out.png"
+    },
+    "leave-sequence": {
+      "file": "assets/leave-sequence.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "字词就在生活里",
+      "template": "picture-points",
+      "data": {
+        "title": "字词就在生活里",
+        "picture": "garden",
+        "points": [
+          "南—北　男—女",
+          "开—关　正—反",
+          "先—后　内—外",
+          "意思相反或相对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小朋友们，今天我们一起在花园里找字。"
+        },
+        {
+          "say": "我们来找意思相反或相对的词。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "在地图上，南和北是相对的方向。"
+        },
+        {
+          "say": "男和女也是相对的称呼，大家都能一起玩。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "打开门说开，合上门说关。"
+        },
+        {
+          "say": "书的封面和背面可以用正、反来区分。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "出门先穿鞋，穿好以后再出门。"
+        },
+        {
+          "say": "门的里边叫内，外边叫外。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "选同一件事想一想，就容易找出成对的词。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "让意思变一变",
+      "page": "p02",
+      "widgetType": "garden-p02",
+      "startImage": "book-front",
+      "script": [
+        {
+          "highlight": "#object-stage"
+        },
+        {
+          "say": "今天我们玩一个翻书游戏。"
+        },
+        {
+          "say": "先看有太阳图案的一面，这是书的正面。"
+        },
+        {
+          "setState": {
+            "demo": "show"
+          }
+        },
+        {
+          "say": "我翻到书的背面，这一面叫反面。"
+        },
+        {
+          "say": "图案不见了，书脊也换到了另一边。"
+        },
+        {
+          "highlight": "#target-word"
+        },
+        {
+          "say": "看大字，读到反，就把反面朝向自己。"
+        },
+        {
+          "highlight": "#change-btn"
+        },
+        {
+          "say": "点圆箭头翻书，选好再点绿色对勾。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "换你试试。读到正，就把有太阳的封面翻回来。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "偏旁带着字回家",
+      "template": "summary",
+      "data": {
+        "title": "偏旁带着字回家",
+        "items": [
+          "禾木旁：秋　木字旁：树、林",
+          "口字旁：叶、吃　三点水：江、河",
+          "草字头：莲、花　宝盖头：家",
+          "言字旁：说、话　虫字旁：蛙、蝶",
+          "折文：冬、夏"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "我们来找偏旁，看字能回到哪一家。"
+        },
+        {
+          "say": "秋里有禾木旁，树和林里有木字旁。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "叶和吃里能找到口字旁。"
+        },
+        {
+          "say": "江和河的左边都有三点水。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "莲和花上面是草字头，家上面是宝盖头。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "说和话有言字旁，蛙和蝶有虫字旁。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "冬和夏里有折文，偏旁也可以在上面。"
+        },
+        {
+          "say": "先认共同的形状，再用整个字读词。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "同一个偏旁",
+      "page": "p04",
+      "widgetType": "garden-p04",
+      "startImage": "garden",
+      "script": [
+        {
+          "highlight": "#radical-trays"
+        },
+        {
+          "say": "今天玩偏旁归类，先看老师怎么放。"
+        },
+        {
+          "say": "上面是偏旁小屋，下面是等着回家的字。"
+        },
+        {
+          "setState": {
+            "demo": "show"
+          }
+        },
+        {
+          "say": "秋字左边有禾木旁，我送它回这个小屋。"
+        },
+        {
+          "highlight": "#character-bank"
+        },
+        {
+          "say": "看看字卡里有没有屋顶上的那个偏旁。"
+        },
+        {
+          "say": "有些偏旁在左边，也有的在上面。"
+        },
+        {
+          "highlight": "#radical-trays"
+        },
+        {
+          "say": "可以拖过去，也能先点字卡，再点小屋。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "一组一组来，放错先把部件再比一遍。"
+        }
+      ]
+    },
+    {
+      "key": "p04b",
+      "type": "slide",
+      "title": "熟字里面找笔画",
+      "template": "title-picture",
+      "data": {
+        "title": "熟字里面找笔画",
+        "picture": "old-strokes",
+        "caption": "看清转弯、弯曲和出钩的地方"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们在六个熟字里找以前学过的笔画。"
+        },
+        {
+          "say": "可字右边的竖钩，先向下，末端再出钩。"
+        },
+        {
+          "say": "这是“了”字。弯钩的地方，先转弯，再出钩。"
+        },
+        {
+          "say": "西字里面有竖弯，向下后弯向右边。"
+        },
+        {
+          "say": "“用”字的横折钩，转弯之后出钩。你发现了吗？"
+        },
+        {
+          "say": "“马”字的竖折折钩，转弯多，最后出钩。"
+        },
+        {
+          "say": "牙字里也能找到转折，转过去不出钩。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "观察转弯和出钩时，看看笔尖最后往哪走。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "四个字写在格中",
+      "template": "big-word",
+      "data": {
+        "title": "四个字写在格中",
+        "word": "女开关先",
+        "hint": "女、开：独体字　关、先：上下结构"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "今天我们一起观察女、开、关、先。"
+        },
+        {
+          "say": "先看字形，想想它写在田字格的什么位置。"
+        },
+        {
+          "say": "先看“女”字，它是独体字，写在田字格中间。"
+        },
+        {
+          "say": "再看“开”字，也是独体字，横画要写平。"
+        },
+        {
+          "say": "关是上下结构，先看清上面两笔的位置。"
+        },
+        {
+          "say": "先也是上下结构，最后一笔有弯和钩。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "女的撇点一笔写成，先向左下，再向右下。"
+        },
+        {
+          "say": "看清结构和笔画方向，再动手写。"
+        }
+      ]
+    },
+    {
+      "key": "p05b",
+      "type": "slide",
+      "title": "四个字，按顺序写",
+      "template": "summary",
+      "data": {
+        "title": "四个字，按顺序写",
+        "items": [
+          "女  撇点、撇、横",
+          "开  横、横、撇、竖",
+          "关  点、撇、横、横、撇、捺",
+          "先  撇、横、竖、横、撇、竖弯钩"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "写字要按笔顺来，先仔细观察。"
+        },
+        {
+          "say": "写女，先撇点，再撇，最后横。"
+        },
+        {
+          "say": "第一笔连着写，伸出手跟老师书空。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "写开，先短横，再长横，接着撇和竖。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "写关，先点、撇，再写两横。"
+        },
+        {
+          "say": "下面先撇后捺，注意两笔分开。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "写先，先撇、横、竖、横、撇。"
+        },
+        {
+          "say": "最后写竖弯钩，转过去再出钩。"
+        },
+        {
+          "say": "对照课本逐笔写，请大人看看笔顺和占格。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "撇点和四字描画",
+      "page": "p06",
+      "widgetType": "garden-p06",
+      "startImage": "garden",
+      "script": [
+        {
+          "highlight": "#trace-path"
+        },
+        {
+          "say": "先学一笔撇点，再观察四个字。"
+        },
+        {
+          "setState": {
+            "demo": "trace"
+          }
+        },
+        {
+          "say": "看老师从竖中线起笔，先向左下撇。"
+        },
+        {
+          "say": "过了横中线不抬手，再向右下写点。"
+        },
+        {
+          "highlight": "#writing-grid"
+        },
+        {
+          "say": "轮到你们沿着线连续描一描。"
+        },
+        {
+          "highlight": "#next-char"
+        },
+        {
+          "say": "点绿箭头换字，看看它在田字格的位置。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "这里可以描画，纸笔和笔顺请大人观察。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "小检查：相对的意思",
+      "intro": [
+        "刚学过相对的词，做个小检查。",
+        "听老师读题，再选图片。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "店员要收好小物品。哪个盒子是关着的？",
+          "skill": "g1-opposites",
+          "answer": [
+            "B"
+          ],
+          "analysis": "盒盖完全合上，表示关。打开盖子的图表示开。",
+          "options": {
+            "A": {
+              "label": "盒盖打开",
+              "visual": {
+                "kind": "asset",
+                "image": "open-box",
+                "alt": "盒盖打开"
+              }
+            },
+            "B": {
+              "label": "盒盖合上",
+              "visual": {
+                "kind": "asset",
+                "image": "closed-box",
+                "alt": "盒盖合上"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "哪幅图里的猫在篮外休息？",
+          "skill": "g1-opposites",
+          "answer": [
+            "A"
+          ],
+          "analysis": "猫在篮外，身体和篮子分开；猫在篮内不符合目标字。",
+          "options": {
+            "A": {
+              "label": "猫在篮外",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-outside",
+                "alt": "猫在篮外"
+              }
+            },
+            "B": {
+              "label": "猫在篮内",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-inside",
+                "alt": "猫在篮内"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "时间值得珍惜",
+      "template": "two-columns",
+      "data": {
+        "title": "时间值得珍惜",
+        "left": {
+          "heading": "早作安排",
+          "body": "一年之计在于春，一日之计在于晨。"
+        },
+        "right": {
+          "heading": "珍惜光阴",
+          "body": "一寸光阴一寸金，寸金难买寸光阴。"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "今天我们想想，怎样把时间用好。"
+        },
+        {
+          "say": "先读一读两句名言。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "第一句：一年之计在于春，一日之计在于晨。"
+        },
+        {
+          "say": "这句话告诉我们，做事要早作安排。"
+        },
+        {
+          "say": "比如先想好放学后要做什么，再一件件做。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "光阴就是时间，我们来读第二句。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "第二句：一寸光阴一寸金，寸金难买寸光阴。"
+        },
+        {
+          "say": "时间像金子一样宝贵，金子也买不回时间。"
+        },
+        {
+          "say": "时间过去了，就再也回不来了。"
+        },
+        {
+          "say": "请大人听你背一背，说说你要怎样安排。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "先安排再去做",
+      "page": "p09",
+      "widgetType": "garden-p09",
+      "startImage": "prepare",
+      "script": [
+        {
+          "highlight": "#order-slots"
+        },
+        {
+          "say": "我们来玩一个先后排序的小游戏。"
+        },
+        {
+          "say": "早上出门前，应该先做什么，再做什么？"
+        },
+        {
+          "setState": {
+            "demo": "arrange"
+          }
+        },
+        {
+          "say": "我把收拾书包的图放进第一格。"
+        },
+        {
+          "say": "背包出门的图放在后面，用品就不会落下。"
+        },
+        {
+          "highlight": "#order-bank"
+        },
+        {
+          "say": "看图里的动作，再把卡片拖进先、后两格。"
+        },
+        {
+          "highlight": "#check-order"
+        },
+        {
+          "say": "两幅图放好，点对勾看看顺序。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "也能先点卡片，再点格子。轮到你来安排。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "十二个词连成画",
+      "template": "picture-points",
+      "data": {
+        "title": "十二个词连成画",
+        "picture": "summer",
+        "points": [
+          "春天　夏天　秋天　冬天",
+          "大地　树叶　青草　莲花",
+          "飞鸟　小鱼　青蛙　雪人",
+          "喜欢哪个季节？说说理由"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们认识十二个词，把它们连成一幅画。"
+        },
+        {
+          "say": "看这幅池塘图，你发现了什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先读四个季节：春天、夏天、秋天、冬天。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再读大地、树叶、青草、莲花。"
+        },
+        {
+          "say": "池塘里的花叫莲花，注意听清这个词。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接着读飞鸟、小鱼、青蛙、雪人。"
+        },
+        {
+          "say": "小鱼和青蛙并不只属于一个季节。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "我喜欢夏天，因为池塘里能看见莲花。"
+        },
+        {
+          "say": "你喜欢哪个季节？说一说自己的理由。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "title": "我的季节小画报",
+      "page": "p11",
+      "widgetType": "garden-p11",
+      "startImage": "spring",
+      "script": [
+        {
+          "highlight": "#season-picks"
+        },
+        {
+          "say": "今天来做一个季节小画报。"
+        },
+        {
+          "say": "这里有四个季节，我先选夏天。"
+        },
+        {
+          "setState": {
+            "demo": "summer"
+          }
+        },
+        {
+          "say": "夏天画面换成池塘，我再放上一张小鱼图。"
+        },
+        {
+          "highlight": "#poster-bank"
+        },
+        {
+          "say": "轮到你了。先选季节，再挑两张小图。"
+        },
+        {
+          "highlight": "#poster-field"
+        },
+        {
+          "say": "把图拖进大画框，也能先点图，再点画框。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "选哪个季节都可以，请大人听听你的理由。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "在姓名里认新字",
+      "template": "picture-points",
+      "data": {
+        "title": "在姓名里认新字",
+        "picture": "boy",
+        "points": [
+          "先问本人：你的名字怎么读？",
+          "找到认识的字，再学一个新字",
+          "姓名卡、作业本、值日表",
+          "本课只用虚构姓名卡"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们要在姓名里认新字。"
+        },
+        {
+          "say": "从姓名卡和作业本里，可以找到认识的新字。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看姓名卡，再问本人：你的名字怎么读？"
+        },
+        {
+          "say": "听清了再跟着读，同一个字有时读法不同。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "找到认识的字，再把新字指给大人看。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "写字本封面、姓名卡和值日表都能帮助我们认字。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "游戏里用虚构姓名，真实名字留在你们自己身边。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "interactive",
+      "title": "姓名卡回到主人身边",
+      "page": "p13",
+      "widgetType": "garden-p13",
+      "startImage": "boy",
+      "script": [
+        {
+          "highlight": "#name-people"
+        },
+        {
+          "say": "我们来玩送姓名卡回家的游戏。"
+        },
+        {
+          "say": "青衣男孩叫小满，背带裤女孩叫朵朵。"
+        },
+        {
+          "setState": {
+            "demo": "match"
+          }
+        },
+        {
+          "say": "听，小满。我把小满的卡片送给他。"
+        },
+        {
+          "say": "对上名字，卡片就留在主人脚下。"
+        },
+        {
+          "highlight": "#name-cards"
+        },
+        {
+          "say": "先听清名字，再找下面对应的姓名卡。"
+        },
+        {
+          "highlight": "#name-people"
+        },
+        {
+          "say": "可以拖卡片，也可以先点卡片，再点人物。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "现在换你来配对。遇到陌生姓名可以问本人。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "quiz",
+      "title": "小检查：词在生活里",
+      "intro": [
+        "看过图片和词卡，来做小检查。",
+        "听老师读题，再选图片。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "听到飞鸟，哪幅图合适？",
+          "skill": "g4-season-words",
+          "answer": [
+            "A"
+          ],
+          "analysis": "飞鸟是在空中飞的鸟。鱼和青蛙都有不同的外形，不能配到这个词。",
+          "options": {
+            "A": {
+              "label": "飞翔的小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "bird",
+                "alt": "正在飞翔的一只小鸟"
+              }
+            },
+            "B": {
+              "label": "水里的小鱼",
+              "visual": {
+                "kind": "asset",
+                "image": "fish",
+                "alt": "水中的小鱼"
+              }
+            },
+            "C": {
+              "label": "石上的青蛙",
+              "visual": {
+                "kind": "asset",
+                "image": "frog",
+                "alt": "坐在石头上的青蛙"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "哪个画面里，同伴正在介绍自己的姓名卡？",
+          "skill": "g4-life-literacy",
+          "answer": [
+            "B"
+          ],
+          "analysis": "一位同伴指着自己手里的姓名卡，另一位正面对着他听。遇到不熟悉的名字，可以向本人请教。",
+          "options": {
+            "A": {
+              "label": "转身只看自己的书",
+              "visual": {
+                "kind": "asset",
+                "image": "ignore",
+                "alt": "同伴在旁边，另一个孩子转身只看自己的书"
+              }
+            },
+            "B": {
+              "label": "面对面向名字主人请教",
+              "visual": {
+                "kind": "asset",
+                "image": "ask-name",
+                "alt": "同伴指自己的姓名卡介绍，另一位面对本人请教和听"
+              }
+            },
+            "C": {
+              "label": "站远处等待",
+              "visual": {
+                "kind": "asset",
+                "image": "wait",
+                "alt": "孩子站在远处等待，没有向同伴请教"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "共读一条求助线",
+      "template": "picture-points",
+      "data": {
+        "title": "共读一条求助线",
+        "picture": "root",
+        "points": [
+          "遇到困难：向别人求助",
+          "老公公→老婆婆→小姑娘→小狗",
+          "每位帮手接在前一位后面",
+          "打开教材，和大人一起读"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们来读拔萝卜，先找故事里的求助线。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "老公公一个人没拔动，就请老婆婆帮忙。"
+        },
+        {
+          "say": "有困难时，可以把要帮的事情说清楚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "老婆婆请来小姑娘，小姑娘又请来小狗。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "每一位帮手接在前面的人后边，一起用力。"
+        },
+        {
+          "say": "文字最后是小狗喊小猫来帮忙。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "请和大人翻到书上，看看哪句话停住了。"
+        },
+        {
+          "say": "后面的插图还能给我们一些续编线索。"
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "interactive",
+      "title": "帮手按次序加入",
+      "page": "p16",
+      "widgetType": "garden-p16",
+      "startImage": "root",
+      "script": [
+        {
+          "highlight": "#helper-line"
+        },
+        {
+          "say": "我们来把故事里已经读到的队伍排出来。"
+        },
+        {
+          "say": "老公公先来拔，拔不动就向人求助。"
+        },
+        {
+          "setState": {
+            "demo": "join"
+          }
+        },
+        {
+          "say": "我把老婆婆接在他身后。"
+        },
+        {
+          "highlight": "#helper-bank"
+        },
+        {
+          "say": "接下来小姑娘帮老婆婆，小狗帮小姑娘。"
+        },
+        {
+          "highlight": "#helper-line"
+        },
+        {
+          "say": "一位接一位，想清楚每一位接在谁后面。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "点一张角色图或拖到队尾。小猫留到续编。"
+        }
+      ]
+    },
+    {
+      "key": "p17",
+      "type": "slide",
+      "title": "故事还可以接着说",
+      "template": "steps",
+      "data": {
+        "title": "故事还可以接着说",
+        "steps": [
+          "谁来？",
+          "怎样帮？",
+          "结果怎样？"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "今天我们来学怎么给故事续编。续编就是接着往下说。"
+        },
+        {
+          "say": "书上有文字，也有后来帮忙的插图。"
+        },
+        {
+          "say": "先说清谁来了，可以根据插图接着编。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "比如小猫跑来，接在小狗身后。"
+        },
+        {
+          "say": "再说它怎样和大家一起帮忙。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "最后说结果怎样。结局可以有不同的想法。"
+        },
+        {
+          "say": "告诉大人，哪一段是你接着编的。"
+        }
+      ]
+    },
+    {
+      "key": "p18",
+      "type": "interactive",
+      "title": "我来编下一幕",
+      "page": "p18",
+      "widgetType": "garden-p18",
+      "startImage": "cat",
+      "script": [
+        {
+          "highlight": "#new-helpers"
+        },
+        {
+          "say": "现在轮到我们编下一幕。你想请谁来帮忙？"
+        },
+        {
+          "setState": {
+            "demo": "story"
+          }
+        },
+        {
+          "say": "我选小猫，放在已经排好的队尾。"
+        },
+        {
+          "highlight": "#story-line"
+        },
+        {
+          "say": "我让它和前面的伙伴一起用力。"
+        },
+        {
+          "highlight": "#story-endings"
+        },
+        {
+          "say": "可以编萝卜拔出来了，也可以继续想办法。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "轮到你选帮手，试一试，再决定故事结果。"
+        },
+        {
+          "say": "请大人听你说清谁来、怎样帮、结果怎样。"
+        }
+      ]
+    },
+    {
+      "key": "p19",
+      "type": "quiz",
+      "title": "小检查：求助与续编",
+      "intro": [
+        "刚学了求助和合作。",
+        "现在听题，再看图选一选。"
+      ],
+      "questions": [
+        {
+          "id": "q5",
+          "question": "大空盒一个人不好搬。哪幅图在合作？",
+          "skill": "g5-help",
+          "answer": [
+            "C"
+          ],
+          "analysis": "两个人分别扶住一边，一起搬，是主动寻求协作；独自费力和转身不理都没有形成合作。",
+          "options": {
+            "A": {
+              "label": "一个人费力搬",
+              "visual": {
+                "kind": "asset",
+                "image": "alone",
+                "alt": "一个人费力搬"
+              }
+            },
+            "B": {
+              "label": "转身看书不交流",
+              "visual": {
+                "kind": "asset",
+                "image": "ignore",
+                "alt": "转身看书不交流"
+              }
+            },
+            "C": {
+              "label": "两人合作搬",
+              "visual": {
+                "kind": "asset",
+                "image": "help",
+                "alt": "两人合作搬"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "接着编做手工的故事。哪幅图表示用具备齐了？",
+          "skill": "g5-continue",
+          "answer": [
+            "A"
+          ],
+          "analysis": "纸、胶棒和剪刀都在桌上，说明用具备齐了。另一幅图中的胶水和剪刀还在架上，孩子仍在找用具。这样就把续编的结果说清了。",
+          "options": {
+            "A": {
+              "label": "三样用具都放在桌上",
+              "visual": {
+                "image": "plan",
+                "alt": "纸、胶棒和剪刀放在桌上",
+                "kind": "asset"
+              }
+            },
+            "B": {
+              "label": "胶水和剪刀仍在架上",
+              "visual": {
+                "image": "mess",
+                "alt": "小朋友看着架上的胶水和剪刀",
+                "kind": "asset"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p20",
+      "type": "slide",
+      "title": "交谈从我开始",
+      "template": "picture-points",
+      "data": {
+        "title": "交谈从我开始",
+        "picture": "blocks",
+        "points": [
+          "先介绍自己",
+          "找一个兴趣话题",
+          "问一问，听一听，再回应",
+          "在熟悉场景中与同伴练习"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们学习怎样和同伴交朋友。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先介绍自己。你好，我叫小满。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再分享一个兴趣。我喜欢搭积木，你呢？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "用问句把话题递给同伴，再听听他的想法。"
+        },
+        {
+          "say": "同伴说喜欢搭房子，我可以问：要一起搭吗？"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "遇到还不熟悉的同伴，可以试着这样开口。"
+        },
+        {
+          "say": "在熟悉的地方练习，请大人听你怎么说。"
+        }
+      ]
+    },
+    {
+      "key": "p21",
+      "type": "interactive",
+      "title": "把话题接下去",
+      "page": "p21",
+      "widgetType": "garden-p21",
+      "startImage": "blocks",
+      "script": [
+        {
+          "highlight": "#talk-friends"
+        },
+        {
+          "say": "今天我们学习怎样把话题接下去。"
+        },
+        {
+          "setState": {
+            "demo": "topic"
+          }
+        },
+        {
+          "say": "小满说他喜欢搭积木，我把积木放在桌子中间。"
+        },
+        {
+          "highlight": "#topic-bank"
+        },
+        {
+          "say": "接上话题，可以说：你喜欢搭什么？"
+        },
+        {
+          "highlight": "#talk-table"
+        },
+        {
+          "say": "换成画画或篮球，就选那件相关的东西。"
+        },
+        {
+          "setState": {
+            "demo": "reset"
+          }
+        },
+        {
+          "say": "看桌旁的话题小图，再拖同样的话题图。"
+        },
+        {
+          "say": "也能先点图片再点桌面，真实接话请大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p22",
+      "type": "slide",
+      "title": "礼貌让交谈继续",
+      "template": "picture-points",
+      "data": {
+        "title": "礼貌让交谈继续",
+        "picture": "attend",
+        "points": [
+          "说话时，看着对方的眼睛",
+          "听完再回应，不抢着打断",
+          "喜好不同，也能礼貌交流",
+          "真实交谈，请大人观察"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们来想想，怎样让谈话继续下去。"
+        },
+        {
+          "say": "看，两位朋友在说同一个话题。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "说话时可以自然地看着对方的眼睛。"
+        },
+        {
+          "say": "这样对方更容易知道你在和他说话。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "同伴说完再回应。可以问：后来呢？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "兴趣不同也没关系。大家轮流分享，也能交到好朋友。"
+        },
+        {
+          "say": "一个爱画画，一个爱看书，也能轮流分享。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "请大人观察，你有没有主动说，也耐心听。"
+        }
+      ]
+    },
+    {
+      "key": "p23",
+      "type": "quiz",
+      "title": "小检查：交朋友",
+      "intro": [
+        "做个交朋友小检查。",
+        "听题，再看图选一幅。"
+      ],
+      "questions": [
+        {
+          "id": "q7",
+          "question": "想认识新朋友时，怎样做能主动交流？",
+          "skill": "g6-active-talk",
+          "answer": [
+            "B"
+          ],
+          "analysis": "朝向同伴、挥手打招呼是在主动开始交流；远处等待和只看物品都没有开始对话。",
+          "options": {
+            "A": {
+              "label": "站远处等待",
+              "visual": {
+                "kind": "asset",
+                "image": "wait",
+                "alt": "站远处等待"
+              }
+            },
+            "B": {
+              "label": "走近挥手问候",
+              "visual": {
+                "kind": "asset",
+                "image": "hello",
+                "alt": "走近挥手问候"
+              }
+            }
+          }
+        },
+        {
+          "id": "q8",
+          "question": "朋友说话时，哪张图表示你在专注听？",
+          "skill": "g6-attentive-talk",
+          "answer": [
+            "C"
+          ],
+          "analysis": "两个人朝向彼此，看着对方聊书，表现专注回应；转身只看自己的书或远处等待没有专注交流。",
+          "options": {
+            "A": {
+              "label": "转身只看书",
+              "visual": {
+                "kind": "asset",
+                "image": "ignore",
+                "alt": "转身只看书"
+              }
+            },
+            "B": {
+              "label": "站远处等待",
+              "visual": {
+                "kind": "asset",
+                "image": "wait",
+                "alt": "站远处等待"
+              }
+            },
+            "C": {
+              "label": "面对同伴专心交流",
+              "visual": {
+                "kind": "asset",
+                "image": "share-book",
+                "alt": "公园长椅上两位同伴面对面，专心聊喜爱的书"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p24",
+      "type": "slide",
+      "title": "把办法带回家",
+      "template": "summary",
+      "data": {
+        "title": "把办法带回家",
+        "items": [
+          "成对字找不同，偏旁和四字看仔细",
+          "两句惜时话，早作安排不拖延",
+          "四季十二词，姓名里面也认字",
+          "共读先看事实，续编讲清三件事",
+          "主动问、专心听，礼貌回应交朋友"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "我们来回顾今天学过的本领。"
+        },
+        {
+          "say": "找六对词，找偏旁和旧笔画，练写四个字。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "两句名言提醒我们早作安排，珍惜时间。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "读四季和自然词，说喜欢的季节和理由。"
+        },
+        {
+          "say": "也可以从姓名里认新字。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "共读先看清书里发生了什么，再想新的结局。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "主动开口、专心听，轮流和同伴聊。"
+        },
+        {
+          "say": "请大人听你读、听你说，也看看纸笔书写。"
+        }
+      ]
+    }
+  ]
+}

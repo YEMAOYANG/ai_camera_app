@@ -1,0 +1,754 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "数数比比",
+  "description": "在森林邮局听数取物、印图、换队形、比多少和逐份配放。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "用清晰温和的短句示范听数、逐物点数、改变排法、配对比较和按份配物。让学生自己操作，只记录可观察的互动结果。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "stamp": {
+      "file": "assets/stamp.png"
+    },
+    "leaf": {
+      "file": "assets/leaf.png"
+    },
+    "sun": {
+      "file": "assets/sun.png"
+    },
+    "envelope": {
+      "file": "assets/envelope.png"
+    },
+    "badge": {
+      "file": "assets/badge.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "邮局今天开张",
+      "template": "picture-points",
+      "data": {
+        "title": "邮局今天开张",
+        "picture": "cover",
+        "points": [
+          "听清数目",
+          "每件数一次",
+          "说出总数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你好，我是小数老师。"
+        },
+        {
+          "say": "森林邮局开门啦，今天请你来帮忙。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "小松鼠说，请准备五枚邮票。"
+        },
+        {
+          "say": "我先听清楚：数的是邮票，要五枚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "用手指着，每枚只数一次。"
+        },
+        {
+          "say": "一、二、三、四、五。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "数到五，这一组就是五枚。"
+        },
+        {
+          "say": "还没取够可以继续，取多了可以放回。"
+        },
+        {
+          "say": "这样一数，才知道有没有刚好。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "听数装邮票",
+      "page": "p02",
+      "widgetType": "count-compare-collect",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#count-supply"
+        },
+        {
+          "say": "听到四，就给小熊取四枚邮票。"
+        },
+        {
+          "say": "每拿一枚就数一个数，拿过的留在盘里。"
+        },
+        {
+          "setState": {
+            "showFour": true
+          }
+        },
+        {
+          "highlight": "#count-board"
+        },
+        {
+          "say": "一、二、三、四，正好够了。"
+        },
+        {
+          "say": "我从盘里再数一遍，看看有没有漏。"
+        },
+        {
+          "say": "数量对了才送出，先不用急。"
+        },
+        {
+          "say": "请取三枚邮票，数好再送。"
+        },
+        {
+          "say": "请取六枚邮票，数好再送。"
+        },
+        {
+          "say": "请取九枚邮票，数好再送。"
+        },
+        {
+          "say": "每轮的要求会变，点听题就能重听。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "听数盖图章",
+      "page": "p03",
+      "widgetType": "count-compare-print",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#count-supply"
+        },
+        {
+          "say": "这次不拿邮票，改成在纸上画图。"
+        },
+        {
+          "say": "我们用印章来画，一按就印一个图。"
+        },
+        {
+          "say": "邮局有太阳章和叶子章，先选要画的。"
+        },
+        {
+          "setState": {
+            "showPrint": true
+          }
+        },
+        {
+          "highlight": "#count-board"
+        },
+        {
+          "say": "我听到四个叶子，就盖四个叶印。"
+        },
+        {
+          "say": "我只数叶子，太阳印不混进去。"
+        },
+        {
+          "say": "最后一个数是四，四个叶印就画够了。"
+        },
+        {
+          "say": "请在空纸上印三个太阳。"
+        },
+        {
+          "say": "请在空纸上印五片叶子。"
+        },
+        {
+          "say": "请在空纸上印八个太阳。"
+        },
+        {
+          "say": "先找对印章，再每个图印一次。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "十枚换个队形",
+      "page": "p04",
+      "widgetType": "count-compare-reorder",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#count-board"
+        },
+        {
+          "say": "这里先摆十枚邮票，数过的亮起来。"
+        },
+        {
+          "say": "从左数到右，每枚都只点一次。"
+        },
+        {
+          "say": "一、二、三、四、五、六、七、八、九、十。"
+        },
+        {
+          "setState": {
+            "demoSpread": true
+          }
+        },
+        {
+          "highlight": "#count-main"
+        },
+        {
+          "say": "邮票散开了，还是刚才的那一批。"
+        },
+        {
+          "say": "我没有加进来一枚，也没有拿走一枚。"
+        },
+        {
+          "say": "所以换个队形以后，仍是十枚。"
+        },
+        {
+          "setState": {
+            "demoRows": true
+          }
+        },
+        {
+          "say": "也可以分成两排，按一排一排来数。"
+        },
+        {
+          "say": "先数完上一排，再数下面一排。"
+        },
+        {
+          "say": "请你换个队形，再把同一批邮票点数一遍。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "第一封回信",
+      "intro": [
+        "换些物品，照刚才的办法试一试。",
+        "听完再数点，每个点只数一次。"
+      ],
+      "questions": [
+        {
+          "id": "count-compare-q1",
+          "question": "给刺猬寄八张卡片。哪幅图的点数一样？",
+          "skill": "听数取物",
+          "options": {
+            "A": {
+              "label": "7个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个可数的点"
+              }
+            },
+            "B": {
+              "label": "8个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 8,
+                "alt": "8个可数的点"
+              }
+            },
+            "C": {
+              "label": "9个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 9,
+                "alt": "9个可数的点"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "每个点代表一张卡片。逐个数到八，这幅图正好对应八张。"
+        },
+        {
+          "id": "count-compare-q2",
+          "question": "六片叶子只换了摆法。哪幅图表示现在的片数？",
+          "skill": "重排后数量不变",
+          "options": {
+            "A": {
+              "label": "6个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个可数的点"
+              }
+            },
+            "B": {
+              "label": "5个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 5,
+                "alt": "5个可数的点"
+              }
+            },
+            "C": {
+              "label": "7个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个可数的点"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "只挪位置，没有添叶子或拿走叶子，所以还是六片。"
+        },
+        {
+          "id": "count-compare-q3",
+          "question": "要画七只小鸟。每个点是一只，选出数量图。",
+          "skill": "按数画图",
+          "options": {
+            "A": {
+              "label": "7个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个可数的点"
+              }
+            },
+            "B": {
+              "label": "6个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个可数的点"
+              }
+            },
+            "C": {
+              "label": "9个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 9,
+                "alt": "9个可数的点"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "每画一个点表示一只小鸟。最后数到七，就画了七只。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "哪一组更多",
+      "template": "two-columns",
+      "data": {
+        "title": "哪一组更多",
+        "left": {
+          "heading": "太阳印",
+          "body": "从同一头排起"
+        },
+        "right": {
+          "heading": "叶子印",
+          "body": "一个对着一个"
+        },
+        "left_picture": "sun",
+        "right_picture": "leaf"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "桌上有一排太阳印，一排叶子印。"
+        },
+        {
+          "say": "只看哪排更长，可能会被空隙骗到。"
+        },
+        {
+          "say": "要把它们的开头排在一起。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "每个太阳印，对着一个叶子印。"
+        },
+        {
+          "say": "一个对一个，哪边没配上的多出来。"
+        },
+        {
+          "say": "如果两边都配完了，就是一样多。"
+        },
+        {
+          "say": "想做得更多，就要让新的一边还有剩余。"
+        },
+        {
+          "say": "想做得更少，就留出几个对面的位置。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "对齐以后比一比",
+      "page": "p07",
+      "widgetType": "count-compare-compare",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#count-board"
+        },
+        {
+          "say": "看，太阳印和叶子印已经一一对齐。"
+        },
+        {
+          "say": "这一排太阳印多出一枚，叶印不够配。"
+        },
+        {
+          "setState": {
+            "demoEqual": true
+          }
+        },
+        {
+          "highlight": "#count-main"
+        },
+        {
+          "say": "补一枚叶印，现在两边一样多。"
+        },
+        {
+          "say": "再添叶印，叶印这一排就会有剩。"
+        },
+        {
+          "say": "可不只添一种办法，只要比对面多就行。"
+        },
+        {
+          "say": "第一轮，让叶印比太阳印多。"
+        },
+        {
+          "say": "第二轮，让叶印比太阳印少。"
+        },
+        {
+          "say": "最后一轮，让两排一样多。"
+        },
+        {
+          "say": "先对齐，再看哪边还有没配上的。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "每份都按约定",
+      "template": "two-columns",
+      "data": {
+        "title": "每份都按约定",
+        "left": {
+          "heading": "一封信",
+          "body": "一个信封是一份"
+        },
+        "right": {
+          "heading": "两枚纪念章",
+          "body": "每一份都配两个"
+        },
+        "left_picture": "envelope",
+        "right_picture": "badge"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "刚才一个对一个，是在比较多少。"
+        },
+        {
+          "say": "这一次送纪念章，每个信封是一份。"
+        },
+        {
+          "say": "数清有几个信封，才能一份份检查。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "每份放两枚，不是只放一枚。"
+        },
+        {
+          "say": "我数第一封，一、二，这封够了。"
+        },
+        {
+          "say": "再数第二封，也得有一、二。"
+        },
+        {
+          "say": "三枚都堆在一封里，另一封就空了。"
+        },
+        {
+          "say": "一封一封看，才知道每份是否合适。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "两枚纪念章进一封",
+      "page": "p09",
+      "widgetType": "count-compare-bundle",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#count-supply"
+        },
+        {
+          "say": "现在把纪念章配到每个信封。"
+        },
+        {
+          "say": "第一封里先放一枚，再放一枚。"
+        },
+        {
+          "setState": {
+            "demoFilled": true
+          }
+        },
+        {
+          "highlight": "#count-board"
+        },
+        {
+          "say": "两枚都在这一封里，这封完成。"
+        },
+        {
+          "say": "还要看下一封，不能只数桌上的总数。"
+        },
+        {
+          "say": "每封恰好两枚，才算都按约定做好。"
+        },
+        {
+          "say": "第一轮，给两封信各放两枚。"
+        },
+        {
+          "say": "第二轮，给三封信各放两枚。"
+        },
+        {
+          "say": "最后给五封信各放两枚。"
+        },
+        {
+          "say": "先配好一封，再去照看下一封。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "寄出之前再核对",
+      "intro": [
+        "最后两道图题，听清比较和配放的要求。"
+      ],
+      "questions": [
+        {
+          "id": "count-compare-q4",
+          "question": "一组有五块饼。每点是一块，哪幅图比它少？",
+          "skill": "一一对应比较",
+          "options": {
+            "A": {
+              "label": "5个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 5,
+                "alt": "5个可数的点"
+              }
+            },
+            "B": {
+              "label": "7个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个可数的点"
+              }
+            },
+            "C": {
+              "label": "3个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 3,
+                "alt": "3个可数的点"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "把每一组和五块饼一个对一个。三块饼对完，五块那边还有剩，所以三块少。"
+        },
+        {
+          "id": "count-compare-q5",
+          "question": "四个笔筒，每个放两支笔。选出需要的笔数。",
+          "skill": "每份两个",
+          "options": {
+            "A": {
+              "label": "6个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个可数的点"
+              }
+            },
+            "B": {
+              "label": "10个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 10,
+                "alt": "10个可数的点"
+              }
+            },
+            "C": {
+              "label": "8个数量点",
+              "visual": {
+                "kind": "quantity",
+                "count": 8,
+                "alt": "8个可数的点"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "按笔筒分成四份。每份都放两支，从第一份数到最后一份，一共有八支。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "收好今天的本领",
+      "template": "picture-points",
+      "data": {
+        "title": "收好今天的本领",
+        "picture": "cover",
+        "points": [
+          "听数，再动手",
+          "换位置，个数不变",
+          "对齐看剩余",
+          "每份按规则摆"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "邮局今天的任务做完了，我们来回想。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听到几个，就取或画几个。"
+        },
+        {
+          "say": "每件都只数一次，最后一个数说总数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "同一批物品只换地方，个数不变。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两个队伍一个对一个，看看哪边有剩。"
+        },
+        {
+          "say": "两边都不剩，就一样多。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "每份要求两个，就把每份都配齐。"
+        },
+        {
+          "say": "回家找一组物品，数一数再把它画下。"
+        },
+        {
+          "say": "也能跟家人换个规则，试试每份放几件。"
+        },
+        {
+          "say": "说一说你最喜欢的办法，请大人帮你听。"
+        }
+      ]
+    }
+  ]
+}

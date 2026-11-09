@@ -1,0 +1,911 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "How many green birds?",
+  "description": "外研社一年级下册 Module 3 Unit 2。听清问句，数清全部和指定颜色的小鸟，再核对位置。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#D97757",
+      "persona": "mira_english_standard v2；温和清楚地示范英语，结合图片解释意义，尊重孩子第一次尝试。"
+    }
+  },
+  "images": {
+    "bird-blue": {
+      "file": "assets/bird-blue.png"
+    },
+    "bird-green": {
+      "file": "assets/bird-green.png"
+    },
+    "bird-yellow": {
+      "file": "assets/bird-yellow.png"
+    },
+    "count-lesson-12": {
+      "file": "assets/count-lesson-12.png"
+    },
+    "gear-bench": {
+      "file": "assets/gear-bench.png"
+    },
+    "map-card": {
+      "file": "assets/map-card.png"
+    },
+    "map-in": {
+      "file": "assets/map-in.png"
+    },
+    "map-on": {
+      "file": "assets/map-on.png"
+    },
+    "map-under": {
+      "file": "assets/map-under.png"
+    },
+    "mixed-lesson-9": {
+      "file": "assets/mixed-lesson-9.png"
+    },
+    "quiz-blue-in": {
+      "file": "assets/quiz-blue-in.png"
+    },
+    "quiz-blue-on": {
+      "file": "assets/quiz-blue-on.png"
+    },
+    "quiz-blue-under": {
+      "file": "assets/quiz-blue-under.png"
+    },
+    "quiz-count-10": {
+      "file": "assets/quiz-count-10.png"
+    },
+    "quiz-count-11": {
+      "file": "assets/quiz-count-11.png"
+    },
+    "quiz-count-12": {
+      "file": "assets/quiz-count-12.png"
+    },
+    "quiz-count-9": {
+      "file": "assets/quiz-count-9.png"
+    },
+    "quiz-green-4": {
+      "file": "assets/quiz-green-4.png"
+    },
+    "quiz-green-6": {
+      "file": "assets/quiz-green-6.png"
+    },
+    "quiz-green-7": {
+      "file": "assets/quiz-green-7.png"
+    },
+    "quiz-yellow-2": {
+      "file": "assets/quiz-yellow-2.png"
+    },
+    "quiz-yellow-3": {
+      "file": "assets/quiz-yellow-3.png"
+    },
+    "quiz-yellow-4": {
+      "file": "assets/quiz-yellow-4.png"
+    },
+    "quiz-yellow-in": {
+      "file": "assets/quiz-yellow-in.png"
+    },
+    "quiz-yellow-on": {
+      "file": "assets/quiz-yellow-on.png"
+    },
+    "quiz-yellow-under": {
+      "file": "assets/quiz-yellow-under.png"
+    },
+    "watch-post": {
+      "file": "assets/watch-post.png"
+    },
+    "watch-cover": {
+      "file": "assets/watch-cover.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "来到观察站",
+      "template": "picture-points",
+      "data": {
+        "title": "How many green birds?",
+        "picture": "watch-cover",
+        "points": [
+          "先听清问题",
+          "再看看小鸟",
+          "最后数一数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "大家好，我是 Mia 老师。"
+        },
+        {
+          "say": "今天我们到公园的观鸟站。"
+        },
+        {
+          "say": "看，树旁边有一个观察台。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们先听清老师问什么。"
+        },
+        {
+          "say": "How many?"
+        },
+        {
+          "say": "这句是问有多少。"
+        },
+        {
+          "say": "听到它，我们准备数一数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看老师问的是哪种小鸟。"
+        },
+        {
+          "say": "Birds，就是小鸟。"
+        },
+        {
+          "say": "有的鸟是绿色，有的是别的颜色。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "眼睛看清，手指一只一只点。"
+        },
+        {
+          "say": "同一只小鸟只数一次。"
+        },
+        {
+          "say": "一会儿我们给鸟盖小印章。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "数一数到十二",
+      "template": "picture-points",
+      "data": {
+        "title": "数一数到十二",
+        "picture": "count-lesson-12",
+        "points": [
+          "一只对一个数",
+          "11  eleven",
+          "12  twelve"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看，小鸟一个格子里有一只。"
+        },
+        {
+          "say": "手指挪到下一只，才说下一个数。"
+        },
+        {
+          "say": "先和老师慢慢数前十只。"
+        },
+        {
+          "say": "One, two, three, four, five."
+        },
+        {
+          "say": "Six, seven, eight, nine, ten."
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "每说一个数，只指一只鸟。"
+        },
+        {
+          "say": "指过的留一个小记号。"
+        },
+        {
+          "say": "这样不会忘记哪一只数过。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "十后面再数一只，就是十一。"
+        },
+        {
+          "say": "Eleven."
+        },
+        {
+          "say": "这是十一，不是十二。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "十一后面再数一只，就是十二。"
+        },
+        {
+          "say": "Twelve."
+        },
+        {
+          "say": "最后说的数，就是一共的只数。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "盖个计数戳",
+      "page": "p03",
+      "widgetType": "english-bird-stamps",
+      "startImage": "watch-post",
+      "script": [
+        {
+          "highlight": "#perches"
+        },
+        {
+          "say": "看观察板，小鸟一只挨一只。"
+        },
+        {
+          "say": "小手指要给每只鸟盖一次章。"
+        },
+        {
+          "setState": {
+            "demoCount": 1
+          }
+        },
+        {
+          "say": "老师点第一只，第一枚章出现了。"
+        },
+        {
+          "say": "有章的已经数过，不能再加一。"
+        },
+        {
+          "setState": {
+            "demoCount": 11
+          }
+        },
+        {
+          "say": "现在只剩下一只还没盖章。"
+        },
+        {
+          "say": "看右边，数到了十一。"
+        },
+        {
+          "say": "Eleven."
+        },
+        {
+          "setState": {
+            "demoCount": 12
+          }
+        },
+        {
+          "say": "再点剩下的那只，变成十二。"
+        },
+        {
+          "say": "Twelve birds."
+        },
+        {
+          "say": "最后的数告诉我们一共有几只。"
+        },
+        {
+          "setState": {
+            "demoCount": 0
+          }
+        },
+        {
+          "say": "现在轮到你，从没有印章的开始。"
+        },
+        {
+          "say": "每只只点一次，直到全都盖上章。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "只数绿鸟",
+      "template": "picture-points",
+      "data": {
+        "title": "同一张图，两种数法",
+        "picture": "mixed-lesson-9",
+        "points": [
+          "How many birds?",
+          "How many green birds?",
+          "先听清要数谁"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "来看一块新的观察板。"
+        },
+        {
+          "say": "这里有绿色、蓝色和黄色的鸟。"
+        },
+        {
+          "say": "两次都看这一幅图。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "How many birds?"
+        },
+        {
+          "say": "问全部小鸟，各种颜色都要数。"
+        },
+        {
+          "say": "这一板共有九只小鸟。"
+        },
+        {
+          "say": "Nine birds."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "How many green birds?"
+        },
+        {
+          "say": "听到 green，只看绿色的。"
+        },
+        {
+          "say": "蓝鸟和黄鸟这次先不数。"
+        },
+        {
+          "say": "一只、两只、三只绿鸟。"
+        },
+        {
+          "say": "Three green birds."
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "其他颜色还在，总数没有变。"
+        },
+        {
+          "say": "是问的范围变了，所以答案不同。"
+        },
+        {
+          "say": "听清颜色，再逐一去数。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "按颜色挑一挑",
+      "page": "p05",
+      "widgetType": "english-sort-green-birds",
+      "startImage": "watch-post",
+      "script": [
+        {
+          "highlight": "#sort-line"
+        },
+        {
+          "say": "上面一排都是小鸟，颜色不全一样。"
+        },
+        {
+          "say": "同样都是鸟，也要听清老师问的颜色。"
+        },
+        {
+          "highlight": "#sample-perch"
+        },
+        {
+          "say": "这个小样本是绿色的。"
+        },
+        {
+          "say": "Green，就是绿色。"
+        },
+        {
+          "say": "听到 green，只挑和它颜色一样的鸟。"
+        },
+        {
+          "setState": {
+            "demoPick": true
+          }
+        },
+        {
+          "say": "老师先选一只绿鸟。"
+        },
+        {
+          "say": "看，它进入一个观察格，留下一号。"
+        },
+        {
+          "say": "在观察格里，一只小鸟占一格。"
+        },
+        {
+          "highlight": "#observe-slots"
+        },
+        {
+          "say": "只数到格里的绿鸟，别加别的颜色。"
+        },
+        {
+          "say": "已经进格的，不要再点第二次。"
+        },
+        {
+          "setState": {
+            "demoPick": false
+          }
+        },
+        {
+          "say": "现在老师问你。"
+        },
+        {
+          "say": "How many green birds?"
+        },
+        {
+          "say": "先挑出来，一只一只数清楚。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "在哪里？",
+      "template": "picture-points",
+      "data": {
+        "title": "在哪里？有多少？",
+        "picture": "map-in",
+        "points": [
+          "Where’s the map?",
+          "How many maps?",
+          "Is it in the bag?"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看这张橙色地图卡。"
+        },
+        {
+          "say": "它在打开的袋子里面。"
+        },
+        {
+          "say": "这是同一张图，我可以问不同的问题。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Where's the map?"
+        },
+        {
+          "say": "问地图卡在哪里，要找位置。"
+        },
+        {
+          "say": "袋子包着它，就是 in。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "How many maps?"
+        },
+        {
+          "say": "这句问地图卡有多少张。"
+        },
+        {
+          "say": "要数张数，不能用地方来回答。"
+        },
+        {
+          "say": "这里只看到一张地图卡。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "Is it in the bag?"
+        },
+        {
+          "say": "这句是来确认，是不是在袋子里。"
+        },
+        {
+          "say": "眼睛看见确实在里面。"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "say": "如果位置对不上，就说 No。"
+        },
+        {
+          "say": "No, it isn't."
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "地图卡放哪里",
+      "page": "p07",
+      "widgetType": "english-map-placement",
+      "startImage": "gear-bench",
+      "script": [
+        {
+          "highlight": "#pick-map"
+        },
+        {
+          "say": "这是地图卡，旁边是木桌和打开的袋子。"
+        },
+        {
+          "say": "我们先看老师怎么换位置。"
+        },
+        {
+          "setState": {
+            "demoPlace": "on"
+          }
+        },
+        {
+          "say": "卡片碰着桌面，这叫在桌面上。"
+        },
+        {
+          "say": "On the table."
+        },
+        {
+          "setState": {
+            "demoPlace": "in"
+          }
+        },
+        {
+          "say": "袋口包住卡片，这叫在袋子里。"
+        },
+        {
+          "say": "In the bag."
+        },
+        {
+          "say": "如果问是不是在袋子里，就答 Yes。"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "setState": {
+            "demoPlace": "under"
+          }
+        },
+        {
+          "say": "卡片低于桌面，在桌脚之间。"
+        },
+        {
+          "say": "Under the table."
+        },
+        {
+          "say": "这时问在桌面上吗，位置对不上。"
+        },
+        {
+          "say": "No, it isn't."
+        },
+        {
+          "setState": {
+            "demoPlace": ""
+          }
+        },
+        {
+          "say": "现在由你把地图卡放到桌下。"
+        },
+        {
+          "say": "Under the table."
+        },
+        {
+          "say": "可以拖，也可以先点卡片再点位置。"
+        },
+        {
+          "say": "放好后，听老师确认它在不在桌面。"
+        },
+        {
+          "say": "Is it on the table?"
+        },
+        {
+          "say": "在两幅图里，选实际放好的位置。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "听图小检查",
+      "intro": [
+        "听清老师的问题，再看图片。",
+        "每一题只有一幅图符合听到的话。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "Eleven birds. 哪幅图一样？",
+          "skill": "count-up-to-12",
+          "answer": [
+            "C"
+          ],
+          "analysis": "Eleven 是十一。第三幅是一只一格数出的十一只鸟。",
+          "options": {
+            "A": {
+              "label": "9只小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-9",
+                "alt": "9只小鸟"
+              }
+            },
+            "B": {
+              "label": "10只小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-10",
+                "alt": "10只小鸟"
+              }
+            },
+            "C": {
+              "label": "11只小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-11",
+                "alt": "11只小鸟"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "Three yellow birds. 选图。",
+          "skill": "count-colour-group",
+          "answer": [
+            "B"
+          ],
+          "analysis": "先听清 yellow 只数黄鸟。第二幅有三只，另外两幅分别有两只、四只。",
+          "options": {
+            "A": {
+              "label": "2只黄色小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-2",
+                "alt": "2只黄色小鸟"
+              }
+            },
+            "B": {
+              "label": "3只黄色小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-3",
+                "alt": "3只黄色小鸟"
+              }
+            },
+            "C": {
+              "label": "4只黄色小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-4",
+                "alt": "4只黄色小鸟"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "Six green birds. 选图。",
+          "skill": "count-colour-group",
+          "answer": [
+            "B"
+          ],
+          "analysis": "只数绿色，不把蓝色数进去。第二幅一共有六只绿鸟。",
+          "options": {
+            "A": {
+              "label": "4只绿色小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-green-4",
+                "alt": "4只绿色小鸟"
+              }
+            },
+            "B": {
+              "label": "6只绿色小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-green-6",
+                "alt": "6只绿色小鸟"
+              }
+            },
+            "C": {
+              "label": "7只绿色小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-green-7",
+                "alt": "7只绿色小鸟"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "Twelve birds. 选图。",
+          "skill": "count-up-to-12",
+          "answer": [
+            "A"
+          ],
+          "analysis": "Twelve 是十二。第一幅三个横排，每排四只，一共十二只。",
+          "options": {
+            "A": {
+              "label": "12只小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-12",
+                "alt": "12只小鸟"
+              }
+            },
+            "B": {
+              "label": "11只小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-11",
+                "alt": "11只小鸟"
+              }
+            },
+            "C": {
+              "label": "10只小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-10",
+                "alt": "10只小鸟"
+              }
+            }
+          }
+        },
+        {
+          "id": "q5",
+          "question": "The blue bird is in the bag. 选相符的图。",
+          "skill": "locate-and-confirm",
+          "answer": [
+            "C"
+          ],
+          "analysis": "In the bag 指在袋子里。第三幅蓝鸟在打开的袋子中。",
+          "options": {
+            "A": {
+              "label": "蓝色小鸟在桌面上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-blue-on",
+                "alt": "蓝色小鸟在桌面上"
+              }
+            },
+            "B": {
+              "label": "蓝色小鸟在桌子下",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-blue-under",
+                "alt": "蓝色小鸟在桌子下"
+              }
+            },
+            "C": {
+              "label": "蓝色小鸟在袋子里",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-blue-in",
+                "alt": "蓝色小鸟在袋子里"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "The yellow bird is on the table. 选相符的图。",
+          "skill": "locate-and-confirm",
+          "answer": [
+            "A"
+          ],
+          "analysis": "On the table 指在桌面上。第一幅黄鸟在桌面上。",
+          "options": {
+            "A": {
+              "label": "黄色小鸟在桌面上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-on",
+                "alt": "黄色小鸟在桌面上"
+              }
+            },
+            "B": {
+              "label": "黄色小鸟在袋子里",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-in",
+                "alt": "黄色小鸟在袋子里"
+              }
+            },
+            "C": {
+              "label": "黄色小鸟在桌子下",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-yellow-under",
+                "alt": "黄色小鸟在桌子下"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "一起回看",
+      "template": "summary",
+      "data": {
+        "title": "一起回看观察站",
+        "items": [
+          "How many? 数一数",
+          "听到 green，只数绿鸟",
+          "Where’s? 找位置",
+          "和家人换物品问答"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "How many 是问有多少。"
+        },
+        {
+          "say": "一只对一个数，最后一个数就是总数。"
+        },
+        {
+          "say": "Eleven 是十一，twelve 是十二。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "问指定颜色时，先听清颜色。"
+        },
+        {
+          "say": "听到 green，别把黄鸟也数进去。"
+        },
+        {
+          "say": "只数符合问题的那一组。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "Where's 是问在哪里。"
+        },
+        {
+          "say": "位置可以是里面、上面或下面。"
+        },
+        {
+          "say": "Is it 用来确认猜得对不对。"
+        },
+        {
+          "say": "看图再回答 Yes 或 No。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "请大人拿两种颜色的小物件。"
+        },
+        {
+          "say": "轮流问全部有多少，再问一种颜色。"
+        },
+        {
+          "say": "再藏一张卡片，问它在哪里。"
+        },
+        {
+          "say": "把你说的话给大人听一听。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+.box-kitchen {height:100%;position:relative;color:#23463b}
+.order-ticket {position:absolute;left:26px;top:16px;width:226px;height:408px;background:#f5ead0;border:4px solid #8b9f70;border-radius:26px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:15px}
+.order-ticket img {width:116px;height:104px;object-fit:contain}
+#target-number {font-size:44px}
+#target-count {display:grid;grid-template-columns:repeat(5,24px);gap:6px}
+#target-count .seed {width:23px;height:23px;background:#f5ddac;border-color:#9a7648}
+#target-count .seed.covered {background:#7bc0a8;border-color:#356e59}
+#extra-biscuits {display:flex;justify-content:center;gap:5px}
+#extra-biscuits .seed {width:23px;height:23px;background:#ef8d6d;border-color:#a1422e}
+#tray-choices,#delivery-mat {position:absolute;left:276px;right:24px;border:4px solid #ae9a62;border-radius:28px;display:flex;align-items:center;justify-content:center;gap:23px}
+#tray-choices {top:18px;height:189px;background:#f3ddb1}
+#delivery-mat {top:229px;height:192px;background:#e1ebd6;border-color:#72966d}
+.mat-slot {width:250px;height:136px;border:3px dashed #7eaa7f;border-radius:20px}
+#delivery-mat[data-full='true'] .mat-slot {display:none}
+.box-card {width:248px;height:136px;border:4px solid #99552e;border-radius:21px;background:#fff4d9;padding:10px 16px;display:grid;place-items:center;cursor:pointer;color:#4a4229}
+.box-card[data-kind='1'] {border-color:#1e787f;background:#e3f2ec}
+.box-card[data-kind='2'] {border-color:#84642e;background:#fff0b6}
+.box-card:focus-visible {outline:5px solid #187187;outline-offset:4px}
+.box-card.selected {box-shadow:0 5px 0 #659674}
+.biscuit-grid {display:grid;grid-template-columns:repeat(5,27px);gap:7px}
+.seed {width:27px;height:27px;display:block;border-radius:50%;background:#eeb05e;border:3px solid #955331;box-shadow:inset 0 3px 0 #ffdc93}
+.delivery-controls {position:absolute;left:276px;right:24px;top:443px;height:84px;display:flex;justify-content:center;align-items:center;gap:26px}
+#delivery-total {height:68px;min-width:300px;padding:0 16px;border-radius:21px;background:#fff8de;border:4px solid #ac9863;text-align:center;font-size:38px;font-weight:900;line-height:60px}
+#check-pair {min-width:97px;height:72px;font-size:47px}
+#check-pair.box-ready {outline:5px solid #eea747;outline-offset:5px}

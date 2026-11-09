@@ -1,0 +1,26 @@
+#activity-layout{height:550px;position:relative;display:grid;grid-template-rows:280px 222px;gap:20px}
+#lesson-data{display:none}
+#scene-top{display:grid;grid-template-columns:360px 1fr 150px;gap:24px;align-items:center}
+#prompt-panel{height:260px;border-radius:32px;background:#fff8ee;border:3px solid #dfbd93;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:14px}
+#target-word{font-size:28px;line-height:1.25;text-align:center;color:#714d35;max-width:320px;overflow-wrap:anywhere}
+#prompt-audio{width:88px;height:88px;border-radius:50%;background:#e8b76c;color:#70452b;border:4px solid #fff;box-shadow:0 0 0 2px #d2a368;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#prompt-audio svg{width:42px;height:42px}
+#prompt-audio.audio-failed{border-color:#be613c}
+#photo-target{height:270px;position:relative;overflow:hidden;background:#fffdf7;border:5px dashed #c7ae87;border-radius:28px;display:flex;justify-content:center;align-items:center}
+#photo-target::before{content:'';position:absolute;width:132px;height:164px;border:5px solid #e7cfad;border-radius:14px;transform:rotate(-5deg)}
+#photo-target.occupied{border-style:solid;border-color:#82a886}
+#photo-target.occupied::before{display:none}
+#result-photo{height:250px;max-width:95%;object-fit:contain;position:relative;z-index:2;background:#fffdf7}
+#result-photo[hidden]{display:none}
+#photo-target[data-job='school']{background:center/cover url('__IMG:school__')}
+#photo-target[data-job='clinic']{background:center/cover url('__IMG:clinic__')}
+#photo-track{height:260px;display:flex;align-items:center;justify-content:flex-start;flex-direction:column;gap:5px}
+#photo-track img{width:54px;height:36px;object-fit:contain;border:1px solid #dabd96;border-radius:5px;background:#fff}
+#portrait-shelf{display:flex;justify-content:center;align-items:center;gap:16px;min-width:0}
+.photo-card{width:176px;height:210px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fffdf8;border:3px solid #ddc7a7;border-radius:22px;box-shadow:0 7px 0 #e4d5bc;cursor:grab;padding:6px;touch-action:none;position:relative}
+.photo-card[hidden]{display:none}
+.photo-card img{height:190px;width:156px;object-fit:contain;pointer-events:none;border-radius:13px}
+.photo-card.placed{opacity:.25;transform:scale(.9)}
+.photo-card.answer-hint{border-color:#75a981;box-shadow:0 0 0 6px #d2ead4}
+.photo-card.image-failed{opacity:.5}
+.photo-card.image-failed::after{content:'↻';font-size:62px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#fff8ee;border-radius:18px}

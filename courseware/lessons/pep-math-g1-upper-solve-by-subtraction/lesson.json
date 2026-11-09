@@ -1,0 +1,832 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "用减法解决问题",
+  "description": "从原创小车站出发，理解大括号、问号及整体部分关系，用实物、数量点、算式求剩余，并回图检查。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#E76F51",
+      "persona": "耐心清楚的男数学老师。解释每一步为什么，用具体物体建立整体部分关系，留给孩子真实操作。"
+    }
+  },
+  "images": {
+    "workshop": {
+      "file": "assets/workshop.png"
+    },
+    "toy-car": {
+      "file": "assets/toy-car.png"
+    },
+    "quantity-1": {
+      "file": "assets/quantity-1.png"
+    },
+    "quantity-2": {
+      "file": "assets/quantity-2.png"
+    },
+    "quantity-3": {
+      "file": "assets/quantity-3.png"
+    },
+    "quantity-4": {
+      "file": "assets/quantity-4.png"
+    },
+    "quantity-5": {
+      "file": "assets/quantity-5.png"
+    },
+    "question-sub-q1": {
+      "file": "assets/question-sub-q1.png"
+    },
+    "question-sub-q2": {
+      "file": "assets/question-sub-q2.png"
+    },
+    "question-sub-q3": {
+      "file": "assets/question-sub-q3.png"
+    },
+    "question-sub-q4": {
+      "file": "assets/question-sub-q4.png"
+    },
+    "question-sub-q5": {
+      "file": "assets/question-sub-q5.png"
+    },
+    "question-sub-q6": {
+      "file": "assets/question-sub-q6.png"
+    },
+    "story-diagram": {
+      "file": "assets/story-diagram.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "小车站的剩余任务",
+      "template": "title-picture",
+      "data": {
+        "title": "小车站的剩余任务",
+        "picture": "workshop",
+        "caption": "看清全部，找出留下的部分"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小车站今天要发出一些玩具。"
+        },
+        {
+          "say": "原来所有的小车，叫作整体。"
+        },
+        {
+          "say": "发出去的是整体中的一部分。"
+        },
+        {
+          "say": "留在站里的，是另一部分。"
+        },
+        {
+          "say": "我们知道全部有多少辆。"
+        },
+        {
+          "say": "还知道要发出去多少辆。"
+        },
+        {
+          "say": "想找留下的部分，可以用减法。"
+        },
+        {
+          "say": "今天先看图，再动手，最后检查。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "请把整体和两个部分分清楚。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "把发出的小车移过去",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#p02-whole"
+        },
+        {
+          "say": "大括号把原来的小车全包住。"
+        },
+        {
+          "say": "这里一共有七辆，这是整体。"
+        },
+        {
+          "highlight": "#p02-target"
+        },
+        {
+          "say": "右上角三辆小车，是发出的数量。"
+        },
+        {
+          "say": "问号放在留下的小车旁边。"
+        },
+        {
+          "setState": {
+            "demoMove": 3
+          }
+        },
+        {
+          "say": "我把三辆移到右边的出发区。"
+        },
+        {
+          "say": "这些车原来也在七辆里面。"
+        },
+        {
+          "highlight": "#p02-stock"
+        },
+        {
+          "say": "左边留下的，就是要求的部分。"
+        },
+        {
+          "say": "从全部里去掉发出的，用减法。"
+        },
+        {
+          "setState": {
+            "resetTask": true
+          }
+        },
+        {
+          "say": "现在请你先点包住全部的大括号。"
+        },
+        {
+          "say": "再移走三辆，选留下的数量图。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "画点也能表示小车",
+      "template": "picture-points",
+      "data": {
+        "title": "画点也能表示小车",
+        "picture": "toy-car",
+        "points": [
+          "一辆小车，对应一个点",
+          "移走一辆，划去一个点",
+          "只数没划去的点"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小车太多不好画，可以用点表示。"
+        },
+        {
+          "say": "每辆车只对应一个数量点。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "比如七辆车，就画七个点。"
+        },
+        {
+          "say": "画点时不能漏，也不能多画。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "发出三辆，就划去其中三个点。"
+        },
+        {
+          "say": "划去表示去掉，点还留着作记录。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "没有划去的点，表示留下的小车。"
+        },
+        {
+          "say": "数剩余点，就能知道还剩多少辆。"
+        },
+        {
+          "say": "实物、数量点，说的是同一个故事。"
+        },
+        {
+          "say": "这和七辆发出三辆，是同一个故事。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "留下的点在哪里",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#p04-cars"
+        },
+        {
+          "say": "这一排是五辆小车，先看清全部。"
+        },
+        {
+          "highlight": "#p04-marks"
+        },
+        {
+          "say": "下面五个点，和五辆车一一对应。"
+        },
+        {
+          "highlight": "#p04-order"
+        },
+        {
+          "say": "任务图画着两辆，表示发出两辆。"
+        },
+        {
+          "setState": {
+            "demoCross": 2
+          }
+        },
+        {
+          "say": "我给两个点画上斜线，表示去掉。"
+        },
+        {
+          "highlight": "#p04-marks"
+        },
+        {
+          "say": "只数没划线的点，就是剩下的。"
+        },
+        {
+          "say": "划去的点不能再算进剩余里面。"
+        },
+        {
+          "setState": {
+            "resetTask": true
+          }
+        },
+        {
+          "say": "现在由你划去两个点。"
+        },
+        {
+          "say": "再选一张图，表示剩余的数量。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "为什么用减法",
+      "template": "summary",
+      "data": {
+        "title": "为什么用减法",
+        "items": [
+          "全部：7辆",
+          "发出：3辆",
+          "留下：7 − 3 = 4（辆）"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "回到小车站，全部原来有七辆。"
+        },
+        {
+          "say": "算式里的七，要对着大括号看。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "发出了三辆，是已知的一部分。"
+        },
+        {
+          "say": "从七辆里面去掉这三辆。"
+        },
+        {
+          "say": "去掉一部分，剩下另一部分。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "所以用七减三，得到四辆。"
+        },
+        {
+          "say": "七表示全部，三表示发出的。"
+        },
+        {
+          "say": "四表示留下的，别把含义换了。"
+        },
+        {
+          "say": "已知整体和部分，求另一部分用减法。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "算完还要检查",
+      "template": "summary",
+      "data": {
+        "title": "算完还要检查",
+        "items": [
+          "先看：全部、去掉、要求什么",
+          "再算：整体减去已知部分",
+          "检查：数剩余，或把两部分合回"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先看大括号，知道原来全部多少。"
+        },
+        {
+          "say": "再看已知部分，听清要求什么。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "从全部去掉已知部分，用减法。"
+        },
+        {
+          "say": "算完要回到图里看，不能就停下。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "一种方法，是重新数留下的小车。"
+        },
+        {
+          "say": "另一种，是把发出和留下的合回。"
+        },
+        {
+          "say": "三辆与四辆合起来，正好七辆。"
+        },
+        {
+          "say": "和原来的整体相同，结果就对得上。"
+        },
+        {
+          "say": "如果对不上，就重查信息和计算。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "合回去查一查",
+      "page": "p07",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "demoChoose": 3
+          }
+        },
+        {
+          "highlight": "#p07-original"
+        },
+        {
+          "say": "先看示范，原来一共五辆小车。"
+        },
+        {
+          "highlight": "#p07-shipped"
+        },
+        {
+          "say": "两辆已经发出，是已知的部分。"
+        },
+        {
+          "say": "假设留下三辆，先别急着相信。"
+        },
+        {
+          "highlight": "#p07-combined"
+        },
+        {
+          "say": "三辆和两辆合回，正好五辆。"
+        },
+        {
+          "say": "和原来一样多，示范就对上了。"
+        },
+        {
+          "setState": {
+            "resetTask": true
+          }
+        },
+        {
+          "highlight": "#p07-original"
+        },
+        {
+          "say": "换你检查这组，原来一共七辆。"
+        },
+        {
+          "highlight": "#p07-shipped"
+        },
+        {
+          "say": "发出了三辆，要检查留下多少。"
+        },
+        {
+          "highlight": "#p07-choices"
+        },
+        {
+          "say": "选一张剩余图卡，再按对勾检查。"
+        },
+        {
+          "say": "合回后要和原来整体一样多。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "换个情境小检查",
+      "intro": [
+        "听老师说问题，再看数量图选择。",
+        "这些是新故事，先想整体和部分。"
+      ],
+      "questions": [
+        {
+          "id": "sub-q1",
+          "question": "原来有六盏小灯，取走四盏。还剩几盏？",
+          "skill": "整体减已知部分",
+          "answer": [
+            "B"
+          ],
+          "analysis": "六盏是整体，去掉四盏，六减四等于二。留下两盏。",
+          "visual": {
+            "kind": "asset",
+            "image": "question-sub-q1",
+            "alt": "大括号表示原来6个，划去4个，问号在未划去部分"
+          },
+          "options": {
+            "A": {
+              "label": "1",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-1",
+                "alt": "1个清楚的数量点"
+              }
+            },
+            "B": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-2",
+                "alt": "2个清楚的数量点"
+              }
+            },
+            "C": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-4",
+                "alt": "4个清楚的数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "sub-q2",
+          "question": "五把小伞借走一把。问号问留下几把，选哪图？",
+          "skill": "读懂剩余部分的问号",
+          "answer": [
+            "C"
+          ],
+          "analysis": "问号在留下的部分，要求五把中去掉一把，五减一等于四。",
+          "visual": {
+            "kind": "asset",
+            "image": "question-sub-q2",
+            "alt": "大括号表示原来5个，划去1个，问号在未划去部分"
+          },
+          "options": {
+            "A": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-3",
+                "alt": "3个清楚的数量点"
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-5",
+                "alt": "5个清楚的数量点"
+              }
+            },
+            "C": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-4",
+                "alt": "4个清楚的数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "sub-q3",
+          "question": "七个点划去五个。没划去的点是哪张图？",
+          "skill": "数量点划去表示减法",
+          "answer": [
+            "A"
+          ],
+          "analysis": "从七个点里划去五个，七减五等于二，剩两个点。",
+          "visual": {
+            "kind": "asset",
+            "image": "question-sub-q3",
+            "alt": "大括号表示原来7个，划去5个，问号在未划去部分"
+          },
+          "options": {
+            "A": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-2",
+                "alt": "2个清楚的数量点"
+              }
+            },
+            "B": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-3",
+                "alt": "3个清楚的数量点"
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-5",
+                "alt": "5个清楚的数量点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "用三句话讲故事",
+      "template": "picture-points",
+      "data": {
+        "title": "用三句话讲故事",
+        "picture": "story-diagram",
+        "points": [
+          "画7个点，大括号看全部",
+          "划去3个点，表示发出",
+          "问号放在没划去的点旁"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先听老师用三句话讲一个故事。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "小车站原来共有七辆玩具车。"
+        },
+        {
+          "say": "画七个点，表示这七辆小车。"
+        },
+        {
+          "say": "大括号要包住原来的七个点。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "其中发出了三辆玩具车。"
+        },
+        {
+          "say": "划去三个点，表示发出了三辆。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在还剩多少辆玩具车？"
+        },
+        {
+          "say": "把问号放在没有划去的点旁边。"
+        },
+        {
+          "say": "算完，再把两部分合回检查。"
+        },
+        {
+          "say": "请换数量，向大人讲一个新故事。"
+        },
+        {
+          "say": "能否讲清楚，要请大人帮你观察。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "把方法带走",
+      "intro": [
+        "继续看新情境，听清已知和问题。",
+        "选图后，想想怎样回去检查。"
+      ],
+      "questions": [
+        {
+          "id": "sub-q4",
+          "question": "原来六只纸鹤，送出三只。合回检查，留下几只？",
+          "skill": "用两部分合回整体检查",
+          "answer": [
+            "C"
+          ],
+          "analysis": "留下三只，与送出的三只合起来是六只，符合原来的整体。六减三等于三。",
+          "visual": {
+            "kind": "asset",
+            "image": "question-sub-q4",
+            "alt": "大括号表示原来6个，划去3个，问号在未划去部分"
+          },
+          "options": {
+            "A": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-2",
+                "alt": "2个清楚的数量点"
+              }
+            },
+            "B": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-4",
+                "alt": "4个清楚的数量点"
+              }
+            },
+            "C": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-3",
+                "alt": "3个清楚的数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "sub-q5",
+          "question": "大括号包住四个球，拿走两个。问号求留下几球？",
+          "skill": "大括号表示整体",
+          "answer": [
+            "A"
+          ],
+          "analysis": "大括号四个表示原来整体，去掉两个后还剩两个，四减二等于二。",
+          "visual": {
+            "kind": "asset",
+            "image": "question-sub-q5",
+            "alt": "大括号表示原来4个，划去2个，问号在未划去部分"
+          },
+          "options": {
+            "A": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-2",
+                "alt": "2个清楚的数量点"
+              }
+            },
+            "B": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-4",
+                "alt": "4个清楚的数量点"
+              }
+            },
+            "C": {
+              "label": "1",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-1",
+                "alt": "1个清楚的数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "sub-q6",
+          "question": "五颗松果用五个点表示，划去三个。剩几个点？",
+          "skill": "从整体中求另一部分",
+          "answer": [
+            "B"
+          ],
+          "analysis": "已知整体五颗和拿走的三颗，求另一部分用减法。五减三等于二。",
+          "visual": {
+            "kind": "asset",
+            "image": "question-sub-q6",
+            "alt": "大括号表示原来5个，划去3个，问号在未划去部分"
+          },
+          "options": {
+            "A": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-3",
+                "alt": "3个清楚的数量点"
+              }
+            },
+            "B": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-2",
+                "alt": "2个清楚的数量点"
+              }
+            },
+            "C": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "quantity-4",
+                "alt": "4个清楚的数量点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "剩余任务完成啦",
+      "template": "summary",
+      "data": {
+        "title": "剩余任务完成啦",
+        "items": [
+          "大括号看整体，问号看所求",
+          "整体减去已知部分，求另一部分",
+          "摆小车、画点、列算式能相互表示",
+          "回图检查；再向家人讲故事"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天，大括号帮助我们看清整体。"
+        },
+        {
+          "say": "问号告诉我们要求哪一个部分。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "已知整体和其中一部分，求另一部分。"
+        },
+        {
+          "say": "从整体里去掉已知部分，要用减法。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "摆小车、画点和算式能表示同一件事。"
+        },
+        {
+          "say": "它们都要对准相同的数量和含义。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "算完重新数，或把两个部分合回。"
+        },
+        {
+          "say": "课后用圆片和符号编一个新故事。"
+        },
+        {
+          "say": "请家人听你讲，口述表现还待观察。"
+        }
+      ]
+    }
+  ]
+}

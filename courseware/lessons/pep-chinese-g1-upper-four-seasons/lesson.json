@@ -1,0 +1,1550 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "四季",
+  "description": "整合两个官方课时，认识十二个字和三个偏旁，借图感受四季、叠词与角色语气，比较对谁说和怎样说，仿说并观察五个会写字；中间可休息再继续。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "温柔清楚的小语老师，用图画、示范和逐句领读带孩子观察字词与表达；错误时先提示观察，不立即揭答案。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "spring-field": {
+      "file": "assets/spring-field.png"
+    },
+    "summer-pond": {
+      "file": "assets/summer-pond.png"
+    },
+    "autumn-field": {
+      "file": "assets/autumn-field.png"
+    },
+    "winter-yard": {
+      "file": "assets/winter-yard.png"
+    },
+    "bud": {
+      "file": "assets/bud.png"
+    },
+    "lotus-leaf": {
+      "file": "assets/lotus-leaf.png"
+    },
+    "grain": {
+      "file": "assets/grain.png"
+    },
+    "snowman": {
+      "file": "assets/snowman.png"
+    },
+    "bird": {
+      "file": "assets/bird.png"
+    },
+    "frog": {
+      "file": "assets/frog.png"
+    },
+    "fish": {
+      "file": "assets/fish.png"
+    },
+    "dragonfly": {
+      "file": "assets/dragonfly.png"
+    },
+    "willow": {
+      "file": "assets/willow.png"
+    },
+    "lotus-flower": {
+      "file": "assets/lotus-flower.png"
+    },
+    "fall-leaves": {
+      "file": "assets/fall-leaves.png"
+    },
+    "snowflakes": {
+      "file": "assets/snowflakes.png"
+    },
+    "pencil": {
+      "file": "assets/pencil.png"
+    },
+    "round-stone": {
+      "file": "assets/round-stone.png"
+    },
+    "banana": {
+      "file": "assets/banana.png"
+    },
+    "toy-bear": {
+      "file": "assets/toy-bear.png"
+    },
+    "toy-duck": {
+      "file": "assets/toy-duck.png"
+    },
+    "toy-robot": {
+      "file": "assets/toy-robot.png"
+    },
+    "child-bow": {
+      "file": "assets/child-bow.png"
+    },
+    "child-tummy": {
+      "file": "assets/child-tummy.png"
+    },
+    "child-wave": {
+      "file": "assets/child-wave.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "打开四季观察册",
+      "template": "title-picture",
+      "data": {
+        "title": "四季",
+        "picture": "studio",
+        "caption": "看景物，听声音，做一回小诗人"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，我们一起打开四季观察册。"
+        },
+        {
+          "say": "同一篇课文里，会出现四个不同的季节。"
+        },
+        {
+          "say": "先用眼睛看景物，再用耳朵听诗句。"
+        },
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "课题是四季，四个季节连在一起。"
+        },
+        {
+          "say": "春天、夏天、秋天、冬天，各有诗里的画面。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "我们会认字、找特点，还会安排诗里的对话。"
+        },
+        {
+          "say": "有些本领要亲口说，或者拿笔写。"
+        },
+        {
+          "say": "这些请家人来听、来看，点对图片不算全部学会。"
+        },
+        {
+          "say": "中间可以停一停，再回来继续同一篇课文。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "先听春天和夏天",
+      "template": "two-columns",
+      "data": {
+        "title": "两位景物在说话",
+        "left": {
+          "heading": "春天",
+          "body": "草芽尖尖，\n他对小鸟说：\n“我是春天。”"
+        },
+        "right": {
+          "heading": "夏天",
+          "body": "荷叶圆圆，\n他对青蛙说：\n“我是夏天。”"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这首诗的作者是薛卫民。"
+        },
+        {
+          "say": "一块诗句是一小节。读完一节，停一小下。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "草芽尖尖，"
+        },
+        {
+          "say": "他对小鸟说："
+        },
+        {
+          "say": "我是春天。"
+        },
+        {
+          "say": "想象草芽对小鸟轻轻说。逗号停一下，冒号后读草芽的话。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "荷叶见到青蛙很高兴。圆圆连着读，我是夏天读得轻快。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "荷叶圆圆，"
+        },
+        {
+          "say": "他对青蛙说："
+        },
+        {
+          "say": "我是夏天。"
+        },
+        {
+          "say": "这两节都有说话的景物，也有听话的朋友。"
+        },
+        {
+          "say": "跟老师读一节。先读景物，再连着读他对谁说。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "接着听秋天和冬天",
+      "template": "two-columns",
+      "data": {
+        "title": "动作也能把诗读活",
+        "left": {
+          "heading": "秋天",
+          "body": "谷穗弯弯，\n他鞠着躬说：\n“我是秋天。”"
+        },
+        "right": {
+          "heading": "冬天",
+          "body": "雪人大肚子一挺，\n他顽皮地说：\n“我就是冬天。”"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "谷穗弯腰，像在有礼貌地说话。弯弯连起来读。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "谷穗弯弯，"
+        },
+        {
+          "say": "他鞠着躬说："
+        },
+        {
+          "say": "我是秋天。"
+        },
+        {
+          "say": "连着读他鞠着躬说。着读得轻短，别单独拉长。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "雪人把肚子一挺。声音轻快些，把就是读得神气一点。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "雪人大肚子一挺，"
+        },
+        {
+          "say": "他顽皮地说："
+        },
+        {
+          "say": "我就是冬天。"
+        },
+        {
+          "say": "雪人像活泼的孩子，声音可以带一点顽皮。"
+        },
+        {
+          "say": "前面两节说给谁听，这两节还告诉我们怎样说。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "把字音和词语连起来",
+      "template": "two-columns",
+      "data": {
+        "title": "第一组字朋友",
+        "left": {
+          "heading": "鸟　说　是",
+          "body": "鸟 niǎo　小鸟\n说 shuō　说话\n是 shì　我是"
+        },
+        "right": {
+          "heading": "春　青　蛙",
+          "body": "春 chūn　春天\n青 qīng　青青\n蛙 wā　青蛙"
+        },
+        "left_picture": "bird",
+        "right_picture": "frog"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "找小鸟的后一个字。对照拼音，鸟读第三声。"
+        },
+        {
+          "say": "说话的第一个字是说。左边是言字旁，读第一声。"
+        },
+        {
+          "say": "找我是和就是各自的最后一个字。是，读第四声。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "看拼音，连起来读小鸟、说话、我是。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "草芽说我是春天。找春天开头的字，下边有个日。"
+        },
+        {
+          "say": "在青青和青蛙里找一样的青。它读第一声。"
+        },
+        {
+          "say": "先说青蛙，再找名字最后一个字。蛙的左边有虫。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "把青蛙连起来读。先读青，再读蛙，都是第一声。"
+        },
+        {
+          "say": "你可以跟老师读，再请家人听听字音。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看图先说小鸟，再看小鸟的最后一个字。"
+        },
+        {
+          "say": "拼音提示第三声，单读鸟。把它放回去读小鸟。"
+        },
+        {
+          "say": "遮住拼音，还能从小鸟里找到鸟。现在你来试试。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这是青蛙。先用图说出名字，再用拼音确认蛙的声音。"
+        },
+        {
+          "say": "在青青和青蛙中都能找到青。两个词的意思不同。"
+        },
+        {
+          "say": "找字时先用图想词，再看拼音，最后回到词里确认。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "再认识六个字",
+      "template": "two-columns",
+      "data": {
+        "title": "第二组字朋友",
+        "left": {
+          "heading": "夏　着　皮",
+          "body": "夏 xià　夏天\n着 zhe　鞠着躬\n皮 pí　顽皮"
+        },
+        "right": {
+          "heading": "地　就　冬",
+          "body": "地 de　顽皮地说\n就 jiù　就是\n冬 dōng　冬天"
+        },
+        "left_picture": "grain",
+        "right_picture": "snowman"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "想到荷叶说夏天。找夏天开头，照拼音读第四声。"
+        },
+        {
+          "say": "做个弯腰动作，读鞠着躬。弯着腰也用这个着。"
+        },
+        {
+          "say": "顽皮里的皮，也在果皮里。皮读第二声，声音往上扬。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "荷叶说夏天，谷穗鞠着躬，雪人顽皮。把词放回画面。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "顽皮地说和慢慢地走，地把样子和动作连起来。"
+        },
+        {
+          "say": "找就是和就要开头一样的字。就，读第四声。"
+        },
+        {
+          "say": "冬天开头是冬，上面有折文。跟着拼音读第一声。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "轻声要读得轻一些、短一些，跟前面的词连起来。"
+        },
+        {
+          "say": "现在先记字形和词语，朗读还请家人听一听。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "谷穗弯下去，像在鞠躬。指给我看鞠和躬之间的着。"
+        },
+        {
+          "say": "把鞠和着连着读，着又轻又短。再接上躬。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看雪人，说我就是冬天。圈出就是，再找冬天开头。"
+        },
+        {
+          "say": "我用画面想词，用拼音确认。请你遮住拼音认就和冬。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "字卡进四季册",
+      "page": "characters",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#fs-character-target"
+        },
+        {
+          "say": "大字是这一次要观察的字。"
+        },
+        {
+          "say": "老师先指着鸟，从上到下看看它的形状。"
+        },
+        {
+          "highlight": "#fs-character-bank"
+        },
+        {
+          "say": "三张卡片里，只有一张和大字完全相同。"
+        },
+        {
+          "say": "部件相同还不够，位置和笔画样子也要相同。"
+        },
+        {
+          "setState": {
+            "demo": "sample"
+          }
+        },
+        {
+          "say": "老师把同样的鸟送进字册，两个字就放到一起了。"
+        },
+        {
+          "highlight": "#fs-character-album"
+        },
+        {
+          "say": "接下来十二个字会轮流出现，卡片位置也会变化。"
+        },
+        {
+          "say": "可以点选，也可以把字卡拖到右边字册。"
+        },
+        {
+          "say": "这里只记录字形比较，认读质量还请家人听。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "偏旁回到字旁",
+      "page": "radicals",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#fs-radical-word"
+        },
+        {
+          "say": "说字左边的部分，叫言字旁。"
+        },
+        {
+          "say": "说话要表达意思，言字旁能帮助我们记说。"
+        },
+        {
+          "highlight": "#fs-radical-bank"
+        },
+        {
+          "say": "地字左边是提土旁，想到土地就更好记。"
+        },
+        {
+          "say": "冬字上面的部分叫折文，和它的整体字形一起看。"
+        },
+        {
+          "setState": {
+            "demo": "say"
+          }
+        },
+        {
+          "say": "老师先把言字旁放在说字旁，形状要对得上。"
+        },
+        {
+          "highlight": "#fs-radical-slot"
+        },
+        {
+          "say": "这块空位用来放找到的偏旁，不是重新写一个字。"
+        },
+        {
+          "say": "现在你比较三张偏旁卡，送到相应大字旁。"
+        },
+        {
+          "say": "先看形状，再看位置；放错了可以再试。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "同一个地，放回语境读",
+      "template": "big-word",
+      "data": {
+        "title": "地的声音要看词语",
+        "word": "地",
+        "hint": "顽皮地说　｜　土地",
+        "picture": "winter-yard"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "这是同一个地字，可是放进不同词里，声音会变。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "雪人挺着肚子，顽皮地说出自己的话。"
+        },
+        {
+          "say": "这里的地读轻声，轻轻地跟在顽皮后面。"
+        },
+        {
+          "say": "慢慢地走，自由地飞，这里的地也轻轻读。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "再听土地，地读第四声，声音和刚才不同。"
+        },
+        {
+          "say": "田地、天地人，都要放进完整的词里读。"
+        },
+        {
+          "say": "不要只看字形就固定读一个声音。"
+        },
+        {
+          "say": "先听整句话、想意思，再跟着老师读。"
+        },
+        {
+          "say": "亲口能不能读准，请家人帮我们听。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "景物走进四季册",
+      "page": "seasons",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#fs-season-object"
+        },
+        {
+          "say": "这次先看景物，再找诗里相应的季节。"
+        },
+        {
+          "say": "草芽尖尖，让我们想到课文里的春天。"
+        },
+        {
+          "highlight": "#fs-season-album"
+        },
+        {
+          "say": "荷叶圆圆，对应夏天；谷穗弯弯，对应秋天。"
+        },
+        {
+          "say": "雪人大肚子一挺，对应课文里的冬天。"
+        },
+        {
+          "setState": {
+            "demo": "spring"
+          }
+        },
+        {
+          "say": "老师先把草芽放进春天的画面，景物真的移过去了。"
+        },
+        {
+          "highlight": "#fs-season-object"
+        },
+        {
+          "say": "轮到你时，每次只出现一个景物，先认清它。"
+        },
+        {
+          "say": "可以拖过去，也可以点你选中的季节画面。"
+        },
+        {
+          "say": "这里按诗里的四幅画来配，不是说各地景色都一样。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "叠词让样子更清楚",
+      "template": "picture-points",
+      "data": {
+        "title": "尖尖、圆圆、弯弯",
+        "picture": "grain",
+        "points": [
+          "草芽尖尖",
+          "荷叶圆圆",
+          "谷穗弯弯"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这株谷穗，顺着它的边缘看，是弯下来的。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "草芽尖尖，尖字重复一次，尖尖的样子更清楚。"
+        },
+        {
+          "say": "读尖尖时，两个尖字连起来读，不要急。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "荷叶圆圆，告诉我们叶片圆圆的轮廓。"
+        },
+        {
+          "say": "还可以观察荷叶大大、绿绿，说出别的特点。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "谷穗弯弯，重复的弯字，让人想到弯下的穗头。"
+        },
+        {
+          "say": "这样的词叫叠词，相同的字叠在一起。"
+        },
+        {
+          "say": "先真的看到特点，再选合适的词，不能随便凑。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "title": "叠词找画面",
+      "page": "shapes",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#fs-shape-word"
+        },
+        {
+          "say": "这一次，叠词是目标，要把它和图片的样子连起来。"
+        },
+        {
+          "say": "先看尖尖，想一想什么东西的顶端很尖。"
+        },
+        {
+          "highlight": "#fs-shape-bank"
+        },
+        {
+          "say": "三幅图分别有尖、圆和弯的轮廓，慢慢比较。"
+        },
+        {
+          "say": "圆圆要沿外边看一圈，弯弯要看到弯曲的方向。"
+        },
+        {
+          "setState": {
+            "demo": "point"
+          }
+        },
+        {
+          "say": "老师把草芽放到尖尖旁边，词和画面就配好了。"
+        },
+        {
+          "highlight": "#fs-shape-match"
+        },
+        {
+          "say": "你的图片也会真正移到目标词旁边。"
+        },
+        {
+          "say": "点选或者拖动都可以，第一次放错先再看轮廓。"
+        },
+        {
+          "say": "配好后，再把词读出来，请家人听听。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "interactive",
+      "title": "给景物找听众",
+      "page": "dialogue",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#fs-speaker"
+        },
+        {
+          "say": "诗里的草芽是说话的角色，小鸟是听话的朋友。"
+        },
+        {
+          "say": "第二节换成荷叶说话，青蛙在听。"
+        },
+        {
+          "highlight": "#fs-listener"
+        },
+        {
+          "say": "对谁说，就是把话朝着那位朋友说给他听。"
+        },
+        {
+          "setState": {
+            "demo": "bird"
+          }
+        },
+        {
+          "say": "老师先把小鸟放到草芽对面，两位朋友面对面。"
+        },
+        {
+          "highlight": "#fs-dialogue-line"
+        },
+        {
+          "say": "可以连起来说：草芽尖尖，他对小鸟说，我是春天。"
+        },
+        {
+          "say": "接下来你能选一位听众，安排自己的对话画面。"
+        },
+        {
+          "say": "每一位听众都可以选，这是仿说的准备，不猜唯一答案。"
+        },
+        {
+          "say": "图排好后，说给家人听，屏幕不替家人评价说话。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "怎样说，动作来帮忙",
+      "template": "two-columns",
+      "data": {
+        "title": "从动作读出角色的心情",
+        "left": {
+          "heading": "谷穗弯弯",
+          "body": "鞠着躬说"
+        },
+        "right": {
+          "heading": "雪人挺肚子",
+          "body": "顽皮地说"
+        },
+        "left_picture": "grain",
+        "right_picture": "snowman"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "谷穗弯下来，诗人把它想成鞠躬的样子。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "鞠躬时，上身向前弯，动作带着有礼貌的感觉。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "弯弯读得舒展，鞠着躬连读。听谷穗高兴地说，我是秋天。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再看雪人，它把大肚子一挺，精神地站着。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这个动作显得活泼、淘气，和弯身鞠躬不同。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "雪人挺起肚子，把就是读得神气些。听，我就是冬天！"
+        },
+        {
+          "say": "我们是在表演诗里的想象，不是真让植物开口。"
+        },
+        {
+          "say": "等会儿操作画面，让不同动作帮你回想语气。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "interactive",
+      "title": "把诗里的动作做出来",
+      "page": "theatre",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#fs-actor"
+        },
+        {
+          "say": "屏幕里的角色，先是谷穗，再是雪人。"
+        },
+        {
+          "say": "谷穗鞠着躬，要看到弯身的动作。"
+        },
+        {
+          "highlight": "#fs-theatre-word"
+        },
+        {
+          "say": "雪人肚子一挺，要看到挺起肚子的样子。"
+        },
+        {
+          "setState": {
+            "demo": "bend"
+          }
+        },
+        {
+          "say": "老师先让谷穗弯一下，画面的身体方向真的变了。"
+        },
+        {
+          "highlight": "#fs-theatre-move"
+        },
+        {
+          "say": "轮到你，点弯箭头，让角色一步一步做动作。"
+        },
+        {
+          "say": "进度满了，再点对勾，换下一个角色。"
+        },
+        {
+          "say": "边看边跟着读，用自己的语气试一试。"
+        },
+        {
+          "say": "这里只记录画面操作，真正朗读仍请家人听。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "休息后，串起四个小节",
+      "template": "picture-points",
+      "data": {
+        "title": "同一首诗，继续读完整",
+        "picture": "studio",
+        "points": [
+          "春夏：对谁说",
+          "秋冬：怎样说",
+          "看图想句子，再亲口读"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "眼睛和手可以休息一下，再回到四季观察册。"
+        },
+        {
+          "say": "逗号停一小下。读完一个小节，再开始下一节。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "回想春天和夏天，先说景物，再说它对谁讲话。"
+        },
+        {
+          "say": "草芽对小鸟，荷叶对青蛙，听众各不相同。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "秋天和冬天，句子还告诉我们角色怎样说。"
+        },
+        {
+          "say": "谷穗鞠着躬，雪人顽皮地说，动作和语气连起来。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先想每节的画面，再试着说出诗里的句子。"
+        },
+        {
+          "say": "不看文字能不能读完整，请家人来听和记录。"
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "interactive",
+      "title": "做一张四季口头明信片",
+      "page": "postcard",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#fs-postcard-picture"
+        },
+        {
+          "say": "仿说时，可以先选自己喜欢的景物。"
+        },
+        {
+          "say": "看清它的样子，再用合适的词表达。"
+        },
+        {
+          "highlight": "#fs-postcard-lines"
+        },
+        {
+          "say": "例如杨柳青青，他对微风说，我是春天。"
+        },
+        {
+          "say": "句子里先有景物和特点，再有对谁说或怎样说。"
+        },
+        {
+          "setState": {
+            "demo": "willow"
+          }
+        },
+        {
+          "say": "老师先选柳枝，图卡和说话线索一起出现。"
+        },
+        {
+          "highlight": "#fs-postcard-bank"
+        },
+        {
+          "say": "你也能换荷花、落叶或雪花，选择自己喜欢的画面。"
+        },
+        {
+          "say": "借线索说可以，用自己的话说也可以。"
+        },
+        {
+          "say": "准备好后请家人听，再点对勾结束图卡安排。"
+        },
+        {
+          "say": "我们不自动判断你说得怎么样，真实表现待观察。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p17",
+      "type": "slide",
+      "title": "观察四、小、鸟",
+      "template": "two-columns",
+      "data": {
+        "title": "先看字形，再到纸上练",
+        "left": {
+          "heading": "四",
+          "body": "全包围\n先外后内，再封口\n和西比较"
+        },
+        "right": {
+          "heading": "小　鸟",
+          "body": "独体字\n放在田字格中间\n观察关键笔形"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "四是全包围结构，里面的部分被外框围起来。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "写四先写外框的左、上、右三边，底下留开。"
+        },
+        {
+          "say": "写里面两笔，最后写下横封口。西上面还多一横。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "小和鸟都是独体字，要把整体放在格中间。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "小的竖钩靠着竖中线，两边各留一笔。"
+        },
+        {
+          "say": "鸟上半格的小点别漏，下半格有伸开的长横。"
+        },
+        {
+          "say": "先看老师的范字，再描一描，最后在纸上练。"
+        },
+        {
+          "say": "屏幕描过不等于写规范，请大人看字形和笔顺。"
+        }
+      ]
+    },
+    {
+      "key": "p18",
+      "type": "slide",
+      "title": "天和是，撇捺位置不同",
+      "template": "big-word",
+      "data": {
+        "title": "整体结构先看清",
+        "word": "天是",
+        "hint": "天：独体　｜　是：上下结构",
+        "picture": "studio"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "天是独体字，两横与撇、捺连成一个整体。"
+        },
+        {
+          "say": "天的撇从上横下方起，长长地向左下伸。"
+        },
+        {
+          "say": "天的捺从竖中线附近斜往右下。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "是字是上下结构。日居上，下方的撇起得低又短。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "是的捺偏平，从左边起，在字底向右展开。"
+        },
+        {
+          "say": "比一比，天的撇较长，是的捺在更低处舒展开。"
+        },
+        {
+          "say": "接下来五个字都能在淡色范字上自由描画。"
+        },
+        {
+          "say": "描画只留下一些覆盖记录，不检查完整笔顺。"
+        },
+        {
+          "say": "请家人在纸上帮我们看正确、规范和整洁。"
+        }
+      ]
+    },
+    {
+      "key": "p19",
+      "type": "interactive",
+      "title": "五个字，慢慢描",
+      "page": "trace",
+      "widgetType": "game",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#trace-word"
+        },
+        {
+          "say": "这里依次观察四、小、鸟、是、天五个字。"
+        },
+        {
+          "say": "左边是完整范字，先看它的整体结构。"
+        },
+        {
+          "highlight": "#trace-guide"
+        },
+        {
+          "say": "看四字，外框居中，横中线从框里穿过。"
+        },
+        {
+          "say": "描画时沿着淡色字慢慢走，不要着急涂满。"
+        },
+        {
+          "setState": {
+            "demo": "trace"
+          }
+        },
+        {
+          "say": "老师只示范一小段描迹，这不是完整笔顺示范。"
+        },
+        {
+          "highlight": "#trace-reset"
+        },
+        {
+          "say": "画错可以清除，再沿着淡字试一遍。"
+        },
+        {
+          "highlight": "#trace-next"
+        },
+        {
+          "say": "留下足够的描迹后，点对勾进入下一个字。"
+        },
+        {
+          "say": "五个字都描过，还要在纸上写，请大人看规范和笔顺。"
+        },
+        {
+          "setState": {
+            "example": 1
+          }
+        },
+        {
+          "say": "小字竖钩靠着竖中线，左右两笔各在一边。"
+        },
+        {
+          "setState": {
+            "example": 2
+          }
+        },
+        {
+          "say": "鸟字的点在格子上半部，长横在下半部。"
+        },
+        {
+          "setState": {
+            "example": 4
+          }
+        },
+        {
+          "say": "天字的两横在格子上半部，上横短些。"
+        },
+        {
+          "setState": {
+            "example": 3
+          }
+        },
+        {
+          "say": "是字上半格放日，下半格让捺向右舒展。"
+        },
+        {
+          "setState": {
+            "example": 0
+          }
+        },
+        {
+          "say": "回到四字。看外框左边、上边、右边，底下先留开。"
+        },
+        {
+          "say": "沿范字找里面的两笔，想一想它们怎样住在框里。"
+        },
+        {
+          "say": "最后看最下面的横，把底下封起来。试着写给家人看。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p20",
+      "type": "quiz",
+      "title": "小检查：换一组新物品",
+      "intro": [
+        "现在换成课堂没有配过的新物品。",
+        "听老师读叠词，再比较三幅图片的轮廓。",
+        "这里记录图片选择，不评价你的朗读。"
+      ],
+      "questions": [
+        {
+          "id": "seasons-new-point",
+          "question": "换成新物品，哪一幅最能表现尖尖的？",
+          "skill": "叠词表达物体特点",
+          "answer": [
+            "A"
+          ],
+          "analysis": "铅笔有尖尖的笔尖，石头圆润，香蕉弯曲。",
+          "options": {
+            "A": {
+              "label": "尖头铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "尖头铅笔"
+              }
+            },
+            "B": {
+              "label": "圆润石头",
+              "visual": {
+                "kind": "asset",
+                "image": "round-stone",
+                "alt": "圆润石头"
+              }
+            },
+            "C": {
+              "label": "弯曲香蕉",
+              "visual": {
+                "kind": "asset",
+                "image": "banana",
+                "alt": "弯曲香蕉"
+              }
+            }
+          }
+        },
+        {
+          "id": "seasons-new-bend",
+          "question": "哪一幅新物品能用弯弯的来形容？",
+          "skill": "叠词表达物体特点",
+          "answer": [
+            "C"
+          ],
+          "analysis": "香蕉的轮廓明显弯曲，和弯弯的意思对应。",
+          "options": {
+            "A": {
+              "label": "尖头铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "尖头铅笔"
+              }
+            },
+            "B": {
+              "label": "圆润石头",
+              "visual": {
+                "kind": "asset",
+                "image": "round-stone",
+                "alt": "圆润石头"
+              }
+            },
+            "C": {
+              "label": "弯曲香蕉",
+              "visual": {
+                "kind": "asset",
+                "image": "banana",
+                "alt": "弯曲香蕉"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p21",
+      "type": "quiz",
+      "title": "小检查：形状和听众",
+      "intro": [
+        "再听两个新任务。",
+        "先找形状，再找一句话里听话的对象。",
+        "老师读出任务，你来慢慢比较图片。"
+      ],
+      "questions": [
+        {
+          "id": "seasons-new-round",
+          "question": "看这三件新物品，哪一件最适合说圆圆的？",
+          "skill": "叠词表达物体特点",
+          "answer": [
+            "B"
+          ],
+          "analysis": "圆润石头的轮廓接近圆形，最符合圆圆的。",
+          "options": {
+            "A": {
+              "label": "尖头铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "尖头铅笔"
+              }
+            },
+            "B": {
+              "label": "圆润石头",
+              "visual": {
+                "kind": "asset",
+                "image": "round-stone",
+                "alt": "圆润石头"
+              }
+            },
+            "C": {
+              "label": "弯曲香蕉",
+              "visual": {
+                "kind": "asset",
+                "image": "banana",
+                "alt": "弯曲香蕉"
+              }
+            }
+          }
+        },
+        {
+          "id": "seasons-toy-listener",
+          "question": "小安对方脑袋的玩具说话。谁在听？",
+          "skill": "理解对谁说",
+          "answer": [
+            "A"
+          ],
+          "analysis": "小安把话说给方脑袋的玩具。机器人是方头，所以机器人是听众。",
+          "options": {
+            "A": {
+              "label": "玩具机器人",
+              "visual": {
+                "kind": "asset",
+                "image": "toy-robot",
+                "alt": "玩具机器人"
+              }
+            },
+            "B": {
+              "label": "玩具小鸭",
+              "visual": {
+                "kind": "asset",
+                "image": "toy-duck",
+                "alt": "玩具小鸭"
+              }
+            },
+            "C": {
+              "label": "玩具小熊",
+              "visual": {
+                "kind": "asset",
+                "image": "toy-bear",
+                "alt": "玩具小熊"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p22",
+      "type": "quiz",
+      "title": "小检查：换成人物动作",
+      "intro": [
+        "这次不看谷穗和雪人，换成孩子的动作。",
+        "听清动作词，看身体的方向。",
+        "选图只表示你理解这次图片里的动作。"
+      ],
+      "questions": [
+        {
+          "id": "seasons-child-bow",
+          "question": "哪幅图里的孩子正在鞠着躬？",
+          "skill": "理解鞠着躬与挺肚子",
+          "answer": [
+            "B"
+          ],
+          "analysis": "鞠躬是上身从腰部向前弯；招手和挺肚子都不是这个动作。",
+          "options": {
+            "A": {
+              "label": "孩子站直招手",
+              "visual": {
+                "kind": "asset",
+                "image": "child-wave",
+                "alt": "孩子站直招手"
+              }
+            },
+            "B": {
+              "label": "孩子弯身鞠躬",
+              "visual": {
+                "kind": "asset",
+                "image": "child-bow",
+                "alt": "孩子弯身鞠躬"
+              }
+            },
+            "C": {
+              "label": "孩子挺肚子",
+              "visual": {
+                "kind": "asset",
+                "image": "child-tummy",
+                "alt": "孩子挺肚子"
+              }
+            }
+          }
+        },
+        {
+          "id": "seasons-child-tummy",
+          "question": "哪幅图里的孩子做出了肚子一挺的样子？",
+          "skill": "理解鞠着躬与挺肚子",
+          "answer": [
+            "C"
+          ],
+          "analysis": "挺肚子时身体站着、肚子向前，不是弯腰鞠躬，也不是抬手招手。",
+          "options": {
+            "A": {
+              "label": "孩子弯身鞠躬",
+              "visual": {
+                "kind": "asset",
+                "image": "child-bow",
+                "alt": "孩子弯身鞠躬"
+              }
+            },
+            "B": {
+              "label": "孩子站直招手",
+              "visual": {
+                "kind": "asset",
+                "image": "child-wave",
+                "alt": "孩子站直招手"
+              }
+            },
+            "C": {
+              "label": "孩子挺肚子",
+              "visual": {
+                "kind": "asset",
+                "image": "child-tummy",
+                "alt": "孩子挺肚子"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p23",
+      "type": "slide",
+      "title": "把四季观察册带回家",
+      "template": "summary",
+      "data": {
+        "title": "今天的四季本领",
+        "items": [
+          "十二个字、三个偏旁，放回词里认",
+          "尖尖、圆圆、弯弯：叠词说特点",
+          "春夏对谁说，秋冬怎样说",
+          "用图画仿说喜欢的季节",
+          "四、小、鸟、是、天：纸上再练"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天先把十二个字放回词里认，地的声音要看语境。"
+        },
+        {
+          "say": "说的言字旁、地的提土旁、冬的折文，都要看清。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "尖尖、圆圆、弯弯，让景物的特点更清楚。"
+        },
+        {
+          "say": "读的时候，想象自己真的看到了那个样子。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "前两节有说话的景物和听众，后两节还有动作和语气。"
+        },
+        {
+          "say": "把画面和声音连起来，再请家人听一次完整朗读。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "选自己喜欢的景物，观察特点，再试着仿说。"
+        },
+        {
+          "say": "屏幕留下图片选择，你真实说得怎样仍请家人观察。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "五个字先看结构和格中位置，再到纸上练。"
+        },
+        {
+          "say": "朗读、仿说、书写都可以再试，慢慢把本领练扎实。"
+        }
+      ]
+    }
+  ]
+}

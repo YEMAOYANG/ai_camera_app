@@ -1,0 +1,23 @@
+<div class="solid-board roll-board">
+  <div id="roll-track" class="roll-track" data-semantic-diagram="桌面和方向线用来比较滚动路径">
+    <img id="roll-object" alt="桌面上的物体" src="__IMG:tube__" data-form="tube">
+    <svg viewBox="0 0 800 170" aria-hidden="true">
+      <path class="floor" d="M30 128H770 M65 134H735"/>
+      <path class="path-one" d="M407 125H690m-18-14 18 14-18 14"/>
+      <path class="path-many" d="M405 125 183 65m14-5-14 5 8 14M405 125 624 56m-14-5 14 5-8 13"/>
+    </svg>
+  </div>
+  <aside class="solid-token" id="roll-task" data-semantic-diagram="箭头分别示意站立和滚动方向">
+    <svg viewBox="0 0 100 88" aria-hidden="true">
+      <path class="wish roll-wish" d="M15 44h66m-13-12 13 12-13 12"/>
+      <path class="wish stand-wish" d="M24 68h52M50 63V18M37 31l13-13 13 13"/>
+      <path class="wish many-wish" d="M50 62 15 28m0 13V28h13m22 34 35-34m0 13V28H72"/>
+    </svg>
+    <span id="roll-task-label">让它滚</span>
+  </aside>
+  <div class="solid-cards roll-options">
+    <button type="button" class="solid-card" id="roll-stand" aria-label="让圆柱站起来"><img alt="" src="__IMG:tube__" data-form="tube"></button>
+    <button type="button" class="solid-card" id="roll-side" aria-label="把圆柱横放"><img alt="" src="__IMG:tube-side__" data-form="side"></button>
+    <button type="button" class="solid-card" id="roll-ball" aria-label="试一试球"><img alt="" src="__IMG:model-ball__" data-form="ball"></button>
+  </div>
+</div>

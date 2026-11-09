@@ -1,0 +1,10 @@
+<div id="game-layout">
+  <div id="game-toolbar">
+    <button class="btn blue" id="sound" type="button" aria-label="重听录音"><svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 4V5L7 9H3zm11.5 0v6a3 3 0 000-6zm0-4v2a5 5 0 010 10v2a7 7 0 000-14z"/></svg><span>听一听</span></button>
+    <span id="speaker-cue" aria-live="polite"></span>
+    <button class="btn green" id="next-round" type="button" hidden aria-label="下一轮">继续 →</button>
+  </div>
+ <div class="portrait single-portrait" id="maker-a"><img src="__IMG:maker-a__" alt="橙围裙孩子清楚的正面脸部照片">
+ <button class="target dot" id="target-nose" data-choice="nose" type="button" aria-label="鼻子" style="--x:51.4%;--y:57.8%"></button><button class="target dot" id="target-eye" data-choice="eye" type="button" aria-label="一只眼睛" style="--x:38.7%;--y:50.2%"></button><button class="target dot" id="target-ear" data-choice="ear" type="button" aria-label="一只耳朵" style="--x:21%;--y:56.4%"></button><button class="target dot" id="target-mouth" data-choice="mouth" type="button" aria-label="嘴巴" style="--x:51.1%;--y:67.4%"></button></div>
+</div>
+<script id="game-config" type="application/json">{"title":"听声点亮部位","mode":"lights","trials":[{"key":"ear","audio":"__VOICE:p03-12__"},{"key":"eye","audio":"__VOICE:p03-9__"},{"key":"mouth","audio":"__VOICE:p03-15__"},{"key":"nose","audio":"__VOICE:p03-6__"}]}</script>

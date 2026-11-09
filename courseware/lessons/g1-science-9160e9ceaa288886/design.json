@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "小小科学家：带着好奇找答案",
+  "canvas": [
+    1280,
+    720
+  ],
+  "pages": [
+    {
+      "id": "p03",
+      "mechanism": "叶片与瓢虫两种对象，选实物观察动作后打开放大观察窗并保存图片；第一错只提醒动作，不亮答案。",
+      "targets": [
+        "#observe-object",
+        "#observe-choice-observe",
+        "#observe-record"
+      ],
+      "stateKeys": {
+        "demo": [
+          "observe"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "只提醒对着实物找线索，不给正确选项",
+      "reset": "清空记录，回第一种对象"
+    },
+    {
+      "id": "p06",
+      "mechanism": "相同球与轨道从高低起点放手，球实移到示意终点留下标记；两次结果齐后比较较远位置；示意不当测量。",
+      "targets": [
+        "#roll-ramp",
+        "#roll-low",
+        "#roll-high",
+        "#roll-record"
+      ],
+      "stateKeys": {
+        "demo": [
+          "low",
+          "high"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "提醒对照两标记，不高亮答案",
+      "reset": "清两次试验、分数和结果，旧计时器失效",
+      "semanticDiagram": "球体、斜轨、起点与停球位置是知识本身"
+    },
+    {
+      "id": "p09",
+      "mechanism": "钢球已在一个起点，把同大小木球拖到相同起点；第二关换钢球起点；只检查公平摆法，不捏造材质远近。",
+      "targets": [
+        "#compare-steel",
+        "#compare-wood",
+        "#compare-target-mid",
+        "#compare-record"
+      ],
+      "stateKeys": {
+        "demo": [
+          "same-start"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "提示比较起点，不给位置",
+      "reset": "回第一关清放置、记录与分数",
+      "semanticDiagram": "材质、球大小与释放起点是被比较的条件"
+    },
+    {
+      "id": "p11",
+      "mechanism": "白兔、稻穗、月亮图片拖到动物、植物、天文研究站，实物图片进入记录槽；支持点击代替拖动。",
+      "targets": [
+        "#field-card",
+        "#field-animal",
+        "#field-plant",
+        "#field-star"
+      ],
+      "stateKeys": {
+        "demo": [
+          "rabbit"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "提示看研究动作和环境，不亮答案",
+      "reset": "清三站记录并重新洗牌对象"
+    }
+  ],
+  "quality": {
+    "states": [
+      "初始态",
+      "教师示范态",
+      "首次错误提示态",
+      "答对态",
+      "完成态",
+      "再玩复位"
+    ],
+    "media": "普通插图全为本课登记正式图，知识图示SVG转PNG保持比例，起点由源码控制；遮非目标文字仍可凭配音和图片操作。",
+    "assessment": "六题新情境，A/B/C各两题；不声称真实操作、会口述或独立记录。"
+  }
+}

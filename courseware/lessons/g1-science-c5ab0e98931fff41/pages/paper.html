@@ -1,0 +1,36 @@
+<figure id="paper-materials">
+  <img src="__IMG:paper-kit__" alt="折好的纸片、小杆、胶带和圆头剪刀">
+</figure>
+<figure id="paper-diagram" data-semantic-diagram="纸片折痕、小杆穿过位置及旋转的俯视示意">
+  <svg viewBox="0 0 480 250" role="img" aria-label="纸片制作的俯视模型">
+    <g id="paper-rotor">
+      <rect id="paper-flat" x="130" y="80" width="220" height="90" rx="8" fill="#a8d591" stroke="#3f8756" stroke-width="4"/>
+      <g id="paper-folded" class="hide">
+        <path d="M130 101 L164 80 L350 80 L316 101 L316 169 L130 169 Z" fill="#a8d591" stroke="#3f8756" stroke-width="4"/>
+        <path d="M130 101 L164 80 L164 101 Z M316 101 L350 80 L350 101 Z" fill="#72b77b" stroke="#3f8756" stroke-width="3"/>
+        <path d="M164 101 H316" fill="none" stroke="#3f8756" stroke-width="3" stroke-dasharray="10 7"/>
+      </g>
+      <rect id="paper-band" class="hide" x="218" y="100" width="44" height="50" rx="10" fill="#f8d58c" fill-opacity=".82" stroke="#a97631" stroke-width="3"/>
+    </g>
+    <circle id="paper-shaft" class="hide" cx="240" cy="125" r="12" fill="#795131" stroke="#fff6e0" stroke-width="4"/>
+  </svg>
+</figure>
+<div id="paper-build-controls" class="paper-controls" aria-label="制作步骤">
+  <button id="paper-fold" data-action="fold" aria-label="折纸片">
+    <svg viewBox="0 0 150 90" aria-hidden="true"><path d="M22 35 L40 18 H126 L109 35 V68 H22 Z" fill="#a8d591" stroke="#3f8756" stroke-width="4"/><path d="M22 35 H109 L126 18" fill="none" stroke="#3f8756" stroke-width="4" stroke-dasharray="8 5"/></svg>
+  </button>
+  <button id="paper-shaft-control" data-action="shaft" aria-label="穿过小杆">
+    <svg viewBox="0 0 150 90" aria-hidden="true"><rect x="25" y="23" width="100" height="45" rx="8" fill="#a8d591" stroke="#3f8756" stroke-width="4"/><circle cx="75" cy="45" r="12" fill="#795131" stroke="#fff" stroke-width="4"/></svg>
+  </button>
+  <button id="paper-band-control" data-action="band" aria-label="缠胶带固定">
+    <svg viewBox="0 0 150 90" aria-hidden="true"><rect x="25" y="23" width="100" height="45" rx="8" fill="#a8d591" stroke="#3f8756" stroke-width="4"/><rect x="57" y="25" width="36" height="41" rx="8" fill="#f8d58c" stroke="#a97631" stroke-width="3"/><circle cx="75" cy="45" r="9" fill="#795131"/></svg>
+  </button>
+</div>
+<div id="paper-spin-controls" class="paper-controls hide" aria-label="试转纸片">
+  <button id="paper-slow" data-action="slow" aria-label="慢转">
+    <svg viewBox="0 0 150 90" aria-hidden="true"><path d="M46 63 A32 32 0 1 1 103 52" fill="none" stroke="#4c8ddb" stroke-width="9" stroke-linecap="round"/><path d="M103 52 L82 42 L106 31 Z" fill="#4c8ddb"/></svg>
+  </button>
+  <button id="paper-fast" data-action="fast" aria-label="快转">
+    <svg viewBox="0 0 150 90" aria-hidden="true"><path d="M55 63 A32 32 0 1 1 112 52" fill="none" stroke="#4c8ddb" stroke-width="9" stroke-linecap="round"/><path d="M112 52 L91 42 L115 31 Z" fill="#4c8ddb"/><path d="M18 30 H44 M11 48 H35 M19 65 H42" stroke="#4c8ddb" stroke-width="6" stroke-linecap="round"/></svg>
+  </button>
+</div>

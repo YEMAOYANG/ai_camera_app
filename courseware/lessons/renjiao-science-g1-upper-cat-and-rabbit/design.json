@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "8.猫和兔",
+  "scope": "两个官方课时合成一课；原创身体线索观察站",
+  "canvas": {
+    "width": 1280,
+    "height": 720
+  },
+  "authorModels": [
+    "gpt-6.1-sol"
+  ],
+  "pages": [
+    {
+      "page": "p03",
+      "goal": "有序观察猫兔全身和身体部分",
+      "mechanism": "镜头按全身、头颈、躯干、四肢、尾移动，留下局部观察条，两轮换动物。",
+      "targets": [
+        "#scan-photo",
+        "#scan-whole",
+        "#scan-head",
+        "#scan-body",
+        "#scan-tail",
+        "#scan-strip"
+      ],
+      "states": [
+        "start",
+        "demo:whole/head/body/tail",
+        "play",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "只提醒想观察顺序，不标正确项。",
+      "reset": "清空五张观察条、星星、动物轮次和错误次数，废止旧的延时回调。"
+    },
+    {
+      "page": "p05",
+      "goal": "按同一部位比较猫兔异同",
+      "mechanism": "身体照片拖放或点选到猫、两者共有、兔三个图片区，配对照片留入记录架。",
+      "targets": [
+        "#compare-card",
+        "#compare-cat",
+        "#compare-both",
+        "#compare-rabbit",
+        "#compare-record"
+      ],
+      "states": [
+        "start",
+        "demo:both",
+        "play",
+        "selected",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "重看身体线索，首次不告诉正确位置。",
+      "reset": "清空槽和记录，重新随机排序四张照片，星星和错误次数归零。"
+    },
+    {
+      "page": "p09",
+      "goal": "选合适物品模拟猫肉垫与兔耳",
+      "mechanism": "看部位照片，把海绵动作或纸卷动作配到部位旁；匹配后动作图和部位图成对留档。",
+      "targets": [
+        "#tool-part",
+        "#tool-choice-soft",
+        "#tool-choice-cone",
+        "#tool-record"
+      ],
+      "states": [
+        "start",
+        "demo:pad/ear",
+        "play",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "提示重看部位特点，不报答案。",
+      "reset": "清空已配工具、模型和记录，重排工具与题序，废止旧延时。",
+      "evidence": "仅为工具匹配，不能当作完成实物模拟或听到声音差异。"
+    },
+    {
+      "page": "p11",
+      "goal": "安排直接听、弯手听、纸卷听的比较流程",
+      "mechanism": "点动作图按顺序装入三张记录条，主画面随动作变化；回看按钮重现当前照片。",
+      "targets": [
+        "#listen-stage",
+        "#listen-normal",
+        "#listen-hand",
+        "#listen-paper",
+        "#listen-strip"
+      ],
+      "states": [
+        "start",
+        "demo:normal/hand/paper",
+        "play",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "回想基本听法，首次不标正确图。",
+      "reset": "清空记录条、星星和进度，回到直接听照片，废止旧延时。",
+      "evidence": "照片排好仅表示理解流程，真实听感和实际模拟由成人观察。"
+    },
+    {
+      "page": "p14",
+      "goal": "从动作情境联系身体部位与作用",
+      "mechanism": "四种动作照片随机呈现，选择肉垫、尖爪、长耳、后腿，动作与部位成对进入线索记录。",
+      "targets": [
+        "#skill-scene",
+        "#skill-choice-pad",
+        "#skill-choice-claw",
+        "#skill-choice-hind",
+        "#skill-record"
+      ],
+      "states": [
+        "start",
+        "demo:pad/claw/hind",
+        "play",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "思考当前动作和部位作用，不公布正确项。",
+      "reset": "清空四对记录，重排情境和选项，清零星星和错误数，废止旧延时。"
+    }
+  ],
+  "visualChecks": {
+    "requiredViewports": [
+      "1280x720",
+      "1000x563",
+      "640x360"
+    ],
+    "formalAssets": "26张正式图片；不得用临时占位交付",
+    "keyChecks": [
+      "猫兔全身与五个局部镜头位置符合正式图；头颈镜头保留完整耳尖、眼、口和下颌，四肢和短尾没有裁丢。",
+      "猫短耳长尾、兔长耳短尾；肉垫、尖爪、兔后腿不能互相误代。",
+      "亮暗眼图同一只猫同视角，窄瞳孔和扩大的瞳孔可直接区分。",
+      "三种听法同一女孩，纸卷不插入耳朵；肉垫模拟同手同桌，不伪造真实声音结果。",
+      "各互动初始、正确、首次错误、教师示范截图须另行真实查看。"
+    ]
+  },
+  "evidenceBoundary": "点击、拖动、排序和图片判断不等于真实观察、口述、绘画或模拟实验完成。"
+}

@@ -1,0 +1,15 @@
+#listening-seat{position:absolute;left:416px;top:0;width:400px;height:244px;border:5px solid #91BCA9;border-radius:26px;background:#FFFDF6;overflow:hidden}
+#seat-scene{display:block;width:100%;height:100%;object-fit:contain;background:#FFFDF6}
+#seat-label{position:absolute;left:12px;bottom:8px;background:#fffdf6;padding:4px 16px;border-radius:14px;font-size:24px;font-weight:800}
+#replay-listener{position:absolute;left:42px;top:86px;width:230px;height:88px}
+#listener-candidates{position:absolute;left:176px;top:276px;width:880px;height:248px;display:flex;gap:80px}
+.listener-card{width:400px;height:248px;flex:0 0 400px;background:#fffdf6;border:5px solid #E3C9A0;border-radius:26px;overflow:hidden;cursor:grab;box-shadow:0 5px 0 #CBAE80}
+.listener-card img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.listener-card.placed{border-color:#58B45C;box-shadow:0 5px 0 #2F8A3A}
+.listener-card:focus-visible{outline:6px solid #4C8DDB;outline-offset:5px}
+#listener-media-problem{position:absolute;left:280px;top:175px;width:672px;padding:22px;text-align:center;background:#fffdf6;border:4px solid #E4572E;border-radius:22px;font-size:28px;z-index:8}
+#ready .card{padding:18px 48px 26px}
+#ready .pic{width:500px;height:281px;margin-bottom:6px}
+#ready h1{font-size:48px}
+#ready p{font-size:27px;margin:10px 0 18px}
+#ready .btn.xl,#finish .btn.xl{min-height:88px}

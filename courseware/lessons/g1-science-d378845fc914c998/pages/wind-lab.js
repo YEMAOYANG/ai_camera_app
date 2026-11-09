@@ -1,0 +1,11 @@
+var WindRules={direction:[1,-1,1],correct:function(direction,target){return direction===-1&&target==='left'||direction===1&&target==='right'}};
+if(typeof module==='object'&&module.exports){module.exports=WindRules}else{(function(){
+var round=0,misses=0,locked=false,timer=null,demoDirection=0,bubble=K.$('#wind-bubble'),zones=[K.$('#wind-left'),K.$('#wind-right')];
+K.hud({icon:'',title:'跟着这阵风走',levels:3});K.owl();
+function render(){var d=demoDirection||WindRules.direction[round]||1;K.$('#wind-ribbon svg').style.transform='scaleX('+d+')';K.$('#wind-scene').style.transform='scaleX('+d+')';bubble.style.left='514px';zones.forEach(function(z){z.classList.remove('success')});K.levels(3,round)}
+function reset(){clearTimeout(timer);round=0;misses=0;locked=false;demoDirection=0;K.stars=0;K.$('#star-n').textContent='0';render();K.say('先看这阵风，再拖泡泡预测。')}
+function predict(t){if(locked)return;var side=t===zones[0]?'left':t===zones[1]?'right':'';if(!WindRules.correct(WindRules.direction[round],side)){misses++;K.sfx.no();K.shake(bubble);if(misses>=2)K.highlight('#wind-ribbon');K.say(misses===1?'再看看飘带朝哪一边。':'把这一次的风向和泡泡的位置联系起来。','no');return}locked=true;misses=0;demoDirection=0;t.classList.add('success');bubble.style.left=side==='left'?'88px':'932px';K.sfx.ok();K.star(1,t);round++;K.levels(3,round);K.say('这一次，泡泡顺着图里的风移动了。','ok');timer=setTimeout(function(){if(round===3){K.finish({title:'三次都观察了',sub:'换风向要重新看，真实变化请大人陪同观察。',again:reset})}else{locked=false;render();K.say('换了一阵风，再观察一次。')}},850)}
+K.drag(bubble,{enabled:function(){return !locked},targets:function(){return zones},onDrop:function(el,t){predict(t)},onTap:function(){K.say('把泡泡拖到你预测的位置。')}});
+K.onState=function(state){if(Object.prototype.hasOwnProperty.call(state,'demoDirection')){var d=Number(state.demoDirection);if(d===0)reset();else{clearTimeout(timer);demoDirection=d<0?-1:1;render();bubble.style.left=d<0?'88px':'932px'}}};
+K.$$('img').forEach(function(im){im.addEventListener('error',function(){K.$('#wind-retry').classList.remove('hide');K.say('图片没出现，请点圆箭头重试。')})});K.$('#wind-retry').onclick=function(){location.reload()};K.onStart=reset;K.ready({title:'跟着这阵风走',sub:'每一次都先看看飘带。',emoji:'↻'});
+})();}

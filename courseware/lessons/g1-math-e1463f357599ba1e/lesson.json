@@ -1,0 +1,411 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "说一说",
+  "description": "在原创幼儿园分享角，和小数老师练习让伙伴听清楚的表达、听懂生活讲述和认真倾听。口语与真实习惯待成人观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "数学课的温和男老师，依据准确教材用短句解释行为目的；以生活分享培养表达和倾听，不将自动选择当作口语或习惯掌握。"
+    }
+  },
+  "images": {
+    "room": {
+      "file": "assets/room.png"
+    },
+    "book": {
+      "file": "assets/book.png"
+    },
+    "sand": {
+      "file": "assets/sand.png"
+    },
+    "paint": {
+      "file": "assets/paint.png"
+    },
+    "listen": {
+      "file": "assets/listen.png"
+    },
+    "distract": {
+      "file": "assets/distract.png"
+    },
+    "flower": {
+      "file": "assets/flower.png"
+    },
+    "pond": {
+      "file": "assets/pond.png"
+    },
+    "quiz-listen": {
+      "file": "assets/quiz-listen.png"
+    },
+    "quiz-interrupt": {
+      "file": "assets/quiz-interrupt.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "让伙伴听清楚",
+      "template": "picture-points",
+      "data": {
+        "title": "让伙伴听清楚",
+        "picture": "room",
+        "points": [
+          "围绕一件事讲",
+          "让伙伴听得清",
+          "别人说时认真听"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，我们一起分享幼儿园的生活。"
+        },
+        {
+          "say": "讲一件自己熟悉的小事，就可以。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "比如说，我喜欢在幼儿园看图画书。"
+        },
+        {
+          "say": "这样，伙伴知道你讲的是哪件事。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "说话时，让面前的伙伴听得清楚。"
+        },
+        {
+          "say": "一句一句讲，不用着急，也不用喊叫。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "轮到伙伴说话，就先把自己的话等等。"
+        },
+        {
+          "say": "认真听明白，才能知道他说了什么。"
+        },
+        {
+          "say": "说和听配合好，大家才能一起交流。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "听懂伙伴说的事",
+      "page": "p02",
+      "widgetType": "listen-picture-window",
+      "startImage": "room",
+      "script": [
+        {
+          "highlight": "#share-window"
+        },
+        {
+          "say": "认真听，是先听清伙伴说的事。"
+        },
+        {
+          "say": "别只盯着喜欢的图，就急着选择。"
+        },
+        {
+          "say": "老师先说：我喜欢在幼儿园看绘本。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "这句话讲的是看书这件事。"
+        },
+        {
+          "say": "我把读书角的图放进分享窗。"
+        },
+        {
+          "highlight": "#choice-book"
+        },
+        {
+          "say": "图和听到的意思相同，才合适。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "现在换一件事，请你来听。"
+        },
+        {
+          "say": "不用认字，看看每幅图里的活动。"
+        },
+        {
+          "say": "听老师说：我喜欢在沙池里堆小山。"
+        },
+        {
+          "say": "把听到的事情，点进上面的分享窗。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "轮到别人说的时候",
+      "template": "picture-points",
+      "data": {
+        "title": "轮到别人说的时候",
+        "picture": "listen",
+        "points": [
+          "看着正在说话的伙伴",
+          "等伙伴说完再接着说",
+          "想一想他说了什么"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "朋友讲话时，也希望有人认真听。"
+        },
+        {
+          "say": "我们用图里的样子，练一练倾听。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看着正在讲话的伙伴。"
+        },
+        {
+          "say": "如果转头玩玩具，就容易漏听内容。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "伙伴还没说完，先别急着插话。"
+        },
+        {
+          "say": "等他讲完一件事，再轮到你讲。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听的时候，想一想他说的是哪件事。"
+        },
+        {
+          "say": "比如听见看书，心里想到看书的样子。"
+        },
+        {
+          "say": "听明白了，再接着说，交流更清楚。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把倾听伙伴请回来",
+      "page": "p04",
+      "widgetType": "listener-scene-repair",
+      "startImage": "room",
+      "script": [
+        {
+          "highlight": "#listening-seat"
+        },
+        {
+          "say": "认真听时，心里要装着伙伴说的事。"
+        },
+        {
+          "say": "看着他，更容易留意他的分享。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "老师先请会认真听的孩子坐过来。"
+        },
+        {
+          "say": "他朝向说话的伙伴，没有玩别的。"
+        },
+        {
+          "highlight": "#candidate-distract"
+        },
+        {
+          "say": "转头摆弄玩具，就容易漏听内容。"
+        },
+        {
+          "say": "图里的人物坐回来，交流才能继续。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "请把认真听的伙伴，请到倾听席。"
+        },
+        {
+          "say": "可以拖过去，也可以点一下图片。"
+        },
+        {
+          "say": "等伙伴说完，你再说自己的事情。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "换个情境听一听",
+      "intro": [
+        "换一件幼儿园的小事，认真听题。",
+        "听清楚以后，再选你认为合适的图。"
+      ],
+      "questions": [
+        {
+          "id": "say-q1",
+          "question": "听小朋友说：我喜欢看幼儿园池塘里的金鱼。他说的是哪幅图？",
+          "skill": "听懂一件生活讲述",
+          "answer": [
+            "B"
+          ],
+          "analysis": "讲述中说的是池塘里的金鱼，池塘图与听到的内容相同。花坛图里没有这个内容。选图只记录这次理解选择，口头复述待成人观察。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "flower",
+                "alt": "孩子在幼儿园看花坛"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "pond",
+                "alt": "孩子在幼儿园看池塘里的金鱼"
+              }
+            }
+          }
+        },
+        {
+          "id": "say-q2",
+          "question": "朋友在说幼儿园里的事，哪幅图里的伙伴在认真听？",
+          "skill": "识别认真倾听的行为",
+          "answer": [
+            "A"
+          ],
+          "analysis": "图一中的伙伴朝向正在讲话的朋友，没有玩别的。图二中的伙伴转头玩玩具，容易漏听内容。识别图片不等于已经形成真实倾听习惯，习惯待成人观察。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-listen",
+                "alt": "桌边的孩子面对讲话的伙伴安静倾听"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-interrupt",
+                "alt": "桌边的孩子转头玩飞机，没有听伙伴讲话"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "把一件事说给家人听",
+      "template": "picture-points",
+      "data": {
+        "title": "把一件事说给家人听",
+        "picture": "room",
+        "points": [
+          "说清一件熟悉的小事",
+          "先听明白，再轮到自己说",
+          "真实口述请成人观察"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "现在，回想你在幼儿园的一件小事。"
+        },
+        {
+          "say": "想好了，就把它说给身边的大人听。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "可以先说自己喜欢做什么。"
+        },
+        {
+          "say": "再讲一点自己的经历，让人听明白。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "讲的时候，让大人能听清你的声音。"
+        },
+        {
+          "say": "大人分享时，你也看着他认真听。"
+        },
+        {
+          "say": "听完以后，说说你听见的是哪件事。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "选图记录，只能说明这次的选择。"
+        },
+        {
+          "say": "你讲得怎样，请大人听一听再判断。"
+        },
+        {
+          "say": "今天记住，清楚表达，也要认真倾听。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先说听到的：原来你喜欢画画。"
+        },
+        {
+          "say": "再说自己：我喜欢给小花涂颜色。"
+        },
+        {
+          "say": "讲述和倾听的真实表现，请大人观察。"
+        },
+        {
+          "say": "清楚表达，也要认真倾听。"
+        }
+      ]
+    }
+  ]
+}

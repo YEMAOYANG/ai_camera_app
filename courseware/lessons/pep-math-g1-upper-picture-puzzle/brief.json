@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "拼一拼",
+  "goals": [
+    "根据外形和能否滚动，辨认长方体、正方体、圆柱和球。",
+    "对齐相同小正方体的平面，比较排成一条、叠成一柱与转角拼法。",
+    "逐层拼出大正方体，说明为什么最少用八块同样的小正方体。",
+    "拼摆相同长方体，通过比较各面辨别拼出的形状。",
+    "使一样大的圆柱圆面对齐，拼出更高的圆柱。",
+    "分层数出被遮住的积木，依据数量和缺口形状选出补块。"
+  ],
+  "keyPoint": "让面贴面并对齐，改变相同积木的组合，再比较拼出形状的面和轮廓。",
+  "difficultPoint": "从平面图想象前后和上下的积木，说明四块单层与八块双层的区别，并同时比较缺块的数量和位置。",
+  "pageSequence": [
+    {
+      "page": 1,
+      "key": "p01",
+      "type": "slide",
+      "title": "展台上的立体图形",
+      "play": "以原创积木展台并列盒子、方块、圆筒和球。比较面、边和滚动，给出生活里的具体例子。"
+    },
+    {
+      "page": 2,
+      "key": "p02",
+      "type": "interactive",
+      "title": "把积木送到同形展台",
+      "play": "看样品选同形积木。积木卡移进展台并沿轮廓对齐；相同形状换大小和方向仍要认得出。"
+    },
+    {
+      "page": 3,
+      "key": "p03",
+      "type": "slide",
+      "title": "对齐还是转个弯",
+      "play": "并列两块横排与竖叠，再示范第三块贴在侧面或上面。比较排齐的平面与拐弯后的台阶。"
+    },
+    {
+      "page": 4,
+      "key": "p04",
+      "type": "interactive",
+      "title": "沿着接缝拼",
+      "play": "把候选积木拖向目标接缝。依次拼出横排、竖柱和转角，错位时轮廓提示哪里没有贴齐。"
+    },
+    {
+      "page": 5,
+      "key": "p05",
+      "type": "slide",
+      "title": "一层还不够",
+      "play": "从单层方阵转到双层方阵。看顶面和侧面，按每层两排、每排两块数出至少八块。"
+    },
+    {
+      "page": 6,
+      "key": "p06",
+      "type": "interactive",
+      "title": "叠出大正方体",
+      "play": "为底层选相配的方块排，再给底层加上相同上层，最后沿三个方向比长度。"
+    },
+    {
+      "page": 7,
+      "key": "p07",
+      "type": "slide",
+      "title": "长方盒也能拼",
+      "play": "用四块同样的两格长方体拼成大方块，并与长条拼法比较。带孩子用同一个正方形比几面，明确不是任意四块都可以。"
+    },
+    {
+      "page": 8,
+      "key": "p08",
+      "type": "interactive",
+      "title": "把圆面对齐",
+      "play": "比较圆柱的圆面和弯面。竖放再选与底面完全重合的圆面，叠起并移动偏移的圆柱。"
+    },
+    {
+      "page": 9,
+      "key": "p09",
+      "type": "slide",
+      "title": "积木没有悬空",
+      "play": "先数底层再数上层，用改变观察视角的图揭示被挡住的支撑块。另一图按轮廓比出两格缺口。"
+    },
+    {
+      "page": 10,
+      "key": "p10",
+      "type": "interactive",
+      "title": "补齐展台的空位",
+      "play": "用同一试玩页面依次试两个不同轮廓。把补块拖进缺口，数量相同但形状不合时留下缺口轮廓；最后组合两片互补形状。"
+    },
+    {
+      "page": 11,
+      "key": "p11",
+      "type": "quiz",
+      "title": "小检查",
+      "play": "老师读题，每道题一次显示三张精确几何图。七道原生题改正图题关系和解析，另加一道缺口匹配。"
+    },
+    {
+      "page": 12,
+      "key": "p12",
+      "type": "slide",
+      "title": "拼好后再检查",
+      "play": "用面是否对齐、每层有几块和缺口轮廓串起关键策略。邀请孩子拿手边四块同样的长方体摆放并说理由。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "puzzle-q1",
+      "page": 11,
+      "skill": "根据外形辨认球",
+      "question": "下面三张图，哪一张画的是没有平面的球？",
+      "answer": "A",
+      "origin": "adapted_native"
+    },
+    {
+      "id": "puzzle-q2",
+      "page": 11,
+      "skill": "比较大正方体的层和缺角",
+      "question": "哪个大正方体原本有八块，现在只缺了上面一个角？",
+      "answer": "A",
+      "origin": "adapted_native"
+    },
+    {
+      "id": "puzzle-q3",
+      "page": 11,
+      "skill": "根据圆柱侧边辨认圆面的错位",
+      "question": "哪座圆柱塔上面两段往右错开了？",
+      "answer": "B",
+      "origin": "adapted_native"
+    },
+    {
+      "id": "puzzle-q4",
+      "page": 11,
+      "skill": "辨认相同小正方体的对齐排法",
+      "question": "哪一张把四块小正方体横着排成一条直线？",
+      "answer": "C",
+      "origin": "adapted_native"
+    },
+    {
+      "id": "puzzle-q5",
+      "page": 11,
+      "skill": "逐个数出拼摆所用小正方体",
+      "question": "哪张图恰好用了七块小正方体？",
+      "answer": "B",
+      "origin": "adapted_native"
+    },
+    {
+      "id": "puzzle-q6",
+      "page": 11,
+      "skill": "把被挡住的支撑块计入总数",
+      "question": "这座积木塔没有悬空的块，算上挡住的，一共几块？",
+      "answer": "A",
+      "origin": "adapted_native"
+    },
+    {
+      "id": "puzzle-q7",
+      "page": 11,
+      "skill": "比较相同长方体拼出的形状",
+      "question": "哪张图用四个一样的长方体拼成了大正方体？",
+      "answer": "C",
+      "origin": "adapted_native"
+    },
+    {
+      "id": "puzzle-q8",
+      "page": 11,
+      "skill": "同时比较缺口的数量与轮廓",
+      "question": "哪块橙色积木能正好填满图里的浅色空位？",
+      "answer": "B",
+      "origin": "editorial_addition"
+    }
+  ],
+  "afterClass": {
+    "official": "用手边四块相同长方体试摆，看看能否拼成正方体。比较各面的形状和大小，和大人说说理由。",
+    "inLesson": "用层图说明同样的方块怎样填满空间。把手边盒子的拼法留给实体操作，家长观察。",
+    "weekly": "本课只提供目标、课后练习要点和小检查知识点作为周测题源。"
+  },
+  "assessmentBoundary": "用全新构型、角缺块及匹配关系检查迁移。实际摆物、口头理由与合作待观察。",
+  "authoring": {
+    "contentModel": "deepseek-v4-pro",
+    "route": "OpenMAIC configured DeepSeek route",
+    "editorialModel": "gpt-6.1-sol",
+    "status": "依据同一教材范围修订原生生成正文",
+    "nativeJobId": "-BZGJ7mFnP",
+    "nativeClassroomId": "YZQ421Ubhq",
+    "nativeClassroomSha256": "132d91e2d52deee1a4350ac10f8146c2d234576f5952ae009495d3ae4c3d86bb",
+    "editableRevisionSha256": "dd90093c2ca5c876b925e5430b61ce545b099543f874753606394d6f3284a4f0",
+    "inputBriefSha256": "f2b7f2ea24a268cc4cb2a58caa85d34a61b86ecb0b73cc20d8f8afe24ceb502f"
+  }
+}

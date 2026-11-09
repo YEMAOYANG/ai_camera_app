@@ -1,0 +1,14 @@
+
+#cv{background:#f1eee1}
+.pair-stage{position:relative;height:100%;border-radius:32px;background:#e7f0e7}
+.pair-card{position:absolute;padding:7px;background:#fffcf2;border:4px solid #fff;border-radius:28px;box-shadow:0 7px #c6d6c8;cursor:pointer}
+.pair-card img{width:100%;height:100%;object-fit:contain;display:block;border-radius:17px}
+#pair-left{left:128px;top:142px;width:268px;height:268px}
+.pair-upper,.pair-lower{left:804px;width:222px;height:222px}
+.pair-upper{top:32px}.pair-lower{top:292px}
+#pair-link{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.pair-card[data-picked=true]{border-color:#39775c}
+.pair-card[data-miss=true]{border-color:#b94c34}
+#pair-word{position:absolute;left:538px;top:234px;width:110px;height:84px;display:grid;place-items:center;background:#fff7e3;border-radius:30px;color:#58462a;font:700 67px/1 "Kaiti SC","Songti SC",serif;pointer-events:none}
+.pair-card.image-broken img{opacity:.25}.pair-card.image-broken:after{content:'↻';position:absolute;inset:0;display:grid;place-items:center;font-size:80px;color:#493d29;pointer-events:none}
+

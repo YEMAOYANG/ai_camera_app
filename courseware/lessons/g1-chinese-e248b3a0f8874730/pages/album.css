@@ -1,0 +1,13 @@
+#album-task{position:absolute;left:20px;top:8px;font-size:48px;font-weight:800;color:#614633}
+#album-choices{position:absolute;left:12px;top:130px;width:754px;height:270px;display:flex;gap:20px;align-items:center}
+.album-photo{width:238px;height:220px;padding:8px;border:4px solid #c99a65;border-radius:14px;background:#fff;cursor:grab;flex-shrink:0;transition:transform .18s,outline-color .18s}
+.album-photo img{display:block;width:214px;height:190px;object-fit:contain}
+.album-photo.selected{outline:6px solid #377e93;outline-offset:5px}
+.album-photo:disabled{opacity:.7;cursor:default}
+#album-target{position:absolute;left:816px;top:36px;width:370px;height:434px;border:8px solid #a87445;border-radius:12px;background:#fdf8ee;cursor:pointer;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.album-icon{width:190px;height:160px}
+#album-result{position:absolute;left:15px;top:20px;width:324px;height:370px;object-fit:contain;background:#fff}
+.lesson-icon{position:absolute;left:20px;top:449px;width:74px;height:74px;border:3px solid #ba854f;border-radius:50%;background:#fff;color:#614633;cursor:pointer;display:grid;place-items:center}
+.lesson-icon svg{width:46px;height:46px;fill:currentColor}
+.lesson-image-error{position:absolute;inset:0;z-index:16;background:#fff8ef;display:flex;align-items:center;justify-content:center;gap:24px;font-size:28px}
+@media(prefers-reduced-motion:reduce){.album-photo{transition:none}}

@@ -1,0 +1,21 @@
+#desk-instruction{position:absolute;left:20px;top:0;font-size:28px;font-weight:800}
+.desk-surface{position:absolute;left:20px;top:52px;width:770px;height:450px;background:#efca8d;border:5px solid #be8c4f;border-radius:32px;box-shadow:inset 0 0 0 10px #f6dbab}
+.desk-slot{position:absolute;background:#fff8e3;border:4px dashed #a98451;border-radius:24px;color:var(--ink);font:800 25px 'PingFang SC',sans-serif;cursor:pointer}
+.stack-slot{left:55px;top:42px;width:250px;height:210px}
+.case-slot{left:240px;top:275px;width:290px;height:105px}
+.desk-slot span{display:block;position:absolute;left:12px;top:12px}
+.desk-slot.active{border-color:#d5663c;background:#fff4d2}
+.placed-book,.placed-note,.placed-case{position:absolute;object-fit:contain;pointer-events:none}
+.placed-book{left:70px;top:57px;width:222px;height:186px}
+.placed-note{left:132px;top:51px;width:156px;height:156px;clip-path:polygon(22% 20%,73% 15%,78% 19%,85% 78%,80% 86%,27% 87%,22% 83%)}
+.placed-case{left:253px;top:281px;width:258px;height:90px}
+#desk-seat{position:absolute;bottom:12px;left:315px;font-size:24px;font-weight:700}
+.desk-demo{position:absolute;right:20px;top:20px;background:#fff9e8;border-radius:14px;padding:10px 15px;font-size:24px;font-weight:700}
+.desk-tray{position:absolute;right:20px;top:52px;width:386px;height:450px;background:#fffdf6;border:3px solid #d7bd8a;border-radius:28px;padding:15px;display:flex;flex-direction:column;gap:15px}
+.supply{height:125px;width:350px;border:3px solid #ddc797;border-radius:20px;background:#fff;display:flex;align-items:center;justify-content:center;gap:14px;cursor:grab;font:800 27px 'PingFang SC',sans-serif;color:var(--ink)}
+.supply img{width:150px;height:110px;object-fit:contain;pointer-events:none}
+.supply.selected{border-color:#d5663c;box-shadow:0 0 0 3px #f0b875}
+.supply.stored{opacity:.3;cursor:default}
+
+#ready .big{font-size:28px;max-width:560px;line-height:1.5}
+#lesson-media-error{position:absolute;inset:12px;z-index:15;background:#fff7e6;border:4px solid #d7bd8a;border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;font-size:30px;font-weight:800}

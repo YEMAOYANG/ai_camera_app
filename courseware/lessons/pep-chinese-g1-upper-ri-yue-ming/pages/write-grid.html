@@ -1,0 +1,20 @@
+<section class="ry-writing" aria-label="田字格写字练习" data-semantic-diagram="田字格位置和规范笔画">
+  <div id="ry-grid" class="ry-grid">
+    <svg id="ry-guide" viewBox="0 0 256 256" aria-hidden="true">
+      <rect x="2" y="2" width="252" height="252" rx="4" fill="#fffaf0" stroke="#568f7d" stroke-width="2"/>
+      <path d="M128 3V253 M3 128H253" stroke="#9eb5a9" stroke-width="1.4" stroke-dasharray="4 4"/>
+      <g id="ry-glyph-strokes"></g>
+    </svg>
+    <canvas id="ry-ink" width="512" height="512" aria-label="沿着淡色笔画描画"></canvas>
+  </div>
+  <div class="ry-writing-tools">
+    <div id="ry-character" class="ry-writing-word" aria-live="polite"></div>
+    <div id="ry-sequence" class="ry-sequence" aria-label="笔画顺序"></div>
+    <div class="ry-ink-progress" aria-hidden="true"><span id="ry-ink-progress-value"></span></div>
+    <div class="ry-writing-buttons">
+      <button type="button" id="ry-show-stroke">示范</button>
+      <button type="reset" data-activity-reset id="ry-clear-ink" aria-label="重画">↺</button>
+      <button type="button" id="ry-confirm-ink" aria-label="继续">✓</button>
+    </div>
+  </div>
+</section>

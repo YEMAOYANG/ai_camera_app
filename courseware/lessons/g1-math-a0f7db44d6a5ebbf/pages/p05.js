@@ -1,0 +1,12 @@
+(function(){
+var tasks=[[6,6],[7,5],[8,5]],lev=0,a=6,b=6,taken=0,exchanged=false,demo=false,busy=false,miss=0,timer;
+K.hud({icon:'＋',title:'满十，换一个十',levels:tasks.length});K.owl();K.ready({emoji:'＋',title:'十格换十棒',sub:'先填十格，换十，再搬剩余点'});
+function draw(){K.$('#group-a').textContent=a;K.$('#group-b').textContent=b;K.$('#group-sum').textContent=exchanged&&taken===b?a+b:'?';var frame=K.$('#ten-frame');frame.innerHTML='';frame.classList.toggle('hide',exchanged);K.$('#ten-rod').classList.toggle('hide',!exchanged);for(var i=0;i<10;i++){var c=K.el('span','cell','',frame);if(i<a+taken)K.el('i','point'+(i>=a?' blue':''),'',c)}var ones=K.$('#ones-tray');ones.innerHTML='';if(exchanged)for(var j=0;j<Math.max(0,a+taken-10);j++)K.el('i','point blue','',ones);var pool=K.$('#add-pool');pool.innerHTML='';for(var k=0;k<b;k++){var e=K.el('button','pool-point'+(k<taken?' used':''),'',pool);e.id='pool-'+(k+1);e.setAttribute('aria-label','搬一个点');e.onclick=move;K.drag(e,{enabled:function(){return !demo&&!busy},targets:function(){return [frame,ones]},onDrop:function(el,target){if(target===(exchanged?ones:frame))move();else hint()}})}K.levels(tasks.length,lev)}
+function hint(){if(demo||busy)return;miss++;K.sfx.no();K.say(miss===1?'先看看十格有没有放满。':miss===2?'每个空格只能放一个点，满十才能换十。':'换好一个十，再把剩余点搬到右边。','no')}
+function done(){if(!exchanged||taken!==b)return;busy=true;K.star(1,K.$('#ones-tray'));K.sfx.ok();K.say('重新分组后，总数仍然相同。','ok');timer=setTimeout(function(){lev++;if(lev===tasks.length)K.finish({title:'满十会换啦',sub:'十个一换一个十，总数不变。',again:reset});else load()},1000)}
+function move(){if(demo||busy)return;if(!exchanged&&a+taken===10){hint();return}if(taken<b){taken++;K.sfx.drop();draw();done()}}
+function exchange(){if(demo||busy)return;if(a+taken!==10||exchanged){hint();return}exchanged=true;K.sfx.ok();draw();done()}
+function load(){a=tasks[lev][0];b=tasks[lev][1];taken=0;exchanged=false;busy=false;miss=0;draw();K.say('点右边的数量点，先把十格填满。')}
+function reset(){clearTimeout(timer);demo=false;lev=0;K.stars=0;K.$('#star-n').textContent='0';load()}
+K.$('#exchange').onclick=exchange;K.$('#regroup-reset').onclick=function(){if(!demo&&!busy)load()};K.onStart=reset;K.onState=function(state){if(state.demo){clearTimeout(timer);var finish=K.$("#finish");if(finish)finish.classList.add("gone");K.stars=0;K.$("#star-n").textContent="0";demo=true;busy=false;lev=0;K.say("先看老师示范，再轮到你。");a=7;b=6;taken=0;exchanged=false;draw()}if(state.demoStage===1&&demo){taken=3;draw()}if(state.demoStage===2&&demo){exchanged=true;taken=6;draw()}if(state.play)reset()};load();
+})();

@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "smartedu-math-five-four-g1-upper-18deb512",
+    "revisionId": "directory-8363732513177a3c8af63820",
+    "nodeId": "83c73379-2ab0-45d1-8fd2-a2fdba4f238f",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "upper",
+    "unitTitle": "第1单元 我是小学生",
+    "lessonTitle": "说一说",
+    "schoolSystem": "five_four",
+    "classHours": [],
+    "teachingRevision": "1"
+  },
+  "officialTextbook": {
+    "title": "义务教育教科书（五四学制）数学一年级上册",
+    "publisher": "上海教育出版社",
+    "approval": "国家教材委员会专家委员会2024审核通过，官方封面文件第1页",
+    "resourceId": "18deb512-b4c0-54cf-6fc1-6974f55fa02e",
+    "teachingMaterialId": "8da32ba0-3a0a-46ef-b99d-611a76518e03",
+    "textbookPages": [
+      1
+    ],
+    "filePages": [
+      8
+    ],
+    "frontPageCount": 7,
+    "officialLessonTitle": "说一说",
+    "publicationDate": "当前官方版权页未列版次年月，不作推断。"
+  },
+  "sourceManifest": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/manifest.json",
+  "reviewedAt": "2026-11-05T00:36:51.065336+00:00",
+  "reviewedBy": "codex gpt-6.1-sol",
+  "reviewerKind": "ai",
+  "classHourCoverage": "准确教材完整课目只有印刷第1页（文件第8页），已逐页审读。文件第9页印刷第2页开始另一课玩一玩，仅用于核定边界，不并入本课。准确教材完整配套清单不含本课活动，不冒称存在官方课时。",
+  "objectiveBasis": "依据准确完整教材本课正文整理的原创教学目标，不是官方教学设计目标。",
+  "objectives": [
+    "围绕一件熟悉的幼儿园生活内容表达，让同伴能听清自己在说什么。",
+    "倾听同伴讲述，辨认他说的事情，并理解别人说话时应认真听。"
+  ],
+  "keyPoint": "用幼儿园生活分享练习让伙伴听清楚的表达和认真倾听。",
+  "difficultPoint": "先听明白伙伴说的事情，再轮到自己表达；自动选图只观察理解选择，真实口述与倾听习惯须由成人观察。",
+  "contentBoundary": {
+    "included": [
+      "围绕一件熟悉的幼儿园生活内容练习表达。",
+      "让同伴听清楚，别人说时认真听。",
+      "看着伙伴、等伙伴说完、想想内容，是依据教材倾听要求设计的原创练习支架。"
+    ],
+    "excluded": [
+      "不引入计数、加减法、图形命名、方位或正式口语评分。",
+      "不要求输入文字，不调用付费讨论模型。",
+      "不把选图、按钮确认、听完当作会讲述或养成倾听习惯。"
+    ],
+    "pageBoundary": {
+      "start": "印刷1页，文件8页，说一说",
+      "end": "印刷1页末；下一页印刷2页为玩一玩"
+    }
+  },
+  "factChecks": [],
+  "resources": {
+    "teachingDesign": {
+      "status": "not_provided",
+      "evidence": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/manifest.json：准确教材全部parts共1份，listing-0.json共8个elite_lesson，课名和chapter精确匹配均为0；原始URL和SHA-256在manifest.evidence，非请求失败或403。"
+    },
+    "courseware": {
+      "status": "not_provided",
+      "evidence": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/manifest.json：准确教材全部parts共1份，listing-0.json共8个elite_lesson，课名和chapter精确匹配均为0；原始URL和SHA-256在manifest.evidence，非请求失败或403。"
+    },
+    "learningTaskSheet": {
+      "status": "not_provided",
+      "evidence": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/manifest.json：准确教材全部parts共1份，listing-0.json共8个elite_lesson，课名和chapter精确匹配均为0；原始URL和SHA-256在manifest.evidence，非请求失败或403。"
+    },
+    "afterClassExercise": {
+      "status": "not_provided",
+      "evidence": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/manifest.json：准确教材全部parts共1份，listing-0.json共8个elite_lesson，课名和chapter精确匹配均为0；原始URL和SHA-256在manifest.evidence，非请求失败或403。"
+    },
+    "video": {
+      "status": "waived",
+      "evidence": "当前标准第1条：用户2026-10-30批准视频可豁免；本课未声明看过视频。"
+    }
+  },
+  "textbookReview": {
+    "status": "reviewed",
+    "pageRefs": [
+      "封面：文件1页",
+      "版权：文件3页",
+      "目录：文件5页",
+      "本课全文：文件8页，印刷1页",
+      "边界：文件9页，印刷2页首个课名"
+    ],
+    "findings": [
+      "封面核实五四学制数学一年级上册，2024审核通过；版权页核实上海教育出版社。",
+      "目录将我是小学生单元定位印刷第1页；实时官方ebook_mapping将说一说定位文件第8页，front_page为7。",
+      "本课完整正文为表达与倾听的双重要求，情境是一名孩子介绍幼儿园，其他同伴听。",
+      "本页没有数学运算、图形命名或独立课后练习，不根据课名扩成数数课。",
+      "印刷第2页为玩一玩，证明本课完整边界结束在印刷第1页。"
+    ],
+    "files": [
+      {
+        "path": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/textbook-01.jpg",
+        "sha256": "a70719836500341011291ee528257c79c82d1c0580d94911777d9a89e7a912cf"
+      },
+      {
+        "path": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/textbook-03.jpg",
+        "sha256": "4dec0c9ed28c6e8bfb9f9377ed4a412f61cbfd1a8f103be9819643679aae319e"
+      },
+      {
+        "path": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/textbook-05.jpg",
+        "sha256": "0fb1c23d4d1f66b5c524b4e69100715fabd4006a96a372aab4a3220a4bb3bc88"
+      },
+      {
+        "path": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/textbook-08.jpg",
+        "sha256": "c6766ff111f116e57119035b26ff1f919961417b9daabfc45b84ced6260102f0"
+      },
+      {
+        "path": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/textbook-09.jpg",
+        "sha256": "71294c7896dd4b8d7ba13b4bb75f8d3e32ff9b90391c1da4fce25a0833230a27"
+      },
+      {
+        "path": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/ebook-mapping.txt",
+        "sha256": "5f8a680455ba705d66e3c10467eda7e30b6225e51f5735de5412256ad058ff9c"
+      },
+      {
+        "path": "output/courseware-lessons/g1-math-e1463f357599ba1e/official/textbook-detail.json",
+        "sha256": "d737e7fbc6a0f19eded00a4ddfc1a2ca1674fc25eecd722399e445790006a7ae"
+      }
+    ]
+  },
+  "originalityPlan": "原创绘本教室、读书角、沙池、绘画桌等生活图；听意选图与修复倾听场景，不复制教材人物、构图、台词或题目。",
+  "weeklyQuestionSources": [
+    {
+      "skill": "听懂一件生活讲述",
+      "source": "教材印刷第1页生活分享与倾听情境；原创目标1、2"
+    },
+    {
+      "skill": "识别认真倾听的行为",
+      "source": "教材印刷第1页倾听要求；行为细化为原创操作支架"
+    }
+  ]
+}

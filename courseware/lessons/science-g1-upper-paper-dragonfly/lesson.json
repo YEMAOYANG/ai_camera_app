@@ -1,0 +1,725 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "制作会旋转的纸蜻蜓",
+  "description": "从平纸条的猜想到安全剪折，观察和记录纸蜻蜓怎样下落。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/ke-science-v1.png",
+      "color": "#439B87",
+      "persona": "用实物图、短句和试飞证据引导一年级孩子猜想、剪折、观察和表达。"
+    }
+  },
+  "images": {
+    "bamboo-rotor": {
+      "file": "assets/bamboo-rotor.png"
+    },
+    "fall-record": {
+      "file": "assets/fall-record.png"
+    },
+    "flat-strip": {
+      "file": "assets/flat-strip.png"
+    },
+    "fold-tool": {
+      "file": "assets/fold-tool.png"
+    },
+    "paper-body": {
+      "file": "assets/paper-body.png"
+    },
+    "paper-pattern": {
+      "file": "assets/paper-pattern.png"
+    },
+    "paper-rotor": {
+      "file": "assets/paper-rotor.png"
+    },
+    "paper-slit": {
+      "file": "assets/paper-slit.png"
+    },
+    "paper-split": {
+      "file": "assets/paper-split.png"
+    },
+    "q-evidence-a": {
+      "file": "assets/q-evidence-a.png"
+    },
+    "q-evidence-b": {
+      "file": "assets/q-evidence-b.png"
+    },
+    "q-evidence-c": {
+      "file": "assets/q-evidence-c.png"
+    },
+    "q-fold-a": {
+      "file": "assets/q-fold-a.png"
+    },
+    "q-fold-b": {
+      "file": "assets/q-fold-b.png"
+    },
+    "q-fold-c": {
+      "file": "assets/q-fold-c.png"
+    },
+    "q-fold-stem": {
+      "file": "assets/q-fold-stem.png"
+    },
+    "q-motion-a": {
+      "file": "assets/q-motion-a.png"
+    },
+    "q-motion-b": {
+      "file": "assets/q-motion-b.png"
+    },
+    "q-motion-c": {
+      "file": "assets/q-motion-c.png"
+    },
+    "q-motion-stem": {
+      "file": "assets/q-motion-stem.png"
+    },
+    "q-release-a": {
+      "file": "assets/q-release-a.png"
+    },
+    "q-release-b": {
+      "file": "assets/q-release-b.png"
+    },
+    "q-release-c": {
+      "file": "assets/q-release-c.png"
+    },
+    "safe-scissors": {
+      "file": "assets/safe-scissors.png"
+    },
+    "workshop": {
+      "file": "assets/workshop.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "一条纸会转吗",
+      "template": "two-columns",
+      "data": {
+        "title": "一条纸会转吗",
+        "left": {
+          "heading": "竹蜻蜓",
+          "body": "上面有翼，下面有柄"
+        },
+        "right": {
+          "heading": "纸蜻蜓",
+          "body": "用一张纸条做模型"
+        },
+        "left_picture": "bamboo-rotor",
+        "right_picture": "paper-rotor"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "一张纸条会转吗？今天我们来试一试。"
+        },
+        {
+          "say": "先看看竹蜻蜓。上面有两个翼，下面有一根柄。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "竹蜻蜓是一种玩具，飞翼能转起来。"
+        },
+        {
+          "say": "我们看看，纸条能不能做出这样的翼。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这件纸模型叫纸蜻蜓。"
+        },
+        {
+          "say": "两片翼在上面，下面是细细的躯干。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "拿两张同样大小的纸，一张先留平。"
+        },
+        {
+          "say": "把另一张做成纸蜻蜓，就能比较了。"
+        },
+        {
+          "say": "用眼睛看三件事：快慢、路线和动作。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "先把猜想存下来",
+      "page": "p02",
+      "widgetType": "science-paper-rotor",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#predict-pair"
+        },
+        {
+          "say": "同学们，前面我们认识了平纸条和纸蜻蜓。"
+        },
+        {
+          "say": "现在，请你们先猜一猜，它们会怎么落下来。"
+        },
+        {
+          "say": "猜想是先说说你觉得会怎样。"
+        },
+        {
+          "highlight": "#predict-choices"
+        },
+        {
+          "say": "快慢看谁先落，路线看它怎么走。"
+        },
+        {
+          "say": "动作可以看它转不转，或有没有摇晃。"
+        },
+        {
+          "setState": {
+            "predictDemo": true
+          }
+        },
+        {
+          "say": "老师先猜，它们落下的快慢不一样。"
+        },
+        {
+          "say": "把这幅图放进夹子，等会儿再验证。"
+        },
+        {
+          "highlight": "#predict-ledger"
+        },
+        {
+          "say": "现在还没试，和老师猜得不同也可以。"
+        },
+        {
+          "setState": {
+            "predictDemo": false
+          }
+        },
+        {
+          "say": "轮到你了，点一幅图，再点记录夹。"
+        },
+        {
+          "say": "把快慢、路线和动作的猜想都留下。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "剪刀上桌之前",
+      "template": "two-columns",
+      "data": {
+        "title": "剪刀上桌之前",
+        "left": {
+          "heading": "用圆头安全剪刀",
+          "body": "坐稳，用完合拢放回"
+        },
+        "right": {
+          "heading": "看清剪折线",
+          "body": "实线剪，虚线折"
+        },
+        "left_picture": "safe-scissors",
+        "right_picture": "paper-pattern"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "剪刀上桌前，我们先看看它的头。"
+        },
+        {
+          "say": "第一，要用圆头剪刀。圆圆的头，不尖，更安全。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "第二，剪刀上桌，旁边要有大人陪着。"
+        },
+        {
+          "say": "坐稳再剪，刀尖要离开手和别人。"
+        },
+        {
+          "say": "用完把刀刃合上，再放回原处。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "纸样上有两种线。看到实线，就用剪刀剪。"
+        },
+        {
+          "say": "纸样上断断续续的是虚线。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "手把纸沿虚线压一压，就有了折痕。"
+        },
+        {
+          "say": "一条线是剪还是折，要看它的样子。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把纸折成小飞翼",
+      "page": "p04",
+      "widgetType": "science-paper-rotor",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "foldDemo": 0
+          }
+        },
+        {
+          "say": "今天我们一起做一只纸蜻蜓。"
+        },
+        {
+          "say": "看两边的短实线，剪到线头就停。"
+        },
+        {
+          "say": "中间这截纸要留着，把上和下连住。"
+        },
+        {
+          "setState": {
+            "foldDemo": 1
+          }
+        },
+        {
+          "say": "看这个虚线，往中间折。躯干会变窄。"
+        },
+        {
+          "say": "这一步只折下面，能留下上面的翼。"
+        },
+        {
+          "setState": {
+            "foldDemo": 2
+          }
+        },
+        {
+          "say": "从上端沿中间的实线往下剪。"
+        },
+        {
+          "say": "到止点就停，两片翼都连在根上。"
+        },
+        {
+          "setState": {
+            "foldDemo": 3
+          }
+        },
+        {
+          "say": "沿翼根的虚线，把两片翼反向折。"
+        },
+        {
+          "say": "一片朝这边，另一片朝那边。"
+        },
+        {
+          "setState": {
+            "foldDemo": 4
+          }
+        },
+        {
+          "say": "现在两片翼分开了，躯干也折细了。"
+        },
+        {
+          "setState": {
+            "foldDemo": false
+          }
+        },
+        {
+          "say": "轮到你了，先选剪或折，再点框里的线。"
+        },
+        {
+          "say": "屏幕上是在练步骤。真的剪纸要请大人陪。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "松手后看清楚",
+      "page": "p05",
+      "widgetType": "science-paper-rotor",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#trial-strip"
+        },
+        {
+          "say": "平纸条和纸蜻蜓都用同样大小的纸。"
+        },
+        {
+          "highlight": "#trial-start-line"
+        },
+        {
+          "say": "一件高一件低，就不好比较快慢。"
+        },
+        {
+          "say": "请让两件从一样高的位置开始。"
+        },
+        {
+          "setState": {
+            "trialDemo": "set"
+          }
+        },
+        {
+          "say": "现在把它们从同一高度，同时轻轻放手。"
+        },
+        {
+          "say": "我们轻轻松手，把放的办法也做成一样。"
+        },
+        {
+          "setState": {
+            "trialDemo": "drop"
+          }
+        },
+        {
+          "say": "留意这次谁先落地，再看它们怎么走。"
+        },
+        {
+          "setState": {
+            "trialDemo": "record"
+          }
+        },
+        {
+          "say": "这次平纸条先落地，途中左右晃了晃。"
+        },
+        {
+          "say": "纸蜻蜓的翼在上面，还一边转一边落。"
+        },
+        {
+          "say": "快慢、路线、动作和翼的位置都能记。"
+        },
+        {
+          "say": "另一次可能不一样，要照当时看到的记。"
+        },
+        {
+          "setState": {
+            "trialDemo": false
+          }
+        },
+        {
+          "say": "现在你来摆、来放，再把这次现象记下。"
+        },
+        {
+          "say": "没看清，可以按重看。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "用看到的结果说话",
+      "template": "picture-points",
+      "data": {
+        "title": "用看到的结果说话",
+        "picture": "fall-record",
+        "points": [
+          "看这次试飞",
+          "对照原来猜想",
+          "用证据判断"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这一排小图，它们是一次试飞的三刻。"
+        },
+        {
+          "say": "彩点转到另一边，整件也往下了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这件纸蜻蜓边转边落，路线有一点偏。"
+        },
+        {
+          "say": "路线飘和会不会转，是两件不同的事。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "如果你原先猜它不转，现在要怎样说？"
+        },
+        {
+          "say": "可以说，我原先没想到，它真的转了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我们要做的是会边转边落的纸蜻蜓。"
+        },
+        {
+          "say": "这次看到了旋转，所以达到了这个目标。"
+        },
+        {
+          "say": "下次还想看清楚，可以留意飞翼或躯干。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "平纸条和纸蜻蜓都用同样大小的纸。"
+        },
+        {
+          "say": "平纸条没有剪开、反折的两片翼。"
+        },
+        {
+          "say": "纸蜻蜓多了朝相反方向展开的翼。"
+        },
+        {
+          "say": "这次纸条左右晃，纸蜻蜓的两片翼绕中间转。"
+        },
+        {
+          "say": "剪折让纸条结构变了，这次下落动作也变了。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "小检查：做得有根据",
+      "intro": [
+        "老师会读出题目，听完再点图。",
+        "答错还可以再看一次。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "看橙色纸片。遇到断断续续的虚线，该怎样做？",
+          "skill": "辨认剪折标记",
+          "answer": [
+            "A"
+          ],
+          "analysis": "断断续续的线标出折的位置。沿这里翻折，纸片仍连在一起。",
+          "options": {
+            "A": {
+              "label": "沿虚线翻折",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fold-a",
+                "alt": "沿虚线翻折"
+              }
+            },
+            "B": {
+              "label": "沿虚线剪开",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fold-b",
+                "alt": "沿虚线剪开"
+              }
+            },
+            "C": {
+              "label": "剪另一条线",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fold-c",
+                "alt": "剪另一条线"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-fold-stem",
+            "alt": "橙色纸片上有一条竖虚线和另一条短实线"
+          }
+        },
+        {
+          "id": "q2",
+          "question": "要比较两件纸作品下落的快慢，哪幅图能公平开始？",
+          "skill": "控制试放条件",
+          "answer": [
+            "B"
+          ],
+          "analysis": "两件从相同高度同时松手，开始的条件才一样。",
+          "options": {
+            "A": {
+              "label": "同高，先放一件",
+              "visual": {
+                "kind": "asset",
+                "image": "q-release-a",
+                "alt": "同高，先放一件"
+              }
+            },
+            "B": {
+              "label": "同高，同时松手",
+              "visual": {
+                "kind": "asset",
+                "image": "q-release-b",
+                "alt": "同高，同时松手"
+              }
+            },
+            "C": {
+              "label": "不同高度，同时松手",
+              "visual": {
+                "kind": "asset",
+                "image": "q-release-c",
+                "alt": "不同高度，同时松手"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "小检查：看清再判断",
+      "intro": [
+        "听老师说题目，再观察新的试飞图。",
+        "用图里的变化选答案。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "看同一只纸蜻蜓的三格图。它是怎么动的？",
+          "skill": "依据画面观察旋转",
+          "answer": [
+            "C"
+          ],
+          "analysis": "彩点跟着翼转了方向，同时纸蜻蜓离地面越来越近。",
+          "options": {
+            "A": {
+              "label": "只下降，没有转",
+              "visual": {
+                "kind": "asset",
+                "image": "q-motion-a",
+                "alt": "只下降，没有转"
+              }
+            },
+            "B": {
+              "label": "只转，没有下降",
+              "visual": {
+                "kind": "asset",
+                "image": "q-motion-b",
+                "alt": "只转，没有下降"
+              }
+            },
+            "C": {
+              "label": "边转边下降",
+              "visual": {
+                "kind": "asset",
+                "image": "q-motion-c",
+                "alt": "边转边下降"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-motion-stem",
+            "alt": "同一件金色纸模型，三幅画格里逐步下降，翼上色点转向不同方向"
+          }
+        },
+        {
+          "id": "q4",
+          "question": "哪组画面能证明这件纸蜻蜓会边转边落？",
+          "skill": "用证据评价制作目标",
+          "answer": [
+            "A"
+          ],
+          "analysis": "这一组先后画格既显示翼的方向改变，也显示模型下降，所以有边转边落的证据。",
+          "options": {
+            "A": {
+              "label": "转了方向，也在下降",
+              "visual": {
+                "kind": "asset",
+                "image": "q-evidence-a",
+                "alt": "转了方向，也在下降"
+              }
+            },
+            "B": {
+              "label": "只看到外形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-evidence-b",
+                "alt": "只看到外形"
+              }
+            },
+            "C": {
+              "label": "在下降，方向没有转",
+              "visual": {
+                "kind": "asset",
+                "image": "q-evidence-c",
+                "alt": "在下降，方向没有转"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "把一次试飞讲给大人",
+      "template": "picture-points",
+      "data": {
+        "title": "把一次试飞讲给大人",
+        "picture": "paper-rotor",
+        "points": [
+          "先猜想，再制作",
+          "试一试，记所见",
+          "用记录来评价"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们把一张纸条做成了纸蜻蜓。"
+        },
+        {
+          "say": "一样的纸，剪折后，样子和下落都可能变。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先猜快慢、路线和动作，再看线剪折。"
+        },
+        {
+          "say": "两片翼要朝相反的方向折开。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从同样高的地方轻轻放，眼睛跟着看。"
+        },
+        {
+          "say": "有时会飘，有时飞得稳，都要照实记。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看到一边转一边落，就是这次达标的证据。"
+        },
+        {
+          "say": "可以请大人陪你一起做，边做边讲给大人听。"
+        },
+        {
+          "say": "真实剪折和试飞，请大人帮你观察。"
+        }
+      ]
+    }
+  ]
+}

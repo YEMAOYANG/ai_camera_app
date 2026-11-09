@@ -1,0 +1,25 @@
+
+#play{background:#fffdf6;border-radius:16px}
+button{font-family:inherit;cursor:pointer}button:focus-visible{outline:5px solid #2f66ae;outline-offset:3px}
+.co-reset{position:absolute;right:16px;top:10px;width:68px;height:68px;border:2px solid #c28b42;border-radius:16px;background:#fff;color:#6b4423;font-size:38px;z-index:2}
+.co-pic{width:100%;height:100%;object-fit:contain;pointer-events:none}
+.co-choice{border:3px solid #dfc799;border-radius:16px;background:#fff;overflow:hidden;position:relative;padding:10px}
+.co-choice:hover{background:#fff3ce}.co-choice.placed{opacity:.35;pointer-events:none}.co-choice.selected{outline:5px solid #db8c23;outline-offset:2px}
+.co-choice::after{content:'';position:absolute;right:10px;top:10px;width:38px;height:38px;border-radius:50%;background:#fff;border:2px solid #b69566;opacity:0}
+.co-choice.placed::after{content:'✓';opacity:1;line-height:34px;font-size:26px;color:#28753a}
+.co-tray{border:4px dashed #c6a36f;border-radius:16px;background:#fff6df;display:flex;align-items:center;justify-content:center;gap:20px}
+.co-missing{display:none;position:absolute;inset:85px 20px 20px;background:#fff6df;z-index:8;align-items:center;justify-content:center;font-size:28px;color:#6b4423;text-align:center}
+.co-missing.show{display:flex}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+
+#make-stage{position:absolute;left:18px;top:14px;width:672px;height:360px;background:#f1eddf;border-radius:16px;overflow:hidden}#make-stage img{padding:8px}
+#make-choices{position:absolute;left:716px;top:94px;display:grid;grid-template-columns:repeat(2,238px);gap:20px}#make-choices button{width:238px;height:196px;padding:6px}
+#make-strip{position:absolute;left:18px;top:398px;width:672px;height:132px;justify-content:flex-start;padding:10px;gap:10px;cursor:default}#make-strip img{width:145px;height:100px;object-fit:contain;border:2px solid #d6c39d;border-radius:8px;background:#fff}
+
+#make-trace-preview{display:none;position:absolute;inset:16px}#make-stage.tracing #make-trace-preview{display:block}#make-stage.tracing #make-photo{visibility:hidden}
+.make-trace-diagram{position:absolute;left:0;top:0;width:72%;height:100%;pointer-events:none}
+.make-trace-pencil{position:absolute;left:73%;top:22%;width:24%;height:56%;object-fit:contain;pointer-events:none}
+#make-strip .make-record{position:relative;width:145px;height:100px;flex:none;overflow:hidden;background:#fff;border:2px solid #d6c39d;border-radius:8px}#make-strip .make-record>.co-pic{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border:0;padding:0}
+
+#make-strip .make-trace-pencil{width:24%;height:56%;border:0}

@@ -1,0 +1,15 @@
+.predict-work { position: relative; display: grid; grid-template-columns: 380px 552px 224px; grid-template-rows: 390px 98px; gap: 22px; padding: 12px 15px; color: #174b50; }
+.predict-pair, .predict-choices, .predict-ledger { min-width: 0; border: 3px solid #8db8a8; border-radius: 24px; background: #fffdf5; }
+.predict-pair { display: grid; position: relative; isolation: isolate; align-items: center; grid-template-columns: 1fr 1fr; overflow: hidden; }
+.predict-context { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: .54; z-index: -1; }
+.predict-object { width: 100%; height: 242px; object-fit: contain; }
+.predict-choices { padding: 25px 22px; display: grid; grid-template: 52px 1fr / 1fr 1fr; gap: 14px; align-items: stretch; }
+.predict-choices h2 { grid-column: 1 / -1; text-align: center; font-size: 32px; }
+.predict-choices button { border: 4px solid #91bdb3; border-radius: 18px; background: #eef8ef; display: grid; place-items: center; cursor: pointer; font: inherit; }
+.predict-choices button.selected { border-color: #bf662d; box-shadow: inset 0 0 0 4px #ffd188; background: #fff4d6; }
+.predict-choices svg { width: 95%; height: auto; }
+.predict-ledger { padding: 12px; display: grid; grid-template-rows: repeat(3, 1fr); gap: 10px; }
+.predict-slot { display: grid; place-items: center; border: 3px dashed #97b6ad; border-radius: 14px; color: #427671; min-height: 0; }
+.predict-slot svg { width: auto; height: 96px; max-width: 100%; }
+.predict-slot.stored { border-style: solid; border-color: #359877; background: #e5f5e5; }
+#predict-save { grid-column: 2; justify-self: center; align-self: center; height: 88px; min-width: 240px; }

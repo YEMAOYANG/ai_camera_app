@@ -1,0 +1,280 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "directory-0c147a23366906ebae132dca",
+    "nodeId": "03dd2c14-479f-37cb-8740-06ca2f2b1679",
+    "unitId": "2d724efe-703a-3724-9def-b401dc96389b",
+    "subject": "english",
+    "gradeCode": "primary_1",
+    "volume": "upper",
+    "unitTitle": "Module 6",
+    "lessonTitle": "Unit 1 What's this?",
+    "schoolSystem": "six_year",
+    "teachingRevision": "1",
+    "classHours": [
+      "publisher-m6-hour1",
+      "publisher-m6-hour3-u1-review"
+    ]
+  },
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "objectives": [
+      "听懂What’s this?并在指向情境中用It’s a…说明一件物品。",
+      "听辨书包、书、钢笔、铅笔、尺，根据图像特征区分pen和pencil，并用熟悉的窗或门迁移问答。",
+      "先看局部线索试答，等线索完整后核对并修正，再用新的实物换角色问答。",
+      "从说话人所在位置听懂近处this、稍远处that，理解原课书包示例里my表示说话人自己的书包。"
+    ],
+    "coveredOfficialHours": [
+      "publisher-m6-hour1",
+      "publisher-m6-hour3-u1-review"
+    ],
+    "videoStatus": "waived",
+    "excludedTopics": [
+      "第35至37页M6U2",
+      "系统的失物认领、所有权问答和第37页活动",
+      "扩展学具词、颜色课或文具史",
+      "语法术语与书写测验"
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "d3ef630854188ecf4052dd763106856bd8de2089152a34d9e7ab2751fed44d2f",
+    "briefSha256": "1ecde47660da0a5799a65befa010719798e5dd6b9a7d886ad8153fa3bc241eaf",
+    "sourceDownloadReceiptSha256": "5a6d91c7262dc3fde62baaeaa8eea82e04eb1e9d0b97298803d772f9467f890d",
+    "textbookFacsimileSha256": "7b1eb1b3069a7b453b4db2f13821c1bea8b09b8b27670298be9b76c2c23aa67d"
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  },
+  "teachingFacts": {
+    "book": "外研社一年级起点一年级上册，2011课标修订版，ISBN 978-7-5135-2109-3。印刷第32至34页，35页起为M6U2。",
+    "activity1": "第32页活动1 听与指。依据未完成画面先试猜，随图补全修正。课本猜测由像熊猫到确认是猫；课堂另造画面和角色，不复刻教材插画。",
+    "activity2": "第32至33页活动2 听、指、找。真实目标物是 schoolbag、book、pen、pencil、ruler，书包有 It’s my schoolbag. 的具体例；第33页结尾画画场景引出 What’s that?。",
+    "activity3": "第34页活动3 听与说，拼图语境里的钢笔和书包，两组核心问答都应在老师话里出现。",
+    "activity4": "第34页活动4 听与做。窗、门、钢笔、书包、铅笔、书共六种图像提示；用说话人所在的位置对比近处和稍远处。尺属于本课活动2。",
+    "officialHours": "出版社216244第一课时覆盖U1，第三课时第9至13页含U1的辨物迁移、猜图、pen和pencil短节奏与家庭问答。国家平台2015和2019材料是同一第一课时的两种设计。课后作业用于听辨和图片辨物的变式方向。",
+    "language": "核心问句 What’s this?，回答 It’s a …。发音完整给出 schoolbag、book、pen、pencil、ruler。book、pen、pencil等单数可数物示范用 a。that 是在当前情境中离说话人稍远；my 只随原书书包例句让孩子理解。",
+    "familyPractice": [
+      "和家人各拿一件安全学具。由一人问 What’s this?，另一人用 It’s a … 回答，再换角色。成人观察孩子是否听懂并能尝试说。",
+      "在室内站稳，和家人轮流指近处物品和稍远处物品说问句。第一次先明确说话人的位置，然后换位置再问。",
+      "回想看不清就先猜，看到全图再核对。可拿一本书或一把尺遮住一角，等家人猜后再揭开；过程由家人观察。"
+    ]
+  },
+  "qualityRules": [
+    "用简体中文口语，英语保留必要的正确原形。每句尽量25字内，最长40字。讲解页至少6句100字，互动页至少5句90字；建议每页8至10句。把理由、实际例子与判断要点讲清楚。",
+    "讲解页1000×562.5，依次点亮每个知识点。互动页1280×720，每页教师至少三次操作，先操作再讲话。操作必须能对应可见元素ID，说明指向、揭示、拖动或变位后的实际状态。",
+    "依统一互动框架，演示后孩子操作。首次错误不报答案，分层给线索，可重玩和复位，放行正确状态。角色不抢答，课内点击证据与口语观察分开。",
+    "图担内容，预录老师声音读指令。遮住非目标文字，学生仍能完成；一页一件事，图片选择区至少44像素。不要用抽象图标、emoji或文字替代实际教具和语义图。",
+    "老师音频后制逐句对应。无浏览器语音、现场讨论、外链或网络页面。禁凭新事实补课；角色、故事、题图和原创节奏须可独立制作。小测逐题有技能、答案唯一、解释充分、题面图片语义可验。",
+    "沿用审核过的学具和远近、角色边界。答案位置打散，任何位置不超过半数。收尾逐一回顾四项目标，家庭问答有成人观察建议。"
+  ],
+  "pagePlan": [
+    {
+      "key": "picture-reveal",
+      "kind": "interactive",
+      "title": "图画还差一点",
+      "sourceRefs": [
+        "学生用书第32页活动1",
+        "出版社216246第3至4页",
+        "2019课件第19至23页"
+      ],
+      "play": "孩子先看折页露出的动物轮廓，选一张图片作暂时猜测，再拉开遮片看全图并换选或确认。猜测阶段没有对错分；等耳朵、脸和尾巴都清楚，再问答和确认。以新画面说明线索少时可以先猜，线索齐了要改猜。老师操作折页、圈完整线索、演示改选，动作均先于相应台词。",
+      "assets": [
+        "reveal-cat",
+        "reveal-panda"
+      ]
+    },
+    {
+      "key": "schoolbag-items",
+      "kind": "interactive",
+      "title": "书包里有什么",
+      "sourceRefs": [
+        "学生用书第32至33页活动2",
+        "出版社216246第5至7页",
+        "2015课件第9至14页"
+      ],
+      "play": "成人带孩子在图书角整理学具。老师先点书包并用完整问答介绍，借书包主人说一句 It’s my schoolbag.，解释 my 表示说话人自己的；随后拉开包口，让孩子把书、钢笔、铅笔、尺分别拖进台面轮廓。换位置后听问句和物品名再选；老师先指出钢笔笔尖与铅笔削尖处，再解释为什么易混。",
+      "assets": [
+        "reading-corner",
+        "object-schoolbag",
+        "object-book",
+        "object-pen",
+        "object-pencil",
+        "object-ruler"
+      ]
+    },
+    {
+      "key": "puzzle-listen",
+      "kind": "interactive",
+      "title": "拼好再来问",
+      "sourceRefs": [
+        "学生用书第34页活动3",
+        "出版社216246第8至11页"
+      ],
+      "play": "先看空槽和两张放大局部，选中一片拖到对应缺口，真正补齐画面，再听教师做完整问答。首轮钢笔，次轮书包。首次拖错只提示看接缝或外轮廓，保留再试；拼对才出现完整物件。老师示范看形状、定位缺口、拼入核对，并给幼儿听两轮完整问答。",
+      "assets": [
+        "object-pen",
+        "object-schoolbag",
+        "object-pencil",
+        "object-book"
+      ]
+    },
+    {
+      "key": "speaker-position",
+      "kind": "interactive",
+      "title": "跟着说话人看",
+      "sourceRefs": [
+        "学生用书第33页活动2画画尾声、第34页活动4",
+        "出版社216246第12页",
+        "2019课件第39页"
+      ],
+      "play": "在窗、门、钢笔、书包、铅笔、书的图卡中分轮取两个不同物件，拖动说话人脚下的位置到物件旁，再听短问句点图。演示先固定并标亮说话人，再依次指身边与远处；同样两样物品、移动说话人换位置，让孩子发现 this 或 that 可以指不同的物品。屏上指向线只在教师示范和第二层提示出现，答题初始态不泄题。",
+      "assets": [
+        "art-room",
+        "speaker-child",
+        "object-window",
+        "object-door",
+        "object-pen",
+        "object-schoolbag",
+        "object-pencil",
+        "object-book"
+      ]
+    },
+    {
+      "key": "take-turns",
+      "kind": "interactive",
+      "title": "这一次轮到你问",
+      "sourceRefs": [
+        "学生用书第34页活动4",
+        "出版社216244第9至13页U1相关部分",
+        "出版社216246第13页"
+      ],
+      "play": "两个画面人物交接轮到谁说的实物卡，孩子先点一个新组合里的学具让人物问和答，再把实物卡拖给另一人，改变谁问谁答。把钢笔、铅笔作为简短原创节奏的两项，听辨和跟说后再自然换物问答。孩子试着说，界面只记录选卡或交接，口语有无说对由成人观察。",
+      "assets": [
+        "art-room",
+        "speaker-child",
+        "partner-child",
+        "object-pen",
+        "object-pencil",
+        "object-ruler",
+        "object-book"
+      ]
+    },
+    {
+      "key": "transfer-quiz",
+      "kind": "quiz",
+      "title": "听一听，选一张",
+      "sourceRefs": [
+        "学生用书第32至34页",
+        "国家平台2015课后作业第1至2页",
+        "出版社216245第1至3页"
+      ],
+      "play": "采用独立新图和新情境。各题由教师配音，给可区分的图片，逐题显示解析。保留作答记录，点击只表示孩子在该题选择了什么。",
+      "assets": [
+        "quiz-stationery",
+        "quiz-bag-and-book",
+        "quiz-room",
+        "quiz-clues",
+        "quiz-speaker"
+      ]
+    },
+    {
+      "key": "recap",
+      "kind": "slide",
+      "title": "今天我会问什么",
+      "sourceRefs": [
+        "学生用书第32至34页",
+        "出版社216244第9至13页U1相关部分、216246第13页"
+      ],
+      "play": "依次点亮完整问答、五样学具、补齐线索后核对、从说话人看远近这四点；每点说清原因和可复述的小例子，留出一次居家换角色问答。展示窗门迁移例并回到核心问答。",
+      "assets": [
+        "reading-corner",
+        "object-schoolbag",
+        "object-pen",
+        "object-pencil",
+        "speaker-child"
+      ]
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "skill": "听音认钢笔",
+      "variant": "活动室的文具托盘，听完整问答，三张单物图用订制的新钢笔、铅笔、尺，正确项是钢笔。"
+    },
+    {
+      "skill": "听音认铅笔",
+      "variant": "桌边三张新特写，听完整问答后选有木质削尖的铅笔。不得把选项笔尖裁掉。"
+    },
+    {
+      "skill": "听音认书包",
+      "variant": "新的玄关物件，听完整问答后，从书包、一本书和尺的实物图中选书包。"
+    },
+    {
+      "skill": "听音认书和尺",
+      "variant": "在借书还书的新情境中，另出两题分别听音选书、选尺。每题用图辨物，给足可区分边缘，避免沿用同一组选项的相对位置。"
+    },
+    {
+      "skill": "看全线索核对猜测",
+      "variant": "新遮挡图先露出含混一角，展开后显示一把尺的完整刻度外形，再问辨认哪一样。比较项有明确不同外形。"
+    },
+    {
+      "skill": "按说话人位置听辨远近",
+      "variant": "新门厅两样不同物件一近一远，题面固定一名说话人。分别出 this 与 that 两个变式，听问句后找目标；问句只读指示词，答案用解析讲明。"
+    },
+    {
+      "skill": "新情境理解辨物问答",
+      "variant": "问答迁移到新窗与门图片，听到答语后选实景对象。给一题或两题，正确位置和其他题打散。"
+    }
+  ],
+  "assetPlan": [
+    {
+      "ids": [
+        "reading-corner",
+        "art-room"
+      ],
+      "semanticNeeds": "两张新创整幅场景：阅读角与美术室。宽画面，清晰平视，门窗轮廓好辨，场景留出中央互动空间，无文字符号。"
+    },
+    {
+      "ids": [
+        "reveal-cat",
+        "reveal-panda"
+      ],
+      "semanticNeeds": "同画风的两张单动物完整图，明确猫耳和长尾、熊猫黑眼圈和圆耳。画面遮挡由状态实现，别让完整图提前显现；无原教材人物与构图。"
+    },
+    {
+      "ids": [
+        "object-schoolbag",
+        "object-book",
+        "object-pen",
+        "object-pencil",
+        "object-ruler",
+        "object-window",
+        "object-door"
+      ],
+      "semanticNeeds": "七张独立单物可裁图。钢笔有可见墨水笔尖，铅笔见木质削尖，书见书脊纸页，尺见刻度外形，书包见双肩带。窗有框与玻璃，门见门把手。尺寸和识别性统一。"
+    },
+    {
+      "ids": [
+        "speaker-child",
+        "partner-child"
+      ],
+      "semanticNeeds": "两张原创单人物半身或全身图，朝向明确且可水平换位，用人物位置直接表示谁在说话，不能依赖姓名或角色文字。"
+    },
+    {
+      "ids": [
+        "quiz-stationery",
+        "quiz-bag-and-book",
+        "quiz-room",
+        "quiz-clues",
+        "quiz-speaker"
+      ],
+      "semanticNeeds": "五组仅用于小检查的新实物或新场景图，分别按题的独立选项编号列出实际需要的张数和每张内容，题图和答图均不得提前显露答案。"
+    }
+  ],
+  "request": "为外研社一年级上册 Module 6 Unit 1 What’s this? 写一门可保存、后续可编辑的完整课堂。用阅读角与美术室交接的原创故事串起四项原书活动，统合第一课时及第三课时的U1复习。每个页面输出必要素材标识、教师动作与对应逐句台词、学生实际可操作状态，以及答错线索和可再试行为。以课前述素材和活动方案为范围，教学判断须由孩子可感知的实物形状、遮挡变化和人物位置支撑；不把窗和门当成新词表，也不发展下一单元的所有权与失物认领。小检查在全新场景出8至10个图片题并逐题给技能、唯一答案和解析。最后复习并请孩子说给家人听。"
+}

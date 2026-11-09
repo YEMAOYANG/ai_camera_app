@@ -1,0 +1,402 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation-provenance.v1",
+  "native": {
+    "jobId": "zpA6QXw2yX",
+    "classroomId": "bwmIz9b5fj",
+    "sceneCount": 9,
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
+    "modelPolicyId": "deepseek-v4-pro-current-flash-v1",
+    "sourcePath": "output/courseware-lessons/science-g1-upper-recognize-metals/native-authoring-v1/classroom.json",
+    "sourceSha256": "c8e9164d3beaab91ee475927038b1cca8d3aa5f69510b3bd20a6d983fe443ea1",
+    "inputPath": "output/courseware-lessons/science-g1-upper-recognize-metals/generation-input-v1/draft-native.json",
+    "inputSha256": "bdf1a3c2de217a2450189d027ceddf9d45e5277d851ad623fe5108feda81c08c",
+    "dispatchClaimSha256": "3e259c03fb14c2042ae29b927d1660d27f2a86c87cf64a76a0613ea4554cda83",
+    "dispatchResponseSha256": "b6f80009873a64b29d53948420c1eb76d86bbc9d278623c0168d53386c459f21"
+  },
+  "adaptation": {
+    "model": "gpt-6.1-sol",
+    "editablePath": "lesson.json",
+    "editableSha256": "bb4f2cb2b49a7469ad04adf9a9b8e955d88bff1908d7e6eb20da3e993af97035",
+    "retained": "OpenMAIC九场的教学路线、各场目的和两次小检查分组。",
+    "changes": [
+      "重写偏长台词，保留样品特征的观察限定，补上真实观察及口头记录口径。",
+      "重做互动为桌腿示范加两次部位记录、桥梁示范加两次证据归档。",
+      "六道新图题覆盖六个知识点，答案位置均衡。",
+      "关闭原生自动生成媒体。复用经逐图复核的Codex原图，精确题图以SVG或原图坐标重建。",
+      "依据Terra两处分歧，只补两句具体桌腿看摸示范，安全总结复用本课已成功的插头只看和避开热杯录音。"
+    ]
+  },
+  "images": {
+    "station": {
+      "path": "assets/station.png",
+      "sha256": "df00ae7a30c5efbed0578b6632d7e969b8f134be40c8de16fa1e5c8e3bedac5e",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-fcb02a90-9194-4fb0-aca8-5bc7c6740ac1.png",
+      "promptSummary": "暖米色桌面观察站。铸铁锅、铝罐、放大镜、浅色记录本，无文字。",
+      "usedIn": [
+        "p03开始",
+        "p06开始",
+        "p09"
+      ]
+    },
+    "samples": {
+      "path": "assets/samples.png",
+      "sha256": "c42d0363e62761892293965727818c874b5bc7b2ba95687e70b5a10c3923ded3",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-49851107-a192-4c1b-a1b3-524ae385c14c.png",
+      "promptSummary": "从左到右独立排列深色铁锅、银灰铝罐、透明块里带红的铜芯、金吊坠。统一米色背景，无文字。",
+      "usedIn": [
+        "p01",
+        "p04"
+      ]
+    },
+    "desk": {
+      "path": "assets/desk.png",
+      "sha256": "5b7671a6bbd207441343a94c1a5ead8f411b362fdd83f56c3754cc78d9eb0027",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-254a4444-c272-44c7-97fd-c67ce7b8ce7d.png",
+      "promptSummary": "浅色背景前木面铁腿的桌子，木纹和银灰色腿清晰分离，无文字。",
+      "usedIn": [
+        "p03教师示范"
+      ]
+    },
+    "chair": {
+      "path": "assets/chair.png",
+      "sha256": "6ec529b571c4085b1fe07b5d23c6e914ce6b4a25a0cab3ed5c0f18fa5456c497",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-12d4606a-bb65-474b-8cac-adaee9402ad1.png",
+      "promptSummary": "浅色背景前单把蓝色塑料座面椅，银灰色金属腿清晰可见。",
+      "usedIn": [
+        "p03第1关"
+      ]
+    },
+    "window": {
+      "path": "assets/window.png",
+      "sha256": "ab78f6ced6b0fa55b33d21e9c4957c8cf28644a9b9117906b762fbf15c2d5774",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-48a12fe5-6bd5-4899-9331-42acfa04a1d5.png",
+      "promptSummary": "平视方形窗，区分银灰金属外框和能透光的玻璃。",
+      "usedIn": [
+        "p03第2关",
+        "p06第1关"
+      ]
+    },
+    "hazards": {
+      "path": "assets/hazards.png",
+      "sha256": "f7b2ac65228f3bbbe911909989f46d22313b8c3b945f650d3e4d69d228d5e458",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-6fdec47a-8345-4581-8d95-c903daefbffc.png",
+      "promptSummary": "安全观察的并列画面，左边离开插座的电器插头，右边是冒热气的杯。",
+      "usedIn": [
+        "p02"
+      ]
+    },
+    "bridge": {
+      "path": "assets/bridge.png",
+      "sha256": "3e72a3fa5a61510b23b7c61167c4070d144ea07352498e818406aa33155f8e2d",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-d0850848-5050-49cc-b455-883acec15bdc.png",
+      "promptSummary": "室内展出的斜拉桥通用工程模型，右侧露出桥面下的空心箱形梁，车辆行驶在桥面上。",
+      "usedIn": [
+        "p05",
+        "p06教师示范"
+      ]
+    },
+    "quiz-a": {
+      "path": "art-source/quiz-a.png",
+      "sha256": "21a049cab137c48e0159ea12002dac33bf56cdc1b0634a4023803fe1ccf62c23",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-4b530e73-2633-454f-9597-23af591100aa.png",
+      "promptSummary": "三等宽独立方格，依次是银色钢勺、木勺、青色抽绳布袋，留边并无文字。",
+      "usedIn": [
+        "q1图源"
+      ]
+    },
+    "bench": {
+      "path": "assets/bench.png",
+      "sha256": "f85ff135ad64bde62ef34958035c6ca4974621d97a154899d1c9878f4430557d",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-cc218e08-0d29-43b2-bfda-dba4b1a595a8.png",
+      "promptSummary": "浅色背景的公园长椅，暖木座面和靠背配银灰金属腿。",
+      "usedIn": [
+        "q2图源"
+      ]
+    },
+    "quiz-c": {
+      "path": "art-source/quiz-c.png",
+      "sha256": "3d5fc680ac6a69498357d31ab2b9f7b615fcfc23645f9a225ea2efbe1a3d8f7b",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-f7473df8-0d62-4d79-a2ba-d92f46161a83.png",
+      "promptSummary": "三等宽独立方格，依次是灰色电器插头、冒热气的不锈钢热水壶、青色常温金属文具盒。",
+      "usedIn": [
+        "q3图源"
+      ]
+    },
+    "painted-box": {
+      "path": "assets/painted-box.png",
+      "sha256": "378457c5b65bb5839b68da9e4a700c2e977f2add7af170e00ce62e3d7a94c429",
+      "origin": "Codex ImageGen",
+      "originalArtifact": "exec-7ca07234-e9c8-4236-88cf-9df547a4f699.png",
+      "promptSummary": "单独一个看不见内部、表面有橙色涂层的封闭盒子，不暗示本体材料。",
+      "usedIn": [
+        "p06第2关"
+      ]
+    },
+    "q1-a": {
+      "path": "assets/q1-a.png",
+      "sha256": "d85be725213f2293bf704d202330e8049b5ce88b5125e1d65886c3b38aac21d5",
+      "origin": "精确像素裁取",
+      "design": "按原图精确裁取，顺序钢勺、木勺、布袋。",
+      "usedIn": [
+        "q1 选项 A"
+      ],
+      "baseImage": "quiz-a",
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 724,
+        "height": 724
+      }
+    },
+    "q1-b": {
+      "path": "assets/q1-b.png",
+      "sha256": "d6330ce1ec9ad3b160cebfc74980a55b24784d2ba1c0a17f1baa2f386569dc95",
+      "origin": "精确像素裁取",
+      "design": "按原图精确裁取，顺序钢勺、木勺、布袋。",
+      "usedIn": [
+        "q1 选项 B"
+      ],
+      "baseImage": "quiz-a",
+      "crop": {
+        "x": 724,
+        "y": 0,
+        "width": 724,
+        "height": 724
+      }
+    },
+    "q1-c": {
+      "path": "assets/q1-c.png",
+      "sha256": "9c439d969fc9d57616f3e90665d59f8b771cc98bf71cf06ec01d3af2bbb29afa",
+      "origin": "精确像素裁取",
+      "design": "按原图精确裁取，顺序钢勺、木勺、布袋。",
+      "usedIn": [
+        "q1 选项 C"
+      ],
+      "baseImage": "quiz-a",
+      "crop": {
+        "x": 1448,
+        "y": 0,
+        "width": 724,
+        "height": 724
+      }
+    },
+    "q2-a": {
+      "path": "assets/q2-a.png",
+      "sha256": "03c235fb76e1acfeaff93632d2f111c513bb6c52b414b8d5d67eb47bb6a6563a",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "对同一张公园长椅原图，用相同颜色和线型分别框整椅、右侧金属腿、木条。",
+      "usedIn": [
+        "q2 选项 A"
+      ],
+      "baseImage": "bench",
+      "drawing": {
+        "path": "art-source/q2-a.svg",
+        "sha256": "490bd3182d128e05994aa2978d09b51cc15f8aa4db74c45f2b3a1e7dc6e507dc"
+      }
+    },
+    "q2-b": {
+      "path": "assets/q2-b.png",
+      "sha256": "b06d385d3ac496222343946651e587a14e0ea940b45062956407ba1024504aad",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "对同一张公园长椅原图，用相同颜色和线型分别框整椅、右侧金属腿、木条。",
+      "usedIn": [
+        "q2 选项 B"
+      ],
+      "baseImage": "bench",
+      "drawing": {
+        "path": "art-source/q2-b.svg",
+        "sha256": "14f49f4b05e61dc91a32d5e099e3d500708dce7ae59883cc0d11d20bcb61f79c"
+      }
+    },
+    "q2-c": {
+      "path": "assets/q2-c.png",
+      "sha256": "64b4768e3fd14ea3eec9e2d837aa72e8c61d221f3773204a44f9155f01f158f7",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "对同一张公园长椅原图，用相同颜色和线型分别框整椅、右侧金属腿、木条。",
+      "usedIn": [
+        "q2 选项 C"
+      ],
+      "baseImage": "bench",
+      "drawing": {
+        "path": "art-source/q2-c.svg",
+        "sha256": "2df1598347b0db7727f0aa5877962ab3fb598f85e3b03a8be45fb3bc910f0bb9"
+      }
+    },
+    "q3-a": {
+      "path": "assets/q3-a.png",
+      "sha256": "3dd39051b4c37ba6ec31662626529a6d04ac5fc10064d8cb49b2bc22104acc62",
+      "origin": "精确像素裁取",
+      "design": "按原图精确裁取，顺序插头、热壶、常温文具盒。",
+      "usedIn": [
+        "q3 选项 A"
+      ],
+      "baseImage": "quiz-c",
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 724,
+        "height": 724
+      }
+    },
+    "q3-b": {
+      "path": "assets/q3-b.png",
+      "sha256": "316e58aabd5424c19abaab9a98c648145382946434ab3459f00c7767afc9ddff",
+      "origin": "精确像素裁取",
+      "design": "按原图精确裁取，顺序插头、热壶、常温文具盒。",
+      "usedIn": [
+        "q3 选项 B"
+      ],
+      "baseImage": "quiz-c",
+      "crop": {
+        "x": 724,
+        "y": 0,
+        "width": 724,
+        "height": 724
+      }
+    },
+    "q3-c": {
+      "path": "assets/q3-c.png",
+      "sha256": "4d01bedcce4ec52ab6cd7298593558ba35a3e508ab2e33472a64920bfdc22b5f",
+      "origin": "精确像素裁取",
+      "design": "按原图精确裁取，顺序插头、热壶、常温文具盒。",
+      "usedIn": [
+        "q3 选项 C"
+      ],
+      "baseImage": "quiz-c",
+      "crop": {
+        "x": 1448,
+        "y": 0,
+        "width": 724,
+        "height": 724
+      }
+    },
+    "q4-a": {
+      "path": "assets/q4-a.png",
+      "sha256": "0d3b76da01b1dae8152b1a07a2b098509a7db189852755693c70f7d630ade0ca",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "两块同尺寸记录色片，只变红色与银灰色组合。",
+      "usedIn": [
+        "q4 选项 A"
+      ],
+      "drawing": {
+        "path": "art-source/q4-a.svg",
+        "sha256": "72bb61c434b3b09facdda5ee12682b528f3e4b6a468c7b3b19877cd5faeead8e"
+      }
+    },
+    "q4-b": {
+      "path": "assets/q4-b.png",
+      "sha256": "5c9219e80eaa0f9c250bdab24359848a94a0d2711b3524756b316ff079d6b500",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "两块同尺寸记录色片，只变红色与银灰色组合。",
+      "usedIn": [
+        "q4 选项 B"
+      ],
+      "drawing": {
+        "path": "art-source/q4-b.svg",
+        "sha256": "ff49e18541f7aacdcaebf81e68853d47826c1d19a6506b72f6eaca19fbe5ff52"
+      }
+    },
+    "q4-c": {
+      "path": "assets/q4-c.png",
+      "sha256": "86690fd5d181a735e47d734df453764d11d8041643d36a49ea332cb177a69ba3",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "两块同尺寸记录色片，只变红色与银灰色组合。",
+      "usedIn": [
+        "q4 选项 C"
+      ],
+      "drawing": {
+        "path": "art-source/q4-c.svg",
+        "sha256": "8b13db5520e008677df00e28409dd9910d7c0584c50a6e4aaf77ce856509ff75"
+      }
+    },
+    "q5-a": {
+      "path": "assets/q5-a.png",
+      "sha256": "2e36a17d29bfa055e7662a9e0ac4a03a6ae792c2a862e1447aeacc04a057c799",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "三图使用同一简化桥模型，以同一圈线分别标水面、桥面下钢梁和岸边树。",
+      "usedIn": [
+        "q5 选项 A"
+      ],
+      "drawing": {
+        "path": "art-source/q5-a.svg",
+        "sha256": "e46fd5039fa9a4773df160f93b511313edccbb8b9c3fb9d99695b8f3d37d6d3f"
+      }
+    },
+    "q5-b": {
+      "path": "assets/q5-b.png",
+      "sha256": "fac93c294bec6e98219c1a8c7098196a3d3acbcc05f205deeba36d970878b354",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "三图使用同一简化桥模型，以同一圈线分别标水面、桥面下钢梁和岸边树。",
+      "usedIn": [
+        "q5 选项 B"
+      ],
+      "drawing": {
+        "path": "art-source/q5-b.svg",
+        "sha256": "40b3d98c8aee6717804ea9517ec167ba98066e4498045223dbf6799bbabff6bf"
+      }
+    },
+    "q5-c": {
+      "path": "assets/q5-c.png",
+      "sha256": "038e32624fb9e1ddb79adcf1b46bd164cf7b3ae2b08f733a880089181bc353a4",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "三图使用同一简化桥模型，以同一圈线分别标水面、桥面下钢梁和岸边树。",
+      "usedIn": [
+        "q5 选项 C"
+      ],
+      "drawing": {
+        "path": "art-source/q5-c.svg",
+        "sha256": "a3cf12b25fbd0b5f5bd22db549e43cbeecf50b8d5ddb28d9ca808822a4856037"
+      }
+    },
+    "q6-a": {
+      "path": "assets/q6-a.png",
+      "sha256": "afde099ef7c177d3913d9438d4224d2eb5472c32e6197e9979e913b0faf57286",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "保留同一块有涂层的标牌，材料槽分别写实画出金属、木纹、空槽和待查符号。",
+      "usedIn": [
+        "q6 选项 A"
+      ],
+      "drawing": {
+        "path": "art-source/q6-a.svg",
+        "sha256": "b436fafdfbe51953030275683bd538b94b9a5666093810e0f19ba80cf146ea9a"
+      }
+    },
+    "q6-b": {
+      "path": "assets/q6-b.png",
+      "sha256": "bf3b1ff2cef672e1af2575108508463729b94069a3f0a4296d00c37c718f78e0",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "保留同一块有涂层的标牌，材料槽分别写实画出金属、木纹、空槽和待查符号。",
+      "usedIn": [
+        "q6 选项 B"
+      ],
+      "drawing": {
+        "path": "art-source/q6-b.svg",
+        "sha256": "a4a48dbd58db9bcc755c283f88d493adea1a0df1ebd59428d08c99603ecc1003"
+      }
+    },
+    "q6-c": {
+      "path": "assets/q6-c.png",
+      "sha256": "bbeb0dd962f437a6da546822aa6d24ed02d8f56ebd6febcab32c60ee798dff94",
+      "origin": "课程作者绘制的SVG精确题图",
+      "design": "保留同一块有涂层的标牌，材料槽分别写实画出金属、木纹、空槽和待查符号。",
+      "usedIn": [
+        "q6 选项 C"
+      ],
+      "drawing": {
+        "path": "art-source/q6-c.svg",
+        "sha256": "1bdc0d002816dc75e6d2d8f772d00fe08a21a10fe2eecb44fb426a1027f94ea7"
+      }
+    }
+  }
+}

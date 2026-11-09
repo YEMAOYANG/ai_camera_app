@@ -1,0 +1,318 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "小兔子安家",
+  "goals": [
+    "从图中数出两群同类对象，解释求总数用加法。",
+    "从一个加数接着数，并解释十个一换成一个十时总数不变。",
+    "把一个加数拆成补十与剩余两部分，比较两种正确拆法，算成十加几。",
+    "在数线上从起点向右先跳到十、再跳剩余格，两跳格数合起来是所加的数。",
+    "有序枚举两房都有人时的分配，解释搬一个使一房多一、另一房少一，总数不变。",
+    "在一个加数保持不变时，解释另一个加数多一，和也多一。",
+    "根据正好够用的总量，从三盒中选两盒，并用加法核对。"
+  ],
+  "keyPoint": "理解进位加法的拆、凑、加，用枝形图和数线表同一个计算；从有序分配区分和不变与一个加数固定两种情况。",
+  "difficultPoint": "分出的两部分完整保留，先凑十再加剩余；搬动与新增的变化机制不同。",
+  "pageSequence": [
+    {
+      "page": 1,
+      "key": "p01",
+      "type": "slide",
+      "title": "松林来客",
+      "goalIds": [
+        "join_two_groups"
+      ],
+      "play": "松林雨后两排兔子等候，精确8只和5只。高亮两群，再合并总框，解释两组数加起来。",
+      "move": "松林雨后两排兔子等候，精确8只和5只。高亮两群，再合并总框，解释两组数加起来。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "rabbit-cover",
+        "rabbit-token"
+      ]
+    },
+    {
+      "page": 2,
+      "key": "p02",
+      "type": "slide",
+      "title": "从八接着数，再换成十",
+      "goalIds": [
+        "count_and_exchange"
+      ],
+      "play": "计数标记从8之后逐只移到13；并列十格和散点，演示十个一换成一条十，剩三个一。",
+      "move": "计数标记从8之后逐只移到13；并列十格和散点，演示十个一换成一条十，剩三个一。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "rabbit-token",
+        "tenframe",
+        "units"
+      ]
+    },
+    {
+      "page": 3,
+      "key": "p03",
+      "type": "slide",
+      "title": "先凑到十，再看剩下",
+      "goalIds": [
+        "bridge_ten"
+      ],
+      "play": "仍看8＋5，先把5拆2和3，算8＋2＝10、10＋3＝13；再把8拆5和3，算5＋5＝10、10＋3＝13。两图分开逐步高亮。",
+      "move": "仍看8＋5，先把5拆2和3，算8＋2＝10、10＋3＝13；再把8拆5和3，算5＋5＝10、10＋3＝13。两图分开逐步高亮。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "tenframe",
+        "branch-diagram",
+        "units"
+      ]
+    },
+    {
+      "page": 4,
+      "key": "p04",
+      "type": "interactive",
+      "title": "给十格灯架补灯",
+      "goalIds": [
+        "bridge_ten"
+      ],
+      "play": "分别演示9＋7与6＋8。点或拖动一个候选灯珠组补满十格，错误只提示数空格；未用灯珠留在第二托盘。落位、换十、剩余显示均动。",
+      "move": "分别演示9＋7与6＋8。点或拖动一个候选灯珠组补满十格，错误只提示数空格；未用灯珠留在第二托盘。落位、换十、剩余显示均动。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "tenframe",
+        "units",
+        "rabbit-cover"
+      ],
+      "widgetType": "game",
+      "teacherDemoTargets": [
+        "#ten-board",
+        "#unit-bank",
+        "#remainder-tray"
+      ]
+    },
+    {
+      "page": 5,
+      "key": "p05",
+      "type": "interactive",
+      "title": "沿石径跳两段",
+      "goalIds": [
+        "two_jumps"
+      ],
+      "play": "8＋5示范从8向右跳2到10，再跳3到13；儿童独立用6＋9、9＋8的图形步长卡，兔子移动并画对应弧线。错误只提示检查起点、格数或是否先落10。",
+      "move": "8＋5示范从8向右跳2到10，再跳3到13；儿童独立用6＋9、9＋8的图形步长卡，兔子移动并画对应弧线。错误只提示检查起点、格数或是否先落10。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "numberline",
+        "rabbit-token",
+        "rabbit-cover"
+      ],
+      "widgetType": "game",
+      "teacherDemoTargets": [
+        "#path-start",
+        "#path-ten",
+        "#path-end"
+      ]
+    },
+    {
+      "page": 6,
+      "key": "p06",
+      "type": "slide",
+      "title": "两间小屋，怎样分才不漏",
+      "goalIds": [
+        "fixed_total"
+      ],
+      "play": "始终显示12个可数标记，两房都住有兔子。至少示范1＋11、2＋10、3＋9到6＋6。若区分左右房，镜像仍是另一种房号分法；相同的6＋6只算一次。",
+      "move": "始终显示12个可数标记，两房都住有兔子。至少示范1＋11、2＋10、3＋9到6＋6。若区分左右房，镜像仍是另一种房号分法；相同的6＋6只算一次。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "rabbit-token",
+        "houses",
+        "units"
+      ]
+    },
+    {
+      "page": 7,
+      "key": "p07",
+      "type": "interactive",
+      "title": "只搬一只，总数还在",
+      "goalIds": [
+        "fixed_total"
+      ],
+      "play": "同一只兔子从右房移到左房，两个计数同时变化，合计条不变。依次做3和9到4和8、5和7到6和6等；首错提示来源与去处。",
+      "move": "同一只兔子从右房移到左房，两个计数同时变化，合计条不变。依次做3和9到4和8、5和7到6和6等；首错提示来源与去处。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "rabbit-token",
+        "houses",
+        "rabbit-cover"
+      ],
+      "widgetType": "game",
+      "teacherDemoTargets": [
+        "#left-house",
+        "#right-house",
+        "#total-strip"
+      ]
+    },
+    {
+      "page": 8,
+      "key": "p08",
+      "type": "slide",
+      "title": "只添一只，合起来也多一",
+      "goalIds": [
+        "fixed_addend"
+      ],
+      "play": "清楚展示左边4只不变，右边从7到8到9，是从外面新来。总数11到12到13。用图对比P07搬屋，标明原先总量不守恒的原因是外面新增。",
+      "move": "清楚展示左边4只不变，右边从7到8到9，是从外面新来。总数11到12到13。用图对比P07搬屋，标明原先总量不守恒的原因是外面新增。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "rabbit-token",
+        "units",
+        "houses"
+      ]
+    },
+    {
+      "page": 9,
+      "key": "p09",
+      "type": "interactive",
+      "title": "挑两盒，刚刚好",
+      "goalIds": [
+        "exact_pair"
+      ],
+      "play": "三盒各6、8、10枚种子饼，选两盒送上餐垫，目标16。每选一盒就真的移到垫上，撤回可再选；错答图示还差或有余，不揭答案。老师先对比不足，再解释恰好方案。",
+      "move": "三盒各6、8、10枚种子饼，选两盒送上餐垫，目标16。每选一盒就真的移到垫上，撤回可再选；错答图示还差或有余，不揭答案。老师先对比不足，再解释恰好方案。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "pair-boxes",
+        "units",
+        "rabbit-cover"
+      ],
+      "widgetType": "game",
+      "teacherDemoTargets": [
+        "#tray-choices",
+        "#delivery-mat",
+        "#target-count"
+      ]
+    },
+    {
+      "page": 10,
+      "key": "p10",
+      "type": "quiz",
+      "title": "换个场景试一试",
+      "goalIds": [
+        "join_two_groups",
+        "count_and_exchange",
+        "bridge_ten",
+        "two_jumps",
+        "fixed_total",
+        "fixed_addend",
+        "exact_pair"
+      ],
+      "play": "分六题，一屏一题。题干、情境和数字组合根据出题蓝图原创，图片选项遮字仍可判断。",
+      "move": "分六题，一屏一题。题干、情境和数字组合根据出题蓝图原创，图片选项遮字仍可判断。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "quiz-diagrams"
+      ]
+    },
+    {
+      "page": 11,
+      "key": "p11",
+      "type": "slide",
+      "title": "把办法带回小屋",
+      "goalIds": [
+        "join_two_groups",
+        "count_and_exchange",
+        "bridge_ten",
+        "two_jumps",
+        "fixed_total",
+        "fixed_addend",
+        "exact_pair"
+      ],
+      "play": "逐次点亮两群合计、凑十两跳、搬动与新增、挑正好及家庭凑11。只表述可观测的页面行为。",
+      "move": "逐次点亮两群合计、凑十两跳、搬动与新增、挑正好及家庭凑11。只表述可观测的页面行为。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "rabbit-cover",
+        "rabbit-token",
+        "tenframe",
+        "houses",
+        "pair-boxes"
+      ]
+    }
+  ],
+  "assessments": [
+    {
+      "key": "q01",
+      "skill": "join_two_groups",
+      "quantityPlan": "收两袋松果，每袋8枚，选择总共16枚的图。选项图15、16、17枚，正确B。"
+    },
+    {
+      "key": "q02",
+      "skill": "bridge_ten",
+      "quantityPlan": "有7盏亮灯，另外7盏待装。先选刚好补满十格的一组。选项图2、4、3枚，正确C。"
+    },
+    {
+      "key": "q03",
+      "skill": "two_jumps",
+      "quantityPlan": "小船从6号格出发一共走7格，选先到十的路线。选项都从6出发，A为6→10→13、B为6→9→13、C为6→10→12，正确A。图中弧线与刻度均严格对应。"
+    },
+    {
+      "key": "q04",
+      "skill": "fixed_total",
+      "quantityPlan": "两边分别4与9朵纸花，从右盘往左盘搬一朵。选项用两区数量图，4与8、5与8、5与9，正确B。"
+    },
+    {
+      "key": "q05",
+      "skill": "fixed_addend",
+      "quantityPlan": "白篮原有3颗、蓝篮原有8颗，白篮不动，只向蓝篮新放2颗。选总数图12、14、13，正确C。"
+    },
+    {
+      "key": "q06",
+      "skill": "exact_pair",
+      "quantityPlan": "给18个木偶一人一块徽章，盒子分别8、9、10枚，选恰好两盒；A为8与10、B为8与9、C为9与10，正确A。"
+    }
+  ],
+  "afterClass": {
+    "officialTextbook": "印刷13页第4题和官方作业第2页：家人一起找能凑成11的数对。",
+    "practice": "用手边的小物件或数卡轮流配成11，说出一条加法算式；是否会解释及能否纸笔记录待观察。",
+    "weeklyQuestionSources": {
+      "goals": [
+        "从图中数出两群同类对象，解释求总数用加法。",
+        "从一个加数接着数，并解释十个一换成一个十时总数不变。",
+        "把一个加数拆成补十与剩余两部分，比较两种正确拆法，算成十加几。",
+        "在数线上从起点向右先跳到十、再跳剩余格，两跳格数合起来是所加的数。",
+        "有序枚举两房都有人时的分配，解释搬一个使一房多一、另一房少一，总数不变。",
+        "在一个加数保持不变时，解释另一个加数多一，和也多一。",
+        "根据正好够用的总量，从三盒中选两盒，并用加法核对。"
+      ],
+      "exerciseFocus": [
+        "两群合计",
+        "接着数和换十",
+        "两种拆分凑十",
+        "数线分步",
+        "正数分组、和不变与固定加数变化",
+        "恰好够用的两件组合",
+        "家庭凑11"
+      ],
+      "assessmentBoundary": "页面记录摆放、重试和选择；数实物、口述算理、写算式与家庭合作均待成人观察。"
+    }
+  }
+}

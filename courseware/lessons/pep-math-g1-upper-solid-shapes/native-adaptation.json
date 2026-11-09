@@ -1,0 +1,978 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "reviewedAt": "2026-11-05T18:05:00.663249+00:00",
+  "nativeAuthor": {
+    "via": "OpenMAIC",
+    "providerId": "deepseek",
+    "modelId": "deepseek-v4-pro",
+    "modelPolicyId": "deepseek-v4-pro-current-flash-v1",
+    "jobId": "6YStJXa06i",
+    "classroomId": "y37v_mN-98",
+    "frozenInputSha256": "85fdcec9781565c819ed202e41cbbbc9d5e3bcce53b1e103408e3c338eccf9e9",
+    "nativeClassroomSha256": "c4315637ee74b64b855d1e13314e38ccd758ef5ae1aa3c9d2a75d94c827a2191"
+  },
+  "revisionAuthor": {
+    "model": "gpt-6.1-sol",
+    "role": "校准教材和题图、拆分原生段落、适配互动及补足明确缺项"
+  },
+  "formalLessonSha256": "d0d4c3f2c8af12f390b13e6d13d8e8257be22c8c7e7a5814a0d19e8ad767d9ec",
+  "prototypeLessonSha256": "b3398c1535c17dc86463dd9587ec400dbcbca1e182286ac2230e971604902f76",
+  "sourceBodyPreserved": true,
+  "sceneMap": [
+    {
+      "sourceSceneId": "scene_1DREUIVG4c",
+      "sourceOutlineId": "scene_1",
+      "targetSceneKey": "welcome",
+      "type": "slide",
+      "sourceSpeechCount": 9,
+      "reason": [
+        "将长段落拆为适合一年级配音的短句。",
+        "换成已审核情境封面；按教材用整体观察、触感和滚动作为线索。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "welcome-1",
+          "nativeActionId": "action_hl4A_Bf2",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-2",
+          "nativeActionId": "action_cmxy_Hj4",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-3",
+          "nativeActionId": "action_cmxy_Hj4",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-4",
+          "nativeActionId": "action_wqat3isz",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-5",
+          "nativeActionId": "action_wqat3isz",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-6",
+          "nativeActionId": "action_zW__x_QX",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-7",
+          "nativeActionId": "action__zlsTUEf",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-8",
+          "nativeActionId": "action__zlsTUEf",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-9",
+          "nativeActionId": "action_N6J11DY5",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-10",
+          "nativeActionId": "action_pnpCgB09",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-11",
+          "nativeActionId": "action_pnpCgB09",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-12",
+          "nativeActionId": "action_6a7pjWlM",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-13",
+          "nativeActionId": "action_U3nDnxnr",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-14",
+          "nativeActionId": "action_U3nDnxnr",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-15",
+          "nativeActionId": "action_HOxpBApL",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "welcome-16",
+          "nativeActionId": "action_8kaargAn",
+          "type": "say",
+          "origin": "native-revised"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_eDaKCSpFsC",
+      "sourceOutlineId": "scene_2",
+      "targetSceneKey": "turn",
+      "type": "interactive",
+      "sourceSpeechCount": 4,
+      "reason": [
+        "保留原生多角度活动；用公共框架的实际弯箭头和两种视图代替原生滑块。",
+        "补足五句下限并将方向切换放在讲解之前。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "turn-1",
+          "nativeActionId": "action_rCCkw1pz",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-2",
+          "nativeActionId": "action_r_71UCRf",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-3",
+          "nativeActionId": "action_r_71UCRf",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-4",
+          "nativeActionId": "action_5lpq8-el",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-5",
+          "nativeActionId": "action_r_71UCRf",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-6",
+          "nativeActionId": "action_HIbWswhj",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-7",
+          "nativeActionId": "action_tBMEVNWD",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-8",
+          "nativeActionId": "action_tBMEVNWD",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-9",
+          "nativeActionId": "action_tBMEVNWD",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-10",
+          "nativeActionId": "action_iFQ9Sm85",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-11",
+          "nativeActionId": "action_aQOfiiCA",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-12",
+          "nativeActionId": "action_aQOfiiCA",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-13",
+          "nativeActionId": null,
+          "type": "setState",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "turn-14",
+          "nativeActionId": "action_aQOfiiCA",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "turn-15",
+          "nativeActionId": "action_aQOfiiCA",
+          "type": "say",
+          "origin": "native-revised"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_PFzbvQ5wI-",
+      "sourceOutlineId": "scene_3",
+      "targetSceneKey": "roll",
+      "type": "interactive",
+      "sourceSpeechCount": 3,
+      "reason": [
+        "原生只有三段话和球的状态，没有球的口头讲解；补出对比并保留原生三段动作。",
+        "用当前桌面状态说明滚动，避免把滚动绝对化。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "roll-1",
+          "nativeActionId": "action_RGpCYHDq",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-2",
+          "nativeActionId": "action_D09xH2OZ",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-3",
+          "nativeActionId": "action_D09xH2OZ",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-4",
+          "nativeActionId": "action_D09xH2OZ",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-5",
+          "nativeActionId": "action_sBmgolyV",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-6",
+          "nativeActionId": "action_Nli195cI",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-7",
+          "nativeActionId": "action_Nli195cI",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-8",
+          "nativeActionId": "action_XBLnWp0q",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-9",
+          "nativeActionId": "action_AwXQywVc",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-10",
+          "nativeActionId": "action_09zLGIW6",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-11",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "roll-12",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "roll-13",
+          "nativeActionId": "action_Eq5fxYnG",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-14",
+          "nativeActionId": "action_Nli195cI",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "roll-15",
+          "nativeActionId": null,
+          "type": "setState",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "roll-16",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "roll-17",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "required-calibration"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_MumqCgmUQz",
+      "sourceOutlineId": "scene_4",
+      "targetSceneKey": "atlas",
+      "type": "slide",
+      "sourceSpeechCount": 6,
+      "reason": [
+        "保留四种形体的原生顺序；使用实物和模型有意分开。",
+        "用匹配的四种图及实际聚光位置代替原生占位图。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "atlas-1",
+          "nativeActionId": "action_Fs-wAHCq",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-2",
+          "nativeActionId": "action_vdiFPNvy",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-3",
+          "nativeActionId": "action_N9CbmFGk",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-4",
+          "nativeActionId": "action_u7a307wI",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-5",
+          "nativeActionId": "action_u7a307wI",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-6",
+          "nativeActionId": "action_idEeeNKa",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-7",
+          "nativeActionId": "action_idEeeNKa",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-8",
+          "nativeActionId": "action_vSrNCkUH",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-9",
+          "nativeActionId": "action_1y545GwV",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-10",
+          "nativeActionId": "action_1y545GwV",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-11",
+          "nativeActionId": "action_YSzpnvuH",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-12",
+          "nativeActionId": "action_i54LpHOb",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-13",
+          "nativeActionId": "action_i54LpHOb",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-14",
+          "nativeActionId": "action_TcwmeBnT",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "atlas-15",
+          "nativeActionId": "action_TcwmeBnT",
+          "type": "say",
+          "origin": "native-revised"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_qEpMhjNtL6",
+      "sourceOutlineId": "scene_5",
+      "targetSceneKey": "sort",
+      "type": "interactive",
+      "sourceSpeechCount": 4,
+      "reason": [
+        "将原生正方体示范映射为公共框架实际首件橡皮，保留实物与模型同形归架。",
+        "加入整体分类和颜色无关的具体对比。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "sort-1",
+          "nativeActionId": null,
+          "type": "setState",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "sort-2",
+          "nativeActionId": "action_rCDr0sx7",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-3",
+          "nativeActionId": "action_rCDr0sx7",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-4",
+          "nativeActionId": "action_lbZcGrOy",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-5",
+          "nativeActionId": "action_wWKq2Ih6",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-6",
+          "nativeActionId": "action_wWKq2Ih6",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-7",
+          "nativeActionId": "action_dkzYqpuq",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-8",
+          "nativeActionId": "action_jumGqvsN",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-9",
+          "nativeActionId": "action_MyTXgKZR",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-10",
+          "nativeActionId": "action_jumGqvsN",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-11",
+          "nativeActionId": "action_jumGqvsN",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-12",
+          "nativeActionId": null,
+          "type": "setState",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "sort-13",
+          "nativeActionId": "action_6xdKWK8C",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "sort-14",
+          "nativeActionId": "action_6xdKWK8C",
+          "type": "say",
+          "origin": "native-revised"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_ejfzws-8Gy",
+      "sourceOutlineId": "scene_6",
+      "targetSceneKey": "clues",
+      "type": "interactive",
+      "sourceSpeechCount": 4,
+      "reason": [
+        "原生只有泛化提示，补足每条线索如何对应候选形状。",
+        "沿用原生看印痕、看轨迹和揭盖，绑定经过验收的真实目标。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "clues-1",
+          "nativeActionId": "action_OVMVKrjA",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-2",
+          "nativeActionId": "action_VOTMbfvX",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-3",
+          "nativeActionId": "action_VOTMbfvX",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-4",
+          "nativeActionId": "action_uZfWAOv5",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-5",
+          "nativeActionId": "action_Avzibv1Q",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-6",
+          "nativeActionId": "action_Avzibv1Q",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-7",
+          "nativeActionId": "action_EJzYGxj2",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-8",
+          "nativeActionId": "action_qvvITlGj",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-9",
+          "nativeActionId": "action_qvvITlGj",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-10",
+          "nativeActionId": "action_lx9E1Ds1",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-11",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "clues-12",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "clues-13",
+          "nativeActionId": null,
+          "type": "setState",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "clues-14",
+          "nativeActionId": "action_v5vyhVkI",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "clues-15",
+          "nativeActionId": "action_v5vyhVkI",
+          "type": "say",
+          "origin": "native-revised"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_lzqdXgqxkP",
+      "sourceOutlineId": "scene_7",
+      "targetSceneKey": "stack",
+      "type": "interactive",
+      "sourceSpeechCount": 6,
+      "reason": [
+        "修正原生状态将圆柱误选为底座及先展示学生正确答案的问题。",
+        "保留原生先后、上下和平面相贴的结构。教师示范上层圆柱，学生迁移上层正方体。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "stack-1",
+          "nativeActionId": "action_q0gQFle9",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-2",
+          "nativeActionId": "action_uI_j6JXf",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-3",
+          "nativeActionId": "action_uI_j6JXf",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-4",
+          "nativeActionId": "action_9EMuy-Mq",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-5",
+          "nativeActionId": "action_LAZEJwWp",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-6",
+          "nativeActionId": "action_b9ge_004",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-7",
+          "nativeActionId": "action_NKnWtoy6",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-8",
+          "nativeActionId": "action_NKnWtoy6",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-9",
+          "nativeActionId": "action_PFIXG5DR",
+          "type": "setState",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-10",
+          "nativeActionId": "action_zJZgDuF4",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-11",
+          "nativeActionId": "action_zJZgDuF4",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-12",
+          "nativeActionId": "action_GRSpWcoF",
+          "type": "highlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-13",
+          "nativeActionId": "action__FgHGGiV",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-14",
+          "nativeActionId": "action__FgHGGiV",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-15",
+          "nativeActionId": null,
+          "type": "setState",
+          "origin": "required-calibration"
+        },
+        {
+          "targetActionId": "stack-16",
+          "nativeActionId": "action_vNG4rMb1",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "stack-17",
+          "nativeActionId": "action_vNG4rMb1",
+          "type": "say",
+          "origin": "native-revised"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_eL06mZP0wk",
+      "sourceOutlineId": "scene_8",
+      "targetSceneKey": "check",
+      "type": "quiz",
+      "sourceIntroIds": [
+        "action_gvTho4Ww",
+        "action_qikcmsYN"
+      ],
+      "reason": [
+        "保留原生小检查的位置与六项任务，题图绑定和明显教材错项按逐题映射修订。"
+      ],
+      "questionMap": [
+        {
+          "nativeQuestionId": "q1",
+          "nativeAnswer": [
+            "A"
+          ],
+          "targetQuestionId": "solid-q1",
+          "targetAnswer": [
+            "A"
+          ],
+          "reason": "原生 q1 保留实物辨长方体的问法；词语换成经过核验的现有图。"
+        },
+        {
+          "nativeQuestionId": "q2",
+          "nativeAnswer": [
+            "C"
+          ],
+          "targetQuestionId": "solid-q2",
+          "targetAnswer": [
+            "C"
+          ],
+          "reason": "原生 q2 从单看俯视平面改为本课多角度辨认整体，配图不向学生提前给名称。"
+        },
+        {
+          "nativeQuestionId": "q3",
+          "nativeAnswer": [
+            "B"
+          ],
+          "targetQuestionId": "solid-q3",
+          "targetAnswer": [
+            "B"
+          ],
+          "reason": "原生 q3 答案标成站立，解析却指滚动。改用同一实物两姿势图，唯一答案 B。"
+        },
+        {
+          "nativeQuestionId": "q4",
+          "nativeAnswer": [
+            "A"
+          ],
+          "targetQuestionId": "solid-q4",
+          "targetAnswer": [
+            "A"
+          ],
+          "reason": "原生 q4 保留运动线索，把光滑换成可区分球和圆柱的平面线索。"
+        },
+        {
+          "nativeQuestionId": "q5",
+          "nativeAnswer": [
+            "C"
+          ],
+          "targetQuestionId": "solid-q5",
+          "targetAnswer": [
+            "C"
+          ],
+          "reason": "原生 q5 保留模型与实物匹配；改为看圆柱模型找未练过的实物，加入上大下小的杯子。"
+        },
+        {
+          "nativeQuestionId": "q6",
+          "nativeAnswer": [
+            "C"
+          ],
+          "targetQuestionId": "solid-q6",
+          "targetAnswer": [
+            "B"
+          ],
+          "reason": "原生 q6 三层堆叠把积木压在球上，超出教材范围；改为同一先后和上下目标的两块搭放。"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_aMyUG0btrj",
+      "sourceOutlineId": "scene_9",
+      "targetSceneKey": "recap",
+      "type": "slide",
+      "sourceSpeechCount": 6,
+      "reason": [
+        "保留原生回家找形状、归类、看面、滚动的复盘。",
+        "删去蒙眼与绝对运动表述，补入两块搭放迁移。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "recap-1",
+          "nativeActionId": "action_n4FOBacn",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-2",
+          "nativeActionId": "action_dvef0gVw",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-3",
+          "nativeActionId": "action_dvef0gVw",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-4",
+          "nativeActionId": "action_gsCVFov1",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-5",
+          "nativeActionId": "action_ANntn-M1",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-6",
+          "nativeActionId": "action_BY2kRqDO",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-7",
+          "nativeActionId": "action_BY2kRqDO",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-8",
+          "nativeActionId": "action_LYn92yqW",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-9",
+          "nativeActionId": "action_UARGdUVd",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-10",
+          "nativeActionId": "action_UARGdUVd",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-11",
+          "nativeActionId": "action_UARGdUVd",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-12",
+          "nativeActionId": "action_MOQhsbTh",
+          "type": "spotlight",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-13",
+          "nativeActionId": "action_gslgwGh2",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-14",
+          "nativeActionId": "action_KFxB4MDd",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-15",
+          "nativeActionId": "action_KFxB4MDd",
+          "type": "say",
+          "origin": "native-revised"
+        },
+        {
+          "targetActionId": "recap-16",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "G7-correction"
+        },
+        {
+          "targetActionId": "recap-17",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "G7-correction"
+        },
+        {
+          "targetActionId": "recap-18",
+          "nativeActionId": null,
+          "type": "say",
+          "origin": "G7-correction"
+        }
+      ]
+    }
+  ],
+  "independentReviewCorrection": {
+    "revisedAt": "2026-11-05T18:17:11.428394+00:00",
+    "previousReceiptPath": "output/courseware-lessons/pep-math-g1-upper-solid-shapes/release-work-v1/verification-pre-audio.json",
+    "edits": [
+      "atlas-14 限定在本课按形状归类。",
+      "回顾增加宽纸盒和小方盒的现实迁移示范。"
+    ]
+  }
+}

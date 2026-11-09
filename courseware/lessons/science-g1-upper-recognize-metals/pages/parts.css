@@ -1,0 +1,25 @@
+#play { color:#503627; }
+#cv:has(#ready:not(.gone)) #play { visibility:hidden; }
+#parts-board, #parts-card { position:absolute; top:16px; height:512px; border:3px solid #bd966d; border-radius:26px; background:#fff9ec; }
+#parts-board { left:56px; width:512px; }
+#parts-image { position:absolute; inset:3px; width:500px; height:500px; border-radius:19px; }
+.part-target { position:absolute; width:98px; height:98px; margin:-49px; border:5px dashed #1f686a; border-radius:50%; background:#fff8e212; box-shadow:0 0 0 4px #fffdf2d9; cursor:grab; touch-action:none; }
+.part-target::after { position:absolute; inset:35px; border:4px solid #fff9ed; border-radius:50%; background:#28656a; content:''; pointer-events:none; }
+.part-target.dragging { z-index:8; cursor:grabbing; }
+.part-target.selected { border-style:solid; border-color:#28704a; }
+.part-target:disabled { cursor:default; }
+.part-target:focus-visible, #parts-retry:focus-visible { outline:6px solid #28476b; outline-offset:7px; }
+#parts-card { right:52px; width:510px; padding:20px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+#parts-card h2, #parts-label { margin:0; text-align:center; }
+#parts-card h2 { font-size:40px; }
+#parts-label { font-size:28px; }
+#parts-slot { position:relative; width:378px; height:328px; display:grid; place-items:center; border:5px dashed #b98c62; border-radius:20px; background:#fff3d9; color:#a07557; }
+#parts-slot.filled { border-style:solid; border-color:#458361; }
+#parts-slot svg { width:110px; height:110px; }
+#parts-saved { position:absolute; width:292px; height:292px; }
+#parts-result { width:100%; height:100%; display:block; border-radius:14px; }
+#parts-marker { position:absolute; width:58px; height:58px; margin:-29px; border:5px solid #27724b; box-shadow:0 0 0 4px #fff9ec; border-radius:50%; }
+#parts-retry { position:absolute; left:217px; top:208px; min-width:186px; min-height:98px; z-index:12; }
+.parts-failed { opacity:.25; }
+#ready .pic { width:480px; height:270px; }
+#ready p { margin:10px 0 18px; }

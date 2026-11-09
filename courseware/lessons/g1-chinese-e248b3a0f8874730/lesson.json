@@ -1,0 +1,854 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "我是中国人",
+  "description": "五四学制人教语文一年级上册入学教育整课：国名与首都、56个民族的共同身份、尊重友爱和共同参与；听读三句话，口语待家人观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "清楚温和的语文女老师，借图片与生活情境解释词句，尊重每位伙伴，不把操作成功当作朗读和表达能力。"
+    }
+  },
+  "images": {
+    "family": {
+      "file": "assets/family.png"
+    },
+    "beijing": {
+      "file": "assets/beijing.png"
+    },
+    "partners": {
+      "file": "assets/partners.png"
+    },
+    "craft": {
+      "file": "assets/craft.png"
+    },
+    "help": {
+      "file": "assets/help.png"
+    },
+    "grab": {
+      "file": "assets/grab.png"
+    },
+    "ignore": {
+      "file": "assets/ignore.png"
+    },
+    "welcome": {
+      "file": "assets/welcome.png"
+    },
+    "leftout": {
+      "file": "assets/leftout.png"
+    },
+    "q1-family": {
+      "file": "assets/q1-family.png"
+    },
+    "q1-class": {
+      "file": "assets/q1-class.png"
+    },
+    "q1-park": {
+      "file": "assets/q1-park.png"
+    },
+    "q2-library": {
+      "file": "assets/q2-library.png"
+    },
+    "q2-beijing": {
+      "file": "assets/q2-beijing.png"
+    },
+    "q2-playground": {
+      "file": "assets/q2-playground.png"
+    },
+    "q3-laugh": {
+      "file": "assets/q3-laugh.png"
+    },
+    "q3-listen": {
+      "file": "assets/q3-listen.png"
+    },
+    "q4-all": {
+      "file": "assets/q4-all.png"
+    },
+    "q4-exclude": {
+      "file": "assets/q4-exclude.png"
+    },
+    "q4-alone": {
+      "file": "assets/q4-alone.png"
+    },
+    "q3-turn-away": {
+      "file": "assets/q3-turn-away.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "从我们的家说起",
+      "template": "picture-points",
+      "data": {
+        "title": "从我们的家说起",
+        "picture": "family",
+        "points": [
+          "家人相伴的小家",
+          "我们共同生活的国家：中国",
+          "祖国，联系着许许多多小家"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "相册里，家人坐在一起，听孩子说今天的发现。"
+        },
+        {
+          "say": "你和照顾你的家人，一起组成自己的小家。"
+        },
+        {
+          "say": "小满问：每家的样子，都会完全一样吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "不会呀，家里的人不同，生活的样子也不同。"
+        },
+        {
+          "say": "我们可以关心家人，也可以了解家外的世界。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "许许多多的小家，生活在同一个国家里。"
+        },
+        {
+          "say": "我们今天认识的国家叫中国。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "说起祖国，就是说我们共同生活的国家。"
+        },
+        {
+          "say": "中国把许许多多的小家联系在一起。"
+        },
+        {
+          "say": "猫头鹰站长提醒：小家和国家，要听清楚。",
+          "by": "owl"
+        },
+        {
+          "say": "先记住中国，再来认识祖国完整的名字。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "祖国的名字",
+      "template": "picture-points",
+      "data": {
+        "title": "祖国的名字",
+        "picture": "family",
+        "points": [
+          "中国",
+          "中华人民共和国"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "家人整理相册，也给相册写上清楚的名字。"
+        },
+        {
+          "say": "认识一个国家，同样要知道它的名字。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "平时，我们常常用中国这个名字。"
+        },
+        {
+          "say": "跟老师慢慢说一遍，中国。"
+        },
+        {
+          "say": "朵朵问：祖国还有完整的名字吗？",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "有呀，我国的全名是中华人民共和国。"
+        },
+        {
+          "say": "老师分清字音，再连起来说给你听。"
+        },
+        {
+          "say": "中华人民共和国，这是我国的全名。"
+        },
+        {
+          "say": "中国和这个全名，说的是同一个国家。"
+        },
+        {
+          "say": "猫头鹰站长提醒：名字可以长短不同。",
+          "by": "owl"
+        },
+        {
+          "say": "请试着说给家人听，老师不替你打朗读分。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "首都北京",
+      "template": "big-word",
+      "data": {
+        "title": "认识首都北京",
+        "word": "北京",
+        "picture": "beijing",
+        "hint": "北京是我国的首都"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "旅行相册翻到一座有三层蓝屋顶的建筑。"
+        },
+        {
+          "say": "它叫祈年殿，在北京天坛。"
+        },
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "北京，跟老师把这个名字说清楚。"
+        },
+        {
+          "say": "小满问：我们为什么特别记住北京呢？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "因为北京是我国的首都。"
+        },
+        {
+          "say": "听到首都，就把它和北京联系起来。"
+        },
+        {
+          "say": "看到圆圆的蓝屋顶，可以想起北京的祈年殿。"
+        },
+        {
+          "say": "这张照片记录的是地方，不是一个人的家。"
+        },
+        {
+          "say": "猫头鹰站长提醒：我国的首都是北京。",
+          "by": "owl"
+        },
+        {
+          "say": "接下来，听任务，把照片放进合适的相册。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "整理旅行相册",
+      "page": "album",
+      "widgetType": "game",
+      "startImage": "craft",
+      "script": [
+        {
+          "highlight": "#album-photo-craft"
+        },
+        {
+          "say": "相册会替我们保存有意思的画面。"
+        },
+        {
+          "say": "老师先放一张大家共同画画的照片。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "照片进入活动页，记录的是一起做事。"
+        },
+        {
+          "highlight": "#album-target"
+        },
+        {
+          "say": "所以选照片时，要先想这页记录什么。"
+        },
+        {
+          "say": "接下来听任务，再看照片里的地方。"
+        },
+        {
+          "say": "先把一家人在家里的照片放进家庭页。"
+        },
+        {
+          "say": "下一页，再找首都北京的照片。"
+        },
+        {
+          "say": "可以拖进去，也可先点照片再点相册。"
+        },
+        {
+          "say": "放错会回到原处，不会扣掉你的星星。"
+        },
+        {
+          "say": "想一想，照片记录的是谁，又是哪里。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "相册小检查",
+      "intro": [
+        "老师读题，你看新图片来选择。",
+        "先想画面说的是家人，还是某个地方。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "家人想介绍自己的小家。哪张图最合适？",
+          "skill": "小家与祖国",
+          "answer": [
+            "A"
+          ],
+          "analysis": "孩子与家人在家中相伴，表现的是小家；教室和公园表示别的生活场所。",
+          "options": {
+            "A": {
+              "label": "家中相伴",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-family",
+                "alt": "孩子与长辈在家中看相册"
+              }
+            },
+            "B": {
+              "label": "学校课堂",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-class",
+                "alt": "老师和同学在教室里"
+              }
+            },
+            "C": {
+              "label": "公共公园",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-park",
+                "alt": "公园的小路与游乐设施"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "朋友想找首都北京的祈年殿。哪张图画的是它？",
+          "skill": "首都北京",
+          "answer": [
+            "B"
+          ],
+          "analysis": "蓝色圆屋顶是祈年殿的外观线索。它在北京，北京是我国的首都。",
+          "options": {
+            "A": {
+              "label": "社区图书馆",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-library",
+                "alt": "现代社区图书馆"
+              }
+            },
+            "B": {
+              "label": "北京天坛祈年殿",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-beijing",
+                "alt": "从另一个方向看北京天坛祈年殿"
+              }
+            },
+            "C": {
+              "label": "学校操场",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-playground",
+                "alt": "跑道和球架组成的学校操场"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "很多民族，共同的家",
+      "template": "picture-points",
+      "data": {
+        "title": "很多民族，共同的家",
+        "picture": "craft",
+        "points": [
+          "我国有56个民族",
+          "我们都是中国人",
+          "各民族平等友爱"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "画面里的伙伴，一起做着喜欢的事情。"
+        },
+        {
+          "say": "他们的衣服和笑容，各有自己的样子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我国是一个多民族的国家，共有五十六个民族。"
+        },
+        {
+          "say": "图里只是一些伙伴，不是在画五十六个人。"
+        },
+        {
+          "say": "朵朵问：不同民族的小朋友，都能一起玩吗？",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "当然可以，各民族的人都是中国人。"
+        },
+        {
+          "say": "我们有共同的国家，也有各自的生活习惯。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "相处时，要平等友爱，尊重彼此。"
+        },
+        {
+          "say": "不因为伙伴和自己不同，就把他留在一旁。"
+        },
+        {
+          "say": "猫头鹰站长提醒：不同民族，共同的家。",
+          "by": "owl"
+        },
+        {
+          "say": "我们用一个邀请伙伴的活动，体会这个意思。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "让每位伙伴都加入",
+      "page": "circle",
+      "widgetType": "game",
+      "startImage": "craft",
+      "script": [
+        {
+          "highlight": "#circle-zone"
+        },
+        {
+          "say": "我们的活动圈，要给每位伙伴留位置。"
+        },
+        {
+          "highlight": "#circle-child-1"
+        },
+        {
+          "say": "老师先请这位伙伴一起参与。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "他进入圈里，就成为共同活动的一员。"
+        },
+        {
+          "highlight": "#circle-links"
+        },
+        {
+          "say": "连起来的线，表示大家愿意互相陪伴。"
+        },
+        {
+          "say": "共同参与，要想到每一位伙伴。"
+        },
+        {
+          "say": "现在请把每位伙伴都邀请进圈。"
+        },
+        {
+          "say": "衣服和样子不同，都应受到友好邀请。"
+        },
+        {
+          "say": "先点一位，再点圈里的空位也可以。"
+        },
+        {
+          "say": "最后一位还在外面，就还没有完成。"
+        },
+        {
+          "say": "这里记录邀请的动作，不判断你的民族。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "友好相处有办法",
+      "template": "picture-points",
+      "data": {
+        "title": "友好相处有办法",
+        "picture": "craft",
+        "points": [
+          "尊重不同的习惯",
+          "邀请伙伴一起参与",
+          "遇到困难，友好相助"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "伙伴们一起做作品，想法不一定相同。"
+        },
+        {
+          "say": "先听别人说，再把自己的想法说明白。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "尊重就是不嘲笑别人，愿意认真了解。"
+        },
+        {
+          "say": "不知道的习惯，可以礼貌地请教大人。"
+        },
+        {
+          "say": "小满问：有人刚来，还没加入活动呢？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我们可以留出位置，友好地邀请他。"
+        },
+        {
+          "say": "大家一起参与，心里才会感到温暖。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看到伙伴有困难，还可以问问他需要什么。"
+        },
+        {
+          "say": "在能力范围里帮助他，也是在友好相处。"
+        },
+        {
+          "say": "猫头鹰站长提醒：先尊重，再一起做。",
+          "by": "owl"
+        },
+        {
+          "say": "下面的故事里，请你想想怎样让伙伴舒服些。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "把故事变友好",
+      "page": "story",
+      "widgetType": "game",
+      "startImage": "craft",
+      "script": [
+        {
+          "highlight": "#story-scene"
+        },
+        {
+          "say": "每个故事里，都有一位需要关心的伙伴。"
+        },
+        {
+          "say": "老师先示范，邀请朋友一起制作作品。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "桌边留了位置，朋友就能一起动手了。"
+        },
+        {
+          "highlight": "#story-target"
+        },
+        {
+          "say": "选择一种行为，会改变故事的结局。"
+        },
+        {
+          "say": "判断时，先看谁需要帮助，再想怎样做。"
+        },
+        {
+          "highlight": "#story-choices"
+        },
+        {
+          "say": "下面的图片，表示几种不同的做法。"
+        },
+        {
+          "say": "第一段故事，伙伴的画笔掉在地上了。"
+        },
+        {
+          "say": "第二段故事，新朋友还站在游戏圈外。"
+        },
+        {
+          "say": "把友好的做法移进故事，也可先点再放。"
+        },
+        {
+          "say": "先想为什么合适，放错可以重新试。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "伙伴小检查",
+      "intro": [
+        "听老师说新的故事，再看图片。",
+        "想一想，哪种做法尊重伙伴，也让大家一起参与。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "同学介绍自己的手工。怎样做更尊重他？",
+          "skill": "尊重友爱",
+          "answer": [
+            "C"
+          ],
+          "analysis": "认真听伙伴介绍、友好回应，表现出对伙伴的尊重。",
+          "options": {
+            "A": {
+              "label": "指着嘲笑",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-laugh",
+                "alt": "一名孩子指着新同学的手工作品嘲笑"
+              }
+            },
+            "B": {
+              "label": "转身离开",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-turn-away",
+                "alt": "一位孩子背对拿着手工作品的伙伴走开"
+              }
+            },
+            "C": {
+              "label": "认真倾听",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-listen",
+                "alt": "一名孩子认真听新同学介绍手工作品"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "大家准备一起拼图。哪张图让新伙伴也参加了？",
+          "skill": "共同参与",
+          "answer": [
+            "A"
+          ],
+          "analysis": "主动留出位置、邀请新伙伴一起拼图，表现共同参与和友好相处。",
+          "options": {
+            "A": {
+              "label": "留位邀请",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-all",
+                "alt": "大家拉开椅子邀请新伙伴一起拼图"
+              }
+            },
+            "B": {
+              "label": "挡在外面",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-exclude",
+                "alt": "大家挡住桌边，让新伙伴站在外面"
+              }
+            },
+            "C": {
+              "label": "各自独坐",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-alone",
+                "alt": "孩子们分别独坐，各做自己的活动"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "听老师读三句话",
+      "template": "summary",
+      "data": {
+        "title": "听老师读，试着说给家人听",
+        "items": [
+          "我是中国人。",
+          "我们都是中国人。",
+          "中华民族是一家。"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "第一句，我是中国人。"
+        },
+        {
+          "say": "这里的我，说的是正在介绍自己的那个人。"
+        },
+        {
+          "say": "可以指着自己，试着把这句话说清楚。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "第二句，我们都是中国人。"
+        },
+        {
+          "say": "从一个我，说到大家，就是我们。"
+        },
+        {
+          "say": "不同民族的伙伴，有共同的中国人身份。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "第三句，中华民族是一家。"
+        },
+        {
+          "say": "这里的一家，说的是团结友爱的关系。"
+        },
+        {
+          "say": "相互尊重、共同参与，能把这个意思做出来。"
+        },
+        {
+          "say": "朵朵说：我想把三句话，说给家人听。",
+          "by": "duoduo"
+        },
+        {
+          "say": "猫头鹰站长提醒：点过了，不等于会读了。",
+          "by": "owl"
+        },
+        {
+          "say": "请家人听一听，老师只记录你看过这页。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "把今天的发现带回家",
+      "template": "summary",
+      "data": {
+        "title": "把今天的发现带回家",
+        "items": [
+          "中国的全名：中华人民共和国",
+          "我国的首都：北京",
+          "我国有56个民族，我们都是中国人",
+          "互相尊重，共同参与，友好相助"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "我们认识了中国，也听清祖国完整的名字。"
+        },
+        {
+          "say": "中华人民共和国，是我国的全名。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "我国的首都是北京，祈年殿的图画帮我们记住它。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "我国有五十六个民族，各民族的人都是中国人。"
+        },
+        {
+          "say": "小满说：我记住了，共同的家里有许多伙伴。",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "与伙伴相处，要尊重、邀请，也要友好相助。"
+        },
+        {
+          "say": "回家后，可以和家人做一页自己的学习相册。"
+        },
+        {
+          "say": "也可一起了解喜欢的民族文化，再画画或展示。"
+        },
+        {
+          "say": "这些真实活动，请家人看一看、听一听。"
+        },
+        {
+          "say": "猫头鹰站长提醒：没有观察到的，就写待观察。",
+          "by": "owl"
+        },
+        {
+          "say": "今天先到这里，把发现慢慢说给家人听。"
+        }
+      ]
+    }
+  ]
+}

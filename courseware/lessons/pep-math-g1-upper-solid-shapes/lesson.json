@@ -1,0 +1,831 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "认识立体图形",
+  "description": "在玩具维修台翻看、试滚和归类，用平面、曲面、滚动和顺序认识长方体、正方体、圆柱、球。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "正式数学教师档案；先讲清相关信息和问题，边操作边解释整体与部分；低阅读、逐步提示，首错不揭答案，口述和纸笔均待观察。"
+    }
+  },
+  "images": {
+    "atlas": {
+      "file": "assets/atlas.png"
+    },
+    "chalkbox": {
+      "file": "assets/chalkbox.png"
+    },
+    "cube-plum": {
+      "file": "assets/cube-plum.png"
+    },
+    "cup": {
+      "file": "assets/cup.png"
+    },
+    "eraser": {
+      "file": "assets/eraser.png"
+    },
+    "face-front": {
+      "file": "assets/face-front.png"
+    },
+    "flat-plum": {
+      "file": "assets/flat-plum.png"
+    },
+    "gift": {
+      "file": "assets/gift.png"
+    },
+    "model-ball": {
+      "file": "assets/model-ball.png"
+    },
+    "model-box": {
+      "file": "assets/model-box.png"
+    },
+    "model-cube": {
+      "file": "assets/model-cube.png"
+    },
+    "model-tube": {
+      "file": "assets/model-tube.png"
+    },
+    "orange": {
+      "file": "assets/orange.png"
+    },
+    "parcel": {
+      "file": "assets/parcel.png"
+    },
+    "puck-side": {
+      "file": "assets/puck-side.png"
+    },
+    "puck": {
+      "file": "assets/puck.png"
+    },
+    "quiz-flat": {
+      "file": "assets/quiz-flat.png"
+    },
+    "quiz-stack-correct": {
+      "file": "assets/quiz-stack-correct.png"
+    },
+    "quiz-stack-reversed": {
+      "file": "assets/quiz-stack-reversed.png"
+    },
+    "quiz-stack-side": {
+      "file": "assets/quiz-stack-side.png"
+    },
+    "tube-side": {
+      "file": "assets/tube-side.png"
+    },
+    "tube": {
+      "file": "assets/tube.png"
+    },
+    "welcome": {
+      "file": "assets/welcome.png"
+    },
+    "yarn": {
+      "file": "assets/yarn.png"
+    },
+    "workshop-cover": {
+      "file": "assets/workshop-cover.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "welcome",
+      "type": "slide",
+      "title": "玩具维修台开门了",
+      "template": "picture-points",
+      "data": {
+        "title": "玩具维修台开门了",
+        "picture": "workshop-cover",
+        "points": [
+          "看整体",
+          "摸一摸平面和弯面",
+          "轻轻推一推"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小朋友们，大家好！"
+        },
+        {
+          "say": "今天，玩具维修台开门啦！"
+        },
+        {
+          "say": "看，台上有球和小盒子。"
+        },
+        {
+          "say": "我们要先认出它们的形状。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一步，用眼睛仔细看。"
+        },
+        {
+          "say": "看整个物品，也看看它的旁边。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二步，想象用手摸一摸。"
+        },
+        {
+          "say": "摸到的面是平平的，还是弯弯的？"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三步，轻轻推一推。"
+        },
+        {
+          "say": "看看它会不会滚，往哪里滚。"
+        },
+        {
+          "say": "把看、摸、滚的发现合起来。"
+        },
+        {
+          "say": "我们再按整体形状给物品分分类。"
+        }
+      ]
+    },
+    {
+      "key": "turn",
+      "type": "interactive",
+      "title": "方盒转个身",
+      "page": "turn",
+      "widgetType": "shape_rotation",
+      "startImage": "flat-plum",
+      "script": [
+        {
+          "setState": {
+            "mode": "front"
+          }
+        },
+        {
+          "say": "请仔细看，两个盒子的正面一样方。"
+        },
+        {
+          "say": "那它们是同一种形状吗？先别下结论。"
+        },
+        {
+          "highlight": "#turn-control"
+        },
+        {
+          "say": "用这个弯箭头，让它们转个身。"
+        },
+        {
+          "setState": {
+            "mode": "turned"
+          }
+        },
+        {
+          "say": "看，一个盒子的侧面还是方方的。"
+        },
+        {
+          "say": "另一个的侧面薄薄的。"
+        },
+        {
+          "say": "这个薄薄的盒子是扁长方体。"
+        },
+        {
+          "highlight": "#turn-cube"
+        },
+        {
+          "say": "另一个盒子的方形面一样大，是正方体。"
+        },
+        {
+          "say": "只看到一个方方的面，还不能分清。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "接下来请你也来转一转。"
+        },
+        {
+          "say": "先找正方体，再找扁长方体。"
+        }
+      ]
+    },
+    {
+      "key": "roll",
+      "type": "interactive",
+      "title": "站起来，滚出去",
+      "page": "roll",
+      "widgetType": "shape_roll",
+      "startImage": "tube-side",
+      "script": [
+        {
+          "setState": {
+            "mode": "upright"
+          }
+        },
+        {
+          "say": "看，圆柱稳稳地站住了。"
+        },
+        {
+          "say": "它有两个平平的圆面，大小一样。"
+        },
+        {
+          "say": "平圆面朝下，圆柱就能立在桌上。"
+        },
+        {
+          "highlight": "#roll-side"
+        },
+        {
+          "say": "接下来让圆柱躺下来。"
+        },
+        {
+          "say": "现在弯弯的侧面贴着桌面。"
+        },
+        {
+          "setState": {
+            "mode": "side"
+          }
+        },
+        {
+          "say": "从旁边轻轻推，它就向旁边滚起来。"
+        },
+        {
+          "setState": {
+            "mode": "sphere"
+          }
+        },
+        {
+          "say": "换成球，往另一个方向推，它也能滚。"
+        },
+        {
+          "say": "球没有平平的面，圆柱却有两个。"
+        },
+        {
+          "highlight": "#roll-track"
+        },
+        {
+          "say": "看两种滚动的路线，再想想哪儿贴着桌。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "先让圆柱滚，再让它站。"
+        },
+        {
+          "say": "最后找能换方向滚的形状。"
+        }
+      ]
+    },
+    {
+      "key": "atlas",
+      "type": "slide",
+      "title": "四种立体图形",
+      "template": "picture-points",
+      "data": {
+        "title": "四种立体图形",
+        "picture": "atlas",
+        "points": [
+          "长方体与正方体",
+          "圆柱",
+          "球"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们一起认识架上的四种立体图形。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看这个长长的盒子，它的形状像长方体。"
+        },
+        {
+          "say": "长方体有平平的面。"
+        },
+        {
+          "say": "再看方方正正的这块，它是正方体。"
+        },
+        {
+          "say": "它每一个面都是方方的，一样大。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第三个上下同样粗，叫圆柱。"
+        },
+        {
+          "say": "它有两个平平的圆面，放倒可以滚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后一个圆溜溜的，叫球。"
+        },
+        {
+          "say": "球换个方向推也能滚。"
+        },
+        {
+          "say": "这回按形状分，颜色和大小先放一边。"
+        },
+        {
+          "say": "我们要看物体的整体形状。"
+        }
+      ]
+    },
+    {
+      "key": "sort",
+      "type": "interactive",
+      "title": "把零件送回家",
+      "page": "sort",
+      "widgetType": "shape_sort",
+      "startImage": "welcome",
+      "script": [
+        {
+          "setState": {
+            "mode": "look"
+          }
+        },
+        {
+          "say": "刚才我们看过了四种立体图形。"
+        },
+        {
+          "say": "现在玩把零件送回家的游戏。"
+        },
+        {
+          "highlight": "#sort-item"
+        },
+        {
+          "say": "先别急着送，仔细看看这块橡皮。"
+        },
+        {
+          "say": "它的整个身子长长方方，有平面。"
+        },
+        {
+          "highlight": "#sort-shelf"
+        },
+        {
+          "say": "这里有四个模型架，等着零件回家。"
+        },
+        {
+          "setState": {
+            "mode": "placed"
+          }
+        },
+        {
+          "say": "我把它送到长方体模型的架上。"
+        },
+        {
+          "say": "橡皮和模型颜色不同，整体形状相同。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "现在请你也来试一试。"
+        },
+        {
+          "say": "把每件零件送到和它同形的架子。"
+        }
+      ]
+    },
+    {
+      "key": "clues",
+      "type": "interactive",
+      "title": "听线索，猜一猜",
+      "page": "clues",
+      "widgetType": "shape_inference",
+      "startImage": "atlas",
+      "script": [
+        {
+          "setState": {
+            "mode": "flat"
+          }
+        },
+        {
+          "say": "现在来玩听线索、猜形状的游戏。"
+        },
+        {
+          "say": "盖子下藏着一个立体图形。"
+        },
+        {
+          "highlight": "#clue-trace"
+        },
+        {
+          "say": "先看平面印痕和滚动的路线。"
+        },
+        {
+          "say": "它留下两个圆印，还能横过来滚。"
+        },
+        {
+          "setState": {
+            "mode": "revealed"
+          }
+        },
+        {
+          "say": "把这两条线索合起来想，这是圆柱。"
+        },
+        {
+          "say": "看，圆印来自它的两个平圆面。"
+        },
+        {
+          "highlight": "#clue-choices"
+        },
+        {
+          "say": "如果每个方形面一样大，可以想正方体。"
+        },
+        {
+          "say": "没有平面又能换方向滚，可以想球。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "你先看完线索，再选模型。"
+        },
+        {
+          "say": "第一次选错没关系，回头再比一比。"
+        }
+      ]
+    },
+    {
+      "key": "stack",
+      "type": "interactive",
+      "title": "照着顺序搭两块",
+      "page": "stack",
+      "widgetType": "shape_place",
+      "startImage": "model-box",
+      "script": [
+        {
+          "setState": {
+            "mode": "clear"
+          }
+        },
+        {
+          "say": "今天来当小小建筑师，照顺序搭两块。"
+        },
+        {
+          "say": "先仔细看这个空空的台子。"
+        },
+        {
+          "highlight": "#stack-base"
+        },
+        {
+          "say": "要先放下面的一块当底座。"
+        },
+        {
+          "setState": {
+            "mode": "base"
+          }
+        },
+        {
+          "say": "看，长方体平平的面贴着台子。"
+        },
+        {
+          "say": "底座的上面也平平的。"
+        },
+        {
+          "setState": {
+            "mode": "top"
+          }
+        },
+        {
+          "say": "我把小圆柱的平圆面放在底座上。"
+        },
+        {
+          "say": "平平的两面贴在一起，圆柱能站住。"
+        },
+        {
+          "highlight": "#stack-top"
+        },
+        {
+          "say": "第一块在下面，第二块才放到上面。"
+        },
+        {
+          "say": "放的先后和上下位置都要听清。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "这次先放长方体当底座。"
+        },
+        {
+          "say": "再把正方体放到它的上面。"
+        }
+      ]
+    },
+    {
+      "key": "check",
+      "type": "quiz",
+      "title": "换一批物品再试试",
+      "intro": [
+        "刚才我们认了几种立体图形，还动手搭了搭。",
+        "现在听老师读题，再看看每张图片。",
+        "每题选一张，想好了再点。"
+      ],
+      "questions": [
+        {
+          "id": "solid-q1",
+          "question": "下面哪个物品的整体形状像长方体？",
+          "skill": "实物辨认长方体",
+          "options": {
+            "A": {
+              "label": "扁扁的粉笔盒",
+              "visual": {
+                "kind": "asset",
+                "image": "chalkbox",
+                "alt": "扁扁的粉笔盒"
+              }
+            },
+            "B": {
+              "label": "圆圆的橙子",
+              "visual": {
+                "kind": "asset",
+                "image": "orange",
+                "alt": "圆圆的橙子"
+              }
+            },
+            "C": {
+              "label": "灰色的矮圆盒",
+              "visual": {
+                "kind": "asset",
+                "image": "puck",
+                "alt": "灰色的矮圆盒"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "粉笔盒长长扁扁，有平平的面，整体像长方体。橙子像球，灰色圆盒像圆柱。"
+        },
+        {
+          "id": "solid-q2",
+          "question": "把盒子转过来看，哪一个是正方体？",
+          "skill": "多角度辨认正方体",
+          "options": {
+            "A": {
+              "label": "扁蓝盒",
+              "visual": {
+                "kind": "asset",
+                "image": "chalkbox",
+                "alt": "扁蓝盒"
+              }
+            },
+            "B": {
+              "label": "正面方方的扁橙盒",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flat",
+                "alt": "正面方方的扁橙盒"
+              }
+            },
+            "C": {
+              "label": "带浅色纸带的小礼盒",
+              "visual": {
+                "kind": "asset",
+                "image": "gift",
+                "alt": "带浅色纸带的小礼盒"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "带纸带的小礼盒，方方的面一样大。扁橙盒的正面方方，侧面却薄。"
+        },
+        {
+          "id": "solid-q3",
+          "question": "这个矮圆柱怎样摆，朝旁边轻推就能滚？",
+          "skill": "圆柱横放能滚",
+          "options": {
+            "A": {
+              "label": "用圆面站着",
+              "visual": {
+                "kind": "asset",
+                "image": "puck",
+                "alt": "用圆面站着"
+              }
+            },
+            "B": {
+              "label": "用弯面躺着",
+              "visual": {
+                "kind": "asset",
+                "image": "puck-side",
+                "alt": "用弯面躺着"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "矮圆柱横放，让弯弯的侧面贴着桌，就能滚。平圆面朝下时，它可以站稳。"
+        },
+        {
+          "id": "solid-q4",
+          "question": "一件物品没有平平的面，换个方向推也能滚。它是哪一件？",
+          "skill": "用两条线索辨认球",
+          "options": {
+            "A": {
+              "label": "圆圆的橙子",
+              "visual": {
+                "kind": "asset",
+                "image": "orange",
+                "alt": "圆圆的橙子"
+              }
+            },
+            "B": {
+              "label": "四方的小礼盒",
+              "visual": {
+                "kind": "asset",
+                "image": "gift",
+                "alt": "四方的小礼盒"
+              }
+            },
+            "C": {
+              "label": "灰色的矮圆盒",
+              "visual": {
+                "kind": "asset",
+                "image": "puck",
+                "alt": "灰色的矮圆盒"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "橙子整体圆鼓鼓，形状像球。小礼盒有平面，矮圆盒也有两个平圆面。"
+        },
+        {
+          "id": "solid-q5",
+          "question": "哪件物品和图里的模型整体形状相同？",
+          "skill": "圆柱实物与模型匹配",
+          "options": {
+            "A": {
+              "label": "上大下小的杯子",
+              "visual": {
+                "kind": "asset",
+                "image": "cup",
+                "alt": "上大下小的杯子"
+              }
+            },
+            "B": {
+              "label": "四方的小礼盒",
+              "visual": {
+                "kind": "asset",
+                "image": "gift",
+                "alt": "四方的小礼盒"
+              }
+            },
+            "C": {
+              "label": "上下等粗的矮圆盒",
+              "visual": {
+                "kind": "asset",
+                "image": "puck",
+                "alt": "上下等粗的矮圆盒"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "矮圆盒上下一样粗，两个平圆面一样大。虽然比模型矮，形状还是像圆柱。",
+          "visual": {
+            "kind": "asset",
+            "image": "model-tube",
+            "alt": "蓝色圆柱模型"
+          }
+        },
+        {
+          "id": "solid-q6",
+          "question": "先把扁长方体放下面，再把正方体放到它上面。哪张搭对了？",
+          "skill": "按先后和上下搭放",
+          "options": {
+            "A": {
+              "label": "正方体在下，扁长方体在上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stack-reversed",
+                "alt": "正方体在下，扁长方体在上"
+              }
+            },
+            "B": {
+              "label": "扁长方体在下，正方体在上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stack-correct",
+                "alt": "扁长方体在下，正方体在上"
+              }
+            },
+            "C": {
+              "label": "扁长方体和正方体并排",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stack-side",
+                "alt": "扁长方体和正方体并排"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "扁长方体先放在下面，正方体后来放在上面。顺序换了或摆在旁边都不合题意。"
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "带着形状回家",
+      "template": "picture-points",
+      "data": {
+        "title": "带着形状回家",
+        "picture": "welcome",
+        "points": [
+          "看整件，再换角度",
+          "看平面，再试滚",
+          "找一件，说理由"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们把形状朋友带回家吧！"
+        },
+        {
+          "say": "它们叫长方体、正方体、圆柱和球。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一步，看整体，把同形的放在一起。"
+        },
+        {
+          "say": "再换个角度看面。"
+        },
+        {
+          "say": "正方体的方形面一样大，扁盒的侧面薄。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看看哪一面贴着桌子。"
+        },
+        {
+          "say": "圆柱竖着能立，横放朝旁边推能滚。"
+        },
+        {
+          "say": "球没有平面，换个方向推也能滚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "回家可以找一件东西，说说它的形状。"
+        },
+        {
+          "say": "给大人说两条能帮你判断的线索。"
+        },
+        {
+          "say": "也可以捏一捏，或照上下顺序搭两块。"
+        },
+        {
+          "say": "比如，拿一个宽纸盒当底座。"
+        },
+        {
+          "say": "再把一个小方盒轻轻放在它上面。"
+        },
+        {
+          "say": "看一看，两块贴在一起的面平不平。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "可爱的校园",
+  "description": "北师大版一年级上册完整课目：有序观察、十以内点数、数后标记与生活中的外形。",
+  "grade": 1,
+  "roster": {"teacher":{"name":"小数老师","role":"teacher","gender":"male","voice":"Ethan","avatar":"/avatars/teacher.png","color":"#D97B38","persona":"耐心清楚的数学老师，以真实图片和逐步操作解释十以内的数与生活中的外形，鼓励观察和表达。"}},
+  "images": {"campus":{"file":"assets/campus.png"},"bird":{"file":"assets/bird.png"},"butterfly":{"file":"assets/butterfly.png"},"ball":{"file":"assets/ball.png"},"book":{"file":"assets/book.png"},"clock":{"file":"assets/clock.png"},"board":{"file":"assets/board.png"}},
+  "scenes": [
+    {"key":"welcome","type":"slide","title":"校园里藏着数学","template":"picture-points","data":{"title":"可爱的校园","picture":"campus","points":["分区域看","一个一个数","找找外形"]},"script":[
+      {"spotlight":"picture"},{"say":"欢迎你，我是小数老师。"},{"say":"今天一起到校园里找数学。"},
+      {"spotlight":"point-1"},{"say":"先看教室，再看操场和花园。"},{"say":"每次看一个地方，就不容易漏看。"},
+      {"spotlight":"point-2"},{"say":"选一组同样的物品，一个一个数。"},{"say":"每个物品只数一次，才能数清楚。"},
+      {"spotlight":"point-3"},{"say":"还可以看看物品外面是什么样。"},{"say":"球圆圆的，书封面长长方方的。"},{"say":"数和形，都藏在我们身边。"}
+    ]},
+    {"key":"count-birds","type":"interactive","title":"小鸟排队啦","page":"count-birds","widgetType":"campus-count-once","startImage":"campus","script":[
+      {"setState":{"demoStep":0}},{"highlight":"#bird-demo"},{"say":"先看左边，老师点一只小鸟。"},
+      {"setState":{"demoStep":1}},{"say":"点一只，说一个数，这是一。"},
+      {"setState":{"demoStep":2}},{"say":"接着点第二只，这就是二。"},
+      {"setState":{"demoStep":3}},{"say":"再点第三只，最后数到三。"},{"say":"所以左边这一组有三只小鸟。"},
+      {"highlight":"#bird-field"},{"say":"右边的小鸟要飞到上方停留。"},{"say":"点过的鸟会移动，帮我们记住。"},{"say":"每只只点一次，别漏掉下面的。"},{"say":"现在交给你，一边点一边数。"}
+    ]},
+    {"key":"mark-butterflies","type":"interactive","title":"数过就做标记","page":"mark-butterflies","widgetType":"campus-mark-count","startImage":"butterfly","script":[
+      {"setState":{"demoMark":0}},{"highlight":"#mark-demo"},{"say":"蝴蝶留在原处，也能数清楚。"},
+      {"setState":{"demoMark":1}},{"say":"数第一只，就给它加一个圈。"},
+      {"setState":{"demoMark":2}},{"say":"接着数下一只，也加一个圈。"},
+      {"setState":{"demoMark":3}},{"say":"最后数到三，左边一共有三只。"},{"say":"有圈的是数过的，不要再数。"},
+      {"highlight":"#butterfly-field"},{"say":"右边蝴蝶更多，试着数到十。"},{"say":"按从左到右、从上到下的顺序。"},{"say":"每数一只点一下，圈就留下来。"},{"say":"全部圈好，再看看有没有漏掉。"}
+    ]},
+    {"key":"shape-sort","type":"interactive","title":"看看外面什么样","page":"shape-sort","widgetType":"campus-shape-match","startImage":"campus","script":[
+      {"highlight":"#shape-ball"},{"say":"看皮球，它的外面圆圆的。"},{"say":"顺着外边看，没有尖尖的角。"},
+      {"highlight":"#shape-round"},{"say":"这个圆圈也圆圆的，可以来比一比。"},
+      {"highlight":"#shape-book"},{"say":"再看书封面，长长方方的。"},{"say":"它有直直的边，外形长长的。"},
+      {"highlight":"#shape-long"},{"say":"和右边长方形的轮廓很相像。"},{"say":"我们只观察物品外面的样子。"},
+      {"setState":{"shapeDemo":"round"}},{"say":"先看示范，球和圆圈放在一起。"},
+      {"setState":{"shapeDemo":"reset"}},{"say":"现在请你拖动两张物品图片。"},{"say":"把外面样子相像的放在一起。"}
+    ]},
+    {"key":"nearby","type":"slide","title":"在身边继续找","template":"picture-points","data":{"title":"有什么？有多少？什么样？","picture":"book","points":["先看有什么","再数有多少","再看什么样"]},"script":[
+      {"spotlight":"picture"},{"say":"回到我们熟悉的校园里。"},{"say":"刚才的方法，这里一样能用。"},
+      {"spotlight":"point-1"},{"say":"先选一个地方，看里面有什么。"},{"say":"我看看教室的桌面，那里有练习本。"},
+      {"spotlight":"point-2"},{"say":"我只数练习本，点到一，一共有一本。"},{"say":"数量多时，点过就留下记号。"},
+      {"spotlight":"point-3"},{"say":"最后看外形，练习本封面长长方方。"},{"say":"我发现，桌上有一本长长方方的练习本。"},{"say":"请大人陪你在熟悉的地方找一找。"},{"say":"说出你的发现，请大人帮忙听。"},{"say":"这里没有录音，表达能力还待观察。"}
+    ]},
+    {"key":"check","type":"quiz","title":"图片小检查","intro":["来试试新图片。","听老师说题，再点你选的图片。"],"questions":[
+      {"id":"campus-q1","question":"上面有几个点？选一张同样多的点图。","skill":"campus-count","visual":{"kind":"picture","alt":"题干点图","picture":{"layout":"rows","groups":[{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]},{"cells":[{"glyph":"•"},{"glyph":"•"}]}]}},"answer":["B"],"analysis":"上面的点一个一个数到六，选项中只有六个点的图和它一样多。每个点只数一次。","options":{"A":{"label":"点图一","visual":{"kind":"picture","alt":"点图一","picture":{"layout":"rows","groups":[{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]},{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]}]}}},"B":{"label":"点图二","visual":{"kind":"picture","alt":"点图二","picture":{"layout":"rows","groups":[{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]},{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]}]}}},"C":{"label":"点图三","visual":{"kind":"picture","alt":"点图三","picture":{"layout":"rows","groups":[{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]},{"cells":[{"glyph":"•"},{"glyph":"•"}]}]}}}}},
+      {"id":"campus-q2","question":"再数这组点。哪张点图和它同样多？","skill":"campus-count","visual":{"kind":"picture","alt":"题干点图","picture":{"layout":"rows","groups":[{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]},{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]}]}},"answer":["C"],"analysis":"数过一个就记住一个，最后数到八。只有八个点的图片和题目一样多。","options":{"A":{"label":"点图一","visual":{"kind":"picture","alt":"点图一","picture":{"layout":"rows","groups":[{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]},{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]}]}}},"B":{"label":"点图二","visual":{"kind":"picture","alt":"点图二","picture":{"layout":"rows","groups":[{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]},{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]}]}}},"C":{"label":"点图三","visual":{"kind":"picture","alt":"点图三","picture":{"layout":"rows","groups":[{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]},{"cells":[{"glyph":"•"},{"glyph":"•"},{"glyph":"•"},{"glyph":"•"}]}]}}}}},
+      {"id":"campus-q3","question":"看物品的外边。哪一个圆圆的？","skill":"campus-shape","answer":["A"],"analysis":"钟面的外边圆圆的；书封面和黑板外边长长方方的。","options":{"A":{"label":"挂钟","visual":{"kind":"asset","image":"clock","alt":"圆形挂钟"}},"B":{"label":"书","visual":{"kind":"asset","image":"book","alt":"长方形书封面"}},"C":{"label":"黑板","visual":{"kind":"asset","image":"board","alt":"长方形黑板"}}}},
+      {"id":"campus-q4","question":"换一组。哪一个外面长长方方的？","skill":"campus-shape","answer":["B"],"analysis":"黑板的外边长长方方的；皮球和钟面的外边圆圆的。","options":{"A":{"label":"皮球","visual":{"kind":"asset","image":"ball","alt":"圆圆的皮球"}},"B":{"label":"黑板","visual":{"kind":"asset","image":"board","alt":"长方形黑板"}},"C":{"label":"挂钟","visual":{"kind":"asset","image":"clock","alt":"圆形挂钟"}}}}
+    ]},
+    {"key":"summary","type":"slide","title":"把方法带回家","template":"summary","data":{"title":"校园里的数学发现","items":["按顺序看，不漏看","一个一个数，只数一次","数过做标记，防重漏","发现数与形，说给大人听"]},"script":[
+      {"spotlight":"item-1"},{"say":"今天，我们按顺序观察校园。"},{"say":"一次看一个地方，更容易看仔细。"},
+      {"spotlight":"item-2"},{"say":"数物品时，一个对应一个数。"},{"say":"最后数到几，这组就有几个。"},
+      {"spotlight":"item-3"},{"say":"物品多了，数过就做一个记号。"},{"say":"这样能分清哪些还没有数过。"},
+      {"spotlight":"item-4"},{"say":"我们还发现圆圆的和长长方方的外观。"},{"say":"请大人陪你找身边的数和形。"},{"say":"再把发现说给大人听一听。"},{"say":"你的口头表达，仍需要大人观察。"}
+    ]}
+  ]
+}

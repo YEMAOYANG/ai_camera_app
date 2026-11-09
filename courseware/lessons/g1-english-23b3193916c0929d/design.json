@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "Where's the bird? 小鸟在哪里",
+  "frame": {"slides": [1000,562.5], "interactive": [1280,720], "kit": "courseware/kit"},
+  "visual": {"palette": ["#fff6e5", "#367d7c", "#e0a75c", "#eadfcd"], "semanticPictures": ["bird", "hat", "bird-in", "bird-on", "bird-under", "ball-in", "ball-on", "ball-under"], "knowledgeDiagrams": [], "lowReading": "老师读目标词和指令；正式鸟与帽图片构成位置关系，孩子拖放或点位置让鸟移动，不靠读非目标汉字。小检查选项都是正式红球蓝箱位置图。"},
+  "pages": [
+    {"key": "p03", "goal": "in", "mechanism": "鸟进入帽子开口，帽前部遮住其下半身", "teacherStates": ["on", "in", "play"], "targets": ["#hat-shell", "#bird-token"], "completion": "学生明确把鸟放入帽中"},
+    {"key": "p04", "goal": "on", "mechanism": "鸟脚落在帽沿上表面", "teacherStates": ["in", "on", "play"], "targets": ["#hat-shell", "#bird-token"], "completion": "学生把鸟放到帽沿上"},
+    {"key": "p05", "goal": "under", "mechanism": "鸟位于悬浮帽子正下方，留有间隔", "teacherStates": ["on", "under", "play"], "targets": ["#hat-shell", "#bird-token"], "completion": "学生把鸟放到帽下"}
+  ],
+  "mechanismReason": "同一物品和操作只变化目标位置，降低一年级操作负担并隔离比较in、on、under。每页先解释规则和具体关系，再交给孩子操作。",
+  "feedback": "第一次错只突出整个帽子边界，不报正确位置；第二次加观察鸟的提示；第三次展示后复位，示范不给星。正确后显示实际位置，结束后可重玩清零。",
+  "acceptance": "源码测试不能替代G6；须用正式图片逐个检查教师态、初始、错误和正确态，再做三尺寸试玩、G7和学生播放。",
+  "evidenceBoundary": "只记录听图位置对应，口语朗读和问答表达待成人观察。"
+}

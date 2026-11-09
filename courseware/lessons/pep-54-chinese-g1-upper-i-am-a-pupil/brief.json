@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lessonTitle": "我是小学生",
+  "goals": [
+    "借晨光、花鸟、书包和校门图理解上学歌中的问答，能用自己的话说背书包做什么，愿意跟听和表达自己的上学感受。",
+    "理解按时到校的意思，用先收拾书包、按约定时间出门的生活例子说明如何准备。",
+    "能从新图分辨学习与力所能及的劳动，说出各一个例子，体会学会本领可以帮助别人。"
+  ],
+  "knowledgePoints": [
+    "school_story",
+    "on_time",
+    "learn_and_help"
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "key": "p01",
+      "type": "slide",
+      "title": "书包准备出发",
+      "play": "同一幅经审核的晨间校门插画既是首屏主体也是目录封面。先亮书包、再亮校门，听出小学生出发做什么。",
+      "goalIds": [
+        "school_story"
+      ],
+      "officialHourIds": [],
+      "visualRoles": [
+        "school-morning-cover"
+      ]
+    },
+    {
+      "page": 2,
+      "key": "p02",
+      "type": "slide",
+      "title": "是谁在问",
+      "play": "先看小鸟，再把背书包、去学校的画面联系起来；老师用原创问答示范先听问什么、再用自己的话回答。",
+      "goalIds": [
+        "school_story"
+      ],
+      "officialHourIds": [],
+      "visualRoles": [
+        "bird-on-branch",
+        "bag-at-gate"
+      ]
+    },
+    {
+      "page": 3,
+      "key": "p03",
+      "type": "interactive",
+      "title": "把上学路线接起来",
+      "play": "老师逐次示范先在家把当天书本装好，再按约定出门，最后到学校。孩子听音选图，把图片放入一条真实从家到校的线路，落点出现下一个地点，首错只提醒看人物在哪里。",
+      "goalIds": [
+        "on_time"
+      ],
+      "officialHourIds": [],
+      "visualRoles": [
+        "route-home-pack",
+        "route-leave-home",
+        "route-at-school",
+        "school-morning-cover"
+      ]
+    },
+    {
+      "page": 4,
+      "key": "p04",
+      "type": "slide",
+      "title": "学本领也做小事",
+      "play": "同一校园中，一人跟老师观察学习，另一人擦好自己用过的桌面。先点亮两个动作，再讲熟练后能把本领用来帮同学。",
+      "goalIds": [
+        "learn_and_help"
+      ],
+      "officialHourIds": [],
+      "visualRoles": [
+        "learn-leaf-prints",
+        "wipe-desk"
+      ]
+    },
+    {
+      "page": 5,
+      "key": "p05",
+      "type": "interactive",
+      "title": "给校园小队配照片",
+      "play": "同样的校园画面有两种任务。教师用焦点突出看、听、练的学习动作和收、摆、擦的劳动动作。学生按语音把活动照拖进学习或劳动场景，两张照片会真正移动并被收进场景。",
+      "goalIds": [
+        "learn_and_help"
+      ],
+      "officialHourIds": [],
+      "visualRoles": [
+        "learn-making-model",
+        "water-class-plant",
+        "learn-leaf-prints",
+        "wipe-desk"
+      ]
+    },
+    {
+      "page": 6,
+      "key": "p06",
+      "type": "quiz",
+      "title": "换个情境选一选",
+      "play": "三题用新地点、新图片，分别辨别去学校的目的、出门前准备与力所能及的劳动。每题三图、教师朗读、解释和唯一答案，正确位置打散。",
+      "goalIds": [
+        "school_story",
+        "on_time",
+        "learn_and_help"
+      ],
+      "officialHourIds": [],
+      "visualRoles": [
+        "q-destination-school",
+        "q-destination-market",
+        "q-destination-court",
+        "q-ready-packed",
+        "q-ready-missing",
+        "q-ready-tv",
+        "q-help-supplies",
+        "q-help-lesson",
+        "q-help-rest"
+      ]
+    },
+    {
+      "page": 7,
+      "key": "p07",
+      "type": "slide",
+      "title": "把新发现说给家人",
+      "play": "按上学、按时、学和做依次用图回顾。打开自己的课本跟听并试说，完成一个家庭小行动。选图或点击只作观察证据；口语与生活习惯请大人观察。",
+      "goalIds": [
+        "school_story",
+        "on_time",
+        "learn_and_help"
+      ],
+      "officialHourIds": [],
+      "visualRoles": [
+        "school-morning-cover",
+        "learn-leaf-prints",
+        "wipe-desk"
+      ]
+    }
+  ],
+  "pictureAssessment": [
+    {
+      "id": "destination",
+      "page": 6,
+      "skill": "school_story",
+      "target": "换成另一座社区学校早晨，听为什么背书包出门；选进入学校的图，与市场和篮球场有明确环境差别。",
+      "visualRoles": [
+        "q-destination-school",
+        "q-destination-market",
+        "q-destination-court"
+      ]
+    },
+    {
+      "id": "ready",
+      "page": 6,
+      "skill": "on_time",
+      "target": "下楼前找出要带的课本已放入包、书包在手边的行动；对照书散在桌上或小朋友还在看电视。题干说清要带什么，避免把电视或散书当道德判断。",
+      "visualRoles": [
+        "q-ready-packed",
+        "q-ready-missing",
+        "q-ready-tv"
+      ]
+    },
+    {
+      "id": "help",
+      "page": 6,
+      "skill": "learn_and_help",
+      "target": "美术角用完的公共彩纸需要整理。唯一正确图把纸分类放回；对照听老师示范的新知识和在休息角放松。",
+      "visualRoles": [
+        "q-help-supplies",
+        "q-help-lesson",
+        "q-help-rest"
+      ]
+    }
+  ],
+  "homework": [
+    "和大人翻开自己的课本，试着听读《上学歌》，用自己的话说说图中的孩子为什么背书包。",
+    "今晚在大人陪同下把第二天要用的书本收进书包，再和大人确认明早出门的时间。",
+    "做一件力所能及的小事，之后把做了什么说给家人听。"
+  ],
+  "weeklyQuestionSource": [
+    "objectives",
+    "afterClassExercisePoints",
+    "skills"
+  ],
+  "allOfficialHoursCombined": true,
+  "officialHours": [],
+  "evidenceLimits": "能观察听题、选图、操作完成；开口表达、朗读、按时和家务劳动留待观察。"
+}

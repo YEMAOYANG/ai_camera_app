@@ -1,0 +1,1004 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "我的幼儿园",
+  "description": "青岛版六三制一年级上册完整主题活动：回忆画图、点数与记录、形状印记、按规则计分、方向行动与合作。纸笔、口语和真实合作待大人观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/avatars/teacher.png",
+      "color": "#BA7547",
+      "persona": "耐心解释操作理由的小学数学男教师，用具体对象带孩子观察、点数和记录。"
+    }
+  },
+  "images": {
+    "garden": {
+      "file": "assets/garden.png"
+    },
+    "pot": {
+      "file": "assets/pot.png"
+    },
+    "leaf": {
+      "file": "assets/leaf.png"
+    },
+    "flower": {
+      "file": "assets/flower.png"
+    },
+    "square-diagram": {
+      "file": "assets/square-diagram.png"
+    },
+    "triangle-diagram": {
+      "file": "assets/triangle-diagram.png"
+    },
+    "rectangle-diagram": {
+      "file": "assets/rectangle-diagram.png"
+    },
+    "up-diagram": {
+      "file": "assets/up-diagram.png"
+    },
+    "left-diagram": {
+      "file": "assets/left-diagram.png"
+    },
+    "right-diagram": {
+      "file": "assets/right-diagram.png"
+    },
+    "left-route-diagram": {
+      "file": "assets/left-route-diagram.png"
+    },
+    "stamp-demo-diagram": {
+      "file": "assets/stamp-demo-diagram.png"
+    },
+    "route-demo-diagram": {
+      "file": "assets/route-demo-diagram.png"
+    },
+    "score-demo-diagram": {
+      "file": "assets/score-demo-diagram.png"
+    },
+    "record-8-diagram": {
+      "file": "assets/record-8-diagram.png"
+    },
+    "record-9-diagram": {
+      "file": "assets/record-9-diagram.png"
+    },
+    "record-10-diagram": {
+      "file": "assets/record-10-diagram.png"
+    },
+    "record-6-diagram": {
+      "file": "assets/record-6-diagram.png"
+    },
+    "record-7-diagram": {
+      "file": "assets/record-7-diagram.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "把回忆画下来",
+      "template": "picture-points",
+      "data": {
+        "title": "把回忆画下来",
+        "picture": "garden",
+        "points": [
+          "想一处熟悉的地方",
+          "先画大物体",
+          "说出数学发现"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "还记得幼儿园里最喜欢的地方吗？"
+        },
+        {
+          "say": "游戏区有一座滑梯，滑梯旁站着一位小朋友。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先选自己记得的一处，不用画得很多。"
+        },
+        {
+          "say": "可以选教室，也可以选你玩过的场地。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先画大的物体，再添旁边的小东西。"
+        },
+        {
+          "say": "画面的位置能帮助别人听懂介绍。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "介绍时说有什么，再说有几个。"
+        },
+        {
+          "say": "还可以说它的形状，或者谁在谁旁边。"
+        },
+        {
+          "say": "请大人准备纸笔，等会儿画自己的回忆。"
+        },
+        {
+          "say": "猫头鹰提醒：画和说，请大人帮忙观察。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "花盆点数员",
+      "page": "p02",
+      "widgetType": "count-and-record",
+      "startImage": "garden",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "highlight": "#pot-row"
+        },
+        {
+          "say": "画里有花盆，怎样把数量说清楚呢？"
+        },
+        {
+          "say": "我先示范，点过一盆就留一个标记。"
+        },
+        {
+          "setState": {
+            "phase": "marked"
+          }
+        },
+        {
+          "highlight": "#count-record"
+        },
+        {
+          "say": "这两盆各有标记，没有漏掉或重复。"
+        },
+        {
+          "say": "最后数到二，就知道一共有两盆。"
+        },
+        {
+          "highlight": "#number-tray"
+        },
+        {
+          "say": "所以记录数字二，表示这里的总数量。"
+        },
+        {
+          "say": "数字记录数量，不是花盆的名字。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在换一幅新画，数量也变了。"
+        },
+        {
+          "say": "请你逐个点一遍，再选记录的数字。"
+        },
+        {
+          "say": "不管花盆排在哪里，每盆只能数一次。"
+        },
+        {
+          "say": "点错数字没关系，顺着标记再数一遍。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "quiz",
+      "title": "小检查一",
+      "intro": [
+        "下面是新的活动区，听完再看图选择。",
+        "每个物品只数一次，最后数到几就是几个。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "新活动区需要七只小球。哪幅数量图和七只一样多？",
+          "skill": "有序点数",
+          "answer": [
+            "B"
+          ],
+          "analysis": "每个点只数一次，数到七的图与七只小球一样多。",
+          "options": {
+            "A": {
+              "label": "六个",
+              "visual": {
+                "kind": "asset",
+                "image": "record-6-diagram",
+                "alt": "6个分点"
+              }
+            },
+            "B": {
+              "label": "七个",
+              "visual": {
+                "kind": "asset",
+                "image": "record-7-diagram",
+                "alt": "7个分点"
+              }
+            },
+            "C": {
+              "label": "八个",
+              "visual": {
+                "kind": "asset",
+                "image": "record-8-diagram",
+                "alt": "8个分点"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "看图，每个点代表一个玩具。哪个数字记录总数量？",
+          "skill": "数量记录",
+          "answer": [
+            "C"
+          ],
+          "analysis": "一个点代表一个玩具，逐个数到八，就用数字八记录。",
+          "options": {
+            "A": {
+              "label": "九",
+              "visual": {
+                "kind": "picture",
+                "alt": "数字9",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "9"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "B": {
+              "label": "六",
+              "visual": {
+                "kind": "picture",
+                "alt": "数字6",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "6"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "C": {
+              "label": "八",
+              "visual": {
+                "kind": "picture",
+                "alt": "数字8",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "8"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "record-8-diagram",
+            "alt": "8个分点的记录图"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "印记从哪里来",
+      "template": "picture-points",
+      "data": {
+        "title": "印记从哪里来",
+        "picture": "stamp-demo-diagram",
+        "points": [
+          "看目标轮廓",
+          "找同形的接触面",
+          "压下抬起看结果"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "游戏展板需要印记，我们先看目标。"
+        },
+        {
+          "say": "轮廓就是图形外面这一圈边界。"
+        },
+        {
+          "say": "看清边界的样子，才能找合适的面。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "积木贴着纸的那个面，叫作接触面。"
+        },
+        {
+          "say": "想留下圆形，就找圆形的接触面。"
+        },
+        {
+          "say": "要把接触面的样子和目标仔细比较。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把这个面压在纸上，再轻轻抬起来。"
+        },
+        {
+          "say": "留下的印记，和接触面的轮廓一样。"
+        },
+        {
+          "say": "换个面试一试，留下的样子也可能不同。"
+        },
+        {
+          "say": "猫头鹰提醒：先看轮廓，再挑接触面。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "给展板印图形",
+      "page": "p05",
+      "widgetType": "match-and-stamp",
+      "startImage": "garden",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "highlight": "#stamp-target"
+        },
+        {
+          "say": "老师先印一个圆，看看它的边界。"
+        },
+        {
+          "say": "圆的边界弯弯的，没有直直的边。"
+        },
+        {
+          "highlight": "#stamp-tray"
+        },
+        {
+          "say": "我把托盘里的接触面，逐个和圆比较。"
+        },
+        {
+          "say": "找到同形的面，就把它压到目标上。"
+        },
+        {
+          "setState": {
+            "phase": "print"
+          }
+        },
+        {
+          "highlight": "#stamp-result"
+        },
+        {
+          "say": "印出来也是圆，两个轮廓对上了。"
+        },
+        {
+          "say": "这说明选面时，要比样子而不是颜色。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在换了新目标，轮到你给展板印图形。"
+        },
+        {
+          "say": "拖过去或者点一下，就会试印这个面。"
+        },
+        {
+          "say": "第一次没对上，先看边界再重新比较。"
+        },
+        {
+          "say": "选对的面会留下印记，然后进入下一关。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "先看计分规则",
+      "template": "picture-points",
+      "data": {
+        "title": "先看计分规则",
+        "picture": "score-demo-diagram",
+        "points": [
+          "一朵花记一分",
+          "一片叶子记两分",
+          "逐件展开，再合起来数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "花园游戏会收集花和叶子的图片。"
+        },
+        {
+          "say": "先听清规则，才能把结果记得公平。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们的新规则是，一朵花记一分。"
+        },
+        {
+          "say": "记一朵花，就在记录里放一个分点。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一片叶子记两分，要放两个分点。"
+        },
+        {
+          "say": "花和叶子虽然都是一件，分值却不同。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我收集一片叶子和一朵花来试算。"
+        },
+        {
+          "say": "叶子展开两个点，花展开一个点。"
+        },
+        {
+          "say": "把这些点一起数，一共得到三分。"
+        },
+        {
+          "say": "先分清每件的分值，再数总分，不会漏。"
+        },
+        {
+          "say": "猫头鹰提醒：比较得分，要按同一规则。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "把分数记清楚",
+      "page": "p07",
+      "widgetType": "expand-and-record-points",
+      "startImage": "garden",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "highlight": "#score-rule"
+        },
+        {
+          "say": "看图上的规则，花一分，叶子两分。"
+        },
+        {
+          "say": "我先记录一片叶子，再记录一朵花。"
+        },
+        {
+          "highlight": "#collect-row"
+        },
+        {
+          "say": "每点一件，它就会变淡，表示记过了。"
+        },
+        {
+          "setState": {
+            "phase": "record"
+          }
+        },
+        {
+          "highlight": "#point-record"
+        },
+        {
+          "say": "叶子的记录有两个点，花有一个点。"
+        },
+        {
+          "say": "逐件展开后，我们把所有分点一起数。"
+        },
+        {
+          "say": "这次一共三分，不能只说有两件。"
+        },
+        {
+          "highlight": "#score-choices"
+        },
+        {
+          "say": "选总分数字，是把分点数量记下来。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在是新的收集结果，请你自己记录。"
+        },
+        {
+          "say": "先把每件都记好，再数记录里的分点。"
+        },
+        {
+          "say": "出错时看看规则，别把叶子只记一分。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "小检查二",
+      "intro": [
+        "这次印记和收集物都换了，请听老师说。",
+        "先看清轮廓和规则，再独立选择。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "新的拼画需要一个正方形印记。应该选哪个接触面？",
+          "skill": "印记形状",
+          "answer": [
+            "A"
+          ],
+          "analysis": "接触面的轮廓是正方形，留下的印记才是正方形。",
+          "options": {
+            "A": {
+              "label": "正方形面",
+              "visual": {
+                "kind": "asset",
+                "image": "square-diagram",
+                "alt": "正方形轮廓"
+              }
+            },
+            "B": {
+              "label": "三角形面",
+              "visual": {
+                "kind": "asset",
+                "image": "triangle-diagram",
+                "alt": "三角形轮廓"
+              }
+            },
+            "C": {
+              "label": "长方形面",
+              "visual": {
+                "kind": "asset",
+                "image": "rectangle-diagram",
+                "alt": "长方形轮廓"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "新一轮收集到三片叶子和两朵花。叶子每片两分，花每朵一分，一共几分？",
+          "skill": "按规则记分",
+          "answer": [
+            "C"
+          ],
+          "analysis": "三片叶子记六分，两朵花记两分，合起来是八分。",
+          "options": {
+            "A": {
+              "label": "七分",
+              "visual": {
+                "kind": "asset",
+                "image": "record-7-diagram",
+                "alt": "7个分点"
+              }
+            },
+            "B": {
+              "label": "九分",
+              "visual": {
+                "kind": "asset",
+                "image": "record-9-diagram",
+                "alt": "9个分点"
+              }
+            },
+            "C": {
+              "label": "八分",
+              "visual": {
+                "kind": "asset",
+                "image": "record-8-diagram",
+                "alt": "8个分点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "先找起点再听方向",
+      "template": "picture-points",
+      "data": {
+        "title": "先找起点再听方向",
+        "picture": "route-demo-diagram",
+        "points": [
+          "找到起点",
+          "面朝屏幕上方",
+          "按方向逐格移动"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "找花盆的游戏，要先说明从哪里出发。"
+        },
+        {
+          "say": "出发的位置就是起点，先把标记放好。"
+        },
+        {
+          "say": "起点不同，同一句指令会走到别处。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这次一直面朝屏幕上方，不转身。"
+        },
+        {
+          "say": "朝屏幕上方走，就是我们说的向前。"
+        },
+        {
+          "say": "左边和右边，也都按这个面向来确定。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "箭头告诉方向，每个箭头表示走一格。"
+        },
+        {
+          "say": "离开起点进入下一格，才数第一格。"
+        },
+        {
+          "say": "起点不再算一格，经过几格就数几下。"
+        },
+        {
+          "say": "听清方向和格数，才能走到目的地。"
+        },
+        {
+          "say": "猫头鹰提醒：先定起点，再按方向走。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "按方向找花盆",
+      "page": "p10",
+      "widgetType": "follow-direction-route",
+      "startImage": "garden",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "highlight": "#route-marker"
+        },
+        {
+          "say": "小圆标记从左下角出发，朝着屏幕上方。"
+        },
+        {
+          "highlight": "#route-sequence"
+        },
+        {
+          "say": "老师先照这排图序，向前一格。"
+        },
+        {
+          "setState": {
+            "phase": "step"
+          }
+        },
+        {
+          "say": "离开起点进一格，位置已经改变了。"
+        },
+        {
+          "say": "后面两个箭头都向右，要各走一格。"
+        },
+        {
+          "setState": {
+            "phase": "step"
+          }
+        },
+        {
+          "setState": {
+            "phase": "step"
+          }
+        },
+        {
+          "highlight": "#route-goal"
+        },
+        {
+          "say": "向右走了两格，正好到了花盆所在的格子。"
+        },
+        {
+          "say": "一张方向图只做一步，不能跳过中间。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在图序换了，请你按顺序一步步走。"
+        },
+        {
+          "say": "四个箭头按钮，都只移动相邻的一格。"
+        },
+        {
+          "say": "点错方向不会移动，看看下一张再试。"
+        },
+        {
+          "say": "到达以后，再完成另一条新路线。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "小检查三",
+      "intro": [
+        "换一个新操场，方向和记录都要自己判断。",
+        "听完问题再选，先看位置，再看数量。"
+      ],
+      "questions": [
+        {
+          "id": "q5",
+          "question": "小圆点面朝屏幕上方，空圈在它左边。要去空圈，先朝哪边走？",
+          "skill": "方向识别",
+          "answer": [
+            "B"
+          ],
+          "analysis": "固定朝屏幕上方时，图里的左边对应向左的箭头。",
+          "options": {
+            "A": {
+              "label": "向上",
+              "visual": {
+                "kind": "asset",
+                "image": "up-diagram",
+                "alt": "向上的箭头"
+              }
+            },
+            "B": {
+              "label": "向左",
+              "visual": {
+                "kind": "asset",
+                "image": "left-diagram",
+                "alt": "向左的箭头"
+              }
+            },
+            "C": {
+              "label": "向右",
+              "visual": {
+                "kind": "asset",
+                "image": "right-diagram",
+                "alt": "向右的箭头"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "left-route-diagram",
+            "alt": "空圈在小圆点左边，标记朝屏幕上方"
+          }
+        },
+        {
+          "id": "q6",
+          "question": "两组都一片记一分。哪幅记录图比九片更多？",
+          "skill": "记录比较",
+          "answer": [
+            "A"
+          ],
+          "analysis": "十片比九片多一片；九片一样多，八片更少。",
+          "options": {
+            "A": {
+              "label": "十片记录",
+              "visual": {
+                "kind": "asset",
+                "image": "record-10-diagram",
+                "alt": "10个分点的记录图"
+              }
+            },
+            "B": {
+              "label": "九片记录",
+              "visual": {
+                "kind": "asset",
+                "image": "record-9-diagram",
+                "alt": "9个分点的记录图"
+              }
+            },
+            "C": {
+              "label": "八片记录",
+              "visual": {
+                "kind": "asset",
+                "image": "record-8-diagram",
+                "alt": "8个分点的记录图"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "record-9-diagram",
+            "alt": "9个分点的记录图"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "轮流玩也要认真记",
+      "template": "summary",
+      "data": {
+        "title": "轮流玩也要认真记",
+        "items": [
+          "先说清玩法和规则",
+          "你一次，我一次",
+          "按同一规则如实记录"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "数学游戏不只是抢着快，还要玩得明白。"
+        },
+        {
+          "say": "开始前，先说清怎样行动，怎样记分。"
+        },
+        {
+          "say": "如果规则不同，结果就不能直接比较。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "和朋友一起玩时，你一次，我一次。"
+        },
+        {
+          "say": "我先玩，记下两朵花的两分。"
+        },
+        {
+          "say": "再轮到小满，记下一片叶子和一朵花的三分。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "做过几次、得到多少，都按实际记下。"
+        },
+        {
+          "say": "比较记录时，要看是不是同一套规则。"
+        },
+        {
+          "say": "同一规则下，三分比两分多，小满得分高。"
+        },
+        {
+          "say": "请大人陪你玩一次，观察你怎样合作。"
+        },
+        {
+          "say": "猫头鹰提醒：网页点击不能代替真实合作。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "带着数学介绍幼儿园",
+      "template": "summary",
+      "data": {
+        "title": "带着数学介绍幼儿园",
+        "items": [
+          "画回忆，用数学介绍",
+          "每件只数一次",
+          "看接触面，留下同形印记",
+          "按规则记分，按方向行动",
+          "轮流合作，如实记录"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天从幼儿园的回忆，找到了数学。"
+        },
+        {
+          "say": "画一个熟悉的地方，说有什么、有几个。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "点数要留下标记，每一件只数一次。"
+        },
+        {
+          "say": "最后数到几，就用那个数字记总数量。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "想印出一种轮廓，要找同形的接触面。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "记分先分清每件值几分，再合起来数。"
+        },
+        {
+          "say": "移动先定起点和面向，再照方向逐格走。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "和朋友轮流行动，用相同规则认真记录。"
+        },
+        {
+          "say": "回家画好你的回忆，再介绍给大人听。"
+        },
+        {
+          "say": "猫头鹰提醒：画、说和合作，还请大人观察。",
+          "by": "owl"
+        }
+      ]
+    }
+  ]
+}

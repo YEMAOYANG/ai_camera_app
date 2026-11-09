@@ -1,0 +1,818 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "拆装玩具",
+  "description": "完整课：观察结构、工具选择、零件整理、按图组装、测试改进与合作接续。屏幕模拟不等于真实工具技能。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/ke-science-v1.png",
+      "color": "#439B87",
+      "persona": "通过观察、操作和测试引导孩子表达发现；讲清原因，不把点击当作真实动手能力。"
+    }
+  },
+  "images": {
+    "truck": {
+      "file": "assets/truck.png"
+    },
+    "chassis": {
+      "file": "assets/chassis.png"
+    },
+    "wheel": {
+      "file": "assets/wheel.png"
+    },
+    "cab": {
+      "file": "assets/cab.png"
+    },
+    "bed": {
+      "file": "assets/bed.png"
+    },
+    "driver": {
+      "file": "assets/driver.png"
+    },
+    "hammer": {
+      "file": "assets/hammer.png"
+    },
+    "scissors": {
+      "file": "assets/scissors.png"
+    },
+    "q-plane": {
+      "file": "assets/q-plane.png"
+    },
+    "q-cart": {
+      "file": "assets/q-cart.png"
+    },
+    "q-manual": {
+      "file": "assets/q-manual.png"
+    },
+    "q-brush": {
+      "file": "assets/q-brush.png"
+    },
+    "q-gift": {
+      "file": "assets/q-gift.png"
+    },
+    "q-bus": {
+      "file": "assets/q-bus.png"
+    },
+    "q-fix": {
+      "file": "assets/q-fix.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "今天当拆装师",
+      "template": "picture-points",
+      "data": {
+        "title": "今天当拆装师",
+        "picture": "truck",
+        "points": [
+          "看清连接",
+          "工具来帮忙",
+          "装好还要试"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，玩具小货车来到我们的工作台。"
+        },
+        {
+          "say": "它看起来是一辆车，里面却有不同零件。"
+        },
+        {
+          "say": "我们要把它拆开看，再把零件装回去。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先观察零件在哪里，怎样连在一起。"
+        },
+        {
+          "say": "小满问：只用手拉，就能拆开吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这辆车用螺丝连接，要请螺丝刀帮忙。"
+        },
+        {
+          "say": "工具选合适，拆装会更方便。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "装回去以后，还要测试小车。"
+        },
+        {
+          "say": "看看零件齐不齐，连接牢不牢。"
+        },
+        {
+          "say": "再试一试，小车能不能正常行驶。"
+        },
+        {
+          "say": "猫头鹰提醒：先观察，再动手，装好要测试。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "工具对准螺丝",
+      "page": "p02",
+      "widgetType": "science-toy-workshop",
+      "startImage": "truck",
+      "script": [
+        {
+          "highlight": "#toy-joint"
+        },
+        {
+          "say": "看车轮中间，这里有一颗螺丝。"
+        },
+        {
+          "say": "它把零件连在一起，我们先看连接处。"
+        },
+        {
+          "highlight": "#tool-driver"
+        },
+        {
+          "say": "螺丝刀的刀头能对准螺丝上的凹槽。"
+        },
+        {
+          "say": "老师先把螺丝刀送到练习接头。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "用螺丝刀拧动螺丝后，连接才能分开。"
+        },
+        {
+          "highlight": "#tool-hammer"
+        },
+        {
+          "say": "锤子用来敲，这里需要处理螺丝连接。"
+        },
+        {
+          "say": "所以不能只看哪件工具大，就选哪件。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "highlight": "#tool-bank"
+        },
+        {
+          "say": "现在请你选工具，再送到车上的连接处。"
+        },
+        {
+          "say": "图上是在练习选择，不是在检查真实握法。"
+        },
+        {
+          "say": "以后和大人拆玩具，还要请大人看操作。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "小车由零件组成",
+      "template": "picture-points",
+      "data": {
+        "title": "小车由零件组成",
+        "picture": "truck",
+        "points": [
+          "底座连着车轮",
+          "车头在前面",
+          "货斗在后面"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "把小车拆开，就能看见它的不同零件。"
+        },
+        {
+          "say": "本课练习的是这辆青绿色货车。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "下面的底座，连着能转动的车轮。"
+        },
+        {
+          "say": "车轮装回底座后，才一起组成车的下面。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "车头在前面，有一扇淡蓝色车窗。"
+        },
+        {
+          "say": "朵朵说：我能用形状找到车头。",
+          "by": "duoduo"
+        },
+        {
+          "say": "对，观察形状和原来的位置，就能认零件。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "后面敞开的货斗，是小车装货的地方。"
+        },
+        {
+          "say": "拆下一件就放好一件，别把零件混在一起。"
+        },
+        {
+          "say": "按拆下的顺序排好，回头找起来更清楚。"
+        },
+        {
+          "say": "别的玩具零件可能不同，要先仔细观察。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "拆下放整齐",
+      "page": "p04",
+      "widgetType": "science-toy-workshop",
+      "startImage": "truck",
+      "script": [
+        {
+          "highlight": "#parts-car"
+        },
+        {
+          "say": "螺丝已经处理好了，现在整理拆下的零件。"
+        },
+        {
+          "say": "先看零件的形状，再看托盘的位置。"
+        },
+        {
+          "highlight": "#part-cab"
+        },
+        {
+          "say": "老师先把车头放进第一个小托盘。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "车头离开小车，留在托盘里，位置没有乱。"
+        },
+        {
+          "highlight": "#tray-1"
+        },
+        {
+          "say": "拆下顺序留在托盘中，组装前还能再查看。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "highlight": "#parts-trays"
+        },
+        {
+          "say": "现在换你，按出现的步骤逐件收好。"
+        },
+        {
+          "say": "先车头，再货斗，最后收好这组车轮。"
+        },
+        {
+          "say": "这只是本课练习车的拆下顺序。"
+        },
+        {
+          "say": "真实玩具要先观察，按自己的说明来拆。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "小检查：工具和结构",
+      "intro": [
+        "听老师读题，再观察新玩具的图片。",
+        "选出合适的图片，答错可以再想一想。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "玩具飞机用十字螺丝连接。拆这个接头选哪件工具？",
+          "skill": "选择拆装工具",
+          "answer": [
+            "A"
+          ],
+          "analysis": "螺丝刀与螺丝配合使用；锤子和剪刀不用于这个螺丝接头。",
+          "options": {
+            "A": {
+              "label": "螺丝刀",
+              "visual": {
+                "kind": "asset",
+                "image": "driver",
+                "alt": "螺丝刀"
+              }
+            },
+            "B": {
+              "label": "小锤子",
+              "visual": {
+                "kind": "asset",
+                "image": "hammer",
+                "alt": "小锤子"
+              }
+            },
+            "C": {
+              "label": "剪刀",
+              "visual": {
+                "kind": "asset",
+                "image": "scissors",
+                "alt": "剪刀"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-plane",
+            "alt": "这架玩具飞机用十字螺丝连接。拆装这个接头，应选哪件工具？"
+          }
+        },
+        {
+          "id": "q2",
+          "question": "观察这辆新玩具拖车，旁边脱落的圆形零件是哪一种？",
+          "skill": "观察玩具结构",
+          "answer": [
+            "B"
+          ],
+          "analysis": "脱落的圆形零件是车轮，车头和货斗的形状不同。",
+          "options": {
+            "A": {
+              "label": "车头",
+              "visual": {
+                "kind": "asset",
+                "image": "cab",
+                "alt": "车头"
+              }
+            },
+            "B": {
+              "label": "车轮",
+              "visual": {
+                "kind": "asset",
+                "image": "wheel",
+                "alt": "车轮"
+              }
+            },
+            "C": {
+              "label": "货斗",
+              "visual": {
+                "kind": "asset",
+                "image": "bed",
+                "alt": "货斗"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-cart",
+            "alt": "观察这辆新玩具拖车，旁边脱落的圆形零件是哪一种？"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "看懂本课组装图",
+      "template": "picture-points",
+      "data": {
+        "title": "看懂本课组装图",
+        "picture": "truck",
+        "points": [
+          "1 车轮接底座 ↓",
+          "2 装上车头 ↓",
+          "3 装上货斗"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "零件找齐了，先看这辆练习车的组装图。"
+        },
+        {
+          "say": "数字告诉我们先做哪一步，箭头连着下一步。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一步，先把车轮接在底座上。"
+        },
+        {
+          "say": "下面这一部分先装好，才继续后面的连接。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二步，把车头装到图上前面的位置。"
+        },
+        {
+          "say": "小满问：我想先拿货斗，可以吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "先对照当前步骤，不要只挑自己喜欢的零件。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三步，再把货斗装到后面的位置。"
+        },
+        {
+          "say": "按图一步一步来，就不容易漏掉部件。"
+        },
+        {
+          "say": "这些步骤属于这辆车，别的玩具要看自己的图。"
+        },
+        {
+          "say": "猫头鹰提醒：看图、找零件、按顺序连接。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "照图装一辆",
+      "page": "p07",
+      "widgetType": "science-toy-workshop",
+      "startImage": "truck",
+      "script": [
+        {
+          "highlight": "#assembly-guide"
+        },
+        {
+          "say": "上面是本课练习车的图片说明书。"
+        },
+        {
+          "say": "每一步的零件都画出来，不用急着认字。"
+        },
+        {
+          "highlight": "#assembly-wheel"
+        },
+        {
+          "say": "老师先找车轮，把它送到小车的底座。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "车轮接好了，下面的结构变完整了。"
+        },
+        {
+          "highlight": "#assembly-target"
+        },
+        {
+          "say": "接着对照下一步，再找车头的形状。"
+        },
+        {
+          "say": "按顺序连接，比拿起什么就装什么更清楚。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "highlight": "#assembly-bank"
+        },
+        {
+          "say": "现在从第一步开始，亲手装一辆。"
+        },
+        {
+          "say": "拖不方便，也可以先点零件再点小车。"
+        },
+        {
+          "say": "每装好一部分，再去看下一幅图。"
+        },
+        {
+          "say": "全部装上，还不能省掉后面的测试。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "测试发现再改进",
+      "page": "p08",
+      "widgetType": "science-toy-workshop",
+      "startImage": "truck",
+      "script": [
+        {
+          "highlight": "#test-track"
+        },
+        {
+          "say": "车装好了，先看看部件齐不齐。"
+        },
+        {
+          "say": "再测试连接是否稳固，能不能正常行驶。"
+        },
+        {
+          "highlight": "#test-go"
+        },
+        {
+          "say": "老师轻轻推一下这辆示范车。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "车头晃开了，说明这个连接还要改进。"
+        },
+        {
+          "highlight": "#repair-bank"
+        },
+        {
+          "say": "车头的连接松了，要用螺丝刀固定。"
+        },
+        {
+          "setState": {
+            "demoRepair": true
+          }
+        },
+        {
+          "say": "固定后再测试，车头不晃了，小车继续前进。"
+        },
+        {
+          "say": "不能看到小车动了一下，就说已经完成。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "highlight": "#test-car"
+        },
+        {
+          "say": "现在换你，先按箭头，观察测试现象。"
+        },
+        {
+          "say": "再找相关的零件或工具，送到小车上。"
+        },
+        {
+          "say": "改好后，再推一次，看看问题有没有解决。"
+        },
+        {
+          "say": "屏幕只能记录这些选择，真实稳固性待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "合作要一环接一环",
+      "template": "picture-points",
+      "data": {
+        "title": "合作要一环接一环",
+        "picture": "truck",
+        "points": [
+          "各做一环",
+          "按顺序交接",
+          "一起听取发现"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "现在我们想把这辆车交给伙伴合作组装。"
+        },
+        {
+          "say": "合作不是大家同时抢同一个零件。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "可以让一个人负责一环，清楚自己的任务。"
+        },
+        {
+          "say": "比如一人装车轮，一人接着装车头。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "前一步做好，再交给下一位伙伴。"
+        },
+        {
+          "say": "这样步骤能接上，也容易发现少了哪一步。"
+        },
+        {
+          "say": "小满问：我这里还没装好，要不要先说？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "要把自己的发现讲清楚，也听伙伴怎么想。"
+        },
+        {
+          "say": "大家一起找办法，改好以后再做测试。"
+        },
+        {
+          "say": "这种按顺序接续的分工，像一条流水线。"
+        },
+        {
+          "say": "朵朵说：我知道自己的这一步连着谁了。",
+          "by": "duoduo"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "小检查：顺序和测试",
+      "intro": [
+        "下面是没有玩过的新情境。",
+        "先想观察、按图和测试这些办法，再选图片。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "第一次组装新玩具直升机，动手前应先看什么？",
+          "skill": "先读说明书按序组装",
+          "answer": [
+            "C"
+          ],
+          "analysis": "先看这件新玩具的组装说明图，才知道零件位置和步骤。",
+          "options": {
+            "A": {
+              "label": "涂色画笔",
+              "visual": {
+                "kind": "asset",
+                "image": "q-brush",
+                "alt": "涂色画笔"
+              }
+            },
+            "B": {
+              "label": "礼物盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q-gift",
+                "alt": "礼物盒"
+              }
+            },
+            "C": {
+              "label": "组装说明图",
+              "visual": {
+                "kind": "asset",
+                "image": "q-manual",
+                "alt": "组装说明图"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "玩具公交车一推就掉前轮。接下来该怎样改进？",
+          "skill": "测试发现问题并改进",
+          "answer": [
+            "A"
+          ],
+          "analysis": "测试发现前轮脱落，应针对前轮连接进行修正，之后再测试。",
+          "options": {
+            "A": {
+              "label": "固定前轮连接",
+              "visual": {
+                "kind": "asset",
+                "image": "q-fix",
+                "alt": "固定前轮连接"
+              }
+            },
+            "B": {
+              "label": "给车涂色",
+              "visual": {
+                "kind": "asset",
+                "image": "q-brush",
+                "alt": "给车涂色"
+              }
+            },
+            "C": {
+              "label": "把车装进礼盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q-gift",
+                "alt": "把车装进礼盒"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-bus",
+            "alt": "装好的新玩具公交车一推就掉前轮。下一步应怎样改进？"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "带着发现回家",
+      "template": "summary",
+      "data": {
+        "title": "带着发现回家",
+        "items": [
+          "观察零件，选合适工具",
+          "拆下一件，按顺序收好",
+          "看图组装，做好再测试",
+          "发现问题，改好再测试",
+          "合作接续，听取发现"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天，我们观察了玩具由哪些零件组成。"
+        },
+        {
+          "say": "遇到螺丝连接，就选择合适的螺丝刀。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "拆下一件收好一件，留下顺序方便查找。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "组装前先看说明图，再按顺序连接。"
+        },
+        {
+          "say": "装完要看完整、看稳固，还要试能不能行驶。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "发现问题不着急，找相关部位改好再测试。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "合作时各做一环，前后步骤要接起来。"
+        },
+        {
+          "say": "猫头鹰提醒：说出自己的发现，也听伙伴想法。",
+          "by": "owl"
+        },
+        {
+          "say": "回家可以和大人观察一件需要修理的物品。"
+        },
+        {
+          "say": "说说哪里出了问题，可能需要什么工具。"
+        },
+        {
+          "say": "真实工具操作和口述，请大人帮忙观察。"
+        }
+      ]
+    }
+  ]
+}

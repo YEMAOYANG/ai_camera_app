@@ -1,0 +1,21 @@
+const assert = require('node:assert/strict');
+const { createModel } = require('../pages/guess.js');
+
+const model = createModel();
+assert.equal(model.target().clue, 'under');
+assert.equal(model.target().slots.car, 'under-right');
+assert.equal(model.target().slots.bear, 'under-left');
+assert.equal(model.attempt('bear'), 'excluded');
+assert.equal(model.level, 0, 'a plausible guess does not advance the round');
+assert.equal(model.attempt('bear'), 'ignored');
+assert.equal(model.attempt('car'), 'confirmed');
+model.next();
+assert.equal(model.target().clue, 'on');
+assert.deepEqual([...model.excluded], []);
+assert.equal(model.attempt('car'), 'excluded');
+assert.equal(model.attempt('hat'), 'confirmed');
+assert.equal(model.target(), undefined);
+assert.equal(model.attempt('hat'), 'ignored');
+model.reset();
+assert.equal(model.target().clue, 'under');
+assert.deepEqual([...model.excluded], []);

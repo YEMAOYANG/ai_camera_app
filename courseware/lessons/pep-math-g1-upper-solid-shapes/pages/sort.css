@@ -1,0 +1,24 @@
+#cv{background:#f2eedb}
+.solid-board{position:relative;width:1232px;height:552px;border:2px solid #cdbd94;border-radius:32px;background:#fffaf0;color:#314b48}
+.solid-cards{display:flex;justify-content:center;gap:18px}
+.solid-card,.solid-command{border:3px solid #9bb2a1;border-radius:25px;background:#f9fbef;color:#275b58;cursor:pointer}
+.solid-card:hover:not(:disabled),.solid-command:hover:not(:disabled){border-color:#176c69;background:#ebf6e9}
+.solid-card:focus-visible,.solid-command:focus-visible{outline:4px solid #146766;outline-offset:3px}
+.solid-card.success,.solid-card.placed{border-color:#55834e;background:#e4f1d9}
+.solid-card:disabled,.solid-command:disabled{cursor:default}
+.solid-card img,.solid-token img{object-fit:contain;pointer-events:none}
+.solid-token{display:flex;align-items:center;justify-content:center;flex-direction:column;border:2px solid #bca779;border-radius:23px;background:#fff3cf;color:#3b5145;font-size:23px;font-weight:700}
+.solid-token svg{display:block;max-width:100%}
+.solid-token span{display:block;text-align:center}
+img[hidden]{display:none!important}
+#sort-item{position:absolute;top:25px;left:489px;width:250px;height:225px;display:grid;place-items:center;border:2px solid #c6b486;border-radius:24px;background:#f8eed0}
+#sort-current{width:222px;height:194px;object-fit:contain}
+.sort-direction{position:absolute;left:579px;top:264px;width:70px;height:52px;color:#648c73}
+.sort-shelf{position:absolute;left:44px;right:44px;top:334px;height:185px}
+.sort-shelf button{position:relative;width:250px;height:178px;display:grid;place-items:center}
+.sort-shelf .model{width:203px;height:150px}
+.sort-shelf .stored{position:absolute;left:75px;top:4px;width:122px;height:93px;animation:put-on-shelf .3s ease-out}
+.sort-shelf .placed .model{transform:translate(-51px,37px) scale(.58);opacity:.72}
+@keyframes put-on-shelf{from{transform:translateY(-14px);opacity:.25}to{transform:translateY(0);opacity:1}}
+.geometry-fallback{position:absolute;pointer-events:none}
+img[hidden]+.geometry-fallback{display:none!important}

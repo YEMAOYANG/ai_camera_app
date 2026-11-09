@@ -1,0 +1,879 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 2 Point to the window!",
+  "description": "听英语指令，指教室物件和认识的朋友，跟节奏做动作，学会听后改指。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "可可老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "blue",
+      "persona": "语速清晰，先示范再让孩子动手，用具体图像和声音建立英语指令。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "window": {
+      "file": "assets/window.png"
+    },
+    "door": {
+      "file": "assets/door.png"
+    },
+    "desk": {
+      "file": "assets/desk.png"
+    },
+    "chair": {
+      "file": "assets/chair.png"
+    },
+    "may": {
+      "file": "assets/may.png"
+    },
+    "ben": {
+      "file": "assets/ben.png"
+    },
+    "jo": {
+      "file": "assets/jo.png"
+    },
+    "stand": {
+      "file": "assets/stand.png"
+    },
+    "sit": {
+      "file": "assets/sit.png"
+    },
+    "ceiling": {
+      "file": "assets/ceiling.png"
+    },
+    "floor": {
+      "file": "assets/floor.png"
+    },
+    "test-window": {
+      "file": "assets/test-window.png"
+    },
+    "test-door": {
+      "file": "assets/test-door.png"
+    },
+    "test-desk": {
+      "file": "assets/test-desk.png"
+    },
+    "test-chair": {
+      "file": "assets/test-chair.png"
+    },
+    "test-ceiling": {
+      "file": "assets/test-ceiling.png"
+    },
+    "test-floor": {
+      "file": "assets/test-floor.png"
+    },
+    "test-mia": {
+      "file": "assets/test-mia.png"
+    },
+    "test-leo": {
+      "file": "assets/test-leo.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "listen-point",
+      "title": "先听，再指",
+      "type": "interactive",
+      "page": "pointing-stage",
+      "widgetType": "game",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "start"
+          }
+        },
+        {
+          "say": "三位动物朋友来学英语。我们先听，再指。"
+        },
+        {
+          "say": "我说出目标，你先听清楚，再用手指。"
+        },
+        {
+          "say": "Point to the window!"
+        },
+        {
+          "setState": {
+            "demo": "window"
+          }
+        },
+        {
+          "say": "听到window。看，手指向了窗户。"
+        },
+        {
+          "say": "Point to，意思是用手朝那个方向指。"
+        },
+        {
+          "say": "Point to the door!"
+        },
+        {
+          "setState": {
+            "demo": "door"
+          }
+        },
+        {
+          "say": "这次最后是door，手要转向门。"
+        },
+        {
+          "say": "门有把手，窗有玻璃，两个目标不同。"
+        },
+        {
+          "say": "先听英文，再看示例，最后自己动手。"
+        },
+        {
+          "say": "点喇叭，听完了，再选图片。"
+        },
+        {
+          "say": "如果没听清，先把整句再听一遍。"
+        },
+        {
+          "say": "再听一次，留意最后的词。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "room-relay",
+      "title": "教室指向接力",
+      "type": "interactive",
+      "page": "pointing-stage",
+      "widgetType": "game",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "start"
+          }
+        },
+        {
+          "say": "来玩教室指向接力，先认识四种物品。"
+        },
+        {
+          "setState": {
+            "demo": "window"
+          }
+        },
+        {
+          "say": "第一样是窗户。看玻璃和窗台，window。"
+        },
+        {
+          "setState": {
+            "demo": "door"
+          }
+        },
+        {
+          "say": "再看门。门框连着地面，还有把手，door。"
+        },
+        {
+          "setState": {
+            "demo": "desk"
+          }
+        },
+        {
+          "say": "有桌面可以放书写字，这是课桌，desk。"
+        },
+        {
+          "say": "Point to the desk!"
+        },
+        {
+          "setState": {
+            "demo": "chair"
+          }
+        },
+        {
+          "say": "能坐、能靠背的是椅子，chair。"
+        },
+        {
+          "say": "Point to the chair!"
+        },
+        {
+          "say": "每一轮，图片的位置都会换一换。"
+        },
+        {
+          "say": "别只记位置，听完指令，再找到那个物件。"
+        },
+        {
+          "say": "轮到你。指对以后，还可以跟着说。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "name-voices",
+      "title": "听名字找朋友",
+      "type": "interactive",
+      "page": "pointing-stage",
+      "widgetType": "game",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "start"
+          }
+        },
+        {
+          "say": "这次要指的是朋友，先认识他们的样子。"
+        },
+        {
+          "setState": {
+            "demo": "may"
+          }
+        },
+        {
+          "say": "第一位是May。她是戴红领结的长耳兔。"
+        },
+        {
+          "say": "Point to May!"
+        },
+        {
+          "setState": {
+            "demo": "ben"
+          }
+        },
+        {
+          "say": "第二位是Ben。他是戴蓝领结的圆耳熊。"
+        },
+        {
+          "say": "Point to Ben!"
+        },
+        {
+          "setState": {
+            "demo": "jo"
+          }
+        },
+        {
+          "say": "穿黄色背心的浣熊是Jo。"
+        },
+        {
+          "say": "Point to Jo!"
+        },
+        {
+          "say": "三个头像会换位置，样子和名字没换。"
+        },
+        {
+          "say": "耳朵先听，眼睛再看，小手最后点。"
+        },
+        {
+          "say": "请按听到的名字，把朋友请到台前。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "room-beat",
+      "title": "跟着节奏做动作",
+      "type": "interactive",
+      "page": "pointing-stage",
+      "widgetType": "game",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "start"
+          }
+        },
+        {
+          "say": "现在跟着节奏动起来。一拍只做一个动作。"
+        },
+        {
+          "setState": {
+            "demo": "stand"
+          }
+        },
+        {
+          "say": "听到Stand up，脚站稳，身体直起来。"
+        },
+        {
+          "say": "Stand up!"
+        },
+        {
+          "setState": {
+            "demo": "sit"
+          }
+        },
+        {
+          "say": "听到Sit down，就坐回椅子上。"
+        },
+        {
+          "say": "Sit down!"
+        },
+        {
+          "setState": {
+            "demo": "ceiling"
+          }
+        },
+        {
+          "say": "抬头看，头顶高高的天花板是ceiling。"
+        },
+        {
+          "say": "Point to the ceiling!"
+        },
+        {
+          "say": "灯挂在顶面上。听到ceiling，指的是顶面。"
+        },
+        {
+          "setState": {
+            "demo": "floor"
+          }
+        },
+        {
+          "say": "低头看，脚踩的平面是floor，地板。"
+        },
+        {
+          "say": "Point to the floor!"
+        },
+        {
+          "say": "还会听到门窗的词。朝听到的地方指。"
+        },
+        {
+          "say": "听一拍，做一下。也能在图片上选。"
+        },
+        {
+          "say": "你也可以打拍子，把口令念给大人听。"
+        },
+        {
+          "setState": {
+            "demo": "rhythm"
+          }
+        },
+        {
+          "say": "我来连做三拍。听一句，做一下。"
+        },
+        {
+          "say": "Stand up! Sit down! Point to the door!"
+        },
+        {
+          "say": "第一拍站，第二拍坐，第三拍指门。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "spot-and-fix",
+      "title": "指错了，换一个",
+      "type": "interactive",
+      "page": "pointing-stage",
+      "widgetType": "game",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "window"
+          }
+        },
+        {
+          "say": "Point to the door! 你看，它先指到了窗。"
+        },
+        {
+          "say": "No，指错了。重听，最后是door。"
+        },
+        {
+          "setState": {
+            "demo": "door"
+          }
+        },
+        {
+          "say": "再听指令，找有把手的门，把手转过去。"
+        },
+        {
+          "say": "这下指到了听见的对象。Yes!"
+        },
+        {
+          "setState": {
+            "demo": "chair"
+          }
+        },
+        {
+          "say": "如果它指错桌椅，可以说No，请它再听。"
+        },
+        {
+          "say": "先留住原来的位置，再核对最后听到的词。"
+        },
+        {
+          "say": "确定以后，把手转到对的地方。"
+        },
+        {
+          "say": "最后换你当小老师，请大人做动作。"
+        },
+        {
+          "say": "先说Point to the，再说你想让他指的物件。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "stage-friends",
+      "title": "剧场里指给大家看",
+      "type": "interactive",
+      "page": "pointing-stage",
+      "widgetType": "game",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "start"
+          }
+        },
+        {
+          "say": "现在来到小剧场。三位小演员等着点名。"
+        },
+        {
+          "setState": {
+            "demo": "may"
+          }
+        },
+        {
+          "say": "听到May，请长耳兔上台。"
+        },
+        {
+          "say": "Hello, I'm May."
+        },
+        {
+          "setState": {
+            "demo": "ben"
+          }
+        },
+        {
+          "say": "听到Ben，请圆耳小熊站到台前。"
+        },
+        {
+          "say": "Hello, I'm Ben."
+        },
+        {
+          "setState": {
+            "demo": "jo"
+          }
+        },
+        {
+          "say": "听到Jo，请穿黄背心的浣熊出场。"
+        },
+        {
+          "say": "Hello, I'm Jo."
+        },
+        {
+          "say": "演员用I'm和自己的名字介绍自己。"
+        },
+        {
+          "say": "同伴也能挥挥手，回应一声Hello。"
+        },
+        {
+          "say": "听名字，指对演员。也来向朋友问好。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "check",
+      "title": "听一听，选图片",
+      "type": "quiz",
+      "intro": [
+        "来到新的活动室。请独立听指令，再点图。",
+        "慢一点也没关系。没听清，可以再听。"
+      ],
+      "questions": [
+        {
+          "id": "q-window",
+          "question": "Point to the window!",
+          "skill": "听懂并指向教室物品",
+          "answer": [
+            "B"
+          ],
+          "analysis": "window是窗户。透过有窗框和窗台的玻璃，可以看见天空。",
+          "options": {
+            "A": {
+              "label": "门",
+              "visual": {
+                "kind": "asset",
+                "image": "test-door",
+                "alt": "门"
+              }
+            },
+            "B": {
+              "label": "窗户",
+              "visual": {
+                "kind": "asset",
+                "image": "test-window",
+                "alt": "窗户"
+              }
+            },
+            "C": {
+              "label": "椅子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-chair",
+                "alt": "椅子"
+              }
+            },
+            "D": {
+              "label": "桌子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-desk",
+                "alt": "桌子"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-door",
+          "question": "Point to the door!",
+          "skill": "听懂并指向教室物品",
+          "answer": [
+            "D"
+          ],
+          "analysis": "door是门。图中有完整门框，中间两扇门各有一个把手。",
+          "options": {
+            "A": {
+              "label": "桌子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-desk",
+                "alt": "桌子"
+              }
+            },
+            "B": {
+              "label": "椅子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-chair",
+                "alt": "椅子"
+              }
+            },
+            "C": {
+              "label": "窗户",
+              "visual": {
+                "kind": "asset",
+                "image": "test-window",
+                "alt": "窗户"
+              }
+            },
+            "D": {
+              "label": "门",
+              "visual": {
+                "kind": "asset",
+                "image": "test-door",
+                "alt": "门"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-desk",
+          "question": "Point to the desk!",
+          "skill": "听懂并指向教室物品",
+          "answer": [
+            "A"
+          ],
+          "analysis": "desk是桌子。选有平桌面、可以放画笔的物件。",
+          "options": {
+            "A": {
+              "label": "桌子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-desk",
+                "alt": "桌子"
+              }
+            },
+            "B": {
+              "label": "窗户",
+              "visual": {
+                "kind": "asset",
+                "image": "test-window",
+                "alt": "窗户"
+              }
+            },
+            "C": {
+              "label": "门",
+              "visual": {
+                "kind": "asset",
+                "image": "test-door",
+                "alt": "门"
+              }
+            },
+            "D": {
+              "label": "椅子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-chair",
+                "alt": "椅子"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-chair",
+          "question": "Point to the chair!",
+          "skill": "听懂并指向教室物品",
+          "answer": [
+            "C"
+          ],
+          "analysis": "chair是椅子。它有坐的地方，也有能靠背的地方。",
+          "options": {
+            "A": {
+              "label": "窗户",
+              "visual": {
+                "kind": "asset",
+                "image": "test-window",
+                "alt": "窗户"
+              }
+            },
+            "B": {
+              "label": "桌子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-desk",
+                "alt": "桌子"
+              }
+            },
+            "C": {
+              "label": "椅子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-chair",
+                "alt": "椅子"
+              }
+            },
+            "D": {
+              "label": "门",
+              "visual": {
+                "kind": "asset",
+                "image": "test-door",
+                "alt": "门"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-correct",
+          "question": "它指了门。听：Point to the desk!",
+          "skill": "听令检查并改指",
+          "answer": [
+            "B"
+          ],
+          "analysis": "听到desk，要指桌子。手原来指着门，要转到桌子。",
+          "options": {
+            "A": {
+              "label": "椅子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-chair",
+                "alt": "椅子"
+              }
+            },
+            "B": {
+              "label": "桌子",
+              "visual": {
+                "kind": "asset",
+                "image": "test-desk",
+                "alt": "桌子"
+              }
+            },
+            "C": {
+              "label": "门",
+              "visual": {
+                "kind": "asset",
+                "image": "test-door",
+                "alt": "门"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-ceiling",
+          "question": "Point to the ceiling!",
+          "skill": "听懂歌曲中的位置词",
+          "answer": [
+            "A"
+          ],
+          "analysis": "ceiling是天花板。抬头能看见顶面和长灯。",
+          "options": {
+            "A": {
+              "label": "天花板",
+              "visual": {
+                "kind": "asset",
+                "image": "test-ceiling",
+                "alt": "天花板"
+              }
+            },
+            "B": {
+              "label": "地板",
+              "visual": {
+                "kind": "asset",
+                "image": "test-floor",
+                "alt": "地板"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-floor",
+          "question": "Point to the floor!",
+          "skill": "听懂歌曲中的位置词",
+          "answer": [
+            "B"
+          ],
+          "analysis": "floor是地板。低头能看见脚踩的地砖。",
+          "options": {
+            "A": {
+              "label": "天花板",
+              "visual": {
+                "kind": "asset",
+                "image": "test-ceiling",
+                "alt": "天花板"
+              }
+            },
+            "B": {
+              "label": "地板",
+              "visual": {
+                "kind": "asset",
+                "image": "test-floor",
+                "alt": "地板"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-friend",
+          "question": "圆帽是Mia，领巾是Leo。Point to Leo!",
+          "skill": "听名指人",
+          "answer": [
+            "A"
+          ],
+          "analysis": "听到的名字是Leo。前面介绍系领巾的是Leo，要指向系领巾的朋友。",
+          "options": {
+            "A": {
+              "label": "系领巾的水獭",
+              "visual": {
+                "kind": "asset",
+                "image": "test-leo",
+                "alt": "系领巾的水獭"
+              }
+            },
+            "B": {
+              "label": "戴圆帽的小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "test-mia",
+                "alt": "戴圆帽的小鸟"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-mia",
+          "question": "领巾是Leo，圆帽是Mia。Point to Mia!",
+          "skill": "听名指人",
+          "answer": [
+            "B"
+          ],
+          "analysis": "Mia是戴圆帽的朋友，Leo系着领巾。听到Mia就指向戴圆帽的朋友。",
+          "options": {
+            "A": {
+              "label": "系领巾的水獭",
+              "visual": {
+                "kind": "asset",
+                "image": "test-leo",
+                "alt": "系领巾的水獭"
+              }
+            },
+            "B": {
+              "label": "戴圆帽的小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "test-mia",
+                "alt": "戴圆帽的小鸟"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "title": "今天我会听指令",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "今天我会听指令",
+        "picture": "cover",
+        "points": [
+          "先听动作",
+          "再听对象",
+          "指向并核对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们在教室和小剧场里听指令。"
+        },
+        {
+          "say": "记住三个步骤，手就不会乱指。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先听动作。Point to，是要把手指向。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再听对象。门窗、桌椅，或朋友的名字。"
+        },
+        {
+          "say": "位置会换，还是找听到的那个对象。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "指好，再回头看看，手指对了吗？"
+        },
+        {
+          "say": "指错可以重听，再把手转到对的方向。"
+        },
+        {
+          "say": "在家也给大人发一条指令，换他指一指。"
+        },
+        {
+          "say": "你还可以演个小演员，用Hello问候。"
+        }
+      ]
+    }
+  ]
+}

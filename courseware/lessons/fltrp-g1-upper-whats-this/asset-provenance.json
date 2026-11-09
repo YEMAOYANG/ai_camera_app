@@ -1,0 +1,1128 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "assetPlanSha256": "6d72a8af1fcf0316781fb0fd39bc091eb1ef5294e1c78ca068b8008bac9d38fd",
+  "assets": [
+    {
+      "assetKey": "cover",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-cover.png",
+      "originalSha256": "a5d056dea6a1551fe80c94a8ed46d5f019da83facf75c0923a4a579dc178c396",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-cover.json",
+      "generationReceiptSha256": "38d60e2816c9702dea7dd13fa708b4eacca9b1f609fd529b840fad585a2111b1",
+      "prompt": "16:9 横向封面，人物和全部物件保留在中心安全区。\n图书角暖光场景，两个低年级学生在低矮学习桌旁打开一只双肩书包，孩子手中有书和一把尺，桌上有独立的一支钢笔和一支铅笔。各物可辨，画面中心偏上，留出下部与一侧空间叠加课堂标题和开始按钮。不要多件物品重叠。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/cover.png",
+      "sha256": "a5d056dea6a1551fe80c94a8ed46d5f019da83facf75c0923a4a579dc178c396",
+      "pixels": [
+        1672,
+        941
+      ],
+      "derivation": {
+        "method": "original_bytes"
+      },
+      "review": "两名儿童与敞开的书包居中。手中书和尺、桌上墨水钢笔与木铅笔完整易辨，无可读文字。原画幅保持完整，底部留空。",
+      "usedByScenes": [
+        "picture-reveal",
+        "schoolbag-items",
+        "puzzle-listen",
+        "speaker-position",
+        "take-turns",
+        "recap"
+      ],
+      "usedByQuestions": []
+    },
+    {
+      "assetKey": "object-schoolbag",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/object-schoolbag.png",
+      "sha256": "2859828f25f2224804d33d184521a4a271a6d5895e2fcface40eb9400a8a3812",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          0,
+          0,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "肩带、提手、袋体和扣件完整，轮廓清楚。",
+      "usedByScenes": [
+        "schoolbag-items",
+        "puzzle-listen",
+        "speaker-position"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "f7296dff9510dadce2e0ef8a21a7fad7f03324b18f199859b25fbf1c5d11c0da",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "object-book",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/object-book.png",
+      "sha256": "40a3fecc4bc6f57b8a3cf3cb6f3efd4670508e7fa2dfe5d058a83deb76254ac6",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          418,
+          0,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "完整硬皮书有独立书脊和成摞纸页，未混入别格。",
+      "usedByScenes": [
+        "schoolbag-items",
+        "puzzle-listen",
+        "speaker-position"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "c0e4fa05b2a907751f20f411e6fb77f6cbbd3dda5a32a00b41665dbab537096a",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "object-pen",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/object-pen.png",
+      "sha256": "b66079fcde54d04f0855fd621bc11de21c84438e1ed9bfb9aee33239f19a5b80",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          836,
+          0,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "蓝色笔身和金色墨水尖完整。尖端分缝与开孔可区别于铅笔。",
+      "usedByScenes": [
+        "schoolbag-items",
+        "puzzle-listen",
+        "speaker-position",
+        "take-turns"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "f370572a522e65a8046d2187f47fee9b029d269e70c3d9bd6933e2b111d71384",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "object-pencil",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/object-pencil.png",
+      "sha256": "8163dda40ee75e26ab4643a571464f5c6d757caa0c6928a73fad99fe445ee9e6",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          0,
+          418,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "木质削尖处、石墨尖和黄色笔身完整，另一端有橡皮头。",
+      "usedByScenes": [
+        "schoolbag-items",
+        "puzzle-listen",
+        "speaker-position",
+        "take-turns"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "ff57bc394ffa7595e0ec71600f281d20785c1e61398e70eb5a3a154f37fe7edc",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "object-ruler",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/object-ruler.png",
+      "sha256": "28eca9a9bf67432b04bd6219ef91a1c62b7651bcde0d468ab1d95c17cd1ef95d",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          418,
+          418,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "单把直尺、两端和短刻线全部保留，没有数字。",
+      "usedByScenes": [
+        "schoolbag-items",
+        "take-turns"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "703b5ffc53030110b2c73d02dc3d151cd538e08bb4d0a78ddcfea26068c4fa7d",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "object-window",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/object-window.png",
+      "sha256": "71a1a1376f8ff61278f6a96a751d8f26969e8db7454f6534dbff4db6047a6be2",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          836,
+          418,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "四边框、交叉窗棂和四块玻璃完整，玻璃反光可分辨。",
+      "usedByScenes": [
+        "speaker-position"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "9c8a7b6b7dbc153844c7c27a4f776189cb044c5b430563f2d57dc6858389654d",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "object-door",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/object-door.png",
+      "sha256": "87aace0b9707055061ef938fe42d6fbc78e8ea9e45bbea45a96b848a30b81669",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          0,
+          836,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "门扇、外框和水平把手完整，独立于窗格。",
+      "usedByScenes": [
+        "speaker-position"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "1d507fa33a3527d701d9c696f27480c010943fca6dd804e4a0da0d3441f833be",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "reveal-cat",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/reveal-cat.png",
+      "sha256": "9b807caad0acc6c45990f032e64f3c097d3496832a42ebd6dc14d371e48f2b2b",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          418,
+          836,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "两只尖耳、猫脸、四肢和橙色长尾完整，未切尾尖。",
+      "usedByScenes": [
+        "picture-reveal"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "bdfcf686479a889eaeb30e9981b2f4ba78baa2c0024960770fb95fb2c198a161",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "reveal-panda",
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-teaching-objects.png",
+      "originalSha256": "70692351d2e6c54b5a43d428f60bef1ebf9057d4b34b9e36e36651a4646dd0f0",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-teaching-objects.json",
+      "generationReceiptSha256": "17be85e95675ae74d3062d183fbdffbac072746becd343bb10a8c279091d39d2",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，顺序完全按原提示，每格主体留四边裁切空间。\n九格资产：红橘双肩书包（肩带可见）、封面浅蓝且见书脊纸页的合上硬皮书、露金属笔尖的蓝色钢笔；削出木头和石墨尖的黄铅笔、单独平直并带短刻线但没有数字的绿色尺、完整四边框玻璃窗；带把手的浅木门、坐姿橘猫有三角耳和一条长尾、坐姿熊猫有黑眼圈和圆耳。每格一个主体，在浅奶油背景上独立。两笔大小接近，裸露笔尖放大清楚，钢笔不用圆珠尖，铅笔不用自动铅笔。书与尺不画真实字。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "assetPath": "assets/reveal-panda.png",
+      "sha256": "3ddd5f3925b73acbf25ab47d980c6d23a973648236964a66ecabc4ec82ac5fc5",
+      "pixels": [
+        418,
+        418
+      ],
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          836,
+          836,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      },
+      "review": "圆耳、黑色眼圈、浅色脸和黑白躯干完整，未切脚掌。",
+      "usedByScenes": [
+        "picture-reveal"
+      ],
+      "usedByQuestions": [],
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "313647ffc7ad93cd73aed508521713cbdfa0a1bbe7597e8a82979fe1a380090a",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "reading-corner",
+      "assetPath": "assets/reading-corner.png",
+      "sha256": "fce42698b891d83d1b7e271b15838745a62ff16fa01a4243fa93ce38c7ae9e75",
+      "pixels": [
+        1072,
+        603
+      ],
+      "review": "暖色阅读角，矮书架和无字的书可识别；中央可叠加卡片。",
+      "usedByScenes": [
+        "schoolbag-items"
+      ],
+      "usedByQuestions": [],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-rooms.png",
+      "originalSha256": "995d5a76d9615c429b66b3d0cdc167fd7d814a915bf75f9620686c6402742447",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-rooms.json",
+      "generationReceiptSha256": "1099bbfa0a5a1da476b83871d351ec67a7a4aef5623dc69b1b2f53eb312cd3cd",
+      "prompt": "极宽横幅，两幅室内场景左右并列、严格等宽，正中竖向位置是两幅场景之间的干净切线。每幅尽量保留16:9比例，把关键布置集中在中间高度以便各自裁成16:9。不要可见边框。\n两个室内宽景。第一格是简单安静的学校阅读角，单个矮书架靠边，空地与桌面背景轻；第二格是安静美术活动室，墙边一角有收纳盒，不画窗、门、人物或显眼的近远指示物，预留地面两站位与顶部两物位置。两格空间和光色不同。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          7,
+          32,
+          1072,
+          603
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "art-room",
+      "assetPath": "assets/art-room.png",
+      "sha256": "d327735abf046c3a9e746bd1cf4e2bdd910e5428ff9561dcce2d5b6112ace01f",
+      "pixels": [
+        1072,
+        603
+      ],
+      "review": "青色美术室有画具与收纳，门窗和人物均由前景独立呈现。",
+      "usedByScenes": [
+        "speaker-position",
+        "take-turns"
+      ],
+      "usedByQuestions": [],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-rooms.png",
+      "originalSha256": "995d5a76d9615c429b66b3d0cdc167fd7d814a915bf75f9620686c6402742447",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-rooms.json",
+      "generationReceiptSha256": "1099bbfa0a5a1da476b83871d351ec67a7a4aef5623dc69b1b2f53eb312cd3cd",
+      "prompt": "极宽横幅，两幅室内场景左右并列、严格等宽，正中竖向位置是两幅场景之间的干净切线。每幅尽量保留16:9比例，把关键布置集中在中间高度以便各自裁成16:9。不要可见边框。\n两个室内宽景。第一格是简单安静的学校阅读角，单个矮书架靠边，空地与桌面背景轻；第二格是安静美术活动室，墙边一角有收纳盒，不画窗、门、人物或显眼的近远指示物，预留地面两站位与顶部两物位置。两格空间和光色不同。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          1093,
+          32,
+          1072,
+          603
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "speaker-child",
+      "assetPath": "assets/speaker-child.png",
+      "sha256": "504a7af892b9836f16340d9e51121e03170296026a62e05bcae4340a7ea4bbe9",
+      "pixels": [
+        627,
+        627
+      ],
+      "review": "橙衣学生向右，头、手和脚完整，没有指向答案。",
+      "usedByScenes": [
+        "speaker-position",
+        "take-turns"
+      ],
+      "usedByQuestions": [],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-speakers.png",
+      "originalSha256": "33c2bac01542b06319fef131b3ceb4f9db9adc96861a504cc942feab53125ab5",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-speakers.json",
+      "generationReceiptSha256": "b8f7a937f60888d7425ecd4ac456cf7bd1752587faeb5667bd7aea5d9fe23ae3",
+      "prompt": "1:1 正方形画布，严格两列两行等面积隐形网格，每格背景同一暖奶油色，人物完整，脚与头均离格边有留白。\n前两格为两位不同的中国一年级孩子，左格一个短发穿浅橘上衣，身体面向右；右格一个扎低辫穿淡青上衣，身体面向左。都站立，目光朝面对的伙伴，双手自然下垂，不用手势提示答案。下两格分别换成姿态中立的绿衣和红褐衣学生，作为新题中位置参照。每格只一人，人物不跨格。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          0,
+          0,
+          627,
+          627
+        ],
+        "tool": "ffmpeg"
+      },
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "f7fc35f6495bb8cd78ed161e7679c9ce1e96c42ef40a384d2e46672398ea5333",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "partner-child",
+      "assetPath": "assets/partner-child.png",
+      "sha256": "73bcd20375e7f2ee7cb450363ca242ab7acb20633d970e9e6284ef9e7d3e6817",
+      "pixels": [
+        627,
+        627
+      ],
+      "review": "青衣学生向左，发辫和鞋完整，没有指向答案。",
+      "usedByScenes": [
+        "take-turns"
+      ],
+      "usedByQuestions": [],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-speakers.png",
+      "originalSha256": "33c2bac01542b06319fef131b3ceb4f9db9adc96861a504cc942feab53125ab5",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-speakers.json",
+      "generationReceiptSha256": "b8f7a937f60888d7425ecd4ac456cf7bd1752587faeb5667bd7aea5d9fe23ae3",
+      "prompt": "1:1 正方形画布，严格两列两行等面积隐形网格，每格背景同一暖奶油色，人物完整，脚与头均离格边有留白。\n前两格为两位不同的中国一年级孩子，左格一个短发穿浅橘上衣，身体面向右；右格一个扎低辫穿淡青上衣，身体面向左。都站立，目光朝面对的伙伴，双手自然下垂，不用手势提示答案。下两格分别换成姿态中立的绿衣和红褐衣学生，作为新题中位置参照。每格只一人，人物不跨格。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          627,
+          0,
+          627,
+          627
+        ],
+        "tool": "ffmpeg"
+      },
+      "embeddedBackup": {
+        "tool": "ffmpeg",
+        "scale": [
+          192,
+          192
+        ],
+        "format": "jpeg",
+        "qScale": 3,
+        "sha256": "10e5e7dd453ffeef0e8acd1b6a6037c83e95a895c53cf371463ff2debd740e5a",
+        "usedIn": "pages/object-stage.js"
+      }
+    },
+    {
+      "assetKey": "quiz-speaker-green",
+      "assetPath": "assets/quiz-speaker-green.png",
+      "sha256": "8510062bc1bd737efb20c301d6656a0f94b7cdd68290f2ccdce28db551cd250d",
+      "pixels": [
+        627,
+        627
+      ],
+      "review": "绿衣学生正面站稳，双手自然垂下。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-this"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-speakers.png",
+      "originalSha256": "33c2bac01542b06319fef131b3ceb4f9db9adc96861a504cc942feab53125ab5",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-speakers.json",
+      "generationReceiptSha256": "b8f7a937f60888d7425ecd4ac456cf7bd1752587faeb5667bd7aea5d9fe23ae3",
+      "prompt": "1:1 正方形画布，严格两列两行等面积隐形网格，每格背景同一暖奶油色，人物完整，脚与头均离格边有留白。\n前两格为两位不同的中国一年级孩子，左格一个短发穿浅橘上衣，身体面向右；右格一个扎低辫穿淡青上衣，身体面向左。都站立，目光朝面对的伙伴，双手自然下垂，不用手势提示答案。下两格分别换成姿态中立的绿衣和红褐衣学生，作为新题中位置参照。每格只一人，人物不跨格。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          0,
+          627,
+          627,
+          627
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-speaker-brown",
+      "assetPath": "assets/quiz-speaker-brown.png",
+      "sha256": "1a302e6548cd6a345a44f6cb70dafbf7bdb9f04591031fa3cbcfab6d59f81869",
+      "pixels": [
+        627,
+        627
+      ],
+      "review": "红褐衣学生正面站稳，两脚完整。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-that"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-speakers.png",
+      "originalSha256": "33c2bac01542b06319fef131b3ceb4f9db9adc96861a504cc942feab53125ab5",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-speakers.json",
+      "generationReceiptSha256": "b8f7a937f60888d7425ecd4ac456cf7bd1752587faeb5667bd7aea5d9fe23ae3",
+      "prompt": "1:1 正方形画布，严格两列两行等面积隐形网格，每格背景同一暖奶油色，人物完整，脚与头均离格边有留白。\n前两格为两位不同的中国一年级孩子，左格一个短发穿浅橘上衣，身体面向右；右格一个扎低辫穿淡青上衣，身体面向左。都站立，目光朝面对的伙伴，双手自然下垂，不用手势提示答案。下两格分别换成姿态中立的绿衣和红褐衣学生，作为新题中位置参照。每格只一人，人物不跨格。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          627,
+          627,
+          627,
+          627
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-schoolbag",
+      "assetPath": "assets/quiz-schoolbag.png",
+      "sha256": "f7dbdcee10ab3a7b6197d62e3b0bbd5f8c589fdf54f668e3db4003b9f46bd2fb",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "青色双肩书包可见提手、背带和正面拉链，轮廓完整。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-book",
+        "q-pencil",
+        "q-ruler",
+        "q-schoolbag",
+        "q-this",
+        "q-whole"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          0,
+          0,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-book",
+      "assetPath": "assets/quiz-book.png",
+      "sha256": "a403157f9e5915212a1b6cade017f2199130bb25c27466f2d4f39324b4029261",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "橘封面、书脊和纸页均清楚，书上无印字。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-book",
+        "q-pen",
+        "q-schoolbag",
+        "q-this",
+        "q-whole"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          418,
+          0,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-pen-green",
+      "assetPath": "assets/quiz-pen-green.png",
+      "sha256": "8d843d927ca4a8cbc41feefd3c9f2ed2ccce8bc4c34fd86867dc9b8025d923d3",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "绿钢笔金属墨尖、笔身和笔尾完整。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-book",
+        "q-pen",
+        "q-whole"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          836,
+          0,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-pencil",
+      "assetPath": "assets/quiz-pencil.png",
+      "sha256": "8741d1ec03f2714ab305624ab3837f068e0c4409e3ba35bb386a22389664b43d",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "蓝铅笔裸露木质削尖，另一端橡皮完整。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-pen",
+        "q-pencil",
+        "q-ruler",
+        "q-schoolbag"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          0,
+          418,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-ruler-clear",
+      "assetPath": "assets/quiz-ruler-clear.png",
+      "sha256": "8bd7ca700d9350f968d796dc9f26b108dab6735a0c1fdcf61323be2986391fd9",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "透明直尺两端与短刻线完整，背景有对比。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-pen",
+        "q-ruler",
+        "q-schoolbag",
+        "q-whole"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          418,
+          418,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-ruler-odd",
+      "assetPath": "assets/quiz-ruler-odd.png",
+      "sha256": "768f4667cedbc577996ae9d6717f3c409af8b46c9e767243b865ca1b2302ad19",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "灰绿尺圆端有孔，顶部连续短刻线可辨。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-book",
+        "q-pencil",
+        "q-whole"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          836,
+          418,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-window",
+      "assetPath": "assets/quiz-window.png",
+      "sha256": "8d00737eddebb5f1508307242ac5a8a2dadbae016b8a0a4948ff7dc42fb2a0aa",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "横推窗玻璃扇与框完整，与实心门区分。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-that",
+        "q-window"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          0,
+          836,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-door",
+      "assetPath": "assets/quiz-door.png",
+      "sha256": "19323adb5562e5d5c7f40a877fee3bbd9ec11a39333c1a2a38af1752019282e2",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "深青色门体和单个圆把手完整。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-that",
+        "q-window"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          418,
+          836,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-pen-purple",
+      "assetPath": "assets/quiz-pen-purple.png",
+      "sha256": "7389c5f8641bf4436a1d7d827ff9d6f216a4980a6ebd6a3c365cd6a322e6d25e",
+      "pixels": [
+        418,
+        418
+      ],
+      "review": "紫钢笔露出金属墨尖，主体各边完整。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-pencil",
+        "q-ruler"
+      ],
+      "tool": "Codex built-in image_gen",
+      "originalPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/candidates/wwt-quiz-objects.png",
+      "originalSha256": "066e9c6293caf5ae8661c30a31b37f3cde6af7e021257c78bc9c278f436080b8",
+      "generationReceiptPath": "output/courseware-lessons/fltrp-g1-upper-whats-this/codex-imagegen-v1/wwt-quiz-objects.json",
+      "generationReceiptSha256": "cbaf61311e85f8b2416525aab7d823a4c5d54255f2bfce85bceed7368217f5d6",
+      "prompt": "1:1 正方形画布，严格三列三行等面积隐形网格，按行从左到右对应顺序，各格主体留四边裁切空间。\n九张小测新实物图，和教学图改形状、朝向、色彩与拍法。依次为青色帆布圆角书包，橘色合书露页边，一支暗绿墨水钢笔朝左上露明晰金属笔尖；一支木头削尖的蓝铅笔朝左，白色透明直尺但背景衬深以显刻线，一把灰绿色异形末端直尺；金色木质横推窗带两玻璃扇，深青色带圆把手闭合门，一支露金属笔尖的深紫色墨水钢笔。每格只有一种物，钢笔与铅笔的笔尖务必无裁切且能独立认出。清晰温暖的原创图画书，暖奶油底、深线与少量橘红和青蓝，物体明暗分离，低细节，幼儿一眼可分辨；无文字、标签、数字、emoji、箭头、边框、现有教材角色与图样。多格图严格等面积，图像主体居中于各格并留足裁边，不画可见分隔线。",
+      "derivation": {
+        "method": "pixel_crop_no_resample",
+        "rectangleXywh": [
+          836,
+          836,
+          418,
+          418
+        ],
+        "tool": "ffmpeg"
+      }
+    },
+    {
+      "assetKey": "quiz-ruler-revealed",
+      "assetPath": "assets/quiz-ruler-revealed.png",
+      "sha256": "8b4fea57739fd7372f4877dbaa7e54a980bd92f7ca23f5582869a942d68e3e60",
+      "pixels": [
+        960,
+        540
+      ],
+      "review": "展开的两块遮片分居两侧。中间新尺的两端和连续刻线清楚。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-whole"
+      ],
+      "tool": "code layout using checked Codex crops",
+      "derivation": {
+        "method": "ffmpeg exact image placement",
+        "canvas": [
+          960,
+          540
+        ],
+        "background": "fff2d6",
+        "boxesXywhRgb": [
+          [
+            44,
+            93,
+            190,
+            354,
+            "e9be83"
+          ],
+          [
+            726,
+            93,
+            190,
+            354,
+            "e9be83"
+          ],
+          [
+            221,
+            93,
+            13,
+            354,
+            "b9804a"
+          ],
+          [
+            726,
+            93,
+            13,
+            354,
+            "b9804a"
+          ]
+        ],
+        "components": [
+          {
+            "asset": "quiz-ruler-odd",
+            "size": 432,
+            "xy": [
+              264,
+              54
+            ],
+            "sourceSha256": "768f4667cedbc577996ae9d6717f3c409af8b46c9e767243b865ca1b2302ad19"
+          }
+        ],
+        "filterGraph": "[0:v]format=rgb24,drawbox=x=44:y=93:w=190:h=354:color=0xe9be83:t=fill,drawbox=x=726:y=93:w=190:h=354:color=0xe9be83:t=fill,drawbox=x=221:y=93:w=13:h=354:color=0xb9804a:t=fill,drawbox=x=726:y=93:w=13:h=354:color=0xb9804a:t=fill[layer0];[1:v]scale=432:432:flags=lanczos[part1];[layer0][part1]overlay=264:54:format=rgb[layer1]"
+      }
+    },
+    {
+      "assetKey": "quiz-this-room",
+      "assetPath": "assets/quiz-this-room.png",
+      "sha256": "a55e19d9c8b128532cbe9be3579b8f5d50d8c31e3694d12efb09a046f5d4c0d5",
+      "pixels": [
+        960,
+        540
+      ],
+      "review": "绿衣人、书包、书从左至右。图像中心相距286与630像素，this 唯一命中书包。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-this"
+      ],
+      "tool": "code layout using checked Codex crops",
+      "derivation": {
+        "method": "ffmpeg exact image placement",
+        "canvas": [
+          960,
+          540
+        ],
+        "background": "fdf1d9",
+        "boxesXywhRgb": [
+          [
+            0,
+            458,
+            960,
+            82,
+            "efce98"
+          ]
+        ],
+        "components": [
+          {
+            "asset": "quiz-speaker-green",
+            "size": 328,
+            "xy": [
+              26,
+              118
+            ],
+            "sourceSha256": "8510062bc1bd737efb20c301d6656a0f94b7cdd68290f2ccdce28db551cd250d"
+          },
+          {
+            "asset": "quiz-schoolbag",
+            "size": 224,
+            "xy": [
+              364,
+              230
+            ],
+            "sourceSha256": "f7dbdcee10ab3a7b6197d62e3b0bbd5f8c589fdf54f668e3db4003b9f46bd2fb"
+          },
+          {
+            "asset": "quiz-book",
+            "size": 224,
+            "xy": [
+              708,
+              230
+            ],
+            "sourceSha256": "a403157f9e5915212a1b6cade017f2199130bb25c27466f2d4f39324b4029261"
+          }
+        ],
+        "filterGraph": "[0:v]format=rgb24,drawbox=x=0:y=458:w=960:h=82:color=0xefce98:t=fill[layer0];[1:v]scale=328:328:flags=lanczos[part1];[layer0][part1]overlay=26:118:format=rgb[layer1];[2:v]scale=224:224:flags=lanczos[part2];[layer1][part2]overlay=364:230:format=rgb[layer2];[3:v]scale=224:224:flags=lanczos[part3];[layer2][part3]overlay=708:230:format=rgb[layer3]"
+      }
+    },
+    {
+      "assetKey": "quiz-that-room",
+      "assetPath": "assets/quiz-that-room.png",
+      "sha256": "85d23c367cb191e98cb8e647208c9998bc0c0db1bfc70d370d3ff61cd632a584",
+      "pixels": [
+        960,
+        540
+      ],
+      "review": "门、窗、红褐衣人从左至右。图像中心相距632与286像素，that 唯一命中门。",
+      "usedByScenes": [
+        "transfer-quiz"
+      ],
+      "usedByQuestions": [
+        "q-that"
+      ],
+      "tool": "code layout using checked Codex crops",
+      "derivation": {
+        "method": "ffmpeg exact image placement",
+        "canvas": [
+          960,
+          540
+        ],
+        "background": "fdf1d9",
+        "boxesXywhRgb": [
+          [
+            0,
+            458,
+            960,
+            82,
+            "efce98"
+          ]
+        ],
+        "components": [
+          {
+            "asset": "quiz-door",
+            "size": 224,
+            "xy": [
+              26,
+              230
+            ],
+            "sourceSha256": "19323adb5562e5d5c7f40a877fee3bbd9ec11a39333c1a2a38af1752019282e2"
+          },
+          {
+            "asset": "quiz-window",
+            "size": 224,
+            "xy": [
+              372,
+              230
+            ],
+            "sourceSha256": "8d00737eddebb5f1508307242ac5a8a2dadbae016b8a0a4948ff7dc42fb2a0aa"
+          },
+          {
+            "asset": "quiz-speaker-brown",
+            "size": 328,
+            "xy": [
+              606,
+              118
+            ],
+            "sourceSha256": "1a302e6548cd6a345a44f6cb70dafbf7bdb9f04591031fa3cbcfab6d59f81869"
+          }
+        ],
+        "filterGraph": "[0:v]format=rgb24,drawbox=x=0:y=458:w=960:h=82:color=0xefce98:t=fill[layer0];[1:v]scale=224:224:flags=lanczos[part1];[layer0][part1]overlay=26:230:format=rgb[layer1];[2:v]scale=224:224:flags=lanczos[part2];[layer1][part2]overlay=372:230:format=rgb[layer2];[3:v]scale=328:328:flags=lanczos[part3];[layer2][part3]overlay=606:118:format=rgb[layer3]"
+      }
+    }
+  ],
+  "rejected": []
+}

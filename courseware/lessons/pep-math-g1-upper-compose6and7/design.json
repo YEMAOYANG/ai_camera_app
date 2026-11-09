@@ -1,0 +1,14 @@
+{
+  "schemaVersion":"mira.courseware.design.v1",
+  "cast":[{"name":"小满和朵朵","look":"暖白工坊里两个穿简洁日常衣服的孩子，陪伴但不替老师讲解；讲述角色沿用公共cast。"}],
+  "style":{"palette":"暖白、赤陶橙、湖蓝、鼠尾草绿","notes":"固定1280×720逻辑画布，双托盘和明确总数为视觉中心。正式插画只作工坊情境与单物品，数量由代码决定；不画临时卡通图标代替教学物品。"},
+  "pages":[
+    {"id":"p02","mechanism":"自由拖放并保存三种不同非空分组；圆片可点换边，底部回收箭头重置；全部分入且两边非空才可保存，已有分法不重复计星。","ids":["whole-total","tray-left","tray-right","loose-pieces","saved-splits","save-split","reset-split"],"stateKeys":{"demoLeft":"整数1–5，教师把6颗圆片分成指定左数量，右侧补足；不计星","play":"true，明确结束教师示范并复位为孩子自由分组"},"levels":3,"hints":["先数总数，再看两边","每颗圆片都要分进托盘，两边都有才是本课的分法","第三次错误后示范尚未保存的合法分法，孩子核验并自行确认，不自动计星"]},
+    {"id":"p04","mechanism":"每次把一颗圆片从右移到左并保存，建成五行有序记录；回移可改错，跳号不能保存。","ids":["whole-total","ordered-left","ordered-right","record-wall","move-next","move-back","record-next"],"stateKeys":{"demoLeft":"整数1–5，演示对应分法与之前记录，且不算孩子完成","play":"true，复位为空记录与1/5开始"},"levels":5,"hints":["记录墙从少到多排","只把一颗从右边移到左边","第三次错误展示下一步移动，保留确认步骤让孩子完成"]},
+    {"id":"p07","mechanism":"点七节组成条中间的六个接缝，真实分开左右段，保存三种不同切分；接合按钮恢复整体。","ids":["whole-total","block-strip","seam-1","seam-2","seam-3","seam-4","seam-5","seam-6","part-left","part-right","save-cut","join-again"],"stateKeys":{"demoCut":"整数1–6，教师示范在此接缝分开；0把两段重新接合；不计星","play":"true，复位让孩子探索"},"levels":3,"hints":["在两块之间点接缝","七块都在，只改变分开的地方","第三次错误展示一处接缝，孩子仍需保存并尝试别处"]},
+    {"id":"p09","mechanism":"根据总数和可见圆片选择缺失数量点，选对后开盒核验，再进入不同总数；不能把可见部分当总数。","ids":["whole-total","shown-beads","hidden-box","missing-choices","choice-1","choice-2","choice-3"],"stateKeys":{"demo":"true，显示总数6、露出4颗的教师示范；开盒显出2颗","play":"true，开始孩子新题组"},"levels":4,"hints":["先看最上面的总数","数露出的，再想还缺多少","第三次错误展开总数占位框，让孩子自己对照补足"]},
+    {"id":"p11","mechanism":"从四盘数量图中拖两盘到合并台；也可点选再点一次撤回，正确合并台展开整组核验。","ids":["whole-total","group-pool","group-1","group-2","group-3","group-4","merge-target","check-merge","reset-merge"],"stateKeys":{"demo":"true，教师合并两盘2与4成为6，不计星","play":"true，复位进入新摆放题组"},"levels":3,"hints":["要把两盘一起数","先看目标总数，再找互相补足的盘","第三次错误演示可行的两盘，优先保留已选且能配组的一盘；孩子重新数并确认，不自动计星"]}
+  ],
+  "teacherHandoff":"每页教师先操作再讲原因，最后一个setState的play明确交还操作；不会在老师说话时用三秒定时器提前清掉示范。",
+  "fallback":"正式图片失败显示原有知识数量点图，并保留可继续操作的数量结构；不会把失败图片当已通过视觉审核。"
+}

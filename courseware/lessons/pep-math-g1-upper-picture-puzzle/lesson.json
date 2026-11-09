@@ -1,0 +1,1215 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "拼一拼",
+  "description": "在积木展台用相同的积木拼摆立体图形，对齐平面或圆面，分层数积木，再按缺口补块。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "用短句引导观察接缝、平面和层数，先示范再交给孩子操作。用图和摆放解释原因，口头和实体操作由成人观察。"
+    }
+  },
+  "images": {
+    "aligned-pair-views": {
+      "file": "assets/aligned-pair-views.png"
+    },
+    "ball": {
+      "file": "assets/ball.png"
+    },
+    "bars-cube": {
+      "file": "assets/bars-cube.png"
+    },
+    "bars-quiz-cube": {
+      "file": "assets/bars-quiz-cube.png"
+    },
+    "bars-quiz-post": {
+      "file": "assets/bars-quiz-post.png"
+    },
+    "bars-quiz-stair": {
+      "file": "assets/bars-quiz-stair.png"
+    },
+    "bars-row": {
+      "file": "assets/bars-row.png"
+    },
+    "big-cube": {
+      "file": "assets/big-cube.png"
+    },
+    "cover-block-gallery": {
+      "file": "assets/cover-block-gallery.png"
+    },
+    "cube-base-corner": {
+      "file": "assets/cube-base-corner.png"
+    },
+    "cube-upper-layer": {
+      "file": "assets/cube-upper-layer.png"
+    },
+    "cube-upper-pair": {
+      "file": "assets/cube-upper-pair.png"
+    },
+    "cylinder": {
+      "file": "assets/cylinder.png"
+    },
+    "cylinder-shift-left": {
+      "file": "assets/cylinder-shift-left.png"
+    },
+    "cylinder-shifted": {
+      "file": "assets/cylinder-shifted.png"
+    },
+    "cylinder-three": {
+      "file": "assets/cylinder-three.png"
+    },
+    "cylinder-three-shift": {
+      "file": "assets/cylinder-three-shift.png"
+    },
+    "cylinder-three-thin": {
+      "file": "assets/cylinder-three-thin.png"
+    },
+    "cylinder-two": {
+      "file": "assets/cylinder-two.png"
+    },
+    "gallery": {
+      "file": "assets/gallery.png"
+    },
+    "gap-column": {
+      "file": "assets/gap-column.png"
+    },
+    "gap-column-filled": {
+      "file": "assets/gap-column-filled.png"
+    },
+    "gap-demo": {
+      "file": "assets/gap-demo.png"
+    },
+    "gap-demo-filled": {
+      "file": "assets/gap-demo-filled.png"
+    },
+    "gap-elbow": {
+      "file": "assets/gap-elbow.png"
+    },
+    "gap-elbow-filled": {
+      "file": "assets/gap-elbow-filled.png"
+    },
+    "hidden-demo": {
+      "file": "assets/hidden-demo.png"
+    },
+    "hidden-demo-reveal": {
+      "file": "assets/hidden-demo-reveal.png"
+    },
+    "join-bend": {
+      "file": "assets/join-bend.png"
+    },
+    "join-x": {
+      "file": "assets/join-x.png"
+    },
+    "join-z": {
+      "file": "assets/join-z.png"
+    },
+    "layer-four": {
+      "file": "assets/layer-four.png"
+    },
+    "match-bar": {
+      "file": "assets/match-bar.png"
+    },
+    "match-cube": {
+      "file": "assets/match-cube.png"
+    },
+    "match-cylinder": {
+      "file": "assets/match-cylinder.png"
+    },
+    "piece-elbow": {
+      "file": "assets/piece-elbow.png"
+    },
+    "piece-line": {
+      "file": "assets/piece-line.png"
+    },
+    "piece-pair": {
+      "file": "assets/piece-pair.png"
+    },
+    "piece-square": {
+      "file": "assets/piece-square.png"
+    },
+    "piece-upright": {
+      "file": "assets/piece-upright.png"
+    },
+    "quiz-cylinder-four": {
+      "file": "assets/quiz-cylinder-four.png"
+    },
+    "quiz-cylinder-left": {
+      "file": "assets/quiz-cylinder-left.png"
+    },
+    "quiz-cylinder-shift": {
+      "file": "assets/quiz-cylinder-shift.png"
+    },
+    "quiz-dots-5": {
+      "file": "assets/quiz-dots-5.png"
+    },
+    "quiz-dots-6": {
+      "file": "assets/quiz-dots-6.png"
+    },
+    "quiz-dots-7": {
+      "file": "assets/quiz-dots-7.png"
+    },
+    "quiz-flat-eight": {
+      "file": "assets/quiz-flat-eight.png"
+    },
+    "quiz-flat-seven": {
+      "file": "assets/quiz-flat-seven.png"
+    },
+    "quiz-flat-six": {
+      "file": "assets/quiz-flat-six.png"
+    },
+    "quiz-gap-target": {
+      "file": "assets/quiz-gap-target.png"
+    },
+    "quiz-hidden-stack": {
+      "file": "assets/quiz-hidden-stack.png"
+    },
+    "quiz-piece-turn": {
+      "file": "assets/quiz-piece-turn.png"
+    },
+    "quiz-row-four": {
+      "file": "assets/quiz-row-four.png"
+    },
+    "quiz-seven-cubes": {
+      "file": "assets/quiz-seven-cubes.png"
+    },
+    "quiz-six-notch": {
+      "file": "assets/quiz-six-notch.png"
+    },
+    "quiz-step-four": {
+      "file": "assets/quiz-step-four.png"
+    },
+    "quiz-turn-four": {
+      "file": "assets/quiz-turn-four.png"
+    },
+    "row-three": {
+      "file": "assets/row-three.png"
+    },
+    "row-two": {
+      "file": "assets/row-two.png"
+    },
+    "single-bar": {
+      "file": "assets/single-bar.png"
+    },
+    "single-cube": {
+      "file": "assets/single-cube.png"
+    },
+    "step-three": {
+      "file": "assets/step-three.png"
+    },
+    "tower-three": {
+      "file": "assets/tower-three.png"
+    },
+    "tower-two": {
+      "file": "assets/tower-two.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "展台上的立体图形",
+      "template": "two-columns",
+      "data": {
+        "title": "展台上的立体图形",
+        "left_picture": "cover-block-gallery",
+        "left": {
+          "heading": "积木展台",
+          "body": "用眼睛看，用手想一想"
+        },
+        "right_picture": "gallery",
+        "right": {
+          "heading": "四种立体图形",
+          "body": "看平面、圆面和滚动"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "展台上摆着好玩的积木，今天跟小数老师来认一认。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看桌上，长盒、方块、圆筒和球分开放着。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "看积木的面，再想一想它们能怎么动。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "先看长长的盒子，我们把它叫作长方体。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "长方体有六个平平的面，平放在桌上很稳。"
+        },
+        {
+          "say": "旁边方方的小块叫正方体，跟长纸盒比一比。"
+        },
+        {
+          "say": "正方体的六个面都是一样大的正方形。"
+        },
+        {
+          "say": "接下来看圆筒，它叫圆柱，两头都有圆面。"
+        },
+        {
+          "say": "圆柱躺下，弯弯的侧面接触桌子，就能滚。"
+        },
+        {
+          "say": "最后是球，像小皮球，没有平平的面。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "轻推小球，换一个方向也能滚。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "把积木送到同形展台",
+      "page": "p02",
+      "widgetType": "geometry-exhibition-p02",
+      "startImage": "gallery",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#board-target"
+        },
+        {
+          "say": "展台来了几块积木，请送它们去形状相同的地方。"
+        },
+        {
+          "say": "先看左边的样品。它前面的面正正方方。"
+        },
+        {
+          "say": "还要看整个外形。六个面一样大，才认出是正方体。"
+        },
+        {
+          "highlight": "#piece-tray"
+        },
+        {
+          "say": "再看右边三件积木，找跟样品一样的形状。"
+        },
+        {
+          "say": "遇到球，看看它有没有像盒子一样的平面。"
+        },
+        {
+          "highlight": "#direction-mark"
+        },
+        {
+          "say": "点选的积木会移到左边的展台。"
+        },
+        {
+          "setState": {
+            "demoResult": true
+          }
+        },
+        {
+          "say": "看，青色积木的颜色不同，外形还是一样。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "现在你来找，每次先看左边，再点同形积木。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "对齐还是转个弯",
+      "template": "two-columns",
+      "data": {
+        "title": "对齐还是转个弯",
+        "left_picture": "aligned-pair-views",
+        "left": {
+          "heading": "两个面贴齐",
+          "body": "横着接，竖着叠"
+        },
+        "right_picture": "step-three",
+        "right": {
+          "heading": "往上添一块",
+          "body": "外边有了一个台阶"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "用同样的小正方体搭一搭，比较排齐和转弯。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "两块小正方体横着排成一排，像一条小路。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "把两块竖着叠起来，就像一根小柱子。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "横着接或竖着叠，只要面贴齐，都能拼成长方体。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再拿第三块，贴在横排末端，就成了更长的一条。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "如果放到右边积木的上面，轮廓就会转弯。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "左边一层，右边两层，拼出了小台阶。"
+        },
+        {
+          "say": "用手指沿外边比一比，哪里是直的，哪里有高低？"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "沿着接缝拼",
+      "page": "p04",
+      "widgetType": "geometry-exhibition-p04",
+      "startImage": "row-three",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#board-target"
+        },
+        {
+          "say": "玩沿着接缝拼。展台上浅色的地方还没有积木。"
+        },
+        {
+          "say": "第一关的两个空位在原来积木右边，横着相连。"
+        },
+        {
+          "highlight": "#piece-tray"
+        },
+        {
+          "say": "托盘里有一块、横着两块和竖着两块。"
+        },
+        {
+          "say": "要填横排的两个空位，先找一样长、方向也一样的积木。"
+        },
+        {
+          "highlight": "#direction-mark"
+        },
+        {
+          "say": "慢慢把它拖过去，让两块积木的面挨紧。"
+        },
+        {
+          "setState": {
+            "demoResult": true
+          }
+        },
+        {
+          "say": "看，接缝贴好以后，三块排成直直的一条。"
+        },
+        {
+          "say": "后面还有竖柱和转角，每次都要先看接缝。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "从第一关开始试。也可以直接点你选的积木。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "一层还不够",
+      "template": "two-columns",
+      "data": {
+        "title": "一层还不够",
+        "left_picture": "layer-four",
+        "left": {
+          "heading": "底下一层",
+          "body": "前后两排，每排两块"
+        },
+        "right_picture": "big-cube",
+        "right": {
+          "heading": "再叠一层",
+          "body": "上下两层一共八块"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "摆过长条和台阶，再来挑战一层够不够。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看底下这层，前面两块，后面也两块。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "从上面看是一个正方形，一层一共四块。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "从侧面看只有一块高，所以它还扁扁的。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "现在，我们要在上面再加一层，让它变高。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "上面也两排，每排两块，下面还是四块。"
+        },
+        {
+          "say": "侧边上下贴齐，哪一块都没有凸出来。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "下面四块，上面四块，合在一起是八块。"
+        },
+        {
+          "say": "要比一块大，左右、前后、上下都至少摆两块。"
+        },
+        {
+          "say": "这样填满的最小大正方体，最少要八块。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "叠出大正方体",
+      "page": "p06",
+      "widgetType": "geometry-exhibition-p06",
+      "startImage": "big-cube",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#board-target"
+        },
+        {
+          "say": "这次要把空位补齐，叠出一个大正方体。"
+        },
+        {
+          "say": "第一关先看底下这一层，从前排数到后排。"
+        },
+        {
+          "say": "浅色格是空位，边上都已经放了小正方体。"
+        },
+        {
+          "highlight": "#piece-tray"
+        },
+        {
+          "say": "选跟空位一样大、一样齐的方块。"
+        },
+        {
+          "setState": {
+            "demoResult": true
+          }
+        },
+        {
+          "say": "摆好后，前排两块，后排两块，底下一层铺齐了。"
+        },
+        {
+          "say": "再补好上面一层，让上层和底层对齐。"
+        },
+        {
+          "say": "左右、前后、上下各是两块，就能拼成大正方体。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "从底下开始试。看这一关缺一块、一排还是一层。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "长方盒也能拼",
+      "template": "two-columns",
+      "data": {
+        "title": "长方盒也能拼",
+        "left_picture": "bars-row",
+        "left": {
+          "heading": "排成一条",
+          "body": "短面贴住短面"
+        },
+        "right_picture": "bars-cube",
+        "right": {
+          "heading": "两排叠成两层",
+          "body": "用一个方形比各面"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "刚才用小正方体拼，现在换成四个同样的长方体。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "每个长方体像两个小正方体并在一起那么长。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "让四块短面贴短面，接成一条长盒。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "长盒的前面扁扁长长，跟它的短面不一样。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "换个摆法，两块并排是一层，上面叠同样的一层。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "侧边也对齐，前后、左右和上下的长度就一样了。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "用同一个正方形比一比每一个面。"
+        },
+        {
+          "say": "这个拼法的每个面都一样大，可以拼成正方体。"
+        },
+        {
+          "say": "换成别的四块长方体，就要重新试一试。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "把圆面对齐",
+      "page": "p08",
+      "widgetType": "geometry-exhibition-p08",
+      "startImage": "cylinder-three",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#board-target"
+        },
+        {
+          "say": "继续看圆柱，比一比平平的圆面和弯弯的侧面。"
+        },
+        {
+          "say": "让圆面朝下，圆柱就能竖在桌上。"
+        },
+        {
+          "say": "左边上面一段往右偏，侧边没有接齐。"
+        },
+        {
+          "highlight": "#piece-tray"
+        },
+        {
+          "say": "找两段一样粗、侧边从下到上接齐的图。"
+        },
+        {
+          "highlight": "#direction-mark"
+        },
+        {
+          "say": "让上面一段移回中间，圆面贴住圆面。"
+        },
+        {
+          "setState": {
+            "demoResult": true
+          }
+        },
+        {
+          "say": "圆面完全对齐了，拼出的圆柱就更高。"
+        },
+        {
+          "say": "再叠一段一样粗的，也用这个办法。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "轮到你了。看两边的轮廓，再点能叠齐的图。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "积木没有悬空",
+      "template": "two-columns",
+      "data": {
+        "title": "积木没有悬空",
+        "left_picture": "hidden-demo",
+        "left": {
+          "heading": "每块都稳稳放好",
+          "body": "前面可能挡住后面"
+        },
+        "right_picture": "hidden-demo-reveal",
+        "right": {
+          "heading": "分开上下两层",
+          "body": "底下三块，上面一块"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "来攻克一个小难题，这座积木里的每块都稳稳地放着。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "底下有板，上层的积木下面都有积木托住。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "前面露出两块，上面也露出一块橙色的。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "橙色积木下面还有一块，被前排挡住了。"
+        },
+        {
+          "say": "如果只数露在前面的，就会漏数这块。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "把上层移开，再分开看底层和上层。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "灰色前排两块，后面一块红色，底层三块。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "底下三块加上上面一块，一共有四块。"
+        },
+        {
+          "say": "换个积木塔，也可以先数底层，再往上一层一层数。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "补齐展台的空位",
+      "page": "p10",
+      "widgetType": "geometry-exhibition-p10",
+      "startImage": "gap-demo",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#board-target"
+        },
+        {
+          "say": "展台有空位，我们一起来把它补齐。"
+        },
+        {
+          "say": "先看第一个轮廓。右下的两个空位横着连在一起。"
+        },
+        {
+          "highlight": "#piece-tray"
+        },
+        {
+          "say": "右边有两块横着连，也有两块竖着连。"
+        },
+        {
+          "say": "两种补块数量一样，可摆的方向不一样。"
+        },
+        {
+          "highlight": "#direction-mark"
+        },
+        {
+          "say": "把横着连好的两块拖进缺口，看看边能不能对齐。"
+        },
+        {
+          "setState": {
+            "demoResult": true
+          }
+        },
+        {
+          "say": "现在浅色空位全填满，边也没有超出去。"
+        },
+        {
+          "say": "再遇到转弯的缺口，就找朝同一个方向转弯的补块。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "继续试第二个轮廓。先数格，再比形状。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "小检查",
+      "intro": [
+        "听小数老师问，再点一张你选的积木图。",
+        "拿不准时，可以听一遍，再仔细看看图。"
+      ],
+      "questions": [
+        {
+          "id": "puzzle-q1",
+          "question": "下面三张图，哪一张画的是没有平面的球？",
+          "skill": "根据外形辨认球",
+          "answer": [
+            "A"
+          ],
+          "analysis": "球没有平面，朝不同方向轻推都能滚。圆柱有两个圆面，长方体有平面。",
+          "options": {
+            "A": {
+              "label": "没有平面的球",
+              "visual": {
+                "kind": "asset",
+                "image": "ball",
+                "alt": "没有平面的球"
+              }
+            },
+            "B": {
+              "label": "有长长平面的长方体",
+              "visual": {
+                "kind": "asset",
+                "image": "single-bar",
+                "alt": "有长长平面的长方体"
+              }
+            },
+            "C": {
+              "label": "有两个圆面的圆柱",
+              "visual": {
+                "kind": "asset",
+                "image": "cylinder",
+                "alt": "有两个圆面的圆柱"
+              }
+            }
+          }
+        },
+        {
+          "id": "puzzle-q2",
+          "question": "哪个大正方体原本有八块，现在只缺了上面一个角？",
+          "skill": "比较大正方体的层和缺角",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一张图只少了右前上方一块，下面仍有四块，上面还剩三块。另两张图分别缺两块和没有缺块。",
+          "options": {
+            "A": {
+              "label": "底层四块，上层只少一角",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-seven-cubes",
+                "alt": "底层四块，上层只少一角"
+              }
+            },
+            "B": {
+              "label": "上层的前排两块都不在",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-six-notch",
+                "alt": "上层的前排两块都不在"
+              }
+            },
+            "C": {
+              "label": "上下两层都摆满",
+              "visual": {
+                "kind": "asset",
+                "image": "big-cube",
+                "alt": "上下两层都摆满"
+              }
+            }
+          }
+        },
+        {
+          "id": "puzzle-q3",
+          "question": "哪座圆柱塔上面两段往右错开了？",
+          "skill": "根据圆柱侧边辨认圆面的错位",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二座的上面两段一起移到了右边。第一座上下对齐，第三座的上两段往左偏。",
+          "options": {
+            "A": {
+              "label": "四段一样粗且上下对齐",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cylinder-four",
+                "alt": "四段一样粗且上下对齐"
+              }
+            },
+            "B": {
+              "label": "上方两段往右偏",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cylinder-shift",
+                "alt": "上方两段往右偏"
+              }
+            },
+            "C": {
+              "label": "上方两段往左偏",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cylinder-left",
+                "alt": "上方两段往左偏"
+              }
+            }
+          }
+        },
+        {
+          "id": "puzzle-q4",
+          "question": "哪一张把四块小正方体横着排成一条直线？",
+          "skill": "辨认相同小正方体的对齐排法",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三张的四块都在同一排，相邻的平面贴齐。另两张分别摆出高低台阶和向后的转角。",
+          "options": {
+            "A": {
+              "label": "右边往后拐",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-turn-four",
+                "alt": "右边往后拐"
+              }
+            },
+            "B": {
+              "label": "右边叠高成台阶",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-step-four",
+                "alt": "右边叠高成台阶"
+              }
+            },
+            "C": {
+              "label": "四块横排成直线",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-row-four",
+                "alt": "四块横排成直线"
+              }
+            }
+          }
+        },
+        {
+          "id": "puzzle-q5",
+          "question": "哪张图恰好用了七块小正方体？",
+          "skill": "逐个数出拼摆所用小正方体",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二张一排三块，另一排四块，合起来七块。另两张分别是六块和八块。",
+          "options": {
+            "A": {
+              "label": "两排各三块",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flat-six",
+                "alt": "两排各三块"
+              }
+            },
+            "B": {
+              "label": "前排三块，后排四块",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flat-seven",
+                "alt": "前排三块，后排四块"
+              }
+            },
+            "C": {
+              "label": "两排各四块",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flat-eight",
+                "alt": "两排各四块"
+              }
+            }
+          }
+        },
+        {
+          "id": "puzzle-q6",
+          "question": "这座积木塔没有悬空的块，算上挡住的，一共几块？",
+          "skill": "把被挡住的支撑块计入总数",
+          "answer": [
+            "A"
+          ],
+          "analysis": "底层两排各有两块，左后方的一块托住上面的积木。它虽然被挡住，也要算进去。底层四块，再加上面两块，一共六块。",
+          "options": {
+            "A": {
+              "label": "六个数量点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-6",
+                "alt": "六个数量点"
+              }
+            },
+            "B": {
+              "label": "五个数量点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-5",
+                "alt": "五个数量点"
+              }
+            },
+            "C": {
+              "label": "七个数量点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dots-7",
+                "alt": "七个数量点"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-hidden-stack",
+            "alt": "底层两排，左后方还叠高两块"
+          }
+        },
+        {
+          "id": "puzzle-q7",
+          "question": "哪张图用四个一样的长方体拼成了大正方体？",
+          "skill": "比较相同长方体拼出的形状",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三张上下各两块，前后、左右、上下都一样长。长柱和台阶的各面不都是同样大的正方形。",
+          "options": {
+            "A": {
+              "label": "四块竖叠成长柱",
+              "visual": {
+                "kind": "asset",
+                "image": "bars-quiz-post",
+                "alt": "四块竖叠成长柱"
+              }
+            },
+            "B": {
+              "label": "四块拼成台阶",
+              "visual": {
+                "kind": "asset",
+                "image": "bars-quiz-stair",
+                "alt": "四块拼成台阶"
+              }
+            },
+            "C": {
+              "label": "四块排成两层的大正方体",
+              "visual": {
+                "kind": "asset",
+                "image": "bars-quiz-cube",
+                "alt": "四块排成两层的大正方体"
+              }
+            }
+          }
+        },
+        {
+          "id": "puzzle-q8",
+          "question": "哪块橙色积木能正好填满图里的浅色空位？",
+          "skill": "同时比较缺口的数量与轮廓",
+          "answer": [
+            "B"
+          ],
+          "analysis": "空位拐一个弯，一共有三格。三格拐角的形状吻合，三格直条形状不合，两格短条少了一格。",
+          "options": {
+            "A": {
+              "label": "横着连的三格",
+              "visual": {
+                "kind": "asset",
+                "image": "piece-line",
+                "alt": "横着连的三格"
+              }
+            },
+            "B": {
+              "label": "转角相连的三格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-piece-turn",
+                "alt": "转角相连的三格"
+              }
+            },
+            "C": {
+              "label": "横着连的两格",
+              "visual": {
+                "kind": "asset",
+                "image": "piece-pair",
+                "alt": "横着连的两格"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-gap-target",
+            "alt": "展台右侧有三个呈拐角的空位"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "拼好后再检查",
+      "template": "picture-points",
+      "data": {
+        "title": "拼好后再检查",
+        "picture": "big-cube",
+        "points": [
+          "面贴面，对齐再拼",
+          "拼大正方体，数两层",
+          "从底往上，别漏块",
+          "补空位，看数也看形"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "拼完了，再当一回小检查员，看看摆得对不对。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一招，看贴在一起的面，边缘要对齐。"
+        },
+        {
+          "say": "圆面也一样，叠圆柱时不要让边错开。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二招，看看大正方体，每层四块，一共有两层。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "沿着三个方向看，它们都正好是两块长。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一层一层数，挡住的支撑块也算进去。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "最后看缺口，先数有几格，再看哪里有转角。"
+        },
+        {
+          "say": "下课找四块同样的长方体，和大人一起试摆。"
+        },
+        {
+          "say": "如果拼成方方的一块，用同一个正方形去比各面。"
+        },
+        {
+          "say": "把你的摆法和发现说给大人听。"
+        }
+      ]
+    }
+  ]
+}

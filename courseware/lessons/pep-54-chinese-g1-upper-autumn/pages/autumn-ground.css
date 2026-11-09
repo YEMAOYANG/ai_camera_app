@@ -1,0 +1,14 @@
+#postcards{position:absolute;inset:24px 52px auto;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.photo{border:4px solid #fbf7dd;border-radius:22px;padding:0;height:232px;background:#f8e8bf;box-shadow:0 5px 0 #bc8a53;overflow:hidden;cursor:pointer}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.photo.stamped{filter:saturate(.78);border-color:#3f8d73}
+.photo.stamped img{opacity:.68}
+.photo:focus-visible,.hear:focus-visible{outline:5px solid #145e58;outline-offset:4px}
+#autumn-envelope{position:absolute;left:324px;top:301px;width:632px;height:204px;border:3px solid #bd9057;border-radius:22px;background:#e9bc7d;overflow:hidden}
+#autumn-envelope:after{content:'';position:absolute;inset:84px 0 0;background:#f8deb1;clip-path:polygon(0 0,50% 70%,100% 0,100% 100%,0 100%);pointer-events:none}
+#autumn-pocket{display:flex;gap:14px;padding:12px 18px}
+#autumn-pocket img{width:187px;height:124px;object-fit:cover;border-radius:12px;border:4px solid #fff9e5;animation:send 300ms ease-out}
+@keyframes send{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.hear{position:absolute;left:50px;top:354px;min-width:124px;min-height:92px;background:#46796b;color:white}
+#ready .btn.xl,#finish .btn.xl{min-height:92px}
+#view-sleeve img{object-fit:contain;background:#ede1bf}

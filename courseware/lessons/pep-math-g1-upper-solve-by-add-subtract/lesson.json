@@ -1,0 +1,1022 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "用加、减法解决问题",
+  "description": "原创手作展台整课：关联图文信息，依据整体与部分选择加减法，操作模型并检查；涵盖官方全部课时。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "正式数学教师档案；先讲清相关信息和问题，边操作边解释整体与部分；低阅读、逐步提示，首错不揭答案，口述和纸笔均待观察。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "bird": {
+      "file": "assets/bird.png"
+    },
+    "cup": {
+      "file": "assets/cup.png"
+    },
+    "boat": {
+      "file": "assets/boat.png"
+    },
+    "quiz-stars": {
+      "file": "assets/quiz-stars.png"
+    },
+    "quiz-shells": {
+      "file": "assets/quiz-shells.png"
+    },
+    "quiz-brushes": {
+      "file": "assets/quiz-brushes.png"
+    },
+    "quiz-flowers": {
+      "file": "assets/quiz-flowers.png"
+    },
+    "quiz-cones": {
+      "file": "assets/quiz-cones.png"
+    },
+    "quiz-pencils": {
+      "file": "assets/quiz-pencils.png"
+    },
+    "sub-model": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘",
+                "crossed": true
+              },
+              {
+                "glyph": "∘",
+                "crossed": true
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "add-model": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              },
+              {
+                "glyph": "∘"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "9"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "part-model": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "9"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "5"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "whole-model": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "9"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "手作展台里的问题",
+      "template": "picture-points",
+      "data": {
+        "title": "用加、减法解决问题",
+        "picture": "studio",
+        "points": [
+          "先找相关信息和问题",
+          "求整体合并，求部分去掉",
+          "摆图、列式，再回头检查"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我是小数老师，欢迎来到手作展台。"
+        },
+        {
+          "say": "展台摆着各式各样的手工作品。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "解题先听清问题到底问什么。"
+        },
+        {
+          "say": "再找两条和这个问题相关的信息。"
+        },
+        {
+          "say": "问纸鸟，就先找纸鸟的数量。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把两个部分合起来，是在求整体。"
+        },
+        {
+          "say": "知道整体和一个部分，可求另一部分。"
+        },
+        {
+          "say": "我们会用摆图，看看是合并还是去掉。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "列完算式，还要回头检查。"
+        },
+        {
+          "say": "先看方法，再看计算是否正确。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "信息要和问题连起来",
+      "page": "p02",
+      "widgetType": "mira-p02",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#info-scene"
+        },
+        {
+          "say": "先看展台，老师把问题读给你听。"
+        },
+        {
+          "say": "一共八只纸鸟，已经送出两只。"
+        },
+        {
+          "say": "问题是：还剩几只纸鸟？"
+        },
+        {
+          "highlight": "#info-total"
+        },
+        {
+          "say": "总共八只，是我们需要的一条信息。"
+        },
+        {
+          "highlight": "#info-away"
+        },
+        {
+          "say": "送出两只，是另一条相关信息。"
+        },
+        {
+          "highlight": "#info-other"
+        },
+        {
+          "say": "还有三个花盆，但问题没有问花盆。"
+        },
+        {
+          "say": "不用把每个数字都放进算式。"
+        },
+        {
+          "setState": {
+            "demoSelected": true
+          }
+        },
+        {
+          "say": "先听问题，再把相关的两条连起来。"
+        },
+        {
+          "say": "轮到你来选，选中后相应物品会亮起。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "求剩下的一部分",
+      "template": "picture-points",
+      "data": {
+        "title": "八只送出两只，还剩几只",
+        "picture": "sub-model",
+        "points": [
+          "整体是8，送出的是2",
+          "8 − 2 = 6，剩下6只",
+          "6 + 2 = 8，回到原来整体"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "一个圆片，代表一只纸鸟。"
+        },
+        {
+          "say": "八个圆片，表示原来八只这个整体。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "有叉的两个，是已经送出的部分。"
+        },
+        {
+          "say": "剩下的纸鸟，是要找的另一部分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从整体里去掉送出的，用减法。"
+        },
+        {
+          "say": "八减二等于六，还剩六只纸鸟。"
+        },
+        {
+          "say": "不能把送出的再数进剩下的部分。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "检查时，把剩下六只和送出两只合起。"
+        },
+        {
+          "say": "六加二等于八，正好回到原来整体。"
+        },
+        {
+          "say": "方法回答了剩下，计算也对得上。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "送出后数剩下",
+      "page": "p04",
+      "widgetType": "mira-p04",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#bird-whole"
+        },
+        {
+          "say": "这里原来有八只纸鸟，每只都算一次。"
+        },
+        {
+          "say": "老师示范送出两只，求还剩多少。"
+        },
+        {
+          "setState": {
+            "demoRemove": true
+          }
+        },
+        {
+          "highlight": "#bird-away"
+        },
+        {
+          "say": "这两只移进送出区，就不在剩下里面。"
+        },
+        {
+          "say": "左边保留的，才是问题要求的部分。"
+        },
+        {
+          "highlight": "#bird-remain"
+        },
+        {
+          "say": "从八只里面去掉两只，用八减二。"
+        },
+        {
+          "say": "剩下六只，再和送出两只合起来检查。"
+        },
+        {
+          "say": "你要先按本关的要求送出纸鸟。"
+        },
+        {
+          "say": "然后选和剩下数量相同的圆片图。"
+        },
+        {
+          "say": "第一次没选对，先看看漏数或重复没有。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "求两个部分的整体",
+      "template": "picture-points",
+      "data": {
+        "title": "合起来求一共，用加法",
+        "picture": "add-model",
+        "points": [
+          "左边5只，右边4只",
+          "求一共，要把两部分合起",
+          "5 + 4 = 9，一共9只"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这回两个部分都没有送出。"
+        },
+        {
+          "say": "左边五只纸船，右边四只纸船。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "五和四，是已经知道的两个部分。"
+        },
+        {
+          "say": "问题换成一共有多少只纸船。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "求一共，需要把两个部分合起来。"
+        },
+        {
+          "say": "这里没有从原来的整体里去掉。"
+        },
+        {
+          "say": "所以应该用加法，不能看数字就猜。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "五加四等于九，一共九只纸船。"
+        },
+        {
+          "say": "检查时，两组都数到，每只只数一次。"
+        },
+        {
+          "say": "图、算式、问题说的是同一件事。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "把两组船合起来",
+      "page": "p06",
+      "widgetType": "mira-p06",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#boat-left"
+        },
+        {
+          "say": "左边五只船，右边四只船。"
+        },
+        {
+          "say": "问题是一共有多少只纸船。"
+        },
+        {
+          "highlight": "#boat-right"
+        },
+        {
+          "say": "老师把右边的船，移到一起。"
+        },
+        {
+          "setState": {
+            "demoJoin": true
+          }
+        },
+        {
+          "highlight": "#boat-left"
+        },
+        {
+          "say": "船的位置改变了，数量没有丢掉。"
+        },
+        {
+          "say": "两部分合成一个整体，正好是九只。"
+        },
+        {
+          "say": "求整体用加法，五加四等于九。"
+        },
+        {
+          "say": "你把右边的船都拖进左边展台。"
+        },
+        {
+          "say": "合好以后，选出相同数量的圆片图。"
+        },
+        {
+          "say": "回头看看，有没有少移或数了两次。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "同一组物品可以怎样问",
+      "template": "two-columns",
+      "data": {
+        "title": "问题改变，求的数量也改变",
+        "left": {
+          "heading": "知道整体和一个部分",
+          "body": "一共9个，展台4个，盒里几个？"
+        },
+        "right": {
+          "heading": "知道两个部分",
+          "body": "展台4个，盒里5个，一共几个？"
+        },
+        "left_picture": "part-model",
+        "right_picture": "whole-model"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "同样的花盆，可以提出不同问题。"
+        },
+        {
+          "say": "如果知道一共九个，展台有四个。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "问盒里有几个，是求另一个部分。"
+        },
+        {
+          "say": "从九个里面去掉四个，九减四等于五。"
+        },
+        {
+          "say": "盒子盖着，也不能当里面没有花盆。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "如果知道展台四个，盒里五个。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "问一共有多少，就是求整体。"
+        },
+        {
+          "say": "四加五等于九，要把两个部分合起来。"
+        },
+        {
+          "say": "先辨清问题求哪里，再决定加或减。"
+        },
+        {
+          "say": "最后检查两个部分是否组成给定整体。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "补出盒里的一部分",
+      "page": "p08",
+      "widgetType": "mira-p08",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#cup-total"
+        },
+        {
+          "say": "老师读出标注：一共九个花盆。"
+        },
+        {
+          "say": "展台上四个，盒里还有几个？"
+        },
+        {
+          "highlight": "#cup-visible"
+        },
+        {
+          "say": "四个是已知部分，九个是整个数量。"
+        },
+        {
+          "highlight": "#cup-box"
+        },
+        {
+          "say": "盒里是另一部分，不能把九当盒里数。"
+        },
+        {
+          "setState": {
+            "demoFill": true
+          }
+        },
+        {
+          "say": "从九里去掉展台四个，得到盒里五个。"
+        },
+        {
+          "say": "把四和五合起来检查，刚好九个。"
+        },
+        {
+          "say": "下面三组花盆，都先数一数。"
+        },
+        {
+          "say": "想想哪组和展台的合起来等于整体。"
+        },
+        {
+          "say": "把选好的一整组花盆，拖进盒里。"
+        },
+        {
+          "say": "不合适时，先合起来点数，再试一组。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "换个故事自己试一试",
+      "intro": [
+        "接下来换新物品和新数量。",
+        "我读题，你选圆片数量图。",
+        "每一个圆片，代表题里的一件物品。"
+      ],
+      "questions": [
+        {
+          "id": "ss-q1",
+          "question": "七枚星片送出两枚，还剩几枚？",
+          "skill": "整体去掉部分求剩余",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "整体七枚，去掉送出的两枚，用七减二等于五。五加二回到七。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-stars",
+            "alt": "左边五枚星片，右边两枚已送出的星片"
+          }
+        },
+        {
+          "id": "ss-q2",
+          "question": "三枚贝壳和五枚贝壳，一共几枚？",
+          "skill": "两部分合并求整体",
+          "options": {
+            "A": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            },
+            "C": {
+              "label": "2",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "三和五是两个部分，求整体用加法，三加五等于八。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-shells",
+            "alt": "左边三枚贝壳，右边五枚贝壳"
+          }
+        },
+        {
+          "id": "ss-q3",
+          "question": "一共六支画笔，桌上四支，盘里几支？",
+          "skill": "已知整体和部分求另一部分",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "C": {
+              "label": "2",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "整体六支，桌上四支是一个部分，六减四等于二，盘里两支。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-brushes",
+            "alt": "桌上四支画笔，盘里两支画笔"
+          }
+        },
+        {
+          "id": "ss-q4",
+          "question": "九朵纸花送出一朵，还剩几朵？",
+          "skill": "从图和语音关联两个信息",
+          "options": {
+            "A": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            },
+            "B": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            },
+            "C": {
+              "label": "9",
+              "visual": {
+                "kind": "quantity",
+                "count": 9
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "一共九朵和送出一朵是相关信息。九减一等于八，送出的不算在剩下里面。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-flowers",
+            "alt": "桌上八朵纸花，托盘上一朵送出的纸花"
+          }
+        },
+        {
+          "id": "ss-q5",
+          "question": "两只纸锥和六只纸锥，合起来几只？",
+          "skill": "根据问题选择加法",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "C": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "问题求两部分合起来的整体，用二加六等于八，不是用六减二。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-cones",
+            "alt": "左两只纸锥，右六只纸锥"
+          }
+        },
+        {
+          "id": "ss-q6",
+          "question": "剩下几支铅笔，加上送出三支是七支？",
+          "skill": "用部分合并复核减法",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "B": {
+              "label": "3",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "剩下四支，加上送出的三支，四加三等于七，和原来整体一致，因此剩下四支。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-pencils",
+            "alt": "左边四支剩下的铅笔，右边三支送出的铅笔"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "把方法带回家",
+      "template": "summary",
+      "data": {
+        "title": "找信息、看关系、列式、检查",
+        "items": [
+          "两条相关信息，连着一个问题",
+          "求整体用加法，求部分用减法",
+          "先查方法，再查计算",
+          "画、摆、说、写展示你的收获"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天你帮手作展台解决了几个问题。"
+        },
+        {
+          "say": "先听清求什么，再找两条相关信息。"
+        },
+        {
+          "say": "和问题无关的数字，不必放进算式。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "求整体，就把两个部分用加法合起来。"
+        },
+        {
+          "say": "求部分，就从整体去掉已知部分。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "算完先看方法是否回答了原问题。"
+        },
+        {
+          "say": "再用点数，或合回整体来检查计算。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家可以拿九件以内的物品摆一摆。"
+        },
+        {
+          "say": "把数的认识、分合和解题收获画出来。"
+        },
+        {
+          "say": "也可以说给大人听，请大人帮忙观察。"
+        },
+        {
+          "say": "选对图片记录下来，口述本领还待观察。"
+        }
+      ]
+    }
+  ]
+}

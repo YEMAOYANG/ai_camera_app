@@ -1,0 +1,23 @@
+button {font-family:inherit;cursor:pointer}
+button:focus-visible {outline:6px solid #194b67;outline-offset:3px}
+.equation {position:absolute;top:8px;left:346px;width:540px;height:69px;display:grid;place-items:center;background:#fffef9;border:3px solid #c5ad85;border-radius:22px;font-size:50px;font-weight:850;letter-spacing:3px;color:#284b55}
+.lamp {display:block;width:46px;height:46px;flex:none;border-radius:50%;border:3px solid #2b6584;background:#8bc3d9;position:relative}
+.lamp::after {content:'';position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:50%;background:#eaf8fb;transform:translate(-50%,-50%)}
+.lamp.green {background:#9acb9f;border-color:#397354}
+.lamp.green::after {width:15px;height:5px;border-radius:4px;background:#f1f9ee}
+.cluster {display:flex;align-items:center;align-content:center;justify-content:center;flex-wrap:wrap;gap:8px}
+.board {position:absolute;left:285px;top:101px;width:662px;height:226px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,1fr);gap:9px;padding:12px;background:#eff5f0;border:4px solid #a7b8a4;border-radius:26px}
+.slot {display:grid;place-items:center;min-width:0;min-height:0;border:3px dashed #bdc8b6;border-radius:14px;background:#fcfff9}
+.slot .lamp {width:62px;height:62px}
+.cards {position:absolute;left:30px;top:356px;width:1172px;height:177px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card {min-width:0;border:3px solid #afc0af;border-radius:22px;background:#fffefb;display:grid;place-items:center;padding:10px;color:#2b555e}
+.card:disabled {cursor:default}
+.card .cluster {width:300px;max-width:100%;min-height:50px}
+.card.selected {border-color:#3e895a;background:#e6f4df}
+ .board {left:275px;top:125px;width:682px;height:224px}
+.target {position:absolute;left:36px;top:135px;width:214px;height:199px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;border:3px solid #a6bd9d;background:#fcfff7;border-radius:22px;padding:8px}
+.goal-number {display:block;font-size:45px;color:#356e57;font-weight:850;line-height:55px}
+.target .cluster {width:172px;min-height:35px;gap:7px}
+.target .lamp {width:31px;height:31px;border-width:2px}
+.target .lamp.green::after {width:10px;height:4px}
+.card.previewed {border-color:#b78c53;background:#fbf0db}

@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "initialJob": "PWCUbWcdww",
+  "originalOutcome": "succeeded",
+  "savedJob": "PWCUbWcdww",
+  "savedClassroomId": "Bdf7RFCVXD",
+  "savedClassroomSha256": "906e486b7d912fe838b550e0735461c9898a2893c70d56d85357471499f22739",
+  "authoringModels": [
+    "deepseek-v4-pro",
+    "gpt-6.1-sol"
+  ],
+  "sceneBindings": [
+    {
+      "nativeSceneId": "scene_ob0fpHKXk0",
+      "nativeSceneTitle": "打开晨光书包",
+      "releaseSceneKey": "welcome"
+    },
+    {
+      "nativeSceneId": "scene_qqXg8oFU_7",
+      "nativeSceneTitle": "三件帮纸面变整齐的用品",
+      "releaseSceneKey": "tools-for-paper"
+    },
+    {
+      "nativeSceneId": "scene_f5UPu8r8E8",
+      "nativeSceneTitle": "笔袋、铅笔、转笔刀",
+      "releaseSceneKey": "tools-for-pencil"
+    },
+    {
+      "nativeSceneId": "scene_hSNSCrczuO",
+      "nativeSceneTitle": "听任务，找对文具",
+      "releaseSceneKey": "find-tool"
+    },
+    {
+      "nativeSceneId": "scene_iVUmGaLJgV",
+      "nativeSceneTitle": "三个偏旁在哪儿",
+      "releaseSceneKey": "part-shapes"
+    },
+    {
+      "nativeSceneId": "scene_hx2urh2j0-",
+      "nativeSceneTitle": "书包里的宝贝",
+      "releaseSceneKey": "treasures"
+    },
+    {
+      "nativeSceneId": "scene_Ccl_aGIHh5",
+      "nativeSceneTitle": "听清文具词，再跟读",
+      "releaseSceneKey": "rhythm-one"
+    },
+    {
+      "nativeSceneId": "scene_6QkxBX6o9O",
+      "nativeSceneTitle": "看笔顺，学写尺和刀",
+      "releaseSceneKey": "write-first"
+    },
+    {
+      "nativeSceneId": "scene_oL--frz_8p",
+      "nativeSceneTitle": "课和早，藏在日常里",
+      "releaseSceneKey": "school-words"
+    },
+    {
+      "nativeSceneId": "scene__MG8XvufJu",
+      "nativeSceneTitle": "练短句，听轻轻的得",
+      "releaseSceneKey": "rhythm-two"
+    },
+    {
+      "nativeSceneId": "scene_5m4I95sIm4",
+      "nativeSceneTitle": "文具收好，书本放平",
+      "releaseSceneKey": "organize-show"
+    },
+    {
+      "nativeSceneId": "scene_oDz440re96",
+      "nativeSceneTitle": "给文具找回家",
+      "releaseSceneKey": "organize-play"
+    },
+    {
+      "nativeSceneId": "scene_QXZUERyzUP",
+      "nativeSceneTitle": "练写本、不、少",
+      "releaseSceneKey": "write-second"
+    },
+    {
+      "nativeSceneId": "scene_l1p1RlSRGY",
+      "nativeSceneTitle": "文具管理员小检查",
+      "releaseSceneKey": "picture-check"
+    },
+    {
+      "nativeSceneId": "scene_TDDxFSLRA7",
+      "nativeSceneTitle": "合上书包，带走三个本领",
+      "releaseSceneKey": "recap"
+    }
+  ],
+  "corrections": [
+    "逐场保留原生两课时结构、标题、顺序和四个互动目标，用已审读的第76至77页及两课时教案修正文具、偏旁、停连和书写口播。",
+    "修正原稿小两笔、少三笔及少五笔的互相冲突表述。小三笔且首笔竖钩；少四笔，依次竖、撇、点、撇。同步校准尺、刀、本、不。",
+    "去除未经原书支持的宝贝字源故事，改从生活语境解释珍惜。儿歌朗读返回原书，课件先用原创短句演示轻声和停顿。",
+    "以真用品图片和新情境替换原生表情图标，两个笔顺互动按同一真实路径渲染示范与选择，去除滑杆、计时得分与自动识别书写的暗示。",
+    "六道文字检查重构为独立图片选择，三处正确位置均衡，并记录技能与原因。整理、朗读及纸笔能力仍请家长观察。",
+    "唯一首屏封面使用相同的 opening-desk 原画。额外增加五张有教学意义的实物或情境图，并用代码生成五张字形对照图。正式插画未生成前，离线源码不能作为发布或浏览器验收结果。"
+  ],
+  "sourceNotesSha256": "80311c2809c06620cc06976397626aad8ced0df627bfce2c080ae023cd35f357",
+  "editableLessonSha256": "5b01146bf786dfb1d08aa07794ef023b0b0ed2df4717025cc883fcc41a9b824e",
+  "codeDiagram": {
+    "id": "glyph-components",
+    "sceneKey": "part-shapes",
+    "source": "diagrams/glyph-components.svg",
+    "sourceSha256": "385db44312ba92cf49f13d2d41eb04d93f80c877f16d9c3ed4ba7f059c57f37f",
+    "raster": "assets/glyph-components.png",
+    "rasterSha256": "e72ff17855a2ee10a7d16181418f736ecd2eb6931d75493edb044f7c997a42a6",
+    "renderer": "Chromium SVG, Kaiti SC; visual check of all three characters and their three isolated components"
+  },
+  "adaptationRevisions": [
+    {
+      "adaptedAt": "2026-11-06T15:21:43.249066+00:00",
+      "previousEditableLessonSha256": "3b559fb9c2fe3b464c90d3db0602daceaed889e43c2355e28495609b6b46c062",
+      "editableLessonSha256": "c752cefde685c0faafb8857800a0ba3663f760a24e0e0dcde04c394aced50c5f",
+      "changes": [
+        "根据实际首屏，导入改说“书包旁的文具”，避免把桌上的文具说成已经装在书包里。"
+      ]
+    },
+    {
+      "adaptedAt": "2026-11-06T19:00:35.723949+00:00",
+      "previousEditableLessonSha256": "c752cefde685c0faafb8857800a0ba3663f760a24e0e0dcde04c394aced50c5f",
+      "editableLessonSha256": "5b01146bf786dfb1d08aa07794ef023b0b0ed2df4717025cc883fcc41a9b824e",
+      "changes": [
+        "根据第2和第3屏正式原图与640像素实渲染，将六个顺序要点聚光灯改为同位置标准激光指示，讲到词时文具原图保留完整亮度。图、台词、动作编号、场序均保持。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+<div class="solid-board stack-board">
+  <div class="stack-stage" aria-label="积木台">
+    <div class="stack-plate" aria-hidden="true"></div>
+    <div id="stack-base" class="stack-slot" data-semantic-diagram="台面上方的下层">
+      <img alt="长方体底座" src="__IMG:model-box__" data-form="box" hidden>
+    </div>
+    <div id="stack-top" class="stack-slot" data-semantic-diagram="底座上方的上层">
+      <img alt="上层积木" hidden>
+    </div>
+  </div>
+  <aside id="stack-task" class="solid-token" data-semantic-diagram="左侧分层标记显示本轮放在下面或上面">
+    <svg viewBox="0 0 86 92" width="72" height="80" aria-hidden="true">
+      <rect class="top-layer" x="28" y="10" width="33" height="30" rx="4"/>
+      <rect class="base-layer" x="13" y="44" width="64" height="31" rx="4"/>
+      <path d="M5 83h76"/>
+    </svg>
+    <img id="stack-target" alt="要放的积木模型" src="__IMG:model-box__" data-form="box">
+  </aside>
+  <div class="solid-cards stack-choices">
+    <button type="button" class="solid-card" data-form="ball" aria-label="球"><img alt="" src="__IMG:model-ball__" data-form="ball"></button>
+    <button type="button" class="solid-card" data-form="box" aria-label="长方体"><img alt="" src="__IMG:model-box__" data-form="box"></button>
+    <button type="button" class="solid-card" data-form="tube" aria-label="圆柱"><img alt="" src="__IMG:model-tube__" data-form="tube"></button>
+    <button type="button" class="solid-card" data-form="cube" aria-label="正方体"><img alt="" src="__IMG:model-cube__" data-form="cube"></button>
+  </div>
+</div>

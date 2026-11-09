@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "mira.courseware.asset-plan.v1",
+  "style": "低年级原创纸艺展厅绘本，奶油白纸、矿物蓝、杏橙与松绿，2D温和水粉、细深棕描边，清楚形体、轻微纸纹、无文字、无照片、无水印。各素材保持同一视觉风格。",
+  "originals": {
+    "exhibit": {
+      "scenes": [
+        "p01",
+        "p03",
+        "p05",
+        "p07",
+        "p09"
+      ],
+      "prompt": "Landscape 3:2 picture-book illustration. An airy children's model exhibition with handmade card exhibits, a pale cream wall and mint pedestals. A cheerful girl in an orange apron is on the left and a young boy with neat short black hair and a muted blue apron is on the right. The girl gestures with an open palm, not touching, toward the boy's two clearly visible eyes, and he looks toward her. Show both faces large and separate in the middle of the frame. Uncluttered space, no arrows, no labels, no third person or additional faces. Gentle gouache, crisp thin brown outlines, warm cream, muted blue, pine green, apricot."
+    },
+    "teach-body": {
+      "scenes": [
+        "p02",
+        "p04",
+        "p05",
+        "p06",
+        "p07",
+        "p09"
+      ],
+      "prompt": "Portrait 2:3, original full-height single East Asian boy in a plain muted blue sleeveless apron over a soft cream short-sleeved top, kneelength plain navy shorts, bare lower legs and clearly depicted bare feet. Short dark wavy hair above the two ears. Front facing, at the center, arms angled slightly outward and lowered, both open hands with five fingers each and separated from the torso, feet flat, comfortably separated, no overlapping limbs. Eyes, both ears, head, both shoulders, both knees, hands, legs, feet and toes clearly distinguishable at high resolution. Entire silhouette from hair to toes inside frame with only small margins. No objects, props, labels, rings, or arrows. Plain warm off-white background, crisp thin brown outlines, restrained gouache like an early-grade illustrated reference plate."
+    },
+    "baby-pair": {
+      "scenes": [
+        "p03"
+      ],
+      "prompt": "Square editorial picture-book image, one adult companion and one much smaller baby seated safely beside them, distinctly two people. Smiling adult in muted teal, seated baby with a yellow romper and round face, warm connection. Both characters entirely recognizable, with baby closest to viewer and unobstructed. Simple cream studio background. Soft flat gouache paper texture, crisp brown contours, no props, text, additional children or objects with faces."
+    },
+    "model-shell": {
+      "scenes": [
+        "p07"
+      ],
+      "prompt": "Portrait 2:3 early-grade storybook illustration of a harmless handmade cardboard robot display model on a low mint pedestal. Robot has a warm blue rounded rectangular head, two friendly eyes, peach torso and absolutely no visible limbs, since its two hands, two legs and two feet are being made elsewhere. Entire centered head and torso with plenty of clear empty margins around the sides and below torso, simple light cream background. Avoid mannequin realism. Cut paper edges and gentle illustrated gouache, no text or labels, no holes that look like extra eyes."
+    },
+    "model-show": {
+      "scenes": [
+        "p08",
+        "p11"
+      ],
+      "prompt": "Landscape 3:2 original picture-book illustration in a cardboard model exhibition, two original children exactly. On left a girl with dark short braids wearing a warm orange apron over cream shirt, on right a boy with short dark wavy hair in a muted blue apron. Both from head to toe, fully in frame, arms well separated and hands visible, his two eyes clearly visible. Each stands behind a separate low pedestal supporting a blank standing display card, fully separate from both faces and legs. Calm slight turned heads as if talking to one another, no hand covers any face. Warm cream field, neat tactile editorial picture-book gouache, fine dark brown contours, no lettering, arrows, or labels."
+    },
+    "quiz-actors": {
+      "scenes": [
+        "p10"
+      ],
+      "prompt": "Landscape 3:2 paired illustrated reference plate, two entirely separate new original young actors at equal height from crown to bare toes, on a pale lilac solid background. At center of left half a boy with black short straight hair, teal shirt and charcoal knee-length shorts; at center of right half a girl with dark hair in two short braids, orange shirt and leaf green knee-length shorts. Empty space between actors, arms held slightly outward and down, both palms, eyes, both ears, knees, whole bare legs, feet and toes all easily recognizable. No clipping, overlapping limbs, third people, accessories, letters, rings, arrows or labels. Calm warm 2D classroom gouache with clear fine dark contours. The two poses are front-facing and visually matched."
+    }
+  },
+  "derived": {
+    "teachingPlate": {
+      "source": "teach-body",
+      "outputs": [
+        "parts-grid",
+        "one-eye",
+        "two-eyes",
+        "one-ear",
+        "two-ears",
+        "one-foot",
+        "two-feet",
+        "rhythm-strip",
+        "hand-l",
+        "hand-r",
+        "leg-l",
+        "leg-r",
+        "foot-l",
+        "foot-r"
+      ],
+      "method": "正式图返还后逐点记录像素标注。相同的标线粗细与颜色圈出每个所指部位。一眼与双眼、单耳与双耳、单脚与双脚保留相同裁幅；只改标出的对象数量。手腿脚总图左一右多，节奏图明确头、双肩、双膝、双脚脚趾，不用装饰图标代替部位。 六块装配部件分别从清楚的原图局部裁切。p09 按原图的头、手、腿、脚实测 7 个按钮坐标。"
+    },
+    "newQuizActors": {
+      "source": "quiz-actors",
+      "outputs": [
+        "q-a-hand1",
+        "q-a-hands2",
+        "q-a-feet2",
+        "q-a-legs2",
+        "q-b-foot1",
+        "q-b-feet2",
+        "q-b-leg1",
+        "q-b-hand1",
+        "q-a-ear1",
+        "q-a-ears2",
+        "q-a-eyes2",
+        "q-a-nose1",
+        "q-pair-boy-leg1",
+        "q-pair-girl-leg1",
+        "q-pair-boy-head1",
+        "q-pair-boy-foot1",
+        "q-a-foot1"
+      ],
+      "method": "新角色上画相同粗细标线，保留同题相同取景、颜色与尺寸。q5四张均显示左右两人，只改变圈定的角色和部位；正确与干扰均有清楚图片语义。q1、q6可复用相同新图选项，问句、正确项与顺序不同。"
+    },
+    "exactCounts": {
+      "source": "Course-owned SVG, local Sharp/libvips rasterization",
+      "outputs": [
+        "q-eyes5",
+        "q-eyes6",
+        "q-eyes7",
+        "q-eyes8"
+      ],
+      "method": "新纸板展品图统一底板，程序逐枚画杏仁形、有深色瞳孔的眼纹，固定两行四列，空位不画框也不画圆，确保5、6、7、8一眼可数。题图与课堂互动的配色和框型有区别。"
+    }
+  }
+}

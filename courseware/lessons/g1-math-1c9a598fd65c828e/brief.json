@@ -1,0 +1,28 @@
+{
+  "title": "可爱的校园",
+  "grade": 1,
+  "subject": "math",
+  "fullLesson": true,
+  "officialHours": ["lesson_1"],
+  "goals": ["有序观察校园里的数与形", "十以内一一对应点数", "用标记防止重复与遗漏", "感知圆圆的与长长方方的外观", "在熟悉环境中说出数学发现"],
+  "pages": [
+    {"key": "welcome", "type": "slide", "goal": "campus-order", "play": "原创校园全景，从教室到操场再到花园，教师解释分区域观察的理由。"},
+    {"key": "count-birds", "type": "interactive", "goal": "campus-count", "play": "教师在独立示范区逐一点过三只鸟；孩子让五只小鸟逐只飞到树枝，每只只记一次，最后一数表示总数。"},
+    {"key": "mark-butterflies", "type": "interactive", "goal": "campus-mark", "play": "教师示范数过一只加一个圈；孩子为十只散放的蝴蝶做标记，完成时保留全部标记。", "adjacentMechanismReason": "前页通过移动对象分开数过和没数过的对象；本页对象原地不动，改用标记并把数量拓展到十，比较两种防重漏的方法。"},
+    {"key": "shape-sort", "type": "interactive", "goal": "campus-shape", "play": "比较球的圆圆外观与书封面的长方形外观，把真实物品图拖进相应轮廓区；轮廓图示本身是知识。"},
+    {"key": "nearby", "type": "slide", "goal": "campus-transfer", "play": "教师以教室桌面上的一本练习本示范发现物品、点数和看外形，再请孩子与大人一起观察。"},
+    {"key": "check", "type": "quiz", "goal": "campus-count,campus-shape", "play": "四道图片小检查：六个点与八个点的新数量；圆钟面、长方形黑板的新物品。正确位置分散为B、C、A、B。"},
+    {"key": "summary", "type": "slide", "goal": "all", "play": "逐项点亮有序看、只数一次、做标记、数与形在身边，明确口头表达待观察。"}
+  ],
+  "lessonExamples": {"teacherDemoCount": 3, "gameBirdCount": 5, "gameButterflyCount": 10, "shapeExamples": ["球", "书封面"]},
+  "quiz": [
+    {"id": "campus-q1", "skill": "campus-count", "target": "点数六个点并匹配同样多个点", "answer": "B"},
+    {"id": "campus-q2", "skill": "campus-count", "target": "点数八个点并匹配同样多个点", "answer": "C"},
+    {"id": "campus-q3", "skill": "campus-shape", "target": "在新物品中辨认圆圆的钟面", "answer": "A"},
+    {"id": "campus-q4", "skill": "campus-shape", "target": "在新物品中辨认长长方方的黑板外观", "answer": "B"}
+  ],
+  "afterClass": {"task": "请大人陪同，在熟悉的家中或校园选一组十以内物品，按顺序数一数，再找一个圆圆的和一个长长方方的外观，说出自己的发现。", "evidence": "实地观察、数数和口头表达待观察，不用点击代替。", "source": "lesson_1/afterClassExercise-01.jpg"},
+  "weeklyQuestionSource": ["十以内不同排列的一一对应点数", "数后标记的防重复与遗漏", "新生活物品的直观外形", "观察并描述有什么、有多少、什么样"],
+  "visualPolicy": "普通对象全部使用本课正式登记图片；点图、圆形轮廓与长方形轮廓属于知识图示。遮住非目标文字仍可听题、辨图、操作和继续。",
+  "evidenceLimits": ["屏幕点击不代表会口述", "没有录到的实地数数与表达保留待观察"]
+}

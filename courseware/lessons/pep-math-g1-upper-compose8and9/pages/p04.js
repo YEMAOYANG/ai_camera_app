@@ -1,0 +1,12 @@
+(function(){
+var tasks=[[8,2,6],[9,4,5],[8,4,4],[9,3,6]],level=0,total=8,a=2,b=6,miss=0,demo=false,busy=false,choices=[],timer;
+K.hud({icon:'◉',title:'翻过来还是同一个总数',levels:4});K.owl();K.ready({emoji:'◉',title:'交换两边',sub:'看图，选出交换后的两部分'});
+function dots(parent,n,second){var g=K.el('div','quantity'+(second?' second':''),'',parent);g.setAttribute('data-semantic-diagram','数量点');for(var i=0;i<n;i++)K.el('i','','',g)}
+function part(parent,n,second){var p=K.el('div','part'+(second?' second':''),'',parent);for(var i=0;i<n;i++){var e=K.el('span','bead','<img src="__IMG:bead__" alt="">',p);e.querySelector('img').onerror=function(){this.style.visibility='hidden';this.parentElement.classList.add('fallback')}}K.el('b','',String(n),p)}
+function render(){K.$('#whole-total').textContent=total;var source=K.$('#source-pair');source.innerHTML='';part(source,a,false);part(source,b,true);K.$('#flip-options').innerHTML='';choices.forEach(function(pair,index){var btn=K.el('button','pair-option','',K.$('#flip-options'));btn.id='pair-'+(index+1);btn.setAttribute('aria-label','左边'+pair[0]+'，右边'+pair[1]);dots(btn,pair[0],false);dots(btn,pair[1],true);btn.disabled=demo||busy;btn.onclick=function(){choose(pair,btn)}});K.levels(4,level)}
+function load(){var t=tasks[level];total=t[0];a=t[1];b=t[2];choices=K.shuffle([[b,a],[Math.max(1,b-1),a+1],[Math.min(total-1,b+1),Math.max(1,a-1)]]);miss=0;busy=false;render();K.say('原来的右边换到左边，左边换到右边。')}
+function reset(){clearTimeout(timer);level=0;demo=false;K.stars=0;K.$('#star-n').textContent='0';load()}
+function choose(pair,button){if(demo||busy)return;if(pair[0]!==b||pair[1]!==a){miss++;K.sfx.no();K.say(miss===1?'只换位置，不能把物品多添或拿走。':miss===2?'先看原来右边有几片，再想左边。':'看两组怎样互换，再选一次。','no');if(miss>=3){K.highlight('#source-pair');miss=0}return}busy=true;button.classList.add('success');var source=K.$('#source-pair');source.innerHTML='';part(source,b,false);part(source,a,true);K.star(1,button);K.sfx.ok();K.say('两部分换了位置，总数没有变。','ok');timer=setTimeout(function(){level++;if(level===tasks.length)K.finish({title:'会用交换关系了',sub:'四和四交换以后还是相同的一种。',again:reset});else load()},950)}
+function teacherStart(){demo=true;miss=0;busy=false;K.stars=0;K.$('#star-n').textContent='0';document.querySelectorAll('.flystar,.cf').forEach(function(el){el.remove()});level=0;}
+K.onStart=reset;K.onState=function(state){clearTimeout(timer);if(state.demo){teacherStart();total=8;a=3;b=5;choices=[[5,3],[4,4],[6,2]];render();K.say('示范：原来左边三片、右边五片，交换后该怎样？')}if(state.play)reset()};load();
+})();

@@ -1,0 +1,12 @@
+(function(){
+var objects=[{src:'__IMG:leaf__',alt:'绿色叶片'},{src:'__IMG:insect__',alt:'瓢虫与叶片'}],index=0,tries=0,busy=false,phase='play',epoch=0,ready=false;
+var windowEl=K.$('#observe-window'),photo=K.$('#observe-object'),record=K.$('#observe-record'),choices=K.$$('.observe-choice');
+K.hud({icon:'◉',title:'打开观察窗',levels:2});K.owl();K.ready({emoji:'◉',title:'打开观察窗',sub:'选择能看清实物的动作',btn:'start-btn'});
+function load(){ready=false;var token=epoch,left=5;['__IMG:leaf__','__IMG:insect__','__IMG:observe__','__IMG:guess__','__IMG:leave__'].forEach(function(src){var im=new Image();im.onload=function(){if(token===epoch&&--left===0)ready=true};im.onerror=function(){if(token===epoch){ready=false;K.$('#observe-board').classList.add('image-error');K.say('图片没载入，请点重来，或重新打开本页')}};im.src=src})}
+function show(){photo.src=objects[index].src;photo.alt=objects[index].alt;windowEl.classList.remove('open');choices.forEach(function(b){b.classList.remove('correct')})}
+function reset(){epoch++;index=0;tries=0;busy=false;phase='play';record.innerHTML='';K.stars=0;K.$('#star-n').textContent='0';K.$('#observe-board').classList.remove('image-error');K.levels(2,0);show();load();K.say('看动作图片，怎样找到实物线索？')}
+function save(){var im=K.el('img','',null,record);im.src=objects[index].src;im.alt='已观察的'+objects[index].alt;windowEl.classList.add('open')}
+function choose(method,button){if(!K.started||busy||phase!=='play')return;if(!ready){K.say('图片正在载入，稍等或点重来');return}if(method!=='observe'){tries++;K.sfx.no();K.shake(button);if(tries===1)K.say('这个动作有对着实物找线索吗？','no');else if(tries===2)K.say('留在实物旁边，用眼睛和工具查看','no');else{K.highlight('#observe-choice-observe');K.say('看老师提示的动作，再选一次','no')}return}busy=true;button.classList.add('correct');save();K.sfx.ok();K.star(1,button);K.say('观察窗打开，留下真实对象的线索','ok');var token=epoch;setTimeout(function(){if(token!==epoch)return;index++;K.levels(2,index);if(index===objects.length)K.finish({title:'观察线索收好了',sub:'对着实物看，才能找到它的线索',again:reset});else{tries=0;busy=false;show();K.say('换了一个对象，继续选择观察动作')}},900)}
+choices.forEach(function(b){b.addEventListener('click',function(){choose(b.dataset.method,b)})});photo.onerror=function(){ready=false;K.say('实物图片没载入，请点重来')};K.$('#observe-reset').addEventListener('click',reset);
+K.onState=function(state){if(state.demo==='observe'){phase='demo';index=0;record.innerHTML='';show();save();K.$('#observe-choice-observe').classList.add('correct')}if(state.phase==='play')reset()};K.onStart=reset;reset();
+})();

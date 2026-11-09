@@ -1,0 +1,18 @@
+<section class="surface-scene">
+  <div id="surface-workbench" class="surface-workbench" role="button" tabindex="0" aria-label="实验台，先放物体再观察">
+    <img id="surface-object" alt="请选择一个表面" hidden>
+    <div id="surface-bubbles" class="surface-bubbles" hidden><img src="__IMG:bubble__" alt="透明泡泡"><img src="__IMG:bubble__" alt="另一个较小泡泡"></div>
+    <div id="surface-trace" class="surface-trace" hidden data-semantic-diagram="泡泡破后残留液体的位置"></div>
+    <span class="surface-drop-hint" aria-hidden="true">↓</span>
+  </div>
+  <button id="surface-blow" class="btn blue surface-blow" aria-label="吹气，观察这个表面"><span class="air-mark" aria-hidden="true">≈</span>吹气</button>
+  <div id="surface-records" class="surface-records" role="button" tabindex="0" aria-label="把这次观察放进记录区">
+    <div class="surface-record" data-slot="table"></div><div class="surface-record" data-slot="cloth"></div><div class="surface-record" data-slot="ball"></div><div class="surface-record" data-slot="water"></div>
+  </div>
+  <div id="surface-bank" class="surface-bank">
+    <button id="surface-table" class="surface-choice" data-object="table" aria-label="桌面"><img src="__IMG:table__" alt="浅木桌面"></button>
+    <button id="surface-cloth" class="surface-choice" data-object="cloth" aria-label="布料"><img src="__IMG:cloth__" alt="蓝色棉布"></button>
+    <button id="surface-ball" class="surface-choice" data-object="ball" aria-label="球"><img src="__IMG:ball__" alt="橙色皮球"></button>
+    <button id="surface-water" class="surface-choice" data-object="water" aria-label="水面"><img src="__IMG:water__" alt="一碗清水"></button>
+  </div>
+</section>

@@ -1,0 +1,1080 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "金鱼：小小观察员",
+  "description": "按顺序观察金鱼的身体和水中生活，练习如实记录，学会爱护动物。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "温和细心的科学女老师，带孩子先观察、再描述，用看到的线索解释现象，先讲清爱护动物。"
+    }
+  },
+  "images": {
+    "station": {
+      "file": "assets/station.png"
+    },
+    "fish-orange": {
+      "file": "assets/fish-orange.png"
+    },
+    "fish-white": {
+      "file": "assets/fish-white.png"
+    },
+    "fish-red": {
+      "file": "assets/fish-red.png"
+    },
+    "fish-carp": {
+      "file": "assets/fish-carp.png"
+    },
+    "feeding": {
+      "file": "assets/feeding.png"
+    },
+    "mouth": {
+      "file": "assets/mouth.png"
+    },
+    "eye": {
+      "file": "assets/eye.png"
+    },
+    "gill": {
+      "file": "assets/gill.png"
+    },
+    "fin": {
+      "file": "assets/fin.png"
+    },
+    "scales": {
+      "file": "assets/scales.png"
+    },
+    "tail": {
+      "file": "assets/tail.png"
+    },
+    "quiet": {
+      "file": "assets/quiet.png"
+    },
+    "tap": {
+      "file": "assets/tap.png"
+    },
+    "grab": {
+      "file": "assets/grab.png"
+    },
+    "record-true": {
+      "file": "assets/record-true.png"
+    },
+    "record-wings": {
+      "file": "assets/record-wings.png"
+    },
+    "record-legs": {
+      "file": "assets/record-legs.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "池边观察员",
+      "template": "title-picture",
+      "data": {
+        "title": "池边观察员",
+        "picture": "station",
+        "caption": "先看清，再留下真实记录"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，我们来到一个安静的金鱼观察站。"
+        },
+        {
+          "say": "金鱼留在水里，我们在鱼缸外面看。"
+        },
+        {
+          "say": "先看看整条鱼，别急着只盯着尾巴。"
+        },
+        {
+          "say": "小满问：我能把想到的也画上吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "观察记录要写看到的，不能随便添。"
+        },
+        {
+          "say": "画得简单没关系，真实比漂亮更重要。"
+        },
+        {
+          "say": "我们还要观察它怎样游，怎样吃东西。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "猫头鹰站长提醒：先看清，再记录。",
+          "by": "owl"
+        },
+        {
+          "say": "现在跟着老师，一步一步找身体线索。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "先整条，再局部",
+      "template": "picture-points",
+      "data": {
+        "title": "先整条，再局部",
+        "picture": "fish-orange",
+        "points": [
+          "先看整体的形状",
+          "再从头看到尾",
+          "换个角度，仔细确认"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "老师先看这条金鱼的完整样子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "它的身体看上去像一个圆圆的椭圆。"
+        },
+        {
+          "say": "先看整体，就不会漏掉身体的一大块。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接着从头开始，看躯干，再看到尾。"
+        },
+        {
+          "say": "躯干就是头后面、尾前面的身体部分。"
+        },
+        {
+          "say": "朵朵说：按顺序看，就不会来回乱找。",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "同一条鱼，还可以从不同角度观察。"
+        },
+        {
+          "say": "看不清的部位，等它转过来再确认。"
+        },
+        {
+          "say": "不拿手抓出来，鱼要留在水里观察。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "让放大镜走一遍",
+      "page": "p03",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#observe-photo"
+        },
+        {
+          "say": "老师先用整条鱼的画面，看看外形。"
+        },
+        {
+          "setState": {
+            "demo": "whole"
+          }
+        },
+        {
+          "say": "放大镜收小以前，先记住身体的整体。"
+        },
+        {
+          "setState": {
+            "demo": "head"
+          }
+        },
+        {
+          "say": "再把视线移到头，从这里顺着往后看。"
+        },
+        {
+          "setState": {
+            "demo": "rest"
+          }
+        },
+        {
+          "say": "看到躯干，再看到尾，顺序没有乱。"
+        },
+        {
+          "say": "同样的方法，也能观察另一条金鱼。"
+        },
+        {
+          "say": "现在轮到你，按顺序点图片小窗。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "每看一处，观察条就留下那一处的图。"
+        },
+        {
+          "say": "第一次点错不要急，想想观察的先后。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "看到哪些部位",
+      "template": "picture-points",
+      "data": {
+        "title": "看到哪些部位",
+        "picture": "fish-orange",
+        "points": [
+          "头部：口、眼和鳃",
+          "躯干：表面有鳞",
+          "身体和尾部有鳍"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "把整条鱼看过，我们再看清各个部位。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "头的前面有口，眼睛在头部两侧。"
+        },
+        {
+          "say": "眼睛后面的鳃，要仔细看它所在的位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再往后看躯干，表面能看到一片片鳞。"
+        },
+        {
+          "say": "鳞像一片片小片，排列在鱼的身上。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "鱼鳍在身体和尾部，样子像展开的小扇。"
+        },
+        {
+          "say": "有的鳍在身体上面，有的在身体下面。"
+        },
+        {
+          "say": "小满问：鳃和鳍是同一个地方吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "不是，鳃在头后侧，鳍是伸出的部分。"
+        },
+        {
+          "say": "先辨清所在位置，再把它记到观察卡上。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "老师这样说，我看到一条橙色金鱼，身子圆圆的。"
+        },
+        {
+          "say": "我先勾出圆鱼身，再画头上的眼和口。"
+        },
+        {
+          "say": "身旁的鳍和后面的大尾，我照着看到的画。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "装好观察记录",
+      "page": "p05",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#part-photo"
+        },
+        {
+          "say": "老师先看看完整金鱼，再认局部照片。"
+        },
+        {
+          "setState": {
+            "demo": "mouth"
+          }
+        },
+        {
+          "highlight": "#part-card"
+        },
+        {
+          "say": "这张照片是鱼的嘴，嘴在头的前面。"
+        },
+        {
+          "say": "把嘴的照片放到鱼头前面，位置就对应了。"
+        },
+        {
+          "highlight": "#part-record"
+        },
+        {
+          "say": "观察卡留下这张照片，没有添加别的东西。"
+        },
+        {
+          "say": "尾在身体后面，鳍的形状像展开的小扇。"
+        },
+        {
+          "say": "现在请你把不同部位送回对应的位置。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "可以拖照片，也可以先点照片再点位置。"
+        },
+        {
+          "say": "放错时看看整鱼，重新找一找就可以。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "quiz",
+      "title": "观察顺序小检查",
+      "intro": [
+        "换一条鱼和一个新镜头，听题看图再选择。",
+        "老师把问题讲给你，再想想观察的方法。"
+      ],
+      "questions": [
+        {
+          "id": "gf-q1",
+          "question": "朵朵初次观察花金鱼，先看哪张图了解整体？",
+          "skill": "整体到局部的观察顺序",
+          "answer": [
+            "A"
+          ],
+          "analysis": "先看整条金鱼，知道整体样子，再观察局部。",
+          "options": {
+            "A": {
+              "label": "整条金鱼",
+              "visual": {
+                "kind": "asset",
+                "image": "fish-white",
+                "alt": "一条完整的白底橙斑金鱼"
+              }
+            },
+            "B": {
+              "label": "鱼眼近景",
+              "visual": {
+                "kind": "asset",
+                "image": "eye",
+                "alt": "以眼为中心的鱼头局部，未显示完整鱼身"
+              }
+            },
+            "C": {
+              "label": "鱼尾近景",
+              "visual": {
+                "kind": "asset",
+                "image": "tail",
+                "alt": "只看到鱼尾的局部照片"
+              }
+            }
+          }
+        },
+        {
+          "id": "gf-q2",
+          "question": "记录员要找金鱼的口，哪张局部照片对应它取食的地方？",
+          "skill": "辨认金鱼的口",
+          "answer": [
+            "B"
+          ],
+          "analysis": "金鱼用口取食，口在头的前面。",
+          "options": {
+            "A": {
+              "label": "鳞",
+              "visual": {
+                "kind": "asset",
+                "image": "scales",
+                "alt": "金鱼躯干表面的鳞片近景，没有嘴部"
+              }
+            },
+            "B": {
+              "label": "口",
+              "visual": {
+                "kind": "asset",
+                "image": "mouth",
+                "alt": "金鱼嘴部局部图"
+              }
+            },
+            "C": {
+              "label": "尾",
+              "visual": {
+                "kind": "asset",
+                "image": "tail",
+                "alt": "金鱼尾部局部图"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "水里怎样动",
+      "template": "picture-points",
+      "data": {
+        "title": "水里怎样动",
+        "picture": "fish-white",
+        "points": [
+          "观察游动的方向",
+          "看躯干、尾和鳍",
+          "鳍是主要运动器官"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看到鱼在水里游，还要留心哪里在动。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "它能向不同方向游，不是只朝一边走。"
+        },
+        {
+          "say": "先看方向，再把视线移到身体的变化。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "躯干、尾和鳍会配合，帮助它在水中运动。"
+        },
+        {
+          "say": "比如金鱼往前游，躯干和尾一起摆，鳍也在动。"
+        },
+        {
+          "say": "朵朵说：我要慢慢看，找到变化再说。",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "laser": "point-3"
+        },
+        {
+          "say": "鳍是金鱼主要的运动器官。"
+        },
+        {
+          "say": "屏幕动画帮助理解，不能代替真实观察。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "观察变化，留下证据",
+      "page": "p08",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#motion-tank"
+        },
+        {
+          "say": "这是一段游动示意，先看它向哪里移动。"
+        },
+        {
+          "setState": {
+            "demo": "tail"
+          }
+        },
+        {
+          "say": "老师让尾的示意摆动，再暂停看清部位。"
+        },
+        {
+          "setState": {
+            "demo": "record-tail"
+          }
+        },
+        {
+          "say": "把这个变化收入观察卡，说明我看到了尾动。"
+        },
+        {
+          "say": "鳍也会活动，要把不同部位联系起来看。"
+        },
+        {
+          "setState": {
+            "demo": "fin"
+          }
+        },
+        {
+          "say": "现在鳍的示意亮起来，留意它所在的位置。"
+        },
+        {
+          "highlight": "#motion-parts"
+        },
+        {
+          "say": "轮到你先播放，再选发生变化的部位。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "点相机留下记录，鱼儿还会换一个位置。"
+        },
+        {
+          "say": "这是屏幕模拟，真实鱼的活动还要亲眼看。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "吃食和呼吸",
+      "template": "two-columns",
+      "data": {
+        "title": "吃食和呼吸",
+        "left": {
+          "heading": "口：取食",
+          "body": "看嘴接近鱼食的现象"
+        },
+        "right": {
+          "heading": "鳃：呼吸",
+          "body": "观察鳃所在位置及变化"
+        },
+        "left_picture": "feeding",
+        "right_picture": "gill"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这条金鱼的嘴靠近鱼食，正在取食。"
+        },
+        {
+          "say": "金鱼用口吃东西，鱼食从口进入。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "把取食和口联系起来，就有了观察线索。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看头后侧的鳃，它帮助金鱼呼吸。"
+        },
+        {
+          "say": "金鱼用鳃呼吸，观察时留心鳃的变化。"
+        },
+        {
+          "say": "小满问：看到嘴动，就只是在吃东西吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "还要看当时的情境，不能只凭一个动作猜。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "口取食、鳃呼吸，记录时要分清部位。"
+        },
+        {
+          "say": "照片展示位置，真实的变化要继续观察。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "把线索归入记录",
+      "page": "p10",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#life-source"
+        },
+        {
+          "say": "观察卡上有两种线索，先看看照片。"
+        },
+        {
+          "setState": {
+            "demo": "food"
+          }
+        },
+        {
+          "say": "老师把取食照片送到嘴部的观察镜头。"
+        },
+        {
+          "highlight": "#life-mouth"
+        },
+        {
+          "say": "鱼食靠近嘴，我们就把它与口联系起来。"
+        },
+        {
+          "setState": {
+            "demo": "breath"
+          }
+        },
+        {
+          "say": "这一张是鳃所在的位置，用鳃来呼吸。"
+        },
+        {
+          "highlight": "#life-gill"
+        },
+        {
+          "say": "嘴和鳃不是一个部位，不能混放记录。"
+        },
+        {
+          "say": "现在请你给观察照片找对应的镜头。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "先看照片呈现什么，再拖进相应的镜头。"
+        },
+        {
+          "say": "我们只练习联系部位，不把照片当真实实验。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "不打扰小伙伴",
+      "template": "picture-points",
+      "data": {
+        "title": "不打扰小伙伴",
+        "picture": "station",
+        "points": [
+          "安静观察，不拍鱼缸",
+          "不触摸或伤害金鱼",
+          "把看到的如实记下来"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "金鱼也能听到声音，先看看它原来怎样游。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "站在鱼缸外安静看，不敲打鱼缸。"
+        },
+        {
+          "say": "比如鱼原先直游，听到声音后转弯，就记下变化。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "不把手伸进去抓金鱼，也不伤害它。"
+        },
+        {
+          "say": "真实养护和操作请大人照看，别自己尝试。"
+        },
+        {
+          "say": "小满问：靠得近就一定看得更清楚吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "看不清可以等一等、换角度，不必碰它。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "记录本只画看到的，不添上想象的部位。"
+        },
+        {
+          "say": "猫头鹰站长提醒：爱护动物，真实记录。",
+          "by": "owl"
+        },
+        {
+          "say": "比如响声过后，尾巴一摆，鱼身跟着转了。"
+        },
+        {
+          "say": "把声音和鱼身、尾的动作记在一起，才说得清变化。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "interactive",
+      "title": "给观察站换个做法",
+      "page": "p12",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#care-scene"
+        },
+        {
+          "say": "老师看到有人拍鱼缸，先停下这个动作。"
+        },
+        {
+          "highlight": "#care-choice-quiet"
+        },
+        {
+          "say": "换成安静看、在外面记录的图片。"
+        },
+        {
+          "setState": {
+            "demo": "quiet"
+          }
+        },
+        {
+          "say": "金鱼留在水里，人和记录本留在鱼缸外。"
+        },
+        {
+          "highlight": "#care-record"
+        },
+        {
+          "say": "这样观察，也能把身体和活动记清楚。"
+        },
+        {
+          "say": "另一种不合适的动作，是伸手去抓金鱼。"
+        },
+        {
+          "say": "不能为了看得清，就碰它或伤害它。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "轮到你给观察站换一种合适的做法。"
+        },
+        {
+          "say": "第一次没选好，再看看手在做什么。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "quiz",
+      "title": "生活与记录小检查",
+      "intro": [
+        "现在换到爷爷家的鱼缸旁，看新情境想一想。",
+        "先听清老师的问题，再看图片作答。"
+      ],
+      "questions": [
+        {
+          "id": "gf-q3",
+          "question": "花金鱼游到鱼食旁，用哪个部位吃进去？",
+          "skill": "金鱼用口取食",
+          "answer": [
+            "C"
+          ],
+          "analysis": "金鱼用口取食，鳃和鳍不是取食的部位。",
+          "options": {
+            "A": {
+              "label": "鳃",
+              "visual": {
+                "kind": "asset",
+                "image": "gill",
+                "alt": "金鱼头后侧的鳃盖局部"
+              }
+            },
+            "B": {
+              "label": "鳍",
+              "visual": {
+                "kind": "asset",
+                "image": "fin",
+                "alt": "金鱼的一片胸鳍"
+              }
+            },
+            "C": {
+              "label": "口",
+              "visual": {
+                "kind": "asset",
+                "image": "mouth",
+                "alt": "金鱼嘴部局部"
+              }
+            }
+          }
+        },
+        {
+          "id": "gf-q4",
+          "question": "小满到爷爷家观察金鱼，哪种做法合适？",
+          "skill": "爱护金鱼的观察行为",
+          "answer": [
+            "A"
+          ],
+          "analysis": "安静地在缸外观察记录，手留在外面，也不拍缸。",
+          "options": {
+            "A": {
+              "label": "安静记录",
+              "visual": {
+                "kind": "asset",
+                "image": "quiet",
+                "alt": "男孩双手在鱼缸外安静画观察记录"
+              }
+            },
+            "B": {
+              "label": "拍鱼缸",
+              "visual": {
+                "kind": "asset",
+                "image": "tap",
+                "alt": "男孩用指节敲碰鱼缸外壁"
+              }
+            },
+            "C": {
+              "label": "伸手入缸",
+              "visual": {
+                "kind": "asset",
+                "image": "grab",
+                "alt": "男孩把手伸进鱼缸，手指靠近水面"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "slide",
+      "title": "换条鱼也会观察",
+      "template": "two-columns",
+      "data": {
+        "title": "换条鱼也会观察",
+        "left": {
+          "heading": "金鱼",
+          "body": "先看整体，再从头到尾"
+        },
+        "right": {
+          "heading": "鲤鱼",
+          "body": "也按顺序找身体部位"
+        },
+        "left_picture": "fish-orange",
+        "right_picture": "fish-carp"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看这幅橙色金鱼图，它的身子显得圆一些。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看整体的样子，再从头慢慢看到尾。"
+        },
+        {
+          "say": "头上有什么，身上有什么，都看清再记。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边这条鲤鱼偏灰，鱼身看着比金鱼长些。"
+        },
+        {
+          "say": "按同样顺序找一找，两幅图都有头、躯干、鳍和尾。"
+        },
+        {
+          "say": "朵朵说：颜色不同，也能用同一个办法。",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "观察方法能搬过去，发现却要重新确认。"
+        },
+        {
+          "say": "不能把金鱼的样子，原封不动画到别的鱼上。"
+        },
+        {
+          "say": "看见什么记什么，这才是自己的真实发现。"
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "quiz",
+      "title": "我能如实记录",
+      "intro": [
+        "最后两题，想想身体部位和观察记录。",
+        "从画面找线索，不急着猜答案。"
+      ],
+      "questions": [
+        {
+          "id": "gf-q5",
+          "question": "观察员要找金鱼用来呼吸的部位，选哪张图？",
+          "skill": "金鱼用鳃呼吸",
+          "answer": [
+            "B"
+          ],
+          "analysis": "金鱼用鳃呼吸，鳃在头部后侧；鳞和鳍不是鳃。",
+          "options": {
+            "A": {
+              "label": "鳞",
+              "visual": {
+                "kind": "asset",
+                "image": "scales",
+                "alt": "金鱼躯干表面鳞片"
+              }
+            },
+            "B": {
+              "label": "鳃",
+              "visual": {
+                "kind": "asset",
+                "image": "gill",
+                "alt": "金鱼头后侧鳃盖"
+              }
+            },
+            "C": {
+              "label": "鳍",
+              "visual": {
+                "kind": "asset",
+                "image": "fin",
+                "alt": "金鱼胸鳍"
+              }
+            }
+          }
+        },
+        {
+          "id": "gf-q6",
+          "question": "三张观察卡里，哪张画对了金鱼的身体形状？",
+          "skill": "如实记录观察证据",
+          "answer": [
+            "C"
+          ],
+          "analysis": "如实画出金鱼的鳍和尾。观察时没看到的翅膀和腿，不添到画里。",
+          "options": {
+            "A": {
+              "label": "观察卡一",
+              "visual": {
+                "kind": "asset",
+                "image": "record-wings",
+                "alt": "画本上金鱼被加了鸟翅膀"
+              }
+            },
+            "B": {
+              "label": "观察卡二",
+              "visual": {
+                "kind": "asset",
+                "image": "record-legs",
+                "alt": "画本上金鱼被加了腿和脚"
+              }
+            },
+            "C": {
+              "label": "观察卡三",
+              "visual": {
+                "kind": "asset",
+                "image": "record-true",
+                "alt": "画本上是有鱼鳍和鱼尾的橙色鱼"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "slide",
+      "title": "带着方法去观察",
+      "template": "summary",
+      "data": {
+        "title": "带着方法去观察",
+        "items": [
+          "先整体，再局部，按顺序看",
+          "联系身体和水中生活",
+          "安静观察，不拍缸、不抓鱼",
+          "看见什么，就真实记什么"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们先看整条鱼，再从头看到尾。"
+        },
+        {
+          "say": "这样观察，身体的大部位就不容易漏掉。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "金鱼的躯干、尾和鳍，配合着在水里运动。"
+        },
+        {
+          "say": "还记得口用来取食，鳃帮助它呼吸。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "观察时安静，不拍缸，也不伸手抓鱼。"
+        },
+        {
+          "say": "小满说：我会等它游过来，再仔细看。",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "把看见的画下来，没看清的就继续观察。"
+        },
+        {
+          "say": "猫头鹰站长提醒：不把猜想写成发现。",
+          "by": "owl"
+        },
+        {
+          "say": "可以请大人陪你观察一条真实的鱼。"
+        },
+        {
+          "say": "口头描述和纸上画得怎样，还请大人看看。"
+        }
+      ]
+    }
+  ]
+}

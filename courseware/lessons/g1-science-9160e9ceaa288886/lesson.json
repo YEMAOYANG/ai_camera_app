@@ -1,0 +1,989 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "小小科学家：带着好奇找答案",
+  "description": "整合苏教版一年级上册《1 小小科学家》唯一官方课时，从好奇、观察和滚球比较到研究领域及麻雀课后观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "细心温和的科学女老师，示范怎样提出问题、观察和安排实验，提醒记录实际发现，不把屏幕示意当真实测量。"
+    }
+  },
+  "images": {
+    "station": {
+      "file": "assets/station.png"
+    },
+    "leaf": {
+      "file": "assets/leaf.png"
+    },
+    "insect": {
+      "file": "assets/insect.png"
+    },
+    "observe": {
+      "file": "assets/observe.png"
+    },
+    "guess": {
+      "file": "assets/guess.png"
+    },
+    "leave": {
+      "file": "assets/leave.png"
+    },
+    "ball-lab": {
+      "file": "assets/ball-lab.png"
+    },
+    "animal-work": {
+      "file": "assets/animal-work.png"
+    },
+    "plant-work": {
+      "file": "assets/plant-work.png"
+    },
+    "star-work": {
+      "file": "assets/star-work.png"
+    },
+    "rabbit": {
+      "file": "assets/rabbit.png"
+    },
+    "rice": {
+      "file": "assets/rice.png"
+    },
+    "moon": {
+      "file": "assets/moon.png"
+    },
+    "rock-work": {
+      "file": "assets/rock-work.png"
+    },
+    "shell-observe": {
+      "file": "assets/shell-observe.png"
+    },
+    "sparrow-watch": {
+      "file": "assets/sparrow-watch.png"
+    },
+    "sea-work": {
+      "file": "assets/sea-work.png"
+    },
+    "squirrel-watch": {
+      "file": "assets/squirrel-watch.png"
+    },
+    "squirrel-record": {
+      "file": "assets/squirrel-record.png"
+    },
+    "quiz-high": {
+      "file": "assets/quiz-high.png"
+    },
+    "quiz-mid": {
+      "file": "assets/quiz-mid.png"
+    },
+    "quiz-low": {
+      "file": "assets/quiz-low.png"
+    },
+    "quiz-fair": {
+      "file": "assets/quiz-fair.png"
+    },
+    "quiz-height-mixed": {
+      "file": "assets/quiz-height-mixed.png"
+    },
+    "quiz-size-mixed": {
+      "file": "assets/quiz-size-mixed.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "title": "小小科学家",
+      "type": "slide",
+      "template": "title-picture",
+      "data": {
+        "title": "小小科学家",
+        "picture": "station",
+        "caption": "带着好奇，去寻找答案"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，我们一起当小小科学家。"
+        },
+        {
+          "say": "看看桌上的叶子，你想知道什么？"
+        },
+        {
+          "say": "叶子边缘的样子，就是一个小问题。"
+        },
+        {
+          "say": "有了问题，我们还要想办法找答案。"
+        },
+        {
+          "say": "仔细看一看，可以发现细小的线索。"
+        },
+        {
+          "say": "亲手做一做，也能看见新的变化。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "科学家也会这样观察和做实验。"
+        },
+        {
+          "say": "我们从身边的小事开始研究。"
+        },
+        {
+          "say": "遇到不明白的事，保留你的好奇心。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "title": "好奇之后，要找线索",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "好奇之后，要找线索",
+        "picture": "observe",
+        "points": [
+          "先提出一个问题",
+          "观察或实验找答案",
+          "留下实际看到的记录"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "好奇，就是看见一件事想问个为什么。"
+        },
+        {
+          "say": "比如，我想知道叶片边缘是什么样。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "老师拿放大镜，仔细看叶片边缘。"
+        },
+        {
+          "say": "只闭眼猜，不能代替查看这片叶子。"
+        },
+        {
+          "say": "想知道小球怎样滚，就可以做实验。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "找到线索后，把看到的画下来。"
+        },
+        {
+          "say": "记录实际发现，别把想象当作答案。"
+        },
+        {
+          "say": "小满问：我也能提出自己的问题吗？"
+        },
+        {
+          "say": "当然可以，小问题也值得认真研究。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "title": "为问题打开观察窗",
+      "type": "interactive",
+      "page": "p03",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#observe-object"
+        },
+        {
+          "say": "这是一片叶子，老师想看清它的细节。"
+        },
+        {
+          "highlight": "#observe-choice-observe"
+        },
+        {
+          "say": "老师选拿放大镜观察的动作。"
+        },
+        {
+          "setState": {
+            "demo": "observe"
+          }
+        },
+        {
+          "say": "观察窗打开，叶片的细节进入记录。"
+        },
+        {
+          "say": "眼睛对着实物看，才会找到它的线索。"
+        },
+        {
+          "highlight": "#observe-record"
+        },
+        {
+          "say": "闭眼想象，不能知道这片叶子的样子。"
+        },
+        {
+          "say": "走开以后，也没有继续寻找答案。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在换你选，让问题获得观察线索。"
+        },
+        {
+          "say": "两次对象会变化，办法都要对着实物。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "title": "科学家的研究办法",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "科学家的研究办法",
+        "left": {
+          "heading": "仔细观察",
+          "body": "从真实事物中寻找线索"
+        },
+        "right": {
+          "heading": "动手实验",
+          "body": "安排条件，观察变化"
+        },
+        "left_picture": "insect",
+        "right_picture": "ball-lab"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "法布尔研究昆虫，会认真观察昆虫。"
+        },
+        {
+          "say": "昆虫怎样活动，要到真实情境里查看。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "观察，是有目的地仔细查看事物。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "伽利略做过斜面上的滚球实验。"
+        },
+        {
+          "say": "他通过实验，研究小球滚动的变化。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "实验，是安排条件，再看会发生什么。"
+        },
+        {
+          "say": "两种办法都帮助我们寻找问题答案。"
+        },
+        {
+          "say": "科学家研究的内容，可以很不一样。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "title": "滚球实验：只换起点",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "滚球实验：只换起点",
+        "picture": "ball-lab",
+        "points": [
+          "同一小球，同一条斜轨",
+          "从不同起点轻轻放手",
+          "看停在哪里，再作比较"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "老师先提出问题：起点会影响远近吗？"
+        },
+        {
+          "say": "我们用同一小球，保留同一条斜轨。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先从低处放手，再从高处放手。"
+        },
+        {
+          "say": "放手时不推球，地面也保持一样。"
+        },
+        {
+          "say": "只换释放起点，比较才容易看明白。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "等球停下，用标记留下停的位置。"
+        },
+        {
+          "say": "本课实验中，起点高的小球滚得远。"
+        },
+        {
+          "say": "下一页是屏幕示意，帮我们练习比较。"
+        },
+        {
+          "say": "家里的真实结果，要亲自观察和记录。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "title": "让两个起点留下记录",
+      "type": "interactive",
+      "page": "p06",
+      "widgetType": "game",
+      "startImage": "ball-lab",
+      "script": [
+        {
+          "highlight": "#roll-ramp"
+        },
+        {
+          "say": "灰绿色线条表示同一条斜轨和地面。"
+        },
+        {
+          "highlight": "#roll-low"
+        },
+        {
+          "say": "老师先选低起点，同一小球轻轻放手。"
+        },
+        {
+          "setState": {
+            "demo": "low"
+          }
+        },
+        {
+          "say": "低起点的停球位置，留下一个圆标记。"
+        },
+        {
+          "highlight": "#roll-high"
+        },
+        {
+          "setState": {
+            "demo": "high"
+          }
+        },
+        {
+          "say": "再选高起点，示意小球停得更远。"
+        },
+        {
+          "highlight": "#roll-record"
+        },
+        {
+          "say": "对照两个标记，起点和远近连起来了。"
+        },
+        {
+          "say": "这是帮助比较的示意，不是真实测量。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请分别试两个起点，再找出较远的标记。"
+        },
+        {
+          "say": "只试一次还不够，两个结果都要留下。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "观察与滚球小检查",
+      "intro": [
+        "听老师读题，选择对应的图片。",
+        "这里换了新情境，请根据方法来判断。"
+      ],
+      "questions": [
+        {
+          "id": "little-scientist-q1",
+          "question": "想知道贝壳表面的花纹，哪幅画在寻找线索？",
+          "skill": "通过观察寻找问题答案",
+          "answer": [
+            "B"
+          ],
+          "analysis": "对着贝壳仔细查看，才能看到它表面的真实花纹。闭眼猜和走开都没有查看贝壳。",
+          "options": {
+            "A": {
+              "label": "闭眼想象",
+              "visual": {
+                "kind": "asset",
+                "image": "guess",
+                "alt": "闭眼想象"
+              }
+            },
+            "B": {
+              "label": "仔细查看贝壳",
+              "visual": {
+                "kind": "asset",
+                "image": "shell-observe",
+                "alt": "仔细查看贝壳"
+              }
+            },
+            "C": {
+              "label": "背对物体离开",
+              "visual": {
+                "kind": "asset",
+                "image": "leave",
+                "alt": "背对物体离开"
+              }
+            }
+          }
+        },
+        {
+          "id": "little-scientist-q2",
+          "question": "同一小球想滚远些，先从哪个起点放手？",
+          "skill": "同一条件下比较滚球释放起点",
+          "answer": [
+            "A"
+          ],
+          "analysis": "保持同一球、同一斜轨和地面，只改变起点。本课实验中，从较高起点放手，小球滚得较远。图片为条件示意，真实距离需观察。",
+          "options": {
+            "A": {
+              "label": "较高起点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-high",
+                "alt": "较高起点"
+              }
+            },
+            "B": {
+              "label": "较低起点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-low",
+                "alt": "较低起点"
+              }
+            },
+            "C": {
+              "label": "中间起点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-mid",
+                "alt": "中间起点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "title": "换一种球，怎样比",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "换一种球，怎样比",
+        "picture": "ball-lab",
+        "points": [
+          "比较大小相同的木球和钢球",
+          "从同一个起点放手",
+          "看实际结果，不抢着下结论"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "现在的问题变了：换一种球会怎样？"
+        },
+        {
+          "say": "我们准备大小相同的木球和钢球。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这次要保留同一个释放起点。"
+        },
+        {
+          "say": "斜轨和地面相同，放手时也不推。"
+        },
+        {
+          "say": "球的材质不同，其他条件尽量一样。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "等每个球停下，分别留下它的位置。"
+        },
+        {
+          "say": "先看实际结果，再交流自己的发现。"
+        },
+        {
+          "say": "不能只听见钢球二字，就猜它一定远。"
+        },
+        {
+          "say": "真实发现还要靠观察，不能预先填写。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "title": "搭好比较实验",
+      "type": "interactive",
+      "page": "p09",
+      "widgetType": "game",
+      "startImage": "ball-lab",
+      "script": [
+        {
+          "highlight": "#compare-steel"
+        },
+        {
+          "say": "这颗灰色球表示钢球，放在中间起点。"
+        },
+        {
+          "highlight": "#compare-wood"
+        },
+        {
+          "say": "棕色球表示木球，大小和钢球相同。"
+        },
+        {
+          "highlight": "#compare-target-mid"
+        },
+        {
+          "setState": {
+            "demo": "same-start"
+          }
+        },
+        {
+          "say": "老师把木球放在相同的中间起点。"
+        },
+        {
+          "say": "这样比较材质，起点就不会一起变化。"
+        },
+        {
+          "highlight": "#compare-record"
+        },
+        {
+          "say": "两颗球的起点对齐，实验准备完成。"
+        },
+        {
+          "say": "这里只检查摆法，不替真实实验编结果。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "轮到你，把木球送到钢球相同的起点。"
+        },
+        {
+          "say": "摆好以后，再让大人陪你做真实比较。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "title": "他们研究不同的世界",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "他们研究不同的世界",
+        "left": {
+          "heading": "生命的线索",
+          "body": "动物、植物，都值得研究"
+        },
+        "right": {
+          "heading": "大地与天空",
+          "body": "岩石、星空，也值得研究"
+        },
+        "left_picture": "animal-work",
+        "right_picture": "rock-work"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这位研究者正在观察动物的活动。"
+        },
+        {
+          "say": "还有科学家在田里观察植物怎样生长。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "动物和植物，都是可以研究的对象。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这位研究者查看岩石，寻找地面线索。"
+        },
+        {
+          "say": "也有科学家用望远镜研究夜空。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "科学家的研究，并不只有一种内容。"
+        },
+        {
+          "say": "他们在不同地方，用办法寻找答案。"
+        },
+        {
+          "say": "你关心什么，也可以先提一个小问题。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "title": "把研究对象送到观察站",
+      "type": "interactive",
+      "page": "p11",
+      "widgetType": "game",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#field-card"
+        },
+        {
+          "say": "这张图片是白兔，是一种动物。"
+        },
+        {
+          "highlight": "#field-animal"
+        },
+        {
+          "setState": {
+            "demo": "rabbit"
+          }
+        },
+        {
+          "say": "老师把白兔送到观察动物的研究者那里。"
+        },
+        {
+          "say": "研究对象对应，观察站就留下这张图。"
+        },
+        {
+          "highlight": "#field-plant"
+        },
+        {
+          "say": "观察植物的研究者在稻田里找线索。"
+        },
+        {
+          "highlight": "#field-star"
+        },
+        {
+          "say": "看星空的研究者用望远镜观察夜空。"
+        },
+        {
+          "say": "每个地方都可能有值得研究的问题。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请把三张对象图，放到对应观察站。"
+        },
+        {
+          "say": "你可以拖动，也可以先选图再点观察站。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "像科学家一样想一想",
+      "intro": [
+        "接着用新情境检查你的想法。",
+        "每题听完，再选择最合适的一张图。"
+      ],
+      "questions": [
+        {
+          "id": "little-scientist-q3",
+          "question": "比较木球和钢球，哪幅图的大小和起点都相同？",
+          "skill": "控制滚球比较实验的其他条件",
+          "answer": [
+            "C"
+          ],
+          "analysis": "只比较材质时，球的大小与释放起点都保持相同。另一幅同时改变起点，另一幅同时改变球的大小，不能只归因于材质。",
+          "options": {
+            "A": {
+              "label": "起点不同",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-height-mixed",
+                "alt": "起点不同"
+              }
+            },
+            "B": {
+              "label": "球的大小不同",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-size-mixed",
+                "alt": "球的大小不同"
+              }
+            },
+            "C": {
+              "label": "同大小同起点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-fair",
+                "alt": "同大小同起点"
+              }
+            }
+          }
+        },
+        {
+          "id": "little-scientist-q4",
+          "question": "小舟想研究海里的动物，应找哪位研究者？",
+          "skill": "举例说明科学家有不同研究方面",
+          "answer": [
+            "B"
+          ],
+          "analysis": "研究海中动物，可以到安全的海边观察它们。研究天空和田中植物的科学家关注的对象不同，说明研究方面很多。",
+          "options": {
+            "A": {
+              "label": "研究星空",
+              "visual": {
+                "kind": "asset",
+                "image": "star-work",
+                "alt": "研究星空"
+              }
+            },
+            "B": {
+              "label": "研究海中动物",
+              "visual": {
+                "kind": "asset",
+                "image": "sea-work",
+                "alt": "研究海中动物"
+              }
+            },
+            "C": {
+              "label": "研究田中植物",
+              "visual": {
+                "kind": "asset",
+                "image": "plant-work",
+                "alt": "研究田中植物"
+              }
+            }
+          }
+        },
+        {
+          "id": "little-scientist-q5",
+          "question": "想知道松鼠怎样活动，哪幅画在寻找真实线索？",
+          "skill": "把观察方法迁移到新的研究对象",
+          "answer": [
+            "C"
+          ],
+          "analysis": "在大人陪同下安静观察松鼠，才能收集它真实活动的线索。只闭眼想或直接离开，都没有完成观察。",
+          "options": {
+            "A": {
+              "label": "只闭眼想",
+              "visual": {
+                "kind": "asset",
+                "image": "guess",
+                "alt": "只闭眼想"
+              }
+            },
+            "B": {
+              "label": "直接走开",
+              "visual": {
+                "kind": "asset",
+                "image": "leave",
+                "alt": "直接走开"
+              }
+            },
+            "C": {
+              "label": "安静观察松鼠",
+              "visual": {
+                "kind": "asset",
+                "image": "squirrel-watch",
+                "alt": "安静观察松鼠"
+              }
+            }
+          }
+        },
+        {
+          "id": "little-scientist-q6",
+          "question": "看到了松鼠跳向树枝，哪幅画是在留下记录？",
+          "skill": "用记录保存实际观察发现",
+          "answer": [
+            "A"
+          ],
+          "analysis": "把实际看到的松鼠活动画下来，可以留下观察记录。猜想不是已经看到的发现，离开也没有留下记录。",
+          "options": {
+            "A": {
+              "label": "把看到的活动画下",
+              "visual": {
+                "kind": "asset",
+                "image": "squirrel-record",
+                "alt": "把看到的活动画下"
+              }
+            },
+            "B": {
+              "label": "闭眼继续猜",
+              "visual": {
+                "kind": "asset",
+                "image": "guess",
+                "alt": "闭眼继续猜"
+              }
+            },
+            "C": {
+              "label": "直接离开",
+              "visual": {
+                "kind": "asset",
+                "image": "leave",
+                "alt": "直接离开"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "title": "把好奇带到公园",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "把好奇带到公园",
+        "picture": "sparrow-watch",
+        "points": [
+          "问题：麻雀和人怎样走",
+          "和大人安静观察，不追赶",
+          "画下方法与实际发现"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "课后，请研究一个新的小问题。"
+        },
+        {
+          "say": "麻雀也有两条腿，它和人怎样行走？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "和大人找个安全地方，安静地看。"
+        },
+        {
+          "say": "不追赶，不抓小鸟，也不打扰它们。"
+        },
+        {
+          "say": "看看人的脚怎样动，再看看麻雀的脚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "你可以画画，也可以说给大人听。"
+        },
+        {
+          "say": "先说自己怎样观察，再说实际发现。"
+        },
+        {
+          "say": "没有观察到就说还不知道，继续找线索。"
+        },
+        {
+          "say": "屏幕没有看见你的观察，这项记待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "title": "我的科学第一步",
+      "type": "slide",
+      "template": "summary",
+      "data": {
+        "title": "我的科学第一步",
+        "items": [
+          "保持好奇，提出问题",
+          "观察或实验，寻找答案",
+          "滚球比较，一次看清一个变化",
+          "科学家研究不同方面",
+          "记录真实发现，继续探究"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天，我们从身边的小问题出发。"
+        },
+        {
+          "say": "好奇让我们愿意继续问为什么。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "观察要对着实物，实验要安排条件。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "同一小球换起点，比较它停得远近。"
+        },
+        {
+          "say": "换成不同材质时，要保留相同起点。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "动物、植物、大地和天空都值得研究。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "用实际看到的线索，留下真实记录。"
+        },
+        {
+          "say": "点对图片只说明这次选择对了。"
+        },
+        {
+          "say": "真实操作和口头表达，请大人继续观察。"
+        },
+        {
+          "say": "带着好奇去寻找答案，你也能做科学。"
+        }
+      ]
+    }
+  ]
+}

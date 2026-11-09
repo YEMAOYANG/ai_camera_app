@@ -1,0 +1,14 @@
+.comparison-board {position:absolute;inset:16px 72px 10px;padding:22px 28px;border:2px solid #93b8aa;border-radius:30px;background:#fffdf5;color:#244d49;display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:14px}
+#ready .card,#finish .card {border-color:#a8c8ba}
+#ready h1,#finish h1 {color:#244d49}
+#ready p,#finish p {color:#38665e}
+#hud .chip {color:#244d49;border-color:#a8c8ba}
+.diagram-board {width:770px;min-height:210px;border-radius:24px;background:#eef7f1;border:2px solid #8db1a7;display:flex;justify-content:center;align-items:center;padding:10px}
+.diagram-board svg {display:block;width:100%;height:200px;overflow:visible}
+.choice-rack {display:flex;gap:24px;align-items:center;justify-content:center}
+.choice-tile {width:196px;height:108px;padding:8px;border:2px solid #8db1a7;border-radius:22px;background:#fffdf5;color:#244d49;cursor:pointer;box-shadow:0 5px 0 #c1d8cc;display:flex;align-items:center;justify-content:center;font:700 60px/1 system-ui,sans-serif}
+.choice-tile:focus-visible {outline:4px solid #c7792d;outline-offset:4px}
+.choice-tile.chosen {border-color:#256d5e;background:#e6f5ea;box-shadow:0 5px 0 #8db8a7}
+.choice-tile svg {width:164px;height:80px}
+.formula-card {height:70px;min-width:250px;border:2px solid #a8c8ba;border-radius:18px;display:flex;align-items:center;justify-content:center;gap:30px;background:#f6fbf4;font:700 54px/1 system-ui,sans-serif;color:#244d49}
+.formula-symbol {min-width:60px;text-align:center}

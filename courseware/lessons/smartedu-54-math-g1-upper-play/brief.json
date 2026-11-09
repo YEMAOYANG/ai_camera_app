@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "玩一玩",
+  "goals": [
+    "看图认出几种熟悉的游戏，并和伙伴商量选择一个游戏一起玩。",
+    "先听清约好的规则再行动，能在游戏中照口令做并回看是否符合规则。",
+    "在合作游戏中轮到自己才操作，伙伴操作时在自己的位置等一等。"
+  ],
+  "goalsBasis": "依据沪教版五四学制准确教材印刷第2页正文整理的原创目标。",
+  "keyPoint": "一起选一个游戏，先听约定，按规则参加，轮流操作。",
+  "difficultPoint": "在玩得兴奋时仍能等到口令或轮到自己，伙伴操作时留出位置。",
+  "pageSequence": [
+    {
+      "id": "p01",
+      "type": "slide",
+      "title": "今天玩什么",
+      "goal": "主讲依次点亮四种真实活动图，解释怎样从动作或物品认出游戏。示范同伴商量后选定一种，也邀请孩子口头说想选哪一种。",
+      "assetKeys": [
+        "game_group",
+        "game_folding",
+        "game_hop",
+        "game_blocks"
+      ]
+    },
+    {
+      "id": "p02",
+      "type": "slide",
+      "title": "先听约定再开始",
+      "goal": "以本次跳房子为例，给出清楚约定，一人离开最后一格后下一人从等待印出发。依次示范倾听、等候和出发，用画面说明为什么要等。",
+      "assetKeys": [
+        "hop_wait_demo",
+        "hop_ready_demo"
+      ]
+    },
+    {
+      "id": "p03",
+      "type": "interactive",
+      "title": "听口令结队",
+      "goal": "老师先圈出活动垫、说本轮口令、移动人物并复点核对。孩子听到预录口令后逐个点选或拖动伙伴，人物进入活动垫，达到约好人数后确认。早确认或多放有图声提示，第一次不揭底。示范二人、练习二人和三人，不做加减。",
+      "assetKeys": [
+        "group_mat",
+        "game_group",
+        "group_players"
+      ]
+    },
+    {
+      "id": "p04",
+      "type": "interactive",
+      "title": "积木接力",
+      "goal": "同一搭台有两名伙伴和一个可交接的接力牌。老师点亮持牌伙伴、示范放一块、再转交牌并解释轮流。孩子先按持牌身份操作，选择另一人时提示看牌，正确操作后木块出现、接力牌移到同伴。",
+      "assetKeys": [
+        "blocks_station",
+        "blocks_partner_pair",
+        "turn_marker"
+      ]
+    },
+    {
+      "id": "p05",
+      "type": "quiz",
+      "title": "看图小检查",
+      "goal": "三题都是新活动情境，图片选项可独立识别，老师完整读题，提交后给原因。",
+      "assetKeys": [
+        "quiz_choice",
+        "quiz_rule",
+        "quiz_wait"
+      ]
+    },
+    {
+      "id": "p06",
+      "type": "slide",
+      "title": "一起玩得开心",
+      "goal": "依次点亮共同选择、听清约定、轮流操作并解释每一步。邀请孩子和家人选一种游戏，先说清规则再试一轮。真实表现待成人观察。",
+      "assetKeys": [
+        "game_folding",
+        "game_group",
+        "game_blocks"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q01",
+      "skill": "认图并选择约好的游戏",
+      "probe": "校园游园会两人约好玩把布豆袋投进桶的游戏。三张不同活动图分别是套圈、投豆袋入桶、滚球撞瓶。靠道具和动作识别，只有投豆袋入桶符合约定。",
+      "correctSlot": 1,
+      "assetKey": "quiz_choice"
+    },
+    {
+      "id": "q02",
+      "skill": "按事先约定参与游戏",
+      "probe": "新的彩带游戏，约好每轮四名伙伴一起握同一根彩带，听到开始才举起。只问哪队人数合约定。三组选项用同样清楚的版式表现分别有四、三、五名同队伙伴，每人只出现一次且彼此留白。",
+      "correctSlot": 0,
+      "assetKey": "quiz_rule"
+    },
+    {
+      "id": "q03",
+      "skill": "等待轮流与文明参与",
+      "probe": "新场景为海绵套圈，轮到伙伴正在投。选择下一位孩子此时在地面等候印站好、走到投掷线旁并排、或提前拿圈从旁边投。三张都画同样物件与孩子，只有站在等候印符合约定。",
+      "correctSlot": 2,
+      "assetKey": "quiz_wait"
+    }
+  ],
+  "afterClass": {
+    "suggestion": "与家人挑一个游戏，事先说清怎样开始、怎样轮流，再玩一轮。孩子可以向家人说出自己刚才是怎么做的。",
+    "adultObservation": "真实说约定、真实等待和轮流待成人观察。",
+    "weeklyQuestionSource": [
+      {
+        "skill": "认图并选择约好的游戏",
+        "source": "教材第2页四种可选游戏及邀请。"
+      },
+      {
+        "skill": "按事先约定参与游戏",
+        "source": "教材第2页守规则和喊数抱团示例。"
+      },
+      {
+        "skill": "等待轮流与文明参与",
+        "source": "教材第2页文明游戏要求，具体行为由本课原创示范。"
+      }
+    ]
+  },
+  "authoring": {
+    "requiredRoute": "OpenMAIC 配置的 DeepSeek",
+    "stage": "教材完整审读后冻结原创简要稿",
+    "codexRole": "范围与资料审读、生成稿修订、配套图片、互动与验收"
+  }
+}

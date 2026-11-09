@@ -1,0 +1,11 @@
+<div id="game-layout">
+  <div id="game-toolbar">
+    <button class="btn blue" id="sound" type="button" aria-label="重听录音"><svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 4V5L7 9H3zm11.5 0v6a3 3 0 000-6zm0-4v2a5 5 0 010 10v2a7 7 0 000-14z"/></svg><span>听一听</span></button>
+    <span id="speaker-cue" aria-live="polite"></span>
+    <button class="btn green" id="next-round" type="button" hidden aria-label="下一轮">继续 →</button>
+  </div>
+ <button class="btn ghost" id="stamp" type="button" aria-label="可以拖动的照片印章"><svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><path fill="#286A66" d="M17 7a5 5 0 0110 0l2 14 8 4v8H7v-8l8-4zM7 35h30v4H7z"/></svg></button>
+ <div class="portrait-pair"><div class="portrait" id="maker-a"><img src="__IMG:maker-a__" alt="橙围裙的小橙"><button class="target dot" id="target-a-nose" data-choice="a-nose" type="button" aria-label="小橙的鼻子" style="--x:51.4%;--y:57.8%"></button><button class="target dot" id="target-a-ear" data-choice="a-ear" type="button" aria-label="小橙的一只耳朵" style="--x:21%;--y:56.4%"></button></div>
+ <div class="portrait" id="maker-b"><img src="__IMG:maker-b__" alt="青围裙的小青"><button class="target dot" id="target-b-nose" data-choice="b-nose" type="button" aria-label="小青的鼻子" style="--x:51.5%;--y:58%"></button><button class="target dot" id="target-b-ear" data-choice="b-ear" type="button" aria-label="小青的一只耳朵" style="--x:22%;--y:57.2%"></button></div></div>
+</div>
+<script id="game-config" type="application/json">{"title":"给照片盖章","mode":"stamp","trials":[{"key":"b-ear","speaker":"a","audio":"__VOICE:p07-10__"},{"key":"b-nose","speaker":"b","audio":"__VOICE:p07-11__"},{"key":"a-ear","speaker":"b","audio":"__VOICE:p07-12__"},{"key":"a-nose","speaker":"a","audio":"__VOICE:p07-13__"}]}</script>

@@ -1,0 +1,1078 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "浪花",
+  "description": "人教六三制一年级下册第11课《浪花》。两个官方课时合一课，听读三段、看浪花来回、懂字词和表达，练写六字。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#217871",
+      "persona": "女语文老师，用儿童能听懂的短句讲解、示范朗读与看图活动。"
+    }
+  },
+  "images": {
+    "foam-edge": {
+      "file": "assets/foam-edge.png"
+    },
+    "grid-bei": {
+      "file": "assets/grid-bei.png"
+    },
+    "grid-lei": {
+      "file": "assets/grid-lei.png"
+    },
+    "grid-qi": {
+      "file": "assets/grid-qi.png"
+    },
+    "grid-ta": {
+      "file": "assets/grid-ta.png"
+    },
+    "grid-wa": {
+      "file": "assets/grid-wa.png"
+    },
+    "grid-yan": {
+      "file": "assets/grid-yan.png"
+    },
+    "hands-cupped": {
+      "file": "assets/hands-cupped.png"
+    },
+    "happy-splash": {
+      "file": "assets/happy-splash.png"
+    },
+    "melon-cupped": {
+      "file": "assets/melon-cupped.png"
+    },
+    "melon-pointed": {
+      "file": "assets/melon-pointed.png"
+    },
+    "melon-pushed": {
+      "file": "assets/melon-pushed.png"
+    },
+    "playful-breeze": {
+      "file": "assets/playful-breeze.png"
+    },
+    "playful-child": {
+      "file": "assets/playful-child.png"
+    },
+    "quiet-raised-hand": {
+      "file": "assets/quiet-raised-hand.png"
+    },
+    "quiet-shout": {
+      "file": "assets/quiet-shout.png"
+    },
+    "quiet-whisper": {
+      "file": "assets/quiet-whisper.png"
+    },
+    "rabbit-leaps-ears-up": {
+      "file": "assets/rabbit-leaps-ears-up.png"
+    },
+    "rabbit-rests-ears-low": {
+      "file": "assets/rabbit-rests-ears-low.png"
+    },
+    "rabbit-sits-ears-up": {
+      "file": "assets/rabbit-sits-ears-up.png"
+    },
+    "shore-background": {
+      "file": "assets/shore-background.png"
+    },
+    "story-basket": {
+      "file": "assets/story-basket.png"
+    },
+    "story-order-strip": {
+      "file": "assets/story-order-strip.png"
+    },
+    "story-shell": {
+      "file": "assets/story-shell.png"
+    },
+    "story-shrimp": {
+      "file": "assets/story-shrimp.png"
+    },
+    "tippy-child": {
+      "file": "assets/tippy-child.png"
+    },
+    "toy-first-sequence": {
+      "file": "assets/toy-first-sequence.png"
+    },
+    "toy-return-sequence": {
+      "file": "assets/toy-return-sequence.png"
+    },
+    "toy-still-sequence": {
+      "file": "assets/toy-still-sequence.png"
+    },
+    "truck-box-fit": {
+      "file": "assets/truck-box-fit.png"
+    },
+    "truck-box-full": {
+      "file": "assets/truck-box-full.png"
+    },
+    "truck-box-roomy": {
+      "file": "assets/truck-box-roomy.png"
+    },
+    "waves-cover": {
+      "file": "assets/waves-cover.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "shore",
+      "title": "听，海边来了什么",
+      "type": "slide",
+      "template": "title-picture",
+      "data": {
+        "title": "听，海边来了什么",
+        "picture": "waves-cover",
+        "caption": "浪花"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "同学们好，我是小语老师。今天我们去看海。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "找一找，哪边是沙滩？哪边是海水？"
+        },
+        {
+          "say": "贴着海水的白泡沫，正向沙滩靠过来。"
+        },
+        {
+          "say": "这道白边跟着海水动，我们叫它浪花。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "这个字读浪，第四声。跟老师读，浪花。"
+        },
+        {
+          "say": "浪花来过以后会去哪儿？咱们接着看。"
+        }
+      ]
+    },
+    {
+      "key": "gentle-steps",
+      "title": "轻轻迈一步",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "轻轻迈一步",
+        "left_picture": "tippy-child",
+        "left": {
+          "heading": "迈着",
+          "body": "抬起脚，往前走"
+        },
+        "right_picture": "shore-background",
+        "right": {
+          "heading": "悄悄",
+          "body": "脚步轻，不吵人"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看走廊里的孩子，他抬起了脚。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "迈步，就是抬起脚，往前走。"
+        },
+        {
+          "say": "脚尖轻轻落下，走过去几乎没有声音。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "悄悄，就是很轻，不吵人。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "在故事里，海水轻轻靠近，像在迈小步。"
+        },
+        {
+          "say": "水碰了碰脚丫，好像有人轻轻挠了一下。"
+        },
+        {
+          "say": "悄悄的悄，读第一声。听，悄悄。"
+        }
+      ]
+    },
+    {
+      "key": "shore-move",
+      "title": "看浪花来和回",
+      "type": "interactive",
+      "page": "shore-move",
+      "widgetType": "game",
+      "script": [
+        {
+          "highlight": "#shore-view"
+        },
+        {
+          "say": "看白泡沫在哪儿，看看脚丫又在哪里。"
+        },
+        {
+          "highlight": "#come-choice"
+        },
+        {
+          "setState": {
+            "demo": "come"
+          }
+        },
+        {
+          "say": "白泡沫从海里向沙滩慢慢靠近。"
+        },
+        {
+          "highlight": "#touch-choice"
+        },
+        {
+          "setState": {
+            "demo": "touch"
+          }
+        },
+        {
+          "say": "浪花轻轻碰到脚边，好像在挠痒。"
+        },
+        {
+          "highlight": "#return-choice"
+        },
+        {
+          "setState": {
+            "demo": "return"
+          }
+        },
+        {
+          "say": "最后，海水就退回海里去了。"
+        },
+        {
+          "say": "先来，再碰，最后退回去。这就是三个动作。"
+        },
+        {
+          "say": "轮到你了，按刚才的顺序点三幅画。"
+        },
+        {
+          "say": "选错了也能再来，先看看白泡沫在什么位置。"
+        }
+      ]
+    },
+    {
+      "key": "laugh-and-read",
+      "title": "痒得笑出眼泪",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "痒得笑出眼泪",
+        "picture": "happy-splash",
+        "points": [
+          "轻轻走来",
+          "笑出眼泪",
+          "哗哗退回"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先连起来听，迈着轻轻的步子走来。"
+        },
+        {
+          "say": "这一小段意思说完，我们轻轻停一下。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "孩子眼睛弯弯在笑，脚边有浪花。多开心呀！"
+        },
+        {
+          "say": "浪花碰碰脚丫，痒痒的，孩子笑出了眼泪。"
+        },
+        {
+          "say": "这个字读“泪”。眼泪的泪。"
+        },
+        {
+          "say": "这里的眼泪是笑出来的，孩子玩得开心。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听，哗哗哗，像海水退回时的声音。"
+        },
+        {
+          "say": "像被挠痒时那样，把好痒啊读得又惊又乐。"
+        },
+        {
+          "say": "浪花来碰碰又跑开，真像个爱玩的淘气孩子。"
+        },
+        {
+          "say": "淘气的淘，第二声。课后打开书，练读第一段。"
+        }
+      ]
+    },
+    {
+      "key": "eye-and-tear",
+      "title": "眼和泪哪里不同",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "眼和泪哪里不同",
+        "left_picture": "grid-yan",
+        "left": {
+          "heading": "眼",
+          "body": "目在左边"
+        },
+        "right_picture": "grid-lei",
+        "right": {
+          "heading": "泪",
+          "body": "目在右边"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看左边的范字，眼，眼睛的眼。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "眼的目在左边，右边是艮。"
+        },
+        {
+          "say": "左边的目窄一些，留地方给右边的笔画。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边的这个字，是“泪”。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "泪的左边是三点水，右边才是目。"
+        },
+        {
+          "say": "目换了位置。写之前，用手指在格子上比一比。"
+        },
+        {
+          "say": "请在纸上练写两个字，让家人对照范字看看。"
+        }
+      ]
+    },
+    {
+      "key": "waves-return",
+      "title": "浪花又来了",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "浪花又来了",
+        "picture": "shore-background",
+        "points": [
+          "来过一次",
+          "又来一次"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看，第一次，浪花来过。"
+        },
+        {
+          "say": "退回去以前，浪花已经来过一次。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在，又来了。这就是“又”。"
+        },
+        {
+          "say": "又，就是做过这件事，后来再做一次。"
+        },
+        {
+          "say": "吹过一口泡泡，再吹一口，就是又吹了一次。"
+        },
+        {
+          "say": "这个字读次，第四声。用它说一次、两次。"
+        },
+        {
+          "say": "课文第二段从浪花又来写起，接着还有小礼物。"
+        }
+      ]
+    },
+    {
+      "key": "support",
+      "title": "用双手从下托",
+      "type": "slide",
+      "template": "title-picture",
+      "data": {
+        "title": "用双手从下托",
+        "picture": "hands-cupped",
+        "caption": "捧"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这两只手，掌心向上，从下面托住石子。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "用两只手合起来，从下面托住，就叫捧。"
+        },
+        {
+          "say": "如果只伸一根手指指过去，石子还在桌上。"
+        },
+        {
+          "say": "那是指给人看。捧起来，东西会随着手一起抬高。"
+        },
+        {
+          "say": "浪花没有手。课文想象它像朋友一样给我送礼物。"
+        },
+        {
+          "say": "给，读第三声。把东西送到别人面前，就是给。"
+        }
+      ]
+    },
+    {
+      "key": "gifts",
+      "title": "浪花给我带来礼物",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "浪花给我带来礼物",
+        "left_picture": "story-shell",
+        "left": {
+          "heading": "雪白的贝壳",
+          "body": "贝壳的壳"
+        },
+        "right_picture": "story-shrimp",
+        "right": {
+          "heading": "青青的小虾",
+          "body": "小虾的虾"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看这件礼物，白得像雪一样。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "雪白的贝壳。这里的壳，读第二声。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "还有青青的小虾。它有细细的长须。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "青青的小虾。虾，第一声。"
+        },
+        {
+          "say": "把颜色和东西连起来读，就像真的见到礼物。"
+        },
+        {
+          "say": "想象朋友带着礼物跑来，心里多惊喜呀。"
+        },
+        {
+          "say": "指着两幅图，连起来说说你看到了哪两件礼物。"
+        }
+      ]
+    },
+    {
+      "key": "basket",
+      "title": "看看小篮还能不能装",
+      "type": "interactive",
+      "page": "basket",
+      "widgetType": "game",
+      "script": [
+        {
+          "highlight": "#basket-view"
+        },
+        {
+          "setState": {
+            "demo": "empty"
+          }
+        },
+        {
+          "say": "先看空篮，里面还没有放礼物。"
+        },
+        {
+          "highlight": "#basket-slot-one"
+        },
+        {
+          "setState": {
+            "demo": "one"
+          }
+        },
+        {
+          "say": "放进去一件，篮里空的地方少了一块。"
+        },
+        {
+          "say": "看，篮口还有空位，还能装。"
+        },
+        {
+          "highlight": "#basket-slot-two"
+        },
+        {
+          "setState": {
+            "demo": "full"
+          }
+        },
+        {
+          "say": "再放一件，两个位置都被占住了。"
+        },
+        {
+          "highlight": "#check-extra"
+        },
+        {
+          "say": "把另一个一样大的贝壳拿近，还能放吗？"
+        },
+        {
+          "say": "没有空处再放，贝壳只能留在篮外，这就叫装不下。"
+        },
+        {
+          "highlight": "#choose-shrimp"
+        },
+        {
+          "say": "现在你把故事里的两样礼物放到篮子里。"
+        },
+        {
+          "say": "放好再试同样的贝壳，看看篮里是不是真的满了。"
+        }
+      ]
+    },
+    {
+      "key": "compare-arrival",
+      "title": "多说一点，听出动作",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "多说一点，听出动作",
+        "left_picture": "foam-edge",
+        "left": {
+          "heading": "浪花来了",
+          "body": "唱着笑着：声音和快乐"
+        },
+        "right_picture": "playful-breeze",
+        "right": {
+          "heading": "风吹过来",
+          "body": "轻轻摇着树叶"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "听第一句，浪花来了。我们知道它到了近处。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "加上唱着笑着，像听见哗哗的水声。"
+        },
+        {
+          "say": "还会想起一个快乐朋友跑来的样子。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "换个例子。风吹过来，我们知道风来了。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "多说风轻轻摇着树叶，就能想象叶子在动。"
+        },
+        {
+          "say": "课本第六十五页有两组比较，拿着书跟老师找一找。"
+        }
+      ]
+    },
+    {
+      "key": "playful-wave",
+      "title": "为什么像淘气的小娃娃",
+      "type": "slide",
+      "template": "two-columns",
+      "data": {
+        "title": "为什么像淘气的小娃娃",
+        "left_picture": "story-order-strip",
+        "left": {
+          "heading": "浪花来来回回",
+          "body": "轻轻碰脚，后来又来"
+        },
+        "right_picture": "playful-child",
+        "right": {
+          "heading": "像淘气的小娃娃",
+          "body": "淘气的：爱玩、活泼"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一次，它轻轻挠脚。第二次，它又带来礼物。"
+        },
+        {
+          "say": "来一回又退开，浪花总想和孩子做游戏似的。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "它这样一去一来，真像个淘气的小娃娃呀！"
+        },
+        {
+          "say": "像是说有相似的地方，浪花没有真的变成人。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "加上淘气的，爱玩、来来回回的样子更清楚。"
+        },
+        {
+          "say": "像，第四声。淘气的淘，第二声。娃，第二声。"
+        },
+        {
+          "say": "孩子笑得流泪，收到礼物又很惊喜。他喜欢浪花。"
+        }
+      ]
+    },
+    {
+      "key": "write-it",
+      "title": "写它，先看上面",
+      "type": "slide",
+      "template": "big-word",
+      "data": {
+        "title": "写它，先看上面",
+        "word": "它",
+        "pinyin": "tā",
+        "picture": "grid-ta",
+        "hint": "看上下位置，纸笔练写"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "读它，第一声。故事里的它指的是浪花。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看范字，上面是宝盖头，像一顶小帽子。"
+        },
+        {
+          "say": "宝盖头在上，“匕”在下。"
+        },
+        {
+          "say": "上面的横把下面罩住。看看下面转弯的样子。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "对照范字，用田字格纸写一个它。"
+        },
+        {
+          "say": "写完比一比上下的位置，和家人一起看看。"
+        }
+      ]
+    },
+    {
+      "key": "write-shell",
+      "title": "写贝，看看格子两边",
+      "type": "slide",
+      "template": "big-word",
+      "data": {
+        "title": "写贝，看看格子两边",
+        "word": "贝",
+        "pinyin": "bèi",
+        "picture": "grid-bei",
+        "hint": "外框下面留开口，纸笔对照"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "这是贝，第四声。贝壳的贝。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看外面的框，上面连着，下面没有封口。"
+        },
+        {
+          "say": "框里面的一笔向左下伸出来，右下还有一点。"
+        },
+        {
+          "say": "两边要留出一点空，不要顶到格子的边。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "先用眼睛找位置，再拿纸笔写一写。"
+        },
+        {
+          "say": "写完看一看，外框和下面的笔画像不像范字。"
+        }
+      ]
+    },
+    {
+      "key": "write-air",
+      "title": "写气，看看最后的形状",
+      "type": "slide",
+      "template": "big-word",
+      "data": {
+        "title": "写气，看看最后的形状",
+        "word": "气",
+        "pinyin": "qì",
+        "picture": "grid-qi",
+        "hint": "看下面弯过去的样子"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "淘气的气，第四声。跟着老师读，气。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看上半部分，几道横画有长有短。"
+        },
+        {
+          "say": "下面这笔往右走，再弯向下，末端轻轻向上。"
+        },
+        {
+          "say": "看看这道弯占了格子下边多少地方。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "纸上试写一个，对照范字看最后的形状。"
+        },
+        {
+          "say": "怎样起笔、顺序怎样，请家人陪你对着书练。"
+        }
+      ]
+    },
+    {
+      "key": "write-child",
+      "title": "写娃，左右分开看",
+      "type": "slide",
+      "template": "big-word",
+      "data": {
+        "title": "写娃，左右分开看",
+        "word": "娃",
+        "pinyin": "wá",
+        "picture": "grid-wa",
+        "hint": "左边是女字旁，右边是圭"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "小娃娃的娃，第二声。看这个要写的字。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "娃的左边是女字旁，占的位置比较窄。"
+        },
+        {
+          "say": "右边是圭，可以看见上下一组短竖和横。"
+        },
+        {
+          "say": "让左右靠近一些，写在一格里才是一个字。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "请在田字格纸上写一个娃，再和范字比一比。"
+        },
+        {
+          "say": "指给家人看左边和右边，请他们帮你观察。"
+        }
+      ]
+    },
+    {
+      "key": "picture-check",
+      "type": "quiz",
+      "title": "听问题，选你看到的图",
+      "intro": [
+        "小语老师有五个问题。听完一个，就选一张图。",
+        "每一题先自己想一想，做完后再一起看。"
+      ],
+      "questions": [
+        {
+          "id": "q-quiet",
+          "question": "哪张图里，孩子在悄悄说话？",
+          "skill": "按动作理解悄悄",
+          "analysis": "凑到同伴耳边并用手挡住嘴，是轻声说悄悄话。操场上喊话和举手等待不符合。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "操场上张嘴喊话",
+              "visual": {
+                "kind": "asset",
+                "image": "quiet-shout",
+                "alt": "操场上张嘴喊话"
+              }
+            },
+            "B": {
+              "label": "凑到同伴耳边轻声说话",
+              "visual": {
+                "kind": "asset",
+                "image": "quiet-whisper",
+                "alt": "凑到同伴耳边轻声说话"
+              }
+            },
+            "C": {
+              "label": "坐在桌前举手等待",
+              "visual": {
+                "kind": "asset",
+                "image": "quiet-raised-hand",
+                "alt": "坐在桌前举手等待"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-support",
+          "question": "哪张图里，有人在用双手捧西瓜？",
+          "skill": "辨认双手托住的捧",
+          "analysis": "双手在西瓜下方同时托住它，是捧。手推瓜和手指指瓜都没有从下方托住。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "双手从下方托起西瓜",
+              "visual": {
+                "kind": "asset",
+                "image": "melon-cupped",
+                "alt": "双手从下方托起西瓜"
+              }
+            },
+            "B": {
+              "label": "用手从侧面推桌上的西瓜",
+              "visual": {
+                "kind": "asset",
+                "image": "melon-pushed",
+                "alt": "用手从侧面推桌上的西瓜"
+              }
+            },
+            "C": {
+              "label": "用手指指向桌上的西瓜",
+              "visual": {
+                "kind": "asset",
+                "image": "melon-pointed",
+                "alt": "用手指指向桌上的西瓜"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-capacity",
+          "question": "哪张图表示玩具箱装不下卡车了？",
+          "skill": "看剩余空间判断装不下",
+          "analysis": "玩具占满箱口，没有空处再放卡车。另两幅还有空处，或者车已经进了箱。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "打开的玩具箱有大空处，卡车在旁边",
+              "visual": {
+                "kind": "asset",
+                "image": "truck-box-roomy",
+                "alt": "打开的玩具箱有大空处，卡车在旁边"
+              }
+            },
+            "B": {
+              "label": "红色玩具卡车放进了箱里",
+              "visual": {
+                "kind": "asset",
+                "image": "truck-box-fit",
+                "alt": "红色玩具卡车放进了箱里"
+              }
+            },
+            "C": {
+              "label": "箱里塞满玩具，卡车还在箱外",
+              "visual": {
+                "kind": "asset",
+                "image": "truck-box-full",
+                "alt": "箱里塞满玩具，卡车还在箱外"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-again",
+          "question": "哪组图表示玩具车又回到孩子身边？",
+          "skill": "看动作反复理解又",
+          "analysis": "车先到孩子身边，再离开，最后回到原处，这叫又回来了。第一次来和一直没来都不同。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "车先到孩子身边，开远后又回来",
+              "visual": {
+                "kind": "asset",
+                "image": "toy-return-sequence",
+                "alt": "车先到孩子身边，开远后又回来"
+              }
+            },
+            "B": {
+              "label": "车从远处第一次来到孩子身边",
+              "visual": {
+                "kind": "asset",
+                "image": "toy-first-sequence",
+                "alt": "车从远处第一次来到孩子身边"
+              }
+            },
+            "C": {
+              "label": "车一直停在远处",
+              "visual": {
+                "kind": "asset",
+                "image": "toy-still-sequence",
+                "alt": "车一直停在远处"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-detail",
+          "question": "小兔竖着耳朵跳来了。哪张图最像？",
+          "skill": "听加入动作与样子细节的句子",
+          "analysis": "这幅图里，小兔耳朵竖起，四脚离开地面。它在向前跳，符合听到的两个细节。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "竖着耳朵蹲坐的小兔",
+              "visual": {
+                "kind": "asset",
+                "image": "rabbit-sits-ears-up",
+                "alt": "竖着耳朵蹲坐的小兔"
+              }
+            },
+            "B": {
+              "label": "竖着耳朵向前跳的小兔",
+              "visual": {
+                "kind": "asset",
+                "image": "rabbit-leaps-ears-up",
+                "alt": "竖着耳朵向前跳的小兔"
+              }
+            },
+            "C": {
+              "label": "耳朵放低趴在草地上的小兔",
+              "visual": {
+                "kind": "asset",
+                "image": "rabbit-rests-ears-low",
+                "alt": "耳朵放低趴在草地上的小兔"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "retell",
+      "title": "三幅图，说出海边故事",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "三幅图，说出海边故事",
+        "picture": "story-order-strip",
+        "points": [
+          "第一次轻轻来，又退回",
+          "又来带了小礼物",
+          "来来去去，像淘气的孩子"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看第一幅。浪花挠脚丫，孩子痒得笑出了眼泪。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二幅图，浪花又来了，它送来了礼物，贝壳、小虾。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "海水跑去又跑来，像个淘气的娃娃。孩子很喜欢它。"
+        },
+        {
+          "say": "用三幅画讲一遍，再拿课本把全文有感情地读一读。"
+        },
+        {
+          "say": "给生字组词。想象浪花还能送什么，画出来再说给家人听。"
+        },
+        {
+          "say": "纸笔写眼、泪、它、贝、气、娃，请家人观察。"
+        }
+      ]
+    }
+  ]
+}

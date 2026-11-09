@@ -1,0 +1,18 @@
+.shore-activity { height: 100%; position: relative; }
+.shore-view { position: relative; height: 356px; overflow: hidden; border: 3px solid #387d7d; border-radius: 22px; background: #f2d8b1; }
+.shore-picture { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 72%; }
+.shore-marks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.move-mark { display: none; fill: none; stroke: #ffe079; stroke-width: 10px; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 2px #36504a); }
+.shore-view[data-step="1"] .mark-come,
+.shore-view[data-step="2"] .mark-touch,
+.shore-view[data-step="3"] .mark-return { display: block; }
+.mark-touch { stroke-dasharray: 13 10; }
+.mark-touch-water { stroke: #fffaf0; stroke-width: 8px; stroke-dasharray: 3 13; }
+.shore-choices { display: flex; justify-content: center; gap: 28px; padding: 16px 0 0; }
+.shore-choice { display: grid; grid-template-columns: 155px 38px; align-items: center; gap: 14px; height: 121px; padding: 8px 12px; color: #155751; background: #f2fff9; border: 3px solid #5e9a92; border-radius: 17px; font-size: 32px; }
+.shore-choice.done { background: #d8f1dd; opacity: .68; }
+.shore-card { position: relative; height: 95px; overflow: hidden; border-radius: 9px; background: url('__IMG:shore-background__') center 72%/cover; }
+.shore-card::after { content: ''; position: absolute; width: 22px; height: 22px; top: 50px; left: 53px; border: solid #ffe079; border-width: 0 7px 7px 0; transform: rotate(-45deg); filter: drop-shadow(0 1px 1px #355e52); }
+.outgoing .shore-card::after { transform: rotate(135deg); left: 35px; }
+.touching .shore-card::after { left: 89px; top: 67px; width: 29px; height: 14px; border: 4px dashed #ffe079; border-radius: 50%; transform: none; }
+.picture-error { position: absolute; left: 12%; top: 110px; padding: 18px; font-size: 32px; background: white; border: 3px solid #bd6848; border-radius: 12px; }

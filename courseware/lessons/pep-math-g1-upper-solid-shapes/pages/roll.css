@@ -1,0 +1,32 @@
+#cv{background:#f2eedb}
+.solid-board{position:relative;width:1232px;height:552px;border:2px solid #cdbd94;border-radius:32px;background:#fffaf0;color:#314b48}
+.solid-cards{display:flex;justify-content:center;gap:18px}
+.solid-card,.solid-command{border:3px solid #9bb2a1;border-radius:25px;background:#f9fbef;color:#275b58;cursor:pointer}
+.solid-card:hover:not(:disabled),.solid-command:hover:not(:disabled){border-color:#176c69;background:#ebf6e9}
+.solid-card:focus-visible,.solid-command:focus-visible{outline:4px solid #146766;outline-offset:3px}
+.solid-card.success,.solid-card.placed{border-color:#55834e;background:#e4f1d9}
+.solid-card:disabled,.solid-command:disabled{cursor:default}
+.solid-card img,.solid-token img{object-fit:contain;pointer-events:none}
+.solid-token{display:flex;align-items:center;justify-content:center;flex-direction:column;border:2px solid #bca779;border-radius:23px;background:#fff3cf;color:#3b5145;font-size:23px;font-weight:700}
+.solid-token svg{display:block;max-width:100%}
+.solid-token span{display:block;text-align:center}
+img[hidden]{display:none!important}
+#roll-track{position:absolute;left:135px;top:36px;width:850px;height:275px;border:2px solid #afc3a9;border-radius:26px;background:#e8f3e0;overflow:hidden}
+#roll-track svg{position:absolute;left:22px;bottom:7px;width:800px;height:170px}
+#roll-track .floor{stroke:#92a991;stroke-width:3;fill:none}
+#roll-track .path-one,#roll-track .path-many{stroke:#286b65;stroke-width:5;stroke-linecap:round;fill:none;visibility:hidden}
+#roll-track[data-mode="side"] .path-one,#roll-track[data-mode="sphere"] .path-many{visibility:visible}
+#roll-object{position:absolute;left:336px;top:105px;width:178px;height:146px;object-fit:contain;z-index:1}
+#roll-track[data-mode="side"].moving img{animation:track-side .66s ease-out forwards}
+#roll-track[data-mode="sphere"].moving img{animation:track-sphere .69s ease-in-out forwards}
+@keyframes track-side{to{transform:translateX(235px)}}
+@keyframes track-sphere{35%{transform:translate(-146px,-25px) rotate(-40deg)}to{transform:translate(177px,-30px) rotate(57deg)}}
+#roll-task{position:absolute;right:32px;top:52px;width:165px;height:142px}
+#roll-task svg{width:100px;height:88px}
+#roll-task .wish{fill:none;stroke:#2b6a64;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;display:none}
+#roll-task[data-cue="roll"] .roll-wish,#roll-task[data-cue="stand"] .stand-wish,#roll-task[data-cue="many"] .many-wish{display:block}
+.roll-options{position:absolute;left:166px;top:344px;width:900px;height:158px}
+.roll-options button{width:244px;height:155px}
+.roll-options img{width:208px;height:141px}
+.geometry-fallback{position:absolute;pointer-events:none}
+img[hidden]+.geometry-fallback{display:none!important}

@@ -1,0 +1,961 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 Is it a dog?",
+  "description": "在风筝展中先听、再猜，揭开照片后用英语确认真实的对象。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#2D6261",
+      "persona": "英语教师示范先听清问题、看完整图、再说肯定或否定，鼓励第一次猜错后再次观察。"
+    }
+  },
+  "images": {
+    "exhibit-cover": {
+      "file": "assets/exhibit-cover-v2.png"
+    },
+    "dog": {
+      "file": "assets/dog.png"
+    },
+    "monkey": {
+      "file": "assets/monkey.png"
+    },
+    "monster": {
+      "file": "assets/monster.png"
+    },
+    "kite": {
+      "file": "assets/kite.png"
+    },
+    "cat": {
+      "file": "assets/cat.png"
+    },
+    "cat-kite": {
+      "file": "assets/cat-kite.png"
+    },
+    "dog-kite": {
+      "file": "assets/dog-kite.png"
+    },
+    "help-scene": {
+      "file": "assets/help-scene.png"
+    },
+    "quiz-dog": {
+      "file": "assets/quiz-dog.png"
+    },
+    "quiz-monkey": {
+      "file": "assets/quiz-monkey.png"
+    },
+    "quiz-kite": {
+      "file": "assets/quiz-kite.png"
+    },
+    "quiz-monster": {
+      "file": "assets/quiz-monster.png"
+    },
+    "quiz-cat": {
+      "file": "assets/quiz-cat.png"
+    },
+    "quiz-dog-kite": {
+      "file": "assets/quiz-dog-kite.png"
+    },
+    "quiz-help": {
+      "file": "assets/quiz-help.png"
+    },
+    "quiz-reading": {
+      "file": "assets/quiz-reading.png"
+    },
+    "quiz-waving": {
+      "file": "assets/quiz-waving.png"
+    },
+    "quiz-cat-kite": {
+      "file": "assets/quiz-cat-kite.png"
+    },
+    "quiz-pair-dog-match": {
+      "file": "assets/quiz-pair-dog-match.png"
+    },
+    "quiz-pair-dog-different": {
+      "file": "assets/quiz-pair-dog-different.png"
+    },
+    "quiz-pair-cat-match": {
+      "file": "assets/quiz-pair-cat-match.png"
+    },
+    "quiz-pair-cat-different": {
+      "file": "assets/quiz-pair-cat-different.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "welcome-exhibit",
+      "type": "slide",
+      "title": "风筝展里的猜谜台",
+      "template": "title-picture",
+      "data": {
+        "title": "风筝展里的猜谜台",
+        "picture": "exhibit-cover",
+        "caption": "先猜，再看清"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，我们走进风筝展。小禾请你帮忙摆展品。"
+        },
+        {
+          "say": "看这个猜谜台，桌上有个东西盖着布。"
+        },
+        {
+          "say": "布边只露出一点，我们还看不清它是什么。"
+        },
+        {
+          "say": "它像你认识的什么东西？你可以先猜一个。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "如果已经有了一个猜测，就可以问一句。"
+        },
+        {
+          "say": "Is it a dog?"
+        },
+        {
+          "say": "猜完别急着认定。揭开布，看看完整的东西。"
+        },
+        {
+          "say": "等看清了，我们再确认这一次猜得对不对。"
+        }
+      ]
+    },
+    {
+      "key": "name-the-animals",
+      "type": "slide",
+      "title": "认出要猜的东西",
+      "template": "two-columns",
+      "data": {
+        "title": "认出要猜的东西",
+        "left_picture": "dog",
+        "right_picture": "monkey",
+        "left": {
+          "heading": "dog",
+          "body": "小狗"
+        },
+        "right": {
+          "heading": "monkey",
+          "body": "猴子"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小禾准备了两张画，想让伙伴来猜。"
+        },
+        {
+          "say": "先看左边，它用四只脚站在地上。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这只小狗叫 dog。听我读，dog。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "听到 dog，就指这张小狗图。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看另一张。它抓着树枝，脸和小狗不一样。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "这是猴子，monkey。跟我说，monkey。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "听到 monkey，就指这张猴子图。"
+        },
+        {
+          "say": "先听词，再把它和眼睛看到的对象配起来。"
+        }
+      ]
+    },
+    {
+      "key": "ask-a-guess",
+      "type": "slide",
+      "title": "先提出一个猜测",
+      "template": "two-columns",
+      "data": {
+        "title": "先提出一个猜测",
+        "left_picture": "monster",
+        "right_picture": "kite",
+        "left": {
+          "heading": "monster",
+          "body": "想象的怪兽"
+        },
+        "right": {
+          "heading": "kite",
+          "body": "风筝"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小禾又拿来一个展品，只露出一个尖角。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "她想到故事里的想象怪兽，monster。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "故事里可以想象怪兽。图里是怪兽样子的玩偶。"
+        },
+        {
+          "say": "有了一个猜测，就可以这样问。"
+        },
+        {
+          "say": "Is it a monster?"
+        },
+        {
+          "say": "这里的 it 指她正在猜的那个东西。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "揭开一看，薄面下有支杆，连着一根线。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "这是一面风筝，kite。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "问的时候先猜一个，看清后再确认。"
+        }
+      ]
+    },
+    {
+      "key": "hear-and-reveal",
+      "type": "interactive",
+      "title": "听猜测，再揭图",
+      "page": "exhibit",
+      "widgetType": "game",
+      "startImage": "exhibit-cover",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "round": 0,
+            "step": "question"
+          }
+        },
+        {
+          "say": "刚才我们猜了展品，现在把线索拿到检验台。"
+        },
+        {
+          "highlight": "#listen-cue"
+        },
+        {
+          "say": "先听一句，听清老师在猜哪样东西。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "round": 0,
+            "step": "answer"
+          }
+        },
+        {
+          "highlight": "#exhibit-target"
+        },
+        {
+          "say": "揭开布，看到完整的图，才能检查猜得对不对。"
+        },
+        {
+          "highlight": "#match-options"
+        },
+        {
+          "say": "听到的东西和看到的图，一样或不一样。"
+        },
+        {
+          "say": "选能配上这两张图的一组，实际照片就会入册。"
+        },
+        {
+          "say": "Is it a dog?"
+        },
+        {
+          "say": "Is it a kite?"
+        },
+        {
+          "say": "点声音按钮能重听，答错也可以再选一次。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "confirm-or-correct",
+      "type": "slide",
+      "title": "对得上怎样回答",
+      "template": "two-columns",
+      "data": {
+        "title": "对得上怎样回答",
+        "left_picture": "dog",
+        "right_picture": "kite",
+        "left": {
+          "heading": "Yes, it is.",
+          "body": "猜的和看到的一样"
+        },
+        "right": {
+          "heading": "No, it isn't.",
+          "body": "猜的和看到的不一样"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小禾听见伙伴在猜，先看看眼前的图。"
+        },
+        {
+          "say": "Is it a dog?"
+        },
+        {
+          "say": "图里确实有一只小狗，和猜的对象一样。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这时可以肯定地回答。"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "猜的和看到的一样，回答就是肯定。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "如果换成这面风筝，眼前就不是小狗了。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "No, it isn't."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "看到的和猜的不一样，先告诉他不是。"
+        },
+        {
+          "say": "还可以补上真实物件。"
+        },
+        {
+          "say": "It's a kite."
+        }
+      ]
+    },
+    {
+      "key": "check-the-reply",
+      "type": "quiz",
+      "title": "听完问答选图",
+      "intro": [
+        "听老师问一句，再听回应。",
+        "听完以后，选出真正的对象。"
+      ],
+      "questions": [
+        {
+          "id": "identify-from-yes",
+          "question": "Is it a monster? Yes, it is. 选图。",
+          "skill": "听懂肯定回应并找出实际对象",
+          "answer": [
+            "C"
+          ],
+          "analysis": "肯定回应表示猜测一致。展台上的物品是虚构怪兽造型的玩偶，另两张图是狗和猴子。",
+          "options": {
+            "A": {
+              "label": "草地上的小狗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog",
+                "alt": "草地上的小狗"
+              }
+            },
+            "B": {
+              "label": "木桩上的猴子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-monkey",
+                "alt": "木桩上的猴子"
+              }
+            },
+            "C": {
+              "label": "台面上的怪兽玩偶",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-monster",
+                "alt": "台面上的怪兽玩偶"
+              }
+            }
+          }
+        },
+        {
+          "id": "identify-from-correction",
+          "question": "Is it a cat? No, it isn't. It's a dog.",
+          "skill": "听懂否定和更正",
+          "answer": [
+            "B"
+          ],
+          "analysis": "回答先说不是猫，再说实际对象是小狗。应选草地上的小狗。",
+          "options": {
+            "A": {
+              "label": "带尾带和牵线的风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-kite",
+                "alt": "带尾带和牵线的风筝"
+              }
+            },
+            "B": {
+              "label": "草地上的小狗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog",
+                "alt": "草地上的小狗"
+              }
+            },
+            "C": {
+              "label": "地毯上的猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat",
+                "alt": "地毯上的猫"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "cat-or-cat-kite",
+      "type": "slide",
+      "title": "画着小猫的风筝",
+      "template": "two-columns",
+      "data": {
+        "title": "画着小猫的风筝",
+        "left_picture": "cat",
+        "right_picture": "cat-kite",
+        "left": {
+          "heading": "cat",
+          "body": "一只猫"
+        },
+        "right": {
+          "heading": "cat kite",
+          "body": "画着猫的风筝"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看看这个风筝展，还有一面风筝画着小猫。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看左边。窗边有一只真的小猫。"
+        },
+        {
+          "say": "你能看到它的耳朵、胡须和脚。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "这只小猫可以说 cat。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边。猫脸画在风筝薄面上。"
+        },
+        {
+          "say": "顺着边看，有风筝的支杆、尾带和牵线。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "It's a cat kite."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "猫脸只是图案。整件东西还是一面风筝。"
+        },
+        {
+          "say": "看清整件东西，再回答别人猜得对不对。"
+        }
+      ]
+    },
+    {
+      "key": "sort-the-picture",
+      "type": "interactive",
+      "title": "把真实照片放上展台",
+      "page": "exhibit",
+      "widgetType": "game",
+      "startImage": "cat-kite",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "round": 0,
+            "step": "question"
+          }
+        },
+        {
+          "say": "现在我们用完整照片来检查一个新的猜测。"
+        },
+        {
+          "highlight": "#listen-cue"
+        },
+        {
+          "say": "听清问题，想想里面猜的是哪样东西。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "round": 0,
+            "step": "answer"
+          }
+        },
+        {
+          "highlight": "#exhibit-target"
+        },
+        {
+          "say": "露出完整照片后，沿着图案找一找薄面和牵线。"
+        },
+        {
+          "highlight": "#match-options"
+        },
+        {
+          "say": "拖动整张照片，送到能说明两张图关系的一组。"
+        },
+        {
+          "say": "也可以先点照片，再点你选的图片对。"
+        },
+        {
+          "say": "Is it a dog?"
+        },
+        {
+          "say": "Is it a kite?"
+        },
+        {
+          "say": "猜错了可以改，最后按看清的东西来确认。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "check-the-evidence",
+      "type": "quiz",
+      "title": "看清对象再作答",
+      "intro": [
+        "看上方整张图，听老师在猜什么。",
+        "选表示一样或不一样的那一组。"
+      ],
+      "questions": [
+        {
+          "id": "reply-to-match",
+          "question": "看大图。Is it a cat? 选回答图。",
+          "skill": "按实际证据肯定猜测",
+          "answer": [
+            "A"
+          ],
+          "analysis": "大图是真猫，口头也猜猫。两张猫图表示一样，所以回答 Yes, it is.",
+          "options": {
+            "A": {
+              "label": "两张都是真猫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pair-cat-match",
+                "alt": "两张都是真猫"
+              }
+            },
+            "B": {
+              "label": "左边是真猫，右边是猴子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pair-cat-different",
+                "alt": "左边是真猫，右边是猴子"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-cat",
+            "alt": "趴在地毯上的真猫"
+          }
+        },
+        {
+          "id": "reply-to-mismatch",
+          "question": "看大图。Is it a dog? 选回答图。",
+          "skill": "按实际证据否定猜测",
+          "answer": [
+            "B"
+          ],
+          "analysis": "大图是怪兽造型的玩偶，和猜的小狗不同，所以回答 No, it isn't.",
+          "options": {
+            "A": {
+              "label": "两张都是小狗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pair-dog-match",
+                "alt": "两张都是小狗"
+              }
+            },
+            "B": {
+              "label": "左边是小狗，右边是怪兽玩偶",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pair-dog-different",
+                "alt": "左边是小狗，右边是怪兽玩偶"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-monster",
+            "alt": "台面上的怪兽玩偶"
+          }
+        }
+      ]
+    },
+    {
+      "key": "ask-for-help",
+      "type": "slide",
+      "title": "猜错了可以再问",
+      "template": "picture-points",
+      "data": {
+        "title": "猜错了可以再问",
+        "picture": "help-scene",
+        "points": [
+          "先问，再看清",
+          "发现不对，换一个回答",
+          "Help!"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "猜错也没关系。小禾看到一块像猴子的花纹。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "她先问，是不是她想到的那样东西。"
+        },
+        {
+          "say": "Is it a monkey?"
+        },
+        {
+          "say": "再看清，原来花纹在风筝上。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "No, it isn't. It's a kite."
+        },
+        {
+          "say": "有了新线索，她就可以把猜测改一改。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这时风筝线打结了。小禾需要有人帮忙。"
+        },
+        {
+          "say": "Help!"
+        },
+        {
+          "say": "这是在求助。她举手请附近的大人来帮她。"
+        }
+      ]
+    },
+    {
+      "key": "trade-roles",
+      "type": "interactive",
+      "title": "轮流问，轮流答",
+      "page": "exhibit",
+      "widgetType": "game",
+      "startImage": "exhibit-cover",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "round": 0,
+            "step": "question"
+          }
+        },
+        {
+          "say": "现在轮流问，轮流答，一起给展品做好记录。"
+        },
+        {
+          "highlight": "#listen-cue"
+        },
+        {
+          "say": "先听问句，把问到的对象图放到猜测位。"
+        },
+        {
+          "say": "Is it a dog?"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "round": 0,
+            "step": "answer"
+          }
+        },
+        {
+          "highlight": "#exhibit-target"
+        },
+        {
+          "say": "揭开照片，再看猜的和看到的是不是一样。"
+        },
+        {
+          "say": "No, it isn't. It's a kite."
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "round": 1,
+            "step": "question"
+          }
+        },
+        {
+          "highlight": "#match-options"
+        },
+        {
+          "say": "换一轮。你可以轻轻跟说一句新的问句。"
+        },
+        {
+          "say": "Is it a monkey?"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "round": 1,
+            "step": "answer"
+          }
+        },
+        {
+          "say": "看清后再答。两个人可以交换问和答。"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "say": "现在自己听一轮，先找问的，再检验答案。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "check-at-the-festival",
+      "type": "quiz",
+      "title": "在新地方听懂问题",
+      "intro": [
+        "到了新的展台，也可以用刚才的方法。",
+        "听完再从新照片里选一张。"
+      ],
+      "questions": [
+        {
+          "id": "pattern-and-object",
+          "question": "It's a dog kite. 选对应的图。",
+          "skill": "区分像动物的图案和风筝类别",
+          "answer": [
+            "C"
+          ],
+          "analysis": "要找画着狗脸的风筝。狗脸只在薄面上，牵线连着风筝。真狗没有牵线，另一张风筝画的是猫脸。",
+          "options": {
+            "A": {
+              "label": "草地上的一只真狗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog",
+                "alt": "草地上的一只真狗"
+              }
+            },
+            "B": {
+              "label": "画着猫脸并连着牵线的风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-kite",
+                "alt": "画着猫脸并连着牵线的风筝"
+              }
+            },
+            "C": {
+              "label": "画着狗脸并连着牵线的风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog-kite",
+                "alt": "画着狗脸并连着牵线的风筝"
+              }
+            }
+          }
+        },
+        {
+          "id": "recognize-help",
+          "question": "Help! 谁在请大人帮忙？",
+          "skill": "听懂故事求助语",
+          "answer": [
+            "A"
+          ],
+          "analysis": "正在求助的孩子指向被卡住的风筝线，并向转过来的成人举手示意。独自看书和两个孩子互相问好都不是求助。",
+          "options": {
+            "A": {
+              "label": "手指卡住的风筝线并向大人举手求助",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-help",
+                "alt": "手指卡住的风筝线并向大人举手求助"
+              }
+            },
+            "B": {
+              "label": "独自看图画书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-reading",
+                "alt": "独自看图画书"
+              }
+            },
+            "C": {
+              "label": "两个孩子见面挥手问好",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-waving",
+                "alt": "两个孩子见面挥手问好"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "take-the-game-home",
+      "type": "slide",
+      "title": "把猜谜带回家",
+      "template": "summary",
+      "data": {
+        "title": "把猜谜带回家",
+        "items": [
+          "听词，看看是什么",
+          "Is it a ...?",
+          "Yes, it is. / No, it isn't.",
+          "轮流问答"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们在风筝展做了猜谜员。"
+        },
+        {
+          "say": "dog 是小狗，monkey 是猴子。"
+        },
+        {
+          "say": "kite 是风筝，monster 是想象故事里的怪兽。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "心里有一个猜测，可以这样问。"
+        },
+        {
+          "say": "Is it a dog?"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "一样就答 Yes, it is.。"
+        },
+        {
+          "say": "不一样就答 No, it isn't.。"
+        },
+        {
+          "say": "看完整东西，再回答猜对了没有。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家拿两件不一样的东西，和家人轮流猜。"
+        },
+        {
+          "say": "一个人问，另一个看清楚再回答。"
+        },
+        {
+          "say": "请家人实际听你问一次、答一次。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,668 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "学科学",
+  "description": "从身边发现问题，学习先猜后试、仔细观察和如实交流。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/ke-science-v1.png",
+      "color": "#57B05A",
+      "persona": "温柔好奇的女科学老师，先观察、先讲安全，鼓励猜想、动手尝试和如实表达；不把屏幕点击当作实际动手表现。"
+    }
+  },
+  "images": {
+    "park": {
+      "file": "assets/park.png"
+    },
+    "leaf": {
+      "file": "assets/leaf.png"
+    },
+    "cloud": {
+      "file": "assets/cloud.png"
+    },
+    "flower": {
+      "file": "assets/flower.png"
+    },
+    "wonder-leaf": {
+      "file": "assets/wonder-leaf.png"
+    },
+    "paper-guess": {
+      "file": "assets/paper-guess.png"
+    },
+    "paper-try": {
+      "file": "assets/paper-try.png"
+    },
+    "paper-observe": {
+      "file": "assets/paper-observe-strips.png"
+    },
+    "share": {
+      "file": "assets/share.png"
+    },
+    "q1-question": {
+      "file": "assets/q1-question.png"
+    },
+    "q1-eat": {
+      "file": "assets/q1-eat.png"
+    },
+    "q1-sleep": {
+      "file": "assets/q1-sleep.png"
+    },
+    "q2-try": {
+      "file": "assets/q2-try.png"
+    },
+    "q2-observe": {
+      "file": "assets/q2-observe.png"
+    },
+    "q2-guess": {
+      "file": "assets/q2-guess.png"
+    },
+    "q3-guess": {
+      "file": "assets/q3-guess.png"
+    },
+    "q3-share": {
+      "file": "assets/q3-share.png"
+    },
+    "q3-hide": {
+      "file": "assets/q3-hide.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "科学问题在身边",
+      "template": "picture-points",
+      "data": {
+        "title": "科学问题在身边",
+        "picture": "park",
+        "points": [
+          "停一停，仔细看",
+          "把想知道的说出来",
+          "科学从好奇开始"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到科学课，我是小科老师。"
+        },
+        {
+          "say": "先看这个公园，孩子停下了脚步。"
+        },
+        {
+          "say": "他没有急着走，而是看看身边的东西。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "树叶、花和天空，都值得我们看看。"
+        },
+        {
+          "say": "仔细观察，就是留心东西是什么样。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看见花，可以问它叫什么名字。"
+        },
+        {
+          "say": "看见天空的云，也可以说自己想知道的。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这些从身边冒出来的问题，很有意思。"
+        },
+        {
+          "say": "学科学，会用到我们的观察和好奇心。"
+        },
+        {
+          "say": "今天先从图片里，练习发现与提问。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "放大镜找发现",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "park",
+      "script": [
+        {
+          "highlight": "#lens"
+        },
+        {
+          "say": "先看看放大镜中间的小图片。"
+        },
+        {
+          "say": "它是我们这次要仔细观察的东西。"
+        },
+        {
+          "highlight": "#nature-0"
+        },
+        {
+          "say": "老师先比较颜色，再比较外形。"
+        },
+        {
+          "setState": {
+            "demo": "match"
+          }
+        },
+        {
+          "say": "相同的图找到了，它进入了观察窗。"
+        },
+        {
+          "highlight": "#observation-window"
+        },
+        {
+          "say": "进入观察窗以后，再留心它的细节。"
+        },
+        {
+          "say": "观察时不要急，先看清再判断。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在轮到你，把放大镜拖到相同的图。"
+        },
+        {
+          "say": "也可以先点放大镜，再点目标图片。"
+        },
+        {
+          "say": "每找到一幅，就看看它的颜色和外形。"
+        },
+        {
+          "say": "想知道什么，可以先说给身旁的大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "从发现到问题",
+      "template": "picture-points",
+      "data": {
+        "title": "从发现到问题",
+        "picture": "wonder-leaf",
+        "points": [
+          "先说看到了什么",
+          "再说自己想知道什么",
+          "问题可以慢慢寻找答案"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里的孩子发现了一片叶子。"
+        },
+        {
+          "say": "他先仔细看叶子的颜色和外形。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "说出看到的东西，是在说自己的观察。"
+        },
+        {
+          "say": "例如，我看见枝条上有一片叶子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "他还想知道，这片叶子以后会怎样。"
+        },
+        {
+          "say": "把想知道的说出来，就是提出问题。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "提出问题，不需要马上把答案说出来。"
+        },
+        {
+          "say": "可以继续观察，也可以和大人一起想办法。"
+        },
+        {
+          "say": "你注意到的事情，也能变成一个问题。"
+        },
+        {
+          "say": "请从身边找一件东西，说说想知道什么。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "先猜一猜，再试一试",
+      "template": "picture-points",
+      "data": {
+        "title": "先猜一猜，再试一试",
+        "picture": "paper-guess",
+        "points": [
+          "动手之前，可以先猜",
+          "不同猜想都可以说",
+          "用活动看看实际发生什么"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "现在看看孩子手里的两片纸。"
+        },
+        {
+          "say": "他准备朝两片纸中间轻轻吹气。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "还没动手时，可以先猜纸会怎样动。"
+        },
+        {
+          "say": "有的人猜分开，有的人猜靠近。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "猜想，是对可能发生的事情先想一想。"
+        },
+        {
+          "say": "不同的人，猜想也可能不一样。"
+        },
+        {
+          "say": "这时候还没有观察结果，不急着判输赢。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接下来动手试，留心纸片实际怎么动。"
+        },
+        {
+          "say": "试完以后，要根据看见的现象来说。"
+        },
+        {
+          "say": "猜想和观察不一样，也有值得发现的事。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "科学活动排顺序",
+      "page": "p05",
+      "widgetType": "game",
+      "startImage": "paper-try",
+      "script": [
+        {
+          "highlight": "#steps-tray"
+        },
+        {
+          "say": "三张图，画着同一次科学活动。"
+        },
+        {
+          "say": "我们把活动从开始到后来排一排。"
+        },
+        {
+          "highlight": "#step-card-guess"
+        },
+        {
+          "say": "还没吹气时先想一想，这是猜想。"
+        },
+        {
+          "setState": {
+            "demo": "first"
+          }
+        },
+        {
+          "say": "老师把这张图放在最前面的空位。"
+        },
+        {
+          "highlight": "#step-slot-1"
+        },
+        {
+          "say": "接着动手尝试，才能观察实际的现象。"
+        },
+        {
+          "say": "最后认真看一看，再把发现告诉别人。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在图卡回来了，请你重新排好。"
+        },
+        {
+          "say": "点图再点空位，也可以直接把图拖过去。"
+        },
+        {
+          "say": "位置不合适时，先想这件事发生在何时。"
+        },
+        {
+          "say": "排好后按下检查，再看看活动的先后。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "把真正看见的说出来",
+      "template": "picture-points",
+      "data": {
+        "title": "把真正看见的说出来",
+        "picture": "paper-observe",
+        "points": [
+          "请大人陪伴尝试",
+          "留心纸片实际的变化",
+          "据实交流，不照搬猜想"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里的孩子正在看自己手里的纸片。"
+        },
+        {
+          "say": "他已经试过，现在留心实际发生的变化。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "你想尝试时，请先让大人陪在身边。"
+        },
+        {
+          "say": "请大人准备干净纸条，不用尖锐工具。"
+        },
+        {
+          "say": "只向纸片之间轻轻吹，不把纸放进嘴里。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先说你猜会怎样，再试着仔细看一看。"
+        },
+        {
+          "say": "看清以后，告诉大人你看到了什么。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果没看清，可以说这一次还没看清。"
+        },
+        {
+          "say": "观察和原来的猜想不一样，也要如实说。"
+        },
+        {
+          "say": "看完屏幕，不等于已经做过真实活动。"
+        },
+        {
+          "say": "真正的动手和表达，要请大人在旁观察。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "记录画面里的发现",
+      "page": "p07",
+      "widgetType": "game",
+      "startImage": "share",
+      "script": [
+        {
+          "highlight": "#before-diagram"
+        },
+        {
+          "say": "这一页先练习看图，把发现记下来。"
+        },
+        {
+          "say": "两幅小图，表示纸片前后的位置。"
+        },
+        {
+          "highlight": "#after-diagram"
+        },
+        {
+          "say": "老师先比较前一幅，再看后一幅。"
+        },
+        {
+          "setState": {
+            "demo": "record"
+          }
+        },
+        {
+          "say": "老师把相同的记录图，放进了发现册。"
+        },
+        {
+          "highlight": "#discovery-book"
+        },
+        {
+          "say": "记录要跟看见的画面相同，不能凭空改。"
+        },
+        {
+          "say": "这里练习读图，不代替你真实做实验。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在图变了，请你重新比较两幅图。"
+        },
+        {
+          "say": "选和后一幅相同的记录，再送进发现册。"
+        },
+        {
+          "say": "可以拖记录图，也可以先点图再点发现册。"
+        },
+        {
+          "say": "真实活动若看到不同变化，就说真实发现。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "科学小检查",
+      "intro": [
+        "老师读题，你仔细看图片再选择。",
+        "这次换成新的生活情境，想想学过的方法。",
+        "不用急，先听清这道题想找哪个动作。",
+        "题目做完后，真实表达仍请大人观察。"
+      ],
+      "questions": [
+        {
+          "id": "science-q1",
+          "question": "雨后看见水洼，哪张图在提出问题？",
+          "skill": "从观察中提出问题",
+          "answer": [
+            "A"
+          ],
+          "analysis": "指着水洼与大人交流想知道的事，是从观察中提出问题。",
+          "options": {
+            "A": {
+              "label": "指着水洼问大人",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-question",
+                "alt": "指着水洼问大人"
+              }
+            },
+            "B": {
+              "label": "吃点心",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-eat",
+                "alt": "吃点心"
+              }
+            },
+            "C": {
+              "label": "闭眼睡觉",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-sleep",
+                "alt": "闭眼睡觉"
+              }
+            }
+          }
+        },
+        {
+          "id": "science-q2",
+          "question": "还没放纸船，哪张图是在猜想？",
+          "skill": "区分猜想与动手尝试",
+          "answer": [
+            "C"
+          ],
+          "analysis": "纸船还没入水，先想它可能怎样，是动手之前的猜想。",
+          "options": {
+            "A": {
+              "label": "把纸船放入水中",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-try",
+                "alt": "把纸船放入水中"
+              }
+            },
+            "B": {
+              "label": "看水中的纸船",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-observe",
+                "alt": "看水中的纸船"
+              }
+            },
+            "C": {
+              "label": "放船前先想一想",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-guess",
+                "alt": "放船前先想一想"
+              }
+            }
+          }
+        },
+        {
+          "id": "science-q3",
+          "question": "车停在门边，哪张图在如实交流？",
+          "skill": "依据观察如实交流",
+          "answer": [
+            "B"
+          ],
+          "analysis": "指着门边真实停放的车，把看到的位置告诉大人，是如实交流。",
+          "options": {
+            "A": {
+              "label": "闭眼想象车在桌上",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-guess",
+                "alt": "闭眼想象车在桌上"
+              }
+            },
+            "B": {
+              "label": "指着门边的车告诉大人",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-share",
+                "alt": "指着门边的车告诉大人"
+              }
+            },
+            "C": {
+              "label": "独自把车收进盒子",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-hide",
+                "alt": "独自把车收进盒子"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "带着好奇继续发现",
+      "template": "picture-points",
+      "data": {
+        "title": "带着好奇继续发现",
+        "picture": "share",
+        "points": [
+          "仔细观察，发现问题",
+          "先猜再试，留心变化",
+          "根据观察，交流发现"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，我们从身边的东西开始学科学。"
+        },
+        {
+          "say": "一片叶子，一朵花，都能引起好奇。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先留心它是什么样，再说想知道什么。"
+        },
+        {
+          "say": "问题可以一点一点地寻找答案。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "动手之前先猜一猜，接着安全地试一试。"
+        },
+        {
+          "say": "做活动时，认真看看实际发生的变化。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把真正看到的说出来，不照搬原来的猜想。"
+        },
+        {
+          "say": "没看清也可以诚实说，再留心观察。"
+        },
+        {
+          "say": "请告诉大人，你觉得哪件事最有意思。"
+        },
+        {
+          "say": "还可以说一个问题，带着好奇继续发现。"
+        }
+      ]
+    }
+  ]
+}

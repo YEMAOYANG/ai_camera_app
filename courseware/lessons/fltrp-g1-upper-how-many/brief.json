@@ -1,0 +1,202 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "How many?｜数数小码头",
+  "goals": [
+    "十个数词的图音码对应",
+    "一物一数与最后数词表示总数",
+    "How many?数量问答和亲子练习"
+  ],
+  "objectives": [
+    "听懂并把one到ten十个数词与1到10的数码和具体数量对应。",
+    "理解How many?询问数量，按一物一个数词依次计数，用最后数到的数词回答总数。",
+    "在教师示范后听数指认、点数实物，并在家人支持下尝试数量问答与手指计数。"
+  ],
+  "teacher": {
+    "code": "mira_english_standard",
+    "gender": "female",
+    "voice": "Jennifer"
+  },
+  "pages": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "goal": "进入原创小船码头，认识声音、数码和数量。",
+      "activity": "观察三只木船，听问句，老师逐只点亮后给出数量。"
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "goal": "一物一个数词，先点后报数，最后一个数词表示总数。",
+      "activity": "用四只摆放错落的木船示范逐只点亮和数到four，已数过的船保留标记。"
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "goal": "one到five与1到5及数量对应。",
+      "activity": "数码和船队逐组显示，教师配音并依次点亮每组。"
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "goal": "six到ten与6到10及数量对应。",
+      "activity": "数量保持清楚无重叠，逐组对应6到10的数码和声音。"
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "goal": "听数词指认乱序数码。",
+      "activity": "听声音选择三个数码中的一个，选中的号码移入登船牌，再重排下一轮；示范three，再玩1到10。"
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "goal": "理解How many?问多少并用最后数词回答。",
+      "activity": "问句配音后逐只点亮六只木船，说数词，最后重复Six.作为总数。"
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "goal": "对实物一一对应点数并回答数量。",
+      "activity": "点击每只未数小船，点击后进入已点区域且禁止重复计数，点齐后听How many?选择图片数码牌；首错只提示重看，复位保留可玩。"
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "goal": "亲子数量问答和手指练习的规则。",
+      "activity": "用五只木船复述问、数、答。教师引导孩子先伸出三根手指，边指边说数词，只数竖起的手指，最后回答Three.，再和家人互换角色。真实手指动作和口语交给家人观察。"
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "goal": "用全新贝壳情境检查听数、指数字与How many?数量理解。",
+      "activity": "六题，教师读题，原创图片选项，分布b/a/c/c/b/a。"
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "goal": "回顾十个数词、听数指码、点数和数量问答。",
+      "activity": "逐项点亮回顾，布置身边物品计数和家庭观察。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "skill": "number-word-digit",
+      "prompt": "听：eight。选对应的数码。",
+      "target": 8,
+      "optionValues": [
+        6,
+        8,
+        9
+      ],
+      "answer": "b",
+      "visualMode": "digit-images"
+    },
+    {
+      "id": "q2",
+      "skill": "number-word-quantity",
+      "prompt": "听：seven。选对应数量的贝壳。",
+      "target": 7,
+      "optionValues": [
+        7,
+        6,
+        8
+      ],
+      "answer": "a",
+      "visualMode": "shell-group-images"
+    },
+    {
+      "id": "q3",
+      "skill": "how-many-count",
+      "prompt": "How many? 数一数这组贝壳。",
+      "target": 9,
+      "optionValues": [
+        8,
+        10,
+        9
+      ],
+      "answer": "c",
+      "visualMode": "question-shells-option-digits"
+    },
+    {
+      "id": "q4",
+      "skill": "number-word-digit",
+      "prompt": "听：two。选对应的数码。",
+      "target": 2,
+      "optionValues": [
+        3,
+        1,
+        2
+      ],
+      "answer": "c",
+      "visualMode": "digit-images"
+    },
+    {
+      "id": "q5",
+      "skill": "number-word-quantity",
+      "prompt": "听：five。选对应数量的贝壳。",
+      "target": 5,
+      "optionValues": [
+        4,
+        5,
+        6
+      ],
+      "answer": "b",
+      "visualMode": "shell-group-images"
+    },
+    {
+      "id": "q6",
+      "skill": "how-many-count",
+      "prompt": "How many? 数一数这组贝壳。",
+      "target": 10,
+      "optionValues": [
+        10,
+        9,
+        8
+      ],
+      "answer": "a",
+      "visualMode": "question-shells-option-digits"
+    }
+  ],
+  "assetPlan": [
+    {
+      "id": "wooden-boat-single",
+      "type": "generated-image",
+      "meaning": "单只完整木制玩具小船，统一温暖清晰手工插画风，数量和位置由代码复制排列。"
+    },
+    {
+      "id": "shell-single",
+      "type": "generated-image",
+      "meaning": "单只完整扇贝贝壳，和小船统一画风，专用于新情境检查，数量和位置由代码复制排列。"
+    },
+    {
+      "id": "harbour-cover",
+      "type": "generated-image",
+      "meaning": "原创平静玩具码头入口，无教材角色、文字及可误计数的装饰船。"
+    },
+    {
+      "id": "digit-cards-1-to-10",
+      "type": "code-diagram",
+      "meaning": "1到10数码正是被教知识，以代码绘制为图片，不加入颜色暗示答案。"
+    },
+    {
+      "id": "quantity-layouts",
+      "type": "code-composition",
+      "meaning": "登记单物插画排为精确1到10个，每个物体不重叠，课上木船与题目贝壳保持不同物体和排法。"
+    }
+  ],
+  "weeklyQuestionSource": {
+    "skills": [
+      "number-word-quantity",
+      "number-word-digit",
+      "how-many-count"
+    ],
+    "homePractice": [
+      "由大人问How many?，孩子点数1到10件实物并用数词回答。",
+      "大人说一个数词，孩子指认对应数码。",
+      "和家人用手指做数数游戏，发音及动作待观察。"
+    ],
+    "noSeparateWeeklyTest": true
+  },
+  "sourceDecision": "已审读原书四活动和出版社35页，合并U1首课时与模块复习中对应部分，国家平台该节点无配套。"
+}

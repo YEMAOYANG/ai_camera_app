@@ -1,0 +1,55 @@
+#paper-materials, #paper-diagram {
+  position: absolute;
+  background: #fff;
+  border: 4px solid var(--line);
+  border-radius: 28px;
+  padding: 10px;
+}
+#paper-materials {
+  top: 42px;
+  left: 10px;
+  width: 414px;
+  height: 258px;
+}
+#paper-diagram {
+  top: 20px;
+  right: 14px;
+  width: 754px;
+  height: 350px;
+}
+#paper-materials img, #paper-diagram svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.paper-controls {
+  position: absolute;
+  right: 14px;
+  top: 392px;
+  width: 754px;
+  display: flex;
+  gap: 22px;
+  justify-content: center;
+}
+.paper-controls button {
+  width: 224px;
+  height: 124px;
+  padding: 9px;
+  background: #fff;
+  border: 4px solid var(--line);
+  border-radius: 23px;
+  cursor: pointer;
+}
+.paper-controls button.assembled { border-color: var(--gr); }
+.paper-controls svg { width: 100%; height: 100%; }
+#paper-rotor { transform-origin: 240px 125px; }
+#paper-rotor.slow-turn { animation: paper-turn 1250ms linear; }
+#paper-rotor.fast-turn { animation: paper-turn 600ms linear 2; }
+@keyframes paper-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  #paper-rotor.slow-turn, #paper-rotor.fast-turn {
+    animation: none;
+    transform: rotate(35deg);
+  }
+}

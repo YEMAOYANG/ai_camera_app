@@ -1,0 +1,19 @@
+
+#play{font-size:28px}.picture-control{border:4px solid #E8C48F;border-radius:24px;background:#fff;cursor:pointer;position:relative;padding:8px;overflow:hidden;box-shadow:0 6px 0 #E3C9A0}.picture-control img{width:100%;height:100%;object-fit:contain;pointer-events:none}.picture-control.selected{border-color:#F6A935}.picture-control.placed{border-color:#58B45C;box-shadow:none}.picture-control:disabled{cursor:default}.image-retry{position:absolute;inset:8px;background:#FFF7E8;border:3px dashed #BA854B;border-radius:20px;display:grid;place-items:center;font-size:68px;color:#8A5A24;cursor:pointer}.hint-ring{outline:6px dashed #F6A935;outline-offset:4px}.place-area{border:5px dashed #CFA66A;border-radius:36px;background:#FFFDF6}.round-action{border:4px solid #E8C48F;background:#fff;border-radius:28px;cursor:pointer;box-shadow:0 6px 0 #DABB8C}.round-action svg{width:100%;height:100%;pointer-events:none}.demo-label{position:absolute;left:6px;top:0;font-size:26px;color:#9E5D25}img{object-fit:contain}.source-broken{opacity:.35}
+#seq-history{position:absolute;left:8px;top:74px;width:340px;height:400px;display:grid;grid-template-columns:repeat(2,156px);grid-template-rows:repeat(2,186px);gap:18px}.seq-step{border:4px solid #E8C48F;border-radius:26px;background:#FFFDF6;padding:8px;opacity:.7}.seq-step img{width:100%;height:100%}.seq-step.active{border-color:#F6A935;opacity:1}.seq-step.done{border-color:#58B45C;opacity:1}#seq-view{position:absolute;left:386px;top:34px;width:420px;height:468px;border:4px solid #E8C48F;background:#fff;border-radius:38px;padding:12px;overflow:hidden}#seq-cup-image{width:100%;height:100%}#seq-moving-tool{position:absolute;left:160px;top:20px;width:130px;height:130px;filter:drop-shadow(0 8px 6px #0002)}#seq-tools{position:absolute;right:32px;top:32px;width:240px;height:480px;display:flex;flex-direction:column;gap:14px;align-items:center}#seq-tools button{width:210px;height:146px}@keyframes stirring{from{transform:rotate(-16deg) translateX(-14px)}to{transform:rotate(16deg) translateX(14px)}}#seq-moving-tool.moving{animation:stirring .35s ease-in-out 3 alternate}
+#seq-moving-tool {
+  mix-blend-mode: multiply;
+  filter: none;
+}
+#seq-moving-tool[data-tool="chopsticks"] {
+  top: 100px;
+  left: 164px;
+  transform: rotate(-53deg);
+}
+#seq-moving-tool[data-tool="chopsticks"].moving {
+  animation: stir-in-cup .35s ease-in-out 3 alternate;
+}
+@keyframes stir-in-cup {
+  from { transform: translateX(-10px) rotate(-63deg); }
+  to { transform: translateX(10px) rotate(-45deg); }
+}

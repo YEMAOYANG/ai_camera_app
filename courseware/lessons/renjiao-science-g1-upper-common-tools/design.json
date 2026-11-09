@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "mira.courseware.page-design.v1",
+  "style": "公共 kit；正式工具和材料插画；只有直线、圆形引导与切点是知识图示。",
+  "pages": {
+    "p03": {
+      "page": "drawing",
+      "ids": [
+        "draw-target",
+        "draw-ruler",
+        "draw-template",
+        "draw-scissors",
+        "draw-demo",
+        "draw-guide",
+        "draw-reset",
+        "draw-demo-tool",
+        "draw-demo-lines",
+        "draw-demo-circles"
+      ],
+      "stateKeys": [
+        "mode"
+      ],
+      "states": {
+        "demo": "备用直线的独立示范，不计星",
+        "play": "清空示范，回到儿童第一关",
+        "demo-circle": "显示徒手圆与沿圆孔描出的圆进行具体比较，不计星"
+      },
+      "mechanism": "选择并放置直尺或圆孔图形尺，逐段描画后虚线变实线。",
+      "levels": [
+        "水平直线选择直尺",
+        "圆形选择圆孔图形尺"
+      ],
+      "evidence": "工具选用、屏幕描画片段；现实用尺待观察"
+    },
+    "p06": {
+      "page": "cutting",
+      "ids": [
+        "cut-material",
+        "cut-scissors",
+        "cut-pliers",
+        "cut-ruler",
+        "cut-demo-tag",
+        "cut-reset"
+      ],
+      "stateKeys": [
+        "mode"
+      ],
+      "states": {
+        "demo": "备用卡纸由剪刀分开的示范，不计星",
+        "play": "回到完整毛线第一关"
+      },
+      "mechanism": "拖合适工具到材料，选对后两个图像半片移开，材料可见分开。",
+      "levels": [
+        "柔软毛线选择剪刀",
+        "未接电器的工艺金属丝选择钳子"
+      ],
+      "evidence": "屏幕工具适配；真实钳切待成人观察"
+    },
+    "p08": {
+      "page": "connecting",
+      "ids": [
+        "join-joint",
+        "join-screw",
+        "join-driver",
+        "join-band",
+        "join-turn",
+        "join-reset"
+      ],
+      "stateKeys": [
+        "mode"
+      ],
+      "states": {
+        "demo": "展示螺丝就位与刀头配合的接头，不计星",
+        "play": "撤回示范，回到待放螺丝的接口"
+      },
+      "mechanism": "带孔片按先螺丝、再螺丝刀、转动手柄连接；光滑棒改用橡皮筋捆扎。",
+      "levels": [
+        "带孔塑料片",
+        "光滑塑料棒"
+      ],
+      "evidence": "屏幕步骤与连接材料选择；现实拧螺丝、捆扎待观察"
+    }
+  },
+  "regression": "每页 window.__lessonTest() 在真实浏览器中返回命名断言；覆盖首次错误、材料适配、中间步骤、完成、重玩、教师示范交回。最终以正式媒体版本 G6 回执为准。"
+}

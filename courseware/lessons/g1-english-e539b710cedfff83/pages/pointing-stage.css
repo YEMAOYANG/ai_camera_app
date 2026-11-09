@@ -1,0 +1,201 @@
+#cv {
+  --ink: #25354e;
+  --ink2: #25354e;
+  --line: #ccdacb;
+  --or: #146e71;
+  --or2: #0e5458;
+  --gr: #197065;
+  --gr2: #07554b;
+  background: #e7eee6;
+}
+
+#pointing-room {
+  height: 552px;
+  padding: 20px 26px;
+  border: 2px solid #bccdc2;
+  border-radius: 34px;
+  background: #fffdf4;
+}
+
+#task-panel {
+  display: flex;
+  height: 98px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 0 12px 0 8px;
+}
+
+#task-panel h2 {
+  font-size: 38px;
+  line-height: 1.2;
+}
+
+#activity-note {
+  margin-top: 6px;
+  font-size: 24px;
+  line-height: 1.4;
+  color: #456065;
+}
+
+#listen-again {
+  display: grid;
+  flex: 0 0 108px;
+  height: 88px;
+  place-items: center;
+  border: 3px solid #0e5458;
+  border-radius: 24px;
+  background: #146e71;
+  color: white;
+  cursor: pointer;
+}
+
+#listen-again[data-playing="true"] {
+  background: #265181;
+  border-color: #265181;
+}
+
+#listen-again:disabled {
+  opacity: .48;
+  cursor: default;
+}
+
+#activity-board {
+  position: relative;
+  display: grid;
+  height: 402px;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 30px;
+  align-items: stretch;
+}
+
+#actor-panel {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  border: 2px solid #d9cdb1;
+  border-radius: 28px;
+  background: #f7edd5;
+}
+
+#actor-picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 18px;
+}
+
+#actor-badge {
+  display: grid;
+  width: 100%;
+  height: 48px;
+  place-items: center;
+  border-radius: 18px;
+  background: #fffaf0;
+  color: #355452;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+#object-options {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+#object-options[data-count="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#object-options[data-count="4"] {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.object-choice {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 8px;
+  place-items: center;
+  border: 3px solid #bdcfc2;
+  border-radius: 26px;
+  background: #f5f1e5;
+  color: #26374c;
+  cursor: pointer;
+}
+
+.object-choice:disabled {
+  cursor: default;
+}
+
+.object-choice img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  border-radius: 17px;
+}
+
+#pointing-room img[hidden] {
+  display: none;
+}
+
+.object-choice[data-outcome="correct"] {
+  border-color: #197065;
+  background: #d7f1df;
+}
+
+.object-choice[data-outcome="retry"] {
+  border-color: #ba592f;
+  background: #ffe9cf;
+}
+
+.object-choice[data-outcome="demo"] {
+  border-color: #2a61a0;
+  background: #e4effc;
+}
+
+#listen-again:focus-visible,
+.object-choice:focus-visible {
+  outline: 5px solid #244f8c;
+  outline-offset: 4px;
+}
+
+#pointing-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#point-trace {
+  fill: none;
+  stroke: #2a61a0;
+  stroke-width: 4;
+  stroke-linecap: round;
+  paint-order: stroke;
+}
+
+#pointing-path[data-outcome="correct"] #point-trace { stroke: #197065; }
+#pointing-path[data-outcome="retry"] #point-trace { stroke: #ba592f; }
+
+.image-fallback {
+  display: grid;
+  min-height: 90px;
+  place-items: center;
+  padding: 12px;
+  font-size: 23px;
+  font-weight: 700;
+  text-align: center;
+}

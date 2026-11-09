@@ -1,0 +1,897 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "常见的工具：工具小工坊",
+  "description": "认识绘图、裁剪和连接工具，按任务、材料与接口选择合适帮手，体验工具的便利并开展真实观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "温和细心的科学女老师，先观察材料和任务，再用具体示范解释工具的作用，真实动手请成人指导。"
+    }
+  },
+  "images": {
+    "workshop": {
+      "file": "assets/workshop.png"
+    },
+    "ruler": {
+      "file": "assets/ruler.png"
+    },
+    "template": {
+      "file": "assets/template.png"
+    },
+    "scissors": {
+      "file": "assets/scissors.png"
+    },
+    "pliers": {
+      "file": "assets/pliers.png"
+    },
+    "screwdriver": {
+      "file": "assets/screwdriver.png"
+    },
+    "band": {
+      "file": "assets/band.png"
+    },
+    "tape": {
+      "file": "assets/tape.png"
+    },
+    "eraser": {
+      "file": "assets/eraser.png"
+    },
+    "paper-strip": {
+      "file": "assets/paper-strip.png"
+    },
+    "yarn": {
+      "file": "assets/yarn.png"
+    },
+    "craft-wire": {
+      "file": "assets/craft-wire.png"
+    },
+    "plastic-strip": {
+      "file": "assets/plastic-strip.png"
+    },
+    "plastic-rod": {
+      "file": "assets/plastic-rod.png"
+    },
+    "screw": {
+      "file": "assets/screw.png"
+    },
+    "comb": {
+      "file": "assets/comb.png"
+    },
+    "punch": {
+      "file": "assets/punch.png"
+    },
+    "pencil": {
+      "file": "assets/pencil.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "工具小工坊",
+      "template": "title-picture",
+      "data": {
+        "title": "常见的工具",
+        "picture": "workshop",
+        "caption": "先看任务，再选工具"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到小工坊，桌上摆着生活小帮手。"
+        },
+        {
+          "say": "今天要画线、分开材料，还要连接材料。"
+        },
+        {
+          "say": "只用手，有些事情做起来不太方便。"
+        },
+        {
+          "say": "合适的工具，能帮我们把事情做好。"
+        },
+        {
+          "say": "小满问：拿起一件工具就能做所有事吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "每种工具有自己的作用，要先看任务。"
+        },
+        {
+          "say": "要画线、剪开还是连住，选法会不同。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "使用前先学方法，再按方法慢慢做。"
+        },
+        {
+          "say": "今天先在屏幕上试，真实操作请大人指导。"
+        },
+        {
+          "say": "猫头鹰提醒：先看要做什么，再找帮手。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "画得更方便",
+      "template": "picture-points",
+      "data": {
+        "title": "借助工具画图",
+        "picture": "ruler",
+        "points": [
+          "直尺：沿直边画线",
+          "图形尺：沿孔边描画",
+          "比较结果，发现便利"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这把直尺有长长的直边，可以帮忙画线。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "老师先把直尺放稳，再沿直边画。"
+        },
+        {
+          "say": "笔贴着边慢慢走，线就有了依靠。"
+        },
+        {
+          "say": "徒手也能画，借助尺子更容易画直。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "图形尺上有形状的孔，可以沿孔边描。"
+        },
+        {
+          "say": "要画圆，就找圆孔，沿着它走一圈。"
+        },
+        {
+          "say": "小满问：尺子滑动了，还能画好吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "先把尺子按稳，再画，过程更方便。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把两次画的结果放一起，比一比。"
+        },
+        {
+          "say": "我们关心工具帮了什么忙，不比谁画得快。"
+        },
+        {
+          "say": "朵朵说：我会看看线和图形有什么变化。",
+          "by": "duoduo"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "沿着工具画一画",
+      "page": "drawing",
+      "widgetType": "tool-workshop",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#draw-ruler"
+        },
+        {
+          "say": "先看老师示范，直边能给笔带路。"
+        },
+        {
+          "say": "老师把直尺放到示范位置，先让它稳住。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "上面是这次徒手画的线，有一点弯。"
+        },
+        {
+          "say": "下面借助直尺，沿直边画出了直线。"
+        },
+        {
+          "highlight": "#draw-demo"
+        },
+        {
+          "say": "这条线有尺边帮忙，方向就容易保持。"
+        },
+        {
+          "say": "再来比较画圆，老师把两种结果放一起。"
+        },
+        {
+          "setState": {
+            "mode": "demo-circle"
+          }
+        },
+        {
+          "say": "左边是这次徒手画的圈，边缘有些歪。"
+        },
+        {
+          "say": "右边沿圆孔描画，形状更容易保持。"
+        },
+        {
+          "say": "不同的绘图工具，给笔提供不同的边缘。"
+        },
+        {
+          "highlight": "#draw-target"
+        },
+        {
+          "say": "接下来轮到你，先看纸上的淡淡线条。"
+        },
+        {
+          "say": "想一想，需要直边，还是圆形的孔呢？"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "把合适的工具拖到纸上，再沿线点画。"
+        },
+        {
+          "say": "线段亮起来，表示这一段已在屏幕上画过。"
+        },
+        {
+          "say": "画错先停一停，回头看看线和工具的边。"
+        },
+        {
+          "say": "屏幕描画不代表真会用尺，回家请大人看。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "quiz",
+      "title": "绘图小检查",
+      "intro": [
+        "接下来是新任务，老师把题目说给你听。",
+        "先想要做什么，再看图片选工具。",
+        "可以再听一遍，慢慢想，不用着急。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "做赛车出发线，要画一条直线，选哪件工具帮忙？",
+          "skill": "绘图工具作用",
+          "answer": [
+            "A"
+          ],
+          "analysis": "直尺的直边可以帮助画直线。",
+          "options": {
+            "A": {
+              "label": "直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "ruler",
+                "alt": "直尺"
+              }
+            },
+            "B": {
+              "label": "胶带",
+              "visual": {
+                "kind": "asset",
+                "image": "tape",
+                "alt": "胶带"
+              }
+            },
+            "C": {
+              "label": "钳子",
+              "visual": {
+                "kind": "asset",
+                "image": "pliers",
+                "alt": "钳子"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "做观察记录，要画出看到的叶片，哪件用品能留下线条？",
+          "skill": "绘图用品作用",
+          "answer": [
+            "B"
+          ],
+          "analysis": "铅笔可以在纸上画出观察到的形状。",
+          "options": {
+            "A": {
+              "label": "螺丝刀",
+              "visual": {
+                "kind": "asset",
+                "image": "screwdriver",
+                "alt": "螺丝刀"
+              }
+            },
+            "B": {
+              "label": "铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "铅笔"
+              }
+            },
+            "C": {
+              "label": "橡皮筋",
+              "visual": {
+                "kind": "asset",
+                "image": "band",
+                "alt": "橡皮筋"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "材料不同，工具不同",
+      "template": "picture-points",
+      "data": {
+        "title": "先看材料，再选裁剪工具",
+        "picture": "scissors",
+        "points": [
+          "纸、布、线绳：用剪刀",
+          "金属丝：用钳子",
+          "成人指导，不玩耍，用后归位"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看剪刀，上面是刀头，下面是握住的刀柄。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "纸、布和线绳，可以用合适的剪刀裁剪。"
+        },
+        {
+          "say": "大拇指放一个柄孔，食指中指放另一个。"
+        },
+        {
+          "say": "先张开，把材料放好，再合拢剪。"
+        },
+        {
+          "say": "重复张开和合拢，材料就逐渐分开了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "金属丝和柔软的线绳不同，要换合适工具。"
+        },
+        {
+          "say": "钳子能夹持、弯折，也能剪断金属丝。"
+        },
+        {
+          "say": "小满问：同样叫线，都用剪刀就行吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "先辨认材料，再决定工具，不能只听名字。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "真实裁剪要大人指导，先学好使用方法。"
+        },
+        {
+          "say": "剪刀不是玩具，不能拿着它乱跑。"
+        },
+        {
+          "say": "用完后，把剪刀放回原来的位置。"
+        },
+        {
+          "say": "美工刀也能裁纸，今天交给成人处理。"
+        },
+        {
+          "say": "猫头鹰提醒：屏幕选对了，动手仍要学。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "材料加工台",
+      "page": "cutting",
+      "widgetType": "tool-workshop",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#cut-material"
+        },
+        {
+          "say": "这是备用的薄卡纸，老师先做一次示范。"
+        },
+        {
+          "highlight": "#cut-scissors"
+        },
+        {
+          "say": "它是纸片，老师选剪刀，放到要剪的位置。"
+        },
+        {
+          "say": "看，张开后合拢，薄卡纸分成了两部分。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "工具选得合适，材料加工起来更方便。"
+        },
+        {
+          "highlight": "#cut-material"
+        },
+        {
+          "say": "接下来换新材料，先看柔软毛线的样子。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "把你选的工具拖到材料上，看看结果。"
+        },
+        {
+          "say": "下一关是手工金属丝，想想材料有何不同。"
+        },
+        {
+          "say": "选错会回到原处，不扣星，可以重新选择。"
+        },
+        {
+          "say": "屏幕只检查选用，真实钳切还要成人指导。"
+        },
+        {
+          "say": "今天的手工金属丝没有连接任何电器。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "把材料连起来",
+      "template": "picture-points",
+      "data": {
+        "title": "看看接口，用什么连住",
+        "picture": "screwdriver",
+        "points": [
+          "带孔片：螺丝配螺丝刀",
+          "光滑棒：橡皮筋捆住",
+          "纸张：胶带粘合"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "材料不只可以分开，还能连接起来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看带孔塑料片，先让要连接的孔重叠。"
+        },
+        {
+          "say": "把螺丝放进孔里，再让螺丝刀头对准槽。"
+        },
+        {
+          "say": "握着手柄转动，螺丝就能帮助连住片材。"
+        },
+        {
+          "say": "刀头要和槽配合，十字槽配十字刀头。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "光滑的塑料棒没有孔，可以换橡皮筋。"
+        },
+        {
+          "say": "把橡皮筋捆在相接处，棒就被连住了。"
+        },
+        {
+          "say": "朵朵说：我先看接口，再决定怎么连。",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "纸张要粘合，可以选胶带来帮忙。"
+        },
+        {
+          "say": "同样是连接，材料和接口不同，工具也不同。"
+        },
+        {
+          "say": "真实拧螺丝和捆扎，要请大人指导观察。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "让材料连起来",
+      "page": "connecting",
+      "widgetType": "tool-workshop",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#join-joint"
+        },
+        {
+          "say": "老师先把两片塑料片的孔对在一起。"
+        },
+        {
+          "highlight": "#join-screw"
+        },
+        {
+          "say": "看清重叠的孔，把螺丝放到孔里面。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "螺丝就位后，还需要合适的螺丝刀。"
+        },
+        {
+          "highlight": "#join-driver"
+        },
+        {
+          "say": "十字刀头对着十字槽，再转动手柄。"
+        },
+        {
+          "say": "两个片材连住了，这就是工具配合的作用。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "现在你来连另一个接口，先放螺丝。"
+        },
+        {
+          "say": "再把螺丝刀放到接头，点圆箭头转动。"
+        },
+        {
+          "say": "下一关换成光滑棒，要换一种连接帮手。"
+        },
+        {
+          "say": "看看有没有孔，再选择，不合适可以重来。"
+        },
+        {
+          "say": "屏幕连成了，真实连接仍请大人帮忙看。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "选用工具小检查",
+      "intro": [
+        "接下来是新任务，老师把题目说给你听。",
+        "先想要做什么，再看图片选工具。",
+        "可以再听一遍，慢慢想，不用着急。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "给布做的小旗修剪边角，哪件工具合适？",
+          "skill": "裁剪工具与材料",
+          "answer": [
+            "C"
+          ],
+          "analysis": "剪刀适合剪裁布料，应在成人指导下使用。",
+          "options": {
+            "A": {
+              "label": "直尺",
+              "visual": {
+                "kind": "asset",
+                "image": "ruler",
+                "alt": "直尺"
+              }
+            },
+            "B": {
+              "label": "橡皮筋",
+              "visual": {
+                "kind": "asset",
+                "image": "band",
+                "alt": "橡皮筋"
+              }
+            },
+            "C": {
+              "label": "剪刀",
+              "visual": {
+                "kind": "asset",
+                "image": "scissors",
+                "alt": "剪刀"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "纸信封的边开了，想把两边粘在一起，选什么？",
+          "skill": "纸面连接工具",
+          "answer": [
+            "A"
+          ],
+          "analysis": "胶带能把分开的纸边粘合起来。",
+          "options": {
+            "A": {
+              "label": "胶带",
+              "visual": {
+                "kind": "asset",
+                "image": "tape",
+                "alt": "胶带"
+              }
+            },
+            "B": {
+              "label": "钳子",
+              "visual": {
+                "kind": "asset",
+                "image": "pliers",
+                "alt": "钳子"
+              }
+            },
+            "C": {
+              "label": "铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "铅笔"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "生活里的工具侦探",
+      "template": "picture-points",
+      "data": {
+        "title": "发现更多生活小帮手",
+        "picture": "comb",
+        "points": [
+          "看工具怎样帮助做事",
+          "记名称，也记用途",
+          "不会使用，先请成人示范"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这把梳子有整齐的齿，它可以梳理头发。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "生活里还有许多工具，先看它在帮什么忙。"
+        },
+        {
+          "say": "比如铲子能铲土，打孔器能给纸打孔。"
+        },
+        {
+          "say": "看到工具的样子，还要联系实际用途。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "调查时，可以画工具，也可以请大人记名称。"
+        },
+        {
+          "say": "旁边再记它帮助做的事情，这就是用途。"
+        },
+        {
+          "say": "小满问：没看到的作用也可以写上吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "先观察再记录，不清楚的就继续问大人。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "没有学过的工具，请成人示范，先看方法。"
+        },
+        {
+          "say": "记录要真实，不把认识图片说成已经会用。"
+        },
+        {
+          "say": "猫头鹰提醒：多发现，也把看到的说清楚。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "生活工具小检查",
+      "intro": [
+        "接下来是新任务，老师把题目说给你听。",
+        "先想要做什么，再看图片选工具。",
+        "可以再听一遍，慢慢想，不用着急。"
+      ],
+      "questions": [
+        {
+          "id": "q5",
+          "question": "要把相册纸页打出小孔，方便装订，哪件工具有帮助？",
+          "skill": "生活工具功能",
+          "answer": [
+            "B"
+          ],
+          "analysis": "打孔器能给纸打孔。",
+          "options": {
+            "A": {
+              "label": "梳子",
+              "visual": {
+                "kind": "asset",
+                "image": "comb",
+                "alt": "梳子"
+              }
+            },
+            "B": {
+              "label": "打孔器",
+              "visual": {
+                "kind": "asset",
+                "image": "punch",
+                "alt": "打孔器"
+              }
+            },
+            "C": {
+              "label": "橡皮",
+              "visual": {
+                "kind": "asset",
+                "image": "eraser",
+                "alt": "橡皮"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "玩具上的螺丝有十字槽，要转动它，选哪件工具？",
+          "skill": "螺丝刀与螺丝配合",
+          "answer": [
+            "C"
+          ],
+          "analysis": "十字螺丝刀的刀头能对准十字槽。",
+          "options": {
+            "A": {
+              "label": "胶带",
+              "visual": {
+                "kind": "asset",
+                "image": "tape",
+                "alt": "胶带"
+              }
+            },
+            "B": {
+              "label": "剪刀",
+              "visual": {
+                "kind": "asset",
+                "image": "scissors",
+                "alt": "剪刀"
+              }
+            },
+            "C": {
+              "label": "十字螺丝刀",
+              "visual": {
+                "kind": "asset",
+                "image": "screwdriver",
+                "alt": "十字螺丝刀"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "带着办法去观察",
+      "template": "summary",
+      "data": {
+        "title": "工具小工坊的发现",
+        "items": [
+          "画图：直尺和图形尺帮忙",
+          "裁剪：先看任务和材料",
+          "连接：看接口，选合适工具",
+          "真实动手：成人指导，继续观察"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们知道，直尺能帮助画直线。"
+        },
+        {
+          "say": "图形尺能沿孔边描画，工具让绘图更方便。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "纸、布、线绳和金属丝，材料并不相同。"
+        },
+        {
+          "say": "裁剪先看材料，剪刀和钳子各有作用。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "带孔片可用螺丝和螺丝刀配合连接。"
+        },
+        {
+          "say": "光滑棒可用橡皮筋，纸张可用胶带粘合。"
+        },
+        {
+          "say": "朵朵说：我会先看任务，再看看接口。",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家和大人找一件工具，看看它帮助做什么。"
+        },
+        {
+          "say": "画下它，请大人记下名称和你观察的用途。"
+        },
+        {
+          "say": "真实绘图、裁剪、连接，请成人指导并观察。"
+        },
+        {
+          "say": "猫头鹰提醒：屏幕练过，动手还要慢慢学。",
+          "by": "owl"
+        }
+      ]
+    }
+  ]
+}

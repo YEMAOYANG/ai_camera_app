@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "9.更多的家养动物",
+  "canvas": {
+    "width": 1280,
+    "height": 720
+  },
+  "authorModels": [
+    "gpt-6.1-sol"
+  ],
+  "visualLanguage": "生活相册—同方面比较—成长示意—动物小书，正式图片直接承载进食、运动、成长和亲子意义。",
+  "pages": [
+    {
+      "page": "p03",
+      "goal": "辨认狗四类生活情境",
+      "mechanism": "自由打开进食、运动、成长示意、亲子照片，每看一种大图切换并收录一张观察缩略图；四种均看过才完成。",
+      "targets": [
+        "#album-main",
+        "#album-eat",
+        "#album-move",
+        "#album-grow",
+        "#album-family",
+        "#album-record"
+      ],
+      "states": [
+        "start",
+        "demo:eat/move/grow/family",
+        "play",
+        "new-photo",
+        "repeat-photo",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "本页为开放观察，没有错误选项。重复打开同一张不累计新种类、不惩罚，提醒继续观察其他方面。",
+      "reset": "清空四类已看标记和记录、星星、进度，废止旧延时回调。"
+    },
+    {
+      "page": "p05",
+      "goal": "把狗鸡同一方面的生活线索对齐",
+      "mechanism": "鸡生活图拖放或点选到狗生活图旁，格内保存两种动物证据，形成四格比较表。",
+      "targets": [
+        "#match-source",
+        "#match-eat",
+        "#match-move",
+        "#match-grow",
+        "#match-family"
+      ],
+      "states": [
+        "start",
+        "demo:eat/move/grow",
+        "play",
+        "selected",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "只提示两张图是否同一方面，不报正确格。",
+      "reset": "清空四格鸡图，重新随机题序，星星与错误数归零。"
+    },
+    {
+      "page": "p08",
+      "goal": "从幼小到成体理解长大",
+      "mechanism": "按当前动物选择幼小、成体照片，放进前后相框，完成狗与鸡两轮成长示意；幼小图片显示尺寸较小。",
+      "targets": [
+        "#grow-animal",
+        "#grow-early",
+        "#grow-late",
+        "#grow-choices"
+      ],
+      "states": [
+        "start",
+        "demo:early/late",
+        "play",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "提示先确认动物再看前后变化，不标正确照片。",
+      "reset": "清空相框、进度、星星与轮次，回到狗幼小阶段，废止旧延时。",
+      "evidence": "成长示意是图解，不声称是实际连续观察或实拍时间证据。"
+    },
+    {
+      "page": "p10",
+      "goal": "按样子、进食和活动整理小书",
+      "mechanism": "另一动物的同方面照片提供可见主题线索，把本书动物的对应照片放入空白页并收录三页，先狗再鸡；不是只换分数。",
+      "targets": [
+        "#book-animal",
+        "#book-model",
+        "#book-target",
+        "#book-record"
+      ],
+      "states": [
+        "start",
+        "demo:look/eat/move",
+        "play",
+        "selected",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "提醒主人与主题，不报正确选项。",
+      "reset": "清空书页与两本已整理记录，回到狗的样子页，清零星星与错误数，废止旧延时。",
+      "evidence": "只记录照片主题整理，真实画图、口述和个人小书制作由成人观察。"
+    },
+    {
+      "page": "p12",
+      "goal": "用不打扰动物的方法观察",
+      "mechanism": "看追赶或伸手拉翅动作，选择成人陪同的安静观察，大画面和两张关爱记录随选择改变。",
+      "targets": [
+        "#care-scene",
+        "#care-choice-quiet",
+        "#care-record"
+      ],
+      "states": [
+        "start",
+        "demo:quiet/wing",
+        "play",
+        "correct",
+        "first-miss",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "看手脚动作会不会打扰动物，不直接标正确项。",
+      "reset": "回到追赶情境，清空记录、星星与错误数，重新排选项，废止旧延时。"
+    }
+  ],
+  "requiredViewports": [
+    "1280x720",
+    "1000x563",
+    "640x360"
+  ],
+  "formalImageChecks": [
+    "24张正式图片，临时占位不得交付。",
+    "成长示意必须幼小到成体，亲子同框不能冒充同一个体成长。",
+    "狗和鸡四类生活照片分别清楚，不用静止全身图充当运动、进食或亲子。",
+    "鸡、鹅不画直接产下幼鸟，不用一幅静态图声称实际观察了生育过程。",
+    "初始、正确、首次错误与教师示范状态须真实截图复核图片语义和裁切。"
+  ],
+  "evidenceBoundary": "系统仅记录打开、排序、匹配和小检查；真实养护、画图、口述和现场观察不得由屏幕成绩推断。"
+}

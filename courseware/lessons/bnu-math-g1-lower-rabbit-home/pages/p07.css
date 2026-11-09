@@ -1,0 +1,16 @@
+.rabbit-neighborhood {height:100%;position:relative;color:#23463b}
+#house-pair {position:absolute;top:7px;left:176px;width:880px;height:217px;object-fit:contain}
+.room-boards {position:absolute;top:224px;left:56px;right:56px;display:flex;align-items:center;justify-content:space-between}
+.room {display:flex;flex-direction:column;align-items:center;gap:6px;width:474px;height:210px;padding:8px 15px;border:5px solid #a04b33;border-radius:28px;background:#f7e3cc}
+.room.blue-room {border-color:#287a85;background:#deece8}
+.room-count {font-size:32px;line-height:42px}
+.room-grid {display:grid;grid-template-columns:repeat(6,62px);grid-template-rows:repeat(2,61px);gap:3px 6px;justify-content:center;width:100%;height:140px;align-items:center}
+.home-rabbit {width:62px;height:61px;display:grid;place-items:center;cursor:pointer;border:2px solid transparent;background:transparent;border-radius:12px}
+.home-rabbit img {width:60px;height:57px;object-fit:contain;pointer-events:none}
+.rabbit-fallback {position:relative;display:block;width:34px;height:27px;margin-top:13px;border-radius:48%;background:#b46746;border:3px solid #74432c;pointer-events:none}
+.rabbit-fallback::before,.rabbit-fallback::after {content:'';position:absolute;top:-17px;width:9px;height:19px;border-radius:70%;background:#b46746;border:2px solid #74432c}
+.rabbit-fallback::before {left:2px}.rabbit-fallback::after {right:2px}
+.home-rabbit:focus-visible {outline:4px solid #2d786b;outline-offset:1px}
+.home-rabbit.moved {border-color:#a54c30;background:#ffd981;animation:popk .35s}
+#move-arrow {display:grid;place-items:center;width:112px;height:90px;font-size:78px;color:#8e5326;font-weight:900}
+#total-strip {position:absolute;top:455px;left:338px;width:556px;height:72px;border:4px solid #69937d;border-radius:23px;background:#fff7db;text-align:center;font-size:45px;font-weight:900;line-height:60px}

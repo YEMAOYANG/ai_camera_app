@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "style": {
+    "setting": "社区读书角，空书架、还书台与借书出口为同一场景。场景插画用温暖的低饱和木色和湖绿，物件摆放清晰。",
+    "visualAssets": [
+      {"key": "reading-corner", "purpose": "介绍和互动开始页的正式空读书角插画，保留空书架与入口，画内无文字、数字或可被误数的书本。"},
+      {"key": "single-book", "purpose": "一册合上的书的正式图片，方向稳定、清晰，复用作每个实际可选可拖的物件。数量与摆放由代码生成。"}
+    ]
+  },
+  "geometry": {
+    "interactiveCanvas": [1280, 720],
+    "shelf": {"columns": 5, "rows": 2, "capacity": 10, "minimumTouchPx": 44},
+    "eventOrder": ["初始状态", "第一次后", "第二次后"],
+    "activeSet": "每本书有稳定标识。第一次和第二次新增书各自来自独立的待入集合。每次送出只可从当前架上集合中选择，已借出书保留在单独记录里。",
+    "counts": "占满的格子数严格等于当前数量。两批新增书通过独立边界和箭头区分，两批送出书通过独立区域和步骤记号区分。借出的书和待还的书均不计入架上数。",
+    "movement": "箭头从物件原区域指向目标区域。加减符号连的是参与当前计算的量，时间轴连接的是同一书架的不同时刻。画面同时出现总量和其中一部分时，用区域或移动箭头表示关系。",
+    "emptyShelf": "零本显示空格和数字0，书的图片从架上全部移走。",
+    "lowReading": "用确切物件数量、区框、进出方向和两张事件卡的前后位置区分任务。颜色辅助区分，线型、方向与空间关系也要可辨。老师读出需要行动的数量和顺序。",
+    "semanticDiagrams": "书架格、计数点、时间线和加减关系箭头可标记 data-semantic-diagram。实际的书和场景使用正式图片。"
+  },
+  "pages": [
+    {
+      "id": "p03",
+      "mechanism": "从不同数量的还书批次中选出本次应收的一批，并拖到书架或按点击顺序放置。检查通过后把对应册数加入书架，随后切换第二次还书。",
+      "levels": [
+        {"initial": 1, "changes": [3, 5], "snapshots": [1, 4, 9]},
+        {"initial": 2, "changes": [4, 4], "snapshots": [2, 6, 10]}
+      ],
+      "ids": ["shelf-now", "incoming-batches", "step-timeline", "stage-one", "stage-two", "undo-selection"],
+      "stateKeys": {"demoStep": "0、1、2分别显示3＋1＋2的起始、第一次后、第二次后", "play": "清除演示并打开第一关，演示不记星"},
+      "hints": ["先只数这一次送到的书", "比一比有几本，把这批加到架上已有的书里", "演示一批入架，仍由孩子核对并完成放置"]
+    },
+    {
+      "id": "p05",
+      "mechanism": "点选书架上若干本书并按出口按钮送出。第一批留下明确位置记录，只有仍在架上的书可再次选择。可点第二次取消，送出前能修正。",
+      "levels": [
+        {"initial": 9, "changes": [-2, -5], "snapshots": [9, 7, 2]},
+        {"initial": 10, "changes": [-6, -4], "snapshots": [10, 4, 0]}
+      ],
+      "ids": ["shelf-now", "batch-out-first", "batch-out-second", "ship-selected", "undo-selection", "step-timeline"],
+      "stateKeys": {"demoStep": "0、1、2分别显示9−4−2的起始、第一次后、第二次后", "play": "清除演示并打开第一关，演示不记星"},
+      "hints": ["从架上还在的书中选", "先数这一次借几本，再核一下圈出的数量", "演示剩余书的可选范围，保留孩子自己送出这批书的动作"]
+    },
+    {
+      "id": "p09",
+      "mechanism": "从一张收进卡和一张借出卡排出两次事件。第一张确认后即时绘制中间书架，再放第二张。原始顺序和中间状态各自核验。",
+      "levels": [
+        {"initial": 2, "changes": [5, -3], "snapshots": [2, 7, 4], "reversedFirst": -1, "reversedPossible": false},
+        {"initial": 8, "changes": [-3, 2], "snapshots": [8, 5, 7], "reversedFirst": 10, "reversedPossible": true, "reversedFinal": 7}
+      ],
+      "ids": ["shelf-now", "incoming-event", "outgoing-event", "first-event-slot", "second-event-slot", "intermediate-shelf", "undo-event"],
+      "stateKeys": {"demoCase": "add-first或subtract-first，分别绑定3＋4−1和7−4＋2", "demoStep": "0、1、2显示对应演示快照", "play": "清除演示和卡位，打开第一关，演示不记星"},
+      "hints": ["重新听先发生什么", "看看书移动的方向，再数这一次的书", "演示第一张卡怎样改变书架，再让孩子自己排和核对下一步"]
+    }
+  ],
+  "quizAcceptance": [
+    {"id": "chain-q1", "context": "校庆摆放作品", "initial": 2, "changes": [1, 4], "snapshots": [2, 3, 7], "ask": "final", "visualOptionCounts": [6, 7, 3], "answerIndex": 1},
+    {"id": "chain-q2", "context": "活动桌两次分发圆片", "initial": 10, "changes": [-1, -6], "snapshots": [10, 9, 3], "ask": "final", "visualOptionCounts": [3, 9, 4], "answerIndex": 0},
+    {"id": "chain-q3", "context": "积木区补进再领走", "initial": 3, "changes": [5, -2], "snapshots": [3, 8, 6], "ask": "final", "visualOptionCounts": [3, 8, 6], "answerIndex": 2},
+    {"id": "chain-q4", "context": "美术课先分出再补来", "initial": 6, "changes": [-4, 3], "snapshots": [6, 2, 5], "ask": "intermediate", "visualOptionCounts": [6, 2, 5], "answerIndex": 1},
+    {"id": "chain-q5", "context": "两次移动磁贴", "initial": 5, "changes": [4, -3], "snapshots": [5, 9, 6], "reversedFirst": 2, "reversedFinal": 6, "ask": "intermediate", "visualOptionCounts": [9, 6, 2], "answerIndex": 0},
+    {"id": "chain-q6", "context": "班级交换书箱", "initial": 9, "changes": [-4, 3], "snapshots": [9, 5, 8], "ask": "final", "visualOptionCounts": [5, 9, 8], "answerIndex": 2}
+  ],
+  "teacherHandoff": "演示先改变图，再解释变化前后各有多少和为什么。逐个点亮起点、第一步、第二步和规则。互动至少三次实际操作，示范态一直保留到最后的显式 play 交接。每句台词用教师注册声音预录，第一条错误提示只引导重新数或重新听。",
+  "fallback": "图片加载失败时用可数的几何点保持操作和状态一致，记录正式图缺失并在视觉验收拦截。",
+  "acceptance": [
+    "校验每个例子和练习的起始、中间、最终数量都在0至10，第二次运算的左操作数等于第一步结果，选项图逐张数过且唯一正确。",
+    "在1280×720、1000×563、640×360的视口分别运行。检查初始态、教师演示态、答错态、答对态、完成态和重玩态。",
+    "遮住非目标文字后试听口令，依靠图片完成三种互动。测试鼠标拖放、触屏点选、撤回和错误修正。",
+    "连加以两个批次分别加入且每本书只出现一次。连减测试第一批已移出的书不能再次选择，零本时架上无书。",
+    "混合第二关用同终点的反向排卡尝试。即使最后都是7，第一步把架上数量变成10也应提示核对故事，不计通过。",
+    "从教师示范交接到实际游戏，以及重玩后，验证归零进度、星星、已送出记录和错题计数，课堂动作不自动提交小检查。"
+  ]
+}

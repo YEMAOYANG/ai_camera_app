@@ -1,0 +1,944 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "The toy car is under the bed.",
+  "description": "外研社一年级起点一年级下册Module2 Unit2完整课目；通过找物、摆放和图片检查理解位置，口语表现待观察。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#D86657",
+      "persona": "温暖清晰的英语老师，用简体中文解释概念，准确慢读英文目标词句，先示范再交给孩子操作。"
+    }
+  },
+  "images": {
+    "scene-home": {
+      "file": "assets/scene-home.png"
+    },
+    "obj-bed": {
+      "file": "assets/obj-bed.png"
+    },
+    "obj-box": {
+      "file": "assets/obj-box.png"
+    },
+    "obj-desk": {
+      "file": "assets/obj-desk.png"
+    },
+    "obj-car": {
+      "file": "assets/obj-car.png"
+    },
+    "obj-bear": {
+      "file": "assets/obj-bear.png"
+    },
+    "obj-hat": {
+      "file": "assets/obj-hat.png"
+    },
+    "q-bear-on-bag": {
+      "file": "assets/q-bear-on-bag.png"
+    },
+    "q-bear-in-bag": {
+      "file": "assets/q-bear-in-bag.png"
+    },
+    "q-bear-under-bag": {
+      "file": "assets/q-bear-under-bag.png"
+    },
+    "q-hat-under-chair": {
+      "file": "assets/q-hat-under-chair.png"
+    },
+    "q-hat-in-box": {
+      "file": "assets/q-hat-in-box.png"
+    },
+    "q-hat-on-chair": {
+      "file": "assets/q-hat-on-chair.png"
+    },
+    "q-kite-under-chair": {
+      "file": "assets/q-kite-under-chair.png"
+    },
+    "q-kite-on-chair": {
+      "file": "assets/q-kite-on-chair.png"
+    },
+    "q-kite-in-box": {
+      "file": "assets/q-kite-in-box.png"
+    },
+    "q-book-under-bag": {
+      "file": "assets/q-book-under-bag.png"
+    },
+    "q-book-in-bag": {
+      "file": "assets/q-book-in-bag.png"
+    },
+    "q-book-on-bag": {
+      "file": "assets/q-book-on-bag.png"
+    },
+    "toy-car-under-bed": {
+      "file": "assets/toy-car-under-bed.png"
+    },
+    "hat-in-hand-action": {
+      "file": "assets/hat-in-hand-action.png"
+    },
+    "hat-on-head-action": {
+      "file": "assets/hat-on-head-action.png"
+    },
+    "p11-position-recap": {
+      "file": "assets/p11-position-recap.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "玩具小屋",
+      "template": "picture-points",
+      "data": {
+        "title": "玩具小屋",
+        "picture": "scene-home",
+        "points": [
+          "toy car · bed",
+          "bear · hat",
+          "找物品，也说位置"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们来到暖暖的玩具小屋。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "toy car，说的是玩具小汽车。"
+        },
+        {
+          "say": "bed，是我们休息的小床。"
+        },
+        {
+          "say": "听词时先看实物，意思就清楚了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "bear，是软软的玩具熊。"
+        },
+        {
+          "say": "hat，是头上戴的帽子。"
+        },
+        {
+          "say": "慢慢跟我读，不着急说得很快。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这些物品都能摆在不同的地方。"
+        },
+        {
+          "say": "找东西时，名字和位置都要听清。"
+        },
+        {
+          "say": "今天我们帮忙找物品，再整理好。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "听一听，摆一摆",
+      "page": "position",
+      "widgetType": "listen-place",
+      "startImage": "scene-home",
+      "script": [
+        {
+          "highlight": "#position-car"
+        },
+        {
+          "say": "同一辆车，换个地方，位置就变了。"
+        },
+        {
+          "highlight": "#position-bed"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "relation": "under"
+          }
+        },
+        {
+          "say": "小车在床的下面，用 under。"
+        },
+        {
+          "say": "The toy car is under the bed."
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "relation": "on"
+          }
+        },
+        {
+          "say": "小车贴着床面，在上面用 on。"
+        },
+        {
+          "say": "The toy car is on the bed."
+        },
+        {
+          "highlight": "#position-box"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "relation": "in"
+          }
+        },
+        {
+          "say": "小车进了盒子，在里面用 in。"
+        },
+        {
+          "say": "The toy car is in the box."
+        },
+        {
+          "say": "先听位置，再找床或盒子作参照。"
+        },
+        {
+          "say": "拖动小车，或者点一处，让它搬家。"
+        },
+        {
+          "say": "听不清就点小喇叭，再听一次。"
+        },
+        {
+          "say": "再听一遍，先找参照物。"
+        },
+        {
+          "say": "你可以重新试，试错不会扣星星。"
+        },
+        {
+          "setState": {
+            "mode": "play",
+            "relation": "under"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "在哪里",
+      "template": "picture-points",
+      "data": {
+        "title": "Where's the toy car?",
+        "picture": "toy-car-under-bed",
+        "points": [
+          "先听：问的是谁",
+          "再看：它在哪里",
+          "回答时说出参照物"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "想知道一个物品在哪里，可以用英语问。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Where's the toy car?"
+        },
+        {
+          "say": "先听见 toy car，就知道要找小汽车。"
+        },
+        {
+          "say": "只听见在哪里，还不知道我们要找谁。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看图，小车在床板下面，两条床腿之间。"
+        },
+        {
+          "say": "我们是看小车和床的关系，才知道位置。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "It's under the bed."
+        },
+        {
+          "say": "这句话告诉别人，小车在床的下面。"
+        },
+        {
+          "say": "如果别人已经知道问的是小车，可以用 it 来答。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "帮忙找玩具",
+      "page": "search",
+      "widgetType": "find-and-reveal",
+      "startImage": "scene-home",
+      "script": [
+        {
+          "setState": {
+            "mode": "focus",
+            "place": "in"
+          }
+        },
+        {
+          "highlight": "#search-target"
+        },
+        {
+          "say": "先认准要找的物品，再去找位置。"
+        },
+        {
+          "say": "Where's the hat?"
+        },
+        {
+          "say": "问的是帽子，要找帽子的图片。"
+        },
+        {
+          "highlight": "#search-box"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "place": "in"
+          }
+        },
+        {
+          "say": "掀开看看，帽子藏在盒子里面。"
+        },
+        {
+          "say": "The hat is in the box."
+        },
+        {
+          "setState": {
+            "mode": "focus",
+            "place": "under"
+          }
+        },
+        {
+          "say": "Where's the bear?"
+        },
+        {
+          "highlight": "#search-desk"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "place": "under"
+          }
+        },
+        {
+          "say": "找到熊了，再看它和桌子的关系。"
+        },
+        {
+          "say": "The bear is under the desk."
+        },
+        {
+          "setState": {
+            "mode": "focus",
+            "place": "on"
+          }
+        },
+        {
+          "say": "Where's the toy car?"
+        },
+        {
+          "highlight": "#search-bed"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "place": "on"
+          }
+        },
+        {
+          "say": "这个小车停在床面上。"
+        },
+        {
+          "say": "The toy car is on the bed."
+        },
+        {
+          "say": "不是这个物品，先听清名字。"
+        },
+        {
+          "say": "每找到一件，它就到收集区里。"
+        },
+        {
+          "say": "现在听问题，自己帮忙找一找。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "帽子跟着动作变位置",
+      "template": "two-columns",
+      "data": {
+        "title": "帽子跟着动作变位置",
+        "left": {
+          "heading": "在手里",
+          "body": "in my hand"
+        },
+        "left_picture": "hat-in-hand-action",
+        "right": {
+          "heading": "在头上",
+          "body": "on my head"
+        },
+        "right_picture": "hat-on-head-action"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "帽子还是这一顶，换个动作，位置就变了。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看手，手指托着帽子，帽子在手里。"
+        },
+        {
+          "say": "My hat is in my hand."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "听到 in my hand，就把手掌托起来。"
+        },
+        {
+          "say": "Hold the hat. Tap, tap."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看头，帽子戴上去了，手已经放下。"
+        },
+        {
+          "say": "My hat is on my head."
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "听到 on my head，就做一个戴帽子的动作。"
+        },
+        {
+          "say": "Wear the hat. Clap, clap."
+        },
+        {
+          "say": "没有帽子也能用手势跟做，说得怎么样请大人看。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "quiz",
+      "title": "听位置选图片",
+      "intro": [
+        "先听我读，再选和这句话一样的图。",
+        "bag 是书包，chair 是椅子。",
+        "听清位置，再看物品和参照物。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "The bear is in the bag. 哪张图对？",
+          "skill": "听辨物品在里面",
+          "answer": [
+            "B"
+          ],
+          "analysis": "in 表示在里面；熊装在书包内，下半身被书包挡住。",
+          "options": {
+            "A": {
+              "label": "熊在书包上面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bear-on-bag",
+                "alt": "熊在书包上面"
+              }
+            },
+            "B": {
+              "label": "熊在书包里面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bear-in-bag",
+                "alt": "熊在书包里面"
+              }
+            },
+            "C": {
+              "label": "熊在书包下面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-bear-under-bag",
+                "alt": "熊在书包下面"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "The hat is on the chair. 哪张图对？",
+          "skill": "听辨物品在上面",
+          "answer": [
+            "C"
+          ],
+          "analysis": "on 表示在上面；帽子放在椅子的座位上。",
+          "options": {
+            "A": {
+              "label": "帽子在椅子下面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-hat-under-chair",
+                "alt": "帽子在椅子下面"
+              }
+            },
+            "B": {
+              "label": "帽子在盒子里面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-hat-in-box",
+                "alt": "帽子在盒子里面"
+              }
+            },
+            "C": {
+              "label": "帽子在椅子上面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-hat-on-chair",
+                "alt": "帽子在椅子上面"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "把位置说完整",
+      "template": "picture-points",
+      "data": {
+        "title": "把位置说完整",
+        "picture": "toy-car-under-bed",
+        "points": [
+          "The toy car",
+          "is under",
+          "the bed."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "告诉别人位置，像把三块积木连好。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先说哪件物品。看，这是一辆玩具小车。"
+        },
+        {
+          "say": "The toy car."
+        },
+        {
+          "say": "光说有个东西，别人还不知道找谁。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再说它的位置。小车在床板的下方。"
+        },
+        {
+          "say": "Is under."
+        },
+        {
+          "say": "如果小车搬到床面上，位置词就要换成 on。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后说是在什么东西的下面。这里是床。"
+        },
+        {
+          "say": "The bed."
+        },
+        {
+          "say": "把小车、位置、床连起来，就能说清楚。"
+        },
+        {
+          "say": "The toy car is under the bed."
+        },
+        {
+          "say": "你可以指着图跟我说，读说请大人帮看。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "听到线索，猜一件",
+      "page": "guess",
+      "startImage": "scene-home",
+      "widgetType": "game",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "feedback": "clue"
+          }
+        },
+        {
+          "highlight": "#guess-desk"
+        },
+        {
+          "say": "It's under the desk."
+        },
+        {
+          "say": "听到的是位置，我还没有说是哪一件。"
+        },
+        {
+          "highlight": "#guess-car"
+        },
+        {
+          "say": "小车和熊都在桌子下面，两个都可以先猜。"
+        },
+        {
+          "say": "Is it a toy car?"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "feedback": "no"
+          }
+        },
+        {
+          "say": "No, it isn't."
+        },
+        {
+          "say": "小车淡了，表示这回猜的不是它。"
+        },
+        {
+          "highlight": "#guess-bear"
+        },
+        {
+          "say": "再试试也在桌子下面的熊。"
+        },
+        {
+          "say": "Is it a bear?"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "feedback": "yes"
+          }
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "say": "熊来到右边，说明这一次猜中了。"
+        },
+        {
+          "say": "It's on the desk."
+        },
+        {
+          "say": "如果位置词换成 on，就看看桌面上的物品。"
+        },
+        {
+          "say": "听线索，点一件，听完回答还可以再猜。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "整理我们的玩具角",
+      "page": "arrange",
+      "widgetType": "multi-object-room",
+      "startImage": "scene-home",
+      "script": [
+        {
+          "highlight": "#arrange-car"
+        },
+        {
+          "say": "这一回，要听完整句子再整理。"
+        },
+        {
+          "highlight": "#arrange-box"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "relation": "in",
+            "toy": "car"
+          }
+        },
+        {
+          "say": "先听见小车，再听见盒子里面。"
+        },
+        {
+          "say": "The toy car is in the box."
+        },
+        {
+          "highlight": "#arrange-bear"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "relation": "on",
+            "toy": "bear"
+          }
+        },
+        {
+          "say": "听见熊，就换成熊。听见 on，就找床面。"
+        },
+        {
+          "say": "The bear is on the bed."
+        },
+        {
+          "highlight": "#arrange-desk"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "relation": "under",
+            "toy": "hat"
+          }
+        },
+        {
+          "say": "帽子在桌面下方，要让它落到桌子下面。"
+        },
+        {
+          "say": "The hat is under the desk."
+        },
+        {
+          "say": "先选物品，再决定它和家具的关系。"
+        },
+        {
+          "say": "三件物品各有位置，整理完看图说一说。"
+        },
+        {
+          "say": "不对就再听，先认准物品和位置。"
+        },
+        {
+          "say": "摆放可以记录，能否自己说请大人观察。"
+        },
+        {
+          "say": "现在听一句，找准物品，再拖到那个位置。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "新的位置小检查",
+      "intro": [
+        "kite 是风筝，book 是书。",
+        "听听说的是哪一件、在哪里。",
+        "选好以后，再看看图片里的关系。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "The kite is under the chair. 哪张图对？",
+          "skill": "听辨物品在下面",
+          "answer": [
+            "A"
+          ],
+          "analysis": "under 表示在下面；风筝放在椅子座位正下方的地面。",
+          "options": {
+            "A": {
+              "label": "风筝在椅子下面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-kite-under-chair",
+                "alt": "风筝在椅子下面"
+              }
+            },
+            "B": {
+              "label": "风筝在椅子上面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-kite-on-chair",
+                "alt": "风筝在椅子上面"
+              }
+            },
+            "C": {
+              "label": "风筝在盒子里面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-kite-in-box",
+                "alt": "风筝在盒子里面"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "The book is in the bag. 哪张图对？",
+          "skill": "理解完整位置描述",
+          "answer": [
+            "B"
+          ],
+          "analysis": "句子说的是书在书包里面。书的下部被书包挡住。风筝也在里面，但物品和参照物都不一样。",
+          "options": {
+            "A": {
+              "label": "书在书包下面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-book-under-bag",
+                "alt": "书在书包下面"
+              }
+            },
+            "B": {
+              "label": "书在书包里面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-book-in-bag",
+                "alt": "书在书包里面"
+              }
+            },
+            "C": {
+              "label": "书贴在书包外面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-book-on-bag",
+                "alt": "书贴在书包外面"
+              }
+            },
+            "D": {
+              "label": "风筝在盒子里面",
+              "visual": {
+                "kind": "asset",
+                "image": "q-kite-in-box",
+                "alt": "风筝在盒子里面"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "位置小帮手",
+      "template": "picture-points",
+      "data": {
+        "title": "位置小帮手",
+        "picture": "p11-position-recap",
+        "points": [
+          "in：小车在盒子里",
+          "on：小车在床面上",
+          "under：小车在床板下",
+          "听、找、说给家人听"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们听物品的名字，也听它在哪里。"
+        },
+        {
+          "laser": "point-1"
+        },
+        {
+          "say": "小车进了盒子，在里面用 in。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "laser": "point-2"
+        },
+        {
+          "say": "小车贴着床面，在上面用 on。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "laser": "point-3"
+        },
+        {
+          "say": "在床板下面用 under，还要看清是哪个物品。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "帽子拿在手里或戴在头上，位置也会变。"
+        },
+        {
+          "laser": "point-4"
+        },
+        {
+          "say": "想找物品，先听问的是哪一件。"
+        },
+        {
+          "say": "Where's the toy car?"
+        },
+        {
+          "say": "如果只有位置线索，先猜一件，再听是不是。"
+        },
+        {
+          "say": "说完整位置，要说明物品、方位和参照物。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "The toy car is under the bed."
+        },
+        {
+          "laser": "point-4"
+        },
+        {
+          "say": "回家摆一件物品，再告诉家人它的位置。"
+        },
+        {
+          "say": "家人可以先听你说，再和你一起去看一看。"
+        },
+        {
+          "say": "找物和摆放可以记录，能否独立说请家人观察。"
+        }
+      ]
+    }
+  ]
+}

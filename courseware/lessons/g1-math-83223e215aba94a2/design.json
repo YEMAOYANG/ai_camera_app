@@ -1,0 +1,79 @@
+{
+  "cast": [
+    {
+      "name": "小数老师",
+      "look": "男教师，声音耐心清晰，游戏内不以卡通头像替代教学对象。"
+    }
+  ],
+  "style": {
+    "notes": "奶油纸色、陶土橙、植物绿；正式插画表达真实物品，精确轮廓、分点与位移由代码表达。"
+  },
+  "pages": [
+    {
+      "id": "p02",
+      "mechanism": "逐件标记花盆，记录总数量；标记改变花盆状态，首错不泄答案。",
+      "ids": [
+        "pot-row",
+        "count-record",
+        "number-tray"
+      ],
+      "stateKeys": {
+        "phase": "demo两盆，marked逐件留记，play恢复孩子三盆及五盆"
+      },
+      "levels": [
+        "三盆",
+        "五盆"
+      ]
+    },
+    {
+      "id": "p05",
+      "mechanism": "把同形接触面拖到目标轮廓，留下真实印记；形状本身就是知识图示。",
+      "ids": [
+        "stamp-target",
+        "stamp-tray",
+        "stamp-result"
+      ],
+      "stateKeys": {
+        "phase": "demo圆形、print演示印记、play恢复正方形等三个任务"
+      },
+      "levels": [
+        "正方形",
+        "三角形",
+        "长方形"
+      ]
+    },
+    {
+      "id": "p07",
+      "mechanism": "每件按规则展开分点，形成记录，再选择总分。",
+      "ids": [
+        "score-rule",
+        "collect-row",
+        "point-record",
+        "score-choices"
+      ],
+      "stateKeys": {
+        "phase": "demo叶花各一，record逐件展开，play孩子新集合"
+      },
+      "levels": [
+        "一叶两花",
+        "两叶两花"
+      ]
+    },
+    {
+      "id": "p10",
+      "mechanism": "按固定面向的方向图序逐格行动；错误不会改变位置。",
+      "ids": [
+        "route-marker",
+        "route-sequence",
+        "route-goal"
+      ],
+      "stateKeys": {
+        "phase": "demo新示范路线，step移动当前一步，play恢复孩子两条新路线"
+      },
+      "levels": [
+        "前前右",
+        "右右前前"
+      ]
+    }
+  ]
+}

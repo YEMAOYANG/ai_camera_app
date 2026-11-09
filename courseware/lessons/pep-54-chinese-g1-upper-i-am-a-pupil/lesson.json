@@ -1,0 +1,583 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "我是小学生",
+  "description": "人教五四学制语文一年级上册。借上学图景听懂问答，练习按时到校的准备，分辨学习和劳动。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "温柔亲切的女老师，说话清楚有节奏，喜欢用图画和儿歌带孩子认字读诗；孩子答错时先让孩子再听一遍、再看一眼。"
+    }
+  },
+  "images": {
+    "bag-at-gate": {
+      "file": "assets/bag-at-gate.png"
+    },
+    "bird-on-branch": {
+      "file": "assets/bird-on-branch.png"
+    },
+    "learn-leaf-prints": {
+      "file": "assets/learn-leaf-prints.png"
+    },
+    "learn-making-model": {
+      "file": "assets/learn-making-model.png"
+    },
+    "q-destination-court": {
+      "file": "assets/q-destination-court.png"
+    },
+    "q-destination-market": {
+      "file": "assets/q-destination-market.png"
+    },
+    "q-destination-school": {
+      "file": "assets/q-destination-school.png"
+    },
+    "q-help-lesson": {
+      "file": "assets/q-help-lesson.png"
+    },
+    "q-help-rest": {
+      "file": "assets/q-help-rest.png"
+    },
+    "q-help-supplies": {
+      "file": "assets/q-help-supplies.png"
+    },
+    "q-ready-missing": {
+      "file": "assets/q-ready-missing.png"
+    },
+    "q-ready-packed": {
+      "file": "assets/q-ready-packed.png"
+    },
+    "q-ready-tv": {
+      "file": "assets/q-ready-tv.png"
+    },
+    "route-at-school": {
+      "file": "assets/route-at-school.png"
+    },
+    "route-home-pack": {
+      "file": "assets/route-home-pack.png"
+    },
+    "route-leave-home": {
+      "file": "assets/route-leave-home.png"
+    },
+    "school-morning-cover": {
+      "file": "assets/school-morning-cover.png"
+    },
+    "water-class-plant": {
+      "file": "assets/water-class-plant.png"
+    },
+    "wipe-desk": {
+      "file": "assets/wipe-desk.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "书包准备出发",
+      "template": "picture-points",
+      "data": {
+        "title": "书包准备出发",
+        "picture": "school-morning-cover",
+        "points": [
+          "清早出发",
+          "背上书包",
+          "去学校"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小语老师陪你看一看，小学生的一天从哪里开始。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "你看，清早的阳光照在路上，路边还有小花。"
+        },
+        {
+          "say": "故事里的孩子看着这些景物，心里很开心。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看肩上的背带，孩子身后背着一个书包。"
+        },
+        {
+          "say": "课本和上课要用的东西，可以收在书包里。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "顺着孩子走的方向看，前面就是学校的大门。"
+        },
+        {
+          "say": "走进那扇门，就能去教室和同学一起学习。"
+        },
+        {
+          "say": "这就是课文上学歌里，小学生出发的早晨。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "是谁在问",
+      "template": "two-columns",
+      "data": {
+        "title": "是谁在问",
+        "left": {
+          "heading": "小鸟问",
+          "body": "想知道什么"
+        },
+        "right": {
+          "heading": "孩子答",
+          "body": "说清去做什么"
+        },
+        "left_picture": "bird-on-branch",
+        "right_picture": "bag-at-gate"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看枝头，故事里的小鸟看见有人背着书包。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "上学歌里把小鸟写成了爱问问题的朋友。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "小鸟想知道，你背着书包，要去做什么？"
+        },
+        {
+          "say": "听到问去做什么，我们就要回答要做的事。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看，孩子到了学校门口，老师在迎接他们。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "我们可以学孩子回答，我背着书包来上学。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "这样既说清要做什么，也说清要去哪里。"
+        },
+        {
+          "say": "要是你来到校门口，会是什么心情？"
+        },
+        {
+          "say": "想一想，再用自己的话，说给身边的大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "把上学路线接起来",
+      "page": "school-route",
+      "widgetType": "courseware",
+      "startImage": "school-morning-cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#route-photo-pack"
+        },
+        {
+          "say": "想按时到学校，可以先把要用的课本放进书包。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "routeStep": 0
+          }
+        },
+        {
+          "say": "老师把准备书包的图，放在从家出发的第一站。"
+        },
+        {
+          "say": "提前收好，早上就不用在家到处找书。"
+        },
+        {
+          "highlight": "#route-photo-leave"
+        },
+        {
+          "say": "下一张是家门口，跟家人约好时间再出门。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "routeStep": 1
+          }
+        },
+        {
+          "say": "书包已经背好，就能按约定的时间走出家门。"
+        },
+        {
+          "highlight": "#route-photo-school"
+        },
+        {
+          "say": "再往前，校门和迎接我们的老师出现了。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "routeStep": 2
+          }
+        },
+        {
+          "say": "按时到校，就是在学校要求的时间内到达。"
+        },
+        {
+          "say": "提前准备和按时出发，都能帮我们不迟到。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "轮到你了，听一条，选一张，接起这条路线。"
+        },
+        {
+          "say": "先找在家把课本放进包的图。"
+        },
+        {
+          "say": "再找背好书包走出家门的图。"
+        },
+        {
+          "say": "最后找孩子到了学校的图。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "学本领也做小事",
+      "template": "two-columns",
+      "data": {
+        "title": "学本领也做小事",
+        "left": {
+          "heading": "学本领",
+          "body": "跟着老师观察"
+        },
+        "right": {
+          "heading": "做小事",
+          "body": "擦好用过的桌面"
+        },
+        "left_picture": "learn-leaf-prints",
+        "right_picture": "wipe-desk"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看这边，老师用放大镜看一片叶子。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "孩子看老师怎样做，再试着找叶子上的细纹。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "遇到不懂的地方再看一看，这就是学本领。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "活动结束了，看看桌上还有一小处水渍。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "孩子拿块布来，把自己用过的桌子擦干净。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "桌子干净了，下一个同学就能接着用。"
+        },
+        {
+          "say": "把用过的东西收好，也是力所能及的劳动。"
+        },
+        {
+          "say": "你学会的小本领，还能在别人需要时帮一把。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "给校园小队配照片",
+      "page": "school-photos",
+      "widgetType": "courseware",
+      "startImage": "school-morning-cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#place-learn"
+        },
+        {
+          "say": "左边的孩子在跟老师观察，正在学新本领。"
+        },
+        {
+          "highlight": "#card-bridge"
+        },
+        {
+          "say": "看这张，孩子先看老师放积木，再学着搭。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "activityCard": 1
+          }
+        },
+        {
+          "say": "老师把搭桥的照片放到学本领的场景里。"
+        },
+        {
+          "highlight": "#place-help"
+        },
+        {
+          "say": "右边的孩子在擦桌子，让桌子能接着用。"
+        },
+        {
+          "highlight": "#card-grow"
+        },
+        {
+          "say": "这张照片里，孩子拿小壶给班里的花浇水。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "activityCard": 0
+          }
+        },
+        {
+          "say": "我把浇花照放到劳动这一边，因为她在照顾花。"
+        },
+        {
+          "say": "分照片时先看手在做什么，再想这件事的目的。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "先点一张图，再点它要去的地方。也可以拖过去。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "quiz",
+      "title": "换个情境选一选",
+      "intro": [
+        "听小语老师说，看三张图。",
+        "选好以后，再看看为什么。"
+      ],
+      "questions": [
+        {
+          "id": "pupil-destination",
+          "skill": "school_story",
+          "question": "哪一幅图表示小朋友背着书包去学校？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "这张图有学校大门、迎接孩子的老师，还有背着书包上学的同伴。",
+          "options": {
+            "A": {
+              "label": "走进学校大门",
+              "visual": {
+                "kind": "asset",
+                "image": "q-destination-school",
+                "alt": "走进学校大门"
+              }
+            },
+            "B": {
+              "label": "来到菜市场",
+              "visual": {
+                "kind": "asset",
+                "image": "q-destination-market",
+                "alt": "来到菜市场"
+              }
+            },
+            "C": {
+              "label": "来到篮球场",
+              "visual": {
+                "kind": "asset",
+                "image": "q-destination-court",
+                "alt": "来到篮球场"
+              }
+            }
+          }
+        },
+        {
+          "id": "pupil-ready",
+          "skill": "on_time",
+          "question": "马上要出门，哪张图里的蓝封面课本已经装进书包？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "书包口露出蓝色书封，说明要带的课本已经装进去了。",
+          "options": {
+            "A": {
+              "label": "蓝封面课本留在桌上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ready-missing",
+                "alt": "蓝封面课本留在桌上"
+              }
+            },
+            "B": {
+              "label": "蓝封面课本放在包里",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ready-packed",
+                "alt": "蓝封面课本放在包里"
+              }
+            },
+            "C": {
+              "label": "孩子坐着，课本仍在桌上",
+              "visual": {
+                "kind": "asset",
+                "image": "q-ready-tv",
+                "alt": "孩子坐着，课本仍在桌上"
+              }
+            }
+          }
+        },
+        {
+          "id": "pupil-help",
+          "skill": "learn_and_help",
+          "question": "美术活动结束了。哪一幅图是在帮大家整理彩纸？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "把大家用剩的彩纸放回收纳盒，下一组同学还可以接着用。",
+          "options": {
+            "A": {
+              "label": "跟老师学折纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-help-lesson",
+                "alt": "跟老师学折纸"
+              }
+            },
+            "B": {
+              "label": "坐着喝水休息",
+              "visual": {
+                "kind": "asset",
+                "image": "q-help-rest",
+                "alt": "坐着喝水休息"
+              }
+            },
+            "C": {
+              "label": "把彩纸放回盒子",
+              "visual": {
+                "kind": "asset",
+                "image": "q-help-supplies",
+                "alt": "把彩纸放回盒子"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "把新发现说给家人",
+      "template": "picture-points",
+      "data": {
+        "title": "把新发现说给家人",
+        "picture": "school-morning-cover",
+        "points": [
+          "背上书包去上学",
+          "提前准备，按时到校",
+          "学本领，做小事"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看，小学生背着书包走到校门口了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "要是小鸟问你为什么背书包，你可以说去上学。"
+        },
+        {
+          "say": "打开自己的课本，听家人带着你读上学歌。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "今晚先把要用的东西收好，再约定出门时间。"
+        },
+        {
+          "say": "早上心里有数，就能按时走进学校。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "到了学校，学会一个本领，也能做一件小事。"
+        },
+        {
+          "say": "比如擦好用过的桌子，让同学接着用。"
+        },
+        {
+          "say": "把你的上学感受和做过的小事，讲给家人听。"
+        },
+        {
+          "say": "长大以后，也能用学会的本领帮更多的人。"
+        }
+      ]
+    }
+  ]
+}

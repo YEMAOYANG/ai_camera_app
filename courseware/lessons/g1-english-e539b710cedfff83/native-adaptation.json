@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "openMaicJobId": "XerE-DFv1l",
+  "originalFailedJobId": "ZjfU0tfus3",
+  "openMaicClassroomId": "6er-IOH4I8",
+  "nativeClassroomSha256": "7b6148119f3c39470e8b25f3016a06c18518348cfb22b396e35654983b521535",
+  "nativeDraftInputSha256": "aad951ec03b2e92682d7e157ff77a82db209aa081f186853bf536bcfcbc5f9f1",
+  "nativeModelRoute": "deepseek-v4-pro",
+  "editorModel": "gpt-6.1-sol",
+  "rawScenes": 16,
+  "scope": "逐场对照已保存原生正文；旧Codex方案只作为本课画面互动适配基线。原生部分使用自己的角色、台词、图题和结构，在G0证据下逐项修订。",
+  "adaptedScenes": [
+    {
+      "key": "listen-point",
+      "originalSceneIds": [
+        "scene_a0S-KYoiGS",
+        "scene_3WiEF4_TnS",
+        "scene_gKRCvMCAM4"
+      ],
+      "change": "合并角色开场和门窗示范，保留先听、看示例、跟做，统一角色名并分句。"
+    },
+    {
+      "key": "room-relay",
+      "originalSceneIds": [
+        "scene_CxZt96r4S6",
+        "scene_0JJ_7DgVqD"
+      ],
+      "change": "合并四物讲解和接力，逐物说明可见特征，用实际四轮轮换。"
+    },
+    {
+      "key": "name-voices",
+      "originalSceneIds": [
+        "scene_K7zeehz84u",
+        "scene_nOZ7YYDJCY"
+      ],
+      "change": "保留原生第二组May、Ben、Jo和耳朵先听的顺序，统一开场角色。"
+    },
+    {
+      "key": "room-beat",
+      "originalSceneIds": [
+        "scene_iVdcKavz-W",
+        "scene_Nw2AVOWzPT"
+      ],
+      "change": "保留上下与节奏练习，补书中门窗指向，提示可选择图而不强制起坐。"
+    },
+    {
+      "key": "spot-and-fix",
+      "originalSceneIds": [
+        "scene_9Hu7OFUJ4I",
+        "scene_0ynTcsYefR"
+      ],
+      "change": "保留观察、重听、改指与反向发指令，以温和反馈保留修正机会。"
+    },
+    {
+      "key": "stage-friends",
+      "originalSceneIds": [
+        "scene_K7zeehz84u",
+        "scene_9QANMclcjP"
+      ],
+      "change": "将原生剧场示范落成可操作的登场活动，使用教材对应的角色介绍和回应。"
+    },
+    {
+      "key": "check",
+      "originalSceneIds": [
+        "scene_9nf4ozj7_e",
+        "scene_l5GTNb3BPQ",
+        "scene_ZU7p9FwBth"
+      ],
+      "change": "合并三组小检查，补齐实际位置词读题；两道人物题改用同一素材组的圆帽、领巾特征；新增改指变式。"
+    },
+    {
+      "key": "recap",
+      "originalSceneIds": [
+        "scene_kWjgI7-LqU"
+      ],
+      "change": "保留三步核对与家庭指令任务，缩短并顺序点亮，复习由声音支持。"
+    }
+  ],
+  "adaptedLessonSha256": "80f5e17e2efaf53a5d667a9a3315f8e5c1f696439a29ae517c5f7385ccd5039c",
+  "assetReadbackChanges": [
+    "ceiling讲解区分头顶平面和吊灯",
+    "门题解析指向已审核双开门的两个把手"
+  ],
+  "adaptedPageJsSha256": "1fcd52fd3f074be8a8e8b84485dbb5c7caf227f954eac79319e1a17a2c0e4d3b",
+  "assetProvenanceSha256": "38d408c752da22911c0e46337ba346fe9dbb0df7010f18412844234af544000e",
+  "bodySha256": "07fa162a3f646a68ec25e9c9d9cf1d0b7ee176972388f2c114ced045d4c1be72",
+  "reviewEdits": [
+    {
+      "priorBodySha256": "f4a2cd2f35deeade8795dd8ea058b26eafae35c45e924a6b6ed0167c7116109d",
+      "priorVerificationSha256": "3875a6918d625f04123cc9c3f719b02e12cdadae3d84f0b480106b9e0ab4bcc2",
+      "issueId": "goal-4",
+      "change": "添加一个可见的三拍连续示范与节拍顺序说明，保留原各动作和位置词单独示范。"
+    },
+    {
+      "priorBodySha256": "7b056ba90352196e465f72751ed36997f749d1a7b3822d45782ec639120d29a8",
+      "priorVerificationSha256": "8ca9cc4d21a95a983e431071d7029f35acd4a496fc3647b448409d29cb5d0abb",
+      "issueIds": [
+        "q-door",
+        "goal-2",
+        "difficultPoint"
+      ],
+      "change": "门题解析仅写可见门框和把手；改指示例补英语口令与No否定反馈，发生在同伴从窗改指门之前。"
+    }
+  ],
+  "adaptedBriefSha256": "eb4775df03e0e03b17ff557a6f88801fb5c370fff9104e8c2f7c577de634174e",
+  "briefPackagingChange": "正式发布工具要求goals；沿用原brief的4项目标，原始brief冻结在pre-native-reference。"
+}

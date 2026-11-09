@@ -1,0 +1,664 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-upper-a32d0ba5",
+    "revisionId": "directory-95a21955795dff0ab5eea338",
+    "nodeId": "c878c4c7-eea2-4e01-a6d1-a076fc1840a3",
+    "unitId": "94d9fe6e-3cd9-44bf-9198-cc78e92b3159",
+    "officialMaterialId": "f0b17947-32aa-4d9b-84bc-090ded268dd5",
+    "activityId": "5e78d931-f2eb-1a8f-704d-f0480d83838b",
+    "classHours": [
+      "lesson_1"
+    ]
+  },
+  "request": "为江苏凤凰教育出版社2024年7月版《科学》六三学制一年级上册《1 小小科学家》创作一门完整的原创科学课。遵循页序、评估蓝图和既有正式素材的语义，让小科老师讲明科学方法并逐页示范。每题只设一个正确选项，答案字段只含对应选项的一个值，选项素材与解析一致。依据官方教学范围撰写台词，保留真实观察待观察口径，避免扩写人物轶事。已有图片由后续制作流程关联，引用 assetKey。交付可编辑草稿。",
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "objectives": [
+      "通过身边观察活动和科学家实例，知道科学家因好奇提出问题，并通过观察、实验寻找答案。",
+      "在同一小球、同一斜坡和地面条件下比较不同释放起点的滚动距离，知道本课实验中起点高的小球滚得远；把屏幕示意与真实实验证据分开。",
+      "能够布置同一起点比较大小相同的木球和钢球的实验，知道需要观察实际结果，不能仅按材质猜结论。",
+      "举例说明科学家可以研究动物、植物、岩石、天空等不同方面，保持提出问题和寻找答案的兴趣。",
+      "将方法迁移到麻雀与人行走的课后观察，用口述或绘画记录方法和实际发现；无真实观察的数据标为待观察。"
+    ],
+    "coveredOfficialHours": [
+      "lesson_1"
+    ],
+    "videoStatus": "waived",
+    "excludedTopics": [
+      "不引入官方未审的故事细节、斜坡物理公式或引力原理。",
+      "不推断某种材质必然滚得更远，也不把屏幕模拟当作真实测量。",
+      "不预先给出麻雀的固定行走结论。真实实验、纸笔、口述由大人观察。"
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "9390df04a551ce2a8fe44ce74cf496ad95558794dd37a0d12c72be5fb5d18a08",
+    "briefSha256": "a08181be950697e3000bc2afc0cae751851e60a8ea4c8862fe1822af3a483836",
+    "officialManifestSha256": "94fb30afb1d826d4afce2c66d79914c8ec11209eda3aade8b6c19ab979c1a055",
+    "officialDetailsSha256": "3898a4828add03759d6ea2a23aae8b75c9580a04014af1a56c1f8795d238cb96",
+    "existingEditableDraftSha256": "fdefa804d2cc9a0de48a6add24bd09709540181c8f36b36742739295ac0ce080",
+    "existingPictureRequestsSha256": "e97c43e71f6a11d5c3d438e1780a0f61e300204cd5bd70fb91a868a1a9d379d2"
+  },
+  "qualityRules": [
+    "小科老师主讲，简体中文儿童口语。单句尽量25字以内，最长40字。",
+    "讲解至少6句且100字，互动至少5句且90字，互动至少三次先操作画面再开口。",
+    "讲解页1000×562.5，互动页1280×720。一二年级靠图和老师预录音，遮住非目标字仍能操作。",
+    "每页集中一个任务，首错只提示，支持分步帮助和重玩。互动要改变图中的对象。",
+    "小检查采用新情境和图片选项，每题给唯一答案、知识点和解析，六题A、B、C各两次。",
+    "禁止课堂讨论、外链、机械浏览器语音和占位图。末页总结。",
+    "区分屏幕活动与真实观察，孩子线下的实验、口述和绘画由大人观察。"
+  ],
+  "pagePlan": [
+    {
+      "page": 1,
+      "id": "p01",
+      "type": "slide",
+      "title": "小小科学家",
+      "play": "教师逐项聚光讲解。",
+      "assetKeys": [
+        "station"
+      ]
+    },
+    {
+      "page": 2,
+      "id": "p02",
+      "type": "slide",
+      "title": "好奇之后，要找线索",
+      "play": "教师逐项聚光讲解。",
+      "assetKeys": [
+        "observe"
+      ]
+    },
+    {
+      "page": 3,
+      "id": "p03",
+      "type": "interactive",
+      "title": "为问题打开观察窗",
+      "play": "叶片与瓢虫两种对象，选实物观察动作后打开放大观察窗并保存图片；第一错只提醒动作，不亮答案。",
+      "assetKeys": [
+        "guess",
+        "insect",
+        "leaf",
+        "leave",
+        "observe",
+        "station"
+      ]
+    },
+    {
+      "page": 4,
+      "id": "p04",
+      "type": "slide",
+      "title": "科学家的研究办法",
+      "play": "教师逐项聚光讲解。",
+      "assetKeys": [
+        "ball-lab",
+        "insect"
+      ]
+    },
+    {
+      "page": 5,
+      "id": "p05",
+      "type": "slide",
+      "title": "滚球实验：只换起点",
+      "play": "教师逐项聚光讲解。",
+      "assetKeys": [
+        "ball-lab"
+      ]
+    },
+    {
+      "page": 6,
+      "id": "p06",
+      "type": "interactive",
+      "title": "让两个起点留下记录",
+      "play": "相同球与轨道从高低起点放手，球实移到示意终点留下标记；两次结果齐后比较较远位置；示意不当测量。",
+      "assetKeys": [
+        "ball-lab"
+      ]
+    },
+    {
+      "page": 7,
+      "id": "p07",
+      "type": "quiz",
+      "title": "观察与滚球小检查",
+      "play": "全新情境图片选项，科学教师逐题配音，六题A、B、C各两次。",
+      "assetKeys": [
+        "guess",
+        "leave",
+        "quiz-high",
+        "quiz-low",
+        "quiz-mid",
+        "shell-observe"
+      ]
+    },
+    {
+      "page": 8,
+      "id": "p08",
+      "type": "slide",
+      "title": "换一种球，怎样比",
+      "play": "教师逐项聚光讲解。",
+      "assetKeys": [
+        "ball-lab"
+      ]
+    },
+    {
+      "page": 9,
+      "id": "p09",
+      "type": "interactive",
+      "title": "搭好比较实验",
+      "play": "钢球已在一个起点，把同大小木球拖到相同起点；第二关换钢球起点；只检查公平摆法，不捏造材质远近。",
+      "assetKeys": [
+        "ball-lab"
+      ]
+    },
+    {
+      "page": 10,
+      "id": "p10",
+      "type": "slide",
+      "title": "他们研究不同的世界",
+      "play": "教师逐项聚光讲解。",
+      "assetKeys": [
+        "animal-work",
+        "rock-work"
+      ]
+    },
+    {
+      "page": 11,
+      "id": "p11",
+      "type": "interactive",
+      "title": "把研究对象送到观察站",
+      "play": "白兔、稻穗、月亮图片拖到动物、植物、天文研究站，实物图片进入记录槽；支持点击代替拖动。",
+      "assetKeys": [
+        "animal-work",
+        "moon",
+        "plant-work",
+        "rabbit",
+        "rice",
+        "star-work",
+        "station"
+      ]
+    },
+    {
+      "page": 12,
+      "id": "p12",
+      "type": "quiz",
+      "title": "像科学家一样想一想",
+      "play": "全新情境图片选项，科学教师逐题配音，六题A、B、C各两次。",
+      "assetKeys": [
+        "guess",
+        "leave",
+        "plant-work",
+        "quiz-fair",
+        "quiz-height-mixed",
+        "quiz-size-mixed",
+        "sea-work",
+        "squirrel-record",
+        "squirrel-watch",
+        "star-work"
+      ]
+    },
+    {
+      "page": 13,
+      "id": "p13",
+      "type": "slide",
+      "title": "把好奇带到公园",
+      "play": "教师逐项聚光讲解。",
+      "assetKeys": [
+        "sparrow-watch"
+      ]
+    },
+    {
+      "page": 14,
+      "id": "p14",
+      "type": "slide",
+      "title": "我的科学第一步",
+      "play": "教师逐项聚光讲解。",
+      "assetKeys": []
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "id": "little-scientist-q1",
+      "pageId": "p07",
+      "skill": "通过观察寻找问题答案",
+      "scenario": "想知道贝壳表面的花纹，哪幅画在寻找线索？",
+      "availablePictureChoices": {
+        "A": {
+          "assetKey": "guess",
+          "meaning": "闭眼想象"
+        },
+        "B": {
+          "assetKey": "shell-observe",
+          "meaning": "仔细查看贝壳"
+        },
+        "C": {
+          "assetKey": "leave",
+          "meaning": "背对物体离开"
+        }
+      },
+      "correctSlot": "B",
+      "explanationPoint": "对着贝壳仔细查看，才能看到它表面的真实花纹。闭眼猜和走开都没有查看贝壳。"
+    },
+    {
+      "id": "little-scientist-q2",
+      "pageId": "p07",
+      "skill": "同一条件下比较滚球释放起点",
+      "scenario": "同一小球想滚远些，先从哪个起点放手？",
+      "availablePictureChoices": {
+        "A": {
+          "assetKey": "quiz-high",
+          "meaning": "较高起点"
+        },
+        "B": {
+          "assetKey": "quiz-low",
+          "meaning": "较低起点"
+        },
+        "C": {
+          "assetKey": "quiz-mid",
+          "meaning": "中间起点"
+        }
+      },
+      "correctSlot": "A",
+      "explanationPoint": "保持同一球、同一斜轨和地面，只改变起点。本课实验中，从较高起点放手，小球滚得较远。图片为条件示意，真实距离需观察。"
+    },
+    {
+      "id": "little-scientist-q3",
+      "pageId": "p12",
+      "skill": "控制滚球比较实验的其他条件",
+      "scenario": "比较木球和钢球，哪幅图的大小和起点都相同？",
+      "availablePictureChoices": {
+        "A": {
+          "assetKey": "quiz-height-mixed",
+          "meaning": "起点不同"
+        },
+        "B": {
+          "assetKey": "quiz-size-mixed",
+          "meaning": "球的大小不同"
+        },
+        "C": {
+          "assetKey": "quiz-fair",
+          "meaning": "同大小同起点"
+        }
+      },
+      "correctSlot": "C",
+      "explanationPoint": "只比较材质时，球的大小与释放起点都保持相同。另一幅同时改变起点，另一幅同时改变球的大小，不能只归因于材质。"
+    },
+    {
+      "id": "little-scientist-q4",
+      "pageId": "p12",
+      "skill": "举例说明科学家有不同研究方面",
+      "scenario": "小舟想研究海里的动物，应找哪位研究者？",
+      "availablePictureChoices": {
+        "A": {
+          "assetKey": "star-work",
+          "meaning": "研究星空"
+        },
+        "B": {
+          "assetKey": "sea-work",
+          "meaning": "研究海中动物"
+        },
+        "C": {
+          "assetKey": "plant-work",
+          "meaning": "研究田中植物"
+        }
+      },
+      "correctSlot": "B",
+      "explanationPoint": "研究海中动物，可以到安全的海边观察它们。研究天空和田中植物的科学家关注的对象不同，说明研究方面很多。"
+    },
+    {
+      "id": "little-scientist-q5",
+      "pageId": "p12",
+      "skill": "把观察方法迁移到新的研究对象",
+      "scenario": "想知道松鼠怎样活动，哪幅画在寻找真实线索？",
+      "availablePictureChoices": {
+        "A": {
+          "assetKey": "guess",
+          "meaning": "只闭眼想"
+        },
+        "B": {
+          "assetKey": "leave",
+          "meaning": "直接走开"
+        },
+        "C": {
+          "assetKey": "squirrel-watch",
+          "meaning": "安静观察松鼠"
+        }
+      },
+      "correctSlot": "C",
+      "explanationPoint": "在大人陪同下安静观察松鼠，才能收集它真实活动的线索。只闭眼想或直接离开，都没有完成观察。"
+    },
+    {
+      "id": "little-scientist-q6",
+      "pageId": "p12",
+      "skill": "用记录保存实际观察发现",
+      "scenario": "看到了松鼠跳向树枝，哪幅画是在留下记录？",
+      "availablePictureChoices": {
+        "A": {
+          "assetKey": "squirrel-record",
+          "meaning": "把看到的活动画下"
+        },
+        "B": {
+          "assetKey": "guess",
+          "meaning": "闭眼继续猜"
+        },
+        "C": {
+          "assetKey": "leave",
+          "meaning": "直接离开"
+        }
+      },
+      "correctSlot": "A",
+      "explanationPoint": "把实际看到的松鼠活动画下来，可以留下观察记录。猜想不是已经看到的发现，离开也没有留下记录。"
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "station",
+      "imageSha256": "d2a75365efa69fb62d7909bfc549e58cd6f3e0afb3329aeb71537e034a5cee4c",
+      "pages": [
+        "p01",
+        "p03",
+        "p11"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "16:9",
+      "purpose": "一个安全科学观察角，短发女孩拿放大镜观察桌上叶片，旁边有稳固低矮滚球斜坡和大号球，窗外树木与天空，画面安静、明亮、清楚；桌上不放化学药品。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "leaf",
+      "imageSha256": "d0a0aebc4d2167dbb5507272963eb0e6bb3125c68fe927457dad33ad51711680",
+      "pages": [
+        "p03"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一片完整宽大的绿色银杏叶及叶柄，叶缘与放射叶脉清楚，白底占画面75%。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "insect",
+      "imageSha256": "14c826ebc4ca6f4bcab7b7cea80dc97ce7c4d7eaa9d25453e0515358422f1632",
+      "pages": [
+        "p03",
+        "p04"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一只自然真实结构的七星瓢虫停在绿色叶子上，六条腿、两根触角清楚，白底，近景但不夸张拟人。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "observe",
+      "imageSha256": "b848a03dcb49d6254c20e869099d67fa5465cf121c62f181005b51650bed2cda",
+      "pages": [
+        "p02",
+        "p03"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一个短发小女孩在桌前拿放大镜仔细查看桌上的叶片，眼睛睁开注视透镜后的叶片，动作与工具一看就懂。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "guess",
+      "imageSha256": "ce3d2ae5c1d9843f5be72a94050ba76dfa340e5d8268102af83dc41e1a9c145a",
+      "pages": [
+        "p03",
+        "p07",
+        "p12"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一个短发小女孩坐在同一张桌前双眼紧闭，双手轻贴太阳穴凭空想象，桌上叶片未被查看；不要任何想象气泡或文字。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "leave",
+      "imageSha256": "6d160535e7671494f22bc733c46776bd3ca1a15762eda0e152ec3d5d9adea944",
+      "pages": [
+        "p03",
+        "p07",
+        "p12"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "同一个短发小女孩背对桌上的叶片，正走向远处门口，叶片留在桌面未被观察；完整动作清楚。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "ball-lab",
+      "imageSha256": "ac4293dbe66cc05dae24740616ad95c091241d8a238a2d32fd48d9b735ac9ae9",
+      "pages": [
+        "p04",
+        "p05",
+        "p06",
+        "p08",
+        "p09"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "16:9",
+      "purpose": "稳固桌面上的简易小球实验装置：一条低矮灰绿色光滑斜轨平顺接到水平长轨，轨道有侧边挡板，一个直径约六厘米橙色球在斜轨上，终点有接球盒；旁边一位成人陪同儿童，手不推球。侧面视角，非危险高速游戏。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "animal-work",
+      "imageSha256": "c86ef43d95ab4a4de8b9475a1caad7245c3f1b4c213ea465f5178e792cc594b7",
+      "pages": [
+        "p10",
+        "p11"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一位成年女性动物研究者隔一段距离用望远镜观察草地上的白兔，膝上画本有无字的兔子轮廓记录，兔子自由活动、不接触不惊吓。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "plant-work",
+      "imageSha256": "2739e5c173b40c5b533ff70f39a5c31b4150c9c643db25d643bcb7d3a31b012e",
+      "pages": [
+        "p11",
+        "p12"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一位成年男性植物研究者在绿色稻田中仔细观察饱满稻穗，手拿放大镜和无字记录本，稻穗一看可辨认。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "star-work",
+      "imageSha256": "d90b63b6023dd70037b5e95d3306d683e650d7c3a0e2254e25bda49488ad0e69",
+      "pages": [
+        "p11",
+        "p12"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一位成年女性研究者在夜间通过一架明确朝向星空的大型天文望远镜观察天空，繁星与月亮可见，望远镜不指向太阳。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "rabbit",
+      "imageSha256": "65ec73fe068aab80d810263936c46536a2b9eca7a647bfc9ac4763d2a560f908",
+      "pages": [
+        "p11"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一只完整自然比例的白兔静静在草地上，长耳、四肢清楚，整体白色背景。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "rice",
+      "imageSha256": "ad1802404e1069a205840e67b3059161885b1a616c8410e909d1bc27c8f063f6",
+      "pages": [
+        "p11"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一簇完整稻穗，成熟金色谷粒与细长绿色叶片连接清楚，自然科学绘本植物图。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "moon",
+      "imageSha256": "f02d20f9c5c5c2db7f08dc2bc51a6e9a5628d0fe13695c1cde6dd54e77047230",
+      "pages": [
+        "p11"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "夜空里一轮有自然月面纹理的圆月，四周几颗小星星，主体清楚，不画人的脸或其他天体。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "rock-work",
+      "imageSha256": "1a1226d4ab8db87757a9ef66e05fcba89f28bf5a8800ab0a3c9bc9fe71bc07ba",
+      "pages": [
+        "p10"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "16:9",
+      "purpose": "一位成年地质研究者戴安全帽在安全平坦的岩石露头旁使用放大镜查看石块，手边无字记录本，不出现喷发火山、悬崖或危险动作。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "shell-observe",
+      "imageSha256": "6a2f2256fca1db2ea4e29c6b18815bdb23a8175899706f5031a4124d2dea8575",
+      "pages": [
+        "p07"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "与课堂女孩不同的卷发男孩，在桌前拿放大镜仔细观察一枚完整扇贝壳，贝壳花纹清楚，眼睛睁开看实物。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "sparrow-watch",
+      "imageSha256": "9471c7ca4128b990b937149b2b187a043dba5582f9012a66c3870d1d1b6be79e",
+      "pages": [
+        "p13"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "16:9",
+      "purpose": "一个女孩和一位家长在公园小路上远远蹲着安静观察地上麻雀，女孩拿无字画本，麻雀完整可辨认，没有追赶、捕捉或喂食，场景安全。原创统一的儿童科学绘本插图，温暖奶油白背景、森林绿与陶土橙点缀，清楚自然的形体，简洁但不是图标，主体完整不裁切，无文字、无数字、无箭头、无水印。所有人物约六至七岁儿童或成年研究者，表情自然，不使用表情符号。"
+    },
+    {
+      "assetKey": "sea-work",
+      "imageSha256": "42fdb9a7e7bc4be27bdc58498f2ee5ff4bffd73196b8989af7c45411c1d182a5",
+      "pages": [
+        "p12"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一位海洋生物研究者在海边安全观测站拿望远镜观察近海的海龟，旁有无字海龟图画记录本；研究者在陆地栏杆内，海龟自然游动，画面明确表现研究海中生物。原创统一儿童科学绘本，奶油白背景、森林绿和陶土橙，清楚自然形体，主体完整，非图标，无文字数字箭头和水印。"
+    },
+    {
+      "assetKey": "squirrel-watch",
+      "imageSha256": "ad07061643facc2b948bbe8ed77d95a01e562a5826703a14d44b29c6610e15ca",
+      "pages": [
+        "p12"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一个卷发男孩和家长在公园远处安静观察树下自然活动的松鼠，男孩持无字画本，完整松鼠和尾巴清楚可辨，不追赶不喂食。原创统一儿童科学绘本，奶油白背景、森林绿和陶土橙，清楚自然形体，主体完整，非图标，无文字数字箭头和水印。"
+    },
+    {
+      "assetKey": "squirrel-record",
+      "imageSha256": "5079f3e03ee7ef7bef45494ef95010f819d6edd8c6cafc03664d2e2ba49dea68",
+      "pages": [
+        "p12"
+      ],
+      "kind": "existing-verified-illustration",
+      "aspect": "1:1",
+      "purpose": "一张桌上打开的儿童观察本，页面清楚画着松鼠从地面跳向低树枝的连续两幅简单科学绘画，旁边蜡笔，没有文字、数字或字母；主体是记录真实观察的画本。原创统一儿童科学绘本，奶油白背景、森林绿和陶土橙，清楚自然形体，主体完整，非图标，无文字数字箭头和水印。"
+    },
+    {
+      "assetKey": "quiz-high",
+      "imageSha256": "dfb9ec57054efa1e21eed07940ae0211387fc1b6929df3a301d649575393a706",
+      "pages": [
+        "p07"
+      ],
+      "kind": "precise-semantic-diagram",
+      "purpose": "同一坡面，等大小橙球在较高释放位置。",
+      "svgSha256": "69224edade24ec0a6fcd87af32977e5459326cbcbdf54e0ac284f52f95ab8d97"
+    },
+    {
+      "assetKey": "quiz-mid",
+      "imageSha256": "ad9a1012418383e80803771b4165f6a0a85231d44e7edb018311d2eff40fbf26",
+      "pages": [
+        "p07"
+      ],
+      "kind": "precise-semantic-diagram",
+      "purpose": "同一坡面，等大小橙球在居中释放位置。",
+      "svgSha256": "87b5c46e8e103408f02c70487eab123f7b2ad57f62a2f087fc2d228ab7cb326d"
+    },
+    {
+      "assetKey": "quiz-low",
+      "imageSha256": "0344e81cb616cd23153fb8150fd1a4cf7d3e00efdfefb1be9524465e36d3b708",
+      "pages": [
+        "p07"
+      ],
+      "kind": "precise-semantic-diagram",
+      "purpose": "同一坡面，等大小橙球在较低释放位置。",
+      "svgSha256": "50375c75872b652b737714929b48042245581947d4b913c98ffe21e710cd51b6"
+    },
+    {
+      "assetKey": "quiz-fair",
+      "imageSha256": "fd22ad81fe7afba03975be1091662cbf3b4af0802dac571e69aa738927207d3a",
+      "pages": [
+        "p12"
+      ],
+      "kind": "precise-semantic-diagram",
+      "purpose": "上下同样斜轨，木球和钢球大小相同，两个球在各自斜轨的对应释放位置。",
+      "svgSha256": "e8e542b40d3e085c8d0d317378e17be1cb23aa901de60402bf56a6e3a400d0b3"
+    },
+    {
+      "assetKey": "quiz-height-mixed",
+      "imageSha256": "e7a107113050db84470748323e248793c7844b70870d69ef9d233c92bbf630aa",
+      "pages": [
+        "p12"
+      ],
+      "kind": "precise-semantic-diagram",
+      "purpose": "上下同样斜轨，木球和钢球大小相同，但释放位置不同。",
+      "svgSha256": "d2cde97286b654bc69d1abc10ff2862a56b40f111dec49070e55879f49352eda"
+    },
+    {
+      "assetKey": "quiz-size-mixed",
+      "imageSha256": "aa6476f50340d6a57a0601c6f1ab6cbd881747435a8834f52e89ac3432e4ddd4",
+      "pages": [
+        "p12"
+      ],
+      "kind": "precise-semantic-diagram",
+      "purpose": "上下同样斜轨，木球和钢球大小不同。",
+      "svgSha256": "21aa305413043e624f72f929c78d918f91f6dced1fdedd48a68366a75ffb7864"
+    }
+  ],
+  "teachingFacts": {
+    "keyPoint": "知道科学家通过观察、实验寻找问题答案，并能举出不同研究方面的例子。",
+    "difficultPoint": "通过滚球实践认识自己也能像科学家一样研究，分清比较时改变的条件与保持相同的条件，依据观察留下记录。",
+    "sources": {
+      "teachingDesign": [
+        "第1页：教材为江苏凤凰教育出版社2024年7月《科学一年级上册》；目标包括回忆科学活动、科学家通过观察实验找答案、不同研究领域、做滚球实验、重视好奇心；重点为科学家工作，难点为滚球后认识自己也能做科学。日常活动引入后以法布尔、李时珍、李四光、牛顿等例子说明好奇并寻求答案。",
+        "第2页：先介绍伽利略滚球实验。实验一在不同高度滚同一小球，归纳起点越高滚得越远。实验二从同一高度滚大小相同的钢球、木球，仅要求交流发现，没有预设哪种材质一定更远的答案。再认识不同研究领域，交流自己的研究兴趣。",
+        "第3页：总结保持好奇、努力寻找答案；课后观察麻雀的行走方式是否与人相同，选择研究方法并记录真实发现。"
+      ],
+      "courseware": [
+        "第1页：苏教版一年级科学《小小科学家》，授课陈颖琪；第19页制作单位江苏凤凰教育出版社。",
+        "第2页：完整单课分科学是什么、学做科学家、不同类型科学家三部分；不拆成多个上架课件。",
+        "第3页：儿童用放大镜观察草地、看花、做液体活动、用望远镜看星空的情境；第4页请回忆幼儿园或家中类似活动。",
+        "第5页：日常活动背后的好奇；第6页：从问题走向寻找答案；第7页引出科学。",
+        "第8页：法布尔与昆虫研究的示意，文字说明法国昆虫学家及科普作家；第9页将法布尔观察蚂蚁与李时珍观察植物并置。原创课不扩写未阅读视频中的故事。",
+        "第10页：李四光对大石头来源、牛顿对苹果落下和月亮的疑问作为好奇的例子。原图为教学故事示意，不把故事插图当作已验证历史细节，也不在新课扩讲引力理论。",
+        "第11页：伽利略在斜面做滚球实验，研究小球越滚越快的现象；第12页展示钢球、斜坡、记录距离的地面布。",
+        "第13页：同一球在不同起点滚动的装置示意；第14页增加大小相同的木球和钢球；第15页比较不同材质的滚球装置。静态页不提供可重解的材质远近统一结论。",
+        "第16页：科学家研究动物、稻作、火山岩石、天文等领域；第17页归纳研究方面多样并请孩子说兴趣。",
+        "第18页：课后观察麻雀行走方法是否与人相同，记录研究方法和发现。"
+      ],
+      "learningTaskSheet": [
+        "第1页：同版本教材与2024年7月出版信息；目标为观察实验找答案、不同科学领域、滚球发现。课前了解熟悉的科学家及工作，回忆研究活动。课上按认识科学、滚球实验、不同科学家三任务展开。推荐阅读《想了十万次的科学》，本课未取得该书内容，不引用或声称读过。"
+      ],
+      "afterClassExercise": [
+        "第1页：唯一练习为麻雀与人行走方式是否相同；课后观察探究，用喜欢的方式记录方法和发现。不是背诵固定麻雀行走答案；本课用新的观察计划图帮助准备，实际观察、口述、绘画均由大人观察，不计为屏幕已掌握。"
+      ]
+    },
+    "afterClass": {
+      "official": [
+        "教学设计第3页、课件第18页、课后练习第1页：观察麻雀与人的行走方法，记录研究方法与实际发现。",
+        "任务单第1页：做滚球实验，了解不同研究领域。"
+      ],
+      "inLesson": "知识图示帮助比较起点，配对检查实验摆法；真实滚球、麻雀行走、孩子口述及绘画由大人观察，不用屏幕得分替代。",
+      "weekly": "提供提出问题、观察找答案、同球不同起点、同起点比较材质、不同研究方面、真实记录等题源；采用本课未用的新对象和新装置，不单独造周测。"
+    }
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  }
+}

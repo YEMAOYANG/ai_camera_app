@@ -1,0 +1,92 @@
+#flight-field {
+  position: absolute;
+  inset: 4px 38px 6px;
+  border: 3px solid #b0c6a3;
+  border-radius: 38px;
+  background: linear-gradient(#edf7e2 0%, #edf7e2 47%, #dcebc8 47%, #dcebc8 100%);
+}
+#far-pattern {
+  position: absolute;
+  left: 402px;
+  top: 55px;
+  width: 350px;
+  color: #285d44;
+  text-align: center;
+  font-size: 58px;
+  font-weight: 800;
+}
+.bird-choice {
+  position: absolute;
+  top: 30px;
+  width: 240px;
+  height: 228px;
+  border: 4px solid #a1bd92;
+  border-radius: 30px;
+  background: #fffdf3;
+  box-shadow: 0 6px 0 #aab893;
+  cursor: pointer;
+}
+.bird-choice:focus-visible { outline: 5px solid #286e9b; outline-offset: 5px; }
+.bird-choice[disabled] { cursor: default; }
+.bird-choice.chosen { border-color: #388758; background: #e8f2dc; }
+#post-left { left: 83px; }
+#post-right { right: 83px; }
+#walking-trail {
+  position: absolute;
+  left: 88px;
+  right: 88px;
+  top: 378px;
+  height: 90px;
+  border: 4px solid #c3ac75;
+  border-radius: 45px;
+  background: #ead6a9;
+}
+#station-guide {
+  position: absolute;
+  left: 121px;
+  top: 327px;
+  width: 164px;
+  height: 164px;
+  border: 4px solid #63795a;
+  border-radius: 50%;
+  background: #fffbef;
+  box-shadow: 0 5px 0 #839e73;
+  transition: left .32s ease;
+}
+#station-guide.station-right { left: 865px; }
+#station-guide img { border-radius: 50%; }
+#station-guide.station-right img { transform: scaleX(-1); }
+#sighting-card {
+  position: absolute;
+  left: 498px;
+  top: 276px;
+  width: 158px;
+  height: 108px;
+  border: 4px dashed #7b9b72;
+  border-radius: 20px;
+  background: #f1f7e5;
+}
+#sighting-card.stored { border: 4px solid #388758; }
+.bird-choice img, #station-guide img, #sighting-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.bird-choice img, #sighting-card img { border-radius: 18px; }
+.picture-fallback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  place-items: center;
+  color: #365344;
+  font-size: 28px;
+  font-weight: 700;
+}
+.image-unavailable .picture-fallback { display: grid; }
+.image-unavailable img { visibility: hidden; }
+#sighting-card:not(.stored) img, #sighting-card:not(.stored) .picture-fallback { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  #station-guide { transition: none; }
+  .bird-choice { animation: none !important; }
+}

@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "cast": {
+    "teacher": "science / 小科老师 / female / Serena"
+  },
+  "style": {
+    "canvas": [
+      1280,
+      720
+    ],
+    "palette": [
+      "#FFFDF6",
+      "#EAF3DF",
+      "#439B87",
+      "#E8C48F"
+    ],
+    "illustrations": "pictures.json登记的原创科学插画，保持同一套视觉风格；普通物体不用手画占位。",
+    "text": "操作目标为图片，界面图标为辅助；语音承载任务。"
+  },
+  "pages": {
+    "surface-lab": {
+      "scene": "p03",
+      "mechanism": "拖吸管换四种物体；每种出现接触泡泡示意并收集观察。",
+      "teacherTargets": [
+        "#station-water",
+        "#lab-straw",
+        "#station-table"
+      ],
+      "stateKeys": [
+        "demoStation"
+      ],
+      "completion": "table/cloth/ball/water各至少访问一次；同一站重复不加星。",
+      "observationBoundary": "示意不编码固定保留时间，不能推定真实实验完成。"
+    },
+    "nested-lab": {
+      "scene": "p06",
+      "mechanism": "先润湿→大泡泡→管口进入内部留间隔；顺序或边缘错误不推进。",
+      "teacherTargets": [
+        "#nested-wet",
+        "#nested-inner"
+      ],
+      "stateKeys": [
+        "demoStep"
+      ],
+      "completion": "按wet→table→inner顺序完成；所有跨步操作无效。",
+      "observationBoundary": "只检查顺序与示意位置，真实吹泡泡待观察。"
+    },
+    "wind-lab": {
+      "scene": "p09",
+      "mechanism": "看这一阵风的方向，把泡泡拖到预测位置；正确才演示随风移动。",
+      "teacherTargets": [
+        "#wind-ribbon",
+        "#wind-bubble",
+        "#wind-left"
+      ],
+      "stateKeys": [
+        "demoDirection"
+      ],
+      "completion": "右、左、右三次独立预测完成；演示不计入成绩。",
+      "observationBoundary": "一阵风的简化示意，不表示真实天气总相同。"
+    },
+    "tool-lab": {
+      "scene": "p10",
+      "mechanism": "工具先蘸液再轻挥，留工具而释放球状泡泡；换两种工具比较。",
+      "teacherTargets": [
+        "#tool-tray",
+        "#tool-air",
+        "#tool-round"
+      ],
+      "stateKeys": [
+        "demoTool",
+        "demoReleased"
+      ],
+      "completion": "两种不同工具都先蘸液后释放；重复工具不重复计分。",
+      "observationBoundary": "比较一般情况球状，不教表面张力原理。"
+    }
+  },
+  "acceptance": {
+    "firstMiss": "先给观察或顺序线索，不自动完成，不直接报坐标。",
+    "replay": "清空分数、已访问站、泡泡、蘸液状态和定时器；可再次完整通关。",
+    "imagesFailure": "出现圆箭头重新加载，不将替代图当正式教学证据。",
+    "pendingExternal": [
+      "registered Serena narration audio and listening review, including six quiz prompts",
+      "rerun G6 on the final body with narration bound",
+      "independent textbook and item review",
+      "G0-G8 publication",
+      "registered archive and student acceptance"
+    ],
+    "offlinePreviewBodySha256": "1b30f52e8e8e8d3f9d15a7137e34a7eda403bc7f5b3e461a755b2a84f907e752",
+    "offlinePreviewEvidence": "work/visual-review.json"
+  },
+  "nativeAdaptation": {
+    "jobId": "T4A3P23Ifh",
+    "classroomId": "IQ7ZHvvAWl",
+    "rawSha256": "14513d61b2ae4ceb28bb9577ba4386e456ee264f32c79c65fccb9e0c95561f12",
+    "inputSha256": "2690884617d81eb9d2a9e1a29e7d2c985cb854164ad18b6bdd5f07d2777ccf98",
+    "priorLocalDraftSha256": "4b05fe17c292308f85c1b8e911348f94ace2347d1dde2812662f5e4a392436cb",
+    "adaptedLessonSha256": "3324fe6c05259bc2bc8fc5e3dca3ff17e6fb08b5466005f58b478fe899ca50cf",
+    "sceneBindings": {
+      "p01": "scene_DDQ5IqixGm",
+      "p02": "scene_-9h9E6G4y5",
+      "p03": "scene_OpSmpGmn6q",
+      "p04": "scene_6AROG2xZRB",
+      "p05": "scene_ZC5TWuVRcB",
+      "p06": "scene_I1aO5hy9om",
+      "p07": "scene_ChVvfeMFwf",
+      "p08": "scene_u4tofAGhW3",
+      "p09": "scene_pplSivFx2W",
+      "p10": "scene_Uypto5aQ_f",
+      "p11": "scene_ze--q77ZBB",
+      "p12": "scene_F-ANhN-p_Z"
+    },
+    "corrections": [
+      "回到五四课时的桌面、布面、水面和球面四个观察位置。",
+      "将飘带来向误说改为飘向，限定为图中这一阵风。",
+      "将套泡泡滑条改为先湿桌面、先大后小并留间隔的示意操作。",
+      "将绝对圆形结论改为通常球状，家庭真实操作待观察。",
+      "原生小检查有重复题号和多集中于A的答案，改成三组六题，使用本课已审图和精确图示。"
+    ],
+    "assetRegistration": {
+      "historicalRequests": "pictures.json",
+      "currentAssets": "lesson.json images",
+      "reusedReviewed": [
+        "bubble-dome",
+        "bubble-sphere",
+        "hero",
+        "nested-scene",
+        "outdoor-scene",
+        "quiz-burst",
+        "quiz-diamond-tool",
+        "quiz-face",
+        "quiz-film-cube",
+        "quiz-film-star",
+        "quiz-first-big",
+        "quiz-first-small",
+        "quiz-first-two",
+        "quiz-nested-gap",
+        "quiz-nested-outside",
+        "quiz-safe",
+        "quiz-see-leaf",
+        "quiz-spill",
+        "straw",
+        "surface-ball",
+        "surface-cloth",
+        "surface-table",
+        "surface-water",
+        "tool-round",
+        "tool-square"
+      ],
+      "codeDiagrams": [
+        "diagram-nested-touch",
+        "diagram-wind-left",
+        "diagram-wind-right",
+        "diagram-wind-still"
+      ]
+    },
+    "adaptedInteractiveFilesSha256": {
+      "pages/nested-lab.css": "063bf7045d7f6f406fabdda1e35858d33cd4a4968450798b78998b0cee38ebcb",
+      "pages/nested-lab.html": "f8c3a6c13156a3b6f4b39436057fbeb7a016f4a8bd438b712b751bc0c5d1da27",
+      "pages/nested-lab.js": "ca15967e04e3fdaaa0ff726a7d96ab0108257e63021fcc80aea67c54ff571b68",
+      "pages/surface-lab.css": "9f7a60d91559cc8f6bc39cf34053ddcfe528cb0e94e538580ca29ddeeed36d04",
+      "pages/surface-lab.html": "3f9ba7abba96e75a4954430532ff0103dc4daa06e9a956ee2b39d96159eb5b18",
+      "pages/surface-lab.js": "fc785b94c6ff759c12d11df79ebc4cea530c09391da2396ccceecce62934473c",
+      "pages/tool-lab.css": "15c601dd6f9d60db5aab476ca8172d731cab53a384cbee0bf3979bd6b03cbb76",
+      "pages/tool-lab.html": "05ddec0cb4aea50da649eb560199d7ff029287dd048b260d9976e71a490d8ca3",
+      "pages/tool-lab.js": "2e474a43dfe40959ebe736e31e72066e838586977011ebc1ce0a024196d6db86",
+      "pages/wind-lab.css": "0ef47fe9baa5cfd6a704e933b8d177353b0e206ea2f40e71b26f1f279dd5df3d",
+      "pages/wind-lab.html": "cdfc62e477cfcda11346890722a4d70a6d91b0423bb951287935d77d909adc88",
+      "pages/wind-lab.js": "0adc5bff3d3f77e7bde7b0502863e76ffb594188530ed47d7fc47024cab50561"
+    }
+  }
+}

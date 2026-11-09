@@ -1,0 +1,522 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "818460d8-dfb3-4560-84ad-ab4f35870e73",
+    "lessonTitle": "10 古诗二首",
+    "gradeCode": "primary_1",
+    "subject": "chinese",
+    "volume": "lower",
+    "classHours": [
+      "national-1",
+      "national-2"
+    ],
+    "classHour": "complete",
+    "teachingRevision": "1",
+    "coveredNodeIds": [
+      "818460d8-dfb3-4560-84ad-ab4f35870e73",
+      "6077ad88-ec67-406a-bc1e-21ebe35114ef"
+    ],
+    "canonicalDeliveryNodeId": "818460d8-dfb3-4560-84ad-ab4f35870e73",
+    "directoryAliasNodeIds": [
+      "6077ad88-ec67-406a-bc1e-21ebe35114ef"
+    ],
+    "officialParentNodeId": "b674791a-777f-4797-8fc0-f234b7078eca",
+    "unitId": "2a9f8ec3-0486-4664-9478-9ace5cebb956",
+    "officialActivityId": "cf199129-93a8-8fe2-006c-d697783b1605",
+    "officialMaterialId": "2d22a5c9-80b8-46cb-8595-564f5c368f3e",
+    "officialTextbookResourceId": "b87e153f-a64c-451a-aa6c-6ed9ac7d6821",
+    "printedPages": [
+      61,
+      62,
+      63
+    ],
+    "schoolSystem": "six_year",
+    "publisher": "人民教育出版社",
+    "slug": "g1-chinese-11902376dc966de3",
+    "supportingReviewedHours": [
+      {
+        "id": "elite-1",
+        "activityId": "d8a4c232-00e9-bea7-3aa0-9c5448dbea5a",
+        "title": "池上 第1课时"
+      },
+      {
+        "id": "elite-xiaochi-1",
+        "activityId": "cad3acc4-c203-0d03-5233-5c6f2ebca75a",
+        "title": "小池 精品课 第1课时"
+      }
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "81041460a26fb2013376ec7f91a6880fbf589be0d2773a7355070f7c9bf66176",
+    "officialManifestSha256": "c166b1377109ddcc135dd4c3e54e6fd7066f50b58c60a04a7b4c6b4980c11426",
+    "briefSha256": "c240a82e6e41703e0037e403aed908a2c291f88c83b9116f53d4c8846b746941",
+    "catalogManifestSha256": "87750a784e70233d4c6024027d172c51d5c37d246f32ca68d797bc87aaa48dfd",
+    "picturePlanSha256": "79d8d8481deebd48ee68f7f7b6ff3c94eadf20bf955919051261efe81904985e"
+  },
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "coveredOfficialHours": [
+      "national-1",
+      "national-2"
+    ],
+    "videoStatus": "waived-per-standard",
+    "objectives": [
+      "借助听读、图画和语境认识诗、首、偷、浮、萍，联系一首诗、悄悄采、漂浮的水草理解字词。",
+      "正确、流利地朗读池上，按每行前二字后三字读好停顿，借图复述画面并尝试背诵。实际朗读和背诵待成人观察。",
+      "理解撑小艇、偷采白莲、不解藏踪迹、浮萍一道开，联系生活理解撑、采、踪迹和浮，体会小娃的天真顽皮。",
+      "观察首、池、采的字形、部件与格中位置，进行纸笔练写。不据点击认定会写，规范和笔顺待成人观察。",
+      "借助图画和语境认识泉、惜、照、柔、荷、露、角，理解泉眼、细流、树阴、晴柔和才露尖尖角。",
+      "按二二三停顿正确流利朗读小池，借四种景物背诵并说出诗句画面；朗读背诵和口述待成人观察。",
+      "从泉眼惜细流、树阴爱晴柔、蜻蜓早已立在小荷尖上，体会初夏小池的生机与诗人对自然的喜爱；知道惜和爱是像写人一样写景物。",
+      "观察尖、角、早的结构和田字格中位置，纸笔仿写后对照修改；书写规范与笔顺待成人观察。"
+    ],
+    "excludedTopics": [
+      "画面、教学台词和题目原创；古诗原文为公版教学目标文本。",
+      "不把诗中情节当成现实独自下水或取物的操作任务。",
+      "不讲未经核对的完整笔顺、白莲采收部位或诗人生平逸闻。",
+      "选择只记录选择证据；朗读背诵口述纸笔质量为待观察。",
+      "不继承旧课G7豁免。"
+    ]
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  },
+  "qualityRules": [
+    "小语老师。对一年级学生先看图，再听讲和指图，单屏一项任务。遮住非目标文字仍能玩；读音可用简体中文说声调，带调拼音只放画面。",
+    "讲解页用1000×562.5画布，至少6句和100字；互动用1280×720，至少5句和90字。所有讲述先点亮对应对象，每互动至少三次可见教师操作。句子以30字以内为目标，超过40字不可用。",
+    "互动需封面、开始、可见进度、错误线索及重试、通关及复位。儿童操作改变真实画面。教师示范不记儿童奖励、动作或答案。",
+    "小检查合计五题，逐题三幅已登记图片。每个单选题的 answer 为仅含一个真实 option id 的数组。问题、图片、解析一致；使用 skill 和位置分散的答案。题干与解析重新创作，解析只讲题图能判定的事实。",
+    "课件中文用简体。无外链、讨论或浏览器机械语音。图片仅引用已有素材标识。后续使用 Qwen Serena 录制。真实朗读背诵、复述与纸笔书写待成人观察。"
+  ],
+  "pagePlan": [
+    {
+      "type": "slide",
+      "hours": [
+        "national-1",
+        "national-2"
+      ],
+      "goal": "引入两首诗。同是初夏水边，第一首观察小娃，第二首观察景物。",
+      "assets": [
+        "boat",
+        "small-pond"
+      ]
+    },
+    {
+      "type": "slide",
+      "hours": [
+        "national-1"
+      ],
+      "goal": "先看图，再听辨并读准诗、首、偷、浮、萍；联系一首诗、悄悄、漂浮的水草。",
+      "assets": [
+        "boat",
+        "duckweed"
+      ]
+    },
+    {
+      "type": "interactive",
+      "hours": [
+        "national-1"
+      ],
+      "goal": "让撑竿推动小艇、靠近目标和采莲后返回产生可见状态变化。先教师示范后儿童重做。",
+      "assets": [
+        "boat"
+      ]
+    },
+    {
+      "type": "interactive",
+      "hours": [
+        "national-1"
+      ],
+      "goal": "小艇经过后浮萍向两侧分开，观察水道并从撑船人物和水道中指出踪迹。错答给观察线索再试。",
+      "assets": [
+        "boat",
+        "duckweed"
+      ]
+    },
+    {
+      "type": "slide",
+      "hours": [
+        "national-1"
+      ],
+      "goal": "按诗句顺序听读全诗；二三轻停，理解不解和踪迹，借画面复述和背诵。",
+      "assets": [
+        "boat",
+        "duckweed"
+      ]
+    },
+    {
+      "type": "slide",
+      "hours": [
+        "national-1"
+      ],
+      "goal": "展示首、池、采各自范字，逐个指结构与田字格位置，建议纸笔练写。三字若合页，保证目标字清楚可辨。",
+      "assets": [
+        "grid-shou",
+        "grid-chi",
+        "grid-cai"
+      ]
+    },
+    {
+      "type": "slide",
+      "hours": [
+        "national-2"
+      ],
+      "goal": "观察小池全景，逐处找泉眼、细流、树阴。结合图像读泉、惜、照、柔，理解晴柔与惜爱像写人。",
+      "assets": [
+        "small-pond",
+        "thin-stream"
+      ]
+    },
+    {
+      "type": "slide",
+      "hours": [
+        "national-2"
+      ],
+      "goal": "放大看小荷尖和蜻蜓，听辨荷、露、角。把才露与早有联系在同一画面，体会初夏生机。",
+      "assets": [
+        "small-pond"
+      ]
+    },
+    {
+      "type": "interactive",
+      "hours": [
+        "national-2"
+      ],
+      "goal": "依提示点泉眼、树阴、小荷、蜻蜓；选中位置点亮并带出相应诗句，误选给空间线索。教师与学生状态分开。",
+      "assets": [
+        "small-pond"
+      ]
+    },
+    {
+      "type": "slide",
+      "hours": [
+        "national-2"
+      ],
+      "goal": "逐句呈现全诗，示范每行二二三的两次轻停；借四种景物说图和背诵，联系诗人爱自然。",
+      "assets": [
+        "small-pond"
+      ]
+    },
+    {
+      "type": "slide",
+      "hours": [
+        "national-2"
+      ],
+      "goal": "观察尖、角、早结构与田字格位置，课后纸笔练写，邀请成人观察。三字若合页，保证目标字清楚可辨。",
+      "assets": [
+        "grid-jian",
+        "grid-jiao",
+        "grid-zao"
+      ]
+    },
+    {
+      "type": "quiz",
+      "hours": [
+        "national-1",
+        "national-2"
+      ],
+      "goal": "一页原创图片小检查，五题都使用有意义的图片，题干由小语老师读出来。"
+    },
+    {
+      "type": "slide",
+      "hours": [
+        "national-1",
+        "national-2"
+      ],
+      "goal": "用两幅图回顾两诗的不同观察重点和停顿；邀请课后读背、口述、写字和小池书签。",
+      "assets": [
+        "boat",
+        "small-pond"
+      ]
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "skill": "新情境辨认采摘动作",
+      "options": {
+        "A": "water-tomato",
+        "B": "pick-tea",
+        "C": "cut-paper"
+      },
+      "answerPlan": [
+        "B"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "skill": "新情境辨认事物经过后留下的踪迹",
+      "options": {
+        "A": "bike-shadow",
+        "B": "grass",
+        "C": "tire-track"
+      },
+      "answerPlan": [
+        "C"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "skill": "新情境辨认物体浮在水面",
+      "options": {
+        "A": "cork-float",
+        "B": "stone-sink",
+        "C": "cup-table"
+      },
+      "answerPlan": [
+        "A"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "skill": "辨认细小水流，区别于瀑布和其他事物",
+      "options": {
+        "A": "waterfall",
+        "B": "thin-stream",
+        "C": "cup-table"
+      },
+      "answerPlan": [
+        "B"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "skill": "新情境辨认物体露出一部分",
+      "options": {
+        "A": "closed-box",
+        "B": "empty-box",
+        "C": "peek-puppy"
+      },
+      "answerPlan": [
+        "C"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "boat",
+      "role": "小娃坐在小艇，握竹竿撑船，艇里有白莲。池上全课同一人物图。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "ba611748cc26f513c14217d3ebfd05164825e46af307e790e9c662c73c355bdd"
+    },
+    {
+      "assetKey": "duckweed",
+      "role": "俯视微小浮萍和分开后的清水道；大荷叶只供大小对照。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "7362803b267aff9621ab471d0c9a3960ea0e2339512aa4cf842a8ead48bc9a8a"
+    },
+    {
+      "assetKey": "small-pond",
+      "role": "初夏小池全景，左侧细泉，右侧树阴，偏右的小荷尖上有蜻蜓。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "4d7effa12e1ffca70cd7d2c121dab357be1c57fb6c9e9d4fcb8e082214730aec"
+    },
+    {
+      "assetKey": "pick-tea",
+      "role": "女孩采一片嫩茶叶。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "bd84a0e0e3e4f73e9bdbae0299bf1a6a8b6fc5749eb8746534f08313a81fa270"
+    },
+    {
+      "assetKey": "water-tomato",
+      "role": "女孩用壶给番茄浇水。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "37262ef613da8ffb7c982c8e6774573d94eaffea96a9bbc31f8016e22653aaed"
+    },
+    {
+      "assetKey": "cut-paper",
+      "role": "女孩剪彩纸。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "d0a7d02f45751a9e2fdcbcf35a111fd2720d39831722c3ff066b81e2d5e7f286"
+    },
+    {
+      "assetKey": "tire-track",
+      "role": "湿泥里的清晰轮胎印。不能判定是哪一辆车留下的。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "662de2fbfd8cc74648b1a1e220fc996e51a87d85203456fc27f1353bd436f728"
+    },
+    {
+      "assetKey": "bike-shadow",
+      "role": "平石地上的自行车影子，地上没有轮胎印。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "61a1a653d61c0823d3473ee22ad876e3e84288ace1042acf908f50e8bb227e9a"
+    },
+    {
+      "assetKey": "grass",
+      "role": "草地有蛙，无供判作泥中轮胎压痕的印子。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "4639e8f01f341db3a8bff7bd2104e41dd10650c2d8056987f44d6a834c62dc9b"
+    },
+    {
+      "assetKey": "cork-float",
+      "role": "玻璃盆水面上的木塞，部分露出水。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "802bb12d83505047bb62bc9f3005df6125b7d4e82339fd28f747847e3633e494"
+    },
+    {
+      "assetKey": "stone-sink",
+      "role": "玻璃盆底的石子。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "60521c168dec3ae41d1b83faecf87a69bf4dd7b275801c07622f0998c204dbce"
+    },
+    {
+      "assetKey": "cup-table",
+      "role": "木桌上的杯子。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "5008ddecc7d1f06394a75c44314b11d03d915d310b50ac88a683c584dbd165f0"
+    },
+    {
+      "assetKey": "thin-stream",
+      "role": "石缝中细细的水线。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "3fedb9998360078cfbd816cb9cc93ce49a0660b6c97767134d943d42a7c335fe"
+    },
+    {
+      "assetKey": "waterfall",
+      "role": "大量水从高处奔流的瀑布。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "4809b01fa28bf76995fa8ad9a47346eaa29f507a18655df2754217776e453634"
+    },
+    {
+      "assetKey": "closed-box",
+      "role": "完全关上的纸箱。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "64a2f818feb9206aeb9bb76be30a15ca2b26615583d3b1cc87062152411c6f3c"
+    },
+    {
+      "assetKey": "empty-box",
+      "role": "打开的空纸箱。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "1d7d05109b6aa0e115123f73881ef527f0ebc04a4ec58e9aff14cc1ee203a0ce"
+    },
+    {
+      "assetKey": "peek-puppy",
+      "role": "小狗从纸箱沿上露出脑袋。",
+      "status": "existing-reviewed-original-picture",
+      "sha256": "9489bd4e4305228b3f5f641d5b39640dee424af1497e1a6fe8b6ec4f9ba50c14"
+    },
+    {
+      "assetKey": "grid-shou",
+      "role": "首字的田字格范字。",
+      "status": "existing-reviewed-deterministic-glyph",
+      "sha256": "c8696ea0ea05497e15dfd64f2eb59ca68cbf786f03e0244726ef1e9bcb4beb26"
+    },
+    {
+      "assetKey": "grid-chi",
+      "role": "池字的田字格范字。",
+      "status": "existing-reviewed-deterministic-glyph",
+      "sha256": "46995a292017e3a2e41eec898df49fb1f22bcc24420f4cf547ceff9e71b10b36"
+    },
+    {
+      "assetKey": "grid-cai",
+      "role": "采字的田字格范字。",
+      "status": "existing-reviewed-deterministic-glyph",
+      "sha256": "3fccaca15647a27ccdbf494251ad8ce0fe3093efd65942bec624d14cc0122acd"
+    },
+    {
+      "assetKey": "grid-jian",
+      "role": "尖字的田字格范字。",
+      "status": "existing-reviewed-deterministic-glyph",
+      "sha256": "ad6783f50577c7aab562cd19769a1f68675cdd72ab78cbaa38c096a65a52a96b"
+    },
+    {
+      "assetKey": "grid-jiao",
+      "role": "角字的田字格范字。",
+      "status": "existing-reviewed-deterministic-glyph",
+      "sha256": "69d98613268a1823ce5472e82958395c41ad7ad4022f572c30cfecd35d83a22d"
+    },
+    {
+      "assetKey": "grid-zao",
+      "role": "早字的田字格范字。",
+      "status": "existing-reviewed-deterministic-glyph",
+      "sha256": "952fd9815c3710ecfa7a45e9e1a34e148a01e3ef79e869be0144551e3411e98f"
+    }
+  ],
+  "teachingFacts": {
+    "verifiedPoems": [
+      {
+        "title": "池上",
+        "attribution": "唐 白居易",
+        "lines": [
+          "小娃撑小艇，",
+          "偷采白莲回。",
+          "不解藏踪迹，",
+          "浮萍一道开。"
+        ],
+        "rhythm": [
+          "小娃/撑小艇",
+          "偷采/白莲回",
+          "不解/藏踪迹",
+          "浮萍/一道开"
+        ]
+      },
+      {
+        "title": "小池",
+        "attribution": "宋 杨万里",
+        "lines": [
+          "泉眼无声惜细流，",
+          "树阴照水爱晴柔。",
+          "小荷才露尖尖角，",
+          "早有蜻蜓立上头。"
+        ],
+        "rhythm": [
+          "泉眼/无声/惜细流",
+          "树阴/照水/爱晴柔",
+          "小荷/才露/尖尖角",
+          "早有/蜻蜓/立上头"
+        ]
+      }
+    ],
+    "readingCharacters": {
+      "池上": [
+        "诗",
+        "首",
+        "偷",
+        "浮",
+        "萍"
+      ],
+      "小池": [
+        "泉",
+        "惜",
+        "照",
+        "柔",
+        "荷",
+        "露",
+        "角"
+      ]
+    },
+    "writingCharacters": {
+      "池上": [
+        "首",
+        "池",
+        "采"
+      ],
+      "小池": [
+        "尖",
+        "角",
+        "早"
+      ]
+    },
+    "reviewedClaims": [
+      "按二三节奏读池上；不解为不知道；诗中的踪迹为小船行过留下的痕迹。",
+      "首上宽下窄，点和撇分在竖中线两边，横要写直；池左窄右宽，右边的竖高、竖弯钩向右伸；采上部和木字底分上下观察，木横位于横中线附近，撇捺舒展。只讲字形和格中位置，不演示完整笔顺。",
+      "小池按二二三节奏朗读；晴柔是晴天柔和的风光；惜与爱是把景物写得像有感情的人；早写蜻蜓已经站在刚露的小荷尖上。",
+      "尖上小下大，上方小的竖钩变短竖；角上小下大，竖在竖中线；早日字头小扁，下方十横长竖在中线。不演示未核完整笔顺。"
+    ],
+    "glyphBoundary": "只说可在正式范字中直接核对的形状和格中位置。角范字中的短横不作是否接触两侧的讲解。",
+    "keyPoint": "十二认读字和首池采尖角早六个会写字；池上二三、小池二二三节奏；两诗的完整图意。",
+    "difficultPoint": "池上联系浮萍水道理解踪迹与童真；小池把惜爱早与安静初夏景物联系，体会诗人的喜爱。",
+    "afterClass": {
+      "task": "朗读背诵两诗、口述图意；首池采尖角早纸笔练写；任选小池诗句配原创生活书签。",
+      "observation": "实际朗读背诵口述与纸笔规范待成人观察。"
+    }
+  },
+  "request": "创作一门完整《古诗二首（池上、小池）》课堂。先教池上，再教小池，最后共用一次五题图片小检查和回顾。根据官方目标、已核教材事实和原创图片索引创作完整课堂结构、实际讲解台词、互动演示与机制、题干和解析。画面显示准确两诗原文，读诗台词可拆行但不改字。逐场交付有序操作和讲话，保留图片标识便于用共享框架适配。"
+}

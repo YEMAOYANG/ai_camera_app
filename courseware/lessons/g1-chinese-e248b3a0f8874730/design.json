@@ -1,0 +1,167 @@
+{
+  "cast": [
+    {
+      "name": "小语老师",
+      "look": "老师只用预录音和高亮领学。"
+    },
+    {
+      "name": "伙伴们",
+      "look": "统一绘本笔触、清楚友善的虚构小学生，日常服装有差异，不从外貌标注民族。"
+    }
+  ],
+  "style": {
+    "notes": "沿用courseware/kit框架，明亮珊瑚、青绿与白色；相册、活动圈和行为图占据画面主体。文字只是被教的国名、北京和三句话；题意由预录音承担。"
+  },
+  "pages": [
+    {
+      "id": "album",
+      "title": "整理旅行相册",
+      "mechanism": "听任务，把家庭或首都照片放入相册；老师另用共同创作照片示范。不扣星、不在第一次放错后标出答案。",
+      "stage": "三张正式绘本照片和大型相册放置区，照片真实落入相册。",
+      "levels": [
+        "家庭生活照片",
+        "首都北京照片"
+      ],
+      "ids": [
+        "album-photo-craft",
+        "album-target"
+      ],
+      "stateKeys": {
+        "mode": "demo展示共同创作照片进入活动页；play完整复位到家庭页。"
+      },
+      "hints": [
+        "想这页记录谁或哪里",
+        "重听任务，看场景环境",
+        "第三次才给正确照片边框示范"
+      ],
+      "start": {
+        "title": "整理旅行相册",
+        "sub": "听任务，移动照片"
+      },
+      "finish": {
+        "title": "相册整理好了",
+        "sub": "家人与首都，记录得清楚"
+      }
+    },
+    {
+      "id": "circle",
+      "title": "让每位伙伴都加入",
+      "mechanism": "邀请每位伙伴进入同一活动圈，不排除任何人；人物移动，连接线随加入显现。不同于相册的语义分类，本页实践共同参与。",
+      "stage": "本课正式人物素材的独立裁切，以及由代码绘制的活动圈和关系线；不通过图上人数教授56。",
+      "levels": [
+        "邀请画面里的三位伙伴",
+        "邀请画面里的四位伙伴"
+      ],
+      "ids": [
+        "circle-zone",
+        "circle-child-1",
+        "circle-links"
+      ],
+      "stateKeys": {
+        "mode": "demo移动一位伙伴进圈；play复位全部人物、关卡与星星。"
+      },
+      "hints": [
+        "伙伴可重新邀请",
+        "看看哪里还没有加入",
+        "第三次提示活动圈位置"
+      ],
+      "start": {
+        "title": "让每位伙伴都加入",
+        "sub": "把邀请做出来"
+      },
+      "finish": {
+        "title": "伙伴都加入了",
+        "sub": "共同参与，彼此尊重"
+      }
+    },
+    {
+      "id": "story",
+      "title": "把故事变友好",
+      "mechanism": "看需要帮助或邀请的伙伴，选行为后拖入故事；结局换成帮助或邀请的正式插图。不同于前页邀请所有人的空间操作，本页判断行为是否友好。",
+      "stage": "大型当前故事插画、三张正式行为图和放置箭头；教师共同创作示范不计分。",
+      "levels": [
+        "伙伴画笔掉落，判断友好相助",
+        "新伙伴站在圈外，判断共同参与"
+      ],
+      "ids": [
+        "story-scene",
+        "story-target",
+        "story-choices"
+      ],
+      "stateKeys": {
+        "mode": "demo显示共同创作的友好结局；play完整复位到第一故事。"
+      },
+      "hints": [
+        "想做法是否让伙伴舒服",
+        "看谁需要关心、看动作",
+        "第三次才示范友好图片"
+      ],
+      "start": {
+        "title": "把故事变友好",
+        "sub": "想想怎样关心伙伴"
+      },
+      "finish": {
+        "title": "故事变友好了",
+        "sub": "尊重伙伴，关心需要"
+      }
+    }
+  ],
+  "eventAudioBindings": {
+    "__VOICE_ALBUM_HOME__": {
+      "lineId": "p04-9",
+      "text": "先把一家人在家里的照片放进家庭页。",
+      "voice": "Serena",
+      "filename": "tts-p04-9-83dbc5e331df60e6c2c030a0848d0e47d15b0e06d944a874212f6bfbd3e791ac.wav"
+    },
+    "__VOICE_ALBUM_BEIJING__": {
+      "lineId": "p04-10",
+      "text": "下一页，再找首都北京的照片。",
+      "voice": "Serena",
+      "filename": "tts-p04-10-c818ab931235598d96ffda0500ece0788a22b19641f46137f9074e4f55ff08af.wav"
+    },
+    "__VOICE_CIRCLE_TASK__": {
+      "lineId": "p07-10",
+      "text": "现在请把每位伙伴都邀请进圈。",
+      "voice": "Serena",
+      "filename": "tts-p07-10-9f01d9ee411c8314f3dc5c1749116574e93223c8eca7ace836444052f78e61e9.wav"
+    },
+    "__VOICE_STORY_PENCIL__": {
+      "lineId": "p09-11",
+      "text": "第一段故事，伙伴的画笔掉在地上了。",
+      "voice": "Serena",
+      "filename": "tts-p09-11-8f54417582c11ba0294fe43398c6342ac8a0abb76ad72cc0373c8916179831f2.wav"
+    },
+    "__VOICE_STORY_WELCOME__": {
+      "lineId": "p09-12",
+      "text": "第二段故事，新朋友还站在游戏圈外。",
+      "voice": "Serena",
+      "filename": "tts-p09-12-df45f79f118e2be13ca21b98f6b1d5060c6ba5eab179fd125861901ac488b7fb.wav"
+    }
+  },
+  "eventAudioBindingState": "verified-local-wav",
+  "assetSources": {
+    "beijing": {
+      "kind": "original-vector",
+      "source": "assets-src/beijing.svg",
+      "final": "assets/beijing.png",
+      "sourceEvidence": [
+        "beijingParkGuide",
+        "unescoTempleOfHeaven"
+      ]
+    },
+    "q2-beijing": {
+      "kind": "original-vector",
+      "source": "assets-src/q2-beijing.svg",
+      "final": "assets/q2-beijing.png",
+      "sourceEvidence": [
+        "beijingParkGuide",
+        "unescoTempleOfHeaven"
+      ]
+    },
+    "q3-turn-away": {
+      "kind": "generated-original",
+      "replacesCandidate": "q3-away",
+      "reason": "首轮图片人物仍相对微笑，无法独立辨认转身离开的动作。原图片和原回执保留。"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+.count-board{position:relative;width:1232px;height:552px}
+.demo-zone{position:absolute;left:0;top:20px;width:300px;height:510px;background:#fffdf6;border:3px solid #e3cf9e;border-radius:28px;text-align:center}
+.demo-zone h2{font-size:28px;margin:30px 0;color:#75502d}
+.demo-zone p{position:absolute;bottom:55px;width:100%;font-size:27px}
+.demo-birds{display:flex;justify-content:center;gap:6px;margin-top:65px;padding:0 12px}
+.demo-birds>div{width:82px;position:relative;border:3px solid transparent;border-radius:18px;padding:3px}
+.demo-birds img{display:block;width:70px;height:70px;object-fit:contain}
+.demo-birds b{display:block;visibility:hidden;font-size:38px;margin-top:16px}
+.demo-birds .marked{border-color:#4e9563;background:#edf8eb}
+.demo-birds .marked b{visibility:visible}
+.bird-field{position:absolute;left:320px;top:20px;width:912px;height:510px;background:#e5f2dd;border:3px solid #bad1a6;border-radius:28px}
+.bird-landing{position:absolute;left:30px;top:62px;width:846px;height:138px;background:#c2de9e;border:3px dashed #77985a;border-radius:24px}
+.bird-item{position:absolute;width:112px;height:112px;padding:0;background:#fffdf6;border:3px solid #c7d1af;border-radius:24px;cursor:pointer;transition:top .45s ease,background .2s}
+.bird-item img{display:block;width:100%;height:100%;object-fit:contain;border-radius:20px;pointer-events:none}
+.bird-item.counted{background:#d8efc7;border-color:#4e9563}
+.count-number{position:absolute;bottom:20px;right:24px;width:80px;height:80px;background:white;border-radius:22px;border:3px solid #adc68f;text-align:center;line-height:72px;font-size:54px;font-weight:800}
+.bird-item.load-error::after{content:'重试图片';position:absolute;inset:8px;display:grid;place-items:center;font-size:24px;background:#fff4df;border-radius:14px}
+#ready .pic{object-fit:contain;background:#fffdf6}

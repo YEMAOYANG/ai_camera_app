@@ -1,0 +1,871 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "春夏秋冬：看图读词与描摹",
+  "description": "五四制一年级下册完整课目。依据准确官方教材原创，以图义联系、位置变化、认读与描摹练习完成学习；口语和纸笔待成人观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/mi-chinese-v1.png",
+      "color": "#537A62",
+      "persona": "温柔、耐心，先看图再解释，普通话清楚，诚实记录学习证据。"
+    }
+  },
+  "images": {
+    "season-park": {
+      "file": "assets/season-park.png"
+    },
+    "spring-wind": {
+      "file": "assets/spring-wind.png"
+    },
+    "summer-rain": {
+      "file": "assets/summer-rain.png"
+    },
+    "autumn-frost": {
+      "file": "assets/autumn-frost.png"
+    },
+    "winter-snow": {
+      "file": "assets/winter-snow.png"
+    },
+    "pond-park": {
+      "file": "assets/pond-park.png"
+    },
+    "red-fish": {
+      "file": "assets/red-fish.png"
+    },
+    "blue-bird": {
+      "file": "assets/blue-bird.png"
+    },
+    "quiz-wind": {
+      "file": "assets/quiz-wind.png"
+    },
+    "quiz-rain": {
+      "file": "assets/quiz-rain.png"
+    },
+    "quiz-frost": {
+      "file": "assets/quiz-frost.png"
+    },
+    "quiz-bird-in": {
+      "file": "assets/quiz-bird-in.png"
+    },
+    "quiz-bird-out": {
+      "file": "assets/quiz-bird-out.png"
+    },
+    "quiz-duck-water": {
+      "file": "assets/quiz-duck-water.png"
+    },
+    "quiz-duck-shore": {
+      "file": "assets/quiz-duck-shore.png"
+    },
+    "quiz-duck-flight": {
+      "file": "assets/quiz-duck-flight.png"
+    },
+    "quiz-garden-pond": {
+      "file": "assets/quiz-garden-pond.png"
+    },
+    "quiz-dry-garden": {
+      "file": "assets/quiz-dry-garden.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "四季里的词语",
+      "template": "picture-points",
+      "data": {
+        "title": "春夏秋冬",
+        "picture": "season-park",
+        "points": [
+          "春风  春风吹",
+          "夏雨  夏雨落",
+          "秋霜  秋霜降",
+          "冬雪  冬雪飘"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天学习春夏秋冬，跟着小语老师看图。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "四季有不同的景象，词语给它们起名字。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "春风，是春天吹来的风，枝条随风摆动。"
+        },
+        {
+          "say": "把动作接上，春风吹，意思就更清楚了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "夏雨，是夏天的雨，雨滴从上面落下来。"
+        },
+        {
+          "say": "夏雨落，连起来读，让声音轻轻走过去。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "秋霜，先记住秋天的霜这个名字。"
+        },
+        {
+          "say": "课文用降字连起来说，秋霜降。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "冬雪，是冬天的雪，雪花在空中飘动。"
+        },
+        {
+          "say": "冬雪飘，说出了图里雪花的样子。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "让动作找到图",
+      "page": "weather",
+      "widgetType": "game",
+      "startImage": "season-park",
+      "script": [
+        {
+          "highlight": "#weather-demo"
+        },
+        {
+          "say": "现在把动作字送进图里，让短语完整。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "先看示范，柳枝被风吹动，要想到吹字。"
+        },
+        {
+          "annotate": "#weather-demo",
+          "content": "春风吹"
+        },
+        {
+          "say": "吹字进入春风的图，春风吹就连起来了。"
+        },
+        {
+          "highlight": "#weather-bank"
+        },
+        {
+          "say": "雨点向下落，落字要和雨的图联系。"
+        },
+        {
+          "highlight": "#weather-targets"
+        },
+        {
+          "say": "看薄霜和飘雪，想起降和飘这两个字。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "点一张字卡，再点图片，也能把字送过去。"
+        },
+        {
+          "say": "放错了可以再试，先看看图里发生什么。"
+        },
+        {
+          "say": "四张图都配好，再跟老师把短语读一遍。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "池边的词语",
+      "template": "picture-points",
+      "data": {
+        "title": "池边有什么",
+        "picture": "pond-park",
+        "points": [
+          "青草  池草青",
+          "红花  山花红",
+          "游鱼  鱼出水",
+          "飞鸟  鸟入林"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "来到池塘边，先看清每一种景物。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "青草，把草的颜色放在前面说。"
+        },
+        {
+          "say": "池草青，说清池边的草是什么颜色。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "红花，是红色的花，眼睛看见红颜色。"
+        },
+        {
+          "say": "山花红，把花的红颜色说清楚了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "游鱼，是在水里游动的鱼，注意游这个字。"
+        },
+        {
+          "say": "鱼出水，出字让我们想到从水里出来。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "飞鸟，是飞着的鸟，翅膀在空中展开。"
+        },
+        {
+          "say": "鸟入林，入字说清鸟到了树林里面。"
+        },
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "词语给景物起名字，短语把样子说清楚。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "鱼出水，鸟入林",
+      "page": "movement",
+      "widgetType": "game",
+      "startImage": "pond-park",
+      "script": [
+        {
+          "highlight": "#move-water"
+        },
+        {
+          "say": "先看这幅池塘图，水在左边，树林在右边。"
+        },
+        {
+          "setState": {
+            "demo": "fish"
+          }
+        },
+        {
+          "say": "鱼在水里游，把鱼带到水面上方看看。"
+        },
+        {
+          "highlight": "#move-air"
+        },
+        {
+          "say": "从水里到外面，位置变了，这叫鱼出水。"
+        },
+        {
+          "highlight": "#move-woods"
+        },
+        {
+          "say": "再看小鸟，把小鸟送到树林里面。"
+        },
+        {
+          "setState": {
+            "demo": "bird"
+          }
+        },
+        {
+          "say": "入，是到里面去，鸟入林的意思就清楚了。"
+        },
+        {
+          "annotate": "#move-animals",
+          "content": "出与入，看位置变化"
+        },
+        {
+          "say": "点动物，再点要到的地方，也可以移动。"
+        },
+        {
+          "setState": {
+            "demo": "clear"
+          }
+        },
+        {
+          "say": "如果位置不合适，动物会留在原处。"
+        },
+        {
+          "say": "完成后说给大人听，谁出来了，谁进去了。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "认读霜吹落降",
+      "template": "big-word",
+      "data": {
+        "title": "看图认字",
+        "word": "霜吹落降",
+        "pinyin": "shuāng chuī luò jiàng",
+        "picture": "season-park",
+        "hint": "雨字头  霜"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "这四个字，都能回到刚才的图里找意思。"
+        },
+        {
+          "say": "霜，第一声，先把声音读得平平的。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "霜字上面是雨字头，先看清它的位置。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "想起秋天叶面上的薄霜，再来认霜字。"
+        },
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "吹，第一声，春风吹，枝条随风摆动。"
+        },
+        {
+          "say": "落，第四声，夏雨落，雨点从上面下来。"
+        },
+        {
+          "say": "降，第四声，秋霜降，声音要读清楚。"
+        },
+        {
+          "say": "看图想意思，再把字和声音联系起来。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "认读飘游池入",
+      "template": "big-word",
+      "data": {
+        "title": "再认四个字",
+        "word": "飘游池入",
+        "pinyin": "piāo yóu chí rù",
+        "picture": "pond-park",
+        "hint": "飘  游  池  入"
+      },
+      "script": [
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "再看这四个字，它们也有自己的图景。"
+        },
+        {
+          "say": "飘，第一声，想起雪花在空中轻轻飘动。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "游，第二声，鱼在水里摆尾巴，叫游。"
+        },
+        {
+          "say": "池，第二声，这片围起来的水就是池。"
+        },
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "入，第四声，是到里面去，不是到外面。"
+        },
+        {
+          "say": "鸟入林，鸟到了树林里面，意思变清楚。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "字形不同，声音不同，要和图景一起来记。"
+        },
+        {
+          "say": "跟着老师各读一次，读得怎样请大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "把词语补完整",
+      "page": "wordfill",
+      "widgetType": "game",
+      "startImage": "season-park",
+      "script": [
+        {
+          "highlight": "#wordfill-picture"
+        },
+        {
+          "say": "这次看图，把缺少的字放回词语里面。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "先看春风的图，春风吹，要补上吹字。"
+        },
+        {
+          "highlight": "#wordfill-slot"
+        },
+        {
+          "say": "字送进空位，词语会完整，图景也会动。"
+        },
+        {
+          "highlight": "#wordfill-options"
+        },
+        {
+          "say": "八个字都学过，可以先想图里是什么。"
+        },
+        {
+          "annotate": "#wordfill-context",
+          "content": "看图，想词语"
+        },
+        {
+          "say": "再看空位前后的字，把整组词连起来。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "认不准就回想老师刚才带读的声音。"
+        },
+        {
+          "say": "第一次选错不会扣分，换一张再试试看。"
+        },
+        {
+          "say": "把八个空位补好，不代表已经会朗读。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "先观察，再描摹",
+      "template": "summary",
+      "data": {
+        "title": "六个字，慢慢描",
+        "items": [
+          "春  冬",
+          "吹  花",
+          "飞  入"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "下面观察六个字，再用手指沿着字形描。"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "第一组是春和冬，先看字在格子里的位置。"
+        },
+        {
+          "say": "眼睛看清浅灰的字形，手指再慢慢跟上。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "第二组是吹和花，每个字都要完整观察。"
+        },
+        {
+          "say": "描的时候可以停下来，重新看一看范形。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "第三组是飞和入，小字也要认真看位置。"
+        },
+        {
+          "say": "描摹页面只看覆盖，不判断笔顺和字好坏。"
+        },
+        {
+          "say": "纸上书写和笔顺，请大人另外帮助观察。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "六个字的描摹",
+      "page": "trace",
+      "widgetType": "game",
+      "startImage": "pond-park",
+      "script": [
+        {
+          "highlight": "#trace-board"
+        },
+        {
+          "say": "先看大格子里的春字，浅灰字形是路标。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "手指沿着字形慢慢描，蓝色会留下轨迹。"
+        },
+        {
+          "highlight": "#trace-board"
+        },
+        {
+          "say": "看一段，描一段，不用急着把格子涂满。"
+        },
+        {
+          "highlight": "#trace-meter"
+        },
+        {
+          "say": "右边小条显示字形覆盖，够了才能向后。"
+        },
+        {
+          "highlight": "#trace-reset"
+        },
+        {
+          "say": "想重新描，就点弯箭头，当前轨迹会擦掉。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "接着依次描冬、吹、花、飞和入。"
+        },
+        {
+          "say": "页面不判断笔顺，也不判断纸上书写质量。"
+        },
+        {
+          "say": "描完请大人看一看，哪些地方还可以练习。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "词语连成好听的节奏",
+      "template": "two-columns",
+      "data": {
+        "title": "看图，听读，再试着回想",
+        "left": {
+          "heading": "四季",
+          "body": "春风 夏雨 秋霜 冬雪\n春风吹 夏雨落 秋霜降 冬雪飘"
+        },
+        "right": {
+          "heading": "池边",
+          "body": "青草 红花 游鱼 飞鸟\n池草青 山花红 鱼出水 鸟入林"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先听四季这一组，词语之间轻轻停一下。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "春风，夏雨，秋霜，冬雪。"
+        },
+        {
+          "say": "春风吹，夏雨落，秋霜降，冬雪飘。"
+        },
+        {
+          "say": "每组三个字连着读，动作就跟着景物走。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再听池边这一组，先读名字，再读短语。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "青草，红花，游鱼，飞鸟。"
+        },
+        {
+          "say": "池草青，山花红，鱼出水，鸟入林。"
+        },
+        {
+          "say": "看看图，回想词语，再试着轻声读一遍。"
+        },
+        {
+          "say": "能否朗读和背诵，请大人听后再记录。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "小检查一",
+      "intro": [
+        "听老师读题，看新的图片，再作选择。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "听到吹，选彩带被风吹动的图。",
+          "skill": "图义联系：吹",
+          "answer": [
+            "A"
+          ],
+          "analysis": "风让彩带向一边扬起，对应吹；雨落和薄霜是另外的景象。",
+          "options": {
+            "A": {
+              "label": "彩带扬起",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-wind",
+                "alt": "窗边橙色彩带被风吹得扬起"
+              }
+            },
+            "B": {
+              "label": "雨滴落下",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-rain",
+                "alt": "屋檐雨滴落到小水洼"
+              }
+            },
+            "C": {
+              "label": "椅面薄霜",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-frost",
+                "alt": "长椅和落叶上附着薄霜"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "听到入，哪只小鸟已经到了竹林里面？",
+          "skill": "图义联系：入",
+          "answer": [
+            "C"
+          ],
+          "analysis": "入是到里面去，竹竿和竹叶围着的小鸟已经在竹林里面。",
+          "options": {
+            "A": {
+              "label": "林外飞鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-bird-out",
+                "alt": "橙色鸟飞在开阔天空，身边没有树枝"
+              }
+            },
+            "B": {
+              "label": "岸上小鸭",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-duck-shore",
+                "alt": "白鸭站在干燥石路上"
+              }
+            },
+            "C": {
+              "label": "林中小鸟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-bird-in",
+                "alt": "橙色鸟被竹竿竹叶围绕，位于竹林内部"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "小检查二",
+      "intro": [
+        "再换一组新图，想想游和池的意思。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "听到游，哪只小鸭正在水里游？",
+          "skill": "图义联系：游",
+          "answer": [
+            "B"
+          ],
+          "analysis": "水面上的小鸭划动身体，身后有水纹，表现正在游。",
+          "options": {
+            "A": {
+              "label": "站在岸上",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-duck-shore",
+                "alt": "白鸭双脚站在干燥石路上"
+              }
+            },
+            "B": {
+              "label": "水中游动",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-duck-water",
+                "alt": "白鸭浮在水面游动，身后有水纹"
+              }
+            },
+            "C": {
+              "label": "空中飞行",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-duck-flight",
+                "alt": "白鸭展开翅膀飞在空中"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "听到池，选小花园里的水池。",
+          "skill": "图义联系：池",
+          "answer": [
+            "C"
+          ],
+          "analysis": "石边围着清澈水面的小池，对应池；干燥花园和覆霜长椅都不是池。",
+          "options": {
+            "A": {
+              "label": "干燥花园",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dry-garden",
+                "alt": "花草与石路，画面没有水面"
+              }
+            },
+            "B": {
+              "label": "覆霜长椅",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-frost",
+                "alt": "薄霜附在木椅上"
+              }
+            },
+            "C": {
+              "label": "花园水池",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-garden-pond",
+                "alt": "石边围合清澈水池，有水面倒影与睡莲"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "带走今天的发现",
+      "template": "summary",
+      "data": {
+        "title": "今天的发现",
+        "items": [
+          "四季景象，连上动作",
+          "景物词语，说清样子",
+          "八个字，联系图景认",
+          "六个字，观察再描摹",
+          "朗读背诵，请大人听"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天我们走过四季，也来到池塘边。"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "春风吹，夏雨落，秋霜降，冬雪飘。"
+        },
+        {
+          "say": "名字连上动作，让图里的景象更清楚。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "青草红花说名字，池草青说清颜色。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "认字时，把字形、声音和图景联系起来。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "春、冬、吹、花、飞、入，先观察再描摹。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "图片选择和描摹，只记录页面上的操作。"
+        },
+        {
+          "say": "朗读、背诵和纸上书写，请大人继续观察。"
+        }
+      ]
+    }
+  ]
+}

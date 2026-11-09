@@ -1,0 +1,1728 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "综合与实践：我的幼儿园",
+  "description": "整合西南大学版一年级上册四个官方课时：数形观察、四类比较、面与孔的观察推理、学习与整理习惯。原创场景和练习，系统只记录实际屏幕操作。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "按正式数学教师档案讲清数学方法。短句解释原因，先操作示范再交给孩子；不把点击说成会说或真实习惯。"
+    }
+  },
+  "images": {
+    "courtyard": {
+      "file": "assets/courtyard.png"
+    },
+    "pot": {
+      "file": "assets/pot.png"
+    },
+    "book": {
+      "file": "assets/book.png"
+    },
+    "notebook": {
+      "file": "assets/notebook.png"
+    },
+    "pencil": {
+      "file": "assets/pencil.png"
+    },
+    "pencil-case": {
+      "file": "assets/pencil-case.png"
+    },
+    "backpack": {
+      "file": "assets/backpack.png"
+    },
+    "habits": {
+      "file": "assets/habits.png"
+    },
+    "diagram-shapes": {
+      "file": "assets/diagram-shapes.png"
+    },
+    "diagram-towers": {
+      "file": "assets/diagram-towers.png"
+    },
+    "diagram-ribbons": {
+      "file": "assets/diagram-ribbons.png"
+    },
+    "diagram-pairing": {
+      "file": "assets/diagram-pairing.png"
+    },
+    "diagram-size": {
+      "file": "assets/diagram-size.png"
+    },
+    "diagram-faces": {
+      "file": "assets/diagram-faces.png"
+    },
+    "diagram-clue": {
+      "file": "assets/diagram-clue.png"
+    },
+    "diagram-circle": {
+      "file": "assets/diagram-circle.png"
+    },
+    "diagram-triangle": {
+      "file": "assets/diagram-triangle.png"
+    },
+    "diagram-square": {
+      "file": "assets/diagram-square.png"
+    },
+    "diagram-rectangle": {
+      "file": "assets/diagram-rectangle.png"
+    },
+    "diagram-height-0": {
+      "file": "assets/diagram-height-0.png"
+    },
+    "diagram-height-1": {
+      "file": "assets/diagram-height-1.png"
+    },
+    "diagram-height-2": {
+      "file": "assets/diagram-height-2.png"
+    },
+    "diagram-length-0": {
+      "file": "assets/diagram-length-0.png"
+    },
+    "diagram-length-1": {
+      "file": "assets/diagram-length-1.png"
+    },
+    "diagram-length-2": {
+      "file": "assets/diagram-length-2.png"
+    },
+    "diagram-containers-0": {
+      "file": "assets/diagram-containers-0.png"
+    },
+    "diagram-containers-1": {
+      "file": "assets/diagram-containers-1.png"
+    },
+    "diagram-containers-2": {
+      "file": "assets/diagram-containers-2.png"
+    },
+    "diagram-classify": {
+      "file": "assets/diagram-classify.png"
+    },
+    "diagram-quiz-dot-row": {
+      "file": "assets/diagram-quiz-dot-row.png"
+    },
+    "diagram-quiz-dots-5": {
+      "file": "assets/diagram-quiz-dots-5.png"
+    },
+    "diagram-quiz-dots-6": {
+      "file": "assets/diagram-quiz-dots-6.png"
+    },
+    "diagram-quiz-dots-8": {
+      "file": "assets/diagram-quiz-dots-8.png"
+    },
+    "diagram-quiz-dots-9": {
+      "file": "assets/diagram-quiz-dots-9.png"
+    },
+    "diagram-pencils-home": {
+      "file": "assets/diagram-pencils-home.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "带上数学眼睛",
+      "template": "picture-points",
+      "data": {
+        "title": "带上数学眼睛",
+        "picture": "courtyard",
+        "points": [
+          "数一数，找一找",
+          "动手比，说理由",
+          "有规则，再验证"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到原创的萤火幼儿园。"
+        },
+        {
+          "say": "先看小屋两侧的窗，再看看右下方的沙池。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "指左边一扇窗，数一；右边一扇窗，数二。一共有两扇窗。"
+        },
+        {
+          "say": "我来介绍这儿：小屋有两扇窗，旁边是一个圆形沙池。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "比较时要说清正在比什么。"
+        },
+        {
+          "say": "还要想想，怎样比才公平。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "有了线索，我们才能作出判断。"
+        },
+        {
+          "say": "先照规则做，再看结果对不对。"
+        },
+        {
+          "say": "最后整理物品，把方法带回家。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "一盆一盆数清楚",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "这排盆栽，跟我从左往右数。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "setState": {
+            "phase": "count",
+            "marks": 1
+          }
+        },
+        {
+          "say": "第一盆，数一。数过就打个勾。"
+        },
+        {
+          "setState": {
+            "phase": "count",
+            "marks": 2
+          }
+        },
+        {
+          "say": "第二盆，数二。只数还没有打勾的。"
+        },
+        {
+          "setState": {
+            "phase": "count",
+            "marks": 3
+          }
+        },
+        {
+          "say": "第三盆，数三。最后数到三，一共有三盆。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "你可以说：幼儿园这一排摆了三盆植物。"
+        },
+        {
+          "say": "盆栽换个位置，数量不会跟着变。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在请你把盆栽一个一个数，再选数量点。"
+        },
+        {
+          "say": "漏数时，看看有没有还没打勾的盆栽。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "物体身上找轮廓",
+      "template": "picture-points",
+      "data": {
+        "title": "物体身上找轮廓",
+        "picture": "diagram-shapes",
+        "points": [
+          "看的是一个面的轮廓",
+          "形状相同，颜色可不同",
+          "用形状介绍环境"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "数告诉我们有多少，形告诉我们像什么。"
+        },
+        {
+          "say": "现在看这几片平平的图形。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这个圆形像鼓面，边缘圆圆的。"
+        },
+        {
+          "say": "三角形有三个尖尖的角。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "正方形像方方正正的纸片。"
+        },
+        {
+          "say": "这个长方形像门面，也能立着放。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这些都是一个平面的形状。"
+        },
+        {
+          "say": "同样的轮廓，换颜色还是同样的形状。"
+        },
+        {
+          "say": "看到窗面、纸面，可以说说它的轮廓。"
+        },
+        {
+          "say": "物体能拿起来，轮廓是它一面的样子。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "轮廓贴回原处",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "把平平的图形贴到相同轮廓上。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "先沿着边看一圈，不要只看颜色。"
+        },
+        {
+          "say": "圆片需要圆轮廓，尖角片要看角。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "贴对以后，空轮廓就会变成实色。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "大小也要合适，边才能贴得整齐。"
+        },
+        {
+          "say": "换了颜色仍可比，形状并没变。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请先点图形，再点它能贴合的轮廓。"
+        },
+        {
+          "say": "贴不上时，先比较弯边和尖角。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "数与形小检查",
+      "intro": [
+        "听老师读题，看图片选一选。",
+        "每题只选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "garden-q1",
+          "question": "这排数量点有多少？选一样多的一组。",
+          "skill": "逐个点数确定数量",
+          "answer": [
+            "A"
+          ],
+          "analysis": "逐个点数是八个，选择八个点的一组。",
+          "options": {
+            "A": {
+              "label": "1号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-quiz-dots-8",
+                "alt": "8个绿色数量点"
+              }
+            },
+            "B": {
+              "label": "2号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-quiz-dots-6",
+                "alt": "6个绿色数量点"
+              }
+            },
+            "C": {
+              "label": "3号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-quiz-dots-9",
+                "alt": "9个绿色数量点"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "diagram-quiz-dot-row",
+            "alt": "一排橙色数量点"
+          }
+        },
+        {
+          "id": "garden-q2",
+          "question": "要给三角形小旗补上同样形状的布片，选哪一片？",
+          "skill": "识别平面轮廓",
+          "answer": [
+            "B"
+          ],
+          "analysis": "三角形小旗有三个角，选三角形布片。",
+          "options": {
+            "A": {
+              "label": "圆形",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-circle",
+                "alt": "圆形轮廓"
+              }
+            },
+            "B": {
+              "label": "三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-triangle",
+                "alt": "三角形轮廓"
+              }
+            },
+            "C": {
+              "label": "长方形",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-rectangle",
+                "alt": "长方形轮廓"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "脚下齐平再比高",
+      "template": "picture-points",
+      "data": {
+        "title": "脚下齐平再比高",
+        "picture": "diagram-towers",
+        "points": [
+          "先看脚下是否齐平",
+          "同一底线，比上端",
+          "高矮要说清比谁"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两座积木塔，应该怎样比较高矮？"
+        },
+        {
+          "say": "先看看它们的底部是不是一样高。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一座站在台子上，会把结果看错。"
+        },
+        {
+          "say": "把底部放到同一条线上才公平。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "底部齐平以后，再看上面到哪里。"
+        },
+        {
+          "say": "伸得更高的那座，就是较高的塔。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "同一次比较，还能反过来说。"
+        },
+        {
+          "say": "另一座比它矮，两句话说的是一回事。"
+        },
+        {
+          "say": "这是比高矮，不是在数积木有几块。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "让两座塔站齐",
+      "page": "p07",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "先让两座塔站在同一条底线上。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "拖动塔的底部，直到碰到地面线。"
+        },
+        {
+          "say": "塔没变高，只是把站的位置放公平。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "两座都站齐了，才看它们的顶端。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "顶端更高的塔，才是这次较高的一座。"
+        },
+        {
+          "say": "颜色不会决定高矮，脚下的位置很重要。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请先拖两座塔站齐，再点较高的一座。"
+        },
+        {
+          "say": "如果选错，回头看看底端和顶端。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "先齐一端再看长短",
+      "template": "picture-points",
+      "data": {
+        "title": "先齐一端再看长短",
+        "picture": "diagram-ribbons",
+        "points": [
+          "一端对齐",
+          "弯的先拉直",
+          "再看另一端"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "长短和高矮一样，也要公平地比较。"
+        },
+        {
+          "say": "这里有两条颜色不同的丝带。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先把它们的左端放在同一条线上。"
+        },
+        {
+          "say": "起点不同，右端靠前也不一定更长。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "有一条弯着时，先把它轻轻拉直。"
+        },
+        {
+          "say": "弯曲改变摆法，不会凭空变短。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "都直了，一端齐了，再看另一端。"
+        },
+        {
+          "say": "伸得更远的那条，就是较长的。"
+        },
+        {
+          "say": "比较时说清，哪条比哪条长。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "丝带排到起点",
+      "page": "p09",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "这次比较的是长短，不是摆放的位置。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "先把两条丝带的一端移到起点线。"
+        },
+        {
+          "say": "有弯曲丝带时，点弯线图标把它拉直。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "操作以后丝带展开，真正的长度露出来。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "两端起点相同，再看右边哪条伸得远。"
+        },
+        {
+          "say": "较长的丝带，另一端会更远一些。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在请先整理摆法，再点较长的一条。"
+        },
+        {
+          "say": "没比准时，先查起点和弯曲有没有处理。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "一个对一个看剩下",
+      "template": "picture-points",
+      "data": {
+        "title": "一个对一个看剩下",
+        "picture": "diagram-pairing",
+        "points": [
+          "一个只配一个",
+          "看有没有剩下",
+          "没有剩下就是一样多"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "比多少，不能只看哪一排铺得更宽。"
+        },
+        {
+          "say": "我们让一个数量点去找一个伙伴。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "上面一个，配下面一个，不漏也不重复。"
+        },
+        {
+          "say": "已经配好的两个，就先放在一边。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "两排还能配时，就继续一个对一个。"
+        },
+        {
+          "say": "一边有剩余，那边的数量就更多。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两边都没有剩余，就是一样多。"
+        },
+        {
+          "say": "这办法叫一个对一个地比较。"
+        },
+        {
+          "say": "排得松一些，数量也不会自己变多。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "title": "两排数量配成对",
+      "page": "p11",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "先让上下两排的数量点一一配对。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "点上面一个，再点下面没配过的一个。"
+        },
+        {
+          "say": "也可以直接拖过去，画面会连起一对。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "同一个点不能再去找第二个伙伴。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "配完以后，看哪一排还有没配上的点。"
+        },
+        {
+          "say": "有剩余的一排更多，都没剩就一样多。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请你先配成对，再选择更多的一排。"
+        },
+        {
+          "say": "向上箭头选上排，向下箭头选下排。"
+        },
+        {
+          "say": "两边都没剩时，点中间的等号图标。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "放在一起比大小",
+      "template": "picture-points",
+      "data": {
+        "title": "放在一起比大小",
+        "picture": "diagram-size",
+        "points": [
+          "先放在一起",
+          "同角对齐再重叠",
+          "看覆盖和露出"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两张同样形状的纸，怎样比较大小？"
+        },
+        {
+          "say": "先放在一起看，差别很大时容易发现。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看不清楚时，可以把它们叠起来。"
+        },
+        {
+          "say": "这张图把左下角和底边对齐了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小纸完全落在大纸里面，没有伸出去。"
+        },
+        {
+          "say": "大纸还露出一圈，所以它更大。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "比的是纸面的大小，不是颜色深浅。"
+        },
+        {
+          "say": "换了颜色，覆盖的关系也不会改变。"
+        },
+        {
+          "say": "不是所有不同形状，都能这样一眼断定。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "interactive",
+      "title": "纸片叠起来",
+      "page": "p13",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "这些纸片形状相同，大小有些不同。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "把活动纸片拖到左下角的小圆点处。"
+        },
+        {
+          "say": "同一个角放齐以后，再观察边缘。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "重叠时让纸片半透明，露出的边更清楚。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "盖住另一张，还露出边的那张更大。"
+        },
+        {
+          "say": "边缘露出来多少，比颜色更有用。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请你先把纸片叠齐，再点较大的一张。"
+        },
+        {
+          "say": "没看清时，点圆形箭头重新摆一摆。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "quiz",
+      "title": "比较方法小检查",
+      "intro": [
+        "听老师读题，看图片选一选。",
+        "每题只选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "garden-q3",
+          "question": "哪幅图里，两座塔底部齐平，能比高矮？",
+          "skill": "同一底线比较高矮",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三幅图两座塔底端齐平，可以再看顶端。",
+          "options": {
+            "A": {
+              "label": "1号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-height-0",
+                "alt": "两座塔的底端比较图"
+              }
+            },
+            "B": {
+              "label": "2号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-height-1",
+                "alt": "两座塔的底端比较图"
+              }
+            },
+            "C": {
+              "label": "3号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-height-2",
+                "alt": "两座塔的底端比较图"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-q4",
+          "question": "哪幅图的两条丝带，一端齐平而且拉直？",
+          "skill": "对齐一端比较长短",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一幅图一端对齐且两条都直，再看另一端。",
+          "options": {
+            "A": {
+              "label": "1号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-length-0",
+                "alt": "丝带起点和弯直比较图"
+              }
+            },
+            "B": {
+              "label": "2号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-length-1",
+                "alt": "丝带起点和弯直比较图"
+              }
+            },
+            "C": {
+              "label": "3号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-length-2",
+                "alt": "丝带起点和弯直比较图"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "积木和它的一个面",
+      "template": "picture-points",
+      "data": {
+        "title": "积木和它的一个面",
+        "picture": "diagram-faces",
+        "points": [
+          "物体与平平的面",
+          "选一个面印轮廓",
+          "看轮廓，不只看颜色"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "积木是立体的，可以从不同方向看。"
+        },
+        {
+          "say": "贴在纸上的，只是它选中的一个面。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "正方体的平平面，能印出正方形。"
+        },
+        {
+          "say": "不是把整个积木变成了一张纸。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这里的长方体选了长方形的面。"
+        },
+        {
+          "say": "沿这个面印一下，就得到长方形轮廓。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "圆柱要用上下平平的圆面来印。"
+        },
+        {
+          "say": "弯着的侧面，不能当作这里的平平面。"
+        },
+        {
+          "say": "同一轮廓可以换颜色，边的样子仍相同。"
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "interactive",
+      "title": "按一个面印一印",
+      "page": "p16",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "先看纸上需要什么样的平面轮廓。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "再选积木的平平面，不是看它的颜色。"
+        },
+        {
+          "say": "把积木拖到纸面，印迹才会出现。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "正方体的这个面，会印出正方形。"
+        },
+        {
+          "setState": {
+            "phase": "show",
+            "example": "circle"
+          }
+        },
+        {
+          "say": "圆柱平平的底面，会留下圆的轮廓。"
+        },
+        {
+          "setState": {
+            "phase": "show",
+            "example": "rectangle"
+          }
+        },
+        {
+          "say": "这里长方体选中的面，印出长方形。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请你选合适的积木，拖到纸上试一试。"
+        },
+        {
+          "say": "印错可以换一块，观察轮廓重新比较。"
+        }
+      ]
+    },
+    {
+      "key": "p17",
+      "type": "interactive",
+      "title": "形状大小刚好贴齐",
+      "page": "p17",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "这关的规则，是把孔口刚好补满。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "先比较孔口和积木的平面轮廓。"
+        },
+        {
+          "say": "形状选对了，还要看看大小是否合适。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "大了或小了，都不能把孔口刚好补满。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "我们先用边缘相同、大小合适的来验证。"
+        },
+        {
+          "say": "边缘刚好贴齐，空缺就会变成实色。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在请你拖合适的积木补满孔口。"
+        },
+        {
+          "say": "第一次没成功，先看轮廓，再看大小。"
+        }
+      ]
+    },
+    {
+      "key": "p18",
+      "type": "slide",
+      "title": "有线索才能确定",
+      "template": "picture-points",
+      "data": {
+        "title": "有线索才能确定",
+        "picture": "diagram-clue",
+        "points": [
+          "先说清全部规则",
+          "看见一边，排除可能",
+          "揭开以后再验证"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "猜藏在哪里，也可以有认真思考的方法。"
+        },
+        {
+          "say": "先说明，只有这两个容器里可以放物品。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一共几个，也必须事先告诉大家。"
+        },
+        {
+          "say": "老师把一个容器揭开，里面是空的。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "如果总共只有一个，它只能在另一个里。"
+        },
+        {
+          "say": "这叫根据线索排除不可能的位置。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "没揭开、没线索时，不能说自己确定了。"
+        },
+        {
+          "say": "还要最后揭开验证，看看推想对不对。"
+        },
+        {
+          "say": "换了规则，要重新听清楚再判断。"
+        }
+      ]
+    },
+    {
+      "key": "p19",
+      "type": "interactive",
+      "title": "看一边摆另一边",
+      "page": "p19",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "上面这一排点，告诉你总共只有多少。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "所有点都只会放在下面两个容器里。"
+        },
+        {
+          "say": "先点左边的眼睛图标，看见里面几个。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "总共只有一个，左边空，就去右边找。"
+        },
+        {
+          "setState": {
+            "phase": "show",
+            "example": "two"
+          }
+        },
+        {
+          "say": "总共两个，左边一个，另一个在右边。"
+        },
+        {
+          "say": "我点对号来验证：左边一个，右边一个，合起来正好两个。右边放一个就对了。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请你先看线索，点圆点送到右边容器。"
+        },
+        {
+          "say": "多放了可以点容器里的点，送回去重摆。"
+        }
+      ]
+    },
+    {
+      "key": "p20",
+      "type": "quiz",
+      "title": "观察推理小检查",
+      "intro": [
+        "听老师读题，看图片选一选。",
+        "每题只选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "garden-q5",
+          "question": "把圆柱平平的底面印在纸上，会留下哪种轮廓？",
+          "skill": "立体的平面轮廓",
+          "answer": [
+            "B"
+          ],
+          "analysis": "圆柱上下平平的面是圆，印下圆轮廓。",
+          "options": {
+            "A": {
+              "label": "正方形",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-square",
+                "alt": "正方形平面图"
+              }
+            },
+            "B": {
+              "label": "圆形",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-circle",
+                "alt": "圆形平面图"
+              }
+            },
+            "C": {
+              "label": "三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-triangle",
+                "alt": "三角形平面图"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-q6",
+          "question": "只有这两盒。共三个点，左盒两个。选哪图？",
+          "skill": "根据已知条件排除推理",
+          "answer": [
+            "C"
+          ],
+          "analysis": "总共三个，左边已有两个，右边还要一个；第三幅符合。",
+          "options": {
+            "A": {
+              "label": "1号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-containers-0",
+                "alt": "两个盒子中的圆点分布"
+              }
+            },
+            "B": {
+              "label": "2号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-containers-1",
+                "alt": "两个盒子中的圆点分布"
+              }
+            },
+            "C": {
+              "label": "3号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-containers-2",
+                "alt": "两个盒子中的圆点分布"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p21",
+      "type": "slide",
+      "title": "好习惯接着用",
+      "template": "picture-points",
+      "data": {
+        "title": "好习惯接着用",
+        "picture": "habits",
+        "points": [
+          "倾听，发言先举手",
+          "用完送回原处",
+          "分类方便再找到"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "从幼儿园来到小学，好习惯还可以接着用。"
+        },
+        {
+          "say": "别人说话时认真听，才知道他的想法。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "想发言先举手，给每个人说话的机会。"
+        },
+        {
+          "say": "课前准备好需要的书本和文具。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "用完把东西送回合适的地方。"
+        },
+        {
+          "say": "书本、练习本和文具分开放，更好寻找。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "同类书本再按大小整理，摆放更稳妥。"
+        },
+        {
+          "say": "请跟大人说说：你今天用完什么东西，记得放回去了吗？"
+        },
+        {
+          "say": "也说说下次想做得更好的地方，请大人继续帮忙观察。"
+        }
+      ]
+    },
+    {
+      "key": "p22",
+      "type": "interactive",
+      "title": "东西送回各自的家",
+      "page": "p22",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "桌面有课本、练习本和铅笔。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "先看它是什么，再找同类的收纳位置。"
+        },
+        {
+          "say": "盒子前面的图片，说明这里收什么。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "课本和练习本分开放，准备时更好找。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "铅笔用完，送回打开的文具盒里。"
+        },
+        {
+          "say": "不是把所有东西随便塞进同一个地方。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请先点物品，再点它应该回去的家。"
+        },
+        {
+          "say": "放错时物品会回来，看看图示再试。"
+        }
+      ]
+    },
+    {
+      "key": "p23",
+      "type": "interactive",
+      "title": "书本按大小排好",
+      "page": "p23",
+      "widgetType": "game",
+      "startImage": "courtyard",
+      "script": [
+        {
+          "setState": {
+            "phase": "demo"
+          }
+        },
+        {
+          "say": "同一类书本，也能按大小整理。"
+        },
+        {
+          "highlight": "#garden-stage"
+        },
+        {
+          "say": "这里从左到右，要从大到小放。"
+        },
+        {
+          "say": "先比较纸面大小，不是比书的颜色。"
+        },
+        {
+          "setState": {
+            "phase": "show"
+          }
+        },
+        {
+          "say": "最大的先站左边，再找剩下较大的。"
+        },
+        {
+          "highlight": "#garden-anchor"
+        },
+        {
+          "say": "三个位置放好以后，大小逐渐变小。"
+        },
+        {
+          "say": "放错会回到下面，可以再挑一本。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请把书依次放入三个位置，再点对号。"
+        },
+        {
+          "say": "屏幕排好后，也请大人看看真实书包。"
+        }
+      ]
+    },
+    {
+      "key": "p24",
+      "type": "quiz",
+      "title": "整理方法小检查",
+      "intro": [
+        "听老师读题，看图片选一选。",
+        "每题只选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "garden-q7",
+          "question": "铅笔用完了，送到哪里最合适？",
+          "skill": "按用途分类归位",
+          "answer": [
+            "A"
+          ],
+          "analysis": "铅笔属于文具，用完送回文具盒。",
+          "options": {
+            "A": {
+              "label": "文具盒",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil-case",
+                "alt": "打开的文具盒"
+              }
+            },
+            "B": {
+              "label": "课本",
+              "visual": {
+                "kind": "asset",
+                "image": "book",
+                "alt": "闭合的课本"
+              }
+            },
+            "C": {
+              "label": "盆栽",
+              "visual": {
+                "kind": "asset",
+                "image": "pot",
+                "alt": "一盆植物"
+              }
+            }
+          }
+        },
+        {
+          "id": "garden-q8",
+          "question": "先把方形和圆形分开。图里方形点片有几个？",
+          "skill": "分类后逐个计数",
+          "answer": [
+            "B"
+          ],
+          "analysis": "六个方形点片是一类，两个圆形不算进这一类。",
+          "options": {
+            "A": {
+              "label": "1号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-quiz-dots-5",
+                "alt": "5个绿色数量点"
+              }
+            },
+            "B": {
+              "label": "2号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-quiz-dots-6",
+                "alt": "6个绿色数量点"
+              }
+            },
+            "C": {
+              "label": "3号图",
+              "visual": {
+                "kind": "asset",
+                "image": "diagram-quiz-dots-8",
+                "alt": "8个绿色数量点"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "diagram-classify",
+            "alt": "六个方形和两个圆形"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p25",
+      "type": "slide",
+      "title": "把方法带回生活",
+      "template": "picture-points",
+      "data": {
+        "title": "把方法带回生活",
+        "picture": "diagram-pencils-home",
+        "points": [
+          "把笔尾放齐",
+          "摆好再说理由",
+          "和家人试试"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "回到生活里，桌上的两支铅笔也可以比一比。"
+        },
+        {
+          "say": "我想知道哪支更长，就把两个笔尾都放到桌边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先检查两个笔尾都碰到同一条桌边，再看笔尖。"
+        },
+        {
+          "say": "我来说明理由：笔尾齐了，绿铅笔的笔尖伸得更远，所以它更长。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "请大人陪你试一次，画下怎么摆，再说给大人听。"
+        },
+        {
+          "say": "比快慢或远近，也先说清比什么、从哪里比。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "按约好的规则和家人玩藏物游戏，也可以一起收书包。"
+        },
+        {
+          "say": "你可以说：我记得收铅笔，下次还想把练习本放整齐。"
+        },
+        {
+          "say": "自己想一想，哪样做得好，哪样想改？说给大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p26",
+      "type": "slide",
+      "title": "数形游戏和习惯",
+      "template": "summary",
+      "data": {
+        "title": "数形游戏和习惯",
+        "items": [
+          "数与形：逐个点数，观察轮廓",
+          "比较：同起点、配对或重叠",
+          "面与孔：形状和大小都观察",
+          "推理：规则、线索与验证",
+          "习惯：分类、按大小整理"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天把幼儿园里的数学连在了一起。"
+        },
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "数一数能说数量，找轮廓能说形状。"
+        },
+        {
+          "say": "比高矮要同底线，比长短要齐一端。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "弯的先拉直，再看哪一端更远。"
+        },
+        {
+          "say": "比多少一个对一个，比大小可以重叠。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "物体的平平面，可以印出平面轮廓。"
+        },
+        {
+          "say": "过孔口还要看大小，不能只认颜色。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "藏物先听总量和位置规则，再利用线索。"
+        },
+        {
+          "say": "猜想之后揭开验证，没线索时先别确定。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "物品用完分类归位，同类书本按大小放。"
+        },
+        {
+          "say": "这些是屏幕里做过的方法。"
+        },
+        {
+          "say": "说得清不清、生活是否坚持，请大人观察。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+[hidden]{display:none!important}
+#count-room{display:grid;grid-template-columns:316px 1fr;gap:36px;padding:16px 30px}
+#baby-picture{height:382px;margin-top:86px;border:5px solid #d7b58d;border-radius:34px;background:#fff9ec;display:grid;place-items:center}
+#baby-picture img{width:100%;height:100%;object-fit:contain;border-radius:27px}
+#count-toolbar{height:78px;display:grid;grid-template-columns:198px 1fr 198px;align-items:start}
+#count-total{justify-self:center;min-width:88px;border:4px solid #95c5c5;border-radius:26px;background:#fffdf5;text-align:center;font-size:48px;color:#225e60;line-height:56px}
+#eye-panel{height:372px;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:24px;padding:26px;background:#315c73;border:7px solid #254e60;border-radius:36px}
+.eye-lamp{min-width:88px;min-height:88px;border:4px solid #d3dedf;border-radius:26px;background:#e8f0e9;display:grid;place-items:center;cursor:pointer}
+.eye-lamp svg{width:75%;max-width:120px;pointer-events:none}
+.eye-lamp.lit{background:#fff3bd;border-color:#f7c760;box-shadow:inset 0 0 20px #ffcd5d}
+.eye-lamp.hinted{outline:5px dashed #ffda7e;outline-offset:3px}
+.eye-lamp:focus-visible,#count-sound:focus-visible{outline:5px solid #f3943f;outline-offset:3px}
+#count-sound.audio-error{outline:4px dashed #a44828}
+#baby-picture.picture-error{border-style:dashed}

@@ -1,0 +1,913 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Module 1 Unit 2 She's a nurse.",
+  "description": "用原创家庭相册和工作场景学习职业词、人称及家人与自我介绍；真实口语由大人观察。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#C96B4A",
+      "persona": "温暖清楚的英语老师，用中文解释、标准英语示范目标词句，先教原因再让孩子操作，不从点击判断口语。"
+    }
+  },
+  "images": {
+    "family": {
+      "file": "assets/family.png"
+    },
+    "nurse": {
+      "file": "assets/nurse.png"
+    },
+    "driver": {
+      "file": "assets/driver.png"
+    },
+    "policeman": {
+      "file": "assets/policeman.png"
+    },
+    "policewoman": {
+      "file": "assets/policewoman.png"
+    },
+    "pupil": {
+      "file": "assets/pupil.png"
+    },
+    "clinic": {
+      "file": "assets/clinic.png"
+    },
+    "bus": {
+      "file": "assets/bus.png"
+    },
+    "q-nurse": {
+      "file": "assets/q-nurse.png"
+    },
+    "q-driver": {
+      "file": "assets/q-driver.png"
+    },
+    "q-policeman": {
+      "file": "assets/q-policeman.png"
+    },
+    "q-policewoman": {
+      "file": "assets/q-policewoman.png"
+    },
+    "q-pupil-boy": {
+      "file": "assets/q-pupil-boy.png"
+    },
+    "q-pupil-girl": {
+      "file": "assets/q-pupil-girl.png"
+    },
+    "q-teacher": {
+      "file": "assets/q-teacher.png"
+    },
+    "q-doctor": {
+      "file": "assets/q-doctor.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "我们的家庭职业相册",
+      "template": "title-picture",
+      "data": {
+        "title": "我们的家庭职业相册",
+        "picture": "family",
+        "caption": "看看家人，听听职业"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这是安安和家人的一张合照。"
+        },
+        {
+          "say": "爸爸、妈妈和安安站在一起。"
+        },
+        {
+          "say": "今天我们打开一本职业相册。"
+        },
+        {
+          "say": "先看一个人正在做什么工作。"
+        },
+        {
+          "say": "再听老师用英语介绍这个人。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "介绍家人，要说清他是谁。"
+        },
+        {
+          "say": "还要说清这位家人在做什么。"
+        },
+        {
+          "say": "介绍自己时，要换一个说法。"
+        },
+        {
+          "say": "图片会帮你听懂这些英语。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "nurse 和 driver",
+      "template": "two-columns",
+      "data": {
+        "title": "两种帮助大家的工作",
+        "left": {
+          "heading": "nurse",
+          "body": "She's a nurse."
+        },
+        "right": {
+          "heading": "driver",
+          "body": "He's a driver."
+        },
+        "left_picture": "nurse",
+        "right_picture": "driver"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看左边，妈妈在照护小朋友。"
+        },
+        {
+          "say": "她穿着护理服，留意身体情况。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这样的护士，英语说 nurse。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "She's a nurse."
+        },
+        {
+          "say": "这句话介绍她是一名护士。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边爸爸坐在公交车驾驶座。"
+        },
+        {
+          "say": "他握好方向盘，负责驾驶车。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "司机的英语是 driver。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "He's a driver."
+        },
+        {
+          "say": "看工作内容，就能理解职业。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "照片回工作站",
+      "page": "p03",
+      "widgetType": "picture-album",
+      "startImage": "family",
+      "script": [
+        {
+          "highlight": "#job-card"
+        },
+        {
+          "say": "两张工作照要回到合适场景。"
+        },
+        {
+          "say": "先看这张照片里的人在做什么。"
+        },
+        {
+          "highlight": "#clinic-place"
+        },
+        {
+          "say": "这位护士正在照护小朋友。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "所以我把她放进诊室的场景。"
+        },
+        {
+          "say": "诊室里的床和护理台帮助判断。"
+        },
+        {
+          "highlight": "#bus-place"
+        },
+        {
+          "say": "另一边有方向盘和驾驶座。"
+        },
+        {
+          "say": "司机驾驶公交车，适合这个位置。"
+        },
+        {
+          "say": "现在请你把照片送回工作场景。"
+        },
+        {
+          "say": "放错可以再试，不扣小星星。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "两位帮助大家的警察",
+      "template": "two-columns",
+      "data": {
+        "title": "同是警察，说法有区别",
+        "left": {
+          "heading": "policeman",
+          "body": "He's a policeman."
+        },
+        "right": {
+          "heading": "policewoman",
+          "body": "She's a policewoman."
+        },
+        "left_picture": "policeman",
+        "right_picture": "policewoman"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这位男警察正在帮助大家。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "男警察，英语说 policeman。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "He's a policeman."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这边是一位女警察，也在助人。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "女警察的说法是 policewoman。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "She's a policewoman."
+        },
+        {
+          "say": "两个词都说警察，但指的人不同。"
+        },
+        {
+          "say": "介绍哪一个人，就看哪位人物。"
+        },
+        {
+          "say": "职业一样，也要看清具体的人。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "he 和 she 相册",
+      "page": "p05",
+      "widgetType": "picture-album",
+      "startImage": "family",
+      "script": [
+        {
+          "highlight": "#he-page"
+        },
+        {
+          "say": "相册有两页，分别介绍他和她。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "男警察这张照片，介绍的是他。"
+        },
+        {
+          "say": "英语介绍他，先说 he。"
+        },
+        {
+          "highlight": "#she-page"
+        },
+        {
+          "say": "女警察这张照片，介绍的是她。"
+        },
+        {
+          "say": "英语介绍她，先说 she。"
+        },
+        {
+          "highlight": "#job-card"
+        },
+        {
+          "say": "先看具体人物，再选相册的页。"
+        },
+        {
+          "say": "不要只凭职业来猜他或她。"
+        },
+        {
+          "say": "例如男警察和女警察职业相同。"
+        },
+        {
+          "say": "现在请你把每个人送到合适的页。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "quiz",
+      "title": "小检查：职业词",
+      "intro": [
+        "听老师读题，再看图片选人。",
+        "每道题只有一幅图片最合适。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "听 nurse，哪幅图里是护士？",
+          "skill": "听辨 nurse",
+          "answer": [
+            "B"
+          ],
+          "analysis": "nurse 表示护士，图中的护理服和照护动作对应护士。",
+          "options": {
+            "A": {
+              "label": "男警察",
+              "visual": {
+                "kind": "asset",
+                "image": "q-policeman",
+                "alt": "男警察"
+              }
+            },
+            "B": {
+              "label": "女护士",
+              "visual": {
+                "kind": "asset",
+                "image": "q-nurse",
+                "alt": "女护士"
+              }
+            },
+            "C": {
+              "label": "女司机",
+              "visual": {
+                "kind": "asset",
+                "image": "q-driver",
+                "alt": "女司机"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "听 driver，哪幅图里是司机？",
+          "skill": "听辨 driver",
+          "answer": [
+            "C"
+          ],
+          "analysis": "driver 表示司机，图中握着公交车方向盘的女士是司机。",
+          "options": {
+            "A": {
+              "label": "女医生",
+              "visual": {
+                "kind": "asset",
+                "image": "q-doctor",
+                "alt": "女医生"
+              }
+            },
+            "B": {
+              "label": "男老师",
+              "visual": {
+                "kind": "asset",
+                "image": "q-teacher",
+                "alt": "男老师"
+              }
+            },
+            "C": {
+              "label": "女司机",
+              "visual": {
+                "kind": "asset",
+                "image": "q-driver",
+                "alt": "女司机"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "先说家人，再说职业",
+      "template": "two-columns",
+      "data": {
+        "title": "先介绍是谁，再介绍工作",
+        "left": {
+          "heading": "mother",
+          "body": "This is my mother."
+        },
+        "right": {
+          "heading": "father",
+          "body": "This is my father."
+        },
+        "left_picture": "nurse",
+        "right_picture": "driver"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "安安要介绍妈妈，先看这张照片。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "mother 表示妈妈。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "This is my mother."
+        },
+        {
+          "say": "这句话先告诉别人这是我妈妈。"
+        },
+        {
+          "say": "接着说出妈妈的职业。"
+        },
+        {
+          "say": "She's a nurse."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "介绍爸爸时，就把照片换成爸爸。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "father 表示爸爸。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "This is my father."
+        },
+        {
+          "say": "He's a driver."
+        },
+        {
+          "say": "先说家人关系，再说工作就清楚。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "给家庭相册补照片",
+      "page": "p08",
+      "widgetType": "picture-album",
+      "startImage": "family",
+      "script": [
+        {
+          "highlight": "#album-family"
+        },
+        {
+          "say": "安安的相册里，妈妈站在右边。"
+        },
+        {
+          "say": "爸爸戴着眼镜，站在左边。"
+        },
+        {
+          "highlight": "#job-card"
+        },
+        {
+          "say": "先看工作照里的人，认出是谁。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "短棕发的这位，是安安的妈妈。"
+        },
+        {
+          "say": "她的工作照应放回妈妈的位置。"
+        },
+        {
+          "highlight": "#father-page"
+        },
+        {
+          "say": "爸爸的工作照要回爸爸的位置。"
+        },
+        {
+          "say": "照片放好，可以跟老师介绍家人。"
+        },
+        {
+          "say": "先介绍关系，再说这个人的职业。"
+        },
+        {
+          "say": "说给大人听，系统不判断发音。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "小检查：人物介绍",
+      "intro": [
+        "听老师读题，再看图片选人。",
+        "每道题只有一幅图片最合适。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "听 He's a policeman.，选出对应的人。",
+          "skill": "he 与人物指向",
+          "answer": [
+            "A"
+          ],
+          "analysis": "He 指他，policeman 是男警察，完整句对应图里的男警察。",
+          "options": {
+            "A": {
+              "label": "男警察",
+              "visual": {
+                "kind": "asset",
+                "image": "q-policeman",
+                "alt": "男警察"
+              }
+            },
+            "B": {
+              "label": "女警察",
+              "visual": {
+                "kind": "asset",
+                "image": "q-policewoman",
+                "alt": "女警察"
+              }
+            },
+            "C": {
+              "label": "女司机",
+              "visual": {
+                "kind": "asset",
+                "image": "q-driver",
+                "alt": "女司机"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "This is my mother. She's a driver. 选照片。",
+          "skill": "介绍母亲及其职业",
+          "answer": [
+            "B"
+          ],
+          "analysis": "mother 指妈妈，driver 指司机；图中的成年女司机符合两条线索。",
+          "options": {
+            "A": {
+              "label": "女医生",
+              "visual": {
+                "kind": "asset",
+                "image": "q-doctor",
+                "alt": "女医生"
+              }
+            },
+            "B": {
+              "label": "女司机",
+              "visual": {
+                "kind": "asset",
+                "image": "q-driver",
+                "alt": "女司机"
+              }
+            },
+            "C": {
+              "label": "女护士",
+              "visual": {
+                "kind": "asset",
+                "image": "q-nurse",
+                "alt": "女护士"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "This is me.",
+      "template": "big-word",
+      "data": {
+        "title": "相册里也有我",
+        "word": "pupil",
+        "picture": "pupil",
+        "hint": "This is me. I'm a pupil."
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这张照片是安安自己。"
+        },
+        {
+          "say": "他背着书包，准备到学校学习。"
+        },
+        {
+          "spotlight": "word"
+        },
+        {
+          "say": "小学生的英语说 pupil。"
+        },
+        {
+          "say": "自己介绍自己，先指向自己。"
+        },
+        {
+          "spotlight": "hint"
+        },
+        {
+          "say": "This is me."
+        },
+        {
+          "say": "这句话说，这就是我。"
+        },
+        {
+          "say": "I'm a pupil."
+        },
+        {
+          "say": "这句话介绍，我是一名小学生。"
+        },
+        {
+          "say": "别人介绍他，可以说 he。"
+        },
+        {
+          "say": "自己说自己，要换成 I。"
+        },
+        {
+          "say": "请指指自己，跟着老师说给大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "title": "我的小学生相册",
+      "page": "p11",
+      "widgetType": "picture-album",
+      "startImage": "family",
+      "script": [
+        {
+          "highlight": "#self-frame"
+        },
+        {
+          "say": "现在要给小学生的自我介绍配图。"
+        },
+        {
+          "say": "先看人物在做什么，不只看衣服。"
+        },
+        {
+          "highlight": "#pick-pupil"
+        },
+        {
+          "say": "背书包去学校学习的孩子是小学生。"
+        },
+        {
+          "say": "英语介绍自己，可以说我是小学生。"
+        },
+        {
+          "say": "I'm a pupil."
+        },
+        {
+          "highlight": "#pick-driver"
+        },
+        {
+          "say": "成年人工作照不能放进这一页。"
+        },
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "say": "我先把安安的照片放进相框。"
+        },
+        {
+          "say": "看，画面出现了他的自我介绍。"
+        },
+        {
+          "say": "现在换你选图，照片位置会变化。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "小检查：自己与职业",
+      "intro": [
+        "听老师读题，再看图片选人。",
+        "每道题只有一幅图片最合适。"
+      ],
+      "questions": [
+        {
+          "id": "q5",
+          "question": "听 I'm a pupil.，哪张照片适合说这句话？",
+          "skill": "理解自我介绍 pupil",
+          "answer": [
+            "C"
+          ],
+          "analysis": "pupil 指小学生；背书包去课堂的女孩符合，女孩介绍自己也用 I。",
+          "options": {
+            "A": {
+              "label": "男老师",
+              "visual": {
+                "kind": "asset",
+                "image": "q-teacher",
+                "alt": "男老师"
+              }
+            },
+            "B": {
+              "label": "男警察",
+              "visual": {
+                "kind": "asset",
+                "image": "q-policeman",
+                "alt": "男警察"
+              }
+            },
+            "C": {
+              "label": "女小学生",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pupil-girl",
+                "alt": "女小学生"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "听 policewoman，哪幅图对应？",
+          "skill": "听辨 policewoman",
+          "answer": [
+            "A"
+          ],
+          "analysis": "policewoman 表示女警察，图中女警察与男警察、男小学生不同。",
+          "options": {
+            "A": {
+              "label": "女警察",
+              "visual": {
+                "kind": "asset",
+                "image": "q-policewoman",
+                "alt": "女警察"
+              }
+            },
+            "B": {
+              "label": "男警察",
+              "visual": {
+                "kind": "asset",
+                "image": "q-policeman",
+                "alt": "男警察"
+              }
+            },
+            "C": {
+              "label": "男小学生",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pupil-boy",
+                "alt": "男小学生"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "带着相册说一说",
+      "template": "summary",
+      "data": {
+        "title": "把今天的发现带回家",
+        "items": [
+          "看工作，理解职业词",
+          "看人物，区分 he 和 she",
+          "先介绍家人，再介绍职业",
+          "This is me. I'm a pupil."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们认识了几种职业的说法。"
+        },
+        {
+          "say": "护士照护别人，司机驾驶车辆。"
+        },
+        {
+          "say": "警察帮助大家，小学生在学校学习。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "介绍他或她，要看具体是哪位人物。"
+        },
+        {
+          "say": "同一种职业，也可以由不同的人做。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "介绍家人，先说清这位家人是谁。"
+        },
+        {
+          "say": "再用合适的句子说出职业。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "介绍自己，要指着自己说。"
+        },
+        {
+          "say": "I'm a pupil."
+        },
+        {
+          "say": "请大人听你介绍一张家庭照片。"
+        },
+        {
+          "say": "会不会说，留给大人观察。"
+        },
+        {
+          "say": "再请大人陪你问问三位朋友。"
+        },
+        {
+          "say": "听听他们将来想做什么工作。"
+        }
+      ]
+    }
+  ]
+}

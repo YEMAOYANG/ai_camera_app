@@ -1,0 +1,1259 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "1～5的认识",
+  "description": "在原创社区手作邮局点数、配对、正着倒着排数卡，再用起点和方向练习写1到5。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "以实物、计数点和数字建立对应，示范有序点数、1到5的数序和教材书写方向，留给孩子开口和纸笔练习。"
+    }
+  },
+  "images": {
+    "postroom": {
+      "file": "assets/postroom.png"
+    },
+    "letter": {
+      "file": "assets/letter.png"
+    },
+    "parcel": {
+      "file": "assets/parcel.png"
+    },
+    "stamp": {
+      "file": "assets/stamp.png"
+    },
+    "clip": {
+      "file": "assets/clip.png"
+    },
+    "quiz-shells": {
+      "file": "assets/quiz-shells.png"
+    },
+    "quiz-towels": {
+      "file": "assets/quiz-towels.png"
+    },
+    "quiz-crayons": {
+      "file": "assets/quiz-crayons.png"
+    },
+    "number-strip": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          760,
+          610
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "1"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "writing-guide": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "↙"
+              },
+              {
+                "glyph": "1"
+              }
+            ]
+          }
+        ],
+        "size": [
+          850,
+          380
+        ]
+      }
+    },
+    "one-dot": {
+      "glyph": {
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              }
+            ]
+          }
+        ],
+        "size": [
+          520,
+          300
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "走进手作邮局",
+      "template": "title-picture",
+      "data": {
+        "title": "1～5的认识",
+        "picture": "postroom",
+        "caption": "先看是哪一类，再一件一件数"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "同学们好！我们一起走进手作邮局。"
+        },
+        {
+          "say": "我是小数老师。今天给物品贴数量卡。"
+        },
+        {
+          "say": "桌上摆什么，就先认清要数哪一种。"
+        },
+        {
+          "say": "比如要数信封，就把眼睛留在信封上。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "手指碰到一件，嘴里数一个数。"
+        },
+        {
+          "say": "碰过的这件做个记号，下一件接着数。"
+        },
+        {
+          "say": "每件都点齐，数到几，总数就是几。"
+        },
+        {
+          "say": "等会儿你也来当一次邮局的小帮手。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "点一件，记一次",
+      "page": "p02",
+      "widgetType": "one-to-one-count-and-mark",
+      "startImage": "postroom",
+      "script": [
+        {
+          "setState": {
+            "demo": "prepare"
+          }
+        },
+        {
+          "highlight": "#count-target"
+        },
+        {
+          "say": "先看看屏幕上方，我们要找什么？"
+        },
+        {
+          "highlight": "#count-desk"
+        },
+        {
+          "say": "这里散放着几种东西，我只找夹子。"
+        },
+        {
+          "setState": {
+            "demo": "first"
+          }
+        },
+        {
+          "highlight": "#count-track"
+        },
+        {
+          "say": "点第一只夹子，下面就多一颗点。"
+        },
+        {
+          "say": "点一件，记一次。亮过的就不再点。"
+        },
+        {
+          "setState": {
+            "demo": "all"
+          }
+        },
+        {
+          "highlight": "#count-track"
+        },
+        {
+          "say": "接着从左到右，把还没点的夹子找齐。"
+        },
+        {
+          "say": "我最后数到四，所以夹子一共有四只。"
+        },
+        {
+          "highlight": "#count-check"
+        },
+        {
+          "say": "收工前，看看还有没有漏掉的夹子。"
+        },
+        {
+          "say": "轮到你了。先认上面的图，再点一件。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "认识五张数卡",
+      "template": "steps",
+      "data": {
+        "title": "认识五张数卡",
+        "steps": [
+          "●",
+          "●●",
+          "●●●",
+          "●●●●",
+          "●●●●●"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "从左边开始，这是数字一。一颗点用一。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "这是数字二。两颗点，跟我读二。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "这是数字三。三颗点，跟我读三。"
+        },
+        {
+          "spotlight": "step-4"
+        },
+        {
+          "say": "接着是数字四。四颗点，跟我读四。"
+        },
+        {
+          "spotlight": "step-5"
+        },
+        {
+          "say": "最后是数字五。五颗点，跟我读五。"
+        },
+        {
+          "say": "点的个数和数卡读出来的数要相同。"
+        },
+        {
+          "say": "一只信封和一个包裹，都可以用一。"
+        },
+        {
+          "say": "同一个数可以表示不同东西，得一样多。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "同样多，送到一起",
+      "page": "p04",
+      "widgetType": "objects-and-dot-card-match",
+      "startImage": "postroom",
+      "script": [
+        {
+          "setState": {
+            "demo": "objects"
+          }
+        },
+        {
+          "highlight": "#match-items"
+        },
+        {
+          "say": "先看左边的展示台。两只信封，数到二。"
+        },
+        {
+          "highlight": "#match-choices"
+        },
+        {
+          "say": "右边哪一张点卡和信封一样多？"
+        },
+        {
+          "say": "一只信封对应一颗点，逐个配才清楚。"
+        },
+        {
+          "setState": {
+            "demo": "matched"
+          }
+        },
+        {
+          "highlight": "#match-bridge"
+        },
+        {
+          "say": "我们把它们配起来验证。两边都配齐了。"
+        },
+        {
+          "say": "每只信封都有点相配，也没有剩下的点。"
+        },
+        {
+          "say": "所以这组信封用数字二来记。"
+        },
+        {
+          "setState": {
+            "demo": "transfer"
+          }
+        },
+        {
+          "highlight": "#match-items"
+        },
+        {
+          "say": "换成两个包裹，配的还是这张二。"
+        },
+        {
+          "say": "两组物品样子不同，个数相同。"
+        },
+        {
+          "say": "请把每组物品送到同样多的卡片上。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "换个地方数一数",
+      "intro": [
+        "刚才学了点数。换一换东西，再数一数。",
+        "听老师读题，数过了再选。"
+      ],
+      "questions": [
+        {
+          "id": "r15-q1",
+          "question": "浅盘里有几枚贝壳？",
+          "skill": "散放物品点数并读数",
+          "options": {
+            "A": {
+              "label": "数字3",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "3"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字3"
+              }
+            },
+            "B": {
+              "label": "数字4",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "4"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字4"
+              }
+            },
+            "C": {
+              "label": "数字5",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "5"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字5"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "顺着数一圈，每枚只点一次。数到四，选数字4。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-shells",
+            "alt": "浅盘里分开散放的贝壳"
+          }
+        },
+        {
+          "id": "r15-q2",
+          "question": "哪组点和毛巾的个数同样多？",
+          "skill": "物品与点阵一一对应",
+          "options": {
+            "A": {
+              "label": "2颗点",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            },
+            "B": {
+              "label": "3颗点",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            },
+            "C": {
+              "label": "1颗点",
+              "visual": {
+                "kind": "quantity",
+                "count": 1
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "每块毛巾配一颗点。两块刚好配两颗点。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-towels",
+            "alt": "架子左右各摆一块毛巾"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "数字排队的秘密",
+      "template": "picture-points",
+      "data": {
+        "title": "数字排队的秘密",
+        "picture": "number-strip",
+        "points": [
+          "向前走，多一颗",
+          "往回走，少一颗",
+          "1 → 2 → 3 → 4 → 5",
+          "5 → 4 → 3 → 2 → 1"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们来玩数字排队。先看点是怎么变的。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "桌上两颗计数点，再添一颗是三颗。"
+        },
+        {
+          "say": "三比二多一颗圆点，所以三在二后面。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从五颗拿走一颗，就剩四颗。"
+        },
+        {
+          "say": "往回走一步，点的个数少一颗。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在正着数：一、二、三、四、五。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "再倒着数：五、四、三、二、一。"
+        },
+        {
+          "say": "看清走的方向，再决定下一张放谁。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "两条送信路线",
+      "page": "p07",
+      "widgetType": "number-route-ordering",
+      "startImage": "postroom",
+      "script": [
+        {
+          "setState": {
+            "demo": "forward"
+          }
+        },
+        {
+          "highlight": "#route-badge"
+        },
+        {
+          "say": "阶梯往上，箭头告诉我们从少到多。"
+        },
+        {
+          "highlight": "#route-slots"
+        },
+        {
+          "say": "二的旁边添一颗点，就成了三。"
+        },
+        {
+          "say": "我把多一颗点的三放到二的下一格。"
+        },
+        {
+          "setState": {
+            "demo": "reverse"
+          }
+        },
+        {
+          "highlight": "#route-badge"
+        },
+        {
+          "say": "这回台阶往下，改成从多到少。"
+        },
+        {
+          "highlight": "#route-slots"
+        },
+        {
+          "say": "五少一颗剩四，五的下一张放四。"
+        },
+        {
+          "say": "相邻的两张，只差一颗点。"
+        },
+        {
+          "setState": {
+            "demo": "ready"
+          }
+        },
+        {
+          "highlight": "#route-tray"
+        },
+        {
+          "say": "数一数卡片上有几颗点，再找它的位置。"
+        },
+        {
+          "say": "从箭头的起点出发，一张一张排。"
+        },
+        {
+          "say": "每排一张，看看相邻两张差几颗。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "先看起笔点",
+      "template": "picture-points",
+      "data": {
+        "title": "先看起笔点",
+        "picture": "writing-guide",
+        "points": [
+          "先找圆起点",
+          "顺着箭头走",
+          "回到纸上写一写"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "现在学写数。数卡上的数字也能自己写。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "写数字，第一步要先找准起笔点。"
+        },
+        {
+          "say": "比如写一，起点在上面靠右一点。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看清箭头指的方向。一要向左下走。"
+        },
+        {
+          "say": "慢一点，沿同一条线走到末尾。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "用纸写时，坐正，握笔放轻松。"
+        },
+        {
+          "say": "伸出小手，跟着箭头在空中比划。"
+        },
+        {
+          "say": "请家人看看，你写出的数认不认得。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "数字沿线走",
+      "page": "p09",
+      "widgetType": "number-writing-direction",
+      "startImage": "postroom",
+      "script": [
+        {
+          "setState": {
+            "digit": 1,
+            "stroke": 0
+          }
+        },
+        {
+          "highlight": "#writing-board"
+        },
+        {
+          "say": "写一，从右上的圆点向左下斜着走。"
+        },
+        {
+          "say": "这一条斜线走到底，就写完了一。"
+        },
+        {
+          "setState": {
+            "digit": 2,
+            "stroke": 0
+          }
+        },
+        {
+          "highlight": "#writing-board"
+        },
+        {
+          "say": "写二，从左上出发，向右弯过来。"
+        },
+        {
+          "say": "接着斜下去，到了底部再向右。"
+        },
+        {
+          "setState": {
+            "digit": 3,
+            "stroke": 0
+          }
+        },
+        {
+          "highlight": "#writing-board"
+        },
+        {
+          "say": "写三要拐两个弯，先向右画上面的弯。"
+        },
+        {
+          "say": "走回中间，再往右画下面的弯。"
+        },
+        {
+          "say": "下面的弯绕回来，在左下收住。"
+        },
+        {
+          "setState": {
+            "digit": 4,
+            "stroke": 0
+          }
+        },
+        {
+          "highlight": "#writing-board"
+        },
+        {
+          "say": "写四先斜着下来，再向右横过去。"
+        },
+        {
+          "setState": {
+            "digit": 4,
+            "stroke": 1
+          }
+        },
+        {
+          "highlight": "#writing-board"
+        },
+        {
+          "say": "另一条斜线往左下，穿过短横。"
+        },
+        {
+          "setState": {
+            "digit": 5,
+            "stroke": 0
+          }
+        },
+        {
+          "highlight": "#writing-board"
+        },
+        {
+          "say": "写五先向下，再向右绕出圆弯。"
+        },
+        {
+          "setState": {
+            "digit": 5,
+            "stroke": 1
+          }
+        },
+        {
+          "highlight": "#writing-board"
+        },
+        {
+          "say": "五的顶上，再向右加一小段短横。"
+        },
+        {
+          "highlight": "#writing-route"
+        },
+        {
+          "say": "点一下你找的起点，看看路线怎么亮。"
+        },
+        {
+          "say": "也可以用手指顺着它描一遍。"
+        },
+        {
+          "say": "有纸笔时再写一遍，请家人帮你看。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "看看数卡和路线",
+      "intro": [
+        "我们来看看数卡和路线记住了没有。",
+        "听清每道题，想好再选图。"
+      ],
+      "questions": [
+        {
+          "id": "r15-q3",
+          "question": "从少到多排数，空位上放哪个数字？",
+          "skill": "从少到多的数序",
+          "options": {
+            "A": {
+              "label": "数字3",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "3"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字3"
+              }
+            },
+            "B": {
+              "label": "数字5",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "5"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字5"
+              }
+            },
+            "C": {
+              "label": "数字4",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "4"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字4"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "从少到多是二、三、四、五，所以空位放四。",
+          "visual": {
+            "kind": "picture",
+            "picture": {
+              "groups": [
+                {
+                  "cells": [
+                    {
+                      "glyph": "2"
+                    },
+                    {
+                      "glyph": "3"
+                    },
+                    {
+                      "glyph": "?"
+                    },
+                    {
+                      "glyph": "5"
+                    }
+                  ]
+                }
+              ]
+            },
+            "alt": "从左往右，二、三、空位、五"
+          }
+        },
+        {
+          "id": "r15-q4",
+          "question": "倒着从多到少数，空位上放哪个数字？",
+          "skill": "从多到少的数序",
+          "options": {
+            "A": {
+              "label": "数字1",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "1"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字1"
+              }
+            },
+            "B": {
+              "label": "数字2",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "2"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字2"
+              }
+            },
+            "C": {
+              "label": "数字3",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "3"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "数字3"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "三少一个是二，二再少一个是一，所以空位放二。",
+          "visual": {
+            "kind": "picture",
+            "picture": {
+              "groups": [
+                {
+                  "cells": [
+                    {
+                      "glyph": "5"
+                    },
+                    {
+                      "glyph": "4"
+                    },
+                    {
+                      "glyph": "3"
+                    },
+                    {
+                      "glyph": "?"
+                    },
+                    {
+                      "glyph": "1"
+                    }
+                  ]
+                }
+              ]
+            },
+            "alt": "从左往右，五、四、三、空位、一"
+          }
+        },
+        {
+          "id": "r15-q5",
+          "question": "数字二底下的短横，往哪边写？",
+          "skill": "识别数字2末段的书写方向",
+          "options": {
+            "A": {
+              "label": "向右",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "→"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "向右"
+              }
+            },
+            "B": {
+              "label": "向左",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "←"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "向左"
+              }
+            },
+            "C": {
+              "label": "向上",
+              "visual": {
+                "kind": "picture",
+                "picture": {
+                  "groups": [
+                    {
+                      "cells": [
+                        {
+                          "glyph": "↑"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "alt": "向上"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "数字2上面弯过来，再斜向左下，底下的短横向右写。",
+          "visual": {
+            "kind": "picture",
+            "picture": {
+              "groups": [
+                {
+                  "cells": [
+                    {
+                      "glyph": "2"
+                    }
+                  ]
+                }
+              ]
+            },
+            "alt": "要练写的数字二"
+          }
+        },
+        {
+          "id": "r15-q6",
+          "question": "每支蜡笔配一颗点，哪个点图合适？",
+          "skill": "用点表示日常数量",
+          "options": {
+            "A": {
+              "label": "4颗点",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "B": {
+              "label": "3颗点",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            },
+            "C": {
+              "label": "5颗点",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "给桌上的蜡笔逐支配点，五支蜡笔正好配五颗。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-crayons",
+            "alt": "桌上分开横排的蜡笔"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "把一个数带回家",
+      "template": "two-columns",
+      "data": {
+        "title": "把一个数带回家",
+        "left": {
+          "heading": "家里的物品",
+          "body": "我数了一只夹子"
+        },
+        "left_picture": "clip",
+        "right": {
+          "heading": "用点来记",
+          "body": "一颗点，写作1"
+        },
+        "right_picture": "one-dot"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边，这里是家里的一只夹子。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "我点过这只夹子，最后数到一。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看右边，一颗点代表一件东西。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "一只夹子就配一颗点，两边一样多。"
+        },
+        {
+          "say": "再写上数字一，把这一件的数量记下来。"
+        },
+        {
+          "say": "现在你选一到五里的一个数。"
+        },
+        {
+          "say": "找几件东西，画点或摆出同样多。"
+        },
+        {
+          "say": "把你选的数和配点的方法说给家人听。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "数、配、排、写",
+      "template": "summary",
+      "data": {
+        "title": "数、配、排、写",
+        "items": [
+          "每件点一次，最后的数是总数",
+          "一个物品配一个标记",
+          "从少到多或从多到少排队",
+          "看准起点，沿方向写数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先想第一个本领，数。先认清是哪一类。"
+        },
+        {
+          "say": "每件只数一次，不重也不漏。"
+        },
+        {
+          "say": "最后数到几，这一组就有几个。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "配的时候一样多才配齐，也用同一个数。"
+        },
+        {
+          "say": "这五张卡读一、二、三、四、五。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "正着数每步多一个，倒着数每步少一个。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "写数从起点出发，沿箭头慢慢走。"
+        },
+        {
+          "say": "你还可以到家里找一组东西再数数。"
+        },
+        {
+          "say": "记好数量，把你的方法说给家人听。"
+        }
+      ]
+    }
+  ]
+}

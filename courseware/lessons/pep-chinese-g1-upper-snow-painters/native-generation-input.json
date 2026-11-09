@@ -1,0 +1,373 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "pep-chinese-g1-upper-2022-standard",
+    "revisionId": "20260924-directory-3",
+    "nodeId": "u5-l3",
+    "unitId": "unit-5-reading",
+    "title": "雪地里的小画家",
+    "classHours": [
+      "lesson_1",
+      "lesson_2"
+    ],
+    "gradeCode": "primary_1",
+    "subject": "chinese",
+    "volume": "upper",
+    "printedTextbookStartPage": 64,
+    "officialMaterialId": "b7062df1-f929-458e-964c-d778f89ca255",
+    "activityId": "5ef14afa-61cd-4d4f-ebb7-03b539e58111"
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "9b000e4875ccc01ddbf96e249ce574b66b8738e2569b34900b5e68192c550220",
+    "briefSha256": "b2a9b9c5aa2bf697c62ab4c15339bebfb894b8393a1b26707c720bcc73899c72",
+    "officialManifestSha256": "a635377dd42d92b2b34113cfc1cfbbd7df1cd5f5a5e3ae0ee17b1cd31f5ffe69",
+    "previousEditableLessonSha256": "3ea4b89207ca3bfc4612c9e4869b21a975d2c982d7f55e1fa1bf4f126cf87540",
+    "assetRequirementsSha256": "65ac20396ac40a31e6b5f272c57feb9a0f951668cc6d3a0a6fe232f2c86a4492"
+  },
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "objectives": [
+      "借助拼音、图画和词语认识的、家、鸡、竹、牙、用、几、步、没、参、加，认识宝盖头；读准课题中的轻声的。",
+      "正确朗读全文并尝试背诵，读出开头下雪时的快乐和结尾问答的轻缓语气，实际朗读背诵由成人观察。",
+      "理解一群和没参加等词义，知道课文中的小鸡、小狗、小鸭、小马；用脚印形状分别联想到竹叶、梅花、枫叶、月牙。",
+      "理解不用颜料不用笔、几步就成一幅画，是把小动物踩出的脚印想成一幅画；几步不规定某个精确步数。",
+      "知道青蛙没有参加是因为在洞里冬眠，初步感受自然现象；只讲本课资料支持的青蛙事实。",
+      "观察马、牙、用、竹、几的字形、格中位置和关键笔形，认识竖折折钩、竖折、横折钩；自由描画后到纸上练写，笔顺与规范由成人观察。"
+    ],
+    "coveredOfficialHours": [
+      "lesson_1",
+      "lesson_2"
+    ],
+    "videoStatus": "waived",
+    "excludedTopics": [
+      "两课时合成同一上架课件，不分开发布。",
+      "不把画面配对说成会朗读背诵；五字描画只统计覆盖。",
+      "未核成两处来源的完整整字笔顺不讲、不画路径；纸笔规范与笔顺写待观察。",
+      "不把冬眠扩展到未教的动物名单或生理机制。",
+      "不继承其他版本或课程的G7豁免。"
+    ]
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  },
+  "request": "以小学一年级语文上册《雪地里的小画家》为唯一课目，两课时合成一门完整的可编辑课件。按 p01 至 p20 页标识组织草稿，已有互动和图片资产可适配。为每页写新的教师口语台词、画面动作及反馈，提供可编辑题目与解析。按照所给教材核对边界逐句创作。",
+  "qualityRules": [
+    "使用简体。教师女声 Serena，教师台词使用可清楚听懂的短句。讲解页至少六句一百字，互动页至少五句九十字。",
+    "互动页老师先实际操作再解释，至少三次动作；遮住非目标字，孩子仍可靠正式图片与听题完成。第一次错误只提示观察方向，支持复位和重玩。",
+    "一屏一事，讲解页依次点亮。图片仅按资产 ID 引用，无外链、无浏览器语音、无实时课堂讨论。",
+    "朗读、背诵、纸笔笔顺和书写规范由成人观察，屏幕练习只记录实际操作。"
+  ],
+  "pagePlan": [
+    {
+      "id": "p01",
+      "type": "slide",
+      "title": "雪地里的神秘画展",
+      "purpose": "从白雪小院图片出发，课题里「的」读轻声，介绍听、找脚印、认字和练写。"
+    },
+    {
+      "id": "p02",
+      "type": "slide",
+      "title": "听一遍完整的儿歌",
+      "purpose": "对照核准课文顺序完整领读，开始轻快、结尾放缓，画面分段依序点亮。"
+    },
+    {
+      "id": "p03",
+      "type": "slide",
+      "title": "轻声的，宝盖头的家",
+      "purpose": "读课题轻声「的」，用「家」介绍宝盖头，语境里理解「一群」。"
+    },
+    {
+      "id": "p04",
+      "type": "interactive",
+      "title": "给家找回宝盖头",
+      "purpose": "从字形比较里找到宝盖头，移到「家」上方，并能换位重玩。"
+    },
+    {
+      "id": "p05",
+      "type": "slide",
+      "title": "鸡、竹、牙，字音连画面",
+      "purpose": "看小鸡、竹叶、月牙辨认鸡、竹、牙，依次点亮图和字。"
+    },
+    {
+      "id": "p06",
+      "type": "slide",
+      "title": "用、几步和没参加",
+      "purpose": "借画画和参与活动的语境辨认用、几、步、没、参、加，讲「几步」和「没参加」。"
+    },
+    {
+      "id": "p07",
+      "type": "interactive",
+      "title": "把同一个字放到一起",
+      "purpose": "图片、字音与字形引导十一字归位，逐轮换位并能重玩。"
+    },
+    {
+      "id": "p08",
+      "type": "interactive",
+      "title": "小画家与它的脚印",
+      "purpose": "看四只动物找其脚印，教师先逐对操作，孩子完成图片配对。"
+    },
+    {
+      "id": "p09",
+      "type": "slide",
+      "title": "不用画笔，怎样留下画",
+      "purpose": "按先走、再留印、连成画说明不用颜料和笔；不要给「几步」指定数量。"
+    },
+    {
+      "id": "p10",
+      "type": "interactive",
+      "title": "脚印像什么",
+      "purpose": "由图中的足印反向找相似形状，图卡移动并给予可重试反馈。"
+    },
+    {
+      "id": "p11",
+      "type": "slide",
+      "title": "休息后再找青蛙",
+      "purpose": "承接前半场的认字和脚印，回想结尾问答，引出青蛙。"
+    },
+    {
+      "id": "p12",
+      "type": "slide",
+      "title": "青蛙为什么没来",
+      "purpose": "用洞中青蛙图理解没参加是因冬眠，练读轻缓的问答。"
+    },
+    {
+      "id": "p13",
+      "type": "interactive",
+      "title": "让脚步连成画",
+      "purpose": "选择动物后依次踩多个踏点留印，解释几步成画，不把它固定成某个数量。"
+    },
+    {
+      "id": "p14",
+      "type": "slide",
+      "title": "借图回想整首儿歌",
+      "purpose": "以雪地、脚印、洞中青蛙三条画面线索回想全文，安排成人听读和背诵。"
+    },
+    {
+      "id": "p15",
+      "type": "interactive",
+      "title": "三个转折笔形",
+      "purpose": "观察并匹配竖折折钩、竖折、横折钩单笔形态，给出局部转折观察提示。"
+    },
+    {
+      "id": "p16",
+      "type": "slide",
+      "title": "观察五个字",
+      "purpose": "逐字观察马、牙、用、竹、几在田字格中的位置和形状。"
+    },
+    {
+      "id": "p17",
+      "type": "interactive",
+      "title": "沿淡字慢慢描",
+      "purpose": "五个范字依次自由描画，能擦掉重来，电子记录只表示描画覆盖。"
+    },
+    {
+      "id": "p18",
+      "type": "quiz",
+      "title": "小检查：换成泥地",
+      "purpose": "用同底色泥地变式检验辨认细长竹叶形与连续月牙形，老师读题。"
+    },
+    {
+      "id": "p19",
+      "type": "quiz",
+      "title": "小检查：换个游戏",
+      "purpose": "在新生活场景中检验脚步留下花样和没参加的理解，老师读题。"
+    },
+    {
+      "id": "p20",
+      "type": "slide",
+      "title": "把画展带回家",
+      "purpose": "回顾课文、字形和比喻，安排课后认读、背诵和纸笔练习，家庭观察与课内作答分开。"
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "page": "p18",
+      "question": "哪枚新泥印像细细的竹叶？",
+      "answer": [
+        "B"
+      ],
+      "skill": "动物足印与形状联系",
+      "analysis": "细长分开的印形像竹叶，与儿歌中小鸡足印的联想相同。",
+      "options": {
+        "A": "mud-dog",
+        "B": "mud-chick",
+        "C": "mud-duck"
+      }
+    },
+    {
+      "page": "p18",
+      "question": "哪枚新泥印像弯弯的月牙？",
+      "answer": [
+        "C"
+      ],
+      "skill": "动物足印与形状联系",
+      "analysis": "弯弯的蹄缘印与月牙相似，是课文中小马足印的形状联想。",
+      "options": {
+        "A": "mud-duck",
+        "B": "mud-dog",
+        "C": "mud-horse"
+      }
+    },
+    {
+      "page": "p19",
+      "question": "哪幅图只靠脚步在地面留下花样？",
+      "answer": [
+        "A"
+      ],
+      "skill": "不用画笔的脚步画",
+      "analysis": "脚踩过的地面留下足印，这种花样来自脚步，不靠画笔涂画。",
+      "options": {
+        "A": "mud-dog",
+        "B": "child-paint",
+        "C": "child-snowman"
+      }
+    },
+    {
+      "page": "p19",
+      "question": "谁没有参加屋外的雪地游戏？",
+      "answer": [
+        "B"
+      ],
+      "skill": "没参加的含义",
+      "analysis": "室内看书的孩子没有加入屋外游戏，堆雪人和坐雪橇的孩子参加了。",
+      "options": {
+        "A": "child-snowman",
+        "B": "child-read",
+        "C": "child-sled"
+      }
+    }
+  ],
+  "assetPlan": [
+    {
+      "id": "winter-yard",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "chick",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "dog",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "duck",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "horse",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "track-chick",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "track-dog",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "track-duck",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "track-horse",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "bamboo-leaf",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "plum-blossom",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "maple-leaf",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "crescent",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "frog-shelter",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "mud-chick",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "mud-dog",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "mud-duck",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "mud-horse",
+      "provision": "待重新验收的连续单道弯月形泥地凹痕"
+    },
+    {
+      "id": "child-paint",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "child-read",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "child-snowman",
+      "provision": "由 Codex 提供对应正式插画"
+    },
+    {
+      "id": "child-sled",
+      "provision": "由 Codex 提供对应正式插画"
+    }
+  ],
+  "teachingFacts": {
+    "verifiedText": [
+      "下雪啦，下雪啦！",
+      "雪地里来了一群小画家。",
+      "小鸡画竹叶，小狗画梅花，",
+      "小鸭画枫叶，小马画月牙。",
+      "不用颜料不用笔，",
+      "几步就成一幅画。",
+      "青蛙为什么没参加？",
+      "他在洞里睡着啦。"
+    ],
+    "keyPoint": "生字与宝盖头、四种脚印和形状联想、朗读背诵及五个书写字。",
+    "difficultPoint": "把雪地脚印理解为诗意的画，理解不用笔与几步的意思，读出快乐与结尾问答语气。",
+    "factChecks": [
+      [
+        "牙中学习竖折，马中学习竖折折钩，用中学习横折钩。",
+        "本课展示这三种单笔笔形，不凭记忆补全整字笔顺。"
+      ],
+      [
+        "课文中小鸡的脚印像竹叶，小狗的脚印像梅花，小鸭的脚印像枫叶，小马的脚印像月牙。",
+        "这是一组基于课文图画的形状联想，不声称任意真实足印都可仅凭该图准确判定物种。"
+      ],
+      [
+        "青蛙没有参加，是在洞里冬眠；课文用睡着啦作表达。"
+      ],
+      [
+        "竹左右两部分不完全相同，要观察长短、高低和收笔。",
+        "几与儿整体字形不同，需对照范字观察弯处和收笔。"
+      ]
+    ],
+    "afterClass": {
+      "sourceTasks": [
+        "第一课时课后1页：朗读、生字听读，介绍小画家和所画之物。",
+        "第二课时课后1页：朗读、背诵课文。"
+      ],
+      "destination": "课内教师领读和图画线索；家人听一次朗读背诵并看纸笔书写；只提交本课学习目标和小检查技能作周测题源。"
+    }
+  }
+}

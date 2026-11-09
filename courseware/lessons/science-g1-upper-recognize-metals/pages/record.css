@@ -1,0 +1,29 @@
+#play { color:#503627; }
+#cv:has(#ready:not(.gone)) #play { visibility:hidden; }
+#record-board { position:absolute; inset:16px 26px; border:3px solid #bd966d; border-radius:26px; background:#fff9ec; }
+#record-photo { position:absolute; left:365px; top:55px; width:444px; height:390px; padding:14px; border:4px solid #b1875c; border-radius:18px; background:#fffdf2; box-shadow:0 7px 0 #ddc29e; cursor:grab; touch-action:none; }
+#record-photo.dragging { z-index:9; cursor:grabbing; }
+#record-photo.filed { opacity:.33; }
+#record-photo img { width:100%; height:100%; border-radius:12px; object-fit:contain; background:#fcf3e4; display:block; }
+#record-focus { display:none; position:absolute; left:63.2%; top:57.7%; width:27.5%; height:6.4%; border:4px solid #2d7652; box-shadow:0 0 0 4px #fffaf1; transform:rotate(6deg); border-radius:12px; pointer-events:none; }
+#record-photo.show-focus #record-focus { display:block; }
+.record-pocket { position:absolute; top:111px; width:271px; height:303px; }
+.record-pocket.known { left:42px; }
+.record-pocket.unknown { right:42px; }
+.record-pocket button { position:absolute; inset:0; width:100%; height:100%; border:5px dashed; border-radius:24px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:22px; padding:24px; font-size:34px; cursor:pointer; }
+.known button { background:#edf6e7; color:#286249; border-color:#789878; }
+.unknown button { background:#fff1db; color:#835235; border-color:#bf935e; }
+.record-pocket button:hover { filter:brightness(0.96); }
+.record-pocket button:disabled { cursor:default; }
+.record-pocket button:focus-visible,#record-photo:focus-visible,#record-retry:focus-visible { outline:6px solid #28476b; outline-offset:6px; }
+.record-pocket svg { width:126px; height:126px; }
+.record-pocket.received button { border-style:solid; }
+.record-pocket.received svg { visibility:hidden; }
+#record-result { position:absolute; top:144px; width:213px; height:177px; padding:7px; border:3px solid #987a57; border-radius:15px; background:#fffaf0; box-shadow:0 5px 0 #ba946080; pointer-events:none; }
+#record-result.left { left:71px; }
+#record-result.right { right:71px; }
+#record-result img { width:100%; height:100%; object-fit:contain; display:block; background:#fbf1e1; border-radius:8px; }
+#record-retry { position:absolute; left:494px; top:194px; min-width:186px; min-height:98px; z-index:12; }
+.record-failed { opacity:.25; }
+#ready .pic { width:480px; height:270px; }
+#ready p { margin:10px 0 18px; }

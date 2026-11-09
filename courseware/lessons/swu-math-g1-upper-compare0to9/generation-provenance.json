@@ -1,0 +1,197 @@
+{
+  "schemaVersion": "mira.courseware.generation-provenance.v1",
+  "generator": {
+    "tool": "OpenMAIC",
+    "providerId": "deepseek",
+    "modelId": "deepseek-v4-pro"
+  },
+  "nativeJobId": "NeAT0pMhMk",
+  "nativeClassroomId": "opgccwI-DU",
+  "nativeSceneCount": 17,
+  "adaptedSceneCount": 17,
+  "editorModel": "gpt-6.1-sol",
+  "sourceInputSha256": "ea2ad94bcfe44bbcd36614bf303cbf7f7be8fce0daebb32122ab909986bdad19",
+  "nativeClassroomRawSha256": "ca75193c1d44ea12a9f6aab582f6cd737b07fb10f57b425bd06589ccfd2399e6",
+  "nativeClassroomSha256": "b1c93a79682427a53f6cb88edb3c7299eb7f4cb8d2ff0d73937a41e9944326c7",
+  "nativeJobReceiptSha256": "510e63eb4f531c3c7a454abfc425795b46d486c88e41cc95618f12a863b30365",
+  "requestReceiptSha256": "f2156d0f6ba234842679e0cb9f5d16a6875e2bbd4b5fe7248756c0a3c8260122",
+  "adaptationBoundaries": [
+    "保留DeepSeek生成的完整场景顺序、知识结构与具体例，纠正数学错误、重复题和超长句，补足示范及理由。",
+    "图、互动和题目选项由 Codex 按原生场景逐项适配可编辑公共 kit，题目更动在场景映射逐一记载。"
+  ],
+  "sceneMap": [
+    {
+      "nativeSceneId": "scene_5MSrLX3Q3a",
+      "sourceSceneKey": "p01",
+      "nativeType": "slide",
+      "sourceType": "slide",
+      "nativeTitle": "先看看这两组",
+      "retainedVerbatimSpeech": [
+        "小朋友们，美术角要开始整理啦！先看看这两组东西。",
+        "三对都配完啦，两边都没有剩下。"
+      ],
+      "adaptedSceneSha256": "92c74aba416a6d1f2b80b17ca56a5b26cf02e1d4bf0c1f67c06869b336e28f0f",
+      "reason": "保留美术角开场和三对配完；明确从两组各取一件，不搬官方蜜蜂情境。"
+    },
+    {
+      "nativeSceneId": "scene_179_XqjeE7",
+      "sourceSceneKey": "p02",
+      "nativeType": "interactive",
+      "sourceType": "interactive",
+      "nativeTitle": "配一配找同样多",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "e26ef5fa055e947d3417e17b62c2a6ade026f6b88fc227ae116f2ca9850d21da",
+      "reason": "保留配对后出等号和场景的三对示范。原生成游戏中同样多选项可能多于一个，公共互动按唯一选项和可见连线制作。"
+    },
+    {
+      "nativeSceneId": "scene_tzY-_6Jjr6",
+      "sourceSceneKey": "p03",
+      "nativeType": "slide",
+      "sourceType": "slide",
+      "nativeTitle": "换位置，换符号",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "52403d0c24f43279aad7b9dcdfbf5a113d958d7e730d8806a1527e3fe8bf5410",
+      "reason": "保留五与三、换位后三与五的例子和读法；补宽口与尖端验证，视觉和两组数量对应。"
+    },
+    {
+      "nativeSceneId": "scene_DiWh9Nooer",
+      "sourceSceneKey": "p04",
+      "nativeType": "interactive",
+      "sourceType": "interactive",
+      "nativeTitle": "把开口朝向大数",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "7764b9c63c550f02dbdb83576de5a0aa423b0aab404232d957c80b383fe662e5",
+      "reason": "保留托盘选择比较符号和核对方向。补一个可实际操作的六与二示范，提供足量短句和反向新任务。"
+    },
+    {
+      "nativeSceneId": "scene_85q64clcvX",
+      "sourceSceneKey": "p05",
+      "nativeType": "slide",
+      "sourceType": "slide",
+      "nativeTitle": "田字格里的三个符号",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "3cd5e6ad785d0e69fb16521f98c265293fba96bbddaa1802c5c952d2e9f2e959",
+      "reason": "保留三种范形和成人纸笔观察。删去吃东西的类比，补左右尖端和田字格位置。"
+    },
+    {
+      "nativeSceneId": "scene_OIy3_b5vkQ",
+      "sourceSceneKey": "p06",
+      "nativeType": "interactive",
+      "sourceType": "interactive",
+      "nativeTitle": "配好，再数剩下的",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "95c9d398aa725c51152253852702178c4cd0db8644d5eb7c5d5a4ff5f0c57915",
+      "reason": "原生说配成五对并剩二片，却把五与二当作两组数量并误报多三。更正为七片与五片配成五对，七比五多二，五比七少二。"
+    },
+    {
+      "nativeSceneId": "scene_xrVpl1tBUv",
+      "sourceSceneKey": "p07",
+      "nativeType": "slide",
+      "sourceType": "slide",
+      "nativeTitle": "空托盘也能比较",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "9ffd953a11a5e21aad3b87b5b0e00bfe8dfcb322f851905be971aa8f815b31d9",
+      "reason": "保留零与五、零与零的原生例，删去重复指令与非空术语，并准确指出宽口和尖端。"
+    },
+    {
+      "nativeSceneId": "scene_VdvOt2JXoe",
+      "sourceSceneKey": "p08",
+      "nativeType": "interactive",
+      "sourceType": "interactive",
+      "nativeTitle": "按要求放好一组",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "a43e958d5c351bb55a4cc23fb5e053e0b31bb0338adcee0b20a1c8a5d8a2ace7",
+      "reason": "原生操作态四与三，口述却判同样多。修为四片与三片的过程，实际补成四对再说同样多，孩子练习较少。"
+    },
+    {
+      "nativeSceneId": "scene_gJkAfYUxKJ",
+      "sourceSceneKey": "p09",
+      "nativeType": "slide",
+      "sourceType": "slide",
+      "nativeTitle": "三个数接着比",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "2ac65bb23e55fb9f301b59499a0cc6b1d7425bc9561c1177d66fc8c03dcc2ef6",
+      "reason": "保留三、四、五的具体比较和补中间数。补配对验证和清楚的首尾理由。"
+    },
+    {
+      "nativeSceneId": "scene_rrqzwxg-LA",
+      "sourceSceneKey": "p10",
+      "nativeType": "quiz",
+      "sourceType": "quiz",
+      "nativeTitle": "试一试：找同样多",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "0ff6665c98b6fdb6a0a6a4bc731d398e22cc36fa860531d513d44006d93c9bc2",
+      "reason": "原题有两个三件的选项。保留同样多目标，改用未练过的六、四、七数量，只有一组同样多。"
+    },
+    {
+      "nativeSceneId": "scene_AQGKMmTbQb",
+      "sourceSceneKey": "p11",
+      "nativeType": "quiz",
+      "sourceType": "quiz",
+      "nativeTitle": "试一试：选符号",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "54338c78aec8b654a5767c29ace3c9369695e5c63e7f79950ff855266d07ea8a",
+      "reason": "原生成四与三已出现于官方课件，改为新组合四和八，完整保留选比较符号的语义。"
+    },
+    {
+      "nativeSceneId": "scene_OXO8QrNq1c",
+      "sourceSceneKey": "p12",
+      "nativeType": "quiz",
+      "sourceType": "quiz",
+      "nativeTitle": "试一试：认符号",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "fa81c47a54770ce9dd07e2a2bb8f684496ecf779fffc63bf8dc0d5f7af11b89a",
+      "reason": "保留原大于号题、三种选项顺序与正确位置，替换为实际田字格图片。"
+    },
+    {
+      "nativeSceneId": "scene_433yECl02d",
+      "sourceSceneKey": "p13",
+      "nativeType": "quiz",
+      "sourceType": "quiz",
+      "nativeTitle": "试一试：数剩余",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "6dcecbd93ca2f70f5f35c088e539a1dbd73b9f000649e84b89afe036f76e03cd",
+      "reason": "保留原图上排五、下排四和剩一片的题意，调换答案位置使位置分布均衡。"
+    },
+    {
+      "nativeSceneId": "scene_g1Eq1p5GV7",
+      "sourceSceneKey": "p14",
+      "nativeType": "quiz",
+      "sourceType": "quiz",
+      "nativeTitle": "试一试：比零",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "6b2da6be8594ac2e0e464bf78c2d6dceed9d9d628dc5f3b859f0808e09b17a11",
+      "reason": "原题五和零与课中同一组数量重合。改用七和零的新量，保留正反与等量干扰项并平衡答案位置。"
+    },
+    {
+      "nativeSceneId": "scene_3on0utTVhq",
+      "sourceSceneKey": "p15",
+      "nativeType": "quiz",
+      "sourceType": "quiz",
+      "nativeTitle": "试一试：按要求选",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "f5b8676e51d7b1d62cbd575acabc6ff330fd8a3fff879cd2c3ae7355c86fb6ee",
+      "reason": "原题只测数出四个苹果，偏离比较目标。保留选托盘结构，改为与六个圆片比较的唯一合格方片盘。"
+    },
+    {
+      "nativeSceneId": "scene_ZAXAhCUn29",
+      "sourceSceneKey": "p16",
+      "nativeType": "quiz",
+      "sourceType": "quiz",
+      "nativeTitle": "试一试：补中间数",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "d2091e5689d48f9994478105e3d12ee379d14e9c616e92177c5cf0ef7ea57c13",
+      "reason": "原题首尾四大于二不能唯一约束中间，改为八大于中卡、中卡大于六两个约束，只有七片可放。"
+    },
+    {
+      "nativeSceneId": "scene_ziIX7_Rb_L",
+      "sourceSceneKey": "p17",
+      "nativeType": "slide",
+      "sourceType": "slide",
+      "nativeTitle": "今天怎样比",
+      "retainedVerbatimSpeech": [],
+      "adaptedSceneSha256": "1da98e46f0ebf0e256c63f22be1fd47d97d864fc1ac7856fb1827bf8989288a5",
+      "reason": "保留原逐项回顾与家庭应用，修正剩余与空托盘口述，补连续比较及真实生活观察。"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+#activity-places{position:absolute;left:100px;right:100px;top:12px;display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.activity-place{position:relative;height:252px;border:4px solid #fff9e5;border-radius:22px;padding:0;background:#f0ecd3;box-shadow:0 5px 0 #b88f60;overflow:hidden;cursor:pointer}
+.activity-place>img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+.activity-place span{position:absolute;left:15px;top:15px;padding:7px 12px;border-radius:9px;background:#fffbec;color:#334a39;font-size:24px;font-weight:800;pointer-events:none}
+.activity-place.assigned{border-color:#3d806b}
+.activity-place .saved-photo{position:absolute;right:12px;bottom:10px;width:141px;height:100px;object-fit:cover;border:4px solid #fff4d6;border-radius:10px;animation:photo-place .28s ease-out}
+@keyframes photo-place{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+#activity-cards{position:absolute;left:313px;right:313px;top:315px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.activity-card{position:relative;height:180px;border:4px solid #fff9e5;border-radius:20px;padding:0;background:#f9edca;box-shadow:0 5px 0 #b88f60;overflow:hidden;cursor:grab}
+.activity-card img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+.activity-card.selected{border-color:#2d715e;outline:4px solid #ffd277;outline-offset:3px}
+.activity-card.assigned{opacity:.42}
+.voice-button{position:absolute;left:88px;top:365px;min-width:112px;min-height:92px;background:#497a68}
+.activity-card:focus-visible,.activity-place:focus-visible,.voice-button:focus-visible{outline:5px solid #145e58;outline-offset:4px}
+#ready .btn.xl,#finish .btn.xl{min-height:92px}

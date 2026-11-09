@@ -1,0 +1,1187 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Module 4 Unit 2 It's a red dog.",
+  "description": "在玩具画室听名称、选颜色和上色，再用英语介绍原创木玩具。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#BB6D3B",
+      "persona": "发音清楚、语速舒缓的英语老师，用图片和短句解释，再让孩子听词、操作并尝试说给大人听。"
+    }
+  },
+  "images": {
+    "animal-bird": {
+      "file": "assets/animal-bird.png"
+    },
+    "animal-panda": {
+      "file": "assets/animal-panda.png"
+    },
+    "car-blue": {
+      "file": "assets/car-blue.png"
+    },
+    "car-unpainted": {
+      "file": "assets/car-unpainted.png"
+    },
+    "car-yellow": {
+      "file": "assets/car-yellow.png"
+    },
+    "cat-black": {
+      "file": "assets/cat-black.png"
+    },
+    "cat-black-white": {
+      "file": "assets/cat-black-white.png"
+    },
+    "cat-blue": {
+      "file": "assets/cat-blue.png"
+    },
+    "cat-green": {
+      "file": "assets/cat-green.png"
+    },
+    "cat-orange": {
+      "file": "assets/cat-orange.png"
+    },
+    "cat-red-green": {
+      "file": "assets/cat-red-green.png"
+    },
+    "cat-yellow": {
+      "file": "assets/cat-yellow.png"
+    },
+    "dog-blue-yellow": {
+      "file": "assets/dog-blue-yellow.png"
+    },
+    "dog-green": {
+      "file": "assets/dog-green.png"
+    },
+    "dog-orange": {
+      "file": "assets/dog-orange.png"
+    },
+    "dog-red": {
+      "file": "assets/dog-red.png"
+    },
+    "dog-white": {
+      "file": "assets/dog-white.png"
+    },
+    "dog-yellow": {
+      "file": "assets/dog-yellow.png"
+    },
+    "quiz-cat-black": {
+      "file": "assets/quiz-cat-black.png"
+    },
+    "quiz-cat-black-white": {
+      "file": "assets/quiz-cat-black-white.png"
+    },
+    "quiz-cat-blue": {
+      "file": "assets/quiz-cat-blue.png"
+    },
+    "quiz-cat-red": {
+      "file": "assets/quiz-cat-red.png"
+    },
+    "quiz-cat-white": {
+      "file": "assets/quiz-cat-white.png"
+    },
+    "quiz-dog-black": {
+      "file": "assets/quiz-dog-black.png"
+    },
+    "quiz-dog-black-white": {
+      "file": "assets/quiz-dog-black-white.png"
+    },
+    "quiz-dog-blue": {
+      "file": "assets/quiz-dog-blue.png"
+    },
+    "quiz-dog-red": {
+      "file": "assets/quiz-dog-red.png"
+    },
+    "studio": {
+      "file": "assets/studio.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "s01",
+      "type": "slide",
+      "title": "玩具画室开门",
+      "template": "title-picture",
+      "data": {
+        "title": "玩具画室开门",
+        "picture": "studio",
+        "caption": "听声音 · 给玩具上色 · 介绍作品"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小朋友们好，跟我去玩具画室吧。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看画室里的木制玩具。"
+        },
+        {
+          "say": "每个玩具有自己的形状和颜色。"
+        },
+        {
+          "say": "先听声音，把对应的小动物送到台上。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "再听颜色，把颜料放到小车车身上。"
+        },
+        {
+          "say": "车身变色后，再看看颜色对不对。"
+        },
+        {
+          "say": "最后选一个玩具，试着完整介绍它。"
+        },
+        {
+          "say": "我们一步一步来，随时可以重听。"
+        }
+      ]
+    },
+    {
+      "key": "s02",
+      "type": "slide",
+      "title": "认识猫和狗",
+      "template": "two-columns",
+      "data": {
+        "title": "认识猫和狗",
+        "left": {
+          "heading": "cat",
+          "body": "小猫"
+        },
+        "right": {
+          "heading": "dog",
+          "body": "小狗"
+        },
+        "left_picture": "cat-green",
+        "right_picture": "dog-white"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "Look!"
+        },
+        {
+          "say": "这句话在提醒你往这里看。"
+        },
+        {
+          "say": "这位木头朋友有尖耳朵和小胡须。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Cat."
+        },
+        {
+          "say": "这个声音指小猫。听清，再跟着我说。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边。这位朋友有两只垂耳朵。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Dog."
+        },
+        {
+          "say": "这个声音指小狗。"
+        },
+        {
+          "say": "先看形状，再把声音和图连起来。"
+        },
+        {
+          "say": "猫和狗的名字不同，听清了就能指对。"
+        }
+      ]
+    },
+    {
+      "key": "s03",
+      "type": "interactive",
+      "title": "听声音送朋友",
+      "page": "animals",
+      "widgetType": "mira-listening-workshop",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#animal-options"
+        },
+        {
+          "say": "我们来玩听声音送朋友。"
+        },
+        {
+          "say": "每一轮先听一个动物的名字。"
+        },
+        {
+          "highlight": "#animal-stage"
+        },
+        {
+          "say": "这里是展示框，选好的玩具会移过来。"
+        },
+        {
+          "setState": {
+            "demo": "dog"
+          }
+        },
+        {
+          "say": "我听到 dog，就把狗送进框里。"
+        },
+        {
+          "say": "它垂着耳朵，和尖耳朵的猫不同。"
+        },
+        {
+          "setState": {
+            "reset": true
+          }
+        },
+        {
+          "say": "现在轮到你，先听再点。"
+        },
+        {
+          "say": "如果想重听，就按圆形播放按钮。"
+        },
+        {
+          "say": "看看尖耳和垂耳，再听名字。"
+        },
+        {
+          "say": "第一轮请听。"
+        },
+        {
+          "say": "Cat."
+        }
+      ]
+    },
+    {
+      "key": "s04",
+      "type": "slide",
+      "title": "红色与蓝色",
+      "template": "two-columns",
+      "data": {
+        "title": "红色和蓝色",
+        "left": {
+          "heading": "red",
+          "body": "红色"
+        },
+        "right": {
+          "heading": "blue",
+          "body": "蓝色"
+        },
+        "left_picture": "dog-red",
+        "right_picture": "cat-blue"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看这只木头小狗，注意它身体的颜色。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Red."
+        },
+        {
+          "say": "它的身体涂了红色。只说颜色，可以这样回答。"
+        },
+        {
+          "say": "It's red."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看这只小猫，听它的颜色。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Blue."
+        },
+        {
+          "say": "它的身体是蓝色。可以指着它说。"
+        },
+        {
+          "say": "It's blue."
+        },
+        {
+          "say": "指对颜色，就能把词和图连在一起。"
+        },
+        {
+          "say": "先看玩具的大色块，再听这个颜色词。"
+        }
+      ]
+    },
+    {
+      "key": "s05",
+      "type": "slide",
+      "title": "黄色与绿色",
+      "template": "two-columns",
+      "data": {
+        "title": "黄色和绿色",
+        "left": {
+          "heading": "yellow",
+          "body": "黄色"
+        },
+        "right": {
+          "heading": "green",
+          "body": "绿色"
+        },
+        "left_picture": "dog-yellow",
+        "right_picture": "cat-green"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "刚才看过红色和蓝色。再看两种颜色。"
+        },
+        {
+          "say": "左边小狗的身体涂了黄色。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Yellow."
+        },
+        {
+          "say": "你可以指着它，只回答它的颜色。"
+        },
+        {
+          "say": "It's yellow."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边小猫的身体是什么颜色。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Green."
+        },
+        {
+          "say": "小猫身体的大色块是绿色。"
+        },
+        {
+          "say": "It's green."
+        },
+        {
+          "say": "同一种颜色，也可以出现在别的玩具上。"
+        }
+      ]
+    },
+    {
+      "key": "s06",
+      "type": "slide",
+      "title": "黑色与白色",
+      "template": "two-columns",
+      "data": {
+        "title": "黑色和白色",
+        "left": {
+          "heading": "black",
+          "body": "黑色"
+        },
+        "right": {
+          "heading": "white",
+          "body": "白色"
+        },
+        "left_picture": "cat-black",
+        "right_picture": "dog-white"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边，猫玩具的身体颜色很深。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Black."
+        },
+        {
+          "say": "我们在说猫身体的颜色。"
+        },
+        {
+          "say": "It's black."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边狗玩具的身体是白色。"
+        },
+        {
+          "say": "外面这圈边线帮我们看清它的样子。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "White."
+        },
+        {
+          "say": "看轮廓里的身体，再想它的颜色。"
+        },
+        {
+          "say": "It's white."
+        },
+        {
+          "say": "图的底色只是背景，回答时看玩具本身。"
+        }
+      ]
+    },
+    {
+      "key": "s07",
+      "type": "slide",
+      "title": "问颜色和说橙色",
+      "template": "picture-points",
+      "data": {
+        "title": "问颜色和说橙色",
+        "picture": "dog-orange",
+        "points": [
+          "orange",
+          "What colour is it?",
+          "It's orange."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这只木头狗的身体是橙色。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Orange."
+        },
+        {
+          "say": "我想请你告诉我它的颜色。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "What colour is it?"
+        },
+        {
+          "say": "听到这句，眼睛就去找玩具的颜色。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "It's orange."
+        },
+        {
+          "say": "这句回答只告诉我们它是什么颜色。"
+        },
+        {
+          "say": "我问时指着小狗，你可以跟着回答。"
+        },
+        {
+          "say": "换了玩具，就回答眼前这个玩具的颜色。"
+        }
+      ]
+    },
+    {
+      "key": "s08",
+      "type": "interactive",
+      "title": "听颜色给小车上色",
+      "page": "colors",
+      "widgetType": "mira-listening-workshop",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#color-drop"
+        },
+        {
+          "say": "我们给这辆原木色小车涂上颜料。"
+        },
+        {
+          "say": "先听一个颜色词，车身上还没有答案。"
+        },
+        {
+          "highlight": "#color-tray"
+        },
+        {
+          "say": "这些圆片是颜料，圆片的颜色很重要。"
+        },
+        {
+          "setState": {
+            "demo": "blue"
+          }
+        },
+        {
+          "say": "我听到 blue，选蓝色放到车身上。"
+        },
+        {
+          "say": "车轮和车窗还在原处，变色的是车身。"
+        },
+        {
+          "say": "It's blue."
+        },
+        {
+          "setState": {
+            "reset": true
+          }
+        },
+        {
+          "say": "轮到你，选圆片，再点小车。"
+        },
+        {
+          "say": "也可以把圆片直接拖到车身。"
+        },
+        {
+          "say": "重听颜色，再挑一块颜料。"
+        },
+        {
+          "say": "现在请听。"
+        },
+        {
+          "say": "Yellow."
+        }
+      ]
+    },
+    {
+      "key": "s09",
+      "type": "slide",
+      "title": "完整介绍一个动物",
+      "template": "picture-points",
+      "data": {
+        "title": "完整介绍一个动物",
+        "picture": "dog-green",
+        "points": [
+          "It's green.",
+          "a green dog",
+          "It's a green dog."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这是一只绿色的木头狗。"
+        },
+        {
+          "say": "同一只玩具，有两种不同的介绍办法。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "It's green."
+        },
+        {
+          "say": "这样只告诉别人，它的颜色是绿色。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "如果还要说是哪种动物，先听这一小段。"
+        },
+        {
+          "say": "A green dog."
+        },
+        {
+          "say": "先说颜色 green，再说动物 dog。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "It's a green dog."
+        },
+        {
+          "say": "这样别人既听见颜色，也知道是什么。"
+        },
+        {
+          "say": "你也可以指着图，把整个句子说一次。"
+        }
+      ]
+    },
+    {
+      "key": "s10",
+      "type": "slide",
+      "title": "橙色玩具跟节奏说",
+      "template": "picture-points",
+      "data": {
+        "title": "橙色玩具跟节奏说",
+        "picture": "dog-orange",
+        "points": [
+          "orange · dog",
+          "an orange dog",
+          "It's an orange dog."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看这只橙色木头狗。"
+        },
+        {
+          "say": "我们边拍手，边把它的颜色说出来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "Orange, orange."
+        },
+        {
+          "say": "接着轻轻拍腿，说出它是什么。"
+        },
+        {
+          "say": "Dog, dog."
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "说橙色的狗时，开头跟我这样接。"
+        },
+        {
+          "say": "An orange dog."
+        },
+        {
+          "say": "听清 an 和 orange 连在一起的声音。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "It's an orange dog."
+        },
+        {
+          "say": "跟着拍一拍，再完整地说给旁边的人听。"
+        }
+      ]
+    },
+    {
+      "key": "s11",
+      "type": "interactive",
+      "title": "选卡给动物做展签",
+      "page": "phrases",
+      "widgetType": "mira-listening-workshop",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#phrase-options"
+        },
+        {
+          "say": "选一张动物卡，再配一张颜色卡。"
+        },
+        {
+          "say": "尖耳的是猫，垂耳的是狗。"
+        },
+        {
+          "say": "Panda."
+        },
+        {
+          "say": "熊猫有圆耳朵和大大的黑眼圈。"
+        },
+        {
+          "say": "Bird."
+        },
+        {
+          "say": "小鸟有尖尖的嘴和翅膀。"
+        },
+        {
+          "highlight": "#phrase-frame"
+        },
+        {
+          "say": "两张卡放到一起，就有了作品计划。"
+        },
+        {
+          "setState": {
+            "demo": "dog"
+          }
+        },
+        {
+          "say": "老师给小狗选了红色，然后给它上色。"
+        },
+        {
+          "say": "It's a red dog."
+        },
+        {
+          "setState": {
+            "reset": true
+          }
+        },
+        {
+          "say": "接下来由你来选。先听动物的名字。"
+        },
+        {
+          "say": "再听名字，看看卡片上的动物。"
+        },
+        {
+          "say": "猫狗可以上色。熊猫和鸟先做配色计划。"
+        },
+        {
+          "say": "选好后，说说图上的成品或你想画的动物。"
+        },
+        {
+          "say": "选好动物后，接着选一块颜色。"
+        },
+        {
+          "say": "看好颜色和动物，再试着说一句。"
+        },
+        {
+          "say": "Panda."
+        }
+      ]
+    },
+    {
+      "key": "s12",
+      "type": "slide",
+      "title": "两种颜色手牵手",
+      "template": "two-columns",
+      "data": {
+        "title": "两种颜色手牵手",
+        "left": {
+          "heading": "black and white",
+          "body": "一只猫 · 两种颜色"
+        },
+        "right": {
+          "heading": "blue and yellow",
+          "body": "一只狗 · 两种颜色"
+        },
+        "left_picture": "cat-black-white",
+        "right_picture": "dog-blue-yellow"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看这只猫，身体有黑色，也有白色。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "Black and white."
+        },
+        {
+          "say": "用 and，把同一只猫的两种颜色接起来。"
+        },
+        {
+          "say": "It's a black and white cat."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看这只狗，它身上有蓝色和黄色。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "Blue and yellow."
+        },
+        {
+          "say": "It's a blue and yellow dog."
+        },
+        {
+          "say": "说完猫，也可以用 and 接着说另一件。"
+        },
+        {
+          "say": "And it's a blue and yellow dog."
+        },
+        {
+          "say": "先指猫，再指狗，这次介绍的是两件玩具。"
+        }
+      ]
+    },
+    {
+      "key": "s13",
+      "type": "interactive",
+      "title": "双色玩具工坊",
+      "page": "pairs",
+      "widgetType": "mira-listening-workshop",
+      "startImage": "studio",
+      "script": [
+        {
+          "highlight": "#pair-tray"
+        },
+        {
+          "say": "双色工坊里，每次听到两种颜色。"
+        },
+        {
+          "say": "听到 and，前后两种颜色都要找。"
+        },
+        {
+          "highlight": "#pair-slots"
+        },
+        {
+          "say": "这里有两个圆位，一种颜色占一个。"
+        },
+        {
+          "setState": {
+            "demo": [
+              "black",
+              "white"
+            ]
+          }
+        },
+        {
+          "say": "我先找到黑色，再把白色也放进去。"
+        },
+        {
+          "say": "两种颜色都找齐，同一只猫就能展出。"
+        },
+        {
+          "say": "先找哪一种都可以，两种都要有。"
+        },
+        {
+          "setState": {
+            "demo": [
+              "red",
+              "green"
+            ]
+          }
+        },
+        {
+          "say": "换一只木头猫，再听两种颜色。"
+        },
+        {
+          "say": "Red and green."
+        },
+        {
+          "setState": {
+            "reset": true
+          }
+        },
+        {
+          "say": "轮到你。选中的颜色也可以点掉重选。"
+        },
+        {
+          "say": "两种颜色都要找，再听一遍。"
+        },
+        {
+          "say": "要是没听清，按圆形播放按钮。"
+        },
+        {
+          "say": "Black and white."
+        }
+      ]
+    },
+    {
+      "key": "s14",
+      "type": "quiz",
+      "title": "小检查",
+      "script": [],
+      "intro": [
+        "现在看新场景里的玩具。",
+        "听完一句，再选对应的图片。",
+        "想重听，按声音按钮。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "哪张图是 cat？",
+          "skill": "动物名称听辨",
+          "answer": [
+            "B"
+          ],
+          "analysis": "Cat 指猫。尖耳朵和胡须可以帮你辨认。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog-blue",
+                "alt": "小推车上的蓝色狗玩具"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-blue",
+                "alt": "小推车上的蓝色猫玩具"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog-black",
+                "alt": "木凳上的黑色狗玩具"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "Black. 哪张图的玩具是这个颜色？",
+          "skill": "颜色词听辨",
+          "answer": [
+            "C"
+          ],
+          "analysis": "Black 是黑色。要看玩具的身体颜色。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-white",
+                "alt": "白色猫玩具"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-red",
+                "alt": "红色猫玩具"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-black",
+                "alt": "黑色猫玩具"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "What colour is it? It's blue. 请选图。",
+          "skill": "颜色问答",
+          "answer": [
+            "A"
+          ],
+          "analysis": "问句在问颜色，回答 blue 指蓝色。这组图都画着狗，蓝色那只符合回答。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog-blue",
+                "alt": "蓝色狗玩具"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog-red",
+                "alt": "红色狗玩具"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog-black",
+                "alt": "黑色狗玩具"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "It's a white cat. 请选图。",
+          "skill": "颜色与动物联合描述",
+          "answer": [
+            "C"
+          ],
+          "analysis": "White 是白色，cat 是猫。两条线索都符合的图是白色猫玩具。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "dog-white",
+                "alt": "白色狗玩具"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-black",
+                "alt": "黑色猫玩具"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-white",
+                "alt": "白色猫玩具"
+              }
+            }
+          }
+        },
+        {
+          "id": "q5",
+          "question": "It's an orange cat. 请选图。",
+          "skill": "橙色动物描述",
+          "answer": [
+            "B"
+          ],
+          "analysis": "Orange 是橙色，cat 是猫。图片中的玩具须是一只橙色的猫。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-black",
+                "alt": "木凳上的黑色猫玩具"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-orange",
+                "alt": "木凳上的橙色猫玩具"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "dog-orange",
+                "alt": "橙色狗玩具"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "It's a black and white dog. 请选图。",
+          "skill": "and连接同一动物的两种颜色",
+          "answer": [
+            "A"
+          ],
+          "analysis": "Black and white 指两种颜色，dog 指狗。同一只玩具狗身上须有黑色和白色。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog-black-white",
+                "alt": "黑白双色狗玩具"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-cat-black-white",
+                "alt": "黑白双色猫玩具"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-dog-black",
+                "alt": "黑色狗玩具"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "s15",
+      "type": "slide",
+      "title": "把今天的发现带回家",
+      "template": "summary",
+      "data": {
+        "title": "把今天的发现带回家",
+        "items": [
+          "听名字，找动物",
+          "问颜色，给玩具上色",
+          "说颜色，再说动物",
+          "两种颜色可以用 and"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们先听名称，再把动物送上台。"
+        },
+        {
+          "say": "你也可以请家人说一个名字，再找图。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "问颜色时，指着要问的东西。"
+        },
+        {
+          "say": "听见颜色后，给自己的小车画上那种颜色。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "介绍一个动物，先说颜色，再说它是什么。"
+        },
+        {
+          "say": "说橙色玩具时，跟老师连着说。"
+        },
+        {
+          "say": "An orange dog."
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "同一个玩具有两种颜色，可以用 and 接起来。"
+        },
+        {
+          "say": "回家选一个新玩具，试着完整介绍它。"
+        },
+        {
+          "say": "课上能记录选图和上色。"
+        },
+        {
+          "say": "独立说得怎么样，请家人帮你听一听。"
+        }
+      ]
+    }
+  ]
+}

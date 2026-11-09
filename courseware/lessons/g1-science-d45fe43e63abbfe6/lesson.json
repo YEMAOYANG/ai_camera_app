@@ -1,0 +1,711 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "走近科学·单元回顾",
+  "description": "人教鄂教版一年级科学上册第一单元完整回顾。用原创图片和小科老师原声整理提问、方法、过程及习惯；屏幕表现不等于真实操作能力。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#287B94",
+      "persona": "依照科学教师档案，以普通话耐心引导观察、提问、证据和安全。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "method-observe": {
+      "file": "assets/method-observe.png"
+    },
+    "method-experiment": {
+      "file": "assets/method-experiment.png"
+    },
+    "method-make": {
+      "file": "assets/method-make.png"
+    },
+    "method-measure": {
+      "file": "assets/method-measure.png"
+    },
+    "method-reference": {
+      "file": "assets/method-reference.png"
+    },
+    "goal-leaf": {
+      "file": "assets/goal-leaf.png"
+    },
+    "goal-paper": {
+      "file": "assets/goal-paper.png"
+    },
+    "goal-flag": {
+      "file": "assets/goal-flag.png"
+    },
+    "goal-stick": {
+      "file": "assets/goal-stick.png"
+    },
+    "goal-flower": {
+      "file": "assets/goal-flower.png"
+    },
+    "plan-flag": {
+      "file": "assets/plan-flag.png"
+    },
+    "make-flag": {
+      "file": "assets/make-flag.png"
+    },
+    "test-flag": {
+      "file": "assets/test-flag.png"
+    },
+    "safe-store": {
+      "file": "assets/safe-store.png"
+    },
+    "unsafe-taste": {
+      "file": "assets/unsafe-taste.png"
+    },
+    "wash-hands": {
+      "file": "assets/wash-hands.png"
+    },
+    "unsafe-snack": {
+      "file": "assets/unsafe-snack.png"
+    },
+    "quiz-scarf": {
+      "file": "assets/quiz-scarf.png"
+    },
+    "quiz-shell": {
+      "file": "assets/quiz-shell.png"
+    },
+    "quiz-bug": {
+      "file": "assets/quiz-bug.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "从一个发现出发",
+      "template": "title-picture",
+      "data": {
+        "title": "走近科学·单元回顾",
+        "picture": "cover",
+        "caption": "从发现出发，带着问题找办法"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我是小科老师，今天回顾走近科学。"
+        },
+        {
+          "say": "科学活动常从一个小发现开始。"
+        },
+        {
+          "say": "看到两片叶子的边缘不同，是现象。"
+        },
+        {
+          "say": "想知道哪里不同，就是一个问题。"
+        },
+        {
+          "say": "我们要把想知道的事情说清楚。"
+        },
+        {
+          "say": "再选办法，动手寻找需要的信息。"
+        },
+        {
+          "say": "做完还要检查，想想有没有新问题。"
+        },
+        {
+          "say": "请你看一看，今天从工作台出发。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "方法工作台",
+      "page": "p02",
+      "widgetType": "science-method-workbench",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "level": 0
+          }
+        },
+        {
+          "highlight": "#method-goal"
+        },
+        {
+          "say": "叶片边缘哪里不同？先把问题说清楚。"
+        },
+        {
+          "highlight": "#method-choice-0"
+        },
+        {
+          "say": "观察，是仔细看清颜色、形状和细节。"
+        },
+        {
+          "say": "放大镜能帮我们看，但要认真比较。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#method-goal"
+        },
+        {
+          "say": "想知道两种纸遇水后有什么变化。"
+        },
+        {
+          "highlight": "#method-choice-1"
+        },
+        {
+          "say": "我会动手试一试，这里用实验的方法。"
+        },
+        {
+          "say": "两种纸都要试，留下看到的结果。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "level": 2
+          }
+        },
+        {
+          "highlight": "#method-goal"
+        },
+        {
+          "say": "想把这些材料做成一面纸旗。"
+        },
+        {
+          "say": "这里用制作，让材料变成作品。"
+        },
+        {
+          "highlight": "#method-choice-2"
+        },
+        {
+          "say": "先想做成什么样，再准备材料动手做。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "level": 3
+          }
+        },
+        {
+          "highlight": "#method-goal"
+        },
+        {
+          "say": "想知道这两根木棒哪根长。"
+        },
+        {
+          "say": "测量能帮助我们比较长度。"
+        },
+        {
+          "highlight": "#method-choice-0"
+        },
+        {
+          "say": "用尺子量一量，留下测量的记录。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "level": 4
+          }
+        },
+        {
+          "highlight": "#method-goal"
+        },
+        {
+          "say": "想查找这朵花的名字。"
+        },
+        {
+          "say": "查阅资料可以帮助寻找信息。"
+        },
+        {
+          "highlight": "#method-choice-1"
+        },
+        {
+          "say": "找图鉴或请大人查资料，再对照图片。"
+        },
+        {
+          "say": "这些办法可以一起用，不是只能挑一个。"
+        },
+        {
+          "say": "这次只选最直接回答问题的办法。"
+        },
+        {
+          "say": "听目标，把行动图片送到问题现场。"
+        },
+        {
+          "setState": {
+            "mode": "play",
+            "level": 0
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "做完了，还要检查",
+      "template": "picture-points",
+      "data": {
+        "title": "做完了，还要检查",
+        "picture": "plan-flag",
+        "points": [
+          "先想样子和材料",
+          "按计划动手制作",
+          "试一试，再想怎样改"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "纸旗做好了，不表示所有问题都解决了。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先想做成什么样，要用什么材料。"
+        },
+        {
+          "say": "这能帮助我们开始有准备地制作。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "按自己的计划动手做，并观察变化。"
+        },
+        {
+          "say": "如果遇到困难，可以停下来再想办法。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "作品做完，要试一试看效果怎样。"
+        },
+        {
+          "say": "发现问题，可以调整，再试一试。"
+        },
+        {
+          "say": "纸旗牢固后，还能问：换张纸会怎样？"
+        },
+        {
+          "say": "这些是这次制作的过程，不是唯一顺序。"
+        },
+        {
+          "say": "别的科学活动，还可以用不同的办法。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把制作过程接起来",
+      "page": "p04",
+      "widgetType": "science-process-sequence",
+      "startImage": "plan-flag",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "step": 0
+          }
+        },
+        {
+          "highlight": "#process-plan"
+        },
+        {
+          "say": "我先想纸旗的样子，再准备要用的材料。"
+        },
+        {
+          "annotate": "#process-plan",
+          "content": "先准备"
+        },
+        {
+          "say": "这张图能帮我说清开始准备了什么。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "step": 1
+          }
+        },
+        {
+          "highlight": "#process-make"
+        },
+        {
+          "say": "这里正在给木棒涂胶，准备贴纸片。"
+        },
+        {
+          "say": "动手按计划做，材料才会变成作品。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "step": 2
+          }
+        },
+        {
+          "highlight": "#process-test"
+        },
+        {
+          "say": "这里的作品做好了，正在检查连接处。"
+        },
+        {
+          "say": "先猜纸片会不会松，这还不是结果。"
+        },
+        {
+          "say": "再轻轻试一试，看看猜想对不对。"
+        },
+        {
+          "say": "试一试，才能发现还需不需要改进。"
+        },
+        {
+          "say": "如果纸片松了，可以调整后再检查。"
+        },
+        {
+          "say": "看看图里手在做什么，不要只看文字。"
+        },
+        {
+          "say": "轮到你，按这次纸旗活动的过程摆图。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "好习惯跟着每次活动",
+      "template": "picture-points",
+      "data": {
+        "title": "好习惯跟着每次活动",
+        "picture": "safe-store",
+        "points": [
+          "认真看，及时记",
+          "先听完，再说想法",
+          "材料放桌上，结束要洗手"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "做科学活动，还要照顾自己和伙伴。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "认真观察，才不会漏掉重要的变化。"
+        },
+        {
+          "say": "及时画一画或记一记，留下看到的情况。"
+        },
+        {
+          "say": "不确定的地方，就记下还不确定。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "伙伴说发现时，先听完，再说自己的想法。"
+        },
+        {
+          "say": "别人的观察，也能提醒我们继续检查。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "材料留在工作台上，不能放到嘴里。"
+        },
+        {
+          "say": "用工具要注意安全，需要时请大人帮忙。"
+        },
+        {
+          "say": "活动结束后，把双手洗干净。"
+        },
+        {
+          "say": "做完问一问，我用了什么方法？"
+        },
+        {
+          "say": "我留心观察、认真记录、注意安全了吗？"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "安全收好，干净结束",
+      "page": "p06",
+      "widgetType": "science-safety-reset",
+      "startImage": "safe-store",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "level": 0
+          }
+        },
+        {
+          "highlight": "#safety-option-0"
+        },
+        {
+          "say": "先看手和嘴，小物品不是食物。"
+        },
+        {
+          "highlight": "#safety-option-1"
+        },
+        {
+          "say": "我把珠子放进盘子，让材料留在桌上。"
+        },
+        {
+          "say": "需要使用时再取出，不把材料放入口中。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "level": 1
+          }
+        },
+        {
+          "highlight": "#safety-option-0"
+        },
+        {
+          "say": "做完活动后，先把双手洗干净。"
+        },
+        {
+          "highlight": "#safety-option-1"
+        },
+        {
+          "say": "手上还有材料痕迹时，不要急着拿食物。"
+        },
+        {
+          "say": "这些习惯每次都要做，不只为过关。"
+        },
+        {
+          "say": "第一关，材料应该留在哪里？"
+        },
+        {
+          "say": "第二关，活动后该先做什么？"
+        },
+        {
+          "say": "把安全的行动图片送到工作区。"
+        },
+        {
+          "setState": {
+            "mode": "play",
+            "level": 0
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "换个情境，选一选",
+      "intro": [
+        "听老师读问题，看图片选办法。",
+        "这次用的是没有练过的新情境。"
+      ],
+      "questions": [
+        {
+          "id": "method-scarf",
+          "question": "想知道围巾有多长，用哪种方法？",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-scarf",
+            "alt": "两条长度不同的围巾摆在桌上"
+          },
+          "options": {
+            "A": {
+              "label": "仔细观察叶片",
+              "visual": {
+                "kind": "asset",
+                "image": "method-observe",
+                "alt": "孩子用放大镜仔细观察"
+              }
+            },
+            "B": {
+              "label": "用尺子测量",
+              "visual": {
+                "kind": "asset",
+                "image": "method-measure",
+                "alt": "孩子用尺子测量长度"
+              }
+            },
+            "C": {
+              "label": "翻自然图鉴",
+              "visual": {
+                "kind": "asset",
+                "image": "method-reference",
+                "alt": "孩子与成人查阅图鉴"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "问题关心长度，测量能帮助比较。观察和查图鉴不是这里最直接的办法。",
+          "skill": "science-method-choice"
+        },
+        {
+          "id": "method-shell",
+          "question": "想看清贝壳细细的条纹，先用哪种方法？",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-shell",
+            "alt": "表面有细密条纹的大贝壳"
+          },
+          "options": {
+            "A": {
+              "label": "给纸片加水",
+              "visual": {
+                "kind": "asset",
+                "image": "method-experiment",
+                "alt": "孩子对不同纸片动手做实验"
+              }
+            },
+            "B": {
+              "label": "动手做纸旗",
+              "visual": {
+                "kind": "asset",
+                "image": "method-make",
+                "alt": "孩子正在制作小纸旗"
+              }
+            },
+            "C": {
+              "label": "仔细观察",
+              "visual": {
+                "kind": "asset",
+                "image": "method-observe",
+                "alt": "孩子使用放大镜仔细观察细节"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "要看清细小条纹，可以先仔细观察。做纸旗或给纸片加水不能回答这个问题。",
+          "skill": "science-method-choice"
+        },
+        {
+          "id": "method-bug",
+          "question": "不知道小虫叫什么，哪种做法能帮助查找？",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-bug",
+            "alt": "陌生小虫的观察照片和一本自然图鉴"
+          },
+          "options": {
+            "A": {
+              "label": "查阅自然图鉴",
+              "visual": {
+                "kind": "asset",
+                "image": "method-reference",
+                "alt": "孩子与成人对照图鉴查阅资料"
+              }
+            },
+            "B": {
+              "label": "测量木棒",
+              "visual": {
+                "kind": "asset",
+                "image": "method-measure",
+                "alt": "孩子用尺子测量木棒长度"
+              }
+            },
+            "C": {
+              "label": "制作纸旗",
+              "visual": {
+                "kind": "asset",
+                "image": "method-make",
+                "alt": "孩子动手制作一面小纸旗"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "查阅可靠的自然图鉴或请大人一起找资料，能帮助查找信息。量木棒和做纸旗与这个问题无关。",
+          "skill": "science-method-choice"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "带着新问题继续出发",
+      "template": "summary",
+      "data": {
+        "title": "带着新问题继续出发",
+        "items": [
+          "先提问，再找合适的方法",
+          "做过之后检查，需要时改进",
+          "观察记录，倾听安全，再提新问题"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们把科学活动串在了一起。"
+        },
+        {
+          "say": "从看见的现象，提出自己想知道的问题。"
+        },
+        {
+          "say": "观察、实验、制作、测量和查资料。"
+        },
+        {
+          "say": "这些方法帮助我们寻找需要的信息。"
+        },
+        {
+          "say": "不同问题，可以选不同的方法来试。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "做完要检查，发现问题还能继续改。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "认真看、及时记，也要听伙伴说完。"
+        },
+        {
+          "say": "材料不入口，活动结束把手洗干净。"
+        },
+        {
+          "say": "回家找一个安全现象，提一个新问题。"
+        },
+        {
+          "say": "请大人听你说，记下你的原话。"
+        },
+        {
+          "say": "屏幕上完成了，真实操作还要再观察。"
+        }
+      ]
+    }
+  ]
+}
+

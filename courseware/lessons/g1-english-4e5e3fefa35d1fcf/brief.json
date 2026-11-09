@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "Unit 1 He's a doctor.",
+  "goals": [
+    "听懂六个家人词，并理解my连接到说话人的关系。",
+    "在已介绍身份的情境中听懂he、she、boy、girl。",
+    "听懂teacher和doctor，理解男、女都可以从事两种职业。",
+    "听懂家人与职业的组合介绍；口头介绍仅交成人观察。"
+  ],
+  "keyPoint": "家人关系、人物指代和职业意义相连。",
+  "difficultPoint": "人物指代随介绍对象变化，职业不决定he或she。",
+  "pageSequence": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "相册里的家人",
+      "play": "先指明原创主人公，再依次介绍六位家人；图片和连接线承载关系，语音读出目标词。"
+    },
+    {
+      "page": 2,
+      "type": "interactive",
+      "title": "照片回相册",
+      "play": "听家人词，把人物照片移入相册，照片实际移动并保留。示范一位后换关系，首次错误只提示观察，第三次才示范。"
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "介绍他和她",
+      "play": "用已介绍身份的人物解释he和she，结合男孩女孩给例子；不凭发型猜身份。"
+    },
+    {
+      "page": 4,
+      "type": "interactive",
+      "title": "谁在被介绍",
+      "play": "听人物句子，把对应人物送上介绍台，台上人物真实改变。本页判断指代，首次错误不亮答案，第三次示范。"
+    },
+    {
+      "page": 5,
+      "type": "quiz",
+      "title": "听懂家人和人物",
+      "play": "两个新图片情境检查grandma与girl、she，使用新人物而非记图。"
+    },
+    {
+      "page": 6,
+      "type": "slide",
+      "title": "工作不分他和她",
+      "play": "男女教师和医生的工作图逐个点亮，说明teacher、doctor与he或she组合。"
+    },
+    {
+      "page": 7,
+      "type": "interactive",
+      "title": "送到工作的地方",
+      "play": "听职业词，把医生或教师移入诊室或教室，人物就位形成工作场景；男女交替。首次错误只提示工作线索，第三次示范。"
+    },
+    {
+      "page": 8,
+      "type": "interactive",
+      "title": "听句子做相册",
+      "play": "听完整家人职业介绍，把正确照片放进相册，人物与场景一起变化。相邻页保留拖放以减轻操作负担，决策从单词改成关系与职业合句；首错不揭答案。"
+    },
+    {
+      "page": 9,
+      "type": "quiz",
+      "title": "换个场景再听",
+      "play": "两个新工作情境检查职业与he、she组合，不复用课堂人物，答案位置分散。"
+    },
+    {
+      "page": 10,
+      "type": "slide",
+      "title": "说给家人听",
+      "play": "逐项回顾六个家人词、he、she与两种职业；邀请介绍现实家人，口语明确待观察。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "skill": "家人关系听辨",
+      "page": 5
+    },
+    {
+      "id": "q2",
+      "skill": "he和she的语境理解",
+      "page": 5
+    },
+    {
+      "id": "q3",
+      "skill": "teacher和doctor听辨",
+      "page": 9
+    },
+    {
+      "id": "q4",
+      "skill": "家人职业合句理解",
+      "page": 9
+    }
+  ],
+  "afterClass": {
+    "official": [],
+    "sourceStatus": "独立课后配套未提供；练习依据教材印刷第4页的听说、换人物练习原创整理。",
+    "inLesson": "第2、4、7、8页分步练习；第5、9页检查迁移。",
+    "weekly": "六个家人词、he和she、两种职业可用新人物图片变式；口语交成人观察，不从点击推断。"
+  },
+  "authoring": {
+    "authorModel": "gpt-6.1-sol",
+    "teacher": "Mia 老师",
+    "teacherCode": "mira_english_standard",
+    "gender": "female",
+    "voice": "Jennifer",
+    "objectiveOrigin": "依据完整准确官方教材整理的原创目标",
+    "verificationModel": "gpt-6.1-terra",
+    "noG7Waiver": true,
+    "pageAudioBinding": "Interactive HTML __VOICE:<speech-action-id>__ tokens bind to the same recorded Jennifer speech action audioUrl after TTS. Persist resolved URLs in own source before final prepare/finish. No token may remain in the release body; regression test defaults to requiring resolved audio."
+  }
+}

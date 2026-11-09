@@ -1,0 +1,12 @@
+#cv{background:#f9f0db;color:#303e36}
+.workbench{position:absolute;left:64px;top:38px;right:64px;height:330px;display:grid;grid-template-columns:1.18fr 1fr;gap:32px}
+.panel{padding:25px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,1fr);align-items:center;justify-items:center;gap:12px;border-radius:24px}
+.tray{background:#f1e3c3;border:3px solid #ac8656}.loose{background:#e3eade;border:3px solid #73977e}
+.slot,.piece{display:grid;place-items:center;width:77px;height:77px;border-radius:16px}
+.slot{border:2px dashed #ad885f;background:#fff7e5}.slot.full{border-style:solid}
+.disc{display:block;width:57px;height:57px;border-radius:50%;background:#44816d;box-shadow:inset 0 -5px 0 #2f6151}
+.disc.added,.piece .disc{background:#f3aa49;box-shadow:inset 0 -5px 0 #cc7827}
+.piece{border:2px solid #98b19b;background:#f7f8eb;cursor:pointer}.piece:disabled{cursor:default}
+.equation{position:absolute;top:385px;width:100%;text-align:center;font-size:45px;font-weight:800;line-height:1.25}
+.choices{position:absolute;top:455px;left:0;right:0;display:flex;justify-content:center;gap:28px}
+.choices[hidden]{display:none}.choices .btn{width:107px}

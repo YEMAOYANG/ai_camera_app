@@ -1,0 +1,16 @@
+
+#cv{background:#f1eee1}
+#ready .pic{object-fit:contain;background:#f6f5e9}
+.weather-stage{height:100%;padding:10px 96px 16px;background:linear-gradient(#e7f1ed,#faf1dc);border:3px solid #c4d5c6;border-radius:32px}
+.token{display:block;margin:0 auto 18px;width:172px;height:116px;border-radius:22px;border:3px solid #967c46;background:#fffaf0;color:#493d29;box-shadow:0 5px #c5ab77;font:700 84px/1 "Kaiti SC","Songti SC",serif;cursor:grab}
+.token[aria-pressed=true]{outline:5px solid #39775c;outline-offset:5px}
+.token[hidden]{display:block;visibility:hidden}
+.weather-board{display:flex;justify-content:center;gap:28px}
+.weather-tile{position:relative;width:340px;height:345px;padding:8px;border:4px solid #fffdfa;border-radius:28px;overflow:hidden;cursor:pointer;background:#fffdf2;box-shadow:0 8px 0 #b8cdbd}
+.weather-tile img{display:block;width:100%;height:100%;object-fit:contain;border-radius:17px}
+.weather-tile[data-ok=true]{border-color:#39775c}
+.weather-tile[data-miss=true]{border-color:#b94c34}
+.weather-stamp{position:absolute;right:18px;bottom:18px;width:94px;height:94px;display:none;place-items:center;border-radius:18px;background:#fdf8e8;color:#1f5c43;font:700 66px/1 "Kaiti SC","Songti SC",serif;box-shadow:0 3px 9px #352f2433}
+.weather-stamp:not(:empty){display:grid}
+.weather-tile.image-broken img{opacity:.3}.weather-tile.image-broken:after{content:'↻';position:absolute;inset:0;display:grid;place-items:center;font-size:80px;color:#493d29;pointer-events:none}
+

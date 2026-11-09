@@ -1,0 +1,13 @@
+(function(){
+var K=window.K,level=0,miss=0,selected=null,locked=false,epoch=0;
+K.hud({icon:'',title:'工具对准螺丝',levels:2});K.owl();
+var joint=K.$('#toy-joint'),buttons=K.$$('#tool-bank button');
+function draw(){miss=0;selected=null;locked=false;joint.classList.remove('open','hint');buttons.forEach(function(b){b.disabled=false;b.classList.remove('selected','placed')});K.$('#tool-car').style.opacity='1';K.$('img',joint).src='__IMG:wheel__';K.$('img',joint).alt='带十字螺丝的车轮';K.$('img',joint).style.transform=level?'scale(.72) rotate(22deg)':'none';K.levels(2,level);K.say(level?'换一处车轮接头，观察形状再选工具':'观察接头，选择工具后送过来');}
+function reset(){epoch++;level=0;K.stars=0;K.$('#star-n').textContent='0';draw();}
+function use(b){if(locked)return;if(b.id!=='tool-driver'){miss++;K.sfx.no();K.shake(b);joint.classList.add('hint');K.say(miss===1?'观察连接处的形状，再想一想':'工具的头，要与螺丝接头相配','no');if(miss>=3){K.highlight('#tool-driver');miss=0}return;}locked=true;joint.classList.add('open');K.$('#tool-car').style.opacity='.65';K.star(1,joint);K.sfx.ok();K.say('选对工具，接头打开了','ok');var t=epoch;setTimeout(function(){if(t!==epoch)return;level++;if(level>=2){K.levels(2,2);K.finish({title:'工具选好了',sub:'观察接头，再选工具',again:reset});}else draw();},700);}
+buttons.forEach(function(b){b.onclick=function(){if(locked)return;selected=b;buttons.forEach(function(x){x.classList.toggle('selected',x===b)});K.sfx.pick()};K.drag(b,{enabled:function(){return !locked},targets:function(){return [joint]},onDrop:function(el,t){if(t)use(el);else{K.shake(el);K.say('把工具移向连接处')}},onTap:function(el){el.click()}})});
+joint.onclick=function(){if(selected)use(selected);else{K.pop(joint);K.say('先选一件工具，再点连接处')}};joint.onkeydown=function(e){if(e.key==='Enter'||e.key===' ')joint.click()};
+K.$('#tool-reset').onclick=reset;K.onStart=reset;K.onState=function(state){epoch++;if(state.demo){reset();locked=true;joint.classList.add('open');K.$('#tool-car').style.opacity='.65';K.say('示范：螺丝刀对准，接头打开');}else if(state.demo===false)reset()};draw();K.ready({emoji:'↻',title:'工具对准螺丝',sub:'听老师说，再动手选择'});
+
+K.$$('img.object').forEach(function(im){im.onerror=function(){if(im.dataset.failed==='1')return;im.dataset.failed='1';im.style.opacity='0';var retry=K.el('span','asset-retry','↻',im.parentElement);retry.setAttribute('role','button');retry.setAttribute('tabindex','0');retry.setAttribute('aria-label','重新加载图片');retry.onpointerdown=function(e){e.stopPropagation()};retry.onclick=function(e){e.preventDefault();e.stopPropagation();im.src=im.src};retry.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();im.src=im.src}};im.onload=function(){im.dataset.failed='0';im.style.opacity='1';retry.remove()};};});
+})();

@@ -1,0 +1,962 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "小兔子安家",
+  "description": "用松林小兔的原创情境练习20以内进位加法，理解凑十、数线两跳、和不变和固定加数变化。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "用一年级孩子听得懂的短句解释算理，画面动作先于台词。只记录可观察的操作与选择。"
+    }
+  },
+  "images": {
+    "houses": {
+      "file": "assets/houses.png"
+    },
+    "quiz-badges-a": {
+      "file": "assets/quiz-badges-a.png"
+    },
+    "quiz-badges-b": {
+      "file": "assets/quiz-badges-b.png"
+    },
+    "quiz-badges-c": {
+      "file": "assets/quiz-badges-c.png"
+    },
+    "quiz-balls-a": {
+      "file": "assets/quiz-balls-a.png"
+    },
+    "quiz-balls-b": {
+      "file": "assets/quiz-balls-b.png"
+    },
+    "quiz-balls-c": {
+      "file": "assets/quiz-balls-c.png"
+    },
+    "quiz-flowers-a": {
+      "file": "assets/quiz-flowers-a.png"
+    },
+    "quiz-flowers-b": {
+      "file": "assets/quiz-flowers-b.png"
+    },
+    "quiz-flowers-c": {
+      "file": "assets/quiz-flowers-c.png"
+    },
+    "quiz-lamps-a": {
+      "file": "assets/quiz-lamps-a.png"
+    },
+    "quiz-lamps-b": {
+      "file": "assets/quiz-lamps-b.png"
+    },
+    "quiz-lamps-c": {
+      "file": "assets/quiz-lamps-c.png"
+    },
+    "quiz-paths-a": {
+      "file": "assets/quiz-paths-a.png"
+    },
+    "quiz-paths-b": {
+      "file": "assets/quiz-paths-b.png"
+    },
+    "quiz-paths-c": {
+      "file": "assets/quiz-paths-c.png"
+    },
+    "quiz-pinecones-a": {
+      "file": "assets/quiz-pinecones-a.png"
+    },
+    "quiz-pinecones-b": {
+      "file": "assets/quiz-pinecones-b.png"
+    },
+    "quiz-pinecones-c": {
+      "file": "assets/quiz-pinecones-c.png"
+    },
+    "rabbit-cover": {
+      "file": "assets/rabbit-cover.png"
+    },
+    "rabbit-token": {
+      "file": "assets/rabbit-token.png"
+    },
+    "slide-branch-5": {
+      "file": "assets/slide-branch-5.png"
+    },
+    "slide-branch-8": {
+      "file": "assets/slide-branch-8.png"
+    },
+    "slide-exchange": {
+      "file": "assets/slide-exchange.png"
+    },
+    "slide-guests": {
+      "file": "assets/slide-guests.png"
+    },
+    "slide-new-guests": {
+      "file": "assets/slide-new-guests.png"
+    },
+    "slide-rooms": {
+      "file": "assets/slide-rooms.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "松林来客",
+      "template": "picture-points",
+      "data": {
+        "title": "松林来客",
+        "picture": "slide-guests",
+        "points": [
+          "左边8只，右边5只",
+          "问一共，合起来",
+          "8＋5＝13（只）"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "雨后的松林里，两群小兔来做客。"
+        },
+        {
+          "say": "一只兔子算一个，别把两只耳朵当两个。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看左边，第一排六只，下面还有两只。"
+        },
+        {
+          "say": "左边一共八只，右边是一排五只。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在想知道两群合起来一共有几只。"
+        },
+        {
+          "say": "它们都是小兔，单位都是只。"
+        },
+        {
+          "say": "求合起来有多少，就用加法。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "用八加五，得到十三只小兔。"
+        },
+        {
+          "say": "下一页我们一起看看十三是怎么算出来的。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "从八接着数，再换成十",
+      "template": "picture-points",
+      "data": {
+        "title": "从八接着数，再换成十",
+        "picture": "slide-exchange",
+        "points": [
+          "从8后面接着数5次",
+          "10个一换成1个十",
+          "1个十和3个一是13"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先把原来八只兔子记在心里。"
+        },
+        {
+          "say": "再来五只，就从八后面接着数五次。"
+        },
+        {
+          "say": "九、十、十一、十二、十三。"
+        },
+        {
+          "say": "八是出发的数，不能算作新来的第一只。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看十格里，八个圆片再添两个就满了。"
+        },
+        {
+          "say": "十格里的十个一，可以换成一条十。"
+        },
+        {
+          "say": "换的是摆法，圆片的总数没有变。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "外面还有三个一，没有被换走。"
+        },
+        {
+          "say": "一个十和三个一合起来，还是十三。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "先凑到十，再看剩下",
+      "template": "two-columns",
+      "data": {
+        "title": "先凑到十，再看剩下",
+        "left": {
+          "heading": "拆5，给8补2",
+          "body": "8＋2＝10，再加3等于13。"
+        },
+        "right": {
+          "heading": "拆8，给5补5",
+          "body": "5＋5＝10，再加3等于13。"
+        },
+        "left_picture": "slide-branch-8",
+        "right_picture": "slide-branch-5"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "还是算八加五，我们先给八凑十。"
+        },
+        {
+          "say": "八还差两个，所以从五里拿出两个。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这条分叉表示五分成二和三。"
+        },
+        {
+          "say": "拿了两个，剩下三个，原来的五都在。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "先算八加二等于十，再算十加三等于十三。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "也可以换个起点，先给五凑十。"
+        },
+        {
+          "say": "五还差五个，就把八分成五和三。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "先拿五个补满十，剩下三个留在外面。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "五加五等于十，再加三还是十三。"
+        },
+        {
+          "say": "选哪边先凑都可以，拆出的两部分不能少。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "给十格灯架补灯",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "rabbit-cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#ten-board"
+        },
+        {
+          "say": "先看老师给灯架补灯。"
+        },
+        {
+          "say": "十格里亮了九盏，还空着一格。"
+        },
+        {
+          "highlight": "#unit-bank"
+        },
+        {
+          "say": "旁边还有七颗灯珠。"
+        },
+        {
+          "say": "从这七颗里只取一颗，正好补上空位。"
+        },
+        {
+          "setState": {
+            "fill": true
+          }
+        },
+        {
+          "highlight": "#remainder-tray"
+        },
+        {
+          "say": "我把这一颗放进空格。"
+        },
+        {
+          "say": "七颗用了一个，外面还留着六个。"
+        },
+        {
+          "setState": {
+            "exchange": true
+          }
+        },
+        {
+          "highlight": "#ten-board"
+        },
+        {
+          "say": "架上十颗合成一条十。"
+        },
+        {
+          "say": "十再加剩下的六，得到十六。"
+        },
+        {
+          "say": "先看空格，再选正好补满的一组。"
+        },
+        {
+          "say": "轮到你了，先给六盏灯补到十。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "沿石径跳两段",
+      "page": "p05",
+      "widgetType": "game",
+      "startImage": "rabbit-cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#path-start"
+        },
+        {
+          "say": "看小兔站在八上，它要向右走五格。"
+        },
+        {
+          "say": "起点只是站的地方，不算走过的一格。"
+        },
+        {
+          "highlight": "#path-ten"
+        },
+        {
+          "say": "从八到十要跨过两个间隔。"
+        },
+        {
+          "setState": {
+            "first": true
+          }
+        },
+        {
+          "say": "第一段向右跳两格，正好落到十。"
+        },
+        {
+          "say": "五格分成两格和三格，已经走了两格。"
+        },
+        {
+          "setState": {
+            "second": true
+          }
+        },
+        {
+          "highlight": "#path-end"
+        },
+        {
+          "say": "剩下的三格从十接着跳，落在十三。"
+        },
+        {
+          "say": "这和先算八加二，再加三是同一个办法。"
+        },
+        {
+          "say": "试试从六出发，先想要跨几格到十。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "两间小屋，怎样分才不漏",
+      "template": "picture-points",
+      "data": {
+        "title": "两间小屋，怎样分才不漏",
+        "picture": "slide-rooms",
+        "points": [
+          "从1＋11开始",
+          "每次左边多1，右边少1",
+          "交换位置，合计仍是12"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "现在另外有十二只兔子要住两间房。"
+        },
+        {
+          "say": "红屋在左，蓝屋在右，两间都要有兔子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从红屋住一只开始，蓝屋就住十一只。"
+        },
+        {
+          "say": "一加十一等于十二，是第一种分法。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "搬一只到红屋，就变成二和十。"
+        },
+        {
+          "say": "再搬一只，是三和九，合起来还是十二。"
+        },
+        {
+          "say": "接着是四和八，再是五和七。"
+        },
+        {
+          "say": "下一步两边各六只，和也还是十二。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三和九交换房子，就是九和三。"
+        },
+        {
+          "say": "房间住法不同，兔子的总数相同。"
+        },
+        {
+          "say": "两边各六只交换以后一样，只记一次。"
+        },
+        {
+          "say": "如果区分两间房，一直排到左边十一只。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "只搬一只，总数还在",
+      "page": "p07",
+      "widgetType": "game",
+      "startImage": "rabbit-cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#left-house"
+        },
+        {
+          "say": "红屋有三只，先看它们原来在哪里。"
+        },
+        {
+          "highlight": "#right-house"
+        },
+        {
+          "say": "蓝屋有九只，我只从这里选一只。"
+        },
+        {
+          "say": "我把它送到红屋，别的兔子都留在原处。"
+        },
+        {
+          "setState": {
+            "move": true
+          }
+        },
+        {
+          "highlight": "#left-house"
+        },
+        {
+          "say": "看，刚才那一只已经到了红屋。"
+        },
+        {
+          "say": "红屋多了一只，变成四只。"
+        },
+        {
+          "highlight": "#right-house"
+        },
+        {
+          "say": "蓝屋少了一只，变成八只。"
+        },
+        {
+          "highlight": "#total-strip"
+        },
+        {
+          "say": "四加八还是十二，因为只是换了屋。"
+        },
+        {
+          "say": "轮到你，从蓝屋送一只到红屋。"
+        },
+        {
+          "say": "可以点那只兔子，也可以把它拖过去。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "只添一只，合起来也多一",
+      "template": "picture-points",
+      "data": {
+        "title": "只添一只，合起来也多一",
+        "picture": "slide-new-guests",
+        "points": [
+          "4＋7＝11",
+          "4＋8＝12",
+          "4＋9＝13"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这张图，一个圆片表示一只小兔。"
+        },
+        {
+          "say": "这次红屋的四只留在原地，没有搬家。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一排，蓝屋原来有七只。"
+        },
+        {
+          "say": "四加七，一共十一只。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二排，外面新来一只进了蓝屋。"
+        },
+        {
+          "say": "蓝屋从七只变成八只，四加八是十二。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三排，蓝屋又新来一只，变成九只。"
+        },
+        {
+          "say": "红屋还是四只，四加九，一共十三。"
+        },
+        {
+          "say": "这次每添一只，总数也跟着多一只。"
+        },
+        {
+          "say": "上一页是挪动，这一页是从外面添进来。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "挑两盒，刚刚好",
+      "page": "p09",
+      "widgetType": "game",
+      "startImage": "rabbit-cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#target-count"
+        },
+        {
+          "say": "松林餐厅要准备十六块种子饼。"
+        },
+        {
+          "say": "左边的空位表示每人需要一块。"
+        },
+        {
+          "highlight": "#tray-choices"
+        },
+        {
+          "say": "架上有三盒，里面是六块、八块和十块。"
+        },
+        {
+          "say": "每次只能挑两盒，同一盒不能拿两次。"
+        },
+        {
+          "setState": {
+            "short": true
+          }
+        },
+        {
+          "highlight": "#delivery-mat"
+        },
+        {
+          "say": "我先放六块和八块，一共十四块。"
+        },
+        {
+          "say": "左边还有两个空位，所以这一对不够。"
+        },
+        {
+          "setState": {
+            "match": true
+          }
+        },
+        {
+          "highlight": "#delivery-mat"
+        },
+        {
+          "say": "留下六块，把八块的盒子换成十块。"
+        },
+        {
+          "say": "六加十等于十六，空位正好全部填满。"
+        },
+        {
+          "say": "请你也挑两盒，放好以后点对勾。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "换个场景试一试",
+      "intro": [
+        "听老师说完，再点合适的图片。",
+        "慢慢想，选好一题，再到下一题。"
+      ],
+      "questions": [
+        {
+          "id": "q01",
+          "question": "两袋松果，每袋八枚，合起来一共多少枚？",
+          "skill": "从两群同类对象求合计",
+          "options": {
+            "A": {
+              "label": "15枚松果",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pinecones-a",
+                "alt": "15枚松果"
+              }
+            },
+            "B": {
+              "label": "16枚松果",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pinecones-b",
+                "alt": "16枚松果"
+              }
+            },
+            "C": {
+              "label": "17枚松果",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pinecones-c",
+                "alt": "17枚松果"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "把两袋合起来，八加八是十六。选有十六枚的图。"
+        },
+        {
+          "id": "q02",
+          "question": "亮了七盏灯。另有七盏没装，拿几盏正好凑成十盏？",
+          "skill": "拆分时找补十的一组",
+          "options": {
+            "A": {
+              "label": "2盏灯",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-lamps-a",
+                "alt": "2盏灯"
+              }
+            },
+            "B": {
+              "label": "4盏灯",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-lamps-b",
+                "alt": "4盏灯"
+              }
+            },
+            "C": {
+              "label": "3盏灯",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-lamps-c",
+                "alt": "3盏灯"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "十格还空三格。从另外七盏里拿三盏，七加三正好是十。"
+        },
+        {
+          "id": "q03",
+          "question": "小船从六出发走七格。哪条路先到十，再走完？",
+          "skill": "数线先到十再走剩余",
+          "options": {
+            "A": {
+              "label": "6到10再到13",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-paths-a",
+                "alt": "6到10再到13"
+              }
+            },
+            "B": {
+              "label": "6到9再到13",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-paths-b",
+                "alt": "6到9再到13"
+              }
+            },
+            "C": {
+              "label": "6到10再到12",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-paths-c",
+                "alt": "6到10再到12"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "从六到十走四格，再走三格到十三。四格加三格正好七格。"
+        },
+        {
+          "id": "q04",
+          "question": "左盘四朵，右盘九朵。从右往左搬一朵，怎么摆？",
+          "skill": "搬一个时总数不变",
+          "options": {
+            "A": {
+              "label": "左4朵，右8朵",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flowers-a",
+                "alt": "左4朵，右8朵"
+              }
+            },
+            "B": {
+              "label": "左5朵，右8朵",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flowers-b",
+                "alt": "左5朵，右8朵"
+              }
+            },
+            "C": {
+              "label": "左5朵，右9朵",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-flowers-c",
+                "alt": "左5朵，右9朵"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "左盘多一朵，变成五朵。右盘少一朵，变成八朵，合起来还是十三朵。"
+        },
+        {
+          "id": "q05",
+          "question": "白篮三颗，蓝篮八颗。只给蓝篮新添两颗，一共多少颗？",
+          "skill": "一个加数固定，另一项变化",
+          "options": {
+            "A": {
+              "label": "12颗球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-balls-a",
+                "alt": "12颗球"
+              }
+            },
+            "B": {
+              "label": "14颗球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-balls-b",
+                "alt": "14颗球"
+              }
+            },
+            "C": {
+              "label": "13颗球",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-balls-c",
+                "alt": "13颗球"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "白篮仍是三颗。蓝篮从八颗变成十颗，合起来十三颗。"
+        },
+        {
+          "id": "q06",
+          "question": "给十八个木偶发徽章，每人一枚。选哪两盒刚刚好？",
+          "skill": "挑出满足指定总量的两盒",
+          "options": {
+            "A": {
+              "label": "8枚与10枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-badges-a",
+                "alt": "8枚与10枚"
+              }
+            },
+            "B": {
+              "label": "8枚与9枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-badges-b",
+                "alt": "8枚与9枚"
+              }
+            },
+            "C": {
+              "label": "9枚与10枚",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-badges-c",
+                "alt": "9枚与10枚"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "八枚和十枚合起来是十八枚。八加九太少，九加十太多。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "把办法带回小屋",
+      "template": "summary",
+      "data": {
+        "title": "把办法带回小屋",
+        "items": [
+          "两群合起来，用加法",
+          "先凑到十，再加剩下的",
+          "只在两屋间搬动，总数不变",
+          "从外面新添，总数增加",
+          "挑两盒，合起来正好"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先找同类东西的两个数。"
+        },
+        {
+          "say": "想知道一共有多少，就把两个数相加。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "可以先拆一组补到十，剩下的一个也不漏。"
+        },
+        {
+          "say": "数线上也能这样，第一跳到十，第二跳走完。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "从这间房搬到另一间，两边有增也有减。"
+        },
+        {
+          "say": "一只也没新添，所以合计不变。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "从外面新来一只，总数就增加一只。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "挑两盒时，先看需要的总数。"
+        },
+        {
+          "say": "把两盒合起来，刚好一样多就合适。"
+        },
+        {
+          "say": "和家人玩凑十一，再说说你是怎么配的。"
+        }
+      ]
+    }
+  ]
+}

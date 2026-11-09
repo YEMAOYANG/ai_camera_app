@@ -1,0 +1,27 @@
+<section class="reading-board" aria-label="读书角书架">
+  <div id="step-timeline" data-semantic-diagram="two-step-time-sequence">
+    <div id="stage-zero" class="moment"><span data-instruction>开始</span><b></b></div>
+    <div class="time-arrow" aria-hidden="true">→</div>
+    <div id="stage-one" class="moment"><span data-instruction>第一次后</span><b></b></div>
+    <div class="time-arrow" aria-hidden="true">→</div>
+    <div id="stage-two" class="moment"><span data-instruction>第二次后</span><b></b></div>
+  </div>
+  <div class="reading-workspace">
+    <section id="shelf-panel" aria-label="架上的书">
+      <div class="panel-top"><span data-instruction>现在架上</span><strong id="shelf-count">0</strong></div>
+      <div id="shelf-now" data-semantic-diagram="exact-book-positions"></div>
+    </section>
+    <section id="event-panel" aria-label="这次书本的变化">
+      <div id="event-cue" data-semantic-diagram="direction-and-exact-change"></div>
+      <div id="event-choices"></div>
+      <div id="event-controls">
+        <button type="button" class="btn ghost" id="undo-selection" aria-label="清除这次选择">↶</button>
+        <button type="button" class="btn green" id="apply-event" aria-label="执行这次变化">✓</button>
+      </div>
+    </section>
+  </div>
+  <div class="reading-footer">
+    <div id="event-traces" aria-label="已经完成的两次变化"></div>
+    <button type="button" class="btn green hide" id="next-round" aria-label="继续下一关">→</button>
+  </div>
+</section>

@@ -1,0 +1,70 @@
+.guess-room {
+  position: absolute;
+  inset: 0;
+  border: 3px solid #e9d5af;
+  border-radius: 32px;
+  background: #fffdf6;
+  overflow: hidden;
+}
+#guess-listen, .guess-media-error button {
+  width: 72px;
+  height: 72px;
+  border: 3px solid #c88e42;
+  border-radius: 50%;
+  background: #fff4d9;
+  color: #795026;
+  font-size: 42px;
+  cursor: pointer;
+}
+#guess-listen { position: absolute; left: 28px; top: 20px; z-index: 2; }
+#guess-desk {
+  position: absolute;
+  left: 340px;
+  top: 52px;
+  width: 480px;
+  height: 480px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.guess-toy {
+  position: absolute;
+  width: 128px;
+  height: 128px;
+  z-index: 2;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  cursor: pointer;
+  mix-blend-mode: multiply;
+}
+.guess-toy img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.guess-toy.excluded { opacity: .28; cursor: default; pointer-events: none; }
+.guess-toy.confirmed { outline: 5px solid #78a95a; cursor: default; pointer-events: none; }
+.guess-toy[data-slot="on-left"] { left: 422px; top: 120px; }
+.guess-toy[data-slot="on-right"] { left: 598px; top: 120px; }
+.guess-toy[data-slot="under-left"] { left: 422px; top: 324px; }
+.guess-toy[data-slot="under-right"] { left: 598px; top: 324px; }
+.guess-toy[data-slot="confirmed"] { left: 940px; top: 220px; }
+#guess-tray {
+  position: absolute;
+  left: 908px;
+  top: 190px;
+  width: 192px;
+  height: 188px;
+  border: 3px dashed #d5bd90;
+  border-radius: 26px;
+  background: #fff7e5;
+}
+.guess-media-error {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: #fff5e4;
+  font-size: 28px;
+}

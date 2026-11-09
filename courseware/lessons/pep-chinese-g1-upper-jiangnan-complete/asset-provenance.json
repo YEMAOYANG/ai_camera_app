@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "lesson": "江南",
+  "sourcePackage": "output/courseware-packages/pep-chinese-g1-upper-jiangnan-h1-v3",
+  "sourceAuthors": [
+    "gpt-6.1-terra",
+    "claude-sonnet-5-5",
+    "gpt-6.1-sol"
+  ],
+  "sourceArchiveManifest": "backend/data/course-storage/archives/9c2e1fe8aae7d75c4689e87d-3e4a95e6/manifest.json",
+  "sourceReleaseSha256": "f1d27ebef3d6686a234f4051f61dadc9cc37f6e1dab240dba031b3aa3779b8c6",
+  "readMethod": "主控从已登记课程媒体接口 GET sourceIdentity，核对 sha256、byteSize 和 PNG 解码后，保持原字节写入 destination；本清单未宣称新近网络回读成功。",
+  "reused": [
+    {
+      "key": "water-town",
+      "sha256": "2e0ccaf169d62a6b34b204b44e3479fbaf9dbcfbcc2b4f7a265a50fbe9218c86",
+      "byteSize": 670679,
+      "mimeType": "image/png",
+      "destination": "assets/water-town.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/2e0ccaf169d62a6b34b204b44e3479fbaf9dbcfbcc2b4f7a265a50fbe9218c86.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/2e0ccaf169d62a6b34b204b44e3479fbaf9dbcfbcc2b4f7a265a50fbe9218c86.png"
+    },
+    {
+      "key": "pond",
+      "sha256": "445248a39a7041cf10c45ab424f1df1c1447e8a38ce17e4de4056d6e5309ca06",
+      "byteSize": 564846,
+      "mimeType": "image/png",
+      "destination": "assets/pond.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/445248a39a7041cf10c45ab424f1df1c1447e8a38ce17e4de4056d6e5309ca06.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/445248a39a7041cf10c45ab424f1df1c1447e8a38ce17e4de4056d6e5309ca06.png"
+    },
+    {
+      "key": "river",
+      "sha256": "6da80b17d5327e1c6cb423b9a73edcd1936dd28f0a988931b91a0740d0d3a83e",
+      "byteSize": 1373579,
+      "mimeType": "image/png",
+      "destination": "assets/river.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/6da80b17d5327e1c6cb423b9a73edcd1936dd28f0a988931b91a0740d0d3a83e.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/6da80b17d5327e1c6cb423b9a73edcd1936dd28f0a988931b91a0740d0d3a83e.png"
+    },
+    {
+      "key": "mountain",
+      "sha256": "1c4686ffbd4719de0def04b6b69a3e045ae293a92f51ffbecf8e53e6ce065281",
+      "byteSize": 1237813,
+      "mimeType": "image/png",
+      "destination": "assets/mountain.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/1c4686ffbd4719de0def04b6b69a3e045ae293a92f51ffbecf8e53e6ce065281.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/1c4686ffbd4719de0def04b6b69a3e045ae293a92f51ffbecf8e53e6ce065281.png"
+    },
+    {
+      "key": "tree",
+      "sha256": "1dedeff4572126ce1211f8e8c163826079de09c05c98cc30f0056fd6dc01d60b",
+      "byteSize": 1296302,
+      "mimeType": "image/png",
+      "destination": "assets/tree.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/1dedeff4572126ce1211f8e8c163826079de09c05c98cc30f0056fd6dc01d60b.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/1dedeff4572126ce1211f8e8c163826079de09c05c98cc30f0056fd6dc01d60b.png"
+    },
+    {
+      "key": "dense",
+      "sha256": "3c1cc3187739a089dcf7da2b0e81c172a869496fe9345c30b34b09c375274a67",
+      "byteSize": 1670782,
+      "mimeType": "image/png",
+      "destination": "assets/dense.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/3c1cc3187739a089dcf7da2b0e81c172a869496fe9345c30b34b09c375274a67.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/3c1cc3187739a089dcf7da2b0e81c172a869496fe9345c30b34b09c375274a67.png"
+    },
+    {
+      "key": "sparse",
+      "sha256": "57db04ebc96f36e72c64274d3681e9b0832a5574cde2932297e79245542277c3",
+      "byteSize": 1248155,
+      "mimeType": "image/png",
+      "destination": "assets/sparse.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/57db04ebc96f36e72c64274d3681e9b0832a5574cde2932297e79245542277c3.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/57db04ebc96f36e72c64274d3681e9b0832a5574cde2932297e79245542277c3.png"
+    },
+    {
+      "key": "empty",
+      "sha256": "15be06bed54ccdab68862e4bf55f5dd3240e818efd907ef18751f22ae994bce3",
+      "byteSize": 923903,
+      "mimeType": "image/png",
+      "destination": "assets/empty.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/15be06bed54ccdab68862e4bf55f5dd3240e818efd907ef18751f22ae994bce3.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/15be06bed54ccdab68862e4bf55f5dd3240e818efd907ef18751f22ae994bce3.png"
+    }
+  ],
+  "newGeneration": {
+    "requests": "output/courseware-lessons/pep-chinese-g1-upper-jiangnan-complete/picture-requests.json",
+    "keys": [
+      "pond-map",
+      "fish",
+      "boat-east",
+      "boat-west",
+      "boat-north",
+      "boat-south",
+      "child-play",
+      "child-sleep",
+      "leaf",
+      "bird-fly",
+      "bird-sleep",
+      "wash-hands"
+    ],
+    "count": 12,
+    "review": "正式图片生成后仍须逐张语义和四态截图核查；互动鱼和莲叶使用本次同风格原创单图，不沿用 h1 的照片精灵拼图或 G6 回执。",
+    "pondMapInvariant": "中央四叶围出可见水隙，鱼在叶间水面；四方仍有足够水域。"
+  },
+  "restoredNotUsed": [
+    {
+      "key": "jiangnan-game-sprites-v2",
+      "sha256": "c42328537b8a2a49ecbe5602f8959254211dcca5cf271184871fd70f627af8a6",
+      "byteSize": 1438751,
+      "mimeType": "image/png",
+      "destination": "assets/jiangnan-game-sprites-v2.png",
+      "sourceIdentity": "/api/classroom-media/tbpub_18b88cf2f47092d0e6623ad3/media/c42328537b8a2a49ecbe5602f8959254211dcca5cf271184871fd70f627af8a6.png",
+      "archivePath": "媒体/openmaic-runtime/.runtime/OpenMAIC/data/classrooms/tbpub_18b88cf2f47092d0e6623ad3/media/c42328537b8a2a49ecbe5602f8959254211dcca5cf271184871fd70f627af8a6.png",
+      "reason": "实际目视确认该图为写实精灵拼图，与本整课绘本风格不符；保留恢复所得原字节和旧版证据，本完整新版不引用该图。"
+    }
+  ],
+  "registeredImageCount": 20,
+  "renderingCompositions": [
+    {
+      "pages": [
+        "directions",
+        "sentence"
+      ],
+      "sources": [
+        "pond-map",
+        "fish"
+      ],
+      "method": "宽图完整保留在方位板中央，按图的实际叶簇大小留出四方水域；同一已登记 pond-map 的清水区域裁切成羽化水隙，遮住原图水隙里非目标的淡蓝鱼影。原PNG字节与生成回执保持不变。",
+      "purpose": "场景中只出现一条用于任务的可移动橘鱼，四方位置和方向字不相遮挡。"
+    },
+    {
+      "pages": [
+        "characters",
+        "density",
+        "directions",
+        "sentence",
+        "journey"
+      ],
+      "sources": [
+        "fish"
+      ],
+      "method": "仅在CSS视口裁切已经登记的fish.png中央完整鱼身，不带入生成图边缘的装饰水面与小荷叶；不改PNG、不额外生成。",
+      "purpose": "操作对象是完整小鱼，边缘不拉伸、不带着一整块背景移动。"
+    },
+    {
+      "pages": [
+        "journey"
+      ],
+      "sources": [
+        "pond",
+        "empty",
+        "leaf",
+        "fish"
+      ],
+      "method": "开头使用完整莲塘图；叶间图用四张正式单叶围住小鱼；四方图用一张正式单叶和定位的小鱼；全部在正式空水面上组合。",
+      "purpose": "六幅图分别表达开头、叶间、东、西、南、北，不将横向大场景硬裁成狭窄图卡。"
+    }
+  ]
+}

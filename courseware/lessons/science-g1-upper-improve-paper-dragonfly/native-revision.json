@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "mira.courseware.native-revision.v1",
+  "nativeJobId": "WoLVlzQB_w",
+  "originalFailedJobId": "F8cUMOI9go",
+  "nativeClassroomId": "1JsDrDbOeB",
+  "nativeClassroomSha256": "14f7853154a8c0c18195e12b1d395076e1c6a6950a8383f38b79dcc28b25a855",
+  "frozenDraftSha256": "f75d0f4a0084a85b74774d9b2c5cf125d6d3e209614f433e98fcafd8e601554c",
+  "originalDispatchSha256": "4565aa7420d71239e8b7d02f90d41cadedc3a5188bb542fbd141d8d8e1fbfeb3",
+  "balanceRetrySha256": "23a45d6b23c53f09b95805748a900a27c9d172d570efa4090868f8c2191893a2",
+  "authorModels": [
+    "deepseek-v4-pro",
+    "gpt-6.1-sol"
+  ],
+  "originalNativeScenes": [
+    {
+      "sourceId": "scene_VPbE9XvjoN",
+      "sourceType": "slide",
+      "releaseKey": "p01",
+      "changes": "保留原生前后版的飞翼和纸身对照，改正同一张纸做两件和前版必为单层的误导；补全三个设计位置。"
+    },
+    {
+      "sourceId": "scene_1Wy3SrWgjB",
+      "sourceType": "slide",
+      "releaseKey": "p02",
+      "changes": "保留安全和标线顺序；修正长虚线被写成剪线，改成沿长虚线折躯干，并补充止点和安全动作。"
+    },
+    {
+      "sourceId": "scene_DcumM2cZJG",
+      "sourceType": "interactive",
+      "releaseKey": "p03",
+      "changes": "把原生四步图改成共同框架的图选操作，点击后显示纸的实际形状、加入逐步反馈、真实示范和复位。"
+    },
+    {
+      "sourceId": "scene_3mpkiOoja6",
+      "sourceType": "interactive",
+      "releaseKey": "p04",
+      "changes": "把原生数值滑条和模拟机改成同高同时松手、两版共同时间线和三种真实可读的图形记录；补足原生漏讲的例子和理由。"
+    },
+    {
+      "sourceId": "scene_1WrMbA4kF8",
+      "sourceType": "slide",
+      "releaseKey": "p05",
+      "changes": "保留三次试飞、结实与飞行分开；用新画面和可听证据代替表格，避免引入飞得远近要求。"
+    },
+    {
+      "sourceId": "scene_lw5rERmJNJ",
+      "sourceType": "quiz",
+      "releaseKey": "p06",
+      "changes": "保留同纸改折痕和剪口止点的题型，用原创横放样图替换原生无正式图选项。"
+    },
+    {
+      "sourceId": "scene_lXitQHYsZ2",
+      "sourceType": "quiz",
+      "releaseKey": "p07",
+      "changes": "删除纸飞机误称、把检验高度影响的题改回本课同条件比较，修复跨场重复题号并制作原创图。"
+    },
+    {
+      "sourceId": "scene_IRAKEzOFqI",
+      "sourceType": "slide",
+      "releaseKey": "p08",
+      "changes": "保留成人陪伴、同纸同高同时、稳定旋转和下次试验，补足慢落与留空久，以及真实口述观察。"
+    }
+  ],
+  "finalMediaReconciliation": [
+    {
+      "draftLineId": "p01-2",
+      "outcome": "unknown_upstream_outcome",
+      "responseSha256": "4d400481e724b44001fe8d15129eb127ffb35e1d49dcd419089d4819f9ad91a7",
+      "change": "改为高亮两版图，保留其后左版和右版的完整配音。"
+    },
+    {
+      "draftLineId": "p02-3",
+      "outcome": "unknown_upstream_outcome",
+      "responseSha256": "da43cdedc34c48d20dbb7108a16f523c4887e0510b78fa9127ff610b127519c6",
+      "change": "保留成人陪伴和剪刀远离手，用同一位科学教师的两段既有正式原录音。"
+    }
+  ]
+}

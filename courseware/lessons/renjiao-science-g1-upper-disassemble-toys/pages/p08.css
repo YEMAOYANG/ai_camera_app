@@ -1,0 +1,23 @@
+
+.work-board{position:absolute;inset:0;background:#fffcf3;border:3px solid #e7d5ad;border-radius:32px;overflow:hidden}
+.object{object-fit:contain;pointer-events:none;display:block;width:100%;height:100%;mix-blend-mode:multiply}
+.round-control{position:absolute;width:84px;height:84px;border:3px solid var(--line);border-radius:50%;background:#fff9dd;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.round-control svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.piece-button{position:relative;width:220px;height:160px;border:3px solid #d7c8a2;border-radius:25px;background:#fff;cursor:grab;padding:6px;flex-shrink:0;transition:opacity .2s,transform .2s}
+.piece-button.selected{border-color:var(--bl);box-shadow:0 0 0 5px #4c8ddb55}
+.piece-button.placed{opacity:.32;pointer-events:none}
+.piece-button:disabled{cursor:default}
+.bank{position:absolute;display:flex;gap:22px;align-items:center;justify-content:center}
+.target{border:4px dashed #9bbcb2;border-radius:28px;background:#edf5ec;cursor:pointer}
+.track-line{position:absolute;height:8px;border-radius:4px;background:#c7b28b}
+.bad-mark{position:absolute;width:78px;height:78px;border-radius:50%;border:4px solid var(--rd);color:var(--rd);background:#fff8ed;font-size:52px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#ready h1{font-size:46px}#ready p{font-size:27px}#ready .card{padding:22px 58px 28px}#ready .pic{width:480px;height:270px}
+#test-track{position:absolute;left:50px;top:12px;width:1100px;height:325px}.track-line{left:0;right:0;top:300px}#test-car{position:absolute;left:20px;top:20px;width:540px;height:275px;cursor:pointer;transition:transform .55s ease}#test-base{position:absolute;left:15px;top:130px;width:500px;height:130px}#test-cab{position:absolute;left:35px;top:8px;width:200px;height:185px;transition:transform .4s}#test-bed{position:absolute;left:255px;top:8px;width:250px;height:170px}#test-wheel-one,#test-wheel-two{position:absolute;top:172px;width:112px;height:112px}#test-wheel-one{left:80px}#test-wheel-two{left:355px}#test-problem{display:none;left:400px;top:45px}#test-go{left:65px;top:385px}#repair-bank{left:295px;top:365px}#test-reset{right:18px;bottom:18px}#track-end{position:absolute;left:1015px;top:200px;font-size:95px;color:var(--gr)}#test-car.tested #test-problem{display:flex}#test-car.success #test-problem{display:none}#test-car.loose #test-cab{transform:rotate(-17deg) translateY(-22px)}#test-car .absent{visibility:hidden}.asset-retry{position:absolute;left:50%;top:50%;margin:-44px 0 0 -44px;width:88px;height:88px;display:flex;align-items:center;justify-content:center;border:3px solid var(--rd);border-radius:50%;font-size:62px;background:var(--paper);color:var(--rd);cursor:pointer;z-index:6}
+
+.piece-button>.object{object-fit:cover}
+
+#test-base,#test-cab,#test-bed{object-fit:cover}#test-bed{left:160px;width:280px}
+
+#test-wheel-one,#test-wheel-two{top:124px;width:160px;height:160px}#test-wheel-one{left:84px}#test-wheel-two{left:298px}.track-line{top:274px}
+
+.paper-key-def{position:absolute;pointer-events:none}.object{mix-blend-mode:normal;filter:url(#paper-key)}

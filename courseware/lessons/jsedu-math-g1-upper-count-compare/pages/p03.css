@@ -1,0 +1,25 @@
+
+.count-head{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;color:#1d5d63}
+.count-head h2{font-size:35px;margin:0}
+.count-head span{font-size:27px;font-weight:700}
+.count-controls{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:22px}
+.count-panel{border:3px solid #a9c7be;border-radius:25px;background:#fffdf5}
+.count-art{object-fit:contain;mix-blend-mode:multiply;pointer-events:none}
+.count-action{display:grid;place-items:center;background:#fffdf5;border:3px solid #aac6bb;border-radius:17px;padding:4px;cursor:pointer;font:inherit;color:#245d64}
+.count-action:disabled{cursor:default}
+.count-action.chosen{outline:4px solid #2d7e7e}
+.count-action.wrong,.count-panel.wrong{border-color:#cd6339}
+.count-empty{width:74px;height:74px;border:2px dashed #bbd1c7;border-radius:15px}
+.count-missing{outline:4px solid #b44e31}
+
+#count-main{position:relative;height:400px}
+#count-supply{position:absolute;left:34px;top:39px;width:206px;height:285px;display:grid;align-content:center;justify-content:center;gap:20px}
+#count-supply button{width:142px;height:110px}
+#count-supply img{width:94px;height:94px}
+#count-board{position:absolute;left:292px;top:35px;width:888px;height:300px;display:grid;grid-template-columns:repeat(5,106px);grid-template-rows:repeat(2,106px);gap:13px;justify-content:center;align-content:center}
+#count-board button{width:106px;height:106px;border-style:dashed}
+#count-board button.placed{border-style:solid;background:#f4faf0}
+#count-board img{width:88px;height:88px}
+#count-return{position:absolute;right:56px;top:350px}
+
+.count-icon{width:25px;height:25px;flex:0 0 25px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}

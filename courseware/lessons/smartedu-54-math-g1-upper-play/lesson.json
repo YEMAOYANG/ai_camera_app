@@ -1,0 +1,505 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "玩一玩",
+  "description": "和伙伴一起选游戏，先听约定，再按规则轮流。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "color": "#D39252",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "persona": "沪教版小学数学老师，先示范，再让孩子听规则动手试。"
+    }
+  },
+  "images": {
+    "game-menu": {
+      "file": "assets/game-menu.png"
+    },
+    "hop-wait": {
+      "file": "assets/hop-wait.png"
+    },
+    "hop-go": {
+      "file": "assets/hop-go.png"
+    },
+    "group-intro": {
+      "file": "assets/group-intro.png"
+    },
+    "blocks-intro": {
+      "file": "assets/blocks-intro.png"
+    },
+    "turn-ticket": {
+      "file": "assets/turn-ticket.png"
+    },
+    "player-1": {
+      "file": "assets/player-1.png"
+    },
+    "player-2": {
+      "file": "assets/player-2.png"
+    },
+    "player-3": {
+      "file": "assets/player-3.png"
+    },
+    "player-4": {
+      "file": "assets/player-4.png"
+    },
+    "player-5": {
+      "file": "assets/player-5.png"
+    },
+    "choice-rings": {
+      "file": "assets/choice-rings.png"
+    },
+    "choice-beanbag": {
+      "file": "assets/choice-beanbag.png"
+    },
+    "choice-bowling": {
+      "file": "assets/choice-bowling.png"
+    },
+    "rule-four": {
+      "file": "assets/rule-four.png"
+    },
+    "rule-three": {
+      "file": "assets/rule-three.png"
+    },
+    "rule-five": {
+      "file": "assets/rule-five.png"
+    },
+    "wait-line": {
+      "file": "assets/wait-line.png"
+    },
+    "wait-throw": {
+      "file": "assets/wait-throw.png"
+    },
+    "wait-footprints": {
+      "file": "assets/wait-footprints.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "玩一玩",
+      "template": "picture-points",
+      "data": {
+        "title": "玩一玩",
+        "picture": "game-menu",
+        "points": [
+          "喊数抱团",
+          "折纸",
+          "跳房子",
+          "搭积木"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小朋友，今天有四个游戏可以选。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "听口令和伙伴站成一组，是喊数抱团。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "两人拿着纸折小船，这是折纸。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一个人沿地面格子跳，这是跳房子。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "两人把木块搭成小桥，这是搭积木。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "想一起玩，得先听听伙伴的主意。"
+        },
+        {
+          "say": "我想搭积木，你想选哪一个？"
+        },
+        {
+          "say": "两人都想搭小桥，就一起选搭积木。"
+        },
+        {
+          "say": "你想选什么？可以指给家人看。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "先听约定再开始",
+      "template": "two-columns",
+      "data": {
+        "title": "先听约定再开始",
+        "left": {
+          "heading": "在等候印上等",
+          "body": "伙伴还在格子里。"
+        },
+        "left_picture": "hop-wait",
+        "right": {
+          "heading": "轮到了再出发",
+          "body": "伙伴离开格子了。"
+        },
+        "right_picture": "hop-go"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看跳房子这张图，伙伴还在格子里。"
+        },
+        {
+          "say": "我们这轮约好，一次只让一人跳。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "下一位站在等候印上，把路留出来。"
+        },
+        {
+          "say": "如果一起进格子，就容易碰到对方。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在，前面的伙伴走出了最后一格。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "轮到你了，就从起点开始跳。"
+        },
+        {
+          "say": "先听清约定，再照着做，人人都能玩。"
+        },
+        {
+          "say": "换一种玩法，也要先一起说好。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "听口令结队",
+      "page": "p03",
+      "widgetType": "group-players",
+      "startImage": "group-intro",
+      "script": [
+        {
+          "highlight": "#group-mat"
+        },
+        {
+          "say": "我先看看集合垫，伙伴要在这里结队。"
+        },
+        {
+          "say": "咱们这轮用手指请伙伴过去，不用推。"
+        },
+        {
+          "highlight": "#group-call"
+        },
+        {
+          "say": "先听我说这轮要几个人。"
+        },
+        {
+          "say": "这轮请两个伙伴站进垫子。"
+        },
+        {
+          "setState": {
+            "demo": "one"
+          }
+        },
+        {
+          "say": "我先请一位进来，垫子里有一个。"
+        },
+        {
+          "setState": {
+            "demo": "two"
+          }
+        },
+        {
+          "say": "再请一位进来，现在有两个。"
+        },
+        {
+          "highlight": "#group-confirm"
+        },
+        {
+          "say": "我点着他们数，确认和口令一样。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "现在你来。点伙伴，或把伙伴拖进垫子。"
+        },
+        {
+          "say": "请两个伙伴到垫子里，再点确认。"
+        },
+        {
+          "say": "下一轮请三个伙伴到垫子里。"
+        },
+        {
+          "say": "想再听一遍，就点喇叭。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "积木接力",
+      "page": "p04",
+      "widgetType": "build-in-turn",
+      "startImage": "blocks-intro",
+      "script": [
+        {
+          "setState": {
+            "demo": "holder"
+          }
+        },
+        {
+          "say": "这轮约好，拿到接力牌的人放一块。"
+        },
+        {
+          "highlight": "#block-partner-a"
+        },
+        {
+          "say": "牌在蓝衣伙伴身边，他先搭。"
+        },
+        {
+          "setState": {
+            "demo": "place"
+          }
+        },
+        {
+          "say": "他把一块木头放到了搭台上。"
+        },
+        {
+          "setState": {
+            "demo": "pass"
+          }
+        },
+        {
+          "say": "他把接力牌交给了橙衣伙伴。"
+        },
+        {
+          "highlight": "#block-partner-b"
+        },
+        {
+          "say": "橙衣伙伴拿到牌，接下来轮到她。"
+        },
+        {
+          "say": "没拿牌的人先等，这样不会抢同一块。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "到你了，点拿着接力牌的伙伴。"
+        },
+        {
+          "say": "放好一块后，看牌又传给了谁。"
+        },
+        {
+          "say": "每人放一块再交牌，小桥就搭起来了。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "看图小检查",
+      "intro": [
+        "换几个新游戏，听清问题再选图。"
+      ],
+      "questions": [
+        {
+          "id": "play-q1",
+          "question": "他们约好把豆袋投进桶。哪幅图是这个游戏？",
+          "skill": "认图并选择约好的游戏",
+          "answer": [
+            "B"
+          ],
+          "analysis": "投进桶的是布豆袋。另两幅图用圈或滚球，动作和道具都与约定不同。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "choice-rings",
+                "alt": "把圈套向立杆"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "choice-beanbag",
+                "alt": "把布豆袋投向开口桶"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "choice-bowling",
+                "alt": "在地上滚球撞瓶"
+              }
+            }
+          }
+        },
+        {
+          "id": "play-q2",
+          "question": "彩带游戏约好一组四个人。哪组正好有四个？",
+          "skill": "按事先约定参与游戏",
+          "answer": [
+            "A"
+          ],
+          "analysis": "沿彩带逐个数，第一组有四个伙伴，正好合约定。另两组分别是三个和五个。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "rule-four",
+                "alt": "一条彩带和四名伙伴"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "rule-three",
+                "alt": "一条彩带和三名伙伴"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "rule-five",
+                "alt": "一条彩带和五名伙伴"
+              }
+            }
+          }
+        },
+        {
+          "id": "play-q3",
+          "question": "伙伴正在套圈。说好等在脚印上。哪幅图对？",
+          "skill": "等待轮流与文明参与",
+          "answer": [
+            "C"
+          ],
+          "analysis": "两只脚留在等候脚印上才符合约定。走到投掷线或提前投圈都没有等轮次。",
+          "options": {
+            "A": {
+              "label": "图一",
+              "visual": {
+                "kind": "asset",
+                "image": "wait-line",
+                "alt": "伙伴正在投，下一位已走到投掷线旁"
+              }
+            },
+            "B": {
+              "label": "图二",
+              "visual": {
+                "kind": "asset",
+                "image": "wait-throw",
+                "alt": "两人同时投圈"
+              }
+            },
+            "C": {
+              "label": "图三",
+              "visual": {
+                "kind": "asset",
+                "image": "wait-footprints",
+                "alt": "伙伴正在投，下一位站在等候脚印上"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "一起玩得开心",
+      "template": "picture-points",
+      "data": {
+        "title": "一起玩得开心",
+        "picture": "game-menu",
+        "points": [
+          "一起挑一个",
+          "听清再开始",
+          "轮到自己再动手"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们在好几个游戏里练习了约定。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先商量，和伙伴挑一个想玩的游戏。"
+        },
+        {
+          "say": "两个人都想折纸，就一起准备纸。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "玩前先说清，怎样开始，怎样轮流。"
+        },
+        {
+          "say": "听到结队口令，就照着人数去找伙伴。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "伙伴还在玩，我等他做完再接着做。"
+        },
+        {
+          "say": "回家选一种游戏，把约定说给家人听。"
+        },
+        {
+          "say": "然后一起玩一轮，请家人看看你怎么做。"
+        }
+      ]
+    }
+  ]
+}

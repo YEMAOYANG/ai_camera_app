@@ -1,0 +1,992 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "1 人有哪些感官",
+  "description": "从窗边找线索，认识感官，按安全顺序观察橘子，再用感官线索猜盒子里的物体。",
+  "grade": 1,
+  "roster": {
+    "science-teacher": {
+      "role": "teacher",
+      "name": "小科老师",
+      "gender": "female",
+      "voice": "Serena",
+      "color": "#29735B",
+      "avatar": "/avatars/teacher.png",
+      "persona": "温和的科学老师，带孩子从真实的线索出发。"
+    }
+  },
+  "images": {
+    "courtyard": {
+      "file": "assets/courtyard.png"
+    },
+    "body-model": {
+      "file": "assets/body-model.png"
+    },
+    "organ-eye": {
+      "file": "assets/organ-eye.png"
+    },
+    "organ-ear": {
+      "file": "assets/organ-ear.png"
+    },
+    "organ-nose": {
+      "file": "assets/organ-nose.png"
+    },
+    "organ-tongue": {
+      "file": "assets/organ-tongue.png"
+    },
+    "organ-skin": {
+      "file": "assets/organ-skin.png"
+    },
+    "comparison-left": {
+      "file": "assets/comparison-left.png"
+    },
+    "comparison-right": {
+      "file": "assets/comparison-right.png"
+    },
+    "desk-tap": {
+      "file": "assets/desk-tap.png"
+    },
+    "paper-rustle": {
+      "file": "assets/paper-rustle.png"
+    },
+    "skin-touch": {
+      "file": "assets/skin-touch.png"
+    },
+    "smell-flower": {
+      "file": "assets/smell-flower.png"
+    },
+    "taste-snack": {
+      "file": "assets/taste-snack.png"
+    },
+    "orange-outside": {
+      "file": "assets/orange-outside.png"
+    },
+    "orange-inside": {
+      "file": "assets/orange-inside.png"
+    },
+    "wash-setup": {
+      "file": "assets/wash-setup.png"
+    },
+    "closed-box": {
+      "file": "assets/closed-box.png"
+    },
+    "box-foam-block": {
+      "file": "assets/box-foam-block.png"
+    },
+    "box-ball": {
+      "file": "assets/box-ball.png"
+    },
+    "box-wood-block": {
+      "file": "assets/box-wood-block.png"
+    },
+    "tool-magnifier": {
+      "file": "assets/tool-magnifier.png"
+    },
+    "tool-microscope": {
+      "file": "assets/tool-microscope.png"
+    },
+    "tool-stethoscope": {
+      "file": "assets/tool-stethoscope.png"
+    },
+    "tool-road-mirror": {
+      "file": "assets/tool-road-mirror.png"
+    },
+    "observation-journal": {
+      "file": "assets/observation-journal.png"
+    },
+    "unsafe-sample-sniff": {
+      "file": "assets/unsafe-sample-sniff.png"
+    },
+    "unsafe-sample-touch": {
+      "file": "assets/unsafe-sample-touch.png"
+    },
+    "safe-sample-tell-adult": {
+      "file": "assets/safe-sample-tell-adult.png"
+    },
+    "safe-teaching-scene": {
+      "file": "assets/safe-teaching-scene.png"
+    },
+    "open-box-sponge": {
+      "file": "assets/open-box-sponge.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "welcome",
+      "type": "slide",
+      "title": "窗边有什么线索",
+      "template": "picture-points",
+      "data": {
+        "title": "窗边有什么线索",
+        "picture": "courtyard",
+        "points": [
+          "看到的",
+          "听到的",
+          "我们的感官"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我是小科老师，今天一起到窗边找线索。"
+        },
+        {
+          "say": "小朋友从窗里望出去，她看到了什么？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我看到一片片椭圆形的绿叶。"
+        },
+        {
+          "say": "叶子的颜色和形状，是用眼睛看出来的。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "风吹动风铃时，我们可能听到叮当声。"
+        },
+        {
+          "say": "风铃的响声要用耳朵听，图片里只能看见它。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "眼睛和耳朵是感官。"
+        },
+        {
+          "say": "感官帮我们发现周围的东西是什么样的。"
+        },
+        {
+          "say": "接下来找找，身体还有哪些感官。"
+        }
+      ]
+    },
+    {
+      "key": "organ-map",
+      "type": "interactive",
+      "title": "认一认身体的感官",
+      "page": "organ-map",
+      "startImage": "courtyard",
+      "widgetType": "guided-observation",
+      "script": [
+        {
+          "setState": {
+            "demo": "eye"
+          }
+        },
+        {
+          "say": "看老师的身体图，眼睛在脸的上方。"
+        },
+        {
+          "say": "眼睛能看见东西，我把眼睛图卡放这里。"
+        },
+        {
+          "setState": {
+            "demo": "tongue"
+          }
+        },
+        {
+          "say": "嘴唇后面有舌头，请看旁边的口腔模型。"
+        },
+        {
+          "say": "尝味道用的是舌头，嘴唇不是舌头。"
+        },
+        {
+          "setState": {
+            "demo": "skin"
+          }
+        },
+        {
+          "say": "这块亮起的是前臂的皮肤。"
+        },
+        {
+          "say": "手背也有皮肤，身体许多地方都有皮肤。"
+        },
+        {
+          "setState": {
+            "demo": "ear"
+          }
+        },
+        {
+          "say": "头的两边有耳朵，帮我们听声音。"
+        },
+        {
+          "setState": {
+            "demo": "nose"
+          }
+        },
+        {
+          "say": "眼睛下面是鼻子，帮我们闻气味。"
+        },
+        {
+          "setState": {
+            "demo": "clear"
+          }
+        },
+        {
+          "say": "现在挑一张图卡，再点身体图上对应的位置。"
+        },
+        {
+          "say": "先看图卡是什么，再找它的位置。"
+        }
+      ]
+    },
+    {
+      "key": "see-details",
+      "type": "interactive",
+      "title": "眼睛找不同",
+      "page": "see-details",
+      "startImage": "courtyard",
+      "widgetType": "guided-observation",
+      "script": [
+        {
+          "setState": {
+            "demo": "color"
+          }
+        },
+        {
+          "say": "两张图都有圆片，圆片的颜色变了。"
+        },
+        {
+          "say": "这两块都是圆的，刚才比较的是颜色。"
+        },
+        {
+          "setState": {
+            "demo": "shape"
+          }
+        },
+        {
+          "say": "再看中间，一块有三个角，另一块有四个角。"
+        },
+        {
+          "say": "角数不同，说明形状变了。"
+        },
+        {
+          "setState": {
+            "demo": "size"
+          }
+        },
+        {
+          "say": "右边两块都是绿色方片，但一块大，一块小。"
+        },
+        {
+          "say": "同一位置对着看，就能发现大小的不同。"
+        },
+        {
+          "setState": {
+            "demo": "clear"
+          }
+        },
+        {
+          "say": "轮到你了，点亮你找到的变化。"
+        },
+        {
+          "say": "从左边比到右边，找过的地方会留一个圈。"
+        }
+      ]
+    },
+    {
+      "key": "hear-details",
+      "type": "slide",
+      "title": "耳朵分辨不同声音",
+      "template": "two-columns",
+      "data": {
+        "title": "耳朵分辨不同声音",
+        "left": {
+          "heading": "手指敲桌",
+          "body": "笃、笃、笃"
+        },
+        "right": {
+          "heading": "双手折纸",
+          "body": "沙、沙沙"
+        },
+        "left_picture": "desk-tap",
+        "right_picture": "paper-rustle"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一边是手指轻敲木桌。"
+        },
+        {
+          "say": "老师学给你听，笃、笃、笃。"
+        },
+        {
+          "say": "一下一下的，声音短短的。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "另一边是双手折纸。"
+        },
+        {
+          "say": "老师学给你听，沙、沙沙。"
+        },
+        {
+          "say": "折纸会有细碎的响声，跟敲桌声不一样。"
+        },
+        {
+          "say": "图片告诉我们有人在做什么。"
+        },
+        {
+          "say": "真正听到的声音，是耳朵帮我们分辨的。"
+        }
+      ]
+    },
+    {
+      "key": "touch-smell",
+      "type": "slide",
+      "title": "皮肤感受，鼻子闻",
+      "template": "two-columns",
+      "data": {
+        "title": "皮肤感受，鼻子闻",
+        "left": {
+          "heading": "碰到软布",
+          "body": "用皮肤感受"
+        },
+        "right": {
+          "heading": "闻到花香",
+          "body": "用鼻子闻"
+        },
+        "left_picture": "skin-touch",
+        "right_picture": "smell-flower"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "软布碰到手指，也碰到了前臂。"
+        },
+        {
+          "say": "这两处都能感到布是柔软的。"
+        },
+        {
+          "say": "有皮肤的地方，就能感受物体的触碰。"
+        },
+        {
+          "say": "皮肤还能帮我们比较表面的粗糙和光滑。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "大人确认花朵可以安全观察。"
+        },
+        {
+          "say": "小朋友用鼻子闻到了花香。"
+        },
+        {
+          "say": "眼睛能看花的颜色，鼻子帮我们闻气味。"
+        },
+        {
+          "say": "看着花的图，只能知道图里画了什么。"
+        },
+        {
+          "say": "花的香味，不能从屏幕里闻到。"
+        }
+      ]
+    },
+    {
+      "key": "taste-safely",
+      "type": "slide",
+      "title": "舌头尝味道，安全先确认",
+      "template": "two-columns",
+      "data": {
+        "title": "舌头尝味道，安全先确认",
+        "left": {
+          "heading": "熟悉的食物",
+          "body": "大人同意再尝"
+        },
+        "right": {
+          "heading": "陌生的纸包",
+          "body": "站远点，请大人看"
+        },
+        "left_picture": "taste-snack",
+        "right_picture": "safe-teaching-scene"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小朋友和大人一起准备了熟悉的香蕉。"
+        },
+        {
+          "say": "吃一小口，舌头能尝出甜味。"
+        },
+        {
+          "say": "食物没入口，不能靠看就知道它的味道。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "长椅上放着一个陌生纸包，应该怎么办？"
+        },
+        {
+          "say": "先站远一点，把看到的情况告诉大人。"
+        },
+        {
+          "say": "不知道是什么，就不碰、不闻，也不尝。"
+        },
+        {
+          "say": "就算看起来熟悉，也先请大人确认。"
+        },
+        {
+          "say": "屏幕里的图只能帮我们练习怎么选。"
+        }
+      ]
+    },
+    {
+      "key": "orange-route",
+      "type": "interactive",
+      "title": "给橘子做一张观察记录",
+      "page": "orange-route",
+      "startImage": "orange-outside",
+      "widgetType": "guided-observation",
+      "script": [
+        {
+          "setState": {
+            "demo": "wash"
+          }
+        },
+        {
+          "say": "大人确认橘子安全，再清洁双手和橘子外皮。"
+        },
+        {
+          "say": "我们先观察完整橘子的外面。"
+        },
+        {
+          "setState": {
+            "demo": "outside"
+          }
+        },
+        {
+          "say": "图上这颗橘子接近圆形，皮上有小凹点。"
+        },
+        {
+          "say": "我用眼睛看到了颜色、形状和小凹点。"
+        },
+        {
+          "say": "真正摸到的是粗糙还是光滑，要用皮肤感受。"
+        },
+        {
+          "setState": {
+            "demo": "inside"
+          }
+        },
+        {
+          "say": "请大人剥开，再用眼睛看橘子的里面。"
+        },
+        {
+          "say": "里面有一瓣一瓣的果肉，这条也可以记下。"
+        },
+        {
+          "setState": {
+            "demo": "evidence"
+          }
+        },
+        {
+          "say": "如果这时没听见响声，只记录此时没有听见。"
+        },
+        {
+          "say": "闻和尝要由大人确认适合，没做就不记。"
+        },
+        {
+          "setState": {
+            "demo": "clear"
+          }
+        },
+        {
+          "say": "把两张记录按先外后内的顺序放进观察册。"
+        },
+        {
+          "say": "说给大人听，你用了什么感官，有什么发现。"
+        }
+      ]
+    },
+    {
+      "key": "mystery-box",
+      "type": "interactive",
+      "title": "听线索，再开盒检查",
+      "page": "mystery-box",
+      "startImage": "closed-box",
+      "widgetType": "guided-observation",
+      "script": [
+        {
+          "setState": {
+            "demo": "shape"
+          }
+        },
+        {
+          "say": "老师先问，盒里的东西是什么形状？"
+        },
+        {
+          "say": "问形状用眼睛看，得到的线索是有平平的面。"
+        },
+        {
+          "setState": {
+            "demo": "texture"
+          }
+        },
+        {
+          "say": "再问这个东西轻轻按下去会怎么样。"
+        },
+        {
+          "say": "老师碰的是确认安全的材料，用皮肤来感觉。"
+        },
+        {
+          "say": "它有点软，按下去能压出一个浅浅的坑。"
+        },
+        {
+          "setState": {
+            "demo": "choices"
+          }
+        },
+        {
+          "say": "三件东西里，也许有两件的形状差不多。"
+        },
+        {
+          "say": "还要听软硬这条线索，才能挑出更合适的猜想。"
+        },
+        {
+          "setState": {
+            "demo": "clear"
+          }
+        },
+        {
+          "say": "先替两个问题选感官，再选出同时符合的东西。"
+        },
+        {
+          "say": "选好后打开盒子，看看里面的东西能不能证实。"
+        }
+      ]
+    },
+    {
+      "key": "tools-see",
+      "type": "slide",
+      "title": "两个帮眼睛观察的工具",
+      "template": "two-columns",
+      "data": {
+        "title": "两个帮眼睛观察的工具",
+        "left": {
+          "heading": "放大镜",
+          "body": "看清小细节"
+        },
+        "right": {
+          "heading": "显微镜",
+          "body": "看更细小的地方"
+        },
+        "left_picture": "tool-magnifier",
+        "right_picture": "tool-microscope"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这是放大镜，它能让眼睛看清小细节。"
+        },
+        {
+          "say": "看看这片叶子，镜里细细的纹路显得大一些。"
+        },
+        {
+          "say": "还是那片叶子，变大的是镜里看到的样子。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这是显微镜，它也能帮助眼睛观察。"
+        },
+        {
+          "say": "有些细节太小，平常用眼睛不容易看清。"
+        },
+        {
+          "say": "用显微镜，可以把更细小的地方看清楚。"
+        },
+        {
+          "say": "这两件是帮助观察的工具。"
+        },
+        {
+          "say": "我们认识它们的用途，就能明白工具怎样帮忙。"
+        }
+      ]
+    },
+    {
+      "key": "tools-hear-see",
+      "type": "slide",
+      "title": "还有哪些观察帮手",
+      "template": "two-columns",
+      "data": {
+        "title": "还有哪些观察帮手",
+        "left": {
+          "heading": "听诊器",
+          "body": "帮耳朵听"
+        },
+        "right": {
+          "heading": "道路反光镜",
+          "body": "帮眼睛看"
+        },
+        "left_picture": "tool-stethoscope",
+        "right_picture": "tool-road-mirror"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "听诊器是医生常用的工具。"
+        },
+        {
+          "say": "医生能用听诊器听到身体里的声音。"
+        },
+        {
+          "say": "比如咚咚的心跳声，还是由耳朵听到的。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这是装在路边的反光镜。"
+        },
+        {
+          "say": "转弯处有墙挡着，从原来的方向不容易看到来车。"
+        },
+        {
+          "say": "看一看镜里，能看到拐角另一边的一部分。"
+        },
+        {
+          "say": "它们帮助我们听清或看清。"
+        },
+        {
+          "say": "要找什么线索，就挑适合的观察工具。"
+        }
+      ]
+    },
+    {
+      "key": "sensory-check",
+      "type": "quiz",
+      "title": "感官小检查",
+      "intro": [
+        "听清问题后，点选一张合适的图。",
+        "需要再听一遍，可以点声音按钮。"
+      ],
+      "questions": [
+        {
+          "id": "q-see",
+          "question": "发现积木是三角形，主要用到哪种感官？",
+          "options": {
+            "A": {
+              "label": "耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-ear",
+                "alt": "耳朵"
+              }
+            },
+            "B": {
+              "label": "眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-eye",
+                "alt": "眼睛"
+              }
+            },
+            "C": {
+              "label": "鼻子",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-nose",
+                "alt": "鼻子"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "skill": "辨认颜色形状和大小所需的感官",
+          "analysis": "三角形是用眼睛看出来的形状。"
+        },
+        {
+          "id": "q-hear",
+          "question": "听见雨滴敲在窗上，用的是哪种感官？",
+          "options": {
+            "A": {
+              "label": "耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-ear",
+                "alt": "耳朵"
+              }
+            },
+            "B": {
+              "label": "皮肤",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-skin",
+                "alt": "皮肤"
+              }
+            },
+            "C": {
+              "label": "舌头",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-tongue",
+                "alt": "舌头"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "skill": "选择用来辨认声音的感官",
+          "analysis": "滴答的响声是耳朵听到的。"
+        },
+        {
+          "id": "q-smell",
+          "question": "知道杯边散出茶香，主要用哪种感官？",
+          "options": {
+            "A": {
+              "label": "眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-eye",
+                "alt": "眼睛"
+              }
+            },
+            "B": {
+              "label": "舌头",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-tongue",
+                "alt": "舌头"
+              }
+            },
+            "C": {
+              "label": "鼻子",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-nose",
+                "alt": "鼻子"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "skill": "区分气味和味道的信息来源",
+          "analysis": "没喝茶时闻到的茶香是气味，靠鼻子发现。"
+        },
+        {
+          "id": "q-taste",
+          "question": "一口熟苹果尝起来甜，靠什么尝出甜味？",
+          "options": {
+            "A": {
+              "label": "皮肤",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-skin",
+                "alt": "皮肤"
+              }
+            },
+            "B": {
+              "label": "舌头",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-tongue",
+                "alt": "舌头"
+              }
+            },
+            "C": {
+              "label": "耳朵",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-ear",
+                "alt": "耳朵"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "skill": "区分舌头辨味与鼻子闻气味",
+          "analysis": "这里问入口后尝到的甜味，靠舌头。"
+        },
+        {
+          "id": "q-touch",
+          "question": "手背碰到桌边，靠什么感觉到？",
+          "options": {
+            "A": {
+              "label": "皮肤",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-skin",
+                "alt": "皮肤"
+              }
+            },
+            "B": {
+              "label": "眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-eye",
+                "alt": "眼睛"
+              }
+            },
+            "C": {
+              "label": "鼻子",
+              "visual": {
+                "kind": "asset",
+                "image": "organ-nose",
+                "alt": "鼻子"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "skill": "认识手背等部位的皮肤可以感知触碰",
+          "analysis": "手背的皮肤能感受到桌边碰到自己。"
+        },
+        {
+          "id": "q-safe",
+          "question": "发现陌生瓶子，下面哪种做法安全？",
+          "options": {
+            "A": {
+              "label": "凑近闻瓶子",
+              "visual": {
+                "kind": "asset",
+                "image": "unsafe-sample-sniff",
+                "alt": "凑近闻瓶子"
+              }
+            },
+            "B": {
+              "label": "伸手碰瓶口",
+              "visual": {
+                "kind": "asset",
+                "image": "unsafe-sample-touch",
+                "alt": "伸手碰瓶口"
+              }
+            },
+            "C": {
+              "label": "离远一点，请大人看",
+              "visual": {
+                "kind": "asset",
+                "image": "safe-sample-tell-adult",
+                "alt": "离远一点，请大人看"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "skill": "未知物体只远看并请大人确认",
+          "analysis": "先不碰、不闻、不尝，远一点看，请大人确认。"
+        },
+        {
+          "id": "q-tool",
+          "question": "想看清邮票上很小的花纹，选哪件工具？",
+          "options": {
+            "A": {
+              "label": "听诊器",
+              "visual": {
+                "kind": "asset",
+                "image": "tool-stethoscope",
+                "alt": "听诊器"
+              }
+            },
+            "B": {
+              "label": "放大镜",
+              "visual": {
+                "kind": "asset",
+                "image": "tool-magnifier",
+                "alt": "放大镜"
+              }
+            },
+            "C": {
+              "label": "道路反光镜",
+              "visual": {
+                "kind": "asset",
+                "image": "tool-road-mirror",
+                "alt": "道路反光镜"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "skill": "选择帮助眼睛看清小细节的工具",
+          "analysis": "放大镜能帮眼睛看清邮票上的小花纹。"
+        }
+      ]
+    },
+    {
+      "key": "review",
+      "type": "slide",
+      "title": "把你的发现说清楚",
+      "template": "picture-points",
+      "data": {
+        "title": "把你的发现说清楚",
+        "picture": "observation-journal",
+        "points": [
+          "哪种感官",
+          "什么线索",
+          "怎样确认"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看看这本观察册，想想今天是怎么找线索的。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "眼睛看，耳朵听，鼻子闻，舌头尝。"
+        },
+        {
+          "say": "手背和前臂都有皮肤，能感觉被碰到。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "观察橘子时，先看外面，再看里面。"
+        },
+        {
+          "say": "我用眼睛看到橘瓣，这样说就把发现讲清了。"
+        },
+        {
+          "say": "未知的东西先不碰、不闻、不尝，请大人确认。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "猜盒子里是什么，要把不一样的线索合起来。"
+        },
+        {
+          "say": "选了以后再开盒看看，才能知道猜得对不对。"
+        },
+        {
+          "say": "在家也可以请大人帮你选一件安全的东西。"
+        },
+        {
+          "say": "说说你用了哪种感官，发现了哪一条线索。"
+        }
+      ]
+    }
+  ]
+}

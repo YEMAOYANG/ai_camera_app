@@ -1,0 +1,1263 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "8、9的组成",
+  "description": "把有序、交换和添一片连起来，在原创建构工坊找全八与九的组成，再换个方向识别整体与部分。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "依据正式数学教师档案，用准确短句解释每一步为什么。先让儿童看见整体与部分，示范一增一减、交换与添1，再交给儿童操作；不把点击成绩当作口头掌握。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "bead": {
+      "file": "assets/bead.png"
+    },
+    "eight-family": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "1"
+              },
+              {
+                "glyph": "7"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "5"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "nine-family": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "1"
+              },
+              {
+                "glyph": "8"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "7"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "5"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "one-more": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              },
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "9"
+              },
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "life-groups": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "6"
+              },
+              {
+                "glyph": "8"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "9"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "q5-relation": {
+      "file": "assets/q5-relation.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "分类工坊的新任务",
+      "template": "title-picture",
+      "data": {
+        "title": "8、9的组成",
+        "picture": "studio",
+        "caption": "有顺序地分，用关系来想"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "欢迎来到分类工坊，我是小数老师。"
+        },
+        {
+          "say": "今天要把八片和九片分别分成两组。"
+        },
+        {
+          "say": "一整组里的全部，叫作整体。"
+        },
+        {
+          "say": "分开后的每一组，都是它的一部分。"
+        },
+        {
+          "say": "两个部分合在一起，仍是原来的整体。"
+        },
+        {
+          "say": "小满问：数量多一点，怎样才不漏掉？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "我们可以从一边一片开始，依次搬动。"
+        },
+        {
+          "say": "每次只搬一片，就能清楚地比较变化。"
+        },
+        {
+          "say": "还可以交换两边，借旧分法想新分法。"
+        },
+        {
+          "say": "等会儿再添一片，看看八怎样变成九。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "八片按顺序分",
+      "page": "p02",
+      "widgetType": "composition-ordered-eight",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demoLeft": 1
+          }
+        },
+        {
+          "highlight": "#strip"
+        },
+        {
+          "say": "这里的八片，一片也不能丢。"
+        },
+        {
+          "say": "左边一片，右边七片，合起来是八片。"
+        },
+        {
+          "highlight": "#left-count"
+        },
+        {
+          "setState": {
+            "demoLeft": 2
+          }
+        },
+        {
+          "say": "从右边搬一片到左边。"
+        },
+        {
+          "say": "左边变成两片，比刚才多一片。"
+        },
+        {
+          "highlight": "#right-count"
+        },
+        {
+          "say": "右边变成六片，比刚才少一片。"
+        },
+        {
+          "say": "总数没变，因为只是搬动，没有增加。"
+        },
+        {
+          "highlight": "#records"
+        },
+        {
+          "say": "按这个顺序记录，就不会跳过中间。"
+        },
+        {
+          "say": "一直找到左边七片、右边一片。"
+        },
+        {
+          "say": "八共有七种这样的左右分法。"
+        },
+        {
+          "say": "现在每搬一片，就把当前分法保存。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "交换两边省力记",
+      "template": "picture-points",
+      "data": {
+        "title": "交换两边省力记",
+        "picture": "eight-family",
+        "points": [
+          "1和7 ↔ 7和1",
+          "2和6 ↔ 6和2",
+          "3和5 ↔ 5和3",
+          "4和4：交换后相同"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "八的分法还能借交换来记。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一和七交换，是七和一。"
+        },
+        {
+          "say": "两个部分都还在，合起来还是八。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "二和六交换，就是六和二。"
+        },
+        {
+          "say": "只记一边，就能想起对应的一边。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三和五交换，又能想到五和三。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "四和四，两边原来就一样多。"
+        },
+        {
+          "say": "交换以后仍是四和四，不算新的一种。"
+        },
+        {
+          "say": "朵朵提醒：不能把相同的一种算两次。",
+          "by": "duoduo"
+        },
+        {
+          "say": "全部有七种左右分法。"
+        },
+        {
+          "say": "我们用这四组关系来帮助记忆。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "翻过来还是同一个总数",
+      "page": "p04",
+      "widgetType": "composition-swap-pairs",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#source-pair"
+        },
+        {
+          "say": "示范里左边三片，右边五片。"
+        },
+        {
+          "say": "现在只把两个部分交换位置。"
+        },
+        {
+          "highlight": "#flip-options"
+        },
+        {
+          "say": "原来右边的五片，应该来到左边。"
+        },
+        {
+          "say": "原来左边的三片，应该来到右边。"
+        },
+        {
+          "highlight": "#whole-total"
+        },
+        {
+          "say": "三片和五片合起来还是八片。"
+        },
+        {
+          "say": "交换没有添东西，也没有拿走东西。"
+        },
+        {
+          "say": "遇到四和四，换过来仍是同一种。"
+        },
+        {
+          "say": "九也可以这样成对记忆分法。"
+        },
+        {
+          "say": "请看数量图，找出交换以后的那张。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "八的分合换个问法",
+      "intro": [
+        "换一种物品和问法，想想八的分合。",
+        "听我说完，请选合适的数量图。"
+      ],
+      "questions": [
+        {
+          "id": "c89-q1",
+          "question": "八枚纽扣分两袋，一袋六枚，另一袋几枚？",
+          "skill": "根据总数8和已知部分补足",
+          "options": {
+            "A": {
+              "label": "2",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            },
+            "B": {
+              "label": "3",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            },
+            "C": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "八是总数。六枚和两枚组成八枚，所以另一袋是两枚。",
+          "visual": {
+            "kind": "quantity",
+            "count": 6
+          }
+        },
+        {
+          "id": "c89-q2",
+          "question": "五个夹子和三个夹子交换位置，总数仍是几个？",
+          "skill": "交换部分总数仍是8",
+          "options": {
+            "A": {
+              "label": "9",
+              "visual": {
+                "kind": "quantity",
+                "count": 9
+              }
+            },
+            "B": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "五和三的两组都保留，只交换位置，合起来仍是八个。",
+          "visual": {
+            "kind": "picture",
+            "alt": "五个数量点和三个数量点两组",
+            "picture": {
+              "layout": "rows",
+              "size": [
+                800,
+                400
+              ],
+              "groups": [
+                {
+                  "cells": [
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    }
+                  ]
+                },
+                {
+                  "cells": [
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "八怎样变成九",
+      "template": "picture-points",
+      "data": {
+        "title": "八怎样变成九",
+        "picture": "one-more",
+        "points": [
+          "原来：2和6组成8",
+          "给左边添1：2变3",
+          "右边的6保持不动",
+          "现在：3和6组成9"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看八片分成两片和六片。"
+        },
+        {
+          "say": "这两部分合起来，是原来的八片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在只给左边再添一片。"
+        },
+        {
+          "say": "左边从两片变成三片。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "右边仍是六片，一片也没搬动。"
+        },
+        {
+          "say": "不能两边都添，因为这里只多了一片。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "整个数量从八片变成了九片。"
+        },
+        {
+          "say": "所以三片和六片，就能组成九片。"
+        },
+        {
+          "say": "站长猫头鹰提醒：先看哪一边变了。",
+          "by": "owl"
+        },
+        {
+          "say": "给右边添一片，也能找到九的分法。"
+        },
+        {
+          "say": "关键是只添一片，另一边保持不动。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "添一片放哪边",
+      "page": "p07",
+      "widgetType": "composition-eight-to-nine",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#extra-bead"
+        },
+        {
+          "say": "中间只有一片，是准备新添的。"
+        },
+        {
+          "setState": {
+            "demoPlaced": true
+          }
+        },
+        {
+          "highlight": "#tray-left"
+        },
+        {
+          "say": "示范把它添在左边，两片变成三片。"
+        },
+        {
+          "highlight": "#tray-right"
+        },
+        {
+          "say": "右边还是六片，没有再添。"
+        },
+        {
+          "highlight": "#whole-total"
+        },
+        {
+          "say": "原来八片，多了一片就变成九片。"
+        },
+        {
+          "highlight": "#goal-part"
+        },
+        {
+          "say": "箭头指出，这次要让哪一边达到目标。"
+        },
+        {
+          "say": "只让总数变九，还要检查指定的部分。"
+        },
+        {
+          "say": "放错可以拿回来，再想想放哪边。"
+        },
+        {
+          "say": "你也能先点新增的一片，再点托盘。"
+        },
+        {
+          "say": "现在请拖这一片，给合适的一边添上。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "九的八种分法",
+      "template": "picture-points",
+      "data": {
+        "title": "九的八种分法",
+        "picture": "nine-family",
+        "points": [
+          "1和8 ↔ 8和1",
+          "2和7 ↔ 7和2",
+          "3和6 ↔ 6和3",
+          "4和5 ↔ 5和4"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先把九片分成左边一片、右边八片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从右边搬一片到左边，变成二和七。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再从右边搬一片，变成三和六。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "接着搬一片，就是左边四片、右边五片。"
+        },
+        {
+          "say": "继续每次搬一片，就有五和四、六和三。"
+        },
+        {
+          "say": "最后是七和二、八和一，八种就找全了。"
+        },
+        {
+          "say": "按左边一到八排，右边就是八到一。"
+        },
+        {
+          "say": "只给八的固定一边添一片，还没找全。"
+        },
+        {
+          "say": "给一和七的右边添一，就补出一和八。"
+        },
+        {
+          "say": "每一边都有物品，才是本课的两部分。"
+        },
+        {
+          "say": "把两部分重新合好，又回到整体九。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "换方向也能找",
+      "page": "p09",
+      "widgetType": "composition-rotated-relation",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#relation"
+        },
+        {
+          "say": "这张分合图换了方向，关系还一样。"
+        },
+        {
+          "say": "两条线连接一个整体和两个部分。"
+        },
+        {
+          "highlight": "#node-whole"
+        },
+        {
+          "say": "这里的八，是全部物品的总数。"
+        },
+        {
+          "highlight": "#node-a"
+        },
+        {
+          "say": "其中一个部分是两片。"
+        },
+        {
+          "highlight": "#missing-slot"
+        },
+        {
+          "say": "另一个部分要和两片一起组成八片。"
+        },
+        {
+          "say": "也能按顺序找，先从一和七想起。"
+        },
+        {
+          "setState": {
+            "demoOrderStart": true
+          }
+        },
+        {
+          "highlight": "#node-a"
+        },
+        {
+          "say": "整体八不变，先分成一片和七片。"
+        },
+        {
+          "setState": {
+            "demoOrderNext": true
+          }
+        },
+        {
+          "highlight": "#node-a"
+        },
+        {
+          "say": "一添一变成二，七少一变成六。"
+        },
+        {
+          "highlight": "#node-b"
+        },
+        {
+          "say": "按顺序走到二和六，就找到了六。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#missing-slot"
+        },
+        {
+          "say": "所以这个缺少的部分，要填六片。"
+        },
+        {
+          "highlight": "#quantity-options"
+        },
+        {
+          "say": "有时缺的是整体，就把两个部分合起来。"
+        },
+        {
+          "say": "先看缺的是谁，不能只认上面或下面。"
+        },
+        {
+          "say": "把合适的数量卡拖进去，也能点选。"
+        },
+        {
+          "setState": {
+            "demoWhole": true
+          }
+        },
+        {
+          "highlight": "#missing-slot"
+        },
+        {
+          "say": "换一张，问号在下面，缺的是整体。"
+        },
+        {
+          "highlight": "#node-a"
+        },
+        {
+          "say": "一个部分是三片。"
+        },
+        {
+          "highlight": "#node-b"
+        },
+        {
+          "say": "另一个部分是六片。"
+        },
+        {
+          "say": "先把三片和六片合起来，数一数是九片。"
+        },
+        {
+          "say": "还能借刚学的添一来想，为什么是九。"
+        },
+        {
+          "say": "原来二和六组成八，只给二添一变成三。"
+        },
+        {
+          "say": "六不变，整体多一，所以三和六组成九。"
+        },
+        {
+          "setState": {
+            "demoWholeSolved": true
+          }
+        },
+        {
+          "highlight": "#missing-slot"
+        },
+        {
+          "say": "把九放进整体，图向改变，分合关系不变。"
+        },
+        {
+          "say": "找缺少的部分，也能交换已知的分合来想。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "九的分合小检查",
+      "intro": [
+        "再听两道新问题，看看添一片和合起来。",
+        "请按题意选择数量图。"
+      ],
+      "questions": [
+        {
+          "id": "c89-q3",
+          "question": "八枚棋子分成四和四。只给左边添一枚，左边几枚？",
+          "skill": "一边添1后总数变9",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "B": {
+              "label": "9",
+              "visual": {
+                "kind": "quantity",
+                "count": 9
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "左边原来四枚，只在左边添一枚，变成五枚。九是新的总数，不是左边数量。",
+          "visual": {
+            "kind": "quantity",
+            "count": 4
+          }
+        },
+        {
+          "id": "c89-q4",
+          "question": "一盒五张纸，另一盒四张纸，两盒一共几张？",
+          "skill": "两部分合成总数9",
+          "options": {
+            "A": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            },
+            "B": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            },
+            "C": {
+              "label": "9",
+              "visual": {
+                "kind": "quantity",
+                "count": 9
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "五和四是两个部分，合起来组成九，所以一共九张。",
+          "visual": {
+            "kind": "picture",
+            "alt": "五个数量点和四个数量点两组",
+            "picture": {
+              "layout": "rows",
+              "size": [
+                800,
+                400
+              ],
+              "groups": [
+                {
+                  "cells": [
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    }
+                  ]
+                },
+                {
+                  "cells": [
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    },
+                    {
+                      "glyph": "🔵"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "把分合用在生活里",
+      "template": "picture-points",
+      "data": {
+        "title": "把分合用在生活里",
+        "picture": "life-groups",
+        "points": [
+          "8枚徽章，先放好2枚",
+          "还要放6枚，才能凑齐8",
+          "9个杯垫，分成4个和5个",
+          "先找整体，再找两个部分"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "整理徽章时，一共要准备八枚。"
+        },
+        {
+          "say": "已经摆好两枚，这是其中一个部分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先按顺序想，一和七组成八。"
+        },
+        {
+          "say": "摆好的从一枚变两枚，没摆的就少一枚。"
+        },
+        {
+          "say": "七枚少一枚是六枚，所以还要摆六枚。"
+        },
+        {
+          "say": "如果先想起六和二组成八，也可以交换。"
+        },
+        {
+          "say": "交换成二和六，就找到了还缺的六枚。"
+        },
+        {
+          "say": "不是再拿八枚，因为两枚已经算在里面。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "九个杯垫，也能给两张桌子分着用。"
+        },
+        {
+          "say": "一张桌子四个，另一张桌子五个。"
+        },
+        {
+          "say": "四和五合在一起，正好还是九个。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "先说全部有多少，再说两边各有多少。"
+        },
+        {
+          "say": "这样就能讲清一个生活中的分合问题。"
+        },
+        {
+          "say": "可以把自己的问题讲给家人听。"
+        },
+        {
+          "say": "说得是否清楚，请家人帮忙观察。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "分合变式小检查",
+      "intro": [
+        "最后换个方向和变化，继续用分合来想。",
+        "选图前先分清整体和部分。"
+      ],
+      "questions": [
+        {
+          "id": "c89-q5",
+          "question": "一组一枚、一组八枚，两条线合到问号。总数是几？",
+          "skill": "不同朝向分合图缺总数",
+          "options": {
+            "A": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            },
+            "B": {
+              "label": "9",
+              "visual": {
+                "kind": "quantity",
+                "count": 9
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "一和八是两个部分，合成整体九。分合图朝向改变，总数仍是九。",
+          "visual": {
+            "kind": "asset",
+            "image": "q5-relation",
+            "alt": "左边一枚与八枚两个部分，两条线向右汇合到总数问号"
+          }
+        },
+        {
+          "id": "c89-q6",
+          "question": "八片左五右三。从左边搬一片到右边，右边几片？",
+          "skill": "一边多1另一边少1",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "B": {
+              "label": "3",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "右边原来三片，搬来一片就成四片；左边相应少一片，总数仍是八。",
+          "visual": {
+            "kind": "quantity",
+            "count": 3
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "分得全，合得清",
+      "template": "summary",
+      "data": {
+        "title": "分得全，合得清",
+        "items": [
+          "有顺序：一边多1，一边少1",
+          "会交换：同一整体，两个部分换位",
+          "添一片：8的一边添1，整体变9",
+          "找缺数：先辨整体，再找部分"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "我们用每次搬一片，找全了分法。"
+        },
+        {
+          "say": "八有七种，九有八种左右分法。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "交换两个部分，整体的数量不变。"
+        },
+        {
+          "say": "八的四和四相同，不要重复算两次。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "给八的一个部分添一片，整体变成九。"
+        },
+        {
+          "say": "另一个部分不动，只多出这一片。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "图向改变，也要先认整体和两个部分。"
+        },
+        {
+          "say": "缺整体就合起来，缺部分就想还差多少。"
+        },
+        {
+          "say": "站长猫头鹰说：把好办法讲给家人听。",
+          "by": "owl"
+        },
+        {
+          "say": "回家拿八或九件安全物品摆一摆。"
+        },
+        {
+          "say": "再举一个分组或合并的生活问题。"
+        },
+        {
+          "say": "口头是否讲清楚，请家人帮忙观察。"
+        }
+      ]
+    }
+  ]
+}

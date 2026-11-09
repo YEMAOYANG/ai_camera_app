@@ -1,0 +1,763 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 He's a doctor.",
+  "description": "外研社一年级起点一年级下册Module 1 Unit 1完整课：听懂家人、他和她与职业介绍。口语交成人观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#D67C53",
+      "persona": "温和清楚的英语老师，用短句和图片解释，慢速读目标英语，不把选图当作口语达标。"
+    }
+  },
+  "images": {
+    "family-scene": {
+      "file": "assets/family-scene.png"
+    },
+    "mother": {
+      "file": "assets/mother.png"
+    },
+    "father": {
+      "file": "assets/father.png"
+    },
+    "grandpa": {
+      "file": "assets/grandpa.png"
+    },
+    "grandma": {
+      "file": "assets/grandma.png"
+    },
+    "brother": {
+      "file": "assets/brother.png"
+    },
+    "sister": {
+      "file": "assets/sister.png"
+    },
+    "clinic": {
+      "file": "assets/clinic.png"
+    },
+    "school": {
+      "file": "assets/school.png"
+    },
+    "woman-teacher": {
+      "file": "assets/woman-teacher.png"
+    },
+    "man-doctor": {
+      "file": "assets/man-doctor.png"
+    },
+    "quiz-grandma": {
+      "file": "assets/quiz-grandma.png"
+    },
+    "quiz-grandpa": {
+      "file": "assets/quiz-grandpa.png"
+    },
+    "quiz-boy": {
+      "file": "assets/quiz-boy.png"
+    },
+    "quiz-girl": {
+      "file": "assets/quiz-girl.png"
+    },
+    "quiz-man-teacher": {
+      "file": "assets/quiz-man-teacher.png"
+    },
+    "quiz-woman-doctor": {
+      "file": "assets/quiz-woman-doctor.png"
+    },
+    "quiz-man-doctor": {
+      "file": "assets/quiz-man-doctor.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "相册里的家人",
+      "template": "title-picture",
+      "data": {
+        "title": "My family",
+        "picture": "family-scene",
+        "caption": "This is my family."
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我是Mia老师，今天一起听英语。"
+        },
+        {
+          "say": "画面中翻相册的女孩叫圆圆。"
+        },
+        {
+          "say": "这些人是圆圆的家人。"
+        },
+        {
+          "say": "右边白大褂的是妈妈，mother。"
+        },
+        {
+          "say": "左边抱书的是爸爸，father。"
+        },
+        {
+          "say": "右后方的老人是爷爷，grandpa。"
+        },
+        {
+          "say": "左后方的老人是奶奶，grandma。"
+        },
+        {
+          "say": "后排橙衣男孩是哥哥，brother。"
+        },
+        {
+          "say": "右边绿裙孩子是妹妹，sister。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "圆圆介绍家人时，会说my。"
+        },
+        {
+          "say": "my就是我的，要看是谁在介绍。"
+        },
+        {
+          "say": "介绍妈妈，可以说This is my mother。"
+        },
+        {
+          "say": "听词找照片，关系要连到圆圆身上。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "照片回相册",
+      "page": "p02",
+      "widgetType": "family-album",
+      "startImage": "family-scene",
+      "script": [
+        {
+          "highlight": "#prompt-audio"
+        },
+        {
+          "say": "相册缺照片，我们来听词找家人。"
+        },
+        {
+          "say": "每次先听上方圆按钮里的录音。"
+        },
+        {
+          "highlight": "#card-grandpa"
+        },
+        {
+          "say": "这位是圆圆的爷爷，grandpa。"
+        },
+        {
+          "setState": {
+            "demo": "grandpa"
+          }
+        },
+        {
+          "say": "把爷爷照片送入相框，家人就回来了。"
+        },
+        {
+          "highlight": "#photo-target"
+        },
+        {
+          "say": "要听家人关系，不能只看照片位置。"
+        },
+        {
+          "say": "听：mother。"
+        },
+        {
+          "say": "听：father。"
+        },
+        {
+          "say": "听：grandma。"
+        },
+        {
+          "say": "听：brother。"
+        },
+        {
+          "say": "听：sister。"
+        },
+        {
+          "say": "选错不会扣星，再听一次就能改。"
+        },
+        {
+          "say": "可以点照片，也可以拖进相框。"
+        },
+        {
+          "setState": {
+            "demo": null,
+            "handoff": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "介绍他和她",
+      "template": "two-columns",
+      "data": {
+        "title": "He / She",
+        "left": {
+          "heading": "He",
+          "body": "He's a boy."
+        },
+        "right": {
+          "heading": "She",
+          "body": "She's a girl."
+        },
+        "left_picture": "brother",
+        "right_picture": "sister"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这是刚才认识的哥哥，他是男孩。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "说到他，可以用he。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "He's a boy，意思是他是男孩。"
+        },
+        {
+          "say": "这里的he指哥哥，不是指我自己。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这是妹妹，她是女孩。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "说到她，可以用she。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "She's a girl，意思是她是女孩。"
+        },
+        {
+          "say": "先弄清说的是谁，再听he还是she。"
+        },
+        {
+          "say": "爸爸和爷爷也可以用he介绍。"
+        },
+        {
+          "say": "妈妈和奶奶也可以用she介绍。"
+        },
+        {
+          "say": "头发长短不是选择词的办法。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "谁在被介绍",
+      "page": "p04",
+      "widgetType": "pronoun-stage",
+      "startImage": "family-scene",
+      "script": [
+        {
+          "highlight": "#prompt-audio"
+        },
+        {
+          "say": "现在听介绍，把说到的人送上小台。"
+        },
+        {
+          "highlight": "#card-sister"
+        },
+        {
+          "say": "妹妹是女孩，我们已经认识她了。"
+        },
+        {
+          "setState": {
+            "demo": "sister"
+          }
+        },
+        {
+          "say": "She's a girl，说的就是她。"
+        },
+        {
+          "highlight": "#photo-target"
+        },
+        {
+          "say": "台上出现妹妹，句子与人物连上了。"
+        },
+        {
+          "say": "He's a boy。"
+        },
+        {
+          "say": "She，指妈妈。"
+        },
+        {
+          "say": "He，指爷爷。"
+        },
+        {
+          "say": "每关两个人都能看见，先听清指代。"
+        },
+        {
+          "say": "想再听，就点圆圆的声音按钮。"
+        },
+        {
+          "say": "第一次选错只提醒，不替你选。"
+        },
+        {
+          "say": "我们只记录听懂选图，跟说不打分。"
+        },
+        {
+          "setState": {
+            "demo": null,
+            "handoff": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "听懂家人和人物",
+      "intro": [
+        "换一组新人物，听录音选图片。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "小杰看相册：这是我的弟弟、爷爷和奶奶。听：grandma。",
+          "skill": "家人关系听辨",
+          "answer": [
+            "A"
+          ],
+          "analysis": "题干先交代三张照片里是小杰的弟弟、爷爷和奶奶。grandma指奶奶，这组家人中只有A是老年女性。亲属关系来自题干。",
+          "options": {
+            "A": {
+              "label": "奶奶",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grandma",
+                "alt": "新人物：玫瑰红开衫的老奶奶"
+              }
+            },
+            "B": {
+              "label": "弟弟",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-boy",
+                "alt": "新人物：蓝色背带裤男孩"
+              }
+            },
+            "C": {
+              "label": "爷爷",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grandpa",
+                "alt": "新人物：蓝开衫老爷爷"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "听：She's a girl。请选择对应的人物。",
+          "skill": "he和she的语境理解",
+          "answer": [
+            "C"
+          ],
+          "analysis": "girl是女孩，she用来指她；女孩图片符合，男孩与爷爷不符合。",
+          "options": {
+            "A": {
+              "label": "爷爷",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grandpa",
+                "alt": "新人物：蓝开衫老爷爷"
+              }
+            },
+            "B": {
+              "label": "男孩",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-boy",
+                "alt": "新人物：蓝色背带裤男孩"
+              }
+            },
+            "C": {
+              "label": "女孩",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-girl",
+                "alt": "新人物：黄裙女孩"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "工作不分他和她",
+      "template": "two-columns",
+      "data": {
+        "title": "teacher / doctor",
+        "left": {
+          "heading": "teacher",
+          "body": "He's a teacher."
+        },
+        "right": {
+          "heading": "doctor",
+          "body": "She's a doctor."
+        },
+        "left_picture": "father",
+        "right_picture": "mother"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "圆圆的爸爸在教室里带大家学习。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "教师，英语叫teacher。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "He's a teacher，介绍他是一位教师。"
+        },
+        {
+          "say": "he说的是谁，teacher说做什么工作。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "圆圆的妈妈用听诊器给人检查身体。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "医生，英语叫doctor。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "She's a doctor，介绍她是一位医生。"
+        },
+        {
+          "say": "she说的是谁，doctor说做什么工作。"
+        },
+        {
+          "say": "男的可以当教师，女的也可以。"
+        },
+        {
+          "say": "男的可以当医生，女的也可以。"
+        },
+        {
+          "say": "工作不能决定用he还是she。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "送到工作的地方",
+      "page": "p07",
+      "widgetType": "job-place",
+      "startImage": "school",
+      "script": [
+        {
+          "highlight": "#card-father"
+        },
+        {
+          "say": "先看工作线索，再听英语介绍。"
+        },
+        {
+          "say": "爸爸拿图画书带大家学习，是教师。"
+        },
+        {
+          "setState": {
+            "demo": "father"
+          }
+        },
+        {
+          "highlight": "#photo-target"
+        },
+        {
+          "say": "他来到教室，这里能看见教室画面。"
+        },
+        {
+          "say": "He's a teacher。"
+        },
+        {
+          "highlight": "#prompt-audio"
+        },
+        {
+          "say": "她拿着听诊器工作，是医生。"
+        },
+        {
+          "say": "She's a doctor。"
+        },
+        {
+          "say": "He是一位医生：He's a doctor。"
+        },
+        {
+          "say": "她是一位教师：She's a teacher。"
+        },
+        {
+          "say": "同样的工作，可以由不同的人来做。"
+        },
+        {
+          "say": "听到句子，把符合的人送到中间。"
+        },
+        {
+          "say": "第一次错只提醒工作线索，不亮答案。"
+        },
+        {
+          "setState": {
+            "demo": null,
+            "handoff": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "听句子做相册",
+      "page": "p08",
+      "widgetType": "family-job-album",
+      "startImage": "family-scene",
+      "script": [
+        {
+          "highlight": "#prompt-audio"
+        },
+        {
+          "say": "这次要把家人和工作一起听懂。"
+        },
+        {
+          "highlight": "#card-mother"
+        },
+        {
+          "say": "先听my mother，知道介绍妈妈。"
+        },
+        {
+          "setState": {
+            "demo": "mother"
+          }
+        },
+        {
+          "say": "再听doctor，知道妈妈是医生。"
+        },
+        {
+          "highlight": "#photo-target"
+        },
+        {
+          "say": "两条线索都符合，照片才放进相册。"
+        },
+        {
+          "say": "This is说这是，That's说那是。"
+        },
+        {
+          "say": "介绍这边或那边的人，都要说清是谁。"
+        },
+        {
+          "say": "This is my mother. She's a doctor。"
+        },
+        {
+          "say": "This is my father. He's a teacher。"
+        },
+        {
+          "say": "That's my brother. He's a boy。"
+        },
+        {
+          "say": "This is my sister. She's a girl。"
+        },
+        {
+          "say": "这些是圆圆的家人，不是所有人的工作。"
+        },
+        {
+          "say": "你家的人可能做不同工作，都要尊重。"
+        },
+        {
+          "say": "跟着说可以，老师不会自动给口语分。"
+        },
+        {
+          "setState": {
+            "demo": null,
+            "handoff": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "换个场景再听",
+      "intro": [
+        "再听新人物的介绍，看看能不能听懂。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "听：He's a teacher。请选择对应的人物。",
+          "skill": "teacher和doctor听辨",
+          "answer": [
+            "B"
+          ],
+          "analysis": "teacher指教师，he指他；拿图画书在黑板旁工作的男教师符合。",
+          "options": {
+            "A": {
+              "label": "女医生",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-woman-doctor",
+                "alt": "新人物：棕发女医生和听诊器"
+              }
+            },
+            "B": {
+              "label": "男教师",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-man-teacher",
+                "alt": "新人物：卷发男教师和图画书、无字黑板"
+              }
+            },
+            "C": {
+              "label": "男医生",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-man-doctor",
+                "alt": "新人物：短发男医生和听诊器"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "新朋友介绍妈妈：She's a doctor。哪张照片符合？",
+          "skill": "家人职业合句理解",
+          "answer": [
+            "A"
+          ],
+          "analysis": "题干先说明说话人正在介绍妈妈。she指这位女性，doctor说明她是医生。选项只要匹配人物指代和职业，A是拿听诊器的女医生。",
+          "options": {
+            "A": {
+              "label": "女医生",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-woman-doctor",
+                "alt": "新人物：棕发女医生和听诊器"
+              }
+            },
+            "B": {
+              "label": "男医生",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-man-doctor",
+                "alt": "新人物：短发男医生和听诊器"
+              }
+            },
+            "C": {
+              "label": "男教师",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-man-teacher",
+                "alt": "新人物：卷发男教师和图画书、无字黑板"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "说给家人听",
+      "template": "summary",
+      "data": {
+        "title": "认识家人，介绍工作",
+        "items": [
+          "mother / father / grandpa / grandma",
+          "brother / sister；he / she",
+          "teacher / doctor",
+          "听懂图片已记录；开口介绍待观察"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "头发和衣服不能告诉你谁是谁的家人。"
+        },
+        {
+          "say": "mother妈妈，father爸爸。"
+        },
+        {
+          "say": "grandpa爷爷，grandma奶奶。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "brother是哥哥或弟弟。sister是姐姐或妹妹。"
+        },
+        {
+          "say": "he指他，she指她，先弄清介绍谁。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "teacher教师，doctor医生。"
+        },
+        {
+          "say": "男的女的都可以做这两种工作。"
+        },
+        {
+          "say": "介绍家人时，还能加上my。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "听懂并选对图片，已经留下记录。"
+        },
+        {
+          "say": "会不会开口介绍，还需要大人来观察。"
+        },
+        {
+          "say": "现在挑一位家人，试着说给大人听。"
+        },
+        {
+          "say": "先说是谁，再说工作，不着急。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "mira.courseware.first-scene-cover-plan.v1",
+  "lessonSlug": "pep-54-chinese-g1-upper-i-am-a-pupil",
+  "reviewedAt": "2026-11-06T13:47:35.764962+00:00",
+  "status": "first_scene_source_visually_approved_runtime_binding_pending",
+  "sceneKey": "p01",
+  "firstImageKey": "school-morning-cover",
+  "sourcePath": "courseware/lessons/pep-54-chinese-g1-upper-i-am-a-pupil/assets/school-morning-cover.png",
+  "sourceSha256": "d1454142ffb4a27cb0ef7cd70004ca6e053698b5e8241984ab09a7db75cef2f9",
+  "sourceBytes": 3033112,
+  "sourceWidth": 1672,
+  "sourceHeight": 941,
+  "sourceGenerationReceipt": "output/courseware-lessons/pep-54-chinese-g1-upper-i-am-a-pupil/codex-imagegen-v1/school-morning-cover.json",
+  "directoryRouteTemplate": "/textbooks/course-covers-v2/{contentKey}.webp",
+  "directoryDerivative": {
+    "method": "services.textbook_cover_guard.cover_bytes",
+    "mimeType": "image/webp",
+    "size": [
+      960,
+      540
+    ],
+    "expectedSha256": "8267b5ffad50488268be738f8f365997c3b311df5b35cbf9575769207f3bacac",
+    "bytes": 153992,
+    "crop": {
+      "sourceBox": [
+        0,
+        0,
+        1672,
+        940
+      ],
+      "fit": "center crop and scale with Lanczos"
+    },
+    "secondaryDisplayCrop": "目录卡1.8:1约略裁去原等比图每侧上下6px；兼容2:1卡面裁上下约52px。课件讲解页等比完整保留。"
+  },
+  "review": [
+    "孩子正背着青绿色书包走向敞开的学校门，老师在门内迎接。教学线索都在画面中部。",
+    "明亮晨光、路旁的花和普通教学楼可辨，没有教材原画、可见文字或假校名。",
+    "原图与课件首图使用同一PNG字节，目录端按现有动态接口从同一归档PNG派生WebP，不额外登记通用封面。"
+  ],
+  "liveReadbackPending": [
+    "已发布首个讲解页首图的真实 media SHA",
+    "目录动态WebP返回HTTP200且字节为预期派生图"
+  ]
+}

@@ -1,0 +1,19 @@
+[hidden]{display:none!important}
+#assembly-toolbar{height:72px;display:flex;justify-content:space-between;padding:5px 30px 0}
+#assembly-table{display:grid;grid-template-columns:490px 604px;gap:46px;margin:8px 46px}
+#model-pieces{height:434px;display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,minmax(0,1fr));gap:13px}
+.assembly-piece{min-width:0;min-height:0;border:4px solid #d5ae82;background:#fff9ec;border-radius:20px;padding:6px;box-shadow:0 5px 0 #cca06e;cursor:grab}
+.assembly-piece img,.assembly-dock img{width:100%;height:100%;display:block;object-fit:contain;border-radius:13px;pointer-events:none}
+.assembly-piece:disabled{opacity:.28;cursor:default}
+.assembly-piece.hinted,.assembly-piece:focus-visible{outline:5px solid #f2a144;outline-offset:3px}
+#model-docks{height:434px;display:grid;grid-template-columns:145px 1fr 145px;grid-template-rows:repeat(3,minmax(0,1fr));gap:12px;padding:14px;background:#e9f0e5;border:5px solid #9ab7a5;border-radius:30px}
+#model-shell{min-width:0;min-height:0;grid-area:1/2/4/3;width:100%;height:100%;object-fit:contain;border-radius:15px}
+.assembly-dock{min-width:0;min-height:0;border:4px dashed #92ad9e;background:#f9fcf4;border-radius:22px;padding:5px;display:grid;place-items:center}
+.assembly-dock.filled{border:4px solid #478b79;background:#dff4e9}
+.assembly-dock[data-dock="hand-l"]{grid-area:1/1}
+.assembly-dock[data-dock="hand-r"]{grid-area:1/3}
+.assembly-dock[data-dock="leg-l"]{grid-area:2/1}
+.assembly-dock[data-dock="leg-r"]{grid-area:2/3}
+.assembly-dock[data-dock="foot-l"]{grid-area:3/1}
+.assembly-dock[data-dock="foot-r"]{grid-area:3/3}
+#assembly-sound.audio-error{outline:4px dashed #a44828}

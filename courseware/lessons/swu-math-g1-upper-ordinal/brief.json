@@ -1,0 +1,582 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "slug": "swu-math-g1-upper-ordinal",
+    "editionId": "smartedu-math-six-year-g1-upper-3e6eb324",
+    "revisionId": "directory-2afc775be6bf98e9828f0115",
+    "nodeId": "ced9e227-2070-4909-aa59-ad547f9a540f",
+    "unitId": "78fd8d21-1807-4bf4-ba13-d96f6c69146f",
+    "unitTitle": "第一单元 0-9的认识",
+    "lessonTitle": "第几",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "classHour": "integrated_all",
+    "teachingRevision": "1",
+    "classHours": [
+      "lesson_1",
+      "lesson_2"
+    ],
+    "printedPages": [
+      24,
+      25,
+      26
+    ],
+    "pdfPages": [
+      29,
+      30,
+      31
+    ]
+  },
+  "goals": [
+    "在同一排里区别几件、第几件和前几件。总量数全排，第几个只点一件，前几个圈起点到指定位置的一段。",
+    "看清从左、右或标记端数起。起点那件算第一，按方向数，换一端后重数同一件。",
+    "区分目标前面、目标自己、目标后面三个部分。数前后都不算目标，数总量时只算目标一次。",
+    "比较前方和后方移出或移入的不同影响。保持原目标标记，从同一端重数，解释它的序位是否改变。",
+    "把不同的零至九数卡按升序或降序摆放。卡面数字和位置不同；零卡可在从小到大时排第一。",
+    "用每层一户和已给总层数，把上下户数与层对应。固定楼层号从下开始，倒数位置从上开始。",
+    "用从同一端的两个位置推遮住的空位与全组，再按规定调位并重数。位置跳号对应实际缺口。",
+    "用数数或一一对应巩固零至九的大小比较与等号、不等号。在三个数的连续比较中分别核对两边条件。"
+  ],
+  "goalMap": [
+    {
+      "id": "quantity_and_ordinal",
+      "goal": "在同一排里区别几件、第几件和前几件。总量数全排，第几个只点一件，前几个圈起点到指定位置的一段。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "counting_direction",
+      "goal": "看清从左、右或标记端数起。起点那件算第一，按方向数，换一端后重数同一件。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "before_after",
+      "goal": "区分目标前面、目标自己、目标后面三个部分。数前后都不算目标，数总量时只算目标一次。",
+      "officialHourId": "lesson_2"
+    },
+    {
+      "id": "queue_change",
+      "goal": "比较前方和后方移出或移入的不同影响。保持原目标标记，从同一端重数，解释它的序位是否改变。",
+      "officialHourId": "lesson_2"
+    },
+    {
+      "id": "order_number_cards",
+      "goal": "把不同的零至九数卡按升序或降序摆放。卡面数字和位置不同；零卡可在从小到大时排第一。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "floor_number",
+      "goal": "用每层一户和已给总层数，把上下户数与层对应。固定楼层号从下开始，倒数位置从上开始。",
+      "officialHourId": "lesson_2"
+    },
+    {
+      "id": "hidden_queue",
+      "goal": "用从同一端的两个位置推遮住的空位与全组，再按规定调位并重数。位置跳号对应实际缺口。",
+      "officialHourId": "lesson_2"
+    },
+    {
+      "id": "compare_numbers",
+      "goal": "用数数或一一对应巩固零至九的大小比较与等号、不等号。在三个数的连续比较中分别核对两边条件。",
+      "officialHourId": "lesson_2"
+    }
+  ],
+  "goalBasis": "完整活动的两个官方课时，四类资源共61页逐页审读。",
+  "keyPoint": "先说从哪里开始，再按次序一件一件数。用几表示数量，用第几表示其中一件的位置；连着比较时分别检验两次关系。",
+  "difficultPoint": "辨认前几个与某对象的前面有几个。改变方向或队列时重新找原对象，区分计数的顺序、卡片数字和固定楼层编号。",
+  "pageSequence": [
+    {
+      "page": 1,
+      "key": "p01",
+      "type": "slide",
+      "title": "同一排，两种问题",
+      "play": "从原创车站封面过渡到精确图。数全组给总数，再数到某一节停住，用边框让目标只指那一件。用自己的例子给出总量和序位。",
+      "goalIds": [
+        "quantity_and_ordinal"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "cover-park-station",
+        "row-total-position"
+      ]
+    },
+    {
+      "page": 2,
+      "key": "p02",
+      "type": "interactive",
+      "title": "选一个，还是选一段",
+      "play": "老师示范第几个只点一件，前几个从第一件连续框到目标，目标本身包括在前段。让孩子按口令分别标一件或一段，结果改变实际图形边框。",
+      "goalIds": [
+        "quantity_and_ordinal"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "row-total-position"
+      ]
+    },
+    {
+      "page": 3,
+      "key": "p03",
+      "type": "slide",
+      "title": "换一边开始数",
+      "play": "以同一排不对称的位置为例，分别从左端和右端一件件数，保持带图章的目标不移动，两端序位须不同。讲清第一件和数的方向。",
+      "goalIds": [
+        "counting_direction"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "bidirectional-row"
+      ]
+    },
+    {
+      "page": 4,
+      "key": "p04",
+      "type": "interactive",
+      "title": "从箭头那头找位置",
+      "play": "演示点亮起点和数过的位置，展示同一列的指定目标。孩子从两种方向轮流寻找，目标位置、方向和错误提示都对应实际图形。",
+      "goalIds": [
+        "counting_direction"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "bidirectional-row"
+      ]
+    },
+    {
+      "page": 5,
+      "key": "p05",
+      "type": "slide",
+      "title": "前面、自己、后面",
+      "play": "三个部分分别标亮。逐个数前方、后方，讲目标不在前后任一组；数全组时目标只数一次。用具体数量和实物检查。",
+      "goalIds": [
+        "before_after"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "target-neighbors"
+      ]
+    },
+    {
+      "page": 6,
+      "key": "p06",
+      "type": "interactive",
+      "title": "少一件，位置变了吗",
+      "play": "老师实际移走前方一件，再从原端重数。复原后移走后方一件，说明总量改变但目标从原端的序位不变。孩子按图完成一种变化，画面实际删去或挪动指定件。",
+      "goalIds": [
+        "queue_change",
+        "before_after"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "queue-rearrangement",
+        "target-neighbors"
+      ]
+    },
+    {
+      "page": 7,
+      "key": "p07",
+      "type": "slide",
+      "title": "数卡的数字和位置",
+      "play": "同一张数卡保持不变，左边插零卡后数位置，口述两个序位并给原因。用完整零至九的两种排列验证升降序。",
+      "goalIds": [
+        "order_number_cards"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "digit-cards"
+      ]
+    },
+    {
+      "page": 8,
+      "key": "p08",
+      "type": "interactive",
+      "title": "按方向把数卡排好",
+      "play": "老师比较相邻候选值，拖放或点击将卡插进空位，顺次核对升序或降序。孩子排列小组新卡，操作改变卡的真实位置。",
+      "goalIds": [
+        "order_number_cards"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "digit-cards"
+      ]
+    },
+    {
+      "page": 9,
+      "key": "p09",
+      "type": "slide",
+      "title": "从楼上数，核楼层号",
+      "play": "用原创楼层格和每层一户条件，示范从屋顶数目标倒数位置，再从地面数楼层号。另示范给楼下户数的情形。必须有两个具体例与解释。",
+      "goalIds": [
+        "floor_number"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "fixed-floor"
+      ]
+    },
+    {
+      "page": 10,
+      "key": "p10",
+      "type": "interactive",
+      "title": "挡住几位，调位后再数",
+      "play": "先从标记端对齐可见编号，用两个位置之间的空档找被遮个数，揭开核验。再按指定条件把前端对象移到另一端，保持目标标记并重数；分步各操作清楚，不把猜测或排序当点击完成。",
+      "goalIds": [
+        "hidden_queue",
+        "queue_change"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "occluded-row",
+        "queue-rearrangement"
+      ]
+    },
+    {
+      "page": 11,
+      "key": "p11",
+      "type": "slide",
+      "title": "比较两次，再检查中间",
+      "play": "先示范数或一一对应判断两组相等和不等，读三个比较符号。再给一例有两个合格中间数，用两边条件分别核对，首尾关系用图验证。作为第二课时复习，避免变成上一课复刻。",
+      "goalIds": [
+        "compare_numbers"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "number-comparisons",
+        "digit-cards"
+      ]
+    },
+    {
+      "page": 12,
+      "key": "p12",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "听单一位置或前段的要求，从三幅标记图选出对应一幅。",
+      "goalIds": [
+        "quantity_and_ordinal"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "row-total-position",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 13,
+      "key": "p13",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "指定方向从另一端数，选唯一目标标记图。",
+      "goalIds": [
+        "counting_direction"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "bidirectional-row",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 14,
+      "key": "p14",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "看已标目标的排列，判断目标前或后的件数，选数量图。",
+      "goalIds": [
+        "before_after"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "target-neighbors",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 15,
+      "key": "p15",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "指定移走前面或后面的一件，选原目标在新排列中的位置。",
+      "goalIds": [
+        "queue_change"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "queue-rearrangement",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 16,
+      "key": "p16",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "看一组新数卡的规定顺序，选择指定位置的数卡。",
+      "goalIds": [
+        "order_number_cards"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "digit-cards",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 17,
+      "key": "p17",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "看新总层数和楼上或楼下户数，选目标的固定楼层图。",
+      "goalIds": [
+        "floor_number"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "fixed-floor",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 18,
+      "key": "p18",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "看遮挡、明确起点和两个序位锚点，选择被遮住的数量图。",
+      "goalIds": [
+        "hidden_queue"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "occluded-row",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 19,
+      "key": "p19",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "根据两侧连续比较的条件，选唯一合格中间数图。",
+      "goalIds": [
+        "compare_numbers"
+      ],
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "number-comparisons",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 20,
+      "key": "p20",
+      "type": "slide",
+      "title": "怎么找到第几个",
+      "play": "老师逐项回顾数量、位次、方向、前后、换位、数卡、楼层和比较。给出实物练习口头表达，纸笔与口语由成人观察。",
+      "goalIds": [
+        "quantity_and_ordinal",
+        "counting_direction",
+        "before_after",
+        "queue_change",
+        "order_number_cards",
+        "floor_number",
+        "hidden_queue",
+        "compare_numbers"
+      ],
+      "officialHourIds": [
+        "lesson_1",
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "row-total-position",
+        "digit-cards",
+        "fixed-floor"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q-ordinal",
+      "page": 12,
+      "skill": "quantity_and_ordinal",
+      "target": "听单一位置或前段的要求，从三幅标记图选出对应一幅。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "row-total-position",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q-direction",
+      "page": 13,
+      "skill": "counting_direction",
+      "target": "指定方向从另一端数，选唯一目标标记图。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "bidirectional-row",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q-neighbor",
+      "page": 14,
+      "skill": "before_after",
+      "target": "看已标目标的排列，判断目标前或后的件数，选数量图。",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "target-neighbors",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q-move",
+      "page": 15,
+      "skill": "queue_change",
+      "target": "指定移走前面或后面的一件，选原目标在新排列中的位置。",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "queue-rearrangement",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q-cards",
+      "page": 16,
+      "skill": "order_number_cards",
+      "target": "看一组新数卡的规定顺序，选择指定位置的数卡。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "digit-cards",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q-floor",
+      "page": 17,
+      "skill": "floor_number",
+      "target": "看新总层数和楼上或楼下户数，选目标的固定楼层图。",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "fixed-floor",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q-hidden",
+      "page": 18,
+      "skill": "hidden_queue",
+      "target": "看遮挡、明确起点和两个序位锚点，选择被遮住的数量图。",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "occluded-row",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q-compare",
+      "page": 19,
+      "skill": "compare_numbers",
+      "target": "根据两侧连续比较的条件，选唯一合格中间数图。",
+      "officialHourIds": [
+        "lesson_2"
+      ],
+      "visualRoles": [
+        "number-comparisons",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    }
+  ],
+  "afterClass": {
+    "official": [
+      {
+        "classHourId": "lesson_1",
+        "sourcePageRefs": [
+          "lesson_1:1"
+        ],
+        "officialPurpose": [
+          "第1课时第1页，按序位为鱼着色并圈指定数量；用一组不连续的零至九数字卡练比较、升序和第几个；每层一户的楼房题练用楼上或楼下户数反推楼层。"
+        ]
+      },
+      {
+        "classHourId": "lesson_2",
+        "sourcePageRefs": [
+          "lesson_2:1",
+          "lesson_2:2"
+        ],
+        "officialPurpose": [
+          "第2课时第1页，按指定方向将散数排序。用队列的右端已知序位与遮挡区边界推断总数和被遮人数，再把原左端两人移到最右，重数目标从右的序位与右边人数。",
+          "第2课时第2页，官方资源计为第二页，页图只有页首横线，未出现新增练习或内容。"
+        ]
+      }
+    ],
+    "originalPracticeDirection": "家里用一排小物件从两端数，区分只选一个、选前几件。移动一件后重数。比较数字卡的升降序。与成人说说楼层并验证。",
+    "weekly": "本课目标、作业能力与实际小检查作为周末变式题源。"
+  },
+  "assessmentBoundary": "只记录交互、作答和课堂运行证据。口头表达与纸笔表现留为待观察。",
+  "authoring": {
+    "status": "generation-brief",
+    "formalBodyProducer": "OpenMAIC/DeepSeek",
+    "pageSequenceIsGuidance": true,
+    "automaticImageGeneration": false,
+    "formalImageProducer": "Codex",
+    "questionsLockedBeforeGeneration": false
+  }
+}

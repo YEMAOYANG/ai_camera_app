@@ -1,0 +1,223 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "11～20 的认识",
+  "goals": [
+    "用十个一扎成一捆表示一个十，根据一捆和一至九根散棒读写11至19，逐个数不重不漏。",
+    "把十九再添一根变成两捆，解释同样二十根为何换成两个十，没有散棒。",
+    "在两杆计数器上区分左侧十位与右侧个位，说明11中两个1含义不同，依据珠数读写，20个位写0占位。",
+    "在等距的0至20数线上定位、顺数倒数、找邻数和补空；右边的数较大，用等长小格比较接近程度。",
+    "联系数序定位生活中的页码或位置，并用一个生活总数的具体例子说几个十和几个一。"
+  ],
+  "objectives": [
+    "用十个一扎成一捆表示一个十，根据一捆和一至九根散棒读写11至19，逐个数不重不漏。",
+    "把十九再添一根变成两捆，解释同样二十根为何换成两个十，没有散棒。",
+    "在两杆计数器上区分左侧十位与右侧个位，说明11中两个1含义不同，依据珠数读写，20个位写0占位。",
+    "在等距的0至20数线上定位、顺数倒数、找邻数和补空；右边的数较大，用等长小格比较接近程度。",
+    "联系数序定位生活中的页码或位置，并用一个生活总数的具体例子说几个十和几个一。"
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "key": "intro",
+      "type": "slide",
+      "title": "纸艺补给站开门了",
+      "goalIds": [
+        "group"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "开场看情境，提出十个一归一组，先数组、再数散棒。",
+      "play": "开场看情境，提出十个一归一组，先数组、再数散棒。",
+      "visualRoles": [
+        "cover-workshop",
+        "tray-ten"
+      ]
+    },
+    {
+      "page": 2,
+      "key": "pack",
+      "type": "interactive",
+      "title": "十根一捆，接着数",
+      "goalIds": [
+        "group"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "pack-trays 先从9、10、11根三盘中找恰好10，点后变成1捆；pack-count 再看1捆和4根、1捆和8根，认读14和18。教师带读11至19。",
+      "play": "pack-trays 先从9、10、11根三盘中找恰好10，点后变成1捆；pack-count 再看1捆和4根、1捆和8根，认读14和18。教师带读11至19。",
+      "visualRoles": [
+        "rod-unit",
+        "rod-bundle",
+        "tray-ten"
+      ]
+    },
+    {
+      "page": 3,
+      "key": "twenty",
+      "type": "interactive",
+      "title": "十九添一，换一捆",
+      "goalIds": [
+        "exchange"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "exchange-tens、exchange-ones、exchange-controls；从一捆九根起，点一根让散棒达到十，再把这十根变成第二捆。总量没有在捆的动作中增加；两捆和空散棒的状态要清晰。",
+      "play": "exchange-tens、exchange-ones、exchange-controls；从一捆九根起，点一根让散棒达到十，再把这十根变成第二捆。总量没有在捆的动作中增加；两捆和空散棒的状态要清晰。",
+      "visualRoles": [
+        "rod-unit",
+        "rod-bundle"
+      ]
+    },
+    {
+      "page": 4,
+      "key": "places",
+      "type": "slide",
+      "title": "两个一，位置不同",
+      "goalIds": [
+        "places"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "对比11两根杆各1珠，依次点亮左十位和右个位，分清含义。对比20中左两珠右空，0必须占位。",
+      "play": "对比11两根杆各1珠，依次点亮左十位和右个位，分清含义。对比20中左两珠右空，0必须占位。",
+      "visualRoles": [
+        "counter-eleven",
+        "counter-twenty"
+      ]
+    },
+    {
+      "page": 5,
+      "key": "beads",
+      "type": "interactive",
+      "title": "把数摆进两根杆",
+      "goalIds": [
+        "places"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "bead-target、bead-tens、bead-ones；示范11，按亮起的列依次选择珠数；实践15和18，珠子真正进对应杆。空列显示空而保留0标签。",
+      "play": "bead-target、bead-tens、bead-ones；示范11，按亮起的列依次选择珠数；实践15和18，珠子真正进对应杆。空列显示空而保留0标签。",
+      "visualRoles": [
+        "counter-eleven",
+        "counter-twenty"
+      ]
+    },
+    {
+      "page": 6,
+      "key": "numberline",
+      "type": "slide",
+      "title": "沿着等长小格走",
+      "goalIds": [
+        "order"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "在0至20等距线上点亮0、10、15、20；说沿右大、向左小，相邻隔一格，顺数与倒数。",
+      "play": "在0至20等距线上点亮0、10、15、20；说沿右大、向左小，相邻隔一格，顺数与倒数。",
+      "visualRoles": [
+        "line-all"
+      ]
+    },
+    {
+      "page": 7,
+      "key": "route",
+      "type": "interactive",
+      "title": "给数牌找位置",
+      "goalIds": [
+        "order",
+        "life"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "route-line、route-hole、route-choices；演示一个前后邻数，学生给缺位放正确数字牌，读左右再查顺序。数位定位迁移到书页和从左起位置。",
+      "play": "route-line、route-hole、route-choices；演示一个前后邻数，学生给缺位放正确数字牌，读左右再查顺序。数位定位迁移到书页和从左起位置。",
+      "visualRoles": [
+        "line-all"
+      ]
+    },
+    {
+      "page": 8,
+      "key": "near",
+      "type": "interactive",
+      "title": "哪边的小格更少",
+      "goalIds": [
+        "order"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "near-line、near-left、near-right；用同一条等距线先比较12到10和20，再比较18。错误只亮所选路径，引导数步。正确显示两条路的格数。",
+      "play": "near-line、near-left、near-right；用同一条等距线先比较12到10和20，再比较18。错误只亮所选路径，引导数步。正确显示两条路的格数。",
+      "visualRoles": [
+        "line-all",
+        "line-near-13"
+      ]
+    },
+    {
+      "page": 9,
+      "key": "check",
+      "type": "quiz",
+      "title": "换一批补给再试试",
+      "goalIds": [
+        "group",
+        "exchange",
+        "places",
+        "order",
+        "life"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "六个新图题，保持答案均衡。老师先读题，选项全是图。",
+      "play": "六个新图题，保持答案均衡。老师先读题，选项全是图。",
+      "visualRoles": [
+        "qty-17",
+        "counter-fourteen",
+        "counter-twenty",
+        "line-gap-14",
+        "line-near-13",
+        "span-14-18"
+      ]
+    },
+    {
+      "page": 10,
+      "key": "recap",
+      "type": "slide",
+      "title": "把这些数用到身边",
+      "goalIds": [
+        "group",
+        "exchange",
+        "places",
+        "order",
+        "life"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "move": "回顾扎十、19到20、十位个位及0、数线方向和相邻。示范页码指位置、十七张纸是一组十和七张。课后找生活数。",
+      "play": "回顾扎十、19到20、十位个位及0、数线方向和相邻。示范页码指位置、十七张纸是一组十和七张。课后找生活数。",
+      "visualRoles": [
+        "line-all",
+        "qty-17"
+      ]
+    }
+  ],
+  "mechanismRationale": "凑十用选择足额整理盘及合捆，换十用补一与换捆，位值改变两杆珠数，数序补位放数牌，接近程度显示实际小格路径。",
+  "smallCheckSkills": [
+    "group",
+    "places",
+    "exchange",
+    "order",
+    "order",
+    "life"
+  ],
+  "homework": "在书里找第十六页，再在家找一组十与几件散物，向大人说出总数的组成。周末从本课提取题源。",
+  "observation": "读数、纸笔写数、实物分组和口述请家长观察。"
+}

@@ -1,0 +1,124 @@
+{
+  "cast": [],
+  "style": {
+    "notes": "米白纸、鼠尾草绿、琥珀黄、珊瑚橙；四张正式绘本插图同风格。数量和几何外形由精确知识图示表示，不能以普通手画图标冒充实物插画。"
+  },
+  "pages": [
+    {
+      "id": "p02",
+      "mechanism": "自主选择教室、树、滑梯并放进六格场景；三种图均布置后完成，位置自由，仅记录布置操作。",
+      "stateKeys": {
+        "demo": "true显示教师在中上位置放教室，false清空并交还孩子"
+      },
+      "ids": [
+        "map-frame",
+        "stamp-building",
+        "stamp-tree",
+        "map-slot-1"
+      ]
+    },
+    {
+      "id": "p04",
+      "mechanism": "逐棵点数树，记录标记避免重复；点齐后选总量，三关3/4/5。",
+      "stateKeys": {
+        "demo": "true显示教师计数记录，false完整复位",
+        "count": "教师已数过的树的棵数"
+      },
+      "ids": [
+        "count-field",
+        "count-item-1",
+        "count-record"
+      ]
+    },
+    {
+      "id": "p07",
+      "mechanism": "按外形选印章接触面，拖放后轮廓被同形实心印迹填入；首错不揭答案，第三次才示范。",
+      "stateKeys": {
+        "demo": "true展示教师印迹，false完整复位",
+        "shape": "教师演示印章外形"
+      },
+      "ids": [
+        "shape-target",
+        "shape-stamp-circle",
+        "shape-palette"
+      ]
+    },
+    {
+      "id": "p10",
+      "mechanism": "绿色棋子逐枚变成2个点、橙色变成1个点，收齐再合计；三关总分4/6/7。",
+      "stateKeys": {
+        "demo": "true展示一枚绿色生成两个计分点，false完整复位"
+      },
+      "ids": [
+        "score-rule-panel",
+        "score-record",
+        "score-tokens"
+      ]
+    },
+    {
+      "id": "p12",
+      "mechanism": "逐步执行前进/右移的有序箭头指令，小点在网格中实际移动；错误方向原位重试。",
+      "stateKeys": {
+        "demo": "true显示示范步数，false从第一关原位复位",
+        "step": "教师示范向前走过的格数"
+      },
+      "ids": [
+        "route-plan",
+        "route-grid",
+        "route-up"
+      ]
+    }
+  ],
+  "sourceCoverage": {
+    "printedPages1and2": [
+      "p01",
+      "p02",
+      "p03",
+      "p04",
+      "p05"
+    ],
+    "printedPage3": [
+      "p06",
+      "p07",
+      "p08"
+    ],
+    "printedPage4": [
+      "p09",
+      "p10",
+      "p13"
+    ],
+    "printedPage5": [
+      "p11",
+      "p12",
+      "p13"
+    ],
+    "printedPage6": [
+      "p14"
+    ]
+  },
+  "evidenceLimits": [
+    "图画布置只记录对象位置，不判断绘画水平。",
+    "逐个点数、图形匹配、计分和路线操作可记录；口语、线下合作仍待观察。"
+  ],
+  "mathematicalAssets": {
+    "kind": "精确知识图示",
+    "assets": [
+      "shape-faces",
+      "score-rule",
+      "route-demo",
+      "quiz-circle",
+      "quiz-triangle",
+      "quiz-square",
+      "quiz-rectangle",
+      "quiz-circle-small",
+      "quiz-circle-medium",
+      "quiz-circle-large",
+      "quiz-score",
+      "quiz-route",
+      "quiz-route-a",
+      "quiz-route-b",
+      "quiz-route-c"
+    ],
+    "basis": "数量点、几何印迹、计分棋子和方向网格本身即教学知识；非普通场景插图。"
+  }
+}

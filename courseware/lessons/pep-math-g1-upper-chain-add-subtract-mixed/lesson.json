@@ -1,0 +1,233 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "连加、连减  加、减混合",
+  "description": "跟着小数老师整理社区读书角，观察先后两次变化，学会用第一步的结果接着算。",
+  "grade": 1,
+  "roster": {
+    "teacher": {"name": "小数老师", "role": "teacher", "gender": "male", "voice": "Ethan", "avatar": "/teachers/ashu-math-v1.png", "color": "#4A90D9", "persona": "用清楚短句和实物数量解释两次变化，示范第一步怎样接到第二步。"}
+  },
+  "images": {
+    "reading-corner": {"file": "assets/reading-corner.png"},
+    "single-book": {"file": "assets/single-book.png"},
+    "add-add": {"file": "assets/add-add.png"},
+    "subtract-subtract": {"file": "assets/subtract-subtract.png"},
+    "add-subtract": {"file": "assets/add-subtract.png"},
+    "subtract-add": {"file": "assets/subtract-add.png"},
+    "quantity-2": {"file": "assets/quantity-2.png"},
+    "quantity-3": {"file": "assets/quantity-3.png"},
+    "quantity-4": {"file": "assets/quantity-4.png"},
+    "quantity-5": {"file": "assets/quantity-5.png"},
+    "quantity-6": {"file": "assets/quantity-6.png"},
+    "quantity-7": {"file": "assets/quantity-7.png"},
+    "quantity-8": {"file": "assets/quantity-8.png"},
+    "quantity-9": {"file": "assets/quantity-9.png"},
+    "quantity-10": {"file": "assets/quantity-10.png"}
+  },
+  "scenes": [
+    {
+      "key": "p01", "type": "slide", "title": "读书角的两次变化", "template": "title-picture",
+      "data": {"title": "读书角的两次变化", "picture": "reading-corner", "caption": "起点 → 第一次变化 → 第二次变化"},
+      "script": [
+        {"spotlight":"title"}, {"say":"小朋友们好，我是小数老师。"},
+        {"say":"今天，我们一起去社区的读书角。"},
+        {"spotlight":"picture"}, {"say":"这是书架，新书会从右边的台子送来。"},
+        {"say":"放进架子，架上的书就多了。"},
+        {"say":"把书借出去，架上的书就少了。"},
+        {"spotlight":"caption"}, {"say":"算两次变化，先数变化前架上有几本。"},
+        {"say":"接着看第一次做了什么，架上变成几本。"},
+        {"say":"记住这个数，再用它算第二次。"}
+      ]
+    },
+    {
+      "key": "p02", "type": "slide", "title": "收进两批就是连加", "template": "picture-points",
+      "data": {"title": "收进两批就是连加", "picture": "add-add", "points": ["原来有 3 本", "先收 1 本，3＋1＝4", "再收 2 本，4＋2＝6", "3＋1＋2＝6"]},
+      "script": [
+        {"spotlight":"picture"}, {"say":"我们来收两批书，看书架怎样变。"},
+        {"spotlight":"point-1"}, {"say":"看最上面，架上原来有三本书。"},
+        {"spotlight":"point-2"}, {"say":"先收进一本。收进来，要用加法。"},
+        {"say":"三加一等于四。中间这排一共有四本。"},
+        {"spotlight":"point-3"}, {"say":"接着又收两本，要从刚才的四本接着数。"},
+        {"say":"四加二等于六，最下面的架上有六本。"},
+        {"spotlight":"point-4"}, {"say":"三加一再加二，把两次增加写在一起。"},
+        {"say":"两个加号连着算，叫作连加。"},
+        {"say":"从左往右，先得四，再用四加二。"}
+      ]
+    },
+    {
+      "key": "p03", "type": "interactive", "title": "把新书放上架", "page": "shelf", "widgetType": "game", "startImage": "reading-corner",
+      "script": [
+        {"setState":{"demoStep":0}}, {"highlight":"#shelf-now"}, {"say":"请当读书角的小管理员。架上先有三本。"},
+        {"highlight":"#event-cue"}, {"say":"先数出一本。向里移动，把它放到架上。"},
+        {"setState":{"demoStep":1}}, {"highlight":"#stage-one"}, {"say":"现在有四本了。第一批已经算在四本里。"},
+        {"say":"这次从四本接着收两本。"},
+        {"setState":{"demoStep":2}}, {"highlight":"#stage-two"}, {"say":"四加二得六，六本就是最后的总数。"},
+        {"say":"轮到你了。每次先数这批，再把书放进去。"},
+        {"say":"第一关先收三本，再收五本。"},
+        {"say":"第二关收两批，每批四本。"},
+        {"setState":{"play":true}}
+      ]
+    },
+    {
+      "key": "p04", "type": "slide", "title": "两次借出是连减", "template": "picture-points",
+      "data": {"title": "两次借出是连减", "picture": "subtract-subtract", "points": ["开始有 9 本", "先借 4 本，9−4＝5", "再借 2 本，5−2＝3", "9−4−2＝3"]},
+      "script": [
+        {"spotlight":"picture"}, {"say":"有人来借书。我们来看看架上会剩多少。"},
+        {"spotlight":"point-1"}, {"say":"变化以前，书架上一共有九本。"},
+        {"spotlight":"point-2"}, {"say":"第一次借走四本。书变少，要用减法。"},
+        {"say":"九减四等于五。现在只数还在架上的书。"},
+        {"spotlight":"point-3"}, {"say":"第二次借走两本，要从剩下的五本里拿。"},
+        {"say":"五减二等于三，最后架上还有三本。"},
+        {"spotlight":"point-4"}, {"say":"九减四再减二，叫作连减。"},
+        {"say":"先算九减四，再把得到的五继续减二。"}
+      ]
+    },
+    {
+      "key": "p05", "type": "interactive", "title": "两张借书单", "page": "shelf", "widgetType": "game", "startImage": "reading-corner",
+      "script": [
+        {"setState":{"demoStep":0}}, {"highlight":"#shelf-now"}, {"say":"这里有两张借书单，架上原来有九本。"},
+        {"highlight":"#event-cue"}, {"say":"第一张要四本。点四本，再点向外的箭头。"},
+        {"setState":{"demoStep":1}}, {"highlight":"#event-traces"}, {"say":"四本已经借出。先把它们记在旁边。"},
+        {"highlight":"#shelf-now"}, {"say":"现在架上剩五本。第二次从这五本里选。"},
+        {"highlight":"#event-cue"}, {"say":"第二张要两本。再点两本送出去。"},
+        {"setState":{"demoStep":2}}, {"highlight":"#stage-two"}, {"say":"五减二还剩三本。"},
+        {"say":"分清两批，借走的书不能再借一次。"},
+        {"say":"第一关先借两本，再借五本。"},
+        {"say":"第二关先借六本，再借四本。点错可以重选。"},
+        {"setState":{"play":true}}
+      ]
+    },
+    {
+      "key": "p06", "type": "quiz", "title": "收书和借书小检查", "intro": ["听老师读题，选一张数量图。"],
+      "questions": [
+        {
+          "id": "chain-q1", "skill": "连加中的两次增加", "question": "展台有两张画，先放一张，再放四张。最后有几张？",
+          "answer": ["B"], "analysis": "两张加一张是三张，再加四张就是七张。",
+          "visual": {"kind":"asset","image":"quantity-2","alt":"开始有两张画"},
+          "options": {
+            "A":{"label":"6","visual":{"kind":"asset","image":"quantity-6","alt":"六个点"}},
+            "B":{"label":"7","visual":{"kind":"asset","image":"quantity-7","alt":"七个点"}},
+            "C":{"label":"3","visual":{"kind":"asset","image":"quantity-3","alt":"三个点"}}
+          }
+        },
+        {
+          "id": "chain-q2", "skill": "连减中的两次拿走", "question": "有十个圆片，先拿走一个，又拿走六个。还剩几个？",
+          "answer": ["A"], "analysis": "先从十个中拿走一个，剩九个，再拿走六个，剩三个。",
+          "visual": {"kind":"asset","image":"quantity-10","alt":"开始有十个圆片"},
+          "options": {
+            "A":{"label":"3","visual":{"kind":"asset","image":"quantity-3","alt":"三个点"}},
+            "B":{"label":"9","visual":{"kind":"asset","image":"quantity-9","alt":"九个点"}},
+            "C":{"label":"4","visual":{"kind":"asset","image":"quantity-4","alt":"四个点"}}
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07", "type": "slide", "title": "先收进再借出", "template": "picture-points",
+      "data": {"title": "先收进再借出", "picture": "add-subtract", "points": ["起点有 3 本", "先收 4 本，3＋4＝7", "再借 1 本，7−1＝6", "3＋4−1＝6"]},
+      "script": [
+        {"spotlight":"picture"}, {"say":"这次先收进一些书，再借出去一些书。"},
+        {"spotlight":"point-1"}, {"say":"最上面的书架是起点，原来有三本。"},
+        {"spotlight":"point-2"}, {"say":"先收进四本，书变多，要用加法。"},
+        {"say":"三加四等于七。中间一排表示七本。"},
+        {"spotlight":"point-3"}, {"say":"接着借走一本，就从刚才的七本中拿。"},
+        {"say":"七减一等于六。最下面剩六本。"},
+        {"spotlight":"point-4"}, {"say":"写作三加四再减一，等于六。"},
+        {"say":"故事先收进，再借出，算式也先加再减。"}
+      ]
+    },
+    {
+      "key": "p08", "type": "slide", "title": "先借出再收进", "template": "picture-points",
+      "data": {"title": "先借出再收进", "picture": "subtract-add", "points": ["起点有 7 本", "先借 4 本，7−4＝3", "再收 2 本，3＋2＝5", "7−4＋2＝5"]},
+      "script": [
+        {"spotlight":"picture"}, {"say":"这次换一换，先借出书，再收进书。"},
+        {"spotlight":"point-1"}, {"say":"看故事开头，架上起初有七本。"},
+        {"spotlight":"point-2"}, {"say":"先借走四本。七减四等于三。"},
+        {"say":"中间的三本，就是第一次借完剩下的书。"},
+        {"spotlight":"point-3"}, {"say":"接着收进两本，从这三本开始往上加。"},
+        {"say":"三加二等于五，最后有五本。"},
+        {"spotlight":"point-4"}, {"say":"写成七减四再加二，等于五。"},
+        {"say":"同样是两步，减号在前，这回先算减法。"},
+        {"say":"先发生的先算，带着算出的数做下一步。"}
+      ]
+    },
+    {
+      "key": "p09", "type": "interactive", "title": "把两次变化排好", "page": "shelf", "widgetType": "game", "startImage": "reading-corner",
+      "script": [
+        {"setState":{"demoCase":"add-first","demoStep":0}}, {"highlight":"#shelf-now"}, {"say":"我们来给收书和借书排先后。架上有三本。"},
+        {"highlight":"#event-cue"}, {"say":"先收进四本，箭头朝着书架，要选加号。"},
+        {"setState":{"demoCase":"add-first","demoStep":1}}, {"highlight":"#stage-one"}, {"say":"第一步有七本。要用这七本继续做。"},
+        {"say":"再借走一本，箭头离开书架，要选减号。"},
+        {"setState":{"demoCase":"add-first","demoStep":2}}, {"highlight":"#stage-two"}, {"say":"七减一得六。先后两次都核对好。"},
+        {"say":"第一关先收五本，再借三本。"},
+        {"say":"第二关先借三本，再收两本。"},
+        {"say":"拖卡片到书架，或点卡片再点对号。"},
+        {"say":"先看第一步。最后一样多，过程也可能不同。"},
+        {"setState":{"play":true}}
+      ]
+    },
+    {
+      "key": "p10", "type": "quiz", "title": "两种混合顺序小检查", "intro": ["先听发生了什么，再选对应的图。"],
+      "questions": [
+        {
+          "id": "chain-q3", "skill": "先加后减", "question": "有三块积木，先放进五块，再取出两块。还剩几块？",
+          "answer": ["C"], "analysis": "三加五等于八，再用八减二，剩六块。",
+          "visual": {"kind":"asset","image":"quantity-3","alt":"开始有三块积木"},
+          "options": {
+            "A":{"label":"3","visual":{"kind":"asset","image":"quantity-3","alt":"三个点"}},
+            "B":{"label":"8","visual":{"kind":"asset","image":"quantity-8","alt":"八个点"}},
+            "C":{"label":"6","visual":{"kind":"asset","image":"quantity-6","alt":"六个点"}}
+          }
+        },
+        {
+          "id": "chain-q4", "skill": "先减后加", "question": "有六支笔，先送出四支，再拿来三支。刚送完时剩几支？",
+          "answer": ["B"], "analysis": "刚送完是第一步，六减四等于二。这时三支笔还没拿来。",
+          "visual": {"kind":"asset","image":"quantity-6","alt":"开始有六支笔"},
+          "options": {
+            "A":{"label":"6","visual":{"kind":"asset","image":"quantity-6","alt":"六个点"}},
+            "B":{"label":"2","visual":{"kind":"asset","image":"quantity-2","alt":"两个点"}},
+            "C":{"label":"5","visual":{"kind":"asset","image":"quantity-5","alt":"五个点"}}
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11", "type": "quiz", "title": "第一步以后有多少", "intro": ["听清题目问第一步，还是问最后。"],
+      "questions": [
+        {
+          "id": "chain-q5", "skill": "根据中间量辨认事件顺序", "question": "有五枚磁贴，先添四枚，再取三枚。刚添完有几枚？",
+          "answer": ["A"], "analysis": "先添四枚是五加四等于九。取走三枚在第二步。",
+          "visual": {"kind":"asset","image":"quantity-5","alt":"开始有五枚磁贴"},
+          "options": {
+            "A":{"label":"9","visual":{"kind":"asset","image":"quantity-9","alt":"九个点"}},
+            "B":{"label":"6","visual":{"kind":"asset","image":"quantity-6","alt":"六个点"}},
+            "C":{"label":"2","visual":{"kind":"asset","image":"quantity-2","alt":"两个点"}}
+          }
+        },
+        {
+          "id": "chain-q6", "skill": "把第一步结果接到第二步", "question": "书箱有九本书，借走四本后，又放进三本。最后有几本？",
+          "answer": ["C"], "analysis": "九减四等于五，再用剩下的五本加三本，一共有八本。",
+          "visual": {"kind":"asset","image":"quantity-9","alt":"书箱里开始有九本书"},
+          "options": {
+            "A":{"label":"5","visual":{"kind":"asset","image":"quantity-5","alt":"五个点"}},
+            "B":{"label":"9","visual":{"kind":"asset","image":"quantity-9","alt":"九个点"}},
+            "C":{"label":"8","visual":{"kind":"asset","image":"quantity-8","alt":"八个点"}}
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12", "type": "slide", "title": "带着第一步的结果往下算", "template": "summary",
+      "data": {"title": "带着第一步的结果往下算", "items": ["两次收进，连加", "两次借出，连减", "先收后借，先加后减", "先借后收，先减后加", "第一步的结果，是第二步的起点"]},
+      "script": [
+        {"spotlight":"title"}, {"say":"我们一起回想读书角里发生的四种变化。"},
+        {"spotlight":"item-1"}, {"say":"两次都收进，书越来越多，连着加两次。"},
+        {"spotlight":"item-2"}, {"say":"两次都借出，每次从还在架上的书里减。"},
+        {"spotlight":"item-3"}, {"say":"先收后借，先加进来的，再减借出去的。"},
+        {"spotlight":"item-4"}, {"say":"先借后收，先减出去的，再加收进来的。"},
+        {"spotlight":"item-5"}, {"say":"像接力一样，把第一步的结果交给第二步。"},
+        {"say":"在家找一件有两次变化的小事，画成三幅图。"},
+        {"say":"和家人说说第一步是几，再按画的顺序列式。"}
+      ]
+    }
+  ]
+}

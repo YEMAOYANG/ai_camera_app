@@ -1,0 +1,10 @@
+<div id="game-layout">
+  <div id="game-toolbar">
+    <button class="btn blue" id="sound" type="button" aria-label="重听录音"><svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 4V5L7 9H3zm11.5 0v6a3 3 0 000-6zm0-4v2a5 5 0 010 10v2a7 7 0 000-14z"/></svg><span>听一听</span></button>
+    <span id="speaker-cue" aria-live="polite"></span>
+    <button class="btn green" id="next-round" type="button" hidden aria-label="下一轮">继续 →</button>
+  </div>
+ <div class="cards-and-slot"><div class="photo-choices"><button class="target photo-card" id="target-head" data-choice="head" type="button" aria-label="圈住整个头"><img src="__IMG:a-head__" alt="圈住整个头"></button><button class="target photo-card" id="target-face" data-choice="face" type="button" aria-label="圈在头的正面"><img src="__IMG:a-face__" alt="圈在头的正面"></button><button class="target photo-card" id="target-ear" data-choice="ear" type="button" aria-label="圈在一只耳朵上"><img src="__IMG:a-ear__" alt="圈在一只耳朵上"></button></div>
+ <div id="photo-slot" aria-label="橙围裙照片框"><img id="slot-picture" src="__IMG:maker-a__" alt="橙围裙孩子"></div></div>
+</div>
+<script id="game-config" type="application/json">{"title":"听口令指照片","mode":"cards","trials":[{"key":"ear","audio":"__VOICE:p05-10__"},{"key":"head","audio":"__VOICE:p05-11__"},{"key":"face","audio":"__VOICE:p05-12__"}]}</script>

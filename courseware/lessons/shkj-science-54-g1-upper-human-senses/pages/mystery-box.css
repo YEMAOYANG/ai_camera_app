@@ -1,0 +1,13 @@
+.mystery{display:grid;grid-template-columns:488px 1fr;gap:28px;height:100%;padding:12px 38px}
+.box-stage,.mystery-options{border:3px solid #c0d1b7;border-radius:26px;background:#fffdf4;padding:18px;display:grid;align-content:center;justify-items:center;gap:16px}
+#box-open{width:318px;height:318px;padding:0;border:3px solid #b4bc9b;border-radius:22px;background:#fff7df;overflow:hidden;cursor:pointer}
+#box-open:disabled{cursor:default}.box-stage img,.mystery-options img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+.clues{display:flex;gap:20px}.clue-card{width:120px;height:106px;background:#fff5db;border:3px dashed #c4bc93;border-radius:16px;display:grid;place-items:center}
+.clue-card>div{visibility:hidden}.clue-card.visible>div{visibility:visible}.clue-card.visible{border:3px solid #5f9274;background:#f2f6e1}
+.shape-clue{width:59px;height:59px;border:6px solid #29785f;border-radius:8px;background:#d9e6bd}
+.pressed-clue{width:78px;height:52px;background:#b4d287;clip-path:polygon(0 0,29% 0,37% 21%,49% 32%,61% 21%,70% 0,100% 0,100% 100%,0 100%)}
+.options-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}
+.options-grid button{width:100%;height:176px;border:3px solid #94b491;border-radius:21px;background:#fff7df;overflow:hidden;cursor:pointer}
+.options-grid button.picked{outline:5px solid #bd7637;outline-offset:3px}
+
+.btn.xl{height:90px}

@@ -1,0 +1,26 @@
+<section id="map-station" aria-label="地图卡的位置">
+  <button id="pick-map" type="button" aria-label="拿起地图卡">
+    <img src="__IMG:map-card__" alt="">
+  </button>
+  <div id="equipment">
+    <img id="equipment-picture" src="__IMG:gear-bench__" alt="一张木桌，旁边是打开的布袋">
+    <img id="equipment-demo" class="hide" src="__IMG:map-on__" alt="老师演示地图卡的位置">
+    <button id="zone-on" class="map-zone" type="button" data-place="on" aria-label="桌面上"></button>
+    <button id="zone-under" class="map-zone" type="button" data-place="under" aria-label="桌下"></button>
+    <button id="zone-in" class="map-zone" type="button" data-place="in" aria-label="袋子里"></button>
+  </div>
+  <div id="map-confirmation" class="hide" aria-label="听到确认问题后选图">
+    <button id="map-on-answer" type="button" data-response="yes" aria-label="是的，图中地图卡在桌面上">
+      <img src="__IMG:map-on__" alt="地图卡在桌面上">
+      <span aria-hidden="true">✓</span>
+    </button>
+    <button id="map-under-answer" type="button" data-response="no" aria-label="不是，图中地图卡在桌下">
+      <img src="__IMG:map-under__" alt="地图卡在桌下">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+</section>
+<aside id="map-picture-failure" class="hide" role="status">
+  <p>图片暂时没打开。</p>
+  <button id="reload-map" type="button">重试图片</button>
+</aside>

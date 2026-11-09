@@ -1,0 +1,1500 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "认识0-9",
+  "description": "从一件物品和一整组开始，数出零到九，观察数字写法，分合、排数序并寻找落单。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#417D77",
+      "persona": "和孩子一件一件数，用清楚的图片、短句和操作解释一年级数学。纸笔与口头表现请成人观察。"
+    }
+  },
+  "images": {
+    "count-route": {
+      "file": "assets/count-route.png"
+    },
+    "count-unit": {
+      "file": "assets/count-unit.png"
+    },
+    "cover-counting-workshop": {
+      "file": "assets/cover-counting-workshop.png"
+    },
+    "digit-grid-high": {
+      "file": "assets/digit-grid-high.png"
+    },
+    "digit-grid-low": {
+      "file": "assets/digit-grid-low.png"
+    },
+    "digit-zero": {
+      "file": "assets/digit-zero.png"
+    },
+    "fixed-side": {
+      "file": "assets/fixed-side.png"
+    },
+    "fixed-total": {
+      "file": "assets/fixed-total.png"
+    },
+    "number-line": {
+      "file": "assets/number-line.png"
+    },
+    "one-more": {
+      "file": "assets/one-more.png"
+    },
+    "pairing-teach": {
+      "file": "assets/pairing-teach.png"
+    },
+    "parts-ordered": {
+      "file": "assets/parts-ordered.png"
+    },
+    "parts-small": {
+      "file": "assets/parts-small.png"
+    },
+    "q-count-a": {
+      "file": "assets/q-count-a.png"
+    },
+    "q-count-b": {
+      "file": "assets/q-count-b.png"
+    },
+    "q-count-c": {
+      "file": "assets/q-count-c.png"
+    },
+    "q-count-d": {
+      "file": "assets/q-count-d.png"
+    },
+    "q-glyph-a": {
+      "file": "assets/q-glyph-a.png"
+    },
+    "q-glyph-b": {
+      "file": "assets/q-glyph-b.png"
+    },
+    "q-glyph-c": {
+      "file": "assets/q-glyph-c.png"
+    },
+    "q-next-a": {
+      "file": "assets/q-next-a.png"
+    },
+    "q-next-b": {
+      "file": "assets/q-next-b.png"
+    },
+    "q-next-c": {
+      "file": "assets/q-next-c.png"
+    },
+    "q-next-d": {
+      "file": "assets/q-next-d.png"
+    },
+    "q-next-stem": {
+      "file": "assets/q-next-stem.png"
+    },
+    "q-order-a": {
+      "file": "assets/q-order-a.png"
+    },
+    "q-order-b": {
+      "file": "assets/q-order-b.png"
+    },
+    "q-order-c": {
+      "file": "assets/q-order-c.png"
+    },
+    "q-order-d": {
+      "file": "assets/q-order-d.png"
+    },
+    "q-order-stem": {
+      "file": "assets/q-order-stem.png"
+    },
+    "q-pair-a": {
+      "file": "assets/q-pair-a.png"
+    },
+    "q-pair-b": {
+      "file": "assets/q-pair-b.png"
+    },
+    "q-pair-c": {
+      "file": "assets/q-pair-c.png"
+    },
+    "q-pair-stem": {
+      "file": "assets/q-pair-stem.png"
+    },
+    "q-split-a": {
+      "file": "assets/q-split-a.png"
+    },
+    "q-split-b": {
+      "file": "assets/q-split-b.png"
+    },
+    "q-split-c": {
+      "file": "assets/q-split-c.png"
+    },
+    "q-split-d": {
+      "file": "assets/q-split-d.png"
+    },
+    "q-split-stem": {
+      "file": "assets/q-split-stem.png"
+    },
+    "q-unit-a": {
+      "file": "assets/q-unit-a.png"
+    },
+    "q-unit-b": {
+      "file": "assets/q-unit-b.png"
+    },
+    "q-unit-c": {
+      "file": "assets/q-unit-c.png"
+    },
+    "q-zero-a": {
+      "file": "assets/q-zero-a.png"
+    },
+    "q-zero-b": {
+      "file": "assets/q-zero-b.png"
+    },
+    "q-zero-c": {
+      "file": "assets/q-zero-c.png"
+    },
+    "zero-empty": {
+      "file": "assets/zero-empty.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "数数工坊",
+      "template": "two-columns",
+      "data": {
+        "title": "数数工坊",
+        "left": {
+          "heading": "先看数什么",
+          "body": "进入数数工坊"
+        },
+        "right": {
+          "heading": "单件和整组",
+          "body": "一个圆片，或者一组圆片"
+        },
+        "left_picture": "cover-counting-workshop",
+        "right_picture": "count-unit"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "小朋友们，欢迎来到数数工坊。"
+        },
+        {
+          "say": "今天，我们学从零到九这些数。"
+        },
+        {
+          "say": "数之前，先看清楚要数什么。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "左框里有一个圆片，这是一件。"
+        },
+        {
+          "say": "右框里有三个圆片，也能看成一整组。"
+        },
+        {
+          "say": "如果问几组，这个框就只数一组。"
+        },
+        {
+          "say": "如果问几件，三个圆片要一个一个数。"
+        },
+        {
+          "say": "数的单位先说清楚，别人才能听明白。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "一次数一个单位",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "cover-counting-workshop",
+      "script": [
+        {
+          "highlight": "#count-mode"
+        },
+        {
+          "say": "同一堆圆片，可以按单件数，也可以按组数。"
+        },
+        {
+          "setState": {
+            "demo": "single"
+          }
+        },
+        {
+          "say": "先按单件数，一次只点一个圆片。"
+        },
+        {
+          "say": "一个圆片亮起来，就给这个圆片记一次。"
+        },
+        {
+          "say": "点过的圆片留下记号，不用再点第二次。"
+        },
+        {
+          "setState": {
+            "demo": "group"
+          }
+        },
+        {
+          "say": "再按整组数，看这条边框包住了什么。"
+        },
+        {
+          "say": "这回点一个框，只记一组，不数里面的圆片。"
+        },
+        {
+          "highlight": "#unit-preview"
+        },
+        {
+          "say": "先选好单位，再点你要数的东西。"
+        },
+        {
+          "say": "每个记号都要和一个单位对得上。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "添一后是下一个数",
+      "template": "picture-points",
+      "data": {
+        "title": "添一后是下一个数",
+        "picture": "one-more",
+        "points": [
+          "先数原来的数量",
+          "只添一件",
+          "读出下一个数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看左边，原来有三个圆片。"
+        },
+        {
+          "say": "数一个圆片，就记一次。"
+        },
+        {
+          "say": "最后一个记号念三，所以一共是三个。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在只添一件，看看黄色圆片。"
+        },
+        {
+          "say": "前三个还在，只有这一个是新添的。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再给新来的圆片记一次。"
+        },
+        {
+          "say": "我们数到四，一共就是四个。"
+        },
+        {
+          "say": "三添上一，变成四。"
+        },
+        {
+          "say": "照这个办法，可以找出下一个数。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边有三支短铅笔。每支下面放一个圆片来记数。"
+        },
+        {
+          "say": "对一对，每支都只对一片。数出三片，就写数字三。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把数和数量配上",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "cover-counting-workshop",
+      "script": [
+        {
+          "highlight": "#match-tray"
+        },
+        {
+          "say": "左边是圆片，右边是数字牌。"
+        },
+        {
+          "setState": {
+            "demo": "one"
+          }
+        },
+        {
+          "say": "我们先点一片，它留下记号。"
+        },
+        {
+          "say": "从一边开始，一片一片点，不会漏掉。"
+        },
+        {
+          "say": "点过的颜色不同，不要再数它一遍。"
+        },
+        {
+          "highlight": "#match-choices"
+        },
+        {
+          "say": "最后一个记号念几，就选数字几。"
+        },
+        {
+          "setState": {
+            "demo": "added"
+          }
+        },
+        {
+          "say": "我再放进一片，记号也要添一个。"
+        },
+        {
+          "say": "这次要给新的总数选牌，原来的牌就不合适了。"
+        },
+        {
+          "say": "你来试试，先数圆片，再找数字。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "小数量的两部分",
+      "template": "picture-points",
+      "data": {
+        "title": "小数量的两部分",
+        "picture": "parts-small",
+        "points": [
+          "先看一共五件",
+          "分到两个框",
+          "合回来还是五件"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看第一个框，五件圆片都在里面。"
+        },
+        {
+          "say": "一件一件数，最后一个念五。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在把这些圆片分到两个框。"
+        },
+        {
+          "say": "左边有两件，右边有三件。"
+        },
+        {
+          "say": "两边都有东西，这就是两个非空部分。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再把两个框的圆片都放回去。"
+        },
+        {
+          "say": "原来的每一件都回来了，一共还是五件。"
+        },
+        {
+          "say": "分的时候只换位置，没有拿走，也没有添进来。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "辨认一到五的写法",
+      "template": "picture-points",
+      "data": {
+        "title": "辨认一到五的写法",
+        "picture": "digit-grid-low",
+        "points": [
+          "认清两条中线",
+          "看一、二、三",
+          "看四、五的两笔"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "田字格有横中线，也有竖中线。"
+        },
+        {
+          "say": "左半格写数字。小圆点是落笔的位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一从左半格上面偏右起笔，斜到左下方。"
+        },
+        {
+          "say": "二从左上起笔，向右弯，再斜到左下，横向右写。"
+        },
+        {
+          "say": "三从左上起笔，向右绕回中间，再向右绕回左下。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "四从上部斜向左下，再横向右。"
+        },
+        {
+          "say": "提笔换到靠右的小圆点，再斜向左下。"
+        },
+        {
+          "say": "五从上部起笔，先向左下写短斜线，再弯下半圈，最后补短横。"
+        },
+        {
+          "say": "看范形跟着比一比，再请大人看纸上的写法。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "从六数到九",
+      "template": "picture-points",
+      "data": {
+        "title": "从六数到九",
+        "picture": "count-route",
+        "points": [
+          "排成一行也能数",
+          "围成一圈先做记号",
+          "最后一个数是总数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "左边一列圆片，我们从第一片开始数。"
+        },
+        {
+          "say": "每片只记一次，先数到六，接着是七。"
+        },
+        {
+          "say": "最后一片念八。如果再添一片，就会数到九。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "右边同样多的圆片，现在围成了一圈。"
+        },
+        {
+          "say": "先选一片做起点记号，然后朝同一边走。"
+        },
+        {
+          "say": "每走到一片，就记一次，走到最后就停。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后一个圆片念八，这里一共八片。"
+        },
+        {
+          "say": "排成一行也好，围成一圈也好。"
+        },
+        {
+          "say": "一个不漏，也不多记，总数就不会变。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "圈起来不重数",
+      "page": "p08",
+      "widgetType": "game",
+      "startImage": "cover-counting-workshop",
+      "script": [
+        {
+          "highlight": "#route-board"
+        },
+        {
+          "say": "圆片现在围成一圈，没有明显的第一个。"
+        },
+        {
+          "setState": {
+            "demo": "start"
+          }
+        },
+        {
+          "say": "先选一个作为起点，把它标出来。"
+        },
+        {
+          "say": "选好起点，再沿同一个方向，一个接一个点。"
+        },
+        {
+          "setState": {
+            "demo": "three"
+          }
+        },
+        {
+          "say": "看，已经点过的圆片带着记号。"
+        },
+        {
+          "say": "如果跳过一个，回头很容易忘记哪片没数。"
+        },
+        {
+          "highlight": "#route-shape"
+        },
+        {
+          "say": "数完一圈就停，不要再点最先的那一片。"
+        },
+        {
+          "say": "再试一次排成一行，看看同样多的圆片数出几。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "格子里的六到九",
+      "template": "picture-points",
+      "data": {
+        "title": "格子里的六到九",
+        "picture": "digit-grid-high",
+        "points": [
+          "六的圈在下面",
+          "七先横再斜",
+          "八有两圈，九的圈在上面"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们来看左半格里的六、七、八、九。"
+        },
+        {
+          "say": "六从上部偏右起笔，弯向左下。"
+        },
+        {
+          "say": "到下面继续向右绕，再往上把圈合起来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "七从左半格上边靠左起笔，横向右写。"
+        },
+        {
+          "say": "到了靠近竖中线的位置，斜向左下写。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "八从上部偏右起笔，向左绕上圈，再向右绕下圈，回到起点。"
+        },
+        {
+          "say": "九从上部偏右起笔，向左绕成圈，再向左下写尾巴。"
+        },
+        {
+          "say": "可以用手指比划，再请大人看你纸上的写法。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "两边怎么分有次序",
+      "template": "picture-points",
+      "data": {
+        "title": "两边怎么分有次序",
+        "picture": "parts-ordered",
+        "points": [
+          "总数一直是六",
+          "每次从右向左移一件",
+          "交换左右，总数不变"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们来把六个圆片分到左右两边。"
+        },
+        {
+          "say": "最开始左边一个，右边五个。"
+        },
+        {
+          "say": "两边的圆片合起来，仍然有六个。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我从右边拿一个，移到左边。"
+        },
+        {
+          "say": "左边多一个成了两个，右边少一个还剩四个。"
+        },
+        {
+          "say": "我们继续按这个方向，每次只移一个。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "左右对调，左二右四会变成左四右二。"
+        },
+        {
+          "say": "对调只换位置，总数还是六。"
+        },
+        {
+          "say": "如果左右各三个，对调后没有新分法。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左三右三换过来，左右还是各三片，所以这一行只记一次。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "interactive",
+      "title": "移动一件找下一种分法",
+      "page": "p11",
+      "widgetType": "game",
+      "startImage": "cover-counting-workshop",
+      "script": [
+        {
+          "highlight": "#split-left"
+        },
+        {
+          "say": "这次我们有七个圆片，要分到左右两边。"
+        },
+        {
+          "setState": {
+            "demo": "first"
+          }
+        },
+        {
+          "say": "先摆好左一右六，两个框里都有圆片。"
+        },
+        {
+          "say": "左右的圆片一起数，一共有七个。"
+        },
+        {
+          "setState": {
+            "demo": "transfer"
+          }
+        },
+        {
+          "say": "我从右边移一个到左边。"
+        },
+        {
+          "say": "左边多一个，右边少一个，总数还是七。"
+        },
+        {
+          "highlight": "#split-record"
+        },
+        {
+          "say": "你也按这个方向再移一次，找下一种分法。"
+        },
+        {
+          "say": "如果一边会空掉，就停在前一种。"
+        },
+        {
+          "setState": {
+            "demo": "transfer"
+          }
+        },
+        {
+          "highlight": "#split-record"
+        },
+        {
+          "say": "每移一片，就数两边各有几片，把左右两个数记在一格。"
+        },
+        {
+          "say": "先记左一右六，再记左二右五。照搬动的顺序记，就不容易漏。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "没有和起点都能用到零",
+      "template": "two-columns",
+      "data": {
+        "title": "没有和起点都能用到零",
+        "left": {
+          "heading": "盒里一个也没有",
+          "body": "这里的零表示没有。"
+        },
+        "right": {
+          "heading": "从尺子的零刻度开始",
+          "body": "这里的零表示起点。"
+        },
+        "left_picture": "zero-empty",
+        "right_picture": "number-line"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "一到九是我们已经认识的数。"
+        },
+        {
+          "say": "现在看这个空盒，里面一个圆片也没有。"
+        },
+        {
+          "say": "数的是圆片，所以这里用零来表示没有。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再看右边的小尺子。"
+        },
+        {
+          "say": "最左的零是开始量的位置。"
+        },
+        {
+          "say": "从零出发，一个格接一个格，是一、二、三。"
+        },
+        {
+          "say": "盒子里的零说数量，尺子上的零指位置。"
+        }
+      ]
+    },
+    {
+      "key": "p12-write",
+      "type": "slide",
+      "title": "田字格里的零",
+      "template": "title-picture",
+      "data": {
+        "title": "田字格里的零",
+        "picture": "digit-zero",
+        "caption": "长长的圈要合上"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "再看看田字格里的零。"
+        },
+        {
+          "say": "这个零是个上下长、左右窄的圆形。"
+        },
+        {
+          "say": "从左半格上部偏右的小圆点起笔，往左绕。"
+        },
+        {
+          "say": "绕到下方再向右上，回到起笔处合上。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "你可以伸手指沿着形状比一遍。"
+        },
+        {
+          "say": "想在纸上写，就请大人看看有没有闭合。"
+        },
+        {
+          "say": "请大人也看看，零是不是上下长、左右窄。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "interactive",
+      "title": "在有序位置找空缺",
+      "page": "p13",
+      "widgetType": "game",
+      "startImage": "cover-counting-workshop",
+      "script": [
+        {
+          "highlight": "#order-board"
+        },
+        {
+          "say": "这把尺子从零到九，挨着的两格一样宽。"
+        },
+        {
+          "say": "从左往右，零、一、二、三、四、五、六、七、八、九。"
+        },
+        {
+          "say": "从右往左，九、八、七、六、五、四、三、二、一、零。"
+        },
+        {
+          "setState": {
+            "demo": "mark"
+          }
+        },
+        {
+          "say": "这一格前面是五，后面是七。"
+        },
+        {
+          "say": "往右读五、六、七，所以把六放回这一格。"
+        },
+        {
+          "setState": {
+            "demo": "reveal"
+          }
+        },
+        {
+          "say": "放好再念一遍，五、六、七，一格接一格。"
+        },
+        {
+          "highlight": "#order-cards"
+        },
+        {
+          "say": "轮到你了，可以点数字牌，也可以拖进空位。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "slide",
+      "title": "总数固定与一边固定",
+      "template": "two-columns",
+      "data": {
+        "title": "总数固定与一边固定",
+        "left": {
+          "heading": "左边这图总数不变",
+          "body": "只在两个框之间移动圆片。"
+        },
+        "right": {
+          "heading": "右边这图左边不变",
+          "body": "从框外拿新圆片，放进右边。"
+        },
+        "left_picture": "fixed-total",
+        "right_picture": "fixed-side"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "看左图，一共七个圆片，左三，右四。"
+        },
+        {
+          "say": "从右边拿一个移到左边。"
+        },
+        {
+          "say": "左边变四个，右边变三个，一共还是七个。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "现在换右图，左边一直放着两个圆片。"
+        },
+        {
+          "say": "原来右边三个，两个框一共五个。"
+        },
+        {
+          "say": "这一次，从框外拿一片放到右边。"
+        },
+        {
+          "say": "右边变四个，一共变六个，左边还是两个。"
+        },
+        {
+          "say": "先看什么不变，再看哪个数量改变。"
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "每次添二和两两配对",
+      "template": "picture-points",
+      "data": {
+        "title": "每次添二和两两配对",
+        "picture": "pairing-teach",
+        "points": [
+          "从零开始，每次添两件",
+          "两个一组",
+          "有没有剩下一个"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从零开始，每次添上两颗珠子。"
+        },
+        {
+          "say": "两颗、四颗、六颗、八颗，每次都多两颗。"
+        },
+        {
+          "say": "看上面一行，就知道每一步有几颗。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "八颗珠子，两颗放一组，一共配成四组。"
+        },
+        {
+          "say": "每颗都有同伴，所以八是双数。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "七颗也两颗一组，配好三组后，剩下一颗。"
+        },
+        {
+          "say": "七颗珠子有一颗落单，所以七是单数。"
+        },
+        {
+          "say": "在家把蜡笔两支一组摆开，也能这样判断。"
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "interactive",
+      "title": "两件一组找落单",
+      "page": "p16",
+      "widgetType": "game",
+      "startImage": "cover-counting-workshop",
+      "script": [
+        {
+          "highlight": "#pair-tray"
+        },
+        {
+          "say": "我们来看这排圆片，每两片配成一组。"
+        },
+        {
+          "setState": {
+            "demo": "one"
+          }
+        },
+        {
+          "highlight": "#pair-groups"
+        },
+        {
+          "say": "接下来找还没进组的两个，不重复用。"
+        },
+        {
+          "highlight": "#pair-result"
+        },
+        {
+          "say": "配完以后，看看有没有一片自己留下。"
+        },
+        {
+          "say": "只剩下一片，就叫落单。"
+        },
+        {
+          "say": "如果一个也没剩下，每片都有同伴。"
+        },
+        {
+          "say": "轮到你了，每次点两个，最后再看有没有落单。"
+        }
+      ]
+    },
+    {
+      "key": "p17",
+      "type": "quiz",
+      "title": "听题选图",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-unit",
+          "skill": "counting_unit",
+          "question": "按一整包来数，哪幅图刚好是一包贴纸？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "贴纸封在同一个包里，所以按包只数一次。另一幅是散开的，最后一幅有两包。",
+          "options": {
+            "A": {
+              "label": "三张散开的贴纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-unit-a",
+                "alt": "三张散开的贴纸"
+              }
+            },
+            "B": {
+              "label": "一个包里有三张贴纸",
+              "visual": {
+                "kind": "asset",
+                "image": "q-unit-b",
+                "alt": "一个包里有三张贴纸"
+              }
+            },
+            "C": {
+              "label": "左右各有一包",
+              "visual": {
+                "kind": "asset",
+                "image": "q-unit-c",
+                "alt": "左右各有一包"
+              }
+            }
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p18",
+      "type": "quiz",
+      "title": "听题选图",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-count",
+          "skill": "count_and_next",
+          "question": "看图数一数，哪一组刚好有七个圆片？",
+          "answer": [
+            "D"
+          ],
+          "analysis": "有一组上排三片，下排四片。逐片数到七，它就是七片的一组。",
+          "options": {
+            "A": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-count-a",
+                "alt": "两排圆片"
+              }
+            },
+            "B": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-count-b",
+                "alt": "两排圆片"
+              }
+            },
+            "C": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-count-c",
+                "alt": "两排圆片"
+              }
+            },
+            "D": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-count-d",
+                "alt": "两排圆片"
+              }
+            }
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p19",
+      "type": "quiz",
+      "title": "听题选图",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-next",
+          "skill": "count_and_next",
+          "question": "看图里的圆片，再添一片。哪幅图是添好后的样子？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "图里原来有五片，再添一片，数到六。要选刚好六片的图。",
+          "options": {
+            "A": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-next-a",
+                "alt": "两排圆片"
+              }
+            },
+            "B": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-next-b",
+                "alt": "两排圆片"
+              }
+            },
+            "C": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-next-c",
+                "alt": "两排圆片"
+              }
+            },
+            "D": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-next-d",
+                "alt": "两排圆片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-next-stem",
+            "alt": "原有的圆片"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p20",
+      "type": "quiz",
+      "title": "听题选图",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-glyph",
+          "skill": "read_and_write",
+          "question": "听老师读这个数字，八。哪张田字格里写的是八？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "八上下各一个圈，中间交叉。六的圈在下面，九的圈在上面。",
+          "options": {
+            "A": {
+              "label": "田字格里有一个数字",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-a",
+                "alt": "田字格里有一个数字"
+              }
+            },
+            "B": {
+              "label": "田字格里有一个数字",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-b",
+                "alt": "田字格里有一个数字"
+              }
+            },
+            "C": {
+              "label": "田字格里有一个数字",
+              "visual": {
+                "kind": "asset",
+                "image": "q-glyph-c",
+                "alt": "田字格里有一个数字"
+              }
+            }
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p21",
+      "type": "quiz",
+      "title": "听题选图",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-split",
+          "skill": "split_and_join",
+          "question": "一共有九片，露出两片。盖住的有几片？",
+          "answer": [
+            "D"
+          ],
+          "analysis": "露出两片后，继续数三、四、五、六、七、八、九。还数了七片，所以盖住七片。",
+          "options": {
+            "A": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-split-a",
+                "alt": "两排圆片"
+              }
+            },
+            "B": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-split-b",
+                "alt": "两排圆片"
+              }
+            },
+            "C": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-split-c",
+                "alt": "两排圆片"
+              }
+            },
+            "D": {
+              "label": "两排圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "q-split-d",
+                "alt": "两排圆片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-split-stem",
+            "alt": "一块盖板，右边能看见两片圆片"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p22",
+      "type": "quiz",
+      "title": "听题选图",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-zero",
+          "skill": "zero_and_order",
+          "question": "哪幅图里的零，是从这里开始量的意思？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "小尺最左边的零表示开始量的位置。空盒下面的零表示没有，门牌用数字做记号。",
+          "options": {
+            "A": {
+              "label": "有刻度的短尺",
+              "visual": {
+                "kind": "asset",
+                "image": "q-zero-a",
+                "alt": "有刻度的短尺"
+              }
+            },
+            "B": {
+              "label": "空盒图",
+              "visual": {
+                "kind": "asset",
+                "image": "q-zero-b",
+                "alt": "空盒图"
+              }
+            },
+            "C": {
+              "label": "门牌图",
+              "visual": {
+                "kind": "asset",
+                "image": "q-zero-c",
+                "alt": "门牌图"
+              }
+            }
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p23",
+      "type": "quiz",
+      "title": "听题选图",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-order",
+          "skill": "zero_and_order",
+          "question": "沿着尺子往右数，空格里该放哪张牌？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "空格在一的后一格、三的前一格。从左向右读一、二、三，所以要放二。",
+          "options": {
+            "A": {
+              "label": "数字牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q-order-a",
+                "alt": "数字牌"
+              }
+            },
+            "B": {
+              "label": "数字牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q-order-b",
+                "alt": "数字牌"
+              }
+            },
+            "C": {
+              "label": "数字牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q-order-c",
+                "alt": "数字牌"
+              }
+            },
+            "D": {
+              "label": "数字牌",
+              "visual": {
+                "kind": "asset",
+                "image": "q-order-d",
+                "alt": "数字牌"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-order-stem",
+            "alt": "一把短尺，一和三之间有空格"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p24",
+      "type": "quiz",
+      "title": "听题选图",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-pairs",
+          "skill": "group_in_pairs",
+          "question": "相同形状两个一组。哪种形状找不到同伴？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "两个圆形是一组，两个方形也是一组。菱形只有一个，找不到一样的同伴。",
+          "options": {
+            "A": {
+              "label": "红色圆形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pair-a",
+                "alt": "红色圆形"
+              }
+            },
+            "B": {
+              "label": "蓝色方形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pair-b",
+                "alt": "蓝色方形"
+              }
+            },
+            "C": {
+              "label": "黄色菱形",
+              "visual": {
+                "kind": "asset",
+                "image": "q-pair-c",
+                "alt": "黄色菱形"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "q-pair-stem",
+            "alt": "一排不同形状的珠子"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p25",
+      "type": "slide",
+      "title": "回顾数数的方法",
+      "template": "summary",
+      "data": {
+        "title": "回顾数数的方法",
+        "items": [
+          "先说数的是一件还是一组",
+          "点数时不重不漏",
+          "认读并试写零到九",
+          "分开再合，总数不变",
+          "零、数序和两两配对"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先看清楚是数一件，还是把一整组当一份。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "数一个做一个记号，最后念的数就是总数。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "数字读出来，再看它在田字格里的样子。"
+        },
+        {
+          "say": "可以在纸上试写，请大人看看格子和笔画。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "分成两边之后，全都合回去，总数不变。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "空盒里没有圆片，小尺从零的位置开始。"
+        },
+        {
+          "say": "正数一格一格往右，倒数一格一格往左。"
+        },
+        {
+          "say": "物品两两配好，最后检查有没有一个落单。"
+        }
+      ]
+    }
+  ]
+}

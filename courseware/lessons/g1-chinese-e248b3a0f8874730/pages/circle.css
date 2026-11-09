@@ -1,0 +1,17 @@
+#circle-tray{position:absolute;left:20px;top:25px;width:524px;height:440px;display:grid;grid-template-columns:230px 230px;grid-template-rows:205px 205px;gap:20px}
+.circle-child{position:relative;width:230px;height:205px;border:3px solid #bd916b;border-radius:14px;background:#fff;cursor:grab;overflow:hidden}
+.circle-sprite{display:block;width:200px;height:168.75px;margin:auto;background-image:url('__IMG:partners__');background-size:600px 337.5px;background-repeat:no-repeat}
+.circle-child[data-person="0"] .circle-sprite{background-position:0 0}.circle-child[data-person="1"] .circle-sprite{background-position:-200px 0}.circle-child[data-person="2"] .circle-sprite{background-position:-400px 0}.circle-child[data-person="3"] .circle-sprite{background-position:0 -168.75px}
+.circle-child.selected{outline:6px solid #357f93;outline-offset:3px}
+.circle-child.placed{position:absolute;width:155px;height:155px;border:0;background:transparent;cursor:default}
+.circle-child.placed .circle-sprite{width:145px;height:122.34375px;background-size:435px 244.6875px;margin:0}
+.circle-child.placed[data-person="1"] .circle-sprite{background-position:-145px 0}.circle-child.placed[data-person="2"] .circle-sprite{background-position:-290px 0}.circle-child.placed[data-person="3"] .circle-sprite{background-position:0 -122.34375px}
+#circle-zone{position:absolute;left:626px;top:18px;width:540px;height:440px;border:0;border-radius:20px;background:transparent;cursor:pointer}
+#circle-links{position:absolute;left:0;top:0;width:540px;height:440px}
+#circle-seats{position:absolute;left:626px;top:18px;width:540px;height:440px;pointer-events:none}
+#circle-seats .circle-child{pointer-events:auto}
+#circle-seats .circle-child:nth-child(1){left:75px;top:65px}#circle-seats .circle-child:nth-child(2){left:318px;top:65px}#circle-seats .circle-child:nth-child(3){left:318px;top:228px}#circle-seats .circle-child:nth-child(4){left:75px;top:228px}
+.circle-control{position:absolute;top:470px;width:72px;height:64px;border:3px solid #b98856;border-radius:50%;background:#fff;color:#674932;font-size:42px;cursor:pointer;display:grid;place-items:center}
+#circle-listen{left:26px}.circle-control svg{width:44px;height:44px;fill:currentColor}
+.circle-image-error{position:absolute;inset:0;z-index:16;background:#fff8ef;display:flex;align-items:center;justify-content:center;gap:24px;font-size:28px}
+@media(prefers-reduced-motion:reduce){.circle-child{transition:none}}

@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "走近科学·单元回顾",
+  "basis": "依据官方准确教材印刷13—15整理的原创目标；官方附件全清单无本课记录，见official-notes.json。",
+  "objectives": [
+    "联系可见现象说出自己想知道的问题，区分看到的情况与尚需调查的问题。",
+    "理解科学活动会从提出问题走向寻找解决办法，借助行动和结果检查想法。",
+    "在图片和口述支持下，为简单问题选择观察、实验、制作、测量或查阅资料等合适方法，知道方法可以结合使用。",
+    "回顾认真观察、记录、倾听及安全等学习习惯，对已做活动提出新的问题。"
+  ],
+  "pageOrder": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "goal": [
+        1,
+        2
+      ],
+      "play": "用科学工作台情境说明看到的现象、想知道的问题和寻找办法的关系。"
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "goal": [
+        1,
+        3
+      ],
+      "play": "五轮方法工作台；把对应方法的行动图片拖到问题现场，现场留下实际选择的方法图片和调查记录缩略图。每轮有教师原声问题及重听。"
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "goal": [
+        2
+      ],
+      "play": "以原创纸旗制作情境讲明计划、制作、检查和再改进；不给出固定唯一科学步骤。"
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "goal": [
+        2
+      ],
+      "play": "先观察三张纸旗行动图，再依次放到制作轨道；逐步把材料台变成制作现场和测试现场。三图不是读词排序。"
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "goal": [
+        4
+      ],
+      "play": "讲解认真观察、及时记录、倾听及材料安全、洗手，区分画面记录和真实行为。"
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "goal": [
+        4
+      ],
+      "play": "两轮安全整理；把安全行动图片送到工作区，材料进入收纳盘，第二轮工作台转换为洗手结束现场。首次错误只引导观察动作，不报答案。"
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "goal": [
+        3
+      ],
+      "play": "三道全新情境的图片小检查：围巾长度、贝壳条纹、陌生小虫；只抽样检查方法选择，答案B/C/A。"
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "goal": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "play": "回顾从问题到方法、从行动到检查、良好习惯，并请孩子向家长提出一个新的安全问题。"
+    }
+  ],
+  "mechanicsReason": "三页分别用方法与问题匹配、真实行动顺序、材料安全归位；操作都改变图像场景或对象位置。每页机制服务不同目标。",
+  "quiz": {
+    "questionIds": [
+      "method-scarf",
+      "method-shell",
+      "method-bug"
+    ],
+    "skills": [
+      "science-method-choice"
+    ],
+    "newContexts": [
+      "围巾长度",
+      "贝壳条纹",
+      "陌生小虫"
+    ],
+    "answerPositions": [
+      "B",
+      "C",
+      "A"
+    ],
+    "limitation": "本次三题只抽样观察方法选择；未测口语提问、真实制作、真实测量和安全习惯，不由题分推断。"
+  },
+  "postclass": [
+    {
+      "basis": "PDF19/印刷14学以致用",
+      "direction": "与家人观察家中一个安全的生活现象，说出一个想知道的问题，不照搬教材原图原问。",
+      "evidence": "口头表达待观察"
+    },
+    {
+      "basis": "PDF20/印刷15学习反思",
+      "direction": "说一说本次用了什么方法、注意了什么安全，再提一个新问题；成人记录原话。",
+      "evidence": "家长可记录，未采集前待观察"
+    }
+  ],
+  "weeklyQuestionSource": {
+    "objectives": "沿用本文件objectives，每目标约2题原创变式，由统一周测生成；本课不独立出周测。",
+    "postclassPoints": [
+      "从现象提问",
+      "方法适配问题",
+      "制作或调查后检查结果",
+      "记录、倾听和安全反思"
+    ],
+    "assessmentSkills": [
+      "science-method-choice",
+      "science-question-focus",
+      "science-process-reflection",
+      "science-safety-habit"
+    ]
+  },
+  "lowReading": "图片表现行动及现场，老师原声读操作目标；非目标文字遮住仍能听题、看图、拖动及继续。",
+  "evidenceBoundary": "屏幕点击、匹配和排序只记录这些行为；会说问题、真实测量、真实制作、实验操作与安全习惯均待观察。",
+  "teacher": {
+    "profileId": "mira_science_inquiry",
+    "name": "小科老师",
+    "gender": "female",
+    "voice": "Serena",
+    "authority": "backend/content/teacher_profiles.py formal science identity"
+  },
+  "media": "使用统一media_dispatch持久回执，图片与音频均正式生成，禁止未对账重发。",
+  "goals": [
+    "联系可见现象说出自己想知道的问题，区分看到的情况与尚需调查的问题。",
+    "理解科学活动会从提出问题走向寻找解决办法，借助行动和结果检查想法。",
+    "在图片和口述支持下，为简单问题选择观察、实验、制作、测量或查阅资料等合适方法，知道方法可以结合使用。",
+    "回顾认真观察、记录、倾听及安全等学习习惯，对已做活动提出新的问题。"
+  ]
+}

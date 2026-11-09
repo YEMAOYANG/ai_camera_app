@@ -1,0 +1,646 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "b6aacc7f-4ab7-4bf4-9b81-dc3792d952a5",
+    "lessonTitle": "语文园地五",
+    "gradeCode": "primary_1",
+    "subject": "chinese",
+    "volume": "lower",
+    "unitTitle": "第五单元·识字",
+    "schoolSystem": "six_year",
+    "classHours": [
+      "lesson_1"
+    ],
+    "partIndex": 1,
+    "teachingRevision": "1",
+    "slug": "g1-chinese-48d123e26b3df40d",
+    "unitId": "d62100c0-115d-4116-b924-ca0f41d954ff",
+    "officialChapterId": "b6aacc7f-4ab7-4bf4-9b81-dc3792d952a5",
+    "officialMaterialId": "2d22a5c9-80b8-46cb-8595-564f5c368f3e",
+    "officialActivityId": "3558dddc-1894-a00d-66d8-d2c9d808705c",
+    "textbookPrintedStartPage": 56,
+    "textbookPdfStartPage": 61,
+    "publisher": "人民教育出版社",
+    "officialTextbookResourceId": "b87e153f-a64c-451a-aa6c-6ed9ac7d6821"
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "26c9c7274bf933882b5d8b353c5c075dee4f233337267669329896ab683a796e",
+    "officialManifestSha256": "2f27da40b7413a74419b8e49014f8de9c0e6c88dbbe7a68d81b1b716fac5236c",
+    "briefSha256": "93a99b84157739de601906f51210e0273591771d079a1a9fd153684d06aa6343",
+    "priorBriefSha256": "16d680605ad7884937e338276146411d723960b3aefee086033887803415406d",
+    "priorLessonSha256": "96afd38bd329a4ce5f3870c3d8a753a74edc6596dccfca75a1c490d4726fd84a",
+    "catalogManifestSha256": "59356b971828097a0502dcf365d5ac8d31d3b3c2b45744605236d719bd3d34c0"
+  },
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "coveredOfficialHours": [
+      "lesson_1"
+    ],
+    "videoStatus": "waived-per-standard",
+    "objectives": [
+      "结合生活图画和字族儿歌认识饭、饱、茶、泡、轻、穿、袍、鞭、炮九个生字以及食字旁、火字旁；理解饱、泡、跑、抱、袍、炮的共同部件包及不同形旁。",
+      "观察饱、抱的两部分结构，在田字格淡字上自由描画后用纸笔练写；规范字形、笔顺和姿势交成人观察。",
+      "在新语境中区分青和清、再和在，知道同音字需要联系意思选择。",
+      "通过吃叫吹唱、抱拔提拍、跑跳踢跟的动作和字形，发现口字旁、提手旁、足字旁多表示相关意思。",
+      "复习大小写字母对应，借拼音确定音序并按音序查字法在实际字典中查找溪、解、准、楼、伯，记录自己字典的真实页码。"
+    ],
+    "excludedTopics": [
+      "不扩展官方本课没有的日积月累、古诗或额外阅读板块。",
+      "不声称形旁能说明所有字的意思，也不把同部件说成读音完全相同。",
+      "不从静态范字或记忆编造饱、抱完整笔顺；官方视频已豁免，字形与笔顺质量待成人观察。",
+      "不伪造不同版本字典的页码，不把字母匹配说成已经会查实际字典。",
+      "不把点击、拖动、描画覆盖说成会读会写。"
+    ]
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  },
+  "qualityRules": [
+    "一年级先看图和听小语老师。遮住非目标文字仍能玩；目标字和拼音可以保留。课堂不加入讨论、外链、机械语音。",
+    "讲解页 1000×562.5，一页一事，至少6句100字。互动页 1280×720，至少5句90字，先有至少3次真实教师操作。逐项先点亮后说，台词不写拼音字母。",
+    "互动先有封面和开始按钮，再有可见进度。操作要改变图、对象或笔迹；第一次答错给线索并能重试，不能给出答案。教师示范用不同情境、无学生奖励或答题证据。",
+    "单题三个图片或知识字卡选项，单选且 answer 仅含一个正确 option id，题干、解析与选项语义一致。覆盖计划中的5项 skill，正确位置不能集中。",
+    "课后保留儿歌听读、纸笔写字、翻实际字典给成人观察。操作、点击、听完、答对只记录实际事件，不声称孩子已经会读、会写或会独立查字。"
+  ],
+  "pagePlan": [
+    {
+      "page": 1,
+      "key": "p01",
+      "type": "slide",
+      "title": "走进字的生活",
+      "goal": "用原创生活图引出本课五类目标。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-1",
+        "goal-2",
+        "goal-3",
+        "goal-4",
+        "goal-5"
+      ],
+      "visualRoles": [
+        "garden-cover"
+      ]
+    },
+    {
+      "page": 2,
+      "key": "p02",
+      "type": "slide",
+      "title": "饭香和茶香",
+      "goal": "认识饭饱茶泡，学习食字旁，联系吃喝与水。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-1"
+      ],
+      "visualRoles": [
+        "full-meal",
+        "tea-pour"
+      ]
+    },
+    {
+      "page": 3,
+      "key": "p03",
+      "type": "slide",
+      "title": "脚会跑，手会抱",
+      "goal": "读准跑抱轻，联系脚和手；解释轻轻抱的动作。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-1"
+      ],
+      "visualRoles": [
+        "child-run",
+        "child-hug"
+      ]
+    },
+    {
+      "page": 4,
+      "key": "p04",
+      "type": "slide",
+      "title": "衣和火来帮忙",
+      "goal": "认识穿袍鞭炮和火字旁，归纳包字族。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-1"
+      ],
+      "visualRoles": [
+        "long-robe",
+        "firecrackers"
+      ]
+    },
+    {
+      "page": 5,
+      "key": "p04-read",
+      "type": "slide",
+      "title": "把六幅画读成儿歌",
+      "goal": "作为教材目标文本完整听读六句字族儿歌，逐组点亮并联系已讲解的生活图和形旁；儿歌原句为必要教学文本，其他台词和题目原创。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-1"
+      ],
+      "visualRoles": [
+        "full-meal",
+        "tea-pour",
+        "child-run",
+        "child-hug",
+        "long-robe",
+        "firecrackers"
+      ]
+    },
+    {
+      "page": 6,
+      "key": "p05",
+      "type": "interactive",
+      "title": "给包字家族找画面",
+      "play": "观察目标字的形旁，选择正式语义图片；选中图片进入对应字的生活相册。教师用泡示范，儿童练习其余五字。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-1"
+      ],
+      "visualRoles": [
+        "full-meal",
+        "tea-pour",
+        "child-run",
+        "child-hug",
+        "long-robe",
+        "firecrackers"
+      ]
+    },
+    {
+      "page": 7,
+      "key": "p06",
+      "type": "interactive",
+      "title": "饱和抱进田字格",
+      "play": "在大号饱抱淡字上自由描画，笔迹真实改变、清除可复位；不评判笔顺与规范字形，最后转入纸笔观察。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-2"
+      ],
+      "visualRoles": [
+        "garden-cover",
+        "田字格知识图示"
+      ]
+    },
+    {
+      "page": 8,
+      "key": "p07",
+      "type": "slide",
+      "title": "青和清，声音相同",
+      "goal": "青联系颜色、清联系水，原创青草清溪语境。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-3"
+      ],
+      "visualRoles": [
+        "green-grass",
+        "clear-stream"
+      ]
+    },
+    {
+      "page": 9,
+      "key": "p08",
+      "type": "slide",
+      "title": "再一次，在哪里",
+      "goal": "在表示位置、再表示又一次，先听意思再选字。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-3"
+      ],
+      "visualRoles": [
+        "child-run",
+        "同图不同时间的知识图示"
+      ]
+    },
+    {
+      "page": 10,
+      "key": "p09",
+      "type": "interactive",
+      "title": "听意思，让画面动起来",
+      "play": "先示范饭桌旁的位置，再让孩子看四种不同的生活情境选择目标字。选对后草色、水面、人物位置或重复跑步画面发生变化。本页由情境意思决定目标字。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-3"
+      ],
+      "visualRoles": [
+        "full-meal",
+        "green-grass",
+        "clear-stream",
+        "child-run"
+      ]
+    },
+    {
+      "page": 11,
+      "key": "p10",
+      "type": "slide",
+      "title": "形旁会提醒",
+      "goal": "按顺序讲清口字旁、提手旁、足字旁大多联系嘴、手、脚。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-4"
+      ],
+      "visualRoles": [
+        "child-blow",
+        "child-hug",
+        "child-kick"
+      ]
+    },
+    {
+      "page": 12,
+      "key": "p11",
+      "type": "interactive",
+      "title": "动作图送到哪一家",
+      "play": "将吹泡泡、抱玩具、踢球的正式图片拖到口、提手、足三个字族柜；正确图保留在柜中，错误保留重试。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-4"
+      ],
+      "visualRoles": [
+        "child-blow",
+        "child-hug",
+        "child-kick"
+      ]
+    },
+    {
+      "page": 13,
+      "key": "p12",
+      "type": "slide",
+      "title": "字典里的寻字路",
+      "goal": "在原创练习字典中找准。画面显示 zhǔn、z→Z、索引 zhun→26 和正文，老师用儿童可听懂的中文说出声韵、首字母对应和第三声。学生用自己字典完成真实查找。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-5"
+      ],
+      "visualRoles": [
+        "原创练习字典索引与正文知识图示"
+      ]
+    },
+    {
+      "page": 14,
+      "key": "p13",
+      "type": "interactive",
+      "title": "给音序找大写伙伴",
+      "play": "先配大小写字母，再看溪解准楼的目标拼音，选开头字母的大写；字卡进入索引栏。实际翻字典留成人观察。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-5"
+      ],
+      "visualRoles": [
+        "garden-cover",
+        "目标字和大小写字母知识图示"
+      ]
+    },
+    {
+      "page": 15,
+      "key": "p14",
+      "type": "quiz",
+      "title": "换个情境小检查",
+      "goal": "五题新情境，覆盖包字族、同音字、形旁、音序；正确位置B、C、A、B、C。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-1",
+        "goal-3",
+        "goal-4",
+        "goal-5"
+      ],
+      "visualRoles": [
+        "quiz-hug-cat",
+        "quiz-clear-glass",
+        "quiz-eat-noodles",
+        "garden5-q3-glyph-a",
+        "garden5-q3-glyph-b",
+        "garden5-q3-glyph-c",
+        "garden5-q5-glyph-prompt",
+        "garden5-q5-glyph-a",
+        "garden5-q5-glyph-b",
+        "garden5-q5-glyph-c"
+      ]
+    },
+    {
+      "page": 16,
+      "key": "p15",
+      "type": "slide",
+      "title": "把字用到生活里",
+      "goal": "按五项目标回顾，布置儿歌听读、纸笔饱抱、实际查字的成人观察去向。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "goalIds": [
+        "goal-1",
+        "goal-2",
+        "goal-3",
+        "goal-4",
+        "goal-5"
+      ],
+      "visualRoles": [
+        "garden-cover"
+      ]
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "page": 15,
+      "id": "garden5-q1",
+      "skill": "包字族形旁与字义",
+      "target": "在不同于教师抱玩具示范的新情境里，用抱小猫图识别抱的意思，联系提手旁。",
+      "visualRoles": [
+        "child-run",
+        "quiz-hug-cat",
+        "long-robe"
+      ],
+      "questionVisual": null,
+      "options": {
+        "A": "child-run",
+        "B": "quiz-hug-cat",
+        "C": "long-robe"
+      },
+      "answerPlan": [
+        "B"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "page": 15,
+      "id": "garden5-q2",
+      "skill": "青清语境",
+      "target": "在与小溪教学图不同的生活场景中，用透明水杯图理解清水的清。",
+      "visualRoles": [
+        "green-grass",
+        "firecrackers",
+        "quiz-clear-glass"
+      ],
+      "questionVisual": null,
+      "options": {
+        "A": "green-grass",
+        "B": "firecrackers",
+        "C": "quiz-clear-glass"
+      },
+      "answerPlan": [
+        "C"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "page": 15,
+      "id": "garden5-q3",
+      "skill": "再在语境",
+      "target": "在画完又画的情境里，用目标字卡判断表示又一次的字。",
+      "visualRoles": [
+        "garden5-q3-glyph-a",
+        "garden5-q3-glyph-b",
+        "garden5-q3-glyph-c"
+      ],
+      "questionVisual": null,
+      "options": {
+        "A": "garden5-q3-glyph-a",
+        "B": "garden5-q3-glyph-b",
+        "C": "garden5-q3-glyph-c"
+      },
+      "answerPlan": [
+        "A"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "page": 15,
+      "id": "garden5-q4",
+      "skill": "身体相关形旁",
+      "target": "以吃面这个新动作判断口字旁的语义线索。",
+      "visualRoles": [
+        "child-kick",
+        "quiz-eat-noodles",
+        "child-hug"
+      ],
+      "questionVisual": null,
+      "options": {
+        "A": "child-kick",
+        "B": "quiz-eat-noodles",
+        "C": "child-hug"
+      },
+      "answerPlan": [
+        "B"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "page": 15,
+      "id": "garden5-q5",
+      "skill": "音序与大小写",
+      "target": "读题后看伯的完整拼音目标卡，从三张大写字母卡里选它的音序。",
+      "visualRoles": [
+        "garden5-q5-glyph-a",
+        "garden5-q5-glyph-b",
+        "garden5-q5-glyph-c"
+      ],
+      "questionVisual": "garden5-q5-glyph-prompt",
+      "options": {
+        "A": "garden5-q5-glyph-a",
+        "B": "garden5-q5-glyph-b",
+        "C": "garden5-q5-glyph-c"
+      },
+      "answerPlan": [
+        "C"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "garden-cover",
+      "role": "课首完整生活图和互动开始图",
+      "status": "existing-reviewed-original-png",
+      "sha256": "bc5d81b685cef1a9c29102e732668f33a32500f7c8ba7d814c10a57c78979ff4",
+      "aspectRatio": "16:9"
+    },
+    {
+      "assetKey": "full-meal",
+      "role": "饭后满足，食字旁，或作为在饭桌旁的独立教师示范",
+      "status": "existing-reviewed-original-png",
+      "sha256": "0ad48c4df1bc1f3a376b12c6bf562e0df01847b2831daa70012cd712af516315",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "tea-pour",
+      "role": "往杯中倒水泡茶，对应泡和三点水",
+      "status": "existing-reviewed-original-png",
+      "sha256": "8549d6eadb13ea03807328fc145a7e24fe3186acb3720c27d93c71170f76f379",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "child-run",
+      "role": "草地跑步，跑和足字旁，两个时间画框表现又跑一次",
+      "status": "existing-reviewed-original-png",
+      "sha256": "d347ea1a88b1cf8ab06b2073678de805043d6af9140b01eea45c030b143527d9",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "child-hug",
+      "role": "孩子双臂抱玩具，对应抱和提手旁",
+      "status": "existing-reviewed-original-png",
+      "sha256": "e471f156b27b1d3ea6288ba08e2c5f2ce59c45710271a2cf6ff465b0ab68aba9",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "long-robe",
+      "role": "长袍，对应衣字旁和袍",
+      "status": "existing-reviewed-original-png",
+      "sha256": "36bb96362493686badb2c6f48fde47e8d8e87c53c89885c6dd35edb5881885e5",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "firecrackers",
+      "role": "鞭炮，对应本课目标词和火字旁",
+      "status": "existing-reviewed-original-png",
+      "sha256": "34dad1f03aebc182f8128381126a260a1b3b5cf858168b522c162f494ca2e188",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "green-grass",
+      "role": "生活里的青绿色草地",
+      "status": "existing-reviewed-original-png",
+      "sha256": "a53913e7af2ea15b91dc1ade76dcbdbd4a722420d58e8a205a8f9784497c1bf1",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "clear-stream",
+      "role": "能看见石头的清澈小溪",
+      "status": "existing-reviewed-original-png",
+      "sha256": "c40f83ac14d6b5a757f95128bd1c2e1c260acc807372476d2907def91d9def8e",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "child-blow",
+      "role": "用嘴吹泡泡，对应口字旁",
+      "status": "existing-reviewed-original-png",
+      "sha256": "1c60e86f11baa4f6534a0936f4858e9895b84e2c1360f5c2a49ae20af059f45c",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "child-kick",
+      "role": "用脚踢球，对应足字旁",
+      "status": "existing-reviewed-original-png",
+      "sha256": "a0ede6d39ecc06da77f321987ec600748fd003780d4c7280b2601ed0c0efb5f1",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "quiz-hug-cat",
+      "role": "只用于小检查的新情境，孩子抱小猫",
+      "status": "existing-reviewed-original-png",
+      "sha256": "19801032bcd3636364297382e465b67e4baf794ba7ef31a744daadcbc8468a7c",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "quiz-clear-glass",
+      "role": "只用于小检查的新情境，装清水的透明杯",
+      "status": "existing-reviewed-original-png",
+      "sha256": "4bd5d009016340b1619d2afb063e53b6b1e3fa1970300333fa946b1eaa830b53",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "quiz-eat-noodles",
+      "role": "只用于小检查的新情境，孩子用嘴吃面",
+      "status": "existing-reviewed-original-png",
+      "sha256": "16300db0ce88588d4fea2ea8b610e322462afc57fc2e0e1f4971170430580a3e",
+      "aspectRatio": "1:1"
+    },
+    {
+      "assetKey": "garden5-q3-glyph-a",
+      "role": "目标字卡再",
+      "status": "existing-reviewed-deterministic-target-glyph",
+      "sha256": "77e2134cce704d459d790d0f7bc1a5c73ff61d94f6e3ab02c5f3221f158109f3"
+    },
+    {
+      "assetKey": "garden5-q3-glyph-b",
+      "role": "目标字卡在",
+      "status": "existing-reviewed-deterministic-target-glyph",
+      "sha256": "cc2c31ddf3fb6bece27e7c827fa9e9d8d0c0fd85150f50df7f0a887791860cea"
+    },
+    {
+      "assetKey": "garden5-q3-glyph-c",
+      "role": "目标字卡青",
+      "status": "existing-reviewed-deterministic-target-glyph",
+      "sha256": "e7fdff2e59cc07c4e2da0ba7782a8de98b3ada84d609f8f5ebe840a163a21b11"
+    },
+    {
+      "assetKey": "garden5-q5-glyph-prompt",
+      "role": "目标字卡伯 bó",
+      "status": "existing-reviewed-deterministic-target-glyph",
+      "sha256": "1f22d8b3a763c0fa59b4673285d943bcb06993f0af113592abd0c14552d82425"
+    },
+    {
+      "assetKey": "garden5-q5-glyph-a",
+      "role": "目标字卡D",
+      "status": "existing-reviewed-deterministic-target-glyph",
+      "sha256": "880d00269820ad9d0c141c5a9d5b1167b08ea5a4e89fe2b2504d595a9347578b"
+    },
+    {
+      "assetKey": "garden5-q5-glyph-b",
+      "role": "目标字卡P",
+      "status": "existing-reviewed-deterministic-target-glyph",
+      "sha256": "f400d6986a925b6e8f25d7878f2b2c36bb271ba2ad7645f9036c5cfcff045de7"
+    },
+    {
+      "assetKey": "garden5-q5-glyph-c",
+      "role": "目标字卡B",
+      "status": "existing-reviewed-deterministic-target-glyph",
+      "sha256": "c0468fe0fc4808f865dc96c39256175ac374c23ef425ae461ea7258701a43612"
+    }
+  ],
+  "teachingFacts": {
+    "scope": "人教统编新版六三制一年级下册，第五单元识字，唯一官方课时。上位单元和教材节点都已核验。",
+    "keyPoint": "认识九个生字和食字旁、火字旁，体会包字族形旁表意、声旁提示读音的规律；观察练写饱、抱。",
+    "difficultPoint": "在语境中辨用同音字，能根据形旁联系大致意思，复习并实际使用音序查字法。",
+    "factClaims": [
+      "饱、泡、跑、抱、袍、炮右部都有包；不同左部帮助联系大致意思，读音相近但声调或声母不一定完全相同。",
+      "饭和饱带食字旁，多和食物或吃喝有关；炮带火字旁。",
+      "青、清同音，青可表示颜色，清带三点水，这里的清泉与水有关。",
+      "再和在同音；再表示又一次，在可表示所在位置。",
+      "口字旁的字大多和嘴有关，提手旁的字大多和手部动作有关，足字旁的字大多和脚部动作有关。",
+      "本课复习大小写字母对应并用音序查字法查溪、解、准、楼、伯。",
+      "五字本课读音为溪第一声、解第三声、准第三声、楼第二声、伯第二声。准的完整拼音为 zhǔn，音序为 Z，音节索引用不带声调的 zhun。",
+      "音序取字音拼音首字母的大写；音序查字先在汉语拼音音节索引找到大写，再找到对应音节和正文页码。",
+      "按索引页码翻到正文，按声调核对目标汉字；同音节可能跨页，应继续寻找。",
+      "字典版本不同，正文页码可能不同，不能照抄别人的页码。",
+      "准的音节是 zhǔn。可以听辨为知的声母 zh 加温的韵母 uen，接在声母后写作 un，再标第三声。",
+      "准的声母由 zh 两个字母书写。音序只取第一个字母 z，与资的首字母相同，对应大写 Z。"
+    ],
+    "dictionaryDemonstration": "配音说出声韵组成、目标字第三声和首字母的听辨线索。画面显示准的完整拼音 zhǔn、首字母小写 z 和对应的大写音序 Z。索引画面显示不标声调的 zhun，对应原创练习小字典的示例第26页，正文再找第三声。实际查字以学生手边字典为准。",
+    "targetRhyme": "保留六句教材目标儿歌的独立朗读段。生成稿写原创引导与讲解，教材原句由适配者从已逐字核对的现有目标文本接入，不自行猜写。",
+    "evidence": "国家中小学智慧教育平台官方教学设计4页、课件33页、学习任务单2页、课后练习1页。视频按既有授权豁免。"
+  },
+  "request": "创作《语文园地五》一门完整一年级语文课，围绕已审读的唯一官方课时。沿用已核准的教学页序、素材标识和练习去向，给出适配为现有课件组件的原创讲解、互动与五道有唯一正确答案的小检查。教师示范与孩子练习须分开。不要复制配套资料原文和布局，不另生成图片或录音。"
+}

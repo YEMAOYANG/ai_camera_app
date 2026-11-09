@@ -1,0 +1,28 @@
+<div class="solid-board clue-board">
+  <div class="clue-trace" id="clue-trace" data-semantic-diagram="平面留下的印痕和物体移动的路径">
+    <svg viewBox="0 0 320 174" width="320" height="174" aria-hidden="true">
+      <g class="clue-tube">
+        <circle cx="105" cy="50" r="35"/><circle cx="215" cy="50" r="35"/>
+        <path d="M60 132h200m-18-15 18 15-18 15"/>
+      </g>
+      <g class="clue-cube">
+        <rect x="38" y="54" width="63" height="63" rx="3"/><rect x="128" y="54" width="63" height="63" rx="3"/><rect x="218" y="54" width="63" height="63" rx="3"/>
+        <path d="M69 136h181" stroke-dasharray="9 10"/>
+      </g>
+      <g class="clue-ball">
+        <path d="M161 127 66 54m2 22-2-22 23-2m72 75 97-74m-23 1 23-1-2 22"/>
+        <circle cx="161" cy="127" r="8"/>
+      </g>
+    </svg>
+  </div>
+  <div class="clue-reveal" id="clue-reveal" data-semantic-diagram="盖子打开后显示线索对应的立体模型">
+    <img id="clue-object" alt="藏起来的立体图形" hidden>
+    <div class="clue-lid" aria-hidden="true"><b></b></div>
+  </div>
+  <div id="clue-choices" class="solid-cards clue-choices">
+    <button type="button" class="solid-card" data-form="cube" aria-label="正方体模型"><img alt="" src="__IMG:model-cube__" data-form="cube"></button>
+    <button type="button" class="solid-card" data-form="box" aria-label="长方体模型"><img alt="" src="__IMG:model-box__" data-form="box"></button>
+    <button type="button" class="solid-card" data-form="ball" aria-label="球模型"><img alt="" src="__IMG:model-ball__" data-form="ball"></button>
+    <button type="button" class="solid-card" data-form="tube" aria-label="圆柱模型"><img alt="" src="__IMG:model-tube__" data-form="tube"></button>
+  </div>
+</div>

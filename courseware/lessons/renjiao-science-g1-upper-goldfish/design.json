@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "金鱼：小小观察员",
+  "canvas": [
+    1280,
+    720
+  ],
+  "pages": [
+    {
+      "id": "p03",
+      "mechanism": "顺序点击四种照片视窗，放大镜实移，观察条保存局部，两条金鱼迁移；白底花金鱼留给首次小检查作为新个体",
+      "targets": [
+        "#observe-photo",
+        "#observe-strip",
+        "#observe-whole",
+        "#observe-head",
+        "#observe-body",
+        "#observe-tail"
+      ],
+      "stateKeys": {
+        "demo": [
+          "whole",
+          "head",
+          "rest"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "只提醒有先后顺序，保持视窗不变",
+      "reset": "清空观察条、返回第一条鱼整体"
+    },
+    {
+      "id": "p05",
+      "mechanism": "拖动或点选局部照片，与整鱼口、鳍、尾位置对应；完成真实局部记录",
+      "targets": [
+        "#part-photo",
+        "#part-card",
+        "#part-record",
+        "#part-mouth",
+        "#part-fin",
+        "#part-tail"
+      ],
+      "stateKeys": {
+        "demo": [
+          "mouth"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "提醒比较形状，不给正确位置",
+      "reset": "清空记录，随机新局部顺序"
+    },
+    {
+      "id": "p08",
+      "mechanism": "先播放尾、鳍、躯干运动示意，再选择观察部位并拍照；留档后金鱼换位置。",
+      "targets": [
+        "#motion-tank",
+        "#motion-camera",
+        "#motion-parts",
+        "#motion-tail-choice",
+        "#motion-fin-choice",
+        "#motion-body-choice"
+      ],
+      "stateKeys": {
+        "demo": [
+          "tail",
+          "record-tail",
+          "fin"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "要求再观察变化，不高亮正确项",
+      "evidenceBoundary": "仅屏幕示意的选择记录，不能作为真实动物运动实验",
+      "reset": "清空部位记录和星星，回到第一段示意的待播放状态"
+    },
+    {
+      "id": "p10",
+      "mechanism": "取食照片、鳃部近景拖入对应的口或鳃观察镜头，图片归位形成记录",
+      "targets": [
+        "#life-source",
+        "#life-mouth",
+        "#life-gill"
+      ],
+      "stateKeys": {
+        "demo": [
+          "food",
+          "breath"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "提醒照片线索，不改变两个目标",
+      "evidenceBoundary": "鳃近景表示位置，不据照片声称测到了呼吸；照片必须准确显示鳃盖",
+      "reset": "清空两个镜头记录，重新洗牌"
+    },
+    {
+      "id": "p12",
+      "mechanism": "把拍缸、伸手入缸的动作场景改成安静在缸外观察，主场景图片发生变化",
+      "targets": [
+        "#care-scene",
+        "#care-choice-quiet",
+        "#care-record"
+      ],
+      "stateKeys": {
+        "demo": [
+          "quiet"
+        ],
+        "phase": [
+          "play"
+        ]
+      },
+      "firstMiss": "提醒观察手的动作，不突出正确项",
+      "reset": "返回拍缸情境，清空改进记录并重新洗牌"
+    }
+  ],
+  "quality": {
+    "images": "必须逐张检查正式图片的口、鳃、鳍部位语义；AI插图不可替代真实观察或精确鱼鳍计数",
+    "states": [
+      "初始态",
+      "教师示范态",
+      "首次错误提示态",
+      "答对与完成态",
+      "重玩复位"
+    ],
+    "assessment": "只记录屏幕操作与六题结果；真实口述、画鱼和实际观察标待观察"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "Where's the orange cat?",
+  "goals": [
+    "听辨并指认 orange/white/black cat。",
+    "听懂位置问句，区分 on the bed、under the bed、in the box。",
+    "听辨 eleven/twelve，逐一数出11和12个物体。",
+    "在找不到与确认位置两种情境中理解 I don't know、Yes, it is、No, it isn't。"
+  ],
+  "pages": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "goal": "进入原创寻猫场景，知道本课既找位置也数数量。"
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "game": "听老师读 an orange cat，在三只猫中指认，选中的猫实际移动到小地垫。教师用白猫演示，不示范正式题答案。"
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "goal": "用三张清楚的正式场景图片讲清 on the bed、under the bed、in the box；解释位置要相对物品判断。"
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "game": "教师先把黑猫放进打开的盒子，展示盒壁围住猫身，再交给孩子把橙猫放到床面。拖放和先点猫再点落点均可。"
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "game": "对照听 Where 和 How many，分别理解找位置与点数。每只猫只能计数一次并移到地垫；示范十只再加第十一、第十二只。"
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "goal": "用遮挡与揭示情境讲清不知道时回应；看到床下再判断 Yes/No；与大人口头练习，系统不声称会说。"
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "game": "听 Under the bed，把可移动猫安置在床下；配套 on/under/in 图片回顾。与p04分隔两页，复用拖动为了对比同一参照物的相反方位。"
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "game": "6题新排列和数量点图，不重复课上的猫数量或拖动实例；图片/点图选项、老师逐题读题、答案A/B/C各2次。"
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "goal": "回顾颜色、位置、数量问句、11/12与不知道/肯定否定回应，交代家庭口头观察。"
+    }
+  ],
+  "quizSkills": [
+    "english-colour-cat-listening",
+    "english-position-on-under-in",
+    "english-number-eleven-twelve"
+  ],
+  "quizOriginality": "颜色题改为black并改变排列。位置题选用独立新图，课堂演示是黑猫探出盒口，检查用橙猫在盒内。数字题用公共工具绘制独立圆点图，便于按实际图片逐个复核。",
+  "weeklyQuestionSources": [
+    "颜色+动物名词的听图辨认",
+    "where位置问句与on/under/in参照物",
+    "how many数量问句与eleven/twelve",
+    "不知道时表达与位置确认问答"
+  ],
+  "homePractice": [
+    "由大人摆放真实玩具并观察孩子的口头回应。",
+    "用11或12个安全小物件做听数指认；发音和完整口语仍待观察。"
+  ],
+  "evidenceBoundary": "本课选择与操作只证明当次听图辨认，真实发音、朗读和口语迁移待大人观察。",
+  "assetCorrections": [
+    {
+      "originalKey": "cat-white",
+      "originalSha256": "b13ba6ddb8e22b029aee07f3bde8e1d9025564091f2e82e1a65e8f44370bb022",
+      "replacementKey": "cat-white-v2",
+      "reason": "Visual inspection found an extra undesired kitten. The current G6 semantic-picture rule rejects this asset. Original asset and paid request/response are retained; replacement uses a distinct prompt and key."
+    },
+    {
+      "originalKey": "cat-black",
+      "originalSha256": "206f1e448dcb33929236da728fb869d03d5869ee6cfb7682e1efabf86ef9b2ae",
+      "replacementKey": "cat-black-v2",
+      "reason": "Visual inspection found an extra undesired kitten. The current G6 semantic-picture rule rejects this asset. Original asset and paid request/response are retained; replacement uses a distinct prompt and key."
+    },
+    {
+      "originalKey": "empty-box",
+      "originalSha256": "cab97d8a280f5ad6f1f5ded41c422747f3bb450ee93e223d690e5a2476796aa5",
+      "replacementKey": "empty-box-v2",
+      "reason": "Visual inspection found an extra undesired kitten. The current G6 semantic-picture rule rejects this asset. Original asset and paid request/response are retained; replacement uses a distinct prompt and key."
+    },
+    {
+      "originalKey": "on-box",
+      "originalSha256": "5c02459f5a9cd43ee32b2b8c91fcd7215f96d5d365e498f681462d4c632b6e12",
+      "replacementKey": "on-box-v2",
+      "reason": "Visual inspection found an extra undesired kitten. The current G6 semantic-picture rule rejects this asset. Original asset and paid request/response are retained; replacement uses a distinct prompt and key."
+    },
+    {
+      "originalKey": "quiz-under-bed",
+      "originalSha256": "7a5e0d90b5c59d39e78b8eae6517a2d2c30d31e52d633ee11f9e45ee450aee1c",
+      "replacementKey": "quiz-under-bed-v2",
+      "reason": "Visual inspection found an extra undesired kitten. The current G6 semantic-picture rule rejects this asset. Original asset and paid request/response are retained; replacement uses a distinct prompt and key."
+    }
+  ]
+}

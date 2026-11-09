@@ -1,0 +1,963 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 This is our teacher.",
+  "description": "跟 Mia 老师参观学校，听懂介绍，指认校园里的人和物，再试着向家人介绍。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#347A6D",
+      "persona": "亲切、清晰的英语老师，先用图片示范，再引导孩子听、指、说。"
+    }
+  },
+  "images": {
+    "school": {
+      "file": "assets/school.png"
+    },
+    "classroom": {
+      "file": "assets/classroom.png"
+    },
+    "teacher": {
+      "file": "assets/teacher.png"
+    },
+    "child": {
+      "file": "assets/child.png"
+    },
+    "solo-desk": {
+      "file": "assets/solo-desk.png"
+    },
+    "desk": {
+      "file": "assets/desk.png"
+    },
+    "chair": {
+      "file": "assets/chair.png"
+    },
+    "guest-door": {
+      "file": "assets/guest-door.png"
+    },
+    "greeting": {
+      "file": "assets/greeting.png"
+    },
+    "quiz-room": {
+      "file": "assets/quiz-room.png"
+    },
+    "quiz-school": {
+      "file": "assets/quiz-school.png"
+    },
+    "quiz-park": {
+      "file": "assets/quiz-park.png"
+    },
+    "quiz-teacher": {
+      "file": "assets/quiz-teacher.png"
+    },
+    "quiz-gardener": {
+      "file": "assets/quiz-gardener.png"
+    },
+    "quiz-child": {
+      "file": "assets/quiz-child.png"
+    },
+    "quiz-chair": {
+      "file": "assets/quiz-chair.png"
+    },
+    "quiz-desk": {
+      "file": "assets/quiz-desk.png"
+    },
+    "quiz-bookcase": {
+      "file": "assets/quiz-bookcase.png"
+    },
+    "quiz-own-desk": {
+      "file": "assets/quiz-own-desk.png"
+    },
+    "quiz-my-class": {
+      "file": "assets/quiz-my-class.png"
+    },
+    "quiz-our-class": {
+      "file": "assets/quiz-our-class.png"
+    },
+    "quiz-our-teacher": {
+      "file": "assets/quiz-our-teacher-v2.png"
+    },
+    "quiz-meet": {
+      "file": "assets/quiz-meet.png"
+    },
+    "quiz-read": {
+      "file": "assets/quiz-read.png"
+    },
+    "quiz-sleep": {
+      "file": "assets/quiz-sleep.png"
+    },
+    "group-photo": {
+      "file": "assets/group-photo.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "places",
+      "type": "slide",
+      "title": "走进我们的学校",
+      "template": "two-columns",
+      "data": {
+        "title": "走进我们的学校",
+        "left": {
+          "heading": "school",
+          "body": "This is our school."
+        },
+        "right": {
+          "heading": "classroom",
+          "body": "This is my classroom."
+        },
+        "left_picture": "school",
+        "right_picture": "classroom"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "同学们好！欢迎来到今天的校园开放日。"
+        },
+        {
+          "say": "小然带我们从校门看进去，那里有教学楼和操场。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看这个词。跟老师读，school。"
+        },
+        {
+          "say": "school 指我们一起上学的整个地方。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "This is our school."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再走进这间屋子。这里摆着桌椅，大家在这里上课。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "跟老师读，classroom。上课的房间就是教室。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "This is my classroom."
+        },
+        {
+          "say": "小然可以这样介绍自己上课的那一间教室。"
+        }
+      ]
+    },
+    {
+      "key": "find-places",
+      "type": "interactive",
+      "title": "把参观照片收进路线",
+      "page": "find-places",
+      "widgetType": "game",
+      "startImage": "school",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "choice": "school"
+          }
+        },
+        {
+          "say": "刚才我们参观了学校，现在要把照片收进参观册。"
+        },
+        {
+          "say": "照片会进这个空位，像放进小相框。"
+        },
+        {
+          "highlight": "#find-school"
+        },
+        {
+          "say": "听到 school，就找有校门和操场的那张照片。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "choice": "classroom"
+          }
+        },
+        {
+          "say": "再看另一张。画的是里面摆着桌椅的房间。"
+        },
+        {
+          "highlight": "#find-classroom"
+        },
+        {
+          "say": "听到 classroom，就找大家上课的这间屋子。"
+        },
+        {
+          "say": "现在仔细听，点对的照片会进参观册。"
+        },
+        {
+          "say": "Classroom."
+        },
+        {
+          "say": "School."
+        },
+        {
+          "say": "点声音按钮可以把这一轮再听一次。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "people",
+      "type": "slide",
+      "title": "给客人介绍身边的人",
+      "template": "two-columns",
+      "data": {
+        "title": "给客人介绍身边的人",
+        "left": {
+          "heading": "teacher",
+          "body": "This is our teacher."
+        },
+        "right": {
+          "heading": "child",
+          "body": "This is a child."
+        },
+        "left_picture": "teacher",
+        "right_picture": "child"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "开放日来了客人。我们学着介绍身边的人。"
+        },
+        {
+          "say": "小然伸手请客人看给孩子们上课的这位大人。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "我们把这样的老师叫作 teacher。"
+        },
+        {
+          "say": "This is a teacher."
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "向客人介绍班上的老师，还可以这样说。"
+        },
+        {
+          "say": "This is our teacher."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看背书包来上课的这位。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "这个小朋友叫 child。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "This is a child."
+        },
+        {
+          "say": "先说 This is，再说是谁，客人就知道你介绍谁。"
+        }
+      ]
+    },
+    {
+      "key": "check-places",
+      "type": "quiz",
+      "title": "听一听，找地方和人",
+      "intro": [
+        "仔细听，然后点你选的图片。",
+        "两题都选好，再点提交。"
+      ],
+      "questions": [
+        {
+          "id": "place-school",
+          "question": "School. 请选对应的画。",
+          "skill": "听辨 school 和 classroom",
+          "answer": [
+            "B"
+          ],
+          "analysis": "校园图里能看到教学楼和操场。classroom 是校内上课的一间屋子。",
+          "options": {
+            "A": {
+              "label": "一间教室",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-room",
+                "alt": "一间教室"
+              }
+            },
+            "B": {
+              "label": "从校门看整所学校",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-school",
+                "alt": "从校门看整所学校"
+              }
+            },
+            "C": {
+              "label": "有长椅与树木的公园",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-park",
+                "alt": "有长椅与树木的公园"
+              }
+            }
+          }
+        },
+        {
+          "id": "role-teacher",
+          "question": "Teacher. 请选对应的人物。",
+          "skill": "听辨 teacher 和 child",
+          "answer": [
+            "C"
+          ],
+          "analysis": "黑板前拿着书、正在讲课的人是 teacher。背书包上学的小朋友是 child。",
+          "options": {
+            "A": {
+              "label": "背着书包上学的孩子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-child",
+                "alt": "背着书包上学的孩子"
+              }
+            },
+            "B": {
+              "label": "照料花圃的园丁",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-gardener",
+                "alt": "照料花圃的园丁"
+              }
+            },
+            "C": {
+              "label": "在黑板前上课的老师",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-teacher",
+                "alt": "在黑板前上课的老师"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "perspective",
+      "type": "slide",
+      "title": "从谁的角度介绍",
+      "template": "two-columns",
+      "data": {
+        "title": "从谁的角度介绍",
+        "left": {
+          "heading": "my",
+          "body": "从我自己说起"
+        },
+        "right": {
+          "heading": "our",
+          "body": "把我和大家放在一起"
+        },
+        "left_picture": "solo-desk",
+        "right_picture": "classroom"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "介绍东西时，要先想想从谁的角度说。"
+        },
+        {
+          "say": "先看左边。小然在介绍自己用的桌子。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "my 就是我的，从说话的我自己出发。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "This is my desk."
+        },
+        {
+          "say": "他在说自己用的桌子，所以用 my。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边。小然站在同学中间，介绍大家的教室。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "our 就是我们的，把说话的我和大家放在一起。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "This is our classroom."
+        },
+        {
+          "say": "小然一个人也能替同学们介绍。"
+        },
+        {
+          "say": "同一间教室，只说自己在哪上课，也能用 my。"
+        },
+        {
+          "say": "想想他是说自己，还是替大家说。"
+        }
+      ]
+    },
+    {
+      "key": "place-photos",
+      "type": "interactive",
+      "title": "送照片给介绍的人",
+      "page": "place-photos",
+      "widgetType": "game",
+      "startImage": "classroom",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "choice": "solo"
+          }
+        },
+        {
+          "say": "现在看两本相册。先看老师怎样送照片。"
+        },
+        {
+          "highlight": "#photo-one"
+        },
+        {
+          "say": "小然介绍自己在哪上课，说 my，照片进个人相册。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "choice": "group"
+          }
+        },
+        {
+          "say": "还是同一间教室。这次小然替大家介绍。"
+        },
+        {
+          "highlight": "#photo-group"
+        },
+        {
+          "say": "听到 our，照片就送到大家的相册。"
+        },
+        {
+          "say": "可以拖过去，也可以先点照片，再点人物。"
+        },
+        {
+          "say": "This is my classroom."
+        },
+        {
+          "say": "This is our classroom."
+        },
+        {
+          "say": "每轮先听，再把同一张照片送进对应的相册。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "furniture",
+      "type": "slide",
+      "title": "把桌和椅指给客人看",
+      "template": "two-columns",
+      "data": {
+        "title": "把桌和椅指给客人看",
+        "left": {
+          "heading": "desk",
+          "body": "This is my desk."
+        },
+        "right": {
+          "heading": "chair",
+          "body": "This is my chair."
+        },
+        "left_picture": "desk",
+        "right_picture": "chair"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "我们把教室里的桌子和椅子指给客人看。"
+        },
+        {
+          "say": "看这张桌子，平平的桌面上放着一个本子。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先跟我读，desk。我们用来学习的桌子叫 desk。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "This is my desk."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看旁边这把椅子。后面靠着的地方是椅背。"
+        },
+        {
+          "say": "下面平平的地方，可以坐。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "跟我读，chair。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "This is my chair."
+        },
+        {
+          "say": "边指边介绍，客人就知道你说的是哪一件。"
+        }
+      ]
+    },
+    {
+      "key": "build-seat",
+      "type": "interactive",
+      "title": "摆好小然的座位",
+      "page": "build-seat",
+      "widgetType": "game",
+      "startImage": "solo-desk",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "choice": "desk"
+          }
+        },
+        {
+          "say": "小然要给客人介绍学习角。我们帮他把座位摆好。"
+        },
+        {
+          "highlight": "#seat-desk"
+        },
+        {
+          "say": "看这张课桌。本子可以放在桌面上。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "choice": "chair"
+          }
+        },
+        {
+          "say": "接着看椅子。坐在它上面，就能在桌边学习。"
+        },
+        {
+          "highlight": "#seat-chair"
+        },
+        {
+          "say": "先听清句子最后的词，再点那件东西。"
+        },
+        {
+          "say": "点对以后，它会摆进小然的学习角。"
+        },
+        {
+          "say": "This is my chair."
+        },
+        {
+          "say": "This is my desk."
+        },
+        {
+          "say": "一轮听一件，看看桌和椅会怎么摆进去。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "check-things",
+      "type": "quiz",
+      "title": "听一听，找桌椅和介绍人",
+      "intro": [
+        "现在来做两个小挑战。",
+        "仔细听句子，再选一张图。"
+      ],
+      "questions": [
+        {
+          "id": "thing-chair",
+          "question": "This is my chair. 选这句话介绍的东西。",
+          "skill": "听辨 desk 和 chair",
+          "answer": [
+            "A"
+          ],
+          "analysis": "句子最后是 chair。带椅背、供人坐的是椅子。",
+          "options": {
+            "A": {
+              "label": "有靠背的一把椅子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-chair",
+                "alt": "有靠背的一把椅子"
+              }
+            },
+            "B": {
+              "label": "有抽屉的课桌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-desk",
+                "alt": "有抽屉的课桌"
+              }
+            },
+            "C": {
+              "label": "装书的书架",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-bookcase",
+                "alt": "装书的书架"
+              }
+            }
+          }
+        },
+        {
+          "id": "speaker-our",
+          "question": "拿合照替大家。摸胸口说自己。This is our classroom. 选图。",
+          "skill": "理解 my 和 our 的介绍视角",
+          "answer": [
+            "C"
+          ],
+          "analysis": "题里拿合照的孩子代表同学们介绍。这句用 our，把自己和同学们放在一起。",
+          "options": {
+            "A": {
+              "label": "一个孩子介绍自己用的课桌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-own-desk",
+                "alt": "一个孩子介绍自己用的课桌"
+              }
+            },
+            "B": {
+              "label": "一个小朋友指着自己介绍教室",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-my-class",
+                "alt": "一个小朋友把手放在自己胸前向来访者介绍教室"
+              }
+            },
+            "C": {
+              "label": "拿着班级合照的孩子代表同学介绍教室",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-our-class",
+                "alt": "拿着班级合照的孩子代表同学介绍教室"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "greeting",
+      "type": "slide",
+      "title": "见面时打个招呼",
+      "template": "picture-points",
+      "data": {
+        "title": "见面时打个招呼",
+        "picture": "greeting",
+        "points": [
+          "Nice to meet you.",
+          "Nice to meet you."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "客人和老师刚认识，面对面微笑。"
+        },
+        {
+          "say": "我们学一学，第一次见面怎么问好。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先听客人问候老师。"
+        },
+        {
+          "say": "Nice to meet you."
+        },
+        {
+          "say": "这句话的意思是，很高兴见到你。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "现在轮到老师。她也很高兴认识这位客人。"
+        },
+        {
+          "say": "Nice to meet you."
+        },
+        {
+          "say": "他们用同一句话互相问好。"
+        },
+        {
+          "say": "跟身边的人试一试。你先说，再听对方说。"
+        }
+      ]
+    },
+    {
+      "key": "welcome-guest",
+      "type": "interactive",
+      "title": "陪小然接待新客人",
+      "page": "welcome-guest",
+      "widgetType": "game",
+      "startImage": "guest-door",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "choice": "intro"
+          }
+        },
+        {
+          "say": "教室里来了新客人。我们一起帮小然接待他。"
+        },
+        {
+          "highlight": "#guest-frame"
+        },
+        {
+          "say": "先听小然介绍谁，再选这个人物。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "choice": "greeting"
+          }
+        },
+        {
+          "say": "接下来，两个人会面对面，向对方问好。"
+        },
+        {
+          "highlight": "#guest-action"
+        },
+        {
+          "say": "听到见面问候，就选两个人正在互相问好的画。"
+        },
+        {
+          "say": "This is our teacher."
+        },
+        {
+          "say": "Nice to meet you."
+        },
+        {
+          "say": "你可以跟着说，再换旁边的人回一句。"
+        },
+        {
+          "say": "漏听了哪个词，就点声音按钮再听一遍。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "check-meeting",
+      "type": "quiz",
+      "title": "听一听，接待新朋友",
+      "intro": [
+        "最后来听两个新场景。",
+        "听一句，找出最合适的画。"
+      ],
+      "questions": [
+        {
+          "id": "introduce-teacher",
+          "question": "This is our teacher. 选对应的介绍画面。",
+          "skill": "听懂介绍班级老师的句子",
+          "answer": [
+            "B"
+          ],
+          "analysis": "our teacher 是说话者和同学们的老师。图里孩子伸手介绍班上的音乐老师，老师在示范弹琴。",
+          "options": {
+            "A": {
+              "label": "一个孩子给人介绍个人课桌",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-own-desk",
+                "alt": "一个孩子给人介绍个人课桌"
+              }
+            },
+            "B": {
+              "label": "同学向来访者示意班级老师",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-our-teacher",
+                "alt": "同学向来访者示意班级老师"
+              }
+            },
+            "C": {
+              "label": "孩子自己走进校门",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-child",
+                "alt": "孩子自己走进校门"
+              }
+            }
+          }
+        },
+        {
+          "id": "greet-meeting",
+          "question": "新朋友初次见面。Nice to meet you. 选适合的画。",
+          "skill": "理解并选出见面问候情境",
+          "answer": [
+            "A"
+          ],
+          "analysis": "两位刚见面的人面对面互相问候，可以用这句表示很高兴认识对方。",
+          "options": {
+            "A": {
+              "label": "新伙伴见面时面对面微笑问候",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-meet",
+                "alt": "新伙伴见面时面对面微笑问候"
+              }
+            },
+            "B": {
+              "label": "孩子独自坐在角落看书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-read",
+                "alt": "孩子独自坐在角落看书"
+              }
+            },
+            "C": {
+              "label": "孩子已经在床上睡着",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-sleep",
+                "alt": "孩子已经在床上睡着"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "type": "slide",
+      "title": "把导览说给家人听",
+      "template": "summary",
+      "data": {
+        "title": "把导览说给家人听",
+        "items": [
+          "school / classroom",
+          "This is my desk.",
+          "This is our teacher.",
+          "Nice to meet you."
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "在开放日导览里，我们听出了两个地方。"
+        },
+        {
+          "say": "school 是整所学校，classroom 是上课的教室。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "介绍东西时，先说 This is。"
+        },
+        {
+          "say": "说自己用的课桌和椅子，可以加 my。"
+        },
+        {
+          "say": "This is my desk."
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "说班里的老师时，可以把自己和同学们都算进去。"
+        },
+        {
+          "say": "This is our teacher."
+        },
+        {
+          "say": "teacher 是老师，child 是小朋友。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "第一次见到新朋友时，我们可以轮流问好。"
+        },
+        {
+          "say": "Nice to meet you."
+        },
+        {
+          "say": "回家找一件自己用的东西，指给家人看。"
+        },
+        {
+          "say": "说一说这是什么，也请家人听一听。"
+        }
+      ]
+    }
+  ]
+}

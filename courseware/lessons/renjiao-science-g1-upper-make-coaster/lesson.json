@@ -1,0 +1,1129 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "制作杯垫：设计、试用与改进",
+  "description": "整合两个官方课时，从材料工具、多种画圆、纸杯垫制作到测试改进，再用粘毛器迁移工程流程；屏幕操作与真实制作证据分开。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "温和细心的科学女老师，引导先观察生活需要、提出设计、再测试改进；如实区分屏幕操作和真实制作。"
+    }
+  },
+  "images": {
+    "workshop": {
+      "file": "assets/workshop.png"
+    },
+    "trace-lid": {
+      "file": "assets/trace-lid.png"
+    },
+    "cut-circle": {
+      "file": "assets/cut-circle.png"
+    },
+    "decorate": {
+      "file": "assets/decorate.png"
+    },
+    "test": {
+      "file": "assets/test.png"
+    },
+    "lint-scene": {
+      "file": "assets/lint-scene.png"
+    },
+    "roller-design": {
+      "file": "assets/roller-design.png"
+    },
+    "paper": {
+      "file": "assets/paper.png"
+    },
+    "scissors": {
+      "file": "assets/scissors.png"
+    },
+    "pencil": {
+      "file": "assets/pencil.png"
+    },
+    "string": {
+      "file": "assets/string.png"
+    },
+    "round-lid": {
+      "file": "assets/round-lid.png"
+    },
+    "spoon": {
+      "file": "assets/spoon.png"
+    },
+    "small-coaster": {
+      "file": "assets/small-coaster.png"
+    },
+    "wide-coaster": {
+      "file": "assets/wide-coaster.png"
+    },
+    "wet-coaster": {
+      "file": "assets/wet-coaster.png"
+    },
+    "thick-coaster": {
+      "file": "assets/thick-coaster.png"
+    },
+    "tube": {
+      "file": "assets/tube.png"
+    },
+    "tape": {
+      "file": "assets/tape.png"
+    },
+    "roller": {
+      "file": "assets/roller.png"
+    },
+    "clean-shirt": {
+      "file": "assets/clean-shirt.png"
+    },
+    "lint-shirt": {
+      "file": "assets/lint-shirt.png"
+    },
+    "compass": {
+      "file": "assets/compass.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "杯垫小工坊",
+      "template": "title-picture",
+      "data": {
+        "title": "杯垫小工坊",
+        "picture": "workshop",
+        "caption": "发现需要，动手设计，再试一试"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "空杯要放在桌上，我们给它设计一个小垫子。"
+        },
+        {
+          "say": "杯垫就在杯子下面，是一件生活小用品。"
+        },
+        {
+          "say": "做之前先想，它要给什么杯子使用。"
+        },
+        {
+          "say": "杯子大小不同，想做的垫子也可能不同。"
+        },
+        {
+          "say": "小满问：漂亮就算做好了吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "还要把杯子放上去，看看实际好不好用。"
+        },
+        {
+          "say": "发现不合适，就想办法改一改，再试一次。"
+        },
+        {
+          "say": "今天我们从需要出发，学着选择材料和工具。"
+        },
+        {
+          "say": "屏幕上先练方法，实物制作请大人陪着做。"
+        },
+        {
+          "say": "猫头鹰站长提醒：做好之后还要测试。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "材料和工具各有用",
+      "template": "picture-points",
+      "data": {
+        "title": "材料和工具各有用",
+        "picture": "workshop",
+        "points": [
+          "材料：被加工成作品",
+          "工具：帮助我们加工",
+          "先想任务，再选合适的物品"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "工作台上有纸、铅笔和剪刀，它们做的事不同。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "纸会变成杯垫的身体，这次它是材料。"
+        },
+        {
+          "say": "用纸做垫子，纸会被画上圆，再被剪下来。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "铅笔帮我们留下圆线，剪刀帮我们裁剪。"
+        },
+        {
+          "say": "它们帮助加工，这次我们把它们叫作工具。"
+        },
+        {
+          "say": "朵朵说：要看它在这次任务里做什么。",
+          "by": "duoduo"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "材料和工具要按任务来选，不是全部拿来。"
+        },
+        {
+          "say": "想做纸杯垫，就先准备纸和画剪用的工具。"
+        },
+        {
+          "say": "汤勺能舀东西，这次画剪纸用不上它。"
+        },
+        {
+          "say": "纸、纸板等材料可以试一试，之后还要测试。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "整理工作台",
+      "page": "p03",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#supply-bench"
+        },
+        {
+          "say": "先把要用的物品送到工作台，不把东西全拿走。"
+        },
+        {
+          "highlight": "#supply-paper"
+        },
+        {
+          "say": "老师先选纸，因为这次要把纸加工成杯垫。"
+        },
+        {
+          "setState": {
+            "demo": "paper"
+          }
+        },
+        {
+          "say": "纸到了台面，它是这次制作的材料。"
+        },
+        {
+          "highlight": "#supply-pencil"
+        },
+        {
+          "say": "要留下清楚的圆线，还需要能画线的工具。"
+        },
+        {
+          "say": "铅笔画好线后，剪刀才知道沿哪里剪。"
+        },
+        {
+          "highlight": "#supply-scissors"
+        },
+        {
+          "say": "剪刀用来裁剪，真实使用要有大人在旁指导。"
+        },
+        {
+          "say": "绳和圆盖可以帮助画圆，后面再比较方法。"
+        },
+        {
+          "say": "这轮只收好纸、铅笔和安全剪刀三样。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "把物品拖到台面，也可以点物品放进去。"
+        },
+        {
+          "say": "选错可以再想，屏幕练习不代表会用剪刀。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "画圆有不同办法",
+      "template": "picture-points",
+      "data": {
+        "title": "画圆有不同办法",
+        "picture": "round-lid",
+        "points": [
+          "圆形物品：沿边描一圈",
+          "简易工具：组合笔，或用笔和绳",
+          "改变物品或工具，画不同大小的圆"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看圆盖的边，画圆时用一只手按稳它。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "另一只手让铅笔贴着圆边，绕回开始的地方。"
+        },
+        {
+          "say": "圆形的盖子或盘子，可以帮助我们描圆。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "也可以把笔组合起来，做一个简易画圆工具。"
+        },
+        {
+          "say": "还可以用绳连接固定点和笔，帮助笔绕一圈。"
+        },
+        {
+          "say": "小满问：只会画一样大的圆吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "换大小不同的圆物品，就能描出不同的圆。"
+        },
+        {
+          "say": "用笔和绳时，改变固定点到笔的距离。"
+        },
+        {
+          "say": "距离保持不变，绕一圈；距离变大，圆也变大。"
+        },
+        {
+          "say": "画圆办法不止一种，圆规也是画圆工具。"
+        },
+        {
+          "say": "真实组装和试画，请大人指导，不拿笔尖打闹。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "让笔绕一圈",
+      "page": "p05",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "highlight": "#circle-center"
+        },
+        {
+          "say": "这块画圆板，用一点代替被按住的绳头。"
+        },
+        {
+          "say": "先固定这一点，再让笔沿着拉直的绳绕行。"
+        },
+        {
+          "setState": {
+            "demo": "small"
+          }
+        },
+        {
+          "say": "老师先用短一点的绳，笔离固定点比较近。"
+        },
+        {
+          "highlight": "#circle-line"
+        },
+        {
+          "say": "转动时这段距离不变，笔就留下圆形轨迹。"
+        },
+        {
+          "setState": {
+            "demo": "large"
+          }
+        },
+        {
+          "say": "现在把绳放长，笔离固定点更远。"
+        },
+        {
+          "say": "再绕一圈，画出的圆就比刚才大。"
+        },
+        {
+          "highlight": "#circle-target"
+        },
+        {
+          "say": "轮到你，先看虚线圈要多大，再选合适距离。"
+        },
+        {
+          "say": "点中央固定点，再依次点亮圆周上的笔点。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "选的距离不合适，可以重新选，不会扣星。"
+        },
+        {
+          "say": "这里只检查画板操作，实物画圆请大人看看。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "画好再剪下来",
+      "template": "picture-points",
+      "data": {
+        "title": "画好再剪下来",
+        "picture": "cut-circle",
+        "points": [
+          "先设计大小，再画圆线",
+          "请大人指导，使用安全剪刀",
+          "沿线裁剪，再装饰作品"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "有了画圆办法，还要先想杯垫做多大。"
+        },
+        {
+          "say": "把杯底和计划的圆比一比，再决定画哪里。"
+        },
+        {
+          "say": "纸上的圆线，是我们裁剪时可以参照的线。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看老师的剪纸示范，握纸和剪纸各有一只手。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "做实物时，请大人指导，尽量使用安全剪刀。"
+        },
+        {
+          "say": "没有大人在旁，就先看屏幕，不自己拿剪刀。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "画完圆，再沿圆线慢慢剪，最后装饰。"
+        },
+        {
+          "say": "剪刀能帮我们把纸剪得比手撕更平整。"
+        },
+        {
+          "say": "朵朵说：工具让制作方便，也要正确使用。",
+          "by": "duoduo"
+        },
+        {
+          "say": "可以画喜欢的花纹，但装饰不能代替测试。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "作品慢慢成形",
+      "page": "p07",
+      "widgetType": "game",
+      "startImage": "decorate",
+      "script": [
+        {
+          "highlight": "#make-stage"
+        },
+        {
+          "say": "一张纸怎样变成杯垫？我们把制作过程排出来。"
+        },
+        {
+          "highlight": "#make-trace"
+        },
+        {
+          "say": "老师先放画圆这张图，圆线要先留在纸上。"
+        },
+        {
+          "setState": {
+            "demo": "trace"
+          }
+        },
+        {
+          "say": "如果还没画好就急着剪，就不容易按设计做。"
+        },
+        {
+          "highlight": "#make-cut"
+        },
+        {
+          "say": "有了线，再沿线剪下，纸才变成圆形的作品。"
+        },
+        {
+          "highlight": "#make-decorate"
+        },
+        {
+          "say": "剪好后可以装饰，然后再把空杯放上去试。"
+        },
+        {
+          "say": "每一步都有作用，装饰漂亮不等于好用。"
+        },
+        {
+          "say": "屏幕会把选中的过程放进长条，作品也会变化。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "请从画圆开始，把四幅图按制作顺序放上去。"
+        },
+        {
+          "say": "你可以拖图到长条，也可以点图选择。"
+        },
+        {
+          "say": "真实裁剪和装饰是否完成，仍请大人观察。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "换个任务试一试",
+      "intro": [
+        "现在换成新的制作任务，先听清要做什么。",
+        "看图比较工具和方法，再选一张图。",
+        "想到工具怎样帮忙，比记住位置更有用。"
+      ],
+      "questions": [
+        {
+          "id": "coaster-q1",
+          "question": "想把画好的小旗从纸上裁下来，哪件工具适合？",
+          "skill": "根据加工任务选择工具",
+          "answer": [
+            "A"
+          ],
+          "analysis": "剪刀能沿画好的线裁剪纸，铅笔画线，汤勺不用于裁剪。",
+          "options": {
+            "A": {
+              "label": "安全剪刀",
+              "visual": {
+                "kind": "asset",
+                "image": "scissors",
+                "alt": "安全剪刀"
+              }
+            },
+            "B": {
+              "label": "铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "铅笔"
+              }
+            },
+            "C": {
+              "label": "汤勺",
+              "visual": {
+                "kind": "asset",
+                "image": "spoon",
+                "alt": "汤勺"
+              }
+            }
+          }
+        },
+        {
+          "id": "coaster-q2",
+          "question": "想为纸徽章沿一个现成的圆边描线，选哪件物品？",
+          "skill": "利用圆形物品描圆",
+          "answer": [
+            "C"
+          ],
+          "analysis": "圆盖的完整圆边适合描圆；铅笔和这张纸片都没有一圈完整的圆边。",
+          "options": {
+            "A": {
+              "label": "铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "铅笔"
+              }
+            },
+            "B": {
+              "label": "手工纸",
+              "visual": {
+                "kind": "asset",
+                "image": "paper",
+                "alt": "有四个角的绿色手工纸"
+              }
+            },
+            "C": {
+              "label": "圆盖",
+              "visual": {
+                "kind": "asset",
+                "image": "round-lid",
+                "alt": "圆盖"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "试过才知道哪里改",
+      "template": "two-columns",
+      "data": {
+        "title": "试过才知道哪里改",
+        "left": {
+          "heading": "观察结果",
+          "body": "大小、平整和试用后的变化"
+        },
+        "right": {
+          "heading": "按不足改进",
+          "body": "调整大小、增加厚度或换材料"
+        },
+        "left_picture": "wet-coaster",
+        "right_picture": "thick-coaster"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "作品做好后，先放空杯或常温水杯试一试。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "有的纸垫试用后起皱了，这是观察到的变化。"
+        },
+        {
+          "say": "还可以看看杯底能不能放下，纸垫是否平整。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "把好用的地方和不足都记下来，不只说好看。"
+        },
+        {
+          "say": "小满问：看到不足，是不是就失败了？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "不足能告诉我们下一步改哪里，是有用的线索。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "可以尝试增加纸的厚度，或者换一种材料。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "如果杯底放不下，就要调整大小，再试一次。"
+        },
+        {
+          "say": "改变以后还要测试，不能没试就说一定更好。"
+        },
+        {
+          "say": "不拿热水测试，也不把纸垫都当作防水隔热垫。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "杯底放得下吗",
+      "page": "p10",
+      "widgetType": "game",
+      "startImage": "test",
+      "script": [
+        {
+          "highlight": "#test-bench"
+        },
+        {
+          "say": "这次只检查大小，画板上的圆表示杯底。"
+        },
+        {
+          "say": "先让杯底落到垫子中央，再观察边缘的位置。"
+        },
+        {
+          "setState": {
+            "demo": "small"
+          }
+        },
+        {
+          "say": "老师故意用小垫子，杯底有一圈留在外面。"
+        },
+        {
+          "highlight": "#test-overhang"
+        },
+        {
+          "say": "这说明大小不够，单加花纹解决不了问题。"
+        },
+        {
+          "setState": {
+            "demo": "fit"
+          }
+        },
+        {
+          "say": "把垫子做大一些，杯底能完整放在垫子里。"
+        },
+        {
+          "highlight": "#test-sizes"
+        },
+        {
+          "say": "轮到你，为新的杯底选一个放得下的圆垫。"
+        },
+        {
+          "say": "先选圆垫，再把杯底拖进去，或点中央试放。"
+        },
+        {
+          "say": "结果在画面上直接看，发现不足可以换大小。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "三轮杯底不同，每轮都要重新比较，不背位置。"
+        },
+        {
+          "say": "这只是大小模拟，实物的其他效果还要继续测试。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "工具从需要出发",
+      "template": "steps",
+      "data": {
+        "title": "工具从需要出发",
+        "steps": [
+          "明确任务",
+          "选择材料",
+          "画设计图",
+          "制作",
+          "测试与评价"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "回看小工坊，第一步不是拿工具，而是想任务。"
+        },
+        {
+          "say": "我们先知道要为杯子做垫子，才有设计方向。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "接着选材料，想想用什么加工成要做的作品。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "再画设计图，把形状和打算怎样做画出来。"
+        },
+        {
+          "spotlight": "step-4"
+        },
+        {
+          "say": "有了设计，用合适工具加工，慢慢把作品做成。"
+        },
+        {
+          "spotlight": "step-5"
+        },
+        {
+          "say": "做好后测试，记录优点不足，评价后再改进。"
+        },
+        {
+          "say": "改过还要试，试过才知道问题有没有解决。"
+        },
+        {
+          "say": "朵朵说：生活需要能让我们想到新的工具。",
+          "by": "duoduo"
+        },
+        {
+          "say": "人们发明和改进工具，让生产和生活更方便。"
+        },
+        {
+          "say": "下面换一个生活问题，也用这条路想一想。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "给粘毛问题画方案",
+      "template": "picture-points",
+      "data": {
+        "title": "给粘毛问题画方案",
+        "picture": "roller-design",
+        "points": [
+          "任务：把衣物上的毛清走",
+          "设计：纸筒和胶面怎样配合",
+          "制作后试用，再说优点和不足"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "衣物上粘着细毛，想清走它，这就是新任务。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "老师画了一个方案，让纸筒在支架上转动。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "把可粘的胶面安排在外面，接触衣物上的毛。"
+        },
+        {
+          "say": "纸筒帮助胶面滚动，手柄帮助我们握住工具。"
+        },
+        {
+          "say": "这只是一种方案，也可以想别的办法。"
+        },
+        {
+          "say": "小满问：画了方案，就算把衣服清干净了吗？",
+          "by": "xiaoman"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "还没有，做成以后要试用，看细毛能否被带走。"
+        },
+        {
+          "say": "也要看看转动是否方便，再说优点和不足。"
+        },
+        {
+          "say": "衣架、钳子等实物组装交给大人协助。"
+        },
+        {
+          "say": "屏幕只练方案和试用顺序，不证明实物效果。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "interactive",
+      "title": "组好再清毛",
+      "page": "p13",
+      "widgetType": "game",
+      "startImage": "lint-scene",
+      "script": [
+        {
+          "highlight": "#roller-work"
+        },
+        {
+          "say": "换到工具台，先想衣物有细毛，需要什么功能。"
+        },
+        {
+          "highlight": "#roller-tube"
+        },
+        {
+          "say": "老师先把纸筒放到支架上，它可以转动。"
+        },
+        {
+          "setState": {
+            "demo": "tube"
+          }
+        },
+        {
+          "say": "只有纸筒还不够，表面还要能粘住细毛。"
+        },
+        {
+          "highlight": "#roller-tape"
+        },
+        {
+          "say": "把胶面安排到纸筒外面，这是一种原创方案。"
+        },
+        {
+          "setState": {
+            "demo": "ready"
+          }
+        },
+        {
+          "say": "工具组好后，轻轻在试用衣物上滚动。"
+        },
+        {
+          "say": "每次试滚留下一段记录，真正效果请大人一起看。"
+        },
+        {
+          "highlight": "#roller-cloth"
+        },
+        {
+          "say": "轮到你，把纸筒和胶带送到工具台，再试用。"
+        },
+        {
+          "say": "点工具或拖工具到衣物，让滚筒走过几处。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "先组好再测试，不能只组装就宣布问题解决。"
+        },
+        {
+          "say": "实物清毛和转动效果，要请大人一起观察。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "quiz",
+      "title": "把办法带到新地方",
+      "intro": [
+        "再听两个新情境，想怎样解决问题。",
+        "先看使用结果，再比较图里的做法或工具。",
+        "选完听解析，想想这条办法还能用在哪儿。"
+      ],
+      "questions": [
+        {
+          "id": "coaster-q3",
+          "question": "给小花盆做的纸垫太薄，想试着增加厚度，选什么再试？",
+          "skill": "依据不足提出改进并再测试",
+          "answer": [
+            "B"
+          ],
+          "analysis": "选择较厚的圆垫，是增加厚度的尝试；改后还要测试，不能只凭外观宣布有效。",
+          "options": {
+            "A": {
+              "label": "薄纸",
+              "visual": {
+                "kind": "asset",
+                "image": "paper",
+                "alt": "薄纸"
+              }
+            },
+            "B": {
+              "label": "厚一些的圆垫",
+              "visual": {
+                "kind": "asset",
+                "image": "thick-coaster",
+                "alt": "侧面能看到厚度的圆垫"
+              }
+            },
+            "C": {
+              "label": "铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "pencil",
+                "alt": "铅笔"
+              }
+            }
+          }
+        },
+        {
+          "id": "coaster-q4",
+          "question": "布沙发粘了细毛，想试着把毛清走，哪件工具适合先试？",
+          "skill": "根据生活需要选择工具并测试",
+          "answer": [
+            "A"
+          ],
+          "analysis": "粘毛滚筒的胶面可用来尝试清走细毛，试用后仍要观察实际效果。",
+          "options": {
+            "A": {
+              "label": "粘毛滚筒",
+              "visual": {
+                "kind": "asset",
+                "image": "roller",
+                "alt": "粘毛滚筒"
+              }
+            },
+            "B": {
+              "label": "安全剪刀",
+              "visual": {
+                "kind": "asset",
+                "image": "scissors",
+                "alt": "安全剪刀"
+              }
+            },
+            "C": {
+              "label": "圆盖",
+              "visual": {
+                "kind": "asset",
+                "image": "round-lid",
+                "alt": "圆盖"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "把真实发现留下来",
+      "template": "picture-points",
+      "data": {
+        "title": "把真实发现留下来",
+        "picture": "workshop",
+        "points": [
+          "画一画：设计和改进的办法",
+          "说一说：工具怎样帮助制作",
+          "真实操作和效果，请大人观察"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "离开屏幕，可以和大人一起做一次小制作。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先画杯垫的设计，再把要用的物品画在旁边。"
+        },
+        {
+          "say": "做完后试一试，把发现的不足和改法也画下。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "给大人说一说，哪件工具帮你完成了哪一步。"
+        },
+        {
+          "say": "比如铅笔留下圆线，剪刀沿线把纸剪下来。"
+        },
+        {
+          "say": "再提出一个新问题，例如工具怎样更方便。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "手上真的怎样画、怎样剪，请大人看着记录。"
+        },
+        {
+          "say": "屏幕选对和拖对，只能说明完成了这些操作。"
+        },
+        {
+          "say": "不能凭点击就说会制作，没看到的先写待观察。"
+        },
+        {
+          "say": "猫头鹰站长提醒：把真实发现记下来。",
+          "by": "owl"
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "slide",
+      "title": "带着改进的眼光出发",
+      "template": "summary",
+      "data": {
+        "title": "带着改进的眼光出发",
+        "items": [
+          "按生活需要，选择材料和工具",
+          "圆物描边，或用简易工具画圆",
+          "画好再剪，用工具需要指导",
+          "测试看不足，改进以后再测试",
+          "先设计再制作，留下真实记录"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们从杯子放在哪里，走到了设计小工具。"
+        },
+        {
+          "say": "材料会成为作品，工具帮助我们加工。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "圆形物品能帮助描边，也能组合简易画圆工具。"
+        },
+        {
+          "say": "改变圆物品或固定点到笔的距离，圆会变大小。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "先设计和画线，再裁剪装饰，实物请大人指导。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "做完试一试，发现大小或材料不合适，就改进。"
+        },
+        {
+          "say": "改过再测试，不因为作品漂亮就宣布好用。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "粘毛器也从需要出发，先设计制作，再测试评价。"
+        },
+        {
+          "say": "朵朵说：工具让生活方便，我还想问新问题。",
+          "by": "duoduo"
+        },
+        {
+          "say": "真实画图、口述和操作表现，留给大人观察。"
+        },
+        {
+          "say": "猫头鹰站长提醒：发现需要，试着想办法。",
+          "by": "owl"
+        }
+      ]
+    }
+  ]
+}

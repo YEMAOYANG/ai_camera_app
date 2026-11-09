@@ -1,0 +1,948 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 What's this?",
+  "description": "外研社一年级上册 Module 6 Unit 1。先听问答、辨物拼图，再从说话人位置听辨远近。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "blue",
+      "persona": "先示范，再让孩子动手，用实物图片、位置变化和清晰的英语问答教辨物。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "reading-corner": {
+      "file": "assets/reading-corner.png"
+    },
+    "art-room": {
+      "file": "assets/art-room.png"
+    },
+    "object-schoolbag": {
+      "file": "assets/object-schoolbag.png"
+    },
+    "object-book": {
+      "file": "assets/object-book.png"
+    },
+    "object-pen": {
+      "file": "assets/object-pen.png"
+    },
+    "object-pencil": {
+      "file": "assets/object-pencil.png"
+    },
+    "object-ruler": {
+      "file": "assets/object-ruler.png"
+    },
+    "object-window": {
+      "file": "assets/object-window.png"
+    },
+    "object-door": {
+      "file": "assets/object-door.png"
+    },
+    "reveal-cat": {
+      "file": "assets/reveal-cat.png"
+    },
+    "reveal-panda": {
+      "file": "assets/reveal-panda.png"
+    },
+    "speaker-child": {
+      "file": "assets/speaker-child.png"
+    },
+    "partner-child": {
+      "file": "assets/partner-child.png"
+    },
+    "quiz-speaker-green": {
+      "file": "assets/quiz-speaker-green.png"
+    },
+    "quiz-speaker-brown": {
+      "file": "assets/quiz-speaker-brown.png"
+    },
+    "quiz-schoolbag": {
+      "file": "assets/quiz-schoolbag.png"
+    },
+    "quiz-book": {
+      "file": "assets/quiz-book.png"
+    },
+    "quiz-pen-green": {
+      "file": "assets/quiz-pen-green.png"
+    },
+    "quiz-pencil": {
+      "file": "assets/quiz-pencil.png"
+    },
+    "quiz-ruler-clear": {
+      "file": "assets/quiz-ruler-clear.png"
+    },
+    "quiz-ruler-odd": {
+      "file": "assets/quiz-ruler-odd.png"
+    },
+    "quiz-window": {
+      "file": "assets/quiz-window.png"
+    },
+    "quiz-door": {
+      "file": "assets/quiz-door.png"
+    },
+    "quiz-pen-purple": {
+      "file": "assets/quiz-pen-purple.png"
+    },
+    "quiz-ruler-revealed": {
+      "file": "assets/quiz-ruler-revealed.png"
+    },
+    "quiz-this-room": {
+      "file": "assets/quiz-this-room.png"
+    },
+    "quiz-that-room": {
+      "file": "assets/quiz-that-room.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "picture-reveal",
+      "title": "图画还差一点",
+      "type": "interactive",
+      "widgetType": "game",
+      "page": "object-stage",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "peek"
+          }
+        },
+        {
+          "say": "今天我们来做一个猜动物的游戏。"
+        },
+        {
+          "say": "我看到两个圆角，可是图还遮着。"
+        },
+        {
+          "say": "What's this?"
+        },
+        {
+          "say": "先别急，看到一点点，可以先猜。"
+        },
+        {
+          "setState": {
+            "demo": "guess"
+          }
+        },
+        {
+          "say": "What's this? It's a panda."
+        },
+        {
+          "say": "我先放一张熊猫图。现在只算猜测。"
+        },
+        {
+          "setState": {
+            "demo": "uncover"
+          }
+        },
+        {
+          "say": "拉开遮片，再看一看全图。"
+        },
+        {
+          "say": "三角形的耳朵和长尾巴都露出来了。"
+        },
+        {
+          "setState": {
+            "demo": "revise"
+          }
+        },
+        {
+          "say": "What's this? It's a cat."
+        },
+        {
+          "say": "原来是小猫，我把熊猫图换成猫图。"
+        },
+        {
+          "say": "看清了再确认，换答案也是学会了。"
+        },
+        {
+          "say": "轮到你，先放一张图，再点遮片。"
+        },
+        {
+          "say": "看清完整的样子，再留着或换一张。"
+        },
+        {
+          "say": "先看看耳朵和尾巴。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "schoolbag-items",
+      "title": "书包里有什么",
+      "type": "interactive",
+      "widgetType": "game",
+      "page": "object-stage",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "bag"
+          }
+        },
+        {
+          "say": "我们到阅读角整理学具。"
+        },
+        {
+          "say": "先看老师指着的这一件。"
+        },
+        {
+          "say": "What's this? It's a schoolbag."
+        },
+        {
+          "say": "It's my schoolbag."
+        },
+        {
+          "say": "书包主人说 my，意思是他自己的书包。"
+        },
+        {
+          "setState": {
+            "demo": "book"
+          }
+        },
+        {
+          "say": "What's this? It's a book."
+        },
+        {
+          "say": "书合起来了，还能看见一层层纸页。"
+        },
+        {
+          "setState": {
+            "demo": "pen"
+          }
+        },
+        {
+          "say": "What's this? It's a pen."
+        },
+        {
+          "say": "这里是钢笔，前面有墨水笔尖。"
+        },
+        {
+          "setState": {
+            "demo": "pencil"
+          }
+        },
+        {
+          "say": "What's this? It's a pencil."
+        },
+        {
+          "say": "铅笔削过，尖尖旁边露出一圈木头。"
+        },
+        {
+          "say": "两支笔都有尖头，留意尖头周围。"
+        },
+        {
+          "setState": {
+            "demo": "ruler"
+          }
+        },
+        {
+          "say": "What's this? It's a ruler."
+        },
+        {
+          "say": "它长长直直，边上有一排小刻线。"
+        },
+        {
+          "setState": {
+            "demo": "sort"
+          }
+        },
+        {
+          "say": "我把书拖到能放进书的地方。"
+        },
+        {
+          "say": "每样学具都有自己的位置。"
+        },
+        {
+          "say": "轮到你，先归位，再点喇叭听题。"
+        },
+        {
+          "say": "学具会换位置，听完再选一张图。"
+        },
+        {
+          "say": "再看看形状，试一试。"
+        },
+        {
+          "say": "再听一次，留意最后一个词。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "puzzle-listen",
+      "title": "拼好再来问",
+      "type": "interactive",
+      "widgetType": "game",
+      "page": "object-stage",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "seam"
+          }
+        },
+        {
+          "say": "先看空槽，再看两张放大的局部。"
+        },
+        {
+          "say": "我顺着空槽边，看缺的那一段。"
+        },
+        {
+          "setState": {
+            "demo": "piece"
+          }
+        },
+        {
+          "say": "这一片边上有个弯，跟空槽合得上。"
+        },
+        {
+          "say": "拖到别处拼不住，得放到缺口里。"
+        },
+        {
+          "setState": {
+            "demo": "pen-complete"
+          }
+        },
+        {
+          "say": "放进缺口，钢笔的图就完整了。"
+        },
+        {
+          "say": "What's this? It's a pen."
+        },
+        {
+          "setState": {
+            "demo": "bag-complete"
+          }
+        },
+        {
+          "say": "换一幅图。书包的肩带接起来了。"
+        },
+        {
+          "say": "What's this? It's a schoolbag."
+        },
+        {
+          "say": "轮到你，先看边，再把一片送进缺口。"
+        },
+        {
+          "say": "没接上，就换一片，或者换个位置。"
+        },
+        {
+          "say": "两幅都拼好后，再听问答。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "speaker-position",
+      "title": "跟着说话人看",
+      "type": "interactive",
+      "widgetType": "game",
+      "page": "object-stage",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "speaker"
+          }
+        },
+        {
+          "say": "我们在美术室看看谁在说话。"
+        },
+        {
+          "say": "两张图先站定，我们跟着小朋友看。"
+        },
+        {
+          "setState": {
+            "demo": "near"
+          }
+        },
+        {
+          "say": "What's this? It's a window."
+        },
+        {
+          "say": "问 this 时，看说话人身边的窗。"
+        },
+        {
+          "setState": {
+            "demo": "far"
+          }
+        },
+        {
+          "say": "What's that? It's a door."
+        },
+        {
+          "say": "问 that 时，看离说话人稍远的门。"
+        },
+        {
+          "setState": {
+            "demo": "swap"
+          }
+        },
+        {
+          "say": "窗和门都没动，说话的小朋友换边。"
+        },
+        {
+          "say": "What's this? It's a door."
+        },
+        {
+          "say": "他现在站在门旁，this 就指到门。"
+        },
+        {
+          "say": "所以先找谁在说，再看哪件离他近。"
+        },
+        {
+          "say": "请你先移小朋友，再听问题和选图。"
+        },
+        {
+          "say": "What's this?"
+        },
+        {
+          "say": "What's that?"
+        },
+        {
+          "say": "先找说话的小朋友在哪边。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "take-turns",
+      "title": "这一次轮到你问",
+      "type": "interactive",
+      "widgetType": "game",
+      "page": "object-stage",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": "left"
+          }
+        },
+        {
+          "say": "两个小朋友来问答。拿到卡的先问。"
+        },
+        {
+          "say": "What's this? It's a pen."
+        },
+        {
+          "say": "我指着钢笔问，伙伴说完整的答句。"
+        },
+        {
+          "setState": {
+            "demo": "right"
+          }
+        },
+        {
+          "say": "我把卡给另一边，他就成了发问的人。"
+        },
+        {
+          "say": "What's this? It's a pencil."
+        },
+        {
+          "say": "问句一样，图变了，回答也要跟着变。"
+        },
+        {
+          "setState": {
+            "demo": "beat-pen"
+          }
+        },
+        {
+          "say": "看笔尖，一拍，听清钢笔。"
+        },
+        {
+          "say": "Pen. A pen. It’s a pen."
+        },
+        {
+          "setState": {
+            "demo": "beat-pencil"
+          }
+        },
+        {
+          "say": "看露出的木头，下一拍是铅笔。"
+        },
+        {
+          "say": "Pencil. A pencil. It’s a pencil."
+        },
+        {
+          "setState": {
+            "demo": "new-object"
+          }
+        },
+        {
+          "say": "What's this? It's a ruler."
+        },
+        {
+          "say": "换了尺，还可以用刚才的办法问和答。"
+        },
+        {
+          "say": "请把实物卡交给伙伴，再来一次。"
+        },
+        {
+          "say": "先看卡在谁手里，再传给另一位。"
+        },
+        {
+          "say": "你说得怎样，请身边的大人听一听。"
+        },
+        {
+          "setState": {
+            "ready": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "transfer-quiz",
+      "title": "听一听，选一张",
+      "type": "quiz",
+      "intro": [
+        "看新图，先听问答，再点一张图。",
+        "没听清，可以再点小喇叭。"
+      ],
+      "questions": [
+        {
+          "id": "q-pen",
+          "question": "What's this? It's a pen.",
+          "skill": "听音认钢笔",
+          "analysis": "pen 是钢笔。绿钢笔前端露着金属墨水笔尖。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "蓝铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil",
+                "alt": "蓝铅笔"
+              }
+            },
+            "B": {
+              "label": "绿钢笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pen-green",
+                "alt": "绿钢笔"
+              }
+            },
+            "C": {
+              "label": "透明尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ruler-clear",
+                "alt": "透明尺"
+              }
+            },
+            "D": {
+              "label": "橘封面的书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book",
+                "alt": "橘封面的书"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-pencil",
+          "question": "What's this? It's a pencil.",
+          "skill": "听音认铅笔",
+          "analysis": "pencil 是铅笔。蓝铅笔尖旁边能看见削出的木头。",
+          "answer": [
+            "D"
+          ],
+          "options": {
+            "A": {
+              "label": "紫钢笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pen-purple",
+                "alt": "紫钢笔"
+              }
+            },
+            "B": {
+              "label": "灰绿色尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ruler-odd",
+                "alt": "灰绿色尺"
+              }
+            },
+            "C": {
+              "label": "青色书包",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-schoolbag",
+                "alt": "青色书包"
+              }
+            },
+            "D": {
+              "label": "蓝铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil",
+                "alt": "蓝铅笔"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-schoolbag",
+          "question": "What's this? It's a schoolbag.",
+          "skill": "听音认书包",
+          "analysis": "schoolbag 是书包。青色书包能看见两条背带。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "橘封面的书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book",
+                "alt": "橘封面的书"
+              }
+            },
+            "B": {
+              "label": "蓝铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil",
+                "alt": "蓝铅笔"
+              }
+            },
+            "C": {
+              "label": "青色书包",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-schoolbag",
+                "alt": "青色书包"
+              }
+            },
+            "D": {
+              "label": "透明尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ruler-clear",
+                "alt": "透明尺"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-book",
+          "question": "What's this? It's a book.",
+          "skill": "听音认书",
+          "analysis": "book 是书。橘封面下面有整齐的纸页。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "橘封面的书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book",
+                "alt": "橘封面的书"
+              }
+            },
+            "B": {
+              "label": "灰绿色尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ruler-odd",
+                "alt": "灰绿色尺"
+              }
+            },
+            "C": {
+              "label": "绿钢笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pen-green",
+                "alt": "绿钢笔"
+              }
+            },
+            "D": {
+              "label": "青色书包",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-schoolbag",
+                "alt": "青色书包"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-ruler",
+          "question": "What's this? It's a ruler.",
+          "skill": "听音认尺",
+          "analysis": "ruler 是尺。透明尺的直边旁有短短的刻线。",
+          "answer": [
+            "D"
+          ],
+          "options": {
+            "A": {
+              "label": "紫钢笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pen-purple",
+                "alt": "紫钢笔"
+              }
+            },
+            "B": {
+              "label": "青色书包",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-schoolbag",
+                "alt": "青色书包"
+              }
+            },
+            "C": {
+              "label": "蓝铅笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pencil",
+                "alt": "蓝铅笔"
+              }
+            },
+            "D": {
+              "label": "透明尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ruler-clear",
+                "alt": "透明尺"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-whole",
+          "question": "看展开后的图。哪一张也是这样？",
+          "skill": "看全线索核对猜测",
+          "analysis": "折页展开后，能看见完整直边和一排刻线，选另一把同样有这些线索的尺。",
+          "answer": [
+            "C"
+          ],
+          "options": {
+            "A": {
+              "label": "绿钢笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-pen-green",
+                "alt": "绿钢笔"
+              }
+            },
+            "B": {
+              "label": "橘封面的书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book",
+                "alt": "橘封面的书"
+              }
+            },
+            "C": {
+              "label": "透明尺",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ruler-clear",
+                "alt": "透明尺"
+              }
+            },
+            "D": {
+              "label": "青色书包",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-schoolbag",
+                "alt": "青色书包"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-ruler-revealed",
+            "alt": "展开的折页，两侧灰纸分开，中间看得见一件长条物品"
+          }
+        },
+        {
+          "id": "q-this",
+          "question": "听绿衣小朋友问。What's this?",
+          "skill": "从说话人位置听辨 this",
+          "analysis": "绿衣小朋友站在书包旁。this 问的是离他近的书包。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "橘封面的书",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-book",
+                "alt": "橘封面的书"
+              }
+            },
+            "B": {
+              "label": "青色书包",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-schoolbag",
+                "alt": "青色书包"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-this-room",
+            "alt": "绿衣小朋友站在左侧。青色书包在他旁边，橘封面的书在右侧。"
+          }
+        },
+        {
+          "id": "q-that",
+          "question": "听小朋友问。What's that?",
+          "skill": "从说话人位置听辨 that",
+          "analysis": "红衣小朋友在右侧的玻璃窗旁，that 问的是离他稍远的门。",
+          "answer": [
+            "A"
+          ],
+          "options": {
+            "A": {
+              "label": "有把手的门",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-door",
+                "alt": "有把手的门"
+              }
+            },
+            "B": {
+              "label": "玻璃窗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-window",
+                "alt": "玻璃窗"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-that-room",
+            "alt": "红衣小朋友站在右侧窗边，门在左侧。"
+          }
+        },
+        {
+          "id": "q-window",
+          "question": "What's this? It's a window.",
+          "skill": "在新图里听懂辨物问答",
+          "analysis": "window 是窗户。这个窗框里有玻璃，门有单独的把手。",
+          "answer": [
+            "B"
+          ],
+          "options": {
+            "A": {
+              "label": "有把手的门",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-door",
+                "alt": "有把手的门"
+              }
+            },
+            "B": {
+              "label": "玻璃窗",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-window",
+                "alt": "玻璃窗"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "recap",
+      "title": "今天我会问什么",
+      "type": "slide",
+      "template": "picture-points",
+      "data": {
+        "title": "今天我会问什么",
+        "picture": "cover",
+        "points": [
+          "问一句，答完整",
+          "听声音，认学具",
+          "看全图，再核对",
+          "跟着说话人找远近"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "想知道指着的是什么，可以这样问。"
+        },
+        {
+          "say": "What's this? It's a book."
+        },
+        {
+          "say": "伙伴说出物品的名字，回答才完整。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "书包、书、钢笔、铅笔和尺都能这样问。"
+        },
+        {
+          "say": "钢笔看墨水笔尖，铅笔看削出的木头。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "只看到一点图时，可以先猜。"
+        },
+        {
+          "say": "看到全图，再用完整的线索核对。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "先找说话的人，再找他身边的东西。"
+        },
+        {
+          "say": "What's that? It's a door."
+        },
+        {
+          "say": "听到 that，要看离说话人稍远的地方。"
+        },
+        {
+          "say": "回家和大人各拿一样学具，轮流问答。"
+        },
+        {
+          "say": "换过位置，再请大人听一听你的回答。"
+        }
+      ]
+    }
+  ]
+}

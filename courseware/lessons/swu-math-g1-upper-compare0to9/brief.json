@@ -1,0 +1,518 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": {
+    "slug": "swu-math-g1-upper-compare0to9",
+    "editionId": "smartedu-math-six-year-g1-upper-3e6eb324",
+    "revisionId": "directory-2afc775be6bf98e9828f0115",
+    "nodeId": "7acb3d69-bd7b-4b90-b0c1-09d621594fce",
+    "unitId": "78fd8d21-1807-4bf4-ba13-d96f6c69146f",
+    "unitTitle": "第一单元 0-9的认识",
+    "lessonTitle": "比较",
+    "gradeCode": "primary_1",
+    "subject": "math",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "classHour": "integrated_all",
+    "teachingRevision": "1",
+    "classHours": [
+      "lesson_1"
+    ],
+    "printedPages": [
+      22,
+      23
+    ],
+    "pdfPages": [
+      27,
+      28
+    ]
+  },
+  "goals": [
+    "观察物件的数量。用一组一个与另一组一个配成一对，用两组的剩余情况判断同样多、多或少。",
+    "从左到右读出比较式。知道同样多用等号，开口朝较大数、尖端朝较小数；比较的左右位置互换时选对反向符号。",
+    "在田字格左半格识别和区分三种符号范形，明白等号有两条等长的横线，不等号由相接的两条斜线组成。",
+    "配完对数剩余。用同一个剩余件数分别说一组比另一组多几个、另一组少几个。",
+    "用空托盘对应0，比较0和非零数字以及两个0。",
+    "根据同样多、多或少的口头要求挑选或放入物件，能用配对检查所做的选择。",
+    "用三组有序的数量图验证两次同向比较，说明首尾两数的大小并按关系补一个数。"
+  ],
+  "goalMap": [
+    {
+      "id": "match_sets",
+      "goal": "观察物件的数量。用一组一个与另一组一个配成一对，用两组的剩余情况判断同样多、多或少。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "read_relations",
+      "goal": "从左到右读出比较式。知道同样多用等号，开口朝较大数、尖端朝较小数；比较的左右位置互换时选对反向符号。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "sign_shapes",
+      "goal": "在田字格左半格识别和区分三种符号范形，明白等号有两条等长的横线，不等号由相接的两条斜线组成。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "count_extras",
+      "goal": "配完对数剩余。用同一个剩余件数分别说一组比另一组多几个、另一组少几个。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "compare_zero",
+      "goal": "用空托盘对应0，比较0和非零数字以及两个0。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "choose_amount",
+      "goal": "根据同样多、多或少的口头要求挑选或放入物件，能用配对检查所做的选择。",
+      "officialHourId": "lesson_1"
+    },
+    {
+      "id": "chain_comparison",
+      "goal": "用三组有序的数量图验证两次同向比较，说明首尾两数的大小并按关系补一个数。",
+      "officialHourId": "lesson_1"
+    }
+  ],
+  "goalBasis": "官方唯一课时四类23页的逐页笔记。词语和符号关系、配对、零、画图、三个数的比较都有相应来源。",
+  "keyPoint": "用一一对应和剩余情况确定两组数量关系，能用比较词语和正确符号表达。",
+  "difficultPoint": "判断数量要核对每组实际件数及对应关系。互换位置后区分实际多少、式子从哪边开始读及符号方向。",
+  "pageSequence": [
+    {
+      "page": 1,
+      "key": "p01",
+      "type": "slide",
+      "title": "先看看这两组",
+      "play": "封面说清整理任务，再换成独立可计数的画面。老师边一对一连接边解释从两组各取一件，三对全配完。用相同件数、不同间距的摆法做检查。",
+      "goalIds": [
+        "match_sets"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "cover-art-station",
+        "paired-trays"
+      ]
+    },
+    {
+      "page": 2,
+      "key": "p02",
+      "type": "interactive",
+      "title": "配一配找同样多",
+      "play": "老师在示范组逐对点亮，指出两侧都没有剩余，再揭示等号，读完整比较式。孩子从多种图中挑一个同样多的托盘，让状态显示连接和等号。",
+      "goalIds": [
+        "match_sets",
+        "read_relations"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "paired-trays",
+        "relation-board"
+      ]
+    },
+    {
+      "page": 3,
+      "key": "p03",
+      "type": "slide",
+      "title": "换位置，换符号",
+      "play": "用左多右少的明确新例子。实际配对，指出左边余下几个。读左大于右，调换两组后指出同一批物件仍更多并读左小于右。分别说清两个方向下开口和尖端位置。",
+      "goalIds": [
+        "match_sets",
+        "read_relations"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "paired-trays",
+        "relation-board"
+      ]
+    },
+    {
+      "page": 4,
+      "key": "p04",
+      "type": "interactive",
+      "title": "把开口朝向大数",
+      "play": "老师演示看左右数量、选符号、核对宽口和尖端，逐步点亮。孩子在新例子里选择比较符号，符号真实落进中间位置并显示图的对应；同一对象组左右各练一次。",
+      "goalIds": [
+        "read_relations"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "paired-trays",
+        "relation-board"
+      ]
+    },
+    {
+      "page": 5,
+      "key": "p05",
+      "type": "slide",
+      "title": "田字格里的三个符号",
+      "play": "逐个点亮等号、大于号、小于号的范形。用观察形状和相接位置作辨认示范；提醒纸笔照范形试写请大人看。避免自创未经双源核实的固定笔顺。",
+      "goalIds": [
+        "sign_shapes",
+        "read_relations"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "sign-grid"
+      ]
+    },
+    {
+      "page": 6,
+      "key": "p06",
+      "type": "interactive",
+      "title": "配好，再数剩下的",
+      "play": "老师用较多与较少的新数量完成配对，真实余数标亮并数出。分别说谁比谁多几个及谁比谁少几个。孩子找出剩余件数，画面连接完已成对的并圈出未成对的。",
+      "goalIds": [
+        "count_extras",
+        "match_sets"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "paired-trays",
+        "extra-lane"
+      ]
+    },
+    {
+      "page": 7,
+      "key": "p07",
+      "type": "slide",
+      "title": "空托盘也能比较",
+      "play": "老师指空盘说明0，再指非空盘的可数件数。先比较空与非空，再比较两个空盘。读出具体比较式，解释看里面实际数量。",
+      "goalIds": [
+        "compare_zero",
+        "read_relations"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "empty-trays",
+        "relation-board"
+      ]
+    },
+    {
+      "page": 8,
+      "key": "p08",
+      "type": "interactive",
+      "title": "按要求放好一组",
+      "play": "老师照指定关系真实放入或取出物件，配对复查。演示一种合格的数量后，孩子以一个新数量关系挑托盘或放物件，所选状态真实改变。",
+      "goalIds": [
+        "choose_amount",
+        "match_sets"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "build-tray",
+        "paired-trays"
+      ]
+    },
+    {
+      "page": 9,
+      "key": "p09",
+      "type": "slide",
+      "title": "三个数接着比",
+      "play": "老师依次用具体三组筹码验证每次比较，再遮中间一组，用首尾实物核验推断。示范给定两端条件时在三个数之间补一个合适的数。只用0—9且不出现第几。",
+      "goalIds": [
+        "chain_comparison",
+        "read_relations"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "three-step-trays",
+        "relation-board"
+      ]
+    },
+    {
+      "page": 10,
+      "key": "p10",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "从新排列的图选择同样多的一组。",
+      "goalIds": [
+        "match_sets"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "paired-trays",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 11,
+      "key": "p11",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "给出两个以前未组合的非零数字及准确图，选择让完整比较式成立的符号图。",
+      "goalIds": [
+        "read_relations"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "relation-board",
+        "paired-trays",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 12,
+      "key": "p12",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "根据老师念出的符号名，从三张田字格范形图辨认指定符号。",
+      "goalIds": [
+        "sign_shapes"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "sign-grid",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 13,
+      "key": "p13",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "给出能看清配对关系的新数量图，从物件或点阵选项中选择未配对的件数。",
+      "goalIds": [
+        "count_extras"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "extra-lane",
+        "paired-trays",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 14,
+      "key": "p14",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "在新情境的三张完整比较图中选出符合所读关系的一张，至少有一边为空盘。",
+      "goalIds": [
+        "compare_zero"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "empty-trays",
+        "relation-board",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 15,
+      "key": "p15",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "依指定的新关系从不同数量的托盘中选一个满足条件的图，确保只有一个符合。",
+      "goalIds": [
+        "choose_amount"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "build-tray",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 16,
+      "key": "p16",
+      "type": "quiz",
+      "title": "试一试",
+      "play": "给出新的两端数量和符号图，从三张点阵选唯一可放进中间的数量卡。",
+      "goalIds": [
+        "chain_comparison"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "three-step-trays",
+        "relation-board",
+        "fresh-quiz-art"
+      ]
+    },
+    {
+      "page": 17,
+      "key": "p17",
+      "type": "slide",
+      "title": "今天怎样比",
+      "play": "老师用简图依次回顾配对、符号方向和田字格形状、数剩下、空托盘、按要求摆以及用三组数验证。每个回顾点先高亮后说出验证方法。邀请在家用实物比较和试写，表现留作成人观察。",
+      "goalIds": [
+        "match_sets",
+        "read_relations",
+        "sign_shapes",
+        "count_extras",
+        "compare_zero",
+        "choose_amount",
+        "chain_comparison"
+      ],
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "paired-trays",
+        "relation-board",
+        "sign-grid",
+        "empty-trays",
+        "three-step-trays"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1-match",
+      "page": 10,
+      "skill": "match_sets",
+      "target": "从新排列的图选择同样多的一组。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "paired-trays",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q2-sign",
+      "page": 11,
+      "skill": "read_relations",
+      "target": "给出两个以前未组合的非零数字及准确图，选择让完整比较式成立的符号图。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "relation-board",
+        "paired-trays",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q3-grid",
+      "page": 12,
+      "skill": "sign_shapes",
+      "target": "根据老师念出的符号名，从三张田字格范形图辨认指定符号。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "sign-grid",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q4-extras",
+      "page": 13,
+      "skill": "count_extras",
+      "target": "给出能看清配对关系的新数量图，从物件或点阵选项中选择未配对的件数。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "extra-lane",
+        "paired-trays",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q5-zero",
+      "page": 14,
+      "skill": "compare_zero",
+      "target": "在新情境的三张完整比较图中选出符合所读关系的一张，至少有一边为空盘。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "empty-trays",
+        "relation-board",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q6-build",
+      "page": 15,
+      "skill": "choose_amount",
+      "target": "依指定的新关系从不同数量的托盘中选一个满足条件的图，确保只有一个符合。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "build-tray",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    },
+    {
+      "id": "q7-chain",
+      "page": 16,
+      "skill": "chain_comparison",
+      "target": "给出新的两端数量和符号图，从三张点阵选唯一可放进中间的数量卡。",
+      "officialHourIds": [
+        "lesson_1"
+      ],
+      "visualRoles": [
+        "three-step-trays",
+        "relation-board",
+        "fresh-quiz-art"
+      ],
+      "formalQuestionAuthoredBy": "OpenMAIC/DeepSeek"
+    }
+  ],
+  "afterClass": {
+    "official": [
+      {
+        "classHourId": "lesson_1",
+        "sourcePageRefs": [
+          "lesson_1:1",
+          "lesson_1:2"
+        ],
+        "officialPurpose": [
+          "作业第1页确认相同版本，用5个方形和5个三角形巩固等量、用4只狗和5只猫练习互换读法，再比较0—9的数字。0作为空量参与不等和相等比较。",
+          "作业第2页要求按同样多、更多或更少添画；不等的添画有多种合格数量。提升部分从两次比较推断首尾数的关系，并在0—9内填写三个数的连续比较。"
+        ],
+        "originalPracticeDirection": "在家用两组积木做配对，交换比较顺序并读比较式；照田字格描写三种符号，请大人观察。给定口头关系时摆物并说明原因。"
+      }
+    ],
+    "weekly": "将七项目标、作业能力和已验收小检查的 skill 作为该课的每周变式题源。"
+  },
+  "assessmentBoundary": "记录作答证据。口述、独立纸笔书写和家庭摆放的掌握情况写待观察。",
+  "authoring": {
+    "status": "generation-brief",
+    "formalBodyProducer": "OpenMAIC/DeepSeek",
+    "pageSequenceIsGuidance": true,
+    "automaticImageGeneration": false,
+    "formalImageProducer": "Codex",
+    "questionsLockedBeforeGeneration": false
+  }
+}

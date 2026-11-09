@@ -1,0 +1,1077 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "秋天",
+  "description": "人教五四学制语文一年级上册。沿校园找秋景，听读课文词语，看雁阵变队形，观察自然段和田字格。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "温柔亲切的女老师，说话清楚有节奏，喜欢用图画和儿歌带孩子认字读诗；孩子答错时先让孩子再听一遍、再看一眼。"
+    }
+  },
+  "images": {
+    "blue-sky": {
+      "file": "assets/blue-sky.png"
+    },
+    "cool-path": {
+      "file": "assets/cool-path.png"
+    },
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "empty-tray": {
+      "file": "assets/empty-tray.png"
+    },
+    "flock-line": {
+      "file": "assets/flock-line.png"
+    },
+    "flock-scatter": {
+      "file": "assets/flock-scatter.png"
+    },
+    "flock-v": {
+      "file": "assets/flock-v.png"
+    },
+    "goose": {
+      "file": "assets/goose.png"
+    },
+    "leaf-fall": {
+      "file": "assets/leaf-fall.png"
+    },
+    "many-leaves": {
+      "file": "assets/many-leaves.png"
+    },
+    "one-tray": {
+      "file": "assets/one-tray.png"
+    },
+    "pace-diagram": {
+      "file": "assets/pace-diagram.png"
+    },
+    "paragraph-diagram": {
+      "file": "assets/paragraph-diagram.png"
+    },
+    "quiz-lake-autumn": {
+      "file": "assets/quiz-lake-autumn.png"
+    },
+    "quiz-lake-green": {
+      "file": "assets/quiz-lake-green.png"
+    },
+    "quiz-lake-snow": {
+      "file": "assets/quiz-lake-snow.png"
+    },
+    "quiz-layout-one": {
+      "file": "assets/quiz-layout-one.png"
+    },
+    "quiz-layout-three": {
+      "file": "assets/quiz-layout-three.png"
+    },
+    "quiz-layout-two": {
+      "file": "assets/quiz-layout-two.png"
+    },
+    "quiz-stroke-dot": {
+      "file": "assets/quiz-stroke-dot.png"
+    },
+    "quiz-stroke-flat": {
+      "file": "assets/quiz-stroke-flat.png"
+    },
+    "quiz-stroke-left": {
+      "file": "assets/quiz-stroke-left.png"
+    },
+    "quiz-tray-empty": {
+      "file": "assets/quiz-tray-empty.png"
+    },
+    "quiz-tray-many": {
+      "file": "assets/quiz-tray-many.png"
+    },
+    "quiz-tray-one": {
+      "file": "assets/quiz-tray-one.png"
+    },
+    "radical-diagram": {
+      "file": "assets/radical-diagram.png"
+    },
+    "stroke-da-ren": {
+      "file": "assets/stroke-da-ren.png"
+    },
+    "stroke-le-zi": {
+      "file": "assets/stroke-le-zi.png"
+    },
+    "tone-diagram": {
+      "file": "assets/tone-diagram.png"
+    },
+    "yellow-tree": {
+      "file": "assets/yellow-tree.png"
+    },
+    "sky-goose": {
+      "file": "assets/sky-goose.png"
+    },
+    "recap-triptych": {
+      "file": "assets/recap-triptych.png"
+    },
+    "fall-close": {
+      "file": "assets/fall-close.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "秋天寄来一封信",
+      "template": "picture-points",
+      "data": {
+        "title": "秋天寄来一封信",
+        "picture": "cover",
+        "points": [
+          "天气凉了",
+          "树叶黄了",
+          "叶子飘下来"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小语老师和你沿着校园的小路找秋天。"
+        },
+        {
+          "say": "课文叫秋天，我们来给秋天收几张照片。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "走出教室，风吹到手上，觉得有些凉。"
+        },
+        {
+          "say": "小邮差套上外衣，这张图让我们想到天气凉了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看头顶，银杏树上有一把把金黄的小扇子。"
+        },
+        {
+          "say": "那是变黄的银杏叶，黄是叶子的颜色。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "风吹过，叶子离开树枝，慢慢飘到地上。"
+        },
+        {
+          "say": "等会儿找这三种图，读课文时就能想起它们。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "把地面的秋信放回去",
+      "page": "autumn-ground",
+      "widgetType": "courseware",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#view-sleeve"
+        },
+        {
+          "say": "老师先把衣袖图放进信里，你看衣服盖住手臂。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "picture": 0
+          }
+        },
+        {
+          "say": "风吹着有些凉，外套让小邮差暖和些。"
+        },
+        {
+          "highlight": "#view-tree"
+        },
+        {
+          "say": "第二张图要看枝头，找还连着树枝的叶子。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "picture": 1
+          }
+        },
+        {
+          "say": "我把黄色树冠装进去，树上的叶子还没落。"
+        },
+        {
+          "highlight": "#view-fall"
+        },
+        {
+          "say": "最后这张有叶子离开枝头，飘在半空里。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "picture": 2
+          }
+        },
+        {
+          "say": "我放进第三张，你瞧，落叶还会落到路面。"
+        },
+        {
+          "say": "记住这三个线索，就能顺着图想起首段。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "轮到你了，听一条，选一张，装进信封。"
+        },
+        {
+          "say": "先找穿着外套的孩子。"
+        },
+        {
+          "say": "再找还长在枝头的黄叶。"
+        },
+        {
+          "say": "最后找已经飘离树枝的叶子。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "三处段首",
+      "template": "picture-points",
+      "data": {
+        "title": "三处段首",
+        "picture": "paragraph-diagram",
+        "points": [
+          "找开头空两格",
+          "换行也可能接着说",
+          "课文有三段"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这是一张排版图，小方块代替一行字。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看第一行，前面两个空座位后才写字。"
+        },
+        {
+          "say": "开头空两格，告诉我们一段话从这里开始。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看下一行，文字从左边接着排下去。"
+        },
+        {
+          "say": "一段话可以排好几行，换一行还可以是这一段。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再找有空座位的行，一共有三个这样的开头。"
+        },
+        {
+          "say": "打开课本找一找，秋天也有三个自然段。"
+        },
+        {
+          "say": "第一段看树和叶，第二段看天和大雁，第三段是感叹。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "听一的不同声音",
+      "template": "picture-points",
+      "data": {
+        "title": "听一的不同声音",
+        "picture": "tone-diagram",
+        "points": [
+          "一片片 · 二声",
+          "一群 · 四声",
+          "一会儿 · 二声",
+          "“一”字 · 一声"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "小耳朵竖起来，同一个字放进不同词里，声音会变。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先听，一片片。开头的声音往上走，是第二声。"
+        },
+        {
+          "say": "一片片树叶飘下来，跟着我读一片片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再听，一群。开头的声音从高往低落，是第四声。"
+        },
+        {
+          "say": "一群大雁飞过来了。跟着我读一群。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听一会儿，开头和一片片一样，也是第二声。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "鸟排成一条横线，像一个汉字。"
+        },
+        {
+          "say": "单念那个字，声音平平的，是第一声。一。"
+        },
+        {
+          "say": "听声音往哪儿走，再跟老师读这几个词。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "自己借拼音读时，先看字上方的拼音，再找声调记号。"
+        },
+        {
+          "say": "像一片片，开头的记号斜着往上，声音也跟着往上。"
+        },
+        {
+          "say": "先照着记号试读，再听老师读一次，比较声音。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "词尾连读和轻声",
+      "template": "picture-points",
+      "data": {
+        "title": "词尾连读和轻声",
+        "picture": "pace-diagram",
+        "points": [
+          "会儿连在一起",
+          "凉了、黄了、来了",
+          "叶子"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "读词语时，后面的声音有时会变轻、变短。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先听一会儿。会和儿连成一个音节。"
+        },
+        {
+          "say": "儿贴在会的后面，一口气读，不单独停一下。"
+        },
+        {
+          "say": "一会儿是一小段时间，等一会儿，叶子就落了。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "听我读，天气凉了，树叶黄了，秋天来了。"
+        },
+        {
+          "say": "这几个短语末尾的了，都要读得轻一点、短一点。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "听我再读，叶子。子在后面，也读轻声。"
+        },
+        {
+          "say": "跟我读一遍，叶子。一片片叶子。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "认一认凉了末尾的字，上边横撇，下边弯弯带钩。"
+        },
+        {
+          "say": "天气凉了，凉是感觉，末尾的了告诉我们天气变凉。"
+        },
+        {
+          "say": "换一句，叶子黄了。还是这个字，也跟在变了的事后面。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "认认秋、树、叶",
+      "template": "picture-points",
+      "data": {
+        "title": "认认秋、树、叶",
+        "picture": "radical-diagram",
+        "points": [
+          "秋 · 禾字旁",
+          "树 · 木字旁",
+          "叶 · 口字旁",
+          "天气 · 黄色"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看三个字，涂了颜色的部分都在左边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "秋，秋天的秋。左边是禾字旁，右边是火。"
+        },
+        {
+          "say": "禾变成禾字旁，要在左边给右边留出位置。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "树，树木的树。左边是木字旁，右边是对。"
+        },
+        {
+          "say": "木在左边写窄些，末笔写成点，右边才排得下。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "叶，树叶的叶。左边是口字旁，右边是十。"
+        },
+        {
+          "say": "口当偏旁写得小一些，你可以比比卡片上的样子。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "再认两个字，天气的气，黄色的黄。"
+        },
+        {
+          "say": "早上天气凉，树上叶子黄。把字放进词里就好记。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "看天气的气，最下面那一笔伸出去，末端挑一个钩。"
+        },
+        {
+          "say": "再看黄色的黄，最下面两笔向两旁分开。"
+        },
+        {
+          "say": "下次看见词卡，把气的钩、黄下面分开的两笔找出来。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "一片和一片片",
+      "page": "leaf-trays",
+      "widgetType": "courseware",
+      "startImage": "leaf-fall",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#tray-single"
+        },
+        {
+          "say": "看左边这盘，里面只有一张银杏叶，叫一片叶子。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "picture": 0
+          }
+        },
+        {
+          "say": "我先把它从左边挪到右边，右边的盘子有了叶子。"
+        },
+        {
+          "highlight": "#tray-several"
+        },
+        {
+          "say": "再看这一盘，很多张叶子摆在一起，叫一片片叶子。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "picture": 1
+          }
+        },
+        {
+          "say": "多说一个片，指的是好多片，和一片可不一样。"
+        },
+        {
+          "highlight": "#leaf-drop"
+        },
+        {
+          "say": "从左盘到右盘，从告诉我们叶子原先在哪里。"
+        },
+        {
+          "say": "叶子来到右边，来指向这一边，东西到这里了。"
+        },
+        {
+          "say": "听好，右边原来是空的，现在有叶子了。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "轮到你了，可以点，也可以把图拖到右边。"
+        },
+        {
+          "say": "找一片叶子，放到右边。"
+        },
+        {
+          "say": "找一片片叶子，放到右边。"
+        },
+        {
+          "highlight": "#leaf-words"
+        },
+        {
+          "say": "看采集盘旁的字，片字的右下边有一折。"
+        },
+        {
+          "say": "从字里能找到前后两个小人，右边那个人的脚更长。"
+        },
+        {
+          "say": "来字中间长长的一竖穿过横画，看看它站在哪里。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "抬头读天空",
+      "template": "picture-points",
+      "data": {
+        "title": "抬头读天空",
+        "picture": "sky-goose",
+        "points": [
+          "那么蓝，那么高",
+          "飞",
+          "一群大雁往南飞"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们沿着小路抬头看，眼睛从树叶转到天空。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "蓝说的是颜色，高让人感觉天空离地面很远。"
+        },
+        {
+          "say": "说天空那么蓝，是告诉我们它看起来非常蓝。"
+        },
+        {
+          "say": "再说那么高，就是看上去特别高，感觉很开阔。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "认一认飞字，大雁展开翅膀，飞过天边。"
+        },
+        {
+          "say": "你也可以伸伸胳膊，做一做鸟飞的动作。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "课文里是一群大雁一起往南飞。"
+        },
+        {
+          "say": "第二段还写了它们变队形，下一页看同一群雁怎么变。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再认一眼飞字，右边短撇和点，好像小鸟的翅膀。"
+        },
+        {
+          "say": "看到这个字，想起张开翅膀从眼前飞过去的样子。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "雁阵转场",
+      "page": "goose-formation",
+      "widgetType": "courseware",
+      "startImage": "blue-sky",
+      "script": [
+        {
+          "setState": {
+            "demo": true,
+            "formation": "scatter"
+          }
+        },
+        {
+          "highlight": "#flight-sky"
+        },
+        {
+          "say": "这些鸟在同一片天里，等一等，它们会换位置。"
+        },
+        {
+          "highlight": "#photo-ren"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "formation": "ren"
+          }
+        },
+        {
+          "say": "领头的大雁在上，两边斜斜地排开，像人字。"
+        },
+        {
+          "say": "这两排从顶上往两旁分开，眼睛可以沿着队伍走。"
+        },
+        {
+          "highlight": "#photo-yi"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "formation": "yi"
+          }
+        },
+        {
+          "say": "再看，还是刚才那群雁，现在排成了一条横线。"
+        },
+        {
+          "say": "从左往右看平平的一横，这个样子像一字。"
+        },
+        {
+          "say": "只过了很短的时间，就变成另一个样子。"
+        },
+        {
+          "say": "课文里说一会儿这样，一会儿那样，就是很快换了队形。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "你来选一选，让这一群大雁也变两次队形。"
+        },
+        {
+          "say": "先选像人字一样分两边的照片。"
+        },
+        {
+          "say": "再选排成一条横线的照片。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "写了和子",
+      "template": "picture-points",
+      "data": {
+        "title": "写了和子",
+        "picture": "stroke-le-zi",
+        "points": [
+          "了 · 横撇、弯钩",
+          "子 · 再写横",
+          "田字格里试一试"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看田字格，红色告诉你这一次写哪一笔。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "了有两笔，先写横撇，再写弯钩。"
+        },
+        {
+          "say": "横撇先从左往右写横，再折向左下，笔尖不离纸。"
+        },
+        {
+          "say": "弯钩向下写，到了下面，再轻轻往左上钩。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "子前两笔也是横撇和弯钩，最后还要写一横。"
+        },
+        {
+          "say": "横从左向右过中间，比上面的横写得更长、更平。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "拿纸写一遍，坐端正，纸放平，再下笔。"
+        },
+        {
+          "say": "请大人看看两笔和三笔的顺序，还有横的位置。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "写大和人",
+      "template": "picture-points",
+      "data": {
+        "title": "写大和人",
+        "picture": "stroke-da-ren",
+        "points": [
+          "大 · 横、撇、捺",
+          "人 · 撇、捺",
+          "对着格子试一试"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "仔细看看这两组格子，每次变红的笔就是新写的一笔。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看大，它比人多一横。第一笔先从左往右写横。"
+        },
+        {
+          "say": "第二笔在上面起笔，先往下，再往左撇，是竖撇。"
+        },
+        {
+          "say": "第三笔向右下写捺。撇和捺分开托住上面的横。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "人先撇后捺。撇从竖中线附近起笔，向左下写。"
+        },
+        {
+          "say": "从撇的中上部向右下写捺，看看两边末端差不多齐。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "写大时先写横。写人时，直接从撇写起。"
+        },
+        {
+          "say": "两字各试写一个，请大人看笔顺和田字格里的位置。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "秋信小检查",
+      "intro": [
+        "听老师读题，再看三张图。"
+      ],
+      "questions": [
+        {
+          "id": "autumn-q1",
+          "question": "秋天到了，哪张湖边步道的图能配上黄叶飘落？",
+          "skill": "season_cues",
+          "answer": [
+            "A"
+          ],
+          "analysis": "这幅图里树叶是金黄色的，有的正在飘落，还有的已经落在木板上。",
+          "options": {
+            "A": {
+              "label": "黄叶飘落",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-lake-autumn",
+                "alt": "黄叶飘落"
+              }
+            },
+            "B": {
+              "label": "枝上是绿叶",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-lake-green",
+                "alt": "枝上是绿叶"
+              }
+            },
+            "C": {
+              "label": "木板上有雪",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-lake-snow",
+                "alt": "木板上有雪"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "quiz",
+      "title": "找一片片",
+      "intro": [
+        "听老师读题，再看三张图。"
+      ],
+      "questions": [
+        {
+          "id": "autumn-q2",
+          "question": "窗台有三个盘子。哪一盘放着一片片枫叶？",
+          "skill": "characters",
+          "answer": [
+            "B"
+          ],
+          "analysis": "一片片表示有许多片。只有这个盘子里有很多片枫叶。",
+          "options": {
+            "A": {
+              "label": "一片枫叶",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-tray-one",
+                "alt": "一片枫叶"
+              }
+            },
+            "B": {
+              "label": "许多片枫叶",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-tray-many",
+                "alt": "许多片枫叶"
+              }
+            },
+            "C": {
+              "label": "空盘子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-tray-empty",
+                "alt": "空盘子"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "quiz",
+      "title": "哪页有三个段首",
+      "intro": [
+        "听老师读题，再看三张图。"
+      ],
+      "questions": [
+        {
+          "id": "autumn-q3",
+          "question": "小书有三页。哪一页有三行开头空了两格？",
+          "skill": "paragraph",
+          "answer": [
+            "C"
+          ],
+          "analysis": "每个有两格空位的行是一个段首。只有这页有三处这样的开头。",
+          "options": {
+            "A": {
+              "label": "一处开头空两格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-layout-one",
+                "alt": "一处开头空两格"
+              }
+            },
+            "B": {
+              "label": "两处开头空两格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-layout-two",
+                "alt": "两处开头空两格"
+              }
+            },
+            "C": {
+              "label": "三处开头空两格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-layout-three",
+                "alt": "三处开头空两格"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "quiz",
+      "title": "帮忙排好写字卡",
+      "intro": [
+        "听老师读题，再看三张图。"
+      ],
+      "questions": [
+        {
+          "id": "autumn-q4",
+          "question": "子的前两笔已经写好。哪张图的红笔画是最后一笔？",
+          "skill": "handwriting",
+          "answer": [
+            "B"
+          ],
+          "analysis": "子先写横撇，再写弯钩，最后写穿过中间的长横。",
+          "options": {
+            "A": {
+              "label": "右下短点",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stroke-dot",
+                "alt": "右下短点"
+              }
+            },
+            "B": {
+              "label": "中间长横",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stroke-flat",
+                "alt": "中间长横"
+              }
+            },
+            "C": {
+              "label": "斜向左下的撇",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stroke-left",
+                "alt": "斜向左下的撇"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "slide",
+      "title": "三幅图合成一封秋信",
+      "template": "picture-points",
+      "data": {
+        "title": "三幅图合成一封秋信",
+        "picture": "recap-triptych",
+        "points": [
+          "地面 · 凉、黄、落",
+          "天空 · 蓝、高、雁阵",
+          "最后 · 惊喜"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天我们收好了一封秋信，打开自己的课本吧。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一段先感到天气凉，再看到树叶黄、叶子落。"
+        },
+        {
+          "say": "跟着这三个画面试读，读到逗号可以轻轻停一停。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二段先看很蓝、很高的天，再看大雁往南飞。"
+        },
+        {
+          "say": "大雁一会儿排成人字，一会儿排成一字，变得快。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后一段短短的，发现秋天时，心里又惊又喜欢。"
+        },
+        {
+          "say": "读感叹的话，可以把看到秋天的惊喜读出来。"
+        },
+        {
+          "say": "找齐三个段首，再把整篇读一遍，试着背给大人听。"
+        },
+        {
+          "say": "今天还认了偏旁，听了轻声，也练了田字格里的四个字。"
+        },
+        {
+          "say": "出去找一处秋景，画下来、说给家人听，再练写四个字。"
+        }
+      ]
+    }
+  ]
+}

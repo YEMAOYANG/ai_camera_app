@@ -1,0 +1,20 @@
+<section id="record-board" aria-label="把照片放进记录袋">
+  <div id="record-known" class="record-pocket known">
+    <button id="record-confirmed" aria-label="已确认材料的记录袋">
+      <svg viewBox="0 0 120 120" aria-hidden="true" data-semantic-diagram><circle cx="60" cy="60" r="49" fill="#dbefe0"/><path d="m33 60 18 19 36-40" fill="none" stroke="#296548" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>已确认</span>
+    </button>
+  </div>
+  <button id="record-photo" aria-label="拖动观察照片">
+    <img id="record-image" src="__IMG:window__" alt="有金属窗框的窗户">
+    <span id="record-focus" aria-hidden="true"></span>
+  </button>
+  <div id="record-unknown" class="record-pocket unknown">
+    <button id="record-pending" aria-label="材料还没查清的记录袋">
+      <svg viewBox="0 0 120 120" aria-hidden="true" data-semantic-diagram><circle cx="60" cy="60" r="49" fill="#ffedcd"/><path d="M43 45c0-19 35-21 35-1c0 13-17 16-17 28" fill="none" stroke="#8b5738" stroke-width="10" stroke-linecap="round"/><circle cx="60" cy="86" r="6" fill="#8b5738"/></svg>
+      <span>还要查</span>
+    </button>
+  </div>
+  <div id="record-result" class="hide"><img id="record-copy" src="__IMG:window__" alt=""></div>
+  <button id="record-retry" class="btn hide" aria-label="重试载入照片">重试图片</button>
+</section>

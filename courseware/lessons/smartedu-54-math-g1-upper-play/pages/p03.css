@@ -1,0 +1,24 @@
+#group-board{position:absolute;left:12px;top:0;width:942px;height:552px;padding:18px;border:4px solid #E4BA7F;border-radius:32px;background:#FFF9EA}
+#group-mat,#group-bench{border-radius:26px}
+#group-mat{height:244px;border:6px dashed #458E72;background:#D5F3DD}
+#group-bench{height:230px;margin-top:22px;background:#F2E4CC;border:4px solid #DFC398}
+#group-players{position:absolute;inset:0;pointer-events:none}
+.group-player{display:block;position:absolute;top:304px;width:160px;height:186px;border:4px solid #FFF8EE;border-radius:24px;overflow:hidden;background:#FFFCF5;cursor:grab;box-shadow:0 6px 0 #C4A578;pointer-events:auto}
+.group-player[data-player="0"]{left:108px}
+.group-player[data-player="1"]{left:296px}
+.group-player[data-player="2"]{left:484px}
+.group-player[data-player="3"]{left:672px}
+.group-player img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.group-player:focus-visible,#group-tools button:focus-visible{outline:5px solid #2F66AE;outline-offset:4px}
+.group-player.placed{top:46px;border-color:#388967;box-shadow:0 6px 0 #388967}
+#group-tools{position:absolute;left:984px;top:25px;width:224px;height:466px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;border:4px solid #E4BA7F;border-radius:28px;background:#FFF9EA}
+#group-cue{display:flex;align-items:center;justify-content:center;gap:12px;width:182px;height:96px;border-radius:20px;background:#E3EBD7}
+#group-cue span{width:32px;height:32px;border-radius:50%;background:#286E53}
+#group-tools button{width:150px;height:94px}
+#group-tools svg{width:54px;height:54px;fill:currentColor}
+#group-media-problem{position:absolute;top:186px;left:124px;width:700px;padding:24px;background:#FFFDF6;border:4px solid #E4572E;border-radius:22px;text-align:center;font-size:28px;z-index:8}
+#ready .card{padding:16px 44px 24px}
+#ready .pic{width:500px;height:281px;margin-bottom:6px}
+#ready h1{font-size:48px}
+#ready p{font-size:27px;margin:10px 0 18px}
+#ready .btn.xl,#finish .btn.xl{min-height:88px}

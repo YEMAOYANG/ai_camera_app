@@ -1,0 +1,362 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "openMaicJobId": "ZM_8AvmqlA",
+  "openMaicClassroomId": "p-UKz4kaed",
+  "nativeClassroomSha256": "39d1a11254823b034e401829812004233696ac3bbab532cc05c1de7f6bd010ab",
+  "nativeDraftInputSha256": "dd46724a6e1e8784e97504543384c8b449a831ec56dbbbfdd6ba910683c8d960",
+  "nativeModelRoute": {
+    "modelPolicyId": "deepseek-v4-pro-current-flash-v1",
+    "providerId": "deepseek",
+    "modelId": "deepseek-v4-pro"
+  },
+  "editorModel": "gpt-6.1-sol",
+  "authoringModels": [
+    "deepseek-v4-pro",
+    "gpt-6.1-sol"
+  ],
+  "officialNotesSha256": "81041460a26fb2013376ec7f91a6880fbf589be0d2773a7355070f7c9bf66176",
+  "frozenBriefSha256": "c240a82e6e41703e0037e403aed908a2c291f88c83b9116f53d4c8846b746941",
+  "frozenBriefPath": "output/courseware-lessons/g1-chinese-11902376dc966de3/qa-first-pass/codex-direct-reference/source/brief.json",
+  "sceneBindings": [
+    {
+      "nativeSceneId": "scene_T6boqV2azA",
+      "nativeSceneTitle": "引入：同看两幅初夏水边图",
+      "nativeSceneSha256": "ab5581115e3ddf3529c59bb579cef2bdbc77fb64cbea1d2170358cbebe861405",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_EItluYyb",
+        "action_NGi-gP-W",
+        "action_P9aFwVVa",
+        "action_lwKfIckP",
+        "action_xKcc1aUk"
+      ],
+      "releaseScenes": [
+        {
+          "key": "p01",
+          "change": "把原生双图对比接入双栏，拆分末句并逐图点亮。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_HaNVNrtaSb",
+      "nativeSceneTitle": "《池上》看图识字",
+      "nativeSceneSha256": "2a7f33b02f0ceedc3919c80081fc30605f041770bc19da735777a22a2de698d5",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_4xMCKPJj",
+        "action_7d-Qu71H",
+        "action_Kzg5e23Z",
+        "action_QSm1zjxx",
+        "action_UeuJSbLV",
+        "action__08sriRQ"
+      ],
+      "releaseScenes": [
+        {
+          "key": "p02",
+          "change": "原生两图识字归入三个词组，保留五字的认读并指向正式画面。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_TcVnQO_WAK",
+      "nativeSceneTitle": "互动：小娃撑船",
+      "nativeSceneSha256": "9fd8f4a5e3c8b03f478d281c4b135de2dfca8e3a1439a86d5b95885076f87b8f",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_21G1fu1O",
+        "action_3rlemyKP",
+        "action_RvwV0CV5",
+        "action_wOtS0FtU"
+      ],
+      "releaseScenes": [
+        {
+          "key": "p03",
+          "change": "采用原生撑艇、采莲再归来目标；用低阅读公共互动取代力度和角度调参。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_YGprf0ToxW",
+      "nativeSceneTitle": "互动：观察浮萍水道",
+      "nativeSceneSha256": "0c93b9f348252a0a069ac65a3c668fd7b043181002110f785e9f0123816e4b3f",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_1tLWcaaz",
+        "action_NXId6JOH",
+        "action_WtEYttz6"
+      ],
+      "releaseScenes": [
+        {
+          "key": "p04",
+          "change": "用现有浮萍与人物图还原原生水道变化和判断，增加观察线索与回扣诗句。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_YKZpnv2fv5",
+      "nativeSceneTitle": "《池上》读诗与背诵",
+      "nativeSceneSha256": "9c3ac2796a0b21a1f0c70f2e9c559b1211302d57b76960e0aff116b8f64309e4",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_dwguJFRD",
+        "action_mQac-iA8",
+        "action_oBPA3qFT"
+      ],
+      "releaseScenes": [
+        {
+          "key": "p05",
+          "change": "修正原生“船桨”，保留逐句读诗、图意复述和尝试背诵，补上二三轻停。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_BWMeEKQ8IZ",
+      "nativeSceneTitle": "写一写：首、池、采",
+      "nativeSceneSha256": "d3a0d4c4aff2ff8f8d986500f6fdc3527aa0e76c73476d2c9d6629e8f081eb13",
+      "exactOrEditedSpeechSourceActionIds": [],
+      "releaseScenes": [
+        {
+          "key": "p07-shou",
+          "change": "从原生三字合页拆出首，保留上宽下窄。"
+        },
+        {
+          "key": "p07-chi",
+          "change": "从原生三字合页拆出池，保留左右宽窄和关键笔形。"
+        },
+        {
+          "key": "p07-cai",
+          "change": "从原生三字合页拆出采，保留上下部件和横中线位置。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_H32DXc1Vyd",
+      "nativeSceneTitle": "《小池》观察泉眼细流树阴",
+      "nativeSceneSha256": "736ae34c4ead1abb167b2bb52837d1de97ced350e7c08890546d2783e1e4e840",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_fpOxpR5L",
+        "action_qlrmCfdG"
+      ],
+      "releaseScenes": [
+        {
+          "key": "x01",
+          "change": "将原生小池全景导入拆出单屏，教材署名与图中位置用于观察。"
+        },
+        {
+          "key": "x02",
+          "change": "保留原生泉眼、细流和树阴观察，删改原图不支持的圆亮描述并补惜爱和晴柔。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_1orHtepYsk",
+      "nativeSceneTitle": "《小池》观察小荷与蜻蜓",
+      "nativeSceneSha256": "1bb492cc24fbda4714a9a0671dffda342092b233077f315f56311d5a6a97bb8f",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_5EFGYZfY",
+        "action_Vx_j5sy4",
+        "action__ZZkdGxb",
+        "action_b_PYaVrh",
+        "action_iI-Ri35b",
+        "action_ioOufsGW"
+      ],
+      "releaseScenes": [
+        {
+          "key": "x03",
+          "change": "保留小荷与蜻蜓的原生观察和识字，颜色按正式图核正，区分露出与露水的读法。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_Zabo0w2p6x",
+      "nativeSceneTitle": "互动：找出四种景物",
+      "nativeSceneSha256": "f2f3b42d526bf49f2be009ed1e73c83a98e1580da928d6372b34920f4ea9d16a",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_7NGyqnXR",
+        "action_EfUtAHeA",
+        "action_IV9GmWYr",
+        "action_Q6Pi6YtE",
+        "action_S_zd6BsY",
+        "action_UIdFV42c",
+        "action_tTDCp3ne",
+        "action_vxqkjZGq",
+        "action_yliiSPWR"
+      ],
+      "releaseScenes": [
+        {
+          "key": "x04",
+          "change": "还原原生四个热点与空间反馈，改为正式全景和依诗句顺序找景物。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_4Au0hVvtsD",
+      "nativeSceneTitle": "《小池》读诗与背诵",
+      "nativeSceneSha256": "099a477632ac9e8ff771c1bdac588c1eff32978223de5f4b45ec780020f0997d",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_12-BciAz",
+        "action_3yFleCRS",
+        "action_8S2yjctY",
+        "action_BtxmlXSY",
+        "action_JNtqXEZo",
+        "action_RSGVrftb",
+        "action_sYTQ7ryJ"
+      ],
+      "releaseScenes": [
+        {
+          "key": "x05",
+          "change": "保留原生全诗逐句和四景顺序，补上二二三节奏和背诵提醒。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_vMPJpLKnj_",
+      "nativeSceneTitle": "写一写：尖、角、早",
+      "nativeSceneSha256": "96c14c0bd9f62a04faf7ba28f29fe744b272dfd83f715dc32c8d496f92106931",
+      "exactOrEditedSpeechSourceActionIds": [],
+      "releaseScenes": [
+        {
+          "key": "x06-jian",
+          "change": "从原生三字合页拆出尖，保留关键笔形。"
+        },
+        {
+          "key": "x06-jiao",
+          "change": "从原生三字合页拆出角，保留中竖，避开字体无法支持的短横关系。"
+        },
+        {
+          "key": "x06-zao",
+          "change": "从原生三字合页拆出早，保留日字头和下部十的位置。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_uRP6rzfeFz",
+      "nativeSceneTitle": "五题图片小检查",
+      "nativeSceneSha256": "9c603434481ae8ce5028de3c21ee2016efaa07e658e6a46d01d6dd51d91c54a5",
+      "exactOrEditedSpeechSourceActionIds": [],
+      "releaseScenes": [
+        {
+          "key": "p08",
+          "change": "保留原生五题目标和题干；依已验图片调整干扰项、正确位置与图像可见解析。"
+        }
+      ]
+    },
+    {
+      "nativeSceneId": "scene_koxummwU3f",
+      "nativeSceneTitle": "回顾与课后任务",
+      "nativeSceneSha256": "160f9383875e000e7e9919a117ecb780d02d93d24d497cfc283f02fee1199b7e",
+      "exactOrEditedSpeechSourceActionIds": [
+        "action_5NZf9qZs",
+        "action_ZYnlfAcz",
+        "action_sQc2vzrI"
+      ],
+      "releaseScenes": [
+        {
+          "key": "p09",
+          "change": "保留原生两首诗节奏对比、六字练写和课后读背，补充说图与家长观察。"
+        }
+      ]
+    }
+  ],
+  "questionBindings": [
+    {
+      "nativeQuestionId": "q1",
+      "releaseQuestionId": "q-cai",
+      "originalAnswer": [
+        "A"
+      ],
+      "releaseAnswer": [
+        "B"
+      ],
+      "mappedPictures": {
+        "A": "water-tomato",
+        "B": "pick-tea",
+        "C": "cut-paper"
+      }
+    },
+    {
+      "nativeQuestionId": "q2",
+      "releaseQuestionId": "q-trace",
+      "originalAnswer": [
+        "B"
+      ],
+      "releaseAnswer": [
+        "C"
+      ],
+      "mappedPictures": {
+        "A": "bike-shadow",
+        "B": "grass",
+        "C": "tire-track"
+      }
+    },
+    {
+      "nativeQuestionId": "q3",
+      "releaseQuestionId": "q-float",
+      "originalAnswer": [
+        "A"
+      ],
+      "releaseAnswer": [
+        "A"
+      ],
+      "mappedPictures": {
+        "A": "cork-float",
+        "B": "stone-sink",
+        "C": "cup-table"
+      }
+    },
+    {
+      "nativeQuestionId": "q4",
+      "releaseQuestionId": "q-fine-stream",
+      "originalAnswer": [
+        "B"
+      ],
+      "releaseAnswer": [
+        "B"
+      ],
+      "mappedPictures": {
+        "A": "waterfall",
+        "B": "thin-stream",
+        "C": "grass"
+      }
+    },
+    {
+      "nativeQuestionId": "q5",
+      "releaseQuestionId": "q-show-part",
+      "originalAnswer": [
+        "C"
+      ],
+      "releaseAnswer": [
+        "C"
+      ],
+      "mappedPictures": {
+        "A": "closed-box",
+        "B": "empty-box",
+        "C": "peek-puppy"
+      }
+    }
+  ],
+  "interactiveSources": {
+    "pages/p03.css": "c5d1bb84c105049d1632a18269745c166b2e94577813bf7954012980c330deb0",
+    "pages/p03.html": "b9332686c6451da19132cf4b9c10b16b0791a3dd9610ddf5c867b789cd6baadf",
+    "pages/p03.js": "e7bbd9c7c031a5535e0c9e3bcec47bce85bc043c4c6a0ed6284dc217e1970f1c",
+    "pages/p04.css": "f858b32ff5d56ea3a7959ce7199a98d84b377f6fdacfa2918501d2b8721119e4",
+    "pages/p04.html": "3a0facc2d064b1c026a871fb2370d88a462583fbdfe5e897ccd42167ec7a9f34",
+    "pages/p04.js": "6164ffad1209871d99644b28522743935db2f89a3fde290abad91e1355576a53",
+    "pages/x04.css": "d0ded3d45a08f23780d9ade8003b2f3a389d6dd68ee9fe082062d1b1dde8b25d",
+    "pages/x04.html": "1c12f4a0cb345d918aa50e2f9accc1f699f5675d922f46748c1c0f7ed2c56c30",
+    "pages/x04.js": "2e55422898903b0d480e655a6823802249740861be8aef9bbda929c34667bca5"
+  },
+  "adaptedLessonSha256": "7250dcef71e4be53a86051f3e4ee3db069d29f53bdd07ac2b5c94ecdbc3b280d",
+  "assetSource": "本课冻结的23张经核对图片。旧 Codex 直写候选保留为互动实现和图片适配参考。",
+  "adaptationRevisions": [
+    {
+      "adaptedAt": "2026-11-06T08:44:27.181657+00:00",
+      "previousEditableLessonSha256": "e2e4150f8b5c7559cf1c6076800d410094ce6a0116884039cae60a17339698a0",
+      "editableLessonSha256": "7250dcef71e4be53a86051f3e4ee3db069d29f53bdd07ac2b5c94ecdbc3b280d",
+      "previousVerificationSha256": "f3e644f4b954528110693fc1bd42e1bc6e40d2661bdf78edb8ae1840506a2b05",
+      "previousBodySha256": "37a2bc6b8906206064306da515996c0aa2c35fffb955a767c54352e08fc1e7e7",
+      "changesByReleaseScene": {
+        "p03": "解释采是伸手从植物摘取，加入菜园豆荚例子。",
+        "p05": "明确说出小娃的天真顽皮。",
+        "x02": "由惜爱和初夏风光引出诗人对自然的喜爱。",
+        "x04": "按官方注释把晴柔说成晴天柔和的风光。",
+        "p08": "小狗图的解析、选项文字和替代文本明确脑袋和前爪露出。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,477 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "9加几",
+  "description": "用十格托盘和圆形纸片看懂先凑十再加剩下的。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#437763",
+      "persona": "温和地演示每一步，讲清纸片去哪里。"
+    }
+  },
+  "images": {
+    "workshop": {
+      "file": "assets/workshop.png"
+    },
+    "q1-before": {
+      "file": "assets/q1-before.png"
+    },
+    "q1-ten-seven": {
+      "file": "assets/q1-ten-seven.png"
+    },
+    "q1-nine-eight": {
+      "file": "assets/q1-nine-eight.png"
+    },
+    "q1-eight-nine": {
+      "file": "assets/q1-eight-nine.png"
+    },
+    "q2-before": {
+      "file": "assets/q2-before.png"
+    },
+    "q3-before": {
+      "file": "assets/q3-before.png"
+    },
+    "q3-seventeen": {
+      "file": "assets/q3-seventeen.png"
+    },
+    "q3-eighteen": {
+      "file": "assets/q3-eighteen.png"
+    },
+    "q3-nineteen": {
+      "file": "assets/q3-nineteen.png"
+    },
+    "q4-before": {
+      "file": "assets/q4-before.png"
+    },
+    "q4-thirteen": {
+      "file": "assets/q4-thirteen.png"
+    },
+    "q4-fourteen": {
+      "file": "assets/q4-fourteen.png"
+    },
+    "q4-twelve": {
+      "file": "assets/q4-twelve.png"
+    },
+    "q2-remain-0": {
+      "file": "assets/q2-remain-0.png"
+    },
+    "q2-remain-1": {
+      "file": "assets/q2-remain-1.png"
+    },
+    "q2-remain-2": {
+      "file": "assets/q2-remain-2.png"
+    },
+    "opening-counts": {
+      "file": "assets/opening-counts.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "纸灯工坊开工",
+      "template": "picture-points",
+      "data": {
+        "title": "纸灯工坊开工",
+        "picture": "opening-counts",
+        "points": [
+          "已有9枚",
+          "又取6枚",
+          "一共有多少枚？"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天我们来帮纸灯工坊配材料。"
+        },
+        {
+          "say": "每做一批纸灯，要先数清需要的纸片。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "看左边的托盘，已经有九枚纸片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看桌上，又拿来了六枚橙色纸片。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我们想知道两组纸片一共有多少枚。"
+        },
+        {
+          "say": "求合起来的总数，可以把两组的个数相加。"
+        },
+        {
+          "say": "从九接着数也能算，我们来试个更好数的办法。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "先把十格放满",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "demoMoved": false
+          }
+        },
+        {
+          "highlight": "#ten-frame"
+        },
+        {
+          "say": "看，托盘有十格，九枚纸片已经摆进去了。"
+        },
+        {
+          "say": "还空一格，放进一枚就正好装满。"
+        },
+        {
+          "highlight": "#loose-pieces"
+        },
+        {
+          "say": "桌上有六枚，我们从六枚中拿出一枚。"
+        },
+        {
+          "setState": {
+            "demoMoved": true
+          }
+        },
+        {
+          "highlight": "#count-equation"
+        },
+        {
+          "say": "盘里现在是十枚，桌上还剩五枚。"
+        },
+        {
+          "say": "拿过去的一枚已经在盘里，别再数一次。"
+        },
+        {
+          "say": "十加五是十五，所以九加六也是十五。"
+        },
+        {
+          "setState": {
+            "resetTask": true
+          }
+        },
+        {
+          "say": "现在盘外换成七枚，轮到你去凑十。"
+        },
+        {
+          "say": "点一枚纸片放进空格，再选合起来的总数。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "找出合适的分法",
+      "page": "p03",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "demoRegroup": false
+          }
+        },
+        {
+          "highlight": "#split-model"
+        },
+        {
+          "say": "我们也可以用分开的两组点，记下移动过程。"
+        },
+        {
+          "say": "这里是九枚和五枚，先想九还差几就到十。"
+        },
+        {
+          "highlight": "#split-options"
+        },
+        {
+          "say": "九差一，所以把右边五枚分成一枚和四枚。"
+        },
+        {
+          "setState": {
+            "demoRegroup": true
+          }
+        },
+        {
+          "highlight": "#split-equation"
+        },
+        {
+          "say": "一枚挪过去，左边变成十，右边留下四。"
+        },
+        {
+          "say": "纸片总数没变，十加四就是原来的总数。"
+        },
+        {
+          "setState": {
+            "resetTask": true
+          }
+        },
+        {
+          "say": "这次要算九加三。下面三张图是三种分法。"
+        },
+        {
+          "say": "点一张，把正好能去凑十的一组分出来。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "quiz",
+      "title": "看看凑十这一步",
+      "intro": [
+        "听题，再点一张图。"
+      ],
+      "questions": [
+        {
+          "id": "nine-plus-1",
+          "question": "九枚绿片和八枚橙片。挪一枚后，哪张图凑成十？",
+          "skill": "理解凑十的动作",
+          "answer": [
+            "A"
+          ],
+          "analysis": "十格里是十枚，八枚橙片移走一枚，盘外还剩七枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q1-before",
+            "alt": "九枚绿片和八枚橙片"
+          },
+          "options": {
+            "A": {
+              "label": "格里十枚，外面七枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-ten-seven",
+                "alt": "格里十枚，外面七枚"
+              }
+            },
+            "B": {
+              "label": "格里九枚，外面八枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-nine-eight",
+                "alt": "格里九枚，外面八枚"
+              }
+            },
+            "C": {
+              "label": "格里八枚，外面九枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-eight-nine",
+                "alt": "格里八枚，外面九枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "nine-plus-2",
+          "question": "盘外两枚，挪一枚凑十。外面还剩几枚？",
+          "skill": "分出一和剩余",
+          "answer": [
+            "B"
+          ],
+          "analysis": "两枚里拿出一枚，盘外就剩一枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q2-before",
+            "alt": "盘里九枚，盘外两枚"
+          },
+          "options": {
+            "A": {
+              "label": "两枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-remain-2",
+                "alt": "两枚"
+              }
+            },
+            "B": {
+              "label": "一枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-remain-1",
+                "alt": "一枚"
+              }
+            },
+            "C": {
+              "label": "没有纸片",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-remain-0",
+                "alt": "没有纸片"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "换个地方再算",
+      "intro": [
+        "换个地方，试试同一个办法。"
+      ],
+      "questions": [
+        {
+          "id": "nine-plus-3",
+          "question": "拼画用两堆圆片，每堆九枚。凑十后选总数。",
+          "skill": "凑十后求总数",
+          "answer": [
+            "C"
+          ],
+          "analysis": "拿一枚去凑十，另一堆剩八枚。十和八合起来是十八。",
+          "visual": {
+            "kind": "asset",
+            "image": "q3-before",
+            "alt": "格里九枚，外面九枚"
+          },
+          "options": {
+            "A": {
+              "label": "整十和七枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-seventeen",
+                "alt": "整十和七枚"
+              }
+            },
+            "B": {
+              "label": "整十和九枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-nineteen",
+                "alt": "整十和九枚"
+              }
+            },
+            "C": {
+              "label": "整十和八枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-eighteen",
+                "alt": "整十和八枚"
+              }
+            }
+          }
+        },
+        {
+          "id": "nine-plus-4",
+          "question": "做纸鱼用九枚绿片、四枚橙片。哪张图凑对了？",
+          "skill": "凑十后求总数",
+          "answer": [
+            "B"
+          ],
+          "analysis": "四枚里有一枚已经进了十格。十再加剩下三枚，一共十三枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "q4-before",
+            "alt": "格里九枚，外面四枚"
+          },
+          "options": {
+            "A": {
+              "label": "整十和四枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-fourteen",
+                "alt": "整十和四枚"
+              }
+            },
+            "B": {
+              "label": "整十和三枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-thirteen",
+                "alt": "整十和三枚"
+              }
+            },
+            "C": {
+              "label": "整十和两枚",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-twelve",
+                "alt": "整十和两枚"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "把凑十办法带回家",
+      "template": "summary",
+      "data": {
+        "title": "把凑十办法带回家",
+        "items": [
+          "九只差一",
+          "挪一枚凑成十",
+          "十再加剩下的",
+          "回家翻卡练一练"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "看到九加几，先想九离十还差一。"
+        },
+        {
+          "say": "九加一正好是十，第二组只有一枚就全用上。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "第二组有好几枚时，分出一枚放进十格。"
+        },
+        {
+          "say": "这一枚换了位置，两组的总数没有变。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "移过去的那一枚已经算进了十。"
+        },
+        {
+          "say": "把十和右边留下的加在一起，就得到总数。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家请家人翻一张数字卡，用九加上它。"
+        },
+        {
+          "say": "你可以摆一摆，再说说哪一枚挪进了十。"
+        },
+        {
+          "say": "要是翻到零，就没有东西可以挪，总数还是九。"
+        }
+      ]
+    }
+  ]
+}

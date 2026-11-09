@@ -1,0 +1,690 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "assets": {
+    "count-route": {
+      "file": "assets/count-route.png",
+      "sha256": "b6a8349982f1f31f78e7bc7abe387400ed9a8a53ff46d9820e87c768423259d3",
+      "uses": [
+        {
+          "pageKey": "p07",
+          "use": "picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/count-route.svg",
+      "drawingSha256": "b65d7a8cb9058ef9a13d08694f500bb852e4f02fb3c6021aea28cd2df197aef2"
+    },
+    "count-unit": {
+      "file": "assets/count-unit.png",
+      "sha256": "3caf7d746a4da9a12b41af8ff25ae379f0f240bced935bdf674d6c0415f6136a",
+      "uses": [
+        {
+          "pageKey": "p01",
+          "use": "right_picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/count-unit.svg",
+      "drawingSha256": "3fce7cf8b1867e3b67fc49ba55acd33bd2a6fbc6c4db2f9e2a14c9a17a618083"
+    },
+    "cover-counting-workshop": {
+      "file": "assets/cover-counting-workshop.png",
+      "sha256": "1a2a2e2e4215879f1004e35b6cb235942620aa20ec50e2925b9ff578f62df24c",
+      "uses": [
+        {
+          "pageKey": "p01",
+          "use": "left_picture"
+        },
+        {
+          "pageKey": "p02",
+          "use": "start"
+        },
+        {
+          "pageKey": "p04",
+          "use": "start"
+        },
+        {
+          "pageKey": "p08",
+          "use": "start"
+        },
+        {
+          "pageKey": "p11",
+          "use": "start"
+        },
+        {
+          "pageKey": "p13",
+          "use": "start"
+        },
+        {
+          "pageKey": "p16",
+          "use": "start"
+        }
+      ],
+      "kind": "Codex imagegen",
+      "provenance": {
+        "schemaVersion": "mira.courseware.image-provenance.v1",
+        "assetId": "cover-counting-workshop",
+        "assetPath": "courseware/lessons/swu-math-g1-upper-recognize0to9/assets/cover-counting-workshop.png",
+        "sha256": "1a2a2e2e4215879f1004e35b6cb235942620aa20ec50e2925b9ff578f62df24c",
+        "width": 1672,
+        "height": 941,
+        "source": "codex_builtin_imagegen",
+        "prompt": "Create one landscape 16:9 raster illustration, intended as the title background for an original Chinese first-grade mathematics lesson about recognizing the numbers zero through nine. An inviting little counting workshop with a warm wood workbench viewed gently from above, a shallow open wooden sorting tray at the right-center, a few large separated matte colorful wooden counters on the right, and a quiet warm ivory left half reserved for a separately rendered lesson title and start controls. Soft natural daylight, clean shapes, restrained teal, tangerine, and warm-yellow accents, crisp children's educational picture-book editorial style, avoid gradients that reduce legibility. The props are only scene-setting, not a counting question. No words, letters, numerals, arithmetic signs, grid paper, logos, human figures, or embedded interface. Keep the edges quiet and the illustrated objects fully visible with generous margins. The art will be cropped to the 16:9 classroom canvas and overlaid with editable title text.",
+        "uses": [
+          "course_cover"
+        ],
+        "scope": "introductory illustration; no assessed quantity",
+        "review": {
+          "noEmbeddedText": true,
+          "leftTextSpace": true,
+          "subjectsUncropped": true,
+          "sceneSupportsCountingContext": true,
+          "fourStateLessonAuditPending": true
+        }
+      }
+    },
+    "digit-grid-high": {
+      "file": "assets/digit-grid-high.png",
+      "sha256": "c8549aec044893dc367dfe07e3885832e231a35052ff21d7271b891c16cce99d",
+      "uses": [
+        {
+          "pageKey": "p09",
+          "use": "picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/digit-grid-high.svg",
+      "drawingSha256": "b823f53d3a97861af1c4f4acf969069a8e953c84cf76c33eb4b62468112157eb",
+      "referenceGeometry": "assets/digit-grid.svg",
+      "referenceGeometrySha256": "3c766862e05650188e1cf47d83b2a00c8d369a50241e581d1f2e0944b2c37073"
+    },
+    "digit-grid-low": {
+      "file": "assets/digit-grid-low.png",
+      "sha256": "586c9b623e154e9ac328c13a9931af2fa4b944745d963da0bc71e9d632d8f85f",
+      "uses": [
+        {
+          "pageKey": "p06",
+          "use": "picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/digit-grid-low.svg",
+      "drawingSha256": "d86d55e56e2ae7ce36818e3a9ea4209ad1e3c43fe71766733d358f86c6137664",
+      "referenceGeometry": "assets/digit-grid.svg",
+      "referenceGeometrySha256": "3c766862e05650188e1cf47d83b2a00c8d369a50241e581d1f2e0944b2c37073"
+    },
+    "digit-zero": {
+      "file": "assets/digit-zero.png",
+      "sha256": "dc8f1f6ea7bef0273a494108e7b8429a6225b39746408757278d257a05a48f28",
+      "uses": [
+        {
+          "pageKey": "p12-write",
+          "use": "picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/digit-zero.svg",
+      "drawingSha256": "ee200ba265fa545dad08c326350bde6b4bccd8d7afc9dee4293c2ce8b620b53b",
+      "referenceGeometry": "assets/digit-grid.svg",
+      "referenceGeometrySha256": "3c766862e05650188e1cf47d83b2a00c8d369a50241e581d1f2e0944b2c37073"
+    },
+    "fixed-side": {
+      "file": "assets/fixed-side.png",
+      "sha256": "1963d6bb5c2beda4fce2b8cae470f513af8d7a1d82557bd5222c87e0b1ddc797",
+      "uses": [
+        {
+          "pageKey": "p14",
+          "use": "right_picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/fixed-side.svg",
+      "drawingSha256": "b588533f2e757689f06b34cd1dab6c811528de40825f9495f660a24616f8fa3e"
+    },
+    "fixed-total": {
+      "file": "assets/fixed-total.png",
+      "sha256": "a7f751c018b0ed8fb42c8fa28fb82d6b735ddce1ab95c607bc41eeeb6e361e0a",
+      "uses": [
+        {
+          "pageKey": "p14",
+          "use": "left_picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/fixed-total.svg",
+      "drawingSha256": "05f2100645bcb57f122edb16c9ea4886def16bff4c3d6596919fa9bcffed681d"
+    },
+    "number-line": {
+      "file": "assets/number-line.png",
+      "sha256": "a6adfd7e444e1bc9d4d167bb4251eb1be2329f6f49e2975dc7433c1e1253e302",
+      "uses": [
+        {
+          "pageKey": "p12",
+          "use": "right_picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/number-line.svg",
+      "drawingSha256": "f62ce7a87fb691143b39a8c410b8ff8e8812d8f8ca71bc94388f62bad3abf769"
+    },
+    "one-more": {
+      "file": "assets/one-more.png",
+      "sha256": "f48507795866ffd051ccffb04a70e9069037d1ab8b2ffe15d2dbb212b9c0f1f6",
+      "uses": [
+        {
+          "pageKey": "p03",
+          "use": "picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/one-more.svg",
+      "drawingSha256": "0b6942bc658adac951f2da6679011bce6e5fdf2dbbc34a4af7c73e4a9e69b3ad"
+    },
+    "pairing-teach": {
+      "file": "assets/pairing-teach.png",
+      "sha256": "b1e12f05c580c0d6e9ebfbc8b2b3ae9117d9414eba0c23bc97526cfd700cd240",
+      "uses": [
+        {
+          "pageKey": "p15",
+          "use": "picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/pairing-teach.svg",
+      "drawingSha256": "21bcb92162cd430de258699b9b562168e2e3cfcbab07b7e769dd03908a5a849b"
+    },
+    "parts-ordered": {
+      "file": "assets/parts-ordered.png",
+      "sha256": "df20d87c3a9257d7b4f0e2f07e4dca6e53248843f567c60669395c38853847e7",
+      "uses": [
+        {
+          "pageKey": "p10",
+          "use": "picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/parts-ordered.svg",
+      "drawingSha256": "a3c53b4e678be2ba8f84fc3968ed1bf083c952dd279d607e4a46ce4d15008ab7"
+    },
+    "parts-small": {
+      "file": "assets/parts-small.png",
+      "sha256": "fa24ebd8e1a352fc9600ee2eb1d5ff1f943652fef0005e36a6fdb796ab19c322",
+      "uses": [
+        {
+          "pageKey": "p05",
+          "use": "picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/parts-small.svg",
+      "drawingSha256": "95ad6196b57087ac854eba767468e88a5e7846a46f879958626d3d0489620b72"
+    },
+    "q-count-a": {
+      "file": "assets/q-count-a.png",
+      "sha256": "7d09e1fca031aba63a2c30fa81daaf1c55f3b313e3a9a457e0abdf85179df9d7",
+      "uses": [
+        {
+          "pageKey": "p18",
+          "questionId": "q-count",
+          "choice": "A"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-count-a.svg",
+      "drawingSha256": "92dc84615d1066430022ce1fe5016d675bc1891f2fb6e83d36734175a493a5fc"
+    },
+    "q-count-b": {
+      "file": "assets/q-count-b.png",
+      "sha256": "698065cc5e49a942b8032d1803ad03a2012b6e7c1236fac34a1653ef04f51d41",
+      "uses": [
+        {
+          "pageKey": "p18",
+          "questionId": "q-count",
+          "choice": "B"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-count-b.svg",
+      "drawingSha256": "9235a6cb57d2beb8c9ff1087a3e0fd32842164dd15e3476cadf408a71ac7817b"
+    },
+    "q-count-c": {
+      "file": "assets/q-count-c.png",
+      "sha256": "b2f659372297cc9130f6cf6a6bf88b9b6b3d9dbb3bfd027982b3a5eecdf9ccfd",
+      "uses": [
+        {
+          "pageKey": "p18",
+          "questionId": "q-count",
+          "choice": "C"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-count-c.svg",
+      "drawingSha256": "c7477da6b4dbaf750d67c45e9e9f0459ba1286c9a96b514e9d1fa5352672860f"
+    },
+    "q-count-d": {
+      "file": "assets/q-count-d.png",
+      "sha256": "45db44e539eedaa72b4965c5ef8051797aa1bab9c489f826f36142cf8454f408",
+      "uses": [
+        {
+          "pageKey": "p18",
+          "questionId": "q-count",
+          "choice": "D"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-count-d.svg",
+      "drawingSha256": "c9796ed993fee8ae91fb00afdb51412b5a419c696be30514153caadd99db4854"
+    },
+    "q-glyph-a": {
+      "file": "assets/q-glyph-a.png",
+      "sha256": "248bcfae0ab20bb8d9414075e1ed8aae77d2630a83e3dc1a253800d17d4cbfa9",
+      "uses": [
+        {
+          "pageKey": "p20",
+          "questionId": "q-glyph",
+          "choice": "A"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-glyph-a.svg",
+      "drawingSha256": "b43e6c0b139c13e9a5a73c1835ac35f5566d0df6f343aad71d6d35fb7c149665",
+      "referenceGeometry": "assets/digit-grid.svg",
+      "referenceGeometrySha256": "3c766862e05650188e1cf47d83b2a00c8d369a50241e581d1f2e0944b2c37073"
+    },
+    "q-glyph-b": {
+      "file": "assets/q-glyph-b.png",
+      "sha256": "befc87227ed732bb5455a94ebde3e35e4066f14ca133d9e590d9ced043294313",
+      "uses": [
+        {
+          "pageKey": "p20",
+          "questionId": "q-glyph",
+          "choice": "B"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-glyph-b.svg",
+      "drawingSha256": "119021dc56f52456e35937c35221c37ef42bdac1c1274ef55d28e2ffcde943ec",
+      "referenceGeometry": "assets/digit-grid.svg",
+      "referenceGeometrySha256": "3c766862e05650188e1cf47d83b2a00c8d369a50241e581d1f2e0944b2c37073"
+    },
+    "q-glyph-c": {
+      "file": "assets/q-glyph-c.png",
+      "sha256": "cff082b3c5ea41deabdc318c90db7c4ffc2cdebe2b640fcfbda195d8970bf863",
+      "uses": [
+        {
+          "pageKey": "p20",
+          "questionId": "q-glyph",
+          "choice": "C"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-glyph-c.svg",
+      "drawingSha256": "536e37e4c12ff4c1a22060c40125e2fcbc9bc5e2c6796fbe6e4418298e4bc2f4",
+      "referenceGeometry": "assets/digit-grid.svg",
+      "referenceGeometrySha256": "3c766862e05650188e1cf47d83b2a00c8d369a50241e581d1f2e0944b2c37073"
+    },
+    "q-next-a": {
+      "file": "assets/q-next-a.png",
+      "sha256": "7d09e1fca031aba63a2c30fa81daaf1c55f3b313e3a9a457e0abdf85179df9d7",
+      "uses": [
+        {
+          "pageKey": "p19",
+          "questionId": "q-next",
+          "choice": "A"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-next-a.svg",
+      "drawingSha256": "92dc84615d1066430022ce1fe5016d675bc1891f2fb6e83d36734175a493a5fc"
+    },
+    "q-next-b": {
+      "file": "assets/q-next-b.png",
+      "sha256": "92b2e339a4b78386bbd5ba8deb734d366a2da15f3a7fb099ec93a8da6980b72b",
+      "uses": [
+        {
+          "pageKey": "p19",
+          "questionId": "q-next",
+          "choice": "B"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-next-b.svg",
+      "drawingSha256": "d2ca2a31f3eb847772bb18873bf9f2267a7d97d74385f9693fddb747efb9a4e8"
+    },
+    "q-next-c": {
+      "file": "assets/q-next-c.png",
+      "sha256": "b2f659372297cc9130f6cf6a6bf88b9b6b3d9dbb3bfd027982b3a5eecdf9ccfd",
+      "uses": [
+        {
+          "pageKey": "p19",
+          "questionId": "q-next",
+          "choice": "C"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-next-c.svg",
+      "drawingSha256": "c7477da6b4dbaf750d67c45e9e9f0459ba1286c9a96b514e9d1fa5352672860f"
+    },
+    "q-next-d": {
+      "file": "assets/q-next-d.png",
+      "sha256": "45db44e539eedaa72b4965c5ef8051797aa1bab9c489f826f36142cf8454f408",
+      "uses": [
+        {
+          "pageKey": "p19",
+          "questionId": "q-next",
+          "choice": "D"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-next-d.svg",
+      "drawingSha256": "c9796ed993fee8ae91fb00afdb51412b5a419c696be30514153caadd99db4854"
+    },
+    "q-next-stem": {
+      "file": "assets/q-next-stem.png",
+      "sha256": "f613925f9c72f28f41f1621bbed634de0c381d2ca4c881b1f182a6939903d1fc",
+      "uses": [
+        {
+          "pageKey": "p19",
+          "questionId": "q-next",
+          "use": "stem"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-next-stem.svg",
+      "drawingSha256": "58cf4ac6b5260968d04d81832ce988fd37bd2359b8e3a8058147c764a2f5d95f"
+    },
+    "q-order-a": {
+      "file": "assets/q-order-a.png",
+      "sha256": "216f06c602b6e3d8cb908fc98925834302e8c8e7b35d3377811f3bc8029811c3",
+      "uses": [
+        {
+          "pageKey": "p23",
+          "questionId": "q-order",
+          "choice": "A"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-order-a.svg",
+      "drawingSha256": "715ef398a0048827aff2a5097d114efc2fb4c42092b612365975662a238fc9a6"
+    },
+    "q-order-b": {
+      "file": "assets/q-order-b.png",
+      "sha256": "323c01d8fc025fc1aae5f602698086e2b577248ee223522fb9f1c37be1fe21b3",
+      "uses": [
+        {
+          "pageKey": "p23",
+          "questionId": "q-order",
+          "choice": "B"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-order-b.svg",
+      "drawingSha256": "a66ff51a344488db3366ff6c5ba8814d3a3c730e026f1c26dc51e6eb1b2bd596"
+    },
+    "q-order-c": {
+      "file": "assets/q-order-c.png",
+      "sha256": "a8be2b2782d16d1b7c89864efa63145827cf53cc44da619833729b01e5cd1ca7",
+      "uses": [
+        {
+          "pageKey": "p23",
+          "questionId": "q-order",
+          "choice": "C"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-order-c.svg",
+      "drawingSha256": "eb963eaa76ee85a7db584a3ac817424e735bb87a0907dd467a86680ec84201f9"
+    },
+    "q-order-d": {
+      "file": "assets/q-order-d.png",
+      "sha256": "2135772fc9962f572a52ebada2dc70f5f75bb8cf5e2ec7126eef495a970b6744",
+      "uses": [
+        {
+          "pageKey": "p23",
+          "questionId": "q-order",
+          "choice": "D"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-order-d.svg",
+      "drawingSha256": "a5d1362b8ec96a708c9b0ae865b881da286ef62be0358e9eced960ded1ec4a47"
+    },
+    "q-order-stem": {
+      "file": "assets/q-order-stem.png",
+      "sha256": "6dd503a4919afa72cbf013c8157d791f6d93b539087fd7ae27fdd40838b0467c",
+      "uses": [
+        {
+          "pageKey": "p23",
+          "questionId": "q-order",
+          "use": "stem"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-order-stem.svg",
+      "drawingSha256": "12b5181013d543b0d7d0190ef9ec355a14dc8c634ba5d62dbb99416a0417aefd"
+    },
+    "q-pair-a": {
+      "file": "assets/q-pair-a.png",
+      "sha256": "9b6dfb564bba17182dd9c1af28389b14b2fd7b7ec94e3ff918d378342122dfee",
+      "uses": [
+        {
+          "pageKey": "p24",
+          "questionId": "q-pairs",
+          "choice": "A"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-pair-a.svg",
+      "drawingSha256": "d85b807e49f9f93a6f558461bcc55ebe0428b06e8ced4281a073161b25351f3f"
+    },
+    "q-pair-b": {
+      "file": "assets/q-pair-b.png",
+      "sha256": "7ac26c43f5bd7f44332f6471764bf9694a8befbf31845ae6ae2aecce25f80d7d",
+      "uses": [
+        {
+          "pageKey": "p24",
+          "questionId": "q-pairs",
+          "choice": "B"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-pair-b.svg",
+      "drawingSha256": "faef02d6731dc3b745a82dd34f7c0baec2ee22524c9191de172973a9663bbe96"
+    },
+    "q-pair-c": {
+      "file": "assets/q-pair-c.png",
+      "sha256": "fba0b54d9c8fc62c016775de04b9b112fd105236b0f86aa04a7761cdf0f9fda7",
+      "uses": [
+        {
+          "pageKey": "p24",
+          "questionId": "q-pairs",
+          "choice": "C"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-pair-c.svg",
+      "drawingSha256": "c92fea671d8c1a22d73209072f940445391e36669b5ddbc1e2c814f24bebba49"
+    },
+    "q-pair-stem": {
+      "file": "assets/q-pair-stem.png",
+      "sha256": "11cde5640622d4f034f00c987dc44b3a2d548a5bd92621e8371b25903feaaaf1",
+      "uses": [
+        {
+          "pageKey": "p24",
+          "questionId": "q-pairs",
+          "use": "stem"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-pair-stem.svg",
+      "drawingSha256": "fbcbb64db540ae5cda63a6e9179e49b6ef46ad8b9c7b96288447b02e133c719d"
+    },
+    "q-split-a": {
+      "file": "assets/q-split-a.png",
+      "sha256": "698065cc5e49a942b8032d1803ad03a2012b6e7c1236fac34a1653ef04f51d41",
+      "uses": [
+        {
+          "pageKey": "p21",
+          "questionId": "q-split",
+          "choice": "A"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-split-a.svg",
+      "drawingSha256": "9235a6cb57d2beb8c9ff1087a3e0fd32842164dd15e3476cadf408a71ac7817b"
+    },
+    "q-split-b": {
+      "file": "assets/q-split-b.png",
+      "sha256": "b2f659372297cc9130f6cf6a6bf88b9b6b3d9dbb3bfd027982b3a5eecdf9ccfd",
+      "uses": [
+        {
+          "pageKey": "p21",
+          "questionId": "q-split",
+          "choice": "B"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-split-b.svg",
+      "drawingSha256": "c7477da6b4dbaf750d67c45e9e9f0459ba1286c9a96b514e9d1fa5352672860f"
+    },
+    "q-split-c": {
+      "file": "assets/q-split-c.png",
+      "sha256": "7d09e1fca031aba63a2c30fa81daaf1c55f3b313e3a9a457e0abdf85179df9d7",
+      "uses": [
+        {
+          "pageKey": "p21",
+          "questionId": "q-split",
+          "choice": "C"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-split-c.svg",
+      "drawingSha256": "92dc84615d1066430022ce1fe5016d675bc1891f2fb6e83d36734175a493a5fc"
+    },
+    "q-split-d": {
+      "file": "assets/q-split-d.png",
+      "sha256": "45db44e539eedaa72b4965c5ef8051797aa1bab9c489f826f36142cf8454f408",
+      "uses": [
+        {
+          "pageKey": "p21",
+          "questionId": "q-split",
+          "choice": "D"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-split-d.svg",
+      "drawingSha256": "c9796ed993fee8ae91fb00afdb51412b5a419c696be30514153caadd99db4854"
+    },
+    "q-split-stem": {
+      "file": "assets/q-split-stem.png",
+      "sha256": "95f0ea306eada95bf37132713a0a568408c9837a442ba7b97adab833442e2b2c",
+      "uses": [
+        {
+          "pageKey": "p21",
+          "questionId": "q-split",
+          "use": "stem"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-split-stem.svg",
+      "drawingSha256": "4031c39ce8fe2581cb8f54bdd028c700aec1c4b10e0ada68fe3ebe45252c10fb"
+    },
+    "q-unit-a": {
+      "file": "assets/q-unit-a.png",
+      "sha256": "5707644d697e8b685bff58c4e93a7302631d0c1749ffeb4a5068990a12421734",
+      "uses": [
+        {
+          "pageKey": "p17",
+          "questionId": "q-unit",
+          "choice": "A"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-unit-a.svg",
+      "drawingSha256": "16b4daa7851d3c9491d4ff6f722aabcaa1c2b01ca25887b7df20e808a8f776c5"
+    },
+    "q-unit-b": {
+      "file": "assets/q-unit-b.png",
+      "sha256": "43e5e1dbc5f75049f35ca5ce1cdf2c95a3387c85b5c6f5882d798ec8836e81d6",
+      "uses": [
+        {
+          "pageKey": "p17",
+          "questionId": "q-unit",
+          "choice": "B"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-unit-b.svg",
+      "drawingSha256": "d81fea591855d01bbc76a04d6c2f298e5ea0a11abac94ac30eac0300a8140d0a"
+    },
+    "q-unit-c": {
+      "file": "assets/q-unit-c.png",
+      "sha256": "e7fe2cf2729cedf8e74aa3f752216205b15efd4d70995c9d0da2f263c4b096eb",
+      "uses": [
+        {
+          "pageKey": "p17",
+          "questionId": "q-unit",
+          "choice": "C"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-unit-c.svg",
+      "drawingSha256": "8739887d3670f3d6a9c2bfe872b64eabc8b016f8dfaa88b85a1abe16f03fd865"
+    },
+    "q-zero-a": {
+      "file": "assets/q-zero-a.png",
+      "sha256": "01ec110ab84a5f52e10a1cd31985235edfd22aef972dadda0dac87f07eacf681",
+      "uses": [
+        {
+          "pageKey": "p22",
+          "questionId": "q-zero",
+          "choice": "A"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-zero-a.svg",
+      "drawingSha256": "aa72424ba59fc7d0b8953898c4eb477d87e9d36ebb2714de9979a341c42d2949"
+    },
+    "q-zero-b": {
+      "file": "assets/q-zero-b.png",
+      "sha256": "f9dff45546e51f01b7f4cb44a39d3fabd8bb743ecce57ffda1898184a9426a6e",
+      "uses": [
+        {
+          "pageKey": "p22",
+          "questionId": "q-zero",
+          "choice": "B"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-zero-b.svg",
+      "drawingSha256": "7a1144feddaf9197245f5d57258c68624555d807187c429d92cb383fe611c4b2"
+    },
+    "q-zero-c": {
+      "file": "assets/q-zero-c.png",
+      "sha256": "ad5ff7877dd85cbdba8e710a065897967f3ee2122d1ce925f8a1a69acb2fc4cc",
+      "uses": [
+        {
+          "pageKey": "p22",
+          "questionId": "q-zero",
+          "choice": "C"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/q-zero-c.svg",
+      "drawingSha256": "8e8f040876a8504514c41d339a618da2c35140dc55f65cf44f974825400a7d3c"
+    },
+    "zero-empty": {
+      "file": "assets/zero-empty.png",
+      "sha256": "325295feb3aa22582e172e19ee13c4ffe421f23177d6a972f97f17bab875339e",
+      "uses": [
+        {
+          "pageKey": "p12",
+          "use": "left_picture"
+        }
+      ],
+      "kind": "code-drawn",
+      "drawingFile": "assets/zero-empty.svg",
+      "drawingSha256": "218070d69a3a034d2639bcb4a00fd4cce34d0caecf7118e2ef61c42d42d01f6e"
+    }
+  }
+}

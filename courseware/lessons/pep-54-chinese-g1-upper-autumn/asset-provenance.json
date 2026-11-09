@@ -1,0 +1,481 @@
+{
+  "schemaVersion": "mira.courseware.asset-provenance.v1",
+  "assets": {
+    "blue-sky": {
+      "file": "assets/blue-sky.png",
+      "sha256": "51174cb919da83c5f9e7b1547e50da59bd207ba8bdfc375e5a765ee6cea39df7",
+      "width": 980,
+      "height": 552,
+      "sceneKeys": [
+        "p09"
+      ],
+      "method": "Codex imagegen",
+      "sourceKeys": [
+        "blue-sky"
+      ],
+      "source": "imagegen-prompts.json",
+      "visualReview": "主体为蓝天与低地平线；无额外飞鸟。"
+    },
+    "cool-path": {
+      "file": "assets/cool-path.png",
+      "sha256": "b93f173bd878c3f5f22d1f5927be8a43f1d90735f34e7f20ecf2c49dbd43d156",
+      "width": 439,
+      "height": 560,
+      "sceneKeys": [
+        "p02"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "cover"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "同幅封面裁切，外套和衣袖完整可见。"
+    },
+    "cover": {
+      "file": "assets/cover.png",
+      "sha256": "92e180c7c31d5f664b754dfd6662ff1b6ef8f3fccc90f1f2e66bf56cb0151dae",
+      "width": 1450,
+      "height": 816,
+      "sceneKeys": [
+        "p01",
+        "p02"
+      ],
+      "method": "Codex imagegen",
+      "sourceKeys": [
+        "cover"
+      ],
+      "source": "imagegen-prompts.json",
+      "visualReview": "秋日校园、外套、空信封、金黄银杏；画面无文字。"
+    },
+    "empty-tray": {
+      "file": "assets/empty-tray.png",
+      "sha256": "918d27685fedcbe0516a35c21e4e36279eafd96eaef2aecc04589d8549de1935",
+      "width": 640,
+      "height": 360,
+      "sceneKeys": [
+        "p07"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "盘中无叶。"
+    },
+    "flock-line": {
+      "file": "assets/flock-line.png",
+      "sha256": "0194d4d587412d8432f4053245963fc8bb5dc7fedda50ee8caa40c6a7df5857d",
+      "width": 720,
+      "height": 405,
+      "sceneKeys": [
+        "p09"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "blue-sky",
+        "goose"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "七只大雁的中心在同一水平线上。"
+    },
+    "flock-scatter": {
+      "file": "assets/flock-scatter.png",
+      "sha256": "688abbc5ad919c878618a1ebce383c875f6262964542bc4308a480d0d5dccb60",
+      "width": 720,
+      "height": 405,
+      "sceneKeys": [
+        "p09"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "blue-sky",
+        "goose"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "七只大雁错落，无人字或一字。"
+    },
+    "flock-v": {
+      "file": "assets/flock-v.png",
+      "sha256": "048107c6788f89693833167b6da8a9638c70495dc83c7c52ebc47b20d1825cba",
+      "width": 720,
+      "height": 405,
+      "sceneKeys": [
+        "p09"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "blue-sky",
+        "goose"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "七只大雁，首鸟在上，左右各三只沿两斜线。"
+    },
+    "goose": {
+      "file": "assets/goose.png",
+      "sha256": "05e1667715e7aa1894d6c4c630395e30f00b71ddb2987d17cc261c58fb971357",
+      "width": 870,
+      "height": 580,
+      "sceneKeys": [
+        "p09"
+      ],
+      "method": "Codex imagegen",
+      "sourceKeys": [
+        "goose"
+      ],
+      "source": "imagegen-prompts.json",
+      "visualReview": "一只展翅大雁，颈、翼、尾完整，透明背景。"
+    },
+    "leaf-fall": {
+      "file": "assets/leaf-fall.png",
+      "sha256": "48fb5f3ed6c8662995cb721de12d0d21f02615d12cb9c3e5564affe1fd7acacf",
+      "width": 980,
+      "height": 552,
+      "sceneKeys": [
+        "p07"
+      ],
+      "method": "Codex imagegen",
+      "sourceKeys": [
+        "leaf-fall"
+      ],
+      "source": "imagegen-prompts.json",
+      "visualReview": "有树冠、半空和地面三层，叶子位置清楚。"
+    },
+    "many-leaves": {
+      "file": "assets/many-leaves.png",
+      "sha256": "c038ec7d7985a6f5c80561a117fdc61204a8d036062ed0f7ca126ea81c144e3e",
+      "width": 640,
+      "height": 360,
+      "sceneKeys": [
+        "p07"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "one-leaf"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "盘中五片清晰分开的银杏叶。"
+    },
+    "one-tray": {
+      "file": "assets/one-tray.png",
+      "sha256": "25351e13966798f56e18f812fc929f06b9383181f34073c2d15c281f20138985",
+      "width": 640,
+      "height": 360,
+      "sceneKeys": [
+        "p07"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "one-leaf"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "盘中恰好一片银杏叶。"
+    },
+    "pace-diagram": {
+      "file": "assets/pace-diagram.png",
+      "sha256": "a8ffec2e8ed0930a5d227f6a31977da30b0c894b2b3bf77d38dc18416c776882",
+      "width": 840,
+      "height": 400,
+      "sceneKeys": [
+        "p05"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "会儿连读，了和子在对应词尾用红字提示。"
+    },
+    "paragraph-diagram": {
+      "file": "assets/paragraph-diagram.png",
+      "sha256": "50254f1e2555b8d6c58047d83af4e0c3af5428678cd4234e3fd09fff4aa6be5f",
+      "width": 640,
+      "height": 365,
+      "sceneKeys": [
+        "p03"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "首、三、五行有两格空位，图形替代文字。"
+    },
+    "quiz-lake-autumn": {
+      "file": "assets/quiz-lake-autumn.png",
+      "sha256": "ac3ade76a48af88e66234f341ada16ec9e62d49fc0ed869951278dd0bf103dae",
+      "width": 980,
+      "height": 552,
+      "sceneKeys": [
+        "p12"
+      ],
+      "method": "Codex imagegen",
+      "sourceKeys": [
+        "quiz-lake-autumn"
+      ],
+      "source": "imagegen-prompts.json",
+      "visualReview": "黄叶从树上飘落并在路面可见。"
+    },
+    "quiz-lake-green": {
+      "file": "assets/quiz-lake-green.png",
+      "sha256": "33b1f863a6a78d22df1721b94fe83036103acc95b4c08d876152c91210796a31",
+      "width": 980,
+      "height": 552,
+      "sceneKeys": [
+        "p12"
+      ],
+      "method": "Codex imagegen",
+      "sourceKeys": [
+        "quiz-lake-green"
+      ],
+      "source": "imagegen-prompts.json",
+      "visualReview": "绿叶仍连在枝上，无黄叶和雪。"
+    },
+    "quiz-lake-snow": {
+      "file": "assets/quiz-lake-snow.png",
+      "sha256": "b9fa14607fca172acb1251b41a138cf991e65e2e8a1ac9d5bbacfc9f1c980b3d",
+      "width": 980,
+      "height": 552,
+      "sceneKeys": [
+        "p12"
+      ],
+      "method": "Codex imagegen",
+      "sourceKeys": [
+        "quiz-lake-snow"
+      ],
+      "source": "imagegen-prompts.json",
+      "visualReview": "木步道有积雪，树枝无叶。"
+    },
+    "quiz-layout-one": {
+      "file": "assets/quiz-layout-one.png",
+      "sha256": "3019c5495984ac81a3b6d1b588cdfbb6d2426a281532590721f6bba6f1bb3931",
+      "width": 640,
+      "height": 365,
+      "sceneKeys": [
+        "p14"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "五行中只有一行开头空两格。"
+    },
+    "quiz-layout-three": {
+      "file": "assets/quiz-layout-three.png",
+      "sha256": "f28f18502b703d2f4fc154701cb49a39cb124fc6553b5910bdb7712587dfc770",
+      "width": 640,
+      "height": 365,
+      "sceneKeys": [
+        "p14"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "五行中有三行开头空两格。"
+    },
+    "quiz-layout-two": {
+      "file": "assets/quiz-layout-two.png",
+      "sha256": "29ae38b69d06b16fce3026edad0b66910f160e072035f0a486d254af9f1f7777",
+      "width": 640,
+      "height": 365,
+      "sceneKeys": [
+        "p14"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "五行中有两行开头空两格。"
+    },
+    "quiz-stroke-dot": {
+      "file": "assets/quiz-stroke-dot.png",
+      "sha256": "ea6f1a46b35aa0b0b0c23bfaa24b8ef56a62ede07ded899ccd5a2d4cda4f8286",
+      "width": 480,
+      "height": 280,
+      "sceneKeys": [
+        "p15"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "共同前两笔后加斜向右下的短点，为干扰。"
+    },
+    "quiz-stroke-flat": {
+      "file": "assets/quiz-stroke-flat.png",
+      "sha256": "a72bedd9010a3dc3e1898ea11f4024012ccf129a399eccee2bb5866125fc68d1",
+      "width": 480,
+      "height": 280,
+      "sceneKeys": [
+        "p15"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "共同前两笔后加穿过中线的长横，为正确项。"
+    },
+    "quiz-stroke-left": {
+      "file": "assets/quiz-stroke-left.png",
+      "sha256": "230875b4310486c9ca2e316e94aa83e228ae9b1c3701b775565225274b766ced",
+      "width": 480,
+      "height": 280,
+      "sceneKeys": [
+        "p15"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "共同前两笔后加斜向左下的撇，为干扰。"
+    },
+    "quiz-tray-empty": {
+      "file": "assets/quiz-tray-empty.png",
+      "sha256": "0ea290e13b65cc811af6510024f34a9c95c6359ea7cb27d5c3b22d79247f7e32",
+      "width": 632,
+      "height": 360,
+      "sceneKeys": [
+        "p13"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "盘内没有枫叶。"
+    },
+    "quiz-tray-many": {
+      "file": "assets/quiz-tray-many.png",
+      "sha256": "37a6cabc649b96ba0f4880b56ec388810d164a6f4a2b8dd9e1316eb4b19c49d1",
+      "width": 640,
+      "height": 360,
+      "sceneKeys": [
+        "p13"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "quiz-maple"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "盘中五片枫叶，未重叠。"
+    },
+    "quiz-tray-one": {
+      "file": "assets/quiz-tray-one.png",
+      "sha256": "8ab5a652b9c56f89a3eea97a2b832daafea2d04a9be68c65746a237e6faaa956",
+      "width": 640,
+      "height": 360,
+      "sceneKeys": [
+        "p13"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "quiz-maple"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "盘中恰好一片枫叶。"
+    },
+    "radical-diagram": {
+      "file": "assets/radical-diagram.png",
+      "sha256": "7bd6fa9634983571134769855a4e7d845de184dbf50a2f3a61761a144673c23a",
+      "width": 840,
+      "height": 400,
+      "sceneKeys": [
+        "p06"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "秋、树、叶各显左边部件，楷体汉字。"
+    },
+    "stroke-da-ren": {
+      "file": "assets/stroke-da-ren.png",
+      "sha256": "7f2b5436d8f98001469b53fe906921067ddc9f548b8421b7bc932d20967fa5e4",
+      "width": 840,
+      "height": 460,
+      "sceneKeys": [
+        "p11"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "大横撇捺、人撇捺依次标红，对照官方第二课时第13至17页。"
+    },
+    "stroke-le-zi": {
+      "file": "assets/stroke-le-zi.png",
+      "sha256": "640a05123156e2d4c5ea8a5b67169c37846458eef2b2643a81c0e1cd562d4be0",
+      "width": 840,
+      "height": 460,
+      "sceneKeys": [
+        "p10"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "横撇、弯钩和子末笔横依次标红，对照官方第一课时第22至26页。"
+    },
+    "tone-diagram": {
+      "file": "assets/tone-diagram.png",
+      "sha256": "0afde93c0beeffecaa1de19c739b293455f377003744f92276227e943d188b9f",
+      "width": 840,
+      "height": 400,
+      "sceneKeys": [
+        "p04"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [],
+      "source": "art/render_assets.py",
+      "visualReview": "四个课文词例的声调按官方课件第9页核对，声线为平、上扬或下落。"
+    },
+    "yellow-tree": {
+      "file": "assets/yellow-tree.png",
+      "sha256": "240c3f55938fccb5f8512685976fc38cbb4438a99b9510bc4e1c199d46fc6f20",
+      "width": 665,
+      "height": 420,
+      "sceneKeys": [
+        "p02"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "leaf-fall"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "只保留树冠、黄色枝叶和主要枝条，不把枝头误作地面。"
+    },
+    "sky-goose": {
+      "file": "assets/sky-goose.png",
+      "sha256": "3e294b193dbd8b29af77a58ccbf97ae295dbd3d8da04dc011eb183f42f678389",
+      "width": 840,
+      "height": 472,
+      "sceneKeys": [
+        "p08"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "blue-sky",
+        "goose"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "一只展翅大雁，图中保留开阔蓝天。"
+    },
+    "recap-triptych": {
+      "file": "assets/recap-triptych.png",
+      "sha256": "b6ad609b25a6a963801dac0e989168edd09aca262335b5148f48dd15fa3deb87",
+      "width": 720,
+      "height": 460,
+      "sceneKeys": [
+        "p16"
+      ],
+      "method": "code illustration or precise diagram",
+      "sourceKeys": [
+        "leaf-fall",
+        "blue-sky",
+        "goose",
+        "cover"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "三栏分别为飘叶、雁阵、抬头的孩子。"
+    },
+    "fall-close": {
+      "file": "assets/fall-close.png",
+      "method": "code illustration or precise diagram",
+      "sceneKeys": [
+        "p02"
+      ],
+      "sourceKeys": [
+        "leaf-fall",
+        "one-leaf"
+      ],
+      "source": "art/render_assets.py",
+      "visualReview": "离枝的三片银杏叶在半空从上至下分开，画面中没有枝头黄叶。",
+      "sha256": "9db6da460e12d8431c39dcea2bbff83a987f3447a5c46f8ef36a820a67fe824a",
+      "width": 750,
+      "height": 474
+    }
+  }
+}

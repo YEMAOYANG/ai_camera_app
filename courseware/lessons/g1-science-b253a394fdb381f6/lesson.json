@@ -1,0 +1,918 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "吹泡泡",
+  "description": "青岛版六三制一年级上册完整课：不同表面、多角度观察、大泡套小泡、户外现象与不同形工具比较。屏幕证据仅代表选择和操作，真实实验与口述待观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/ke-science-v1.png",
+      "color": "#439B87",
+      "persona": "引导孩子安全观察、比较具体证据，讲清方法，不把点击当成真实实验或表达能力。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "table": {
+      "file": "assets/table.png"
+    },
+    "cloth": {
+      "file": "assets/cloth.png"
+    },
+    "ball": {
+      "file": "assets/ball.png"
+    },
+    "water": {
+      "file": "assets/water.png"
+    },
+    "bubble": {
+      "file": "assets/bubble.png"
+    },
+    "nested": {
+      "file": "assets/nested.png"
+    },
+    "outdoor": {
+      "file": "assets/outdoor.png"
+    },
+    "circle-tool": {
+      "file": "assets/circle-tool.png"
+    },
+    "heart-tool": {
+      "file": "assets/heart-tool.png"
+    },
+    "star-tool": {
+      "file": "assets/star-tool.png"
+    },
+    "rectangle-tool": {
+      "file": "assets/rectangle-tool.png"
+    },
+    "wet-straw": {
+      "file": "assets/wet-straw.png"
+    },
+    "rect-bubble": {
+      "file": "assets/rect-bubble.png"
+    },
+    "tri-bubble": {
+      "file": "assets/tri-bubble.png"
+    },
+    "wet-plate": {
+      "file": "assets/wet-plate.png"
+    },
+    "dry-plate": {
+      "file": "assets/dry-plate.png"
+    },
+    "crumb-plate": {
+      "file": "assets/crumb-plate.png"
+    },
+    "pair-different": {
+      "file": "assets/pair-different.png"
+    },
+    "pair-equal": {
+      "file": "assets/pair-equal.png"
+    },
+    "one-bubble": {
+      "file": "assets/one-bubble.png"
+    },
+    "adult": {
+      "file": "assets/adult.png"
+    },
+    "chase": {
+      "file": "assets/chase.png"
+    },
+    "spill": {
+      "file": "assets/spill.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "泡泡观察站",
+      "template": "picture-points",
+      "data": {
+        "title": "泡泡观察站",
+        "picture": "cover",
+        "points": [
+          "看大小和样子",
+          "换表面再观察",
+          "听发现，注意安全"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，我们一起走进泡泡观察站。"
+        },
+        {
+          "say": "玩泡泡时，小眼睛也能发现科学。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看泡泡有多大，是什么样子。"
+        },
+        {
+          "say": "还可以看它停在哪里，后来怎么变。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "换到不同表面，再慢慢观察一次。"
+        },
+        {
+          "say": "条件变了，看到的现象可能也变。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "说出自己看到的，也听伙伴的发现。"
+        },
+        {
+          "say": "真实吹泡泡要有大人陪同。"
+        },
+        {
+          "say": "液体不洒地上，脚下湿了先请大人处理。"
+        },
+        {
+          "say": "屏幕练习能记录选择，真实操作还待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "换个表面看看",
+      "page": "p02",
+      "widgetType": "science-bubble-observation",
+      "startImage": "cover",
+      "script": [
+        {
+          "highlight": "#surface-workbench"
+        },
+        {
+          "say": "这里有四种表面，我们逐个换着看。"
+        },
+        {
+          "say": "先选一个物体，再送到实验台。"
+        },
+        {
+          "highlight": "#surface-table"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "老师先看桌面上的这一泡。"
+        },
+        {
+          "say": "它贴着桌面，像半个圆圆的球。"
+        },
+        {
+          "say": "破掉以后，桌面还留下了一点液体。"
+        },
+        {
+          "highlight": "#surface-water"
+        },
+        {
+          "setState": {
+            "demoObject": "water"
+          }
+        },
+        {
+          "say": "换成水面，这次例子里的泡泡停得更久。"
+        },
+        {
+          "say": "这是一次观察，不代表每次都一样。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "highlight": "#surface-records"
+        },
+        {
+          "say": "现在换你，按吹气图，再把发现收进记录区。"
+        },
+        {
+          "say": "四种都看过，再和大人说哪里不同。"
+        },
+        {
+          "say": "不能只凭一次游戏，就给所有表面排顺序。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "一个泡泡，多种发现",
+      "template": "picture-points",
+      "data": {
+        "title": "一个泡泡，多种发现",
+        "picture": "bubble",
+        "points": [
+          "大小可以比较",
+          "透明，也有彩色边缘",
+          "贴住表面，样子会变",
+          "看它后来怎么变化"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "同一个泡泡，可以换几个角度观察。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先比大小，有的大，有的小。"
+        },
+        {
+          "say": "把两个放在一起，比较就更清楚。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "透过泡泡还能看到后面，这是透明。"
+        },
+        {
+          "say": "在光下，薄薄边缘还可能显出彩色。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "空中独立的泡泡，一般圆圆像个球。"
+        },
+        {
+          "say": "桌面上的泡泡贴着表面，像半个球。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "还要继续看，它会破，还是会滑动。"
+        },
+        {
+          "say": "说发现时，先说在哪儿，再说看见什么。"
+        },
+        {
+          "say": "朵朵说：我会把看到的说清楚。",
+          "by": "duoduo"
+        },
+        {
+          "say": "真实看见和口头描述，请大人帮忙观察。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "quiz",
+      "title": "小检查：大小和表面",
+      "intro": [
+        "听老师说新情境，再选择图片。",
+        "这些题用新的盘子和托盘，慢慢观察。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "新瓷盘上的泡泡破了。哪图显示留下泡泡液？",
+          "skill": "观察泡泡破后的表面变化",
+          "answer": [
+            "A"
+          ],
+          "analysis": "泡泡液是液体。湿水痕是这道题观察到的结果，干盘和饼干碎不是。",
+          "options": {
+            "A": {
+              "label": "留有水痕的瓷盘",
+              "visual": {
+                "kind": "asset",
+                "image": "wet-plate",
+                "alt": "留有水痕的瓷盘"
+              }
+            },
+            "B": {
+              "label": "干燥的瓷盘",
+              "visual": {
+                "kind": "asset",
+                "image": "dry-plate",
+                "alt": "干燥的瓷盘"
+              }
+            },
+            "C": {
+              "label": "有饼干碎的瓷盘",
+              "visual": {
+                "kind": "asset",
+                "image": "crumb-plate",
+                "alt": "有饼干碎的瓷盘"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "蓝托盘上方，哪图有一大一小两个泡泡？",
+          "skill": "根据画面比较泡泡大小",
+          "answer": [
+            "B"
+          ],
+          "analysis": "这幅图有两个泡泡，并且一个明显较大、一个明显较小。",
+          "options": {
+            "A": {
+              "label": "两个一样大的泡泡",
+              "visual": {
+                "kind": "asset",
+                "image": "pair-equal",
+                "alt": "两个一样大的泡泡"
+              }
+            },
+            "B": {
+              "label": "一大一小两个泡泡",
+              "visual": {
+                "kind": "asset",
+                "image": "pair-different",
+                "alt": "一大一小两个泡泡"
+              }
+            },
+            "C": {
+              "label": "只有一个泡泡",
+              "visual": {
+                "kind": "asset",
+                "image": "one-bubble",
+                "alt": "只有一个泡泡"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "大泡泡的里面",
+      "template": "picture-points",
+      "data": {
+        "title": "大泡泡的里面",
+        "picture": "nested",
+        "points": [
+          "先吹一个大泡泡",
+          "吸管轻轻穿入",
+          "再吹小泡，观察后调整"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这次，我们想让小泡泡住进大泡泡。"
+        },
+        {
+          "say": "先想一个办法，再按顺序试。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "在湿润桌面上，先吹出一个大泡泡。"
+        },
+        {
+          "say": "外面的泡泡够大，里面才有尝试的空间。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "吸管拿稳，再轻轻穿过外面的泡。"
+        },
+        {
+          "say": "不要急着乱碰，注意吸管接触的位置。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接着轻轻吹，在里面形成一个小泡。"
+        },
+        {
+          "say": "大小泡的边缘分开，才能看清里面和外面。"
+        },
+        {
+          "say": "如果碰破了，就观察哪里接触，再试一次。"
+        },
+        {
+          "say": "小满问：一次没成，可以换办法吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "可以，认真看现象，再调整，正是探索。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "搭一个泡泡小屋",
+      "page": "p06",
+      "widgetType": "science-bubble-observation",
+      "startImage": "nested",
+      "script": [
+        {
+          "highlight": "#nest-table"
+        },
+        {
+          "say": "这张台面，是我们练习嵌套泡泡的地方。"
+        },
+        {
+          "highlight": "#nest-water"
+        },
+        {
+          "setState": {
+            "demoStep": 1
+          }
+        },
+        {
+          "say": "老师先把水碗送来，让台面变湿润。"
+        },
+        {
+          "highlight": "#nest-large"
+        },
+        {
+          "setState": {
+            "demoStep": 2
+          }
+        },
+        {
+          "say": "再吹一个大泡，把里面的空间留出来。"
+        },
+        {
+          "highlight": "#nest-wet-straw"
+        },
+        {
+          "setState": {
+            "demoStep": 3
+          }
+        },
+        {
+          "say": "拿着吸管，轻轻送进大泡的中间。"
+        },
+        {
+          "say": "边缘留开一点，别急着碰到大泡。"
+        },
+        {
+          "highlight": "#nest-small"
+        },
+        {
+          "setState": {
+            "demoStep": 4
+          }
+        },
+        {
+          "say": "再轻轻吹，小泡就出现在大泡里面。"
+        },
+        {
+          "say": "这个画面在示范顺序，不保证真做必成。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "highlight": "#nest-table"
+        },
+        {
+          "say": "现在从湿润台面开始，亲手试一遍。"
+        },
+        {
+          "say": "如果泡破了，先看碰在哪里，再换个位置。"
+        },
+        {
+          "say": "真实吹气和工具握法，还要请大人观察。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "到户外继续观察",
+      "template": "picture-points",
+      "data": {
+        "title": "到户外继续观察",
+        "picture": "outdoor",
+        "points": [
+          "看飘动，也看颜色",
+          "站稳观察，不追跑",
+          "说自己的，也听伙伴的"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "来到户外，泡泡又给我们新线索。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "风吹来，泡泡会随着风飘动。"
+        },
+        {
+          "say": "看泡泡原来在哪儿，再看它往哪儿飘。"
+        },
+        {
+          "say": "在阳光下，泡泡边缘还可能出现彩色。"
+        },
+        {
+          "say": "观察颜色和观察飘动，是两个观察角度。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "站在安全地方慢慢看，不追着泡泡跑。"
+        },
+        {
+          "say": "旁边有大人陪着，也要留心脚下。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "把看见的新现象说出来，再听伙伴说。"
+        },
+        {
+          "say": "别人看到了你没注意的，也值得再找一找。"
+        },
+        {
+          "say": "屏幕能留下选图，真实分享和倾听待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "看着风，找泡泡",
+      "page": "p08",
+      "widgetType": "science-bubble-observation",
+      "startImage": "outdoor",
+      "script": [
+        {
+          "highlight": "#wind-ribbon"
+        },
+        {
+          "say": "先看上面的风向箭头，它表示这次的风向线索。"
+        },
+        {
+          "say": "不能只记上一次，要看这一次的方向。"
+        },
+        {
+          "highlight": "#wind-bubble"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "老师把这个泡泡，送向箭头指向的那一边。"
+        },
+        {
+          "say": "泡泡沿着风的方向，移进了观察窗。"
+        },
+        {
+          "highlight": "#wind-right"
+        },
+        {
+          "say": "看清线索，再移动，就有观察的依据。"
+        },
+        {
+          "say": "下一次风向变了，泡泡的去处也会变。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "highlight": "#wind-left"
+        },
+        {
+          "say": "现在请你拖动泡泡，找到这一次的观察窗。"
+        },
+        {
+          "say": "拖不方便，可以先点泡泡，再点窗。"
+        },
+        {
+          "say": "泡泡移动后，再说一说你看到了什么。"
+        },
+        {
+          "say": "这里是方向练习，户外现象还要亲眼观察。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "工具变了，泡泡呢",
+      "template": "picture-points",
+      "data": {
+        "title": "工具变了，泡泡呢",
+        "picture": "bubble",
+        "points": [
+          "换一种工具，先想一想",
+          "只看离开工具的独立泡泡",
+          "一般都是球形"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "吹泡泡的工具，可以有不同的形状。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "圆环、心形环和星形环，都可以试一试。"
+        },
+        {
+          "say": "先想泡泡可能怎样，再亲眼看结果。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "比较时，只看已经离开工具的独立泡泡。"
+        },
+        {
+          "say": "不要把环里的薄膜，当成空中的泡泡。"
+        },
+        {
+          "say": "也别把贴住桌面的样子混在一起。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "换了环的形状，独立泡泡一般仍是球形。"
+        },
+        {
+          "say": "它不会因为心形工具，就保留成一个爱心。"
+        },
+        {
+          "say": "这是比较后找到的共同点。"
+        },
+        {
+          "say": "多试几种，边做边看，发现才更清楚。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "换工具做比较",
+      "page": "p10",
+      "widgetType": "science-bubble-observation",
+      "startImage": "cover",
+      "script": [
+        {
+          "highlight": "#tool-bank"
+        },
+        {
+          "say": "三种工具，分别请到泡泡液盘来。"
+        },
+        {
+          "say": "每换一种，都看看离开工具后的结果。"
+        },
+        {
+          "highlight": "#tool-dish"
+        },
+        {
+          "setState": {
+            "demoPhase": "load"
+          }
+        },
+        {
+          "say": "老师先用圆环，沾一沾泡泡液。"
+        },
+        {
+          "highlight": "#tool-blow"
+        },
+        {
+          "setState": {
+            "demoPhase": "blow"
+          }
+        },
+        {
+          "say": "按吹气图，空中出现一个独立的球形泡泡。"
+        },
+        {
+          "highlight": "#tool-result"
+        },
+        {
+          "say": "我们记录泡泡的样子，不记录环的样子。"
+        },
+        {
+          "highlight": "#tool-shapes"
+        },
+        {
+          "say": "心形环和星形环，也要这样比较。"
+        },
+        {
+          "say": "先看结果，再选图，不用猜工具喜欢什么。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "highlight": "#tool-bank"
+        },
+        {
+          "say": "现在换你，三种工具都试过，记录才完整。"
+        },
+        {
+          "say": "第一次选错可以再看，慢慢改。"
+        },
+        {
+          "say": "把共同点说给大人听，口头表达待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "小检查：新的工具与安全",
+      "intro": [
+        "换一个从没用过的工具，再想想共同点。",
+        "最后看看社区里怎样安全观察。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "长方形环吹出的独立泡泡，一般像哪图？",
+          "skill": "不同形工具与独立泡泡形状",
+          "answer": [
+            "C"
+          ],
+          "analysis": "环的形状改变，独立空中泡泡一般仍为球形，不保持长方形或三角形。",
+          "options": {
+            "A": {
+              "label": "长方体形的想象泡泡",
+              "visual": {
+                "kind": "asset",
+                "image": "rect-bubble",
+                "alt": "长方体形的想象泡泡"
+              }
+            },
+            "B": {
+              "label": "三角形的想象泡泡",
+              "visual": {
+                "kind": "asset",
+                "image": "tri-bubble",
+                "alt": "三角形的想象泡泡"
+              }
+            },
+            "C": {
+              "label": "球形泡泡",
+              "visual": {
+                "kind": "asset",
+                "image": "bubble",
+                "alt": "球形泡泡"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "rectangle-tool",
+            "alt": "用新的长方形环吹泡泡。独立空中泡泡一般像哪幅图？"
+          }
+        },
+        {
+          "id": "q4",
+          "question": "社区小路上，哪种观察泡泡的做法安全？",
+          "skill": "户外安全观察",
+          "answer": [
+            "A"
+          ],
+          "analysis": "在大人陪同下站稳观察，留心脚下；不追跑，也不能踩进洒出的泡泡液。",
+          "options": {
+            "A": {
+              "label": "大人陪同站稳观察",
+              "visual": {
+                "kind": "asset",
+                "image": "adult",
+                "alt": "大人陪同站稳观察"
+              }
+            },
+            "B": {
+              "label": "独自追着泡泡跑",
+              "visual": {
+                "kind": "asset",
+                "image": "chase",
+                "alt": "独自追着泡泡跑"
+              }
+            },
+            "C": {
+              "label": "走进洒出的泡泡液",
+              "visual": {
+                "kind": "asset",
+                "image": "spill",
+                "alt": "走进洒出的泡泡液"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "把发现带回家",
+      "template": "summary",
+      "data": {
+        "title": "把发现带回家",
+        "items": [
+          "换角度，看见不同现象",
+          "换表面，比较具体结果",
+          "先大后小，观察再调整",
+          "看风和光，换工具比较",
+          "分享倾听，安全再探索"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天，我们从大小、透明和变化观察泡泡。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "换一个表面，看到的具体结果可能不同。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "大泡套小泡，可以先大后小，轻轻尝试。"
+        },
+        {
+          "say": "失败了，看看接触在哪里，再调整。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "户外可以观察随风飘动和彩色边缘。"
+        },
+        {
+          "say": "不同形工具吹出的独立泡泡，一般是球形。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "说出自己看见的，也听伙伴的发现。"
+        },
+        {
+          "say": "回家请大人陪同，继续尝试会滚动的泡泡。"
+        },
+        {
+          "say": "调配材料先由大人确认，孩子不独自调配。"
+        },
+        {
+          "say": "官方练习没给完整配比，我们不乱补步骤。"
+        },
+        {
+          "say": "真实滚动、吹气和口述表现，都请大人观察。"
+        }
+      ]
+    }
+  ]
+}

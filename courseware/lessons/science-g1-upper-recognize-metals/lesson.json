@@ -1,0 +1,752 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "认识金属",
+  "description": "跟小科老师找一找生活和科技产品里的金属，练习安全观察，并用图卡记录实际发现。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "温和细心的科学女老师，从具体物品教孩子安全观察、如实记录。"
+    }
+  },
+  "images": {
+    "station": {
+      "file": "assets/station.png"
+    },
+    "samples": {
+      "file": "assets/samples.png"
+    },
+    "desk": {
+      "file": "assets/desk.png"
+    },
+    "chair": {
+      "file": "assets/chair.png"
+    },
+    "window": {
+      "file": "assets/window.png"
+    },
+    "hazards": {
+      "file": "assets/hazards.png"
+    },
+    "bridge": {
+      "file": "assets/bridge.png"
+    },
+    "painted-box": {
+      "file": "assets/painted-box.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "认识金属",
+      "template": "title-picture",
+      "data": {
+        "title": "认识金属",
+        "picture": "samples",
+        "caption": "物品叫什么？它用什么做？"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "观察台上有四件样品，先从左边的锅看起。"
+        },
+        {
+          "say": "它叫锅，可以用来做饭。"
+        },
+        {
+          "say": "老师知道这口锅的锅身是铁做的。"
+        },
+        {
+          "say": "第二件是饮料罐，这只罐身用的是铝。"
+        },
+        {
+          "say": "第三件的铜芯封在透明盒里，只用眼睛看。"
+        },
+        {
+          "say": "最右边这件吊坠，用的材料是金。"
+        },
+        {
+          "say": "铁、铝、铜、金，都是常见的金属。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "锅和罐是物品，铁和铝是它们用的材料。"
+        },
+        {
+          "say": "说清楚是哪个部位，就能让别人明白你的发现。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "先看能不能碰",
+      "template": "picture-points",
+      "data": {
+        "title": "先看能不能碰",
+        "picture": "hazards",
+        "points": [
+          "电器插头的金属片，只看",
+          "盛着热水的容器，只看",
+          "大人确认安全，再轻轻摸"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图上有电器插头，也有一杯冒热气的水。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "插头上的金属片只用眼睛看。"
+        },
+        {
+          "say": "遇到电器，自己动手有触电危险。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "装着热水的杯子，杯身也可能很烫。"
+        },
+        {
+          "say": "和热杯保持距离，以免手被烫伤。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "想摸一样东西，先让大人确认安全。"
+        },
+        {
+          "say": "比如大人选了一个完整的常温铝罐。"
+        },
+        {
+          "say": "先看颜色和光泽，再轻摸罐身，说说感觉。"
+        },
+        {
+          "say": "只说你真的看到或摸到的样子。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "找对部位再记录",
+      "page": "parts",
+      "widgetType": "metal-observation",
+      "startImage": "station",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo-top"
+          }
+        },
+        {
+          "highlight": "#parts-upper"
+        },
+        {
+          "say": "来看这张桌子，老师先从上面看起。"
+        },
+        {
+          "say": "上面是木头做的桌面，能看到木纹。"
+        },
+        {
+          "setState": {
+            "mode": "demo-leg"
+          }
+        },
+        {
+          "highlight": "#parts-lower"
+        },
+        {
+          "say": "再顺着桌边往下看，这条桌腿是铁的。"
+        },
+        {
+          "say": "大人确认常温桌腿安全，老师才轻摸。"
+        },
+        {
+          "say": "同一张桌子，上面和下面用的材料可以不同。"
+        },
+        {
+          "setState": {
+            "mode": "demo-record"
+          }
+        },
+        {
+          "highlight": "#parts-card"
+        },
+        {
+          "say": "我把桌腿的图放进记录卡，写桌腿用了铁。"
+        },
+        {
+          "say": "老师这样记：桌腿银灰色，摸起来凉凉的。"
+        },
+        {
+          "say": "这样别人能看明白，我说的是哪一部分。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "换成一把椅子，蓝色的座面是塑料。"
+        },
+        {
+          "say": "支撑座面的细腿是金属。"
+        },
+        {
+          "say": "点金属腿，或把它拖进右边的记录卡。"
+        },
+        {
+          "say": "下一张是窗户，玻璃外面的银色框是金属。"
+        },
+        {
+          "say": "先看清部位，再把窗框记下来。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "金属可以长得不同",
+      "template": "picture-points",
+      "data": {
+        "title": "金属可以长得不同",
+        "picture": "samples",
+        "points": [
+          "这口铁锅，颜色较深",
+          "这只铝罐，亮亮的银灰色",
+          "这段铜芯，带红色",
+          "这件金吊坠，金黄色"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们用已经知道材料的四件样品来比一比。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这口铁锅看起来颜色深，表面有小颗粒。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "这只铝罐有银灰色的亮光，跟锅身不一样。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "从透明盒外面看，这段铜芯带点红色。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "这件金吊坠看起来是金黄色，也会反光。"
+        },
+        {
+          "say": "同是金属，这几件样品的颜色并不相同。"
+        },
+        {
+          "say": "有些东西涂了颜色，光看颜色还不能确定材料。"
+        },
+        {
+          "say": "记录时，说这件样品的样子，就够清楚了。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "桥上的金属在哪里",
+      "template": "picture-points",
+      "data": {
+        "title": "桥上的金属在哪里",
+        "picture": "bridge",
+        "points": [
+          "桥面在上，车辆从这里过",
+          "钢梁在下，托住桥面",
+          "日用品和科技产品都能用金属"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这是一幅大桥示意图，右侧露出了里面。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "上方平平的部分是桥面，车辆从这里通过。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "下面露出的梁托住桥面，能帮桥承受重量。"
+        },
+        {
+          "say": "港珠澳大桥有用钢做的箱形梁。"
+        },
+        {
+          "say": "钢梁是金属部件，藏在平时不容易看到的地方。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "家里的锅和工程里的大桥都能用到金属。"
+        },
+        {
+          "say": "像飞机、新能源汽车和望远镜，也能找到金属部件。"
+        },
+        {
+          "say": "想说一个部位用了什么材料，先查清楚再说。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "把证据放进记录卡",
+      "page": "record",
+      "widgetType": "metal-observation",
+      "startImage": "station",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo-look"
+          }
+        },
+        {
+          "highlight": "#record-photo"
+        },
+        {
+          "say": "老师先看大桥示意图，找到桥面下面的梁。"
+        },
+        {
+          "say": "如果只看到图片的颜色，材料还要再查。"
+        },
+        {
+          "setState": {
+            "mode": "demo-evidence"
+          }
+        },
+        {
+          "highlight": "#record-known"
+        },
+        {
+          "say": "我查到这条梁是钢梁，就有了确认的依据。"
+        },
+        {
+          "say": "左边的勾表示已经确认，可以记录具体部位。"
+        },
+        {
+          "setState": {
+            "mode": "demo-file"
+          }
+        },
+        {
+          "highlight": "#record-result"
+        },
+        {
+          "say": "现在把梁的图放进卡里，记录桥面下的钢梁。"
+        },
+        {
+          "say": "右边是问号袋，用来收还没查清的照片。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        },
+        {
+          "say": "换成窗户。观察单告诉我们，窗框是金属。"
+        },
+        {
+          "say": "把照片拖进能记录的袋子，也可以直接点袋子。"
+        },
+        {
+          "say": "下一轮只看到橙色盒子，材料还不知道。"
+        },
+        {
+          "say": "可以先记下看见的颜色，把材料留着再查。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "小检查：看清材料",
+      "intro": [
+        "老师读题，你先听，再看每张图。",
+        "可以点喇叭再听一遍。",
+        "选好以后，说说你从哪儿看出来。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "这里有钢勺、木勺和布袋。哪一件用了金属？",
+          "skill": "认识常见金属",
+          "answer": [
+            "A"
+          ],
+          "analysis": "钢勺由钢制成，钢是金属。木勺和布袋的主要材料分别是木和布。",
+          "options": {
+            "A": {
+              "label": "钢勺",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "钢勺"
+              }
+            },
+            "B": {
+              "label": "木勺",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "木勺"
+              }
+            },
+            "C": {
+              "label": "布袋",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "布袋"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "公园长椅的腿是金属。哪张图圈出了要记的部位？",
+          "skill": "按部位记录材料",
+          "answer": [
+            "B"
+          ],
+          "analysis": "只圈出银灰色的椅腿，才能让人明白记录的是哪个部位。整把长椅还有木条。",
+          "options": {
+            "A": {
+              "label": "整把长椅",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "整把长椅"
+              }
+            },
+            "B": {
+              "label": "长椅的金属腿",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "长椅的金属腿"
+              }
+            },
+            "C": {
+              "label": "长椅的木条",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "长椅的木条"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "插头、热锅、文具盒。大人说文具盒安全，能摸哪件？",
+          "skill": "安全观察",
+          "answer": [
+            "C"
+          ],
+          "analysis": "成人已确认常温文具盒安全，可以轻摸。插头和盛热水的锅都用眼睛观察。",
+          "options": {
+            "A": {
+              "label": "电器插头",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "电器插头"
+              }
+            },
+            "B": {
+              "label": "冒热气的锅",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "冒热气的锅"
+              }
+            },
+            "C": {
+              "label": "常温文具盒",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "常温文具盒"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "小检查：看懂证据",
+      "intro": [
+        "老师读题，你先听，再看每张图。",
+        "可以点喇叭再听一遍。",
+        "选好以后，说说你从哪儿看出来。"
+      ],
+      "questions": [
+        {
+          "id": "q4",
+          "question": "一片铜偏红，一片铝银灰。哪张卡两种颜色都记了？",
+          "skill": "比较实际特征",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左红右银灰的卡分别记下了这片铜和这片铝的颜色。同是金属，两件样品的颜色可以不同。",
+          "options": {
+            "A": {
+              "label": "一片红色和一片银灰色",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "一片红色和一片银灰色"
+              }
+            },
+            "B": {
+              "label": "两片红色",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "两片红色"
+              }
+            },
+            "C": {
+              "label": "两片银灰色",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "两片银灰色"
+              }
+            }
+          }
+        },
+        {
+          "id": "q5",
+          "question": "模型桥面下有钢梁。哪张图圈住了这个金属部位？",
+          "skill": "科技产品中的金属",
+          "answer": [
+            "B"
+          ],
+          "analysis": "桥面下的长梁是钢梁，是题目明确指出的金属部位。水面和岸边的树都不是那条梁。",
+          "options": {
+            "A": {
+              "label": "模型下面的水面",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "模型下面的水面"
+              }
+            },
+            "B": {
+              "label": "桥面下的钢梁",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "桥面下的钢梁"
+              }
+            },
+            "C": {
+              "label": "岸边的树",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "岸边的树"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "只看到蓝牌的漆面，材料未知。哪张卡记得合适？",
+          "skill": "保留待观察记录",
+          "answer": [
+            "C"
+          ],
+          "analysis": "蓝漆只能告诉我们表面颜色。应保留照片，并把材料留作待查。",
+          "options": {
+            "A": {
+              "label": "把蓝牌记成金属",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "把蓝牌记成金属"
+              }
+            },
+            "B": {
+              "label": "把蓝牌记成木头",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "把蓝牌记成木头"
+              }
+            },
+            "C": {
+              "label": "留下蓝牌照片，材料待查",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "留下蓝牌照片，材料待查"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "带着发现回家",
+      "template": "picture-points",
+      "data": {
+        "title": "带着发现回家",
+        "picture": "station",
+        "points": [
+          "铁、铝、铜、金都是金属",
+          "先看安全，再看部位",
+          "看见什么，就记什么",
+          "找一件物品，说说金属在哪里"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "铁、铝、铜、金，是不同的金属。"
+        },
+        {
+          "say": "这几种样品的颜色和表面，可以有差别。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "先从上到下看清物品，找出要观察的部位。"
+        },
+        {
+          "say": "插头上的金属片只用眼睛看。"
+        },
+        {
+          "say": "和热杯保持距离，以免手被烫伤。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看见什么就记什么，拿不准的就先留个问号。"
+        },
+        {
+          "say": "像桌腿和大桥的梁，都可以说清楚具体部位。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "请和大人找一件家里的金属制品。"
+        },
+        {
+          "say": "画下它，圈出金属部位，再把发现说给大人听。"
+        },
+        {
+          "say": "家里还没观察的发现，留给下次再交流。"
+        }
+      ]
+    }
+  ]
+}

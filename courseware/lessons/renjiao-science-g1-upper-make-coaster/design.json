@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "12.制作杯垫",
+  "scope": "两课时33页整合为一门完整课",
+  "authorModels": [
+    "gpt-6.1-sol"
+  ],
+  "cast": [
+    {
+      "name": "小科老师",
+      "look": "温和的科学女老师，与短发青绿上衣女孩共用原创绘本画风。"
+    }
+  ],
+  "style": {
+    "notes": "沿用公共kit暖橙和绿色状态色，物品用正式插画；只有圆周轨迹、绳长和圆形包含比较用带标记的纯知识图示；不使用emoji作教学对象。"
+  },
+  "canvas": {
+    "width": 1280,
+    "height": 720
+  },
+  "pages": [
+    {
+      "id": "p03",
+      "title": "整理工作台",
+      "mechanism": "把所需材料和工具拖放或点入工作台；物品进入台面。",
+      "targets": [
+        "#supply-bench",
+        "#supply-paper",
+        "#supply-pencil",
+        "#supply-scissors"
+      ],
+      "stateKeys": {
+        "demo": "教师示范内容，切入demo并更新对象；['paper']",
+        "phase": "play:完整复位并交给孩子操作"
+      },
+      "states": [
+        "ready",
+        "demo",
+        "play",
+        "first-miss",
+        "correct",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "只给观察方向，不改选、不标答案；第二次细化提示，第三次才示范。",
+      "reset": "清空阶段、操作轨迹、进度、星星、错误次数；递增epoch使旧延时失效。",
+      "testHook": "window.__lessonTest 实测首次错误、通关、重玩和教师示范，需主控浏览器执行。"
+    },
+    {
+      "id": "p05",
+      "title": "让笔绕一圈",
+      "mechanism": "选固定点到笔的距离，点选后固定中心，或把距离条直接拖到中心装好；点圆周笔点逐段描出圆，三关大小变化。",
+      "targets": [
+        "#circle-center",
+        "#circle-line",
+        "#circle-target"
+      ],
+      "stateKeys": {
+        "demo": "教师示范内容，切入demo并更新对象；['small', 'large']",
+        "phase": "play:完整复位并交给孩子操作"
+      },
+      "states": [
+        "ready",
+        "demo",
+        "play",
+        "first-miss",
+        "correct",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "只给观察方向，不改选、不标答案；第二次细化提示，第三次才示范。",
+      "reset": "清空阶段、操作轨迹、进度、星星、错误次数；递增epoch使旧延时失效。",
+      "testHook": "window.__lessonTest 实测首次错误、通关、重玩和教师示范，需主控浏览器执行。"
+    },
+    {
+      "id": "p07",
+      "title": "作品慢慢成形",
+      "mechanism": "把画圆、剪纸、装饰、测试的过程图按序放入长条，主画面随制作变化。",
+      "targets": [
+        "#make-stage",
+        "#make-trace",
+        "#make-cut",
+        "#make-decorate"
+      ],
+      "stateKeys": {
+        "demo": "教师示范内容，切入demo并更新对象；['trace']",
+        "phase": "play:完整复位并交给孩子操作"
+      },
+      "states": [
+        "ready",
+        "demo",
+        "play",
+        "first-miss",
+        "correct",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "只给观察方向，不改选、不标答案；第二次细化提示，第三次才示范。",
+      "reset": "清空阶段、操作轨迹、进度、星星、错误次数；递增epoch使旧延时失效。",
+      "testHook": "window.__lessonTest 实测首次错误、通关、重玩和教师示范，需主控浏览器执行。"
+    },
+    {
+      "id": "p10",
+      "title": "杯底放得下吗",
+      "mechanism": "先选不同大小圆垫，再拖杯底试放；杯底伸出或完整放入可直接看到。",
+      "targets": [
+        "#test-bench",
+        "#test-overhang",
+        "#test-sizes"
+      ],
+      "stateKeys": {
+        "demo": "教师示范内容，切入demo并更新对象；['small', 'fit']",
+        "phase": "play:完整复位并交给孩子操作"
+      },
+      "states": [
+        "ready",
+        "demo",
+        "play",
+        "first-miss",
+        "correct",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "只给观察方向，不改选、不标答案；第二次细化提示，第三次才示范。",
+      "reset": "清空阶段、操作轨迹、进度、星星、错误次数；递增epoch使旧延时失效。",
+      "testHook": "window.__lessonTest 实测首次错误、通关、重玩和教师示范，需主控浏览器执行。"
+    },
+    {
+      "id": "p13",
+      "title": "组好再清毛",
+      "mechanism": "把纸筒和胶面组装成滚筒。点或拖滚筒试用，在同一幅衣物图上依次留下四段试滚进度。",
+      "targets": [
+        "#roller-work",
+        "#roller-tube",
+        "#roller-tape",
+        "#roller-cloth"
+      ],
+      "stateKeys": {
+        "demo": "教师示范内容，切入demo并更新对象；['tube', 'ready']",
+        "phase": "play:完整复位并交给孩子操作"
+      },
+      "states": [
+        "ready",
+        "demo",
+        "play",
+        "first-miss",
+        "correct",
+        "finish",
+        "reset"
+      ],
+      "firstMiss": "只给观察方向，不改选、不标答案；第二次细化提示，第三次才示范。",
+      "reset": "清空阶段、操作轨迹、进度、星星、错误次数；递增epoch使旧延时失效。",
+      "testHook": "window.__lessonTest 实测首次错误、通关、重玩和教师示范，需主控浏览器执行。"
+    }
+  ],
+  "visualChecks": {
+    "viewports": [
+      "1280x720",
+      "1000x563",
+      "640x360"
+    ],
+    "formalAssetCount": 23,
+    "requiredStates": [
+      "initial",
+      "correct",
+      "first-miss",
+      "teacher-demo"
+    ],
+    "reviewFocus": [
+      "纸、铅笔、剪刀、绳、盖、汤勺无歧义。",
+      "圆周和圆垫保持正圆，无拉伸，包含关系由代码准确表达。",
+      "四过程图含画圆、裁剪、装饰、空杯试放，与排序一致。",
+      "试滚使用同一幅衣物图显示经过区域，真实除毛效果请大人观察。",
+      "开始页正式插图、物品加载失败有阻断与重开说明。",
+      "沿盖描圆不采用生成图里的偏离圆线；p04用正式圆盖图，p07用精确代码圆周和正式铅笔图表达。"
+    ]
+  },
+  "evidenceBoundary": "仅记录屏幕选择、组装、轨迹与试放，实际画圆、用剪刀、制作、说画方案、清毛效果均待成人观察。",
+  "inactiveAssets": {
+    "trace-lid": "生成图中的轨迹偏离圆盖，不能作为描边示范；讲解改用正式圆盖图，制作顺序改用精确代码圆周。",
+    "small-coaster": "请求小垫托不住杯底，结果图却完全托住；不得用于大小比较。实际大小比较全部由代码精确表达。",
+    "wide-coaster": "大小包含比较已统一改为代码知识图示，此图不进入播放正文。",
+    "clean-shirt": "衣领和版型与试滚场景不同，课堂用同一幅衣物图记录试滚过程。"
+  }
+}

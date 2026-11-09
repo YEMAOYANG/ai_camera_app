@@ -1,0 +1,1518 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "8和9的加、减法",
+  "description": "在原创拼装工坊合并、遮挡、配组和叠式，理解8与9的整体和部分、同图四式、想加算减与相等部分的特例。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "依据正式数学教师档案，用准确短句解释每一步为什么。先示范整体与部分的画面变化，再让儿童操作；讲清加减关系，不把点击成绩当作口头掌握。"
+    }
+  },
+  "images": {
+    "workshop": {
+      "file": "assets/workshop.png"
+    },
+    "counter": {
+      "file": "assets/counter.png"
+    },
+    "eight-family": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1200,
+          620
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "8"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "8"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "5"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "nine-family": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1200,
+          620
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "7"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "9"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "7"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "9"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "9"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "2"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "7"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "9"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "7"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "equal-family": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1200,
+          620
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "8"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "4"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "4"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "subtract-eight": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1200,
+          620
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "5"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "8"
+              },
+              {
+                "glyph": "−"
+              },
+              {
+                "glyph": "5"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "3"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiz-count-2": {
+      "glyph": {
+        "size": [
+          480,
+          240
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiz-count-3": {
+      "glyph": {
+        "size": [
+          480,
+          240
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiz-count-4": {
+      "glyph": {
+        "size": [
+          480,
+          240
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiz-count-7": {
+      "glyph": {
+        "size": [
+          480,
+          240
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiz-count-8": {
+      "glyph": {
+        "size": [
+          480,
+          240
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiz-count-9": {
+      "glyph": {
+        "size": [
+          480,
+          240
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "count-example": {
+      "glyph": {
+        "size": [
+          1200,
+          620
+        ],
+        "separator": "plus",
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔴"
+              },
+              {
+                "glyph": "🔴"
+              },
+              {
+                "glyph": "🔴"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "从两组到一个整体",
+      "template": "picture-points",
+      "data": {
+        "title": "从两组到一个整体",
+        "picture": "workshop",
+        "points": [
+          "合起来，求整体",
+          "知道整体，找部分",
+          "同一张图，联系加减"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "欢迎来到拼装工坊，今天研究八和九。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "桌上的材料分成两组，每组是一个部分。"
+        },
+        {
+          "say": "把两组放在一起，就看到全部材料。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "这个全部的数量，我们叫作整体。"
+        },
+        {
+          "say": "求两部分合起来多少，可以用加法。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "已经知道整体和一部分，可以用减法。"
+        },
+        {
+          "say": "减去知道的部分，就找到另一个部分。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "图里物品没有变，问法可以变化。"
+        },
+        {
+          "say": "今天把八和九的整体、部分连起来。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "两组接成一排",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#part-a"
+        },
+        {
+          "say": "这里三片，那里五片，是两个部分。"
+        },
+        {
+          "highlight": "#part-b"
+        },
+        {
+          "say": "现在问合起来多少，要找一个整体。"
+        },
+        {
+          "setState": {
+            "demoMerged": true
+          }
+        },
+        {
+          "highlight": "#merge-zone"
+        },
+        {
+          "say": "把两组都移入长托盘，没有增加也没丢。"
+        },
+        {
+          "highlight": "#merge-equation"
+        },
+        {
+          "say": "三和五合成八，所以三加五等于八。"
+        },
+        {
+          "setState": {
+            "demoSwap": true
+          }
+        },
+        {
+          "say": "换成五片先放，接着三片，总数仍是八。"
+        },
+        {
+          "say": "两部分的先后变了，合起来的数量不变。"
+        },
+        {
+          "say": "每次都要让两个部分全部进入托盘。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "轮到你，拖两组，再点表示整体的数量图。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "减去一部分找另一部分",
+      "template": "picture-points",
+      "data": {
+        "title": "减去一部分找另一部分",
+        "picture": "subtract-eight",
+        "points": [
+          "先看整体是8",
+          "减去3，剩下5",
+          "减去5，剩下3"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "八片材料，既能合起来，也能分开看。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "八表示全部，三和五表示其中的两部分。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "减法要从整体开始，不能从部分开始。"
+        },
+        {
+          "say": "先记住总共八片，再看已知哪一部分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "知道其中三片，求另一些就从八里减三。"
+        },
+        {
+          "say": "八能分成三和五，所以八减三等于五。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "换成知道五片，求另外一部分就减五。"
+        },
+        {
+          "say": "八减五等于三，两个减法都在说同张图。"
+        },
+        {
+          "say": "遮住一部分也能这样想，不一定要扔掉。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把一部分遮起来",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#cover-equation"
+        },
+        {
+          "say": "八减三，是从八片里暂时盖住三片。"
+        },
+        {
+          "highlight": "#whole-row"
+        },
+        {
+          "say": "先看清整体八片，每片都属于这一个整体。"
+        },
+        {
+          "setState": {
+            "demoCovered": true
+          }
+        },
+        {
+          "highlight": "#covered-zone"
+        },
+        {
+          "say": "我把三片移到盖板下，其他五片留在外面。"
+        },
+        {
+          "highlight": "#remain-options"
+        },
+        {
+          "say": "求没盖住的部分，选五个点的数量图。"
+        },
+        {
+          "say": "三和五合成八，也说明八减三等于五。"
+        },
+        {
+          "say": "盖住多少要按减号后面的数来决定。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "你点圆片移入盖板，再选剩余部分的图。"
+        },
+        {
+          "say": "点盖板里的圆片能退回，改好再试。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "整体和部分小检查",
+      "intro": [
+        "老师读题，点数量图作答。",
+        "这些是新问题，先想整体还是部分。"
+      ],
+      "questions": [
+        {
+          "id": "a89-q1",
+          "question": "贴纸盒里一张星星贴纸和七张叶子贴纸，合起来有几张？",
+          "skill": "合并两部分求8",
+          "answer": [
+            "B"
+          ],
+          "analysis": "一和七合成八，求全部用加法，所以一加七等于八。",
+          "options": {
+            "A": {
+              "label": "7",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-7",
+                "alt": "7个精确数量点"
+              }
+            },
+            "B": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-8",
+                "alt": "8个精确数量点"
+              }
+            },
+            "C": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-9",
+                "alt": "9个精确数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "a89-q2",
+          "question": "书架上一共八本书，六本放进书包，书架上还剩几本？",
+          "skill": "从整体8求另一部分",
+          "answer": [
+            "A"
+          ],
+          "analysis": "八本是整体，拿走六本后，八减六等于二，还剩二本。",
+          "options": {
+            "A": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-2",
+                "alt": "2个精确数量点"
+              }
+            },
+            "B": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-3",
+                "alt": "3个精确数量点"
+              }
+            },
+            "C": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-4",
+                "alt": "4个精确数量点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "同一幅图连着四式",
+      "template": "picture-points",
+      "data": {
+        "title": "同一幅图连着四式",
+        "picture": "eight-family",
+        "points": [
+          "两部分合起来：两道加法",
+          "整体减去一部分：两道减法",
+          "每个数都要和图对应"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "同一张八片的图，可以连着想四道算式。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "图里只用三个数，三、五和整体八。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "从三片接着五片想，三加五等于八。"
+        },
+        {
+          "say": "从五片接着三片想，五加三也等于八。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "整体八片减去三片，得到另一部分五片。"
+        },
+        {
+          "say": "整体八片减去五片，得到另一部分三片。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这就是两道加法和两道减法的联系。"
+        },
+        {
+          "say": "九分成二和七，也能用同样的方法。"
+        },
+        {
+          "say": "只看得数相同还不够，每个数要对应图。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "给算式找同伴",
+      "page": "p07",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#family-diagram"
+        },
+        {
+          "say": "图里二片和七片，整个托盘共有九片。"
+        },
+        {
+          "highlight": "#formula-pool"
+        },
+        {
+          "say": "先找合起来求九的式子，不能只看得数。"
+        },
+        {
+          "setState": {
+            "demoAdd": true
+          }
+        },
+        {
+          "highlight": "#addition-bank"
+        },
+        {
+          "say": "二加七和七加二，都表示两个部分合并。"
+        },
+        {
+          "setState": {
+            "demoAll": true
+          }
+        },
+        {
+          "highlight": "#subtraction-bank"
+        },
+        {
+          "say": "九减二找七，九减七找二，都从整体开始。"
+        },
+        {
+          "say": "两加两减都用图里的二、七、九三个数。"
+        },
+        {
+          "say": "数用错了，或者符号不合适，都要退回。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "请把同图算式拖到加号区或减号区。"
+        },
+        {
+          "say": "轻点卡片也能配组，错了再对照图片。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "知道加法就能想减法",
+      "template": "picture-points",
+      "data": {
+        "title": "知道加法就能想减法",
+        "picture": "nine-family",
+        "points": [
+          "知道2 + 7 = 9",
+          "9 − 2是在找另一部分",
+          "加回去，检查整体"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "求减法时，已经会的加法可以来帮忙。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "比如二加七等于九，把二和七联系起来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "二和七是两个部分，九是它们的整体。"
+        },
+        {
+          "say": "知道这个关系，不必每次重新数全部。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "九减二是在问，另一个部分是几。"
+        },
+        {
+          "say": "想二加几等于九，就能想到七。"
+        },
+        {
+          "say": "同样，九减七等于二，因为七加二等于九。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "算出一个部分后，还可以把两部分加回去。"
+        },
+        {
+          "say": "二和七加回九，说明整体和部分对应了。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "盖着的部分有多少",
+      "page": "p09",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#known-add"
+        },
+        {
+          "say": "已知四加五等于九，两个部分合成九。"
+        },
+        {
+          "highlight": "#visible-part"
+        },
+        {
+          "say": "现在看得见四片，盖板下面是另一部分。"
+        },
+        {
+          "highlight": "#missing-equation"
+        },
+        {
+          "say": "九减四求盖着多少，想四加几等于九。"
+        },
+        {
+          "setState": {
+            "demoReveal": true
+          }
+        },
+        {
+          "highlight": "#hidden-part"
+        },
+        {
+          "say": "想到五，再移开盖板，果然有五片。"
+        },
+        {
+          "say": "四和五加回九，刚好和已知整体相同。"
+        },
+        {
+          "say": "不能把看得见的四片又当作隐藏数量。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "先想已知加法，再点盖着部分的数量图。"
+        },
+        {
+          "say": "答对后盖板会移开，让你核对两个部分。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "换个情境想加算减",
+      "intro": [
+        "老师读题，点数量图作答。",
+        "这些是新问题，先想整体还是部分。"
+      ],
+      "questions": [
+        {
+          "id": "a89-q3",
+          "question": "九支画笔，一支进笔筒。想一加几等于九，外面几支？",
+          "skill": "从整体9求另一部分",
+          "answer": [
+            "C"
+          ],
+          "analysis": "一和八合成九，九减一等于八，外面还有八支。",
+          "options": {
+            "A": {
+              "label": "7",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-7",
+                "alt": "7个精确数量点"
+              }
+            },
+            "B": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-9",
+                "alt": "9个精确数量点"
+              }
+            },
+            "C": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-8",
+                "alt": "8个精确数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "a89-q4",
+          "question": "手工盒里六个蓝纽扣和三个红纽扣，合起来有几个？",
+          "skill": "两部分合并求9",
+          "answer": [
+            "B"
+          ],
+          "analysis": "六和三组成九，两部分合起来，六加三等于九。",
+          "options": {
+            "A": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-8",
+                "alt": "8个精确数量点"
+              }
+            },
+            "B": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-9",
+                "alt": "9个精确数量点"
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-7",
+                "alt": "7个精确数量点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "两部分一样时",
+      "template": "picture-points",
+      "data": {
+        "title": "两部分一样时",
+        "picture": "equal-family",
+        "points": [
+          "4和4，两个部分一样多",
+          "交换后仍是4 + 4",
+          "重复的式子只留一道"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "有一张特别的图，八片分成四片和四片。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两个部分一样多，都用四来表示。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "把这两部分合起来，四加四等于八。"
+        },
+        {
+          "say": "交换两组的位置，仍然是四加四等于八。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "减去左边四片，右边也是四片。"
+        },
+        {
+          "say": "减去右边四片，左边还是四片。"
+        },
+        {
+          "say": "两次都写八减四等于四，算式没有不同。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "因此这张图只有两道不同的算式。"
+        },
+        {
+          "say": "一道加法、一道减法，重复的不多算。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "interactive",
+      "title": "相同算式只留一张",
+      "page": "p12",
+      "widgetType": "game",
+      "startImage": "workshop",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#equal-diagram"
+        },
+        {
+          "say": "两组各四片，合起来是整体八片。"
+        },
+        {
+          "setState": {
+            "demoSwap": true
+          }
+        },
+        {
+          "highlight": "#equal-equation"
+        },
+        {
+          "say": "交换两组，还是四加四，算式没有变。"
+        },
+        {
+          "highlight": "#equal-cards"
+        },
+        {
+          "say": "这里写了两遍加法、两遍减法。"
+        },
+        {
+          "setState": {
+            "demoStack": true
+          }
+        },
+        {
+          "highlight": "#unique-bank"
+        },
+        {
+          "say": "把一样的式子叠到一起，只留下两种。"
+        },
+        {
+          "say": "四加四等于八，是把两个部分合并。"
+        },
+        {
+          "say": "八减四等于四，是从整体找一个部分。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        },
+        {
+          "say": "先点交换键，再把相同式子拖到一起。"
+        },
+        {
+          "say": "只有完全相同才叠，不能只看有同个数字。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "把方法带回生活",
+      "template": "picture-points",
+      "data": {
+        "title": "把方法带回生活",
+        "picture": "count-example",
+        "points": [
+          "数一数：每件不重不漏",
+          "分与合：整体连着部分",
+          "想加算减：用加法来帮忙",
+          "摆一摆，说理由"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "整理扣子时，可以画圆点表示数量。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左盒三枚，右盒五枚，先求合起来有几枚。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先数三点，再接着数四、五、六、七、八。"
+        },
+        {
+          "say": "最后数到八，三加五等于八，求整体用加法。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "三和五组成八，也能联系整体和部分。"
+        },
+        {
+          "say": "反过来，已知一共八枚，左盒三枚。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "问右盒有几枚，就是求另一个部分。"
+        },
+        {
+          "say": "想三加几等于八，想到五，八减三等于五。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "请自己摆两组，指出全部和每个部分。"
+        },
+        {
+          "say": "向大人解释理由，口头表达仍待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "quiz",
+      "title": "图和算式连起来",
+      "intro": [
+        "老师读题，点数量图作答。",
+        "这些是新问题，先想整体还是部分。"
+      ],
+      "questions": [
+        {
+          "id": "a89-q5",
+          "question": "六块方积木和两块圆积木，交换两组后共几块？",
+          "skill": "交换两部分总数不变",
+          "answer": [
+            "A"
+          ],
+          "analysis": "六和二组成八，交换两部分的先后没有增减物品，仍有八块。",
+          "options": {
+            "A": {
+              "label": "8",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-8",
+                "alt": "8个精确数量点"
+              }
+            },
+            "B": {
+              "label": "7",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-7",
+                "alt": "7个精确数量点"
+              }
+            },
+            "C": {
+              "label": "9",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-9",
+                "alt": "9个精确数量点"
+              }
+            }
+          }
+        },
+        {
+          "id": "a89-q6",
+          "question": "九块点心，看见六块，其余盖着。盖着几块？",
+          "skill": "由已知部分找隐藏部分",
+          "answer": [
+            "C"
+          ],
+          "analysis": "想六加几等于九，六和三组成九，因此九减六等于三。",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-4",
+                "alt": "4个精确数量点"
+              }
+            },
+            "B": {
+              "label": "2",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-2",
+                "alt": "2个精确数量点"
+              }
+            },
+            "C": {
+              "label": "3",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-count-3",
+                "alt": "3个精确数量点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "slide",
+      "title": "整体部分记清楚",
+      "template": "picture-points",
+      "data": {
+        "title": "整体部分记清楚",
+        "picture": "eight-family",
+        "points": [
+          "求整体，用加法",
+          "求另一部分，用减法",
+          "想加算减，再加回去检查",
+          "两部分相同，不重复算式"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天我们把八和九的加法、减法连起来。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先认清全部是整体，两组各是一个部分。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "两部分合起来求整体，可以写加法。"
+        },
+        {
+          "say": "交换两部分的先后，整体数量没有变。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "整体减去一个部分，就找到另一个部分。"
+        },
+        {
+          "say": "同图两加两减，每个数都必须和图对应。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "还可以想加法算减法，再加回去核对。"
+        },
+        {
+          "say": "这样不用每次重新数全部，也有依据。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "两部分都是四时，只留一加一减两种。"
+        },
+        {
+          "say": "课后请摆八个或九个物品，向家人说明。"
+        },
+        {
+          "say": "你是否能独立说清楚，仍请家人观察。"
+        }
+      ]
+    }
+  ]
+}

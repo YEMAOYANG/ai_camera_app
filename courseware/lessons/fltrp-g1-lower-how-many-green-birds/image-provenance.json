@@ -1,0 +1,484 @@
+{
+  "watch-post": {
+    "source": "Codex built-in imagegen",
+    "prompt": "Use case: illustration-story. A landscape 16:9 original children's field-guide classroom backdrop for a six-year-old English counting lesson, rendered as gently textured gouache picture-book art with crisp simple silhouettes and an airy turquoise-and-olive palette. A friendly public-park bird observation station by an old tree, a wooden low rail at bottom, quiet horizontal viewing area and clear soft cream sky. Keep generous open, relatively flat interior space for a separate counting panel. A wide editorial composition, warm daylight, contemporary original art. Absolutely zero birds, animals, people, feathers, bird-shaped marks, or extra countable colored icons anywhere. No lettering, no numbers, no signage, no frame, no watermark.",
+    "originalPath": "output/courseware-lessons/fltrp-g1-lower-how-many-green-birds/imagegen-originals/watch-post.png",
+    "sha256": "58052dd1aa2f7676d021290b69c1f72b597a0c86f2c8e5fbab0ff8d0d0d7a8f5",
+    "file": "assets/watch-post.png",
+    "formalSha256": "8c6d05c30b404434ed8679dd51a9836b1f08ac3df820df388bf5740277e39214",
+    "bytes": 1311084
+  },
+  "lesson-sprite-sheet": {
+    "source": "Codex built-in imagegen",
+    "prompt": "Use case: scientific-educational. Transparent-background square raster sprite sheet for a first-grade English picture lesson, exactly four separated objects with generous fully transparent gutters, one centered in each quadrant, similar visual size. TOP LEFT exactly one single lime-green songbird, TOP RIGHT exactly one single cobalt-blue songbird, BOTTOM LEFT exactly one single golden-yellow songbird, BOTTOM RIGHT exactly one single small orange rounded rectangular folded map card with a simple unlettered meander line. Each bird has the same unmistakable rounded perched side silhouette, two feet, a small dark eye, one beak and wing. Body saturated in its own distinct color with minimal accent. Original softly textured gouache and crisp outlines, no shadow, no perch, no decorative details, no extra marks, no labels or letters. Edges and corners fully transparent and each object isolated entirely within its quadrant. Flat front view, accessible high color contrast.",
+    "originalPath": "output/courseware-lessons/fltrp-g1-lower-how-many-green-birds/imagegen-originals/lesson-sprite-sheet.png",
+    "sha256": "c4d3a1885477ad32bd16efea618c534166dbdc3df3794edb2087406c66854c6d"
+  },
+  "gear-bench": {
+    "source": "Codex built-in imagegen",
+    "prompt": "Use case: scientific-educational. Wide 3:2 illustrated first-grade object-location reference plate, flat eye-level orthographic view with minimal perspective. A single low honey-brown wooden table dominates the left two-thirds, a single OPEN dark teal canvas field bag sits independently on the floor to the far right. All items are large and separate. The table has a clearly visible horizontal top surface and two widely spaced legs, with a completely empty, open, clear under-table floor space between the legs. The bag has a wide light-colored interior opening angled slightly toward the viewer, with a clearly visible low front lip, empty inside. Clear featureless light cream background and a faint floor line. Original gouache picture-book style with solid readable silhouettes and crisp edges, warm bird-observation-station character. No objects on the table, under the table or inside the bag. No people, animals, birds, maps, decoration, letters, labels, numbers, text, or watermarks. Full uncropped equipment inside frame with margins.",
+    "originalPath": "output/courseware-lessons/fltrp-g1-lower-how-many-green-birds/imagegen-originals/gear-bench.png",
+    "sha256": "da07f57efeac3c20fb9bd77b76543e744f98a73c9910ffa6dd77a218373f99ca",
+    "file": "assets/gear-bench.png",
+    "formalSha256": "f7abde4552fa87874da331cd9d88a84e89049e7b290ec8597746388c1d606338",
+    "bytes": 790734
+  },
+  "bird-green": {
+    "source": "lesson-sprite-sheet",
+    "quarterCrop": [
+      0,
+      0,
+      627,
+      627
+    ],
+    "alphaContentBounds": [
+      64,
+      96,
+      563,
+      564
+    ],
+    "file": "assets/bird-green.png",
+    "formalSha256": "fdba6e2521924843aaa7efd3a6809f5639fe14e7096b7a98da8e8011d32616d8",
+    "bytes": 75455
+  },
+  "bird-blue": {
+    "source": "lesson-sprite-sheet",
+    "quarterCrop": [
+      627,
+      0,
+      1254,
+      627
+    ],
+    "alphaContentBounds": [
+      67,
+      95,
+      568,
+      565
+    ],
+    "file": "assets/bird-blue.png",
+    "formalSha256": "c938df16b6dc315c5dd669c33080d3ac838c53679f1b26536cf2c6a74c266a9f",
+    "bytes": 68313
+  },
+  "bird-yellow": {
+    "source": "lesson-sprite-sheet",
+    "quarterCrop": [
+      0,
+      627,
+      627,
+      1254
+    ],
+    "alphaContentBounds": [
+      64,
+      97,
+      563,
+      567
+    ],
+    "file": "assets/bird-yellow.png",
+    "formalSha256": "543abac905740211173c339cc25bb97e65d411cbb770a2f7166da24b7946b948",
+    "bytes": 66881
+  },
+  "map-card": {
+    "source": "lesson-sprite-sheet",
+    "quarterCrop": [
+      627,
+      627,
+      1254,
+      1254
+    ],
+    "alphaContentBounds": [
+      45,
+      137,
+      579,
+      515
+    ],
+    "file": "assets/map-card.png",
+    "formalSha256": "0f56e5e2398e59393ce125ab1353aa7f4f0c889894bbda37629b108b4c64ec05",
+    "bytes": 77902
+  },
+  "count-lesson-12": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue"
+    ],
+    "columns": 4,
+    "size": [
+      660,
+      380
+    ],
+    "file": "assets/count-lesson-12.png",
+    "formalSha256": "5350a7526e234591e84c49e77d1959250a9688451e32bdb0d9d592bde5543102",
+    "bytes": 34041
+  },
+  "mixed-lesson-9": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "green",
+      "yellow",
+      "blue",
+      "blue",
+      "green",
+      "yellow",
+      "blue",
+      "yellow",
+      "green"
+    ],
+    "columns": 3,
+    "size": [
+      660,
+      380
+    ],
+    "file": "assets/mixed-lesson-9.png",
+    "formalSha256": "c2b7b73d0db77d379b829c2afc342277cd16b5dd6c8ec6026e1ea2c5fd9909b6",
+    "bytes": 91485
+  },
+  "quiz-count-9": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      340
+    ],
+    "file": "assets/quiz-count-9.png",
+    "formalSha256": "ae023a207b64b783687fcdc8975f1710f6dd7528ab299bd5b02d938966cc6bd1",
+    "bytes": 27257
+  },
+  "quiz-count-10": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      340
+    ],
+    "file": "assets/quiz-count-10.png",
+    "formalSha256": "7a29c377a257b189cc23e21fdbf1944554c594b97c19d3050710442e4ee04cdc",
+    "bytes": 27513
+  },
+  "quiz-count-11": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      340
+    ],
+    "file": "assets/quiz-count-11.png",
+    "formalSha256": "d8cf445ac81dbc2711981cd4ae2199ebfd31d922e73198631f40ff2616e1129d",
+    "bytes": 27671
+  },
+  "quiz-count-12": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue",
+      "blue"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      340
+    ],
+    "file": "assets/quiz-count-12.png",
+    "formalSha256": "d43770714bc53795e634fb0f1cf04dca201e253700f78b63939659906a899076",
+    "bytes": 27697
+  },
+  "quiz-yellow-2": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "yellow",
+      "blue",
+      "yellow",
+      "blue",
+      "blue",
+      "blue",
+      "blue"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      290
+    ],
+    "file": "assets/quiz-yellow-2.png",
+    "formalSha256": "ee5df0d75cab427a454d9e9becd98d794d44b36d236c04502bd03ca7baea74cb",
+    "bytes": 32885
+  },
+  "quiz-yellow-3": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "yellow",
+      "blue",
+      "yellow",
+      "blue",
+      "yellow",
+      "blue",
+      "blue"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      290
+    ],
+    "file": "assets/quiz-yellow-3.png",
+    "formalSha256": "c06eadc7bd9eded17ab78c35e635194e0dfb9fb14fc1da02cba3f12580650865",
+    "bytes": 42447
+  },
+  "quiz-yellow-4": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "yellow",
+      "blue",
+      "yellow",
+      "blue",
+      "yellow",
+      "blue",
+      "yellow"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      290
+    ],
+    "file": "assets/quiz-yellow-4.png",
+    "formalSha256": "1cd2af11e326965126ebce690e37b98017bf71123973d02fac60989213caf68f",
+    "bytes": 42468
+  },
+  "quiz-green-4": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "green",
+      "blue",
+      "green",
+      "blue",
+      "green",
+      "blue",
+      "green"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      290
+    ],
+    "file": "assets/quiz-green-4.png",
+    "formalSha256": "2837c9af369d48008bbbb223f8a20841d6fb31e677b32cb62e0c4de5b7c46b39",
+    "bytes": 43967
+  },
+  "quiz-green-6": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "green",
+      "blue",
+      "green",
+      "green",
+      "green",
+      "green",
+      "green"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      290
+    ],
+    "file": "assets/quiz-green-6.png",
+    "formalSha256": "4bcda9f98489e170d59376d522a77394a3f02a0a983e1837e15541305c8efddf",
+    "bytes": 34332
+  },
+  "quiz-green-7": {
+    "source": "deterministic composition of registered sprites",
+    "colours": [
+      "blue",
+      "green",
+      "green",
+      "green",
+      "green",
+      "green",
+      "green",
+      "green"
+    ],
+    "columns": 4,
+    "size": [
+      520,
+      290
+    ],
+    "file": "assets/quiz-green-7.png",
+    "formalSha256": "e65fd5d9a6251dee30f64c603eb076bd26a642cacd1adf5cc6c5da29b7936f60",
+    "bytes": 34190
+  },
+  "quiz-blue-in": {
+    "source": "position composition of gear-bench and bird-blue",
+    "position": "in",
+    "centreFraction": [
+      0.85,
+      0.63
+    ],
+    "file": "assets/quiz-blue-in.png",
+    "formalSha256": "b28cab10ab6889bd4a52db11cd9e20608174fde307553df7cff30df65f4e5829",
+    "bytes": 793800
+  },
+  "quiz-blue-on": {
+    "source": "position composition of gear-bench and bird-blue",
+    "position": "on",
+    "centreFraction": [
+      0.36,
+      0.31
+    ],
+    "file": "assets/quiz-blue-on.png",
+    "formalSha256": "553cddfda920858a96ee952f9bc9ec396fea75205ded536e4a05fb984de3799b",
+    "bytes": 798971
+  },
+  "quiz-blue-under": {
+    "source": "position composition of gear-bench and bird-blue",
+    "position": "under",
+    "centreFraction": [
+      0.36,
+      0.78
+    ],
+    "file": "assets/quiz-blue-under.png",
+    "formalSha256": "7eb2a2d8bec307ede49ebbc8f8fe6a0b1046cf7d94eae345c2758807cf041838",
+    "bytes": 800410
+  },
+  "quiz-yellow-in": {
+    "source": "position composition of gear-bench and bird-yellow",
+    "position": "in",
+    "centreFraction": [
+      0.85,
+      0.63
+    ],
+    "file": "assets/quiz-yellow-in.png",
+    "formalSha256": "90f61ef8d70b32f64ff5c299f0bb876f0edd109c5d28e2c38f844f239651e677",
+    "bytes": 791903
+  },
+  "quiz-yellow-on": {
+    "source": "position composition of gear-bench and bird-yellow",
+    "position": "on",
+    "centreFraction": [
+      0.36,
+      0.31
+    ],
+    "file": "assets/quiz-yellow-on.png",
+    "formalSha256": "217a0402cb58dc5a29b7207b514593b11e01209d15530a6df7372020d7988fee",
+    "bytes": 796566
+  },
+  "quiz-yellow-under": {
+    "source": "position composition of gear-bench and bird-yellow",
+    "position": "under",
+    "centreFraction": [
+      0.36,
+      0.78
+    ],
+    "file": "assets/quiz-yellow-under.png",
+    "formalSha256": "6429347361a2c0ab808096b952659f386435e1fd2cae89cda8cba71ed4ae4c31",
+    "bytes": 799196
+  },
+  "map-in": {
+    "source": "position composition of gear-bench and map-card",
+    "position": "in",
+    "centreFraction": [
+      0.85,
+      0.63
+    ],
+    "file": "assets/map-in.png",
+    "formalSha256": "4cd18f16074a03005bb441c0d899ec2e71ecd0027d9f46c5d90daea3e07152f9",
+    "bytes": 791289
+  },
+  "map-on": {
+    "source": "position composition of gear-bench and map-card",
+    "position": "on",
+    "centreFraction": [
+      0.36,
+      0.31
+    ],
+    "file": "assets/map-on.png",
+    "formalSha256": "c026c5301437d7e23112912b1726adf9b1158304100417afe52500cbb3989a49",
+    "bytes": 799920
+  },
+  "map-under": {
+    "source": "position composition of gear-bench and map-card",
+    "position": "under",
+    "centreFraction": [
+      0.36,
+      0.78
+    ],
+    "file": "assets/map-under.png",
+    "formalSha256": "71a961076fed962081df41b9ee8f26b4ad55aa09dcac045f429aae56c7930b08",
+    "bytes": 801606
+  },
+  "watch-cover": {
+    "source": "controlled composition of the original observation station and three registered bird sprites",
+    "positions": {
+      "green": [
+        0.38,
+        0.78
+      ],
+      "blue": [
+        0.55,
+        0.78
+      ],
+      "yellow": [
+        0.72,
+        0.78
+      ]
+    },
+    "file": "assets/watch-cover.png",
+    "formalSha256": "874feb544bbfc82564bafbceca914c4aceedcf807b0299963bd1bbe9015499f7",
+    "bytes": 1327000
+  }
+}

@@ -1,0 +1,26 @@
+#cv{background:#f2eedb}
+.solid-board{position:relative;width:1232px;height:552px;border:2px solid #cdbd94;border-radius:32px;background:#fffaf0;color:#314b48}
+.solid-cards{display:flex;justify-content:center;gap:18px}
+.solid-card,.solid-command{border:3px solid #9bb2a1;border-radius:25px;background:#f9fbef;color:#275b58;cursor:pointer}
+.solid-card:hover:not(:disabled),.solid-command:hover:not(:disabled){border-color:#176c69;background:#ebf6e9}
+.solid-card:focus-visible,.solid-command:focus-visible{outline:4px solid #146766;outline-offset:3px}
+.solid-card.success,.solid-card.placed{border-color:#55834e;background:#e4f1d9}
+.solid-card:disabled,.solid-command:disabled{cursor:default}
+.solid-card img,.solid-token img{object-fit:contain;pointer-events:none}
+.solid-token{display:flex;align-items:center;justify-content:center;flex-direction:column;border:2px solid #bca779;border-radius:23px;background:#fff3cf;color:#3b5145;font-size:23px;font-weight:700}
+.solid-token svg{display:block;max-width:100%}
+.solid-token span{display:block;text-align:center}
+img[hidden]{display:none!important}
+#clue-trace{position:absolute;left:170px;top:40px;width:400px;height:241px;display:grid;place-items:center;background:#fff1d3;border:2px solid #c7b07b;border-radius:24px}
+#clue-trace g{display:none;stroke:#4b7765;fill:none;stroke-width:6;stroke-linejoin:round;stroke-linecap:round}
+#clue-trace[data-cue="tube"] .clue-tube,#clue-trace[data-cue="cube"] .clue-cube,#clue-trace[data-cue="ball"] .clue-ball{display:block}
+#clue-reveal{position:absolute;left:659px;top:40px;width:370px;height:241px;border:2px solid #a8b6a4;border-radius:26px;background:#edf4e6;overflow:hidden}
+.clue-lid{position:absolute;left:88px;top:60px;width:190px;height:140px;background:#779b88;border:4px solid #436958;border-radius:76px 76px 24px 24px}
+.clue-lid b{position:absolute;left:78px;top:6px;width:28px;height:20px;border-radius:7px;background:#365e50}
+#clue-reveal.revealed .clue-lid{transform:translate(65px,-54px) rotate(28deg) scale(.54);opacity:.5}
+#clue-object{position:absolute;left:74px;top:23px;width:220px;height:196px;object-fit:contain;z-index:1}
+.clue-choices{position:absolute;left:70px;right:70px;top:330px;height:183px}
+.clue-choices button{width:236px;height:172px}
+.clue-choices img{width:202px;height:156px}
+.geometry-fallback{position:absolute;pointer-events:none}
+img[hidden]+.geometry-fallback{display:none!important}

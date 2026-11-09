@@ -1,0 +1,415 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "pep-chinese-g1-lower-2022-standard",
+    "revisionId": "directory-b30168cf88d5ee5709335698",
+    "nodeId": "b6aacc7f-4ab7-4bf4-9b81-dc3792d952a5",
+    "lessonTitle": "语文园地五",
+    "gradeCode": "primary_1",
+    "subject": "chinese",
+    "volume": "lower",
+    "unitTitle": "第五单元·识字",
+    "schoolSystem": "six_year",
+    "classHours": [
+      "lesson_1"
+    ],
+    "partIndex": 1,
+    "teachingRevision": "1"
+  },
+  "officialTextbook": {
+    "title": "新教材-小学语文统编版一年级下册",
+    "publisher": "人民教育出版社",
+    "publicationDate": "2024年10月",
+    "teachingMaterialId": "2d22a5c9-80b8-46cb-8595-564f5c368f3e",
+    "ebookResourceId": "b87e153f-a64c-451a-aa6c-6ed9ac7d6821",
+    "officialLessonTitle": "语文园地五",
+    "activityId": "3558dddc-1894-a00d-66d8-d2c9d808705c"
+  },
+  "sourceManifest": "output/courseware-lessons/g1-chinese-48d123e26b3df40d/official/manifest.json",
+  "reviewedAt": "2026-11-05",
+  "reviewedBy": "Codex gpt-6.1-sol / lesson_46",
+  "reviewerKind": "ai",
+  "reviewMethod": "按manifest逐张目视全部lesson_1的40张页图：教学设计4页、课件33页、学习任务单2页、课后练习1页。官方仅列一个课时；未审看视频。重复页、空白田字格页和结尾页均已审看。",
+  "objectives": [
+    "结合生活图画和字族儿歌认识饭、饱、茶、泡、轻、穿、袍、鞭、炮九个生字以及食字旁、火字旁；理解饱、泡、跑、抱、袍、炮的共同部件包及不同形旁。",
+    "观察饱、抱的两部分结构，在田字格淡字上自由描画后用纸笔练写；规范字形、笔顺和姿势交成人观察。",
+    "在新语境中区分青和清、再和在，知道同音字需要联系意思选择。",
+    "通过吃叫吹唱、抱拔提拍、跑跳踢跟的动作和字形，发现口字旁、提手旁、足字旁多表示相关意思。",
+    "复习大小写字母对应，借拼音确定音序并按音序查字法在实际字典中查找溪、解、准、楼、伯，记录自己字典的真实页码。"
+  ],
+  "keyPoint": "认识九个生字和食字旁、火字旁，体会包字族形旁表意、声旁提示读音的规律；观察练写饱、抱。",
+  "difficultPoint": "在语境中辨用同音字，能根据形旁联系大致意思，复习并实际使用音序查字法。",
+  "lessonBoundary": {
+    "scope": "官方全部lesson_1整合为一个完整上架课件，不拆课时。",
+    "sourceCorrection": "学习任务单第1页任务二字例存在泡重复；九字清单以课件第2、4页字表为准，饱、抱写字以教学设计第2页和课件第14、17、18页为准。",
+    "excluded": [
+      "不扩展官方本课没有的日积月累、古诗或额外阅读板块。",
+      "不声称形旁能说明所有字的意思，也不把同部件说成读音完全相同。",
+      "不从静态范字或记忆编造饱、抱完整笔顺；官方视频已豁免，字形与笔顺质量待成人观察。",
+      "不伪造不同版本字典的页码，不把字母匹配说成已经会查实际字典。",
+      "不把点击、拖动、描画覆盖说成会读会写。"
+    ]
+  },
+  "factChecks": [
+    {
+      "factId": "bao-family-meaning",
+      "claims": [
+        "饱、泡、跑、抱、袍、炮右部都有包；不同左部帮助联系大致意思，读音相近但声调或声母不一定完全相同。",
+        "饭和饱带食字旁，多和食物或吃喝有关；炮带火字旁。"
+      ],
+      "sources": [
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            2
+          ],
+          "finding": "总结包字族左边是形旁、右边包是声旁；说明饱饭食字旁与吃喝、泡三点水、炮火字旁，逐句识字。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            6,
+            7,
+            8,
+            9,
+            12
+          ],
+          "finding": "第6页着色共同包部件并显示共同韵母；第7、8页食字旁，9页泡三点水，12页炮火字旁；拼音表明不能说成完全同音。"
+        }
+      ]
+    },
+    {
+      "factId": "homophones-in-context",
+      "claims": [
+        "青、清同音，青可表示颜色，清带三点水，这里的清泉与水有关。",
+        "再和在同音；再表示又一次，在可表示所在位置。"
+      ],
+      "sources": [
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            2,
+            3
+          ],
+          "finding": "第2页末和第3页说明同音字；第3页归纳青清、再在的意思并核对语境填空。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            20,
+            21,
+            22,
+            23
+          ],
+          "finding": "20页列青清再在；21至23页以青山清泉、在学校再见作语境对照。"
+        }
+      ]
+    },
+    {
+      "factId": "body-radicals",
+      "claims": [
+        "口字旁的字大多和嘴有关，提手旁的字大多和手部动作有关，足字旁的字大多和脚部动作有关。"
+      ],
+      "sources": [
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            3,
+            4
+          ],
+          "finding": "第3页列三组字并用做动作发现规律，第4页总结看形旁猜大致意思。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            24,
+            25,
+            26,
+            27
+          ],
+          "finding": "24至26页显示三组身体动作字，25至26页明确口字旁大多与嘴有关，27页扩展身体相关偏旁。"
+        }
+      ]
+    },
+    {
+      "factId": "dictionary-exercise-boundary",
+      "claims": [
+        "本课复习大小写字母对应并用音序查字法查溪、解、准、楼、伯。",
+        "五字本课读音为溪第一声、解第三声、准第三声、楼第二声、伯第二声。准的完整拼音为 zhǔn，音序为 Z，音节索引用不带声调的 zhun。"
+      ],
+      "sources": [
+        {
+          "resource": "teachingDesign",
+          "pageRefs": [
+            4
+          ],
+          "finding": "复习字母表与大小写匹配，再借拼音读五字，按音序查字并写页码。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [
+            28,
+            29,
+            30
+          ],
+          "finding": "28页大小写配对；29页给五字拼音和查字任务，30页再次标出准的拼音 zhǔn 并展示一本字典的查找结果。正式教材截图未搬入本课。"
+        }
+      ]
+    },
+    {
+      "factId": "dictionary-method-steps",
+      "claims": [
+        "音序取字音拼音首字母的大写；音序查字先在汉语拼音音节索引找到大写，再找到对应音节和正文页码。",
+        "按索引页码翻到正文，按声调核对目标汉字；同音节可能跨页，应继续寻找。",
+        "字典版本不同，正文页码可能不同，不能照抄别人的页码。"
+      ],
+      "sources": [
+        {
+          "resource": "dictionaryMethodTeachingDesign",
+          "pageRefs": [
+            1,
+            2,
+            3
+          ],
+          "finding": "同册官方语文园地三教学设计说明大写首字母、音节、正文页码和声调顺序，厨字跨64至65页；第3页说明版本不同页码可能不同。"
+        },
+        {
+          "resource": "dictionaryMethodCourseware",
+          "pageRefs": [
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "finding": "同册官方课件逐步指向首字母大写、完整音节、页码和正文，19页合并三步并按声调找到目标字。"
+        }
+      ]
+    },
+    {
+      "factId": "dictionary-example-audible-spelling",
+      "claims": [
+        "准的音节是 zhǔn。可以听辨为知的声母 zh 加温的韵母 uen，接在声母后写作 un，再标第三声。",
+        "准的声母由 zh 两个字母书写。音序只取第一个字母 z，与资的首字母相同，对应大写 Z。"
+      ],
+      "sources": [
+        {
+          "resource": "pinyinSchemeReference",
+          "pageRefs": ["一、字母表", "二、声母表", "三、韵母表第4和5条", "四、声调符号"],
+          "finding": "列出 Z 与 z 的大小写、知和资的声母，列明温对应 uen；跟声母相拼时缩写为 un，并核实第三声符号。"
+        },
+        {
+          "resource": "pinyinSoundReference",
+          "pageRefs": ["正文 uen 韵母段"],
+          "finding": "以准确为例给出准的注音 zhǔn，并说明温的韵母与声母相拼时写作 un。"
+        },
+        {
+          "resource": "courseware",
+          "pageRefs": [29, 30],
+          "finding": "本课两页标注准的拼音 zhǔn，要求用音序查字。"
+        }
+      ]
+    }
+  ],
+  "instructionalPresentation": {
+    "dictionaryExample": "配音说出声韵组成、目标字第三声和首字母的听辨线索。画面显示准的完整拼音 zhǔn、首字母小写 z 和对应的大写音序 Z。索引画面显示不标声调的 zhun，对应原创练习小字典的示例第26页，正文再找第三声。实际查字以学生手边字典为准。"
+  },
+  "resources": {
+    "teachingDesign": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "resourceId": "fdcbffad-5c42-5117-04e1-5f52eb044b9f",
+      "pageCount": 4,
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "findings": [
+        "第1页：2024年10月版人教语文一下；目标为九生字、两偏旁、两写字、包字族规律、同音形近字辨析、音序查字。",
+        "第2页：依六句字族儿歌识字，联系食字旁、三点水、提手旁、衣字旁和火字旁；读准轻、穿、鞭；写字为饱、抱。",
+        "第3页：青联系颜色、清联系水；再表示又一次，在表示方位；三组身体动作字用形旁联系意思。",
+        "第4页：复习字母表与大小写匹配，用音序查五字，写真实字典页码；总结并布置儿歌朗读。"
+      ]
+    },
+    "courseware": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "resourceId": "0aefecf9-0468-21ed-35b5-50fa87e28350",
+      "pageCount": 33,
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33
+      ],
+      "findings": [
+        "第1页课题信息；第2页教材识字加油站、九字表及饱抱范字；第3页板块标题。",
+        "第4页有拼音儿歌和九字表；第5页去掉儿歌拼音；第6页突出六个末字的包部件与共同韵母。",
+        "第7页饱和食字旁；第8页饭；第9页泡茶；第10页轻；第11页穿袍并呈长袍旗袍图；第12页鞭炮及火字旁；第13页去拼音读儿歌。",
+        "第14页饱、抱田字格范字；第15页空白田字格用于视频；第16页抱范字；第17页按笔画正确、字迹清晰、书面整洁评价；第18页范字与学生字例对照。静态页不支持推断完整笔顺。",
+        "第19页过渡；第20页青清再在；第21页青清填空；第22页再在填空；第23页给两个原教材例句的答案。",
+        "第24页三组字：吃叫吹唱、抱拔提拍、跑跳踢跟；第25、26页为重复的口字旁规律页，均审看；第27页扩展身体相关偏旁。",
+        "第28页大小写匹配；第29页五字拼音与查字任务；第30页展示具体字典结果；第31页重复过渡；第32页朗读儿歌任务；第33页出版社结尾。"
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "resourceId": "da5c57c1-20b2-ef8e-cb30-6e91365d5cc3",
+      "pageCount": 2,
+      "pageRefs": [
+        1,
+        2
+      ],
+      "findings": [
+        "第1页列四类目标，课前无任务；课中字族文朗读、随文识字、饱抱练写、青清再在辨用。",
+        "第2页观察三组字发现身体相关形旁；复习大小写并实际查五字、写页码；推荐资源无。"
+      ]
+    },
+    "afterClassExercise": {
+      "status": "reviewed",
+      "classHour": "lesson_1",
+      "resourceId": "7ff6a7f9-b4fe-8aeb-49b4-c37e72bdb346",
+      "pageCount": 1,
+      "pageRefs": [
+        1
+      ],
+      "findings": [
+        "第1页唯一明列课后练习是读识字加油站中的儿歌。小检查按目标原创变式；每周只交目标、课后要点与skill题源，不另造每课周测。"
+      ]
+    },
+    "video": {
+      "status": "waived",
+      "resourceId": "fd93562c-3de6-cedb-95f6-42dfb2527f23",
+      "reason": "按所有者2026-10-30批准的视频审看豁免，本次未审看。"
+    },
+    "dictionaryMethodTeachingDesign": {
+      "status": "reviewed",
+      "purpose": "仅补本课复习所需的音序查字方法事实，不制作语文园地三",
+      "sourceManifest": "output/courseware-lessons/g1-chinese-48d123e26b3df40d/official-dictionary-method/manifest.json",
+      "sourceManifestSha256": "43731e80698211bffa1f283254780286aae8058200d94d90a7bb3d8d15287272",
+      "materialId": "2d22a5c9-80b8-46cb-8595-564f5c368f3e",
+      "activityId": "a0e46919-3db3-5886-019f-28a7e151ad1a",
+      "resourceId": "c28280c9-aa73-552a-9774-c44d6117fd3c",
+      "pageCount": 4,
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "findings": [
+        "第1页明确2024年10月同册教材以及音节索引和正文两部分。",
+        "第2页以厨为例：找拼音首字母的大写，在其下找完整音节及正文页码，翻正文后按声调寻找；同音节可能跨页。",
+        "第3页明确不同版本字典页码可能不同；借三拼音节练习说明音序仍找首字母的大写。",
+        "第4页是写字与总结，未用于本课新增写字内容。"
+      ]
+    },
+    "pinyinSchemeReference": {
+      "status": "reviewed_excerpt",
+      "purpose": "核对查准时用到的声母、韵母及大小写，非本课配套课时资料",
+      "url": "https://yywz.ecnu.edu.cn/1f/56/c30556a335702/page.htm",
+      "pageRefs": ["一、字母表", "二、声母表", "三、韵母表第4和5条", "四、声调符号"],
+      "findings": ["准的目标字音可用标准声母、韵母、声调拆解，字母表最后一组是 Z 和 z。"]
+    },
+    "pinyinSoundReference": {
+      "status": "reviewed_excerpt",
+      "purpose": "交叉核对准的拼音和温的韵母省写，非本课配套课时资料",
+      "url": "https://jc.sdbi.edu.cn/info/1018/2044.htm",
+      "pageRefs": ["正文 uen 韵母段"],
+      "findings": ["给出准确的示例注音，说明温的韵母与声母相拼时缩写。"]
+    },
+    "dictionaryMethodCourseware": {
+      "status": "reviewed_excerpt",
+      "purpose": "只核对音序方法相关片段，不声称审读整份补充课件",
+      "sourceManifest": "output/courseware-lessons/g1-chinese-48d123e26b3df40d/official-dictionary-method/manifest.json",
+      "resourceId": "ebf2e8f3-0d81-eda5-c137-d00cf5782c86",
+      "pageCount": 81,
+      "pageRefs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        25,
+        30
+      ],
+      "findings": [
+        "已目视第1至20页和第25、30页；未将其余页列为已审读。",
+        "第2至9页认识字典与音节索引，第10至12页大小写字母表，第13至19页逐步找拼音首字母的大写、完整音节、页码、正文和声调。",
+        "第19页汇总三步，正文按声调找字；第20、25、30页是音序和页码练习。"
+      ]
+    }
+  },
+  "weeklyQuestionSource": {
+    "goals": [
+      "包字族形旁和字义",
+      "同音字语境辨用",
+      "身体相关形旁",
+      "大小写音序与实际查字"
+    ],
+    "afterClassFocus": "字族儿歌正确、流利、有节奏朗读；朗读能力待成人观察。",
+    "excludeUnobserved": [
+      "点击不能证明朗读发音、纸笔书写、独立翻查字典速度。"
+    ]
+  },
+  "sourceManifestSha256": "2f27da40b7413a74419b8e49014f8de9c0e6c88dbbe7a68d81b1b716fac5236c",
+  "visualReview": {
+    "rejectedAssets": [
+      {
+        "key": "child-clap",
+        "sha256": "7486b168874c5ec1d54384c851469c4c2b03080f058687349f049b19a5b4dea4",
+        "reason": "静态双掌贴合像合掌，不能让不看文字的孩子明确分辨拍手；正式课中不使用。",
+        "disposition": "保留原始付费图片和回执作证据，不进入lesson.images或发布媒体。"
+      }
+    ],
+    "replacement": "使用已验收的抱玩具图教提手旁，使用完整跑步图的前后两个画框表达再跑一次。未新增付费请求。"
+  }
+}

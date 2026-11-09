@@ -1,0 +1,926 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "10的加、减法",
+  "description": "在灯牌工坊把两组灯片合成十、从整板移走一部分，再用图和算式讲清变化。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "用简短而准确的口语把数量图、动作和数学算式联系起来。"
+    }
+  },
+  "images": {
+    "lamp-workshop": {
+      "file": "assets/lamp-workshop.png"
+    },
+    "remove-contrast": {
+      "file": "assets/remove-contrast.png"
+    },
+    "equal-groups": {
+      "file": "assets/equal-groups.png"
+    },
+    "variation": {
+      "file": "assets/variation.png"
+    },
+    "story-groups": {
+      "file": "assets/story-groups.png"
+    },
+    "six-plus-missing": {
+      "file": "assets/six-plus-missing.png"
+    },
+    "eight-taken": {
+      "file": "assets/eight-taken.png"
+    },
+    "empty-and-ten": {
+      "file": "assets/empty-and-ten.png"
+    },
+    "nine-and-one": {
+      "file": "assets/nine-and-one.png"
+    },
+    "take-nine": {
+      "file": "assets/take-nine.png"
+    },
+    "take-eight": {
+      "file": "assets/take-eight.png"
+    },
+    "take-one": {
+      "file": "assets/take-one.png"
+    },
+    "two-taken": {
+      "file": "assets/two-taken.png"
+    },
+    "map-and-equal": {
+      "file": "assets/map-and-equal.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "给展板装灯片",
+      "template": "picture-points",
+      "data": {
+        "title": "给展板装灯片",
+        "picture": "lamp-workshop",
+        "points": [
+          "两组灯片，装进一块展板",
+          "两个部分，合成一个整体",
+          "从十片里拿走一组"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "欢迎来到灯牌工坊，我是小数老师。"
+        },
+        {
+          "say": "我们把两组灯片装到同一块板上。"
+        },
+        {
+          "say": "图上的圆点代表灯片，每片只数一次。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "一组有两片，另一组有八片。"
+        },
+        {
+          "say": "把两片和八片合起来，就有十片。"
+        },
+        {
+          "say": "加号告诉我们，要一起数这两组。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "已经装满的十片，是一个整体。"
+        },
+        {
+          "say": "从十片里拿走一组，盒里留下另一组。"
+        },
+        {
+          "say": "这一课就用图来想加法和减法。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "两组合成十",
+      "page": "p02",
+      "widgetType": "ten-join-parts",
+      "startImage": "lamp-workshop",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#join-board"
+        },
+        {
+          "say": "这块灯板有十格，每格只装一片。"
+        },
+        {
+          "say": "已经放好两片，还有一组在板外。"
+        },
+        {
+          "highlight": "#join-cards"
+        },
+        {
+          "say": "把空格一格一格数，空着八格。"
+        },
+        {
+          "say": "八片那组能把这些空格刚好装满。"
+        },
+        {
+          "setState": {
+            "demoJoined": true
+          }
+        },
+        {
+          "highlight": "#join-equation"
+        },
+        {
+          "say": "二加八等于十，加号连接两组。"
+        },
+        {
+          "say": "十是合起来的总数，不能再加一次。"
+        },
+        {
+          "setState": {
+            "demoSwapped": true
+          }
+        },
+        {
+          "highlight": "#join-board"
+        },
+        {
+          "say": "把八片先放，再放两片，也有十片。"
+        },
+        {
+          "say": "先放哪组不同，两组的片数没变。"
+        },
+        {
+          "say": "轮到你，点一组刚好填满空格的灯片。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "十片能拿走不同的一组",
+      "template": "picture-points",
+      "data": {
+        "title": "十片能拿走不同的一组",
+        "picture": "remove-contrast",
+        "points": [
+          "整盒10片，分成3片和7片",
+          "10 − 3 = 7",
+          "10 − 7 = 3"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一格图里，三片和七片都在盒里。"
+        },
+        {
+          "say": "两组都数进十里，十是拿走前的总数。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "看中间图，斜线标出了取走的三片。"
+        },
+        {
+          "say": "从十片里去掉三片，留下七片。"
+        },
+        {
+          "say": "减号后面的三，说的是取走多少。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再看下面图，去掉的是七片那组。"
+        },
+        {
+          "say": "从十片里去掉七片，留下三片。"
+        },
+        {
+          "say": "两次都从十开始，拿走的组不同。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "整盒拿走一组",
+      "page": "p04",
+      "widgetType": "ten-remove-group",
+      "startImage": "lamp-workshop",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#whole-box"
+        },
+        {
+          "say": "请看盒里，四片和六片共十片。"
+        },
+        {
+          "say": "十是原来的整盒，减号前面写十。"
+        },
+        {
+          "highlight": "#take-first"
+        },
+        {
+          "say": "如果题目说取走四片，就找四片这组。"
+        },
+        {
+          "setState": {
+            "demoFirst": true
+          }
+        },
+        {
+          "highlight": "#removed-tray"
+        },
+        {
+          "say": "四片已经移到盒外，不算进剩下的。"
+        },
+        {
+          "say": "盒里留下六片，十减四等于六。"
+        },
+        {
+          "setState": {
+            "demoSecond": true
+          }
+        },
+        {
+          "highlight": "#take-equation"
+        },
+        {
+          "say": "换成取走六片，盒里只留下四片。"
+        },
+        {
+          "say": "十减六等于四，仍从十片开始。"
+        },
+        {
+          "say": "点减号后面那个数量的一组。"
+        },
+        {
+          "say": "遇到两组同样多，取走哪组都可以。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "一幅图可以写几道算式",
+      "template": "picture-points",
+      "data": {
+        "title": "一幅图可以写几道算式",
+        "picture": "map-and-equal",
+        "points": [
+          "合在一起，写加法",
+          "去掉哪组，决定哪道减法",
+          "两组都是5，只留一加一减"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "两片和八片合成十，二加八等于十。"
+        },
+        {
+          "say": "先数八片再数两片，八加二也等于十。"
+        },
+        {
+          "say": "记关系时，一个加法就能说清合并。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第一行是两片蓝灯片、八片绿灯片。"
+        },
+        {
+          "say": "第二行是八片蓝灯片、两片绿灯片。"
+        },
+        {
+          "say": "两张图都能写十减二等于八。"
+        },
+        {
+          "say": "第一行取走蓝组，第二行取走绿组。"
+        },
+        {
+          "say": "要拿走的是两片，剩下的都是八片。"
+        },
+        {
+          "say": "如果改为拿走八片，就只留下两片。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "图上两组各有五片，五加五等于十。"
+        },
+        {
+          "say": "两边同样多，调换也还是五加五。"
+        },
+        {
+          "say": "拿走左边五片，右边还剩五片。"
+        },
+        {
+          "say": "拿走右边五片，左边也剩五片。"
+        },
+        {
+          "say": "两次都写十减五等于五，只记一遍。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "给算式配动作图",
+      "page": "p06",
+      "widgetType": "ten-equation-actions",
+      "startImage": "lamp-workshop",
+      "script": [
+        {
+          "setState": {
+            "demoJoin": true
+          }
+        },
+        {
+          "highlight": "#map-equation"
+        },
+        {
+          "say": "四加六等于十，说的是合并两组。"
+        },
+        {
+          "highlight": "#action-cards"
+        },
+        {
+          "say": "带加号的动作图，把四片和六片合到一起。"
+        },
+        {
+          "say": "合好后十格都亮起来，整板是十片。"
+        },
+        {
+          "setState": {
+            "demoTake": true
+          }
+        },
+        {
+          "highlight": "#map-board"
+        },
+        {
+          "say": "换成十减四，就要先有整板十片。"
+        },
+        {
+          "say": "移出四片，那四个位置会空出来。"
+        },
+        {
+          "say": "没有被拿走的六片，是这道题的差。"
+        },
+        {
+          "setState": {
+            "demoOther": true
+          }
+        },
+        {
+          "highlight": "#map-equation"
+        },
+        {
+          "say": "十减六则取走六片，留下四片。"
+        },
+        {
+          "say": "别只看颜色，数清被移出的那一组。"
+        },
+        {
+          "say": "现在从三张动作图中选和算式相符的。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "十不变，两个部分会怎样",
+      "template": "picture-points",
+      "data": {
+        "title": "十不变，两个部分会怎样",
+        "picture": "variation",
+        "points": [
+          "一边多1，另一边少1",
+          "10不变，取走越多，剩得越少",
+          "拿走0片，仍是10片",
+          "十片全拿走，留下0片"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一行是一片和九片，合起来是十。"
+        },
+        {
+          "say": "再把一片移到小组，变成两片和八片。"
+        },
+        {
+          "say": "一边多一，另一边少一，总数还是十。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从十片里取走一片，会剩下九片。"
+        },
+        {
+          "say": "取走两片，就比刚才少留一片。"
+        },
+        {
+          "say": "原来的十没变，拿得多就剩得少。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果一片都不取走，就是十减零。"
+        },
+        {
+          "say": "原来的十片都还在，剩下还是十。"
+        },
+        {
+          "say": "空盒没有灯片，与十片合起来仍是十。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "如果十片都取走，盒里一片也不剩。"
+        },
+        {
+          "say": "用零表示一片也没有，十减十等于零。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "留下指定的灯片",
+      "page": "p08",
+      "widgetType": "ten-subtraction-unknown",
+      "startImage": "lamp-workshop",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#remain-target"
+        },
+        {
+          "say": "我们要在十片里留下八片。"
+        },
+        {
+          "say": "先看目标图，空白格暂时不用管。"
+        },
+        {
+          "setState": {
+            "demoOne": true
+          }
+        },
+        {
+          "highlight": "#remain-board"
+        },
+        {
+          "say": "拿走一片，只剩九片，比八还多一。"
+        },
+        {
+          "setState": {
+            "demoTwo": true
+          }
+        },
+        {
+          "highlight": "#missing-equation"
+        },
+        {
+          "say": "再拿走一片，留下的正好是八片。"
+        },
+        {
+          "say": "一共取走两片，所以问号里填二。"
+        },
+        {
+          "say": "也能想二和八合成十，十减二剩八。"
+        },
+        {
+          "setState": {
+            "demoAll": true
+          }
+        },
+        {
+          "highlight": "#remain-target"
+        },
+        {
+          "say": "要留零片，就把十片全部拿走。"
+        },
+        {
+          "say": "如果剩下的图不一样，就换一组来试。"
+        },
+        {
+          "say": "轮到你，点一组拿走，让两幅图一样。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "从生活画面里找算式",
+      "template": "picture-points",
+      "data": {
+        "title": "从生活画面里找算式",
+        "picture": "story-groups",
+        "points": [
+          "求合计，把两组放在一起",
+          "问剩下，先找到原来的总数",
+          "先说数量，再说发生什么"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "展台左边摆六片，右边摆四片。"
+        },
+        {
+          "say": "问一共有多少片，要数左右两组。"
+        },
+        {
+          "say": "六加四等于十，展台上一共十片。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再问收起右边四片后，展台还剩多少。"
+        },
+        {
+          "say": "原来十片已经包含右边那四片。"
+        },
+        {
+          "say": "从十片里去掉四片，算十减四。"
+        },
+        {
+          "say": "展台上留下六片，和没有收起的一组一样。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "同样两组灯片，可以问合计，也能问剩下。"
+        },
+        {
+          "say": "讲故事要让别人听清哪组拿走了。"
+        },
+        {
+          "say": "请说给家人听，让家人看你有没有说清。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "换场景小检查",
+      "intro": [
+        "看图，听我把问题说完，再选图。",
+        "每个小圆点代表题目里的一件物品。"
+      ],
+      "questions": [
+        {
+          "id": "ten-q1",
+          "question": "十支彩笔分两袋，左袋六支，右袋几支？",
+          "skill": "由整体十和已知部分找另一部分",
+          "options": {
+            "A": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "B": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "六和四合成十，十减六还剩四，所以右袋有四支。",
+          "visual": {
+            "kind": "asset",
+            "image": "six-plus-missing",
+            "alt": "十格里有六个数量点，还有四格未放"
+          }
+        },
+        {
+          "id": "ten-q2",
+          "question": "盒里有十块拼片，取出八块，还剩几块？",
+          "skill": "从整体十减去指定的一部分",
+          "options": {
+            "A": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            },
+            "B": {
+              "label": "2",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            },
+            "C": {
+              "label": "3",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "十块里面取出八块，盒里没有被取走的是两块。",
+          "visual": {
+            "kind": "asset",
+            "image": "eight-taken",
+            "alt": "十个点里划去八个，留下未划的两个"
+          }
+        },
+        {
+          "id": "ten-q3",
+          "question": "两袋各五枚棋子，收起其中一袋，还剩几枚？",
+          "skill": "两部分相同对应同一个减法",
+          "options": {
+            "A": {
+              "label": "10",
+              "visual": {
+                "kind": "quantity",
+                "count": 10
+              }
+            },
+            "B": {
+              "label": "0",
+              "visual": {
+                "kind": "quantity",
+                "count": 0
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "两袋共十枚。哪袋被收起都只拿走五枚，十减五等于五。",
+          "visual": {
+            "kind": "asset",
+            "image": "equal-groups",
+            "alt": "两个数量相同的组，每组五个"
+          }
+        },
+        {
+          "id": "ten-q4",
+          "question": "空托盘放入十枚夹子，现在有几枚？",
+          "skill": "理解零和十相加仍是十",
+          "options": {
+            "A": {
+              "label": "10",
+              "visual": {
+                "kind": "quantity",
+                "count": 10
+              }
+            },
+            "B": {
+              "label": "0",
+              "visual": {
+                "kind": "quantity",
+                "count": 0
+              }
+            },
+            "C": {
+              "label": "9",
+              "visual": {
+                "kind": "quantity",
+                "count": 9
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "空托盘原来是零枚，零和十合起来还是十枚。",
+          "visual": {
+            "kind": "asset",
+            "image": "empty-and-ten",
+            "alt": "上方空托盘，下方十个数量点"
+          }
+        },
+        {
+          "id": "ten-q5",
+          "question": "十减九等于一，哪张图画出了这个动作？",
+          "skill": "由算式选择去掉指定部分的图",
+          "options": {
+            "A": {
+              "label": "去掉一片",
+              "visual": {
+                "kind": "asset",
+                "image": "take-one",
+                "alt": "十个点中划去一个"
+              }
+            },
+            "B": {
+              "label": "去掉九片",
+              "visual": {
+                "kind": "asset",
+                "image": "take-nine",
+                "alt": "十个点中划去九个"
+              }
+            },
+            "C": {
+              "label": "去掉八片",
+              "visual": {
+                "kind": "asset",
+                "image": "take-eight",
+                "alt": "十个点中划去八个"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "十是原来的总数。要选划去九个、留一个的图。",
+          "visual": {
+            "kind": "asset",
+            "image": "nine-and-one",
+            "alt": "十个数量点，分成一和九两组"
+          }
+        },
+        {
+          "id": "ten-q6",
+          "question": "盘里有十块圆饼，两块装袋，盘里还剩几块？",
+          "skill": "在新生活情境中区分拿走数与剩下数",
+          "options": {
+            "A": {
+              "label": "2",
+              "visual": {
+                "kind": "quantity",
+                "count": 2
+              }
+            },
+            "B": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            },
+            "C": {
+              "label": "8",
+              "visual": {
+                "kind": "quantity",
+                "count": 8
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "装袋的两块要从原来的十块中减掉，盘里还有八块。",
+          "visual": {
+            "kind": "asset",
+            "image": "two-taken",
+            "alt": "十个圆点中划去两个，剩八个未划"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "用分合想十的加减",
+      "template": "summary",
+      "data": {
+        "title": "用分合想十的加减",
+        "items": [
+          "合两部分，用加法",
+          "整盒十减掉一部分",
+          "两组同样多，算式不重记",
+          "看清问题，讲清数量和动作"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "两个部分合在一起，可以用加法。"
+        },
+        {
+          "say": "哪一组先数都行，两组各数一次。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "减法先找整盒的十片，再看拿走多少。"
+        },
+        {
+          "say": "一片不拿走还剩十，拿走十片就剩零。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "两组各五片，拿走哪边都留下五片。"
+        },
+        {
+          "say": "相同的十减五等于五，写一遍就够。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "回家找两组小物品，讲一次合并。"
+        },
+        {
+          "say": "再想拿走一组，剩下多少。"
+        },
+        {
+          "say": "请家人听你说，帮你看数量和动作是否相符。"
+        }
+      ]
+    }
+  ]
+}

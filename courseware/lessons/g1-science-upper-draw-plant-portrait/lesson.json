@@ -1,0 +1,934 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "给植物画张“像”",
+  "description": "观察植物的可见特点，照实画像、对照修正，再把同一株的两次画像分开保存。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/ke-science-v1.png",
+      "color": "#4B8B67",
+      "persona": "先观察再比较，用孩子能听懂的话说出可见证据。"
+    }
+  },
+  "images": {
+    "cover-plant-studio": {
+      "file": "assets/cover_plant_studio.png"
+    },
+    "spider-plant-observation": {
+      "file": "assets/spider_plant_observation.png"
+    },
+    "plants-nearby": {
+      "file": "assets/plants_nearby.png"
+    },
+    "practice-plant-observation": {
+      "file": "assets/practice_plant_observation.png"
+    },
+    "edit-plant-observation": {
+      "file": "assets/edit_plant_observation.png"
+    },
+    "sharing-and-care": {
+      "file": "assets/sharing_and_care.png"
+    },
+    "observation-journal-plant": {
+      "file": "assets/observation_journal_plant.png"
+    },
+    "quiz-leaf": {
+      "file": "assets/quiz_leaf.png"
+    },
+    "quiz-where": {
+      "file": "assets/quiz_where.png"
+    },
+    "quiz-flowers": {
+      "file": "assets/quiz_flowers.png"
+    },
+    "quiz-hidden": {
+      "file": "assets/quiz_hidden.png"
+    },
+    "quiz-journal": {
+      "file": "assets/quiz_journal.png"
+    },
+    "glass-pot": {
+      "file": "assets/glass-pot.png"
+    },
+    "spider-leaves": {
+      "file": "assets/spider-leaves.png"
+    },
+    "spider-portrait": {
+      "file": "assets/spider-portrait.png"
+    },
+    "pothos-pot": {
+      "file": "assets/pothos-pot.png"
+    },
+    "pothos-shape": {
+      "file": "assets/pothos-shape.png"
+    },
+    "pothos-vein": {
+      "file": "assets/pothos-vein.png"
+    },
+    "blue-pot": {
+      "file": "assets/blue-pot.png"
+    },
+    "red-flower": {
+      "file": "assets/red-flower.png"
+    },
+    "hidden-roots": {
+      "file": "assets/hidden-roots.png"
+    },
+    "mint-leaves": {
+      "file": "assets/mint-leaves.png"
+    },
+    "mint-stem": {
+      "file": "assets/mint-stem.png"
+    },
+    "mint-wrong-leaves": {
+      "file": "assets/mint-wrong-leaves.png"
+    },
+    "mint-extra-flower": {
+      "file": "assets/mint-extra-flower.png"
+    },
+    "journal-first": {
+      "file": "assets/journal-first.png"
+    },
+    "journal-second": {
+      "file": "assets/journal-second.png"
+    },
+    "q1-a": {
+      "file": "assets/q1-a.png"
+    },
+    "q1-b": {
+      "file": "assets/q1-b.png"
+    },
+    "q1-c": {
+      "file": "assets/q1-c.png"
+    },
+    "q2-a": {
+      "file": "assets/q2-a.png"
+    },
+    "q2-b": {
+      "file": "assets/q2-b.png"
+    },
+    "q2-c": {
+      "file": "assets/q2-c.png"
+    },
+    "q3-a": {
+      "file": "assets/q3-a.png"
+    },
+    "q3-b": {
+      "file": "assets/q3-b.png"
+    },
+    "q3-c": {
+      "file": "assets/q3-c.png"
+    },
+    "q4-a": {
+      "file": "assets/q4-a.png"
+    },
+    "q4-b": {
+      "file": "assets/q4-b.png"
+    },
+    "q4-c": {
+      "file": "assets/q4-c.png"
+    },
+    "q5-a": {
+      "file": "assets/q5-a.png"
+    },
+    "q5-b": {
+      "file": "assets/q5-b.png"
+    },
+    "q5-c": {
+      "file": "assets/q5-c.png"
+    },
+    "q6-a": {
+      "file": "assets/q6-a.png"
+    },
+    "q6-b": {
+      "file": "assets/q6-b.png"
+    },
+    "q6-c": {
+      "file": "assets/q6-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "植物小画室",
+      "template": "title-picture",
+      "data": {
+        "title": "植物小画室",
+        "picture": "plants-nearby",
+        "caption": "看样子，找线索"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小朋友们好，欢迎来到植物小画室。"
+        },
+        {
+          "say": "今天我们先看清楚，再给植物画一张像。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "先看左边这盆绿萝，叶片宽宽的。"
+        },
+        {
+          "say": "中间是吊兰，这株有细长的弯叶。"
+        },
+        {
+          "say": "右边的仙人球圆圆的，图上能看到尖刺。"
+        },
+        {
+          "say": "它们都在架子上，可各有各的样子。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "想让别人认出你的画，就要留下真的线索。"
+        },
+        {
+          "say": "看它长在哪里，还要看它的样子。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "看清这株吊兰",
+      "template": "picture-points",
+      "data": {
+        "title": "看清这株吊兰",
+        "picture": "spider-plant-observation",
+        "points": [
+          "透明杯里有水",
+          "叶子又细又长",
+          "能看见浅色的根"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天我们来仔细看一株吊兰。"
+        },
+        {
+          "say": "观察时，先看眼前的这一株。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先找透明水杯，看看杯里的水线。"
+        },
+        {
+          "say": "画上这个位置，别人就知道它在哪里。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看看叶子，细细长长的，还带着弯。"
+        },
+        {
+          "say": "叶子从杯口伸出来，有的向两边垂。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "透过杯壁，能见到一些浅色的根。"
+        },
+        {
+          "say": "这里看得见，就可以记到画上。"
+        },
+        {
+          "say": "遇到挡住的地方，留空就好。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "放大镜找线索",
+      "page": "observe",
+      "widgetType": "observation_zoom",
+      "startImage": "cover-plant-studio",
+      "script": [
+        {
+          "say": "小朋友们，我们用放大镜来找线索。"
+        },
+        {
+          "say": "先看老师怎么找，再按同样的顺序找。"
+        },
+        {
+          "highlight": "#observe-cup"
+        },
+        {
+          "setState": {
+            "focus": 0
+          }
+        },
+        {
+          "say": "先点杯壁旁边，放大就能找见水线。"
+        },
+        {
+          "say": "画杯子时，这一圈能提醒我们水在哪里。"
+        },
+        {
+          "highlight": "#observe-leaf"
+        },
+        {
+          "setState": {
+            "focus": 1
+          }
+        },
+        {
+          "say": "接着点上面的镜子，看细长的弯叶。"
+        },
+        {
+          "say": "叶子的弯处，是让画更像的线索。"
+        },
+        {
+          "highlight": "#observe-root"
+        },
+        {
+          "setState": {
+            "focus": 2
+          }
+        },
+        {
+          "say": "最后点杯子里面，放大看看浅色的根。"
+        },
+        {
+          "say": "用眼睛观察就行，不用拉它。"
+        },
+        {
+          "setState": {
+            "practice": true
+          }
+        },
+        {
+          "say": "轮到你了，按杯子、叶子、根的顺序找。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "三笔画成记录",
+      "template": "picture-points",
+      "data": {
+        "title": "三笔画成记录",
+        "picture": "spider-portrait",
+        "points": [
+          "先画水杯和水线",
+          "接着画细长弯叶",
+          "最后画可见的根"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "我们用笔画一张吊兰的观察记录。"
+        },
+        {
+          "say": "像不像，要拿画和实物对照。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先画水杯，再加上看到的水线。"
+        },
+        {
+          "say": "这样能记住这株吊兰长在哪里。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "沿着实物看，叶子从杯口向外弯。"
+        },
+        {
+          "say": "把细长的叶形画下来，再比一比。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后画透过杯壁看见的浅色根。"
+        },
+        {
+          "say": "眼前没有看到花，就不用添花。"
+        },
+        {
+          "say": "名字可以讲给大人听，请大人帮着写。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "给眼前这株画像",
+      "page": "assemble",
+      "widgetType": "portrait_layers",
+      "startImage": "practice-plant-observation",
+      "script": [
+        {
+          "say": "换一株绿萝，看看眼前的植物长什么样。"
+        },
+        {
+          "say": "左边是实物，右边的纸等着我们来画。"
+        },
+        {
+          "highlight": "#assemble-pot"
+        },
+        {
+          "setState": {
+            "layer": 0
+          }
+        },
+        {
+          "say": "先看它的容器，红褐色的盆口有土。"
+        },
+        {
+          "say": "把相同的盆放进画纸，就记住了位置。"
+        },
+        {
+          "highlight": "#assemble-leaf"
+        },
+        {
+          "setState": {
+            "layer": 1
+          }
+        },
+        {
+          "say": "再看看宽叶，叶尖往下，像个小心形。"
+        },
+        {
+          "say": "把这种叶子放上去，画就更像实物。"
+        },
+        {
+          "highlight": "#assemble-detail"
+        },
+        {
+          "setState": {
+            "layer": 2
+          }
+        },
+        {
+          "say": "叶面还能看到几条线，把它们也记下。"
+        },
+        {
+          "say": "根被土遮住了，我们不把它猜进画里。"
+        },
+        {
+          "setState": {
+            "practice": true
+          }
+        },
+        {
+          "say": "现在自己选图卡，点一下或拖到画纸上。"
+        },
+        {
+          "say": "先画盆，再画叶，最后找叶面线条。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "拿画和实物对一对",
+      "page": "correct",
+      "widgetType": "portrait_revision",
+      "startImage": "edit-plant-observation",
+      "script": [
+        {
+          "say": "同学们，我们继续来当小小观察员。"
+        },
+        {
+          "say": "左边是这盆薄荷，右边是要修改的画。"
+        },
+        {
+          "highlight": "#edit-flower-button"
+        },
+        {
+          "setState": {
+            "correction": 0
+          }
+        },
+        {
+          "say": "画上多了一朵花，左边却没有看见。"
+        },
+        {
+          "say": "先把多画的花拿掉，只记下看到的。"
+        },
+        {
+          "highlight": "#edit-pot-button"
+        },
+        {
+          "setState": {
+            "correction": 1
+          }
+        },
+        {
+          "say": "左边是鼓鼓的蓝花盆，不是透明杯。"
+        },
+        {
+          "say": "换成蓝花盆，位置这条线索就对了。"
+        },
+        {
+          "highlight": "#edit-leaf-button"
+        },
+        {
+          "setState": {
+            "correction": 2
+          }
+        },
+        {
+          "say": "再看叶边，左边能看见一圈小尖齿。"
+        },
+        {
+          "say": "把光滑圆叶换掉，才像这盆薄荷。"
+        },
+        {
+          "setState": {
+            "practice": true
+          }
+        },
+        {
+          "say": "轮到你了，依次对一对花、花盆和叶形。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "介绍和爱护",
+      "template": "picture-points",
+      "data": {
+        "title": "介绍和爱护",
+        "picture": "sharing-and-care",
+        "points": [
+          "说说植物的名字",
+          "说出样子和位置",
+          "听一听，轻轻看"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "画好之后，可以介绍你的植物朋友。"
+        },
+        {
+          "say": "看这两个小朋友，把画和实物放在一起。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先说它叫什么，让伙伴知道你画了谁。"
+        },
+        {
+          "say": "名字忘了，可以先请大人帮你认一认。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再说它的叶子什么样，长在哪里。"
+        },
+        {
+          "say": "比如宽宽的绿叶，从红褐色的盆里伸出。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "伙伴在说时，先听一听他的发现。"
+        },
+        {
+          "say": "观察只用眼睛，不拔叶，也不拉枝条。"
+        },
+        {
+          "say": "想指出一片叶，可以指画上的那片。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "今天一张，下次一张",
+      "page": "journal",
+      "widgetType": "observation_journal",
+      "startImage": "observation-journal-plant",
+      "script": [
+        {
+          "say": "同一株植物，今天和下次都能画下来。"
+        },
+        {
+          "say": "左边是第一次，右边是后来看到的样子。"
+        },
+        {
+          "highlight": "#journal-first-slot"
+        },
+        {
+          "setState": {
+            "time": 0
+          }
+        },
+        {
+          "say": "先看左图，蓝纹花盆里的小苗还很矮。"
+        },
+        {
+          "say": "把那一次的画像放进第一个夹子。"
+        },
+        {
+          "highlight": "#journal-second-slot"
+        },
+        {
+          "setState": {
+            "time": 1
+          }
+        },
+        {
+          "say": "后来同一株上面又多出一对小叶。"
+        },
+        {
+          "say": "把后来那张放进第二个夹子。"
+        },
+        {
+          "highlight": "#journal-reference"
+        },
+        {
+          "say": "两张画都收好，下次才有东西可以比。"
+        },
+        {
+          "say": "画每次亲眼看到的样子，不猜会长多快。"
+        },
+        {
+          "setState": {
+            "practice": true
+          }
+        },
+        {
+          "say": "轮到你了，先放第一次，再放下一次。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "看图小检查",
+      "intro": [
+        "听老师读题，再仔细看看图。",
+        "先选最符合观察证据的那一张。"
+      ],
+      "questions": [
+        {
+          "id": "q1-portrait",
+          "question": "哪张画和眼前这片叶的形状最像？",
+          "skill": "观察叶片形状",
+          "answer": [
+            "B"
+          ],
+          "analysis": "图里这片叶向几边伸出尖角。圆片和长带的轮廓都不同。",
+          "options": {
+            "A": {
+              "label": "圆片形的叶",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-a",
+                "alt": "圆片形的叶"
+              }
+            },
+            "B": {
+              "label": "有几个尖角的手掌形叶",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-b",
+                "alt": "有几个尖角的手掌形叶"
+              }
+            },
+            "C": {
+              "label": "细长带形的叶",
+              "visual": {
+                "kind": "asset",
+                "image": "q1-c",
+                "alt": "细长带形的叶"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-leaf",
+            "alt": "枝上有尖角、像手掌的叶"
+          }
+        },
+        {
+          "id": "q2-portrait",
+          "question": "哪张画记下了小苗现在长在哪里？",
+          "skill": "记录植物的生长位置",
+          "answer": [
+            "C"
+          ],
+          "analysis": "小苗在窗边的小黄盆里。画在门旁或换成大盆都和实物不同。",
+          "options": {
+            "A": {
+              "label": "门边的小黄盆",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-a",
+                "alt": "门边的小黄盆"
+              }
+            },
+            "B": {
+              "label": "窗边的大黄盆",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-b",
+                "alt": "窗边的大黄盆"
+              }
+            },
+            "C": {
+              "label": "窗边的小黄盆",
+              "visual": {
+                "kind": "asset",
+                "image": "q2-c",
+                "alt": "窗边的小黄盆"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-where",
+            "alt": "窗台的小黄盆里有小苗，右侧有一扇门"
+          }
+        },
+        {
+          "id": "q3-portrait",
+          "question": "看看这株植物，哪张画照实记录了？",
+          "skill": "按可见证据画像",
+          "answer": [
+            "A"
+          ],
+          "analysis": "只看见绿色叶子和紫盆，另外两张添了眼前没有的花。",
+          "options": {
+            "A": {
+              "label": "只画看见的绿叶和紫盆",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-a",
+                "alt": "只画看见的绿叶和紫盆"
+              }
+            },
+            "B": {
+              "label": "多添一朵花",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-b",
+                "alt": "多添一朵花"
+              }
+            },
+            "C": {
+              "label": "多添两朵花",
+              "visual": {
+                "kind": "asset",
+                "image": "q3-c",
+                "alt": "多添两朵花"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-flowers",
+            "alt": "只有绿叶、未见花的一株植物，长在紫盆里"
+          }
+        },
+        {
+          "id": "q4-portrait",
+          "question": "在花圃观察时，哪个动作爱护植物？",
+          "skill": "爱护植物地观察",
+          "answer": [
+            "B"
+          ],
+          "analysis": "手指和花之间有空隙，可以用眼睛看。扯叶、摘花都可能伤到植物。",
+          "options": {
+            "A": {
+              "label": "用手扯叶片",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-a",
+                "alt": "用手扯叶片"
+              }
+            },
+            "B": {
+              "label": "隔着一点距离指给伙伴看",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-b",
+                "alt": "隔着一点距离指给伙伴看"
+              }
+            },
+            "C": {
+              "label": "把花摘下来",
+              "visual": {
+                "kind": "asset",
+                "image": "q4-c",
+                "alt": "把花摘下来"
+              }
+            }
+          }
+        },
+        {
+          "id": "q5-portrait",
+          "question": "木板挡住了下面，哪张画照实记录？",
+          "skill": "只记观察到的部分",
+          "answer": [
+            "A"
+          ],
+          "analysis": "图里只能直接看见木板上方的叶，根和花都没有看见。",
+          "options": {
+            "A": {
+              "label": "只记木板上方看得见的叶",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-a",
+                "alt": "只记木板上方看得见的叶"
+              }
+            },
+            "B": {
+              "label": "把看不见的根也画进去",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-b",
+                "alt": "把看不见的根也画进去"
+              }
+            },
+            "C": {
+              "label": "在看得见的叶上添花",
+              "visual": {
+                "kind": "asset",
+                "image": "q5-c",
+                "alt": "在看得见的叶上添花"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-hidden",
+            "alt": "宽叶伸出木板上面，下面被木板遮住"
+          }
+        },
+        {
+          "id": "q6-portrait",
+          "question": "同一株看了两次，哪种方法留得全？",
+          "skill": "分别保存连续观察",
+          "answer": [
+            "C"
+          ],
+          "analysis": "两次看到的样子分别留一张，后来才有两份记录可以对照。",
+          "options": {
+            "A": {
+              "label": "只留第一次的画像",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-a",
+                "alt": "只留第一次的画像"
+              }
+            },
+            "B": {
+              "label": "只留下一次的画像",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-b",
+                "alt": "只留下一次的画像"
+              }
+            },
+            "C": {
+              "label": "两次各留一张画像",
+              "visual": {
+                "kind": "asset",
+                "image": "q6-c",
+                "alt": "两次各留一张画像"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-journal",
+            "alt": "同一星纹方盆的小藤，分成两个观察时间"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "把今天的像留下",
+      "template": "picture-points",
+      "data": {
+        "title": "把今天的像留下",
+        "picture": "observation-journal-plant",
+        "points": [
+          "先看，再照样画",
+          "对照修改，讲给别人",
+          "同一株，下次再记录"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "小画室快关门了，我们把今天的画留好。"
+        },
+        {
+          "say": "还记得画植物像的办法吗？"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先观察形状、颜色，还要看看长在哪。"
+        },
+        {
+          "say": "照着眼前看得见的样子画，不添没见的。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "画完再和实物对一对，不像的就改。"
+        },
+        {
+          "say": "说说名字、特点和位置，听一听伙伴。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "选一株身边的植物，先画今天的样子。"
+        },
+        {
+          "say": "下一次再看同一株，把新的样子画下来。"
+        },
+        {
+          "say": "两次分开放好，讲给家里的大人听。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,689 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "我爱我们的祖国",
+  "description": "五四学制一年级上册，借原创照片展认识国旗、天安门、长江和黄河，听读表达喜爱；朗读和姿态待家长观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "温柔亲切的女老师，说话清楚有节奏，喜欢用图画和儿歌带孩子认字读诗；孩子答错时先让孩子再听一遍、再看一眼。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "flag-school": {
+      "file": "assets/flag-school.png"
+    },
+    "gate-front": {
+      "file": "assets/gate-front.png"
+    },
+    "yangtze-gorge": {
+      "file": "assets/yangtze-gorge.png"
+    },
+    "yellow-falls": {
+      "file": "assets/yellow-falls.png"
+    },
+    "flag-stadium": {
+      "file": "assets/flag-stadium.png"
+    },
+    "gate-sunset": {
+      "file": "assets/gate-sunset.png"
+    },
+    "q-flag": {
+      "file": "assets/q-flag.png"
+    },
+    "q-gate": {
+      "file": "assets/q-gate.png"
+    },
+    "q-river": {
+      "file": "assets/q-river.png"
+    },
+    "q-stand": {
+      "file": "assets/q-stand.png"
+    },
+    "q-play": {
+      "file": "assets/q-play.png"
+    },
+    "q-back": {
+      "file": "assets/q-back.png"
+    },
+    "kite": {
+      "file": "assets/kite.png"
+    },
+    "castle": {
+      "file": "assets/castle.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "一起看祖国照片展",
+      "template": "title-picture",
+      "data": {
+        "title": "我爱我们的祖国",
+        "picture": "cover",
+        "caption": "看图画，听名称，说喜爱"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，小语老师陪你看一场照片展。"
+        },
+        {
+          "say": "展墙上有国旗，也有城楼和河流。"
+        },
+        {
+          "say": "祖国，就是我们共同生活的国家。"
+        },
+        {
+          "say": "我们可以从这些图画想到祖国。"
+        },
+        {
+          "say": "这就叫祖国的象征，像一张张名片。"
+        },
+        {
+          "say": "先用眼睛观察，再听老师读名称。"
+        },
+        {
+          "say": "不用急着认识每个字，先看懂图画。"
+        },
+        {
+          "say": "等会儿换一张照片，你也来找一找。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "五星红旗",
+      "template": "picture-points",
+      "data": {
+        "title": "五星红旗",
+        "picture": "flag-school",
+        "points": [
+          "红色的旗面",
+          "黄色的五角星",
+          "我爱五星红旗。"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "校园的旗杆上，飘着五星红旗。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先看旗面，它是鲜艳的红色。"
+        },
+        {
+          "say": "风吹过，旗面会轻轻展开。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再看旗面上的黄色五角星。"
+        },
+        {
+          "say": "这一大四小的星星很醒目。"
+        },
+        {
+          "say": "红旗面和黄色星星，帮我们认出它。"
+        },
+        {
+          "say": "五星红旗是我们国家的国旗。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我爱五星红旗。"
+        },
+        {
+          "say": "说这句话时，可以看看图上的国旗。"
+        },
+        {
+          "say": "让声音清楚，把喜爱表达出来。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "北京天安门",
+      "template": "picture-points",
+      "data": {
+        "title": "北京天安门",
+        "picture": "gate-front",
+        "points": [
+          "北京天安门",
+          "看城楼，听名称",
+          "我爱北京天安门。"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "照片里这座城楼，是北京天安门。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "北京天安门，名称要连起来听。"
+        },
+        {
+          "say": "先看上面的屋顶，再看下面的城墙。"
+        },
+        {
+          "say": "换一个角度拍照，还是同一座城楼。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "观察完整样子，别只认一种颜色。"
+        },
+        {
+          "say": "它也是让我们想到祖国的象征。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "我爱北京天安门。"
+        },
+        {
+          "say": "我爱，说出了我们心里的喜爱。"
+        },
+        {
+          "say": "请你看着图，轻轻跟老师说一次。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把照片送进展框",
+      "page": "gallery",
+      "widgetType": "picture-gallery",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo"
+          }
+        },
+        {
+          "highlight": "#gallery-example"
+        },
+        {
+          "say": "先看这张示范照片，红旗面很醒目。"
+        },
+        {
+          "say": "我把它和另一张照片比较。"
+        },
+        {
+          "highlight": "#gallery-model"
+        },
+        {
+          "say": "看见黄色星星，就能联系五星红旗。"
+        },
+        {
+          "say": "判断同一种东西，不能只看背景。"
+        },
+        {
+          "annotate": "#gallery-target",
+          "content": "先比较，再移动"
+        },
+        {
+          "say": "轮到你时，照片换了新的场景。"
+        },
+        {
+          "say": "看中哪张，可以拖进中间的展框。"
+        },
+        {
+          "say": "也可以点照片，它会自己走进展框。"
+        },
+        {
+          "say": "选错不用担心，照片会回来等你。"
+        },
+        {
+          "say": "先看画面里的主体，再重新比较。"
+        },
+        {
+          "say": "这一关，请把五星红旗送到展框。"
+        },
+        {
+          "say": "下一关，请把北京天安门送到展框。"
+        },
+        {
+          "say": "按三角按钮，可以再听这一关的要求。"
+        },
+        {
+          "setState": {
+            "mode": "play"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "升旗时认真看",
+      "template": "picture-points",
+      "data": {
+        "title": "看升旗要怎样做",
+        "picture": "flag-school",
+        "points": [
+          "立正",
+          "脱帽",
+          "面向国旗",
+          "行注目礼"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看到国旗升起，我们要认真对待。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先立正，把身体站端正。"
+        },
+        {
+          "say": "身体不来回晃，也不追着玩具跑。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "如果戴着帽子，要把帽子脱下来。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再面向国旗，把身体朝向国旗。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "行注目礼，就是目光认真看着国旗。"
+        },
+        {
+          "say": "这些做法，表达我们对国旗的尊重。"
+        },
+        {
+          "say": "现在请你试一试，让大人看一看。"
+        },
+        {
+          "say": "屏幕只带你了解，站得怎样要请大人观察。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "长江和黄河",
+      "template": "two-columns",
+      "data": {
+        "title": "祖国的山河",
+        "left": {
+          "heading": "长江",
+          "body": "我爱长江。"
+        },
+        "right": {
+          "heading": "黄河",
+          "body": "我爱黄河。"
+        },
+        "left_picture": "yangtze-gorge",
+        "right_picture": "yellow-falls"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一边，画的是长江的峡谷景色。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "长江，是一条河流的名字。"
+        },
+        {
+          "say": "看看江水，两边还有高高的山。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这一边，画的是黄河的瀑布景色。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "黄河，也是我们祖国的河流。"
+        },
+        {
+          "say": "画里河水奔涌，能看到飞起的水雾。"
+        },
+        {
+          "say": "这是两幅景色，不是河流全部的样子。"
+        },
+        {
+          "say": "我们不能只凭水的颜色给河流取名字。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "我爱长江。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "我爱黄河。"
+        },
+        {
+          "say": "把两句连起来，表达对祖国山河的喜爱。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "揭开山河画面",
+      "page": "rivers",
+      "widgetType": "picture-observation",
+      "startImage": "yangtze-gorge",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#river-frame"
+        },
+        {
+          "say": "观察大河，可以一块一块仔细看。"
+        },
+        {
+          "say": "先找水面，再看看两边的山和岩石。"
+        },
+        {
+          "highlight": "#river-window-2"
+        },
+        {
+          "say": "我先打开一块观察窗，画面更清楚了。"
+        },
+        {
+          "say": "这些窗连起来，是一幅完整的河流图。"
+        },
+        {
+          "annotate": "#river-frame",
+          "content": "把图画看完整"
+        },
+        {
+          "say": "你来把每一块观察窗都打开。"
+        },
+        {
+          "say": "第一幅，是长江的峡谷景色。"
+        },
+        {
+          "say": "第二幅，是黄河的瀑布景色。"
+        },
+        {
+          "say": "看完图，可以把河流的名字说给大人听。"
+        },
+        {
+          "say": "这里记录看图完成，不判断你读得怎样。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "换个情境选图片",
+      "intro": [
+        "接下来是四道图片小检查，老师会把要求读给你听。",
+        "听完老师的要求，再选一张图片。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "朵朵在旅行船边看见一面国旗。请找出五星红旗。",
+          "skill": "五星红旗图词联系",
+          "answer": [
+            "A"
+          ],
+          "analysis": "红色旗面和黄色五角星，帮助我们认出五星红旗。",
+          "options": {
+            "A": {
+              "label": "五星红旗",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flag",
+                "alt": "五星红旗"
+              }
+            },
+            "B": {
+              "label": "风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "kite",
+                "alt": "风筝"
+              }
+            },
+            "C": {
+              "label": "城堡",
+              "visual": {
+                "kind": "asset",
+                "image": "castle",
+                "alt": "城堡"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "小满想把北京天安门的照片放进旅行本。应该放哪一张？",
+          "skill": "北京天安门图词联系",
+          "answer": [
+            "B"
+          ],
+          "analysis": "北京天安门有这座熟悉的金色屋顶城楼和红色城墙，换季节仍能认出来。",
+          "options": {
+            "A": {
+              "label": "石头城堡",
+              "visual": {
+                "kind": "asset",
+                "image": "castle",
+                "alt": "石头城堡"
+              }
+            },
+            "B": {
+              "label": "北京天安门",
+              "visual": {
+                "kind": "asset",
+                "image": "q-gate",
+                "alt": "北京天安门"
+              }
+            },
+            "C": {
+              "label": "风筝",
+              "visual": {
+                "kind": "asset",
+                "image": "kite",
+                "alt": "风筝"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "长江和黄河都是祖国的河流。哪张图画能放在河流这一页？",
+          "skill": "长江黄河是祖国河流",
+          "answer": [
+            "C"
+          ],
+          "analysis": "河流画面有沿着河岸流动的水；城楼和国旗不是河流。",
+          "options": {
+            "A": {
+              "label": "城楼",
+              "visual": {
+                "kind": "asset",
+                "image": "q-gate",
+                "alt": "城楼"
+              }
+            },
+            "B": {
+              "label": "国旗",
+              "visual": {
+                "kind": "asset",
+                "image": "q-flag",
+                "alt": "国旗"
+              }
+            },
+            "C": {
+              "label": "山间河流",
+              "visual": {
+                "kind": "asset",
+                "image": "q-river",
+                "alt": "山间河流"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "运动会要升国旗了。哪位小朋友站端正，准备认真看国旗？",
+          "skill": "升旗礼仪",
+          "answer": [
+            "A"
+          ],
+          "analysis": "升旗时要立正、脱帽、面向国旗行注目礼，不能跑着玩或低头玩玩具。",
+          "options": {
+            "A": {
+              "label": "站端正认真看",
+              "visual": {
+                "kind": "asset",
+                "image": "q-stand",
+                "alt": "站端正认真看"
+              }
+            },
+            "B": {
+              "label": "跑着玩球",
+              "visual": {
+                "kind": "asset",
+                "image": "q-play",
+                "alt": "跑着玩球"
+              }
+            },
+            "C": {
+              "label": "低头玩玩具",
+              "visual": {
+                "kind": "asset",
+                "image": "q-back",
+                "alt": "低头玩玩具"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "把喜爱说出来",
+      "template": "summary",
+      "data": {
+        "title": "我爱我们的祖国",
+        "items": [
+          "我爱五星红旗。",
+          "我爱北京天安门。",
+          "我爱长江，我爱黄河。",
+          "我爱中华人民共和国。"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "我爱五星红旗。"
+        },
+        {
+          "say": "想到红旗面和黄色星星，把名称说清楚。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "我爱北京天安门。"
+        },
+        {
+          "say": "想到熟悉的城楼，把喜爱放进声音里。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "我爱长江，我爱黄河。"
+        },
+        {
+          "say": "中间稍停一下，两条河的名字都说完整。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "我爱中华人民共和国。"
+        },
+        {
+          "say": "中华人民共和国，是我们祖国的名字。"
+        },
+        {
+          "say": "四句话，连着四幅让我们想到祖国的图画。"
+        },
+        {
+          "say": "课后，把这四句话说给家人听听。"
+        },
+        {
+          "say": "今天选对了图片，朗读的表现还要请大人观察。"
+        }
+      ]
+    }
+  ]
+}

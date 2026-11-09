@@ -1,0 +1,674 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "改进我的纸蜻蜓",
+  "description": "同样的纸条，试着折出更结实的纸蜻蜓，再把结实和飞行分开比较。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/ke-science-v1.png",
+      "color": "#439B87",
+      "persona": "用实物图、短句和试飞证据引导一年级孩子设计、剪折、观察和比较。"
+    }
+  },
+  "images": {
+    "versions": {
+      "file": "assets/versions.png"
+    },
+    "plan-same": {
+      "file": "assets/plan-same.png"
+    },
+    "plan-changed": {
+      "file": "assets/plan-changed.png"
+    },
+    "plan-double": {
+      "file": "assets/plan-double.png"
+    },
+    "blueprint": {
+      "file": "assets/blueprint.png"
+    },
+    "paper-0": {
+      "file": "assets/paper-0.png"
+    },
+    "paper-1": {
+      "file": "assets/paper-1.png"
+    },
+    "paper-2": {
+      "file": "assets/paper-2.png"
+    },
+    "paper-3": {
+      "file": "assets/paper-3.png"
+    },
+    "paper-4": {
+      "file": "assets/paper-4.png"
+    },
+    "cut-short": {
+      "file": "assets/cut-short.png"
+    },
+    "cut-across": {
+      "file": "assets/cut-across.png"
+    },
+    "cut-fold": {
+      "file": "assets/cut-fold.png"
+    },
+    "motion-upright": {
+      "file": "assets/motion-upright.png"
+    },
+    "motion-flip": {
+      "file": "assets/motion-flip.png"
+    },
+    "motion-steady": {
+      "file": "assets/motion-steady.png"
+    },
+    "motion-sway": {
+      "file": "assets/motion-sway.png"
+    },
+    "motion-spin": {
+      "file": "assets/motion-spin.png"
+    },
+    "motion-still": {
+      "file": "assets/motion-still.png"
+    },
+    "release-same": {
+      "file": "assets/release-same.png"
+    },
+    "release-high": {
+      "file": "assets/release-high.png"
+    },
+    "release-time": {
+      "file": "assets/release-time.png"
+    },
+    "setup-same": {
+      "file": "assets/setup-same.png"
+    },
+    "setup-high": {
+      "file": "assets/setup-high.png"
+    },
+    "rotor-old": {
+      "file": "assets/rotor-old.png"
+    },
+    "rotor-new": {
+      "file": "assets/rotor-new.png"
+    },
+    "proof-body": {
+      "file": "assets/proof-body.png"
+    },
+    "proof-route": {
+      "file": "assets/proof-route.png"
+    },
+    "proof-time": {
+      "file": "assets/proof-time.png"
+    },
+    "trial-records": {
+      "file": "assets/trial-records.png"
+    },
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "tools": {
+      "file": "assets/tools.png"
+    },
+    "body-compared": {
+      "file": "assets/body-compared.png"
+    },
+    "steps-recap": {
+      "file": "assets/steps-recap.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "让纸蜻蜓更结实",
+      "template": "picture-points",
+      "data": {
+        "title": "让纸蜻蜓更结实",
+        "picture": "versions",
+        "points": [
+          "同样的一张纸条",
+          "比较飞翼和躯干",
+          "先想哪儿要改"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "左边的飞翼长长的，纸身比较薄。"
+        },
+        {
+          "say": "右边的飞翼短些，纸身折得更厚实。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "两版各用一张同样大小、同样的纸。"
+        },
+        {
+          "say": "纸一样，就能比一比做法有什么不同。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "今天想让纸身用起来更结实。"
+        },
+        {
+          "say": "比如放过几次，折起的身体还不松。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先想一想，画线的位置要挪吗？"
+        },
+        {
+          "say": "剪口和折痕的位置也可以重新想。"
+        },
+        {
+          "say": "告诉大人，你想改哪儿，为什么。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "看准再剪折",
+      "template": "two-columns",
+      "data": {
+        "title": "看准再剪折",
+        "left": {
+          "heading": "安全准备",
+          "body": "坐稳，刀尖离手"
+        },
+        "right": {
+          "heading": "标记看清",
+          "body": "短实线剪，虚线折"
+        },
+        "left_picture": "tools",
+        "right_picture": "blueprint"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "用一张纸条，配一把圆头剪刀。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "第二，剪刀上桌，旁边要有大人陪着。"
+        },
+        {
+          "say": "坐稳再剪，刀尖要离开手和别人。"
+        },
+        {
+          "say": "坐稳，拿稳剪刀，别对着人挥动。"
+        },
+        {
+          "say": "不用时合上，放回原来的地方。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "纸上横着的虚线，是对折的位置。"
+        },
+        {
+          "say": "先沿它折，一张纸就叠成了两层。"
+        },
+        {
+          "say": "两边各有一小段连着的实线。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "剪刀从边上走到短线尽头就停。"
+        },
+        {
+          "say": "这样中间还连着，两片翼不会掉。"
+        },
+        {
+          "say": "长虚线给纸身折用，沿线往里折。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "title": "在纸上做四步",
+      "page": "p03",
+      "widgetType": "science-improve-paper-build",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "paperDemo": 0
+          }
+        },
+        {
+          "say": "先沿横虚线对折，纸就叠成两层。"
+        },
+        {
+          "say": "这时上面两片纸还贴在一起。"
+        },
+        {
+          "setState": {
+            "paperDemo": 1
+          }
+        },
+        {
+          "say": "沿两侧短实线剪，各剪一个短口。"
+        },
+        {
+          "say": "中间留着，纸的上下两段还能相连。"
+        },
+        {
+          "setState": {
+            "paperDemo": 2
+          }
+        },
+        {
+          "say": "沿两条长虚线，把纸身两侧往里折。"
+        },
+        {
+          "say": "下面变窄了，重叠的纸也折得更实。"
+        },
+        {
+          "setState": {
+            "paperDemo": 3
+          }
+        },
+        {
+          "say": "最后把上端叠着的两片飞翼打开。"
+        },
+        {
+          "say": "剪口让飞翼能打开，下面还是一个身体。"
+        },
+        {
+          "setState": {
+            "paperDemo": 4
+          }
+        },
+        {
+          "say": "飞翼在上，折紧的身体在下面。"
+        },
+        {
+          "setState": {
+            "paperDemo": false
+          }
+        },
+        {
+          "say": "现在轮到你，选一幅图，让纸变一次。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "同高松手，记录三件事",
+      "page": "p04",
+      "widgetType": "science-improve-paper-trial",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "flightDemo": "align"
+          }
+        },
+        {
+          "say": "两版各用同样的纸做，从同样高开始。"
+        },
+        {
+          "say": "一个高一个低，就不好比下落。"
+        },
+        {
+          "highlight": "#test-level"
+        },
+        {
+          "say": "沿这条线对齐，两只手一起松开。"
+        },
+        {
+          "setState": {
+            "flightDemo": "drop"
+          }
+        },
+        {
+          "say": "看右边这件，飞翼一直在上吗？"
+        },
+        {
+          "say": "看它有没有一会儿向左，一会儿向右。"
+        },
+        {
+          "setState": {
+            "flightDemo": "record"
+          }
+        },
+        {
+          "say": "这一次，纸身左右飘，路线不太稳。"
+        },
+        {
+          "say": "飞翼却一直在上，还绕着身子转。"
+        },
+        {
+          "highlight": "#test-record"
+        },
+        {
+          "say": "我们分三项记，看见什么就记什么。"
+        },
+        {
+          "say": "再试一次时，也别照抄刚才的结果。"
+        },
+        {
+          "setState": {
+            "flightDemo": false
+          }
+        },
+        {
+          "say": "现在请你摆到一样高，再放落并记图。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "飞行和结实分开比",
+      "template": "two-columns",
+      "data": {
+        "title": "飞行和结实分开比",
+        "left": {
+          "heading": "三轮试飞",
+          "body": "同样高，同时放，记下每一轮"
+        },
+        "right": {
+          "heading": "两版结构",
+          "body": "观察纸身会不会松弯"
+        },
+        "left_picture": "trial-records",
+        "right_picture": "body-compared"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一组从同样高度同时放，一共试三回。"
+        },
+        {
+          "say": "三回里，两版都转着落下，路线也接近。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "所以这一组的飞行表现基本相同。"
+        },
+        {
+          "say": "如果下一组不一样，就照看到的记。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看纸身。改进版的纸叠起来再折紧。"
+        },
+        {
+          "say": "这两件同样用过几回，前版的身子弯了。"
+        },
+        {
+          "say": "改进版的身子还合得很紧。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "纸身的折法变了，这件就更耐用。"
+        },
+        {
+          "say": "它更结实，刚才却没有飞得更好。"
+        },
+        {
+          "say": "说飞行看试飞，说结实就看纸身。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "quiz",
+      "title": "小检查 · 设计和制作",
+      "intro": [
+        "老师会读出题目，听完再点图。",
+        "选好以后，可以听听为什么。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "纸条要和原来一样。哪张图只换了折痕的位置？",
+          "skill": "设计改进方案",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一幅图还是一张同样大小、同种的纸条，只把折痕挪了。换纸或添纸都改变了材料。",
+          "options": {
+            "A": {
+              "label": "同一种单张纸改折痕",
+              "visual": {
+                "kind": "asset",
+                "image": "plan-same",
+                "alt": "同一种单张纸改折痕"
+              }
+            },
+            "B": {
+              "label": "换一种更宽的纸",
+              "visual": {
+                "kind": "asset",
+                "image": "plan-changed",
+                "alt": "换一种更宽的纸"
+              }
+            },
+            "C": {
+              "label": "改用两张纸条",
+              "visual": {
+                "kind": "asset",
+                "image": "plan-double",
+                "alt": "改用两张纸条"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "横放的纸上，红线表示要剪。哪幅图能剪两个短口又留下中间？",
+          "skill": "安全剪折纸样",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二幅图两段红线从纸边各剪到止点，中间没有剪断。横切整条或剪长折线都错。",
+          "options": {
+            "A": {
+              "label": "从一边一直剪到另一边",
+              "visual": {
+                "kind": "asset",
+                "image": "cut-across",
+                "alt": "从一边一直剪到另一边"
+              }
+            },
+            "B": {
+              "label": "两边各剪一个短口，中间相连",
+              "visual": {
+                "kind": "asset",
+                "image": "cut-short",
+                "alt": "两边各剪一个短口，中间相连"
+              }
+            },
+            "C": {
+              "label": "沿纸身的一条长折线剪",
+              "visual": {
+                "kind": "asset",
+                "image": "cut-fold",
+                "alt": "沿纸身的一条长折线剪"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "quiz",
+      "title": "小检查 · 试飞和证据",
+      "intro": [
+        "老师会读出题目，听完再点图。",
+        "选好以后，可以听听为什么。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "两件纸蜻蜓的纸一样。哪幅图是同样高又同时松手？",
+          "skill": "同条件试飞",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三幅两只手在同一条高度线上同时放开。另两图一个放得低，或还有一只手握着。",
+          "options": {
+            "A": {
+              "label": "一只手已放，另一只手还握着",
+              "visual": {
+                "kind": "asset",
+                "image": "release-time",
+                "alt": "一只手已放，另一只手还握着"
+              }
+            },
+            "B": {
+              "label": "两个放手点一个高一个低",
+              "visual": {
+                "kind": "asset",
+                "image": "release-high",
+                "alt": "两个放手点一个高一个低"
+              }
+            },
+            "C": {
+              "label": "两只手在同一高度线上一起松开",
+              "visual": {
+                "kind": "asset",
+                "image": "release-same",
+                "alt": "两只手在同一高度线上一起松开"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "两件纸蜻蜓用了几回。哪幅记录能直接看出哪件的纸身更结实？",
+          "skill": "用证据评价改进",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一幅直接给出纸身的情况。一件折层松开，另一件仍贴紧。路线和飞行时间只说飞行。",
+          "options": {
+            "A": {
+              "label": "前一件纸身折层松开，另一件仍贴紧",
+              "visual": {
+                "kind": "asset",
+                "image": "proof-body",
+                "alt": "前一件纸身折层松开，另一件仍贴紧"
+              }
+            },
+            "B": {
+              "label": "记录两件不同的飞行路线",
+              "visual": {
+                "kind": "asset",
+                "image": "proof-route",
+                "alt": "记录两件不同的飞行路线"
+              }
+            },
+            "C": {
+              "label": "记录两件飞行时间不同",
+              "visual": {
+                "kind": "asset",
+                "image": "proof-time",
+                "alt": "记录两件飞行时间不同"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "下一次还想改哪里",
+      "template": "picture-points",
+      "data": {
+        "title": "下一次还想改哪里",
+        "picture": "steps-recap",
+        "points": [
+          "定好要改哪里",
+          "做完试飞再评价",
+          "再试一种新办法"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天用同样的纸条，让纸身变结实。"
+        },
+        {
+          "say": "我们先猜哪里该改，再照着纸样做。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "横虚线先折，两侧短实线再剪。"
+        },
+        {
+          "say": "纸身向里折紧，打开上面两片翼。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "同高同时松手，试三回，把看到的记下。"
+        },
+        {
+          "say": "飞翼、路线、旋转，三个现象分开记。"
+        },
+        {
+          "say": "纸身结实不结实，要另看它松不松。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "下次和大人用同样的纸，再做两版。"
+        },
+        {
+          "say": "可以只改翼长，或者只改翼的角度。"
+        },
+        {
+          "say": "在一样高的地方一起松手试试。"
+        },
+        {
+          "say": "看谁转得稳，还落得慢，在空中留得久。"
+        },
+        {
+          "say": "把改了哪里、看见什么，说给大人听。"
+        }
+      ]
+    }
+  ]
+}

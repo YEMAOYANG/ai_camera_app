@@ -1,0 +1,575 @@
+{
+  "schemaVersion": "mira.courseware.illustration-provenance.v1",
+  "lessonSlug": "qingdao-54-math-g1-upper-ordinal-within5",
+  "illustrationPlanSha256": "2825bbefd5f8ea495aabb903fd73d4d2bb59093f115fc1f42f9d429c69732886",
+  "reviewedAt": "2026-11-06T18:03:18.439523+00:00",
+  "assets": [
+    {
+      "assetId": "sound-museum-cover",
+      "tool": "Codex built-in image_gen",
+      "prompt": "Create a wide 16:9 original picture-book illustration for a grade-one interactive mathematics lesson, the entrance lobby of a small children’s sound museum. Hand-painted gouache, light warm ivory and pale honey wood, muted teal accents, soft indirect daylight, warm and calm. Front-facing view. The left quarter contains a clear teal arched doorway and the right quarter a plain warm wall. Keep the central 70 percent and lower half mostly clear in a single pale tone for separately rendered interactive objects and labels. Gentle paper grain only at the edges, accurate perspective, and crisp uncluttered silhouette. The doorway itself should read immediately as the entrance. No people, instruments, display objects, dots, numbers, letters, signs, directional arrows, logos, floating music symbols, rows of repeated objects or frames. No borders, white margins or typography. Output the wide illustration filling the canvas.",
+      "sourceArtifactName": "exec-1a59d0ab-6a5e-4a66-a940-8d3fca09690b.png",
+      "sourceReceipt": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/codex-imagegen-v1/sound-museum-cover.json",
+      "sourceReceiptSha256": "8d8165ccdfab8309b9c07234a5dab049061dd9105144f30330eac433ea273804",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/sound-museum-cover.png",
+      "sha256": "9299bc63a9ff0d6d1374d614680a60c9f71eb1d8651ff8b493b17cbf5149fd07",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "usedIn": [
+        "p02",
+        "p04",
+        "p05"
+      ],
+      "placement": "公共开始页插图",
+      "visualObservation": "左侧青色拱门清楚，暖木门厅画面无教学数量或文字。"
+    },
+    {
+      "assetId": "sound-gallery-room",
+      "tool": "Codex built-in image_gen",
+      "prompt": "Create a wide 16:9 original illustration of the inside of a children’s sound museum, visually paired with a hand-painted gouache entrance image. Straight-on quiet display room, light warm ivory and pale honey wood, subtle teal at the far edges only, bright diffuse daylight, softly painted wall and low clear work surface. Keep the entire central 80 percent essentially blank, bright and quiet so that foreground assets remain extremely legible. This is an empty setting for composited rows and shelves; do not paint any shelves, cabinets, plinths, boxes, vertical grid, objects, furniture in the center, people, musical instruments, music notes, letters, digits, arrows, labels, logos, repeated visible marks or border. Paint low-contrast edge details only and fill the full wide canvas. Grade-one picture-book art, generous negative space, no embedded text.",
+      "sourceArtifactName": "exec-aac980c5-d308-4524-8134-59325f32548d.png",
+      "sourceReceipt": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/codex-imagegen-v1/sound-gallery-room.json",
+      "sourceReceiptSha256": "f7727ce8a00f13223f0cee6c4be0b36e4762d82028cae1e6244b270b87bea4ab",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/sound-gallery-room.png",
+      "sha256": "c0df11a3ecb41a8f1e1db505d9239f4d6c1844de6636ab969848b3f07b2f9635",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "usedIn": [
+        "p02",
+        "p04",
+        "p05"
+      ],
+      "placement": "互动场景底图",
+      "visualObservation": "中部留白，左右建筑元素压低对比，画面没有乐器、数字、文字、方向标。"
+    },
+    {
+      "assetId": "instrument-drum",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/instrument-drum.png",
+      "sha256": "6161680b906b77d77c4177aaf2bb039823518f131033942fbf288f49c8f8e216",
+      "dimensions": [
+        120,
+        120
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p02",
+        "p04",
+        "p05"
+      ]
+    },
+    {
+      "assetId": "instrument-harp",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/instrument-harp.png",
+      "sha256": "d4006c85abd2f189d16e8b8f291b3fd7d416d7cfc1cb6aed23042ac7d2ad5bee",
+      "dimensions": [
+        120,
+        120
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p02",
+        "p04",
+        "p05"
+      ]
+    },
+    {
+      "assetId": "instrument-piano",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/instrument-piano.png",
+      "sha256": "c54f9169887f67202570d88c35befc430c3ed726ec8ef52188d40c2b64db28e5",
+      "dimensions": [
+        120,
+        120
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p02",
+        "p04",
+        "p05"
+      ]
+    },
+    {
+      "assetId": "instrument-tambourine",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/instrument-tambourine.png",
+      "sha256": "2b4080fd57a718c246ce677671ab0eba6d6e038d813c1f9e92039f9712fd5f88",
+      "dimensions": [
+        120,
+        120
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p02",
+        "p04",
+        "p05"
+      ]
+    },
+    {
+      "assetId": "instrument-trumpet",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/instrument-trumpet.png",
+      "sha256": "c7cc9d6cd22c1357c12aea0fbeaba7e7127e4d26bc13654970e97df23a7e953b",
+      "dimensions": [
+        120,
+        120
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p02",
+        "p04",
+        "p05"
+      ]
+    },
+    {
+      "assetId": "quiz-1-a",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-1-a.png",
+      "sha256": "b101a1e9265a83b6d7c2e51ffbb7290537641902cf2d7c2edcecdc0d289a2326",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q1"
+      ]
+    },
+    {
+      "assetId": "quiz-1-b",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-1-b.png",
+      "sha256": "fe86ef54b4ff52557dd20b7e3e25ec6fe41b683e357371d173096253920f77d5",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q1"
+      ]
+    },
+    {
+      "assetId": "quiz-1-c",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-1-c.png",
+      "sha256": "5bbf5b4180c16367dbf61019952a17ed7d01170face9f695b17a4cf3c4e948d1",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q1"
+      ]
+    },
+    {
+      "assetId": "quiz-1-prompt",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-1-prompt.png",
+      "sha256": "2354f1243564a95d5cce851e54181df7b2adc022a16ab8abc2dae21a900e6660",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q1"
+      ]
+    },
+    {
+      "assetId": "quiz-2-a",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-2-a.png",
+      "sha256": "80ea9e5b3089464787047db632263483758c9339023a96526fdb3aaa0835a5a0",
+      "dimensions": [
+        240,
+        186
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q2"
+      ]
+    },
+    {
+      "assetId": "quiz-2-b",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-2-b.png",
+      "sha256": "c03964f2d8cb13efd5c3a24c4f1da706aa942e430d4b51f07cdf2f1b27a20338",
+      "dimensions": [
+        240,
+        186
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q2"
+      ]
+    },
+    {
+      "assetId": "quiz-2-c",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-2-c.png",
+      "sha256": "7515f8b7b89dc983d4a209d7c6fb149c84e2ab796f7ed09931bb67dd17410f2a",
+      "dimensions": [
+        240,
+        186
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q2"
+      ]
+    },
+    {
+      "assetId": "quiz-2-prompt",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-2-prompt.png",
+      "sha256": "8522c066e59a9fd87b85ccabd497a15d1ca7e9a9d98023926ff5bcfb493339bf",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q2"
+      ]
+    },
+    {
+      "assetId": "quiz-3-a",
+      "tool": "deterministic Pillow diagrams",
+      "path": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/revision-q3-v2/source/assets/quiz-3-a.png",
+      "sha256": "cf0f17d31c60c0d9711e6373e445f28c5677d5826e8f5409e54ce2058019df0e",
+      "dimensions": [
+        360,
+        220
+      ],
+      "drawingSource": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/revision-q3-v2/source/diagrams.py",
+      "drawingSourceSha256": "314d674e9671cfe6e5f8088ab39e5ed6568fd333429c79860829b19d8fd9ec07",
+      "usedIn": [
+        "p06-q3"
+      ],
+      "previousSha256": "832ed0b1828d73c2a85dc01d137ae0e34e136d85695d51a5798f0086bb10e420"
+    },
+    {
+      "assetId": "quiz-3-b",
+      "tool": "deterministic Pillow diagrams",
+      "path": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/revision-q3-v2/source/assets/quiz-3-b.png",
+      "sha256": "4aaf566537145ccfa9bd3ee8b2b8a42b40f610fefd6ced5be19155302efad4a1",
+      "dimensions": [
+        360,
+        220
+      ],
+      "drawingSource": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/revision-q3-v2/source/diagrams.py",
+      "drawingSourceSha256": "314d674e9671cfe6e5f8088ab39e5ed6568fd333429c79860829b19d8fd9ec07",
+      "usedIn": [
+        "p06-q3"
+      ],
+      "previousSha256": "6ab7cf91ed9038ec2bdad44d006432e74113dda7222761a32e129d4a82a414bc"
+    },
+    {
+      "assetId": "quiz-3-c",
+      "tool": "deterministic Pillow diagrams",
+      "path": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/revision-q3-v2/source/assets/quiz-3-c.png",
+      "sha256": "60d32520f06cdb57088d5cb988e436cd8f3fc8ea08a4723894e32fcaa785100c",
+      "dimensions": [
+        360,
+        220
+      ],
+      "drawingSource": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/revision-q3-v2/source/diagrams.py",
+      "drawingSourceSha256": "314d674e9671cfe6e5f8088ab39e5ed6568fd333429c79860829b19d8fd9ec07",
+      "usedIn": [
+        "p06-q3"
+      ],
+      "previousSha256": "a285590c163da71ef3f717588c9c50350002f94078f257a95fa6bcd4224f9bb6"
+    },
+    {
+      "assetId": "quiz-3-prompt",
+      "tool": "deterministic Pillow diagrams",
+      "path": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/revision-q3-v2/source/assets/quiz-3-prompt.png",
+      "sha256": "14bfba2a0c2239a24bbc92f4e1f0470efdcaa20a0825dd330c67f72ef867614a",
+      "dimensions": [
+        760,
+        278
+      ],
+      "drawingSource": "output/courseware-lessons/qingdao-54-math-g1-upper-ordinal-within5/revision-q3-v2/source/diagrams.py",
+      "drawingSourceSha256": "314d674e9671cfe6e5f8088ab39e5ed6568fd333429c79860829b19d8fd9ec07",
+      "usedIn": [
+        "p06-q3"
+      ],
+      "previousSha256": "b7a7ef5ddc4913ebcff766764330b10b4ccfce14a0dd8e516ee4cd371d9a3fe0"
+    },
+    {
+      "assetId": "quiz-4-a",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-4-a.png",
+      "sha256": "e8083d28cb4acd6e432e939df8006b06bea580a399f7e02d43013e7dc8e453c3",
+      "dimensions": [
+        240,
+        186
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q4"
+      ]
+    },
+    {
+      "assetId": "quiz-4-b",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-4-b.png",
+      "sha256": "057c7fdfa0b4f01aa0b37806083eb90f32398b0671f5273f491c8cf23bbf711e",
+      "dimensions": [
+        240,
+        186
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q4"
+      ]
+    },
+    {
+      "assetId": "quiz-4-c",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-4-c.png",
+      "sha256": "ae98b186e7a8d27c4f9d43a3c439768b8906564f876054a996d46b04d5b1582f",
+      "dimensions": [
+        240,
+        186
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q4"
+      ]
+    },
+    {
+      "assetId": "quiz-4-prompt",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-4-prompt.png",
+      "sha256": "2a74ee473a32754a923e53ff6caa7b8627c253b494359a63668d2b10abb027eb",
+      "dimensions": [
+        340,
+        525
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q4"
+      ]
+    },
+    {
+      "assetId": "quiz-5-a",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-5-a.png",
+      "sha256": "26de095a3801d76502f7ed36d10957381f605c28bda8a3ed8d26426dca7baafc",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q5"
+      ]
+    },
+    {
+      "assetId": "quiz-5-b",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-5-b.png",
+      "sha256": "258af7213e258f739d3c01c20d959ec64474dd53c4f9d8ee5ac9445891d038b3",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q5"
+      ]
+    },
+    {
+      "assetId": "quiz-5-c",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-5-c.png",
+      "sha256": "ad6774d2eae284d0051b59d5b42c96b3456f75d9d26b23c6a4b79c8a406bb209",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q5"
+      ]
+    },
+    {
+      "assetId": "quiz-5-prompt",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-5-prompt.png",
+      "sha256": "659580b1ee2bc41d32982279d90ef9c65f56eecc3edebf067325b3bd7ca77736",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q5"
+      ]
+    },
+    {
+      "assetId": "quiz-6-a",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-6-a.png",
+      "sha256": "340d7717e509d5d019b1ee7cc8efcc1e70e937a28486bd36e6c744e73b9e816e",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q6"
+      ]
+    },
+    {
+      "assetId": "quiz-6-b",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-6-b.png",
+      "sha256": "0e77973c1b8f9e773888d66bd8b0f965f653fc0b4f948b369cfcf0ec0178103a",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q6"
+      ]
+    },
+    {
+      "assetId": "quiz-6-c",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-6-c.png",
+      "sha256": "667693b48092d7bca29aa36c3e5f84ff3dd770688940919a9649a46a2df9a6f4",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q6"
+      ]
+    },
+    {
+      "assetId": "quiz-6-prompt",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/quiz-6-prompt.png",
+      "sha256": "7eb1b4518b9565b971d4511267cdebb88086d4825539a1df7c04209aeb60a877",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p06-q6"
+      ]
+    },
+    {
+      "assetId": "teach-fifth-position",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/teach-fifth-position.png",
+      "sha256": "117bf8c1b0e65ce7419c367da6428e199bac2c886baae0ae773a4918640e811b",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p01"
+      ]
+    },
+    {
+      "assetId": "teach-five-quantity",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/teach-five-quantity.png",
+      "sha256": "44ec0b83810656003862aec1754fd66af75bd5c741735f91789bdf5090b3d400",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p01"
+      ]
+    },
+    {
+      "assetId": "teach-recap",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/teach-recap.png",
+      "sha256": "5447e604f83dd021f31a1563ed4f589651d8ece62306586321690ddff28cfc5d",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p07"
+      ]
+    },
+    {
+      "assetId": "teach-reverse-left",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/teach-reverse-left.png",
+      "sha256": "a2c7ca60c6855fd8720d97df4396e2c0b8f59e3f8741a512ecb17240d3b61fd1",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p03"
+      ]
+    },
+    {
+      "assetId": "teach-reverse-right",
+      "tool": "deterministic Pillow diagrams",
+      "path": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/assets/teach-reverse-right.png",
+      "sha256": "21903bc304cf11664a05c35703b447440e2007ae7d7aa691b36548b4de357320",
+      "dimensions": [
+        720,
+        300
+      ],
+      "drawingSource": "courseware/lessons/qingdao-54-math-g1-upper-ordinal-within5/diagrams.py",
+      "drawingSourceSha256": "563793aeb5f7086b98adcd74b940c4005620016eb8cb0eb018772b262af80cf4",
+      "usedIn": [
+        "p03"
+      ]
+    }
+  ],
+  "quiz3Revision": "同一题干和答案。上、下方向轨用不同颜色和菱形起点，题干保留同一排四个书袋。"
+}

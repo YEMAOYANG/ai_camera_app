@@ -1,0 +1,740 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "我和我的幼儿园",
+  "description": "把数与形的幼儿园经验带到小学：做数量图卡，给玩具找形状朋友，约好规则练习轮流，并把生活发现说给家人听。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "以准确、温和的短句讲清具体物品、数量、形状和游戏约定。只报告可观察的点击、匹配和轮次行为，不把自动得分当成会口述或会合作。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "book": {
+      "file": "assets/book.png"
+    },
+    "tree": {
+      "file": "assets/tree.png"
+    },
+    "ball": {
+      "file": "assets/ball.png"
+    },
+    "cube": {
+      "file": "assets/cube.png"
+    },
+    "orange": {
+      "file": "assets/orange.png"
+    },
+    "box": {
+      "file": "assets/box.png"
+    },
+    "melon": {
+      "file": "assets/melon.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "用数说说我",
+      "template": "picture-points",
+      "data": {
+        "title": "我和我的幼儿园",
+        "picture": "cover",
+        "points": [
+          "数一数，介绍我",
+          "先说数什么",
+          "再说有几个"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "你好，我是小数老师。"
+        },
+        {
+          "say": "今天把幼儿园的数学经验带到小学。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "可以用数，介绍自己喜欢的东西。"
+        },
+        {
+          "say": "比如，我有两本喜欢的绘本。"
+        },
+        {
+          "say": "一本、两本，每本都只数一次。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我先告诉别人，数的是绘本。"
+        },
+        {
+          "say": "只说两，别人还不知道是什么。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再说两本，别人就听懂了数量。"
+        },
+        {
+          "say": "小满问：同一个数，能说不同的东西吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "可以，两本书和两个球，说的对象不同。"
+        },
+        {
+          "say": "数字会帮我们把自己的故事说清楚。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "听一听，做张图卡",
+      "page": "p02",
+      "widgetType": "garden-number-story",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#garden-card"
+        },
+        {
+          "say": "这张图卡，要介绍喜欢的绘本。"
+        },
+        {
+          "say": "我先选书的图片，再慢慢数。"
+        },
+        {
+          "highlight": "#garden-options"
+        },
+        {
+          "say": "一本、两本，每一本只数一次。"
+        },
+        {
+          "setState": {
+            "demoPlaced": true
+          }
+        },
+        {
+          "say": "把两本书放进去，数量就看得见了。"
+        },
+        {
+          "annotate": "#garden-board",
+          "content": "先说对象，再说数量"
+        },
+        {
+          "say": "我可以说：我喜欢这两本绘本。"
+        },
+        {
+          "say": "下面有三张新图卡，请听清再选。"
+        },
+        {
+          "say": "名片图卡：请放进三本绘本。"
+        },
+        {
+          "say": "校园图卡：请放进五棵小树。"
+        },
+        {
+          "say": "玩具图卡：请放进四个小球。"
+        },
+        {
+          "say": "每张图卡都先数物品，再选整组图片。"
+        },
+        {
+          "say": "不确定时，点听题，还能再听一遍。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "校园也能用数介绍",
+      "template": "picture-points",
+      "data": {
+        "title": "给校园留一条数量记录",
+        "picture": "tree",
+        "points": [
+          "先选一类物品",
+          "一件一件数",
+          "对象和数量一起说"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "幼儿园和小学里，都藏着数字故事。"
+        },
+        {
+          "say": "楼里有物品，院里也有物品可以数。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我先选小树，只数小树这一类。"
+        },
+        {
+          "say": "书和球先不算进去，才不会混在一起。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "从一边开始，一棵一棵地指过去。"
+        },
+        {
+          "say": "已经数过的，不要再数一次。"
+        },
+        {
+          "say": "还没数到的，也不要漏掉。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "最后把数和对象，一起说给别人听。"
+        },
+        {
+          "say": "比如，院子里有五棵小树。"
+        },
+        {
+          "say": "朵朵问：两个地方怎样介绍才清楚？",
+          "by": "duoduo"
+        },
+        {
+          "say": "先分别说地点，再说数的是什么。"
+        },
+        {
+          "say": "你也可以向家人介绍自己熟悉的校园。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "quiz",
+      "title": "数字故事小检查",
+      "intro": [
+        "换成新的数量和场景，听老师说完再选图。"
+      ],
+      "questions": [
+        {
+          "id": "garden-q1",
+          "question": "安安有六本故事书。每点代表一本，选数量图。",
+          "skill": "用数量介绍自己",
+          "options": {
+            "A": {
+              "label": "六本书",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个数量点，每点表示一件物品"
+              }
+            },
+            "B": {
+              "label": "五本书",
+              "visual": {
+                "kind": "quantity",
+                "count": 5,
+                "alt": "5个数量点，每点表示一件物品"
+              }
+            },
+            "C": {
+              "label": "七本书",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个数量点，每点表示一件物品"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "一句话里数的是故事书，数量是六本。把六本书一一数清，再放进名片。"
+        },
+        {
+          "id": "garden-q2",
+          "question": "新校园有七棵树。每点代表一棵，选数量图。",
+          "skill": "用数介绍学校物品",
+          "options": {
+            "A": {
+              "label": "六棵树",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个数量点，每点表示一件物品"
+              }
+            },
+            "B": {
+              "label": "八棵树",
+              "visual": {
+                "kind": "quantity",
+                "count": 8,
+                "alt": "8个数量点，每点表示一件物品"
+              }
+            },
+            "C": {
+              "label": "七棵树",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个数量点，每点表示一件物品"
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "先确定数的是小树，再一棵一棵数到七。地点换了，仍要把对象和数量都说清。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "玩具的形状会交朋友",
+      "template": "two-columns",
+      "data": {
+        "title": "颜色不同，形状也可能相像",
+        "left": {
+          "heading": "看看小球",
+          "body": "看整个外形，像一个球。"
+        },
+        "left_picture": "ball",
+        "right": {
+          "heading": "看看木方块",
+          "body": "看整个外形，像一个方盒。"
+        },
+        "right_picture": "cube"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "玩具不只有数量，还有不同的形状。"
+        },
+        {
+          "say": "先看看小球，注意它整个的外形。"
+        },
+        {
+          "say": "别只盯着上面的颜色和花纹。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看木方块，外形和小球不一样。"
+        },
+        {
+          "say": "可以把玩具拿在手上，换个方向看。"
+        },
+        {
+          "say": "观察的是整个物品，不只是一幅图案。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "生活里，有些物品的外形像小球。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "也有些物品的外形像木方块。"
+        },
+        {
+          "say": "颜色不同，大小不同，外形仍可能相像。"
+        },
+        {
+          "say": "等会儿，给玩具找一位形状朋友。"
+        },
+        {
+          "say": "先看外形，再说你为什么这样想。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "给玩具找形状朋友",
+      "page": "p06",
+      "widgetType": "garden-shape-friends",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#garden-toy"
+        },
+        {
+          "say": "小球在这里，先看看它整个的外形。"
+        },
+        {
+          "highlight": "#garden-shape-options"
+        },
+        {
+          "say": "再看橘子和方盒，先不要只看颜色。"
+        },
+        {
+          "say": "橘子的整个外形，和小球更相像。"
+        },
+        {
+          "setState": {
+            "demoMatch": true
+          }
+        },
+        {
+          "highlight": "#garden-match"
+        },
+        {
+          "say": "我把橘子移到小球旁边，放在一起看。"
+        },
+        {
+          "say": "它们颜色不同，外形仍然可以相像。"
+        },
+        {
+          "say": "第一轮，请给小球找形状朋友。"
+        },
+        {
+          "say": "第二轮，请给木方块找形状朋友。"
+        },
+        {
+          "say": "第三轮，图片换了位置，再仔细看看。"
+        },
+        {
+          "say": "可以把图片拖过去，也可以先点图片再点空位。"
+        },
+        {
+          "say": "想再听方法，就点听题。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "先约好，再一起玩",
+      "template": "steps",
+      "data": {
+        "title": "推荐游戏，要把玩法说清楚",
+        "steps": [
+          "说名称和材料",
+          "约好每次做什么",
+          "轮流，直到结束"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "推荐数学游戏，先说它叫什么。"
+        },
+        {
+          "say": "我们的原创游戏，叫轮流装小格。"
+        },
+        {
+          "say": "材料可以选小球，也可以选木方块。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "接着约好规则，每次只放一个物品。"
+        },
+        {
+          "say": "一个空格放一个，不能挤进两个。"
+        },
+        {
+          "say": "这样大家知道，每一次该做什么。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "你放好一个，就等小满放一个。"
+        },
+        {
+          "say": "然后再轮到你，不能一直抢着放。"
+        },
+        {
+          "say": "最后一个空格放满，这一局就结束。"
+        },
+        {
+          "say": "玩完还可以说：我发现空格越来越少。"
+        },
+        {
+          "say": "还可以问：换成积木，每次也只放一个吗？"
+        },
+        {
+          "say": "我们约好的这一局，换材料也不改规则。"
+        },
+        {
+          "say": "把不清楚的地方问明白，再开始玩。"
+        },
+        {
+          "say": "你想到了什么问题，也说给家人听。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "轮流把小格装满",
+      "page": "p08",
+      "widgetType": "garden-taking-turns",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#garden-materials"
+        },
+        {
+          "say": "先从两张图片里，选这局使用的材料。"
+        },
+        {
+          "highlight": "#garden-tray"
+        },
+        {
+          "say": "这一排空格，每格只能放一个。"
+        },
+        {
+          "setState": {
+            "demoPlace": true
+          }
+        },
+        {
+          "say": "我把一个小球，放进第一个空格。"
+        },
+        {
+          "highlight": "#garden-turn"
+        },
+        {
+          "say": "放好以后，就轮到虚拟同伴小满。"
+        },
+        {
+          "say": "小满也只放一个，然后又轮到你。"
+        },
+        {
+          "annotate": "#garden-token",
+          "content": "点一下，或拖到空格"
+        },
+        {
+          "say": "轮到你时，点物品，或把它拖进空格。"
+        },
+        {
+          "say": "不是你的回合，就先等一等。"
+        },
+        {
+          "say": "空格全满，这局结束，再开始新的一局。"
+        },
+        {
+          "say": "三局的空格不同，规则都是每次放一个。"
+        },
+        {
+          "say": "游戏轮流练习开始，先选材料吧。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "形状与规则小检查",
+      "intro": [
+        "再看一种新物品，再听一个新规则。"
+      ],
+      "questions": [
+        {
+          "id": "garden-q3",
+          "question": "看看这个完整的圆西瓜，它的整个外形更像哪件玩具？",
+          "skill": "观察并匹配相像的形状",
+          "options": {
+            "A": {
+              "label": "木方块",
+              "visual": {
+                "kind": "asset",
+                "image": "cube",
+                "alt": "一块木方块"
+              }
+            },
+            "B": {
+              "label": "小球",
+              "visual": {
+                "kind": "asset",
+                "image": "ball",
+                "alt": "一个玩具小球"
+              }
+            },
+            "C": {
+              "label": "绘本",
+              "visual": {
+                "kind": "asset",
+                "image": "book",
+                "alt": "一本厚绘本"
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "圆西瓜和小球的整个外形更相像。颜色、花纹不同，不能只看这些来判断形状。",
+          "visual": {
+            "kind": "asset",
+            "image": "melon",
+            "alt": "一个完整的圆西瓜"
+          }
+        },
+        {
+          "id": "garden-q4",
+          "question": "每点代表一本书。每次拿两本，该选哪组点？",
+          "skill": "听懂并遵守简单游戏规则",
+          "options": {
+            "A": {
+              "label": "两本书",
+              "visual": {
+                "kind": "quantity",
+                "count": 2,
+                "alt": "2个数量点，每点表示一件物品"
+              }
+            },
+            "B": {
+              "label": "一本书",
+              "visual": {
+                "kind": "quantity",
+                "count": 1,
+                "alt": "1个数量点，每点表示一件物品"
+              }
+            },
+            "C": {
+              "label": "三本书",
+              "visual": {
+                "kind": "quantity",
+                "count": 3,
+                "alt": "3个数量点，每点表示一件物品"
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "这个新规则要求每次拿两本。一次拿两本才符合约定，不能沿用上个游戏每次放一个的规则。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "把发现说给家人听",
+      "template": "summary",
+      "data": {
+        "title": "带着数和形，继续发现",
+        "items": [
+          "数什么、有几个，要一起说",
+          "看整个外形，找相像的朋友",
+          "约好规则，再轮流玩",
+          "社区数一数，家里找形状"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们把幼儿园的经验，带进了小学。"
+        },
+        {
+          "say": "介绍喜欢的物品，先说数的是什么。"
+        },
+        {
+          "say": "再一件一件数，把数量介绍清楚。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "观察玩具时，看整个物品的外形。"
+        },
+        {
+          "say": "颜色和大小不同，也可能形状相像。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "推荐游戏，要把材料和规则说清楚。"
+        },
+        {
+          "say": "一起约好轮次，知道什么时候结束。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "课后请成人陪你，在熟悉的社区数一数。"
+        },
+        {
+          "say": "再拿一块积木，在家找形状相像的物品。"
+        },
+        {
+          "say": "数完、找完，把发现私下说给家人听。"
+        },
+        {
+          "say": "会不会讲清楚，请大人帮你观察。"
+        },
+        {
+          "say": "也可以推荐今天的游戏，先说材料再说规则。"
+        },
+        {
+          "say": "也欢迎你提出一个新的数学小问题。"
+        }
+      ]
+    }
+  ]
+}

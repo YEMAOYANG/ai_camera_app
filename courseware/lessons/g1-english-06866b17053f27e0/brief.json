@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "title": "It's red.｜颜色小工坊",
+  "objectives": [
+    "六色图音词义对应",
+    "What colour?与It's颜色问答",
+    "now与当前颜色状态"
+  ],
+  "pages": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "goal": "原创雨伞工坊引入"
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "goal": "red与yellow"
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "goal": "blue与green"
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "goal": "black与white"
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "mechanic": "听颜色选雨伞，正确雨伞进入展示位，六轮选项位置重排",
+      "goal": "六色词义辨认",
+      "lowReading": "正式教师音频读颜色，实物图片选项"
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "goal": "now是现在，改变颜色后描述需更新"
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "mechanic": "听Now句子选色盘，改变工坊雨伞图片，按当前颜色完成三个新状态",
+      "goal": "现在的颜色与描述相符",
+      "adjacencyReason": "与选雨伞页隔开now讲解，选择实物与改变对象是不同机制"
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "goal": "问答含义与向家人描述单色物品"
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "goal": "六道新情境灯笼图音题"
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "goal": "回顾六色、问答及now，口语纸笔待观察"
+    }
+  ],
+  "quiz": {
+    "skills": [
+      "colour-listening",
+      "colour-dialogue",
+      "now-current-colour"
+    ],
+    "questions": 6,
+    "answerPositions": [
+      "b",
+      "a",
+      "c",
+      "c",
+      "b",
+      "a"
+    ],
+    "novelContext": "课中只用雨伞，检查用全新灯笼图片。"
+  },
+  "teacher": {
+    "id": "mira_english_standard",
+    "version": 2,
+    "name": "Mia 老师",
+    "voice": "Jennifer",
+    "gender": "female"
+  },
+  "sourceDecision": "仅原创六色、问答、now当前状态，排除官方未区分媒介的混色拓展结论。",
+  "weeklyQuestionSource": {
+    "goals": [
+      "六色图音对应",
+      "问颜色与回答",
+      "更新当前颜色"
+    ],
+    "homePractice": [
+      "家人指物问答，口语待观察",
+      "按听音涂色",
+      "变化后描述现在颜色"
+    ],
+    "noSeparateWeeklyTest": true
+  },
+  "goals": [
+    "六色图音词义对应",
+    "What colour?与It's颜色问答",
+    "now与当前颜色状态"
+  ]
+}

@@ -1,0 +1,1284 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "雪地里的小画家",
+  "description": "整合两个官方课时，认字识偏旁、比较脚印与形状联想、理解脚步成画和青蛙冬眠、借图朗读背诵并观察五个书写字；中间可休息再继续。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#D65A8A",
+      "persona": "温柔亲切的女老师，说话清楚有节奏，喜欢用图画和儿歌带孩子认字读诗；孩子答错时先让孩子再听一遍、再看一眼。"
+    }
+  },
+  "images": {
+    "winter-yard": {
+      "file": "assets/winter-yard.png"
+    },
+    "chick": {
+      "file": "assets/chick.png"
+    },
+    "dog": {
+      "file": "assets/dog.png"
+    },
+    "duck": {
+      "file": "assets/duck.png"
+    },
+    "horse": {
+      "file": "assets/horse.png"
+    },
+    "track-chick": {
+      "file": "assets/track-chick.png"
+    },
+    "track-dog": {
+      "file": "assets/track-dog.png"
+    },
+    "track-duck": {
+      "file": "assets/track-duck.png"
+    },
+    "track-horse": {
+      "file": "assets/track-horse.png"
+    },
+    "bamboo-leaf": {
+      "file": "assets/bamboo-leaf.png"
+    },
+    "plum-blossom": {
+      "file": "assets/plum-blossom.png"
+    },
+    "maple-leaf": {
+      "file": "assets/maple-leaf.png"
+    },
+    "crescent": {
+      "file": "assets/crescent.png"
+    },
+    "frog-shelter": {
+      "file": "assets/frog-shelter.png"
+    },
+    "mud-chick": {
+      "file": "assets/mud-chick.png"
+    },
+    "mud-dog": {
+      "file": "assets/mud-dog.png"
+    },
+    "mud-duck": {
+      "file": "assets/mud-duck.png"
+    },
+    "mud-horse": {
+      "file": "assets/mud-horse.png"
+    },
+    "child-paint": {
+      "file": "assets/child-paint.png"
+    },
+    "child-read": {
+      "file": "assets/child-read.png"
+    },
+    "child-snowman": {
+      "file": "assets/child-snowman.png"
+    },
+    "child-sled": {
+      "file": "assets/child-sled.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "雪地里的神秘画展",
+      "template": "title-picture",
+      "data": {
+        "title": "雪地里的小画家",
+        "picture": "winter-yard",
+        "caption": "听儿歌，找脚印里的画"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "一场雪把小院铺得白白的。"
+        },
+        {
+          "say": "雪地像一张大纸，等着谁来留下画面。"
+        },
+        {
+          "say": "今天不拿画笔，我们也去找一找画。"
+        },
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "课题叫雪地里的小画家。"
+        },
+        {
+          "say": "题目里的的要读轻声，轻轻短短的。"
+        },
+        {
+          "say": "小画家是谁，它们又怎样画画呢？"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "先听完整的儿歌，再到图里找线索。"
+        },
+        {
+          "say": "我们会认字、找脚印，还会试着背儿歌。"
+        },
+        {
+          "say": "最后观察五个字，在纸上再练一练。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "听一遍完整的儿歌",
+      "template": "two-columns",
+      "data": {
+        "title": "雪地里的小画家",
+        "left": {
+          "heading": "雪地来了小画家",
+          "body": "下雪啦，下雪啦！\n雪地里来了一群小画家。\n小鸡画竹叶，小狗画梅花，\n小鸭画枫叶，小马画月牙。"
+        },
+        "right": {
+          "heading": "脚步成画，青蛙过冬",
+          "body": "不用颜料不用笔，\n几步就成一幅画。\n青蛙为什么没参加？\n他在洞里睡着啦。"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这首儿歌的作者是程宏明。"
+        },
+        {
+          "say": "先听老师读，心里想象白白的雪地。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "下雪啦，下雪啦！"
+        },
+        {
+          "say": "雪地里来了一群小画家。"
+        },
+        {
+          "say": "小鸡画竹叶，小狗画梅花，"
+        },
+        {
+          "say": "小鸭画枫叶，小马画月牙。"
+        },
+        {
+          "say": "一边听，一边想：谁来了，留下什么？"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "接着听，它们用什么办法画出画面。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "不用颜料不用笔，"
+        },
+        {
+          "say": "几步就成一幅画。"
+        },
+        {
+          "say": "青蛙为什么没参加？"
+        },
+        {
+          "say": "他在洞里睡着啦。"
+        },
+        {
+          "say": "开头很快乐，最后轻轻问、轻轻答。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "轻声的，宝盖头的家",
+      "template": "two-columns",
+      "data": {
+        "title": "听字音，也看字形",
+        "left": {
+          "heading": "的 de",
+          "body": "雪地里的小画家\n小鸡的脚印"
+        },
+        "right": {
+          "heading": "家 jiā",
+          "body": "画家　家人\n宀：宝盖头"
+        }
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "这个字是的，在题目中读轻声。"
+        },
+        {
+          "say": "轻声要轻轻短短，不给它加重重的调子。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "连着读：雪地里的小画家。"
+        },
+        {
+          "say": "再听小鸡的脚印，的把前后连起来。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "家，第一声，和老师读家。"
+        },
+        {
+          "say": "画家里的家，是这个称呼中的一个字。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "会画画的人可以叫画家，家人是家里的人。"
+        },
+        {
+          "say": "同一个字，放进词语后要连着意思来记。"
+        },
+        {
+          "say": "家上面的宀叫宝盖头，先看清它的样子。"
+        },
+        {
+          "say": "它像字形上方的小屋顶，等会儿你来拼一拼。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "给家找回宝盖头",
+      "page": "roof",
+      "widgetType": "game",
+      "startImage": "winter-yard",
+      "script": [
+        {
+          "highlight": "#house-base"
+        },
+        {
+          "say": "家的下面留在原处，上方少了一个偏旁。"
+        },
+        {
+          "say": "先看整个字，想一想家上面是什么样。"
+        },
+        {
+          "highlight": "#roof-card"
+        },
+        {
+          "say": "这张字形卡是宝盖头，像字上方的小屋顶。"
+        },
+        {
+          "setState": {
+            "demo": "roof"
+          }
+        },
+        {
+          "say": "老师把宝盖头放到上方，字形就接起来了。"
+        },
+        {
+          "say": "看清位置，再和完整的家比一比。"
+        },
+        {
+          "annotate": "#roof-slot",
+          "content": "宝盖头在家的上面"
+        },
+        {
+          "say": "旁边还有别的偏旁，不要见到卡片就随便放。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在你来选，也能把字形卡拖到上面的空位。"
+        },
+        {
+          "say": "位置换了以后，再看字形，不只记住哪边。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "鸡、竹、牙，字音连画面",
+      "template": "picture-points",
+      "data": {
+        "title": "字音连上图画",
+        "picture": "chick",
+        "points": [
+          "鸡 jī：小鸡",
+          "竹 zhú：竹叶",
+          "牙 yá：月牙"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这只小动物是小鸡，先看看它的样子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "鸡，第一声，读得平平的。"
+        },
+        {
+          "say": "小鸡的鸡和儿歌里的小鸡，是同一个字。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "竹，第二声，声音往上扬。"
+        },
+        {
+          "say": "竹叶细细长长，竹字可以放进竹叶这个词里。"
+        },
+        {
+          "say": "念小鸡画竹叶时，别把竹读成第一声。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "牙，第二声，月牙的牙也这样读。"
+        },
+        {
+          "say": "弯弯的一线月亮，可以叫月牙。"
+        },
+        {
+          "say": "等会儿把声音和画面连起来，找出脚印的秘密。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "用、几步和没参加",
+      "template": "summary",
+      "data": {
+        "title": "听懂儿歌里的几个词",
+        "items": [
+          "用 yòng：使用；不用",
+          "几 jǐ　步 bù：几步",
+          "没 méi　参 cān　加 jiā：没参加"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "用，第四声，说使用时会用到它。"
+        },
+        {
+          "say": "不用，就是这里没有用上这种东西。"
+        },
+        {
+          "say": "儿歌说不用颜料不用笔，等会儿看它怎样成画。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "几，第三声；步，第四声，连起来读几步。"
+        },
+        {
+          "say": "几步说走了不多的步子，这里没有规定一个数。"
+        },
+        {
+          "say": "几和儿长得有点像，要从上到下比字形。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "没，第二声；参，第一声；加，第一声。"
+        },
+        {
+          "say": "连起来读没参加，表示没有加入这件活动。"
+        },
+        {
+          "say": "小动物都到了雪地，青蛙为什么没有来呢？"
+        },
+        {
+          "say": "听清词语的意思，读到句子里才更明白。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "把同一个字放到一起",
+      "page": "characters",
+      "widgetType": "game",
+      "startImage": "winter-yard",
+      "script": [
+        {
+          "highlight": "#character-target"
+        },
+        {
+          "say": "老师先读这些字：的、家、鸡、竹、牙。"
+        },
+        {
+          "say": "还有用、几、步、没、参、加，先把字音听清。"
+        },
+        {
+          "highlight": "#character-bank"
+        },
+        {
+          "say": "大字是这一轮要找的字，右边有三个候选。"
+        },
+        {
+          "say": "从上往下比较字形，别只看其中的一小部分。"
+        },
+        {
+          "setState": {
+            "demo": "home"
+          }
+        },
+        {
+          "say": "老师用家示范，找到完全相同的家放进字册。"
+        },
+        {
+          "annotate": "#character-album",
+          "content": "两个字形完全相同"
+        },
+        {
+          "say": "同样的字换了位置，样子仍然完全相同。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "你可以点字卡，也可以把它拖进字册。"
+        },
+        {
+          "say": "每一轮目标会更换，重新听、重新看。"
+        },
+        {
+          "say": "配好字形以后，再请大人听你认读这些字。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "小画家与它的脚印",
+      "page": "tracks",
+      "widgetType": "game",
+      "startImage": "winter-yard",
+      "script": [
+        {
+          "say": "群是许多人或动物聚在一起的意思。"
+        },
+        {
+          "say": "不止一位小画家来了，这里要叫一群。"
+        },
+        {
+          "highlight": "#animal-chick"
+        },
+        {
+          "say": "小鸡的细脚踩进雪里，留下细细的印。"
+        },
+        {
+          "highlight": "#track-chick"
+        },
+        {
+          "say": "这些细长的印记，让儿歌想到竹叶。"
+        },
+        {
+          "highlight": "#animal-dog"
+        },
+        {
+          "say": "小狗的脚掌圆圆的，留下圆润的印。"
+        },
+        {
+          "say": "小狗的足印像梅花，和细细的鸡印不同。"
+        },
+        {
+          "highlight": "#animal-duck"
+        },
+        {
+          "say": "小鸭有宽宽的蹼足，留下的印也宽。"
+        },
+        {
+          "say": "儿歌把它想成枫叶，看看张开的轮廓。"
+        },
+        {
+          "highlight": "#animal-horse"
+        },
+        {
+          "say": "小马用蹄子走路，留下弯弯的印。"
+        },
+        {
+          "say": "儿歌用月牙来形容这个弯弯的样子。"
+        },
+        {
+          "setState": {
+            "demo": "chick"
+          }
+        },
+        {
+          "say": "老师先把小鸡送到相应的足印旁。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "你来给小画家找足印，拖动物或先点动物再点足印。"
+        },
+        {
+          "say": "看脚的样子，也看印的轮廓，别只按位置猜。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "不用画笔，怎样留下画",
+      "template": "steps",
+      "data": {
+        "title": "脚步把雪地变成画纸",
+        "steps": [
+          "脚踩雪地",
+          "留下足印",
+          "把印记想成画"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "小动物在雪地里走路，脚碰到了雪。"
+        },
+        {
+          "say": "它们没有拿画笔，也没有蘸上颜料。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "抬起脚后，雪面留下了不同形状的足印。"
+        },
+        {
+          "say": "往前走，新的足印又接在前面。"
+        },
+        {
+          "say": "所以儿歌说不用颜料不用笔，几步就成一幅画。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "这里的画，是把足印想成了美丽的图案。"
+        },
+        {
+          "say": "小鸡没有真的搬来竹叶，雪里留下的是脚印。"
+        },
+        {
+          "say": "形状相像，让平常的走路变成有趣的儿歌。"
+        },
+        {
+          "say": "我们读的时候，也把发现秘密的快乐读出来。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "脚印像什么",
+      "page": "analogy",
+      "widgetType": "game",
+      "startImage": "winter-yard",
+      "script": [
+        {
+          "highlight": "#analogy-track"
+        },
+        {
+          "say": "这一次先看足印，再想它像哪一种东西。"
+        },
+        {
+          "say": "从细长、圆润、宽阔和弯曲的轮廓去比较。"
+        },
+        {
+          "highlight": "#likeness-bamboo"
+        },
+        {
+          "say": "细长的鸡印像竹叶，注意尖尖长长的样子。"
+        },
+        {
+          "setState": {
+            "demo": "bamboo"
+          }
+        },
+        {
+          "say": "老师把足印放到竹叶旁，让两种轮廓靠近看。"
+        },
+        {
+          "say": "像，是说形状有相似的地方，不是同一件东西。"
+        },
+        {
+          "annotate": "#likeness-bank",
+          "content": "先看轮廓，再作联想"
+        },
+        {
+          "say": "圆圆的狗印像梅花，宽宽的鸭印像枫叶。"
+        },
+        {
+          "say": "小马的弯印像月牙，方向转了也可以比较轮廓。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "你来移动足印，也可以直接点你想到的图。"
+        },
+        {
+          "say": "每次先说明为什么像，再试着接一句儿歌。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "休息后再找青蛙",
+      "template": "steps",
+      "data": {
+        "title": "给眼睛歇一歇",
+        "steps": [
+          "回想四位小画家",
+          "望远处，活动身体",
+          "回来问问青蛙"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "我们找到了四位小画家，也认出四种足印。"
+        },
+        {
+          "say": "小鸡、小狗、小鸭、小马，走路就能留下画。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "现在先停一停，看看远处，让眼睛歇一会儿。"
+        },
+        {
+          "say": "愿意的话站起来，轻轻活动肩膀和双手。"
+        },
+        {
+          "say": "累了可以先停在这里，回来再继续这份课件。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "回来时，再想想谁没有来到雪地。"
+        },
+        {
+          "say": "青蛙没有参加，儿歌会在最后告诉我们原因。"
+        },
+        {
+          "say": "我们还要学着轻轻问、轻轻答，再回想整首儿歌。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "青蛙为什么没来",
+      "template": "picture-points",
+      "data": {
+        "title": "最后一问一答，声音轻下来",
+        "picture": "frog-shelter",
+        "points": [
+          "青蛙为什么没参加？",
+          "他在洞里睡着啦。",
+          "冬眠：青蛙的一种过冬方式"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看雪下面的小土洞，青蛙安静地待在里面。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "青蛙为什么没参加？这是一个问句。"
+        },
+        {
+          "say": "这里是好奇地问一问，声音自然些。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "他在洞里睡着啦。答案说得轻轻的。"
+        },
+        {
+          "say": "和开头下雪啦的兴奋不同，结尾的啦慢下来。"
+        },
+        {
+          "say": "老师再连起来读，你也可以轻轻跟着说。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "这里睡着说的是青蛙在洞里冬眠。"
+        },
+        {
+          "say": "冬眠是青蛙过冬的一种方式，所以没有出来画画。"
+        },
+        {
+          "say": "我们了解的是课文里的青蛙，不把别的动物随意套进来。"
+        },
+        {
+          "say": "读结尾时，想想安静的小土洞，声音也跟着轻下来。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "interactive",
+      "title": "让脚步连成画",
+      "page": "stamps",
+      "widgetType": "game",
+      "startImage": "winter-yard",
+      "script": [
+        {
+          "highlight": "#stamp-target"
+        },
+        {
+          "say": "看这张图，想想儿歌里是谁画出这样的花样。"
+        },
+        {
+          "say": "先选小动物，再让它沿着雪面往前走。"
+        },
+        {
+          "highlight": "#stamp-chick"
+        },
+        {
+          "say": "老师用小鸡示范，它留下细细的足印。"
+        },
+        {
+          "setState": {
+            "demo": "steps"
+          }
+        },
+        {
+          "say": "脚一落下，雪面留下一个印记；继续走，又多一个。"
+        },
+        {
+          "highlight": "#step-1"
+        },
+        {
+          "say": "这几个点只提示往哪里走，不规定几步一定是某个数。"
+        },
+        {
+          "annotate": "#stamp-trail",
+          "content": "脚步留下印记，像连成一幅画"
+        },
+        {
+          "say": "我们没有加颜料，也没有让小动物拿画笔。"
+        },
+        {
+          "say": "脚印留在身后，正好解释几步就成一幅画。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "你来选合适的小动物，再点前面的踏点。"
+        },
+        {
+          "say": "也能拖着小动物过去，看看画面怎样留下足印。"
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "slide",
+      "title": "借图回想整首儿歌",
+      "template": "steps",
+      "data": {
+        "title": "从画面回想，再试着背",
+        "steps": [
+          "先想下雪和一群小画家",
+          "再想四幅画与脚步",
+          "最后想青蛙的一问一答"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "step-1"
+        },
+        {
+          "say": "先在心里想白白雪地，读出下雪时的快乐。"
+        },
+        {
+          "say": "下雪啦，下雪啦！雪地里来了一群小画家。"
+        },
+        {
+          "spotlight": "step-2"
+        },
+        {
+          "say": "接着依次想小鸡、小狗、小鸭、小马。"
+        },
+        {
+          "say": "每位小画家配一种画面，别把竹叶和梅花接错。"
+        },
+        {
+          "say": "再想脚步留下的足印，接上不用笔、几步成画。"
+        },
+        {
+          "spotlight": "step-3"
+        },
+        {
+          "say": "最后问青蛙为什么没参加，再轻轻回答洞里睡着。"
+        },
+        {
+          "say": "用这三条图画线索，试着把儿歌连起来说。"
+        },
+        {
+          "say": "想不起来可以回看全文，听老师再读一遍。"
+        },
+        {
+          "say": "背得怎样，要请家人听；看过图不等于已经会背。"
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "interactive",
+      "title": "三个转折笔形",
+      "page": "stroke-match",
+      "widgetType": "game",
+      "startImage": "winter-yard",
+      "script": [
+        {
+          "highlight": "#stroke-sample"
+        },
+        {
+          "say": "写字前，先看三种会转折的笔形。"
+        },
+        {
+          "say": "牙里学竖折，马里学竖折折钩，用里学横折钩。"
+        },
+        {
+          "highlight": "#stroke-choice-vertical"
+        },
+        {
+          "say": "这个形状先竖后折，是竖折。"
+        },
+        {
+          "setState": {
+            "demo": "vertical"
+          }
+        },
+        {
+          "say": "老师让同样的笔形靠在一起，比较转弯的位置。"
+        },
+        {
+          "highlight": "#stroke-choice-hook"
+        },
+        {
+          "say": "再看横折钩，它先横着走，再转向下面并带钩。"
+        },
+        {
+          "say": "竖折折钩的转折更多，要完整观察，别只看开头。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "你来把笔形送到相同的轮廓旁，点轮廓也可以。"
+        },
+        {
+          "say": "这里只比单个笔形，不把它当成整个字的笔顺。"
+        },
+        {
+          "say": "纸上写这几个字时，请大人帮你看先后和位置。"
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "slide",
+      "title": "观察五个字",
+      "template": "summary",
+      "data": {
+        "title": "先观察字形，再落笔",
+        "items": [
+          "用、马、牙：看关键笔形",
+          "竹：比较左右两边",
+          "几：留意弯处和收笔"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "用，第四声，马，第三声，牙，第二声。"
+        },
+        {
+          "say": "用里有横折钩，马里有竖折折钩，牙里有竖折。"
+        },
+        {
+          "say": "看完整字形，再找今天学过的笔形。"
+        },
+        {
+          "say": "不只看会转弯的地方，还要看它在字里的位置。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "竹，第二声，左边和右边并不完全相同。"
+        },
+        {
+          "say": "对照范字，比较左右的长短、高低和收笔。"
+        },
+        {
+          "say": "观察好了再描，不能把两边随便写成一样。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "几，第三声，先看整体，再看弯处和收笔。"
+        },
+        {
+          "say": "它和儿的字形不同，想一想前面比较过的样子。"
+        },
+        {
+          "say": "接下来依次描用、马、牙、竹、几。"
+        },
+        {
+          "say": "描迹只表示手指描过，纸笔是否规范还要请大人看。"
+        }
+      ]
+    },
+    {
+      "key": "p17",
+      "type": "interactive",
+      "title": "沿淡字慢慢描",
+      "page": "trace",
+      "widgetType": "game",
+      "startImage": "winter-yard",
+      "script": [
+        {
+          "highlight": "#trace-guide"
+        },
+        {
+          "say": "田字格里先出现用，看看整个字的形状。"
+        },
+        {
+          "say": "用、马、牙、竹、几，依次都会轮到。"
+        },
+        {
+          "setState": {
+            "demo": "trace"
+          }
+        },
+        {
+          "say": "老师沿淡字描一小段，示范画笔会留下痕迹。"
+        },
+        {
+          "say": "这一小段不是完整笔顺，不用照着它猜顺序。"
+        },
+        {
+          "highlight": "#trace-reset"
+        },
+        {
+          "say": "画错了可以点圆箭头，清干净以后再来。"
+        },
+        {
+          "annotate": "#trace-progress",
+          "content": "只表示淡字描到了多少"
+        },
+        {
+          "say": "进度条只记录描到了多少淡字，不替你评价规范。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在慢慢描，手指跟着淡色的字形走。"
+        },
+        {
+          "say": "有了足够描迹，对勾会亮起来，点它换下一个字。"
+        },
+        {
+          "say": "练过以后在纸上写五个字，请大人观察笔顺和字形。"
+        }
+      ]
+    },
+    {
+      "key": "p18",
+      "type": "quiz",
+      "title": "小检查：换成泥地",
+      "intro": [
+        "这次换成新泥地印记图，仔细比较轮廓。",
+        "图形参照儿歌里的联想画法，再听老师问。"
+      ],
+      "questions": [
+        {
+          "id": "snow-mud-bamboo",
+          "question": "哪枚新泥印像细细的竹叶？",
+          "skill": "动物足印与形状联系",
+          "answer": [
+            "B"
+          ],
+          "analysis": "细长分开的印形像竹叶，与儿歌中小鸡足印的联想相同。",
+          "options": {
+            "A": {
+              "label": "圆润的泥地掌印",
+              "visual": {
+                "kind": "asset",
+                "image": "mud-dog",
+                "alt": "圆润的泥地掌印"
+              }
+            },
+            "B": {
+              "label": "细长的泥地足印",
+              "visual": {
+                "kind": "asset",
+                "image": "mud-chick",
+                "alt": "细长的泥地足印"
+              }
+            },
+            "C": {
+              "label": "宽阔的泥地蹼印",
+              "visual": {
+                "kind": "asset",
+                "image": "mud-duck",
+                "alt": "宽阔的泥地蹼印"
+              }
+            }
+          }
+        },
+        {
+          "id": "snow-mud-crescent",
+          "question": "哪枚新泥印像弯弯的月牙？",
+          "skill": "动物足印与形状联系",
+          "answer": [
+            "C"
+          ],
+          "analysis": "弯弯的蹄缘印与月牙相似，是课文中小马足印的形状联想。",
+          "options": {
+            "A": {
+              "label": "宽阔的泥地蹼印",
+              "visual": {
+                "kind": "asset",
+                "image": "mud-duck",
+                "alt": "宽阔的泥地蹼印"
+              }
+            },
+            "B": {
+              "label": "圆润的泥地掌印",
+              "visual": {
+                "kind": "asset",
+                "image": "mud-dog",
+                "alt": "圆润的泥地掌印"
+              }
+            },
+            "C": {
+              "label": "弯弯的泥地蹄印",
+              "visual": {
+                "kind": "asset",
+                "image": "mud-horse",
+                "alt": "弯弯的泥地蹄印"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p19",
+      "type": "quiz",
+      "title": "小检查：换个游戏",
+      "intro": [
+        "再看看新的生活画面，想一想词语的意思。",
+        "老师会读出题目，听清后再选图。"
+      ],
+      "questions": [
+        {
+          "id": "snow-without-brush",
+          "question": "哪幅图只靠脚步在地面留下花样？",
+          "skill": "不用画笔的脚步画",
+          "answer": [
+            "A"
+          ],
+          "analysis": "脚踩过的地面留下足印，这种花样来自脚步，不靠画笔涂画。",
+          "options": {
+            "A": {
+              "label": "泥地里的足印",
+              "visual": {
+                "kind": "asset",
+                "image": "mud-dog",
+                "alt": "泥地里的足印"
+              }
+            },
+            "B": {
+              "label": "用画笔和颜料画画",
+              "visual": {
+                "kind": "asset",
+                "image": "child-paint",
+                "alt": "用画笔和颜料画画"
+              }
+            },
+            "C": {
+              "label": "用双手堆雪人",
+              "visual": {
+                "kind": "asset",
+                "image": "child-snowman",
+                "alt": "用双手堆雪人"
+              }
+            }
+          }
+        },
+        {
+          "id": "snow-not-joining",
+          "question": "谁没有参加屋外的雪地游戏？",
+          "skill": "没参加的含义",
+          "answer": [
+            "B"
+          ],
+          "analysis": "室内看书的孩子没有加入屋外游戏，堆雪人和坐雪橇的孩子参加了。",
+          "options": {
+            "A": {
+              "label": "雪地里堆雪人",
+              "visual": {
+                "kind": "asset",
+                "image": "child-snowman",
+                "alt": "雪地里堆雪人"
+              }
+            },
+            "B": {
+              "label": "屋里看书",
+              "visual": {
+                "kind": "asset",
+                "image": "child-read",
+                "alt": "屋里看书"
+              }
+            },
+            "C": {
+              "label": "雪地里坐雪橇",
+              "visual": {
+                "kind": "asset",
+                "image": "child-sled",
+                "alt": "雪地里坐雪橇"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p20",
+      "type": "slide",
+      "title": "把画展带回家",
+      "template": "summary",
+      "data": {
+        "title": "把今天的发现带回家",
+        "items": [
+          "认字：轻声的，宝盖头的家",
+          "赏画：足印像竹叶、梅花、枫叶、月牙",
+          "读背：快乐开头，轻轻问答",
+          "写字：观察五字，纸笔请大人看"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "题目里的的读轻声，家的上面是宝盖头。"
+        },
+        {
+          "say": "听字音，也把字放进词里想意思。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "小画家留下的是足印，形状像四种美丽的东西。"
+        },
+        {
+          "say": "不用颜料不用笔，脚步也能在雪地留下图案。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "开头像发现下雪一样快乐，结尾问答轻轻的。"
+        },
+        {
+          "say": "青蛙在洞里冬眠，用画面线索把儿歌连起来背。"
+        },
+        {
+          "say": "回家读给家人听，再请他们听一次背诵。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "写字先看整体和关键笔形，描过后到纸上再练。"
+        },
+        {
+          "say": "用、马、牙、竹、几，正确、规范、整洁都要看。"
+        },
+        {
+          "say": "家人没有听到或看到的地方，我们留着继续观察。"
+        }
+      ]
+    }
+  ]
+}

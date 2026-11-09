@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "mira.courseware.native-authoring-revision.v1",
+  "course": "玩一玩",
+  "nativeJobId": "iIFlxUPrGe",
+  "nativeClassroomId": "G6pSniFpjb",
+  "nativeModel": {
+    "providerId": "deepseek",
+    "modelId": "deepseek-v4-pro",
+    "modelPolicyId": "deepseek-v4-pro-current-flash-v1"
+  },
+  "nativeRequest": {
+    "path": "output/courseware-lessons/smartedu-54-math-g1-upper-play/native-authoring-v1/input.json",
+    "sha256": "c217dc9f8560c9a606c876565ca5af9a4200ba0261ccf332978e028f2980de0a"
+  },
+  "nativeDraft": {
+    "path": "output/courseware-lessons/smartedu-54-math-g1-upper-play/native-authoring-v1/classroom.json",
+    "sha256": "6ec13abc4610583d5b671aa1db17c738fb71010ccbb1c6c0a34293c33af29aa6"
+  },
+  "adaptedSource": {
+    "path": "courseware/lessons/smartedu-54-math-g1-upper-play/lesson.json",
+    "sha256": "9a617dcf58b6a8144925c72f2fa538488a74dfdff806515f630639546f24d255"
+  },
+  "sceneMapping": [
+    {
+      "sourceSceneId": "scene_ORVETEnSi2",
+      "adaptedSceneKey": "p01"
+    },
+    {
+      "sourceSceneId": "scene_E6YRtiyoZh",
+      "adaptedSceneKey": "p02"
+    },
+    {
+      "sourceSceneId": "scene_qoTO89hdTH",
+      "adaptedSceneKey": "p03"
+    },
+    {
+      "sourceSceneId": "scene_mjbGQh6-63",
+      "adaptedSceneKey": "p04"
+    },
+    {
+      "sourceSceneId": "scene_TvSirXDfcQ",
+      "adaptedSceneKey": "p05"
+    },
+    {
+      "sourceSceneId": "scene_EjSsx8eJUb",
+      "adaptedSceneKey": "p06"
+    }
+  ],
+  "changes": [
+    "保留原生六场顺序、游戏情境、两套互动和三类测题。第一场纠正五种误说，按教材讲四种。",
+    "删除原生现场讨论，在跳房子图中明确等候印、本轮约定及出发时机。",
+    "结队与接力改用公共互动框架并补足画面操作、讲解、渐进提示及重玩。",
+    "题一补齐豆袋约定，题二改为数量清楚的三张独立图，题三只检查明确的脚印等候约定。按B、A、C登记。",
+    "回顾加入实际线下观察口径。正式图音、独立复核和发布仍待后续验证。"
+  ]
+}

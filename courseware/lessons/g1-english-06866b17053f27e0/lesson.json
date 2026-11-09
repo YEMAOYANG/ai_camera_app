@@ -1,0 +1,884 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "It's red.｜颜色小工坊",
+  "description": "外研社一年级起点一年级上Module 4 Unit 1完整课：六色、颜色问答和now当前状态。原创图音教学、两种互动及新灯笼检查，口语待观察。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#328b83",
+      "persona": "以标准清晰的英语示范和简短中文解释，先教词义，再示范，最后请孩子看图、听音、作答。遵守mira_english_standard v2教师档案。"
+    }
+  },
+  "images": {
+    "cover": {
+      "file": "assets/cover.png"
+    },
+    "umbrella-red": {
+      "file": "assets/umbrella-red.png"
+    },
+    "lantern-red": {
+      "file": "assets/lantern-red.png"
+    },
+    "umbrella-yellow": {
+      "file": "assets/umbrella-yellow.png"
+    },
+    "lantern-yellow": {
+      "file": "assets/lantern-yellow.png"
+    },
+    "umbrella-blue": {
+      "file": "assets/umbrella-blue.png"
+    },
+    "lantern-blue": {
+      "file": "assets/lantern-blue.png"
+    },
+    "umbrella-green": {
+      "file": "assets/umbrella-green.png"
+    },
+    "lantern-green": {
+      "file": "assets/lantern-green.png"
+    },
+    "umbrella-black": {
+      "file": "assets/umbrella-black.png"
+    },
+    "lantern-black": {
+      "file": "assets/lantern-black.png"
+    },
+    "umbrella-white": {
+      "file": "assets/umbrella-white.png"
+    },
+    "lantern-white": {
+      "file": "assets/lantern-white.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "欢迎来到颜色小工坊",
+      "template": "title-picture",
+      "data": {
+        "title": "It's red.",
+        "picture": "cover",
+        "caption": "听颜色，看图片，说给家人听"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我是Mia老师，欢迎来到雨伞小工坊。"
+        },
+        {
+          "say": "小雨伞有不同的颜色，仔细看看。"
+        },
+        {
+          "say": "今天我们用英语说出它们的颜色。"
+        },
+        {
+          "say": "先听清颜色的声音，再看伞面。"
+        },
+        {
+          "say": "红、黄、蓝、绿、黑、白都在这里。"
+        },
+        {
+          "say": "颜色词告诉别人眼前是什么颜色。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "我们还要学会问颜色和回答颜色。"
+        },
+        {
+          "say": "雨伞换了颜色，就要说现在的颜色。"
+        },
+        {
+          "say": "不用自己读长句，老师会读给你听。"
+        },
+        {
+          "say": "最后用新图片检查这次的选择。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "红色和黄色",
+      "template": "two-columns",
+      "data": {
+        "title": "red · yellow",
+        "left": {
+          "heading": "red",
+          "body": "红色：It's red."
+        },
+        "right": {
+          "heading": "yellow",
+          "body": "黄色：It's yellow."
+        },
+        "left_picture": "umbrella-red",
+        "right_picture": "umbrella-yellow"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边雨伞的伞面，是红色。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "red."
+        },
+        {
+          "say": "red就是红色，和这把伞的颜色对应。"
+        },
+        {
+          "say": "我们说颜色时，不用说雨伞的大小。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "It's red."
+        },
+        {
+          "say": "这句话是在说，它是红色的。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边的伞面，这把是黄色。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "yellow."
+        },
+        {
+          "say": "yellow就是黄色，和红色不一样。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "It's yellow."
+        },
+        {
+          "say": "它们都是雨伞，颜色词却不相同。"
+        },
+        {
+          "say": "先看清实际颜色，再选相应的词。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "蓝色和绿色",
+      "template": "two-columns",
+      "data": {
+        "title": "blue · green",
+        "left": {
+          "heading": "blue",
+          "body": "蓝色：It's blue."
+        },
+        "right": {
+          "heading": "green",
+          "body": "绿色：It's green."
+        },
+        "left_picture": "umbrella-blue",
+        "right_picture": "umbrella-green"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "现在看左边的蓝色雨伞，先听老师。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "blue."
+        },
+        {
+          "say": "blue说的是蓝色，仔细听它的声音。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "It's blue."
+        },
+        {
+          "say": "它是蓝色的，声音和伞面对应起来。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "右边这把是绿色，和蓝色分开看。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "green."
+        },
+        {
+          "say": "green说的是绿色，别和blue弄混。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "It's green."
+        },
+        {
+          "say": "这句话是在说，它是绿色的。"
+        },
+        {
+          "say": "你可以先指着伞面，再听一次名称。"
+        },
+        {
+          "say": "不同的颜色，需要不同的颜色词。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "黑色和白色",
+      "template": "two-columns",
+      "data": {
+        "title": "black · white",
+        "left": {
+          "heading": "black",
+          "body": "黑色：It's black."
+        },
+        "right": {
+          "heading": "white",
+          "body": "白色：It's white."
+        },
+        "left_picture": "umbrella-black",
+        "right_picture": "umbrella-white"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这一对雨伞，一把黑色，一把白色。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "black."
+        },
+        {
+          "say": "black是黑色，左边的伞面就是黑色。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "It's black."
+        },
+        {
+          "say": "说这句话，就是在介绍它的颜色。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "看右边这把白伞，注意清楚的轮廓。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "white."
+        },
+        {
+          "say": "white是白色，和黑色是不同的词。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "It's white."
+        },
+        {
+          "say": "我们看伞面的颜色，不看伞柄。"
+        },
+        {
+          "say": "这六个颜色词，听清后再慢慢选择。"
+        },
+        {
+          "say": "跟着读给家人听，发音请家人帮看。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "听声音，选雨伞",
+      "page": "p05",
+      "widgetType": "colour-audio-selection",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "demoColor": "red"
+          }
+        },
+        {
+          "highlight": "#colour-prompt"
+        },
+        {
+          "say": "这一关先听颜色，再从图片里找雨伞。"
+        },
+        {
+          "say": "红色、黄色、蓝色都有自己的英语名。"
+        },
+        {
+          "highlight": "#colour-tray"
+        },
+        {
+          "say": "例如听到red，就看哪把伞是红色。"
+        },
+        {
+          "say": "不要根据左边或右边的位置猜答案。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "demoColor": "red"
+          }
+        },
+        {
+          "say": "老师示范，把红伞送进上面的展示位。"
+        },
+        {
+          "highlight": "#colour-display"
+        },
+        {
+          "say": "伞面变成被选中的颜色，物品真的移动。"
+        },
+        {
+          "say": "等会儿每轮都会播放一个颜色词。"
+        },
+        {
+          "say": "听不清可以按重听，先别急着选。"
+        },
+        {
+          "say": "第一次选错，可以继续观察和尝试。"
+        },
+        {
+          "say": "现在轮到你，听录音再选图片。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "now：说的是现在",
+      "template": "two-columns",
+      "data": {
+        "title": "now：现在",
+        "left": {
+          "heading": "先前",
+          "body": "It's red."
+        },
+        "right": {
+          "heading": "现在",
+          "body": "Now it's green."
+        },
+        "left_picture": "umbrella-red",
+        "right_picture": "umbrella-green"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小工坊给同一把雨伞换了颜色。"
+        },
+        {
+          "say": "先前伞面是红色，我们说它是红色。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "It's red."
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在雨伞已经换成绿色，要看当前。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "now的意思是现在，提醒我们看这时。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "Now it's green."
+        },
+        {
+          "say": "意思是，现在它是绿色的。"
+        },
+        {
+          "say": "不能还用先前的红色描述现在。"
+        },
+        {
+          "say": "不是所有东西都会自己改变颜色。"
+        },
+        {
+          "say": "这里是工坊换了伞面，画面也换了。"
+        },
+        {
+          "say": "听见now，留意眼前最新的颜色。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "看看现在的颜色",
+      "page": "p07",
+      "widgetType": "current-colour-timeline",
+      "startImage": "cover",
+      "script": [
+        {
+          "setState": {
+            "mode": "demo",
+            "demoColor": "red"
+          }
+        },
+        {
+          "highlight": "#now-current"
+        },
+        {
+          "say": "这一页比较先前和现在，先看大雨伞。"
+        },
+        {
+          "say": "左边小图片保存先前的样子。"
+        },
+        {
+          "highlight": "#now-before"
+        },
+        {
+          "say": "小图片只作比较，不是现在的答案。"
+        },
+        {
+          "setState": {
+            "mode": "demo",
+            "demoColor": "yellow"
+          }
+        },
+        {
+          "say": "工坊换了伞面，大雨伞现在变成黄色。"
+        },
+        {
+          "highlight": "#now-current"
+        },
+        {
+          "say": "描述现在，就要看大的这把雨伞。"
+        },
+        {
+          "say": "先听问颜色，再从色盘选当前颜色。"
+        },
+        {
+          "say": "选对后，这把雨伞会进入作品栏。"
+        },
+        {
+          "say": "下一轮又有新颜色，不能沿用旧答案。"
+        },
+        {
+          "say": "选错时还能重看画面，不扣星星。"
+        },
+        {
+          "say": "现在请你观察大图，开始新的三轮。"
+        },
+        {
+          "setState": {
+            "mode": "practice"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "问颜色和回答颜色",
+      "template": "picture-points",
+      "data": {
+        "title": "What colour?",
+        "picture": "umbrella-blue",
+        "points": [
+          "What colour?  什么颜色？",
+          "It's blue.  它是蓝色的。",
+          "指一个物品，再问再答。"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们面对这把蓝伞，来做一次问答。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "What colour?"
+        },
+        {
+          "say": "这句话是在问，眼前物品是什么颜色。"
+        },
+        {
+          "say": "不是在问名字，也不是问有多少。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "It's blue."
+        },
+        {
+          "say": "回答用It's，后面接真实的颜色词。"
+        },
+        {
+          "say": "因为这把伞是蓝色，所以说blue。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "换成黑伞，回答也要换成black。"
+        },
+        {
+          "say": "和家人练习时，先指明一个单色物品。"
+        },
+        {
+          "say": "一个人问颜色，另一个人看清再答。"
+        },
+        {
+          "say": "跟读和独立说话，需要家人继续观察。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "quiz",
+      "title": "小检查：灯笼的新颜色",
+      "intro": [
+        "现在换成新灯笼，听录音选图片。",
+        "每题只选一张，老师会读题。",
+        "检查的是这次图音选择。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "听：yellow。选对应的灯笼。",
+          "skill": "colour-listening",
+          "answer": [
+            "b"
+          ],
+          "analysis": "yellow表示黄色，黄色灯笼与录音相符。",
+          "options": {
+            "a": {
+              "label": "蓝色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-blue",
+                "alt": "蓝色灯笼"
+              }
+            },
+            "b": {
+              "label": "黄色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-yellow",
+                "alt": "黄色灯笼"
+              }
+            },
+            "c": {
+              "label": "红色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-red",
+                "alt": "红色灯笼"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "听：black。选对应的灯笼。",
+          "skill": "colour-listening",
+          "answer": [
+            "a"
+          ],
+          "analysis": "black表示黑色，不是white白色。",
+          "options": {
+            "a": {
+              "label": "黑色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-black",
+                "alt": "黑色灯笼"
+              }
+            },
+            "b": {
+              "label": "白色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-white",
+                "alt": "白色灯笼"
+              }
+            },
+            "c": {
+              "label": "绿色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-green",
+                "alt": "绿色灯笼"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "听：It's green. 选对应的灯笼。",
+          "skill": "colour-dialogue",
+          "answer": [
+            "c"
+          ],
+          "analysis": "It's green.是在说它是绿色的，选绿色灯笼。",
+          "options": {
+            "a": {
+              "label": "黄色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-yellow",
+                "alt": "黄色灯笼"
+              }
+            },
+            "b": {
+              "label": "蓝色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-blue",
+                "alt": "蓝色灯笼"
+              }
+            },
+            "c": {
+              "label": "绿色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-green",
+                "alt": "绿色灯笼"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "先前是red。Now it's white. 选现在。",
+          "skill": "now-current-colour",
+          "answer": [
+            "c"
+          ],
+          "analysis": "now说的是现在。现在是white白色，不能沿用先前的红色。",
+          "options": {
+            "a": {
+              "label": "红色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-red",
+                "alt": "红色灯笼"
+              }
+            },
+            "b": {
+              "label": "黑色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-black",
+                "alt": "黑色灯笼"
+              }
+            },
+            "c": {
+              "label": "白色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-white",
+                "alt": "白色灯笼"
+              }
+            }
+          }
+        },
+        {
+          "id": "q5",
+          "question": "听：It's blue. 选对应的灯笼。",
+          "skill": "colour-dialogue",
+          "answer": [
+            "b"
+          ],
+          "analysis": "It's blue.是在说它是蓝色的，选蓝色灯笼。",
+          "options": {
+            "a": {
+              "label": "绿色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-green",
+                "alt": "绿色灯笼"
+              }
+            },
+            "b": {
+              "label": "蓝色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-blue",
+                "alt": "蓝色灯笼"
+              }
+            },
+            "c": {
+              "label": "黄色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-yellow",
+                "alt": "黄色灯笼"
+              }
+            }
+          }
+        },
+        {
+          "id": "q6",
+          "question": "先前是green。Now it's red. 选现在。",
+          "skill": "now-current-colour",
+          "answer": [
+            "a"
+          ],
+          "analysis": "现在是red红色。green绿色是先前的颜色。",
+          "options": {
+            "a": {
+              "label": "红色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-red",
+                "alt": "红色灯笼"
+              }
+            },
+            "b": {
+              "label": "黄色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-yellow",
+                "alt": "黄色灯笼"
+              }
+            },
+            "c": {
+              "label": "绿色灯笼",
+              "visual": {
+                "kind": "asset",
+                "image": "lantern-green",
+                "alt": "绿色灯笼"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "把今天的颜色带回家",
+      "template": "summary",
+      "data": {
+        "title": "今天记住了什么",
+        "items": [
+          "六色：red · yellow · blue · green · black · white",
+          "问颜色：What colour?",
+          "答颜色：It's ...",
+          "now：看现在的颜色"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们用图片学习了六个颜色词。"
+        },
+        {
+          "say": "红黄蓝绿黑白，要和它们的声音对应。"
+        },
+        {
+          "say": "可以再指着雨伞，听一遍老师的示范。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "想问一个物品是什么颜色，就问颜色。"
+        },
+        {
+          "say": "What colour?"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "回答时先看清，再把颜色词接在后面。"
+        },
+        {
+          "say": "It's blue."
+        },
+        {
+          "say": "换一个颜色，回答也要跟着改变。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "now强调现在，要看最新的画面。"
+        },
+        {
+          "say": "和家人指一个单色物品，轮流问和答。"
+        },
+        {
+          "say": "课堂记录只写我们看到的这次选择。"
+        },
+        {
+          "say": "是否会独立说、发音准不准，待观察。"
+        }
+      ]
+    }
+  ]
+}

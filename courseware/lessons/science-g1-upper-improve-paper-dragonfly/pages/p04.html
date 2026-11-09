@@ -1,0 +1,21 @@
+<section class="flight-table" aria-label="两版纸蜻蜓试飞和观察记录">
+  <div class="flight-stage" id="test-lane" aria-label="两个纸蜻蜓的试飞路线">
+    <div class="flight-level" id="test-level"></div>
+    <div class="flight-floor"></div>
+    <div class="flight-piece previous"><img src="__IMG:rotor-old__" alt="前版纸蜻蜓"></div>
+    <div class="flight-piece improved"><img src="__IMG:rotor-new__" alt="改进版纸蜻蜓"></div>
+    <img id="test-path" class="flight-path hide" src="__IMG:motion-sway__" alt="改进版的弯曲飞行路线记录">
+    <img id="test-motion-frames" class="flight-frames hide" src="__IMG:motion-upright__" alt="">
+  </div>
+  <div class="flight-tools" id="test-tools">
+    <div id="test-prompt" class="flight-prompt" aria-live="polite"></div>
+    <button type="button" id="test-release" class="trial-command hide" aria-label="一起松手放落两件纸蜻蜓"><img src="__IMG:setup-same__" alt=""><span>一起松手</span></button>
+    <button type="button" id="test-watch" class="trial-replay hide" aria-label="再看一遍试飞">↻</button>
+    <div class="flight-choices" id="test-options">
+      <button type="button" id="test-a"><img src="__IMG:setup-high__" alt="一高一低放手"></button>
+      <button type="button" id="test-b"><img src="__IMG:setup-same__" alt="同高度一起放手"></button>
+    </div>
+    <button type="button" id="test-retry" class="trial-command hide" aria-label="重新加载试飞图片">↻</button>
+  </div>
+  <div class="flight-record" id="test-record" aria-label="眼前这次试飞的三项记录"><span></span><span></span><span></span></div>
+</section>

@@ -1,0 +1,15 @@
+
+#cv{background:#f0eddf}
+.spring-stage{height:100%;padding:22px;display:grid;grid-template-columns:896px 250px;gap:28px;background:#e7f0e7;border:2px solid #bbd1c2;border-radius:28px}
+#spring-view{position:relative;width:896px;height:504px;border-radius:22px;background:#faf3df}
+#spring-image{display:block;width:896px;height:504px;object-fit:contain;border-radius:22px}
+.spring-hit{position:absolute;width:112px;height:112px;border:4px solid #fffefa;border-radius:23px;background:#fffefa24;cursor:pointer;box-shadow:0 0 0 2px #2d574884}
+#spring-mountain{left:294px;top:46px}#spring-water{left:408px;top:338px}#spring-willow{left:64px;top:173px}#spring-peach{left:677px;top:148px}
+.spring-hit[data-state=ok]{border-color:#28674f;box-shadow:0 0 0 5px #f8e8aa;background:#fffefa35}
+.spring-hit[data-state=no]{border-color:#b44228}
+.spring-panel{display:flex;flex-direction:column;gap:30px;justify-content:center;align-items:center;background:#fffaf0;border-radius:22px}
+#spring-word{font:700 68px/1.3 "Kaiti SC","Songti SC",serif;color:#285c47;white-space:nowrap}
+#spring-close{width:208px;height:208px;border:6px solid #e8d8b5;border-radius:50%;background:#f1e6cf;overflow:hidden}
+#spring-close[data-show=true]{background-image:url('__IMG:landscape__');background-size:400% auto}
+#spring-retry{position:absolute;left:380px;top:160px;width:136px;height:136px;background:#fffcf0;color:#5c4827;border:4px solid #d8ba7f;border-radius:26px;font-size:88px;cursor:pointer}
+

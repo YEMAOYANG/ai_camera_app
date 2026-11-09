@@ -1,0 +1,1135 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "更多的家养动物：生活线索小书",
+  "description": "观察比较狗、鸡等家养动物的生活，归纳进食、运动、长大和下一代的共同特征，整理真实动物小书。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小科老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/avatars/teacher-2.png",
+      "color": "#57B05A",
+      "persona": "温和细心的科学女老师，带孩子从同一方面的真实生活线索归纳共同点，鼓励记录、比较、关爱和安全。"
+    }
+  },
+  "images": {
+    "station": {
+      "file": "assets/station.png"
+    },
+    "dog": {
+      "file": "assets/dog.png"
+    },
+    "hen": {
+      "file": "assets/hen.png"
+    },
+    "dog-eat": {
+      "file": "assets/dog-eat.png"
+    },
+    "dog-move": {
+      "file": "assets/dog-move.png"
+    },
+    "dog-family": {
+      "file": "assets/dog-family.png"
+    },
+    "hen-eat": {
+      "file": "assets/hen-eat.png"
+    },
+    "hen-move": {
+      "file": "assets/hen-move.png"
+    },
+    "hen-family": {
+      "file": "assets/hen-family.png"
+    },
+    "puppy": {
+      "file": "assets/puppy.png"
+    },
+    "chick": {
+      "file": "assets/chick.png"
+    },
+    "dog-grow": {
+      "file": "assets/dog-grow.png"
+    },
+    "hen-grow": {
+      "file": "assets/hen-grow.png"
+    },
+    "rooster-crow": {
+      "file": "assets/rooster-crow.png"
+    },
+    "cow-eat": {
+      "file": "assets/cow-eat.png"
+    },
+    "goose-move": {
+      "file": "assets/goose-move.png"
+    },
+    "goose-family": {
+      "file": "assets/goose-family.png"
+    },
+    "adult-watch": {
+      "file": "assets/adult-watch.png"
+    },
+    "chase": {
+      "file": "assets/chase.png"
+    },
+    "pull-wing": {
+      "file": "assets/pull-wing.png"
+    },
+    "wash": {
+      "file": "assets/wash.png"
+    },
+    "both-eat": {
+      "file": "assets/both-eat.png"
+    },
+    "goose-grow": {
+      "file": "assets/goose-grow.png"
+    },
+    "both-move": {
+      "file": "assets/both-move.png"
+    },
+    "cow-goose-motion-example": {
+      "file": "assets/cow-goose-motion-example.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "农场观察小书",
+      "template": "title-picture",
+      "data": {
+        "title": "农场观察小书",
+        "picture": "station",
+        "caption": "看生活，找共同点，留下真实发现"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "今天，我们带着一本空白小书来到观察角。"
+        },
+        {
+          "say": "狗和鸡长得不同，生活会有哪些共同点？"
+        },
+        {
+          "say": "先看它们在做什么，别急着猜结论。"
+        },
+        {
+          "say": "站在大人身旁，让动物自在活动。"
+        },
+        {
+          "say": "小满问：只要名字不一样，就没有共同点吗？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "不能这样想，名字不同也可以比较生活。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "我们要看进食、运动、长大和下一代。"
+        },
+        {
+          "say": "找到同一方面的线索，再把发现放进小书。"
+        },
+        {
+          "say": "图里没有看到的，先留成一个问题。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "slide",
+      "title": "外形不同，生活可比较",
+      "template": "two-columns",
+      "data": {
+        "title": "外形不同，生活可比较",
+        "left": {
+          "heading": "看狗",
+          "body": "外形有自己的特点"
+        },
+        "right": {
+          "heading": "再看鸡",
+          "body": "比较生活，要看同一方面"
+        },
+        "left_picture": "dog",
+        "right_picture": "hen"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这只狗有毛、四肢和尾，先记下看到的。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "外形是认识动物的一条线索。"
+        },
+        {
+          "say": "换只狗看，也要重新确认眼前样子。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这只鸡有嘴、翅和两只脚，外形不同。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "要找共同点，不能只问长得像不像。"
+        },
+        {
+          "say": "我们可以一起看它们是不是要吃食物。"
+        },
+        {
+          "say": "也可以比较怎样运动，怎样慢慢长大。"
+        },
+        {
+          "say": "先约定同一方面，才容易找到共同线索。"
+        },
+        {
+          "say": "看到一处不同，不代表所有方面都不同。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "interactive",
+      "page": "p03",
+      "widgetType": "game",
+      "title": "打开狗的生活相册",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#album-main"
+        },
+        {
+          "say": "相册里有四种生活线索，我们一张张打开。"
+        },
+        {
+          "say": "看图只能认识情境，不能代替长时间观察。"
+        },
+        {
+          "setState": {
+            "demo": "eat"
+          }
+        },
+        {
+          "highlight": "#album-eat"
+        },
+        {
+          "say": "狗把口靠近食盆，这张给出进食线索。"
+        },
+        {
+          "setState": {
+            "demo": "move"
+          }
+        },
+        {
+          "highlight": "#album-move"
+        },
+        {
+          "say": "腿的位置在变化，这张表示它在运动。"
+        },
+        {
+          "setState": {
+            "demo": "grow"
+          }
+        },
+        {
+          "highlight": "#album-grow"
+        },
+        {
+          "say": "幼犬和成犬并排，是长大的示意。"
+        },
+        {
+          "setState": {
+            "demo": "family"
+          }
+        },
+        {
+          "highlight": "#album-family"
+        },
+        {
+          "say": "成年犬带着幼犬，是有下一代的线索。"
+        },
+        {
+          "highlight": "#album-record"
+        },
+        {
+          "say": "每看过一种情境，就放进相册记录。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在自由打开四张图，看看各自说了什么。"
+        },
+        {
+          "say": "同一张看两次，不会变成两种不同线索。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "slide",
+      "title": "再看鸡的生活",
+      "template": "picture-points",
+      "data": {
+        "title": "再看鸡的生活",
+        "picture": "hen-family",
+        "points": [
+          "也要进食，也会运动",
+          "幼小个体会慢慢长大",
+          "也会有自己的下一代"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "换成鸡，也按刚才的四个方面看。"
+        },
+        {
+          "say": "小鸡和母鸡同框，是亲子生活的图景。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "鸡用嘴啄食，狗用嘴吃，都是在进食。"
+        },
+        {
+          "say": "鸡迈步，狗奔跑，方式不同也都在运动。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小鸡慢慢长成大鸡，这叫长大。"
+        },
+        {
+          "say": "不要把两只不同大小的动物，随便当成长大。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "长大与有下一代，是两件不同的事。"
+        },
+        {
+          "say": "有下一代，关注的是新的小生命。"
+        },
+        {
+          "say": "共同点要靠同一方面的资料来比较。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "page": "p05",
+      "widgetType": "game",
+      "title": "把两本相册对起来",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#match-source"
+        },
+        {
+          "say": "左边是鸡的生活照片，先看正在发生什么。"
+        },
+        {
+          "say": "右边四个格子，放着狗的生活线索。"
+        },
+        {
+          "setState": {
+            "demo": "eat"
+          }
+        },
+        {
+          "highlight": "#match-eat"
+        },
+        {
+          "say": "老师把鸡啄食，与狗进食放在同一格。"
+        },
+        {
+          "setState": {
+            "demo": "move"
+          }
+        },
+        {
+          "highlight": "#match-move"
+        },
+        {
+          "say": "狗跑、鸡走，方式不同，都是运动。"
+        },
+        {
+          "setState": {
+            "demo": "grow"
+          }
+        },
+        {
+          "highlight": "#match-grow"
+        },
+        {
+          "say": "长大的图要和长大的图对照，别和亲子混。"
+        },
+        {
+          "highlight": "#match-family"
+        },
+        {
+          "say": "成年动物带幼小个体，是下一代的线索。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在把鸡的四张照片，按同一方面配好。"
+        },
+        {
+          "say": "每一格都要有狗和鸡两边的线索。"
+        },
+        {
+          "say": "只看其中一边，就还没完成比较。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "quiz",
+      "title": "生活线索小检查",
+      "intro": [
+        "这次换成以前没放进相册的白鹅。",
+        "听问题，从新生活图里找证据。"
+      ],
+      "questions": [
+        {
+          "id": "da-q1",
+          "question": "哪张图显示成年鹅有了下一代？",
+          "skill": "有下一代的生活证据",
+          "answer": [
+            "A"
+          ],
+          "analysis": "成年鹅与幼小鹅相伴，是下一代的生活线索。",
+          "options": {
+            "A": {
+              "label": "成年鹅与幼小鹅相伴",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-family",
+                "alt": "成年鹅与幼小鹅相伴"
+              }
+            },
+            "B": {
+              "label": "奶牛低头吃草",
+              "visual": {
+                "kind": "asset",
+                "image": "cow-eat",
+                "alt": "奶牛低头吃草"
+              }
+            },
+            "C": {
+              "label": "白鹅在平地走",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-move",
+                "alt": "白鹅在平地走"
+              }
+            }
+          }
+        },
+        {
+          "id": "da-q2",
+          "question": "要记录白鹅怎样运动，选哪张图？",
+          "skill": "动物运动的生活证据",
+          "answer": [
+            "B"
+          ],
+          "analysis": "白鹅迈步走的图，直接提供运动的线索。",
+          "options": {
+            "A": {
+              "label": "奶牛吃草",
+              "visual": {
+                "kind": "asset",
+                "image": "cow-eat",
+                "alt": "奶牛吃草"
+              }
+            },
+            "B": {
+              "label": "白鹅迈步走",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-move",
+                "alt": "白鹅迈步走"
+              }
+            },
+            "C": {
+              "label": "成年鹅与幼小鹅安静相伴",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-family",
+                "alt": "成年鹅与幼小鹅安静相伴"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "共同点要有证据",
+      "template": "picture-points",
+      "data": {
+        "title": "共同点要有证据",
+        "picture": "station",
+        "points": [
+          "进食：需要吃食物",
+          "运动：方式可以不同",
+          "长大与下一代：分别找线索"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "把狗和鸡的资料放在一起，能找到共同点。"
+        },
+        {
+          "say": "身体不一样，也可以有共同的生活特征。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "狗吃、鸡啄，都是吃食物。"
+        },
+        {
+          "say": "不能因为食物不同，就说它们不需要进食。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "跑和走样子不同，都是运动。"
+        },
+        {
+          "say": "找共同点，不是把不同的样子抹掉。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "长大看幼小到成体，下一代看新的小生命。"
+        },
+        {
+          "say": "进食、运动、长大、有下一代，要分别找证据。"
+        },
+        {
+          "say": "再换动物比较，还要去看相应的生活资料。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "page": "p08",
+      "widgetType": "game",
+      "title": "把长大的故事排出来",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#grow-animal"
+        },
+        {
+          "say": "这一轮先看小狗，下一轮再看鸡。"
+        },
+        {
+          "say": "要排的是幼小到长大，不是亲子全家照。"
+        },
+        {
+          "highlight": "#grow-early"
+        },
+        {
+          "setState": {
+            "demo": "early"
+          }
+        },
+        {
+          "say": "老师先把幼小个体放在前面的相框。"
+        },
+        {
+          "say": "它后来会慢慢长大，前后都要是同一种动物。"
+        },
+        {
+          "highlight": "#grow-late"
+        },
+        {
+          "setState": {
+            "demo": "late"
+          }
+        },
+        {
+          "say": "成体放在后面的相框，身体比幼小时大。"
+        },
+        {
+          "highlight": "#grow-choices"
+        },
+        {
+          "say": "四张照片先分清动物，再分清幼小和成体。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在按前后顺序，把两轮成长示意排好。"
+        },
+        {
+          "say": "这是帮助思考的图示，不是亲自拍的时间记录。"
+        },
+        {
+          "say": "真想记录长大，要在不同时间继续观察。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "小书怎样留下发现",
+      "template": "picture-points",
+      "data": {
+        "title": "小书怎样留下发现",
+        "picture": "station",
+        "points": [
+          "先整理有依据的资料",
+          "按样子、食物、活动分好页",
+          "只画真实发现，不添加幻想"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "科学小书不比谁画得花哨，要比资料真实。"
+        },
+        {
+          "say": "选一种熟悉的动物，先看看有哪些资料。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "一张图里没看到的，可以继续找资料。"
+        },
+        {
+          "say": "不知道的地方，写成想知道的问题。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "样子页放身体，进食页放吃东西的线索。"
+        },
+        {
+          "say": "活动页放怎样运动，别让照片跑错地方。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再把看到的画下来，说给大人听。"
+        },
+        {
+          "say": "不能给普通动物随意添翅膀或魔法。"
+        },
+        {
+          "say": "书做得简单也没关系，有证据就能继续完善。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "page": "p10",
+      "widgetType": "game",
+      "title": "装订生活小书",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#book-animal"
+        },
+        {
+          "say": "先认准这本书的主人，只放它的照片。"
+        },
+        {
+          "say": "今天先做狗的小书，再做鸡的小书。"
+        },
+        {
+          "setState": {
+            "demo": "look"
+          }
+        },
+        {
+          "highlight": "#book-model"
+        },
+        {
+          "say": "左侧给出同一方面的例子，帮你分清页面。"
+        },
+        {
+          "say": "先用完整身体照片，做样子页。"
+        },
+        {
+          "setState": {
+            "demo": "eat"
+          }
+        },
+        {
+          "highlight": "#book-target"
+        },
+        {
+          "say": "翻到进食页，就放正在吃东西的照片。"
+        },
+        {
+          "setState": {
+            "demo": "move"
+          }
+        },
+        {
+          "highlight": "#book-record"
+        },
+        {
+          "say": "活动页留下运动资料，三页连起来成小书。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在选照片，点选或拖到书里的空白页。"
+        },
+        {
+          "say": "放错先看看主题，不用把长标签读出来。"
+        },
+        {
+          "say": "这只是整理照片，真实画图和介绍还要你完成。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "关心动物，也顾安全",
+      "template": "picture-points",
+      "data": {
+        "title": "关心动物，也顾安全",
+        "picture": "adult-watch",
+        "points": [
+          "成人陪同，保持距离观察",
+          "不追赶，不拉扯动物",
+          "接触之后，认真清洁双手"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "会关心动物，才是认真观察的小伙伴。"
+        },
+        {
+          "say": "不一定要自己饲养，也能看资料和观察。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "到不熟悉的地方，先请大人陪着。"
+        },
+        {
+          "say": "站稳在合适距离，给动物活动的空间。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "不追赶狗，不拉鸡的翅膀和尾羽。"
+        },
+        {
+          "say": "让动物按自己的方式活动，才容易看清。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "接触动物之后，记得把双手洗干净。"
+        },
+        {
+          "say": "不知道怎样照顾，就先请教身边大人。"
+        },
+        {
+          "say": "爱护和安全，也是观察活动的一部分。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "interactive",
+      "page": "p12",
+      "widgetType": "game",
+      "title": "换成温柔观察",
+      "startImage": "station",
+      "script": [
+        {
+          "highlight": "#care-scene"
+        },
+        {
+          "say": "先看这张动作图，孩子和动物发生了什么。"
+        },
+        {
+          "say": "追着动物跑，会打扰它原来的生活。"
+        },
+        {
+          "setState": {
+            "demo": "quiet"
+          }
+        },
+        {
+          "highlight": "#care-choice-quiet"
+        },
+        {
+          "say": "老师换成大人陪同，站在外面安静观察。"
+        },
+        {
+          "highlight": "#care-record"
+        },
+        {
+          "say": "这一种合适做法，留下作关爱记录。"
+        },
+        {
+          "setState": {
+            "demo": "wing"
+          }
+        },
+        {
+          "highlight": "#care-scene"
+        },
+        {
+          "say": "再看伸向鸡翅的手，也要停下来。"
+        },
+        {
+          "say": "翅膀和尾羽都是动物身体，不能拉来玩。"
+        },
+        {
+          "setState": {
+            "phase": "play"
+          }
+        },
+        {
+          "say": "现在选择合适做法，让大画面真正换一换。"
+        },
+        {
+          "say": "先看动作，别只凭画面的颜色选择。"
+        },
+        {
+          "say": "选对图片是方法练习，真实观察还要照做。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "quiz",
+      "title": "共同点与成长小检查",
+      "intro": [
+        "把两种动物放一起，找最贴合问题的图。",
+        "再换一种动物，分清长大和亲子相伴。"
+      ],
+      "questions": [
+        {
+          "id": "da-q3",
+          "question": "哪张图支持牛和鹅都需要吃食物？",
+          "skill": "归纳共同进食特征",
+          "answer": [
+            "C"
+          ],
+          "analysis": "牛在吃草、鹅在进食，同一方面都有线索，支持共同进食。",
+          "options": {
+            "A": {
+              "label": "公鸡抬头打鸣",
+              "visual": {
+                "kind": "asset",
+                "image": "rooster-crow",
+                "alt": "公鸡抬头打鸣"
+              }
+            },
+            "B": {
+              "label": "幼犬与成犬的成长示意",
+              "visual": {
+                "kind": "asset",
+                "image": "dog-grow",
+                "alt": "幼犬与成犬的成长示意"
+              }
+            },
+            "C": {
+              "label": "牛与鹅分别进食的比较图",
+              "visual": {
+                "kind": "asset",
+                "image": "both-eat",
+                "alt": "牛与鹅分别进食的比较图"
+              }
+            }
+          }
+        },
+        {
+          "id": "da-q4",
+          "question": "同学想记录鹅长大，哪张图合适？",
+          "skill": "区分长大与亲子同框",
+          "answer": [
+            "A"
+          ],
+          "analysis": "幼小鹅到成年鹅的示意表现长大，亲子相伴关注下一代。",
+          "options": {
+            "A": {
+              "label": "幼小鹅到成年鹅的成长示意",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-grow",
+                "alt": "幼小鹅到成年鹅的成长示意"
+              }
+            },
+            "B": {
+              "label": "成年鹅带着小鹅相伴",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-family",
+                "alt": "成年鹅带着小鹅相伴"
+              }
+            },
+            "C": {
+              "label": "白鹅在平地迈步走",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-move",
+                "alt": "白鹅在平地迈步走"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "slide",
+      "title": "换一种动物，怎样比较",
+      "template": "picture-points",
+      "data": {
+        "title": "换一种动物，怎样比较",
+        "picture": "cow-goose-motion-example",
+        "points": [
+          "先选运动这一方面",
+          "再看牛和鹅的运动图",
+          "说出共同点和不同点"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "换成牛和鹅，也用刚才的比较办法。"
+        },
+        {
+          "say": "左图是草地上的牛，右图是水里的鹅。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "想找共同点，要先约好比较什么。"
+        },
+        {
+          "say": "不能一边看吃食物，一边拿尾巴来比。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我们只比运动，两边都找运动的线索。"
+        },
+        {
+          "say": "牛在草地上跑，鹅在水里游。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "一个跑，一个游，运动方式不一样。"
+        },
+        {
+          "say": "可它们都在运动，这就是共同点。"
+        },
+        {
+          "say": "带着方法换动物，才是把观察本领用起来。"
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "type": "quiz",
+      "title": "新资料进小书",
+      "intro": [
+        "收到新资料了，按主题整理，再找共同线索。",
+        "这一题换成牛，另一题比较狗与鹅。"
+      ],
+      "questions": [
+        {
+          "id": "da-q5",
+          "question": "新做奶牛的进食页，应放哪张资料？",
+          "skill": "按生活主题整理小书资料",
+          "answer": [
+            "B"
+          ],
+          "analysis": "低头吃草的牛图，与奶牛进食页的主题一致。",
+          "options": {
+            "A": {
+              "label": "成年鹅与小鹅相伴",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-family",
+                "alt": "成年鹅与小鹅相伴"
+              }
+            },
+            "B": {
+              "label": "奶牛低头吃草",
+              "visual": {
+                "kind": "asset",
+                "image": "cow-eat",
+                "alt": "奶牛低头吃草"
+              }
+            },
+            "C": {
+              "label": "白鹅在平地走",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-move",
+                "alt": "白鹅在平地走"
+              }
+            }
+          }
+        },
+        {
+          "id": "da-q6",
+          "question": "哪张图支持狗和鹅都能运动？",
+          "skill": "迁移比较共同运动特征",
+          "answer": [
+            "C"
+          ],
+          "analysis": "狗跑、鹅走，方式不同，但两边都有运动线索。",
+          "options": {
+            "A": {
+              "label": "奶牛低头吃草",
+              "visual": {
+                "kind": "asset",
+                "image": "cow-eat",
+                "alt": "奶牛低头吃草"
+              }
+            },
+            "B": {
+              "label": "鹅家庭安静相伴",
+              "visual": {
+                "kind": "asset",
+                "image": "goose-family",
+                "alt": "鹅家庭安静相伴"
+              }
+            },
+            "C": {
+              "label": "狗小跑与白鹅迈步走的比较图",
+              "visual": {
+                "kind": "asset",
+                "image": "both-move",
+                "alt": "狗小跑与白鹅迈步走的比较图"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "type": "slide",
+      "title": "小书还要继续长",
+      "template": "summary",
+      "data": {
+        "title": "小书还要继续长",
+        "items": [
+          "看同一方面，再找共同点",
+          "进食、运动、长大、有下一代",
+          "用真实资料，做动物小书",
+          "关爱动物，继续观察和提问"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天先看狗和鸡，再把方法带到别的动物。"
+        },
+        {
+          "say": "比较先对准同一方面，不能只凭印象。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "家养动物有共同的生活特征。"
+        },
+        {
+          "say": "会吃食物、会运动、会长大，也有下一代。"
+        },
+        {
+          "say": "长大和下一代的线索，要分别说明。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "小书按样子、食物和活动，把资料放清楚。"
+        },
+        {
+          "say": "接下来一周，继续画画、补资料和介绍。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "真实画图和口述，请大人看看再记录。"
+        },
+        {
+          "say": "爱护动物、注意安全，带着新问题再观察。"
+        },
+        {
+          "say": "猫头鹰站长说：小书里的发现，还能继续长。",
+          "by": "owl"
+        }
+      ]
+    }
+  ]
+}

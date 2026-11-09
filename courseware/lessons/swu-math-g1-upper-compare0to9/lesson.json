@@ -1,0 +1,1046 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "比较",
+  "description": "西南大学版一年级数学上册。用一一对应的方法比较0—9的数量，学会读三个符号、数剩余与连续比较。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#417D77",
+      "persona": "带一年级学生看图、摆学具、配对后说清数量和比较符号。请成人观察口语和纸笔表现。"
+    }
+  },
+  "images": {
+    "chain-three-four-five": {
+      "file": "assets/chain-three-four-five.png"
+    },
+    "compare-zero-five": {
+      "file": "assets/compare-zero-five.png"
+    },
+    "compare-zero-zero": {
+      "file": "assets/compare-zero-zero.png"
+    },
+    "cover-art-station": {
+      "file": "assets/cover-art-station.png"
+    },
+    "order-five-three": {
+      "file": "assets/order-five-three.png"
+    },
+    "order-three-five": {
+      "file": "assets/order-three-five.png"
+    },
+    "paired-three": {
+      "file": "assets/paired-three.png"
+    },
+    "quiz-build-a": {
+      "file": "assets/quiz-build-a.png"
+    },
+    "quiz-build-b": {
+      "file": "assets/quiz-build-b.png"
+    },
+    "quiz-build-c": {
+      "file": "assets/quiz-build-c.png"
+    },
+    "quiz-build-reference": {
+      "file": "assets/quiz-build-reference.png"
+    },
+    "quiz-chain-a": {
+      "file": "assets/quiz-chain-a.png"
+    },
+    "quiz-chain-b": {
+      "file": "assets/quiz-chain-b.png"
+    },
+    "quiz-chain-c": {
+      "file": "assets/quiz-chain-c.png"
+    },
+    "quiz-chain-reference": {
+      "file": "assets/quiz-chain-reference.png"
+    },
+    "quiz-extras-a": {
+      "file": "assets/quiz-extras-a.png"
+    },
+    "quiz-extras-b": {
+      "file": "assets/quiz-extras-b.png"
+    },
+    "quiz-extras-c": {
+      "file": "assets/quiz-extras-c.png"
+    },
+    "quiz-extras-reference": {
+      "file": "assets/quiz-extras-reference.png"
+    },
+    "quiz-match-a": {
+      "file": "assets/quiz-match-a.png"
+    },
+    "quiz-match-b": {
+      "file": "assets/quiz-match-b.png"
+    },
+    "quiz-match-c": {
+      "file": "assets/quiz-match-c.png"
+    },
+    "quiz-match-reference": {
+      "file": "assets/quiz-match-reference.png"
+    },
+    "quiz-relation-reference": {
+      "file": "assets/quiz-relation-reference.png"
+    },
+    "quiz-zero-a": {
+      "file": "assets/quiz-zero-a.png"
+    },
+    "quiz-zero-b": {
+      "file": "assets/quiz-zero-b.png"
+    },
+    "quiz-zero-c": {
+      "file": "assets/quiz-zero-c.png"
+    },
+    "sign-equal": {
+      "file": "assets/sign-equal.png"
+    },
+    "sign-greater": {
+      "file": "assets/sign-greater.png"
+    },
+    "sign-grid-equal": {
+      "file": "assets/sign-grid-equal.png"
+    },
+    "sign-grid-greater": {
+      "file": "assets/sign-grid-greater.png"
+    },
+    "sign-grid-less": {
+      "file": "assets/sign-grid-less.png"
+    },
+    "sign-grid": {
+      "file": "assets/sign-grid.png"
+    },
+    "sign-less": {
+      "file": "assets/sign-less.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "先看看这两组",
+      "template": "two-columns",
+      "data": {
+        "title": "先看看这两组",
+        "left": {
+          "heading": "美术角",
+          "body": "整理桌上的学具"
+        },
+        "right": {
+          "heading": "一个对一个",
+          "body": "两排都没有剩下"
+        },
+        "left_picture": "cover-art-station",
+        "right_picture": "paired-three"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "小朋友们，美术角要开始整理啦！先看看这两组东西。"
+        },
+        {
+          "say": "今天我们帮美术角整理两组学具。"
+        },
+        {
+          "say": "先看清楚，要比的是每组有多少片。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "上面是圆片，下面是方片。"
+        },
+        {
+          "say": "从上面拿一片，也从下面拿一片。"
+        },
+        {
+          "say": "两片用一根线连起来，就成了一对。"
+        },
+        {
+          "say": "每片只用一次，再去找下一对。"
+        },
+        {
+          "say": "三对都配完啦，两边都没有剩下。"
+        },
+        {
+          "say": "两边都没有剩下，说明两组同样多。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "配一配找同样多",
+      "page": "p02",
+      "widgetType": "game",
+      "startImage": "cover-art-station",
+      "script": [
+        {
+          "setState": {
+            "demo": "trays"
+          }
+        },
+        {
+          "say": "先看上面的托盘，里面有三个圆片。"
+        },
+        {
+          "say": "下面有三盘方片。我们先看中间那盘。"
+        },
+        {
+          "setState": {
+            "demo": "paired"
+          }
+        },
+        {
+          "say": "一个圆片对一个方片，按顺序配。"
+        },
+        {
+          "say": "连接线把圆片和方片一个对一个连好。"
+        },
+        {
+          "say": "两边都没有剩下，所以它们同样多。"
+        },
+        {
+          "setState": {
+            "demo": "relation"
+          }
+        },
+        {
+          "say": "三和三同样多，中间放等号。"
+        },
+        {
+          "say": "从左往右读，三等于三。"
+        },
+        {
+          "setState": {
+            "demo": "practice"
+          }
+        },
+        {
+          "say": "现在换成新托盘，轮到你了。"
+        },
+        {
+          "say": "选一盘同样多的，再看看两组配得满不满。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "换位置，换符号",
+      "template": "two-columns",
+      "data": {
+        "title": "换位置，换符号",
+        "left": {
+          "heading": "先读五",
+          "body": "五大于三"
+        },
+        "right": {
+          "heading": "先读三",
+          "body": "三小于五"
+        },
+        "left_picture": "order-five-three",
+        "right_picture": "order-three-five"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "今天学一个新本领，换位置，换符号。"
+        },
+        {
+          "say": "上面五个圆片，下面三个方片。"
+        },
+        {
+          "say": "配了三对，上面还剩两个圆片。"
+        },
+        {
+          "say": "从左边开始读，我们读作五大于三。"
+        },
+        {
+          "say": "大于号的宽口朝左边的五。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "把三放左边，把五放右边。"
+        },
+        {
+          "say": "两组的数量没变，还是五比三多。"
+        },
+        {
+          "say": "这次从三开始读，三小于五。"
+        },
+        {
+          "say": "宽口还朝五，所以它现在朝右。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把开口朝向大数",
+      "page": "p04",
+      "widgetType": "game",
+      "startImage": "cover-art-station",
+      "script": [
+        {
+          "setState": {
+            "demo": "trays"
+          }
+        },
+        {
+          "say": "先看两边，左边有六片，右边有两片。"
+        },
+        {
+          "say": "配过以后左边还有剩，左边多。"
+        },
+        {
+          "highlight": "#sign-choices"
+        },
+        {
+          "say": "从三个符号里挑宽口在左边的。"
+        },
+        {
+          "say": "这个符号叫大于号。"
+        },
+        {
+          "setState": {
+            "demo": "symbol"
+          }
+        },
+        {
+          "say": "放在中间以后，看看宽口朝哪边。"
+        },
+        {
+          "say": "宽口朝较大的六，尖端朝较小的二。"
+        },
+        {
+          "say": "从左往右读，六大于二。"
+        },
+        {
+          "setState": {
+            "demo": "practice"
+          }
+        },
+        {
+          "say": "现在换一组，你来选符号。"
+        },
+        {
+          "say": "选好以后，用宽口和尖端再检查一遍。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "田字格里的三个符号",
+      "template": "picture-points",
+      "data": {
+        "title": "田字格里的三个符号",
+        "picture": "sign-grid",
+        "points": [
+          "等号：两横一样长",
+          "大于号：开口向左",
+          "小于号：开口向右"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们一起看田字格里的三个符号。"
+        },
+        {
+          "say": "它们都写在田字格的左半边。"
+        },
+        {
+          "say": "第一位叫等号。它有两条横线。"
+        },
+        {
+          "say": "上面一条，下面一条，两条一样长。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "接下来认识大于号。它的开口在左边。"
+        },
+        {
+          "say": "两条斜线在右边接成一个尖角。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "小于号的方向反过来，开口在右边。"
+        },
+        {
+          "say": "它的两条斜线在左边接成尖角。"
+        },
+        {
+          "say": "可以照着田字格里的样子写一写。"
+        },
+        {
+          "say": "写好后请大人看看开口和尖角朝哪边。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "配好，再数剩下的",
+      "page": "p06",
+      "widgetType": "game",
+      "startImage": "cover-art-station",
+      "script": [
+        {
+          "setState": {
+            "demo": "trays"
+          }
+        },
+        {
+          "say": "上面有七个圆片，下面有五个方片。"
+        },
+        {
+          "say": "一个圆片配一个方片，配过的就连起来。"
+        },
+        {
+          "setState": {
+            "demo": "pairs"
+          }
+        },
+        {
+          "say": "先配好的有五对，不把这五对再数进去。"
+        },
+        {
+          "say": "要知道多几个，数没有配上的。"
+        },
+        {
+          "setState": {
+            "demo": "extras"
+          }
+        },
+        {
+          "say": "看看橙框里的圆片，一、二，一共两片。"
+        },
+        {
+          "say": "所以七比五多二。"
+        },
+        {
+          "say": "反过来说，五比七少二。"
+        },
+        {
+          "setState": {
+            "demo": "practice"
+          }
+        },
+        {
+          "say": "接下来是两排新的筹码。"
+        },
+        {
+          "say": "你来找没有配上的筹码，再选剩下几个。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "空托盘也能比较",
+      "template": "two-columns",
+      "data": {
+        "title": "空托盘也能比较",
+        "left": {
+          "heading": "空盘和有东西的盘",
+          "body": "零小于五"
+        },
+        "right": {
+          "heading": "两个空盘",
+          "body": "零等于零"
+        },
+        "left_picture": "compare-zero-five",
+        "right_picture": "compare-zero-zero"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先看左边这个托盘，里面一件也没有。"
+        },
+        {
+          "say": "空盘表示没有，我们用数字零来表示。"
+        },
+        {
+          "say": "旁边那盘有方片，一、二、三、四、五。"
+        },
+        {
+          "say": "五件比一件也没有多。"
+        },
+        {
+          "say": "从左边读，零小于五。"
+        },
+        {
+          "say": "宽口朝右边的五，尖端朝左边的零。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "如果两边都换成空托盘呢？"
+        },
+        {
+          "say": "左边是零，右边也是零。"
+        },
+        {
+          "say": "两边都没有物件，它们一样多。"
+        },
+        {
+          "say": "我们用等号，从左往右读零等于零。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "interactive",
+      "title": "按要求放好一组",
+      "page": "p08",
+      "widgetType": "game",
+      "startImage": "cover-art-station",
+      "script": [
+        {
+          "setState": {
+            "demo": "trays"
+          }
+        },
+        {
+          "say": "先听要求。请把下面摆得和上面同样多。"
+        },
+        {
+          "say": "上面有四个圆片，下面先摆三个方片。"
+        },
+        {
+          "setState": {
+            "demo": "pairs"
+          }
+        },
+        {
+          "say": "一个一个连起来，上面还有一片没配上。"
+        },
+        {
+          "say": "想要同样多，就给下面再放一片。"
+        },
+        {
+          "setState": {
+            "demo": "built"
+          }
+        },
+        {
+          "say": "现在正好配成四对，两边都没有剩。"
+        },
+        {
+          "say": "这样摆，下面就和上面同样多了。"
+        },
+        {
+          "setState": {
+            "demo": "practice"
+          }
+        },
+        {
+          "say": "换你来摆，这次要让下面比上面少。"
+        },
+        {
+          "say": "挑一盘放进去，再用连线检查有没有剩。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "三个数接着比",
+      "template": "picture-points",
+      "data": {
+        "title": "三个数接着比",
+        "picture": "chain-three-four-five",
+        "points": [
+          "先比三和四",
+          "再比四和五",
+          "最后比三和五",
+          "按两端补中间"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "我们会比较两个数了，现在接着比三个。"
+        },
+        {
+          "say": "左边三片，中间四片，一一配后中间余一片。"
+        },
+        {
+          "say": "所以三小于四。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "中间四片，右边五片，配完右边余一片。"
+        },
+        {
+          "say": "所以四小于五。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "三比四小，四又比五小，所以三比五小。"
+        },
+        {
+          "say": "我们直接比最左三片和最右五片。"
+        },
+        {
+          "say": "配完右边剩两片，核对了三小于五。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "如果三和五中间缺了一张卡，试试放四。"
+        },
+        {
+          "say": "三小于四，四小于五，两边都合适。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "找同样多",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-match",
+          "skill": "match_sets",
+          "question": "看上面的圆片，哪一盘方片和它同样多？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "上面有六个圆片。中间有六个方片，刚好能配成六对，两边都不剩。另两盘有四片和七片。",
+          "options": {
+            "A": {
+              "label": "托盘内有四个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-match-a",
+                "alt": "托盘内有四个方片"
+              }
+            },
+            "B": {
+              "label": "托盘内有六个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-match-b",
+                "alt": "托盘内有六个方片"
+              }
+            },
+            "C": {
+              "label": "托盘内有七个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-match-c",
+                "alt": "托盘内有七个方片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-match-reference",
+            "alt": "托盘内有六个圆片"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "选符号",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-sign",
+          "skill": "read_relations",
+          "question": "看四和八，选哪个符号放进中间，才能读出正确的比较？",
+          "answer": [
+            "A"
+          ],
+          "analysis": "四个圆片能和八个方片配成四对，方片还剩四个。四比八小，选开口朝右的小于号。",
+          "options": {
+            "A": {
+              "label": "小于号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-less",
+                "alt": "小于号"
+              }
+            },
+            "B": {
+              "label": "等号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-equal",
+                "alt": "等号"
+              }
+            },
+            "C": {
+              "label": "大于号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-greater",
+                "alt": "大于号"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-relation-reference",
+            "alt": "上排四个圆片，下排八个方片，比较式左边四，右边八"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "认符号",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-grid",
+          "skill": "sign_shapes",
+          "question": "听老师读，大于号。哪张田字格里是大于号？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "中间的符号开口朝左，尖端朝右，是大于号。左边开口朝右，右边是两条横线。",
+          "options": {
+            "A": {
+              "label": "田字格内是小于号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-grid-less",
+                "alt": "田字格内是小于号"
+              }
+            },
+            "B": {
+              "label": "田字格内是大于号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-grid-greater",
+                "alt": "田字格内是大于号"
+              }
+            },
+            "C": {
+              "label": "田字格内是等号",
+              "visual": {
+                "kind": "asset",
+                "image": "sign-grid-equal",
+                "alt": "田字格内是等号"
+              }
+            }
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p13",
+      "type": "quiz",
+      "title": "数剩余",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-extras",
+          "skill": "count_extras",
+          "question": "看图配对，还有几个圆片没配上？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "上排五个圆片，下排四个方片。四条连线各用一个圆片和一个方片，还剩一个圆片。",
+          "options": {
+            "A": {
+              "label": "托盘里有两个圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-extras-a",
+                "alt": "托盘里有两个圆片"
+              }
+            },
+            "B": {
+              "label": "托盘里有三个圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-extras-b",
+                "alt": "托盘里有三个圆片"
+              }
+            },
+            "C": {
+              "label": "托盘里有一个圆片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-extras-c",
+                "alt": "托盘里有一个圆片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-extras-reference",
+            "alt": "上排五个圆片，下排四个方片，前四对相连"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p14",
+      "type": "quiz",
+      "title": "比零",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-zero",
+          "skill": "compare_zero",
+          "question": "听老师读，七大于零。哪幅图表示七大于零？",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右边那张图左盘有七片，右盘是空的，也就是零。从左往右读，就是七大于零。",
+          "options": {
+            "A": {
+              "label": "左盘空，右盘七片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-zero-a",
+                "alt": "左盘空，右盘七片"
+              }
+            },
+            "B": {
+              "label": "两个托盘都是空的",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-zero-b",
+                "alt": "两个托盘都是空的"
+              }
+            },
+            "C": {
+              "label": "左盘七片，右盘空",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-zero-c",
+                "alt": "左盘七片，右盘空"
+              }
+            }
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p15",
+      "type": "quiz",
+      "title": "按要求选",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-build",
+          "skill": "choose_amount",
+          "question": "哪盘方片比上面的圆片多？选出来。",
+          "answer": [
+            "A"
+          ],
+          "analysis": "上面有六个圆片。左边的盘有八个方片，配完还有两个方片。中间的盘刚好配完，右边的盘方片更少。",
+          "options": {
+            "A": {
+              "label": "托盘内有八个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-build-a",
+                "alt": "托盘内有八个方片"
+              }
+            },
+            "B": {
+              "label": "托盘内有六个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-build-b",
+                "alt": "托盘内有六个方片"
+              }
+            },
+            "C": {
+              "label": "托盘内有四个方片",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-build-c",
+                "alt": "托盘内有四个方片"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-build-reference",
+            "alt": "托盘内有六个圆片"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p16",
+      "type": "quiz",
+      "title": "补中间数",
+      "intro": [
+        "听老师读题，再选一幅图。"
+      ],
+      "questions": [
+        {
+          "id": "q-chain",
+          "skill": "chain_comparison",
+          "question": "中间的数量要比八少，比六多。选哪张卡放进去？",
+          "answer": [
+            "B"
+          ],
+          "analysis": "七比八小，也比六大，所以八大于七，七大于六。六和八各有一边相等，不能放进去。",
+          "options": {
+            "A": {
+              "label": "有六个圆片的数量卡",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-chain-a",
+                "alt": "有六个圆片的数量卡"
+              }
+            },
+            "B": {
+              "label": "有七个圆片的数量卡",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-chain-b",
+                "alt": "有七个圆片的数量卡"
+              }
+            },
+            "C": {
+              "label": "有八个圆片的数量卡",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-chain-c",
+                "alt": "有八个圆片的数量卡"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-chain-reference",
+            "alt": "左卡八个，右卡六个，两个大于号之间留一张空卡"
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p17",
+      "type": "slide",
+      "title": "今天怎样比",
+      "template": "summary",
+      "data": {
+        "title": "今天怎样比",
+        "items": [
+          "一一配对，看看有没有剩",
+          "从左读，宽口朝大数",
+          "数没配上的，空盘记作零",
+          "按要求摆，三个数接着比",
+          "回家用学具比一比"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们当小老师，说说怎么比。"
+        },
+        {
+          "say": "从两组各拿一个配起来，每件只用一次。"
+        },
+        {
+          "say": "两边都没有剩下，就是同样多。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "同样多用两条等长横线，也就是等号。"
+        },
+        {
+          "say": "不一样多时，宽口朝大数，尖端朝小数。"
+        },
+        {
+          "say": "交换位置就重新从左边读。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "配好以后，数剩下的就知道多几个。"
+        },
+        {
+          "say": "托盘没有东西，数量记作零。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "按要求摆好后，用配对检查。"
+        },
+        {
+          "say": "有三个数就先比左边两个，再比右边两个。"
+        },
+        {
+          "say": "两个方向一样时，还可以直接比首尾核对。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "回家和大人用积木或小碗试一试。"
+        },
+        {
+          "say": "照田字格写三个符号，也请大人帮忙看看。"
+        }
+      ]
+    }
+  ]
+}

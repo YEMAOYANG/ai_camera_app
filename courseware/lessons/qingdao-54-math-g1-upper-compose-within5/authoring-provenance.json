@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "mira.courseware.authoring-provenance.v1",
+  "native": {
+    "inputSha256": "bd7568ebe3957aeea9a807758a4fe9788dec20c5ee850d62da3a7d64ae0b2870",
+    "modelPolicyId": "deepseek-v4-pro-current-flash-v1",
+    "providerId": "deepseek",
+    "modelId": "deepseek-v4-pro",
+    "jobId": "zC-BV6PGuH",
+    "classroomId": "Yvo2R_29li",
+    "status": "succeeded",
+    "classroomSha256": "881f4e37c4776ace2fe6252cb4333d59932ff6fd08ca4f6b929289f6ae918774",
+    "rawDraft": "output/courseware-lessons/qingdao-54-math-g1-upper-compose-within5/native-authoring-v1/classroom.json",
+    "scenes": [
+      {
+        "scene": "p01",
+        "nativeSceneId": "scene_eyDkNsaZAP",
+        "nativeSceneTitle": "种子分装台",
+        "verbatimNativeLinesRetained": [
+          "小朋友们，今天我们来到种子分装台。",
+          "看，这里有五粒种子，要分到两个袋子里。",
+          "左边这个袋子，我们放一粒种子。",
+          "右边这个袋子，我们放四粒种子。",
+          "左边是一，右边是四。",
+          "把两袋合起来，还是原来那五粒种子。"
+        ],
+        "finalTeacherSpeechLines": 10
+      },
+      {
+        "scene": "p02",
+        "nativeSceneId": "scene_3F4ZfrrzN3",
+        "nativeSceneTitle": "每次移一粒",
+        "verbatimNativeLinesRetained": [
+          "大家好，我们继续来看五粒种子怎么分。",
+          "现在左边有一粒，右边有四粒。",
+          "请把右边的种子，轻轻移一粒到左边。",
+          "看一看，现在左边两粒，右边三粒。",
+          "最后是左边四粒，右边一粒。"
+        ],
+        "finalTeacherSpeechLines": 13
+      },
+      {
+        "scene": "p03",
+        "nativeSceneId": "scene_SNk6yVpgii",
+        "nativeSceneTitle": "同一组能分也能合",
+        "verbatimNativeLinesRetained": [],
+        "finalTeacherSpeechLines": 10
+      },
+      {
+        "scene": "p04",
+        "nativeSceneId": "scene_1u9mQqsqwD",
+        "nativeSceneTitle": "四枚圆贴的三种分法",
+        "verbatimNativeLinesRetained": [
+          "小朋友，今天我们一起玩一个分贴纸的游戏。",
+          "请你把四枚圆贴放进两个托盘里。"
+        ],
+        "finalTeacherSpeechLines": 11
+      },
+      {
+        "scene": "p05",
+        "nativeSceneId": "scene_4cnfxk0uuP",
+        "nativeSceneTitle": "三和二也能分合",
+        "verbatimNativeLinesRetained": [
+          "先看看三的分与合。",
+          "顶端是三，它是整体。",
+          "再来看看二的分与合。"
+        ],
+        "finalTeacherSpeechLines": 10
+      },
+      {
+        "scene": "p06",
+        "nativeSceneId": "scene_oHcFqUuSxz",
+        "nativeSceneTitle": "找出盖住的一组",
+        "verbatimNativeLinesRetained": [
+          "先找第一个例子，总数是二，看得见一个。"
+        ],
+        "finalTeacherSpeechLines": 12
+      },
+      {
+        "scene": "p07",
+        "nativeSceneId": "scene_7-RBYHqQuZ",
+        "nativeSceneTitle": "分和合小检查",
+        "verbatimNativeLinesRetained": [],
+        "finalTeacherSpeechLines": 0
+      },
+      {
+        "scene": "p08",
+        "nativeSceneId": "scene_HrI26fsL4J",
+        "nativeSceneTitle": "带着分合去生活里",
+        "verbatimNativeLinesRetained": [],
+        "finalTeacherSpeechLines": 10
+      }
+    ]
+  },
+  "adaptation": {
+    "authorModel": "gpt-6.1-sol",
+    "savedAt": "2026-11-05T23:07:14.208812+00:00",
+    "lessonSha256": "651d9ddc46bc44686d8983e0e7f8c9ade8eb2b721898c0862ca280c067d8bd89",
+    "changes": [
+      "保留原八页结构、情境和适用的老师话，适配公共课件框架和动作。",
+      "补上五的顺序完整示范、四的全部组合、三的反向分法、二的分合和遮盖推理。",
+      "原六道题均涉及超出五的数量或加减，全部按本课范围重新写，原模型题保留于私有读回草稿。",
+      "图像由 Codex 内置工具制作，计数和题图由确定性源码绘制。",
+      "根据首轮独立复核，在总结示范按夹子颜色分组，明确一枚、两枚及总数三枚；互动揭晓切换为真实开盖图，奖励移到计数区外。"
+    ],
+    "priorLessonSha256": "d1607be77e8f4f1a371c1706324035e78ae7aa5e6c30632073aab503edc7196b",
+    "independentReviewRevisionAt": "2026-11-06T00:52:14.015060+00:00"
+  }
+}

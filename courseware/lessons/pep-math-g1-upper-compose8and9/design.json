@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "mira.courseware.design.v1",
+  "lesson": "8、9的组成",
+  "frame": {
+    "slides": [
+      1000,
+      562.5
+    ],
+    "interactive": [
+      1280,
+      720
+    ],
+    "kit": "courseware/kit"
+  },
+  "visual": {
+    "palette": [
+      "#fff9ef",
+      "#e49a62",
+      "#72a9b5",
+      "#86a179"
+    ],
+    "semanticPictures": [
+      "studio",
+      "bead"
+    ],
+    "knowledgeDiagrams": [
+      "重复单位的数量点",
+      "分合分支线",
+      "有向数对表",
+      {
+        "key": "q5-relation",
+        "file": "assets/q5-relation.png",
+        "kind": "deterministic-part-whole-diagram",
+        "size": [
+          1000,
+          600
+        ],
+        "parts": [
+          1,
+          8
+        ],
+        "whole": "?",
+        "orientation": "whole-right",
+        "sha256": "11f6942bf872c1b92a2d8d19c9c55100182cd36fffda929abbf3330bcd97146e",
+        "note": "数量点和分支线本身是数学知识，不是情境插画；两条分支直接连接整体与两个部分。"
+      }
+    ],
+    "lowReading": "每个部分都有可数的相同物品；总数数字是被教对象；教师预录音说明题意。移位、添1、图向的空间关系直接可见，遮住非目标汉字仍能操作。"
+  },
+  "pages": [
+    {
+      "key": "p02",
+      "mechanism": "有序移动分隔处，一片从右边转入左边并保存7种分法",
+      "stateKeys": [
+        "demoLeft",
+        "play"
+      ],
+      "teacherTargets": [
+        "#strip",
+        "#left-count",
+        "#right-count",
+        "#records"
+      ],
+      "completion": "保存1和7至7和1的7种分法",
+      "reset": "复位为一和七；清空记录与星星"
+    },
+    {
+      "key": "p04",
+      "mechanism": "选择数量组互换后的图卡，实物组真实换位",
+      "stateKeys": [
+        "demo",
+        "play"
+      ],
+      "teacherTargets": [
+        "#source-pair",
+        "#flip-options",
+        "#whole-total"
+      ],
+      "completion": "4关交换配对",
+      "reset": "回到首关，重新打乱选项"
+    },
+    {
+      "key": "p07",
+      "mechanism": "新增一枚单位拖入一侧，已知部分保持，整体从8到9",
+      "stateKeys": [
+        "demo",
+        "demoPlaced",
+        "play"
+      ],
+      "teacherTargets": [
+        "#extra-bead",
+        "#tray-left",
+        "#tray-right",
+        "#goal-part"
+      ],
+      "completion": "3关只添一片且满足目标部分",
+      "reset": "额外单位返回中央；两部分恢复8的初态"
+    },
+    {
+      "key": "p09",
+      "mechanism": "分合图旋转，数量卡补缺失整体或部分",
+      "stateKeys": [
+        "demo",
+        "play",
+        "demoWhole",
+        "demoWholeSolved",
+        "demoOrderStart",
+        "demoOrderNext"
+      ],
+      "teacherTargets": [
+        "#relation",
+        "#missing-slot",
+        "#quantity-options",
+        "#node-a",
+        "#node-b"
+      ],
+      "completion": "4个不同朝向和缺失位置",
+      "reset": "图向、关卡、错误提示和星星复位",
+      "teacherWorkedExample": "在右向整体8的图上先显示1和7，再显示2和6，强调一边多1另一边少1；回到部分2缺6完成求解。再示范下方整体问号、部分3和6，用2和6为8左添1解释整体9。"
+    }
+  ],
+  "teacherHandoff": "每页先教师真实示范并解释为什么，再用显式 setState.play=true 交给孩子；示范态不使用定时器自行解锁。",
+  "feedback": "首次错误不给答案、不扣分；后续提示先区分总数与部分、再指出未变部分；第三次可展示一步示范。",
+  "acceptance": "静态结构与语法通过不等于G6。正式图片、音频到位后须三尺寸脚本检查、随机通关与重玩复位、每个互动四状态截图及独立核对。",
+  "coverage": "同一教材课目全部官方lesson_1整合为一个课件。",
+  "reviewRemediation": {
+    "independentModel": "gpt-6.1-terra",
+    "teachingGaps": [
+      "九的有序逐次搬动缺示范",
+      "缺失整体没有完整示范求解",
+      "不同图向与生活问题未具体运用分合关系"
+    ],
+    "changes": [
+      "p08逐一搬动列全九的8种分法",
+      "p09新增缺失整体的方向变化及添1推理解题状态",
+      "p11明确用交换关系找生活场景缺失部分",
+      "第二轮按缺口补入p09可见的有序迁移状态和p11生活题有序求缺数"
+    ],
+    "priorReceipt": "output/courseware-lessons/pep-math-g1-upper-compose8and9/work-v1/independent-review/pending-review.json",
+    "secondReceipt": "output/courseware-lessons/pep-math-g1-upper-compose8and9/work-v1/independent-review/pending-review-v2.json"
+  }
+}

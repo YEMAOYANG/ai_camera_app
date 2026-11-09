@@ -1,0 +1,24 @@
+
+.count-head{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;color:#1d5d63}
+.count-head h2{font-size:35px;margin:0}
+.count-head span{font-size:27px;font-weight:700}
+.count-controls{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:22px}
+.count-panel{border:3px solid #a9c7be;border-radius:25px;background:#fffdf5}
+.count-art{object-fit:contain;mix-blend-mode:multiply;pointer-events:none}
+.count-action{display:grid;place-items:center;background:#fffdf5;border:3px solid #aac6bb;border-radius:17px;padding:4px;cursor:pointer;font:inherit;color:#245d64}
+.count-action:disabled{cursor:default}
+.count-action.chosen{outline:4px solid #2d7e7e}
+.count-action.wrong,.count-panel.wrong{border-color:#cd6339}
+.count-empty{width:74px;height:74px;border:2px dashed #bbd1c7;border-radius:15px}
+.count-missing{outline:4px solid #b44e31}
+
+#count-main{position:relative;height:400px}
+#count-board{position:absolute;left:42px;top:23px;width:1148px;height:268px;display:grid;align-content:center;justify-content:center;gap:20px}
+.count-strip{display:grid;grid-template-columns:repeat(10,80px);gap:14px}
+.count-strip .count-empty,.count-strip img{width:80px;height:80px}
+.count-strip img.paired{border:3px solid #8ac0ad;border-radius:14px;background:#eef8ee}
+.count-strip img.unpaired{border:4px solid #e19a49;border-radius:14px;background:#fff1d7}
+.count-adjust{position:absolute;left:0;right:0;top:321px;display:flex;justify-content:center;gap:24px}
+.count-adjust button{min-width:110px}
+
+.count-icon{width:25px;height:25px;flex:0 0 25px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}

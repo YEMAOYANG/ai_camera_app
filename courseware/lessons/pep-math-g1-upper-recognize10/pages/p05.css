@@ -1,0 +1,15 @@
+#cv{background:#f7eed9}
+[hidden]{display:none!important}
+.p05-panel{position:absolute;left:46px;right:46px;top:80px;height:380px;border:4px solid #9ab298;border-radius:26px;background:#fafbef}
+.p05-arrow{position:absolute;top:22px;width:144px;height:80px;text-align:center;font-size:75px;line-height:70px;font-weight:800;color:#42745d}
+.p05-left{left:26px}.p05-right{right:26px}
+.p05-pots{position:absolute;left:26px;right:26px;top:117px;display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.p05-pot{width:100%;height:113px;border:3px solid #cfb898;background:#fff7e4;border-radius:17px;display:grid;place-items:center;cursor:pointer}
+.p05-pot:disabled{opacity:1;cursor:default}
+.p05-pot img{width:96px;height:96px;object-fit:contain;mix-blend-mode:multiply}
+.p05-pot i{display:none;width:28px;height:28px;border:2px solid #375f4b;background:#74a486;border-radius:50%}
+.p05-pot.failed img{display:none}.p05-pot.failed i{display:block}
+.p05-pot.chosen{border:5px solid #447861;background:#d9efdc;border-radius:50%}
+.p05-whole{position:absolute;top:258px;left:26px;right:26px;height:52px;border:4px solid #688b72;border-top:0;border-radius:0 0 20px 20px;text-align:center}
+.p05-whole span{position:relative;top:30px;display:inline-block;min-width:100px;padding:2px 12px;background:#fafbef;color:#345b46;font-size:40px;line-height:42px;font-weight:800}
+#ready .card{padding:22px 56px 26px}#ready .pic{width:480px;height:270px}#ready h1{font-size:50px;line-height:1.15}#ready p{font-size:28px;margin:10px 0 20px}

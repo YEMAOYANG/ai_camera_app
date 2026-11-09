@@ -1,0 +1,193 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "Module 1 Unit 2 She's a nurse.",
+  "goals": [
+    "听辨并结合图片理解 nurse、driver、policeman、pupil，认识拓展词 policewoman。",
+    "依据所介绍的具体人物区分 he 与 she，不按职业猜人称。",
+    "借助原创家庭照片理解 This is my mother/father. 与接续的职业介绍。",
+    "理解 This is me. 和 I'm a pupil.，尝试向大人介绍自己。",
+    "知道不同职业都能帮助他人，向朋友了解未来愿望；实际口语由大人观察。"
+  ],
+  "keyPoint": "结合人物和职业图片理解完整介绍，而不只背职业词。",
+  "difficultPoint": "he/she 指向具体人物；policeman/policewoman 的词义区别；介绍自己改用 I。",
+  "pageSequence": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "我们的家庭职业相册",
+      "play": "原创家庭情境引入本课。"
+    },
+    {
+      "page": 2,
+      "type": "slide",
+      "title": "nurse 和 driver",
+      "play": "老师结合工作图讲清两个职业。"
+    },
+    {
+      "page": 3,
+      "type": "interactive",
+      "title": "照片回工作站",
+      "play": "把人物照片送进照护区或公交车。对后人物进入场景；首错提示看工作内容，第三次示范，重玩全复位。"
+    },
+    {
+      "page": 4,
+      "type": "slide",
+      "title": "两位帮助大家的警察",
+      "play": "图片区分 policeman/policewoman。"
+    },
+    {
+      "page": 5,
+      "type": "interactive",
+      "title": "he 和 she 相册",
+      "play": "把四位职业人物拖入 he/she 相册，人物真实移动；教师先示范再清空，首错不显示答案。"
+    },
+    {
+      "page": 6,
+      "type": "quiz",
+      "title": "小检查：职业词",
+      "play": "全新人物图，听 nurse/driver 作答。"
+    },
+    {
+      "page": 7,
+      "type": "slide",
+      "title": "先说家人，再说职业",
+      "play": "母亲、父亲与孩子的原创相册示范介绍句式。"
+    },
+    {
+      "page": 8,
+      "type": "interactive",
+      "title": "给家庭相册补照片",
+      "play": "孩子按相框中的家庭人物匹配同一个人的工作照，正确照片放进相册；首错只提示观察人物，第三错示范。"
+    },
+    {
+      "page": 9,
+      "type": "quiz",
+      "title": "小检查：人物介绍",
+      "play": "新人物、新情境，听完整句识别人物和职业。"
+    },
+    {
+      "page": 10,
+      "type": "slide",
+      "title": "This is me.",
+      "play": "老师解释 me、I 和 pupil 的自我指向。"
+    },
+    {
+      "page": 11,
+      "type": "interactive",
+      "title": "我的小学生相册",
+      "play": "从成人和孩子照片中挑小学生，放入自我介绍相框；男女孩都能是 pupil，首错只提示看上学线索。"
+    },
+    {
+      "page": 12,
+      "type": "quiz",
+      "title": "小检查：自己与职业",
+      "play": "新人物图片检查 pupil 和 policewoman。"
+    },
+    {
+      "page": 13,
+      "type": "slide",
+      "title": "带着相册说一说",
+      "play": "顺序回顾职业、人称、家庭、自我介绍；请大人观察口语并陪伴职业愿望交流。"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "skill": "听辨 nurse",
+      "page": 6
+    },
+    {
+      "id": "q2",
+      "skill": "听辨 driver",
+      "page": 6
+    },
+    {
+      "id": "q3",
+      "skill": "he 与人物指向",
+      "page": 9
+    },
+    {
+      "id": "q4",
+      "skill": "介绍母亲及其职业",
+      "page": 9
+    },
+    {
+      "id": "q5",
+      "skill": "理解自我介绍 pupil",
+      "page": 12
+    },
+    {
+      "id": "q6",
+      "skill": "听辨 policewoman",
+      "page": 12
+    }
+  ],
+  "afterClass": {
+    "official": [
+      "教学设计第3页、课件第57页：了解三位朋友的未来职业愿望，大人陪伴。",
+      "教学设计第3页：迁移家人和职业介绍，口语由大人观察。"
+    ],
+    "inLesson": "p03/p05/p08/p11 练习图像理解与对应；p13 提醒实际口语、调查完成情况待观察。",
+    "weekly": "在孩子本周已学课程范围内提供职业词、人称与介绍句式的原创图题变式；不另造单课周测。"
+  },
+  "authoring": {
+    "model": "gpt-6.1-sol",
+    "visualStyle": "温暖精细平涂绘本，奶油白底、鼠尾草绿、珊瑚橙，柔和阴影。",
+    "cast": "原创安安家庭：男孩安安、短棕发护士母亲、黑发公交司机父亲。",
+    "evidence": "选择和拖放只证明当次任务表现，口语与真实调查待观察。",
+    "revisionPolicy": "现有13页为预研构建。正式教学正文按当前规则由 OpenMAIC 已配置的 DeepSeek 生成，再按本笔记修订并验收。已有16张原创图保留供核对复用，若与新正文不匹配需重新确定图位。",
+    "adaptationChecks": [
+      "保留原书听声找人、动作复习、人物指向纠错与口头迁移。正式正文应显式示范一次发现 he/she 用错后如何改正。",
+      "policewoman 是配套课时拓展。正式小检查用教材核心词和人物指向的原创情境，拓展词仅作可选练习。",
+      "现有预研中对职业与家庭关系的示例为原创安安家庭，教材不同人物的职业不得混写成安安家的事实。"
+    ]
+  },
+  "sourceBinding": {
+    "editionId": "smartedu-english-six-year-g1-lower-sync-c8ae9406",
+    "revisionId": "directory-057e330e9b4c19ff0e6ab21e",
+    "unitId": "082e6be1-31e4-3c35-b164-0a5a89e97ba7",
+    "nodeId": "f870af5f-3f8a-3c66-9681-aa2e8ffedad9",
+    "materialId": "c8ae9406-6280-bd3e-0444-3227ae2dab7a",
+    "assetId": "a32f0b46-96e7-46cc-8b44-50ad329cb9c2",
+    "printedPages": [
+      5,
+      6,
+      7
+    ],
+    "ebookPages": [
+      10,
+      11,
+      12
+    ],
+    "companionHours": [
+      "lesson_1"
+    ],
+    "reviewedAt": "2026-11-06T06:14:31.916506+00:00"
+  },
+  "textbookActivityMap": [
+    {
+      "printedPage": 5,
+      "activities": [
+        1,
+        2
+      ],
+      "adaptation": "先听看家人和工作，再用原创相册分开练习家人关系、职业和本人。教师先说，再让孩子指出或操作，最后请大人听孩子开口。"
+    },
+    {
+      "printedPage": 6,
+      "activities": [
+        3,
+        4
+      ],
+      "adaptation": "用新的工作场景做职业词听辨和图片对应，可以边模仿驾驶或照护动作边说目标词。设计原创短节奏，无需复制教材歌曲、配乐或听题顺序。"
+    },
+    {
+      "printedPage": 7,
+      "activities": [
+        5,
+        6
+      ],
+      "adaptation": "用已由老师介绍的人物练习 he/she，示范发现用错后自己改正。最后用孩子自选照片或自制指偶向大人说一说家人职业。"
+    }
+  ]
+}

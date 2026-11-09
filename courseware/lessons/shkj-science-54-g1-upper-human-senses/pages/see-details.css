@@ -1,0 +1,10 @@
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:center;height:100%;padding:28px 24px}
+.diagram{position:relative;aspect-ratio:3 / 2;border:3px solid #a5b9a5;border-radius:24px;overflow:hidden;background:#f7f2dd}
+.diagram img{width:100%;height:100%;display:block;object-fit:contain;pointer-events:none}
+.search,.unchanged,.diagram i{position:absolute;top:33%;width:27%;height:44%;background:transparent;border:3px solid transparent;border-radius:26px}
+.search,.unchanged{cursor:pointer}.search:focus-visible,.unchanged:focus-visible{outline:4px solid #23725d;outline-offset:-6px}
+[data-zone=color],[data-ring=color]{left:5%}[data-zone=shape],[data-ring=shape]{left:36.5%}[data-zone=size],[data-ring=size]{left:68%}
+.unchanged{left:34%;top:5%;width:32%;height:24%}
+.search.found,.diagram i.found{border-color:#22795d;background:#6ead6922}.search.demo,.diagram i.demo{border:5px dashed #ac6028;background:#ffca6122}
+
+.btn.xl{height:90px}

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "smartedu-english-six-year-g1-upper-sync-af05bc77",
+    "revisionId": "directory-0c147a23366906ebae132dca",
+    "nodeId": "1ec91103-6d98-353f-a2b1-ea16b74bb857",
+    "lessonTitle": "Unit 1 It's red.",
+    "gradeCode": "primary_1",
+    "subject": "english",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "unitTitle": "Module 4",
+    "classHour": "lesson_1",
+    "classHours": ["lesson_1"],
+    "teachingRevision": "1"
+  },
+  "officialTextbook": {
+    "title": "英语（新标准）（一年级起点）一年级上册",
+    "publisher": "外语教学与研究出版社",
+    "editors": ["陈琳", "Printha Ellis"],
+    "edition": "2011年版课标修订系列，封面标注教育部审定2012，官方任务单标注2012年7月，具体印次未核",
+    "curriculumStandard": "2011",
+    "isbn": "978-7-5135-2109-3",
+    "publisherBibliographyUrl": "https://www.fltrp.com/upload/resources/file/2022/08/10/71169.pdf",
+    "editionReconciliationPath": "backend/content/textbooks/sources/fltrp-primary-source-reconciliation-20260928.json",
+    "textbookPages": [20, 21, 22],
+    "printedPages": [20, 21, 22],
+    "pdfPages": [25, 26, 27],
+    "teachingMaterialId": "af05bc77-0902-9842-f1b5-37cdfad7c5c8",
+    "file": {
+      "path": "output/courseware-lessons/g1-english-e818f015bc1fd476/official/textbook-candidate.pdf",
+      "sha256": "7b1eb1b3069a7b453b4db2f13821c1bea8b09b8b27670298be9b76c2c23aa67d",
+      "gitBlobSha": "450dc275e7c30691feb857ec0727308b96d7aef9",
+      "pageCount": 83
+    },
+    "mirrorReceipt": {
+      "path": "output/courseware-lessons/g1-english-e818f015bc1fd476/official/textbook-candidate.receipt.json",
+      "sha256": "3e2778edb57f01071c92a8f2faf515480515f29ea1e542ab31dd2c6c12ef46ba"
+    },
+    "sourceHostRole": "第三方固定提交存放的外研社原版电子副本，教材身份由本次实读封面封底、扉页、出版页、前言和目录，以及国家平台教材标识和出版社书目交叉核对。",
+    "fileBoundaryException": "PDF第83页另附六年级上册封面样张，与本册封面及正文不同，排除在书目和本课取证范围之外。使用PDF第1页拼版中属于一年级上册的封面及封底识别ISBN。"
+  },
+  "textbookReview": {
+    "reviewedAt": "2026-11-06",
+    "fullLessonViewed": true,
+    "activityCount": 4,
+    "renderMethod": "从同一冻结PDF直接渲染并逐页目视审读，复算整文件SHA-256和Git blob SHA-1。",
+    "boundaryProof": [
+      {"pdfPage": 1, "finding": "印刷拼版包含本册封面和封底，标明一年级起点一年级上册、外研社、教育部审定2012及ISBN 978-7-5135-2109-3。"},
+      {"pdfPage": 2, "finding": "扉页标明义务教育教科书、一年级起点一年级上册、陈琳和Printha Ellis主编、外语教学与研究出版社。"},
+      {"pdfPage": 3, "finding": "出版说明再次标明一年级起点一年级上册学生用书及两位主编。"},
+      {"pdfPage": 4, "finding": "前言说明以2011年版英语课程标准修订。"},
+      {"pdfPage": 5, "finding": "目录标出Module 4 Unit 1始于印刷页20，Unit 2始于印刷页23。"},
+      {"pdfPage": 24, "printedPage": 19, "finding": "前一页仍是Module 3 Unit 2活动5、6，属于前课。"},
+      {"pdfPage": 25, "printedPage": 20, "finding": "本课起页，有活动1和活动2开头。"},
+      {"pdfPage": 26, "printedPage": 21, "finding": "本课活动2续页，完成六幅颜色情境。"},
+      {"pdfPage": 27, "printedPage": 22, "finding": "本课末页，有活动3和活动4。原任务单的朗读引用到第21页，不能当作完整课目止页。"},
+      {"pdfPage": 28, "printedPage": 23, "finding": "下一页已开始Module 4 Unit 2，颜色加动物名词组合归下一课。"},
+      {"pdfPage": 83, "finding": "附有与本册无关的六年级上册封面样张，未用于教材身份或课文内容。"}
+    ],
+    "activities": [
+      {"number": 1, "pdfPages": [25], "printedPages": [20], "finding": "听音指图，先辨认蓝、黄并理解询问颜色。插画的变化用于听说情境，不推导颜料或光的混色规律。"},
+      {"number": 2, "pdfPages": [25, 26], "printedPages": [20, 21], "finding": "听音、指认并找It's结构。招呼后按图理解绿、黑、白、蓝、红、黄的颜色表达，后五幅用now更新当前颜色。原创活动保留图音映射和当前状态，不搬原图或连续对白。"},
+      {"number": 3, "pdfPages": [27], "printedPages": [22], "finding": "听说，比较白色和黑色物体，使用It's加颜色词完整描述。原创对白沿用颜色语义，物品改为雨伞。"},
+      {"number": 4, "pdfPages": [27], "printedPages": [22], "finding": "看情境练习问颜色、看物品再完整回答。原创课程以雨伞问答和新物品听音选择覆盖同一目标，不把选对图片等同于开口会说。"}
+    ],
+    "pairedClassHours": ["lesson_1"],
+    "lessonMapping": "本课国家平台五个同节点备课包均指lesson_1，教材四项活动合并为一课。",
+    "nonVerbatimPolicy": "只取语言、认知和操作目标，继续使用原创画面、台词、游戏和练习题。"
+  },
+  "objectiveOrigin": "依据完整原教材正文和国家平台同课资料整理的原创目标。",
+  "sourceManifest": "output/courseware-lessons/g1-english-06866b17053f27e0/official/legacy-manifest.json",
+  "reviewedAt": "2026-11-05",
+  "reviewedBy": "lesson_19 author gpt-6.1-sol",
+  "reviewerKind": "ai",
+  "classHourCoverage": "精确教材与节点匹配五个不同教师的官方备课包，每包lesson_list只有lesson_1。全部103个可访问非视频文档页已逐页视觉审读并辅以OCR，不把候选包拆成五课。两个无页预览的图片素材仅核清单，其问答和涂色内容已在同包课件第21至23页读到，未冒称读过原图。",
+  "objectives": [
+    "听懂并把red、yellow、blue、green、black、white六个颜色词与实际图片颜色对应。",
+    "理解What colour?是在问颜色，用It's加颜色词说明眼前一个物品的颜色。",
+    "理解now是现在，物品当前颜色变化后用Now it's加当前颜色更新描述。"
+  ],
+  "keyPoint": "在图片与老师配音支持下建立六个颜色词、颜色实物和It's句子的联系。",
+  "difficultPoint": "分辨green与blue、black与white，依据当前而非先前颜色回应now。",
+  "contentBoundary": {
+    "coreWords": ["red", "yellow", "blue", "green", "black", "white", "colour", "now"],
+    "sentencePatterns": ["What colour?", "It's red.", "It's yellow.", "It's blue.", "It's green.", "It's black.", "It's white.", "Now it's green."],
+    "excluded": ["下一课a red dog等名词短语", "强制掌握orange、purple、pink", "混色科学原理", "变色龙生理机制", "颜色词拼写", "照搬官方画面、角色台词、题目、歌曲"],
+    "evidenceLimit": "点击和选色仅能证明该次图音任务中的颜色词义选择；真实口语发音、脱离提示表达及纸笔作业待观察。"
+  },
+  "resources": {
+    "teachingDesign": {
+      "status": "reviewed",
+      "findings": [
+        "包2第1页列六色及What colour? / It's；难点含Now it's。第2至5页以实物、示范、看图问答联系词义。第6至8页迁移到生活物品并安排向家人介绍颜色。",
+        "包4设计第1至2页及教案素材第1至3页重复核六色、It's和What colour?，采用先示范再操作。",
+        "包5设计第1页把now列为提升点，第2页安排听读、当前状态变化、对话和家庭巩固。"
+      ],
+      "pageRefs": [
+        {"package": "ff808081-5d1a-66f6-015d-29d21a7c125f", "resourceId": "0675133d-7967-dc30-90e2-27b02cbce6d5", "pages": [1,2,3,4,5,6,7,8]},
+        {"package": "ff808081-57a3-04f1-0157-a82064dd4284", "resourceId": "cb8c8271-af58-e0a1-d918-2173aecfebd6", "pages": [1,2]},
+        {"package": "ff808081-4cf9-94a6-014d-078428180fff", "resourceId": "b6d88c56-0c08-14e9-ea7b-22748355dc53", "pages": [1,2]}
+      ]
+    },
+    "courseware": {
+      "status": "reviewed",
+      "findings": [
+        "包2第1至11页为课题、引入、六色图词、生活颜色问答、拓展和作业；拓展词不设为本课必考。",
+        "包4第1至24页逐色呈现yellow、blue、green、white、red、black，单色物体与词对应，问答和五环涂色。",
+        "包5第1至33页含开门情境、六色、What colour? / It's、颜色定位、当前变化、生活拓展和作业。"
+      ],
+      "pageRefs": [
+        {"package": "ff808081-5d1a-66f6-015d-29d21a7c125f", "resourceId": "2f242c41-8384-6cc7-aef3-1de5103531e3", "pages": [1,2,3,4,5,6,7,8,9,10,11]},
+        {"package": "ff808081-57a3-04f1-0157-a82064dd4284", "resourceId": "78455bae-4bff-62c0-f23a-e70c07479aa8", "pages": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]},
+        {"package": "ff808081-4cf9-94a6-014d-078428180fff", "resourceId": "f16f1f03-4aa0-d08f-3a9a-7f8ca2645744", "pages": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33]}
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed",
+      "findings": ["第1页核教材2012年7月、六色图音对应和颜色问答目标，圈听到的颜色并指It's结构。", "第2页为按词涂色、和伙伴对身边物品问答；歌曲仅为拓展。"],
+      "pageRefs": [{"package": "8ae7e4a9-83d5-d033-0183-e9048fd03c3d", "resourceId": "f3b6621b-69f6-d671-9dc1-f0041b21a54c", "pages": [1,2]}]
+    },
+    "afterClassExercise": {
+      "status": "reviewed",
+      "findings": ["包1第1页要求教材P20至21朗读及按六色词涂图，口语保持待观察。", "包1第2至3页混色题有来源缺陷，排除其科学结论及原题。", "包3第1页为颜色句型选择、描述颜色和共同问答；只取练习目标，改为原创图音题。"],
+      "pageRefs": [
+        {"package": "8ae7e4a9-83d5-d033-0183-e9048fd03c3d", "resourceId": "b348c858-6491-70d2-7acc-abd6d82a3d99", "pages": [1,2,3]},
+        {"package": "ff808081-5754-9fd3-0157-558cfd722bbf", "resourceId": "5fb539a8-afed-4f6b-55bc-3db267cf39c7", "pages": [1]}
+      ]
+    },
+    "supplementalMaterials": {
+      "status": "reviewed",
+      "findings": ["包3第1至14页为设计演示：本课位置、六色目标、引入、看图听音、操练与总结。", "包4素材第1至3页为完整教案，证实六色及问答；另外两个image_list无可访问页预览。"],
+      "pageRefs": [
+        {"package": "ff808081-5754-9fd3-0157-558cfd722bbf", "resourceId": "da876ba7-5948-729e-6184-b698625facdb", "pages": [1,2,3,4,5,6,7,8,9,10,11,12,13,14]},
+        {"package": "ff808081-57a3-04f1-0157-a82064dd4284", "resourceId": "8c71b37f-2674-a212-1aba-81137fed26be", "pages": [1,2,3]}
+      ]
+    }
+  },
+  "factChecks": [],
+  "sourceDefects": [
+    {"resource": "afterClassExercise", "package": "8ae7e4a9-83d5-d033-0183-e9048fd03c3d", "pageRefs": [2,3], "finding": "未区分颜料和光的混色，red+green+blue的同一文字又给white和black；末题颜色图与文字不一致。", "handling": "不移入课件或题库。仅提取六色辨认、涂色与生活问答目标。"},
+    {"resource": "courseware", "package": "ff808081-4cf9-94a6-014d-078428180fff", "pageRefs": [25,26,31], "finding": "混色和文化用色属于教师拓展，不能据图推及普遍规律。", "handling": "本课只描述实际可见物品颜色，不教授拓展事实。"}
+  ],
+  "unreadSupplementalAssets": [
+    {"id": "5b870b27-2069-bcf2-0c33-7986c4daa9d9", "title": "color the rings", "status": "no_page_preview", "handling": "同包课件22至23页已读到完整涂色活动，未冒称下载原素材。"},
+    {"id": "4efa89da-9041-03f7-0e5c-93c162c3fd4b", "title": "Ask and Answer", "status": "no_page_preview", "handling": "同包课件21页已读到完整问答，未冒称下载原素材。"}
+  ],
+  "weeklyQuestionSource": {
+    "skills": ["colour-listening", "colour-dialogue", "now-current-colour"],
+    "homePractice": ["由大人指一个单色物品，问颜色并听孩子回答，口语待观察。", "按听到的颜色涂原创线稿。", "物品改变颜色后再次描述现在的颜色。"],
+    "noSeparateWeeklyTest": true
+  }
+}

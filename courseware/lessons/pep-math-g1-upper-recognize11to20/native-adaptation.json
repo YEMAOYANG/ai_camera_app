@@ -1,0 +1,949 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "reviewedAt": "2026-11-05T23:19:04.105930+00:00",
+  "nativeAuthor": {
+    "via": "OpenMAIC",
+    "providerId": "deepseek",
+    "modelId": "deepseek-v4-pro",
+    "modelPolicyId": "deepseek-v4-pro-current-flash-v1",
+    "jobId": "ycyLgPseiW",
+    "classroomId": "CAGjlsazyt",
+    "frozenInputSha256": "2c216f40c799311caf45e845eff37d53f383efd893417a802c551c2b6547a637",
+    "nativeClassroomSha256": "67bfc04ef1eab8e979e4add4dac0d0b805e93992a12da3959fdf5c7d33de056f"
+  },
+  "revisionAuthor": {
+    "model": "gpt-6.1-sol",
+    "role": "校准教材范围、题目和图，拆分台词并适配互动"
+  },
+  "formalLessonSha256": "9dba687a95b82836474781935eaa69be08c4fc742688b507f48be18f2a080430",
+  "sourceBodyPreserved": true,
+  "sceneMap": [
+    {
+      "sourceSceneId": "scene_mAtw_p3e63",
+      "sourceOutlineId": "scene_1",
+      "targetSceneKey": "intro",
+      "reason": [
+        "沿用原生补给站开场和数捆、数散棒的步骤。",
+        "教师按数学档案改为小数老师，封面仅提供情境。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "intro-1",
+          "type": "spotlight",
+          "nativeActionId": "action_LKYlZgbp"
+        },
+        {
+          "targetActionId": "intro-2",
+          "type": "say",
+          "nativeActionId": "action_uKxs5ZNd"
+        },
+        {
+          "targetActionId": "intro-3",
+          "type": "say",
+          "nativeActionId": "action_uKxs5ZNd"
+        },
+        {
+          "targetActionId": "intro-4",
+          "type": "say",
+          "nativeActionId": "action_uKxs5ZNd"
+        },
+        {
+          "targetActionId": "intro-5",
+          "type": "spotlight",
+          "nativeActionId": "action_FZSTFf5P"
+        },
+        {
+          "targetActionId": "intro-6",
+          "type": "say",
+          "nativeActionId": "action_ZQiC4f3O"
+        },
+        {
+          "targetActionId": "intro-7",
+          "type": "say",
+          "nativeActionId": "action_ZQiC4f3O"
+        },
+        {
+          "targetActionId": "intro-8",
+          "type": "spotlight",
+          "nativeActionId": "action_IhMaThsP"
+        },
+        {
+          "targetActionId": "intro-9",
+          "type": "say",
+          "nativeActionId": "action_6G4NH3eO"
+        },
+        {
+          "targetActionId": "intro-10",
+          "type": "spotlight",
+          "nativeActionId": "action_qaqMDX4I"
+        },
+        {
+          "targetActionId": "intro-11",
+          "type": "say",
+          "nativeActionId": "action_67_La_O0"
+        },
+        {
+          "targetActionId": "intro-12",
+          "type": "say",
+          "nativeActionId": "action_vYikgnLh"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_fJpvZD47Gb",
+      "sourceOutlineId": "scene_2",
+      "targetSceneKey": "pack",
+      "reason": [
+        "用实际三盘选择和捆散图映射原生小棒任务。",
+        "补全按顺序读十一至十九。",
+        "十八的说明前切换到八根散棒的实际画面。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "pack-1",
+          "type": "setState",
+          "nativeActionId": "action_mo4DRyrA"
+        },
+        {
+          "targetActionId": "pack-2",
+          "type": "say",
+          "nativeActionId": "action_rb5te1iF"
+        },
+        {
+          "targetActionId": "pack-3",
+          "type": "highlight",
+          "nativeActionId": "action_mo4DRyrA"
+        },
+        {
+          "targetActionId": "pack-4",
+          "type": "say",
+          "nativeActionId": "action_9Hps9VlL"
+        },
+        {
+          "targetActionId": "pack-5",
+          "type": "setState",
+          "nativeActionId": "action_hMfJMEWa"
+        },
+        {
+          "targetActionId": "pack-6",
+          "type": "say",
+          "nativeActionId": "action_81jyF6e4"
+        },
+        {
+          "targetActionId": "pack-7",
+          "type": "say",
+          "nativeActionId": "action_81jyF6e4"
+        },
+        {
+          "targetActionId": "pack-8",
+          "type": "setState",
+          "nativeActionId": "action_EK8Ew_li"
+        },
+        {
+          "targetActionId": "pack-9",
+          "type": "say",
+          "nativeActionId": "action_jfdzn3ak"
+        },
+        {
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "pack-10"
+        },
+        {
+          "type": "setState",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "pack-11"
+        },
+        {
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "pack-12"
+        },
+        {
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "pack-13"
+        },
+        {
+          "targetActionId": "pack-14",
+          "type": "say",
+          "nativeActionId": "action_jfdzn3ak"
+        },
+        {
+          "targetActionId": "pack-15",
+          "type": "setState",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "pack-16",
+          "type": "highlight",
+          "nativeActionId": "action_MSARIqIX"
+        },
+        {
+          "targetActionId": "pack-17",
+          "type": "say",
+          "nativeActionId": "action_jfdzn3ak"
+        },
+        {
+          "targetActionId": "pack-18",
+          "type": "say",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "pack-19",
+          "type": "say",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "pack-20",
+          "type": "say",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "pack-21",
+          "type": "setState",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "pack-22",
+          "type": "say",
+          "nativeActionId": "action_jfdzn3ak"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_505Sg00xpZ",
+      "sourceOutlineId": "scene_3",
+      "targetSceneKey": "twenty",
+      "reason": [
+        "保留原生十九、满十、换第二捆三阶段，并让孩子操作。",
+        "总量只在添一根时改变，扎捆时保持二十。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "twenty-1",
+          "type": "setState",
+          "nativeActionId": "action_A6i39ucG"
+        },
+        {
+          "targetActionId": "twenty-2",
+          "type": "say",
+          "nativeActionId": "action_KuK54eTr"
+        },
+        {
+          "targetActionId": "twenty-3",
+          "type": "say",
+          "nativeActionId": "action_KuK54eTr"
+        },
+        {
+          "targetActionId": "twenty-4",
+          "type": "highlight",
+          "nativeActionId": "action_xUBuwdwz"
+        },
+        {
+          "targetActionId": "twenty-5",
+          "type": "say",
+          "nativeActionId": "action_s-mu-JEd"
+        },
+        {
+          "targetActionId": "twenty-6",
+          "type": "setState",
+          "nativeActionId": "action_S8eFoN8g"
+        },
+        {
+          "targetActionId": "twenty-7",
+          "type": "say",
+          "nativeActionId": "action_s-mu-JEd"
+        },
+        {
+          "targetActionId": "twenty-8",
+          "type": "say",
+          "nativeActionId": "action_s-mu-JEd"
+        },
+        {
+          "targetActionId": "twenty-9",
+          "type": "highlight",
+          "nativeActionId": "action_9krLNJxD"
+        },
+        {
+          "targetActionId": "twenty-10",
+          "type": "say",
+          "nativeActionId": "action_b9igXTpk"
+        },
+        {
+          "targetActionId": "twenty-11",
+          "type": "setState",
+          "nativeActionId": "action_u-4y7dXw"
+        },
+        {
+          "targetActionId": "twenty-12",
+          "type": "say",
+          "nativeActionId": "action_7rS5WDcg"
+        },
+        {
+          "targetActionId": "twenty-13",
+          "type": "say",
+          "nativeActionId": "action_7rS5WDcg"
+        },
+        {
+          "targetActionId": "twenty-14",
+          "type": "say",
+          "nativeActionId": "action_7rS5WDcg"
+        },
+        {
+          "targetActionId": "twenty-15",
+          "type": "setState",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "twenty-16",
+          "type": "say",
+          "nativeActionId": null
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_3IdNrHijpw",
+      "sourceOutlineId": "scene_4",
+      "targetSceneKey": "places",
+      "reason": [
+        "修正原生教师和前后语境。",
+        "保留十一两杆和二十占位对比；二十教学用捆，题目迁移到计数器。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "places-1",
+          "type": "spotlight",
+          "nativeActionId": "action_DoLi5lXg"
+        },
+        {
+          "targetActionId": "places-2",
+          "type": "say",
+          "nativeActionId": "action_MUTafXuT"
+        },
+        {
+          "targetActionId": "places-3",
+          "type": "spotlight",
+          "nativeActionId": "action_FAXIH4Tl"
+        },
+        {
+          "targetActionId": "places-4",
+          "type": "say",
+          "nativeActionId": "action_kBZj_t5U"
+        },
+        {
+          "targetActionId": "places-5",
+          "type": "spotlight",
+          "nativeActionId": "action_lPhDVnNW"
+        },
+        {
+          "targetActionId": "places-6",
+          "type": "say",
+          "nativeActionId": "action_nbCaPOHH"
+        },
+        {
+          "targetActionId": "places-7",
+          "type": "say",
+          "nativeActionId": "action_VYhtZiVC"
+        },
+        {
+          "targetActionId": "places-8",
+          "type": "say",
+          "nativeActionId": "action_i19WK4K6"
+        },
+        {
+          "targetActionId": "places-9",
+          "type": "say",
+          "nativeActionId": "action_i19WK4K6"
+        },
+        {
+          "targetActionId": "places-10",
+          "type": "spotlight",
+          "nativeActionId": "action_9wQ6poyC"
+        },
+        {
+          "targetActionId": "places-11",
+          "type": "say",
+          "nativeActionId": "action_dt6_W5UJ"
+        },
+        {
+          "targetActionId": "places-12",
+          "type": "spotlight",
+          "nativeActionId": "action_53-rriPk"
+        },
+        {
+          "targetActionId": "places-13",
+          "type": "say",
+          "nativeActionId": "action_mwiwjat5"
+        },
+        {
+          "targetActionId": "places-14",
+          "type": "spotlight",
+          "nativeActionId": "action_utdxG03o"
+        },
+        {
+          "targetActionId": "places-15",
+          "type": "say",
+          "nativeActionId": "action_GYcNGI3-"
+        },
+        {
+          "targetActionId": "places-16",
+          "type": "say",
+          "nativeActionId": "action_Sr-XDKi4"
+        },
+        {
+          "targetActionId": "places-17",
+          "type": "say",
+          "nativeActionId": "action_Sr-XDKi4"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_Elf-Fu4sOq",
+      "sourceOutlineId": "scene_5",
+      "targetSceneKey": "beads",
+      "reason": [
+        "把原生两杆滑块映射为用图片选珠子，再真实摆入该杆。",
+        "答错保持杆上的原状态，正确才增加珠子。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "beads-1",
+          "type": "setState",
+          "nativeActionId": "action_c_U7ocDe"
+        },
+        {
+          "targetActionId": "beads-2",
+          "type": "say",
+          "nativeActionId": "action_4W9BBtbg"
+        },
+        {
+          "targetActionId": "beads-3",
+          "type": "say",
+          "nativeActionId": "action_4W9BBtbg"
+        },
+        {
+          "targetActionId": "beads-4",
+          "type": "highlight",
+          "nativeActionId": "action_c_U7ocDe"
+        },
+        {
+          "targetActionId": "beads-5",
+          "type": "setState",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "beads-6",
+          "type": "say",
+          "nativeActionId": "action_nXEwxYeI"
+        },
+        {
+          "targetActionId": "beads-7",
+          "type": "highlight",
+          "nativeActionId": "action_UkDtK2hR"
+        },
+        {
+          "targetActionId": "beads-8",
+          "type": "setState",
+          "nativeActionId": "action_ePOWmpcY"
+        },
+        {
+          "targetActionId": "beads-9",
+          "type": "say",
+          "nativeActionId": "action_nXEwxYeI"
+        },
+        {
+          "targetActionId": "beads-10",
+          "type": "say",
+          "nativeActionId": "action_nXEwxYeI"
+        },
+        {
+          "type": "setState",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "beads-11"
+        },
+        {
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "beads-12"
+        },
+        {
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "beads-13"
+        },
+        {
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "beads-14"
+        },
+        {
+          "targetActionId": "beads-15",
+          "type": "setState",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "beads-16",
+          "type": "highlight",
+          "nativeActionId": "action_kGuPIIzT"
+        },
+        {
+          "targetActionId": "beads-17",
+          "type": "say",
+          "nativeActionId": "action_FSrcH2X6"
+        },
+        {
+          "targetActionId": "beads-18",
+          "type": "say",
+          "nativeActionId": "action_FSrcH2X6"
+        },
+        {
+          "targetActionId": "beads-19",
+          "type": "say",
+          "nativeActionId": "action_geBGs6ES"
+        },
+        {
+          "targetActionId": "beads-20",
+          "type": "say",
+          "nativeActionId": "action_geBGs6ES"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_EXBLuP9ryn",
+      "sourceOutlineId": "scene_6",
+      "targetSceneKey": "numberline",
+      "reason": [
+        "采用精确等距的0至20刻度，保留左右、相邻及0、10、15、20的锚点。",
+        "顺数与倒数用数序，不引入下一课正式算式。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "numberline-1",
+          "type": "spotlight",
+          "nativeActionId": "action_-PyTh9UB"
+        },
+        {
+          "targetActionId": "numberline-2",
+          "type": "say",
+          "nativeActionId": "action_dxTSTLCk"
+        },
+        {
+          "targetActionId": "numberline-3",
+          "type": "say",
+          "nativeActionId": "action_dxTSTLCk"
+        },
+        {
+          "targetActionId": "numberline-4",
+          "type": "spotlight",
+          "nativeActionId": "action_aoi-6G5Q"
+        },
+        {
+          "targetActionId": "numberline-5",
+          "type": "say",
+          "nativeActionId": "action_vjS2X3U3"
+        },
+        {
+          "targetActionId": "numberline-6",
+          "type": "spotlight",
+          "nativeActionId": "action_zBtXIwGF"
+        },
+        {
+          "targetActionId": "numberline-7",
+          "type": "say",
+          "nativeActionId": "action_GAv-jRE5"
+        },
+        {
+          "targetActionId": "numberline-8",
+          "type": "say",
+          "nativeActionId": "action_pOyi2diE"
+        },
+        {
+          "targetActionId": "numberline-9",
+          "type": "say",
+          "nativeActionId": "action_1DpNdFIi"
+        },
+        {
+          "targetActionId": "numberline-10",
+          "type": "say",
+          "nativeActionId": "action_1DpNdFIi"
+        },
+        {
+          "targetActionId": "numberline-11",
+          "type": "spotlight",
+          "nativeActionId": "action_WtJCtcz-"
+        },
+        {
+          "targetActionId": "numberline-12",
+          "type": "say",
+          "nativeActionId": "action_PcjiBiu3"
+        },
+        {
+          "targetActionId": "numberline-13",
+          "type": "say",
+          "nativeActionId": "action_KHDztGn_"
+        },
+        {
+          "targetActionId": "numberline-14",
+          "type": "say",
+          "nativeActionId": "action_KHDztGn_"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_VNZ4H-c0hu",
+      "sourceOutlineId": "scene_7",
+      "targetSceneKey": "route",
+      "reason": [
+        "原生拖放数牌改为触控点放，显示真实落位。",
+        "把示例从小数段迁到十一至十三，并用两端包含的三格示例支持第80页练习。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "route-1",
+          "type": "setState",
+          "nativeActionId": "action_717MF0_p"
+        },
+        {
+          "targetActionId": "route-2",
+          "type": "say",
+          "nativeActionId": "action_ULQwCyJW"
+        },
+        {
+          "targetActionId": "route-3",
+          "type": "highlight",
+          "nativeActionId": "action_66I9p7zj"
+        },
+        {
+          "targetActionId": "route-4",
+          "type": "say",
+          "nativeActionId": "action__Sta0wgz"
+        },
+        {
+          "targetActionId": "route-5",
+          "type": "say",
+          "nativeActionId": "action__Sta0wgz"
+        },
+        {
+          "targetActionId": "route-6",
+          "type": "highlight",
+          "nativeActionId": "action_svvJzP8s"
+        },
+        {
+          "targetActionId": "route-7",
+          "type": "say",
+          "nativeActionId": "action__Sta0wgz"
+        },
+        {
+          "targetActionId": "route-8",
+          "type": "say",
+          "nativeActionId": "action__Sta0wgz"
+        },
+        {
+          "targetActionId": "route-9",
+          "type": "setState",
+          "nativeActionId": "action_zlU7i_tC"
+        },
+        {
+          "targetActionId": "route-10",
+          "type": "say",
+          "nativeActionId": "action_oVOvjaE4"
+        },
+        {
+          "targetActionId": "route-11",
+          "type": "say",
+          "nativeActionId": "action_oVOvjaE4"
+        },
+        {
+          "targetActionId": "route-12",
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v2 distinction between tick positions and intervals"
+        },
+        {
+          "targetActionId": "route-13",
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v2 distinction between tick positions and intervals"
+        },
+        {
+          "targetActionId": "route-14",
+          "type": "setState",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "route-15",
+          "type": "say",
+          "nativeActionId": "action_ixL1v-CQ"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_nMQX5zgcX6",
+      "sourceOutlineId": "scene_8",
+      "targetSceneKey": "near",
+      "reason": [
+        "保留原生十二和十八的距离比较，不使用形式算式。",
+        "路径亮出准确格数，首次错误只显示所选路径并提示。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "near-1",
+          "type": "setState",
+          "nativeActionId": "action_dMfQLNl-"
+        },
+        {
+          "targetActionId": "near-2",
+          "type": "say",
+          "nativeActionId": "action_tiymdWK2"
+        },
+        {
+          "targetActionId": "near-3",
+          "type": "say",
+          "nativeActionId": "action_tiymdWK2"
+        },
+        {
+          "targetActionId": "near-4",
+          "type": "highlight",
+          "nativeActionId": "action_WDO60rSj"
+        },
+        {
+          "targetActionId": "near-5",
+          "type": "say",
+          "nativeActionId": "action_qEuikv8G"
+        },
+        {
+          "targetActionId": "near-6",
+          "type": "say",
+          "nativeActionId": "action_qEuikv8G"
+        },
+        {
+          "targetActionId": "near-7",
+          "type": "highlight",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "near-8",
+          "type": "say",
+          "nativeActionId": "action_rxlDaGCI"
+        },
+        {
+          "targetActionId": "near-9",
+          "type": "setState",
+          "nativeActionId": "action_uWMLt6Lf"
+        },
+        {
+          "targetActionId": "near-10",
+          "type": "say",
+          "nativeActionId": "action_s323F2ha"
+        },
+        {
+          "targetActionId": "near-11",
+          "type": "say",
+          "nativeActionId": "action_s323F2ha"
+        },
+        {
+          "targetActionId": "near-12",
+          "type": "setState",
+          "nativeActionId": "action_dcKBgiRo"
+        },
+        {
+          "targetActionId": "near-13",
+          "type": "say",
+          "nativeActionId": "action_5_rnj-ls"
+        },
+        {
+          "targetActionId": "near-14",
+          "type": "say",
+          "nativeActionId": "action_5_rnj-ls"
+        },
+        {
+          "targetActionId": "near-15",
+          "type": "setState",
+          "nativeActionId": null
+        },
+        {
+          "targetActionId": "near-16",
+          "type": "say",
+          "nativeActionId": "action_5_rnj-ls"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_S6ZaNlRpOV",
+      "sourceOutlineId": "scene_9",
+      "targetSceneKey": "check",
+      "reason": [
+        "原生多题使用35、46、52或60，越过本课范围。",
+        "把题意修到已冻结的图数关系，保留每题原生来源和修订说明。"
+      ],
+      "questionMap": [
+        {
+          "nativeQuestionId": "q1",
+          "nativeAnswer": [
+            "B"
+          ],
+          "targetQuestionId": "n1120-q1",
+          "targetAnswer": "B",
+          "reason": "保留原生题型可用的提问逻辑，修订到本课0至20，并依冻结题图逐项绑定。"
+        },
+        {
+          "nativeQuestionId": "q2",
+          "nativeAnswer": [
+            "C"
+          ],
+          "targetQuestionId": "n1120-q2",
+          "targetAnswer": "A",
+          "reason": "保留原生题型可用的提问逻辑，修订到本课0至20，并依冻结题图逐项绑定。"
+        },
+        {
+          "nativeQuestionId": "q3",
+          "nativeAnswer": [
+            "D"
+          ],
+          "targetQuestionId": "n1120-q3",
+          "targetAnswer": "C",
+          "reason": "保留原生题型可用的提问逻辑，修订到本课0至20，并依冻结题图逐项绑定。"
+        },
+        {
+          "nativeQuestionId": "q5",
+          "nativeAnswer": [
+            "C"
+          ],
+          "targetQuestionId": "n1120-q4",
+          "targetAnswer": "B",
+          "reason": "保留原生题型可用的提问逻辑，修订到本课0至20，并依冻结题图逐项绑定。"
+        },
+        {
+          "nativeQuestionId": "q6",
+          "nativeAnswer": [
+            "B"
+          ],
+          "targetQuestionId": "n1120-q5",
+          "targetAnswer": "A",
+          "reason": "保留原生题型可用的提问逻辑，修订到本课0至20，并依冻结题图逐项绑定。"
+        },
+        {
+          "nativeQuestionId": "q4",
+          "nativeAnswer": [
+            "B"
+          ],
+          "targetQuestionId": "n1120-q6",
+          "targetAnswer": "C",
+          "reason": "原生同类数量题重复且超出20，按教材第80页转为在连续格中数包含两端的一段。"
+        }
+      ]
+    },
+    {
+      "sourceSceneId": "scene_p9fM_YYrfE",
+      "sourceOutlineId": "scene_10",
+      "targetSceneKey": "recap",
+      "reason": [
+        "原生生活练习中的第十六页、十七张纸保留并明确位置和数量区别。",
+        "补足口述家长观察。"
+      ],
+      "actionMap": [
+        {
+          "targetActionId": "recap-1",
+          "type": "spotlight",
+          "nativeActionId": "action_p-JnPPI8"
+        },
+        {
+          "targetActionId": "recap-2",
+          "type": "say",
+          "nativeActionId": "action_Jrismmje"
+        },
+        {
+          "targetActionId": "recap-3",
+          "type": "spotlight",
+          "nativeActionId": "action_xSdSnAj9"
+        },
+        {
+          "targetActionId": "recap-4",
+          "type": "say",
+          "nativeActionId": "action_aYIEpWrb"
+        },
+        {
+          "targetActionId": "recap-5",
+          "type": "say",
+          "nativeActionId": "action_tD_5EHg9"
+        },
+        {
+          "targetActionId": "recap-6",
+          "type": "say",
+          "nativeActionId": "action_tD_5EHg9"
+        },
+        {
+          "targetActionId": "recap-7",
+          "type": "spotlight",
+          "nativeActionId": "action_Meu2hZyo"
+        },
+        {
+          "targetActionId": "recap-8",
+          "type": "say",
+          "nativeActionId": "action_JVFwiEo5"
+        },
+        {
+          "targetActionId": "recap-9",
+          "type": "say",
+          "nativeActionId": "action_JVFwiEo5"
+        },
+        {
+          "targetActionId": "recap-10",
+          "type": "say",
+          "nativeActionId": "action_SQoAkSj-"
+        },
+        {
+          "targetActionId": "recap-11",
+          "type": "say",
+          "nativeActionId": "action_SQoAkSj-"
+        },
+        {
+          "targetActionId": "recap-12",
+          "type": "spotlight",
+          "nativeActionId": "action_vh8apUYh"
+        },
+        {
+          "targetActionId": "recap-13",
+          "type": "say",
+          "nativeActionId": "action_ljFXrQJr"
+        },
+        {
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "recap-14"
+        },
+        {
+          "type": "say",
+          "nativeActionId": null,
+          "origin": "G7-v1 teaching correction",
+          "targetActionId": "recap-15"
+        },
+        {
+          "targetActionId": "recap-16",
+          "type": "say",
+          "nativeActionId": "action_ljFXrQJr"
+        },
+        {
+          "targetActionId": "recap-17",
+          "type": "say",
+          "nativeActionId": "action_ljFXrQJr"
+        },
+        {
+          "targetActionId": "recap-18",
+          "type": "say",
+          "nativeActionId": null
+        }
+      ]
+    }
+  ]
+}

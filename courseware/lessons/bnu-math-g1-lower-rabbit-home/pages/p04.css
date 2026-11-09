@@ -1,0 +1,16 @@
+.lamp-workshop {height:100%;padding:18px 58px;position:relative;color:#23463b}
+.workshop-guide {position:absolute;width:158px;height:158px;object-fit:contain;right:38px;top:24px}
+#lamp-equation {height:76px;text-align:center;font-size:55px;font-weight:900;line-height:70px}
+.lamp-display {display:flex;align-items:center;justify-content:center;gap:52px;height:260px}
+#ten-board {width:510px;height:198px;border:5px solid #36584a;border-radius:25px;padding:16px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,1fr);gap:11px;background:#fffbef}
+.lamp-slot {display:grid;place-items:center;border:3px dashed #b8ae87;border-radius:16px;background:#f2edd7}
+.lamp-slot.lit {background:#ffe8a2;border-style:solid;border-color:#bc832f}
+.lamp-bead {display:inline-block;width:32px;height:37px;border-radius:52% 52% 40% 40%;background:#f5bc55;border:3px solid #745030;box-shadow:inset 0 5px 0 #ffe6a8}
+.lamp-bead.new {background:#70b6ae;border-color:#216b68;box-shadow:inset 0 5px 0 #bce2d7}
+.lamp-slot.hint {outline:5px solid #f0a53d;outline-offset:1px}
+#remainder-tray {display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;width:340px;min-height:124px;padding:18px;border:4px solid #77a096;border-radius:24px;background:#e3f1e8}
+.lamp-strip {width:100%;display:grid;grid-template-columns:repeat(10,1fr);height:36px;border:4px solid #6e562c;border-radius:11px;background:#edbd56}
+.lamp-strip i+i {border-left:2px solid #6e562c}
+#unit-bank {height:142px;display:flex;justify-content:center;align-items:center;gap:24px}
+.lamp-choice {min-width:260px;height:106px;padding:14px;display:flex;align-content:center;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;background:#fffdf1;border:4px solid #af9967;border-radius:22px;cursor:pointer;color:#23463b}
+.lamp-choice:focus-visible {outline:5px solid #167d79;outline-offset:3px}

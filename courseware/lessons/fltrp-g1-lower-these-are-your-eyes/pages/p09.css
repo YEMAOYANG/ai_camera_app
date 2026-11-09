@@ -1,0 +1,8 @@
+[hidden]{display:none!important}
+#pointer-toolbar{height:70px;display:flex;justify-content:space-between;padding:5px 30px 0}
+#pointer-body{position:relative;width:312px;height:468px;margin:0 auto;background:#fff9ec;border-radius:28px;box-shadow:0 0 0 5px #d7b58d,0 9px 0 #d7b58d}
+#pointer-body img{display:block;width:100%;height:100%;object-fit:contain;border-radius:28px}
+.pointer-target{position:absolute;left:var(--x);top:var(--y);width:48px;height:48px;transform:translate(-50%,-50%);border:3px dashed #573f25;border-radius:50%;background:#fff8e436;cursor:pointer}
+.pointer-target.chosen{background:#8dd9ab72;border:4px solid #23614f;box-shadow:0 0 0 3px #fffbed}
+.pointer-target.hinted,.pointer-target:focus-visible{outline:5px solid #f0a544;outline-offset:3px}
+#pointer-sound.audio-error{outline:4px dashed #a44828}

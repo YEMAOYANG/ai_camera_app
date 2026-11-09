@@ -1,0 +1,255 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-upper-5082db8c",
+    "revisionId": "directory-85c5a7913d61bf6ad6fd9a50",
+    "nodeId": "73080964-7bc4-422c-bea9-76b591309092",
+    "unitId": "d761c8f1-ed10-40ca-8694-202bc5a9e260",
+    "officialMaterialId": "6033099a-2732-44c8-b885-c7153e231428",
+    "activityId": "18bfc26b-5081-9fbd-96c1-85332be52ce4",
+    "classHours": [
+      "lesson_1"
+    ]
+  },
+  "request": "为教科版2024年7月一年级上册第4课《给植物画张“像”》创作一门完整原创课。用教科版资料中的观察、画像、介绍、保护、再观察范围。输出有用的讲解原句、互动规则、原创建议素材和六道图题的候选台词及解析。保持每页一个小任务，课末回顾。不把计划说成学生已经完成，不把一张图变成植物常识。不要引用官方截图、讲稿句子或链接。让 OpenMAIC 保存各场景，便于后续导出编辑。",
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "objectives": [
+      "辨认几种常见植物，能观察并说出一株植物可见的形状、颜色和它长在哪里。",
+      "先观察再画像，画出实际能看到的主要特点和生长位置，比较实物和画稿后按证据修改。",
+      "用画和口头介绍分享植物的名称、可见特点和生长位置，愿意听同伴并爱护植物。",
+      "在不同时间继续观察同一株植物，把每次实际看见的样子分别画下来。"
+    ],
+    "coveredOfficialHours": [
+      "lesson_1"
+    ],
+    "videoStatus": "waived",
+    "excludedTopics": [
+      "只记录眼前这株，不推断看不见的根，不把未见的花画入观察记录。",
+      "透明杯观察为特定样本，不讲所有吊兰只在水中生活，也不把长条绿叶作为正式茎叶鉴别考试。",
+      "不讲养护配方、植物分类或下一课的生长周期。",
+      "纸笔作品、口头介绍、真实照料和长期观察只留待观察，不用线上点选证明。"
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "96d1ddb7b05e2fd6e4dbdde97eefd44ed47f9eb517786aa2544a440a4d76c876",
+    "officialNotesSha256": "6438b22fec68efdb1370b9818429c219b119015a05eb061a4ac6064ef3c24ef5",
+    "briefSha256": "04d84c2c5c79a36aef968fb00d00a51c29fd52d0e5ac859ab485028a5a2c7e7c",
+    "officialManifestSha256": "ef0c2cab443521165396801a027abda72696b82771b86b32fcbe9380fc257e16",
+    "officialDetailsSha256": "322a06e99bd1d6926154a4f28feadd8cb318d797b7cb86ae3292477ba4dea4bb",
+    "textbookDirectorySha256": "57708714e8d4f7d0c59ec582306d4dbc1f56189aa2e867893fcb0024eb3cb42b"
+  },
+  "qualityRules": [
+    "小科老师为主讲，简体中文儿童口语，句子最好不超过25字且最长40字。",
+    "讲解页至少6句及100字，互动页至少5句及90字。每个互动页至少三个真实操作目标，由老师先逐步点亮、示范和说明理由。",
+    "图先于字，语音携带完整题意；遮住非目标文字仍能分辨选项和完成操作。",
+    "一次错误先提示看证据，不揭答案；有可见画面变化和完成后重玩。",
+    "小检查三项图选，唯一答案，新情境，有知识点和具体解析。",
+    "不生成现场讨论、学生语音或猜测绘画评分。"
+  ],
+  "pagePlan": [
+    {
+      "id": "p01",
+      "type": "slide",
+      "title": "植物小画室",
+      "goal": "看几株常见植物，听名称和可以比较的明显特点。",
+      "assetKeys": [
+        "cover_plant_studio",
+        "plants_nearby"
+      ]
+    },
+    {
+      "id": "p02",
+      "type": "slide",
+      "title": "看清这株吊兰",
+      "goal": "在同一个透明水杯样本里依次看水杯、细长弯叶和杯中可见的浅色根；说明只描述这一株。",
+      "assetKeys": [
+        "spider_plant_observation"
+      ]
+    },
+    {
+      "id": "p03",
+      "type": "interactive",
+      "title": "放大镜找线索",
+      "goal": "听指令，在同一真实样本图上把放大镜移到可见的水杯、叶片和根，改变相应区域的观察标记；老师先逐点示范。",
+      "assetKeys": [
+        "spider_plant_observation"
+      ]
+    },
+    {
+      "id": "p04",
+      "type": "slide",
+      "title": "三笔画成记录",
+      "goal": "示范先画样本容器和位置，再画叶子的形状，最后记录透过杯壁能看到的根。画名称可以请家人帮写。",
+      "assetKeys": [
+        "spider_plant_observation",
+        "spider_plant_portrait_layers"
+      ]
+    },
+    {
+      "id": "p05",
+      "type": "interactive",
+      "title": "给眼前这株画像",
+      "goal": "把与另一株真实参考匹配的容器、叶形与可见特点放到画像上，画纸逐层生成。对比实物后才作答，不加没见的部位。",
+      "assetKeys": [
+        "practice_plant_observation",
+        "practice_portrait_layers"
+      ]
+    },
+    {
+      "id": "p06",
+      "type": "interactive",
+      "title": "拿画和实物对一对",
+      "goal": "对照一个新的样本，逐步找出画纸里凭空添出的花、错误的容器或叶形，并修正画纸上相应对象。",
+      "assetKeys": [
+        "edit_plant_observation",
+        "edit_portrait_layers"
+      ]
+    },
+    {
+      "id": "p07",
+      "type": "slide",
+      "title": "介绍和爱护",
+      "goal": "用自己的话说名称、样子、长在哪儿；听别人说一条观察。观察时用眼睛看，不拔、不扯。",
+      "assetKeys": [
+        "sharing_and_care"
+      ]
+    },
+    {
+      "id": "p08",
+      "type": "interactive",
+      "title": "今天一张，下次一张",
+      "goal": "根据两个真实观察场景中的先后图标把同一株的画像放进对应日期夹，两张画分别保留。先后由看见的日期和顺序决定，不靠猜哪株长得快。",
+      "assetKeys": [
+        "observation_journal_plant",
+        "observation_journal_slots"
+      ]
+    },
+    {
+      "id": "p09",
+      "type": "quiz",
+      "title": "看图小检查",
+      "goal": "用未在讲解或互动中见过的观察场景进行图题检查，逐题读题和解释。",
+      "assetKeys": [
+        "quiz_plant_cases"
+      ]
+    },
+    {
+      "id": "p10",
+      "type": "slide",
+      "title": "把今天的像留下",
+      "goal": "回顾先看、照样画、对照后再介绍；隔一段时间再看同一株，回家纸笔作画和口述待成人观察。",
+      "assetKeys": [
+        "cover_plant_studio",
+        "observation_journal_plant"
+      ]
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "skill": "notice_visible_feature",
+      "probe": "新的园地植物观察图，选与实际叶形吻合的图案，口头题不要求认植物名。",
+      "correctSlot": 1
+    },
+    {
+      "skill": "record_where_it_grows",
+      "probe": "新的温室小苗，选符合当前生长位置与容器的画。",
+      "correctSlot": 2
+    },
+    {
+      "skill": "record_observed_appearance",
+      "probe": "新的无可见花样本，找与可见内容一致的记录，形状与添加花的干扰项都能仅看图分辨。",
+      "correctSlot": 0
+    },
+    {
+      "skill": "care_and_share",
+      "probe": "新的室外花圃，选观察时只看或指、不拉扯的动作图。",
+      "correctSlot": 1
+    },
+    {
+      "skill": "record_observed_appearance",
+      "probe": "新的观察点，选能画出已看见特征又没有补画遮挡部位的画像。",
+      "correctSlot": 0
+    },
+    {
+      "skill": "care_and_continue_observation",
+      "probe": "新的同一株两次观察，选两次实际记录分开保存的图；不以绘画好看或生长快慢作为答案。",
+      "correctSlot": 2
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "cover_plant_studio",
+      "kind": "CodexIllustration",
+      "purpose": "温暖、明亮的真实植物观察桌，简明场景与留白。"
+    },
+    {
+      "assetKey": "plants_nearby",
+      "kind": "CodexIllustration",
+      "purpose": "可分辨的常见植物和可见生长环境，只讲图证据。"
+    },
+    {
+      "assetKey": "spider_plant_observation",
+      "kind": "CodexIllustration",
+      "purpose": "单一水培观察样本，清楚窄长弯叶、可见浅色根、透明水杯，未见花，不装饰。"
+    },
+    {
+      "assetKey": "spider_plant_portrait_layers",
+      "kind": "PreciseDiagram",
+      "purpose": "分层可编辑观察线稿，容器轮廓、叶形和可见根逐项与参照对齐。"
+    },
+    {
+      "assetKey": "practice_plant_observation",
+      "kind": "CodexIllustration",
+      "purpose": "与吊兰不同的常见真实植株，盆与可见叶形清楚、根不外露。"
+    },
+    {
+      "assetKey": "practice_portrait_layers",
+      "kind": "PreciseDiagram",
+      "purpose": "给观察图做配套可组合的画像笔画。"
+    },
+    {
+      "assetKey": "edit_plant_observation",
+      "kind": "CodexIllustration",
+      "purpose": "新的可见证据，给正误画稿提供明确依据。"
+    },
+    {
+      "assetKey": "edit_portrait_layers",
+      "kind": "PreciseDiagram",
+      "purpose": "与编辑参照一致的分层记录画，错误添画可撤除。"
+    },
+    {
+      "assetKey": "sharing_and_care",
+      "kind": "CodexIllustration",
+      "purpose": "两名孩子在安全距离指看真实植物，手不拔扯，易看懂。"
+    },
+    {
+      "assetKey": "observation_journal_plant",
+      "kind": "CodexIllustration",
+      "purpose": "同株两次真实样子示例，不限定日期或所有植物的生长节奏。"
+    },
+    {
+      "assetKey": "observation_journal_slots",
+      "kind": "PreciseDiagram",
+      "purpose": "日期先后或视觉图标明确的独立画页与照片卡。"
+    },
+    {
+      "assetKey": "quiz_plant_cases",
+      "kind": "CodexIllustrationPlusPreciseDiagrams",
+      "purpose": "一题一处新植物场景，答案与干扰图的结构差别都清晰，只看图可独立答题。"
+    }
+  ],
+  "teachingFacts": {
+    "sample": "资料展示透明水杯里的单株吊兰，观察其长条弯叶和透杯可见的浅色根；用这个特定样本来画。",
+    "demonstration": "先观察真实样本，画出容器位置和看得见的叶、根，再与实物对照。遮挡处和没见到的花不添画。",
+    "sharing": "画和说名称、外形和生长位置，听同伴，爱护植物。",
+    "extension": "在不同时间记录同一株实际可见的变化。居家图画和口语为待观察。"
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  }
+}

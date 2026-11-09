@@ -1,0 +1,13 @@
+(function(){
+var forms=['in','out','still'],level=0,selected=null,misses=0,busy=false,demo=false,timer;
+K.hud({icon:'◎',title:'记录画面里的发现',levels:3});K.owl();K.ready({emoji:'◎',title:'记录画面里的发现',sub:'认真比较，再把相同的图送进发现册'});
+function update(){var after=K.$('#after-diagram .paper-frame');after.className='paper-frame '+forms[Math.min(level,2)];K.$$('#record-choices button').forEach(function(b){b.classList.toggle('selected',b.dataset.form===selected);b.classList.remove('recorded')});K.levels(3,level)}
+function reset(){clearTimeout(timer);level=0;selected=null;misses=0;busy=false;demo=false;K.stars=0;K.$('#star-n').textContent='0';K.$('#saved-records').innerHTML='';update();K.say('先比较前后，再选相同记录送进发现册。')}
+function pick(button){if(!K.started||busy||demo)return;selected=button.dataset.form;update();K.sfx.pick()}
+function save(){if(!selected||busy||demo)return;var button=K.$('#record-'+selected);if(selected!==forms[level]){misses++;K.sfx.no();K.shake(button);K.say(misses===1?'再看看后图，纸片下端在哪里？':misses===2?'比较下端位置，记录要和画面相同。':'先看后一幅图，再慢慢比较记录图。','no');if(misses>=3){K.highlight('#after-diagram');misses=0}return}
+ busy=true;misses=0;K.$('#saved-records').innerHTML='';K.$('#saved-records').appendChild(button.querySelector('.paper-frame').cloneNode(true));button.classList.add('recorded');K.star(1,button);K.sfx.ok();K.say('这张记录和画面相同，放进发现册。','ok');timer=setTimeout(function(){level++;if(level===3){K.levels(3,3);K.finish({title:'发现记下来了',sub:'真实活动中，也要照看见的如实说。',again:reset})}else{busy=false;selected=null;K.$('#saved-records').innerHTML='';update()}},1000)}
+K.$$('#record-choices button').forEach(function(b){b.addEventListener('click',function(){pick(b)});K.drag(b,{enabled:function(){return K.started&&!busy&&!demo},targets:function(){return [K.$('#discovery-book')]},onTap:function(){pick(b)},onDrop:function(el,target){if(target){selected=el.dataset.form;save()}}})});
+K.$('#discovery-book').addEventListener('click',save);K.$('#discovery-book').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();save()}});
+K.onStart=reset;K.onState=function(state){if(state.demo==='record'){reset();demo=true;K.$('#saved-records').appendChild(K.$('#record-in .paper-frame').cloneNode(true));K.say('老师记录了和后图相同的画面。','ok')}if(state.phase==='play')reset()};update();
+K.$('#play').addEventListener('error',function(e){if(e.target&&e.target.tagName==='IMG'){e.target.alt='图片暂未加载';K.say('图片暂未加载，请重新打开这一页。','no')}},true);
+})();

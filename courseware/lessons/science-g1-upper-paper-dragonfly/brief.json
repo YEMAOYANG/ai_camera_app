@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "mira.courseware.brief.v1",
+  "lesson": "制作会旋转的纸蜻蜓",
+  "goals": [
+    "从竹蜻蜓的翼和柄引出纸模型，比较平纸条与纸蜻蜓时，能就下落快慢、路线和动作提出自己的猜想。",
+    "会区分要剪的实线和要折的虚线，按四步剪折出细躯干和朝相反方向展开的两片飞翼，并说出剪刀的安全用法。",
+    "能在相同起点、以一致方式试放同大小纸条和纸蜻蜓，按看到的快慢、路线、动作和飞翼状态如实记录。",
+    "能用一次或多次试飞中是否边转边落的证据，判断作品有没有达到本课的制作要求，并说出一个还想检查的部位。",
+    "能结合用同样纸条做出的两个形态，解释剪折改变结构后，下落的样子可能改变。"
+  ],
+  "keyPoint": "按实线剪、按虚线折，用同样的纸条做出能旋转的纸蜻蜓，联系结构变化和试飞表现。",
+  "difficultPoint": "准确分清两次剪和两次折的位置，尤其保持两片飞翼朝相反方向折。用实际看到的现象评价作品。",
+  "pageSequence": [
+    {
+      "id": "p01",
+      "type": "slide",
+      "title": "一条纸会转吗",
+      "play": "依次揭示竹蜻蜓、平纸条、纸模型和试飞目标。说清翼和柄，提出三个观察角度。",
+      "assets": [
+        "workshop",
+        "bamboo-rotor",
+        "flat-strip",
+        "paper-rotor"
+      ]
+    },
+    {
+      "id": "p02",
+      "type": "interactive",
+      "title": "先把猜想存下来",
+      "play": "从快慢、路径和动作依次选图记下自己的猜想。两种猜法均可存入，没有预设对错。用同大小两纸条摆在准备区。",
+      "assets": [
+        "workshop",
+        "flat-strip",
+        "paper-rotor",
+        "flight-paths"
+      ]
+    },
+    {
+      "id": "p03",
+      "type": "slide",
+      "title": "剪刀上桌之前",
+      "play": "高亮圆头剪刀、桌面和纸条说明安全，先指出完整线和断开的线，再用剪和折动作解释区别。",
+      "assets": [
+        "safe-scissors",
+        "paper-pattern",
+        "workshop"
+      ]
+    },
+    {
+      "id": "p04",
+      "type": "interactive",
+      "title": "把纸折成小飞翼",
+      "play": "四关实际改变纸形：剪侧短口、折下段两侧、从上端中间剪到止点、两翼向相反方向折。可点或拖，错误只提醒线的样子和位置。",
+      "assets": [
+        "workshop",
+        "safe-scissors",
+        "paper-pattern",
+        "paper-states"
+      ]
+    },
+    {
+      "id": "p05",
+      "type": "interactive",
+      "title": "松手后看清楚",
+      "play": "把平纸条和纸蜻蜓放同一高度，一起轻放，播放原创建模试飞。记录谁先触地、走过的路线和是否转动，再放一轮看翼在上还是翻动。答案只由屏幕实际画面决定。",
+      "assets": [
+        "workshop",
+        "flat-strip",
+        "paper-rotor",
+        "flight-paths"
+      ]
+    },
+    {
+      "id": "p06",
+      "type": "slide",
+      "title": "用看到的结果说话",
+      "play": "逐项亮起真实可见的试飞卡、原猜想卡和目标卡。示范会转却有些飘仍符合会转要求，说明可留意飞翼或躯干。",
+      "assets": [
+        "flight-paths",
+        "paper-rotor",
+        "observation-cards"
+      ]
+    },
+    {
+      "id": "p07",
+      "type": "quiz",
+      "title": "小检查：做得有根据",
+      "play": "分别听题并点图，区分剪折符号和设置同样的试放条件。",
+      "assets": [
+        "quiz-fold",
+        "quiz-release"
+      ]
+    },
+    {
+      "id": "p08",
+      "type": "quiz",
+      "title": "小检查：看清再判断",
+      "play": "看新试飞片段，判断动作，挑支持达标的图证据。",
+      "assets": [
+        "quiz-motion",
+        "quiz-evidence"
+      ]
+    },
+    {
+      "id": "p09",
+      "type": "slide",
+      "title": "把一次试飞讲给大人",
+      "play": "依序亮起猜想、做成、看试飞和据实评价的画面。可请成人一起做并记录一次，口述和真实剪折留给成人观察。",
+      "assets": [
+        "workshop",
+        "paper-states",
+        "observation-cards"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "skill": "辨认剪折标记",
+      "intent": "新橙色折片的虚线怎么处理，图片选择向虚线折而不是剪。",
+      "correctPosition": "A",
+      "options": [
+        "沿虚线翻折",
+        "沿虚线剪开",
+        "沿另一道实线剪开"
+      ],
+      "asset": "quiz-fold"
+    },
+    {
+      "skill": "控制试放条件",
+      "intent": "新蓝绿两件纸作品准备比较，哪幅图从同高度同时松手。",
+      "correctPosition": "B",
+      "options": [
+        "同高但先后松手",
+        "同高同时松手",
+        "一高一低同时松手"
+      ],
+      "asset": "quiz-release"
+    },
+    {
+      "skill": "依据画面观察旋转",
+      "intent": "金色纸蜻蜓上的彩点从右侧到前侧再到左侧，同时整件越来越靠近地面。判断画面中的运动。",
+      "correctPosition": "C",
+      "options": [
+        "只向下没有转",
+        "在原高度转",
+        "边转边下降"
+      ],
+      "asset": "quiz-motion"
+    },
+    {
+      "skill": "用证据评价制作目标",
+      "intent": "展台上有三张不同作品的观察卡，哪张能证明这件作品达到了边转边落的要求。",
+      "correctPosition": "A",
+      "options": [
+        "连续画格出现转动并下降",
+        "只有漂亮外形的静止图",
+        "向下但朝向不变的连续画格"
+      ],
+      "asset": "quiz-evidence"
+    }
+  ],
+  "afterClass": "和大人试放一次，在纸上画下看到的路线，并说一个还想看清楚的部位。周测题源采用辨线、试放条件、识别旋转和以证据判断。",
+  "authoring": {
+    "mode": "OpenMAIC server-routed DeepSeek text, Codex revision",
+    "videoWaiver": "2026-10-30",
+    "evidencePolicy": "真实剪折、口述和试飞待观察"
+  }
+}

@@ -1,0 +1,46 @@
+<section id="pack-view" class="station-board" hidden>
+  <div id="pack-trays" class="choice-row" data-semantic-diagram="三盘各有准确的小棒数"></div>
+  <div id="pack-count" class="arrangement" data-semantic-diagram="一捆十根和外面的散棒">
+    <img class="bundle-illustration" src="__IMG:rod-bundle__" alt="一捆小棒">
+    <div id="pack-loose" class="rod-shelf"></div>
+  </div>
+  <div id="pack-options" class="choice-row bottom-row"></div>
+</section>
+<section id="twenty-view" class="station-board" hidden>
+  <div class="arrangement exchange-stage">
+    <div id="exchange-tens" class="exchange-card" data-semantic-diagram="扎好的整捆">
+      <img class="bundle-illustration" src="__IMG:rod-bundle__" alt="原来的一捆">
+      <img id="exchange-new-bundle" class="bundle-illustration" src="__IMG:rod-bundle__" alt="第二捆" hidden>
+    </div>
+    <div id="exchange-ones" class="rod-shelf exchange-card" data-semantic-diagram="未扎捆的散棒"></div>
+  </div>
+  <div id="exchange-controls" class="choice-row bottom-row">
+    <button type="button" class="station-button operation" id="exchange-add" aria-label="添一根">
+      <img src="__IMG:rod-unit__" alt=""><span>添一根</span>
+    </button>
+    <button type="button" class="station-button operation" id="exchange-tie" aria-label="扎成一捆">
+      <img src="__IMG:rod-bundle__" alt=""><span>扎成一捆</span>
+    </button>
+  </div>
+</section>
+<section id="beads-view" class="station-board" hidden>
+  <aside id="bead-target" class="target-token" data-semantic-diagram="等待摆出的两位数"></aside>
+  <div class="bead-rack" data-semantic-diagram="左十位和右个位的两杆计数器">
+    <div class="bead-column" id="bead-tens"><div class="bead-rail"></div><div class="bead-stack"></div><span>十位</span></div>
+    <div class="bead-column" id="bead-ones"><div class="bead-rail"></div><div class="bead-stack"></div><span>个位</span></div>
+  </div>
+  <div id="bead-choices" class="choice-row bottom-row"></div>
+</section>
+<section id="route-view" class="station-board" hidden>
+  <div id="route-line" class="route-line" data-semantic-diagram="每个数之间的距离都是一小格">
+    <div id="route-left" class="route-number"></div><div id="route-hole" class="route-number missing"></div><div id="route-right" class="route-number"></div>
+  </div>
+  <div id="route-choices" class="choice-row bottom-row"></div>
+</section>
+<section id="near-view" class="station-board" hidden>
+  <div id="near-line" class="near-line" data-semantic-diagram="10至20的11根等距刻度与真实小格距离"></div>
+  <div id="near-choices" class="choice-row bottom-row">
+    <button type="button" class="station-button digit-option" id="near-left" aria-label="比较到十的距离">10</button>
+    <button type="button" class="station-button digit-option" id="near-right" aria-label="比较到二十的距离">20</button>
+  </div>
+</section>

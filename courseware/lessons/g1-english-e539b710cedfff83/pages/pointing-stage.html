@@ -1,0 +1,29 @@
+<main id="pointing-room">
+  <header id="task-panel">
+    <div>
+      <h2 id="activity-heading"></h2>
+      <p id="activity-note"></p>
+    </div>
+    <button id="listen-again" type="button" aria-label="播放本轮指令">
+      <svg width="58" height="58" viewBox="0 0 56 56" aria-hidden="true">
+        <path d="M8 22h10l12-9v30l-12-9H8z" fill="currentColor"/>
+        <path d="M38 21q8 7 0 14m5-21q13 14 0 28" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </header>
+  <section id="activity-board" aria-label="英语活动">
+    <div id="actor-panel">
+      <img id="actor-picture" src="__IMG:jo__" alt="浣熊乔">
+      <span id="actor-badge" aria-live="polite"></span>
+    </div>
+    <div id="object-options" aria-label="图片选项"></div>
+    <svg id="pointing-path" viewBox="0 0 1176 402" aria-hidden="true">
+      <defs>
+        <marker id="pointer-end" markerWidth="11" markerHeight="11" refX="10" refY="5.5" orient="auto">
+          <path d="M1 1L10 5.5 1 10" fill="none" stroke="context-stroke" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <path id="point-trace" marker-end="url(#pointer-end)"/>
+    </svg>
+  </section>
+</main>

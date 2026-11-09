@@ -1,0 +1,90 @@
+{
+  "cast": [
+    {
+      "name": "小语老师",
+      "look": "小语老师用轻快的口语带孩子读、观察和尝试。"
+    }
+  ],
+  "style": {
+    "notes": "纸面底色、浅叶绿、墨绿与暖金，采用同一套绘本插图。主图区显示教学对象，文字只用于当前学习的字和词。"
+  },
+  "pages": [
+    {
+      "id": "p04",
+      "title": "字卡送到天气里",
+      "mechanism": "拖拽或先点字卡再点图片，正确字卡进入天气图。第一次错只说明没配上，第三次才突出相应天气图。",
+      "stage": "两张正式天气图、一个目标汉字。",
+      "levels": [
+        "风到旗子飘的图",
+        "雨到水洼和雨线图"
+      ],
+      "ids": [
+        "weather-token",
+        "weather-a",
+        "weather-b"
+      ],
+      "stateKeys": {
+        "weatherDemo": "prepare先排示范雨字卡，true示范配对，false恢复独立操作"
+      }
+    },
+    {
+      "id": "p06",
+      "title": "给对子牵线",
+      "mechanism": "先点左图再点相配右图，两边连上弧线。错误不保留线条，第一次只提示重新观察。",
+      "stage": "独立正式植物图和动物图，线条用于显示配对。",
+      "levels": [
+        "鸟找虫",
+        "虫找鸟"
+      ],
+      "ids": [
+        "pair-left",
+        "pair-option-tree",
+        "pair-option-other",
+        "pair-link"
+      ],
+      "stateKeys": {
+        "pairDemo": "prepare显示花与候选，true示范花树配对，false从孩子关卡开始"
+      }
+    },
+    {
+      "id": "p10",
+      "title": "用小镜头找春景",
+      "mechanism": "点图上对应景物，右边取景镜显示局部放大。第一次错只提示注意形状与颜色，第三次才突出目标。",
+      "stage": "使用正式风景插图与互不重叠的四个景物触控区。",
+      "levels": [
+        "水秀",
+        "柳绿",
+        "桃红"
+      ],
+      "ids": [
+        "spring-view",
+        "spring-mountain",
+        "spring-water",
+        "spring-willow",
+        "spring-peach"
+      ],
+      "stateKeys": {
+        "springDemo": "true在青山区域示范，false回到孩子关卡"
+      }
+    },
+    {
+      "id": "trace",
+      "title": "跟着范字慢慢描、再描山和水",
+      "mechanism": "两页共用真实田字格和示范路径；沿当前笔画拖动会给经过的浅线着色，也可逐笔观看。只说明屏幕操作，不给纸笔笔顺判定。",
+      "stage": "大田字格、已核对笔画、正式春景图、两个图形按钮。",
+      "levels": [
+        "云、雨、虫",
+        "山、水"
+      ],
+      "ids": [
+        "ink-grid",
+        "ink-example",
+        "ink-show",
+        "ink-redo"
+      ],
+      "stateKeys": {
+        "inkDemo": "指定当前场景中的目标字做逐笔示范；practice重置为孩子练习。"
+      }
+    }
+  ]
+}

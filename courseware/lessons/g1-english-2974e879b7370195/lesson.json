@@ -1,0 +1,992 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "Unit 1 Where's the orange cat?",
+  "description": "外研社一年级起点一年级下册 Module 3 Unit 1，原创图画、预录音与操作活动，整合该课全部官方课时资料。",
+  "grade": 1,
+  "roster": {
+    "mia": {
+      "name": "Mia 老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Jennifer",
+      "avatar": "/teachers/coco-english-v1.png",
+      "color": "#D97757",
+      "persona": "mira_english_standard v2；温和清楚地示范英语，结合图片解释意义，尊重孩子第一次尝试。"
+    }
+  },
+  "images": {
+    "on-bed": {
+      "file": "assets/on-bed.png"
+    },
+    "under-bed": {
+      "file": "assets/under-bed.png"
+    },
+    "in-box": {
+      "file": "assets/in-box.png"
+    },
+    "cat-orange": {
+      "file": "assets/cat-orange.png"
+    },
+    "cat-white": {
+      "file": "assets/cat-white-v2.png"
+    },
+    "cat-black": {
+      "file": "assets/cat-black-v2.png"
+    },
+    "empty-bed": {
+      "file": "assets/empty-bed.png"
+    },
+    "empty-box": {
+      "file": "assets/empty-box-v2.png"
+    },
+    "on-box": {
+      "file": "assets/on-box-v2.png"
+    },
+    "quiz-under-bed": {
+      "file": "assets/quiz-under-bed-v2.png"
+    },
+    "dots-9": {
+      "glyph": {
+        "size": [
+          640,
+          320
+        ],
+        "layout": "rows",
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dots-10": {
+      "glyph": {
+        "size": [
+          640,
+          320
+        ],
+        "layout": "rows",
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dots-11": {
+      "glyph": {
+        "size": [
+          640,
+          320
+        ],
+        "layout": "rows",
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dots-12": {
+      "glyph": {
+        "size": [
+          640,
+          320
+        ],
+        "layout": "rows",
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              },
+              {
+                "glyph": "•"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "小猫在哪里？",
+      "template": "title-picture",
+      "data": {
+        "title": "Where's the orange cat?",
+        "picture": "on-bed",
+        "caption": "找位置，也数数量"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我是 Mia 老师，和你一起找小猫。"
+        },
+        {
+          "say": "这只小猫的毛是橙色的。"
+        },
+        {
+          "say": "英语里，橙色可以说 orange。"
+        },
+        {
+          "say": "Orange cat."
+        },
+        {
+          "say": "就是橙色的小猫。"
+        },
+        {
+          "say": "我们先听清要找哪一只。"
+        },
+        {
+          "say": "再看它和床、盒子的相对位置。"
+        },
+        {
+          "say": "问在哪里，要留心它藏在哪儿。"
+        },
+        {
+          "say": "问有多少，要一只一只数清。"
+        },
+        {
+          "say": "这一课还会认识十一和十二。"
+        },
+        {
+          "say": "老师会先示范，再请你动手。"
+        },
+        {
+          "say": "开口说英语时，请大人听一听。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "听颜色，找到小猫",
+      "page": "p02",
+      "widgetType": "english-colour-pick",
+      "startImage": "on-bed",
+      "script": [
+        {
+          "highlight": "#demo-cat"
+        },
+        {
+          "say": "先看老师找到的这只白猫。"
+        },
+        {
+          "say": "White cat."
+        },
+        {
+          "say": "白色是 white，小猫是 cat。"
+        },
+        {
+          "annotate": "#demo-cat",
+          "content": "white cat"
+        },
+        {
+          "say": "颜色放在小猫前，告诉我们哪一只。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "老师把白猫送到小地垫上。"
+        },
+        {
+          "say": "现在换你来找橙色的小猫。"
+        },
+        {
+          "say": "An orange cat."
+        },
+        {
+          "say": "先看毛的颜色，再点那只猫。"
+        },
+        {
+          "say": "黑色是 black，白色是 white。"
+        },
+        {
+          "say": "A black cat."
+        },
+        {
+          "say": "听清 orange，别只看谁离你近。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "点对以后，小猫会走到小地垫上。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "看清床上和床下",
+      "template": "two-columns",
+      "data": {
+        "title": "同一张床，位置不同",
+        "left": {
+          "heading": "On the bed.",
+          "body": "在床面上"
+        },
+        "right": {
+          "heading": "Under the bed.",
+          "body": "在床底下"
+        },
+        "left_picture": "on-bed",
+        "right_picture": "under-bed"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "先看左边，小猫坐在床面上。"
+        },
+        {
+          "say": "On the bed."
+        },
+        {
+          "say": "这里 on 表示在上面。"
+        },
+        {
+          "say": "要看小猫和床面的关系。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再看右边，小猫在床底的空隙里。"
+        },
+        {
+          "say": "Under the bed."
+        },
+        {
+          "say": "这里 under 表示在下面。"
+        },
+        {
+          "say": "两张图都是小猫，也都是床。"
+        },
+        {
+          "say": "玩具在盒盖上，也可以用 on。"
+        },
+        {
+          "say": "问小猫在哪里，可以这样说。"
+        },
+        {
+          "say": "Where's the orange cat?"
+        },
+        {
+          "say": "看到床下，就回答 under the bed。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "把小猫送到床上",
+      "page": "p04",
+      "widgetType": "english-position-place",
+      "startImage": "on-bed",
+      "script": [
+        {
+          "highlight": "#bed-picture"
+        },
+        {
+          "say": "这是一张床，先认清这个参照物。"
+        },
+        {
+          "say": "床面上方和床底下是不同位置。"
+        },
+        {
+          "setState": {
+            "boxDemo": true
+          }
+        },
+        {
+          "say": "看，黑猫藏到盒子里了。"
+        },
+        {
+          "say": "It's in the box."
+        },
+        {
+          "say": "这句话表示它在盒子里面。"
+        },
+        {
+          "setState": {
+            "boxDemo": false,
+            "pointOn": true
+          }
+        },
+        {
+          "say": "老师指向床面，这里可以说 on。"
+        },
+        {
+          "say": "On the bed."
+        },
+        {
+          "say": "现在请把橙色小猫送到床面上。"
+        },
+        {
+          "say": "拖动小猫，让它停在床面的位置。"
+        },
+        {
+          "say": "也可以先点小猫，再点一个落点。"
+        },
+        {
+          "say": "看清是床面，不是床下或盒内。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "interactive",
+      "title": "每只小猫只数一次",
+      "page": "p05",
+      "widgetType": "english-count-eleven-twelve",
+      "startImage": "on-bed",
+      "script": [
+        {
+          "highlight": "#count-cat-10"
+        },
+        {
+          "say": "Where's the cat?"
+        },
+        {
+          "say": "How many cats?"
+        },
+        {
+          "say": "前一句找位置，后一句要点数。"
+        },
+        {
+          "say": "已经数过的猫，会到下面的小地垫。"
+        },
+        {
+          "setState": {
+            "demoCount": 10
+          }
+        },
+        {
+          "say": "老师先把十只小猫排好。"
+        },
+        {
+          "say": "Ten."
+        },
+        {
+          "setState": {
+            "demoCount": 11
+          }
+        },
+        {
+          "say": "再来一只，就是十一只。"
+        },
+        {
+          "say": "Eleven."
+        },
+        {
+          "say": "十一对应 eleven，听清这个声音。"
+        },
+        {
+          "setState": {
+            "demoCount": 12
+          }
+        },
+        {
+          "say": "十一后面再来一只，就是十二只。"
+        },
+        {
+          "say": "Twelve."
+        },
+        {
+          "say": "十二对应 twelve，和十一不一样。"
+        },
+        {
+          "setState": {
+            "demoCount": 0
+          }
+        },
+        {
+          "say": "现在轮到你，把每只小猫点数一次。"
+        },
+        {
+          "say": "数过的小猫不会再算第二次。"
+        },
+        {
+          "say": "全都到地垫后，看看总数是十二。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "先找清楚，再回答",
+      "template": "two-columns",
+      "data": {
+        "title": "不知道与看清楚",
+        "left": {
+          "heading": "I don't know.",
+          "body": "还没有找到，先如实说不知道"
+        },
+        "right": {
+          "heading": "Yes, it is.",
+          "body": "已经看清，它就在床下"
+        },
+        "left_picture": "empty-bed",
+        "right_picture": "under-bed"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "这边暂时没有看到那只猫。"
+        },
+        {
+          "say": "只看这一处，还不能知道它在哪儿。"
+        },
+        {
+          "say": "I don't know."
+        },
+        {
+          "say": "这句话是我不知道，不用随便猜。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "现在看见橙色小猫在床下了。"
+        },
+        {
+          "say": "老师问，它在床底下吗？"
+        },
+        {
+          "say": "Is it under the bed?"
+        },
+        {
+          "say": "图里确实在床下，就这样回答。"
+        },
+        {
+          "say": "Yes, it is."
+        },
+        {
+          "say": "如果问它在床上，图里却不是。"
+        },
+        {
+          "say": "Is it on the bed?"
+        },
+        {
+          "say": "No, it isn't."
+        },
+        {
+          "say": "这表示不是，要根据看见的位置回答。"
+        },
+        {
+          "say": "现在请大人听你试着说一遍。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "把小猫安置在床下",
+      "page": "p07",
+      "widgetType": "english-position-place",
+      "startImage": "on-bed",
+      "script": [
+        {
+          "highlight": "#bed-picture"
+        },
+        {
+          "say": "这次还是这张床，位置要换一换。"
+        },
+        {
+          "say": "床面与地板之间，有一个空隙。"
+        },
+        {
+          "annotate": "#place-under",
+          "content": "under the bed"
+        },
+        {
+          "say": "Under the bed."
+        },
+        {
+          "say": "表示在床底下，不是在床面上。"
+        },
+        {
+          "highlight": "#cat-mover"
+        },
+        {
+          "say": "听见 under，想一想下方的空隙。"
+        },
+        {
+          "say": "现在请把小猫送到床底下。"
+        },
+        {
+          "say": "可以拖到空隙，也能先点再点。"
+        },
+        {
+          "say": "点错先停一停，重新看参照物。"
+        },
+        {
+          "say": "小猫到床下后，请试着回答。"
+        },
+        {
+          "say": "Is it under the bed?"
+        },
+        {
+          "say": "看着真实位置，再说 Yes, it is。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "听一听，选图片",
+      "intro": [
+        "老师读一句，你点对应的图片。",
+        "数量题里，每个圆点只数一次。",
+        "先听完，再动手。"
+      ],
+      "questions": [
+        {
+          "id": "q-colour",
+          "question": "Listen: a black cat.",
+          "skill": "english-colour-cat-listening",
+          "answer": [
+            "A"
+          ],
+          "analysis": "black 表示黑色，黑猫图片是唯一相符的选项。",
+          "options": {
+            "A": {
+              "label": "黑色小猫",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-black",
+                "alt": "一只黑色小猫"
+              }
+            },
+            "B": {
+              "label": "橙色小猫",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-orange",
+                "alt": "一只橙色小猫"
+              }
+            },
+            "C": {
+              "label": "白色小猫",
+              "visual": {
+                "kind": "asset",
+                "image": "cat-white",
+                "alt": "一只白色小猫"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-in",
+          "question": "It's in the box.",
+          "skill": "english-position-on-under-in",
+          "answer": [
+            "B"
+          ],
+          "analysis": "in the box 表示在盒子里面；小猫身体被盒壁围住的图片相符。",
+          "options": {
+            "A": {
+              "label": "白猫在床下",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-under-bed",
+                "alt": "一只白色猫在铺有薄荷绿床单的床下"
+              }
+            },
+            "B": {
+              "label": "小猫在盒内",
+              "visual": {
+                "kind": "asset",
+                "image": "in-box",
+                "alt": "一只橙色猫坐在打开的盒子里面"
+              }
+            },
+            "C": {
+              "label": "小猫在盒上",
+              "visual": {
+                "kind": "asset",
+                "image": "on-box",
+                "alt": "一只黑色猫坐在盒子顶面上"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-on",
+          "question": "It's on the box.",
+          "skill": "english-position-on-under-in",
+          "answer": [
+            "C"
+          ],
+          "analysis": "on the box 表示在盒子顶面上，黑猫坐在盒顶的图片相符。",
+          "options": {
+            "A": {
+              "label": "小猫在盒内",
+              "visual": {
+                "kind": "asset",
+                "image": "in-box",
+                "alt": "一只橙色猫在盒子里面"
+              }
+            },
+            "B": {
+              "label": "白猫在床下",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-under-bed",
+                "alt": "一只白色猫在铺有薄荷绿床单的床下"
+              }
+            },
+            "C": {
+              "label": "小猫在盒上",
+              "visual": {
+                "kind": "asset",
+                "image": "on-box",
+                "alt": "一只黑色猫坐在盒子顶面上"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-under",
+          "question": "It's under the bed.",
+          "skill": "english-position-on-under-in",
+          "answer": [
+            "A"
+          ],
+          "analysis": "under the bed 表示在床底下，白猫在床面与地面之间的图片相符。",
+          "options": {
+            "A": {
+              "label": "白猫在床下",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-under-bed",
+                "alt": "一只白色猫在铺有薄荷绿床单的床下"
+              }
+            },
+            "B": {
+              "label": "小猫在盒上",
+              "visual": {
+                "kind": "asset",
+                "image": "on-box",
+                "alt": "一只黑色猫坐在盒子顶面上"
+              }
+            },
+            "C": {
+              "label": "小猫在盒内",
+              "visual": {
+                "kind": "asset",
+                "image": "in-box",
+                "alt": "一只橙色猫在盒子里面"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-eleven",
+          "question": "Eleven. 点选一样多的圆点。",
+          "skill": "english-number-eleven-twelve",
+          "answer": [
+            "B"
+          ],
+          "analysis": "eleven 对应十一，十一颗圆点的图相符；每颗只数一次。",
+          "options": {
+            "A": {
+              "label": "十二颗圆点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-12",
+                "alt": "十二颗圆点"
+              }
+            },
+            "B": {
+              "label": "十一颗圆点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-11",
+                "alt": "十一颗圆点"
+              }
+            },
+            "C": {
+              "label": "九颗圆点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-9",
+                "alt": "九颗圆点"
+              }
+            }
+          }
+        },
+        {
+          "id": "q-twelve",
+          "question": "Twelve. 点选一样多的圆点。",
+          "skill": "english-number-eleven-twelve",
+          "answer": [
+            "C"
+          ],
+          "analysis": "twelve 对应十二，十二颗圆点的图相符；不要把 eleven 的十一当成十二。",
+          "options": {
+            "A": {
+              "label": "十颗圆点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-10",
+                "alt": "十颗圆点"
+              }
+            },
+            "B": {
+              "label": "十一颗圆点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-11",
+                "alt": "十一颗圆点"
+              }
+            },
+            "C": {
+              "label": "十二颗圆点",
+              "visual": {
+                "kind": "asset",
+                "image": "dots-12",
+                "alt": "十二颗圆点"
+              }
+            }
+          }
+        }
+      ],
+      "script": []
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "把今天的发现带回家",
+      "template": "summary",
+      "data": {
+        "title": "今天听懂了什么？",
+        "items": [
+          "颜色 + cat：先听清是哪只猫",
+          "Where：问位置；on / under / in",
+          "How many：问数量；eleven 11，twelve 12",
+          "I don't know：不知道就如实回答",
+          "看清位置，再用 Yes 或 No 回应"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们先听颜色，找到指定的猫。"
+        },
+        {
+          "say": "颜色词和小猫连在一起听。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "问位置时，先看它和物品的关系。"
+        },
+        {
+          "say": "床上用 on，床下用 under。"
+        },
+        {
+          "say": "盒子里面，可以说 in the box。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "问数量，要一只一只数清。"
+        },
+        {
+          "say": "Eleven."
+        },
+        {
+          "say": "十一。"
+        },
+        {
+          "say": "Twelve."
+        },
+        {
+          "say": "十二。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "没有找到时，可以如实说不知道。"
+        },
+        {
+          "say": "I don't know."
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "看清楚后，再用肯定或否定回应。"
+        },
+        {
+          "say": "请大人换一个玩具位置，陪你说。"
+        },
+        {
+          "say": "这次练习了听声音、看图片。"
+        },
+        {
+          "say": "开口说得怎样，还请大人听一听。"
+        }
+      ]
+    }
+  ]
+}

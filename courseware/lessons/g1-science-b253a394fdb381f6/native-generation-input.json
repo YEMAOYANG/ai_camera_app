@@ -1,0 +1,314 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "smartedu-science-six-year-g1-upper-2c31bb8a",
+    "revisionId": "directory-0916225743d847071f677a1a",
+    "nodeId": "cc37f0d9-de2d-4cde-975c-0c2ecfd6c76e",
+    "unitId": "060a916d-cdbb-4b40-b294-7bb1799199a3",
+    "officialMaterialId": "24bd131b-22ce-45b1-8f10-f2895cb36484",
+    "activityId": "a21c17d6-6960-a0a0-c682-ec16a83924b4",
+    "classHours": [
+      "lesson_1"
+    ]
+  },
+  "request": "为青岛出版社六三学制一年级上册第一单元《1.吹泡泡》原创一门完整科学课。请生成每页可直接说给孩子听的讲解、师生分工的互动过程和四道唯一答案的图片小检查及解析。按本课计划和已有正式素材语义拟稿，课末回顾。保持实物观察、多角度证据与安全边界，勿复制原资料。老师先操作画面再讲解。",
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "objectives": [
+      "在游戏中观察泡泡的大小、透明、表面附着形态及停留时间，区分具体观察和猜想。",
+      "比较不同物体表面上的泡泡现象，知道条件不同，观察结果可能不同。",
+      "知道大泡套小泡的一种尝试顺序，依据现象调整方法。",
+      "观察户外泡泡的飘动和颜色；不同形工具吹出的独立泡泡一般呈球形。",
+      "说出自己的发现、倾听他人发现；在大人陪同下安全继续观察。"
+    ],
+    "coveredOfficialHours": [
+      "lesson_1"
+    ],
+    "videoStatus": "waived",
+    "excludedTopics": [
+      "不讲表面张力、薄膜干涉等官方页未讲清的原理。",
+      "表面比较采用官方教学设计列举的具体观察，不声称所有材料和每次都如此。",
+      "独立空气泡泡一般为球形；桌面泡泡为贴在表面的半球状；不混淆相连与独立泡泡。",
+      "官方课后材料和步骤有胶水缺步且未给比例，不自行补配方，不要求儿童独立操作。",
+      "真实吹泡泡、口头表达和倾听表现待大人观察；屏幕只记录图像判断与操作。"
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "cd0c95f77d4bf9463bd59bb626af13a139802c5fc9b3f2020b1fd4eeb9345c29",
+    "briefSha256": "2c7d89ca4c93940122ba8ba029451d12c6af8da6af9e35b642f5d52f6c720e84",
+    "officialManifestSha256": "6dac8ce9d5ed975473f0bc7e762cff15ab7b32ca27b7c19072a4f94d88c1b220",
+    "officialDetailsSha256": "5627d129c00569119124fd282a06d5440c23959b00d34579944f7065cbadeee2"
+  },
+  "qualityRules": [
+    "小科老师为主讲，简体中文儿童口语，单句尽量25字，最长40字。",
+    "讲解至少6句且100字，互动至少5句且90字，真实画面至少三次先操作再开口。",
+    "一二年级靠有意义的图和老师读题，首次错只提示观察，不揭答案，完成后可重玩。",
+    "小检查为原创新情境三选一，给唯一答案、知识点和解析。",
+    "记录屏幕操作，真实吹、说、听待观察。不要课堂讨论、外链或临时占位图。"
+  ],
+  "pagePlan": [
+    {
+      "page": 1,
+      "type": "slide",
+      "title": "泡泡观察站",
+      "play": "原创实验桌插画与三个观察点，老师介绍看大小、看表面、看变化；安全和证据边界用短句口述。"
+    },
+    {
+      "page": 2,
+      "type": "interactive",
+      "title": "换个表面看看",
+      "play": "孩子将正式图片物体拖进实验台，按图示吹气按钮，让泡泡在桌面、布料、球、水面上出现不同的示例状态；每个表面须先观察再放入记录区，操作真正改变泡泡的位置和状态。该页是四次示例观察，不保证真实实验每次相同。"
+    },
+    {
+      "page": 3,
+      "type": "slide",
+      "title": "同一个泡泡，多种发现",
+      "play": "正式泡泡图展示透明与彩色边缘；老师逐点讲大小、形态和变化，说明透明仍可有彩色反光；请孩子向大人说实际发现，口述待观察。"
+    },
+    {
+      "page": 4,
+      "type": "quiz",
+      "title": "小检查：大小和表面",
+      "play": "新情境湿瓷盘泡泡破后留下液体；新蓝托盘两个大小不同的泡泡。老师读题，孩子选原创图片；不复用课堂实验表面例图作题干。"
+    },
+    {
+      "page": 5,
+      "type": "slide",
+      "title": "大泡泡的里面",
+      "play": "原创嵌套泡泡图，分点讲先大后小、吸管轻轻穿入、观察后再调整；不保证成功、不解释未核对的物理机制。"
+    },
+    {
+      "page": 6,
+      "type": "interactive",
+      "title": "搭一个泡泡小屋",
+      "play": "孩子拖水碗到台面形成湿润区，用大号吹气图产生外泡，把吸管轻轻送到中间，再用小号吹气图产生内泡。碰到外泡边缘会在示例中破裂；首次错只提示观察接触处，保留重试，逐级提示。不增加官方页没有写出的湿干吸管比较结论。"
+    },
+    {
+      "page": 7,
+      "type": "slide",
+      "title": "到户外继续观察",
+      "play": "原创小公园插画包含飘带、分散泡泡和家长；老师讲随风飘动、光下可见彩色、站稳不追跑与倾听新发现。"
+    },
+    {
+      "page": 8,
+      "type": "interactive",
+      "title": "看着风，找泡泡",
+      "play": "孩子拖泡泡到与本次风向箭头一致的观察窗，泡泡真的移动；先向右、再向左的新风向，教看每次线索；错时回到起点，不抢答。完成后比较大小和颜色，口头发现待观察。"
+    },
+    {
+      "page": 9,
+      "type": "slide",
+      "title": "工具变了，泡泡呢",
+      "play": "不同形工具配正式球形泡泡插画，老师强调比较独立空中泡泡，一般为球形，桌面贴住的泡泡不能混在同一次比较里。"
+    },
+    {
+      "page": 10,
+      "type": "interactive",
+      "title": "换工具做比较",
+      "play": "孩子把圆、心、星工具分别拖到泡泡液盘，按吹气键，工具图淡出，独立球形泡泡飞向同一个观察窗；每轮把工具与结果图配对，三次都记录才完成。相邻页为风向拖动和工具实验，机制不同。"
+    },
+    {
+      "page": 11,
+      "type": "quiz",
+      "title": "小检查：新的工具与安全",
+      "play": "新长方形工具题，球形、长方体形、三角形三幅泡泡图作选项；新社区小路情境选择大人陪同站稳观察，干扰画面有追跑和踩进洒出的泡泡液。答案位置与前两题均衡。"
+    },
+    {
+      "page": 12,
+      "type": "slide",
+      "title": "把发现带回家",
+      "play": "依次回顾多角度观察、比较表面、先大后小、户外与工具比较、倾听安全；承接官方滚动泡泡拓展，仅请大人照官方任务安排，不擅补胶水步骤或配比，真实滚动和口述均待观察。"
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "id": "q1",
+      "skill": "观察泡泡破后的表面变化",
+      "scenario": "新瓷盘上的泡泡破了。哪图显示留下泡泡液？",
+      "availablePictureChoices": {
+        "A": "留有水痕的瓷盘",
+        "B": "干燥的瓷盘",
+        "C": "有饼干碎的瓷盘"
+      },
+      "correctSlot": "A"
+    },
+    {
+      "id": "q2",
+      "skill": "根据画面比较泡泡大小",
+      "scenario": "蓝托盘上方，哪图有一大一小两个泡泡？",
+      "availablePictureChoices": {
+        "A": "两个一样大的泡泡",
+        "B": "一大一小两个泡泡",
+        "C": "只有一个泡泡"
+      },
+      "correctSlot": "B"
+    },
+    {
+      "id": "q3",
+      "skill": "不同形工具与独立泡泡形状",
+      "scenario": "长方形环吹出的独立泡泡，一般像哪图？",
+      "availablePictureChoices": {
+        "A": "长方体形的想象泡泡",
+        "B": "三角形的想象泡泡",
+        "C": "球形泡泡"
+      },
+      "correctSlot": "C"
+    },
+    {
+      "id": "q4",
+      "skill": "户外安全观察",
+      "scenario": "社区小路上，哪种观察泡泡的做法安全？",
+      "availablePictureChoices": {
+        "A": "大人陪同站稳观察",
+        "B": "独自追着泡泡跑",
+        "C": "走进洒出的泡泡液"
+      },
+      "correctSlot": "A"
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "cover",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "明亮科学活动桌，左侧浅木桌面、右侧折叠蓝布、橙色皮球和透明浅水碗分开放；桌上两三个透明泡泡，后方空中漂浮几个独立彩色边缘球形泡泡，留白清爽。"
+    },
+    {
+      "assetKey": "table",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "单张浅木色小实验桌，正面略俯视，清晰完整的空桌面位于图像中间偏下，不要泡泡、不放其他物体。"
+    },
+    {
+      "assetKey": "cloth",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一块蓝色柔软棉布铺在浅木桌面上，正面略俯视，纹理和布边清楚，中间留出可承托泡泡的空间，不要泡泡。"
+    },
+    {
+      "assetKey": "ball",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一个圆润橙色皮球放在浅木桌上，略俯视，皮球在画面下半部居中，完整显示，不要泡泡、不写标志。"
+    },
+    {
+      "assetKey": "water",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一只透明浅玻璃碗盛清水放在浅木桌上，略俯视，水面清楚且在画面中央偏下，完整显示，不要泡泡。"
+    },
+    {
+      "assetKey": "bubble",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一个独立透明球形肥皂泡悬在浅米白背景中，能透过它看见背景，薄薄边缘有淡彩虹反光，柔和高光显示球体。只有一个泡泡，无底座无手无文字。"
+    },
+    {
+      "assetKey": "nested",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "青绿色湿润桌面上一个透明大半球泡泡，里面完整套着一个更小的透明半球泡泡，两者边缘分开不接触；透明吸管从右侧轻轻穿入外泡到内泡旁，清楚表达里面和外面。"
+    },
+    {
+      "assetKey": "outdoor",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "安静社区小公园，草坪与宽阔步道，母亲陪一年级孩子站稳观察泡泡；孩子在左侧，右侧留宽阔天空供观察，远处一根飘带向右伸展，透明独立球形泡泡大小不同、淡彩反光，不出现追跑。"
+    },
+    {
+      "assetKey": "circle-tool",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一根粗柄安全吹泡泡棒，圆形空心环，青绿色塑料，直立完整居中，无泡泡。"
+    },
+    {
+      "assetKey": "heart-tool",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一根粗柄安全吹泡泡棒，心形空心环，珊瑚橙塑料，直立完整居中，无泡泡。"
+    },
+    {
+      "assetKey": "star-tool",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一根粗柄安全吹泡泡棒，五角星形空心环，暖黄色塑料，直立完整居中，无泡泡。"
+    },
+    {
+      "assetKey": "rectangle-tool",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一根粗柄安全吹泡泡棒，长方形空心环，淡紫色塑料，直立完整居中，无泡泡，长方形区别于方形。"
+    },
+    {
+      "assetKey": "wet-straw",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "单根透明淡青色粗吸管，斜放完整显示；下端有清楚的一小滴水，旁边浅水碟只露少许，表现吸管端已沾湿，吸管占画面主体，无人物。"
+    },
+    {
+      "assetKey": "rect-bubble",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "儿童科学判断用的错误想象图：一个独立透明长方体状肥皂泡，有清楚的平面和直角、淡彩虹边缘，与球形显著不同，悬空浅米白底。不要真实方盒、不要文字。"
+    },
+    {
+      "assetKey": "tri-bubble",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "儿童科学判断用的错误想象图：一个独立透明三角形轮廓的肥皂泡，有三个清楚角点、淡彩虹边缘，与球形显著不同，悬空浅米白底。不要实体三角积木、不要文字。"
+    },
+    {
+      "assetKey": "wet-plate",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一只白色圆瓷盘，盘内有泡泡破后留下的一小片清水痕和几滴水，没有完整泡泡，俯视清楚，浅米白底。"
+    },
+    {
+      "assetKey": "dry-plate",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "同样的白色圆瓷盘，表面干燥干净，没有水滴、没有泡泡、没有食物，俯视清楚，浅米白底。"
+    },
+    {
+      "assetKey": "crumb-plate",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "同样的白色圆瓷盘，盘内只有几块明显的棕色饼干碎屑，没有水滴、没有泡泡，俯视清楚，浅米白底。"
+    },
+    {
+      "assetKey": "pair-different",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "蓝色平托盘上方悬着两个透明球形泡泡，左边明显大、右边明显小，两者不接触，只有两个泡泡，淡彩薄边缘清楚。"
+    },
+    {
+      "assetKey": "pair-equal",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "与大小不同泡泡图相同的蓝色平托盘上方，悬着两个大小完全相同的透明球形泡泡，两者不接触，只有两个泡泡，淡彩薄边缘清楚。"
+    },
+    {
+      "assetKey": "one-bubble",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "与两泡图相同的蓝色平托盘上方，只有一个透明球形泡泡，淡彩薄边缘清楚，空处没有其他泡泡。"
+    },
+    {
+      "assetKey": "adult",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一年级女孩在社区公园宽步道旁站稳观察一个泡泡，旁边母亲陪同，地面干燥整洁、远离车道，姿势清楚，半身以上完整。"
+    },
+    {
+      "assetKey": "chase",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "一年级女孩在社区步道追着泡泡快跑，身体前倾、迈大步、手臂伸向泡泡，旁边无人陪同，地面上有小石头；表现追跑这一个动作，无事故。"
+    },
+    {
+      "assetKey": "spill",
+      "kind": "CodexDirectedIllustration",
+      "purpose": "社区步道上一瓶泡泡液已倾倒，地面有清楚湿滑液体，一年级女孩正要迈步踩进湿处，没有清理动作，无事故，画面清楚。"
+    }
+  ],
+  "teachingFacts": {
+    "surfaces": "第2页：回忆游戏；依次尝试桌面、布料、球、水面；液体不洒地上以防滑。观察例子有桌面易破、留下液体、半球状、大小不同、透明、水上停留较长和沿球面滑下。",
+    "nesting": "第3页：反复尝试；大泡套小泡可先大后小，湿桌面、轻轻穿入有助尝试。碰到大泡可能破裂或变并列等，不把一次结果说成必然；接着户外观察。",
+    "outdoor": "第4页：户外可借风、轻挥工具；泡泡随风飘、显彩色、近球形；不同形工具吹出的独立泡泡一般为球体；拓展能滚动的泡泡。",
+    "extension": {
+      "official": [
+        "在不同物体表面吹泡泡，记录具体发现。",
+        "尝试大泡套小泡并交流方法。",
+        "户外和不同形工具吹泡泡，说新发现。",
+        "家长陪同尝试滚动泡泡；官方未给完整配比，胶水没有对应步骤。"
+      ],
+      "inLesson": "前三项对应第2、3、5、6、7、8、9、10页；第12页承接家庭拓展，不把屏幕完成等同真实操作达标。",
+      "weekly": "提供观察证据、比较表面、嵌套顺序、户外风向、独立泡泡形状、安全分享等题源；每目标约2题原创变式，由周测统一生成，不另造本课测验。"
+    }
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  }
+}

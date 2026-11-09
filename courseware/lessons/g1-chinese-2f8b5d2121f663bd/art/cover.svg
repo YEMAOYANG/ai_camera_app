@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="wall" x2="1" y2="1">
+      <stop stop-color="#f7e8ce"/>
+      <stop offset="1" stop-color="#e8ccb1"/>
+    </linearGradient>
+    <linearGradient id="floor" x2="0" y2="1">
+      <stop stop-color="#d6ae87"/>
+      <stop offset="1" stop-color="#b78266"/>
+    </linearGradient>
+    <filter id="shadow" x="-.2" y="-.2" width="1.4" height="1.5">
+      <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="#694739" flood-opacity=".21"/>
+    </filter>
+  </defs>
+  <path d="M0 0h1280v596H0Z" fill="url(#wall)"/>
+  <path d="M0 588h1280v132H0Z" fill="url(#floor)"/>
+  <path d="M0 572h1280v17H0Z" fill="#c99d7c"/>
+  <path d="M0 636h1280M0 693h1280M260 588L171 720m295-132-22 132m350-132 32 132m190-132 105 132" stroke="#8c644e" stroke-width="3" opacity=".25"/>
+  <path d="M369 628q258-38 540 1l107 70q-358 39-764-2Z" fill="#538b7b" opacity=".65"/>
+  <path d="M385 638q242-30 506-1l77 51q-321 27-662-1Z" fill="none" stroke="#e0c48e" stroke-width="3"/>
+  <g filter="url(#shadow)">
+    <path d="M117 51h492v249H117Z M671 51h492v249H671Z M117 325h492v249H117Z M671 325h492v249H671Z" fill="#a26f57"/>
+    <path d="M124 58h478v235H124Z M678 58h478v235H678Z M124 332h478v235H124Z M678 332h478v235H678Z" fill="#fff5df"/>
+    <image x="139" y="66" width="448" height="219" href="../assets/flag-school.png" preserveAspectRatio="xMidYMid meet"/>
+    <image x="693" y="66" width="448" height="219" href="../assets/gate-front.png" preserveAspectRatio="xMidYMid meet"/>
+    <image x="139" y="340" width="448" height="219" href="../assets/yangtze-gorge.png" preserveAspectRatio="xMidYMid meet"/>
+    <image x="693" y="340" width="448" height="219" href="../assets/yellow-falls.png" preserveAspectRatio="xMidYMid meet"/>
+  </g>
+  <g transform="translate(81 537)">
+    <ellipse cy="146" rx="70" ry="13" fill="#8a6556" opacity=".3"/>
+    <path d="M-27 47h54l13 60h-80Z" fill="#c38466"/>
+    <path d="M0 61v-93m0 68q-21-35-52-55m52 38q15-48 53-62m-53 87q17-24 40-22" fill="none" stroke="#486e5c" stroke-width="6"/>
+    <path d="M0-24q-27-30 3-63q31 31-3 63Zm-13 43q-45-2-55-44q46-6 55 44Zm19-14q7-51 58-56q-4 51-58 56Zm13 39q22-34 56-21q-15 37-56 21Z" fill="#79a67a"/>
+    <path d="M-47 49h93l-17 83h-59Z" fill="#d59675"/>
+    <rect x="-48" y="47" width="96" height="14" rx="5" fill="#e5aa88"/>
+  </g>
+</svg>

@@ -1,0 +1,1082 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "用加法解决问题",
+  "description": "在原创野餐准备情境里看清大括号和问号，提取两个信息与一个问题，用圆片建模求整体，并检查运算思路和计算。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "/teachers/ashu-math-v1.png",
+      "color": "#4A90D9",
+      "persona": "依据正式数学教师档案，教师读图意和问题，先示范两信息一问题，再操作数量模型解释为什么用加法，强调一一对应与回头检查；口头创编留待成人观察。"
+    }
+  },
+  "images": {
+    "studio": {
+      "file": "assets/studio.png"
+    },
+    "cup": {
+      "file": "assets/cup.png"
+    },
+    "bead": {
+      "file": "assets/bead.png"
+    },
+    "two-parts": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "sum-relation": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "+"
+              },
+              {
+                "glyph": "3"
+              },
+              {
+                "glyph": "="
+              },
+              {
+                "glyph": "6"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "add-more": {
+      "glyph": {
+        "layout": "rows",
+        "size": [
+          1000,
+          600
+        ],
+        "groups": [
+          {
+            "cells": [
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              },
+              {
+                "glyph": "🔵"
+              }
+            ]
+          },
+          {
+            "cells": [
+              {
+                "glyph": "🟠"
+              },
+              {
+                "glyph": "🟠"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "quiz-shells": {
+      "file": "assets/quiz-shells.png"
+    },
+    "quiz-stickers": {
+      "file": "assets/quiz-stickers.png"
+    },
+    "quiz-windmills": {
+      "file": "assets/quiz-windmills.png"
+    },
+    "quiz-balls": {
+      "file": "assets/quiz-balls.png"
+    },
+    "quiz-pencils": {
+      "file": "assets/quiz-pencils.png"
+    },
+    "quiz-cards": {
+      "file": "assets/quiz-cards.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "野餐问题从哪开始",
+      "template": "title-picture",
+      "data": {
+        "title": "用加法解决问题",
+        "picture": "studio",
+        "caption": "看清信息和问题，再摆图、列式、检查"
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "野餐要准备杯子，我是小数老师。"
+        },
+        {
+          "say": "数学问题先要说清楚知道了什么。"
+        },
+        {
+          "say": "左边的一组杯子，是一条信息。"
+        },
+        {
+          "say": "右边的一组杯子，是另一条信息。"
+        },
+        {
+          "say": "如果问一共有多少，就是要找整体。"
+        },
+        {
+          "say": "两个相关信息，连着一个相关问题。"
+        },
+        {
+          "say": "小满问：图片下面的长符号表示什么？",
+          "by": "xiaoman"
+        },
+        {
+          "say": "大括号会告诉我们，要把什么合起来。"
+        },
+        {
+          "say": "问号提醒我们，这个数量还要求出来。"
+        },
+        {
+          "say": "我们会先看图，再用圆片摆出数量。"
+        },
+        {
+          "say": "最后列式，回头检查想法和计算。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "大括号要括住谁",
+      "page": "p02",
+      "widgetType": "addition-problem-bracket-scope",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#cup-left"
+        },
+        {
+          "say": "示范中，左边有三只杯子。"
+        },
+        {
+          "highlight": "#cup-right"
+        },
+        {
+          "say": "右边也有三只，问题是一共几只。"
+        },
+        {
+          "highlight": "#whole-bracket"
+        },
+        {
+          "say": "如果只括左边，就只看了一个部分。"
+        },
+        {
+          "say": "这样还不能表示求两边一共的意思。"
+        },
+        {
+          "setState": {
+            "demoBoth": true
+          }
+        },
+        {
+          "highlight": "#whole-bracket"
+        },
+        {
+          "say": "把大括号伸长，两部分都括进去。"
+        },
+        {
+          "say": "大括号表示，把括住的两部分合起来。"
+        },
+        {
+          "say": "下面的问号，就在问整体有多少。"
+        },
+        {
+          "highlight": "#scope-options"
+        },
+        {
+          "say": "选图时看看，有没有漏掉其中一边。"
+        },
+        {
+          "say": "现在按求一共的意思，选择括号范围。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "两条信息，一个问题",
+      "template": "picture-points",
+      "data": {
+        "title": "两条信息，一个问题",
+        "picture": "two-parts",
+        "points": [
+          "左边有3只杯子",
+          "右边也有3只杯子",
+          "问题：一共有几只？",
+          "大括号括两部分，问号求整体"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这里用一枚数量点表示一只杯子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "第一句话，左边有三只杯子。"
+        },
+        {
+          "say": "这是告诉我们第一个部分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "第二句话，右边也有三只杯子。"
+        },
+        {
+          "say": "这是另一个相关的部分。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "第三句话，问两边一共有几只杯子。"
+        },
+        {
+          "say": "问题和这两条信息是连在一起的。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "大括号把左右两部分都包括进来。"
+        },
+        {
+          "say": "问号表示，整体的数量还不知道。"
+        },
+        {
+          "say": "先说清两条信息和问题，再想怎么解答。"
+        },
+        {
+          "say": "请把这三句话说给身边大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "一只杯子配一枚圆片",
+      "page": "p04",
+      "widgetType": "addition-problem-one-to-one-model",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#cups"
+        },
+        {
+          "say": "我们可以用圆片代替真实的杯子。"
+        },
+        {
+          "say": "一枚圆片，只代表其中一只杯子。"
+        },
+        {
+          "highlight": "#model-left"
+        },
+        {
+          "say": "左边三只，就在左模型区摆三枚。"
+        },
+        {
+          "highlight": "#model-right"
+        },
+        {
+          "say": "右边三只，也在右模型区摆三枚。"
+        },
+        {
+          "setState": {
+            "demoModel": true
+          }
+        },
+        {
+          "highlight": "#cups"
+        },
+        {
+          "say": "上下逐个配对，每只都要有自己的圆片。"
+        },
+        {
+          "say": "不能一只配两枚，也不能漏掉一只。"
+        },
+        {
+          "highlight": "#bead-supply"
+        },
+        {
+          "say": "这样两组圆片，就表示原来的两个部分。"
+        },
+        {
+          "say": "拖一枚到一边，或点模型区添一枚。"
+        },
+        {
+          "say": "请你分别摆好两边，再按勾检查。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "看清问题再作答",
+      "intro": [
+        "换个物品和摆法，先看清两个信息。",
+        "我说完问题，你再选择数量图。"
+      ],
+      "questions": [
+        {
+          "id": "sa-q1",
+          "question": "蓝盒两枚贝壳，黄盒五枚，一共几枚？",
+          "skill": "两部分合并求整体",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            },
+            "C": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "两枚和五枚是两个部分，求一共要合起来，二加五等于七。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-shells",
+            "alt": "蓝色浅盒两枚贝壳，黄色浅盒五枚贝壳"
+          }
+        },
+        {
+          "id": "sa-q2",
+          "question": "上面一枚贴纸，下面五枚，一共几枚？",
+          "skill": "从图片提取两个相关数量",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            },
+            "C": {
+              "label": "1",
+              "visual": {
+                "kind": "quantity",
+                "count": 1
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "一枚和五枚是两个部分，求一共要把两组都算上，一加五等于六。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-stickers",
+            "alt": "上面一枚圆贴纸，下面五枚星形贴纸"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "求整体为什么用加法",
+      "template": "picture-points",
+      "data": {
+        "title": "求整体为什么用加法",
+        "picture": "sum-relation",
+        "points": [
+          "三只杯子与三只杯子是两部分",
+          "问题要求把两部分都算上",
+          "3＋3＝6：用加法求整体",
+          "答：一共有6只杯子"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "杯子分成左边三只、右边三只。"
+        },
+        {
+          "say": "这两组是问题里的两个部分。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "问一共有多少，要把每只都算上。"
+        },
+        {
+          "say": "不是拿走一组，而是把两组合起来。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "所以用加法，三加三等于六。"
+        },
+        {
+          "say": "前面的三表示左组，后面的三表示右组。"
+        },
+        {
+          "say": "等号后面的六，表示合起来的整体。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "算出六以后，还要回答题目。"
+        },
+        {
+          "say": "一共有六只杯子，数量和单位都说清。"
+        },
+        {
+          "say": "朵朵提醒：知道为什么，算式才和图对得上。",
+          "by": "duoduo"
+        },
+        {
+          "say": "摆图能帮助我们看清这个合并过程。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "让算式和问题对上",
+      "page": "p07",
+      "widgetType": "addition-problem-operation-and-total",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#scene-cups"
+        },
+        {
+          "say": "仍用两组三只杯子来示范。"
+        },
+        {
+          "highlight": "#whole-bracket"
+        },
+        {
+          "say": "大括号和问号表示，求两组合起的整体。"
+        },
+        {
+          "highlight": "#operation-options"
+        },
+        {
+          "say": "合起来用加法，选择加号。"
+        },
+        {
+          "setState": {
+            "demoPlus": true
+          }
+        },
+        {
+          "highlight": "#scene-cups"
+        },
+        {
+          "say": "看，两部分现在合在同一个范围里。"
+        },
+        {
+          "say": "每只杯子都算进来，不能移走其中一组。"
+        },
+        {
+          "highlight": "#result-options"
+        },
+        {
+          "say": "三和三组成六，选择六个数量点。"
+        },
+        {
+          "say": "先选对运算含义，再核对计算的数量。"
+        },
+        {
+          "say": "只看最后数字，可能漏掉解题的想法。"
+        },
+        {
+          "say": "现在请按新问题，选择运算和总数。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "做完以后回头检查",
+      "template": "picture-points",
+      "data": {
+        "title": "做完以后回头检查",
+        "picture": "two-parts",
+        "points": [
+          "检查想法：两部分都算进去了吗？",
+          "检查计算：每件是不是只数一次？",
+          "也能想组成，复核结果",
+          "答案要回答原来的问题"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "算完还不能马上离开，要回头检查。"
+        },
+        {
+          "say": "先看思路，题目求的是两组一共多少。"
+        },
+        {
+          "say": "有没有把其中一组误当成全部？"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "再检查计算，可以逐个点数。"
+        },
+        {
+          "say": "每件数一次，不重复也不漏掉。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "也能想三和三组成六，复核这个得数。"
+        },
+        {
+          "say": "点数或想组成，都要和图里的数量对应。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "最后看回答，是不是在回答原来的问题。"
+        },
+        {
+          "say": "题目问杯子，就说一共有六只杯子。"
+        },
+        {
+          "say": "既检查想法，也检查计算，才更完整。"
+        },
+        {
+          "say": "下一页请你帮忙检查一份作业。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "interactive",
+      "title": "逐个核对再修正",
+      "page": "p09",
+      "widgetType": "addition-problem-review-and-repair",
+      "startImage": "studio",
+      "script": [
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "highlight": "#draft-equation"
+        },
+        {
+          "say": "示范把三只和三只写成了减法。"
+        },
+        {
+          "say": "三减三等于零，计算本身可以成立。"
+        },
+        {
+          "say": "但这里求一共，思路却和题目不一致。"
+        },
+        {
+          "highlight": "#review-cups"
+        },
+        {
+          "say": "先逐只核对，两组杯子都要数进去。"
+        },
+        {
+          "setState": {
+            "demoCount": true
+          }
+        },
+        {
+          "say": "点过的一只留下标记，不再重复计数。"
+        },
+        {
+          "highlight": "#review-operation"
+        },
+        {
+          "say": "求两部分合起来的整体，应改成加法。"
+        },
+        {
+          "setState": {
+            "demoFixed": true
+          }
+        },
+        {
+          "highlight": "#draft-equation"
+        },
+        {
+          "say": "六只都核对完，三加三等于六。"
+        },
+        {
+          "highlight": "#review-options"
+        },
+        {
+          "say": "有的作业思路对，只是得数算错。"
+        },
+        {
+          "say": "请同时看运算和得数，别只改一个数字。"
+        },
+        {
+          "say": "现在你来逐只检查，再修正新作业。"
+        },
+        {
+          "setState": {
+            "play": true
+          }
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "quiz",
+      "title": "思路和计算都要对",
+      "intro": [
+        "这两题换成加入情境，再检查有没有漏算。",
+        "听清问题，选出合适的数量图。"
+      ],
+      "questions": [
+        {
+          "id": "sa-q3",
+          "question": "原有三个纸风车，又放来四个，现在一共几个？",
+          "skill": "动态加入求整体",
+          "options": {
+            "A": {
+              "label": "3",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            },
+            "B": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "原有三个与新增四个是两个部分，求现在整体用加法，三加四等于七。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-windmills",
+            "alt": "左边三个纸风车，右边新放来四个纸风车"
+          }
+        },
+        {
+          "id": "sa-q4",
+          "question": "篮外一只球，篮里六只。只回答六只，会漏算几只？",
+          "skill": "检查是否把两部分都算入",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "1",
+              "visual": {
+                "kind": "quantity",
+                "count": 1
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            }
+          },
+          "answer": [
+            "B"
+          ],
+          "analysis": "六只只包括篮内部分，漏掉篮外的一只。求全部要把两部分都算入。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-balls",
+            "alt": "篮内六只球，篮外另有一只球"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "把静态两组连到又来一组",
+      "template": "picture-points",
+      "data": {
+        "title": "又来一组，也要求整体",
+        "picture": "add-more",
+        "points": [
+          "原来有4只杯子",
+          "又拿来2只杯子",
+          "求现在一共：4＋2＝6",
+          "原来和新增，也是两个部分"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "两组不一定一直摆在左右两边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "例如原来桌上有四只杯子。"
+        },
+        {
+          "say": "这是我们已经知道的第一条信息。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "又拿来两只，是第二条相关信息。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "如果问现在一共有几只，也是在求整体。"
+        },
+        {
+          "say": "四加二等于六，现在一共六只杯子。"
+        },
+        {
+          "spotlight": "point-4"
+        },
+        {
+          "say": "原来的一组和新来的一组，是两个部分。"
+        },
+        {
+          "say": "时间前后变了，合并的关系仍然相同。"
+        },
+        {
+          "say": "用大括号把现在这两部分都包括起来。"
+        },
+        {
+          "say": "再点数或想组成，检查这个计算。"
+        },
+        {
+          "say": "也可以用自己熟悉的物品编这样的故事。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "quiz",
+      "title": "换个故事用一用",
+      "intro": [
+        "最后换两个故事，看你能否把信息连完整。",
+        "每题按老师说的问题来选择。"
+      ],
+      "questions": [
+        {
+          "id": "sa-q5",
+          "question": "五支短铅笔和一支长铅笔，一共几支？",
+          "skill": "求整体与计算核验",
+          "options": {
+            "A": {
+              "label": "6",
+              "visual": {
+                "kind": "quantity",
+                "count": 6
+              }
+            },
+            "B": {
+              "label": "5",
+              "visual": {
+                "kind": "quantity",
+                "count": 5
+              }
+            },
+            "C": {
+              "label": "1",
+              "visual": {
+                "kind": "quantity",
+                "count": 1
+              }
+            }
+          },
+          "answer": [
+            "A"
+          ],
+          "analysis": "长短不影响每支只算一次。五和一合起来是六支。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-pencils",
+            "alt": "五支短铅笔，另一组一支长铅笔"
+          }
+        },
+        {
+          "id": "sa-q6",
+          "question": "三张红卡、四张蓝卡，一共几张？",
+          "skill": "完整问题的两条信息",
+          "options": {
+            "A": {
+              "label": "3",
+              "visual": {
+                "kind": "quantity",
+                "count": 3
+              }
+            },
+            "B": {
+              "label": "4",
+              "visual": {
+                "kind": "quantity",
+                "count": 4
+              }
+            },
+            "C": {
+              "label": "7",
+              "visual": {
+                "kind": "quantity",
+                "count": 7
+              }
+            }
+          },
+          "answer": [
+            "C"
+          ],
+          "analysis": "三张与四张是两个已知部分，求整体要把两条信息都用上，三加四等于七。",
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-cards",
+            "alt": "左边三张红卡，右边四张蓝卡"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "slide",
+      "title": "把你的数学故事讲出来",
+      "template": "summary",
+      "data": {
+        "title": "把你的数学故事讲出来",
+        "items": [
+          "看清：两条信息，一个问题",
+          "摆图列式：一一对应，合并求整体",
+          "回头检查：想法和计算都核对",
+          "用大括号和问号编自己的加法故事"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "先把两个相关信息和问题说清楚。"
+        },
+        {
+          "say": "大括号告诉我们合并的范围。"
+        },
+        {
+          "say": "问号表示要求的整体数量。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "用圆片一一对应，再把两部分合起来。"
+        },
+        {
+          "say": "求整体，用加法表示这个合并过程。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "做完检查思路，也核对计算结果。"
+        },
+        {
+          "say": "每件只数一次，回答原来的问题。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "我先用家里的杯子编一个故事。"
+        },
+        {
+          "say": "第一句：桌上原来有四只杯子。"
+        },
+        {
+          "say": "第二句：家人又拿来两只杯子。"
+        },
+        {
+          "say": "画两组杯子，大括号要把两组都括住。"
+        },
+        {
+          "say": "在大括号下面画问号，再问第三句。"
+        },
+        {
+          "say": "现在一共有几只杯子？"
+        },
+        {
+          "say": "四加二等于六，现在一共六只杯子。"
+        },
+        {
+          "say": "这就把两条信息和一个问题连起来了。"
+        },
+        {
+          "say": "回家找安全物品，摆成两部分。"
+        },
+        {
+          "say": "画上大括号和问号，编一个加法故事。"
+        },
+        {
+          "say": "两条信息加一个问题，说给家人听。"
+        },
+        {
+          "say": "站长猫头鹰说：口头表达，请家人帮忙观察。",
+          "by": "owl"
+        },
+        {
+          "say": "系统只记录你实际的摆图、核验和作答。"
+        }
+      ]
+    }
+  ]
+}

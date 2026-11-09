@@ -1,0 +1,957 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "我的幼儿园",
+  "description": "青岛版五四制一年级上册主题活动：用图表达熟悉环境，数物、匹配外形、按规则记分、按方向与步数移动。口头分享与线下合作待观察。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小数老师",
+      "role": "teacher",
+      "gender": "male",
+      "voice": "Ethan",
+      "avatar": "teacher-math",
+      "color": "#E8A22F",
+      "persona": "用儿童听得懂的话解释数学，示范每一步及原因，鼓励观察、动手、记录和分享，不把点击说成会读会说。"
+    }
+  },
+  "images": {
+    "garden": {
+      "file": "assets/garden.png"
+    },
+    "building": {
+      "file": "assets/building.png"
+    },
+    "tree": {
+      "file": "assets/tree.png"
+    },
+    "slide": {
+      "file": "assets/slide.png"
+    },
+    "shape-faces": {
+      "file": "assets/shape-faces.png"
+    },
+    "score-rule": {
+      "file": "assets/score-rule.png"
+    },
+    "route-demo": {
+      "file": "assets/route-demo.png"
+    },
+    "quiz-circle": {
+      "file": "assets/quiz-circle.png"
+    },
+    "quiz-triangle": {
+      "file": "assets/quiz-triangle.png"
+    },
+    "quiz-square": {
+      "file": "assets/quiz-square.png"
+    },
+    "quiz-rectangle": {
+      "file": "assets/quiz-rectangle.png"
+    },
+    "quiz-circle-small": {
+      "file": "assets/quiz-circle-small.png"
+    },
+    "quiz-circle-medium": {
+      "file": "assets/quiz-circle-medium.png"
+    },
+    "quiz-circle-large": {
+      "file": "assets/quiz-circle-large.png"
+    },
+    "quiz-score": {
+      "file": "assets/quiz-score.png"
+    },
+    "quiz-route": {
+      "file": "assets/quiz-route.png"
+    },
+    "quiz-route-a": {
+      "file": "assets/quiz-route-a.png"
+    },
+    "quiz-route-b": {
+      "file": "assets/quiz-route-b.png"
+    },
+    "quiz-route-c": {
+      "file": "assets/quiz-route-c.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "幼儿园里的数学",
+      "template": "title-picture",
+      "data": {
+        "title": "幼儿园里的数学",
+        "picture": "garden",
+        "caption": "观察 · 动手 · 分享"
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "我是小数老师，今天回想幼儿园。"
+        },
+        {
+          "say": "熟悉的生活里，藏着许多数学发现。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看着这幅图，想想你熟悉的地方。"
+        },
+        {
+          "say": "图画能把脑海里的幼儿园摆出来。"
+        },
+        {
+          "say": "我们可以数一数，也可以比一比。"
+        },
+        {
+          "say": "还可以看看形状，说说物体的位置。"
+        },
+        {
+          "spotlight": "caption"
+        },
+        {
+          "say": "做游戏前，要先听懂约定的规则。"
+        },
+        {
+          "say": "一会儿动动手，把发现讲给大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "摆出熟悉的地方",
+      "page": "p02",
+      "widgetType": "memory-map",
+      "startImage": "garden",
+      "script": [
+        {
+          "highlight": "#map-frame"
+        },
+        {
+          "say": "图画可以帮助别人了解一个地方。"
+        },
+        {
+          "say": "不用画得一模一样，先放熟悉的物体。"
+        },
+        {
+          "highlight": "#stamp-building"
+        },
+        {
+          "say": "这个小房子，用来表示幼儿园的教室。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "我把教室放进图里，大家就能找到它。"
+        },
+        {
+          "highlight": "#stamp-tree"
+        },
+        {
+          "say": "旁边还可以放树，也可以放游戏器材。"
+        },
+        {
+          "say": "先选一张图，再点空位置把它放下。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "让教室、小树和滑梯都进入图里。"
+        },
+        {
+          "say": "位置可以自己选，也可以重新布置。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "把发现说清楚",
+      "template": "picture-points",
+      "data": {
+        "title": "把发现说清楚",
+        "picture": "garden",
+        "points": [
+          "先说观察的对象",
+          "再说数量、形状或位置",
+          "慢慢数，清楚说"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "介绍图画时，先让别人知道你在看什么。"
+        },
+        {
+          "say": "比如先指着树，说一说你发现了什么。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先确定要数的对象，别把滑梯也算进来。"
+        },
+        {
+          "say": "只看同一种对象，别人就容易听明白。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "数量能说清有多少，形状能说清外形。"
+        },
+        {
+          "say": "还可以说教室旁边有树，交代物体位置。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "数的时候，一个一个来，别漏也别重复。"
+        },
+        {
+          "say": "说给大人听，你的图里有什么数学发现。"
+        },
+        {
+          "say": "这里没有检查你的声音，表达还待观察。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "一棵一棵数",
+      "page": "p04",
+      "widgetType": "counting",
+      "startImage": "garden",
+      "script": [
+        {
+          "highlight": "#count-field"
+        },
+        {
+          "say": "要知道这里有几棵树，就逐个数一遍。"
+        },
+        {
+          "say": "只数树，每棵树只能对应一个数。"
+        },
+        {
+          "highlight": "#count-item-1"
+        },
+        {
+          "say": "从一棵开始，点过的树会留下小标记。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "count": 2
+          }
+        },
+        {
+          "say": "我已经数过两棵，标记帮助我不重复。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "count": 3
+          }
+        },
+        {
+          "say": "最后数到三，就表示一共有三棵树。"
+        },
+        {
+          "highlight": "#count-record"
+        },
+        {
+          "say": "最后的那个数，要和全部树的数量对应。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "count": 0
+          }
+        },
+        {
+          "say": "你来逐棵点数，再选相同数量的数字。"
+        },
+        {
+          "say": "如果不确定，可以看着标记再数一遍。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "quiz",
+      "title": "第一站小检查",
+      "intro": [
+        "小检查换了新情境。",
+        "听老师读题，再看图片来选择。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "这一堆有九个点，哪张图也是九个点？",
+          "skill": "按对象逐个数物",
+          "answer": [
+            "B"
+          ],
+          "analysis": "逐个数，每个点只数一次，九个点对应中间的图。",
+          "options": {
+            "A": {
+              "label": "八个点",
+              "visual": {
+                "kind": "quantity",
+                "count": 8,
+                "alt": "8个点"
+              }
+            },
+            "B": {
+              "label": "九个点",
+              "visual": {
+                "kind": "quantity",
+                "count": 9,
+                "alt": "9个点"
+              }
+            },
+            "C": {
+              "label": "六个点",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个点"
+              }
+            }
+          },
+          "visual": {
+            "kind": "quantity",
+            "count": 9,
+            "alt": "9个点"
+          }
+        },
+        {
+          "id": "q2",
+          "question": "哪张图的点比八个少，且正好是六个？",
+          "skill": "数物后比较多少",
+          "answer": [
+            "C"
+          ],
+          "analysis": "六个比八个少，右边的图正好有六个点。",
+          "options": {
+            "A": {
+              "label": "八个点",
+              "visual": {
+                "kind": "quantity",
+                "count": 8,
+                "alt": "8个点"
+              }
+            },
+            "B": {
+              "label": "九个点",
+              "visual": {
+                "kind": "quantity",
+                "count": 9,
+                "alt": "9个点"
+              }
+            },
+            "C": {
+              "label": "六个点",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个点"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "slide",
+      "title": "形状留下的脚印",
+      "template": "picture-points",
+      "data": {
+        "title": "形状留下的脚印",
+        "picture": "shape-faces",
+        "points": [
+          "看接触纸的那一面",
+          "沿着印迹的边观察",
+          "外形相同，也能有大小不同"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "把物体的一面贴在纸上，就能留下印迹。"
+        },
+        {
+          "say": "我们观察印迹时，看的就是平面的外形。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "换一个物体，接触纸的面可能不同。"
+        },
+        {
+          "say": "所以先看贴着纸的那一面，再想印迹。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "我们沿着边看一圈，找相同的外形。"
+        },
+        {
+          "say": "三角形、正方形和长方形也有各自外形。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "两个圆印迹都圆，也可以一个大一个小。"
+        },
+        {
+          "say": "匹配时既看外形，也要留意印迹的大小。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "interactive",
+      "title": "给图案盖印",
+      "page": "p07",
+      "widgetType": "shape-stamping",
+      "startImage": "garden",
+      "script": [
+        {
+          "highlight": "#shape-target"
+        },
+        {
+          "say": "轮廓告诉我们，这里需要什么外形。"
+        },
+        {
+          "say": "先沿着边看一圈，再选择相同的印章面。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "shape": "circle"
+          }
+        },
+        {
+          "say": "这个印章面是圆的，会留下圆形印迹。"
+        },
+        {
+          "highlight": "#shape-stamp-circle"
+        },
+        {
+          "say": "我把圆形面贴上去，印迹和轮廓合上了。"
+        },
+        {
+          "highlight": "#shape-palette"
+        },
+        {
+          "say": "另外的印章面，边的样子并不一样。"
+        },
+        {
+          "say": "不能只看颜色，要看整个外形是否相同。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "shape": "triangle"
+          }
+        },
+        {
+          "say": "请你把合适的印章拖到轮廓里试一试。"
+        },
+        {
+          "say": "放错了也没关系，印章会回到原处。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "quiz",
+      "title": "第二站小检查",
+      "intro": [
+        "小检查换了新情境。",
+        "听老师读题，再看图片来选择。"
+      ],
+      "questions": [
+        {
+          "id": "q3",
+          "question": "想盖出图里这样的长方形印迹，该选哪张？",
+          "skill": "外形匹配",
+          "answer": [
+            "A"
+          ],
+          "analysis": "左边也是长方形；外形相同才能合上这个轮廓。",
+          "options": {
+            "A": {
+              "label": "长方形",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-rectangle",
+                "alt": "横向的长方形"
+              }
+            },
+            "B": {
+              "label": "圆形",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-circle",
+                "alt": "圆形"
+              }
+            },
+            "C": {
+              "label": "三角形",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-triangle",
+                "alt": "三角形"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-rectangle",
+            "alt": "较宽的长方形印迹"
+          }
+        },
+        {
+          "id": "q4",
+          "question": "三个圆印迹里，哪一个最大？",
+          "skill": "同类印迹大小比较",
+          "answer": [
+            "C"
+          ],
+          "analysis": "右边的圆占的地方最大；三个都是圆，大小仍有区别。",
+          "options": {
+            "A": {
+              "label": "小圆",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-circle-small",
+                "alt": "小圆"
+              }
+            },
+            "B": {
+              "label": "中圆",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-circle-medium",
+                "alt": "中等圆"
+              }
+            },
+            "C": {
+              "label": "大圆",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-circle-large",
+                "alt": "大圆"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "先听规则再记分",
+      "template": "picture-points",
+      "data": {
+        "title": "先听规则再记分",
+        "picture": "score-rule",
+        "points": [
+          "绿色一枚记两分",
+          "橙色一枚记一分",
+          "逐枚记点，再合起来数"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "我们来玩新的彩色棋子记分游戏。"
+        },
+        {
+          "say": "棋子数量相同，得分也可能不一样。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "先听清这次的规则，绿色一枚记两分。"
+        },
+        {
+          "say": "拿到一枚绿色棋子，就记下两个小点。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "橙色一枚只记一分，记一个小点就够。"
+        },
+        {
+          "say": "颜色决定怎么记分，别把分值弄反了。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "每枚都记录好，再把小点合起来数。"
+        },
+        {
+          "say": "记录能让别人看懂，也方便自己检查。"
+        },
+        {
+          "say": "比较得分前，大家必须使用同一套规则。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "interactive",
+      "title": "彩色棋子记分台",
+      "page": "p10",
+      "widgetType": "weighted-score",
+      "startImage": "garden",
+      "script": [
+        {
+          "highlight": "#score-rule-panel"
+        },
+        {
+          "say": "先看规则，绿色记两分，橙色记一分。"
+        },
+        {
+          "say": "一个棋子对应几分，要按颜色来决定。"
+        },
+        {
+          "setState": {
+            "demo": true
+          }
+        },
+        {
+          "say": "我收进一枚绿色棋子，记录两个计分点。"
+        },
+        {
+          "highlight": "#score-record"
+        },
+        {
+          "say": "这两个点合在一起，表示这一枚的两分。"
+        },
+        {
+          "highlight": "#score-tokens"
+        },
+        {
+          "say": "收进橙色棋子时，就只添一个计分点。"
+        },
+        {
+          "say": "每一枚都要记，收完以后再一起数。"
+        },
+        {
+          "setState": {
+            "demo": false
+          }
+        },
+        {
+          "say": "现在你来把棋子放进盘子，再选总分。"
+        },
+        {
+          "say": "遇到不确定的地方，就回看计分点。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "slide",
+      "title": "箭头说方向",
+      "template": "picture-points",
+      "data": {
+        "title": "箭头说方向",
+        "picture": "route-demo",
+        "points": [
+          "画面上方是向前",
+          "画面右方是向右",
+          "一格一步，按顺序走"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "走格子前，大家要先约好方向。"
+        },
+        {
+          "say": "在这张图上，我们都从下边开始看。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "箭头朝画面上方，就表示向前走。"
+        },
+        {
+          "say": "走一格算一步，不能一口气跨过两格。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "箭头朝画面右方，就表示向右走。"
+        },
+        {
+          "say": "方向要一直按这张图的约定来判断。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "先向前，再向右，必须按先后顺序做。"
+        },
+        {
+          "say": "数完前面这段，才开始下一段。"
+        },
+        {
+          "say": "一步一步跟着箭头，就能检查走到哪里。"
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "interactive",
+      "title": "沿着箭头走",
+      "page": "p12",
+      "widgetType": "ordered-route",
+      "startImage": "garden",
+      "script": [
+        {
+          "highlight": "#route-plan"
+        },
+        {
+          "say": "箭头排成一条指令，要从左边开始看。"
+        },
+        {
+          "say": "先走前一段，走完才接下一段。"
+        },
+        {
+          "highlight": "#route-grid"
+        },
+        {
+          "say": "橙色小点是我们，一格只移动一步。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "step": 1
+          }
+        },
+        {
+          "say": "我向画面上方走一格，就完成了一步。"
+        },
+        {
+          "highlight": "#route-up"
+        },
+        {
+          "say": "再向前一步，前面这段才算走完。"
+        },
+        {
+          "setState": {
+            "demo": true,
+            "step": 2
+          }
+        },
+        {
+          "say": "然后要换方向，继续看后面的箭头。"
+        },
+        {
+          "setState": {
+            "demo": false,
+            "step": 0
+          }
+        },
+        {
+          "say": "你来点箭头按钮，让小点按指令走。"
+        },
+        {
+          "say": "走错不挪位置，也不扣分，可以重新试。"
+        }
+      ]
+    },
+    {
+      "key": "p13",
+      "type": "quiz",
+      "title": "第三站小检查",
+      "intro": [
+        "小检查换了新情境。",
+        "听老师读题，再看图片来选择。"
+      ],
+      "questions": [
+        {
+          "id": "q5",
+          "question": "绿色每枚两分，橙色每枚一分。图中这些棋子共几分？",
+          "skill": "按不同分值计总分",
+          "answer": [
+            "A"
+          ],
+          "analysis": "两枚绿色记四分，四枚橙色记四分，合起来是八分。",
+          "options": {
+            "A": {
+              "label": "八分",
+              "visual": {
+                "kind": "quantity",
+                "count": 8,
+                "alt": "8个点"
+              }
+            },
+            "B": {
+              "label": "六分",
+              "visual": {
+                "kind": "quantity",
+                "count": 6,
+                "alt": "6个点"
+              }
+            },
+            "C": {
+              "label": "七分",
+              "visual": {
+                "kind": "quantity",
+                "count": 7,
+                "alt": "7个点"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-score",
+            "alt": "上方两枚绿色棋子，下方四枚橙色棋子"
+          }
+        },
+        {
+          "id": "q6",
+          "question": "从橙点出发，先向前两格，再向右三格。蓝点在哪？",
+          "skill": "按方向和步数依次移动",
+          "answer": [
+            "B"
+          ],
+          "analysis": "先向画面上方走两格，再向画面右方走三格，停在上排最右格。",
+          "options": {
+            "A": {
+              "label": "中排最右格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-route-a",
+                "alt": "橙点在左下，蓝点在中排最右格"
+              }
+            },
+            "B": {
+              "label": "上排最右格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-route-b",
+                "alt": "橙点在左下，蓝点在上排最右格"
+              }
+            },
+            "C": {
+              "label": "上排第三格",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-route-c",
+                "alt": "橙点在左下，蓝点在上排第三格"
+              }
+            }
+          },
+          "visual": {
+            "kind": "asset",
+            "image": "quiz-route",
+            "alt": "三行四列，橙点在左下，两步向前和三步向右的箭头提示"
+          }
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "type": "slide",
+      "title": "把数学发现带回家",
+      "template": "summary",
+      "data": {
+        "title": "把数学发现带回家",
+        "items": [
+          "图画能表示熟悉的地方",
+          "逐个数，认清对象和数量",
+          "观察外形，也比较大小",
+          "先听规则，再记录总分",
+          "看方向和步数，按顺序走"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "item-1"
+        },
+        {
+          "say": "今天我们用图画，摆出了熟悉的地方。"
+        },
+        {
+          "say": "画里有什么、在哪里，都能帮助别人了解。"
+        },
+        {
+          "spotlight": "item-2"
+        },
+        {
+          "say": "数物要一个一个来，避免漏掉或重复。"
+        },
+        {
+          "say": "说清对象，再说数量，介绍才容易听懂。"
+        },
+        {
+          "spotlight": "item-3"
+        },
+        {
+          "say": "看印迹要看外形，同样的外形也有大小。"
+        },
+        {
+          "say": "选印章时，想一想接触纸的那一面。"
+        },
+        {
+          "spotlight": "item-4"
+        },
+        {
+          "say": "做游戏先听规则，每枚棋子都按规则记分。"
+        },
+        {
+          "say": "记下过程，再把点合起来数，就方便检查。"
+        },
+        {
+          "spotlight": "item-5"
+        },
+        {
+          "say": "走格子要看方向、数步数，也要按顺序。"
+        },
+        {
+          "say": "现在请向大人介绍一个你自己的数学发现。"
+        },
+        {
+          "say": "这里的操作已经记录，口头分享还待观察。"
+        }
+      ]
+    }
+  ]
+}

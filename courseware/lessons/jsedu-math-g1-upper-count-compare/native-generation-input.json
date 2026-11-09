@@ -1,0 +1,242 @@
+{
+  "schemaVersion": "mira.courseware.openmaic-generation-input.v1",
+  "binding": {
+    "editionId": "jsedu-math-g1-upper-2022-standard",
+    "revisionId": "directory-9d19e596f40fcc7287c3653d",
+    "nodeId": "1a3030e6-907a-4f8a-9025-cccf88bca8ba",
+    "unitId": "d738273f-b070-4f72-979d-284c3cb18729",
+    "officialMaterialId": "c25c89ae-4df4-4959-8353-dc7114049fdd",
+    "activityId": "f1846642-8217-2ba8-a13c-dccea5131e3a",
+    "classHours": [
+      "lesson_1"
+    ]
+  },
+  "sourceInput": {
+    "standardSha256": "f00d1dc1156b77af1282517909b201bba7fb8e424411c2e78920c9edfc2ee682",
+    "officialNotesSha256": "88438e8941a6d9b41997fd1e82f72caa1f9d3dccef48d07e9e1e89b8bff27f82",
+    "briefSha256": "1e563e097afaa3a3cc66863b73d9a9f38be830505a8d4732f24aebabf291f5e4",
+    "officialManifestSha256": "c9d32af57bc51d60899cb40b93a9284c8dce2ebe419e83d445d28a44b9d0afbe",
+    "officialDetailsSha256": "040fea375eea469a5127215699f4bbc2609e70f457ef96950eb804ee3f9b2e54",
+    "textbookDirectorySha256": "7b8cdb3359739f4ed02e011e61f73972e451f38157ea4cc9a5dcb3caf3c23a54",
+    "preNativeEditableDraftSha256": "ea1eee41656f1b30cecec1743ed3d4c0fa47350df38d4df9b045c4fb69eaf595"
+  },
+  "generationControls": {
+    "serverRoutedDeepSeekRequired": true,
+    "automaticImageGeneration": false,
+    "automaticVideoGeneration": false,
+    "automaticTts": false,
+    "publication": false
+  },
+  "scopeReview": {
+    "status": "current-standard-g0-reviewed",
+    "coveredOfficialHours": [
+      "lesson_1"
+    ],
+    "objectives": [
+      "听清一至十中的报数，用每物一个数词的办法准确取出相同数量的物品。",
+      "听数做出相应个数的图案，检查时先说清数哪一类，再一个一个点数。",
+      "数出十件物品并换一种摆法，能说明只挪位置、没有添减时仍是十件。",
+      "让两组一个对一个，观察哪边有剩余，判断多、少或一样多，并能摆出比参照组多或少的一组。",
+      "按每份两个的约定逐组配放，能从图里区分逐个比较与一组配两个。"
+    ],
+    "videoStatus": "制作标准豁免；其余四类配套资料共33页均逐页核验。",
+    "excludedTopics": [
+      "数字书写训练",
+      "比较符号",
+      "加减和乘法算式",
+      "以速度作为正确标准",
+      "自动判定口语或实际合作"
+    ]
+  },
+  "qualityRules": [
+    "小数老师主讲，简体中文儿童口语。每句尽量25字以内，最长40字。讲解页至少六句且100字，互动页至少五句且90字。",
+    "互动用真实可指认的图片和可移动物件。每页设计至少三个真实画面操作；先操作再讲，逐步说明为什么，再由学生操作。",
+    "视觉资产只用给出的素材标识。数量由代码重复单件物品或画知识点，不让插画猜件数。无文字辅助也能听题、分图并作答。",
+    "每页一个任务，第一次答错先引导核对，不告诉正确数量。保存所做的选择，能退回、纠错、通关和重玩。",
+    "原创三项图片小检查，清楚题意、唯一答案、知识点和解释，正确项位置分散。口语、纸笔和实际合作写待观察。",
+    "不开现场讨论，不开浏览器语音、图像、视频、TTS、网络搜索，也不直接发布。"
+  ],
+  "pagePlan": [
+    {
+      "id": "p01",
+      "type": "slide",
+      "title": "邮局今天开张",
+      "goal": "看森林邮局开张，听清取多少，逐物点数并检查所取总数。",
+      "assetKeys": [
+        "cover"
+      ]
+    },
+    {
+      "id": "p02",
+      "type": "interactive",
+      "title": "听数装邮票",
+      "goal": "听预录数量，把散放的实物邮票逐件移进托盘，可以退回，再检查送出。三轮不同目标。",
+      "assetKeys": [
+        "cover",
+        "stamp"
+      ]
+    },
+    {
+      "id": "p03",
+      "type": "interactive",
+      "title": "听数盖图章",
+      "goal": "选一种印章，在一张新纸上逐格印图，纠正选错的形状和数量。不同于取实物。",
+      "assetKeys": [
+        "cover",
+        "sun",
+        "leaf"
+      ]
+    },
+    {
+      "id": "p04",
+      "type": "interactive",
+      "title": "十枚换个队形",
+      "goal": "同样十枚邮票从整队换成散排或两排，逐一翻亮已数的实物再核对。",
+      "assetKeys": [
+        "cover",
+        "stamp"
+      ]
+    },
+    {
+      "id": "p05",
+      "type": "quiz",
+      "title": "第一封回信",
+      "goal": "用卡片、叶片、小鸟的新数量检测取物、重排、作图的数量理解。",
+      "assetKeys": [
+        "quantity-dots"
+      ]
+    },
+    {
+      "id": "p06",
+      "type": "slide",
+      "title": "哪一组更多",
+      "goal": "对齐一边开始比，通过两个图片对象和预录讲解导入配对方法。",
+      "assetKeys": [
+        "sun",
+        "leaf"
+      ]
+    },
+    {
+      "id": "p07",
+      "type": "interactive",
+      "title": "对齐以后比一比",
+      "goal": "在对齐的邮局比较板上增减叶印，分别做得更多、更少和同样多，实际显示配对和剩余。",
+      "assetKeys": [
+        "cover",
+        "sun",
+        "leaf"
+      ]
+    },
+    {
+      "id": "p08",
+      "type": "slide",
+      "title": "每份都按约定",
+      "goal": "区分一对一比较与每个信封配两枚的规则。",
+      "assetKeys": [
+        "envelope",
+        "badge"
+      ]
+    },
+    {
+      "id": "p09",
+      "type": "interactive",
+      "title": "两枚纪念章进一封",
+      "goal": "学生为每封放章，某一封已装两枚时不能继续塞，逐份核查。",
+      "assetKeys": [
+        "cover",
+        "envelope",
+        "badge"
+      ]
+    },
+    {
+      "id": "p10",
+      "type": "quiz",
+      "title": "寄出之前再核对",
+      "goal": "用饼干和笔筒新情境检查一一对应比较和每份两个。",
+      "assetKeys": [
+        "quantity-dots"
+      ]
+    },
+    {
+      "id": "p11",
+      "type": "slide",
+      "title": "收好今天的本领",
+      "goal": "复述数、摆、比、配，邀请家人一起观察课后口头与纸笔操作。",
+      "assetKeys": [
+        "cover"
+      ]
+    }
+  ],
+  "assessmentBlueprint": [
+    {
+      "skill": "听数取物",
+      "probe": "用家庭或邮局中的新物件表示听到的数量，三个可点数图。",
+      "correctSlot": 1
+    },
+    {
+      "skill": "重排后数量不变",
+      "probe": "换一类物件、换一个数量，只移动位置，选择仍旧对应的数量图。",
+      "correctSlot": 0
+    },
+    {
+      "skill": "按数画图",
+      "probe": "在不同于老师示范的图样和数量下，选满足所报数的作品。",
+      "correctSlot": 0
+    },
+    {
+      "skill": "一一对应比较",
+      "probe": "换新的日常物件，比较比参照少的一组。",
+      "correctSlot": 2
+    },
+    {
+      "skill": "每份两个",
+      "probe": "换不同的容器与物件，通过一个容器配两件的图片证据确定需要的件数。",
+      "correctSlot": 2
+    }
+  ],
+  "assetPlan": [
+    {
+      "assetKey": "cover",
+      "kind": "CodexIllustration",
+      "purpose": "A calm forest post office opening in the morning, original picture book scene. A very small woodland wooden post kiosk, one friendly little squirrel clerk, cream envelopes, stamps and a sorting shelf, wide landscape framing. No lettering, numerals, logos or signs. Main scene on the center-left, uncluttered warm background. The illustration is an invitation into a counting lesson, it is not used as an exact quantity diagram."
+    },
+    {
+      "assetKey": "stamp",
+      "kind": "CodexIllustration",
+      "purpose": "One small square lavender paper postage stamp with perforated edges and a simple red kite motif printed in the middle, face up from directly overhead, one whole object, no text or numerals, soft cream empty background and tiny shadow."
+    },
+    {
+      "assetKey": "leaf",
+      "kind": "CodexIllustration",
+      "purpose": "One emerald green leaf ink print, one broad oval leaf with one stem and a couple subtle vein strokes, directly overhead, not a pile and not a sprig, clear silhouette, cream background. No text."
+    },
+    {
+      "assetKey": "sun",
+      "kind": "CodexIllustration",
+      "purpose": "One amber sun ink print, circular central disk with short bold rays, single stylized ink mark viewed from overhead. Do not add faces, text, objects, stars or extra marks. Cream background."
+    },
+    {
+      "assetKey": "envelope",
+      "kind": "CodexIllustration",
+      "purpose": "One broad pale-blue open paper envelope viewed straight from overhead, distinct open mouth and symmetrical folded flap, with absolutely nothing inside. One complete object, isolated on cream, no addresses, no stamp, no text."
+    },
+    {
+      "assetKey": "badge",
+      "kind": "CodexIllustration",
+      "purpose": "One small round orange wooden commemorative token, simple dark blue spiral motif engraved on the top, viewed straight overhead, distinguishable from the sun ink print, isolated centered on plain cream. One object, no text, no objects beside it."
+    },
+    {
+      "assetKey": "quantity-dots",
+      "kind": "PreciseDiagram",
+      "purpose": "每点恰表示一件，程序生成可数、整齐间隔的点图，数量限定一至十。"
+    }
+  ],
+  "teachingFacts": {
+    "听数取和画": "一个物件或一个图案只数一次，先说清数什么，再把口头数目对应到具体东西。",
+    "十件重排": "同一批十件，只挪动不添减。用具体对象演示换排、重数；不把空隙当物件。",
+    "一一比较": "对齐同一头，逐个比。哪边有未配上的物件，哪边多；两边都配上，一样多。",
+    "一组两个": "明确一个容器为一份，逐份放两件并检查每份。区分它与上面的比较方法，别引入乘法术语、算式或比较符号。",
+    "家庭延伸": "找同数物件画出来，并同家人换一个逐份配放约定。纸笔和口头结果待观察。"
+  },
+  "request": "苏教版《数数比比》，一年级上册，纸本第3至4页。请原创森林邮局情境的一整课，生成可编辑的场景结构、短台词、操作步骤、图片题与解析。按前列素材标识写画面要求，具体对象数量由确定性布局表达。先听数装邮票，再按数盖图，十枚移位再点数，对齐比较，最后逐封配两个。五个操作各有不同动作。加入新题和一页回顾。不要引用官方截图、原台词、原题或外部链接。"
+}

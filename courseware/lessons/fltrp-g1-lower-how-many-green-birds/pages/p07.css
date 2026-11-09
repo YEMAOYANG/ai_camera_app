@@ -1,0 +1,23 @@
+#play { background: #f9edd3; }
+#map-station { position: absolute; inset: 86px 80px 96px; }
+#equipment { position: absolute; width: 735px; height: 490px; top: 0; left: 212px; overflow: hidden; border-radius: 21px; background: #fff4df; }
+#equipment-picture, #equipment-demo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+#equipment-demo.hide, #map-confirmation.hide, #pick-map.hide, .map-zone.hide { display: none; }
+#pick-map { position: absolute; width: 176px; height: 130px; top: 172px; left: 7px; border: 3px solid #9a754d; border-radius: 20px; background: #fffdf4; cursor: grab; z-index: 2; }
+#pick-map.selected { outline: 5px solid #2b775d; }
+#pick-map img { width: 130px; height: 90px; object-fit: contain; pointer-events: none; }
+.map-zone { position: absolute; width: 108px; height: 86px; border: 3px dashed #146454; background: #fffef044; border-radius: 16px; cursor: pointer; }
+.map-zone::after { content: '+'; font: 700 36px/1 sans-serif; color: #164638; }
+#zone-on { left: 211px; top: 116px; }
+#zone-under { left: 211px; top: 344px; }
+#zone-in { left: 570px; top: 267px; }
+#equipment.confirming { width: 354px; height: 236px; left: 0; top: 121px; outline: 3px solid #a88a63; }
+#map-confirmation { position: absolute; z-index: 3; top: 92px; left: 380px; display: grid; grid-template-columns: repeat(2, 350px); gap: 16px; }
+#map-confirmation button { position: relative; display: grid; place-items: center; border: 3px solid #709d76; border-radius: 22px; width: 350px; height: 294px; padding: 14px; background: #fffefa; cursor: pointer; }
+#map-confirmation button img { width: 312px; height: 220px; object-fit: contain; pointer-events: none; }
+#map-confirmation button span { position: absolute; top: 14px; right: 16px; display: grid; place-items: center; width: 43px; height: 43px; font-size: 30px; font-weight: 800; border-radius: 50%; background: #e2f3df; color: #18533b; pointer-events: none; }
+#map-confirmation button[data-response="no"] span { background: #ffe4d2; color: #7a291b; }
+#map-confirmation button.placed { border-width: 7px; }
+#map-picture-failure { position: absolute; inset: 110px 180px 138px; z-index: 10; background: #fffaf0; border: 4px solid #709d76; border-radius: 24px; display: grid; place-content: center; justify-items: center; padding: 16px; font-size: 24px; }
+#map-picture-failure.hide { display: none; }
+#reload-map { min-width: 180px; min-height: 58px; }

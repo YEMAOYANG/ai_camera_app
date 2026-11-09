@@ -1,0 +1,985 @@
+{
+  "schemaVersion": "mira.courseware.lesson.v1",
+  "title": "3 小青蛙",
+  "description": "人教五四制一年级下册识字第3课。看图说青蛙怎样帮禾苗，听读认字，比较青字族，观察六个田字格范字。",
+  "grade": 1,
+  "roster": {
+    "teacher": {
+      "name": "小语老师",
+      "role": "teacher",
+      "gender": "female",
+      "voice": "Serena",
+      "avatar": "/teachers/mi-chinese-v1.png",
+      "color": "#4B8D72",
+      "persona": "用情境图和短句引导一年级孩子听读、比较偏旁，并观察书写。"
+    }
+  },
+  "images": {
+    "frog-rice-hero": {
+      "file": "assets/frog-rice-hero.png"
+    },
+    "story-see": {
+      "file": "assets/story-see.png"
+    },
+    "story-help": {
+      "file": "assets/story-help.png"
+    },
+    "story-care": {
+      "file": "assets/story-care.png"
+    },
+    "river-and-sun": {
+      "file": "assets/river-and-sun.png"
+    },
+    "scene-sun": {
+      "file": "assets/scene-sun.png"
+    },
+    "scene-eyes": {
+      "file": "assets/scene-eyes.png"
+    },
+    "scene-rice": {
+      "file": "assets/scene-rice.png"
+    },
+    "scene-insect": {
+      "file": "assets/scene-insect.png"
+    },
+    "scene-request": {
+      "file": "assets/scene-request.png"
+    },
+    "scene-mood": {
+      "file": "assets/scene-mood.png"
+    },
+    "tone-contrast": {
+      "file": "assets/tone-contrast.png"
+    },
+    "tone-light": {
+      "file": "assets/tone-light.png"
+    },
+    "glyph-grid-qing": {
+      "file": "assets/glyph-grid-qing.png"
+    },
+    "glyph-grid-sheng": {
+      "file": "assets/glyph-grid-sheng.png"
+    },
+    "glyph-grid-left-family": {
+      "file": "assets/glyph-grid-left-family.png"
+    },
+    "glyph-fold-lift": {
+      "file": "assets/glyph-fold-lift.png"
+    },
+    "glyph-grid-miao": {
+      "file": "assets/glyph-grid-miao.png"
+    },
+    "story-review": {
+      "file": "assets/story-review.png"
+    },
+    "quiz-frog-rest": {
+      "file": "assets/quiz-frog-rest.png"
+    },
+    "quiz-frog-catch": {
+      "file": "assets/quiz-frog-catch.png"
+    },
+    "quiz-frog-reflect": {
+      "file": "assets/quiz-frog-reflect.png"
+    },
+    "quiz-word-sunny": {
+      "file": "assets/quiz-word-sunny.png"
+    },
+    "quiz-word-eyes": {
+      "file": "assets/quiz-word-eyes.png"
+    },
+    "quiz-word-clear": {
+      "file": "assets/quiz-word-clear.png"
+    },
+    "quiz-ask-block": {
+      "file": "assets/quiz-ask-block.png"
+    },
+    "quiz-grab-block": {
+      "file": "assets/quiz-grab-block.png"
+    },
+    "quiz-return-block": {
+      "file": "assets/quiz-return-block.png"
+    },
+    "quiz-stroke-left": {
+      "file": "assets/quiz-stroke-left.png"
+    },
+    "quiz-stroke-stop": {
+      "file": "assets/quiz-stroke-stop.png"
+    },
+    "quiz-stroke-rise": {
+      "file": "assets/quiz-stroke-rise.png"
+    },
+    "scene-river": {
+      "file": "assets/scene-river.png"
+    }
+  },
+  "scenes": [
+    {
+      "key": "p01",
+      "type": "slide",
+      "title": "3 小青蛙",
+      "template": "picture-points",
+      "data": {
+        "title": "3 小青蛙",
+        "picture": "frog-rice-hero",
+        "points": [
+          "清水和晴天",
+          "小青蛙的大眼睛",
+          "稻田里的小帮手"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "title"
+        },
+        {
+          "say": "今天读第三课《小青蛙》。"
+        },
+        {
+          "say": "先把书打开，找到印刷的第六页。"
+        },
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "顺着画面看，小青蛙蹲在稻田边。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "河水很清，天也晴，能看见亮亮的太阳。"
+        },
+        {
+          "say": "小石头在水底，也能看得清。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "小青蛙有一双醒目的大眼睛。"
+        },
+        {
+          "say": "书上先让我们看看小青蛙的样子。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "再跟着它看看，为什么说它是小帮手。"
+        },
+        {
+          "say": "翻到这一课，听大人读一遍，你跟着读。"
+        }
+      ]
+    },
+    {
+      "key": "p02",
+      "type": "interactive",
+      "title": "把三幅图排好",
+      "page": "p02",
+      "widgetType": "picture-choice",
+      "startImage": "frog-rice-hero",
+      "script": [
+        {
+          "highlight": "#story-place-1"
+        },
+        {
+          "say": "课文先让我们看河边和小青蛙。"
+        },
+        {
+          "say": "这样一开头，我们就知道在说谁。"
+        },
+        {
+          "highlight": "#story-place-2"
+        },
+        {
+          "say": "中间写小青蛙做的一件好事。"
+        },
+        {
+          "say": "想想稻田里，哪幅图画出了它在帮忙。"
+        },
+        {
+          "highlight": "#story-place-3"
+        },
+        {
+          "say": "最后，课文说我们该怎样对待它。"
+        },
+        {
+          "say": "看见小青蛙，可以在远处轻轻地看。"
+        },
+        {
+          "highlight": "#story-choices"
+        },
+        {
+          "say": "轮到你了，按课文的顺序把三张图放好。"
+        },
+        {
+          "say": "可以点一张，也可以拖到亮起的空格。"
+        },
+        {
+          "say": "排好以后，把三幅图连起来说给大人听。"
+        }
+      ]
+    },
+    {
+      "key": "p03",
+      "type": "slide",
+      "title": "河边看清楚",
+      "template": "two-columns",
+      "data": {
+        "title": "河边看清楚",
+        "left": {
+          "heading": "河　晴",
+          "body": "河面　晴天"
+        },
+        "right": {
+          "heading": "眼　睛",
+          "body": "大眼睛"
+        },
+        "left_picture": "river-and-sun",
+        "right_picture": "scene-eyes"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "看，弯弯的水流是一条河。"
+        },
+        {
+          "say": "天空亮亮的，太阳出来，是个晴天。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "河有三点水，帮我们想起河水。"
+        },
+        {
+          "say": "晴的左边是日字旁，帮我们想到天气。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "跟我读，河面，晴天。"
+        },
+        {
+          "say": "晴天的晴读第二声。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "再找一找，小青蛙用什么看东西？"
+        },
+        {
+          "say": "这对鼓鼓的就是它的大眼睛。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "眼和睛的左边都有目字旁。"
+        },
+        {
+          "say": "目字旁能提醒我们，这两个字和眼睛有关。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "把这两个字合起来读，眼睛。"
+        },
+        {
+          "say": "这里的第二个字轻轻一带，后面我们再听。"
+        }
+      ]
+    },
+    {
+      "key": "p04",
+      "type": "interactive",
+      "title": "看它帮了什么",
+      "page": "p04",
+      "widgetType": "picture-choice",
+      "startImage": "story-help",
+      "script": [
+        {
+          "setState": {
+            "riceStep": 0
+          }
+        },
+        {
+          "say": "看田里的小苗，这就是禾苗。"
+        },
+        {
+          "say": "苗的上面是草字头，提醒我们它是植物。"
+        },
+        {
+          "setState": {
+            "riceStep": 1
+          }
+        },
+        {
+          "say": "看叶子旁边，有一只会咬苗的害虫。"
+        },
+        {
+          "setState": {
+            "riceStep": 2
+          }
+        },
+        {
+          "say": "小青蛙捉到了害虫，把它吃掉。"
+        },
+        {
+          "setState": {
+            "riceStep": 3
+          }
+        },
+        {
+          "say": "害虫少了，禾苗就少受一点伤害。"
+        },
+        {
+          "say": "这样帮它少受伤害，就叫保护。"
+        },
+        {
+          "setState": {
+            "riceStep": false
+          }
+        },
+        {
+          "say": "一起读，禾苗，吃，保护。"
+        },
+        {
+          "highlight": "#rice-choices"
+        },
+        {
+          "say": "先点禾苗，再点害虫，最后点青蛙捉虫。"
+        },
+        {
+          "say": "每选对一步，田里的画面就会变一次。"
+        }
+      ]
+    },
+    {
+      "key": "p05",
+      "type": "slide",
+      "title": "一句礼貌的话",
+      "template": "two-columns",
+      "data": {
+        "title": "一句礼貌的话",
+        "left": {
+          "heading": "请　让",
+          "body": "请让一让"
+        },
+        "right": {
+          "heading": "事　情",
+          "body": "一件事情"
+        },
+        "left_picture": "scene-request",
+        "right_picture": "scene-mood"
+      },
+      "script": [
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "小朋友想走过去，前面站着一位伙伴。"
+        },
+        {
+          "say": "他轻轻地说，请让一让。"
+        },
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "请放在前面，听起来更有礼貌。"
+        },
+        {
+          "say": "让一让，就是给别人留一点地方。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "课文也用了请，是请我们爱护小青蛙。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "这边，积木搭好了，小朋友很高兴。"
+        },
+        {
+          "say": "搭积木就是一件做过的事情。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "事情的事，说的是这件事。"
+        },
+        {
+          "say": "情的左边是竖心旁，在心情里给我们线索。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "这回跟我说，一件事情。"
+        },
+        {
+          "say": "情在这个词里轻轻带过去。"
+        }
+      ]
+    },
+    {
+      "key": "p06",
+      "type": "interactive",
+      "title": "找出青的五个伙伴",
+      "page": "p06",
+      "widgetType": "picture-choice",
+      "startImage": "river-and-sun",
+      "script": [
+        {
+          "setState": {
+            "familyDemo": 0
+          }
+        },
+        {
+          "say": "中间是一个青，跟我读，第一声。"
+        },
+        {
+          "say": "这五个伙伴里都有青，读音有点像。"
+        },
+        {
+          "setState": {
+            "familyDemo": 1
+          }
+        },
+        {
+          "say": "看看河水，三点水在左边，合起来是清。"
+        },
+        {
+          "setState": {
+            "familyDemo": 2
+          }
+        },
+        {
+          "say": "晴天的晴，左边是日字旁，想一想太阳。"
+        },
+        {
+          "setState": {
+            "familyDemo": 3
+          }
+        },
+        {
+          "say": "眼睛的睛，左边是目字旁，提醒我们想到眼睛。"
+        },
+        {
+          "setState": {
+            "familyDemo": 4
+          }
+        },
+        {
+          "say": "心情的情，竖心旁能让我们想到心里的感受。"
+        },
+        {
+          "setState": {
+            "familyDemo": 5
+          }
+        },
+        {
+          "say": "说话想请别人帮忙，请的左边是言字旁。"
+        },
+        {
+          "say": "先想意思，再听一听，别把它们读成一个声调。"
+        },
+        {
+          "setState": {
+            "familyDemo": false
+          }
+        },
+        {
+          "say": "现在轮到你，看图选一个左边的偏旁。"
+        },
+        {
+          "highlight": "#family-options"
+        },
+        {
+          "say": "合对了就会出现整字，念一念再继续。"
+        }
+      ]
+    },
+    {
+      "key": "p07",
+      "type": "slide",
+      "title": "听清轻重和声调",
+      "template": "two-columns",
+      "data": {
+        "title": "听清轻重和声调",
+        "left": {
+          "heading": "青　清　晴　情　请",
+          "body": "qīng　qīng　qíng　qíng　qǐng"
+        },
+        "right": {
+          "heading": "眼睛　事情",
+          "body": "yǎn jing　shì qing"
+        },
+        "left_picture": "tone-contrast",
+        "right_picture": "tone-light"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "小青蛙的青和清水的清，都是第一声。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "第一声读得平平的，听，青，清。"
+        },
+        {
+          "say": "晴天的晴、心情的情，读第二声。"
+        },
+        {
+          "say": "第二声往上扬，听，晴天，心情。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "请问的请是第三声，比前两个声调低些。"
+        },
+        {
+          "say": "把这几个词放回意思里，才不容易认混。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "现在听两个词，眼睛，事情。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "末尾的睛和情，在这两个词里读轻声。"
+        },
+        {
+          "say": "轻声轻一点、短一点，跟我说，眼睛，事情。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "再跟大人听一遍课文，听到这两个词就轻轻读。"
+        }
+      ]
+    },
+    {
+      "key": "p08",
+      "type": "slide",
+      "title": "田字格里的青和生",
+      "template": "two-columns",
+      "data": {
+        "title": "田字格里的青和生",
+        "left": {
+          "heading": "青",
+          "body": "看上面的长横"
+        },
+        "right": {
+          "heading": "生",
+          "body": "竖站在中间"
+        },
+        "left_picture": "glyph-grid-qing",
+        "right_picture": "glyph-grid-sheng"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "先来写小青蛙的青。"
+        },
+        {
+          "say": "看看青，上面几横分开，第三横比较长。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "写两横，再写一竖，接着写第三横。"
+        },
+        {
+          "say": "下面先竖，再写横折钩，最后添两横。"
+        },
+        {
+          "say": "下面这一部分是青字的一部分，照图写。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "上面长横舒展，下部在中间收住。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "再来看生，三条横分开，中间站着一竖。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "先写撇、横，再写竖，最后写两横。"
+        },
+        {
+          "say": "这条竖沿着竖中线，最后一横托住字。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "用手在空中各写一次，再请大人看你写在纸上。"
+        }
+      ]
+    },
+    {
+      "key": "p09",
+      "type": "slide",
+      "title": "田字格里的左旁和青",
+      "template": "two-columns",
+      "data": {
+        "title": "田字格里的左旁和青",
+        "left": {
+          "heading": "清　晴　请",
+          "body": "左边让一让　右边写青"
+        },
+        "right": {
+          "heading": "横折提",
+          "body": "向右　折下　向右上提"
+        },
+        "left_picture": "glyph-grid-left-family",
+        "right_picture": "glyph-fold-lift"
+      },
+      "script": [
+        {
+          "spotlight": "left-heading"
+        },
+        {
+          "say": "清、晴、请都左边放偏旁，右边写青。"
+        },
+        {
+          "spotlight": "left-picture"
+        },
+        {
+          "say": "清的左边是三点水，和河水的河一样。"
+        },
+        {
+          "say": "晴的左边是日字旁，写窄些给右边留位置。"
+        },
+        {
+          "say": "请的左边是言字旁，右边也写一个青。"
+        },
+        {
+          "spotlight": "left-body"
+        },
+        {
+          "say": "在纸上照图写三字，先左边，再写右边。"
+        },
+        {
+          "spotlight": "right-heading"
+        },
+        {
+          "say": "请的言字旁第二笔，是新笔画横折提。"
+        },
+        {
+          "spotlight": "right-picture"
+        },
+        {
+          "say": "先向右写短横，再折向下，最后向右上提。"
+        },
+        {
+          "say": "看这条线，三个方向连起来，一笔写成。"
+        },
+        {
+          "spotlight": "right-body"
+        },
+        {
+          "say": "手指慢慢走一遍，再把这一笔写给大人看。"
+        }
+      ]
+    },
+    {
+      "key": "p10",
+      "type": "slide",
+      "title": "草字头下面是什么",
+      "template": "picture-points",
+      "data": {
+        "title": "草字头下面是什么",
+        "picture": "glyph-grid-miao",
+        "points": [
+          "上面是草字头",
+          "下面是田",
+          "两部分对着中线"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "这是禾苗的苗，先看它在田字格里的样子。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "苗是上下结构，先写草字头。"
+        },
+        {
+          "say": "草字头先写一横，再从左到右写两竖。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "下面写田，位置对着格子的中间。"
+        },
+        {
+          "say": "田先写竖和横折，再写里面的一横一竖。"
+        },
+        {
+          "say": "最后写底横，把田字的下边封起来。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "看看上下两部分，摆正就不容易写歪。"
+        },
+        {
+          "say": "手指走一遍，再在纸上照样写一个苗。"
+        },
+        {
+          "say": "让大人看看，上面的草字头有没有写对位置。"
+        }
+      ]
+    },
+    {
+      "key": "p11",
+      "type": "quiz",
+      "title": "小检查",
+      "intro": [
+        "小语老师会读题，听完再选一张图。",
+        "选好后，我们一起听一听为什么。"
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "question": "田里有个小帮手。哪幅图画的是青蛙捉害虫？",
+          "skill": "理解课文里的捉虫护苗",
+          "answer": [
+            "B"
+          ],
+          "analysis": "第二幅，小青蛙抓到了叶子旁的害虫。它吃掉害虫，可以帮禾苗少受伤害。",
+          "options": {
+            "A": {
+              "label": "青蛙趴在叶子上休息",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-frog-rest",
+                "alt": "青蛙趴在叶子上休息"
+              }
+            },
+            "B": {
+              "label": "青蛙捉住叶子旁的害虫",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-frog-catch",
+                "alt": "青蛙捉住叶子旁的害虫"
+              }
+            },
+            "C": {
+              "label": "青蛙看着水里的倒影",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-frog-reflect",
+                "alt": "青蛙看着水里的倒影"
+              }
+            }
+          }
+        },
+        {
+          "id": "q2",
+          "question": "小鱼缸的水能看见底。选一个合适的字。",
+          "skill": "在新语境用偏旁辨字",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三幅是清，三点水帮我们想到水。晴多用在天气里，睛出现在眼睛里。",
+          "options": {
+            "A": {
+              "label": "晴，旁边是明亮的太阳",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-word-sunny",
+                "alt": "晴，旁边是明亮的太阳"
+              }
+            },
+            "B": {
+              "label": "睛，旁边是眼睛",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-word-eyes",
+                "alt": "睛，旁边是眼睛"
+              }
+            },
+            "C": {
+              "label": "清，旁边是清水里看得见的鱼和石子",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-word-clear",
+                "alt": "清，旁边是清水里看得见的鱼和石子"
+              }
+            }
+          }
+        },
+        {
+          "id": "q3",
+          "question": "想借伙伴手里的红积木，哪幅图画的是开口请求？",
+          "skill": "听懂礼貌用语请",
+          "answer": [
+            "A"
+          ],
+          "analysis": "第一幅先指着想借的积木，等伙伴同意。可以说，请借我用一下红积木。",
+          "options": {
+            "A": {
+              "label": "指着积木开口问，等待同伴答应",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-ask-block",
+                "alt": "指着积木开口问，等待同伴答应"
+              }
+            },
+            "B": {
+              "label": "伸手直接从伙伴手里拿走积木",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-grab-block",
+                "alt": "伸手直接从伙伴手里拿走积木"
+              }
+            },
+            "C": {
+              "label": "用完积木后把它还给伙伴",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-return-block",
+                "alt": "用完积木后把它还给伙伴"
+              }
+            }
+          }
+        },
+        {
+          "id": "q4",
+          "question": "找一找，哪条线从圆点出发，一笔写成横折提？",
+          "skill": "辨认新笔画横折提",
+          "answer": [
+            "C"
+          ],
+          "analysis": "第三条从圆点向右走，折向下，最后向右上提。这三个动作连起来，是一笔。",
+          "options": {
+            "A": {
+              "label": "向右折下后向左上收笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stroke-left",
+                "alt": "向右折下后向左上收笔"
+              }
+            },
+            "B": {
+              "label": "向右折下后直着停住",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stroke-stop",
+                "alt": "向右折下后直着停住"
+              }
+            },
+            "C": {
+              "label": "向右折下后向右上收笔",
+              "visual": {
+                "kind": "asset",
+                "image": "quiz-stroke-rise",
+                "alt": "向右折下后向右上收笔"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "p12",
+      "type": "slide",
+      "title": "把课文读给大人听",
+      "template": "picture-points",
+      "data": {
+        "title": "把课文读给大人听",
+        "picture": "story-review",
+        "points": [
+          "从三幅图想起课文",
+          "听准字音　看偏旁",
+          "读一遍　写一写"
+        ]
+      },
+      "script": [
+        {
+          "spotlight": "picture"
+        },
+        {
+          "say": "看这三幅图，把今天读过的意思连起来。"
+        },
+        {
+          "spotlight": "point-1"
+        },
+        {
+          "say": "晴天河边有只大眼睛的小青蛙。"
+        },
+        {
+          "say": "它吃害虫，能帮着保护禾苗。"
+        },
+        {
+          "say": "我们可以安静看它，别追着捉它。"
+        },
+        {
+          "spotlight": "point-2"
+        },
+        {
+          "say": "同样带青，左边的偏旁能帮我们想意思。"
+        },
+        {
+          "say": "读眼睛和事情时，最后一个字轻轻地读。"
+        },
+        {
+          "spotlight": "point-3"
+        },
+        {
+          "say": "现在翻到第六页，把课文读给大人听。"
+        },
+        {
+          "say": "第七页有六个字，照着田字格练写。"
+        },
+        {
+          "say": "请大人看看横折提有没有一笔写完。"
+        },
+        {
+          "say": "也请大人看你写的苗，草字头在上面吗？"
+        }
+      ]
+    }
+  ]
+}

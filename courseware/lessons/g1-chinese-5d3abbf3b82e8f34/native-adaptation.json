@@ -1,0 +1,1274 @@
+{
+  "schemaVersion": "mira.courseware.native-adaptation.v1",
+  "binding": {
+    "editionId": "pep-chinese-g1-upper-2022-standard",
+    "revisionId": "20260924-directory-3",
+    "nodeId": "u5-l5",
+    "unitId": "unit-5-reading",
+    "unitTitle": "第五单元 · 阅读",
+    "gradeCode": "primary_1",
+    "subject": "chinese",
+    "volume": "upper",
+    "lessonTitle": "语文园地五",
+    "schoolSystem": "six_year",
+    "classHour": "complete",
+    "classHours": [
+      "lesson_1",
+      "lesson_2",
+      "lesson_3",
+      "lesson_4"
+    ],
+    "officialMaterialId": "b7062df1-f929-458e-964c-d778f89ca255",
+    "officialActivityId": "a8c4f5e3-2a95-cda5-17db-7f4d85aed907",
+    "officialChapterIds": [
+      "a54eba3a-c467-4c59-a586-dfc61819f0c8",
+      "1ddddd74-1c34-42d8-b6cc-6c17630ecc4a"
+    ],
+    "textbookResourceId": "1c73b348-e8b6-47d6-84b0-6dbacbe28268",
+    "teacherCode": "mira_chinese_gentle",
+    "teachingRevision": "1"
+  },
+  "nativeClassroom": "output/courseware-lessons/g1-chinese-5d3abbf3b82e8f34/native-authoring-v1/classroom.json",
+  "nativeClassroomSha256": "7fdb3101cbf3fb8d36682dfd66040153fa0e9b4e31c34c061627344479be8ab3",
+  "openMaicJobId": "7424rPU-5g",
+  "openMaicClassroomId": "toURP3t4iO",
+  "nativeDraftInputSha256": "0b4d353aaea2d5e62b1da18609e33c5270c97cabe967f786222993dd0faa6a14",
+  "nativeModelRoute": {
+    "modelPolicyId": "deepseek-v4-pro-current-flash-v1",
+    "providerId": "deepseek",
+    "modelId": "deepseek-v4-pro"
+  },
+  "editorModel": "gpt-6.1-sol",
+  "authoringModels": [
+    "deepseek-v4-pro",
+    "gpt-6.1-sol"
+  ],
+  "officialNotesSha256": "27bb8e00d4b1b0cf74629ba54c8dd56293a12d68e289bd6c7fb6d3fc238ba5f7",
+  "frozenBriefSha256": "ccd1538f7fe29700eadb35d27d1085752965bf95a433cce3bc81a3914996f498",
+  "prototypeLessonSha256": "4ab639483773582023a534ec493bb6348b6f3098f3bf1d609aff7210b037b69a",
+  "adaptedLessonSha256": "3e2c37dcce4f072f31c5ad4698a713fb6f868b6fe0564904d4cb15c85820796f",
+  "authoredAt": "2026-11-06T20:30:14.164567+00:00",
+  "scope": "逐场校对并适配同一册次。采用原生课堂的场次、表达与教学构思。交互使用本课原型的公共页面，问答重写按教材及实际题图绑定。此为作者自审，G7另行执行。",
+  "sceneBindings": [
+    {
+      "releaseKey": "p01",
+      "nativeSceneId": "scene_PxNSsrIY29",
+      "nativeSceneTitle": "字词就在生活里",
+      "nativeSceneSha256": "dea7d7d31543b719b7075b9eddd95bea070b1fda76768f9a0830dea4be0413dc",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "1ee21a25ad46efb4ca8c2ca95e4cdb3c08d32a3f62150aa96e57815f14a92719",
+      "change": "保留花园与成对词引入，补齐六对，删除“相反总成对”的绝对化说法。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_klZTiqQq",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_D0ghX5sp",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_EkPmEL5b",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": "action_uaGlhGSk",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 13,
+          "nativeActionId": "action_77ZME7F1",
+          "treatment": "edited"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p02",
+      "nativeSceneId": "scene_oZ3BqRnzuj",
+      "nativeSceneTitle": "让意思变一变",
+      "nativeSceneSha256": "6edd5c7c7524d42f6afa1723c180d960aae7b8058aec0f2c8297b9d9fb072758",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "f54b20d0d7ee1eb7b0b92cd8c2eec0c5aee6ac3da2b0af65fb69b78acd54129f",
+      "change": "将原生误写的大字改为正、反，绑定翻书正式图和真实教师状态。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_KMdMOWdf",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_e6G8LtmS",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_2f-wnrSo",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": "action_slkuyAGv",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p03",
+      "nativeSceneId": "scene_DDCE3WoPoM",
+      "nativeSceneTitle": "偏旁带着字回家",
+      "nativeSceneSha256": "69736b25359f28343f16af64216d644bbc10e7bd05b704b78d242eb21d20b4f1",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "0a765c65a1e769f064eff6d56290ea887549f26c9517b332ea8b42dbf8658aff",
+      "change": "把原生三组扩为课件复习范围九组，说明部件线索不等于整字词义。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_62eIrDYs",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action__5ZWjUQ5",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_GJq-iKZN",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_rMo7wkrG",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": "action_Zb3A1LGc",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 12,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p04",
+      "nativeSceneId": "scene_clyiW0i6_Z",
+      "nativeSceneTitle": "同一个偏旁",
+      "nativeSceneSha256": "98c79ccb0fc88ea458cee674ed318ec05d4d5d5248220c128c283b3c3746c806",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "6b4d41918deb70f0aa0806491ac6f1f71671b4ff29983915d2896d710a4835be",
+      "change": "保留原生归类步骤，以实际首轮“秋—禾”为示范，扩为九个偏旁。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_fd2XjOQ6",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_kKuK6bax",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_npb_2oZV",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p04b",
+      "nativeSceneId": "scene_wbrQg81-Ag",
+      "nativeSceneTitle": "熟字里面找笔画",
+      "nativeSceneSha256": "540a23ab50f6ece65c121ad898097c212b3d9e69ee2527ff5c83198d87412825",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "5ae4b14652da22cf1d208d341f8685d1e1c2e0e92633a1143d7d4ff1060a99a4",
+      "change": "保留熟字观察与四个明确出钩例子，补西与牙，避免统称凡转弯都有钩。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_-n4Dykvg",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action_UWf5GsEl",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_Rh33H1wJ",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_BSTS4Slh",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_QujksdCY",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": "action_YiXMhiUE",
+          "treatment": "edited"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p05",
+      "nativeSceneId": "scene_OoRCl6_R4_",
+      "nativeSceneTitle": "四个字写在格中",
+      "nativeSceneSha256": "72fae5ab2aaec506a8542d8185b8f087e023c1ec1eff62653b826f2b356363d8",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "89a00fbf3a8b20191fc639c557fe1458a0fe173f46569910377474a4f6df49aa",
+      "change": "保留独体和上下结构，用田字格位置及撇点真实轨迹给书写支架。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_UM16T8Y5",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action_UA7jk3EH",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_LTw9ycKc",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_rNZEYVal",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_Fagt8JJk",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_UYt4vFzP",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": "action_zmhynY6W",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p05b",
+      "nativeSceneId": "scene_7fNxOwc9y4",
+      "nativeSceneTitle": "女和开，按顺序写",
+      "nativeSceneSha256": "ee52ad9402d3f89858bbcf73761ff95213d138382e18d63ded7de79689b5e12e",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "c59d7ba7c50cd2a6f9cf1330b68a205f6df9c52f97ae63abca82e4cf8d9cc256",
+      "change": "拆分原生超长口播，保留女开顺序；以原书68页与官方课件23页补关、先。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_CaDvc8bT",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action__ezN5lTq",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_C4lbCsLr",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_e9IOjxYn",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 12,
+          "nativeActionId": "action_1ccVLtSH",
+          "treatment": "edited"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p06",
+      "nativeSceneId": "scene_isimD_L3PN",
+      "nativeSceneTitle": "撇点和四字描画",
+      "nativeSceneSha256": "a2ece8e4041acfdacd96f2d7a68dcf58c3df5dd162a8d8e58a38c3e6dc109852",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "22d954da57e3fbc6e74cbcbc6f264bc171f8639af1a68301382af4deeca61140",
+      "change": "把原生轨迹描述绑定到已修正的竖中线起点，区分自由描画与笔顺评定。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_xFw4yA1r",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_6-4uNylc",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_2NYcSi_s",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_AZppwnmV",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": "action_8bddpjMa",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p07",
+      "nativeSceneId": "scene_A3VoLPYvcZ",
+      "nativeSceneTitle": "小检查：相对的意思",
+      "nativeSceneSha256": "3f774821f1cf0e84e22e8347622659b899e7d8e1cd15ad0eb0821e89f99a8ec8",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "565be59c50c7855af329ccde2c37ed49724f96cfefba7e04c8157ed785111fc4",
+      "change": "改掉原生题干直接报答案和文字选项。保留开关、内外，改用新情境的盒盖与篮子图。",
+      "introNativeActionIds": [
+        "action_9d5twnMr",
+        "action_1mbAwcGd"
+      ],
+      "nativeQuestionBindings": [
+        {
+          "nativeQuestionId": "q1",
+          "adaptedQuestionId": "q1"
+        },
+        {
+          "nativeQuestionId": "q2",
+          "adaptedQuestionId": "q2"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p08",
+      "nativeSceneId": "scene_txLE-Ku013",
+      "nativeSceneTitle": "时间值得珍惜",
+      "nativeSceneSha256": "103f346ef05a0f3c6bf43e343c1ac9cd2f3b667d0240201eff2cbbd64c914c63",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "ae1ecd33e870d7116131fd14d2986478313acb2ae0c28f23763b70417dc8767d",
+      "change": "保留两句原生准确引文并校对教材，补各自解释与一个可实施安排。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_anlG8rwN",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action__euS9yyh",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_73Ut9NMI",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_JT5MiETY",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": "action_ejDwkWCV",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": "action_tD8fpaaj",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 12,
+          "nativeActionId": "action_I2zhCaPU",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 13,
+          "nativeActionId": "action_CSxpzW7V",
+          "treatment": "edited"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p09",
+      "nativeSceneId": "scene_kFuyrtxS5J",
+      "nativeSceneTitle": "先安排再去做",
+      "nativeSceneSha256": "ac576ba481d36b60251aa17990ba2f015ecb247cf132f610d62d159b4d63826e",
+      "officialClassHours": [
+        "lesson_1"
+      ],
+      "releaseSceneSha256": "4add5b201ead813d2d234a6dcef1bf08b80165196a5d4d03a4681d0b98620d9b",
+      "change": "原生排序收书包目标接入现有动作图，补示范、纠错线索与先后理由。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_tTzg10bX",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action_ppzdLDLZ",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_31QbKOfy",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_iZZa0iZ8",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p10",
+      "nativeSceneId": "scene_dvWE-gsreP",
+      "nativeSceneTitle": "十二个词连成画",
+      "nativeSceneSha256": "b07d01fef5864fe2dd711be6633552be5243a2ebc63917e876fb970f3ed30f62",
+      "officialClassHours": [
+        "lesson_2"
+      ],
+      "releaseSceneSha256": "590eedac25be5623882c6b7bf15330a84502dc9528722c757b4c0618486004de",
+      "change": "删除原生误换的太阳月亮等词，逐项点亮原书十二词，避免季节唯一化。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_uXwmO5Kz",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_5WYP9paZ",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_DA7S5iQt",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_zm3sR9_j",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 12,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 13,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p11",
+      "nativeSceneId": "scene_BGkpjpkzbp",
+      "nativeSceneTitle": "我的季节小画报",
+      "nativeSceneSha256": "5ac62fbbb9c048c5eac6b3d0b2190fc4b941ca2e851b083a3330e393d575a02a",
+      "officialClassHours": [
+        "lesson_2"
+      ],
+      "releaseSceneSha256": "d306cdb5b4c0418ed79e2d804d993909aa27812bf3510dacb8a997f059dd1063",
+      "change": "保留原生季节画报和说理由目标，使用本页已有的夏天示范状态。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_uvQl0uJb",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action_fjqhUSNt",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_gAQk5n7g",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_sHXE_DiF",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": "action_bKaSTAWf",
+          "treatment": "edited"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p12",
+      "nativeSceneId": "scene_5sndsG_jw9",
+      "nativeSceneTitle": "在姓名里认新字",
+      "nativeSceneSha256": "5915559d2136a2dd5ba8e94ade44337b3bca623974a0ac22ecb20595274ae420",
+      "officialClassHours": [
+        "lesson_2"
+      ],
+      "releaseSceneSha256": "2fd705a28c34a7cdad92dbf868d0df242582271b881989bee2c9662c56de7242",
+      "change": "保留看和问的识字思路，去掉表意表情符，补向本人核读和生活载体。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_KWup0XuR",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action_G5Fh6xQR",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_u2q5fq56",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_x68PZlmA",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p13",
+      "nativeSceneId": "scene_z-nhbyuZ9v",
+      "nativeSceneTitle": "姓名卡回到主人身边",
+      "nativeSceneSha256": "95b4a5355a388560156b4b5632f6fdfaf84233774bdaf01ebe9fa634b09ee6c6",
+      "officialClassHours": [
+        "lesson_2"
+      ],
+      "releaseSceneSha256": "fea1e99a227d0193e370a28aeb0ed4057fc6ece5b337634f9ee09c11934d6cbb",
+      "change": "保留姓名配对和听名字任务，原生小阳对齐已登记人物小满、朵朵。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_ErAzOZ8m",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_QWVqJvaL",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_QaXTbpDa",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_oGTN6QL1",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": "action_vrgmozYX",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": "action_b2kWAGw-",
+          "treatment": "edited"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p14",
+      "nativeSceneId": "scene_U2HsyzGZn2",
+      "nativeSceneTitle": "小检查：词在生活里",
+      "nativeSceneSha256": "f2698e5d1487b80e6d5c64c51de40648268beb9ac24e7b04ae571f50dd42444c",
+      "officialClassHours": [
+        "lesson_2"
+      ],
+      "releaseSceneSha256": "d976cf5f46e1a93994527238204a487c671a148ddf156339e0a25d8328084178",
+      "change": "保留飞鸟辨认题并挂正式题图；第二题换为姓名来源，覆盖第二课时另一目标。",
+      "introNativeActionIds": [
+        "action_tVnK8xF7",
+        "action_So4PmrmS"
+      ],
+      "nativeQuestionBindings": [
+        {
+          "nativeQuestionId": "q1",
+          "adaptedQuestionId": "q3"
+        },
+        {
+          "nativeQuestionId": "q2",
+          "adaptedQuestionId": "q4"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p15",
+      "nativeSceneId": "scene_zR3VbLRa86",
+      "nativeSceneTitle": "共读一条求助线",
+      "nativeSceneSha256": "33c970ca5285119bf8b8b2c44589af505c56b7663898bc8ac33b4c8e6c2a34e7",
+      "officialClassHours": [
+        "lesson_3"
+      ],
+      "releaseSceneSha256": "e8103e1732ef0525ff9af3eb77a8090d2d179d74d4507cf6e4348860597aa41a",
+      "change": "纠正原生老公公叫小猫的错误，按原书71–72页讲求助链与文字截止位置。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_LB410q54",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_M-I3R3fh",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_rGqz_2KE",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": "action_m5EAv1Lq",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": "action_54OI28Us",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 12,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p16",
+      "nativeSceneId": "scene_ZuSrYVNcM-",
+      "nativeSceneTitle": "帮手按次序加入",
+      "nativeSceneSha256": "732bdc30469b95c0c504de39e21247085bdce88f000e17ba1181d5cd143231b4",
+      "officialClassHours": [
+        "lesson_3"
+      ],
+      "releaseSceneSha256": "5b8e1007a8053907a94205f976024cbaab913f3c6efe77f003a62347ab3f2fd7",
+      "change": "改正原生顺序问法和先后动作，按实际状态从老婆婆接起。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_gJ1VZ4DL",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action_64FJN5VV",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": "action_HqBqFMbM",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p17",
+      "nativeSceneId": "scene_4xZRj62Qqs",
+      "nativeSceneTitle": "故事还可以接着说",
+      "nativeSceneSha256": "23b31531a3becccc126b5e4e7a8f62061aa8d81d0274c890af578858c64d64c9",
+      "officialClassHours": [
+        "lesson_3"
+      ],
+      "releaseSceneSha256": "146507490f029530f5725b563f7ff4fd5074070c3fff0c4635061d2e5dabfb58",
+      "change": "保留续编三要素，区分已有文字、插图与原创续编，不规定单一好结局。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_2ubaN05B",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action_qCUEyaV5",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_EeUppYwX",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_iee75X6z",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_lWdwVnay",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": "action_zf_hoQJU",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p18",
+      "nativeSceneId": "scene_fDukqWaq6_",
+      "nativeSceneTitle": "我来编下一幕",
+      "nativeSceneSha256": "3e6140292a93c4fb41ccef02081eca07ae6b44c74e07831c37d17b96e63bb7c9",
+      "officialClassHours": [
+        "lesson_3"
+      ],
+      "releaseSceneSha256": "3786467055615314c046434729b2a628ffbed00e1dc1ffe0d029b22fc6901914",
+      "change": "保留原生选小猫排队示范，补协作动作、两种结果、开放表达。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_WEKn5_qS",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_60Bx134p",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": "action_jkZTp0fh",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p19",
+      "nativeSceneId": "scene_zq2EJ_Ah3O",
+      "nativeSceneTitle": "小检查：求助与续编",
+      "nativeSceneSha256": "dfd6c36494fc082133f6c52947edc5a5a0fca5ee227b80e1192b707770da465b",
+      "officialClassHours": [
+        "lesson_3"
+      ],
+      "releaseSceneSha256": "d621f571e69d94089c149ed8b1b084b9b26abdcc9b3364a411194bb9c9fb3314",
+      "change": "保留原生合作搬箱情境，去掉文字长选项；第二题转成新手工情境的续编结果，用两个已付费图片。",
+      "introNativeActionIds": [
+        "action_9rwKZ2RU",
+        "action_vH6VUXRI"
+      ],
+      "nativeQuestionBindings": [
+        {
+          "nativeQuestionId": "q1",
+          "adaptedQuestionId": "q5"
+        },
+        {
+          "nativeQuestionId": "q2",
+          "adaptedQuestionId": "q6"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p20",
+      "nativeSceneId": "scene_0llKTYs7kX",
+      "nativeSceneTitle": "交谈从我开始",
+      "nativeSceneSha256": "4ebe7a2e8c5f5de3b68b6c7f1125afeff15b277f2a2cb61fe5772e6410de644f",
+      "officialClassHours": [
+        "lesson_4"
+      ],
+      "releaseSceneSha256": "c20ab407d56c1c52f588e9cb134917f1fb03194bf6ee76bdc863690b6e8c0eac",
+      "change": "保留原生三步谈话，补不同于原书跳绳的完整搭积木问答。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_P2osZuGv",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_zvdF5-4L",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_JPmmMX-5",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_Mf1hQNTM",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 8,
+          "nativeActionId": "action_z5iPwqf8",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": "action_zaltqeDS",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p21",
+      "nativeSceneId": "scene_YCPbEp1QYH",
+      "nativeSceneTitle": "把话题接下去",
+      "nativeSceneSha256": "0861520b22cc16d8d8d0ab01dee1adbe2e186799f159cec290a49a730829b047",
+      "officialClassHours": [
+        "lesson_4"
+      ],
+      "releaseSceneSha256": "fe0ce1c6e69ba8751bb9f88c6c659f10cc4ae454ad8044062a6da4cbc4cf99c5",
+      "change": "保留原生接话机制，把小狗和足球改为实际人物及积木、画画、篮球素材。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_qXt5nS8O",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 3,
+          "nativeActionId": "action_K6RJyR9S",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_lDCHbMa6",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_Ts_PDilj",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p22",
+      "nativeSceneId": "scene_lGZKZOOblx",
+      "nativeSceneTitle": "礼貌让交谈继续",
+      "nativeSceneSha256": "04a4d739b3657ff19a4dc4acfb072ddad849664358c6676d9fa268485279e101",
+      "officialClassHours": [
+        "lesson_4"
+      ],
+      "releaseSceneSha256": "43b96f2e4bcc6402c5314f3046dbfce27b66b7179794654c735cb685079c87c7",
+      "change": "保留专注回应、轮流分享三要点，绑定真实同伴交谈图与具体回应例子。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_jGoQvDYv",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_AGqF0ojG",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 5,
+          "nativeActionId": "action_0KUpE11e",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": "action_Ea7a0_LZ",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": "action_RMrLdXfK",
+          "treatment": "exact"
+        },
+        {
+          "releaseScriptIndex": 10,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 12,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p23",
+      "nativeSceneId": "scene_E6dE7wFiMI",
+      "nativeSceneTitle": "小检查：交朋友",
+      "nativeSceneSha256": "f96b83929407bbb0d70bdd52e963c036fae861a1670bcd0df18addec4ea084ea",
+      "officialClassHours": [
+        "lesson_4"
+      ],
+      "releaseSceneSha256": "8b227435fe2db790fe8c18adc334a63351805fb10cb39fec3bce186df7853210",
+      "change": "保留原生主动与专注两个检查点，删除自己看图选答的单独指令，绑定同学招呼与公园共读新图。",
+      "introNativeActionIds": [
+        "action_0g1sLUr5"
+      ],
+      "nativeQuestionBindings": [
+        {
+          "nativeQuestionId": "q1",
+          "adaptedQuestionId": "q7"
+        },
+        {
+          "nativeQuestionId": "q2",
+          "adaptedQuestionId": "q8"
+        }
+      ]
+    },
+    {
+      "releaseKey": "p24",
+      "nativeSceneId": "scene_K09ey0GleY",
+      "nativeSceneTitle": "把办法带回家",
+      "nativeSceneSha256": "c70eea6bd136b99e6830c2721affc28286539856ba0d199cceacaefbe20b0811",
+      "officialClassHours": [
+        "lesson_1",
+        "lesson_2",
+        "lesson_3",
+        "lesson_4"
+      ],
+      "releaseSceneSha256": "62fb30118b29a6eb9a2536e8416824103fe257d5ea9e3f75b5b9a683b43ecab9",
+      "change": "保留回顾和成人参与，补字词运用、续编与主动交谈的具体回顾。",
+      "speechMapping": [
+        {
+          "releaseScriptIndex": 1,
+          "nativeActionId": "action_VlVzubc5",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 2,
+          "nativeActionId": "action_RrvMo858",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 4,
+          "nativeActionId": "action_AMAJXtRm",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 6,
+          "nativeActionId": "action_RqsP2iwK",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 7,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 9,
+          "nativeActionId": null,
+          "treatment": "editorAddition"
+        },
+        {
+          "releaseScriptIndex": 11,
+          "nativeActionId": "action_rVCvKx-9",
+          "treatment": "edited"
+        },
+        {
+          "releaseScriptIndex": 12,
+          "nativeActionId": "action_Q3ww4axi",
+          "treatment": "edited"
+        }
+      ]
+    }
+  ],
+  "interactionFixes": [
+    {
+      "sceneKey": "p16",
+      "issue": "一次真实点击同时触发两条处理路径，首错露出完整顺序。",
+      "change": "保留原生按钮点击和拖放路径，移除重复模拟点击。每次正确加入后重置提示计数，开场提示不直接给首位帮手。",
+      "beforeSha256": "3586f440152af3de43e314d3655828015c2bcbf57535f18ddc5dcd5ea75e1633",
+      "afterSha256": "afe230110363a401ef1629efdb7e0ec5478568fcf9c449822e60b0eb451f2379",
+      "regression": "同一真实按钮首次错只显示线索。验证拖放后计数重置、完整通关和重玩复位。"
+    }
+  ],
+  "prevoiceBodySha256": "e219b251c3a82b78aac506720ccdca80d8a4b48517a5ef8bc4ffa03397d2bf45",
+  "prevoiceEvidenceDirectory": "output/courseware-lessons/g1-chinese-5d3abbf3b82e8f34/native-adapted-v2"
+}

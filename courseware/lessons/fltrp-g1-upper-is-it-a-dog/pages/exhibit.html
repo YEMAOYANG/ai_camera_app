@@ -1,0 +1,30 @@
+<header class="exhibit-header">
+  <h2 id="activity-heading"></h2>
+  <button class="retry-art" id="retry-art" type="button" hidden>重试图片</button>
+  <button class="cue" id="listen-cue" type="button" aria-label="听老师读这一题">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path fill="currentColor" d="M7 17h9l10-8v30l-10-8H7z"/>
+      <path fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" d="M32 17c5 4 5 10 0 14m6-20c8 7 8 19 0 26"/>
+    </svg>
+  </button>
+</header>
+<div class="exhibit-workspace">
+  <section class="compare-station" aria-label="猜测与看到的图">
+    <div class="stage-card">
+      <h3>听到的猜测</h3>
+      <div id="guess-photo" class="photo-frame"></div>
+    </div>
+    <button class="object-card is-covered" id="exhibit-target" type="button" aria-label="揭开待检验的图"></button>
+  </section>
+  <section id="match-options" class="match-options" aria-label="图片选项">
+    <button class="match-choice" id="match-left" type="button" disabled></button>
+    <button class="match-choice" id="match-right" type="button" disabled></button>
+  </section>
+  <section class="result-station" aria-label="入册的展品">
+    <h3>已经检验</h3>
+    <div id="evidence-photos" class="evidence-photos" aria-live="polite">
+      <div class="photo-frame"></div>
+      <div class="photo-frame"></div>
+    </div>
+  </section>
+</div>
