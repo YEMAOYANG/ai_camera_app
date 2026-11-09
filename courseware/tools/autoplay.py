@@ -4,6 +4,9 @@ The bot (autoplay.mjs, Playwright and Chrome) opens every interactive scene as a
 finds what the generic audit cannot: soft locks (a level that never ends), errors that only show during play, a finish
 overlay that does not reset. A page is ok when it finished at least once without script errors and 'play again' reset it;
 a second finish is reported but not required, because random play needs many steps for the longer pages.
+Real-time pages built on the shared game engine (courseware/kit/game.py) are first pressed and dragged at random to
+surface errors, then finished twice by the engine's own autopilot over every level; their result says method
+'game-autopilot' so the receipt never presents an autopilot finish as random play.
 """
 import argparse
 from datetime import datetime, timezone
@@ -71,9 +74,12 @@ def play_body(body, media_dir, *, run=default_run, work_dir=None, max_steps=400,
     for (index, _), result in zip(scenes, results):
         errors = sorted(set(result['errors']))
         stuck = result.get('stuck')
-        pages.append({'scene': index, 'finished': bool(result['finishes']), 'stepsToFinish': result['finishes'][0] if result['finishes'] else None,
-                      'finishedAgain': len(result['finishes']) > 1, 'errors': errors, 'stuck': stuck,
-                      'ok': bool(result['finishes']) and not errors and not stuck})
+        page = {'scene': index, 'finished': bool(result['finishes']), 'stepsToFinish': result['finishes'][0] if result['finishes'] else None,
+                'finishedAgain': len(result['finishes']) > 1, 'errors': errors, 'stuck': stuck,
+                'ok': bool(result['finishes']) and not errors and not stuck, 'method': result.get('method', 'random')}
+        if result.get('seconds'):
+            page['secondsToFinish'] = result['seconds']
+        pages.append(page)
     return {'schemaVersion': 'mira.courseware.autoplay-receipt.v1', 'bodySha256': body_hash(body), 'ok': all(p['ok'] for p in pages),
             'maxSteps': max_steps, 'seed': seed, 'pages': pages, 'tool': {'ranAt': datetime.now(timezone.utc).isoformat()}}
 

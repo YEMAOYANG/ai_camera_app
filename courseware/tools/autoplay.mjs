@@ -74,15 +74,21 @@ const snapshot = () => {
     const clickable = el.tagName === 'BUTTON' || el.tagName === 'CANVAS' || el.getAttribute('role') === 'button'
       || ['pointer', 'grab'].includes(style.cursor) || style.touchAction === 'none';
     if (!clickable) continue;
+    const label = el.getAttribute('aria-label') || '';
+    const text = (el.textContent || '').trim();
+    candidateNodes.add(el);
+    // Keep the child's reset control out of ordinary exploration. Replay is
+    // still exercised through the finish screen on every successful run.
+    if (el.matches('[data-activity-reset],button[type="reset"],input[type="reset"]')
+        || (/^(重新|重置|重来|Reset\b|Restart\b)/i.test(label) && /^[↺↶⟲]$/.test(text))) continue;
     const baseClasses = [...el.classList].filter((name) => !stateClass.test(name)).sort().join('.');
     const parent = el.parentElement;
     const parentKey = parent && (parent.id ? `#${parent.id}` : `.${[...parent.classList].filter((name) => !stateClass.test(name)).sort().join('.') || parent.tagName}`);
     const group = `${parentKey || '#play'}|${el.tagName}|${baseClasses || '-'}`;
     const position = positions[group] || 0;
     positions[group] = position + 1;
-    candidateNodes.add(el);
     candidates.push({
-      group, position, id: el.id || '', label: el.getAttribute('aria-label') || '', text: (el.textContent || '').trim(),
+      group, position, id: el.id || '', label, text,
       x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, w: rect.width, h: rect.height,
       canvas: el.tagName === 'CANVAS', draggable: liveDragElements.has(el),
       active: [...el.classList].some((name) => stateClass.test(name)),
@@ -134,7 +140,56 @@ const snapshot = () => {
     stars: Number((document.querySelector('#star-n') || {}).textContent || 0),
     sayKind: say ? say.className : '',
     sayText: say ? say.textContent : '',
+    feedbackRevision: window.__miraAutoplayFeedbackRevision || 0,
   };
+};
+
+// Real-time pages built on the shared game engine (courseware/kit/game.py, K.game) cannot be finished by blind
+// tapping. For them the bot first presses, drags and types at random to surface script errors, then lets the engine's
+// own autopilot play every level from level 1, presses 'play again' and requires a second complete run. Engine frame
+// errors arrive in K.errs. The receipt records the method, so it never claims that random play finished a game.
+const GAME_RANDOM_INPUTS = 40;
+const GAME_SECONDS_PER_LEVEL = Number(args['game-seconds-per-level'] || 150);
+const playGame = async (page, file, errors) => {
+  const result = { file, finishes: [], errors, stuck: null, method: 'game-autopilot', seconds: [] };
+  const status = () => page.evaluate(() => window.K.game.status());
+  const finished = async () => (await page.evaluate(snapshot)).finished;
+  let inputs = 0;
+  for (; inputs < GAME_RANDOM_INPUTS && !(await finished()); inputs += 1) {
+    const x = 20 + rand() * 1240;
+    const y = 20 + rand() * 680;
+    if (rand() < 0.3) {
+      await page.mouse.move(x, y); await page.mouse.down();
+      await page.mouse.move(20 + rand() * 1240, 20 + rand() * 680, { steps: 6 }); await page.mouse.up();
+    } else await page.mouse.click(x, y);
+    if (rand() < 0.3) await page.keyboard.press(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'][Math.floor(rand() * 5)]);
+    await page.waitForTimeout(120);
+  }
+  const { levels } = await status();
+  for (let round = 1; round <= 2 && !result.stuck; round += 1) {
+    const logStart = await page.evaluate(() => window.K.log.length);
+    const started = Date.now();
+    if (round === 1) await page.evaluate(() => { window.K.game.autoplay(true); window.K.onState({ level: 1 }); });
+    while (Date.now() - started < levels * GAME_SECONDS_PER_LEVEL * 1000 && !(await finished())) await page.waitForTimeout(250);
+    if (!(await finished())) { result.stuck = `game autopilot did not finish round ${round}`; break; }
+    const won = await page.evaluate((from) => window.K.log.slice(from).filter((x) => x.startsWith('win:'))
+      .map((x) => Number(x.split(':')[1])), logStart);
+    const missing = Array.from({ length: levels }, (_, i) => i + 1).filter((level) => !won.includes(level));
+    if (missing.length) { result.stuck = `game autopilot finished without winning level ${missing.join(', ')}`; break; }
+    result.finishes.push(inputs + round);
+    result.seconds.push(Math.round((Date.now() - started) / 1000));
+    if (round === 2) break;
+    const again = await page.$('#btn-again');
+    if (!again) { result.stuck = 'no play-again button'; break; }
+    await again.click(); await page.waitForTimeout(400);
+    const restart = await page.$('#ready button');
+    if (restart && await restart.isVisible()) { await restart.click(); await page.waitForTimeout(300); }
+    if (await finished()) { result.stuck = 'finish still showing after play again'; break; }
+    const now = await status();
+    if (now.level !== 1 || now.state !== 'play') result.stuck = `play again did not restart level 1 (${now.state} ${now.level})`;
+  }
+  for (const message of await page.evaluate(() => (window.K.errs || []).map(String))) errors.push(message);
+  return result;
 };
 
 const browser = await chromium.launch({ executablePath: args.chrome, headless: true });
@@ -149,8 +204,21 @@ for (const file of files) {
   await page.waitForTimeout(300);
   const start = await page.$('#ready button');
   if (start) { await start.click(); await page.waitForTimeout(300); }
+  await page.evaluate(() => {
+    const feedback = document.querySelector('#say');
+    if (!feedback) return;
+    window.__miraAutoplayFeedbackRevision = 0;
+    new MutationObserver(() => { window.__miraAutoplayFeedbackRevision += 1; })
+      .observe(feedback, { childList: true, characterData: true, subtree: true });
+  });
   if (args.inspect === '1') {
     report.push({ file, snapshot: await page.evaluate(snapshot) });
+    await page.close();
+    continue;
+  }
+  if (await page.evaluate(() => !!(window.K && window.K.game && typeof window.K.game.status === 'function'
+      && window.K.game.status()))) {
+    report.push(await playGame(page, file, errors));
     await page.close();
     continue;
   }
@@ -163,9 +231,12 @@ for (const file of files) {
   const settle = async (before) => {
     await page.waitForTimeout(90);
     let after = await page.evaluate(snapshot);
-    if (after.finished) return after;
+    if (after.finished) return { changed: true, after };
     const newMessage = before.sayKind !== after.sayKind || before.sayText !== after.sayText;
-    if (advanced(before, after) || (newMessage && after.sayKind === 'ok')) {
+    // A correct intermediate action can repeat the same visible feedback
+    // before any star or level changes. It only guides the next exploration.
+    const success = after.sayKind === 'ok' && (newMessage || after.feedbackRevision !== before.feedbackRevision);
+    if (advanced(before, after) || success) {
       wrongs = 0;
       await page.waitForTimeout(1200);
       after = await page.evaluate(snapshot);
@@ -174,7 +245,7 @@ for (const file of files) {
       await page.waitForTimeout(wrongs % 3 === 0 ? 1900 : 300);
       after = await page.evaluate(snapshot);
     }
-    return after;
+    return { changed: success || advanced(before, after), after };
   };
   const click = async (reference) => {
     if (steps >= maxSteps) return { changed: false, after: await page.evaluate(snapshot) };
@@ -184,8 +255,7 @@ for (const file of files) {
     if (!current) return { changed: false, after: before };
     await page.mouse.click(current.x, current.y);
     steps += 1;
-    const after = await settle(before);
-    return { changed: advanced(before, after), after };
+    return settle(before);
   };
   const scribble = async (reference) => {
     if (steps >= maxSteps) return;
@@ -221,8 +291,7 @@ for (const file of files) {
     await page.mouse.move((source.x + target.x) / 2, (source.y + target.y) / 2, { steps: 4 });
     await page.mouse.move(target.x, target.y, { steps: 4 }); await page.mouse.up();
     steps += 1;
-    const after = await settle(before);
-    return { changed: advanced(before, after), after };
+    return settle(before);
   };
   const dragSweep = async () => {
     const tried = new Set();
@@ -246,6 +315,16 @@ for (const file of files) {
       for (const canvas of now.candidates.filter((item) => item.canvas)) await scribble(canvas);
       const outcome = await drag(pair.source.key, pair.target.key);
       if (outcome.changed || outcome.after.finished) return true;
+      // A drag may build a quantity without completing the level. Try the
+      // visible answer groups at each intermediate state, before another drag
+      // changes it. Singleton controls (often reset/undo) must not erase that
+      // state before the choices have been explored. No answer is read here.
+      const choices = grouped(outcome.after.candidates.filter((item) => !item.canvas && !item.draggable))
+        .filter((group) => group.members.length >= 2 && group.members.length <= 12);
+      for (const group of choices) for (const member of shuffle(group.members)) {
+        const response = await click(member);
+        if (response.changed || response.after.finished) return true;
+      }
     }
     return false;
   };

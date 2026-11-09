@@ -81,6 +81,8 @@ The single standard for every new courseware lesson, across subjects and grades,
 
 It replaces `docs/learning/low-reading-interaction-rule.md`, `backend/content/textbook_interaction_policy.v1.json`, `backend/content/textbook_courseware_quality.v1.json` and `backend/content/low_reading_policy.v1.json`. Those files stay only while published legacy lessons still need validating; do not apply them to new work, and never rewrite the frozen requests, receipts or review records of lessons that are already published.
 
+Interactive pages are real-time mini-games (standard rule 8). Build them on the shared engine `courseware/kit/game.py` (page scripts call `K.game`; usage is in that file and `courseware/kit/tests/test_game.py`). Give every game an autopilot, because the G6 robot (`courseware/tools/autoplay.mjs`) finishes every level twice with it. Let the teacher demonstrate with `setState {demo:true}` and hand over with `{demo:false, level:1}`, and put anchor elements over canvas regions so the teacher's highlights have real targets. Working examples on this machine: `courseware/lessons/pep-math-g1-upper-recognize10-games` (published) and `courseware/lessons/pep-math-g1-upper-add-subtract10-games`.
+
 Courseware engineering rules, for every code change that serves courseware:
 
 - Course-specific content (lesson names, node ids, textbook editions) lives in course data, never in shared code.

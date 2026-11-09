@@ -5,9 +5,13 @@ A lesson page is a body, a stylesheet and a script written against the `K` objec
 finish overlay, drag helper and the receivers for the teacher's page operations (highlight, annotate, reveal and set
 state; the message types are in courseware/kit/contract.py). JS_TEST holds scripted-play helpers (K.sim, K.audit, K.cp,
 K.check); they are only included when a page is built for a play-through (tests=True) and never ship to children.
+A page that calls K.game(...) also gets the real-time mini-game engine from courseware/kit/game.py; other pages are
+built exactly as before.
 """
 import html
 import re
+
+from courseware.kit import game
 
 CSS = r"""
 :root{--ink:#6B4423;--ink2:#8A5A24;--paper:#FFFDF6;--line:#E8C48F;--or:#F6A935;--or2:#C47A12;--gr:#58B45C;--gr2:#2F8A3A;--rd:#E4572E;--rd2:#B23A17;--bl:#4C8DDB;--bl2:#2F66AE;--pu:#8B5CF6}
@@ -152,10 +156,12 @@ JS_TAIL = r"""
 
 
 def page(title, body, css, js, css_extra="", *, tests=False):
-    script = JS_HEAD + (JS_TEST if tests else "") + JS_TAIL
+    with_game = game.uses_game(js)
+    script = JS_HEAD + (game.GAME_JS if with_game else "") + (JS_TEST if tests else "") + JS_TAIL
+    style = CSS + (game.GAME_CSS if with_game else "") + css + css_extra
     return ('<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<title>' + html.escape(title) + '</title><style>' + CSS + css + css_extra + '</style></head><body>'
+            '<title>' + html.escape(title) + '</title><style>' + style + '</style></head><body>'
             '<div id="cv"><div id="play">' + body + '</div></div>'
             '<script>' + script + '</script><script>' + js + '</script></body></html>')
 
@@ -172,4 +178,4 @@ def defined_ids(source):
 
 def reserved_ids():
     """The ids the kit creates itself; a page that reuses one breaks the kit's own elements (a page once reused 'dots')."""
-    return frozenset(defined_ids(page('', '', '', '')) | {'start-btn'})
+    return frozenset(defined_ids(page('', '', '', '')) | defined_ids(game.GAME_JS) | {'start-btn'})
