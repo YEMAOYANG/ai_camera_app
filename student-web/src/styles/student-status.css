@@ -1,10 +1,11 @@
-/* One quiet, centered identity state across books, reviews and classrooms. */
+/* Shared student loading, preparation and error screens. */
 .student-session-screen { display: grid; place-items: center; min-height: 100dvh; padding: 24px; color: var(--mira-ink); background: var(--mira-bg) url("/images/storybook/paper-texture.webp") repeat; background-size: 512px; }
 .student-session-state { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(100%, 420px); text-align: center; }
 .student-session-icon { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 8px; border-radius: 14px; color: #684d1c; background: #f5cf70; }
+.student-session-state[role="alert"] .student-session-icon { color: var(--mira-warning); background: var(--mira-sun-soft); }
 .student-session-state h1 { margin: 0; font-size: 24px; line-height: 1.4; font-weight: 650; text-wrap: balance; }
 .student-session-state p { margin: 0; color: var(--mira-muted); font-size: 15px; line-height: 1.65; overflow-wrap: anywhere; }
-.student-session-retry { margin-top: 8px; }
+.student-status-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding-top: 8px; }
 .student-session-progress { width: 128px; height: 3px; margin-top: 12px; overflow: hidden; border-radius: 999px; background: var(--mira-border); }
 .student-session-progress > i { display: block; width: 40%; height: 100%; border-radius: inherit; background: var(--mira-brand); animation: student-session-progress 1.5s ease-in-out infinite; }
 @keyframes student-session-progress { from { transform: translateX(-100%); } to { transform: translateX(350%); } }

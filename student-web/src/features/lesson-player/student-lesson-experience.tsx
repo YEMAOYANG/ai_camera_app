@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { MiraMark } from "@/components/student/mira-mark";
+import { StudentStatusScreen } from "@/components/student/student-status-screen";
 import { Button } from "@/components/ui/button";
 import { StudentSessionState } from "@/features/auth/student-session-state";
 import { getLatestLearningReport, startLearningSession, submitLearningAnswer } from "@/features/learning/learning-client";
@@ -353,13 +354,8 @@ function LessonLoading() {
 
 function LessonError({ message }: { message: string }) {
   return (
-    <main id="main-content" className="mira-ui-surface student-session-screen">
-      <section className="student-session-state" role="alert">
-        <span className="student-session-icon" aria-hidden="true"><CircleAlert size={28} /></span>
-        <h1>这节课暂时打不开</h1>
-        <p>{message}</p>
-        <Button asChild><Link href="/learning">回到书包 <ArrowRight aria-hidden="true" /></Link></Button>
-      </section>
-    </main>
+    <StudentStatusScreen icon={CircleAlert} role="alert" title="这节课暂时打不开" message={message}>
+      <Button size="compact" asChild><Link href="/learning">回到书包 <ArrowRight aria-hidden="true" /></Link></Button>
+    </StudentStatusScreen>
   );
 }

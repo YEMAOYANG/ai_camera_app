@@ -43,7 +43,7 @@ describe("classroom release gate", () => {
     };
     render(<ClassroomEntry student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} taskId="task-1" startSession={startSession} />);
     expect(await screen.findByText("课程制作中")).toBeInTheDocument();
-    expect(screen.getByText("老师正在把课件和声音准备好")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("老师正在把课件和声音准备好");
     expect(screen.queryByText("提交答案")).not.toBeInTheDocument();
   });
 
