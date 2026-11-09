@@ -1,0 +1,857 @@
+{
+  "schemaVersion": "mira.courseware.asset-sources.v1",
+  "design": "design.json",
+  "records": {
+    "books-mark-left": {
+      "origin": "deterministic count composite",
+      "geometry": {
+        "base": "closed-book",
+        "placedArtSize": [
+          58,
+          68
+        ],
+        "centers": [
+          [
+            [
+              53,
+              172
+            ],
+            [
+              120,
+              172
+            ],
+            [
+              187,
+              172
+            ],
+            [
+              254,
+              172
+            ],
+            [
+              321,
+              172
+            ],
+            [
+              388,
+              172
+            ],
+            [
+              455,
+              172
+            ],
+            [
+              522,
+              172
+            ],
+            [
+              589,
+              172
+            ],
+            [
+              656,
+              172
+            ]
+          ]
+        ],
+        "rows": [
+          10
+        ],
+        "sha256": "7aae38aff5a623c0c66fdc6cd3b45b60d74092c22441460f59dd1acbf5905df9"
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "books-mark-middle": {
+      "origin": "deterministic count composite",
+      "geometry": {
+        "base": "closed-book",
+        "placedArtSize": [
+          58,
+          68
+        ],
+        "centers": [
+          [
+            [
+              53,
+              172
+            ],
+            [
+              120,
+              172
+            ],
+            [
+              187,
+              172
+            ],
+            [
+              254,
+              172
+            ],
+            [
+              321,
+              172
+            ],
+            [
+              388,
+              172
+            ],
+            [
+              455,
+              172
+            ],
+            [
+              522,
+              172
+            ],
+            [
+              589,
+              172
+            ],
+            [
+              656,
+              172
+            ]
+          ]
+        ],
+        "rows": [
+          10
+        ],
+        "sha256": "4959465b27200232cae664b8f484b6e8bd6f77e97660d04146659503b81f75e6"
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "books-mark-right": {
+      "origin": "deterministic count composite",
+      "geometry": {
+        "base": "closed-book",
+        "placedArtSize": [
+          58,
+          68
+        ],
+        "centers": [
+          [
+            [
+              53,
+              172
+            ],
+            [
+              120,
+              172
+            ],
+            [
+              187,
+              172
+            ],
+            [
+              254,
+              172
+            ],
+            [
+              321,
+              172
+            ],
+            [
+              388,
+              172
+            ],
+            [
+              455,
+              172
+            ],
+            [
+              522,
+              172
+            ],
+            [
+              589,
+              172
+            ],
+            [
+              656,
+              172
+            ]
+          ]
+        ],
+        "rows": [
+          10
+        ],
+        "sha256": "5f016bc79fcb0d5eb828f3540fc7a261f3f5e94c2ea7f0cfa31dc61b81deb716"
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "closed-book": {
+      "origin": "Codex image_gen builtin",
+      "sha256": "dda849fe81fe7f54d236e5c4c28a4052974ad59a24397ecb4b77f0c236c5a0a6",
+      "request": {
+        "key": "closed-book",
+        "aspect": "1:1",
+        "prompt": "原创同一儿童绘本里单独的一本竖立合上的短书，直面宽封面，封面为雾青绿色无字素布、书页米白，微侧只露一窄条书页，宽而稳定的轮廓完整居中，暖调细腻彩铅水粉肌理，极柔和投影。仅一本，完整边界并四周留白，主体约占画面80%。不要其他书或书架、字母、数字、图案、标志、水印。 请输出真实透明背景（带 alpha），无背景板、底边、投影垫或白色外轮廓；完整独立物件。",
+        "transparentBackground": true
+      },
+      "receipt": "output/courseware-lessons/pep-math-g1-upper-recognize10/codex-images-v1/closed-book.receipt.json",
+      "scenes": [],
+      "usedForComposites": [
+        "books-mark-left",
+        "books-mark-middle",
+        "books-mark-right"
+      ]
+    },
+    "compare-plants": {
+      "origin": "deterministic count composite",
+      "geometry": {
+        "base": "seedling",
+        "placedArtSize": [
+          66,
+          91
+        ],
+        "centers": [
+          [
+            [
+              76,
+              104
+            ],
+            [
+              161,
+              104
+            ],
+            [
+              246,
+              104
+            ],
+            [
+              331,
+              104
+            ],
+            [
+              416,
+              104
+            ],
+            [
+              501,
+              104
+            ],
+            [
+              586,
+              104
+            ],
+            [
+              671,
+              104
+            ],
+            [
+              756,
+              104
+            ],
+            [
+              841,
+              104
+            ]
+          ],
+          [
+            [
+              76,
+              279
+            ],
+            [
+              161,
+              279
+            ],
+            [
+              246,
+              279
+            ],
+            [
+              331,
+              279
+            ],
+            [
+              416,
+              279
+            ],
+            [
+              501,
+              279
+            ],
+            [
+              586,
+              279
+            ],
+            [
+              671,
+              279
+            ],
+            [
+              756,
+              279
+            ]
+          ]
+        ],
+        "rows": [
+          10,
+          9
+        ],
+        "sha256": "29f085c5b4a5bd8ce277204e39e9287bc4ecc562a9a238602e8d19e226655382"
+      },
+      "scenes": [
+        "p04"
+      ],
+      "usedForComposites": []
+    },
+    "compare-spools": {
+      "origin": "deterministic count composite",
+      "geometry": {
+        "base": "thread-spool",
+        "placedArtSize": [
+          62,
+          91
+        ],
+        "centers": [
+          [
+            [
+              76,
+              104
+            ],
+            [
+              161,
+              104
+            ],
+            [
+              246,
+              104
+            ],
+            [
+              331,
+              104
+            ],
+            [
+              416,
+              104
+            ],
+            [
+              501,
+              104
+            ],
+            [
+              586,
+              104
+            ],
+            [
+              671,
+              104
+            ],
+            [
+              756,
+              104
+            ],
+            [
+              841,
+              104
+            ]
+          ],
+          [
+            [
+              76,
+              279
+            ],
+            [
+              161,
+              279
+            ],
+            [
+              246,
+              279
+            ],
+            [
+              331,
+              279
+            ],
+            [
+              416,
+              279
+            ],
+            [
+              501,
+              279
+            ],
+            [
+              586,
+              279
+            ],
+            [
+              671,
+              279
+            ],
+            [
+              756,
+              279
+            ]
+          ]
+        ],
+        "rows": [
+          10,
+          9
+        ],
+        "sha256": "1f9bdc21b9bd62c46f00a2d93706aa1cc6fc291da17ae5826dfe2bb57f9fbd12"
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "dots-3": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "4ef4c5c46dd9c465b619f3639307ee2ee27dcc4f5c519e7690b166f22b2302c9",
+      "geometry": {
+        "kind": "quantity-dots",
+        "count": 3
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "dots-4": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "bce3a72aa86d22b9fc65e9453082b676ac8e59b833d434d5bc49640170954c57",
+      "geometry": {
+        "kind": "quantity-dots",
+        "count": 4
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "dots-5": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "df1e75b1014d9f12f51811d9a880c159e7afdde6f37471000d1896b63a180a9e",
+      "geometry": {
+        "kind": "quantity-dots",
+        "count": 5
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "greenhouse": {
+      "origin": "Codex image_gen builtin",
+      "sha256": "6afff1f71dbc260927217afae8df629c71c80cb3a09e8b128e3e4cc33ac3cadf",
+      "request": {
+        "key": "greenhouse",
+        "aspect": "16:9",
+        "prompt": "原创儿童数学绘本插画，横幅16:9，温暖自然光。玻璃温室里的班级花房，浅色木作、淡奶油纸感、低饱和雾青绿、赤陶色小物，干净柔和的彩铅水粉肌理。一个扎发六岁女孩和一位同龄男孩在空的长木桌后，穿青绿色与土黄围裙，正准备整理花架。近景所有桌板和架位空白，只有窗外远景是模糊不可数的成片叶子，画面里不放任何花盆、花瓶、可数成组物件。桌面和人物有清楚轮廓，头部完整，横版构图，禁止任何文字、数字、印章、标志、水印。",
+        "transparentBackground": false
+      },
+      "receipt": "output/courseware-lessons/pep-math-g1-upper-recognize10/codex-images-v1/greenhouse.receipt.json",
+      "scenes": [
+        "p01",
+        "p02",
+        "p03",
+        "p05",
+        "p06"
+      ],
+      "usedForComposites": []
+    },
+    "grid-one": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "9a4848778dca598eba03dbb717c01d5320cd2bbf393cbbb125f88db104405e8e",
+      "geometry": {
+        "kind": "writing-grid",
+        "mode": "one",
+        "trace": true
+      },
+      "scenes": [
+        "p07"
+      ],
+      "usedForComposites": []
+    },
+    "grid-ten": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "de1fe6fe7e3eabdec45d29241d156f2c4173cefd8c8b1e0271d01e1585a70415",
+      "geometry": {
+        "kind": "writing-grid",
+        "mode": "ten",
+        "trace": true
+      },
+      "scenes": [
+        "p07"
+      ],
+      "usedForComposites": []
+    },
+    "lantern-frame": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "f7bf1e32ae696c6b6501275c77dcd7a56abdcea393a1bd84b39ebf2cf2389f74",
+      "geometry": {
+        "kind": "ten-frame",
+        "rows": 2,
+        "columns": 5,
+        "filled": 6,
+        "empty": 4
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "number-10": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "58a8d623b8e99fc89188a83dcad601a1404150f06479d6378df040d095aa1d57",
+      "geometry": {
+        "kind": "target-numeral",
+        "value": 10
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "number-8": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "8edd1423455cb8463a372bad9248740fd9c671a5ec5e413a984e537b233fcedf",
+      "geometry": {
+        "kind": "target-numeral",
+        "value": 8
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "number-9": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "c7789868fc02a82bd8cdeb04904c892ed734024b7bf1096dd22dbf96cee0906c",
+      "geometry": {
+        "kind": "target-numeral",
+        "value": 9
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "ruler-gap": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "5dbcf14cd91ce78447ad12792e63e7d72a82d8ac1e0513963a28e5aca24b5930",
+      "geometry": {
+        "kind": "number-track",
+        "direction": "left-to-right",
+        "labels": [
+          7,
+          8,
+          null,
+          10
+        ]
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "seedling": {
+      "origin": "Codex image_gen builtin",
+      "sha256": "745e9ca77d871215508062a2f1955986cc43eee52a31710b437cb1594a6a5e1c",
+      "request": {
+        "key": "seedling",
+        "aspect": "1:1",
+        "prompt": "原创一年级数学绘本里的单个可数物体。唯一一盆幼苗，全貌清晰居中，哑光赤陶小花盆，圆润梯形，褐色土面上长一根短茎与三片青绿色圆叶，不要花朵或额外装饰。正面略俯，柔和自然光，温暖彩铅与水粉的童书风格，极淡投影，单盆对象占正方形约82%且四周留白，盆底完整。没有任何其他物体、花盆、零散叶子、文字、数字、标志、水印。缩为45像素仍认得是一个花盆。 请输出真实透明背景（带 alpha），无背景板、底边、投影垫或白色外轮廓；完整独立物件。",
+        "transparentBackground": true
+      },
+      "receipt": "output/courseware-lessons/pep-math-g1-upper-recognize10/codex-images-v1/seedling.receipt.json",
+      "scenes": [
+        "p02",
+        "p03",
+        "p05",
+        "p06"
+      ],
+      "usedForComposites": [
+        "compare-plants"
+      ]
+    },
+    "spools-10": {
+      "origin": "deterministic count composite",
+      "geometry": {
+        "base": "thread-spool",
+        "placedArtSize": [
+          70,
+          104
+        ],
+        "centers": [
+          [
+            [
+              67,
+              80
+            ],
+            [
+              171,
+              80
+            ],
+            [
+              275,
+              80
+            ],
+            [
+              379,
+              80
+            ],
+            [
+              483,
+              80
+            ]
+          ],
+          [
+            [
+              67,
+              215
+            ],
+            [
+              171,
+              215
+            ],
+            [
+              275,
+              215
+            ],
+            [
+              379,
+              215
+            ],
+            [
+              483,
+              215
+            ]
+          ]
+        ],
+        "rows": [
+          5,
+          5
+        ],
+        "sha256": "2b852fd4594b274b503a03ae22f6cb2bcff50ddbd2433ed9c2395cb79f5c0dab"
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "spools-8": {
+      "origin": "deterministic count composite",
+      "geometry": {
+        "base": "thread-spool",
+        "placedArtSize": [
+          70,
+          104
+        ],
+        "centers": [
+          [
+            [
+              67,
+              80
+            ],
+            [
+              171,
+              80
+            ],
+            [
+              275,
+              80
+            ],
+            [
+              379,
+              80
+            ],
+            [
+              483,
+              80
+            ]
+          ],
+          [
+            [
+              67,
+              215
+            ],
+            [
+              171,
+              215
+            ],
+            [
+              275,
+              215
+            ]
+          ]
+        ],
+        "rows": [
+          5,
+          3
+        ],
+        "sha256": "2d9e1d80f979a2ef6f79cd4535566197185a7c3f1d652f90bd375d33d4e5ed4a"
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "spools-9": {
+      "origin": "deterministic count composite",
+      "geometry": {
+        "base": "thread-spool",
+        "placedArtSize": [
+          70,
+          104
+        ],
+        "centers": [
+          [
+            [
+              67,
+              80
+            ],
+            [
+              171,
+              80
+            ],
+            [
+              275,
+              80
+            ],
+            [
+              379,
+              80
+            ],
+            [
+              483,
+              80
+            ]
+          ],
+          [
+            [
+              67,
+              215
+            ],
+            [
+              171,
+              215
+            ],
+            [
+              275,
+              215
+            ],
+            [
+              379,
+              215
+            ]
+          ]
+        ],
+        "rows": [
+          5,
+          4
+        ],
+        "sha256": "1f4559bef3ecbe64fb6778ff5dcc40a489f0fae292ebf89937621d63bee3bf1f"
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "symbol-equal": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "20f5262eccb88249306cdad31264825a5f3f24cc0c0544f6931b78d84ecad25c",
+      "geometry": {
+        "kind": "comparison-symbol",
+        "value": "="
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "symbol-greater": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "5fce923797095473efe929dd92e7fb716a42f5956a94be7a583917ff471cbd3f",
+      "geometry": {
+        "kind": "comparison-symbol",
+        "value": ">"
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "symbol-less": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "0db1822ecc73af6c23f580a82c477fe264a2141da25f94596b45e10209ffd006",
+      "geometry": {
+        "kind": "comparison-symbol",
+        "value": "<"
+      },
+      "scenes": [
+        "p08"
+      ],
+      "usedForComposites": []
+    },
+    "thread-spool": {
+      "origin": "Codex image_gen builtin",
+      "sha256": "442a3f0b6be6e069bbbd9c09ac512687c2086c55544b884320a54005b1e7ee63",
+      "request": {
+        "key": "thread-spool",
+        "aspect": "1:1",
+        "prompt": "原创同一儿童绘本中单独的一只木线轴，米色木两端和蓝绿色绕线，正面微俯，外轮廓圆润明晰，直立，只有一个线轴，完整居中，柔和短影、暖调彩铅水粉肌理。棉线整齐绕在线轴上，不拖散线，不加缝针、手、布料或其他工具。主体约占画面80%。禁止文字、数字、标志、水印。缩小仍能清楚辨识。 请输出真实透明背景（带 alpha），无背景板、底边、投影垫或白色外轮廓；完整独立物件。",
+        "transparentBackground": true
+      },
+      "receipt": "output/courseware-lessons/pep-math-g1-upper-recognize10/codex-images-v1/thread-spool.receipt.json",
+      "scenes": [],
+      "usedForComposites": [
+        "compare-spools",
+        "spools-8",
+        "spools-9",
+        "spools-10"
+      ]
+    },
+    "write-reversed": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "3a7f4f572dc8b69182527649b2bb9cb6ce8d4f8201bf1747bddc45eac132d8b9",
+      "geometry": {
+        "kind": "writing-grid",
+        "mode": "reverse",
+        "trace": false
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "write-separated": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "bcdf073ab0d40ccd304f0c961aa95e0e583a1697a074b59f077fcb9d688026e7",
+      "geometry": {
+        "kind": "writing-grid",
+        "mode": "separated",
+        "trace": false
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    },
+    "write-ten": {
+      "origin": "code-rendered mathematical diagram",
+      "sha256": "8ba26db7bf8f50fc3111ad809b1dec920a364639a6ecb21eff4f2bd1af4f7756",
+      "geometry": {
+        "kind": "writing-grid",
+        "mode": "ten",
+        "trace": false
+      },
+      "scenes": [
+        "p09"
+      ],
+      "usedForComposites": []
+    }
+  }
+}

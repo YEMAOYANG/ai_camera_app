@@ -1,0 +1,334 @@
+{
+  "schemaVersion": "mira.courseware.semantic-diagrams.v1",
+  "purpose": "数字、大小符号、田字格笔迹、数轨、十格框和一一对应线均表达具体数学内容。课堂与小检查插图使用已登记的正式原创单物图片做精确排布。",
+  "palette": {
+    "background": "#fff7e8",
+    "ink": "#38594a",
+    "emphasis": "#366d57",
+    "line": "#b7aa8a",
+    "trace": "#a64532"
+  },
+  "writingReference": {
+    "textbookPrintedPage": 55,
+    "textbookPdfPage": 60,
+    "slidePage": 22,
+    "one": "左半格内从上偏右向下偏左",
+    "zero": "右半格内由右上侧起笔，先向左上绕，再经左侧、下方与右侧闭合"
+  },
+  "native": {
+    "number-8": {
+      "kind": "target-numeral",
+      "value": 8
+    },
+    "number-9": {
+      "kind": "target-numeral",
+      "value": 9
+    },
+    "number-10": {
+      "kind": "target-numeral",
+      "value": 10
+    },
+    "symbol-greater": {
+      "kind": "comparison-symbol",
+      "value": ">"
+    },
+    "symbol-less": {
+      "kind": "comparison-symbol",
+      "value": "<"
+    },
+    "symbol-equal": {
+      "kind": "comparison-symbol",
+      "value": "="
+    },
+    "dots-3": {
+      "kind": "quantity-dots",
+      "count": 3
+    },
+    "dots-4": {
+      "kind": "quantity-dots",
+      "count": 4
+    },
+    "dots-5": {
+      "kind": "quantity-dots",
+      "count": 5
+    },
+    "ruler-gap": {
+      "kind": "number-track",
+      "direction": "left-to-right",
+      "labels": [
+        7,
+        8,
+        null,
+        10
+      ]
+    },
+    "lantern-frame": {
+      "kind": "ten-frame",
+      "rows": 2,
+      "columns": 5,
+      "filled": 6,
+      "empty": 4
+    },
+    "grid-one": {
+      "kind": "writing-grid",
+      "mode": "one",
+      "trace": true
+    },
+    "grid-ten": {
+      "kind": "writing-grid",
+      "mode": "ten",
+      "trace": true
+    },
+    "write-reversed": {
+      "kind": "writing-grid",
+      "mode": "reverse",
+      "trace": false
+    },
+    "write-ten": {
+      "kind": "writing-grid",
+      "mode": "ten",
+      "trace": false
+    },
+    "write-separated": {
+      "kind": "writing-grid",
+      "mode": "separated",
+      "trace": false
+    }
+  },
+  "composites": {
+    "compare-plants": {
+      "base": "seedling",
+      "kind": "paired-rows",
+      "canvas": [
+        920,
+        550
+      ],
+      "rows": [
+        10,
+        9
+      ],
+      "direction": "left-aligned",
+      "x": [
+        76,
+        85
+      ],
+      "y": [
+        104,
+        279
+      ],
+      "itemSize": [
+        72,
+        91
+      ],
+      "symbols": [
+        "10 > 9",
+        "9 < 10"
+      ]
+    },
+    "compare-spools": {
+      "base": "thread-spool",
+      "kind": "paired-rows",
+      "canvas": [
+        920,
+        550
+      ],
+      "rows": [
+        10,
+        9
+      ],
+      "direction": "left-aligned",
+      "x": [
+        76,
+        85
+      ],
+      "y": [
+        104,
+        279
+      ],
+      "itemSize": [
+        72,
+        91
+      ],
+      "symbols": [
+        "10 □ 9"
+      ]
+    },
+    "spools-8": {
+      "base": "thread-spool",
+      "kind": "countable-pictures",
+      "canvas": [
+        550,
+        295
+      ],
+      "rows": [
+        5,
+        3
+      ],
+      "x": [
+        67,
+        104
+      ],
+      "y": [
+        80,
+        215
+      ],
+      "itemSize": [
+        93,
+        104
+      ]
+    },
+    "spools-9": {
+      "base": "thread-spool",
+      "kind": "countable-pictures",
+      "canvas": [
+        550,
+        295
+      ],
+      "rows": [
+        5,
+        4
+      ],
+      "x": [
+        67,
+        104
+      ],
+      "y": [
+        80,
+        215
+      ],
+      "itemSize": [
+        93,
+        104
+      ]
+    },
+    "spools-10": {
+      "base": "thread-spool",
+      "kind": "countable-pictures",
+      "canvas": [
+        550,
+        295
+      ],
+      "rows": [
+        5,
+        5
+      ],
+      "x": [
+        67,
+        104
+      ],
+      "y": [
+        80,
+        215
+      ],
+      "itemSize": [
+        93,
+        104
+      ]
+    },
+    "books-mark-left": {
+      "base": "closed-book",
+      "kind": "ordinal-pictures",
+      "canvas": [
+        710,
+        300
+      ],
+      "rows": [
+        10
+      ],
+      "x": [
+        53,
+        67
+      ],
+      "y": [
+        172
+      ],
+      "itemSize": [
+        58,
+        86
+      ],
+      "markIndexFromLeft": 1,
+      "direction": "right-to-left"
+    },
+    "books-mark-middle": {
+      "base": "closed-book",
+      "kind": "ordinal-pictures",
+      "canvas": [
+        710,
+        300
+      ],
+      "rows": [
+        10
+      ],
+      "x": [
+        53,
+        67
+      ],
+      "y": [
+        172
+      ],
+      "itemSize": [
+        58,
+        86
+      ],
+      "markIndexFromLeft": 6,
+      "direction": "right-to-left"
+    },
+    "books-mark-right": {
+      "base": "closed-book",
+      "kind": "ordinal-pictures",
+      "canvas": [
+        710,
+        300
+      ],
+      "rows": [
+        10
+      ],
+      "x": [
+        53,
+        67
+      ],
+      "y": [
+        172
+      ],
+      "itemSize": [
+        58,
+        86
+      ],
+      "markIndexFromLeft": 10,
+      "direction": "right-to-left"
+    }
+  },
+  "writingGeometry": {
+    "view": [
+      440,
+      270
+    ],
+    "square": [
+      114,
+      29,
+      212
+    ],
+    "strokeColor": "#38594a",
+    "traceColor": "#a64532",
+    "oneTop": [
+      0.325,
+      0.17
+    ],
+    "oneBottom": [
+      0.175,
+      0.83
+    ],
+    "zeroCenter": [
+      0.75,
+      0.5
+    ],
+    "zeroRadius": [
+      0.116,
+      0.34
+    ],
+    "zeroSkewXPerY": -0.22,
+    "zeroStartAngle": -65,
+    "zeroArrowAngle": -151,
+    "zeroDirection": "decreasing"
+  }
+}

@@ -1,0 +1,1224 @@
+{
+ "schemaVersion": "mira.courseware.lesson.v1",
+ "title": "10的认识",
+ "description": "帮班级花房整理幼苗，在六个小游戏里认识10：数一数、排一排、比一比、第几个、分与合、写一写。",
+ "grade": 1,
+ "roster": {
+  "teacher": {
+   "name": "小数老师",
+   "role": "teacher",
+   "gender": "male",
+   "voice": "Ethan",
+   "avatar": "/teachers/ashu-math-v1.png",
+   "color": "#437763",
+   "persona": "耐心清楚地讲出数量、数序和分合。通过实际移动说明理由，再让孩子动手。"
+  }
+ },
+ "images": {
+  "greenhouse": {
+   "file": "assets/greenhouse.png"
+  },
+  "seedling": {
+   "file": "assets/seedling.png"
+  },
+  "compare-plants": {
+   "file": "assets/compare-plants.png"
+  },
+  "grid-one": {
+   "file": "assets/grid-one.png"
+  },
+  "grid-ten": {
+   "file": "assets/grid-ten.png"
+  },
+  "spools-9": {
+   "file": "assets/spools-9.png"
+  },
+  "spools-10": {
+   "file": "assets/spools-10.png"
+  },
+  "spools-8": {
+   "file": "assets/spools-8.png"
+  },
+  "ruler-gap": {
+   "file": "assets/ruler-gap.png"
+  },
+  "number-10": {
+   "file": "assets/number-10.png"
+  },
+  "number-8": {
+   "file": "assets/number-8.png"
+  },
+  "number-9": {
+   "file": "assets/number-9.png"
+  },
+  "compare-spools": {
+   "file": "assets/compare-spools.png"
+  },
+  "symbol-greater": {
+   "file": "assets/symbol-greater.png"
+  },
+  "symbol-less": {
+   "file": "assets/symbol-less.png"
+  },
+  "symbol-equal": {
+   "file": "assets/symbol-equal.png"
+  },
+  "books-mark-right": {
+   "file": "assets/books-mark-right.png"
+  },
+  "books-mark-middle": {
+   "file": "assets/books-mark-middle.png"
+  },
+  "books-mark-left": {
+   "file": "assets/books-mark-left.png"
+  },
+  "lantern-frame": {
+   "file": "assets/lantern-frame.png"
+  },
+  "dots-4": {
+   "file": "assets/dots-4.png"
+  },
+  "dots-3": {
+   "file": "assets/dots-3.png"
+  },
+  "dots-5": {
+   "file": "assets/dots-5.png"
+  },
+  "write-reversed": {
+   "file": "assets/write-reversed.png"
+  },
+  "write-ten": {
+   "file": "assets/write-ten.png"
+  },
+  "write-separated": {
+   "file": "assets/write-separated.png"
+  }
+ },
+ "scenes": [
+  {
+   "key": "s01",
+   "type": "slide",
+   "title": "花房的十盆花",
+   "template": "title-picture",
+   "data": {
+    "title": "花房的十盆花",
+    "picture": "greenhouse",
+    "caption": "一架刚好放十盆"
+   },
+   "script": [
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "同学们好，今天我们来到班级花房。"
+    },
+    {
+     "say": "花房里有一个空花架。"
+    },
+    {
+     "say": "花架有上下两层，每层放五盆。"
+    },
+    {
+     "say": "我们要把幼苗一盆一盆摆上去。"
+    },
+    {
+     "say": "一边摆，一边用手指着数。"
+    },
+    {
+     "say": "一盆只数一次，不跳过，也不重复。"
+    },
+    {
+     "say": "数到最后一盆是几，一共就有几盆。"
+    },
+    {
+     "spotlight": "caption"
+    },
+    {
+     "say": "一架摆满，正好是十盆，读作十。"
+    },
+    {
+     "say": "十个一合在一起，就是一个十。"
+    }
+   ]
+  },
+  {
+   "key": "g02",
+   "type": "interactive",
+   "title": "小熊跑酷收幼苗",
+   "page": "p02",
+   "widgetType": "game",
+   "startImage": "greenhouse",
+   "script": [
+    {
+     "setState": {
+      "demo": true
+     }
+    },
+    {
+     "say": "先看小熊怎么玩。"
+    },
+    {
+     "say": "小熊一直往前跑，点一下就跳起来。"
+    },
+    {
+     "say": "接到一盆幼苗，就放上花架一格。"
+    },
+    {
+     "highlight": "#r10a-shelf"
+    },
+    {
+     "say": "花架一格放一盆，一盆只放一次。"
+    },
+    {
+     "say": "一层五格，两层合起来正好十格。"
+    },
+    {
+     "annotate": "#r10a-count",
+     "content": "最后一盆是几，一共就是几盆"
+    },
+    {
+     "say": "看绿色的数，最后放的是几，就有几盆。"
+    },
+    {
+     "say": "放满十格，十个一就捆成一个十。"
+    },
+    {
+     "say": "第二关一次接两盆，两盆两盆地数。"
+    },
+    {
+     "say": "二、四、六、八、十，也是十盆。"
+    },
+    {
+     "say": "小满：我数出了十一盆，怎么回事？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "小满可能把一盆数了两次。"
+    },
+    {
+     "say": "数过的就放上花架，就不会数重。"
+    },
+    {
+     "highlight": "#r10a-bear"
+    },
+    {
+     "say": "看到水坑要跳过去，摔倒会慢下来。"
+    },
+    {
+     "say": "现在轮到你，帮小熊把花架摆满！"
+    },
+    {
+     "setState": {
+      "demo": false,
+      "level": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "g03",
+   "type": "interactive",
+   "title": "小青蛙过河",
+   "page": "p03",
+   "widgetType": "game",
+   "startImage": "greenhouse",
+   "script": [
+    {
+     "setState": {
+      "demo": true
+     }
+    },
+    {
+     "say": "这只小青蛙要跳过小河。"
+    },
+    {
+     "say": "它每次只跳到挨着的下一片荷叶。"
+    },
+    {
+     "highlight": "#r10b-ruler"
+    },
+    {
+     "say": "上面是一把数尺，从零排到十。"
+    },
+    {
+     "say": "正着数，一个比一个多一。"
+    },
+    {
+     "say": "八的后面是九，九的后面是十。"
+    },
+    {
+     "annotate": "#r10b-next",
+     "content": "先想好下一个数是几"
+    },
+    {
+     "say": "跳之前，先想好下一个数是几。"
+    },
+    {
+     "say": "点上面或下面，瞄准写着它的荷叶。"
+    },
+    {
+     "say": "第二关倒着跳，从十往回数。"
+    },
+    {
+     "say": "十、九、八，一个比一个少一。"
+    },
+    {
+     "say": "小满：正着数，九的后面是八吧？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "不对哦，八在九的前面。"
+    },
+    {
+     "say": "正着数，九后面紧挨着的是十。"
+    },
+    {
+     "highlight": "#r10b-frog"
+    },
+    {
+     "say": "绿圈转完，小青蛙就跳，要先瞄准。"
+    },
+    {
+     "say": "轮到你啦，帮小青蛙过河！"
+    },
+    {
+     "setState": {
+      "demo": false,
+      "level": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "s04",
+   "type": "slide",
+   "title": "十比九多一",
+   "template": "picture-points",
+   "data": {
+    "title": "十比九多一",
+    "picture": "compare-plants",
+    "points": [
+     "一盆对一盆",
+     "十盆这一排多一盆",
+     "开口朝较大的数"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "picture"
+    },
+    {
+     "say": "我们来比一比十和九。"
+    },
+    {
+     "say": "上排有十盆花，下排有九盆。"
+    },
+    {
+     "say": "两排要从同一头排整齐。"
+    },
+    {
+     "spotlight": "point-1"
+    },
+    {
+     "say": "上面一盆对下面一盆，连成一对。"
+    },
+    {
+     "say": "一对一对连下去，一共连成九对。"
+    },
+    {
+     "spotlight": "point-2"
+    },
+    {
+     "say": "上排最后还剩一盆，没有和它配对。"
+    },
+    {
+     "say": "所以十比九多一，九比十少一。"
+    },
+    {
+     "spotlight": "point-3"
+    },
+    {
+     "say": "比大小的符号，开口朝着大的数。"
+    },
+    {
+     "say": "十在左边，读作十大于九。"
+    },
+    {
+     "say": "九在左边，读作九小于十。"
+    }
+   ]
+  },
+  {
+   "key": "g05",
+   "type": "interactive",
+   "title": "套圈比多少",
+   "page": "p05",
+   "widgetType": "game",
+   "startImage": "greenhouse",
+   "script": [
+    {
+     "setState": {
+      "demo": true
+     }
+    },
+    {
+     "say": "池塘里有十只小鸭，只有九个游泳圈。"
+    },
+    {
+     "say": "一只小鸭套一个圈，这叫一个对一个。"
+    },
+    {
+     "highlight": "#r10c-ducks"
+    },
+    {
+     "say": "点一只小鸭，圈就飞过去套住它。"
+    },
+    {
+     "say": "九个圈都套完，看看会怎么样。"
+    },
+    {
+     "say": "小满：鸭子和圈差不多，一样多吧？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "我们一个对一个连起来看。"
+    },
+    {
+     "say": "最后多出一只小鸭，没有圈。"
+    },
+    {
+     "say": "所以十比九多一，九比十少一。"
+    },
+    {
+     "highlight": "#r10c-sign"
+    },
+    {
+     "say": "第二关，符号方块会掉下来。"
+    },
+    {
+     "say": "点一下，它就翻个方向。"
+    },
+    {
+     "annotate": "#r10c-sign",
+     "content": "开口朝着大的数"
+    },
+    {
+     "say": "开口要朝着大的数，尖尖对着小的数。"
+    },
+    {
+     "say": "十在左边，读作十大于九。"
+    },
+    {
+     "say": "九在左边，读作九小于十。"
+    },
+    {
+     "say": "现在请你来套圈、翻符号吧！"
+    },
+    {
+     "setState": {
+      "demo": false,
+      "level": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "g06",
+   "type": "interactive",
+   "title": "吊车装幼苗",
+   "page": "p06",
+   "widgetType": "game",
+   "startImage": "greenhouse",
+   "script": [
+    {
+     "setState": {
+      "demo": true
+     }
+    },
+    {
+     "say": "小火车有十节车厢。"
+    },
+    {
+     "highlight": "#r10d-engine"
+    },
+    {
+     "say": "数车厢，要从车头开始数。"
+    },
+    {
+     "say": "一、二、三，一直数到第十节。"
+    },
+    {
+     "say": "吊车来回走，点一下就放下幼苗。"
+    },
+    {
+     "annotate": "#r10d-train",
+     "content": "第十节只有一节"
+    },
+    {
+     "say": "第十节是一个位置，只有一节车厢。"
+    },
+    {
+     "say": "小满：第十节，就是十节车厢吧？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "不对哦，十节是全部的车厢。"
+    },
+    {
+     "say": "第十节，只是数到十的那一节。"
+    },
+    {
+     "say": "第二关，车头换到右边。"
+    },
+    {
+     "say": "还是从车头数，第十节就换了地方。"
+    },
+    {
+     "say": "第三关每节装一盆，一共装十盆。"
+    },
+    {
+     "highlight": "#r10d-claw"
+    },
+    {
+     "say": "吊车走到车厢正上方，再放下去。"
+    },
+    {
+     "say": "轮到你来装幼苗啦！"
+    },
+    {
+     "setState": {
+      "demo": false,
+      "level": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "g07",
+   "type": "interactive",
+   "title": "降落伞凑十",
+   "page": "p07",
+   "widgetType": "game",
+   "startImage": "greenhouse",
+   "script": [
+    {
+     "setState": {
+      "demo": true
+     }
+    },
+    {
+     "say": "花架上已经有九盆幼苗。"
+    },
+    {
+     "highlight": "#r10e-shelf"
+    },
+    {
+     "say": "数一数空格，还空着一格。"
+    },
+    {
+     "say": "所以要接装着一盆的那一盘。"
+    },
+    {
+     "say": "九和一组成十。"
+    },
+    {
+     "say": "下一轮有八盆，空两格，要接两盆。"
+    },
+    {
+     "annotate": "#r10e-shelf",
+     "content": "架上少一盆，空格多一格"
+    },
+    {
+     "say": "架上少了一盆，空格就多了一格。"
+    },
+    {
+     "say": "要接的盆数，也跟着多了一盆。"
+    },
+    {
+     "say": "一边少一，一边多一，合起来总是十。"
+    },
+    {
+     "say": "按顺序是九和一、八和二、七和三。"
+    },
+    {
+     "say": "接着是六和四，还有五和五。"
+    },
+    {
+     "say": "小满：七和三是十，三和七就不是了吧？",
+     "by": "xiaoman"
+    },
+    {
+     "say": "两部分换个位置，合起来还是十。"
+    },
+    {
+     "say": "三和七，也组成十。"
+    },
+    {
+     "annotate": "#r10e-sky",
+     "content": "先数空格，再找盘子"
+    },
+    {
+     "say": "接错了，花架会放不下，或者摆不满。"
+    },
+    {
+     "say": "第二关顺序打乱，还要躲开毛毛虫。"
+    },
+    {
+     "highlight": "#r10e-rabbit"
+    },
+    {
+     "say": "左右移动小兔，接住正好的那一盘。"
+    },
+    {
+     "say": "轮到你啦！"
+    },
+    {
+     "setState": {
+      "demo": false,
+      "level": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "s08",
+   "type": "slide",
+   "title": "把十写下来",
+   "template": "two-columns",
+   "data": {
+    "title": "把十写下来",
+    "left": {
+     "heading": "先写左半",
+     "body": "从上往下写1"
+    },
+    "right": {
+     "heading": "再写右半",
+     "body": "在右半写0"
+    },
+    "left_picture": "grid-one",
+    "right_picture": "grid-ten"
+   },
+   "script": [
+    {
+     "spotlight": "left-heading"
+    },
+    {
+     "say": "现在我们来学写十。"
+    },
+    {
+     "say": "十要写在同一个田字格里。"
+    },
+    {
+     "spotlight": "left-picture"
+    },
+    {
+     "say": "先在左半格写一。"
+    },
+    {
+     "say": "从左半格上方偏右起笔，往下写。"
+    },
+    {
+     "spotlight": "left-body"
+    },
+    {
+     "say": "一要写直，不要写到右半格去。"
+    },
+    {
+     "spotlight": "right-heading"
+    },
+    {
+     "say": "再把笔移到同一格的右半边。"
+    },
+    {
+     "spotlight": "right-picture"
+    },
+    {
+     "say": "零从上面起笔，先往左下绕。"
+    },
+    {
+     "say": "绕一圈回到起点，把口封好。"
+    },
+    {
+     "spotlight": "right-body"
+    },
+    {
+     "say": "小满：我把零写左边，一写右边。",
+     "by": "xiaoman"
+    },
+    {
+     "say": "那样读出来是零一，不是十。"
+    },
+    {
+     "say": "十是左边一、右边零，挨在一格里。"
+    },
+    {
+     "say": "等一下，我们开着小赛车来写十。"
+    }
+   ]
+  },
+  {
+   "key": "g09",
+   "type": "interactive",
+   "title": "小赛车描十",
+   "page": "p08",
+   "widgetType": "game",
+   "startImage": "greenhouse",
+   "script": [
+    {
+     "setState": {
+      "demo": true
+     }
+    },
+    {
+     "say": "看，田字格里铺好了跑道。"
+    },
+    {
+     "highlight": "#r10f-grid"
+    },
+    {
+     "say": "左半格是一的跑道，右半格是零的跑道。"
+    },
+    {
+     "highlight": "#r10f-start"
+    },
+    {
+     "say": "小车从绿旗出发，沿着跑道开。"
+    },
+    {
+     "say": "一从上往下开，车轮压过就写出一。"
+    },
+    {
+     "say": "零从上面出发，先往左边绕。"
+    },
+    {
+     "annotate": "#r10f-car",
+     "content": "按住小车，沿跑道慢慢开"
+    },
+    {
+     "say": "绕一圈回到起点，零就写好了。"
+    },
+    {
+     "say": "方向开反了，小车就开不动。"
+    },
+    {
+     "say": "第三关在同一格写十，先一后零。"
+    },
+    {
+     "say": "玩完请拿出纸笔，在田字格里写一写。"
+    },
+    {
+     "say": "请大人帮你看看位置对不对。"
+    },
+    {
+     "say": "轮到你开小赛车啦！"
+    },
+    {
+     "setState": {
+      "demo": false,
+      "level": 1
+     }
+    }
+   ]
+  },
+  {
+   "key": "s10",
+   "type": "slide",
+   "title": "生活里找十个",
+   "template": "steps",
+   "data": {
+    "title": "生活里找十个",
+    "steps": [
+     "摆一摆：一个一个摆成一排",
+     "指着数：数到最后是十",
+     "说一说：我是怎么数的"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "title"
+    },
+    {
+     "say": "生活里也藏着十，我们来找一找。"
+    },
+    {
+     "say": "先看自己的两只手。"
+    },
+    {
+     "say": "伸出两只手，一根一根点着数。"
+    },
+    {
+     "say": "一只手五根，两只手合起来正好十根。"
+    },
+    {
+     "spotlight": "step-1"
+    },
+    {
+     "say": "找别的东西也一样，比如铅笔。"
+    },
+    {
+     "say": "先一支一支摆成一排，别挤在一起。"
+    },
+    {
+     "say": "摆开了，就不会漏数，也不会数两次。"
+    },
+    {
+     "spotlight": "step-2"
+    },
+    {
+     "say": "再用手指着，一支一支往下数。"
+    },
+    {
+     "say": "数到最后一支是十，就正好十支。"
+    },
+    {
+     "say": "只数到九，还差一支；数到十一，就多了。"
+    },
+    {
+     "spotlight": "step-3"
+    },
+    {
+     "say": "数完说给家人听：我是一支一支数的。"
+    },
+    {
+     "say": "也可以五支一排，摆两排，五和五是十。"
+    },
+    {
+     "say": "钟面上写着的十是数字，不是十个东西。"
+    },
+    {
+     "say": "回家找一找，哪里正好有十个东西。"
+    }
+   ]
+  },
+  {
+   "key": "q10",
+   "type": "quiz",
+   "title": "带着办法找一找",
+   "intro": [
+    "现在来做小检查，先听题。",
+    "可以用手指一个一个指着数。"
+   ],
+   "questions": [
+    {
+     "id": "r10-q1",
+     "question": "手工桌上哪张图里正好有十个线轴？",
+     "skill": "数出10并认读",
+     "answer": [
+      "B"
+     ],
+     "analysis": "十个线轴排成两行，每行五个。一个一个数，也正好数到十。",
+     "options": {
+      "A": {
+       "label": "9个线轴",
+       "visual": {
+        "kind": "asset",
+        "image": "spools-9",
+        "alt": "9个线轴"
+       }
+      },
+      "B": {
+       "label": "10个线轴",
+       "visual": {
+        "kind": "asset",
+        "image": "spools-10",
+        "alt": "10个线轴"
+       }
+      },
+      "C": {
+       "label": "8个线轴",
+       "visual": {
+        "kind": "asset",
+        "image": "spools-8",
+        "alt": "8个线轴"
+       }
+      }
+     }
+    },
+    {
+     "id": "r10-q2",
+     "question": "顺着箭头从七往后数，空格里应该填几？",
+     "skill": "0至10数序",
+     "answer": [
+      "C"
+     ],
+     "analysis": "数轨上，七后面是八，再往后是九、十。空格里应该填九。",
+     "visual": {
+      "kind": "asset",
+      "image": "ruler-gap",
+      "alt": "从左向右依次是7、8、空格、10的数轨"
+     },
+     "options": {
+      "A": {
+       "label": "数字10",
+       "visual": {
+        "kind": "asset",
+        "image": "number-10",
+        "alt": "数字10"
+       }
+      },
+      "B": {
+       "label": "数字8",
+       "visual": {
+        "kind": "asset",
+        "image": "number-8",
+        "alt": "数字8"
+       }
+      },
+      "C": {
+       "label": "数字9",
+       "visual": {
+        "kind": "asset",
+        "image": "number-9",
+        "alt": "数字9"
+       }
+      }
+     }
+    },
+    {
+     "id": "r10-q7",
+     "question": "从十往回数，十前面紧挨着的是几？",
+     "skill": "0至10数序",
+     "answer": [
+      "B"
+     ],
+     "analysis": "往回数是十、九、八。十前面紧挨着的是九。",
+     "options": {
+      "A": {
+       "label": "数字10",
+       "visual": {
+        "kind": "asset",
+        "image": "number-10",
+        "alt": "数字10"
+       }
+      },
+      "B": {
+       "label": "数字9",
+       "visual": {
+        "kind": "asset",
+        "image": "number-9",
+        "alt": "数字9"
+       }
+      },
+      "C": {
+       "label": "数字8",
+       "visual": {
+        "kind": "asset",
+        "image": "number-8",
+        "alt": "数字8"
+       }
+      }
+     }
+    },
+    {
+     "id": "r10-q3",
+     "question": "上排十个线轴，下排九个。十和九中间选哪个符号？",
+     "skill": "比较9和10",
+     "answer": [
+      "A"
+     ],
+     "analysis": "一个对一个看，上排多出来一个。所以十大于九，开口朝左边的十。",
+     "visual": {
+      "kind": "asset",
+      "image": "compare-spools",
+      "alt": "上下两行对齐，上面10个线轴、下面9个线轴，底部显示10、空框、9"
+     },
+     "options": {
+      "A": {
+       "label": "大于号，开口朝左",
+       "visual": {
+        "kind": "asset",
+        "image": "symbol-greater",
+        "alt": "大于号，开口朝左"
+       }
+      },
+      "B": {
+       "label": "小于号，开口朝右",
+       "visual": {
+        "kind": "asset",
+        "image": "symbol-less",
+        "alt": "小于号，开口朝右"
+       }
+      },
+      "C": {
+       "label": "等于号",
+       "visual": {
+        "kind": "asset",
+        "image": "symbol-equal",
+        "alt": "等于号"
+       }
+      }
+     }
+    },
+    {
+     "id": "r10-q9",
+     "question": "九在左边，十在右边。中间应该填哪个符号？",
+     "skill": "比较9和10",
+     "answer": [
+      "A"
+     ],
+     "analysis": "九比十少一。开口朝着大的十，读作九小于十。",
+     "options": {
+      "A": {
+       "label": "小于号，开口朝右",
+       "visual": {
+        "kind": "asset",
+        "image": "symbol-less",
+        "alt": "小于号，开口朝右"
+       }
+      },
+      "B": {
+       "label": "大于号，开口朝左",
+       "visual": {
+        "kind": "asset",
+        "image": "symbol-greater",
+        "alt": "大于号，开口朝左"
+       }
+      },
+      "C": {
+       "label": "等于号",
+       "visual": {
+        "kind": "asset",
+        "image": "symbol-equal",
+        "alt": "等于号"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "key": "q11",
+   "type": "quiz",
+   "title": "把十带回家",
+   "intro": [
+    "再做几道题，先看清每张图。",
+    "想一想，再选。"
+   ],
+   "questions": [
+    {
+     "id": "r10-q4",
+     "question": "从书架右边开始数，哪张图圈出了第十本书？",
+     "skill": "区分十个和第十个",
+     "answer": [
+      "C"
+     ],
+     "analysis": "从右边开始一本一本数。左边最后一本是第十本。",
+     "options": {
+      "A": {
+       "label": "十本书从右数，圈中第1本",
+       "visual": {
+        "kind": "asset",
+        "image": "books-mark-right",
+        "alt": "十本书从右数，圈中第1本"
+       }
+      },
+      "B": {
+       "label": "十本书从右数，圈中第5本",
+       "visual": {
+        "kind": "asset",
+        "image": "books-mark-middle",
+        "alt": "十本书从右数，圈中第5本"
+       }
+      },
+      "C": {
+       "label": "十本书从右数，圈中第10本",
+       "visual": {
+        "kind": "asset",
+        "image": "books-mark-left",
+        "alt": "十本书从右数，圈中第10本"
+       }
+      }
+     }
+    },
+    {
+     "id": "r10-q5",
+     "question": "灯箱有十格，已经亮了六格。还要再亮几格？",
+     "skill": "十的分合",
+     "answer": [
+      "A"
+     ],
+     "analysis": "十个位置已有六格亮灯，空着四格。六和四合起来是十。",
+     "visual": {
+      "kind": "asset",
+      "image": "lantern-frame",
+      "alt": "十格灯箱已有6盏亮灯，4个空位"
+     },
+     "options": {
+      "A": {
+       "label": "4个点",
+       "visual": {
+        "kind": "asset",
+        "image": "dots-4",
+        "alt": "4个点"
+       }
+      },
+      "B": {
+       "label": "3个点",
+       "visual": {
+        "kind": "asset",
+        "image": "dots-3",
+        "alt": "3个点"
+       }
+      },
+      "C": {
+       "label": "5个点",
+       "visual": {
+        "kind": "asset",
+        "image": "dots-5",
+        "alt": "5个点"
+       }
+      }
+     }
+    },
+    {
+     "id": "r10-q8",
+     "question": "一盘要放十个苹果，已经放了七个。还要再放几个？",
+     "skill": "十的分合",
+     "answer": [
+      "A"
+     ],
+     "analysis": "七和三合起来是十。所以还要再放三个。",
+     "options": {
+      "A": {
+       "label": "3个点",
+       "visual": {
+        "kind": "asset",
+        "image": "dots-3",
+        "alt": "3个点"
+       }
+      },
+      "B": {
+       "label": "5个点",
+       "visual": {
+        "kind": "asset",
+        "image": "dots-5",
+        "alt": "5个点"
+       }
+      },
+      "C": {
+       "label": "4个点",
+       "visual": {
+        "kind": "asset",
+        "image": "dots-4",
+        "alt": "4个点"
+       }
+      }
+     }
+    },
+    {
+     "id": "r10-q6",
+     "question": "给十件工具贴标签，哪张在同一个田字格里写对了十？",
+     "skill": "辨认与书写10",
+     "answer": [
+      "B"
+     ],
+     "analysis": "写十时，左半格写一，右半格写零。两个数字占同一个田字格。",
+     "options": {
+      "A": {
+       "label": "同一田字格左0右1",
+       "visual": {
+        "kind": "asset",
+        "image": "write-reversed",
+        "alt": "同一田字格左0右1"
+       }
+      },
+      "B": {
+       "label": "同一田字格左1右0",
+       "visual": {
+        "kind": "asset",
+        "image": "write-ten",
+        "alt": "同一田字格左1右0"
+       }
+      },
+      "C": {
+       "label": "1和0分写两个田字格",
+       "visual": {
+        "kind": "asset",
+        "image": "write-separated",
+        "alt": "1和0分写两个田字格"
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "key": "s12",
+   "type": "slide",
+   "title": "回顾花房里的十",
+   "template": "summary",
+   "data": {
+    "title": "回顾花房里的十",
+    "items": [
+     "数出十个，读作十",
+     "数序与大小",
+     "十个和第十个",
+     "十的分合",
+     "左1右0，生活找十"
+    ]
+   },
+   "script": [
+    {
+     "spotlight": "item-1"
+    },
+    {
+     "say": "我们来回顾一下今天学的十。"
+    },
+    {
+     "say": "一盆一盆地数，数到十，读作十。"
+    },
+    {
+     "say": "两盆两盆地数，也能数到十。"
+    },
+    {
+     "spotlight": "item-2"
+    },
+    {
+     "say": "正着数，九的后面是十。"
+    },
+    {
+     "say": "十比九多一，十大于九。"
+    },
+    {
+     "spotlight": "item-3"
+    },
+    {
+     "say": "十个说的是一共有多少。"
+    },
+    {
+     "say": "第十个说的是一个位置，要从起点数。"
+    },
+    {
+     "spotlight": "item-4"
+    },
+    {
+     "say": "十可以分成九和一、八和二。"
+    },
+    {
+     "say": "还有七和三、六和四、五和五。"
+    },
+    {
+     "say": "一边少一，一边多一，合起来总是十。"
+    },
+    {
+     "say": "两部分换位置，合起来还是十。"
+    },
+    {
+     "spotlight": "item-5"
+    },
+    {
+     "say": "写十时，左边写一，右边写零。"
+    },
+    {
+     "say": "生活里也有十：两只手有十根手指。"
+    },
+    {
+     "say": "回家找一找，哪里正好有十个东西。"
+    },
+    {
+     "say": "摆一摆、数一数，再讲给家人听。"
+    }
+   ]
+  }
+ ]
+}
