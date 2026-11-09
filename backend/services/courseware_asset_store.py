@@ -174,8 +174,14 @@ class CoursewareAssetStore:
         if not _READ_SLOTS.acquire(timeout=10):
             raise CoursewareAssetStorageError("Courseware asset storage is busy")
         try:
-            request = Request(url, headers={"If-Match": entry["etag"], "Accept-Encoding": "identity"})
-            with self.opener.open(request, timeout=10) as response:
+            if config.provider == "tencent-cos":
+                from services.course_cos_object_transport import open_cos_object
+                opened = open_cos_object(config, entry["objectKey"], if_match=entry["etag"],
+                                         version_id=entry.get("versionId"))
+            else:
+                request = Request(url, headers={"If-Match": entry["etag"], "Accept-Encoding": "identity"})
+                opened = self.opener.open(request, timeout=10)
+            with opened as response:
                 if (response.status != 200 or response.headers.get("Content-Encoding", "identity") != "identity"
                         or int(response.headers.get("Content-Length", -1)) != entry["byteSize"]
                         or response.headers.get("ETag", "").strip('"') != entry["etag"].strip('"')):

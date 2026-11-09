@@ -6,11 +6,11 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
-import {ROOT,readConfig,storageIdentity} from './course-storage.mjs';
+import {ROOT,clientFor,readConfig,storageIdentity} from './course-storage.mjs';
 import {archiveKey} from './course-archive.mjs';
 
 const require=createRequire(path.join(ROOT,'openmaic-runtime/.runtime/OpenMAIC/package.json'));
-const {S3Client,HeadObjectCommand,GetObjectCommand,CopyObjectCommand,PutObjectCommand}=require('@aws-sdk/client-s3');
+const {HeadObjectCommand,GetObjectCommand,CopyObjectCommand,PutObjectCommand}=require('@aws-sdk/client-s3');
 const STATE=path.join(ROOT,'backend/data/course-storage');
 const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
 const canonical=value=>JSON.stringify(value,(key,item)=>item&&!Array.isArray(item)&&typeof item==='object'?Object.fromEntries(Object.keys(item).sort().map(k=>[k,item[k]])):item);
@@ -172,7 +172,7 @@ export async function relocateArchive(indexPath,{targetDirectory,transport='cond
   const indexRaw=Buffer.from(canonical(index)+'\n');
   for(const [name,raw]of [['source-index.json',source.raw],['source-verification.json',source.receiptRaw],['source-manifest.json',source.manifestRaw]])await immutable(path.join(journalDirectory,name),raw,journalRoots);
   await immutable(newIndexPath,indexRaw,journalRoots);await immutable(path.join(staging,'manifest.json'),source.manifestRaw,journalRoots);
-  const client=dependencies.client||new S3Client({endpoint:config.endpoint,region:config.region,forcePathStyle:true,credentials:{accessKeyId:config.accessKeyId,secretAccessKey:config.secretAccessKey},maxAttempts:1,requestChecksumCalculation:'WHEN_REQUIRED',responseChecksumValidation:'WHEN_REQUIRED'});
+  const client=dependencies.client||clientFor(config,{maxAttempts:1});
   const conditionPath=path.join(journalDirectory,'destination-condition.json');
   try{const previous=JSON.parse(await readPrivate(conditionPath,journalRoots));if(previous.status==='unsupported'&&transport==='conditional-copy')throw Error('Archive server does not enforce destination IfNoneMatch; further copies refused');}
   catch(error){if(error.code!=='ENOENT')throw error;}

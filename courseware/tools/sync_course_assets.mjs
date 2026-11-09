@@ -13,10 +13,10 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
-import { ROOT, readConfig } from "../../openmaic-runtime/scripts/course-storage.mjs";
+import { ROOT, clientFor, readConfig } from "../../openmaic-runtime/scripts/course-storage.mjs";
 
 const require = createRequire(path.join(ROOT, "openmaic-runtime/.runtime/OpenMAIC/package.json"));
-const { S3Client, HeadObjectCommand, PutObjectCommand, GetObjectCommand,
+const { HeadObjectCommand, PutObjectCommand, GetObjectCommand,
   DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 export const SCHEMA = "mira.courseware-assets.v1";
@@ -154,12 +154,6 @@ async function inventory(includes) {
       byteSize: bytes.length, mimeType });
   }
   return files;
-}
-
-function clientFor(config) {
-  return new S3Client({ endpoint: config.endpoint, region: config.region, forcePathStyle: true,
-    credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey },
-    maxAttempts: 3, requestChecksumCalculation: "WHEN_REQUIRED", responseChecksumValidation: "WHEN_REQUIRED" });
 }
 
 async function readRemote(client, config, entry, expected = undefined) {

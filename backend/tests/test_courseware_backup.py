@@ -1,3 +1,4 @@
+import base64
 import importlib.util
 import json
 import os
@@ -88,6 +89,18 @@ class CoursewareBackupTests(unittest.TestCase):
         self.assertEqual(source.stat().st_mtime_ns,
                          (restored / "output/lesson/original.json").stat().st_mtime_ns)
         self.assertTrue(source.is_file())
+
+    def test_remote_export_rejects_signed_provider_urls_without_preventing_local_recovery(self):
+        response_path = "output/lesson/.media-dispatch/requests/example/response.json"
+        signed = b'{"url":"https://images.invalid/item?OSSAccessKeyId=fixture&Signature=fixture&Expires=9999999999"}'
+        self.put(response_path, json.dumps({"bodyBase64": base64.b64encode(signed).decode()}).encode())
+        _, _, archive, _ = self.make_backup()
+        backup.verify_backup(archive)
+        with self.assertRaisesRegex(backup.BackupError, "signed_provider_url_in_remote_receipt"):
+            backup.verify_backup(archive, remote_export=True)
+        self.put(response_path, b'{"bodySha256":"fixture","httpStatus":200}')
+        _, _, redacted, _ = self.make_backup("redacted")
+        backup.verify_backup(redacted, remote_export=True)
 
     def test_embedded_stdlib_recovery_works_without_project_and_selects_roots(self):
         _, directory, archive, _ = self.make_backup()

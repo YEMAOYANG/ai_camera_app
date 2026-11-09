@@ -20,7 +20,7 @@ import threading
 import time
 from types import SimpleNamespace
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode, urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 import zipfile
 
@@ -90,18 +90,33 @@ def _key(value):
 class _RemoteObject:
     def __init__(self, config, locator, size):
         key = _key(locator.get("objectKey"))
+        self.config = config
+        self.key = key
         self.etag = _etag(locator.get("etag"))
         if type(size) is not int or size < 0:
             raise CourseFileStorageError("Course file object size invalid")
         self.size = size
-        self.url = (config.endpoint.rstrip("/") + "/" + quote(config.bucket, safe="")
-                    + "/" + "/".join(quote(p, safe="") for p in key.split("/")))
+        encoded_key = "/".join(quote(p, safe="") for p in key.split("/"))
+        if config.provider == "tencent-cos":
+            self.url = f"cos://{quote(config.bucket, safe='')}/{encoded_key}"
+            self.opener = None
+        elif config.addressing_style == "virtual":
+            endpoint = urlsplit(config.endpoint)
+            host = f"{quote(config.bucket, safe='')}.{endpoint.hostname}"
+            if endpoint.port is not None:
+                host += f":{endpoint.port}"
+            self.url = urlunsplit((endpoint.scheme, host, "/" + encoded_key, "", ""))
+            self.opener = build_opener(ProxyHandler({}), _NoRedirect())
+        else:
+            self.url = (config.endpoint.rstrip("/") + "/" + quote(config.bucket, safe="")
+                        + "/" + encoded_key)
+            self.opener = build_opener(ProxyHandler({}), _NoRedirect())
         version = locator.get("versionId")
         if version:
             if not isinstance(version, str) or len(version) > 1024 or re.search(r"[\x00-\x1f]", version):
                 raise CourseFileStorageError("Course file version invalid")
             self.url += "?" + urlencode({"versionId": version})
-        self.opener = build_opener(ProxyHandler({}), _NoRedirect())
+        self.version = version or None
         self.deadline = time.monotonic() + 60
 
     def get(self, start=0, end=None, *, whole=False):
@@ -111,7 +126,18 @@ class _RemoteObject:
         headers = {"If-Match": '"' + self.etag + '"', "Accept-Encoding": "identity"}
         if not whole:
             headers["Range"] = f"bytes={start}-{end - 1}"
-        with self.opener.open(Request(self.url, headers=headers), timeout=10) as response:
+        if self.config.provider == "tencent-cos":
+            from services.course_cos_object_transport import open_cos_object
+            opened = open_cos_object(
+                self.config,
+                self.key,
+                range_header=headers.get("Range"),
+                if_match=headers["If-Match"],
+                version_id=self.version,
+            )
+        else:
+            opened = self.opener.open(Request(self.url, headers=headers), timeout=10)
+        with opened as response:
             if (response.status != (200 if whole else 206)
                     or _etag(response.headers.get("ETag")) != self.etag
                     or int(response.headers.get("Content-Length", -1)) != end - start

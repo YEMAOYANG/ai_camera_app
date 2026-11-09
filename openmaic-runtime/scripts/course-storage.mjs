@@ -31,25 +31,32 @@ function args(argv) {
   }
   return result;
 }
-export function readConfig(filename = path.join(ROOT, 'backend/.env')) {
+export function readConfig(filename = path.join(ROOT, 'backend/.env'), namespace = 'COURSE_STORAGE') {
+  if (!['COURSE_STORAGE', 'COS_TARGET'].includes(namespace)) throw Error('Unknown storage configuration namespace');
   const values = {};
   for (const line of fs.readFileSync(filename, 'utf8').split(/\r?\n/)) {
-    const m = line.match(/^\s*(COURSE_STORAGE_[A-Z_]+)\s*=\s*(.*?)\s*$/);
+    const m = line.match(/^\s*((?:COURSE_STORAGE|COS_TARGET)_[A-Z_]+)\s*=\s*(.*?)\s*$/);
     if (m) values[m[1]] = m[2].replace(/^(['"])(.*)\1$/, '$2');
   }
-  const value = name => process.env[name] ?? values[name];
-  const config = { endpoint:value('COURSE_STORAGE_ENDPOINT'), bucket:value('COURSE_STORAGE_BUCKET'),
-    prefix:value('COURSE_STORAGE_PREFIX') || 'mira-courseware/v1', region:value('COURSE_STORAGE_REGION') || 'us-east-1',
-    accessKeyId:value('COURSE_STORAGE_ACCESS_KEY'), secretAccessKey:value('COURSE_STORAGE_SECRET_KEY') };
+  const value = name => process.env[`${namespace}_${name}`] ?? values[`${namespace}_${name}`];
+  const provider=value('PROVIDER') || (namespace==='COS_TARGET'?'tencent-cos':'s3-compatible');
+  const addressingStyle=value('ADDRESSING_STYLE') || (provider==='tencent-cos'?'virtual':'path');
+  const config = { endpoint:value('ENDPOINT'), bucket:value('BUCKET'),
+    prefix:value('PREFIX') || 'mira-courseware/v1', region:value('REGION') || 'us-east-1',
+    accessKeyId:value('ACCESS_KEY'), secretAccessKey:value('SECRET_KEY'),provider,addressingStyle };
   if (Object.values(config).some(v => typeof v !== 'string' || !v)) throw Error('Course storage configuration is incomplete');
   const endpoint = new URL(config.endpoint);
   if (!['http:','https:'].includes(endpoint.protocol) || endpoint.username || endpoint.password || endpoint.search || endpoint.hash || endpoint.pathname !== '/') throw Error('Invalid endpoint');
   if (!/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(config.bucket) || !/^[a-zA-Z0-9][a-zA-Z0-9/_-]*$/.test(config.prefix)) throw Error('Invalid bucket or prefix');
+  if (!['s3-compatible','tencent-cos'].includes(provider) || !['path','virtual'].includes(addressingStyle)) throw Error('Invalid storage provider');
+  if (provider==='tencent-cos' && (addressingStyle!=='virtual' || endpoint.protocol!=='https:' || endpoint.port ||
+      endpoint.hostname!==`cos.${config.region}.myqcloud.com` || !/^[a-z0-9][a-z0-9.-]{1,48}-[1-9][0-9]{4,}$/.test(config.bucket))) throw Error('Invalid Tencent COS configuration');
   return config;
 }
-function clientFor(c) {
-  return new S3Client({ endpoint:c.endpoint,region:c.region,forcePathStyle:true,
-    credentials:{accessKeyId:c.accessKeyId,secretAccessKey:c.secretAccessKey},maxAttempts:3,
+export function clientFor(c, {maxAttempts=3}={}) {
+  return new S3Client({ endpoint:c.endpoint,region:c.region,
+    forcePathStyle:(c.addressingStyle ?? (c.provider==='tencent-cos'?'virtual':'path'))==='path',
+    credentials:{accessKeyId:c.accessKeyId,secretAccessKey:c.secretAccessKey},maxAttempts,
     requestChecksumCalculation:'WHEN_REQUIRED',responseChecksumValidation:'WHEN_REQUIRED' });
 }
 export function safePath(relative) {

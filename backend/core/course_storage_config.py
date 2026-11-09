@@ -16,6 +16,8 @@ from urllib.parse import urlsplit
 @dataclass(frozen=True)
 class CourseStorageConfig:
     mode: Literal["local", "manifest", "remote", "registry"] = "local"
+    provider: Literal["s3-compatible", "tencent-cos"] = "s3-compatible"
+    addressing_style: Literal["path", "virtual"] = "path"
     endpoint: str = ""
     bucket: str = ""
     prefix: str = "mira-courseware/v1"
@@ -35,11 +37,21 @@ class CourseStorageConfig:
         mode = value("MODE", "local") or "local"
         if mode not in {"local", "manifest", "remote", "registry"}:
             raise ValueError("Invalid course storage mode")
+        provider = value("PROVIDER", "s3-compatible") or "s3-compatible"
+        if provider not in {"s3-compatible", "tencent-cos"}:
+            raise ValueError("Invalid course storage provider")
+        addressing_style = value(
+            "ADDRESSING_STYLE", "virtual" if provider == "tencent-cos" else "path"
+        ) or ("virtual" if provider == "tencent-cos" else "path")
+        if addressing_style not in {"path", "virtual"}:
+            raise ValueError("Invalid course storage addressing style")
         archive_enabled = value("ARCHIVE_ENABLED", "0").lower()
         if archive_enabled not in {"0", "1", "false", "true"}:
             raise ValueError("Invalid course archive flag")
         config = cls(
             mode=cast(Literal["local", "manifest", "remote", "registry"], mode),
+            provider=cast(Literal["s3-compatible", "tencent-cos"], provider),
+            addressing_style=cast(Literal["path", "virtual"], addressing_style),
             endpoint=value("ENDPOINT"), bucket=value("BUCKET"),
             prefix=value("PREFIX", "mira-courseware/v1") or "mira-courseware/v1",
             region=value("REGION", "us-east-1") or "us-east-1",
@@ -59,6 +71,13 @@ class CourseStorageConfig:
             endpoint.port  # Reject malformed port syntax without revealing it.
         except ValueError:
             valid_endpoint = False
+            endpoint = None
+        cos_endpoint = bool(
+            endpoint
+            and endpoint.scheme == "https"
+            and endpoint.port is None
+            and endpoint.hostname == f"cos.{config.region}.myqcloud.com"
+        )
         if (
             not valid_endpoint
             or not re.fullmatch(r"[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]", config.bucket)
@@ -66,6 +85,16 @@ class CourseStorageConfig:
             or not re.fullmatch(r"[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*", config.prefix)
             or not re.fullmatch(r"[A-Za-z0-9_-]+", config.region)
             or (config.mode in {"manifest", "remote"} and not Path(config.manifest_path).is_absolute())
+            or (
+                config.provider == "tencent-cos"
+                and (
+                    config.addressing_style != "virtual"
+                    or not cos_endpoint
+                    or not re.fullmatch(r"[a-z0-9][a-z0-9.-]{1,48}-[1-9][0-9]{4,}", config.bucket)
+                    or not config.access_key
+                    or not config.secret_key
+                )
+            )
         ):
             raise ValueError("Invalid course storage configuration")
         return config

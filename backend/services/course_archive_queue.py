@@ -1393,7 +1393,11 @@ class CourseArchiveWorker:
             self.queue.enqueue(event)
             cache["files"][name] = fingerprint
             discovered += 1
-        cache["after"] = selected[-1][0] if selected else ""
+        # An empty page means the existing cursor is already at the end.  Do
+        # not rewind it: doing so makes a later worker pass rediscover every
+        # historical classroom whose queue record has intentionally expired.
+        if selected:
+            cache["after"] = selected[-1][0]
         _write(cache_path, cache)
         return discovered
 
@@ -1406,7 +1410,10 @@ class CourseArchiveWorker:
         for row in rows:
             self.seed_native_snapshot(row["snapshot_json"], source_kind="native_pg_stage",
                 source_digest=row["source_digest"], revision=row["stage_revision"], created_at=row["created_at"])
-        _write(path, {"after": rows[-1]["stage_id"] if rows else ""})
+        # Preserve an end-of-stream cursor.  Resetting it on an empty page
+        # turns the next pass into a full historical rescan.
+        if rows:
+            _write(path, {"after": rows[-1]["stage_id"]})
         return len(rows)
 
     def run_once(self, *, limit=10, stop_requested=lambda: False):
@@ -1439,7 +1446,11 @@ class CourseArchiveWorker:
                         summary["discovered"] += 1
                     except Exception:
                         summary["discoveryErrors"] += 1
-                _write(cursor_path, {"afterId": int(rows[-1]["id"]) if rows else 0})
+                # Keep the last acknowledged position when no newer event is
+                # available.  Rewinding to zero re-enqueues old outbox events
+                # after their intentionally retired queue records are pruned.
+                if rows:
+                    _write(cursor_path, {"afterId": int(rows[-1]["id"])})
             except Exception:
                 summary["discoveryErrors"] += 1
         if self.scan_catalog and self.database is not None:

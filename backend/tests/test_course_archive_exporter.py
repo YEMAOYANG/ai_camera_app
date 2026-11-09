@@ -17,6 +17,7 @@ from services.course_archive_exporter import (
     ArchiveSnapshot, CourseArchiveError, CourseArchiveExporter, _check_public, _safe_name, _storage_name,
 )
 from services.course_media_object_store import CourseMediaStorageError
+from services.course_file_store import CourseFileStorageError
 from core.course_storage_config import CourseStorageConfig
 
 
@@ -1340,6 +1341,84 @@ class CourseArchiveExporterTest(unittest.TestCase):
         with self.assertRaisesRegex(CourseArchiveError, "source_adapter_identity_mismatch"):
             self.exporter.export_course(conn, course_id="course", course_version="1",
                 staging_root=self.staging / "exports", source_adapter=lambda *a, **k: wrong)
+
+    def unreadable_authoring_job(self, state):
+        """A workbench job whose stored originals storage cannot return (deleted backing archive)."""
+        job = self.root / "output/book/broken-node/teaching-1/authoring-job"
+        job.mkdir(parents=True)
+        (job / "frozen.json").write_text(json.dumps({"teachingRevision": 1, "draftSha256": "0" * 64}))
+        (job / "draft.json").write_text("{}")
+        if state is not None:
+            (job / "state.json").write_text(json.dumps(state))
+        unreadable = {job / "frozen.json", job / "draft.json"}
+        from services import course_archive_exporter as exporter_module
+        real = exporter_module.course_bytes
+
+        def course_bytes(path, *args, **kwargs):
+            if Path(path).resolve() in unreadable:
+                raise CourseFileStorageError("Course file storage unavailable")
+            return real(path, *args, **kwargs)
+        patcher = patch("services.course_archive_exporter.course_bytes", side_effect=course_bytes)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        return job, unreadable
+
+    def export_saved(self, stage_id, **kwargs):
+        room = {"stage": {"id": stage_id}, "scenes": [{"id": "scene1", "type": "slide"}]}
+        meta = {"courseId": "native-" + stage_id, "courseVersion": "saved-1", "title": "已保存课件",
+                "subject": "course", "generatedAt": "2026-11-09T06:00:00Z"}
+        return self.exporter.export_native_snapshot(room, source_kind="legacy_classroom",
+            source_digest=self.exporter._native_digest(room), staging_root=self.staging / "native",
+            meta=meta, **kwargs)
+
+    def test_unreadable_authoring_job_never_blocks_an_unrelated_saved_classroom(self):
+        self.unreadable_authoring_job({"sessionId": "broken-author", "savedStages": [{"stageId": "stage_broken"}]})
+        job = self.root / "output/book/node/teaching-1/authoring-job"
+        job.mkdir(parents=True)
+        draft = b'{"request":"Teach one observation"}'
+        (job / "draft.json").write_bytes(draft)
+        (job / "frozen.json").write_text(json.dumps({"teachingRevision": 1,
+            "draftSha256": hashlib.sha256(draft).hexdigest()}))
+        (job / "state.json").write_text(json.dumps({"sessionId": "author", "savedStages": [{"stageId": "stage_saved"}]}))
+        result = self.export_saved("stage_saved")
+        self.assertTrue(result["complete"])
+        with zipfile.ZipFile(result["zip"]["path"]) as archive:
+            names = archive.namelist()
+            self.assertEqual(archive.read("原稿/output/book/node/teaching-1/authoring-job/draft.json"), draft)
+            self.assertFalse(any("broken-node" in name for name in names))
+        self.assertTrue(self.export_saved("stage_direct_native")["complete"])
+
+    def test_unreadable_authoring_job_refuses_the_stage_it_may_own(self):
+        self.unreadable_authoring_job({"sessionId": "broken-author", "savedStages": [{"stageId": "stage_broken"}]})
+        with self.assertRaisesRegex(CourseArchiveError, "native_authoring_original_unavailable"):
+            self.export_saved("stage_broken")
+        with self.assertRaisesRegex(CourseArchiveError, "native_authoring_original_unavailable"):
+            self.export_saved("stage_new", authoring_binding={"sessionId": "broken-author"})
+        self.assertTrue(self.export_saved("stage_new", authoring_binding={"sessionId": "other-author"})["complete"])
+        self.assertEqual(len(list((self.staging / "native").rglob("index.json"))), 1)
+
+    def test_unreadable_authoring_job_without_ownership_evidence_fails_closed(self):
+        job, unreadable = self.unreadable_authoring_job({"sessionId": "broken-author", "savedStages": []})
+        unreadable.add(job / "state.json")
+        with self.assertRaisesRegex(CourseArchiveError, "native_authoring_original_unavailable"):
+            self.export_saved("stage_other")
+        unreadable.discard(job / "state.json")
+        (job / "state.json").write_text('{"savedStages": "not-a-list"}')
+        with self.assertRaisesRegex(CourseArchiveError, "native_authoring_original_unavailable"):
+            self.export_saved("stage_other")
+        (job / "state.json").unlink()
+        # The readable scan ignores a job without session state; it owns no stage.
+        self.assertTrue(self.export_saved("stage_other")["complete"])
+
+    def test_textbook_source_scan_sets_aside_unreadable_job_but_refuses_its_stage(self):
+        self.unreadable_authoring_job({"sessionId": "broken-author", "savedStages": [{"stageId": "stage_broken"}]})
+        frozen = {"textbookBinding": {"editionId": "book", "nodeId": "node"}}
+        with patch.object(self.exporter, "_add_authoring_stage") as add:
+            self.exporter._textbook_sources(self.snapshot, {"authoring": {"stageId": "stage_other"}}, frozen)
+            add.assert_called_once()
+            with self.assertRaisesRegex(CourseArchiveError, "native_authoring_original_unavailable"):
+                self.exporter._textbook_sources(deepcopy(self.snapshot), {"authoring": {"stageId": "stage_broken"}}, frozen)
+            add.assert_called_once()
 
 
 if __name__ == "__main__":

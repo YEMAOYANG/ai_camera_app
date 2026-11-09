@@ -23,7 +23,8 @@ import zipfile
 from content.textbook_review_evidence import restore_review_text
 from scripts import course_storage_releases as releases
 from services.course_media_object_store import CourseMediaObjectStore
-from services.course_file_store import (CourseFileStore, course_bytes, course_exists, course_is_dir, course_glob, course_stat)
+from services.course_file_store import (CourseFileStore, CourseFileStorageError, course_bytes, course_exists,
+                                        course_is_dir, course_glob, course_stat)
 from core.course_storage_config import CourseStorageConfig
 
 
@@ -443,6 +444,7 @@ class CourseArchiveExporter:
         self.media_store = media_store or CourseMediaObjectStore(project_root=self.root)
         self.native_document_loader = native_document_loader or self._native_document
         self._workbench_index = None
+        self._workbench_unavailable = []
         self._catalog_file_cache = {}
         self.standard_asset_resolver = standard_asset_resolver or self._standard_assets
         self.material_inventory_loader = material_inventory_loader or self._material_inventory
@@ -1466,6 +1468,7 @@ class CourseArchiveExporter:
                         and b.get("nodeId") == binding["nodeId"]
                         and any(s.get("stageId") == stage_id for s in state.get("savedStages", []))):
                     matches.append(job.parent)
+            self._require_unavailable_jobs_unowned(stage_id)
             snapshot.source_roots.extend(matches)
             self._add_authoring_stage(snapshot, original_input)
         # Legacy native imports have their request/page plan in the raw frozen
@@ -1476,28 +1479,69 @@ class CourseArchiveExporter:
         if refresh:
             self._workbench_index = None
         if self._workbench_index is None:
-            self._workbench_index = []
+            index, unavailable = [], []
             for path in course_glob(self.root / "output", "**/authoring-job/frozen.json"):
                 path = self._source_path(path)
-                value = json.loads(course_bytes(path))
-                draft = path.parent / "draft.json"
-                state = path.parent / "state.json"
-                if not course_exists(state):
+                try:
+                    job = self._workbench_job(path, session_id=session_id)
+                except CourseFileStorageError:
+                    # Storage cannot return this job's registered originals
+                    # (for example its backing archive object was deleted).
+                    # Set it aside instead of failing every other saved
+                    # classroom; callers still refuse a stage it may own.
+                    unavailable.append((path.parent, self._workbench_state(path.parent)))
                     continue
-                state_value = json.loads(course_bytes(self._source_path(state)))
-                valid = course_exists(draft)
-                if valid:
-                    raw = course_bytes(self._source_path(draft))
-                    draft_value = json.loads(raw)
-                    valid = (_sha(raw) == value.get("draftSha256")
-                        and path.parent.parent.name == "teaching-" + str(value.get("teachingRevision"))
-                        and (not value.get("draftCanonicalSha256") or _sha(releases.canonical(draft_value).encode()) == value["draftCanonicalSha256"])
-                        and (not value.get("requestSha256") or _sha(draft_value.get("request", "").encode()) == value["requestSha256"]))
-                if session_id and state_value.get("sessionId") == session_id:
-                    _require(valid, "native_authoring_original_integrity_mismatch")
-                if valid:
-                    self._workbench_index.append((path.parent, value, state_value))
+                if job is not None:
+                    index.append(job)
+            self._workbench_index, self._workbench_unavailable = index, unavailable
         return self._workbench_index
+
+    def _workbench_job(self, path, *, session_id=None):
+        value = json.loads(course_bytes(path))
+        draft = path.parent / "draft.json"
+        state = path.parent / "state.json"
+        if not course_exists(state):
+            return None
+        state_value = json.loads(course_bytes(self._source_path(state)))
+        valid = course_exists(draft)
+        if valid:
+            raw = course_bytes(self._source_path(draft))
+            draft_value = json.loads(raw)
+            valid = (_sha(raw) == value.get("draftSha256")
+                and path.parent.parent.name == "teaching-" + str(value.get("teachingRevision"))
+                and (not value.get("draftCanonicalSha256") or _sha(releases.canonical(draft_value).encode()) == value["draftCanonicalSha256"])
+                and (not value.get("requestSha256") or _sha(draft_value.get("request", "").encode()) == value["requestSha256"]))
+        if session_id and state_value.get("sessionId") == session_id:
+            _require(valid, "native_authoring_original_integrity_mismatch")
+        return (path.parent, value, state_value) if valid else None
+
+    def _workbench_state(self, job):
+        """Ownership evidence of a set-aside job: {} without state, None if unreadable."""
+        state = job / "state.json"
+        try:
+            if not course_exists(state):
+                return {}
+            value = json.loads(course_bytes(self._source_path(state)))
+        except (CourseFileStorageError, CourseArchiveError, OSError, ValueError):
+            return None
+        return value if isinstance(value, dict) else None
+
+    def _require_unavailable_jobs_unowned(self, stage_id, session_id=None):
+        """Refuse a stage that a set-aside (unreadable) workbench job may own.
+
+        The same ownership rule as the readable scan applies: an authoring
+        binding matches its session, otherwise the saved stage list. Missing
+        or malformed ownership evidence counts as a possible owner.
+        """
+        for _, state in getattr(self, "_workbench_unavailable", ()):
+            saved = state.get("savedStages", []) if isinstance(state, dict) else None
+            if not isinstance(saved, list):
+                owner = True
+            elif session_id:
+                owner = state.get("sessionId") == session_id
+            else:
+                owner = any(isinstance(item, dict) and item.get("stageId") == stage_id for item in saved)
+            _require(not owner, "native_authoring_original_unavailable")
 
     def _native_authoring_sources(self, snapshot, binding, *, source_digest=None):
         """Bind private control identity to exact frozen originals, never export it."""
@@ -1517,6 +1561,7 @@ class CourseArchiveExporter:
         owned = matches(jobs)
         if not owned and not session_id:
             owned = matches(self._workbench_jobs(refresh=True))
+        self._require_unavailable_jobs_unowned(stage_id, session_id)
         repair_sessions = {session_id} if session_id else {state.get("sessionId") for _, _, state in owned}
         for repair_session in sorted(s for s in repair_sessions if isinstance(s, str)):
             self._add_operator_repairs(snapshot, repair_session, stage_id)

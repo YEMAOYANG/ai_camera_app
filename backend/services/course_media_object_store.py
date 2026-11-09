@@ -14,7 +14,7 @@ import re
 import threading
 import time
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
 from core.course_storage_config import CourseStorageConfig
@@ -162,15 +162,29 @@ class CourseMediaObjectStore:
 
     @staticmethod
     def _download(config: CourseStorageConfig, entry: dict, limit: int) -> bytes:
-        encoded_key = "/".join(quote(segment, safe="") for segment in entry["objectKey"].split("/"))
-        url = f"{config.endpoint.rstrip('/')}/{quote(config.bucket, safe='')}/{encoded_key}"
-        # Public read is intentional. No credentials, cookies, generic proxy
-        # configuration or redirects may participate in byte delivery.
-        opener = build_opener(ProxyHandler({}), _NoRedirect())
         if not _READ_SLOTS.acquire(timeout=10):
             raise CourseMediaStorageError("Course media storage busy")
         try:
-            with opener.open(Request(url, method="GET"), timeout=10) as response:
+            if config.provider == "tencent-cos":
+                from services.course_cos_object_transport import open_cos_object
+                opened = open_cos_object(config, entry["objectKey"])
+            else:
+                encoded_key = "/".join(
+                    quote(segment, safe="") for segment in entry["objectKey"].split("/")
+                )
+                if config.addressing_style == "virtual":
+                    endpoint = urlsplit(config.endpoint)
+                    host = f"{quote(config.bucket, safe='')}.{endpoint.hostname}"
+                    if endpoint.port is not None:
+                        host += f":{endpoint.port}"
+                    url = urlunsplit((endpoint.scheme, host, "/" + encoded_key, "", ""))
+                else:
+                    url = f"{config.endpoint.rstrip('/')}/{quote(config.bucket, safe='')}/{encoded_key}"
+                # Legacy S3-compatible delivery is intentionally anonymous.
+                # Cookies, proxies and redirects cannot participate.
+                opener = build_opener(ProxyHandler({}), _NoRedirect())
+                opened = opener.open(Request(url, method="GET"), timeout=10)
+            with opened as response:
                 if response.status != 200:
                     raise CourseMediaStorageError("Course media storage unavailable")
                 declared = response.headers.get("Content-Length")

@@ -4,10 +4,10 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
-import {ROOT,readConfig} from './course-storage.mjs';
+import {ROOT,clientFor,readConfig} from './course-storage.mjs';
 
 const require=createRequire(path.join(ROOT,'openmaic-runtime/.runtime/OpenMAIC/package.json'));
-const {S3Client,PutObjectCommand,GetObjectCommand}=require('@aws-sdk/client-s3');
+const {PutObjectCommand,GetObjectCommand}=require('@aws-sdk/client-s3');
 export const MAX_FILE_BYTES=64*1024*1024;
 const MAX_INPUT_BYTES=Math.ceil(MAX_FILE_BYTES/3)*4+32*1024;
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
@@ -48,9 +48,7 @@ export async function uploadCourseStorageFile(input,dependencies={}){
   const config=dependencies.config??readConfig();
   const owner=storageIdentity(config),requested=storageIdentity(input.storage);
   if(JSON.stringify(owner)!==JSON.stringify(requested))fail();
-  const client=dependencies.client??new S3Client({endpoint:config.endpoint,region:config.region,forcePathStyle:true,
-    credentials:{accessKeyId:config.accessKeyId,secretAccessKey:config.secretAccessKey},maxAttempts:1,
-    requestChecksumCalculation:'WHEN_REQUIRED',responseChecksumValidation:'WHEN_REQUIRED'});
+  const client=dependencies.client??clientFor(config,{maxAttempts:1});
   const put=await client.send(new PutObjectCommand({Bucket:config.bucket,Key:input.objectKey,Body:bytes,
     ContentLength:bytes.length,ContentType:input.mimeType,Metadata:{sha256:input.sha256},
     ChecksumSHA256:Buffer.from(input.sha256,'hex').toString('base64'),IfNoneMatch:'*'}));

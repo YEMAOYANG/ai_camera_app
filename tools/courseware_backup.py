@@ -8,6 +8,7 @@ No command removes, relocates, or changes a source file.
 from __future__ import annotations
 
 import argparse
+import base64
 import ctypes
 import datetime
 import hashlib
@@ -512,7 +513,20 @@ def _sidecar_path(base, relative):
     return path
 
 
-def verify_backup(archive_path, sidecar_base=None):
+def _verify_remote_media_receipt(raw):
+    try:
+        receipt = json.loads(raw)
+        body = receipt.get("bodyBase64") if isinstance(receipt, dict) else None
+        decoded = base64.b64decode(body, validate=True) if isinstance(body, str) else b""
+    except (ValueError, TypeError) as error:
+        raise BackupError("invalid_remote_media_receipt") from error
+    for value in (raw, decoded):
+        if (re.search(rb"(?:OSSAccessKeyId|X-Amz-Credential|X-Oss-Credential)=", value, re.I)
+                and re.search(rb"(?:[?&]Signature|X-Amz-Signature|X-Oss-Signature)=", value, re.I)):
+            raise BackupError("signed_provider_url_in_remote_receipt")
+
+
+def verify_backup(archive_path, sidecar_base=None, *, remote_export=False):
     archive_path = Path(archive_path)
     _no_parent_links(archive_path)
     if not stat.S_ISREG(archive_path.lstat().st_mode):
@@ -521,6 +535,8 @@ def verify_backup(archive_path, sidecar_base=None):
     try:
         with zipfile.ZipFile(str(archive_path), "r") as archive:
             index, raw = _index_from_archive(archive)
+            media_responses = {f["sha256"] for f in index["files"] if f["path"].endswith("/response.json")
+                               and "/.media-dispatch/requests/" in "/" + f["path"]} if remote_export else set()
             recovery = index.get("recoveryTool", {})
             if not isinstance(recovery, dict):
                 raise BackupError("invalid_recovery_tool_record")
@@ -543,6 +559,10 @@ def verify_backup(archive_path, sidecar_base=None):
                         size += len(chunk)
                 if actual.hexdigest() != digest or size != record["byteSize"]:
                     raise BackupError("object_hash_mismatch")
+                if digest in media_responses:
+                    if size > 64 * CHUNK_BYTES:
+                        raise BackupError("remote_media_receipt_too_large")
+                    _verify_remote_media_receipt(archive.read(info))
             for record in index["sidecars"]:
                 path = _sidecar_path(base, record["backupPath"])
                 digest, size, _ = _scan_file(path)

@@ -6,10 +6,10 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
-import {ROOT,readConfig,storageIdentity} from './course-storage.mjs';
+import {ROOT,clientFor,readConfig,storageIdentity} from './course-storage.mjs';
 
 const require=createRequire(path.join(ROOT,'openmaic-runtime/.runtime/OpenMAIC/package.json'));
-const {S3Client,HeadObjectCommand,PutObjectCommand,GetObjectCommand}=require('@aws-sdk/client-s3');
+const {HeadObjectCommand,PutObjectCommand,GetObjectCommand}=require('@aws-sdk/client-s3');
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 const canonical=value=>JSON.stringify(value,(key,item)=>item && !Array.isArray(item) && typeof item==='object' ? Object.fromEntries(Object.keys(item).sort().map(k=>[k,item[k]])) : item);
 const TYPES={'.zip':'application/zip','.json':'application/json','.html':'text/html','.md':'text/markdown','.txt':'text/plain'};
@@ -60,7 +60,7 @@ async function fullRemote(client,c,e,expected){
 }
 export async function uploadArchive(indexFilename,dependencies={}){
   const c=dependencies.config || readConfig(),state=dependencies.state || STATE;
-  const client=dependencies.client || new S3Client({endpoint:c.endpoint,region:c.region,forcePathStyle:true,credentials:{accessKeyId:c.accessKeyId,secretAccessKey:c.secretAccessKey},maxAttempts:3,requestChecksumCalculation:'WHEN_REQUIRED',responseChecksumValidation:'WHEN_REQUIRED'});
+  const client=dependencies.client || clientFor(c);
   const allowed=dependencies.allowedRoots || [path.join(state,'archives'),...(process.env.MIRA_TASK_TMPDIR?[await fsp.realpath(process.env.MIRA_TASK_TMPDIR)]:[])];
   const indexRaw=await fsp.readFile(indexFilename),index=JSON.parse(indexRaw);
   if(index.schemaVersion!=='mira.course-archive.export.v1' || index.complete!==true || !privateId(index.archiveId) || (index.missingSources || []).length || !Array.isArray(index.generatedPublicFiles) || !index.generatedPublicFiles.length)throw Error('A complete validated course export is required');
