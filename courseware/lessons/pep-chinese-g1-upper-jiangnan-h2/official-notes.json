@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "mira.courseware.official-notes.v1",
+  "binding": {
+    "editionId": "pep-chinese-g1-upper-2022-standard",
+    "revisionId": "20260924-directory-3",
+    "nodeId": "u5-l2",
+    "lessonTitle": "2 江南",
+    "gradeCode": "primary_1",
+    "subject": "chinese",
+    "volume": "upper",
+    "schoolSystem": "six_year",
+    "unitTitle": "第五单元 · 阅读",
+    "classHour": "lesson_2",
+    "partIndex": 2,
+    "teachingRevision": "1"
+  },
+  "officialTextbook": {
+    "title": "新教材-小学语文统编版一年级上册",
+    "publisher": "人民教育出版社",
+    "editionLabel": "根据2022年版课程标准修订",
+    "publicationDate": "2024年8月",
+    "teachingMaterialId": "b7062df1-f929-458e-964c-d778f89ca255",
+    "officialLessonTitle": "江南（第2课时）",
+    "activityId": "6bf70b14-f2b8-9f84-f9e5-25ae0fd75e0f"
+  },
+  "sourceManifest": "output/courseware-lessons/pep-chinese-g1-upper-jiangnan-h2/official/manifest.json",
+  "reviewedAt": "2026-11-05",
+  "reviewedBy": "codex gpt-6.1-sol",
+  "reviewerKind": "ai",
+  "reviewMethod": "逐张目视第2课时全部24张官方页图：教学设计2页、课件20页、学习任务单1页、课后练习1页；没有审看视频。",
+  "objectives": [
+    "在简短的听读回顾中巩固江、南、采、莲等已学生字，不重复第一课时的完整识字教学。",
+    "结合小鱼在莲叶周围游动的画面理解东、西、南、北四个方位词。",
+    "理解戏在诗句中表示嬉戏、玩耍，读好鱼戏莲叶东、西、南、北的叠句。",
+    "借助莲叶、小鱼和方位画面背诵完整的江南；屏幕活动只记录图文操作，朗读和背诵质量交成人观察。",
+    "观察东、西的整体字形与田字格中的位置，学习竖弯与竖弯钩的笔形区别，并在淡字上自由描画后到纸上练写。"
+  ],
+  "keyPoint": "理解东、西、南、北方位词，观察东、西字形并学习竖弯。",
+  "difficultPoint": "把反复出现的鱼戏莲叶与变化的方位词联系起来，借画面读好叠句并背诵。",
+  "lessonBoundary": {
+    "priorLesson": "第一课时已教九个生字、三点水和草字头、莲叶田田、初读停顿、可和叶的书写。",
+    "thisLesson": "仅用短导入复习旧字；新任务集中在方位词、鱼戏画面、叠句与背诵、东和西及竖弯。",
+    "excluded": ["不重做第一课时的九字配图和可、叶描写", "不教学未经两处资料核验的完整笔顺", "不把方位板的显示约定说成现实中任意图片的固定方位", "不以点击通过声称会朗读、背诵或规范书写"]
+  },
+  "factChecks": [
+    {
+      "factId": "shu-wan-shape-and-ending",
+      "claims": ["竖弯先向下写竖，再圆转向右写短横，末尾不向上出钩。", "竖弯和竖弯钩的区别在收笔，西中所学笔形为竖弯。"],
+      "sources": [
+        {"resource": "teachingDesign", "pageRefs": [2], "finding": "学习新笔画竖弯，比较竖弯与竖弯钩；文字明确从上往下写竖，再圆转向右写短横、收笔稍重。"},
+        {"resource": "courseware", "pageRefs": [15,16], "finding": "第15页用红色突出西中的竖弯；第16页并列西和七，圈示竖弯平收与竖弯钩上挑的末端差别。"}
+      ]
+    },
+    {
+      "factId": "dong-xi-observation-not-full-stroke-order",
+      "claims": ["东和西都是独体字。", "东的竖钩在竖中线上，西的竖弯靠近竖中线。"],
+      "sources": [
+        {"resource": "teachingDesign", "pageRefs": [2], "finding": "明确东、西是独体字，指出东的竖钩在竖中线上，西的竖弯靠近竖中线。"},
+        {"resource": "courseware", "pageRefs": [15,17,18], "finding": "田字格范字呈现整体字形、中心线和对应笔形位置，并通过范字与学生字例比较观察。"}
+      ],
+      "limit": "资料没有提供可逐字复核的完整笔顺文字清单；本课不从记忆补全笔顺，不在代码中伪造整字笔画路径。"
+    }
+  ],
+  "resources": {
+    "teachingDesign": {
+      "status": "reviewed", "pageCount": 2, "pageRefs": [1,2],
+      "findings": [
+        "第1页列出第二课时三个目标：巩固生字，了解四个方位词并学写东、西和竖弯，借插图与表演读好叠句、感受水乡景色并背诵。注明教材2024年8月出版。",
+        "第1页导入以旧字听读和古诗回顾进入莲塘情境；重点不在重新完成第一课时识字表。",
+        "第2页用小鱼游到各方向的表演理解方位词；师生合作读反复出现的句式，再完整朗读和借图背诵。",
+        "第2页安排观察东、西，比较竖弯与竖弯钩，再由教师范写、学生练写和评价；实际纸笔书写须成人观察。"
+      ]
+    },
+    "courseware": {
+      "status": "reviewed", "pageCount": 20, "pageRefs": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+      "findings": [
+        "第1页明确第二课时。第2至4页用莲塘字卡、莲蓬图和江南、采莲、东西南北词组回顾旧知。",
+        "第5页呈现古诗全文：江南可采莲，莲叶何田田。鱼戏莲叶间。鱼戏莲叶东，鱼戏莲叶西，鱼戏莲叶南，鱼戏莲叶北。",
+        "第6页以繁茂莲叶图配前两句；第7页把鱼戏莲叶间与东、西、南、北四句并列，建立画面与诗句的联系。",
+        "第8至9页以鱼儿在莲叶间玩游戏、游向四方的语句帮助理解戏和方向。第10至11页突出四个变化的方位词及反复出现的句式。",
+        "第12页完整朗读，第13页以填空帮助回想，第14页只留莲叶和小鱼图片支持背诵。",
+        "第15页呈现东、西田字格范字并突出相关笔形；第16页比较竖弯、竖弯钩末端。",
+        "第17页展示范字和纸笔书写；第18页以正确、规范、整洁评价书写；第19页回到古诗全文，第20页结束。"
+      ]
+    },
+    "learningTaskSheet": {
+      "status": "reviewed", "pageCount": 1, "pageRefs": [1],
+      "findings": ["课前正确朗读并复习江、南、采、莲；课中借画面与情境游戏感受鱼儿嬉戏、朗读并背诵；观察书写东、西，学习竖弯并评价修改。"]
+    },
+    "afterClassExercise": {
+      "status": "reviewed", "pageCount": 1, "pageRefs": [1],
+      "findings": ["课后要求背诵江南。本课提交该目标和成人观察去向，不另造一套周测。"]
+    },
+    "video": {"status": "waived", "resourceId": "1f26533b-e763-dab9-e5a9-127981640fb9", "reason": "按2026-10-30所有者对后续课次的视频审看豁免；本次未审看视频。"}
+  }
+}
