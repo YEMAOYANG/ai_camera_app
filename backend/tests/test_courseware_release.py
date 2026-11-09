@@ -94,6 +94,17 @@ class CoursewareReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, '^' + code + '$'):
             build_release(self.inputs)
 
+    def test_alias_must_be_an_exact_sibling_in_the_same_section(self):
+        first = self.inputs['manifest']['units'][0]['lessons'][0]
+        first['sectionTitle'] = 'Reviewed lesson group'
+        second = {**first, 'nodeId': 'second-lesson', 'sectionTitle': 'Different section'}
+        self.inputs['manifest']['units'][0]['lessons'].append(second)
+        self.inputs['identity']['directoryAliasNodeIds'] = [second['nodeId']]
+        self.rejected('directory_aliases_invalid')
+        second['sectionTitle'] = first['sectionTitle']
+        prepared = build_release(self.inputs)
+        self.assertEqual(prepared['frozen']['identity']['directoryAliasNodeIds'], [second['nodeId']])
+
     def test_valid_release_accepted_by_unchanged_validator(self):
         original = deepcopy(self.inputs)
         prepared = build_release(self.inputs)
@@ -179,6 +190,39 @@ class CoursewareReleaseTests(unittest.TestCase):
     def test_source_flag_refuses_notes_without_page_references(self):
         self.inputs['notes']['resources']['courseware']['pageRefs'] = []
         self.rejected('notes_invalid')
+
+    def test_source_flag_accepts_structured_page_references(self):
+        self.inputs['notes']['resources']['courseware']['pageRefs'] = [
+            'p. 1', 2, {'package': 'official-hour-1', 'resourceId': 'slides', 'pages': [3, 4]},
+        ]
+        refresh_receipts(self.inputs)
+        prepared = build_release(self.inputs)
+        self.assertEqual(prepared['frozen']['coursewareLight']['evidence']['notesSha256'], digest(self.inputs['notes']))
+        self.assertEqual(validate_light_release(prepared, self.inputs['manifest']), [])
+
+    def test_source_flag_refuses_incomplete_structured_page_references(self):
+        source = {'package': 'official-hour-1', 'resourceId': 'slides', 'pages': [3]}
+        for update in ({'package': ' '}, {'resourceId': None}, {'pages': []},
+                       {'pages': '3'}, {'pages': [0]}, {'pages': [True]}):
+            with self.subTest(update=update):
+                self.inputs['notes']['resources']['courseware']['pageRefs'] = [source | update]
+                self.rejected('notes_invalid')
+
+    def test_source_flag_accepts_structured_findings_with_page_references(self):
+        self.inputs['notes']['resources']['courseware']['findings'].append({
+            'classHour': 'lesson_1', 'pageRefs': [3, 'p. 4'], 'finding': 'Compare two groups.',
+        })
+        refresh_receipts(self.inputs)
+        prepared = build_release(self.inputs)
+        self.assertEqual(prepared['frozen']['coursewareLight']['evidence']['notesSha256'], digest(self.inputs['notes']))
+        self.assertEqual(validate_light_release(prepared, self.inputs['manifest']), [])
+
+    def test_source_flag_refuses_incomplete_structured_findings(self):
+        source = {'classHour': 'lesson_1', 'pageRefs': [3], 'finding': 'Compare two groups.'}
+        for update in ({'classHour': None}, {'finding': ' '}, {'pageRefs': []}, {'pageRefs': [False]}):
+            with self.subTest(update=update):
+                self.inputs['notes']['resources']['courseware']['findings'] = [source | update]
+                self.rejected('notes_invalid')
 
     def test_a_resource_the_official_listing_lacks_needs_its_evidence(self):
         item = self.inputs['notes']['resources']['afterClassExercise']

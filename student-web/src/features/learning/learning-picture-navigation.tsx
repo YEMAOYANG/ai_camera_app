@@ -6,6 +6,7 @@ import { Backpack, Play, Volume2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { TextbookCatalog, TextbookSubject } from "@/lib/contracts/textbooks";
+import { textbookCoursePath } from "./textbook-navigation";
 import voice from "./navigation-audio.json";
 import lessonPictures from "./lesson-pictures.json";
 
@@ -59,9 +60,14 @@ export function LearningListenButton({ cue, label = "听老师说" }: { cue: Lea
 }
 
 export function LessonPicture({ title, subject = "chinese", contentKey }: { title: string; subject?: TextbookSubject; contentKey?: string }) {
+  const [failedCover, setFailedCover] = useState<string>();
   const picture = contentKey ? publishedPictures[contentKey] : undefined;
-  if (picture) return <Image className="learning-lesson-picture" src={picture.src} alt={picture.alt}
-    width={picture.width} height={picture.height} sizes="(max-width: 760px) 92vw, 620px" />;
+  const cover = picture ?? (contentKey && /^[a-f0-9]{64}$/.test(contentKey)
+    ? { src: `/textbooks/course-covers-v2/${contentKey}.webp`, alt: `《${title}》封面`, width: 960, height: 540 }
+    : undefined);
+  if (cover && failedCover !== cover.src) return <Image className="learning-lesson-picture" src={cover.src} alt={cover.alt}
+    width={cover.width} height={cover.height} sizes="(max-width: 760px) 92vw, 620px"
+    onError={() => setFailedCover(cover.src)} />;
   return title.includes("天地人") ? <Image className="learning-lesson-picture" src="/textbooks/navigation-v1/tiandiren-140b4fec01160057.webp"
     width={1600} height={800} alt="天空下，三个孩子在花园的小路上说话、挥手" sizes="(max-width: 760px) 92vw, 620px" />
     : <SubjectPicture subject={subject} />;
@@ -82,7 +88,7 @@ export function LearningNextPicture({ catalog }: { catalog: TextbookCatalog }) {
   const contentKey = journey?.contentKey ?? start?.contentKey;
   const heading = cue === "review" ? "再来试一试" : cue === "continue" ? "接着玩" : cue === "start" ? "开始小任务" : cue === "welcome" ? "上次的学习已保存" : cue === "choose" ? "看看教材目录" : cue === "unavailable" ? "课件正在准备" : "等家长放入课本";
   return <section className="learning-next-picture" aria-label={heading}>
-    {contentKey && title ? <Link prefetch={false} href={`/learning/textbooks/courses/${contentKey}`} className="learning-picture-launch" aria-label={`${heading}，${title}`}>
+    {contentKey && title ? <Link prefetch={false} href={textbookCoursePath(contentKey, journey ? undefined : start?.entry)} className="learning-picture-launch" aria-label={`${heading}，${title}`}>
       <LessonPicture title={title} subject={start?.subject} contentKey={contentKey} /><span className="learning-picture-play"><Play size={36} fill="currentColor" aria-hidden="true" /></span>
       <span className="learning-picture-caption"><strong>{heading}</strong><span>{title}</span></span>
     </Link> : <div className="learning-picture-rest"><Backpack size={56} aria-hidden="true" /><strong>{heading}</strong>

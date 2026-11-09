@@ -1,0 +1,250 @@
+diff --git a/components/classroom/ClassroomSurface.tsx b/components/classroom/ClassroomSurface.tsx
+index 132f8b0798955c0ac27e81e5a184e309c16871e9..f618be0fcdfcf3b2f8db485e0eff06ae55fc906f 100644
+--- a/components/classroom/ClassroomSurface.tsx
++++ b/components/classroom/ClassroomSurface.tsx
+@@ -196,7 +196,7 @@ export function ClassroomSurface({
+                 if (!runtimeEvents) throw new Error('课堂进度暂时无法读取，请重试。');
+                 const [classroom] = await Promise.all([
+                   fetchStudentClassroomIndex(classroomId),
+-                  runtimeEvents.readProgress(),
++                  runtimeEvents.readEntryProgress(),
+                 ]);
+                 paged = classroom?.paged === true;
+                 return classroom;
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 68df4dccce58f0a1ed4b77dd5042216fbb4e6207..aa5ed69f6a3ced4521d8c5460cad2d4cf2994db2 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -828,8 +828,9 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
+         if (cancelled) return;
+ 
+-        // Synchronize accepted progress without forcing a return to a discussion.
+-        if (studentMode && runtimeEvents && currentScene) {
++        // Paged textbooks synchronize at entry and before gated navigation.
++        // Avoid another network wait before making the page's controls usable.
++        if (studentMode && runtimeEvents && currentScene && !classroomPages) {
+           try {
+             await runtimeEvents.readProgress();
+             if (cancelled) return;
+diff --git a/components/header.tsx b/components/header.tsx
+index 89875f6882de869736da520d71c886ce9620f0db..984afb4c78facf55a414b8e021dcbb18868e9fb1 100644
+--- a/components/header.tsx
++++ b/components/header.tsx
+@@ -6,9 +6,13 @@ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { useRouter, useSearchParams } from 'next/navigation';
+ import type { StageMode } from '@/lib/types/stage';
+ import { classroomExitLabelKey, exitClassroom } from '@/lib/workbench/classroom-exit';
+-import { HeaderControls } from './stage/header-controls';
++import dynamic from 'next/dynamic';
+ import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
++const HeaderControls = dynamic(() =>
++  import('./stage/header-controls').then((module) => module.HeaderControls),
++);
++
+ interface HeaderProps {
+   readonly currentSceneTitle: string;
+   readonly mode?: StageMode;
+diff --git a/components/slide-renderer/Editor/ScreenCanvas.tsx b/components/slide-renderer/Editor/ScreenCanvas.tsx
+index 880dd41d024b45ebfa2be0340ff82cfa79d0c351..4833da272153ca2a8995ac11bd20a7f49f2c2077 100644
+--- a/components/slide-renderer/Editor/ScreenCanvas.tsx
++++ b/components/slide-renderer/Editor/ScreenCanvas.tsx
+@@ -4,7 +4,6 @@ import { ScreenElement } from './ScreenElement';
+ import { HighlightOverlay } from './HighlightOverlay';
+ import { SpotlightOverlay } from './SpotlightOverlay';
+ import { LaserOverlay } from './LaserOverlay';
+-import { RendererScreenCanvas } from './RendererScreenCanvas';
+ import { useSlideBackgroundStyle } from '@/lib/hooks/use-slide-background-style';
+ import { useCanvasStore } from '@/lib/store';
+ import { useSyncCanvasViewportFromSlide } from '@/lib/store/sync-canvas-viewport';
+@@ -16,7 +15,6 @@ import type { PercentageGeometry } from '@/lib/types/action';
+ import { useViewportSize } from './Canvas/hooks/useViewportSize';
+ import { useRef, useMemo } from 'react';
+ import { AnimatePresence } from 'motion/react';
+-import { isPlaybackRendererEnabled } from '@/lib/config/feature-flags';
+ 
+ export function ScreenCanvas() {
+   useSyncCanvasViewportFromSlide();
+@@ -125,7 +123,3 @@ export function ScreenCanvas() {
+     </div>
+   );
+ }
+-
+-export function PlaybackScreenCanvas() {
+-  return isPlaybackRendererEnabled() ? <RendererScreenCanvas /> : <ScreenCanvas />;
+-}
+diff --git a/components/slide-renderer/Editor/index.tsx b/components/slide-renderer/Editor/index.tsx
+index d66bd62ceda713f8ee57e7b8507167042fc1d95e..fc11ecafa020ee9a19944a8c4ee0e02e13b8bfb9 100644
+--- a/components/slide-renderer/Editor/index.tsx
++++ b/components/slide-renderer/Editor/index.tsx
+@@ -1,8 +1,16 @@
+ 'use client';
+ 
+-import Canvas from './Canvas';
++import dynamic from 'next/dynamic';
+ import type { StageMode } from '@/lib/types/stage';
+-import { PlaybackScreenCanvas } from './ScreenCanvas';
++import { RendererScreenCanvas } from './RendererScreenCanvas';
++import { isPlaybackRendererEnabled } from '@/lib/config/feature-flags';
++
++const Canvas = dynamic(() => import('./Canvas'));
++const LegacyScreenCanvas = dynamic(() => import('./ScreenCanvas').then((module) => module.ScreenCanvas));
++
++function PlaybackScreenCanvas() {
++  return isPlaybackRendererEnabled() ? <RendererScreenCanvas /> : <LegacyScreenCanvas />;
++}
+ 
+ /**
+  * Slide Editor - wraps Canvas with SceneProvider
+diff --git a/components/stage.tsx b/components/stage.tsx
+index 6069d2ce7336992f3284164a5a7de60a637c4ae2..74f1d1fee131b7379c8c1aee1660f15cc1d50ca6 100644
+--- a/components/stage.tsx
++++ b/components/stage.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useCallback, useEffect, useRef, useState } from 'react';
+ import { useRouter } from 'next/navigation';
++import dynamic from 'next/dynamic';
+ import { AnimatePresence, motion } from 'motion/react';
+ import { useStageStore } from '@/lib/store';
+ import {
+@@ -10,7 +11,6 @@ import {
+   resolveStageChromeMode,
+ } from '@/lib/edit/stage-mode';
+ import { isMaicEditorEnabled, isProWorkbenchEnabled } from '@/lib/config/feature-flags';
+-import { EditChromeRoot } from '@/components/edit/EditChromeRoot';
+ import {
+   PlaybackChromeRoot,
+   type PlaybackChromeRootHandle,
+@@ -31,6 +31,10 @@ import {
+   useMiraStudentRuntimeEvents,
+ } from '@/lib/contexts/mira-student-runtime-context';
+ 
++const EditChromeRoot = dynamic(() =>
++  import('@/components/edit/EditChromeRoot').then((module) => module.EditChromeRoot),
++);
++
+ /**
+  * Stage — top-level classroom container. Standalone classrooms dispatch
+  * between the two chrome roots based on `useStageStore.mode`:
+@@ -68,6 +72,7 @@ export function Stage({
+ }) {
+   const { mode, setMode, scenes, currentSceneId, generatingOutlines, stage } = useStageStore();
+   const router = useRouter();
++  const studentMode = useMiraStudentRuntime();
+   const [activityContainer, setActivityContainer] = useState<HTMLDivElement | null>(null);
+   const enteringWorkbench = useRef(false);
+   const proWorkbenchFlag = isProWorkbenchEnabled();
+@@ -76,7 +81,7 @@ export function Stage({
+     proWorkbenchFlag ? 'pending' : 'off',
+   );
+   useEffect(() => {
+-    if (!proWorkbenchFlag) return;
++    if (!proWorkbenchFlag || studentMode) return;
+     let cancelled = false;
+     fetch('/api/agent/runtime')
+       .then((res) => (res.ok ? res.json() : null))
+@@ -89,10 +94,9 @@ export function Stage({
+     return () => {
+       cancelled = true;
+     };
+-  }, [proWorkbenchFlag]);
++  }, [proWorkbenchFlag, studentMode]);
+   const proWorkbenchEntry = proWorkbenchFlag && proRuntime === 'on';
+   const currentScene = useStageStore((s) => s.getCurrentScene());
+-  const studentMode = useMiraStudentRuntime();
+   const runtimeEvents = useMiraStudentRuntimeEvents();
+   // The reference implementation makes editing owner-only. `isOwner` is true for the stage creator and
+   // defaults to true with browser storage (single-user IndexedDB), so this gate is
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+index 45cf339ec6ce4ba6012501bb6f882625094fc3fb..7ef17abc2eaede25c43bbfeba8056f232a7eaf74 100644
+--- a/lib/contexts/mira-student-runtime-context.tsx
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -183,11 +183,12 @@ export function MiraStudentRuntimeProvider({
+   );
+ 
+   useEffect(() => {
+-    if (!runtimeEvents) return;
++    // Published textbooks read their starting position with the page directory.
++    if (!runtimeEvents || /^tbpub_[a-f0-9]{24}$/.test(classroomId)) return;
+     void runtimeEvents.resume().catch((error) => {
+       console.error('[Mira Runtime] Failed to resume authoritative event stream', error);
+     });
+-  }, [runtimeEvents]);
++  }, [classroomId, runtimeEvents]);
+ 
+   return (
+     <MiraStudentParentOriginsContext.Provider value={parentOrigins}>
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+index 93dbf3f1fe7a0a1a0a5c3aab630651b0dd6e08db..2134c365b5559d492a9ed64c11670b6128472cc5 100644
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -114,6 +114,8 @@ interface RuntimeReceipt {
+ 
+ export interface MiraStudentRuntimeEventClient {
+   resume(): Promise<void>;
++  /** Synchronize once per classroom entry and replay a pending local event if present. */
++  readEntryProgress(): Promise<void>;
+   /** Read accepted progress without flushing an unfinished teaching event. */
+   readProgress(): Promise<void>;
+   /** Highest server-accepted visit; never sourced from the local playback cursor. */
+@@ -162,6 +164,7 @@ export function createMiraStudentRuntimeEventClient(
+   let synchronized = false;
+   let lastStatus: RuntimeStatus | null = null;
+   let tail: Promise<void> = Promise.resolve();
++  let entryProgress: Promise<void> | undefined;
+   let completedInteractions = new Set<number>();
+   let completedScenes = new Set<string>();
+   let initialResumeScene: SceneIdentity | null | undefined;
+@@ -298,6 +301,22 @@ export function createMiraStudentRuntimeEventClient(
+   };
+ 
+   return {
++    readEntryProgress: () => {
++      if (entryProgress) return entryProgress;
++      const operation = tail.catch(() => undefined).then(async () => {
++        await synchronize(true);
++        if (state.pending) {
++          await flushPending();
++          await synchronize(true);
++        }
++      });
++      tail = operation;
++      entryProgress = operation.catch((error: unknown) => {
++        entryProgress = undefined;
++        throw error;
++      });
++      return entryProgress;
++    },
+     readProgress: () => {
+       const operation = tail
+         .catch(() => undefined)
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+index 061ac52dcfe23d35f9b51dbdb0425f98ba7fff45..3fa56a8cbdc97abbe261fa715e64f1bf8f629a0e 100644
+--- a/tests/runtime/mira-student-runtime-events.test.ts
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -673,3 +673,23 @@ it('replays a finished lesson quietly on a device that never emitted its page ma
+   ).rejects.toThrow('Mira Runtime event stream is already completed');
+   expect(posted).toEqual([]);
+ });
++
++it('shares the textbook entry read without replaying extra GETs and allows a retry after failure', async () => {
++  const fetcher = vi.fn()
++    .mockResolvedValueOnce(response({ error: 'unavailable' }, 503))
++    .mockResolvedValueOnce(response(status(4)))
++    .mockResolvedValueOnce(response(status(5)));
++  const client = createMiraStudentRuntimeEventClient({
++    classroomId: 'classroom-a',
++    fetcher,
++    storage: memoryStorage(),
++  });
++  await expect(client.readEntryProgress()).rejects.toThrow();
++  const entry = client.readEntryProgress();
++  expect(client.readEntryProgress()).toBe(entry);
++  await entry;
++  await client.readEntryProgress();
++  expect(fetcher).toHaveBeenCalledTimes(2);
++  await client.readProgress();
++  expect(fetcher).toHaveBeenCalledTimes(3);
++});

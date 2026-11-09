@@ -66,29 +66,18 @@ body:has(.schoolbag-shell) { background: #f6f8fa; }
 .schoolbag-footer [aria-pressed="true"] { color: var(--mira-brand); }
 
 /* The same quiet reading space continues inside a book and its picture guide. */
-.schoolbag-shell .space-page-heading { margin: 0 0 24px; }
-.schoolbag-shell .space-page-heading h1 { font-size: 30px; text-shadow: none; color: var(--mira-ink); }
-.schoolbag-shell .space-page-description, .schoolbag-shell .space-eyebrow { color: var(--mira-muted); text-shadow: none; }
-.schoolbag-shell .space-back-link { min-height: 48px; color: var(--mira-muted); border-color: var(--mira-border); background: transparent; margin-bottom: 18px; }
-.schoolbag-shell .space-page-heading__row { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
 .schoolbag-shell.schoolbag-auth { background: var(--mira-bg); }
-.schoolbag-auth .space-auth-header { max-width: 1280px; padding: 24px 40px; }
-.schoolbag-auth .space-auth-header > span { color: var(--mira-muted); }
-.schoolbag-auth .space-auth-header > span svg, .schoolbag-auth .space-auth-steps svg { color: var(--mira-brand); }
-.schoolbag-auth .space-auth-intro h1 { text-shadow: none; font-size: 36px; }
-.schoolbag-auth .space-auth-description { text-shadow: none; color: var(--mira-muted); }
-.schoolbag-auth .space-eyebrow { color: var(--mira-muted); }
-.schoolbag-auth .space-auth-steps { border-color: var(--mira-border); }
-.schoolbag-auth .space-auth-steps small { color: var(--mira-muted); }
-.schoolbag-auth .space-auth-panel { background: #fff; border: 1px solid var(--mira-border); border-radius: 16px; box-shadow: 0 14px 45px #263b4808; }
-.schoolbag-auth .space-auth-panel :is(h1, h2) { color: var(--mira-ink); }
-.schoolbag-auth .space-auth-panel input { color: var(--mira-ink); caret-color: var(--mira-brand); }
-.schoolbag-auth .space-pair-code-form { background: var(--mira-surface-soft); border-color: var(--mira-border); }
-.schoolbag-auth .space-auth-panel::before { content: none; }
-.schoolbag-auth .space-auth-steps li > svg { animation: none; }
-.schoolbag-auth .space-unlock-panel[data-pin-state="ready"] input { border-color: var(--mira-brand); box-shadow: none; }
-.schoolbag-auth .space-qr-code { box-shadow: 0 0 0 4px var(--mira-brand-wash); }
-.schoolbag-auth .space-qr[data-qr-state="waiting"] .space-qr-code::after { border-color: var(--mira-brand); animation: none; }
+.schoolbag-auth .student-auth-header { max-width: 1280px; padding: 24px 40px; }
+.schoolbag-auth .student-auth-header > span { color: var(--mira-muted); }
+.schoolbag-auth .student-auth-header > span svg { color: var(--mira-brand); }
+.schoolbag-auth .student-auth-intro h1 { text-shadow: none; font-size: 36px; }
+.schoolbag-auth .student-auth-description { text-shadow: none; color: var(--mira-muted); }
+.schoolbag-auth .student-auth-panel { background: #fff; border: 1px solid var(--mira-border); border-radius: 16px; box-shadow: 0 14px 45px #263b4808; }
+.schoolbag-auth .student-auth-panel :is(h1, h2) { color: var(--mira-ink); }
+.schoolbag-auth .student-auth-panel input { color: var(--mira-ink); caret-color: var(--mira-brand); }
+.schoolbag-auth .student-pair-code-form { background: var(--mira-surface-soft); border-color: var(--mira-border); }
+.schoolbag-auth .student-unlock-panel[data-pin-state="ready"] input { border-color: var(--mira-brand); box-shadow: none; }
+.schoolbag-auth .student-qr-code { box-shadow: 0 0 0 4px var(--mira-brand-wash); }
 .schoolbag-auth-art { display: block; width: 240px; height: auto; margin-bottom: 22px; }
 
 @media (max-width: 1000px) {
@@ -134,11 +123,9 @@ body:has(.schoolbag-shell) { background: #f6f8fa; }
   .schoolbag-notice strong { font-size: 16px; }
   .schoolbag-notice p { font-size: 14px; }
   .schoolbag-notice > button { margin-left: 32px; }
-  .schoolbag-shell .space-page-heading h1 { font-size: 25px; }
-  .schoolbag-shell .space-page-heading__row { align-items: start; }
   .schoolbag-auth-art { float: right; width: 116px; margin: 0 0 0 8px; }
-  .schoolbag-auth .space-auth-intro h1 { font-size: 30px; }
-  .schoolbag-auth .space-auth-header { padding: 20px; }
+  .schoolbag-auth .student-auth-intro h1 { font-size: 30px; }
+  .schoolbag-auth .student-auth-header { padding: 20px; }
 }
 @media (max-width: 380px) {
   .schoolbag-main { padding-inline: 14px; }

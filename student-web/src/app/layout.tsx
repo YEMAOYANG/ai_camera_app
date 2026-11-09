@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
-import { SpaceNavigationProvider } from "@/components/student/space-navigation";
 import { SchoolbagMotionProvider } from "@/components/schoolbag/schoolbag-motion";
 import "katex/dist/katex.min.css";
 import "./globals.css";
-import "../styles/space.css";
-import "../styles/space-pages.css";
-import "../styles/space-legacy.css";
-import "../styles/space-effects.css";
-import "../styles/space-explore.css";
-import "../styles/space-practice-motion.css";
-import "../styles/space-journey.css";
-import "../styles/space-navigation.css";
-import "../styles/space-controls.css";
-import "../styles/space-session-transition.css";
-import "../styles/space-textbooks.css";
+import "../styles/student-auth.css";
+import "../styles/student-status.css";
+import "../styles/textbooks.css";
+import "../styles/lesson-player.css";
+import "../styles/course-detail.css";
 import "../styles/schoolbag.css";
 import "../styles/schoolbag-motion.css";
 import "../styles/learning-picture-navigation.css";
@@ -43,7 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip-link focus-ring" href="#main-content">
           跳到主要内容
         </a>
-        <SpaceNavigationProvider><SchoolbagMotionProvider>{children}</SchoolbagMotionProvider></SpaceNavigationProvider>
+        <SchoolbagMotionProvider>{children}</SchoolbagMotionProvider>
       </body>
     </html>
   );

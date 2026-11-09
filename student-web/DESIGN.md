@@ -35,7 +35,7 @@ These are principles, not copied branding, characters or textbook covers. The bo
 
 ## System
 
-Theme tokens live in `src/styles/tokens.css`, scoped to `.schoolbag-shell` and `.mira-ui-surface` so historical classroom renderers retain their own contracts. `src/styles/storybook.css` supplies the chosen visual language after the base styles; all textbook CSS is imported in root layout to avoid route-dependent cascade changes. `src/styles/schoolbag-motion.css` covers the persistent 3D scene, subject links and transitions. Radix remains the headless behavior layer for accessible selects, disclosures and switches; Mira owns their appearance.
+The light student theme is defined in `src/styles/tokens.css` and shared by the schoolbag, login screens and classroom chrome. Embedded classroom content owns its own rendering and controls. `src/styles/storybook.css` supplies the chosen visual language after the base styles; all textbook CSS is imported in root layout to avoid route-dependent cascade changes. `src/styles/schoolbag-motion.css` covers the persistent 3D scene, subject links and transitions. Radix remains the headless behavior layer for accessible selects, disclosures and switches; Mira owns their appearance.
 
 Short editorial headings use a locally subsetted Ma Shan Zheng font (SIL Open Font License, included in `public/fonts/OFL.txt`), with system Kaiti fallback. Controls, body copy and textbook lesson names use the system sans-serif stack. Targets are at least 48 px; visible focus, error/retry, loading, unavailable and reduced-motion states are required. Limit render resolution, release GPU resources and stop drawing when the scene is idle.
 

@@ -1,0 +1,291 @@
+diff --git a/lib/playback/types.ts b/lib/playback/types.ts
+--- a/lib/playback/types.ts
++++ b/lib/playback/types.ts
+@@ -42,6 +42,8 @@
+   onSceneChange?: (sceneId: string) => void;
+   onSpeechStart?: (text: string) => void;
+   onSpeechEnd?: () => void;
++  /** Only a completed prerecorded audio element, never a cursor or reading timer. */
++  onRecordedSpeechEnd?: (actionId: string) => void;
+   onAudioPlaybackIssue?: (issue: AudioPlaybackIssue) => void;
+   onTextDelta?: (content: string) => void;
+   onSpeakerChange?: (role: string) => void;
+diff --git a/lib/playback/engine.ts b/lib/playback/engine.ts
+--- a/lib/playback/engine.ts
++++ b/lib/playback/engine.ts
+@@ -295,6 +295,9 @@
+         this.audioPlayer.onEnded(() => {
+           if (!this.isCurrentGeneration(generation)) return;
+           this.callbacks.onSpeechEnd?.();
++          if (resumedSpeech && hasSpeechAudioReference(resumedSpeech)) {
++            this.callbacks.onRecordedSpeechEnd?.(resumedSpeech.id);
++          }
+           if (this.mode === 'playing') {
+             this.processNext(generation);
+           }
+@@ -707,6 +710,9 @@
+         this.audioPlayer.onEnded(() => {
+           if (!this.isCurrentGeneration(generation)) return;
+           this.callbacks.onSpeechEnd?.();
++          if (hasSpeechAudioReference(speechAction)) {
++            this.callbacks.onRecordedSpeechEnd?.(speechAction.id);
++          }
+           if (this.mode === 'playing') {
+             this.processNext(generation);
+           }
+diff --git a/lib/utils/audio-player.ts b/lib/utils/audio-player.ts
+--- a/lib/utils/audio-player.ts
++++ b/lib/utils/audio-player.ts
+@@ -265,8 +265,8 @@
+         if (!graphConnected) {
+           this.attachStudentAudioGraphAfterUnlock(audio, legacyUrl, requestToken);
+         }
+-        this.audio.addEventListener('ended', () => {
+-          this.onEndedCallback?.();
++        audio.addEventListener('ended', () => {
++          if (this.audio === audio && this.requestToken === requestToken) this.onEndedCallback?.();
+         });
+         await this.audio.play();
+         if (requestToken !== this.requestToken) return false;
+@@ -328,10 +328,10 @@
+       this.audio.defaultPlaybackRate = this.playbackRate;
+       this.audio.playbackRate = this.playbackRate;
+ 
+-      // Set ended callback
+-      this.audio.addEventListener('ended', () => {
++      const audio = this.audio;
++      audio.addEventListener('ended', () => {
+         this.releaseBlobUrl(blobUrl);
+-        this.onEndedCallback?.();
++        if (this.audio === audio && this.requestToken === requestToken) this.onEndedCallback?.();
+       });
+ 
+       // Play. If play() rejects (autoplay policy, decode error, interrupted
+@@ -375,9 +375,8 @@
+     // settle: the play was superseded and its result is unwanted.
+     this.abortLegacyFetch();
+     this.stopAudioElement();
+-    // Note: onEndedCallback intentionally NOT cleared here because play()
+-    // calls stop() internally — clearing would break the callback chain.
+-    // Stale callbacks are harmless: engine mode check prevents processNext().
++    // Keep the callback installed. The request token invalidates the old audio
++    // element while the next play may already have registered its callback.
+   }
+ 
+   /**
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -28,6 +28,12 @@
+       readonly schemaVersion: typeof EVENT_SCHEMA;
+       readonly sequence: number;
+       readonly type: 'action_completed';
++      readonly payload: SceneIdentity & { readonly actionId: string };
++    }
++  | {
++      readonly schemaVersion: typeof EVENT_SCHEMA;
++      readonly sequence: number;
++      readonly type: 'section_speech_completed';
+       readonly payload: SceneIdentity & { readonly actionId: string };
+     }
+   | {
+@@ -125,6 +131,7 @@
+   hasCompletedScene(sceneId: string): boolean;
+   sceneEntered(payload: SceneIdentity): Promise<void>;
+   actionCompleted(payload: SceneIdentity & { readonly actionId: string }): Promise<void>;
++  sectionSpeechCompleted(payload: SceneIdentity & { readonly actionId: string }): Promise<void>;
+   answerSubmitted(
+     payload: SceneIdentity & {
+       readonly questionId: string;
+@@ -251,7 +258,8 @@
+       // Rebase idempotent listening markers only after an explicit sequence
+       // rejection. A lost response keeps its original sequence for replay.
+       if (entry && retryConflict && result.status === 409 && error.name === 'textbook_event_conflict'
+-          && (pending.event.type === 'scene_entered' || pending.event.type === 'action_completed')) {
++          && (pending.event.type === 'scene_entered' || pending.event.type === 'action_completed'
++              || pending.event.type === 'section_speech_completed')) {
+         const status = await synchronize(true);
+         if (state.pending === pending && !status.completed) {
+           state.pending = { ...pending, event: { ...pending.event, sequence: status.nextSequence } };
+@@ -297,7 +305,8 @@
+       // A finished lesson can be replayed on another device, or after its
+       // pages were reordered. Its page markers are already final, so replay
+       // stays quiet; answers and other new evidence are still refused.
+-      if (type === 'scene_entered' || type === 'action_completed') return;
++      if (type === 'scene_entered' || type === 'action_completed' || type === 'section_speech_completed')
++        return;
+       throw new Error('Mira Runtime event stream is already completed');
+     }
+     const event = {
+@@ -366,6 +375,11 @@
+       record('scene_entered', scenePayload(payload) as EventPayload<'scene_entered'>),
+     actionCompleted: (payload) =>
+       record('action_completed', {
++        ...scenePayload(payload),
++        actionId: identifier(payload.actionId, 'actionId'),
++      }),
++    sectionSpeechCompleted: (payload) =>
++      record('section_speech_completed', {
+         ...scenePayload(payload),
+         actionId: identifier(payload.actionId, 'actionId'),
+       }),
+@@ -503,6 +517,7 @@
+     [
+       'scene_entered',
+       'action_completed',
++      'section_speech_completed',
+       'answer_submitted',
+       'asr_transcribed',
+       'interaction_completed',
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -986,6 +986,17 @@
+             // Clearing here causes fallback to idleText (first sentence).
+             setActiveBubbleId(null);
+           },
++          onRecordedSpeechEnd: runtimeEvents?.entry ? (actionId) => {
++            const state = useStageStore.getState();
++            if (engineRef.current !== engine || state.currentSceneId !== currentScene.id
++                || runtimeEvents.hasCompletedScene(currentScene.id)) return;
++            const sceneIndex = [...state.scenes].sort((left, right) => left.order - right.order)
++              .findIndex(scene => scene.id === currentScene.id);
++            if (sceneIndex >= 0) {
++              void runtimeEvents.sectionSpeechCompleted({ sceneIndex, sceneId: currentScene.id, actionId })
++                .catch(error => console.warn('[Mira Runtime] Could not save completed narration', error));
++            }
++          } : undefined,
+           onAudioPlaybackIssue: ({ reason, actionId }) => {
+             if (studentMode) {
+               setAutoPlayLecture(false);
+@@ -1097,11 +1108,13 @@
+               const actionId = currentScene.actions?.at(-1)?.id;
+               if (sceneIndex < 0 || !actionId) return;
+               try {
+-                await runtimeEvents.actionCompleted({
+-                  sceneIndex,
+-                  sceneId: currentScene.id,
+-                  actionId,
+-                });
++                if (runtimeEvents.entry) {
++                  // Retry queued speech evidence. An exhausted cursor or jump
++                  // cannot create a new listening record.
++                  await runtimeEvents.resume();
++                } else {
++                  await runtimeEvents.actionCompleted({ sceneIndex, sceneId: currentScene.id, actionId });
++                }
+               } catch (error) {
+                 if (
+                   engineRef.current !== engine ||
+@@ -1194,7 +1207,7 @@
+                     stageState.setCurrentSceneId(target, page);
+                   });
+                 } else if (
+-                  idx === allScenes.length - 1 &&
++                  !runtimeEvents?.entry && idx === allScenes.length - 1 &&
+                   stageState.generatingOutlines.length > 0
+                 ) {
+                   // Last scene exhausted but next is still generating — go to pending page
+@@ -1443,6 +1456,7 @@
+       }
+       if (
+         !runtimeEvents ||
++        runtimeEvents.entry ||
+         !engine.isExhausted() ||
+         runtimeEvents.hasCompletedScene(currentScene.id)
+       )
+@@ -1665,7 +1679,7 @@
+     const isCourseComplete =
+       generationComplete ||
+       (outlines.length > 0 && scenes.length === outlines.length && generatingOutlines.length === 0);
+-    const canAdvanceToPendingSlot = hasNextPending || isCourseComplete;
++    const canAdvanceToPendingSlot = !runtimeEvents?.entry && (hasNextPending || isCourseComplete);
+ 
+     // previous scene (gated)
+     const handlePreviousScene = useCallback(() => {
+diff --git a/tests/playback/action-navigation.test.ts b/tests/playback/action-navigation.test.ts
+--- a/tests/playback/action-navigation.test.ts
++++ b/tests/playback/action-navigation.test.ts
+@@ -273,6 +273,47 @@
+     vi.unstubAllGlobals();
+   });
+ 
++  it('records the audio that ended rather than speech skipped by a line jump', async () => {
++    const { engine: actionEngine } = createActionEngine();
++    const { player, fireEnded } = createAudioPlayer(async () => true);
++    const heard = vi.fn();
++    const actions = ['first', 'last'].map(id => ({ ...speech(id), audioId: id }));
++    const engine = new PlaybackEngine([scene(actions)], actionEngine, player, {
++      onRecordedSpeechEnd: heard,
++    });
++
++    expect(await engine.jumpToAction(1, { autoplay: false })).toBe(true);
++    engine.continuePlayback();
++    await flushPromises();
++    expect(engine.isExhausted()).toBe(true);
++    expect(heard).not.toHaveBeenCalled();
++
++    fireEnded();
++    expect(heard.mock.calls).toEqual([['last']]);
++    engine.start();
++    await flushPromises();
++    fireEnded();
++    expect(heard.mock.calls).toEqual([['last'], ['first']]);
++    engine.stop();
++    fireEnded();
++    expect(heard.mock.calls).toEqual([['last'], ['first']]);
++  });
++
++  it('does not count text fallback as recorded audio', async () => {
++    vi.useFakeTimers();
++    const { engine: actionEngine } = createActionEngine();
++    const { player } = createAudioPlayer();
++    const heard = vi.fn();
++    const complete = vi.fn();
++    const engine = new PlaybackEngine([scene([{ ...speech('missing'), audioId: 'missing' }])],
++      actionEngine, player, { onRecordedSpeechEnd: heard, onComplete: complete });
++    engine.start();
++    await flushPromises();
++    await vi.runAllTimersAsync();
++    expect(complete).toHaveBeenCalledOnce();
++    expect(heard).not.toHaveBeenCalled();
++  });
++
+   it('rejects invalid and unsafe jump targets', async () => {
+     const { engine: actionEngine } = createActionEngine();
+     const { player } = createAudioPlayer();
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+--- a/tests/runtime/mira-student-runtime-events.test.ts
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -83,6 +83,31 @@
+       ['section-a', 2, 'scene-a'],
+     ]);
+     expect(storage.length).toBe(2);
++  });
++
++  it('retries section speech without turning one sentence into a completed page', async () => {
++    const posted: Array<{ type: string; sequence: number }> = [];
++    let rejected = false;
++    const client = createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a', entry: 'section-a', storage: memoryStorage(),
++      fetcher: vi.fn(async (_input, init) => {
++        if (init?.method === 'GET') return response({ ...status(rejected ? 1 : 0), entry: 'section-a' });
++        const event = JSON.parse(String(init?.body));
++        posted.push(event);
++        if (!rejected) {
++          rejected = true;
++          return response({ error: 'textbook_event_conflict' }, 409);
++        }
++        return response({ ok: true, sequence: event.sequence, receiptSha256: 'a'.repeat(64) });
++      }),
++    });
++    const payload = { sceneIndex: 0, sceneId: 'scene-a', actionId: 'speech-a' };
++    await client.sectionSpeechCompleted(payload);
++    await client.sectionSpeechCompleted(payload);
++    expect(posted.map(({ type, sequence }) => [type, sequence])).toEqual([
++      ['section_speech_completed', 1], ['section_speech_completed', 2],
++    ]);
++    expect(client.hasCompletedScene('scene-a')).toBe(false);
+   });
+ 
+   it('accepts the full 255-character upstream classroom identity boundary', async () => {

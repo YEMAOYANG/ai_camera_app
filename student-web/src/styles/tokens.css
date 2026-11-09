@@ -1,47 +1,53 @@
 :root {
-  --mira-on-brand: #10170a;
-  --space-cyan: #71d9ff;
+  --mira-on-brand: #29383b;
   --mira-picture-blue: #4c8bb5;
-  --mira-bg: #060c17;
-  --mira-bg-warm: #080f1d;
-  --mira-surface: #101c2c;
-  --mira-surface-soft: #132237;
-  --mira-ink: #f5f8ff;
-  --mira-muted: #b5c3d5;
-  --mira-subtle: #93a5bc;
-  --mira-brand: #e4ff90;
-  --mira-brand-deep: #daff7e;
-  --mira-brand-wash: #273622;
-  --mira-ai: #75d8ff;
-  --mira-sky: #122c3c;
-  --mira-mint: #122e2b;
-  --mira-mint-deep: #89e2c4;
+  --mira-bg: #fcf6ec;
+  --mira-bg-warm: #fcf6ec;
+  --mira-surface: #fffcf6;
+  --mira-surface-soft: #f2ebdd;
+  --mira-ink: #29383b;
+  --mira-muted: #6b706c;
+  --mira-subtle: #73756c;
+  --mira-brand: #efb73d;
+  --mira-brand-deep: #f7c752;
+  --mira-brand-wash: #f7edce;
+  --mira-ai: #7b662e;
+  --mira-sky: #f3eddf;
+  --mira-mint: #e4f0e7;
+  --mira-mint-deep: #36765b;
   --mira-sun: #ffd166;
-  --mira-sun-soft: #302a1b;
-  --mira-peach: #32231e;
-  --mira-lilac: #26223d;
+  --mira-sun-soft: #f8edcc;
+  --mira-peach: #f9e8df;
+  --mira-lilac: #eee9f5;
   --mira-buddy-body: #f8fbff;
   --mira-buddy-line: #2a4a85;
   --mira-buddy-cheek: #ffb8ae;
   --mira-buddy-mouth: #ff8c7a;
   --mira-buddy-antenna: #ffd166;
   --mira-buddy-book: #bfead4;
-  --mira-success: #89e2c4;
-  --mira-warning: #ffd27d;
-  --mira-danger: #ffad9f;
-  --mira-border: #2a3b51;
-  --mira-border-soft: #1b2a3f;
-  --mira-disabled: #1b293a;
-  --mira-radius-control: 14px;
+  --mira-success: #36765b;
+  --mira-warning: #926718;
+  --mira-danger: #b63e3c;
+  --mira-border: #ded8ca;
+  --mira-border-soft: #e9e1d4;
+  --mira-disabled: #eee8dc;
+  --mira-radius-control: 10px;
   --mira-radius-button: 999px;
-  --mira-radius-card: 22px;
+  --mira-radius-card: 16px;
   --mira-radius-playful: 30px;
   --mira-radius-hero: 28px;
   --mira-shadow-card: 0 18px 54px rgba(33, 54, 89, 0.09);
-  --mira-shadow-action: 0 8px 32px rgba(205, 255, 113, 0.12);
+  --mira-shadow-action: none;
   --mira-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --mira-duration-fast: 160ms;
   --mira-duration-base: 260ms;
+  --mira-focus: #7d6530;
+  --mira-control-height: 48px;
+  --mira-control-hover: #f1e8d6;
+  --font-mira-story: "Mira Storybook", "Kaiti SC", "STKaiti", "KaiTi", serif;
+  --book-chinese: #d76a54;
+  --book-math: #5b91ad;
+  --book-english: #649380;
 }
 
 @theme inline {
@@ -54,41 +60,6 @@
   --color-brand-wash: var(--mira-brand-wash);
   --color-border: var(--mira-border);
   --font-sans: var(--font-mira-sans);
-}
-
-/* The selected storybook direction is scoped away from formal classroom renderers. */
-.schoolbag-shell, .mira-ui-surface {
-  --mira-bg: #fcf6ec;
-  --mira-bg-warm: #fcf6ec;
-  --mira-surface: #fffcf6;
-  --mira-surface-soft: #f2ebdd;
-  --mira-ink: #29383b;
-  --mira-muted: #6b706c;
-  --mira-subtle: #73756c;
-  --mira-brand: #efb73d;
-  --mira-brand-deep: #f7c752;
-  --mira-brand-wash: #f7edce;
-  --mira-on-brand: #29383b;
-  --mira-ai: #7b662e;
-  --mira-sky: #f3eddf;
-  --mira-mint: #e4f0e7;
-  --mira-mint-deep: #36765b;
-  --mira-success: #36765b;
-  --mira-warning: #926718;
-  --mira-danger: #b63e3c;
-  --mira-border: #ded8ca;
-  --mira-border-soft: #e9e1d4;
-  --mira-disabled: #eee8dc;
-  --mira-shadow-action: none;
-  --mira-radius-control: 10px;
-  --mira-radius-card: 16px;
-  --mira-focus: #7d6530;
-  --mira-control-height: 48px;
-  --mira-control-hover: #f1e8d6;
-  --font-mira-story: "Mira Storybook", "Kaiti SC", "STKaiti", "KaiTi", serif;
-  --book-chinese: #d76a54;
-  --book-math: #5b91ad;
-  --book-english: #649380;
 }
 
 @media (prefers-reduced-motion: reduce) {

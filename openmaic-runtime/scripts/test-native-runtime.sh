@@ -215,6 +215,7 @@ const state = {
   ),
   structuredScenePolicy: process.env.MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY,
   strictTtsPresent: Boolean(process.env.TTS_QWEN_API_KEY),
+  ttsRequestTimeoutMs: process.env.TTS_REQUEST_TIMEOUT_MS,
   strictAsrPresent: Boolean(process.env.ASR_QWEN_API_KEY),
   videoKeyPresent: Boolean(process.env.VIDEO_HAPPYHORSE_API_KEY),
   videoDefault: process.env.DEFAULT_VIDEO_PROVIDER,
@@ -289,6 +290,7 @@ production_output="$(
   MIRA_STUDENT_WEB_ENV_FILE="${TMP_ROOT}/student-web.env" \
   MIRA_OPENMAIC_ENABLE_MODEL_PROVIDER=1 \
   MIRA_OPENMAIC_ENABLE_QWEN_TTS=1 \
+  TTS_REQUEST_TIMEOUT_MS=90000 \
   MIRA_OPENMAIC_ENABLE_QWEN_ASR=1 \
   MIRA_OPENMAIC_AGENT_RUNTIME_ENABLED=1 \
   MIRA_OPENMAIC_AGENT_DATABASE_URL=postgresql://test.invalid/private-authoring \
@@ -310,6 +312,7 @@ production_output="$(
 [[ "${production_output}" == *'"reviewedModelRoutes":true'* ]] || fail "production foreground did not replace caller routes with the exact reviewed model routes"
 [[ "${production_output}" == *'"structuredScenePolicy":"deepseek-v4-pro-flash-v1"'* ]] || fail "production foreground accepted a caller structured scene policy"
 [[ "${production_output}" == *'"strictTtsPresent":true'* ]] || fail "production foreground omitted the TTS contract"
+[[ "${production_output}" == *'"ttsRequestTimeoutMs":"90000"'* ]] || fail "production foreground dropped the TTS timeout"
 [[ "${production_output}" == *'"strictAsrPresent":true'* ]] || fail "production foreground omitted the ASR contract"
 [[ "${production_output}" == *'"videoKeyPresent":true'* ]] || fail "production foreground omitted video credential"
 [[ "${production_output}" == *'"videoDefault":"happyhorse"'* ]] || fail "production foreground omitted formal video default"
@@ -465,6 +468,7 @@ IDENTITY_TEST_PID=""
   export MODEL_ROUTES='{"scene-content":"attacker:model"}'
   export OPENMAIC_MODEL_ROUTES='{"scene-content":"attacker:model"}'
   export MIRA_OPENMAIC_STRUCTURED_SCENE_POLICY=attacker-controlled
+  TTS_REQUEST_TIMEOUT_MS=90000
   process_start_hash() { printf '%064d' 0 | tr '0' 'a'; }
   prepare_openmaic_start() { rm -f "${OPENMAIC_PID_FILE}" "${OPENMAIC_MODE_FILE}"; }
   write_openmaic_mode() {
@@ -533,6 +537,7 @@ IDENTITY_TEST_PID=""
   done
   grep -Fq '"reviewedModelRoutes":true' "${OPENMAIC_LOG}" || fail "detached start did not replace caller routes with the exact reviewed model routes"
   grep -Fq '"agentDriverOutputCap":"65536"' "${OPENMAIC_LOG}" || fail "detached start dropped the parent output cap"
+  grep -Fq '"ttsRequestTimeoutMs":"90000"' "${OPENMAIC_LOG}" || fail "detached start dropped the TTS timeout"
   grep -Fq '"detachedProcessGroup":true' "${OPENMAIC_LOG}" || fail "detached start still belongs to the invoking terminal process group"
   grep -Fq '"structuredScenePolicy":"deepseek-v4-pro-flash-v1"' "${OPENMAIC_LOG}" || fail "detached start accepted a caller structured scene policy"
 )

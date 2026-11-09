@@ -12,7 +12,7 @@ from content.textbook_batch_release import (
     REVIEW_SCHEMA as ACTIVITY_REVIEW_SCHEMA,
     validate_input as validate_activity_input,
 )
-from content.textbook_catalog import canonical, digest, lesson_by_id
+from content.textbook_catalog import canonical, digest, lesson_by_id, lesson_release_aliases
 from content.textbook_review_evidence import restore_split_review
 from content.textbook_release import (
     INPUT_SCHEMA as CLASSROOM_INPUT_SCHEMA,
@@ -257,6 +257,7 @@ def _directory_entry(repo, build, manifest, child):
             fail()
     elif frozen.get('schemaVersion') == CLASSROOM_INPUT_SCHEMA:
         _, node = lesson_by_id(manifest, build['node_id'])
+        lesson_release_aliases(manifest, build['node_id'], frozen.get('identity'))
         if (release.get('schemaVersion') != CLASSROOM_RELEASE_SCHEMA
                 or any(evidence.get(name) is not True for name in (
                     'alignmentConfirmed', 'originalExpressionConfirmed',
@@ -314,7 +315,11 @@ def published_books(service, child):
                 continue
             builds = service.repository.directory_builds(conn, row['edition_id'], row['revision_id'])
             releases = published_node_directory_entries(service.repository, child, builds, manifest)
+            counted = set()
             for build, _, _, manifest in releases.values():
+                if build['content_key'] in counted:
+                    continue
+                counted.add(build['content_key'])
                 identity = (manifest['editionId'], manifest['revisionId'])
                 if identity not in result:
                     result[identity] = {**service._book(manifest), 'selected': False, 'selectionRevision': 0,
@@ -324,6 +329,18 @@ def published_books(service, child):
                 counter = 'availableLessonCount' if kind == 'lesson_courseware' else 'availableActivityCount'
                 result[identity]['learningStatus'][counter] += 1
     return result
+
+
+def _with_directory_aliases(repo, direct):
+    aliases = {}
+    for entry in direct.values():
+        build, _, _, manifest = entry
+        frozen = repo.parse(build['input_json'])
+        if frozen.get('schemaVersion') != CLASSROOM_INPUT_SCHEMA:
+            continue
+        for node_id in lesson_release_aliases(manifest, build['node_id'], frozen.get('identity')):
+            aliases.setdefault(node_id, entry)
+    return {**aliases, **direct}
 
 
 def published_node_directory_entries(repo, child, builds, manifest):
@@ -344,7 +361,7 @@ def published_node_directory_entries(repo, child, builds, manifest):
             # revision and node. Launch still validates the selected full row.
             continue
         result[build['node_id']] = entry
-    return result
+    return _with_directory_aliases(repo, result)
 
 
 def published_node_releases(repo, conn, child, builds):
@@ -365,4 +382,4 @@ def published_node_releases(repo, conn, child, builds):
             # reviewed release or break the whole catalogue response.
             continue
         result[build['node_id']] = release
-    return result
+    return _with_directory_aliases(repo, result)

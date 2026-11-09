@@ -14,7 +14,7 @@ import { LearningClientError } from "@/features/learning/learning-client";
 import { LearningCourseStartButton } from "@/features/learning/learning-course-start-button";
 import { LearningTextbookIntroduction } from "@/features/learning/learning-textbook-introduction";
 import { TextbookPicture } from "@/features/learning/textbook-picture";
-import { textbookContentsPath, textbookIntroductionPath, type TextbookLocation } from "@/features/learning/textbook-navigation";
+import { textbookContentsPath, textbookCoursePath, textbookIntroductionPath, type TextbookLocation } from "@/features/learning/textbook-navigation";
 import { loadTextbookContents } from "@/features/learning/textbook-contents-client";
 import { useTextbookCatalog } from "@/features/learning/use-textbook-catalog";
 import type { TextbookContents } from "@/lib/contracts/textbooks";
@@ -85,7 +85,7 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
   const introduction = location?.introductionId ? (detail?.introduction?.introductionId === location.introductionId ? detail.introduction : introUnit?.introduction) : null;
   if (detail && introduction) return <LearningTextbookIntroduction key={`${contentsKey}:${introduction.contentSha256}`} student={student} contents={detail} introduction={introduction} unitId={introUnit?.unitId} />;
 
-  return <SchoolbagShell student={student} className="space-textbooks storybook-directory textbook-browser"
+  return <SchoolbagShell student={student} className="textbook-page storybook-directory textbook-browser"
     navigation={<Link href="/learning" onClick={goHome}><Backpack size={32} aria-hidden="true" /><span>回到书包</span></Link>}>
     {!detail && <header className="textbook-empty-heading"><h1>{book ? `我的${subjectNames[book.subject]}课本` : location?.subject ? `${subjectNames[location.subject]}教材目录` : "我的课本"}</h1><Button variant="quiet" size="compact" onClick={refreshAll}><RefreshCw aria-hidden="true" />刷新教材</Button></header>}
     {error && !detail ? <div className="textbook-state" role="alert"><p>{error}</p><Button onClick={refreshAll}>再试一次</Button></div>
@@ -149,7 +149,7 @@ export function LearningTextbooks({ student, location }: { student: Student; loc
                 <ol className="textbook-lessons">{activeUnit.lessons.map(lesson => <li key={lesson.nodeId} className="textbook-lesson" aria-current={detail.currentNodeId === lesson.nodeId ? "step" : undefined}>
                   <div>{lesson.sectionTitle ? <p>{lesson.sectionTitle}</p> : null}<h4>{lesson.title}</h4><p>{lesson.printedPage ? `课本第 ${lesson.printedPage} 页` : "对应课本课程"}{detail.currentNodeId === lesson.nodeId ? " · 学校当前进度" : ""}</p></div>
                   {lesson.status === "ready" && lesson.course && (detail.selected || detail.accessMode === "published") ? lesson.course.delivery === "fixed_textbook"
-                    ? <Button asChild><Link prefetch={false} href={`/learning/textbooks/courses/${lesson.course.contentKey}`}>开始上课<ArrowRight size={20} aria-hidden="true" /></Link></Button>
+                    ? <Button asChild><Link prefetch={false} href={textbookCoursePath(lesson.course.contentKey, lesson.course.entry)}>开始上课<ArrowRight size={20} aria-hidden="true" /></Link></Button>
                     : <LearningCourseStartButton courseId={lesson.course.courseId} version={lesson.course.courseVersion} />
                     : <span className="textbook-lesson-status">{lesson.status === "locked" ? lesson.message || "请先完成前面的课程" : "课件待生成"}</span>}
                 </li>)}</ol>
@@ -210,7 +210,7 @@ function PictureLessons({ detail, unit, onChooseUnits }: { detail: TextbookConte
         <span className="learning-picture-caption"><span>单元探索 · 约 {guide.estimatedMinutes} 分钟</span><strong>{guide.title}</strong></span>
       </Link>}
       {lessons.slice(Math.max(0, first - guideCount), last - guideCount).map(lesson => <Link className="learning-picture-launch" prefetch={false} key={lesson.nodeId}
-        href={`/learning/textbooks/courses/${lesson.course!.contentKey}`} aria-label={`开始上课，${lesson.title}`}>
+        href={textbookCoursePath(lesson.course!.contentKey, lesson.course!.entry)} aria-label={`开始上课，${lesson.title}`}>
         <span className="picture-course-art"><LessonPicture title={lesson.title} subject={detail.book.subject} contentKey={lesson.course!.contentKey} /><span className="learning-picture-play"><Play size={30} fill="currentColor" aria-hidden="true" /></span></span>
         <span className="learning-picture-caption"><span>互动课堂</span><strong>{lesson.title}</strong></span>
       </Link>)}

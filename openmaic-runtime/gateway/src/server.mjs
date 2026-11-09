@@ -3,6 +3,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { Writable } from "node:stream";
 import { URL } from "node:url";
 import { parse } from "parse5";
+import { createTextbookMediaCache } from "./textbook-media-cache.mjs";
 
 const DEFAULT_MAX_BODY_BYTES = 25 * 1024 * 1024;
 const MAX_ACTIVITY_STATE_BODY_BYTES = 384 * 1024;
@@ -76,6 +77,7 @@ const CLIENT_PROVIDER_HEADERS = new Set([
 
 export function createGateway(overrides = {}) {
   const config = gatewayConfig(overrides);
+  config.verifiedTextbookMedia = createTextbookMediaCache();
   return http.createServer((request, response) => {
     void handleRequest(request, response, config).catch((error) => {
       if (response.destroyed || response.writableEnded) return;
@@ -126,7 +128,8 @@ async function handleRequest(request, response, config) {
   const runtime = await validateRuntime(runtimeToken, config);
   // The page/referrer only selects a credential; the backend remains the
   // authority for its classroom, student, expiry, and permitted operations.
-  if (selection.classroomId && runtime.classroomId !== selection.classroomId) {
+  if ((selection.classroomId && runtime.classroomId !== selection.classroomId)
+      || (selection.entry || (selection.classroomId && runtime.entry)) && selection.entry !== runtime.entry) {
     return unauthorized(response);
   }
   if (runtime.purpose === 'fixed_textbook') {
@@ -254,6 +257,7 @@ export function prepareRuntimeEvent(raw, runtime) {
   const fieldsByType = {
     scene_entered: ["sceneId", "sceneIndex"],
     action_completed: ["actionId", "sceneId", "sceneIndex"],
+    section_speech_completed: ["actionId", "sceneId", "sceneIndex"],
     answer_submitted: ["attemptNumber", "questionId", "response", "sceneId", "sceneIndex"],
     asr_transcribed: ["sceneId", "sceneIndex", "transcript", "turnId"],
     interaction_completed: ["action", "controlSelector", "feedbackText", "objectiveIndex", "sceneId", "sceneIndex", "value"],
@@ -271,6 +275,9 @@ export function prepareRuntimeEvent(raw, runtime) {
     return invalidRuntimeEvent();
   }
   const payload = { ...input.payload };
+  if (input.type === "section_speech_completed" &&
+      (runtime.purpose !== "fixed_textbook" || !validTextbookEntry(runtime.entry) ||
+       typeof payload.actionId !== "string")) return invalidRuntimeEvent();
   if (
     !Number.isInteger(payload.sceneIndex) ||
     payload.sceneIndex < 0 ||
@@ -453,14 +460,17 @@ async function launchTextbook(_request, response, url, config) {
     return unauthorized(response);
   const result = await backendJson(config, '/internal/learning/textbooks/runtime/exchange', { ticket });
   if (!result.ok || !String(result.runtimeToken).startsWith('tbpr_')
-      || !/^tbpub_[a-f0-9]{24}$/.test(String(result.classroomId))) return unauthorized(response);
+      || !/^tbpub_[a-f0-9]{24}$/.test(String(result.classroomId))
+      || (result.entry !== undefined && !validTextbookEntry(result.entry))) return unauthorized(response);
+  const query = new URLSearchParams({ mira: '1', textbook: '1' });
+  if (result.entry) query.set('entry', result.entry);
   const maxAge = Math.max(1, Math.floor((Number(result.expiresAt) - Date.now()) / 1000));
   response.statusCode = 303;
-  response.setHeader('Set-Cookie', [RUNTIME_COOKIE, classroomCookieName(result.classroomId)].map(name =>
+  response.setHeader('Set-Cookie', [RUNTIME_COOKIE, classroomCookieName(result.classroomId, result.entry)].map(name =>
     serializeCookie(name, result.runtimeToken, { maxAge, secure: config.secureCookie })));
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('Referrer-Policy', 'no-referrer');
-  response.setHeader('Location', `/classroom/${result.classroomId}?mira=1&textbook=1`);
+  response.setHeader('Location', `/classroom/${result.classroomId}?${query}`);
   response.end();
 }
 
@@ -475,9 +485,18 @@ export function authorizeTextbookRequest(request, url, runtime) {
   if (method !== 'GET') return method === 'HEAD' && FORMAL_TEACHER_ASSET_PATHS.has(url.pathname)
     ? authorizeRuntimeRequest(request, url, runtime) : { allowed: false };
   if (url.pathname === '/api/server-providers') return { allowed: true, kind: 'json' };
-  if (url.pathname === '/api/classroom')
-    return { allowed: url.searchParams.getAll('id').length === 1 && url.searchParams.get('id') === runtime.classroomId,
-      kind: 'textbook-classroom' };
+  if (url.pathname === '/api/classroom') {
+    const params = url.searchParams;
+    const allowed = params.getAll('id').length === 1 && params.get('id') === runtime.classroomId;
+    if (params.has('view')) return { allowed: allowed && params.size === 2 && params.get('view') === 'pages',
+      kind: 'textbook-classroom', index: true };
+    if (params.has('scene')) {
+      const sceneId = params.get('scene');
+      return { allowed: allowed && params.size === 2 && sceneId.length > 0 && sceneId.length <= 128,
+        kind: 'textbook-classroom', sceneId };
+    }
+    return { allowed, kind: 'textbook-classroom' };
+  }
   if (url.pathname.startsWith('/api/classroom-media/')) {
     const media = runtime.media?.find(item => item.path === url.pathname);
     return { allowed: Boolean(media && !url.search), kind: 'textbook-media', media };
@@ -506,19 +525,31 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
   }
   if (decision.kind === 'textbook-classroom') {
     const result = await backendJson(config, '/internal/learning/textbooks/runtime/classroom', undefined, trusted, 'GET');
+    const scenes = result.classroom?.scenes || [];
+    if (decision.index && result.success) {
+      return json(response, 200, { success: true, classroom: {
+        stage: result.classroom.stage, scenes: scenes.map(textbookPageSummary), paged: true,
+      } });
+    }
+    const selected = decision.sceneId ? scenes.find(scene => scene.id === decision.sceneId) : undefined;
+    if (decision.sceneId && !selected) {
+      return json(response, 404, { success: false, error: 'textbook_page_not_found' });
+    }
     // The interactive iframe intentionally has an opaque origin. Its media
     // requests cannot carry the classroom's SameSite cookie. Deliver only
     // these exact reviewed bytes inside the authenticated snapshot instead
     // of relaxing iframe isolation or exposing a public media route.
     const verifiedAssets = new Map();
-    for (const scene of result.classroom?.scenes || []) {
+    await Promise.all((selected ? [selected] : scenes).map(async scene => {
       // This is delivery metadata, never an authored assertion of ownership.
       delete scene.miraPageNarration;
       bindTextbookActivityPersistence(scene, runtime);
-      if (scene.miraActivity || scene.type !== 'interactive' || typeof scene.content?.html !== 'string') continue;
+      if (scene.miraActivity || scene.type !== 'interactive' || typeof scene.content?.html !== 'string') return;
       const embedded = runtime.media.filter(media => scene.content.html.includes(media.path));
       const assets = await Promise.all(embedded.map(async media => {
-        if (!verifiedAssets.has(media.path)) verifiedAssets.set(media.path, textbookMediaBytes(media, config));
+        if (!verifiedAssets.has(media.path)) {
+          verifiedAssets.set(media.path, textbookMediaBytes(media, runtime.releaseSha256, config));
+        }
         return { path: media.path, mimeType: media.mimeType,
           base64: (await verifiedAssets.get(media.path)).toString('base64') };
       }));
@@ -527,8 +558,8 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
       // embedding below replaces those paths with data/blob URLs.
       bindTextbookPageNarration(scene, runtime, new Set(assets.map(asset => asset.path)));
       scene.content.html = embedTextbookSceneMedia(scene.content.html, assets);
-    }
-    return json(response, 200, result);
+    }));
+    return json(response, 200, selected ? { success: true, scene: selected } : result);
   }
   if (decision.kind === 'textbook-record') {
     let data;
@@ -556,7 +587,7 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
   }
   if (decision.kind === 'textbook-media') {
     const media = decision.media;
-    const bytes = await textbookMediaBytes(media, config);
+    const bytes = await textbookMediaBytes(media, runtime.releaseSha256, config);
     response.statusCode = 200;
     response.setHeader('Content-Type', media.mimeType);
     response.setHeader('Content-Length', bytes.length);
@@ -567,6 +598,23 @@ async function handleTextbookRequest(request, response, url, runtime, runtimeTok
   }
   if (decision.kind === 'student-video-export-capability') return json(response, 200, { enabled: false });
   return proxyToUpstream(request, response, url, runtime, config, decision, runtimeToken);
+}
+
+function textbookPageSummary(scene) {
+  const { id, stageId, order, title, type, outlineId, miraActivity } = scene;
+  const content = { type };
+  if (type === 'slide') content.canvas = { id, elements: [] };
+  if (type === 'quiz') content.questions = [];
+  if (type === 'interactive') {
+    // Resume and forward navigation use the published participation plan even
+    // when the page that carries it has not been opened in this session.
+    const scripts = String(scene.content?.html || '').matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi);
+    content.html = [...scripts].filter(([, attrs]) =>
+      /\bid\s*=\s*["']mira-interaction-plan["']/i.test(attrs)
+      && /\btype\s*=\s*["']application\/json["']/i.test(attrs)
+    ).map(([script]) => script).join('');
+  }
+  return { id, stageId, order, title, type, outlineId, miraActivity, content, miraPageSummary: true };
 }
 
 /** Bind only the authenticated release's exact cue/text/media relationship.
@@ -702,19 +750,24 @@ export function embedTextbookSceneMedia(html, assets) {
     + 'document.open();document.write(page);document.close();})();</script></body></html>';
 }
 
-async function textbookMediaBytes(media, config) {
+async function textbookMediaBytes(media, releaseSha256, config) {
   const newFormats = { 'video/mp4': '.mp4', 'video/webm': '.webm', 'model/gltf-binary': '.glb' };
   if (!/^\/api\/classroom-media\/tbpub_[a-f0-9]{24}\/(audio|media)\/[A-Za-z0-9_.-]+$/.test(media.path)
       || !['audio/wav', 'audio/mpeg', 'image/webp', 'image/png', ...Object.keys(newFormats)].includes(media.mimeType)
       || (newFormats[media.mimeType] && !media.path.toLowerCase().endsWith(newFormats[media.mimeType]))
       || !/^[a-f0-9]{64}$/.test(media.sha256) || !Number.isInteger(media.byteSize)
       || media.byteSize <= 0 || media.byteSize > MAX_RUNTIME_AUDIO_BYTES) return runtimeAudioBindingError();
-  const upstream = await fetch(new URL(media.path, config.upstreamUrl), { redirect: 'error', signal: AbortSignal.timeout(config.upstreamTimeoutMs) });
-  if (!upstream.ok) return runtimeAudioDeliveryError();
-  const bytes = await readFetchBody(upstream.body, MAX_RUNTIME_AUDIO_BYTES, runtimeAudioBindingError);
-  if (bytes.length !== media.byteSize || createHash('sha256').update(bytes).digest('hex') !== media.sha256)
-    return runtimeAudioBindingError();
-  return bytes;
+  const key = /^[a-f0-9]{64}$/.test(releaseSha256 || '')
+    ? JSON.stringify([releaseSha256, media.path, media.sha256, media.byteSize, media.mimeType])
+    : null;
+  return config.verifiedTextbookMedia(key, async () => {
+    const upstream = await fetch(new URL(media.path, config.upstreamUrl), { redirect: 'error', signal: AbortSignal.timeout(config.upstreamTimeoutMs) });
+    if (!upstream.ok) return runtimeAudioDeliveryError();
+    const bytes = await readFetchBody(upstream.body, MAX_RUNTIME_AUDIO_BYTES, runtimeAudioBindingError);
+    if (bytes.length !== media.byteSize || createHash('sha256').update(bytes).digest('hex') !== media.sha256)
+      return runtimeAudioBindingError();
+    return bytes;
+  });
 }
 
 export function authorizeRuntimeRequest(request, url, runtime) {
@@ -1460,8 +1513,21 @@ function readCookie(header, name) {
   return "";
 }
 
-function classroomCookieName(classroomId) {
-  return CLASSROOM_COOKIE_PREFIX + createHash("sha256").update(classroomId).digest("hex").slice(0, 32);
+function validTextbookEntry(value) {
+  return typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/.test(value);
+}
+
+function classroomCookieName(classroomId, entry) {
+  const identity = entry ? `${classroomId}\n${entry}` : classroomId;
+  return CLASSROOM_COOKIE_PREFIX + createHash("sha256").update(identity).digest("hex").slice(0, 32);
+}
+
+function documentEntry(url, classroomId) {
+  if (!classroomId || url.pathname !== `/classroom/${classroomId}`) return undefined;
+  const entries = url.searchParams.getAll('entry');
+  if (!entries.length) return undefined;
+  return entries.length === 1 && validTextbookEntry(entries[0])
+    && /^tbpub_[a-f0-9]{24}$/.test(classroomId) && url.searchParams.get('textbook') === '1' ? entries[0] : null;
 }
 
 function classroomInPath(pathname) {
@@ -1476,6 +1542,9 @@ function classroomInPath(pathname) {
 
 function selectRuntimeCookie(request, url, config) {
   let classroomId = classroomInPath(url.pathname);
+  const document = classroomId && url.pathname === `/classroom/${classroomId}`;
+  let entry = documentEntry(url, classroomId);
+  if (entry === null) return null;
   if (url.pathname === "/api/classroom") {
     const ids = url.searchParams.getAll("id");
     if (ids.length !== 1 || !CLASSROOM_ID_PATTERN.test(ids[0])) return null;
@@ -1495,18 +1564,24 @@ function selectRuntimeCookie(request, url, config) {
     }
     if (source.username || source.password) return null;
     if (origins.has(source.origin)) {
-      // Ignore query parameters: a page cannot name another classroom there.
+      // The pathname owns the classroom. Only its validated entry selector
+      // participates in the credential namespace for same-origin requests.
       const sourceClassroom = classroomInPath(source.pathname);
       if (classroomId && sourceClassroom && classroomId !== sourceClassroom) return null;
       classroomId ||= sourceClassroom;
+      if (!document) {
+        entry = documentEntry(source, sourceClassroom);
+        if (entry === null) return null;
+      }
     } else if (!classroomId) {
       // An external page must never select a credential for unscoped APIs.
       return null;
     }
   }
   const cookies = request.headers.cookie;
-  const scoped = classroomId && readCookie(cookies, classroomCookieName(classroomId));
-  if (scoped) return { token: scoped, classroomId, legacy: false };
+  const scoped = classroomId && readCookie(cookies, classroomCookieName(classroomId, entry));
+  if (scoped) return { token: scoped, classroomId, entry, legacy: false };
+  if (entry) return null;
   const legacy = readCookie(cookies, RUNTIME_COOKIE);
   const hasScopedCookies = String(cookies || "").split(";").some(part =>
     part.trim().startsWith(CLASSROOM_COOKIE_PREFIX));

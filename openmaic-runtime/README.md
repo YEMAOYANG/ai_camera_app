@@ -28,6 +28,30 @@ Patches `0251`–`0253` keep frozen classroom URLs, original source paths and me
 
 Maintain storage configuration only in `backend/.env`; the native launcher forwards the same `COURSE_STORAGE_*` keys. For the subject layout, `COURSE_STORAGE_PREFIX` binds the fourth directory's archive batch date (`YYYY-MM-DD`), and `COURSE_STORAGE_MANIFEST_PATH` is the absolute path to `backend/data/course-storage/active-manifest.json`. Endpoint, bucket, date and region are part of the media verification identity. `local` uses disk; `manifest` requires remote delivery for registered files and leaves unregistered originals local; `remote` rejects unregistered files. A registered remote failure never falls back to disk.
 
+Patch `0301` adds Tencent COS virtual-hosted addressing. Existing MinIO keeps
+`COURSE_STORAGE_PROVIDER=s3-compatible` and `COURSE_STORAGE_ADDRESSING_STYLE=path`.
+COS uses `tencent-cos`, `virtual`, the HTTPS service endpoint
+`https://cos.<region>.myqcloud.com`, and the full bucket name including APPID.
+Python readers sign private COS reads with the official SDK; Range, version,
+ETag and byte/hash checks remain in the existing readers. API keys stay private.
+
+For a shadow migration, configure the separate `COS_TARGET_*` keys in the same
+backend dotenv. Run `node courseware/tools/mirror_course_storage.mjs pilot`, then
+`mirror --concurrency 16`. `--limit` and `--max-bytes` bound each run. The tool
+requires target versioning, encrypts uploads with SSE-COS, and preserves the
+source keys. Small objects use bounded buffers; large archives stream. Successful
+uploads record a source SHA-256 plus COS Content-MD5/ETag verification, or complete
+destination readback for non-MD5 source identities. `pilot` always checks complete
+bytes and Range reads. `verify` reads all selected source and target bytes without
+uploading. Private receipts and a single-process lock live under
+`backend/data/course-storage/cos-migration/`. Resume checks recorded target versions;
+conflicting target contents stop the run. COS versioned buckets do not provide
+the same documented conditional-create guarantee as MinIO: keep this target
+dedicated to the migration and do not run other writers against it. Source objects
+are never deleted. A completed mirror does not switch delivery: registry storage
+IDs, target ETags/version IDs, the courseware asset manifest, queue state and
+student playback must be reconciled before changing the active configuration.
+
 Patches `0254`–`0255` add `COURSE_STORAGE_MODE=registry` for complete course-file reads. The backend database keeps immutable file versions, course scopes and current heads (added by migration `089_course_storage_registry.sql`, now part of the PostgreSQL baseline); file bytes remain in MinIO. This mode does not require a local active media manifest. Python readers and Native server readers resolve the original source path through this registry, verify remote identity, size and SHA-256, and never use a local shadow for a registered path. Existing complete archives supply originals through bounded ZIP Range reads, so opening a small JSON does not download the whole ZIP. Database release snapshots remain frozen verification evidence, alongside course associations and learning records.
 
 Patch `0256` extends the same reader to fixed authoring materials: uploaded originals, their session copies, extracted text and course research sources. Archive export selects these through the exact frozen producer/session and same-owner material records, validates MIME and bytes, and preserves both source keys. Registered material writes are immutable; identical writes are idempotent and compensation cannot remove an archived original. New, unregistered authoring files remain a preparation workspace until the saved course is archived. Dynamic teaching conversations, student learning state and AI usage logs are separate from fixed course files.

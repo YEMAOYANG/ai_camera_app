@@ -35,6 +35,17 @@ class CoursewareAssetRouteTest(unittest.TestCase):
         self.assertEqual(result.headers["Cache-Control"], "public, max-age=31536000, immutable")
         self.store.read_public.assert_called_once_with("textbooks/navigation-v1/picture.webp")
 
+    def test_course_cover_dispatches_by_immutable_content_key(self):
+        key = "a" * 64
+        with patch("routes.api.v2.student_textbooks.textbook_learning_service") as service, patch(
+            "services.textbook_directory_cover.read_directory_cover", return_value=(self.entry, self.body)
+        ) as read_cover:
+            result = self.get(f"textbooks/course-covers-v2/{key}.webp")
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.data, self.body)
+        read_cover.assert_called_once_with(service.return_value.repository, key)
+        self.store.read_public.assert_not_called()
+
     def test_unknown_invalid_and_storage_errors_are_explicit_and_sanitized(self):
         self.store.read_public.side_effect = CoursewareAssetNotFound("private location")
         self.assertEqual(self.get().status_code, 404)

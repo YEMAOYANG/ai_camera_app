@@ -15,11 +15,7 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--mira-ink);
-  background:
-    radial-gradient(circle at 10% 8%, rgba(47, 108, 246, 0.1), transparent 28rem),
-    radial-gradient(circle at 92% 80%, rgba(79, 143, 122, 0.09), transparent 26rem),
-    radial-gradient(circle at 72% 12%, rgba(255, 209, 102, 0.12), transparent 18rem),
-    linear-gradient(145deg, var(--mira-bg) 0%, var(--mira-bg-warm) 100%);
+  background: var(--mira-bg);
   font-family: var(--font-mira-sans);
   text-rendering: optimizeLegibility;
 }
@@ -60,11 +56,11 @@ a {
 
 ::selection {
   color: var(--mira-ink);
-  background: rgba(47, 108, 246, 0.2);
+  background: var(--mira-brand-wash);
 }
 
 .focus-ring:focus-visible {
-  outline: 3px solid rgba(47, 108, 246, 0.32);
+  outline: 2px solid var(--mira-focus);
   outline-offset: 3px;
 }
 
@@ -1759,7 +1755,7 @@ a {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  color: var(--mira-brand-deep);
+  color: var(--mira-ink);
   background: var(--mira-brand-wash);
   font-size: 15px;
   font-weight: 900;
@@ -2304,7 +2300,7 @@ a {
 /* One Mira classroom system with subject character and age-appropriate density. */
 .classroom-page {
   --classroom-accent: var(--mira-brand);
-  --classroom-accent-text: var(--mira-brand-deep);
+  --classroom-accent-text: var(--mira-ai);
   --classroom-accent-wash: var(--mira-brand-wash);
 }
 
@@ -2319,7 +2315,7 @@ a {
 
 .classroom-subject-math {
   --classroom-accent: var(--mira-brand);
-  --classroom-accent-text: var(--mira-brand-deep);
+  --classroom-accent-text: var(--mira-ai);
   --classroom-accent-wash: var(--mira-brand-wash);
   background:
     radial-gradient(circle at 10% 13%, color-mix(in srgb, var(--mira-brand) 12%, transparent), transparent 26rem),
@@ -2433,7 +2429,7 @@ a {
   inset: 0;
   z-index: 80;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: 60px minmax(0, 1fr);
   width: 100vw;
   min-width: 320px;
   height: 100dvh;
@@ -2448,8 +2444,8 @@ a {
   align-items: center;
   gap: 18px;
   min-width: 0;
-  min-height: 64px;
-  padding: 8px max(18px, env(safe-area-inset-right)) 8px max(18px, env(safe-area-inset-left));
+  min-height: 60px;
+  padding: 6px max(18px, env(safe-area-inset-right)) 8px max(18px, env(safe-area-inset-left));
   border-bottom: 1px solid var(--mira-border-soft);
   background: var(--mira-surface);
 }
@@ -2475,10 +2471,7 @@ a {
     transform var(--mira-duration-fast) var(--mira-ease-out);
 }
 
-.full-openmaic-back:hover {
-  color: #1d4dbf;
-  background: #dce8ff;
-}
+.full-openmaic-back:hover { background: var(--mira-control-hover); }
 
 .full-openmaic-back:active { transform: translateY(1px); }
 
@@ -2889,3 +2882,16 @@ a {
     animation: none;
   }
 }
+
+.mira-wordmark { display: grid; width: fit-content; color: var(--mira-ink); line-height: 1.1; }
+.mira-wordmark strong { font-size: 23px; font-weight: 850; }
+.mira-wordmark span { margin-top: 3px; font-size: 10px; letter-spacing: .1em; }
+.mira-wordmark--compact strong { font-size: 19px; }
+
+.classroom-page .classroom-play:enabled,
+.classroom-page .classroom-scene-button.is-active .classroom-scene-index,
+.classroom-page .sort-train-engine,
+.classroom-page .aid-flow-arrow { color: var(--mira-on-brand); }
+.classroom-page .classroom-listen-question { color: var(--mira-on-brand); background: var(--mira-brand-deep); }
+.classroom-page .phonics-listen:not(.is-fallback) { color: var(--mira-ink); }
+.classroom-page.classroom-grade-lower button:not(.mira-button) { min-height: 48px; min-width: 48px; }

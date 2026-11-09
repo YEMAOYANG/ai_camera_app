@@ -1,9 +1,10 @@
 "use client";
 
-import { AlertCircle, LoaderCircle, Orbit, RefreshCw } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { StudentSessionState } from "@/features/auth/student-session-state";
 import {
   ClassroomBackdrop,
   ClassroomHeader,
@@ -265,7 +266,7 @@ function ClassroomPlayerReady({
         : undefined;
 
   return (
-    <div className={`classroom-page ${stagePresentation.subjectClass} ${stagePresentation.gradeBandClass}`}>
+    <div className={`mira-ui-surface classroom-page ${stagePresentation.subjectClass} ${stagePresentation.gradeBandClass}`}>
       <ClassroomHeader studentName={student.displayName} title={classroom.title} minutes={classroom.estimatedMinutes} />
       <div className="classroom-layout">
         <SceneRail scenes={scenes} currentSceneId={scene.id} unlockedSceneIndex={authoritativeSceneIndex} open={railOpen} onClose={() => setRailOpen(false)} onSelect={selectScene} />
@@ -299,7 +300,7 @@ function scenePhaseLabel(scene: ReturnType<typeof currentScene>) {
 }
 
 export function ClassroomBooting() {
-  return <main id="main-content" className="space-route-state" aria-busy="true"><div className="space-route-state-content" role="status"><span className="space-route-orbit" aria-hidden="true"><Orbit /></span><p className="space-route-eyebrow">MIRA 学习空间</p><h1>准备进入课堂</h1><p><LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" />Mira 正在打开互动课堂</p></div></main>;
+  return <StudentSessionState title="准备进入课堂" description="正在打开互动课堂" />;
 }
 
 function createIdempotencyKey(sessionId: string, actionId: string) {

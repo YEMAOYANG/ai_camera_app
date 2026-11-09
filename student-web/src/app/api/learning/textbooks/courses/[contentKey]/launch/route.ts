@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { studentRouteError } from "@/lib/api/route-response";
 import { applyRefreshedStudentSession, studentBackendRequest } from "@/lib/auth/student-backend-session";
-import { textbookLaunchSchema } from "@/lib/contracts/textbooks";
+import { textbookLaunchRequestSchema, textbookLaunchSchema, textbookSectionProgressSchema } from "@/lib/contracts/textbooks";
 import { openMaicLaunchUrlForRequest, resolveOpenMaicRuntimeOrigin } from "@/lib/security/openmaic-runtime-policy";
 
 const classroomPath = /^\/classroom\/(tbpub_[a-f0-9]{24})$/;
@@ -21,9 +21,10 @@ function setCookies(headers: Headers) {
   return combined.split(/,(?=\s*[!#$%&'*+.^_`|~0-9A-Za-z-]+=)/).map(value => value.trim());
 }
 
-function verifiedRuntimeCookies(headers: Headers, classroomId: string, secure: boolean) {
+function verifiedRuntimeCookies(headers: Headers, classroomId: string, secure: boolean, entry?: string) {
+  const identity = entry ? `${classroomId}\n${entry}` : classroomId;
   const scoped = `mira_openmaic_runtime_classroom_${createHash("sha256")
-    .update(classroomId).digest("hex").slice(0, 32)}`;
+    .update(identity).digest("hex").slice(0, 32)}`;
   const expected = new Set(["mira_openmaic_runtime", scoped]);
   const found = new Map<string, { raw: string; value: string }>();
   for (const raw of setCookies(headers)) {
@@ -54,7 +55,7 @@ function verifiedRuntimeCookies(headers: Headers, classroomId: string, secure: b
   return [...found.values()].map(item => item.raw);
 }
 
-async function exchangeLocalLaunch(data: { launchUrl: string }, browserLaunchUrl: string) {
+async function exchangeLocalLaunch(data: { launchUrl: string; entry?: string }, browserLaunchUrl: string) {
   const exchanged = await fetch(data.launchUrl, { method: "GET", redirect: "manual", cache: "no-store" });
   if (exchanged.status !== 303) throw new Error("课堂启动未通过检查");
   const location = exchanged.headers.get("location");
@@ -62,27 +63,38 @@ async function exchangeLocalLaunch(data: { launchUrl: string }, browserLaunchUrl
   const upstream = new URL(location, data.launchUrl);
   const match = classroomPath.exec(upstream.pathname);
   if (upstream.origin !== new URL(data.launchUrl).origin || upstream.username || upstream.password
-      || upstream.hash || !match || upstream.searchParams.size !== 2
-      || upstream.searchParams.get("mira") !== "1" || upstream.searchParams.get("textbook") !== "1")
+      || upstream.hash || !match || upstream.searchParams.size !== (data.entry ? 3 : 2)
+      || upstream.searchParams.get("mira") !== "1" || upstream.searchParams.get("textbook") !== "1"
+      || upstream.searchParams.get("entry") !== (data.entry ?? null))
     throw new Error("课堂启动未通过检查");
   const launch = new URL(browserLaunchUrl);
   launch.pathname = upstream.pathname;
   launch.search = upstream.search;
   launch.hash = "";
   return { launchUrl: launch.toString(), cookies: verifiedRuntimeCookies(
-    exchanged.headers, match[1], launch.protocol === "https:") };
+    exchanged.headers, match[1], launch.protocol === "https:", data.entry) };
 }
 
-export async function POST(request: NextRequest, context: { params: Promise<{ contentKey: string }> }) {
+type RouteContext = { params: Promise<{ contentKey: string }> };
+
+export async function POST(request: NextRequest, context: RouteContext) {
   const { contentKey } = await context.params;
   if (!/^[a-f0-9]{64}$/.test(contentKey) || request.nextUrl.searchParams.size)
     return NextResponse.json({ ok: false, error: "textbook_query_invalid", message: "课程地址无效" }, { status: 400 });
+  let body;
+  try {
+    const raw = await request.text();
+    body = textbookLaunchRequestSchema.parse(raw ? JSON.parse(raw) : {});
+  } catch {
+    return NextResponse.json({ ok: false, error: "textbook_query_invalid", message: "课程地址无效" }, { status: 400 });
+  }
   try {
     const { payload, refreshed } = await studentBackendRequest(request,
-      `/api/v2/student/learning/textbooks/courses/${contentKey}/launch`, { method: "POST", body: "{}" });
+      `/api/v2/student/learning/textbooks/courses/${contentKey}/launch`, { method: "POST", body: JSON.stringify(body) });
     const data = textbookLaunchSchema.parse(payload);
     const origin = resolveOpenMaicRuntimeOrigin();
-    if (!origin || data.contentKey !== contentKey || new URL(data.launchUrl).pathname !== "/mira/textbook-launch")
+    if (!origin || data.contentKey !== contentKey || (body.entry && data.entry !== body.entry)
+        || new URL(data.launchUrl).pathname !== "/mira/textbook-launch")
       throw new Error("课堂地址未通过检查");
     const browserUrl = new URL(request.nextUrl);
     browserUrl.host = request.headers.get("host") || browserUrl.host;
@@ -99,5 +111,22 @@ export async function POST(request: NextRequest, context: { params: Promise<{ co
     return applyRefreshedStudentSession(response, refreshed);
   } catch (error) {
     return studentRouteError(error, "课堂暂时打不开，请返回教材目录再试");
+  }
+}
+
+export async function GET(request: NextRequest, context: RouteContext) {
+  const { contentKey } = await context.params;
+  const query = request.nextUrl.searchParams;
+  const sessionId = query.get("learningSessionId");
+  if (!/^[a-f0-9]{64}$/.test(contentKey) || query.size !== 1 || !sessionId
+      || !/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/.test(sessionId))
+    return NextResponse.json({ ok: false, error: "textbook_query_invalid", message: "课程地址无效" }, { status: 400 });
+  try {
+    const { payload, refreshed } = await studentBackendRequest(request,
+      `/api/v2/student/learning/textbooks/courses/${contentKey}/sections?${query}`);
+    return applyRefreshedStudentSession(NextResponse.json(textbookSectionProgressSchema.parse(payload),
+      { headers: { "Cache-Control": "private, no-store" } }), refreshed);
+  } catch (error) {
+    return studentRouteError(error, "课堂进度暂时无法读取");
   }
 }

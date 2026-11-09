@@ -246,6 +246,7 @@
 .homework-chat-exchange + .homework-chat-exchange { margin-top: 28px; }
 .homework-chat-message { display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
 .homework-chat-avatar { flex: none; object-fit: cover; border-radius: 50%; border: 2px solid var(--mira-surface); }
+.homework-chat-child-avatar { display: grid; place-items: center; width: 36px; height: 36px; color: var(--mira-ai); background: var(--mira-brand-wash); }
 .homework-chat-message[data-speaking="true"] > .homework-chat-avatar { outline: 2px solid var(--mira-success); outline-offset: 2px; }
 .homework-chat-bubble { min-width: 0; max-width: calc(100% - 46px); padding: 16px; border-radius: 2px 12px 12px; background: var(--mira-surface-soft); overflow-wrap: anywhere; }
 .homework-chat-message-title { display: block; margin-bottom: 12px; font-size: 14px; font-weight: 550; color: var(--mira-muted); }

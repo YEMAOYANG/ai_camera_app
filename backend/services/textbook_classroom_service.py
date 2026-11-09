@@ -26,6 +26,7 @@ from services.course_file_store import CourseFileStore, CourseFileStorageError
 from services.textbook_quiz_evidence import record_quiz_evidence
 from services import textbook_activity_state as activity_state
 from content import textbook_course_interaction as course_interaction
+from content import textbook_sections as sections
 
 
 RECEIPT_SCHEMA = 'mira.openmaic.student-runtime-event-receipt.v1'
@@ -141,7 +142,7 @@ class TextbookClassroomService:
             fail()
         return build, release, course
 
-    def launch(self, token, key, *, access_scope='published_directory'):
+    def launch(self, token, key, *, access_scope='published_directory', entry=None):
         context = self.auth.authenticate(token)
         principal = context['principal']
         with self.repository.transaction() as conn:
@@ -149,14 +150,25 @@ class TextbookClassroomService:
             if child is None:
                 fail()
             build, release, course = self._release(conn, key, child, access_scope=access_scope)
+            plan = sections.plan_for(key, release['sha256'])
+            entry = sections.resolve_entry(plan, entry)
+            groups = sections.scene_groups(release, plan) if plan else None
             task, _ = self.learning.assign_catalog_task(conn, family_id=child['family_id'], child_id=child['id'],
                 course=course, created_by=principal['id'], now=now_ms())
             session, _ = self.learning.create_or_get_session(conn, family_id=child['family_id'], child_id=child['id'],
                 task_id=task['id'], course_id=course['id'], course_version=course['version'], now=now_ms())
+            section_status = None
+            if plan:
+                state = self._state(session)
+                section_status = sections.progress(state, plan, groups)
+                if entry == sections.CHECK_ENTRY and not section_status['checkReady']:
+                    sections.require_check(state, plan, groups)
             self.learning.mark_task_in_progress(conn, family_id=child['family_id'], task_id=task['id'], now=now_ms())
             authority = {'purpose': 'ticket', 'key': key, 'release': release['sha256'],
                 'studentSession': context['session']['id'], 'learningSession': session['id'],
                 'gradeRevision': int(child['grade_selection_revision']), 'accessScope': access_scope}
+            if entry is not None:
+                authority['entry'] = entry
             directory = self.repository.get_revision(conn, build['edition_id'], build['revision_id'])
             if release.get('assessmentMode') == 'ungraded':
                 from content.textbook_batch_release import activity_unit
@@ -166,7 +178,22 @@ class TextbookClassroomService:
         ticket = 'tbpt_' + self.signer.dumps(authority)
         return {'ok': True, 'launchUrl': self.public_url + '/mira/textbook-launch?' + urlencode({'ticket': ticket}),
             'title': course['title'], 'editionId': build['edition_id'], 'revisionId': build['revision_id'],
-            'unitId': unit['unitId'] if unit else None, 'contentKey': key, 'learningSessionId': session['id']}
+            'unitId': unit['unitId'] if unit else None, 'contentKey': key, 'learningSessionId': session['id'],
+            **({'entry': entry, 'sectionProgress': section_status} if plan else {})}
+
+    def section_progress(self, token, key, session_id):
+        principal = self.auth.authenticate(token)['principal']
+        with self.repository.transaction() as conn:
+            child = self.repository.child(conn, principal['family_id'], principal['child_id'])
+            if child is None:
+                fail()
+            _, release, course = self._release(conn, key, child, access_scope='published_directory')
+            plan = sections.plan_for(key, release['sha256'])
+            session = self.learning.get_session(conn, family_id=child['family_id'], session_id=session_id)
+            if (not plan or not session or session['child_id'] != child['id'] or session['course_id'] != course['id']
+                    or session['course_version'] != course['version']):
+                fail('课堂身份与课程不一致')
+            return {'ok': True, **sections.progress(self._state(session), plan, sections.scene_groups(release, plan))}
 
     def _authority(self, token, *, purpose='runtime'):
         prefix, age = ('tbpt_', 90) if purpose == 'ticket' else ('tbpr_', 14400)
@@ -192,13 +219,23 @@ class TextbookClassroomService:
             if (session is None or session['child_id'] != child['id'] or session['course_id'] != course['id']
                     or session['course_version'] != course['version'] or data.get('release') != release['sha256']):
                 fail('课堂身份与课程不一致')
+            plan = sections.plan_for(data['key'], release['sha256'])
+            if plan is not None:
+                # A ticket issued before sections were deployed must be reopened
+                # from the directory before it can acquire a new playback scope.
+                if 'entry' not in data:
+                    raise ApiError('textbook_session_invalid', '请从教材目录重新进入课堂', 401)
+                sections.resolve_entry(plan, data['entry'])
+                if data['entry'] == sections.CHECK_ENTRY:
+                    sections.require_check(self._state(session), plan, sections.scene_groups(release, plan))
         return data, child, build, release, course, session
 
     def exchange(self, ticket):
         data, _, _, release, _, session = self._authority(ticket, purpose='ticket')
         authority = {**data, 'purpose': 'runtime', 'expiresAt': now_ms() + 14400_000}
         return {'ok': True, 'runtimeToken': 'tbpr_' + self.signer.dumps(authority),
-            'classroomId': release['classroomId'], 'expiresAt': authority['expiresAt'], 'learningSessionId': session['id']}
+            'classroomId': release['classroomId'], 'expiresAt': authority['expiresAt'], 'learningSessionId': session['id'],
+            **({'entry': data['entry']} if 'entry' in data else {})}
 
     def validate(self, token):
         data, _, _, release, _, session = self._authority(token)
@@ -208,6 +245,13 @@ class TextbookClassroomService:
             'runtimeSessionId': session['id'], 'learningSessionId': session['id'], 'expiresAt': data['expiresAt'],
             'media': release['media'], 'releaseSha256': release['sha256'],
             'activityPersistence': activity_state.descriptors(release)}
+        if 'entry' in data:
+            result['entry'] = data['entry']
+            plan = sections.plan_for(data['key'], release['sha256'])
+            scenes = sections.scene_groups(release, plan)[data['entry']]
+            indexes = {scene['id']: index for index, scene in enumerate(scenes)}
+            result['activityPersistence'] = [{**item, 'sceneIndex': indexes[item['sceneId']]}
+                for item in result['activityPersistence'] if item['sceneId'] in indexes]
         if release.get('interactionCompletionContract'):
             contract = course_interaction.validate_contract(release)
             result['courseInteraction'] = {'schemaVersion': course_interaction.OP_SCHEMA,
@@ -215,10 +259,14 @@ class TextbookClassroomService:
         return result
 
     def classroom(self, token):
-        _, child, build, release, _, _ = self._authority(token)
+        data, child, build, release, _, _ = self._authority(token)
         release = self._playback_release(release)
         content = public_classroom(release)
         textbook_activity.attach(content, release)
+        if data and 'entry' in data:
+            plan = sections.plan_for(data['key'], release['sha256'])
+            visible = {scene['id'] for scene in sections.scene_groups(release, plan)[data['entry']]}
+            content['scenes'] = [scene for scene in content['scenes'] if scene['id'] in visible]
         # Bind the published subject, never the operator's default roster.
         # This is session presentation metadata; the signed release is unchanged.
         ids, agents = classroom_roster(self.repository.parse(build['input_json']), release)
@@ -236,7 +284,7 @@ class TextbookClassroomService:
         Fixed textbook means shared authored content, not a read-only player.
         The native discussion, voice, and whiteboard engines stay unchanged.
         """
-        _, child, build, release, course, session = self._authority(token)
+        authority, child, build, release, course, session = self._authority(token)
         if (not isinstance(data, dict) or set(data) != {'path', 'request'}
                 or data['path'] not in INTERACTION_PATHS or not isinstance(data['request'], dict)):
             raise ApiError('textbook_interaction_invalid', '课堂互动请求无效', 400)
@@ -245,6 +293,11 @@ class TextbookClassroomService:
         if data['path'] in {'/api/chat', '/api/chat/pi'}:
             release = self._playback_release(release)
             canonical_request = discussion_request(frozen, release, data['request'])
+            if authority and 'entry' in authority:
+                plan = sections.plan_for(authority['key'], release['sha256'])
+                visible = sections.scene_groups(release, plan)[authority['entry']]
+                if canonical_request['storeState']['currentSceneId'] not in {scene['id'] for scene in visible}:
+                    raise ApiError('textbook_entry_invalid', '这个课堂入口不包含该讲解页面', 400)
         from services.learning_paid_authority import scope_digest
         scope = {'purpose': 'required_teaching', 'gradeCode': frozen['gradeCode'], 'subject': frozen['subject'],
             'courseId': course['id'], 'courseVersion': course['version'], 'userId': child['id'],
@@ -294,9 +347,9 @@ class TextbookClassroomService:
         return value
 
     @staticmethod
-    def _status(session, release):
+    def _status(session, release, *, entry=None, visible_scenes=None):
         state = TextbookClassroomService._state(session)
-        scenes = textbook_activity.ordered_scenes(release)
+        scenes = visible_scenes if entry is not None else textbook_activity.ordered_scenes(release)
         visited = set(state['visited'])
         resume = max((i for i, s in enumerate(scenes) if s['id'] in visited), default=-1)
         play = state.get('textbookPlay')
@@ -310,10 +363,13 @@ class TextbookClassroomService:
             if pending:
                 resume = next(i for i, s in enumerate(scenes)
                               if s['id'] == textbook_activity.definition(release=release).plan['sceneIds'][pending])
-        complete = session['status'] == 'completed'
         # OpenMAIC records the final action after the page's narration finishes.
-        completed_scenes = [s['id'] for s in scenes if not s.get('actions')
-                            or s['actions'][-1]['id'] in state['actions']]
+        completed_scenes = (sections.completed_pages(state, scenes) if entry is not None else
+            [s['id'] for s in scenes if not s.get('actions') or s['actions'][-1]['id'] in state['actions']])
+        scoped_ready = bool(entry == sections.CHECK_ENTRY and state['quiz'] and len(completed_scenes) == len(scenes))
+        # An old course-wide completion is preserved in storage, but it cannot
+        # close a newly scoped runtime before its own evidence is present.
+        complete = session['status'] == 'completed' and (entry is None or scoped_ready)
         # Native activity completion is separate evidence from lecture audio.
         # Its own cues can pause the lecture without making a finished game
         # depend on replaying the legacy HTML introduction to the final action.
@@ -332,8 +388,9 @@ class TextbookClassroomService:
         zero_quiz_ready = bool(zero_quiz and interaction_contract and verified_interactions and zero_quiz_viewed)
         return {'ok': True, 'schemaVersion': RECEIPT_SCHEMA, 'runtimeSessionId': session['id'],
             'learningSessionId': session['id'], 'classroomId': release['classroomId'], 'releaseId': release['sha256'],
+            **({'entry': entry} if entry is not None else {}),
             'lastSequence': state['lastSequence'], 'nextSequence': state['lastSequence'] + 1, 'completed': complete,
-            'completionReady': zero_quiz_ready if zero_quiz else ungraded_ready if release.get('assessmentMode') == 'ungraded' else textbook_activity.complete(state) if (play or {}).get('flowVersion') == 2 else bool(state['quiz'] and len(visited) == len(scenes)
+            'completionReady': scoped_ready if entry is not None else zero_quiz_ready if zero_quiz else ungraded_ready if release.get('assessmentMode') == 'ungraded' else textbook_activity.complete(state) if (play or {}).get('flowVersion') == 2 else bool(state['quiz'] and len(visited) == len(scenes)
                                     and all(scene_id in completed_scenes for scene_id in required_audio)
                                     and (complete or not textbook_activity.supported(release)
                                          or textbook_activity.complete(state))),
@@ -341,18 +398,26 @@ class TextbookClassroomService:
             **({'courseInteractionState': course_interaction.recovery_state(state, release)} if interaction_contract else {}),
             'answeredQuestionIds': [] if zero_quiz else [r['questionId'] for r in (state['quiz'] or state.get('quizPartial') or {}).get('results', [])],
             'completedInteractionObjectiveIndexes': [], 'completedActionSceneIds': completed_scenes,
-            'resumeScene': {'sceneIndex': resume, 'sceneId': scenes[resume]['id']} if resume >= 0 else None}
+            'resumeScene': {'sceneIndex': resume, 'sceneId': scenes[resume]['id']} if entry is None and resume >= 0 else None}
 
     def events(self, token, event=None):
-        _, child, _, release, course, initial_session = self._authority(token)
+        authority, child, _, release, course, initial_session = self._authority(token)
+        entry = (authority or {}).get('entry')
+        scenes = (sections.scene_groups(release, sections.plan_for(authority['key'], release['sha256']))[entry]
+                  if entry is not None else textbook_activity.ordered_scenes(release))
         with self.repository.transaction() as conn:
             session = self.learning.get_session(conn, family_id=child['family_id'], session_id=initial_session['id'], for_update=True)
             if event is None:
-                return self._status(session, release)
+                return self._status(session, release, entry=entry, visible_scenes=scenes)
             if (not isinstance(event, dict) or set(event) != {'schemaVersion', 'sequence', 'type', 'payload'}
                     or event['schemaVersion'] != 'mira.openmaic.student-runtime-event.v1'
                     or type(event['sequence']) is not int or event['sequence'] < 1):
                 raise ApiError('textbook_event_invalid', '学习记录格式无效', 400)
+            payload = event['payload']
+            index = payload.get('sceneIndex') if isinstance(payload, dict) else None
+            if type(index) is not int or not 0 <= index < len(scenes) or payload.get('sceneId') != scenes[index]['id']:
+                raise ApiError('textbook_event_invalid', '课件页面身份无效', 400)
+            scene = scenes[index]
             previous = conn.execute('SELECT * FROM learning_session_runtime_records WHERE session_id=? AND seq=?',
                                     (session['id'], event['sequence'])).fetchone()
             if previous:
@@ -362,12 +427,6 @@ class TextbookClassroomService:
             state = self._state(session)
             if event['sequence'] != state['lastSequence'] + 1:
                 raise ApiError('textbook_event_conflict', '请刷新课堂后继续', 409)
-            scenes = textbook_activity.ordered_scenes(release)
-            payload = event['payload']
-            index = payload.get('sceneIndex') if isinstance(payload, dict) else None
-            if type(index) is not int or not 0 <= index < len(scenes) or payload.get('sceneId') != scenes[index]['id']:
-                raise ApiError('textbook_event_invalid', '课件页面身份无效', 400)
-            scene = scenes[index]
             interaction_result = None
             if event['type'] == 'scene_entered' and set(payload) == {'sceneIndex', 'sceneId'}:
                 if scene['id'] not in state['visited']:
@@ -375,8 +434,18 @@ class TextbookClassroomService:
             elif event['type'] == 'action_completed' and set(payload) == {'sceneIndex', 'sceneId', 'actionId'}:
                 if payload['actionId'] not in {a['id'] for a in scene.get('actions', [])}:
                     raise ApiError('textbook_event_invalid', '讲解片段不存在', 400)
+                if entry is not None and scene['id'] not in state['visited']:
+                    raise ApiError('textbook_event_invalid', '请先进入当前讲解页面', 400)
                 if payload['actionId'] not in state['actions']:
                     state['actions'].append(payload['actionId'])
+            elif event['type'] == 'section_speech_completed' and set(payload) == {'sceneIndex', 'sceneId', 'actionId'}:
+                if entry is None or not isinstance(payload['actionId'], str) or payload['actionId'] not in sections.speech_actions(scene):
+                    raise ApiError('textbook_event_invalid', '讲解配音不存在', 400)
+                if scene['id'] not in state['visited']:
+                    raise ApiError('textbook_event_invalid', '请先进入当前讲解页面', 400)
+                heard = state.setdefault('sectionSpeech', {}).setdefault(scene['id'], [])
+                if payload['actionId'] not in heard:
+                    heard.append(payload['actionId'])
             elif event['type'] == 'asr_transcribed':
                 # The existing recorder persists the turn before forwarding it
                 # to discussion. Keep its contract; speech is not quiz credit.
@@ -392,7 +461,7 @@ class TextbookClassroomService:
                     contract_sha256=payload['contractSha256'], operation_id=payload['operationId'],
                     operation=payload['operation'])
             elif event['type'] == 'classroom_completed' and set(payload) == {'sceneIndex', 'sceneId'}:
-                if not self._status(session, release)['completionReady']:
+                if not self._status(session, release, entry=entry, visible_scenes=scenes)['completionReady']:
                     raise ApiError('textbook_learning_incomplete', '请先完成学习和练习', 409)
                 result = None if release.get('assessmentPolicy') == 'verified-frozen-no-native-quiz' else state['quiz']
                 self._complete(conn, session, child, course, result,
@@ -402,7 +471,9 @@ class TextbookClassroomService:
             state['lastSequence'] = event['sequence']
             conn.execute('UPDATE learning_sessions SET runtime_state_json=?,updated_at=? WHERE id=?',
                           (canonical(state), now_ms(), session['id']))
-            completed = event['type'] == 'classroom_completed' or session['status'] == 'completed'
+            completed = event['type'] == 'classroom_completed' or (
+                session['status'] == 'completed' and (entry is None or self._status(
+                    {**session, 'runtime_state_json': canonical(state)}, release, entry=entry, visible_scenes=scenes)['completed']))
             receipt = {'ok': True, 'sequence': event['sequence'], 'completed': completed,
                 'receiptSha256': digest({'session': session['id'], 'event': event})}
             if interaction_result is not None:
@@ -414,10 +485,22 @@ class TextbookClassroomService:
 
     def activity_state(self, token, data=None):
         """Persist only the bound iframe's UI continuity, independently of grades."""
-        _, child, _, release, course, initial_session = self._authority(token)
+        authority, child, _, release, course, initial_session = self._authority(token)
         if data is not None:
             data = activity_state.parse_post(data)
         definitions = activity_state.descriptors(release)
+        entry = (authority or {}).get('entry')
+        local_indexes = None
+        if entry is not None:
+            plan = sections.plan_for(authority['key'], release['sha256'])
+            visible = sections.scene_groups(release, plan)[entry]
+            local_indexes = {scene['id']: index for index, scene in enumerate(visible)}
+            definitions = [item for item in definitions if item['sceneId'] in local_indexes]
+            if data is not None:
+                definition = next((item for item in definitions if item['sceneId'] == data['sceneId']), None)
+                if definition is None or local_indexes.get(data['sceneId']) != data['sceneIndex']:
+                    activity_state.invalid('小游戏版本已变化，请重新进入', code='textbook_activity_state_identity', status=409)
+                data = {**data, 'sceneIndex': definition['sceneIndex']}
         with self.repository.transaction() as conn:
             session = self.learning.get_session(conn, family_id=child['family_id'],
                 session_id=initial_session['id'], for_update=True)
@@ -431,10 +514,15 @@ class TextbookClassroomService:
             if changed:
                 conn.execute('UPDATE learning_sessions SET runtime_state_json=?,updated_at=? WHERE id=?',
                     (canonical(progress), now_ms(), session['id']))
+            if local_indexes is not None:
+                for item in result.get('activities', [result.get('activity')]):
+                    item['sceneIndex'] = local_indexes[item['sceneId']]
             return result
 
     def quiz(self, token, answers=None):
-        _, child, _, release, course, initial_session = self._authority(token)
+        authority, child, _, release, course, initial_session = self._authority(token)
+        if (authority or {}).get('entry') not in (None, sections.CHECK_ENTRY):
+            raise ApiError('textbook_check_locked', '请从共用小检查入口进入', 409)
         with self.repository.transaction() as conn:
             session = self.learning.get_session(conn, family_id=child['family_id'], session_id=initial_session['id'], for_update=True)
             state = self._state(session)

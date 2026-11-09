@@ -63,7 +63,7 @@ export function LearningCourseStartButton({ courseId, version, label = "开始�
         {locked ? "暂未解锁" : pending ? "正在进入…" : label}
         {locked ? <LockKeyhole className="size-5" aria-hidden="true" /> : pending ? <LoaderCircle className="size-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <ArrowRight className="size-5" aria-hidden="true" />}
       </Button>
-      {error ? <p id={errorId} className="space-inline-error text-sm" role="alert">{error}</p> : null}
+      {error ? <p id={errorId} className="course-action-error text-sm" role="alert">{error}</p> : null}
     </div>
   );
 }

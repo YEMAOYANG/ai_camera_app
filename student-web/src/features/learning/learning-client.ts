@@ -3,17 +3,11 @@ import {
   learningCourseDetailResponseSchema,
   learningCourseStartResponseSchema,
   learningFavoriteResponseSchema,
-  learningLibraryResponseSchema,
   learningReportSchema,
   learningStartResponseSchema,
-  learningTeacherPreferenceResponseSchema,
   learningTeachersResponseSchema,
-  learningTodayResponseSchema,
   type LearningAnswerResponse,
-  type LearningLibraryBucket,
-  type LearningSubject,
   type TeacherSubject,
-  type LearningTodayResponse,
 } from "@/lib/contracts/learning";
 import {
   classroomRuntimeResponseSchema,
@@ -35,36 +29,6 @@ export class LearningClientError extends Error {
     super(message);
     this.name = "LearningClientError";
   }
-}
-
-export async function getTodayLearning(): Promise<LearningTodayResponse> {
-  return learningTodayResponseSchema.parse(await requestJson("/api/learning/today"));
-}
-
-export async function assignTodayLearning(): Promise<LearningTodayResponse> {
-  return learningTodayResponseSchema.parse(
-    await requestJson("/api/learning/today/assign", {
-      method: "POST",
-      body: JSON.stringify({}),
-    }),
-  );
-}
-
-export async function getLearningLibrary(options: {
-  bucket: LearningLibraryBucket;
-  subject?: LearningSubject;
-  cursor?: string;
-  limit?: number;
-}) {
-  const search = new URLSearchParams({
-    bucket: options.bucket,
-    limit: String(options.limit || 20),
-  });
-  if (options.subject) search.set("subject", options.subject);
-  if (options.cursor) search.set("cursor", options.cursor);
-  return learningLibraryResponseSchema.parse(
-    await requestJson(`/api/learning/library?${search.toString()}`),
-  );
 }
 
 export async function getLearningCourse(courseId: string, version?: string) {
@@ -97,19 +61,6 @@ export async function startLearningCourse(courseId: string, version: string) {
 export async function getLearningTeachers(subject?: TeacherSubject) {
   const search = subject ? `?subject=${encodeURIComponent(subject)}` : "";
   return learningTeachersResponseSchema.parse(await requestJson(`/api/learning/teachers${search}`));
-}
-
-export async function setLearningTeacher(
-  subject: TeacherSubject,
-  teacherProfileId: string,
-  teacherProfileVersion: number,
-) {
-  return learningTeacherPreferenceResponseSchema.parse(
-    await requestJson("/api/learning/teachers", {
-      method: "PUT",
-      body: JSON.stringify({ subject, teacherProfileId, teacherProfileVersion }),
-    }),
-  );
 }
 
 export async function startLearningSession(taskId: string) {

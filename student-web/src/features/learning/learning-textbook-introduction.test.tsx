@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
-import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LearningTextbookIntroduction } from "./learning-textbook-introduction";
 import { LearningTextbooks } from "./learning-textbooks";
@@ -9,11 +8,6 @@ import { textbookContentsSchema } from "@/lib/contracts/textbooks";
 
 const { router } = vi.hoisted(() => ({ router: { replace: vi.fn() } }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
-vi.mock("@/components/student/space-shell", () => ({
-  SpaceShell: ({ children }: { children: ReactNode }) => <main>{children}</main>,
-  SpacePageHeading: ({ title }: { title: string }) => <header><h1>{title}</h1></header>,
-}));
-vi.mock("@/components/student/space-course-art", () => ({ SpaceCourseArt: () => null }));
 const manifest = JSON.parse(readFileSync(resolve(process.cwd(), "../backend/content/textbooks/revisions/pep-chinese-g1-upper.directory.v3.json"), "utf8"));
 const pack = JSON.parse(readFileSync(resolve(process.cwd(), "../backend/content/textbooks/intro-media-v1/published.json"), "utf8"));
 const withMedia = (value: { introductionId: string }) => ({ ...value, contentSha256: pack.guides[value.introductionId].sourceContentSha256, presentation: pack.guides[value.introductionId] });

@@ -223,6 +223,10 @@ load_course_storage_env() {
     if [[ "${key}" == COURSE_STORAGE_ARCHIVE_ENABLED && -z "${value}" ]]; then value=false; fi
     OPENMAIC_COURSE_STORAGE_ENV+=("${key}=${value}")
   done
+  for key in COURSE_STORAGE_PROVIDER COURSE_STORAGE_ADDRESSING_STYLE; do
+    value="$(read_env_value "${key}" "${env_file}" || true)"
+    if [[ -n "${value}" ]]; then OPENMAIC_COURSE_STORAGE_ENV+=("${key}=${value}"); fi
+  done
 }
 
 clear_openmaic_provider_env() {
@@ -2383,6 +2387,7 @@ run_openmaic_production_foreground() {
     LANG="${LANG:-en_US.UTF-8}" \
     NODE_OPTIONS="${node_options}" \
     NODE_ENV=production \
+    TTS_REQUEST_TIMEOUT_MS="${TTS_REQUEST_TIMEOUT_MS:-}" \
     MIRA_OPENMAIC_NATIVE_BUILD=1 \
     MIRA_OPENMAIC_PRIVATE_PORT="${OPENMAIC_PORT}" \
     MIRA_FORMAL_QA_BASE_URL="${OPENMAIC_URL}" \
@@ -2668,6 +2673,7 @@ start_openmaic() {
       LANG="${LANG:-en_US.UTF-8}" \
       NODE_OPTIONS="${node_options}" \
       NODE_ENV=production \
+      TTS_REQUEST_TIMEOUT_MS="${TTS_REQUEST_TIMEOUT_MS:-}" \
       MIRA_OPENMAIC_NATIVE_BUILD=1 \
       MIRA_OPENMAIC_PRIVATE_PORT="${OPENMAIC_PORT}" \
     MIRA_FORMAL_QA_BASE_URL="${OPENMAIC_URL}" \

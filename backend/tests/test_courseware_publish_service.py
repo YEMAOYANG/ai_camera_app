@@ -354,6 +354,35 @@ class CoursewarePublishDatabaseTests(unittest.TestCase):
         self.assertEqual(entries[self.inputs['identity']['nodeId']][0]['content_key'], result['contentKey'])
         self.assertEqual(result['archiveStatus'], 'archive pending')
 
+    def test_section_siblings_share_one_release_and_cannot_publish_twice(self):
+        from services.textbook_directory_access import published_books, published_node_directory_entries, published_release
+        manifest = self.inputs['manifest']
+        manifest['revisionId'] = 'grouped-lessons'
+        first, second = manifest['units'][0]['lessons'][:2]
+        first['sectionTitle'] = second['sectionTitle'] = 'Reviewed lesson group'
+        self.inputs['identity'].update(revisionId=manifest['revisionId'], directoryAliasNodeIds=[second['nodeId']])
+        self.repo.import_revision(self.db, manifest, 2)
+        self.db.raw.commit()
+
+        result = self.publish('1')
+        child = {'grade_code': manifest['gradeCode']}
+        entries = published_node_directory_entries(self.repo, child,
+            self.repo.directory_builds(self.db, manifest['editionId'], manifest['revisionId']), manifest)
+        for lesson in (first, second):
+            self.assertEqual(entries[lesson['nodeId']][0]['content_key'], result['contentKey'])
+        _, release, _, _ = published_release(self.repo, self.db, result['contentKey'], child)
+        self.assertEqual(release['classroomId'], result['classroomId'])
+        self.assertEqual(self.db.execute('SELECT COUNT(*) AS count FROM learning_courses').fetchone()['count'], 1)
+        books = published_books(SimpleNamespace(repository=self.repo, _book=lambda _: {}), child)
+        self.assertEqual(books[(manifest['editionId'], manifest['revisionId'])]['learningStatus']['availableLessonCount'], 1)
+
+        self.inputs['identity'].update(nodeId=second['nodeId'])
+        del self.inputs['identity']['directoryAliasNodeIds']
+        write_lesson(self.lesson, self.inputs)
+        for apply in (False, True):
+            with self.subTest(apply=apply), self.assertRaisesRegex(ValueError, 'directory_alias_conflict'):
+                self.service.publish(self.lesson, apply=apply)
+
     def test_retires_only_same_node_and_counts_open_sessions(self):
         old = self.publish('1')
         old_course = self.db.execute('SELECT * FROM learning_courses').fetchone()

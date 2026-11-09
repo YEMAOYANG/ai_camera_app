@@ -1,0 +1,19 @@
+.lesson-player { color: var(--mira-ink); background: var(--mira-bg); }
+.lesson-player-header { min-height: 64px; }
+.lesson-player-back { background: var(--mira-surface); }
+.lesson-player-back:hover { background: var(--mira-brand-wash); }
+.lesson-player-stage { background: var(--mira-surface); }
+.lesson-player-accent { height: 3px; background: var(--mira-brand); }
+.lesson-player-eyebrow { color: var(--mira-ai); }
+.lesson-player-step { border: 1px solid var(--mira-border); }
+.lesson-player-step.is-current { color: var(--mira-on-brand); background: var(--mira-brand-deep); border-color: var(--mira-brand-deep); }
+.lesson-player-step.is-done { color: var(--mira-success); background: var(--mira-mint); }
+.lesson-player-step.is-next { color: var(--mira-muted); }
+.lesson-player-teacher { display: grid; justify-items: center; gap: 12px; padding: 24px; border-radius: var(--mira-radius-card); color: var(--mira-ai); background: var(--mira-brand-wash); }
+.lesson-player-teacher-book { width: 56px; height: 56px; stroke-width: 1.4; }
+.lesson-player-practice-icon, .lesson-player-trophy { display: grid; flex: none; place-items: center; border-radius: 50%; color: var(--mira-ai); background: var(--mira-brand-wash); }
+.lesson-player-practice-icon { width: 56px; height: 56px; }
+.lesson-player-trophy { width: 80px; height: 80px; margin: 0 auto 16px; }
+.lesson-player-trophy svg { width: 36px; height: 36px; stroke-width: 1.4; }
+.lesson-player-state-icon { width: 56px; height: 56px; stroke-width: 1.4; color: var(--mira-ai); }
+.lesson-player-report-stats > div { border: 1px solid var(--mira-border); }

@@ -12,7 +12,7 @@ vi.mock("@/lib/auth/student-backend-session", () => ({
   applyRefreshedStudentSession: (response: Response) => response,
 }));
 
-import { POST } from "@/app/api/learning/textbooks/courses/[contentKey]/launch/route";
+import { GET, POST } from "@/app/api/learning/textbooks/courses/[contentKey]/launch/route";
 
 const contentKey = "a".repeat(64);
 const classroomId = "tbpub_0123456789abcdef01234567";
@@ -94,6 +94,52 @@ describe("textbook launch BFF", () => {
     expect((await response.json()).launchUrl).toBe(
       `http://localhost:3101/classroom/${classroomId}?mira=1&textbook=1`,
     );
+  });
+
+  it("uses the requested section in both the backend request and verified gateway cookie", async () => {
+    const entry = "section-b";
+    studentBackendRequest.mockResolvedValue({ payload: { ...launch, entry } });
+    const headers = new Headers({ Location: `/classroom/${classroomId}?mira=1&textbook=1&entry=${entry}` });
+    const scoped = `mira_openmaic_runtime_classroom_${createHash("sha256")
+      .update(`${classroomId}\n${entry}`).digest("hex").slice(0, 32)}`;
+    for (const name of ["mira_openmaic_runtime", scoped])
+      headers.append("Set-Cookie", `${name}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=900`);
+    vi.stubGlobal("fetch", vi.fn().mockImplementation(() => Promise.resolve(new Response(null, { status: 303, headers }))));
+    const input = new NextRequest(request().url, {
+      method: "POST", headers: { host: "localhost:3000" }, body: JSON.stringify({ entry }),
+    });
+    const result = await POST(input, { params: Promise.resolve({ contentKey }) });
+    expect(studentBackendRequest).toHaveBeenCalledWith(input,
+      `/api/v2/student/learning/textbooks/courses/${contentKey}/launch`,
+      { method: "POST", body: JSON.stringify({ entry }) });
+    expect(result.status).toBe(200);
+    expect(new URL((await result.json()).launchUrl).searchParams.get("entry")).toBe(entry);
+    expect(result.headers.get("set-cookie")).toContain(scoped);
+
+    const mixedHeaders = new Headers(headers);
+    mixedHeaders.set("Location", `/classroom/${classroomId}?mira=1&textbook=1&entry=section-a`);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 303, headers: mixedHeaders })));
+    const sameRequest = new NextRequest(request().url, {
+      method: "POST", headers: { host: "localhost:3000" }, body: JSON.stringify({ entry }),
+    });
+    expect((await POST(sameRequest, { params: Promise.resolve({ contentKey }) })).status).toBeGreaterThanOrEqual(400);
+  });
+
+  it("reads progress only for one validated learning session", async () => {
+    const progress = { sections: [
+      { nodeId: "section-a", title: "第一部分", firstPage: 2, lastPage: 8, listened: true },
+      { nodeId: "section-b", title: "第二部分", firstPage: 9, lastPage: 16, listened: false },
+    ], checkReady: false };
+    studentBackendRequest.mockResolvedValue({ payload: { ok: true, ...progress } });
+    const input = new NextRequest(request().url + "?learningSessionId=session-a");
+    const response = await GET(input, { params: Promise.resolve({ contentKey }) });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(progress);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(studentBackendRequest).toHaveBeenCalledWith(input,
+      `/api/v2/student/learning/textbooks/courses/${contentKey}/sections?learningSessionId=session-a`);
+    expect((await GET(new NextRequest(input.url + "&learningSessionId=session-b"),
+      { params: Promise.resolve({ contentKey }) })).status).toBe(400);
   });
 
   it("keeps the pinned launch flow for a different browser hostname", async () => {

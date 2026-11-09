@@ -13,7 +13,7 @@ html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
 .schoolbag-shell, .schoolbag-shell.schoolbag-auth { background: var(--mira-bg) url("/images/storybook/paper-texture.webp") repeat; background-size: 512px 512px; }
 .schoolbag-shell :is(a, button, input, summary):not(.mira-button):focus-visible { outline: 2px solid var(--mira-focus); outline-offset: 4px; }
 .schoolbag-header { display: flex; justify-content: space-between; height: 64px; padding: 0 max(48px, calc((100% - 1440px) / 2)); border: 0; max-width: none; gap: 20px; }
-.schoolbag-header, .schoolbag-auth .space-auth-header { position: sticky; top: 0; z-index: 40; background: var(--mira-bg) url("/images/storybook/paper-texture.webp") repeat; background-size: 512px; box-shadow: 0 1px 0 #bdaa8126; }
+.schoolbag-header, .schoolbag-auth .student-auth-header { position: sticky; top: 0; z-index: 40; background: var(--mira-bg) url("/images/storybook/paper-texture.webp") repeat; background-size: 512px; box-shadow: 0 1px 0 #bdaa8126; }
 .schoolbag-header-start { display: flex; gap: 30px; align-items: center; min-width: 0; }
 .schoolbag-brand { gap: 12px; flex: none; min-width: 48px; min-height: 48px; }
 .schoolbag-brand > span { width: 38px; height: 40px; border-radius: 15px; background: #f6ca5f; }
@@ -58,32 +58,31 @@ html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
 .schoolbag-preferences .mira-switch[data-state="checked"] { background: #857447; }
 
 /* Authentication is part of the same paper desk, with no floating form card. */
-.schoolbag-auth .space-auth-header { padding: 24px max(48px, calc((100% - 1344px) / 2)); max-width: none; }
-.schoolbag-auth .space-auth-header > span { font-size: 12px; color: var(--mira-muted); }
-.schoolbag-auth .space-auth-main { max-width: 1280px; grid-template-columns: minmax(0, 1.4fr) minmax(320px, .9fr); gap: 60px; padding: 32px 48px 48px; min-height: calc(100svh - 100px); align-items: center; }
-.schoolbag-auth .space-auth-intro { align-self: center; text-align: center; padding: 0; }
-.schoolbag-auth .space-auth-intro h1 { font-family: var(--font-mira-story); font-size: 40px; font-weight: 400; line-height: 1.5; margin-bottom: 8px; }
-.schoolbag-auth .space-auth-description { font-size: 15px; margin: 0; }
+.schoolbag-auth .student-auth-header { padding: 24px max(48px, calc((100% - 1344px) / 2)); max-width: none; }
+.schoolbag-auth .student-auth-header > span { font-size: 12px; color: var(--mira-muted); }
+.schoolbag-auth .student-auth-main { max-width: 1280px; grid-template-columns: minmax(0, 1.4fr) minmax(320px, .9fr); gap: 60px; padding: 32px 48px 48px; min-height: calc(100svh - 100px); align-items: center; }
+.schoolbag-auth .student-auth-intro { align-self: center; text-align: center; padding: 0; }
+.schoolbag-auth .student-auth-intro h1 { font-family: var(--font-mira-story); font-size: 40px; font-weight: 400; line-height: 1.5; margin-bottom: 8px; }
+.schoolbag-auth .student-auth-description { font-size: 15px; margin: 0; }
 .schoolbag-auth .bag-scene-slot { float: none; width: 100%; max-width: 670px; height: 490px; min-height: 0; margin: -5px auto 0; }
 .auth-scene-caption { display: none; }
-.schoolbag-auth .space-auth-panel { max-width: 380px; padding: 28px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.schoolbag-auth .space-auth-panel .auth-form-title { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
-.schoolbag-auth .space-auth-panel .auth-form-welcome { font-size: 13px; font-weight: 400; color: var(--mira-muted); letter-spacing: .06em; margin-bottom: 12px; }
-.schoolbag-auth .space-auth-panel .auth-form-description { font-size: 14px; line-height: 1.8; margin-top: 13px; }
+.schoolbag-auth .student-auth-panel { max-width: 380px; padding: 28px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.schoolbag-auth .student-auth-panel .auth-form-title { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+.schoolbag-auth .student-auth-panel .auth-form-welcome { font-size: 13px; font-weight: 400; color: var(--mira-muted); letter-spacing: .06em; margin-bottom: 12px; }
+.schoolbag-auth .student-auth-panel .auth-form-description { font-size: 14px; line-height: 1.8; margin-top: 13px; }
 .auth-pin-form { margin-top: 28px; }
 .mira-pin-slots { gap: 12px; }
 .mira-pin-slot { height: 66px; border-radius: 12px; background: #fffaf2; border-color: #d8d0bf; }
 .mira-pin-slot[data-active] { box-shadow: 0 0 0 3px #e8d6a044; }
 .auth-field-error { min-height: 30px; padding-top: 8px; font-size: 14px; line-height: 1.5; color: var(--mira-danger); }
 .auth-pair-disclosure { border-top: 1px solid var(--mira-border-soft); margin-top: 18px; }
-.schoolbag-auth .space-pair-code-form { background: transparent; border: 0; padding: 8px 0 0; }
-.schoolbag-auth .space-auth-panel .pairing-code-input { min-height: 56px; font-size: 21px; text-align: center; letter-spacing: .16em; }
-.schoolbag-auth .space-qr-code { padding: 8px; box-shadow: none; }
-.schoolbag-auth .space-qr[data-qr-state="waiting"] .space-qr-code::after { display: none; }
-.schoolbag-auth .space-qr > div:nth-child(2) { border: 0; border-radius: 0; background: transparent; padding: 12px 0; }
-.schoolbag-auth .space-qr [aria-label^="核对码"] { color: var(--mira-ink); font-weight: 550; }
-.schoolbag-auth .space-qr > div:first-child { font-size: 14px; }
-.schoolbag-auth .space-qr > div:first-child > div, .schoolbag-auth .space-qr > div:first-child > span { font-size: 14px; font-weight: 500; }
+.schoolbag-auth .student-pair-code-form { background: transparent; border: 0; padding: 8px 0 0; }
+.schoolbag-auth .student-auth-panel .pairing-code-input { min-height: 56px; font-size: 21px; text-align: center; letter-spacing: .16em; }
+.schoolbag-auth .student-qr-code { padding: 8px; box-shadow: none; }
+.schoolbag-auth .student-qr > div:nth-child(2) { border: 0; border-radius: 0; background: transparent; padding: 12px 0; }
+.schoolbag-auth .student-qr [aria-label^="核对码"] { color: var(--mira-ink); font-weight: 550; }
+.schoolbag-auth .student-qr > div:first-child { font-size: 14px; }
+.schoolbag-auth .student-qr > div:first-child > div, .schoolbag-auth .student-qr > div:first-child > span { font-size: 14px; font-weight: 500; }
 
 /* Published 2×2 art stays correctly cropped to its authored panel. */
 .textbook-picture { position: relative; display: block; width: 100%; overflow: hidden; }
@@ -184,7 +183,7 @@ html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
   .schoolbag-home .schoolbag-copy { padding-left: 0; }
   .schoolbag-copy h1 { font-size: 38px; }
   .schoolbag-stage--three { height: 490px; }
-  .schoolbag-auth .space-auth-main { gap: 32px; padding-inline: 30px; }
+  .schoolbag-auth .student-auth-main { gap: 32px; padding-inline: 30px; }
   .schoolbag-auth .bag-scene-slot { height: 400px; }
   .textbook-layout { grid-template-columns: 200px minmax(0, 1fr); gap: 30px; }
   .textbook-unit-introduction { gap: 20px; }
@@ -218,16 +217,16 @@ html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
   .schoolbag-subject { min-height: 80px; padding-block: 2px; }
   .schoolbag-subject strong { font-size: 30px; }
   .schoolbag-settings .mira-disclosure-trigger { padding-inline: 4px; }
-  .schoolbag-auth .space-auth-header { padding: 20px 24px; }
-  .schoolbag-auth .space-auth-header > span { display: none; }
-  .schoolbag-auth .space-auth-main { display: flex; flex-direction: column; gap: 0; padding: 6px 28px 28px; min-height: 0; }
-  .schoolbag-auth .space-auth-intro { width: 100%; }
-  .schoolbag-auth .space-auth-intro h1 { font-size: 32px; margin: 0 0 8px; }
-  .schoolbag-auth .space-auth-description { font-size: 14px; }
+  .schoolbag-auth .student-auth-header { padding: 20px 24px; }
+  .schoolbag-auth .student-auth-header > span { display: none; }
+  .schoolbag-auth .student-auth-main { display: flex; flex-direction: column; gap: 0; padding: 6px 28px 28px; min-height: 0; }
+  .schoolbag-auth .student-auth-intro { width: 100%; }
+  .schoolbag-auth .student-auth-intro h1 { font-size: 32px; margin: 0 0 8px; }
+  .schoolbag-auth .student-auth-description { font-size: 14px; }
   .schoolbag-auth .bag-scene-slot { width: 100%; max-width: 410px; height: 285px; margin: -6px auto -12px; }
-  .schoolbag-auth .space-auth-panel { width: 100%; max-width: 360px; padding: 8px 0 0; }
-  .schoolbag-auth .space-auth-panel .auth-form-title { font-size: 23px; }
-  .schoolbag-auth .space-auth-panel .auth-form-welcome { display: none; }
+  .schoolbag-auth .student-auth-panel { width: 100%; max-width: 360px; padding: 8px 0 0; }
+  .schoolbag-auth .student-auth-panel .auth-form-title { font-size: 23px; }
+  .schoolbag-auth .student-auth-panel .auth-form-welcome { display: none; }
   .auth-pin-form { margin-top: 20px; }
   .mira-pin-slot { height: 58px; }
   .textbook-welcome h1 { font-size: 30px; }
@@ -304,4 +303,10 @@ html:has(.schoolbag-shell) { scroll-padding-top: 84px; }
 .textbook-classroom-stage { position: relative; }
 .textbook-classroom .textbook-classroom-loading { position: absolute; inset: 0; z-index: 1; background: #fbf7ec; }
 .textbook-classroom-frame { display: block; width: 100%; height: calc(100dvh - 64px); min-height: 0; border: 0; background: #fbf7ec; }
+.textbook-classroom-stage--section { display: flex; flex-direction: column; height: calc(100dvh - 64px); }
+.textbook-classroom-stage--section .textbook-classroom-frame { flex: 1; height: auto; }
+.textbook-classroom-section { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 16px; padding: 8px clamp(12px, 4vw, 40px); background: #fbf7ec; }
+.textbook-classroom-section > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.textbook-classroom-section span { color: var(--mira-muted); font-size: .875rem; }
 @media (max-width: 640px) { .textbook-classroom-frame { height: calc(100dvh - 60px); min-height: 0; } }
+@media (max-width: 640px) { .textbook-classroom-stage--section { height: calc(100dvh - 60px); } }

@@ -8,9 +8,9 @@ import type { Student } from "@/lib/contracts/student-session";
 import { useSchoolbagMotion } from "@/components/schoolbag/schoolbag-motion";
 import { Button } from "@/components/ui/button";
 
-export function SchoolbagShell({ children, className = "", home = false, navigation, tools, onRest }: {
+export function SchoolbagShell({ children, className = "", home = false, navigation, tools, onRest, prefetchHome }: {
   student?: Student; children: ReactNode; className?: string; home?: boolean;
-  navigation?: ReactNode; tools?: ReactNode; onRest?: () => void;
+  navigation?: ReactNode; tools?: ReactNode; onRest?: () => void; prefetchHome?: boolean;
 }) {
   const router = useRouter();
   const { returnHome, busy } = useSchoolbagMotion();
@@ -33,7 +33,7 @@ export function SchoolbagShell({ children, className = "", home = false, navigat
   return <div className={`schoolbag-shell ${className}`}>
     <header className="schoolbag-header">
       <div className="schoolbag-header-start">
-        <Link className="schoolbag-brand" href="/learning" aria-label="暖瞳学习首页" aria-current={home ? "page" : undefined} onClick={goHome}><span><Backpack size={26} strokeWidth={1.6} aria-hidden="true" /></span><strong>暖瞳</strong></Link>
+        <Link className="schoolbag-brand" href="/learning" prefetch={prefetchHome} aria-label="暖瞳学习首页" aria-current={home ? "page" : undefined} onClick={goHome}><span><Backpack size={26} strokeWidth={1.6} aria-hidden="true" /></span><strong>暖瞳</strong></Link>
         {navigation && <nav className="schoolbag-context-nav" aria-label="学生导航">{navigation}</nav>}
       </div>
       <div className="schoolbag-account">{tools}

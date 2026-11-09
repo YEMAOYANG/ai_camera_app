@@ -1,7 +1,8 @@
 """Read and publish a light lesson directory without generation or remote calls.
 
 Layout: identity.json (editionId, revisionId, nodeId, teachingRevision, title,
-objective, teacherCode, authorModels, estimatedMinutes; optional confirmation), body.json, media/<sha256>.<ext>,
+objective, teacherCode, authorModels, estimatedMinutes; optional confirmation and directoryAliasNodeIds),
+body.json, media/<sha256>.<ext>,
 official-notes.json, brief.json, audit-receipt.json, play-receipt.json, verification.json, roster.json.
 Identity authorModels lists every model that wrote pages, lines or questions;
 verification.verifier.model must differ from each, case-insensitively.
@@ -17,7 +18,7 @@ from pathlib import Path
 import time
 
 from content.courseware_release import build_release, require, validate_light_release
-from content.textbook_catalog import digest
+from content.textbook_catalog import digest, lesson_section_nodes
 from content.textbook_release import validate_release
 
 
@@ -122,6 +123,24 @@ class CoursewarePublishService:
             "AND course_version=? AND status='in_progress'", (row['course_id'], row['course_version'])).fetchone()['count']
             for row in predecessors)
 
+    def _require_directory_ownership(self, conn, frozen, manifest):
+        binding = frozen['textbookBinding']
+        node_id = binding['nodeId']
+        siblings = [node for node in lesson_section_nodes(manifest, node_id) if node != node_id]
+        if not siblings:
+            return
+        aliases = frozen['identity'].get('directoryAliasNodeIds', [])
+        placeholders = ','.join('?' for _ in siblings)
+        rows = conn.execute('SELECT node_id,input_json FROM learning_textbook_course_builds '
+            'WHERE edition_id=? AND revision_id=? AND part_index=1 AND status=\'published\' '
+            f'AND node_id IN ({placeholders})',
+            (binding['editionId'], binding['alignmentRevisionId'], *siblings)).fetchall()
+        for row in rows:
+            existing = self.repository.parse(row['input_json'])
+            existing_aliases = (existing.get('identity') or {}).get('directoryAliasNodeIds', [])
+            require(row['node_id'] not in aliases and node_id not in existing_aliases,
+                    'directory_alias_conflict')
+
     def publish(self, lesson_dir, *, confirmation=None, apply=False):
         inputs = self._inputs(lesson_dir, confirmation)
         prepared = build_release(inputs)
@@ -135,6 +154,7 @@ class CoursewarePublishService:
             with self.repository.transaction() as conn:
                 # Dry runs need no row locks or immutable file writes.
                 b = frozen['textbookBinding']
+                self._require_directory_ownership(conn, frozen, inputs['manifest'])
                 rows = conn.execute("SELECT * FROM learning_textbook_course_builds WHERE edition_id=? AND revision_id=? "
                     "AND node_id=? AND part_index=? AND status='published' AND content_key<>?",
                     (b['editionId'], b['alignmentRevisionId'], b['nodeId'], b['partIndex'], frozen['contentKey'])).fetchall()
@@ -152,6 +172,7 @@ class CoursewarePublishService:
                 'AND revision_id=? AND retired_at IS NULL FOR UPDATE', (b['editionId'], b['alignmentRevisionId'])).fetchone()
             require(revision is not None and revision['manifest_sha256'] == digest(inputs['manifest'])
                     and self.repository.manifest(revision) == inputs['manifest'], 'manifest_mismatch')
+            self._require_directory_ownership(conn, frozen, inputs['manifest'])
             timestamp = self.clock()
             build, _ = self.repository.reserve_build(conn, frozen, timestamp)
             require(build['status'] != 'retired', 'build_retired')

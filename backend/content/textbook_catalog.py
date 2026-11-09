@@ -238,6 +238,24 @@ def lesson_by_id(manifest, node_id):
     raise ApiError("textbook_lesson_not_found", "这本教材中没有这节课", 404)
 
 
+def lesson_section_nodes(manifest, node_id):
+    unit, lesson = lesson_by_id(manifest, node_id)
+    section = lesson.get('sectionTitle')
+    if not section:
+        return [node_id]
+    return [sibling['nodeId'] for sibling in unit['lessons'] if sibling.get('sectionTitle') == section]
+
+
+def lesson_release_aliases(manifest, node_id, identity):
+    if not isinstance(identity, dict) or 'directoryAliasNodeIds' not in identity:
+        return ()
+    section_nodes = lesson_section_nodes(manifest, node_id)
+    aliases = identity['directoryAliasNodeIds']
+    if len(section_nodes) < 2 or section_nodes[0] != node_id or aliases != section_nodes[1:]:
+        raise ValueError('directory_aliases_invalid')
+    return tuple(aliases)
+
+
 def generation_brief(manifest, node_id, *, teaching_revision="1", part_index=1):
     manifest = validate_manifest(manifest)
     unit, lesson = lesson_by_id(manifest, node_id)

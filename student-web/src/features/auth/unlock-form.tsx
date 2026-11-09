@@ -38,7 +38,7 @@ export function UnlockForm() {
   }
 
   return (
-    <section className="space-auth-panel space-unlock-panel" data-pin-state={submitting ? "connecting" : error ? "error" : pin.length === 4 ? "ready" : "entering"}>
+    <section className="student-auth-panel student-unlock-panel" data-pin-state={submitting ? "connecting" : error ? "error" : pin.length === 4 ? "ready" : "entering"}>
       <p className="auth-form-welcome">欢迎回来</p>
       <h2 className="auth-form-title">输入学习 PIN</h2>
       <p className="auth-form-description">用家长设置的 4 位数字解锁。</p>

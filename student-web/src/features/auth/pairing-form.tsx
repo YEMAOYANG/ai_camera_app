@@ -23,7 +23,7 @@ export function PairingForm() {
 
   return (
     <div>
-      <section className="space-auth-panel">
+      <section className="student-auth-panel">
         <div className="relative">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -74,7 +74,7 @@ function PairingCodeForm() {
   }
 
   return (
-    <form className="space-pair-code-form" onSubmit={submit} noValidate>
+    <form className="student-pair-code-form" onSubmit={submit} noValidate>
       <label htmlFor="pairing-code" className="mb-3 flex items-center gap-2 text-lg font-extrabold text-[var(--mira-ink)]">
         <KeyRound className="size-4 text-[var(--mira-brand-deep)]" aria-hidden="true" /> 8位配对码
       </label>

@@ -23,16 +23,18 @@ export function StudentSessionGate({
   courseVersion,
   textbookLocation,
   textbookCourseKey,
+  textbookCourseEntry,
   reviewId,
   submissionId,
 }: {
   lessonTaskId?: string;
   classroomMode?: "discover" | "openmaic";
-  learningView?: "library" | "course" | "practice" | "path" | "textbooks" | "schoolbag" | "reviews" | "homework" | "international";
+  learningView?: "course" | "textbooks" | "schoolbag" | "reviews" | "homework" | "international";
   courseId?: string;
   courseVersion?: string;
   textbookLocation?: TextbookLocation;
   textbookCourseKey?: string;
+  textbookCourseEntry?: string;
   reviewId?: string;
   submissionId?: string;
 }) {
@@ -74,7 +76,8 @@ export function StudentSessionGate({
   if (learningView === "reviews") return <LearningReviews student={student} reviewId={reviewId} />;
   if (learningView === "homework") return <LearningHomework student={student} submissionId={submissionId} />;
   if (learningView === "international") return <LearningInternationalTrials student={student} />;
-  if (textbookCourseKey) return <LearningTextbookClassroom key={textbookCourseKey} student={student} contentKey={textbookCourseKey} />;
+  if (textbookCourseKey) return <LearningTextbookClassroom key={`${textbookCourseKey}:${textbookCourseEntry ?? ""}`}
+    student={student} contentKey={textbookCourseKey} requestedEntry={textbookCourseEntry} />;
   if (lessonTaskId) {
     return <ClassroomEntry key={`${classroomMode}:${lessonTaskId}`} student={student} taskId={lessonTaskId} mode={classroomMode} />;
   }

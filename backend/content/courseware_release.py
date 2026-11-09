@@ -13,7 +13,7 @@ import hashlib
 from pathlib import PurePosixPath
 import re
 
-from content.textbook_catalog import canonical, digest, identifier, lesson_by_id
+from content.textbook_catalog import canonical, digest, identifier, lesson_by_id, lesson_release_aliases
 from content.textbook_release import INPUT_SCHEMA, RELEASE_SCHEMA, MEDIA, check_questions, validate_release
 from content.textbook_release_media import media_mime_type
 from core.errors import ApiError
@@ -34,6 +34,23 @@ def require(condition, code):
 
 def _text(value):
     return isinstance(value, str) and bool(value.strip())
+
+
+def _page_reference(value):
+    if isinstance(value, dict):
+        pages = value.get('pages')
+        return (_text(value.get('package')) and _text(value.get('resourceId'))
+                and isinstance(pages, list) and bool(pages)
+                and all(type(page) is int and page > 0 for page in pages))
+    return _text(value) or type(value) is int and value > 0
+
+
+def _finding(value):
+    if isinstance(value, dict):
+        refs = value.get('pageRefs')
+        return (_text(value.get('classHour')) and _text(value.get('finding'))
+                and isinstance(refs, list) and bool(refs) and all(_page_reference(ref) for ref in refs))
+    return _text(value)
 
 
 def _independent_verifier(author_models, verifier):
@@ -75,9 +92,9 @@ def _evidence(inputs, speech, questions, confirmation):
             require(_text(item.get('evidence')), 'notes_invalid')
             continue
         require(isinstance(item, dict) and isinstance(item.get('findings'), list)
-                and bool(item['findings']) and all(_text(v) for v in item['findings'])
+                and bool(item['findings']) and all(_finding(v) for v in item['findings'])
                 and isinstance(item.get('pageRefs'), list) and bool(item['pageRefs'])
-                and all(_text(v) or type(v) is int and v > 0 for v in item['pageRefs']), 'notes_invalid')
+                and all(_page_reference(v) for v in item['pageRefs']), 'notes_invalid')
     objectives = notes.get('objectives')
     require(isinstance(objectives, list) and bool(objectives) and all(_text(value) for value in objectives),
             'objectives_invalid')
@@ -175,6 +192,7 @@ def build_release(inputs):
         _, node = lesson_by_id(manifest, identity.get('nodeId'))
     except ApiError:
         raise ValueError('node_missing') from None
+    aliases = lesson_release_aliases(manifest, identity['nodeId'], identity)
     source_id = body.get('stage', {}).get('id')
     require(isinstance(source_id, str) and re.fullmatch(r'[A-Za-z0-9_-]+', source_id)
             and body.get('id', source_id) == source_id and bool(body.get('scenes'))
@@ -256,6 +274,8 @@ def build_release(inputs):
             'gates': gates,
             'confirmation': {k: confirmation[k] for k in ('userQuote', 'confirmedAt', 'confirmedBy')},
             'evidence': evidence}}
+    if aliases:
+        frozen['identity']['directoryAliasNodeIds'] = list(aliases)
     key = digest(frozen)
     frozen['contentKey'] = key
     classroom_id = 'tbpub_' + key[:24]

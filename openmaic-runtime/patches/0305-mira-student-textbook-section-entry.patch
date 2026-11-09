@@ -1,0 +1,209 @@
+diff --git a/app/classroom/[id]/page.tsx b/app/classroom/[id]/page.tsx
+--- a/app/classroom/[id]/page.tsx
++++ b/app/classroom/[id]/page.tsx
+@@ -22,9 +22,11 @@
+ export default async function ClassroomDetailPage({ params, searchParams }: ClassroomPageProps) {
+   const [{ id }, query] = await Promise.all([params, searchParams]);
+   const studentMode = isMiraStudentRuntimeParam(query.mira);
++  const entry = studentMode && query.textbook === '1' && typeof query.entry === 'string'
++    && /^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/.test(query.entry) ? query.entry : undefined;
+ 
+   return (
+-    <MiraStudentRuntimeProvider studentMode={studentMode} classroomId={id}
++    <MiraStudentRuntimeProvider studentMode={studentMode} classroomId={id} entry={entry}
+       parentOrigins={studentParentOrigins(process.env.ALLOWED_FRAME_ANCESTORS ?? '', process.env.MIRA_LOCAL_LAN_PRODUCTION_MODE === '1', process.env.MIRA_RUNTIME_PUBLIC_ORIGIN ?? '')}>
+       <ClassroomSurface classroomId={id} variant="page" />
+     </MiraStudentRuntimeProvider>
+diff --git a/lib/contexts/mira-student-runtime-context.tsx b/lib/contexts/mira-student-runtime-context.tsx
+--- a/lib/contexts/mira-student-runtime-context.tsx
++++ b/lib/contexts/mira-student-runtime-context.tsx
+@@ -165,10 +165,12 @@
+   parentOrigins = [],
+   studentMode,
+   classroomId,
++  entry,
+   children,
+ }: {
+   readonly studentMode: boolean;
+   readonly classroomId: string;
++  readonly entry?: string;
+   readonly parentOrigins?: readonly string[];
+   readonly children: ReactNode;
+ }) {
+@@ -177,9 +179,9 @@
+   const runtimeEvents = useMemo(
+     () =>
+       studentMode && typeof window !== 'undefined'
+-        ? createMiraStudentRuntimeEventClient({ classroomId })
++        ? createMiraStudentRuntimeEventClient({ classroomId, entry })
+         : null,
+-    [classroomId, studentMode],
++    [classroomId, entry, studentMode],
+   );
+ 
+   useEffect(() => {
+diff --git a/lib/mira/student-runtime-events.ts b/lib/mira/student-runtime-events.ts
+--- a/lib/mira/student-runtime-events.ts
++++ b/lib/mira/student-runtime-events.ts
+@@ -90,6 +90,7 @@
+   readonly ok: true;
+   readonly schemaVersion: typeof RECEIPT_SCHEMA;
+   readonly runtimeSessionId: string;
++  readonly entry?: string;
+   readonly lastSequence: number;
+   readonly nextSequence: number;
+   readonly completed: boolean;
+@@ -113,6 +114,7 @@
+ }
+ 
+ export interface MiraStudentRuntimeEventClient {
++  readonly entry?: string;
+   resume(): Promise<void>;
+   /** Synchronize once per classroom entry and replay a pending local event if present. */
+   readEntryProgress(): Promise<void>;
+@@ -147,6 +149,7 @@
+ 
+ export interface MiraStudentRuntimeEventClientOptions {
+   readonly classroomId: string;
++  readonly entry?: string;
+   readonly fetcher?: typeof fetch;
+   readonly storage?: Storage;
+   readonly endpoint?: string;
+@@ -158,7 +161,11 @@
+   const classroomId = identifier(options.classroomId, 'classroomId', 255);
+   const fetcher = options.fetcher ?? fetch;
+   const storage = options.storage ?? browserStorage();
+-  const storageKey = `${STORAGE_PREFIX}${encodeURIComponent(classroomId)}`;
++  const entry = options.entry;
++  if (entry !== undefined && !/^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$/.test(entry))
++    throw new Error('Classroom entry is invalid');
++  // The entries share server progress, never their pending browser events.
++  const storageKey = `${STORAGE_PREFIX}${encodeURIComponent(classroomId)}${entry ? ':' + entry : ''}`;
+   const endpoint = options.endpoint ?? '/mira/runtime-events';
+   let state = readState(storage, storageKey);
+   let synchronized = false;
+@@ -183,6 +190,7 @@
+     const body = await jsonBody(result);
+     if (!result.ok) throw runtimeRequestError(result.status, body);
+     const status = runtimeStatus(body);
++    if (status.entry !== entry) throw new Error('课堂入口已改变，请重新进入课堂。');
+     if (status.resumeScene !== undefined) {
+       if (status.classroomId !== classroomId)
+         throw new Error('Mira Runtime resume classroom does not match');
+@@ -224,7 +232,7 @@
+     return status;
+   };
+ 
+-  const flushPending = async () => {
++  const flushPending = async (retryConflict = true): Promise<void> => {
+     const pending = state.pending;
+     if (!pending) return;
+     const result = await fetcher(endpoint, {
+@@ -238,7 +246,21 @@
+       body: JSON.stringify(pending.event),
+     });
+     const body = await jsonBody(result);
+-    if (!result.ok) throw runtimeRequestError(result.status, body);
++    if (!result.ok) {
++      const error = runtimeRequestError(result.status, body);
++      // Rebase idempotent listening markers only after an explicit sequence
++      // rejection. A lost response keeps its original sequence for replay.
++      if (entry && retryConflict && result.status === 409 && error.name === 'textbook_event_conflict'
++          && (pending.event.type === 'scene_entered' || pending.event.type === 'action_completed')) {
++        const status = await synchronize(true);
++        if (state.pending === pending && !status.completed) {
++          state.pending = { ...pending, event: { ...pending.event, sequence: status.nextSequence } };
++          persist();
++          return flushPending(false);
++        }
++      }
++      throw error;
++    }
+     const receipt = runtimeReceipt(body, pending.event.sequence);
+     rememberEmitted(state, pending.eventKey);
+     if (pending.event.type === 'interaction_completed')
+@@ -301,6 +323,7 @@
+   };
+ 
+   return {
++    entry,
+     readEntryProgress: () => {
+       if (entryProgress) return entryProgress;
+       const operation = tail.catch(() => undefined).then(async () => {
+diff --git a/tests/runtime/mira-student-runtime-events.test.ts b/tests/runtime/mira-student-runtime-events.test.ts
+--- a/tests/runtime/mira-student-runtime-events.test.ts
++++ b/tests/runtime/mira-student-runtime-events.test.ts
+@@ -50,6 +50,41 @@
+ });
+ 
+ describe('Mira authoritative student Runtime events', () => {
++  it('isolates section queues and rebases rejected listening markers on shared progress', async () => {
++    const storage = memoryStorage();
++    let sequence = 0;
++    let loseResponse = true;
++    const received: Array<[string, number, string]> = [];
++    const client = (entry: string) => createMiraStudentRuntimeEventClient({
++      classroomId: 'classroom-a', entry, storage,
++      fetcher: vi.fn(async (_input, init) => {
++        if (init?.method === 'GET') return response({ ...status(sequence), entry });
++        const event = JSON.parse(String(init?.body));
++        received.push([entry, event.sequence, event.payload.sceneId]);
++        if (entry === 'section-a' && loseResponse) {
++          loseResponse = false;
++          throw new Error('disconnected before request arrived');
++        }
++        if (event.sequence !== sequence + 1) return response({ error: 'textbook_event_conflict' }, 409);
++        sequence = event.sequence;
++        return response({ ok: true, sequence, receiptSha256: 'a'.repeat(64) });
++      }),
++    });
++    const first = client('section-a');
++    await expect(first.sceneEntered({ sceneIndex: 0, sceneId: 'scene-a' })).rejects.toThrow('disconnected');
++    const second = client('section-b');
++    await second.readEntryProgress();
++    await second.sceneEntered({ sceneIndex: 0, sceneId: 'scene-b' });
++    await first.readEntryProgress();
++    expect(received).toEqual([
++      ['section-a', 1, 'scene-a'],
++      ['section-b', 1, 'scene-b'],
++      ['section-a', 1, 'scene-a'],
++      ['section-a', 2, 'scene-a'],
++    ]);
++    expect(storage.length).toBe(2);
++  });
++
+   it('accepts the full 255-character upstream classroom identity boundary', async () => {
+     const classroomId = `c${'a'.repeat(254)}`;
+     const client = createMiraStudentRuntimeEventClient({
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -849,8 +849,9 @@
+         // Stop any in-flight discussion TTS audio on scene switch
+         discussionTTS.cleanup();
+ 
++        const newSectionEntry = Boolean(runtimeEvents?.entry && !previousSceneId);
+         const sessionResumeCursor =
+-          currentScene && typeof window !== 'undefined'
++          !newSectionEntry && currentScene && typeof window !== 'undefined'
+             ? getActionResumeRestoreCursor(
+                 readActionResumeState(window.sessionStorage, actionResumeStorageKey),
+                 currentScene.id,
+@@ -860,7 +861,7 @@
+         let savedResumeActionIndex = sessionResumeCursor.actionIndex;
+         let hasSavedPlaybackPosition = sessionResumeCursor.position !== null;
+         const playbackStageId = stage?.id ?? currentScene?.stageId;
+-        if (currentScene && playbackStageId && !sessionResumeCursor.position) {
++        if (!newSectionEntry && currentScene && playbackStageId && !sessionResumeCursor.position) {
+           try {
+             const cursor = await loadCursor(playbackStageId);
+             if (
+@@ -1227,7 +1228,7 @@
+         } else {
+           // Load saved playback state and restore position (but never auto-play).
+           if (
+-            studentMode &&
++            studentMode && !newSectionEntry &&
+             (studentAutoPlayRuntime?.audioStartAccepted ||
+               hasSavedPlaybackPosition ||
+               runtimeEvents?.getResumeScene()?.sceneId === currentScene.id) &&

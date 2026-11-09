@@ -1,0 +1,28 @@
+.course-detail .schoolbag-main { max-width: 960px; }
+.course-detail-hero { padding: clamp(20px, 4vw, 32px); border: 1px solid var(--mira-border); border-radius: var(--mira-radius-card); background: var(--mira-surface); }
+.course-detail-caption { color: var(--mira-muted); font-size: 15px; }
+.course-detail-copy h2 { margin: 8px 0 12px; font-size: clamp(24px, 4vw, 34px); line-height: 1.3; font-weight: 700; text-wrap: balance; }
+.course-detail-intro { margin-bottom: 12px; line-height: 1.7; }
+.course-detail-facts, .course-detail-facts span, .course-detail-heading h2, .course-detail-status > p { display: flex; align-items: center; gap: 8px; }
+.course-detail-facts { flex-wrap: wrap; margin-top: 12px; color: var(--mira-muted); }
+.course-detail-facts svg { width: 18px; height: 18px; }
+.course-detail-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; }
+.course-detail-status > span { color: var(--mira-muted); }
+.course-detail-status.is-complete > p { color: var(--mira-success); }
+.course-detail-outline { margin-block: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--mira-border); }
+.course-detail-heading h2, .course-detail-report h2, .course-detail-state h1 { font-size: 22px; font-weight: 650; }
+.course-detail-heading > p { margin-top: 4px; color: var(--mira-muted); }
+.course-detail-goals { display: grid; gap: 14px; margin-block: 18px; }
+.course-detail-goals li { display: flex; align-items: start; gap: 12px; }
+.course-detail-step, .course-detail-result-icon { display: grid; flex: none; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--mira-ai); background: var(--mira-brand-wash); }
+.course-detail-goals h3 { font-weight: 650; }
+.course-detail-goals p { color: var(--mira-muted); }
+.course-detail-intro-disclosure { margin-top: 16px; }
+.course-detail-intro-disclosure summary { width: fit-content; min-height: 48px; padding-block: 12px; cursor: pointer; }
+.course-detail-intro-disclosure p { color: var(--mira-muted); white-space: pre-line; }
+.course-detail-report { display: flex; flex-wrap: wrap; align-items: start; gap: 14px; padding: 20px; border-radius: var(--mira-radius-card); background: var(--mira-mint); }
+.course-detail-report > div { flex: 1 1 200px; }
+.course-detail-report > strong { font-size: 28px; color: var(--mira-success); }
+.course-detail-report > strong > small { margin-left: 4px; font-size: 14px; }
+.course-detail-state { display: grid; justify-items: start; gap: 10px; padding-block: 24px; }
+.course-action-error { color: var(--mira-danger); overflow-wrap: anywhere; }

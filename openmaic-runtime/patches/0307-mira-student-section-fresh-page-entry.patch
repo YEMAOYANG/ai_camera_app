@@ -1,0 +1,144 @@
+diff --git a/lib/playback/action-resume.ts b/lib/playback/action-resume.ts
+--- a/lib/playback/action-resume.ts
++++ b/lib/playback/action-resume.ts
+@@ -111,6 +111,31 @@
+   return { actionIndex: position.actionIndex, position };
+ }
+ 
++export async function initialActionPlaybackPosition({
++  sectionEntry, sceneId, actions, readSessionState, loadPersistedCursor,
++}: {
++  sectionEntry?: string;
++  sceneId?: string;
++  actions: readonly Action[];
++  readSessionState: () => StoredActionResumeState | undefined;
++  loadPersistedCursor: () => Promise<{ sceneId: string; actionIndex: number } | undefined>;
++}): Promise<{ actionIndex: number; resumed: boolean }> {
++  // Section progress is authoritative per speech. A browser cursor is only a
++  // playback position and must never skip the opening of a selected page.
++  if (sectionEntry || !sceneId) return { actionIndex: 0, resumed: false };
++
++  const session = readSessionState();
++  if (session) {
++    const cursor = getActionResumeRestoreCursor(session, sceneId, actions);
++    if (cursor.position) return { actionIndex: cursor.actionIndex, resumed: true };
++  }
++  const saved = await loadPersistedCursor();
++  if (saved?.sceneId === sceneId && canJumpWithinReconstructablePrefix(actions, 0, saved.actionIndex)) {
++    return { actionIndex: saved.actionIndex, resumed: true };
++  }
++  return { actionIndex: 0, resumed: false };
++}
++
+ export function createActionResumePosition(
+   actions: readonly Action[],
+   actionIndex: number | null | undefined,
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -33,7 +33,7 @@
+   isUnsafePlaybackNavigationAction,
+ } from '@/lib/playback/action-navigation';
+ import {
+-  getActionResumeRestoreCursor,
++  initialActionPlaybackPosition,
+   clearActionResumePosition,
+   createActionResumePosition,
+   getActionResumeStorageKey,
+@@ -849,33 +849,24 @@
+         // Stop any in-flight discussion TTS audio on scene switch
+         discussionTTS.cleanup();
+ 
+-        const newSectionEntry = Boolean(runtimeEvents?.entry && !previousSceneId);
+-        const sessionResumeCursor =
+-          !newSectionEntry && currentScene && typeof window !== 'undefined'
+-            ? getActionResumeRestoreCursor(
+-                readActionResumeState(window.sessionStorage, actionResumeStorageKey),
+-                currentScene.id,
+-                currentScene.actions ?? [],
+-              )
+-            : { actionIndex: 0, position: null };
+-        let savedResumeActionIndex = sessionResumeCursor.actionIndex;
+-        let hasSavedPlaybackPosition = sessionResumeCursor.position !== null;
+         const playbackStageId = stage?.id ?? currentScene?.stageId;
+-        if (!newSectionEntry && currentScene && playbackStageId && !sessionResumeCursor.position) {
+-          try {
+-            const cursor = await loadCursor(playbackStageId);
+-            if (
+-              cursor?.sceneId === currentScene.id &&
+-              currentScene.actions?.[cursor.actionIndex] &&
+-              canJumpWithinReconstructablePrefix(currentScene.actions, 0, cursor.actionIndex)
+-            ) {
+-              savedResumeActionIndex = cursor.actionIndex;
+-              hasSavedPlaybackPosition = true;
+-            }
+-          } catch (error) {
+-            console.warn(`Failed to load playback cursor for stage ${playbackStageId}:`, error);
+-          }
+-        }
++        const { actionIndex: savedResumeActionIndex, resumed: hasSavedPlaybackPosition } =
++          await initialActionPlaybackPosition({
++            sectionEntry: runtimeEvents?.entry,
++            sceneId: currentScene?.id,
++            actions: currentScene?.actions ?? [],
++            readSessionState: () => typeof window === 'undefined' ? undefined
++              : readActionResumeState(window.sessionStorage, actionResumeStorageKey),
++            loadPersistedCursor: async () => {
++              if (!playbackStageId) return undefined;
++              try {
++                return (await loadCursor(playbackStageId)) ?? undefined;
++              } catch (error) {
++                console.warn(`Failed to load playback cursor for stage ${playbackStageId}:`, error);
++                return undefined;
++              }
++            },
++          });
+ 
+         if (cancelled) return;
+ 
+@@ -1241,7 +1232,7 @@
+         } else {
+           // Load saved playback state and restore position (but never auto-play).
+           if (
+-            studentMode && !newSectionEntry &&
++            studentMode && !runtimeEvents?.entry &&
+             (studentAutoPlayRuntime?.audioStartAccepted ||
+               hasSavedPlaybackPosition ||
+               runtimeEvents?.getResumeScene()?.sceneId === currentScene.id) &&
+diff --git a/tests/playback/action-navigation.test.ts b/tests/playback/action-navigation.test.ts
+--- a/tests/playback/action-navigation.test.ts
++++ b/tests/playback/action-navigation.test.ts
+@@ -13,6 +13,7 @@
+   clearActionResumePosition,
+   createActionResumePosition,
+   getActionResumeRestoreCursor,
++  initialActionPlaybackPosition,
+   getValidActionResumePosition,
+   readActionResumeState,
+   saveActionResumePosition,
+@@ -241,6 +242,25 @@
+     });
+   });
+ 
++  it('reopens a scoped page at its first speech despite two saved cursors', async () => {
++    const actions = [speech('first'), speech('second'), speech('third')];
++    const storage = createMemoryStorage();
++    saveActionResumePosition(storage, 'key', 'scene-1', createActionResumePosition(actions, 1)!);
++    const readSessionState = vi.fn(() => readActionResumeState(storage, 'key'));
++    const loadPersistedCursor = vi.fn(async () => ({ sceneId: 'scene-1', actionIndex: 2 }));
++    const options = { sceneId: 'scene-1', actions, readSessionState, loadPersistedCursor };
++
++    expect(await initialActionPlaybackPosition({ ...options, sectionEntry: 'poem-a' }))
++      .toEqual({ actionIndex: 0, resumed: false });
++    expect(readSessionState).not.toHaveBeenCalled();
++    expect(loadPersistedCursor).not.toHaveBeenCalled();
++
++    expect(await initialActionPlaybackPosition(options)).toEqual({ actionIndex: 1, resumed: true });
++    expect(loadPersistedCursor).not.toHaveBeenCalled();
++    clearActionResumePosition(storage, 'key', 'scene-1');
++    expect(await initialActionPlaybackPosition(options)).toEqual({ actionIndex: 2, resumed: true });
++  });
++
+   it('restores a saved action boundary and resumes from that action', async () => {
+     const storage = createMemoryStorage();
+     const actions = [speech('a'), speech('b'), speech('c')];

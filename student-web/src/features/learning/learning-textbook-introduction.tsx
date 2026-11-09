@@ -93,7 +93,7 @@ function PictureIntroduction({ student, contents, introduction, unitId }: Props)
     <ol aria-label="导学环节">{steps.map((name, i) => <li key={name} aria-current={index === i ? "step" : undefined} data-past={index > i}><span className="sr-only">{name}</span></li>)}</ol>
   </div>;
 
-  return <SchoolbagShell student={student} className="space-textbooks picture-guide-page storybook-guide"
+  return <SchoolbagShell student={student} className="textbook-page picture-guide-page storybook-guide"
     navigation={<Link href={returnPath}><ArrowLeft size={21} aria-hidden="true" /><span>返回目录</span></Link>}
     tools={<>{pagination}{current && <Button type="button" size="compact" variant="quiet" className="storybook-caption-toggle" aria-label="字幕" aria-pressed={showTranscript} aria-controls={transcriptId} onClick={() => setShowTranscript(value => !value)}><Captions aria-hidden="true" /><span>字幕</span></Button>}</>}>
     <header className="storybook-title"><p>{contents.book.title}</p><h1>{presentation?.title ?? introduction.title}</h1></header>

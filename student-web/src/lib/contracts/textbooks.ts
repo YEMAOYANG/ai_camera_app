@@ -77,7 +77,7 @@ export const textbookCatalogSchema = z.object({
   startHere: z.object({ contentKey: hash, courseId: z.string(), courseVersion: z.string(),
     title: z.string(), subject: textbookSubjectSchema, editionId: textbookIdSchema,
     revisionId: textbookIdSchema, nodeId: textbookIdSchema, current: z.boolean(),
-    delivery: z.literal("fixed_textbook").optional() }).nullable().optional(),
+    delivery: z.literal("fixed_textbook").optional(), entry: textbookIdSchema.optional() }).nullable().optional(),
   books: z.array(z.object({ ...bookFields, selected: z.boolean(), accessMode: z.literal("published").optional(), selectionRevision: z.number().int().nonnegative(), currentNodeId: textbookIdSchema.nullable(), learningStatus: z.object({status: z.enum(["ready", "unpublished", "locked"]), availableLessonCount: z.number().int().nonnegative(), availableActivityCount: z.number().int().nonnegative().optional(), completedLessonCount: z.number().int().nonnegative()}).optional() })),
 });
 export const textbookContentsSchema = z.object({
@@ -97,7 +97,7 @@ export const textbookContentsSchema = z.object({
       printedPage: z.number().int().positive().nullable(), pdfPage: z.number().int().positive().nullable(),
       objectives: z.array(z.string()), status: z.enum(["ready", "preparing", "reviewing", "locked"]), message: z.string().nullable().optional(),
       course: z.object({ courseId: z.string().min(1), courseVersion: z.string().min(1), contentKey: hash,
-        delivery: z.literal("fixed_textbook").optional() }).nullable(),
+        delivery: z.literal("fixed_textbook").optional(), entry: textbookIdSchema.optional() }).nullable(),
     }).refine(node => (node.status === "ready") === (node.course !== null))),
   })),
 }).refine(data => data.selected || data.accessMode === "published" || (!data.explorationCourse && data.units.every(unit => !unit.guideCourse && unit.lessons.every(lesson => lesson.course === null))))
@@ -115,8 +115,15 @@ export type TextbookContents = z.infer<typeof textbookContentsSchema>;
 export type TextbookIntroduction = z.infer<typeof textbookIntroductionSchema>;
 export type PictureGuideSegment = z.infer<typeof pictureSegmentSchema>;
 
+export const textbookLaunchRequestSchema = z.object({ entry: textbookIdSchema.optional() }).strict();
+export const textbookSectionProgressSchema = z.object({
+  sections: z.array(z.object({ nodeId: textbookIdSchema, title: z.string().min(1),
+    firstPage: z.number().int().positive(), lastPage: z.number().int().positive(), listened: z.boolean() })).min(2),
+  checkReady: z.boolean(),
+});
 export const textbookLaunchSchema = z.object({
   ok: z.literal(true), contentKey: hash, title: z.string().min(1),
   editionId: textbookIdSchema, revisionId: textbookIdSchema,
   unitId: textbookIdSchema.nullable(), learningSessionId: z.string().min(1), launchUrl: z.string().url(),
+  entry: textbookIdSchema.optional(), sectionProgress: textbookSectionProgressSchema.optional(),
 });

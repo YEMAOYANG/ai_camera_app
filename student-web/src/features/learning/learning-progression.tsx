@@ -20,7 +20,7 @@ export function learningProgressionMessage(progression: LearningProgression) {
 export function LearningProgressionNote({ progression }: { progression?: LearningProgression }) {
   if (!progression) return null;
   return (
-    <p className="space-course-readiness space-course-progression">
+    <p className="course-detail-caption">
       {progression.sequence > 0 ? `知识点学习顺序 ${progression.sequence} · ` : ""}
       {learningProgressionMessage(progression)}
     </p>

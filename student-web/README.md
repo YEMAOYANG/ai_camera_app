@@ -4,7 +4,7 @@
 
 ## 已完成的学习闭环
 
-- `/today`：读取后端自动安排的当天语文、数学、英语课程和完成进度。
+- `/learning`：从书包进入教材、导学、课堂、复习和作业。历史首页入口 `/` 和 `/today` 跳转到书包。
 - `/lesson/[taskId]`：读取已发布的 LessonPackage，严格按“讲解 → q1 示范 → q2/q3 引导 → q4/q5 独立检查 → 复盘”执行。
 - `/lesson/[taskId]/classroom`：完整 OpenMAIC runtime 专用路由。受信课堂 iframe 位于 Mira/暖瞳课堂顶栏下方，学生始终可以硬导航返回课程列表；runtime、语音或能力未就绪时明确报错，绝不降级到 Mira 播放器。
 - 讲授阶段：使用 Mira 受控 React 模板；一年级拼音金样板提供 a/o/e 发音卡、口型提示、点读波纹和示范步骤。

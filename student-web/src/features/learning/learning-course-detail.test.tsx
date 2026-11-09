@@ -4,8 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LearningCourseDetail } from "@/features/learning/learning-course-detail";
 import type { LearningCourseDetailResponse, LearningProgression } from "@/lib/contracts/learning";
 
-const { getLearningCourse, startLearningCourse } = vi.hoisted(() => ({
+const { getLearningCourse, setLearningFavorite, startLearningCourse } = vi.hoisted(() => ({
   getLearningCourse: vi.fn(),
+  setLearningFavorite: vi.fn(),
   startLearningCourse: vi.fn(),
 }));
 
@@ -13,8 +14,8 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), refres
 
 vi.mock("@/features/learning/learning-client", () => ({
   getLearningCourse,
+  setLearningFavorite,
   startLearningCourse,
-  setLearningFavorite: vi.fn(),
 }));
 
 const detail: LearningCourseDetailResponse = {
@@ -65,7 +66,21 @@ describe("LearningCourseDetail formal classroom gate", () => {
   beforeEach(() => {
     getLearningCourse.mockReset();
     getLearningCourse.mockResolvedValue(detail);
+    setLearningFavorite.mockReset();
     startLearningCourse.mockReset();
+  });
+
+  it("keeps favorites and classroom navigation on old course links in the bookbag shell", async () => {
+    getLearningCourse.mockResolvedValue({ ...detail, item: { ...detail.item, fullClassroomAvailable: true } });
+    setLearningFavorite.mockResolvedValue({ favorite: true });
+    render(<LearningCourseDetail student={{ id: "student-1", childId: "child-1", displayName: "乐乐", gradeCode: "primary_1" }} courseId="course-formal-1" version="1" />);
+
+    expect(await screen.findByRole("link", { name: "开始上课" })).toHaveAttribute("href", "/lesson/task-package-only/classroom");
+    expect(screen.getByRole("link", { name: "回到书包" })).toHaveAttribute("href", "/learning");
+    expect(screen.getByRole("main").closest(".schoolbag-shell")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "收藏课程" }));
+    expect(await screen.findByRole("button", { name: "已收藏" })).toHaveAttribute("aria-pressed", "true");
+    expect(setLearningFavorite).toHaveBeenCalledExactlyOnceWith("course-formal-1", "1", true);
   });
 
   it.each(["task-package-only", null])("preserves details and favorites while blocking a future lesson", async (taskId) => {

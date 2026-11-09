@@ -321,6 +321,57 @@ test('fixed textbook delivery uses private backend snapshot, verified media and 
   assert.equal(paidCalls, 0);
 });
 
+test('two entries to one fixed classroom keep their signed document and event scopes', async () => {
+  const classroomId = 'tbpub_' + 'e'.repeat(24);
+  const entries = ['section-a', 'section-b'];
+  const backend = await listen(http.createServer(async (request, response) => {
+    if (request.url.endsWith('/exchange')) {
+      const entry = (await jsonBody(request)).ticket.slice('tbpt_'.length);
+      return reply(response, { ok: true, runtimeToken: 'tbpr_' + entry, classroomId, entry,
+        expiresAt: Date.now() + 60_000 });
+    }
+    if (request.url.endsWith('/validate')) {
+      const entry = (await jsonBody(request)).runtimeToken.slice('tbpr_'.length);
+      return reply(response, { ok: true, classroomId, entry, purpose: 'fixed_textbook',
+        runtimeSessionId: 'shared-session', expiresAt: Date.now() + 60_000, media: [] });
+    }
+    if (request.url.endsWith('/events')) {
+      const entry = request.headers['x-mira-textbook-token'].slice('tbpr_'.length);
+      return reply(response, { ok: true, entry, sessionId: 'shared-session' });
+    }
+    response.writeHead(404).end();
+  }));
+  const upstream = await listen(http.createServer((_request, response) => {
+    response.end('classroom document');
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const locations = [];
+  const cookies = new Map();
+  for (const entry of entries) {
+    const launch = await fetch(`${gateway}/mira/textbook-launch?ticket=tbpt_${entry}`, { redirect: 'manual' });
+    assert.equal(launch.status, 303);
+    const location = launch.headers.get('location');
+    assert.equal(location, `/classroom/${classroomId}?mira=1&textbook=1&entry=${entry}`);
+    locations.push(location);
+    for (const item of launch.headers.getSetCookie()) {
+      const cookie = item.split(';')[0];
+      cookies.set(cookie.split('=')[0], cookie);
+    }
+  }
+  const cookie = [...cookies.values()].join('; ');
+  assert.equal(cookies.size, 3); // latest legacy cookie and two separate entry cookies
+  for (const [index, entry] of entries.entries()) {
+    assert.equal((await fetch(gateway + locations[index], { headers: { cookie } })).status, 200);
+    const result = await fetch(gateway + '/mira/runtime-events', {
+      headers: { cookie, referer: 'http://runtime.test' + locations[index] },
+    });
+    assert.deepEqual(await result.json(), { ok: true, entry, sessionId: 'shared-session' });
+  }
+  assert.equal((await fetch(gateway + '/mira/runtime-events', {
+    headers: { cookie, referer: `http://runtime.test/classroom/${classroomId}?mira=1&textbook=1&entry=shared-check` },
+  })).status, 401);
+});
+
 test('activity snapshots retain cookie authority and their dedicated body limit without widening quiz limits', async () => {
   const classroomId='tbpub_'+'f'.repeat(24),releaseSha256='e'.repeat(64);
   const html='<button id="move">move</button>',contentSha256=createHash('sha256').update(html).digest('hex');
@@ -370,6 +421,19 @@ test('activity snapshots retain cookie authority and their dedicated body limit 
   assert.equal((await fetch(gateway+'/mira/activity-state',{method:'POST',headers:{...headers,'content-type':'text/plain'},body:'{}'})).status,415);
   assert.equal(writes,2);
   assert.equal(upstreamReads,0);
+});
+
+test('speech end evidence requires an authenticated fixed textbook section', () => {
+  const runtime = { runtimeSessionId: 'session', learningSessionId: 'session', classroomId: 'classroom',
+    purpose: 'fixed_textbook', entry: 'poem-a' };
+  const payload = { actionId: 'speech-a', sceneId: 'page-a', sceneIndex: 0 };
+  const encode = fields => Buffer.from(JSON.stringify({ schemaVersion: 'mira.openmaic.student-runtime-event.v1',
+    sequence: 3, type: 'section_speech_completed', payload: fields }));
+  assert.deepEqual(prepareRuntimeEvent(encode(payload), runtime).payload, payload);
+  assert.throws(() => prepareRuntimeEvent(encode(payload), { ...runtime, entry: undefined }));
+  assert.throws(() => prepareRuntimeEvent(encode(payload), { ...runtime, purpose: 'conversation_probe' }));
+  assert.throws(() => prepareRuntimeEvent(encode({ ...payload, actionId: 3 }), runtime));
+  assert.throws(() => prepareRuntimeEvent(encode({ ...payload, played: true }), runtime));
 });
 
 test('fixed textbook forwards bounded stroke events unchanged under its authenticated identity', async () => {
@@ -511,6 +575,129 @@ test('conversation probes cannot read or write formal activity progress', async 
   }
   assert.equal(activityCalls, 0);
   assert.equal(upstreamCalls, 0);
+});
+
+test('published classroom media shares verified reads across students without caching their classroom state', async () => {
+  const classroomId = 'tbpub_' + 'e'.repeat(24);
+  const paths = Array.from({length: 12}, (_, i) => `/api/classroom-media/${classroomId}/media/page-${i}.png`);
+  const bytes = Buffer.from('published picture');
+  const sha256 = createHash('sha256').update(bytes).digest('hex');
+  const media = paths.map(path => ({path, sha256, byteSize: bytes.length, mimeType: 'image/png'}));
+  let releaseSha256 = 'a'.repeat(64);
+  let reads = 0, active = 0, peak = 0;
+  let revoked = false, corrupt = false;
+  const backend = await listen(http.createServer(async (request, response) => {
+    if (request.url.endsWith('/validate')) {
+      const {runtimeToken} = await jsonBody(request);
+      if (revoked || !['tbpr_first', 'tbpr_second'].includes(runtimeToken)) {
+        return response.writeHead(401).end();
+      }
+      return reply(response, {ok:true, purpose:'fixed_textbook', classroomId, releaseSha256, media});
+    }
+    assert.equal(request.url, '/internal/learning/textbooks/runtime/classroom');
+    return reply(response, {success:true, classroom: {
+      id: classroomId,
+      stage: {miraStudent: {name: request.headers['x-mira-textbook-token']}},
+      scenes: paths.map((path, i) => ({id: `page-${i}`, type: 'interactive',
+        content: {type:'interactive', html: `<img src="${path}">`}})),
+    }});
+  }));
+  const upstream = await listen(http.createServer(async (request, response) => {
+    assert.ok(paths.includes(request.url));
+    reads++;
+    peak = Math.max(peak, ++active);
+    await new Promise(resolve => setTimeout(resolve, 25));
+    active--;
+    response.end(corrupt ? Buffer.alloc(bytes.length) : bytes);
+  }));
+  const gateway = await listenGateway({backend, upstream});
+  const classroomUrl = `${gateway}/api/classroom?id=${classroomId}`;
+  const headers = student => ({cookie: `mira_openmaic_runtime=tbpr_${student}`});
+  const opened = await Promise.all(['first','second'].map(async student => {
+    const response = await fetch(classroomUrl, {headers: headers(student)});
+    assert.equal(response.status, 200);
+    return (await response.json()).classroom;
+  }));
+  assert.deepEqual(opened.map(room => room.stage.miraStudent.name), ['tbpr_first', 'tbpr_second']);
+  assert.deepEqual(opened[0].scenes, opened[1].scenes);
+  assert.match(opened[0].scenes[0].content.html, /data:image\/png;base64,/);
+  assert.equal(reads, paths.length);
+  assert.ok(peak > 1 && peak <= 8, `bounded parallel reads, got ${peak}`);
+
+  const reopened = await fetch(classroomUrl, {headers: headers('first')});
+  assert.deepEqual((await reopened.json()).classroom, opened[0]);
+  const mediaUrl = gateway + paths[0];
+  assert.deepEqual(Buffer.from(await (await fetch(mediaUrl, {headers: headers('first')})).arrayBuffer()), bytes);
+  assert.equal(reads, paths.length);
+  revoked = true;
+  assert.equal((await fetch(classroomUrl, {headers: headers('first')})).status, 401);
+  assert.equal((await fetch(mediaUrl, {headers: headers('first')})).status, 401);
+  assert.equal(reads, paths.length);
+
+  revoked = false;
+  releaseSha256 = 'b'.repeat(64);
+  corrupt = true;
+  assert.equal((await fetch(mediaUrl, {headers: headers('first')})).status, 502);
+  corrupt = false;
+  assert.equal((await fetch(mediaUrl, {headers: headers('first')})).status, 200);
+  assert.equal(reads, paths.length + 2);
+});
+
+test('fixed textbook directory reads no media and each authorized page only embeds its own assets', async () => {
+  const { scene, runtime, bytes, audioPath } = narrationFixture();
+  const classroomId = runtime.classroomId;
+  const secondPath = `/api/classroom-media/${classroomId}/media/second.png`;
+  const secondBytes = Buffer.from('second page image');
+  runtime.releaseSha256 = 'a'.repeat(64);
+  runtime.media.push({ path: secondPath, mimeType: 'image/png', byteSize: secondBytes.length,
+    sha256: createHash('sha256').update(secondBytes).digest('hex') });
+  const plan = '<script id="mira-interaction-plan" type="application/json">{"objectives":[]}</script>';
+  scene.content.html += plan;
+  const scenes = [
+    { ...scene, title: 'Opening page', order: 1 },
+    { id: 'second', title: 'Second page', stageId: classroomId, order: 2, type: 'interactive',
+      content: { type: 'interactive', html: `<img src="${secondPath}">` } },
+    { id: 'quiz', title: 'Review', stageId: classroomId, order: 3, type: 'quiz',
+      content: { type: 'quiz', questions: [{ id: 'question' }] } },
+  ];
+  let revoked = false;
+  const backend = await listen(http.createServer((request, response) => {
+    if (request.url.endsWith('/validate')) return revoked
+      ? response.writeHead(401).end() : reply(response, { ok: true, ...runtime });
+    assert.equal(request.url, '/internal/learning/textbooks/runtime/classroom');
+    return reply(response, { success: true, classroom: { stage: { id: classroomId }, scenes } });
+  }));
+  const reads = [];
+  const upstream = await listen(http.createServer((request, response) => {
+    reads.push(request.url);
+    return response.end(request.url === audioPath ? bytes : secondBytes);
+  }));
+  const gateway = await listenGateway({ backend, upstream });
+  const url = `${gateway}/api/classroom?id=${classroomId}`;
+  const options = { headers: { cookie: 'mira_openmaic_runtime=tbpr_paging' } };
+  const response = await fetch(`${url}&view=pages`, options);
+  const index = (await response.json()).classroom;
+  assert.equal(index.paged, true);
+  assert.deepEqual(index.scenes.map(page => page.title), scenes.map(page => page.title));
+  assert.ok(index.scenes.every(page => page.miraPageSummary));
+  assert.equal(index.scenes[0].content.html, plan);
+  assert.equal(index.scenes[0].actions, undefined);
+  assert.deepEqual(index.scenes[2].content.questions, []);
+  assert.deepEqual(reads, []);
+
+  assert.equal((await fetch(`${url}&scene=foreign`, options)).status, 404);
+  assert.equal((await fetch(`${url}&scene=second&scene=scene`, options)).status, 403);
+  assert.equal((await fetch(`${url}&scene=second&view=pages`, options)).status, 403);
+  assert.deepEqual(reads, []);
+  const first = (await (await fetch(`${url}&scene=scene`, options)).json()).scene;
+  assert.match(first.content.html, /data:audio\/mpeg;base64,/);
+  assert.equal(first.miraPageNarration.bindings[0].audioPath, audioPath);
+  assert.deepEqual(reads, [audioPath]);
+  const second = (await (await fetch(`${url}&scene=second`, options)).json()).scene;
+  assert.match(second.content.html, /data:image\/png;base64,/);
+  assert.deepEqual(reads, [audioPath, secondPath]);
+  revoked = true;
+  assert.equal((await fetch(`${url}&scene=second`, options)).status, 401);
 });
 
 test('published video and GLB bytes retain exact session, hash, size and format boundaries', async () => {

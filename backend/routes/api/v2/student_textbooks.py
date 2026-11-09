@@ -1,3 +1,5 @@
+import re
+
 from flask import Blueprint, Response, jsonify, request
 
 from core.errors import ApiError, error_response
@@ -12,9 +14,24 @@ parent_textbooks_bp = Blueprint("parent_textbooks", __name__)
 @student_textbooks_bp.post('/courses/<content_key>/launch')
 def launch(content_key):
     try:
-        if request.args or json_body(request) != {}:
+        body = json_body(request)
+        if (request.args or not isinstance(body, dict) or set(body) - {'entry'}
+                or ('entry' in body and (not isinstance(body['entry'], str)
+                    or not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_.-]{0,79}', body['entry'])))):
             raise ApiError('textbook_query_invalid', '课堂请求参数无效', 400)
-        return jsonify(textbook_classroom_service().launch(bearer_token(request), content_key))
+        return jsonify(textbook_classroom_service().launch(bearer_token(request), content_key, entry=body.get('entry')))
+    except ApiError as exc:
+        return error_response(exc)
+
+
+@student_textbooks_bp.get('/courses/<content_key>/sections')
+def section_progress(content_key):
+    try:
+        values = request.args.getlist('learningSessionId')
+        if (set(request.args) != {'learningSessionId'} or len(values) != 1
+                or not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}', values[0])):
+            raise ApiError('textbook_query_invalid', '课堂请求参数无效', 400)
+        return jsonify(textbook_classroom_service().section_progress(bearer_token(request), content_key, values[0]))
     except ApiError as exc:
         return error_response(exc)
 
@@ -29,11 +46,16 @@ def catalog():
 
 @student_textbooks_bp.get("/assets/<path:asset_path>")
 def asset(asset_path):
-    """Serve only immutable, manifest-listed public courseware resources."""
+    """Serve public courseware assets and covers derived from published media."""
     if request.args:
         return error_response(ApiError("courseware_asset_request_invalid", "课件资源请求无效", 400))
     try:
-        entry, body = courseware_asset_store().read_public(asset_path)
+        from services.textbook_directory_cover import ASSET_PATH, read_directory_cover
+        cover = ASSET_PATH.fullmatch(asset_path)
+        if cover is None:
+            entry, body = courseware_asset_store().read_public(asset_path)
+        else:
+            entry, body = read_directory_cover(textbook_learning_service().repository, cover[1])
         return Response(body, content_type=entry["mimeType"], headers={
             "Content-Length": str(len(body)),
             "Cache-Control": "public, max-age=31536000, immutable",

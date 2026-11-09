@@ -16,6 +16,13 @@ export function textbookContentsPath(book: TextbookContents["book"], unitId?: st
   return `/learning/textbooks?${query}`;
 }
 
+export const TEXTBOOK_CHECK_ENTRY = "shared-check";
+
+export function textbookCoursePath(contentKey: string, entry?: string) {
+  const path = `/learning/textbooks/courses/${contentKey}`;
+  return entry ? `${path}?${new URLSearchParams({ entry })}` : path;
+}
+
 export function textbookIntroductionPath(book: TextbookContents["book"], introductionId: string) {
   return `/learning/textbooks/${encodeURIComponent(book.editionId)}/${encodeURIComponent(book.revisionId)}/intro/${encodeURIComponent(introductionId)}`;
 }

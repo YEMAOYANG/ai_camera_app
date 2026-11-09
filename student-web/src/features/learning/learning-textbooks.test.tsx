@@ -1,5 +1,4 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LearningTextbooks } from "@/features/learning/learning-textbooks";
@@ -9,10 +8,6 @@ import { textbookContentsSchema } from "@/lib/contracts/textbooks";
 const { router, startLearningCourse } = vi.hoisted(() => ({ router: { replace: vi.fn(), push: vi.fn() }, startLearningCourse: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("@/features/learning/learning-client", async importOriginal => ({ ...await importOriginal<typeof import("@/features/learning/learning-client")>(), startLearningCourse }));
-vi.mock("@/components/student/space-shell", () => ({
-  SpaceShell: ({ children }: { children: ReactNode }) => <main>{children}</main>,
-  SpacePageHeading: ({ title, children }: { title: string; children: ReactNode }) => <header><h1>{title}</h1>{children}</header>,
-}));
 const student = { id: "student-a", childId: "child-a", displayName: "乐乐", gradeCode: "primary_1" };
 const book = { editionId: "pep-chinese-g1", revisionId: "review-1", title: "语文 一年级上册", publisher: "人民教育出版社", editionLabel: "测试目录", gradeCode: "primary_1", subject: "chinese", volume: "upper", schoolSystem: "six_year", coverage: { status: "partial", note: "仅首单元" }, sourceUrl: "https://basic.smartedu.cn/tchMaterial/detail?contentId=test", unitCount: 1, lessonCount: 1 };
 const catalog = (selected = true) => ({ ok: true, schemaVersion: "mira.learning.textbooks.v1", gradeCode: "primary_1", schoolYearStartYear: 2026, semester: "upper", books: [{ ...book, selected, selectionRevision: selected ? 1 : 0, currentNodeId: null }] });
@@ -123,6 +118,26 @@ describe("school textbooks", () => {
     expect(screen.queryByText("家长已确认")).not.toBeInTheDocument();
     expect(fetch.mock.calls.every(([, options]) => !options?.method || options.method === "GET")).toBe(true);
     expect(startLearningCourse).not.toHaveBeenCalled();
+  });
+
+  it("carries each section selector from both directory views while keeping one course key", async () => {
+    const contentKey = "b".repeat(64);
+    const entries = [{ title: "第一部分", nodeId: "section-a" }, { title: "第二部分", nodeId: "section-b" }];
+    const unit = detail().units[0];
+    const response = { ...detail(), units: [{ ...unit, lessons: entries.map((entry, index) => ({
+      ...unit.lessons[0], ...entry, sequence: index + 1, status: "ready",
+      course: { courseId: "shared", courseVersion: "1", contentKey, delivery: "fixed_textbook", entry: entry.nodeId },
+    })) }] };
+    vi.stubGlobal("fetch", vi.fn((path: string) => Promise.resolve(reply(
+      path === "/api/learning/textbooks" ? catalog() : response))));
+    render(<LearningTextbooks student={student} />);
+    for (const entry of entries) {
+      expect(await screen.findByRole("link", { name: `开始上课，${entry.title}` })).toHaveAttribute("href",
+        `/learning/textbooks/courses/${contentKey}?entry=${entry.nodeId}`);
+    }
+    fireEvent.click(screen.getByRole("button", { name: "完整目录" }));
+    expect(screen.getAllByRole("link", { name: "开始上课" }).map(link => link.getAttribute("href")))
+      .toEqual(entries.map(entry => `/learning/textbooks/courses/${contentKey}?entry=${entry.nodeId}`));
   });
 
   it("opens released exploration and unit guide from the selected book without treating them as lesson mastery", async () => {

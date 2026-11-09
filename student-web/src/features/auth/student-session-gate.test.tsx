@@ -7,11 +7,7 @@ const { router } = vi.hoisted(() => ({ router: { replace: vi.fn(), refresh: vi.f
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("@/features/learning/learning-textbooks", () => ({ LearningTextbooks: () => <div>已授权的教材课程库</div> }));
 vi.mock("@/features/learning/learning-schoolbag", () => ({ LearningSchoolbag: () => <div>已授权的书包首页</div> }));
-vi.mock("@/features/today/student-dashboard", () => ({ StudentDashboard: () => <div>已授权的今日课程</div> }));
-vi.mock("@/features/learning/learning-library", () => ({ LearningLibrary: () => <div>已授权的课程库</div> }));
 vi.mock("@/features/learning/learning-course-detail", () => ({ LearningCourseDetail: () => <div>已授权的课程详情</div> }));
-vi.mock("@/features/learning/learning-practice", () => ({ LearningPractice: () => <div>已授权的练习</div> }));
-vi.mock("@/features/learning/learning-path", () => ({ LearningPath: () => <div>已授权的学习路线</div> }));
 vi.mock("@/features/classroom/classroom-entry", () => ({ ClassroomEntry: () => <div>已授权的课堂</div> }));
 
 describe("StudentSessionGate", () => {
@@ -28,18 +24,17 @@ describe("StudentSessionGate", () => {
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith(destination));
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith("/api/auth/me", expect.objectContaining({ signal: expect.any(AbortSignal) }));
-    expect(screen.queryByText("已授权的今日课程")).not.toBeInTheDocument();
   });
 
   it("shows the real error without revealing protected content or account controls", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ message: "学习身份服务暂时不可用" }), { status: 503 })));
-    render(<StudentSessionGate learningView="practice" />);
+    render(<StudentSessionGate learningView="schoolbag" />);
     expect(await screen.findByRole("alert")).toHaveTextContent("学习身份服务暂时不可用");
     expect(screen.getByRole("alert")).toHaveAttribute("aria-busy", "false");
+    expect(screen.queryByText("已授权的书包首页")).not.toBeInTheDocument();
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "休息一下" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "再试一次" })).toBeEnabled();
-    expect(screen.queryByText("已授权的练习")).not.toBeInTheDocument();
     expect(router.replace).not.toHaveBeenCalled();
   });
 
@@ -91,16 +86,12 @@ describe("StudentSessionGate", () => {
     expect(router.replace).not.toHaveBeenCalled();
   });
 
-  it.each([undefined, "path", "library", "practice", "textbooks"] as const)("opens only the textbook library for entry %s after authentication", async (learningView) => {
+  it.each([undefined, "schoolbag", "textbooks"] as const)("opens only the textbook library for entry %s after authentication", async (learningView) => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
       ok: true, student: { id: "student-1", childId: "child-1", displayName: "小米", gradeCode: "primary_1" },
       device: { id: "device-1", label: "学习设备" },
     }))));
     render(<StudentSessionGate learningView={learningView} />);
-    expect(screen.queryByText("已授权的学习路线")).not.toBeInTheDocument();
     expect(await screen.findByText(learningView === "textbooks" ? "已授权的教材课程库" : "已授权的书包首页")).toBeInTheDocument();
-    expect(screen.queryByText("已授权的今日课程")).not.toBeInTheDocument();
-    expect(screen.queryByText("已授权的课程库")).not.toBeInTheDocument();
-    expect(screen.queryByText("已授权的练习")).not.toBeInTheDocument();
   });
 });

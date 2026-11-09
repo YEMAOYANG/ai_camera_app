@@ -3,7 +3,7 @@ from copy import deepcopy
 import hashlib
 import re
 
-from content.textbook_catalog import canonical, digest, lesson_by_id
+from content.textbook_catalog import canonical, digest, lesson_by_id, lesson_release_aliases
 from content.textbook_review_evidence import restore_split_review
 from core.errors import ApiError
 
@@ -158,6 +158,10 @@ def validate_release(build, manifest, course=None):
             or not review.get('reviewer') or not review.get('basis')):
         fail()
     _, node = lesson_by_id(manifest, build['node_id'])
+    try:
+        lesson_release_aliases(manifest, build['node_id'], frozen.get('identity'))
+    except ValueError:
+        fail()
     if frozen.get('knowledgeBrief') != node['brief'] or frozen.get('gradeCode') != manifest['gradeCode']:
         fail()
     if course is not None and (course['status'] != 'published' or course['quality_status'] != 'released'

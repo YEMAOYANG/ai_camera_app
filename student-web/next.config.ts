@@ -22,6 +22,12 @@ function configuredDevOrigins() {
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   allowedDevOrigins: configuredDevOrigins(),
+  async redirects() {
+    return [
+      { source: "/", destination: "/learning", permanent: false },
+      { source: "/today", destination: "/learning", permanent: false },
+    ];
+  },
   async rewrites() {
     return {
       // These compatibility URLs are frozen into published textbook data.

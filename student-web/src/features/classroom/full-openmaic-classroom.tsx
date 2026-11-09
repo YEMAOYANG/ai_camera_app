@@ -5,7 +5,6 @@ import { useState } from "react";
 
 import { DocumentLink } from "@/components/navigation/document-link";
 import { MiraMark } from "@/components/student/mira-mark";
-import { SpaceAtmosphere } from "@/components/student/space-atmosphere";
 import { Button } from "@/components/ui/button";
 import type { LearningStartResponse } from "@/lib/contracts/learning";
 import type { OpenMaicFormalRuntimeLaunch } from "@/lib/contracts/openmaic-runtime";
@@ -23,7 +22,7 @@ export function FullOpenMaicClassroom({
     : [];
   if (missing.length > 0) {
     return (
-      <main id="main-content" className="classroom-preparing-state">
+      <main id="main-content" className="mira-ui-surface classroom-preparing-state">
         <p>课程制作中</p>
         <h1>完整互动课堂制作未完成</h1>
         <span>还有课堂内容或互动能力没有通过检查，准备好后就会自动开放。</span>
@@ -39,11 +38,9 @@ export function FullOpenMaicClassroom({
   return (
     <main
       id="main-content"
-      className="full-openmaic-shell"
-      data-space-stage
+      className="mira-ui-surface full-openmaic-shell"
       aria-label="完整互动课堂"
     >
-      <SpaceAtmosphere scenic={false} variant="toolbar" />
       <nav className="full-openmaic-toolbar" aria-label="课堂导航">
         <DocumentLink
           href="/learning"

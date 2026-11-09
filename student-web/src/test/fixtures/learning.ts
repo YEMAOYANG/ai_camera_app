@@ -1,4 +1,4 @@
-import type { LearningLesson, LearningSession, LearningTodayResponse } from "@/lib/contracts/learning";
+import type { LearningLesson, LearningSession } from "@/lib/contracts/learning";
 
 export const lessonFixture: LearningLesson = {
   courseId: "course-pinyin-1",
@@ -63,59 +63,4 @@ export const sessionFixture: LearningSession = {
     ],
   },
   startedAt: 1,
-};
-
-export const todayFixture: LearningTodayResponse = {
-  ok: true,
-  date: "2026-08-13",
-  catalogStatus: "complete",
-  availableCourseCount: 30,
-  targetCourseCount: 30,
-  itemCount: 3,
-  completedCount: 0,
-  items: [
-    {
-      slot: "core",
-      state: "scheduled",
-      subject: "chinese",
-      recommendation: { ...lessonFixture, teachingFlow: undefined },
-      task: { id: "task-1", status: "scheduled", scheduledStart: "19:30", learningSlot: "core" },
-      session: null,
-      latestReport: null,
-    },
-    {
-      slot: "rotation",
-      state: "scheduled",
-      subject: "math",
-      recommendation: {
-        ...lessonFixture,
-        courseId: "course-math-1",
-        title: "20以内加法小实验",
-        subject: "math",
-        subjectLabel: "数学",
-        objective: "理解把两个数量合在一起",
-        teachingFlow: undefined,
-      },
-      task: { id: "task-2", status: "scheduled", scheduledStart: "19:45", learningSlot: "rotation" },
-      session: null,
-      latestReport: null,
-    },
-    {
-      slot: "extension",
-      state: "scheduled",
-      subject: "english",
-      recommendation: {
-        ...lessonFixture,
-        courseId: "course-english-1",
-        title: "Hello! 见面问好",
-        subject: "english",
-        subjectLabel: "英语",
-        objective: "能听懂并说出日常问候语",
-        teachingFlow: undefined,
-      },
-      task: { id: "task-3", status: "scheduled", scheduledStart: "20:00", learningSlot: "extension" },
-      session: null,
-      latestReport: null,
-    },
-  ],
 };

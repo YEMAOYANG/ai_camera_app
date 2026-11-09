@@ -117,7 +117,7 @@ export function QrPairing({ paused = false }: { paused?: boolean }) {
   }, [enterLearning, status]);
 
   return (
-    <div className="space-qr mt-6" data-qr-state={status} aria-live="polite">
+    <div className="student-qr mt-6" data-qr-state={status} aria-live="polite">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-lg font-extrabold text-[var(--mira-ink)]">
           <ScanLine className="size-5 text-[var(--mira-brand-deep)]" aria-hidden="true" />
@@ -135,7 +135,7 @@ export function QrPairing({ paused = false }: { paused?: boolean }) {
         {status === "starting" ? <QrStarting /> : null}
         {status === "waiting" && challenge ? (
           <div className="text-center">
-            <div className="mx-auto w-fit space-qr-code">
+            <div className="mx-auto w-fit student-qr-code">
               <QRCodeSVG
                 value={challenge.qrValue}
                 size={220}

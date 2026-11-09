@@ -135,7 +135,7 @@ class TextbookLearningService:
                 builds = self.repository.directory_builds(conn, book["editionId"], book["revisionId"])
                 from services.textbook_directory_access import published_node_directory_entries
                 releases = published_node_directory_entries(self.repository, child, builds, manifest)
-                available, locked = [], 0
+                available, locked = set(), 0
                 guides = [self._available_activity(conn, child, manifest, builds, 'book_exploration', releases=releases)]
                 guides.extend(self._available_activity(conn, child, manifest, builds, 'unit_guide', unit['unitId'], releases=releases)
                               for unit in manifest['units'])
@@ -147,7 +147,7 @@ class TextbookLearningService:
                     for node in unit["lessons"]:
                         course, blocked = self._available_course(conn, child, manifest, node, builds, releases=releases)
                         if course:
-                            available.append((course["courseId"], course["courseVersion"]))
+                            available.add((course["courseId"], course["courseVersion"]))
                             suggestions.append({**course, 'title': node['title'], 'subject': book['subject'],
                                 'editionId': book['editionId'], 'revisionId': book['revisionId'],
                                 'nodeId': node['nodeId'], 'current': node['nodeId'] == book['currentNodeId']})
@@ -270,9 +270,13 @@ class TextbookLearningService:
             releases = published_node_directory_entries(self.repository, child, builds, manifest)
         released = releases.get(node['nodeId'])
         if released is not None:
-            build, _, course, _ = released
+            from content.textbook_sections import plan_for
+            build, release, course, _ = released
+            plan = plan_for(build['content_key'], release['sha256'])
+            entry = node['nodeId'] if plan and any(item['nodeId'] == node['nodeId'] for item in plan['sections']) else None
             return {'courseId': course['id'], 'courseVersion': course['version'],
-                    'contentKey': build['content_key'], 'delivery': 'fixed_textbook'}, None
+                    'contentKey': build['content_key'], 'delivery': 'fixed_textbook',
+                    **({'entry': entry} if entry else {})}, None
         candidates = [b for b in builds if b['node_id'] == node['nodeId'] and b['part_index'] == 1]
         if candidates:
             build = candidates[0]

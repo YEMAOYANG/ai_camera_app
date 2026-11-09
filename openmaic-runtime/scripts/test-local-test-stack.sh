@@ -14,6 +14,21 @@ fail() {
 # shellcheck source=local-test-stack.sh
 source "${STACK_SCRIPT}"
 
+# The native launcher clears its environment. Keep the TTS timeout available
+# to the runtime so a slow response does not cut off a paid request at 30s.
+(
+  NATIVE_RUNTIME_SCRIPT="${TMP_ROOT}/native-timeout-fixture"
+  cat > "${NATIVE_RUNTIME_SCRIPT}" <<'EOF'
+#!/usr/bin/env bash
+printf '%s' "${TTS_REQUEST_TIMEOUT_MS:-missing}"
+EOF
+  chmod +x "${NATIVE_RUNTIME_SCRIPT}"
+  unset TTS_REQUEST_TIMEOUT_MS
+  [[ "$(native_invoke status)" == '90000' ]] || fail "native runtime did not receive the local TTS timeout"
+  TTS_REQUEST_TIMEOUT_MS=60000
+  [[ "$(native_invoke status)" == '60000' ]] || fail "native runtime did not receive the TTS timeout override"
+)
+
 HASH_A="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 HASH_B="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 HASH_C="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"

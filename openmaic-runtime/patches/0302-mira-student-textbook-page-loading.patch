@@ -1,0 +1,562 @@
+diff --git a/components/classroom/ClassroomSurface.tsx b/components/classroom/ClassroomSurface.tsx
+index ec3f5d24e5deab414e773bf7788e31af3b553ab4..132f8b0798955c0ac27e81e5a184e309c16871e9 100644
+--- a/components/classroom/ClassroomSurface.tsx
++++ b/components/classroom/ClassroomSurface.tsx
+@@ -58,6 +58,13 @@ import {
+ } from '@/lib/contexts/mira-student-runtime-context';
+ import { connectStudentParentReady, hasVisibleStudentClassroom, type StudentParentReadyChannel } from '@/lib/mira/student-parent-ready';
+ import { studentResumeSceneId } from '@/lib/mira/student-resume-scene';
++import {
++  createStudentClassroomPages,
++  fetchStudentClassroomIndex,
++  StudentClassroomPagesContext,
++  type StudentClassroomPages,
++} from '@/lib/mira/student-classroom-pages';
++import type { Scene } from '@/lib/types/stage';
+ import {
+   applyHydratedClassroomFallbackScenes,
+   hydrateClassroomFallbackChats,
+@@ -65,6 +72,14 @@ import {
+ 
+ const log = createLogger('Classroom');
+ 
++function hasUsableStudentPage(root: HTMLElement | null, scene: Scene, paged: boolean) {
++  if (scene.miraPageSummary || !hasVisibleStudentClassroom(root, scene.id)) return false;
++  if (!paged || (scene.type !== 'interactive' && !scene.miraActivity)) return true;
++  // The interactive canvas lays out before the opaque iframe has parsed its
++  // document. Native activities likewise need their initial state first.
++  return !!root?.querySelector(`[data-mira-student-page-ready="${CSS.escape(scene.id)}"]`);
++}
++
+ type ClassroomLoadOutcome = 'loaded' | 'unavailable' | 'failed' | 'cancelled';
+ 
+ // stage_link can become visible shortly before its document. Probe only that
+@@ -85,6 +100,8 @@ export function ClassroomSurface({
+   const currentScene = useStageStore((s) => s.getCurrentScene());
+   const surfaceRef = useRef<HTMLDivElement>(null);
+   const readyChannelRef = useRef<StudentParentReadyChannel | null>(null);
++  const pagesRef = useRef<StudentClassroomPages | null>(null);
++  const [classroomPages, setClassroomPages] = useState<StudentClassroomPages | null>(null);
+   const { t } = useI18n();
+   // The retry loop below reads the message after async gaps, so it must see
+   // the CURRENT translation (a locale switch may have happened since mount).
+@@ -116,7 +133,7 @@ export function ClassroomSurface({
+       const scene = state.getCurrentScene();
+       return state.stage?.id === classroomId && !!scene && scene.stageId === classroomId
+         && scene.content.type === scene.type
+-        && hasVisibleStudentClassroom(surfaceRef.current, scene.id);
++        && hasUsableStudentPage(surfaceRef.current, scene, !!pagesRef.current);
+     });
+     readyChannelRef.current = channel;
+     return () => {
+@@ -128,6 +145,25 @@ export function ClassroomSurface({
+     readyChannelRef.current?.flush();
+   }, [classroomId, currentScene, error, loadedClassroomId, loading, notFound]);
+ 
++  useEffect(() => {
++    if (!classroomPages || !currentScene || loading || error || notFound) return;
++    const scenes = useStageStore.getState().scenes;
++    const next = scenes[scenes.findIndex((scene) => scene.id === currentScene.id) + 1];
++    if (!next?.miraPageSummary) return;
++    let timer: ReturnType<typeof setTimeout>;
++    let remainingChecks = 300;
++    const prefetchWhenUsable = () => {
++      if (!classroomPages.active || useStageStore.getState().currentSceneId !== currentScene.id) return;
++      if (hasUsableStudentPage(surfaceRef.current, currentScene, true)) {
++        void classroomPages.read(next.id, 'low').catch(() => { /* A later page selection retries. */ });
++      } else if (remainingChecks-- > 0) {
++        timer = setTimeout(prefetchWhenUsable, 100);
++      }
++    };
++    prefetchWhenUsable();
++    return () => clearTimeout(timer);
++  }, [classroomPages, currentScene, loading, error, notFound]);
++
+   const generationStartedRef = useRef(false);
+ 
+   const { generateRemaining, retrySingleOutline, stop } = useSceneGenerator({
+@@ -141,6 +177,11 @@ export function ClassroomSurface({
+       const loadToken = claimStageSceneLoadToken();
+       const isCurrent = () => isEffectCurrent() && isCurrentStageSceneLoadToken(loadToken);
+       let outcome: ClassroomLoadOutcome = 'loaded';
++      const fixedStudent = studentMode && /^tbpub_[a-f0-9]{24}$/.test(classroomId);
++      let paged = false;
++      pagesRef.current?.dispose();
++      pagesRef.current = null;
++      setClassroomPages(null);
+ 
+       try {
+         await runClassroomLoad({
+@@ -150,18 +191,42 @@ export function ClassroomSurface({
+           requireServerClassroom: studentMode,
+           loadFromStorage,
+           getCurrentStage: () => useStageStore.getState().stage,
+-          fetchClassroom: defaultClassroomLoadDeps.fetchClassroom,
++          fetchClassroom: fixedStudent
++            ? async () => {
++                if (!runtimeEvents) throw new Error('课堂进度暂时无法读取，请重试。');
++                const [classroom] = await Promise.all([
++                  fetchStudentClassroomIndex(classroomId),
++                  runtimeEvents.readProgress(),
++                ]);
++                paged = classroom?.paged === true;
++                return classroom;
++              }
++            : defaultClassroomLoadDeps.fetchClassroom,
+           applyFallbackScenes: async (args) => {
+             // Stage must not mount and emit a default page-zero visit before
+             // authoritative resume has selected the already accepted page.
+             if (studentMode) {
+               if (!runtimeEvents) throw new Error('课堂进度暂时无法读取，请重试。');
+-              await runtimeEvents.readProgress();
++              if (!fixedStudent) await runtimeEvents.readProgress();
+               if (!isCurrent()) return false;
+             }
++            let initialSceneId: string | undefined;
++            let scenes = [...args.scenes];
++            if (paged && runtimeEvents && scenes.length > 0) {
++              const pages = createStudentClassroomPages(classroomId, scenes);
++              pagesRef.current = pages;
++              initialSceneId =
++                studentResumeSceneId(classroomId, scenes, runtimeEvents) ?? scenes[0].id;
++              const initial = await pages.read(initialSceneId);
++              if (!isCurrent() || !pages.active) return false;
++              scenes = scenes.map((scene) => scene.id === initial.id ? initial : scene);
++              setClassroomPages(pages);
++            }
+             return applyHydratedClassroomFallbackScenes({
+               ...args,
++              scenes,
+               isCurrent,
++              ...(paged ? { hydrateScenes: async () => scenes } : {}),
+               // Student playback owns no editor chat history. Skipping legacy
+               // chat hydration also avoids the Web Locks-only migration path
+               // on plain-HTTP LAN development origins.
+@@ -179,10 +244,9 @@ export function ClassroomSurface({
+                   // server authority on every launch.
+                   persist: !studentMode,
+                   memoryOnly: studentMode,
+-                  initialSceneId:
+-                    studentMode && runtimeEvents
+-                      ? studentResumeSceneId(classroomId, scenes, runtimeEvents)
+-                      : undefined,
++                  initialSceneId: !paged && studentMode && runtimeEvents
++                    ? studentResumeSceneId(classroomId, scenes, runtimeEvents)
++                    : initialSceneId,
+                 }),
+             });
+           },
+@@ -279,9 +343,11 @@ export function ClassroomSurface({
+     };
+     void loadUntilAvailable();
+ 
+-    // Cancel ongoing generation when classroomId changes or component unmounts
++    // Cancel ongoing generation and pending page requests on navigation.
+     return () => {
+       cancelled = true;
++      pagesRef.current?.dispose();
++      pagesRef.current = null;
+       if (retryTimer) clearTimeout(retryTimer);
+       stop();
+     };
+@@ -461,7 +527,9 @@ export function ClassroomSurface({
+               </div>
+             </div>
+           ) : (
+-            <Stage classroomId={classroomId} onRetryOutline={retrySingleOutline} />
++            <StudentClassroomPagesContext.Provider value={classroomPages}>
++              <Stage classroomId={classroomId} onRetryOutline={retrySingleOutline} />
++            </StudentClassroomPagesContext.Provider>
+           )}
+         </div>
+       </MediaStageProvider>
+diff --git a/components/edit/PlaybackChromeRoot.tsx b/components/edit/PlaybackChromeRoot.tsx
+index 9cf4a2c2a65ce116e3ecf41efa7ab466179ce4a2..68df4dccce58f0a1ed4b77dd5042216fbb4e6207 100644
+--- a/components/edit/PlaybackChromeRoot.tsx
++++ b/components/edit/PlaybackChromeRoot.tsx
+@@ -80,6 +80,7 @@ import {
+   shouldShowMiraStudentStartGate,
+ } from '@/lib/mira/student-runtime';
+ import { toast } from 'sonner';
++import { useStudentClassroomPages } from '@/lib/mira/student-classroom-pages';
+ import { requiredInteractionsBeforeScene } from '@/lib/mira/student-interaction-bridge';
+ import {
+   finishGuidedDiscussionPlayback,
+@@ -138,6 +139,16 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+   ) {
+     const { t } = useI18n();
+     const studentMode = useMiraStudentRuntime();
++    const classroomPages = useStudentClassroomPages();
++    const preparePage = useCallback(async (sceneId: string) => {
++      if (!classroomPages || sceneId === PENDING_SCENE_ID) return undefined;
++      try {
++        return await classroomPages.read(sceneId);
++      } catch {
++        if (classroomPages.active) toast.info('课件页面暂时打不开，请再试一次。');
++        return null;
++      }
++    }, [classroomPages]);
+     const studentAutoPlayRuntime = useMiraStudentAutoPlayRuntime();
+     const runtimeEvents = useMiraStudentRuntimeEvents();
+     const {
+@@ -1171,8 +1182,15 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+                   ) {
+                     return;
+                   }
+-                  autoStartRef.current = true;
+-                  stageState.setCurrentSceneId(allScenes[idx + 1].id);
++                  const target = allScenes[idx + 1].id;
++                  const requestId = sceneSwitchRequestRef.current;
++                  void preparePage(target).then((page) => {
++                    if (page === null || classroomPages?.active === false
++                        || requestId !== sceneSwitchRequestRef.current || engineRef.current !== engine
++                        || useStageStore.getState().currentSceneId !== currentScene.id) return;
++                    autoStartRef.current = true;
++                    stageState.setCurrentSceneId(target, page);
++                  });
+                 } else if (
+                   idx === allScenes.length - 1 &&
+                   stageState.generatingOutlines.length > 0
+@@ -1484,17 +1502,21 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+           setPendingSceneId(targetSceneId);
+           return false;
+         }
++        const page = await preparePage(targetSceneId);
++        if (page === null || classroomPages?.active === false || requestId !== sceneSwitchRequestRef.current) return false;
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
+         if (requestId !== sceneSwitchRequestRef.current) return false;
+         if (!(await saveDiscussionNavigation())) return false;
+         if (requestId !== sceneSwitchRequestRef.current) return false;
+         armSelectedSceneAutoStart(targetSceneId, continueOperatorPlayback);
+-        setCurrentSceneId(targetSceneId);
++        setCurrentSceneId(targetSceneId, page);
+         return true;
+       },
+       [
+         armSelectedSceneAutoStart,
++        classroomPages,
+         currentSceneId,
++        preparePage,
+         isTopicActive,
+         playbackView.phase,
+         setCurrentSceneId,
+@@ -1512,19 +1534,23 @@ export const PlaybackChromeRoot = forwardRef<PlaybackChromeRootHandle, PlaybackC
+       sceneSwitchConfirmingRef.current = true;
+       setPendingSceneId(null);
+       try {
++        const page = await preparePage(targetSceneId);
++        if (page === null || classroomPages?.active === false || requestId !== sceneSwitchRequestRef.current) return;
+         await chatAreaRef.current?.endActiveSession({ source: 'scene_switch' });
+         if (requestId !== sceneSwitchRequestRef.current) return;
+         doSessionCleanup();
+         if (!(await saveDiscussionNavigation())) return;
+         if (requestId !== sceneSwitchRequestRef.current) return;
+         armSelectedSceneAutoStart(targetSceneId);
+-        setCurrentSceneId(targetSceneId);
++        setCurrentSceneId(targetSceneId, page);
+       } finally {
+         sceneSwitchConfirmingRef.current = false;
+       }
+     }, [
+       armSelectedSceneAutoStart,
++      classroomPages,
+       pendingSceneId,
++      preparePage,
+       setCurrentSceneId,
+       doSessionCleanup,
+       saveDiscussionNavigation,
+diff --git a/components/scene-renderers/InteractiveIframeHost.tsx b/components/scene-renderers/InteractiveIframeHost.tsx
+index ad7209291de216f7d396863054bff2c9820bb2e7..1252dcf99e4675a6631621af60cc022c0ef51746 100644
+--- a/components/scene-renderers/InteractiveIframeHost.tsx
++++ b/components/scene-renderers/InteractiveIframeHost.tsx
+@@ -197,6 +197,8 @@ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+   const visibleRef = useRef(visible);
+   visibleRef.current = visible;
+   const iframeRef = useRef<HTMLIFrameElement>(null);
++  const source = entry.srcDoc ?? entry.src;
++  const [loadedSource, setLoadedSource] = useState<string>();
+   const checkpointIntroRef = useRef<((requested: boolean) => void) | null>(null);
+   const mathOperationReadyRef = useRef<string | null>(null);
+   const [readyMathOperation, setReadyMathOperation] = useState<string | null>(null);
+@@ -527,7 +529,10 @@ function PooledIframe({ sceneId, entry, visible }: PooledIframeProps) {
+         ref={iframeRef}
+         srcDoc={entry.srcDoc}
+         src={entry.srcDoc ? undefined : entry.src}
++        data-mira-student-page-ready={studentMode && shown && source && loadedSource === source
++          && (!needsCheckpoint || readyCheckpoint === checkpointKey) && mathOperationReady ? sceneId : undefined}
+         onLoad={() => {
++          setLoadedSource(source);
+           if (needsCheckpoint) { checkpointReadyRef.current = null; setReadyCheckpoint(null); }
+           if (guardedMathOperation) {
+             mathOperationReadyRef.current = null; setReadyMathOperation(null);
+diff --git a/components/scene-renderers/textbook-play.tsx b/components/scene-renderers/textbook-play.tsx
+index e7e8a20604c9c79103c903c5701afbc23cc4b80a..caf6ff5e595a6ba72677a24fefe6aabce256be30 100644
+--- a/components/scene-renderers/textbook-play.tsx
++++ b/components/scene-renderers/textbook-play.tsx
+@@ -14,6 +14,7 @@ import {
+ } from 'lucide-react';
+ import { useStageStore } from '@/lib/store';
+ import { useMiraStudentRuntimeEvents } from '@/lib/contexts/mira-student-runtime-context';
++import { useStudentClassroomPages } from '@/lib/mira/student-classroom-pages';
+ import styles from './textbook-play.module.css';
+ import {
+   PictureChoice,
+@@ -125,6 +126,7 @@ export function TextbookPlay({ section, sceneId }: { section: Section; sceneId:
+   const alive = useRef(true);
+   const inFlight = useRef(false);
+   const events = useMiraStudentRuntimeEvents();
++  const classroomPages = useStudentClassroomPages();
+   const view = snapshot?.[section];
+   useEffect(() => {
+     surface.current?.scrollTo({ top: 0, behavior: 'instant' });
+@@ -268,6 +270,18 @@ export function TextbookPlay({ section, sceneId }: { section: Section; sceneId:
+     }
+   }
+ 
++  async function openScene(target: string) {
++    try {
++      const page = await classroomPages?.read(target);
++      const store = useStageStore.getState();
++      if (alive.current && store.currentSceneId === sceneId && classroomPages?.active !== false) {
++        store.setCurrentSceneId(target, page);
++      }
++    } catch {
++      if (alive.current) setError('课件页面暂时打不开，请再试一次。');
++    }
++  }
++
+   function nextScene() {
+     silence();
+     const store = useStageStore.getState();
+@@ -277,7 +291,7 @@ export function TextbookPlay({ section, sceneId }: { section: Section; sceneId:
+       section === 'games' && snapshot?.journey
+         ? scenes.find((s) => s.miraActivity?.section === 'challenge')
+         : scenes[index + 1];
+-    if (target) store.setCurrentSceneId(target.id);
++    if (target) void openScene(target.id);
+   }
+ 
+   function drop(event: PointerEvent<HTMLButtonElement>) {
+@@ -297,6 +311,7 @@ export function TextbookPlay({ section, sceneId }: { section: Section; sceneId:
+   return (
+     <section
+       ref={surface}
++      data-mira-student-page-ready={snapshot && view ? sceneId : undefined}
+       className={styles.root}
+       aria-label={section === 'games' ? '看图互动' : '自主练习'}
+     >
+@@ -370,7 +385,7 @@ export function TextbookPlay({ section, sceneId }: { section: Section; sceneId:
+                   else {
+                     const store = useStageStore.getState();
+                     const first = store.scenes.find((s) => s.miraActivity?.section === 'games');
+-                    if (first) store.setCurrentSceneId(first.id);
++                    if (first) void openScene(first.id);
+                   }
+                 }}
+               >
+diff --git a/components/stage/scene-sidebar.tsx b/components/stage/scene-sidebar.tsx
+index 12267f99c29781ff4f4e92ea774951360982b784..279abc9712d96aaa6777ca3280c1b02594df3e29 100644
+--- a/components/stage/scene-sidebar.tsx
++++ b/components/stage/scene-sidebar.tsx
+@@ -170,7 +170,7 @@ export function SceneSidebar({
+           {scenes.map((scene, index) => {
+             const isActive = currentSceneId === scene.id;
+             const Icon = getSceneTypeIcon(scene.type);
+-            const isSlide = scene.type === 'slide';
++            const isSlide = scene.type === 'slide' && !scene.miraPageSummary;
+             const isInteractive = scene.type === 'interactive';
+             const slideContent = isSlide ? (scene.content as SlideContent) : null;
+             const interactiveContent = isInteractive ? (scene.content as InteractiveContent) : null;
+@@ -266,7 +266,7 @@ export function SceneSidebar({
+                           ))}
+                         </div>
+                       </div>
+-                    ) : scene.type === 'interactive' && interactiveContent?.html ? (
++                    ) : scene.type === 'interactive' && !scene.miraPageSummary && interactiveContent?.html ? (
+                       /* Interactive: live iframe preview */
+                       <ThumbnailInteractive
+                         content={interactiveContent}
+diff --git a/lib/classroom/load-classroom.ts b/lib/classroom/load-classroom.ts
+index 1f27d4f8d1fbd1f475cd1b02cba2a357518dbc27..79438aec344386f33b958cadbae539fa8b0a285d 100644
+--- a/lib/classroom/load-classroom.ts
++++ b/lib/classroom/load-classroom.ts
+@@ -27,6 +27,7 @@ import {
+ export interface ClassroomPayload {
+   stage: Stage;
+   scenes: Scene[];
++  paged?: true;
+ }
+ 
+ interface Logger {
+diff --git a/lib/mira/student-classroom-pages.ts b/lib/mira/student-classroom-pages.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..e07b7a9c53c563d766f487b33c3469ee06a56ae9
+--- /dev/null
++++ b/lib/mira/student-classroom-pages.ts
+@@ -0,0 +1,59 @@
++'use client';
++
++import { createContext, useContext } from 'react';
++import { hydrateClassroomFallbackScenes } from '@/lib/classroom/pbl-fallback-hydration';
++import type { ClassroomPayload } from '@/lib/classroom/load-classroom';
++import type { Scene } from '@/lib/types/stage';
++
++export async function fetchStudentClassroomIndex(classroomId: string) {
++  const response = await fetch(`/api/classroom?id=${encodeURIComponent(classroomId)}&view=pages`);
++  if (!response.ok) return null;
++  const data: { success?: boolean; classroom?: ClassroomPayload } = await response.json();
++  return data.success && data.classroom?.stage.id === classroomId ? data.classroom : null;
++}
++
++export function createStudentClassroomPages(classroomId: string, directory: readonly Scene[]) {
++  const summaries = new Map(directory.map((scene) => [scene.id, scene]));
++  const requested = new Map<string, Promise<Scene>>();
++  const controller = new AbortController();
++
++  return {
++    get active() { return !controller.signal.aborted; },
++    dispose() {
++      controller.abort();
++      requested.clear();
++    },
++    read(sceneId: string, priority: 'high' | 'low' = 'high'): Promise<Scene> {
++      const summary = summaries.get(sceneId);
++      if (!summary || controller.signal.aborted) {
++        return Promise.reject(new Error('课件页面已不可用，请重新进入课堂。'));
++      }
++      const existing = requested.get(sceneId);
++      if (existing) return existing;
++      const query = new URLSearchParams({ id: classroomId, scene: sceneId });
++      const page = (async () => {
++        const response = await fetch(`/api/classroom?${query}`, { signal: controller.signal, priority });
++        if (!response.ok) throw new Error('课件页面暂时打不开，请再试一次。');
++        const data: { success?: boolean; scene?: Scene } = await response.json();
++        const scene = data.scene;
++        if (!data.success || !scene || scene.id !== sceneId || scene.stageId !== classroomId
++            || scene.order !== summary.order || scene.type !== summary.type
++            || scene.content?.type !== summary.type || scene.miraPageSummary) {
++          throw new Error('课件页面与当前课堂不一致，请重新进入课堂。');
++        }
++        const [hydrated] = await hydrateClassroomFallbackScenes(classroomId, [scene]);
++        controller.signal.throwIfAborted();
++        return hydrated;
++      })().catch((error: unknown) => {
++        requested.delete(sceneId);
++        throw error;
++      });
++      requested.set(sceneId, page);
++      return page;
++    },
++  };
++}
++
++export type StudentClassroomPages = ReturnType<typeof createStudentClassroomPages>;
++export const StudentClassroomPagesContext = createContext<StudentClassroomPages | null>(null);
++export const useStudentClassroomPages = () => useContext(StudentClassroomPagesContext);
+diff --git a/lib/store/stage.ts b/lib/store/stage.ts
+index b8fcc0f503dde572547cc487d3da6c077d96c0c2..073675eec731041ff8f74607596d26006043ac41 100644
+--- a/lib/store/stage.ts
++++ b/lib/store/stage.ts
+@@ -357,7 +357,7 @@ interface StageState {
+   insertSceneAfter: (anchorSceneId: string, scene: Scene) => void;
+   updateScene: (sceneId: string, updates: ScenePatch) => void;
+   deleteScene: (sceneId: string) => void;
+-  setCurrentSceneId: (sceneId: string | null) => void;
++  setCurrentSceneId: (sceneId: string | null, deliveredPage?: Scene) => void;
+   setChats: (chats: ChatSession[]) => void;
+   setMode: (mode: StageMode) => void;
+   setToolbarState: (state: ToolbarState) => void;
+@@ -702,7 +702,18 @@ const useStageStoreBase = create<StageState>()((set, get) => ({
+     );
+   },
+ 
+-  setCurrentSceneId: (sceneId) => {
++  setCurrentSceneId: (sceneId, deliveredPage) => {
++    const { scenes, stage, persistenceMode } = get();
++    const target = scenes.find((scene) => scene.id === sceneId);
++    if (target?.miraPageSummary) {
++      if (!deliveredPage || deliveredPage.id !== sceneId || deliveredPage.stageId !== stage?.id
++          || persistenceMode !== 'memory-only') return;
++      set({
++        currentSceneId: sceneId,
++        scenes: scenes.map((scene) => scene === target ? deliveredPage : scene),
++      });
++      return;
++    }
+     set({ currentSceneId: sceneId });
+     markPendingChanges(get().stage?.id, { kind: 'currentScene' });
+   },
+diff --git a/lib/types/stage.ts b/lib/types/stage.ts
+index 12f441499dc9f48d391133a0e590e028f0366bc3..5492138c0ab04f07f803af3817c4c6bac90e5e93 100644
+--- a/lib/types/stage.ts
++++ b/lib/types/stage.ts
+@@ -97,6 +97,8 @@ export type SceneContent = AppSceneContent;
+  * all four kinds).
+  */
+ export type AppScene = DslScene<Action, SceneContent> & {
++  /** A fixed-textbook directory entry. Only a delivered page may be played. */
++  miraPageSummary?: true;
+   /** Gateway-only delivery metadata, derived before sandbox media embedding.
+    * Not an authored/persisted DSL field or permission to skip arbitrary speech.
+    */
+diff --git a/tests/mira/student-classroom-pages.test.ts b/tests/mira/student-classroom-pages.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..f9b6b2ca40abf803bae7f203029b411da0e33c87
+--- /dev/null
++++ b/tests/mira/student-classroom-pages.test.ts
+@@ -0,0 +1,55 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { createStudentClassroomPages } from '@/lib/mira/student-classroom-pages';
++import type { Scene } from '@/lib/types/stage';
++
++vi.mock('@/lib/classroom/pbl-fallback-hydration', () => ({
++  hydrateClassroomFallbackScenes: async (_id: string, scenes: Scene[]) => scenes,
++}));
++
++const classroomId = 'tbpub_' + 'a'.repeat(24);
++const summary = (id: string, order: number): Scene => ({
++  id, stageId: classroomId, order, title: id, type: 'interactive',
++  content: { type: 'interactive', html: '' }, miraPageSummary: true,
++});
++const first = summary('first', 1);
++const second = summary('second', 2);
++const fullPage = (scene: Scene) => ({ ...scene, miraPageSummary: undefined,
++  content: { type: 'interactive', html: '<button>开始</button>' } });
++
++afterEach(() => vi.unstubAllGlobals());
++
++describe('fixed textbook page requests', () => {
++  it('starts with the resumed page and reuses an in-flight prefetch when the student turns the page', async () => {
++    const fetcher = vi.fn(async (url: string) => {
++      const scene = url.endsWith('scene=first') ? first : second;
++      return Response.json({ success: true, scene: fullPage(scene) });
++    });
++    vi.stubGlobal('fetch', fetcher);
++    const pages = createStudentClassroomPages(classroomId, [first, second]);
++    expect(fetcher).not.toHaveBeenCalled();
++    await expect(pages.read(second.id)).resolves.toMatchObject({ id: second.id });
++    expect(fetcher).toHaveBeenCalledTimes(1);
++    expect(fetcher.mock.calls[0][0]).toContain('scene=second');
++    const prefetch = pages.read(first.id, 'low');
++    expect(pages.read(first.id)).toBe(prefetch);
++    await expect(prefetch).resolves.toMatchObject({ id: first.id });
++    expect(fetcher).toHaveBeenCalledTimes(2);
++  });
++
++  it('retries a failed prefetch, rejects a mismatched page and stops work when leaving the classroom', async () => {
++    const fetcher = vi.fn()
++      .mockResolvedValueOnce(new Response(null, { status: 503 }))
++      .mockResolvedValueOnce(Response.json({ success: true, scene: fullPage(second) }))
++      .mockResolvedValueOnce(Response.json({ success: true, scene: fullPage(first) }));
++    vi.stubGlobal('fetch', fetcher);
++    const pages = createStudentClassroomPages(classroomId, [first, second]);
++    await expect(pages.read(first.id, 'low')).rejects.toThrow('暂时打不开');
++    await expect(pages.read(first.id)).rejects.toThrow('不一致');
++    await expect(pages.read(first.id)).resolves.toMatchObject({ id: first.id });
++    const signal = fetcher.mock.calls[2][1].signal as AbortSignal;
++    pages.dispose();
++    expect(signal.aborted).toBe(true);
++    await expect(pages.read(second.id)).rejects.toThrow('不可用');
++    expect(fetcher).toHaveBeenCalledTimes(3);
++  });
++});

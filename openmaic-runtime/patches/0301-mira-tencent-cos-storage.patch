@@ -1,0 +1,136 @@
+diff --git a/lib/server/classroom-media-object-store.ts b/lib/server/classroom-media-object-store.ts
+--- a/lib/server/classroom-media-object-store.ts
++++ b/lib/server/classroom-media-object-store.ts
+@@ -3,7 +3,8 @@
+ import path from 'node:path';
+ import { GetObjectCommand, HeadObjectCommand, S3Client } from '@aws-sdk/client-s3';
+ import type { ClassroomMediaRange } from './classroom-media-range';
+-import { courseStorageAsset, readCourseStorageAsset } from './course-storage-registry';
++import { courseStorageAsset, readCourseStorageAsset } from './course-storage-registry';
++import { courseStorageForcePathStyle } from './course-storage-addressing';
+ 
+ const NATIVE_MEDIA_ROOT = 'openmaic-runtime/.runtime/OpenMAIC/data/classrooms/';
+ const MAX_MANIFEST_BYTES = 64 * 1024 * 1024;
+@@ -199,30 +200,32 @@
+ 
+ let clientCache: { identity: string; client: S3Client } | undefined;
+ 
+-function storageClient(config: StorageConfig): S3Client {
+-  const identity = JSON.stringify([
+-    config.endpoint,
+-    config.region,
+-    config.accessKeyId,
+-    config.secretAccessKey,
+-  ]);
+-  if (clientCache?.identity !== identity) {
+-    clientCache?.client.destroy();
+-    clientCache = {
+-      identity,
+-      client: new S3Client({
+-        endpoint: config.endpoint,
+-        region: config.region,
+-        forcePathStyle: true,
+-        credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey },
+-        maxAttempts: 2,
+-        requestChecksumCalculation: 'WHEN_REQUIRED',
+-        responseChecksumValidation: 'WHEN_REQUIRED',
+-      }),
+-    };
+-  }
+-  return clientCache.client;
+-}
++function storageClient(config: StorageConfig): S3Client {
++  const forcePathStyle = courseStorageForcePathStyle(config);
++  const identity = JSON.stringify([
++    forcePathStyle,
++    config.endpoint,
++    config.region,
++    config.accessKeyId,
++    config.secretAccessKey,
++  ]);
++  if (clientCache?.identity !== identity) {
++    clientCache?.client.destroy();
++    clientCache = {
++      identity,
++      client: new S3Client({
++        endpoint: config.endpoint,
++        region: config.region,
++        forcePathStyle,
++        credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey },
++        maxAttempts: 2,
++        requestChecksumCalculation: 'WHEN_REQUIRED',
++        responseChecksumValidation: 'WHEN_REQUIRED',
++      }),
++    };
++  }
++  return clientCache.client;
++}
+ 
+ function mappedError(error: unknown): ClassroomMediaStorageError {
+   if (error instanceof ClassroomMediaStorageError) return error;
+diff --git a/lib/server/course-storage-addressing.ts b/lib/server/course-storage-addressing.ts
+new file mode 100644
+--- /dev/null
++++ b/lib/server/course-storage-addressing.ts
+@@ -0,0 +1,21 @@
++/** Storage addressing stays in the private server environment. */
++export function courseStorageForcePathStyle(
++  storage: { endpoint: string; bucket: string; region: string },
++  environment: NodeJS.ProcessEnv = process.env,
++): boolean {
++  const provider = environment.COURSE_STORAGE_PROVIDER?.trim() || 's3-compatible';
++  const style = environment.COURSE_STORAGE_ADDRESSING_STYLE?.trim() ||
++    (provider === 'tencent-cos' ? 'virtual' : 'path');
++  const invalid = () => { throw new Error('Course storage configuration invalid'); };
++  if (!['s3-compatible', 'tencent-cos'].includes(provider) || !['path', 'virtual'].includes(style))
++    return invalid();
++  if (provider === 'tencent-cos') {
++    const url = new URL(storage.endpoint);
++    if (style !== 'virtual' || url.protocol !== 'https:' || url.port || url.username ||
++        url.password || url.pathname !== '/' || url.search || url.hash ||
++        url.hostname !== `cos.${storage.region}.myqcloud.com` ||
++        !/^[a-z0-9][a-z0-9.-]{1,48}-[1-9][0-9]{4,}$/.test(storage.bucket))
++      return invalid();
++  }
++  return style === 'path';
++}
+diff --git a/tests/server/course-storage-addressing.test.ts b/tests/server/course-storage-addressing.test.ts
+new file mode 100644
+--- /dev/null
++++ b/tests/server/course-storage-addressing.test.ts
+@@ -0,0 +1,35 @@
++import { expect, it } from 'vitest';
++import { courseStorageForcePathStyle } from '@/lib/server/course-storage-addressing';
++
++const cos = {
++  endpoint: 'https://cos.ap-guangzhou.myqcloud.com',
++  bucket: 'study-1350855375',
++  region: 'ap-guangzhou',
++};
++
++it('keeps existing MinIO path addressing and selects virtual hosts for COS', () => {
++  expect(courseStorageForcePathStyle({
++    endpoint: 'http://minio.invalid:9000', bucket: 'study', region: 'us-east-1',
++  }, {})).toBe(true);
++  expect(courseStorageForcePathStyle(cos, { COURSE_STORAGE_PROVIDER: 'tencent-cos' })).toBe(false);
++});
++
++it('rejects unsafe or incompatible COS endpoints before credentials are sent', () => {
++  for (const endpoint of [
++    'http://cos.ap-guangzhou.myqcloud.com',
++    'https://study-1350855375.cos.ap-guangzhou.myqcloud.com',
++    'https://cos.ap-shanghai.myqcloud.com',
++    'https://cos.ap-guangzhou.myqcloud.com/private',
++    'https://user:secret@cos.ap-guangzhou.myqcloud.com',
++  ]) expect(() => courseStorageForcePathStyle({ ...cos, endpoint },
++    { COURSE_STORAGE_PROVIDER: 'tencent-cos' })).toThrow();
++  expect(() => courseStorageForcePathStyle(cos, {
++    COURSE_STORAGE_PROVIDER: 'tencent-cos', COURSE_STORAGE_ADDRESSING_STYLE: 'path',
++  })).toThrow();
++});
++
++it('rejects unknown providers and allows explicit virtual S3-compatible addressing', () => {
++  expect(() => courseStorageForcePathStyle(cos, { COURSE_STORAGE_PROVIDER: 'typo' })).toThrow();
++  expect(() => courseStorageForcePathStyle(cos, { COURSE_STORAGE_ADDRESSING_STYLE: 'typo' })).toThrow();
++  expect(courseStorageForcePathStyle(cos, { COURSE_STORAGE_ADDRESSING_STYLE: 'virtual' })).toBe(false);
++});

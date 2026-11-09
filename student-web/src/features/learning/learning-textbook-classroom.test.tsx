@@ -11,6 +11,34 @@ const student = { id: 'student-a', childId: 'child-a', displayName: '乐乐', gr
 const launch = { ok: true, contentKey, title: '课堂', editionId: 'book', revisionId: 'review-1', unitId: 'u1', learningSessionId: 'session', launchUrl: 'http://localhost:3101/mira/textbook-launch?token=test-only' };
 
 describe('classroom entry recovery', () => {
+  it('switches to the sibling section first, then offers the shared check only after verified progress', async () => {
+    const sections = [
+      { nodeId: 'part-a', title: '第一部分', firstPage: 2, lastPage: 8, listened: false },
+      { nodeId: 'part-b', title: '第二部分', firstPage: 9, lastPage: 16, listened: false },
+    ];
+    const fetch = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ...launch, entry: 'part-a', sectionProgress: { sections, checkReady: false } })))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        sections: [{ ...sections[0], listened: true }, sections[1]], checkReady: false,
+      })))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        sections: sections.map(section => ({ ...section, listened: true })), checkReady: true,
+      })));
+    vi.stubGlobal('fetch', fetch);
+    render(<LearningTextbookClassroom student={student} contentKey={contentKey} requestedEntry="part-a" />);
+    const frame = await screen.findByTitle('第一部分') as HTMLIFrameElement;
+    expect(fetch.mock.calls[0][1].body).toBe('{"entry":"part-a"}');
+    expect(screen.getByText('第 2–8 页')).toBeVisible();
+    expect(screen.queryByRole('link', { name: '做共用小检查' })).not.toBeInTheDocument();
+    fireEvent(window, new MessageEvent('message', { source: frame.contentWindow, origin: 'http://localhost:3101',
+      data: { type: 'mira.textbook.ready' } }));
+    expect(await screen.findByRole('link', { name: '去学《第二部分》' })).toHaveAttribute('href',
+      `/learning/textbooks/courses/${contentKey}?entry=part-b`);
+    fireEvent(document, new Event('visibilitychange'));
+    expect(await screen.findByRole('link', { name: '做共用小检查' })).toHaveAttribute('href',
+      `/learning/textbooks/courses/${contentKey}?entry=shared-check`);
+  });
+
   it('ends a stalled launch, retries explicitly, and ignores the expired response', async () => {
     vi.useFakeTimers();
     let finishExpired!: (value: Response) => void;
@@ -61,7 +89,7 @@ describe('classroom entry recovery', () => {
     render(<LearningTextbookClassroom student={student} contentKey={contentKey} />);
     await act(async () => {});
     expect(screen.getByTitle('课堂')).toBeInTheDocument();
-    await act(() => vi.advanceTimersByTimeAsync(12_000));
+    await act(() => vi.advanceTimersByTimeAsync(50_000));
     expect(screen.getByRole('alert')).toHaveTextContent('课堂暂时没有打开');
     await act(async () => { fireEvent.click(screen.getByRole('button', { name: '重新进入' })); });
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -69,16 +97,18 @@ describe('classroom entry recovery', () => {
     expect(screen.getByRole('status')).toHaveTextContent('正在翻开课本');
   });
 
-  it('accepts a late classroom readiness signal after the timeout', async () => {
+  it('continues the same classroom load on a slow connection and opens when ready', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('fetch', vi.fn().mockImplementation(() => Promise.resolve(new Response(JSON.stringify(launch)))));
     render(<LearningTextbookClassroom student={student} contentKey={contentKey} />);
     await act(async () => {});
     const frame = screen.getByTitle('课堂') as HTMLIFrameElement;
     await act(() => vi.advanceTimersByTimeAsync(12_000));
-    expect(screen.getByRole('alert')).toBeVisible();
-    fireEvent(window, new MessageEvent('message', { source: frame.contentWindow, origin: 'http://localhost:3101', data: { type: 'mira.textbook.ready' } }));
+    expect(screen.getByRole('status')).toHaveTextContent('课件还在加载');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '重新进入' })).not.toBeInTheDocument();
+    fireEvent(window, new MessageEvent('message', { source: frame.contentWindow, origin: 'http://localhost:3101', data: { type: 'mira.textbook.ready' } }));
+    expect(screen.queryByText('课件还在加载…')).not.toBeInTheDocument();
     expect(frame).toBeInTheDocument();
   });
 });

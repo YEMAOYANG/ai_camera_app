@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleAlert, Clock3, Orbit } from "lucide-react";
+import { BookOpen, CircleAlert } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { DocumentLink } from "@/components/navigation/document-link";
@@ -194,13 +194,13 @@ export function ClassroomEntry({
 
 function ClassroomPreparing({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <main id="main-content" className="space-route-state">
-      <div className="space-route-state-content">
-        <span className="space-route-orbit" aria-hidden="true"><Orbit /></span>
-        <p className="space-route-eyebrow"><Clock3 className="size-5" aria-hidden="true" />课程制作中</p>
+    <main id="main-content" className="mira-ui-surface student-session-screen">
+      <div className="student-session-state">
+        <span className="student-session-icon" aria-hidden="true"><BookOpen size={28} /></span>
+        <p>课程制作中</p>
         <h1>老师正在把课件和声音准备好</h1>
         <p>{message || "通过内容、语音和课堂运行检查后，这节课就会自动开放。"}</p>
-        <div className="space-route-actions"><Button asChild><DocumentLink href="/learning">看看其他课程</DocumentLink></Button><Button variant="secondary" onClick={onRetry}>重新检查</Button></div>
+        <div className="flex flex-wrap justify-center gap-3 pt-2"><Button asChild><DocumentLink href="/learning">看看其他课程</DocumentLink></Button><Button variant="secondary" onClick={onRetry}>重新检查</Button></div>
       </div>
     </main>
   );
@@ -208,13 +208,13 @@ function ClassroomPreparing({ message, onRetry }: { message: string; onRetry: ()
 
 function OpenMaicRuntimeError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <main id="main-content" className="space-route-state" role="alert">
-      <div className="space-route-state-content">
-        <span className="space-route-orbit is-warning" aria-hidden="true"><CircleAlert /></span>
-        <p className="space-route-eyebrow">完整课堂未就绪</p>
+    <main id="main-content" className="mira-ui-surface student-session-screen" role="alert">
+      <div className="student-session-state">
+        <span className="student-session-icon" aria-hidden="true"><CircleAlert size={28} /></span>
+        <p>完整课堂未就绪</p>
         <h1>完整互动课堂暂时打不开</h1>
         <p>{message || "课堂运行服务暂时不可用。请重新检查；如果仍未恢复，请让家长检查课堂运行、语音服务和麦克风安全域名配置。"}</p>
-        <div className="space-route-actions"><Button onClick={onRetry}>重新检查</Button><Button variant="secondary" asChild><DocumentLink href="/learning">返回课程列表</DocumentLink></Button></div>
+        <div className="flex flex-wrap justify-center gap-3 pt-2"><Button onClick={onRetry}>重新检查</Button><Button variant="secondary" asChild><DocumentLink href="/learning">返回课程列表</DocumentLink></Button></div>
       </div>
     </main>
   );

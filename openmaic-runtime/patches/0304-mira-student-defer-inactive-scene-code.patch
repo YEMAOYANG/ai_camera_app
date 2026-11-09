@@ -1,0 +1,224 @@
+diff --git a/components/canvas/canvas-area.tsx b/components/canvas/canvas-area.tsx
+index dc507b8d393e1224e2b50ceb1f53d48314eca6d0..afa2d50a5c476a5b4a60b2c10ef0674898666c85 100644
+--- a/components/canvas/canvas-area.tsx
++++ b/components/canvas/canvas-area.tsx
+@@ -1,12 +1,12 @@
+ 'use client';
+ 
+-import { useCallback, type ReactNode } from 'react';
++import { useCallback, useState, type ReactNode } from 'react';
++import dynamic from 'next/dynamic';
+ import { motion, AnimatePresence } from 'motion/react';
+ import { Play } from 'lucide-react';
+ import { cn } from '@/lib/utils';
+ import { SceneRenderer } from '@/components/stage/scene-renderer';
+ import { SceneProvider } from '@/lib/contexts/scene-context';
+-import { Whiteboard } from '@/components/whiteboard';
+ import { CanvasToolbar } from '@/components/canvas/canvas-toolbar';
+ import type { CanvasToolbarProps } from '@/components/canvas/canvas-toolbar';
+ import type { Scene, StageMode } from '@/lib/types/stage';
+@@ -14,6 +14,9 @@ import { useI18n } from '@/lib/hooks/use-i18n';
+ import { ClassroomCompletePageConnected } from '@/components/scene-renderers/classroom-complete';
+ import { ContainBox } from '@/components/edit/ContainBox';
+ import { useInWorkbenchPanel } from '@/lib/workbench/panel-context';
++import { useStudentClassroomPages } from '@/lib/mira/student-classroom-pages';
++
++const Whiteboard = dynamic(() => import('@/components/whiteboard').then((module) => module.Whiteboard));
+ 
+ interface CanvasAreaProps extends CanvasToolbarProps {
+   readonly currentScene: Scene | null;
+@@ -56,6 +59,9 @@ export function CanvasArea({
+ }: CanvasAreaProps) {
+   const { t } = useI18n();
+   const inWorkbenchPanel = useInWorkbenchPanel();
++  const classroomPages = useStudentClassroomPages();
++  const [whiteboardWasOpened, setWhiteboardWasOpened] = useState(whiteboardOpen);
++  if (whiteboardOpen && !whiteboardWasOpened) setWhiteboardWasOpened(true);
+   const showControls = mode === 'playback' && !whiteboardOpen;
+   const showPlayHint =
+     showControls &&
+@@ -125,7 +131,9 @@ export function CanvasArea({
+           <div className="absolute inset-0 z-[110] pointer-events-none"
+             data-mira-whiteboard-scene={whiteboardOpen ? currentScene?.id : undefined}>
+             <SceneProvider>
+-              <Whiteboard isOpen={whiteboardOpen} onClose={onWhiteboardClose} />
++              {(!classroomPages || whiteboardOpen || whiteboardWasOpened) && (
++                <Whiteboard isOpen={whiteboardOpen} onClose={onWhiteboardClose} />
++              )}
+             </SceneProvider>
+           </div>
+ 
+diff --git a/components/classroom/ClassroomSurface.tsx b/components/classroom/ClassroomSurface.tsx
+index f618be0fcdfcf3b2f8db485e0eff06ae55fc906f..f6d925fe16384372a91f17363e38791f853c4a86 100644
+--- a/components/classroom/ClassroomSurface.tsx
++++ b/components/classroom/ClassroomSurface.tsx
+@@ -25,6 +25,7 @@
+  */
+ 
+ import { Stage } from '@/components/stage';
++import { preloadStudentSceneRenderer } from '@/components/stage/scene-renderer';
+ import { ThemeProvider } from '@/lib/hooks/use-theme';
+ import { useStageStore } from '@/lib/store';
+ import { useSettingsStore } from '@/lib/store/settings';
+@@ -73,7 +74,7 @@ import {
+ const log = createLogger('Classroom');
+ 
+ function hasUsableStudentPage(root: HTMLElement | null, scene: Scene, paged: boolean) {
+-  if (scene.miraPageSummary || !hasVisibleStudentClassroom(root, scene.id)) return false;
++  if (scene.miraPageSummary || !hasVisibleStudentClassroom(root, scene.id, paged)) return false;
+   if (!paged || (scene.type !== 'interactive' && !scene.miraActivity)) return true;
+   // The interactive canvas lays out before the opaque iframe has parsed its
+   // document. Native activities likewise need their initial state first.
+@@ -155,6 +156,7 @@ export function ClassroomSurface({
+     const prefetchWhenUsable = () => {
+       if (!classroomPages.active || useStageStore.getState().currentSceneId !== currentScene.id) return;
+       if (hasUsableStudentPage(surfaceRef.current, currentScene, true)) {
++        preloadStudentSceneRenderer(next);
+         void classroomPages.read(next.id, 'low').catch(() => { /* A later page selection retries. */ });
+       } else if (remainingChecks-- > 0) {
+         timer = setTimeout(prefetchWhenUsable, 100);
+@@ -217,6 +219,8 @@ export function ClassroomSurface({
+               pagesRef.current = pages;
+               initialSceneId =
+                 studentResumeSceneId(classroomId, scenes, runtimeEvents) ?? scenes[0].id;
++              const initialSummary = scenes.find((scene) => scene.id === initialSceneId);
++              if (initialSummary) preloadStudentSceneRenderer(initialSummary);
+               const initial = await pages.read(initialSceneId);
+               if (!isCurrent() || !pages.active) return false;
+               scenes = scenes.map((scene) => scene.id === initial.id ? initial : scene);
+diff --git a/components/stage/scene-renderer.tsx b/components/stage/scene-renderer.tsx
+index 7bce17ad9ff121285ae4655f7681abbe8c61a471..b99bf3f6c8278f55d472698d1148782245d24986 100644
+--- a/components/stage/scene-renderer.tsx
++++ b/components/stage/scene-renderer.tsx
+@@ -1,14 +1,25 @@
+ 'use client';
+ 
+-import { useMemo } from 'react';
++import { lazy, Suspense, useMemo } from 'react';
+ import type { Scene, StageMode } from '@/lib/types/stage';
+-import { SlideEditor as SlideRenderer } from '../slide-renderer/Editor';
+-import { QuizView } from '../scene-renderers/quiz-view';
+ import { InteractiveRenderer } from '../scene-renderers/interactive-renderer';
+-import { PBLRenderer } from '../scene-renderers/pbl-renderer';
+-import { TextbookPlay } from '../scene-renderers/textbook-play';
+ import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
++const loadSlide = () => import('../slide-renderer/Editor');
++const loadQuiz = () => import('../scene-renderers/quiz-view');
++const loadProject = () => import('../scene-renderers/pbl-renderer');
++const loadActivity = () => import('../scene-renderers/textbook-play');
++const SlideRenderer = lazy(async () => ({ default: (await loadSlide()).SlideEditor }));
++const QuizView = lazy(async () => ({ default: (await loadQuiz()).QuizView }));
++const PBLRenderer = lazy(async () => ({ default: (await loadProject()).PBLRenderer }));
++const TextbookPlay = lazy(async () => ({ default: (await loadActivity()).TextbookPlay }));
++const pageRenderers = { slide: loadSlide, quiz: loadQuiz, pbl: loadProject, interactive: null };
++
++export function preloadStudentSceneRenderer(scene: Scene) {
++  const load = scene.miraActivity ? loadActivity : pageRenderers[scene.type];
++  void load?.().catch(() => { /* Rendering can retry a failed preload. */ });
++}
++
+ interface SceneRendererProps {
+   readonly scene: Scene;
+   readonly mode: StageMode;
+@@ -50,5 +61,9 @@ export function SceneRenderer({ scene, mode }: SceneRendererProps) {
+     }
+   }, [scene, mode, studentMode]);
+ 
+-  return <div className="w-full h-full">{renderer}</div>;
++  return (
++    <Suspense fallback={<div className="w-full h-full" aria-busy="true" />}>
++      <div data-mira-rendered-scene={scene.id} className="w-full h-full">{renderer}</div>
++    </Suspense>
++  );
+ }
+diff --git a/components/stage/scene-sidebar.tsx b/components/stage/scene-sidebar.tsx
+index 279abc9712d96aaa6777ca3280c1b02594df3e29..c85ceafcdecb857b6fff71f3f47549f65bf54a63 100644
+--- a/components/stage/scene-sidebar.tsx
++++ b/components/stage/scene-sidebar.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useState, useRef, useCallback } from 'react';
+ import { useRouter } from 'next/navigation';
++import dynamic from 'next/dynamic';
+ import {
+   PanelLeftClose,
+   PieChart,
+@@ -14,7 +15,6 @@ import {
+   Trophy,
+ } from 'lucide-react';
+ import { cn } from '@/lib/utils';
+-import { SlideThumbnail } from '@/components/slide-renderer/SlideThumbnail';
+ import { ThumbnailInteractive } from '@/components/slide-renderer/components/ThumbnailInteractive';
+ import { useStageStore, useCanvasStore } from '@/lib/store';
+ import { useI18n } from '@/lib/hooks/use-i18n';
+@@ -22,6 +22,10 @@ import type { SceneType, SlideContent, InteractiveContent } from '@/lib/types/st
+ import { PENDING_SCENE_ID } from '@/lib/store/stage';
+ import { useMiraStudentRuntime } from '@/lib/contexts/mira-student-runtime-context';
+ 
++const SlideThumbnail = dynamic(() =>
++  import('@/components/slide-renderer/SlideThumbnail').then((module) => module.SlideThumbnail),
++);
++
+ interface SceneSidebarProps {
+   readonly collapsed: boolean;
+   readonly onCollapseChange: (collapsed: boolean) => void;
+@@ -223,7 +227,7 @@ export function SceneSidebar({
+                   className="relative aspect-video w-full rounded overflow-hidden bg-gray-100 dark:bg-gray-800 ring-1 ring-black/5 dark:ring-white/5"
+                 >
+                   <div className="absolute inset-0 flex items-center justify-center">
+-                    {isSlide && slideContent ? (
++                    {isSlide && slideContent && (!studentMode || !collapsed) ? (
+                       <SlideThumbnail
+                         slide={slideContent.canvas}
+                         sceneId={scene.id}
+diff --git a/lib/mira/student-parent-ready.ts b/lib/mira/student-parent-ready.ts
+index a23f58980660464df3bc6de3f36740d6f1d77816..4283641303e521d6adcb7664d941f3af6825f1ea 100644
+--- a/lib/mira/student-parent-ready.ts
++++ b/lib/mira/student-parent-ready.ts
+@@ -66,12 +66,17 @@ export function connectStudentParentReady(
+ }
+ 
+ /** The current scene or its open whiteboard must have a laid-out playback canvas. */
+-export function hasVisibleStudentClassroom(root: HTMLElement | null, sceneId: string): boolean {
++export function hasVisibleStudentClassroom(
++  root: HTMLElement | null, sceneId: string, requireRenderedScene = false,
++): boolean {
+   if (!root?.isConnected || !sceneId) return false;
+   const shell = root.querySelector<HTMLElement>('[data-mira-playback-shell="storybook"]');
+   const scene = shell?.querySelector<HTMLElement>('[data-mira-scene-content], [data-mira-whiteboard-scene]');
+   if (!scene || (scene.getAttribute('data-mira-scene-content') ?? scene.getAttribute('data-mira-whiteboard-scene')) !== sceneId
+       || !scene.isConnected) return false;
++  if (requireRenderedScene && scene.hasAttribute('data-mira-scene-content')
++      && scene.querySelector('[data-mira-rendered-scene]')?.getAttribute('data-mira-rendered-scene') !== sceneId)
++    return false;
+   const view = root.ownerDocument.defaultView;
+   if (!view) return false;
+   const box = scene.getBoundingClientRect();
+diff --git a/tests/runtime/student-parent-ready.test.ts b/tests/runtime/student-parent-ready.test.ts
+index 7704f969fd930a963a47ffe69dcedc18cddd8988..1835e6d8e757ffb3fbd3f7f01bab1bd8ffe321ac 100644
+--- a/tests/runtime/student-parent-ready.test.ts
++++ b/tests/runtime/student-parent-ready.test.ts
+@@ -76,6 +76,22 @@ describe('student parent readiness channel', () => {
+     } finally { styles.mockRestore(); root.remove(); }
+   });
+ 
++  it('waits for a paged scene renderer to commit before declaring readiness', () => {
++    const root = document.createElement('div');
++    root.innerHTML = '<div data-mira-playback-shell="storybook"><div data-mira-scene-content="page-2"></div></div>';
++    document.body.appendChild(root);
++    const scene = root.querySelector('[data-mira-scene-content]')!;
++    vi.spyOn(scene, 'getBoundingClientRect').mockReturnValue({ width: 800, height: 450 } as DOMRect);
++    const styles = vi.spyOn(window, 'getComputedStyle').mockReturnValue({ display: 'block', visibility: 'visible', opacity: '1' } as CSSStyleDeclaration);
++    try {
++      expect(hasVisibleStudentClassroom(root, 'page-2', true)).toBe(false);
++      scene.innerHTML = '<div data-mira-rendered-scene="page-1"></div>';
++      expect(hasVisibleStudentClassroom(root, 'page-2', true)).toBe(false);
++      scene.innerHTML = '<div data-mira-rendered-scene="page-2"></div>';
++      expect(hasVisibleStudentClassroom(root, 'page-2', true)).toBe(true);
++    } finally { styles.mockRestore(); root.remove(); }
++  });
++
+   it('accepts the visible whiteboard for the current scene without accepting a previous scene', () => {
+     const root = document.createElement('div'); const shell = document.createElement('div');
+     const whiteboard = document.createElement('div'); document.body.appendChild(root);
